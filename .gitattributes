@@ -1,0 +1,5 @@
+# Set default behaviour, in case users don't have core.autocrlf set.
+* text=auto
+
+# Set to always use Windows line endings
+*.cs text eol=crlf
