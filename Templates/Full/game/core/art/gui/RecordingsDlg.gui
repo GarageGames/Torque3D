@@ -1,0 +1,99 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(recordingsDlg) {
+   profile = "GuiDefaultProfile";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 8";
+   visible = "1";
+   helpTag = "0";
+
+   new GuiWindowCtrl() {
+      profile = "GuiWindowProfile";
+      horizSizing = "center";
+      vertSizing = "center";
+      position = "55 65";
+      extent = "530 338";
+      minExtent = "48 92";
+      visible = "1";
+      helpTag = "0";
+      text = "Demo Recordings";
+      maxLength = "255";
+      resizeWidth = "0";
+      resizeHeight = "0";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      closeCommand = "Canvas.popDialog(recordingsDlg);";
+
+      new GuiScrollCtrl() {
+         profile = "GuiScrollProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "23 37";
+         extent = "484 260";
+         minExtent = "32 32";
+         visible = "1";
+         helpTag = "0";
+         willFirstRespond = "1";
+         hScrollBar = "dynamic";
+         vScrollBar = "alwaysOn";
+         lockHorizScroll = "false";
+         lockVertScroll = "false";
+         constantThumbHeight = "0";
+         childMargin = "0 0";
+         defaultLineHeight = "15";
+
+         new GuiTextListCtrl(RecordingsDlgList) {
+            profile = "GuiTextArrayProfile";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            position = "2 2";
+            extent = "462 20";
+            minExtent = "8 20";
+            visible = "1";
+            helpTag = "0";
+            enumerate = "0";
+            columns = "0";
+            resizeCell = "1";
+            fitParentWidth = "1";
+            clipColumnText = "0";
+            noDuplicates = "false";
+         };
+      };
+      new GuiButtonCtrl(DR_CancelBtn) {
+         profile = "GuiButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "396 306";
+         extent = "110 20";
+         minExtent = "8 8";
+         visible = "1";
+         command = "Canvas.popDialog(recordingsDlg);";
+         accelerator = "escape";
+         helpTag = "0";
+         text = "Cancel";
+         groupNum = "-1";
+         buttonType = "PushButton";
+      };
+      new GuiButtonCtrl(DR_StartDemoBtn) {
+         profile = "GuiButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "25 305";
+         extent = "110 20";
+         minExtent = "8 8";
+         visible = "1";
+         command = "StartSelectedDemo();";
+         helpTag = "0";
+         text = "Play";
+         groupNum = "-1";
+         buttonType = "PushButton";
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+

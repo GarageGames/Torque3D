@@ -1,0 +1,48 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GameTSCtrl(HudlessPlayGui) {
+   canSaveDynamicFields = "1";
+   isContainer = "1";
+   Profile = "GuiContentProfile";
+   HorizSizing = "right";
+   VertSizing = "bottom";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 8";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "GuiToolTipProfile";
+   hovertime = "1000";
+   Margin = "0 0 0 0";
+   Padding = "0 0 0 0";
+   AnchorTop = "1";
+   AnchorBottom = "0";
+   AnchorLeft = "1";
+   AnchorRight = "0";
+   cameraZRot = "0";
+   forceFOV = "0";
+      Enabled = "1";
+      helpTag = "0";
+      noCursor = "1";
+};
+//--- OBJECT WRITE END ---
+
+
+function HudlessPlayGui::onWake(%this)
+{
+   // just update the action map here
+   moveMap.push();
+}
+
+function HudlessPlayGui::onSleep(%this)
+{
+   // pop the keymaps
+   moveMap.pop();
+}
+
+function HudlessPlayGui::toggle(%this)
+{
+   if (%this.isAwake())
+      Canvas.setContent(PlayGui);
+   else
+      Canvas.setContent(HudlessPlayGui);
+}

@@ -1,0 +1,118 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(ConsoleVarDlg) {
+   isContainer = "1";
+   Profile = "GuiModelessDialogProfile";
+   HorizSizing = "right";
+   VertSizing = "bottom";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 2";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "GuiToolTipProfile";
+   hovertime = "1000";
+   canSaveDynamicFields = "1";
+   noCursor = true;
+
+   new GuiWindowCtrl() {
+      resizeWidth = "1";
+      resizeHeight = "1";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "1";
+      canMaximize = "1";
+      minSize = "50 50";
+      EdgeSnap = "1";
+      text = "Console Variables";
+      Margin = "0 0 0 0";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "0";
+      AnchorLeft = "1";
+      AnchorRight = "0";
+      isContainer = "1";
+      Profile = "GuiWindowProfile";
+      HorizSizing = "right";
+      VertSizing = "bottom";
+      position = "131 153";
+      Extent = "194 324";
+      MinExtent = "8 2";
+      canSave = "1";
+      Visible = "1";
+      tooltipprofile = "GuiToolTipProfile";
+      hovertime = "1000";
+      internalName = "window";
+      canSaveDynamicFields = "0";
+      closeCommand = "Canvas.popDialog( ConsoleVarDlg );";
+
+      new GuiScrollCtrl() {
+         willFirstRespond = "1";
+         hScrollBar = "alwaysOff";
+         vScrollBar = "dynamic";
+         lockHorizScroll = "0";
+         lockVertScroll = "0";
+         constantThumbHeight = "0";
+         childMargin = "0 0";
+         mouseWheelScrollSpeed = "-1";
+         Docking = "Client";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         isContainer = "1";
+         Profile = "GuiScrollProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "1 21";
+         Extent = "192 300";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "GuiToolTipProfile";
+         hovertime = "1000";
+         internalName = "Scroll";
+         canSaveDynamicFields = "0";
+         
+         new GuiVariableInspector(ConsoleVarInspector) {
+            StackingType = "Vertical";
+            HorizStacking = "Left to Right";
+            VertStacking = "Top to Bottom";
+            Padding = "1";
+            canSaveDynamicFields = "0";
+            Enabled = "1";
+            isContainer = "1";
+            Profile = "GuiTransparentProfile";
+            HorizSizing = "width";
+            VertSizing = "bottom";
+            Position = "1 1";
+            Extent = "190 298";
+            MinExtent = "16 16";
+            canSave = "1";
+            isDecoy = "0";
+            Visible = "1";
+            tooltipprofile = "GuiToolTipProfile";
+            hovertime = "1000";
+            dividerMargin = "5";
+         };
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+
+function InspectVars( %filter )
+{
+   if ( %filter $= "" )
+      %filter = "*";
+   
+   //if ( !ConsoleVarDlg.isAwake() )   
+      Canvas.pushDialog( ConsoleVarDlg, 100 );
+      
+   ConsoleVarInspector.loadVars( %filter );
+}
+
+function InspectVarsToggleCursor()
+{
+   ConsoleVarDlg.noCursor = !(ConsoleVarDlg.noCursor);
+}
