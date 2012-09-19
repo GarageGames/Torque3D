@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>__CFBundleExecutable__</string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string>__CFBundleIdentifier__</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>BRPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.01</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+        <key>WebPluginDescription</key>
+	<string>__WebPluginDescription__</string>
+	<key>WebPluginMIMETypes</key>
+	<dict>
+		<key>__WebPluginMIMEType__</key>
+		<dict>
+			<key>WebPluginTypeDescription</key>
+			<string>1.0</string>
+		</dict>
+	</dict>
+	<key>WebPluginName</key>
+        <string>__WebPluginName__</string>
+	<key>GameName</key>
+        <string>__GameName__</string>
+	<key>GameInstallPath</key>
+        <string>__GameInstallPath__</string>
+</dict>
+</plist>
