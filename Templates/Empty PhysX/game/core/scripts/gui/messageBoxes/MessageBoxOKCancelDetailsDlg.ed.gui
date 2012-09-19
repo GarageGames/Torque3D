@@ -1,0 +1,137 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(MessageBoxOKCancelDetailsDlg) {
+   canSaveDynamicFields = "0";
+   Profile = "GuiOverlayProfile";
+   HorizSizing = "width";
+   VertSizing = "height";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 8";
+   canSave = "1";
+   Visible = "1";
+   hovertime = "1000";
+
+   new GuiWindowCtrl(MBOKCancelDetailsFrame) {
+      canSaveDynamicFields = "0";
+      Profile = "GuiWindowProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "362 219";
+      Extent = "300 330";
+      MinExtent = "48 92";
+      canSave = "1";
+      Visible = "1";
+      hovertime = "1000";
+      maxLength = "255";
+      resizeWidth = "1";
+      resizeHeight = "1";
+      canMove = "1";
+      canClose = "0";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      text = "";
+
+      new GuiMLTextCtrl(MBOKCancelDetailsText) {
+         canSaveDynamicFields = "0";
+         Profile = "GuiMLTextProfile";
+         HorizSizing = "center";
+         VertSizing = "bottom";
+         position = "32 39";
+         Extent = "236 70";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+      };
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Profile = "GuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "top";
+         position = "158 273";
+         Extent = "110 23";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         Command = "MessageCallback(MessageBoxOKCancelDetailsDlg,MessageBoxOKCancelDetailsDlg.callback);";
+         Accelerator = "return";
+         hovertime = "1000";
+         text = "OK";
+         groupNum = "-1";
+         buttonType = "PushButton";
+      };
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Profile = "GuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "top";
+         position = "30 273";
+         Extent = "110 23";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         Command = "MessageCallback(MessageBoxOKCancelDetailsDlg,MessageBoxOKCancelDetailsDlg.cancelCallback);";
+         Accelerator = "escape";
+         hovertime = "1000";
+         text = "CANCEL";
+         groupNum = "-1";
+         buttonType = "PushButton";
+      };
+      new GuiButtonCtrl(MBOKCancelDetailsButton) {
+         canSaveDynamicFields = "0";
+         Profile = "GuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "top";
+         position = "9 302";
+         Extent = "86 17";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         Command = "MBOKCancelDetailsToggleInfoFrame();";
+         hovertime = "1000";
+         text = "Details";
+         groupNum = "-1";
+         buttonType = "PushButton";
+      };
+      new GuiScrollCtrl(MBOKCancelDetailsScroll) {
+         canSaveDynamicFields = "0";
+         Profile = "GuiScrollProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "8 115";
+         Extent = "281 138";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         willFirstRespond = "1";
+         hScrollBar = "alwaysOff";
+         vScrollBar = "dynamic";
+         lockHorizScroll = "true";
+         lockVertScroll = "false";
+         constantThumbHeight = "0";
+         childMargin = "0 0";
+
+         new GuiMLTextCtrl(MBOKCancelDetailsInfoText) {
+            canSaveDynamicFields = "0";
+            Profile = "GuiMLTextProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "2 2";
+            Extent = "259 56";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            hovertime = "1000";
+            lineSpacing = "2";
+            allowColorChars = "0";
+            maxChars = "-1";
+         };
+      };
+   };
+};
+//--- OBJECT WRITE END ---
