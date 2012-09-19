@@ -1,0 +1,75 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(MessageBoxOKCancelDlg) {
+   profile = "GuiOverlayProfile";
+   horizSizing = "width";
+   vertSizing = "height";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 8";
+   visible = "1";
+   helpTag = "0";
+
+   new GuiWindowCtrl(MBOKCancelFrame) {
+      profile = "GuiWindowProfile";
+      horizSizing = "center";
+      vertSizing = "center";
+      position = "170 175";
+      extent = "300 100";
+      minExtent = "48 92";
+      visible = "1";
+      helpTag = "0";
+      maxLength = "255";
+      resizeWidth = "1";
+      resizeHeight = "1";
+      canMove = "1";
+      canClose = "0";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      text = "";
+
+      new GuiMLTextCtrl(MBOKCancelText) {
+         profile = "GuiMLTextProfile";
+         horizSizing = "center";
+         vertSizing = "bottom";
+         position = "8 34";
+         extent = "283 24";
+         minExtent = "8 8";
+         visible = "1";
+         helpTag = "0";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+         
+      };
+      new GuiButtonCtrl() {
+         profile = "GuiButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "66 68";
+         extent = "80 24";
+         minExtent = "8 8";
+         visible = "1";
+         command = "MessageCallback(MessageBoxOKCancelDlg,MessageBoxOKCancelDlg.callback);";
+         accelerator = "return";
+         helpTag = "0";
+         text = "Ok";
+         simpleStyle = "0";
+      };
+      new GuiButtonCtrl() {
+         profile = "GuiButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "156 68";
+         extent = "80 24";
+         minExtent = "8 8";
+         visible = "1";
+         command = "MessageCallback(MessageBoxOKCancelDlg,MessageBoxOKCancelDlg.cancelCallback);";
+         accelerator = "escape";
+         helpTag = "0";
+         text = "Cancel";
+         simpleStyle = "0";
+      };
+   };
+};
+//--- OBJECT WRITE END ---
