@@ -1,0 +1,315 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = libmng.dll
+OBJFILES = ..\..\..\obj\libmng.obj ..\..\..\obj\libmng_hlapi.obj \
+  ..\..\..\obj\libmng_callback_xs.obj ..\..\..\obj\libmng_prop_xs.obj \
+  ..\..\..\obj\libmng_chunk_xs.obj ..\..\..\obj\libmng_object_prc.obj \
+  ..\..\..\obj\libmng_chunk_descr.obj ..\..\..\obj\libmng_chunk_prc.obj \
+  ..\..\..\obj\libmng_chunk_io.obj ..\..\..\obj\libmng_read.obj \
+  ..\..\..\obj\libmng_write.obj ..\..\..\obj\libmng_display.obj \
+  ..\..\..\obj\libmng_dither.obj ..\..\..\obj\libmng_pixels.obj \
+  ..\..\..\obj\libmng_filter.obj ..\..\..\obj\libmng_error.obj \
+  ..\..\..\obj\libmng_trace.obj ..\..\..\obj\libmng_cms.obj \
+  ..\..\..\obj\libmng_zlib.obj ..\..\..\obj\libmng_jpeg.obj \
+  ..\..\..\obj\adler32.obj ..\..\..\obj\compress.obj ..\..\..\obj\crc32.obj \
+  ..\..\..\obj\deflate.obj ..\..\..\obj\inffast.obj ..\..\..\obj\inflate.obj \
+  ..\..\..\obj\inftrees.obj ..\..\..\obj\trees.obj ..\..\..\obj\uncompr.obj \
+  ..\..\..\obj\zutil.obj ..\..\..\obj\jquant2.obj ..\..\..\obj\jcapistd.obj \
+  ..\..\..\obj\jccoefct.obj ..\..\..\obj\jccolor.obj ..\..\..\obj\jcdctmgr.obj \
+  ..\..\..\obj\jchuff.obj ..\..\..\obj\jcinit.obj ..\..\..\obj\jcmainct.obj \
+  ..\..\..\obj\jcmarker.obj ..\..\..\obj\jcmaster.obj ..\..\..\obj\jcomapi.obj \
+  ..\..\..\obj\jcparam.obj ..\..\..\obj\jcphuff.obj ..\..\..\obj\jcprepct.obj \
+  ..\..\..\obj\jcsample.obj ..\..\..\obj\jctrans.obj ..\..\..\obj\jdapistd.obj \
+  ..\..\..\obj\jdatadst.obj ..\..\..\obj\jdatasrc.obj ..\..\..\obj\jdcoefct.obj \
+  ..\..\..\obj\jdcolor.obj ..\..\..\obj\jddctmgr.obj ..\..\..\obj\jdhuff.obj \
+  ..\..\..\obj\jdinput.obj ..\..\..\obj\jdmainct.obj ..\..\..\obj\jdmarker.obj \
+  ..\..\..\obj\jdmaster.obj ..\..\..\obj\jdmerge.obj ..\..\..\obj\jdphuff.obj \
+  ..\..\..\obj\jdpostct.obj ..\..\..\obj\jdsample.obj ..\..\..\obj\jdtrans.obj \
+  ..\..\..\obj\jerror.obj ..\..\..\obj\jfdctflt.obj ..\..\..\obj\jfdctfst.obj \
+  ..\..\..\obj\jfdctint.obj ..\..\..\obj\jidctflt.obj ..\..\..\obj\jidctfst.obj \
+  ..\..\..\obj\jidctint.obj ..\..\..\obj\jidctred.obj ..\..\..\obj\jmemmgr.obj \
+  ..\..\..\obj\jmemnobs.obj ..\..\..\obj\jquant1.obj ..\..\..\obj\jcapimin.obj \
+  ..\..\..\obj\jutils.obj ..\..\..\obj\jdapimin.obj
+RESFILES = libmng.res
+RESDEPEN = $(RESFILES)
+LIBFILES = ..\..\..\lcms\Projects\Bcc-5.5-static\lcmsstat.lib
+LIBRARIES = VCL35.lib
+SPARELIBS = VCL35.lib
+PACKAGES = vclx35.bpi VCL35.bpi vcldb35.bpi vcldbx35.bpi bcbsmp35.bpi dclocx35.bpi \
+  Qrpt35.bpi
+DEFFILE =
+# ---------------------------------------------------------------------------
+PATHCPP = .;..\..;..\..\..\zlib;..\..\..\jpgsrc6b
+PATHASM = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -WD -O2 -Hc -w- -d -k- -vi -w-par -c -tWD
+CFLAG2 = -D_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;XMNG_INCLUDE_MPNG_PROPOSAL;XMNG_INCLUDE_ANG_PROPOSAL \
+  -I"c:\program files\borland\cbuilder3\projects";..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin \
+  -H=$(BCB)\lib\vcl35.csm
+CFLAG3 = -Tkh30000 -ff -pr -wuse -wucp -wstv -wstu -wsig -wpin -wnod -wnak -wdef -wcln \
+  -wbbf -wasm -wamp -wamb
+PFLAGS = -D_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;XMNG_INCLUDE_MPNG_PROPOSAL;XMNG_INCLUDE_ANG_PROPOSAL \
+  -N2..\..\..\obj -N0..\..\..\obj \
+  -U"c:\program files\borland\cbuilder3\projects";..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\lib;$(BCB)\bin;$(RELEASELIBPATH) \
+  -I"c:\program files\borland\cbuilder3\projects";..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin \
+  -H -W -$L- -$D- -v -JPHN -M
+RFLAGS = -D_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;XMNG_INCLUDE_MPNG_PROPOSAL;XMNG_INCLUDE_ANG_PROPOSAL \
+  -i"c:\program files\borland\cbuilder3\projects";..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin
+AFLAGS = /i"c:\program files\borland\cbuilder3\projects" /i..\..\..\libmng-devel \
+  /i..\..\..\zlib /i..\..\..\jpgsrc6b /i..\..\..\lcms\include /i..\..\..\lcms\src \
+  /i$(BCB)\include /i$(BCB)\bin /d_NO_VCL /dMNG_BUILD_DLL /dMNG_FULL_CMS \
+  /dMNG_STRICT_ANSI /dMNG_CHECK_BAD_ICCP /dZLIB_DLL /dZLIB_WINAPI \
+  /dMNG_OPTIMIZE_FOOTPRINT_COMPOSE /dMNG_OPTIMIZE_FOOTPRINT_DIV \
+  /dMNG_OPTIMIZE_FOOTPRINT_SWITCH /dXMNG_DECREMENT_LOOPS \
+  /dMNG_OPTIMIZE_FOOTPRINT_INIT /dXMNG_OPTIMIZE_FOOTPRINT_MAGN \
+  /dMNG_OPTIMIZE_OBJCLEANUP /dMNG_OPTIMIZE_CHUNKINITFREE \
+  /dMNG_OPTIMIZE_CHUNKASSIGN /dMNG_OPTIMIZE_CHUNKREADER \
+  /dXMNG_OPTIMIZE_DISPLAYCALLS /dXMNG_INCLUDE_MPNG_PROPOSAL \
+  /dXMNG_INCLUDE_ANG_PROPOSAL /mx /w2 /zd
+LFLAGS = -L"c:\program files\borland\cbuilder3\projects";..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\lib;$(BCB)\bin;$(RELEASELIBPATH) \
+  -H:0x1000000 -Hc:0x10000 -B:0x60000000 -aa -Tpd -s -Gn -Gi -M -wdpl -d
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0d32.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES)  import32.lib cw32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=1
+MajorVer=1
+MinorVer=0
+Release=10
+Build=1440
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=1
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=PNG/MNG Group
+FileDescription=libmng - THE MNG library
+FileVersion=1.0.10.1440
+InternalName=libmng
+LegalCopyright=Copyright © 2000-2007 G. Juyn, 2007 G.Randers-Pherson
+LegalTrademarks=
+OriginalFilename=libmng.dll
+ProductName=libmng
+ProductVersion=1.0.10
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=12
+Item0=c:\program files\borland\cbuilder3\projects;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin
+Item1=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin
+Item2=c:\program files\borland\cbuilder3\projects;..\..\..\libmng;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin
+Item3=..\..\..\libmng;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\include;$(BCB)\bin
+Item4=..\..\..\libmng;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;$(BCB)\include;$(BCB)\bin
+Item5=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;$(BCB)\include;$(BCB)\bin
+Item6=..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;$(BCB)\include;$(BCB)\bin
+Item7=..\..\..\..\jpgsrc6b;..\..\..\..\lcms\include;..\..\..\..\lcms\source;..\..\..\..\zlib;..\..\..\..\libmng;$(BCB)\include;$(BCB)\bin
+Item8=..\..\..\..\lcms\include;..\..\..\..\lcms\source;..\..\..\..\zlib;..\..\..\..\libmng;$(BCB)\include;$(BCB)\bin
+Item9=..\..\..\..\zlib;..\..\..\..\libmng;$(BCB)\include;$(BCB)\bin
+Item10=..\..\libmng;$(BCB)\include;$(BCB)\bin
+Item11=..\..\libmng;$(BCB)\include
+
+[HistoryLists\hlLibraryPath]
+Count=12
+Item0=c:\program files\borland\cbuilder3\projects;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\lib;$(BCB)\bin
+Item1=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\include;..\..\..\lcms\src;$(BCB)\lib;$(BCB)\bin
+Item2=c:\program files\borland\cbuilder3\projects;..\..\..\lcms\src;..\..\..\libmng;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib;$(BCB)\bin
+Item3=..\..\..\lcms\src;..\..\..\libmng;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib;$(BCB)\bin
+Item4=..\..\..\libmng;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib;$(BCB)\bin
+Item5=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib;$(BCB)\bin
+Item6=..\..\..\libmng;..\..\..\jpgsrc6b;..\..\..\zlib;$(BCB)\lib;$(BCB)\bin
+Item7=..\..\..\..\jpgsrc6b;..\..\..\..\lcms\source;..\..\..\..\zlib;..\..\..\..\libmng;$(BCB)\lib;$(BCB)\bin
+Item8=..\..\..\..\lcms\source;..\..\..\..\zlib;..\..\..\..\libmng;$(BCB)\lib;$(BCB)\bin
+Item9=..\..\..\..\zlib;..\..\..\..\libmng;$(BCB)\lib;$(BCB)\bin
+Item10=..\..\libmng;$(BCB)\lib;$(BCB)\bin
+Item11=..\..\libmng;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=7
+Item0=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\src
+Item1=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\source;..\..\..\lcms\src
+Item2=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\source
+Item3=..\..\..\jpgsrc6b;..\..\..\lcms\source;..\..\..\zlib;..\..\..\libmng
+Item4=..\..\..\..\jpgsrc6b;..\..\..\..\lcms\source;..\..\..\..\zlib;..\..\..\..\libmng
+Item5=..\..\..\..\libmng
+Item6=..\..\libmng
+
+[HistoryLists\hlConditionals]
+Count=30
+Item0=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;XMNG_INCLUDE_MPNG_PROPOSAL;XMNG_INCLUDE_ANG_PROPOSAL
+Item1=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_INCLUDE_MPNG_PROPOSAL;MNG_INCLUDE_ANG_PROPOSAL
+Item2=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;XMNG_INCLUDE_MPNG_PROPOSAL;MNG_INCLUDE_ANG_PROPOSAL
+Item3=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_INCLUDE_MPNG_PROPOSAL;XMNG_INCLUDE_ANG_PROPOSAL
+Item4=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_INCLUDE_MPNG_PROPOSAL;MNG_INCLUDE_ANG6_PROPOSAL
+Item5=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_INCLUDE_MPNG_PROPOSAL
+Item6=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;XMNG_INCLUDE_MPNG_PROPOSAL
+Item7=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;XMNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_INCLUDE_MPNG_PROPOSAL
+Item8=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_SUPPORT_MPNG_PROPOSAL
+Item9=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS
+Item10=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;MNG_OPTIMIZE_DISPLAYCALLS
+Item11=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS
+Item12=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_DECREMENT_LOOPS;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_FOOTPRINT_MAGN;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS
+Item13=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS
+Item14=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;XMNG_OPTIMIZE_DISPLAYCALLS;MNG_NO_OLD_VERSIONS
+Item15=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER;MNG_OPTIMIZE_DISPLAYCALLS
+Item16=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER
+Item17=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_OBJCLEANUP;XMNG_OPTIMIZE_CHUNKINITFREE;XMNG_OPTIMIZE_CHUNKASSIGN;XMNG_OPTIMIZE_CHUNKREADER
+Item18=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_CHUNKASSIGN;XMNG_OPTIMIZE_CHUNKREADER
+Item19=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKASSIGN;MNG_OPTIMIZE_CHUNKREADER
+Item20=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKASSIGN;XMNG_OPTIMIZE_CHUNKREADER
+Item21=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_OBJCLEANUP;MNG_OPTIMIZE_CHUNKASSIGN
+Item22=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_CHUNKINITFREE;MNG_OPTIMIZE_OBJCLEANUP
+Item23=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_OPTIMIZE_CHUNKINITFREE
+Item24=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;XMNG_OPTIMIZE_CHUNKINITFREE
+Item25=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT
+Item26=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;XMNG_OPTIMIZE_FOOTPRINT_COMPOSE;XMNG_OPTIMIZE_FOOTPRINT_DIV;XMNG_OPTIMIZE_FOOTPRINT_SWITCH;XMNG_OPTIMIZE_FOOTPRINT_INIT
+Item27=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_SUPPORT_TRACE
+Item28=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;x_MNG_NO_16BIT_SUPPORT
+Item29=_NO_VCL;MNG_BUILD_DLL;MNG_FULL_CMS;MNG_STRICT_ANSI;MNG_CHECK_BAD_ICCP;ZLIB_DLL;ZLIB_WINAPI;MNG_OPTIMIZE_FOOTPRINT_COMPOSE;MNG_OPTIMIZE_FOOTPRINT_DIV;MNG_OPTIMIZE_FOOTPRINT_SWITCH;MNG_OPTIMIZE_FOOTPRINT_INIT;MNG_NO_16BIT_SUPPORT
+
+[HistoryLists\hlIntOutputDir]
+Count=2
+Item0=..\..\..\obj
+Item1=..\..\..\..\obj
+
+[HistoryLists\hlHostApplication]
+Count=23
+Item0=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngview.exe
+Item1=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\MNGJNGportal.exe
+Item2=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\gif2mng.exe
+Item3=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngview_push.exe
+Item4=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngtree.exe
+Item5=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngdump.exe
+Item6=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\lm_diag.exe
+Item7=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\eMNGma.exe
+Item8=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\bogus.exe
+Item9=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\TestNGImage.exe
+Item10=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngrepair.exe
+Item11=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\Test_lz.exe
+Item12=D:\Triple-T\Software\LossyPNG\Bin\Test_lz.exe
+Item13=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\SlowView.exe
+Item14=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\Bin\eMNGma.exe
+Item15=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngpromo.exe
+Item16=D:\Triple-T\Software\mnglib3t\libmng\bcb\win32dll\mngdump.exe
+Item17=D:\Triple-T\Software\mnglib3t\libmng\bcb\win32dll\mngview.exe
+Item18=D:\Triple-T\Software\mnglib3t\libmng\bcb\win32dll\bogus.exe
+Item19=D:\Triple-T\Software\mnglib3t\libmng\bcb\win32dll\mngtree.exe
+Item20=D:\Triple-T\Software\mnglib3t\libmng\samples\bcb\win32dll\mngview.exe
+Item21=D:\Triple-T\Software\mnglib3t\libmng\samples\bcb\win32dll\mngdump.exe
+Item22=D:\Triple-T\Software\mnglib3t\libmng\samples\Delphi3\mngdump\mngdump.exe
+
+[HistoryLists\hlRunParameters]
+Count=3
+Item0=sample.mng
+Item1=roilion02.mng roilion02-fixed.mng
+Item2=usflag-lc-d63.mng
+
+[Debugging]
+DebugSourceDirs=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms\src
+
+[Parameters]
+RunParams=
+HostApplication=D:\Triple-T\Software\mnglib3t\libmng-devel\bcb\win32dll\mngview.exe
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------

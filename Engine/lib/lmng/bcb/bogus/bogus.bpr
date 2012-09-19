@@ -1,0 +1,184 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = bogus.exe
+OBJFILES = bogus.obj
+RESFILES = bogus.res
+RESDEPEN = $(RESFILES)
+LIBFILES = ..\win32dll\libmng.lib
+LIBRARIES =
+SPARELIBS = 
+PACKAGES = vclx35.bpi VCL35.bpi vcldb35.bpi vcldbx35.bpi bcbsmp35.bpi dclocx35.bpi \
+  Qrpt35.bpi
+DEFFILE =
+# ---------------------------------------------------------------------------
+PATHCPP = .;
+PATHASM = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -O2 -w -r- -k -y -v -vi- -c -tWC
+CFLAG2 = -D_NO_VCL;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL \
+  -I..\win32dll;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+CFLAG3 = -Tkh30000
+PFLAGS = -D_NO_VCL;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL \
+  -U..\win32dll;$(BCB)\lib;$(DEBUGLIBPATH) \
+  -I..\win32dll;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include \
+  -$Y -$W -$O- -v -JPHN -M
+RFLAGS = -D_NO_VCL;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL \
+  -i..\win32dll;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+AFLAGS = /i..\win32dll /i..\..\..\libmng-devel /i..\..\..\zlib /i..\..\..\jpgsrc6b \
+  /i..\..\..\lcms /i$(BCB)\include /d_NO_VCL /dMNG_SUPPORT_WRITE \
+  /dMNG_ACCESS_CHUNKS /dMNG_STORE_CHUNKS /dMNG_NO_CMS /dMNG_USE_DLL /mx /w2 /zd
+LFLAGS = -L..\win32dll;$(BCB)\lib;$(DEBUGLIBPATH) -ap -Tpe -x -Gn -v
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0x32.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES)  import32.lib cw32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=1
+MajorVer=1
+MinorVer=0
+Release=1
+Build=9
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=Executable (Console)
+FileVersion=1.0.1.9
+InternalName=bogus
+LegalCopyright=copyright (c) 2000,2002 G. Juyn
+LegalTrademarks=
+OriginalFilename=bogus.exe
+ProductName=bogus
+ProductVersion=1.0.1
+Comments=
+
+[Excluded Packages]
+C:\Program Files\Borland\CBuilder3\Bin\DbX35.bpl=(untitled)
+
+[HistoryLists\hlIncludePath]
+Count=3
+Item0=..\win32dll;..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+Item1=..\..\..\libmng-devel;..\..\..\zlib;$(BCB)\include
+Item2=..\..\..\libmng;..\..\..\zlib;$(BCB)\include
+
+[HistoryLists\hlLibraryPath]
+Count=2
+Item0=..\win32dll;$(BCB)\lib
+Item1=$(BCB)\lib
+
+[HistoryLists\hlConditionals]
+Count=2
+Item0=_NO_VCL;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL
+Item1=_NO_VCL;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_USE_DLL
+
+[Debugging]
+DebugSourceDirs=
+
+[Parameters]
+RunParams=
+HostApplication=
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------

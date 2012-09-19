@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+app_install_dir=/data/Triple-T/Software/mnglib3t/libmng-devel/contrib/kylix/mngview
+app_path=$app_install_dir/mngview.bin
+app_ld_path=$app_install_dir/lib
+#
+if [ -n "$LD_LIBRARY_PATH" ]; then
+  export LD_LIBRARY_PATH="$app_ld_path:$LD_LIBRARY_PATH"
+else
+  export LD_LIBRARY_PATH="$app_ld_path"
+fi
+#
+if [ -z "$LANG" ]; then
+  export LANG="en_US"
+fi
+#
+exec $app_path $*

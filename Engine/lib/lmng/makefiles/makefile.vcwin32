@@ -1,0 +1,99 @@
+# makefile for libmng
+# Copyright (C) 2000 AM(s98t269@stmail.eng.kagawa-u.ac.jp)
+# For conditions of distribution and use, see copyright notice in libmng.h
+# Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
+# Assumes that libjpeg.lib, *.h have been copied to ..\jpgsrc6b
+# Assumes that lcmsdll.lib and lcmsstat.lib have been copied to ..\lcms\lib\msvc
+# To use, do "nmake /f makefiles\makefile.vcwin32"
+
+# -------- Microsoft Visual C++ 4.0 and later, no assembler code --------
+
+CFLAGS= -Ox -GA3s -nologo -W3 -I..\zlib -I..\jpgsrc6b -I..\lcms\include
+
+CC=cl
+LD=link
+LDFLAGS= 
+O=.obj
+
+#uncomment next to put error messages in a file
+#ERRFILE= >> mngerrs
+
+# variables
+OBJS1 = libmng_callback_xs$(O) libmng_chunk_io$(O) libmng_chunk_prc$(O) libmng_chunk_descr$(0)
+OBJS2 = libmng_chunk_xs$(O) libmng_cms$(O) libmng_display$(O) libmng_dither$(O)
+OBJS3 = libmng_error$(O) libmng_filter$(O) libmng_hlapi$(O) libmng_jpeg$(O)
+OBJS4 = libmng_object_prc$(O) libmng_pixels$(O) libmng_prop_xs$(O)
+OBJS5 = libmng_read$(O) libmng_trace$(O) libmng_write$(O) libmng_zlib$(O)
+
+all: libmng.lib
+
+libmng_callback_xs$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_chunk_io$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_chunk_descr$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_chunk_prc$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_chunk_xs$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_cms$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_display$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_dither$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_error$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_filter$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_hlapi$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_jpeg$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_object_prc$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_pixels$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_prop_xs$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_read$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_trace$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_write$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng_zlib$(O): libmng.h libmng_data.h libmng_error.h libmng_trace.h
+		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+libmng.lib: $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5)
+	echo something to del > libmng.lib
+	del libmng.lib
+	lib /OUT:libmng.lib $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5)
+
+mngtest.exe: mngtest.obj libmng.lib
+	$(LD) $(LDFLAGS) mngtest.obj libmng.lib ..\zlib\zlib.lib /OUT:mngtest.exe /SUBSYSTEM:CONSOLE
+
+test: mngtest.exe
+	mngtest
+
+# End of makefile for libmng
+

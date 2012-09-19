@@ -1,0 +1,46 @@
+/*
+   You can use one or more of the following defines to
+   reduce the size of the compiled library.  Define the
+   SKIPCANVAS macros for any canvas configurations that
+   your application doesn't use.  Define the SKIPCHUNK
+   macros for any chunks that your application doesn't
+   process.  Define MNG_OPTIMIZE_FOOTPRINT to choose
+   smaller code size over faster execution and less memory
+   usage.  These macros became available in version 1.0.6.
+*/
+
+/* eliminate unused features from libmng */
+#define MNG_OPTIMIZE_FOOTPRINT
+#define MNG_OPTIMIZE_OBJCLEANUP
+#define MNG_OPTIMIZE_CHUNKINITFREE
+#define MNG_OPTIMIZE_CHUNKASSIGN
+#define MNG_OPTIMIZE_CHUNKREADER
+
+#define MNG_SKIPCANVAS_ABGR8
+#define MNG_SKIPCANVAS_ARGB8
+#define MNG_SKIPCANVAS_BGR8
+#define MNG_SKIPCANVAS_BGRA8
+#define MNG_SKIPCANVAS_BGRA8_PM
+#define MNG_SKIPCANVAS_BGRX8
+#define MNG_SKIPCANVAS_RGBA8
+#define MNG_SKIPCANVAS_BGR565
+#define MNG_SKIPCANVAS_RGB565
+#define MNG_SKIPCANVAS_BGRA565
+#define MNG_SKIPCANVAS_RGBA565
+
+#define MNG_SKIPCHUNK_iCCP
+#define MNG_SKIPCHUNK_tEXt
+#define MNG_SKIPCHUNK_zTXt
+#define MNG_SKIPCHUNK_iTXt
+#define MNG_SKIPCHUNK_bKGD
+#define MNG_SKIPCHUNK_pHYs
+#define MNG_SKIPCHUNK_sBIT
+#define MNG_SKIPCHUNK_sPLT
+#define MNG_SKIPCHUNK_hIST
+#define MNG_SKIPCHUNK_tIME
+#define MNG_SKIPCHUNK_eXPI
+#define MNG_SKIPCHUNK_fPRI
+#define MNG_SKIPCHUNK_nEED
+#define MNG_SKIPCHUNK_pHYg
+
+

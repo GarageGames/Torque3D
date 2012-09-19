@@ -1,0 +1,35 @@
+dnl Process this file with autoconf to produce a configure script.
+
+dnl Version of this release
+VERSION=0.1
+
+AC_INIT(mngplay.c)
+AM_INIT_AUTOMAKE(mngplay, $VERSION)
+
+dnl AC_CANONICAL_SYSTEM
+AC_LANG_C
+
+dnl Checks for programs.
+AC_PROG_CC
+
+dnl Checks for header files.
+AC_HEADER_STDC
+
+dnl check for Simple Direct Media Layer
+AC_CHECK_PROG(HAS_SDL, sdl-config, yes)
+if test "x$HAS_SDL" != "xyes"; then
+    AC_MSG_ERROR([ SDL library not found!
+    You need this for any display to happen. (rather the point)
+    You can get a copy at <http://libsdl.org/>])
+fi
+CFLAGS="$CFLAGS `sdl-config --cflags`"
+
+mngplay_LDADD="`sdl-config --libs`"
+mngplay_static_LDADD="`sdl-config --static-libs`"
+AC_SUBST(mngplay_LDADD)
+AC_SUBST(mngplay_static_LDADD)
+
+dnl check for libmng - macro in acinclude.m4
+LIBMNG_CHECK()
+
+AC_OUTPUT(Makefile)

@@ -1,0 +1,2 @@
+Need to include <memory> to use std::auto_ptr with gcc-4.3 - Andrew Galante, GG 8/2/2009: include/dae.h
+

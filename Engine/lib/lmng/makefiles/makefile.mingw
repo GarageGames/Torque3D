@@ -1,0 +1,164 @@
+#
+# For conditions of distribution and use, see copyright notice in libmng.h
+#
+# makefile for libmng - THE MNG library
+# this makefile is for MinGW32, it have been tested with gcc 2.95.3, 
+# binutils 2.11.90 and mingw-runtime 1.0
+#
+# By Benoit Blanchon - benoit.blanchon@laposte.net
+#
+# Note : this makefile builds a static library; although it's seems to be
+# possible to build working DLL and import lib, I didn't manage do to it.
+# If you do, please let me know.
+
+# outputs
+LIBMNG_A   = libmng.a
+INSTALL_PREFIX = C:/MinGW/
+# maybe you sould replace with anti-slashes
+
+# default build options
+OPTIONS = -DMNG_NO_CMS -DMNG_ACCESS_CHUNKS -DMNG_STORE_CHUNKS
+
+# Where the zlib library and include files are located
+ZLIBLIB=-lz
+#ZLIBLIB=-L../zlib -lz
+#ZLIBINC=-I../zlib
+
+# Where the jpeg library and include files are located
+JPEGLIB=-ljpeg
+#JPEGLIB=-L../jpgsrc -ljpeg
+#JPEGINC=-I../jpgsrc
+
+# Where the lcms library and include files are located
+#LCMSLIB=-llcms
+#LCMSLIB=-L../lcms/lib -llcms
+#LCMSINC=-I../lcms/source
+
+# file deletion command
+RM=rm -f 
+#RM=del
+
+# directory creation command
+MKDIR=mkdir -p
+
+# file copy command
+COPY=cp
+#COPY=copy
+
+# compiler
+CC=gcc
+
+ALIGN=
+# for i386:
+#ALIGN=-malign-loops=2 -malign-functions=2
+
+CFLAGS=$(ZLIBINC) $(JPEGINC) $(LCMSINC) -Wall -O3 -funroll-loops $(OPTIONS) $(ALIGN)
+LDFLAGS=-L. -lmng $(ZLIBLIB) $(JPEGLIB) $(LCMSLIB) -lm
+
+# library (.a) file creation command
+AR= ar rc
+# second step in .a creation (use "touch" if not needed)
+AR2= ranlib
+
+INCPATH=$(prefix)/include
+LIBPATH=$(prefix)/lib
+
+OBJS = \
+	libmng_callback_xs.o \
+	libmng_chunk_io.o \
+	libmng_chunk_descr.o \
+	libmng_chunk_prc.o \
+	libmng_chunk_xs.o \
+	libmng_cms.o \
+	libmng_display.o \
+	libmng_dither.o \
+	libmng_error.o \
+	libmng_filter.o \
+	libmng_hlapi.o \
+	libmng_jpeg.o \
+	libmng_object_prc.o \
+	libmng_pixels.o \
+	libmng_prop_xs.o \
+	libmng_read.o \
+	libmng_trace.o \
+	libmng_write.o \
+	libmng_zlib.o
+
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) -c $(CFLAGS) -o $@ $*.c
+
+all: $(LIBMNG_A)
+
+$(LIBMNG_A) : $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(AR2) $@
+
+install : $(LIBMNG_A)
+	$(MKDIR)                 $(INSTALL_PREFIX)include	
+	$(COPY)  libmng.h        $(INSTALL_PREFIX)include
+	$(COPY)  libmng_conf.h   $(INSTALL_PREFIX)include
+	$(COPY)  libmng_types.h  $(INSTALL_PREFIX)include
+	$(MKDIR)                 $(INSTALL_PREFIX)lib
+	$(COPY)  $(LIBMNG_A)     $(INSTALL_PREFIX)lib
+
+clean:
+	$(RM) *.o
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+libmng_hlapi.o : libmng_hlapi.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_object_prc.h \
+	libmng_chunks.h libmng_memory.h libmng_error.h libmng_trace.h libmng_read.h \
+        libmng_write.h libmng_display.h libmng_zlib.h libmng_cms.h libmng_zlib.h
+libmng_callback_xs.o : libmng_callback_xs.c libmng.h \
+        libmng_conf.h libmng_types.h libmng_data.h libmng_error.h libmng_trace.h
+libmng_prop_xs.o : libmng_prop_xs.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_error.h libmng_trace.h libmng_cms.h
+libmng_chunk_xs.o : libmng_chunk_xs.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_chunks.h libmng_chunk_prc.h \
+        libmng_error.h libmng_trace.h
+libmng_read.o : libmng_read.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_object_prc.h \
+	libmng_chunks.h libmng_chunk_prc.h libmng_chunk_io.h libmng_memory.h \
+        libmng_error.h libmng_trace.h libmng_read.h libmng_display.h
+libmng_write.o : libmng_write.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h libmng_write.h
+libmng_display.o : libmng_display.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_objects.h libmng_object_prc.h libmng_memory.h \
+	libmng_error.h libmng_trace.h libmng_zlib.h libmng_cms.h libmng_pixels.h \
+        libmng_display.h
+libmng_object_prc.o : libmng_object_prc.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_objects.h libmng_object_prc.h libmng_memory.h \
+        libmng_error.h libmng_trace.h libmng_display.h libmng_pixels.h
+libmng_chunk_descr.o : libmng_chunk_descr.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_chunks.h libmng_chunk_descr.h \
+        libmng_chunk_prc.h libmng_memory.h libmng_error.h libmng_trace.h
+libmng_chunk_prc.o : libmng_chunk_prc.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_chunks.h libmng_chunk_prc.h libmng_memory.h \
+        libmng_error.h libmng_trace.h
+libmng_chunk_io.o : libmng_chunk_io.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_objects.h libmng_object_prc.h \
+        libmng_chunks.h libmng_chunk_io.h libmng_chunk_prc.h libmng_memory.h libmng_error.h \
+        libmng_trace.h libmng_display.h libmng_zlib.h libmng_pixels.h
+libmng_error.o : libmng_error.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h
+libmng_trace.o : libmng_trace.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h
+libmng_pixels.o : libmng_pixels.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_memory.h libmng_error.h libmng_trace.h \
+        libmng_cms.h libmng_filter.h libmng_pixels.h
+libmng_filter.o : libmng_filter.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h libmng_filter.h
+libmng_dither.o : libmng_dither.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h libmng_dither.h
+libmng_zlib.o : libmng_zlib.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_memory.h libmng_error.h libmng_trace.h libmng_pixels.h \
+        libmng_filter.h libmng_zlib.h
+libmng_jpeg.o : libmng_jpeg.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_memory.h libmng_error.h libmng_trace.h libmng_pixels.h libmng_jpeg.h
+libmng_cms.o : libmng_cms.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_error.h libmng_trace.h libmng_cms.h
+

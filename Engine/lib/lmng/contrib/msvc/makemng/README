@@ -1,0 +1,24 @@
+MAKEMNG - Jan 10, 2003
+
+A simple MNG encoder. MAKEMNG takes a bunch of still frames (PNGs)
+as input, computes delta images and stuffs it all into an MNG, thus
+creating an animation.
+
+You will need zlib to compile and run this app.
+The included Makefile should work on Linux and CYGWIN.
+The MSVC project will most likely need modifications for your
+environment.
+
+usage: makemng [-v] [-f rate] [-r] [-s size] [-o outputfile] <png-in-mask>
+produces an MNG animation from a bunch of frame images
+options:
+  -v             : be verbose, explains things no human should know
+  -f rate        : sets the framerate; rate is 1..100 per second (default 5)
+  -b             : auto-select background frame (instead of frame0)
+  -r             : split delta frames into full rectangles only
+  -s size        : enable sector cleanup and set sector size (8..64)
+diagnostical options:
+  -d             : generate delta-mask PNGs (form: mask_FRM1_FRM2.png)
+
+-------------
+Alex Volkov <codepro@usa.net>

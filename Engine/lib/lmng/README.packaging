@@ -1,0 +1,24 @@
+Packaging Libmng for distribution
+---------------------------------
+
+These are some notes for those building binaries for distribution.
+
+We're interested to hear about anywhere libmng is helpful, so let us
+know if you're including it with your application or OS. Also, if your
+build is publicly accessible, we'd be happy to link to it from
+the libmng site.
+
+However, We respectfully request that you *not* distribute binaries as a
+shared library (DLL) with any of the major features disabled. While
+there is support for this in terms of #ifdef directives (in
+libmng_conf.h) and autoconf switches they are intended for embedded
+application and testing. The default compilation options support the
+full MNG specification, and we wish to avoid the confusion among
+general users that partial support would engender.
+
+
+Platform specific notes:
+
+We have a basic .spec file for generating rpms. Send us a note if you'd
+like to clean it up.
+

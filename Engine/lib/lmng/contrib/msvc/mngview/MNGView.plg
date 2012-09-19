@@ -1,0 +1,34 @@
+<html>
+<body>
+<pre>
+<h1>Erstellungsprotokoll</h1>
+<h3>
+--------------------Konfiguration: MNGView - Win32 Release--------------------
+</h3>
+<h3>Befehlszeilen</h3>
+Erstellen der temporären Datei  "C:\WINDOWS\TEMP\RSPF386.TMP" mit Inhalten
+[
+/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/MNGView.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"F:\Nikgames\Libmng\contrib\MNGView\Main.cpp"
+]
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSPF386.TMP" 
+Erstellen der temporären Datei  "C:\WINDOWS\TEMP\RSPF387.TMP" mit Inhalten
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/MNGView.pdb" /machine:I386 /out:"MNGView.exe" 
+.\Release\Main.obj
+.\Release\mng.obj
+.\Release\Main.res
+]
+Erstellen der Befehlzeile "link.exe @C:\WINDOWS\TEMP\RSPF387.TMP"
+<h3>Ausgabefenster</h3>
+Kompilierung läuft...
+Main.cpp
+Linker-Vorgang läuft...
+
+
+
+<h3>Ergebnisse</h3>
+MNGView.exe - 0 Fehler, 0 Warnung(en)
+</pre>
+</body>
+</html>

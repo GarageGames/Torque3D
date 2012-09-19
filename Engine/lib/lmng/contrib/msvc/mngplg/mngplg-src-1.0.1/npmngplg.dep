@@ -1,0 +1,22 @@
+# Microsoft Developer Studio Generated Dependency File, included by npmngplg.mak
+
+.\npmngplg.c : \
+	"..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\jpgsrc6b\jconfig.h"\
+	"..\jpgsrc6b\jmorecfg.h"\
+	"..\jpgsrc6b\jpeglib.h"\
+	"..\jpgsrc6b\jversion.h"\
+	"..\lcms-1.08a\include\icc34.h"\
+	"..\lcms-1.08a\include\lcms.h"\
+	"..\libmng-1.0.4\libmng.h"\
+	"..\libmng-1.0.4\libmng_conf.h"\
+	"..\libmng-1.0.4\libmng_types.h"\
+	"..\zlib-1.1.4\zconf.h"\
+	"..\zlib-1.1.4\zlib.h"\
+	".\npapidefs.h"\
+	
+
+.\npmngplg.rc : \
+	".\cur_ie.cur"\
+	".\cur_ns.cur"\
+	

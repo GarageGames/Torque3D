@@ -1,0 +1,48 @@
+The samples are in platform-specific directories.
+
+!!! contributions are very welcome !!!
+
+
+bcb - Borland C++ Builder (3.0) (found under bcb/xxx)
+-----------------------------------------------------
+
+win32dll - sample project to create a Windows dll. Requires zlib1.2.1,
+           IJG jpgsrc6b and lcms1.0.14. The directories containing these
+           libraries must be at the same level as the libmng directory.
+           So if you're in the directory with this file and the libmng
+           sources, they should be in ..\zlib , ..\jpgsrc6b and ..\lcms
+           respectively.
+
+!!!        To run the other Win32 samples you need to copy the libmng.dll
+           file from here into the sample's directory !!!
+
+mngtree  - sample project to create a little command-line tool that dumps
+           the chunk-structure of a given file onto stdout.
+
+bogus    - a completely bogus example on how to create a perfectly valid
+           (though slightly biased) MNG.
+
+mngview  - port of the Delphi mngview sample. contributed by Andy Protano.
+           see also README.contrib
+
+mngrepair- an example on how to fix invalid MNG files
+           uses the new mng_copy_chunks() function and MNG_SOFTERRORS to
+           'ignore' certain input-errors. This conditional *MUST* only be used
+           for exactly this kind of software; eg. repair utilities.
+
+
+delphi - Borland Delphi (3.0+) (found under contrib/delphi/xxx)
+---------------------------------------------------------------
+
+mngview  - sample project for a simple mng-viewer. The general unit in
+           the delphi directory was translated from libmng.h It can be
+           used in other projects to access libmng.dll created with the
+           win32dll example above.
+
+
+unix - Unix (found under contrib/gcc/xxx)
+-----------------------------------------
+
+mngtree  - basically a copy of the BCB sample. It includes a makefile for
+           Linux and it's been tested on RedHat6.2
+

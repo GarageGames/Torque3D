@@ -1,0 +1,235 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = mngrepair.exe
+OBJFILES = obj\mngrepair.obj obj\libmng_hlapi.obj obj\libmng_callback_xs.obj \
+  obj\libmng_prop_xs.obj obj\libmng_chunk_xs.obj obj\libmng_object_prc.obj \
+  obj\libmng_chunk_prc.obj obj\libmng_chunk_io.obj obj\libmng_read.obj \
+  obj\libmng_write.obj obj\libmng_display.obj obj\libmng_dither.obj \
+  obj\libmng_pixels.obj obj\libmng_filter.obj obj\libmng_error.obj \
+  obj\libmng_trace.obj obj\libmng_cms.obj obj\libmng_zlib.obj obj\libmng_jpeg.obj \
+  obj\adler32.obj obj\compress.obj obj\crc32.obj obj\deflate.obj obj\infblock.obj \
+  obj\infcodes.obj obj\inffast.obj obj\inflate.obj obj\inftrees.obj \
+  obj\infutil.obj obj\trees.obj obj\uncompr.obj obj\zutil.obj
+RESFILES = mngrepair.res
+RESDEPEN = $(RESFILES)
+LIBFILES =
+LIBRARIES = VCL35.lib
+SPARELIBS = VCL35.lib
+PACKAGES = vclx35.bpi VCL35.bpi vcldb35.bpi vcldbx35.bpi bcbsmp35.bpi dclocx35.bpi \
+  Qrpt35.bpi
+DEFFILE =
+# ---------------------------------------------------------------------------
+PATHCPP = .;..\..;..\..\..\zlib
+PATHASM = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -Od -Hc -w -r- -d -k -y -v -vi- -w-par -c -tWC
+CFLAG2 = -D_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_NO_CMS;MNG_SOFTERRORS \
+  -I..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\include \
+  -H=$(BCB)\lib\vcl35.csm
+CFLAG3 = -Tkh30000 -ff -5 -wuse -wucp -wstv -wstu -wsig -wpin -wnod -wnak -wdef -wcln \
+  -wbbf -wasm -wamp -wamb
+PFLAGS = -D_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_NO_CMS;MNG_SOFTERRORS \
+  -N2.\obj -N0.\obj \
+  -U..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib;$(RELEASELIBPATH) \
+  -I..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\include -H -W \
+  -$Y -$W -$O- -v -JPHN -M
+RFLAGS = -D_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_NO_CMS;MNG_SOFTERRORS \
+  -i..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\include
+AFLAGS = /i..\..\..\libmng-devel /i..\..\..\zlib /i..\..\..\jpgsrc6b /i$(BCB)\include \
+  /d_NO_VCL /dMNG_SUPPORT_FULL /dMNG_SUPPORT_READ /dMNG_SUPPORT_WRITE \
+  /dMNG_ACCESS_CHUNKS /dMNG_STORE_CHUNKS /dMNG_INCLUDE_ZLIB /dMNG_NO_CMS \
+  /dMNG_SOFTERRORS /mx /w2 /zd
+LFLAGS = -L..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib;$(RELEASELIBPATH) \
+  -ap -Tpe -x -Gn -wdef -wdpl -v
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0x32.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES)  import32.lib cw32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=1
+MajorVer=1
+MinorVer=0
+Release=0
+Build=27
+Debug=1
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=Executable (Console)
+FileVersion=1.0.0.27
+InternalName=mngrepair
+LegalCopyright=copyright (c) 2002 G.Juyn
+LegalTrademarks=
+OriginalFilename=mngrepair.exe
+ProductName=mngrepair
+ProductVersion=1.0
+Comments=
+
+[Excluded Packages]
+C:\Program Files\Borland\CBuilder3\Bin\DbX35.bpl=(untitled)
+
+[HistoryLists\hlIncludePath]
+Count=9
+Item0=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\include
+Item1=..\..\..\libmng-devel;..\..;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\include
+Item2=..\..;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\include
+Item3=..\..\..\libmng-devel;..\..;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+Item4=..\..;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+Item5=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+Item6=..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b;..\..\..\lcms;$(BCB)\include
+Item7=..\..\..\libmng;..\..\..\zlib;$(BCB)\include
+Item8=..\..\..\libmng;$(BCB)\include
+
+[HistoryLists\hlLibraryPath]
+Count=7
+Item0=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib
+Item1=..\..\..\libmng-devel;..\..;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib
+Item2=..\..;..\..\..\zlib;..\..\..\jpgsrc6b;$(BCB)\lib
+Item3=..\..\..\jpgsrc6b;..\..\..\zlib;..\..\..\libmng-devel;..\win32dll;$(BCB)\lib
+Item4=..\win32dll;$(BCB)\lib
+Item5=..\..\..\libmng\bcb\win32dll;$(BCB)\lib
+Item6=..\..\..\libmng;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b
+
+[HistoryLists\hlConditionals]
+Count=13
+Item0=_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_NO_CMS;MNG_SOFTERRORS
+Item1=_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_INCLUDE_IJG6B;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL;MNG_SOFTERRORS
+Item2=_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_INCLUDE_IJG6B;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL;MNG_SOFTERROR
+Item3=_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_INCLUDE_IJG6B;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL
+Item4=_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_INCLUDE_ZLIB;MNG_INCLUDE_IJG;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL
+Item5=_NO_VCL;MNG_SUPPORT_FULL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL
+Item6=_NO_VCL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL;MNG_SUPPORT_IJG6B
+Item7=_NO_VCL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_DEFINE_JPEG_STDCALL
+Item8=_NO_VCL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_SUPPORT_DISPLAY;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS
+Item9=_NO_VCL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS
+Item10=_NO_VCL;MNG_SUPPORT_READ;MNG_SUPPORT_WRITE;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL
+Item11=_NO_VCL;MNG_SUPPORT_READ;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL
+Item12=_NO_VCL;MNG_SUPPORT_READ;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS
+
+[HistoryLists\hlIntOutputDir]
+Count=2
+Item0=.\obj
+Item1=..\..\..\obj
+
+[HistoryLists\hlRunParameters]
+Count=4
+Item0=roilion02.mng roilion02-fixed.mng
+Item1=roilion.mng roilion-fixed.mng
+Item2=dutch.mng
+Item3=usflag-lc-d63.mng
+
+[Debugging]
+DebugSourceDirs=..\..\..\libmng-devel;..\..\..\zlib;..\..\..\jpgsrc6b
+
+[Parameters]
+RunParams=roilion02.mng roilion02-fixed.mng
+HostApplication=
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------

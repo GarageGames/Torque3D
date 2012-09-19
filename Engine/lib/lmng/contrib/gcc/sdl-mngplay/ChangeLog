@@ -1,0 +1,29 @@
+2001-07-08  Greg Roelofs  <newt@pobox.com>
+	- added SDL/libmng/zlib/libjpeg version info to usage screen
+	- added mouse-click handling (as an alternate quit mode)
+	- added completely static build
+	- fixed automake setup to order options and libraries correctly on
+	  link line, and included resulting files (configure, Makefile.in,
+	  etc.) in order to match instructions in INSTALL file
+
+2000-07-06  Ralph Giles  <giles@ashlu.bc.ca>
+	* Release 0.1
+	- added error handling callback
+	- added event system so you can actually quit
+	  (click the window closebox or type 'escape' or 'q')
+	- window titles from the filename
+	- added basic auto*
+
+2000-07-05  Ralph Giles  <giles@ashlu.bc.ca>
+	* snapshot;
+	- changed refresh parameters to patch libmng 0.9
+
+2000-06-06  Ralph Giles  <giles@ashlu.bc.ca>
+	* snapshot; 
+	- basic playing works now with the MNGsuite tests
+
+2000-06-06  Ralph Giles  <giles@ashlu.bc.ca>
+	* snapshot;
+	- doesn't really work yet
+
+# beginning =)

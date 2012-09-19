@@ -1,0 +1,195 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = MNGDUMP.exe
+OBJFILES = MNGDUMP.obj Main.obj Chunks.obj About.obj Callback.obj Help.obj
+RESFILES = MngDump.res
+DEFFILE =
+RESDEPEN = $(RESFILES) Main.dfm
+LIBFILES = ..\..\..\bcb\win32dll\libmng.lib
+LIBRARIES = VCL35.lib
+SPARELIBS = VCL35.lib
+PACKAGES = VCLX35.bpi VCL35.bpi VCLDB35.bpi VCLDBX35.bpi bcbsmp35.bpi dclocx35.bpi \
+  QRPT35.bpi
+# ---------------------------------------------------------------------------
+PATHCPP = .;
+PATHASM = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -O2 -w -Ve -k- -vi -c -b- -w-par -w-inl -Vx -tW
+CFLAG2 = -I..\win32dll;$(BCB)\include;$(BCB)\include\vcl;..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b
+CFLAG3 = -Tkh30000 -6
+PFLAGS = -U..\win32dll;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -I..\win32dll;$(BCB)\include;$(BCB)\include\vcl;..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b \
+  -$L- -$D- -v -JPHN -M
+RFLAGS = -i..\win32dll;$(BCB)\include;$(BCB)\include\vcl;..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b
+AFLAGS = /i$(BCB)\include /i$(BCB)\include\vcl /i..\..\..\libmng /i..\..\..\zlib \
+  /i..\..\..\jpgsrc6b /mx /w2 /zd /dMNG_SUPPORT_READ /dMNG_ACCESS_CHUNKS \
+  /dMNG_STORE_CHUNKS /dMNG_NO_CMS /dMNG_USE_DLL /dHAVE_BOOLEAN
+LFLAGS = -L..\win32dll;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) -aa -Tpe -x -Gn
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0w32.obj sysinit.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=1
+Special=0
+Private=0
+DLL=0
+Locale=2057
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=RDS
+FileDescription=MngDump
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=Copyright (c) 2000 G.Juyn
+LegalTrademarks=
+OriginalFilename=MngTree
+ProductName=
+ProductVersion=1.0.0.0
+Comments=Author Andy Protano - September 2000
+
+[HistoryLists\hlIncludePath]
+Count=10
+Item0=$(BCB)\include;$(BCB)\include\vcl;..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b
+Item1=$(BCB)\include;$(BCB)\include\vcl;..\..;..\..\..\zlib;..\..\..\jpgsrc6b
+Item2=..\mngtree;..\..\delphi\mngview;$(BCB)\include;$(BCB)\include\vcl;..\..\..\libmng;..\..\..\zlib;..\..\..\jpgsrc6b
+Item3=..\mngtree;..\..\delphi\mngview;$(BCB)\include;$(BCB)\include\vcl;..\..\..\libmng;..\..\..\zlib;..\..\..\libjpeg
+Item4=..\..\delphi\mngview;$(BCB)\include;$(BCB)\include\vcl;..\..;..\..\..\zlib;..\..\..\libjpeg
+Item5=$(BCB)\include;$(BCB)\include\vcl;..\..;..\..\..\zlib;..\..\..\libjpeg
+Item6=$(BCB)\include;$(BCB)\include\vcl;..\..;..\..\zlib;..\..\libjpeg
+Item7=$(BCB)\include;$(BCB)\include\vcl;..\..
+Item8=$(BCB)\include;$(BCB)\include\vcl;..
+Item9=$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=4
+Item0=$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\mngtree;$(BCB)\lib\obj;$(BCB)\lib
+Item2=..\mngtree;..\..\delphi\mngview;$(BCB)\lib\obj;$(BCB)\lib
+Item3=..\..\delphi\mngview;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=6
+Item0=MNG_SUPPORT_READ;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL;HAVE_BOOLEAN
+Item1=_RTLDLL;MNG_SUPPORT_READ;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL;HAVE_BOOLEAN
+Item2=_RTLDLL;MNG_SUPPORT_READ;MNG_ACCESS_CHUNKS;MNG_STORE_CHUNKS;MNG_NO_CMS;MNG_USE_DLL
+Item3=_RTLDLL;HAVE_BOOLEAN
+Item4=_RTLDLL
+Item5=_RTLDLL;USEPACKAGES
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------

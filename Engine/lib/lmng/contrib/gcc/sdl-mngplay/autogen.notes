@@ -1,0 +1,54 @@
+[The end of this file is the result of the following command, executed
+ under tcsh:
+
+	(time /bin/sh autogen.sh) >>&! autogen.log &
+
+ If you have automake and autoconf, the following minimal set of files
+ is sufficient to rerun the autogen.sh script:
+
+	Makefile.am
+	acinclude.m4
+	autogen.sh
+	configure.in
+	mngplay.c
+
+ It will then create the following files:
+
+	aclocal.m4
+	mkinstalldirs	[symbolic link to utility supplied with automake]
+	missing		[symbolic link to utility supplied with automake]
+	install-sh	[symbolic link to utility supplied with automake]
+	Makefile.in
+	configure
+
+ The following documentation files are also part of mngplay:
+
+	AUTHORS
+	COPYING
+	ChangeLog
+	INSTALL
+	README
+
+ I have replaced the symbolic links with copies of the actual utilities and
+ included all files in order to match the instructions in the INSTALL file.
+ Either run configure and make in the usual manner, or, if you prefer, rerun
+ autogen.sh from scratch and then run configure and make.
+
+ Greg Roelofs, 20010708
+]
+
+------------------------------------------------------------------------------
+
+If you wish to pass any options to configure, please specify them on the
+`autogen.sh' command line.
+For example use --prefix= to specify the install directory.
+
+processing .
+Running aclocal  ...
+Running automake --foreign ...
+automake: configure.in: installing `./install-sh'
+automake: configure.in: installing `./mkinstalldirs'
+automake: configure.in: installing `./missing'
+Running autoconf ...
+Skipping configure process.
+1.370u 0.220s 0:03.32 47.8%	0+0k 0+0io 3201pf+0w

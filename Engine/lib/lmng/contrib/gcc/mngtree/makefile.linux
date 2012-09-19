@@ -1,0 +1,43 @@
+# makefile for mngtree test-program on Linux ELF with gcc
+
+prefix=/usr/local
+
+CC=gcc
+
+INCPATH=$(prefix)/include
+LIBPATH=$(prefix)/lib
+
+JPEGLIB=/usr/lib
+
+ALIGN=
+# for i386:
+#ALIGN=-malign-loops=2 -malign-functions=2
+
+WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
+	-Wmissing-declarations -Wtraditional -Wcast-align \
+	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
+
+# for pgcc version 2.95.1, -O3 is buggy; don't use it.
+
+CFLAGS=-I$(INCPATH) -Wall -O3 -funroll-loops -DMNG_USE_SO $(ALIGN) # $(WARNMORE) -g
+LDFLAGS=-L. -Wl,-rpath,. -L$(LIBPATH) -Wl,-rpath,$(LIBPATH) \
+	-L$(JPEGLIB) -Wl,-rpath,$(JPEGLIB) -lmng -lz -ljpeg -lm
+
+OBJS = mngtree.o
+
+.SUFFIXES:      .c .o
+
+.c.o:
+	$(CC) -c $(CFLAGS) -o $@ $*.c
+
+all: mngtree
+
+mngtree: mngtree.o
+	$(CC) -o mngtree $(CFLAGS) mngtree.o $(LDFLAGS)
+
+clean:
+	/bin/rm -f *.o mngtree 
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+mngtree.o: mngtree.c

@@ -1,0 +1,40 @@
+MNGPLG
+A simple browser plug-in for the MNG image/animation file format.
+
+By Jason Summers  <jason1@pobox.com>
+Web site: <http://pobox.com/~jason1/mngplg/>
+
+
+COPYRIGHT NOTICE
+
+Copyright (c) 2000-2002 by Jason Summers <jason1@pobox.com>
+
+THIS SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT 
+ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR 
+FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND 
+PERFORMANCE OF THE LIBRARY IS WITH YOU.  SHOULD THE LIBRARY PROVE DEFECTIVE, 
+YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL 
+ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE 
+THIS SOFTWARE AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING 
+ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE 
+USE OR INABILITY TO USE THIS SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF 
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD 
+PARTIES OR A FAILURE OF THIS SOFTWARE TO OPERATE WITH ANY OTHER PROGRAMS), 
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF 
+SUCH DAMAGES.
+
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it 
+freely, subject to the following restrictions:
+
+ 1. The origin of this source code must not be misrepresented;
+    you must not claim that you wrote the original software.
+ 2. Altered source versions must be plainly marked as such, and must not
+    be misrepresented as being the original source.
+ 3. Altered binary versions must not be misrepresented as being the
+    original.
+ 4. This Copyright notice may not be removed or altered from any source
+    or altered source distribution, although you may add a Copyright
+    notice for yourself for any code that you have written.

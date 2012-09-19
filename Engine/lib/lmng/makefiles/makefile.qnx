@@ -1,0 +1,160 @@
+#
+# For conditions of distribution and use, see copyright notice in libmng.h
+#
+# makefile for libmng - THE MNG library
+# this makefile is suitable for QNX Neutrino
+
+# Configuration options are now in libmng_conf.h
+
+# The architecture of your target
+# one of arm, mips, ppc, sh, x86
+ARCH = mips
+
+# The name of the library
+LIBNAME = libmng
+ARNAME = $(LIBNAME).a
+SONAME = $(LIBNAME).so
+
+# current version numbers
+MNGMAJ = 1
+MNGMIN = 0.9
+MNGVER = $(MNGMAJ).$(MNGMIN)
+
+# The artefact output folder
+OBJDIR = bin
+
+# Location of jpeg header files
+JPEG_INC = $(QNX_TARGET)/usr/include/jpeg
+
+# Location of zlib header files
+ZLIB_INC = $(QNX_TARGET)/usr/include
+
+# Location of lcms header files
+# (switch on MNG_FULL_CMS in libmng_conf.h if you want to use this)
+LCMS_INC = $(QNX_TARGET)/usr/include/lcms
+
+# default build defines
+DEF = 
+DEF_SO = -DMNG_BUILD_SO
+
+# compiler options:
+CFLAGS = -O2 -funroll-loops
+
+# include paths
+INC = -I$(ZLIB_INC) -I$(JPEG_INC)
+
+# The name of your C compiler:
+CC = nto$(ARCH)-gcc
+
+# source files
+SRC= \
+	libmng_callback_xs.c \
+	libmng_chunk_io.c \
+	libmng_chunk_descr.c \
+	libmng_chunk_prc.c \
+	libmng_chunk_xs.c \
+	libmng_cms.c \
+	libmng_display.c \
+	libmng_dither.c \
+	libmng_error.c \
+	libmng_filter.c \
+	libmng_hlapi.c \
+	libmng_jpeg.c \
+	libmng_object_prc.c \
+	libmng_pixels.c \
+	libmng_prop_xs.c \
+	libmng_read.c \
+	libmng_trace.c \
+	libmng_write.c \
+	libmng_zlib.c
+
+# object files
+OBJ=$(addprefix $(OBJDIR)/$(ARCH)/, $(SRC:%.c=%.o))
+
+# object files for shared object
+OBJ_SO=$(addprefix $(OBJDIR)/$(ARCH)/, $(SRC:%.c=%.pic.o))
+
+# type dependancies
+$(OBJDIR)/$(ARCH)/%.o: %.c
+	$(CC) $(CFLAGS) $(INC) $(DEF) -o $@ -c $<
+
+$(OBJDIR)/$(ARCH)/%.pic.o: %.c
+	$(CC) $(CFLAGS) $(INC) $(DEF_SO) -fPIC -o $@ -c $<
+
+all: init $(ARNAME) $(SONAME)
+
+init:
+	if [ ! -d $(OBJDIR)/$(ARCH) ]; then mkdir -p $(OBJDIR)/$(ARCH); fi 
+
+$(ARNAME): $(OBJ)
+	ar r $(OBJDIR)/$(ARCH)/$(ARNAME) $(OBJ)
+
+$(SONAME): $(SONAME).$(MNGMAJ)
+	ln -sf $(OBJDIR)/$(ARCH)/$(SONAME).$(MNGMAJ) $(OBJDIR)/$(ARCH)/$(SONAME)
+
+$(SONAME).$(MNGMAJ): $(SONAME).$(MNGVER)
+	ln -sf $(OBJDIR)/$(ARCH)/$(SONAME).$(MNGVER) $(OBJDIR)/$(ARCH)/$(SONAME).$(MNGMAJ)
+
+$(SONAME).$(MNGVER): $(OBJ_SO)
+	$(CC) -shared -Wl,-soname,$(SONAME).$(MNGMAJ) -o $(OBJDIR)/$(ARCH)/$(SONAME).$(MNGVER) $(OBJ_SO) \
+	-lz -lm -ljpeg
+#	-lz -lm -ljpeg -llcms
+
+clean:
+	rm -f $(OBJ) $(OBJ_SO)
+	rm -f $(OBJDIR)/$(ARCH)/$(ARNAME) $(OBJDIR)/$(ARCH)/$(SONAME)*
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+libmng_hlapi.o libmng_hlapi.pic.o: libmng_hlapi.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_object_prc.h \
+	libmng_chunks.h libmng_memory.h libmng_error.h libmng_trace.h libmng_read.h \
+        libmng_write.h libmng_display.h libmng_zlib.h libmng_cms.h libmng_zlib.h
+libmng_callback_xs.o libmng_callback_xs.pic.o: libmng_callback_xs.c libmng.h \
+        libmng_conf.h libmng_types.h libmng_data.h libmng_error.h libmng_trace.h
+libmng_prop_xs.o libmng_prop_xs.pic.o: libmng_prop_xs.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_error.h libmng_trace.h libmng_cms.h
+libmng_chunk_xs.o libmng_chunk_xs.pic.o: libmng_chunk_xs.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_chunks.h libmng_chunk_prc.h \
+        libmng_error.h libmng_trace.h
+libmng_read.o libmng_read.pic.o: libmng_read.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_object_prc.h \
+	libmng_chunks.h libmng_chunk_prc.h libmng_chunk_io.h libmng_memory.h \
+        libmng_error.h libmng_trace.h libmng_read.h libmng_display.h
+libmng_write.o libmng_write.pic.o: libmng_write.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h libmng_write.h
+libmng_display.o libmng_display.pic.o: libmng_display.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_objects.h libmng_object_prc.h libmng_memory.h \
+	libmng_error.h libmng_trace.h libmng_zlib.h libmng_cms.h libmng_pixels.h \
+        libmng_display.h
+libmng_object_prc.o libmng_object_prc.pic.o: libmng_object_prc.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_objects.h libmng_object_prc.h libmng_memory.h \
+        libmng_error.h libmng_trace.h libmng_display.h libmng_pixels.h
+libmng_chunk_descr.o libmng_chunk_descr.pic.o: libmng_chunk_descr.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_chunks.h libmng_chunk_descr.h libmng_memory.h \
+        libmng_chunk_prc.h libmng_error.h libmng_trace.h
+libmng_chunk_prc.o libmng_chunk_prc.pic.o: libmng_chunk_prc.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_chunks.h libmng_chunk_prc.h libmng_memory.h \
+        libmng_error.h libmng_trace.h
+libmng_chunk_io.o libmng_chunk_io.pic.o: libmng_chunk_io.c libmng.h libmng_conf.h \
+        libmng_types.h libmng_data.h libmng_objects.h libmng_object_prc.h \
+        libmng_chunks.h libmng_chunk_io.h libmng_chunk_prc.h libmng_memory.h libmng_error.h \
+        libmng_trace.h libmng_display.h libmng_zlib.h libmng_pixels.h
+libmng_error.o libmng_error.pic.o: libmng_error.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h
+libmng_trace.o libmng_trace.pic.o: libmng_trace.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h
+libmng_pixels.o libmng_pixels.pic.o: libmng_pixels.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_memory.h libmng_error.h libmng_trace.h \
+        libmng_cms.h libmng_filter.h libmng_pixels.h
+libmng_filter.o libmng_filter.pic.o: libmng_filter.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h libmng_filter.h
+libmng_dither.o libmng_dither.pic.o: libmng_dither.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_error.h libmng_trace.h libmng_dither.h
+libmng_zlib.o libmng_zlib.pic.o: libmng_zlib.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_memory.h libmng_error.h libmng_trace.h libmng_pixels.h \
+        libmng_filter.h libmng_zlib.h
+libmng_jpeg.o libmng_jpeg.pic.o: libmng_jpeg.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_memory.h libmng_error.h libmng_trace.h libmng_pixels.h libmng_jpeg.h
+libmng_cms.o libmng_cms.pic.o: libmng_cms.c libmng.h libmng_conf.h libmng_types.h \
+	libmng_data.h libmng_objects.h libmng_error.h libmng_trace.h libmng_cms.h

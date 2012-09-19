@@ -1,0 +1,38 @@
+From dummy.c:
+
+/*
+ *  Very simple program, that has been used by us
+ *  (V. Babin <babin@users.sourceforge.net> and
+ *   S. Kondrat <valiska@users.sourceforge.net>)
+ *  during toying with libmng (http://www.limng.com)
+ *
+ *  License: GPL :-))
+ *
+ *  7 July 2001:  added key-press/button-press handling to exit viewer without
+ *                window-manager help; added libmng version info [Greg Roelofs]
+ */
+
+From gtk-mng-view.c:
+
+/* Toy widget for GTK+ for displaying MNG animations.
+ *
+ * Copyright (C) 2000 The Free Software Foundation
+ *
+ * Author(s): Volodymyr Babin <vb@dwuj.ichf.edu.pl>
+ *
+ * This code is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
+

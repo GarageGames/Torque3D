@@ -1,0 +1,30 @@
+* fbmngplay *
+
+a simple fbcon based mng player
+
+This is a simple example program, using the kernel framebuffer device
+to display mng animation decoded by the new libmng implementation.
+
+This player is based on the SDL version included in the libmng package
+from Ralph Giles  <giles@ashlu.bc.ca>. The code's fairly rough at this
+point, but there was no example player for *nix in the distribution.
+Patches welcome, of course.
+
+On a unix-like system, the build instructions are simple:
+
+(install and/or build the mng library from libmng.com)
+make
+make install
+
+To use the player:
+
+fbmngplay <filename>.mng <filename>.mng ...
+
+To stop looping animations, press CTRL C or send a TERM or INT signal.
+
+See the options with 
+fbmngplay -h
+
+---
+Stefan Reinauer, <stepan@suse.de>
+$Date: 2002/09/26 18:09:36 $

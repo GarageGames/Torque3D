@@ -1,0 +1,23 @@
+Program:
+========
+
+'xmngview' displays MNG/JNG/PNG files. The program can be called
+
+	xmngview
+	xmngview filename
+
+This program is used within a plugin library for a browser:
+	xmngview -wWINDOWID -bgBGPIXEL filename
+
+Limitations: 
+============
+	needs Lesstif/Motif, i.e. '-lXm -lXt -lX11'.
+	depth >= 8 (tested with 8bpp, 16bpp, 24bpp)
+	perhaps INTEL only
+	perhaps LINUX only
+
+libmng:
+=======
+	read the first lines of xmngview.c
+
+szukw000, March 2003

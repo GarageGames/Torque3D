@@ -1,0 +1,8 @@
+Require:
+
+  * gtk+ >= 1.2.0 (tested on 1.2.8)
+  * libmng (tested on 0.9.2)
+
+You have specify Your libmng instalation prefix
+before typing `make' in the first line of a Makefile
+in this directory. Later type `make'.

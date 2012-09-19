@@ -1,0 +1,27 @@
+* mngplay *
+
+a simple SDL-based mng player
+
+This is a simple example program, using the Simple Direct media Layer
+to display mng animation decoded by the new libmng implementation.
+
+SDL and libmng are quite portable, but I've only tried it on x86 Linux.
+Project files for MacOS, BeOS and Win32 are welcome. The code's fairly
+rough at this point, but there was no example player for *nix in the
+distribution. Patches welcome, of course.
+
+On a unix-like system, the build instructions are simple:
+
+(install and/or build the SDL libraries from libsdl.org)
+(install and/or build the mng library from libmng.com)
+./configure    (or ./autogen.sh if you're using the cvs source)
+make
+make install
+
+To use the player:
+
+mngplay <filename>.mng
+
+---
+Ralph Giles  <giles@ashlu.bc.ca>
+$Date: 2002/09/26 18:09:37 $

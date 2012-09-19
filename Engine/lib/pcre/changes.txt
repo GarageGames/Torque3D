@@ -1,0 +1,5 @@
+Don't use bits/type_traits.h on Linux - Andrew Galante, GG 8/2/2009: pcre_stringpiece.h
+
+Both Mac and Linux support strtoq - Andrew Galante, GG 8/2/2009: config.h
+
+Neither Mac nor Linux support _strtoi64 - Andrew Galante, GG 8/2/2009: config.h
