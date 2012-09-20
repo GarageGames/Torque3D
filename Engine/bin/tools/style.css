@@ -1,0 +1,305 @@
+/*--------------------------------------- Default Styles ----------------------------------------------*/
+QWidget { font: 11px Arial, Helvetica, sans-serif ; }
+QMainWindow{
+ 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 255), stop:0.001 rgba(49, 43, 76, 255), stop:0.155 rgba(32, 26, 38, 255), stop:0.156 rgba(240, 239, 238, 255), stop:1 rgba(240, 239, 238, 255));
+}
+
+/*--------------------------------------- Radio Button ----------------------------------------------*/
+QRadioButton::indicator {width:13px; height:13px; } 
+QRadioButton::indicator::unchecked {image: url(:/Torque3DFrontloader/resources/radioButton_unchecked.png); } 
+QRadioButton::indicator:unchecked:hover {image: url(:/Torque3DFrontloader/resources/radioButton_unchecked_hover.png); } 
+QRadioButton::indicator:unchecked:pressed {image: url(:/Torque3DFrontloader/resources/radioButton_unchecked_pressed.png); } 
+QRadioButton::indicator::checked {image: url(:/Torque3DFrontloader/resources/radioButton_checked.png); } 
+QRadioButton::indicator:checked:hover {image: url(:/Torque3DFrontloader/resources/radioButton_checked_hover.png); } 
+QRadioButton::indicator:checked:pressed {image: url(:/Torque3DFrontloader/resources/radioButton_checked_pressed.png); }
+
+/*--------------------------------------- CheckBox ----------------------------------------------*/
+QCheckBox {spacing: 5px; } 
+QCheckBox::indicator {width: 13px; height: 13px; } 
+QCheckBox::indicator:unchecked {image: url(:/Torque3DFrontloader/resources/checkbox_unchecked.png); } 
+QCheckBox::indicator:unchecked:hover {image: url(:/Torque3DFrontloader/resources/checkbox_unchecked_hover.png); } 
+QCheckBox::indicator:unchecked:pressed {image: url(:/Torque3DFrontloader/resources/checkbox_unchecked_pressed.png); } 
+QCheckBox::indicator:checked {image: url(:/Torque3DFrontloader/resources/checkbox_checked.png); } 
+QCheckBox::indicator:checked:hover {image: url(:/Torque3DFrontloader/resources/checkbox_checked_hover.png); } 
+QCheckBox::indicator:checked:pressed {image: url(:/Torque3DFrontloader/resources/checkbox_checked_pressed.png); } 
+QCheckBox::indicator:indeterminate {image: url(:/Torque3DFrontloader/resources/checkbox_indeterminate.png); } 
+/*QCheckBox::indicator:indeterminate:hover {image: url(:/Torque3DFrontloader/resources/checkbox_indeterminate_hover.png); } 
+QCheckBox::indicator:indeterminate:pressed {image: url(:/Torque3DFrontloader/resources/checkbox_indeterminate_pressed.png); }*/
+
+/*--------------------------------------- Vertical Scrolbar ----------------------------------------------*/
+QScrollBar:vertical {      
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));      
+width: 15px;
+margin: 16px 0 16px 0;  }
+QScrollBar::handle:vertical {     
+	border:1px solid  rgb(200,200,200); border-radius:3px;
+	background-image: url(:/Torque3DFrontloader/resources/grip-v.png); background-repeat:none; background-position:center center;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255)); padding:5px 15px 5px 15px; min-height: 20px;  }  
+QScrollBar::handle:vertical:hover {border:1px solid  rgb(150,150,150); background-image: url(:/Torque3DFrontloader/resources/grip-v_d.png);}  
+QScrollBar::add-line:vertical {   
+	background:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));
+	height:16px; subcontrol-position:bottom; subcontrol-origin:margin;  } 
+QScrollBar::sub-line:vertical {         
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));       
+	height: 16px;      subcontrol-position: top;      	subcontrol-origin: margin;}  
+QScrollBar::up-arrow:vertical{margin:0 0 0 1px; width:16px; height:16px; background-image: url(:/Torque3DFrontloader/resources/up-arrow_n.png);  }  
+QScrollBar::down-arrow:vertical {margin:1px 0 0 1px; width:16px; height:16px; background-image: url(:/Torque3DFrontloader/resources/down-arrow_n.png);  }  
+QScrollBar::up-arrow:vertical:hover{background-image: url(:/Torque3DFrontloader/resources/up-arrow.png);  }  
+QScrollBar::down-arrow:vertical:hover {background-image: url(:/Torque3DFrontloader/resources/down-arrow.png);  } 
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {  background: none;  }
+/*--------------------------------------- Horizontal Scrolbar ----------------------------------------------*/
+QScrollBar:horizontal {      
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));      
+height: 15px;
+margin: 0 16px 0 16px ;  }
+QScrollBar::handle:horizontal {     
+	border:1px solid  rgb(200,200,200); border-radius:3px;
+	background-image: url(:/Torque3DFrontloader/resources/grip-h.png); background-repeat:none; background-position:center center;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255)); padding:5px 15px 5px 15px; min-width: 20px;  }  
+QScrollBar::handle:horizontal:hover {border:1px solid  rgb(150,150,150); background-image: url(:/Torque3DFrontloader/resources/grip-h_d.png);}  
+QScrollBar::add-line:horizontal {   
+	background:qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));
+	width:16px; subcontrol-position:right; subcontrol-origin:margin;  } 
+QScrollBar::sub-line:horizontal {  
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));       
+	width: 16px;      subcontrol-position:left;      subcontrol-origin: margin;}  
+QScrollBar::left-arrow:horizontal{margin:0 0 0 1px; width:16px; height:16px; background-image: url(:/Torque3DFrontloader/resources/left-arrow_n.png);  }  
+QScrollBar::right-arrow:horizontal {margin:1px 0 0 1px; width:16px; height:16px; background-image: url(:/Torque3DFrontloader/resources/right-arrow_n.png);  }  
+QScrollBar::left-arrow:horizontal:hover{background-image: url(:/Torque3DFrontloader/resources/left-arrow.png);  }  
+QScrollBar::right-arrow:horizontal:hover {background-image: url(:/Torque3DFrontloader/resources/right-arrow.png);  }  
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {  background: none;  }
+
+/*--------------------------------------- Window Background Color ----------------------------------------------*/
+.DeploymentPageAdvanced, .DeploymentPage, .launchingdialog, .NewProjectPage, .ProgressFinishedDialog, QDialogue, .ProgressDialog, QDialog { 
+	background-color: rgb(242, 241, 240);
+}
+.DeploymentPage > QGroupBox{
+	margin-left:8px;
+	margin-right:8px;
+	padding: 0 4px 0 4px;
+}
+
+/*--------------------------------------- Tab Page ----------------------------------------------*/
+QTabWidget::pane {
+	position:absolute;
+	top:0px; /*fixes mac vertical centering*/
+	border: 1px solid rgb(100, 100, 100);
+	border-top-right-radius:3px; border-bottom-left-radius:3px; border-bottom-right-radius:3px;
+	background-color: rgb(255, 255, 255);
+}
+QTabWidget::tab-bar{
+	alignment: left; /*fixes mac horizontal centering*/
+	top:0px; /*fixes mac vertical centering*/
+}
+QTabBar::tab {
+	right:0px;
+	border: 1px solid rgb(100, 100, 100);
+	min-width:8ex;
+	border-top-left-radius:3px; border-top-right-radius:3px;
+	padding:1px 10px 2px 10px;
+	background-color: rgb(255,255,255);
+}
+QTabBar::tab::selected {
+	border-style: solid solid none solid;
+	background-color: rgb(255,255,255);
+}
+QTabBar::tab::!selected:hover {
+	border-style: solid;
+	background-color:qlineargradient(spread:pad, x1:1, y1:0, x2:1, y2:1, stop:0.8125 rgba(230, 230, 230, 255), stop:1 rgba(190, 190, 190, 255));
+}
+QTabBar::tab:!selected {
+	background-color:qlineargradient(spread:pad, x1:1, y1:0, x2:1, y2:1, stop:0.8125 rgba(212, 212, 212, 255), stop:1 rgba(178, 178, 178, 255));
+	margin-top:3px;
+}
+QTabWidget::pane QTextEdit{
+	border: none;
+}
+
+/*--------------------------------------- Dropdown Boxes ----------------------------------------------*/
+QComboBox::drop-down{
+	subcontrol-origin: padding;     subcontrol-position: top right;     width: 17px;       
+	padding:-2px 2px 0 0; border-top-right-radius: 3px; border-bottom-right-radius: 3px;
+}
+QComboBox::down-arrow{ background-image: url(:/Torque3DFrontloader/resources/down-arrow.png);}
+QComboBox::down-arrow:on { top: 1px;     left: 1px; }
+QComboBox QAbstractItemView {   background: white; border:1px solid gray; }
+QComboBox:on{background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0.903409 rgba(212, 212, 212, 255), stop:1 rgba(178, 178, 178, 255));}
+QComboBox{ 
+	border:1px solid  rgb(100,100,100);  border-radius:3px;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255));
+}
+
+/*--------------------------------------- Default Button ----------------------------------------------*/
+QPushButton{ 
+	border:1px solid  rgb(100,100,100);
+	border-radius:3px;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255));
+	padding:4px 15px 4px 15px;
+	min-height:11px;
+}
+
+/*--------------------------------------- Tool Button ----------------------------------------------*/
+QToolButton{
+	border:1px solid  rgb(100,100,100);
+	border-radius:3px;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255));
+}
+.QPushButton:pressed, .QToolButton::pressed, #PackageGroupBox .QPushButton:pressed, #CreateNewProjectButton:pressed, #OtherGroupBox .QPushButton:pressed, #EditorQuickLinkGroupBox .QPushButton:pressed{ /* Default Button Pressed state */
+	background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0.903409 rgba(212, 212, 212, 255), stop:1 rgba(178, 178, 178, 255));
+}
+QPushButton::hover, QToolButton::hover, QComboBox::hover{ /* Default Button Hover state */
+	background-color:qlineargradient(spread:repeat, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(247, 246, 245, 255), stop:1 rgba(222, 222, 222, 255));
+}
+QPushButton::menu-indicator{
+	subcontrol-position:right center;
+	subcontrol-orgin:padding;
+}
+
+/*--------------------------------------- New Project Button ----------------------------------------------*/
+#CreateNewProjectButton { border:none; background:none; margin:0; padding:0; }
+#CreateNewProjectButton:hover { border:1px solid rgb(200,200,200); background:none; }
+
+/*--------------------------------------- Web link style button ----------------------------------------------*/
+#EditToolBarButton, #HelpGroupBox QPushButton, #EditCommentsButton {
+	font:10px;
+	color:#0A0260;
+	border:none; background:none;
+	margin:0 0 5px 0;
+	text-decoration:underline;
+	max-height:20px;
+	padding:0;
+}
+#EditToolBarButton:hover, #HelpGroupBox QPushButton:hover, #EditCommentsButton:hover {
+	color:#000000;
+	margin:0 0 5px 0;
+}
+
+/*--------------------------------------- Project Tree Item ----------------------------------------------*/
+.ProjectTreeItem{  /*-- unSelected --*/
+	border-bottom-right-radius:4px;
+	border-top-right-radius:4px;
+	background:#F6f5f4;
+	border:1px solid #eeeeee;
+}
+.ProjectTreeItem::hover { /*-- Hover --*/
+	border:1px solid #cccccc;
+	background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));
+}
+/*border:1px solid rgb(0, 44, 67);   -- Selected done in Code --
+	
+background-color: qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(223, 245, 255, 255), stop:0.49 rgba(252, 254, 255, 255), stop:0.5 rgba(208, 233, 245, 255), stop:1 rgba(239, 250, 255, 255))*/
+#ProjectName{ /*-- project name color --*/
+	color:#000000;
+}	
+/*--------------------------------------- Thumb Image Border ----------------------------------------------*/
+.ProjectTreeItem QLabel#ProjectImage, #ProjectInformationGroupBox QLabel#ExistingProjectInfoPreviewImage, #PreviewImage
+{
+	border:1px solid #444444;
+	border-radius:2px;
+}
+/*--------------------------------------- Blank Frame style ----------------------------------------------*/
+#PreviewImageFrame{ border:none; }
+
+/*--------------------------------------- Default text area styles ----------------------------------------------*/
+.ProjectScrollArea,  QTreeView, QTextEdit, QLineEdit:focus, #DirectoryTextEdit:focus, #ExistingProjectInfoComment:focus{
+	border:1px inset rgb(100,100,100);
+	border-radius:2px;
+	background-color: rgb(255,255,255);
+}
+#ExistingProjectInfoComment{ border:1px solid rgb(200, 200, 200); border-radius:2px; background-color: rgb(255,255,255);}
+#DirectoryTextEdit{ border:none; background-color: rgb(242, 241, 240); }
+.ProjectScrollArea #ProjectScrollContent { background-color: rgb(255,255,255); }
+QLineEdit{ /*line edit not selected state*/
+	border:1px inset rgb(100,100,100);
+	border-radius:2px;
+	background-color: rgb(242, 241, 240);
+}
+/*--------------------------------------- Header style ----------------------------------------------*/
+QHeaderView::section{
+ 	border:1px solid rgb(100,100,100);
+	margin:-1px 0 0 -1px;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255));
+	padding-left:10px;
+	height:20px;
+}
+/*--------------------------------------- Quicklinks ----------------------------------------------*/
+#EditorQuickLinkGroupBox QPushButton {
+	height:20px; min-height:20px;
+	width:125px; max-width:125px;
+}
+/*--------------------------------------- Left Quicklinks ----------------------------------------------*/
+#LeftQuickLinkButton {
+	border:1px solid rgb(150,150,150); border-top-left-radius:3px; border-bottom-left-radius:3px;  border-top-right-radius:0; border-bottom-right-radius:0;
+	width:100px; height:24px;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255));
+}
+#LeftQuickLinkButton::pressed, #RightQuickLinkButton::pressed  { background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0.903409 rgba(212, 212, 212, 255), stop:1 rgba(178, 178, 178, 255));}
+/*--------------------------------------- Right Quicklinks ----------------------------------------------*/
+#RightQuickLinkButton {
+	border:1px solid rgb(150,150,150); border-top-right-radius:3px; border-bottom-right-radius:3px; border-top-left-radius:0; border-bottom-left-radius:0;
+	width:100px; height:24px;
+	background-color:qlineargradient(spread:repeat, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(247, 246, 245, 255), stop:0.497326 rgba(241, 240, 239, 255), stop:0.5 rgba(232, 231, 230, 255), stop:1 rgba(222, 222, 222, 255));
+}
+#RightQuickLinkButton::hover, #LeftQuickLinkButton::hover { background-color:qlineargradient(spread:repeat, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(247, 246, 245, 255), stop:1 rgba(222, 222, 222, 255)); }
+
+/*--------------------------------------- Less important Editor Buttons ----------------------------------------------*/
+#OtherGroupBox QPushButton{ 
+	color:rgb(50,50,50);
+	border:1px solid rgb(150,150,150);
+	background:none;
+}
+#PackageGroupBox QPushButton { 
+	color:rgb(50,50,50);
+	border:1px solid rgb(200,200,200);
+	background:none;
+}
+#PackageGroupBox QPushButton:hover, #OtherGroupBox QPushButton:hover { 
+	color:rgb(0,0,0);
+	border:1px solid rgb(100,100,100);
+	background:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));
+}
+/*---------------------------------------  Default GroupBox Style ----------------------------------------------*/
+QGroupBox { 
+	border:1px rgb(150,150,150); 
+	border-style: solid none none none; 
+	border-radius:0;
+	margin:5px 0 0 0px;
+}
+QGroupBox::title {  /* Default GroupBox Title Style */
+	top:-7px; left:0px;
+	margin: 0 4px 0 0px;
+}
+/*--------------------------------------- Full GroupBox ----------------------------------------------*/
+#ProjectApplicationsGroupBox, #commentsGroupBox{
+	border:1px solid rgb(220,220,220);
+	border-radius:3px;
+	margin:9px 0 0 0;
+	padding:8px 8px 8px 8px;
+}
+#ProjectApplicationsGroupBox::title { left:7px; margin: 0 4px 0 4px; } /* Full GroupBox Title*/
+
+/*--------------------------------------- Quicklinks GroupBox ----------------------------------------------*/
+#EditorQuickLinkGroupBox {
+	border:1px solid rgb(150,150,150);
+	border-radius:5px;
+	margin:0;
+	background:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(240, 239, 238, 255), stop:1 rgba(255, 255, 255, 255));
+}
+
+/*--------------------------------------- Transparent GroupBox ----------------------------------------------*/
+#EditorQuickLinkLabel, #OtherGroupBox, #HelpGroupBox, #ExistingProjectInfoComment { /* invisable group boxes */ border: none; background:none; }
+
+/*--------------------------------------- Launching Dialog Main Text ----------------------------------------------*/
+#LaunchingDialogMainText{ font:18px Arial, Helvetica, sans-serif bold; }
+/*--------------------------------------- Gray light Text Lables ----------------------------------------------*/
+#ExistingProjectInfoSizeLabel, #ExistingProjectInfoLastUpdateLabel , #ProjectLastUpdate, #ProjectSize, #TemplatePreviewSizeLabel, #TemplatePreviewLastUpdateLabel, #TemplatePreviewCreatedDataLabel{
+	color:#999999
+}
+/*--------------------------------------- Gray dark Text Lables ----------------------------------------------*/
+#ProjectLastUpdateValue, #ProjectSizeValue{
+	color:#444444;
+}
+/*--------------------------------------- Text White Background Fill ----------------------------------------------*/
+#ExistingProjectInfoMyGameName, #ExistingProjectInfoLastUpdateValue, #EditCommentsButton, #ExistingProjectInfoCommentTime, #CurrentStageStatusText{
+	background-color: rgb(255, 255, 255);
+}

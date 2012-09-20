@@ -1,0 +1,14 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {remove = id; }; 
+            CLASS = PMActionView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_headerView" = NSView; "_titleField" = PMActionViewTitleField; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = PMActionViewTitleField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

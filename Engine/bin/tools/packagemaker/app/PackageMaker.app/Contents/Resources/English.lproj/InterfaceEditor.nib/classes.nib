@@ -1,0 +1,46 @@
+{
+    IBClasses = (
+        {CLASS = DroppableTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = IEBackgroundImageView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_dragDelegate" = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = IEOpaqueContentView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            CLASS = IEResourceTextView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_dragDelegate" = id; }; 
+            SUPERCLASS = NSTextView; 
+        }, 
+        {CLASS = IESectionMatrix; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
+        {
+            ACTIONS = {
+                chooseResource = id; 
+                continueButtonClicked = id; 
+                goBackButtonClicked = id; 
+                matrixButtonClicked = id; 
+            }; 
+            CLASS = IEWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_backgroundImageView" = IEBackgroundImageView; 
+                "_currentLocaleController" = NSObjectController; 
+                "_modelController" = NSObjectController; 
+                "_sectionMatrix" = IESectionMatrix; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = PMDragTargetTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {CLASS = PMImagePopUpButton; LANGUAGE = ObjC; SUPERCLASS = NSPopUpButton; }, 
+        {
+            CLASS = ResourcesLocaleController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_windowController" = NSWindowController; }; 
+            SUPERCLASS = NSArrayController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

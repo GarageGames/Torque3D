@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Megabytes Available on Target</string>
+		<key>identifier</key>
+		<string>kilo</string>
+		<key>Type</key>
+		<string>number</string>
+		<key>javascriptTemplate</key>
+		<string>my.target.availableKilobytes %comparator %value * 1024 * 1024</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Maximum CPU Frequency (Hz)</string>
+		<key>identifier</key>
+		<string>cpuf</string>
+		<key>Type</key>
+		<string>number</string>
+		<key>javascriptTemplate</key>
+		<string>system.sysctl('hw.cpufrequency_max') %comparator %value</string>
+		<key>SpecType</key>
+		<string>sysctl</string>
+		<key>SpecArgument</key>
+		<string>hw.cpufrequency_max</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Memory Available (Bytes)</string>
+		<key>identifier</key>
+		<string>memo</string>
+		<key>Type</key>
+		<string>number</string>
+		<key>javascriptTemplate</key>
+		<string>system.sysctl('hw.memsize') %comparator %value</string>
+		<key>SpecType</key>
+		<string>sysctl</string>
+		<key>SpecArgument</key>
+		<string>hw.memsize</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Number of CPUs</string>
+		<key>identifier</key>
+		<string>cpus</string>
+		<key>Type</key>
+		<string>number</string>
+		<key>javascriptTemplate</key>
+		<string>system.sysctl('hw.ncpu') %comparator %value</string>
+		<key>SpecType</key>
+		<string>sysctl</string>
+		<key>SpecArgument</key>
+		<string>hw.ncpu</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<string></string>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>64-bit Instructions Available</string>
+		<key>identifier</key>
+		<string>64bi</string>
+		<key>Type</key>
+		<string>boolean</string>
+		<key>javascriptTemplate</key>
+		<string>system.sysctl('hw.optional.64bitops') %comparator %value</string>
+		<key>SpecType</key>
+		<string>sysctl</string>
+		<key>SpecArgument</key>
+		<string>hw.optional.64bitops</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Altivec Available</string>
+		<key>identifier</key>
+		<string>alti</string>
+		<key>Type</key>
+		<string>boolean</string>
+		<key>javascriptTemplate</key>
+		<string>system.sysctl('hw.optional.altivec') %comparator %value</string>
+		<key>SpecType</key>
+		<string>sysctl</string>
+		<key>SpecArgument</key>
+		<string>hw.optional.altivec</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Logged-in Users</string>
+		<key>identifier</key>
+		<string>user</string>
+		<key>Type</key>
+		<string>number</string>
+		<key>javascriptTemplate</key>
+		<string>system.users.desktopSessionsCount %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Target Mountpoint</string>
+		<key>identifier</key>
+		<string>moun</string>
+		<key>Type</key>
+		<string>string</string>
+		<key>javascriptTemplate</key>
+		<string>my.target.mountpoint %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>System OS Version (e.g. 10.x.x)</string>
+		<key>identifier</key>
+		<string>sosv</string>
+		<key>Type</key>
+		<string>string</string>
+		<key>javascriptTemplate</key>
+		<string>system.version.ProductVersion %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Target OS Version (e.g. 10.x.x)</string>
+		<key>identifier</key>
+		<string>tosv</string>
+		<key>Type</key>
+		<string>string</string>
+		<key>javascriptTemplate</key>
+		<string>my.target.systemVersion.ProductVersion %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<string></string>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>File Exists on System</string>
+		<key>identifier</key>
+		<string>file</string>
+		<key>Type</key>
+		<string>file</string>
+		<key>javascriptTemplate</key>
+		<string>system.files.fileExistsAtPath('%path') %comparator %value</string>
+		<key>SpecType</key>
+		<string>file</string>
+		<key>SpecArgument</key>
+		<string>%path</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>File Exists on Target</string>
+		<key>identifier</key>
+		<string>filt</string>
+		<key>Type</key>
+		<string>file</string>
+		<key>javascriptTemplate</key>
+		<string>system.files.fileExistsAtPath(my.target.mountpoint + '%path') %comparator %value</string>
+		<key>SpecType</key>
+		<string>file</string>
+		<key>SpecArgument</key>
+		<string>%path</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Info from Bundle on System</string>
+		<key>identifier</key>
+		<string>bund</string>
+		<key>Type</key>
+		<string>bundle</string>
+		<key>javascriptTemplate</key>
+		<string>system.files.bundleAtPath('%path').%key %comparator %value</string>
+		<key>SpecType</key>
+		<string>bundle</string>
+		<key>SpecArgument</key>
+		<string>%path</string>
+		<key>SpecProperty</key>
+		<string>%key</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Info from Bundle on Target</string>
+		<key>identifier</key>
+		<string>bunt</string>
+		<key>Type</key>
+		<string>bundle</string>
+		<key>javascriptTemplate</key>
+		<string>system.files.bundleAtPath(my.target.mountpoint + '%path').%key %comparator %value</string>
+		<key>SpecType</key>
+		<string>bundle</string>
+		<key>SpecArgument</key>
+		<string>%path</string>
+		<key>SpecProperty</key>
+		<string>%key</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Info from Property List on System</string>
+		<key>identifier</key>
+		<string>plis</string>
+		<key>Type</key>
+		<string>plist</string>
+		<key>javascriptTemplate</key>
+		<string>system.files.plistAtPath('%path').%key %comparator %value</string>
+		<key>SpecType</key>
+		<string>plist</string>
+		<key>SpecArgument</key>
+		<string>%path</string>
+		<key>SpecProperty</key>
+		<string>%key</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Info from Property List on Target</string>
+		<key>identifier</key>
+		<string>plit</string>
+		<key>Type</key>
+		<string>plist</string>
+		<key>javascriptTemplate</key>
+		<string>system.files.plistAtPath(my.target.mountpoint + '%path').%key %comparator %value</string>
+		<key>SpecType</key>
+		<string>plist</string>
+		<key>SpecArgument</key>
+		<string>%path</string>
+		<key>SpecProperty</key>
+		<string>%key</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<string></string>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Choices</string>
+		<key>identifier</key>
+		<string>choi</string>
+		<key>Type</key>
+		<string>choices</string>
+		<key>javascriptTemplate</key>
+		<string>choices.%choice.%choiceProperty %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>ChoiceCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Current Choice</string>
+		<key>identifier</key>
+		<string>ccho</string>
+		<key>Type</key>
+		<string>curchoice</string>
+		<key>javascriptTemplate</key>
+		<string>my.choice.%choiceProperty %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>ChoiceCheck</string>
+		</array>
+	</dict>
+	<string></string>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>IORegistry Entry</string>
+		<key>identifier</key>
+		<string>iore</string>
+		<key>Type</key>
+		<string>ioregistry</string>
+		<key>SpecType</key>
+		<string>ioregistry</string>
+		<key>SpecArgument</key>
+		<string>%planepath</string>
+		<key>SpecProperty</key>
+		<string>%attribute</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>FireWire Device Exists</string>
+		<key>identifier</key>
+		<string>fire</string>
+		<key>Type</key>
+		<string>device</string>
+		<key>javascriptTemplate</key>
+		<string>pm_device_exists('FireWire', '%argument') %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>PCI Device Exists</string>
+		<key>identifier</key>
+		<string>pcid</string>
+		<key>Type</key>
+		<string>device</string>
+		<key>javascriptTemplate</key>
+		<string>pm_device_exists('PCI', '%argument') %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>USB Device Exists</string>
+		<key>identifier</key>
+		<string>usbd</string>
+		<key>Type</key>
+		<string>device</string>
+		<key>javascriptTemplate</key>
+		<string>pm_device_exists('USB', '%argument') %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<string></string>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Result of Gestalt</string>
+		<key>identifier</key>
+		<string>gest</string>
+		<key>Type</key>
+		<string>combo</string>
+		<key>Values</key>
+		<array>
+			<string>addr</string>
+			<string>afps</string>
+			<string>alis</string>
+			<string>Appl</string>
+			<string>appr</string>
+			<string>arb </string>
+			<string>ascr</string>
+			<string>ata </string>
+			<string>bbox</string>
+			<string>BSDa</string>
+			<string>cfrg</string>
+			<string>cmta</string>
+			<string>cmtc</string>
+			<string>cntl</string>
+			<string>conn</string>
+			<string>cpkr</string>
+			<string>cpnt</string>
+			<string>cpuf</string>
+			<string>cput</string>
+			<string>crm </string>
+			<string>dbac</string>
+			<string>dict</string>
+			<string>ditl</string>
+			<string>dkpx</string>
+			<string>dlog</string>
+			<string>doub</string>
+			<string>dply</string>
+			<string>drag</string>
+			<string>dtpf</string>
+			<string>easy</string>
+			<string>edtn</string>
+			<string>evnt</string>
+			<string>fbci</string>
+			<string>fbcv</string>
+			<string>flmp</string>
+			<string>flpy</string>
+			<string>fndr</string>
+			<string>fold</string>
+			<string>font</string>
+			<string>fpu </string>
+			<string>fred</string>
+			<string>fs  </string>
+			<string>fxfr</string>
+			<string>gfxa</string>
+			<string>grfx</string>
+			<string>hdwr</string>
+			<string>help</string>
+			<string>hrad</string>
+			<string>i486</string>
+			<string>i586</string>
+			<string>i5ii</string>
+			<string>i5pr</string>
+			<string>icon</string>
+			<string>kbd </string>
+			<string>mach</string>
+			<string>mbeh</string>
+			<string>menu</string>
+			<string>misc</string>
+			<string>mixd</string>
+			<string>mmap</string>
+			<string>mmu </string>
+			<string>mpsc</string>
+			<string>nlup</string>
+			<string>nmgr</string>
+			<string>ocet</string>
+			<string>oceu</string>
+			<string>os  </string>
+			<string>otan</string>
+			<string>otcf</string>
+			<string>otra</string>
+			<string>pccd</string>
+			<string>pcxg</string>
+			<string>pic1</string>
+			<string>pop!</string>
+			<string>powr</string>
+			<string>ppc </string>
+			<string>ppcf</string>
+			<string>proc</string>
+			<string>prty</string>
+			<string>q3vc</string>
+			<string>qd  </string>
+			<string>qd3d</string>
+			<string>qdrw</string>
+			<string>qdtf</string>
+			<string>qdtx</string>
+			<string>qtim</string>
+			<string>qtrs</string>
+			<string>qtth</string>
+			<string>qtvr</string>
+			<string>rmbg</string>
+			<string>rsrc</string>
+			<string>rtmr</string>
+			<string>safe</string>
+			<string>scra</string>
+			<string>scsi</string>
+			<string>sdev</string>
+			<string>ser </string>
+			<string>shut</string>
+			<string>slot</string>
+			<string>snd </string>
+			<string>spos</string>
+			<string>srad</string>
+			<string>srta</string>
+			<string>stdf</string>
+			<string>sys1</string>
+			<string>sys2</string>
+			<string>sysa</string>
+			<string>sysv</string>
+			<string>te  </string>
+			<string>teat</string>
+			<string>tele</string>
+			<string>term</string>
+			<string>thds</string>
+			<string>tmgr</string>
+			<string>tmTE</string>
+			<string>tmTV</string>
+			<string>tree</string>
+			<string>trip</string>
+			<string>tsma</string>
+			<string>tsmv</string>
+			<string>ttsc</string>
+			<string>tv  </string>
+			<string>uisf</string>
+			<string>uisv</string>
+			<string>usb </string>
+			<string>vers</string>
+			<string>vm  </string>
+			<string>vmin</string>
+			<string>wind</string>
+			<string>wsat</string>
+			<string>x86f</string>
+			<string>x86v</string>
+			<string>xlat</string>
+			<string>zak </string>
+			<string>zak </string>
+		</array>
+		<key>javascriptTemplate</key>
+		<string>system.gestalt('%argument') %comparator %value</string>
+		<key>SpecType</key>
+		<string>gestalt</string>
+		<key>SpecArgument</key>
+		<string>%argument</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Result of Script</string>
+		<key>identifier</key>
+		<string>scri</string>
+		<key>Type</key>
+		<string>file</string>
+		<key>javascriptTemplate</key>
+		<string>system.run('%path') %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Result of Script for Target</string>
+		<key>identifier</key>
+		<string>scrt</string>
+		<key>Type</key>
+		<string>file</string>
+		<key>javascriptTemplate</key>
+		<string>system.run('%path') %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Result of JavaScript</string>
+		<key>identifier</key>
+		<string>java</string>
+		<key>Type</key>
+		<string>javascript</string>
+		<key>javascriptTemplate</key>
+		<string>%function %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Result of JavaScript for Target</string>
+		<key>identifier</key>
+		<string>javt</string>
+		<key>Type</key>
+		<string>javascript</string>
+		<key>javascriptTemplate</key>
+		<string>%function %comparator %value</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Result of Sysctl</string>
+		<key>identifier</key>
+		<string>sysc</string>
+		<key>Type</key>
+		<string>combo</string>
+		<key>Values</key>
+		<array>
+			<string>hw.memsize</string>
+			<string>hw.ncpu</string>
+			<string>hw.activecpu</string>
+			<string>hw.physicalcpu</string>
+			<string>hw.physicalcpu_max</string>
+			<string>hw.logicalcpu</string>
+			<string>hw.logicalcpu_max</string>
+			<string>hw.tbfrequency</string>
+			<string>hw.cpufrequency</string>
+			<string>hw.cpufrequency_max</string>
+			<string>hw.cpufrequency_min</string>
+			<string>hw.busfrequency</string>
+			<string>hw.busfrequency_max</string>
+			<string>hw.busfrequency_min</string>
+			<string>hw.cputype</string>
+			<string>hw.cpusubtype</string>
+			<string>hw.cputhreadtype</string>
+			<string>hw.byteorder</string>
+			<string>hw.pagesize</string>
+			<string>hw.cachelinesize</string>
+			<string>hw.l1dcachesize</string>
+			<string>hw.l1icachesize</string>
+			<string>hw.l2cachesize</string>
+			<string>hw.l3cachesize</string>
+			<string>hw.optional.floatingpoint</string>
+			<string>hw.optional.altivec</string>
+			<string>hw.optional.graphicsops</string>
+			<string>hw.optional.64bitops</string>
+			<string>hw.optional.fsqrt</string>
+			<string>hw.optional.stfiwx</string>
+			<string>hw.optional.dcba</string>
+			<string>hw.optional.datastreams</string>
+			<string>hw.optional.dcbtstreams</string>
+			<string>kern.aiomax</string>
+			<string>kern.aioprocmax</string>
+			<string>kern.aiothreads</string>
+			<string>kern.argmax</string>
+			<string>kern.bootfile</string>
+			<string>kern.boottime</string>
+			<string>kern.clockrate</string>
+			<string>kern.coredump</string>
+			<string>kern.corefile</string>
+			<string>kern.delayterm</string>
+			<string>kern.dummy</string>
+			<string>kern.dumpdev</string>
+			<string>kern.file</string>
+			<string>kern.hostid</string>
+			<string>kern.hostname</string>
+			<string>kern.ipc</string>
+			<string>kern.job_control</string>
+			<string>kern.kdebug</string>
+			<string>kern.logsigexit</string>
+			<string>kern.low_pri_delay</string>
+			<string>kern.low_pri_window</string>
+			<string>kern.maxfiles</string>
+			<string>kern.maxfilesperproc</string>
+			<string>kern.maxpartitions</string>
+			<string>kern.maxproc</string>
+			<string>kern.maxprocperuid</string>
+			<string>kern.maxvnodes</string>
+			<string>kern.netboot</string>
+			<string>kern.ngroups</string>
+			<string>kern.nisdomainname</string>
+			<string>kern.ntp_pll</string>
+			<string>kern.osreldate</string>
+			<string>kern.osrelease</string>
+			<string>kern.osrevision</string>
+			<string>kern.ostype</string>
+			<string>kern.panicinfo</string>
+			<string>kern.pcsamples</string>
+			<string>kern.posix</string>
+			<string>kern.posix1version</string>
+			<string>kern.proc_low_pri_io</string>
+			<string>kern.proc</string>
+			<string>kern.procargs</string>
+			<string>kern.procargs2</string>
+			<string>kern.profiling</string>
+			<string>kern.saved_ids</string>
+			<string>kern.securelevel</string>
+			<string>kern.shreg_private</string>
+			<string>kern.sugid_coredump</string>
+			<string>kern.symfile</string>
+			<string>kern.sysv</string>
+			<string>kern.update</string>
+			<string>kern.usrstack</string>
+			<string>kern.version</string>
+			<string>kern.vnode</string>
+		</array>
+		<key>javascriptTemplate</key>
+		<string>system.sysctl('%argument') %comparator %value</string>
+		<key>SpecType</key>
+		<string>sysctl</string>
+		<key>SpecArgument</key>
+		<string>%argument</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>InstallationCheck</string>
+		</array>
+	</dict>
+	<string></string>
+	<dict>
+		<key>Human-readable Name</key>
+		<string>Search Result is Found</string>
+		<key>identifier</key>
+		<string>seac</string>
+		<key>Type</key>
+		<string>search</string>
+		<key>javascriptTemplate</key>
+		<string>my.search.results['%search-id']</string>
+		<key>ScriptTypes</key>
+		<array>
+			<string>ChoiceCheck</string>
+			<string>VolumeCheck</string>
+		</array>
+	</dict>
+</array>
+</plist>

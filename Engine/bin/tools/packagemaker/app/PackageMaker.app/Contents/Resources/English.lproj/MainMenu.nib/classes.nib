@@ -1,0 +1,72 @@
+{
+    IBClasses =     (
+                {
+            ACTIONS =             {
+                addChoice = id;
+                addFiles = id;
+                addPackageFromSystemChanges = id;
+                addPackageReference = id;
+                addPackageVariant = id;
+                build = id;
+                buildAndRun = id;
+                buildResults = id;
+                bumpVersion = id;
+                editCertificate = id;
+                editFlags = id;
+                editProperties = id;
+                revealInFinder = id;
+                revertRawChanges = id;
+                showInterfaceEditor = id;
+                toggleEditingMode = id;
+            };
+            CLASS = FirstResponder;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                showPreferences = id;
+            };
+            CLASS = NSMenu;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                didAdjustSubviews = RBSplitView;
+                willAdjustSubviews = RBSplitView;
+            };
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            CLASS = NSView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
+            ACTIONS =             {
+                showAboutBox = id;
+                showHelpInXcode = id;
+                toggleOverwriteProjectPackage = id;
+            };
+            CLASS = PMApplicationDelegate;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            CLASS = RBSplitSubview;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSView;
+        },
+                {
+            CLASS = RBSplitView;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                delegate = id;
+            };
+            SUPERCLASS = RBSplitSubview;
+        }
+    );
+    IBVersion = 1;
+}

@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {done = id; searchTextEntered = id; }; 
+            CLASS = BOMInspectorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                arrayController = id; 
+                bomInspectorWindow = id; 
+                fileTable = id; 
+                searchField = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {filterChanged = id; searchTextEntered = id; }; 
+            CLASS = FilteredArrayController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fileCount = id; filterMatrix = id; searchTextField = id; }; 
+            SUPERCLASS = NSArrayController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = InspectorDataProvider; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {view = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = TextInspector; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {textView = id; view = id; }; 
+            SUPERCLASS = InspectorDataProvider; 
+        }
+    ); 
+    IBVersion = 1; 
+}

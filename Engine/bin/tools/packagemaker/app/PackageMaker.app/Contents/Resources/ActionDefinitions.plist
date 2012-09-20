@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+<!--
+	<dict>
+		<key>icon</key>
+		<string>Dock</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.adddockitem</string>
+		<key>name</key>
+		<string>Add Dock Item</string>
+		<key>type</key>
+		<string>AddDockItem</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>System Preferences</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.addloginitem</string>
+		<key>name</key>
+		<string>Add Login Item</string>
+		<key>type</key>
+		<string>AddLoginItem</string>
+	</dict>
+-->
+	<dict>
+		<key>icon</key>
+		<string>Finder</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.createalias</string>
+		<key>name</key>
+		<string>Create Alias</string>
+		<key>type</key>
+		<string>CreateAlias</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Finder</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.createcookie</string>
+		<key>name</key>
+		<string>Create Cookie File</string>
+		<key>type</key>
+		<string>CreateCookie</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Activity Monitor</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.getapplication</string>
+		<key>name</key>
+		<string>Get Application</string>
+		<key>type</key>
+		<string>GetApplication</string>
+	</dict>
+<!--
+	<dict>
+		<key>icon</key>
+		<string>Dock</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.getdockitem</string>
+		<key>name</key>
+		<string>Get Dock Item</string>
+		<key>type</key>
+		<string>GetDockItem</string>
+	</dict>
+-->
+	<dict>
+		<key>icon</key>
+		<string>Activity Monitor</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.killapplication</string>
+		<key>name</key>
+		<string>Kill Application</string>
+		<key>type</key>
+		<string>KillApplication</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Terminal</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.loadkext</string>
+		<key>name</key>
+		<string>Load Kernel Extension</string>
+		<key>type</key>
+		<string>LoadKext</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Finder</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.openfile</string>
+		<key>name</key>
+		<string>Open File</string>
+		<key>type</key>
+		<string>OpenFile</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Safari</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.openurl</string>
+		<key>name</key>
+		<string>Open URL</string>
+		<key>type</key>
+		<string>OpenURL</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Activity Monitor</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.quitapplication</string>
+		<key>name</key>
+		<string>Quit Application</string>
+		<key>type</key>
+		<string>QuitApplication</string>
+	</dict>
+<!--
+	<dict>
+		<key>icon</key>
+		<string>Dock</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.removedockitem</string>
+		<key>name</key>
+		<string>Remove Dock Item</string>
+		<key>type</key>
+		<string>RemoveDockItem</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>System Preferences</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.removeloginitem</string>
+		<key>name</key>
+		<string>Remove Login Item</string>
+		<key>type</key>
+		<string>RemoveLoginItem</string>
+	</dict>
+-->
+	<dict>
+		<key>icon</key>
+		<string>Finder</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.showfile</string>
+		<key>name</key>
+		<string>Show File in Finder</string>
+		<key>type</key>
+		<string>ShowFile</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>Terminal</string>
+		<key>identifier</key>
+		<string>com.apple.packagemaker.actions.unloadkext</string>
+		<key>name</key>
+		<string>Unload Kernel Extension</string>
+		<key>type</key>
+		<string>UnloadKext</string>
+	</dict>
+</array>
+</plist>

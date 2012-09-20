@@ -1,0 +1,23 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {chooseComponent = id; choosePackageFile = id; }; 
+            CLASS = PMAction; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_addDockItemView" = NSView; 
+                "_addLoginItemView" = NSView; 
+                "_createItemView" = NSView; 
+                "_fileSelectView" = NSView; 
+                "_getItemView" = NSView; 
+                "_textFieldView" = NSView; 
+                "_textView" = NSTextView; 
+                "_textViewView" = NSView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = PMDragTargetTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

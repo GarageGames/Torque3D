@@ -1,0 +1,179 @@
+This is a distribution of NASM, the Netwide Assembler. NASM is a
+prototype general-purpose x86 assembler. It will currently output
+flat-form binary files, a.out, COFF and ELF Unix object files,
+Microsoft Win32 and 16-bit DOS object files, OS/2 object files, the
+as86 object format, and a home-grown format called RDOFF.
+
+Also included is NDISASM, a prototype x86 binary-file disassembler
+which uses the same instruction table as NASM.
+
+To install NASM on UNIX or Linux, type `./configure', then `make', and
+then either `make install', or copy the file `nasm' (and maybe
+`ndisasm') to a directory on your search path (maybe /usr/local/bin,
+or ~/bin if you don't have root access). You may also want to copy the
+man page `nasm.1' (and maybe `ndisasm.1') to somewhere sensible.  Note
+that source and binaries are also available in RPM format; to install
+an RPM on a system which uses this packaging format (mostly Linux
+distributions) simply do "rpm -Uivh filename.rpm".
+
+To install under DOS, if you don't need to rebuild from the sources,
+you can just copy either nasm.exe and ndisasm.exe (32-bit DOS-extended
+versions), nasmr.exe and ndisasmr.exe (16-bit classical DOS
+executables), or nasmw.exe and ndisasmw.exe (Win32 console
+applications - less likely to run out of memory), to somewhere on your
+PATH.
+
+The 32-bit applications require a DPMI server.  If you're running
+under plain DOS and don't have a DPMI server already, you can get
+CSDPMI from ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2misc/.
+
+To rebuild the DOS sources, various makefiles are provided:
+
+- Makefile.dos, the one I build the standard 16-bit releases from,
+  designed for a hybrid system using Microsoft C and Borland Make
+  (don't ask why :-)
+- Makefile.vc, for Microsoft Visual C++ compiling to a Win32
+  command-line application. This is the one I build the standard
+  Win32 release binaries from.
+
+- Makefile.bor, for Borland C.
+- Makefile.bc2, also for Borland C, contributed by Fox Cutter.
+  Reported to work better than Makefile.bor on some systems.
+
+- Makefile.sc, for Symantec C++, compiling to a 32-bit extended DOS
+  executable.. Contributed by Mark Junker.
+- Makefile.scw, also for Symantec C++, compiling to a Win32 command-
+  line application. Also contributed by Mark Junker.
+
+- Makefile.wc, for Watcom C, compiling to a 32-bit extended DOS
+  executable. Contributed by Dominik Behr.
+- Makefile.wcw, also for Watcom C, compiling to a Win32 command-
+  line application. Also contributed by Dominik Behr.
+
+- Makefile.dj, for DJGPP, compiling to a 32-bit extended DOS
+  executable. Contributed by Dominik Behr.
+
+- Makefile.lcc, for lcc-win32, compiling to a Win32 command line
+  application. (The lcc-win32 compiler and tools are available from
+  http://www.remcomp.com/lcc-win32/)
+
+I can't guarantee that all of those makefiles work, because I don't
+have all of those compilers. However, Makefile.dos and Makefile.vc
+work on my system, and so do Makefile.bor and Makefile.bc2.
+
+Be careful with Borland C: there have been various conflicting
+reports about how reliable the Huge memory model is. If you try to
+compile NASM in Large model, you may get DGROUP overflows due to the
+vast quantity of data in the instruction tables. I've had reports
+from some people that Huge model doesn't work at all (and also
+reports from others that it works fine), so if you don't want to try
+moving to Huge, you could try adding the option `-dc' to the
+compiler command line instead, which causes string literals to be
+moved from DGROUP to the code segments and might make Large model
+start working. (Either solution works for me.)
+
+To rebuild truly from scratch, or to make any changes to insns.dat or
+standard.mac, you need a Perl interpreter installed.  Perl
+interpreters are available for a number of platforms, from:
+
+	http://www.cpan.org/ports/
+
+For DOS you can also get one from:
+
+	ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/
+
+Dominik Behr has also contributed the file misc/pmw.bat, which is a
+batch file to turn the output from Makefile.wc (NASM.EXE and
+NDISASM.EXE) into standalone executables incorporating Tran's
+PMODE/W DOS extender, rather than depending on an external extender
+program.
+
+Some of the Windows makefiles produce executables called nasmw.exe
+and ndisasmw.exe, and some don't. Be prepared for either...
+
+If you want to build a restricted version of NASM containing only
+some of the object file formats, you can achieve this by adding
+#defines to `outform.h' (see the file itself for documentation), or
+equivalently by adding compiler command line options in the
+Makefile.
+
+There is a machine description file for the `LCC' retargetable C
+compiler (version 4.0), in the directory `lcc', along with
+instructions for its use. This means that NASM can now be used as
+the code-generator back end for a useful C compiler.
+
+Michael `Wuschel' Tippach has ported his DOS extender `WDOSX' to
+enable it to work with the 32-bit binary files NASM can output: the
+original extender and his port `WDOSX/N' are available from his web
+page, http://www.geocities.com/SiliconValley/Park/4493.
+
+Matt Mastracci has written a document explaining how to write
+assembly language modules in DJGPP programs using NASM: it's on his
+web site at http://www.ucalgary.ca/~mmastrac/djgppasm.doc.
+
+The `misc' directory contains `nasm.sl', a NASM editing mode for the
+JED programmers' editor (see http://space.mit.edu/~davis/jed.html
+for details about JED). The comment at the start of the file gives
+instructions on how to install the mode. This directory also
+contains a file (`magic') containing lines to add to /etc/magic on
+Unix systems to allow the `file' command to recognise RDF files, and
+a zip file (`exasm.zip') containing the necessary files for syntax
+highlighting in the Aurora DOS editor. (The Aurora files were
+contributed by <U993847220@aol.com>; I haven't tested them as I
+don't have Aurora.)
+
+The `rdoff' directory contains sources for a linker and loader for
+the RDF object file format, to run under Linux, and also
+documentation on the internal structure of RDF files.
+
+For information about how you can distribute and use NASM, see the
+file Licence. We were tempted to put NASM under the GPL, but decided
+that in many ways it was too restrictive for developers.
+
+For release 0.98 and later, the NASM source distribution contains the
+following components:
+
+          Unix                      Windows, OS/2               DOS
+
+          nasm-X.XX.tar.gz          nasm-X.XX.zip               nasmXXXs.zip
+
+          Main archive: Contain all sources you need to build NASM,
+          plus the documentation source code.  If you have a Perl
+          interpreter and (possibly) Winhelp compiler installed, you
+          don't need any additional files.
+
+          nasm-X.XX-xdoc.tar.gz     nasm-X.XX-xdoc.zip          nasmXXXd.zip
+
+          Documentation in HTML, INFO, text, and PostScript format.
+          You can compile these files yourself from the main archive
+          if you have a Perl interpreter installed.
+
+          N/A                       nasm-X.XX-whlp.zip          N/A
+
+          Documentation in Windows help format.  You can compile this
+          file yourself from the main archive if you have a Perl
+          interpreter and a Winhelp compiler installed.
+
+The Unix, Windows-OS/2, and DOS versions differ in the following ways:
+
+The Unix version uses the Unix line ending convention (LF), and long file
+names with upper and lower case.
+
+The Windows-OS/2 version uses the Microsoft line ending convention
+(CR+LF), and long file names with upper and lower case.
+
+The DOS version uses the Microsoft line ending convention (CR+LF),
+with all filenames in 8.3 monocase.
+
+For information about how to use NASM, see the various forms of
+documentation in the `doc' directory: documentation is provided in
+HTML, PostScript, plain text, Texinfo, and Windows Help formats. For
+information about how to use NDISASM, see `ndisasm.doc'. For
+information about the internal structure of NASM, see
+`internal.doc'. (In particular, _please_ read `internal.doc' before
+writing any code for us...)
+
+The NASM web page is at http://www.cryogen.com/Nasm/
+
+Bug reports (and patches if you can) should be sent to
+<hpa@zytor.com>.

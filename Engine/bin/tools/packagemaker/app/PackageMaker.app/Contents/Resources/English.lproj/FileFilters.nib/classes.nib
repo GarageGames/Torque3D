@@ -1,0 +1,19 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {setPatterns = id; }; 
+            CLASS = FileFiltersArrayController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSArrayController; 
+        }, 
+        {
+            ACTIONS = {editFiltersCancel = id; editFiltersOK = id; }; 
+            CLASS = FileFiltersController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_filtersArrayController" = FileFiltersArrayController; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

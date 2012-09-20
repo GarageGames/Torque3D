@@ -1,0 +1,24 @@
+{
+    IBClasses = (
+        {
+            CLASS = ErrorsAndWarningsHeaderRow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_mainField" = NSTextField; 
+                "_pillBox" = PMPillBoxTextField; 
+                "_subField" = NSTextField; 
+            }; 
+            SUPERCLASS = NSViewCellRow; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = NSViewCellRow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_contentView" = NSView; "_objectController" = NSObjectController; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = PMClickthroughImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
+        {CLASS = PMPillBoxTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

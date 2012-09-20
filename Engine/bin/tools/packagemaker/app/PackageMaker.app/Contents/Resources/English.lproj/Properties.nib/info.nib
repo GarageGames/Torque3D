@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBDocumentLocation</key>
+	<string>69 14 356 240 0 0 1280 777 </string>
+	<key>IBFramework Version</key>
+	<string>462.0</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../PackageMaker.xcodeproj</string>
+	<key>IBOldestOS</key>
+	<integer>5</integer>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>7</integer>
+	</array>
+	<key>IBSystem Version</key>
+	<string>9A474</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
+</dict>
+</plist>

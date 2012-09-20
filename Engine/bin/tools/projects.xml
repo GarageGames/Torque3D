@@ -1,0 +1,29 @@
+<!-- World Builder Launcher Project Entries
+
+Entry Attribute Descriptions
+
+'type'
+projectDirectory  = Assumes that one directory down is the project, and inside is the executable
+file              = Execute the file directly
+
+'path'
+Path to the root project directory, or directly to the file (including file itself)
+
+'args'
+Any additional command line switches to be sent to the executable.
+
+Here are some examples:
+<entries>
+  <entry type="projectDirectory" path="Demos" args="">Demos</entry>
+  <entry type="projectDirectory" path="Genre Kits" args="">Genre Kits</entry>
+  <entry type="file" path="Demos/Stronghold/game/rStronghold.exe" args="">Stronghold Demo</entry>
+</entries>
+-->
+<entries>
+  <entry type="projectDirectory" path="My Projects" args="">My Projects</entry>
+  <entry type="projectDirectory" path="Games" args="">Games</entry>
+  <entry type="projectDirectory" path="Demos" args="">Demos</entry>
+  <entry type="projectDirectory" path="Examples" args="">Examples</entry>
+  <entry type="projectDirectory" path="Genre Kits" args="">Genre Kits</entry>
+  <entry type="projectDirectory" path="Templates" args="">Templates</entry>
+</entries>

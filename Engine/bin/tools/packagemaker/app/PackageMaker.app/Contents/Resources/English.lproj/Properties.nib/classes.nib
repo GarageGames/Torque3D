@@ -1,0 +1,62 @@
+{
+    IBClasses =     (
+                {
+            CLASS = FirstResponder;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                didAdjustSubviews = RBSplitView;
+                willAdjustSubviews = RBSplitView;
+            };
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            CLASS = NSView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
+            CLASS = PMDragTargetTextField;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSTextField;
+        },
+                {
+            CLASS = PMOrganizationFormatter;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_propertiesController" = PropertiesController;
+            };
+            SUPERCLASS = NSFormatter;
+        },
+                {
+            ACTIONS =             {
+                endSheet = id;
+            };
+            CLASS = PropertiesController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_organizationField" = NSTextField;
+                "_organizationFormatter" = NSFormatter;
+                "_prefPanel" = NSPanel;
+            };
+            SUPERCLASS = NSWindowController;
+        },
+                {
+            CLASS = RBSplitSubview;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSView;
+        },
+                {
+            CLASS = RBSplitView;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                delegate = id;
+            };
+            SUPERCLASS = RBSplitSubview;
+        }
+    );
+    IBVersion = 1;
+}

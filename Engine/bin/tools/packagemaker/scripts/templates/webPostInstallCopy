@@ -1,0 +1,15 @@
+#!/bin/sh
+
+ditto "/private/tmp/<name>/<bundle>" "/Users/$USER/Library/Internet Plug-Ins/<bundle>"
+
+exec osascript <<EOF
+tell application "safari"
+   set theURL to "$1"
+   activate
+   if not (document 1 exists) then
+      make new document at beginning of documents
+   end if
+   tell front window
+      set URL of document 1 to theURL
+   end tell
+end tell 

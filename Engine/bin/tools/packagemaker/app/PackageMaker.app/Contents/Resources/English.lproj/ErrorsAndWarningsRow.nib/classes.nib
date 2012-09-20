@@ -1,0 +1,21 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {showHelp = id; }; 
+            CLASS = ErrorsAndWarningsRow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_helpButton" = NSButton; "_mainField" = NSTextField; }; 
+            SUPERCLASS = NSViewCellRow; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = NSViewCellRow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_contentView" = NSView; "_objectController" = NSObjectController; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = PMClickthroughImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
+        {CLASS = PMHoverButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,17 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = XARDocument; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                outlineView = id; 
+                progressPanel = id; 
+                progressStatus = id; 
+                progressView = id; 
+            }; 
+            SUPERCLASS = NSDocument; 
+        }
+    ); 
+    IBVersion = 1; 
+}

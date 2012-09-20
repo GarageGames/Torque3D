@@ -1,0 +1,32 @@
+{
+    IBClasses = (
+        {CLASS = BorderedBox; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = PMKeyboardControllableOutlineView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSOutlineView; 
+        }, 
+        {
+            ACTIONS = {cancel = id; }; 
+            CLASS = PMRawController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_defaultView" = BorderedBox; 
+                "_dragView" = NSImageView; 
+                "_filesController" = PMRawFilesController; 
+                "_leftPane" = RBSplitSubview; 
+                "_rightPane" = RBSplitSubview; 
+                "_splitView" = RBSplitView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = PMRawFilesController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_outlineView" = NSOutlineView; "_textEditor" = NSTextView; }; 
+            SUPERCLASS = NSTreeController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

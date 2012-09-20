@@ -1,0 +1,190 @@
+# Header, don't edit
+NLF v6
+# Language ID
+1057
+# Font and size - dash (-) means default
+-
+-
+# Codepage - dash (-) means ANSI code page
+-
+# RTL - anything else than RTL means LTR
+-
+# Translation ariel825010106@yahoo.com [visit www.ariel106.cjb.net]
+# ^Branding
+Nullsoft Install System %s
+# ^SetupCaption
+Setup $(^Name)
+# ^UninstallCaption
+Uninstall $(^Name)
+# ^LicenseSubCaption
+: Perihal Lisensi
+# ^ComponentsSubCaption
+: Options Instalasi
+# ^DirSubCaption
+: Folder Instalasi
+# ^InstallingSubCaption
+: Menginstall
+# ^CompletedSubCaption
+: Selesai
+# ^UnComponentsSubCaption
+: Options Uninstal
+# ^UnDirSubCaption
+: Folder Uninstal
+# ^ConfirmSubCaption
+: Konfirmasi
+# ^UninstallingSubCaption
+: Meng-uninstall
+# ^UnCompletedSubCaption
+: Selsai
+# ^BackBtn
+< &Mundur
+# ^NextBtn
+&Maju >
+# ^AgreeBtn
+Saya &setuju
+# ^AcceptBtn
+Saya s&etuju dengan Perihal Lisensi
+# ^DontAcceptBtn
+Saya &tidak setuju dengan Perihal Lisensi
+# ^InstallBtn
+&Instal
+# ^UninstallBtn
+&Uninstal
+# ^CancelBtn
+Cancel
+# ^CloseBtn
+&Tutup
+# ^BrowseBtn
+B&rowse...
+# ^ShowDetailsBtn
+Buka &lagi
+# ^ClickNext
+Klik Maju untuk melanjutkan.
+# ^ClickInstall
+Klik Instal untuk memulai instalasi.
+# ^ClickUninstall
+Klik Uninstall untuk memulai uninstalasi.
+# ^Name
+Nama
+# ^Completed
+Selesai
+# ^LicenseText
+Silahkan membaca lisensi berikut sebelum menginstall $(^NameDA). Jika anda menerima semua yang ada di lisensi, klik Saya setuju.
+# ^LicenseTextCB
+Silahkan membaca linsensi berikut sebelum menginstall $(^NameDA). Jika anda menerima semua yang ada di lisensi, beri tanda centang. $_CLICK
+# ^LicenseTextRB
+Silahkan membaca linsensi berikut sebelum menginstall $(^NameDA). Jika anda menerima semua yang ada di lisensi, pilihlah salah satu item dibawah ini. $_CLICK
+# ^UnLicenseText
+Silahkan membaca linsensi berikut sebelum meng-uninstall $(^NameDA). Jika anda menerima semua yang ada di lisensi, klik Saya setuju.
+# ^UnLicenseTextCB
+Silahkan membaca linsensi berikut sebelum meng-uninstall $(^NameDA). Jika anda menerima semua yang ada di lisensi, beri tanda centang. $_CLICK
+# ^UnLicenseTextRB
+Silahkan membaca linsensi berikut sebelum meng-uninstall $(^NameDA). Jika anda menerima semua yang ada di lisensi, pilihlah salah satu item dibawah ini. $_CLICK
+# ^Custom
+Custom
+# ^ComponentsText
+Beri tanda centang pada komponen yang mau di install and hilangkan tanda centang pada komponen yang tidak perlu di install. $_CLICK
+# ^ComponentsSubText1
+Pilih tipe instalasi:
+# ^ComponentsSubText2_NoInstTypes
+Pilih komponen-komponen untuk di install:
+# ^ComponentsSubText2
+Atau, pilih komponen berikut untuk di install:
+# ^UnComponentsText
+Beri tanda centang pada komponen yang mau di uninstall and hilangkan tanda centang pada komponen yang tidak perlu di uninstall. $_CLICK
+# ^UnComponentsSubText1
+Pilih tipe un-instalasi:
+# ^UnComponentsSubText2_NoInstTypes
+Pilih komponen-komponen untuk di un-install:
+# ^UnComponentsSubText2
+Atau, pilih komponen berikut untuk di un-install:
+# ^DirText
+Setup akan menginstall $(^NameDA) pada folder berikut. Untuk memilih folder lainnya, klik Browse dan pilih folder pilihan anda. $_CLICK
+# ^DirSubText
+Folder tujuan
+# ^DirBrowseText
+Pilih folder untuk menginstall $(^NameDA):
+# ^UnDirText
+Setup akan meng-uninstall $(^NameDA) dari folder berikut. Untuk memilih folder lainnya, klik Browse dan pilih folder pilihan anda. $_CLICK
+# ^UnDirSubText
+""
+# ^UnDirBrowseText
+Pilih folder untuk meng-uninstall $(^NameDA):
+# ^SpaceAvailable
+"Ruang disk yang tersedia: "
+# ^SpaceRequired
+"Ruang disk yang dibutuhkan: "
+# ^UninstallingText
+$(^NameDA) akan di-uninstall dari folder berikut. $_CLICK
+# ^UninstallingSubText
+Meng-uninstall:
+# ^FileError
+Tidak dapat menulis pada file: \r\n\t"$0"\r\nKlik abort untuk membatalkan instalasi,\r\nretry untuk mencoba lagi, atau\r\nignore untuk mengacuhkan file ini.
+# ^FileError_NoIgnore
+Tidak dapat menulis pada file: \r\n\t"$0"\r\nKlik retry untuk mencoba lagi, atau\r\ncancel untuk membatalkan instalasi
+# ^CantWrite
+"Tidak bisa menulis pada: "
+# ^CopyFailed
+Gagal meng-copy
+# ^CopyTo
+"Meng-copy ke "
+# ^Registering
+"Mendaftarkan modul: "
+# ^Unregistering
+"Melepas modul: "
+# ^SymbolNotFound
+"Tidak dapat menemukan : "
+# ^CouldNotLoad
+"Tidak dapat membuka: "
+# ^CreateFolder
+"Membuat folder: "
+# ^CreateShortcut
+"Membuat shortcut: "
+# ^CreatedUninstaller
+"Membuat program unistall: "
+# ^Delete
+"Menghapus file: "
+# ^DeleteOnReboot
+"Akan dihapus pada reboot: "
+# ^ErrorCreatingShortcut
+"Tidak dapat membuat shortcut: "
+# ^ErrorCreating
+"Error creating: "
+# ^ErrorDecompressing
+Error pada saat membuka data! Program Installer rusak
+# ^ErrorRegistering
+Error mendaftarkan modul DLL
+# ^ExecShell
+"ExecShell: "
+# ^Exec
+"Menjalankan: "
+# ^Extract
+"Meng-ekstrak: "
+# ^ErrorWriting
+"Ekstrak: error pada saat menulis ke file "
+# ^InvalidOpcode
+Installer rusak: opcode tidak lengkap
+# ^NoOLE
+"OLE tidak ditemukan: "
+# ^OutputFolder
+"Folder tujuan: "
+# ^RemoveFolder
+"Menghapus folder: "
+# ^RenameOnReboot
+"Akan di-Rename pada reboot: "
+# ^Rename
+"Rename: "
+# ^Skipped
+"Dilewati: "
+# ^CopyDetails
+Copy Details ke Clipboard
+# ^LogInstall
+Catat proses instalasi
+# ^Byte
+B
+# ^Kilo
+K
+# ^Mega
+M
+# ^Giga
+G

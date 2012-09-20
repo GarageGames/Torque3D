@@ -1,0 +1,22 @@
+{
+    IBClasses = (
+        {
+            CLASS = ErrorsAndWarningsOutlineView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = VariableHeightRowOutlineView; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = PMBuildResultWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_outlineView" = NSOutlineView; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = VariableHeightRowOutlineView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSOutlineView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

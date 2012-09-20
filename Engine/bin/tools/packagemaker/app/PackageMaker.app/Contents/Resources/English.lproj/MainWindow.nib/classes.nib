@@ -1,0 +1,339 @@
+{
+    IBClasses =     (
+                {
+            CLASS = AnimatingTabView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSTabView;
+        },
+                {
+            CLASS = BorderedBox;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSView;
+        },
+                {
+            ACTIONS =             {
+                buildResults = id;
+                cancel = id;
+                openInInstaller = id;
+                showInFinder = id;
+            };
+            CLASS = BuildUIController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_activeViewTabView" = NSTabView;
+                "_enclosingTabView" = AnimatingTabView;
+                "_helpAccessController" = PMHelpAccessController;
+                "_lowerBox" = BorderedBox;
+                "_mirrorView" = ImageMirrorView;
+                "_objectController" = NSObjectController;
+                "_outlineView" = NSOutlineView;
+                "_upperBox" = BorderedBox;
+                "_window" = NSWindow;
+            };
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                chooseCustomLocation = id;
+            };
+            CLASS = ChoiceController;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObjectController;
+        },
+                {
+            CLASS = ChoiceRequirementsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_modelController" = NSObjectController;
+            };
+            SUPERCLASS = RequirementsController;
+        },
+                {
+            CLASS = ErrorsAndWarningsOutlineView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = PMKeyboardControllableOutlineView;
+        },
+                {
+            CLASS = ErrorsAndWarningsTableColumn;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSTableColumn;
+        },
+                {
+            CLASS = ImageMirrorView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSView;
+        },
+                {
+            ACTIONS =             {
+                addChoice = id;
+                addFiles = id;
+                addPackageFromSystemChanges = id;
+                addPackageReference = id;
+                addPackageVariant = id;
+                build = id;
+                buildAndRun = id;
+                bumpVersion = id;
+                cancel = id;
+                chooseItemScript = id;
+                chooseWrapperScript = id;
+                editCertificate = id;
+                editFlags = id;
+                editProperties = id;
+                revealInFinder = id;
+                revertRawChanges = id;
+                showInterfaceEditor = id;
+                toggleEditingMode = id;
+            };
+            CLASS = MainWindowController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_buildController" = BuildUIController;
+                "_leftPane" = RBSplitSubview;
+                "_packageContentFilesController" = PMPackageContentFilesController;
+                "_rightPane" = RBSplitSubview;
+                "_sidebarController" = SidebarController;
+                "_splitView" = RBSplitView;
+                "_splitterView" = NSImageView;
+                "_tabView" = AnimatingTabView;
+            };
+            SUPERCLASS = NSWindowController;
+        },
+                {
+            CLASS = MainWindowStatusController;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                edit = id;
+            };
+            CLASS = PMActionsArrayController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_tableView" = NSTableView;
+                "_wrapperController" = NSObjectController;
+            };
+            SUPERCLASS = NSArrayController;
+        },
+                {
+            CLASS = PMComponent;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                configurePatching = id;
+                configureRelocation = id;
+                configureScripts = id;
+                toggleDowngrade = id;
+                togglePatching = id;
+                toggleRelocation = id;
+            };
+            CLASS = PMComponentsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_outlineView" = NSOutlineView;
+                "_wrapperController" = NSObjectController;
+            };
+            SUPERCLASS = NSTreeController;
+        },
+                {
+            CLASS = PMDisablingTextField;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSTextField;
+        },
+                {
+            CLASS = PMDragTargetTextField;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSTextField;
+        },
+                {
+            ACTIONS =             {
+                flip = id;
+            };
+            CLASS = PMFlippableWindow;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_backside" = NSView;
+            };
+            SUPERCLASS = NSWindow;
+        },
+                {
+            CLASS = PMGradientOutlineView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = PMKeyboardControllableOutlineView;
+        },
+                {
+            CLASS = PMGradientTableView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = PMKeyboardControllableTableView;
+        },
+                {
+            CLASS = PMHelpAccessController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_authorizationButton" = NSView;
+                "_bundleIdentifierField" = NSView;
+                "_choiceIdentifier" = NSView;
+                "_choiceRequirements" = NSView;
+                "_choiceState" = NSView;
+                "_choiceTabView" = NSTabView;
+                "_choiceTitleField" = NSView;
+                "_contentsController" = PMPackageContentFilesController;
+                "_domainField" = NSView;
+                "_installFromField" = NSView;
+                "_installToField" = NSView;
+                "_locationStringField" = NSView;
+                "_packageTabView" = NSTabView;
+                "_postinstallActionsController" = PMActionsArrayController;
+                "_postinstallField" = NSView;
+                "_postupgradeField" = NSView;
+                "_preinstallActionsController" = PMActionsArrayController;
+                "_preinstallField" = NSView;
+                "_preupgradeField" = NSView;
+                "_relocationButton" = NSView;
+                "_requirementsController" = PackageRequirementsController;
+                "_sidebarController" = SidebarController;
+                "_userSeesButton" = NSView;
+                "_window" = NSWindow;
+                "_wrapperContentsOutlineView" = NSView;
+                "_wrapperTabView" = NSTabView;
+                "_wrapperTitleField" = NSView;
+            };
+            SUPERCLASS = NSObject;
+        },
+                {
+            CLASS = PMImagePopUpButton;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSPopUpButton;
+        },
+                {
+            CLASS = PMKeyboardControllableOutlineView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSOutlineView;
+        },
+                {
+            ACTIONS =             {
+                delete = id;
+            };
+            CLASS = PMKeyboardControllableTableView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSTableView;
+        },
+                {
+            ACTIONS =             {
+                addFile = id;
+                applyRecommendations = id;
+                editFileFilters = id;
+            };
+            CLASS = PMPackageContentFilesController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_outlineColumn" = NSTableColumn;
+                "_outlineView" = NSOutlineView;
+                "_statusController" = MainWindowStatusController;
+            };
+            SUPERCLASS = NSTreeController;
+        },
+                {
+            ACTIONS =             {
+                choosePatchRootLocation = id;
+            };
+            CLASS = PMPackageContentsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_wrapperController" = NSObjectController;
+            };
+            SUPERCLASS = NSObjectController;
+        },
+                {
+            CLASS = PMPathMappingsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_packageContentsController" = NSTreeController;
+                "_packageModelsController" = NSArrayController;
+                "_tableView" = NSTableView;
+            };
+            SUPERCLASS = NSArrayController;
+        },
+                {
+            CLASS = PMScaledImageButton;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSButton;
+        },
+                {
+            CLASS = PackageRequirementsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_sidebarController" = SidebarController;
+            };
+            SUPERCLASS = RequirementsController;
+        },
+                {
+            CLASS = PackageResourcesController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_tableView" = NSTableView;
+                "_windowController" = NSWindowController;
+            };
+            SUPERCLASS = NSArrayController;
+        },
+                {
+            CLASS = RequirementsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_tableView" = NSTableView;
+                "_windowController" = NSWindowController;
+            };
+            SUPERCLASS = NSArrayController;
+        },
+                {
+            CLASS = ResourcesLocaleController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_windowController" = NSWindowController;
+            };
+            SUPERCLASS = NSArrayController;
+        },
+                {
+            ACTIONS =             {
+                addChoice = id;
+                addFiles = id;
+                addVariant = id;
+                bumpVersion = id;
+                contentsDoubleAction = id;
+                editFlags = id;
+                revealInFinder = id;
+            };
+            CLASS = SidebarController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_choiceController" = NSObjectController;
+                "_choicesTabView" = NSTabView;
+                "_contentsOutlineView" = PMGradientOutlineView;
+                "_modelController" = NSObjectController;
+                "_packageTabView" = NSTabView;
+                "_windowController" = NSWindowController;
+                "_wrapperTabView" = NSTabView;
+                "_wrapperTableView" = PMGradientTableView;
+            };
+            SUPERCLASS = NSArrayController;
+        },
+                {
+            ACTIONS =             {
+                add = id;
+                edit = id;
+                remove = id;
+            };
+            CLASS = WrapperContentsController;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                "_modelController" = NSObjectController;
+                "_outlineView" = NSOutlineView;
+                "_windowController" = NSWindowController;
+            };
+            SUPERCLASS = NSObject;
+        }
+    );
+    IBVersion = 1;
+}

@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {collapseAll = id; deleteSelected = id; deselectAll = id; expandAll = id; }; 
+            CLASS = PMActionWorkspaceView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_windowController" = PMActionsWindowController; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {browserAction = id; cancel = id; choose = id; save = id; }; 
+            CLASS = PMActionsWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_browser" = NSBrowser; 
+                "_packageTableView" = NSTableView; 
+                "_workspace" = PMActionWorkspaceView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = PMAvailableActionsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_table" = NSTableView; "_workspace" = PMActionWorkspaceView; }; 
+            SUPERCLASS = NSArrayController; 
+        }, 
+        {
+            ACTIONS = {flip = id; }; 
+            CLASS = PMFlippableWindow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_backside" = NSView; }; 
+            SUPERCLASS = NSWindow; 
+        }
+    ); 
+    IBVersion = 1; 
+}

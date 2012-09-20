@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>Full Plugin</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mygamecompany.fulltemplateplugin</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>BRPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.01</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>GameInstallPath</key>
+	<string>/Users/garagegames/Desktop/Torque3DCheckout/Templates/Full/game/</string>
+	<key>GameName</key>
+	<string>Full</string>
+	<key>WebPluginDescription</key>
+	<string>Full Template Plugin 1.0</string>
+	<key>WebPluginMIMETypes</key>
+	<dict>
+		<key>application/x-fulltemplateplugin</key>
+		<dict>
+			<key>WebPluginTypeDescription</key>
+			<string>1.0</string>
+		</dict>
+	</dict>
+	<key>WebPluginName</key>
+	<string>Full Plugin</string>
+</dict>
+</plist>

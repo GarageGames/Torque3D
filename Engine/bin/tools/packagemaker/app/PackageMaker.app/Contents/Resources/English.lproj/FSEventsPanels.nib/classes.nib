@@ -1,0 +1,19 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = PMDragTargetTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {back = id; cancel = id; next = id; save = id; start = id; stop = id; }; 
+            CLASS = PMFSEventsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_outlineView" = NSOutlineView; 
+                "_startStopButton" = NSButton; 
+                "_step1" = NSView; 
+                "_step2" = NSView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

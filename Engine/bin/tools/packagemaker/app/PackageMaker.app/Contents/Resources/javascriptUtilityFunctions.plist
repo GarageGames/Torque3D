@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>pm_device_exists</key>
+	<string>
+function pm_device_exists(deviceClass, deviceName) {
+	var classObjects = system.ioregistry.matchingClass('IO' + deviceClass + 'Device');
+	if(classObjects) {
+		for(var i = 0; i &lt; classObjects.length; i++) {
+			var obj = classObjects[i];
+			if(obj[deviceClass + ' Product Name'] == deviceName)
+				return true;
+		}
+	}
+	
+	return false;
+}
+	</string>
+	<key>pm_pid_for_app</key>
+	<string>
+function pm_pid_for_app(identifier, name) {
+	if(identifier &amp;&amp; identifier.length) {
+		var apps = system.applications.fromIdentifier(identifier);
+		if(apps)
+			return apps[0].pid;
+		else
+			return -1;
+	}
+	var apps = system.applications.all();
+	if(!apps || !name || name.length == 0)
+		return -1;
+	for(i = 0; i &lt; apps.length; i++) {
+		if(name == apps[i].CFBundleName)
+			return apps[i].pid;
+	}
+	return -1;
+}
+	</string>
+	<key>pm_index_of_dock_item</key>
+	<string>
+function pm_index_of_dock_item(name, label) {
+	var items = workspace.dockItems();
+	if(!items)
+		return -1;
+	for(i = 0; i &lt; items.length; i++) {
+		var item = items[i];
+		if(label &amp;&amp; label.length &amp;&amp; label == item.label)
+			return i;
+		var index = (!item.path ? -1:item.path.lastIndexOf(name));
+		if(index != -1 &amp;&amp; name &amp;&amp; name.length &amp;&amp; index == item.path.length - name.length)
+			return i;
+	}
+	return -1;
+}
+	</string>
+	<key>pm_index_of_login_item</key>
+	<string>
+function pm_index_of_login_item(name) {
+	var items = workspace.loginItems();
+	if(!items || !name || name.length == 0)
+		return -1;
+	for(i = 0; i &lt; items.length; i++) {
+		if(name == items[i].name)
+			return i;
+	}
+	return -1;
+}
+	</string>
+</dict>
+</plist>

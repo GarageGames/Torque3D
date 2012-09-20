@@ -1,0 +1,44 @@
+{
+    IBClasses =     (
+                {
+            CLASS = NSButton;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                delegate = id;
+            };
+            SUPERCLASS = NSControl;
+        },
+                {
+            ACTIONS =             {
+                didAdjustSubviews = RBSplitView;
+                willAdjustSubviews = RBSplitView;
+            };
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            CLASS = NSView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
+            CLASS = PMPreferencesController;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSWindowController;
+        },
+                {
+            CLASS = RBSplitSubview;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSView;
+        },
+                {
+            CLASS = RBSplitView;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                delegate = id;
+            };
+            SUPERCLASS = RBSplitSubview;
+        }
+    );
+    IBVersion = 1;
+}

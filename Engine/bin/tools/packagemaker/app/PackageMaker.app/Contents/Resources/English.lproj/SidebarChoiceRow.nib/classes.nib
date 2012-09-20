@@ -1,0 +1,21 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = PMClickthroughImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
+        {CLASS = PMClickthroughTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            CLASS = PMViewCellRow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_contentView" = PMViewCellView; "_objectController" = NSObjectController; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = PMViewCellView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            CLASS = SidebarChoiceRow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_mainField" = NSTextField; }; 
+            SUPERCLASS = PMViewCellRow; 
+        }
+    ); 
+    IBVersion = 1; 
+}

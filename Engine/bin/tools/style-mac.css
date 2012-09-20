@@ -1,0 +1,20 @@
+/*--------------------------------------- Tab Page ----------------------------------------------*/
+QTabWidget::pane {
+	top:0.6em; /*fixes mac vertical centering*/
+}
+/*--------------------------------------- mainWindow style ----------------------------------------------*/
+QMainWindow{
+ 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(49, 43, 76, 255), stop:0.155 rgba(32, 26, 38, 255), stop:0.156 rgba(240, 239, 238, 255), stop:1 rgba(240, 239, 238, 255));
+}
+.DeploymentPage > QGroupBox{
+	margin-top:10px;
+}
+.DeploymentPage > QPushButton, .ProgressDialog QPushButton, .NewProjectPage QPushButton, .ProgressFinishedDialog QPushButton, .ToolBarEditorAdd QPushButton{
+    margin:0px 0px 0px 15px;
+}
+QPushButton{ padding-left:5px; padding-right:5px;}
+#PackageGroupBox QPushButton{ /*fixes button crowding issue*/
+    margin:0 10px 0 0;
+}
+#ProjectInformationGroupBox{border:none;}
+#ExistingProjectInfoLastUpdateValue{padding:0; margin:0;}

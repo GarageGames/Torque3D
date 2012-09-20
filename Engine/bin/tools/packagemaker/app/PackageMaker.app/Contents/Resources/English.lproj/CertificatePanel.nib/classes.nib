@@ -1,0 +1,14 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {changeCertificate = id; close = id; removeCertificate = id; }; 
+            CLASS = CertificateController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_certificateView" = SFCertificateView; "_tabView" = NSTabView; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = SFCertificateView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}
