@@ -421,9 +421,6 @@ function GameCore::endGame(%game, %client)
       return;
    }
 
-//    // Stop the AIManager
-//    AIManager.delete();
-
    // Stop any game timers
    cancel($Game::Schedule);
 
