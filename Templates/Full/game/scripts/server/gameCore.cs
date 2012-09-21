@@ -405,10 +405,8 @@ function GameCore::startGame(%game)
       $Game::Schedule = %game.schedule($Game::Duration * 1000, "onGameDurationEnd");
    $Game::Running = true;
 
-//    // Start the AIManager
-//    new ScriptObject(AIManager) {};
-//    MissionCleanup.add(AIManager);
-//    AIManager.think();
+//    // Start the AI on the specified path
+//    AIPlayer::spawn("Path1");
 }
 
 function GameCore::endGame(%game, %client)
@@ -699,7 +697,7 @@ function GameCore::onDeath(%game, %client, %sourceObject, %sourceClient, %damage
    call( %sendMsgFunction, 'MsgClientKilled', %client, %sourceClient, %damLoc );
 
    // Dole out points and check for win
-   if ( %damageType $= "Suicide" || %sourceClient == %client )
+   if (( %damageType $= "Suicide" || %sourceClient == %client ) && isObject(%sourceClient))
    {
       %game.incDeaths( %client, 1, true );
       %game.incScore( %client, -1, false );
