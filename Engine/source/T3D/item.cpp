@@ -457,6 +457,11 @@ void Item::onDeleteNotify( SimObject *obj )
    Parent::onDeleteNotify( obj );
 }
 
+void Item::inspectPostApply() 
+{ 
+   setMaskBits(InitialUpdateMask); 
+} 
+
 // Lighting: -----------------------------------------------------------------
 
 void Item::registerLights(LightManager * lightManager, bool lightingScene)
