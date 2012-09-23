@@ -153,7 +153,7 @@ $c = BuildTarget::add( 'Make',                // Name
 
 $c->setSolutionInfo( 'makeSolution.tpl', '', '' );
 
-$c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'asm' );
+$c->setFileExtensions( 'c', 'cc', 'cpp', 'asm' );
 
 $c->setPlatforms( "linux" );
 
@@ -175,7 +175,7 @@ $c = BuildTarget::add( 'Make Dedicated',      // Name
 
 $c->setSolutionInfo( 'makeSolution.tpl', '', '' );
 
-$c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'asm' );
+$c->setFileExtensions( 'c', 'cc', 'cpp', 'asm' );
 
 $c->setPlatforms( "linux_dedicated" );
 
@@ -197,7 +197,7 @@ $c = BuildTarget::add( 'build',						// Name
                   '',         				   // ActiveX Project Template
                   '.txt' );
          
-$c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'asm', 'm', 'mm' );
+$c->setFileExtensions( 'c', 'cc', 'cpp', 'asm', 'm', 'mm' );
 
 // NO PLATFORMS - SO ALL OR NONE?
 $c->setPlatforms("");
