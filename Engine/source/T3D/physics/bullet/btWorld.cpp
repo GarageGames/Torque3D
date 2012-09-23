@@ -33,7 +33,11 @@
 #include "console/consoleTypes.h"
 #include "scene/sceneRenderState.h"
 #include "T3D/gameBase/gameProcess.h"
-
+#ifdef _WIN32
+#include "BulletMultiThreaded/Win32ThreadSupport.h"
+#elif defined (USE_PTHREADS)
+#include "BulletMultiThreaded/PosixThreadSupport.h"
+#endif
 
 BtWorld::BtWorld() :
    mProcessList( NULL ),

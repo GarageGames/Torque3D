@@ -416,7 +416,7 @@ namespace _Private {
 
 
 #define _DECLARE_TYPE( type )                                                                \
-   template<> extern const EngineTypeInfo* TYPE< type >();                                   \
+   template<> const EngineTypeInfo* TYPE< type >();                                          \
    template<> struct _SCOPE< type > {                                                        \
       EngineExportScope& operator()() const {                                                \
          return *reinterpret_cast< EngineExportScope* >(                                     \
