@@ -170,3 +170,4 @@ console.log
 *.cached.dts
 !Engine/bin
 My Projects
+!My Projects/readme.txt
