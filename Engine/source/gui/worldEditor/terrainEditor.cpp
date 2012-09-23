@@ -2714,7 +2714,7 @@ ConsoleMethod(TerrainEditor, updateMaterial, bool, 4, 4,
    if ( index >= terr->getMaterialCount() )
       return false;
 
-   terr->updateMaterial( index, argv[3] );
+   terr->updateMaterial( index, (const char*)argv[3] );
 
    object->setDirty();
 
@@ -2729,7 +2729,7 @@ ConsoleMethod(TerrainEditor, addMaterial, S32, 3, 3,
    if ( !terr )
       return false;
    
-   terr->addMaterial( argv[2] );
+   terr->addMaterial( (const char*)argv[2] );
 
    object->setDirty();
 

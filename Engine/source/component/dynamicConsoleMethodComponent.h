@@ -62,7 +62,7 @@ protected:
    /// Internal callMethod : Actually does component notification and script method execution
    ///  @attention This method does some magic to the argc argv to make Con::execute act properly
    ///   as such it's internal and should not be exposed or used except by this class
-   virtual const char* _callMethod( U32 argc, const char *argv[], bool callThis = true );
+   virtual const char* _callMethod( U32 argc, ConsoleValueRef argv[], bool callThis = true );
 
 public:
 
@@ -75,7 +75,7 @@ public:
 #endif
 
    /// Call Method
-   virtual const char* callMethodArgList( U32 argc, const char *argv[], bool callThis = true );
+   virtual const char* callMethodArgList( U32 argc, ConsoleValueRef argv[], bool callThis = true );
 
    /// Call Method format string
    const char* callMethod( S32 argc, const char* methodName, ... );

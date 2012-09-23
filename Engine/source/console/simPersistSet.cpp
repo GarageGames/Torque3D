@@ -46,7 +46,7 @@ SimPersistSet::SimPersistSet()
 
 //-----------------------------------------------------------------------------
 
-bool SimPersistSet::processArguments( S32 argc, const char** argv )
+bool SimPersistSet::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    for( U32 i = 0; i < argc; ++ i )
    {

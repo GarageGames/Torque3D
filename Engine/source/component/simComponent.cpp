@@ -171,7 +171,7 @@ void SimComponent::onRemove()
 
 //////////////////////////////////////////////////////////////////////////
 
-bool SimComponent::processArguments(S32 argc, const char **argv)
+bool SimComponent::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    for(S32 i = 0; i < argc; i++)
    {

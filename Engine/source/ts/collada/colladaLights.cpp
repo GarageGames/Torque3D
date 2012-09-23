@@ -162,7 +162,7 @@ ConsoleFunction( loadColladaLights, bool, 2, 4,
    "@ingroup Editors\n"
    "@internal")
 {
-   Torque::Path path(argv[1]);
+   Torque::Path path((const char*)argv[1]);
 
    // Optional group to add the lights to. Create if it does not exist, and use
    // the MissionGroup if not specified.

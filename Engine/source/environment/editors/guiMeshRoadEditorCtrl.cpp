@@ -1040,7 +1040,7 @@ void GuiMeshRoadEditorCtrl::setMode( String mode, bool sourceShortcut = false )
    mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", mode );
+		Con::executef( this, "paletteSync", (const char*)mode );
 }
 
 void GuiMeshRoadEditorCtrl::setSelectedRoad( MeshRoad *road )

@@ -86,7 +86,7 @@ void SFXTrack::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool SFXTrack::processArguments( S32 argc, const char **argv )
+bool SFXTrack::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    if( typeid( *this ) == typeid( SFXTrack ) )
    {

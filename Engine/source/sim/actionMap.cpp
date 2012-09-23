@@ -1746,7 +1746,8 @@ static ConsoleDocFragment _ActionMapbind2(
 ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier spec, mod...], command )" 
 			  "@hide")
 {
-   return object->processBind( argc - 2, argv + 2, NULL );
+   StringStackWrapper args(argc - 2, argv + 2);
+   return object->processBind( args.count(), args, NULL );
 }
 
 static ConsoleDocFragment _ActionMapbindObj1(
@@ -1801,7 +1802,9 @@ ConsoleMethod( ActionMap, bindObj, bool, 6, 11, "(device, action, [modifier spec
         return false;
     }
 
-    return object->processBind( argc - 3, argv + 2, simObject );
+	StringStackWrapper args(argc - 3, argv + 2);
+
+    return object->processBind( args.count(), args, simObject );
 }
 
 //------------------------------------------------------------------------------

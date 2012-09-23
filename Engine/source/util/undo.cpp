@@ -566,7 +566,7 @@ ConsoleMethod( UndoManager, pushCompound, const char*, 2, 3, "( string name=\"\"
 {
    String name;
    if( argc > 2 )
-      name = argv[ 2 ];
+      name = (String)argv[ 2 ];
       
    CompoundUndoAction* action = object->pushCompound( name );
    if( !action )

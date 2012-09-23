@@ -1207,7 +1207,9 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
    "@endtsexample\n\n"
    "@ingroup Strings" )
 {
-   char *str = (char *) argv[1];
+   char buffer[4096];
+   dStrncpy(buffer, argv[1], 4096);
+   char *str = buffer;
    const char *token = argv[2];
    const char *delim = argv[3];
 
@@ -1240,7 +1242,9 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
          str++;
    }
 
-   return str;
+   char *ret = Con::getReturnBuffer(dStrlen(str)+1);
+   dStrncpy(ret, str, dStrlen(str)+1);
+   return ret;
 }
 
 //=============================================================================
@@ -1302,16 +1306,17 @@ ConsoleFunction(getTag, const char *, 2, 2, "(string textTagString)"
    TORQUE_UNUSED(argc);
    if(argv[1][0] == StringTagPrefixByte)
    {
+	  const char *arg  = argv[1];
       const char * space = dStrchr(argv[1], ' ');
 
       U32 len;
       if(space)
-         len = space - argv[1];
+         len = space - arg;
       else
-         len = dStrlen(argv[1]) + 1;
+         len = dStrlen(arg) + 1;
 
       char * ret = Con::getReturnBuffer(len);
-      dStrncpy(ret, argv[1] + 1, len - 1);
+      dStrncpy(ret, arg + 1, len - 1);
       ret[len - 1] = 0;
 
       return(ret);
@@ -2394,7 +2399,7 @@ ConsoleFunction( pushInstantGroup, void, 1, 2, "([group])"
 				"@internal")
 {
    if( argc > 1 )
-      Con::pushInstantGroup( argv[ 1 ] );
+      Con::pushInstantGroup( (const char*)argv[ 1 ] );
    else
       Con::pushInstantGroup();
 }

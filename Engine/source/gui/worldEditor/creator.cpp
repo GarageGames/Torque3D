@@ -264,7 +264,7 @@ ConsoleMethod( CreatorTree, fileNameMatch, bool, 5, 5, "(string world, string ty
    if(dToupper(argv[4][0]) != dToupper(argv[2][0]))
       return(false);
 
-   return(!dStrnicmp(argv[4]+1, argv[3], typeLen));
+   return(!dStrnicmp(((const char*)argv[4])+1, argv[3], typeLen));
 }
 
 ConsoleMethod( CreatorTree, getSelected, S32, 2, 2, "Return a handle to the currently selected item.")

@@ -782,7 +782,7 @@ void GuiDecalEditorCtrl::setMode( String mode, bool sourceShortcut = false )
 	mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", mMode );
+		Con::executef( this, "paletteSync", (const char*)mMode );
 }
 
 ConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, 2, 2, "deleteSelectedDecal()" )
@@ -894,7 +894,7 @@ ConsoleMethod( GuiDecalEditorCtrl, getSelectionCount, S32, 2, 2, "" )
 ConsoleMethod( GuiDecalEditorCtrl, retargetDecalDatablock, void, 4, 4, "" )
 {
    if( dStrcmp( argv[2], "" ) != 0 && dStrcmp( argv[3], "" ) != 0 )
-		object->retargetDecalDatablock( argv[2], argv[3] );
+		object->retargetDecalDatablock( (const char*)argv[2], (const char*)argv[3] );
 }
 
 void GuiDecalEditorCtrl::setGizmoFocus( DecalInstance * decalInstance )

@@ -2758,7 +2758,7 @@ void WorldEditor::initPersistFields()
 //------------------------------------------------------------------------------
 // These methods are needed for the console interfaces.
 
-void WorldEditor::ignoreObjClass( U32 argc, const char **argv )
+void WorldEditor::ignoreObjClass( U32 argc, ConsoleValueRef *argv )
 {
    for(S32 i = 2; i < argc; i++)
    {
@@ -3542,7 +3542,7 @@ void WorldEditor::colladaExportSelection( const String &path )
 ConsoleMethod( WorldEditor, colladaExportSelection, void, 3, 3, 
               "( String path ) - Export the combined geometry of all selected objects to the specified path in collada format." )
 {  
-   object->colladaExportSelection( argv[2] );
+   object->colladaExportSelection( (const char*)argv[2] );
 }
 
 void WorldEditor::makeSelectionPrefab( const char *filename )

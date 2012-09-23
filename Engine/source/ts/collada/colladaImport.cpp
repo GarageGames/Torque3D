@@ -145,7 +145,7 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
 
    // Check if a cached DTS is available => no need to import the collada file
    // if we can load the DTS instead
-   Torque::Path path(argv[1]);
+   Torque::Path path((const char*)argv[1]);
    if (ColladaShapeLoader::canLoadCachedDTS(path))
       return false;
 

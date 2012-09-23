@@ -54,6 +54,9 @@ namespace Compiler
       OP_RETURN,
       // fixes a bug when not explicitly returning a value
       OP_RETURN_VOID,
+	  OP_RETURN_FLT,
+	  OP_RETURN_UINT,
+
       OP_CMPEQ,
       OP_CMPGR,
       OP_CMPGE,
@@ -136,8 +139,10 @@ namespace Compiler
       OP_TERMINATE_REWIND_STR,
       OP_COMPARE_STR,
 
-      OP_PUSH,
-      OP_PUSH_FRAME,
+      OP_PUSH,          // String
+	  OP_PUSH_UINT,      // Integer
+	  OP_PUSH_FLT,    // Float
+      OP_PUSH_FRAME,    // Frame
 
       OP_ASSERT,
       OP_BREAK,
