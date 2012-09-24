@@ -245,9 +245,9 @@ bool SFXFMODDevice::_init()
       if( smPrefDisableSoftware )
          flags |= FMOD_INIT_SOFTWARE_DISABLE;
       if( smPrefUseSoftwareOcclusion )
-         flags |= FMOD_INIT_SOFTWARE_OCCLUSION;
+         flags |= FMOD_INIT_OCCLUSION_LOWPASS;
       if( smPrefUseSoftwareHRTF )
-         flags |= FMOD_INIT_SOFTWARE_HRTF;
+         flags |= FMOD_INIT_HRTF_LOWPASS;
       if( smPrefUseSoftwareReverbLowmem )
          flags |= FMOD_INIT_SOFTWARE_REVERB_LOWMEM;
       if( smPrefEnableProfile )
