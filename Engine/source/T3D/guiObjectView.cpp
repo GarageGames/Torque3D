@@ -520,6 +520,9 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
       false
    );
 
+   renderPass->assignSharedXform( RenderPassManager::View, MatrixF::Identity );
+   renderPass->assignSharedXform( RenderPassManager::Projection, GFX->getProjectionMatrix() );
+
    // Set up our TS render state here.   
    TSRenderState rdata;
    rdata.setSceneState( &state );
