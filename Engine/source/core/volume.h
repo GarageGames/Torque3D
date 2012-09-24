@@ -443,6 +443,19 @@ inline bool AddChangeNotification( const Path &path, T obj, U func )
    return fs->getChangeNotifier()->addNotification( path, dlg );
 }
 
+/// Adds a file change notification callback for a function.
+///@ingroup VolumeSystem
+template <class U>
+inline bool AddChangeNotification( const Path &path, U func )
+{
+   FileSystemRef fs = GetFileSystem( path );
+   if ( !fs || !fs->getChangeNotifier() )
+      return false;
+
+   FileSystemChangeNotifier::ChangeDelegate dlg( func );
+   return fs->getChangeNotifier()->addNotification( path, dlg );
+}
+
 /// Removes an existing file change notification callback.
 ///@ingroup VolumeSystem
 template <class T,class U>
