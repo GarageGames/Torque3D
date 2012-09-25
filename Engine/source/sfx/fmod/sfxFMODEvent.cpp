@@ -117,11 +117,11 @@ SFXFMODEvent::SFXFMODEvent( SFXFMODEventGroup* group, FMOD_EVENT* handle )
    if( group->isClientOnly() )
       Sim::getRootGroup()->addObject( mDescription );
    
-   int intValue;
+   FMOD_MODE modeValue;
    float floatValue;
    
-   if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_MODE, &intValue, true ) == FMOD_OK )
-      mDescription->mIs3D = ( intValue == FMOD_3D );
+   if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_MODE, &modeValue, true ) == FMOD_OK )
+      mDescription->mIs3D = ( modeValue == FMOD_3D );
    if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_VOLUME, &floatValue, true ) == FMOD_OK )
       mDescription->mVolume = floatValue;
    if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_PITCH, &floatValue, true ) == FMOD_OK )
