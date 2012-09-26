@@ -149,6 +149,7 @@ class Item: public ShapeBase
    bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere);
    void buildConvex(const Box3F& box, Convex* convex);
    void onDeleteNotify(SimObject*);
+   void inspectPostApply();
 
   protected:
    void _updatePhysics();
