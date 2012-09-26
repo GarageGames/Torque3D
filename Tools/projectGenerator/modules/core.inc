@@ -36,6 +36,7 @@ if (Generator::isApp())
     
 addEngineSrcDir('console');
 addEngineSrcDir('core');
+addEngineSrcDir('core/smart_ptr');
 addEngineSrcDir('core/stream');
 addEngineSrcDir('core/strings');
 addEngineSrcDir('core/util');
@@ -185,6 +186,7 @@ includeModule( 'tools' );
 addIncludePath( '../../source' );		   // product source (relative to solution output directories)
 addIncludePath( getAppEngineSrcDir() );	// main engine source dir relative to app project file 
 addIncludePath( getAppLibSrcDir() ); 	   // main lib source dir relative to app project file
+addLibIncludePath( "boost_subset" );
 
 if ( Generator::$platform == "win32" )
 {
