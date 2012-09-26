@@ -1,9 +1,0 @@
-<!DOCTYPE Comments>
-<Comments>
-   <Project Name="Demos-Physics" >
-      <Comment Author="Torque 3D" Name="Mon Oct 12 15:12:23 2009" >A singleplayer demo of the integrated PhysX support in Torque 3D</Comment>
-   </Project>
-   <Project Name="Examples-FPS Example" >
-      <Comment Author="Torque 3D" Name="Mon Oct 12 15:13:35 2009" >An example of a multiplayer first person shooter built with the stock Torque 3D functionality</Comment>
-   </Project>
-</Comments>
