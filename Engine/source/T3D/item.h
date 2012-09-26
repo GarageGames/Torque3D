@@ -149,7 +149,9 @@ class Item: public ShapeBase
    bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere);
    void buildConvex(const Box3F& box, Convex* convex);
    void onDeleteNotify(SimObject*);
-   void inspectPostApply();
+
+   static bool _setStatic(void *object, const char *index, const char *data);
+   static bool _setRotate(void *object, const char *index, const char *data);
 
   protected:
    void _updatePhysics();
