@@ -68,10 +68,6 @@ public:
 		return *this;
 	}
 
-
-
-protected:
-	//char buffer[ sizeof(AnyStrongRefPtr<T>) ];
 };
 
 
