@@ -76,6 +76,8 @@ struct scoped_array
 {
 public:
 	typedef tScopedArray<T> type;
+private:
+	scoped_array() {}
 };
 
 

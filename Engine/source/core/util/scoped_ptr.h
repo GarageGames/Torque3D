@@ -6,35 +6,35 @@
 namespace Torque
 {
 	template<class T> 
-	class scoped_ptr // noncopyable
+	class tScopedPtr // noncopyable
 	{
 	private:
 
 		T * px;
 
-		scoped_ptr(scoped_ptr const &);
-		scoped_ptr & operator=(scoped_ptr const &);
+		tScopedPtr(tScopedPtr const &);
+		tScopedPtr & operator=(tScopedPtr const &);
 
-		typedef scoped_ptr<T> this_type;
+		typedef tScopedPtr<T> this_type;
 
-		void operator==( scoped_ptr const& ) const;
-		void operator!=( scoped_ptr const& ) const;
+		void operator==( tScopedPtr const& ) const;
+		void operator!=( tScopedPtr const& ) const;
 
 	public:
 
 		typedef T element_type;
 
-		typedef scoped_ptr<T> type;
+		typedef tScopedPtr<T> type;
 
-		explicit scoped_ptr( T * p = 0 ): px( p ) // never throws
+		explicit tScopedPtr( T * p = 0 ): px( p ) // never throws
 		{	
 		}
 
-		explicit scoped_ptr( AutoPtr<T> p ): px( p.release() ) // never throws
+		explicit tScopedPtr( AutoPtr<T> p ): px( p.release() ) // never throws
 		{
 		}
 
-		~scoped_ptr() // never throws
+		~tScopedPtr() // never throws
 		{
 			if( px )
 				delete px;
@@ -71,7 +71,7 @@ namespace Torque
 			return px == 0? 0: &this_type::px;
 		}
 
-		void swap(scoped_ptr & b) // never throws
+		void swap(tScopedPtr & b) // never throws
 		{
 			T * tmp = b.px;
 			b.px = px;
@@ -79,13 +79,20 @@ namespace Torque
 		}
 	};
 
+	template<typename T>
+	struct scoped_ptr
+	{
+		typedef tScopedPtr<T> type;
+	private:
+		scoped_ptr() {}
+	};
 	
 };
 
 	
 
 template<class T>
-inline void swap(Torque::scoped_ptr<T> & a, Torque::scoped_ptr<T> & b) // never throws
+inline void swap(typename Torque::scoped_ptr<T>::type & a, typename Torque::scoped_ptr<T>::type & b) // never throws
 {
     a.swap(b);
 }
@@ -93,7 +100,7 @@ inline void swap(Torque::scoped_ptr<T> & a, Torque::scoped_ptr<T> & b) // never 
 // get_pointer(p) is a generic way to say p.get()
 
 template<class T>
-inline T * get_pointer(Torque::scoped_ptr<T> const & p)
+inline T * get_pointer(typename Torque::scoped_ptr<T>::type const & p)
 {
     return p.get();
 }
