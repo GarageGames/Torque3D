@@ -1,5 +1,6 @@
 Torque3D
 ========
+![Documentation qr-code](http://chart.apis.google.com/chart?chs=350x350&cht=qr&chl=https://github.com/GarageGames/Torque3D-Documentation/blob/master/README.md&choe=UTF-8)
 
 MIT Licensed Open Source version of [Torque 3D](http://www.garagegames.com/products/torque-3d) from [GarageGames](http://www.garagegames.com)
 
