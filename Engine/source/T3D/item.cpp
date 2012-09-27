@@ -1279,7 +1279,7 @@ DefineEngineMethod( Item, getLastStickyNormal, const char *, (),,
 bool Item::_setStatic(void *object, const char *index, const char *data)
 {
    Item *i = static_cast<Item*>(object);
-   i->mAtRest = false;
+   i->mAtRest = dAtob(data);
    i->setMaskBits(InitialUpdateMask | PositionMask);
    return true;
 }
@@ -1294,7 +1294,7 @@ bool Item::_setRotate(void *object, const char *index, const char *data)
 void Item::initPersistFields()
 {
    addGroup("Misc");	
-   addProtectedField("static", TypeBool, Offset(mStatic, Item), &_setStatic, &defaultProtectedGetFn, "If true, the object is not moving in the world (and will not be updated through the network).\n");
+   addProtectedField("static", TypeBool, Offset(mStatic, Item), &_setStatic, &defaultProtectedGetFn, "If true, the object is not moving in the world.\n");
    addProtectedField("rotate", TypeBool, Offset(mRotate, Item), &_setRotate, &defaultProtectedGetFn, "If true, the object will automatically rotate around its Z axis.\n");
    endGroup("Misc");
 
