@@ -116,7 +116,9 @@ static const F32 F32_MAX = F32(3.402823466e+38F);                 ///< Constant 
 
 
 #ifdef _MSC_VER
+#if _MSC_VER < 1700
 #define for if(false) {} else for   ///< Hack to work around Microsoft VC's non-C++ compliance on variable scoping
+#endif
 #endif
 
 
