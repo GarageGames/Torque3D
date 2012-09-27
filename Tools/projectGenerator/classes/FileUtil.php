@@ -81,7 +81,7 @@ class FileUtil
 	      if( !is_array( $v ) )
 	         continue;
 	
-	      FileUtil::trimFileList( &$list[ $k ] );
+	      FileUtil::trimFileList( $list[ $k ] );
 	   }
 	}
 	
