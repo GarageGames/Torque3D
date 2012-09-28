@@ -7,13 +7,16 @@
 
 namespace Torque
 {
+	template<class T> class weak_ptr;
+	template<typename T> class AnyWeakRefPtr;
+	
 
 template<typename T>
 class AnyStrongRefPtr
-{	
-	T* px;
-	StrongRefBase *ref;
+{		
 public:	
+	StrongRefBase *ref;
+	T* px;
 
 	~AnyStrongRefPtr()
 	{
@@ -28,15 +31,25 @@ public:
 	AnyStrongRefPtr() : px(nullptr), ref(nullptr) {}
 
 	template<typename Y>
-	explicit AnyStrongRefPtr(Y* p) : px(p)
+	AnyStrongRefPtr(Y* p) : px(p)
 	{
-		ref = new StrongRefBase();
+		ref = new StrongRefBase();		
 		ref->incRefCount();
 	}
 
 	AnyStrongRefPtr(const AnyStrongRefPtr<T>& p)
 	{		
 		ref = p.ref;		
+		px = p.px;
+
+		if(ref)
+			ref->incRefCount();
+	}
+
+	template<typename Y>
+	AnyStrongRefPtr( AnyWeakRefPtr<Y> const &p)
+	{		
+		ref = static_cast<StrongRefBase*>(p.ref);		
 		px = p.px;
 
 		if(ref)
@@ -88,6 +101,10 @@ public:
     {
     }
 
+	tSharedPtr( const AnyStrongRefPtr<T> &r ): px( r.px ), pn( r ) // never throws
+    {
+    } 
+
     template<class Y>
     explicit tSharedPtr( Y * p ): px( p ), pn( p ) // Y must be complete
     {       
@@ -95,7 +112,16 @@ public:
 
     tSharedPtr( tSharedPtr const & r ): px( r.px ), pn( r.pn ) // never throws
     {
-    }    
+    }   
+
+	template<class Y>
+    explicit tSharedPtr(weak_ptr<Y> const & r): pn(r.pn) // may throw
+    {
+        // it is now safe to copy r.px, as pn(r.pn) did not throw
+        px = r.px;
+    }
+
+	 
 
     // assignment
 
@@ -103,20 +129,7 @@ public:
     {
         this_type(r).swap(*this);
         return *this;
-    }
-
-	/*
-#if !defined(BOOST_MSVC) || (BOOST_MSVC >= 1400)
-
-    template<class Y>
-    tSharedPtr & operator=(tSharedPtr<Y> const & r) // never throws
-    {
-        this_type(r).swap(*this);
-        return *this;
-    }
-
-#endif
-	*/
+    }	
 
     template<class Y>
     tSharedPtr & operator=( AutoPtr<Y> & r )
@@ -212,6 +225,8 @@ public:
 template<typename T>
 struct shared_ptr
 {
+	static tSharedPtr<T> get_type();
+	tSharedPtr<T> p;
 	typedef tSharedPtr<T> type;
 private:
 	shared_ptr() {}
