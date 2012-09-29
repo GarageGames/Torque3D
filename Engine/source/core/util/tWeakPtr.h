@@ -21,43 +21,36 @@ namespace Torque
 	template<typename T>
 	class AnyWeakRefPtr
 	{
-		void set(T* _px, WeakRefBase * _ref)
-	   {
-		  if (ref)
-			 ref->getWeakReference()->decRefCount();
-		  ref = NULL;
-		  px = NULL;
-		  if (_ref)
-		  {
-			 ref = _ref;
-			 ref->getWeakReference()->incRefCount();
-			 px = _px;
-		  }
+		void set( WeakRefPtr<AnyStrongRefBase> const &_ref)
+	   {	
+		  w_ref = _ref;		 
 	   }
 
 	public:	
+		
+		WeakRefPtr<AnyStrongRefBase> w_ref;
 
-		T* px;
-		WeakRefBase *ref;
+		WeakRefBase::WeakReference* get_ref() const { if(w_ref.getPointer()) return w_ref.getPointer()->getWeakReference(); else return NULL;}
+		T* get_real_ptr() const { if(w_ref.getPointer()) return (T*)w_ref.getPointer()->_px; return NULL;}
 
-		WeakRefBase* get_ref() const { return ref; }
 		~AnyWeakRefPtr()
 		{
-			set( NULL, NULL );
+			//set( NULL ); //TODO check
 		}
 
-		AnyWeakRefPtr() : px(NULL), ref(NULL) {}			
+		AnyWeakRefPtr() : w_ref(NULL) {}			
 
 		template<typename Y>
-		AnyWeakRefPtr(const AnyWeakRefPtr<Y>& p)
+		AnyWeakRefPtr(AnyWeakRefPtr<Y> const &p)
 		{		
-			set( p.px, p.ref );
+			set( p.w_ref );
 		}
 
 		template< typename Y >
-		AnyWeakRefPtr(const AnyStrongRefPtr<Y>& p)
+		AnyWeakRefPtr(AnyStrongRefPtr<Y> const &p) 
 		{		
-			set( p.px, p.ref );
+			(T*)p.get_real_ptr();			
+			set( p.ref.getPointer() );
 		}
 
 		void swap( AnyWeakRefPtr<T>& p)
@@ -67,18 +60,32 @@ namespace Torque
 			p = temp;
 		}
 
-		template<typename Y>
+		/*template<typename Y>
 		AnyWeakRefPtr<T>& operator=( const AnyStrongRefPtr<Y>& p )
 		{
-			set( p.px, p.ref );
+			set( p.ref );
 			return *this;
-		}
+		}*/
 
 		template<typename Y>
 		AnyWeakRefPtr<T>& operator=( const AnyWeakRefPtr<Y>& p )
 		{
-			set( p.px, p.ref );
+			set( p.w_ref );
 			return *this;
+		}
+
+		template<typename Y>
+		bool operator<( const AnyWeakRefPtr<Y>& p ) const
+		{
+			return get_ref() < p.get_ref();
+		}
+
+		long use_count() const
+		{
+			if( w_ref.isNull() )
+				return 0;
+
+			return w_ref.getPointer()->getRefCount();
 		}
 
 	};
@@ -93,26 +100,25 @@ private:
 public:
 
     typedef T element_type;
-	typedef weak_ptr<T> type;
+	typedef weak_ptr<T> type;	
 
-    weak_ptr(): px(0), pn()
+    weak_ptr(): pn()
     {
     }
 
 	template<class Y>
-    weak_ptr( weak_ptr<Y> const & r ) : px(r.lock().get()), pn(r.pn) // never throws
-    {
+    weak_ptr( weak_ptr<Y> const & r ) : pn( r.lock().pn ) // never throws
+    {		
     }
 
     template<class Y>
-    weak_ptr( weak_ptr<Y> && r )
-    : px( r.lock().get() ), pn( r.pn ) // never throws
+    weak_ptr( weak_ptr<Y> && r ) : pn(  r.lock().pn  ) // never throws
     {
         r.px = NULL;
     }
 
     // for better efficiency in the T == Y case
-    weak_ptr( weak_ptr && r ): px( r.px ), pn( r.pn ) // never throws
+    weak_ptr( weak_ptr && r ): pn( r.pn ) // never throws
     {
         r.px = NULL;
     }
@@ -124,9 +130,8 @@ public:
         return *this;
     }
 
-	//template< typename Y >
-    weak_ptr( typename Torque::shared_ptr<T>::type const & r )
-    : px( r.px ), pn( r.pn ) // never throws
+	template< typename Y >
+	weak_ptr( Torque::tSharedPtr<Y> const & r ) :  pn( r.pn ) // never throws
     {
     }
 
@@ -134,17 +139,15 @@ public:
 
     template<class Y>
     weak_ptr & operator=(weak_ptr<Y> const & r) // never throws
-    {
-        px = r.lock().get();
-        pn = r.pn;
+    {      
+        pn = r.lock().pn;
         return *this;
     }
 
     template<class Y>
     weak_ptr & operator=(shared_ptr<Y> const & r) // never throws
-    {
-        px = r.px;
-        pn = r.pn;
+    {        
+        pn = r.pn.mObject;
         return *this;
     }
 
@@ -152,18 +155,20 @@ public:
 
     typename shared_ptr<T>::type lock() const // never throws
     {
-		AnyStrongRefPtr<T>* ptr = (AnyStrongRefPtr<T>*)this->pn.get_ref();
-        return shared_ptr<T>::type( *ptr );
+		if( !pn.get_ref() )
+			return shared_ptr<T>::type();
+		
+        return tSharedPtr<T>( AnyStrongRefPtr<T>(pn) );
     }
 
     long use_count() const // never throws
-    {
+    {		
         return pn.use_count();
     }
 
     bool expired() const // never throws
     {
-        return pn.use_count() == 0;
+		return pn.w_ref.isNull();
     }
 
     bool _empty() const // extension, not in std::weak_ptr
@@ -177,14 +182,12 @@ public:
     }
 
     void swap(this_type & other) // never throws
-    {
-        std::swap(px, other.px);
+    {      
         pn.swap(other.pn);
     }
 
-    void _internal_assign(T * px2, boost::detail::shared_count const & pn2)
-    {
-        px = px2;
+    void _internal_assign(T * px2, AnyWeakRefPtr<T> const & pn2)
+    {       
         pn = pn2;
     }
 
@@ -197,9 +200,7 @@ public:
     {
         return pn < rhs.pn;
     }
-
-
-    T * px;                       // contained pointer
+    
     AnyWeakRefPtr<T> pn; // reference counter
 
 };  // weak_ptr
