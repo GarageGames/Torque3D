@@ -1,8 +1,6 @@
-#ifndef BOOST_SMART_PTR_WEAK_PTR_HPP_INCLUDED
-#define BOOST_SMART_PTR_WEAK_PTR_HPP_INCLUDED
+#ifndef _TORQUE_WEAK_PTR_H_
+#define _TORQUE_WEAK_PTR_H_
 
-//
-//  weak_ptr.hpp
 //
 //  Copyright (c) 2001, 2002, 2003 Peter Dimov
 //
@@ -10,7 +8,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-//  See http://www.boost.org/libs/smart_ptr/weak_ptr.htm for documentation.
+//  See http://www.boost.org/libs/smart_ptr/WeakPtr.htm for documentation.
 //
 
 #include "core\util\refBase.h"
@@ -23,10 +21,16 @@ namespace Torque
 	{
 		void set( WeakRefPtr<AnyStrongRefBase> const &_ref)
 	   {	
-		  w_ref = _ref;		 
+		  w_ref = _ref;
+		  if( _ref.isValid() )
+			_last_ref = _ref->getWeakReference();
+		  else
+			  _last_ref = NULL;
 	   }
-
+		
 	public:	
+
+		void* _last_ref; //TODO to private
 		
 		WeakRefPtr<AnyStrongRefBase> w_ref;
 
@@ -35,10 +39,10 @@ namespace Torque
 
 		~AnyWeakRefPtr()
 		{
-			//set( NULL ); //TODO check
+			
 		}
 
-		AnyWeakRefPtr() : w_ref(NULL) {}			
+		AnyWeakRefPtr() : w_ref(NULL), _last_ref(NULL) {}			
 
 		template<typename Y>
 		AnyWeakRefPtr(AnyWeakRefPtr<Y> const &p)
@@ -60,12 +64,13 @@ namespace Torque
 			p = temp;
 		}
 
-		/*template<typename Y>
+		template<typename Y>
 		AnyWeakRefPtr<T>& operator=( const AnyStrongRefPtr<Y>& p )
 		{
-			set( p.ref );
+			WeakRefPtr<AnyStrongRefBase> temp_wref = p.ref.getPointer();
+			set( temp_wref );
 			return *this;
-		}*/
+		}
 
 		template<typename Y>
 		AnyWeakRefPtr<T>& operator=( const AnyWeakRefPtr<Y>& p )
@@ -77,7 +82,7 @@ namespace Torque
 		template<typename Y>
 		bool operator<( const AnyWeakRefPtr<Y>& p ) const
 		{
-			return get_ref() < p.get_ref();
+			return _last_ref < p._last_ref;
 		}
 
 		long use_count() const
@@ -90,136 +95,140 @@ namespace Torque
 
 	};
 
+	struct bad_weak_ptr {};
 
-template<class T> class weak_ptr
-{
-private:
+
+	template<class T> 
+	class WeakPtr
+	{
+	private:
     
-    typedef weak_ptr<T> this_type;
+		typedef WeakPtr<T> this_type;
 
-public:
+		template<class Y> friend class SharedPtr;
+		template<class Y> friend class WeakPtr;
 
-    typedef T element_type;
-	typedef weak_ptr<T> type;	
+	public:
 
-    weak_ptr(): pn()
-    {
-    }
+		typedef T element_type;
+		typedef WeakPtr<T> type;	
 
-	template<class Y>
-    weak_ptr( weak_ptr<Y> const & r ) : pn( r.lock().pn ) // never throws
-    {		
-    }
+		WeakPtr(): pn()
+		{
+		}
 
-    template<class Y>
-    weak_ptr( weak_ptr<Y> && r ) : pn(  r.lock().pn  ) // never throws
-    {
-        r.px = NULL;
-    }
+		template<class Y>
+		WeakPtr( WeakPtr<Y> const & r ) : pn( r.lock().pn ) // never throws
+		{		
+		}
 
-    // for better efficiency in the T == Y case
-    weak_ptr( weak_ptr && r ): pn( r.pn ) // never throws
-    {
-        r.px = NULL;
-    }
+		template<class Y>
+		WeakPtr( WeakPtr<Y> && r ) : pn(  r.lock().pn  ) // never throws
+		{
+			r.px = NULL;
+		}
 
-    // for better efficiency in the T == Y case
-    weak_ptr & operator=( weak_ptr && r ) // never throws
-    {
-        this_type( static_cast< weak_ptr && >( r ) ).swap( *this );
-        return *this;
-    }
+		// for better efficiency in the T == Y case
+		WeakPtr( WeakPtr && r ): pn( r.pn ) // never throws
+		{
+			r.px = NULL;
+		}
 
-	template< typename Y >
-	weak_ptr( Torque::tSharedPtr<Y> const & r ) :  pn( r.pn ) // never throws
-    {
-    }
+		template< typename Y >
+		WeakPtr( Torque::SharedPtr<Y> const & r ) :  pn( r.pn ) // never throws
+		{
+		}
 
-#if !defined(BOOST_MSVC) || (BOOST_MSVC >= 1300)
+		// for better efficiency in the T == Y case
+		WeakPtr & operator=( WeakPtr && r ) // never throws
+		{
+			this_type( static_cast< WeakPtr && >( r ) ).swap( *this );
+			return *this;
+		}		
 
-    template<class Y>
-    weak_ptr & operator=(weak_ptr<Y> const & r) // never throws
-    {      
-        pn = r.lock().pn;
-        return *this;
-    }
+		template<class Y>
+		WeakPtr & operator=(WeakPtr<Y> const & r) // never throws
+		{      
+			pn = r.lock().pn;
+			return *this;
+		}
 
-    template<class Y>
-    weak_ptr & operator=(shared_ptr<Y> const & r) // never throws
-    {        
-        pn = r.pn.mObject;
-        return *this;
-    }
+		template<class Y>
+		WeakPtr & operator=(SharedPtr<Y> const & r) // never throws
+		{        
+			pn = r.pn;
+			return *this;
+		}
 
-#endif
-
-    typename shared_ptr<T>::type lock() const // never throws
-    {
-		if( !pn.get_ref() )
-			return shared_ptr<T>::type();
+		SharedPtr<T> lock() const // never throws
+		{
+			if( !pn.get_ref() )
+				return SharedPtr<T>();
 		
-        return tSharedPtr<T>( AnyStrongRefPtr<T>(pn) );
-    }
+			return SharedPtr<T>( AnyStrongRefPtr<T>(pn) );
+		}
 
-    long use_count() const // never throws
-    {		
-        return pn.use_count();
-    }
+		long use_count() const // never throws
+		{		
+			return pn.use_count();
+		}
 
-    bool expired() const // never throws
-    {
-		return pn.w_ref.isNull();
-    }
+		bool expired() const // never throws
+		{
+			return pn.w_ref.isNull();
+		}
 
-    bool _empty() const // extension, not in std::weak_ptr
-    {
-        return pn.empty();
-    }
+		bool _empty() const // extension, not in std::WeakPtr
+		{
+			return pn.empty();
+		}
 
-    void reset() // never throws in 1.30+
-    {
-        this_type().swap(*this);
-    }
+		void reset() // never throws in 1.30+
+		{
+			this_type().swap(*this);
+		}
 
-    void swap(this_type & other) // never throws
-    {      
-        pn.swap(other.pn);
-    }
+		void swap(this_type & other) // never throws
+		{      
+			pn.swap(other.pn);
+		}
 
-    void _internal_assign(T * px2, AnyWeakRefPtr<T> const & pn2)
-    {       
-        pn = pn2;
-    }
+		void _internal_assign(T * px2, AnyWeakRefPtr<T> const & pn2)
+		{       
+			pn = pn2;
+		}
 
-    template<class Y> bool owner_before( weak_ptr<Y> const & rhs ) const
-    {
-        return pn < rhs.pn;
-    }
+		template<class Y> bool owner_before( WeakPtr<Y> const & rhs ) const
+		{
+			return pn < rhs.pn;
+		}
 
-    template<class Y> bool owner_before( shared_ptr<Y> const & rhs ) const
-    {
-        return pn < rhs.pn;
-    }
+		template<class Y> bool owner_before( SharedPtr<Y> const & rhs ) const
+		{
+			return pn < rhs.pn;
+		}
+
+	private:
     
-    AnyWeakRefPtr<T> pn; // reference counter
+		AnyWeakRefPtr<T> pn; // reference counter
 
-};  // weak_ptr
+	};  // WeakPtr
 
-template<class T, class U> inline bool operator<(weak_ptr<T> const & a, weak_ptr<U> const & b)
-{
-    return a.owner_before( b );
-}
+	template<class T, class U> inline bool operator<(WeakPtr<T> const & a, WeakPtr<U> const & b)
+	{
+		return a.owner_before( b );
+	}
 
-template<class T> void swap(weak_ptr<T> & a, weak_ptr<T> & b)
-{
-    a.swap(b);
-}
+	template<class T> void swap(WeakPtr<T> & a, WeakPtr<T> & b)
+	{
+		a.swap(b);
+	}
 
-}; // namespace boost
-
-
+}; // namespace Torque
 
 
-#endif  // #ifndef BOOST_SMART_PTR_WEAK_PTR_HPP_INCLUDED
+
+
+#endif  // #ifndef _TORQUE_WEAK_PTR_H_
 
 

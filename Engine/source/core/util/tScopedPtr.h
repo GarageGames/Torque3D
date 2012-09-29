@@ -1,40 +1,52 @@
 #ifndef _T3T_SCOPED_PTR_H_
 
-#include "core\util\autoPtr.h"
+//
+//  Copyright (c) 2001, 2002, 2003 Peter Dimov
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+//  See http://www.boost.org/libs/smart_ptr/WeakPtr.htm for documentation.
+//
+
 #include "platform\platformAssert.h"
 
 namespace Torque
 {
 	template<class T> 
-	class tScopedPtr // noncopyable
+	class ScopedPtr // noncopyable
 	{
 	private:
 
 		T * px;
 
-		tScopedPtr(tScopedPtr const &);
-		tScopedPtr & operator=(tScopedPtr const &);
+		ScopedPtr(ScopedPtr const &);
+		ScopedPtr & operator=(ScopedPtr const &);
 
-		typedef tScopedPtr<T> this_type;
+		typedef ScopedPtr<T> this_type;
 
-		void operator==( tScopedPtr const& ) const;
-		void operator!=( tScopedPtr const& ) const;
+		void operator==( ScopedPtr const& ) const;
+		void operator!=( ScopedPtr const& ) const;
 
 	public:
 
 		typedef T element_type;
 
-		typedef tScopedPtr<T> type;
+		typedef ScopedPtr<T> type;
 
-		explicit tScopedPtr( T * p = 0 ): px( p ) // never throws
+		explicit ScopedPtr( T * p = 0 ): px( p ) // never throws
 		{	
-		}
+		}	
 
-		explicit tScopedPtr( AutoPtr<T> p ): px( p.release() ) // never throws
-		{
-		}
+		//Not valid
+		template< class Y>
+		explicit ScopedPtr( Y * p ): px( p ) // never throws
+		{	
+			Y* _y = px; //Forced error
+		}	
 
-		~tScopedPtr() // never throws
+		~ScopedPtr() // never throws
 		{
 			if( px )
 				delete px;
@@ -71,20 +83,12 @@ namespace Torque
 			return px == 0? 0: &this_type::px;
 		}
 
-		void swap(tScopedPtr & b) // never throws
+		void swap(ScopedPtr & b) // never throws
 		{
 			T * tmp = b.px;
 			b.px = px;
 			px = tmp;
 		}
-	};
-
-	template<typename T>
-	struct scoped_ptr
-	{
-		typedef tScopedPtr<T> type;
-	private:
-		scoped_ptr() {}
 	};
 	
 };
@@ -92,7 +96,7 @@ namespace Torque
 	
 
 template<class T>
-inline void swap(typename Torque::scoped_ptr<T>::type & a, typename Torque::scoped_ptr<T>::type & b) // never throws
+inline void swap( Torque::ScopedPtr<T> & a, Torque::ScopedPtr<T> & b) // never throws
 {
     a.swap(b);
 }
@@ -100,7 +104,7 @@ inline void swap(typename Torque::scoped_ptr<T>::type & a, typename Torque::scop
 // get_pointer(p) is a generic way to say p.get()
 
 template<class T>
-inline T * get_pointer(typename Torque::scoped_ptr<T>::type const & p)
+inline T * get_pointer( Torque::ScopedPtr<T> const & p)
 {
     return p.get();
 }
