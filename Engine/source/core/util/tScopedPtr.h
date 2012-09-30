@@ -1,4 +1,5 @@
 #ifndef _T3T_SCOPED_PTR_H_
+#define _T3T_SCOPED_PTR_H_
 
 //
 //  Copyright (c) 2001, 2002, 2003 Peter Dimov
