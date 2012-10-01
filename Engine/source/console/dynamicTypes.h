@@ -252,7 +252,7 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
    extern S32 type; \
    extern const char* castConsoleTypeToString( _ConsoleConstType< nativeType >::ConstType &arg ); \
    extern bool castConsoleTypeFromString( nativeType &arg, const char *str ); \
-   template<> extern S32 TYPEID< nativeType >();
+   template<> S32 TYPEID< nativeType >();
    
 #define DefineUnmappedConsoleType( type, nativeType ) \
    DefineConsoleType( type, nativeType ) \

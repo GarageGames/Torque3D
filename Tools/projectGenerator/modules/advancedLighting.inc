@@ -37,6 +37,8 @@ beginModule( 'advancedLighting' );
          addEngineSrcDir( 'lighting/advanced/hlsl' );
          break;
       case "mac":
+      case "linux":
+      case "linux_dedicated":
          addEngineSrcDir( 'lighting/advanced/glsl' );
          break;
    }

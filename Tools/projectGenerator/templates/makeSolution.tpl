@@ -3,6 +3,11 @@
 # copyright on the actual sources.
 # Copyright 2005 Jon Watte.
 
+# This sets the option for how many instances of gcc we'll run at the
+# same time, one per CPU core in this case. This speeds up build time.
+# Adjust to your amount of cores.
+OPTIONS := --jobs=4
+
 DEPS := 
 LIB_TARGETS :=
 LIB_TARGETS_DEBUG := 

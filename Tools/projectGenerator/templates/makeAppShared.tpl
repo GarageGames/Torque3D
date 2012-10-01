@@ -13,12 +13,13 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 
 LDFLAGS := -g -m32
 LDLIBS := -lstdc++
-CFLAGS := -MMD -I. -Wfatal-errors -m32
+CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686
 
 {foreach item=def from=$projIncludes}CFLAGS += -I{$def}
 {/foreach}
 
 CFLAGS += -DUNICODE
+CFLAGS += -DLINUX
 
 {foreach item=def from=$projDefines}CFLAGS += -D{$def}
 {/foreach}
@@ -30,7 +31,7 @@ CFLAGS_DEBUG += -DTORQUE_DEBUG_GUARD
 
 CFLAGS += -O3
 
-#CC := gcc
+CC := gcc
 LD := gcc
 
 APP_TARGETS += $(APPNAME)
