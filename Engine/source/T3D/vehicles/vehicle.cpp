@@ -1104,6 +1104,22 @@ void Vehicle::updateMove(const Move* move)
       mSteering.y = 0;
    }
 
+   // Steering return
+   if(mDataBlock->steeringReturn > 0.0f &&
+      (!mDataBlock->powerSteering || (move->yaw == 0.0f && move->pitch == 0.0f)))
+   {
+      Point2F returnAmount(mSteering.x * mDataBlock->steeringReturn * TickSec,
+                           mSteering.y * mDataBlock->steeringReturn * TickSec);
+      if(mDataBlock->steeringReturnSpeedScale > 0.0f)
+      {
+         Point3F vel;
+         mWorldToObj.mulV(getVelocity(), &vel);
+         returnAmount += Point2F(mSteering.x * vel.y * mDataBlock->steeringReturnSpeedScale * TickSec,
+                                 mSteering.y * vel.y * mDataBlock->steeringReturnSpeedScale * TickSec);
+      }
+      mSteering -= returnAmount;
+   }
+
    // Jetting flag
    if (move->trigger[3]) {
       if (!mJetting && getEnergyLevel() >= mDataBlock->minJetEnergy)
