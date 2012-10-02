@@ -34,7 +34,7 @@
 #include "materials/baseMatInstance.h"
 #include "scene/sceneManager.h"
 #include "scene/sceneRenderState.h"
-#include "scene/zones/SceneZoneSpace.h"
+#include "scene/zones/sceneZoneSpace.h"
 #include "lighting/lightManager.h"
 #include "math/mathUtils.h"
 #include "shaderGen/shaderGenVars.h"
@@ -42,6 +42,7 @@
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
 #include "materials/shaderData.h"
+#include "core/module.h"
 
 // Used for creation in ShadowMapParams::getOrCreateShadowMap()
 #include "lighting/shadowMap/singleLightShadowMap.h"
@@ -545,8 +546,15 @@ void LightingShaderConstants::_onShaderReload()
       init( mShader );
 }
 
+MODULE_BEGIN( ShadowMapParams )
+MODULE_INIT_BEFORE( LightMapParams )
+MODULE_INIT
+{
+   ShadowMapParams::Type = "ShadowMapParams" ;
+}
+MODULE_END;
 
-const LightInfoExType ShadowMapParams::Type( "ShadowMapParams" );
+LightInfoExType ShadowMapParams::Type( "" );
 
 ShadowMapParams::ShadowMapParams( LightInfo *light ) 
    :  mLight( light ),

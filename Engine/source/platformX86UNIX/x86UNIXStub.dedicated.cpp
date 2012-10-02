@@ -81,6 +81,8 @@ void OpenALDLLShutdown() {}
 
 // Platform Stubs
 
+bool Platform::excludeOtherInstances(const char*) { return true; }
+
 // clipboard
 const char* Platform::getClipboard() { return ""; }
 bool Platform::setClipboard(const char *text) { return false; }
