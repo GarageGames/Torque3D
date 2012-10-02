@@ -107,6 +107,10 @@ struct VehicleData: public ShapeBaseData
    F32 jetEnergyDrain;        ///< Energy drain/tick
    F32 minJetEnergy;
 
+   F32 steeringReturn;
+   F32 steeringReturnSpeedScale;
+   bool powerSteering;
+
    ParticleEmitterData * dustEmitter;
    S32 dustID;
    F32 triggerDustHeight;  ///< height vehicle has to be under to kick up dust
