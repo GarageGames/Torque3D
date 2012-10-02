@@ -298,7 +298,7 @@ void VehicleData::packData(BitStream* stream)
 
    stream->write(steeringReturn);
    stream->write(steeringReturnSpeedScale);
-   stream->write(powerSteering);
+   stream->writeFlag(powerSteering);
 
    stream->writeFlag(cameraRoll);
    stream->write(cameraLag);
