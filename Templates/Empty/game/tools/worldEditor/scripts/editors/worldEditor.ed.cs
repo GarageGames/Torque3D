@@ -126,7 +126,7 @@ function WorldEditor::onSelectionCentroidChanged( %this )
 function WorldEditor::init(%this)
 {
    // add objclasses which we do not want to collide with
-   %this.ignoreObjClass(Sky, AIObjective);
+   %this.ignoreObjClass(Sky);
 
    // editing modes
    %this.numEditModes = 3;
