@@ -361,19 +361,28 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
    mClipper.cullUnusedVerts();
    mClipper.triangulate();
    
+   const U32 numVerts = mClipper.mVertexList.size();
+   const U32 numIndices = mClipper.mIndexList.size();
+
+   if ( !numVerts || !numIndices )
+      return false;
+
+   // Fail if either of the buffer metrics exceeds our limits
+   // on dynamic geometry buffers.
+   if ( numVerts > smMaxVerts ||
+        numIndices > smMaxIndices )
+      return false;
+
    if ( !decalData->skipVertexNormals )
       mClipper.generateNormals();
    
-   if ( mClipper.mVertexList.empty() )
-      return false;
-
 #ifdef DECALMANAGER_DEBUG
    mDebugPlanes.clear();
    mDebugPlanes.merge( mClipper.mPlaneList );
 #endif
 
-   decal->mVertCount = mClipper.mVertexList.size();
-   decal->mIndxCount = mClipper.mIndexList.size();
+   decal->mVertCount = numVerts;
+   decal->mIndxCount = numIndices;
    
    Vector<Point3F> tmpPoints;
 
