@@ -1265,6 +1265,9 @@ public:
    ///
    /// @return Damage factor, between 0.0 - 1.0
    F32  getDamageValue();
+ 
+   /// Returns the datablock.maxDamage value  
+   F32 getMaxDamage(); 
 
    /// Returns the rate at which the object regenerates damage
    F32  getRepairRate() { return mRepairRate; }
