@@ -285,6 +285,24 @@ inline void ExprEvalState::setStringVariable(const char *val)
    currentVariable->setStringValue(val);
 }
 
+inline void ExprEvalState::setCopyVariable()
+{
+   if (copyVariable) {
+      switch (copyVariable->value.type)
+      {
+         case ConsoleValue::TypeInternalInt:
+            currentVariable->setIntValue(copyVariable->getIntValue());
+         break;
+         case ConsoleValue::TypeInternalFloat:
+            currentVariable->setFloatValue(copyVariable->getFloatValue());
+         break;
+         default:
+            currentVariable->setStringValue(copyVariable->getStringValue());
+         break;
+	   }
+   }
+}
+
 //------------------------------------------------------------
 
 // Gets a component of an object's field value or a variable and returns it
@@ -1362,6 +1380,11 @@ breakContinue:
             STR.setStringValue(val);
             break;
 
+         case OP_LOADVAR_VAR:
+            // Sets current source of OP_SAVEVAR_VAR
+            gEvalState.copyVariable = gEvalState.currentVariable;
+            break;
+
          case OP_SAVEVAR_UINT:
             gEvalState.setIntVariable(intStack[_UINT]);
             break;
@@ -1372,6 +1395,11 @@ breakContinue:
 
          case OP_SAVEVAR_STR:
             gEvalState.setStringVariable(STR.getStringValue());
+            break;
+		    
+         case OP_SAVEVAR_VAR:
+			   // this basically handles %var1 = %var2
+            gEvalState.setCopyVariable();
             break;
 
          case OP_SETCUROBJECT:
@@ -1558,6 +1586,11 @@ breakContinue:
 
          case OP_UINT_TO_NONE:
             _UINT--;
+            break;
+
+         case OP_COPYVAR_TO_NONE:
+            // nop
+            gEvalState.copyVariable = NULL;
             break;
 
          case OP_LOADIMMED_UINT:
@@ -1939,6 +1972,13 @@ breakContinue:
 			//Con::printf("Pushing float: %f",(F32)intStack[_UINT]);
             CSTK.pushFLT(floatStack[_FLT]);
 			_FLT--;
+            break;
+         case OP_PUSH_VAR:
+			//Con::printf("Pushing variable: %s",gEvalState.getCurrentVariable()]);
+            if (gEvalState.currentVariable)
+			   CSTK.pushValue(gEvalState.currentVariable->value);
+			else
+			   CSTK.pushString("");
             break;
 
          case OP_PUSH_FRAME:

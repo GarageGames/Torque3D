@@ -90,10 +90,12 @@ namespace Compiler
       OP_LOADVAR_UINT,
       OP_LOADVAR_FLT,
       OP_LOADVAR_STR,
+      OP_LOADVAR_VAR,
 
       OP_SAVEVAR_UINT,
       OP_SAVEVAR_FLT,
       OP_SAVEVAR_STR,
+      OP_SAVEVAR_VAR,
 
       OP_SETCUROBJECT,
       OP_SETCUROBJECT_NEW,
@@ -120,6 +122,7 @@ namespace Compiler
       OP_UINT_TO_FLT,
       OP_UINT_TO_STR,
       OP_UINT_TO_NONE,
+      OP_COPYVAR_TO_NONE,
 
       OP_LOADIMMED_UINT,
       OP_LOADIMMED_FLT,
@@ -140,8 +143,9 @@ namespace Compiler
       OP_COMPARE_STR,
 
       OP_PUSH,          // String
-	  OP_PUSH_UINT,      // Integer
-	  OP_PUSH_FLT,    // Float
+      OP_PUSH_UINT,     // Integer
+      OP_PUSH_FLT,      // Float
+      OP_PUSH_VAR,      // Variable
       OP_PUSH_FRAME,    // Frame
 
       OP_ASSERT,

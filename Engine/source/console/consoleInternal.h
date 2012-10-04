@@ -464,6 +464,7 @@ public:
     ///
     SimObject *thisObject;
     Dictionary::Entry *currentVariable;
+    Dictionary::Entry *copyVariable;
     bool traceOn;
     
     U32 mStackDepth;
@@ -485,12 +486,14 @@ public:
     
     void setCurVarName(StringTableEntry name);
     void setCurVarNameCreate(StringTableEntry name);
+
     S32 getIntVariable();
     F64 getFloatVariable();
     const char *getStringVariable();
     void setIntVariable(S32 val);
     void setFloatVariable(F64 val);
     void setStringVariable(const char *str);
+	 void setCopyVariable();
 
     void pushFrame(StringTableEntry frameName, Namespace *ns);
     void popFrame();
