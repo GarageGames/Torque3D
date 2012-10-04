@@ -496,7 +496,9 @@ void GuiTabBookCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // Clip to tab area
    RectI savedClipRect = GFX->getClipRect();
-   GFX->setClipRect( tabRect );
+   RectI clippedTabRect = tabRect;
+   clippedTabRect.intersect( savedClipRect );
+   GFX->setClipRect( clippedTabRect );
 
    // Render our tabs
    renderTabs( offset, tabRect );
