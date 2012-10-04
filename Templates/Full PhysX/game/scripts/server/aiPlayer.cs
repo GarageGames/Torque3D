@@ -87,7 +87,7 @@ function DemoPlayer::onEndSequence(%this,%obj,%slot)
 // AIPlayer static functions
 //-----------------------------------------------------------------------------
 
-function AIPlayer::create(%name,%spawnPoint)
+function AIPlayer::produce(%name,%spawnPoint)
 {
    // Create the demo player object
    %player = new AiPlayer()
@@ -107,7 +107,7 @@ function AIPlayer::spawnOnPath(%name,%path)
    if (!isObject(%path))
       return 0;
    %node = %path.getObject(0);
-   %player = AIPlayer::create(%name, %node.getTransform());
+   %player = AIPlayer::produce(%name, %node.getTransform());
    return %player;
 }
 
