@@ -303,7 +303,7 @@ class Project
             }
         }
 
-        FileUtil::trimFileList( &$projectFiles );
+        FileUtil::trimFileList( $projectFiles );
 
         // Uncomment me to see the structure the file lister is returning.
         //print_r($projectFiles);
@@ -316,6 +316,7 @@ class Project
         // Set the template delimiters
         $tpl->left_delimiter  = $output->ldelim  ? $output->ldelim  : '{';
         $tpl->right_delimiter = $output->rdelim ? $output->rdelim : '}';
+        $gameProjectName = getGameProjectName();
 
         // Evaluate template into a file.
         $tpl->assign_by_ref( 'projSettings', $this );
@@ -331,7 +332,7 @@ class Project
         $tpl->assign_by_ref( 'projLibs',     $this->libs );
         $tpl->assign_by_ref( 'projLibDirs',  $this->lib_dirs );
         $tpl->assign_by_ref( 'projDepend',   $this->dependencies );
-        $tpl->assign_by_ref( 'gameProjectName', getGameProjectName() );
+        $tpl->assign_by_ref( 'gameProjectName', $gameProjectName );
         $tpl->assign_by_ref( 'projModuleDefinitionFile',   $this->moduleDefinitionFile );
         $tpl->assign_by_ref( 'projSubSystem', $this->projSubSystem );
         

@@ -88,7 +88,9 @@ typedef unsigned _int64 U64;
 #  define FN_CDECL __cdecl            ///< Calling convention
 #endif
 
+#if _MSC_VER < 1700
 #define for if(false) {} else for   ///< Hack to work around Microsoft VC's non-C++ compliance on variable scoping
+#endif
 
 // disable warning caused by memory layer
 // see msdn.microsoft.com "Compiler Warning (level 1) C4291" for more details
