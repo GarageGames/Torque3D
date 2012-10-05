@@ -87,7 +87,7 @@ function DemoPlayer::onEndSequence(%this,%obj,%slot)
 // AIPlayer static functions
 //-----------------------------------------------------------------------------
 
-function AIPlayer::produce(%name,%spawnPoint)
+function AIPlayer::spawnAtLocation(%name, %spawnPoint)
 {
    // Create the demo player object
    %player = new AiPlayer()
@@ -101,13 +101,13 @@ function AIPlayer::produce(%name,%spawnPoint)
    return %player;
 }
 
-function AIPlayer::spawnOnPath(%name,%path)
+function AIPlayer::spawnOnPath(%name, %path)
 {
    // Spawn a player and place him on the first node of the path
    if (!isObject(%path))
       return 0;
    %node = %path.getObject(0);
-   %player = AIPlayer::produce(%name, %node.getTransform());
+   %player = AIPlayer::spawnAtLocation(%name, %node.getTransform());
    return %player;
 }
 
