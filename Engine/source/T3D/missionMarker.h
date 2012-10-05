@@ -176,6 +176,7 @@ class SpawnSphere : public MissionMarker
       String   mSpawnProperties;
       String   mSpawnScript;
       bool     mAutoSpawn;
+      bool     mSpawnTransform;
 
       // Radius/weight info
       F32      mRadius;
