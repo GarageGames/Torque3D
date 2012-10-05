@@ -382,6 +382,7 @@ ConsoleDocClass( SpawnSphere,
 SpawnSphere::SpawnSphere()
 {
    mAutoSpawn = false;
+   mSpawnTransform = false;
 
    mRadius = 100.f;
    mSphereWeight = 100.f;
@@ -420,6 +421,12 @@ SimObject* SpawnSphere::spawnObject(String additionalProps)
    // If we have a spawnObject add it to the MissionCleanup group
    if (spawnObject)
    {
+      if (mSpawnTransform)
+      {
+         if(SceneObject *s = dynamic_cast<SceneObject*>(spawnObject))
+            s->setTransform(getTransform());
+      }
+
       SimObject* cleanup = Sim::findObject("MissionCleanup");
 
       if (cleanup)
@@ -447,6 +454,7 @@ U32 SpawnSphere::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
    if(stream->writeFlag(mask & UpdateSphereMask))
    {
       stream->writeFlag(mAutoSpawn);
+      stream->writeFlag(mSpawnTransform);
 
       stream->write(mSpawnClass);
       stream->write(mSpawnDataBlock);
@@ -463,6 +471,7 @@ void SpawnSphere::unpackUpdate(NetConnection * con, BitStream * stream)
    if(stream->readFlag())
    {
       mAutoSpawn = stream->readFlag();
+      mSpawnTransform = stream->readFlag();
 
       stream->read(&mSpawnClass);
       stream->read(&mSpawnDataBlock);
@@ -505,6 +514,8 @@ void SpawnSphere::initPersistFields()
       "Command to execute immediately after spawning an object. New object id is stored in $SpawnObject.  Max 255 characters." );
    addField( "autoSpawn", TypeBool, Offset(mAutoSpawn, SpawnSphere),
       "Flag to spawn object as soon as SpawnSphere is created, true to enable or false to disable." );
+   addField( "spawnTransform", TypeBool, Offset(mSpawnTransform, SpawnSphere),
+      "Flag to set the spawned object's transform to the SpawnSphere's transform." );
    endGroup( "Spawn" );
 
    addGroup( "Dimensions" );
