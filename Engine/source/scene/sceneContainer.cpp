@@ -1633,9 +1633,9 @@ DefineEngineFunction( containerRayCast, const char*,
    char *returnBuffer = Con::getReturnBuffer(256);
    if(ret)
    {
-      dSprintf(returnBuffer, 256, "%d %g %g %g %g %g %g",
+      dSprintf(returnBuffer, 256, "%d %g %g %g %g %g %g %g",
                ret, rinfo.point.x, rinfo.point.y, rinfo.point.z,
-               rinfo.normal.x, rinfo.normal.y, rinfo.normal.z);
+               rinfo.normal.x, rinfo.normal.y, rinfo.normal.z, rinfo.distance);
    }
    else
    {
