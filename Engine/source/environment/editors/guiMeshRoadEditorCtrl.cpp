@@ -1040,7 +1040,7 @@ void GuiMeshRoadEditorCtrl::setMode( String mode, bool sourceShortcut = false )
    mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", (const char*)mode );
+		Con::executef( this, "paletteSync", mode );
 }
 
 void GuiMeshRoadEditorCtrl::setSelectedRoad( MeshRoad *road )
@@ -1240,7 +1240,7 @@ ConsoleMethod( GuiMeshRoadEditorCtrl, setNodePosition, void, 3, 3, "" )
 	
 	if ( (count != 3) )
    {
-		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
+		Con::printf("Failed to parse node information \"px py pz\" from '%s'", (const char*)argv[3]);
       return;
    }
 
@@ -1266,7 +1266,7 @@ ConsoleMethod( GuiMeshRoadEditorCtrl, setNodeNormal, void, 3, 3, "" )
 	
 	if ( (count != 3) )
    {
-		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
+		Con::printf("Failed to parse node information \"px py pz\" from '%s'", (const char*)argv[3]);
       return;
    }
 

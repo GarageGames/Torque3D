@@ -1181,7 +1181,7 @@ void GuiRiverEditorCtrl::setMode( String mode, bool sourceShortcut = false )
    mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", mode.utf8() );
+		Con::executef( this, "paletteSync", mode );
 }
 
 void GuiRiverEditorCtrl::setSelectedRiver( River *river )
@@ -1444,7 +1444,7 @@ ConsoleMethod( GuiRiverEditorCtrl, setNodePosition, void, 3, 3, "" )
 	
 	if ( (count != 3) )
    {
-		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
+		Con::printf("Failed to parse node information \"px py pz\" from '%s'", (const char*)argv[3]);
       return;
    }
 
@@ -1470,7 +1470,7 @@ ConsoleMethod( GuiRiverEditorCtrl, setNodeNormal, void, 3, 3, "" )
 	
 	if ( (count != 3) )
    {
-		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
+		Con::printf("Failed to parse node information \"px py pz\" from '%s'", (const char*)argv[3]);
       return;
    }
 

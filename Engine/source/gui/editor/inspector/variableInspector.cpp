@@ -63,5 +63,5 @@ void GuiVariableInspector::loadVars( String searchStr )
 
 ConsoleMethod( GuiVariableInspector, loadVars, void, 3, 3, "loadVars( searchString )" )
 {
-   object->loadVars( (const char*)argv[2] );
+   object->loadVars( argv[2] );
 }

@@ -172,7 +172,7 @@ ConsoleFunction( loadColladaLights, bool, 2, 4,
       if (!Sim::findObject(argv[2], group)) {
          // Create the group if it could not be found
          group = new SimGroup;
-         if (group->registerObject(argv[2])) {
+         if (group->registerObject((const char*)argv[2])) {
             if (missionGroup)
                missionGroup->addObject(group);
          }

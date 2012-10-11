@@ -175,7 +175,7 @@ ConsoleStaticMethod( EditorIconRegistry, add, void, 3, 4, "( String className, S
    if ( argc > 3 )
       overwrite = dAtob( argv[3] );
 
-   gEditorIcons.add( (const char*)argv[1], (const char*)argv[2], overwrite );
+   gEditorIcons.add( argv[1], argv[2], overwrite );
 }
 
 ConsoleStaticMethod( EditorIconRegistry, loadFromPath, void, 2, 3, "( String imagePath [, bool overwrite = true] )"
@@ -185,7 +185,7 @@ ConsoleStaticMethod( EditorIconRegistry, loadFromPath, void, 2, 3, "( String ima
    if ( argc > 2 )
       overwrite = dAtob( argv[2] );
 
-   gEditorIcons.loadFromPath( (const char*)argv[1], overwrite );
+   gEditorIcons.loadFromPath( argv[1], overwrite );
 }
 
 ConsoleStaticMethod( EditorIconRegistry, clear, void, 1, 1, "" 
@@ -212,7 +212,7 @@ ConsoleStaticMethod( EditorIconRegistry, findIconBySimObject, const char*, 2, 2,
    SimObject *obj = NULL;
    if ( !Sim::findObject( argv[1], obj ) )
    {
-      Con::warnf( "EditorIconRegistry::findIcon, parameter %d was not a SimObject!", argv[1] );
+      Con::warnf( "EditorIconRegistry::findIcon, parameter %d was not a SimObject!", (const char*)argv[1] );
       return NULL;
    }
 

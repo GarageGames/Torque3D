@@ -21,6 +21,10 @@
 //-----------------------------------------------------------------------------
 
 #include "component/dynamicConsoleMethodComponent.h"
+#include "console/stringStack.h"
+
+extern StringStack STR;
+extern ConsoleValueStack CSTK;
 
 IMPLEMENT_CO_NETOBJECT_V1(DynamicConsoleMethodComponent);
 
@@ -152,10 +156,20 @@ const char *DynamicConsoleMethodComponent::_callMethod( U32 argc, ConsoleValueRe
          DynamicConsoleMethodComponent *pThisComponent = dynamic_cast<DynamicConsoleMethodComponent*>( pComponent );
          AssertFatal( pThisComponent, "DynamicConsoleMethodComponent::callMethod - Non DynamicConsoleMethodComponent component attempting to callback!");
 
+         // Prevent stack corruption
+         STR.pushFrame();
+         CSTK.pushFrame();
+         // --
+
          // Only call on first depth components
          // Should isMethod check these calls?  [11/22/2006 justind]
          if(pComponent->isEnabled())
             Con::execute( pThisComponent, argc, argv );
+
+         // Prevent stack corruption
+         STR.popFrame();
+         CSTK.popFrame();
+         // --
 
          // Bail if this was the first element
          //if( nItr == componentList.begin() )
@@ -163,12 +177,21 @@ const char *DynamicConsoleMethodComponent::_callMethod( U32 argc, ConsoleValueRe
       }
       unlockComponentList();
    }
+
+   // Prevent stack corruption
+   STR.pushFrame();
+   CSTK.pushFrame();
+   // --
    
    // Set Owner Field
    const char* result = "";
    if(callThis)
       result = Con::execute( pThis, argc, argv, true ); // true - exec method onThisOnly, not on DCMCs
 
+   // Prevent stack corruption
+   STR.popFrame();
+   CSTK.popFrame();
+   // --
    return result;
 }
 

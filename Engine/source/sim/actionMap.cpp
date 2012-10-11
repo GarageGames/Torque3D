@@ -1795,16 +1795,15 @@ static ConsoleDocFragment _ActionMapbindObj2(
 ConsoleMethod( ActionMap, bindObj, bool, 6, 11, "(device, action, [modifier spec, mod...], command, object)"
 			  "@hide")
 {
-    SimObject* simObject = Sim::findObject(argv[argc - 1]);
-    if ( simObject == NULL )
-    {
-        Con::warnf("ActionMap::bindObj() - Cannot bind, specified object was not found!");
-        return false;
-    }
+   SimObject* simObject = Sim::findObject(argv[argc - 1]);
+   if ( simObject == NULL )
+   {
+      Con::warnf("ActionMap::bindObj() - Cannot bind, specified object was not found!");
+      return false;
+   }
 
-	StringStackWrapper args(argc - 3, argv + 2);
-
-    return object->processBind( args.count(), args, simObject );
+   StringStackWrapper args(argc - 3, argv + 2);
+   return object->processBind( args.count(), args, simObject );
 }
 
 //------------------------------------------------------------------------------

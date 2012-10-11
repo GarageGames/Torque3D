@@ -54,8 +54,8 @@ namespace Compiler
       OP_RETURN,
       // fixes a bug when not explicitly returning a value
       OP_RETURN_VOID,
-	  OP_RETURN_FLT,
-	  OP_RETURN_UINT,
+      OP_RETURN_FLT,
+      OP_RETURN_UINT,
 
       OP_CMPEQ,
       OP_CMPGR,

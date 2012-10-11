@@ -160,7 +160,7 @@ inline void EngineMarshallData( bool arg, S32& argc, ConsoleValueRef *argv )
 }
 inline void EngineMarshallData( S32 arg, S32& argc, ConsoleValueRef *argv )
 {
-   argv[ argc ] = Con::getIntArg( arg );
+   argv[ argc ] = arg;
    argc ++;
 }
 inline void EngineMarshallData( U32 arg, S32& argc, ConsoleValueRef *argv )
@@ -169,7 +169,7 @@ inline void EngineMarshallData( U32 arg, S32& argc, ConsoleValueRef *argv )
 }
 inline void EngineMarshallData( F32 arg, S32& argc, ConsoleValueRef *argv )
 {
-   argv[ argc ] = Con::getFloatArg( arg );
+   argv[ argc ] = arg;
    argc ++;
 }
 inline void EngineMarshallData( const char* arg, S32& argc, ConsoleValueRef *argv )
@@ -207,6 +207,11 @@ struct EngineUnmarshallData
 template<>
 struct EngineUnmarshallData< S32 >
 {
+   S32 operator()( ConsoleValueRef &ref ) const
+   {
+      return (S32)ref;
+   }
+
    S32 operator()( const char* str ) const
    {
       return dAtoi( str );
@@ -215,6 +220,11 @@ struct EngineUnmarshallData< S32 >
 template<>
 struct EngineUnmarshallData< U32 >
 {
+   U32 operator()( ConsoleValueRef &ref ) const
+   {
+      return (U32)((S32)ref);
+   }
+
    U32 operator()( const char* str ) const
    {
       return dAtoui( str );
@@ -223,6 +233,11 @@ struct EngineUnmarshallData< U32 >
 template<>
 struct EngineUnmarshallData< F32 >
 {
+   F32 operator()( ConsoleValueRef &ref ) const
+   {
+      return (F32)ref;
+   }
+
    F32 operator()( const char* str ) const
    {
       return dAtof( str );
@@ -2626,12 +2641,12 @@ struct _EngineConsoleCallbackHelper
          if( mThis )
          {
             // Cannot invoke callback until object has been registered
-			if (mThis->isProperlyAdded()) {
-				return Con::execute( mThis, mArgc, mArgv );
-			} else {
-				Con::resetStackFrame(); // jamesu - we might have pushed some vars here
-				return "";
-			}
+            if (mThis->isProperlyAdded()) {
+               return Con::execute( mThis, mArgc, mArgv );
+            } else {
+               Con::resetStackFrame(); // We might have pushed some vars here
+               return "";
+            }
          }
          else
             return Con::execute( mArgc, mArgv );

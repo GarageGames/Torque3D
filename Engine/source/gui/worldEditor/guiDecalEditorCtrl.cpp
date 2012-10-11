@@ -782,7 +782,7 @@ void GuiDecalEditorCtrl::setMode( String mode, bool sourceShortcut = false )
 	mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", (const char*)mMode );
+		Con::executef( this, "paletteSync", mMode );
 }
 
 ConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, 2, 2, "deleteSelectedDecal()" )
@@ -792,7 +792,7 @@ ConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, 2, 2, "deleteSelec
 
 ConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, 3, 3, "deleteSelectedDecalDatablock( String datablock )" )
 {
-	String lookupName( argv[2] );
+	String lookupName( (const char*)argv[2] );
 	if( lookupName == String::EmptyString )
 		return;
 	
@@ -801,7 +801,7 @@ ConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, 3, 3, "deleteSele
 
 ConsoleMethod( GuiDecalEditorCtrl, setMode, void, 3, 3, "setMode( String mode )()" )
 {
-	String newMode = ( argv[2] );
+	String newMode = ( (const char*)argv[2] );
 	object->setMode( newMode );
 }
 
@@ -868,7 +868,7 @@ ConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, 4, 4, "editDecalDetai
 	
 	if ( (count != 7) )
    {
-		Con::printf("Failed to parse decal information \"px py pz tx ty tz s\" from '%s'", argv[3]);
+		Con::printf("Failed to parse decal information \"px py pz tx ty tz s\" from '%s'", (const char*)argv[3]);
       return;
    }
 
@@ -894,7 +894,7 @@ ConsoleMethod( GuiDecalEditorCtrl, getSelectionCount, S32, 2, 2, "" )
 ConsoleMethod( GuiDecalEditorCtrl, retargetDecalDatablock, void, 4, 4, "" )
 {
    if( dStrcmp( argv[2], "" ) != 0 && dStrcmp( argv[3], "" ) != 0 )
-		object->retargetDecalDatablock( (const char*)argv[2], (const char*)argv[3] );
+		object->retargetDecalDatablock( argv[2], argv[3] );
 }
 
 void GuiDecalEditorCtrl::setGizmoFocus( DecalInstance * decalInstance )

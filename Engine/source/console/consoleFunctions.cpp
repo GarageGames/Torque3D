@@ -1306,7 +1306,7 @@ ConsoleFunction(getTag, const char *, 2, 2, "(string textTagString)"
    TORQUE_UNUSED(argc);
    if(argv[1][0] == StringTagPrefixByte)
    {
-	  const char *arg  = argv[1];
+      const char *arg  = argv[1];
       const char * space = dStrchr(argv[1], ' ');
 
       U32 len;
@@ -2364,7 +2364,7 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
       if (dStrcmp(argv[1], "0") && dStrcmp(argv[1], "") && (Sim::findObject(argv[1]) != NULL))
          return true;
       else if (argc > 2)
-         Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, argv[1]);
+         Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, (const char*)argv[1]);
    }
 
    return false;
@@ -2419,7 +2419,7 @@ ConsoleFunction(getPrefsPath, const char *, 1, 2, "([relativeFileName])"
 				"@note Appears to be useless in Torque 3D, should be deprecated\n"
 				"@internal")
 {
-   const char *filename = Platform::getPrefsPath(argc > 1 ? argv[1] : NULL);
+   const char *filename = Platform::getPrefsPath(argc > 1 ? (const char*)argv[1] : NULL);
    if(filename == NULL || *filename == 0)
       return "";
      

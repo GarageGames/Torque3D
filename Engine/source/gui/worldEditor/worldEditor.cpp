@@ -3204,7 +3204,7 @@ ConsoleMethod( WorldEditor, setActiveSelection, void, 3, 3, "( id set ) - Set th
    WorldEditorSelection* selection;
    if( !Sim::findObject( argv[ 2 ], selection ) )
    {
-      Con::errorf( "WorldEditor::setActiveSelectionSet - no selection set '%s'", argv[ 2 ] );
+      Con::errorf( "WorldEditor::setActiveSelectionSet - no selection set '%s'", (const char*)argv[ 2 ] );
       return;
    }
    
@@ -3330,14 +3330,14 @@ ConsoleMethod( WorldEditor, alignByBounds, void, 3, 3, "(int boundsAxis)"
               "Align all selected objects against the given bounds axis.")
 {
 	if(!object->alignByBounds(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", argv[2]));
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", (const char*)argv[2]));
 }
 
 ConsoleMethod( WorldEditor, alignByAxis, void, 3, 3, "(int axis)"
               "Align all selected objects along the given axis.")
 {
 	if(!object->alignByAxis(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", argv[2]));
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", (const char*)argv[2]));
 }
 
 ConsoleMethod( WorldEditor, resetSelectedRotation, void, 2, 2, "")

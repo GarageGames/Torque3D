@@ -307,7 +307,7 @@ ConsoleFunction( addTaggedString, const char*, 2, 2, "(string str)"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
 {
-   NetStringHandle s(argv[1]);
+   NetStringHandle s((const char*)argv[1]);
    gNetStringTable->incStringRefScript(s.getIndex());
 
    char *ret = Con::getReturnBuffer(10);

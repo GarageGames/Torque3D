@@ -745,9 +745,9 @@ bool getVariableObjectField(const char *name, SimObject **object, const char **f
          }
          else
          {
-			*object = obj;
-			*field = fieldToken;
-			return true;
+            *object = obj;
+            *field = fieldToken;
+            return true;
          }
       }
    }
@@ -778,9 +778,8 @@ Dictionary::Entry *getAddVariableEntry(const char *name)
    name = prependDollar(name);
    StringTableEntry stName = StringTable->insert(name);
    Dictionary::Entry *entry = gEvalState.globalVars.lookup(stName);
-   if (!entry) {
+   if (!entry)
 	   entry = gEvalState.globalVars.add(stName);
-   }
    return entry;
 }
 
@@ -789,9 +788,8 @@ Dictionary::Entry *getAddLocalVariableEntry(const char *name)
    name = prependPercent(name);
    StringTableEntry stName = StringTable->insert(name);
    Dictionary::Entry *entry = gEvalState.getCurrentFrame().lookup(stName);
-   if (!entry) {
+   if (!entry)
 	   entry = gEvalState.getCurrentFrame().add(stName);
-   }
    return entry;
 }
 
@@ -800,9 +798,12 @@ void setVariable(const char *name, const char *value)
    SimObject *obj = NULL;
    const char *objField = NULL;
 
-   if (getVariableObjectField(name, &obj, &objField)) {
+   if (getVariableObjectField(name, &obj, &objField))
+   {
 	   obj->setDataField(StringTable->insert(objField), 0, value);
-   } else {
+   }
+   else 
+   {
       name = prependDollar(name);
       gEvalState.globalVars.setVariable(StringTable->insert(name), value);
    }
@@ -819,9 +820,12 @@ void setBoolVariable(const char *varName, bool value)
    SimObject *obj = NULL;
    const char *objField = NULL;
 
-   if (getVariableObjectField(varName, &obj, &objField)) {
+   if (getVariableObjectField(varName, &obj, &objField))
+   {
 	   obj->setDataField(StringTable->insert(objField), 0, value ? "1" : "0");
-   } else {
+   }
+   else
+   {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
 	  entry->setStringValue(value ? "1" : "0");
@@ -833,11 +837,14 @@ void setIntVariable(const char *varName, S32 value)
    SimObject *obj = NULL;
    const char *objField = NULL;
 
-   if (getVariableObjectField(varName, &obj, &objField)) {
+   if (getVariableObjectField(varName, &obj, &objField))
+   {
 	   char scratchBuffer[32];
 	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
 	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
-   } else {
+   }
+   else
+   {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
       entry->setIntValue(value);
@@ -849,11 +856,14 @@ void setFloatVariable(const char *varName, F32 value)
    SimObject *obj = NULL;
    const char *objField = NULL;
 
-   if (getVariableObjectField(varName, &obj, &objField)) {
+   if (getVariableObjectField(varName, &obj, &objField))
+   {
 	   char scratchBuffer[32];
 	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
 	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
-   } else {
+   }
+   else
+   {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
 	  entry->setFloatValue(value);
@@ -951,11 +961,14 @@ const char *getObjectTokenField(const char *name)
 const char *getVariable(const char *name)
 {
    const char *objField = getObjectTokenField(name);
-   if (objField) {
+   if (objField)
+   {
       return objField;
-   } else {
+   }
+   else
+   {
       Dictionary::Entry *entry = getVariableEntry(name);
-	  return entry ? entry->getStringValue() : "";
+      return entry ? entry->getStringValue() : "";
    }
 }
 
@@ -969,11 +982,14 @@ const char *getLocalVariable(const char *name)
 bool getBoolVariable(const char *varName, bool def)
 {
    const char *objField = getObjectTokenField(varName);
-   if (objField) {
+   if (objField)
+   {
       return *objField ? dAtob(objField) : def;
-   } else {
+   }
+   else
+   {
       Dictionary::Entry *entry = getVariableEntry(varName);
-	  objField = entry ? entry->getStringValue() : "";
+      objField = entry ? entry->getStringValue() : "";
       return *objField ? dAtob(objField) : def;
    }
 }
@@ -981,22 +997,28 @@ bool getBoolVariable(const char *varName, bool def)
 S32 getIntVariable(const char *varName, S32 def)
 {
    const char *objField = getObjectTokenField(varName);
-   if (objField) {
+   if (objField)
+   {
       return *objField ? dAtoi(objField) : def;
-   } else {
+   }
+   else
+   {
       Dictionary::Entry *entry = getVariableEntry(varName);
-	  return entry ? entry->getIntValue() : def;
+      return entry ? entry->getIntValue() : def;
    }
 }
 
 F32 getFloatVariable(const char *varName, F32 def)
 {
    const char *objField = getObjectTokenField(varName);
-   if (objField) {
+   if (objField)
+   {
       return *objField ? dAtof(objField) : def;
-   } else {
+   }
+   else
+   {
       Dictionary::Entry *entry = getVariableEntry(varName);
-	  return entry ? entry->getFloatValue() : def;
+	   return entry ? entry->getFloatValue() : def;
    }
 }
 
@@ -1154,11 +1176,11 @@ const char *execute(S32 argc, ConsoleValueRef argv[])
 
       if(!ent)
       {
-         warnf(ConsoleLogEntry::Script, "%s: Unknown command.", argv[0]);
+         warnf(ConsoleLogEntry::Script, "%s: Unknown command.", (const char*)argv[0]);
 
          // Clean up arg buffers, if any.
          STR.clearFunctionOffset();
-		 CSTK.resetFrame();
+         CSTK.resetFrame();
          return "";
       }
       return ent->execute(argc, argv, &gEvalState);
@@ -1184,7 +1206,6 @@ const char *execute(S32 argc, const char *argv[])
 //------------------------------------------------------------------------------
 const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool thisCallOnly)
 {
-   //static char idBuf[16];
    if(argc < 2)
       return "";
 
@@ -1194,13 +1215,14 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
    if( !thisCallOnly )
    {
       ICallMethod *com = dynamic_cast<ICallMethod *>(object);
-      if(com) {
+      if(com)
+      {
          STR.pushFrame();
          CSTK.pushFrame();
          com->callMethodArgList(argc, argv, false);
          STR.popFrame();
          CSTK.popFrame();
-	  }
+      }
    }
 
    if(object->getNamespace())
@@ -1218,14 +1240,13 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
          //warnf(ConsoleLogEntry::Script, "%s: undefined for object '%s' - id %d", funcName, object->getName(), object->getId());
 
          // Clean up arg buffers, if any.
-		 //CSTK.
          STR.clearFunctionOffset();
-		 CSTK.resetFrame();
+         CSTK.resetFrame();
          return "";
       }
 
       // Twiddle %this argument
-	  argv[1] = (S32)ident;
+      argv[1] = (S32)ident;
 
       SimObject *save = gEvalState.thisObject;
       gEvalState.thisObject = object;
@@ -1237,7 +1258,7 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
 
       return ret;
    }
-   warnf(ConsoleLogEntry::Script, "Con::execute - %d has no namespace: %s", object->getId(), argv[0]);
+   warnf(ConsoleLogEntry::Script, "Con::execute - %d has no namespace: %s", object->getId(), (const char*)argv[0]);
    return "";
 }
 
@@ -1252,7 +1273,7 @@ inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc, ConsoleValu
    const U32 maxArg = 12;
    AssertWarn(checkArgc == argc, "Incorrect arg count passed to Con::executef(SimObject*)");
    AssertFatal(argc <= maxArg - 1, "Too many args passed to Con::_executef(SimObject*). Please update the function to handle more.");
-   return execute(obj, argc, argv); // jamesu - argc should == argc
+   return execute(obj, argc, argv);
 }
 
 #define A ConsoleValueRef
@@ -1589,14 +1610,16 @@ StringStackWrapper::StringStackWrapper(int targc, ConsoleValueRef targv[])
    argv = new const char*[targc];
    argc = targc;
 
-   for (int i=0; i<targc; i++) {
+   for (int i=0; i<targc; i++)
+   {
       argv[i] = dStrdup(targv[i]);
    }
 }
 
 StringStackWrapper::~StringStackWrapper()
 {
-   for (int i=0; i<argc; i++) {
+   for (int i=0; i<argc; i++)
+   {
       dFree(argv[i]);
    }
    delete[] argv;
@@ -1615,7 +1638,8 @@ StringStackConsoleWrapper::StringStackConsoleWrapper(int targc, const char** tar
 
 StringStackConsoleWrapper::~StringStackConsoleWrapper()
 {
-   for (int i=0; i<argc; i++) {
+   for (int i=0; i<argc; i++)
+   {
       argv[i] = NULL;
    }
    delete[] argv;
@@ -1623,86 +1647,88 @@ StringStackConsoleWrapper::~StringStackConsoleWrapper()
 
 
 
-   U32 ConsoleValue::getIntValue()
+U32 ConsoleValue::getIntValue()
+{
+   if(type <= TypeInternalString)
+      return ival;
+   else
+      return dAtoi(Con::getData(type, dataPtr, 0, enumTable));
+}
+
+F32 ConsoleValue::getFloatValue()
+{
+   if(type <= TypeInternalString)
+      return fval;
+   else
+      return dAtof(Con::getData(type, dataPtr, 0, enumTable));
+}
+
+const char *ConsoleValue::getStringValue()
+{
+   if(type == TypeInternalString || type == TypeInternalStackString)
+      return sval;
+   if(type == TypeInternalFloat)
+      return Con::getData(TypeF32, &fval, 0);
+   else if(type == TypeInternalInt)
+      return Con::getData(TypeS32, &ival, 0);
+   else
+      return Con::getData(type, dataPtr, 0, enumTable);
+}
+
+void ConsoleValue::setIntValue(U32 val)
+{
+   if(type <= TypeInternalString)
    {
-      if(type <= TypeInternalString)
-         return ival;
-      else
-         return dAtoi(Con::getData(type, dataPtr, 0, enumTable));
-   }
-   
-   F32 ConsoleValue::getFloatValue()
-   {
-      if(type <= TypeInternalString)
-         return fval;
-      else
-         return dAtof(Con::getData(type, dataPtr, 0, enumTable));
-   }
-   
-   const char *ConsoleValue::getStringValue()
-   {
-      if(type == TypeInternalString || type == TypeInternalStackString)
-         return sval;
-      if(type == TypeInternalFloat)
-         return Con::getData(TypeF32, &fval, 0);
-      else if(type == TypeInternalInt)
-         return Con::getData(TypeS32, &ival, 0);
-      else
-         return Con::getData(type, dataPtr, 0, enumTable);
-   }
-   
-   void ConsoleValue::setIntValue(U32 val)
-   {
-      if(type <= TypeInternalString)
+      fval = (F32)val;
+      ival = val;
+      if(sval != typeValueEmpty)
       {
-         fval = (F32)val;
-         ival = val;
-         if(sval != typeValueEmpty)
-         {
-            if (type != TypeInternalStackString) dFree(sval);
-            sval = typeValueEmpty;
-         }
-         type = TypeInternalInt;
+         if (type != TypeInternalStackString) dFree(sval);
+         sval = typeValueEmpty;
       }
-      else
-      {
-         const char *dptr = Con::getData(TypeS32, &val, 0);
-         Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
-      }
+      type = TypeInternalInt;
    }
-   
-   void ConsoleValue::setFloatValue(F32 val)
+   else
    {
-      if(type <= TypeInternalString)
-      {
-         fval = val;
-         ival = static_cast<U32>(val);
-         if(sval != typeValueEmpty)
-         {
-            if (type != TypeInternalStackString) dFree(sval);
-            sval = typeValueEmpty;
-         }
-         type = TypeInternalFloat;
-      }
-      else
-      {
-         const char *dptr = Con::getData(TypeF32, &val, 0);
-         Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
-      }
+      const char *dptr = Con::getData(TypeS32, &val, 0);
+      Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
    }
+}
+
+void ConsoleValue::setFloatValue(F32 val)
+{
+   if(type <= TypeInternalString)
+   {
+      fval = val;
+      ival = static_cast<U32>(val);
+      if(sval != typeValueEmpty)
+      {
+         if (type != TypeInternalStackString) dFree(sval);
+         sval = typeValueEmpty;
+      }
+      type = TypeInternalFloat;
+   }
+   else
+   {
+      const char *dptr = Con::getData(TypeF32, &val, 0);
+      Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
+   }
+}
 
 
-   const char *ConsoleValueRef::getStringArgValue()
+const char *ConsoleValueRef::getStringArgValue()
+{
+   if (value)
    {
-      if (value) {
-         if (stringStackValue == NULL) {
-			 stringStackValue = Con::getStringArg(value->getStringValue());
-		 }
-         return stringStackValue;
-      } else {
-         return "";
-      }
+      if (stringStackValue == NULL)
+         stringStackValue = Con::getStringArg(value->getStringValue());
+      return stringStackValue;
    }
+   else
+   {
+      return "";
+   }
+}
 
 
 extern ConsoleValueStack CSTK;

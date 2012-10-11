@@ -909,7 +909,7 @@ ConsoleMethod( SimSet, add, void, 3, 0,
       if(obj)
          object->addObject( obj );
       else
-         Con::printf("Set::add: Object \"%s\" doesn't exist", argv[ i ] );
+         Con::printf("Set::add: Object \"%s\" doesn't exist", (const char*)argv[ i ] );
    }
 }
 
@@ -934,7 +934,7 @@ ConsoleMethod( SimSet, remove, void, 3, 0,
       if(obj && object->find(object->begin(),object->end(),obj) != object->end())
          object->removeObject(obj);
       else
-         Con::printf("Set::remove: Object \"%s\" does not exist in set", argv[i]);
+         Con::printf("Set::remove: Object \"%s\" does not exist in set", (const char*)argv[i]);
       object->unlock();
    }
 }

@@ -291,33 +291,34 @@ class ConsoleValueStack
       MaxArgs = 20,
       ReturnBufferSpace = 512
    };
+
 public:
-	ConsoleValueStack();
-	~ConsoleValueStack();
+   ConsoleValueStack();
+   ~ConsoleValueStack();
 
-	void pushVar(ConsoleValue *variable);
-	void pushValue(ConsoleValue &value);
-	ConsoleValue* pop();
+   void pushVar(ConsoleValue *variable);
+   void pushValue(ConsoleValue &value);
+   ConsoleValue* pop();
 
-    ConsoleValue *pushString(const char *value);
-    ConsoleValue *pushStackString(const char *value);
-    ConsoleValue *pushUINT(U32 value);
-    ConsoleValue *pushFLT(float value);
+   ConsoleValue *pushString(const char *value);
+   ConsoleValue *pushStackString(const char *value);
+   ConsoleValue *pushUINT(U32 value);
+   ConsoleValue *pushFLT(float value);
 
-	void pushFrame();
-	void popFrame();
+   void pushFrame();
+   void popFrame();
 
-	void resetFrame();
+   void resetFrame();
 
-    void getArgcArgv(StringTableEntry name, U32 *argc, ConsoleValueRef **in_argv, bool popStackFrame = false);
+   void getArgcArgv(StringTableEntry name, U32 *argc, ConsoleValueRef **in_argv, bool popStackFrame = false);
 
-	ConsoleValue mStack[MaxStackDepth];
-	U32 mStackFrames[MaxStackDepth];
+   ConsoleValue mStack[MaxStackDepth];
+   U32 mStackFrames[MaxStackDepth];
 
-	U32 mFrame;
-	U32 mStackPos;
+   U32 mFrame;
+   U32 mStackPos;
 
-	ConsoleValueRef mArgv[MaxArgs];
+   ConsoleValueRef mArgv[MaxArgs];
 };
 
 #endif

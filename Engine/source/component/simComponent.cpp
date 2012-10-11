@@ -179,7 +179,7 @@ bool SimComponent::processArguments(S32 argc, ConsoleValueRef *argv)
       if(obj)
          addComponent(obj);
       else
-         Con::printf("SimComponent::processArguments - Invalid Component Object \"%s\"", argv[i]);
+         Con::printf("SimComponent::processArguments - Invalid Component Object \"%s\"", (const char*)argv[i]);
    }
    return true;
 }
@@ -383,7 +383,7 @@ ConsoleMethod( SimComponent, addComponents, bool, 3, 64, "%obj.addComponents( %c
       if(obj)
          object->addComponent(obj);
       else
-         Con::printf("SimComponent::addComponents - Invalid Component Object \"%s\"", argv[i]);
+         Con::printf("SimComponent::addComponents - Invalid Component Object \"%s\"", (const char*)argv[i]);
    }
    return true;
 }
@@ -399,7 +399,7 @@ ConsoleMethod( SimComponent, removeComponents, bool, 3, 64, "%obj.removeComponen
       if(obj)
          object->removeComponent(obj);
       else
-         Con::printf("SimComponent::removeComponents - Invalid Component Object \"%s\"", argv[i]);
+         Con::printf("SimComponent::removeComponents - Invalid Component Object \"%s\"", (const char*)argv[i]);
    }
    return true;
 }

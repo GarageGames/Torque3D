@@ -465,7 +465,7 @@ ConsoleFunction( addMaterialMapping, void, 3, 3, "(string texName, string matNam
    "block or interior surface using the associated texture.\n\n"
    "@ingroup Materials")
 {
-   MATMGR->mapMaterial((const char*)argv[1],(const char*)argv[2]);
+   MATMGR->mapMaterial(argv[1], argv[2]);
 }
 
 ConsoleFunction( getMaterialMapping, const char*, 2, 2, "(string texName)\n"
@@ -474,7 +474,7 @@ ConsoleFunction( getMaterialMapping, const char*, 2, 2, "(string texName)\n"
    "@param texName Name of the texture\n\n"
    "@ingroup Materials")
 {
-   return MATMGR->getMapEntry((const char*)argv[1]).c_str();
+   return MATMGR->getMapEntry(argv[1]).c_str();
 }
 
 ConsoleFunction( dumpMaterialInstances, void, 1, 1, 
@@ -487,5 +487,5 @@ ConsoleFunction( dumpMaterialInstances, void, 1, 1,
 ConsoleFunction( getMapEntry, const char *, 2, 2, 
    "@hide")
 {
-	return MATMGR->getMapEntry( String(argv[1]) );
+	return MATMGR->getMapEntry( argv[1] );
 }

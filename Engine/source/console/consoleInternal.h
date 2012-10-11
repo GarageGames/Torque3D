@@ -384,138 +384,138 @@ public:
       }
    };
 
-    struct HashTableData
-    {
-        Dictionary* owner;
-        S32 size;
-        S32 count;
-        Entry **data;
-        FreeListChunker< Entry > mChunker;
-        
-        HashTableData( Dictionary* owner )
-           : owner( owner ), size( 0 ), count( 0 ), data( NULL ) {}
-    };
+   struct HashTableData
+   {
+      Dictionary* owner;
+      S32 size;
+      S32 count;
+      Entry **data;
+      FreeListChunker< Entry > mChunker;
+     
+      HashTableData( Dictionary* owner )
+         : owner( owner ), size( 0 ), count( 0 ), data( NULL ) {}
+   };
 
-    HashTableData* hashTable;
-    HashTableData ownHashTable;
-    ExprEvalState *exprState;
-    
-    StringTableEntry scopeName;
-    Namespace *scopeNamespace;
-    CodeBlock *code;
-    U32 ip;
+   HashTableData* hashTable;
+   HashTableData ownHashTable;
+   ExprEvalState *exprState;
 
-    Dictionary();
-    ~Dictionary();
+   StringTableEntry scopeName;
+   Namespace *scopeNamespace;
+   CodeBlock *code;
+   U32 ip;
 
-    Entry *lookup(StringTableEntry name);
-    Entry *add(StringTableEntry name);
-    void setState(ExprEvalState *state, Dictionary* ref=NULL);
-    void remove(Entry *);
-    void reset();
+   Dictionary();
+   ~Dictionary();
 
-    void exportVariables( const char *varString, const char *fileName, bool append );
-    void exportVariables( const char *varString, Vector<String> *names, Vector<String> *values );
-    void deleteVariables( const char *varString );
+   Entry *lookup(StringTableEntry name);
+   Entry *add(StringTableEntry name);
+   void setState(ExprEvalState *state, Dictionary* ref=NULL);
+   void remove(Entry *);
+   void reset();
 
-    void setVariable(StringTableEntry name, const char *value);
-    const char *getVariable(StringTableEntry name, bool *valid = NULL);
-    S32 getIntVariable(StringTableEntry name, bool *valid = NULL);
-	F32 getFloatVariable(StringTableEntry name, bool *entValid = NULL);
-    
-    U32 getCount() const
-    {
+   void exportVariables( const char *varString, const char *fileName, bool append );
+   void exportVariables( const char *varString, Vector<String> *names, Vector<String> *values );
+   void deleteVariables( const char *varString );
+
+   void setVariable(StringTableEntry name, const char *value);
+   const char *getVariable(StringTableEntry name, bool *valid = NULL);
+   S32 getIntVariable(StringTableEntry name, bool *valid = NULL);
+   F32 getFloatVariable(StringTableEntry name, bool *entValid = NULL);
+
+   U32 getCount() const
+   {
       return hashTable->count;
-    }
-    bool isOwner() const
-    {
+   }
+   bool isOwner() const
+   {
       return hashTable->owner;
-    }
+   }
 
-    /// @see Con::addVariable
-    Entry* addVariable(    const char *name, 
-                           S32 type, 
-                           void *dataPtr, 
-                           const char* usage );
+   /// @see Con::addVariable
+   Entry* addVariable(  const char *name, 
+                        S32 type, 
+                        void *dataPtr, 
+                        const char* usage );
 
-    /// @see Con::removeVariable
-    bool removeVariable(StringTableEntry name);
+   /// @see Con::removeVariable
+   bool removeVariable(StringTableEntry name);
 
-    /// @see Con::addVariableNotify
-    void addVariableNotify( const char *name, const Con::NotifyDelegate &callback );
+   /// @see Con::addVariableNotify
+   void addVariableNotify( const char *name, const Con::NotifyDelegate &callback );
 
-    /// @see Con::removeVariableNotify
-    void removeVariableNotify( const char *name, const Con::NotifyDelegate &callback );
+   /// @see Con::removeVariableNotify
+   void removeVariableNotify( const char *name, const Con::NotifyDelegate &callback );
 
-    /// Return the best tab completion for prevText, with the length
-    /// of the pre-tab string in baseLen.
-    const char *tabComplete(const char *prevText, S32 baseLen, bool);
-    
-    /// Run integrity checks for debugging.
-    void validate();
+   /// Return the best tab completion for prevText, with the length
+   /// of the pre-tab string in baseLen.
+   const char *tabComplete(const char *prevText, S32 baseLen, bool);
+
+   /// Run integrity checks for debugging.
+   void validate();
 };
 
 class ExprEvalState
 {
 public:
-    /// @name Expression Evaluation
-    /// @{
+   /// @name Expression Evaluation
+   /// @{
 
-    ///
-    SimObject *thisObject;
-    Dictionary::Entry *currentVariable;
-    Dictionary::Entry *copyVariable;
-    bool traceOn;
-    
-    U32 mStackDepth;
+   ///
+   SimObject *thisObject;
+   Dictionary::Entry *currentVariable;
+   Dictionary::Entry *copyVariable;
+   bool traceOn;
 
-    ExprEvalState();
-    ~ExprEvalState();
+   U32 mStackDepth;
 
-    /// @}
+   ExprEvalState();
+   ~ExprEvalState();
 
-    /// @name Stack Management
-    /// @{
+   /// @}
 
-    /// The stack of callframes.  The extra redirection is necessary since Dictionary holds
-    /// an interior pointer that will become invalid when the object changes address.
-    Vector< Dictionary* > stack;
+   /// @name Stack Management
+   /// @{
 
-    ///
-    Dictionary globalVars;
-    
-    void setCurVarName(StringTableEntry name);
-    void setCurVarNameCreate(StringTableEntry name);
+   /// The stack of callframes.  The extra redirection is necessary since Dictionary holds
+   /// an interior pointer that will become invalid when the object changes address.
+   Vector< Dictionary* > stack;
 
-    S32 getIntVariable();
-    F64 getFloatVariable();
-    const char *getStringVariable();
-    void setIntVariable(S32 val);
-    void setFloatVariable(F64 val);
-    void setStringVariable(const char *str);
-	 void setCopyVariable();
+   ///
+   Dictionary globalVars;
 
-    void pushFrame(StringTableEntry frameName, Namespace *ns);
-    void popFrame();
+   void setCurVarName(StringTableEntry name);
+   void setCurVarNameCreate(StringTableEntry name);
 
-    /// Puts a reference to an existing stack frame
-    /// on the top of the stack.
-    void pushFrameRef(S32 stackIndex);
-    
-    U32 getStackDepth() const
-    {
-       return mStackDepth;
-    }
-    
-    Dictionary& getCurrentFrame()
-    {
+   S32 getIntVariable();
+   F64 getFloatVariable();
+   const char *getStringVariable();
+   void setIntVariable(S32 val);
+   void setFloatVariable(F64 val);
+   void setStringVariable(const char *str);
+   void setCopyVariable();
+
+   void pushFrame(StringTableEntry frameName, Namespace *ns);
+   void popFrame();
+
+   /// Puts a reference to an existing stack frame
+   /// on the top of the stack.
+   void pushFrameRef(S32 stackIndex);
+ 
+   U32 getStackDepth() const
+   {
+      return mStackDepth;
+   }
+ 
+   Dictionary& getCurrentFrame()
+   {
       return *( stack[ mStackDepth - 1 ] );
-    }
+   }
 
-    /// @}
-    
-    /// Run integrity checks for debugging.
-    void validate();
+   /// @}
+
+   /// Run integrity checks for debugging.
+   void validate();
 };
 
 namespace Con
