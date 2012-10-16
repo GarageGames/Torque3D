@@ -119,6 +119,9 @@ function WorldEditor::onSelectionCentroidChanged( %this )
 {
    // Inform the camera
    commandToServer('EditorOrbitCameraSelectChange', %this.getSelectionSize(), %this.getSelectionCentroid());
+   
+   // Refresh inspector.
+   Inspector.refresh();
 }
 
 //////////////////////////////////////////////////////////////////////////
