@@ -225,13 +225,16 @@ void GuiRiverEditorCtrl::get3DCursor( GuiCursor *&cursor,
 
 void GuiRiverEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 {
-   
+   _process3DMouseDown( event );
 
    mGizmo->on3DMouseDown( event );
 
    if ( !isFirstResponder() )
       setFirstResponder();
-	
+}
+
+void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
+{
 	// Get the raycast collision position
    Point3F tPos;
    if ( !getStaticPos( event, tPos ) )
