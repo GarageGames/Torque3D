@@ -2911,6 +2911,9 @@ void WorldEditor::dropCurrentSelection( bool skipUndo )
       submitUndo( mSelected );
 
 	dropSelection( mSelected );	
+
+   if ( mSelected->hasCentroidChanged() )
+      Con::executef( this, "onSelectionCentroidChanged" );
 }
 
 void WorldEditor::redirectConsole( S32 objID )
