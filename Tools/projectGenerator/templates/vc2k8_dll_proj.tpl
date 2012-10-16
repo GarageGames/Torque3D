@@ -45,7 +45,7 @@
 				AdditionalOptions="/MP4"
 				Optimization="0"
 				EnableIntrinsicFunctions="1"
-				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
+				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}$(DXSDK_DIR)/Include"
 				PreprocessorDefinitions="{foreach item=def from=$projDefines}{$def};{/foreach}TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="0"
@@ -71,7 +71,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
+				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}$(DXSDK_DIR)/Include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -88,7 +88,7 @@
             
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
+				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);$(DXSDK_DIR)/Lib/x86"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD"
 				ModuleDefinitionFile="{$projModuleDefinitionFile}"
 				GenerateDebugInformation="true"
@@ -155,7 +155,7 @@
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="1"
-				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
+				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}$(DXSDK_DIR)/Include"
 				PreprocessorDefinitions="{foreach item=def from=$projDefines}{$def};{/foreach}TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="0"
@@ -181,7 +181,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
+				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}$(DXSDK_DIR)/Include"
 			/>
          <Tool
 				Name="VCPreLinkEventTool"
@@ -198,7 +198,7 @@
 
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
+				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);$(DXSDK_DIR)/Lib/x86"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD"
 				ModuleDefinitionFile="{$projModuleDefinitionFile}"
 				GenerateDebugInformation="true"
@@ -265,7 +265,7 @@
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="1"
-				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
+				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}$(DXSDK_DIR)/Include"
 				PreprocessorDefinitions="{foreach item=def from=$projDefines}{$def};{/foreach}UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="0"
@@ -291,7 +291,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-            AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
+            AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}$(DXSDK_DIR)/Include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -302,7 +302,7 @@
 				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
+				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);$(DXSDK_DIR)/Lib/x86"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD"
 				ModuleDefinitionFile="{$projModuleDefinitionFile}"
 				GenerateDebugInformation="false"
