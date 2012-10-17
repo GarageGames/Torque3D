@@ -71,6 +71,8 @@ protected:
 
    void _onPhysicsReset( PhysicsResetEvent reset );
 
+   void _onStaticChanged();
+
 public:
    
 	PxPlayer();
