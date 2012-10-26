@@ -515,10 +515,13 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
    (
       gClientSceneGraph,
       SPT_Diffuse,
-      SceneCameraState( GFX->getViewport(), frust, MatrixF::Identity, GFX->getProjectionMatrix() ),
+      SceneCameraState( GFX->getViewport(), frust, GFX->getWorldMatrix(), GFX->getProjectionMatrix() ),
       renderPass,
       false
    );
+
+   renderPass->assignSharedXform( RenderPassManager::View, MatrixF::Identity );
+   renderPass->assignSharedXform( RenderPassManager::Projection, GFX->getProjectionMatrix() );
 
    // Set up our TS render state here.   
    TSRenderState rdata;
