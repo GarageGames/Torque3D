@@ -328,9 +328,9 @@ void Sim3DAudioEvent::pack(NetConnection *con, BitStream *bstream)
       AssertFatal((1.0 - ((q.x * q.x) + (q.y * q.y) + (q.z * q.z))) >= (0.0 - 0.001),
                   "QuatF::normalize() is broken in Sim3DAudioEvent");
 
-      bstream->writeFloat(q.x,SoundRotBits);
-      bstream->writeFloat(q.y,SoundRotBits);
-      bstream->writeFloat(q.z,SoundRotBits);
+      bstream->writeSignedFloat(q.x,SoundRotBits);
+      bstream->writeSignedFloat(q.y,SoundRotBits);
+      bstream->writeSignedFloat(q.z,SoundRotBits);
       bstream->writeFlag(q.w < 0.0);
    }
 
