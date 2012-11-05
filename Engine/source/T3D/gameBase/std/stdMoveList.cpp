@@ -96,7 +96,7 @@ void StdMoveList::clientWriteMovePacket(BitStream *bstream)
    {
       move[offset + i].sendCount++;
       move[offset + i].pack(bstream,prevMove);
-      bstream->writeInt(move[offset + i].checksum,Move::ChecksumBits);
+      bstream->writeInt(move[offset + i].checksum & (~(0xFFFFFFFF << Move::ChecksumBits)),Move::ChecksumBits);
       prevMove = &move[offset+i];
    }
 }
