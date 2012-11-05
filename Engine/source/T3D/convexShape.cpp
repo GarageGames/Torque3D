@@ -367,7 +367,14 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
 
    stream.write(2, "\r\n");   
 
-   for ( U32 i = 0; i < mSurfaces.size(); i++ )
+   S32 count = mSurfaces.size();
+   if ( count > smMaxSurfaces )
+   {
+       Con::errorf( "ConvexShape has too many surfaces to save! Truncated value %d to maximum value of %d", count, smMaxSurfaces );
+       count = smMaxSurfaces;
+   }
+
+   for ( U32 i = 0; i < count; i++ )
    {      
       const MatrixF &mat = mSurfaces[i];
 
@@ -423,12 +430,18 @@ U32 ConvexShape::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
    if ( stream->writeFlag( mask & UpdateMask ) )
    {
       stream->write( mMaterialName );
-
-      const U32 surfCount = mSurfaces.size();
+      
+      U32 surfCount = mSurfaces.size();
       stream->writeInt( surfCount, 32 );
 
-      for ( S32 i = 0; i < surfCount; i++ )      
-         mathWrite( *stream, mSurfaces[i] );               
+      for ( S32 i = 0; i < surfCount; i++ )    
+      {
+         QuatF quat( mSurfaces[i] );
+		 Point3F pos( mSurfaces[i].getPosition() );
+
+         mathWrite( *stream, quat );
+         mathWrite( *stream, pos );                    
+      }
    }
 
    return retMask;
@@ -462,7 +475,14 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
          mSurfaces.increment();
          MatrixF &mat = mSurfaces.last();
 
-         mathRead( *stream, &mat );
+         QuatF quat;
+         Point3F pos;
+
+         mathRead( *stream, &quat );
+         mathRead( *stream, &pos ); 
+
+         quat.setMatrix( &mat );
+         mat.setPosition( pos );
       }
 
       if ( isProperlyAdded() )
