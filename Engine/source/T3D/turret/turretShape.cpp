@@ -824,7 +824,11 @@ void TurretShape::_updateNodes(const Point3F& rot)
    {
       MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
       Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-      mat->set(zRot);
+      Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
+
+      QuatF qrot(zRot);
+      qrot *= defaultRot.getQuatF();
+      qrot.setMatrix( mat );      
       mat->setColumn(3, defaultPos);
    }
 
@@ -834,7 +838,11 @@ void TurretShape::_updateNodes(const Point3F& rot)
    {
       MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
       Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-      mat->set(xRot);
+      Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
+
+      QuatF qrot(xRot);
+      qrot *= defaultRot.getQuatF();
+      qrot.setMatrix( mat );    
       mat->setColumn(3, defaultPos);
    }
 
@@ -846,7 +854,11 @@ void TurretShape::_updateNodes(const Point3F& rot)
       {
          MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
          Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-         mat->set(xRot);
+         Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];         
+
+         QuatF qrot(xRot);
+         qrot *= defaultRot.getQuatF();
+         qrot.setMatrix( mat );    
          mat->setColumn(3, defaultPos);
       }
 
@@ -855,7 +867,11 @@ void TurretShape::_updateNodes(const Point3F& rot)
       {
          MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
          Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-         mat->set(zRot);
+         Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
+
+         QuatF qrot(zRot);
+         qrot *= defaultRot.getQuatF();
+         qrot.setMatrix( mat );      
          mat->setColumn(3, defaultPos);
       }
    }
