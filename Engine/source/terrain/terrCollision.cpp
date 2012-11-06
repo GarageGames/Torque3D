@@ -616,6 +616,7 @@ bool TerrainBlock::castRay(const Point3F &start, const Point3F &end, RayInfo *in
       
    // Set intersection point.
    info->setContactPoint( start, end );
+   getTransform().mulP( info->point );    // transform to world coordinates for getGridPos
 
    // Set material at contact point.
    Point2I gridPos = getGridPos( info->point );
