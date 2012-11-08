@@ -814,7 +814,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->showFootprintsCheckbox.setValue((%material).showFootprints);
    MaterialEditorPropertiesWindow-->showDustCheckbox.setValue((%material).showDust);
    MaterialEditorGui.updateSoundPopup("Footstep", (%material).footstepSoundId, (%material).customFootstepSound);
-   MaterialEditorGui.updateSoundPopup("Impact", (%material).footstepSoundId, (%material).customFootstepSound);
+   MaterialEditorGui.updateSoundPopup("Impact", (%material).impactSoundId, (%material).customImpactSound);
 
    //layer specific controls are located here
    %layer = MaterialEditorGui.currentLayer;
