@@ -284,7 +284,8 @@ void GuiArrayCtrl::onRender(Point2I offset, const RectI &updateRect)
          //now render the header
          onRenderColumnHeaders(offset, parentOffset, mHeaderDim);
 
-         clipRect.point.y = headerClip.point.y + headerClip.extent.y - 1;
+         clipRect.point.y += headerClip.extent.y;
+         clipRect.extent.y -= headerClip.extent.y;
       }
       offset.y += mHeaderDim.y;
    }
