@@ -54,6 +54,10 @@ struct PlayerData: public ShapeBaseData {
    };
    bool renderFirstPerson;    ///< Render the player shape in first person
 
+   /// Render shadows while in first person when 
+   /// renderFirstPerson is disabled.
+   bool firstPersonShadows; 
+
    StringTableEntry  imageAnimPrefix;                             ///< Passed along to mounted images to modify
                                                                   ///  animation sequences played in third person. [optional]
    bool              allowImageStateAnimation;                    ///< When true a new thread is added to the player to allow for
