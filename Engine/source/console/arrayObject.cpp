@@ -55,7 +55,7 @@ ConsoleDocClass( ArrayObject,
 );
 
 
-bool ArrayObject::smIncreasing = false;
+bool ArrayObject::smDecreasing = false;
 bool ArrayObject::smCaseSensitive = false;
 const char* ArrayObject::smCompareFunction;
 
@@ -65,7 +65,7 @@ S32 QSORT_CALLBACK ArrayObject::_valueCompare( const void* a, const void* b )
    ArrayObject::Element *ea = (ArrayObject::Element *) (a);
    ArrayObject::Element *eb = (ArrayObject::Element *) (b);
    S32 result = smCaseSensitive ? dStrnatcmp(ea->value, eb->value) : dStrnatcasecmp(ea->value, eb->value);
-   return ( smIncreasing ? -result : result );
+   return ( smDecreasing ? -result : result );
 }
 
 S32 QSORT_CALLBACK ArrayObject::_valueNumCompare( const void* a, const void* b )
@@ -76,7 +76,7 @@ S32 QSORT_CALLBACK ArrayObject::_valueNumCompare( const void* a, const void* b )
    F32 bCol = dAtof(eb->value);
    F32 result = aCol - bCol;
    S32 res = result < 0 ? -1 : (result > 0 ? 1 : 0);
-   return ( smIncreasing ? res : -res );
+   return ( smDecreasing ? res : -res );
 }
 
 S32 QSORT_CALLBACK ArrayObject::_keyCompare( const void* a, const void* b )
@@ -84,7 +84,7 @@ S32 QSORT_CALLBACK ArrayObject::_keyCompare( const void* a, const void* b )
    ArrayObject::Element *ea = (ArrayObject::Element *) (a);
    ArrayObject::Element *eb = (ArrayObject::Element *) (b);
    S32 result = smCaseSensitive ? dStrnatcmp(ea->key, eb->key) : dStrnatcasecmp(ea->key, eb->key);
-   return ( smIncreasing ? -result : result );
+   return ( smDecreasing ? -result : result );
 }
 
 S32 QSORT_CALLBACK ArrayObject::_keyNumCompare( const void* a, const void* b )
@@ -95,7 +95,7 @@ S32 QSORT_CALLBACK ArrayObject::_keyNumCompare( const void* a, const void* b )
    const char* bCol = eb->key;
    F32 result = dAtof(aCol) - dAtof(bCol);
    S32 res = result < 0 ? -1 : (result > 0 ? 1 : 0);
-   return ( smIncreasing ? res : -res );
+   return ( smDecreasing ? res : -res );
 }
 
 S32 QSORT_CALLBACK ArrayObject::_keyFunctionCompare( const void* a, const void* b )
@@ -110,7 +110,7 @@ S32 QSORT_CALLBACK ArrayObject::_keyFunctionCompare( const void* a, const void* 
    
    S32 result = dAtoi( Con::execute( 3, argv ) );
    S32 res = result < 0 ? -1 : ( result > 0 ? 1 : 0 );
-   return ( smIncreasing ? res : -res );
+   return ( smDecreasing ? res : -res );
 }
 
 S32 QSORT_CALLBACK ArrayObject::_valueFunctionCompare( const void* a, const void* b )
@@ -125,7 +125,7 @@ S32 QSORT_CALLBACK ArrayObject::_valueFunctionCompare( const void* a, const void
    
    S32 result = dAtoi( Con::execute( 3, argv ) );
    S32 res = result < 0 ? -1 : ( result > 0 ? 1 : 0 );
-   return ( smIncreasing ? res : -res );
+   return ( smDecreasing ? res : -res );
 }
 
 
@@ -472,12 +472,12 @@ void ArrayObject::setValue( const String &value, S32 index )
 
 //-----------------------------------------------------------------------------
 
-void ArrayObject::sort( bool valsort, bool desc, bool numeric )
+void ArrayObject::sort( bool valsort, bool asc, bool numeric )
 {
    if ( mArray.size() <= 1 )
       return;
 
-   smIncreasing = desc ? false : true;
+   smDecreasing = asc ? false : true;
    smCaseSensitive = isCaseSensitive();
 
    if ( numeric )
@@ -498,12 +498,12 @@ void ArrayObject::sort( bool valsort, bool desc, bool numeric )
 
 //-----------------------------------------------------------------------------
 
-void ArrayObject::sort( bool valsort, bool desc, const char* callbackFunctionName )
+void ArrayObject::sort( bool valsort, bool asc, const char* callbackFunctionName )
 {
    if( mArray.size() <= 1 )
       return;
 
-   smIncreasing = desc ? false : true;
+   smDecreasing = asc ? false : true;
    smCompareFunction = callbackFunctionName;
 
    if( valsort )
@@ -767,80 +767,80 @@ DefineEngineMethod( ArrayObject, append, bool, ( ArrayObject* target ),,
    return false;
 }
 
-DefineEngineMethod( ArrayObject, sort, void, ( bool descending ), ( false ),
+DefineEngineMethod( ArrayObject, sort, void, ( bool ascending ), ( false ),
    "Alpha sorts the array by value\n\n"
-   "@param descending [optional] True for descending sort, false for ascending sort\n" )
+   "@param ascending [optional] True for ascending sort, false for descending sort\n" )
 {
-   object->sort( true, descending, false );
+   object->sort( true, ascending, false );
 }
 
 DefineEngineMethod( ArrayObject, sorta, void, (),,
    "Alpha sorts the array by value in ascending order" )
 {
-   object->sort( true, false, false );
+   object->sort( true, true, false );
 }
 
 DefineEngineMethod( ArrayObject, sortd, void, (),,
    "Alpha sorts the array by value in descending order" )
 {
-   object->sort( true, true, false );
+   object->sort( true, false, false );
 }
 
-DefineEngineMethod( ArrayObject, sortk, void, ( bool descending ), ( false ),
+DefineEngineMethod( ArrayObject, sortk, void, ( bool ascending ), ( false ),
    "Alpha sorts the array by key\n\n"
-   "@param descending [optional] True for descending sort, false for ascending sort\n" )
+   "@param ascending [optional] True for ascending sort, false for descending sort\n" )
 {
-   object->sort( false, descending, false );
+   object->sort( false, ascending, false );
 }
 
 DefineEngineMethod( ArrayObject, sortka, void, (),,
    "Alpha sorts the array by key in ascending order" )
 {
-   object->sort( false, false, false );
+   object->sort( false, true, false );
 }
 
 DefineEngineMethod( ArrayObject, sortkd, void, (),,
    "Alpha sorts the array by key in descending order" )
 {
-   object->sort( false, true, false );
+   object->sort( false, false, false );
 }
 
-DefineEngineMethod( ArrayObject, sortn, void, ( bool descending ), ( false ),
+DefineEngineMethod( ArrayObject, sortn, void, ( bool ascending ), ( false ),
    "Numerically sorts the array by value\n\n"
-   "@param descending [optional] True for descending sort, false for ascending sort\n" )
+   "@param ascending [optional] True for ascending sort, false for descending sort\n" )
 {
-   object->sort( true, descending, true );
+   object->sort( true, ascending, true );
 }
 
 DefineEngineMethod( ArrayObject, sortna, void, (),,
    "Numerically sorts the array by value in ascending order" ) 
 {
-   object->sort( true, false, true );
+   object->sort( true, true, true );
 }
 
 DefineEngineMethod( ArrayObject, sortnd, void, (),,
    "Numerically sorts the array by value in descending order" )
 {
-   object->sort( true, true, true );
+   object->sort( true, false, true );
 }
 
-DefineEngineMethod( ArrayObject, sortnk, void, ( bool descending ), ( false ),
+DefineEngineMethod( ArrayObject, sortnk, void, ( bool ascending ), ( false ),
    "Numerically sorts the array by key\n\n"
-   "@param descending [optional] True for descending sort, false for ascending sort\n" )
+   "@param ascending [optional] True for ascending sort, false for descending sort\n" )
 {
-   object->sort( false, descending, true );
+   object->sort( false, ascending, true );
 }
 
 DefineEngineMethod( ArrayObject, sortnka, void, (),,
    "Numerical sorts the array by key in ascending order" )
 {
-   object->sort( false, false, true );
+   object->sort( false, true, true );
 }
 
 DefineEngineMethod( ArrayObject, sortnkd, void, (),,
    "Numerical sorts the array by key in descending order" )
 {
-   object->sort( false, true, true );
+   object->sort( false, false, true );
 }
 
 DefineEngineMethod( ArrayObject, sortf, void,  ( const char* functionName ),,
@@ -854,7 +854,7 @@ DefineEngineMethod( ArrayObject, sortf, void,  ( const char* functionName ),,
    "%array.sortf( \"mySortCallback\" );\n"
    "@endtsexample\n" )
 {
-   object->sort( true, false, functionName );
+   object->sort( true, true, functionName );
 }
 
 DefineEngineMethod( ArrayObject, sortfk, void,  ( const char* functionName ),,
@@ -862,7 +862,7 @@ DefineEngineMethod( ArrayObject, sortfk, void,  ( const char* functionName ),,
    "@param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal."
    "@see sortf\n" )
 {
-   object->sort( false, false, functionName );
+   object->sort( false, true, functionName );
 }
 
 DefineEngineMethod( ArrayObject, sortfd, void, ( const char* functionName ),,
@@ -870,7 +870,7 @@ DefineEngineMethod( ArrayObject, sortfd, void, ( const char* functionName ),,
    "@param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal."
    "@see sortf\n" )
 {
-   object->sort( true, true, functionName );
+   object->sort( true, false, functionName );
 }
 
 DefineEngineMethod( ArrayObject, sortfkd, void, ( const char* functionName ),,
@@ -878,7 +878,7 @@ DefineEngineMethod( ArrayObject, sortfkd, void, ( const char* functionName ),,
    "@param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal."
    "@see sortf\n" )
 {
-   object->sort( false, true, functionName );
+   object->sort( false, false, functionName );
 }
 
 DefineEngineMethod( ArrayObject, moveFirst, S32, (),,
