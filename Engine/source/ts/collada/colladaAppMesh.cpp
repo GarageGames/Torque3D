@@ -463,6 +463,11 @@ S32 ColladaAppMesh::addMaterial(const char* symbol)
          }
       }
    }
+   else
+   {
+      // No Collada material is present for this symbol, so just create an empty one
+      appMaterials.push_back(new ColladaAppMaterial(symbol));
+   }
 
    // Add this symbol to the bound list for the mesh
    boundMaterials.insert(StringTable->insert(symbol), matIndex);
