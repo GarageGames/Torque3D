@@ -322,9 +322,11 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
          }
          else
          {
-            base = polyList->addPoint( mVertexData[firstVert].vert() );
+            base = polyList->addPointAndNormal( mVertexData[firstVert].vert(), mVertexData[firstVert].normal() );
             for ( i = 1; i < vertsPerFrame; i++ )
-               polyList->addPoint( mVertexData[ i + firstVert ].vert() );
+            {
+               polyList->addPointAndNormal( mVertexData[ i + firstVert ].vert(), mVertexData[ i + firstVert ].normal() );
+            }
          }
       }
       else
@@ -348,9 +350,9 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
          }
          else
          {
-            base = polyList->addPoint( verts[firstVert] );
+            base = polyList->addPointAndNormal( verts[firstVert], norms[firstVert] );
             for ( i = 1; i < vertsPerFrame; i++ )
-               polyList->addPoint( verts[ i + firstVert ] );
+               polyList->addPointAndNormal( verts[ i + firstVert ], norms[ i + firstVert ] );
          }
       }
    }

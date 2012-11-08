@@ -827,6 +827,8 @@ bool TSStatic::buildPolyList(PolyListContext context, AbstractPolyList* polyList
          return false;
       else if ( meshType == Bounds )
          polyList->addBox( mObjBox );
+      else if ( meshType == VisibleMesh )
+          mShapeInstance->buildPolyList( polyList, 0 );
       else
       {
          // Everything else is done from the collision meshes

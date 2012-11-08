@@ -157,6 +157,11 @@ public:
    /// an ID number for that point.
    virtual U32  addPoint(const Point3F& p) = 0;
 
+   /// Adds a point and normal to the poly list, and returns
+   /// an ID number for them.  Normals are ignored for polylists
+   /// that do not support them.
+   virtual U32  addPointAndNormal(const Point3F& p, const Point3F& normal) { return addPoint( p ); }
+
    /// Adds a plane to the poly list, and returns
    /// an ID number for that point.
    virtual U32  addPlane(const PlaneF& plane) = 0;
