@@ -57,7 +57,7 @@ protected:
    /// @name Sorting
    /// @{
 
-   static bool smIncreasing;
+   static bool smDecreasing;
    static bool smCaseSensitive;
    static const char* smCompareFunction;
 
@@ -175,15 +175,15 @@ public:
 
    /// This sorts the array.
    /// @param valtest  Determines whether sorting by value or key.
-   /// @param desc     Determines if sorting ascending or descending.
+   /// @param asc      Determines if sorting ascending or descending.
    /// @param numeric  Determines if sorting alpha or numeric search.
-   void sort( bool valtest, bool desc, bool numeric );
+   void sort( bool valtest, bool asc, bool numeric );
    
    /// This sorts the array using a script callback.
    /// @param valtest  Determines whether sorting by value or key.
-   /// @param desc     Determines if sorting ascending or descending.
+   /// @param asc      Determines if sorting ascending or descending.
    /// @param callbackFunctionName Name of the script function.
-   void sort( bool valtest, bool desc, const char* callbackFunctionName );
+   void sort( bool valtest, bool asc, const char* callbackFunctionName );
 
    /// @}
 
