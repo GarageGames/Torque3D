@@ -163,17 +163,17 @@ public:
    };
    
    U32 getIntValue();
-   
+   S32 getSignedIntValue();
    F32 getFloatValue();
-   
    const char *getStringValue();
+   bool getBoolValue();
    
    void setIntValue(U32 val);
-
+   void setIntValue(S32 val);
    void setFloatValue(F32 val);
-   
    void setStringValue(const char *value);
    void setStackStringValue(const char *value);
+   void setBoolValue(bool val);
    
    void init()
    {
@@ -211,6 +211,7 @@ public:
    ConsoleValueRef(const ConsoleValueRef &ref);
    ConsoleValueRef(const char *value);
    ConsoleValueRef(const String &ref);
+   ConsoleValueRef(U32 value);
    ConsoleValueRef(S32 value);
    ConsoleValueRef(F32 value);
    ConsoleValueRef(F64 value);
@@ -218,12 +219,15 @@ public:
    const char *getStringValue() { return value ? value->getStringValue() : ""; }
    const char *getStringArgValue();
 
-   inline S32 getIntValue() { return value ? value->getIntValue() : 0; }
+   inline U32 getIntValue() { return value ? value->getIntValue() : 0; }
+   inline S32 getSignedIntValue() { return value ? value->getSignedIntValue() : 0; }
    inline F32 getFloatValue() { return value ? value->getFloatValue() : 0.0f; }
+   inline bool getBoolValue() { return value ? value->getBoolValue() : false; }
 
    inline operator const char*() { return getStringValue(); }
    inline operator String() { return String(getStringValue()); }
-   inline operator S32() { return getIntValue(); }
+   inline operator U32() { return getIntValue(); }
+   inline operator S32() { return getSignedIntValue(); }
    inline operator F32() { return getFloatValue(); }
 
    inline bool isString() { return value ? value->type >= ConsoleValue::TypeInternalStackString : true; }
@@ -233,6 +237,7 @@ public:
    // Note: operators replace value
    ConsoleValueRef& operator=(const ConsoleValueRef &other);
    ConsoleValueRef& operator=(const char *newValue);
+   ConsoleValueRef& operator=(U32 newValue);
    ConsoleValueRef& operator=(S32 newValue);
    ConsoleValueRef& operator=(F32 newValue);
    ConsoleValueRef& operator=(F64 newValue);
@@ -242,12 +247,17 @@ public:
 
 inline S32 dAtoi(ConsoleValueRef &ref)
 {
-   return ref.getIntValue();
+   return ref.getSignedIntValue();
 }
 
 inline F32 dAtof(ConsoleValueRef &ref)
 {
    return ref.getFloatValue();
+}
+
+inline bool dAtob(ConsoleValue &ref)
+{
+   return ref.getBoolValue();
 }
 
 
