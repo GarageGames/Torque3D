@@ -56,9 +56,13 @@ class BitVector
       /// Constructs a bit vector with the desired size.
       /// @note The resulting vector is not cleared.
       BitVector( U32 sizeInBits );
+
+	  BitVector( const BitVector &r);
       
       /// Destructor.
       ~BitVector();
+
+	  BitVector& operator=( const BitVector &r);
 
       /// @name Size Management
       /// @{
@@ -148,6 +152,17 @@ inline BitVector::BitVector( U32 sizeInBits )
    mByteSize = 0;
    mSize = 0;
    setSize( sizeInBits );
+}
+
+inline BitVector::BitVector( const BitVector &r )
+{
+	copy(r);
+}
+
+inline BitVector& BitVector::operator=( const BitVector &r)
+{
+	copy(r);
+	return *this;
 }
 
 inline BitVector::~BitVector()
