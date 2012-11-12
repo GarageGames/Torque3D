@@ -1550,6 +1550,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
    {
       PROFILE_SCOPE( GroundCover_RenderBillboards );
 
+      // Take zoom into account.
       F32 screenScale = state->getWorldToScreenScale().y / state->getViewport().extent.y;
 
       // Set the far distance for billboards.
