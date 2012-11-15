@@ -1632,6 +1632,11 @@ F32 ShapeBase::getDamageValue()
    return mDamage / mDataBlock->maxDamage;
 }
 
+F32 ShapeBase::getMaxDamage()
+{
+   return mDataBlock->maxDamage;
+}
+
 void ShapeBase::updateDamageLevel()
 {
    if (mDamageThread) {
@@ -4534,6 +4539,13 @@ DefineEngineMethod( ShapeBase, getDamagePercent, F32, (),,
 {
    return object->getDamageValue();
 }
+  
+DefineEngineMethod(ShapeBase, getMaxDamage, F32, (),,   
+   "Get the object's maxDamage level.\n"  
+   "@return datablock.maxDamage\n")    
+{    
+   return object->getMaxDamage();    
+}  
 
 DefineEngineMethod( ShapeBase, setDamageState, bool, ( const char* state ),,
    "@brief Set the object's damage state.\n\n"

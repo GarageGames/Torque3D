@@ -676,9 +676,6 @@ function GameCore::onDeath(%game, %client, %sourceObject, %sourceClient, %damage
    // Clear out the name on the corpse
    %client.player.setShapeName("");
 
-   // Update the numerical Health HUD
-   %client.player.updateHealth();
-
    // Switch the client over to the death cam and unhook the player object.
    if (isObject(%client.camera) && isObject(%client.player))
    {
