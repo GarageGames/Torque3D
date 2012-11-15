@@ -46,26 +46,6 @@ function clientCmdSyncClock(%time)
 }
 
 //-----------------------------------------------------------------------------
-// Numerical Health Counter
-//-----------------------------------------------------------------------------
-
-function clientCmdSetNumericalHealthHUD(%curHealth)
-{
-   // Skip if the hud is missing.
-   if (!isObject(numericalHealthHUD))
-      return;
-
-   // The server has sent us our current health, display it on the HUD
-   numericalHealthHUD.setValue(%curHealth);
-
-   // Ensure the HUD is set to visible while we have health / are alive
-   if (%curHealth)
-      HealthHUD.setVisible(true);
-   else
-      HealthHUD.setVisible(false);
-}
-
-//-----------------------------------------------------------------------------
 // Damage Direction Indicator
 //-----------------------------------------------------------------------------
 
