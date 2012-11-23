@@ -352,9 +352,9 @@ void Sim3DAudioEvent::unpack(NetConnection *con, BitStream *bstream)
 
    if (bstream->readFlag()) {
       QuatF q;
-      q.x = bstream->readFloat(SoundRotBits);
-      q.y = bstream->readFloat(SoundRotBits);
-      q.z = bstream->readFloat(SoundRotBits);
+      q.x = bstream->readSignedFloat(SoundRotBits);
+      q.y = bstream->readSignedFloat(SoundRotBits);
+      q.z = bstream->readSignedFloat(SoundRotBits);
       F32 value = ((q.x * q.x) + (q.y * q.y) + (q.z * q.z));
 // #ifdef __linux
       // Hmm, this should never happen, but it does...
