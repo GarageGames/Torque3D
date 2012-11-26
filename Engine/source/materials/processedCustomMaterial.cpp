@@ -347,13 +347,14 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
             }
          case Material::BackBuff:
             {
-               if ( sgData.reflectTex )
-                  GFX->setTexture( samplerRegister, sgData.reflectTex );
-               else
-               {
-                   GFXTextureObject *refractTex = REFLECTMGR->getRefractTex( true );
-                   GFX->setTexture( samplerRegister, refractTex );
-               }
+               GFX->setTexture( samplerRegister, sgData.backBuffTex );
+               //if ( sgData.reflectTex )
+               //   GFX->setTexture( samplerRegister, sgData.reflectTex );
+               //else
+               //{
+               //    GFXTextureObject *refractTex = REFLECTMGR->getRefractTex( true );
+               //    GFX->setTexture( samplerRegister, refractTex );
+               //}
                break;
             }
          case Material::ReflectBuff:
