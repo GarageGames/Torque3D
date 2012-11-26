@@ -194,7 +194,7 @@ void TSShapeInstance::buildInstanceData(TSShape * _shape, bool loadMaterials)
    animateSubtrees();
 
    // Construct billboards if not done already
-   if ( loadMaterials && mShapeResource )
+   if ( loadMaterials && mShapeResource && GFXDevice::devicePresent() )
       mShape->setupBillboardDetails( mShapeResource.getPath().getFullPath() );
 }
 
