@@ -341,7 +341,7 @@ bool Tokenizer::advanceToken(const bool crossLine, const bool assertAvail)
             break;
 
            default:
-            if (c == '\"' || c == '\'')
+            if ((c == '\"' || c == '\''))
             {
                // Quoted token
                U32 startLine = getCurrentLine();
@@ -355,6 +355,8 @@ bool Tokenizer::advanceToken(const bool crossLine, const bool assertAvail)
                   AssertISV(mCurrPos < mBufferSize,
                             avar("End of file before quote closed.  Quote started: (%s: %d)",
                                  getFileName(), startLine));
+
+
                   AssertISV((mpBuffer[mCurrPos] != '\n' && mpBuffer[mCurrPos] != '\r'),
                             avar("End of line reached before end of quote.  Quote started: (%s: %d)",
                                  getFileName(), startLine));
@@ -384,6 +386,30 @@ bool Tokenizer::advanceToken(const bool crossLine, const bool assertAvail)
                   cont = false;
                }
             }
+            else if (c == '/' && mpBuffer[mCurrPos+1] == '*')
+			{
+               // Block quote...
+               if (currPosition == 0)
+               {
+                  // continue to end of block, then let crossLine determine on the next pass
+                  while (mCurrPos < mBufferSize - 1 && (mpBuffer[mCurrPos] != '*' || mpBuffer[mCurrPos + 1] != '/'))
+                     mCurrPos++;
+
+				  if (mCurrPos < mBufferSize - 1)
+					  mCurrPos += 2;
+               }
+               else
+               {
+                  // This is the end of the token.  Continue to EOL
+                  while (mCurrPos < mBufferSize - 1 && (mpBuffer[mCurrPos] != '*' || mpBuffer[mCurrPos + 1] != '/'))
+                     mCurrPos++;
+
+				  if (mCurrPos < mBufferSize - 1)
+					  mCurrPos += 2;
+
+                  cont = false;
+               }
+			}
             else
             {
                // If this is the first non-token character then store the
