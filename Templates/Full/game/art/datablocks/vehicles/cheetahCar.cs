@@ -274,7 +274,7 @@ datablock WheeledVehicleTire(CheetahCarTire)
    // forces to move the vehicle. These distortion/spring forces
    // are what convert wheel angular velocity into forces that
    // act on the rigid body.
-   shapeFile = "art/shapes/Cheetah/wheel.dae";
+   shapeFile = "art/shapes/Cheetah/wheel.DAE";
    staticFriction = 4.2;
    kineticFriction = "1";
 
@@ -296,7 +296,7 @@ datablock WheeledVehicleTire(CheetahCarTireRear)
    // forces to move the vehicle. These distortion/spring forces
    // are what convert wheel angular velocity into forces that
    // act on the rigid body.
-   shapeFile = "art/shapes/Cheetah/wheelBack.dae";
+   shapeFile = "art/shapes/Cheetah/wheelBack.DAE";
    staticFriction = "7.2";
    kineticFriction = "1";
 
@@ -324,7 +324,7 @@ datablock WheeledVehicleSpring(CheetahCarSpring)
 datablock WheeledVehicleData(CheetahCar)
 {
    category = "Vehicles";
-   shapeFile = "art/shapes/Cheetah/Cheetah_Body.dae";
+   shapeFile = "art/shapes/Cheetah/Cheetah_Body.DAE";
    emap = 1;
 
    mountPose[0] = sitting;
