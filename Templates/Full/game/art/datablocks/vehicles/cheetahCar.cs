@@ -55,7 +55,7 @@ datablock SFXProfile(DirtKickup)
    fileName = "art/sound/cheetah/softImpact.ogg";
 };
 
-datablock SFXProfile(TurretFireSound)
+datablock SFXProfile(CheetahTurretFireSound)
 {
    filename = "art/sound/cheetah/turret_firing.wav";
    description = BulletFireDesc;
@@ -220,7 +220,7 @@ datablock ShapeBaseImageData(TurretImage)
    stateSequence[3]                 = "Fire";
    stateSequenceRandomFlash[3]      = true;        // use muzzle flash sequence
    stateScript[3]                   = "onFire";
-   stateSound[3]                    = TurretFireSound;
+   stateSound[3]                    = CheetahTurretFireSound;
    stateEmitter[3]                  = TurretFireSmokeEmitter;
    stateEmitterTime[3]              = 0.025;
 
