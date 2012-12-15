@@ -26,6 +26,7 @@
 #include "scene/sceneManager.h"
 #include "scene/sceneRenderState.h"
 #include "console/consoleTypes.h"
+#include "console/typeValidators.h"
 #include "core/stream/bitStream.h"
 #include "core/strings/stringUnit.h"
 #include "math/mRandom.h"
@@ -177,31 +178,31 @@ void ParticleEmitterData::initPersistFields()
 {
    addGroup( "ParticleEmitterData" );
 
-      addField("ejectionPeriodMS", TYPEID< S32 >(), Offset(ejectionPeriodMS,   ParticleEmitterData),
+      addFieldV("ejectionPeriodMS", TYPEID< S32 >(), Offset(ejectionPeriodMS,   ParticleEmitterData), new IRangeValidator(1, 2047),
          "Time (in milliseconds) between each particle ejection." );
 
-      addField("periodVarianceMS", TYPEID< S32 >(), Offset(periodVarianceMS,   ParticleEmitterData),
+      addFieldV("periodVarianceMS", TYPEID< S32 >(), Offset(periodVarianceMS,   ParticleEmitterData), new IRangeValidator(0, 2047),
          "Variance in ejection period, from 1 - ejectionPeriodMS." );
 
-      addField( "ejectionVelocity", TYPEID< F32 >(), Offset(ejectionVelocity, ParticleEmitterData),
+      addFieldV( "ejectionVelocity", TYPEID< F32 >(), Offset(ejectionVelocity, ParticleEmitterData), new FRangeValidator(0, 655.35f),
          "Particle ejection velocity." );
 
-      addField( "velocityVariance", TYPEID< F32 >(), Offset(velocityVariance, ParticleEmitterData),
+      addFieldV( "velocityVariance", TYPEID< F32 >(), Offset(velocityVariance, ParticleEmitterData), new FRangeValidator(0, 163.83f),
          "Variance for ejection velocity, from 0 - ejectionVelocity." );
 
-      addField( "ejectionOffset", TYPEID< F32 >(), Offset(ejectionOffset, ParticleEmitterData),
+      addFieldV( "ejectionOffset", TYPEID< F32 >(), Offset(ejectionOffset, ParticleEmitterData), new FRangeValidator(0, 655.35f),
          "Distance along ejection Z axis from which to eject particles." );
 
-      addField( "thetaMin", TYPEID< F32 >(), Offset(thetaMin, ParticleEmitterData),
+      addFieldV( "thetaMin", TYPEID< F32 >(), Offset(thetaMin, ParticleEmitterData), new FRangeValidator(0, 180.0f),
          "Minimum angle, from the horizontal plane, to eject from." );
 
-      addField( "thetaMax", TYPEID< F32 >(), Offset(thetaMax, ParticleEmitterData),
+      addFieldV( "thetaMax", TYPEID< F32 >(), Offset(thetaMax, ParticleEmitterData), new FRangeValidator(0, 180.0f),
          "Maximum angle, from the horizontal plane, to eject particles from." );
 
-      addField( "phiReferenceVel", TYPEID< F32 >(), Offset(phiReferenceVel, ParticleEmitterData),
+      addFieldV( "phiReferenceVel", TYPEID< F32 >(), Offset(phiReferenceVel, ParticleEmitterData), new FRangeValidator(0, 360.0f),
          "Reference angle, from the vertical plane, to eject particles from." );
 
-      addField( "phiVariance", TYPEID< F32 >(), Offset(phiVariance, ParticleEmitterData),
+      addFieldV( "phiVariance", TYPEID< F32 >(), Offset(phiVariance, ParticleEmitterData), new FRangeValidator(0, 360.0f),
          "Variance from the reference angle, from 0 - 360." );
 
       addField( "softnessDistance", TYPEID< F32 >(), Offset(softnessDistance, ParticleEmitterData),
@@ -302,8 +303,8 @@ void ParticleEmitterData::packData(BitStream* stream)
 {
    Parent::packData(stream);
 
-   stream->writeInt(ejectionPeriodMS, 10);
-   stream->writeInt(periodVarianceMS, 10);
+   stream->writeInt(ejectionPeriodMS, 11);      // must match limit on valid range in ParticleEmitterData::initPersistFields
+   stream->writeInt(periodVarianceMS, 11);
    stream->writeInt((S32)(ejectionVelocity * 100), 16);
    stream->writeInt((S32)(velocityVariance * 100), 14);
    if( stream->writeFlag( ejectionOffset != sgDefaultEjectionOffset ) )
@@ -352,8 +353,8 @@ void ParticleEmitterData::unpackData(BitStream* stream)
 {
    Parent::unpackData(stream);
 
-   ejectionPeriodMS = stream->readInt(10);
-   periodVarianceMS = stream->readInt(10);
+   ejectionPeriodMS = stream->readInt(11);
+   periodVarianceMS = stream->readInt(11);
    ejectionVelocity = stream->readInt(16) / 100.0f;
    velocityVariance = stream->readInt(14) / 100.0f;
    if( stream->readFlag() )

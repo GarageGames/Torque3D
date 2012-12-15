@@ -129,6 +129,7 @@ IMPLEMENT_CALLBACK(TCPObject, onConnectionRequest, void, (const char* address, c
    "This callback is used when the TCPObject is listening to a port and a client is attempting to connect.\n"
    "@param address Server address connecting from.\n"
    "@param ID Connection ID\n"
+   "@see listen()\n"
    );
 
 IMPLEMENT_CALLBACK(TCPObject, onLine, void, (const char* line), (line),
@@ -424,14 +425,30 @@ DefineEngineMethod(TCPObject, send, void, (const char *data),,
 DefineEngineMethod(TCPObject, listen, void, (int port),, 
    "@brief Start listening on the specified port for connections.\n\n"
 
+   "This method starts a listener which looks for incoming TCP connections to a port.  "
+   "You must overload the onConnectionRequest callback to create a new TCPObject to "
+   "read, write, or reject the new connection.\n\n"
+
    "@param port Port for this TCPObject to start listening for connections on.\n"
 
    "@tsexample\n"
-      "// Set the port number list\n"
-      "%portNumber = 80;\n\n"
 
-      "// Inform this TCPObject to start listening at the specified port.\n"
-      "%thisTCPObj.send(%portNumber);\n"
+    "// Create a listener on port 8080.\n"
+    "new TCPObject( TCPListener );\n"
+    "TCPListener.listen( 8080 );\n\n"
+
+    "function TCPListener::onConnectionRequest( %this, %address, %id )\n"
+    "{\n"
+    "   // Create a new object to manage the connection.\n"
+    "   new TCPObject( TCPClient, %id );\n"
+    "}\n\n"
+
+    "function TCPClient::onLine( %this, %line )\n"
+    "{\n"
+    "   // Print the line of text from client.\n"
+    "   echo( %line );\n"
+    "}\n"
+
    "@endtsexample\n")
 {
    object->listen(U32(port));

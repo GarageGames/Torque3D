@@ -1612,7 +1612,8 @@ DefineEngineFunction( containerRayCast, const char*,
    "@returns A string containing either null, if nothing was struck, or these fields:\n"
    "<ul><li>The ID of the object that was struck.</li>"
    "<li>The x, y, z position that it was struck.</li>"
-   "<li>The x, y, z of the normal of the face that was struck.</li></ul>" 
+   "<li>The x, y, z of the normal of the face that was struck.</li>"
+   "<li>The distance between the start point and the position we hit.</li></ul>" 
 
    "@ingroup Game")
 {
@@ -1633,9 +1634,9 @@ DefineEngineFunction( containerRayCast, const char*,
    char *returnBuffer = Con::getReturnBuffer(256);
    if(ret)
    {
-      dSprintf(returnBuffer, 256, "%d %g %g %g %g %g %g",
+      dSprintf(returnBuffer, 256, "%d %g %g %g %g %g %g %g",
                ret, rinfo.point.x, rinfo.point.y, rinfo.point.z,
-               rinfo.normal.x, rinfo.normal.y, rinfo.normal.z);
+               rinfo.normal.x, rinfo.normal.y, rinfo.normal.z, rinfo.distance);
    }
    else
    {

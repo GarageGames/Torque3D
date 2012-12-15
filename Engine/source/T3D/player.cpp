@@ -252,6 +252,7 @@ PlayerData::PlayerData()
    shadowProjectionDistance = 14.0f;
 
    renderFirstPerson = true;
+   firstPersonShadows = false;
 
    // Used for third person image rendering
    imageAnimPrefix = StringTable->insert("");
@@ -678,6 +679,9 @@ void PlayerData::initPersistFields()
 
       addField( "renderFirstPerson", TypeBool, Offset(renderFirstPerson, PlayerData),
          "@brief Flag controlling whether to render the player shape in first person view.\n\n" );
+
+      addField( "firstPersonShadows", TypeBool, Offset(firstPersonShadows, PlayerData),
+         "@brief Forces shadows to be rendered in first person when renderFirstPerson is disabled.  Defaults to false.\n\n" );
 
       addField( "minLookAngle", TypeF32, Offset(minLookAngle, PlayerData),
          "@brief Lowest angle (in radians) the player can look.\n\n"
@@ -1180,7 +1184,8 @@ void PlayerData::packData(BitStream* stream)
    Parent::packData(stream);
 
    stream->writeFlag(renderFirstPerson);
-
+   stream->writeFlag(firstPersonShadows);
+   
    stream->write(minLookAngle);
    stream->write(maxLookAngle);
    stream->write(maxFreelookAngle);
@@ -1361,6 +1366,7 @@ void PlayerData::unpackData(BitStream* stream)
    Parent::unpackData(stream);
 
    renderFirstPerson = stream->readFlag();
+   firstPersonShadows = stream->readFlag();
 
    stream->read(&minLookAngle);
    stream->read(&maxLookAngle);
@@ -6947,6 +6953,11 @@ void Player::prepRenderImage( SceneRenderState* state )
    GameConnection* connection = GameConnection::getConnectionToServer();
    if( connection && connection->getControlObject() == this && connection->isFirstPerson() )
    {
+      // If we're first person and we are not rendering the player
+      // then disable all shadow rendering... a floating gun shadow sucks.
+      if ( state->isShadowPass() && !mDataBlock->renderFirstPerson && !mDataBlock->firstPersonShadows )
+         return;
+
       renderPlayer = mDataBlock->renderFirstPerson || !state->isDiffusePass();
 
       if( !sRenderMyPlayer )

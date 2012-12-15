@@ -52,7 +52,7 @@ void OrientedBox3F::set( const MatrixF& transform, const Point3F& extents )
    mAxes[ ForwardVector ] = transform.getForwardVector();
    mAxes[ UpVector ] = transform.getUpVector();
 
-   mHalfExtents = extents;
+   mHalfExtents = extents * 0.5f;
 
    _initPoints();
 }

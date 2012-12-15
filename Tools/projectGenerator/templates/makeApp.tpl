@@ -12,13 +12,17 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS := -g -m32
-LDLIBS := -lstdc++
-CFLAGS := -MMD -I. -Wfatal-errors -m32
+LDLIBS := -lstdc++ -lm -lpthread -lrt
+{foreach item=def from=$projLibs}LDLIBS += -l{$def}
+{/foreach}
+
+CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -pipe
 
 {foreach item=def from=$projIncludes}CFLAGS += -I{$def}
 {/foreach}
 
-CFLAGS += -DUNICODE;
+CFLAGS += -DUNICODE
+CFLAGS += -DLINUX
 
 {foreach item=def from=$projDefines}CFLAGS += -D{$def}
 {/foreach}
@@ -28,9 +32,9 @@ CFLAGS_DEBUG += -DTORQUE_DEBUG
 CFLAGS_DEBUG += -DTORQUE_DEBUG_GUARD
 CFLAGS_DEBUG += -DTORQUE_NET_STATS
 
-CFLAGS += -O3
+CFLAGS += -O0
 
-#CC := gcc
+CC := gcc
 LD := gcc
 
 APP_TARGETS += $(APPNAME)

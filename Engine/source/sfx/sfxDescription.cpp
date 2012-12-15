@@ -508,8 +508,8 @@ void SFXDescription::packData( BitStream *stream )
    Parent::packData( stream );
 
    stream->writeFloat( mVolume, 6 );
-   stream->writeFloat( mPitch, 6 );
-   stream->writeFloat( mPriority, 6 );
+   stream->write( mPitch );
+   stream->write( mPriority );
 
    stream->writeFlag( mIsLooping );
    stream->writeFlag( mFadeLoops );
@@ -576,8 +576,8 @@ void SFXDescription::unpackData( BitStream *stream )
    Parent::unpackData( stream );
 
    mVolume        = stream->readFloat( 6 );
-   mPitch         = stream->readFloat( 6 );
-   mPriority      = stream->readFloat( 6 );
+   stream->read( &mPitch );
+   stream->read( &mPriority );
 
    mIsLooping     = stream->readFlag();
    mFadeLoops     = stream->readFlag();

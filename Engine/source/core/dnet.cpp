@@ -79,11 +79,19 @@ void ConnectionProtocol::buildSendPacketHeader(BitStream *stream, S32 packetType
 
    stream->writeFlag(true);
    stream->writeInt(mConnectSequence & 1, 1);
-   stream->writeInt(mLastSendSeq, 9);
-   stream->writeInt(mLastSeqRecvd, 9);
-   stream->writeInt(packetType, 2);
-   stream->writeInt(ackByteCount, 3);
-   stream->writeInt(mAckMask, ackByteCount * 8);
+   stream->writeInt(mLastSendSeq & 0x1FF, 9);
+   stream->writeInt(mLastSeqRecvd & 0x1FF, 9);
+   stream->writeInt(packetType & 0x3, 2);
+   stream->writeInt(ackByteCount & 0x7, 3);
+   U32 bitmask = ~(0xFFFFFFFF << (ackByteCount*8));
+   if(ackByteCount == 4)
+   {
+      // Performing a bit shift that is the same size as the variable being shifted
+      // is undefined in the C/C++ standard.  Handle that exception here when
+      // ackByteCount*8 == 4*8 == 32
+      bitmask = 0xFFFFFFFF;
+   }
+   stream->writeInt(mAckMask & bitmask, ackByteCount * 8);
 
    // if we're resending this header, we can't advance the
    // sequence recieved (in case this packet drops and the prev one

@@ -28,7 +28,7 @@
 
 datablock SFXProfile(WeaponUseSound)
 {
-   filename = "art/sound/weapons/weapon_switch";
+   filename = "art/sound/weapons/Weapon_switch";
    description = AudioClose3d;
    preload = true;
 };

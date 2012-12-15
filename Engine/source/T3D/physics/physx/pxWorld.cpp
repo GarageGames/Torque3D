@@ -569,9 +569,11 @@ void PxWorld::_releaseQueues()
    mReleaseJointQueue.clear();
 
    // Now release any actors still pending in the queue.
+   bool staticChanged = false;
    for ( S32 i = 0; i < mReleaseActorQueue.size(); i++ )
    {
-      NxActor *currActor = mReleaseActorQueue[i];     
+      NxActor *currActor = mReleaseActorQueue[i];
+      staticChanged |= !currActor->isDynamic();
       mScene->releaseActor( *currActor );
    }
 
@@ -618,6 +620,9 @@ void PxWorld::_releaseQueues()
       mScene->releaseFluid( *currFluid );
    }
    mReleaseFluidQueue.clear();
+
+   if ( staticChanged )
+    mStaticChangedSignal.trigger();
 }
 
 void PxWorld::setEnabled( bool enabled )

@@ -15,13 +15,14 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS_{$projName} := -g -m32 -shared
-LDLIBS_{$projName} := -lstdc++ -lSDL -lpthread
+LDLIBS_{$projName} := -lstdc++ -lpthread
 CFLAGS_{$projName} := -MMD -I. -m32 -mmmx -msse -march=i686 
 
 {foreach item=def from=$projIncludes}CFLAGS_{$projName} += -I{$def}
 {/foreach}
 
 CFLAGS_{$projName} += -DUNICODE
+CFLAGS_{$projName} += -DLINUX
 
 {foreach item=def from=$projDefines}CFLAGS_{$projName} += -D{$def}
 {/foreach}
@@ -31,9 +32,9 @@ CFLAGS_DEBUG_{$projName} += -DTORQUE_DEBUG
 CFLAGS_DEBUG_{$projName} += -DTORQUE_DEBUG_GUARD
 CFLAGS_DEBUG_{$projName} += -DTORQUE_NET_STATS
 
-CFLAGS_{$projName} += -O3
+CFLAGS_{$projName} += -O0
 
-#CC := gcc
+CC := gcc
 LD := gcc
 
 SHARED_LIB_TARGETS += {$projName}.so

@@ -119,6 +119,7 @@ public:
    // AbstractPolyList
    bool isEmpty() const;
    U32 addPoint(const Point3F& p);
+   U32 addPointAndNormal(const Point3F& p, const Point3F& normal);
    U32 addPlane(const PlaneF& plane);
    void begin(BaseMatInstance* material,U32 surfaceKey);
    void plane(U32 v1,U32 v2,U32 v3);

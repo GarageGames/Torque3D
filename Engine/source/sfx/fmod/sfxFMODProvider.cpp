@@ -201,21 +201,16 @@ void SFXFMODProvider::init()
    
    mFMod.eventDllRef = OsLoadLibrary( eventDllName );
    if(!mFMod.eventDllRef)
-      Con::warnf( "SFXFMODProvider - Could not locate %s - FMOD Designer intergration not available.", eventDllName );
+      Con::warnf( "SFXFMODProvider - Could not locate %s - FMOD Designer integration not available.", eventDllName );
 
    mFMod.isLoaded = true;
    mFMod.eventIsLoaded = true;
 
    #define FMOD_FUNCTION(fn_name, fn_args) \
       mFMod.isLoaded &= fmodBindFunction(mFMod.dllRef, *(void**)&mFMod.fn_name.fn, #fn_name);
-   #ifdef TORQUE_OS_WIN32
-      #define FMOD_EVENT_FUNCTION(fn_name, fn_args, export) \
-         mFMod.eventIsLoaded &= fmodBindFunction(mFMod.eventDllRef, *(void**)&mFMod.fn_name.fn, export);
-   #else
-      #define FMOD_EVENT_FUNCTION(fn_name, fn_args, export) \
-         mFMod.eventIsLoaded &= fmodBindFunction(mFMod.eventDllRef, *(void**)&mFMod.fn_name.fn, #fn_name);
-   #endif
-      
+   #define FMOD_EVENT_FUNCTION(fn_name, fn_args) \
+      mFMod.eventIsLoaded &= fmodBindFunction(mFMod.eventDllRef, *(void**)&mFMod.fn_name.fn, #fn_name);
+            
    #include FMOD_FN_FILE
    
    #undef FMOD_FUNCTION
@@ -223,11 +218,11 @@ void SFXFMODProvider::init()
 
    if(mFMod.isLoaded == false)
    {
-      Con::warnf("SFXFMODProvider - Could not locate %s - FMOD not available.", dllName);
+      Con::warnf("SFXFMODProvider - Could not load %s - FMOD not available.", dllName);
       return;
    }
    if( !mFMod.eventIsLoaded && mFMod.eventDllRef )
-      Con::warnf("SFXFMODProvider - Could not load the %s - FMOD Designer integration not available.", eventDllName);
+      Con::warnf("SFXFMODProvider - Could not load %s - FMOD Designer integration not available.", eventDllName);
 
 #endif
 

@@ -36,36 +36,11 @@ function HealthPatch::onCollision(%this, %obj, %col)
    {
       %col.applyRepair(%this.repairAmount);
 
-      // Update the Health GUI while repairing
-      %this.doHealthUpdate(%col);
-
       %obj.respawn();
       if (%col.client)
          messageClient(%col.client, 'MsgHealthPatchUsed', '\c2Health Patch Applied');
       serverPlay3D(HealthUseSound, %obj.getTransform());
    }
-}
-
-function HealthPatch::doHealthUpdate(%this, %obj)
-{
-   // Would be better to add a onRepair() callback to shapeBase.cpp in order to
-   // prevent any excess/unneccesary schedules from this.  But for the time
-   // being....
-
-   // This is just a rough timer to update the Health HUD every 250 ms.  From
-   // my tests a large health pack will fully heal a player from 10 health in
-   // 36 iterations (ie. 9 seconds).  If either the scheduling time, the repair
-   // amount, or the repair rate is changed then the healthTimer counter should
-   // be changed also.
-
-   if (%obj.healthTimer < 40) // 40 = 10 seconds at 1 iteration per 250 ms.
-   {
-      %obj.UpdateHealth();
-      %this.schedule(250, doHealthUpdate, %obj);
-      %obj.healthTimer++;
-   }
-   else
-      %obj.healthTimer = 0;
 }
 
 function ShapeBase::tossPatch(%this)
