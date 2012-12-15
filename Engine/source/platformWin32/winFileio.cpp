@@ -29,6 +29,9 @@
 #include "core/strings/unicode.h"
 #include "util/tempAlloc.h"
 #include "core/util/safeDelete.h"
+//MGT: fixes for zip support
+#include "core/volume.h"
+//MGT: end
 
 // Microsoft VC++ has this POSIX header in the wrong directory
 #if defined(TORQUE_COMPILER_VISUALC)
@@ -945,8 +948,12 @@ bool Platform::isFile(const char *pFilePath)
    HANDLE handle = FindFirstFile(buf, &findData);
    FindClose(handle);
 
-   if(handle == INVALID_HANDLE_VALUE)
-      return false;
+   if(handle == INVALID_HANDLE_VALUE) {
+    
+	   //MGT: since file does not exist on disk lets see if it exists in a zip file loaded
+	   return Torque::FS::IsFile(pFilePath);
+	   //MGT: end
+   }
 
    // if the file is a Directory, Offline, System or Temporary then FALSE
    if (findData.dwFileAttributes &
