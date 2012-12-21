@@ -79,12 +79,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="{foreach item=def from=$projLibs}{$def} {/foreach}"
+				AdditionalDependencies="{foreach item=def from=$projLibsDebug}{$def} {/foreach}"
 				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_DEBUG.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD"
+				IgnoreDefaultLibraryNames="LIBC,LIBCD{foreach item=def from=$projLibsIgnore},{$def}{/foreach}"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_DEBUG.pdb"
 				SubSystem="{$projSubSystem}"
@@ -182,12 +182,12 @@
 			/>
          <Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="{foreach item=def from=$projLibs}{$def} {/foreach}"
+				AdditionalDependencies="{foreach item=def from=$projLibsDebug}{$def} {/foreach}"
 				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_OPTIMIZEDDEBUG.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD"
+				IgnoreDefaultLibraryNames="LIBC,LIBCD{foreach item=def from=$projLibsIgnore},{$def}{/foreach}"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_OPTIMIZEDDEBUG.pdb"
 				SubSystem="{$projSubSystem}"
@@ -290,7 +290,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC{foreach item=def from=$projLibsIgnore},{$def}{/foreach}"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="{$projSubSystem}"

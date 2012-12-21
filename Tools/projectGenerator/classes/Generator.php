@@ -255,10 +255,16 @@ class Generator
         array_push( self::$project_cur->lib_dirs, $dir );
     }
     
-    static function addProjectLibInput( $lib )
+    static function addProjectLibInput( $lib, $libDebug = null )
     {
         array_push( self::$project_cur->libs, $lib );
+		array_push( self::$project_cur->libsDebug, $libDebug != null ? $libDebug : $lib );
     }
+	
+	static function addProjectIgnoreDefaultLib( $lib )
+	{
+		array_push( self::$project_cur->libsIgnore, $lib );
+	}
     
     static function includeLib( $lib )
     {
