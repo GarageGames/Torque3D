@@ -305,9 +305,14 @@ function addProjectLibDir( $dir )
     Generator::addProjectLibDir( $dir );
 }
 
-function addProjectLibInput( $lib_name )
+function addProjectLibInput( $lib_name, $libDebug = null )
 {
-    Generator::addProjectLibInput( $lib_name );
+    Generator::addProjectLibInput( $lib_name, $libDebug );
+}
+
+function addProjectIgnoreDefaultLib( $lib )
+{
+	Generator::addProjectIgnoreDefaultLib( $lib );
 }
 
 function addProjectDependency( $pd )
