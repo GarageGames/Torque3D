@@ -95,11 +95,11 @@
       <AdditionalIncludeDirectories>{foreach item=def from=$projIncludes}{$def};{/foreach}%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>{foreach item=def from=$projLibs}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>{foreach item=def from=$projLibsDebug}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir){$projOutName}_DEBUG.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>{if $projSubSystem == 1}Console{else}Windows{/if}</SubSystem>
@@ -146,11 +146,11 @@
       <AdditionalIncludeDirectories>{foreach item=def from=$projIncludes}{$def};{/foreach}%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>{foreach item=def from=$projLibs}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>{foreach item=def from=$projLibsDebug}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir){$projOutName}_OPTIMIZEDDEBUG.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>{if $projSubSystem == 1}Console{else}Windows{/if}</SubSystem>
@@ -201,7 +201,7 @@
       <OutputFile>$(OutDir){$projOutName}.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>{if $projSubSystem == 1}Console{else}Windows{/if}</SubSystem>
