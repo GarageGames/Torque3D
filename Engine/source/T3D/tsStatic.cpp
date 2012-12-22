@@ -1121,7 +1121,9 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
    newMat->mMapTo = mapTo;
 
    // Map the material in the in the matmgr
-   MATMGR->mapMaterial( mapTo, newMat->mMapTo );
+   //MATMGR->mapMaterial( mapTo, newMat->mMapTo );
+   // DS - mapping material name not mapping type.
+   MATMGR->mapMaterial( mapTo, newMat->getName());
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
