@@ -66,7 +66,8 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
    switch ( GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType ) )
    {
       // [rene, 12/09/2008] why do we turn a gamepad into a joystick here?
-
+	  
+      case DI8DEVTYPE_DRIVING:
       case DI8DEVTYPE_GAMEPAD:
       case DI8DEVTYPE_JOYSTICK:
          deviceTypeName    = "joystick";
