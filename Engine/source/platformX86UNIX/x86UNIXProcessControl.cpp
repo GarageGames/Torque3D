@@ -80,11 +80,10 @@ void Cleanup(bool minimal)
    }
 
    StdConsole::destroy();
-//MGT: removed SDL from dedicated
+
 #ifndef TORQUE_DEDICATED   
    SDL_Quit();
 #endif
-//MGT: end
 }
 
 //-----------------------------------------------------------------------------
