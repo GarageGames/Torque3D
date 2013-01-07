@@ -141,7 +141,7 @@ ConsoleMethod( TerrainBlock, exportHeightMap, bool, 3, 4, "(string filename, [st
    UTF8 fileName[1024];
    String format = "png";
    if( argc > 3 )
-      format = argv[ 3 ];
+      format = (const char*)argv[ 3 ];
 
    Con::expandScriptFilename( fileName, sizeof( fileName ), argv[2] );
 
@@ -153,7 +153,7 @@ ConsoleMethod( TerrainBlock, exportLayerMaps, bool, 3, 4, "(string filePrefix, [
    UTF8 filePrefix[1024];
    String format = "png";
    if( argc > 3 )
-      format = argv[3];
+      format = (const char*)argv[3];
 
    Con::expandScriptFilename( filePrefix, sizeof( filePrefix ), argv[2] );
 

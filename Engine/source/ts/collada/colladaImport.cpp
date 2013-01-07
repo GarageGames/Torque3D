@@ -139,13 +139,13 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
    GuiTreeViewCtrl* tree;
    if (!Sim::findObject(argv[2], tree))
    {
-      Con::errorf("enumColladaScene::Could not find GuiTreeViewCtrl '%s'", argv[2]);
+      Con::errorf("enumColladaScene::Could not find GuiTreeViewCtrl '%s'", (const char*)argv[2]);
       return false;
    }
 
    // Check if a cached DTS is available => no need to import the collada file
    // if we can load the DTS instead
-   Torque::Path path(argv[1]);
+   Torque::Path path((const char*)argv[1]);
    if (ColladaShapeLoader::canLoadCachedDTS(path))
       return false;
 

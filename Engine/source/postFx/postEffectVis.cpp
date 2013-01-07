@@ -400,7 +400,7 @@ ConsoleStaticMethod( PfxVis, open, void, 2, 3, "( PostEffect, [bool clear = fals
    PostEffect *pfx;
    if ( !Sim::findObject( argv[1], pfx ) )
    {
-      Con::errorf( "PfxVis::add, argument %s was not a PostEffect", argv[1] );
+      Con::errorf( "PfxVis::add, argument %s was not a PostEffect", (const char*)argv[1] );
       return;
    }
 
@@ -450,7 +450,7 @@ ConsoleStaticMethod( PfxVis, onWindowClosed, void, 2, 2, "( GuiWindowCtrl )"
    GuiWindowCtrl *ctrl;
    if ( !Sim::findObject( argv[1], ctrl ) )
    {
-      Con::errorf( "PfxVis::onWindowClosed, argument %s was not a GuiWindowCtrl", argv[1] );
+      Con::errorf( "PfxVis::onWindowClosed, argument %s was not a GuiWindowCtrl", (const char*)argv[1] );
       return;
    }
 

@@ -214,7 +214,7 @@ class SimSet: public SimObject
       
       /// @}
 
-      void callOnChildren( const String &method, S32 argc, const char *argv[], bool executeOnChildGroups = true );
+      void callOnChildren( const String &method, S32 argc, ConsoleValueRef argv[], bool executeOnChildGroups = true );
 
       /// Return the number of objects in this set as well as all sets that are contained
       /// in this set and its children.
@@ -434,7 +434,7 @@ class SimGroup: public SimSet
       virtual SimObject* findObject(const char* name);
       virtual void onRemove();
 
-      virtual bool processArguments( S32 argc, const char** argv );
+      virtual bool processArguments( S32 argc, ConsoleValueRef *argv );
 
       DECLARE_CONOBJECT( SimGroup );
 };

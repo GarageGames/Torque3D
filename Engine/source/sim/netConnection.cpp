@@ -433,6 +433,9 @@ NetConnection::NetConnection()
 
    // Disable starting a new journal recording or playback from here on
    Journal::Disable();
+
+   // Ensure NetAddress is cleared
+   dMemset(&mNetAddress, '\0', sizeof(NetAddress));
 }
 
 NetConnection::~NetConnection()

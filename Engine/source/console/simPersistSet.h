@@ -58,7 +58,7 @@ class SimPersistSet : public SimSet
       // SimSet.
       virtual void addObject( SimObject* );
       virtual void write( Stream &stream, U32 tabStop, U32 flags = 0 );
-      virtual bool processArguments( S32 argc, const char** argv );
+      virtual bool processArguments( S32 argc, ConsoleValueRef *argv );
       
       DECLARE_CONOBJECT( SimPersistSet );
       DECLARE_CATEGORY( "Console" );

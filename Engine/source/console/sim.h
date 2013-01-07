@@ -32,6 +32,9 @@
 #ifndef _MODULE_H_
 #include "core/module.h"
 #endif
+#ifndef _CONSOLE_H_
+#include "console/console.h"
+#endif
 
 // Forward Refs
 class SimSet;
@@ -122,9 +125,15 @@ namespace Sim
    SimDataBlockGroup *getDataBlockGroup();
    SimGroup* getRootGroup();
 
+   SimObject* findObject(ConsoleValueRef&);
    SimObject* findObject(SimObjectId);
    SimObject* findObject(const char* name);
    SimObject* findObject(const char* fileName, S32 declarationLine);
+   template<class T> inline bool findObject(ConsoleValueRef &ref,T*&t)
+   {
+      t = dynamic_cast<T*>(findObject(ref));
+      return t != NULL;
+   }
    template<class T> inline bool findObject(SimObjectId iD,T*&t)
    {
       t = dynamic_cast<T*>(findObject(iD));

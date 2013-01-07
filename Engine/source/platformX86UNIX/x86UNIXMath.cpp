@@ -70,7 +70,7 @@ ConsoleFunction( MathInit, void, 1, 10, "(detect|C|FPU|MMX|3DNOW|SSE|...)")
          properties |= CPU_PROP_SSE;
          continue;
       }
-      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", *argv);
+      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", (const char*)argv[0]);
    }
    Math::init(properties);
 }
