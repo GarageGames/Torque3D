@@ -278,7 +278,7 @@ inline F32 mEaseOutElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
 	F32 s;
 	if (a < mFabs(c)) { a=c; s=p/4; }
 	else s = p/(2*M_PI_F) * mAsin (c/a);
-	return a*mPow(2,-10*t) * mAsin( (t*d-s)*(2*M_PI_F)/p ) + c + b;
+	return a*mPow(2,-10*t) * mSin( (t*d-s)*(2*M_PI_F)/p ) + c + b;
 };
 
 inline F32 mEaseInOutElastic(F32 t, F32 b, F32 c, F32 d, F32 a, F32 p) {
