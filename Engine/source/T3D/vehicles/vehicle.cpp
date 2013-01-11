@@ -172,6 +172,10 @@ VehicleData::VehicleData()
    jetEnergyDrain =  0.8f;
    minJetEnergy = 1;
 
+   steeringReturn = 0.0f;
+   steeringReturnSpeedScale = 0.01f;
+   powerSteering = false;
+
    for (S32 i = 0; i < Body::MaxSounds; i++)
       body.sound[i] = 0;
 
@@ -292,6 +296,10 @@ void VehicleData::packData(BitStream* stream)
    stream->write(jetEnergyDrain);
    stream->write(minJetEnergy);
 
+   stream->write(steeringReturn);
+   stream->write(steeringReturnSpeedScale);
+   stream->writeFlag(powerSteering);
+
    stream->writeFlag(cameraRoll);
    stream->write(cameraLag);
    stream->write(cameraDecay);
@@ -384,6 +392,10 @@ void VehicleData::unpackData(BitStream* stream)
    stream->read(&jetEnergyDrain);
    stream->read(&minJetEnergy);
 
+   stream->read(&steeringReturn);
+   stream->read(&steeringReturnSpeedScale);
+   powerSteering = stream->readFlag();
+
    cameraRoll = stream->readFlag();
    stream->read(&cameraLag);
    stream->read(&cameraDecay);
@@ -461,6 +473,13 @@ void VehicleData::initPersistFields()
       "Once the vehicle's energy level reaches 0, it will no longer be able to jet." );
    addField( "minJetEnergy", TypeF32, Offset(minJetEnergy, VehicleData),
       "Minimum vehicle energy level to begin jetting." );
+
+   addField( "steeringReturn", TypeF32, Offset(steeringReturn, VehicleData),
+      "Rate at which the vehicle's steering returns to forwards when it is moving." );
+   addField( "steeringReturnSpeedScale", TypeF32, Offset(steeringReturnSpeedScale, VehicleData),
+      "Amount of effect the vehicle's speed has on its rate of steering return." );
+   addField( "powerSteering", TypeBool, Offset(powerSteering, VehicleData),
+      "If true, steering does not auto-centre while the vehicle is being steered by its driver." );
 
    addField( "massCenter", TypePoint3F, Offset(massCenter, VehicleData),
       "Defines the vehicle's center of mass (offset from the origin of the model)." );
@@ -1083,6 +1102,22 @@ void Vehicle::updateMove(const Move* move)
    else {
       mSteering.x = 0;
       mSteering.y = 0;
+   }
+
+   // Steering return
+   if(mDataBlock->steeringReturn > 0.0f &&
+      (!mDataBlock->powerSteering || (move->yaw == 0.0f && move->pitch == 0.0f)))
+   {
+      Point2F returnAmount(mSteering.x * mDataBlock->steeringReturn * TickSec,
+                           mSteering.y * mDataBlock->steeringReturn * TickSec);
+      if(mDataBlock->steeringReturnSpeedScale > 0.0f)
+      {
+         Point3F vel;
+         mWorldToObj.mulV(getVelocity(), &vel);
+         returnAmount += Point2F(mSteering.x * vel.y * mDataBlock->steeringReturnSpeedScale * TickSec,
+                                 mSteering.y * vel.y * mDataBlock->steeringReturnSpeedScale * TickSec);
+      }
+      mSteering -= returnAmount;
    }
 
    // Jetting flag
