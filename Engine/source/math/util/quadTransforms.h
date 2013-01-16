@@ -50,7 +50,8 @@ public:
                   const Point2F &p01 );
 
    /// Transforms the point.
-   Point2F transform( const Point2F &p ) const;
+   //Point2F transform( const Point2F &p ) const;
+   Point2F transform( const Point2F &p );
 
 protected:
 
@@ -59,7 +60,6 @@ protected:
    Point2F m_kP00, m_kB, m_kC, m_kD;
 
    F32 m_fBC, m_fBD, m_fCD;
-
 };
 
 
