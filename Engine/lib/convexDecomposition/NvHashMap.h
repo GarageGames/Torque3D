@@ -1,10 +1,3 @@
-/*
-
-NvHashMap.h : A simple hash map and array template class to avoid introducing dependencies on the STL for containers.
-
-*/
-
-
 // This code contains NVIDIA Confidential Information and is disclosed
 // under the Mutual Non-Disclosure Agreement.
 //
@@ -24,23 +17,20 @@ NvHashMap.h : A simple hash map and array template class to avoid introducing de
 // components in life support devices or systems without express written approval of
 // NVIDIA Corporation.
 //
-// Copyright ï¿½ 2009 NVIDIA Corporation. All rights reserved.
-// Copyright ï¿½ 2002-2008 AGEIA Technologies, Inc. All rights reserved.
-// Copyright ï¿½ 2001-2006 NovodeX. All rights reserved.
+// Copyright © 2009 NVIDIA Corporation. All rights reserved.
+// Copyright © 2002-2008 AGEIA Technologies, Inc. All rights reserved.
+// Copyright © 2001-2006 NovodeX. All rights reserved.
 
 #ifndef NV_HASH_MAP_H
 #define NV_HASH_MAP_H
 
 #include "NvUserMemAlloc.h"
-
+#include <string.h>
 #if (defined(NX_WINDOWS) | defined(NX_X360))
 #include <typeinfo.h>
 #endif
-
 #include <new>
-#include <typeinfo>
 #include <stdlib.h>
-#include <string.h>
 //******************************************************
 //******************************************************
 //******************************************************
@@ -1247,10 +1237,6 @@ namespace CONVEX_DECOMPOSITION
 #ifndef NV_FOUNDATION_HASHFUNCTION_H
 #define NV_FOUNDATION_HASHFUNCTION_H
 
-/*!
-Central definition of hash functions
-*/
-
 namespace CONVEX_DECOMPOSITION
 {
 	// Hash functions
@@ -1436,7 +1422,7 @@ namespace CONVEX_DECOMPOSITION
 			return !strcmp(string0, string1);
 		}
 	};
-}
+} // end of namespace
 
 #endif
 
@@ -1450,6 +1436,7 @@ namespace CONVEX_DECOMPOSITION
 
 namespace CONVEX_DECOMPOSITION
 {
+
 	namespace Internal
 	{
 		template <class Entry,
@@ -1465,12 +1452,12 @@ namespace CONVEX_DECOMPOSITION
 
 			HashBase(NxU32 initialTableSize = 64, float loadFactor = 0.75f):
 			mLoadFactor(loadFactor),
-				mFreeList((NxU32)EOL),
+				mFreeList(EOL),
 				mTimestamp(0),
 				mSize(0),
-				mEntries(Allocator(NV_DEBUG_EXP("hashBaseEntries"))),
-				mNext(Allocator(NV_DEBUG_EXP("hashBaseNext"))),
-				mHash(Allocator(NV_DEBUG_EXP("hashBaseHash")))
+				mEntries(),
+				mNext(),
+				mHash()
 			{
 				if(initialTableSize)
 					reserveInternal(initialTableSize);
@@ -1485,15 +1472,14 @@ namespace CONVEX_DECOMPOSITION
 				}
 			}
 
-			static const int EOL = 0xffffffff;
+			static const NxU32 EOL = 0xffffffff;
 
-			NX_INLINE Entry *create(const Key &k, bool &exists)
+			NX_INLINE Entry* create(const Key& k, bool& exists)
 			{
-				NxU32 h=0;
+				NxU32 n = HashFn()(k);
 				if(mHash.size())
 				{
-					h = hash(k);
-					NxU32 index = mHash[h];
+					NxU32 index = mHash[n&(mHash.size()-1)];
 					while(index!=EOL && !HashFn()(GetKey()(mEntries[index]), k))
 						index = mNext[index];
 					exists = index!=EOL;
@@ -1502,13 +1488,11 @@ namespace CONVEX_DECOMPOSITION
 				}
 
 				if(freeListEmpty())
-				{
 					grow();
-					h = hash(k);
-				}
 
 				NxU32 entryIndex = freeListGetNext();
 
+				NxU32 h = n&(mHash.size()-1);
 				mNext[entryIndex] = mHash[h];
 				mHash[h] = entryIndex;
 
@@ -1518,7 +1502,7 @@ namespace CONVEX_DECOMPOSITION
 				return &mEntries[entryIndex];
 			}
 
-			NX_INLINE const Entry *find(const Key &k) const
+			NX_INLINE const Entry* find(const Key& k) const
 			{
 				if(!mHash.size())
 					return false;
@@ -1530,13 +1514,13 @@ namespace CONVEX_DECOMPOSITION
 				return index != EOL ? &mEntries[index]:0;
 			}
 
-			NX_INLINE bool erase(const Key &k)
+			NX_INLINE bool erase(const Key& k)
 			{
 				if(!mHash.size())
 					return false;
 
 				NxU32 h = hash(k);
-				NxU32 *ptr = &mHash[h];
+				NxU32* ptr = &mHash[h];
 				while(*ptr!=EOL && !HashFn()(GetKey()(mEntries[*ptr]), k))
 					ptr = &mNext[*ptr];
 
@@ -1570,10 +1554,10 @@ namespace CONVEX_DECOMPOSITION
 					return;
 
 				for(NxU32 i = 0;i<mHash.size();i++)
-					mHash[i] = (NxU32)EOL;
+					mHash[i] = EOL;
 				for(NxU32 i = 0;i<mEntries.size()-1;i++)
 					mNext[i] = i+1;
-				mNext[mEntries.size()-1] = (NxU32)EOL;
+				mNext[mEntries.size()-1] = EOL;
 				mFreeList = 0;
 				mSize = 0;
 			}
@@ -1584,7 +1568,7 @@ namespace CONVEX_DECOMPOSITION
 					reserveInternal(size);
 			}
 
-			NX_INLINE const Entry *getEntries() const
+			NX_INLINE const Entry* getEntries() const
 			{
 				return &mEntries[0];
 			}
@@ -1615,7 +1599,7 @@ namespace CONVEX_DECOMPOSITION
 				{
 					for(NxU32 i = start; i<end-1; i++)	// add the new entries to the free list
 						mNext[i] = i+1;
-					mNext[end-1] = (NxU32)EOL;
+					mNext[end-1] = EOL;
 				}
 				mFreeList = start;
 			}
@@ -1658,7 +1642,7 @@ namespace CONVEX_DECOMPOSITION
 			}
 
 
-			NX_INLINE NxU32 hash(const Key &k) const
+			NX_INLINE NxU32 hash(const Key& k) const
 			{
 				return HashFn()(k)&(mHash.size()-1);
 			}
@@ -1669,7 +1653,7 @@ namespace CONVEX_DECOMPOSITION
 				// resize the hash and reset
 				mHash.resize(size);
 				for(NxU32 i=0;i<mHash.size();i++)
-					mHash[i] = (NxU32)EOL;
+					mHash[i] = EOL;
 
 				NX_ASSERT(!(mHash.size()&(mHash.size()-1)));
 
@@ -1713,7 +1697,7 @@ namespace CONVEX_DECOMPOSITION
 			class Iter
 			{
 			public:
-				NX_INLINE Iter(HashBase &b): mBase(b), mTimestamp(b.mTimestamp), mBucket(0), mEntry((NxU32)b.EOL)
+				NX_INLINE Iter(HashBase& b): mBase(b), mTimestamp(b.mTimestamp), mBucket(0), mEntry(b.EOL)
 				{
 					if(mBase.mEntries.size()>0)
 					{
@@ -1755,7 +1739,7 @@ namespace CONVEX_DECOMPOSITION
 		class HashSetBase
 		{ 
 		public:
-			struct GetKey { NX_INLINE const Key &operator()(const Key &e) {	return e; }	};
+			struct GetKey { NX_INLINE const Key& operator()(const Key& e) {	return e; }	};
 
 			typedef HashBase<Key, Key, HashFn, GetKey, Allocator, Coalesced> BaseMap;
 			typedef typename BaseMap::Iter Iterator;
@@ -1763,7 +1747,7 @@ namespace CONVEX_DECOMPOSITION
 			HashSetBase(NxU32 initialTableSize = 64, 
 						float loadFactor = 0.75f):	mBase(initialTableSize,loadFactor)	{}
 
-			bool insert(const Key &k)
+			bool insert(const Key& k)
 			{
 				bool exists;
 				Key *e = mBase.create(k,exists);
@@ -1772,8 +1756,8 @@ namespace CONVEX_DECOMPOSITION
 				return !exists;
 			}
 
-			NX_INLINE bool		contains(const Key &k)	const	{	return mBase.find(k)!=0;		}
-			NX_INLINE bool		erase(const Key &k)				{	return mBase.erase(k);			}
+			NX_INLINE bool		contains(const Key& k)	const	{	return mBase.find(k)!=0;		}
+			NX_INLINE bool		erase(const Key& k)				{	return mBase.erase(k);			}
 			NX_INLINE NxU32		size()					const	{	return mBase.size();			}
 			NX_INLINE void		reserve(NxU32 size)				{	mBase.reserve(size);			}
 			NX_INLINE void		clear()							{	mBase.clear();					}
@@ -1791,13 +1775,13 @@ namespace CONVEX_DECOMPOSITION
 		{ 
 		public:
 			typedef Pair<const Key,Value> Entry;
-			struct GetKey { NX_INLINE const Key &operator()(const Entry &e) {	return e.first; }	};
+			struct GetKey { NX_INLINE const Key& operator()(const Entry& e) {	return e.first; }	};
 			typedef HashBase<Pair<const Key,Value>, Key, HashFn, GetKey, Allocator, true> BaseMap;
 			typedef typename BaseMap::Iter Iterator;
 
 			HashMapBase(NxU32 initialTableSize = 64, float loadFactor = 0.75f):	mBase(initialTableSize,loadFactor)	{}
 
-			bool insert(const Key &k, const Value &v)
+			bool insert(const Key& k, const Value& v)
 			{
 				bool exists;
 				Entry *e = mBase.create(k,exists);
@@ -1806,18 +1790,18 @@ namespace CONVEX_DECOMPOSITION
 				return !exists;
 			}
 
-			Value &operator [](const Key &k)
+			Value& operator [](const Key& k)
 			{
 				bool exists;
-				Entry *e = mBase.create(k, exists);
+				Entry* e = mBase.create(k, exists);
 				if(!exists)
 					new(e)Entry(k,Value());
 		
 				return e->second;
 			}
 
-			NX_INLINE const Entry *	find(const Key &k)		const	{	return mBase.find(k);			}
-			NX_INLINE bool			erase(const Key &k)				{	return mBase.erase(k);			}
+			NX_INLINE const Entry*	find(const Key& k)		const	{	return mBase.find(k);			}
+			NX_INLINE bool			erase(const Key& k)				{	return mBase.erase(k);			}
 			NX_INLINE NxU32			size()					const	{	return mBase.size();			}
 			NX_INLINE Iterator		getIterator()					{	return Iterator(mBase);			}
 			NX_INLINE void			reserve(NxU32 size)				{	mBase.reserve(size);			}
@@ -1828,7 +1812,8 @@ namespace CONVEX_DECOMPOSITION
 		};
 
 	}
-}
+
+} // end of namespace
 
 #pragma warning(pop)
 
@@ -1837,19 +1822,18 @@ namespace CONVEX_DECOMPOSITION
 #ifndef NV_FOUNDATION_HASHMAP
 #define NV_FOUNDATION_HASHMAP
 
-
 // TODO: make this doxy-format
 //
 // This header defines two hash maps. Hash maps
 // * support custom initial table sizes (rounded up internally to power-of-2)
 // * support custom static allocator objects
-// * auto-resize, based on a load factor (i.e. a 64-entry .75 load factor hash will resize 
+// * auto-resize, based on a load factor (i.e. a 64-entry .75 load factor hash will resize
 //                                        when the 49th element is inserted)
 // * are based on open hashing
 // * have O(1) contains, erase
 //
 // Maps have STL-like copying semantics, and properly initialize and destruct copies of objects
-// 
+//
 // There are two forms of map: coalesced and uncoalesced. Coalesced maps keep the entries in the
 // initial segment of an array, so are fast to iterate over; however deletion is approximately
 // twice as expensive.
@@ -1861,7 +1845,7 @@ namespace CONVEX_DECOMPOSITION
 //		bool			erase(const T &k);						O(1)
 //		NxU32			size();									constant
 //		void			reserve(NxU32 size);					O(MAX(currentOccupancy,size))
-//		void			clear();								O(currentOccupancy) (with zero constant for objects without destructors) 
+//		void			clear();								O(currentOccupancy) (with zero constant for objects without destructors)
 //      Iterator		getIterator();
 //
 // operator[] creates an entry if one does not exist, initializing with the default constructor.
@@ -1869,15 +1853,17 @@ namespace CONVEX_DECOMPOSITION
 // 		const Key *getEntries();
 //
 // Use of iterators:
-// 
+//
 // for(HashMap::Iterator iter = test.getIterator(); !iter.done(); ++iter)
 //			myFunction(iter->first, iter->second);
 
+
 namespace CONVEX_DECOMPOSITION
 {
+
 	template <class Key,
 			  class Value,
-			  class HashFn = Hash<Key>,
+			  class HashFn = Hash<Key>, 
 			  class Allocator = Allocator >
 	class HashMap: public Internal::HashMapBase<Key, Value, HashFn, Allocator>
 	{
@@ -1902,7 +1888,9 @@ namespace CONVEX_DECOMPOSITION
 		const Key *getEntries() const { return HashMapBase::mBase.getEntries(); }
 	};
 
-}
+
+} // end of namespace
+
 #endif
 
 #endif

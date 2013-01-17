@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library Project Template -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Debug|Win32">
+      <Configuration>Optimized Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C0B7BA09-E125-412E-86B0-2D89DB971CAB}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">opcode_DEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">opcode_OPTIMIZEDDEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">opcode</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/opcode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_OPCODE;ICE_NO_DLL;TORQUE_OPCODE;ICE_NO_DLL;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_DEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_DEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>      
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)opcode_DEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/opcode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_OPCODE;ICE_NO_DLL;TORQUE_OPCODE;ICE_NO_DLL;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)opcode_OPTIMIZEDDEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/opcode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_OPCODE;ICE_NO_DLL;TORQUE_OPCODE;ICE_NO_DLL;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)/opcode.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+
+               
+               
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Opcode.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Opcode.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBTree.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBTree.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_BaseModel.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_BaseModel.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_BoxBoxOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_BoxPruning.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_BoxPruning.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Collider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Collider.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Common.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Common.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_HybridModel.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_HybridModel.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_IceHook.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSAABBOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSTriOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_MeshInterface.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_MeshInterface.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Model.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Model.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_OBBCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_OBBCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_OptimizedTree.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_OptimizedTree.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Picking.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Picking.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesAABBOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesTriOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayAABBOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayTriOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Settings.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereAABBOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereTriOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_SweepAndPrune.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SweepAndPrune.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeBuilders.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeBuilders.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeCollider.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TriBoxOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TriTriOverlap.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_VolumeCollider.cpp" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_VolumeCollider.h" />      
+			         
+			      
+   
+      
+               
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceAABB.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceAABB.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceAxes.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceBoundingSphere.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceContainer.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceContainer.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceFPU.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceHPoint.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceHPoint.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceIndexedTriangle.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceIndexedTriangle.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceLSS.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix3x3.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix3x3.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix4x4.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix4x4.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMemoryMacros.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceOBB.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceOBB.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePairs.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePlane.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePlane.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePoint.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePoint.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePreprocessor.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRandom.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRandom.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRay.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRay.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRevisitedRadix.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRevisitedRadix.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceSegment.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceSegment.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTriangle.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTriangle.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTriList.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTypes.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceUtils.cpp" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceUtils.h" />      
+				         
+				      
+   
+      
+      
+      
+  </ItemGroup>
+  <ItemGroup>
+    </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

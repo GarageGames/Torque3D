@@ -5128,7 +5128,10 @@ DefineEngineMethod( ShapeBase, changeMaterial, void, ( const char* mapTo, Materi
    newMat->mMapTo = mapTo;
 
    // Map the material in the in the matmgr
-   MATMGR->mapMaterial( mapTo, newMat->mMapTo );
+   //MATMGR->mapMaterial( mapTo, newMat->mMapTo );
+   // DS - mapping material name not mapping type.
+   MATMGR->mapMaterial( mapTo, newMat->getName());
+
 
    // Replace instances with the new material being traded in. For ShapeBase
    // class we have to update the server/client objects separately so both

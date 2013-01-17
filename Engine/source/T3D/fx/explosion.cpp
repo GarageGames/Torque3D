@@ -151,7 +151,7 @@ DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMa
 
    SceneObject* sceneObject = NULL;
    if (Sim::findObject(id, sceneObject) == false) {
-      Con::warnf(ConsoleLogEntry::General, "calcExplosionCoverage: couldn't find object: %s", id);
+      Con::warnf(ConsoleLogEntry::General, "calcExplosionCoverage: couldn't find object: %d", id);
       return 1.0f;
    }
    if (sceneObject->isClientObject() || sceneObject->getContainer() == NULL) {

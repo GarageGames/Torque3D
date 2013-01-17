@@ -57,11 +57,7 @@ NvSimpleTypes.h : Defines basic data types for integers and floats.
 
 */
 
-#ifdef __APPLE__
-   #include <sys/malloc.h>
-#else
-   #include <malloc.h>
-#endif
+#include <malloc.h>
 #include <assert.h>
 
 #if defined(__APPLE__) || defined(__CELLOS_LV2__) || defined(LINUX)

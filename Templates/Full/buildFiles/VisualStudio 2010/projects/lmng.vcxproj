@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library Project Template -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Debug|Win32">
+      <Configuration>Optimized Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{73D9048F-55AA-4EF6-BF33-3A811DC47FCE}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">lmng_DEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">lmng_OPTIMIZEDDEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">lmng</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/lmng;../../../../../Engine/lib/lpng;../../../../../Engine/lib/zlib;../../../../../Engine/lib/ljpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MNG_OPTIMIZE_OBJCLEANUP;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_DEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_DEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>      
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)lmng_DEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/lmng;../../../../../Engine/lib/lpng;../../../../../Engine/lib/zlib;../../../../../Engine/lib/ljpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MNG_OPTIMIZE_OBJCLEANUP;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)lmng_OPTIMIZEDDEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/lmng;../../../../../Engine/lib/lpng;../../../../../Engine/lib/zlib;../../../../../Engine/lib/ljpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MNG_OPTIMIZE_OBJCLEANUP;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)/lmng.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+
+               
+               
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_callback_xs.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunks.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_descr.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_descr.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_io.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_io.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_prc.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_prc.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_chunk_xs.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_cms.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_cms.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_conf.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_data.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_display.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_display.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_dither.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_dither.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_error.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_error.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_filter.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_filter.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_hlapi.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_jpeg.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_jpeg.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_memory.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_objects.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_object_prc.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_object_prc.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_pixels.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_pixels.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_prop_xs.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_read.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_read.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_trace.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_trace.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_types.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_write.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_write.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\lmng\libmng_zlib.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\lmng\libmng_zlib.h" />      
+			         
+			      
+   
+      
+      
+  </ItemGroup>
+  <ItemGroup>
+    </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

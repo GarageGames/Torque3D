@@ -413,6 +413,9 @@ void GuiMaterialPreview::renderWorld(const RectI &updateRect)
 	  */
    }
 
+   // DS - Set ambient light explicitely for the preview otherwise it would get overwrittten by other calls of setSpecialLight;
+   state.setAmbientLightColor(mFakeSun->getAmbient());
+
    renderPass->renderPass( &state );
 
    gClientSceneGraph->setFogData( savedFogData );         // restore fog setting

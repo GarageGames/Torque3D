@@ -34,9 +34,9 @@
 #define APPLE
 #endif
 
-#include "convexDecomp/NvFloatMath.h"
-#include "convexDecomp/NvConvexDecomposition.h"
-#include "convexDecomp/NvStanHull.h"
+#include "convexDecomposition/NvFloatMath.h"
+#include "convexDecomposition/NvConvexDecomposition.h"
+#include "convexDecomposition/NvStanHull.h"
 
 //-----------------------------------------------------------------------------
 static const Point3F sFacePlanes[] = {

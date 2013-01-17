@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library Project Template -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Debug|Win32">
+      <Configuration>Optimized Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B0B6B74B-2045-43B0-85BF-A24BF2D25155}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">libtheora_DEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">libtheora_OPTIMIZEDDEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libtheora</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/libtheora/include;../../../../../Engine/lib/libogg/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_DEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_DEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>      
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)libtheora_DEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/libtheora/include;../../../../../Engine/lib/libogg/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)libtheora_OPTIMIZEDDEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/libtheora/include;../../../../../Engine/lib/libogg/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)/libtheora.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+
+               
+               
+               
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\include\theora\codec.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\include\theora\theora.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\include\theora\theoradec.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\include\theora\theoraenc.h" />      
+				         
+				      
+   
+      
+      
+               
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\cpu.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\cpu.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\internal.h" />      
+				         
+				      
+   
+      
+               
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\apiwrapper.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\apiwrapper.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\bitpack.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\bitpack.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\dct.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\decapiwrapper.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\decinfo.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\decint.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\decode.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\dequant.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\dequant.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\fragment.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\huffdec.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\huffdec.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\huffman.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\idct.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\idct.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\info.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\internal.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\ocintrin.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\quant.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\quant.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\state.c" />      
+					         
+					      
+   
+      
+               
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\x86_vc\mmxfrag.c" />      
+						         
+						      
+   
+      
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\x86_vc\mmxidct.c" />      
+						         
+						      
+   
+      
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\x86_vc\mmxloopfilter.c" />      
+						         
+						      
+   
+      
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\x86_vc\mmxstate.c" />      
+						         
+						      
+   
+      
+               						                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\x86_vc\x86int.h" />      
+						         
+						      
+   
+      
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\dec\x86_vc\x86state.c" />      
+						         
+						      
+   
+      
+      
+      
+               
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\blockmap.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\block_inline.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\codec_internal.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\dct.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\dct_decode.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\dct_encode.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\dsp.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\dsp.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encapiwrapper.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encode.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encoder_huffman.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encoder_huffman.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encoder_idct.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encoder_lookup.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encoder_quant.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\encoder_toplevel.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\frarray.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\frinit.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\hufftables.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\mcomp.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\misc_common.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\pb.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\pp.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\pp.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\quant_lookup.h" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\reconstruct.c" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\scan.c" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\toplevel_lookup.h" />      
+					         
+					      
+   
+      
+               
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\x86_32_vs\dsp_mmx.c" />      
+						         
+						      
+   
+      
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\x86_32_vs\fdct_mmx.c" />      
+						         
+						      
+   
+      
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\libtheora\lib\enc\x86_32_vs\recon_mmx.c" />      
+						         
+						      
+   
+      
+      
+      
+      
+      
+  </ItemGroup>
+  <ItemGroup>
+    </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

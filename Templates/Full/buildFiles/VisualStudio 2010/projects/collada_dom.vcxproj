@@ -1,0 +1,1224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library Project Template -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Debug|Win32">
+      <Configuration>Optimized Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{25D580F1-2A2C-48EB-89C6-B54CAF4BDC4E}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">collada_dom_DEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">collada_dom_OPTIMIZEDDEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">collada_dom</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/collada/include;../../../../../Engine/lib/collada/include/1.4;../../../../../Engine/lib/pcre;../../../../../Engine/lib/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DOM_INCLUDE_TINYXML;PCRE_STATIC;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_DEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_DEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>      
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)collada_dom_DEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/collada/include;../../../../../Engine/lib/collada/include/1.4;../../../../../Engine/lib/pcre;../../../../../Engine/lib/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DOM_INCLUDE_TINYXML;PCRE_STATIC;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)collada_dom_OPTIMIZEDDEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/collada/include;../../../../../Engine/lib/collada/include/1.4;../../../../../Engine/lib/pcre;../../../../../Engine/lib/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DOM_INCLUDE_TINYXML;PCRE_STATIC;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)/collada_dom.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+
+               
+               
+               
+               
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domAccessor.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domAnimation.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domAnimation_clip.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domAsset.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domBind_material.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domBool_array.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domBox.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCamera.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCapsule.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_connect_param.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_newarray_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_newparam.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_param_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_sampler1D.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_sampler2D.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_sampler3D.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_samplerCUBE.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_samplerDEPTH.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_samplerRECT.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_setarray_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_setparam.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_setparam_simple.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_setuser_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCg_surface_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domChannel.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCOLLADA.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCommon_color_or_texture_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCommon_float_or_param_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCommon_newparam_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCommon_transparent_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domConstants.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domController.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domConvex_mesh.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domCylinder.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domEffect.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domEllipsoid.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domExtra.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFloat_array.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domForce_field.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_annotate_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_annotate_type_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_basic_type_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_clearcolor_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_cleardepth_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_clearstencil_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_code_profile.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_colortarget_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_depthtarget_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_include_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_newparam_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_profile_abstract.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_sampler1D_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_sampler2D_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_sampler3D_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_samplerCUBE_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_samplerDEPTH_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_samplerRECT_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_stenciltarget_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_format_hint_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_init_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_init_cube_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_init_from_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_init_planar_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domFx_surface_init_volume_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGeometry.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_basic_type_common.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_newparam.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_pipeline_settings.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_sampler_state.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texcombiner_argumentAlpha_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texcombiner_argumentRGB_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texcombiner_commandAlpha_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texcombiner_commandRGB_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texcombiner_command_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texenv_command_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texture_constant_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texture_pipeline.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGles_texture_unit.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_newarray_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_newparam.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_param_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_setarray_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_setparam.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_setparam_simple.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGlsl_surface_type.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_hook_abstract.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_pipeline_settings.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_sampler1D.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_sampler2D.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_sampler3D.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_samplerCUBE.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_samplerDEPTH.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domGl_samplerRECT.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domIDREF_array.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domImage.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInputGlobal.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInputLocal.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInputLocalOffset.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstanceWithExtra.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_camera.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_controller.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_effect.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_force_field.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_geometry.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_light.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_material.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_node.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_physics_material.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_physics_model.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_rigid_body.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInstance_rigid_constraint.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domInt_array.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_animations.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_animation_clips.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_cameras.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_controllers.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_effects.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_force_fields.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_geometries.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_images.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_lights.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_materials.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_nodes.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_physics_materials.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_physics_models.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_physics_scenes.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLibrary_visual_scenes.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLight.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLines.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLinestrips.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domLookat.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domMaterial.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domMatrix.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domMesh.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domMorph.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domName_array.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domNode.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domP.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domParam.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domPhysics_material.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domPhysics_model.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domPhysics_scene.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domPlane.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domPolygons.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domPolylist.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domProfile_CG.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domProfile_COMMON.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domProfile_GLES.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domProfile_GLSL.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domRigid_body.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domRigid_constraint.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domRotate.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domSampler.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domScale.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domSkew.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domSkin.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domSource.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domSphere.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domSpline.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTapered_capsule.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTapered_cylinder.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTargetableFloat.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTargetableFloat3.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTechnique.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTranslate.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTriangles.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTrifans.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTristrips.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domTypes.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domVertices.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\1.4\dom\domVisual_scene.cpp" />      
+					         
+					      
+   
+      
+      
+               
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\dae.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeArray.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeAtomicType.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeDatabase.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeDocument.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeDom.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeElement.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeError.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeErrorHandler.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeIDRef.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeIOPluginCommon.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMemorySystem.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaAny.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaAttribute.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaChoice.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaCMPolicy.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaElement.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaElementAttribute.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaGroup.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeMetaSequence.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeRawResolver.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeRefCountedObj.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeSIDResolver.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeStandardURIResolver.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeStringRef.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeStringTable.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeTinyXMLPlugin.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeURI.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\daeUtils.cpp" />      
+					         
+					      
+   
+      
+               					                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\dae\domAny.cpp" />      
+					         
+					      
+   
+      
+      
+               
+               
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\modules\LIBXMLPlugin\daeLIBXMLPlugin.cpp" />      
+						         
+						      
+   
+      
+      
+               
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\modules\STLDatabase\daeSTLDatabase.cpp" />      
+						         
+						      
+   
+      
+      
+               
+               						                     <ClCompile Include="..\..\..\..\..\Engine\lib\collada\src\modules\stdErrPlugin\stdErrPlugin.cpp" />      
+						         
+						      
+   
+      
+      
+      
+      
+      
+  </ItemGroup>
+  <ItemGroup>
+      <ProjectReference Include="pcre.vcxproj">
+      <Project>{910A3F94-E18D-4CB9-87DC-382C75F6B941}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+       <ProjectReference Include="tinyxml.vcxproj">
+      <Project>{470600AC-F51E-4F4E-9406-3B517BF112AC}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+     </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
