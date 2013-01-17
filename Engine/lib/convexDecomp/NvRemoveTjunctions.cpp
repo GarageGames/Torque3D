@@ -58,18 +58,11 @@ NvRemoveTjunctions.cpp : A code snippet to remove tjunctions from a triangle mes
 #pragma warning(disable:4702)
 #pragma warning(disable:4127) //conditional expression is constant (because _HAS_EXCEPTIONS=0)
 #include <vector>
-#ifdef __APPLE__
-   #include <ext/hash_map>
-#else
-   #include <hash_map>
-#endif
+#include <hash_map>
 #include "NvUserMemAlloc.h"
 #include "NvHashMap.h"
 #include "NvRemoveTjunctions.h"
 #include "NvFloatMath.h"
-#ifdef LINUX
-   #include <climits>
-#endif
 
 #pragma warning(disable:4189)
 
