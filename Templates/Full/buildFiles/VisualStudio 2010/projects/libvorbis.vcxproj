@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library Project Template -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Debug|Win32">
+      <Configuration>Optimized Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F8240290-BA36-4696-967F-C2611CEE501A}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">libvorbis_DEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">libvorbis_OPTIMIZEDDEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libvorbis</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/libvorbis/lib;../../../../../Engine/lib/libvorbis/include;../../../../../Engine/lib/libogg/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_DEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_DEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>      
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)libvorbis_DEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/libvorbis/lib;../../../../../Engine/lib/libvorbis/include;../../../../../Engine/lib/libogg/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)libvorbis_OPTIMIZEDDEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/libvorbis/lib;../../../../../Engine/lib/libvorbis/include;../../../../../Engine/lib/libogg/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)/libvorbis.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+
+               
+               
+               
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\include\vorbis\codec.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\include\vorbis\vorbisenc.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\include\vorbis\vorbisfile.h" />      
+				         
+				      
+   
+      
+      
+               
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\analysis.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\backends.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\bitrate.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\bitrate.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\block.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\codebook.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\codebook.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\codec_internal.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\envelope.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\envelope.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\floor0.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\floor1.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\highlevel.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\info.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lookup.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lookup.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lookup_data.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lpc.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lpc.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lsp.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\lsp.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\mapping0.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\masking.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\mdct.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\mdct.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\misc.h" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\os.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\psy.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\psy.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\registry.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\registry.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\res0.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\scales.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\sharedbook.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\smallft.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\smallft.h" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\synthesis.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\vorbisenc.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\vorbisfile.c" />      
+				         
+				      
+   
+      
+               				                     <ClCompile Include="..\..\..\..\..\Engine\lib\libvorbis\lib\window.c" />      
+				         
+				      
+   
+      
+               				                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\window.h" />      
+				         
+				      
+   
+      
+               
+               
+               						                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\books\coupled\res_books_stereo.h" />      
+						         
+						      
+   
+      
+      
+               
+               						                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\books\floor\floor_books.h" />      
+						         
+						      
+   
+      
+      
+               
+               						                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\books\uncoupled\res_books_uncoupled.h" />      
+						         
+						      
+   
+      
+      
+      
+               
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\floor_all.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\psych_11.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\psych_16.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\psych_44.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\psych_8.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\residue_16.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\residue_44.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\residue_44u.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\residue_8.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_11.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_16.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_22.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_32.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_44.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_44u.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_8.h" />      
+					         
+					      
+   
+      
+               					                     <ClInclude Include="..\..\..\..\..\Engine\lib\libvorbis\lib\modes\setup_X.h" />      
+					         
+					      
+   
+      
+      
+      
+      
+  </ItemGroup>
+  <ItemGroup>
+    </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

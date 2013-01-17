@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library Project Template -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Debug|Win32">
+      <Configuration>Optimized Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E2A746EC-8AD3-4D45-AFBB-5A81F705E9BE}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="Torque.Cpp.$(Platform).user.props" Condition="exists('Torque.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ljpeg_DEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">ljpeg_OPTIMIZEDDEBUG</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../../Engine/lib//compiled/$(Configuration).$(Platform)/</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ljpeg</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/ljpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_DEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_DEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>      
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)ljpeg_DEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/ljpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;D3D_DEBUG_INFO;TORQUE_NET_STATS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_OPTIMIZEDDEBUG.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)ljpeg_OPTIMIZEDDEBUG.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../../../../../Engine/lib/ljpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)</AssemblerListingLocation>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4244;4305;4530;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)/ljpeg.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+
+               
+               
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcapimin.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcapistd.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jccoefct.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jccolor.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcdctmgr.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jchuff.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jchuff.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcinit.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcmainct.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcmarker.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcmaster.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcomapi.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jconfig.cw.mac.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jconfig.cw.win.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jconfig.gcc.linux.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jconfig.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jconfig.vc.win.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcparam.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcphuff.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcprepct.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jcsample.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jctrans.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdapimin.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdapistd.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdatadst.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdatasrc.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdcoefct.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdcolor.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jdct.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jddctmgr.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdhuff.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jdhuff.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdinput.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdmainct.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdmarker.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdmaster.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdmerge.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdphuff.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdpostct.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdsample.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jdtrans.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jerror.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jerror.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jfdctflt.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jfdctfst.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jfdctint.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jidctflt.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jidctfst.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jidctint.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jidctred.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jinclude.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jmemmgr.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jmemnobs.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jmemsys.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jmorecfg.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jpegint.h" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jpeglib.h" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jquant1.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jquant2.c" />      
+			         
+			      
+   
+      
+               			                     <ClCompile Include="..\..\..\..\..\Engine\lib\ljpeg\jutils.c" />      
+			         
+			      
+   
+      
+               			                     <ClInclude Include="..\..\..\..\..\Engine\lib\ljpeg\jversion.h" />      
+			         
+			      
+   
+      
+      
+  </ItemGroup>
+  <ItemGroup>
+    </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
