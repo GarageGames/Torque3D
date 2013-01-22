@@ -31,6 +31,18 @@
 /// template expansion.
 namespace IOHelper
 {
+   template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K, class L, class M>
+      inline bool reads(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j,K& k,L& l,M& m)
+   { s->read(&a); s->read(&b); s->read(&c); s->read(&d); s->read(&e); s->read(&f); s->read(&g); s->read(&h); s->read(&i); s->read(&j); s->read(&k); s->read(&l); return s->read(&m); }
+
+   template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K, class L>
+      inline bool reads(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j,K& k,L& l)
+   { s->read(&a); s->read(&b); s->read(&c); s->read(&d); s->read(&e); s->read(&f); s->read(&g); s->read(&h); s->read(&i); s->read(&j); s->read(&k); return s->read(&l); }
+
+   template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K>
+      inline bool reads(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j,K& k)
+   { s->read(&a); s->read(&b); s->read(&c); s->read(&d); s->read(&e); s->read(&f); s->read(&g); s->read(&h); s->read(&i); s->read(&j); return s->read(&k); }
+
    template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J>
       inline bool reads(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j)
    { s->read(&a); s->read(&b); s->read(&c); s->read(&d); s->read(&e); s->read(&f); s->read(&g); s->read(&h); s->read(&i); return s->read(&j); }
@@ -70,6 +82,18 @@ namespace IOHelper
    template<class A>
       inline bool reads(Stream *s,A& a)
    { return s->read(&a); }
+
+   template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L,class M>
+      inline bool writes(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j,K& k,L& l,M& m)
+   { s->write(a); s->write(b); s->write(c); s->write(d); s->write(e); s->write(f); s->write(g); s->write(h); s->write(i); s->write(j); s->write(k); s->write(l); return s->write(m); }
+
+   template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L>
+      inline bool writes(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j,K& k,L& l)
+   { s->write(a); s->write(b); s->write(c); s->write(d); s->write(e); s->write(f); s->write(g); s->write(h); s->write(i); s->write(j); s->write(k); return s->write(l); }
+
+   template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K>
+      inline bool writes(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j,K& k)
+   { s->write(a); s->write(b); s->write(c); s->write(d); s->write(e); s->write(f); s->write(g); s->write(h); s->write(i); s->write(j); return s->write(k); }
 
    template<class A,class B,class C,class D,class E,class F,class G,class H,class I,class J>
       inline bool writes(Stream *s,A& a,B& b,C& c,D& d,E& e,F& f,G& g,H& h,I& i,J& j)

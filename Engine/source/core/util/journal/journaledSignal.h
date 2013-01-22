@@ -243,6 +243,75 @@ public:
    }
 };
 
+/// @copydoc JournaledSignal<void()>
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K> 
+class JournaledSignal<void(A,B,C,D,E,F,G,H,I,J,K)> : public Signal<void(A,B,C,D,E,F,G,H,I,J,K)>
+{
+   typedef Signal<void(A,B,C,D,E,F,G,H,I,J,K)> Parent;
+
+public:
+   JournaledSignal()
+   {
+      Journal::DeclareFunction((Parent*)this, &Parent::trigger);
+   }
+
+   ~JournaledSignal()
+   {
+      Journal::RemoveFunction((Parent*)this, &Parent::trigger);
+   }
+
+   void trigger(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
+   {
+      Journal::Call((Parent*)this, &Parent::trigger, a, b, c, d, e, f, g, h, i, j, k);
+   }
+};
+
+/// @copydoc JournaledSignal<void()>
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L> 
+class JournaledSignal<void(A,B,C,D,E,F,G,H,I,J,K,L)> : public Signal<void(A,B,C,D,E,F,G,H,I,J,K,L)>
+{
+   typedef Signal<void(A,B,C,D,E,F,G,H,I,J,K,L)> Parent;
+
+public:
+   JournaledSignal()
+   {
+      Journal::DeclareFunction((Parent*)this, &Parent::trigger);
+   }
+
+   ~JournaledSignal()
+   {
+      Journal::RemoveFunction((Parent*)this, &Parent::trigger);
+   }
+
+   void trigger(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l)
+   {
+      Journal::Call((Parent*)this, &Parent::trigger, a, b, c, d, e, f, g, h, i, j, k, l);
+   }
+};
+
+/// @copydoc JournaledSignal<void()>
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L, class M> 
+class JournaledSignal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)> : public Signal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)>
+{
+   typedef Signal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)> Parent;
+
+public:
+   JournaledSignal()
+   {
+      Journal::DeclareFunction((Parent*)this, &Parent::trigger);
+   }
+
+   ~JournaledSignal()
+   {
+      Journal::RemoveFunction((Parent*)this, &Parent::trigger);
+   }
+
+   void trigger(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l, M m)
+   {
+      Journal::Call((Parent*)this, &Parent::trigger, a, b, c, d, e, f, g, h, i, j, k, l, m);
+   }
+};
+
 
 //-----------------------------------------------------------------------------
 // Common event callbacks definitions
