@@ -73,6 +73,33 @@ class Journal
       void dispatch()                  { (*ptr)(); }
    };
 
+   template <class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L,class M>
+   struct FunctorDecl< void(*)(A,B,C,D,E,F,G,H,I,J,K,L,M) >: public Functor {
+      typedef void(*FuncPtr)(A,B,C,D,E,F,G,H,I,J,K,L,M);
+      FuncPtr ptr; A a; B b; C c; D d; E e; F f; G g; H h; I i; J j; K k; L l; M m;
+      FunctorDecl(FuncPtr p): ptr(p)   {}
+      void read(Stream *file)   { IOHelper::reads(file,a,b,c,d,e,f,g,h,i,j,k,l,m); }
+      void dispatch()                  { (*ptr)(a,b,c,d,e,f,g,h,i,j,k,l,m); }
+   };
+
+   template <class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L>
+   struct FunctorDecl< void(*)(A,B,C,D,E,F,G,H,I,J,K,L) >: public Functor {
+      typedef void(*FuncPtr)(A,B,C,D,E,F,G,H,I,J,K,L);
+      FuncPtr ptr; A a; B b; C c; D d; E e; F f; G g; H h; I i; J j; K k; L l;
+      FunctorDecl(FuncPtr p): ptr(p)   {}
+      void read(Stream *file)   { IOHelper::reads(file,a,b,c,d,e,f,g,h,i,j,k,l); }
+      void dispatch()                  { (*ptr)(a,b,c,d,e,f,g,h,i,j,k,l); }
+   };
+
+   template <class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K>
+   struct FunctorDecl< void(*)(A,B,C,D,E,F,G,H,I,J,K) >: public Functor {
+      typedef void(*FuncPtr)(A,B,C,D,E,F,G,H,I,J,K);
+      FuncPtr ptr; A a; B b; C c; D d; E e; F f; G g; H h; I i; J j; K k;
+      FunctorDecl(FuncPtr p): ptr(p)   {}
+      void read(Stream *file)   { IOHelper::reads(file,a,b,c,d,e,f,g,h,i,j,k); }
+      void dispatch()                  { (*ptr)(a,b,c,d,e,f,g,h,i,j,k); }
+   };
+
    template <class A,class B,class C,class D,class E,class F,class G,class H,class I,class J>
    struct FunctorDecl< void(*)(A,B,C,D,E,F,G,H,I,J) >: public Functor {
       typedef void(*FuncPtr)(A,B,C,D,E,F,G,H,I,J);
@@ -172,6 +199,36 @@ class Journal
       MethodDecl(ObjPtr o,MethodPtr p): obj(o), method(p)   {}
       void read(Stream *file)   {}
       void dispatch()                  { (obj->*method)(); }
+   };
+
+   template <class T,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L,class M>
+   struct MethodDecl<T*, void(T::*)(A,B,C,D,E,F,G,H,I,J,K,L,M) >: public Functor {
+      typedef T* ObjPtr;
+      typedef void(T::*MethodPtr)(A,B,C,D,E,F,G,H,I,J,K,L,M);
+      ObjPtr obj; MethodPtr method; A a; B b; C c; D d; E e; F f; G g; H h; I i; J j; K k; L l; M m;
+      MethodDecl(ObjPtr o,MethodPtr p): obj(o), method(p)   {}
+      void read(Stream *file)   { IOHelper::reads(file,a,b,c,d,e,f,g,h,i,j,k,l,m); }
+      void dispatch()                  { (obj->*method)(a,b,c,d,e,f,g,h,i,j,k,l,m); }
+   };
+
+   template <class T,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L>
+   struct MethodDecl<T*, void(T::*)(A,B,C,D,E,F,G,H,I,J,K,L) >: public Functor {
+      typedef T* ObjPtr;
+      typedef void(T::*MethodPtr)(A,B,C,D,E,F,G,H,I,J,K,L);
+      ObjPtr obj; MethodPtr method; A a; B b; C c; D d; E e; F f; G g; H h; I i; J j; K k; L l;
+      MethodDecl(ObjPtr o,MethodPtr p): obj(o), method(p)   {}
+      void read(Stream *file)   { IOHelper::reads(file,a,b,c,d,e,f,g,h,i,j,k,l); }
+      void dispatch()                  { (obj->*method)(a,b,c,d,e,f,g,h,i,j,k,l); }
+   };
+
+   template <class T,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K>
+   struct MethodDecl<T*, void(T::*)(A,B,C,D,E,F,G,H,I,J,K) >: public Functor {
+      typedef T* ObjPtr;
+      typedef void(T::*MethodPtr)(A,B,C,D,E,F,G,H,I,J,K);
+      ObjPtr obj; MethodPtr method; A a; B b; C c; D d; E e; F f; G g; H h; I i; J j; K k;
+      MethodDecl(ObjPtr o,MethodPtr p): obj(o), method(p)   {}
+      void read(Stream *file)   { IOHelper::reads(file,a,b,c,d,e,f,g,h,i,j,k); }
+      void dispatch()                  { (obj->*method)(a,b,c,d,e,f,g,h,i,j,k); }
    };
 
    template <class T,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J>
@@ -445,6 +502,12 @@ public:
          return value; \
       }
 
+   template<class Func,class A,class B,class C,class D,class E,class F, class G, class H, class I, class J, class K, class L, class M>
+      Method(Func,(Func func,A a,B b,C c,D d,E e,F f, G g, H h, I i, J j, K k, L l, M m),(a,b,c,d,e,f,g,h,i,j,k,l,m))
+   template<class Func,class A,class B,class C,class D,class E,class F, class G, class H, class I, class J, class K, class L>
+      Method(Func,(Func func,A a,B b,C c,D d,E e,F f, G g, H h, I i, J j, K k, L l),(a,b,c,d,e,f,g,h,i,j,k,l))
+   template<class Func,class A,class B,class C,class D,class E,class F, class G, class H, class I, class J, class K>
+      Method(Func,(Func func,A a,B b,C c,D d,E e,F f, G g, H h, I i, J j, K k),(a,b,c,d,e,f,g,h,i,j,k))
    template<class Func,class A,class B,class C,class D,class E,class F, class G, class H, class I, class J>
       Method(Func,(Func func,A a,B b,C c,D d,E e,F f, G g, H h, I i, J j),(a,b,c,d,e,f,g,h,i,j))
    template<class Func,class A,class B,class C,class D,class E,class F, class G, class H, class I>
@@ -493,6 +556,12 @@ public:
          return; \
       }
 
+   template<class Func,class A,class B,class C,class D,class E, class F, class G, class H, class I, class J, class K, class L, class M>
+      Method((Func func,A a,B b,C c,D d,E e,F f,G g,H h,I i,J j,K k,L l,M m),(mFile,id,a,b,c,d,e,f,g,h,i,j,k,l,m),(a,b,c,d,e,f,g,h,i,j,k,l,m))
+   template<class Func,class A,class B,class C,class D,class E, class F, class G, class H, class I, class J, class K, class L>
+      Method((Func func,A a,B b,C c,D d,E e,F f,G g,H h,I i,J j,K k,L l),(mFile,id,a,b,c,d,e,f,g,h,i,j,k,l),(a,b,c,d,e,f,g,h,i,j,k,l))
+   template<class Func,class A,class B,class C,class D,class E, class F, class G, class H, class I, class J, class K>
+      Method((Func func,A a,B b,C c,D d,E e,F f,G g,H h,I i,J j,K k),(mFile,id,a,b,c,d,e,f,g,h,i,j,k),(a,b,c,d,e,f,g,h,i,j,k))
    template<class Func,class A,class B,class C,class D,class E, class F, class G, class H, class I, class J>
       Method((Func func,A a,B b,C c,D d,E e,F f,G g,H h,I i,J j),(mFile,id,a,b,c,d,e,f,g,h,i,j),(a,b,c,d,e,f,g,h,i,j))
    template<class Func,class A,class B,class C,class D,class E, class F, class G, class H, class I>
@@ -537,6 +606,12 @@ public:
       }
 
 
+   template<class Obj,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L,class M>
+      Method((Obj* obj,void (Obj::*method)(A,B,C,D,E,F,G,H,I,J,K,L,M),A a,B b,C c,D d,E e,F f,G g,H h,I i,J j,K k,L l,M m),(mFile,id,a,b,c,d,e,f,g,h,i,j,k,l,m),(a,b,c,d,e,f,g,h,i,j,k,l,m))
+   template<class Obj,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K,class L>
+      Method((Obj* obj,void (Obj::*method)(A,B,C,D,E,F,G,H,I,J,K,L),A a,B b,C c,D d,E e,F f,G g,H h,I i,J j,K k,L l),(mFile,id,a,b,c,d,e,f,g,h,i,j,k,l),(a,b,c,d,e,f,g,h,i,j,k,l))
+   template<class Obj,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J,class K>
+      Method((Obj* obj,void (Obj::*method)(A,B,C,D,E,F,G,H,I,J,K),A a,B b,C c,D d,E e,F f,G g,H h,I i,J j,K k),(mFile,id,a,b,c,d,e,f,g,h,i,j,k),(a,b,c,d,e,f,g,h,i,j,k))
    template<class Obj,class A,class B,class C,class D,class E,class F,class G,class H,class I,class J>
       Method((Obj* obj,void (Obj::*method)(A,B,C,D,E,F,G,H,I,J),A a,B b,C c,D d,E e,F f,G g,H h,I i,J j),(mFile,id,a,b,c,d,e,f,g,h,i,j),(a,b,c,d,e,f,g,h,i,j))
    template<class Obj,class A,class B,class C,class D,class E,class F,class G,class H,class I>
@@ -574,6 +649,12 @@ public:
          return false; \
       }
 
+   template<class A,class B,class C,class D,class E, class F, class G, class H,class I,class J,class K,class L,class M>
+      Method((A& a,B& b,C& c,D& d,E& e, F& f, G& g, H& h, I& i,J& j,K& k,L& l,M& m),(mFile,a,b,c,d,e,f,g,h,i,j,k,l,m));
+   template<class A,class B,class C,class D,class E, class F, class G, class H,class I,class J,class K,class L>
+      Method((A& a,B& b,C& c,D& d,E& e, F& f, G& g, H& h, I& i,J& j,K& k,L& l),(mFile,a,b,c,d,e,f,g,h,i,j,k,l));
+   template<class A,class B,class C,class D,class E, class F, class G, class H,class I,class J,class K>
+      Method((A& a,B& b,C& c,D& d,E& e, F& f, G& g, H& h, I& i,J& j,K& k),(mFile,a,b,c,d,e,f,g,h,i,j,k));
    template<class A,class B,class C,class D,class E, class F, class G, class H,class I,class J>
       Method((A& a,B& b,C& c,D& d,E& e, F& f, G& g, H& h, I& i,J& j),(mFile,a,b,c,d,e,f,g,h,i,j));
    template<class A,class B,class C,class D,class E, class F, class G, class H,class I>
@@ -608,6 +689,12 @@ public:
          return false; \
       }
 
+   template<class A,class B,class C,class D,class E, class F, class G, class H, class I, class J, class K,class L,class M>
+      Method((A& a,B& b,C& c,D& d,E& e,F& f,G& g, H& h, I& i, J& j, K& k, L& l, M& m),(mFile,a,b,c,d,e,f,g,h,i,j,k,l,m));
+   template<class A,class B,class C,class D,class E, class F, class G, class H, class I, class J, class K,class L>
+      Method((A& a,B& b,C& c,D& d,E& e,F& f,G& g, H& h, I& i, J& j, K& k, L& l),(mFile,a,b,c,d,e,f,g,h,i,j,k,l));
+   template<class A,class B,class C,class D,class E, class F, class G, class H, class I, class J, class K>
+      Method((A& a,B& b,C& c,D& d,E& e,F& f,G& g, H& h, I& i, J& j, K& k),(mFile,a,b,c,d,e,f,g,h,i,j,k));
    template<class A,class B,class C,class D,class E, class F, class G, class H, class I, class J>
       Method((A& a,B& b,C& c,D& d,E& e,F& f,G& g, H& h, I& i, J& j),(mFile,a,b,c,d,e,f,g,h,i,j));
    template<class A,class B,class C,class D,class E, class F, class G, class H, class I>
