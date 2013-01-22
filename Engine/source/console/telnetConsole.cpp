@@ -25,7 +25,6 @@
 
 #include "console/engineAPI.h"
 #include "core/strings/stringFunctions.h"
-#include "platform/event.h"
 #include "core/util/journal/process.h"
 #include "core/module.h"
 

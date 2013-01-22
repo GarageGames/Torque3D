@@ -26,7 +26,6 @@
 #include "gfx/gfxTextureManager.h"
 #include "gui/controls/guiSliderCtrl.h"
 #include "gui/core/guiDefaultControlRender.h"
-#include "platform/event.h"
 #include "gfx/primBuilder.h"
 #include "gfx/gfxDrawUtil.h"
 #include "sfx/sfxSystem.h"
