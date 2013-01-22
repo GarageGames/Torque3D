@@ -25,7 +25,6 @@
 
 #include "core/frameAllocator.h"
 #include "console/console.h"
-#include "platform/event.h"
 #include "core/stringTable.h"
 #include "console/consoleInternal.h"
 #include "console/ast.h"
