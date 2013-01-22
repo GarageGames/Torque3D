@@ -30,7 +30,6 @@
 #include "core/strings/unicode.h"
 #include "core/stream/fileStream.h"
 #include "console/compiler.h"
-#include "platform/event.h"
 #include "platform/platformInput.h"
 #include "core/util/journal/journal.h"
 #include "core/util/uuid.h"

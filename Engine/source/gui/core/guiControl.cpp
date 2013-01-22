@@ -28,7 +28,6 @@
 #include "console/consoleInternal.h"
 #include "console/engineAPI.h"
 #include "console/codeBlock.h"
-#include "platform/event.h"
 #include "gfx/bitmap/gBitmap.h"
 #include "sim/actionMap.h"
 #include "gui/core/guiCanvas.h"

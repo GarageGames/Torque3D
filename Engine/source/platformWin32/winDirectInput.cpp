@@ -23,7 +23,6 @@
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/winDirectInput.h"
 #include "platformWin32/winDInputDevice.h"
-#include "platform/event.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
 #include "sim/actionMap.h"

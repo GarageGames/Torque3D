@@ -26,9 +26,6 @@
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
 
 #include "platform/platformNet.h"
 

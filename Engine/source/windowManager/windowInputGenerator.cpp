@@ -310,7 +310,7 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
 //-----------------------------------------------------------------------------
 // Raw input 
 //-----------------------------------------------------------------------------
-void WindowInputGenerator::handleInputEvent( U32 deviceInst,F32 fValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier )
+void WindowInputGenerator::handleInputEvent( U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier )
 {
    // Skip it if we don't have focus.
    if(!mInputController || !mFocused)
@@ -320,6 +320,10 @@ void WindowInputGenerator::handleInputEvent( U32 deviceInst,F32 fValue, U16 devi
    InputEventInfo event;
    event.deviceInst  = deviceInst;
    event.fValue      = fValue;
+   event.fValue2     = fValue2;
+   event.fValue3     = fValue3;
+   event.fValue4     = fValue4;
+   event.iValue      = iValue;
    event.deviceType  = (InputDeviceTypes)deviceType;
    event.objType     = (InputEventType)objType;
    event.ascii       = ascii;

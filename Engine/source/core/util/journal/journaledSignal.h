@@ -394,8 +394,8 @@ typedef JournaledSignal<void(WindowId, S32, S32)> ResizeEvent;
 /// void event(S32 timeDelta)
 typedef JournaledSignal<void(S32)> TimeManagerEvent;
 
-// void event(U32 deviceInst,F32 fValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier)
-typedef JournaledSignal<void(U32,F32,U16,U16,U16,U16,U8,U8)> InputEvent;
+// void event(U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier)
+typedef JournaledSignal<void(U32,F32,F32,F32,F32,S32,U16,U16,U16,U16,U8,U8)> InputEvent;
 
 /// void event(U32 popupGUID, U32 commandID, bool& returnValue)
 typedef JournaledSignal<void(U32, U32)> PopupMenuEvent;
