@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platform/event.h"
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/winConsole.h"
 #include "platformWin32/winDirectInput.h"

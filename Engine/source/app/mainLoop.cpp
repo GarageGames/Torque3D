@@ -291,6 +291,9 @@ void StandardMainLoop::init()
    tm = new TimeManager;
    tm->timeEvent.notify(&::processTimeEvent);
    
+   // Start up the Input Event Manager
+   INPUTMGR->start();
+
    Sampler::init();
 
    // Hook in for UDP notification
@@ -307,6 +310,9 @@ void StandardMainLoop::init()
 
 void StandardMainLoop::shutdown()
 {
+   // Stop the Input Event Manager
+   INPUTMGR->stop();
+
    delete tm;
    preShutdown();
    

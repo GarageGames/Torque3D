@@ -31,7 +31,6 @@
 
 #include <windows.h>
 
-#include "platform/event.h"
 #include "platform/platformInput.h"
 #include "windowManager/win32/winDispatch.h"
 #include "windowManager/win32/win32Window.h"

@@ -24,7 +24,6 @@
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/core/guiCanvas.h"
 #include "console/consoleTypes.h"
-#include "platform/event.h"
 #include "core/frameAllocator.h"
 #include "core/stringBuffer.h"
 #include "gfx/gfxDrawUtil.h"
