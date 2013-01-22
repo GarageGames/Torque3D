@@ -27,6 +27,10 @@
 #include "console/simBase.h"
 #include "console/engineAPI.h"
 
+//-----------------------------------------------------------------------------
+// ScriptObject
+//-----------------------------------------------------------------------------
+
 IMPLEMENT_CONOBJECT(ScriptObject);
 
 ConsoleDocClass( ScriptObject,
@@ -83,23 +87,103 @@ void ScriptObject::onRemove()
 }
 
 //-----------------------------------------------------------------------------
-// Script group placeholder
+// ScriptTickObject
 //-----------------------------------------------------------------------------
 
-class ScriptGroup : public SimGroup
+IMPLEMENT_CONOBJECT(ScriptTickObject);
+
+ConsoleDocClass( ScriptTickObject,
+   "@brief A ScriptObject that responds to tick and frame events.\n\n"   
+
+   "ScriptTickObject is a ScriptObject that adds callbacks for tick and frame events.  Use "
+   "setProcessTicks() to enable or disable the onInterpolateTick() and onProcessTick() callbacks.  "
+   "The callOnAdvanceTime property determines if the onAdvanceTime() callback is called.\n\n"
+
+   "@see ScriptObject\n"
+   "@ingroup Console\n"
+   "@ingroup Scripting"
+);
+
+IMPLEMENT_CALLBACK( ScriptTickObject, onInterpolateTick, void, ( F32 delta ), ( delta ),
+	"This is called every frame, but only if the object is set to process ticks.\n"
+	"@param delta The time delta for this frame.\n"
+);
+
+IMPLEMENT_CALLBACK( ScriptTickObject, onProcessTick, void, (), (),
+	"Called once every 32ms if this object is set to process ticks.\n"
+);
+
+IMPLEMENT_CALLBACK( ScriptTickObject, onAdvanceTime, void, ( F32 timeDelta ), ( timeDelta ),
+	"This is called every frame regardless if the object is set to process ticks, but only "
+   "if the callOnAdvanceTime property is set to true.\n"
+	"@param timeDelta The time delta for this frame.\n"
+   "@see callOnAdvanceTime\n"
+);
+
+ScriptTickObject::ScriptTickObject()
 {
-   typedef SimGroup Parent;
-   
-public:
-   ScriptGroup();
-   bool onAdd();
-   void onRemove();
+   mCallOnAdvanceTime = false;
+}
 
-   DECLARE_CONOBJECT(ScriptGroup);
+void ScriptTickObject::initPersistFields()
+{
+   addField("callOnAdvanceTime", TypeBool,   Offset(mCallOnAdvanceTime,  ScriptTickObject), "Call the onAdvaceTime() callback.");
 
-   DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
-   DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
-};
+   Parent::initPersistFields();
+}
+
+bool ScriptTickObject::onAdd()
+{
+   if (!Parent::onAdd())
+      return false;
+
+   return true;
+}
+
+void ScriptTickObject::onRemove()
+{
+   Parent::onRemove();
+}
+
+void ScriptTickObject::interpolateTick( F32 delta )
+{
+   onInterpolateTick_callback(delta);
+}
+
+void ScriptTickObject::processTick()
+{
+   onProcessTick_callback();
+}
+
+void ScriptTickObject::advanceTime( F32 timeDelta )
+{
+   if(mCallOnAdvanceTime)
+   {
+      onAdvanceTime_callback(timeDelta);
+   }
+}
+
+DefineEngineMethod( ScriptTickObject, setProcessTicks, void, ( bool tick ),,
+   "@brief Sets this object as either tick processing or not.\n\n"
+
+   "@param tick This object's onInterpolateTick() and onProcessTick() callbacks are called if set to true.\n\n")
+{
+   object->setProcessTicks(tick);
+}
+
+DefineEngineMethod( ScriptTickObject, isProcessingTicks, bool, ( ),,
+   "@brief Is this object wanting to receive tick notifications.\n\n"
+
+   "If this object is set to receive tick notifications then its onInterpolateTick() and "
+   "onProcessTick() callbacks are called.\n"
+   "@return True if object wants tick notifications\n\n" )
+{
+   return object->isProcessingTicks();
+}
+
+//-----------------------------------------------------------------------------
+// ScriptGroup
+//-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(ScriptGroup);
 
@@ -157,7 +241,6 @@ bool ScriptGroup::onAdd()
       return false;
 
    // Call onAdd in script!
-   //Con::executef(this, "onAdd", Con::getIntArg(getId()));
    onAdd_callback(getId());
    return true;
 }
@@ -165,7 +248,6 @@ bool ScriptGroup::onAdd()
 void ScriptGroup::onRemove()
 {
    // Call onRemove in script!
-   //Con::executef(this, "onRemove", Con::getIntArg(getId()));
 	onRemove_callback(getId());
 
    Parent::onRemove();
