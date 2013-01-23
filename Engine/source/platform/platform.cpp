@@ -27,7 +27,7 @@
 #include "console/consoleTypes.h"
 #include "platform/threads/mutex.h"
 #include "app/mainLoop.h"
-#include "platform/event.h"
+#include "platform/input/event.h"
 #include "platform/typetraits.h"
 
 

@@ -30,7 +30,7 @@
 #define _EVENT_H_
 
 #include "platform/types.h"
-#include "platform/IInputDevice.h"
+#include "platform/input/IInputDevice.h"
 #include "core/util/journal/journaledSignal.h"
 #include "core/util/tSingleton.h"
 #include "core/util/tDictionary.h"
