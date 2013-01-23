@@ -23,7 +23,7 @@
 #ifndef _I_PROCESSINPUT_H_
 #define _I_PROCESSINPUT_H_
 
-#include "platform/event.h"
+#include "platform/input/event.h"
 
 
 // CodeReview : Input can come from a number of places to end up in 

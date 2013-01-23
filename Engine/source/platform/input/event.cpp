@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platform/event.h"
+#include "platform/input/event.h"
 #include "core/module.h"
 #include "core/util/journal/process.h"
 #include "core/strings/stringFunctions.h"
