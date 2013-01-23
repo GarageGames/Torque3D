@@ -51,10 +51,16 @@ struct Move
    bool freeLook;
    bool trigger[MaxTriggerKeys];
 
-   void pack(BitStream *stream, const Move * move = NULL);
-   void unpack(BitStream *stream, const Move * move = NULL);
-   void clamp();
-   void unclamp();
+   Move();
+
+   virtual void pack(BitStream *stream, const Move * move = NULL);
+   virtual void unpack(BitStream *stream, const Move * move = NULL);
+   virtual void clamp();
+   virtual void unclamp();
+
+protected:
+   bool packMove(BitStream *stream, const Move* basemove, bool alwaysWriteAll);
+   bool unpackMove(BitStream *stream, const Move* basemove, bool alwaysReadAll);
 };
 
 extern const Move NullMove;

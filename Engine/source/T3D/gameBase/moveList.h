@@ -76,8 +76,8 @@ public:
    /// Reset move list back to last acknowledged move.
    void resetCatchup() { mLastClientMove = mLastMoveAck; }
 
-   void collectMove();
-   void pushMove( const Move &mv );
+   virtual void collectMove();
+   virtual void pushMove( const Move &mv );
    virtual void clearMoves( U32 count );
 
    virtual void markControlDirty() { mLastClientMove = mLastMoveAck; }
@@ -85,15 +85,15 @@ public:
    void clearMismatch() { mControlMismatch = false; }
    
    /// Clear out all moves in the list and reset to initial state.
-   void reset();
+   virtual void reset();
 
    /// If there are no pending moves and the input queue is full,
    /// then the connection to the server must be clogged.
-   bool isBacklogged();
+   virtual bool isBacklogged();
 
-   bool areMovesPending();
+   virtual bool areMovesPending();
 
-   void ackMoves( U32 count );
+   virtual void ackMoves( U32 count );
 
 protected:
 

@@ -41,6 +41,8 @@
 
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
+#elif defined TORQUE_EXTENDED_MOVE
+   #include "T3D/gameBase/extended/extendedMoveList.h"
 #else
    #include "T3D/gameBase/std/stdMoveList.h"
 #endif
@@ -175,6 +177,8 @@ GameConnection::GameConnection()
 
 #ifdef TORQUE_HIFI_NET
    mMoveList = new HifiMoveList();
+#elif defined TORQUE_EXTENDED_MOVE
+   mMoveList = new ExtendedMoveList();
 #else
    mMoveList = new StdMoveList();
 #endif
