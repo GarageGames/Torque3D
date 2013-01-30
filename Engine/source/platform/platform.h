@@ -336,7 +336,7 @@ namespace Platform
    bool openWebBrowser( const char* webAddress );
 
    // display Splash Window
-   bool displaySplashWindow( );
+   bool displaySplashWindow( String path );
 
    void openFolder( const char* path );
 
