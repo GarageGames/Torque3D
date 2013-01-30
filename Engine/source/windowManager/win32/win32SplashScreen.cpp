@@ -22,6 +22,7 @@
 
 #define _WIN32_WINNT 0x0500
 #include <windows.h>
+#include <tchar.h>
 
 #include "platform/platform.h"
 #include "console/console.h"
@@ -120,12 +121,20 @@ void CloseSplashWindow(HINSTANCE hinst)
 	
 }
 
-bool Platform::displaySplashWindow()
+bool Platform::displaySplashWindow( String path )
 {
+   if(path.isEmpty())
+      return false;
 
-	gSplashImage = (HBITMAP) ::LoadImage(0, L"art\\gui\\splash.bmp", 
+#ifdef UNICODE
+   const UTF16 *lFileName = path.utf16();
+#else
+   const UTF8  *lFileName = path.c_str();
+#endif
+
+	gSplashImage = (HBITMAP) ::LoadImage(0, lFileName, 
 		IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-	
+
 	if (!gSplashImage)
 		return false;
 
