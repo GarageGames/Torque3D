@@ -100,6 +100,10 @@ With everything in place you may now follow these steps to compile Torque 3D:
     `./MyGame -dedicated -mission "levels/Empty Terrain.mis"`  
     where the argument after the `-mission` switch is the path to the mission to load.
 
+Accessing the Editors
+---------------------
+From the Main Menu or while in-game, pressing F10 opens the GUI Editor and pressing F11 opens the World Editor.
+
 License
 -------
 
