@@ -128,16 +128,20 @@ ParticleData::~ParticleData()
    }
 }
 
+FRangeValidator dragCoefFValidator(0.f, 5.f);
+FRangeValidator gravCoefFValidator(-10.f, 10.f);
+FRangeValidator spinRandFValidator(-1000.f, 1000.f);
+
 //-----------------------------------------------------------------------------
 // initPersistFields
 //-----------------------------------------------------------------------------
 void ParticleData::initPersistFields()
 {
-   addFieldV( "dragCoefficient", TYPEID< F32 >(), Offset(dragCoefficient, ParticleData), new FRangeValidator(0, 5),
+   addFieldV( "dragCoefficient", TYPEID< F32 >(), Offset(dragCoefficient, ParticleData), &dragCoefFValidator,
       "Particle physics drag amount." );
    addField( "windCoefficient", TYPEID< F32 >(), Offset(windCoefficient, ParticleData),
       "Strength of wind on the particles." );
-   addFieldV( "gravityCoefficient", TYPEID< F32 >(), Offset(gravityCoefficient, ParticleData), new FRangeValidator(-10, 10),
+   addFieldV( "gravityCoefficient", TYPEID< F32 >(), Offset(gravityCoefficient, ParticleData), &gravCoefFValidator,
       "Strength of gravity on the particles." );
    addFieldV( "inheritedVelFactor", TYPEID< F32 >(), Offset(inheritedVelFactor, ParticleData), &CommonValidators::NormalizedFloat,
       "Amount of emitter velocity to add to particle initial velocity." );
@@ -149,9 +153,9 @@ void ParticleData::initPersistFields()
       "Variance in lifetime of particle, from 0 - lifetimeMS." );
    addField( "spinSpeed", TYPEID< F32 >(), Offset(spinSpeed, ParticleData),
       "Speed at which to spin the particle." );
-   addFieldV( "spinRandomMin", TYPEID< F32 >(), Offset(spinRandomMin, ParticleData), new FRangeValidator(-1000.f, 1000.f),
+   addFieldV( "spinRandomMin", TYPEID< F32 >(), Offset(spinRandomMin, ParticleData), &spinRandFValidator,
       "Minimum allowed spin speed of this particle, between -1000 and spinRandomMax." );
-   addFieldV( "spinRandomMax", TYPEID< F32 >(), Offset(spinRandomMax, ParticleData), new FRangeValidator(-1000.f, 1000.f),
+   addFieldV( "spinRandomMax", TYPEID< F32 >(), Offset(spinRandomMax, ParticleData), &spinRandFValidator,
       "Maximum allowed spin speed of this particle, between spinRandomMin and 1000." );
    addField( "useInvAlpha", TYPEID< bool >(), Offset(useInvAlpha, ParticleData),
       "@brief Controls how particles blend with the scene.\n\n"
