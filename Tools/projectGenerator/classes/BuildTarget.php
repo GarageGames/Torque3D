@@ -203,6 +203,17 @@ class BuildTarget
 		
         return false;
     }
+
+    function isResourceFile( $file )
+    {
+        $ext 			= ".rc";
+        $extLen 		= strlen( $ext );
+        $possibleMatch	= substr( $file, -$extLen, $extLen );
+        if( $possibleMatch == $ext )
+            return true; 
+
+        return false;
+    }
 }
 
 ?>

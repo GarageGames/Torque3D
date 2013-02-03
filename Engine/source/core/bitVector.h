@@ -56,6 +56,9 @@ class BitVector
       /// Constructs a bit vector with the desired size.
       /// @note The resulting vector is not cleared.
       BitVector( U32 sizeInBits );
+
+      /// Copy constructor
+      BitVector( const BitVector &r);
       
       /// Destructor.
       ~BitVector();
@@ -85,6 +88,9 @@ class BitVector
 
       /// Copy the content of another bit vector.
       void copy( const BitVector &from );
+
+      /// Copy the contents of another bit vector
+      BitVector& operator=( const BitVector &r);
 
       /// @name Mutators
       /// Note that bits are specified by index, unlike BitSet32.
@@ -150,6 +156,11 @@ inline BitVector::BitVector( U32 sizeInBits )
    setSize( sizeInBits );
 }
 
+inline BitVector::BitVector( const BitVector &r )
+{
+   copy(r);
+}
+
 inline BitVector::~BitVector()
 {
    delete [] mBits;
@@ -180,6 +191,12 @@ inline void BitVector::copy( const BitVector &from )
    _resize( from.getSize(), false );
    if (mSize != 0)
       dMemcpy( mBits, from.getBits(), getByteSize() );
+}
+
+inline BitVector& BitVector::operator=( const BitVector &r)
+{
+   copy(r);
+   return *this;
 }
 
 inline void BitVector::set()

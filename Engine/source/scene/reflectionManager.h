@@ -101,7 +101,7 @@ public:
 
    GFXTexHandle allocRenderTarget( const Point2I &size );  
 
-   GFXTextureObject* getRefractTex();
+   GFXTextureObject* getRefractTex( bool forceUpdate = false );
 
    BaseMatInstance* getReflectionMaterial( BaseMatInstance *inMat ) const;
 

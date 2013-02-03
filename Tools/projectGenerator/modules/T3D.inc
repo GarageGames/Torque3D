@@ -38,7 +38,8 @@ addEngineSrcDir('environment');
 
 addEngineSrcDir('forest');
 addEngineSrcDir('forest/ts');
-addEngineSrcDir('forest/editor');
+if(getToolBuild())
+   addEngineSrcDir('forest/editor');
 
 addEngineSrcDir('ts');
 addEngineSrcDir('ts/arch');
@@ -84,6 +85,8 @@ switch( Generator::$platform )
       // Fall through
       
    case "mac":
+   case "linux":
+   case "linux_dedicated":
       addEngineSrcDir( 'terrain/glsl' );
       addEngineSrcDir( 'forest/glsl' );
       break;

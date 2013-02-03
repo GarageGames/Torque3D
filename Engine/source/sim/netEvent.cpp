@@ -243,7 +243,7 @@ void NetConnection::eventWritePacket(BitStream *bstream, PacketNotify *notify)
          packQueueTail->mNextEvent = ev;
       packQueueTail = ev;
       if(!bstream->writeFlag(ev->mSeqCount == prevSeq + 1))
-         bstream->writeInt(ev->mSeqCount, 7);
+         bstream->writeInt(ev->mSeqCount & 0x7F, 7);
 
       prevSeq = ev->mSeqCount;
 

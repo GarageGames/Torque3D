@@ -53,12 +53,6 @@ function Armor::onAdd(%this, %obj)
    // Default dynamic armor stats
    %obj.setRechargeRate(%this.rechargeRate);
    %obj.setRepairRate(0);
-
-   // Set the numerical Health HUD
-   //%obj.updateHealth();
-
-   // Calling updateHealth() must be delayed now... for some reason
-   %obj.schedule(50, "updateHealth");
 }
 
 function Armor::onRemove(%this, %obj)
@@ -226,9 +220,6 @@ function Armor::damage(%this, %obj, %sourceObject, %position, %damage, %damageTy
    %obj.applyDamage(%damage);
 
    %location = "Body";
-
-   // Update the numerical Health HUD
-   %obj.updateHealth();
 
    // Deal with client callbacks here because we don't have this
    // information in the onDamage or onDisable methods
@@ -435,23 +426,6 @@ function Player::playPain(%this)
 }
 
 // ----------------------------------------------------------------------------
-// Numerical Health Counter
-// ----------------------------------------------------------------------------
-
-function Player::updateHealth(%player)
-{
-   //echo("\c4Player::updateHealth() -> Player Health changed, updating HUD!");
-
-   // Calcualte player health
-   %maxDamage = %player.getDatablock().maxDamage;
-   %damageLevel = %player.getDamageLevel();
-   %curHealth = %maxDamage - %damageLevel;
-   %curHealth = mceil(%curHealth);
-
-   // Send the player object's current health level to the client, where it
-   // will Update the numericalHealth HUD.
-   commandToClient(%player.client, 'setNumericalHealthHUD', %curHealth);
-}
 
 function Player::setDamageDirection(%player, %sourceObject, %damagePos)
 {

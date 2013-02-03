@@ -33,7 +33,9 @@
 #include "platform/event.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/controls/guiTextEditCtrl.h"
-#include "gui/editor/editorFunctions.h"
+#ifdef TORQUE_TOOLS
+   #include "gui/editor/editorFunctions.h"
+#endif
 #include "console/engineAPI.h"
 
 
@@ -4042,7 +4044,10 @@ void GuiTreeViewCtrl::onRenderCell(Point2I offset, Point2I cell, bool, bool )
       // If this item is a VirtualParent we can use the generic SimGroup123 icons.
       // However if there is already an icon in the EditorIconRegistry for this
       // exact class (not counting parent class icons) we want to use that instead.
-      bool hasClassIcon = gEditorIcons.hasIconNoRecurse( pObject );
+      bool hasClassIcon = false;
+#ifdef TORQUE_TOOLS
+      hasClassIcon = gEditorIcons.hasIconNoRecurse( pObject );
+#endif
 
       // draw the icon associated with the item
       if ( !hasClassIcon && item->mState.test(Item::VirtualParent))
@@ -5280,7 +5285,10 @@ void GuiTreeViewCtrl::onRenameValidate()
 
    if ( mRenameInternal )
       obj->setInternalName( data );   
-   else if ( validateObjectName( data, obj ) )
+   else
+#ifdef TORQUE_TOOLS
+   if ( validateObjectName( data, obj ) )
+#endif
       obj->assignName( data ); 
 }
 

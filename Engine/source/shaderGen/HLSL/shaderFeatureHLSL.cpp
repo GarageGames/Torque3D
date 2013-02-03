@@ -1659,59 +1659,67 @@ void ReflectCubeFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
          meta->addStatement( new GenOp( "   @ = @;\r\n", outTex, inTex ) );
       }
    }
+       
+    // create cubeTrans
+    bool useInstancing = fd.features[MFT_UseInstancing];
+    Var *cubeTrans = getObjTrans( componentList, useInstancing, meta );
 
-   // create cubeTrans
-   Var *cubeTrans = new Var;
-   cubeTrans->setType( "float3x3" );
-   cubeTrans->setName( "cubeTrans" );
-   cubeTrans->uniform = true;
-   cubeTrans->constSortPos = cspPrimitive;   
+    // cube vert position
+    Var * cubeVertPos = new Var;
+    cubeVertPos->setName( "cubeVertPos" );
+    cubeVertPos->setType( "float3" );
+    LangElement *cubeVertPosDecl = new DecOp( cubeVertPos );
 
-   // create cubeEye position
-   Var *cubeEyePos = new Var;
-   cubeEyePos->setType( "float3" );
-   cubeEyePos->setName( "cubeEyePos" );
-   cubeEyePos->uniform = true;
-   cubeEyePos->constSortPos = cspPrimitive;   
+    meta->addStatement( new GenOp( "   @ = mul((float3x3)@, @).xyz;\r\n", 
+                        cubeVertPosDecl, cubeTrans, LangElement::find( "position" ) ) );
 
-   // cube vert position
-   Var * cubeVertPos = new Var;
-   cubeVertPos->setName( "cubeVertPos" );
-   cubeVertPos->setType( "float3" );
-   LangElement *cubeVertPosDecl = new DecOp( cubeVertPos );
+    // cube normal
+    Var * cubeNormal = new Var;
+    cubeNormal->setName( "cubeNormal" );
+    cubeNormal->setType( "float3" );
+    LangElement *cubeNormDecl = new DecOp( cubeNormal );
 
-   meta->addStatement( new GenOp( "   @ = mul(@, @).xyz;\r\n", 
-                       cubeVertPosDecl, cubeTrans, LangElement::find( "position" ) ) );
+    meta->addStatement( new GenOp( "   @ = normalize( mul(@, normalize(@)).xyz );\r\n", 
+                        cubeNormDecl, cubeTrans, inNormal ) );
 
-   // cube normal
-   Var * cubeNormal = new Var;
-   cubeNormal->setName( "cubeNormal" );
-   cubeNormal->setType( "float3" );
-   LangElement *cubeNormDecl = new DecOp( cubeNormal );
+    // grab the eye position
+    Var *eyePos = (Var*)LangElement::find( "eyePosWorld" );
+    if ( !eyePos )
+    {
+        eyePos = new Var( "eyePosWorld", "float3" );
+        eyePos->uniform = true;
+        eyePos->constSortPos = cspPass;
+    }
 
-   meta->addStatement( new GenOp( "   @ = normalize( mul(@, normalize(@)).xyz );\r\n", 
-                       cubeNormDecl, cubeTrans, inNormal ) );
+    // cube position
+    Var * cubePos = new Var;
+    cubePos->setName( "cubePos" );
+    cubePos->setType( "float3" );
+    LangElement *cubePosDecl = new DecOp( cubePos );
 
-   // eye to vert
-   Var * eyeToVert = new Var;
-   eyeToVert->setName( "eyeToVert" );
-   eyeToVert->setType( "float3" );
-   LangElement *e2vDecl = new DecOp( eyeToVert );
+    meta->addStatement( new GenOp( "   @ = float3( @[0][3], @[1][3], @[2][3] );\r\n", 
+                        cubePosDecl, cubeTrans, cubeTrans, cubeTrans ) );
 
-   meta->addStatement( new GenOp( "   @ = @ - @;\r\n", 
-                       e2vDecl, cubeVertPos, cubeEyePos ) );
+    // eye to vert
+    Var * eyeToVert = new Var;
+    eyeToVert->setName( "eyeToVert" );
+    eyeToVert->setType( "float3" );
+    LangElement *e2vDecl = new DecOp( eyeToVert );
 
-   // grab connector texcoord register
-   ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-   Var *reflectVec = connectComp->getElement( RT_TEXCOORD );
-   reflectVec->setName( "reflectVec" );
-   reflectVec->setStructName( "OUT" );
-   reflectVec->setType( "float3" );
-   reflectVec->mapsToSampler = true;
+    meta->addStatement( new GenOp( "   @ = @ - ( @ - @ );\r\n", 
+                        e2vDecl, cubeVertPos, eyePos, cubePos ) );
 
-   meta->addStatement( new GenOp( "   @ = reflect(@, @);\r\n", reflectVec, eyeToVert, cubeNormal ) );
+    // grab connector texcoord register
+    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
+    Var *reflectVec = connectComp->getElement( RT_TEXCOORD );
+    reflectVec->setName( "reflectVec" );
+    reflectVec->setStructName( "OUT" );
+    reflectVec->setType( "float3" );
+    reflectVec->mapsToSampler = true;
 
-   output = meta;
+    meta->addStatement( new GenOp( "   @ = reflect(@, @);\r\n", reflectVec, eyeToVert, cubeNormal ) );
+
+    output = meta;
 }
 
 void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList, 

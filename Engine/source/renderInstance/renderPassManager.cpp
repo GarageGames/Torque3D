@@ -42,7 +42,7 @@
 #include "console/engineAPI.h"
 
 
-const RenderInstType RenderInstType::Invalid( String::EmptyString );
+const RenderInstType RenderInstType::Invalid( "" );
 
 const RenderInstType RenderPassManager::RIT_Interior("Interior");
 const RenderInstType RenderPassManager::RIT_Mesh("Mesh");

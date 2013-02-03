@@ -119,6 +119,9 @@ function WorldEditor::onSelectionCentroidChanged( %this )
 {
    // Inform the camera
    commandToServer('EditorOrbitCameraSelectChange', %this.getSelectionSize(), %this.getSelectionCentroid());
+   
+   // Refresh inspector.
+   Inspector.refresh();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,7 +129,7 @@ function WorldEditor::onSelectionCentroidChanged( %this )
 function WorldEditor::init(%this)
 {
    // add objclasses which we do not want to collide with
-   %this.ignoreObjClass(Sky, AIObjective);
+   %this.ignoreObjClass(Sky);
 
    // editing modes
    %this.numEditModes = 3;

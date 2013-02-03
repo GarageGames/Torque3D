@@ -314,7 +314,7 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
 
       // NOTE: We haven't ported the lighting shaders on OSX
       // to the optimized HLSL versions.
-      #ifdef TORQUE_OS_MAC
+      #if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
          static AlignedArray<Point3F> lightPositions( 4, sizeof( Point4F ) );
       #else
          static AlignedArray<Point4F> lightPositions( 3, sizeof( Point4F ) );
@@ -342,7 +342,7 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
          if ( !light )            
             break;
 
-         #ifdef TORQUE_OS_MAC
+         #if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
 
             lightPositions[i] = light->getPosition();
 
@@ -381,7 +381,7 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
       shaderConsts->setSafe( lightDiffuseSC, lightColors );
       shaderConsts->setSafe( lightInvRadiusSqSC, lightInvRadiusSq );
 
-      #ifndef TORQUE_OS_MAC
+      #if !defined( TORQUE_OS_MAC ) && !defined( TORQUE_OS_LINUX )
 
          shaderConsts->setSafe( lightSpotDirSC, lightSpotDirs );
          shaderConsts->setSafe( lightSpotAngleSC, lightSpotAngle );

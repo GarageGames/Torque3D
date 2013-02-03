@@ -78,7 +78,7 @@
 // Typedefs
 #define FMOD_FUNCTION(fn_name, fn_args) \
    typedef FMOD_RESULT (WINAPI *FMODFNPTR##fn_name)fn_args;
-#define FMOD_EVENT_FUNCTION(fn_name, fn_args, dllexport) \
+#define FMOD_EVENT_FUNCTION(fn_name, fn_args) \
    typedef FMOD_RESULT (WINAPI *FMODFNPTR##fn_name)fn_args;
 #include FMOD_FN_FILE
 #undef FMOD_FUNCTION
@@ -189,7 +189,7 @@ struct FModFNTable
 
 #define FMOD_FUNCTION(fn_name, fn_args) \
    Thunk< FMODFNPTR##fn_name > fn_name;
-#define FMOD_EVENT_FUNCTION(fn_name, fn_args, dllexport) \
+#define FMOD_EVENT_FUNCTION(fn_name, fn_args) \
    Thunk< FMODFNPTR##fn_name > fn_name;
 #include FMOD_FN_FILE
 #undef FMOD_FUNCTION

@@ -92,14 +92,14 @@ struct SilhouetteExtractorBasePerspective : public SilhouetteExtractorBase< Poly
 
          // Determine orientation of each of the polygons.
 
-         const U32 numPolygons = mPolyhedron->getNumPlanes();
+         const U32 numPolygons = this->mPolyhedron->getNumPlanes();
          mPolygonOrientations = ( Orientation* ) FrameAllocator::alloc( sizeof( Orientation ) * numPolygons );
 
          Point3F camPos = camView.getPosition();
 
          for( U32 i = 0; i < numPolygons; ++ i )
          {
-            if (mPolyhedron->getPlanes()[i].whichSide( camPos ) == PlaneF::Front)
+            if (this->mPolyhedron->getPlanes()[i].whichSide( camPos ) == PlaneF::Front)
                mPolygonOrientations[i] = FrontFacing;
             else
                mPolygonOrientations[i] = BackFacing;
