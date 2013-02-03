@@ -141,6 +141,10 @@ public:
 
    static bool smRenderEdges;   
 
+   // To prevent bitpack overflows.
+   // This is only indirectly enforced by trucation when serializing.
+   static const S32 smMaxSurfaces = 100;
+
 public:
    
    ConvexShape();

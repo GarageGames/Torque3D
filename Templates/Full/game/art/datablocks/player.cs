@@ -484,7 +484,7 @@ datablock PlayerData(DefaultPlayerData)
    computeCRC = false;
 
    // Third person shape
-   shapeFile = "art/shapes/actors/Soldier/soldier_rigged.dae";
+   shapeFile = "art/shapes/actors/Soldier/soldier_rigged.DAE";
    cameraMaxDist = 3;
    allowImageStateAnimation = true;
 
@@ -503,8 +503,6 @@ datablock PlayerData(DefaultPlayerData)
    debris = playerDebris;
    
    throwForce = 30;
-
-   aiAvoidThis = 1;
 
    minLookAngle = "-1.4";
    maxLookAngle = "0.9";

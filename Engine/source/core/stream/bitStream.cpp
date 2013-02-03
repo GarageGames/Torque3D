@@ -336,6 +336,8 @@ S32 BitStream::readInt(S32 bitCount)
 
 void BitStream::writeInt(S32 val, S32 bitCount)
 {
+   AssertWarn((bitCount == 32) || ((val >> bitCount) == 0), "BitStream::writeInt: value out of range");
+
    val = convertHostToLEndian(val);
    writeBits(bitCount, &val);
 }

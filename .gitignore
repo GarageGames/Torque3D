@@ -159,7 +159,7 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-# Mac crap
+# Mac
 .DS_Store
 
 #############
@@ -169,3 +169,7 @@ pip-log.txt
 console.log
 *.cached.dts
 !Engine/bin
+My Projects/
+Project Manager.exe
+projects.xml
+Qt*.dll

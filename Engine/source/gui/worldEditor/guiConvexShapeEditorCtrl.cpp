@@ -871,10 +871,17 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
             text = "Scale face.";
          }
       }
+   
+      // Issue a warning in the status bar
+      // if this convex has an excessive number of surfaces...
+      if ( mConvexSEL && mConvexSEL->getSurfaces().size() > ConvexShape::smMaxSurfaces )
+      {
+          text = "WARNING: Reduce the number of surfaces on the selected ConvexShape, only the first 100 will be saved!";
+      }
 
       Con::executef( statusbar, "setInfo", text.c_str() );
 
-		Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mConvexSEL == NULL ? 0 : 1 ) );
+	Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mConvexSEL == NULL ? 0 : 1 ) );
    }   
 
    if ( mActiveTool )

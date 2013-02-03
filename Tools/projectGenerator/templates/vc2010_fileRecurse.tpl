@@ -36,6 +36,8 @@
          </CustomBuild>
       {elseif $projOutput->isSourceFile( $dirWalk->path ) }
          <ClCompile Include="{$dirWalk->path|replace:'//':'/'|replace:'/':'\\'}" />      
+      {elseif $projOutput->isResourceFile( $dirWalk->path ) }
+         <ResourceCompile Include="{$dirWalk->path|replace:'//':'/'|replace:'/':'\\'}" />      
       {else}
          <ClInclude Include="{$dirWalk->path|replace:'//':'/'|replace:'/':'\\'}" />      
       {/if}{* if path == "*.asm" *}   

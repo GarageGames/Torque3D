@@ -215,12 +215,18 @@ void FontRenderBatcher::queueChar( UTF16 c, S32 &currentX, GFXVertexColor &curre
 
 FontRenderBatcher::SheetMarker & FontRenderBatcher::getSheetMarker( U32 sheetID )
 {
-   // Allocate if it doesn't exist...
-   if(mSheets.size() <= sheetID || !mSheets[sheetID])
+   // Add empty sheets up to and including the requested sheet if necessary
+   if (mSheets.size() <= sheetID)
    {
-      if(sheetID >= mSheets.size())
-         mSheets.setSize(sheetID+1);
+      S32 oldSize = mSheets.size();
+      mSheets.setSize( sheetID + 1 );
+      for ( S32 i = oldSize; i < mSheets.size(); i++ )
+         mSheets[i] = NULL;
+   }
 
+   // Allocate if it doesn't exist...
+   if (!mSheets[sheetID])
+   {
       S32 size = sizeof( SheetMarker) + mLength * sizeof( CharMarker );
       mSheets[sheetID] = (SheetMarker *)mStorage.alloc(size);
       mSheets[sheetID]->numChars = 0;

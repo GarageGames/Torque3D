@@ -394,7 +394,19 @@ void GuiDecalEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
       // Assign the appropriate changed value back to the decal.
       if ( mGizmo->getMode() == ScaleMode )
-         mSELDecal->mSize = (scale.x + scale.y) * 0.5f;
+      {
+         // Save old size.
+         const F32 oldSize = mSELDecal->mSize;
+
+         // Set new size.
+         mSELDecal->mSize = ( scale.x + scale.y ) * 0.5f;
+
+         // See if the decal properly clips/projects at this size.  If not,
+         // stick to the old size.
+         mSELEdgeVerts.clear();
+         if ( !gDecalManager->clipDecal( mSELDecal, &mSELEdgeVerts ) )
+            mSELDecal->mSize = oldSize;
+      }
       else if ( mGizmo->getMode() == MoveMode )
          mSELDecal->mPosition = gizmoPos;
       else if ( mGizmo->getMode() == RotateMode )

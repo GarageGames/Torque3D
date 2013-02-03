@@ -26,6 +26,10 @@
 #include "renderInstance/renderBinManager.h"
 #endif
 
+class Material;
+class BaseMatInstance;
+
+
 //**************************************************************************
 // RenderOcclusionMgr
 //**************************************************************************
@@ -46,15 +50,17 @@ public:
    DECLARE_CONOBJECT(RenderOcclusionMgr);
 
 protected:
-   BaseMatInstance* mOverrideMat;
-   GFXStateBlockRef mNormalSB;
+   GFXStateBlockRef mRenderSB;
    GFXStateBlockRef mTestSB;
-   
-   GFXStateBlockRef mDebugSB;
+
+   /// The material for rendering occluders.
+   SimObjectPtr<Material> mMaterial;
+   BaseMatInstance *mMatInstance;
+
    static bool smDebugRender;
 
-   GFXVertexBufferHandle<GFXVertexPC> mBoxBuff;
-   GFXVertexBufferHandle<GFXVertexPC> mSphereBuff;
+   GFXVertexBufferHandle<GFXVertexP> mBoxBuff;
+   GFXVertexBufferHandle<GFXVertexP> mSphereBuff;
    U32 mSpherePrimCount;
 };
 

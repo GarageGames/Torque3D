@@ -75,12 +75,25 @@ bool ClippedPolyList::isEmpty() const
 
 U32 ClippedPolyList::addPoint(const Point3F& p)
 {
+    return addPointAndNormal( p, Point3F::Zero );
+}
+
+U32 ClippedPolyList::addPointAndNormal(const Point3F& p, const Point3F& normal)
+{
    mVertexList.increment();
    Vertex& v = mVertexList.last();
    v.point.x = p.x * mScale.x;
    v.point.y = p.y * mScale.y;
    v.point.z = p.z * mScale.z;
    mMatrix.mulP(v.point);
+
+    mNormalList.increment();
+    VectorF& n = mNormalList.last();
+    n = normal;
+    if ( !n.isZero() )
+        mMatrix.mulV(n);
+
+    AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");    
 
    // Build the plane mask
    register U32      mask = 1;
@@ -242,6 +255,13 @@ void ClippedPolyList::end()
             VectorF vv = v2 - v1;
             F32 t = -mPlaneList[p].distToPlane(v1) / mDot(mPlaneList[p],vv);
 
+            mNormalList.increment();
+            VectorF& n1 = mNormalList[mIndexList[i1]];
+            VectorF& n2 = mNormalList[mIndexList[i1]];
+            VectorF nn = mLerp( n1, n2, t );
+            nn.normalizeSafe();
+            mNormalList.last() = nn;
+
             mIndexList.push_back/*_noresize*/(mVertexList.size() - 1);
             Vertex& iv = mVertexList.last();
             iv.point.x = v1.x + vv.x * t;
@@ -343,12 +363,14 @@ void ClippedPolyList::cullUnusedVerts()
       if ( !result )
       {
          mVertexList.setSize( i );
+         mNormalList.setSize( i );
          break;
       }
 
       // Erase unused verts.
       numDeleted = (k-1) - i + 1;       
       mVertexList.erase( i, numDeleted );
+      mNormalList.erase( i, numDeleted );
 
       // Find any references to vertices after those deleted
       // in the mIndexList and correct with an offset
@@ -407,7 +429,7 @@ void ClippedPolyList::generateNormals()
 {
    PROFILE_SCOPE( ClippedPolyList_GenerateNormals );
 
-   mNormalList.setSize( mVertexList.size() );
+   AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");    
 
    U32 i, polyCount;
    VectorF normal;
@@ -418,6 +440,10 @@ void ClippedPolyList::generateNormals()
    U32 n = 0;
    for ( ; normalIter != mNormalList.end(); normalIter++, n++ )
    {
+       // Skip normals that already have values.
+       if ( !normalIter->isZero() )
+           continue;
+
       // Average all the face normals which 
       // share this vertex index.
       indexIter = mIndexList.begin();

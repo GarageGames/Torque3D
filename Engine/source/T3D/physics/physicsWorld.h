@@ -42,6 +42,8 @@ class PhysicsWorld
 {
 protected:
 
+   Signal<void()> mStaticChangedSignal;
+
    Signal<void()> mUpdateSignal;
 
    /// The current gravity force.
@@ -58,6 +60,9 @@ public:
    /// 
    Signal<void()>& getUpdateSignal() { return mUpdateSignal; }
 
+   // Called when a static body in the scene has been removed.
+   Signal<void()>& getStaticChangedSignal() { return mStaticChangedSignal; }
+   
    /// Overloaded to do debug drawing.
    ///
    /// It is assumed the GFX state is setup prior to this call for

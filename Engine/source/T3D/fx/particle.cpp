@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 #include "particle.h"
 #include "console/consoleTypes.h"
+#include "console/typeValidators.h"
 #include "core/stream/bitStream.h"
 #include "math/mRandom.h"
 #include "math/mathIO.h"
@@ -132,13 +133,13 @@ ParticleData::~ParticleData()
 //-----------------------------------------------------------------------------
 void ParticleData::initPersistFields()
 {
-   addField( "dragCoefficient", TYPEID< F32 >(), Offset(dragCoefficient, ParticleData),
+   addFieldV( "dragCoefficient", TYPEID< F32 >(), Offset(dragCoefficient, ParticleData), new FRangeValidator(0, 5),
       "Particle physics drag amount." );
    addField( "windCoefficient", TYPEID< F32 >(), Offset(windCoefficient, ParticleData),
       "Strength of wind on the particles." );
-   addField( "gravityCoefficient", TYPEID< F32 >(), Offset(gravityCoefficient, ParticleData),
+   addFieldV( "gravityCoefficient", TYPEID< F32 >(), Offset(gravityCoefficient, ParticleData), new FRangeValidator(-10, 10),
       "Strength of gravity on the particles." );
-   addField( "inheritedVelFactor", TYPEID< F32 >(), Offset(inheritedVelFactor, ParticleData),
+   addFieldV( "inheritedVelFactor", TYPEID< F32 >(), Offset(inheritedVelFactor, ParticleData), &CommonValidators::NormalizedFloat,
       "Amount of emitter velocity to add to particle initial velocity." );
    addField( "constantAcceleration", TYPEID< F32 >(), Offset(constantAcceleration, ParticleData),
       "Constant acceleration to apply to this particle." );

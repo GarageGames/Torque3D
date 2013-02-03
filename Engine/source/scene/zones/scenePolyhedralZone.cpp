@@ -73,7 +73,7 @@ void ScenePolyhedralZone::_updateOrientedWorldBox()
    if( mIsBox )
       Parent::_updateOrientedWorldBox();
    else
-      mOrientedWorldBox.set( getTransform(), Point3F( mObjBox.len_x(), mObjBox.len_y(), mObjBox.len_z() ) );
+       mOrientedWorldBox.set( getTransform(), mObjBox.getExtents() * getScale() );
 }
 
 //-----------------------------------------------------------------------------

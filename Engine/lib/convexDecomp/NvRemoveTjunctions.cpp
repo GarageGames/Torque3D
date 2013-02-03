@@ -67,6 +67,9 @@ NvRemoveTjunctions.cpp : A code snippet to remove tjunctions from a triangle mes
 #include "NvHashMap.h"
 #include "NvRemoveTjunctions.h"
 #include "NvFloatMath.h"
+#ifdef LINUX
+   #include <climits>
+#endif
 
 #pragma warning(disable:4189)
 

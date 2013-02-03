@@ -236,7 +236,7 @@ GFXTexHandle ReflectionManager::allocRenderTarget( const Point2I &size )
                         avar("%s() - mReflectTex (line %d)", __FUNCTION__, __LINE__) );
 }
 
-GFXTextureObject* ReflectionManager::getRefractTex()
+GFXTextureObject* ReflectionManager::getRefractTex( bool forceUpdate )
 {
    GFXTarget *target = GFX->getActiveRenderTarget();
    GFXFormat targetFormat = target->getFormat();
@@ -261,7 +261,7 @@ GFXTextureObject* ReflectionManager::getRefractTex()
       mUpdateRefract = true;
    }
 
-   if ( mUpdateRefract )
+   if ( forceUpdate || mUpdateRefract )
    {
       target->resolveTo( mRefractTex );   
       mUpdateRefract = false;

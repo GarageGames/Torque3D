@@ -322,9 +322,11 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
          }
          else
          {
-            base = polyList->addPoint( mVertexData[firstVert].vert() );
+            base = polyList->addPointAndNormal( mVertexData[firstVert].vert(), mVertexData[firstVert].normal() );
             for ( i = 1; i < vertsPerFrame; i++ )
-               polyList->addPoint( mVertexData[ i + firstVert ].vert() );
+            {
+               polyList->addPointAndNormal( mVertexData[ i + firstVert ].vert(), mVertexData[ i + firstVert ].normal() );
+            }
          }
       }
       else
@@ -348,9 +350,9 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
          }
          else
          {
-            base = polyList->addPoint( verts[firstVert] );
+            base = polyList->addPointAndNormal( verts[firstVert], norms[firstVert] );
             for ( i = 1; i < vertsPerFrame; i++ )
-               polyList->addPoint( verts[ i + firstVert ] );
+               polyList->addPointAndNormal( verts[ i + firstVert ], norms[ i + firstVert ] );
          }
       }
    }
@@ -1301,6 +1303,8 @@ void TSSkinMesh::createBatchData()
    // Temp vector to build batch operations
    Vector<BatchData::BatchedVertex> batchOperations;
 
+   bool issuedWeightWarning = false;
+
    // Build the batch operations
    while( curVtx != endVtx )
    {
@@ -1313,13 +1317,43 @@ void TSSkinMesh::createBatchData()
       const F32 w = *curWeight;
       ++curWeight;
 
+      // Ignore empty weights
+      if ( vidx < 0 || midx < 0 || w == 0 )
+         continue;
+
       if( !batchOperations.empty() &&
          batchOperations.last().vertexIndex == vidx )
       {
          AssertFatal( batchOperations.last().transformCount > 0, "Not sure how this happened!" );
 
-         const int opIdx = batchOperations.last().transformCount++;
-         AssertISV( BatchData::maxBonePerVert > opIdx, "Too many bones affecting the same vertex, increase the size of 'TSMesh::BatchData::maxBonePerVert'" );
+         S32 opIdx = batchOperations.last().transformCount++;
+
+         // Limit the number of weights per bone (keep the N largest influences)
+         if ( opIdx >= TSSkinMesh::BatchData::maxBonePerVert )
+         {
+            if ( !issuedWeightWarning )
+            {
+               issuedWeightWarning = true;
+               Con::warnf( "At least one vertex has too many bone weights - limiting "
+                  "to the largest %d influences (see maxBonePerVert in tsMesh.h).",
+                  TSSkinMesh::BatchData::maxBonePerVert );
+            }
+
+            // Too many weights => find and replace the smallest one
+            S32 minIndex = 0;
+            F32 minWeight = batchOperations.last().transform[0].weight;
+            for ( S32 i = 1; i < batchOperations.last().transformCount; i++ )
+            {
+               if ( batchOperations.last().transform[i].weight < minWeight )
+               {
+                  minWeight = batchOperations.last().transform[i].weight;
+                  minIndex = i;
+               }
+            }
+
+            opIdx = minIndex;
+            batchOperations.last().transformCount = TSSkinMesh::BatchData::maxBonePerVert;
+         }
 
          batchOperations.last().transform[opIdx].transformIndex = midx;
          batchOperations.last().transform[opIdx].weight = w;
@@ -1336,6 +1370,25 @@ void TSSkinMesh::createBatchData()
       //Con::printf( "[%d] transform idx %d, weight %1.5f", vidx, midx, w );
    }
    //Con::printf("End skin update");
+
+   // Normalize vertex weights (force weights for each vert to sum to 1)
+   if ( issuedWeightWarning )
+   {
+      for ( S32 i = 0; i < batchOperations.size(); i++ )
+      {
+         BatchData::BatchedVertex& batchOp = batchOperations[i];
+
+         // Sum weights for this vertex
+         F32 invTotalWeight = 0;
+         for ( S32 j = 0; j < batchOp.transformCount; j++ )
+            invTotalWeight += batchOp.transform[j].weight;
+
+         // Then normalize the vertex weights
+         invTotalWeight = 1.0f / invTotalWeight;
+         for ( S32 j = 0; j < batchOp.transformCount; j++ )
+            batchOp.transform[j].weight *= invTotalWeight;
+      }
+   }
 
 #ifdef _BATCH_BY_VERTEX
    // Copy data to member, and be done
@@ -2636,10 +2689,14 @@ void TSMesh::disassemble()
       {
          const TSDrawPrimitive& prim = primitives[i];
 
-         TriListOpt::OptimizeTriangleOrdering(verts.size(), prim.numElements,
-            indices.address() + prim.start, tmpIdxs.address());
-         dCopyArray(indices.address() + prim.start, tmpIdxs.address(), 
-            prim.numElements);
+         // only optimize triangle lists (strips and fans are assumed to be already optimized)
+         if ( (prim.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
+         {
+            TriListOpt::OptimizeTriangleOrdering(verts.size(), prim.numElements,
+               indices.address() + prim.start, tmpIdxs.address());
+            dCopyArray(indices.address() + prim.start, tmpIdxs.address(), 
+               prim.numElements);
+         }
       }
    }
 

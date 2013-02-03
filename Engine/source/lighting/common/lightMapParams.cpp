@@ -22,8 +22,17 @@
 
 #include "lighting/common/lightMapParams.h"
 #include "core/stream/bitStream.h"
+#include "core/module.h"
 
-const LightInfoExType LightMapParams::Type( "LightMapParams" );
+MODULE_BEGIN( LightMapParams )
+MODULE_INIT_AFTER( ShadowMapParams )
+MODULE_INIT
+{
+   LightMapParams::Type = "LightMapParams";
+}
+MODULE_END;
+
+LightInfoExType LightMapParams::Type( "" );
 
 LightMapParams::LightMapParams( LightInfo *light ) :
    representedInLightmap(false), 
