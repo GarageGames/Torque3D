@@ -484,7 +484,7 @@ datablock PlayerData(DefaultPlayerData)
    computeCRC = false;
 
    // Third person shape
-   shapeFile = "art/shapes/actors/Soldier/soldier_rigged.dae";
+   shapeFile = "art/shapes/actors/Soldier/soldier_rigged.DAE";
    cameraMaxDist = 3;
    allowImageStateAnimation = true;
 
