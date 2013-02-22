@@ -152,10 +152,11 @@ class RigidShape: public ShapeBase
       WheelCollision = BIT(1),
    };
    enum MaskBits {
-      PositionMask = Parent::NextFreeMask << 0,
-      EnergyMask   = Parent::NextFreeMask << 1,
-      FreezeMask   = Parent::NextFreeMask << 2,
-      NextFreeMask = Parent::NextFreeMask << 3
+      PositionMask   = Parent::NextFreeMask << 0,
+      EnergyMask     = Parent::NextFreeMask << 1,
+      FreezeMask     = Parent::NextFreeMask << 2,
+      ForceMoveMask  = Parent::NextFreeMask << 3,
+      NextFreeMask = Parent::NextFreeMask << 4
    };
 
    void updateDustTrail( F32 dt );
@@ -282,6 +283,10 @@ public:
    /// @param   r   Point on the object to apply impulse to, r is relative to Center of Mass
    /// @param   impulse   Impulse vector to apply.
    void applyImpulse(const Point3F &r, const Point3F &impulse);
+
+   /// Forces the client to jump to the RigidShape's transform rather
+   /// then warp to it.
+   void forceClientTransform();
 
    void getCameraParameters(F32 *min, F32* max, Point3F* offset, MatrixF* rot);
    void getCameraTransform(F32* pos, MatrixF* mat);

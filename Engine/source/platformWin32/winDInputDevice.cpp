@@ -66,7 +66,8 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
    switch ( GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType ) )
    {
       // [rene, 12/09/2008] why do we turn a gamepad into a joystick here?
-
+	  
+      case DI8DEVTYPE_DRIVING:
       case DI8DEVTYPE_GAMEPAD:
       case DI8DEVTYPE_JOYSTICK:
          deviceTypeName    = "joystick";
@@ -991,7 +992,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
                }
                if( clearkeys & POV_down)
                {
-                  newEvent.objInst = ( objInst == 0 ) ? SI_DPOV : SI_DPOV;
+                  newEvent.objInst = ( objInst == 0 ) ? SI_DPOV : SI_DPOV2;
                   _Win32LogPOVInput(newEvent);
                   newEvent.postToSignal(Input::smInputEvent);
                }
@@ -1022,7 +1023,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
                }
                if( setkeys & POV_down)
                {
-                  newEvent.objInst = ( objInst == 0 ) ? SI_DPOV : SI_DPOV;
+                  newEvent.objInst = ( objInst == 0 ) ? SI_DPOV : SI_DPOV2;
                   _Win32LogPOVInput(newEvent);
                   newEvent.postToSignal(Input::smInputEvent);
                }

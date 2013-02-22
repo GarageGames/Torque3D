@@ -66,20 +66,7 @@ F32 MoveManager::mYAxis_R = 0;
 U32 MoveManager::mTriggerCount[MaxTriggerKeys] = { 0, };
 U32 MoveManager::mPrevTriggerCount[MaxTriggerKeys] = { 0, };
 
-const Move NullMove =
-{
-   /*px=*/16, /*py=*/16, /*pz=*/16,
-   /*pyaw=*/0, /*ppitch=*/0, /*proll=*/0,
-   /*x=*/0, /*y=*/0,/*z=*/0,
-   /*yaw=*/0, /*pitch=*/0, /*roll=*/0,
-   /*id=*/0, 
-   /*sendCount=*/0,
-
-   /*checksum=*/false,
-   /*deviceIsKeyboardMouse=*/false, 
-   /*freeLook=*/false,
-   /*triggers=*/{false,false,false,false,false,false}
-};
+const Move NullMove;
 
 void MoveManager::init()
 {
@@ -161,6 +148,26 @@ void MoveManager::init()
    }
 }
 
+Move::Move()
+{
+   px=16; py=16; pz=16;
+   pyaw=0; ppitch=0; proll=0;
+   x=0; y=0; z=0;
+   yaw=0; pitch=0; roll=0;
+   id=0;
+   sendCount=0;
+
+   checksum = false;
+   deviceIsKeyboardMouse = false;
+   freeLook = false;
+   trigger[0] = false;
+   trigger[1] = false;
+   trigger[2] = false;
+   trigger[3] = false;
+   trigger[4] = false;
+   trigger[5] = false;
+}
+
 static inline F32 clampFloatWrap(F32 val)
 {
    return val - F32(S32(val));
@@ -235,6 +242,11 @@ void Move::pack(BitStream *stream, const Move * basemove)
    if (!basemove)
       basemove = &NullMove;
 
+   packMove(stream, basemove, alwaysWriteAll);
+}
+
+bool Move::packMove(BitStream *stream, const Move* basemove, bool alwaysWriteAll)
+{
    S32 i;
    bool triggerDifferent = false;
    for (i=0; i < MaxTriggerKeys; i++)
@@ -272,6 +284,8 @@ void Move::pack(BitStream *stream, const Move * basemove)
          for(i = 0; i < MaxTriggerKeys; i++)
       stream->writeFlag(trigger[i]);
    }
+
+   return (triggerDifferent || somethingDifferent);
 }
 
 void Move::unpack(BitStream *stream, const Move * basemove)
@@ -280,7 +294,20 @@ void Move::unpack(BitStream *stream, const Move * basemove)
    if (!basemove)
       basemove=&NullMove;
 
-   if (alwaysReadAll || stream->readFlag())
+   bool readMove = unpackMove(stream, basemove, alwaysReadAll);
+   if(!readMove)
+      *this = *basemove;
+}
+
+bool Move::unpackMove(BitStream *stream, const Move* basemove, bool alwaysReadAll)
+{
+   bool readMove = alwaysReadAll;
+   if(!readMove)
+   {
+      readMove = stream->readFlag();
+   }
+
+   if (readMove)
    {
       pyaw = stream->readFlag() ? stream->readInt(16) : basemove->pyaw;
       ppitch = stream->readFlag() ? stream->readInt(16) : basemove->ppitch;
@@ -297,6 +324,6 @@ void Move::unpack(BitStream *stream, const Move * basemove)
          trigger[i] = triggersDiffer ? stream->readFlag() : basemove->trigger[i];
       unclamp();
    }
-   else
-      *this = *basemove;
+
+   return readMove;
 }

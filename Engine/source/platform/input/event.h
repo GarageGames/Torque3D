@@ -30,13 +30,21 @@
 #define _EVENT_H_
 
 #include "platform/types.h"
+#include "platform/input/IInputDevice.h"
 #include "core/util/journal/journaledSignal.h"
+#include "core/util/tSingleton.h"
+#include "core/util/tDictionary.h"
+#include "core/tSimpleHashTable.h"
+
+#define AddInputVirtualMap( description, type, code )         \
+   INPUTMGR->addVirtualMap( #description, type, code );
 
 /// @defgroup input_constants Input system constants
 /// @{
 
 /// Input event constants:
-enum InputObjectInstances
+typedef U32 InputObjectInstances;
+enum InputObjectInstancesEnum
 {
    KEY_NULL          = 0x000,     ///< Invalid KeyCode
    KEY_BACKSPACE     = 0x001,
@@ -203,6 +211,22 @@ enum InputObjectInstances
    KEY_BUTTON29      = 0x011D,
    KEY_BUTTON30      = 0x011E,
    KEY_BUTTON31      = 0x011F,
+   KEY_BUTTON32      = 0x0120,
+   KEY_BUTTON33      = 0x0121,
+   KEY_BUTTON34      = 0x0122,
+   KEY_BUTTON35      = 0x0123,
+   KEY_BUTTON36      = 0x0124,
+   KEY_BUTTON37      = 0x0125,
+   KEY_BUTTON38      = 0x0126,
+   KEY_BUTTON39      = 0x0127,
+   KEY_BUTTON40      = 0x0128,
+   KEY_BUTTON41      = 0x0129,
+   KEY_BUTTON42      = 0x012A,
+   KEY_BUTTON43      = 0x012B,
+   KEY_BUTTON44      = 0x012C,
+   KEY_BUTTON45      = 0x012D,
+   KEY_BUTTON46      = 0x012E,
+   KEY_BUTTON47      = 0x012F,
    KEY_ANYKEY        = 0xfffe,
 
    /// Joystick event codes.
@@ -250,10 +274,13 @@ enum InputObjectInstances
    XI_B              = 0x318,
    XI_X              = 0x319,
    XI_Y              = 0x320,
+
+   INPUT_DEVICE_PLUGIN_CODES_START = 0x400,
 };
 
 /// Input device types
-enum InputDeviceTypes
+typedef U32 InputDeviceTypes;
+enum InputDeviceTypesEnum
 {
    UnknownDeviceType,
    MouseDeviceType,
@@ -262,7 +289,9 @@ enum InputDeviceTypes
    GamepadDeviceType,
    XInputDeviceType,
 
-   NUM_INPUT_DEVICE_TYPES
+   NUM_INPUT_DEVICE_TYPES,
+
+   INPUT_DEVICE_PLUGIN_DEVICES_START = NUM_INPUT_DEVICE_TYPES,
 };
 
 /// Device Event Action Types
@@ -278,17 +307,24 @@ enum InputActionType
    SI_MOVE    = 0x03,
 
    /// A key repeat occurred. Happens in between a SI_MAKE and SI_BREAK.
-   SI_REPEAT = 0x04,
+   SI_REPEAT  = 0x04,
+
+   /// A value of some type.  Matched with SI_FLOAT or SI_INT.
+   SI_VALUE   = 0x05,
 };
 
 ///Device Event Types
 enum InputEventType
 {
    SI_UNKNOWN = 0x01,
-   SI_BUTTON  = 0x02,
-   SI_POV     = 0x03,
-   SI_AXIS    = 0x04,
-   SI_KEY     = 0x0A,
+   SI_BUTTON  = 0x02,   // Button press/release
+   SI_POV     = 0x03,   // Point of View hat
+   SI_AXIS    = 0x04,   // Axis in range -1.0..1.0
+   SI_POS     = 0x05,   // Absolute position value (Point3F)
+   SI_ROT     = 0x06,   // Absolute rotation value (QuatF)
+   SI_INT     = 0x07,   // Integer value (S32)
+   SI_FLOAT   = 0x08,   // Float value (F32)
+   SI_KEY     = 0x0A,   // Keyboard key
 };
 
 /// Wildcard match used by the input system.
@@ -356,6 +392,10 @@ struct InputEventInfo
    {
       deviceInst = 0;
       fValue     = 0.f;
+      fValue2    = 0.f;
+      fValue3    = 0.f;
+      fValue4    = 0.f;
+      iValue     = 0;
       deviceType = (InputDeviceTypes)0;
       objType    = (InputEventType)0;
       ascii      = 0;
@@ -367,8 +407,17 @@ struct InputEventInfo
    /// Device instance: joystick0, joystick1, etc
    U32 deviceInst;
 
-   /// Value ranges from -1.0 to 1.0
+   /// Value typically ranges from -1.0 to 1.0, but doesn't have to.
+   /// It depends on the context.
    F32 fValue;
+
+   /// Extended float values (often used for absolute rotation Quat)
+   F32 fValue2;
+   F32 fValue3;
+   F32 fValue4;
+
+   /// Signed integer value
+   S32 iValue;
 
    /// What was the action? (MAKE/BREAK/MOVE)
    InputActionType      action;
@@ -384,9 +433,99 @@ struct InputEventInfo
 
    inline void postToSignal(InputEvent &ie)
    {
-      ie.trigger(deviceInst, fValue, deviceType, objType, ascii, objInst, action, modifier);
+      ie.trigger(deviceInst, fValue, fValue2, fValue3, fValue4, iValue, deviceType, objType, ascii, objInst, action, modifier);
    }
 };
+
+class Point3F;
+class QuatF;
+
+/// Handles input device plug-ins
+class InputEventManager
+{
+public:
+   struct VirtualMapData
+   {
+      StringTableEntry     desc;
+      InputEventType       type;
+      InputObjectInstances code;
+   };
+
+public:
+   InputEventManager();
+   virtual ~InputEventManager();
+
+   /// Get the next device type code
+   U32 getNextDeviceType();
+
+   /// Get the next device action code
+   U32 getNextDeviceCode();
+
+   void registerDevice(IInputDevice* device);
+   void unregisterDevice(IInputDevice* device);
+
+   /// Check if the given device name is a registered device.
+   /// The given name can optionally include an instance number on the end.
+   bool isRegisteredDevice(const char* name);
+
+   /// Check if the given device type is a registered device.
+   bool isRegisteredDevice(U32 type);
+
+   /// Same as above but also provides the found device type and actual
+   // device name length.  Used by ActionMap::getDeviceTypeAndInstance()
+   bool isRegisteredDeviceWithAttributes(const char* name, U32& deviceType, U32&nameLen);
+
+   /// Returns the name of a registered device given its type
+   const char* getRegisteredDeviceName(U32 type);
+
+   void start();
+   void stop();
+
+   void process();
+
+   // Add to the virtual map table
+   void addVirtualMap(const char* description, InputEventType type, InputObjectInstances code);
+
+   // Find a virtual map entry based on the text description
+   VirtualMapData* findVirtualMap(const char* description);
+
+   // Find a virtual map entry's description based on the action code
+   const char* findVirtualMapDescFromCode(U32 code);
+
+   /// Build an input event based on a single iValue
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, S32 iValue);
+
+   /// Build an input event based on a single fValue
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue);
+
+   /// Build an input event based on a Point3F
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, Point3F& pValue);
+
+   /// Build an input event based on a QuatF
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, QuatF& qValue);
+
+protected:
+   U32 mNextDeviceTypeCode;
+   U32 mNextDeviceCode;
+
+   Vector<IInputDevice*> mDeviceList;
+
+   // Holds description to VirtualMapData struct
+   SimpleHashTable<VirtualMapData> mVirtualMap;
+
+   // Used to look up a description based on a VirtualMapData.code
+   HashTable<U32, VirtualMapData> mActionCodeMap;
+
+protected:
+   void buildVirtualMap();
+
+public:
+   // For ManagedSingleton.
+   static const char* getSingletonName() { return "InputEventManager"; }   
+};
+
+/// Returns the InputEventManager singleton.
+#define INPUTMGR ManagedSingleton<InputEventManager>::instance()
 
 
 #endif

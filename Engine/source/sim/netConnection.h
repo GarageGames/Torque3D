@@ -32,9 +32,6 @@
 #ifndef _NETSTRINGTABLE_H_
 #include "sim/netStringTable.h"
 #endif
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
 #ifndef _DNET_H_
 #include "core/dnet.h"
 #endif

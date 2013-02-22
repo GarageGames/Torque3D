@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "terrain/terrMaterial.h"
 #include "console/consoleTypes.h"
+#include "gfx/gfxTextureManager.h"
 #include "gfx/bitmap/gBitmap.h"
 
 
@@ -152,9 +153,9 @@ TerrainMaterial* TerrainMaterial::findOrCreate( const char *nameOrPath )
       // fallback here just in case it gets "lost".
       mat = new TerrainMaterial();
       mat->setInternalName( "warning_material" );
-      mat->mDiffuseMap = "core/art/warnMat.png";
+      mat->mDiffuseMap = GFXTextureManager::getWarningTexturePath();
       mat->mDiffuseSize = 500;
-      mat->mDetailMap = "core/art/warnMat.png";
+      mat->mDetailMap = GFXTextureManager::getWarningTexturePath();
       mat->mDetailSize = 5;
       mat->registerObject();
       
