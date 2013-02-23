@@ -57,7 +57,7 @@ class Stream
    // Public structs and enumerations...
 public:
      /// Status constants for the stream
-   enum Status {
+   enum StatusT3D {
       Ok = 0,           ///< Ok!
       IOError,          ///< Read or Write error
       EOS,              ///< End of Stream reached (mostly for reads)
@@ -74,20 +74,20 @@ public:
 
    // Accessible only through inline accessors
 private:
-   Status m_streamStatus;
+   StatusT3D m_streamStatus;
 
    // Derived accessible data modifiers...
 protected:
-   void setStatus(const Status in_newStatus) { m_streamStatus = in_newStatus; }
+   void setStatus(const StatusT3D in_newStatus) { m_streamStatus = in_newStatus; }
 
 public:
    Stream();
    virtual ~Stream() {}
 
    /// Gets the status of the stream
-   Stream::Status getStatus() const { return m_streamStatus; }
+   Stream::StatusT3D getStatus() const { return m_streamStatus; }
    /// Gets a printable string form of the status
-   static const char* getStatusString(const Status in_status);
+   static const char* getStatusString(const StatusT3D in_status);
 
    // Derived classes must override these...
 protected:

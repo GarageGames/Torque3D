@@ -52,12 +52,17 @@
 #include <time.h> // nanosleep
 
 #ifndef DEDICATED
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL_version.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xos.h>
+#endif
+
+// evil hack to get around insane X windows #define-happy header files
+#ifdef Status
+#undef Status
 #endif
 
 x86UNIXPlatformState *x86UNIXState;

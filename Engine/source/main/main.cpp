@@ -191,7 +191,7 @@ int main(int argc, const char **argv)
 
 #endif // __MACOSX
 
-#ifdef __linux__
+#ifdef __LINUX__
 
 #include <dlfcn.h>
 #include <stdio.h>

@@ -65,10 +65,12 @@ class Torque3D
         $ext = "DLL";
         if ( Generator::$platform == "mac" )
             $ext = "Bundle";
+        else
+            $ext = "SO";
    
 
         //some platforms will not want a shared config        
-        if ( Generator::$platform == "360" || Generator::$platform == "ps3" )
+        if ( Generator::$platform == "360" || Generator::$platform == "ps3" || Generator::$platform == "linux" )
             self::$sharedConfig = false;
 
         //begin either a shared lib config, or a static app config
@@ -158,6 +160,11 @@ class Torque3D
             addProjectDefine( 'LTM_DESC' );
         }
 
+        if ( Generator::$platform == "linux" )
+        {    
+            addProjectDefine( '__LINUX__' );
+        }
+
         if (Generator::$platform == "win32")
         {
             setProjectModuleDefinitionFile('../../' . getLibSrcDir() . 'Torque3D/msvc/torque3d.def');
@@ -213,6 +220,12 @@ class Torque3D
                 {
                     addProjectDefine( 'WIN32' );
                     addProjectDependency( getGameProjectName() . ' DLL' );
+                }
+
+                if (Generator::$platform == "linux")
+                {
+                    addProjectDefine( '__LINUX__' );
+                    addProjectDependency( getGameProjectName() . ' SO' );
                 }
 
                 if (Generator::$platform == "mac")

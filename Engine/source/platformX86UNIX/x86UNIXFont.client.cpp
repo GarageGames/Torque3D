@@ -29,6 +29,9 @@
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platformX86UNIX/x86UNIXFont.h"
 
+// Needed for getenv in createFont
+#include <stdlib.h>
+
 // Needed by createFont
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -37,8 +40,6 @@
 #include <X11/Xft/Xft.h>
 #include <X11/extensions/Xrender.h>      // For XRenderColor
 
-// Needed for getenv in createFont
-#include <stdlib.h>
 XftFont *loadFont(const char *name, S32 size, Display *display)
 {
   XftFont *fontInfo = NULL;

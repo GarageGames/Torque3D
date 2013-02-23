@@ -25,6 +25,8 @@
 //#include "platformX86UNIX/platformGL.h"
 #include "core/strings/stringFunctions.h"
 
+#include <libgen.h> // for basename
+
 #ifndef DEDICATED
 #include <X11/Xlib.h> // for Display, Window and other X mojo
 #else
@@ -32,8 +34,6 @@
 #define Window int
 #define Screen int
 #endif
-
-#include <libgen.h> // for basename
 
 typedef void (*LockFunc_t)(void);
 

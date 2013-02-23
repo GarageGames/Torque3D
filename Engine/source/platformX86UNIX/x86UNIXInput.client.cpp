@@ -23,15 +23,10 @@
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platform/platformInput.h"
 #include "platform/platformVideo.h"
-#include "platform/event.h"
 #include "platform/gameInterface.h"
 #include "console/console.h"
 #include "platformX86UNIX/x86UNIXState.h"
 #include "platformX86UNIX/x86UNIXInputManager.h"
-
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/keysym.h>
 
 #include <SDL/SDL.h>
 
@@ -40,6 +35,10 @@
 #include <stdarg.h>
 #include <fcntl.h>
 #include <platformX86UNIX/x86UNIXUtils.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <X11/keysym.h>
 
 extern int x86UNIXOpen(const char *path, int oflag);
 extern int x86UNIXClose(int fd);
