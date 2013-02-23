@@ -42,7 +42,7 @@ void* dMemset( void* dst, S32 c, dsize_t size )
 }
 
 //--------------------------------------
-S32 dMemcmp( const void* ptr1, const void* ptr2, dsize_t len )s
+S32 dMemcmp( const void* ptr1, const void* ptr2, dsize_t len )
 {
    return memcmp(ptr1, ptr2, len);
 }

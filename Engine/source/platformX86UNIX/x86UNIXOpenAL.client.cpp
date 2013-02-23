@@ -22,6 +22,7 @@
 
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "console/console.h"
+#include "core/strings/stringFunctions.h"
 
 #include <dlfcn.h>
 
@@ -236,8 +237,7 @@ bool OpenALDLLInit()
    char openalPath[4096];
    for (int i = 0; searchPath[i] != NULL; ++i)
    {   
-      dSprintf(openalPath, sizeof(openalPath), "%s/%s/%s",
-         Platform::getWorkingDirectory(), 
+      dSprintf(openalPath, sizeof(openalPath), "%s/%s",
          searchPath[i],
          libName);
          
