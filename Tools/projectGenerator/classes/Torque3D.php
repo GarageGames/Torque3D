@@ -128,11 +128,10 @@ class Torque3D
           includeModule( 'vorbis' );
           includeModule( 'theora' );
         }
-       
-        if(Generator::$platform == "mac" || Generator::$platform == "win32")
-           includeModule( 'openal' );
+        
+        // Dushan - include OpenAL module on all platforms
+        includeModule( 'openal' );
 
-   
         // Dependencies
         
         addProjectDependency( 'lmng' );

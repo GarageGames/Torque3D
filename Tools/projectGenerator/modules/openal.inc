@@ -26,7 +26,17 @@ addEngineSrcDir('sfx/openal');
 addEngineSrcDir('sfx/openal/mac');
 addEngineSrcDir('sfx/openal/win32');
 
-if ( Generator::$platform == "win32" )
-   addIncludePath( getAppLibSrcDir() . 'openal/win32' );
+   switch( Generator::$platform )
+   {
+      case "win32":
+         addIncludePath( getAppLibSrcDir() . 'openal/win32' );
+         break;
+      case "mac":
+         // what ??
+         break;
+      case "linux":
+         addIncludePath( getAppLibSrcDir() . 'openal/LINUX' );
+         break;
+   }
 
 ?>
