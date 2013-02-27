@@ -117,7 +117,13 @@ class Torque3D
         // Modules
         includeModule( 'core' );
         includeModule( 'dsound' );
-        includeModule( 'fmod');
+
+        // Dushan - include FMOD sounds only on Windows
+        if ( Generator::$platform == "win32" )
+        {
+          includeModule( 'fmod');
+        }
+
         includeModule( 'T3D' );
         includeModule( 'advancedLighting' );
         includeModule( 'basicLighting' );
