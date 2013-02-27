@@ -332,6 +332,7 @@ GFXWindowTarget *GFXGLDevice::allocWindowTarget( PlatformWindow *window )
    return ggwt;
 }
 
+#if 0
 void GFXGLDevice::_updateRenderTargets()
 {
    if ( mRTDirty || mCurrentRT->isPendingState() )
@@ -374,6 +375,7 @@ void GFXGLDevice::_updateRenderTargets()
       mViewportDirty = false;
    }
 }
+#endif
 
 GFXFence* GFXGLDevice::_createPlatformSpecificFence()
 {
