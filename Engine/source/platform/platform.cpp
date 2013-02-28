@@ -29,6 +29,9 @@
 #include "app/mainLoop.h"
 #include "platform/input/event.h"
 #include "platform/typetraits.h"
+//MGT: fixes for zip support
+#include "core/volume.h"
+//MGT: end
 
 
 const F32 TypeTraits< F32 >::MIN = - F32_MAX;
@@ -132,8 +135,12 @@ const bool Platform::KeyboardInputExclusion::checkAgainstInput( const InputEvent
 S32 Platform::compareModifiedTimes( const char *firstPath, const char *secondPath )
 {
    FileTime firstModTime;
-   if ( !getFileTimes( firstPath, NULL, &firstModTime ) )
-      return -1;
+   if ( !getFileTimes( firstPath, NULL, &firstModTime ) ) {
+      //MGT: fixes for zip support
+	  //The reason we failed to get file times could be cause it is in a zip.  Lets check.
+	  return Torque::FS::CompareModifiedTimes(firstPath, secondPath);
+	  //MGT: end
+   }
 
    FileTime secondModTime;
    if ( !getFileTimes( secondPath, NULL, &secondModTime ) )

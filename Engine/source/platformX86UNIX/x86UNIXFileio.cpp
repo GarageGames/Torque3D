@@ -57,6 +57,10 @@
  #include "util/tempAlloc.h"
  #include "cinterface/cinterface.h"
 
+//MGT: fixes for zip support
+#include "core/volume.h"
+//MGT: end
+
  #if defined(__FreeBSD__)
     #include <sys/types.h>
  #endif
@@ -979,8 +983,13 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
        return false;
     // Get file info
     struct stat fStat;
-    if (stat(pFilePath, &fStat) < 0)
-       return false;
+	if (stat(pFilePath, &fStat) < 0) {
+     
+		//MGT: since file does not exist on disk lets see if it exists in a zip file loaded
+	   return Torque::FS::IsFile(pFilePath);
+	   //MGT: end
+
+	}
 
     // if the file is a "regular file" then true
     if ( (fStat.st_mode & S_IFMT) == S_IFREG)
