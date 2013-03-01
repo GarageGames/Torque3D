@@ -15,7 +15,7 @@ AL_FUNCTION(ALvoid,     alGetFloatv, ( ALenum param, ALfloat* data ), return; )
 AL_FUNCTION(ALvoid,     alGetDoublev, ( ALenum param, ALdouble* data ), return; )
 AL_FUNCTION(ALubyte*,   alGetString, ( ALenum param ), return NULL; )
 
-AL_FUNCTION(ALenum,     alGetError, ( ALvoid ), return AL_INVALID_VALUE; )
+AL_FUNCTION(ALenum,     alGetError, ( void ), return AL_INVALID_VALUE; )
 AL_FUNCTION(ALboolean,  alIsExtensionPresent, ( ALubyte* fname ), return AL_FALSE; )
 AL_FUNCTION(ALvoid*,    alGetProcAddress, ( ALubyte* fname ), return NULL; )
 AL_FUNCTION(ALenum,     alGetEnumValue, ( ALubyte* ename ), return AL_INVALID_ENUM; )

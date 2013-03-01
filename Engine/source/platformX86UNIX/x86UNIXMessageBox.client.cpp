@@ -24,11 +24,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "platformX86UNIX/x86UNIXMessageBox.h"
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
-
-#include "platformX86UNIX/x86UNIXMessageBox.h"
 
 #define MessageBox_MaxWinWidth 800
 #define MessageBox_MaxWinHeight 600

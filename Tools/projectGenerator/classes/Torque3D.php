@@ -65,10 +65,12 @@ class Torque3D
         $ext = "DLL";
         if ( Generator::$platform == "mac" )
             $ext = "Bundle";
+        else
+            $ext = "SO";
    
 
         //some platforms will not want a shared config        
-        if ( Generator::$platform == "360" || Generator::$platform == "ps3" )
+        if ( Generator::$platform == "360" || Generator::$platform == "ps3" || Generator::$platform == "linux" )
             self::$sharedConfig = false;
 
         //begin either a shared lib config, or a static app config
@@ -115,7 +117,13 @@ class Torque3D
         // Modules
         includeModule( 'core' );
         includeModule( 'dsound' );
-        includeModule( 'fmod');
+
+        // Dushan - include FMOD sounds only on Windows
+        if ( Generator::$platform == "win32" )
+        {
+          includeModule( 'fmod');
+        }
+
         includeModule( 'T3D' );
         includeModule( 'advancedLighting' );
         includeModule( 'basicLighting' );
@@ -126,11 +134,10 @@ class Torque3D
           includeModule( 'vorbis' );
           includeModule( 'theora' );
         }
-       
-        if(Generator::$platform == "mac" || Generator::$platform == "win32")
-           includeModule( 'openal' );
+        
+        // Dushan - include OpenAL module on all platforms
+        includeModule( 'openal' );
 
-   
         // Dependencies
         
         addProjectDependency( 'lmng' );
@@ -156,6 +163,11 @@ class Torque3D
         {    
             addProjectDefine( '__MACOSX__' );
             addProjectDefine( 'LTM_DESC' );
+        }
+
+        if ( Generator::$platform == "linux" )
+        {    
+            addProjectDefine( '__LINUX__' );
         }
 
         if (Generator::$platform == "win32")
@@ -213,6 +225,12 @@ class Torque3D
                 {
                     addProjectDefine( 'WIN32' );
                     addProjectDependency( getGameProjectName() . ' DLL' );
+                }
+
+                if (Generator::$platform == "linux")
+                {
+                    addProjectDefine( '__LINUX__' );
+                    addProjectDependency( getGameProjectName() . ' SO' );
                 }
 
                 if (Generator::$platform == "mac")

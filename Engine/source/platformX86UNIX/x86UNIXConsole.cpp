@@ -23,7 +23,6 @@
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platformX86UNIX/x86UNIXStdConsole.h"
 #include "platformX86UNIX/x86UNIXUtils.h"
-#include "platform/event.h"
 #include "platform/platform.h"
 #include "core/util/rawData.h"
 #include "core/strings/stringFunctions.h"
