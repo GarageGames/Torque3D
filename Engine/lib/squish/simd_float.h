@@ -135,30 +135,30 @@ public:
 	friend Vec4 Min( Vec4::Arg left, Vec4::Arg right )
 	{
 		return Vec4( 
-			SquishMath::min( left.m_x, right.m_x ), 
-			SquishMath::min( left.m_y, right.m_y ), 
-			SquishMath::min( left.m_z, right.m_z ), 
-			SquishMath::min( left.m_w, right.m_w ) 
+			std::min( left.m_x, right.m_x ), 
+			std::min( left.m_y, right.m_y ), 
+			std::min( left.m_z, right.m_z ), 
+			std::min( left.m_w, right.m_w ) 
 		);
 	}
 	
 	friend Vec4 Max( Vec4::Arg left, Vec4::Arg right )
 	{
 		return Vec4( 
-			SquishMath::max( left.m_x, right.m_x ), 
-			SquishMath::max( left.m_y, right.m_y ), 
-			SquishMath::max( left.m_z, right.m_z ), 
-			SquishMath::max( left.m_w, right.m_w ) 
+			std::max( left.m_x, right.m_x ), 
+			std::max( left.m_y, right.m_y ), 
+			std::max( left.m_z, right.m_z ), 
+			std::max( left.m_w, right.m_w ) 
 		);
 	}
 	
 	friend Vec4 Truncate( Vec4::Arg v )
 	{
 		return Vec4(
-			v.m_x > 0.0f ? SquishMath::floor( v.m_x ) : SquishMath::ceil( v.m_x ), 
-			v.m_y > 0.0f ? SquishMath::floor( v.m_y ) : SquishMath::ceil( v.m_y ), 
-			v.m_z > 0.0f ? SquishMath::floor( v.m_z ) : SquishMath::ceil( v.m_z ),
-			v.m_w > 0.0f ? SquishMath::floor( v.m_w ) : SquishMath::ceil( v.m_w )
+			v.m_x > 0.0f ? std::floor( v.m_x ) : std::ceil( v.m_x ), 
+			v.m_y > 0.0f ? std::floor( v.m_y ) : std::ceil( v.m_y ), 
+			v.m_z > 0.0f ? std::floor( v.m_z ) : std::ceil( v.m_z ),
+			v.m_w > 0.0f ? std::floor( v.m_w ) : std::ceil( v.m_w )
 		);
 	}
 	
