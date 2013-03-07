@@ -50,8 +50,13 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    // rename it themselves in their file browser. The main reason for this is so we can easily increment for ourselves;
    // and because its too easy to rename the terrain object and forget to take care of the terrain filename afterwards.
    FileName terrFileName( Con::getVariable("$Client::MissionFile") );
-   terrFileName.replace("tools/levels/", "art/terrains/");
-   terrFileName.replace("levels/", "art/terrains/");
+   String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
+   if ( terrainDirectory.isEmpty() )
+   {
+      terrainDirectory = "art/terrains/";
+   }
+   terrFileName.replace("tools/levels/", terrainDirectory);
+   terrFileName.replace("levels/", terrainDirectory);
 
    TerrainFile::create( &terrFileName, resolution, materials );
 
