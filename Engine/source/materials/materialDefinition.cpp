@@ -1,23 +1,6 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
+// Torque Shader Engine
+// Copyright (C) GarageGames.com, Inc.
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
@@ -116,6 +99,7 @@ Material::Material()
       mSpecular[i].set( 1.0f, 1.0f, 1.0f, 1.0f );
 
       mSpecularPower[i] = 8.0f;
+		mSpecularStrength[i] = 1.0f;		// RDM test
       mPixelSpecular[i] = false;
 
       mParallaxScale[i] = 0.0f;
@@ -239,7 +223,10 @@ void Material::initPersistFields()
          "The color of the specular highlight when not using a specularMap." );
 
       addField("specularPower", TypeF32, Offset(mSpecularPower, Material), MAX_STAGES,
-         "The intensity of the specular highlight when not using a specularMap." );
+         "The hardness of the specular highlight when not using a specularMap." );		// RDM intensity -> hardness
+
+		addField("specularStrength", TypeF32, Offset(mSpecularStrength, Material), MAX_STAGES,
+         "The strength of the specular highlight when not using a specularMap." );		// RDM test
 
       addField("pixelSpecular", TypeBool, Offset(mPixelSpecular, Material), MAX_STAGES, 
          "This enables per-pixel specular highlights controlled by the alpha channel of the "

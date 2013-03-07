@@ -1,23 +1,6 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
+// Torque 3D
+// Copyright (C) GarageGames.com, Inc.
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
@@ -455,6 +438,10 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    specPow->setType( "float" );
    specPow->setName( "specularPower" );
 
+   Var *specStrength = new Var;							// RDM test
+   specStrength->setType( "float" );					// RDM test
+   specStrength->setName( "specularStrength" );		// RDM test
+
    // If the gloss map flag is set, than the specular power is in the alpha
    // channel of the specular map
    if( fd.features[ MFT_GlossMap ] )
@@ -463,6 +450,9 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    {
       specPow->uniform = true;
       specPow->constSortPos = cspPotentialPrimitive;
+
+		specStrength->uniform = true;									// RDM test
+      specStrength->constSortPos = cspPotentialPrimitive;	// RDM test
    }
 
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
@@ -473,8 +463,10 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
       "DeferredPixelSpecularHLSL::processPix - Something hosed the deferred features!" );
 
    // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
-      specDecl, d_specular, specPow, d_NL_Att ) );
+   //meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
+   //   specDecl, d_specular, specPow, d_NL_Att ) );
+	meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
+      specDecl, d_specular, specPow, specStrength ) );   // RDM test
 
    LangElement *specMul = new GenOp( "float4( @.rgb, 0 ) * @", specCol, specular );
    LangElement *final = specMul;
