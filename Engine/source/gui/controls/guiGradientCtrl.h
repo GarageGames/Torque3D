@@ -48,7 +48,6 @@ public:
 	void onRender(Point2I offset, const RectI &updateRect);
 	bool onWake();
 protected:
-	GFXTexHandle mPointer;
 	StringTableEntry  mColorFunction;
 };
 //----------------------------
