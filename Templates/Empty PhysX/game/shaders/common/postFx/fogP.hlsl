@@ -38,7 +38,7 @@ float4 main( PFXVertToPix IN ) : COLOR
    
    // Skip fogging the extreme far plane so that 
    // the canvas clear color always appears.
-   clip( 0.9999 - depth );
+   //clip( 0.9999 - depth ); --changed RK for Fog fix
    
    float factor = computeSceneFog( eyePosWorld,
                                    eyePosWorld + ( IN.wsEyeRay * depth ),
