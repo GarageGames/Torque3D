@@ -62,9 +62,51 @@ singleton PostEffect( FogPostFx )
    
    renderPriority = 5;
    
-   isEnabled = true;
+   isEnabled = false;
 };
 
+//-----------------------------------------------------------------
+// Fog2
+//-----------------------------------------------------------------
+
+singleton ShaderData( FogPassShader2 )
+{
+DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
+DXPixelShaderFile = "shaders/common/postFx/fogP.hlsl";
+
+samplerNames[0] = "$prepassTex";
+samplerNames[0] = "$backBuffer";
+
+pixVersion = 2.0;
+};
+
+singleton GFXStateBlockData( FogPassStateBlock : PFX_DefaultStateBlock )
+{
+blendDefined = true;
+blendEnable = true;
+blendSrc = GFXBlendSrcAlpha;
+blendDest = GFXBlendInvSrcAlpha;
+};
+
+singleton PostEffect( FogPostFx2 )
+{
+// Let the fog effect render during the
+// reflection pass.
+allowReflectPass = true;
+
+renderTime = "PFXBeforeBin";
+renderBin = "ObjTranslucentBin";
+requirements = "PrePassDepth";
+
+shader = FogPassShader2;
+stateBlock = FogPassStateBlock;
+texture[0] = "#prepass";
+texture[1] = "$backBuffer";
+
+renderPriority = 5;
+
+isEnabled = true;
+};
 
 //------------------------------------------------------------------------------
 // UnderwaterFog
