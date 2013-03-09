@@ -1,25 +1,30 @@
 /*===
-cexcept.h 2.0.0 (2001-Jul-12-Thu)
-Adam M. Costello <amc@cs.berkeley.edu>
+cexcept.h 2.0.1 (2008-Jul-19-Sat)
+http://www.nicemice.net/cexcept/
+Adam M. Costello
+http://www.nicemice.net/amc/
 
 An interface for exception-handling in ANSI C (C89 and subsequent ISO
-standards), developed jointly with Cosmin Truta <cosmin@cs.toronto.edu>.
+standards), developed jointly with Cosmin Truta.
 
-    Copyright (c) 2001 Adam M. Costello and Cosmin Truta.  Everyone
-    is hereby granted permission to do whatever they like with this
-    file, provided that if they modify it they take reasonable steps to
-    avoid confusing or misleading people about the authors, version,
-    and terms of use of the derived file.  The copyright holders make
-    no guarantees regarding this file, and are not responsible for any
-    damage resulting from its use.
+    Copyright (c) 2000-2008 Adam M. Costello and Cosmin Truta.
+    This software may be modified only if its author and version
+    information is updated accurately, and may be redistributed
+    only if accompanied by this unaltered notice.  Subject to those
+    restrictions, permission is granted to anyone to do anything
+    with this software.  The copyright holders make no guarantees
+    regarding this software, and are not responsible for any damage
+    resulting from its use.
 
-Only user-defined exceptions are supported, not "real" exceptions like
-division by zero or memory segmentation violations.
+The cexcept interface is not compatible with and cannot interact
+with system exceptions (like division by zero or memory segmentation
+violation), compiler-generated exceptions (like C++ exceptions), or
+other exception-handling interfaces.
 
-If this interface is used by multiple .c files, they shouldn't include
+When using this interface across multiple .c files, do not include
 this header file directly.  Instead, create a wrapper header file that
 includes this header file and then invokes the define_exception_type
-macro (see below), and let your .c files include that header file.
+macro (see below).  The .c files should then include that header file.
 
 The interface consists of one type, one well-known name, and six macros.
 
@@ -164,7 +169,7 @@ Throw expression;
     be compatible with the type passed to define_exception_type().  The
     exception must be caught, otherwise the program may crash.
 
-    Slight limitation:  If the expression is a comma-expression it must
+    Slight limitation:  If the expression is a comma-expression, it must
     be enclosed in parentheses.
 
 
@@ -209,11 +214,11 @@ struct exception_context { \
     exception__prev = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \
-      if (&exception__prev)
+      do
 
 #define exception__catch(action) \
-      else { } \
-      the_exception_context->caught = 0; \
+      while (the_exception_context->caught = 0, \
+             the_exception_context->caught); \
     } \
     else { \
       the_exception_context->caught = 1; \
@@ -226,14 +231,14 @@ struct exception_context { \
 #define Catch(e) exception__catch(((e) = the_exception_context->v.etmp, 0))
 #define Catch_anonymous exception__catch(0)
 
-/* Try ends with if(), and Catch begins and ends with else.  This     */
-/* ensures that the Try/Catch syntax is really the same as the        */
-/* if/else syntax.                                                    */
+/* Try ends with do, and Catch begins with while(0) and ends with     */
+/* else, to ensure that Try/Catch syntax is similar to if/else        */
+/* syntax.                                                            */
 /*                                                                    */
-/* We use &exception__prev instead of 1 to appease compilers that     */
-/* warn about constant expressions inside if().  Most compilers       */
-/* should still recognize that &exception__prev is never zero and     */
-/* avoid generating test code.                                        */
+/* The 0 in while(0) is expressed as x=0,x in order to appease        */
+/* compilers that warn about constant expressions inside while().     */
+/* Most compilers should still recognize that the condition is always */
+/* false and avoid generating code for it.                            */
 
 #define Throw \
   for (;; longjmp(*the_exception_context->penv, 1)) \
