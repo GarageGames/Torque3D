@@ -18,32 +18,32 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;PNG_NO_MMX_CODE;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13.dll"
-				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"/>
+				OutputFile="$(OutDir)/libpng15.dll"
+				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="copy ..\..\scripts\pnglibconf.h.prebuilt ..\..\pnglibconf.h"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -66,11 +66,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_NO_MMX_CODE;PNG_DEBUG=1;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
@@ -78,118 +78,20 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13d.dll"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"
+				OutputFile="$(OutDir)/libpng15d.dll"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="copy ..\..\scripts\pnglibconf.h.prebuilt ..\..\pnglibconf.h"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
-				Culture="1033"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="DLL ASM Release|Win32"
-			OutputDirectory=".\Win32_DLL_ASM_Release"
-			IntermediateDirectory=".\Win32_DLL_ASM_Release"
-			ConfigurationType="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_USE_PNGVCRD;PNG_BUILD_DLL;ZLIB_DLL;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
-				WarningLevel="3"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13.dll"
-				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
-				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS"
-				Culture="1033"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="DLL ASM Debug|Win32"
-			OutputDirectory=".\Win32_DLL_ASM_Debug"
-			IntermediateDirectory=".\Win32_DLL_ASM_Debug"
-			ConfigurationType="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_BUILD_DLL;ZLIB_DLL;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13d.dll"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"
-				GenerateDebugInformation="TRUE"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
-				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -212,32 +114,33 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MMX_CODE;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD;PNG_USER_PRIVATEBUILD;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13vb.dll"
+				OutputFile="$(OutDir)/libpng15vb.dll"
 				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="copy ..\..\scripts\pnglibconf.h.prebuilt ..\..\pnglibconf.h"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
-				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS"
+				AdditionalOptions="/d PNG_NO_PEDANTIC_WARNINGS /d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -260,12 +163,12 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="PNG_NO_MMX_CODE;WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				CompileAs="0"/>
 			<Tool
@@ -278,7 +181,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="copy ..\..\scripts\pnglibconf.h.prebuilt ..\..\pnglibconf.h"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -301,11 +205,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_NO_MMX_CODE;PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
@@ -319,89 +223,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="LIB ASM Release|Win32"
-			OutputDirectory=".\Win32_LIB_ASM_Release"
-			IntermediateDirectory=".\Win32_LIB_ASM_Release"
-			ConfigurationType="4">
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..,..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
-				WarningLevel="3"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libpng.lib"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="LIB ASM Debug|Win32"
-			OutputDirectory=".\Win32_LIB_ASM_Debug"
-			IntermediateDirectory=".\Win32_LIB_ASM_Debug"
-			ConfigurationType="4">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..,..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libpngd.lib"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="copy ..\..\scripts\pnglibconf.h.prebuilt ..\..\pnglibconf.h"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -437,18 +260,6 @@
 						UsePrecompiledHeader="0"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="DLL ASM Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL ASM Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="DLL VB|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -462,18 +273,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="LIB Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="0"/>
@@ -494,18 +293,6 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="DLL ASM Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL ASM Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="DLL VB|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -519,18 +306,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="LIB Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="1"/>
@@ -564,39 +339,6 @@
 				RelativePath="..\..\pngtrans.c">
 			</File>
 			<File
-				RelativePath="..\..\scripts\pngw32.def">
-				<FileConfiguration
-					Name="DLL VB|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\..\pngwio.c">
 			</File>
 			<File
@@ -618,12 +360,15 @@
 			<File
 				RelativePath="..\..\pngconf.h">
 			</File>
+			<File
+				RelativePath="..\..\pngpriv.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
-				RelativePath="..\..\scripts\pngw32.rc">
+				RelativePath="..\..\scripts\pngwin.rc">
 				<FileConfiguration
 					Name="LIB Release|Win32"
 					ExcludedFromBuild="TRUE">
@@ -632,18 +377,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="LIB Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCResourceCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCResourceCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCResourceCompilerTool"/>
@@ -662,22 +395,6 @@
 			</FileConfiguration>
 			<FileConfiguration
 				Name="DLL Debug|Win32">
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Create dummy include files to prevent &quot;Cannot find missing dependency...&quot; warnings."
-					CommandLine="nmake -f PRJ0041.mak IntDir=$(IntDir)"
-					Outputs="$(IntDir)\alloc.h;$(IntDir)\fp.h;$(IntDir)\m68881.h;$(IntDir)\mem.h;$(IntDir)\pngusr.h;$(IntDir)\strings.h;$(IntDir)\unistd.h;$(IntDir)\unixio.h"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="DLL ASM Release|Win32">
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Create dummy include files to prevent &quot;Cannot find missing dependency...&quot; warnings."
-					CommandLine="nmake -f PRJ0041.mak IntDir=$(IntDir)"
-					Outputs="$(IntDir)\alloc.h;$(IntDir)\fp.h;$(IntDir)\m68881.h;$(IntDir)\mem.h;$(IntDir)\pngusr.h;$(IntDir)\strings.h;$(IntDir)\unistd.h;$(IntDir)\unixio.h"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="DLL ASM Debug|Win32">
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Create dummy include files to prevent &quot;Cannot find missing dependency...&quot; warnings."
