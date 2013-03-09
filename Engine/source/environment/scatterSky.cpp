@@ -159,7 +159,7 @@ ScatterSky::ScatterSky()
    mFlareState.clear();
    mFlareScale = 1.0f;
 
-   mMoonEnabled = true;
+mMoonEnabled = true;
    mMoonScale = 0.2f;
    mMoonTint.set( 0.192157f, 0.192157f, 0.192157f, 1.0f );
    MathUtils::getVectorFromAngles( mMoonLightDir, 0.0f, 45.0f );
@@ -169,6 +169,7 @@ ScatterSky::ScatterSky()
    mNightColor.set( 0.0196078f, 0.0117647f, 0.109804f, 1.0f );
    mNightFogColor = mNightColor;
    mUseNightCubemap = false;
+   mSunSize = 1.0f;
 
    mMoonMatInst = NULL;
 
@@ -179,6 +180,10 @@ ScatterSky::ScatterSky()
 
    mMatrixSet = reinterpret_cast<MatrixSet *>(dMalloc_aligned(sizeof(MatrixSet), 16));
    constructInPlace(mMatrixSet);
+   //added for color scatter sky
+   mColorizeAmt = 0;  
+   mColorize.set(0,0,0); 
+   //END addition
 }
 
 ScatterSky::~ScatterSky()
@@ -318,9 +323,15 @@ void ScatterSky::initPersistFields()
 
       addField( "skyBrightness",       TypeF32,    Offset( mSkyBrightness, ScatterSky ),
          "Global brightness and intensity applied to the sky and objects in the level." );
-      
-      addField( "mieScattering",       TypeF32,    Offset( mMieScattering, ScatterSky ),
-         "Affects the size and intensity of light scattering around the sun." );
+
+     addField( "sunSize",       TypeF32,    Offset( mSunSize, ScatterSky ),
+         "Affects the size of the sun's disk." );
+
+	 addField( "colorizeAmount",       TypeF32,   Offset( mColorizeAmt, ScatterSky ),
+         "Controls how much the the alpha component of colorize brigthens the sky. Setting to 0 returns default behavior." );
+
+	  addField( "colorize",            TypeColorF,    Offset( mColorize, ScatterSky ),
+         "Tints the sky the color specified, the alpha controls the brigthness. The brightness is multipled by the value of colorizeAmt." );
       
       addField( "rayleighScattering",  TypeF32,    Offset( mRayleighScattering, ScatterSky ),
          "Controls how blue the atmosphere is during the day." );      
@@ -436,7 +447,9 @@ U32 ScatterSky::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       mMieScattering4PI = mMieScattering * 4.0f * M_PI_F;
 
       stream->write( mMieScattering4PI );
-      
+
+      stream->write( mSunSize ); 
+
       stream->write( mSkyBrightness );
       
       stream->write( mMiePhaseAssymetry );
@@ -460,6 +473,8 @@ U32 ScatterSky::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->write( mAmbientScale );
       stream->write( mSunScale );
       stream->write( mFogScale );
+	  stream->write( mColorizeAmt );  
+      stream->write( mColorize );
 
       stream->write( mExposure );
 
@@ -513,7 +528,9 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
 
       stream->read( &mMieScattering );
       stream->read( &mMieScattering4PI );
-      
+
+      stream->read( &mSunSize );
+
       stream->read( &mSkyBrightness );
       
       stream->read( &mMiePhaseAssymetry );
@@ -539,6 +556,16 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
       stream->read( &mAmbientScale );
       stream->read( &mSunScale );
       stream->read( &mFogScale );
+	  F32 colorizeAmt;  
+      stream->read( &colorizeAmt );  
+  
+      if(mColorizeAmt != colorizeAmt) {  
+         mColorizeAmt = colorizeAmt;  
+         mShader = NULL; //forces shader refresh  
+      }  
+  
+      stream->read( &mColorize );
+
 
       if ( tmpColor != mWavelength )
       {
@@ -663,8 +690,12 @@ bool ScatterSky::_initShader()
       Con::warnf( "ScatterSky::_initShader - failed to locate shader ScatterSkyShaderData!" );
       return false;
    }
+      Vector<GFXShaderMacro> macros;  
+   if ( mColorizeAmt )     
+      macros.push_back( GFXShaderMacro( "USE_COLORIZE" ) );  
+  
+   mShader = shaderData->getShader( macros );
 
-   mShader = shaderData->getShader();
    if ( !mShader )
       return false;
 
@@ -698,6 +729,7 @@ bool ScatterSky::_initShader()
    mInverseWavelengthSC = mShader->getShaderConstHandle( "$invWaveLength" );
    mNightInterpolantAndExposureSC = mShader->getShaderConstHandle( "$nightInterpAndExposure" );
    mUseCubemapSC = mShader->getShaderConstHandle( "$useCubemap" );
+   mColorizeSC = mShader->getShaderConstHandle( "$colorize" );
 
    return true;
 }
@@ -790,72 +822,79 @@ void ScatterSky::_initCurves()
    if ( mCurves->getSampleCount() > 0 )
       return;
 
-   // Takes time of day (0-2) and returns
+   // Takes time of day (0-2) and returns      
    // the night interpolant (0-1) day/night factor.
+   // moonlight = 0, sunlight > 0
    mCurves[0].clear();
-   mCurves[0].addPoint( 0.0f, 0.5f );
-   mCurves[0].addPoint( 0.1f, 1.0f );
-   mCurves[0].addPoint( 0.9f, 1.0f );
-   mCurves[0].addPoint( 1.0f, 0.5f );
-   mCurves[0].addPoint( 1.1f, 0.0f );
-   mCurves[0].addPoint( 1.9f, 0.0f );
-   mCurves[0].addPoint( 2.0f, 0.5f );
-   //mCurves[0].addPoint( 0.0f, 0.25f );
-   //mCurves[0].addPoint( 0.05f, 0.5f );
-   //mCurves[0].addPoint( 0.1f, 1.0f );
-   //mCurves[0].addPoint( 0.6f, 1.0f );
-   //mCurves[0].addPoint( 0.98f, 0.895f );
-   //mCurves[0].addPoint( 1.0f, 0.15f );
-   //mCurves[0].addPoint( 1.15f, 0.0f );
-   //mCurves[0].addPoint( 1.9f, 0.0f );
-   //mCurves[0].addPoint( 2.0f, 0.15f );
-
-   
-   // Takes time of day (0-2) and returns
-   // the moon light brightness.
+   mCurves[0].addPoint( 0.0f, 0.5f );// Sunrise
+   mCurves[0].addPoint( 0.025f, 1.0f );//
+   mCurves[0].addPoint( 0.975f, 1.0f );//
+   mCurves[0].addPoint( 1.0f, 0.5f );//Sunset
+   mCurves[0].addPoint( 1.02f, 0.0f );//Sunlight ends
+   mCurves[0].addPoint( 1.98f, 0.0f );//Sunlight begins
+   mCurves[0].addPoint( 2.0f, 0.5f );// Sunrise
+     
+    //  Takes time of day (0-2) and returns mieScattering factor 
+   //   Regulates the size of the sun's disk
    mCurves[1].clear();
-   mCurves[1].addPoint( 0.0f, 0.0f );
-   mCurves[1].addPoint( 1.0f, 0.0f );
-   mCurves[1].addPoint( 1.1f, 0.0f );
-   mCurves[1].addPoint( 1.2f, 0.5f );   
-   mCurves[1].addPoint( 1.3f, 1.0f );
-   mCurves[1].addPoint( 1.8f, 0.5f );
-   mCurves[1].addPoint( 1.9f, 0.0f );
-   mCurves[1].addPoint( 2.0f, 0.0f );
+   mCurves[1].addPoint( 0.0f, 0.0006f );
+   mCurves[1].addPoint( 0.01f, 0.00035f );
+   mCurves[1].addPoint( 0.03f, 0.00023f );
+   mCurves[1].addPoint( 0.1f, 0.00022f );
+   mCurves[1].addPoint( 0.2f, 0.00043f );
+   mCurves[1].addPoint( 0.3f, 0.00062f );
+   mCurves[1].addPoint( 0.4f, 0.0008f );
+   mCurves[1].addPoint( 0.5f, 0.00086f );// High noon
+   mCurves[1].addPoint( 0.6f, 0.0008f );
+   mCurves[1].addPoint( 0.7f, 0.00062f );
+   mCurves[1].addPoint( 0.8f, 0.00043f );
+   mCurves[1].addPoint( 0.9f, 0.00022f );
+   mCurves[1].addPoint( 0.97f, 0.00023f );
+   mCurves[1].addPoint( 0.99f, 0.00035f );
+   mCurves[1].addPoint( 1.0f, 0.0006f );
+   mCurves[1].addPoint( 2.0f, 0.0006f ); 
 
    // Takes time of day and returns brightness
+   // Controls sunlight and moonlight brightness
    mCurves[2].clear();
-   mCurves[2].addPoint( 0.0f, 0.4f );
-   mCurves[2].addPoint( 0.25f, 1.0f );
-   mCurves[2].addPoint( 0.5f, 1.0f );
-   mCurves[2].addPoint( 0.75f, 0.9f );
-   mCurves[2].addPoint( 1.0f, 0.3f );
-   mCurves[2].addPoint( 1.02877f, 0.0f );
-   mCurves[2].addPoint( 1.05f, 0.0f );
-   mCurves[2].addPoint( 1.15f, 0.0f );   
-   mCurves[2].addPoint( 1.2f, 0.0f );
-   mCurves[2].addPoint( 1.3f, 0.3f );
-   mCurves[2].addPoint( 1.85f, 0.4f );
-   mCurves[2].addPoint( 1.9f, 0.0f );
-   mCurves[2].addPoint( 2.0f, 0.0f );   
-
-
+   mCurves[2].addPoint( 0.0f, 0.2f );// Sunrise
+   mCurves[2].addPoint( 0.1f, 1.0f );
+   mCurves[2].addPoint( 0.9f, 1.0f );// Sunset
+   mCurves[2].addPoint( 1.008f, 0.0f );//Adjust end of sun's reflection
+   mCurves[2].addPoint( 1.02001f, 0.0f );
+   mCurves[2].addPoint( 1.05f, 0.5f );// Turn brightness up for moonlight
+   mCurves[2].addPoint( 1.93f, 0.5f ); 
+   mCurves[2].addPoint( 1.97999f, 0.0f );// No brightness when sunlight starts
+   mCurves[2].addPoint( 1.992f, 0.0f );//Adjust start of sun's reflection
+   mCurves[2].addPoint( 2.0f, 0.2f ); // Sunrise  
+     
+   // Interpolation of day/night color sets
+   // 0/1  ambient/nightcolor
+   // 0 = day colors only anytime
+   // 1 = night colors only anytime
+   // between 0 and 1 renders both color sets anytime
    mCurves[3].clear();
-   mCurves[3].addPoint( 0.0f, 0.01f );
-   mCurves[3].addPoint( 0.05f, 0.0f );
+   mCurves[3].addPoint( 0.0f, 0.8f );//Sunrise
    mCurves[3].addPoint( 0.1f, 0.0f );
-   mCurves[3].addPoint( 0.6f, 0.0f );
-   mCurves[3].addPoint( 0.98f, 0.75f );
-   mCurves[3].addPoint( 1.0f, 1.0f );
-   mCurves[3].addPoint( 1.02877f, 1.0f );
-   mCurves[3].addPoint( 1.05f, 1.0f );
-   mCurves[3].addPoint( 1.2f, 1.0f );   
-   mCurves[3].addPoint( 1.3f, 1.0f );
-   mCurves[3].addPoint( 1.85f, 1.0f );
-   mCurves[3].addPoint( 1.9f, 1.0f );
-   mCurves[3].addPoint( 2.0f, 1.0f );  
-}
+   mCurves[3].addPoint( 0.99f, 0.0f );
+   mCurves[3].addPoint( 1.0f, 0.8f );// Sunset
+   mCurves[3].addPoint( 1.01999f, 1.0f );//
+   mCurves[3].addPoint( 1.98001f, 1.0f );// Sunlight begins with full night colors
+   mCurves[3].addPoint( 2.0f, 0.8f );  //Sunrise
 
+     //  Takes time of day (0-2) and returns smoothing factor 
+   //  Interpolates between mMoonTint color and mNightColor 
+   mCurves[4].clear();
+   mCurves[4].addPoint( 0.0f, 1.0f );
+   mCurves[4].addPoint( 0.96f, 1.0f );
+   mCurves[4].addPoint( 1.01999f, 0.5f );
+   mCurves[4].addPoint( 1.02001f, 0.5f );
+   mCurves[4].addPoint( 1.08f, 1.0f );
+   mCurves[4].addPoint( 1.92f, 1.0f );
+   mCurves[4].addPoint( 1.97999f, 0.5f );
+   mCurves[4].addPoint( 1.98001f, 0.5f ); 
+   mCurves[4].addPoint( 2.0f, 1.0f );
+}
 void ScatterSky::_updateTimeOfDay( TimeOfDay *timeOfDay, F32 time )
 {
    setElevation( timeOfDay->getElevationDegrees() );
@@ -922,6 +961,7 @@ void ScatterSky::_render( ObjectRenderInst *ri, SceneRenderState *state, BaseMat
    mShaderConsts->setSafe( mNightColorSC, mNightColor );
    mShaderConsts->setSafe( mInverseWavelengthSC, invWavelength );
    mShaderConsts->setSafe( mNightInterpolantAndExposureSC, Point2F( mExposure, mNightInterpolant ) );
+   mShaderConsts->setSafe( mColorizeSC, mColorize*mColorizeAmt );
 
    if ( GFXDevice::getWireframe() )
    {
@@ -1119,6 +1159,14 @@ void ScatterSky::_interpolateColors()
    mAmbientColor *= mAmbientScale;
    mSunColor *= mSunScale;
    mFogColor *= mFogScale;
+
+   mMieScattering = (mCurves[1].getVal( mTimeOfDay) * mSunSize ); //Scale the size of the sun's disk  
+ 
+   ColorF moonTemp = mMoonTint;
+   ColorF nightTemp = mNightColor;
+   
+   moonTemp.interpolate( mNightColor, mMoonTint, mCurves[4].getVal( mTimeOfDay ) );
+   nightTemp.interpolate( mMoonTint, mNightColor, mCurves[4].getVal( mTimeOfDay ) );
 
    mFogColor.interpolate( mFogColor, mNightFogColor, mCurves[3].getVal( mTimeOfDay ) );//mNightInterpolant );   
    mFogColor.alpha = 1.0f;
