@@ -26,14 +26,14 @@
 # macros --------------------------------------------------------------------
 
 #PNGDIR = /usr/local/lib
-#PNGINC = -I/usr/local/include/libpng12
-#PNGLIBd = -L$(PNGDIR) -lpng12 # dynamically linked, installed libpng
-#PNGLIBs = $(PNGDIR)/libpng12.a # statically linked, installed libpng
+#PNGINC = -I/usr/local/include/libpng15
+#PNGLIBd = -L$(PNGDIR) -lpng15 # dynamically linked, installed libpng
+#PNGLIBs = $(PNGDIR)/libpng15.a # statically linked, installed libpng
 # or:
 PNGDIR = ../..#	this one is for libpng-x.y.z/contrib/gregbook builds
 #PNGDIR = ../libpng
 PNGINC = -I$(PNGDIR)
-PNGLIBd = -Wl,-rpath,$(PNGDIR) -L$(PNGDIR) -lpng12	# dynamically linked
+PNGLIBd = -Wl,-rpath,$(PNGDIR) -L$(PNGDIR) -lpng15	# dynamically linked
 PNGLIBs = $(PNGDIR)/libpng.a		# statically linked, local libpng
 
 ZDIR = /usr/local/lib

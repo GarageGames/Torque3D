@@ -104,7 +104,8 @@ int writepng_init(mainprog_info *mainprog_ptr)
     /* setjmp() must be called in every function that calls a PNG-writing
      * libpng function, unless an alternate error handler was installed--
      * but compatible error handlers must either use longjmp() themselves
-     * (as in this program) or exit immediately, so here we go: */
+     * (as in this program) or some other method to return control to
+     * application code, so here we go: */
 
     if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -388,5 +389,12 @@ static void writepng_error_handler(png_structp png_ptr, png_const_charp msg)
         exit(99);
     }
 
+    /* Now we have our data structure we can use the information in it
+     * to return control to our own higher level code (all the points
+     * where 'setjmp' is called in this file.)  This will work with other
+     * error handling mechanisms as well - libpng always calls png_error
+     * when it can proceed no further, thus, so long as the error handler
+     * is intercepted, application code can do its own error recovery.
+     */
     longjmp(mainprog_ptr->jmpbuf, 1);
 }

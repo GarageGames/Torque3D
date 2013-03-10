@@ -23,9 +23,9 @@
 
 # macros --------------------------------------------------------------------
 
-PNGINC = -I/usr/local/include/libpng12
-PNGLIB = -L/usr/local/lib -lpng12	  # dynamically linked against libpng
-#PNGLIB = /usr/local/lib/libpng12.a # statically linked against libpng
+PNGINC = -I/usr/local/include/libpng15
+PNGLIB = -L/usr/local/lib -lpng15	  # dynamically linked against libpng
+#PNGLIB = /usr/local/lib/libpng15.a # statically linked against libpng
 # or:
 #PNGINC = -I../..
 #PNGLIB = -L../.. -lpng
