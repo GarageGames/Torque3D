@@ -24,7 +24,6 @@
    -------------------------------------------------------------------------- */
    
 #include "colourblock.h"
-#include <algorithm>
 
 namespace squish {
 
