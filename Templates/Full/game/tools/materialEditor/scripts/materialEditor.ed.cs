@@ -20,8 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Material Editor originally created by Dave Calabrese and Travis Vroman of Gaslight Studios
-
 function MaterialEditorGui::establishMaterials(%this)
 {
    //Cubemap used to preview other cubemaps in the editor.
@@ -35,7 +33,7 @@ function MaterialEditorGui::establishMaterials(%this)
       cubeFace[5] = "tools/materialeditor/gui/cube_YPos";
       parentGroup = "RootGroup";
    };
-   
+
    //Material used to preview other materials in the editor.
    singleton Material(materialEd_previewMaterial)
    {
@@ -49,7 +47,7 @@ function MaterialEditorGui::establishMaterials(%this)
       texture[0] = materialEd_previewMaterial.diffuseMap[0];
    };
 
-   //Custom shader to allow the display of just the alpha channel. 
+   //Custom shader to allow the display of just the alpha channel.
    singleton ShaderData( materialEd_justAlphaShader )
    {
       DXVertexShaderFile 	= "shaders/alphaOnlyV.hlsl";
@@ -67,9 +65,9 @@ function MaterialEditorGui::open(%this)
 	// by editorgui
 	materialSelector.setVisible(0);
 	matEdSaveDialog.setVisible(0);
-	
+
 	MaterialEditorPropertiesWindow-->matEd_cubemapEditBtn.setVisible(0);
-	
+
 	//Setup our dropdown menu contents.
    //Blending Modes
    MaterialEditorPropertiesWindow-->blendingTypePopUp.clear();
@@ -83,8 +81,8 @@ function MaterialEditorGui::open(%this)
 
    //Reflection Types
    MaterialEditorPropertiesWindow-->reflectionTypePopUp.clear();
-   MaterialEditorPropertiesWindow-->reflectionTypePopUp.add("None",0);	
-   MaterialEditorPropertiesWindow-->reflectionTypePopUp.add("cubemap",1);	
+   MaterialEditorPropertiesWindow-->reflectionTypePopUp.add("None",0);
+   MaterialEditorPropertiesWindow-->reflectionTypePopUp.add("cubemap",1);
    MaterialEditorPropertiesWindow-->reflectionTypePopUp.setSelected( 0, false );
 
    //Sounds
@@ -115,33 +113,29 @@ function MaterialEditorGui::open(%this)
    matEd_quickPreview_Popup.add("Pyramid",2);
    matEd_quickPreview_Popup.add("Cylinder",3);
    matEd_quickPreview_Popup.add("Torus",4);
-   matEd_quickPreview_Popup.add("Knot",5);  
+   matEd_quickPreview_Popup.add("Knot",5);
    matEd_quickPreview_Popup.setSelected( 0, false );
    matEd_quickPreview_Popup.selected = matEd_quickPreview_Popup.getText();
-   
-   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.clear();		
-   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 0",0);		
-   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 1",1);		
-   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 2",2);		
-   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 3",3);	
+
+   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.clear();
+   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 0",0);
+   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 1",1);
+   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 2",2);
+   MaterialEditorPropertiesWindow-->MaterialLayerCtrl.add("Layer 3",3);
    MaterialEditorPropertiesWindow-->MaterialLayerCtrl.setSelected( 0, false );
-   
+
    //Sift through the RootGroup and find all loaded material items.
    MaterialEditorGui.updateAllFields();
    MaterialEditorGui.updatePreviewObject();
 
    // If no selected object; go to material mode. And edit the last selected material
    MaterialEditorGui.setMode();
-   
-   MaterialEditorGui.preventUndo = true;   
-   
+
    if( MaterialEditorGui.currentMode $= "Mesh" )
       MaterialEditorGui.prepareActiveObject( true );
    else
       MaterialEditorGui.prepareActiveMaterial( "", true );
-      
-   MaterialEditorGui.preventUndo = false;   
-      
+
 }
 
 function MaterialEditorGui::quit(%this)
@@ -153,24 +147,24 @@ function MaterialEditorGui::quit(%this)
       MaterialEditorGui.copyMaterials( notDirtyMaterial, materialEd_previewMaterial );
       MaterialEditorGui.copyMaterials( notDirtyMaterial, MaterialEditorGui.currentMaterial );
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
-      
+
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
       MaterialEditorGui.currentMaterial.flush();
       MaterialEditorGui.currentMaterial.reload();
    }
-   
+
    if( isObject(MaterialEditorGui.currentMaterial) )
    {
       MaterialEditorGui.lastMaterial = MaterialEditorGui.currentMaterial.getName();
    }
 
    MaterialEditorGui.setMaterialNotDirty();
-   
+
    // First delete the model so that it releases
    // material instances that use the preview materials.
    matEd_previewObjectView.deleteModel();
-   
+
    // Now we can delete the preview materials and shaders
    // knowing that there are no matinstances using them.
    matEdCubeMapPreviewMat.delete();
@@ -184,19 +178,19 @@ function MaterialEditorGui::openFile( %this, %fileType )
 	switch$(%fileType)
 	{
 		case "Texture":         %filters = MaterialEditorGui.textureFormats;
-		
+
 		                if(MaterialEditorGui.lastTextureFile $= "")
 		                  %defaultFileName = "*.*";
                       else
 							   %defaultFileName = MaterialEditorGui.lastTextureFile;
-							   
+
 							     %defaultPath = MaterialEditorGui.lastTexturePath;
-							     
+
       case "Model":           %filters = MaterialEditorGui.modelFormats;
 							 %defaultFileName = "*.dts";
 							     %defaultPath = MaterialEditorGui.lastModelPath;
 	}
-	
+
       %dlg = new OpenFileDialog()
       {
          Filters        = %filters;
@@ -205,7 +199,7 @@ function MaterialEditorGui::openFile( %this, %fileType )
          ChangePath     = false;
          MustExist      = true;
       };
-            
+
       %ret = %dlg.Execute();
       if(%ret)
       {
@@ -214,15 +208,15 @@ function MaterialEditorGui::openFile( %this, %fileType )
 	         case "Texture":
                MaterialEditorGui.lastTexturePath = filePath( %dlg.FileName );
                MaterialEditorGui.lastTextureFile = %filename = %dlg.FileName;
-               
+
             case "Model":
                MaterialEditorGui.lastModelPath = filePath( %dlg.FileName );
                MaterialEditorGui.lastModelFile = %filename = %dlg.FileName;
 	      }
       }
-      
+
       %dlg.delete();
-      
+
       if(!%ret)
          return;
 		else
@@ -230,42 +224,42 @@ function MaterialEditorGui::openFile( %this, %fileType )
 }
 
 //==============================================================================
-// SubMaterial(Material Target) -- Supports different ways to grab the 
+// SubMaterial(Material Target) -- Supports different ways to grab the
 // material from the dropdown list. We're here either because-
-// 1. We have switched over from another editor with an object locked in the 
+// 1. We have switched over from another editor with an object locked in the
 //    $Tools::materialEditorList variable
-// 2. We have selected an object using the Object Editor via the Material Editor 
+// 2. We have selected an object using the Object Editor via the Material Editor
 
 function SubMaterialSelector::onSelect( %this )
 {
-   %material = "";   
-   
+   %material = "";
+
    if( MaterialEditorGui.currentMeshMode $= "Model" )
       %material = getMapEntry( %this.getText() );
    else
       %material = MaterialEditorGui.currentObject.getFieldValue( %this.getText() );
-   
-   %origMat = %material;   
-   if(%material$="")   
+
+   %origMat = %material;
+   if(%material$="")
         %origMat = %material = %this.getText();
-   // if there is no material attached to that objects material field or the 
+   // if there is no material attached to that objects material field or the
    // object does not have a valid method to grab a material
    if( !isObject( %material ) )
    {
       // look for a newMaterial name to grab
-      // addiitonally, convert "." to "_" in case we have something like: "base.texname" as a material name   
-      // at the end we will have generated material name: "base_texname_mat"   
+      // addiitonally, convert "." to "_" in case we have something like: "base.texname" as a material name
+      // at the end we will have generated material name: "base_texname_mat"
       %material = getUniqueName( strreplace(%material, ".", "_") @ "_mat" );
 
-      new Material(%material) 
+      new Material(%material)
       {
-         diffuseMap[0] = %origMat;   
+         diffuseMap[0] = %origMat;
          mapTo = %origMat;
          parentGroup = RootGroup;
       };
-      
+
       eval( "MaterialEditorGui.currentObject." @ strreplace(%this.getText(),".","_") @ " = " @ %material @ ";");
-      
+
       if( MaterialEditorGui.currentObject.isMethod("postApply") )
          MaterialEditorGui.currentObject.postApply();
    }
@@ -280,7 +274,7 @@ function MaterialEditorGui::setMode( %this )
 {
    MatEdMaterialMode.setVisible(0);
    MatEdTargetMode.setVisible(0);
-   
+
    if( isObject(MaterialEditorGui.currentObject) )
    {
       MaterialEditorGui.currentMode = "Mesh";
@@ -299,25 +293,25 @@ function MaterialEditorGui::prepareActiveObject( %this, %override )
    %obj = $Tools::materialEditorList;
    if( MaterialEditorGui.currentObject == %obj && !%override)
       return;
-   
+
    // TSStatics, ShapeBase, and Interiors should have getModelFile methods
    if( %obj.isMethod( "getModelFile" ) )
    {
       MaterialEditorGui.currentObject = %obj;
-      
+
       SubMaterialSelector.clear();
       MaterialEditorGui.currentMeshMode = "Model";
-      
+
       MaterialEditorGui.setMode();
-      
+
       if( MaterialEditorGui.currentObject.isMethod( "getNumDetailLevels" ) ) // Interiors
       {
          for(%j = 0; %j < MaterialEditorGui.currentObject.getNumDetailLevels(); %j++)
-         {  
+         {
             %target = "Detail Level " @ %j;
             %count = SubMaterialSelector.getCount();
             SubMaterialSelector.addCategory(%target);
-               
+
             for(%k = 0; %k < MaterialEditorGui.currentObject.getTargetCount(%j); %k++)
             {
                %target = MaterialEditorGui.currentObject.getTargetName(%j, %k);
@@ -342,10 +336,10 @@ function MaterialEditorGui::prepareActiveObject( %this, %override )
       for( %i = 0; %i < %obj.getFieldCount(); %i++ )
       {
          %fieldName = %obj.getField(%i);
-         
+
          if( %obj.getFieldType(%fieldName) !$= "TypeMaterialName" )
             continue;
-      
+
          if( !%canSupportMaterial )
          {
             MaterialEditorGui.currentObject = %obj;
@@ -359,19 +353,19 @@ function MaterialEditorGui::prepareActiveObject( %this, %override )
          }
          %canSupportMaterial = true;
       }
-      
+
       if( !%canSupportMaterial ) // Non-relevant classes get returned
          return;
 
       MaterialEditorGui.currentMeshMode = "EditorShape";
       MaterialEditorGui.setMode();
    }
-   
+
    %id = SubMaterialSelector.findText( MaterialEditorGui.currentMaterial.mapTo );
    if( %id != -1 )
       SubMaterialSelector.setSelected( %id );
    else
-      SubMaterialSelector.setSelected(0);	   
+      SubMaterialSelector.setSelected(0);
 }
 
 //==============================================================================
@@ -383,7 +377,7 @@ function MaterialEditorGui::updateAllFields(%this)
 }
 
 function MaterialEditorGui::updatePreviewObject(%this)
-{   
+{
    %newModel = matEd_quickPreview_Popup.getValue();
 
    switch$(%newModel)
@@ -392,27 +386,27 @@ function MaterialEditorGui::updatePreviewObject(%this)
          matEd_quickPreview_Popup.selected = %newModel;
          matEd_previewObjectView.setModel("tools/materialeditor/gui/spherePreview.dts");
          matEd_previewObjectView.setOrbitDistance(4);
-				
+
 		case "cube":
          matEd_quickPreview_Popup.selected = %newModel;
          matEd_previewObjectView.setModel("tools/materialeditor/gui/cubePreview.dts");
          matEd_previewObjectView.setOrbitDistance(5);
-				
+
 		case "pyramid":
          matEd_quickPreview_Popup.selected = %newModel;
          matEd_previewObjectView.setModel("tools/materialeditor/gui/pyramidPreview.dts");
          matEd_previewObjectView.setOrbitDistance(5);
-				
+
 		case "cylinder":
          matEd_quickPreview_Popup.selected = %newModel;
          matEd_previewObjectView.setModel("tools/materialeditor/gui/cylinderPreview.dts");
          matEd_previewObjectView.setOrbitDistance(4.2);
-				
+
 		case "torus":
          matEd_quickPreview_Popup.selected = %newModel;
          matEd_previewObjectView.setModel("tools/materialeditor/gui/torusPreview.dts");
          matEd_previewObjectView.setOrbitDistance(4.2);
-				
+
 		case "knot":
          matEd_quickPreview_Popup.selected = %newModel;
          matEd_previewObjectView.setModel("tools/materialeditor/gui/torusknotPreview.dts");
@@ -428,7 +422,7 @@ function MaterialEditorGui::prepareActiveMaterial(%this, %material, %override)
    // If were not valid, grab the first valid material out of the materialSet
    if( !isObject(%material) )
       %material = MaterialSet.getObject(0);
-	
+
 	// Check made in order to avoid loading the same material. Overriding
 	// made in special cases
 	if(%material $= MaterialEditorGui.lastMaterial && !%override)
@@ -438,11 +432,11 @@ function MaterialEditorGui::prepareActiveMaterial(%this, %material, %override)
    else
    {
       if(MaterialEditorGui.materialDirty )
-      { 
+      {
          MaterialEditorGui.showSaveDialog( %material );
          return;
       }
-		   
+
       MaterialEditorGui.setActiveMaterial(%material);
    }
 }
@@ -461,14 +455,14 @@ function MaterialEditorGui::setActiveMaterial( %this, %material )
 
    MaterialEditorGui.currentMaterial = %material;
    MaterialEditorGui.lastMaterial = %material;
-   
+
    // we create or recreate a material to hold in a pristine state
    singleton Material(notDirtyMaterial)
    {
       mapTo = "matEd_mappedMat";
       diffuseMap[0] = "tools/materialEditor/gui/matEd_mappedMat";
    };
-   
+
    // Converts the texture files into absolute paths.
    MaterialEditorGui.convertTextureFields();
 
@@ -478,14 +472,14 @@ function MaterialEditorGui::setActiveMaterial( %this, %material )
    // Copy materials over to other references
    MaterialEditorGui.copyMaterials( MaterialEditorGui.currentMaterial, materialEd_previewMaterial );
    MaterialEditorGui.copyMaterials( MaterialEditorGui.currentMaterial, notDirtyMaterial );
-   MaterialEditorGui.guiSync( materialEd_previewMaterial );   
-     
+   MaterialEditorGui.guiSync( materialEd_previewMaterial );
+
    // Necessary functionality in order to render correctly
    materialEd_previewMaterial.flush();
    materialEd_previewMaterial.reload();
    MaterialEditorGui.currentMaterial.flush();
    MaterialEditorGui.currentMaterial.reload();
-      
+
    MaterialEditorGui.setMaterialNotDirty();
 }
 
@@ -502,37 +496,37 @@ function MaterialEditorGui::setMaterialNotDirty(%this)
    %previewText = "Material Preview";
    MaterialEditorPropertiesWindow.text = %propertyText;
    MaterialEditorPreviewWindow.text = %previewText;
-   
+
    MaterialEditorGui.materialDirty = false;
    matEd_PersistMan.removeDirty(MaterialEditorGui.currentMaterial);
 }
 
 function MaterialEditorGui::setMaterialDirty(%this)
-{ 
+{
    %propertyText = "Material Properties *";
    %previewText = "Material Preview *";
    MaterialEditorPropertiesWindow.text = %propertyText;
    MaterialEditorPreviewWindow.text = %previewText;
-   
+
    MaterialEditorGui.materialDirty = true;
-   
+
    // materials created in the material selector are given that as its filename, so we run another check
    if( MaterialEditorGui.isMatEditorMaterial( MaterialEditorGui.currentMaterial ) )
    {
       if( MaterialEditorGui.currentMaterial.isAutoGenerated() )
       {
          %obj = MaterialEditorGui.currentObject;
-         
+
          if( %obj.interiorFile !$= "" )
             %shapePath = %obj.interiorFile;
-         else if( %obj.shapeName !$= "" ) 
+         else if( %obj.shapeName !$= "" )
             %shapePath = %obj.shapeName;
          else if( %obj.isMethod("getDatablock") )
          {
             if( %obj.getDatablock().shapeFile !$= "" )
                %shapePath = %obj.getDatablock().shapeFile;
          }
-         
+
          //creating toPath
          %k = 0;
          while( strpos( %shapePath, "/", %k ) != -1 )
@@ -542,7 +536,7 @@ function MaterialEditorGui::setMaterialDirty(%this)
          }
          %savePath = getSubStr( %shapePath , 0 , %k );
          %savePath = %savePath @ "materials.cs";
-         
+
          matEd_PersistMan.setDirty(MaterialEditorGui.currentMaterial, %savePath);
       }
       else
@@ -558,59 +552,59 @@ function MaterialEditorGui::convertTextureFields(%this)
 {
    // Find the absolute paths for the texture filenames so that
    // we can properly wire up the preview materials and controls.
-   
+
    for(%diffuseI = 0; %diffuseI < 4; %diffuseI++)
    {
-      %diffuseMap = MaterialEditorGui.currentMaterial.diffuseMap[%diffuseI];         
-      %diffuseMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %diffuseMap);      
+      %diffuseMap = MaterialEditorGui.currentMaterial.diffuseMap[%diffuseI];
+      %diffuseMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %diffuseMap);
       MaterialEditorGui.currentMaterial.diffuseMap[%diffuseI] = %diffuseMap;
    }
-   
+
    for(%normalI = 0; %normalI < 4; %normalI++)
    {
       %normalMap = MaterialEditorGui.currentMaterial.normalMap[%normalI];
       %normalMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %normalMap);
       MaterialEditorGui.currentMaterial.normalMap[%normalI] = %normalMap;
    }
-   
+
    for(%overlayI = 0; %overlayI < 4; %overlayI++)
    {
       %overlayMap = MaterialEditorGui.currentMaterial.overlayMap[%overlayI];
-      %overlayMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %overlayMap);      
+      %overlayMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %overlayMap);
       MaterialEditorGui.currentMaterial.overlayMap[%overlayI] = %overlayMap;
    }
-   
+
    for(%detailI = 0; %detailI < 4; %detailI++)
    {
       %detailMap = MaterialEditorGui.currentMaterial.detailMap[%detailI];
-      %detailMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %detailMap);      
+      %detailMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %detailMap);
       MaterialEditorGui.currentMaterial.detailMap[%detailI] = %detailMap;
    }
-   
+
    for(%detailNormalI = 0; %detailNormalI < 4; %detailNormalI++)
    {
       %detailNormalMap = MaterialEditorGui.currentMaterial.detailNormalMap[%detailNormalI];
-      %detailNormalMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %detailNormalMap);      
+      %detailNormalMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %detailNormalMap);
       MaterialEditorGui.currentMaterial.detailNormalMap[%detailNormalI] = %detailNormalMap;
    }
-   
+
    for(%lightI = 0; %lightI < 4; %lightI++)
    {
-      %lightMap = MaterialEditorGui.currentMaterial.lightMap[%lightI];      
+      %lightMap = MaterialEditorGui.currentMaterial.lightMap[%lightI];
       %lightMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %lightMap);
       MaterialEditorGui.currentMaterial.lightMap[%lightI] = %lightMap;
    }
-   
+
    for(%toneI = 0; %toneI < 4; %toneI++)
    {
-      %toneMap = MaterialEditorGui.currentMaterial.toneMap[%toneI];      
+      %toneMap = MaterialEditorGui.currentMaterial.toneMap[%toneI];
       %toneMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %toneMap);
       MaterialEditorGui.currentMaterial.toneMap[%toneI] = %toneMap;
    }
-   
+
    for(%specI = 0; %specI < 4; %specI++)
    {
-      %specMap = MaterialEditorGui.currentMaterial.specularMap[%specI];      
+      %specMap = MaterialEditorGui.currentMaterial.specularMap[%specI];
       %specMap = MaterialEditorGui.searchForTexture(MaterialEditorGui.currentMaterial, %specMap);
       MaterialEditorGui.currentMaterial.specularMap[%specI] = %specMap;
    }
@@ -618,20 +612,20 @@ function MaterialEditorGui::convertTextureFields(%this)
 
 // still needs to be optimized further
 function MaterialEditorGui::searchForTexture(%this,%material, %texture)
-{   
+{
    if( %texture !$= "" )
    {
-      // set the find signal as false to start out with 
+      // set the find signal as false to start out with
       %isFile = false;
       // sete the formats we're going to be looping through if need be
       %formats = ".png .jpg .dds .bmp .gif .jng .tga";
-      
+
       // if the texture contains the correct filepath and name right off the bat, lets use it
       if( isFile(%texture) )
          %isFile = true;
       else
       {
-         
+
          for( %i = 0; %i < getWordCount(%formats); %i++)
          {
             %testFileName = %texture @ getWord( %formats, %i );
@@ -642,15 +636,15 @@ function MaterialEditorGui::searchForTexture(%this,%material, %texture)
             }
          }
       }
-      
+
       // if we didn't grab a proper name, lets use a string logarithm
       if( !%isFile )
       {
          %materialDiffuse = %texture;
          %materialDiffuse2 = %texture;
-         
+
          %materialPath = %material.getFilename();
-         
+
          if( strchr( %materialDiffuse, "/") $= "" )
          {
             %k = 0;
@@ -659,14 +653,14 @@ function MaterialEditorGui::searchForTexture(%this,%material, %texture)
                %count = strpos( %materialPath, "/", %k );
                %k = %count + 1;
             }
-         
+
             %materialsCs = getSubStr( %materialPath , %k , 99 );
             %texture =  strreplace( %materialPath, %materialsCs, %texture );
          }
          else
             %texture =  strreplace( %materialPath, %materialPath, %texture );
-         
-         
+
+
          // lets test the pathing we came up with
          if( isFile(%texture) )
             %isFile = true;
@@ -682,7 +676,7 @@ function MaterialEditorGui::searchForTexture(%this,%material, %texture)
                }
             }
          }
-         
+
          // as a last resort to find the proper name
          // we have to resolve using find first file functions very very slow
          if( !%isFile )
@@ -693,7 +687,7 @@ function MaterialEditorGui::searchForTexture(%this,%material, %texture)
                %count = strpos( %materialDiffuse2, "/", %k );
                %k = %count + 1;
             }
-            
+
             %texture =  getSubStr( %materialDiffuse2 , %k , 99 );
             for( %i = 0; %i < getWordCount(%formats); %i++)
             {
@@ -707,7 +701,7 @@ function MaterialEditorGui::searchForTexture(%this,%material, %texture)
                }
             }
          }
-         
+
          return %texture;
       }
       else
@@ -724,7 +718,7 @@ function MaterialEditorGui::updateLivePreview(%this,%preview)
       MaterialEditorGui.copyMaterials( materialEd_previewMaterial, MaterialEditorGui.currentMaterial );
    else
       MaterialEditorGui.copyMaterials( notDirtyMaterial, MaterialEditorGui.currentMaterial );
-   
+
    MaterialEditorGui.currentMaterial.flush();
    MaterialEditorGui.currentMaterial.reload();
 }
@@ -740,7 +734,6 @@ function MaterialEditorGui::copyMaterials( %this, %copyFrom, %copyTo)
 
 function MaterialEditorGui::guiSync( %this, %material )
 {
-   %this.preventUndo = true;
    //Setup our headers
    if( MaterialEditorGui.currentMode $= "material" )
    {
@@ -768,7 +761,7 @@ function MaterialEditorGui::guiSync( %this, %material )
          MatEdTargetMode-->selMaterialName.setText(MaterialEditorGui.currentMaterial.name);
       }
    }
-   
+
    MaterialEditorPropertiesWindow-->alphaRefTextEdit.setText((%material).alphaRef);
    MaterialEditorPropertiesWindow-->alphaRefSlider.setValue((%material).alphaRef);
    MaterialEditorPropertiesWindow-->doubleSidedCheckBox.setValue((%material).doubleSided);
@@ -776,7 +769,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->alphaTestCheckBox.setValue((%material).alphaTest);
    MaterialEditorPropertiesWindow-->castShadows.setValue((%material).castShadows);
    MaterialEditorPropertiesWindow-->translucentCheckbox.setValue((%material).translucent);
-   
+
    switch$((%material).translucentBlendOp)
    {
            case "None": %selectedNum = 0;
@@ -787,7 +780,7 @@ function MaterialEditorGui::guiSync( %this, %material )
       case "LerpAlpha": %selectedNum = 5;
    }
    MaterialEditorPropertiesWindow-->blendingTypePopUp.setSelected(%selectedNum);
-   
+
    if((%material).cubemap !$= "")
    {
       MaterialEditorPropertiesWindow-->matEd_cubemapEditBtn.setVisible(1);
@@ -814,23 +807,23 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->showFootprintsCheckbox.setValue((%material).showFootprints);
    MaterialEditorPropertiesWindow-->showDustCheckbox.setValue((%material).showDust);
    MaterialEditorGui.updateSoundPopup("Footstep", (%material).footstepSoundId, (%material).customFootstepSound);
-   MaterialEditorGui.updateSoundPopup("Impact", (%material).impactSoundId, (%material).customImpactSound);
+   MaterialEditorGui.updateSoundPopup("Impact", (%material).footstepSoundId, (%material).customFootstepSound);
 
    //layer specific controls are located here
    %layer = MaterialEditorGui.currentLayer;
-   
-   if((%material).diffuseMap[%layer] $= "") 
+
+   if((%material).diffuseMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->diffuseMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->diffuseMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
    }
    else
    {
-      MaterialEditorPropertiesWindow-->diffuseMapNameText.setText( (%material).diffuseMap[%layer] );      
+      MaterialEditorPropertiesWindow-->diffuseMapNameText.setText( (%material).diffuseMap[%layer] );
       MaterialEditorPropertiesWindow-->diffuseMapDisplayBitmap.setBitmap( (%material).diffuseMap[%layer] );
    }
- 
-   if((%material).normalMap[%layer] $= "") 
+
+   if((%material).normalMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->normalMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->normalMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -840,8 +833,8 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->normalMapNameText.setText( (%material).normalMap[%layer] );
       MaterialEditorPropertiesWindow-->normalMapDisplayBitmap.setBitmap( (%material).normalMap[%layer] );
    }
-   
-   if((%material).overlayMap[%layer] $= "") 
+
+   if((%material).overlayMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->overlayMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->overlayMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -851,8 +844,8 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->overlayMapNameText.setText( (%material).overlayMap[%layer] );
       MaterialEditorPropertiesWindow-->overlayMapDisplayBitmap.setBitmap( (%material).overlayMap[%layer] );
    }
-   
-   if((%material).detailMap[%layer] $= "") 
+
+   if((%material).detailMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->detailMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->detailMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -862,8 +855,8 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->detailMapNameText.setText( (%material).detailMap[%layer] );
       MaterialEditorPropertiesWindow-->detailMapDisplayBitmap.setBitmap( (%material).detailMap[%layer] );
    }
-   
-   if((%material).detailNormalMap[%layer] $= "") 
+
+   if((%material).detailNormalMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->detailNormalMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->detailNormalMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -873,8 +866,8 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->detailNormalMapNameText.setText( (%material).detailNormalMap[%layer] );
       MaterialEditorPropertiesWindow-->detailNormalMapDisplayBitmap.setBitmap( (%material).detailNormalMap[%layer] );
    }
-   
-   if((%material).lightMap[%layer] $= "") 
+
+   if((%material).lightMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->lightMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->lightMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -884,8 +877,8 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->lightMapNameText.setText( (%material).lightMap[%layer] );
       MaterialEditorPropertiesWindow-->lightMapDisplayBitmap.setBitmap( (%material).lightMap[%layer] );
    }
-   
-   if((%material).toneMap[%layer] $= "") 
+
+   if((%material).toneMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->toneMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->toneMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -895,8 +888,8 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->toneMapNameText.setText( (%material).toneMap[%layer] );
       MaterialEditorPropertiesWindow-->toneMapDisplayBitmap.setBitmap( (%material).toneMap[%layer] );
    }
-   
-   if((%material).specularMap[%layer] $= "") 
+
+   if((%material).specularMap[%layer] $= "")
    {
       MaterialEditorPropertiesWindow-->specMapNameText.setText( "None" );
       MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
@@ -906,15 +899,17 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->specMapNameText.setText( (%material).specularMap[%layer] );
       MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap( (%material).specularMap[%layer] );
    }
-   
+
    MaterialEditorPropertiesWindow-->detailScaleTextEdit.setText( getWord((%material).detailScale[%layer], 0) );
    MaterialEditorPropertiesWindow-->detailNormalStrengthTextEdit.setText( getWord((%material).detailNormalMapStrength[%layer], 0) );
-   
+
    MaterialEditorPropertiesWindow-->colorTintSwatch.color = (%material).diffuseColor[%layer];
-   MaterialEditorPropertiesWindow-->specularColorSwatch.color = (%material).specular[%layer];     
-   
+   MaterialEditorPropertiesWindow-->specularColorSwatch.color = (%material).specular[%layer];
+
    MaterialEditorPropertiesWindow-->specularPowerTextEdit.setText((%material).specularPower[%layer]);
    MaterialEditorPropertiesWindow-->specularPowerSlider.setValue((%material).specularPower[%layer]);
+   MaterialEditorPropertiesWindow-->specularStrengthTextEdit.setText((%material).specularStrength[%layer]);   // RDM test
+   MaterialEditorPropertiesWindow-->specularStrengthSlider.setValue((%material).specularStrength[%layer]);    // RDM test
    MaterialEditorPropertiesWindow-->pixelSpecularCheckbox.setValue((%material).pixelSpecular[%layer]);
    MaterialEditorPropertiesWindow-->glowCheckbox.setValue((%material).glow[%layer]);
    MaterialEditorPropertiesWindow-->emissiveCheckbox.setValue((%material).emissive[%layer]);
@@ -935,7 +930,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->WaveAnimation.setValue(0);
    MaterialEditorPropertiesWindow-->ScaleAnimation.setValue(0);
    MaterialEditorPropertiesWindow-->SequenceAnimation.setValue(0);
-   
+
    %flags = (%material).getAnimFlags(%layer);
    %wordCount = getWordCount( %flags );
    for(%i = 0; %i != %wordCount; %i++)
@@ -949,7 +944,7 @@ function MaterialEditorGui::guiSync( %this, %material )
          case "$sequence": MaterialEditorPropertiesWindow-->SequenceAnimation.setValue(1);
       }
    }
-   
+
    MaterialEditorPropertiesWindow-->RotationTextEditU.setText( getWord((%material).rotPivotOffset[%layer], 0) );
    MaterialEditorPropertiesWindow-->RotationTextEditV.setText( getWord((%material).rotPivotOffset[%layer], 1) );
    MaterialEditorPropertiesWindow-->RotationSpeedTextEdit.setText( (%material).rotSpeed[%layer] );
@@ -957,7 +952,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->RotationSliderV.setValue( getWord((%material).rotPivotOffset[%layer], 1) );
    MaterialEditorPropertiesWindow-->RotationSpeedSlider.setValue( (%material).rotSpeed[%layer] );
    MaterialEditorPropertiesWindow-->RotationCrosshair.setPosition( 45*mAbs(getWord((%material).rotPivotOffset[%layer], 0))-2, 45*mAbs(getWord((%material).rotPivotOffset[%layer], 1))-2 );
-   
+
    MaterialEditorPropertiesWindow-->ScrollTextEditU.setText( getWord((%material).scrollDir[%layer], 0) );
    MaterialEditorPropertiesWindow-->ScrollTextEditV.setText( getWord((%material).scrollDir[%layer], 1) );
    MaterialEditorPropertiesWindow-->ScrollSpeedTextEdit.setText( (%material).scrollSpeed[%layer] );
@@ -965,14 +960,14 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->ScrollSliderV.setValue( getWord((%material).scrollDir[%layer], 1) );
    MaterialEditorPropertiesWindow-->ScrollSpeedSlider.setValue( (%material).scrollSpeed[%layer] );
    MaterialEditorPropertiesWindow-->ScrollCrosshair.setPosition( -(23 * getWord((%material).scrollDir[%layer], 0))+20, -(23 * getWord((%material).scrollDir[%layer], 1))+20);
-   
+
    %waveType = (%material).waveType[%layer];
    for( %radioButton = 0; %radioButton < MaterialEditorPropertiesWindow-->WaveButtonContainer.getCount(); %radioButton++ )
    {
       if( %waveType $= MaterialEditorPropertiesWindow-->WaveButtonContainer.getObject(%radioButton).waveType )
          MaterialEditorPropertiesWindow-->WaveButtonContainer.getObject(%radioButton).setStateOn(1);
    }
-   
+
    MaterialEditorPropertiesWindow-->WaveTextEditAmp.setText( (%material).waveAmp[%layer] );
    MaterialEditorPropertiesWindow-->WaveTextEditFreq.setText( (%material).waveFreq[%layer] );
    MaterialEditorPropertiesWindow-->WaveSliderAmp.setValue( (%material).waveAmp[%layer] );
@@ -984,8 +979,6 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->SequenceTextEditSSS.setText( %numFrames );
    MaterialEditorPropertiesWindow-->SequenceSliderFPS.setValue( (%material).sequenceFramePerSec[%layer] );
    MaterialEditorPropertiesWindow-->SequenceSliderSSS.setValue( %numFrames );
-   
-   %this.preventUndo = false;
 }
 
 //=======================================
@@ -995,8 +988,8 @@ function MaterialEditorGui::changeLayer( %this, %layer )
 {
    if( MaterialEditorGui.currentLayer == getWord(%layer, 1) )
       return;
-      
-   MaterialEditorGui.currentLayer = getWord(%layer, 1); 
+
+   MaterialEditorGui.currentLayer = getWord(%layer, 1);
    MaterialEditorGui.guiSync( materialEd_previewMaterial );
 }
 
@@ -1006,7 +999,7 @@ function MaterialEditorGui::updateActiveMaterial(%this, %propertyField, %value, 
 
    if(%value $= "")
       %value = "\"\"";
-   
+
    // Here is where we handle undo actions with slider controls. We want to be able to
    // undo every onMouseUp; so we overrite the same undo action when necessary in order
    // to achieve this desired effect.
@@ -1031,11 +1024,11 @@ function MaterialEditorGui::updateActiveMaterial(%this, %propertyField, %value, 
       %action.oldValue = "\"" @ %action.oldValue @ "\"";
       MaterialEditorGui.submitUndo( %action );
    }
-   
+
    eval("materialEd_previewMaterial." @ %propertyField @ " = " @ %value @ ";");
    materialEd_previewMaterial.flush();
    materialEd_previewMaterial.reload();
-   
+
    if (MaterialEditorGui.livePreview == true)
    {
       eval("MaterialEditorGui.currentMaterial." @ %propertyField @ " = " @ %value @ ";");
@@ -1106,7 +1099,7 @@ function MaterialEditorGui::updateReflectionType( %this, %type )
 	}
 	else
 	{
-      if(%type $= "cubeMap")	 
+      if(%type $= "cubeMap")
       {
          MaterialEditorPropertiesWindow-->matEd_cubemapEditBtn.setVisible(1);
 	      MaterialEditorGui.updateActiveMaterial( %type, materialEd_previewMaterial.cubemap );
@@ -1137,12 +1130,12 @@ function MaterialEditorGui::updateTextureMap( %this, %type, %action )
       if( %texture !$= "" )
       {
          %bitmapCtrl.setBitmap(%texture);
-      
+
          %bitmap = %bitmapCtrl.bitmap;
          %bitmap = strreplace(%bitmap,"tools/materialEditor/scripts/","");
          %bitmapCtrl.setBitmap(%bitmap);
          %textCtrl.setText(%bitmap);
-         MaterialEditorGui.updateActiveMaterial(%type @ "Map[" @ %layer @ "]","\"" @ %bitmap @ "\"");	
+         MaterialEditorGui.updateActiveMaterial(%type @ "Map[" @ %layer @ "]","\"" @ %bitmap @ "\"");
       }
    }
    else
@@ -1156,7 +1149,7 @@ function MaterialEditorGui::updateTextureMap( %this, %type, %action )
 function MaterialEditorGui::updateDetailScale(%this,%newScale)
 {
    %layer = MaterialEditorGui.currentLayer;
-   
+
    %detailScale = "\"" @ %newScale SPC %newScale @ "\"";
    MaterialEditorGui.updateActiveMaterial("detailScale[" @ %layer @ "]", %detailScale);
 }
@@ -1164,7 +1157,7 @@ function MaterialEditorGui::updateDetailScale(%this,%newScale)
 function MaterialEditorGui::updateDetailNormalStrength(%this,%newStrength)
 {
    %layer = MaterialEditorGui.currentLayer;
-   
+
    %detailStrength = "\"" @ %newStrength @ "\"";
    MaterialEditorGui.updateActiveMaterial("detailNormalMapStrength[" @ %layer @ "]", %detailStrength);
 }
@@ -1172,16 +1165,16 @@ function MaterialEditorGui::updateDetailNormalStrength(%this,%newStrength)
 function MaterialEditorGui::updateSpecMap(%this,%action)
 {
    %layer = MaterialEditorGui.currentLayer;
-   
+
    if( %action )
    {
       %texture = MaterialEditorGui.openFile("texture");
       if( %texture !$= "" )
       {
          MaterialEditorGui.updateActiveMaterial("pixelSpecular[" @ MaterialEditorGui.currentLayer @ "]", 0);
-         
+
          MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap(%texture);
-      
+
          %bitmap = MaterialEditorPropertiesWindow-->specMapDisplayBitmap.bitmap;
          %bitmap = strreplace(%bitmap,"tools/materialEditor/scripts/","");
          MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap(%bitmap);
@@ -1195,7 +1188,7 @@ function MaterialEditorGui::updateSpecMap(%this,%action)
       MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap("tools/materialeditor/gui/unknownImage");
       MaterialEditorGui.updateActiveMaterial("specularMap[" @ %layer @ "]","");
    }
-   
+
    MaterialEditorGui.guiSync( materialEd_previewMaterial );
 }
 
@@ -1205,7 +1198,7 @@ function MaterialEditorGui::updateRotationOffset(%this, %isSlider, %onMouseUp)
 	%X = MaterialEditorPropertiesWindow-->RotationTextEditU.getText();
 	%Y = MaterialEditorPropertiesWindow-->RotationTextEditV.getText();
 	MaterialEditorPropertiesWindow-->RotationCrosshair.setPosition(45*mAbs(%X)-2, 45*mAbs(%Y)-2);
-	
+
 	MaterialEditorGui.updateActiveMaterial("rotPivotOffset[" @ %layer @ "]","\"" @ %X SPC %Y @ "\"",%isSlider,%onMouseUp);
 }
 
@@ -1222,8 +1215,8 @@ function MaterialEditorGui::updateScrollOffset(%this, %isSlider, %onMouseUp)
 	%X = MaterialEditorPropertiesWindow-->ScrollTextEditU.getText();
 	%Y = MaterialEditorPropertiesWindow-->ScrollTextEditV.getText();
 	MaterialEditorPropertiesWindow-->ScrollCrosshair.setPosition( -(23 * %X)+20, -(23 * %Y)+20);
-	
-	MaterialEditorGui.updateActiveMaterial("scrollDir[" @ %layer @ "]","\"" @ %X SPC %Y @ "\"",%isSlider,%onMouseUp);	
+
+	MaterialEditorGui.updateActiveMaterial("scrollDir[" @ %layer @ "]","\"" @ %X SPC %Y @ "\"",%isSlider,%onMouseUp);
 }
 
 function MaterialEditorGui::updateScrollSpeed(%this, %isSlider, %onMouseUp)
@@ -1240,7 +1233,7 @@ function MaterialEditorGui::updateWaveType(%this)
       if( MaterialEditorPropertiesWindow-->WaveButtonContainer.getObject(%radioButton).getValue() == 1 )
          %type = MaterialEditorPropertiesWindow-->WaveButtonContainer.getObject(%radioButton).waveType;
    }
-   
+
    %layer = MaterialEditorGui.currentLayer;
    MaterialEditorGui.updateActiveMaterial("waveType[" @ %layer @ "]", %type);
 }
@@ -1263,7 +1256,7 @@ function MaterialEditorGui::updateSequenceFPS(%this, %isSlider, %onMouseUp)
 {
    %layer = MaterialEditorGui.currentLayer;
 	%fps = MaterialEditorPropertiesWindow-->SequenceTextEditFPS.getText();
-	MaterialEditorGui.updateActiveMaterial("sequenceFramePerSec[" @ %layer @ "]", %fps, %isSlider, %onMouseUp);	
+	MaterialEditorGui.updateActiveMaterial("sequenceFramePerSec[" @ %layer @ "]", %fps, %isSlider, %onMouseUp);
 }
 
 function MaterialEditorGui::updateSequenceSSS(%this, %isSlider, %onMouseUp)
@@ -1277,14 +1270,14 @@ function MaterialEditorGui::updateAnimationFlags(%this)
 {
    MaterialEditorGui.setMaterialDirty();
    %single = true;
-   
+
    if(MaterialEditorPropertiesWindow-->RotationAnimation.getValue() == true)
    {
       if(%single == true)
 	      %flags = %flags @ "$Rotate";
 	   else
 		  %flags = %flags @ " | $Rotate";
-		  
+
       %single = false;
    }
    if(MaterialEditorPropertiesWindow-->ScrollAnimation.getValue() == true)
@@ -1293,7 +1286,7 @@ function MaterialEditorGui::updateAnimationFlags(%this)
 	      %flags = %flags @ "$Scroll";
 	   else
 		  %flags = %flags @ " | $Scroll";
-		  
+
       %single = false;
    }
    if(MaterialEditorPropertiesWindow-->WaveAnimation.getValue() == true)
@@ -1302,7 +1295,7 @@ function MaterialEditorGui::updateAnimationFlags(%this)
 	      %flags = %flags @ "$Wave";
 	   else
 		  %flags = %flags @ " | $Wave";
-		  
+
       %single = false;
    }
    if(MaterialEditorPropertiesWindow-->ScaleAnimation.getValue() == true)
@@ -1311,7 +1304,7 @@ function MaterialEditorGui::updateAnimationFlags(%this)
 	      %flags = %flags @ "$Scale";
 	   else
 		  %flags = %flags @ " | $Scale";
-		  
+
       %single = false;
    }
    if(MaterialEditorPropertiesWindow-->SequenceAnimation.getValue() == true)
@@ -1320,31 +1313,31 @@ function MaterialEditorGui::updateAnimationFlags(%this)
 	      %flags = %flags @ "$Sequence";
 	   else
 		  %flags = %flags @ " | $Sequence";
-		  
+
       %single = false;
    }
-   
+
    if(%flags $= "")
       %flags = "\"\"";
-      
+
    %action = %this.createUndo(ActionUpdateActiveMaterialAnimationFlags, "Update Active Material");
    %action.material = MaterialEditorGui.currentMaterial;
    %action.object = MaterialEditorGui.currentObject;
-   %action.layer = MaterialEditorGui.currentLayer; 
-      
+   %action.layer = MaterialEditorGui.currentLayer;
+
    %action.newValue = %flags;
-   
+
    %oldFlags = MaterialEditorGui.currentMaterial.getAnimFlags(MaterialEditorGui.currentLayer);
    if(%oldFlags $= "")
       %oldFlags = "\"\"";
-      
+
    %action.oldValue = %oldFlags;
    MaterialEditorGui.submitUndo( %action );
-   
+
    eval("materialEd_previewMaterial.animFlags[" @ MaterialEditorGui.currentLayer @ "] = " @ %flags @ ";");
    materialEd_previewMaterial.flush();
    materialEd_previewMaterial.reload();
-   
+
    if (MaterialEditorGui.livePreview == true)
    {
       eval("MaterialEditorGui.currentMaterial.animFlags[" @ MaterialEditorGui.currentLayer @ "] = " @ %flags @ ";");
@@ -1382,7 +1375,7 @@ function MaterialEditorGui::updateColorMultiply(%this,%color)
 
 function MaterialEditorGui::updateSpecularCheckbox(%this,%value)
 {
-   MaterialEditorGui.updateActiveMaterial("pixelSpecular[" @ MaterialEditorGui.currentLayer @ "]", %value);   
+   MaterialEditorGui.updateActiveMaterial("pixelSpecular[" @ MaterialEditorGui.currentLayer @ "]", %value);
    MaterialEditorGui.guiSync( materialEd_previewMaterial );
 }
 
@@ -1458,7 +1451,7 @@ function MaterialEditorGui::updateLightColor(%this, %color)
 }
 
 function MaterialEditorGui::updatePreviewBackground(%this,%color)
-{   
+{
    matEd_previewBackground.color = %color;
    MaterialPreviewBackgroundPicker.color = %color;
 }
@@ -1477,7 +1470,7 @@ function MaterialEditorGui::selectCubemap(%this)
    %cubemap = MaterialEditorGui.currentCubemap;
    if(!isObject(%cubemap))
       return;
-   
+
    MaterialEditorGui.updateActiveMaterial( "cubemap", %cubemap.name );
    MaterialEditorGui.hideCubemapEditor();
 }
@@ -1485,14 +1478,14 @@ function MaterialEditorGui::selectCubemap(%this)
 function MaterialEditorGui::cancelCubemap(%this)
 {
    %cubemap = MaterialEditorGui.currentCubemap;
-   
+
    %idx = matEd_cubemapEd_availableCubemapList.findItemText( %cubemap.getName() );
-   matEd_cubemapEd_availableCubemapList.setItemText( %idx, notDirtyCubemap.originalName );      
+   matEd_cubemapEd_availableCubemapList.setItemText( %idx, notDirtyCubemap.originalName );
    %cubemap.setName( notDirtyCubemap.originalName );
-   
+
    MaterialEditorGui.copyCubemaps( notDirtyCubemap, %cubemap );
    MaterialEditorGui.copyCubemaps( notDirtyCubemap, matEdCubeMapPreviewMat);
-   
+
    %cubemap.updateFaces();
    matEdCubeMapPreviewMat.updateFaces();
 }
@@ -1503,16 +1496,16 @@ function MaterialEditorGui::showCubemapEditor(%this)
       return;
 
    MaterialEditorGui.currentCubemap = "";
-   
+
    matEd_cubemapEditor.setVisible(1);
    new PersistenceManager(matEd_cubemapEdPerMan);
    MaterialEditorGui.setCubemapNotDirty();
-   
+
    for( %i = 0; %i < RootGroup.getCount(); %i++ )
    {
       if( RootGroup.getObject(%i).getClassName()!$= "CubemapData" )
          continue;
-         
+
       for( %k = 0; %k < UnlistedCubemaps.count(); %k++ )
       {
          %unlistedFound = 0;
@@ -1522,15 +1515,15 @@ function MaterialEditorGui::showCubemapEditor(%this)
             break;
          }
       }
-   
+
       if( %unlistedFound )
          continue;
-      
+
       matEd_cubemapEd_availableCubemapList.addItem( RootGroup.getObject(%i).name );
    }
-   
+
    singleton CubemapData(notDirtyCubemap);
-   
+
    // if there was no cubemap, pick the first, select, and bail, these are going to take
    // care of themselves in the selected function
    if( !isObject( MaterialEditorGui.currentMaterial.cubemap ) )
@@ -1540,8 +1533,8 @@ function MaterialEditorGui::showCubemapEditor(%this)
          matEd_cubemapEd_availableCubemapList.setSelected(0, true);
          return;
       }
-      else 
-      {  
+      else
+      {
          // if there are no cubemaps, then create one, select, and bail
          %cubemap = MaterialEditorGui.createNewCubemap();
          matEd_cubemapEd_availableCubemapList.addItem( %cubemap.name );
@@ -1553,7 +1546,7 @@ function MaterialEditorGui::showCubemapEditor(%this)
    // do not directly change activeMat!
    MaterialEditorGui.currentCubemap = MaterialEditorGui.currentMaterial.cubemap.getId();
    %cubemap = MaterialEditorGui.currentCubemap;
-   
+
    notDirtyCubemap.originalName = %cubemap.getName();
    MaterialEditorGui.copyCubemaps( %cubemap, notDirtyCubemap);
    MaterialEditorGui.copyCubemaps( %cubemap, matEdCubeMapPreviewMat);
@@ -1564,7 +1557,7 @@ function MaterialEditorGui::hideCubemapEditor(%this,%cancel)
 {
    if(%cancel)
       MaterialEditorGui.cancelCubemap();
-      
+
    matEd_cubemapEd_availableCubemapList.clearItems();
    matEd_cubemapEdPerMan.delete();
    matEd_cubemapEditor.setVisible(0);
@@ -1578,7 +1571,7 @@ function MaterialEditorGui::addCubemap( %this,%cubemapName )
       MessageBoxOK( "Error", "Can not create a cubemap without a valid name.");
       return;
    }
-   
+
    for(%i = 0; %i < RootGroup.getCount(); %i++)
    {
       if( %cubemapName $= RootGroup.getObject(%i).getName() )
@@ -1608,8 +1601,8 @@ function MaterialEditorGui::createNewCubemap( %this, %cubemap )
             break;
       }
    }
-   
-   new CubemapData(%cubemap) 
+
+   new CubemapData(%cubemap)
    {
       cubeFace[0] = "tools/materialeditor/gui/cube_xNeg";
       cubeFace[1] = "tools/materialeditor/gui/cube_xPos";
@@ -1628,7 +1621,7 @@ function MaterialEditorGui::createNewCubemap( %this, %cubemap )
 }
 
 function MaterialEditorGui::setCubemapDirty(%this)
-{ 
+{
    %propertyText = "Create Cubemap *";
    matEd_cubemapEditor.text = %propertyText;
    matEd_cubemapEditor.dirty = true;
@@ -1659,16 +1652,16 @@ function MaterialEditorGui::showDeleteCubemapDialog(%this)
    %idx = matEd_cubemapEd_availableCubemapList.getSelectedItem();
    %cubemap = matEd_cubemapEd_availableCubemapList.getItemText( %idx );
    %cubemap = %cubemap.getId();
-   
+
    if( %cubemap == -1 || !isObject(%cubemap) )
       return;
-      
+
    if( isObject( %cubemap ) )
    {
-      MessageBoxYesNoCancel("Delete Cubemap?", 
-         "Are you sure you want to delete<br><br>" @ %cubemap.getName() @ "<br><br> Cubemap deletion won't take affect until the engine is quit.", 
-         "MaterialEditorGui.deleteCubemap( " @ %cubemap @ ", " @ %idx @ " );", 
-         "", 
+      MessageBoxYesNoCancel("Delete Cubemap?",
+         "Are you sure you want to delete<br><br>" @ %cubemap.getName() @ "<br><br> Cubemap deletion won't take affect until the engine is quit.",
+         "MaterialEditorGui.deleteCubemap( " @ %cubemap @ ", " @ %idx @ " );",
+         "",
          "" );
    }
 }
@@ -1676,9 +1669,9 @@ function MaterialEditorGui::showDeleteCubemapDialog(%this)
 function MaterialEditorGui::deleteCubemap( %this, %cubemap, %idx )
 {
    matEd_cubemapEd_availableCubemapList.deleteItem( %idx );
-   
+
    UnlistedCubemaps.add( "unlistedCubemaps", %cubemap.getName() );
-      
+
    if( !MaterialEditorGui.isMatEditorMaterial( %cubemap ) )
    {
       matEd_cubemapEdPerMan.removeDirty( %cubemap );
@@ -1689,8 +1682,8 @@ function MaterialEditorGui::deleteCubemap( %this, %cubemap, %idx )
    {
       matEd_cubemapEd_availableCubemapList.setSelected(0, true);
    }
-   else 
-   {  
+   else
+   {
       // if there are no cubemaps, then create one, select, and bail
       %cubemap = MaterialEditorGui.createNewCubemap();
       matEd_cubemapEd_availableCubemapList.addItem( %cubemap.getName() );
@@ -1703,13 +1696,13 @@ function matEd_cubemapEd_availableCubemapList::onSelect( %this, %id, %cubemap )
    %cubemap = %cubemap.getId();
    if( MaterialEditorGui.currentCubemap $= %cubemap )
       return;
-   
+
    if( matEd_cubemapEditor.dirty )
-   {         
+   {
       %savedCubemap = MaterialEditorGui.currentCubemap;
-      MessageBoxYesNoCancel("Save Existing Cubemap?", 
-      "Do you want to save changes to <br><br>" @ %savedCubemap.getName(), 
-      "MaterialEditorGui.saveCubemap(" @ true @ ");", 
+      MessageBoxYesNoCancel("Save Existing Cubemap?",
+      "Do you want to save changes to <br><br>" @ %savedCubemap.getName(),
+      "MaterialEditorGui.saveCubemap(" @ true @ ");",
       "MaterialEditorGui.saveCubemapDialogDontSave(" @ %cubemap @ ");",
       "MaterialEditorGui.saveCubemapDialogCancel();" );
    }
@@ -1722,43 +1715,43 @@ function MaterialEditorGui::showSaveCubemapDialog( %this )
    %cubemap = MaterialEditorGui.currentCubemap;
    if( !isObject(%cubemap) )
       return;
-      
-   MessageBoxYesNoCancel("Save Cubemap?", 
-      "Do you want to save changes to <br><br>" @ %cubemap.getName(), 
-      "MaterialEditorGui.saveCubemap( " @ %cubemap @ " );", 
-      "", 
+
+   MessageBoxYesNoCancel("Save Cubemap?",
+      "Do you want to save changes to <br><br>" @ %cubemap.getName(),
+      "MaterialEditorGui.saveCubemap( " @ %cubemap @ " );",
+      "",
       "" );
 }
 
 function MaterialEditorGui::saveCubemap( %this, %cubemap )
-{   
+{
    notDirtyCubemap.originalName = %cubemap.getName();
    MaterialEditorGui.copyCubemaps( %cubemap, notDirtyCubemap );
    MaterialEditorGui.copyCubemaps( %cubemap, matEdCubeMapPreviewMat);
 
-   matEd_cubemapEdPerMan.saveDirty(); 
+   matEd_cubemapEdPerMan.saveDirty();
 
    MaterialEditorGui.setCubemapNotDirty();
 }
 
 function MaterialEditorGui::saveCubemapDialogDontSave( %this, %newCubemap)
-{  
+{
    //deal with old cubemap first
    %oldCubemap = MaterialEditorGui.currentCubemap;
-   
+
    %idx = matEd_cubemapEd_availableCubemapList.findItemText( %oldCubemap.getName() );
-   matEd_cubemapEd_availableCubemapList.setItemText( %idx, notDirtyCubemap.originalName );      
+   matEd_cubemapEd_availableCubemapList.setItemText( %idx, notDirtyCubemap.originalName );
    %oldCubemap.setName( notDirtyCubemap.originalName );
-   
+
    MaterialEditorGui.copyCubemaps( notDirtyCubemap, %oldCubemap);
    MaterialEditorGui.copyCubemaps( notDirtyCubemap, matEdCubeMapPreviewMat);
-   MaterialEditorGui.syncCubemap( %oldCubemap ); 
-   
+   MaterialEditorGui.syncCubemap( %oldCubemap );
+
    MaterialEditorGui.changeCubemap( %newCubemap );
 }
 
 function MaterialEditorGui::saveCubemapDialogCancel( %this )
-{ 
+{
    %cubemap = MaterialEditorGui.currentCubemap;
    %idx = matEd_cubemapEd_availableCubemapList.findItemText( %cubemap.getName() );
    matEd_cubemapEd_availableCubemapList.clearSelection();
@@ -1766,20 +1759,20 @@ function MaterialEditorGui::saveCubemapDialogCancel( %this )
 }
 
 function MaterialEditorGui::changeCubemap( %this, %cubemap )
-{  
+{
    MaterialEditorGui.setCubemapNotDirty();
    MaterialEditorGui.currentCubemap = %cubemap;
-   
+
    notDirtyCubemap.originalName = %cubemap.getName();
    MaterialEditorGui.copyCubemaps( %cubemap, notDirtyCubemap);
    MaterialEditorGui.copyCubemaps( %cubemap, matEdCubeMapPreviewMat);
-   MaterialEditorGui.syncCubemap( %cubemap );  
+   MaterialEditorGui.syncCubemap( %cubemap );
 }
 
 function MaterialEditorGui::editCubemapImage( %this, %face )
-{   
+{
    MaterialEditorGui.setCubemapDirty();
-   
+
    %cubemap = MaterialEditorGui.currentCubemap;
    %bitmap = MaterialEditorGui.openFile("texture");
    if( %bitmap !$= "" && %bitmap !$= "tools/materialEditor/gui/cubemapBtnBorder" )
@@ -1791,15 +1784,15 @@ function MaterialEditorGui::editCubemapImage( %this, %face )
 }
 
 function MaterialEditorGui::editCubemapName( %this, %newName )
-{   
+{
    MaterialEditorGui.setCubemapDirty();
-   
+
    %cubemap = MaterialEditorGui.currentCubemap;
-   
+
    %idx = matEd_cubemapEd_availableCubemapList.findItemText( %cubemap.getName() );
-   matEd_cubemapEd_availableCubemapList.setItemText( %idx, %newName );   
+   matEd_cubemapEd_availableCubemapList.setItemText( %idx, %newName );
    %cubemap.setName(%newName);
-   
+
    MaterialEditorGui.syncCubemap( %cubemap );
 }
 
@@ -1808,29 +1801,29 @@ function MaterialEditorGui::syncCubemap( %this, %cubemap )
    %xpos = MaterialEditorGui.searchForTexture(%cubemap.getName(), %cubemap.cubeFace[0]);
    if( %xpos !$= "" )
       matEd_cubemapEd_XPos.setBitmap( %xpos );
-   
+
    %xneg = MaterialEditorGui.searchForTexture(%cubemap.getName(), %cubemap.cubeFace[1]);
    if( %xneg !$= "" )
-      matEd_cubemapEd_XNeg.setBitmap( %xneg );      
-   
+      matEd_cubemapEd_XNeg.setBitmap( %xneg );
+
    %yneg = MaterialEditorGui.searchForTexture(%cubemap.getName(), %cubemap.cubeFace[2]);
    if( %yneg !$= "" )
       matEd_cubemapEd_YNeG.setBitmap( %yneg );
-   
+
    %ypos = MaterialEditorGui.searchForTexture(%cubemap.getName(), %cubemap.cubeFace[3]);
    if( %ypos !$= "" )
       matEd_cubemapEd_YPos.setBitmap( %ypos );
-   
+
    %zpos = MaterialEditorGui.searchForTexture(%cubemap.getName(), %cubemap.cubeFace[4]);
    if( %zpos !$= "" )
       matEd_cubemapEd_ZPos.setBitmap( %zpos );
-   
+
    %zneg = MaterialEditorGui.searchForTexture(%cubemap.getName(), %cubemap.cubeFace[5]);
    if( %zneg !$= "" )
       matEd_cubemapEd_ZNeg.setBitmap( %zneg );
-   
+
    matEd_cubemapEd_activeCubemapNameTxt.setText(%cubemap.getName());
-   
+
    %cubemap.updateFaces();
    matEdCubeMapPreviewMat.updateFaces();
 }
@@ -1851,31 +1844,31 @@ function MaterialEditorGui::copyCubemaps( %this, %copyFrom, %copyTo)
 
 function MaterialEditorGui::showSaveDialog( %this, %toMaterial )
 {
-   MessageBoxYesNoCancel("Save Material?", 
-      "The material " @ MaterialEditorGui.currentMaterial.getName() @ " has unsaved changes. <br>Do you want to save?", 
-      "MaterialEditorGui.saveDialogSave(" @ %toMaterial @ ");", 
-      "MaterialEditorGui.saveDialogDontSave(" @ %toMaterial @ ");", 
+   MessageBoxYesNoCancel("Save Material?",
+      "The material " @ MaterialEditorGui.currentMaterial.getName() @ " has unsaved changes. <br>Do you want to save?",
+      "MaterialEditorGui.saveDialogSave(" @ %toMaterial @ ");",
+      "MaterialEditorGui.saveDialogDontSave(" @ %toMaterial @ ");",
       "MaterialEditorGui.saveDialogCancel();" );
 }
 
 function MaterialEditorGui::showMaterialChangeSaveDialog( %this, %toMaterial )
 {
    %fromMaterial = MaterialEditorGui.currentMaterial;
-   
-   MessageBoxYesNoCancel("Save Material?", 
-      "The material " @ %fromMaterial.getName() @ " has unsaved changes. <br>Do you want to save before changing the material?", 
-      "MaterialEditorGui.saveDialogSave(" @ %toMaterial @ "); MaterialEditorGui.changeMaterial(" @ %fromMaterial @ ", " @ %toMaterial @ ");", 
-      "MaterialEditorGui.saveDialogDontSave(" @ %toMaterial @ "); MaterialEditorGui.changeMaterial(" @ %fromMaterial @ ", " @ %toMaterial @ ");", 
+
+   MessageBoxYesNoCancel("Save Material?",
+      "The material " @ %fromMaterial.getName() @ " has unsaved changes. <br>Do you want to save before changing the material?",
+      "MaterialEditorGui.saveDialogSave(" @ %toMaterial @ "); MaterialEditorGui.changeMaterial(" @ %fromMaterial @ ", " @ %toMaterial @ ");",
+      "MaterialEditorGui.saveDialogDontSave(" @ %toMaterial @ "); MaterialEditorGui.changeMaterial(" @ %fromMaterial @ ", " @ %toMaterial @ ");",
       "MaterialEditorGui.saveDialogCancel();" );
 }
 
 /*
 function MaterialEditorGui::showCreateNewMaterialSaveDialog( %this, %toMaterial )
 {
-   MessageBoxYesNoCancel("Save Material?", 
-      "The material " @ MaterialEditorGui.currentMaterial.getName() @ " has unsaved changes. <br>Do you want to save before changing the material?", 
-      "MaterialEditorGui.save(); MaterialEditorGui.createNewMaterial(" @ %toMaterial @ ");", 
-      "MaterialEditorGui.saveDialogDontSave(" @ %toMaterial @ "); MaterialEditorGui.changeMaterial(" @ %toMaterial @ ");", 
+   MessageBoxYesNoCancel("Save Material?",
+      "The material " @ MaterialEditorGui.currentMaterial.getName() @ " has unsaved changes. <br>Do you want to save before changing the material?",
+      "MaterialEditorGui.save(); MaterialEditorGui.createNewMaterial(" @ %toMaterial @ ");",
+      "MaterialEditorGui.saveDialogDontSave(" @ %toMaterial @ "); MaterialEditorGui.changeMaterial(" @ %toMaterial @ ");",
       "MaterialEditorGui.saveDialogCancel();" );
 }
 */
@@ -1888,19 +1881,19 @@ function MaterialEditorGui::saveDialogCancel( %this )
 function MaterialEditorGui::saveDialogDontSave( %this, %material )
 {
    MaterialEditorGui.currentMaterial.setName( %this.originalName );
-   
+
    //restore to defaults
    MaterialEditorGui.copyMaterials( notDirtyMaterial, MaterialEditorGui.currentMaterial );
    MaterialEditorGui.copyMaterials( notDirtyMaterial, materialEd_previewMaterial );
    MaterialEditorGui.guiSync( materialEd_previewMaterial );
-   
+
    materialEd_previewMaterial.flush();
    materialEd_previewMaterial.reload();
    MaterialEditorGui.currentMaterial.flush();
    MaterialEditorGui.currentMaterial.reload();
-   
+
    MaterialEditorGui.setMaterialNotDirty();
-   
+
    MaterialEditorGui.setActiveMaterial( %material );
 }
 
@@ -1915,12 +1908,12 @@ function MaterialEditorGui::save( %this )
    if( MaterialEditorGui.currentMaterial.getName() $= "" )
    {
       MessageBoxOK("Cannot perform operation", "Saved materials cannot be named \"\". A name must be given before operation is performed" );
-      return;   
+      return;
    }
-   
+
    // Update the live object regardless in this case
    MaterialEditorGui.updateLivePreview(true);
-   
+
    %currentMaterial = MaterialEditorGui.currentMaterial;
    if( %currentMaterial == -1 )
    {
@@ -1929,12 +1922,12 @@ function MaterialEditorGui::save( %this )
    }
 
    // Specifically for materials autogenerated from shapes.
-   if( %currentMaterial.isAutoGenerated() ) 
-      %currentMaterial.setAutoGenerated( false ); 
-     
+   if( %currentMaterial.isAutoGenerated() )
+      %currentMaterial.setAutoGenerated( false );
+
    // Save the material using the persistence manager
-   matEd_PersistMan.saveDirty();   
-   
+   matEd_PersistMan.saveDirty();
+
    // Clean up the Material Editor
    MaterialEditorGui.copyMaterials( materialEd_previewMaterial, notDirtyMaterial );
    MaterialEditorGui.setMaterialNotDirty();
@@ -1947,20 +1940,20 @@ function MaterialEditorGui::createNewMaterial( %this )
 {
    %action = %this.createUndo(ActionCreateNewMaterial, "Create New Material");
    %action.object = "";
-   
+
    %material = getUniqueName( "newMaterial" );
-   new Material(%material) 
+   new Material(%material)
    {
       diffuseMap[0] = "core/art/warnmat";
       mapTo = "unmapped_mat";
       parentGroup = RootGroup;
    };
-   
+
    %action.newMaterial = %material.getId();
    %action.oldMaterial = MaterialEditorGui.currentMaterial;
-   
+
    MaterialEditorGui.submitUndo( %action );
-   
+
    MaterialEditorGui.currentObject = "";
    MaterialEditorGui.setMode();
    MaterialEditorGui.prepareActiveMaterial( %material.getId(), true );
@@ -1971,23 +1964,23 @@ function MaterialEditorGui::deleteMaterial( %this )
    %action = %this.createUndo(ActionDeleteMaterial, "Delete Material");
    %action.object = MaterialEditorGui.currentObject;
    %action.currentMode = MaterialEditorGui.currentMode;
-   
+
    /*
    if( MaterialEditorGui.currentMode $= "Mesh" )
    {
       %materialTarget = SubMaterialSelector.text;
-      %action.materialTarget = %materialTarget;   
-      
+      %action.materialTarget = %materialTarget;
+
       //create the stub material
       %toMaterial = getUniqueName( "newMaterial" );
-      new Material(%toMaterial) 
+      new Material(%toMaterial)
       {
          diffuseMap[0] = "core/art/warnmat";
          mapTo = "unmapped_mat";
          parentGroup = RootGroup;
       };
-         
-      %action.toMaterial = %toMaterial.getId();   
+
+      %action.toMaterial = %toMaterial.getId();
       %action.fromMaterial = MaterialEditorGui.currentMaterial;
       %action.fromMaterialOldFname = MaterialEditorGui.currentMaterial.getFilename();
    }
@@ -1998,22 +1991,22 @@ function MaterialEditorGui::deleteMaterial( %this )
       if( !isObject( %toMaterial ) )
       {
          %toMaterial = getUniqueName( "newMaterial" );
-         new Material(%toMaterial) 
+         new Material(%toMaterial)
          {
             diffuseMap[0] = "core/art/warnmat";
             mapTo = "unmapped_mat";
             parentGroup = RootGroup;
-         };    
+         };
       }
-   
+
       %action.toMaterial = %toMaterial.getId();
       %action.fromMaterial = MaterialEditorGui.currentMaterial;
    }
    */
-   
+
    // Grab first material we see; if theres not one, create one
    %newMaterial = getUniqueName( "newMaterial" );
-   new Material(%newMaterial) 
+   new Material(%newMaterial)
    {
       diffuseMap[0] = "core/art/warnmat";
       mapTo = "unmapped_mat";
@@ -2024,20 +2017,20 @@ function MaterialEditorGui::deleteMaterial( %this )
    %action.newMaterial = %newMaterial.getId();
    %action.oldMaterial = MaterialEditorGui.currentMaterial;
    %action.oldMaterialFname = MaterialEditorGui.currentMaterial.getFilename();
-   
+
    // Submit undo
    MaterialEditorGui.submitUndo( %action );
-   
+
    // Delete the material from file
    if( !MaterialEditorGui.isMatEditorMaterial( MaterialEditorGui.currentMaterial ) )
    {
       matEd_PersistMan.removeObjectFromFile(MaterialEditorGui.currentMaterial);
       matEd_PersistMan.removeDirty(MaterialEditorGui.currentMaterial);
    }
-   
+
    // Delete the material as seen through the material selector.
    UnlistedMaterials.add( "unlistedMaterials", MaterialEditorGui.currentMaterial.getName() );
-   
+
    // Loadup another material
    MaterialEditorGui.currentObject = "";
    MaterialEditorGui.setMode();
@@ -2052,38 +2045,38 @@ function MaterialEditorGui::clearMaterial(%this)
    %action = %this.createUndo(ActionClearMaterial, "Clear Material");
    %action.material = MaterialEditorGui.currentMaterial;
    %action.object = MaterialEditorGui.currentObject;
-   
+
    pushInstantGroup();
    %action.oldMaterial = new Material();
-   %action.newMaterial = new Material();   
+   %action.newMaterial = new Material();
    popInstantGroup();
-   
+
    MaterialEditorGui.submitUndo( %action );
-   
+
    MaterialEditorGui.copyMaterials( MaterialEditorGui.currentMaterial, %action.oldMaterial );
-   
+
    %tempMat = new Material()
                   {
                      name = "tempMaterial";
                      mapTo = "unmapped_mat";
                      parentGroup = RootGroup;
                   };
-   
+
    MaterialEditorGui.copyMaterials( %tempMat, materialEd_previewMaterial );
    MaterialEditorGui.guiSync( materialEd_previewMaterial );
-      
+
    materialEd_previewMaterial.flush();
    materialEd_previewMaterial.reload();
-   
+
    if (MaterialEditorGui.livePreview == true)
    {
       MaterialEditorGui.copyMaterials( %tempMat, MaterialEditorGui.currentMaterial );
       MaterialEditorGui.currentMaterial.flush();
       MaterialEditorGui.currentMaterial.reload();
    }
-   
+
    MaterialEditorGui.setMaterialDirty();
-   
+
    %tempMat.delete();
 }
 
@@ -2092,34 +2085,34 @@ function MaterialEditorGui::refreshMaterial(%this)
    %action = %this.createUndo(ActionRefreshMaterial, "Refresh Material");
    %action.material = MaterialEditorGui.currentMaterial;
    %action.object = MaterialEditorGui.currentObject;
-   
+
    pushInstantGroup();
    %action.oldMaterial = new Material();
-   %action.newMaterial = new Material();   
+   %action.newMaterial = new Material();
    popInstantGroup();
-   
+
    MaterialEditorGui.copyMaterials( MaterialEditorGui.currentMaterial, %action.oldMaterial );
    MaterialEditorGui.copyMaterials( notDirtyMaterial, %action.newMaterial );
-   
+
    %action.oldName = MaterialEditorGui.currentMaterial.getName();
    %action.newName = %this.originalName;
-   
+
    MaterialEditorGui.submitUndo( %action );
-   
+
    MaterialEditorGui.currentMaterial.setName( %this.originalName );
    MaterialEditorGui.copyMaterials( notDirtyMaterial, materialEd_previewMaterial );
    MaterialEditorGui.guiSync( materialEd_previewMaterial );
-      
+
    materialEd_previewMaterial.flush();
    materialEd_previewMaterial.reload();
-   
+
    if (MaterialEditorGui.livePreview == true)
    {
       MaterialEditorGui.copyMaterials( notDirtyMaterial, MaterialEditorGui.currentMaterial );
       MaterialEditorGui.currentMaterial.flush();
       MaterialEditorGui.currentMaterial.reload();
    }
-   
+
    MaterialEditorGui.setMaterialNotDirty();
 }
 
@@ -2136,11 +2129,11 @@ function MaterialEditorGui::switchMaterial( %this, %material )
 
 /*------------------------------------------------------------------------------
  This changes the map to's of possibly two materials (%fromMaterial, %toMaterial)
- and updates the engines libraries accordingly in order to make this change per 
- object/per objects instances/per target. Before this functionality is enacted, 
+ and updates the engines libraries accordingly in order to make this change per
+ object/per objects instances/per target. Before this functionality is enacted,
  there is a popup beforehand that will ask if you are sure if you want to make
- this change. Making this change will physically alter possibly two materials.cs 
- files in order to move the (%fromMaterial, %toMaterial), replacing the 
+ this change. Making this change will physically alter possibly two materials.cs
+ files in order to move the (%fromMaterial, %toMaterial), replacing the
  (%fromMaterials)'s mapTo to "unmapped_mat".
 -------------------------------------------------------------------------------*/
 
@@ -2148,31 +2141,31 @@ function MaterialEditorGui::changeMaterial(%this, %fromMaterial, %toMaterial)
 {
    %action = %this.createUndo(ActionChangeMaterial, "Change Material");
    %action.object = MaterialEditorGui.currentObject;
-   
+
    %materialTarget = SubMaterialSelector.text;
-   %action.materialTarget = %materialTarget;   
-   
-   %action.fromMaterial = %fromMaterial;    
-   %action.toMaterial = %toMaterial;   
+   %action.materialTarget = %materialTarget;
+
+   %action.fromMaterial = %fromMaterial;
+   %action.toMaterial = %toMaterial;
    %action.toMaterialOldFname = %toMaterial.getFilename();
    %action.object =  MaterialEditorGui.currentObject;
 
    if( MaterialEditorGui.currentMeshMode $= "Model" ) // Models
    {
-      %action.mode = "model";      
-      
+      %action.mode = "model";
+
       MaterialEditorGui.currentObject.changeMaterial( %materialTarget, %fromMaterial.getName(), %toMaterial.getName() );
-      
+
       if( MaterialEditorGui.currentObject.interiorFile !$= "" )
          %sourcePath = MaterialEditorGui.currentObject.interiorFile;
-      else if( MaterialEditorGui.currentObject.shapeName !$= "" ) 
+      else if( MaterialEditorGui.currentObject.shapeName !$= "" )
          %sourcePath = MaterialEditorGui.currentObject.shapeName;
       else if( MaterialEditorGui.currentObject.isMethod("getDatablock") )
       {
          if( MaterialEditorGui.currentObject.getDatablock().shapeFile !$= "" )
             %sourcePath = MaterialEditorGui.currentObject.getDatablock().shapeFile;
       }
-      
+
       // Creating "to" path
       %k = 0;
       while( strpos( %sourcePath, "/", %k ) != -1 )
@@ -2182,19 +2175,19 @@ function MaterialEditorGui::changeMaterial(%this, %fromMaterial, %toMaterial)
       }
       %fileName = getSubStr( %sourcePath , 0 , %k );
       %fileName = %fileName @ "materials.cs";
-      
+
       %action.toMaterialNewFname = %fileName;
-      
+
       MaterialEditorGui.prepareActiveMaterial( %toMaterial, true );
       if( !MaterialEditorGui.isMatEditorMaterial( %toMaterial ) )
       {
          matEd_PersistMan.removeObjectFromFile(%toMaterial);
       }
-      
+
       matEd_PersistMan.setDirty(%fromMaterial);
       matEd_PersistMan.setDirty(%toMaterial, %fileName);
       matEd_PersistMan.saveDirty();
-      
+
       matEd_PersistMan.removeDirty(%fromMaterial);
       matEd_PersistMan.removeDirty(%toMaterial);
    }
@@ -2205,10 +2198,10 @@ function MaterialEditorGui::changeMaterial(%this, %fromMaterial, %toMaterial)
       eval("MaterialEditorGui.currentObject." @ SubMaterialSelector.getText() @ " = " @ %toMaterial.getName() @ ";");
       if( MaterialEditorGui.currentObject.isMethod("postApply") )
          MaterialEditorGui.currentObject.postApply();
-      
+
       MaterialEditorGui.prepareActiveMaterial( %toMaterial, true );
    }
-   
+
    MaterialEditorGui.submitUndo( %action );
 }
 
@@ -2223,24 +2216,24 @@ function MaterialEditorMapThumbnail::onRightClick( %this )
       {
          superClass = "MenuBuilder";
          isPopup = true;
-         
+
          item[ 0 ] = "Open File" TAB "" TAB "openFile( %this.filePath );";
          item[ 1 ] = "Open Folder" TAB "" TAB "openFolder( filePath( %this.filePath ) );";
-         
+
          filePath = "";
       };
-      
+
    // Find the text control containing the filename.
-   
+
    %textCtrl = %this.parentGroup.findObjectByInternalName( %this.fileNameTextCtrl, true );
    if( !%textCtrl )
       return;
-      
+
    %fileName = %textCtrl.getText();
    %fullPath = makeFullPath( %fileName, getMainDotCsDir() );
-      
+
    // Construct a full path.
-   
+
    %isValid = isFile( %fullPath );
    if( !%isValid )
    {
@@ -2252,7 +2245,7 @@ function MaterialEditorMapThumbnail::onRightClick( %this )
       else
       {
          // Try material-relative path.
-         
+
          %material = MaterialEditorGui.currentMaterial;
          if( isObject( %material ) )
          {
@@ -2262,11 +2255,11 @@ function MaterialEditorMapThumbnail::onRightClick( %this )
          }
       }
    }
-   
+
    %popup = MaterialEditorMapThumbnailPopup;
    %popup.enableItem( 0, %isValid );
    %popup.enableItem( 1, %isValid );
    %popup.filePath = %fullPath;
-   
+
    %popup.showPopup( Canvas );
 }

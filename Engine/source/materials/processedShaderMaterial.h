@@ -46,6 +46,7 @@ public:
    GFXShaderConstHandle* mTexMatSC;
    GFXShaderConstHandle* mSpecularColorSC;
    GFXShaderConstHandle* mSpecularPowerSC;
+	GFXShaderConstHandle* mSpecularStrengthSC;
    GFXShaderConstHandle* mParallaxInfoSC;
    GFXShaderConstHandle* mFogDataSC;
    GFXShaderConstHandle* mFogColorSC;   
@@ -92,8 +93,6 @@ class ShaderRenderPassData : public RenderPassData
    typedef RenderPassData Parent;
 
 public:
-
-   virtual ~ShaderRenderPassData() { reset(); }
 
    GFXShaderRef         shader;
    ShaderConstHandles   shaderHandles;
