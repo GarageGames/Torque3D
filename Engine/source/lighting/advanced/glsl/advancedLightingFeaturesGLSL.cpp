@@ -35,17 +35,6 @@
 void DeferredRTLightingFeatGLSL::processPixMacros( Vector<GFXShaderMacro> &macros,
                                                    const MaterialFeatureData &fd  )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if ( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::processPixMacros( macros, fd );
-      return;
-   }
-   */
-
    // Pull in the uncondition method for the light info buffer
    NamedTexTarget *texTarget = NamedTexTarget::find( AdvancedLightBinManager::smBufferName );
    if ( texTarget && texTarget->getConditioner() )
@@ -59,16 +48,6 @@ void DeferredRTLightingFeatGLSL::processPixMacros( Vector<GFXShaderMacro> &macro
 void DeferredRTLightingFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                                 const MaterialFeatureData &fd )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if ( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::processVert( componentList, fd );
-      return;
-   }
-   */
 
    // Pass screen space position to pixel shader to compute a full screen buffer uv
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -76,25 +55,12 @@ void DeferredRTLightingFeatGLSL::processVert(   Vector<ShaderComponent*> &compon
    ssPos->setName( "screenspacePos" );
    ssPos->setType( "vec4" );
 
-//   Var *outPosition = (Var*) LangElement::find( "hpos" );
-//   AssertFatal( outPosition, "No hpos, ohnoes." );
-
    output = new GenOp( "   @ = gl_Position;\r\n", ssPos );
 }
 
 void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                              const MaterialFeatureData &fd )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if ( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::processPix( componentList, fd );
-      return;
-   }
-   */
 
    MultiLine *meta = new MultiLine;
 
@@ -157,13 +123,6 @@ void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &component
 
 ShaderFeature::Resources DeferredRTLightingFeatGLSL::getResources( const MaterialFeatureData &fd )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if( fd.features[MFT_IsTranslucent] )
-      return Parent::getResources( fd );
-   */
 
    Resources res;
    res.numTex = 1;
@@ -176,16 +135,6 @@ void DeferredRTLightingFeatGLSL::setTexData( Material::StageData &stageDat,
                                              RenderPassData &passData,
                                              U32 &texIndex )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::setTexData( stageDat, fd, passData, texIndex );
-      return;
-   }
-   */
 
    NamedTexTarget *texTarget = NamedTexTarget::find( AdvancedLightBinManager::smBufferName );
    if( texTarget )
@@ -507,9 +456,9 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    specPow->setType( "float" );
    specPow->setName( "specularPower" );
 
-   Var *specStrength = new Var;							// RDM test
-   specStrength->setType( "float" );					// RDM test
-   specStrength->setName( "specularStrength" );			// RDM test
+   Var *specStrength = new Var;							
+   specStrength->setType( "float" );					
+   specStrength->setName( "specularStrength" );			
 
    // If the gloss map flag is set, than the specular power is in the alpha
    // channel of the specular map
@@ -520,8 +469,8 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
       specPow->uniform = true;
       specPow->constSortPos = cspPotentialPrimitive;
 
-      specStrength->uniform = true;							// RDM test
-      specStrength->constSortPos = cspPotentialPrimitive;	// RDM test
+      specStrength->uniform = true;							
+      specStrength->constSortPos = cspPotentialPrimitive;	
    }
 
    Var *constSpecPow = new Var;
@@ -533,9 +482,8 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
    AssertFatal( lightInfoSamp, "Something hosed the deferred features! Can't find lightInfoSample" );
 
-   // (a^m)^n = a^(m*n)
-   //meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * d_NL_Att;\r\n", specDecl, specPow, constSpecPow ) );
-   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * @;\r\n", specDecl, specPow, constSpecPow, specStrength ) );	// RDM test
+
+   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * @;\r\n", specDecl, specPow, constSpecPow, specStrength ) );
 
    LangElement *specMul = new GenOp( "@ * @", specCol, specular );
    LangElement *final = specMul;
