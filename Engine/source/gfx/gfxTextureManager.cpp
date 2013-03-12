@@ -41,9 +41,9 @@
 
 S32 GFXTextureManager::smTextureReductionLevel = 0;
 
-String GFXTextureManager::smMissingTexturePath("core/art/missingTexture");
-String GFXTextureManager::smUnavailableTexturePath("core/art/unavailable");
-String GFXTextureManager::smWarningTexturePath("core/art/warnmat");
+StringTableEntry GFXTextureManager::smMissingTexturePath = 0;
+StringTableEntry GFXTextureManager::smUnavailableTexturePath = 0;
+StringTableEntry GFXTextureManager::smWarningTexturePath = 0;
 
 GFXTextureManager::EventSignal GFXTextureManager::smEventSignal;
 
@@ -51,6 +51,10 @@ static const String  sDDSExt( "dds" );
 
 void GFXTextureManager::init()
 {
+   smMissingTexturePath = StringTable->insert("core/art/missingTexture");
+   smUnavailableTexturePath = StringTable->insert("core/art/unavailable");
+   smWarningTexturePath = StringTable->insert("core/art/warnmat");
+
    Con::addVariable( "$pref::Video::textureReductionLevel", TypeS32, &smTextureReductionLevel,
       "The number of mipmap levels to drop on loaded textures to reduce "
       "video memory usage.  It will skip any textures that have been defined "

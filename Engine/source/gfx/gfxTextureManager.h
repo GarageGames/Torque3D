@@ -66,13 +66,13 @@ public:
    static void init();
 
    /// Provide the path to the texture to use when the requested one is missing
-   static const String& getMissingTexturePath() { return smMissingTexturePath; }
+   static const StringTableEntry& getMissingTexturePath() { return smMissingTexturePath; }
 
    /// Provide the path to the texture to use when the requested one is unavailable.
-   static const String& getUnavailableTexturePath() { return smUnavailableTexturePath; }
+   static const StringTableEntry& getUnavailableTexturePath() { return smUnavailableTexturePath; }
 
    /// Provide the path to the texture used to warn the developer
-   static const String& getWarningTexturePath() { return smWarningTexturePath; }
+   static const StringTableEntry& getWarningTexturePath() { return smWarningTexturePath; }
 
    /// Update width and height based on available resources.
    ///
@@ -187,14 +187,14 @@ protected:
    static S32 smTextureReductionLevel;
 
    /// File path to the missing texture
-   static String smMissingTexturePath;
+   static StringTableEntry smMissingTexturePath;
 
    /// File path to the unavailable texture.  Often used by GUI controls
    /// when the requested image is not available.
-   static String smUnavailableTexturePath;
+   static StringTableEntry smUnavailableTexturePath;
 
    /// File path to the warning texture
-   static String smWarningTexturePath;
+   static StringTableEntry smWarningTexturePath;
 
    GFXTextureObject *mListHead;
    GFXTextureObject *mListTail;
