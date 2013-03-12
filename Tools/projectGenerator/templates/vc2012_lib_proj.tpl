@@ -161,6 +161,9 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+	<Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+	</Link>
     <Lib>
       <OutputFile>$(OutDir)/{$projOutName}.lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>

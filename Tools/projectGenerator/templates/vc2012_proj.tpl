@@ -112,6 +112,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <ProfileGuidedDatabase>$(IntDir)$(ProjectName).pgd</ProfileGuidedDatabase>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">
