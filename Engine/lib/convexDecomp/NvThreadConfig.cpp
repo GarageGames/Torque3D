@@ -68,10 +68,10 @@ NvThreadConfig.cpp : A simple wrapper class to define threading and mutex locks.
 #endif
 
 #if defined(_XBOX)
-	#include <xtl.h>
+	#include "NxXBOX.h"
 #endif
 
-#if defined(__linux__) || defined( __APPLE__ )
+#if defined(__linux__)
 	//#include <sys/time.h>
 	#include <time.h>
 	#include <unistd.h>
@@ -79,16 +79,8 @@ NvThreadConfig.cpp : A simple wrapper class to define threading and mutex locks.
 	#define __stdcall
 #endif
 
-#if defined( __APPLE__ )
-   #include <sys/time.h>
-#endif
-
 #if defined(__APPLE__) || defined(__linux__)
 	#include <pthread.h>
-#endif
-
-#if defined( __APPLE__ )
-   #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
 #endif
 
 
@@ -107,12 +99,6 @@ NxU32 tc_timeGetTime(void)
       struct timespec ts;
       clock_gettime(CLOCK_REALTIME, &ts);
       return ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
-   #elif defined( __APPLE__ )
-      struct timeval tp;
-      gettimeofday(&tp, (struct timezone *)0);
-      return tp.tv_sec * 1000 + tp.tv_usec / 1000;
-   #elif defined( _XBOX )
-      return GetTickCount();
    #else
       return timeGetTime();
    #endif
@@ -120,7 +106,7 @@ NxU32 tc_timeGetTime(void)
 
 void   tc_sleep(NxU32 ms)
 {
-   #if defined(__linux__) || defined( __APPLE__ )
+   #if defined(__linux__)
       usleep(ms * 1000);
    #else
       Sleep(ms);
@@ -131,8 +117,6 @@ void tc_spinloop()
 {
    #ifdef __linux__
       asm ( "pause" );
-   #elif defined( _XBOX )
-      // Pause would do nothing on the Xbox. Threads are not scheduled.
    #else
       __asm { pause };
    #endif
@@ -140,12 +124,10 @@ void tc_spinloop()
 
 void tc_interlockedExchange(void *dest, const int64_t exchange)
 {
-   #if defined( __linux__ ) || defined( __APPLE__ )
+   #ifdef __linux__
 	  // not working
 	  assert(false);
 	  //__sync_lock_test_and_set((int64_t*)dest, exchange);
-   #elif defined( _XBOX )
-   InterlockedExchange((volatile LONG *)dest, exchange);
    #else
       __asm
       {
@@ -166,14 +148,12 @@ void tc_interlockedExchange(void *dest, const int64_t exchange)
 
 NxI32 tc_interlockedCompareExchange(void *dest, NxI32 exchange, NxI32 compare)
 {
-   #if defined( __linux__ ) || defined( __APPLE__ )
+   #ifdef __linux__
 	  // not working
 	  assert(false);
 	  return 0;
 	  //return __sync_val_compare_and_swap((uintptr_t*)dest, exchange, compare);
 	  //return __sync_bool_compare_and_swap((uintptr_t*)dest, exchange, compare);
-   #elif defined( _XBOX )
-     return InterlockedCompareExchange((volatile LONG *)dest, exchange, compare);
    #else
       char _ret;
       //
@@ -195,16 +175,13 @@ NxI32 tc_interlockedCompareExchange(void *dest, NxI32 exchange, NxI32 compare)
 
 NxI32 tc_interlockedCompareExchange(void *dest, const NxI32 exchange1, const NxI32 exchange2, const NxI32 compare1, const NxI32 compare2)
 {
-   #if defined( __linux__ ) || defined( __APPLE__ )
+   #ifdef __linux__
 	  // not working
       assert(false);
 	  return 0;
 	  //uint64_t exchange = ((uint64_t)exchange1 << 32) | (uint64_t)exchange2;
 	  //uint64_t compare = ((uint64_t)compare1 << 32) | (uint64_t)compare2;
 	  //return __sync_bool_compare_and_swap((int64_t*)dest, exchange, compare);
-   #elif defined( _XBOX )
-     assert(false);
-     return 0;
    #else
       char _ret;
       //
@@ -438,18 +415,11 @@ public:
 	  }
 	  else
 	  {
-	     struct timespec ts;
-        #ifdef __APPLE__
-        struct timeval tp;
-        gettimeofday(&tp, (struct timezone *)0);
-        ts.tv_nsec = tp.tv_usec * 1000;
-        ts.tv_sec = tp.tv_sec;
-        #else
-	     clock_gettime(CLOCK_REALTIME, &ts);
-        #endif
-	     ts.tv_nsec += ms * 1000000;
-	     ts.tv_sec += ts.tv_nsec / 1000000000;
-	     ts.tv_nsec %= 1000000000;
+	      struct timespec ts;
+	      clock_gettime(CLOCK_REALTIME, &ts);
+	      ts.tv_nsec += ms * 1000000;
+	      ts.tv_sec += ts.tv_nsec / 1000000000;
+	      ts.tv_nsec %= 1000000000;
 		  NxI32 result = pthread_cond_timedwait(&mEvent, &mEventMutex, &ts);
 		  assert(result == 0 || result == ETIMEDOUT);
 	  }
