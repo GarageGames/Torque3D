@@ -73,6 +73,11 @@
 /// the root of the path.  Requires the virtual mount system to be active.
 //#define TORQUE_DISABLE_FIND_ROOT_WITHIN_ZIP
 
+//Uncomment this define if you want to use the alternative zip support where you can 
+//define your directories and files inside the zip just like you would on disk
+//instead of the default zip support that treats the zip as an extra directory.
+//#define TORQUE_ZIP_DISK_LAYOUT
+
 /// Define me if you don't want Torque to compile dso's
 #define TORQUE_NO_DSO_GENERATION
 

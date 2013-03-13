@@ -1538,7 +1538,7 @@ GuiControl* GuiInspectorTypeBitMask32Helper::constructEditControl()
    mButton->setField( "Command", szBuffer );
    mButton->setField( "buttonType", "ToggleButton" );
    mButton->setDataField( StringTable->insert("Profile"), NULL, "GuiInspectorButtonProfile" );
-   mButton->setBitmap( "core/art/gui/images/arrowBtn" );
+   mButton->setBitmap( "tools/gui/images/arrowBtn" );
    mButton->setStateOn( true );
    mButton->setExtent( 16, 16 );
    mButton->registerObject();
