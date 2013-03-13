@@ -610,3 +610,35 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
 	GameBase* obj = object->getAimObject();
    return obj? obj->getId(): -1;
 }
+
+DefineEngineMethod( AIPlayer, getBallisticAimOffset, S32, ( Point3F pos, float roundVelocity, bool mortarAim, float gravMod ),,
+   "@brief Calculates the aim offset for ballistic projectiles.\n\n"
+
+   "@return Returns -1 if the target cannot be hit with the given parameters, "
+   "or the offset for a normalized aim vector to hit the target.\n\n")
+{
+    Point3F posFlat = pos;
+    Point3F thisPos = object->getPosition();
+    posFlat.z = thisPos.z;
+
+	VectorF v = posFlat - thisPos;
+
+    float x = v.len();
+    float y = pos.z - thisPos.z;  
+
+    float g = 9.82f * gravMod;  
+    float r1 = mSqrt(mPow(roundVelocity, 4.0f) - g * (g * (mPow(x, 2.0f)) + ((y / 4) * (mPow(roundVelocity, 2.0f)))));  
+
+    if (r1 < 0.0f) // If not a real number, it's not possible to hit pos, return -1  
+        return -1;  
+
+    float a1 = ((roundVelocity * roundVelocity) - r1) / (g * x);  
+    a1 = mAsin(a1 / mSqrt((a1 * a1) + 1.0f));  
+    float angleOfReach = mRadToDeg(a1);  
+    if (mortarAim)  
+        angleOfReach = 90 - angleOfReach;  
+
+    float offsetHeight = mTan(mDegToRad(angleOfReach)) * x;  
+
+    return offsetHeight;
+}
