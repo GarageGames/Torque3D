@@ -518,7 +518,18 @@ $RemapCount++;
 $RemapName[$RemapCount] = "Bring up Options Dialog";
 $RemapCmd[$RemapCount] = "bringUpOptions";
 $RemapCount++;
-
+$RemapName[$RemapCount] = "Fire Main Weapon";
+$RemapCmd[$RemapCount] = "gamepadFire";
+$RemapCount++;
+$RemapName[$RemapCount] = "Fire Alt Weapon";
+$RemapCmd[$RemapCount] = "gamepadAltTrigger";
+$RemapCount++;
+$RemapName[$RemapCount] = "Cycle to Next Weapon";
+$RemapCmd[$RemapCount] = "nextWeapon";
+$RemapCount++;
+$RemapName[$RemapCount] = "Cycle to Previous Weapon";
+$RemapCmd[$RemapCount] = "prevWeapon";
+$RemapCount++;
 
 function restoreDefaultMappings()
 {
@@ -580,6 +591,51 @@ function getMapDisplayName( %device, %action )
          }
          else
             error( "Unsupported Joystick input object passed to getDisplayMapName!" );
+      }
+	}
+	else if ( strstr( %device, "gamepad" ) != -1 )
+	{
+	   // Substitute "gamepad" for "btn" in the action string:	   
+		%pos = strstr( %action, "btn" );
+		%tpos = strstr( %action, "trigger" );
+		if ( %pos != -1 )
+		{
+			%mods = getSubStr( %action, 0, %pos );
+			%object = getSubStr( %action, %pos, 1000 );
+			%instance = getSubStr( %object, strlen( "btn_" ), 1000 );
+			return( %mods @ strupr( %instance ) @ " Button" );
+		}
+		else if (%tpos != -1)
+		{
+		   %mods = getSubStr( %action, 0, %tpos );
+			%object = getSubStr( %action, %tpos, 1000 );
+			%instance = getSubStr( %object, strlen( "trigger" ), 1000 );
+			return( %mods @ strupr( %instance ) @ " Trigger " );
+		}
+		else
+	   { 
+	      %pos = strstr( %action, "pov" );
+         if ( %pos != -1 )
+         {
+            %wordCount = getWordCount( %action );
+            %mods = %wordCount > 1 ? getWords( %action, 0, %wordCount - 2 ) @ " " : "";
+            %object = getWord( %action, %wordCount - 1 );
+            switch$ ( %object )
+            {
+               case "upov":   %object = "DPad up";
+               case "dpov":   %object = "DPad down";
+               case "lpov":   %object = "DPad left";
+               case "rpov":   %object = "DPad right";
+               case "upov2":  %object = "POV2 up";
+               case "dpov2":  %object = "POV2 down";
+               case "lpov2":  %object = "POV2 left";
+               case "rpov2":  %object = "POV2 right";               
+               default:       %object = "??";
+            }
+            return( %mods @ %object );
+         }
+         else
+            error( "Unsupported gamepad input object passed to getDisplayMapName!" );
       }
 	}
 		

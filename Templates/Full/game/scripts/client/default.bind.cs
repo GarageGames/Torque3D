@@ -541,7 +541,9 @@ function mouseWheelWeaponCycle(%val)
 }
 
 moveMap.bind(keyboard, q, nextWeapon);
+moveMap.bind(gamepad, btn_r, nextWeapon);
 moveMap.bind(keyboard, "ctrl q", prevWeapon);
+moveMap.bind(gamepad, btn_l, prevWeapon);
 moveMap.bind(mouse, "zaxis", mouseWheelWeaponCycle);
 
 //------------------------------------------------------------------------------
