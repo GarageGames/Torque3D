@@ -220,8 +220,6 @@ function disconnectedCleanup()
    // Back to the launch screen
    if (isObject( MainMenuGui ))
       Canvas.setContent( MainMenuGui );
-   else if (isObject( UnifiedMainMenuGui ))
-      Canvas.setContent( UnifiedMainMenuGui );
 
    // Before we destroy the client physics world
    // make sure all ServerConnection objects are deleted.
