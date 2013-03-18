@@ -664,7 +664,7 @@ function EWCreatorWindow::addFolderIcon( %this, %text )
    %ctrl = %this.createIcon();
       
    %ctrl.altCommand = "EWCreatorWindow.navigateDown(\"" @ %text @ "\");";
-   %ctrl.iconBitmap = "core/art/gui/images/folder.png";   
+   %ctrl.iconBitmap = "tools/gui/images/folder.png";   
    %ctrl.text = %text;
    %ctrl.tooltip = %text;     
    %ctrl.class = "CreatorFolderIconBtn";

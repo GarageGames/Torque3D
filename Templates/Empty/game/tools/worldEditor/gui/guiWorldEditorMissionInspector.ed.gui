@@ -2,7 +2,7 @@
 %guiContent = new GuiControl(WorldEditorMissionInspector,EditorGuiGroup) {
    canSaveDynamicFields = "0";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -16,7 +16,7 @@
       canSaveDynamicFields = "0";
       internalName = "InspectorWindow";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "left";
       VertSizing = "bottom";
       position = "333 26";
@@ -39,7 +39,7 @@
       new GuiFrameSetCtrl(EWInspectorFrame) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiFrameSetProfile";
+         Profile = "ToolsGuiFrameSetProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "8 32";
@@ -73,7 +73,7 @@
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "0 0";
@@ -93,7 +93,7 @@
                new GuiTreeViewCtrl(EditorTree) {
                   canSaveDynamicFields = "0";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "2 2";
@@ -130,7 +130,7 @@
             new GuiScrollCtrl(EWCreatorPane) {
                canSaveDynamicFields = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "0 0";
@@ -150,7 +150,7 @@
                new GuiTreeViewCtrl(Creator) {
                   canSaveDynamicFields = "0";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "2 2";
@@ -186,7 +186,7 @@
                new GuiControl() {
                   canSaveDynamicFields = "0";
                   isContainer = "1";
-                  Profile = "GuiSolidDefaultProfile";
+                  Profile = "ToolsGuiSolidDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -199,7 +199,7 @@
                   new GuiButtonCtrl() {
                      canSaveDynamicFields = "0";
                      isContainer = "0";
-                     Profile = "GuiButtonProfile";
+                     Profile = "ToolsGuiButtonProfile";
                      HorizSizing = "right";
                      VertSizing = "bottom";
                      position = "2 2";
@@ -208,7 +208,7 @@
                      canSave = "1";
                      Visible = "1";
                      Command = "EWorldEditor.isDirty = true;EWorldEditor.makeFirstResponder(true);";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      ToolTip = "Don\'t forget to hit Apply after making changes!";
                      hovertime = "1000";
                      text = "Apply";
@@ -256,7 +256,7 @@
                new GuiScrollCtrl() {
                   canSaveDynamicFields = "0";
                   isContainer = "1";
-                  Profile = "GuiScrollProfile";
+                  Profile = "ToolsGuiScrollProfile";
                   HorizSizing = "width";
                   VertSizing = "height";
                   position = "0 24";

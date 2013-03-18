@@ -19,7 +19,7 @@
    anchorLeft = "1";
    anchorRight = "0";
    isContainer = "1";
-   profile = "GuiWindowProfile";
+   profile = "ToolsGuiWindowProfile";
    horizSizing = "right";
    vertSizing = "bottom";
    position = "152 130";
@@ -27,7 +27,7 @@
    minExtent = "8 2";
    canSave = "1";
    visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
    class = "GuiObjectInspector";
@@ -47,7 +47,7 @@
       anchorLeft = "1";
       anchorRight = "0";
       isContainer = "0";
-      profile = "GuiDefaultProfile";
+      profile = "ToolsGuiDefaultProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "1 21";
@@ -55,7 +55,7 @@
       minExtent = "64 64";
       canSave = "1";
       visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "Splitter";
       canSaveDynamicFields = "0";
@@ -69,7 +69,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          horizSizing = "width";
          vertSizing = "bottom";
          position = "0 0";
@@ -77,7 +77,7 @@
          minExtent = "16 16";
          canSave = "1";
          visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "Panel1";
          canSaveDynamicFields = "0";
@@ -85,7 +85,7 @@
          new GuiTextEditCtrl() {
             position = "2 3";
             extent = "278 18";
-            profile = "GuiTextEditProfile";
+            profile = "ToolsGuiTextEditProfile";
             horizSizing = "width";
             vertSizing = "bottom";
             superClass = "GuiTreeViewFilterText";
@@ -99,7 +99,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             position = "281 4";
@@ -107,7 +107,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
             superClass = "GuiTreeViewFilterClearButton";
@@ -130,7 +130,7 @@
             anchorLeft = "1";
             anchorRight = "0";
             isContainer = "1";
-            profile = "GuiScrollProfile";
+            profile = "ToolsGuiScrollProfile";
             horizSizing = "width";
             vertSizing = "height";
             position = "1 22";
@@ -138,7 +138,7 @@
             minExtent = "8 2";
             canSave = "1";
             visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
                      
@@ -162,7 +162,7 @@
                canRenameObjects = "1";
                renameInternal = "0";
                isContainer = "1";
-               profile = "GuiTreeViewProfile";
+               profile = "ToolsGuiTreeViewProfile";
                horizSizing = "width";
                vertSizing = "bottom";
                position = "1 1";
@@ -170,7 +170,7 @@
                minExtent = "8 2";
                canSave = "1";
                visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "TreeView";
                canSaveDynamicFields = "0";
@@ -187,7 +187,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "302 0";
@@ -195,7 +195,7 @@
          minExtent = "16 16";
          canSave = "1";
          visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "panel2";
          canSaveDynamicFields = "0";
@@ -214,7 +214,7 @@
             anchorLeft = "1";
             anchorRight = "0";
             isContainer = "0";
-            profile = "GuiDefaultProfile";
+            profile = "ToolsGuiDefaultProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "0 2";
@@ -222,7 +222,7 @@
             minExtent = "64 64";
             canSave = "1";
             visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -235,7 +235,7 @@
                anchorLeft = "1";
                anchorRight = "0";
                isContainer = "1";
-               profile = "GuiDefaultProfile";
+               profile = "ToolsGuiDefaultProfile";
                horizSizing = "right";
                vertSizing = "bottom";
                position = "0 0";
@@ -243,7 +243,7 @@
                minExtent = "16 16";
                canSave = "1";
                visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "Panel1";
                canSaveDynamicFields = "0";
@@ -265,7 +265,7 @@
                   anchorLeft = "1";
                   anchorRight = "0";
                   isContainer = "1";
-                  profile = "GuiScrollProfile";
+                  profile = "ToolsGuiScrollProfile";
                   horizSizing = "right";
                   vertSizing = "bottom";
                   position = "0 0";
@@ -273,7 +273,7 @@
                   minExtent = "8 2";
                   canSave = "1";
                   visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
 
@@ -296,7 +296,7 @@
                      minExtent = "16 16";
                      canSave = "1";
                      visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      internalName = "inspector";
                      canSaveDynamicFields = "0";
@@ -315,7 +315,7 @@
                anchorLeft = "1";
                anchorRight = "0";
                isContainer = "1";
-               profile = "GuiDefaultProfile";
+               profile = "ToolsGuiDefaultProfile";
                horizSizing = "right";
                vertSizing = "bottom";
                position = "0 302";
@@ -323,7 +323,7 @@
                minExtent = "16 50";
                canSave = "1";
                visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "panel2";
                canSaveDynamicFields = "0";
@@ -345,7 +345,7 @@
                   anchorLeft = "1";
                   anchorRight = "0";
                   isContainer = "1";
-                  profile = "GuiScrollProfile";
+                  profile = "ToolsGuiScrollProfile";
                   horizSizing = "right";
                   vertSizing = "bottom";
                   position = "0 0";
@@ -353,7 +353,7 @@
                   minExtent = "8 2";
                   canSave = "1";
                   visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
 
@@ -377,7 +377,7 @@
                      canRenameObjects = "1";
                      renameInternal = "0";
                      isContainer = "1";
-                     profile = "GuiTreeViewProfile";
+                     profile = "ToolsGuiTreeViewProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "1 1";
@@ -385,7 +385,7 @@
                      minExtent = "8 2";
                      canSave = "1";
                      visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      internalName = "methodList";
                      canSaveDynamicFields = "0";

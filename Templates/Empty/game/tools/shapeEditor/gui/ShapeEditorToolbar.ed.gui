@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    internalName = "";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "bottom";
    Position = "102 0";
@@ -36,7 +36,7 @@
       hovertime = "1000";
 
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "5 7";
@@ -48,17 +48,17 @@
          helpTag = "0";
       };
       new GuiBitmapCtrl() {
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "94 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "showGridBtn";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "100 3";
@@ -67,7 +67,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.renderGrid = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Show grid";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/show-grid";
@@ -80,7 +80,7 @@
          canSaveDynamicFields = "0";
          internalName = "fitToShapeBtn";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "134 3";
@@ -89,7 +89,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.fitToShape();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Fit Camera to Shape (F)";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/fit-selection";
@@ -102,7 +102,7 @@
          canSaveDynamicFields = "0";
          internalName = "orbitNodeBtn";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "168 3";
@@ -111,7 +111,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.orbitNode = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Orbit the selected node";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/orbit-cam";
@@ -121,17 +121,17 @@
          useMouseEvents = "0";
       }; 
       new GuiBitmapCtrl() {
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "202 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "showNodes";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "210 3";
@@ -140,7 +140,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.renderNodes = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Show Nodes (N)";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/shownodes_btn";
@@ -152,7 +152,7 @@
          internalName = "ghostMode";
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "243 3";
@@ -161,7 +161,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.renderGhost = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle shape transparency in the preview window (T)";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/ghost_btn";
@@ -173,7 +173,7 @@
          internalName = "wireframeMode";
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "276 3";
@@ -182,7 +182,7 @@
          canSave = "1";
          Visible = "1";
          Command = "shapeEditorWireframeMode();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle shape wireframe in the preview window (R)";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/show-wireframe";
@@ -191,18 +191,18 @@
          useMouseEvents = "0";
       };
       new GuiBitmapCtrl() {
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "309 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "showBounds";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "315 3";
@@ -211,7 +211,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.renderbounds = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle shape bounding box in the preview window";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/object-bounds";
@@ -224,7 +224,7 @@
          internalName = "showObjBox";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "348 3";
@@ -233,7 +233,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdShapeView.renderObjBox = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle selected object bounding box in the preview window";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/object-fit-bounds";
@@ -246,7 +246,7 @@
          internalName = "renderColMeshes";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "381 3";
@@ -255,7 +255,7 @@
          canSave = "1";
          Visible = "1";
          Command = "shapeEdShapeView.renderColMeshes = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle rendering of collision meshes in the preview window";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/collision-shape";
@@ -264,17 +264,17 @@
          useMouseEvents = "0";
       };
       new GuiBitmapCtrl() {
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "415 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       new GuiBitmapButtonCtrl() {
          internalName = "showAdvanced";
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "423 3";
@@ -283,7 +283,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ShapeEdAdvancedWindow.setVisible( $ThisControl.getValue() );";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle Advanced Properties Window";
          hovertime = "1000";
          bitmap = "tools/shapeEditor/images/detail-levels_btn";

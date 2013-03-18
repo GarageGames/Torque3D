@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(TerrainExportGui, EditorGuiGroup) {
    canSaveDynamicFields = "0";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    Enabled = "1";
    isContainer = "1";
    HorizSizing = "right";
@@ -14,7 +14,7 @@
    hovertime = "1000";
 
    new GuiWindowCtrl(TerrainExportWindow) {
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       canSaveDynamicFields = "0";
       internalName = "TerrainExport";
       Enabled = "1";

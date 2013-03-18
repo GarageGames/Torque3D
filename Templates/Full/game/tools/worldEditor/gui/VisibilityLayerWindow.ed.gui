@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiModelessDialogProfile";
+   Profile = "ToolsGuiModelessDialogProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -12,7 +12,7 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCtrl(EVisibility) {
@@ -20,7 +20,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiToolbarWindowProfile";
+      Profile = "ToolsGuiToolbarWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord(visibilityToggleBtn.position, 0) SPC getWord(EditorGuiToolbar.extent, 1);
@@ -50,7 +50,7 @@
       
       new GuiTabBookCtrl(EVisibilityTabBook) {
          canSaveDynamicFields = "0";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Docking = "Client";
@@ -68,7 +68,7 @@
 
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Docking = "Client";
@@ -86,7 +86,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -96,7 +96,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -121,7 +121,7 @@
                   internalName = "theVisOptionsList";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "1 0";
@@ -130,14 +130,14 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                };
             };
          };
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Docking = "Client";
@@ -155,7 +155,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -165,7 +165,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -190,7 +190,7 @@
                   internalName = "theClassVisList";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "1 0";
@@ -199,14 +199,14 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                };
             };
          };
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Docking = "Client";
@@ -224,7 +224,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -234,7 +234,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -259,7 +259,7 @@
                   internalName = "theClassSelList";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "1 0";
@@ -268,7 +268,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                };
             };

@@ -2,7 +2,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -17,7 +17,7 @@
       internalName = "brushAdjustHeight";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "72 0";
@@ -26,7 +26,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( brushAdjustHeight );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Grab Terrain (1)";
       hovertime = "750";
       text = "Button";
@@ -39,7 +39,7 @@
       internalName = "raiseHeight";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "0 0";
@@ -48,7 +48,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( raiseHeight );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Raise Height (2)";
       hovertime = "750";
       text = "Button";
@@ -61,7 +61,7 @@
       internalName = "lowerHeight";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "36 0";
@@ -70,7 +70,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( lowerHeight );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Lower Height (3)";
       hovertime = "750";
       text = "Button";
@@ -83,7 +83,7 @@
       internalName = "smoothHeight";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "144 0";
@@ -92,7 +92,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( smoothHeight );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Smooth (4)";
       hovertime = "750";
       text = "Button";
@@ -105,7 +105,7 @@
       internalName = "paintNoise";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "72 36";
@@ -114,7 +114,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( paintNoise );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Paint Noise (5)";
       hovertime = "750";
       text = "Button";
@@ -127,7 +127,7 @@
       internalName = "flattenHeight";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "108 0";
@@ -136,7 +136,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( flattenHeight );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Flatten (6)";
       hovertime = "750";
       text = "Button";
@@ -149,7 +149,7 @@
       internalName = "setHeight";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "180 0";
@@ -158,7 +158,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( setHeight );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Set Height (7)";
       hovertime = "750";
       text = "Button";
@@ -171,7 +171,7 @@
       internalName = "setEmpty";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "0 36";
@@ -180,7 +180,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( setEmpty );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Clear Terrain (8)";
       hovertime = "750";
       text = "Button";
@@ -193,7 +193,7 @@
       internalName = "clearEmpty";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "36 36";
@@ -202,7 +202,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ETerrainEditor.switchAction( clearEmpty );";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Restore Terrain (9)";
       hovertime = "750";
       text = "Button";

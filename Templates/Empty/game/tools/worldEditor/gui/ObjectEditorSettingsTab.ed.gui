@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(ObjectEditorSettingsTab,EditorGuiGroup) {
    isContainer = "1";
-   profile = "GuiDefaultProfile";
+   profile = "ToolsGuiDefaultProfile";
    horizSizing = "right";
    vertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    minExtent = "8 2";
    visible = "1";
    active = "1";
-   tooltipProfile = "GuiToolTipProfile";
+   tooltipProfile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSave = "1";
    canSaveDynamicFields = "1";
@@ -25,7 +25,7 @@
       anchorLeft = "1";
       anchorRight = "0";
       isContainer = "1";
-      profile = "GuiSolidDefaultProfile";
+      profile = "ToolsGuiSolidDefaultProfile";
       horizSizing = "width";
       vertSizing = "height";
       position = "0 0";
@@ -33,7 +33,7 @@
       minExtent = "8 2";
       visible = "1";
       active = "1";
-      tooltipProfile = "GuiToolTipProfile";
+      tooltipProfile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSave = "1";
       canSaveDynamicFields = "1";
@@ -54,7 +54,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          isContainer = "1";
-         profile = "GuiScrollProfile";
+         profile = "ToolsGuiScrollProfile";
          horizSizing = "width";
          vertSizing = "height";
          position = "0 0";
@@ -62,7 +62,7 @@
          minExtent = "8 2";
          visible = "1";
          active = "1";
-         tooltipProfile = "GuiToolTipProfile";
+         tooltipProfile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSave = "1";
          canSaveDynamicFields = "0";
@@ -73,7 +73,7 @@
             VertStacking = "Top to Bottom";
             Padding = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "1 1";
@@ -82,7 +82,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
 
             new GuiRolloutCtrl() {
@@ -101,7 +101,7 @@
                   HorizStacking = "Left to Right";
                   VertStacking = "Top to Bottom";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -110,7 +110,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
                   padding = "3";
 
@@ -121,7 +121,7 @@
                      buttonType = "ToggleButton";
                      useMouseEvents = "0";
                      isContainer = "0";
-                     profile = "GuiCheckBoxProfile";
+                     profile = "ToolsGuiCheckBoxProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 10";
@@ -129,7 +129,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -145,7 +145,7 @@
                      buttonType = "ToggleButton";
                      useMouseEvents = "0";
                      isContainer = "0";
-                     profile = "GuiCheckBoxProfile";
+                     profile = "ToolsGuiCheckBoxProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 30";
@@ -153,7 +153,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -169,7 +169,7 @@
                      buttonType = "ToggleButton";
                      useMouseEvents = "0";
                      isContainer = "0";
-                     profile = "GuiCheckBoxProfile";
+                     profile = "ToolsGuiCheckBoxProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 50";
@@ -177,7 +177,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -193,7 +193,7 @@
                      buttonType = "ToggleButton";
                      useMouseEvents = "0";
                      isContainer = "0";
-                     profile = "GuiCheckBoxProfile";
+                     profile = "ToolsGuiCheckBoxProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 70";
@@ -201,7 +201,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -228,7 +228,7 @@
                   HorizStacking = "Left to Right";
                   VertStacking = "Top to Bottom";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -237,13 +237,13 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
                   padding = "3";
 
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 90";
@@ -251,7 +251,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -270,7 +270,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -278,7 +278,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -297,7 +297,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -305,7 +305,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -318,7 +318,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
@@ -326,7 +326,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -336,7 +336,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 110";
@@ -344,7 +344,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -363,7 +363,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -371,7 +371,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -390,7 +390,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -398,7 +398,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -411,14 +411,14 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
                         extent = "14 14";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -428,7 +428,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 130";
@@ -436,7 +436,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -455,7 +455,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -463,7 +463,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -482,7 +482,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -490,7 +490,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -503,7 +503,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
@@ -511,7 +511,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -521,7 +521,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 10";
@@ -529,7 +529,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -548,7 +548,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -556,7 +556,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -575,7 +575,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -583,7 +583,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -596,7 +596,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
@@ -604,7 +604,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -614,7 +614,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 30";
@@ -622,7 +622,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -641,7 +641,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -649,7 +649,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -668,7 +668,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -676,7 +676,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -689,7 +689,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
@@ -697,7 +697,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -707,7 +707,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 50";
@@ -715,7 +715,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -734,7 +734,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -742,7 +742,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -761,7 +761,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -769,7 +769,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -782,7 +782,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
@@ -790,7 +790,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -800,7 +800,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 70";
@@ -808,7 +808,7 @@
                      minExtent = "8 2";
                      visible = "1";
                      active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "1";
@@ -827,7 +827,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextRightProfile";
+                        profile = "ToolsGuiTextRightProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "0 1";
@@ -835,7 +835,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -854,7 +854,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditProfile";
+                        profile = "ToolsGuiTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "80 0";
@@ -862,7 +862,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorEdit";
                         canSave = "1";
@@ -875,7 +875,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiDefaultProfile";
+                        profile = "ToolsGuiDefaultProfile";
                         horizSizing = "left";
                         vertSizing = "bottom";
                         position = "188 2";
@@ -883,7 +883,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         internalName = "ColorButton";
                         canSave = "1";
@@ -910,7 +910,7 @@
                   VertStacking = "Top to Bottom";
                   Padding = "0";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -919,13 +919,13 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
                   padding = "3";
                   
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "0 0";
@@ -938,7 +938,7 @@
                         buttonType = "ToggleButton";
                         useMouseEvents = "0";
                         isContainer = "0";
-                        profile = "GuiCheckBoxProfile";
+                        profile = "ToolsGuiCheckBoxProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "5 0";
@@ -947,7 +947,7 @@
                         visible = "1";
                         active = "1";
                         variable = "EWorldEditor.forceLoadDAE";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -959,7 +959,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 70";
@@ -975,7 +975,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextProfile";
+                        profile = "ToolsGuiTextProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "5 1";
@@ -983,7 +983,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "0";
@@ -1003,7 +1003,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditNumericProfile";
+                        profile = "ToolsGuiNumericTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "120 0";
@@ -1011,7 +1011,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
@@ -1023,7 +1023,7 @@
                   };
                   new GuiControl() {
                      isContainer = "1";
-                     profile = "GuiDefaultProfile";
+                     profile = "ToolsGuiDefaultProfile";
                      horizSizing = "right";
                      vertSizing = "bottom";
                      position = "5 70";
@@ -1039,7 +1039,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextProfile";
+                        profile = "ToolsGuiTextProfile";
                         horizSizing = "right";
                         vertSizing = "bottom";
                         position = "5 1";
@@ -1047,7 +1047,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "0";
@@ -1066,7 +1066,7 @@
                         anchorLeft = "1";
                         anchorRight = "0";
                         isContainer = "0";
-                        profile = "GuiTextEditNumericProfile";
+                        profile = "ToolsGuiNumericTextEditProfile";
                         horizSizing = "width";
                         vertSizing = "bottom";
                         position = "120 0";
@@ -1074,7 +1074,7 @@
                         minExtent = "8 2";
                         visible = "1";
                         active = "1";
-                        tooltipProfile = "GuiToolTipProfile";
+                        tooltipProfile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSave = "1";
                         canSaveDynamicFields = "1";
