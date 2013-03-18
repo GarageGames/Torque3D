@@ -524,7 +524,7 @@ function ShapeEdSelectWindow::addFolderIcon( %this, %text )
    %ctrl = %this.createIcon();
 
    %ctrl.altCommand = "ShapeEdSelectWindow.navigateDown( \"" @ %text @ "\" );";
-   %ctrl.iconBitmap = "core/art/gui/images/folder.png";
+   %ctrl.iconBitmap = "tools/gui/images/folder.png";
    %ctrl.text = %text;
    %ctrl.tooltip = %text;
    %ctrl.class = "CreatorFolderIconBtn";
@@ -1910,7 +1910,7 @@ function ShapeEdShapeView::onThreadPosChanged( %this, %pos, %inTransition )
       if ( %inTransition )
          ShapeEdThreadSlider.profile = GuiShapeEdTransitionSliderProfile;
       else
-         ShapeEdThreadSlider.profile = GuiSliderProfile;
+         ShapeEdThreadSlider.profile = ToolsGuiSliderProfile;
    }
 }
 
@@ -2142,7 +2142,7 @@ function ShapeEdTriggerList::addItem( %this, %frame, %state )
    %ctrl = new GuiBitmapCtrl()
    {
       internalName = "trigger" @ %this.triggerId;
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = %pos SPC "0";

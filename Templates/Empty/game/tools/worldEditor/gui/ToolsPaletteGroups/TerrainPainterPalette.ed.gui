@@ -2,7 +2,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";

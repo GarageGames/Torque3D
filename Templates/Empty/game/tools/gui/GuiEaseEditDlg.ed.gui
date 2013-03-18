@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(GuiEaseEditDlg,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
 
@@ -31,7 +31,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "334 145";
@@ -39,14 +39,14 @@
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "window";
       canSaveDynamicFields = "0";
 
       new GuiBitmapBorderCtrl() {
          isContainer = "1";
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "5 27";
@@ -54,7 +54,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -68,7 +68,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiAutoSizeTextProfile";
+            Profile = "ToolsGuiAutoSizeTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 3";
@@ -76,7 +76,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -93,7 +93,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiPopUpMenuProfile";
+            Profile = "ToolsGuiPopUpMenuProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 20";
@@ -101,7 +101,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "directionList";
             canSaveDynamicFields = "0";
@@ -118,7 +118,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiAutoSizeTextProfile";
+            Profile = "ToolsGuiAutoSizeTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 40";
@@ -126,7 +126,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -143,7 +143,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiPopUpMenuProfile";
+            Profile = "ToolsGuiPopUpMenuProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 57";
@@ -151,7 +151,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "typeList";
             canSaveDynamicFields = "0";
@@ -168,7 +168,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiAutoSizeTextProfile";
+            Profile = "ToolsGuiAutoSizeTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 76";
@@ -176,7 +176,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -190,7 +190,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiAutoSizeTextProfile";
+            Profile = "ToolsGuiAutoSizeTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 111";
@@ -198,7 +198,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -221,7 +221,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 93";
@@ -230,7 +230,7 @@
             canSave = "1";
             Visible = "1";
             AltCommand = "GuiEaseEditDlg.onSetParam1( $ThisControl.getValue() );";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "param1Value";
             canSaveDynamicFields = "0";
@@ -254,7 +254,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "6 128";
@@ -263,7 +263,7 @@
             canSave = "1";
             Visible = "1";
             AltCommand = "GuiEaseEditDlg.onSetParam2( $ThisControl.getValue() );";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "param2Value";
             canSaveDynamicFields = "0";
@@ -275,7 +275,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "67 184";
@@ -284,7 +284,7 @@
          canSave = "1";
          Visible = "1";
          Command = "GuiEaseEditDlg.onOK();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -294,7 +294,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "184 184";
@@ -303,14 +303,14 @@
          canSave = "1";
          Visible = "1";
          Command = "GuiEaseEditDlg.onCancel();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
       new GuiEaseViewCtrl() {
          wrap = "0";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "107 28";
@@ -318,7 +318,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "easeView";
          canSaveDynamicFields = "0";

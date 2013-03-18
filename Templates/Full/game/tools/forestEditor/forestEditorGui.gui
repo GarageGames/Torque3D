@@ -30,7 +30,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
 
@@ -53,7 +53,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowCollapseProfile";
+      Profile = "ToolsGuiWindowCollapseProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 
@@ -62,7 +62,7 @@
       MinExtent = "210 100";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "PalleteWindow";
       canSaveDynamicFields = "0";
@@ -82,7 +82,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "1";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "3 44";
@@ -90,7 +90,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -106,7 +106,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "1";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 22";
@@ -114,7 +114,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "0";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "BrushesTab";
             canSaveDynamicFields = "0";
@@ -136,7 +136,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "0 0";
@@ -144,7 +144,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
 
@@ -168,7 +168,7 @@
                   canRenameObjects = "1";
                   renameInternal = "1";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "1 1";
@@ -176,7 +176,7 @@
                   MinExtent = "8 2";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
                };
@@ -194,7 +194,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "1";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 22";
@@ -202,7 +202,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "MeshesTab";
             canSaveDynamicFields = "0";
@@ -224,7 +224,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "0 0";
@@ -232,7 +232,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
 
@@ -256,7 +256,7 @@
                   canRenameObjects = "1";
                   renameInternal = "0";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "1 -67";
@@ -265,7 +265,7 @@
                   canSave = "1";
                   Visible = "1";
                   AltCommand = "$ThisControl.onDoubleClick();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
                };
@@ -281,7 +281,7 @@
          ChangeChildSizeToFit = "0";
          ChangeChildPosition = "0";
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "170 25";
@@ -289,7 +289,7 @@
          MinExtent = "16 16";
          canSave = "1";
          Visible = "0";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "MeshButtonGroup";
          canSaveDynamicFields = "0";
@@ -300,7 +300,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             position = "0 0";
@@ -309,7 +309,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ForestEditorGui.newMesh();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Add New Mesh";
             hovertime = "1000";
             canSaveDynamicFields = "0";
@@ -320,7 +320,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             position = "19 0";
@@ -330,7 +330,7 @@
             Visible = "1";
             Command = "ForestEditorGui.deleteMesh();";
             tooltip = "Delete Selected";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -344,7 +344,7 @@
          ChangeChildSizeToFit = "0";
          ChangeChildPosition = "0";
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "151 25";
@@ -352,7 +352,7 @@
          MinExtent = "16 16";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "BrushButtonGroup";
          canSaveDynamicFields = "0";
@@ -363,7 +363,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             position = "0 0";
@@ -372,7 +372,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ForestEditorGui.newBrush();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Add New Brush Group";
             hovertime = "1000";
             canSaveDynamicFields = "0";
@@ -383,7 +383,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             position = "19 0";
@@ -393,7 +393,7 @@
             Visible = "1";
             Command = "ForestEditorGui.newElement();";
             tooltip = "Add New Brush Element";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -403,7 +403,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             position = "38 0";
@@ -413,7 +413,7 @@
             Visible = "1";
             Command = "ForestEditorGui.deleteBrushOrElement();";
             tooltip = "Delete Selected";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -438,7 +438,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowCollapseProfile";
+      Profile = "ToolsGuiWindowCollapseProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209
@@ -447,7 +447,7 @@
       MinExtent = "210 50";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "PropertiesWindow";
       canSaveDynamicFields = "0";
@@ -469,7 +469,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "3 23";
@@ -477,7 +477,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -500,7 +500,7 @@
             MinExtent = "16 16";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "Inspector";
             canSaveDynamicFields = "0";

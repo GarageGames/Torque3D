@@ -315,7 +315,7 @@ function EObjectSelection::initClassList( %this )
       {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiCheckBoxListFlipedProfile";
+         Profile = "ToolsGuiCheckBoxListFlipedProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "0 0";
@@ -323,7 +323,7 @@ function EObjectSelection::initClassList( %this )
          MinExtent = "8 2";
          canSave = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          tooltip = "Include/exclude all " @ %className @ " objects.";
          text = %text;

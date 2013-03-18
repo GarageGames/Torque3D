@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(TerrainEditorSettingsTab,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
 
@@ -24,7 +24,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiSolidDefaultProfile";
+      Profile = "ToolsGuiSolidDefaultProfile";
       HorizSizing = "width";
       VertSizing = "height";
       position = "0 0";
@@ -32,7 +32,7 @@
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "1";
 
@@ -52,7 +52,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "0 0";
@@ -60,7 +60,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -70,7 +70,7 @@
             VertStacking = "Top to Bottom";
             Padding = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "1 1";
@@ -79,7 +79,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
 
             new GuiRolloutCtrl() {
@@ -99,7 +99,7 @@
                   VertStacking = "Top to Bottom";
                   Padding = "0";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -108,7 +108,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
                   padding = "3";
                   
@@ -128,7 +128,7 @@
                         AnchorLeft = "1";
                         AnchorRight = "0";
                         isContainer = "0";
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "5 1";
@@ -136,7 +136,7 @@
                         MinExtent = "8 2";
                         canSave = "1";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "0";
                      };
@@ -154,7 +154,7 @@
                         AnchorLeft = "1";
                         AnchorRight = "0";
                         isContainer = "0";
-                        Profile = "GuiTextEditNumericProfile";
+                        Profile = "ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "81 0";
@@ -162,7 +162,7 @@
                         MinExtent = "8 2";
                         canSave = "1";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "1";
                         class = "ESettingsWindowTextEdit";
@@ -188,7 +188,7 @@
                         AnchorLeft = "1";
                         AnchorRight = "0";
                         isContainer = "0";
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "5 1";
@@ -196,7 +196,7 @@
                         MinExtent = "8 2";
                         canSave = "1";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "0";
                      };
@@ -214,7 +214,7 @@
                         AnchorLeft = "1";
                         AnchorRight = "0";
                         isContainer = "0";
-                        Profile = "GuiTextEditNumericProfile";
+                        Profile = "ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "81 0";
@@ -222,7 +222,7 @@
                         MinExtent = "8 2";
                         canSave = "1";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "1";
                         class = "ESettingsWindowTextEdit";
@@ -248,7 +248,7 @@
                         AnchorLeft = "1";
                         AnchorRight = "0";
                         isContainer = "0";
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "5 1";
@@ -256,7 +256,7 @@
                         MinExtent = "8 2";
                         canSave = "1";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "0";
                      };
@@ -274,7 +274,7 @@
                         AnchorLeft = "1";
                         AnchorRight = "0";
                         isContainer = "0";
-                        Profile = "GuiTextEditNumericProfile";
+                        Profile = "ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "81 0";
@@ -282,7 +282,7 @@
                         MinExtent = "8 2";
                         canSave = "1";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "1";
                         class = "ESettingsWindowTextEdit";

@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -17,7 +17,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "231 204";
@@ -46,7 +46,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "84 196";
@@ -66,7 +66,7 @@
          internalName = "FilterCurveCtrl";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "35 46";
@@ -83,7 +83,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "8 43";
@@ -105,7 +105,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "11 159";
@@ -127,7 +127,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "36 174";
@@ -149,7 +149,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "129 176";
@@ -171,7 +171,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "7 196";
@@ -190,7 +190,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "122 26";
