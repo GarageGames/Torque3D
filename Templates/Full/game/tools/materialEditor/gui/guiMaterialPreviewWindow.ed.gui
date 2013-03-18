@@ -4,7 +4,7 @@
    internalName = "MatEdPreviewWindowContainer";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "height";
    Position = "0 0";
@@ -19,7 +19,7 @@
       internalName = "MatEdPreviewWindow";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Extent = "210 251 ";
@@ -50,7 +50,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1"; //1
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "4 23";
@@ -58,7 +58,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "Client";
          Margin = "0 0 0 0";
@@ -72,7 +72,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "height";
             position = "4 45";
@@ -112,7 +112,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "1 1";
@@ -137,7 +137,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiPopUpMenuProfile";
+         Profile = "ToolsGuiPopUpMenuProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "4 24";
@@ -228,7 +228,7 @@
          position = "108 25";
          Extent = "98 18";
          HorizSizing = "left";
-         profile = "GuiCheckBoxProfile";
+         profile = "ToolsGuiCheckBoxProfile";
          Variable = "MaterialEditorGui.livePreview";
          Command = "MaterialEditorGui.updateLivePreview($ThisControl.getValue());";
          text ="Preview in World";
@@ -238,7 +238,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "200 257";
@@ -265,7 +265,7 @@
       text = "Cubemap Editor";
 
       new GuiTextCtrl(){
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          position = "307 40";
          Extent = "30 16";
          text = "Name";
@@ -274,7 +274,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "338 40";
@@ -294,14 +294,14 @@
          AltCommand = "MaterialEditorGui.editCubemapName($ThisControl.getText());";
       };
       new GuiButtonCtrl(){
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          position = "339 216";
          Extent = "74 24";
          text = "Select";
          command = "MaterialEditorGui.selectCubemap();"; // needs hookup use selected cubemap
       };
       new GuiButtonCtrl(){
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          position = "417 216";
          Extent = "52 24";
          text = "Cancel";
@@ -311,7 +311,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "5 40";
@@ -332,7 +332,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiListBoxProfile";
+            Profile = "ToolsGuiListBoxProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "2 2";
@@ -346,7 +346,7 @@
          };
       };
       new GuiTextCtrl(){
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          position = "6 22";
          Extent = "67 16";
          text = "Cubemaps";
@@ -356,7 +356,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "299 106";
@@ -377,7 +377,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "299 106";
@@ -386,7 +386,7 @@
          canSave = "1";
          Visible = "1";
          Command = "MaterialEditorGui.editCubemapImage(\"0\", $ThisControl.bitmap );";
-         tooltipprofile = "GuiDefaultProfile";
+         tooltipprofile = "ToolsGuiDefaultProfile";
          ToolTip = "When using Static Cubemaps, select your CubeMap by clicking here.";
          hovertime = "1000";
          groupNum = "-1";
@@ -399,7 +399,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "167 106";
@@ -420,7 +420,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "167 106";
@@ -429,7 +429,7 @@
          canSave = "1";
          Visible = "1";
          Command = "MaterialEditorGui.editCubemapImage(\"1\", $ThisControl.bitmap );";
-         tooltipprofile = "GuiDefaultProfile";
+         tooltipprofile = "ToolsGuiDefaultProfile";
          ToolTip = "When using Static Cubemaps, select your CubeMap by clicking here.";
          hovertime = "1000";
          groupNum = "-1";
@@ -442,7 +442,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "233 172";
@@ -463,7 +463,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "233 172";
@@ -472,7 +472,7 @@
          canSave = "1";
          Visible = "1";
          Command = "MaterialEditorGui.editCubemapImage(\"3\", $ThisControl.bitmap );";
-         tooltipprofile = "GuiDefaultProfile";
+         tooltipprofile = "ToolsGuiDefaultProfile";
          ToolTip = "When using Static Cubemaps, select your CubeMap by clicking here.";
          hovertime = "1000";
          groupNum = "-1";
@@ -485,7 +485,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "233 40";
@@ -506,7 +506,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "233 40";
@@ -515,7 +515,7 @@
          canSave = "1";
          Visible = "1";
          Command = "MaterialEditorGui.editCubemapImage(\"2\", $ThisControl.bitmap );";
-         tooltipprofile = "GuiDefaultProfile";
+         tooltipprofile = "ToolsGuiDefaultProfile";
          ToolTip = "When using Static Cubemaps, select your CubeMap by clicking here.";
          hovertime = "1000";
          groupNum = "-1";
@@ -528,7 +528,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "233 106";
@@ -549,7 +549,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "233 106";
@@ -558,7 +558,7 @@
          canSave = "1";
          Visible = "1";
          Command = "MaterialEditorGui.editCubemapImage(\"4\", $ThisControl.bitmap );";
-         tooltipprofile = "GuiDefaultProfile";
+         tooltipprofile = "ToolsGuiDefaultProfile";
          ToolTip = "When using Static Cubemaps, select your CubeMap by clicking here.";
          hovertime = "1000";
          groupNum = "-1";
@@ -571,7 +571,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "365 106";
@@ -592,7 +592,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "365 106";
@@ -601,7 +601,7 @@
          canSave = "1";
          Visible = "1";
          Command = "MaterialEditorGui.editCubemapImage(\"5\", $ThisControl.bitmap );";
-         tooltipprofile = "GuiDefaultProfile";
+         tooltipprofile = "ToolsGuiDefaultProfile";
          ToolTip = "When using Static Cubemaps, select your CubeMap by clicking here.";
          hovertime = "1000";
          groupNum = "-1";
@@ -615,7 +615,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "top";
          position = "128 23";
@@ -626,7 +626,7 @@
          Command = "matEd_addCubemapWindow.setVisible(1);"; // -------------- Needs Hookup Create New Cubemap
          hovertime = "1000";
          tooltip = "Create New Cubemap";
-         bitmap = "core/art/gui/images/new";
+         bitmap = "tools/gui/images/new";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
@@ -635,7 +635,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "top";
          position = "143 23";
@@ -656,7 +656,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "top";
          position = "106 23";
@@ -677,7 +677,7 @@
    new GuiWindowCtrl(matEd_addCubemapWindow) {
       canSaveDynamicFields = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "362 333";
@@ -685,7 +685,7 @@
       MinExtent = "48 92";
       canSave = "1";
       Visible = "0";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -707,7 +707,7 @@
          canSaveDynamicFields = "0";
          internalName = "cubemapName";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "96 35";
@@ -715,7 +715,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -734,7 +734,7 @@
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "12 36";
@@ -742,7 +742,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -756,7 +756,7 @@
       new GuiButtonCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "96 68";
@@ -764,7 +764,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          groupNum = "-1";
          buttonType = "PushButton";
@@ -775,7 +775,7 @@
       new GuiButtonCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "228 68";
@@ -783,7 +783,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          groupNum = "-1";
          buttonType = "PushButton";

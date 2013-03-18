@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiModelessDialogProfile";
+   Profile = "ToolsGuiModelessDialogProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -12,14 +12,14 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(ESnapOptions) {
       internalName = "SnapOptionsWindow";
       Enabled = "1";
       isContainer = "1";
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       resizeWidth = "0";
@@ -41,7 +41,7 @@
       new GuiTabBookCtrl(ESnapOptionsTabBook) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Position = "5 52";
@@ -63,7 +63,7 @@
 
          new GuiTabPageCtrl(ESnapOptionsTabTerrain) {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Margin = "0 0 0 0";
@@ -82,7 +82,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -92,7 +92,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -116,7 +116,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "0 0";
@@ -125,14 +125,14 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   
                   new GuiDynamicCtrlArrayControl() {
                      canSaveDynamicFields = "0";
                      internalName = "TerrainSnapAlignment";
                      Enabled = "1";
-                     Profile = "GuiDefaultProfile";
+                     Profile = "ToolsGuiDefaultProfile";
                      HorizSizing = "right";
                      VertSizing = "bottom";
                      Position = "0 18";
@@ -141,7 +141,7 @@
                      canSave = "1";
                      isDecoy = "0";
                      Visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      colCount = "2";
                      colSize = "78";
@@ -154,7 +154,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "0 0";
@@ -177,7 +177,7 @@
                         internalName = "NoAlignment";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiRadioProfile";
+                        Profile = "ToolsGuiRadioProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -187,7 +187,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"None\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "None";
                         groupNum = "1";
@@ -200,7 +200,7 @@
                         internalName = "negX";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiIconButtonSmallProfile";
+                        Profile = "ToolsGuiIconButtonSmallProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -210,7 +210,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"-X\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "- X Axis";
                         iconBitmap = "tools/gui/images/axis-icon_-x";
@@ -225,7 +225,7 @@
                         internalName = "posX";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiIconButtonSmallProfile";
+                        Profile = "ToolsGuiIconButtonSmallProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -235,7 +235,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"+X\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "+ X Axis";
                         iconBitmap = "tools/gui/images/axis-icon_x";
@@ -250,7 +250,7 @@
                         internalName = "negY";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiIconButtonSmallProfile";
+                        Profile = "ToolsGuiIconButtonSmallProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -260,7 +260,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"-Y\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "- Y Axis";
                         iconBitmap = "tools/gui/images/axis-icon_-y";
@@ -275,7 +275,7 @@
                         internalName = "posY";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiIconButtonSmallProfile";
+                        Profile = "ToolsGuiIconButtonSmallProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -285,7 +285,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"+Y\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "+ Y Axis";
                         iconBitmap = "tools/gui/images/axis-icon_y";
@@ -300,7 +300,7 @@
                         internalName = "negZ";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiIconButtonSmallProfile";
+                        Profile = "ToolsGuiIconButtonSmallProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -310,7 +310,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"-Z\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "- Z Axis";
                         iconBitmap = "tools/gui/images/axis-icon_-z";
@@ -325,7 +325,7 @@
                         internalName = "posZ";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiIconButtonSmallProfile";
+                        Profile = "ToolsGuiIconButtonSmallProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -335,7 +335,7 @@
                         isDecoy = "0";
                         Visible = "1";
                         Command = "ESnapOptions.setTerrainSnapAlignment(\"+Z\");";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         text = "+ Z Axis";
                         iconBitmap = "tools/gui/images/axis-icon_z";
@@ -360,7 +360,7 @@
                      active = "1";
                      Variable = "EWorldEditor.dropAtBounds";
                      Command = "EWorldEditor.dropAtBounds = $ThisControl.getValue();";
-                     tooltipProfile = "GuiToolTipProfile";
+                     tooltipProfile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "0";
@@ -370,7 +370,7 @@
          };
          new GuiTabPageCtrl(ESnapOptionsTabSoft) {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Margin = "0 0 0 0";
@@ -389,7 +389,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -399,7 +399,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -424,7 +424,7 @@
                   internalName = "theVisOptionsList";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "2 2";
@@ -433,12 +433,12 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   
                   new GuiControl() {
                      Enabled = "1";
-                     Profile = "GuiDefaultProfile";
+                     Profile = "ToolsGuiDefaultProfile";
                      HorizSizing = "width";
                      Position = "0 0";
                      Extent = "190 18";
@@ -449,7 +449,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "0 0";
@@ -470,7 +470,7 @@
                      
                      new GuiTextEditCtrl() {
                         internalName = "SnapSize";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "left";
                         position = "136 0";
                         Extent = "44 18";
@@ -482,7 +482,7 @@
                   
                   new GuiControl() {
                      Enabled = "1";
-                     Profile = "GuiDefaultProfile";
+                     Profile = "ToolsGuiDefaultProfile";
                      Position = "0 0";
                      Extent = "190 90";
                      MinExtent = "16 16";
@@ -492,7 +492,7 @@
                         canSaveDynamicFields = "0";
                         internalName = "SoftSnapAlignment";
                         Enabled = "1";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "0 0";
@@ -501,7 +501,7 @@
                         canSave = "1";
                         isDecoy = "0";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         colCount = "2";
                         colSize = "78";
@@ -513,7 +513,7 @@
                            canSaveDynamicFields = "0";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiDefaultProfile";
+                           Profile = "ToolsGuiDefaultProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            position = "0 0";
@@ -536,7 +536,7 @@
                            internalName = "NoAlignment";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiRadioProfile";
+                           Profile = "ToolsGuiRadioProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -546,7 +546,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"None\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "None";
                            groupNum = "1";
@@ -559,7 +559,7 @@
                            internalName = "negX";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiIconButtonSmallProfile";
+                           Profile = "ToolsGuiIconButtonSmallProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -569,7 +569,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"-X\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "- X Axis";
                            iconBitmap = "tools/gui/images/axis-icon_-x";
@@ -584,7 +584,7 @@
                            internalName = "posX";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiIconButtonSmallProfile";
+                           Profile = "ToolsGuiIconButtonSmallProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -594,7 +594,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"+X\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "+ X Axis";
                            iconBitmap = "tools/gui/images/axis-icon_x";
@@ -609,7 +609,7 @@
                            internalName = "negY";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiIconButtonSmallProfile";
+                           Profile = "ToolsGuiIconButtonSmallProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -619,7 +619,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"-Y\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "- Y Axis";
                            iconBitmap = "tools/gui/images/axis-icon_-y";
@@ -634,7 +634,7 @@
                            internalName = "posY";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiIconButtonSmallProfile";
+                           Profile = "ToolsGuiIconButtonSmallProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -644,7 +644,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"+Y\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "+ Y Axis";
                            iconBitmap = "tools/gui/images/axis-icon_y";
@@ -659,7 +659,7 @@
                            internalName = "negZ";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiIconButtonSmallProfile";
+                           Profile = "ToolsGuiIconButtonSmallProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -669,7 +669,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"-Z\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "- Z Axis";
                            iconBitmap = "tools/gui/images/axis-icon_-z";
@@ -684,7 +684,7 @@
                            internalName = "posZ";
                            Enabled = "1";
                            isContainer = "0";
-                           Profile = "GuiIconButtonSmallProfile";
+                           Profile = "ToolsGuiIconButtonSmallProfile";
                            HorizSizing = "right";
                            VertSizing = "bottom";
                            Position = "0 0";
@@ -694,7 +694,7 @@
                            isDecoy = "0";
                            Visible = "1";
                            Command = "ESnapOptions.setSoftSnapAlignment(\"+Z\");";
-                           tooltipprofile = "GuiToolTipProfile";
+                           tooltipprofile = "ToolsGuiToolTipProfile";
                            hovertime = "1000";
                            text = "+ Z Axis";
                            iconBitmap = "tools/gui/images/axis-icon_z";
@@ -710,7 +710,7 @@
                   new GuiCheckBoxCtrl(){
                      internalName = "RenderSnapBounds";
                      Enabled = "1";
-                     Profile = "GuiCheckBoxProfile";
+                     Profile = "ToolsGuiCheckBoxProfile";
                      position = "1 0";
                      Extent = "190 18";
                      text = "Render Snap Bounds";
@@ -720,7 +720,7 @@
                   new GuiCheckBoxCtrl(){
                      internalName = "RenderSnappedTriangle";
                      Enabled = "1";
-                     Profile = "GuiCheckBoxProfile";
+                     Profile = "ToolsGuiCheckBoxProfile";
                      position = "1 0";
                      Extent = "190 18";
                      text = "Render Snapped Triangle";
@@ -729,7 +729,7 @@
                   
                   new GuiControl() {
                      Enabled = "1";
-                     Profile = "GuiDefaultProfile";
+                     Profile = "ToolsGuiDefaultProfile";
                      HorizSizing = "width";
                      Position = "0 0";
                      Extent = "190 18";
@@ -740,7 +740,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "0 0";
@@ -761,7 +761,7 @@
                      
                      new GuiTextEditCtrl() {
                         internalName = "SnapBackfaceTolerance";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "left";
                         position = "136 0";
                         Extent = "44 18";
@@ -787,7 +787,7 @@
             visible = "1";
             active = "1";
             command = "toggleSnappingOptions(\"grid\");";
-            tooltipProfile = "GuiToolTipProfile";
+            tooltipProfile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "GridSnapButton";
             canSave = "1";
@@ -803,7 +803,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          isContainer = "0";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          horizSizing = "left";
          vertSizing = "top";
          position = "103 234";
@@ -811,7 +811,7 @@
          minExtent = "8 2";
          visible = "1";
          active = "1";
-         tooltipProfile = "GuiToolTipProfile";
+         tooltipProfile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSave = "1";
          canSaveDynamicFields = "0";
@@ -831,7 +831,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          isContainer = "0";
-         profile = "GuiTextEditProfileNumbersOnly";
+         profile = "ToolsGuiNumericTextEditProfile";
          horizSizing = "left";
          vertSizing = "top";
          position = "127 235";
@@ -840,7 +840,7 @@
          visible = "1";
          active = "1";
          altCommand = "ESnapOptions.setGridSnapSize();";
-         tooltipProfile = "GuiToolTipProfile";
+         tooltipProfile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "gridSize";
          canSave = "1";
@@ -851,7 +851,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "133 23";
@@ -860,7 +860,7 @@
          canSave = "1";
          Visible = "1";
          Command = "toggleSnappingOptions(\"\");";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Off";
          groupNum = "1";

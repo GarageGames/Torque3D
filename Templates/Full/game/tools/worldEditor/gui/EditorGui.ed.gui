@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -38,7 +38,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "4 3";
@@ -47,7 +47,7 @@
          canSave = "1";
          Visible = "1";
          Command = "";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Open the WorldEditor";
          hovertime = "1000";
          bitmap = "tools/worldEditor/images/toolbar/world";
@@ -59,7 +59,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "34 3";
@@ -68,7 +68,7 @@
          canSave = "1";
          Visible = "1";
          Command = "toggleEditor( true ); GuiEdit(); $GuiEditorBtnPressed = true;";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Open the GuiEditor";
          hovertime = "1000";
          bitmap = "tools/worldEditor/images/toolbar/gui";
@@ -80,7 +80,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "64 3";
@@ -89,7 +89,7 @@
          canSave = "1";
          Visible = "1";
          Command = "Editor.close(\"PlayGui\");";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Play Game";
          hovertime = "1000";
          bitmap = "tools/worldEditor/images/toolbar/playbutton";
@@ -100,18 +100,18 @@
      
       new GuiBitmapCtrl() {
       Enabled = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       position = "98 3";
       Extent = "2 26";
       MinExtent = "1 1";
-      bitmap = "core/art/gui/images/separator-h.png";
+      bitmap = "tools/gui/images/separator-h.png";
       };
       
       new GuiBitmapButtonCtrl(EWorldEditorToggleCamera) {
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "102 3";
@@ -120,7 +120,7 @@
          canSave = "1";
          Visible = "1";
          Command = "CameraTypesDropdownToggle();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle Camera Modes";
          hovertime = "1000";
          bitmap = "tools/worldEditor/images/toolbar/player";
@@ -134,13 +134,13 @@
             Position = getWord(EWorldEditorToggleCamera.extent, 0)-6 SPC getWord(EWorldEditorToggleCamera.extent, 1)-6;
             Extent = "4 4";
             MinExtent = "4 4";
-            bitmap = "core/art/gui/images/dropdown-button-arrow";
+            bitmap = "tools/gui/images/dropdown-button-arrow";
          };
       };
       new GuiControl(CameraSpeedDropdownContainer, EditorGuiGroup) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "136 5";
@@ -154,7 +154,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 6";
@@ -176,7 +176,7 @@
             canSaveDynamicFields = "0";
             internalName = "textEdit";
             isContainer = "0";
-            profile="GuiTextEditDropSliderNumbersOnly";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "78 2";
@@ -197,7 +197,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "112 2";
@@ -206,13 +206,13 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(CameraSpeedDropdownCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the Camera Speed";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          };
       };
       /*new GuiPopUpMenuCtrl(EWorldEditorCameraSpeed) {
@@ -220,7 +220,7 @@
          internalName = "CameraSpeedDropdown";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiPopUpMenuProfile";
+         Profile = "ToolsGuiPopUpMenuProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "136 7";
@@ -245,7 +245,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "270 3";
@@ -254,7 +254,7 @@
          canSave = "1";
          Visible = "1";
          Command = "VisibilityDropdownToggle();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Toggle Visibility Modes (ALT V)";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/visibility-toggle";
@@ -268,17 +268,17 @@
             Position = getWord(visibilityToggleBtn.extent, 0)-6 SPC getWord(visibilityToggleBtn.extent, 1)-6;
             Extent = "4 4";
             MinExtent = "4 4";
-            bitmap = "core/art/gui/images/dropdown-button-arrow";
+            bitmap = "tools/gui/images/dropdown-button-arrow";
          };
       };
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "303 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
             
       new GuiPopUpMenuCtrl(EWorldEditorAlignPopup) {
@@ -286,7 +286,7 @@
          internalName = "";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiPopUpMenuProfile";
+         Profile = "ToolsGuiPopUpMenuProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "439 2";
@@ -328,7 +328,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          Position = "3 2";
@@ -349,20 +349,20 @@
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "459 2";
          Extent = "2 18";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       
       new GuiTextCtrl(EWorldEditorStatusBarSelection) {
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "469 2";
@@ -383,20 +383,20 @@
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "659 2";
          Extent = "2 18";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       
       new GuiPopUpMenuCtrl(EWorldEditorStatusBarCamera) {
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiPopUpMenuProfile";
+         Profile = "ToolsGuiPopUpMenuProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "667 2";
@@ -415,13 +415,13 @@
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "800 2";
          Extent = "2 18";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
    };
    
@@ -637,7 +637,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiSolidDefaultProfile";
+      Profile = "ToolsGuiSolidDefaultProfile";
       HorizSizing = "center";
       VertSizing = "center";
       Position = "223 277";
@@ -652,7 +652,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiRLProgressBitmapProfile";
+         Profile = "ToolsGuiRLProgressBitmapProfile";
          HorizSizing = "center";
          VertSizing = "center";
          position = "5 0";
@@ -674,7 +674,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiProgressTextProfile";
+         Profile = "ToolsGuiProgressTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "5 20";
@@ -682,7 +682,7 @@
          MinExtent = "8 8";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -698,7 +698,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiSolidDefaultProfile";
+      Profile = "ToolsGuiSolidDefaultProfile";
       HorizSizing = "width";
       VertSizing = "top";
       Position = "19 570";
@@ -712,7 +712,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          Position = "5 1";
@@ -734,7 +734,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "468 2";
@@ -753,7 +753,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "548 2";
@@ -773,7 +773,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiSolidDefaultProfile";
+      Profile = "ToolsGuiSolidDefaultProfile";
       HorizSizing = "center";
       VertSizing = "top";
       Position = "180 560";
@@ -809,7 +809,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "337 3";
@@ -828,7 +828,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "392 3";
@@ -855,7 +855,7 @@
         canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Position = "5 5";
@@ -863,7 +863,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          colCount = "1";
          colSize = "127";
@@ -879,7 +879,7 @@
             internalName = "StandardCamera";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 5";
@@ -888,7 +888,7 @@
             canSave = "1";
             Visible = "1";
             Command = "CameraTypesDropdownToggle(); EditorGuiStatusBar.setCamera(\"Standard Camera\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Free Camera";
             hovertime = "1000";
             iconBitmap = "tools/worldEditor/images/toolbar/camera_n";
@@ -905,7 +905,7 @@
             internalName = "OrbitCamera";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 32";
@@ -914,7 +914,7 @@
             canSave = "1";
             Visible = "1";
             Command = "CameraTypesDropdownToggle(); EditorGuiStatusBar.setCamera(\"Orbit Camera\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggle Orbit Cam";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/orbit-cam_n";
@@ -932,7 +932,7 @@
             internalName = "PlayerCamera";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 5";
@@ -941,7 +941,7 @@
             canSave = "1";
             Visible = "1";
             Command = "CameraTypesDropdownToggle(); EditorGuiStatusBar.setCamera(\"1st Person Camera\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Player Camera";
             hovertime = "1000";
             iconBitmap = "tools/worldEditor/images/toolbar/player_n";
@@ -958,7 +958,7 @@
             internalName = "trdPersonCamera";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 5";
@@ -967,7 +967,7 @@
             canSave = "1";
             Visible = "1";
             Command = "CameraTypesDropdownToggle(); EditorGuiStatusBar.setCamera(\"3rd Person Camera\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "3rd Person Camera";
             hovertime = "1000";
             iconBitmap = "tools/worldEditor/images/toolbar/3rd-person-camera_n";
@@ -984,7 +984,7 @@
             internalName = "NewtonianCamera";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 64";
@@ -993,7 +993,7 @@
             canSave = "1";
             Visible = "1";
             Command = "CameraTypesDropdownToggle(); EditorGuiStatusBar.setCamera(\"Smooth Camera\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggle Newtonian Cam";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/smooth-cam_n";
@@ -1010,7 +1010,7 @@
             internalName = "NewtonianRotationCamera";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 64";
@@ -1019,7 +1019,7 @@
             canSave = "1";
             Visible = "1";
             Command = "CameraTypesDropdownToggle(); EditorGuiStatusBar.setCamera(\"Smooth Rot Camera\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggle Smooth Camera with Smooth Rotation";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/smooth-cam-rot_n";
@@ -1034,7 +1034,7 @@
       };
       
       new GuiDecoyCtrl(CameraTypesDropdownDecoy) {
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "0 0";
@@ -1056,7 +1056,7 @@
       
       new GuiTabBookCtrl() {
          canSaveDynamicFields = "0";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Docking = "Client";
@@ -1074,7 +1074,7 @@
 
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Docking = "Client";
@@ -1092,7 +1092,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -1102,7 +1102,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -1127,7 +1127,7 @@
                   internalName = "theVisOptionsList";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "1 0";
@@ -1136,14 +1136,14 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                };
             };
          };
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiTabPageProfile";
+            Profile = "ToolsGuiTabPageProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Docking = "Client";
@@ -1161,7 +1161,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Docking = "Client";
@@ -1171,7 +1171,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -1196,7 +1196,7 @@
                   internalName = "theClassVisList";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "1 0";
@@ -1205,7 +1205,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                };
             };
@@ -1240,24 +1240,24 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
       new GuiBitmapCtrl(){ // Fast
          position = "105 15";
          extent = "2 8";
-         bitmap = "core/art/gui/images/separator-h.png";  
-         Profile = "GuiDefaultProfile";
+         bitmap = "tools/gui/images/separator-h.png";  
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom"; 
       };
       new GuiBitmapCtrl(){ // normal
          position = "73 15";
          extent = "2 8";
-         bitmap = "core/art/gui/images/separator-h.png";  
-         Profile = "GuiDefaultProfile";
+         bitmap = "tools/gui/images/separator-h.png";  
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom"; 
       };
       new GuiBitmapCtrl(){ // slow
          position = "41 15";
          extent = "2 8";
-         bitmap = "core/art/gui/images/separator-h.png";  
-         Profile = "GuiDefaultProfile";
+         bitmap = "tools/gui/images/separator-h.png";  
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom"; 
       };
@@ -1266,7 +1266,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
             internalName = "slider";
             position = "9 17";
             extent = "129 15";
-            bitmap = "core/art/gui/images/separator-h.png";  
+            bitmap = "tools/gui/images/separator-h.png";  
             HorizSizing = "width";
             VertSizing = "bottom"; 
             range = "1 200";
@@ -1279,7 +1279,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
             position = "54 3";
             extent = "39 18";
             text = "Normal";  
-            Profile = "GuiTextCenterProfile";
+            Profile = "ToolsGuiTextCenterProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
          };
@@ -1287,7 +1287,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
          position = "11 2";
          extent = "39 18";
          text = "-";  
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
       };
@@ -1295,7 +1295,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
          position = "98 5";
          extent = "39 13";
          text = "+";  
-         Profile = "GuiTextRightProfile";
+         Profile = "ToolsGuiTextRightProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
       };

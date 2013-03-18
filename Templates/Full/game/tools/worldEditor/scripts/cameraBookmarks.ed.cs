@@ -217,7 +217,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
    %gui = new GuiControl() {
       internalName = %mark.getInternalName();
       Enabled = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -233,7 +233,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "2 2";
@@ -242,7 +242,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
          canSave = "1";
          Visible = "1";
          Command = "";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Go to bookmark";
          hovertime = "1000";
          internalName = "goToBookmark";
@@ -252,7 +252,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
       new GuiTextEditCtrl() {
          class = "EManageBookmarksTextEdit";
          internalName = "BookmarkName";
-         profile="GuiTextEditProfile";
+         profile="ToolsGuiTextEditProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          position = "22 2";
@@ -269,7 +269,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "284 3";
@@ -278,7 +278,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
          canSave = "1";
          Visible = "1";
          Command = "";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Delete camera bookmark";
          hovertime = "1000";
          internalName = "deleteBookmark";

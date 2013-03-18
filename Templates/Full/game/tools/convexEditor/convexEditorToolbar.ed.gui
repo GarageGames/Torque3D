@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    internalName = "";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "bottom";
    Position = "305 0";
@@ -36,7 +36,7 @@
       hovertime = "1000";
 
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "15 7";
@@ -48,16 +48,16 @@
          helpTag = "0";
       };
       new GuiBitmapCtrl() {
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "94 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       new GuiBitmapButtonCtrl(ConvexEditorCreateBoxBtn) {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "100 3";
@@ -66,7 +66,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ConvexEditorGui.createConvexBox();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Create ConvexShape Box" NL "Use Alt + Click-Drag instead of this for more control of starting placement.";
          hovertime = "1000";
          bitmap = "tools/convexEditor/images/convex-editor-btn";
@@ -78,7 +78,7 @@
       new GuiBitmapButtonCtrl(ConvexEditorSplitFaceBtn) {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "134 3";
@@ -87,7 +87,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ConvexEditorGui.splitSelectedFace();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Split selected face" NL "Use Ctrl + Rotate instead for more control.";
          hovertime = "1000";
          bitmap = "tools/convexEditor/images/split-face-btn";
@@ -99,7 +99,7 @@
       new GuiBitmapButtonCtrl(ConvexEditorDeleteFaceBtn) {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "166 3";
@@ -108,7 +108,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ConvexEditorGui.handleDelete();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Delete selected face" NL "(Delete)";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/delete-btn";

@@ -2,7 +2,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -17,7 +17,7 @@
       internalName = "ForestEditorSelectMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -26,7 +26,7 @@
       canSave = "1";
       Visible = "1";
       Command = "GlobalGizmoProfile.mode = \"None\"; ForestEditorGui.setActiveTool(ForestTools->SelectionTool);";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Select Item (1)";
       hovertime = "1000";
       bitmap = "tools/gui/images/menubar/arrow";
@@ -38,7 +38,7 @@
       internalName = "ForestEditorMoveMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -47,7 +47,7 @@
       canSave = "1";
       Visible = "1";
       Command = "GlobalGizmoProfile.mode = \"Move\"; ForestEditorGui.setActiveTool(ForestTools->SelectionTool);";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Move Item (2)";
       hovertime = "1000";
       bitmap = "tools/gui/images/menubar/translate";
@@ -59,7 +59,7 @@
       internalName = "ForestEditorRotateMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -68,7 +68,7 @@
       canSave = "1";
       Visible = "1";
       Command = "GlobalGizmoProfile.mode = \"Rotate\"; ForestEditorGui.setActiveTool(ForestTools->SelectionTool);";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Rotate Item (3)";
       hovertime = "1000";
       bitmap = "tools/gui/images/menubar/rotate";
@@ -80,7 +80,7 @@
       internalName = "ForestEditorScaleMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -89,7 +89,7 @@
       canSave = "1";
       Visible = "1";
       Command = "GlobalGizmoProfile.mode = \"Scale\"; ForestEditorGui.setActiveTool(ForestTools->SelectionTool);";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Scale Item (4)";
       hovertime = "1000";
       bitmap = "tools/gui/images/menubar/scale";
@@ -101,7 +101,7 @@
       internalName = "ForestEditorPaintMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -110,7 +110,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"Paint\";";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Paint (5)";
       hovertime = "1000";
       bitmap = "tools/foresteditor/images/paint-forest-btn";
@@ -122,7 +122,7 @@
       internalName = "ForestEditorEraseMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -131,7 +131,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"Erase\";";      
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Erase (6)";
       hovertime = "1000";
       bitmap = "tools/foresteditor/images/erase-all-btn";
@@ -144,7 +144,7 @@
       internalName = "ForestEditorEraseSelectedMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -153,7 +153,7 @@
       canSave = "1";
       Visible = "1";
       Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"EraseSelected\";";  
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Erase Selected (7)";
       hovertime = "1000";
       bitmap = "tools/foresteditor/images/erase-element-btn";

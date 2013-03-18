@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -18,7 +18,7 @@
       internalName = "ToolsPaletteWindow";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiToolbarWindowProfile";
+      Profile = "ToolsGuiToolbarWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Extent = "36 24";
@@ -48,7 +48,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          position = "5 15";

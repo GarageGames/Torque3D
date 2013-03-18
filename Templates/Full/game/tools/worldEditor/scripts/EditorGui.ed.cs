@@ -366,7 +366,7 @@ function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitma
          internalName = %internalName;
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "180 0";
@@ -375,7 +375,7 @@ function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitma
          canSave = "1";
          Visible = "1";
          Command = "EditorGui.setEditor(" @ %pluginName @ ");";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = %tooltip;
          hovertime = "750";
          bitmap = %bitmap;
@@ -2362,7 +2362,7 @@ function EWToolsToolbar::reset( %this )
    EWToolsToolbarDecoy.setVisible(false);
    EWToolsToolbarDecoy.setExtent((29 + 4) * %count + 4, 31);
 
-  %this-->resizeArrow.setBitmap( "core/art/gui/images/collapse-toolbar" );
+  %this-->resizeArrow.setBitmap( "tools/gui/images/collapse-toolbar" );
 }
 
 function EWToolsToolbar::toggleSize( %this, %useDynamics )
@@ -2373,7 +2373,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
 
    if ( %this.isClosed == 0 )
    {
-      %image = "core/art/gui/images/expand-toolbar";
+      %image = "tools/gui/images/expand-toolbar";
       
       for( %i = 0 ; %i < ToolsToolbarArray.getCount(); %i++ )
       {
@@ -2394,7 +2394,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
    }
    else
    {
-      %image = "core/art/gui/images/collapse-toolbar";
+      %image = "tools/gui/images/collapse-toolbar";
 
       %count = ToolsToolbarArray.getCount();
       for( %i = 0 ; %i < %count; %i++ )
