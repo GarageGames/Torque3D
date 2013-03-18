@@ -77,8 +77,7 @@ function initClient()
    exec("art/gui/controlsHelpDlg.gui");
 
    // Load up the shell GUIs
-   if($platform !$= "xenon")  // Use the unified shell instead
-      exec("art/gui/mainMenuGui.gui");
+   exec("art/gui/mainMenuGui.gui");
    exec("art/gui/joinServerDlg.gui");
    exec("art/gui/endGameGui.gui");
    exec("art/gui/StartupGui.gui");
@@ -150,8 +149,7 @@ function loadMainMenu()
    // Startup the client with the Main menu...
    if (isObject( MainMenuGui ))
       Canvas.setContent( MainMenuGui );
-   else if (isObject( UnifiedMainMenuGui ))
-      Canvas.setContent( UnifiedMainMenuGui );
+   
    Canvas.setCursor("DefaultCursor");
 
    // first check if we have a level file to load

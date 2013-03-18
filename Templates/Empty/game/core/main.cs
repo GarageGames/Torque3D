@@ -75,8 +75,6 @@ function onStart()
    exec("./scripts/client/core.cs");
    initializeCore();
 
-   exec("./unifiedShell/main.cs");
-
    exec("./scripts/client/client.cs");
    exec("./scripts/server/server.cs");
    
