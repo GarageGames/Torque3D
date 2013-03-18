@@ -178,7 +178,6 @@ ShaderFeature::Resources DeferredRTLightingFeatHLSL::getResources( const Materia
    if ( fd.features[MFT_ForwardShading] )
       return Parent::getResources( fd );
 
-   // HACK: See DeferredRTLightingFeatHLSL::setTexData.
    mLastTexIndex = 0;
 
    Resources res; 
@@ -202,8 +201,7 @@ void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
    NamedTexTarget *texTarget = NamedTexTarget::find( AdvancedLightBinManager::smBufferName );
    if( texTarget )
    {
-      // HACK: We store this for use in DeferredRTLightingFeatHLSL::processPix()
-      // which cannot deduce the texture unit itself.
+
       mLastTexIndex = texIndex;
 
       passData.mTexType[ texIndex ] = Material::TexTarget;
@@ -455,6 +453,10 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    specPow->setType( "float" );
    specPow->setName( "specularPower" );
 
+   Var *specStrength = new Var;							// RDM test
+   specStrength->setType( "float" );					// RDM test
+   specStrength->setName( "specularStrength" );		// RDM test
+
    // If the gloss map flag is set, than the specular power is in the alpha
    // channel of the specular map
    if( fd.features[ MFT_GlossMap ] )
@@ -463,6 +465,9 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    {
       specPow->uniform = true;
       specPow->constSortPos = cspPotentialPrimitive;
+
+		specStrength->uniform = true;									// RDM test
+      specStrength->constSortPos = cspPotentialPrimitive;	// RDM test
    }
 
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
@@ -472,9 +477,9 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    AssertFatal( lightInfoSamp && d_specular && d_NL_Att,
       "DeferredPixelSpecularHLSL::processPix - Something hosed the deferred features!" );
 
-   // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
-      specDecl, d_specular, specPow, d_NL_Att ) );
+
+	meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
+      specDecl, d_specular, specPow, specStrength ) ); 
 
    LangElement *specMul = new GenOp( "float4( @.rgb, 0 ) * @", specCol, specular );
    LangElement *final = specMul;

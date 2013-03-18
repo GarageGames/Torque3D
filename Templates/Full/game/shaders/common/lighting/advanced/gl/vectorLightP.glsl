@@ -196,7 +196,7 @@ void main()
                                     normal, 
                                     normalize(-wsEyeRay), 
                                     constantSpecularPower, 
-                                    lightColor.a * lightBrightness );
+                                    shadowed * lightBrightness );   // RDM test: removed "lightColor.a"
    
    float Sat_NL_Att = clamp(dotNL, 0.0, 1.0) * shadowed;
    
