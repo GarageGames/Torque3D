@@ -1,6 +1,6 @@
 new GuiControl(UVEditorOverlay, EditorGuiGroup) {
    canSaveDynamicFields = "0";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    Enabled = "1";
    isContainer = "1";
    HorizSizing = "right";
@@ -13,7 +13,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
    hovertime = "1000";
 
    new GuiWindowCtrl(UVEditor){
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       resizeWidth = "0";
@@ -40,7 +40,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "26 24";
@@ -48,7 +48,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -62,7 +62,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextCenterProfile";
+         Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "138 24";
@@ -70,7 +70,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -84,7 +84,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextRightProfile";
+         Profile = "ToolsGuiTextRightProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "250 24";
@@ -92,7 +92,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -107,7 +107,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextRightProfile";
+         Profile = "ToolsGuiTextRightProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "4 36";
@@ -115,7 +115,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -129,7 +129,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextRightProfile";
+         Profile = "ToolsGuiTextRightProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "4 159";
@@ -137,7 +137,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -151,7 +151,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextRightProfile";
+         Profile = "ToolsGuiTextRightProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "4 282";
@@ -159,7 +159,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -167,7 +167,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
       new GuiControl(){
          HorizSizing = "right";
          VertSizing = "bottom";
-         profile = "GuiSolidDefaultProfile";
+         profile = "ToolsGuiSolidDefaultProfile";
          position = "25 37";
          extent = "258 258";
       };
@@ -176,7 +176,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          internalName = "bitmapPreview";
          HorizSizing = "right";
          VertSizing = "bottom";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          position = "26 38";
          extent = "256 256";
          wrap = "0";
@@ -185,7 +185,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
       new GuiRectHandles(){
          internalName = "uvHandles";
          class = "UVEditorRectHandles";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "26 38";
@@ -193,7 +193,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
       };
 
 		new GuiBitmapBorderCtrl() {
-			profile = "GuiGroupBorderProfile";
+			profile = "ToolsGuiGroupBorderProfile";
 			horizSizing = "width";
 			vertSizing = "bottom";
 			position = "26 300";
@@ -214,7 +214,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "10 7";
@@ -222,13 +222,13 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
          new GuiPopupMenuCtrlEx(){
             internalName = "colorPopup";
-            Profile = "GuiPopupMenuProfile";
+            Profile = "ToolsGuiPopUpMenuProfile";
             Position = "80 5";
             Extent = "126 20";
             HorizSizing = "right";
@@ -239,7 +239,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
       };
       
 		new GuiBitmapBorderCtrl() {
-			profile = "GuiGroupBorderProfile";
+			profile = "ToolsGuiGroupBorderProfile";
 			horizSizing = "width";
 			vertSizing = "bottom";
 			position = "292 38";
@@ -260,7 +260,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "10 12";
@@ -268,7 +268,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -288,7 +288,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditNumericProfile";
+            Profile = "ToolsGuiNumericTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "44 10";
@@ -296,7 +296,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "1";
          };
@@ -310,7 +310,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "10 32";
@@ -318,7 +318,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -338,7 +338,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditNumericProfile";
+            Profile = "ToolsGuiNumericTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "44 30";
@@ -346,7 +346,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "1";
          };
@@ -360,7 +360,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "10 52";
@@ -368,7 +368,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -388,7 +388,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditNumericProfile";
+            Profile = "ToolsGuiNumericTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "44 50";
@@ -396,7 +396,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "1";
          };
@@ -410,7 +410,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "10 72";
@@ -418,7 +418,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -438,7 +438,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditNumericProfile";
+            Profile = "ToolsGuiNumericTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "44 70";
@@ -446,14 +446,14 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "1";
          };
          new GuiButtonCtrl(){
             HorizSizing = "right";
             VertSizing = "top";
-            profile = "GuiButtonProfile";
+            profile = "ToolsGuiButtonProfile";
             position = "44 94";
             extent = "64 20";
             text = "Reset";
@@ -465,7 +465,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          internalName = "OKButton";
          HorizSizing = "left";
          VertSizing = "top";
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          position = "292 306";
          extent = "94 24";
          text = "OK";
@@ -475,7 +475,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
       new GuiButtonCtrl(){
          HorizSizing = "left";
          VertSizing = "top";
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          position = "391 306";
          extent = "52 24";
          text = "Cancel";

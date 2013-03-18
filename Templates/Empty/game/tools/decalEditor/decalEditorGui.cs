@@ -240,7 +240,7 @@ function DecalEditorTabBook::onTabSelected( %this, %text, %idx )
 
 function DecalEditorTreeView::onDefineIcons()
 {
-   %icons = "core/art/gui/images/treeview/default:" @
+   %icons = "tools/gui/images/treeview/default:" @
             "tools/classIcons/decal:" @
             "tools/classIcons/decalNode:";
             

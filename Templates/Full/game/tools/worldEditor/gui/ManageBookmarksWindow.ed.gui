@@ -2,7 +2,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiModelessDialogProfile";
+   Profile = "ToolsGuiModelessDialogProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -11,14 +11,14 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(EManageBookmarks) {
       internalName = "ManageBookmarksWindow";
       Enabled = "1";
       isContainer = "1";
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       resizeWidth = "1";
@@ -58,7 +58,7 @@
             text = "New";
          };
          new GuiTextEditCtrl(EAddBookmarkWindowName) {
-            profile = "GuiTextEditProfile";
+            profile = "ToolsGuiTextEditProfile";
             horizSizing = "width";
             vertSizing = "bottom";
             position = "27 2";
@@ -71,7 +71,7 @@
             historySize = "0";
          };
          new GuiBitmapButtonCtrl(EAddBookmarkWindowOK) {
-            profile = "GuiButtonProfile";
+            profile = "ToolsGuiButtonProfile";
             horizSizing = "left";
             vertSizing = "bottom";
             position = "158 3";
@@ -81,7 +81,7 @@
             setFirstResponder = "0";
             modal = "1";
             command = "ManageBookmarksContainer.onOK();";
-            bitmap = "core/art/gui/images/new";
+            bitmap = "tools/gui/images/new";
             helpTag = "0";
             text = "Create";
             tooltip = "Create New Camera Bookmark";
@@ -93,7 +93,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Position = "4 12";
@@ -102,7 +102,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "Client";
          Margin = "26 1 3 3";
@@ -128,7 +128,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             Position = "0 0";
@@ -137,7 +137,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
          };
       };

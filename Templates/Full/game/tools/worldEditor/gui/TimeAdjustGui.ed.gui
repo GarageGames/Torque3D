@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(TimeAdjustGui, EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiModelessDialogProfile";
+   Profile = "ToolsGuiModelessDialogProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
 
@@ -30,7 +30,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "338 63";
@@ -38,7 +38,7 @@
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "0";
       closeCommand = "Canvas.popDialog(TimeAdjustGui);";
@@ -48,7 +48,7 @@
          ticks = "100";
          value = "0.1";
          isContainer = "0";
-         Profile = "GuiSliderProfile";
+         Profile = "ToolsGuiSliderProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          position = "37 27";
@@ -56,7 +56,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
          altCommand = "$ThisControl.onAction();";
@@ -71,7 +71,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextCenterProfile";
+         Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "11 53";
@@ -79,7 +79,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -93,7 +93,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextCenterProfile";
+         Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "206 53";
@@ -101,7 +101,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -115,7 +115,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextCenterProfile";
+         Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "108 53";
@@ -123,7 +123,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -137,7 +137,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextCenterProfile";
+         Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "307 53";
@@ -145,7 +145,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -159,7 +159,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextCenterProfile";
+         Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "393 53"; 
@@ -167,7 +167,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };

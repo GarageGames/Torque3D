@@ -64,7 +64,7 @@ function EVisibility::updateOptions( %this )
       {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiCheckBoxListProfile";
+         Profile = "ToolsGuiCheckBoxListProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "0 0";
@@ -73,7 +73,7 @@ function EVisibility::updateOptions( %this )
          canSave = "1";
          Visible = "1";
          Variable = %var;
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = %text;
          groupNum = "-1";
@@ -142,7 +142,7 @@ function EVisibility::addClassOptions( %this )
       {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiCheckBoxListFlipedProfile";
+         Profile = "ToolsGuiCheckBoxListFlipedProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "0 0";
@@ -151,7 +151,7 @@ function EVisibility::addClassOptions( %this )
          canSave = "1";
          Visible = "1";
          Variable = %visVar;
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          tooltip = "Show/hide all " @ %class @ " objects.";
          text = %text;
@@ -169,7 +169,7 @@ function EVisibility::addClassOptions( %this )
       {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiCheckBoxListFlipedProfile";
+         Profile = "ToolsGuiCheckBoxListFlipedProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "0 0";
@@ -178,7 +178,7 @@ function EVisibility::addClassOptions( %this )
          canSave = "1";
          Visible = "1";
          Variable = %selVar;
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          tooltip = "Enable/disable selection of all " @ %class @ " objects.";
          text = %text;
