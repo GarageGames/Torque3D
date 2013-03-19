@@ -322,7 +322,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       const U32 numVerts = curEntry.vertBuffer->mNumVerts;
 
       // Skip lights which won't affect the scene.
-      if ( !curLightMat || curLightInfo->getBrightness() <= 0.001f )
+      if ( !curLightMat )
          continue;
 
       GFXDEBUGEVENT_SCOPE( AdvancedLightBinManager_Render_Light, ColorI::RED );
