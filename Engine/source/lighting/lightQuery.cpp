@@ -71,14 +71,7 @@ void LightQuery::getLights( LightInfo** outLights, U32 maxLights )
    // Copy them over.
    for ( U32 i = 0; i < lightCount; i++ )
    {
-      LightInfo *light = mLights[i];
-
-      // If the score reaches zero then we got to
-      // the end of the valid lights for this object.
-      if ( light->getScore() <= 0.0f )
-         break;
-
-      outLights[i] = light;
+      outLights[i] = mLights[i];
    }
 }
 
