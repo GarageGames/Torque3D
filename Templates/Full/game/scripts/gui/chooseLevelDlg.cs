@@ -95,7 +95,7 @@ function ChooseLevelDlg::onWake( %this )
       %preview = new GuiBitmapButtonCtrl() {
          internalName = "SmallPreview" @ %i;
          Extent = "108 81";
-         bitmap = "core/art/gui/images/no-preview";
+         bitmap = "art/gui/no-preview";
          command = "ChooseLevelWindow.previewSelected(ChooseLevelWindow->SmallPreviews->SmallPreview" @ %i @ ");";
       };
 
@@ -240,7 +240,7 @@ function ChooseLevelWindow::previewSelected(%this, %preview)
    if (isObject(%preview) && %preview.bitmap !$= "")
       %this->CurrentPreview.setBitmap(%preview.bitmap);
    else
-      %this->CurrentPreview.setBitmap("core/art/gui/images/no-preview");
+      %this->CurrentPreview.setBitmap("art/gui/no-preview");
 
    // Set the current level name
    if (isObject(%preview) && %preview.levelName !$= "")

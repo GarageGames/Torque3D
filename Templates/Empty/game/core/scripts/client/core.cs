@@ -67,7 +67,6 @@ function initializeCore()
    startFileChangeNotifications();
       
    // Core Guis.
-   exec("~/art/gui/remapDlg.gui");
    exec("~/art/gui/console.gui");
    exec("~/art/gui/consoleVarDlg.gui");
    exec("~/art/gui/netGraphGui.gui");
