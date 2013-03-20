@@ -61,7 +61,7 @@
          Visible = "1";
          tooltipprofile = "GuiToolTipProfile";
          hovertime = "1000";
-         bitmap = "./images/no-preview";
+         bitmap = "./no-preview";
          wrap = "0";
       };
 
@@ -192,7 +192,7 @@
          Visible = "1";
          tooltipprofile = "GuiToolTipProfile";
          hovertime = "1000";
-         bitmap = "core/art/gui/images/previous-button";
+         bitmap = "art/gui/previous-button";
          wrap = "0";
          command = "ChooseLevelWindow.previousPreviews();";
       };
@@ -222,7 +222,7 @@
          Visible = "1";
          tooltipprofile = "GuiToolTipProfile";
          hovertime = "1000";
-         bitmap = "core/art/gui/images/next-button";
+         bitmap = "art/gui/next-button";
          wrap = "0";
          command = "ChooseLevelWindow.nextPreviews();";
       };
