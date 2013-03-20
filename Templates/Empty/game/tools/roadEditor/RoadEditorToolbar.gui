@@ -3,7 +3,7 @@
    internalName = "RoadEditorToolbar";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "306 0";
@@ -14,7 +14,7 @@
    hovertime = "1000";
    
    new GuiTextCtrl() {
-      profile = "GuiTextProfile";
+      profile = "ToolsGuiTextProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "6 6";
@@ -39,7 +39,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "167 3";
@@ -49,7 +49,7 @@
          isDecoy = "0";
          Visible = "1";
          Variable = "$DecalRoad::showSpline";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          toolTip = "Show Spline";
          bitmap = "tools/worldEditor/images/road-river/menubar/show-spline";
@@ -62,7 +62,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "253 3";
@@ -72,7 +72,7 @@
          isDecoy = "0";
          Visible = "1";
          Variable = "$DecalRoad::wireframe";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          toolTip = "Show Wireframe";
          bitmap = "tools/worldEditor/images/road-river/menubar/show-wireframe";
@@ -95,7 +95,7 @@
          isDecoy = "0";
          Visible = "1";
          Variable = "$DecalRoad::showRoad";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          toolTip = "Show Road Texture";
          bitmap = "tools/worldEditor/images/road-river/menubar/show-texture";
@@ -108,7 +108,7 @@
    new GuiControl(RoadDefaultWidthTextEditContainer) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "197 5";
@@ -122,7 +122,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 6";
@@ -144,7 +144,7 @@
             canSaveDynamicFields = "0";
             internalName = "textEdit";
             isContainer = "0";
-            profile="GuiNumericDropSliderTextProfile";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "67 2";
@@ -165,7 +165,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "101 2";
@@ -174,20 +174,20 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(RoadDefaultWidthSliderCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes Default Road Width";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          };
       };
       /*new GuiTextEditSliderCtrl(RoadEditorDefaultWidthSlider) {
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiTextEditProfile";
+      Profile = "ToolsGuiTextEditProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "429 6";
@@ -197,7 +197,7 @@
       isDecoy = "0";
       Visible = "1";
       Command = "RoadEditorGui.DefaultWidth = $ThisControl.getValue();";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -221,7 +221,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiTextProfile";
+      Profile = "ToolsGuiTextProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "347 7";
@@ -230,7 +230,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -256,7 +256,7 @@ new GuiMouseEventCtrl(RoadDefaultWidthSliderCtrlContainer, EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(RoadDefaultWidthTextEditContainer.position) + firstWord(RoadEditorToolbar.position) + 10 SPC 

@@ -744,7 +744,12 @@ void TerrainFile::create(  String *inOutFilename,
    if ( !basePath.getExtension().equal("mis") )
    {
       // Use the default path and filename
-      basePath.setPath( "art/terrains" );
+      String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
+      if ( terrainDirectory.isEmpty() )
+      {
+         terrainDirectory = "art/terrains";
+      }
+      basePath.setPath( terrainDirectory );
       basePath.setFileName( "terrain" );
    }
 

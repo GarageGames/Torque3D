@@ -36,6 +36,8 @@ class MissionArea : public NetObject
    F32 mFlightCeiling;
    F32 mFlightCeilingRange;
 
+   static MissionArea * smServerObject;
+
   public:
    MissionArea();
 
@@ -53,6 +55,7 @@ class MissionArea : public NetObject
    /// @name SimObject Inheritance
    /// @{
    bool onAdd();
+   void onRemove();
 
    void inspectPostApply();
 

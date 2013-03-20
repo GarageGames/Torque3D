@@ -3,7 +3,7 @@
    internalName = "MeshRoadEditorToolbar";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "306 0";
@@ -14,7 +14,7 @@
    hovertime = "1000";
    
    new GuiTextCtrl() {
-      profile = "GuiTextProfile";
+      profile = "ToolsGuiTextProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "6 6";
@@ -39,7 +39,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "167 3";
@@ -49,7 +49,7 @@
          isDecoy = "0";
          Visible = "1";
          Variable = "$River::showSpline";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          toolTip = "Show Spline";
          bitmap = "tools/worldEditor/images/road-river/menubar/show-spline";
@@ -62,7 +62,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "253 3";
@@ -73,7 +73,7 @@
          Visible = "1";
          Variable = "$River::showWireframe";
          Command = "$River::showWireframe = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          toolTip = "Show Wireframe";
          bitmap = "tools/worldEditor/images/road-river/menubar/show-wireframe";
@@ -96,7 +96,7 @@
          isDecoy = "0";
          Visible = "1";
          Variable = "$River::showRiver";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          toolTip = "Show River Texture";
          bitmap = "tools/worldEditor/images/road-river/menubar/show-texture";
@@ -109,7 +109,7 @@
    new GuiControl(RiverDefaultWidthTextEditContainer) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "197 5";
@@ -123,7 +123,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 6";
@@ -145,7 +145,7 @@
             canSaveDynamicFields = "0";
             internalName = "textEdit";
             isContainer = "0";
-            profile="GuiNumericDropSliderTextProfile";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "67 2";
@@ -166,7 +166,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "101 2";
@@ -175,19 +175,19 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(RiverDefaultWidthSliderCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes Default River Width";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          };
       };
       new GuiControl(RiverDefaultDepthTextEditContainer) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "327 5";
@@ -201,7 +201,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 6";
@@ -223,7 +223,7 @@
             canSaveDynamicFields = "0";
             internalName = "textEdit";
             isContainer = "0";
-            profile="GuiNumericDropSliderTextProfile";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "67 2";
@@ -244,7 +244,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "101 2";
@@ -253,13 +253,13 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(RiverDefaultDepthSliderCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes Default River Depth";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          };
       };
 };
@@ -277,7 +277,7 @@ new GuiMouseEventCtrl(RiverDefaultWidthSliderCtrlContainer, EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(RiverDefaultWidthTextEditContainer.position) + firstWord(RiverEditorToolbar.position) + 10 SPC 
@@ -306,7 +306,7 @@ new GuiMouseEventCtrl(RiverDefaultDepthSliderCtrlContainer, EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(RiverDefaultDepthTextEditContainer.position) + firstWord(RiverEditorToolbar.position) + 10 SPC 

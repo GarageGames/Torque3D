@@ -2,7 +2,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -17,7 +17,7 @@
       internalName = "MeshRoadEditorSelectMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -26,7 +26,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.prepSelectionMode();";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Select Mesh Road (1)";
       hovertime = "1000";
       bitmap = "tools/gui/images/menubar/arrow";
@@ -39,7 +39,7 @@
       internalName = "MeshRoadEditorMoveMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -48,7 +48,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.setMode(\"MeshRoadEditorMoveMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Move Point (2)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/move-point";
@@ -60,7 +60,7 @@
       internalName = "MeshRoadEditorRotateMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -69,7 +69,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.setMode(\"MeshRoadEditorRotateMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Rotate Point (3)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/rotate-point";
@@ -81,7 +81,7 @@
       internalName = "MeshRoadEditorScaleMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -90,7 +90,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.setMode(\"MeshRoadEditorScaleMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Scale Point (4)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/scale-point";
@@ -102,7 +102,7 @@
       internalName = "MeshRoadEditorAddRoadMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -111,7 +111,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.setMode(\"MeshRoadEditorAddRoadMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Create Road (5)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/add-mesh-road";
@@ -123,7 +123,7 @@
       internalName = "MeshRoadEditorInsertPointMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -132,7 +132,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.setMode(\"MeshRoadEditorInsertPointMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Insert Point (+)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/add-point";
@@ -144,7 +144,7 @@
       internalName = "MeshRoadEditorRemovePointMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -153,7 +153,7 @@
       canSave = "1";
       Visible = "1";
       Command = "MeshRoadEditorGui.setMode(\"MeshRoadEditorRemovePointMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Remove Point (-)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/subtract-point";

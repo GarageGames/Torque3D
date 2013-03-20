@@ -851,7 +851,7 @@ function GuiEditorTabBook::onTabSelected( %this, %text, %index )
          %sidebar-->button4.command = "GuiEditor.showDeleteProfileDialog( GuiEditorProfilesTree.getSelectedProfile() );";
          %sidebar-->button4.tooltip = "Delete Selected Profile";
       
-         %sidebar-->button3.setBitmap( "core/art/gui/images/new" );
+         %sidebar-->button3.setBitmap( "tools/gui/images/new" );
          %sidebar-->button3.command = "GuiEditor.createNewProfile( \"Unnamed\" );";
          %sidebar-->button3.tooltip = "Create New Profile with Default Values";
          

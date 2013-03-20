@@ -89,9 +89,6 @@ bool GuiGradientSwatchCtrl::onWake()
 	if ( !Parent::onWake() )
       return false;
 	
-	if ( mPointer.isNull() )
-		mPointer.set( "core/art/gui/images/arrowbtn_d", &GFXDefaultGUIProfile, avar("%s() - mGrid (line %d)", __FUNCTION__, __LINE__) );
-	
 	char* altCommand = Con::getReturnBuffer(512);
 	dSprintf( altCommand, 512, "%s(%i.color, \"%i.setColor\");", mColorFunction, getId(), getId() );
 	setField( "altCommand", altCommand );

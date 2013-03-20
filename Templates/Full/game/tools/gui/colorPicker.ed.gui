@@ -2,7 +2,7 @@
 %guiContent = new GuiColorPickerCtrl(ColorPickerDlg,EditorGuiGroup) {
    canSaveDynamicFields = "0";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -17,7 +17,7 @@
    new GuiWindowCtrl(GuiPickerDlg) {
       canSaveDynamicFields = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       position = "170 100";
@@ -38,34 +38,34 @@
       closeCommand = "DoColorPickerCancelCallback(); ColorPickerDlg.getRoot().popDialog(ColorPickerDlg);";
       
       new GuiBitmapBorderCtrl(){ // color blend
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          position = "3 24";
          Extent = "255 258";
       };
       new GuiBitmapBorderCtrl(){ // Hue
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          position = "263 23";
          Extent = "25 261";
       };
       new GuiBitmapBorderCtrl(){ // new old color
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          position = "292 37";
          Extent = "52 99";
       };
       new GuiBitmapBorderCtrl(){ // rgb
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          position = "292 209";
          Extent = "52 75";
       };
       new GuiBitmapBorderCtrl(){ // alpha
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          position = "3 287";
          Extent = "341 24";
       };
       new GuiColorPickerCtrl(ColorBlendSelect) {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "3 24";
@@ -84,7 +84,7 @@
       new GuiColorPickerCtrl(ColorRangeSelect) {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "264 24";
@@ -103,7 +103,7 @@
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "298 215";
@@ -116,7 +116,7 @@
          maxLength = "255";
       };
       new GuiTextEditCtrl(Channel_R_Val) { // Red Channal
-         Profile = "GuiTextEditProfileNumbersOnly";
+         Profile = "ToolsGuiNumericTextEditProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "307 215";
@@ -128,7 +128,7 @@
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "297 238";
@@ -141,7 +141,7 @@
          maxLength = "255";
       };
       new GuiTextEditCtrl(Channel_G_Val) { // Green Channal
-         Profile = "GuiTextEditProfileNumbersOnly";
+         Profile = "ToolsGuiNumericTextEditProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "307 238";
@@ -153,7 +153,7 @@
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "298 261";
@@ -166,7 +166,7 @@
          maxLength = "255";
       };
       new GuiTextEditCtrl(Channel_B_Val) { // Blue Channal
-         Profile = "GuiTextEditProfileNumbersOnly";
+         Profile = "ToolsGuiNumericTextEditProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "307 261";
@@ -185,7 +185,7 @@
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "267 0";
@@ -201,7 +201,7 @@
             internalName = "slider";
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiSliderProfile";
+            Profile = "ToolsGuiSliderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "5 3";
@@ -217,7 +217,7 @@
          };
          new GuiTextEditCtrl(Channel_A_Val) { // Alpha Channal
             internalName = "textEdit";
-            Profile = "GuiTextEditProfileNumbersOnly";
+            Profile = "ToolsGuiNumericTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "305 0";
@@ -228,23 +228,23 @@
          };
       };
       new GuiSwatchButtonCtrl(myColor){ // New Color // 
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "293 38";
          Extent = "50 50";
       };      
       new GuiTextCtrl(){
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          text = "New";
          position = "306 22";
          Extent = "26 14";
       };
       new GuiSwatchButtonCtrl(oldColor){ // Old Color // 
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "293 85";
          Extent = "50 50";
       };
       new GuiTextCtrl(){
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          text = "Old";
          position = "310 138";
          Extent = "26 14";
@@ -252,7 +252,7 @@
       new GuiButtonCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "144 316";
@@ -270,7 +270,7 @@
       new GuiButtonCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "268 316";

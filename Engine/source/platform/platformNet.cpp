@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platformNet.h"
-#include "platform/event.h"
 #include "core/strings/stringFunctions.h"
 
 #if defined (TORQUE_OS_WIN32)

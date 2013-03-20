@@ -864,8 +864,13 @@ bool TerrainBlock::onAdd()
    if ( mTerrFileName.isEmpty() )
    {
       mTerrFileName = Con::getVariable( "$Client::MissionFile" );
-      mTerrFileName.replace("tools/levels/", "art/terrains/");
-      mTerrFileName.replace("levels/", "art/terrains/");
+      String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
+      if ( terrainDirectory.isEmpty() )
+      {
+         terrainDirectory = "art/terrains/";
+      }
+      mTerrFileName.replace("tools/levels/", terrainDirectory);
+      mTerrFileName.replace("levels/", terrainDirectory);
 
       Vector<String> materials;
       materials.push_back( "warning_material" );

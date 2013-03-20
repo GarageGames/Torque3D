@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(InteriorExportGui, EditorGuiGroup) {
    canSaveDynamicFields = "0";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    Enabled = "1";
    isContainer = "1";
    HorizSizing = "right";
@@ -14,7 +14,7 @@
    hovertime = "1000";
 
    new GuiWindowCtrl(InteriorExportWindow) {
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       canSaveDynamicFields = "0";
       internalName = "InteriorExport";
       Enabled = "1";
@@ -103,7 +103,7 @@
          maxLength = "1024";
       };
       new GuiCheckBoxCtrl(InteriorSelectAllToggle) {
-         profile = "GuiCheckBoxProfile";
+         profile = "ToolsGuiCheckBoxProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "9 158";
@@ -117,7 +117,7 @@
             maxLength = "255";
       };
       new GuiCheckBoxCtrl(InteriorExportTransToggle) {
-         profile = "GuiCheckBoxProfile";
+         profile = "ToolsGuiCheckBoxProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "9 176";

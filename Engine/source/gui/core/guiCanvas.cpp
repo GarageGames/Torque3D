@@ -26,7 +26,6 @@
 #include "console/console.h"
 #include "console/engineAPI.h"
 #include "platform/profiler.h"
-#include "platform/event.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiTypes.h"

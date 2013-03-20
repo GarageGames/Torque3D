@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(GuiEditorNewGuiDialog,EditorGuiGroup) {
    isContainer = "1";
-   profile = "GuiOverlayProfile";
+   profile = "ToolsGuiOverlayProfile";
    horizSizing = "right";
    vertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    minExtent = "8 2";
    canSave = "1";
    visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
       enabled = "1";
@@ -31,7 +31,7 @@
       anchorLeft = "1";
       anchorRight = "0";
       isContainer = "1";
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       horizSizing = "center";
       vertSizing = "center";
       position = "357 303";
@@ -39,7 +39,7 @@
       minExtent = "8 2";
       canSave = "1";
       visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "0";
 
@@ -49,7 +49,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "top";
          position = "228 114";
@@ -58,7 +58,7 @@
          canSave = "1";
          visible = "1";
          command = "GuiEditorNewGuiDialog.onCancel();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -68,7 +68,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "101 114";
@@ -77,14 +77,14 @@
          canSave = "1";
          visible = "1";
          command = "GuiEditorNewGuiDialog.onOK();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
          accelerator = "enter";
       };
       new GuiControl() {
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "15 28";
@@ -92,7 +92,7 @@
          minExtent = "8 2";
          canSave = "1";
          visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -106,7 +106,7 @@
             anchorLeft = "1";
             anchorRight = "0";
             isContainer = "0";
-            profile = "GuiTextProfile";
+            profile = "ToolsGuiTextProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "14 13";
@@ -114,7 +114,7 @@
             minExtent = "8 2";
             canSave = "1";
             visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -132,7 +132,7 @@
             anchorLeft = "1";
             anchorRight = "0";
             isContainer = "0";
-            profile = "GuiTextEditProfile";
+            profile = "ToolsGuiTextEditProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "103 13";
@@ -140,7 +140,7 @@
             minExtent = "8 2";
             canSave = "1";
             visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "nameField";
             canSaveDynamicFields = "0";
@@ -155,7 +155,7 @@
             anchorLeft = "1";
             anchorRight = "0";
             isContainer = "0";
-            profile = "GuiTextProfile";
+            profile = "ToolsGuiTextProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "14 44";
@@ -163,7 +163,7 @@
             minExtent = "8 2";
             canSave = "1";
             visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -180,7 +180,7 @@
             anchorLeft = "1";
             anchorRight = "0";
             isContainer = "0";
-            profile = "GuiPopUpMenuProfile";
+            profile = "ToolsGuiPopUpMenuProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "103 44";
@@ -188,7 +188,7 @@
             minExtent = "8 2";
             canSave = "1";
             visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "classDropdown";
             canSaveDynamicFields = "0";

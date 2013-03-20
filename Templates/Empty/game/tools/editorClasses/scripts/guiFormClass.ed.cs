@@ -30,7 +30,7 @@ function GuiFormClass::BuildEmptyFrame(%pos, %ext, %columns, %rows, %parentID)
 {
    %frame = new GuiFrameSetCtrl() 
    {
-      profile = "GuiFrameSetProfile";
+      profile = "ToolsGuiFrameSetProfile";
       horizSizing = "width";
       vertSizing = "height";
       position = %pos;
@@ -68,7 +68,7 @@ function GuiFormClass::BuildFormControl( %parentID, %ContentLibrary )
    %newFormObj = new GuiFormCtrl() 
    {
       class = "FormControlClass";
-      profile = "GuiFormProfile";
+      profile = "ToolsGuiFormProfile";
       canSaveDynamicFields = 1;
       horizSizing = "width";
       vertSizing = "height";

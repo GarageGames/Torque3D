@@ -26,7 +26,6 @@
 #include "console/engineAPI.h"
 #include "console/console.h"
 #include "gfx/bitmap/gBitmap.h"
-#include "platform/event.h"
 #include "gui/core/guiDefaultControlRender.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"

@@ -12,7 +12,7 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS := -g -m32
-LDLIBS := -lstdc++ -lm -lSDL -lpthread -lrt
+LDLIBS := -lstdc++ -lm -lpthread -lrt
 {foreach item=def from=$projLibs}LDLIBS += -l{$def}
 {/foreach}
 

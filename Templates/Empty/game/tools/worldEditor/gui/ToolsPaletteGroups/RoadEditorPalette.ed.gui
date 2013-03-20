@@ -2,7 +2,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -17,7 +17,7 @@
       internalName = "RoadEditorSelectMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -26,7 +26,7 @@
       canSave = "1";
       Visible = "1";
       Command = "RoadEditorGui.prepSelectionMode();";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Select Road (1)";
       hovertime = "1000";
       bitmap = "tools/gui/images/menubar/arrow";
@@ -39,7 +39,7 @@
       internalName = "RoadEditorMoveMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -48,7 +48,7 @@
       canSave = "1";
       Visible = "1";
       Command = "RoadEditorGui.setMode(\"RoadEditorMoveMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Move Point (2)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/move-point";
@@ -61,7 +61,7 @@
       internalName = "RoadEditorScaleMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -70,7 +70,7 @@
       canSave = "1";
       Visible = "1";
       Command = "RoadEditorGui.setMode(\"RoadEditorScaleMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Scale Point (4)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/scale-point";
@@ -82,7 +82,7 @@
       internalName = "RoadEditorAddRoadMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -91,7 +91,7 @@
       canSave = "1";
       Visible = "1";
       Command = "RoadEditorGui.setMode(\"RoadEditorAddRoadMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Create Road (5)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/add-road-path";
@@ -103,7 +103,7 @@
       internalName = "RoadEditorInsertPointMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -112,7 +112,7 @@
       canSave = "1";
       Visible = "1";
       Command = "RoadEditorGui.setMode(\"RoadEditorInsertPointMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Insert Point (+)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/add-point";
@@ -125,7 +125,7 @@
       internalName = "RoadEditorRemovePointMode";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -134,7 +134,7 @@
       canSave = "1";
       Visible = "1";
       Command = "RoadEditorGui.setMode(\"RoadEditorRemovePointMode\");";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Remove Point (-)";
       hovertime = "1000";
       bitmap = "tools/worldEditor/images/road-river/subtract-point";

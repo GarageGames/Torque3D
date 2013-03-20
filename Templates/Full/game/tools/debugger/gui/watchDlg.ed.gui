@@ -1,6 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(DebuggerWatchDlg, EditorGuiGroup) {
-   profile = "GuiDefaultProfile";
+   profile = "ToolsGuiDefaultProfile";
    horizSizing = "right";
    vertSizing = "bottom";
    position = "0 0";
@@ -12,7 +12,7 @@
    helpTag = "0";
    
    new GuiWindowCtrl() {
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "220 180";
@@ -33,7 +33,7 @@
          opaque = "true";
    
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 28";
@@ -46,7 +46,7 @@
          text = "Enter the Variable:";
       };
       new GuiTextEditCtrl(WatchDialogExpression) {
-         profile = "GuiTextEditProfile";
+         profile = "ToolsGuiTextEditProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 44";
@@ -60,7 +60,7 @@
          historySize = "0";
       };
       new GuiButtonCtrl() {
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "56 80";
@@ -74,7 +74,7 @@
          text = "Add";
       };
       new GuiButtonCtrl() {
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "104 80";

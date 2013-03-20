@@ -27,7 +27,7 @@
 #include "console/simBase.h"
 #endif
 
-#include "platform/event.h"
+#include "platform/input/event.h"
 
 //------------------------------------------------------------------------------
 U8 TranslateOSKeyCode( U8 vcode );

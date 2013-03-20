@@ -26,7 +26,8 @@
 #ifndef SQUISH_MATHS_H
 #define SQUISH_MATHS_H
 
-#include "squishMath.h"
+#include <cmath>
+#include <algorithm>
 #include "config.h"
 
 namespace squish {
@@ -162,27 +163,27 @@ public:
 	friend Vec3 Min( Arg left, Arg right )
 	{
 		return Vec3(
-			SquishMath::min( left.m_x, right.m_x ), 
-			SquishMath::min( left.m_y, right.m_y ), 
-			SquishMath::min( left.m_z, right.m_z )
+			std::min( left.m_x, right.m_x ), 
+			std::min( left.m_y, right.m_y ), 
+			std::min( left.m_z, right.m_z )
 		);
 	}
 
 	friend Vec3 Max( Arg left, Arg right )
 	{
 		return Vec3(
-			SquishMath::max( left.m_x, right.m_x ), 
-			SquishMath::max( left.m_y, right.m_y ), 
-			SquishMath::max( left.m_z, right.m_z )
+			std::max( left.m_x, right.m_x ), 
+			std::max( left.m_y, right.m_y ), 
+			std::max( left.m_z, right.m_z )
 		);
 	}
 
 	friend Vec3 Truncate( Arg v )
 	{
 		return Vec3(
-			v.m_x > 0.0f ? SquishMath::floor( v.m_x ) : SquishMath::ceil( v.m_x ), 
-			v.m_y > 0.0f ? SquishMath::floor( v.m_y ) : SquishMath::ceil( v.m_y ), 
-			v.m_z > 0.0f ? SquishMath::floor( v.m_z ) : SquishMath::ceil( v.m_z )
+			v.m_x > 0.0f ? std::floor( v.m_x ) : std::ceil( v.m_x ), 
+			v.m_y > 0.0f ? std::floor( v.m_y ) : std::ceil( v.m_y ), 
+			v.m_z > 0.0f ? std::floor( v.m_z ) : std::ceil( v.m_z )
 		);
 	}
 

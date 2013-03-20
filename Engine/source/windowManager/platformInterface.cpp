@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platform/event.h"
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxInit.h"
 #include "gfx/gfxDevice.h"

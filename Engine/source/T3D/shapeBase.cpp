@@ -2582,7 +2582,7 @@ void ShapeBase::_prepRenderImage(   SceneRenderState *state,
       return;
 
    // We don't need to render if all the meshes are forced hidden.
-   if ( mMeshHidden.testAll() )   
+   if ( mMeshHidden.getSize() > 0 && mMeshHidden.testAll() )   
       return;
       
    // If we're rendering shadows don't render the mounted

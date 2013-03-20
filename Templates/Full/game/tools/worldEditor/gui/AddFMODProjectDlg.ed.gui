@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(AddFMODProjectDlg,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiOverlayProfile";//DefaultProfile";
+   Profile = "ToolsGuiOverlayProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
 
@@ -31,7 +31,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = "361 196";
@@ -39,14 +39,14 @@
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "0";
       internalName = "window";
 
       new GuiBitmapBorderCtrl() {
          isContainer = "1";
-         Profile = "GuiGroupBorderProfile";
+         Profile = "ToolsGuiGroupBorderProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "5 26";
@@ -54,7 +54,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -68,7 +68,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiAutoSizeTextProfile";
+            Profile = "ToolsGuiAutoSizeTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "8 51";
@@ -76,7 +76,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -94,7 +94,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "7 72";
@@ -102,7 +102,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "fileNameField";
             canSaveDynamicFields = "0";
@@ -121,7 +121,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "7 127";
@@ -129,7 +129,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "mediaPathField";
             canSaveDynamicFields = "0";
@@ -144,7 +144,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiAutoSizeTextProfile";
+            Profile = "ToolsGuiAutoSizeTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "8 10";
@@ -152,7 +152,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -170,7 +170,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "7 30";
@@ -178,7 +178,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "projectNameField";
             canSaveDynamicFields = "0";
@@ -190,7 +190,7 @@
             text = "Path to the project\'s media files (leave empty if files are in same directory as the project file):";
             useURLMouseCursor = "0";
             isContainer = "0";
-            Profile = "GuiMLTextProfile";
+            Profile = "ToolsGuiMLTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "8 96";
@@ -198,7 +198,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -208,7 +208,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "266 72";
@@ -216,7 +216,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
             command = "AddFMODProjectDlg.onSelectFile();";
@@ -227,7 +227,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "266 127";
@@ -235,7 +235,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
             command = "AddFMODProjectDlg.onSelectMediaPath();";
@@ -247,7 +247,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "206 196";
@@ -256,7 +256,7 @@
          canSave = "1";
          Visible = "1";
          Command = "AddFMODProjectDlg.onCancel();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -266,7 +266,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "112 196";
@@ -275,7 +275,7 @@
          canSave = "1";
          Visible = "1";
          Command = "AddFMODProjectDlg.onOK();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };

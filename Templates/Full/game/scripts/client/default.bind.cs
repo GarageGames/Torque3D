@@ -47,14 +47,6 @@ function showPlayerList(%val)
 
 moveMap.bind( keyboard, F2, showPlayerList );
 
-function showControlsHelp(%val)
-{
-   if (%val)
-      ControlsHelpDlg.toggle();
-}
-
-moveMap.bind(keyboard, h, showControlsHelp);
-
 function hideHUDs(%val)
 {
    if (%val)

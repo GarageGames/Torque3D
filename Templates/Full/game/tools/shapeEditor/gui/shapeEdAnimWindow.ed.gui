@@ -2,7 +2,7 @@
 %guiContent = new GuiWindowCtrl(ShapeEdAnimWindow) {
    canSaveDynamicFields = "0";
    isContainer = "1";
-   Profile = "GuiToolbarWindowProfile";
+   Profile = "ToolsGuiToolbarWindowProfile";
    HorizSizing = "width";
    VertSizing = "top";
    Position = -1 SPC getWord(ShapeEdPreviewGui.extent,0)-94;
@@ -10,7 +10,7 @@
    MinExtent = "475 53";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    Margin = "4 4 4 4";
    Padding = "0 0 0 0";
@@ -32,7 +32,7 @@
    new GuiContainer() {
       canSaveDynamicFields = "0";
       isContainer = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       HorizSizing = "width";
       VertSizing = "top";
       Position = "5 10";
@@ -40,14 +40,14 @@
       MinExtent = "8 8";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
 
       // Sequence playback controls
       new GuiControl() {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "top";
          Position = "0 3";
@@ -55,7 +55,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
 
          new GuiTextCtrl() {
@@ -68,7 +68,7 @@
          new GuiTextCtrl() {
             HorizSizing = "left";
             VertSizing = "top";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             position = "778 19";
             Extent = "26 18";
             Variable = "$ShapeEdCurrentFrame";
@@ -78,7 +78,7 @@
             internalName = "seqIn";
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "0 0";
@@ -87,7 +87,7 @@
             canSave = "1";
             Visible = "1";
             AltCommand = "ShapeEdSequences.onEditSeqInOut(\"in\", $ThisControl.getText());";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Set the In Point to the Current Frame";
             hovertime = "1000";
             Margin = "0 0 0 0";
@@ -107,7 +107,7 @@
          new GuiSliderCtrl(ShapeEdSeqSlider) {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiSliderProfile";
+            Profile = "ToolsGuiSliderProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             Position = "35 4";
@@ -115,7 +115,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             range = "0 255";
             ticks = "0";
@@ -127,7 +127,7 @@
             internalName = "seqOut";
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             Position = "778 0";
@@ -136,7 +136,7 @@
             canSave = "1";
             Visible = "1";
             AltCommand = "ShapeEdSequences.onEditSeqInOut(\"out\", $ThisControl.getText());";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Set the Out Point to the Current Frame";
             hovertime = "1000";
             Margin = "0 0 0 0";
@@ -157,7 +157,7 @@
          new GuiControl() {
             canSaveDynamicFields = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "center";
             VertSizing = "top";
             position = "194 17";
@@ -165,13 +165,13 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
 
             new GuiButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                Position = "0 0";
@@ -180,7 +180,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdSequences.onEditSeqInOut(\"in\", ShapeEdSeqSlider.getValue());";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Set the in position to the current frame (I)";
                hovertime = "1000";
                text = "in";
@@ -191,7 +191,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                Position = "48 0";
@@ -200,7 +200,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdAnimWindow.setKeyframe( ShapeEdAnimWindow-->seqIn.getText() );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Skip to in frame (SHIFT -)";
                hovertime = "1000";
                groupNum = "0";
@@ -211,7 +211,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                Position = "76 0";
@@ -220,7 +220,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdAnimWindow.setKeyframe( mCeil(ShapeEdSeqSlider.getValue() - 1) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Previous frame (-)";
                hovertime = "1000";
                groupNum = "0";
@@ -232,7 +232,7 @@
             new GuiControl() {
                canSaveDynamicFields = "0";
                isContainer = "1";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                Position = "114 0";
@@ -240,14 +240,14 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
 
                new GuiBitmapButtonCtrl() {
                   internalName = "playBkwdBtn";
                   canSaveDynamicFields = "0";
                   isContainer = "0";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "0 0";
@@ -256,7 +256,7 @@
                   canSave = "1";
                   Visible = "1";
                   Command = "ShapeEdAnimWindow.setNoProxySequence(); ShapeEdAnimWindow.setThreadDirection( -1 );";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Play sequence in reverse";
                   hovertime = "1000";
                   groupNum = "0";
@@ -268,7 +268,7 @@
                   internalName = "pauseBtn";
                   canSaveDynamicFields = "0";
                   isContainer = "0";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "38 0";
@@ -277,7 +277,7 @@
                   canSave = "1";
                   Visible = "1";
                   Command = "ShapeEdAnimWindow.setThreadDirection( 0 );";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Toggle pause (SPACE)";
                   hovertime = "1000";
                   groupNum = "0";
@@ -289,7 +289,7 @@
                   internalName = "playFwdBtn";
                   canSaveDynamicFields = "0";
                   isContainer = "0";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "76 0";
@@ -298,7 +298,7 @@
                   canSave = "1";
                   Visible = "1";
                   Command = "ShapeEdAnimWindow.setNoProxySequence(); ShapeEdAnimWindow.setThreadDirection( 1 );";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Play sequence";
                   hovertime = "1000";
                   groupNum = "0";
@@ -310,7 +310,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "228 0";
@@ -319,7 +319,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdAnimWindow.setKeyframe( mFloor(ShapeEdSeqSlider.getValue() + 1) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Next frame (+)";
                hovertime = "1000";
                groupNum = "0";
@@ -331,7 +331,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "266 0";
@@ -340,7 +340,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdAnimWindow.setKeyframe( ShapeEdAnimWindow-->seqOut.getText() );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Skip to out frame (SHIFT +)";
                hovertime = "1000";
                groupNum = "0";
@@ -351,7 +351,7 @@
             new GuiButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                horizSizing = "right";
                VertSizing = "bottom";
                position = "306 0";
@@ -360,7 +360,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdSequences.onEditSeqInOut(\"out\", ShapeEdSeqSlider.getValue());";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Set the out position to the current frame (O)";
                hovertime = "1000";
                text = "out";
@@ -372,7 +372,7 @@
                internalName = "pingpong";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                horizSizing = "left";
                VertSizing = "bottom";
                position = "365 0";
@@ -381,7 +381,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ShapeEdAnimWindow.togglePingPong();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Toggle 'pingpong' mode on the current thread";
                hovertime = "1000";
                groupNum = "0";
@@ -391,7 +391,7 @@
             };
             new GuiTextEditCtrl() {
                internalName = "timeScale";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                horizSizing = "left";
                VertSizing = "bottom";
                position = "390 0";
@@ -401,7 +401,7 @@
                Visible = "1";
                Text = "1.0";
                AltCommand = "ShapeEdShapeView.setTimeScale( $ThisControl.getText() );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Edit this value to change the playback speed for all threads";
                hovertime = "1000";
                canSaveDynamicFields = "0";
@@ -410,7 +410,7 @@
       };
       new GuiBitmapButtonCtrl() {
          internalName = "seqInBar";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "39 0";
@@ -422,7 +422,7 @@
       };
       new GuiBitmapButtonCtrl() {
          internalName = "seqOutBar";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "765 0";

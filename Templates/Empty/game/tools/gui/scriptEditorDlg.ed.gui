@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(ScriptEditorDlg,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "height";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "0";
 
@@ -31,7 +31,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "176 120";
@@ -41,13 +41,13 @@
       Visible = "1";
       Command = "ScriptEditorDlg.close();";
       Accelerator = "escape";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "0";
 
       new GuiControl() {
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "8 24";
@@ -55,13 +55,13 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
          new GuiControl() {
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "height";
             position = "8 7";
@@ -69,7 +69,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -89,7 +89,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "0 0";
@@ -97,7 +97,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
 
@@ -107,7 +107,7 @@
                   maxChars = "-1";
                   useURLMouseCursor = "0";
                   isContainer = "0";
-                  Profile = "GuiTextPadProfile";
+                  Profile = "ToolsGuiTextPadProfile";
                   HorizSizing = "width";
                   VertSizing = "height";
                   position = "2 2";
@@ -115,7 +115,7 @@
                   MinExtent = "8 2";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   internalName = "TextPad";
                   canSaveDynamicFields = "0";
@@ -137,7 +137,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          position = "460 424";
@@ -146,7 +146,7 @@
          canSave = "1";
          Visible = "1";
          Command = "ScriptEditorDlg.close();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -164,7 +164,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          position = "560 424";
@@ -173,7 +173,7 @@
          canSave = "1";
          Visible = "1";
          Command = "_TextPadOnOk();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };

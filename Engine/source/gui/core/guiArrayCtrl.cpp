@@ -25,7 +25,6 @@
 
 #include "console/console.h"
 #include "console/engineAPI.h"
-#include "platform/event.h"
 #include "gui/containers/guiScrollCtrl.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiDefaultControlRender.h"

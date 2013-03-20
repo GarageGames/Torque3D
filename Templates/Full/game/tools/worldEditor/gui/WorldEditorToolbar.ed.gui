@@ -4,7 +4,7 @@
    internalName = "WorldEditorToolbar";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "306 0";
@@ -21,7 +21,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       HorizSizing = "width";
       VertSizing = "bottom";
       Position = "0 3";
@@ -30,7 +30,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       changeChildSizeToFit = false;
       padding = "2";
@@ -40,7 +40,7 @@
          internalName = "";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "2 3";
@@ -49,7 +49,7 @@
          canSave = "1";
          Visible = "1";
          Command = "commandToServer('EditorCameraAutoFit', EWorldEditor.getSelectionRadius()+1);";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Fit View To Selection (F)";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/fit-selection";
@@ -61,15 +61,15 @@
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "34 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "37 7";
@@ -83,7 +83,7 @@
       
       new GuiControl(SnapToBar){
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          Position = "116 3";
          Extent = "123 27";
          Padding = "4";
@@ -93,7 +93,7 @@
          internalName = "snappingSettingsBtn";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "0 0";
@@ -102,7 +102,7 @@
          canSave = "1";
          Visible = "1";
          Command ="ESnapOptions.ToggleVisibility();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Snapping Options";
          hovertime = "1000";
          groupNum = "-1";
@@ -117,7 +117,7 @@
             Position = "23 21";
             Extent = "4 4";
             MinExtent = "4 4";
-            bitmap = "core/art/gui/images/dropdown-button-arrow";
+            bitmap = "tools/gui/images/dropdown-button-arrow";
          };
       }; 
          
@@ -126,7 +126,7 @@
             internalName = "objectGridSnapBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "31 0";
@@ -135,7 +135,7 @@
             canSave = "1";
             Visible = "1";
             Command = "toggleSnappingOptions(\"grid\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggles grid snapping (G)";
             hovertime = "1000";
             groupNum = "-1";
@@ -150,7 +150,7 @@
             internalName = "objectSnapDownBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "62 0";
@@ -159,7 +159,7 @@
             canSave = "1";
             Visible = "1";
             Command = "toggleSnappingOptions(\"terrain\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "All objects will snap to the terrain (T)";
             hovertime = "1000";
             groupNum = "-1";
@@ -174,7 +174,7 @@
             internalName = "objectSnapBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "93 0";
@@ -183,7 +183,7 @@
             canSave = "1";
             Visible = "1";
             Command = "toggleSnappingOptions(\"soft\");";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Soft object snapping to other objects (B)";
             hovertime = "1000";
             groupNum = "-1";
@@ -198,7 +198,7 @@
          canSaveDynamicFields = "0";
          internalName = "softSnapSizeTextEditContainer";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "178 5";
@@ -213,7 +213,7 @@
             internalName = "softSnapSizeTextEdit";
             isContainer = "0";
             HorizSizing = "right";
-            profile="GuiNumericDropSliderTextProfile";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             VertSizing = "bottom";
             position = "0 2";
             Extent = "42 16";
@@ -234,7 +234,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "34 2";
@@ -243,22 +243,22 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(softSnapSizeSliderCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes size of the soft snap region";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          };
       };
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "269 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
          
       new GuiBitmapButtonCtrl() {
@@ -266,7 +266,7 @@
          internalName = "boundingBoxColBtn";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "274 3";
@@ -276,7 +276,7 @@
          Visible = "1";
          Variable = "EWorldEditor.boundingBoxCollision";
          Command = "EWorldEditor.boundingBoxCollision = $ThisControl.getValue();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Object bounds selection toggle (V)";
          hovertime = "1000";
          bitmap = "tools/gui/images/menubar/select-bounds";
@@ -287,16 +287,16 @@
          
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "307 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
       
       new GuiControl(ToggleButtonBar){
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          Position = "313 3";
          Extent = "65 27";
          
@@ -305,7 +305,7 @@
             internalName = "centerObject";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "0 0";
@@ -314,7 +314,7 @@
             canSave = "1";
             Visible = "1";
             Command = "objectCenterDropdown.toggle();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggles object center (O) and bounds center (P)";
             hovertime = "1000";
             bitmap = "tools/gui/images/menubar/object-center";
@@ -329,7 +329,7 @@
                Position = "23 21";
                Extent = "4 4";
                MinExtent = "4 4";
-               bitmap = "core/art/gui/images/dropdown-button-arrow";
+               bitmap = "tools/gui/images/dropdown-button-arrow";
             };
          };
 
@@ -338,7 +338,7 @@
             internalName = "objectTransform";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "31 0";
@@ -347,7 +347,7 @@
             canSave = "1";
             Visible = "1";
             Command = "objectTransformDropdown.toggle();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggles object transform (K) and world transform (L)";
             hovertime = "1000";
             bitmap = "tools/gui/images/menubar/world-transform";
@@ -361,23 +361,23 @@
                Position = "23 21";
                Extent = "4 4";
                MinExtent = "4 4";
-               bitmap = "core/art/gui/images/dropdown-button-arrow";
+               bitmap = "tools/gui/images/dropdown-button-arrow";
             };  
          };
       };
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "379 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
             
       new GuiControl(ToggleNodeBar){
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          Position = "386 3";
          Extent = "63 27";
          
@@ -386,7 +386,7 @@
             internalName = "renderHandleBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "0 0";
@@ -396,7 +396,7 @@
             Visible = "1";
             Variable = "EWorldEditor.renderObjHandle";
             Command = "EWorldEditor.renderObjHandle = $ThisControl.getValue();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Enables Render of Object Node Icons (N)";
             hovertime = "1000";
             bitmap = "tools/gui/images/menubar/object-node-icon";
@@ -409,7 +409,7 @@
             internalName = "renderTextBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "33 0";
@@ -419,7 +419,7 @@
             Visible = "1";
             Variable = "EWorldEditor.renderObjText";
             Command = "EWorldEditor.renderObjText = $ThisControl.getValue();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Enables Render of Object Node Lables (SHIFT N)";
             hovertime = "1000";
             bitmap = "tools/gui/images/menubar/object-node-lable";
@@ -432,16 +432,16 @@
       
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "379 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
             
       new GuiControl(PrefabBar){
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          Position = "386 3";
          Extent = "63 27";
          visible = true;
@@ -451,7 +451,7 @@
             internalName = "makePrefabBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "0 0";
@@ -461,7 +461,7 @@
             Visible = "1";
             Variable = "";
             Command = "EditorMakePrefab();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Make the Selection a Prefab.";
             hovertime = "1000";
             bitmap = "tools/gui/images/menubar/selection-to-prefab";
@@ -474,7 +474,7 @@
             internalName = "explodePrefabBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "33 0";
@@ -484,7 +484,7 @@
             Visible = "1";
             Variable = "";
             Command = "EditorExplodePrefab();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Explode the Selected Prefab.";
             hovertime = "1000";
             bitmap = "tools/gui/images/menubar/explode-prefab";
@@ -507,7 +507,7 @@
             internalName = "objectBoxBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 5";
@@ -516,7 +516,7 @@
             canSave = "1";
             Visible = "1";
             Command = "EWorldEditor.objectsUseBoxCenter = 0; EWorldEditor.syncGui(); objectCenterDropdown.toggle(); ";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Use object defined center (O)";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/object-center_n";
@@ -532,7 +532,7 @@
             internalName = "objectBoundsBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 33 ";
@@ -541,7 +541,7 @@
             canSave = "1";
             Visible = "1";
             Command = "EWorldEditor.objectsUseBoxCenter = 1; EWorldEditor.syncGui(); objectCenterDropdown.toggle(); ";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Use bounding box center (P)";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/bounds-center_n";
@@ -554,7 +554,7 @@
          };
          
          new GuiDecoyCtrl(objectCenterDropdownDecoy) {
-            profile = "GuiDefaultProfile";
+            profile = "ToolsGuiDefaultProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "0 0";
@@ -588,7 +588,7 @@
             canSave = "1";
             Visible = "1";
             Command = "GlobalGizmoProfile.setFieldValue(alignment, World);  EWorldEditor.syncGui(); objectTransformDropdown.toggle(); ";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Use world normal for transformations (L)";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/world-transform_n";
@@ -605,7 +605,7 @@
             internalName = "objectTransformBtn";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiIconButtonProfile";
+            Profile = "ToolsGuiIconButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 33";
@@ -614,7 +614,7 @@
             canSave = "1";
             Visible = "1";
             Command = "GlobalGizmoProfile.setFieldValue(alignment, Object); EWorldEditor.syncGui(); objectTransformDropdown.toggle(); ";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Use object normal for transformations (K)";
             hovertime = "1000";
             iconBitmap = "tools/gui/images/menubar/object-transform_n";
@@ -627,7 +627,7 @@
          };
          
          new GuiDecoyCtrl(objectTransformDropdownDecoy) {
-            profile = "GuiDefaultProfile";
+            profile = "ToolsGuiDefaultProfile";
             horizSizing = "right";
             vertSizing = "bottom";
             position = "0 0";
@@ -656,7 +656,7 @@ new GuiMouseEventCtrl(softSnapSizeSliderCtrlContainer, EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(EWorldEditorToolbar-->softSnapSizeTextEdit.getGlobalPosition()) - 12 SPC 

@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl() {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "0";
 
@@ -31,7 +31,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 
@@ -40,7 +40,7 @@
       MinExtent = "210 140";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "DatablockEditorInspectorWindow";
       canSaveDynamicFields = "0";
@@ -54,7 +54,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "4 41";
@@ -62,7 +62,7 @@
          MinExtent = "64 64";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -91,7 +91,7 @@
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -112,7 +112,7 @@
                MinExtent = "8 8";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
                superClass = "EditorInspectorBase";
@@ -133,7 +133,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -159,7 +159,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "DatablockFile";
          canSaveDynamicFields = "0";
@@ -171,7 +171,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "167 23";
@@ -180,7 +180,7 @@
          canSave = "1";
          Visible = "1";
          Command = "DatablockEditorPlugin.save();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Save Datablock (ALT S)";
          hovertime = "1000";
          canSaveDynamicFields = "0";
@@ -191,7 +191,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "187 23";
@@ -200,7 +200,7 @@
          canSave = "1";
          Visible = "1";
          Command = "DatablockEditorPlugin.showSaveNewFileDialog();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Save Datablock to a New File";
          hovertime = "1000";
          canSaveDynamicFields = "0";
