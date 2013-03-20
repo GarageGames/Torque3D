@@ -72,6 +72,7 @@ switch( Generator::$platform )
 
 addEngineSrcDir('platform/threads');
 addEngineSrcDir('platform/async');
+addEngineSrcDir('platform/input');
 addEngineSrcDir('app');
 addEngineSrcDir('app/net');
 

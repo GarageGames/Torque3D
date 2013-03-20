@@ -1,9 +1,12 @@
 # makefile for libpng under FreeBSD
-# Copyright (C) 2002, 2007 Glenn Randers-Pehrson and Andrey A. Chernov
-# For conditions of distribution and use, see copyright notice in png.h
+# Copyright (C) 2002, 2007, 2009 Glenn Randers-Pehrson and Andrey A. Chernov
+#
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
 
 PREFIX?=        /usr/local
-SHLIB_VER?=     5
+SHLIB_VER?=     15
 
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}
@@ -14,20 +17,18 @@ NOOBJ=          YES
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
 LIBDIR=		/lib
-INCS=		png.h pngconf.h
+INCS=		png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 INCSDIR=	/include/libpng
 INCDIR=		${INCSDIR}		# for 4.x bsd.lib.mk
 MAN=		libpng.3 libpngpf.3 png.5
 MANDIR=		/man/man
 SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
-		libpng/pngconf.h ${INCSDIR}/../pngconf.h
+		libpng/pngconf.h ${INCSDIR}/../pngconf.h \
+		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
 CFLAGS+= -I.
-.if (${MACHINE_ARCH} != "i386")
-CFLAGS+= -DPNG_NO_MMX_CODE
-.endif
 
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
@@ -40,6 +41,10 @@ CLEANFILES= pngtest pngtest.o pngout.png
 
 test: pngtest
 	./pngtest
+
+# see scripts/pnglibconf.mak for more options
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+	cp scripts/pnglibconf.h.prebuilt $@
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

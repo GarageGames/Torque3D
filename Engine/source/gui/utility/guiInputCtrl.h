@@ -26,9 +26,6 @@
 #ifndef _GUIMOUSEEVENTCTRL_H_
    #include "gui/utility/guiMouseEventCtrl.h"
 #endif
-#ifndef _EVENT_H_
-   #include "platform/event.h"
-#endif
 
 
 /// A control that locks the mouse and reports all keyboard input events

@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platform/event.h"
 #include "sim/netConnection.h"
 #include "sim/netInterface.h"
 #include "core/stream/bitStream.h"

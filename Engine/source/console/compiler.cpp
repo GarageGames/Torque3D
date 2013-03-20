@@ -23,7 +23,6 @@
 #include "platform/platform.h"
 #include "console/console.h"
 #include "console/telnetDebugger.h"
-#include "platform/event.h"
 
 #include "console/ast.h"
 #include "core/tAlgorithm.h"

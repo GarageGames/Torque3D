@@ -41,6 +41,9 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
       /// The color to display on the button.
       ColorF mSwatchColor;
       
+      /// Bitmap used for mGrid
+      String mGridBitmap;
+
       /// Background texture that will show through with transparent colors.
       GFXTexHandle mGrid;
       

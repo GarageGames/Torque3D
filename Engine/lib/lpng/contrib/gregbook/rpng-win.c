@@ -23,10 +23,11 @@
               command-line parsing bug
     - 1.10:  enabled "message window"/console (thanks to David Geldreich)
     - 2.00:  dual-licensed (added GNU GPL)
+    - 2.01:  fixed improper display of usage screen on PNG error(s)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -77,14 +78,40 @@
 
 #define PROGNAME  "rpng-win"
 #define LONGNAME  "Simple PNG Viewer for Windows"
-#define VERSION   "2.00 of 2 June 2007"
+#define VERSION   "2.01 of 16 March 2008"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <windows.h>
+#ifdef __CYGWIN__
+/* getch replacement. Turns out, we don't really need this,
+ * but leave it here if we ever enable any of the uses of
+ * _getch in the main code
+ */
+#include <unistd.h>
+#include <termio.h>
+#include <sys/ioctl.h>
+int repl_getch( void )
+{
+  char ch;
+  int fd = fileno(stdin);
+  struct termio old_tty, new_tty;
+
+  ioctl(fd, TCGETA, &old_tty);
+  new_tty = old_tty;
+  new_tty.c_lflag &= ~(ICANON | ECHO | ISIG);
+  ioctl(fd, TCSETA, &new_tty);
+  fread(&ch, 1, sizeof(ch), stdin);
+  ioctl(fd, TCSETA, &old_tty);
+
+  return ch;
+}
+#define _getch repl_getch
+#else
 #include <conio.h>      /* only for _getch() */
+#endif
 
 /* #define DEBUG  :  this enables the Trace() macros */
 
@@ -152,7 +179,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 
     filename = (char *)NULL;
 
-
+#ifndef __CYGWIN__
     /* First reenable console output, which normally goes to the bit bucket
      * for windowed apps.  Closing the console window will terminate the
      * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
@@ -161,6 +188,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     AllocConsole();
     freopen("CONOUT$", "a", stderr);
     freopen("CONOUT$", "a", stdout);
+#endif
 
 
     /* Next set the default value for our display-system exponent, i.e.,
@@ -271,9 +299,43 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         }
     }
 
-    if (!filename) {
+    if (!filename)
         ++error;
-    } else if (!(infile = fopen(filename, "rb"))) {
+
+
+    /* print usage screen if any errors up to this point */
+
+    if (error) {
+#ifndef __CYGWIN__
+        int ch;
+#endif
+
+        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
+        readpng_version_info();
+        fprintf(stderr, "\n"
+          "Usage:  %s [-gamma exp] [-bgcolor bg] file.png\n"
+          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
+          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
+          "\t\t  to the product of the lookup-table exponent (varies)\n"
+          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
+          "    bg  \tdesired background color in 7-character hex RGB format\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
+          "\t\t  used with transparent images\n"
+          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
+#ifndef __CYGWIN__
+          "Press Q or Esc to quit this usage screen.\n"
+#endif
+          "\n", PROGNAME, default_display_exponent);
+#ifndef __CYGWIN__
+        do
+            ch = _getch();
+        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+#endif
+        exit(1);
+    }
+
+
+    if (!(infile = fopen(filename, "rb"))) {
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
         ++error;
     } else {
@@ -286,8 +348,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
                     break;
                 case 2:
                     fprintf(stderr, PROGNAME
-                      ":  [%s] has bad IHDR (libpng longjmp)\n",
-                      filename);
+                      ":  [%s] has bad IHDR (libpng longjmp)\n", filename);
                     break;
                 case 4:
                     fprintf(stderr, PROGNAME ":  insufficient memory\n");
@@ -304,34 +365,25 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     }
 
 
-    /* usage screen */
-
     if (error) {
+#ifndef __CYGWIN__
         int ch;
+#endif
 
-        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
-        readpng_version_info();
-        fprintf(stderr, "\n"
-          "Usage:  %s [-gamma exp] [-bgcolor bg] file.png\n"
-          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
-          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
-          "\t\t  to the product of the lookup-table exponent (varies)\n"
-          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
-          "    bg  \tdesired background color in 7-character hex RGB format\n"
-          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
-          "\t\t  used with transparent images\n"
-          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-          "Press Q or Esc to quit this usage screen.\n"
-          "\n", PROGNAME, default_display_exponent);
+        fprintf(stderr, PROGNAME ":  aborting.\n");
+#ifndef __CYGWIN__
         do
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
-        exit(1);
+#endif
+        exit(2);
     } else {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+#ifndef __CYGWIN__
         fprintf(stderr,
           "\n   [console window:  closing this window will terminate %s]\n\n",
           PROGNAME);
+#endif
     }
 
 
@@ -404,7 +456,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     /* wait for the user to tell us when to quit */
 
     printf(
-      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+#ifndef __CYGWIN__
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n"
+#else
+      "Done.  Press mouse button 1 (within image window) to quit.\n"
+#endif
+    );
     fflush(stdout);
 
     while (GetMessage(&msg, NULL, 0, 0)) {

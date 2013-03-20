@@ -27,7 +27,6 @@
 #include "console/ast.h"
 #include "core/stream/fileStream.h"
 #include "console/compiler.h"
-#include "platform/event.h"
 #include "platform/platformInput.h"
 #include "torqueConfig.h"
 #include "core/frameAllocator.h"

@@ -26,6 +26,7 @@
 #include "basicClouds.h"
 
 #include "gfx/gfxTransformSaver.h"
+#include "gfx/gfxTextureManager.h"
 #include "core/stream/fileStream.h"
 #include "core/stream/bitStream.h"
 #include "scene/sceneRenderState.h"
@@ -336,7 +337,7 @@ void BasicClouds::_initTexture()
       mTexture[i].set( mTexName[i], &GFXDefaultStaticDiffuseProfile, "BasicClouds" );
 
       if ( mTexture[i].isNull() )
-         mTexture[i].set( "core/art/warnmat", &GFXDefaultStaticDiffuseProfile, "BasicClouds" );
+         mTexture[i].set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "BasicClouds" );
    }
 }
 

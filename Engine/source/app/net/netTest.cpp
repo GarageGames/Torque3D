@@ -22,7 +22,6 @@
 
 #include "platform/platform.h"
 #include "console/simBase.h"
-#include "platform/event.h"
 #include "sim/netConnection.h"
 #include "core/stream/bitStream.h"
 #include "sim/netObject.h"

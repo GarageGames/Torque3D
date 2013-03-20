@@ -24,7 +24,6 @@
    -------------------------------------------------------------------------- */
    
 #include "colourset.h"
-#include "squishMath.h"
 
 namespace squish {
 
@@ -104,7 +103,7 @@ ColourSet::ColourSet( u8 const* rgba, int mask, int flags )
 
 	// square root the weights
 	for( int i = 0; i < m_count; ++i )
-		m_weights[i] = SquishMath::sqrt( m_weights[i] );
+		m_weights[i] = std::sqrt( m_weights[i] );
 }
 
 void ColourSet::RemapIndices( u8 const* source, u8* target ) const
