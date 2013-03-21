@@ -43,6 +43,7 @@ function initializeWorldEditor()
    exec("./gui/TimeAdjustGui.ed.gui");
    exec("./gui/AddFMODProjectDlg.ed.gui");
    exec("./gui/SelectObjectsWindow.ed.gui");
+   exec("./gui/ProceduralTerrainPainterGui.gui" );
    
    // Load Scripts.
    exec("./scripts/menus.ed.cs");
