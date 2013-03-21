@@ -64,6 +64,7 @@ function TerrainEditor::setPaintMaterial( %this, %matIndex, %terrainMat )
    ETerrainMaterialSelected.bitmap = %terrainMat.diffuseMap;
    ETerrainMaterialSelectedEdit.Visible = isObject(%terrainMat);
    TerrainTextureText.text = %terrainMat.getInternalName();
+   ProceduralTerrainPainterDescription.text = "Generate "@ %terrainMat.getInternalName() @" layer";
 }
 
 function TerrainEditor::setup( %this )

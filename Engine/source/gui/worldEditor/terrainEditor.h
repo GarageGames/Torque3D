@@ -230,6 +230,8 @@ class TerrainEditor : public EditTSCtrl
       void submitMaterialUndo( String actionName );
       void onMaterialUndo( TerrainBlock *terr );
 
+      void autoMaterialLayer(F32, F32, F32, F32);
+
 	private:	
 
       typedef EditTSCtrl Parent;
