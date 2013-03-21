@@ -61,10 +61,11 @@ const String ShaderGenVars::lightDiffuse("$inLightColor");
 const String ShaderGenVars::lightAmbient("$ambient");
 const String ShaderGenVars::lightInvRadiusSq("$inLightInvRadiusSq");
 const String ShaderGenVars::lightSpotDir("$inLightSpotDir");
-const String ShaderGenVars::lightSpotAngle("$inLightSpotAngle");
 const String ShaderGenVars::lightSpotFalloff("$inLightSpotFalloff");
+const String ShaderGenVars::lightSpotAngle("$inLightSpotAngle");
 const String ShaderGenVars::specularColor("$specularColor");
 const String ShaderGenVars::specularPower("$specularPower");
+const String ShaderGenVars::specularStrength("$specularStrength");
 
 // These are ignored by the D3D layers.
 const String ShaderGenVars::fogMap("$fogMap");

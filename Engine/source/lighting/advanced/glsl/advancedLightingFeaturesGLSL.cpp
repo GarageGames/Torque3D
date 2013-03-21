@@ -32,20 +32,9 @@
 #include "materials/materialFeatureTypes.h"
 
 
-void DeferredRTLightingFeatGLSL::processPixMacros( Vector<GFXShaderMacro> &macros, 
+void DeferredRTLightingFeatGLSL::processPixMacros( Vector<GFXShaderMacro> &macros,
                                                    const MaterialFeatureData &fd  )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if ( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::processPixMacros( macros, fd );
-      return;
-   }
-   */
-
    // Pull in the uncondition method for the light info buffer
    NamedTexTarget *texTarget = NamedTexTarget::find( AdvancedLightBinManager::smBufferName );
    if ( texTarget && texTarget->getConditioner() )
@@ -56,19 +45,9 @@ void DeferredRTLightingFeatGLSL::processPixMacros( Vector<GFXShaderMacro> &macro
    }
 }
 
-void DeferredRTLightingFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void DeferredRTLightingFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                                 const MaterialFeatureData &fd )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if ( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::processVert( componentList, fd );
-      return;
-   }
-   */
 
    // Pass screen space position to pixel shader to compute a full screen buffer uv
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -76,25 +55,12 @@ void DeferredRTLightingFeatGLSL::processVert(   Vector<ShaderComponent*> &compon
    ssPos->setName( "screenspacePos" );
    ssPos->setType( "vec4" );
 
-//   Var *outPosition = (Var*) LangElement::find( "hpos" );
-//   AssertFatal( outPosition, "No hpos, ohnoes." );
-
    output = new GenOp( "   @ = gl_Position;\r\n", ssPos );
 }
 
 void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                              const MaterialFeatureData &fd )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if ( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::processPix( componentList, fd );
-      return;
-   }
-   */
 
    MultiLine *meta = new MultiLine;
 
@@ -135,11 +101,11 @@ void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &component
    lightInfoBuffer->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
    String unconditionLightInfo = String::ToLower( AdvancedLightBinManager::smBufferName ) + "Uncondition";
-   
+
    meta->addStatement( new GenOp( "   vec3 d_lightcolor;\r\n" ) );
    meta->addStatement( new GenOp( "   float d_NL_Att;\r\n" ) );
    meta->addStatement( new GenOp( "   float d_specular;\r\n" ) );
-   meta->addStatement( new GenOp( avar( "   %s(texture2D(@, @), d_lightcolor, d_NL_Att, d_specular);\r\n", unconditionLightInfo.c_str() ), 
+   meta->addStatement( new GenOp( avar( "   %s(texture2D(@, @), d_lightcolor, d_NL_Att, d_specular);\r\n", unconditionLightInfo.c_str() ),
       lightInfoBuffer, uvScene ) );
 
    Var *rtShading = new Var;
@@ -157,35 +123,18 @@ void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &component
 
 ShaderFeature::Resources DeferredRTLightingFeatGLSL::getResources( const MaterialFeatureData &fd )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if( fd.features[MFT_IsTranslucent] )
-      return Parent::getResources( fd );
-   */
 
-   Resources res; 
+   Resources res;
    res.numTex = 1;
    res.numTexReg = 1;
    return res;
 }
 
 void DeferredRTLightingFeatGLSL::setTexData( Material::StageData &stageDat,
-                                             const MaterialFeatureData &fd, 
-                                             RenderPassData &passData, 
+                                             const MaterialFeatureData &fd,
+                                             RenderPassData &passData,
                                              U32 &texIndex )
 {
-   /// TODO: This needs to be done via some sort of material
-   /// feature and not just allow all translucent elements to
-   /// read from the light prepass.
-   /*
-   if( fd.features[MFT_IsTranslucent] )
-   {
-      Parent::setTexData( stageDat, fd, passData, texIndex );
-      return;
-   }
-   */
 
    NamedTexTarget *texTarget = NamedTexTarget::find( AdvancedLightBinManager::smBufferName );
    if( texTarget )
@@ -196,13 +145,13 @@ void DeferredRTLightingFeatGLSL::setTexData( Material::StageData &stageDat,
 }
 
 
-void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
 {
    if( fd.features[MFT_PrePassConditioner] )
    {
       // There is an output conditioner active, so we need to supply a transform
-      // to the pixel shader. 
+      // to the pixel shader.
       MultiLine *meta = new MultiLine;
 
       // setup texture space matrix
@@ -226,7 +175,7 @@ void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentLis
       worldToObj->setName( "worldToObj" );
       worldToObj->uniform = true;
       worldToObj->constSortPos = cspPrimitive;
-      
+
       Var *mat3Conversion = new Var;
       mat3Conversion->setType( "mat3" );
       mat3Conversion->setName( "worldToObjMat3" );
@@ -289,8 +238,8 @@ void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentLis
 
       output = meta;
    }
-   else if (   fd.materialFeatures[MFT_NormalsOut] || 
-               fd.features[MFT_IsTranslucent] || 
+   else if (   fd.materialFeatures[MFT_NormalsOut] ||
+               fd.features[MFT_IsTranslucent] ||
                !fd.features[MFT_RTLighting] )
    {
       Parent::processVert( componentList, fd );
@@ -302,7 +251,7 @@ void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentLis
    }
 }
 
-void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // NULL output in case nothing gets handled
@@ -367,22 +316,22 @@ void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
       LangElement *bumpNormDecl = new DecOp( bumpNorm );
       meta->addStatement( expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd ) );
 
-      // This var is read from GBufferConditionerHLSL and 
+      // This var is read from GBufferConditionerHLSL and
       // used in the prepass output.
       Var *gbNormal = new Var;
       gbNormal->setName( "gbNormal" );
       gbNormal->setType( "vec3" );
       LangElement *gbNormalDecl = new DecOp( gbNormal );
 
-      // Normalize is done later... 
+      // Normalize is done later...
       // Note: The reverse mul order is intentional. Affine matrix.
       meta->addStatement( new GenOp( "   @ = @.xyz * @;\r\n", gbNormalDecl, bumpNorm, worldToTangent ) );
 
       output = meta;
       return;
    }
-   else if (   fd.materialFeatures[MFT_NormalsOut] || 
-               fd.features[MFT_IsTranslucent] || 
+   else if (   fd.materialFeatures[MFT_NormalsOut] ||
+               fd.features[MFT_IsTranslucent] ||
                !fd.features[MFT_RTLighting] )
    {
       Parent::processPix( componentList, fd );
@@ -426,13 +375,13 @@ void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
 ShaderFeature::Resources DeferredBumpFeatGLSL::getResources( const MaterialFeatureData &fd )
 {
-   if (  fd.materialFeatures[MFT_NormalsOut] || 
-         fd.features[MFT_IsTranslucent] || 
+   if (  fd.materialFeatures[MFT_NormalsOut] ||
+         fd.features[MFT_IsTranslucent] ||
          fd.features[MFT_Parallax] ||
          !fd.features[MFT_RTLighting] )
       return Parent::getResources( fd );
 
-   Resources res; 
+   Resources res;
    if(!fd.features[MFT_SpecularMap])
    {
       res.numTex = 1;
@@ -442,12 +391,12 @@ ShaderFeature::Resources DeferredBumpFeatGLSL::getResources( const MaterialFeatu
 }
 
 void DeferredBumpFeatGLSL::setTexData( Material::StageData &stageDat,
-                                       const MaterialFeatureData &fd, 
-                                       RenderPassData &passData, 
+                                       const MaterialFeatureData &fd,
+                                       RenderPassData &passData,
                                        U32 &texIndex )
 {
-   if (  fd.materialFeatures[MFT_NormalsOut] || 
-         fd.features[MFT_IsTranslucent] || 
+   if (  fd.materialFeatures[MFT_NormalsOut] ||
+         fd.features[MFT_IsTranslucent] ||
          !fd.features[MFT_RTLighting] )
    {
       Parent::setTexData( stageDat, fd, passData, texIndex );
@@ -457,7 +406,7 @@ void DeferredBumpFeatGLSL::setTexData( Material::StageData &stageDat,
    GFXTextureObject *normalMap = stageDat.getTex( MFT_NormalMap );
    if (  !fd.features[MFT_Parallax] && !fd.features[MFT_SpecularMap] &&
          ( fd.features[MFT_PrePassConditioner] ||
-           fd.features[MFT_PixSpecular] ) &&         
+           fd.features[MFT_PixSpecular] ) &&
          normalMap )
    {
       passData.mTexType[ texIndex ] = Material::Bump;
@@ -466,7 +415,7 @@ void DeferredBumpFeatGLSL::setTexData( Material::StageData &stageDat,
 }
 
 
-void DeferredPixelSpecularGLSL::processVert( Vector<ShaderComponent*> &componentList, 
+void DeferredPixelSpecularGLSL::processVert( Vector<ShaderComponent*> &componentList,
                                              const MaterialFeatureData &fd )
 {
    if( fd.features[MFT_IsTranslucent] || !fd.features[MFT_RTLighting] )
@@ -477,7 +426,7 @@ void DeferredPixelSpecularGLSL::processVert( Vector<ShaderComponent*> &component
    output = NULL;
 }
 
-void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &componentList, 
+void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &componentList,
                                              const MaterialFeatureData &fd )
 {
    if( fd.features[MFT_IsTranslucent] || !fd.features[MFT_RTLighting] )
@@ -507,6 +456,10 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    specPow->setType( "float" );
    specPow->setName( "specularPower" );
 
+   Var *specStrength = new Var;							
+   specStrength->setType( "float" );					
+   specStrength->setName( "specularStrength" );			
+
    // If the gloss map flag is set, than the specular power is in the alpha
    // channel of the specular map
    if( fd.features[ MFT_GlossMap ] )
@@ -515,6 +468,9 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    {
       specPow->uniform = true;
       specPow->constSortPos = cspPotentialPrimitive;
+
+      specStrength->uniform = true;							
+      specStrength->constSortPos = cspPotentialPrimitive;	
    }
 
    Var *constSpecPow = new Var;
@@ -526,13 +482,13 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
    AssertFatal( lightInfoSamp, "Something hosed the deferred features! Can't find lightInfoSample" );
 
-   // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * d_NL_Att;\r\n", specDecl, specPow, constSpecPow ) );
+
+   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * @;\r\n", specDecl, specPow, constSpecPow, specStrength ) );
 
    LangElement *specMul = new GenOp( "@ * @", specCol, specular );
    LangElement *final = specMul;
 
-   // We we have a normal map then mask the specular 
+   // We we have a normal map then mask the specular
    if( !fd.features[MFT_SpecularMap] && fd.features[MFT_NormalMap] )
    {
       Var *bumpSample = (Var*)LangElement::find( "bumpSample" );
@@ -550,7 +506,7 @@ ShaderFeature::Resources DeferredPixelSpecularGLSL::getResources( const Material
    if( fd.features[MFT_IsTranslucent] || !fd.features[MFT_RTLighting] )
       return Parent::getResources( fd );
 
-   Resources res; 
+   Resources res;
    return res;
 }
 
@@ -567,8 +523,8 @@ ShaderFeature::Resources DeferredMinnaertGLSL::getResources( const MaterialFeatu
 }
 
 void DeferredMinnaertGLSL::setTexData( Material::StageData &stageDat,
-                                       const MaterialFeatureData &fd, 
-                                       RenderPassData &passData, 
+                                       const MaterialFeatureData &fd,
+                                       RenderPassData &passData,
                                        U32 &texIndex )
 {
    if( !fd.features[MFT_IsTranslucent] && fd.features[MFT_RTLighting] )
@@ -582,7 +538,7 @@ void DeferredMinnaertGLSL::setTexData( Material::StageData &stageDat,
    }
 }
 
-void DeferredMinnaertGLSL::processPixMacros( Vector<GFXShaderMacro> &macros, 
+void DeferredMinnaertGLSL::processPixMacros( Vector<GFXShaderMacro> &macros,
                                              const MaterialFeatureData &fd  )
 {
    if( !fd.features[MFT_IsTranslucent] && fd.features[MFT_RTLighting] )
@@ -641,12 +597,12 @@ void DeferredMinnaertGLSL::processVert(   Vector<ShaderComponent*> &componentLis
    }
 
    // Kick out the world-space normal
-   LangElement *statement = new GenOp( "   @ = vec4(@, @) - vec4(@, 0.0);\r\n", 
+   LangElement *statement = new GenOp( "   @ = vec4(@, @) - vec4(@, 0.0);\r\n",
       outWSEyeVec, objToWorld, inVertPos, eyePosWorld );
    output = statement;
 }
 
-void DeferredMinnaertGLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void DeferredMinnaertGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // If there is no deferred information, bail on this feature
@@ -698,7 +654,7 @@ void DeferredMinnaertGLSL::processPix( Vector<ShaderComponent*> &componentList,
 }
 
 
-void DeferredSubSurfaceGLSL::processPix(  Vector<ShaderComponent*> &componentList, 
+void DeferredSubSurfaceGLSL::processPix(  Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
 {
    // If there is no deferred information, bail on this feature
