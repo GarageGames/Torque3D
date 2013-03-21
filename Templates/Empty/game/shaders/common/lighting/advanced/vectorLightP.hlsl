@@ -198,7 +198,7 @@ float4 main( FarFrustumQuadConnectP IN,
    // Specular term
    float specular = AL_CalcSpecular(   -lightDirection, 
                                        normal, 
-                                       normalize(-IN.vsEyeRay) ) * lightColor.a;
+                                       normalize(-IN.vsEyeRay) ) * lightBrightness * shadowed;
                                     
    float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
    float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
