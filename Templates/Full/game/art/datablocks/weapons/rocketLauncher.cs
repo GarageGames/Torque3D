@@ -548,6 +548,7 @@ datablock ParticleData(RLWaterExpDust)
    sizes[1] = 1.5;
    times[0] = 0.0;
    times[1] = 1.0;
+   times[2] = 1.0;
 };
 
 datablock ParticleEmitterData(RLWaterExpDustEmitter)
