@@ -510,6 +510,26 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
+      new GuiCheckBoxCtrl() {
+         text = " Flip Y axis?";
+         groupNum = "-1";
+         buttonType = "ToggleButton";
+         useMouseEvents = "0";
+         position = "12 222";
+         extent = "140 30";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiCheckBoxProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         internalName = "FlipYAxis";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
    };
 };
 //--- OBJECT WRITE END ---
@@ -532,6 +552,8 @@ function TerrainImportGui::import( %this )
      
    %metersPerPixel = %this-->MetersPerPixel.getText();
    %heightScale = %this-->HeightScale.getText();
+   
+   %flipYAxis = %this-->FlipYAxis.isStateOn();
    
    // Grab and validate terrain object name.
    
@@ -568,7 +590,8 @@ function TerrainImportGui::import( %this )
                                   %metersPerPixel, 
                                   %heightScale, 
                                   %opacityNames, 
-                                  %materialNames );
+                                  %materialNames,
+                                  %flipYAxis );
 
    Canvas.popDialog( %this );
 
