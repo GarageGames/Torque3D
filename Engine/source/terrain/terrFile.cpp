@@ -684,7 +684,7 @@ void TerrainFile::import(  const GBitmap &heightMap,
                            F32 heightScale,
                            const Vector<U8> &layerMap, 
                            const Vector<String> &materials,
-                           bool flipYAxis)
+                           bool flipYAxis )
 {
    AssertFatal( heightMap.getWidth() == heightMap.getHeight(), "TerrainFile::import - Height map is not square!" );
    AssertFatal( isPow2( heightMap.getWidth() ), "TerrainFile::import - Height map is not power of two!" );
