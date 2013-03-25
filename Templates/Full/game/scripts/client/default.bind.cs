@@ -795,7 +795,6 @@ vehicleMap.bindCmd(keyboard, "ctrl f","getout();","");
 vehicleMap.bind(keyboard, space, brake);
 vehicleMap.bindCmd(keyboard, "l", "brakeLights();", "");
 vehicleMap.bindCmd(keyboard, "escape", "", "handleEscape();");
-vehicleMap.bind(keyboard, h, showControlsHelp);
 vehicleMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
 //vehicleMap.bind(keyboard, tab, toggleFirstPerson );
 vehicleMap.bind(keyboard, "alt c", toggleCamera);

@@ -46,7 +46,7 @@ datablock ParticleData(TeleporterParticles)
 {
    lifetimeMS = "750";
    lifetimeVarianceMS = "100";
-   textureName = "art/shapes/particles/Streak.png";
+   textureName = "art/particles/Streak.png";
    useInvAlpha = "0";
    gravityCoefficient = "-1";
    spinSpeed = "0";
@@ -61,7 +61,7 @@ datablock ParticleData(TeleporterParticles)
    times[0]      = 0.0;
    times[1]      = "0.415686";
    times[2]      = "0.74902";
-   animTexName = "art/shapes/particles/Streak.png";
+   animTexName = "art/particles/Streak.png";
    inheritedVelFactor = "0.0998043";
    constantAcceleration = "-2";
    colors[3] = "0.694118 0.843137 0.945098 0";
