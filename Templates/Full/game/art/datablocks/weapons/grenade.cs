@@ -41,7 +41,7 @@ datablock SFXProfile(GrenadeExplosionSound)
 
 datablock ParticleData(GrenadeDebrisFireParticle)
 {
-   textureName = "art/shapes/particles/impact";
+   textureName = "art/particles/impact";
    dragCoeffiecient = 0;
    gravityCoefficient = -1.00366;
    inheritedVelFactor = 0.0;
@@ -61,7 +61,7 @@ datablock ParticleData(GrenadeDebrisFireParticle)
    times[0] = 0.0;
    times[1] = 0.494118;
    times[2] = 1.0;
-   animTexName = "art/shapes/particles/impact";
+   animTexName = "art/particles/impact";
    colors[3] = "1 1 1 0.407";
    sizes[3] = "0.5";
 };
@@ -116,7 +116,7 @@ datablock DebrisData(GrenadeDebris)
 
 datablock ParticleData(GrenadeExpFire)
 {
-   textureName = "art/shapes/particles/fireball.png";
+   textureName = "art/particles/fireball.png";
    dragCoeffiecient = 0;
    windCoeffiecient = 0.5;
    gravityCoefficient = -1;
@@ -137,7 +137,7 @@ datablock ParticleData(GrenadeExpFire)
    times[0] = 0.0;
    times[1] = 0.25;
    times[2] = 0.5;
-   animTexName = "art/shapes/particles/fireball.png";
+   animTexName = "art/particles/fireball.png";
    times[3] = "1";
    dragCoefficient = "1.99902";
    sizes[3] = "10";
@@ -159,7 +159,7 @@ datablock ParticleEmitterData(GrenadeExpFireEmitter)
 
 datablock ParticleData(GrenadeExpDust)
 {
-   textureName = "art/shapes/particles/smoke.png";
+   textureName = "art/particles/smoke.png";
    dragCoefficient = 0.498534;
    gravityCoefficient = 0;
    inheritedVelFactor = 1;
@@ -179,7 +179,7 @@ datablock ParticleData(GrenadeExpDust)
    times[0] = 0.0;
    times[1] = 0.494118;
    times[2] = 1.0;
-   animTexName = "art/shapes/particles/smoke.png";
+   animTexName = "art/particles/smoke.png";
    colors[3] = "0.996078 0.996078 0.996078 0";
    sizes[3] = "15";
 };
@@ -203,7 +203,7 @@ datablock ParticleEmitterData(GrenadeExpDustEmitter)
 
 datablock ParticleData(GrenadeExpSpark)
 {
-   textureName = "art/shapes/particles/Sparkparticle";
+   textureName = "art/particles/Sparkparticle";
    dragCoefficient = 1;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.2;
@@ -240,7 +240,7 @@ datablock ParticleEmitterData(GrenadeExpSparkEmitter)
 
 datablock ParticleData(GrenadeExpSparks)
 {
-   textureName = "art/shapes/particles/droplet";
+   textureName = "art/particles/droplet";
    dragCoefficient = 1;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.2;
@@ -280,7 +280,7 @@ datablock ParticleEmitterData(GrenadeExpSparksEmitter)
 
 datablock ParticleData(GrenadeExpSmoke)
 {
-   textureName = "art/shapes/particles/smoke";
+   textureName = "art/particles/smoke";
    dragCoeffiecient = 0;
    gravityCoefficient = -0.40293;
    inheritedVelFactor = 0.0;
@@ -300,7 +300,7 @@ datablock ParticleData(GrenadeExpSmoke)
    times[0] = 0;
    times[1] = 0.498039;
    times[2] = 1;
-   animTexName = "art/shapes/particles/smoke";
+   animTexName = "art/particles/smoke";
    times[3] = "1";
 };
 
