@@ -47,7 +47,7 @@ function ParticleEditor::initEditor( %this )
    };
    datablock ParticleData(PE_ParticleEditor_NotDirtyParticle)
    {
-      textureName = "art/shapes/particles/defaultParticle";
+      textureName = "art/particles/defaultParticle";
    };
    
    PE_UnlistedEmitters.add( PE_EmitterEditor_NotDirtyEmitter );
