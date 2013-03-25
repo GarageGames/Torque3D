@@ -152,7 +152,8 @@ public:
    void import(   const GBitmap &heightMap, 
                   F32 heightScale,
                   const Vector<U8> &layerMap, 
-                  const Vector<String> &materials );
+                  const Vector<String> &materials,
+                  bool flipYAxis = true );
 
    /// Updates the terrain grid for the specified area.
    void updateGrid( const Point2I &minPt, const Point2I &maxPt );
