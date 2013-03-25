@@ -233,7 +233,8 @@ public:
                   F32 heightScale, 
                   F32 metersPerPixel,
                   const Vector<U8> &layerMap, 
-                  const Vector<String> &materials );
+                  const Vector<String> &materials,
+                  bool flipYAxis = true );
 
 #ifdef TORQUE_TOOLS
    bool exportHeightMap( const UTF8 *filePath, const String &format ) const;

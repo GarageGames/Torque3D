@@ -120,8 +120,8 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    return terrain->getId();
 }
 
-ConsoleStaticMethod( TerrainBlock, import, S32, 7, 7, 
-   "( String terrainName, String heightMap, F32 metersPerPixel, F32 heightScale, String materials, String opacityLayers )\n"
+ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8, 
+   "( String terrainName, String heightMap, F32 metersPerPixel, F32 heightScale, String materials, String opacityLayers[, bool flipYAxis=true] )\n"
    "" )
 {
    // Get the parameters.
@@ -131,6 +131,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 7,
    F32 heightScale = dAtof(argv[4]);
    const UTF8 *opacityFiles = argv[5];
    const UTF8 *materialsStr = argv[6];
+   bool flipYAxis = argc == 8? dAtob(argv[7]) : true;
 
    // First load the height map and validate it.
    Resource<GBitmap> heightmap = GBitmap::load( hmap );
@@ -251,12 +252,12 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 7,
    // Do we have an existing terrain with that name... then update it!
    TerrainBlock *terrain = dynamic_cast<TerrainBlock*>( Sim::findObject( terrainName ) );
    if ( terrain )
-      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials );
+      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials, flipYAxis );
    else
    {
       terrain = new TerrainBlock();
       terrain->assignName( terrainName );
-      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials );
+      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials, flipYAxis );
       terrain->registerObject();
 
       // Add to mission group!
@@ -272,7 +273,8 @@ bool TerrainBlock::import( const GBitmap &heightMap,
                            F32 heightScale, 
                            F32 metersPerPixel,
                            const Vector<U8> &layerMap, 
-                           const Vector<String> &materials )
+                           const Vector<String> &materials,
+                           bool flipYAxis)
 {
    AssertFatal( isServerObject(), "TerrainBlock::import - This should only be called on the server terrain!" );
 
@@ -299,7 +301,7 @@ bool TerrainBlock::import( const GBitmap &heightMap,
    }
 
    // The file does a bunch of the work.
-   mFile->import( heightMap, heightScale, layerMap, materials );
+   mFile->import( heightMap, heightScale, layerMap, materials, flipYAxis );
 
    // Set the square size.
    mSquareSize = metersPerPixel;
