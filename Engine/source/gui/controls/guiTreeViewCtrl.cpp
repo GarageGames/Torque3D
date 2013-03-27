@@ -3437,6 +3437,8 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       scrollVisible(newItem);
 
       onDragDropped_callback();
+
+      buildVisibleTree(false);
    }
 
    mDragMidPoint = NomDragMidPoint;

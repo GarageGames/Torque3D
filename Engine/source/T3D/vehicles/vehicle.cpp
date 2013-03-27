@@ -1316,9 +1316,19 @@ bool Vehicle::updateCollision(F32 dt)
    mRigid.getTransform(&mat);
    cmat = mConvex.getTransform();
 
+   // DS - To prevent exception/crash if there is no mesh collision object
+   if (!cmat.isSingular())
+   {
+      cmat.identity();
+
+      mRigid.getTransform(&cmat);
+   }
+
    mCollisionList.clear();
+
    CollisionState *state = mConvex.findClosestState(cmat, getScale(), mDataBlock->collisionTol);
-   if (state && state->dist <= mDataBlock->collisionTol) 
+
+   if (state && state->dist <= mDataBlock->collisionTol && cmat.isSingular()) 
    {
       //resolveDisplacement(ns,state,dt);
       mConvex.getCollisionInfo(cmat, getScale(), &mCollisionList, mDataBlock->collisionTol);
