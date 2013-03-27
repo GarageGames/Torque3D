@@ -32,6 +32,7 @@ BiQuadToSqr::BiQuadToSqr(  const Point2F &p00,
 {
    m_kB = p10 - p00 ;   // width
    m_kC = p01 - p00;   // height
+
    m_kD = p11 + p00 - p10 - p01; // diagonal dist
 
    if(mFabs(m_kD.x) < POINT_EPSILON)    
@@ -44,7 +45,8 @@ BiQuadToSqr::BiQuadToSqr(  const Point2F &p00,
    m_fCD = mDotPerp( m_kC, m_kD );
 }
 
-Point2F BiQuadToSqr::transform( const Point2F &p ) const
+//Point2F BiQuadToSqr::transform( const Point2F &p ) const
+Point2F BiQuadToSqr::transform( const Point2F &p )
 {
    Point2F kA = m_kP00 - p;
    
@@ -70,6 +72,7 @@ Point2F BiQuadToSqr::transform( const Point2F &p ) const
       if ( fDeviation0 == 0.0f )
          return kResult0;
 
+
       Point2F kResult1( 0, 0 );
       kResult1.x = (-fK1 + fRoot)*fInv;
       kResult1.y = fAB/(m_fBC + m_fBD*kResult1.x);
@@ -77,7 +80,7 @@ Point2F BiQuadToSqr::transform( const Point2F &p ) const
       if ( fDeviation1 == 0.0f )
          return kResult1;
 
-      if (fDeviation0 <= fDeviation1)
+		if (fDeviation0 <= fDeviation1)
       {
          if ( fDeviation0 < POINT_EPSILON )
             return kResult0;
@@ -86,6 +89,29 @@ Point2F BiQuadToSqr::transform( const Point2F &p ) const
       {
          if ( fDeviation1 < POINT_EPSILON )
             return kResult1;
+
+			m_kD.y = 0;
+
+         m_fBC = mDotPerp( m_kB, m_kC );
+         m_fBD = mDotPerp( m_kB, m_kD );   
+         m_fCD = mDotPerp( m_kC, m_kD );
+
+         fAB = mDotPerp( kA, m_kB );
+         fAC = mDotPerp( kA, m_kC);
+
+         fK0 = fAC*m_fBC;
+         fK1 = m_fBC*m_fBC + fAC*m_fBD - fAB*m_fCD;
+         fK2 = m_fBC*m_fBD;
+
+         fInv = 0.5f/fK2;
+         fDiscr = fK1*fK1 - 4.0f*fK0*fK2;
+         fRoot = mSqrt( mFabs(fDiscr) );
+
+	      Point2F kResult( 0, 0 );
+	      kResult.x = (-fK1 + fRoot)*fInv;
+		   kResult.y = fAB/(m_fBC + m_fBD*kResult.x);
+			
+		   return kResult;
       }
    }
    else
@@ -96,6 +122,7 @@ Point2F BiQuadToSqr::transform( const Point2F &p ) const
       kResult.x = -fK0/fK1;
       kResult.y = fAB/(m_fBC + m_fBD*kResult.x);
       F32 fDeviation = deviation(kResult);
+
       if ( fDeviation < POINT_EPSILON )
          return kResult;
    }

@@ -1012,7 +1012,7 @@ void TSMesh::computeBounds( const MatrixF &transform, Box3F &bounds, S32 frame, 
    S32 stride = 0;
    S32 numVerts = 0;
 
-   if(mVertexData.isReady())
+   if(mVertexData.isReady() && mVertexData.size() > 0)
    {
       baseVert = &mVertexData[0].vert();
       stride = mVertexData.vertSize();

@@ -470,6 +470,7 @@ static void m_matF_inverse_C(F32 *m)
    // using Cramers Rule find the Inverse
    // Minv = (1/det(M)) * adjoint(M)
    F32 det = m_matF_determinant( m );
+
    AssertFatal( det != 0.0f, "MatrixF::inverse: non-singular matrix, no inverse.");
 
    F32 invDet = 1.0f/det;
@@ -514,6 +515,7 @@ static void m_matF_invert_to_C(const F32 *m, F32 *d)
    // using Cramers Rule find the Inverse
    // Minv = (1/det(M)) * adjoint(M)
    F32 det = m_matF_determinant( m );
+
    AssertFatal( det != 0.0f, "MatrixF::inverse: non-singular matrix, no inverse.");
 
    F32 invDet = 1.0f/det;
