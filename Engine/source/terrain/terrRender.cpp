@@ -94,6 +94,10 @@ void TerrainBlock::_updateMaterials()
       if (  mat->getDetailMap().isNotEmpty() &&
             mat->getDetailDistance() > mMaxDetailDistance )
          mMaxDetailDistance = mat->getDetailDistance();
+
+      if (  mat->getMacroMap().isNotEmpty() &&
+            mat->getMacroDistance() > mMaxDetailDistance )
+         mMaxDetailDistance = mat->getMacroDistance();
    }
 
    if ( mCell )
