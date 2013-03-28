@@ -655,7 +655,7 @@ datablock PlayerData(DefaultPlayerData)
    DecalData = "PlayerFootprint";
 
    // Allowable Inventory Items
-   mainWeapon = Lurker;
+   mainWeapon = Ryder;
 
    maxInv[Lurker] = 1;
    maxInv[LurkerClip] = 20;
