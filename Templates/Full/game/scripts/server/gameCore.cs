@@ -639,7 +639,7 @@ function GameCore::loadOut(%game, %player)
    }
    else
    {
-      %player.mountImage(Lurker, 0);
+      %player.mountImage(Ryder, 0);
    }
 }
 
