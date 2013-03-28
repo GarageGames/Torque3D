@@ -266,22 +266,6 @@
       canSave = "1";
       canSaveDynamicFields = "0";
    };
-   new GuiBitmapCtrl(OOBSign) {
-      bitmap = "art/gui/playHud/missionAreaWarning.png";
-      wrap = "0";
-      isContainer = "0";
-      Profile = "GuiDefaultProfile";
-      HorizSizing = "right";
-      VertSizing = "top";
-      position = "512 693";
-      Extent = "64 64";
-      MinExtent = "8 8";
-      canSave = "1";
-      Visible = "0";
-      tooltipprofile = "GuiToolTipProfile";
-      hovertime = "1000";
-      canSaveDynamicFields = "0";
-   };
    new GuiControl(DamageHUD) {
       position = "384 256";
       extent = "256 256";
