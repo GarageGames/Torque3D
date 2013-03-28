@@ -66,6 +66,11 @@ protected:
    /// planes.
    bool mSideProjection;
 
+   FileName mMacroMap;
+   F32 mMacroSize;
+   F32 mMacroStrength;
+   F32 mMacroDistance;
+
    ///
    F32 mParallaxScale;
 
@@ -96,11 +101,19 @@ public:
 
    const String& getDetailMap() const { return mDetailMap; }
 
+   const String& getMacroMap() const { return mMacroMap; }
+
    F32 getDetailSize() const { return mDetailSize; }
 
    F32 getDetailStrength() const { return mDetailStrength; }
 
    F32 getDetailDistance() const { return mDetailDistance; }
+
+   F32 getMacroSize() const { return mMacroSize; }
+
+   F32 getMacroDistance() const { return mMacroDistance; }
+
+   F32 getMacroStrength() const { return mMacroStrength; }
 
    bool useSideProjection() const { return mSideProjection; }
 

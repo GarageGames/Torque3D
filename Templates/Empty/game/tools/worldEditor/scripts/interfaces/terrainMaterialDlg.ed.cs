@@ -247,6 +247,29 @@ function TerrainMaterialDlg::changeDetail( %this )
    %ctrl.setBitmap( %file );  
 }
 
+//----------------------------------------------------------------------------
+
+function TerrainMaterialDlg::changeMacro( %this )
+{
+   %ctrl = %this-->macroTexCtrl;
+   %file = %ctrl.bitmap;
+   if( getSubStr( %file, 0 , 6 ) $= "tools/" )
+      %file = "";
+
+   %file = TerrainMaterialDlg._selectTextureFileDialog( %file );  
+   if( %file $= "" )
+   {
+      if( %ctrl.bitmap !$= "" )
+         %file = %ctrl.bitmap;
+      else
+         %file = "tools/materialeditor/gui/unknownImage";
+   }
+   
+   %file = makeRelativePath( %file, getMainDotCsDir() );
+   %ctrl.setBitmap( %file );  
+}
+
+
 //-----------------------------------------------------------------------------
 
 function TerrainMaterialDlg::changeNormal( %this )
@@ -362,6 +385,11 @@ function TerrainMaterialDlg::setActiveMaterial( %this, %mat )
       }else{
          %this-->detailTexCtrl.setBitmap( %mat.detailMap );
       }
+      if (%mat.macroMap $= ""){
+         %this-->macroTexCtrl.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      }else{
+         %this-->macroTexCtrl.setBitmap( %mat.macroMap );
+      }      
       if (%mat.normalMap $= ""){
          %this-->normTexCtrl.setBitmap( "tools/materialeditor/gui/unknownImage" );
       }else{
@@ -373,6 +401,10 @@ function TerrainMaterialDlg::setActiveMaterial( %this, %mat )
       %this-->detDistanceCtrl.setText( %mat.detailDistance );      
       %this-->sideProjectionCtrl.setValue( %mat.useSideProjection );
       %this-->parallaxScaleCtrl.setText( %mat.parallaxScale );
+
+      %this-->macroSizeCtrl.setText( %mat.macroSize );
+      %this-->macroStrengthCtrl.setText( %mat.macroStrength );
+      %this-->macroDistanceCtrl.setText( %mat.macroDistance );      
             
       %this.activateMaterialCtrls( true );      
    }
@@ -411,12 +443,21 @@ function TerrainMaterialDlg::saveDirtyMaterial( %this, %mat )
    }else{
       %newDetail = %this-->detailTexCtrl.bitmap;  
    }
+   if (%this-->macroTexCtrl.bitmap $= "tools/materialeditor/gui/unknownImage"){
+      %newMacro = "";
+   }else{
+      %newMacro = %this-->macroTexCtrl.bitmap;  
+   }
    %detailSize = %this-->detSizeCtrl.getText();      
    %diffuseSize = %this-->baseSizeCtrl.getText();     
    %detailStrength = %this-->detStrengthCtrl.getText();
    %detailDistance = %this-->detDistanceCtrl.getText();   
    %useSideProjection = %this-->sideProjectionCtrl.getValue();   
    %parallaxScale = %this-->parallaxScaleCtrl.getText();
+
+   %macroSize = %this-->macroSizeCtrl.getText();      
+   %macroStrength = %this-->macroStrengthCtrl.getText();
+   %macroDistance = %this-->macroDistanceCtrl.getText();   
    
    // If no properties of this materials have changed,
    // return.
@@ -425,11 +466,15 @@ function TerrainMaterialDlg::saveDirtyMaterial( %this, %mat )
          %mat.diffuseMap $= %newDiffuse &&
          %mat.normalMap $= %newNormal &&
          %mat.detailMap $= %newDetail &&
+         %mat.macroMap $= %newMacro &&
          %mat.detailSize == %detailSize &&
          %mat.diffuseSize == %diffuseSize &&
          %mat.detailStrength == %detailStrength &&
          %mat.detailDistance == %detailDistance &&         
          %mat.useSideProjection == %useSideProjection &&
+         %mat.macroSize == %macroSize &&
+         %mat.macroStrength == %macroStrength &&
+         %mat.macroDistance == %macroDistance &&         
          %mat.parallaxScale == %parallaxScale )               
       return;
       
@@ -454,10 +499,14 @@ function TerrainMaterialDlg::saveDirtyMaterial( %this, %mat )
    %mat.diffuseMap = %newDiffuse;    
    %mat.normalMap = %newNormal;    
    %mat.detailMap = %newDetail;    
+   %mat.macroMap = %newMacro;
    %mat.detailSize = %detailSize;  
    %mat.diffuseSize = %diffuseSize;
    %mat.detailStrength = %detailStrength;    
    %mat.detailDistance = %detailDistance;    
+   %mat.macroSize = %macroSize;  
+   %mat.macroStrength = %macroStrength;    
+   %mat.macroDistance = %macroDistance;    
    %mat.useSideProjection = %useSideProjection;
    %mat.parallaxScale = %parallaxScale;
    
@@ -495,10 +544,14 @@ function TerrainMaterialDlg::snapshotMaterials( %this )
          diffuseMap = %mat.diffuseMap;
          normalMap = %mat.normalMap;
          detailMap = %mat.detailMap;
+         macroMap = %mat.macroMap;
          detailSize = %mat.detailSize;
          diffuseSize = %mat.diffuseSize;
          detailStrength = %mat.detailStrength;
          detailDistance = %mat.detailDistance;
+         macroSize = %mat.macroSize;
+         macroStrength = %mat.macroStrength;
+         macroDistance = %mat.macroDistance;
          useSideProjection = %mat.useSideProjection;
          parallaxScale = %mat.parallaxScale;
       };
@@ -525,10 +578,14 @@ function TerrainMaterialDlg::restoreMaterials( %this )
       %mat.diffuseMap = %obj.diffuseMap;
       %mat.normalMap = %obj.normalMap;
       %mat.detailMap = %obj.detailMap;
+      %mat.macroMap = %obj.macroMap;
       %mat.detailSize = %obj.detailSize;
       %mat.diffuseSize = %obj.diffuseSize;
       %mat.detailStrength = %obj.detailStrength;
       %mat.detailDistance = %obj.detailDistance;
+      %mat.macroSize = %obj.macroSize;
+      %mat.macroStrength = %obj.macroStrength;
+      %mat.macroDistance = %obj.macroDistance;
       %mat.useSideProjection = %obj.useSideProjection;
       %mat.parallaxScale = %obj.parallaxScale;
    }
