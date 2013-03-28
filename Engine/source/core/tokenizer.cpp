@@ -384,6 +384,30 @@ bool Tokenizer::advanceToken(const bool crossLine, const bool assertAvail)
                   cont = false;
                }
             }
+            else if (c == '/' && mpBuffer[mCurrPos+1] == '*')
+            {
+               // Block quote...
+               if (currPosition == 0)
+               {
+                  // continue to end of block, then let crossLine determine on the next pass
+                  while (mCurrPos < mBufferSize - 1 && (mpBuffer[mCurrPos] != '*' || mpBuffer[mCurrPos + 1] != '/'))
+                     mCurrPos++;
+
+                  if (mCurrPos < mBufferSize - 1)
+                     mCurrPos += 2;
+               }
+               else
+               {
+                  // This is the end of the token.  Continue to EOL
+                  while (mCurrPos < mBufferSize - 1 && (mpBuffer[mCurrPos] != '*' || mpBuffer[mCurrPos + 1] != '/'))
+                     mCurrPos++;
+
+                  if (mCurrPos < mBufferSize - 1)
+                     mCurrPos += 2;
+
+                  cont = false;
+               }
+            }
             else
             {
                // If this is the first non-token character then store the
