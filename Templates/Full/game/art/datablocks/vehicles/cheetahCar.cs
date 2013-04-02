@@ -64,7 +64,7 @@ datablock SFXProfile(CheetahTurretFireSound)
 
 datablock ParticleData(CheetahTireParticle)
 {
-   textureName          = "art/shapes/buggy/dustParticle";
+   textureName          = "art/particles/dustParticle";
    dragCoefficient      = "1.99902";
    gravityCoefficient   = "-0.100122";
    inheritedVelFactor   = "0.0998043";
