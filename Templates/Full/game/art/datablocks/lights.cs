@@ -117,7 +117,7 @@ datablock LightFlareData( SunFlareExample )
    overallScale = 4.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "./../special/lensFlareSheet0";  
+   flareTexture = "art/lights/lensFlareSheet0";  
 
    elementRect[0] = "512 0 512 512";
    elementDist[0] = 0.0;
@@ -175,7 +175,7 @@ datablock LightFlareData( SunFlareExample2 )
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "./../special/lensFlareSheet0";  
+   flareTexture = "art/lights/lensFlareSheet0";  
    
    elementRect[0] = "1024 0 128 128";
    elementDist[0] = 0.5;
@@ -219,7 +219,7 @@ datablock LightFlareData(SunFlareExample3)
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "core/art/special/lensflareSheet3.png";  
+   flareTexture = "art/lights/lensflareSheet3.png";  
    
    elementRect[0] = "0 256 256 256";
    elementDist[0] = "-0.6";
@@ -361,7 +361,7 @@ datablock LightFlareData(SunFlarePacificIsland)
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "art/special/lensflareSheet3.png";  
+   flareTexture = "art/lights/lensflareSheet3.png";  
    
    elementRect[0] = "0 256 256 256";
    elementDist[0] = "-0.6";
@@ -502,7 +502,7 @@ datablock LightFlareData( LightFlareExample0 )
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = true;
-   flareTexture = "./../special/lensFlareSheet1";
+   flareTexture = "art/lights/lensFlareSheet1";
    
    elementRect[0] = "0 512 512 512";
    elementDist[0] = 0.0;
@@ -525,7 +525,7 @@ datablock LightFlareData( LightFlareExample1 )
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = true;
-   flareTexture = "./../special/lensFlareSheet1";
+   flareTexture = "art/lights/lensFlareSheet1";
    
    elementRect[0] = "512 512 512 512";
    elementDist[0] = 0.0;
@@ -548,7 +548,7 @@ datablock LightFlareData( LightFlareExample2 )
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = true;
-   flareTexture = "./../special/lensFlareSheet0";  
+   flareTexture = "art/lights/lensFlareSheet0";  
 
    elementRect[0] = "512 512 512 512";
    elementDist[0] = 0.0;
