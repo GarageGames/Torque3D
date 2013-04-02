@@ -22,3 +22,6 @@
 
 // Load up all datablocks.  This function is called when
 // a server is constructed.
+
+// LightFlareData and LightAnimData(s)
+exec("./lights.cs");
