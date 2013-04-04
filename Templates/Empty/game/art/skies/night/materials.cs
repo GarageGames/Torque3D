@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( BlackSkyCubemap )
+singleton CubemapData( NightCubemap )
 {
    cubeFace[0] = "./skybox_1";
    cubeFace[1] = "./skybox_2";
@@ -30,7 +30,24 @@ singleton CubemapData( BlackSkyCubemap )
    cubeFace[5] = "./skybox_6";
 };
 
-singleton Material( BlackSkyMat )
+singleton Material( NightSkyMat )
 {
-   cubemap = BlackSkyCubemap;
+   cubemap = NightCubemap;
+   materialTag0 = "Skies";
+};
+
+singleton Material( Moon_Glow_Mat )
+{
+   baseTex = "./moon_wglow.png";
+   emissive = true;
+   translucent = true;
+   vertColor[ 0 ] = true;
+};
+
+singleton Material( Moon_Mat )
+{
+   baseTex = "./moon_noglow.png";
+   emissive = true;
+   translucent = true;
+   vertColor[ 0 ] = true;
 };
