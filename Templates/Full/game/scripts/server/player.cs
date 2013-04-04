@@ -23,29 +23,12 @@
 // Timeouts for corpse deletion.
 $CorpseTimeoutValue = 45 * 1000;
 
-// // Damage Rate for entering Liquid
-// $DamageLava = 0.01;
-// $DamageHotLava = 0.01;
-// $DamageCrustyLava = 0.01;
-
-// Death Animations
-$PlayerDeathAnim::TorsoFrontFallForward = 1;
-$PlayerDeathAnim::TorsoFrontFallBack = 2;
-$PlayerDeathAnim::TorsoBackFallForward = 3;
-$PlayerDeathAnim::TorsoLeftSpinDeath = 4;
-$PlayerDeathAnim::TorsoRightSpinDeath = 5;
-$PlayerDeathAnim::LegsLeftGimp = 6;
-$PlayerDeathAnim::LegsRightGimp = 7;
-$PlayerDeathAnim::TorsoBackFallForward = 8;
-$PlayerDeathAnim::HeadFrontDirect = 9;
-$PlayerDeathAnim::HeadBackFallForward = 10;
-$PlayerDeathAnim::ExplosionBlowBack = 11;
 
 //----------------------------------------------------------------------------
-// Armor Datablock methods
+// Player Datablock methods
 //----------------------------------------------------------------------------
 
-function Armor::onAdd(%this, %obj)
+function PlayerData::onAdd(%this, %obj)
 {
    // Vehicle timeout
    %obj.mountVehicle = true;
@@ -55,19 +38,19 @@ function Armor::onAdd(%this, %obj)
    %obj.setRepairRate(0);
 }
 
-function Armor::onRemove(%this, %obj)
+function PlayerData::onRemove(%this, %obj)
 {
    if (%obj.client.player == %obj)
       %obj.client.player = 0;
 }
 
-function Armor::onNewDataBlock(%this, %obj)
+function PlayerData::onNewDataBlock(%this, %obj)
 {
 }
 
 //----------------------------------------------------------------------------
 
-function Armor::onMount(%this, %obj, %vehicle, %node)
+function PlayerData::onMount(%this, %obj, %vehicle, %node)
 {
    // Node 0 is the pilot's position, we need to dismount his weapon.
    if (%node == 0)
@@ -92,7 +75,7 @@ function Armor::onMount(%this, %obj, %vehicle, %node)
    }
 }
 
-function Armor::onUnmount(%this, %obj, %vehicle, %node)
+function PlayerData::onUnmount(%this, %obj, %vehicle, %node)
 {
    if (%node == 0)
    {
@@ -101,9 +84,9 @@ function Armor::onUnmount(%this, %obj, %vehicle, %node)
    }
 }
 
-function Armor::doDismount(%this, %obj, %forced)
+function PlayerData::doDismount(%this, %obj, %forced)
 {
-   //echo("\c4Armor::doDismount(" @ %this @", "@ %obj.client.nameBase @", "@ %forced @")");
+   //echo("\c4PlayerData::doDismount(" @ %this @", "@ %obj.client.nameBase @", "@ %forced @")");
 
    // This function is called by player.cc when the jump trigger
    // is true while mounted
@@ -169,7 +152,7 @@ function Armor::doDismount(%this, %obj, %forced)
 
 //----------------------------------------------------------------------------
 
-function Armor::onCollision(%this, %obj, %col)
+function PlayerData::onCollision(%this, %obj, %col)
 {
    if (!isObject(%col) || %obj.getState() $= "Dead")
       return;
@@ -205,14 +188,14 @@ function Armor::onCollision(%this, %obj, %col)
    }
 }
 
-function Armor::onImpact(%this, %obj, %collidedObject, %vec, %vecLen)
+function PlayerData::onImpact(%this, %obj, %collidedObject, %vec, %vecLen)
 {
    %obj.damage(0, VectorAdd(%obj.getPosition(), %vec), %vecLen * %this.speedDamageScale, "Impact");
 }
 
 //----------------------------------------------------------------------------
 
-function Armor::damage(%this, %obj, %sourceObject, %position, %damage, %damageType)
+function PlayerData::damage(%this, %obj, %sourceObject, %position, %damage, %damageType)
 {
    if (!isObject(%obj) || %obj.getState() $= "Dead" || !%damage)
       return;
@@ -237,7 +220,7 @@ function Armor::damage(%this, %obj, %sourceObject, %position, %damage, %damageTy
    }
 }
 
-function Armor::onDamage(%this, %obj, %delta)
+function PlayerData::onDamage(%this, %obj, %delta)
 {
    // This method is invoked by the ShapeBase code whenever the
    // object's damage level changes.
@@ -259,7 +242,7 @@ function Armor::onDamage(%this, %obj, %delta)
 // If we want to deal with the damage information that actually caused this
 // death, then we would have to move this code into the script "damage" method.
 
-function Armor::onDisabled(%this, %obj, %state)
+function PlayerData::onDisabled(%this, %obj, %state)
 {
    // Release the main weapon trigger
    %obj.setImageTrigger(0, false);
@@ -293,7 +276,7 @@ function Armor::onDisabled(%this, %obj, %state)
 
 //-----------------------------------------------------------------------------
 
-function Armor::onLeaveMissionArea(%this, %obj)
+function PlayerData::onLeaveMissionArea(%this, %obj)
 {
    //echo("\c4Leaving Mission Area at POS:"@ %obj.getPosition());
 
@@ -304,7 +287,7 @@ function Armor::onLeaveMissionArea(%this, %obj)
    //%obj.setDamageDt(0.2, "MissionAreaDamage");
 }
 
-function Armor::onEnterMissionArea(%this, %obj)
+function PlayerData::onEnterMissionArea(%this, %obj)
 {
    //echo("\c4Entering Mission Area at POS:"@ %obj.getPosition());
 
@@ -317,19 +300,19 @@ function Armor::onEnterMissionArea(%this, %obj)
 
 //-----------------------------------------------------------------------------
 
-function Armor::onEnterLiquid(%this, %obj, %coverage, %type)
+function PlayerData::onEnterLiquid(%this, %obj, %coverage, %type)
 {
    //echo("\c4this:"@ %this @" object:"@ %obj @" just entered water of type:"@ %type @" for "@ %coverage @"coverage");
 }
 
-function Armor::onLeaveLiquid(%this, %obj, %type)
+function PlayerData::onLeaveLiquid(%this, %obj, %type)
 {
    //
 }
 
 //-----------------------------------------------------------------------------
 
-function Armor::onTrigger(%this, %obj, %triggerNum, %val)
+function PlayerData::onTrigger(%this, %obj, %triggerNum, %val)
 {
    // This method is invoked when the player receives a trigger move event.
    // The player automatically triggers slot 0 and slot one off of triggers #
@@ -338,7 +321,7 @@ function Armor::onTrigger(%this, %obj, %triggerNum, %val)
 
 //-----------------------------------------------------------------------------
 
-function Armor::onPoseChange(%this, %obj, %oldPose, %newPose)
+function PlayerData::onPoseChange(%this, %obj, %oldPose, %newPose)
 {
    // Set the script anim prefix to be that of the current pose
    %obj.setImageScriptAnimPrefix( $WeaponSlot, addTaggedString(%newPose) );
@@ -346,12 +329,12 @@ function Armor::onPoseChange(%this, %obj, %oldPose, %newPose)
 
 //-----------------------------------------------------------------------------
 
-function Armor::onStartSprintMotion(%this, %obj)
+function PlayerData::onStartSprintMotion(%this, %obj)
 {
    %obj.setImageGenericTrigger($WeaponSlot, 0, true);
 }
 
-function Armor::onStopSprintMotion(%this, %obj)
+function PlayerData::onStopSprintMotion(%this, %obj)
 {
    %obj.setImageGenericTrigger($WeaponSlot, 0, false);
 }
