@@ -797,9 +797,9 @@ function ObjectBuilderGui::addWaterObjectFields(%this)
    %this.addField("waveSpeed[2]", "TypeFloat", "Wave Speed", "1");
    %this.addField("overallWaveMagnitude", "TypeFloat", "Overall Wave Magnitude", "1.0");
    
-   %this.addField("rippleTex", "TypeImageFilename", "Ripple Texture", "core/art/water/ripple" );
-   %this.addField("depthGradientTex", "TypeImageFilename", "Depth Gradient Texture", "core/art/water/depthcolor_ramp" );
-   %this.addField("foamTex", "TypeImageFilename", "Foam Texture", "core/art/water/foam" );
+   %this.addField("rippleTex", "TypeImageFilename", "Ripple Texture", "art/water/ripple" );
+   %this.addField("depthGradientTex", "TypeImageFilename", "Depth Gradient Texture", "art/water/depthcolor_ramp" );
+   %this.addField("foamTex", "TypeImageFilename", "Foam Texture", "art/water/foam" );
    %this.addField("cubemap", "TypeRealString", "Cubemap", "DefaultSkyCubemap" );
 }
 
