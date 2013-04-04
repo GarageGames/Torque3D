@@ -20,17 +20,50 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( BlankSkyCubemap )
+singleton CubemapData( BlackSkyCubemap )
 {
-   cubeFace[0] = "./skybox_1";
-   cubeFace[1] = "./skybox_2";
-   cubeFace[2] = "./skybox_3";
-   cubeFace[3] = "./skybox_4";
-   cubeFace[4] = "./skybox_5";
-   cubeFace[5] = "./skybox_6";
+   cubeFace[0] = "./solidsky_black";
+   cubeFace[1] = "./solidsky_black";
+   cubeFace[2] = "./solidsky_black";
+   cubeFace[3] = "./solidsky_black";
+   cubeFace[4] = "./solidsky_black";
+   cubeFace[5] = "./solidsky_black";
 };
 
-singleton Material( BlankSkyMat )
+singleton Material( BlackSkyMat )
 {
-   cubemap = BlankSkyCubemap;
+   cubemap = BlackSkyCubemap;
+   materialTag0 = "Skies";
+};
+
+singleton CubemapData( BlueSkyCubemap )
+{
+   cubeFace[0] = "./solidsky_blue";
+   cubeFace[1] = "./solidsky_blue";
+   cubeFace[2] = "./solidsky_blue";
+   cubeFace[3] = "./solidsky_blue";
+   cubeFace[4] = "./solidsky_blue";
+   cubeFace[5] = "./solidsky_blue";
+};
+
+singleton Material( BlueSkyMat )
+{
+   cubemap = BlueSkyCubemap;
+   materialTag0 = "Skies";
+};
+
+singleton CubemapData( GreySkyCubemap )
+{
+   cubeFace[0] = "./solidsky_grey";
+   cubeFace[1] = "./solidsky_grey";
+   cubeFace[2] = "./solidsky_grey";
+   cubeFace[3] = "./solidsky_grey";
+   cubeFace[4] = "./solidsky_grey";
+   cubeFace[5] = "./solidsky_grey";
+};
+
+singleton Material( GreySkyMat )
+{
+   cubemap = GreySkyCubemap;
+   materialTag0 = "Skies";
 };
