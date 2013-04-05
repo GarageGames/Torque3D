@@ -41,8 +41,7 @@
 #include "lighting/lightQuery.h"
 
 
-const U32 csmStaticCollisionMask =  TerrainObjectType  |
-                                    InteriorObjectType;
+const U32 csmStaticCollisionMask =  TerrainObjectType;
 
 const U32 csmDynamicCollisionMask = StaticShapeObjectType;
 

@@ -946,7 +946,7 @@ void ColladaUtils::exportColladaHeader(TiXmlElement* rootNode)
 
    TiXmlElement* authoringToolNode = new TiXmlElement("authoring_tool");
    contributorNode->LinkEndChild(authoringToolNode);
-   TiXmlText* authorText = new TiXmlText(avar("%s %s Interior Exporter", getEngineProductString(), getVersionString()));
+   TiXmlText* authorText = new TiXmlText(avar("%s %s Object Exporter", getEngineProductString(), getVersionString()));
    authoringToolNode->LinkEndChild(authorText);
 
    TiXmlElement* commentsNode = new TiXmlElement("comments");

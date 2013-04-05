@@ -32,7 +32,6 @@ function initializeWorldEditor()
    exec("./gui/genericPromptDialog.ed.gui" );
    exec("./gui/guiTerrainImportGui.gui" );
    exec("./gui/guiTerrainExportGui.gui" );
-   exec("./gui/guiInteriorExportGui.gui" );
    exec("./gui/EditorGui.ed.gui");
    exec("./gui/objectBuilderGui.ed.gui");
    exec("./gui/TerrainEditorVSettingsGui.ed.gui");

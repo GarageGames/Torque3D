@@ -44,7 +44,6 @@
 #include "shaderGen/HLSL/shaderFeatureHLSL.h"
 #include "shaderGen/HLSL/bumpHLSL.h"
 #include "shaderGen/HLSL/pixSpecularHLSL.h"
-#include "lighting/basic/blInteriorSystem.h"
 #include "lighting/basic/blTerrainSystem.h"
 #include "lighting/common/projectedShadow.h"
 
@@ -95,10 +94,8 @@ BasicLightManager::BasicLightManager()
 {
    mTimer = PlatformTimer::create();
    
-   mInteriorSystem = new blInteriorSystem;
    mTerrainSystem = new blTerrainSystem;
    
-   getSceneLightingInterface()->registerSystem( mInteriorSystem );
    getSceneLightingInterface()->registerSystem( mTerrainSystem );
 
    Con::addVariable( "$BasicLightManagerStats::activePlugins", 
@@ -152,7 +149,6 @@ BasicLightManager::~BasicLightManager()
       SAFE_DELETE( mTimer );
 
    SAFE_DELETE( mTerrainSystem );
-   SAFE_DELETE( mInteriorSystem );
 }
 
 bool BasicLightManager::isCompatible() const

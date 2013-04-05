@@ -178,7 +178,7 @@
             AnchorBottom = "0";
             AnchorLeft = "1";
             AnchorRight = "0";
-            text = "Interiors";
+            text = "Objects";
             maxLength = "1024";
             maxPopupHeight = "200";
             sbUsesNAColor = "0";

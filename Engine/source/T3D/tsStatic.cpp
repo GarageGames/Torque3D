@@ -1036,7 +1036,7 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
 }
 
 //------------------------------------------------------------------------
-//These functions are duplicated in tsStatic, shapeBase, and interiorInstance.
+//These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering
 //target names/counts without polluting simObject.
 

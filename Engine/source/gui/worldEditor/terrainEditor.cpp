@@ -33,7 +33,6 @@
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiCanvas.h"
 #include "gui/worldEditor/terrainActions.h"
-#include "interior/interiorInstance.h"
 #include "terrain/terrMaterial.h"
 
 
@@ -2244,73 +2243,6 @@ void TerrainEditor::markEmptySquares()
 {
    if(!checkTerrainBlock(this, "markEmptySquares"))
       return;
-
-   // TODO!
-   /*
-   // build a list of all the marked interiors
-   Vector<InteriorInstance*> interiors;
-   U32 mask = InteriorObjectType;
-   gServerContainer.findObjects(mask, findObjectsCallback, &interiors);
-
-   // walk the terrains and empty any grid which clips to an interior
-   for (U32 i = 0; i < mTerrainBlocks.size(); i++)
-   {
-      for(U32 x = 0; x < TerrainBlock::BlockSize; x++)
-      {
-         for(U32 y = 0; y < TerrainBlock::BlockSize; y++)
-         {
-            TerrainBlock::Material * material = mTerrainBlocks[i]->getMaterial(x,y);
-            material->flags |= ~(TerrainBlock::Material::Empty);
-
-            Point3F a, b;
-            gridToWorld(Point2I(x,y), a, mTerrainBlocks[i]);
-            gridToWorld(Point2I(x+1,y+1), b, mTerrainBlocks[i]);
-
-            Box3F box;
-            box.minExtents = a;
-            box.maxExtents = b;
-
-            box.minExtents.setMin(b);
-            box.maxExtents.setMax(a);
-
-            const MatrixF & terrOMat = mTerrainBlocks[i]->getTransform();
-            const MatrixF & terrWMat = mTerrainBlocks[i]->getWorldTransform();
-
-            terrWMat.mulP(box.minExtents);
-            terrWMat.mulP(box.maxExtents);
-
-            for(U32 i = 0; i < interiors.size(); i++)
-            {
-               MatrixF mat = interiors[i]->getWorldTransform();
-               mat.scale(interiors[i]->getScale());
-               mat.mul(terrOMat);
-
-               U32 waterMark = FrameAllocator::getWaterMark();
-               U16* zoneVector = (U16*)FrameAllocator::alloc(interiors[i]->getDetailLevel(0)->getNumZones());
-               U32 numZones = 0;
-               interiors[i]->getDetailLevel(0)->scanZones(box, mat,
-                                                          zoneVector, &numZones);
-               if (numZones != 0)
-               {
-                  Con::printf("%d %d", x, y);
-                  material->flags |= TerrainBlock::Material::Empty;
-                  FrameAllocator::setWaterMark(waterMark);
-                  break;
-               }
-               FrameAllocator::setWaterMark(waterMark);
-            }
-         }
-      }
-   }
-
-   // rebuild stuff..
-   for (U32 i = 0; i < mTerrainBlocks.size(); i++)
-   {
-      mTerrainBlocks[i]->buildGridMap();
-      mTerrainBlocks[i]->rebuildEmptyFlags();
-      mTerrainBlocks[i]->packEmptySquares();
-   }
-   */
 }
 
 void TerrainEditor::mirrorTerrain(S32 mirrorIndex)
