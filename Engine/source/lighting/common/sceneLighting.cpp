@@ -40,14 +40,6 @@
 #include "core/stream/fileStream.h"
 #include "core/crc.h"
 
-//#define DUMP_LIGHTMAPS
-
-#ifdef DUMP_LIGHTMAPS
-#include "interior/interiorInstance.h"
-#include "core/volume.h"
-#endif
-
-
 namespace
 {
    bool              gTerminateLighting = false;
@@ -394,23 +386,6 @@ void SceneLighting::sgSGObjectCompleteEvent(S32 object)
    // only the last light does something
    mLitObjects[object]->postLight(true);
    
-#ifdef DUMP_LIGHTMAPS
-   InteriorInstance *interiorinst = dynamic_cast<InteriorInstance *>(mLitObjects[object]->getObject());
-   if(interiorinst)
-   {
-      Interior *detail = interiorinst->getDetailLevel(0);
-      for(U32 i=0; i<detail->mNormalLMapIndices.size(); i++)
-      {
-         GFXTexHandle normHandle = gInteriorLMManager.duplicateBaseLightmap(detail->getLMHandle(),
-         interiorinst->getLMHandle(), detail->getNormalLMapIndex(i));
-         GBitmap *normLightmap = normHandle->getBitmap();
-
-         FileStream output;
-         output.open(avar("lightmaps/lm_%d_%d.png", object, i), Torque::FS::File::Write);
-         normLightmap->writeBitmap("png",output);
-      }
-   }
-#endif
    
    /*ObjectProxy *obj = mLitObjects[object];
    for(U32 i=0; i<mLights.size(); i++)

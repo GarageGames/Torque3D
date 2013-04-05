@@ -166,7 +166,6 @@ void fxShapeReplicator::initPersistFields()
 
    addGroup( "Restraints" );	// MM: Added Group Header.
       addField( "AllowOnTerrain",      TypeBool,      Offset( mFieldData.mAllowOnTerrain,       fxShapeReplicator ), "Shapes will be placed on terrain when set." );
-      addField( "AllowOnInteriors",    TypeBool,      Offset( mFieldData.mAllowOnInteriors,     fxShapeReplicator ), "Shapes will be placed on InteriorInstances when set." );
       addField( "AllowOnStatics",      TypeBool,      Offset( mFieldData.mAllowStatics,         fxShapeReplicator ), "Shapes will be placed on Static shapes when set." );
       addField( "AllowOnWater",        TypeBool,      Offset( mFieldData.mAllowOnWater,         fxShapeReplicator ), "Shapes will be placed on/under water when set." );
       addField( "AllowWaterSurface",   TypeBool,      Offset( mFieldData.mAllowWaterSurface,    fxShapeReplicator ), "Shapes will be placed on water when set. Requires AllowOnWater." );
@@ -214,7 +213,6 @@ void fxShapeReplicator::CreateShapes(void)
 
    // Check that we can position somewhere!
    if (!(	mFieldData.mAllowOnTerrain ||
-      mFieldData.mAllowOnInteriors ||
       mFieldData.mAllowStatics ||
       mFieldData.mAllowOnWater))
    {
@@ -318,7 +316,6 @@ void fxShapeReplicator::CreateShapes(void)
 
             // Check Illegal Placements.
             if (((CollisionType & TerrainObjectType) && !mFieldData.mAllowOnTerrain)	||
-               ((CollisionType & InteriorObjectType) && !mFieldData.mAllowOnInteriors)	||
                ((CollisionType & StaticShapeObjectType) && !mFieldData.mAllowStatics)	||
                ((CollisionType & WaterObjectType) && !mFieldData.mAllowOnWater) ) continue;
 
@@ -696,7 +693,6 @@ U32 fxShapeReplicator::packUpdate(NetConnection * con, U32 mask, BitStream * str
       mathWrite(*stream, mFieldData.mShapeRotateMax);					// Shapes Rotate Max.
       stream->writeSignedInt(mFieldData.mOffsetZ, 32);				// Shapes Offset Z.
       stream->writeFlag(mFieldData.mAllowOnTerrain);					// Allow on Terrain.
-      stream->writeFlag(mFieldData.mAllowOnInteriors);				// Allow on Interiors.
       stream->writeFlag(mFieldData.mAllowStatics);					// Allow on Statics.
       stream->writeFlag(mFieldData.mAllowOnWater);					// Allow on Water.
       stream->writeFlag(mFieldData.mAllowWaterSurface);				// Allow on Water Surface.
@@ -742,7 +738,6 @@ void fxShapeReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
       mathRead(*stream, &mFieldData.mShapeRotateMax);						// Shapes Rotate Max.
       mFieldData.mOffsetZ					= stream->readSignedInt(32);	// Shapes Offset Z.
       mFieldData.mAllowOnTerrain			= stream->readFlag();			// Allow on Terrain.
-      mFieldData.mAllowOnInteriors		= stream->readFlag();			// Allow on Interiors.
       mFieldData.mAllowStatics			= stream->readFlag();			// Allow on Statics.
       mFieldData.mAllowOnWater			= stream->readFlag();			// Allow on Water.
       mFieldData.mAllowWaterSurface		= stream->readFlag();			// Allow on Water Surface.

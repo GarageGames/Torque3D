@@ -73,9 +73,9 @@ namespace {
 const U32 sIntergrationsPerTick = 1;
 const F32 sHoverVehicleGravity  = -20;
 
-const U32 sCollisionMoveMask = (TerrainObjectType        | InteriorObjectType   |
-                                PlayerObjectType         | StaticShapeObjectType |
-                                VehicleObjectType        | VehicleBlockerObjectType);
+const U32 sCollisionMoveMask = (TerrainObjectType     | PlayerObjectType  | 
+                                StaticShapeObjectType | VehicleObjectType | 
+                                VehicleBlockerObjectType);
 
 const U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
 const U32 sClientCollisionMask = sCollisionMoveMask;
@@ -724,7 +724,7 @@ void HoverVehicle::updateForces(F32 /*dt*/)
    for (j = 0; j < 2; j++) {
       if (getContainer()->castRay(stabPoints[j].wsPoint, stabPoints[j].wsPoint + stabPoints[j].wsExtension * 2.0,
                                   TerrainObjectType | 
-                                  InteriorObjectType | WaterObjectType, &rinfo)) 
+                                  WaterObjectType, &rinfo)) 
       {
          reallyFloating = false;
 

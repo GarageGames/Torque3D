@@ -25,19 +25,6 @@
 //-----------------------------------------------------------------------------
 
 
-singleton ShaderData( _DebugInterior_ )
-{
-   DXVertexShaderFile   = "shaders/common/debugInteriorsV.hlsl";
-   DXPixelShaderFile    = "shaders/common/debugInteriorsP.hlsl";
-   
-   OGLVertexShaderFile   = "shaders/common/gl/debugInteriorsV.glsl";
-   OGLPixelShaderFile    = "shaders/common/gl/debugInteriorsP.glsl";
-   
-   samplerNames[0] = "$diffuseMap";
-   
-   pixVersion = 1.1;
-};
-
 singleton ShaderData( ParticlesShaderData )
 {
    DXVertexShaderFile     = "shaders/common/particlesV.hlsl";

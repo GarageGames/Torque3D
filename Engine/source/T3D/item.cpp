@@ -53,8 +53,9 @@ static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
 F32 Item::mGravity = -20.0f;
 
 const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  InteriorObjectType    |  StaticShapeObjectType |
-                                  VehicleObjectType     |  PlayerObjectType);
+                                  StaticShapeObjectType |
+                                  VehicleObjectType     |  
+                                  PlayerObjectType);
 
 const U32 sServerCollisionMask = (sClientCollisionMask);
 
