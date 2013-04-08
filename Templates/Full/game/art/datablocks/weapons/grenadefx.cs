@@ -1,58 +1,29 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
+// Torque
+// Copyright GarageGames, LLC 2011
 //-----------------------------------------------------------------------------
 
-// GrenadeLauncher weapon.
-// This script file contains all of the necessary datablocks needed for the
-// GrenadeLauncher.  These datablocks include sound profiles, light descriptions,
-// particle effects, explosions, projectiles, items (weapon and ammo), shell
-// casings (if any), and finally the weapon image which contains the state
-// machine that determines how the weapon operates.
-
-// The various "fire" methods/modes are handled in weapons.cs through a "weapon"
-// namespace function.  This reduces duplicated code, although a unique fire
-// method could still be implemented for this weapon.
-
 // ----------------------------------------------------------------------------
-// Sound profiles
+// Placeholder projectile and explosion with required sounds, debris, and 
+// particle datablocks. These datablocks existed in now removed scripts, but
+// were used within some that remain: see Lurker.cs, Ryder.cs, ProxMine.cs
+// 
+// These effects should be made more generic or new fx created for unique usage.
+//
+// I've removed all effects that are not required for the current weapons.  On
+// reflection I really went overboard when originally making these effects!
 // ----------------------------------------------------------------------------
 
-datablock SFXProfile(GrenadeLauncherReloadSound)
-{
-   filename = "art/sound/weapons/Crossbow_reload";
-   description = AudioClose3d;
-   preload = true;
-};
+$GrenadeUpVectorOffset = "0 0 1";
 
-datablock SFXProfile(GrenadeLauncherFireSound)
-{
-   filename = "art/sound/weapons/relbow_mono_01";
-   description = AudioClose3d;
-   preload = true;
-};
+// ---------------------------------------------------------------------------
+// Sounds
+// ---------------------------------------------------------------------------
 
-datablock SFXProfile(GrenadeLauncherFireEmptySound)
+datablock SFXProfile(GrenadeExplosionSound)
 {
-   filename = "art/sound/weapons/Crossbow_firing_empty";
-   description = AudioClose3d;
+   filename = "art/sound/CT_fx/weapons/GRENADELAND.wav";
+   description = AudioDefault3d;
    preload = true;
 };
 
@@ -77,25 +48,15 @@ datablock LightDescription(GrenadeLauncherLightDesc)
    //flareType = SimpleLightFlare0;
 };
 
-datablock LightDescription(GrenadeLauncherWaterLightDesc)
-{
-   radius = 2.0;
-   color = "1 1 1";
-   brightness = 2.0;
-   animationType = PulseLightAnim;
-   animationPeriod = 0.25;
-   //flareType = SimpleLightFlare0;
-};
-
-//----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // Debris
-//----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 datablock ParticleData(GrenadeDebrisFireParticle)
 {
    textureName = "art/particles/impact";
-   dragCoeffiecient = 0.0;
-   gravityCoefficient = -1;
+   dragCoeffiecient = 0;
+   gravityCoefficient = -1.00366;
    inheritedVelFactor = 0.0;
    constantAcceleration = 0.0;
    lifetimeMS = 300;
@@ -104,34 +65,39 @@ datablock ParticleData(GrenadeDebrisFireParticle)
    spinSpeed = 1;
    spinRandomMin = -280.0;
    spinRandomMax = 280.0;
-   colors[0] = "1.0 0.6 0.2 0.1";
-   colors[1] = "1.0 0.5 0 0.5";
-   colors[2] = "0.1 0.1 0.1 0.0";
-   sizes[0] = 1.0;
-   sizes[1] = 2.0;
-   sizes[2] = 1.0;
+   colors[0] = "1 0.590551 0.188976 0.0944882";
+   colors[1] = "0.677165 0.590551 0.511811 0.496063";
+   colors[2] = "0.645669 0.645669 0.645669 0";
+   sizes[0] = 0.2;
+   sizes[1] = 0.5;
+   sizes[2] = 0.2;
    times[0] = 0.0;
-   times[1] = 0.5;
+   times[1] = 0.494118;
    times[2] = 1.0;
+   animTexName = "art/particles/impact";
+   colors[3] = "1 1 1 0.407";
+   sizes[3] = "0.5";
 };
 
 datablock ParticleEmitterData(GrenadeDebrisFireEmitter)
 {
-   ejectionPeriodMS = 8;
-   periodVarianceMS = 4;
-   ejectionVelocity = 5.0;
-   velocityVariance = 3.0;
+   ejectionPeriodMS = 10;
+   periodVarianceMS = 0;
+   ejectionVelocity = 0;
+   velocityVariance = 0;
    thetaMin = 0.0;
-   thetaMax = 180.0;
+   thetaMax = 25;
    phiReferenceVel = 0;
    phiVariance = 360;
    ejectionoffset = 0.3;
    particles = "GrenadeDebrisFireParticle";
+   orientParticles = "1";
+   blendStyle = "NORMAL";
 };
 
 datablock DebrisData(GrenadeDebris)
 {
-   shapeFile = "art/shapes/weapons/GrenadeLauncher/debris.dts";
+   shapeFile = "art/shapes/weapons/Grenade/grenadeDebris.dae";
    emitters[0] = GrenadeDebrisFireEmitter;
    elasticity = 0.4;
    friction = 0.25;
@@ -297,30 +263,32 @@ datablock ParticleEmitterData(GrenadeSplashRingEmitter)
 
 datablock SplashData(GrenadeSplash)
 {
-//    numSegments = 15;
-//    ejectionFreq = 15;
-//    ejectionAngle = 40;
-//    ringLifetime = 0.5;
-//    lifetimeMS = 300;
-//    velocity = 4.0;
-//    startRadius = 0.0;
-//    acceleration = -3.0;
-//    texWrap = 5.0;
-//    texture = "art/particles/splash";
-
+   // SplashData doesn't have a render function in the source, 
+   // so everything but the emitter array is useless here.
    emitter[0] = GrenadeSplashEmitter;
    emitter[1] = GrenadeSplashMistEmitter;
    emitter[2] = GrenadeSplashRingEmitter;
+   
+    //numSegments = 15;
+    //ejectionFreq = 15;
+    //ejectionAngle = 40;
+    //ringLifetime = 0.5;
+    //lifetimeMS = 300;
+    //velocity = 4.0;
+    //startRadius = 0.0;
+    //acceleration = -3.0;
+    //texWrap = 5.0;
+    //texture = "art/images/particles//splash";
 
-//    colors[0] = "0.7 0.8 1.0 0.0";
-//    colors[1] = "0.7 0.8 1.0 0.3";
-//    colors[2] = "0.7 0.8 1.0 0.7";
-//    colors[3] = "0.7 0.8 1.0 0.0";
-//
-//    times[0] = 0.0;
-//    times[1] = 0.4;
-//    times[2] = 0.8;
-//    times[3] = 1.0;
+    //colors[0] = "0.7 0.8 1.0 0.0";
+    //colors[1] = "0.7 0.8 1.0 0.3";
+    //colors[2] = "0.7 0.8 1.0 0.7";
+    //colors[3] = "0.7 0.8 1.0 0.0";
+
+    //times[0] = 0.0;
+    //times[1] = 0.4;
+    //times[2] = 0.8;
+    //times[3] = 1.0;
 };
 
 // ----------------------------------------------------------------------------
@@ -329,86 +297,94 @@ datablock SplashData(GrenadeSplash)
 
 datablock ParticleData(GrenadeExpFire)
 {
-   textureName = "art/particles/fireball";
+   textureName = "art/particles/fireball.png";
    dragCoeffiecient = 0;
    windCoeffiecient = 0.5;
-   gravityCoefficient = -0.300366;
-   inheritedVelFactor = 0.299413;
-   constantAcceleration = 0.2;
-   lifetimeMS = 2000;//3000;
-   lifetimeVarianceMS = 299;//200;
+   gravityCoefficient = -1;
+   inheritedVelFactor = 0;
+   constantAcceleration = 0;
+   lifetimeMS = 1200;//3000;
+   lifetimeVarianceMS = 100;//200;
    useInvAlpha = false;
-   spinRandomMin = -80.0;
-   spinRandomMax = 0;
+   spinRandomMin = 0;
+   spinRandomMax = 1;
    spinSpeed = 1;
-   colors[0] = "0.795276 0.393701 0 0.795276";
-   colors[1] = "0.19685 0.0944882 0 0.393701";
-   colors[2] = "0 0 0 0";
-   sizes[0] = 0.75;//2;
-   sizes[1] = 1.5;
-   sizes[2] = 3;//0.5;
+   colors[0] = "0.886275 0.854902 0.733333 0.795276";
+   colors[1] = "0.356863 0.34902 0.321569 0.266";
+   colors[2] = "0.0235294 0.0235294 0.0235294 0.207";
+   sizes[0] = 1;//2;
+   sizes[1] = 5;
+   sizes[2] = 7;//0.5;
    times[0] = 0.0;
-   times[1] = 0.498039;
-   times[2] = 1.0;
-   animTexName = "art/particles/Fireball";
+   times[1] = 0.25;
+   times[2] = 0.5;
+   animTexName = "art/particles/fireball.png";
    times[3] = "1";
+   dragCoefficient = "1.99902";
+   sizes[3] = "10";
+   colors[3] = "0 0 0 0";
 };
 
 datablock ParticleEmitterData(GrenadeExpFireEmitter)
 {
    ejectionPeriodMS = 10;
    periodVarianceMS = 5;//0;
-   ejectionVelocity = 4;//1.0;
-   velocityVariance = 1;//0.5;
+   ejectionVelocity = 1;//1.0;
+   velocityVariance = 0;//0.5;
    thetaMin = 0.0;
-   thetaMax = 180.0;
+   thetaMax = 45;
    lifetimeMS = 250;
    particles = "GrenadeExpFire";
+   blendStyle = "ADDITIVE";
 };
 
 datablock ParticleData(GrenadeExpDust)
 {
-   textureName = "art/particles/smoke";
-   dragCoefficient = 1.0;
-   gravityCoefficient = -0.01;
-   inheritedVelFactor = 0.0;
+   textureName = "art/particles/smoke.png";
+   dragCoefficient = 0.498534;
+   gravityCoefficient = 0;
+   inheritedVelFactor = 1;
    constantAcceleration = 0.0;
-   lifetimeMS = 2500;
-   lifetimeVarianceMS = 500;
-   useInvAlpha = true;
+   lifetimeMS = 2000;
+   lifetimeVarianceMS = 250;
+   useInvAlpha = 0;
    spinSpeed = 1;
    spinRandomMin = -90.0;
    spinRandomMax = 90.0;
-   colors[0] = "0.6 0.6 0.6 0.3";
-   colors[1] = "0.6 0.6 0.6 0.3";
-   colors[2] = "0.6 0.6 0.6 0.0";
-   sizes[0] = 1.6;
-   sizes[1] = 2.0;
-   sizes[2] = 2.4;
+   colors[0] = "0.992126 0.992126 0.992126 0.96063";
+   colors[1] = "0.11811 0.11811 0.11811 0.929134";
+   colors[2] = "0.00392157 0.00392157 0.00392157 0.362205";
+   sizes[0] = 1.59922;
+   sizes[1] = 4.99603;
+   sizes[2] = 9.99817;
    times[0] = 0.0;
-   times[1] = 0.7;
+   times[1] = 0.494118;
    times[2] = 1.0;
+   animTexName = "art/particles/smoke.png";
+   colors[3] = "0.996078 0.996078 0.996078 0";
+   sizes[3] = "15";
 };
 
 datablock ParticleEmitterData(GrenadeExpDustEmitter)
 {
-   ejectionPeriodMS = 1;
+   ejectionPeriodMS = 5;
    periodVarianceMS = 0;
-   ejectionVelocity = 15;
+   ejectionVelocity = 8;
    velocityVariance = 0.0;
    ejectionOffset = 0.0;
    thetaMin = 85;
    thetaMax = 85;
    phiReferenceVel = 0;
    phiVariance = 360;
-   overrideAdvances = false;
-   lifetimeMS = 200;
+   overrideAdvances = 0;
+   lifetimeMS = 2000;
    particles = "GrenadeExpDust";
+   blendStyle = "NORMAL";
 };
 
 datablock ParticleData(GrenadeExpSpark)
 {
-   textureName = "art/particles/ricochet";
+   textureName = "art/particles/Sparkparticle";
    dragCoefficient = 1;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.2;
@@ -519,6 +495,52 @@ datablock ParticleEmitterData(GrenadeExpSmokeEmitter)
    thetaMax = 180.0;
    ejectionOffset = 1;
    particles = "GrenadeExpSmoke";
+   blendStyle = "NORMAL";
+};
+
+
+// ----------------------------------------------------------------------------
+// Dry/Air Explosion Objects
+// ----------------------------------------------------------------------------
+
+datablock ExplosionData(GrenadeExplosion)
+{
+   soundProfile = GrenadeExplosionSound;
+   lifeTimeMS = 400; // Quick flash, short burn, and moderate dispersal
+
+   // Volume particles
+   particleEmitter = GrenadeExpFireEmitter;
+   particleDensity = 75;
+   particleRadius = 2.25;
+
+   // Point emission
+   emitter[0] = GrenadeExpDustEmitter;
+   emitter[1] = GrenadeExpSparksEmitter;
+   emitter[2] = GrenadeExpSmokeEmitter;
+
+   // Camera Shaking
+   shakeCamera = true;
+   camShakeFreq = "10.0 11.0 9.0";
+   camShakeAmp = "15.0 15.0 15.0";
+   camShakeDuration = 1.5;
+   camShakeRadius = 20;
+
+   // Exploding debris
+   debris = GrenadeDebris;
+   debrisThetaMin = 10;
+   debrisThetaMax = 60;
+   debrisNum = 4;
+   debrisNumVariance = 2;
+   debrisVelocity = 25;
+   debrisVelocityVariance = 5;
+
+   lightStartRadius = 4.0;
+   lightEndRadius = 0.0;
+   lightStartColor = "1.0 1.0 1.0";
+   lightEndColor = "1.0 1.0 1.0";
+   lightStartBrightness = 4.0;
+   lightEndBrightness = 0.0;
+   lightNormalOffset = 2.0;
 };
 
 // ----------------------------------------------------------------------------
@@ -862,7 +884,7 @@ datablock ParticleEmitterData(GrenadeProjSmokeTrailEmitter)
 
 datablock ProjectileData(GrenadeLauncherProjectile)
 {
-   projectileShapeName = "art/shapes/weapons/GrenadeLauncher/rocket.dts";
+   projectileShapeName = "art/shapes/weapons/shared/rocket.dts";
    directDamage = 30;
    radiusDamage = 30;
    damageRadius = 5;
@@ -871,7 +893,7 @@ datablock ProjectileData(GrenadeLauncherProjectile)
    explosion = GrenadeLauncherExplosion;
    waterExplosion = GrenadeLauncherWaterExplosion;
 
-   decal = ScorchRXDecal;
+   decal = ExpBlastDecal;
    splash = GrenadeSplash;
 
    particleEmitter = GrenadeProjSmokeTrailEmitter;
@@ -892,62 +914,4 @@ datablock ProjectileData(GrenadeLauncherProjectile)
    lightDesc = GrenadeLauncherLightDesc;
 
    damageType = "GrenadeDamage";
-};
-
-// ----------------------------------------------------------------------------
-// Underwater Projectile
-// ----------------------------------------------------------------------------
-
-datablock ProjectileData(GrenadeWetProjectile)
-{
-   projectileShapeName = "art/shapes/weapons/GrenadeLauncher/rocket.dts";
-   directDamage = 20;
-   radiusDamage = 10;
-   damageRadius = 10;
-   areaImpulse = 2000;
-
-   explosion = GrenadeLauncherWaterExplosion;
-
-   particleEmitter = GrenadeProjSmokeTrailEmitter;
-   particleWaterEmitter = GrenadeTrailWaterEmitter;
-
-   muzzleVelocity = 10;
-   velInheritFactor = 0.3;
-
-   armingDelay = 2000;
-   lifetime = 10000;
-   fadeDelay = 4500;
-
-   bounceElasticity = 0.2;
-   bounceFriction = 0.4;
-   isBallistic = true;
-   gravityMod = 0.80;
-
-   lightDesc = GrenadeLauncherWaterLightDesc;
-
-   damageType = "GrenadeDamage";
-};
-
-// ----------------------------------------------------------------------------
-// Ammo Item
-// ----------------------------------------------------------------------------
-
-datablock ItemData(GrenadeLauncherAmmo)
-{
-   // Mission editor category
-   category = "Ammo";
-
-   // Add the Ammo namespace as a parent. The ammo namespace provides
-   // common ammo related functions and hooks into the inventory system.
-   className = "Ammo";
-
-   // Basic Item properties
-   shapeFile = "art/shapes/weapons/GrenadeLauncher/debris.dts";
-   mass = 2;
-   elasticity = 0.2;
-   friction = 0.6;
-
-   // Dynamic properties defined by the scripts
-   pickUpName = "Grenades";
-   maxInventory = 20;
 };
