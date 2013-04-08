@@ -20,6 +20,20 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+// Sample grass
+// ----------------------------------------------------------------------------
+
+singleton Material(TerrainFX_grass1)  
+{  
+   mapTo = "grass1";  
+   footstepSoundId = 0;  
+   terrainMaterials = "1";  
+   ShowDust = "false";  
+   showFootprints = "false"; 
+   materialTag0 = "Terrain"; 
+};  
+
 new TerrainMaterial()
 {
    internalName = "grass1";
@@ -32,18 +46,15 @@ new TerrainMaterial()
    diffuseSize = "200";
 };
 
-new TerrainMaterial()
-{
-   internalName = "rocktest";
-   diffuseMap = "art/terrains/Example/rocktest";
-   detailMap = "art/terrains/Example/rocktest_d";
-   detailSize = "10";
-   detailDistance = "100";
-   isManaged = "1";
-   detailBrightness = "1";
-   Enabled = "1";
-   diffuseSize = "400";
-};
+singleton Material(TerrainFX_grass1dry)  
+{  
+   mapTo = "grass1-dry";  
+   footstepSoundId = 0;  
+   terrainMaterials = "1";  
+   ShowDust = "false";  
+   showFootprints = "false";
+   materialTag0 = "Terrain";  
+};  
 
 new TerrainMaterial()
 {
@@ -59,6 +70,16 @@ new TerrainMaterial()
    detailStrength = "2";
 };
 
+singleton Material(TerrainFX_dirt_grass)  
+{  
+   mapTo = "dirt_grass";  
+   footstepSoundId = 0;  
+   terrainMaterials = "1";  
+   ShowDust = "false";  
+   showFootprints = "false";
+   materialTag0 = "Terrain";  
+};  
+
 new TerrainMaterial()
 {
    internalName = "dirt_grass";
@@ -72,6 +93,47 @@ new TerrainMaterial()
    diffuseSize = "200";
 };
 
+// ----------------------------------------------------------------------------
+// Sample rock
+// ----------------------------------------------------------------------------
+
+singleton Material(TerrainFX_rocktest)  
+{  
+   mapTo = "rocktest";  
+   footstepSoundId = 0;  
+   terrainMaterials = "1";  
+   ShowDust = "false";  
+   showFootprints = "false"; 
+   materialTag0 = "Terrain"; 
+};  
+
+new TerrainMaterial()
+{
+   internalName = "rocktest";
+   diffuseMap = "art/terrains/Example/rocktest";
+   detailMap = "art/terrains/Example/rocktest_d";
+   detailSize = "10";
+   detailDistance = "100";
+   isManaged = "1";
+   detailBrightness = "1";
+   Enabled = "1";
+   diffuseSize = "400";
+};
+
+// ----------------------------------------------------------------------------
+// Sample sand
+// ----------------------------------------------------------------------------
+
+singleton Material(TerrainFX_sand)  
+{  
+   mapTo = "sand";  
+   footstepSoundId = 0;  
+   terrainMaterials = "1";  
+   ShowDust = "false";  
+   showFootprints = "false"; 
+   materialTag0 = "Terrain";  
+};  
+
 new TerrainMaterial()
 {
    internalName = "sand";
@@ -84,4 +146,3 @@ new TerrainMaterial()
    Enabled = "1";
    diffuseSize = "200";
 };
-
