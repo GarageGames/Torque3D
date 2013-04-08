@@ -186,7 +186,7 @@ datablock ExplosionData(BulletDirtExplosion)
 //-----------------------------------------------------------------------------
 datablock DebrisData(BulletShell)
 {
-   shapeFile = "art/shapes/weapons/RifleShell/RifleShell.DAE";
+   shapeFile = "art/shapes/weapons/shared/RifleShell.DAE";
    lifetime = 6.0;
    minSpinSpeed = 300.0;
    maxSpinSpeed = 400.0;
