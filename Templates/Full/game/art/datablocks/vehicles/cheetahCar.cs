@@ -57,7 +57,8 @@ datablock SFXProfile(DirtKickup)
 
 datablock SFXProfile(CheetahTurretFireSound)
 {
-   filename = "art/sound/cheetah/turret_firing.wav";
+   //filename = "art/sound/cheetah/turret_firing.wav";
+   filename = "art/sound/turret/wpn_turret_fire.wav";
    description = BulletFireDesc;
    preload = true;
 };
@@ -101,7 +102,7 @@ datablock ParticleEmitterData(CheetahTireEmitter)
 
 datablock ProjectileData(TurretProjectile)
 {
-   projectileShapeName = "art/shapes/weapons/SwarmGun/rocket.dts";
+   projectileShapeName = "art/shapes/weapons/shared/rocket.dts";
    directDamage = 10;
    radiusDamage = 15;
    damageRadius = 3;
