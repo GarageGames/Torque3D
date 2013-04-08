@@ -40,13 +40,13 @@ exec("./rigidShape.cs");
 
 exec("./health.cs");
 
-// Load our supporting weapon datablocks
+// Load our supporting weapon datablocks, effects and such.  They must be
+// loaded before any weapon that uses them.
 exec("./weapon.cs");
+exec("./weapons/grenadefx.cs");
+exec("./weapons/rocketfx.cs");
 
 // Load the weapon datablocks
-exec("./weapons/grenadeLauncher.cs");
-exec("./weapons/grenade.cs");
-exec("./weapons/rocketLauncher.cs");
 exec("./weapons/Lurker.cs");
 exec("./weapons/Ryder.cs");
 exec("./weapons/ProxMine.cs");
