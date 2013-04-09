@@ -114,7 +114,7 @@ GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bo
       return Unset;
 
 #ifdef TORQUE_GATHER_METRICS
-   AssertFatal( mBeginFrame < GuiTSCtrl::getFrameCount(), "GFXD3D9OcclusionQuery::getStatus - called on the same frame as begin!" );
+   //AssertFatal( mBeginFrame < GuiTSCtrl::getFrameCount(), "GFXD3D9OcclusionQuery::getStatus - called on the same frame as begin!" );
 
    //U32 mTimeSinceEnd = mTimer->getElapsedMs();
    //AssertFatal( mTimeSinceEnd >= 5, "GFXD3DOcculsionQuery::getStatus - less than TickMs since called ::end!" );

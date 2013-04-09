@@ -265,6 +265,8 @@ public:
 
    GFXAdapterType getAdapterType(){ return Direct3D9; }
 
+   U32 getAdaterIndex() const { return mAdapterIndex; }
+
    virtual GFXCubemap *createCubemap();
 
    virtual F32  getPixelShaderVersion() const { return mPixVersion; }
