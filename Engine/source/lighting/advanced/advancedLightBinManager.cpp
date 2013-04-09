@@ -41,14 +41,12 @@
 #include "math/util/matrixSet.h"
 #include "console/consoleTypes.h"
 
-
 const RenderInstType AdvancedLightBinManager::RIT_LightInfo( "LightInfo" );
 const String AdvancedLightBinManager::smBufferName( "lightinfo" );
 
 ShadowFilterMode AdvancedLightBinManager::smShadowFilterMode = ShadowFilterMode_SoftShadowHighQuality;
 bool AdvancedLightBinManager::smPSSMDebugRender = false;
 bool AdvancedLightBinManager::smUseSSAOMask = false;
-
 
 ImplementEnumType( ShadowFilterMode,
    "The shadow filtering modes for Advanced Lighting shadows.\n"
@@ -221,7 +219,7 @@ void AdvancedLightBinManager::addLight( LightInfo *light )
       curBin.push_back( lEntry );
 }
 
-void AdvancedLightBinManager::clear()
+void AdvancedLightBinManager::clearAllLights()
 {
    Con::setIntVariable("lightMetrics::activeLights", mLightBin.size());
    Con::setIntVariable("lightMetrics::culledLights", mNumLightsCulled);
@@ -454,6 +452,33 @@ void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *
    const Point3F *wsFrustumPoints = frustum.getPoints();
    const Point3F& cameraPos = frustum.getPosition();
 
+   // Perform a camera offset.  We need to manually perform this offset on the sun (or vector) light's
+   // polygon, which is at the far plane.
+   const Point2F& projOffset = frustum.getProjectionOffset();
+   Point3F cameraOffsetPos = cameraPos;
+   if(!projOffset.isZero())
+   {
+      // First we need to calculate the offset at the near plane.  The projOffset
+      // given above can be thought of a percent as it ranges from 0..1 (or 0..-1).
+      F32 nearOffset = frustum.getNearRight() * projOffset.x;
+
+      // Now given the near plane distance from the camera we can solve the right
+      // triangle and calcuate the SIN theta for the offset at the near plane.
+      // SIN theta = x/y
+      F32 sinTheta = nearOffset / frustum.getNearDist();
+
+      // Finally, we can calcuate the offset at the far plane, which is where our sun (or vector)
+      // light's polygon is drawn.
+      F32 farOffset = frustum.getFarDist() * sinTheta;
+
+      // We can now apply this far plane offset to the far plane itself, which then compensates
+      // for the project offset.
+      MatrixF camTrans = frustum.getTransform();
+      VectorF offset = camTrans.getRightVector();
+      offset *= farOffset;
+      cameraOffsetPos += offset;
+   }
+
    // Now build the quad for drawing full-screen vector light
    // passes.... this is a volatile VB and updates every frame.
    FarFrustumQuadVert verts[4];
@@ -461,18 +486,22 @@ void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *
       verts[0].point.set( wsFrustumPoints[Frustum::FarBottomLeft] - cameraPos );
       invCam.mulP( wsFrustumPoints[Frustum::FarBottomLeft], &verts[0].normal );
       verts[0].texCoord.set( -1.0, -1.0 );
+      verts[0].tangent.set(wsFrustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos);
 
       verts[1].point.set( wsFrustumPoints[Frustum::FarTopLeft] - cameraPos );
       invCam.mulP( wsFrustumPoints[Frustum::FarTopLeft], &verts[1].normal );
       verts[1].texCoord.set( -1.0, 1.0 );
+      verts[1].tangent.set(wsFrustumPoints[Frustum::FarTopLeft] - cameraOffsetPos);
 
       verts[2].point.set( wsFrustumPoints[Frustum::FarTopRight] - cameraPos );
       invCam.mulP( wsFrustumPoints[Frustum::FarTopRight], &verts[2].normal );
       verts[2].texCoord.set( 1.0, 1.0 );
+      verts[2].tangent.set(wsFrustumPoints[Frustum::FarTopRight] - cameraOffsetPos);
 
       verts[3].point.set( wsFrustumPoints[Frustum::FarBottomRight] - cameraPos );
       invCam.mulP( wsFrustumPoints[Frustum::FarBottomRight], &verts[3].normal );
       verts[3].texCoord.set( 1.0, -1.0 );
+      verts[3].tangent.set(wsFrustumPoints[Frustum::FarBottomRight] - cameraOffsetPos);
    }
    mFarFrustumQuadVerts.set( GFX, 4 );
    dMemcpy( mFarFrustumQuadVerts.lock(), verts, sizeof( verts ) );

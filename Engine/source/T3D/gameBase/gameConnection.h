@@ -45,6 +45,7 @@ enum GameConnectionConstants
    DataBlockQueueCount = 16
 };
 
+class IDisplayDevice;
 class SFXProfile;
 class MatrixF;
 class MatrixF;
@@ -86,6 +87,8 @@ private:
    F32   mCameraFov;       ///< Current camera fov (in degrees).
    F32   mCameraPos;       ///< Current camera pos (0-1).
    F32   mCameraSpeed;     ///< Camera in/out speed.
+
+   IDisplayDevice* mDisplayDevice;  ///< Optional client display device that imposes rendering properties.
    /// @}
 
 public:
@@ -263,6 +266,10 @@ public:
 
    void setFirstPerson(bool firstPerson);
    
+   bool hasDisplayDevice() const { return mDisplayDevice != NULL; }
+   const IDisplayDevice* getDisplayDevice() const { return mDisplayDevice; }
+   void setDisplayDevice(IDisplayDevice* display) { mDisplayDevice = display; }
+   void clearDisplayDevice() { mDisplayDevice = NULL; }
    /// @}
 
    void detectLag();
