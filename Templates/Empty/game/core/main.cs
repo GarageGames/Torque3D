@@ -81,8 +81,6 @@ function onStart()
    exec("./scripts/gui/guiTreeViewCtrl.cs");
    exec("./scripts/gui/messageBoxes/messageBox.ed.cs");
    
-   exec("./art/gui/customProfiles.cs");
-
    echo(" % - Initialized Core");
 }
 
