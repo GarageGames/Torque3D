@@ -52,6 +52,8 @@ Win32WindowManager::Win32WindowManager()
    mCurtainWindow = NULL;
 
    mOffscreenRender = false;
+
+   buildMonitorsList();
 }
 
 Win32WindowManager::~Win32WindowManager()
@@ -107,6 +109,74 @@ S32 Win32WindowManager::getDesktopBitDepth()
 
 BOOL Win32WindowManager::MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData )
 {
+   Vector<MonitorInfo> * monitors = (Vector<MonitorInfo>*)dwData;
+
+   // Fill out the new monitor structure
+   monitors->increment();
+   MonitorInfo& monitor = monitors->last();
+   monitor.monitorHandle = hMonitor;
+   monitor.region.point.x = lprcMonitor->left;
+   monitor.region.point.y = lprcMonitor->top;
+   monitor.region.extent.x = lprcMonitor->right - lprcMonitor->left;
+   monitor.region.extent.y = lprcMonitor->bottom - lprcMonitor->top;
+
+   MONITORINFOEX info;
+   info.cbSize = sizeof(MONITORINFOEX);
+   if(GetMonitorInfo(hMonitor, &info))
+   {
+      monitor.name = info.szDevice;
+   }
+
+   return true;
+}
+
+void Win32WindowManager::buildMonitorsList()
+{
+   // Clear the list
+   mMonitors.clear();
+
+   // Enumerate all monitors
+   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (U32)(void*)&mMonitors);
+}
+
+S32 Win32WindowManager::findFirstMatchingMonitor(const char* name)
+{
+   // Try and match the first part of the output device display name.  For example,
+   // a Monitor name of "\\.\DISPLAY1" might correspond to a display name
+   // of "\\.\DISPLAY1\Monitor0".  If two monitors are set up in duplicate mode then
+   // they will have the same 'display' part in their display name.
+   for(U32 i=0; i<mMonitors.size(); ++i)
+   {
+      if(dStrstr(name, mMonitors[i].name) == name)
+         return i;
+   }
+
+   return -1;
+}
+
+U32 Win32WindowManager::getMonitorCount()
+{
+   return mMonitors.size();
+}
+
+const char* Win32WindowManager::getMonitorName(U32 index)
+{
+   if(index >= mMonitors.size())
+      return "";
+
+   return mMonitors[index].name.c_str();
+}
+
+RectI Win32WindowManager::getMonitorRect(U32 index)
+{
+   if(index >= mMonitors.size())
+      return RectI(0, 0, 0, 0);
+
+   return mMonitors[index].region;
+}
+
+BOOL Win32WindowManager::MonitorRegionEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData )
+{
    Vector<RectI> * regions = (Vector<RectI>*)dwData;
 
    regions->increment();
@@ -120,7 +190,7 @@ BOOL Win32WindowManager::MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRE
 
 void Win32WindowManager::getMonitorRegions(Vector<RectI> &regions)
 {
-   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (U32)(void*)&regions);
+   EnumDisplayMonitors(NULL, NULL, MonitorRegionEnumProc, (U32)(void*)&regions);
 }
 
 void Win32WindowManager::getWindows(VectorPtr<PlatformWindow*> &windows)
