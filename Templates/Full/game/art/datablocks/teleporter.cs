@@ -43,7 +43,7 @@ datablock SFXProfile(TeleportSound)
 
 datablock ParticleData(TeleporterFlash : DefaultParticle)
 {
-   dragCoefficient = "30";
+   dragCoefficient = "5";
    inheritedVelFactor = "0";
    constantAcceleration = "0";
    lifetimeMS = "500";
