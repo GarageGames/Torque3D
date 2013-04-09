@@ -246,6 +246,12 @@ class Frustum : public PolyhedronImpl< FrustumData >
 
       /// @}
 
+      /// Offset used for projection matrix calculations
+      Point2F mProjectionOffset;
+
+      /// The calculated projection offset matrix
+      MatrixF mProjectionOffsetMatrix;
+
    public:
 
       /// @name Constructors
@@ -403,9 +409,23 @@ class Frustum : public PolyhedronImpl< FrustumData >
       /// points typically used for early rejection.
       const Box3F& getBounds() const { _update(); return mBounds; }
 
+      /// Get the offset used when calculating the projection matrix
+      const Point2F& getProjectionOffset() const { return mProjectionOffset; }
+
+      /// Get the offset matrix used when calculating the projection matrix
+      const MatrixF& getProjectionOffsetMatrix() const { return mProjectionOffsetMatrix; }
+
+      /// Set the offset used when calculating the projection matrix
+      void setProjectionOffset(const Point2F& offsetMat);
+
+      /// Clear any offset used when calculating the projection matrix
+      void clearProjectionOffset() { mProjectionOffset.zero(); mProjectionOffsetMatrix.identity(); }
+
       /// Generates a projection matrix from the frustum.
       void getProjectionMatrix( MatrixF *proj, bool gfxRotate=true ) const;
 
+      /// Will update the frustum if it is dirty
+      void update() { _update(); }
       /// @}
 
       /// @name Culling

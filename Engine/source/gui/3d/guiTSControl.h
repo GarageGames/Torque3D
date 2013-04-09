@@ -36,6 +36,8 @@ struct CameraQuery
    F32         nearPlane;
    F32         farPlane;
    F32         fov;
+   Point2F     projectionOffset;
+   Point3F     eyeOffset;
    bool        ortho;
    MatrixF     cameraMatrix;
 };
@@ -45,11 +47,16 @@ class GuiTSCtrl : public GuiContainer
 {
    typedef GuiContainer Parent;
 
+public:
+   enum RenderStyles {
+      RenderStyleStandard           = 0,
+      RenderStyleStereoSideBySide   = (1<<0),
+   };
+
+protected:
    static U32     smFrameCount;
    F32            mCameraZRot;
    F32            mForceFOV;
-
-protected:
 
    /// A list of GuiTSCtrl which are awake and 
    /// most likely rendering.
@@ -59,8 +66,11 @@ protected:
    /// update timeslice for this viewport to get.
    F32 mReflectPriority;
 
-   F32            mOrthoWidth;
-   F32            mOrthoHeight;
+   /// The current render type
+   U32 mRenderStyle;
+
+   F32         mOrthoWidth;
+   F32         mOrthoHeight;
 
    MatrixF     mSaveModelview;
    MatrixF     mSaveProjection;
@@ -149,5 +159,9 @@ public:
    DECLARE_CATEGORY( "Gui 3D" );
    DECLARE_DESCRIPTION( "Abstract base class for controls that render a 3D viewport." );
 };
+
+typedef GuiTSCtrl::RenderStyles GuiTSRenderStyles;
+
+DefineEnumType( GuiTSRenderStyles );
 
 #endif // _GUITSCONTROL_H_
