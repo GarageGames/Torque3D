@@ -63,13 +63,24 @@ bool ExtendedMoveList::getNextExtMove( ExtendedMove &curMove )
       curMove.posY[i] = ExtendedMoveManager::mPosY[i];
       curMove.posZ[i] = ExtendedMoveManager::mPosZ[i];
 
-      // Process rotation.  Rotation is passed in as an Angle Axis in degrees.
-      // We need to convert this into a Quat.
-      QuatF q(Point3F(ExtendedMoveManager::mRotAX[i], ExtendedMoveManager::mRotAY[i], ExtendedMoveManager::mRotAZ[i]), mDegToRad(ExtendedMoveManager::mRotAA[i]));
-      curMove.rotX[i] = q.x;
-      curMove.rotY[i] = q.y;
-      curMove.rotZ[i] = q.z;
-      curMove.rotW[i] = q.w;
+      // Process rotation.  There are two possible forms of rotation: Angle Axis and Euler angles.
+      curMove.EulerBasedRotation[i] = ExtendedMoveManager::mRotIsEuler[i];
+      if(curMove.EulerBasedRotation[i])
+      {
+         // Euler angle based rotation passed in as degrees.  We only need to work with three components.
+         curMove.rotX[i] = mDegToRad(ExtendedMoveManager::mRotAX[i]);
+         curMove.rotY[i] = mDegToRad(ExtendedMoveManager::mRotAY[i]);
+         curMove.rotZ[i] = mDegToRad(ExtendedMoveManager::mRotAZ[i]);
+      }
+      else
+      {
+         //Rotation is passed in as an Angle Axis in degrees.  We need to convert this into a Quat.
+         QuatF q(Point3F(ExtendedMoveManager::mRotAX[i], ExtendedMoveManager::mRotAY[i], ExtendedMoveManager::mRotAZ[i]), mDegToRad(ExtendedMoveManager::mRotAA[i]));
+         curMove.rotX[i] = q.x;
+         curMove.rotY[i] = q.y;
+         curMove.rotZ[i] = q.z;
+         curMove.rotW[i] = q.w;
+      }
    }
 
    if (mConnection->getControlObject())
