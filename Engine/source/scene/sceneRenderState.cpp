@@ -44,7 +44,9 @@ SceneRenderState::SceneRenderState( SceneManager* sceneManager,
       mUsePostEffects( usePostEffects ),
       mDisableAdvancedLightingBins( false ),
       mRenderArea( view.getFrustum().getBounds() ),
-      mAmbientLightColor( sceneManager->getAmbientLightColor() )
+      mAmbientLightColor( sceneManager->getAmbientLightColor() ),
+      mSceneRenderStyle( SRS_Standard ),
+      mRenderField( 0 )
 {
    // Setup the default parameters for the screen metrics methods.
    mDiffuseCameraTransform = view.getViewWorldMatrix();

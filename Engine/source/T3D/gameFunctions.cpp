@@ -32,7 +32,7 @@
 #include "math/mEase.h"
 #include "core/module.h"
 #include "console/engineAPI.h"
-
+#include "platform/output/IDisplayDevice.h"
 
 static void RegisterGameFunctions();
 static void Process3D();
@@ -81,6 +81,8 @@ static S32 gEaseElastic = Ease::Elastic;
 static S32 gEaseBack = Ease::Back;
 static S32 gEaseBounce = Ease::Bounce;	
 
+
+extern bool gEditingMission;
 
 extern void ShowInit();
 
@@ -354,9 +356,44 @@ bool GameProcessCameraQuery(CameraQuery *query)
       sVisDistanceScale = mClampF( sVisDistanceScale, 0.01f, 1.0f );
       query->farPlane = gClientSceneGraph->getVisibleDistance() * sVisDistanceScale;
 
-      F32 cameraFov;
-      if(!connection->getControlCameraFov(&cameraFov))
+      // Provide some default values
+      query->projectionOffset = Point2F::Zero;
+      query->eyeOffset = Point3F::Zero;
+
+      F32 cameraFov = 0.0f;
+      bool fovSet = false;
+
+      // Try to use the connection's display deivce, if any, but only if the editor
+      // is not open
+      if(!gEditingMission && connection->hasDisplayDevice())
+      {
+         const IDisplayDevice* display = connection->getDisplayDevice();
+
+         // The connection's display device may want to set the FOV
+         if(display->providesYFOV())
+         {
+            cameraFov = mRadToDeg(display->getYFOV());
+            fovSet = true;
+         }
+
+         // The connection's display device may want to set the projection offset
+         if(display->providesProjectionOffset())
+         {
+            query->projectionOffset = display->getProjectionOffset();
+         }
+
+         // The connection's display device may want to set the eye offset
+         if(display->providesEyeOffset())
+         {
+            query->eyeOffset = display->getEyeOffset();
+         }
+      }
+
+      // Use the connection's FOV settings if requried
+      if(!fovSet && !connection->getControlCameraFov(&cameraFov))
+      {
          return false;
+      }
 
       query->fov = mDegToRad(cameraFov);
       return true;

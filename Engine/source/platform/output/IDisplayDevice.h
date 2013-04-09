@@ -20,24 +20,25 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../hlslStructs.h"
-#include "farFrustumQuad.hlsl"
+#ifndef _IDISPLAYDEVICE_H_
+#define _IDISPLAYDEVICE_H_
 
+#include "console/consoleTypes.h"
 
-FarFrustumQuadConnectV main( VertexIn_PNTT IN,
-                             uniform float4 rtParams0 )
+// Defines a custom display device that requires particular rendering settings
+// in order for a scene to display correctly.
+
+class IDisplayDevice
 {
-   FarFrustumQuadConnectV OUT;
+public:
+   virtual bool providesYFOV() const = 0;
+   virtual F32 getYFOV() const = 0;
 
-   OUT.hpos = float4( IN.uv0, 0, 1 );
+   virtual bool providesEyeOffset() const = 0;
+   virtual const Point3F& getEyeOffset() const = 0;
 
-   // Get a RT-corrected UV from the SS coord
-   OUT.uv0 = getUVFromSSPos( OUT.hpos.xyz, rtParams0 );
-   
-   // Interpolators will generate eye rays the 
-   // from far-frustum corners.
-   OUT.wsEyeRay = IN.tangent.xyz;
-   OUT.vsEyeRay = IN.normal.xyz;
+   virtual bool providesProjectionOffset() const = 0;
+   virtual const Point2F& getProjectionOffset() const = 0;
+};
 
-   return OUT;
-}
+#endif   // _IDISPLAYDEVICE_H_

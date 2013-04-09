@@ -219,6 +219,7 @@ GameConnection::GameConnection()
    // first person
    mFirstPerson = true;
    mUpdateFirstPerson = false;
+   clearDisplayDevice();
 }
 
 GameConnection::~GameConnection()
@@ -1727,6 +1728,13 @@ DefineEngineMethod( GameConnection, setControlObject, bool, (GameBase* ctrlObj),
 
    object->setControlObject(ctrlObj);
    return true;
+}
+
+DefineEngineMethod( GameConnection, clearDisplayDevice, void, (),,
+   "@brief Clear any display device.\n\n"
+   "A display device may define a number of properties that are used during rendering.\n\n")
+{
+   object->clearDisplayDevice();
 }
 
 DefineEngineMethod( GameConnection, getControlObject, GameBase*, (),,
