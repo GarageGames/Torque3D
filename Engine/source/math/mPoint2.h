@@ -48,6 +48,7 @@ class Point2I
    void set(S32 in_x, S32 in_y);            ///< Set (x,y) position
    void setMin(const Point2I&);             ///< Store lesser co-ordinates from parameter in this point.
    void setMax(const Point2I&);             ///< Store greater co-ordinates from parameter in this point.
+   void zero();                             ///< Zero all values
 
    //-------------------------------------- Math mutators
    void neg();                              ///< Invert sign of point's co-ordinates.
@@ -122,6 +123,8 @@ class Point2F
    /// @param   b   Ending point.
    /// @param   c   Interpolation factor (0.0 .. 1.0).
    void interpolate(const Point2F& a, const Point2F& b, const F32 c);
+
+   void zero();                         ///< Zero all values
 
    operator F32*() { return &x; }
    operator const F32*() const { return &x; }
@@ -213,6 +216,8 @@ class Point2D
    /// @param   c   Interpolation factor (0.0 .. 1.0).
    void interpolate(const Point2D &a, const Point2D &b, const F64 c);
 
+   void zero();                         ///< Zero all values
+
    operator F64*() { return &x; }
    operator const F64*() const { return &x; }
 
@@ -298,6 +303,12 @@ inline void Point2I::setMax(const Point2I& _test)
 {
    x = (_test.x > x) ? _test.x : x;
    y = (_test.y > y) ? _test.y : y;
+}
+
+
+inline void Point2I::zero()
+{
+   x = y = 0;
 }
 
 
@@ -480,6 +491,12 @@ inline void Point2F::interpolate(const Point2F& _rFrom, const Point2F& _to, cons
    AssertFatal(_factor >= 0.0f && _factor <= 1.0f, "Out of bound interpolation factor");
    x = (_rFrom.x * (1.0f - _factor)) + (_to.x * _factor);
    y = (_rFrom.y * (1.0f - _factor)) + (_to.y * _factor);
+}
+
+
+inline void Point2F::zero()
+{
+   x = y = 0.0f;
 }
 
 
@@ -717,6 +734,12 @@ inline void Point2D::interpolate(const Point2D& _rFrom, const Point2D& _to, cons
    AssertFatal(_factor >= 0.0f && _factor <= 1.0f, "Out of bound interpolation factor");
    x = (_rFrom.x * (1.0f - _factor)) + (_to.x * _factor);
    y = (_rFrom.y * (1.0f - _factor)) + (_to.y * _factor);
+}
+
+
+inline void Point2D::zero()
+{
+   x = y = 0.0;
 }
 
 
