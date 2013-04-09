@@ -60,6 +60,11 @@ function initClient()
    $Client::GameTypeQuery = $appName;
    $Client::MissionTypeQuery = "Any";
 
+   // These should be game specific GuiProfiles.  Custom profiles are saved out
+   // from the Gui Editor.  Either of these may override any that already exist.
+   exec("art/gui/gameProfiles.cs");
+   exec("art/gui/customProfiles.cs"); 
+   
    // The common module provides basic client functionality
    initBaseClient();
 
