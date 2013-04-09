@@ -76,6 +76,9 @@ Frustum::Frustum( bool isOrtho,
    mNumTiles = 1;
    mCurrTile.set(0,0);
    mTileOverlap.set(0.0f, 0.0f);
+
+   mProjectionOffset.zero();
+   mProjectionOffsetMatrix.identity();
 }
 
 //-----------------------------------------------------------------------------
@@ -433,12 +436,27 @@ void Frustum::mulL( const MatrixF& mat )
 
 //-----------------------------------------------------------------------------
 
+void Frustum::setProjectionOffset(const Point2F& offsetMat)
+{
+   mProjectionOffset = offsetMat;
+   mProjectionOffsetMatrix.identity();
+   mProjectionOffsetMatrix.setPosition(Point3F(mProjectionOffset.x, mProjectionOffset.y, 0.0f));
+}
+
+//-----------------------------------------------------------------------------
+
 void Frustum::getProjectionMatrix( MatrixF *proj, bool gfxRotate ) const
 {
    if (mIsOrtho)
+   {
       MathUtils::makeOrthoProjection(proj, mNearLeft, mNearRight, mNearTop, mNearBottom, mNearDist, mFarDist, gfxRotate);
+      proj->mulL(mProjectionOffsetMatrix);
+   }
    else
+   {
       MathUtils::makeProjection(proj, mNearLeft, mNearRight, mNearTop, mNearBottom, mNearDist, mFarDist, gfxRotate);
+      proj->mulL(mProjectionOffsetMatrix);
+   }
 }
 
 //-----------------------------------------------------------------------------

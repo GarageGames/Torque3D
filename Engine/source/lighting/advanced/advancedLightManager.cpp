@@ -438,7 +438,7 @@ void AdvancedLightManager::unregisterAllLights()
    Parent::unregisterAllLights();
 
    if ( mLightBinManager )
-      mLightBinManager->clear();
+      mLightBinManager->clearAllLights();
 }
 
 bool AdvancedLightManager::setTextureStage(  const SceneData &sgData,

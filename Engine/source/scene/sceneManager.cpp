@@ -233,7 +233,70 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
 
    // Render the scene.
 
-   renderSceneNoLights( renderState, objectMask, baseObject, baseZone );
+   if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
+   {
+      // Store previous values
+      RectI originalVP = GFX->getViewport();
+      MatrixF originalWorld = GFX->getWorldMatrix();
+
+      Point2F projOffset = GFX->getCurrentProjectionOffset();
+      Point3F eyeOffset = GFX->getStereoEyeOffset();
+
+      // Render left half of display
+      RectI leftVP = originalVP;
+      leftVP.extent.x *= 0.5;
+      GFX->setViewport(leftVP);
+
+      MatrixF leftWorldTrans(true);
+      leftWorldTrans.setPosition(Point3F(eyeOffset.x, eyeOffset.y, eyeOffset.z));
+      MatrixF leftWorld(originalWorld);
+      leftWorld.mulL(leftWorldTrans);
+      GFX->setWorldMatrix(leftWorld);
+
+      Frustum gfxFrustum = GFX->getFrustum();
+      gfxFrustum.setProjectionOffset(Point2F(projOffset.x, projOffset.y));
+      GFX->setFrustum(gfxFrustum);
+
+      SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
+      SceneRenderState renderStateLeft( this, renderState->getScenePassType(), cameraStateLeft );
+      renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
+      renderStateLeft.setSceneRenderField(0);
+
+      renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone );
+
+      // Render right half of display
+      RectI rightVP = originalVP;
+      rightVP.extent.x *= 0.5;
+      rightVP.point.x += rightVP.extent.x;
+      GFX->setViewport(rightVP);
+
+      MatrixF rightWorldTrans(true);
+      rightWorldTrans.setPosition(Point3F(-eyeOffset.x, eyeOffset.y, eyeOffset.z));
+      MatrixF rightWorld(originalWorld);
+      rightWorld.mulL(rightWorldTrans);
+      GFX->setWorldMatrix(rightWorld);
+
+      gfxFrustum = GFX->getFrustum();
+      gfxFrustum.setProjectionOffset(Point2F(-projOffset.x, projOffset.y));
+      GFX->setFrustum(gfxFrustum);
+
+      SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
+      SceneRenderState renderStateRight( this, renderState->getScenePassType(), cameraStateRight );
+      renderStateRight.setSceneRenderStyle(SRS_SideBySide);
+      renderStateRight.setSceneRenderField(1);
+
+      renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone );
+
+      // Restore previous values
+      GFX->setWorldMatrix(originalWorld);
+      gfxFrustum.clearProjectionOffset();
+      GFX->setFrustum(gfxFrustum);
+      GFX->setViewport(originalVP);
+   }
+   else
+   {
+      renderSceneNoLights( renderState, objectMask, baseObject, baseZone );
+   }
 
    // Trigger the post-render signal.
 
