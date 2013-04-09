@@ -57,6 +57,10 @@
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
 
+#ifdef TORQUE_EXTENDED_MOVE
+   #include "T3D/gameBase/extended/extendedMove.h"
+#endif
+
 // Amount of time if takes to transition to a new action sequence.
 static F32 sAnimationTransitionTime = 0.25f;
 static bool sUseAnimationTransitions = true;
@@ -95,6 +99,8 @@ static S32 sVehicleDismountTrigger = 2;
 static F32 sMinWarpTicks = 0.5f;       // Fraction of tick at which instant warp occurs
 static S32 sMaxWarpTicks = 3;          // Max warp duration in ticks
 static S32 sMaxPredictionTicks = 30;   // Number of ticks to predict
+
+S32 Player::smExtendedMoveHeadPosRotIndex = 0;  // The ExtendedMove position/rotation index used for head movements
 
 // Anchor point compression
 const F32 sAnchorMaxDistance = 32.0f;
@@ -1650,6 +1656,9 @@ Player::Player()
       mShapeFPFlashThread[i] = 0;
       mShapeFPSpinThread[i] = 0;
    }
+
+   mLastAbsoluteYaw = 0.0f;
+   mLastAbsolutePitch = 0.0f;
 }
 
 Player::~Player()
@@ -2523,38 +2532,130 @@ void Player::updateMove(const Move* move)
       F32 prevZRot = mRot.z;
       delta.headVec = mHead;
 
-      F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
-      if (p > M_PI_F) 
-         p -= M_2PI_F;
-      mHead.x = mClampF(mHead.x + p,mDataBlock->minLookAngle,
-                        mDataBlock->maxLookAngle);
-
-      F32 y = move->yaw * (mPose == SprintPose ? mDataBlock->sprintYawScale : 1.0f);
-      if (y > M_PI_F)
-         y -= M_2PI_F;
-
+      bool doStandardMove = true;
       GameConnection* con = getControllingClient();
-      if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
-      {
-         mHead.z = mClampF(mHead.z + y,
-                           -mDataBlock->maxFreelookAngle,
-                           mDataBlock->maxFreelookAngle);
-      }
-      else
-      {
-         mRot.z += y;
-         // Rotate the head back to the front, center horizontal
-         // as well if we're controlling another object.
-         mHead.z *= 0.5f;
-         if (mControlObject)
-            mHead.x *= 0.5f;
-      }
 
-      // constrain the range of mRot.z
-      while (mRot.z < 0.0f)
-         mRot.z += M_2PI_F;
-      while (mRot.z > M_2PI_F)
-         mRot.z -= M_2PI_F;
+#ifdef TORQUE_EXTENDED_MOVE
+      // Work with an absolute rotation from the ExtendedMove class?
+      if(con && con->getControlSchemeAbsoluteRotation())
+      {
+         doStandardMove = false;
+         const ExtendedMove* emove = dynamic_cast<const ExtendedMove*>(move);
+         U32 emoveIndex = smExtendedMoveHeadPosRotIndex;
+         if(emoveIndex >= ExtendedMove::MaxPositionsRotations)
+            emoveIndex = 0;
+
+         if(emove->EulerBasedRotation[emoveIndex])
+         {
+            // Head pitch
+            mHead.x += (emove->rotX[emoveIndex] - mLastAbsolutePitch);
+
+            // Do we also include the relative yaw value?
+            if(con->getControlSchemeAddPitchToAbsRot())
+            {
+               F32 x = move->pitch;
+               if (x > M_PI_F)
+                  x -= M_2PI_F;
+
+               mHead.x += x;
+            }
+
+            // Constrain the range of mHead.x
+            while (mHead.x < -M_PI_F) 
+               mHead.x += M_2PI_F;
+            while (mHead.x > M_PI_F) 
+               mHead.x -= M_2PI_F;
+
+            // Rotate (heading) head or body?
+            if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
+            {
+               // Rotate head
+               mHead.z += (emove->rotZ[emoveIndex] - mLastAbsoluteYaw);
+
+               // Do we also include the relative yaw value?
+               if(con->getControlSchemeAddYawToAbsRot())
+               {
+                  F32 z = move->yaw;
+                  if (z > M_PI_F)
+                     z -= M_2PI_F;
+
+                  mHead.z += z;
+               }
+
+               // Constrain the range of mHead.z
+               while (mHead.z < 0.0f)
+                  mHead.z += M_2PI_F;
+               while (mHead.z > M_2PI_F)
+                  mHead.z -= M_2PI_F;
+            }
+            else
+            {
+               // Rotate body
+               mRot.z += (emove->rotZ[emoveIndex] - mLastAbsoluteYaw);
+
+               // Do we also include the relative yaw value?
+               if(con->getControlSchemeAddYawToAbsRot())
+               {
+                  F32 z = move->yaw;
+                  if (z > M_PI_F)
+                     z -= M_2PI_F;
+
+                  mRot.z += z;
+               }
+
+               // Constrain the range of mRot.z
+               while (mRot.z < 0.0f)
+                  mRot.z += M_2PI_F;
+               while (mRot.z > M_2PI_F)
+                  mRot.z -= M_2PI_F;
+            }
+            mLastAbsoluteYaw = emove->rotZ[emoveIndex];
+            mLastAbsolutePitch = emove->rotX[emoveIndex];
+
+            // Head bank
+            mHead.y = emove->rotY[emoveIndex];
+
+            // Constrain the range of mHead.y
+            while (mHead.y > M_PI_F) 
+               mHead.y -= M_2PI_F;
+         }
+      }
+#endif
+
+      if(doStandardMove)
+      {
+         F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
+         if (p > M_PI_F) 
+            p -= M_2PI_F;
+         mHead.x = mClampF(mHead.x + p,mDataBlock->minLookAngle,
+                           mDataBlock->maxLookAngle);
+
+         F32 y = move->yaw * (mPose == SprintPose ? mDataBlock->sprintYawScale : 1.0f);
+         if (y > M_PI_F)
+            y -= M_2PI_F;
+
+         if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
+         {
+            mHead.z = mClampF(mHead.z + y,
+                              -mDataBlock->maxFreelookAngle,
+                              mDataBlock->maxFreelookAngle);
+         }
+         else
+         {
+            mRot.z += y;
+            // Rotate the head back to the front, center horizontal
+            // as well if we're controlling another object.
+            mHead.z *= 0.5f;
+            if (mControlObject)
+               mHead.x *= 0.5f;
+         }
+
+         // constrain the range of mRot.z
+         while (mRot.z < 0.0f)
+            mRot.z += M_2PI_F;
+         while (mRot.z > M_2PI_F)
+            mRot.z -= M_2PI_F;
+      }
 
       delta.rot = mRot;
       delta.rotVec.x = delta.rotVec.y = 0.0f;
@@ -2566,6 +2667,13 @@ void Player::updateMove(const Move* move)
 
       delta.head = mHead;
       delta.headVec -= mHead;
+      for(U32 i=0; i<3; ++i)
+      {
+         if (delta.headVec[i] > M_PI_F)
+            delta.headVec[i] -= M_2PI_F;
+         else if (delta.headVec[i] < -M_PI_F)
+            delta.headVec[i] += M_2PI_F;
+      }
    }
    MatrixF zRot;
    zRot.set(EulerF(0.0f, 0.0f, mRot.z));
@@ -5259,7 +5367,7 @@ void Player::setTransform(const MatrixF& mat)
 
 void Player::getEyeTransform(MatrixF* mat)
 {
-   getEyeBaseTransform(mat);
+   getEyeBaseTransform(mat, true);
 
    // The shape instance is animated in getEyeBaseTransform() so we're
    // good here when attempting to get the eye node position on the server.
@@ -5297,7 +5405,7 @@ void Player::getEyeTransform(MatrixF* mat)
    }
 }
 
-void Player::getEyeBaseTransform(MatrixF* mat)
+void Player::getEyeBaseTransform(MatrixF* mat, bool includeBank)
 {
    // Eye transform in world space.  We only use the eye position
    // from the animation and supply our own rotation.
@@ -5313,7 +5421,19 @@ void Player::getEyeBaseTransform(MatrixF* mat)
    else
       zmat.identity();
 
-   pmat.mul(zmat,xmat);
+   if(includeBank && mDataBlock->cameraCanBank)
+   {
+      // Take mHead.y into account to bank the camera
+      MatrixF imat;
+      imat.mul(zmat, xmat);
+      MatrixF ymat;
+      ymat.set(EulerF(0.0f, mHead.y, 0.0f));
+      pmat.mul(imat, ymat);
+   }
+   else
+   {
+      pmat.mul(zmat,xmat);
+   }
 
    F32 *dp = pmat;
 
@@ -5340,7 +5460,7 @@ void Player::getEyeBaseTransform(MatrixF* mat)
 
 void Player::getRenderEyeTransform(MatrixF* mat)
 {
-   getRenderEyeBaseTransform(mat);
+   getRenderEyeBaseTransform(mat, true);
 
    // Use the first image that is set to use the eye node
    for (U32 i=0; i<ShapeBase::MaxMountedImages; ++i)
@@ -5369,7 +5489,7 @@ void Player::getRenderEyeTransform(MatrixF* mat)
    }
 }
 
-void Player::getRenderEyeBaseTransform(MatrixF* mat)
+void Player::getRenderEyeBaseTransform(MatrixF* mat, bool includeBank)
 {
    // Eye transform in world space.  We only use the eye position
    // from the animation and supply our own rotation.
@@ -5381,7 +5501,19 @@ void Player::getRenderEyeBaseTransform(MatrixF* mat)
    else
       zmat.identity();
 
-   pmat.mul(zmat,xmat);
+   if(includeBank && mDataBlock->cameraCanBank)
+   {
+      // Take mHead.y delta into account to bank the camera
+      MatrixF imat;
+      imat.mul(zmat, xmat);
+      MatrixF ymat;
+      ymat.set(EulerF(0.0f, delta.head.y + delta.headVec.y * delta.dt, 0.0f));
+      pmat.mul(imat, ymat);
+   }
+   else
+   {
+      pmat.mul(zmat,xmat);
+   }
 
    F32 *dp = pmat;
 
@@ -5539,7 +5671,7 @@ void Player::renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRend
       if (data.useEyeNode && data.eyeMountNode[imageShapeIndex] != -1)
       {
          MatrixF nmat;
-         getRenderEyeBaseTransform(&nmat);
+         getRenderEyeBaseTransform(&nmat, mDataBlock->mountedImagesBank);
          MatrixF offsetMat = image.shapeInstance[imageShapeIndex]->mNodeTransforms[data.eyeMountNode[imageShapeIndex]];
          offsetMat.affineInverse();
          world.mul(nmat,offsetMat);
@@ -5547,7 +5679,7 @@ void Player::renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRend
       else
       {
          MatrixF nmat;
-         getRenderEyeBaseTransform(&nmat);
+         getRenderEyeBaseTransform(&nmat, mDataBlock->mountedImagesBank);
          world.mul(nmat,data.eyeOffset);
       }
 
@@ -5866,6 +5998,11 @@ void Player::writePacketData(GameConnection *connection, BitStream *stream)
       }
    }
    stream->write(mHead.x);
+   if(stream->writeFlag(mDataBlock->cameraCanBank))
+   {
+      // Include mHead.y to allow for camera banking
+      stream->write(mHead.y);
+   }
    stream->write(mHead.z);
    stream->write(mRot.z);
 
@@ -5928,6 +6065,11 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
    else
       pos = delta.pos;
    stream->read(&mHead.x);
+   if(stream->readFlag())
+   {
+      // Include mHead.y to allow for camera banking
+      stream->read(&mHead.y);
+   }
    stream->read(&mHead.z);
    stream->read(&rot.z);
    rot.x = rot.y = 0;
@@ -6586,6 +6728,11 @@ void Player::consoleInit()
 	   "@ingroup GameObjects\n");
    Con::addVariable("$player::vehicleDismountTrigger", TypeS32, &sVehicleDismountTrigger, 
       "@brief The move trigger index used to dismount player.\n\n"
+	   "@ingroup GameObjects\n");
+
+   // ExtendedMove support
+   Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
+      "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
 	   "@ingroup GameObjects\n");
 }
 
