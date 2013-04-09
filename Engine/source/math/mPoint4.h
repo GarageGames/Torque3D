@@ -42,6 +42,8 @@ class Point4I
    Point4I() {}
    Point4I(S32 _x, S32 _y, S32 _z, S32 _w);
 
+   void zero();   ///< Zero all values
+
    S32 x;                                                   
    S32 y;                                                   
    S32 z;                                                   
@@ -85,6 +87,8 @@ class Point4F
    /// @param   _factor Interpolation factor (0.0 .. 1.0).
    void interpolate(const Point4F& _pt1, const Point4F& _pt2, F32 _factor);
 
+   void zero();
+
    operator F32*() { return (&x); }
    operator const F32*() const { return &x; }
    
@@ -110,6 +114,14 @@ class Point4F
 };
 
 typedef Point4F Vector4F;   ///< Points can be vectors!
+
+//------------------------------------------------------------------------------
+//-------------------------------------- Point4I
+
+inline void Point4I::zero()
+{
+   x = y = z = w = 0;
+}
 
 //------------------------------------------------------------------------------
 //-------------------------------------- Point4F
@@ -147,6 +159,11 @@ inline void Point4F::interpolate(const Point4F& _from, const Point4F& _to, F32 _
    y = (_from.y * (1.0f - _factor)) + (_to.y * _factor);
    z = (_from.z * (1.0f - _factor)) + (_to.z * _factor);
    w = (_from.w * (1.0f - _factor)) + (_to.w * _factor);
+}
+
+inline void Point4F::zero()
+{
+   x = y = z = w = 0.0f;
 }
 
 inline Point4F& Point4F::operator=(const Point3F &_vec)
