@@ -57,16 +57,16 @@ void GFXTextureManager::init()
       "as not allowing down scaling.\n"
       "@ingroup GFX\n" );
 
-   Con::addVariable( "$pref::Video::missingTexturePath", TypeString, &smMissingTexturePath,
+   Con::addVariable( "$pref::Video::missingTexturePath", TypeRealString, &smMissingTexturePath,
       "The file path of the texture to display when the requested texture is missing.\n"
       "@ingroup GFX\n" );
 
-   Con::addVariable( "$pref::Video::unavailableTexturePath", TypeString, &smUnavailableTexturePath,
+   Con::addVariable( "$pref::Video::unavailableTexturePath", TypeRealString, &smUnavailableTexturePath,
       "@brief The file path of the texture to display when the requested texture is unavailable.\n\n"
       "Often this texture is used by GUI controls to indicate that the request image is unavailable.\n"
       "@ingroup GFX\n" );
 
-   Con::addVariable( "$pref::Video::warningTexturePath", TypeString, &smWarningTexturePath,
+   Con::addVariable( "$pref::Video::warningTexturePath", TypeRealString, &smWarningTexturePath,
       "The file path of the texture used to warn the developer.\n"
       "@ingroup GFX\n" );
 }
