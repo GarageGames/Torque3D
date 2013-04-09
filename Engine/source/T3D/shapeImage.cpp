@@ -1861,7 +1861,7 @@ void ShapeBase::getImageTransform(U32 imageSlot,MatrixF* mat)
          // We need to animate, even on the server, to make sure the nodes are in the correct location.
          image.shapeInstance[shapeIndex]->animate();
 
-         getEyeBaseTransform(&nmat);
+         getEyeBaseTransform(&nmat, mDataBlock->mountedImagesBank);
 
          MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
 
@@ -1900,7 +1900,7 @@ void ShapeBase::getImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
             image.shapeInstance[shapeIndex]->animate();
 
             MatrixF emat;
-            getEyeBaseTransform(&emat);
+            getEyeBaseTransform(&emat, mDataBlock->mountedImagesBank);
 
             MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
             mountTransform.affineInverse();
@@ -1985,7 +1985,7 @@ void ShapeBase::getRenderImageTransform( U32 imageSlot, MatrixF* mat, bool noEye
 
       MatrixF nmat;
       if ( data.useEyeNode && isFirstPerson() && data.eyeMountNode[shapeIndex] != -1 ) {
-         getRenderEyeBaseTransform(&nmat);
+         getRenderEyeBaseTransform(&nmat, mDataBlock->mountedImagesBank);
 
          MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
 
@@ -2023,7 +2023,7 @@ void ShapeBase::getRenderImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
          if ( data.useEyeNode && isFirstPerson() && data.eyeMountNode[shapeIndex] != -1 )
          {
             MatrixF emat;
-            getRenderEyeBaseTransform(&emat);
+            getRenderEyeBaseTransform(&emat, mDataBlock->mountedImagesBank);
 
             MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
             mountTransform.affineInverse();
