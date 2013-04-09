@@ -52,9 +52,15 @@ bool PlatformVideoInfo::profileAdapters()
    String tempString;
 
    if( !_queryProperty( PVI_NumAdapters, 0, &tempString ) )
-      return false;
-
-   mAdapters.increment( dAtoi( tempString ) );
+   {
+      // Not all platforms may support PVI_NumAdapters.  We will assume that there
+      // is one adapter.  This was the behavior before PVI_NumAdapters was implemented.
+      mAdapters.increment( 1 );
+   }
+   else
+   {
+      mAdapters.increment( dAtoi( tempString ) );
+   }
 
    U32 adapterNum = 0;
    for( Vector<PVIAdapter>::iterator itr = mAdapters.begin(); itr != mAdapters.end(); itr++ )
