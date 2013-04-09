@@ -156,35 +156,63 @@ void GFXInit::cleanup()
       SAFE_DELETE( smRegisterDeviceSignal );
 }
 
-GFXAdapter* GFXInit::getAdapterOfType( GFXAdapterType type )
+bool GFXInit::compareAdapterOutputDevice(const GFXAdapter* adapter, const char* outputDevice)
 {
-   GFXAdapter* adapter = NULL;
+   // If the adapter doesn't have an output display device, then it supports all of them
+   if(!adapter->mOutputName[0])
+      return true;
+
+   // Try and match the first part of the output device display name.  For example,
+   // an adapter->mOutputName of "\\.\DISPLAY1" might correspond to a display name
+   // of "\\.\DISPLAY1\Monitor0".  If two monitors are set up in duplicate mode then
+   // they will have the same 'display' part in their display name.
+   return (dStrstr(outputDevice, adapter->mOutputName) == outputDevice);
+}
+
+GFXAdapter* GFXInit::getAdapterOfType( GFXAdapterType type, const char* outputDevice )
+{
+   bool testOutputDevice = false;
+   if(outputDevice && outputDevice[0])
+      testOutputDevice = true;
+
    for( U32 i = 0; i < smAdapters.size(); i++ )
    {
       if( smAdapters[i]->mType == type )
       {
-         adapter = smAdapters[i];
-         break;
+         if(testOutputDevice)
+         {
+            // Check if the output display device also matches
+            if(compareAdapterOutputDevice(smAdapters[i], outputDevice))
+            {
+               return smAdapters[i];
+            }
+         }
+         else
+         {
+            // No need to also test the output display device, so return
+            return smAdapters[i];
+         }
       }
    }
-   return adapter;
+
+   return NULL;
 }
 
-GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type)
+GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevice)
 {
-   GFXAdapter* adapter = GFXInit::getAdapterOfType(type);
+   GFXAdapter* adapter = GFXInit::getAdapterOfType(type, outputDevice);
    
    if(!adapter && type != OpenGL)
    {
       Con::errorf("The requested renderer, %s, doesn't seem to be available."
                   " Trying the default, OpenGL.", getAdapterNameFromType(type));
-      adapter = GFXInit::getAdapterOfType(OpenGL);         
+      adapter = GFXInit::getAdapterOfType(OpenGL, outputDevice);
    }
    
    if(!adapter)
    {
       Con::errorf("The OpenGL renderer doesn't seem to be available. Trying the GFXNulDevice.");
-      adapter = GFXInit::getAdapterOfType(NullDevice);
+      adapter = GFXInit::getAdapterOfType(NullDevice, "");
    }
    
    AssertFatal( adapter, "There is no rendering device available whatsoever.");
@@ -226,8 +254,9 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
 {
    // Get the user's preference for device...
    const String   renderer   = Con::getVariable("$pref::Video::displayDevice");
-   GFXAdapterType adapterType = getAdapterTypeFromName(renderer);
-   GFXAdapter     *adapter    = chooseAdapter(adapterType);
+   const String   outputDevice = Con::getVariable("$pref::Video::displayOutputDevice");
+   GFXAdapterType adapterType = getAdapterTypeFromName(renderer.c_str());
+   GFXAdapter     *adapter    = chooseAdapter(adapterType, outputDevice.c_str());
 
    // Did they have one? Return it.
    if(adapter)
@@ -341,7 +370,7 @@ void GFXInit::enumerateAdapters()
 
 GFXDevice *GFXInit::createDevice( GFXAdapter *adapter ) 
 {
-   Con::printf("Attempting to create GFX device: %s", adapter->getName());
+   Con::printf("Attempting to create GFX device: %s [%s]", adapter->getName(), adapter->getOutputName());
 
    GFXDevice* temp = adapter->mCreateDeviceInstanceDelegate(adapter->mIndex);
    if (temp)
@@ -384,6 +413,20 @@ DefineEngineStaticMethod( GFXInit, getAdapterName, String, ( S32 index ),,
       return adapters[index]->mName;
 
    Con::errorf( "GFXInit::getAdapterName - Out of range adapter index." );
+   return String::EmptyString;
+}
+
+DefineEngineStaticMethod( GFXInit, getAdapterOutputName, String, ( S32 index ),,
+   "Returns the name of the graphics adapter's output display device.\n"
+   "@param index The index of the adapter." )
+{
+   Vector<GFXAdapter*> adapters( __FILE__, __LINE__ );
+   GFXInit::getAdapters(&adapters);
+
+   if(index >= 0 && index < adapters.size())
+      return adapters[index]->mOutputName;
+
+   Con::errorf( "GFXInit::getAdapterOutputName - Out of range adapter index." );
    return String::EmptyString;
 }
 
@@ -486,7 +529,7 @@ DefineEngineStaticMethod( GFXInit, createNullDevice, void, (),,
    GFXInit::enumerateAdapters();
  
    // Create a device.
-   GFXAdapter *a = GFXInit::chooseAdapter(NullDevice);
+   GFXAdapter *a = GFXInit::chooseAdapter(NullDevice, "");
  
    GFXDevice *newDevice = GFX;
  

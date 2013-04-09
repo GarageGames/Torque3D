@@ -119,7 +119,7 @@ struct DXDIAG_INIT_PARAMS
 
 struct IDxDiagContainer : public IUnknown
 {
-   virtual HRESULT   STDMETHODCALLTYPE GetNumberOfChildContaiiners( DWORD* pdwCount ) = 0;
+   virtual HRESULT   STDMETHODCALLTYPE GetNumberOfChildContainers( DWORD* pdwCount ) = 0;
    virtual HRESULT   STDMETHODCALLTYPE EnumChildContainerNames( DWORD dwIndex, LPWSTR pwszContainer, DWORD cchContainer ) = 0;
    virtual HRESULT   STDMETHODCALLTYPE GetChildContainer( LPCWSTR pwszContainer, IDxDiagContainer** ppInstance ) = 0;
    virtual HRESULT   STDMETHODCALLTYPE GetNumberOfProps( DWORD* pdwCount ) = 0;
@@ -360,6 +360,28 @@ bool WMIVideoInfo::_queryPropertyDxDiag( const PVIQueryType queryType, const U32
       IDxDiagContainer* rootContainer = 0;
       IDxDiagContainer* displayDevicesContainer = 0;
       IDxDiagContainer* deviceContainer = 0;
+
+      // Special case to deal with PVI_NumAdapters
+      if(queryType == PVI_NumAdapters)
+      {
+         DWORD count = 0;
+         String value;
+
+         if( mDxDiagProvider->GetRootContainer( &rootContainer ) == S_OK
+            && rootContainer->GetChildContainer( L"DxDiag_DisplayDevices", &displayDevicesContainer ) == S_OK
+            && displayDevicesContainer->GetNumberOfChildContainers( &count ) == S_OK )
+         {
+            value = String::ToString("%d", count);
+         }
+
+         if( rootContainer )
+            SAFE_RELEASE( rootContainer );
+         if( displayDevicesContainer )
+            SAFE_RELEASE( displayDevicesContainer );
+
+         *outValue = value;
+         return true;
+      }
 
       WCHAR adapterIdString[ 2 ];
       adapterIdString[ 0 ] = L'0' + adapterId;
