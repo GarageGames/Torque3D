@@ -171,6 +171,8 @@ ShapeBaseData::ShapeBaseData()
    cameraDefaultFov( 75.0f ),
    cameraMinFov( 5.0f ),
    cameraMaxFov( 120.f ),
+   cameraCanBank( false ),
+   mountedImagesBank( false ),
    isInvincible( false ),
    renderWhenDestroyed( true ),
    debris( NULL ),
@@ -544,6 +546,10 @@ void ShapeBaseData::initPersistFields()
          "The minimum camera vertical FOV allowed in degrees." );
       addField( "cameraMaxFov", TypeF32, Offset(cameraMaxFov, ShapeBaseData),
          "The maximum camera vertical FOV allowed in degrees." );
+      addField( "cameraCanBank", TypeBool, Offset(cameraCanBank, ShapeBaseData),
+         "If the derrived class supports it, allow the camera to bank." );
+      addField( "mountedImagesBank", TypeBool, Offset(mountedImagesBank, ShapeBaseData),
+         "Do mounted images bank along with the camera?" );
       addField( "firstPersonOnly", TypeBool, Offset(firstPersonOnly, ShapeBaseData),
          "Flag controlling whether the view from this object is first person "
          "only." );
@@ -689,6 +695,8 @@ void ShapeBaseData::packData(BitStream* stream)
       stream->write(cameraMinFov);
    if(stream->writeFlag(cameraMaxFov != gShapeBaseDataProto.cameraMaxFov))
       stream->write(cameraMaxFov);
+   stream->writeFlag(cameraCanBank);
+   stream->writeFlag(mountedImagesBank);
    stream->writeString( debrisShapeName );
 
    stream->writeFlag(observeThroughObject);
@@ -787,6 +795,9 @@ void ShapeBaseData::unpackData(BitStream* stream)
       stream->read(&cameraMaxFov);
    else
       cameraMaxFov = gShapeBaseDataProto.cameraMaxFov;
+
+   cameraCanBank = stream->readFlag();
+   mountedImagesBank = stream->readFlag();
 
    debrisShapeName = stream->readSTString();
 
@@ -1872,10 +1883,10 @@ Point3F ShapeBase::getAIRepairPoint()
 
 void ShapeBase::getEyeTransform(MatrixF* mat)
 {
-   getEyeBaseTransform(mat);
+   getEyeBaseTransform(mat, true);
 }
 
-void ShapeBase::getEyeBaseTransform(MatrixF* mat)
+void ShapeBase::getEyeBaseTransform(MatrixF* mat, bool includeBank)
 {
    // Returns eye to world space transform
    S32 eyeNode = mDataBlock->eyeNode;
@@ -1887,10 +1898,10 @@ void ShapeBase::getEyeBaseTransform(MatrixF* mat)
 
 void ShapeBase::getRenderEyeTransform(MatrixF* mat)
 {
-   getRenderEyeBaseTransform(mat);
+   getRenderEyeBaseTransform(mat, true);
 }
 
-void ShapeBase::getRenderEyeBaseTransform(MatrixF* mat)
+void ShapeBase::getRenderEyeBaseTransform(MatrixF* mat, bool includeBank)
 {
    // Returns eye to world space transform
    S32 eyeNode = mDataBlock->eyeNode;
