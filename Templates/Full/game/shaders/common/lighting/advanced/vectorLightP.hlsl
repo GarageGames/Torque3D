@@ -73,7 +73,7 @@ float4 main( FarFrustumQuadConnectP IN,
 
    // Use eye ray to get ws pos
    float4 worldPos = float4(eyePosWorld + IN.wsEyeRay * depth, 1.0f);
-
+   
    // Get the light attenuation.
    float dotNL = dot(-lightDirection, normal);
 
