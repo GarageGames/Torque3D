@@ -36,8 +36,10 @@ class GFXD3D9TextureManager : public GFXTextureManager
 {
    friend class GFXD3D9TextureObject;
 
+   U32 mAdapterIndex;
+
 public:
-   GFXD3D9TextureManager( LPDIRECT3DDEVICE9 d3ddevice );
+   GFXD3D9TextureManager( LPDIRECT3DDEVICE9 d3ddevice, U32 adapterIndex );
    virtual ~GFXD3D9TextureManager();
 
 protected:

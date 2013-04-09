@@ -36,7 +36,7 @@ private:
    UINT mAdapterOrdinal;
 
 public:
-   GFXD3D9CardProfiler();
+   GFXD3D9CardProfiler(U32 adapterIndex);
    ~GFXD3D9CardProfiler();
    void init();
 
