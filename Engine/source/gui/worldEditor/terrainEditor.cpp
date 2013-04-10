@@ -710,6 +710,7 @@ TerrainEditor::TerrainEditor() :
    mActions.push_back(new AdjustHeightAction(this));
    mActions.push_back(new FlattenHeightAction(this));
    mActions.push_back(new SmoothHeightAction(this));
+   mActions.push_back(new SmoothSlopeAction(this));
    mActions.push_back(new PaintNoiseAction(this));
    //mActions.push_back(new ThermalErosionAction(this));
 
