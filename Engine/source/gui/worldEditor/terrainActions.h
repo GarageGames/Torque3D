@@ -258,6 +258,15 @@ class SmoothHeightAction : public TerrainAction
       void process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type);
 };
 
+class SmoothSlopeAction : public TerrainAction  
+{  
+   public:  
+      SmoothSlopeAction(TerrainEditor * editor) : TerrainAction(editor){}  
+      StringTableEntry getName(){return("smoothSlope");}  
+  
+      void process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type);  
+};  
+
 class PaintNoiseAction : public TerrainAction
 {
    public:
