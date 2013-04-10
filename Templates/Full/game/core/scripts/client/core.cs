@@ -54,6 +54,9 @@ function initializeCore()
    exec( "./audioStates.cs" );
    exec( "./audioAmbiences.cs" );
 
+   // Input devices
+   exec("~/scripts/client/oculusVR.cs");
+
    // Seed the random number generator.
    setRandomSeed();
    
