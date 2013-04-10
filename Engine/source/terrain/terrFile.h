@@ -269,7 +269,7 @@ inline F32 fixedToFloat( U16 val )
 /// Conversion from floating point to 11.5 fixed point.
 inline U16 floatToFixed( F32 val )
 {
-   return U16(val * 32.0);
+   return U16(val * 32.0 + 0.5f);
 }
 
 inline bool TerrainFile::isPointInTerrain( U32 x, U32 y ) const
