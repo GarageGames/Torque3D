@@ -100,6 +100,28 @@
       useMouseEvents = "0";
       bitmap = "tools/worldEditor/images/smoothHeight";
    };
+   new GuiBitmapButtonCtrl() {  
+      canSaveDynamicFields = "0";  
+      internalName = "smoothSlope";  
+      Enabled = "1";  
+      isContainer = "0";  
+      Profile = "GuiButtonProfile";  
+      HorizSizing = "right";  
+      VertSizing = "bottom";  
+      position = "144 0";  
+      Extent = "25 19";  
+      MinExtent = "8 2";  
+      canSave = "1";  
+      Visible = "1";  
+      Command = "ETerrainEditor.switchAction( smoothSlope );";  
+      tooltipprofile = "GuiToolTipProfile";  
+      ToolTip = "Smooth Slope (5)";  
+      hovertime = "750";  
+      text = "Button";  
+      buttonType = "RadioButton";  
+      useMouseEvents = "0";  
+      bitmap = "tools/worldEditor/images/softCurve";  
+   };  
    new GuiBitmapButtonCtrl() {
       canSaveDynamicFields = "0";
       internalName = "paintNoise";
@@ -115,7 +137,7 @@
       Visible = "1";
       Command = "ETerrainEditor.switchAction( paintNoise );";
       tooltipprofile = "ToolsGuiToolTipProfile";
-      ToolTip = "Paint Noise (5)";
+      ToolTip = "Paint Noise (6)";
       hovertime = "750";
       text = "Button";
       buttonType = "RadioButton";
@@ -137,7 +159,7 @@
       Visible = "1";
       Command = "ETerrainEditor.switchAction( flattenHeight );";
       tooltipprofile = "ToolsGuiToolTipProfile";
-      ToolTip = "Flatten (6)";
+      ToolTip = "Flatten (7)";
       hovertime = "750";
       text = "Button";
       buttonType = "RadioButton";
@@ -159,7 +181,7 @@
       Visible = "1";
       Command = "ETerrainEditor.switchAction( setHeight );";
       tooltipprofile = "ToolsGuiToolTipProfile";
-      ToolTip = "Set Height (7)";
+      ToolTip = "Set Height (8)";
       hovertime = "750";
       text = "Button";
       buttonType = "RadioButton";
@@ -181,7 +203,7 @@
       Visible = "1";
       Command = "ETerrainEditor.switchAction( setEmpty );";
       tooltipprofile = "ToolsGuiToolTipProfile";
-      ToolTip = "Clear Terrain (8)";
+      ToolTip = "Clear Terrain (9)";
       hovertime = "750";
       text = "Button";
       buttonType = "RadioButton";
@@ -203,7 +225,7 @@
       Visible = "1";
       Command = "ETerrainEditor.switchAction( clearEmpty );";
       tooltipprofile = "ToolsGuiToolTipProfile";
-      ToolTip = "Restore Terrain (9)";
+      ToolTip = "Restore Terrain (0)";
       hovertime = "750";
       text = "Button";
       buttonType = "RadioButton";
