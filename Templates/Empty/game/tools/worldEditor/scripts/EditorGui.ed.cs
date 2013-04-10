@@ -997,12 +997,13 @@ function TerrainEditorPlugin::onWorldEditorStartup( %this )
    %map.bindCmd( keyboard, "1", "ToolsPaletteArray->brushAdjustHeight.performClick();", "" );    //Grab Terrain
    %map.bindCmd( keyboard, "2", "ToolsPaletteArray->raiseHeight.performClick();", "" );     // Raise Height
    %map.bindCmd( keyboard, "3", "ToolsPaletteArray->lowerHeight.performClick();", "" );     // Lower Height
-   %map.bindCmd( keyboard, "4", "ToolsPaletteArray->smoothHeight.performClick();", "" );    // Smooth
-   %map.bindCmd( keyboard, "5", "ToolsPaletteArray->paintNoise.performClick();", "" );      // Noise
-   %map.bindCmd( keyboard, "6", "ToolsPaletteArray->flattenHeight.performClick();", "" );   // Flatten
-   %map.bindCmd( keyboard, "7", "ToolsPaletteArray->setHeight.performClick();", "" );       // Set Height
-   %map.bindCmd( keyboard, "8", "ToolsPaletteArray->setEmpty.performClick();", "" );    // Clear Terrain
-   %map.bindCmd( keyboard, "9", "ToolsPaletteArray->clearEmpty.performClick();", "" );  // Restore Terrain
+   %map.bindCmd( keyboard, "4", "ToolsPaletteArray->smoothHeight.performClick();", "" );    // Average Height
+   %map.bindCmd( keyboard, "5", "ToolsPaletteArray->smoothSlope.performClick();", "" );    // Smooth Slope
+   %map.bindCmd( keyboard, "6", "ToolsPaletteArray->paintNoise.performClick();", "" );      // Noise
+   %map.bindCmd( keyboard, "7", "ToolsPaletteArray->flattenHeight.performClick();", "" );   // Flatten
+   %map.bindCmd( keyboard, "8", "ToolsPaletteArray->setHeight.performClick();", "" );       // Set Height
+   %map.bindCmd( keyboard, "9", "ToolsPaletteArray->setEmpty.performClick();", "" );    // Clear Terrain
+   %map.bindCmd( keyboard, "0", "ToolsPaletteArray->clearEmpty.performClick();", "" );  // Restore Terrain
    %map.bindCmd( keyboard, "v", "EWTerrainEditToolbarBrushType->ellipse.performClick();", "" );// Circle Brush
    %map.bindCmd( keyboard, "b", "EWTerrainEditToolbarBrushType->box.performClick();", "" );// Box Brush
    %map.bindCmd( keyboard, "=", "TerrainEditorPlugin.keyboardModifyBrushSize(1);", "" );// +1 Brush Size
