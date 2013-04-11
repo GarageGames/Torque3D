@@ -68,7 +68,7 @@ datablock SFXPlayList(LurkerFireSoundList)
 
 /*datablock SFXProfile(BulletImpactSound)
 {
-   filename = "art/sound/CT_fx/weapons/SCARFIRE";
+   filename = "art/sound/weapons/SCARFIRE";
    description = AudioClose3D;
    preload = true;
 };*/

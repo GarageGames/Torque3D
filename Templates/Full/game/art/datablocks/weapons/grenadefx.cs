@@ -22,7 +22,7 @@ $GrenadeUpVectorOffset = "0 0 1";
 
 datablock SFXProfile(GrenadeExplosionSound)
 {
-   filename = "art/sound/CT_fx/weapons/GRENADELAND.wav";
+   filename = "art/sound/weapons/GRENADELAND.wav";
    description = AudioDefault3d;
    preload = true;
 };
