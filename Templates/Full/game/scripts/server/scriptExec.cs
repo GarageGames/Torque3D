@@ -37,10 +37,7 @@ exec("./weapon.cs");
 
 // Load our weapon scripts
 // We only need weapon scripts for those weapons that work differently from the
-// "generic" methods defined in weapon.cs
-exec("./rocketLauncher.cs");
-exec("./soldierGun.cs");
-exec("./grenadeLauncher.cs");
+// class methods defined in weapon.cs
 exec("./proximityMine.cs");
 
 // Load our default player script
