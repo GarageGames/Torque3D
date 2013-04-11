@@ -33,10 +33,3 @@ datablock SFXProfile(ThrowSnd)
    description = AudioClose3d;
    preload = false;
 };
-
-datablock SFXProfile(OOBWarningSnd)
-{
-   filename = "art/sound/orc_pain";
-   description = "AudioLoop2D";
-   preload = false;
-};
