@@ -182,6 +182,8 @@ void GuiObjectView::initPersistFields()
          "Minimum distance below which the camera will not zoom in further." );
       addField( "cameraSpeed", TypeF32, Offset( mCameraSpeed, GuiObjectView ),
          "Multiplier for mouse camera operations." );
+      addField( "cameraRotation", TypePoint3F, Offset( mCameraRotation, GuiObjectView ),  
+         "Set the view angle of the camera." );
    
    endGroup( "Camera" );
    
@@ -206,6 +208,7 @@ void GuiObjectView::onStaticModified( StringTableEntry slotName, const char* new
    static StringTableEntry sMinOrbitDistance = StringTable->insert( "minOrbitDistance" );
    static StringTableEntry sMaxOrbitDistance = StringTable->insert( "maxOrbitDistance" );
    static StringTableEntry sAnimSequence = StringTable->insert( "animSequence" );
+   static StringTableEntry sCameraRotation = StringTable->insert( "cameraRotation" );
    
    if( slotName == sShapeFile )
       setObjectModel( String( mModelName ) );
@@ -227,6 +230,15 @@ void GuiObjectView::onStaticModified( StringTableEntry slotName, const char* new
       setOrbitDistance( mOrbitDist );
    else if( slotName == sAnimSequence )
       setObjectAnimation( String( mAnimationSeqName ) );
+   else if( slotName == sCameraRotation )  
+      setCameraRotation( mCameraRotation );
+}
+
+//------------------------------------------------------------------------------
+
+void GuiObjectView::setCameraRotation( const EulerF& rotation )  
+{  
+    mCameraRot.set(rotation);  
 }
 
 //------------------------------------------------------------------------------
