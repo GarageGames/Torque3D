@@ -726,6 +726,7 @@ ParticleEmitter::ParticleEmitter()
    mCurBuffSize = 0;
 
    mDead = false;
+   mDataBlock = NULL;
 
    // ParticleEmitter should be allocated on the client only.
    mNetFlags.set( IsGhost );
