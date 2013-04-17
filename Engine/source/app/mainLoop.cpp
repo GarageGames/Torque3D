@@ -241,6 +241,16 @@ void StandardMainLoop::init()
    DebugOutputConsumer::init();
 #endif
 
+   // init Filesystem first, so we can actually log errors for all components that follow
+   Platform::FS::InstallFileSystems(); // install all drives for now until we have everything using the volume stuff
+   Platform::FS::MountDefaults();
+
+   // Set our working directory.
+   Torque::FS::SetCwd( "game:/" );
+
+   // Set our working directory.
+   Platform::setCurrentDirectory( Platform::getMainDotCsDir() );
+
    Processor::init();
    Math::init();
    Platform::init();    // platform specific initialization
@@ -385,15 +395,6 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
    U32 i;
    for (i = 0; i < argc; i++)
       Con::setVariable(avar("Game::argv%d", i), argv[i]);
-
-   Platform::FS::InstallFileSystems(); // install all drives for now until we have everything using the volume stuff
-   Platform::FS::MountDefaults();
-
-   // Set our working directory.
-   Torque::FS::SetCwd( "game:/" );
-
-   // Set our working directory.
-   Platform::setCurrentDirectory( Platform::getMainDotCsDir() );
 
 #ifdef TORQUE_PLAYER
    if(argc > 2 && dStricmp(argv[1], "-project") == 0)

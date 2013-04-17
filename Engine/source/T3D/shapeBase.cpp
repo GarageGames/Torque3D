@@ -958,6 +958,7 @@ ShapeBase::~ShapeBase()
    if( mShapeInstance && (mShapeInstance->getDebrisRefCount() == 0) )
    {
       delete mShapeInstance;
+      mShapeInstance = NULL;
    }
 
    CollisionTimeout* ptr = mTimeoutList;
