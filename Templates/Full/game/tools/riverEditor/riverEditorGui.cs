@@ -78,7 +78,6 @@ function RiverEditorGui::createRiver( %this )
       
       rippleTex = "art/water/ripple.dds";
       foamTex = "art/water/foam";
-      cubemap = "DefaultSkyCubemap";
       depthGradientTex = "art/water/depthcolor_ramp";
    };
    
