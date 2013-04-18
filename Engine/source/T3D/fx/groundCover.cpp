@@ -1550,8 +1550,11 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
    {
       PROFILE_SCOPE( GroundCover_RenderBillboards );
 
+      // Take zoom into account.
+      F32 screenScale = state->getWorldToScreenScale().y / state->getViewport().extent.y;
+
       // Set the far distance for billboards.
-      mCuller.setFarDist( mRadius );   
+      mCuller.setFarDist( mRadius * screenScale );
 
       F32 cullScale = 1.0f;
       if ( state->isReflectPass() )
@@ -1560,7 +1563,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       // Setup our shader const data.
       // Must be done prior to submitting our render instance.
 
-      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale, mRadius * cullScale );      
+      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale * screenScale, mRadius * cullScale * screenScale );    
 
       const F32 simTime = Sim::getCurrentTime() * 0.001f;
 
