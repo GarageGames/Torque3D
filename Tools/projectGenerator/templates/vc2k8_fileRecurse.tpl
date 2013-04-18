@@ -65,21 +65,21 @@
 		Name="Debug|Win32">
 		<Tool
 			Name="VCCustomBuildTool"
-			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasmw.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
+			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
 			Outputs="$(IntDir)/$(InputName).obj"/>
 	</FileConfiguration>
 	<FileConfiguration
 		Name="Optimized Debug|Win32">
 		<Tool
 			Name="VCCustomBuildTool"
-			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasmw.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
+			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
 			Outputs="$(IntDir)/$(InputName).obj"/>
 	</FileConfiguration>
 	<FileConfiguration
 		Name="Release|Win32">
 		<Tool
 			Name="VCCustomBuildTool"
-         CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasmw.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
+         CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
 			Outputs="$(IntDir)/$(InputName).obj"/>
 	</FileConfiguration>
 {/if}{* if path == "*.asm" *}
