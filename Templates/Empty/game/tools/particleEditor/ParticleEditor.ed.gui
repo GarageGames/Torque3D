@@ -120,8 +120,8 @@ $PE_guielement_ext_colorpicker = "18 18";
             
             new GuiStackControl() {
                StackingType = "Vertical";
-               HorizStacking = "Left to Right";
-               VertStacking = "Top to Bottom";
+               HorizStacking = "Left_to_Right";
+               VertStacking = "Top_to_Bottom";
                Padding = "0";
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -276,8 +276,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -562,8 +562,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -778,8 +778,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -1090,8 +1090,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -1297,8 +1297,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -1596,8 +1596,8 @@ $PE_guielement_ext_colorpicker = "18 18";
             
             new GuiStackControl() {
                StackingType = "Vertical";
-               HorizStacking = "Left to Right";
-               VertStacking = "Top to Bottom";
+               HorizStacking = "Left_to_Right";
+               VertStacking = "Top_to_Bottom";
                Padding = "0";
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -1751,8 +1751,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -2051,8 +2051,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -2290,8 +2290,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -2492,8 +2492,8 @@ $PE_guielement_ext_colorpicker = "18 18";
                   
                   new GuiStackControl() {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "0";
                      canSaveDynamicFields = "0";
                      Enabled = "1";

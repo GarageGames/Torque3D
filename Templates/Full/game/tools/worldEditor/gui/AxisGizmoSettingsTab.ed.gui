@@ -69,8 +69,8 @@
          
          new GuiStackControl() {
             StackingType = "Vertical";
-            HorizStacking = "Left to Right";
-            VertStacking = "Top to Bottom";
+            HorizStacking = "Left_to_Right";
+            VertStacking = "Top_to_Bottom";
             Padding = "0";
             isContainer = "1";
             Profile = "ToolsGuiDefaultProfile";
@@ -98,8 +98,8 @@
                 
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "0";
                   isContainer = "1";
                   Profile = "ToolsGuiDefaultProfile";
@@ -295,8 +295,8 @@
                 
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "0";
                   isContainer = "1";
                   Profile = "ToolsGuiDefaultProfile";

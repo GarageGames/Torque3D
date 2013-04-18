@@ -97,8 +97,8 @@
 
             new GuiStackControl() {
                stackingType = "Vertical";
-               horizStacking = "Left to Right";
-               vertStacking = "Top to Bottom";
+               horizStacking = "Left_to_Right";
+               vertStacking = "Top_to_Bottom";
                padding = "0";
                dynamicSize = "1";
                changeChildSizeToFit = "1";
@@ -431,8 +431,8 @@
 
             new GuiStackControl() {
                stackingType = "Vertical";
-               horizStacking = "Left to Right";
-               vertStacking = "Top to Bottom";
+               horizStacking = "Left_to_Right";
+               vertStacking = "Top_to_Bottom";
                padding = "0";
                dynamicSize = "1";
                changeChildSizeToFit = "1";

@@ -281,8 +281,8 @@
                      dividerMargin = "5";
                      showCustomFields = "1";
                      stackingType = "Vertical";
-                     horizStacking = "Left to Right";
-                     vertStacking = "Top to Bottom";
+                     horizStacking = "Left_to_Right";
+                     vertStacking = "Top_to_Bottom";
                      padding = "1";
                      dynamicSize = "1";
                      changeChildSizeToFit = "1";

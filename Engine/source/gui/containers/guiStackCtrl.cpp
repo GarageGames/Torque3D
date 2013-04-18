@@ -66,15 +66,15 @@ EndImplementEnumType;
 ImplementEnumType( GuiHorizontalStackingType,
    "Determines how child controls are stacked horizontally.\n\n"
    "@ingroup GuiContainers" )
-   { GuiStackControl::horizStackLeft, "Left to Right", "Child controls are positioned in order from left to right (left-most control is first)" },
-   { GuiStackControl::horizStackRight,"Right to Left", "Child controls are positioned in order from right to left (right-most control is first)" }
+   { GuiStackControl::horizStackLeft, "Left_to_Right", "Child controls are positioned in order from left to right (left-most control is first)" },
+   { GuiStackControl::horizStackRight,"Right_to_Left", "Child controls are positioned in order from right to left (right-most control is first)" }
 EndImplementEnumType;
 
 ImplementEnumType( GuiVerticalStackingType,
    "Determines how child controls are stacked vertically.\n\n"
    "@ingroup GuiContainers" )
-   { GuiStackControl::vertStackTop, "Top to Bottom", "Child controls are positioned in order from top to bottom (top-most control is first)" },
-   { GuiStackControl::vertStackBottom,"Bottom to Top", "Child controls are positioned in order from bottom to top (bottom-most control is first)" }
+   { GuiStackControl::vertStackTop, "Top_to_Bottom", "Child controls are positioned in order from top to bottom (top-most control is first)" },
+   { GuiStackControl::vertStackBottom,"Bottom_to_Top", "Child controls are positioned in order from bottom to top (bottom-most control is first)" }
 EndImplementEnumType;
 
 

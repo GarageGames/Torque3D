@@ -57,7 +57,7 @@ ImplementEnumType( GuiTSRenderStyles,
    "Style of rendering for a GuiTSCtrl.\n\n"
    "@ingroup Gui3D" )
 	{ GuiTSCtrl::RenderStyleStandard,         "standard"              },
-	{ GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
+	{ GuiTSCtrl::RenderStyleStereoSideBySide, "stereo_side_by_side"   },
 EndImplementEnumType;
 
 

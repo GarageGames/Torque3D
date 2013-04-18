@@ -995,8 +995,8 @@
                            dividerMargin = "5";
                            showCustomFields = "1";
                            StackingType = "Vertical";
-                           HorizStacking = "Left to Right";
-                           VertStacking = "Top to Bottom";
+                           HorizStacking = "Left_to_Right";
+                           VertStacking = "Top_to_Bottom";
                            Padding = "1";
                            DynamicSize = "1";
                            ChangeChildSizeToFit = "1";
@@ -1086,8 +1086,8 @@
 
                   new GuiStackControl(GuiEditorToolbox) {
                      StackingType = "Vertical";
-                     HorizStacking = "Left to Right";
-                     VertStacking = "Top to Bottom";
+                     HorizStacking = "Left_to_Right";
+                     VertStacking = "Top_to_Bottom";
                      Padding = "2";
                      DynamicSize = "1";
                      ChangeChildSizeToFit = "1";
@@ -1371,8 +1371,8 @@
                            dividerMargin = "5";
                            showCustomFields = "1";
                            StackingType = "Vertical";
-                           HorizStacking = "Left to Right";
-                           VertStacking = "Top to Bottom";
+                           HorizStacking = "Left_to_Right";
+                           VertStacking = "Top_to_Bottom";
                            Padding = "1";
                            DynamicSize = "1";
                            ChangeChildSizeToFit = "1";
