@@ -195,7 +195,7 @@ function toggleDepthViz( %enable )
 {
    if ( %enable $= "" )
    {
-      $AL_DepthVisualizeVar = AL_DepthVisualize.isEnabled() ? false : true;
+      $AL_DepthVisualizeVar = AL_DepthVisualize.GetEnabled() ? false : true;
       AL_DepthVisualize.toggle();
    }
    else if ( %enable )
@@ -209,7 +209,7 @@ function toggleNormalsViz( %enable )
 {
    if ( %enable $= "" )
    {
-      $AL_NormalsVisualizeVar = AL_NormalsVisualize.isEnabled() ? false : true;
+      $AL_NormalsVisualizeVar = AL_NormalsVisualize.GetEnabled() ? false : true;
       AL_NormalsVisualize.toggle();
    }
    else if ( %enable )
@@ -223,7 +223,7 @@ function toggleLightColorViz( %enable )
 {   
    if ( %enable $= "" )
    {
-      $AL_LightColorVisualizeVar = AL_LightColorVisualize.isEnabled() ? false : true;
+      $AL_LightColorVisualizeVar = AL_LightColorVisualize.GetEnabled() ? false : true;
       AL_LightColorVisualize.toggle();
    }
    else if ( %enable )
@@ -237,7 +237,7 @@ function toggleLightSpecularViz( %enable )
 {   
    if ( %enable $= "" )
    {
-      $AL_LightSpecularVisualizeVar = AL_LightSpecularVisualize.isEnabled() ? false : true;
+      $AL_LightSpecularVisualizeVar = AL_LightSpecularVisualize.GetEnabled() ? false : true;
       AL_LightSpecularVisualize.toggle();
    }
    else if ( %enable )

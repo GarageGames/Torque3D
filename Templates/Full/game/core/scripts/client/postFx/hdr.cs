@@ -455,7 +455,7 @@ singleton PostEffect( LuminanceVisPostFX )
 
 function LuminanceVisPostFX::onEnabled( %this )
 {
-   if ( !HDRPostFX.isEnabled() )
+   if ( !HDRPostFX.GetEnabled() )
    {
       HDRPostFX.enable();
    }

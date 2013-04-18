@@ -199,10 +199,10 @@ function PostFXManager::settingsRefreshDOF(%this)
 function PostFXManager::settingsRefreshAll(%this)
 {    
    $PostFXManager::PostFX::Enabled           = $pref::enablePostEffects;
-   $PostFXManager::PostFX::EnableSSAO        = SSAOPostFx.isEnabled();
-   $PostFXManager::PostFX::EnableHDR         = HDRPostFX.isEnabled();
-   $PostFXManager::PostFX::EnableLightRays   = LightRayPostFX.isEnabled();
-   $PostFXManager::PostFX::EnableDOF         = DOFPostEffect.isEnabled();
+   $PostFXManager::PostFX::EnableSSAO        = SSAOPostFx.GetEnabled();
+   $PostFXManager::PostFX::EnableHDR         = HDRPostFX.GetEnabled();
+   $PostFXManager::PostFX::EnableLightRays   = LightRayPostFX.GetEnabled();
+   $PostFXManager::PostFX::EnableDOF         = DOFPostEffect.GetEnabled();
    
    //For all the postFX here, apply the active settings in the system
    //to the gui controls.
