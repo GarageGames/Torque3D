@@ -91,19 +91,6 @@ class MissionMarker : public ShapeBase
 //------------------------------------------------------------------------------
 // Class: WayPoint
 //------------------------------------------------------------------------------
-class WayPoint;
-class WayPointTeam
-{
-   public:
-      WayPointTeam();
-
-      S32         mTeamId;
-      WayPoint *  mWayPoint;
-};
-
-DECLARE_STRUCT( WayPointTeam );
-DefineConsoleType( TypeWayPointTeam, WayPointTeam * );
-
 class WayPoint : public MissionMarker
 {
    private:
@@ -112,9 +99,8 @@ class WayPoint : public MissionMarker
    public:
       enum WayPointMasks {
          UpdateNameMask    = Parent::NextFreeMask,
-         UpdateTeamMask    = Parent::NextFreeMask << 1,
-         UpdateHiddenMask  = Parent::NextFreeMask << 2,
-         NextFreeMask      = Parent::NextFreeMask << 3
+         UpdateHiddenMask  = Parent::NextFreeMask << 1,
+         NextFreeMask      = Parent::NextFreeMask << 2
       };
 
       WayPoint();
@@ -132,7 +118,6 @@ class WayPoint : public MissionMarker
 
       // field data
       StringTableEntry              mName;
-      WayPointTeam                  mTeam;
 
       static void initPersistFields();
 
