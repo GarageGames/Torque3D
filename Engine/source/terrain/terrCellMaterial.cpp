@@ -101,6 +101,19 @@ void TerrainCellMaterial::_updateDefaultAnisotropy()
                   desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
             }
 
+            if ( matInfo->macroTexConst->isValid() )
+            {
+               const S32 sampler = matInfo->macroTexConst->getSamplerRegister();
+
+               if ( maxAnisotropy > 1 )
+               {
+                  desc.samplers[sampler].minFilter = GFXTextureFilterAnisotropic;
+                  desc.samplers[sampler].maxAnisotropy = maxAnisotropy;
+               }
+               else
+                  desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
+            }
+
             if ( matInfo->normalTexConst->isValid() )
             {
                const S32 sampler = matInfo->normalTexConst->getSamplerRegister();
@@ -369,6 +382,10 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
          S32 featureIndex = pass->materials.size();
 
+		 // check for macro detail texture
+         if (  !(mat->getMacroSize() <= 0 || mat->getMacroDistance() <= 0 || mat->getMacroMap().isEmpty() ) )
+	         features.addFeature( MFT_TerrainMacroMap, featureIndex );
+
          features.addFeature( MFT_TerrainDetailMap, featureIndex );
 
          pass->materials.push_back( (*materials)[i] );
@@ -567,6 +584,31 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
             &GFXDefaultStaticDiffuseProfile, "TerrainCellMaterial::_createPass() - DetailMap" );
       }
 
+      matInfo->macroInfoVConst = pass->shader->getShaderConstHandle( avar( "$macroScaleAndFade%d", i ) );
+      matInfo->macroInfoPConst = pass->shader->getShaderConstHandle( avar( "$macroIdStrengthParallax%d", i ) );
+
+      matInfo->macroTexConst = pass->shader->getShaderConstHandle( avar( "$macroMap%d", i ) );
+      if ( matInfo->macroTexConst->isValid() )
+      {
+         const S32 sampler = matInfo->macroTexConst->getSamplerRegister();
+
+         desc.samplers[sampler] = GFXSamplerStateDesc::getWrapLinear();
+         desc.samplers[sampler].magFilter = GFXTextureFilterLinear;
+         desc.samplers[sampler].mipFilter = GFXTextureFilterLinear;
+
+         if ( maxAnisotropy > 1 )
+         {
+            desc.samplers[sampler].minFilter = GFXTextureFilterAnisotropic;
+            desc.samplers[sampler].maxAnisotropy = maxAnisotropy;
+         }
+         else
+            desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
+
+         matInfo->macroTex.set( matInfo->mat->getMacroMap(), 
+            &GFXDefaultStaticDiffuseProfile, "TerrainCellMaterial::_createPass() - MacroMap" );
+      }
+	  //end macro texture
+
       matInfo->normalTexConst = pass->shader->getShaderConstHandle( avar( "$normalMap%d", i ) );
       if ( matInfo->normalTexConst->isValid() )
       {
@@ -657,6 +699,31 @@ void TerrainCellMaterial::_updateMaterialConsts( Pass *pass )
 
       pass->consts->setSafe( matInfo->detailInfoVConst, detailScaleAndFade );
       pass->consts->setSafe( matInfo->detailInfoPConst, detailIdStrengthParallax );
+
+	// macro texture info
+
+      F32 macroSize = matInfo->mat->getMacroSize();
+      F32 macroScale = 1.0f;
+      if ( !mIsZero( macroSize ) )
+         macroScale = mTerrain->getWorldBlockSize() / macroSize;
+
+      // Scale the distance by the global scalar.
+      const F32 macroDistance = mTerrain->smDetailScale * matInfo->mat->getMacroDistance();
+
+      Point4F macroScaleAndFade(   macroScale,
+                                    -macroScale,
+                                    macroDistance, 
+                                    0 );
+
+      if ( !mIsZero( macroDistance ) )
+         macroScaleAndFade.w = 1.0f / macroDistance;
+
+      Point3F macroIdStrengthParallax( matInfo->layerId,
+                                        matInfo->mat->getMacroStrength(),
+                                        0 );
+
+      pass->consts->setSafe( matInfo->macroInfoVConst, macroScaleAndFade );
+      pass->consts->setSafe( matInfo->macroInfoPConst, macroIdStrengthParallax );
    }
 }
 
@@ -706,6 +773,8 @@ bool TerrainCellMaterial::setupPass(   const SceneRenderState *state,
 
       if ( matInfo->detailTexConst->isValid() )
          GFX->setTexture( matInfo->detailTexConst->getSamplerRegister(), matInfo->detailTex );
+      if ( matInfo->macroTexConst->isValid() )
+         GFX->setTexture( matInfo->macroTexConst->getSamplerRegister(), matInfo->macroTex );
       if ( matInfo->normalTexConst->isValid() )
          GFX->setTexture( matInfo->normalTexConst->getSamplerRegister(), matInfo->normalTex );
    }
