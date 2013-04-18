@@ -27,11 +27,11 @@
    {else}
       {if substr($dirWalk->path, -4, 4) == ".asm"}
          <CustomBuild Include="{$dirWalk->path|replace:'//':'/'|replace:'/':'\\'}">
-            <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasmw.exe" -f win32 "%(FullPath)" -o "$(IntDir)%(Filename).obj"</Command>
+            <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe" -f win32 "%(FullPath)" -o "$(IntDir)%(Filename).obj"</Command>
             <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-            <Command Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">"{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasmw.exe" -f win32 "%(FullPath)" -o "$(IntDir)%(Filename).obj"</Command>
+            <Command Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">"{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe" -f win32 "%(FullPath)" -o "$(IntDir)%(Filename).obj"</Command>
             <Outputs Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
-            <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasmw.exe" -f win32 "%(FullPath)" -o "$(IntDir)%(Filename).obj"</Command>
+            <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe" -f win32 "%(FullPath)" -o "$(IntDir)%(Filename).obj"</Command>
             <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
          </CustomBuild>
       {elseif $projOutput->isSourceFile( $dirWalk->path ) }
