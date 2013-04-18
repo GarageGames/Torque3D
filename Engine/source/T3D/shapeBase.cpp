@@ -1243,7 +1243,7 @@ void ShapeBase::processTick(const Move* move)
    }
 
    // Repair management
-   if (mDataBlock->isInvincible == false)
+   if ((mDataBlock->isInvincible == false) && (mDamageState==Enabled))
    {
       F32 store = mDamage;
       mDamage -= mRepairRate;
