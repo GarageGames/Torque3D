@@ -381,8 +381,8 @@
                   tooltipprofile = "GuiToolTipProfile";
                   hovertime = "1000";
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "2";
 
                   new GuiRolloutCtrl() {
@@ -411,8 +411,8 @@
                         tooltipprofile = "GuiToolTipProfile";
                         hovertime = "1000";
                         StackingType = "Vertical";
-                        HorizStacking = "Left to Right";
-                        VertStacking = "Top to Bottom";
+                        HorizStacking = "Left_to_Right";
+                        VertStacking = "Top_to_Bottom";
                         Padding = "2";
                      };
                   };
@@ -443,8 +443,8 @@
                         tooltipprofile = "GuiToolTipProfile";
                         hovertime = "1000";
                         StackingType = "Vertical";
-                        HorizStacking = "Left to Right";
-                        VertStacking = "Top to Bottom";
+                        HorizStacking = "Left_to_Right";
+                        VertStacking = "Top_to_Bottom";
                         Padding = "2";
                      };
                   };

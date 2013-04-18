@@ -114,8 +114,8 @@
 
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "-2";
                   canSaveDynamicFields = "0";
                   internalName = "theVisOptionsList";
@@ -183,8 +183,8 @@
 
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "-2";
                   canSaveDynamicFields = "0";
                   internalName = "theClassVisList";
@@ -252,8 +252,8 @@
 
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "-2";
                   canSaveDynamicFields = "0";
                   internalName = "theClassSelList";

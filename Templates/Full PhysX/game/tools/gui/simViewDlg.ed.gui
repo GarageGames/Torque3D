@@ -95,8 +95,8 @@
 
          new GuiInspector(InspectFields) {
             StackingType = "Vertical";
-            HorizStacking = "Left to Right";
-            VertStacking = "Top to Bottom";
+            HorizStacking = "Left_to_Right";
+            VertStacking = "Top_to_Bottom";
             Padding = "1";
             canSaveDynamicFields = "0";
             Profile = "GuiTransparentProfile";

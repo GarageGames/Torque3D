@@ -98,8 +98,8 @@
             new GuiInspector(DatablockEditorInspector) {
                dividerMargin = "5";
                StackingType = "Vertical";
-               HorizStacking = "Left to Right";
-               VertStacking = "Top to Bottom";
+               HorizStacking = "Left_to_Right";
+               VertStacking = "Top_to_Bottom";
                Padding = "1";
                ChangeChildSizeToFit = "1";
                ChangeChildPosition = "1";

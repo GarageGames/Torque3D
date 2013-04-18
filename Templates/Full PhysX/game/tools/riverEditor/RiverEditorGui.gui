@@ -366,8 +366,8 @@
 
          new GuiInspector(RiverInspector) {
             StackingType = "Vertical";
-            HorizStacking = "Left to Right";
-            VertStacking = "Top to Bottom";
+            HorizStacking = "Left_to_Right";
+            VertStacking = "Top_to_Bottom";
             Padding = "1";
             name = "RiverInspector";
             canSaveDynamicFields = "0";

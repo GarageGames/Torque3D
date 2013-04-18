@@ -444,8 +444,8 @@
          
          new GuiStackControl() {
             StackingType = "Vertical";
-            HorizStacking = "Left to Right";
-            VertStacking = "Top to Bottom";
+            HorizStacking = "Left_to_Right";
+            VertStacking = "Top_to_Bottom";
             Padding = "0";
             isContainer = "1";
             Profile = "GuiDefaultProfile";
@@ -477,8 +477,8 @@
                
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "0";
                   isContainer = "1";
                   Profile = "GuiDefaultProfile";
@@ -557,8 +557,8 @@
                
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "0";
                   isContainer = "1";
                   Profile = "GuiDefaultProfile";
@@ -688,8 +688,8 @@
          
          new GuiStackControl() {
             StackingType = "Vertical";
-            HorizStacking = "Left to Right";
-            VertStacking = "Top to Bottom";
+            HorizStacking = "Left_to_Right";
+            VertStacking = "Top_to_Bottom";
             Padding = "0";
             isContainer = "1";
             Profile = "GuiDefaultProfile";
@@ -721,8 +721,8 @@
                
                new GuiStackControl() {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "0";
                   isContainer = "1";
                   Profile = "GuiDefaultProfile";
@@ -801,8 +801,8 @@
                
                new GuiInspector(DecalInspector) {
                   StackingType = "Vertical";
-                  HorizStacking = "Left to Right";
-                  VertStacking = "Top to Bottom";
+                  HorizStacking = "Left_to_Right";
+                  VertStacking = "Top_to_Bottom";
                   Padding = "1";
                   canSaveDynamicFields = "0";
                   Enabled = "1";

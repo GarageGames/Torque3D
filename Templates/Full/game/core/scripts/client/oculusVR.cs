@@ -59,7 +59,7 @@ function pointCanvasToOculusVRDisplay()
 function enableOculusVRDisplay(%gameConnection, %trueStereoRendering)
 {
    setOVRHMDAsGameConnectionDisplayDevice(%gameConnection);
-   PlayGui.renderStyle = "stereo side by side";
+   PlayGui.renderStyle = "stereo_side_by_side";
    
    if(%trueStereoRendering)
    {
