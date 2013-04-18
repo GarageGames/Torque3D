@@ -800,7 +800,6 @@ function ObjectBuilderGui::addWaterObjectFields(%this)
    %this.addField("rippleTex", "TypeImageFilename", "Ripple Texture", "art/water/ripple" );
    %this.addField("depthGradientTex", "TypeImageFilename", "Depth Gradient Texture", "art/water/depthcolor_ramp" );
    %this.addField("foamTex", "TypeImageFilename", "Foam Texture", "art/water/foam" );
-   %this.addField("cubemap", "TypeRealString", "Cubemap", "DefaultSkyCubemap" );
 }
 
 function ObjectBuilderGui::buildWaterBlock(%this)
