@@ -628,7 +628,7 @@ DefineEngineMethod( ShapeBaseData, checkDeployPos, bool, ( TransformF txfm ),,
       polyList.mPlaneList[i] = temp;
    }
 
-   if (gServerContainer.buildPolyList(PLC_Collision, wBox, InteriorObjectType | StaticShapeObjectType, &polyList))
+   if (gServerContainer.buildPolyList(PLC_Collision, wBox, StaticShapeObjectType, &polyList))
       return false;
    return true;
 }
@@ -5050,7 +5050,7 @@ DefineEngineMethod( ShapeBase, dumpMeshVisibility, void, (),,
 #endif // #ifndef TORQUE_SHIPPING
 
 //------------------------------------------------------------------------
-//These functions are duplicated in tsStatic, shapeBase, and interiorInstance.
+//These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering
 //target names/counts without polluting simObject.
 

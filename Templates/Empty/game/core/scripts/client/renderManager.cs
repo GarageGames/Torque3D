@@ -55,7 +55,6 @@ function initRenderManager()
    
    DiffuseRenderPassManager.addManager( new RenderObjectMgr()              { bintype = "Begin"; renderOrder = 0.2; processAddOrder = 0.2; } );
    // Normal mesh rendering.
-   DiffuseRenderPassManager.addManager( new RenderMeshMgr()                { bintype = "Interior"; renderOrder = 0.3; processAddOrder = 0.3; } );
    DiffuseRenderPassManager.addManager( new RenderTerrainMgr()             { renderOrder = 0.4; processAddOrder = 0.4; } );
    DiffuseRenderPassManager.addManager( new RenderMeshMgr()                { bintype = "Mesh"; renderOrder = 0.5; processAddOrder = 0.5; } );
    DiffuseRenderPassManager.addManager( new RenderImposterMgr()            { renderOrder = 0.56; processAddOrder = 0.56; } );

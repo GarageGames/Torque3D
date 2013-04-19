@@ -1532,7 +1532,6 @@ void Camera::_validateEyePoint(F32 pos, MatrixF *mat)
       disableCollision();
       RayInfo collision;
       U32 mask = TerrainObjectType |
-                 InteriorObjectType |
                  WaterObjectType |
                  StaticShapeObjectType |
                  PlayerObjectType |

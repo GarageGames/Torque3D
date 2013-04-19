@@ -40,7 +40,7 @@ static F32 sMinWarpTicks = 0.5 ;        // Fraction of tick at which instant war
 static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
 
 const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  InteriorObjectType    |  StaticShapeObjectType |
+                                  StaticShapeObjectType |
                                   VehicleObjectType);
 
 const U32 sServerCollisionMask = (sClientCollisionMask);

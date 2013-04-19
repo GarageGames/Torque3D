@@ -441,7 +441,6 @@ static void RegisterGameFunctions()
    Con::setIntVariable("$TypeMasks::StaticObjectType",         StaticObjectType);
    Con::setIntVariable("$TypeMasks::EnvironmentObjectType",    EnvironmentObjectType);
    Con::setIntVariable("$TypeMasks::TerrainObjectType",        TerrainObjectType);
-   Con::setIntVariable("$TypeMasks::InteriorObjectType",       InteriorObjectType);
    Con::setIntVariable("$TypeMasks::WaterObjectType",          WaterObjectType);
    Con::setIntVariable("$TypeMasks::TriggerObjectType",        TriggerObjectType);
    Con::setIntVariable("$TypeMasks::MarkerObjectType",         MarkerObjectType);

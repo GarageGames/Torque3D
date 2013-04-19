@@ -47,12 +47,12 @@
 #include "lighting/lightQuery.h"
 
 
-// Collision masks are used to determin what type of objects the
+// Collision masks are used to determine what type of objects the
 // wheeled vehicle will collide with.
 static U32 sClientCollisionMask =
-      TerrainObjectType    | InteriorObjectType       |
-      PlayerObjectType     | StaticShapeObjectType    |
-      VehicleObjectType    | VehicleBlockerObjectType;
+      TerrainObjectType     | PlayerObjectType  | 
+      StaticShapeObjectType | VehicleObjectType | 
+      VehicleBlockerObjectType;
 
 // Gravity constant
 static F32 sWheeledVehicleGravity = -20;

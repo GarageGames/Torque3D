@@ -86,7 +86,6 @@ RenderGlowMgr::RenderGlowMgr()
                                  GFXFormatR8G8B8A8,
                                  Point2I( 512, 512 ) )
 {
-   notifyType( RenderPassManager::RIT_Interior );
    notifyType( RenderPassManager::RIT_Decal );
    notifyType( RenderPassManager::RIT_Translucent );
 

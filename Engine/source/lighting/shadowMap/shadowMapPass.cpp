@@ -70,7 +70,6 @@ ShadowMapPass::ShadowMapPass(LightManager* lightManager, ShadowMapManager* shado
    // Setup our render pass manager
 
    mShadowRPM->addManager( new RenderMeshMgr(RenderPassManager::RIT_Mesh, 0.3f, 0.3f) );
-   mShadowRPM->addManager( new RenderMeshMgr( RenderPassManager::RIT_Interior, 0.4f, 0.4f ) );
    //mShadowRPM->addManager( new RenderObjectMgr() );
    mShadowRPM->addManager( new RenderTerrainMgr( 0.5f, 0.5f )  );
    mShadowRPM->addManager( new RenderImposterMgr( 0.6f, 0.6f )  );
@@ -231,7 +230,7 @@ void ShadowRenderPassManager::addInst( RenderInst *inst )
 {
    PROFILE_SCOPE(ShadowRenderPassManager_addInst);
 
-   if ( inst->type == RIT_Mesh || inst->type == RIT_Interior )
+   if ( inst->type == RIT_Mesh )
    {
       MeshRenderInst *meshRI = static_cast<MeshRenderInst*>( inst );
       if ( !meshRI->matInst )
