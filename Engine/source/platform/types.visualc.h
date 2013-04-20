@@ -23,15 +23,12 @@
 #ifndef INCLUDED_TYPES_VISUALC_H
 #define INCLUDED_TYPES_VISUALC_H
 
-
-// For more information on VisualC++ predefined macros
-// http://support.microsoft.com/default.aspx?scid=kb;EN-US;q65472
+#include <cstdint>
 
 //--------------------------------------
 // Types
-typedef signed _int64   S64;
-typedef unsigned _int64 U64;
-
+typedef std::int64_t  S64;
+typedef std::uint64_t U64;
 
 //--------------------------------------
 // Compiler Version
@@ -98,4 +95,3 @@ typedef unsigned _int64 U64;
 
 
 #endif // INCLUDED_TYPES_VISUALC_H
-
