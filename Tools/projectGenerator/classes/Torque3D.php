@@ -68,7 +68,8 @@ class Torque3D
    
 
         //some platforms will not want a shared config        
-        if ( Generator::$platform == "360" || Generator::$platform == "ps3" )
+        if ( Generator::$platform == "360" || Generator::$platform == "ps3" ||
+             Generator::$platform == "linux" )
             self::$sharedConfig = false;
 
         //begin either a shared lib config, or a static app config
