@@ -67,7 +67,7 @@ typedef unsigned long long  U64;
 #  define TORQUE_OS_PS3
 #  include "platform/types.posix.h"
 
-#elif defined(linux)
+#elif defined(__linux__)
 #  define TORQUE_OS_STRING "Linux"
 #  define TORQUE_OS_LINUX
 #  define TORQUE_SUPPORTS_NASM
@@ -104,7 +104,7 @@ typedef unsigned long long  U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(i386)
+#if defined(i386) || defined(__i386__)
 #  define TORQUE_CPU_STRING "Intel x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
