@@ -31,6 +31,8 @@ typedef std::int16_t S16;
 typedef std::uint16_t U16;
 typedef std::int32_t S32;
 typedef std::uint32_t U32;
+typedef std::int64_t S64;
+typedef std::uint64_t U64;
 typedef float F32;
 typedef double F64;
 
