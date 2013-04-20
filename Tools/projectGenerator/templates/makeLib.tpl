@@ -16,7 +16,7 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 
 LDFLAGS_{$projName} := -g -m32
 #LDLIBS_{$projName} := -lstdc++
-CFLAGS_{$projName} := -MMD -I. -m32 -msse -mmmx -march=i686
+CFLAGS_{$projName} := -MMD -I. -m32 -msse -mmmx -march=i686 -std=c++11
 
 {foreach item=def from=$projIncludes}CFLAGS_{$projName} += -I{$def}
 {/foreach}

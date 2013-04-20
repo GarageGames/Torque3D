@@ -16,7 +16,7 @@ LDLIBS := -lstdc++ -lm -lpthread -lrt
 {foreach item=def from=$projLibs}LDLIBS += -l{$def}
 {/foreach}
 
-CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -pipe
+CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -pipe -std=c++11
 
 {foreach item=def from=$projIncludes}CFLAGS += -I{$def}
 {/foreach}
