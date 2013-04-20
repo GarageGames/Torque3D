@@ -23,13 +23,6 @@
 #ifndef INCLUDED_TYPES_VISUALC_H
 #define INCLUDED_TYPES_VISUALC_H
 
-#include <cstdint>
-
-//--------------------------------------
-// Types
-typedef std::int64_t  S64;
-typedef std::uint64_t U64;
-
 //--------------------------------------
 // Compiler Version
 #define TORQUE_COMPILER_VISUALC _MSC_VER

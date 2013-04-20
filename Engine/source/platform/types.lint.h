@@ -23,9 +23,6 @@
 #ifndef TORQUE_TYPES_LINT_H_
 #define TORQUE_TYPES_LINT_H_
 
-typedef signed long long S64;
-typedef unsigned long long U64;
-
 typedef unsigned int dsize_t;
 
 struct FileTime
