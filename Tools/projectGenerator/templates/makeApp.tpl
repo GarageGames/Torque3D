@@ -17,6 +17,7 @@ LDLIBS := -lstdc++ -lm -lpthread -lrt
 {/foreach}
 
 CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -pipe -std=c++11
+CFLAGS += -I/usr/include/freetype2
 
 {foreach item=def from=$projIncludes}CFLAGS += -I{$def}
 {/foreach}
