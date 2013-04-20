@@ -1863,12 +1863,6 @@ function EditorTree::GetTooltipParticleEmitterNode( %this, %obj )
    return %text;
 }
 
-// Tooltip for InteriorInstance
-function EditorTree::GetTooltipInteriorInstance( %this, %obj )
-{
-   return "File: " @ %obj.interiorFile;
-}
-
 // Tooltip for WorldEditorSelection
 function EditorTree::GetTooltipWorldEditorSelection( %this, %obj )
 {

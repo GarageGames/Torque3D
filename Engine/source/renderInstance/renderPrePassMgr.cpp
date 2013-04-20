@@ -80,7 +80,6 @@ RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
 {
    notifyType( RenderPassManager::RIT_Decal );
    notifyType( RenderPassManager::RIT_Mesh );
-   notifyType( RenderPassManager::RIT_Interior );
    notifyType( RenderPassManager::RIT_Terrain );
    notifyType( RenderPassManager::RIT_Object );
 
@@ -194,8 +193,7 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
    // First what type of render instance is it?
    const bool isDecalMeshInst = inst->type == RenderPassManager::RIT_Decal;
 
-   const bool isMeshInst = inst->type == RenderPassManager::RIT_Mesh ||
-                           inst->type == RenderPassManager::RIT_Interior;
+   const bool isMeshInst = inst->type == RenderPassManager::RIT_Mesh;
 
    const bool isTerrainInst = inst->type == RenderPassManager::RIT_Terrain;
 

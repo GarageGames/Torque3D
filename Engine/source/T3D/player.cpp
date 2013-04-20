@@ -107,7 +107,6 @@ const F32 sAnchorMaxDistance = 32.0f;
 
 //
 static U32 sCollisionMoveMask =  TerrainObjectType       |
-                                 InteriorObjectType      |
                                  WaterObjectType         | 
                                  PlayerObjectType        |
                                  StaticShapeObjectType   | 
@@ -3494,8 +3493,7 @@ void Player::updateDeathOffsets()
 
 //----------------------------------------------------------------------------
 
-static const U32 sPlayerConformMask =  InteriorObjectType|StaticShapeObjectType|
-                                       StaticObjectType|TerrainObjectType;
+static const U32 sPlayerConformMask =  StaticShapeObjectType | StaticObjectType | TerrainObjectType;
 
 static void accel(F32& from, F32 to, F32 rate)
 {

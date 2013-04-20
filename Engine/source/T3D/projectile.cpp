@@ -126,12 +126,9 @@ IMPLEMENT_CALLBACK( ProjectileData, onCollision, void, ( Projectile* proj, Scene
 				   "@see Projectile\n"
 				  );
 
-const U32 Projectile::csmStaticCollisionMask =  TerrainObjectType    |
-                                                InteriorObjectType   |
-                                                StaticShapeObjectType;
+const U32 Projectile::csmStaticCollisionMask =  TerrainObjectType | StaticShapeObjectType;
 
-const U32 Projectile::csmDynamicCollisionMask = PlayerObjectType        |
-                                                VehicleObjectType;
+const U32 Projectile::csmDynamicCollisionMask = PlayerObjectType | VehicleObjectType;
 
 const U32 Projectile::csmDamageableMask = Projectile::csmDynamicCollisionMask;
 
