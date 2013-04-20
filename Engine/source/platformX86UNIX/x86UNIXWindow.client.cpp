@@ -23,7 +23,7 @@
 
 
 #include "console/console.h"
-#include "core/fileStream.h"
+#include "core/stream/fileStream.h"
 #include "game/resource.h"
 #include "game/version.h"
 #include "math/mRandom.h"
