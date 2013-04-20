@@ -106,13 +106,6 @@ static const F32 F32_MAX = F32(3.402823466e+38F);                 ///< Constant 
 #  error "Unknown Compiler"
 #endif
 
-/// Integral type matching the host's memory address width.
-#ifdef TORQUE_64BITS
-   typedef U64 MEM_ADDRESS;
-#else
-   typedef U32 MEM_ADDRESS;
-#endif
-
 //-------------------------------------- Some all-around useful inlines and globals
 //
 
