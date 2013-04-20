@@ -209,20 +209,3 @@ ConsoleFunction(debug_debugbreak, void, 1, 1, "debug_debugbreak()")
 {
    Platform::debugBreak();
 }
-
-//-----------------------------------------------------------------------------
-void Platform::restartInstance()
-{
-/*
-   if (Game->isRunning() )
-   {
-      //Con::errorf( "Error restarting Instance. Game is Still running!");
-      return;
-   }
-
-   char cmd[2048];
-   sprintf(cmd, "%s &", x86UNIXState->getExePathName());
-   system(cmd);
-*/
-   exit(0);
-}

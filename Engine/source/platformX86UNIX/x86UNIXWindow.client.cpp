@@ -24,19 +24,15 @@
 
 #include "console/console.h"
 #include "core/stream/fileStream.h"
-#include "game/resource.h"
-#include "game/version.h"
+#include "app/version.h"
 #include "math/mRandom.h"
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platformX86UNIX/x86UNIXStdConsole.h"
-#include "platform/event.h"
-#include "platform/gameInterface.h"
+#include "platform/input/event.h"
 #include "platform/platform.h"
-#include "platform/platformAL.h"
 #include "platform/platformInput.h"
-#include "platform/platformVideo.h"
+#include "platform/platformTimer.h"
 #include "platform/profiler.h"
-#include "platformX86UNIX/platformGL.h"
 #include "platformX86UNIX/x86UNIXOGLVideo.h"
 #include "platformX86UNIX/x86UNIXState.h"
 
@@ -65,6 +61,7 @@ x86UNIXPlatformState *x86UNIXState;
 bool DisplayPtrManager::sgDisplayLocked = false;
 LockFunc_t DisplayPtrManager::sgLockFunc = NULL;
 LockFunc_t DisplayPtrManager::sgUnlockFunc = NULL;
+extern GameSomething* Game;
 
 static U32 lastTimeTick;
 static MRandomLCG sgPlatRandom;
@@ -237,7 +234,7 @@ static void SetAppState()
       state & SDL_APPINPUTFOCUS)
    {
       x86UNIXState->setWindowActive(true);
-      Input::reactivate();
+      Input::activate();
    }
    // if we are active, but we don't have appactive or input focus,
    // deactivate input (if window not locked) and clear windowActive
@@ -408,7 +405,6 @@ void DisplayErrorAlert(const char* errMsg, bool showSDLError)
 //------------------------------------------------------------------------------
 static inline void AlertDisableVideo(AlertWinState& state)
 {
-
    state.fullScreen = Video::isFullScreen();
    state.cursorHidden = (SDL_ShowCursor(SDL_QUERY) == SDL_DISABLE);
    state.inputGrabbed = (SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON);
@@ -521,6 +517,9 @@ bool Platform::excludeOtherInstances(const char *mutexName)
 }
 
 
+#if 0
+// tjf: removing this as it doesn't seem to exist in the base namespace
+// anymore.
 //------------------------------------------------------------------------------
 void Platform::enableKeyboardTranslation(void)
 {
@@ -541,8 +540,11 @@ void Platform::disableKeyboardTranslation(void)
    //   SDL_EnableKeyRepeat(0, 0);
 #endif
 }
+#endif
 
 //------------------------------------------------------------------------------
+#if 0
+// tjf: already defined in platformInterface?? which one is right?
 void Platform::setWindowLocked(bool locked)
 {
 #ifndef DEDICATED
@@ -556,8 +558,11 @@ void Platform::setWindowLocked(bool locked)
       uInputManager->setWindowLocked(locked);
 #endif
 }
+#endif
 
 //------------------------------------------------------------------------------
+#if 0
+// tjf: already defined in platformInterface?? which one is right?
 void Platform::minimizeWindow()
 {
 #ifndef DEDICATED
@@ -565,6 +570,7 @@ void Platform::minimizeWindow()
       SDL_WM_IconifyWindow();
 #endif
 }
+#endif
 
 //------------------------------------------------------------------------------
 void Platform::process()
@@ -648,30 +654,16 @@ void Platform::process()
 // static U32 stubCRC = 0xEA63F56C;
 // #endif
 
-//------------------------------------------------------------------------------
-const Point2I &Platform::getWindowSize()
-{
-   return x86UNIXState->getWindowSize();
-}
-
 
 //------------------------------------------------------------------------------
-void Platform::setWindowSize( U32 newWidth, U32 newHeight )
+#if 0
+// tjf: already defined in platformInterface?? which one is right?
+void Platform::setWindowSize( U32 newWidth, U32 newHeight, bool /*fs*/)
 {
    x86UNIXState->setWindowSize( (S32) newWidth, (S32) newHeight );
 }
-
-
-//------------------------------------------------------------------------------
-void Platform::initWindow(const Point2I &initialSize, const char *name)
-{
-#ifndef DEDICATED
-   // initialize window
-   InitWindow(initialSize, name);
-   if (!InitOpenGL())
-      ImmediateShutdown(1);
 #endif
-}
+
 
 
 //------------------------------------------------------------------------------
@@ -707,7 +699,7 @@ bool Platform::openWebBrowser( const char* webAddress )
       // child
       // try to exec konqueror, then netscape
       char* argv[3];
-      argv[0] = "";
+      argv[0] = const_cast<char*>("");
       argv[1] = const_cast<char*>(webAddress);
       argv[2] = 0;
 
@@ -748,6 +740,8 @@ bool Platform::setLoginPassword( const char* password )
    return false;
 }
 
+#if 0
+// tjf -- doesn't seem to exist anymore.
 //-------------------------------------------------------------------------------
 void TimeManager::process()
 {
@@ -760,6 +754,7 @@ void TimeManager::process()
       Game->postEvent(event);
    }
 }
+#endif
 
 //------------------------------------------------------------------------------
 ConsoleFunction( getDesktopResolution, const char*, 1, 1, 
@@ -789,7 +784,9 @@ ConsoleFunction( isKoreanBuild, bool, 1, 1, "isKoreanBuild()" )
 }
 
 //------------------------------------------------------------------------------
-int main(S32 argc, const char **argv)
+// tjf: renaming this main2, there's another main!  don't know which is
+// right...
+int main2(S32 argc, const char **argv)
 {
    // init platform state
    x86UNIXState = new x86UNIXPlatformState;
@@ -823,6 +820,7 @@ int main(S32 argc, const char **argv)
    return returnVal;
 }
 
+#if 0
 void Platform::setWindowTitle( const char* title )
 {
 #ifndef DEDICATED
@@ -830,6 +828,7 @@ void Platform::setWindowTitle( const char* title )
    SDL_WM_SetCaption(x86UNIXState->getWindowName(), NULL);
 #endif
 }
+#endif
 
 Resolution Video::getDesktopResolution()
 {

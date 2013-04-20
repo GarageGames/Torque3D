@@ -22,7 +22,6 @@
 
 #include "math/mPoint2.h"
 #include "platformX86UNIX/platformX86UNIX.h"
-//#include "platformX86UNIX/platformGL.h"
 #include "core/strings/stringFunctions.h"
 
 #ifndef DEDICATED

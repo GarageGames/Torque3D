@@ -22,9 +22,7 @@
 
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platform/platformInput.h"
-#include "platform/platformVideo.h"
-#include "platform/event.h"
-#include "platform/gameInterface.h"
+#include "platform/input/event.h"
 #include "console/console.h"
 #include "platformX86UNIX/x86UNIXState.h"
 #include "platformX86UNIX/x86UNIXInputManager.h"
@@ -278,12 +276,14 @@ void Input::deactivate()
    }
 }
 
+#if 0
 //------------------------------------------------------------------------------
 void Input::reactivate()
 {
    Input::deactivate();
    Input::activate();
 }
+#endif
 
 //------------------------------------------------------------------------------
 bool Input::isEnabled()

@@ -49,7 +49,6 @@
 #include <stdlib.h>
 
 #include "console/console.h"
-#include "platform/gameInterface.h"
 #include "core/fileStream.h"
 #include "core/tVector.h"
 

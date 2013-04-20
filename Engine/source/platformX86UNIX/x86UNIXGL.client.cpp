@@ -20,24 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platformX86UNIX/platformGL.h"
-#include "platformX86UNIX/platformX86UNIX.h"
 #include "console/console.h"
+#include "core/strings/stringFunctions.h"
+#include "platformX86UNIX/platformX86UNIX.h"
+#include "platformX86UNIX/x86UNIXOGLVideo.h"
 
 #include <dlfcn.h>
 #include <SDL/SDL.h>
-
-// declare stub functions
-#define GL_FUNCTION(fn_return, fn_name, fn_args, fn_value) fn_return stub_##fn_name fn_args{ fn_value }
-#include "platform/GLCoreFunc.h"
-#include "platform/GLExtFunc.h"
-#undef GL_FUNCTION
-
-// point gl function pointers at stub functions
-#define GL_FUNCTION(fn_return,fn_name,fn_args, fn_value) fn_return (*fn_name)fn_args = stub_##fn_name;
-#include "platform/GLCoreFunc.h"
-#include "platform/GLExtFunc.h"
-#undef GL_FUNCTION
+#include <SDL/SDL_opengl.h>
 
 static void* dlHandle = NULL;
 
@@ -125,10 +115,7 @@ static bool bindEXTFunction( void *&fnAddress, const char *name )
 static bool bindGLFunctions()
 {
    bool result = true;
-   #define GL_FUNCTION(fn_return, fn_name, fn_args, fn_value) \
-   result &= bindGLFunction( *(void**)&fn_name, #fn_name);
-   #include "platform/GLCoreFunc.h"
-   #undef GL_FUNCTION
+   Con::printf("Binding has been removed...");
    return result;
 }
 
@@ -140,10 +127,7 @@ static bool bindEXTFunctions(U32 extMask)
       if( extMask & flag ) {
    #define GL_GROUP_END() }
 
-   #define GL_FUNCTION(fn_return, fn_name, fn_args, fn_value) \
-   result &= bindEXTFunction( *(void**)&fn_name, #fn_name);
-   #include "platform/GLExtFunc.h"
-   #undef GL_FUNCTION
+   Con::printf("BindingEXT has been removed...");
 
    #undef GL_GROUP_BEGIN
    #undef GL_GROUP_END
@@ -153,15 +137,15 @@ static bool bindEXTFunctions(U32 extMask)
 
 static void unbindGLFunctions()
 {
-   // point gl function pointers at stub functions
-#define GL_FUNCTION(fn_return, fn_name, fn_args, fn_value) fn_name = stub_##fn_name;
-#include "platform/GLCoreFunc.h"
-#include "platform/GLExtFunc.h"
-#undef GL_FUNCTION
+   Con::printf("Unbinding GL functions has been removed.");
 }
 
 namespace GLLoader
 {
+   bool OpenGLInit();
+   void OpenGLShutdown();
+   bool OpenGLDLLInit();
+   void OpenGLDLLShutdown();
 
    bool OpenGLInit()
    {
