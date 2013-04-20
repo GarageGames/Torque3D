@@ -27,7 +27,7 @@
 #include "gfx/gl/gfxGLCubemap.h"
 #include "gfx/gfxTextureManager.h"
 #include "gfx/gfxCardProfile.h"
-#include "gfx/bitmap/DDSFile.h"
+#include "gfx/bitmap/ddsFile.h"
 
 
 GLenum GFXGLCubemap::faceList[6] = 
