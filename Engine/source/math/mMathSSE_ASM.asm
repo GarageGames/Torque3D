@@ -19,6 +19,7 @@
 ; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 ; IN THE SOFTWARE.
 ;-----------------------------------------------------------------------------
+$@feat.00 equ 1
 
 
 segment .data
