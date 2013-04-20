@@ -116,7 +116,10 @@ class Torque3D
         // Modules
         includeModule( 'core' );
         includeModule( 'dsound' );
-        includeModule( 'fmod');
+        if ( Generator::$platform != "linux" )
+        {
+          includeModule( 'fmod');
+        }
         includeModule( 'T3D' );
         includeModule( 'advancedLighting' );
         includeModule( 'basicLighting' );
