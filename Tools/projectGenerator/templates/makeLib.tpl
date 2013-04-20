@@ -15,7 +15,7 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS_{$projName} := -g -m32
-#LDLIBS_{$projName} := -lstdc++
+#LDLIBS_{$projName} :=
 CFLAGS_{$projName} := -MMD -I. -m32 -msse -mmmx -march=i686 -std=c++11
 
 {foreach item=def from=$projIncludes}CFLAGS_{$projName} += -I{$def}
@@ -35,7 +35,7 @@ CFLAGS_DEBUG_{$projName} += -DTORQUE_NET_STATS
 CFLAGS_{$projName} += -O3
 
 CC := gcc
-LD := gcc
+LD := g++
 
 TARGET_{$projName} := {$libDir}/compiled/Make/{$projName}.a
 TARGET_{$projName}_DEBUG := {$libDir}/compiled/Make/{$projName}_DEBUG.a
@@ -59,11 +59,11 @@ $(TARGET_{$projName}_DEBUG):	$(OBJS_{$projName}_DEBUG)
 
 Release/{$projName}/%.o:	{$libDir}%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_{$projName}) $< -o $@
+	$(CXX) -c $(CFLAGS_{$projName}) $< -o $@
    
 Debug/{$projName}/%.o:	{$libDir}%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_DEBUG_{$projName}) $< -o $@
+	$(CXX) -c $(CFLAGS_DEBUG_{$projName}) $< -o $@
    
 release_{$projName}: $(TARGET_{$projName})
 debug_{$projName}: $(TARGET_{$projName}_DEBUG)
