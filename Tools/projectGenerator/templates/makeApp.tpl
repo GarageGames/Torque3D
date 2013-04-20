@@ -13,6 +13,7 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 
 LDFLAGS := -g -m32
 LDLIBS := -lm -lSDL -lpthread -lrt
+LDLIBS += -lpng -ljpeg -lGL -lXft -lvorbis -ltinyxml
 {foreach item=def from=$projLibs}LDLIBS += -l{$def}
 {/foreach}
 
