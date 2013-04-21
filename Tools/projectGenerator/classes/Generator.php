@@ -319,6 +319,17 @@ class Generator
         self::$project_cur->moduleDefinitionFile = $mdef;
     }
     
+    static function copyFileToProject( $sourcePath, $projectDestPath )
+    {
+        // Create the array to hold the source and destination
+        $paths = array();
+        array_push( $paths, $sourcePath );
+        array_push( $paths, $projectDestPath );
+        
+        // Add to the project
+        array_push( self::$project_cur->fileCopyPaths, $paths );
+    }
+    
     static function beginModule( $name )
     {
         if( !self::$module_cur )

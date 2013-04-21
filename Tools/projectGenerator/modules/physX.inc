@@ -89,6 +89,13 @@ beginModule( 'physX' );
    addProjectLibDir( $PHYSX_SDK_PATH . "/SDKs/lib/Win32" );
    addProjectLibInput( "PhysXCooking.lib" );
    addProjectLibInput( "PhysXLoader.lib" );
+          
+   // File Copy
+   copyFileToProject( $PHYSX_SDK_PATH . "/Bin/win32/cudart32_30_9.dll", "/game/cudart32_30_9.dll" );
+   copyFileToProject( $PHYSX_SDK_PATH . "/Bin/win32/PhysXCooking.dll",  "/game/PhysXCooking.dll" );
+   copyFileToProject( $PHYSX_SDK_PATH . "/Bin/win32/PhysXCore.dll",     "/game/PhysXCore.dll" );
+   copyFileToProject( $PHYSX_SDK_PATH . "/Bin/win32/PhysXDevice.dll",   "/game/PhysXDevice.dll" );
+   copyFileToProject( $PHYSX_SDK_PATH . "/Bin/win32/PhysXLoader.dll",   "/game/PhysXLoader.dll" );
 
    // For PhysX support.
    includeLib( 'nxCharacter' );

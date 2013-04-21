@@ -315,6 +315,11 @@ function addProjectIgnoreDefaultLib( $lib )
 	Generator::addProjectIgnoreDefaultLib( $lib );
 }
 
+function copyFileToProject( $sourcePath, $projPath )
+{
+    Generator::copyFileToProject( $sourcePath, $projPath );
+}
+
 function addProjectDependency( $pd )
 {
     Generator::addProjectDependency( $pd );
