@@ -68,6 +68,13 @@ beginModule( 'razerHydra' );
 
       // Includes
       addIncludePath( $RAZERHYDRA_SDK_PATH . "/include" );
+      
+      // File Copy for Release
+      copyFileToProject( $RAZERHYDRA_SDK_PATH . "/bin/win32/release_dll/sixense.dll",  "/game/sixense.dll" );
+
+      // File Copy for Debug
+      copyFileToProject( $RAZERHYDRA_SDK_PATH . "/bin/win32/debug_dll/sixensed.dll",   "/game/sixensed.dll" );
+      copyFileToProject( $RAZERHYDRA_SDK_PATH . "/samples/win32/sixense_simple3d/DeviceDLL.dll", "/game/DeviceDLL.dll" ); // Only needed by the debug sixense library
    }
 
 endModule();
