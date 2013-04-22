@@ -60,7 +60,6 @@ class MatrixSet;
 
 GFXDeclareVertexFormat( ScatterSkyVertex )
 {
-   // .xyz = coords
    Point3F point;
    VectorF normal;
    ColorF color;
@@ -152,7 +151,7 @@ protected:
    static const F32 smAtmosphereRadius;
    static const F32 smViewerHeight;
 
-#define CURVE_COUNT 4
+#define CURVE_COUNT 5
 
    FloatCurve mCurves[CURVE_COUNT];
 
@@ -161,7 +160,7 @@ protected:
 
    F32 mRayleighScattering;
    F32 mRayleighScattering4PI;
-
+   F32 mSunSize;
    F32 mMieScattering;
    F32 mMieScattering4PI;
 
@@ -246,6 +245,10 @@ protected:
    GFXShaderConstHandle *mInverseWavelengthSC;
    GFXShaderConstHandle *mNightInterpolantAndExposureSC;
    GFXShaderConstHandle *mUseCubemapSC;
+   F32 mColorizeAmt;
+   ColorF mColorize;
+   GFXShaderConstHandle *mColorizeSC;
+
 };
 
 #endif // _SCATTERSKY_H_
