@@ -1448,7 +1448,7 @@ DefineEngineMethod( PostEffect, toggle, bool, (),,
    return object->isEnabled();
 }
 
-DefineEngineMethod( PostEffect, isEnabled, bool, (),,
+DefineEngineMethod( PostEffect, GetEnabled, bool, (),,
    "@return True if the effect is enabled." )
 {
    return object->isEnabled();
