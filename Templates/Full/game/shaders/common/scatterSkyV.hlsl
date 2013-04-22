@@ -55,6 +55,14 @@ struct Conn
    float3 pos : TEXCOORD3;
 };
  
+float3 desaturate(const float3 color, const float desaturation) 
+{  
+   const float3 gray_conv = float3 (0.30, 0.59, 0.11);  
+   return lerp(color, dot(gray_conv , color), desaturation);  
+}  
+  
+uniform float4 colorize;  
+
 Conn main(  Vert In,
             uniform float4x4 modelView          : register(C0),
             uniform float4 misc                 : register(C4),
@@ -138,6 +146,16 @@ Conn main(  Vert In,
    Out.rayleighColor.a = 1.0f;
    Out.v3Direction = newCamPos - v3Pos.xyz;
    Out.pos = In.position.xyz;
+
+#ifdef USE_COLORIZE  
+  
+   Out.rayleighColor.rgb = desaturate(Out.rayleighColor.rgb, 1) * colorize.a;  
+     
+   Out.rayleighColor.r *= colorize.r;  
+   Out.rayleighColor.g *= colorize.g;  
+   Out.rayleighColor.b *= colorize.b;  
+     
+#endif  
 
    return Out;
 }
