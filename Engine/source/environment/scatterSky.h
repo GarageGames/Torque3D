@@ -133,7 +133,7 @@ protected:
    void _getSunColor( ColorF *outColor );
    void _interpolateColors();
 
-   void _conformLights(); 
+   void _conformLights();
 
    void _updateTimeOfDay( TimeOfDay *timeofDay, F32 time );
 
@@ -199,7 +199,7 @@ protected:
    ColorF mSunColor;       ///< Not a field
    ColorF mFogColor;       ///< Not a field
 
-   ColorF mAmbientScale;   
+   ColorF mAmbientScale;
    ColorF mSunScale;
    ColorF mFogScale;
 
@@ -211,15 +211,15 @@ protected:
    LightFlareData *mFlareData;
    LightFlareState mFlareState;
    F32 mFlareScale;
-   
-   bool mMoonEnabled;   
-   String mMoonMatName;   
+
+   bool mMoonEnabled;
+   String mMoonMatName;
    BaseMatInstance *mMoonMatInst;
    F32 mMoonScale;
-   ColorF mMoonTint;   
+   ColorF mMoonTint;
    VectorF mMoonLightDir;
    CubemapData *mNightCubemap;
-   String mNightCubemapName;   
+   String mNightCubemapName;
    bool mUseNightCubemap;
    MatrixSet *mMatrixSet;
 
