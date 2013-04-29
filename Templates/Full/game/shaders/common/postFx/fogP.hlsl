@@ -36,10 +36,6 @@ float4 main( PFXVertToPix IN ) : COLOR
    float depth = prepassUncondition( prepassTex, IN.uv0 ).w;
    //return float4( depth, 0, 0, 0.7 );
    
-   // Skip fogging the extreme far plane so that 
-   // the canvas clear color always appears.
-   clip( 0.9999 - depth );
-   
    float factor = computeSceneFog( eyePosWorld,
                                    eyePosWorld + ( IN.wsEyeRay * depth ),
                                    fogData.x, 
