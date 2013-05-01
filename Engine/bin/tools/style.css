@@ -159,6 +159,10 @@ QPushButton::menu-indicator{
 #CreateNewProjectButton { border:none; background:none; margin:0; padding:0; }
 #CreateNewProjectButton:hover { border:1px solid rgb(200,200,200); background:none; }
 
+/*--------------------------------------- Other Modules Buttons ----------------------------------------------*/
+#newChooseModulesButton { padding:0; }
+#ProjectModuleListRegenButton { padding:0; }
+
 /*--------------------------------------- Web link style button ----------------------------------------------*/
 #EditToolBarButton, #HelpGroupBox QPushButton, #EditCommentsButton {
 	font:10px;
