@@ -60,8 +60,11 @@ SkyBox::SkyBox()
 
    mIsVBDirty = false;
    mDrawBottom = true;
+   mDrawTop = true;
+   mExposure = 1.0;
    mPrimCount = 0;
    mFogBandHeight = 0;
+   mFogBandWidth = 0.1f;
 
    mMatrixSet = reinterpret_cast<MatrixSet *>(dMalloc_aligned(sizeof(MatrixSet), 16));
    constructInPlace(mMatrixSet);
@@ -121,8 +124,20 @@ void SkyBox::initPersistFields()
    addField( "drawBottom", TypeBool, Offset( mDrawBottom, SkyBox ),
       "If false the bottom of the skybox is not rendered." );
 
+   addField( "drawTop", TypeBool, Offset( mDrawTop, SkyBox ),
+      "If false the top of the skybox is not rendered." );
+
+   addField( "Exposure", TypeF32, Offset( mExposure, SkyBox ),
+      "The light exposure for lighting the skybox." );
+
+   addField( "SkyboxColor", TypeColorF, Offset( mSkyboxColor, SkyBox ),
+      "Modulates the skybox color. This will blend with the ambient light color ");
+
    addField( "fogBandHeight", TypeF32, Offset( mFogBandHeight, SkyBox ),
       "The height (0-1) of the fog band from the horizon to the top of the SkyBox." );
+
+   addField( "fogBandWidth", TypeF32, Offset( mFogBandWidth, SkyBox ),
+      "The width of the fog band (0-1), added on top of the fog height." );
 
    endGroup( "Sky Box" );
 
@@ -141,7 +156,11 @@ U32 SkyBox::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
    
    stream->write( mMatName );
    stream->writeFlag( mDrawBottom );
+   stream->writeFlag( mDrawTop );
+   stream->write( mExposure );
+   stream->write( mSkyboxColor );
    stream->write( mFogBandHeight );
+   stream->write( mFogBandWidth );
 
    return retMask;
 }
@@ -159,16 +178,34 @@ void SkyBox::unpackUpdate( NetConnection *conn, BitStream *stream )
    }
 
    bool drawBottom = stream->readFlag();
+   bool drawTop = stream->readFlag();
+
+   F32 exposure = 0;
+   stream->read( &exposure );
+
+   ColorF skyboxColor;
+   stream->read( &skyboxColor );
+
    F32 bandHeight = 0;
    stream->read( &bandHeight );
+   F32 bandWidth = 0;
+   stream->read( &bandWidth );
 
    // If this flag has changed
    // we need to update the vertex buffer.
    if (  drawBottom != mDrawBottom || 
-         bandHeight != mFogBandHeight )
+         bandHeight != mFogBandHeight ||
+         bandWidth != mFogBandWidth ||
+		 drawTop != mDrawTop ||
+		 exposure != mExposure ||
+		 skyboxColor != mSkyboxColor )
    {
       mDrawBottom = drawBottom;
+	  mDrawTop = drawTop;
       mFogBandHeight = bandHeight;
+      mFogBandWidth = bandWidth;
+	  mExposure = exposure;
+	  mSkyboxColor = skyboxColor;
       mIsVBDirty = true;
       _initRender();
    }
@@ -191,7 +228,7 @@ void SkyBox::prepRenderImage( SceneRenderState *state )
    ri->renderDelegate.bind( this, &SkyBox::_renderObject );
    ri->type = RenderPassManager::RIT_Sky;
    ri->defaultKey = 10;
-   ri->defaultKey2 = 0;
+   ri->defaultKey2 = 2;
    state->getRenderPass()->addInst( ri );
 }
 
@@ -208,6 +245,10 @@ void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
    SceneData sgData;
    sgData.init( state );
    sgData.objTrans = &worldMat;
+
+   // fixes ambient 
+   sgData.ambientLightColor *= mSkyboxColor;
+   sgData.ambientLightColor *= mExposure;
 
    mMatrixSet->restoreSceneViewProjection();
    mMatrixSet->setWorld( worldMat );
@@ -244,7 +285,8 @@ void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
          mFogBandMatInst->setSceneInfo( state, sgData );
 
          GFX->setVertexBuffer( mFogBandVB );      
-         GFX->drawPrimitive( GFXTriangleList, 0, 16 );
+         //GFX->drawPrimitive( GFXTriangleList, 0, 16 );
+         GFX->drawPrimitive( GFXTriangleList, 0, 96 );
       }
    }
 }
@@ -256,7 +298,10 @@ void SkyBox::_initRender()
    U32 vertCount = 36;
 
    if ( !mDrawBottom )
-      vertCount = 30;
+      vertCount = vertCount - 6;
+
+   if (!mDrawTop)
+      vertCount = vertCount - 6;
 
    mPrimCount = vertCount / 3;
 
@@ -332,42 +377,63 @@ void SkyBox::_initRender()
    tmpVerts[22].texCoord.set( 1.0f, 1.0f );
    tmpVerts[23].texCoord.set( 0, 1.0f );
 
-   tmpVerts[24].point.set( -1, -1, 1 );
-   tmpVerts[25].point.set( -1, 1, 1 );
-   tmpVerts[26].point.set( 1, 1, 1 );
-
-   tmpVerts[24].texCoord.set( 0, 0 );
-   tmpVerts[25].texCoord.set( 1.0f, 0 );
-   tmpVerts[26].texCoord.set( 1.0f, 1.0f );
-
-   tmpVerts[27].point.set( -1, -1, 1 );
-   tmpVerts[28].point.set( 1, 1, 1 );
-   tmpVerts[29].point.set( 1, -1, 1 );
-
-   tmpVerts[27].texCoord.set( 0, 0 );
-   tmpVerts[28].texCoord.set( 1.0f, 1.0f );
-   tmpVerts[29].texCoord.set( 0, 1.0f );
-
-   // Only set up these
-   // vertices if the SkyBox
-   // is set to render the bottom face.
-   if ( mDrawBottom )
+   if ( mDrawTop )
    {
-      tmpVerts[30].point.set( 1, 1, -1 ); 
-      tmpVerts[31].point.set( -1, 1, -1 );
-      tmpVerts[32].point.set( -1, -1, -1 );
+		// rendering the top face	
+	   tmpVerts[24].point.set( -1, -1, 1 );
+	   tmpVerts[25].point.set( -1, 1, 1 );
+	   tmpVerts[26].point.set( 1, 1, 1 );
 
-      tmpVerts[30].texCoord.set( 1.0f, 1.0f ); 
-      tmpVerts[31].texCoord.set( 1.0f, 0 );
-      tmpVerts[32].texCoord.set( 0, 0 );
+	   tmpVerts[24].texCoord.set( 0, 0 );
+	   tmpVerts[25].texCoord.set( 1.0f, 0 );
+	   tmpVerts[26].texCoord.set( 1.0f, 1.0f );
 
-      tmpVerts[33].point.set( 1, -1, -1 ); 
-      tmpVerts[34].point.set( 1, 1, -1 );
-      tmpVerts[35].point.set( -1, -1, -1 );
+	   tmpVerts[27].point.set( -1, -1, 1 );
+	   tmpVerts[28].point.set( 1, 1, 1 );
+	   tmpVerts[29].point.set( 1, -1, 1 );
 
-      tmpVerts[33].texCoord.set( 0, 1.0f ); 
-      tmpVerts[34].texCoord.set( 1.0f, 1.0f );
-      tmpVerts[35].texCoord.set( 0, 0 );
+	   tmpVerts[27].texCoord.set( 0, 0 );
+	   tmpVerts[28].texCoord.set( 1.0f, 1.0f );
+	   tmpVerts[29].texCoord.set( 0, 1.0f );
+
+	   if ( mDrawBottom )  {
+			// we are rendering top and bottom faces
+		  tmpVerts[30].point.set( 1, 1, -1 ); 
+		  tmpVerts[31].point.set( -1, 1, -1 );
+		  tmpVerts[32].point.set( -1, -1, -1 );
+
+		  tmpVerts[30].texCoord.set( 1.0f, 1.0f ); 
+		  tmpVerts[31].texCoord.set( 1.0f, 0 );
+		  tmpVerts[32].texCoord.set( 0, 0 );
+
+		  tmpVerts[33].point.set( 1, -1, -1 ); 
+		  tmpVerts[34].point.set( 1, 1, -1 );
+		  tmpVerts[35].point.set( -1, -1, -1 );
+
+		  tmpVerts[33].texCoord.set( 0, 1.0f ); 
+		  tmpVerts[34].texCoord.set( 1.0f, 1.0f );
+		  tmpVerts[35].texCoord.set( 0, 0 );
+	   } 
+   }
+
+   // Only set up these vertices if the SkyBox
+   // is set to render the bottom face and not the top
+   if ( mDrawBottom && !mDrawTop)  {
+      tmpVerts[24].point.set( 1, 1, -1 ); 
+      tmpVerts[25].point.set( -1, 1, -1 );
+      tmpVerts[26].point.set( -1, -1, -1 );
+
+      tmpVerts[24].texCoord.set( 1.0f, 1.0f ); 
+      tmpVerts[25].texCoord.set( 1.0f, 0 );
+      tmpVerts[26].texCoord.set( 0, 0 );
+
+      tmpVerts[27].point.set( 1, -1, -1 ); 
+      tmpVerts[28].point.set( 1, 1, -1 );
+      tmpVerts[29].point.set( -1, -1, -1 );
+
+      tmpVerts[27].texCoord.set( 0, 1.0f ); 
+      tmpVerts[28].texCoord.set( 1.0f, 1.0f );
+      tmpVerts[29].texCoord.set( 0, 0 );
    }
 
    VectorF tmp( 0, 0, 0 );
@@ -409,146 +475,83 @@ void SkyBox::_initRender()
    delete [] tmpVerts;
 
    if ( mFogBandVB.isNull() )
-      mFogBandVB.set( GFX, 48, GFXBufferTypeStatic );
+      mFogBandVB.set( GFX, 288, GFXBufferTypeStatic );
+      //mFogBandVB.set( GFX, 192, GFXBufferTypeStatic );
+      //mFogBandVB.set( GFX, 48, GFXBufferTypeStatic );
 
    GFXVertexPC *bandVertPtr = mFogBandVB.lock();
 
    // Grab the fog color.
    ColorI fogColor( mLastFogColor.red * 255, mLastFogColor.green * 255, mLastFogColor.blue * 255 );
-   ColorI fogColorAlpha( mLastFogColor.red * 255, mLastFogColor.green * 255, mLastFogColor.blue * 255, 0 );
+   ColorI fogColorAlpha( mLastFogColor.red * 255, mLastFogColor.green * 255, mLastFogColor.blue * 255, 20 );
+   ColorI fogColorAlphaFaint( mLastFogColor.red * 255, mLastFogColor.green * 255, mLastFogColor.blue * 255, 0 );
+   ColorI fogColorPink( 255, 128, 128 );
 
-   // Upper portion of band geometry.
-   {
-      bandVertPtr[0].point.set( -1, -1, mFogBandHeight );
-      bandVertPtr[1].point.set( 1, -1, mFogBandHeight );
-      bandVertPtr[2].point.set( 1, -1, 0 );
+   F32 fogBase = -1.0f + mFogBandHeight;
+   F32 totalFogHeight = mFogBandHeight + mFogBandWidth - 1.0f;
+	if (totalFogHeight > 1.0)
+		totalFogHeight = 1.0;
+	F32 degree = M_PI_F / 8.0f;
+	int pointNum = 0;
 
-      bandVertPtr[0].color.set( fogColorAlpha );
-      bandVertPtr[1].color.set( fogColorAlpha );
-      bandVertPtr[2].color.set( fogColor );
+	for (int i=0;i<16;i++) {
+		F32 x1 = sin(degree * F32(i));
+		F32 y1 = cos(degree * F32(i));
+		F32 x2 = sin(degree * (F32(i) + 1.0f));
+		F32 y2 = cos(degree * (F32(i) + 1.0f));
+		pointNum = i * 18;
 
-      bandVertPtr[3].point.set( -1, -1, mFogBandHeight );
-      bandVertPtr[4].point.set( 1, -1, 0 );
-      bandVertPtr[5].point.set( -1, -1, 0 );
+	   // very faint uppder portion
+      bandVertPtr[pointNum].point.set( x1, y1, totalFogHeight + mFogBandWidth );
+      bandVertPtr[pointNum+1].point.set( x2, y2, totalFogHeight + mFogBandWidth);
+      bandVertPtr[pointNum+2].point.set( x1, y1, totalFogHeight);
 
-      bandVertPtr[3].color.set( fogColorAlpha );
-      bandVertPtr[4].color.set( fogColor );
-      bandVertPtr[5].color.set( fogColor );
+      bandVertPtr[pointNum].color.set( fogColorAlphaFaint );
+      bandVertPtr[pointNum+1].color.set( fogColorAlphaFaint );
+      bandVertPtr[pointNum+2].color.set( fogColorAlpha );
 
-      bandVertPtr[6].point.set( 1, -1, mFogBandHeight );
-      bandVertPtr[7].point.set( 1, 1, mFogBandHeight );
-      bandVertPtr[8].point.set( 1, 1, 0 );
+      bandVertPtr[pointNum+3].point.set( x2, y2, totalFogHeight + mFogBandWidth );
+      bandVertPtr[pointNum+4].point.set( x2, y2, totalFogHeight );
+      bandVertPtr[pointNum+5].point.set( x1, y1, totalFogHeight );
 
-      bandVertPtr[6].color.set( fogColorAlpha );
-      bandVertPtr[7].color.set( fogColorAlpha );
-      bandVertPtr[8].color.set( fogColor );
+      bandVertPtr[pointNum+3].color.set( fogColorAlphaFaint );
+      bandVertPtr[pointNum+4].color.set( fogColorAlpha );
+      bandVertPtr[pointNum+5].color.set( fogColorAlpha );
 
-      bandVertPtr[9].point.set( 1, -1, mFogBandHeight );
-      bandVertPtr[10].point.set( 1, 1, 0 );
-      bandVertPtr[11].point.set( 1, -1, 0 );
+	   // middle portion
+      bandVertPtr[pointNum+6].point.set( x1, y1, totalFogHeight );
+      bandVertPtr[pointNum+7].point.set( x2, y2, totalFogHeight );
+      bandVertPtr[pointNum+8].point.set( x1, y1, fogBase );
 
-      bandVertPtr[9].color.set( fogColorAlpha );
-      bandVertPtr[10].color.set( fogColor );
-      bandVertPtr[11].color.set( fogColor );
+      bandVertPtr[pointNum+6].color.set( fogColorAlpha );
+      bandVertPtr[pointNum+7].color.set( fogColorAlpha );
+      bandVertPtr[pointNum+8].color.set( fogColor );
 
-      bandVertPtr[12].point.set( -1, 1, mFogBandHeight );
-      bandVertPtr[13].point.set( -1, -1, mFogBandHeight );
-      bandVertPtr[14].point.set( -1, -1, 0 );
+      bandVertPtr[pointNum+9].point.set( x2, y2, totalFogHeight );
+      bandVertPtr[pointNum+10].point.set( x2, y2, fogBase );
+      bandVertPtr[pointNum+11].point.set( x1, y1, fogBase );
 
-      bandVertPtr[12].color.set( fogColorAlpha );
-      bandVertPtr[13].color.set( fogColorAlpha );
-      bandVertPtr[14].color.set( fogColor );
+      bandVertPtr[pointNum+9].color.set( fogColorAlpha );
+      bandVertPtr[pointNum+10].color.set( fogColor );
+      bandVertPtr[pointNum+11].color.set( fogColor );
 
-      bandVertPtr[15].point.set( -1, 1, mFogBandHeight );
-      bandVertPtr[16].point.set( -1, -1, 0 ); 
-      bandVertPtr[17].point.set( -1, 1, 0 );
 
-      bandVertPtr[15].color.set( fogColorAlpha );
-      bandVertPtr[16].color.set( fogColor );
-      bandVertPtr[17].color.set( fogColor );
+	  // lower portion
+      bandVertPtr[pointNum+12].point.set( x1, y1, -1 );
+      bandVertPtr[pointNum+13].point.set( x1, y1, fogBase );
+      bandVertPtr[pointNum+14].point.set( x2, y2, -1 );
 
-      bandVertPtr[18].point.set( 1, 1, mFogBandHeight );
-      bandVertPtr[19].point.set( -1, 1, mFogBandHeight );
-      bandVertPtr[20].point.set( -1, 1, 0 );
+      bandVertPtr[pointNum+12].color.set( fogColor );
+      bandVertPtr[pointNum+13].color.set( fogColor );
+      bandVertPtr[pointNum+14].color.set( fogColor );
 
-      bandVertPtr[18].color.set( fogColorAlpha );
-      bandVertPtr[19].color.set( fogColorAlpha );
-      bandVertPtr[20].color.set( fogColor );
+      bandVertPtr[pointNum+15].point.set( x1, y1, fogBase );
+      bandVertPtr[pointNum+16].point.set( x2, y2, fogBase );
+      bandVertPtr[pointNum+17].point.set( x2, y2, -1 );
 
-      bandVertPtr[21].point.set( 1, 1, mFogBandHeight );
-      bandVertPtr[22].point.set( -1, 1, 0 );
-      bandVertPtr[23].point.set( 1, 1, 0 );
-
-      bandVertPtr[21].color.set( fogColorAlpha );
-      bandVertPtr[22].color.set( fogColor );
-      bandVertPtr[23].color.set( fogColor );
-   }
-
-   // Lower portion of band geometry.
-   {
-      bandVertPtr[24].point.set( -1, -1, 0 );
-      bandVertPtr[25].point.set( 1, -1, 0 );
-      bandVertPtr[26].point.set( 1, -1, -1 );
-
-      bandVertPtr[24].color.set( fogColor );
-      bandVertPtr[25].color.set( fogColor );
-      bandVertPtr[26].color.set( fogColor );
-
-      bandVertPtr[27].point.set( -1, -1, 0 );
-      bandVertPtr[28].point.set( 1, -1, -1 );
-      bandVertPtr[29].point.set( -1, -1, -1 );
-
-      bandVertPtr[27].color.set( fogColor );
-      bandVertPtr[28].color.set( fogColor );
-      bandVertPtr[29].color.set( fogColor );
-
-      bandVertPtr[30].point.set( 1, -1, 0 );
-      bandVertPtr[31].point.set( 1, 1, 0 );
-      bandVertPtr[32].point.set( 1, 1, -1 );
-
-      bandVertPtr[30].color.set( fogColor );
-      bandVertPtr[31].color.set( fogColor );
-      bandVertPtr[32].color.set( fogColor );
-
-      bandVertPtr[33].point.set( 1, -1, 0 );
-      bandVertPtr[34].point.set( 1, 1, -1 );
-      bandVertPtr[35].point.set( 1, -1, -1 );
-
-      bandVertPtr[33].color.set( fogColor );
-      bandVertPtr[34].color.set( fogColor );
-      bandVertPtr[35].color.set( fogColor );
-
-      bandVertPtr[36].point.set( -1, 1, 0 );
-      bandVertPtr[37].point.set( -1, -1, 0 );
-      bandVertPtr[38].point.set( -1, -1, -1 );
-
-      bandVertPtr[36].color.set( fogColor );
-      bandVertPtr[37].color.set( fogColor );
-      bandVertPtr[38].color.set( fogColor );
-
-      bandVertPtr[39].point.set( -1, 1, 0 );
-      bandVertPtr[40].point.set( -1, -1, -1 ); 
-      bandVertPtr[41].point.set( -1, 1, -1 );
-
-      bandVertPtr[39].color.set( fogColor );
-      bandVertPtr[40].color.set( fogColor );
-      bandVertPtr[41].color.set( fogColor );
-
-      bandVertPtr[42].point.set( 1, 1, 0 );
-      bandVertPtr[43].point.set( -1, 1, 0 );
-      bandVertPtr[44].point.set( -1, 1, -1 );
-
-      bandVertPtr[42].color.set( fogColor );
-      bandVertPtr[43].color.set( fogColor );
-      bandVertPtr[44].color.set( fogColor );
-
-      bandVertPtr[45].point.set( 1, 1, 0 );
-      bandVertPtr[46].point.set( -1, 1, -1 );
-      bandVertPtr[47].point.set( 1, 1, -1 );
-
-      bandVertPtr[45].color.set( fogColor );
-      bandVertPtr[46].color.set( fogColor );
-      bandVertPtr[47].color.set( fogColor );
+      bandVertPtr[pointNum+15].color.set( fogColor );
+      bandVertPtr[pointNum+16].color.set( fogColor );
+      bandVertPtr[pointNum+17].color.set( fogColor );
    }
 
    mFogBandVB.unlock();
@@ -596,9 +599,8 @@ void SkyBox::_initMaterial()
    desc.setZReadWrite( true, false );
    mMatInstance->addStateBlockDesc( desc );
 
-   // Also disable lighting on the skybox material by default.
+   // Allow lighting on the skybox material by default.
    FeatureSet features = MATMGR->getDefaultFeatures();
-   features.removeFeature( MFT_RTLighting );
    features.removeFeature( MFT_Visibility );
 
    // Now initialize the material.
