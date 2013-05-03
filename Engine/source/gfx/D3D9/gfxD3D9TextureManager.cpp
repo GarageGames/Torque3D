@@ -43,9 +43,10 @@ U32 GFXD3D9TextureObject::mTexCount = 0;
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-GFXD3D9TextureManager::GFXD3D9TextureManager( LPDIRECT3DDEVICE9 d3ddevice ) 
+GFXD3D9TextureManager::GFXD3D9TextureManager( LPDIRECT3DDEVICE9 d3ddevice, U32 adapterIndex ) 
 {
    mD3DDevice = d3ddevice;
+   mAdapterIndex = adapterIndex;
    dMemset( mCurTexSet, 0, sizeof( mCurTexSet ) );   
    mD3DDevice->GetDeviceCaps(&mDeviceCaps);
 }
@@ -183,7 +184,7 @@ void GFXD3D9TextureManager::_innerCreateTexture( GFXD3D9TextureObject *retTex,
                mslevel = antialiasLevel;
 #ifdef TORQUE_DEBUG
                DWORD MaxSampleQualities;      
-               d3d->getD3D()->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dTextureFormat, FALSE, D3DMULTISAMPLE_NONMASKABLE, &MaxSampleQualities);
+               d3d->getD3D()->CheckDeviceMultiSampleType(mAdapterIndex, D3DDEVTYPE_HAL, d3dTextureFormat, FALSE, D3DMULTISAMPLE_NONMASKABLE, &MaxSampleQualities);
                AssertFatal(mslevel < MaxSampleQualities, "Invalid AA level!");
 #endif
             }

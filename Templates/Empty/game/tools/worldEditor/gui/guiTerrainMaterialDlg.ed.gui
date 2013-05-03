@@ -2,29 +2,29 @@
 %guiContent = new GuiControl(TerrainMaterialDlg, EditorGuiGroup) {
    canSaveDynamicFields = "0";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
-   Extent = "800 600";
+   Extent = "800 768";
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCtrl() {
       canSaveDynamicFields = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "221 151";
-      Extent = "394 322";
-      MinExtent = "358 298";
+      Extent = "394 432";
+      MinExtent = "358 432";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Docking = "None";
       Margin = "4 4 4 4";
@@ -52,7 +52,7 @@
          Extent = "189 64";
          
          new GuiTextCtrl(){
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 0";
@@ -62,7 +62,7 @@
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "left";
             VertSizing = "top";
             position = "160 2";
@@ -71,17 +71,17 @@
             canSave = "1";
             Visible = "1";
             Command = "TerrainMaterialDlg.newMat();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/new";
+            bitmap = "tools/gui/images/new";
          };
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "left";
             VertSizing = "top";
             position = "173 2";
@@ -90,7 +90,7 @@
             canSave = "1";
             Visible = "1";
             Command = "TerrainMaterialDlg.deleteMat();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             groupNum = "-1";
             buttonType = "PushButton";
@@ -106,11 +106,11 @@
          HorizSizing = "left";
          VertSizing = "height";
          position = "202 26";
-         Extent = "185 263";
+         Extent = "185 363";
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -122,7 +122,7 @@
          new GuiBitmapCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "1 0";
@@ -130,7 +130,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             bitmap = "core/art/gui/images/separator-v";
             wrap = "0";
@@ -138,7 +138,7 @@
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "8 22";
@@ -146,7 +146,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiDefaultProfile";
+            tooltipprofile = "ToolsGuiDefaultProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -161,7 +161,7 @@
             internalName = "matNameCtrl";
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "39 21";
@@ -169,7 +169,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -188,7 +188,7 @@
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "InspectorTitleTextProfile";
+            Profile = "ToolsGuiInspectorTitleTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "8 0";
@@ -196,7 +196,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -210,7 +210,7 @@
          new GuiContainer() {
             canSaveDynamicFields = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "6 43";
@@ -218,7 +218,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -231,7 +231,7 @@
                internalName = "sideProjectionCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "55 54";
@@ -239,7 +239,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                text = " Use Side Projection";
                groupNum = "-1";
@@ -251,7 +251,7 @@
                internalName = "baseTexCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -259,7 +259,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                bitmap = "tools/materialeditor/gui/unknownImage";
                wrap = "0";
@@ -267,7 +267,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -276,7 +276,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg.changeBase();";
-               tooltipprofile = "GuiDefaultProfile";
+               tooltipprofile = "ToolsGuiDefaultProfile";
                ToolTip = "Change the Active Diffuse Map for this layer";
                hovertime = "1000";
                groupNum = "-1";
@@ -295,7 +295,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -309,7 +309,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "width";
                VertSizing = "bottom";
                position = "56 16";
@@ -317,7 +317,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -331,7 +331,7 @@
             new GuiButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "116 0";
@@ -340,7 +340,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg.changeBase();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                text = "Edit";
                groupNum = "-1";
@@ -350,7 +350,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "159 0";
@@ -359,7 +359,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg-->baseTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                groupNum = "-1";
                buttonType = "PushButton";
@@ -369,7 +369,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "132 35";
@@ -377,7 +377,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -392,7 +392,7 @@
                internalName = "baseSizeCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "94 34";
@@ -400,7 +400,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -419,7 +419,7 @@
          new GuiBitmapCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "6 116";
@@ -427,23 +427,23 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            bitmap = "core/art/gui/images/separator-v";
+            bitmap = "tools/gui/images/separator-v";
             wrap = "0";
          };
          new GuiContainer() {
             canSaveDynamicFields = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
-            position = "6 206";
+            position = "6 295";
             Extent = "185 50";
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -456,7 +456,7 @@
                internalName = "normTexCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -464,7 +464,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                bitmap = "tools/materialeditor/gui/unknownImage";
                wrap = "0";
@@ -480,7 +480,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -494,7 +494,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -503,7 +503,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg.changeNormal();";
-               tooltipprofile = "GuiDefaultProfile";
+               tooltipprofile = "ToolsGuiDefaultProfile";
                ToolTip = "Change the active Normal Map for this layer.";
                hovertime = "1000";
                groupNum = "-1";
@@ -514,7 +514,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "width";
                VertSizing = "bottom";
                position = "56 15";
@@ -522,7 +522,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -536,7 +536,7 @@
             new GuiButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "116 0";
@@ -545,7 +545,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg.changeNormal();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                text = "Edit";
                groupNum = "-1";
@@ -555,7 +555,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "159 0";
@@ -564,7 +564,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg-->normTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                groupNum = "-1";
                buttonType = "PushButton";
@@ -574,7 +574,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "92 34";
@@ -582,7 +582,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -597,7 +597,7 @@
                internalName = "parallaxScaleCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "55 33";
@@ -605,7 +605,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -622,10 +622,337 @@
                passwordMask = "*";
             };
          };
+
+         new GuiBitmapCtrl() {
+            bitmap = "tools/gui/images/separator-v";
+            wrap = "0";
+            position = "6 288";
+            extent = "175 2";
+            minExtent = "8 2";
+            horizSizing = "width";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "0";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+         new GuiContainer() {
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "6 122";
+            extent = "185 72";
+            minExtent = "8 2";
+            horizSizing = "width";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiBitmapCtrl() {
+               bitmap = "tools/materialeditor/gui/unknownImage";
+               wrap = "0";
+               position = "1 1";
+               extent = "47 47";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiDefaultProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               internalName = "macroTexCtrl";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiBitmapButtonCtrl() {
+               bitmap = "tools/materialEditor/gui/cubemapBtnBorder";
+               bitmapMode = "Stretched";
+               autoFitExtents = "0";
+               useModifiers = "0";
+               useStates = "1";
+               groupNum = "-1";
+               buttonType = "PushButton";
+               useMouseEvents = "0";
+               position = "1 1";
+               extent = "48 48";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiDefaultProfile";
+               visible = "1";
+               active = "1";
+               command = "TerrainMaterialDlg.changeMacro();";
+               tooltipProfile = "ToolsGuiDefaultProfile";
+               tooltip = "Change the active Macro Map for this layer.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Macro";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "56 -3";
+               extent = "34 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "EditorTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "None";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "56 17";
+               extent = "116 17";
+               minExtent = "8 2";
+               horizSizing = "width";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiButtonCtrl() {
+               text = "Edit";
+               groupNum = "-1";
+               buttonType = "PushButton";
+               useMouseEvents = "0";
+               position = "116 0";
+               extent = "40 16";
+               minExtent = "8 2";
+               horizSizing = "left";
+               vertSizing = "bottom";
+               profile = "ToolsGuiButtonProfile";
+               visible = "1";
+               active = "1";
+               command = "TerrainMaterialDlg.changeMacro();";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiBitmapButtonCtrl() {
+               bitmap = "tools/gui/images/delete";
+               bitmapMode = "Stretched";
+               autoFitExtents = "0";
+               useModifiers = "0";
+               useStates = "1";
+               groupNum = "-1";
+               buttonType = "PushButton";
+               useMouseEvents = "0";
+               position = "159 0";
+               extent = "16 16";
+               minExtent = "8 2";
+               horizSizing = "left";
+               vertSizing = "bottom";
+               profile = "ToolsGuiDefaultProfile";
+               visible = "1";
+               active = "1";
+               command = "TerrainMaterialDlg-->macroTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Size";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "0";
+               anchorBottom = "0";
+               anchorLeft = "0";
+               anchorRight = "0";
+               position = "132 33";
+               extent = "39 16";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               password = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "0";
+               anchorBottom = "0";
+               anchorLeft = "0";
+               anchorRight = "0";
+               position = "94 32";
+               extent = "34 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextEditProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               internalName = "macroSizeCtrl";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Strength";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "0";
+               anchorBottom = "0";
+               anchorLeft = "0";
+               anchorRight = "0";
+               position = "39 54";
+               extent = "46 16";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               password = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "0";
+               anchorBottom = "0";
+               anchorLeft = "0";
+               anchorRight = "0";
+               position = "1 53";
+               extent = "34 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextEditProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               internalName = "macroStrengthCtrl";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Distance";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "0";
+               anchorBottom = "0";
+               anchorLeft = "0";
+               anchorRight = "0";
+               position = "132 54";
+               extent = "45 16";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               password = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "0";
+               anchorBottom = "0";
+               anchorLeft = "0";
+               anchorRight = "0";
+               position = "94 53";
+               extent = "34 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextEditProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               internalName = "macroDistanceCtrl";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+         };
+         
          new GuiBitmapCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "6 200";
@@ -633,23 +960,23 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            bitmap = "core/art/gui/images/separator-v";
+            bitmap = "tools/gui/images/separator-v";
             wrap = "0";
          };
          new GuiContainer() {
             canSaveDynamicFields = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
-            position = "6 122";
+            position = "6 206";
             Extent = "185 72";
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -662,7 +989,7 @@
                internalName = "detailTexCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -670,7 +997,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                bitmap = "tools/materialeditor/gui/unknownImage";
                wrap = "0";
@@ -678,7 +1005,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -687,7 +1014,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg.changeDetail();";
-               tooltipprofile = "GuiDefaultProfile";
+               tooltipprofile = "ToolsGuiDefaultProfile";
                ToolTip = "Change the active Detail Map for this layer.";
                hovertime = "1000";
                groupNum = "-1";
@@ -706,7 +1033,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -720,7 +1047,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "width";
                VertSizing = "bottom";
                position = "56 16";
@@ -728,7 +1055,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -742,7 +1069,7 @@
             new GuiButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "116 0";
@@ -751,7 +1078,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg.changeDetail();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                text = "Edit";
                groupNum = "-1";
@@ -761,7 +1088,7 @@
             new GuiBitmapButtonCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "159 0";
@@ -770,7 +1097,7 @@
                canSave = "1";
                Visible = "1";
                Command = "TerrainMaterialDlg-->detailTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                groupNum = "-1";
                buttonType = "PushButton";
@@ -780,7 +1107,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "132 33";
@@ -788,7 +1115,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -803,7 +1130,7 @@
                internalName = "detSizeCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "94 32";
@@ -811,7 +1138,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -829,7 +1156,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "39 54";
@@ -837,7 +1164,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -852,7 +1179,7 @@
                internalName = "detStrengthCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 53";
@@ -860,7 +1187,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -878,7 +1205,7 @@
             new GuiTextCtrl() {
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "132 54";
@@ -886,7 +1213,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -901,7 +1228,7 @@
                internalName = "detDistanceCtrl";
                canSaveDynamicFields = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "94 53";
@@ -909,7 +1236,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -929,29 +1256,29 @@
       new GuiControl() {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "6 42";
-         Extent = "189 273";
+         Extent = "189 373";
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
 
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "1";
-            Profile = "GuiScrollProfile";
+            Profile = "ToolsGuiScrollProfile";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 0";
-            Extent = "189 274";
+            Extent = "189 374";
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Margin = "0 0 0 0";
             Padding = "0 0 0 0";
@@ -974,7 +1301,7 @@
                class = "TerrainMaterialTreeCtrl";
                className = "TerrainMaterialTreeCtrl";
                isContainer = "1";
-               Profile = "GuiTreeViewProfile";
+               Profile = "ToolsGuiTreeViewProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "1 1";
@@ -982,7 +1309,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                tabSize = "16";
                textOffset = "2";
@@ -1003,16 +1330,16 @@
       new GuiButtonCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
-         position = "202 294";
+         position = "202 394";
          Extent = "98 22";
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
          Command = "TerrainMaterialDlg.dialogApply();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Apply&Select";
          groupNum = "-1";
@@ -1022,16 +1349,16 @@
       new GuiButtonCtrl() {
          canSaveDynamicFields = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
-         position = "307 294";
+         position = "307 394";
          Extent = "80 22";
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
          Command = "TerrainMaterialDlg.dialogCancel();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Cancel";
          groupNum = "-1";
@@ -1041,18 +1368,18 @@
       
       new GuiBitmapCtrl() { // inactive overlay
          internalName = "inactiveOverlay";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "height";
          position = "199 23";
          Extent = "190 267";
          isContainer = true;
          Visible = false;
-         bitmap = "core/art/gui/images/inactive-overlay";
+         bitmap = "tools/gui/images/inactive-overlay";
          
          new GuiTextCtrl(){
             internalName = "inactiveOverlayDlg";
-            Profile = "GuiTextCenterProfile";
+            Profile = "ToolsGuiTextCenterProfile";
             HorizSizing = "width";
             VertSizing = "center";
             position = "0 104";

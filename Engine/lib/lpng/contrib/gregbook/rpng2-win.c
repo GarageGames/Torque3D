@@ -10,7 +10,7 @@
    tweaking (or maybe not).  Thanks to Adam Costello and Pieter S. van der
    Meulen for the "diamond" and "radial waves" patterns, respectively.
 
-   to do:
+   to do (someday, maybe):
     - handle quoted command-line args (especially filenames with spaces)
     - finish resizable checkerboard-gradient (sizes 4-128?)
     - use %.1023s to simplify truncation of title-bar string?
@@ -29,10 +29,14 @@
     - 1.21:  made minor tweak to usage screen to fit within 25-line console
     - 1.22:  added AMD64/EM64T support (__x86_64__)
     - 2.00:  dual-licensed (added GNU GPL)
+    - 2.01:  fixed 64-bit typo in readpng2.c
+    - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
+              unexpected-EOF and file-read-error cases
+    - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -83,7 +87,7 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "2.00 of 2 June 2007"
+#define VERSION   "2.02 of 16 March 2008"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,7 +96,33 @@
 #include <time.h>
 #include <math.h>      /* only for PvdM background code */
 #include <windows.h>
+#ifdef __CYGWIN__
+/* getch replacement. Turns out, we don't really need this,
+ * but leave it here if we ever enable any of the uses of
+ * _getch in the main code
+ */
+#include <unistd.h>
+#include <termio.h>
+#include <sys/ioctl.h>
+int repl_getch( void )
+{
+  char ch;
+  int fd = fileno(stdin);
+  struct termio old_tty, new_tty;
+
+  ioctl(fd, TCGETA, &old_tty);
+  new_tty = old_tty;
+  new_tty.c_lflag &= ~(ICANON | ECHO | ISIG);
+  ioctl(fd, TCSETA, &new_tty);
+  fread(&ch, 1, sizeof(ch), stdin);
+  ioctl(fd, TCSETA, &old_tty);
+
+  return ch;
+}
+#define _getch repl_getch
+#else
 #include <conio.h>     /* only for _getch() */
+#endif
 
 /* all for PvdM background code: */
 #ifndef PI
@@ -266,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     filename = (char *)NULL;
     memset(&rpng2_info, 0, sizeof(mainprog_info));
 
-
+#ifndef __CYGWIN__
     /* Next reenable console output, which normally goes to the bit bucket
      * for windowed apps.  Closing the console window will terminate the
      * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
@@ -275,7 +305,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     AllocConsole();
     freopen("CONOUT$", "a", stderr);
     freopen("CONOUT$", "a", stdout);
-
+#endif
 
     /* Set the default value for our display-system exponent, i.e., the
      * product of the CRT exponent and the exponent corresponding to
@@ -392,18 +422,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             }
         } else if (!strncmp(*argv, "-timing", 2)) {
             timing = TRUE;
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-        } else if (!strncmp(*argv, "-nommxfilters", 7)) {
-            rpng2_info.nommxfilters = TRUE;
-        } else if (!strncmp(*argv, "-nommxcombine", 7)) {
-            rpng2_info.nommxcombine = TRUE;
-        } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
-            rpng2_info.nommxinterlace = TRUE;
-        } else if (!strcmp(*argv, "-nommx")) {
-            rpng2_info.nommxfilters = TRUE;
-            rpng2_info.nommxcombine = TRUE;
-            rpng2_info.nommxinterlace = TRUE;
-#endif
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -414,9 +432,56 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         }
     }
 
-    if (!filename) {
+    if (!filename)
         ++error;
-    } else if (!(infile = fopen(filename, "rb"))) {
+
+
+    /* print usage screen if any errors up to this point */
+
+    if (error) {
+#ifndef __CYGWIN__
+        int ch;
+#endif
+
+        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
+        readpng2_version_info();
+        fprintf(stderr, "\n"
+          "Usage:  %s [-gamma exp] [-bgcolor bg | -bgpat pat] [-timing]\n"
+          "        %*s file.png\n\n"
+          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
+          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
+          "\t\t  to the product of the lookup-table exponent (varies)\n"
+          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
+          "    bg  \tdesired background color in 7-character hex RGB format\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
+          "\t\t  used with transparent images; overrides -bgpat option\n"
+          "    pat \tdesired background pattern number (1-%d); used with\n"
+          "\t\t  transparent images; overrides -bgcolor option\n"
+          "    -timing\tenables delay for every block read, to simulate modem\n"
+          "\t\t  download of image (~36 Kbps)\n"
+          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
+#ifndef __CYGWIN__
+          "Press Q or Esc to quit this usage screen. ",
+#else
+          ,
+#endif
+          PROGNAME,
+#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__)) && \
+    !(defined(__CYGWIN__) || defined(__MINGW32__))
+          (int)strlen(PROGNAME), " ",
+#endif
+          (int)strlen(PROGNAME), " ", default_display_exponent, num_bgpat);
+        fflush(stderr);
+#ifndef __CYGWIN__
+        do
+            ch = _getch();
+        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+#endif
+        exit(1);
+    }
+
+
+    if (!(infile = fopen(filename, "rb"))) {
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
         ++error;
     } else {
@@ -430,8 +495,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             switch (rc) {
                 case 2:
                     fprintf(stderr, PROGNAME
-                      ":  [%s] has bad IHDR (libpng longjmp)\n",
-                      filename);
+                      ":  [%s] has bad IHDR (libpng longjmp)\n", filename);
                     break;
                 case 4:
                     fprintf(stderr, PROGNAME ":  insufficient memory\n");
@@ -448,51 +512,25 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     }
 
 
-    /* usage screen */
-
     if (error) {
+#ifndef __CYGWIN__
         int ch;
+#endif
 
-        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
-        readpng2_version_info();
-        fprintf(stderr, "\n"
-          "Usage:  %s [-gamma exp] [-bgcolor bg | -bgpat pat] [-timing]\n"
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          "        %*s [[-nommxfilters] [-nommxcombine] [-nommxinterlace] | -nommx]\n"
-#endif
-          "        %*s file.png\n\n"
-          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
-          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
-          "\t\t  to the product of the lookup-table exponent (varies)\n"
-          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
-          "    bg  \tdesired background color in 7-character hex RGB format\n"
-          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
-          "\t\t  used with transparent images; overrides -bgpat option\n"
-          "    pat \tdesired background pattern number (1-%d); used with\n"
-          "\t\t  transparent images; overrides -bgcolor option\n"
-          "    -timing\tenables delay for every block read, to simulate modem\n"
-          "\t\t  download of image (~36 Kbps)\n"
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          "    -nommx*\tdisable optimized MMX routines for decoding row filters,\n"
-          "\t\t  combining rows, and expanding interlacing, respectively\n"
-#endif
-          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-          "Press Q or Esc to quit this usage screen. ",
-          PROGNAME,
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          (int)strlen(PROGNAME), " ",
-#endif
-          (int)strlen(PROGNAME), " ", default_display_exponent, num_bgpat);
-        fflush(stderr);
+        fprintf(stderr, PROGNAME ":  aborting.\n");
+#ifndef __CYGWIN__
         do
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
-        exit(1);
+#endif
+        exit(2);
     } else {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+#ifndef __CYGWIN__
         fprintf(stderr,
           "\n   [console window:  closing this window will terminate %s]\n\n",
           PROGNAME);
+#endif
         fflush(stderr);
     }
 
@@ -519,7 +557,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     } else
         rpng2_info.need_bgcolor = TRUE;
 
-    rpng2_info.done = FALSE;
+    rpng2_info.state = kPreInit;
     rpng2_info.mainprog_init = rpng2_win_init;
     rpng2_info.mainprog_display_row = rpng2_win_display_row;
     rpng2_info.mainprog_finish_display = rpng2_win_finish_display;
@@ -539,10 +577,27 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         if (readpng2_decode_data(&rpng2_info, inbuf, incount))
             ++error;
         Trace((stderr, "done with readpng2_decode_data()\n"))
-        if (error || feof(infile) || rpng2_info.done)
+
+        if (error || incount != INBUFSIZE || rpng2_info.state == kDone) {
+            if (rpng2_info.state == kDone) {
+                Trace((stderr, "done decoding PNG image\n"))
+            } else if (ferror(infile)) {
+                fprintf(stderr, PROGNAME
+                  ":  error while reading PNG image file\n");
+                exit(3);
+            } else if (feof(infile)) {
+                fprintf(stderr, PROGNAME ":  end of file reached "
+                  "(unexpectedly) while reading PNG image file\n");
+                exit(3);
+            } else /* if (error) */ {
+                /* will print error message below */
+            }
             break;
+        }
+
         if (timing)
             Sleep(1000L);
+
         incount = fread(inbuf, 1, INBUFSIZE, infile);
     }
 
@@ -589,7 +644,7 @@ static void rpng2_win_init()
     ulg rowbytes = rpng2_info.rowbytes;
 
     Trace((stderr, "beginning rpng2_win_init()\n"))
-    Trace((stderr, "  rowbytes = %ld\n", rpng2_info.rowbytes))
+    Trace((stderr, "  rowbytes = %d\n", rpng2_info.rowbytes))
     Trace((stderr, "  width  = %ld\n", rpng2_info.width))
     Trace((stderr, "  height = %ld\n", rpng2_info.height))
 
@@ -619,6 +674,8 @@ static void rpng2_win_init()
         readpng2_cleanup(&rpng2_info);
         return;
     }
+
+    rpng2_info.state = kWindowInit;
 }
 
 
@@ -1114,9 +1171,14 @@ static void rpng2_win_finish_display()
      * we have nothing to do here except set a flag and let the user know
      * that the image is done */
 
-    rpng2_info.done = TRUE;
+    rpng2_info.state = kDone;
     printf(
-      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+#ifndef __CYGWIN__
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n"
+#else
+      "Done.  Press mouse button 1 (within image window) to quit.\n"
+#endif
+    );
     fflush(stdout);
 }
 

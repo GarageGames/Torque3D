@@ -58,8 +58,9 @@ singleton PostEffect( LightRayPostFX )
    isEnabled = false;
    allowReflectPass = false;
         
-   renderTime = "PFXAfterDiffuse";
-   renderPriority = 0.1;
+   renderTime = "PFXBeforeBin";
+   renderBin = "EditorBin";
+   renderPriority = 10;
       
    shader = LightRayOccludeShader;
    stateBlock = LightRayStateBlock;

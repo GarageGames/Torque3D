@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -12,7 +12,7 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(EPainter) {
@@ -20,7 +20,7 @@
       internalName = "TerrainPainter";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 SPC getWord(EditorGuiToolbar.extent, 1)+249;
@@ -52,7 +52,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Position = "4 24";
@@ -61,7 +61,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "Client";
          Margin = "3 1 3 3";
@@ -87,7 +87,7 @@
             internalName = "theMaterialList";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             Position = "1 3";
@@ -96,7 +96,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
          };
       };
@@ -106,7 +106,7 @@
       internalName = "TerrainPainterPreview";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 SPC getWord(EditorGuiToolbar.extent, 1)-1;
@@ -146,7 +146,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Position = "0 0";
@@ -155,7 +155,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             wrap = "0";
             bitmap= "tools/materialeditor/gui/unknownImage";
@@ -164,7 +164,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Position = "0 0";
@@ -173,7 +173,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             bitmap = "tools/worldEditor/images/terrainpainter/terrain-painter-border-large";
             wrap = "0";
@@ -183,7 +183,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "170 229";
@@ -193,7 +193,7 @@
          isDecoy = "0";
          Visible = "0";
          Command = "TerrainMaterialDlg.show(ETerrainMaterialSelected.selectedMatIndex, ETerrainMaterialSelected.selectedMat, EPainter_TerrainMaterialUpdateCallback);";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Edit";
          groupNum = "-1";
@@ -204,7 +204,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "width";
          VertSizing = "top";
          Position = "5 230";
@@ -213,7 +213,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -224,6 +224,26 @@
          text = "None";
          maxLength = "1024";
       };
+      new GuiButtonCtrl() {      
+         canSaveDynamicFields = "0";      
+         isContainer = "0";      
+         Profile = "GuiButtonProfile";      
+         HorizSizing = "left";      
+         VertSizing = "bottom";      
+         Position = "100 229";    
+         Extent = "50 18";    
+         MinExtent = "8 2";      
+         canSave = "1";      
+         Visible = "1";      
+         Command = "autoLayers();";      
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         tooltip = "Generate a layer mask for this material.";      
+         hovertime = "1000";      
+         text = "AutoPaint";      
+         groupNum = "-1";      
+         buttonType = "PushButton";      
+         useMouseEvents = "0";      
+      };  
    };
 };
 //--- OBJECT WRITE END ---

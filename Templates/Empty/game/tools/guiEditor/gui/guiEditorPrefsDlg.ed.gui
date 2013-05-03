@@ -1,6 +1,6 @@
 %guiContent = new GuiControl(GuiEditorPrefsDlg, EditorGuiGroup) {
    canSaveDynamicFields = "0";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -12,7 +12,7 @@
 
    new GuiWindowCtrl() {
       canSaveDynamicFields = "0";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "250 210";
@@ -42,7 +42,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          position = "100 60";
@@ -59,7 +59,7 @@
       };
       new GuiButtonCtrl(GuiEditorPrefsDlgOkBtn) {
          canSaveDynamicFields = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          position = "190 60";
@@ -77,7 +77,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "top";
          position = "10 60";
@@ -95,7 +95,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "center";
          VertSizing = "bottom";
          position = "-3 20";
@@ -107,7 +107,7 @@
 
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "16 10";
@@ -131,7 +131,7 @@
             Enabled = "1";
             Component = "textEdit";
             isContainer = "0";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "72 11";
@@ -161,7 +161,7 @@
             Enabled = "1";
             Component = "Slider";
             isContainer = "0";
-            Profile = "GuiSliderProfile";
+            Profile = "ToolsGuiSliderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "112 14";

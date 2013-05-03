@@ -88,7 +88,7 @@ function GuiEditorToolbox::setViewTypeAlphabetical( %this )
       %className = %classes.getKey( %i );
       %ctrl = new GuiIconButtonCtrl()
       {
-         profile = "GuiIconButtonSmallProfile";
+         profile = "ToolsGuiIconButtonSmallProfile";
          extent = "128 18";
          text = %className;
          iconBitmap = EditorIconRegistry::findIconByClassName( %className );
@@ -102,7 +102,7 @@ function GuiEditorToolbox::setViewTypeAlphabetical( %this )
          useMouseEvents = true;
          className = "GuiEditorToolboxButton";
          tooltip = %className NL "\n" @ getDescriptionOfClass( %className );
-         tooltipProfile = "GuiToolTipProfile";
+         tooltipProfile = "ToolsGuiToolTipProfile";
       };
 
       %this.add( %ctrl );
@@ -171,7 +171,7 @@ function GuiEditorToolbox::setViewTypeCategorized( %this )
          %className = %classes.getKey( %n );
          %ctrl = new GuiIconButtonCtrl()
          {
-            profile = "GuiIconButtonSmallProfile";
+            profile = "ToolsGuiIconButtonSmallProfile";
             extent = "128 18";
             text = %className;
             iconBitmap = EditorIconRegistry::findIconByClassName( %className );
@@ -185,7 +185,7 @@ function GuiEditorToolbox::setViewTypeCategorized( %this )
             useMouseEvents = true;
             className = "GuiEditorToolboxButton";
             tooltip = %className NL "\n" @ getDescriptionOfClass( %className );
-            tooltipProfile = "GuiToolTipProfile";
+            tooltipProfile = "ToolsGuiToolTipProfile";
          };
 
          %stack.add( %ctrl );
@@ -227,7 +227,7 @@ function GuiEditorToolbox::getOrCreateRolloutForCategory( %this, %category )
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "0";
       autoCollapseSiblings = true;
@@ -236,7 +236,7 @@ function GuiEditorToolbox::getOrCreateRolloutForCategory( %this, %category )
 
       new GuiDynamicCtrlArrayControl() {
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "0 0";
@@ -244,7 +244,7 @@ function GuiEditorToolbox::getOrCreateRolloutForCategory( %this, %category )
          MinExtent = "64 64";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
          padding = "6 2 4 0";
@@ -306,7 +306,7 @@ function GuiEditorToolbox::startGuiControlDrag( %this, %class )
    %dragCtrl = new GuiDragAndDropControl()
    {
       canSaveDynamicFields    = "0";
-      Profile                 = "GuiSolidDefaultProfile";
+      Profile                 = "ToolsGuiSolidDefaultProfile";
       HorizSizing             = "right";
       VertSizing              = "bottom";
       Position                = %xPos SPC %yPos;

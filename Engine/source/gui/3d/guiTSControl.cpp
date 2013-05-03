@@ -53,6 +53,13 @@ ConsoleDocClass( GuiTSCtrl,
 U32 GuiTSCtrl::smFrameCount = 0;
 Vector<GuiTSCtrl*> GuiTSCtrl::smAwakeTSCtrls;
 
+ImplementEnumType( GuiTSRenderStyles,
+   "Style of rendering for a GuiTSCtrl.\n\n"
+   "@ingroup Gui3D" )
+	{ GuiTSCtrl::RenderStyleStandard,         "standard"              },
+	{ GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
+EndImplementEnumType;
+
 
 //-----------------------------------------------------------------------------
 
@@ -131,6 +138,8 @@ GuiTSCtrl::GuiTSCtrl()
    mForceFOV = 0;
    mReflectPriority = 1.0f;
 
+   mRenderStyle = RenderStyleStandard;
+
    mSaveModelview.identity();
    mSaveProjection.identity();
    mSaveViewport.set( 0, 0, 10, 10 );
@@ -141,6 +150,9 @@ GuiTSCtrl::GuiTSCtrl()
    mLastCameraQuery.object = NULL;
    mLastCameraQuery.farPlane = 10.0f;
    mLastCameraQuery.nearPlane = 0.01f;
+
+   mLastCameraQuery.projectionOffset = Point2F::Zero;
+   mLastCameraQuery.eyeOffset = Point3F::Zero;
 
    mLastCameraQuery.ortho = false;
 }
@@ -164,6 +176,9 @@ void GuiTSCtrl::initPersistFields()
          "The share of the per-frame reflection update work this control's rendering should run.\n"
          "The reflect update priorities of all visible GuiTSCtrls are added together and each control is assigned "
          "a share of the per-frame reflection update time according to its percentage of the total priority value." );
+
+      addField("renderStyle", TYPEID< RenderStyles >(), Offset(mRenderStyle, GuiTSCtrl),
+         "Indicates how this control should render its contents." );
 
    endGroup( "Rendering" );
    
@@ -256,7 +271,9 @@ F32 GuiTSCtrl::calculateViewDistance(F32 radius)
    F32 fov = mLastCameraQuery.fov;
    F32 wwidth;
    F32 wheight;
-   F32 aspectRatio = F32(getWidth()) / F32(getHeight());
+   F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
+   F32 renderHeight = F32(getHeight());
+   F32 aspectRatio = renderWidth / renderHeight;
    
    // Use the FOV to calculate the viewport height scale
    // then generate the width scale from the aspect ratio.
@@ -321,10 +338,27 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       mLastCameraQuery.cameraMatrix.mul(rotMat);
    }
 
+   // Set up the appropriate render style
+   U32 prevRenderStyle = GFX->getCurrentRenderStyle();
+   Point2F prevProjectionOffset = GFX->getCurrentProjectionOffset();
+   Point3F prevEyeOffset = GFX->getStereoEyeOffset();
+   if(mRenderStyle == RenderStyleStereoSideBySide)
+   {
+      GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSideBySide);
+      GFX->setCurrentProjectionOffset(mLastCameraQuery.projectionOffset);
+      GFX->setStereoEyeOffset(mLastCameraQuery.eyeOffset);
+   }
+   else
+   {
+      GFX->setCurrentRenderStyle(GFXDevice::RS_Standard);
+   }
+
    // set up the camera and viewport stuff:
    F32 wwidth;
    F32 wheight;
-   F32 aspectRatio = F32(getWidth()) / F32(getHeight());
+   F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
+   F32 renderHeight = F32(getHeight());
+   F32 aspectRatio = renderWidth / renderHeight;
    
    // Use the FOV to calculate the viewport height scale
    // then generate the width scale from the aspect ratio.
@@ -339,16 +373,28 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       wwidth = aspectRatio * wheight;
    }
 
-   F32 hscale = wwidth * 2.0f / F32(getWidth());
-   F32 vscale = wheight * 2.0f / F32(getHeight());
-
-   F32 left = (updateRect.point.x - offset.x) * hscale - wwidth;
-   F32 right = (updateRect.point.x + updateRect.extent.x - offset.x) * hscale - wwidth;
-   F32 top = wheight - vscale * (updateRect.point.y - offset.y);
-   F32 bottom = wheight - vscale * (updateRect.point.y + updateRect.extent.y - offset.y);
+   F32 hscale = wwidth * 2.0f / renderWidth;
+   F32 vscale = wheight * 2.0f / renderHeight;
 
    Frustum frustum;
-   frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
+   if(mRenderStyle == RenderStyleStereoSideBySide)
+   {
+      F32 left = 0.0f * hscale - wwidth;
+      F32 right = renderWidth * hscale - wwidth;
+      F32 top = wheight - vscale * 0.0f;
+      F32 bottom = wheight - vscale * renderHeight;
+
+      frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
+   }
+   else
+   {
+      F32 left = (updateRect.point.x - offset.x) * hscale - wwidth;
+      F32 right = (updateRect.point.x + updateRect.extent.x - offset.x) * hscale - wwidth;
+      F32 top = wheight - vscale * (updateRect.point.y - offset.y);
+      F32 bottom = wheight - vscale * (updateRect.point.y + updateRect.extent.y - offset.y);
+
+      frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
+   }
 
 	// Manipulate the frustum for tiled screenshots
 	const bool screenShotMode = gScreenShot && gScreenShot->isPending();
@@ -411,6 +457,11 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 	// Restore the previous matrix state before
    // we begin rendering the child controls.
    saver.restore();
+
+   // Restore the render style and any stereo parameters
+   GFX->setCurrentRenderStyle(prevRenderStyle);
+   GFX->setCurrentProjectionOffset(prevProjectionOffset);
+   GFX->setStereoEyeOffset(prevEyeOffset);
 
    // Allow subclasses to render 2D elements.
    GFX->setClipRect(updateRect);

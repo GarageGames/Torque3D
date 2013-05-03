@@ -23,10 +23,6 @@
 #ifndef _AUTH_H_
 #define _AUTH_H_
 
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
-
 /// Formerly contained a certificate, showing that something was valid.
 class Auth2Certificate
 {

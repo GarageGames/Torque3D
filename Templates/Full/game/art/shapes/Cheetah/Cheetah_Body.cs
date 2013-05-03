@@ -42,7 +42,6 @@ function CheetahDAE::onLoad(%this)
    %this.addSequence("timeline", "brakeLight", "50", "51");
    %this.setSequencePriority("brakeLight", "8");
    %this.setNodeTransform("cam", "5.46934e-008 -4.75632 2.89171 -0.404897 0.817636 0.409303 1.71107", "1");
-   %this.removeNode("EnvironmentAmbientLight");
    %this.removeNode("CheetahMesh300");
    %this.removeNode("CheetahMesh200");
    %this.removeNode("CheetahMesh100");
@@ -51,10 +50,5 @@ function CheetahDAE::onLoad(%this)
    %this.removeNode("TailLightsMesh200");
    %this.removeNode("TailLightsMesh100");
    %this.removeNode("TailLightsMesh2");
-   %this.removeNode("collision-1");
-   %this.removeNode("collision-5");
-   %this.removeNode("collision-4");
-   %this.removeNode("collision-3");
-   %this.removeNode("collision-2");
    %this.removeNode("nulldetail1");
 }

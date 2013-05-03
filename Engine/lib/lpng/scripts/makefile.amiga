@@ -1,9 +1,10 @@
 # Commodore Amiga Makefile
 # makefile for libpng and SAS C V6.5x compiler
 # Copyright (C) 1995-2000 Wolf Faust
-# For conditions of distribution and use, see copyright notice in png.h
 #
-# Note: Use #define PNG_READ_BIG_ENDIAN_SUPPORTED in pngconf.h
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
 #
 # Location/path of zlib include files
 ZLIB=/zlib
@@ -23,6 +24,8 @@ LDLIBS= libpng.lib libgz.lib LIB:scm.lib LIB:sc.lib Lib:amiga.lib
 LN= slink
 # file deletion command
 RM= delete quiet
+# file copy command?
+CP= copy
 # library (.lib) file creation command
 AR= oml
 # make directory command
@@ -37,6 +40,11 @@ all: libpng.lib pngtest
 libpng.lib: $(OBJS)
 -$(RM) libpng.lib
 $(AR) libpng.lib r $(OBJS)
+
+$(OBJS): pngpriv.h png.h pngconf.h pnglibconf.h pnginfo.h pngstruct.h pngdebug.h
+
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+$(CP) scripts/pnglibconf.h.prebuilt pnglibconf.h
 
 pngtest: pngtest.o libpng.lib
 $(LN) <WITH <

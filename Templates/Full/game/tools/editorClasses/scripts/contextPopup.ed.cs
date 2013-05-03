@@ -84,7 +84,7 @@ function ContextDialogContainer::onAdd(%this)
    
    %this.base = new GuiButtonBaseCtrl()
    {
-      profile = GuiTransparentProfile;
+      profile = ToolsGuiTransparentProfile;
       class = ContextDialogWatcher;
       parent = %this;
       modal = true;

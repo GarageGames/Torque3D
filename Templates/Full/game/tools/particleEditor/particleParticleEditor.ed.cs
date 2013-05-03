@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
-$PE_PARTICLEEDITOR_DEFAULT_FILENAME = "art/shapes/particles/managedParticleData.cs";
+$PE_PARTICLEEDITOR_DEFAULT_FILENAME = "art/particles/managedParticleData.cs";
 
 
 //=============================================================================================

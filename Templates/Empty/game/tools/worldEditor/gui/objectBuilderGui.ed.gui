@@ -1,6 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(ObjectBuilderGui, EditorGuiGroup) {
-	profile = "GuiDefaultProfile";
+	profile = "ToolsGuiDefaultProfile";
 	horizSizing = "right";
 	vertSizing = "bottom";
 	position = "0 0";
@@ -12,7 +12,7 @@
 	helpTag = "0";
 
 	new GuiWindowCtrl(OBTargetWindow) {
-		profile = "GuiWindowProfile";
+		profile = "ToolsGuiWindowProfile";
 		horizSizing = "center";
 		vertSizing = "center";
 		position = "384 205";
@@ -46,7 +46,7 @@
 		};
 		new GuiTextEditCtrl(OBObjectName) {
 		   class = ObjectBuilderGuiTextEditCtrl;
-			profile = "GuiTextEditProfile";
+			profile = "ToolsGuiTextEditProfile";
 			horizSizing = "width";
 			vertSizing = "bottom";
 			position = "78 26";
@@ -59,7 +59,7 @@
 			historySize = "0";
 		};
 		new GuiBitmapBorderCtrl(OBContentWindow) {
-			profile = "GuiGroupBorderProfile";
+			profile = "ToolsGuiGroupBorderProfile";
 			horizSizing = "width";
 			vertSizing = "bottom";
 			position = "7 51";
@@ -71,7 +71,7 @@
 			helpTag = "0";
 		};
 		new GuiButtonCtrl(OBOKButton) {
-			profile = "GuiButtonProfile";
+			profile = "ToolsGuiButtonProfile";
 			horizSizing = "width";
 			vertSizing = "bottom";
 			position = "7 250";
@@ -86,7 +86,7 @@
 			Accelerator = "return";
 		};
 		new GuiButtonCtrl(OBCancelButton) {
-			profile = "GuiButtonProfile";
+			profile = "ToolsGuiButtonProfile";
 			horizSizing = "left";
 			vertSizing = "bottom";
 			position = "170 250";
@@ -171,7 +171,7 @@ function ObjectBuilderGui::createFileType(%this, %index)
 
    // 
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
-      profile = "GuiTextRightProfile";
+      profile = "ToolsGuiTextRightProfile";
       text = %name;
       extent = %this.fieldNameExtent;
       position = %this.curXPos @ " " @ %this.curYPos;
@@ -181,7 +181,7 @@ function ObjectBuilderGui::createFileType(%this, %index)
    // 
    %this.controls[%this.numControls] = new GuiButtonCtrl() {
       HorizSizing = "width";
-      profile = "GuiButtonProfile";
+      profile = "ToolsGuiButtonProfile";
       extent = %this.fileButtonExtent;
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
       modal = "1";
@@ -245,7 +245,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
 
    // 
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
-      profile = "GuiTextRightProfile";
+      profile = "ToolsGuiTextRightProfile";
       text = %name;
       extent = %this.fieldNameExtent;
       position = %this.curXPos @ " " @ %this.curYPos;
@@ -255,7 +255,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
    // 
    %this.controls[%this.numControls] = new GuiControl() {
       HorizSizing = "width";
-      profile = "GuiDefaultProfile";
+      profile = "ToolsGuiDefaultProfile";
       extent = %this.textEditExtent;
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
       modal = "1";
@@ -265,7 +265,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
       class = ObjectBuilderGuiTextEditCtrl;
       internalName = "MatText";
       HorizSizing = "width";
-      profile = "GuiTextEditProfile";
+      profile = "ToolsGuiTextEditProfile";
       extent = getWord(%this.textEditExtent,0) - getWord(%this.matButtonExtent,0) - 2 @ " " @ getWord(%this.textEditExtent,1);
       text = %this.field[%index, value];
       position = "0 0";
@@ -276,7 +276,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
    %button = new GuiBitmapButtonCtrl() {
       internalName = "MatButton";
       HorizSizing = "left";
-      profile = "GuiButtonProfile";
+      profile = "ToolsGuiButtonProfile";
       extent = %this.matButtonExtent;
       position = getWord(%this.textEditExtent,0) - getWord(%this.matButtonExtent,0) @ " 0";
       modal = "1";
@@ -331,7 +331,7 @@ function ObjectBuilderGui::createDataBlockType(%this, %index)
 
    // 
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
-      profile = "GuiTextRightProfile";
+      profile = "ToolsGuiTextRightProfile";
       text = %name;
       extent = %this.fieldNameExtent;
       position = %this.curXPos @ " " @ %this.curYPos;
@@ -341,7 +341,7 @@ function ObjectBuilderGui::createDataBlockType(%this, %index)
    // 
    %this.controls[%this.numControls] = new GuiPopupMenuCtrl() {
       HorizSizing = "width";
-      profile = "GuiPopUpMenuProfile";
+      profile = "ToolsGuiPopUpMenuProfile";
       extent = %this.popupMenuExtent;
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
       modal = "1";
@@ -389,7 +389,7 @@ function ObjectBuilderGui::createBoolType(%this, %index)
 
    // 
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
-      profile = "GuiTextRightProfile";
+      profile = "ToolsGuiTextRightProfile";
       text = %name;
       extent = %this.fieldNameExtent;
       position = %this.curXPos @ " " @ %this.curYPos;
@@ -398,7 +398,7 @@ function ObjectBuilderGui::createBoolType(%this, %index)
 
    // 
    %this.controls[%this.numControls] = new GuiCheckBoxCtrl() {
-      profile = "GuiCheckBoxProfile";
+      profile = "ToolsGuiCheckBoxProfile";
       extent = %this.checkBoxExtent;
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
       modal = "1";
@@ -431,7 +431,7 @@ function ObjectBuilderGui::createStringType(%this, %index)
 
    // 
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
-      profile = "GuiTextRightProfile";
+      profile = "ToolsGuiTextRightProfile";
       text = %name;
       extent = %this.fieldNameExtent;
       position = %this.curXPos @ " " @ %this.curYPos;
@@ -442,7 +442,7 @@ function ObjectBuilderGui::createStringType(%this, %index)
    %this.controls[%this.numControls] = new GuiTextEditCtrl() {
       class = ObjectBuilderGuiTextEditCtrl;
       HorizSizing = "width";
-      profile = "GuiTextEditProfile";
+      profile = "ToolsGuiTextEditProfile";
       extent = %this.textEditExtent;
       text = %this.field[%index, value];
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
@@ -672,7 +672,7 @@ function ObjectBuilderGui::buildCloudLayer(%this)
 {
    OBObjectName.setValue( "" );      
    %this.objectClassName = "CloudLayer";
-   %this.addField( "texture", "TypeImageFilename", "Texture", "core/art/skies/clouds/clouds_normal_displacement" );   
+   %this.addField( "texture", "TypeImageFilename", "Texture", "art/skies/clouds/clouds_normal_displacement" );   
 	%this.process();
 }
 
@@ -684,9 +684,9 @@ function ObjectBuilderGui::buildBasicClouds(%this)
 	
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
-   %this.addField( "texture[0]", "TypeImageFilename", "Texture", "core/art/skies/clouds/cloud1" );   
-   %this.addField( "texture[1]", "TypeImageFilename", "Texture", "core/art/skies/clouds/cloud2" );   
-   %this.addField( "texture[2]", "TypeImageFilename", "Texture", "core/art/skies/clouds/cloud3" );   	   
+   %this.addField( "texture[0]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud1" );   
+   %this.addField( "texture[1]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud2" );   
+   %this.addField( "texture[2]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud3" );   	   
 }
 
 function ObjectBuilderGui::checkExists( %this, %classname )
@@ -797,10 +797,9 @@ function ObjectBuilderGui::addWaterObjectFields(%this)
    %this.addField("waveSpeed[2]", "TypeFloat", "Wave Speed", "1");
    %this.addField("overallWaveMagnitude", "TypeFloat", "Overall Wave Magnitude", "1.0");
    
-   %this.addField("rippleTex", "TypeImageFilename", "Ripple Texture", "core/art/water/ripple" );
-   %this.addField("depthGradientTex", "TypeImageFilename", "Depth Gradient Texture", "core/art/water/depthcolor_ramp" );
-   %this.addField("foamTex", "TypeImageFilename", "Foam Texture", "core/art/water/foam" );
-   %this.addField("cubemap", "TypeRealString", "Cubemap", "DefaultSkyCubemap" );
+   %this.addField("rippleTex", "TypeImageFilename", "Ripple Texture", "art/water/ripple" );
+   %this.addField("depthGradientTex", "TypeImageFilename", "Depth Gradient Texture", "art/water/depthcolor_ramp" );
+   %this.addField("foamTex", "TypeImageFilename", "Foam Texture", "art/water/foam" );
 }
 
 function ObjectBuilderGui::buildWaterBlock(%this)

@@ -76,10 +76,9 @@ function RiverEditorGui::createRiver( %this )
 
       baseColor = "45 108 171 255";
       
-      rippleTex = "core/art/water/ripple.dds";
-      foamTex = "core/art/water/foam";
-      cubemap = "DefaultSkyCubemap";
-      depthGradientTex = "core/art/water/depthcolor_ramp";
+      rippleTex = "art/water/ripple.dds";
+      foamTex = "art/water/foam";
+      depthGradientTex = "art/water/depthcolor_ramp";
    };
    
    return %river;

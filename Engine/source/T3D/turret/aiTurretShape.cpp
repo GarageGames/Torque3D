@@ -37,7 +37,6 @@ static U32 sScanTypeMask =       PlayerObjectType     |
                                  VehicleObjectType;
 
 static U32 sAimTypeMask =        TerrainObjectType       |
-                                 InteriorObjectType      |
                                  WaterObjectType         | 
                                  PlayerObjectType        |
                                  StaticShapeObjectType   | 

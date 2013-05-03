@@ -11,7 +11,7 @@
    MinExtent = "8 8";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    Docking = "None";
    Margin = "0 0 0 0";
@@ -40,7 +40,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209
@@ -50,7 +50,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -69,7 +69,7 @@
       text = "Mission Area";
       
       new GuiContainer(){
-         profile = GuiDefaultProfile;
+         profile = "ToolsGuiDefaultProfile";
          Position = "5 25";
          Extent = "200 200";
          Docking = "Client";
@@ -113,7 +113,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 
@@ -122,7 +122,7 @@
       MinExtent = "210 300";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -151,7 +151,7 @@
          Margin = "0 0 3 3";
          
          new GuiTextCtrl(){
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 0";
@@ -172,7 +172,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "Client";
          Margin = "-14 0 3 3";
@@ -198,7 +198,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiTransparentProfile";
+            Profile = "ToolsGuiTransparentProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Position = "1 1";
@@ -206,14 +206,14 @@
             MinExtent = "16 16";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             dividerMargin = "5";
          };
       };
       new GuiContainer(){ //Mission Area Properties
          isContainer = "1";
-         Profile = GuiDefaultProfile;
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          Position = "1 0";
@@ -233,7 +233,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             lineSpacing = "2";
             allowColorChars = "0";

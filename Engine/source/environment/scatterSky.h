@@ -60,7 +60,6 @@ class MatrixSet;
 
 GFXDeclareVertexFormat( ScatterSkyVertex )
 {
-   // .xyz = coords
    Point3F point;
    VectorF normal;
    ColorF color;
@@ -134,7 +133,7 @@ protected:
    void _getSunColor( ColorF *outColor );
    void _interpolateColors();
 
-   void _conformLights(); 
+   void _conformLights();
 
    void _updateTimeOfDay( TimeOfDay *timeofDay, F32 time );
 
@@ -152,7 +151,7 @@ protected:
    static const F32 smAtmosphereRadius;
    static const F32 smViewerHeight;
 
-#define CURVE_COUNT 4
+#define CURVE_COUNT 5
 
    FloatCurve mCurves[CURVE_COUNT];
 
@@ -161,7 +160,7 @@ protected:
 
    F32 mRayleighScattering;
    F32 mRayleighScattering4PI;
-
+   F32 mSunSize;
    F32 mMieScattering;
    F32 mMieScattering4PI;
 
@@ -200,7 +199,7 @@ protected:
    ColorF mSunColor;       ///< Not a field
    ColorF mFogColor;       ///< Not a field
 
-   ColorF mAmbientScale;   
+   ColorF mAmbientScale;
    ColorF mSunScale;
    ColorF mFogScale;
 
@@ -212,15 +211,15 @@ protected:
    LightFlareData *mFlareData;
    LightFlareState mFlareState;
    F32 mFlareScale;
-   
-   bool mMoonEnabled;   
-   String mMoonMatName;   
+
+   bool mMoonEnabled;
+   String mMoonMatName;
    BaseMatInstance *mMoonMatInst;
    F32 mMoonScale;
-   ColorF mMoonTint;   
+   ColorF mMoonTint;
    VectorF mMoonLightDir;
    CubemapData *mNightCubemap;
-   String mNightCubemapName;   
+   String mNightCubemapName;
    bool mUseNightCubemap;
    MatrixSet *mMatrixSet;
 
@@ -246,6 +245,10 @@ protected:
    GFXShaderConstHandle *mInverseWavelengthSC;
    GFXShaderConstHandle *mNightInterpolantAndExposureSC;
    GFXShaderConstHandle *mUseCubemapSC;
+   F32 mColorizeAmt;
+   ColorF mColorize;
+   GFXShaderConstHandle *mColorizeSC;
+
 };
 
 #endif // _SCATTERSKY_H_

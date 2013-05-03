@@ -25,15 +25,26 @@
 #include "console/console.h"
 
 static const U32 csgVersionNumber = TORQUE_GAME_ENGINE;
+static const U32 appVersionNumber = TORQUE_APP_VERSION;
 
 U32 getVersionNumber()
 {
    return csgVersionNumber;
 }
 
+U32 getAppVersionNumber()
+{
+   return appVersionNumber;
+}
+
 const char* getVersionString()
 {
    return TORQUE_GAME_ENGINE_VERSION_STRING;
+}
+
+const char* getAppVersionString()
+{
+   return TORQUE_APP_VERSION_STRING;
 }
 
 /// TGE       0001
@@ -42,6 +53,7 @@ const char* getVersionString()
 /// TGEA 360  0004
 /// TGE  WII  0005
 /// Torque 3D 0006
+/// Torque 3D MIT 0007
 
 const char* getEngineProductString()
 {
@@ -62,7 +74,9 @@ const char* getEngineProductString()
          return "Torque for Wii";
       case 0006:
          return "Torque 3D";
-
+      case 0007:
+	     return "Torque 3D MIT";
+		 
       default:
          return "Torque Engine";
    };
@@ -77,16 +91,29 @@ const char* getCompileTimeString()
 
 ConsoleFunctionGroupBegin( CompileInformation, "Functions to get version information about the current executable." );
 
-ConsoleFunction( getVersionNumber, S32, 1, 1, "Get the version of the build, as a string.\n\n"
+ConsoleFunction( getVersionNumber, S32, 1, 1, "Get the version of the engine build, as a string.\n\n"
 				"@ingroup Debugging")
 {
    return getVersionNumber();
 }
 
-ConsoleFunction( getVersionString, const char*, 1, 1, "Get the version of the build, as a string.\n\n"
+ConsoleFunction( getAppVersionNumber, S32, 1, 1, "Get the version of the application build, as a string.\n\n"
+            "@ingroup Debugging")
+{
+   return getAppVersionNumber();
+}
+
+
+ConsoleFunction( getVersionString, const char*, 1, 1, "Get the version of the engine build, as a human readable string.\n\n"
 				"@ingroup Debugging")
 {
    return getVersionString();
+}
+
+ConsoleFunction( getAppVersionString, const char*, 1, 1, "Get the version of the aplication, as a human readable string.\n\n"
+            "@ingroup Debugging")
+{
+   return getAppVersionString();
 }
 
 ConsoleFunction( getEngineName, const char*, 1, 1, "Get the name of the engine product that this is running from, as a string.\n\n"

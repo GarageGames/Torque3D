@@ -1,6 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(DebuggerBreakConditionDlg, EditorGuiGroup) {
-   profile = "GuiDefaultProfile";
+   profile = "ToolsGuiDefaultProfile";
    horizSizing = "right";
    vertSizing = "bottom";
    position = "0 0";
@@ -12,7 +12,7 @@
    helpTag = "0";
    
    new GuiWindowCtrl() {
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "220 146";
@@ -32,7 +32,7 @@
       minSize = "50 50";
    
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 28";
@@ -45,7 +45,7 @@
          text = "Enter the break condition:";
       };
       new GuiTextEditCtrl(BreakCondition) {
-         profile = "GuiTextEditProfile";
+         profile = "ToolsGuiTextEditProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 44";
@@ -59,7 +59,7 @@
          historySize = "0";
       };
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 68";
@@ -72,7 +72,7 @@
          text = "Pass Count:";
       };
       new GuiTextEditCtrl(BreakPassCount) {
-         profile = "GuiTextEditProfile";
+         profile = "ToolsGuiTextEditProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 84";
@@ -86,7 +86,7 @@
             returnTab = "true";
       };
       new GuiTextCtrl() {
-         profile = "GuiTextProfile";
+         profile = "ToolsGuiTextProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 108";
@@ -99,7 +99,7 @@
          text = "Clear:";
       };
       new GuiTextEditCtrl(BreakClear) {
-         profile = "GuiTextEditProfile";
+         profile = "ToolsGuiTextEditProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "20 124";
@@ -113,7 +113,7 @@
             returnTab = "true";
       };
       new GuiButtonCtrl() {
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "56 156";
@@ -127,7 +127,7 @@
          text = "Set";
       };
       new GuiButtonCtrl() {
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "bottom";
          position = "104 156";

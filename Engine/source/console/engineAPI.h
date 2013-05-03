@@ -542,7 +542,7 @@ struct _EngineTrampoline< R( A, B, C, D, E, F, G ) >
       }
       typename EngineTypeTraits< G >::ValueType g() const
       {
-         return EngineTypeTraits< F >::ArgumentToValue(
+         return EngineTypeTraits< G >::ArgumentToValue(
             *( reinterpret_cast< const typename EngineTypeTraits< G >::ArgumentValueType* >
                ( &data[ sizeof( typename EngineTypeTraits< A >::ArgumentValueType ) +
                         sizeof( typename EngineTypeTraits< B >::ArgumentValueType ) +
@@ -1057,7 +1057,7 @@ struct _EngineFunctionTrampoline< R( A, B, C, D, E, F, G, H ) > : public _Engine
 {
    static R jmp( R ( *fn )( A, B, C, D, E, F, G, H ), const typename _EngineFunctionTrampolineBase< R( A, B, C, D, E, F, G, H ) >::Args& args )
    {
-      return R( fn( args.a, args.b, args.c, args.d, args.e, args.f, args.g, args.h ) );
+      return R( fn( args.a(), args.b(), args.c(), args.d(), args.e(), args.f(), args.g(), args.h() ) );
    }
 };
 template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >

@@ -75,24 +75,11 @@ function onStart()
    exec("./scripts/client/core.cs");
    initializeCore();
 
-   exec("./unifiedShell/main.cs");
-
    exec("./scripts/client/client.cs");
    exec("./scripts/server/server.cs");
    
    exec("./scripts/gui/guiTreeViewCtrl.cs");
    exec("./scripts/gui/messageBoxes/messageBox.ed.cs");
-   
-   exec("./art/gui/customProfiles.cs");
-   
-   // Level Chooser GUI
-   exec("./art/gui/chooseLevelDlg.gui");
-   exec("./scripts/gui/chooseLevelDlg.cs");
-
-   exec("./scripts/gui/optionsDlg.cs");
-   exec("./art/gui/optionsDlg.gui");
-   exec("./scripts/gui/loadingGui.cs");
-   exec("./art/gui/loadingGui.gui");
    
    echo(" % - Initialized Core");
 }

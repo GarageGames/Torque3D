@@ -56,16 +56,16 @@ mation and links to the latest version of the source code, and Chapters
 
 Greg Roelofs
 http://pobox.com/~newt/greg_contact.html
-2 June 2007
+16 March 2008
 
 
 BUILD INSTRUCTIONS
 
  - Prerequisites (in order of compilation):
 
-      - zlib		http://zlib.net/
-      - libpng		http://www.libpng.org/pub/png/libpng.html
-      - pngbook		http://www.libpng.org/pub/png/book/sources.html
+      - zlib            http://zlib.net/
+      - libpng          http://www.libpng.org/pub/png/libpng.html
+      - pngbook         http://www.libpng.org/pub/png/book/sources.html
 
      The pngbook demo programs are explicitly designed to demonstrate proper
      coding techniques for using the libpng reference library.  As a result,
@@ -104,7 +104,7 @@ BUILD INSTRUCTIONS
      unpacked the source code.
 
      For MSVC, set up the necessary environment variables by invoking
- 
+
         %devstudio%\vc\bin\vcvars32.bat
 
      where where %devstudio% is the installation directory for MSVC /
@@ -165,19 +165,19 @@ RUNNING THE PROGRAMS:  (VERY) BRIEF INTRO
      rpng is a simple PNG viewer that can display transparent PNGs with a
      specified background color; for example,
 
-	rpng -bgcolor #ff0000 toucan.png
+        rpng -bgcolor \#ff0000 toucan.png
 
      would display the image with a red background.  rpng2 is a progressive
      viewer that simulates a web browser in some respects; it can display
      images against either a background color or a dynamically generated
      background image.  For example:
 
-	rpng2 -bgpat 16 toucan.png
+        rpng2 -bgpat 16 toucan.png
 
      wpng is a purely command-line image converter from binary PBMPLUS/NetPBM
      format (.pgm or .ppm) to PNG; for example,
 
-	wpng -time < toucan-notrans.ppm > toucan-notrans.png
+        wpng -time < toucan-notrans.ppm > toucan-notrans.png
 
      would convert the specified PPM file (using redirection) to PNG, auto-
      matically setting the PNG modification-time chunk.

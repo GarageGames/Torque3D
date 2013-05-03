@@ -366,7 +366,7 @@ function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitma
          internalName = %internalName;
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "180 0";
@@ -375,7 +375,7 @@ function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitma
          canSave = "1";
          Visible = "1";
          Command = "EditorGui.setEditor(" @ %pluginName @ ");";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = %tooltip;
          hovertime = "750";
          bitmap = %bitmap;
@@ -997,12 +997,13 @@ function TerrainEditorPlugin::onWorldEditorStartup( %this )
    %map.bindCmd( keyboard, "1", "ToolsPaletteArray->brushAdjustHeight.performClick();", "" );    //Grab Terrain
    %map.bindCmd( keyboard, "2", "ToolsPaletteArray->raiseHeight.performClick();", "" );     // Raise Height
    %map.bindCmd( keyboard, "3", "ToolsPaletteArray->lowerHeight.performClick();", "" );     // Lower Height
-   %map.bindCmd( keyboard, "4", "ToolsPaletteArray->smoothHeight.performClick();", "" );    // Smooth
-   %map.bindCmd( keyboard, "5", "ToolsPaletteArray->paintNoise.performClick();", "" );      // Noise
-   %map.bindCmd( keyboard, "6", "ToolsPaletteArray->flattenHeight.performClick();", "" );   // Flatten
-   %map.bindCmd( keyboard, "7", "ToolsPaletteArray->setHeight.performClick();", "" );       // Set Height
-   %map.bindCmd( keyboard, "8", "ToolsPaletteArray->setEmpty.performClick();", "" );    // Clear Terrain
-   %map.bindCmd( keyboard, "9", "ToolsPaletteArray->clearEmpty.performClick();", "" );  // Restore Terrain
+   %map.bindCmd( keyboard, "4", "ToolsPaletteArray->smoothHeight.performClick();", "" );    // Average Height
+   %map.bindCmd( keyboard, "5", "ToolsPaletteArray->smoothSlope.performClick();", "" );    // Smooth Slope
+   %map.bindCmd( keyboard, "6", "ToolsPaletteArray->paintNoise.performClick();", "" );      // Noise
+   %map.bindCmd( keyboard, "7", "ToolsPaletteArray->flattenHeight.performClick();", "" );   // Flatten
+   %map.bindCmd( keyboard, "8", "ToolsPaletteArray->setHeight.performClick();", "" );       // Set Height
+   %map.bindCmd( keyboard, "9", "ToolsPaletteArray->setEmpty.performClick();", "" );    // Clear Terrain
+   %map.bindCmd( keyboard, "0", "ToolsPaletteArray->clearEmpty.performClick();", "" );  // Restore Terrain
    %map.bindCmd( keyboard, "v", "EWTerrainEditToolbarBrushType->ellipse.performClick();", "" );// Circle Brush
    %map.bindCmd( keyboard, "b", "EWTerrainEditToolbarBrushType->box.performClick();", "" );// Box Brush
    %map.bindCmd( keyboard, "=", "TerrainEditorPlugin.keyboardModifyBrushSize(1);", "" );// +1 Brush Size
@@ -1862,12 +1863,6 @@ function EditorTree::GetTooltipParticleEmitterNode( %this, %obj )
    return %text;
 }
 
-// Tooltip for InteriorInstance
-function EditorTree::GetTooltipInteriorInstance( %this, %obj )
-{
-   return "File: " @ %obj.interiorFile;
-}
-
 // Tooltip for WorldEditorSelection
 function EditorTree::GetTooltipWorldEditorSelection( %this, %obj )
 {
@@ -2362,7 +2357,7 @@ function EWToolsToolbar::reset( %this )
    EWToolsToolbarDecoy.setVisible(false);
    EWToolsToolbarDecoy.setExtent((29 + 4) * %count + 4, 31);
 
-  %this-->resizeArrow.setBitmap( "core/art/gui/images/collapse-toolbar" );
+  %this-->resizeArrow.setBitmap( "tools/gui/images/collapse-toolbar" );
 }
 
 function EWToolsToolbar::toggleSize( %this, %useDynamics )
@@ -2373,7 +2368,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
 
    if ( %this.isClosed == 0 )
    {
-      %image = "core/art/gui/images/expand-toolbar";
+      %image = "tools/gui/images/expand-toolbar";
       
       for( %i = 0 ; %i < ToolsToolbarArray.getCount(); %i++ )
       {
@@ -2394,7 +2389,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
    }
    else
    {
-      %image = "core/art/gui/images/collapse-toolbar";
+      %image = "tools/gui/images/collapse-toolbar";
 
       %count = ToolsToolbarArray.getCount();
       for( %i = 0 ; %i < %count; %i++ )

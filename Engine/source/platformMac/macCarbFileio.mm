@@ -49,6 +49,8 @@
 #include "platform/profiler.h"
 #include "cinterface/cinterface.h";
 
+#include "core/volume.h"
+
 //TODO: file io still needs some work...
 
 #define MAX_MAC_PATH_LONG     2048
@@ -634,7 +636,10 @@ bool Platform::isFile(const char *path)
    // make sure we can stat the file
    struct stat statData;
    if( stat(path, &statData) < 0 )
-      return false;
+   {
+      // Since file does not exist on disk see if it exists in a zip file loaded
+      return Torque::FS::IsFile(path);
+   }
    
    // now see if it's a regular file
    if( (statData.st_mode & S_IFMT) == S_IFREG)

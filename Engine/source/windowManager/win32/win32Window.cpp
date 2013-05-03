@@ -667,6 +667,9 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 	{
 
 	case WM_DISPLAYCHANGE:
+      // Update the monitor list
+      PlatformWindowManager::get()->buildMonitorsList();
+
 		if(window && window->isVisible() && !window->mSuppressReset && window->getVideoMode().bitDepth != wParam)
 		{
 			Con::warnf("Win32Window::WindowProc - resetting device due to display mode BPP change.");

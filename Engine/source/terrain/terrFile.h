@@ -152,7 +152,8 @@ public:
    void import(   const GBitmap &heightMap, 
                   F32 heightScale,
                   const Vector<U8> &layerMap, 
-                  const Vector<String> &materials );
+                  const Vector<String> &materials,
+                  bool flipYAxis = true );
 
    /// Updates the terrain grid for the specified area.
    void updateGrid( const Point2I &minPt, const Point2I &maxPt );
@@ -268,7 +269,7 @@ inline F32 fixedToFloat( U16 val )
 /// Conversion from floating point to 11.5 fixed point.
 inline U16 floatToFixed( F32 val )
 {
-   return U16(val * 32.0);
+   return U16(val * 32.0 + 0.5f);
 }
 
 inline bool TerrainFile::isPointInTerrain( U32 x, U32 y ) const

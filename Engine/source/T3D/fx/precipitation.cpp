@@ -45,7 +45,6 @@
 
 static const U32 dropHitMask = 
    TerrainObjectType |
-   InteriorObjectType |
    WaterObjectType |
    StaticShapeObjectType;
 

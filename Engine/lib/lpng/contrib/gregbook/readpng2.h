@@ -4,7 +4,7 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -69,6 +69,12 @@
 #  define Trace(x)  ;
 #endif
 
+enum rpng2_states {
+    kPreInit = 0,
+    kWindowInit,
+    kDone
+};
+
 typedef unsigned char   uch;
 typedef unsigned short  ush;
 typedef unsigned long   ulg;
@@ -90,12 +96,7 @@ typedef struct _mainprog_info {
     int rowbytes;
     int channels;
     int need_bgcolor;
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-    int nommxfilters;
-    int nommxcombine;
-    int nommxinterlace;
-#endif
-    int done;
+    int state;
     uch bg_red;
     uch bg_green;
     uch bg_blue;

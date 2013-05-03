@@ -28,6 +28,7 @@
 #endif
 
 DeclareFeatureType( MFT_TerrainBaseMap );
+DeclareFeatureType( MFT_TerrainMacroMap );
 DeclareFeatureType( MFT_TerrainDetailMap );
 DeclareFeatureType( MFT_TerrainNormalMap );
 DeclareFeatureType( MFT_TerrainParallaxMap );

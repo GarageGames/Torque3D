@@ -68,7 +68,7 @@ datablock SFXPlayList(LurkerFireSoundList)
 
 /*datablock SFXProfile(BulletImpactSound)
 {
-   filename = "art/sound/CT_fx/weapons/SCARFIRE";
+   filename = "art/sound/weapons/SCARFIRE";
    description = AudioClose3D;
    preload = true;
 };*/
@@ -78,7 +78,7 @@ datablock SFXPlayList(LurkerFireSoundList)
 // ----------------------------------------------------------------------------
 datablock ParticleData(GunFireSmoke)
 {
-   textureName          = "art/shapes/particles/smoke";
+   textureName          = "art/particles/smoke";
    dragCoefficient      = 0;
    gravityCoefficient   = "-1";
    windCoefficient      = 0;
@@ -101,7 +101,7 @@ datablock ParticleData(GunFireSmoke)
    times[0]      = 0.0;
    times[1]      = "0.498039";
    times[2]      = 1.0;
-   animTexName = "art/shapes/particles/smoke";
+   animTexName = "art/particles/smoke";
 };
 
 datablock ParticleEmitterData(GunFireSmokeEmitter)
@@ -123,7 +123,7 @@ datablock ParticleEmitterData(GunFireSmokeEmitter)
 
 datablock ParticleData(BulletDirtDust)
 {
-   textureName          = "art/shapes/particles/impact";
+   textureName          = "art/particles/impact";
    dragCoefficient      = "1";
    gravityCoefficient   = "-0.100122";
    windCoefficient      = 0;
@@ -146,7 +146,7 @@ datablock ParticleData(BulletDirtDust)
    times[0]      = 0.0;
    times[1]      = "0.498039";
    times[2]      = 1.0;
-   animTexName = "art/shapes/particles/impact";
+   animTexName = "art/particles/impact";
 };
 
 datablock ParticleEmitterData(BulletDirtDustEmitter)
@@ -186,7 +186,7 @@ datablock ExplosionData(BulletDirtExplosion)
 //-----------------------------------------------------------------------------
 datablock DebrisData(BulletShell)
 {
-   shapeFile = "art/shapes/weapons/RifleShell/RifleShell.DAE";
+   shapeFile = "art/shapes/weapons/shared/RifleShell.DAE";
    lifetime = 6.0;
    minSpinSpeed = 300.0;
    maxSpinSpeed = 400.0;

@@ -56,6 +56,15 @@ IMPLEMENT_STRUCT( Point2F,
       FIELD( y, y, 1, "Y coordinate." )
 
 END_IMPLEMENT_STRUCT;
+IMPLEMENT_STRUCT( Point3I,
+   Point3I, MathTypes,
+   "" )
+
+      FIELD( x, x, 1, "X coordinate." )
+      FIELD( y, y, 1, "Y coordinate." )
+      FIELD( z, z, 1, "Z coordinate." )
+
+END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( Point3F,
    Point3F, MathTypes,
    "" )
@@ -151,6 +160,30 @@ ConsoleSetType( TypePoint2F )
       *((Point2F *) dptr) = Point2F(dAtof(argv[0]), dAtof(argv[1]));
    else
       Con::printf("Point2F must be set as { x, y } or \"x y\"");
+}
+
+//-----------------------------------------------------------------------------
+// TypePoint3I
+//-----------------------------------------------------------------------------
+ConsoleType( Point3I, TypePoint3I, Point3I )
+ImplementConsoleTypeCasters(TypePoint3I, Point3I)
+
+ConsoleGetType( TypePoint3I )
+{
+   Point3I *pt = (Point3I *) dptr;
+   char* returnBuffer = Con::getReturnBuffer(256);
+   dSprintf(returnBuffer, 256, "%d %d %d", pt->x, pt->y, pt->z);
+   return returnBuffer;
+}
+
+ConsoleSetType( TypePoint3I )
+{
+   if(argc == 1)
+      dSscanf(argv[0], "%d %d %d", &((Point3I *) dptr)->x, &((Point3I *) dptr)->y, &((Point3I *) dptr)->z);
+   else if(argc == 3)
+      *((Point3I *) dptr) = Point3I(dAtoi(argv[0]), dAtoi(argv[1]), dAtoi(argv[2]));
+   else
+      Con::printf("Point3I must be set as { x, y, z } or \"x y z\"");
 }
 
 //-----------------------------------------------------------------------------

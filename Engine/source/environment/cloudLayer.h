@@ -129,6 +129,7 @@ protected:
    F32 mCoverage;
    F32 mWindSpeed;   
    F32 mHeight;
+   bool mBehindSkybox;
 };
 
 

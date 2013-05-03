@@ -37,7 +37,7 @@
 DepthSortList BlobShadow::smDepthSortList;
 GFXTexHandle BlobShadow::smGenericShadowTexture = NULL;
 S32 BlobShadow::smGenericShadowDim = 32;
-U32 BlobShadow::smShadowMask = TerrainObjectType | InteriorObjectType;
+U32 BlobShadow::smShadowMask = TerrainObjectType;
 F32 BlobShadow::smGenericRadiusSkew = 0.4f; // shrink radius of shape when it always uses generic shadow...
 
 Box3F gBlobShadowBox;

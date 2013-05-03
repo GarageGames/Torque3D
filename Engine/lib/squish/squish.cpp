@@ -34,7 +34,7 @@
 
 namespace squish {
 
-int FixFlags( int flags )
+static int FixFlags( int flags )
 {
 	// grab the flag bits
 	int method = flags & ( kDxt1 | kDxt3 | kDxt5 );

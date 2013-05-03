@@ -255,10 +255,16 @@ class Generator
         array_push( self::$project_cur->lib_dirs, $dir );
     }
     
-    static function addProjectLibInput( $lib )
+    static function addProjectLibInput( $lib, $libDebug = null )
     {
         array_push( self::$project_cur->libs, $lib );
+		array_push( self::$project_cur->libsDebug, $libDebug != null ? $libDebug : $lib );
     }
+	
+	static function addProjectIgnoreDefaultLib( $lib )
+	{
+		array_push( self::$project_cur->libsIgnore, $lib );
+	}
     
     static function includeLib( $lib )
     {
@@ -311,6 +317,17 @@ class Generator
     static function setProjectModuleDefinitionFile ( $mdef )
     {
         self::$project_cur->moduleDefinitionFile = $mdef;
+    }
+    
+    static function copyFileToProject( $sourcePath, $projectDestPath )
+    {
+        // Create the array to hold the source and destination
+        $paths = array();
+        array_push( $paths, $sourcePath );
+        array_push( $paths, $projectDestPath );
+        
+        // Add to the project
+        array_push( self::$project_cur->fileCopyPaths, $paths );
     }
     
     static function beginModule( $name )

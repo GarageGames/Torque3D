@@ -29,6 +29,7 @@
 #include "gui/core/guiCanvas.h"
 #include "gui/core/guiDefaultControlRender.h"
 #include "gfx/gfxDrawUtil.h"
+#include "gfx/gfxTextureManager.h"
 
 
 ImplementEnumType( GuiBitmapMode,
@@ -327,7 +328,7 @@ void GuiBitmapButtonCtrl::setBitmap( const String& name )
             if( i == 0 && mTextures[ i ].mTextureNormal.isNull() && mTextures[ i ].mTextureHilight.isNull() && mTextures[ i ].mTextureDepressed.isNull() && mTextures[ i ].mTextureInactive.isNull() )
             {
                Con::warnf( "GuiBitmapButtonCtrl::setBitmap - Unable to load texture: %s", mBitmapName.c_str() );
-               this->setBitmap( "core/art/unavailable" );
+               this->setBitmap( GFXTextureManager::getUnavailableTexturePath() );
                return;
             }
          }
@@ -372,7 +373,7 @@ void GuiBitmapButtonCtrl::setBitmapHandles(GFXTexHandle normal, GFXTexHandle hig
       if (mTextures[ i ].mTextureNormal.isNull() && mTextures[ i ].mTextureHilight.isNull() && mTextures[ i ].mTextureDepressed.isNull() && mTextures[ i ].mTextureInactive.isNull())
       {
          Con::warnf("GuiBitmapButtonCtrl::setBitmapHandles() - Invalid texture handles");
-         setBitmap("core/art/unavailable");
+         setBitmap( GFXTextureManager::getUnavailableTexturePath() );
          
          return;
       }

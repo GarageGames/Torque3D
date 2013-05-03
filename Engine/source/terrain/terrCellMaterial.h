@@ -71,11 +71,17 @@ protected:
       GFXShaderConstHandle *detailTexConst;
       GFXTexHandle detailTex;
 
+      GFXShaderConstHandle *macroTexConst;
+      GFXTexHandle macroTex;
+
       GFXShaderConstHandle *normalTexConst;
       GFXTexHandle normalTex;
 
       GFXShaderConstHandle *detailInfoVConst;
       GFXShaderConstHandle *detailInfoPConst;
+
+	  GFXShaderConstHandle *macroInfoVConst;
+      GFXShaderConstHandle *macroInfoPConst;
    };
 
    class Pass

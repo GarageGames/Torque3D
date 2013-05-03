@@ -73,7 +73,7 @@ new GuiCursor(EditorDiagLeftCursor)
 
 new GuiControl(EmptyControl)
 {
-   profile = "GuiButtonProfile";
+   profile = "ToolsGuiButtonProfile";
 };
 
 

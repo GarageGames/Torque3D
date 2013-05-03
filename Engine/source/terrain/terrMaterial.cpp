@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "terrain/terrMaterial.h"
 #include "console/consoleTypes.h"
+#include "gfx/gfxTextureManager.h"
 #include "gfx/bitmap/gBitmap.h"
 
 
@@ -61,6 +62,9 @@ TerrainMaterial::TerrainMaterial()
       mDetailSize( 5.0f ),
       mDetailStrength( 1.0f ),
       mDetailDistance( 50.0f ),
+      mMacroSize( 200.0f ),
+      mMacroStrength( 0.7f ),
+      mMacroDistance( 500.0f ),
       mParallaxScale( 0.0f )
 {
 }
@@ -83,6 +87,13 @@ void TerrainMaterial::initPersistFields()
    addField( "detailDistance", TypeF32, Offset( mDetailDistance, TerrainMaterial ), "Changes how far camera can see the detail map rendering on the material" );
    addField( "useSideProjection", TypeBool, Offset( mSideProjection, TerrainMaterial ),"Makes that terrain material project along the sides of steep "
 	   "slopes instead of projected downwards");
+
+   //Macro maps additions
+   addField( "macroMap", TypeStringFilename, Offset( mMacroMap, TerrainMaterial ), "Macro map for the material" );
+   addField( "macroSize", TypeF32, Offset( mMacroSize, TerrainMaterial ), "Used to scale the Macro map to the material square" );
+   addField( "macroStrength", TypeF32, Offset( mMacroStrength, TerrainMaterial ), "Exponentially sharpens or lightens the Macro map rendering on the material" );
+   addField( "macroDistance", TypeF32, Offset( mMacroDistance, TerrainMaterial ), "Changes how far camera can see the Macro map rendering on the material" );
+
    addField( "parallaxScale", TypeF32, Offset( mParallaxScale, TerrainMaterial ), "Used to scale the height from the normal map to give some self "
 	   "occlusion effect (aka parallax) to the terrain material" );
 
@@ -152,10 +163,12 @@ TerrainMaterial* TerrainMaterial::findOrCreate( const char *nameOrPath )
       // fallback here just in case it gets "lost".
       mat = new TerrainMaterial();
       mat->setInternalName( "warning_material" );
-      mat->mDiffuseMap = "core/art/warnMat.png";
+      mat->mDiffuseMap = GFXTextureManager::getWarningTexturePath();
       mat->mDiffuseSize = 500;
-      mat->mDetailMap = "core/art/warnMat.png";
+      mat->mDetailMap = GFXTextureManager::getWarningTexturePath();
       mat->mDetailSize = 5;
+	  mat->mMacroMap = GFXTextureManager::getWarningTexturePath();
+	  mat->mMacroSize = 200;
       mat->registerObject();
       
       Sim::getRootGroup()->addObject( mat );

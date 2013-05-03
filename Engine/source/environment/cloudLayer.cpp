@@ -26,6 +26,7 @@
 #include "cloudLayer.h"
 
 #include "gfx/gfxTransformSaver.h"
+#include "gfx/gfxTextureManager.h"
 #include "core/stream/fileStream.h"
 #include "core/stream/bitStream.h"
 #include "scene/sceneRenderState.h"
@@ -96,6 +97,8 @@ CloudLayer::CloudLayer()
    mTexOffset[0] = mTexOffset[1] = mTexOffset[2] = Point2F::Zero;
 
    mHeight = 4.0f;
+
+   mBehindSkybox = false;
 }
 
 IMPLEMENT_CO_NETOBJECT_V1( CloudLayer );
@@ -142,6 +145,7 @@ bool CloudLayer::onAdd()
       mCoverageSC = mShader->getShaderConstHandle( "$cloudCoverage" );
       mExposureSC = mShader->getShaderConstHandle( "$cloudExposure" );
       mBaseColorSC = mShader->getShaderConstHandle( "$cloudBaseColor" );
+	  mBehindSkybox = false;
 
       // Create StateBlocks
       GFXStateBlockDesc desc;
@@ -205,6 +209,9 @@ void CloudLayer::initPersistFields()
       addField( "height", TypeF32, Offset( mHeight, CloudLayer ),
          "Abstract number which controls the curvature and height of the dome mesh." );
 
+      addField( "behindSkybox", TypeBool, Offset( mBehindSkybox, CloudLayer ),
+         "Controls order of clouds and skybox - Use with transparent skyboxes." );
+
    endGroup( "CloudLayer" );
 
    Parent::initPersistFields();
@@ -238,6 +245,7 @@ U32 CloudLayer::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
    stream->write( mExposure );
    stream->write( mWindSpeed );
    stream->write( mHeight );
+   stream->write( mBehindSkybox );
 
    return retMask;
 }
@@ -267,11 +275,14 @@ void CloudLayer::unpackUpdate( NetConnection *conn, BitStream *stream )
    F32 oldHeight = mHeight;
    stream->read( &mHeight );
 
+   bool oldBehindSkybox = mBehindSkybox;
+   stream->read ( &mBehindSkybox );
+
    if ( isProperlyAdded() )
    {
       if ( ( oldTextureName != mTextureName ) || ( ( oldCoverage == 0.0f ) != ( mCoverage == 0.0f ) ) )
          _initTexture();
-      if ( oldHeight != mHeight )
+      if ( oldHeight != mHeight || oldBehindSkybox != mBehindSkybox)
          _initBuffers();
    }
 }
@@ -307,8 +318,15 @@ void CloudLayer::prepRenderImage( SceneRenderState *state )
    ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
    ri->renderDelegate.bind( this, &CloudLayer::renderObject );
    ri->type = RenderPassManager::RIT_Sky;
-   ri->defaultKey = 0;
-   ri->defaultKey2 = 0;
+
+   if ( mBehindSkybox ) {
+      ri->defaultKey = 10;
+      ri->defaultKey2 = 1;
+   } else {
+      ri->defaultKey = 0;
+      ri->defaultKey2 = 0;
+   }
+
    state->getRenderPass()->addInst( ri );
 }
 
@@ -387,7 +405,7 @@ void CloudLayer::_initTexture()
       mTexture.set( mTextureName, &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
 
    if ( mTexture.isNull() )
-      mTexture.set( "core/art/warnmat", &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
+      mTexture.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
 }
 
 void CloudLayer::_initBuffers()

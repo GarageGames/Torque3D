@@ -70,7 +70,11 @@ bool MountZips(const String &root)
    for(S32 i = 0;i < outList.size();++i)
    {
       String &zipfile = outList[i];
+#ifdef TORQUE_ZIP_DISK_LAYOUT
+      mounted += (S32)Mount(root, new ZipFileSystem(zipfile, false));
+#else 
       mounted += (S32)Mount(root, new ZipFileSystem(zipfile, true));
+#endif
    }
 
    return mounted == outList.size();

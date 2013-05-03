@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(MessageBoxSaveChangesDlg, EditorGuiGroup) {
    canSaveDynamicFields = "0";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "height";
    position = "0 0";
@@ -13,7 +13,7 @@
 
    new GuiWindowCtrl(MBSaveChangesFrame) {
       canSaveDynamicFields = "0";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "362 274";
@@ -34,7 +34,7 @@
 
       new GuiIconButtonCtrl(mbSaveDlgSaveButton) {
          canSaveDynamicFields = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "240 117";
@@ -54,7 +54,7 @@
       };
       new GuiIconButtonCtrl(mbSaveDlgCancelButton) {
          canSaveDynamicFields = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "158 117";
@@ -74,7 +74,7 @@
       };
       new GuiIconButtonCtrl(mbSaveDlgDontButton) {
          canSaveDynamicFields = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "14 117";
@@ -93,7 +93,7 @@
       };
       new GuiControl() {
          canSaveDynamicFields = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "13 31";
@@ -119,7 +119,7 @@
          };
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "15 38";

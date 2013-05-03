@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -18,7 +18,7 @@
       internalName = "InspectorWindow";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       Position = getWord($pref::Video::mode, 0) - 209 SPC 
          getWord(EditorGuiToolbar.extent, 1) + getWord(EWTreeWindow.extent, 1) - 2;
       Extent = "210 373";
@@ -49,7 +49,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Position = "4 24";
@@ -57,7 +57,7 @@
          MinExtent = "64 64";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "client";
          Margin = "3 41 3 3";
@@ -79,7 +79,7 @@
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Docking = "Client";
             Margin = "0 0 0 0";
@@ -112,7 +112,7 @@
                MinExtent = "8 8";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                dividerMargin = "5";
                superClass = "EditorInspectorBase";
@@ -131,7 +131,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          lineSpacing = "2";
          allowColorChars = "0";

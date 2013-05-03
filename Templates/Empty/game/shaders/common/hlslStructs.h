@@ -89,6 +89,14 @@ struct VertexIn_PNT
    float2 uv0        : TEXCOORD0;
 };
 
+struct VertexIn_PNTT
+{
+   float4 pos        : POSITION;
+   float3 normal     : NORMAL;
+   float3 tangent    : TANGENT;
+   float2 uv0        : TEXCOORD0;
+};
+
 struct VertexIn_PNCT
 {
    float4 pos        : POSITION;

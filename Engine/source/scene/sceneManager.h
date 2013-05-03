@@ -89,6 +89,18 @@ enum ScenePassType
 };
 
 
+/// The type of scene render style
+/// @see SceneRenderState
+enum SceneRenderStyle
+{
+   /// The regular style of rendering
+   SRS_Standard,
+
+   /// Side-by-side style rendering
+   SRS_SideBySide,
+};
+
+
 /// An object that manages the SceneObjects belonging to a scene.
 class SceneManager
 {

@@ -29,9 +29,6 @@
 #ifndef _PLATFORMINPUT_H_
 #include "platform/platformInput.h"
 #endif
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>

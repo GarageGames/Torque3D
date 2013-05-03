@@ -30,6 +30,3 @@ exec("./camera.cs");
 exec("./markers.cs");
 
 exec("./defaultparticle.cs");
-
-// LightFlareData and LightAnimData(s)
-exec("./lights.cs");

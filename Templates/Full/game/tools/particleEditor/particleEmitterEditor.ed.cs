@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
-$PE_EMITTEREDITOR_DEFAULT_FILENAME = "art/shapes/particles/managedParticleEmitterData.cs";
+$PE_EMITTEREDITOR_DEFAULT_FILENAME = "art/particles/managedParticleEmitterData.cs";
 
 
 //=============================================================================================

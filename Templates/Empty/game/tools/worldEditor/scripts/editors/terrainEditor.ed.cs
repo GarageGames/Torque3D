@@ -64,6 +64,7 @@ function TerrainEditor::setPaintMaterial( %this, %matIndex, %terrainMat )
    ETerrainMaterialSelected.bitmap = %terrainMat.diffuseMap;
    ETerrainMaterialSelectedEdit.Visible = isObject(%terrainMat);
    TerrainTextureText.text = %terrainMat.getInternalName();
+   ProceduralTerrainPainterDescription.text = "Generate "@ %terrainMat.getInternalName() @" layer";
 }
 
 function TerrainEditor::setup( %this )
@@ -120,7 +121,7 @@ function EPainter::updateLayers( %this, %matIndex )
          buttonType = "RadioButton";
          sizeIconToButton = true;
          makeIconSquare = true;
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          command = %command;
          altCommand = %altCommand;
          useMouseEvents = true;
@@ -165,7 +166,7 @@ function EPainter::updateLayers( %this, %matIndex )
       buttonType = "PushButton";
       sizeIconToButton = true;
       makeIconSquare = true;
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       text = "New Layer";
       tooltip = "New Layer";
       command = "TerrainMaterialDlg.show( " @ %matCount @ ", 0, EPainter_TerrainMaterialAddCallback );";

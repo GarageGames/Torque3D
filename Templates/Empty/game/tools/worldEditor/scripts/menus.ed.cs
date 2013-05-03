@@ -135,7 +135,6 @@ function EditorGui::buildMenus(%this)
    {
       %fileMenu.appendItem("Export Terrain Heightmap" TAB "" TAB "Canvas.pushDialog( TerrainExportGui );");
       %fileMenu.appendItem("-");
-      %fileMenu.appendItem("Export Interiors To COLLADA..." TAB "" TAB "Canvas.pushDialog( InteriorExportGui );");
       %fileMenu.appendItem("Export To COLLADA..." TAB "" TAB "EditorExportToCollada();");
          //item[5] = "Import Terraform Data..." TAB "" TAB "Heightfield::import();";
          //item[6] = "Import Texture Data..." TAB "" TAB "Texture::import();";

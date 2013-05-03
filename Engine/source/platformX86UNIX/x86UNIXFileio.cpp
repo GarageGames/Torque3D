@@ -56,6 +56,7 @@
  #include "core/strings/stringFunctions.h"
  #include "util/tempAlloc.h"
  #include "cinterface/cinterface.h"
+ #include "core/volume.h"
 
  #if defined(__FreeBSD__)
     #include <sys/types.h>
@@ -980,7 +981,10 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
     // Get file info
     struct stat fStat;
     if (stat(pFilePath, &fStat) < 0)
-       return false;
+    {
+       // Since file does not exist on disk see if it exists in a zip file loaded
+       return Torque::FS::IsFile(pFilePath);
+    }
 
     // if the file is a "regular file" then true
     if ( (fStat.st_mode & S_IFMT) == S_IFREG)

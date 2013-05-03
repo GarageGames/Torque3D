@@ -278,7 +278,11 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
    // the last result.
    const Point3F &lightPos = flareState->lightMat.getPosition();  
    const RectI &viewport = GFX->getViewport();
-   bool onScreen = MathUtils::mProjectWorldToScreen( lightPos, outLightPosSS, viewport, GFX->getWorldMatrix(), state->getSceneManager()->getNonClipProjection() );
+   MatrixF projMatrix;
+   state->getFrustum().getProjectionMatrix(&projMatrix);
+   if( state->isReflectPass() )
+      projMatrix = state->getSceneManager()->getNonClipProjection();
+   bool onScreen = MathUtils::mProjectWorldToScreen( lightPos, outLightPosSS, viewport, GFX->getWorldMatrix(), projMatrix );
 
    // It is onscreen, so raycast as a simple occlusion test.
    const LightInfo *lightInfo = flareState->lightInfo;
@@ -452,13 +456,17 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    Point3F oneOverViewportExtent( 1.0f / (F32)viewport.extent.x, 1.0f / (F32)viewport.extent.y, 0.0f );
 
    // Really convert it to screen space.
+   lightPosSS.x -= viewport.point.x;
    lightPosSS.y -= viewport.point.y;
    lightPosSS *= oneOverViewportExtent;
    lightPosSS = ( lightPosSS * 2.0f ) - Point3F::One;
    lightPosSS.y = -lightPosSS.y;
    lightPosSS.z = 0.0f;
 
-   Point3F flareVec( -lightPosSS );
+   // Take any projection offset into account so that the point where the flare's
+   // elements converge is at the 'eye' point rather than the center of the viewport.
+   const Point2F& projOffset = state->getFrustum().getProjectionOffset();
+   Point3F flareVec( -lightPosSS + Point3F(projOffset.x, projOffset.y, 0.0f) );
    const F32 flareLength = flareVec.len();
    if ( flareLength > 0.0f )
       flareVec *= 1.0f / flareLength;
