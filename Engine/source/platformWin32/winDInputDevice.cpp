@@ -233,7 +233,7 @@ bool DInputDevice::create()
             if ( FAILED( result ) )
             {				
                Con::errorf( "  Failed to set the data format for the %s input device.", mName );
-   			   return false;
+               return false;
             }
 
             // Set up the data buffer for buffered input:
