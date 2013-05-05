@@ -33,6 +33,8 @@
 // Static class variables:
 bool DInputManager::smJoystickEnabled = true;
 bool DInputManager::smXInputEnabled = true;
+bool DInputManager::mXInputDeadZoneEnabled = true;
+F32  DInputManager::mXInputDeadZone = XINPUT_DEADZONE_DEFAULT;
 
 // Type definitions:
 typedef HRESULT (WINAPI* FN_DirectInputCreate)(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter);
@@ -55,7 +57,13 @@ void DInputManager::init()
 {
    Con::addVariable( "pref::Input::JoystickEnabled",  TypeBool, &smJoystickEnabled, 
       "@brief If true, the joystick is currently enabled.\n\n"
-	   "@ingroup Game");
+         "@ingroup Game");
+   Con::addVariable( "pref::Input::JoystickDeadzoneEnabled",  TypeBool, &mXInputDeadZoneEnabled, 
+      "@brief If true, the joystick deadzone currently enabled.\n\n"
+         "@ingroup Game");
+   Con::addVariable( "pref::Input::JoystickDeadzone",  TypeF32, &mXInputDeadZone, 
+      "@brief Joystick deadzone in percent (0-1).\n\n"
+         "@ingroup Game");
 }
 
 //------------------------------------------------------------------------------
@@ -67,9 +75,9 @@ bool DInputManager::enable()
 
    // Dynamically load the XInput 9 DLL and cache function pointers to the
    // two APIs we use
-#ifdef LOG_INPUT
-   Input::log( "Enabling XInput...\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( "Enabling XInput..." );
+#endif // LOG_INPUT_DEBUG
    mXInputLib = LoadLibrary( dT("xinput9_1_0.dll") );
    if ( mXInputLib )
    {
@@ -77,26 +85,26 @@ bool DInputManager::enable()
       mfnXInputSetState = (FN_XInputSetState) GetProcAddress( mXInputLib, "XInputSetState" );
       if ( mfnXInputGetState && mfnXInputSetState )
       {
-#ifdef LOG_INPUT
-         Input::log( "XInput detected.\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+         Con::printf( "XInput detected." );
+#endif // LOG_INPUT_DEBUG
          mXInputStateReset = true;
-         mXInputDeadZoneOn = true;
+         mXInputDeadZoneEnabled = true;
          smXInputEnabled = true;
       }
    }
    else
    {
-#ifdef LOG_INPUT
-      Input::log( "XInput was not found.\n" );
+#ifdef LOG_INPUT_DEBUG
+      Con::printf( "XInput was not found." );
       mXInputStateReset = false;
-      mXInputDeadZoneOn = false;
-#endif
+      mXInputDeadZoneEnabled = false;
+#endif // LOG_INPUT_DEBUG
    }
 
-#ifdef LOG_INPUT
-   Input::log( "Enabling DirectInput...\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( "Enabling DirectInput..." );
+#endif // LOG_INPUT_DEBUG
    mDInputLib = LoadLibrary( dT("DInput8.dll") );
    if ( mDInputLib )
    {
@@ -106,9 +114,9 @@ bool DInputManager::enable()
          bool result = SUCCEEDED( fnDInputCreate( winState.appInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(&mDInputInterface), NULL ));
          if ( result )
          {
-#ifdef LOG_INPUT
-            Input::log( "DirectX 8 or greater detected.\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+            Con::printf( "DirectX 8 or greater detected." );
+#endif // LOG_INPUT_DEBUG
          }
 
          if ( result )
@@ -122,9 +130,9 @@ bool DInputManager::enable()
 
    disable();
 
-#ifdef LOG_INPUT
-   Input::log( "Failed to enable DirectInput.\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( "Failed to enable DirectInput." );
+#endif // LOG_INPUT_DEBUG
 
    return false;
 }
@@ -260,15 +268,18 @@ void DInputManager::enumerateDevices()
 {
    if ( mDInputInterface )
    {
-#ifdef LOG_INPUT
-      Input::log( "Enumerating input devices...\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+      Con::printf( "Enumerating input devices..." );
+#endif // LOG_INPUT_DEBUG
 
       DInputDevice::init();
       DInputDevice::smDInputInterface = mDInputInterface;
-      mDInputInterface->EnumDevices( DI8DEVTYPE_KEYBOARD, EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
-      mDInputInterface->EnumDevices( DI8DEVTYPE_MOUSE,    EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
+      mDInputInterface->EnumDevices( DI8DEVTYPE_KEYBOARD,  EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
+      mDInputInterface->EnumDevices( DI8DEVTYPE_MOUSE,     EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
       mDInputInterface->EnumDevices( DI8DEVCLASS_GAMECTRL, EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
+      mDInputInterface->EnumDevices( DI8DEVTYPE_1STPERSON, EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
+      mDInputInterface->EnumDevices( DI8DEVTYPE_DRIVING,   EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
+      mDInputInterface->EnumDevices( DI8DEVTYPE_FLIGHT,    EnumDevicesProc, this, DIEDFL_ATTACHEDONLY );
    }
 }
 
@@ -304,16 +315,10 @@ bool DInputManager::enableJoystick()
    if ( smJoystickEnabled )
    {
       Con::printf( "DirectInput joystick enabled." );
-#ifdef LOG_INPUT
-      Input::log( "Joystick enabled.\n" );
-#endif
    }
    else
    {
       Con::warnf( "DirectInput joystick failed to enable!" );
-#ifdef LOG_INPUT
-      Input::log( "Joystick failed to enable!\n" );
-#endif
    }
 
    return( smJoystickEnabled );
@@ -329,9 +334,6 @@ void DInputManager::disableJoystick()
    mgr->deactivateJoystick();
    smJoystickEnabled = false;
    Con::printf( "DirectInput joystick disabled." );
-#ifdef LOG_INPUT
-   Input::log( "Joystick disabled.\n" );
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -347,9 +349,9 @@ bool DInputManager::activateJoystick()
       return( false );
 
    mJoystickActive = acquire( JoystickDeviceType, SI_ANY );
-#ifdef LOG_INPUT
-   Input::log( mJoystickActive ? "Joystick activated.\n" : "Joystick failed to activate!\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( mJoystickActive ? "Joystick activated." : "Joystick failed to activate!" );
+#endif // LOG_INPUT_DEBUG
    return( mJoystickActive );
 }
 
@@ -360,9 +362,9 @@ void DInputManager::deactivateJoystick()
    {
       unacquire( JoystickDeviceType, SI_ANY );
       mJoystickActive = false;
-#ifdef LOG_INPUT
-      Input::log( "Joystick deactivated.\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+      Con::printf( "Joystick deactivated." );
+#endif // LOG_INPUT_DEBUG
    }
 }
 
@@ -378,6 +380,48 @@ const char* DInputManager::getJoystickAxesString( U32 deviceID )
    }
 
    return( "" );
+}
+
+//------------------------------------------------------------------------------
+const char* DInputManager::getJoystickProductName( U32 deviceID )
+{
+   DInputDevice* dptr;
+   for ( iterator ptr = begin(); ptr != end(); ptr++ )
+   {
+      dptr = dynamic_cast<DInputDevice*>( *ptr );
+      if ( dptr && ( dptr->getDeviceType() == JoystickDeviceType ) && ( dptr->getDeviceID() == deviceID ) )
+         return( dptr->getName() );
+   }
+
+   return( "" );
+}
+
+//------------------------------------------------------------------------------
+const char* DInputManager::getJoystickProductGUID( U32 deviceID )
+{
+   DInputDevice* dptr;
+   for ( iterator ptr = begin(); ptr != end(); ptr++ )
+   {
+      dptr = dynamic_cast<DInputDevice*>( *ptr );
+      if ( dptr && ( dptr->getDeviceType() == JoystickDeviceType ) && ( dptr->getDeviceID() == deviceID ) )
+         return( dptr->getProductGUID() );
+   }
+
+   return( "" );
+}
+
+//------------------------------------------------------------------------------
+S32 DInputManager::getJoystickID( U32 deviceID )
+{
+   DInputDevice* dptr;
+   for ( iterator ptr = begin(); ptr != end(); ptr++ )
+   {
+      dptr = dynamic_cast<DInputDevice*>( *ptr );
+      if ( dptr && ( dptr->getDeviceType() == JoystickDeviceType ) && ( dptr->getDeviceID() == deviceID ) )
+         return( dptr->getDeviceID() );
+   }
+
+   return( -1 );
 }
 
 //------------------------------------------------------------------------------
@@ -401,16 +445,10 @@ bool DInputManager::enableXInput()
    if ( smXInputEnabled )
    {
       Con::printf( "XInput enabled." );
-#ifdef LOG_INPUT
-      Input::log( "XInput enabled.\n" );
-#endif
    }
    else
    {
       Con::warnf( "XInput failed to enable!" );
-#ifdef LOG_INPUT
-      Input::log( "XInput failed to enable!\n" );
-#endif
    }
 
    return( smXInputEnabled );
@@ -425,9 +463,6 @@ void DInputManager::disableXInput()
 
    mgr->deactivateXInput();
    Con::printf( "XInput disabled." );
-#ifdef LOG_INPUT
-   Input::log( "XInput disabled.\n" );
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -491,9 +526,9 @@ bool DInputManager::activateXInput()
       return( false );
 
    mXInputActive = true; //acquire( GamepadDeviceType, SI_ANY );
-#ifdef LOG_INPUT
-   Input::log( mXInputActive ? "XInput activated.\n" : "XInput failed to activate!\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( mXInputActive ? "XInput activated." : "XInput failed to activate!" );
+#endif // LOG_INPUT_DEBUG
    return( mXInputActive );
 }
 
@@ -504,9 +539,9 @@ void DInputManager::deactivateXInput()
    {
       unacquire( GamepadDeviceType, SI_ANY );
       mXInputActive = false;
-#ifdef LOG_INPUT
-      Input::log( "XInput deactivated.\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+      Con::printf( "XInput deactivated." );
+#endif // LOG_INPUT_DEBUG
    }
 }
 
@@ -557,7 +592,7 @@ bool DInputManager::rumble( const char *pDeviceName, float x, float y )
       }
 
       // We should never get here... something's really messed up
-      Con::errorf( "DInputManager::rumbleJoystick - Couldn't find device to rumble! This should never happen!\n" );
+      Con::errorf( "DInputManager::rumbleJoystick - Couldn't find device to rumble! This should never happen!" );
       return false;
 
    default:
@@ -590,9 +625,9 @@ inline void DInputManager::fireXInputConnectEvent( int controllerID, bool condit
 {
    if ( mXInputStateReset || condition )
    {
-#ifdef LOG_INPUT
-      Input::log( "EVENT (XInput): xinput%d CONNECT %s\n", controllerID, connected ? "make" : "break" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+      Con::printf( "EVENT (XInput): xinput%d CONNECT %s", controllerID, connected ? "make" : "break" );
+#endif // LOG_INPUT_DEBUG
       buildXInputEvent( controllerID, SI_BUTTON, XI_CONNECT, connected ? SI_MAKE : SI_BREAK, 0);
    }
 }
@@ -601,7 +636,7 @@ inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition
 {
    if ( mXInputStateReset || condition )
    {
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
       char *objName;
       switch (objInst)
       {
@@ -614,8 +649,8 @@ inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition
       default:               objName = "UNKNOWN"; break;
       }
 
-      Input::log( "EVENT (XInput): xinput%d %s MOVE %.1f.\n", controllerID, objName, fValue );
-#endif
+      Con::printf( "EVENT (XInput): xinput%d %s MOVE %.1f.", controllerID, objName, fValue );
+#endif // LOG_INPUT_DEBUG
       buildXInputEvent( controllerID, SI_AXIS, objInst, SI_MOVE, fValue );
    }
 }
@@ -624,7 +659,7 @@ inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFi
 {
    if ( mXInputStateReset || forceFire || ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != (mXInputStateOld[controllerID].state.Gamepad.wButtons & button)) )
    {
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
       char *objName;
       switch (objInst)
       {      
@@ -647,8 +682,8 @@ inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFi
       default:                objName = "UNKNOWN"; break;
       }
 
-      Input::log( "EVENT (XInput): xinput%d %s %s\n", controllerID, objName, ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != 0) ? "make" : "break" );
-#endif
+      Con::printf( "EVENT (XInput): xinput%d %s %s", controllerID, objName, ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != 0) ? "make" : "break" );
+#endif // LOG_INPUT_DEBUG
       InputActionType action = ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != 0) ? SI_MAKE : SI_BREAK;
       buildXInputEvent( controllerID, SI_BUTTON, objInst, action, ( action == SI_MAKE ? 1 : 0 ) );
    }
@@ -701,18 +736,18 @@ void DInputManager::processXInput( void )
          }
 
          // trim the controller's thumbsticks to zero if they are within the deadzone
-         if( mXInputDeadZoneOn )
+         if( mXInputDeadZoneEnabled )
          {
             // Zero value if thumbsticks are within the dead zone 
-            if( (mXInputStateNew[i].state.Gamepad.sThumbLX < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbLX > -XINPUT_DEADZONE) && 
-                (mXInputStateNew[i].state.Gamepad.sThumbLY < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbLY > -XINPUT_DEADZONE) ) 
+            if( (mXInputStateNew[i].state.Gamepad.sThumbLX < mXInputDeadZone && mXInputStateNew[i].state.Gamepad.sThumbLX > -mXInputDeadZone) && 
+                (mXInputStateNew[i].state.Gamepad.sThumbLY < mXInputDeadZone && mXInputStateNew[i].state.Gamepad.sThumbLY > -mXInputDeadZone) ) 
             {
                mXInputStateNew[i].state.Gamepad.sThumbLX = 0;
                mXInputStateNew[i].state.Gamepad.sThumbLY = 0;
             }
 
-            if( (mXInputStateNew[i].state.Gamepad.sThumbRX < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbRX > -XINPUT_DEADZONE) && 
-                (mXInputStateNew[i].state.Gamepad.sThumbRY < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbRY > -XINPUT_DEADZONE) ) 
+            if( (mXInputStateNew[i].state.Gamepad.sThumbRX < mXInputDeadZone && mXInputStateNew[i].state.Gamepad.sThumbRX > -mXInputDeadZone) && 
+                (mXInputStateNew[i].state.Gamepad.sThumbRY < mXInputDeadZone && mXInputStateNew[i].state.Gamepad.sThumbRY > -mXInputDeadZone) ) 
             {
                mXInputStateNew[i].state.Gamepad.sThumbRX = 0;
                mXInputStateNew[i].state.Gamepad.sThumbRY = 0;
