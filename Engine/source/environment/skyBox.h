@@ -114,12 +114,16 @@ protected:
    ColorF mLastFogColor;
 
    bool mDrawBottom;
+   bool mDrawTop;
+   F32 mExposure;
+   ColorF mSkyboxColor;
    bool mIsVBDirty;
    U32 mPrimCount;
 
    MatrixSet *mMatrixSet;
 
-   F32 mFogBandHeight;   
+   F32 mFogBandHeight;
+   F32 mFogBandWidth;
 
    void _updateMaterial();
    void _initMaterial();
