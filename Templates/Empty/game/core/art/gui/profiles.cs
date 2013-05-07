@@ -565,3 +565,20 @@ new GuiControlProfile ( CenterPrintTextProfile )
    fontColor = "0 255 0";
    category = "Core";
 };
+
+// ----------------------------------------------------------------------------
+// Radio button control
+// ----------------------------------------------------------------------------
+
+if( !isObject( GuiRadioProfile ) )
+new GuiControlProfile( GuiRadioProfile )
+{
+   fontSize = 14;
+   fillColor = "232 232 232";
+   fontColor = "20 20 20";
+   fontColorHL = "80 80 80";
+   fixedExtent = true;
+   bitmap = "./images/radioButton";
+   hasBitmapArray = true;
+   category = "Core";
+};
