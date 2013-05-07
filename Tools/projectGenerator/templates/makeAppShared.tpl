@@ -12,8 +12,8 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS := -g -m32
-LDLIBS := -lstdc++
-CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686
+LDLIBS :=
+CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -std=c++11
 
 {foreach item=def from=$projIncludes}CFLAGS += -I{$def}
 {/foreach}
@@ -32,7 +32,7 @@ CFLAGS_DEBUG += -DTORQUE_DEBUG_GUARD
 CFLAGS += -O3
 
 CC := gcc
-LD := gcc
+LD := g++
 
 APP_TARGETS += $(APPNAME)
 APP_TARGETS_DEBUG += $(APPNAME)_DEBUG
@@ -60,7 +60,7 @@ Release/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 
 Release/{$projName}/%.o:	../../../../Engine/source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
    
 Debug/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 	@mkdir -p $(dir $@)
@@ -68,7 +68,7 @@ Debug/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 
 Debug/{$projName}/%.o:	../../../../Engine/source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_DEBUG) $< -o $@
+	$(CXX) -c $(CFLAGS_DEBUG) $< -o $@
    
 release_{$projName}: $(APPNAME)
 debug_{$projName}: $(APPNAME)_DEBUG

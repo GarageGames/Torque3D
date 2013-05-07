@@ -23,9 +23,56 @@
 #ifndef _X86UNIXOGLVIDEO_H_
 #define _X86UNIXOGLVIDEO_H_
 
-#ifndef _PLATFORMVIDEO_H_
-#include "platform/platformVideo.h"
-#endif
+#include "core/util/tVector.h"
+
+struct Resolution {
+  S32 w;
+  S32 h;
+  int bpp;
+  Resolution(S32 width, S32 height, int b): w(width), h(height), bpp(b) {}
+  Resolution(): w(0), h(0), bpp(-1) {}
+};
+
+class DisplayDevice {
+public:
+  virtual ~DisplayDevice() {}
+
+  static void init() {}
+
+protected:
+  Vector<Resolution> mResolutionList;
+  const char* mDeviceName;
+  bool mFullScreenOnly;
+};
+
+struct GLState {
+  int primMode; // unsure on this type.
+  bool suppSwapInterval;
+  bool suppPalettedTexture;
+  bool suppLockedArrays;
+  bool suppARBMultitexture;
+  bool suppEXTblendcolor;
+  bool suppEXTblendminmax;
+  bool suppFogCoord;
+  bool suppS3TC;
+  bool suppTextureCompression;
+  bool suppFXT1;
+  bool suppPackedPixels;
+  bool suppTextureEnvCombine;
+  bool suppEdgeClamp;
+  bool suppTexEnvAdd;
+  bool suppTexAnisotropic;
+  int maxTextureUnits; // unsure on this type
+  float maxAnisotropy;
+  bool suppVertexArrayRange;
+};
+
+namespace Video {
+  bool setDevice(const char*, U32 width, U32 height, U16 bpp, bool fullscreen);
+  bool isFullScreen();
+  void toggleFullScreen();
+  Resolution getDesktopResolution();
+}
 
 class OpenGLDevice : public DisplayDevice
 {

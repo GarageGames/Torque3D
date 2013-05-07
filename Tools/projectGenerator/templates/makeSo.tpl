@@ -15,7 +15,7 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS_{$projName} := -g -m32 -shared
-LDLIBS_{$projName} := -lstdc++ -lpthread
+LDLIBS_{$projName} := -lpthread
 CFLAGS_{$projName} := -MMD -I. -m32 -mmmx -msse -march=i686 
 
 {foreach item=def from=$projIncludes}CFLAGS_{$projName} += -I{$def}
@@ -35,7 +35,7 @@ CFLAGS_DEBUG_{$projName} += -DTORQUE_NET_STATS
 CFLAGS_{$projName} += -O0
 
 CC := gcc
-LD := gcc
+LD := g++
 
 SHARED_LIB_TARGETS += {$projName}.so
 SHARED_LIB_TARGETS_DEBUG += {$projName}_DEBUG.so
@@ -62,11 +62,11 @@ Release/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 
 Release/{$projName}/%.o:	../../../../Engine/source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_{$projName}) $< -o $@
+	$(CXX) -c $(CFLAGS_{$projName}) $< -o $@
 
 Release/{$projName}/%.o:	../../source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_{$projName}) $< -o $@
+	$(CXX) -c $(CFLAGS_{$projName}) $< -o $@
 
 Debug/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 	@mkdir -p $(dir $@)
@@ -74,11 +74,11 @@ Debug/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 
 Debug/{$projName}/%.o:	../../../../Engine/source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_DEBUG_{$projName}) $< -o $@
+	$(CXX) -c $(CFLAGS_DEBUG_{$projName}) $< -o $@
 
 Debug/{$projName}/%.o:	../../source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_DEBUG_{$projName}) $< -o $@
+	$(CXX) -c $(CFLAGS_DEBUG_{$projName}) $< -o $@
 
 release_{$projName}: {$projName}.so
 debug_{$projName}: {$projName}_DEBUG.so

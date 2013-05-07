@@ -23,16 +23,6 @@
 #ifndef INCLUDED_TYPES_VISUALC_H
 #define INCLUDED_TYPES_VISUALC_H
 
-
-// For more information on VisualC++ predefined macros
-// http://support.microsoft.com/default.aspx?scid=kb;EN-US;q65472
-
-//--------------------------------------
-// Types
-typedef signed _int64   S64;
-typedef unsigned _int64 U64;
-
-
 //--------------------------------------
 // Compiler Version
 #define TORQUE_COMPILER_VISUALC _MSC_VER
@@ -98,4 +88,3 @@ typedef unsigned _int64 U64;
 
 
 #endif // INCLUDED_TYPES_VISUALC_H
-

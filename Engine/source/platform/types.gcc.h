@@ -27,13 +27,6 @@
 // For additional information on GCC predefined macros
 // http://gcc.gnu.org/onlinedocs/gcc-3.0.2/cpp.html
 
-
-//--------------------------------------
-// Types
-typedef signed long long    S64;
-typedef unsigned long long  U64;
-
-
 //--------------------------------------
 // Compiler Version
 #define TORQUE_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -67,7 +60,7 @@ typedef unsigned long long  U64;
 #  define TORQUE_OS_PS3
 #  include "platform/types.posix.h"
 
-#elif defined(linux)
+#elif defined(__linux__)
 #  define TORQUE_OS_STRING "Linux"
 #  define TORQUE_OS_LINUX
 #  define TORQUE_SUPPORTS_NASM
@@ -104,7 +97,7 @@ typedef unsigned long long  U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(i386)
+#if defined(i386) || defined(__i386__)
 #  define TORQUE_CPU_STRING "Intel x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN

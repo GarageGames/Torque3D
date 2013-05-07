@@ -23,20 +23,18 @@
 #ifndef _TORQUE_TYPES_H_
 #define _TORQUE_TYPES_H_
 
-//------------------------------------------------------------------------------
-//-------------------------------------- Basic Types...
+#include <cstdint>
 
-typedef signed char        S8;      ///< Compiler independent Signed Char
-typedef unsigned char      U8;      ///< Compiler independent Unsigned Char
-
-typedef signed short       S16;     ///< Compiler independent Signed 16-bit short
-typedef unsigned short     U16;     ///< Compiler independent Unsigned 16-bit short
-
-typedef signed int         S32;     ///< Compiler independent Signed 32-bit integer
-typedef unsigned int       U32;     ///< Compiler independent Unsigned 32-bit integer
-
-typedef float              F32;     ///< Compiler independent 32-bit float
-typedef double             F64;     ///< Compiler independent 64-bit float
+typedef std::int8_t S8;
+typedef std::uint8_t U8;
+typedef std::int16_t S16;
+typedef std::uint16_t U16;
+typedef std::int32_t S32;
+typedef std::uint32_t U32;
+typedef std::int64_t S64;
+typedef std::uint64_t U64;
+typedef float F32;
+typedef double F64;
 
 struct EmptyType {};             ///< "Null" type used by templates
 
@@ -46,8 +44,8 @@ struct EmptyType {};             ///< "Null" type used by templates
 //------------------------------------- String Types
 
 typedef char           UTF8;        ///< Compiler independent 8  bit Unicode encoded character
-typedef unsigned short UTF16;       ///< Compiler independent 16 bit Unicode encoded character
-typedef unsigned int   UTF32;       ///< Compiler independent 32 bit Unicode encoded character
+typedef std::uint16_t  UTF16;
+typedef std::uint32_t  UTF32;
 
 typedef const char* StringTableEntry;
 
@@ -106,13 +104,6 @@ static const F32 F32_MAX = F32(3.402823466e+38F);                 ///< Constant 
 #  include "platform/types.gcc.h"
 #else
 #  error "Unknown Compiler"
-#endif
-
-/// Integral type matching the host's memory address width.
-#ifdef TORQUE_64BITS
-   typedef U64 MEM_ADDRESS;
-#else
-   typedef U32 MEM_ADDRESS;
 #endif
 
 //-------------------------------------- Some all-around useful inlines and globals

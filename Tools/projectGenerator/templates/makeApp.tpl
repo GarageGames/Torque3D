@@ -12,11 +12,13 @@ SOURCES := {foreach from=$dirWalk item=file key=key}
 {/foreach}
 
 LDFLAGS := -g -m32
-LDLIBS := -lstdc++ -lm -lpthread -lrt
+LDLIBS := -lm -lSDL -lpthread -lrt
+LDLIBS += -lpng -ljpeg -lGL -lXft -lvorbis -ltinyxml
 {foreach item=def from=$projLibs}LDLIBS += -l{$def}
 {/foreach}
 
-CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -pipe
+CFLAGS := -MMD -I. -Wfatal-errors -m32 -msse -mmmx -march=i686 -pipe -std=c++11
+CFLAGS += -I/usr/include/freetype2
 
 {foreach item=def from=$projIncludes}CFLAGS += -I{$def}
 {/foreach}
@@ -35,7 +37,7 @@ CFLAGS_DEBUG += -DTORQUE_NET_STATS
 CFLAGS += -O0
 
 CC := gcc
-LD := gcc
+LD := g++
 
 APP_TARGETS += $(APPNAME)
 APP_TARGETS_DEBUG += $(APPNAME)_DEBUG
@@ -63,11 +65,11 @@ Release/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 
 Release/{$projName}/%.o:	../../../../Engine/source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
 
 Release/{$projName}/%.o:	../../source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
    
 Debug/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 	@mkdir -p $(dir $@)
@@ -75,11 +77,11 @@ Debug/{$projName}/%.asm.o:	../../../../Engine/source/%.asm
 
 Debug/{$projName}/%.o:	../../../../Engine/source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_DEBUG) $< -o $@
+	$(CXX) -c $(CFLAGS_DEBUG) $< -o $@
 
 Debug/{$projName}/%.o:	../../source/%
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS_DEBUG) $< -o $@
+	$(CXX) -c $(CFLAGS_DEBUG) $< -o $@
    
 release_{$projName}: $(APPNAME)
 debug_{$projName}: $(APPNAME)_DEBUG

@@ -21,17 +21,21 @@
 //-----------------------------------------------------------------------------
 
 #include "console/console.h"
-#include "platform/event.h"
-#include "platform/gameInterface.h"
+#include "platform/input/event.h"
 
 #include "platformX86UNIX/platformX86UNIX.h"
-#include "platformX86UNIX/platformGL.h"
 #include "platformX86UNIX/x86UNIXOGLVideo.h"
 #include "platformX86UNIX/x86UNIXState.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL_version.h>
+#include <SDL/SDL_opengl.h>
+
+extern GLState gGLState;
+static GameSomething* Game = new GameSomething();
+static Resolution smCurrentRes(320, 240, 16);
+static bool smIsFullScreen;
 
 //------------------------------------------------------------------------------
 bool InitOpenGL()
@@ -377,7 +381,7 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    // set various other parameters
    x86UNIXState->setWindowCreated(true);
    smCurrentRes = NewResolution;
-   Platform::setWindowSize ( width, height );
+   Platform::setWindowSize ( width, height, fullScreen );
    smIsFullScreen = fullScreen;
    Con::setBoolVariable( "$pref::Video::fullScreen", smIsFullScreen );
    char tempBuf[15];

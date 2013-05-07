@@ -27,7 +27,7 @@
 #include "platform/platform.h"
 #endif
 #ifndef _EVENT_H_
-#include "platform/event.h"
+#include "platform/input/event.h"
 #endif
 
 #include <stdio.h>
@@ -66,4 +66,20 @@ extern "C"
    // x86UNIX doesn't have a way to automatically get the executable file name
    void setExePathName(const char* exePathName);
 }
+
+enum EventType { QuitEventType };
+struct Event : public InputEventInfo {
+  enum EventType type;
+};
+
+struct GameSomething {
+  void textureKill() {}
+  void textureResurrect() {}
+  void refreshWindow() {}
+  void postEvent(InputEventInfo) {}
+  bool isJournalReading() { return false; }
+  bool main(size_t n, const char**);
+  bool isRunning() { return true; }
+};
+
 #endif

@@ -32,6 +32,7 @@
 ; The other funcs from mMath_C were determined to compile into fast
 ;  code using MSVC --Paul Bowman
 
+$@feat.00 equ 1
 
 segment .data
 

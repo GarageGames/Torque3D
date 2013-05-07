@@ -22,30 +22,25 @@
 
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "console/console.h"
+#include "core/strings/stringFunctions.h"
 
 #include <dlfcn.h>
 
-#include <al/altypes.h>
-#include <al/alctypes.h>
 #define INITGUID
-#include <al/eaxtypes.h>
-
 
 // Define the OpenAL and Extension Stub functions
-#define AL_FUNCTION(fn_return, fn_name, fn_args, fn_value) fn_return stub_##fn_name fn_args{ fn_value }
-#include <al/al_func.h>
-#include <al/alc_func.h>
-#include <al/eax_func.h>
-#undef AL_FUNCTION
+#define AL_APIENTRY(fn_return, fn_name, fn_args, fn_value) fn_return stub_##fn_name fn_args{ fn_value }
+#include <AL/al.h>
+#undef AL_APIENTRY
 
 
 // Declare the OpenAL and Extension Function pointers
 // And initialize them to the stub functions
-#define AL_FUNCTION(fn_return,fn_name,fn_args, fn_value) fn_return (*fn_name)fn_args = stub_##fn_name;
-#include <al/al_func.h>
-#include <al/alc_func.h>
-#include <al/eax_func.h>
-#undef AL_FUNCTION
+#define AL_APIENTRY(fn_return,fn_name,fn_args, fn_value) fn_return (*fn_name)fn_args = stub_##fn_name;
+#include <AL/al.h>
+#undef AL_APIENTRY
+
+#include <AL/alc.h>
 
 // Declarations for the "emulated" functions (al functions that don't 
 // exist in the loki openal implementation)
@@ -58,7 +53,7 @@ void emu_alGetListener3f(ALenum pname,ALfloat *v1,ALfloat *v2,ALfloat *v3);
 ALCdevice* emu_alcGetContextsDevice(ALCcontext *context);
 
 static void *dlHandle = NULL;
-static char* dlError = "no error";
+static char* dlError;
 
 /*!   Get an "emulated" function address and bind it to the function pointer
 */
@@ -103,7 +98,7 @@ static bool bindFunction( void *&fnAddress, const char *name )
 */
 static bool bindExtensionFunction( void *&fnAddress, const char *name )
 {
-   fnAddress = alGetProcAddress( (ALubyte*)name );
+   fnAddress = alGetProcAddress( name );
    if( !fnAddress )
       Con::errorf(ConsoleLogEntry::General, " Missing OpenAL Extension function '%s'", name);
    return (fnAddress != NULL);
@@ -114,10 +109,9 @@ static bool bindExtensionFunction( void *&fnAddress, const char *name )
 static bool bindOpenALFunctions()
 {
    bool result = true;
-   #define AL_FUNCTION(fn_return, fn_name, fn_args, fn_value) result &= bindFunction( *(void**)&fn_name, #fn_name);
-   #include <al/al_func.h>
-   #include <al/alc_func.h>
-   #undef AL_FUNCTION
+   #define AL_APIENTRY(fn_return, fn_name, fn_args, fn_value) result &= bindFunction( *(void**)&fn_name, #fn_name);
+   #include <AL/al.h>
+   #undef AL_APIENTRY
    return result;
 }
 
@@ -125,11 +119,9 @@ static bool bindOpenALFunctions()
 */
 static void unbindOpenALFunctions()
 {
-   #define AL_FUNCTION(fn_return, fn_name, fn_args, fn_value) fn_name = stub_##fn_name;
-   #include <al/al_func.h>
-   #include <al/alc_func.h>
-   #include <al/eax_func.h>
-   #undef AL_FUNCTION
+   #define AL_APIENTRY(fn_return, fn_name, fn_args, fn_value) fn_name = stub_##fn_name;
+   #include <AL/al.h>
+   #undef AL_APIENTRY
 }
 
 /*!   Bind the EAX Extension functions to the EAX interface functions  
@@ -137,9 +129,9 @@ static void unbindOpenALFunctions()
 static bool bindEAXFunctions()
 {
    bool result = true;
-   #define AL_FUNCTION(fn_return, fn_name, fn_args, fn_value) result &= bindExtensionFunction( *(void**)&fn_name, #fn_name);
-   #include <al/eax_func.h>
-   #undef AL_FUNCTION
+   #define AL_APIENTRY(fn_return, fn_name, fn_args, fn_value) result &= bindExtensionFunction( *(void**)&fn_name, #fn_name);
+   #include <AL/al.h>
+   #undef AL_APIENTRY
    return result;
 }
 
@@ -237,7 +229,7 @@ bool OpenALDLLInit()
    for (int i = 0; searchPath[i] != NULL; ++i)
    {   
       dSprintf(openalPath, sizeof(openalPath), "%s/%s/%s",
-         Platform::getWorkingDirectory(), 
+         ".",
          searchPath[i],
          libName);
          
@@ -265,7 +257,7 @@ bool OpenALDLLInit()
       if(bindOpenALFunctions())
       {
          // if EAX is available bind it's function pointers
-         if (alIsExtensionPresent((ALubyte*)"EAX" ))
+         if (alIsExtensionPresent("EAX"))
             bindEAXFunctions();
          return(true);
       }
