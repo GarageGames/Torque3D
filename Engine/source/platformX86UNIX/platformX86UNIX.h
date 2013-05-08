@@ -27,7 +27,7 @@
 #include "platform/platform.h"
 #endif
 #ifndef _EVENT_H_
-#include "platform/event.h"
+#include "platform/input/event.h"
 #endif
 
 #include <stdio.h>
