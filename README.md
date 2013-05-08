@@ -1,4 +1,4 @@
-Torque 3D v2.0
+Torque 3D v3.0
 ==============
 
 MIT Licensed Open Source version of [Torque 3D](http://www.garagegames.com/products/torque-3d) from [GarageGames](http://www.garagegames.com)
@@ -7,6 +7,7 @@ More Information
 ----------------
 
 * Torque 3D [main repository](https://github.com/GarageGames/Torque3D)
+* Torque 3D [GitHub Wiki](https://github.com/GarageGames/Torque3D/wiki)
 * Documentation is in the [Torque3D-Documentation](https://github.com/GarageGames/Torque3D-Documentation) GitHub repo.
 * Project Manager is in the [Torque3D-ProjectManager](https://github.com/GarageGames/Torque3D-ProjectManager) GitHub repo.
 * T3D [Beginner's Forum](http://www.garagegames.com/community/forums/73)
@@ -21,13 +22,11 @@ Creating a New Project Based on a Template
 The templates included with Torque 3D provide a starting point for your project.  Once we have created our own project based on a template we may then compile an executable and begin work on our game.  The following templates are included in this version of Torque 3D:
 
 * Empty
-* Empty PhysX
 * Full
-* Full PhysX
 
 ### Using PhysX ###
 
-If you plan on creating a project based on a template that uses PhysX you will first need to have the PhysX SDK intalled on your computer.  Without the PhysX SDK in place the project generation step will fail when using either the *Project Manager* or manual project generation methods.
+If you plan on creating a project that uses PhysX you will first need to have the PhysX SDK intalled on your computer.  Without the PhysX SDK in place the project generation step will fail when using either the *Project Manager* or manual project generation methods.
 
 PhysX SDK version 2.8.4.6 is required for Torque 3D's PhysX templates.  The following steps are used to install this SDK:
 
@@ -42,17 +41,18 @@ PhysX SDK version 2.8.4.6 is required for Torque 3D's PhysX templates.  The foll
 
 ### Using the Project Manager to Create a Project ###
 
-The *Project Manager* may be used to create a new game project based on one of the templates that are included with Torque 3D.  If you are using Torque 3D directly from the [GitHub](https://github.com/GarageGames/Torque3D) repository then you will need to get the *Project Manager* from the [Torque3D-ProjectManager](https://github.com/GarageGames/Torque3D-ProjectManager) repo.
+The *Project Manager* may be used to create a new game project based on one of the templates that are included with Torque 3D.  If you are using Torque 3D directly from the [GitHub](https://github.com/GarageGames/Torque3D) repository then you will need to get the *Project Manager* from the [Torque3D-ProjectManager](https://github.com/GarageGames/Torque3D-ProjectManager) repo, or download a pre-compiled version from the [Project Manager Wiki Page](https://github.com/GarageGames/Torque3D/wiki/Project-Manager).
 
-The following steps use the *Project Manager* to create a new project:
+The following steps use the *Project Manager* to create a new project.  This is a quick summary and more detailed instructions may be found on the [Project Manager Wiki Page](https://github.com/GarageGames/Torque3D/wiki/Project-Manager)
 
 1. Run the *Project Manager*.
 2. Click the *New Project* button.
 3. Choose a template from the drop down on the right.
-4. Give the project a name.
-5. Click the *Create* button to create the project.  This will open a new dialog window that shows the progress.
-6. When it finishes, click the *Finished* button.
-7. You may click on the *Open Folder* button to go to the project's directory.
+4. Pick which modules you want to compile into your project by using the *Choose Modules* button.
+5. Give the project a name.
+6. Click the *Create* button to create the project.  This will open a new dialog window that shows the progress.
+7. When it finishes, click the *Finished* button.
+8. You may click on the *Open Folder* button to go to the project's directory.
 
 ### Manually Creating a Project ###
 
