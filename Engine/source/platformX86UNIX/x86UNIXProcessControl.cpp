@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#ifndef DEDICATED
+#ifndef TORQUE_DEDICATED
 #include <SDL/SDL.h>
 #endif
 
