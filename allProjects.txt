@@ -1,4 +1,2 @@
 Templates\Full\
 Templates\Empty\
-Templates\Empty PhysX\
-Templates\Full PhysX\
