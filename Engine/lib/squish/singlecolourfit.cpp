@@ -26,6 +26,7 @@
 #include "singlecolourfit.h"
 #include "colourset.h"
 #include "colourblock.h"
+#include <limits.h> 
 
 namespace squish {
 
