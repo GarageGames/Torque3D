@@ -300,7 +300,7 @@ function MaterialEditorGui::prepareActiveObject( %this, %override )
    if( MaterialEditorGui.currentObject == %obj && !%override)
       return;
    
-   // TSStatics, ShapeBase, and Interiors should have getModelFile methods
+   // TSStatics and ShapeBase objects should have getModelFile methods
    if( %obj.isMethod( "getModelFile" ) )
    {
       MaterialEditorGui.currentObject = %obj;
@@ -310,30 +310,11 @@ function MaterialEditorGui::prepareActiveObject( %this, %override )
       
       MaterialEditorGui.setMode();
       
-      if( MaterialEditorGui.currentObject.isMethod( "getNumDetailLevels" ) ) // Interiors
+      for(%j = 0; %j < MaterialEditorGui.currentObject.getTargetCount(); %j++)
       {
-         for(%j = 0; %j < MaterialEditorGui.currentObject.getNumDetailLevels(); %j++)
-         {  
-            %target = "Detail Level " @ %j;
-            %count = SubMaterialSelector.getCount();
-            SubMaterialSelector.addCategory(%target);
-               
-            for(%k = 0; %k < MaterialEditorGui.currentObject.getTargetCount(%j); %k++)
-            {
-               %target = MaterialEditorGui.currentObject.getTargetName(%j, %k);
-               %count = SubMaterialSelector.getCount();
-               SubMaterialSelector.add(%target);
-            }
-         }
-      }
-      else // TSStatic and ShapeBase
-      {
-         for(%j = 0; %j < MaterialEditorGui.currentObject.getTargetCount(); %j++)
-         {
-            %target = MaterialEditorGui.currentObject.getTargetName(%j);
-            %count = SubMaterialSelector.getCount();
-            SubMaterialSelector.add(%target);
-         }
+         %target = MaterialEditorGui.currentObject.getTargetName(%j);
+         %count = SubMaterialSelector.getCount();
+         SubMaterialSelector.add(%target);
       }
    }
    else // Other classes that support materials if possible
@@ -523,9 +504,7 @@ function MaterialEditorGui::setMaterialDirty(%this)
       {
          %obj = MaterialEditorGui.currentObject;
          
-         if( %obj.interiorFile !$= "" )
-            %shapePath = %obj.interiorFile;
-         else if( %obj.shapeName !$= "" ) 
+         if( %obj.shapeName !$= "" ) 
             %shapePath = %obj.shapeName;
          else if( %obj.isMethod("getDatablock") )
          {
@@ -2163,9 +2142,7 @@ function MaterialEditorGui::changeMaterial(%this, %fromMaterial, %toMaterial)
       
       MaterialEditorGui.currentObject.changeMaterial( %materialTarget, %fromMaterial.getName(), %toMaterial.getName() );
       
-      if( MaterialEditorGui.currentObject.interiorFile !$= "" )
-         %sourcePath = MaterialEditorGui.currentObject.interiorFile;
-      else if( MaterialEditorGui.currentObject.shapeName !$= "" ) 
+      if( MaterialEditorGui.currentObject.shapeName !$= "" ) 
          %sourcePath = MaterialEditorGui.currentObject.shapeName;
       else if( MaterialEditorGui.currentObject.isMethod("getDatablock") )
       {

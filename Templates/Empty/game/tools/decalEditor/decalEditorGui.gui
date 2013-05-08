@@ -12,7 +12,7 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    Margin = "0 0 0 0";
    Padding = "0 0 0 0";
@@ -41,7 +41,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 SPC getWord(EditorGuiToolbar.extent, 1) -1;
@@ -50,7 +50,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "2 2 2 2";
@@ -72,7 +72,7 @@
       new GuiTabBookCtrl(DecalEditorTabBook) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "0 0";
@@ -96,7 +96,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "EditorTabPage";
+            Profile = "ToolsGuiEditorTabPage";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 0";
@@ -133,14 +133,14 @@
                   Position = "0 0";
                   Extent = "202 483";
                   MinExtent = "0 -500";
-                  Profile = "GuiTabBorderProfile";
+                  Profile = "ToolsGuiTabBorderProfile";
                };
             };      
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Position = "0 0";
@@ -149,7 +149,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiDefaultProfile";
+               tooltipprofile = "ToolsGuiDefaultProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "0 0 0 0";
@@ -169,7 +169,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiListBoxProfile";
+                  Profile = "ToolsGuiListBoxProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "0 0";
@@ -178,7 +178,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   AllowMultipleSelections = "0";
                   fitParentWidth = "0";
@@ -191,7 +191,7 @@
             internalName = "instanceTab";
             Enabled = "1";
             isContainer = "1";
-            Profile = "EditorTabPage";
+            Profile = "ToolsGuiEditorTabPage";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 0";
@@ -228,14 +228,14 @@
                   Position = "0 0";
                   Extent = "202 483";
                   MinExtent = "0 -500";
-                  Profile = "GuiTabBorderProfile";
+                  Profile = "ToolsGuiTabBorderProfile";
                };
             }; 
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Position = "0 0";
@@ -244,7 +244,7 @@
                canSave = "1";
                isDecoy = "0";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Docking = "None";
                Margin = "0 0 0 0";
@@ -265,7 +265,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "1 1";
@@ -294,7 +294,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "137 26";
@@ -317,7 +317,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "157 26";
@@ -326,7 +326,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          tooltip = "Retarget missing decals to an existing decal datablock";
          bitmap = "tools/gui/images/retarget-btn";
@@ -338,7 +338,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "177 26";
@@ -347,10 +347,10 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          tooltip = "Create New Decal Template";
-         bitmap = "core/art/gui/images/new";
+         bitmap = "tools/gui/images/new";
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
@@ -359,7 +359,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "190 26";
@@ -368,7 +368,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "";
          tooltip = "Delete Selected Decal Template";
@@ -386,7 +386,7 @@
       internalName = "";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 SPC getWord(EditorGuiToolbar.extent, 1) + getWord(DecalEditorWindow.extent, 1) - 2;
@@ -417,7 +417,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          VertSizing = "bottom";
          HorizSizing = "width";
          Position = "4 24";
@@ -426,7 +426,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          AnchorTop = "0";
          AnchorBottom = "0";
@@ -448,7 +448,7 @@
             VertStacking = "Top to Bottom";
             Padding = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "0 0";
@@ -457,7 +457,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             
             new GuiRolloutCtrl() {
@@ -481,7 +481,7 @@
                   VertStacking = "Top to Bottom";
                   Padding = "0";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -490,7 +490,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
             
                   new GuiContainer(){
@@ -505,7 +505,7 @@
                         internalName = "instancePreview";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "center";
                         VertSizing = "height";
                         Position = "0 0";
@@ -514,7 +514,7 @@
                         canSave = "1";
                         isDecoy = "0";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         wrap = "0";
                         bitmap= "tools/materialeditor/gui/unknownImage";
@@ -523,7 +523,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "center";
                         VertSizing = "height";
                         Position = "0 0";
@@ -532,7 +532,7 @@
                         canSave = "1";
                         isDecoy = "0";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         bitmap = "tools/worldEditor/images/terrainpainter/terrain-painter-border-large";
                         wrap = "0";
@@ -561,7 +561,7 @@
                   VertStacking = "Top to Bottom";
                   Padding = "0";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -570,7 +570,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
                   
                   new GuiContainer(DecalEditorDetailContainer){
@@ -581,7 +581,7 @@
                      isContainer = "1";
                      
                      new GuiTextCtrl(){ 
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "3 2";
@@ -589,7 +589,7 @@
                         text = "Instance";
                      };
                      new GuiTextCtrl(){ // instance Name
-                        Profile = "GuiTextProfile";
+                        Profile = "ToolsGuiTextProfile";
                         internalName = "instanceId";
                         HorizSizing = "width";
                         VertSizing = "bottom";
@@ -598,7 +598,7 @@
                         text = "";
                      };
                      new GuiTextCtrl(){ 
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "3 21";
@@ -606,7 +606,7 @@
                         text = "Translate";
                      };
                      new GuiTextEditCtrl(){ // instance translate
-                        Profile = "GuiTextEditProfile";
+                        Profile = "ToolsGuiTextEditProfile";
                         internalName = "nodePosition";
                         HorizSizing = "width";
                         VertSizing = "bottom";
@@ -616,7 +616,7 @@
                         text = "";
                      };
                      new GuiTextCtrl(){ 
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "3 41";
@@ -624,7 +624,7 @@
                         text = "Tangent";
                      };
                      new GuiTextEditCtrl(){ // instance rotation
-                        Profile = "GuiTextEditProfile";
+                        Profile = "ToolsGuiTextEditProfile";
                         internalName = "nodeTangent";
                         HorizSizing = "width";
                         VertSizing = "bottom";
@@ -634,7 +634,7 @@
                         text = "";
                      };
                      new GuiTextCtrl(){ 
-                        Profile = "GuiTextRightProfile";
+                        Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         Position = "3 61";
@@ -642,7 +642,7 @@
                         text = "Size";
                      };
                      new GuiTextEditCtrl(){ // instance scale
-                        Profile = "GuiTextEditProfile";
+                        Profile = "ToolsGuiTextEditProfile";
                         internalName = "nodeSize";
                         HorizSizing = "width";
                         VertSizing = "bottom";
@@ -661,7 +661,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          VertSizing = "bottom";
          HorizSizing = "width";
          Position = "4 24";
@@ -670,7 +670,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          AnchorTop = "0";
          AnchorBottom = "0";
@@ -692,7 +692,7 @@
             VertStacking = "Top to Bottom";
             Padding = "0";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "0 0";
@@ -701,7 +701,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             
             new GuiRolloutCtrl() {
@@ -725,7 +725,7 @@
                   VertStacking = "Top to Bottom";
                   Padding = "0";
                   isContainer = "1";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "0 0";
@@ -734,7 +734,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000"; 
             
                   new GuiContainer(){
@@ -749,7 +749,7 @@
                         internalName = "decalPreview";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "center";
                         VertSizing = "height";
                         Position = "0 0";
@@ -758,7 +758,7 @@
                         canSave = "1";
                         isDecoy = "0";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         wrap = "0";
                         bitmap= "tools/materialeditor/gui/unknownImage";
@@ -767,7 +767,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "center";
                         VertSizing = "height";
                         Position = "0 0";
@@ -776,7 +776,7 @@
                         canSave = "1";
                         isDecoy = "0";
                         Visible = "1";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         bitmap = "tools/worldEditor/images/terrainpainter/terrain-painter-border-large";
                         wrap = "0";
@@ -807,7 +807,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiTransparentProfile";
+                  Profile = "ToolsGuiTransparentProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "1 1";
@@ -816,7 +816,7 @@
                   canSave = "1";
                   isDecoy = "0";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   dividerMargin = "5";
                   groupFilters = "+General,+SimBase,+Decal,+Rendering,+Texturing";

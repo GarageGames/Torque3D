@@ -52,6 +52,8 @@ ConsoleDocClass( MissionArea,
 
 RectI MissionArea::smMissionArea(Point2I(768, 768), Point2I(512, 512));
 
+MissionArea * MissionArea::smServerObject = NULL;
+
 //------------------------------------------------------------------------------
 
 MissionArea::MissionArea()
@@ -79,27 +81,24 @@ void MissionArea::setArea(const RectI & area)
 
 MissionArea * MissionArea::getServerObject()
 {
-   SimSet * scopeAlwaysSet = Sim::getGhostAlwaysSet();
-   for(SimSet::iterator itr = scopeAlwaysSet->begin(); itr != scopeAlwaysSet->end(); itr++)
-   {
-      MissionArea * ma = dynamic_cast<MissionArea*>(*itr);
-      if(ma)
-      {
-         AssertFatal(ma->isServerObject(), "MissionArea::getServerObject: found client object in ghost always set!");
-         return(ma);
-      }
-   }
-   return(0);
+   return smServerObject;
 }
 
 //------------------------------------------------------------------------------
 
 bool MissionArea::onAdd()
 {
-   if(isServerObject() && MissionArea::getServerObject())
+   if(isServerObject())
    {
-      Con::errorf(ConsoleLogEntry::General, "MissionArea::onAdd - MissionArea already instantiated!");
-      return(false);
+      if(MissionArea::getServerObject())
+      {
+         Con::errorf(ConsoleLogEntry::General, "MissionArea::onAdd - MissionArea already instantiated!");
+         return(false);
+      }
+      else
+      {
+         smServerObject = this;
+      }
    }
 
    if(!Parent::onAdd())
@@ -107,6 +106,14 @@ bool MissionArea::onAdd()
 
    setArea(mArea);
    return(true);
+}
+
+void MissionArea::onRemove()
+{
+   if (smServerObject == this)
+      smServerObject = NULL;
+
+   Parent::onRemove();
 }
 
 //------------------------------------------------------------------------------

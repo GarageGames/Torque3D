@@ -11,7 +11,7 @@
    MinExtent = "8 8";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    Docking = "None";
    Margin = "0 0 0 0";
@@ -44,7 +44,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209
@@ -54,7 +54,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -78,7 +78,7 @@
          internalName = "LockSelection";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "167 148";
@@ -87,7 +87,7 @@
          canSave = "1";
          Visible = "1";
          Command = "EWorldEditor.lockSelection(true); EditorTree.toggleLock();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "World Editor";
          hovertime = "1000";
          bitmap = "tools/gui/images/lock";
@@ -102,7 +102,7 @@
          internalName = "DeleteSelection";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "185 148";
@@ -111,7 +111,7 @@
          canSave = "1";
          Visible = "1";
          Command = "EditorMenuEditDelete();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "World Editor";
          hovertime = "1000";
          bitmap = "tools/gui/images/delete";
@@ -123,7 +123,7 @@
       
       */
       new GuiContainer(){
-         profile = GuiDefaultProfile;
+         profile = "ToolsGuiDefaultProfile";
          Position = "5 25";
          Extent = "200 120";
          Docking = "Client";
@@ -145,7 +145,7 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             Docking = "Client";
             Margin = "0 0 0 0";
@@ -167,7 +167,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiTreeViewProfile";
+               Profile = "ToolsGuiTreeViewProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                Position = "1 1";
@@ -196,7 +196,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209 
@@ -205,7 +205,7 @@
       MinExtent = "210 300";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -234,7 +234,7 @@
          Margin = "3 3 3 3";
          
          new GuiTextCtrl(){
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 0";
@@ -243,7 +243,7 @@
          };
          
          new GuiTextCtrl(){
-            Profile = "GuiTextRightProfile";
+            Profile = "ToolsGuiTextRightProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "7 21";
@@ -252,7 +252,7 @@
          };
          new GuiTextEditCtrl(){
             internalName = "position";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             Position = "57 21";
@@ -261,7 +261,7 @@
             AltCommand = "RiverEditorGui.editNodeDetails();";
          };
          new GuiTextCtrl(){
-            Profile = "GuiTextRightProfile";
+            Profile = "ToolsGuiTextRightProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "7 42";
@@ -270,7 +270,7 @@
          };
          new GuiTextEditCtrl(){
             internalName = "rotation";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             Position = "57 42";
@@ -279,7 +279,7 @@
             AltCommand = "RiverEditorGui.editNodeDetails();";
          };
          new GuiTextCtrl(){
-            Profile = "GuiTextRightProfile";
+            Profile = "ToolsGuiTextRightProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "7 63";
@@ -288,7 +288,7 @@
          };
          new GuiTextEditCtrl(){
             internalName = "width";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "57 63";
@@ -297,7 +297,7 @@
             AltCommand = "RiverEditorGui.editNodeDetails();";
          };
          new GuiTextCtrl(){
-            Profile = "GuiTextRightProfile";
+            Profile = "ToolsGuiTextRightProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             Position = "110 63";
@@ -306,7 +306,7 @@
          };
          new GuiTextEditCtrl(){
             internalName = "depth";
-            Profile = "GuiTextEditProfile";
+            Profile = "ToolsGuiTextEditProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             Position = "146 63";
@@ -326,7 +326,7 @@
          Margin = "0 0 3 3";
          
          new GuiTextCtrl(){
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "5 0";
@@ -347,7 +347,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "Client";
          Margin = "-14 41 3 3";
@@ -373,7 +373,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiTransparentProfile";
+            Profile = "ToolsGuiTransparentProfile";
             HorizSizing = "width";
             VertSizing = "height";
             Position = "1 1";
@@ -381,7 +381,7 @@
             MinExtent = "16 16";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             dividerMargin = "5";
          };
@@ -398,7 +398,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          lineSpacing = "2";
          allowColorChars = "0";

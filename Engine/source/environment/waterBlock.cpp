@@ -243,7 +243,7 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
          // to a ray cast could detected.
          if(gClientContainer.castRay(start, end, 
             //StaticObjectType | 
-            InteriorObjectType | 
+            //InteriorObjectType | 
             //ShapeBaseObjectType | 
             //StaticShapeObjectType | 
             //ItemObjectType |
@@ -280,7 +280,7 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
 
          if(gClientContainer.castRay(worldPoint, worldPoint + sunVector * 9000.f, 
             //StaticObjectType | 
-            InteriorObjectType | 
+            //InteriorObjectType | 
             //ShapeBaseObjectType | 
             //StaticShapeObjectType | 
             //ItemObjectType |

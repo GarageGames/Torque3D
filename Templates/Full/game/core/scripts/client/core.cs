@@ -54,6 +54,9 @@ function initializeCore()
    exec( "./audioStates.cs" );
    exec( "./audioAmbiences.cs" );
 
+   // Input devices
+   exec("~/scripts/client/oculusVR.cs");
+
    // Seed the random number generator.
    setRandomSeed();
    
@@ -67,7 +70,6 @@ function initializeCore()
    startFileChangeNotifications();
       
    // Core Guis.
-   exec("~/art/gui/remapDlg.gui");
    exec("~/art/gui/console.gui");
    exec("~/art/gui/consoleVarDlg.gui");
    exec("~/art/gui/netGraphGui.gui");

@@ -435,26 +435,53 @@ void PostEffect::_updateScreenGeometry(   const Frustum &frustum,
    const Point3F *frustumPoints = frustum.getPoints();
    const Point3F& cameraPos = frustum.getPosition();
 
+   // Perform a camera offset.  We need to manually perform this offset on the postFx's
+   // polygon, which is at the far plane.
+   const Point2F& projOffset = frustum.getProjectionOffset();
+   Point3F cameraOffsetPos = cameraPos;
+   if(!projOffset.isZero())
+   {
+      // First we need to calculate the offset at the near plane.  The projOffset
+      // given above can be thought of a percent as it ranges from 0..1 (or 0..-1).
+      F32 nearOffset = frustum.getNearRight() * projOffset.x;
+
+      // Now given the near plane distance from the camera we can solve the right
+      // triangle and calcuate the SIN theta for the offset at the near plane.
+      // SIN theta = x/y
+      F32 sinTheta = nearOffset / frustum.getNearDist();
+
+      // Finally, we can calcuate the offset at the far plane, which is where our sun (or vector)
+      // light's polygon is drawn.
+      F32 farOffset = frustum.getFarDist() * sinTheta;
+
+      // We can now apply this far plane offset to the far plane itself, which then compensates
+      // for the project offset.
+      MatrixF camTrans = frustum.getTransform();
+      VectorF offset = camTrans.getRightVector();
+      offset *= farOffset;
+      cameraOffsetPos += offset;
+   }
+
    PFXVertex *vert = outVB->lock();
 
    vert->point.set( -1.0, -1.0, 0.0 );
    vert->texCoord.set( 0.0f, 1.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarBottomLeft] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos;
    vert++;
 
    vert->point.set( -1.0, 1.0, 0.0 );
    vert->texCoord.set( 0.0f, 0.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarTopLeft] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarTopLeft] - cameraOffsetPos;
    vert++;
 
    vert->point.set( 1.0, 1.0, 0.0 );
    vert->texCoord.set( 1.0f, 0.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarTopRight] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarTopRight] - cameraOffsetPos;
    vert++;
 
    vert->point.set( 1.0, -1.0, 0.0 );
    vert->texCoord.set( 1.0f, 1.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarBottomRight] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarBottomRight] - cameraOffsetPos;
    vert++;
 
    outVB->unlock();
@@ -710,6 +737,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
          MathUtils::mProjectWorldToScreen( lightPos, &sunPos, GFX->getViewport(), tmp, proj );
 
          // And normalize it to the 0 to 1 range.
+         sunPos.x -= (F32)GFX->getViewport().point.x;
+         sunPos.y -= (F32)GFX->getViewport().point.y;
          sunPos.x /= (F32)GFX->getViewport().extent.x;
          sunPos.y /= (F32)GFX->getViewport().extent.y;
 

@@ -30,9 +30,9 @@
 #endif
 
 
-GFXD3D9CardProfiler::GFXD3D9CardProfiler() : GFXCardProfiler()
+GFXD3D9CardProfiler::GFXD3D9CardProfiler(U32 adapterIndex) : GFXCardProfiler()
 {
-
+   mAdapterOrdinal = adapterIndex;
 }
 
 GFXD3D9CardProfiler::~GFXD3D9CardProfiler()
@@ -133,7 +133,7 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
    if(texFormat == (_D3DFORMAT)GFX_UNSUPPORTED_VAL)
       return false;
 
-   HRESULT hr = pD3D->CheckDeviceFormat( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, 
+   HRESULT hr = pD3D->CheckDeviceFormat( mAdapterOrdinal, D3DDEVTYPE_HAL, 
       adapterFormat, usage, rType, texFormat );
 
    bool retVal = SUCCEEDED( hr );
@@ -145,7 +145,7 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
    {
       usage ^= D3DUSAGE_AUTOGENMIPMAP;
 
-      hr = pD3D->CheckDeviceFormat( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, 
+      hr = pD3D->CheckDeviceFormat( mAdapterOrdinal, D3DDEVTYPE_HAL, 
          adapterFormat, usage, D3DRTYPE_TEXTURE, GFXD3D9TextureFormat[fmt] );
 
       retVal = SUCCEEDED( hr );

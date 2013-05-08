@@ -32,7 +32,6 @@ function initializeWorldEditor()
    exec("./gui/genericPromptDialog.ed.gui" );
    exec("./gui/guiTerrainImportGui.gui" );
    exec("./gui/guiTerrainExportGui.gui" );
-   exec("./gui/guiInteriorExportGui.gui" );
    exec("./gui/EditorGui.ed.gui");
    exec("./gui/objectBuilderGui.ed.gui");
    exec("./gui/TerrainEditorVSettingsGui.ed.gui");
@@ -43,6 +42,7 @@ function initializeWorldEditor()
    exec("./gui/TimeAdjustGui.ed.gui");
    exec("./gui/AddFMODProjectDlg.ed.gui");
    exec("./gui/SelectObjectsWindow.ed.gui");
+   exec("./gui/ProceduralTerrainPainterGui.gui" );
    
    // Load Scripts.
    exec("./scripts/menus.ed.cs");

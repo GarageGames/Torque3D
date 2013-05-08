@@ -26,7 +26,6 @@
 #include "console/console.h"
 #include "console/engineAPI.h"
 #include "platform/profiler.h"
-#include "platform/event.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiTypes.h"
@@ -2312,6 +2311,40 @@ DefineEngineMethod( GuiCanvas, setWindowTitle, void, ( const char* newTitle),,
 				   "@endtsexample\n\n")
 {
 	object->setWindowTitle(newTitle);
+}
+
+
+DefineEngineMethod( GuiCanvas, findFirstMatchingMonitor, S32, (const char* name),,
+				   "@brief Find the first monitor index that matches the given name.\n\n"
+               "The actual match algorithm depends on the implementation.\n"
+               "@param name The name to search for.\n\n"
+				   "@return The number of monitors attached to the system, including the default monoitor.")
+{
+   return PlatformWindowManager::get()->findFirstMatchingMonitor(name);
+}
+
+DefineEngineMethod( GuiCanvas, getMonitorCount, S32, (),,
+				   "@brief Gets the number of monitors attached to the system.\n\n"
+
+				   "@return The number of monitors attached to the system, including the default monoitor.")
+{
+   return PlatformWindowManager::get()->getMonitorCount();
+}
+
+DefineEngineMethod( GuiCanvas, getMonitorName, const char*, (S32 index),,
+				   "@brief Gets the name of the requested monitor.\n\n"
+               "@param index The monitor index.\n\n"
+				   "@return The name of the requested monitor.")
+{
+   return PlatformWindowManager::get()->getMonitorName(index);
+}
+
+DefineEngineMethod( GuiCanvas, getMonitorRect, RectI, (S32 index),,
+				   "@brief Gets the region of the requested monitor.\n\n"
+               "@param index The monitor index.\n\n"
+				   "@return The rectangular region of the requested monitor.")
+{
+   return PlatformWindowManager::get()->getMonitorRect(index);
 }
 
 

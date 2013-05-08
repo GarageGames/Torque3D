@@ -74,6 +74,10 @@ EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
 
+String TSShapeConstructor::smCapsuleShapePath("core/art/shapes/unit_capsule.dts");
+String TSShapeConstructor::smCubeShapePath("core/art/shapes/unit_cube.dts");
+String TSShapeConstructor::smSphereShapePath("core/art/shapes/unit_sphere.dts");
+
 ResourceRegisterPostLoadSignal< TSShape > TSShapeConstructor::_smAutoLoad( &TSShapeConstructor::_onTSShapeLoaded );
 ResourceRegisterUnloadSignal< TSShape > TSShapeConstructor::_smAutoUnload( &TSShapeConstructor::_onTSShapeUnloaded );
 
@@ -278,6 +282,23 @@ void TSShapeConstructor::initPersistFields()
    endGroup( "Sequences" );
 
    Parent::initPersistFields();
+}
+
+void TSShapeConstructor::consoleInit()
+{
+   Parent::consoleInit();
+
+   Con::addVariable( "$pref::TSShapeConstructor::CapsuleShapePath", TypeRealString, &TSShapeConstructor::smCapsuleShapePath, 
+      "The file path to the capsule shape used by tsMeshFit.\n\n"
+	   "@ingroup MeshFit\n" );
+
+   Con::addVariable( "$pref::TSShapeConstructor::CubeShapePath", TypeRealString, &TSShapeConstructor::smCubeShapePath, 
+      "The file path to the cube shape used by tsMeshFit.\n\n"
+	   "@ingroup MeshFit\n" );
+
+   Con::addVariable( "$pref::TSShapeConstructor::SphereShapePath", TypeRealString, &TSShapeConstructor::smSphereShapePath, 
+      "The file path to the sphere shape used by tsMeshFit.\n\n"
+	   "@ingroup MeshFit\n" );
 }
 
 TSShapeConstructor* TSShapeConstructor::findShapeConstructor(const FileName& path)

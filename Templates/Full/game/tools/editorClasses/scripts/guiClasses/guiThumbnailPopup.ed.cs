@@ -69,7 +69,7 @@ function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label
 {
    %base = new GuiWindowCtrl()
     {
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "0 0";
@@ -88,7 +88,7 @@ function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label
    %scroll = new GuiScrollCtrl() 
    {
       canSaveDynamicFields = "0";
-      Profile = "GuiScrollProfile";
+      Profile = "ToolsGuiScrollProfile";
       class = "GuiThumbnailArray";
       internalName = "thumbnailScroll";
       HorizSizing = "width";
@@ -111,7 +111,7 @@ function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label
    %objectList = new GuiDynamicCtrlArrayControl() 
    {
             canSaveDynamicFields = "0";
-            Profile = "GuiTransparentScrollProfile";
+            Profile = "ToolsGuiScrollProfile";
             class = %this.listType;
             superClass = "GuiThumbnailCreator";
             HorizSizing = "width";
@@ -214,7 +214,7 @@ function GuiThumbnailCreator::AddObject( %this, %object, %data, %tooltip )
    $LB::ObjectLibraryGroup.add( %object );
     
    // Build Object Container
-   %container = new GuiControl() { profile = GuiButtonProfile; };
+   %container = new GuiControl() { profile = ToolsGuiButtonProfile; };
           
    // Add to list.
    %this.add( %container );

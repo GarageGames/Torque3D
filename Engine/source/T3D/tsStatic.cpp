@@ -1036,7 +1036,7 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
 }
 
 //------------------------------------------------------------------------
-//These functions are duplicated in tsStatic, shapeBase, and interiorInstance.
+//These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering
 //target names/counts without polluting simObject.
 
@@ -1120,8 +1120,8 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    newMat->mMapTo = mapTo;
 
-   // Map the material in the in the matmgr
-   MATMGR->mapMaterial( mapTo, newMat->mMapTo );
+   // Map the material by name in the matmgr
+   MATMGR->mapMaterial( mapTo, newMat->getName() );
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought

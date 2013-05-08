@@ -924,68 +924,6 @@ void ConvexShape::exportToCollada()
 		Con::errorf( "ConvexShape::exportToCollada() - has no surfaces to export!" );
 		return;
 	}
-/*		
-		// Get an optimized version of our mesh
-		OptimizedPolyList polyList;
-
-		if (bakeTransform)
-		{
-			MatrixF mat = getTransform();
-			Point3F scale = getScale();
-
-			pInterior->buildExportPolyList(interiorMesh, &mat, &scale);
-		}
-		else
-			pInterior->buildExportPolyList(interiorMesh);
-
-		// Get our export path
-		Torque::Path colladaFile = mInteriorRes.getPath();
-
-		// Make sure to set our Collada extension
-		colladaFile.setExtension("dae");
-
-		// Use the InteriorInstance name if possible
-		String meshName = getName();
-
-		// Otherwise use the DIF's file name
-		if (meshName.isEmpty())
-			meshName = colladaFile.getFileName();
-
-		// If we are baking the transform then append
-		// a CRC version of the transform to the mesh/file name
-		if (bakeTransform)
-		{
-			F32 trans[19];
-
-			const MatrixF& mat = getTransform();
-			const Point3F& scale = getScale();
-
-			// Copy in the transform
-			for (U32 i = 0; i < 4; i++)
-			{
-				for (U32 j = 0; j < 4; j++)
-				{
-					trans[i * 4 + j] = mat(i, j);
-				}
-			}
-
-			// Copy in the scale
-			trans[16] = scale.x;
-			trans[17] = scale.y;
-			trans[18] = scale.z;
-
-			U32 crc = CRC::calculateCRC(trans, sizeof(F32) * 19);
-
-			meshName += String::ToString("_%x", crc);
-		}
-
-		// Set the file name as the meshName
-		colladaFile.setFileName(meshName);
-
-		// Use a ColladaUtils function to do the actual export to a Collada file
-		ColladaUtils::exportToCollada(colladaFile, interiorMesh, meshName);
-	}
-	*/
 }
 
 void ConvexShape::resizePlanes( const Point3F &size )

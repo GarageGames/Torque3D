@@ -180,7 +180,7 @@ datablock ParticleData(PlayerFoamParticle)
    useInvAlpha          = false;
    spinRandomMin        = -90.0;
    spinRandomMax        = 500.0;
-   textureName          = "art/shapes/particles/millsplash01";
+   textureName          = "art/particles/millsplash01";
    colors[0]     = "0.7 0.8 1.0 0.20";
    colors[1]     = "0.7 0.8 1.0 0.20";
    colors[2]     = "0.7 0.8 1.0 0.00";
@@ -246,7 +246,7 @@ datablock ParticleEmitterData( PlayerFoamDropletsEmitter )
 
 datablock ParticleData( PlayerWakeParticle )
 {
-   textureName          = "art/shapes/particles/wake";
+   textureName          = "art/particles/wake";
    dragCoefficient     = "0.0";
    gravityCoefficient   = "0.0";
    inheritedVelFactor   = "0.0";
@@ -348,7 +348,7 @@ datablock SplashData(PlayerSplash)
    acceleration = -3.0;
    texWrap = 5.0;
 
-   texture = "art/shapes/particles/millsplash01";
+   texture = "art/particles/millsplash01";
 
    emitter[0] = PlayerSplashEmitter;
    emitter[1] = PlayerSplashMistEmitter;
@@ -384,6 +384,7 @@ datablock ParticleData(LightPuff)
    sizes[1]      = 0.8;
    times[0]      = 0.3;
    times[1]      = 1.0;
+   times[2] = 1.0;
 };
 
 datablock ParticleEmitterData(LightPuffEmitter)
@@ -420,7 +421,7 @@ datablock ParticleData(LiftoffDust)
    colors[0]     = "1.0 1.0 1.0 1.0";
    sizes[0]      = 1.0;
    times[0]      = 1.0;
-   textureName = "art/shapes/particles/dustParticle";
+   textureName = "art/particles/dustParticle";
 };
 
 datablock ParticleEmitterData(LiftoffDustEmitter)
@@ -648,13 +649,12 @@ datablock PlayerData(DefaultPlayerData)
    //exitingWater         = ExitingWaterLightSound;
 
    observeParameters = "0.5 4.5 4.5";
-   class = "armor";
 
    cameraMinDist = "0";
    DecalData = "PlayerFootprint";
 
    // Allowable Inventory Items
-   mainWeapon = Lurker;
+   mainWeapon = Ryder;
 
    maxInv[Lurker] = 1;
    maxInv[LurkerClip] = 20;

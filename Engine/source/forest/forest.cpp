@@ -330,7 +330,12 @@ void Forest::createNewFile()
 
    // We need to construct a default file name
    String missionName( Con::getVariable( "$Client::MissionFile" ) );
-   missionName.replace( "tools/levels", "levels" );
+   String levelDirectory( Con::getVariable( "$pref::Directories::Level" ) );
+   if ( levelDirectory.isEmpty() )
+   {
+      levelDirectory = "levels";
+   }
+   missionName.replace( "tools/levels", levelDirectory );
    missionName = Platform::makeRelativePathName(missionName, Platform::getMainDotCsDir());
 
    Torque::Path basePath( missionName );

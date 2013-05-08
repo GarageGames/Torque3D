@@ -41,6 +41,8 @@
 
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
+#elif defined TORQUE_EXTENDED_MOVE
+   #include "T3D/gameBase/extended/extendedMoveList.h"
 #else
    #include "T3D/gameBase/std/stdMoveList.h"
 #endif
@@ -175,6 +177,8 @@ GameConnection::GameConnection()
 
 #ifdef TORQUE_HIFI_NET
    mMoveList = new HifiMoveList();
+#elif defined TORQUE_EXTENDED_MOVE
+   mMoveList = new ExtendedMoveList();
 #else
    mMoveList = new StdMoveList();
 #endif
@@ -215,6 +219,14 @@ GameConnection::GameConnection()
    // first person
    mFirstPerson = true;
    mUpdateFirstPerson = false;
+
+   // Control scheme
+   mUpdateControlScheme = false;
+   mAbsoluteRotation = false;
+   mAddYawToAbsRot = false;
+   mAddPitchToAbsRot = false;
+
+   clearDisplayDevice();
 }
 
 GameConnection::~GameConnection()
@@ -738,7 +750,15 @@ void GameConnection::setFirstPerson(bool firstPerson)
    mUpdateFirstPerson = true;
 }
 
+//----------------------------------------------------------------------------
 
+void GameConnection::setControlSchemeParameters(bool absoluteRotation, bool addYawToAbsRot, bool addPitchToAbsRot)
+{
+   mAbsoluteRotation = absoluteRotation;
+   mAddYawToAbsRot = addYawToAbsRot;
+   mAddPitchToAbsRot = addPitchToAbsRot;
+   mUpdateControlScheme = true;
+}
 
 //----------------------------------------------------------------------------
 
@@ -821,6 +841,11 @@ void GameConnection::writeDemoStartBlock(ResizeBitStream *stream)
    stream->write(mCameraPos);
    stream->write(mCameraSpeed);
 
+   // Control scheme
+   stream->write(mAbsoluteRotation);
+   stream->write(mAddYawToAbsRot);
+   stream->write(mAddPitchToAbsRot);
+
    stream->writeString(Con::getVariable("$Client::MissionFile"));
 
    mMoveList->writeDemoStartBlock(stream);
@@ -896,6 +921,11 @@ bool GameConnection::readDemoStartBlock(BitStream *stream)
    stream->read(&mFirstPerson);
    stream->read(&mCameraPos);
    stream->read(&mCameraSpeed);
+
+   // Control scheme
+   stream->read(&mAbsoluteRotation);
+   stream->read(&mAddYawToAbsRot);
+   stream->read(&mAddPitchToAbsRot);
 
    char buf[256];
    stream->readString(buf);
@@ -1073,6 +1103,16 @@ void GameConnection::readPacket(BitStream *bstream)
       else
          setCameraObject(0);
 
+      // server changed control scheme
+      if(bstream->readFlag())
+      {
+         bool absoluteRotation = bstream->readFlag();
+         bool addYawToAbsRot = bstream->readFlag();
+         bool addPitchToAbsRot = bstream->readFlag();
+         setControlSchemeParameters(absoluteRotation, addYawToAbsRot, addPitchToAbsRot);
+         mUpdateControlScheme = false;
+      }
+
       // server changed first person
       if(bstream->readFlag())
       {
@@ -1102,6 +1142,16 @@ void GameConnection::readPacket(BitStream *bstream)
       mCameraPos = bstream->readFlag() ? 1.0f : 0.0f;
       if (bstream->readFlag())
          mControlForceMismatch = true;
+
+      // client changed control scheme
+      if(bstream->readFlag())
+      {
+         bool absoluteRotation = bstream->readFlag();
+         bool addYawToAbsRot = bstream->readFlag();
+         bool addPitchToAbsRot = bstream->readFlag();
+         setControlSchemeParameters(absoluteRotation, addYawToAbsRot, addPitchToAbsRot);
+         mUpdateControlScheme = false;
+      }
 
       // client changed first person
       if(bstream->readFlag())
@@ -1164,6 +1214,15 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
          }
       }
       bstream->writeFlag(forceUpdate);
+
+      // Control scheme changed?
+      if(bstream->writeFlag(mUpdateControlScheme))
+      {
+         bstream->writeFlag(mAbsoluteRotation);
+         bstream->writeFlag(mAddYawToAbsRot);
+         bstream->writeFlag(mAddPitchToAbsRot);
+         mUpdateControlScheme = false;
+      }
 
       // first person changed?
       if(bstream->writeFlag(mUpdateFirstPerson)) 
@@ -1252,6 +1311,15 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       }
       else
          bstream->writeFlag( false );
+
+      // Control scheme changed?
+      if(bstream->writeFlag(mUpdateControlScheme))
+      {
+         bstream->writeFlag(mAbsoluteRotation);
+         bstream->writeFlag(mAddYawToAbsRot);
+         bstream->writeFlag(mAddPitchToAbsRot);
+         mUpdateControlScheme = false;
+      }
 
       // first person changed?
       if(bstream->writeFlag(mUpdateFirstPerson)) 
@@ -1725,6 +1793,13 @@ DefineEngineMethod( GameConnection, setControlObject, bool, (GameBase* ctrlObj),
    return true;
 }
 
+DefineEngineMethod( GameConnection, clearDisplayDevice, void, (),,
+   "@brief Clear any display device.\n\n"
+   "A display device may define a number of properties that are used during rendering.\n\n")
+{
+   object->clearDisplayDevice();
+}
+
 DefineEngineMethod( GameConnection, getControlObject, GameBase*, (),,
    "@brief On the server, returns the object that the client is controlling."
    "By default the control object is an instance of the Player class, but can also be an instance "
@@ -2102,4 +2177,22 @@ DefineEngineMethod( GameConnection, setFirstPerson, void, (bool firstPerson),,
    "@param firstPerson Set to true to put the connection into first person mode.\n\n")
 {
    object->setFirstPerson(firstPerson);
+}
+
+DefineEngineMethod( GameConnection, setControlSchemeParameters, void, (bool absoluteRotation, bool addYawToAbsRot, bool addPitchToAbsRot),,
+   "@brief Set the control scheme that may be used by a connection's control object.\n\n"
+   
+   "@param absoluteRotation Use absolute rotation values from client, likely through ExtendedMove.\n"
+   "@param addYawToAbsRot Add relative yaw control to the absolute rotation calculation.  Only useful when absoluteRotation is true.\n\n" )
+{
+   object->setControlSchemeParameters(absoluteRotation, addYawToAbsRot, addPitchToAbsRot);
+}
+
+DefineEngineMethod( GameConnection, getControlSchemeAbsoluteRotation, bool, (),,
+   "@brief Get the connection's control scheme absolute rotation property.\n\n"
+   
+   "@return True if the connection's control object should use an absolute rotation control scheme.\n\n"
+   "@see GameConnection::setControlSchemeParameters()\n\n")
+{
+   return object->getControlSchemeAbsoluteRotation();
 }

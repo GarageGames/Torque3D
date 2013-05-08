@@ -27,9 +27,6 @@
 #ifndef _CONSOLE_H_
 #include "console/console.h"
 #endif
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
 
 class WinConsole
 {

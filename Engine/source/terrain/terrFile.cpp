@@ -683,7 +683,8 @@ void TerrainFile::setHeightMap( const Vector<U16> &heightmap, bool updateCollisi
 void TerrainFile::import(  const GBitmap &heightMap, 
                            F32 heightScale,
                            const Vector<U8> &layerMap, 
-                           const Vector<String> &materials )
+                           const Vector<String> &materials,
+                           bool flipYAxis )
 {
    AssertFatal( heightMap.getWidth() == heightMap.getHeight(), "TerrainFile::import - Height map is not square!" );
    AssertFatal( isPow2( heightMap.getWidth() ), "TerrainFile::import - Height map is not power of two!" );
@@ -702,23 +703,48 @@ void TerrainFile::import(  const GBitmap &heightMap,
    {
       const F32 toFixedPoint = ( 1.0f / (F32)U16_MAX ) * floatToFixed( heightScale );
       const U16 *iBits = (const U16*)heightMap.getBits();
-      for ( U32 i = 0; i < mSize * mSize; i++ )
+      if ( flipYAxis )
       {
-         U16 height = convertBEndianToHost( *iBits );
-         *oBits = (U16)mCeil( (F32)height * toFixedPoint );
-         ++oBits;
-         ++iBits;
+         for ( U32 i = 0; i < mSize * mSize; i++ )
+         {
+            U16 height = convertBEndianToHost( *iBits );
+            *oBits = (U16)mCeil( (F32)height * toFixedPoint );
+            ++oBits;
+            ++iBits;
+         }
+      }
+      else
+      {
+         for(S32 y = mSize - 1; y >= 0; y--) {
+            for(U32 x = 0; x < mSize; x++) {
+               U16 height = convertBEndianToHost( *iBits );
+               mHeightMap[x + y * mSize] = (U16)mCeil( (F32)height * toFixedPoint );
+               ++iBits;
+            }
+         }
       }
    }
    else
    {
       const F32 toFixedPoint = ( 1.0f / (F32)U8_MAX ) * floatToFixed( heightScale );
       const U8 *iBits = heightMap.getBits();
-      for ( U32 i = 0; i < mSize * mSize; i++ )
+      if ( flipYAxis )
       {
-         *oBits = (U16)mCeil( ((F32)*iBits) * toFixedPoint );
-         ++oBits;
-         iBits += heightMap.getBytesPerPixel();
+         for ( U32 i = 0; i < mSize * mSize; i++ )
+         {
+            *oBits = (U16)mCeil( ((F32)*iBits) * toFixedPoint );
+            ++oBits;
+            iBits += heightMap.getBytesPerPixel();
+         }
+      }
+      else
+      {
+         for(S32 y = mSize - 1; y >= 0; y--) {
+            for(U32 x = 0; x < mSize; x++) {
+               mHeightMap[x + y * mSize] = (U16)mCeil( ((F32)*iBits) * toFixedPoint );
+               iBits += heightMap.getBytesPerPixel();
+            }
+         }
       }
    }
 
@@ -744,7 +770,12 @@ void TerrainFile::create(  String *inOutFilename,
    if ( !basePath.getExtension().equal("mis") )
    {
       // Use the default path and filename
-      basePath.setPath( "art/terrains" );
+      String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
+      if ( terrainDirectory.isEmpty() )
+      {
+         terrainDirectory = "art/terrains";
+      }
+      basePath.setPath( terrainDirectory );
       basePath.setFileName( "terrain" );
    }
 

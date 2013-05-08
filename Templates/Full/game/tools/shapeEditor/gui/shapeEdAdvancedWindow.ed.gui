@@ -20,9 +20,9 @@
    MinExtent = "210 253";
    HorizSizing = "windowRelative";
    VertSizing = "windowRelative";
-   Profile = "GuiWindowProfile";
+   Profile = "ToolsGuiWindowProfile";
    Visible = "0";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    isContainer = "1";
    canSave = "1";
@@ -45,9 +45,9 @@
       MinExtent = "8 -500";
       HorizSizing = "width";
       VertSizing = "height";
-      Profile = "GuiTabBookProfile";
+      Profile = "ToolsGuiTabBookProfile";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       isContainer = "1";
       internalName = "tabBook";
@@ -68,9 +68,9 @@
          MinExtent = "0 -500";
          HorizSizing = "width";
          VertSizing = "height";
-         Profile = "GuiTabPageProfile";
+         Profile = "ToolsGuiTabPageProfile";
          Visible = "0";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          isContainer = "1";
          canSave = "1";
@@ -89,9 +89,9 @@
             MinExtent = "8 8";
             HorizSizing = "width";
             VertSizing = "bottom";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             isContainer = "1";
             canSave = "1";
@@ -111,7 +111,7 @@
                   MinExtent = "8 2";
                   HorizSizing = "width";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                };
                new GuiCheckBoxCtrl() {
                   useInactiveState = "0";
@@ -124,11 +124,11 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.fixedDetail";
                   Command = "ShapeEdAdvancedWindow-->detailSlider.setActive($ThisControl.getValue()); ShapeEdAdvancedWindow-->levelsInactive.setVisible( !$ThisControl.getValue() );";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Allow the slider to select the current detail level";
                   hovertime = "1000";
                   isContainer = "0";
@@ -145,10 +145,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "width";
                   VertSizing = "bottom";
-                  Profile = "GuiSliderProfile";
+                  Profile = "ToolsGuiSliderProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.currentDL";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Drag the slider to change the current detail level";
                   hovertime = "1000";
                   isContainer = "0";
@@ -157,7 +157,7 @@
                   canSaveDynamicFields = "0";
                };
                new GuiBitmapCtrl(){
-                  bitmap = "core/art/gui/images/inactive-overlay"; 
+                  bitmap = "tools/gui/images/inactive-overlay"; 
                   position = "57 19";
                   Extent = "122 20";
                   tooltip = "Levels needs to be selected to enable the detail level slider";
@@ -179,10 +179,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.currentDL";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Index of the current detail level";
                   hovertime = "1000";
                   isContainer = "0";
@@ -196,9 +196,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -210,10 +210,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.detailPolys";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Number of polygons in the current detail level";
                   hovertime = "1000";
                   canSave = "1";
@@ -226,9 +226,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -239,11 +239,11 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextEditProfile";
+                  Profile = "ToolsGuiTextEditProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.detailSize";
                   AltCommand = "ShapeEdAdvancedWindow.onEditDetailSize();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Edit this value to change the size of the current detail";
                   hovertime = "1000";
                   internalName = "detailSize";
@@ -257,9 +257,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -271,10 +271,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.pixelSize";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Current size (in pixels) of the shape";
                   hovertime = "1000";
                   canSave = "1";
@@ -287,9 +287,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -301,10 +301,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.orbitDist";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Current distance from the shape to the camera";
                   hovertime = "1000";
                   canSave = "1";
@@ -317,9 +317,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -331,10 +331,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.numMaterials";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Number of materials used by all meshes at this detail level";
                   hovertime = "1000";
                   canSave = "1";
@@ -347,9 +347,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -361,10 +361,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.numBones";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Number of bones at this detail level (skins only)";
                   hovertime = "1000";
                   canSave = "1";
@@ -377,9 +377,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -391,10 +391,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.numDrawCalls";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Total number of mesh primitives (triangle lists) at this detail level";
                   hovertime = "1000";
                   canSave = "1";
@@ -407,9 +407,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -421,10 +421,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                   Visible = "1";
                   Variable = "ShapeEdShapeView.numWeights";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Number of vertex weights at this detail level (skins only)";
                   hovertime = "1000";
                   canSave = "1";
@@ -477,7 +477,7 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextProfile";
+                  Profile = "ToolsGuiTextProfile";
                };
                new GuiCheckBoxCtrl() {
                   useInactiveState = "0";
@@ -490,10 +490,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   VertSizing = "bottom";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   Visible = "1";
                   Command = "ShapeEdDetails.onToggleImposter( $ThisControl.getValue() );";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Controls whether this shape uses an imposter detail level";
                   hovertime = "1000";
                   isContainer = "0";
@@ -515,9 +515,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   isContainer = "0";
                   canSave = "1";
@@ -529,10 +529,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextEditProfile";
+                  Profile = "ToolsGuiTextEditProfile";
                   Visible = "1";
                   AltCommand = "ShapeEdDetails.onEditImposter();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Specifies the detail level used to generate the imposters";
                   hovertime = "1000";
                   internalName = "bbDetailLevel";
@@ -546,9 +546,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -559,10 +559,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextEditProfile";
+                  Profile = "ToolsGuiTextEditProfile";
                   Visible = "1";
                   AltCommand = "ShapeEdDetails.onEditImposter();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Specifies the dimension (width/height) of the imposters in pixels";
                   hovertime = "1000";
                   internalName = "bbDimension";
@@ -576,9 +576,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSave = "1";
                   canSaveDynamicFields = "0";
@@ -589,10 +589,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextEditProfile";
+                  Profile = "ToolsGuiTextEditProfile";
                   Visible = "1";
                   AltCommand = "ShapeEdDetails.onEditImposter();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Number of steps in the horizontal axis";
                   hovertime = "1000";
                   internalName = "bbEquatorSteps";
@@ -609,10 +609,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   Visible = "1";
                   Command = "ShapeEdDetails.onEditImposter();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Specifies whether to include the poles (top and bottom) of the shape";
                   hovertime = "1000";
                   internalName = "bbIncludePoles";
@@ -633,9 +633,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   Tooltip = "Number of steps in the vertical axis";
                   hovertime = "1000";
                   isContainer = "0";
@@ -648,10 +648,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextEditProfile";
+                  Profile = "ToolsGuiTextEditProfile";
                   Visible = "1";
                   AltCommand = "ShapeEdDetails.onEditImposter();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   internalName = "bbPolarSteps";
                   canSave = "1";
@@ -664,9 +664,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextRightProfile";
+                  Profile = "ToolsGuiTextRightProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   tooltip = "Polar Angle - Y axis";
                   hovertime = "1000";
                   canSave = "1";
@@ -678,17 +678,17 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   VertSizing = "bottom";
-                  Profile = "GuiTextEditProfile";
+                  Profile = "ToolsGuiTextEditProfile";
                   Visible = "1";
                   AltCommand = "ShapeEdDetails.onEditImposter();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   internalName = "bbPolarAngle";
                   canSave = "1";
                   canSaveDynamicFields = "0";
                };
                new GuiBitmapCtrl(){
-                  bitmap = "core/art/gui/images/inactive-overlay";
+                  bitmap = "tools/gui/images/inactive-overlay";
                   position = "4 18";
                   Extent = "193 64";
                   tooltip = "Imposters must be enabled, and an imposter detail level selected to edit these properties";
@@ -713,9 +713,9 @@
          MinExtent = "0 -500";
          HorizSizing = "width";
          VertSizing = "height";
-         Profile = "GuiTabPageProfile";
+         Profile = "ToolsGuiTabPageProfile";
          Visible = "0";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSave = "1";
          canSaveDynamicFields = "0";
@@ -724,7 +724,7 @@
          new GuiControl(){
             docking = "client";
             Margin = "0 0 0 0";
-            Profile = "GuiScrollProfile";
+            Profile = "ToolsGuiScrollProfile";
             position = "0 0";
             extent = "202 224";
             
@@ -743,9 +743,9 @@
             MinExtent = "8 8";
             HorizSizing = "width";
             vertSizing = "height";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSave = "1";
             canSaveDynamicFields = "0";
@@ -761,10 +761,10 @@
                MinExtent = "8 2";
                HorizSizing = "right";
                VertSizing = "bottom";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                Visible = "1";
                Variable = "ShapeEdShapeView.renderMounts";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Controls whether mounted shapes will be rendered in the 3D view";
                hovertime = "1000";
                isContainer = "0";
@@ -795,7 +795,7 @@
                VertSizing = "height";
                Profile = "GuiShapeEdScrollProfile";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
                canSave = "1";
@@ -820,7 +820,7 @@
                   Profile = "GuiShapeEdTextListProfile";
                   Visible = "1";
                   Command = "ShapeEdMountWindow.update_onMountSelectionChanged();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   internalName = "mountList";
                   canSave = "1";
@@ -841,7 +841,7 @@
                   minExtent = "8 2";
                   horizSizing = "right";
                   vertSizing = "bottom";
-                  profile = "GuiTextProfile";
+                  profile = "ToolsGuiTextProfile";
                };
                new GuiBitmapButtonCtrl() {
                   bitmap = "tools/gui/images/delete";
@@ -853,17 +853,17 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   VertSizing = "bottom";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   Visible = "1";
                   Command = "ShapeEdMountWindow.unmountShape();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Delete the selected mount item";
                   canSaveDynamicFields = "0";
                   canSave = "1";
                   isContainer = "0";
                };
                new GuiBitmapButtonCtrl() {
-                  bitmap = "core/art/gui/images/new";
+                  bitmap = "tools/gui/images/new";
                   groupNum = "-1";
                   buttonType = "PushButton";
                   useMouseEvents = "0";
@@ -872,10 +872,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   VertSizing = "bottom";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   Visible = "1";
                   Command = "ShapeEdMountWindow.mountShape(-1);";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Mounts a new shape to the current model";
                   isContainer = "0";
                   canSave = "1";
@@ -891,10 +891,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "right";
                   vertSizing = "top";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   Visible = "1";
                   Command = "ShapeEdMountWindow.unmountAll();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Unmount all shapes";
                   hovertime = "1000";
                   isContainer = "0";
@@ -908,14 +908,14 @@
                   minExtent = "8 2";
                   horizSizing = "right";
                   vertSizing = "bottom";
-                  profile = "GuiTextRightProfile";
+                  profile = "ToolsGuiTextRightProfile";
                };
                new GuiPopUpMenuCtrl(ShapeEdMountShapeMenu) {
                   position = "42 20";
                   extent = "156 18";
                   HorizSizing = "width";
                   vertSizing = "bottom";
-                  Profile = "GuiPopUpMenuProfile";
+                  Profile = "ToolsGuiPopUpMenuProfile";
                   ToolTip = "Select the model to mount";
                };
                new GuiTextCtrl() {
@@ -925,7 +925,7 @@
                   minExtent = "8 2";
                   horizSizing = "right";
                   vertSizing = "bottom";
-                  profile = "GuiTextRightProfile";
+                  profile = "ToolsGuiTextRightProfile";
                };
                new GuiPopUpMenuCtrl() {
                   position = "42 41";
@@ -933,7 +933,7 @@
                   minExtent = "8 2";
                   horizSizing = "width";
                   vertSizing = "bottom";
-                  Profile = "GuiPopUpMenuProfile";
+                  Profile = "ToolsGuiPopUpMenuProfile";
                   Command = "ShapeEdMountWindow.updateSelectedMount();";
                   ToolTip = "Select the node on which to mount the model";
                   internalName = "mountNode";
@@ -945,14 +945,14 @@
                   minExtent = "8 2";
                   horizSizing = "left";
                   vertSizing = "bottom";
-                  profile = "GuiTextProfile";
+                  profile = "ToolsGuiTextProfile";
                };
                new GuiPopUpMenuCtrl() {
                   position = "138 41";
                   extent = "60 18";
                   horizSizing = "left";
                   vertSizing = "bottom";
-                  Profile = "GuiPopUpMenuProfile";
+                  Profile = "ToolsGuiPopUpMenuProfile";
                   Command = "ShapeEdMountWindow.updateSelectedMount();";
                   ToolTip = "Select the type of mounting to use";
                   internalName = "mountType";
@@ -962,7 +962,7 @@
                   extent = "99 18";
                   HorizSizing = "width";
                   vertSizing = "bottom";
-                  Profile = "GuiPopUpMenuProfile";
+                  Profile = "ToolsGuiPopUpMenuProfile";
                   Command = "ShapeEdMountWindow.setMountThreadSequence();";
                   ToolTip = "Select the sequence to play on the mounted model";
                   internalName = "mountSeq";
@@ -977,9 +977,9 @@
                   MinExtent = "8 2";
                   HorizSizing = "width";
                   VertSizing = "top";
-                  Profile = "GuiSliderProfile";
+                  Profile = "ToolsGuiSliderProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Drag the slider to scrub through the sequence keyframes";
                   hovertime = "1000";
                   isContainer = "0";
@@ -996,10 +996,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   vertSizing = "top";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   Visible = "1";
                   Command = "ShapeEdMountWindow.toggleMountThreadPlayback();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Play forwards";
                   hovertime = "1000";
                   isContainer = "0";
@@ -1024,9 +1024,9 @@
          MinExtent = "0 -500";
          HorizSizing = "width";
          VertSizing = "height";
-         Profile = "GuiTabPageProfile";
+         Profile = "ToolsGuiTabPageProfile";
          Visible = "0";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          isContainer = "1";
          canSave = "1";
@@ -1045,9 +1045,9 @@
             MinExtent = "8 8";
             HorizSizing = "width";
             VertSizing = "bottom";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             isContainer = "1";
             canSave = "1";
@@ -1067,7 +1067,7 @@
                   minExtent = "8 2";
                   horizSizing = "right";
                   vertSizing = "bottom";
-                  profile = "GuiTextProfile";
+                  profile = "ToolsGuiTextProfile";
                };
                new GuiScrollCtrl() {
                   willFirstRespond = "1";
@@ -1091,7 +1091,7 @@
                   VertSizing = "height";
                   Profile = "GuiShapeEdScrollProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   isContainer = "1";
                   canSave = "1";
@@ -1107,7 +1107,7 @@
                      VertSizing = "bottom";
                      Profile = "GuiShapeEdTextListProfile";
                      Visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      canSave = "1";
                      canSaveDynamicFields = "0";
@@ -1120,7 +1120,7 @@
                   minExtent = "8 2";
                   horizSizing = "right";
                   vertSizing = "bottom";
-                  profile = "GuiTextProfile";
+                  profile = "ToolsGuiTextProfile";
                };
                new GuiScrollCtrl() {
                   willFirstRespond = "1";
@@ -1144,7 +1144,7 @@
                   VertSizing = "height";
                   Profile = "GuiShapeEdScrollProfile";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   isContainer = "1";
                   canSave = "1";
@@ -1161,7 +1161,7 @@
                      Profile = "GuiShapeEdTextListProfile";
                      Visible = "1";
                      Command = "ShapeEdSequenceList.setSelectedById( $ThisControl.getSelectedId() );";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      internalName = "seqList";
                      canSave = "1";
@@ -1178,17 +1178,17 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   VertSizing = "bottom";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   Visible = "1";
                   Command = "ShapeEdThreadWindow.onRemoveThread();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Delete the selected thread";
                   isContainer = "0";
                   canSave = "1";
                   canSaveDynamicFields = "0";
                };
                new GuiBitmapButtonCtrl() {
-                  bitmap = "core/art/gui/images/new";
+                  bitmap = "tools/gui/images/new";
                   groupNum = "-1";
                   buttonType = "PushButton";
                   useMouseEvents = "0";
@@ -1197,10 +1197,10 @@
                   MinExtent = "8 2";
                   HorizSizing = "left";
                   VertSizing = "bottom";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   Visible = "1";
                   Command = "ShapeEdThreadWindow.onAddThread();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   ToolTip = "Add a new thread";
                   isContainer = "0";
                   canSave = "1";
@@ -1217,9 +1217,9 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "top";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Drag the slider to scrub through the sequence keyframes";
                hovertime = "1000";
                isContainer = "0";
@@ -1236,10 +1236,10 @@
                MinExtent = "8 2";
                HorizSizing = "right";
                vertSizing = "top";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                Visible = "1";
                Command = "ShapeEdAnimWindow-->playBkwdBtn.performClick();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Play backwards";
                hovertime = "1000";
                isContainer = "0";
@@ -1257,10 +1257,10 @@
                MinExtent = "8 2";
                HorizSizing = "left";
                vertSizing = "top";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                Visible = "1";
                Command = "ShapeEdAnimWindow-->pauseBtn.performClick();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Toggle Pause (SPACE)";
                hovertime = "1000";
                isContainer = "0";
@@ -1278,10 +1278,10 @@
                MinExtent = "8 2";
                HorizSizing = "left";
                vertSizing = "top";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                Visible = "1";
                Command = "ShapeEdAnimWindow-->playFwdBtn.performClick();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Play forwards";
                hovertime = "1000";
                isContainer = "0";
@@ -1300,9 +1300,9 @@
                MinExtent = "8 2";
                HorizSizing = "right";
                VertSizing = "top";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Controls whether the thread will smoothly transition when a new sequence is selected";
                hovertime = "1000";
                isContainer = "0";
@@ -1316,9 +1316,9 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "top";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Number of seconds over which to transition to the new sequence";
                hovertime = "1000";
                internalName = "transitionTime";
@@ -1332,7 +1332,7 @@
                minExtent = "8 2";
                horizSizing = "left";
                vertSizing = "top";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiTextCtrl() {
                text = "Transition to";
@@ -1341,14 +1341,14 @@
                minExtent = "8 2";
                horizSizing = "right";
                vertSizing = "top";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiPopUpMenuCtrl() {
                position = "68 185";
                extent = "133 18";
                HorizSizing = "width";
                vertSizing = "top";
-               Profile = "GuiPopUpMenuProfile";
+               Profile = "ToolsGuiPopUpMenuProfile";
                ToolTip = "Select the start position of the new sequence";
                internalName = "transitionTo";
             };
@@ -1359,7 +1359,7 @@
                minExtent = "8 2";
                horizSizing = "right";
                vertSizing = "top";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiPopUpMenuCtrl() {
                position = "68 206";
@@ -1367,7 +1367,7 @@
                minExtent = "8 2";
                horizSizing = "width";
                vertSizing = "top";
-               Profile = "GuiPopUpMenuProfile";
+               Profile = "ToolsGuiPopUpMenuProfile";
                ToolTip = "Select the initial play state of the new sequence";
                internalName = "transitionTarget";
             };
@@ -1387,9 +1387,9 @@
          MinExtent = "0 -500";
          HorizSizing = "width";
          VertSizing = "height";
-         Profile = "GuiTabPageProfile";
+         Profile = "ToolsGuiTabPageProfile";
          Visible = "0";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          isContainer = "1";
          canSave = "1";
@@ -1408,9 +1408,9 @@
             MinExtent = "8 8";
             HorizSizing = "width";
             VertSizing = "bottom";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             isContainer = "1";
             canSave = "1";
@@ -1428,7 +1428,7 @@
                extent = "108 18";
                horizSizing = "right";
                vertSizing = "bottom";
-               Profile = "GuiPopUpMenuProfile";
+               Profile = "ToolsGuiPopUpMenuProfile";
                Command = "ShapeEdColWindow.editCollision();";
                ToolTip = "Select the method used to auto-generate the collision geometry";
                internalName = "colType";
@@ -1445,7 +1445,7 @@
                extent = "108 18";
                horizSizing = "right";
                vertSizing = "bottom";
-               Profile = "GuiPopUpMenuProfile";
+               Profile = "ToolsGuiPopUpMenuProfile";
                Command = "ShapeEdColWindow.editCollision();";
                ToolTip = "Select the object to fit collision geometry to";
                internalName = "colTarget";
@@ -1456,7 +1456,7 @@
                extent = "53 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "0 8";
@@ -1468,10 +1468,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullDepthText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Maximum hull split depth";
                hovertime = "1000";
                isContainer = "0";
@@ -1483,7 +1483,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullDepthText";
             };
             new GuiTextCtrl() {
@@ -1492,7 +1492,7 @@
                extent = "53 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "0 60";
@@ -1504,10 +1504,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullMergeText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Hull volume merge threshold";
                hovertime = "1000";
                isContainer = "0";
@@ -1519,7 +1519,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullMergeText";
             };
             new GuiTextCtrl() {
@@ -1528,7 +1528,7 @@
                extent = "59 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "0 60";
@@ -1540,10 +1540,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullConcaveText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Hull concavity threshold";
                hovertime = "1000";
                isContainer = "0";
@@ -1555,7 +1555,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullConcaveText";
             };
             new GuiTextCtrl() {
@@ -1564,7 +1564,7 @@
                extent = "53 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "8 64";
@@ -1576,10 +1576,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullMaxVertsText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Maximum number of verts in a convex hull";
                hovertime = "1000";
                isContainer = "0";
@@ -1591,7 +1591,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullMaxVertsText";
             };
             new GuiTextCtrl() {
@@ -1600,7 +1600,7 @@
                extent = "53 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "0 100";
@@ -1612,10 +1612,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullMaxBoxErrorText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Maximum box volume error %";
                hovertime = "1000";
                isContainer = "0";
@@ -1627,7 +1627,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullMaxBoxErrorText";
             };
             new GuiTextCtrl() {
@@ -1636,7 +1636,7 @@
                extent = "53 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "0 100";
@@ -1648,10 +1648,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullMaxSphereErrorText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Maximum sphere volume error %";
                hovertime = "1000";
                isContainer = "0";
@@ -1663,7 +1663,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullMaxSphereErrorText";
             };
             new GuiTextCtrl() {
@@ -1672,7 +1672,7 @@
                extent = "53 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
             };
             new GuiSliderCtrl() {
                range = "0 100";
@@ -1684,10 +1684,10 @@
                MinExtent = "8 2";
                HorizSizing = "width";
                VertSizing = "bottom";
-               Profile = "GuiSliderProfile";
+               Profile = "ToolsGuiSliderProfile";
                Visible = "1";
                AltCommand = "ShapeEdColWindow-->hullMaxCapsuleErrorText.setText( mFloor($ThisControl.getValue()) );";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Maximum capsule volume error %";
                hovertime = "1000";
                isContainer = "0";
@@ -1699,7 +1699,7 @@
                extent = "18 16";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiTextProfile";
+               profile = "ToolsGuiTextProfile";
                internalName = "hullMaxCapsuleErrorText";
             };
             new GuiButtonCtrl() {
@@ -1712,10 +1712,10 @@
                MinExtent = "8 2";
                HorizSizing = "right";
                vertSizing = "bottom";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                Visible = "1";
                Command = "ShapeEdColWindow.editCollision();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Update the convex hull(s)";
                hovertime = "1000";
                isContainer = "0";
@@ -1732,10 +1732,10 @@
                MinExtent = "8 2";
                HorizSizing = "right";
                vertSizing = "bottom";
-               Profile = "GuiButtonProfile";
+               Profile = "ToolsGuiButtonProfile";
                Visible = "1";
                Command = "ShapeEdColWindow.update_onCollisionChanged();";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Revert changes to settings";
                hovertime = "1000";
                isContainer = "0";
@@ -1743,12 +1743,12 @@
                canSaveDynamicFields = "0";
             };
             new GuiBitmapCtrl() {
-               bitmap = "core/art/gui/images/inactive-overlay";
+               bitmap = "tools/gui/images/inactive-overlay";
                position = "0 47";
                extent = "199 175";
                horizSizing = "right";
                vertSizing = "bottom";
-               profile = "GuiDefaultProfile";
+               profile = "ToolsGuiDefaultProfile";
                visible = "0";
                canSave = "1";
                canSaveDynamicFields = "0";
@@ -1762,7 +1762,7 @@
 
 new GuiControl(ShapeEdWaitGui,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -1770,7 +1770,7 @@ new GuiControl(ShapeEdWaitGui,EditorGuiGroup) {
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "1";
 
@@ -1784,7 +1784,7 @@ new GuiControl(ShapeEdWaitGui,EditorGuiGroup) {
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "Dialog";
       canSaveDynamicFields = "0";
@@ -1799,7 +1799,7 @@ new GuiControl(ShapeEdWaitGui,EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextBoldCenterProfile";
+         Profile = "ToolsGuiTextBoldCenterProfile";
          HorizSizing = "width";
          VertSizing = "center";
          position = "5 19";
@@ -1807,7 +1807,7 @@ new GuiControl(ShapeEdWaitGui,EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
          internalName = "message";

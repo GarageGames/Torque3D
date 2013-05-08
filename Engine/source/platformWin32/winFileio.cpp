@@ -29,6 +29,7 @@
 #include "core/strings/unicode.h"
 #include "util/tempAlloc.h"
 #include "core/util/safeDelete.h"
+#include "core/volume.h"
 
 // Microsoft VC++ has this POSIX header in the wrong directory
 #if defined(TORQUE_COMPILER_VISUALC)
@@ -946,7 +947,11 @@ bool Platform::isFile(const char *pFilePath)
    FindClose(handle);
 
    if(handle == INVALID_HANDLE_VALUE)
-      return false;
+   {
+    
+      // Since file does not exist on disk see if it exists in a zip file loaded
+      return Torque::FS::IsFile(pFilePath);
+   }
 
    // if the file is a Directory, Offline, System or Temporary then FALSE
    if (findData.dwFileAttributes &

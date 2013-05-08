@@ -26,6 +26,7 @@
 #include "cloudLayer.h"
 
 #include "gfx/gfxTransformSaver.h"
+#include "gfx/gfxTextureManager.h"
 #include "core/stream/fileStream.h"
 #include "core/stream/bitStream.h"
 #include "scene/sceneRenderState.h"
@@ -387,7 +388,7 @@ void CloudLayer::_initTexture()
       mTexture.set( mTextureName, &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
 
    if ( mTexture.isNull() )
-      mTexture.set( "core/art/warnmat", &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
+      mTexture.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
 }
 
 void CloudLayer::_initBuffers()

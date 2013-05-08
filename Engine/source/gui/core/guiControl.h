@@ -38,9 +38,6 @@
 #ifndef _GUITYPES_H_ 
 #include "gui/core/guiTypes.h"
 #endif
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
 #ifndef _UTIL_DELEGATE_H_
 #include "core/util/delegate.h"
 #endif

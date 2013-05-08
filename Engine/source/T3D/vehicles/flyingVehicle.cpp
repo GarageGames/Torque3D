@@ -43,10 +43,10 @@
 
 //----------------------------------------------------------------------------
 
-const static U32 sCollisionMoveMask = ( TerrainObjectType        | InteriorObjectType   |
-                                        WaterObjectType          | PlayerObjectType     |
-                                        StaticShapeObjectType    | VehicleObjectType    |
-                                        VehicleBlockerObjectType );
+const static U32 sCollisionMoveMask = ( TerrainObjectType | WaterObjectType          | 
+                                        PlayerObjectType  | StaticShapeObjectType    | 
+                                        VehicleObjectType | VehicleBlockerObjectType );
+                                        
 static U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
 static U32 sClientCollisionMask = sCollisionMoveMask;
 

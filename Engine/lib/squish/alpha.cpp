@@ -24,7 +24,8 @@
    -------------------------------------------------------------------------- */
    
 #include "alpha.h"
-#include "squishMath.h"
+#include <algorithm>
+#include <limits.h> 
 
 namespace squish {
 
@@ -92,9 +93,9 @@ void DecompressAlphaDxt3( u8* rgba, void const* block )
 static void FixRange( int& min, int& max, int steps )
 {
 	if( max - min < steps )
-		max = SquishMath::min( min + steps, 255 );
+		max = std::min( min + steps, 255 );
 	if( max - min < steps )
-		min = SquishMath::max( 0, max - steps );
+		min = std::max( 0, max - steps );
 }
 
 static int FitCodes( u8 const* rgba, int mask, u8 const* codes, u8* indices )

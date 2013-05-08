@@ -39,11 +39,14 @@ protected:
 
    Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
 
+   Var* _getInMacroCoord(Vector<ShaderComponent*> &componentList );
+
    Var* _getNormalMapTex();
 
    static Var* _getUniformVar( const char *name, const char *type, ConstantSortPosition csp );
 
    Var* _getDetailIdStrengthParallax();
+   Var* _getMacroIdStrengthParallax();
 
 };
 
@@ -84,6 +87,29 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Detail Texture"; }
+};
+
+
+class TerrainMacroMapFeatHLSL : public TerrainFeatHLSL
+{
+protected:
+
+   ShaderIncludeDependency mTorqueDep;
+   ShaderIncludeDependency mTerrainDep;
+
+public:
+
+   TerrainMacroMapFeatHLSL();
+
+   virtual void processVert(  Vector<ShaderComponent*> &componentList,
+                              const MaterialFeatureData &fd );
+
+   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+                              const MaterialFeatureData &fd );
+
+   virtual Resources getResources( const MaterialFeatureData &fd );
+
+   virtual String getName() { return "Terrain Macro Texture"; }
 };
 
 

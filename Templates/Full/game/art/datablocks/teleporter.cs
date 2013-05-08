@@ -41,12 +41,45 @@ datablock SFXProfile(TeleportSound)
    preload = true;  
 };
 
+datablock ParticleData(TeleporterFlash : DefaultParticle)
+{
+   dragCoefficient = "5";
+   inheritedVelFactor = "0";
+   constantAcceleration = "0";
+   lifetimeMS = "500";
+   spinRandomMin = "-90";
+   spinRandomMax = "90";
+   textureName = "art/particles/flare.png";
+   animTexName = "art/particles/flare.png";
+   colors[0] = "0.678431 0.686275 0.913726 0.207";
+   colors[1] = "0 0.543307 1 0.759";
+   colors[2] = "0.0472441 0.181102 0.92126 0.838";
+   colors[3] = "0.141732 0.0393701 0.944882 0";
+   sizes[0] = "0";
+   sizes[1] = "0";
+   sizes[2] = "4";
+   sizes[3] = "0.1";
+   times[1] = "0.166667";
+   times[2] = "0.666667";
+   lifetimeVarianceMS = "0";
+   gravityCoefficient = "-9";
+};
+
+datablock ParticleEmitterData(TeleportFlash_Emitter : DefaultEmitter)
+{
+   ejectionVelocity = "0.1";
+   particles = "TeleporterFlash";
+   thetaMax = "180";
+   softnessDistance = "1";
+   ejectionOffset = "0.417";
+};
+
 // Particles to use for the emitter at the teleporter
 datablock ParticleData(TeleporterParticles)
 {
    lifetimeMS = "750";
    lifetimeVarianceMS = "100";
-   textureName = "art/shapes/particles/Streak.png";
+   textureName = "art/particles/Streak.png";
    useInvAlpha = "0";
    gravityCoefficient = "-1";
    spinSpeed = "0";
@@ -61,7 +94,7 @@ datablock ParticleData(TeleporterParticles)
    times[0]      = 0.0;
    times[1]      = "0.415686";
    times[2]      = "0.74902";
-   animTexName = "art/shapes/particles/Streak.png";
+   animTexName = "art/particles/Streak.png";
    inheritedVelFactor = "0.0998043";
    constantAcceleration = "-2";
    colors[3] = "0.694118 0.843137 0.945098 0";

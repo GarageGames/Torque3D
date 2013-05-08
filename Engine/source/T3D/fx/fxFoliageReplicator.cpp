@@ -397,7 +397,6 @@ void fxFoliageReplicator::initPersistFields()
 
    addGroup( "Restrictions" );	// MM: Added Group Header.
       addField( "AllowOnTerrain",      TypeBool,      Offset( mFieldData.mAllowOnTerrain,       fxFoliageReplicator ), "Foliage will be placed on terrain when set." );
-      addField( "AllowOnInteriors",    TypeBool,      Offset( mFieldData.mAllowOnInteriors,     fxFoliageReplicator ), "Foliage will be placed on InteriorInstances when set." );
       addField( "AllowOnStatics",      TypeBool,      Offset( mFieldData.mAllowStatics,         fxFoliageReplicator ), "Foliage will be placed on Static shapes when set." );
       addField( "AllowOnWater",        TypeBool,      Offset( mFieldData.mAllowOnWater,         fxFoliageReplicator ), "Foliage will be placed on/under water when set." );
       addField( "AllowWaterSurface",   TypeBool,      Offset( mFieldData.mAllowWaterSurface,    fxFoliageReplicator ), "Foliage will be placed on water when set. Requires AllowOnWater." );
@@ -435,7 +434,6 @@ void fxFoliageReplicator::CreateFoliage(void)
 
    // Check that we can position somewhere!
    if (!(	mFieldData.mAllowOnTerrain ||
-      mFieldData.mAllowOnInteriors ||
       mFieldData.mAllowStatics ||
       mFieldData.mAllowOnWater))
    {
@@ -633,7 +631,6 @@ void fxFoliageReplicator::CreateFoliage(void)
 
             // Check Illegal Placements, fail if we hit a disallowed type.
             if (((CollisionType & TerrainObjectType) && !mFieldData.mAllowOnTerrain)	||
-               ((CollisionType & InteriorObjectType) && !mFieldData.mAllowOnInteriors)	||
                ((CollisionType & StaticShapeObjectType ) && !mFieldData.mAllowStatics)	||
                ((CollisionType & WaterObjectType) && !mFieldData.mAllowOnWater) ) continue;
 
@@ -1700,7 +1697,6 @@ U32 fxFoliageReplicator::packUpdate(NetConnection * con, U32 mask, BitStream * s
       stream->write(mFieldData.mLightTime);							// Foliage Light Time.
 
       stream->writeFlag(mFieldData.mAllowOnTerrain);					// Allow on Terrain.
-      stream->writeFlag(mFieldData.mAllowOnInteriors);				// Allow on Interiors.
       stream->writeFlag(mFieldData.mAllowStatics);					// Allow on Statics.
       stream->writeFlag(mFieldData.mAllowOnWater);					// Allow on Water.
       stream->writeFlag(mFieldData.mAllowWaterSurface);				// Allow on Water Surface.
@@ -1777,7 +1773,6 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
       stream->read(&mFieldData.mLightTime);							// Foliage Light Time.
 
       mFieldData.mAllowOnTerrain = stream->readFlag();				// Allow on Terrain.
-      mFieldData.mAllowOnInteriors = stream->readFlag();				// Allow on Interiors.
       mFieldData.mAllowStatics = stream->readFlag();					// Allow on Statics.
       mFieldData.mAllowOnWater = stream->readFlag();					// Allow on Water.
       mFieldData.mAllowWaterSurface = stream->readFlag();				// Allow on Water Surface.

@@ -169,31 +169,6 @@ function EWCreatorWindow::setNewObjectGroup( %this, %group )
    EditorTree.markItem( %itemId );
 }
 
-function EWCreatorWindow::createInterior( %this, %file )
-{
-   if ( !$missionRunning )
-      return;
-      
-   if(isFunction("getObjectLimit") && MissionGroup.getFullCount() >= getObjectLimit())
-   {
-      MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "Canvas.showPurchaseScreen(\"objectlimit\");" );
-      return;
-   }
-
-   if( !isObject(%this.objectGroup) )
-      %this.setNewObjectGroup( MissionGroup );
-
-   %objId = new InteriorInstance()
-   {
-      position = %this.getCreateObjectPosition();
-      rotation = "0 0 0";
-      interiorFile = %file;
-      parentGroup = %this.objectGroup;
-   };
-
-   %this.onObjectCreated( %objId );
-}
-
 function EWCreatorWindow::createStatic( %this, %file )
 {
    if ( !$missionRunning )
@@ -381,10 +356,7 @@ function EWCreatorWindow::navigate( %this, %address )
          // Is this file in the current folder?        
          if ( stricmp( %pathFolders, %address ) == 0 )
          {
-            if ( fileExt( %fullPath ) $= ".dif" )
-               %this.addInteriorIcon( %fullPath );
-            else
-               %this.addStaticIcon( %fullPath );
+            %this.addStaticIcon( %fullPath );
          }
          // Then is this file in a subfolder we need to add
          // a folder icon for?
@@ -664,7 +636,7 @@ function EWCreatorWindow::addFolderIcon( %this, %text )
    %ctrl = %this.createIcon();
       
    %ctrl.altCommand = "EWCreatorWindow.navigateDown(\"" @ %text @ "\");";
-   %ctrl.iconBitmap = "core/art/gui/images/folder.png";   
+   %ctrl.iconBitmap = "tools/gui/images/folder.png";   
    %ctrl.text = %text;
    %ctrl.tooltip = %text;     
    %ctrl.class = "CreatorFolderIconBtn";
@@ -744,30 +716,6 @@ function EWCreatorWindow::addStaticIcon( %this, %fullPath )
    %ctrl.iconBitmap = ( ( %ext $= ".dts" ) ? EditorIconRegistry::findIconByClassName( "TSStatic" ) : "tools/gui/images/iconCollada" );
    %ctrl.text = %file;
    %ctrl.class = "CreatorStaticIconBtn";
-   %ctrl.tooltip = %tip;
-   
-   %ctrl.buttonType = "radioButton";
-   %ctrl.groupNum = "-1";   
-   
-   %this.contentCtrl.addGuiControl( %ctrl );   
-}
-
-function EWCreatorWindow::addInteriorIcon( %this, %fullPath )
-{   
-   %ctrl = EWCreatorWindow.createIcon();
-   
-   %file = fileBase( %fullPath );
-   %fileLong = %file @ fileExt( %fullPath );
-   
-   %tip = %fileLong NL
-          "Size: " @ fileSize( %fullPath ) / 1000.0 SPC "KB" NL
-          "Date Created: " @ fileCreatedTime( %fullPath ) NL
-          "Last Modified: " @ fileModifiedTime( %fullPath );
-   
-   %ctrl.altCommand = "EWCreatorWindow.createInterior( \"" @ %fullPath @ "\" );";   
-   %ctrl.iconBitmap = EditorIconRegistry::findIconByClassName( "InteriorInstance" );
-   %ctrl.text = %file;
-   %ctrl.class = "CreatorInteriorIconBtn";
    %ctrl.tooltip = %tip;
    
    %ctrl.buttonType = "radioButton";

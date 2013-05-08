@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "sim/actionMap.h"
-#include "platform/event.h"
 #include "console/console.h"
 #include "platform/platform.h"
 #include "platform/platformInput.h"
@@ -29,6 +28,8 @@
 #include "core/stream/fileStream.h"
 #include "math/mMathFn.h"
 #include "console/engineAPI.h"
+#include "math/mQuat.h"
+#include "math/mAngAxis.h"
 
 #define CONST_E 2.7182818284590452353602874f
 
@@ -175,20 +176,12 @@ static inline bool dIsDecentChar(U8 c)
    return ((U8(0xa0) <= c) || (( U8(0x21) <= c) && (c <= U8(0x7e))) || ((U8(0x91) <= c) && (c <= U8(0x92))));
 }
 
-struct CodeMapping
-{
-   const char* pDescription;
-   InputEventType       type;
-   InputObjectInstances code;
-};
-
 struct AsciiMapping
 {
    const char* pDescription;
    U16         asciiCode;
 };
 
-extern CodeMapping gVirtualMap[];
 extern AsciiMapping gAsciiMap[];
 
 //------------------------------------------------------------------------------
@@ -521,14 +514,21 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
          }
       }
       // Didn't find an ascii match. Check the virtual map table
-      for (U32 j = 0; gVirtualMap[j].code != 0xFFFFFFFF; j++)
+      //for (U32 j = 0; gVirtualMap[j].code != 0xFFFFFFFF; j++)
+      //{
+      //   if (dStricmp(pObjectString, gVirtualMap[j].pDescription) == 0)
+      //   {
+      //      pDescriptor->eventType = gVirtualMap[j].type;
+      //      pDescriptor->eventCode = gVirtualMap[j].code;
+      //      return true;
+      //   }
+      //}
+      InputEventManager::VirtualMapData* data = INPUTMGR->findVirtualMap(pObjectString);
+      if(data)
       {
-         if (dStricmp(pObjectString, gVirtualMap[j].pDescription) == 0)
-         {
-            pDescriptor->eventType = gVirtualMap[j].type;
-            pDescriptor->eventCode = gVirtualMap[j].code;
-            return true;
-         }
+         pDescriptor->eventType = data->type;
+         pDescriptor->eventCode = data->code;
+         return true;
       }
    }
    return false;
@@ -900,7 +900,8 @@ const char* ActionMap::buildActionString( const InputEventInfo* event )
 bool ActionMap::getDeviceTypeAndInstance(const char *pDeviceName, U32 &deviceType, U32 &deviceInstance)
 {
    U32 offset = 0;
-   
+   U32 inputMgrDeviceType = 0;
+
    if (dStrnicmp(pDeviceName, "keyboard", dStrlen("keyboard")) == 0) 
    {
       deviceType      = KeyboardDeviceType;
@@ -920,6 +921,10 @@ bool ActionMap::getDeviceTypeAndInstance(const char *pDeviceName, U32 &deviceTyp
    {
       deviceType = GamepadDeviceType;
       offset     = dStrlen("gamepad");
+   }
+   else if(INPUTMGR->isRegisteredDeviceWithAttributes(pDeviceName, inputMgrDeviceType, offset))
+   {
+      deviceType = inputMgrDeviceType;
    }
    else 
    {
@@ -964,9 +969,18 @@ bool ActionMap::getDeviceName(const U32 deviceType, const U32 deviceInstance, ch
       dSprintf(buffer, 16, "gamepad%d", deviceInstance);
       break;
 
-      default:
-      Con::errorf( "ActionMap::getDeviceName: unknown device type specified, %d (inst: %d)", deviceType, deviceInstance);
-      return false;
+     default:
+      {
+         const char* name = INPUTMGR->getRegisteredDeviceName(deviceType);
+         if(!name)
+         {
+            Con::errorf( "ActionMap::getDeviceName: unknown device type specified, %d (inst: %d)", deviceType, deviceInstance);
+            return false;
+         }
+
+         dSprintf(buffer, 16, "%s%d", name, deviceInstance);
+         break;
+      }
    }
 
    return true;
@@ -1102,11 +1116,17 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
          buffer[1] = '\0';
          return true;
       }
-      for (U32 i = 0; gVirtualMap[i].code != 0xFFFFFFFF; i++) {
-         if (gVirtualMap[i].code == action) {
-            dStrcpy(buffer, gVirtualMap[i].pDescription);
-            return true;
-         }
+      //for (U32 i = 0; gVirtualMap[i].code != 0xFFFFFFFF; i++) {
+      //   if (gVirtualMap[i].code == action) {
+      //      dStrcpy(buffer, gVirtualMap[i].pDescription);
+      //      return true;
+      //   }
+      //}
+      const char* desc = INPUTMGR->findVirtualMapDescFromCode(action);
+      if(desc)
+      {
+         dStrcpy(buffer, desc);
+         return true;
       }
    }
 
@@ -1297,7 +1317,7 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
    if(Platform::checkKeyboardInputExclusion(pEvent))
       return false;
 
-   static const char *argv[2];
+   static const char *argv[5];
    if (pEvent->action == SI_MAKE) {
       const Node* pNode = findNode(pEvent->deviceType, pEvent->deviceInst,
                                    pEvent->modifier,   pEvent->objInst);
@@ -1390,9 +1410,72 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
             Con::execute(2, argv);
 
          return true;
-      } 
+      }
+      else if ( (pEvent->objType == SI_POS || pEvent->objType == SI_FLOAT || pEvent->objType == SI_ROT || pEvent->objType == SI_INT)
+                && INPUTMGR->isRegisteredDevice(pEvent->deviceType)
+              )
+      {
+         const Node* pNode = findNode(pEvent->deviceType, pEvent->deviceInst,
+                                      pEvent->modifier,   pEvent->objInst);
+
+         if( pNode == NULL )
+            return false;
+
+         // Ok, we're all set up, call the function.
+         argv[0] = pNode->consoleFunction;
+         S32 argc = 1;
+
+         if (pEvent->objType == SI_INT)
+         {
+            // Handle the integer as some sort of motion such as a
+            // single component to an absolute position
+            argv[1] = Con::getIntArg( pEvent->iValue );
+            argc += 1;
+         }
+         else if (pEvent->objType == SI_FLOAT)
+         {
+            // Handle float as some sort of motion such as a
+            // single component to an absolute position
+            argv[1] = Con::getFloatArg( pEvent->fValue );
+            argc += 1;
+         }
+         else if (pEvent->objType == SI_POS)
+         {
+            // Handle Point3F type position
+            argv[1] = Con::getFloatArg( pEvent->fValue );
+            argv[2] = Con::getFloatArg( pEvent->fValue2 );
+            argv[3] = Con::getFloatArg( pEvent->fValue3 );
+
+            argc += 3;
+         }
+         else
+         {
+            // Handle rotation (QuatF)
+            QuatF quat(pEvent->fValue, pEvent->fValue2, pEvent->fValue3, pEvent->fValue4);
+            AngAxisF aa(quat);
+            aa.axis.normalize();
+            argv[1] = Con::getFloatArg( aa.axis.x );
+            argv[2] = Con::getFloatArg( aa.axis.y );
+            argv[3] = Con::getFloatArg( aa.axis.z );
+            argv[4] = Con::getFloatArg( mRadToDeg(aa.angle) );
+
+            argc += 4;
+         }
+
+         if (pNode->object)
+         {
+            Con::execute(pNode->object, argc, argv);
+         }
+         else
+         {
+            Con::execute(argc, argv);
+         }
+
+         return true;
+      }
       else if ( pEvent->deviceType == JoystickDeviceType 
                 || pEvent->deviceType == GamepadDeviceType
+                || INPUTMGR->isRegisteredDevice(pEvent->deviceType)
               )
       {
          // Joystick events...
@@ -1448,6 +1531,49 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
    else if (pEvent->action == SI_BREAK)
    {
       return checkBreakTable(pEvent);
+   }
+   else if (pEvent->action == SI_VALUE)
+   {
+      if ( (pEvent->objType == SI_FLOAT || pEvent->objType == SI_INT)
+                && INPUTMGR->isRegisteredDevice(pEvent->deviceType)
+              )
+      {
+         const Node* pNode = findNode(pEvent->deviceType, pEvent->deviceInst,
+                                      pEvent->modifier,   pEvent->objInst);
+
+         if( pNode == NULL )
+            return false;
+
+         // Ok, we're all set up, call the function.
+         argv[0] = pNode->consoleFunction;
+         S32 argc = 1;
+
+         if (pEvent->objType == SI_INT)
+         {
+            // Handle the integer as some sort of motion such as a
+            // single component to an absolute position
+            argv[1] = Con::getIntArg( pEvent->iValue );
+            argc += 1;
+         }
+         else if (pEvent->objType == SI_FLOAT)
+         {
+            // Handle float as some sort of motion such as a
+            // single component to an absolute position
+            argv[1] = Con::getFloatArg( pEvent->fValue );
+            argc += 1;
+         }
+
+         if (pNode->object)
+         {
+            Con::execute(pNode->object, argc, argv);
+         }
+         else
+         {
+            Con::execute(argc, argv);
+         }
+
+         return true;
+      }
    }
 
    return false;
@@ -1998,223 +2124,6 @@ DefineEngineMethod( ActionMap, getDeadZone, const char*, ( const char* device, c
 }
 
 //------------------------------------------------------------------------------
-//-------------------------------------- Key code to string mapping
-//                                        TODO: Add most obvious aliases...
-//
-CodeMapping gVirtualMap[] =
-{
-   //-------------------------------------- KEYBOARD EVENTS
-   //
-   { "backspace",     SI_KEY,    KEY_BACKSPACE   },
-   { "tab",           SI_KEY,    KEY_TAB         },
-
-   { "return",        SI_KEY,    KEY_RETURN      },
-   { "enter",         SI_KEY,    KEY_RETURN      },
-
-   { "shift",         SI_KEY,    KEY_SHIFT       },
-   { "ctrl",          SI_KEY,    KEY_CONTROL     },
-   { "alt",           SI_KEY,    KEY_ALT         },
-   { "pause",         SI_KEY,    KEY_PAUSE       },
-   { "capslock",      SI_KEY,    KEY_CAPSLOCK    },
-
-   { "escape",        SI_KEY,    KEY_ESCAPE      },
-
-   { "space",         SI_KEY,    KEY_SPACE       },
-   { "pagedown",      SI_KEY,    KEY_PAGE_DOWN   },
-   { "pageup",        SI_KEY,    KEY_PAGE_UP     },
-   { "end",           SI_KEY,    KEY_END         },
-   { "home",          SI_KEY,    KEY_HOME        },
-   { "left",          SI_KEY,    KEY_LEFT        },
-   { "up",            SI_KEY,    KEY_UP          },
-   { "right",         SI_KEY,    KEY_RIGHT       },
-   { "down",          SI_KEY,    KEY_DOWN        },
-   { "print",         SI_KEY,    KEY_PRINT       },
-   { "insert",        SI_KEY,    KEY_INSERT      },
-   { "delete",        SI_KEY,    KEY_DELETE      },
-   { "help",          SI_KEY,    KEY_HELP        },
-
-   { "win_lwindow",   SI_KEY,    KEY_WIN_LWINDOW },
-   { "win_rwindow",   SI_KEY,    KEY_WIN_RWINDOW },
-   { "win_apps",      SI_KEY,    KEY_WIN_APPS    },
-
-   { "cmd",           SI_KEY,    KEY_ALT         },
-   { "opt",           SI_KEY,    KEY_MAC_OPT     },
-   { "lopt",          SI_KEY,    KEY_MAC_LOPT    },
-   { "ropt",          SI_KEY,    KEY_MAC_ROPT    },
-
-   { "numpad0",       SI_KEY,    KEY_NUMPAD0     },
-   { "numpad1",       SI_KEY,    KEY_NUMPAD1     },
-   { "numpad2",       SI_KEY,    KEY_NUMPAD2     },
-   { "numpad3",       SI_KEY,    KEY_NUMPAD3     },
-   { "numpad4",       SI_KEY,    KEY_NUMPAD4     },
-   { "numpad5",       SI_KEY,    KEY_NUMPAD5     },
-   { "numpad6",       SI_KEY,    KEY_NUMPAD6     },
-   { "numpad7",       SI_KEY,    KEY_NUMPAD7     },
-   { "numpad8",       SI_KEY,    KEY_NUMPAD8     },
-   { "numpad9",       SI_KEY,    KEY_NUMPAD9     },
-   { "numpadmult",    SI_KEY,    KEY_MULTIPLY    },
-   { "numpadadd",     SI_KEY,    KEY_ADD         },
-   { "numpadsep",     SI_KEY,    KEY_SEPARATOR   },
-   { "numpadminus",   SI_KEY,    KEY_SUBTRACT    },
-   { "numpaddecimal", SI_KEY,    KEY_DECIMAL     },
-   { "numpaddivide",  SI_KEY,    KEY_DIVIDE      },
-   { "numpadenter",   SI_KEY,    KEY_NUMPADENTER },
-
-   { "f1",            SI_KEY,    KEY_F1          },
-   { "f2",            SI_KEY,    KEY_F2          },
-   { "f3",            SI_KEY,    KEY_F3          },
-   { "f4",            SI_KEY,    KEY_F4          },
-   { "f5",            SI_KEY,    KEY_F5          },
-   { "f6",            SI_KEY,    KEY_F6          },
-   { "f7",            SI_KEY,    KEY_F7          },
-   { "f8",            SI_KEY,    KEY_F8          },
-   { "f9",            SI_KEY,    KEY_F9          },
-   { "f10",           SI_KEY,    KEY_F10         },
-   { "f11",           SI_KEY,    KEY_F11         },
-   { "f12",           SI_KEY,    KEY_F12         },
-   { "f13",           SI_KEY,    KEY_F13         },
-   { "f14",           SI_KEY,    KEY_F14         },
-   { "f15",           SI_KEY,    KEY_F15         },
-   { "f16",           SI_KEY,    KEY_F16         },
-   { "f17",           SI_KEY,    KEY_F17         },
-   { "f18",           SI_KEY,    KEY_F18         },
-   { "f19",           SI_KEY,    KEY_F19         },
-   { "f20",           SI_KEY,    KEY_F20         },
-   { "f21",           SI_KEY,    KEY_F21         },
-   { "f22",           SI_KEY,    KEY_F22         },
-   { "f23",           SI_KEY,    KEY_F23         },
-   { "f24",           SI_KEY,    KEY_F24         },
-
-   { "numlock",       SI_KEY,    KEY_NUMLOCK     },
-   { "scrolllock",    SI_KEY,    KEY_SCROLLLOCK  },
-
-   { "lshift",        SI_KEY,    KEY_LSHIFT      },
-   { "rshift",        SI_KEY,    KEY_RSHIFT      },
-   { "lcontrol",      SI_KEY,    KEY_LCONTROL    },
-   { "rcontrol",      SI_KEY,    KEY_RCONTROL    },
-   { "lalt",          SI_KEY,    KEY_LALT        },
-   { "ralt",          SI_KEY,    KEY_RALT        },
-   { "tilde",         SI_KEY,    KEY_TILDE       },
-
-   { "minus",         SI_KEY,    KEY_MINUS       },
-   { "equals",        SI_KEY,    KEY_EQUALS      },
-   { "lbracket",      SI_KEY,    KEY_LBRACKET    },
-   { "rbracket",      SI_KEY,    KEY_RBRACKET    },
-   { "backslash",     SI_KEY,    KEY_BACKSLASH   },
-   { "semicolon",     SI_KEY,    KEY_SEMICOLON   },
-   { "apostrophe",    SI_KEY,    KEY_APOSTROPHE  },
-   { "comma",         SI_KEY,    KEY_COMMA       },
-   { "period",        SI_KEY,    KEY_PERIOD      },
-   { "slash",         SI_KEY,    KEY_SLASH       },
-   { "lessthan",      SI_KEY,    KEY_OEM_102     },
-
-   //-------------------------------------- BUTTON EVENTS
-   // Joystick/Mouse buttons
-   { "button0",       SI_BUTTON, KEY_BUTTON0    },
-   { "button1",       SI_BUTTON, KEY_BUTTON1    },
-   { "button2",       SI_BUTTON, KEY_BUTTON2    },
-   { "button3",       SI_BUTTON, KEY_BUTTON3    },
-   { "button4",       SI_BUTTON, KEY_BUTTON4    },
-   { "button5",       SI_BUTTON, KEY_BUTTON5    },
-   { "button6",       SI_BUTTON, KEY_BUTTON6    },
-   { "button7",       SI_BUTTON, KEY_BUTTON7    },
-   { "button8",       SI_BUTTON, KEY_BUTTON8    },
-   { "button9",       SI_BUTTON, KEY_BUTTON9    },
-   { "button10",      SI_BUTTON, KEY_BUTTON10   },
-   { "button11",      SI_BUTTON, KEY_BUTTON11   },
-   { "button12",      SI_BUTTON, KEY_BUTTON12   },
-   { "button13",      SI_BUTTON, KEY_BUTTON13   },
-   { "button14",      SI_BUTTON, KEY_BUTTON14   },
-   { "button15",      SI_BUTTON, KEY_BUTTON15   },
-   { "button16",      SI_BUTTON, KEY_BUTTON16   },
-   { "button17",      SI_BUTTON, KEY_BUTTON17   },
-   { "button18",      SI_BUTTON, KEY_BUTTON18   },
-   { "button19",      SI_BUTTON, KEY_BUTTON19   },
-   { "button20",      SI_BUTTON, KEY_BUTTON20   },
-   { "button21",      SI_BUTTON, KEY_BUTTON21   },
-   { "button22",      SI_BUTTON, KEY_BUTTON22   },
-   { "button23",      SI_BUTTON, KEY_BUTTON23   },
-   { "button24",      SI_BUTTON, KEY_BUTTON24   },
-   { "button25",      SI_BUTTON, KEY_BUTTON25   },
-   { "button26",      SI_BUTTON, KEY_BUTTON26   },
-   { "button27",      SI_BUTTON, KEY_BUTTON27   },
-   { "button28",      SI_BUTTON, KEY_BUTTON28   },
-   { "button29",      SI_BUTTON, KEY_BUTTON29   },
-   { "button30",      SI_BUTTON, KEY_BUTTON30   },
-   { "button31",      SI_BUTTON, KEY_BUTTON31   },
-
-   //-------------------------------------- MOVE EVENTS
-   // Mouse/Joystick axes:
-   { "xaxis",         SI_AXIS,   SI_XAXIS       },
-   { "yaxis",         SI_AXIS,   SI_YAXIS       },
-   { "zaxis",         SI_AXIS,   SI_ZAXIS       },
-   { "rxaxis",        SI_AXIS,   SI_RXAXIS      },
-   { "ryaxis",        SI_AXIS,   SI_RYAXIS      },
-   { "rzaxis",        SI_AXIS,   SI_RZAXIS      },
-   { "slider",        SI_AXIS,   SI_SLIDER      },
-
-   //-------------------------------------- POV EVENTS
-   // Joystick POV:
-   { "xpov",          SI_POV,    SI_XPOV        },
-   { "ypov",          SI_POV,    SI_YPOV        },
-   { "upov",          SI_POV,    SI_UPOV        },
-   { "dpov",          SI_POV,    SI_DPOV        },
-   { "lpov",          SI_POV,    SI_LPOV        },
-   { "rpov",          SI_POV,    SI_RPOV        },
-   { "xpov2",         SI_POV,    SI_XPOV2       },
-   { "ypov2",         SI_POV,    SI_YPOV2       },
-   { "upov2",         SI_POV,    SI_UPOV2       },
-   { "dpov2",         SI_POV,    SI_DPOV2       },
-   { "lpov2",         SI_POV,    SI_LPOV2       },
-   { "rpov2",         SI_POV,    SI_RPOV2       },
-
-#if defined( TORQUE_OS_WIN32 ) || defined( TORQUE_OS_XENON )
-   //-------------------------------------- XINPUT EVENTS
-   // Controller connect / disconnect:
-   { "connect",       SI_BUTTON, XI_CONNECT     },
-   
-   // L & R Thumbsticks:
-   { "thumblx",       SI_AXIS,   XI_THUMBLX     },
-   { "thumbly",       SI_AXIS,   XI_THUMBLY     },
-   { "thumbrx",       SI_AXIS,   XI_THUMBRX     },
-   { "thumbry",       SI_AXIS,   XI_THUMBRY     },
-
-   // L & R Triggers:
-   { "triggerl",      SI_AXIS,   XI_LEFT_TRIGGER  },
-   { "triggerr",      SI_AXIS,   XI_RIGHT_TRIGGER },
-
-   // DPAD Buttons:
-   { "dpadu",         SI_BUTTON, SI_UPOV     },
-   { "dpadd",         SI_BUTTON, SI_DPOV   },
-   { "dpadl",         SI_BUTTON, SI_LPOV   },
-   { "dpadr",         SI_BUTTON, SI_RPOV  },
-
-   // START & BACK Buttons:
-   { "btn_start",     SI_BUTTON, XI_START       },
-   { "btn_back",      SI_BUTTON, XI_BACK        },
-
-   // L & R Thumbstick Buttons:
-   { "btn_lt",        SI_BUTTON, XI_LEFT_THUMB  },
-   { "btn_rt",        SI_BUTTON, XI_RIGHT_THUMB },
-
-   // L & R Shoulder Buttons:
-   { "btn_l",         SI_BUTTON, XI_LEFT_SHOULDER  },
-   { "btn_r",         SI_BUTTON, XI_RIGHT_SHOULDER },
-
-   // Primary buttons:
-   { "btn_a",         SI_BUTTON, XI_A           },
-   { "btn_b",         SI_BUTTON, XI_B           },
-   { "btn_x",         SI_BUTTON, XI_X           },
-   { "btn_y",         SI_BUTTON, XI_Y           },
-#endif
-
-   //-------------------------------------- MISCELLANEOUS EVENTS
-   //
-
-   { "anykey",        SI_KEY,      KEY_ANYKEY },
-   { "nomatch",       SI_UNKNOWN,  (InputObjectInstances)0xFFFFFFFF }
-};
-
 AsciiMapping gAsciiMap[] =
 {
    //--- KEYBOARD EVENTS

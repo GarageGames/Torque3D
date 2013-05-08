@@ -65,6 +65,15 @@ public:
    /// Set up some global script interface stuff.
    static void init();
 
+   /// Provide the path to the texture to use when the requested one is missing
+   static const String& getMissingTexturePath() { return smMissingTexturePath; }
+
+   /// Provide the path to the texture to use when the requested one is unavailable.
+   static const String& getUnavailableTexturePath() { return smUnavailableTexturePath; }
+
+   /// Provide the path to the texture used to warn the developer
+   static const String& getWarningTexturePath() { return smWarningTexturePath; }
+
    /// Update width and height based on available resources.
    ///
    /// We provide a simple interface for managing texture memory usage. Specifically,
@@ -176,6 +185,16 @@ protected:
    /// @see GFXTextureProfile::PreserveSize
    /// 
    static S32 smTextureReductionLevel;
+
+   /// File path to the missing texture
+   static String smMissingTexturePath;
+
+   /// File path to the unavailable texture.  Often used by GUI controls
+   /// when the requested image is not available.
+   static String smUnavailableTexturePath;
+
+   /// File path to the warning texture
+   static String smWarningTexturePath;
 
    GFXTextureObject *mListHead;
    GFXTextureObject *mListTail;

@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiModelessDialogProfile";
+   Profile = "ToolsGuiModelessDialogProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -12,14 +12,14 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(ETransformSelection) {
       internalName = "TransformSelectionWindow";
       Enabled = "1";
       isContainer = "1";
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       resizeWidth = "1";
@@ -42,7 +42,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "width";
          VertSizing = "height";
          Position = "4 12";
@@ -51,7 +51,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Docking = "Client";
          Margin = "5 5 5 4";
@@ -76,7 +76,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             Position = "0 0";
@@ -85,12 +85,12 @@
             canSave = "1";
             isDecoy = "0";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             
             new GuiControl() {
                Enabled = "1";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                Position = "0 0";
@@ -102,10 +102,10 @@
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "DoPosition";
                   Enabled = "1";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   position = "1 0";
                   Extent = "190 18";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Apply changes to position";
                   text = "Position";
@@ -118,7 +118,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   HorizSizing = "left";
                   VertSizing = "bottom";
                   Position = "100 0";
@@ -127,7 +127,7 @@
                   canSave = "1";
                   Visible = "1";
                   Command = "ETransformSelection.getAbsPosition();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Get absolute position for selected objects";
                   text = "Get";
@@ -140,7 +140,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "20 22";
@@ -162,7 +162,7 @@
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "PosX";
-                  profile="GuiTextEditProfileNumbersOnly";
+                  profile="ToolsGuiNumericTextEditProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "40 22";
@@ -176,7 +176,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "20 44";
@@ -198,7 +198,7 @@
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "PosY";
-                  profile="GuiTextEditProfileNumbersOnly";
+                  profile="ToolsGuiNumericTextEditProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "40 44";
@@ -212,7 +212,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "20 66";
@@ -234,7 +234,7 @@
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "PosZ";
-                  profile="GuiTextEditProfileNumbersOnly";
+                  profile="ToolsGuiNumericTextEditProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "40 66";
@@ -248,10 +248,10 @@
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "PosRelative";
                   Enabled = "1";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   position = "40 88";
                   Extent = "120 18";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Add values to current position (checked) or set absolute position (unchecked)";
                   text = "Relative";
@@ -261,16 +261,16 @@
             
             new GuiBitmapCtrl() {
                Enabled = "1";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                position = "0 0";
                Extent = "100 2";
                MinExtent = "1 1";
-               bitmap = "core/art/gui/images/separator-v.png";
+               bitmap = "tools/gui/images/separator-v.png";
             };
 
             new GuiControl() {
                Enabled = "1";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "width";
                VertSizing = "bottom";
                Position = "0 0";
@@ -282,10 +282,10 @@
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "DoRotation";
                   Enabled = "1";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   position = "1 0";
                   Extent = "190 18";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Apply changes to rotation";
                   text = "Rotation";
@@ -298,7 +298,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   HorizSizing = "left";
                   VertSizing = "bottom";
                   Position = "100 0";
@@ -307,7 +307,7 @@
                   canSave = "1";
                   Visible = "1";
                   Command = "ETransformSelection.getAbsRotation();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Get absolute rotation for selected objects";
                   text = "Get";
@@ -320,7 +320,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "20 22";
@@ -342,7 +342,7 @@
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "Heading";
-                  profile="GuiTextEditProfileNumbersOnly";
+                  profile="ToolsGuiNumericTextEditProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "40 22";
@@ -356,7 +356,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "20 44";
@@ -378,7 +378,7 @@
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "Pitch";
-                  profile="GuiTextEditProfileNumbersOnly";
+                  profile="ToolsGuiNumericTextEditProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "40 44";
@@ -392,7 +392,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiDefaultProfile";
+                  Profile = "ToolsGuiDefaultProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "20 66";
@@ -414,7 +414,7 @@
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "Bank";
-                  profile="GuiTextEditProfileNumbersOnly";
+                  profile="ToolsGuiNumericTextEditProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   position = "40 66";
@@ -428,10 +428,10 @@
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "RotRelative";
                   Enabled = "1";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   position = "40 88";
                   Extent = "120 18";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Add values to current rotation (checked) or set absolute rotation (unchecked)";
                   text = "Relative";
@@ -442,10 +442,10 @@
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "RotLocal";
                   Enabled = "1";
-                  Profile = "GuiCheckBoxProfile";
+                  Profile = "ToolsGuiCheckBoxProfile";
                   position = "40 110";
                   Extent = "120 18";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   tooltip = "Use object's local origin to rotate from";
                   text = "Local Center";
@@ -455,18 +455,18 @@
             
             new GuiBitmapCtrl() {
                Enabled = "1";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                position = "0 0";
                Extent = "100 2";
                MinExtent = "1 1";
-               bitmap = "core/art/gui/images/separator-v.png";
+               bitmap = "tools/gui/images/separator-v.png";
             };
 
             new GuiTabBookCtrl() {
                internalName = "ScaleTabBook";
                canSaveDynamicFields = "0";
                isContainer = "1";
-               Profile = "GuiTabBookProfile";
+               Profile = "ToolsGuiTabBookProfile";
                HorizSizing = "width";
                VertSizing = "bottom";
                position = "0 0";
@@ -489,7 +489,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiTabPageProfile";
+                  Profile = "ToolsGuiTabPageProfile";
                   HorizSizing = "width";
                   VertSizing = "height";
                   position = "0 19";
@@ -511,7 +511,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "0";
-                     Profile = "GuiTabBorderProfile";
+                     Profile = "ToolsGuiTabBorderProfile";
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      position = "0 0";
@@ -524,7 +524,7 @@
                   
                   new GuiControl() {
                      Enabled = "1";
-                     Profile = "GuiDefaultProfile";
+                     Profile = "ToolsGuiDefaultProfile";
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      Position = "0 0";
@@ -536,10 +536,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "DoScale";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "2 4";
                         Extent = "100 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Apply changes to scale";
                         text = "Scale";
@@ -552,7 +552,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiButtonProfile";
+                        Profile = "ToolsGuiButtonProfile";
                         HorizSizing = "left";
                         VertSizing = "bottom";
                         Position = "100 4";
@@ -561,7 +561,7 @@
                         canSave = "1";
                         Visible = "1";
                         Command = "ETransformSelection.getAbsScale();";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Get absolute scale for selected objects";
                         text = "Get";
@@ -574,7 +574,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "20 26";
@@ -596,7 +596,7 @@
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "ScaleX";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "40 26";
@@ -610,7 +610,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "20 48";
@@ -632,7 +632,7 @@
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "ScaleY";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "40 48";
@@ -646,7 +646,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "20 70";
@@ -668,7 +668,7 @@
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "ScaleZ";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "40 70";
@@ -682,10 +682,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "ScaleRelative";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "40 92";
                         Extent = "120 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Add values to current scale (checked) or set absolute scale (unchecked)";
                         text = "Relative";
@@ -696,10 +696,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "ScaleLocal";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "40 114";
                         Extent = "120 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Use object's local origin to scale from";
                         text = "Local Center";
@@ -710,10 +710,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "ScaleProportional";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "40 136";
                         Extent = "120 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Scale equally in all directions";
                         text = "Constrain Proportions";
@@ -726,7 +726,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiTabPageProfile";
+                  Profile = "ToolsGuiTabPageProfile";
                   HorizSizing = "width";
                   VertSizing = "height";
                   position = "0 19";
@@ -748,7 +748,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "0";
-                     Profile = "GuiTabBorderProfile";
+                     Profile = "ToolsGuiTabBorderProfile";
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      position = "0 0";
@@ -761,7 +761,7 @@
                   
                   new GuiControl() {
                      Enabled = "1";
-                     Profile = "GuiDefaultProfile";
+                     Profile = "ToolsGuiDefaultProfile";
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      Position = "0 0";
@@ -773,10 +773,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "DoSize";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "2 4";
                         Extent = "100 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Apply changes to size";
                         text = "Size";
@@ -789,7 +789,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiButtonProfile";
+                        Profile = "ToolsGuiButtonProfile";
                         HorizSizing = "left";
                         VertSizing = "bottom";
                         Position = "100 4";
@@ -798,7 +798,7 @@
                         canSave = "1";
                         Visible = "1";
                         Command = "ETransformSelection.getAbsSize();";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Get absolute size for selected objects";
                         text = "Get";
@@ -811,7 +811,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "20 26";
@@ -833,7 +833,7 @@
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "SizeX";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "40 26";
@@ -847,7 +847,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "20 48";
@@ -869,7 +869,7 @@
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "SizeY";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "40 48";
@@ -883,7 +883,7 @@
                         canSaveDynamicFields = "0";
                         Enabled = "1";
                         isContainer = "0";
-                        Profile = "GuiDefaultProfile";
+                        Profile = "ToolsGuiDefaultProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
                         position = "20 70";
@@ -905,7 +905,7 @@
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "SizeZ";
-                        profile="GuiTextEditProfileNumbersOnly";
+                        profile="ToolsGuiNumericTextEditProfile";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         position = "40 70";
@@ -919,10 +919,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "SizeRelative";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "40 92";
                         Extent = "120 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Add values to current size (checked) or set absolute size (unchecked)";
                         text = "Relative";
@@ -933,10 +933,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "SizeLocal";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "40 114";
                         Extent = "120 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Use object's local origin to size from";
                         text = "Local Center";
@@ -947,10 +947,10 @@
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "SizeProportional";
                         Enabled = "1";
-                        Profile = "GuiCheckBoxProfile";
+                        Profile = "ToolsGuiCheckBoxProfile";
                         position = "40 136";
                         Extent = "120 18";
-                        tooltipprofile = "GuiToolTipProfile";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         tooltip = "Size equally in all directions";
                         text = "Constrain Proportions";
@@ -981,7 +981,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "0 0";
@@ -990,7 +990,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ETransformSelection.apply();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             text = "Apply";
             groupNum = "-1";
@@ -1004,7 +1004,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
             Position = "140 0";
@@ -1013,7 +1013,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ETransformSelection.hideDialog();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             text = "Close";
             groupNum = "-1";

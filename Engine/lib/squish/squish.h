@@ -215,7 +215,6 @@ int GetStorageRequirements( int width, int height, int flags );
 	squish::GetStorageRequirements.
 */
 void CompressImage( u8 const* rgba, int width, int height, void* blocks, int flags );
-void CompressImageOMP( u8 const* rgba, int width, int height, void* blocks, int flags );
 
 // -----------------------------------------------------------------------------
 
@@ -241,9 +240,6 @@ void CompressImageOMP( u8 const* rgba, int width, int height, void* blocks, int 
 void DecompressImage( u8* rgba, int width, int height, void const* blocks, int flags );
 
 // -----------------------------------------------------------------------------
-
-// Helper method
-int FixFlags( int flags );
 
 } // namespace squish
 

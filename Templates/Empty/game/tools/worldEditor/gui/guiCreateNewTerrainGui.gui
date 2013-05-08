@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -12,14 +12,14 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCtrl() {
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       Position = "182 94";
@@ -28,7 +28,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -52,7 +52,7 @@
          internalName = "theName";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "68 30";
@@ -61,7 +61,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -81,7 +81,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "32 31";
@@ -90,7 +90,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -105,7 +105,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "10 108";
@@ -115,7 +115,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "CreateNewTerrainGui.create();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Create New";
          groupNum = "-1";
@@ -127,7 +127,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "159 108";
@@ -137,7 +137,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "Canvas.popDialog( CreateNewTerrainGui );";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Cancel";
          groupNum = "-1";
@@ -150,7 +150,7 @@
          internalName = "flatRadio";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiRadioProfile";
+         Profile = "ToolsGuiRadioProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "155 80";
@@ -159,7 +159,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Flat";
          groupNum = "1";
@@ -172,7 +172,7 @@
          internalName = "noiseRadio";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiRadioProfile";
+         Profile = "ToolsGuiRadioProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "195 80";
@@ -181,7 +181,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Noise";
          groupNum = "1";
@@ -193,7 +193,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "23 56";
@@ -202,7 +202,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -217,7 +217,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "10 81";
@@ -226,7 +226,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -242,7 +242,7 @@
          internalName = "theRezList";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiPopUpMenuProfile";
+         Profile = "ToolsGuiPopUpMenuProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "68 80";
@@ -251,7 +251,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -270,7 +270,7 @@
          internalName = "theMaterialList";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiPopUpMenuProfile";
+         Profile = "ToolsGuiPopUpMenuProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "68 55";
@@ -279,7 +279,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";

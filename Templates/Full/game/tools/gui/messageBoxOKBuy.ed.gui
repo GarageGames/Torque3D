@@ -1,6 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(MessageBoxOKBuyDlg) {
-	profile = "GuiDefaultProfile";
+	profile = "ToolsGuiDefaultProfile";
 	horizSizing = "width";
 	vertSizing = "height";
 	position = "0 0";
@@ -10,7 +10,7 @@
 	helpTag = "0";
 
 	new GuiWindowCtrl(MBOKBuyFrame) {
-      profile = "GuiWindowProfile";
+      profile = "ToolsGuiWindowProfile";
       horizSizing = "center";
       vertSizing = "center";
       position = "170 175";
@@ -30,7 +30,7 @@
       closeCommand = "MessageCallback(MessageBoxOKBuyDlg,MessageBoxOKBuyDlg.noCallback);";
 
 		new GuiMLTextCtrl(MBOKBuyText) {
-         profile = "GuiMLTextProfile";
+         profile = "ToolsGuiMLTextProfile";
          horizSizing = "center";
          vertSizing = "bottom";
          position = "11 38";
@@ -43,7 +43,7 @@
          maxChars = "-1";
 		};
 		new GuiButtonCtrl() {
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "top";
          position = "70 68";
@@ -57,7 +57,7 @@
          simpleStyle = "0";
 		};
 		new GuiButtonCtrl() {
-         profile = "GuiButtonProfile";
+         profile = "ToolsGuiButtonProfile";
          horizSizing = "right";
          vertSizing = "top";
          position = "167 68";
@@ -77,7 +77,7 @@
 function MessageBoxOKBuy(%title, %message, %OKCallback, %BuyCallback)
 {
    MBOKBuyFrame.text = %title;
-   MessageBoxOKBuyDlg.profile = "GuiOverlayProfile";
+   MessageBoxOKBuyDlg.profile = "ToolsGuiOverlayProfile";
    Canvas.pushDialog(MessageBoxOKBuyDlg);
    MBSetText(MBOKBuyText, MBOKBuyFrame, %message);
    MessageBoxOKBuyDlg.OKCallback = %OKCallback;

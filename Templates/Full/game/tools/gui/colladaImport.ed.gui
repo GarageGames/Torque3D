@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(ColladaImportDlg,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "height";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "0";
 
@@ -31,7 +31,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "254 136";
@@ -40,14 +40,14 @@
       canSave = "1";
       Visible = "1";
       Accelerator = "escape";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "window";
       canSaveDynamicFields = "0";
 
       new GuiControl() {
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "8 24";
@@ -55,7 +55,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
@@ -75,7 +75,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "1";
-            Profile = "GuiScrollProfile";
+            Profile = "ToolsGuiScrollProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 3";
@@ -83,7 +83,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "1";
 
@@ -107,7 +107,7 @@
                canRenameObjects = "1";
                renameInternal = "0";
                isContainer = "1";
-               Profile = "GuiTreeViewProfile";
+               Profile = "ToolsGuiTreeViewProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "1 1";
@@ -115,7 +115,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -123,7 +123,7 @@
       };
       new GuiControl() {
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "254 24";
@@ -131,13 +131,13 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
 
          new GuiBitmapBorderCtrl() {
             isContainer = "1";
-            Profile = "GuiGroupBorderProfile";
+            Profile = "ToolsGuiGroupBorderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 3";
@@ -145,7 +145,7 @@
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -159,7 +159,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "42 2";
@@ -167,7 +167,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -181,7 +181,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "90 2";
@@ -189,7 +189,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "nodes";
                canSaveDynamicFields = "0";
@@ -204,7 +204,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "36 22";
@@ -212,7 +212,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -226,7 +226,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "90 22";
@@ -234,7 +234,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "meshes";
                canSaveDynamicFields = "0";
@@ -249,7 +249,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "132 22";
@@ -257,7 +257,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -271,7 +271,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "193 22";
@@ -279,7 +279,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "polygons";
                canSaveDynamicFields = "0";
@@ -294,7 +294,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "135 2";
@@ -302,7 +302,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -316,7 +316,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "193 2";
@@ -324,7 +324,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "Materials";
                canSaveDynamicFields = "0";
@@ -339,7 +339,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "23 41";
@@ -347,7 +347,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -361,7 +361,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "91 41";
@@ -369,7 +369,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "lights";
                canSaveDynamicFields = "0";
@@ -384,7 +384,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "127 41";
@@ -392,7 +392,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -406,7 +406,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextProfile";
+               Profile = "ToolsGuiTextProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "191 41";
@@ -414,7 +414,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "animations";
                canSaveDynamicFields = "0";
@@ -422,7 +422,7 @@
          };
          new GuiBitmapBorderCtrl() {
             isContainer = "1";
-            Profile = "GuiGroupBorderProfile";
+            Profile = "ToolsGuiGroupBorderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 68";
@@ -430,7 +430,7 @@
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -444,7 +444,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "59 6";
@@ -452,7 +452,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -470,7 +470,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiPopUpMenuProfile";
+               Profile = "ToolsGuiPopUpMenuProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "97 6";
@@ -478,7 +478,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Method used to determine LOD for meshes in the model";
                hovertime = "1000";
                internalName = "lodType";
@@ -499,7 +499,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "196 6";
@@ -507,7 +507,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Detail size for all meshes in this model (when LOD type is SingleSize)";
                hovertime = "1000";
                internalName = "singleDetailSize";
@@ -523,7 +523,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 32";
@@ -531,7 +531,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -549,7 +549,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "97 32";
@@ -558,7 +558,7 @@
                canSave = "1";
                Visible = "1";
                AltCommand = "ColladaImportTreeView.refresh(\"materials\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "materialPrefix";
                canSaveDynamicFields = "0";
@@ -573,7 +573,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "13 58";
@@ -581,7 +581,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -599,7 +599,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "97 58";
@@ -608,7 +608,7 @@
                canSave = "1";
                Visible = "1";
                AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "alwaysImport";
                canSaveDynamicFields = "0";
@@ -623,7 +623,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "20 82";
@@ -631,7 +631,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -649,7 +649,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "97 82";
@@ -658,7 +658,7 @@
                canSave = "1";
                Visible = "1";
                AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "neverImport";
                canSaveDynamicFields = "0";
@@ -673,7 +673,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "13 106";
@@ -681,7 +681,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -699,7 +699,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "97 106";
@@ -708,7 +708,7 @@
                canSave = "1";
                Visible = "1";
                AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "alwaysImportMesh";
                canSaveDynamicFields = "0";
@@ -723,7 +723,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextRightProfile";
+               Profile = "ToolsGuiTextRightProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "13 130";
@@ -731,7 +731,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
             };
@@ -749,7 +749,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "97 130";
@@ -758,7 +758,7 @@
                canSave = "1";
                Visible = "1";
                AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "neverImportMesh";
                canSaveDynamicFields = "0";
@@ -766,7 +766,7 @@
          };
          new GuiBitmapBorderCtrl() {
             isContainer = "1";
-            Profile = "GuiGroupBorderProfile";
+            Profile = "ToolsGuiGroupBorderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 226";
@@ -774,7 +774,7 @@
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -785,7 +785,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 7";
@@ -794,7 +794,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ColladaImportDlg.updateOverrideUpAxis($ThisControl.getValue());";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Overrides the <up_axis> specified in the DAE file";
                hovertime = "1000";
                internalName = "overrideUpAxis";
@@ -813,7 +813,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiPopUpMenuProfile";
+               Profile = "ToolsGuiPopUpMenuProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "151 6";
@@ -821,7 +821,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "upAxis";
                canSaveDynamicFields = "0";
@@ -833,7 +833,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 27";
@@ -842,7 +842,7 @@
                canSave = "1";
                Visible = "1";
                Command = "ColladaImportDlg.updateOverrideScale($ThisControl.getValue());";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Overrides the <unit> scale specified in the DAE file";
                hovertime = "1000";
                internalName = "overrideScale";
@@ -863,7 +863,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "0";
-               Profile = "GuiTextEditProfile";
+               Profile = "ToolsGuiTextEditProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "151 27";
@@ -871,7 +871,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                internalName = "scale";
                canSaveDynamicFields = "0";
@@ -883,7 +883,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 48";
@@ -891,7 +891,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Ignores <scale> elements within <node>s to fix issues with some models";
                hovertime = "1000";
                internalName = "ignoreNodeScale";
@@ -904,7 +904,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 67";
@@ -912,7 +912,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Translates model so the origin is at the center";
                hovertime = "1000";
                internalName = "adjustCenter";
@@ -925,7 +925,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "151 67";
@@ -933,7 +933,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Translates model so the origin is at the bottom";
                hovertime = "1000";
                internalName = "adjustFloor";
@@ -946,7 +946,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 86";
@@ -954,7 +954,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Forces update of materials.cs (even if Materials already exist)";
                hovertime = "1000";
                internalName = "forceUpdateMaterials";
@@ -963,7 +963,7 @@
          };
          new GuiBitmapBorderCtrl() {
             isContainer = "1";
-            Profile = "GuiGroupBorderProfile";
+            Profile = "ToolsGuiGroupBorderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 338";
@@ -971,7 +971,7 @@
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -982,7 +982,7 @@
                buttonType = "ToggleButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiCheckBoxProfile";
+               Profile = "ToolsGuiCheckBoxProfile";
                HorizSizing = "right";
                VertSizing = "bottom";
                position = "11 5";
@@ -990,7 +990,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                ToolTip = "Loads the lights from the DAE file and adds them to the current scene.";
                hovertime = "1000";
                internalName = "loadLights";
@@ -1003,7 +1003,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "11 368";
@@ -1012,7 +1012,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ColladaImportDlg.readDtsConfig();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -1022,7 +1022,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "11 395";
@@ -1031,7 +1031,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ColladaImportDlg.writeDtsConfig();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
          };
@@ -1041,7 +1041,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "159 368";
@@ -1050,7 +1050,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ColladaImportDlg.onOK();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Load the COLLADA model";
             hovertime = "1000";
             canSaveDynamicFields = "0";
@@ -1061,7 +1061,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "159 395";
@@ -1070,7 +1070,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ColladaImportDlg.onCancel();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Exit without loading the COLLADA model";
             hovertime = "1000";
             canSaveDynamicFields = "0";
@@ -1082,7 +1082,7 @@
 
 new GuiControl(ColladaImportProgress,EditorGuiGroup) {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "width";
    VertSizing = "height";
    position = "0 0";
@@ -1090,7 +1090,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
    MinExtent = "8 8";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "0";
 
@@ -1112,7 +1112,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       position = "362 338";
@@ -1120,7 +1120,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
       MinExtent = "48 92";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       canSaveDynamicFields = "0";
 
@@ -1134,7 +1134,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "1";
-         Profile = "GuiRLProgressBitmapProfile";
+         Profile = "ToolsGuiRLProgressBitmapProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          position = "10 34";
@@ -1142,7 +1142,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
          MinExtent = "8 8";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
@@ -1156,7 +1156,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          position = "10 62";
@@ -1164,7 +1164,7 @@ new GuiControl(ColladaImportProgress,EditorGuiGroup) {
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };

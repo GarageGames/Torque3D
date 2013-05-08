@@ -333,7 +333,7 @@ struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K ) > : public _Engin
 template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
 struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ), ... ) > {};
 template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, L ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( J ), T( L ) ) > {};
+struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, L ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ), T( L ) ) > {};
 template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
 struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, L, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ), T( L ), ... ) > {};
 

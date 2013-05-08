@@ -54,6 +54,7 @@ class Point3I
    void set(S32 in_x, S32 in_y, S32 in_z); ///< Set co-ordinates.
    void setMin(const Point3I&); ///< Store lesser co-ordinates in this point.
    void setMax(const Point3I&); ///< Store greater co-ordinates in this point.
+   void zero();                 ///< Zero all values
 
    //-------------------------------------- Math mutators
    void neg();                      ///< Invert co-ordinate's signs.
@@ -222,6 +223,7 @@ class Point3D
    void setMax(const Point3D&);
 
    void interpolate(const Point3D&, const Point3D&, F64);
+   void zero();
 
    operator F64*() { return (&x); }
    operator const F64*() const { return &x; }
@@ -318,6 +320,11 @@ inline void Point3I::setMax(const Point3I& _test)
    x = (_test.x > x) ? _test.x : x;
    y = (_test.y > y) ? _test.y : y;
    z = (_test.z > z) ? _test.z : z;
+}
+
+inline void Point3I::zero()
+{
+   x = y = z = 0;
 }
 
 inline void Point3I::neg()
@@ -808,6 +815,11 @@ inline void Point3D::interpolate(const Point3D& _from, const Point3D& _to, F64 _
 {
    AssertFatal(_factor >= 0.0f && _factor <= 1.0f, "Out of bound interpolation factor");
    m_point3D_interpolate( _from, _to, _factor, *this);
+}
+
+inline void Point3D::zero()
+{
+   x = y = z = 0.0;
 }
 
 inline bool Point3D::isZero() const
