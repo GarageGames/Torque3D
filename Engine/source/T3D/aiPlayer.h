@@ -89,6 +89,8 @@ public:
    void setMoveDestination( const Point3F &location, bool slowdown );
    Point3F getMoveDestination() const { return mMoveDestination; }
    void stopMove();
+  	void setAiPose( const F32 pose );//yorks
+	F32  getAiPose();//yorks
 };
 
 #endif

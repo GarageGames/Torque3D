@@ -3170,16 +3170,32 @@ void Player::updateMove(const Move* move)
    // Update the PlayerPose
    Pose desiredPose = mPose;
 
-   if ( mSwimming )
-      desiredPose = SwimPose; 
-   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
-      desiredPose = CrouchPose;
-   else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
-      desiredPose = PronePose;
-   else if ( move->trigger[sSprintTrigger] && canSprint() )
-      desiredPose = SprintPose;
-   else if ( canStand() )
-      desiredPose = StandPose;
+	if (!mIsAiControlled)//yorks new from here - leave the Player alone!
+	{
+	   if ( mSwimming )
+		  desiredPose = SwimPose; 
+	   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
+		  desiredPose = CrouchPose;
+	   else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
+		  desiredPose = PronePose;
+	   else if ( move->trigger[sSprintTrigger] && canSprint() )
+		  desiredPose = SprintPose;
+	   else if ( canStand() )
+		  desiredPose = StandPose;
+	}
+	else//yorks select for Ai using mAiPose
+	{
+	   if ( mSwimming )
+		  desiredPose = SwimPose; 
+	   else if ( runSurface && mAiPose == 1 && canCrouch() ) 
+				desiredPose = CrouchPose;
+		   else if ( runSurface && mAiPose == 2 && canProne() )
+					desiredPose = PronePose;
+				else if ( mAiPose == 3 && canSprint() )
+						desiredPose = SprintPose;
+					else if ( canStand() )
+							desiredPose = StandPose;
+	}//yorks end of changes
 
    setPose( desiredPose );
 }
@@ -6124,6 +6140,11 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if (stream->writeFlag(mask & MoveMask))
    {
       stream->writeFlag(mFalling);
+	  
+	  //calls to update animations correctly
+		stream->writeFlag(mSwimming);//yorks start
+		stream->writeFlag(mJetting);
+		stream->writeInt(mPose, NumPoseBits);//yorks end
 
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
@@ -6218,6 +6239,12 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
    if (stream->readFlag()) {
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
+	  
+	  //calls to update animations correctly
+		mSwimming = stream->readFlag();//yorks start
+		mJetting = stream->readFlag();
+		Pose newPose = (Pose)(stream->readInt(NumPoseBits));
+		setPose(newPose);//yorks end
 
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
