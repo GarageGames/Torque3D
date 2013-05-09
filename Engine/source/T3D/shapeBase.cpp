@@ -922,7 +922,7 @@ ShapeBase::ShapeBase()
    mOneOverMass( 1.0f ),
    mMoveMotion( false ),
    mIsAiControlled( false ), //yorks comma in
-   mAiPose ( 0 ); //yorks in
+   mAiPose ( 0 ) //yorks in
 {
    mTypeMask |= ShapeBaseObjectType | LightObjectType;   
 
