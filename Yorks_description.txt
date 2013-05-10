@@ -1,0 +1,8 @@
+SteveYorkshire
+
+---------------
+
+Ai Poses via C++ exposed to script
+Read the code and comments to see how it works
+
+----------------
