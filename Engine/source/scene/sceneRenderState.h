@@ -55,6 +55,46 @@ class BaseMatInstance;
 /// It also owns the current culling state.
 class SceneRenderState
 {
+	//Variable decleration for static culling
+	//These variables generate a frustum used to compare 
+	//objects that may be rendered
+	private:
+		//Box used for temporarily storing the object to compare's bounding box.
+		//This object is passed into a helper function "BoxToPlane" for using the
+		// half space test on the 6 planes of the view frustum
+		Box3F bounds;
+
+		//Camera vectors for easy use.
+		//The camera's up, right vector, and forward vector
+		Point3F up, right;
+
+		//Near & Far Plane distances from the camera
+		float nearDist, farDist;
+
+		//Camera's Field of View
+		float fOV;
+
+		//The four corners of the near distance plane
+		//These corners are used for generating the 4 side planes
+		Point3F pTR, pTL, pBR, pBL; 
+
+		//This variable will be used as the camera's position for generating the view frustum sides.
+		//It will also be used as the center of the near plane for finding the corners first.
+		Point3F pCP; 
+		
+		//Four side planes to be created
+		PlaneF plTop;		//Top of view Frustum
+		PlaneF plBottom;	//Bottom of view Frustum
+		PlaneF plRight;		//Right side of view Frustum
+		PlaneF plLeft;		//Left side of view Frustum
+		PlaneF plNear;		//Near clipping plane
+		PlaneF plFar;		//Far clipping plane
+
+		//Amount to incriment to determine corners of near frustum
+		//These are based on the resolution of the screen and the distance of
+		// the near clipping plane.
+		float xAdd, yAdd;
+
    public:
 
       /// The delegate used for material overrides.

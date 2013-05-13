@@ -26,9 +26,13 @@
 #include "renderInstance/renderPassManager.h"
 #include "math/util/matrixSet.h"
 
-
+//Needed for culling
+#include "T3D/gameBase/gameConnection.h"
+#include "gui/core/guiCanvas.h"
+#include "gui/core/guiControl.h"
 
 //-----------------------------------------------------------------------------
+static GuiCanvas* mCanvas;
 
 SceneRenderState::SceneRenderState( SceneManager* sceneManager,
                                     ScenePassType passType,
@@ -95,15 +99,114 @@ const MatrixF& SceneRenderState::getProjectionMatrix() const
 //-----------------------------------------------------------------------------
 
 void SceneRenderState::renderObjects( SceneObject** objects, U32 numObjects )
-{
-   // Let the objects batch their stuff.
+{ 
+	// Let the objects batch their stuff.
+	//Make sure it's a client render
+	if(this->mSceneManager->GetIsClient())
+	{
+		//Get the connection for camera fov
+		GameConnection* connection = GameConnection::getConnectionToServer();
+		if( !connection )
+		{
+			//Client side render with no connection, should we return?
+			return;			
+		}
+		
+		//Get the Camera Object
+		GameBase* cameraObject = 0;
+		cameraObject = connection->getCameraObject();
 
-   PROFILE_START( SceneRenderState_prepRenderImages );
-   for( U32 i = 0; i < numObjects; ++ i )
-   {
-      SceneObject* object = objects[ i ];
-      object->prepRenderImage( this );
-   }
+		//Variables needed for culling
+		fOV = cameraObject->getCameraFov();
+		if(fOV < 90.0f)
+			fOV = 90.0f;
+		else
+			fOV += 30.0f;
+
+		//Near and far plane distances
+		nearDist = this->getNearPlane(); 
+		farDist =  this->getFarPlane();
+		
+		if (!mCanvas)
+			mCanvas =dynamic_cast<GuiCanvas*>( Sim::findObject("Canvas"));
+
+		//Equation for getting Near Plane dimensions
+		yAdd = tan(fOV/2)*nearDist;
+		xAdd = yAdd*(mCanvas->getPlatformWindow()->getVideoMode().resolution.x/mCanvas->getPlatformWindow()->getVideoMode().resolution.y);
+
+		//Far Plane generation
+		Point3F pPos, pView;
+		MatrixF mTrans;
+		cameraObject->getCameraTransform(pPos, &mTrans);
+		pView = mTrans.getForwardVector();
+		pPos = mTrans.getPosition();
+
+		pCP = pPos + (pView)*farDist;
+		plFar.set(pCP, (-1*pView));
+
+		//Near Plane generation
+		pCP = pPos + pView*nearDist;
+		plNear.set(pCP, pView);
+
+		//Getting the camera's orientation vectors
+		right = mTrans.getRightVector();
+		up = mTrans.getUpVector();
+
+		//4 corners of near Plane
+		pTR = pCP + (right*xAdd) + (up*yAdd);
+		pTL = pCP - (right*xAdd) + (up*yAdd);
+		pBR = pCP + (right*xAdd) - (up*yAdd);
+		pBL = pCP - (right*xAdd) - (up*yAdd);
+
+		//Finally set this to the camera position
+		pCP = pPos;
+
+		//Generate the side, top, and bottom planes
+		plLeft.set(pCP, pTL, pBL);
+		plTop.set(pCP, pTR, pTL);
+		plRight.set(pCP, pBR, pTR);
+		plBottom.set(pCP, pBL, pBR);
+
+		//Start sorting throughb and prepping to render
+		PROFILE_START( SceneRenderState_prepRenderImages );
+		for( U32 i = 0; i < numObjects; ++ i )
+		{
+			//Compare each object
+			SceneObject* object = objects[ i ];
+			bounds = object->getWorldBox();
+
+			//For each plane, check all 8 corners of the bounding box
+			//Early outs if any conditions fail.
+			// I.e. if the box is completely behind one plane
+			if(plNear.whichSide(bounds) < 0.0f)
+				continue;
+			if(plFar.whichSide(bounds) < 0.0f)
+				continue;
+			if(plLeft.whichSide(bounds) < 0.0f)
+				continue;
+			if(plRight.whichSide(bounds) < 0.0f)
+				continue;
+			if(plBottom.whichSide(bounds) < 0.0f)
+				continue;
+			if(plTop.whichSide(bounds) < 0.0f)
+				continue;
+			
+			//Add the object if it is within the view
+			object->prepRenderImage( this );
+		}
+	}
+
+	else
+	{
+		//Server Render
+		PROFILE_START( SceneRenderState_prepRenderImages );
+		for( U32 i = 0; i < numObjects; ++ i )
+		{
+			SceneObject* object = objects[ i ];
+			object->prepRenderImage( this );
+		}
+	}
+
    PROFILE_END();
 
    // Render what the objects have batched.
