@@ -757,11 +757,6 @@ bool ParticleEmitter::onAdd()
    {
       cleanup->addObject( this );
    }
-   else
-   {
-      AssertFatal( false, "Error, could not find ClientMissionCleanup group" );
-      return false;
-   }
 
    removeFromProcessList();
 
