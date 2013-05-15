@@ -451,6 +451,24 @@ bool AIPlayer::getAIMove(Move *movePtr)
    return true;
 }
 
+void AIPlayer::setAiPose( F32 pose )
+{
+   mAiPose = pose;
+}
+
+//use as
+//0 = stand
+//1 = crouch
+//2 = prone ... which has no stock animations
+//3 = sprint
+//fall, swim, etc are taken care of automatically by the engine
+//%your_aiplayer_name_or_id.setAiPose(%pose_number);
+
+F32 AIPlayer::getAiPose()
+{
+   return mAiPose; 
+}
+
 /**
  * Utility function to throw callbacks. Callbacks always occure
  * on the datablock class.
@@ -466,6 +484,24 @@ void AIPlayer::throwCallback( const char *name )
 // --------------------------------------------------------------------------------------------
 // Console Functions
 // --------------------------------------------------------------------------------------------
+
+DefineEngineMethod( AIPlayer, setAiPose, void, ( F32 pose ),,
+   "@brief Sets the AiPose for an AI object.nn"
+
+   "@param pose StandPose=0,CrouchPose=1,PronePose=2,SprintPose=3.  "
+   "Uses the new AiPose variable from shapebase (as defined in "
+   "its PlayerData datablock)nn")
+{
+	object->setAiPose(pose);
+}
+
+DefineEngineMethod( AIPlayer, getAiPose, F32, (),,
+   "@brief Get the object's current AiPose.nn"
+
+   "@return StandPose=0,CrouchPose=1,PronePose=2,SprintPose=3n")
+{
+   return object->getAiPose();
+}
 
 DefineEngineMethod( AIPlayer, stop, void, ( ),,
    "@brief Tells the AIPlayer to stop moving.\n\n")
