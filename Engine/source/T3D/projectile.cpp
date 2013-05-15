@@ -56,75 +56,75 @@
 IMPLEMENT_CO_DATABLOCK_V1(ProjectileData);
 
 ConsoleDocClass( ProjectileData,
-   "@brief Stores properties for an individual projectile type.\n"
+                "@brief Stores properties for an individual projectile type.\n"
 
-   "@tsexample\n"
-		"datablock ProjectileData(GrenadeLauncherProjectile)\n"
-		"{\n"
-		  " projectileShapeName = \"art/shapes/weapons/SwarmGun/rocket.dts\";\n"
-		   "directDamage = 30;\n"
-		   "radiusDamage = 30;\n"
-		   "damageRadius = 5;\n"
-		   "areaImpulse = 2000;\n"
+                "@tsexample\n"
+                "datablock ProjectileData(GrenadeLauncherProjectile)\n"
+                "{\n"
+                " projectileShapeName = \"art/shapes/weapons/SwarmGun/rocket.dts\";\n"
+                "directDamage = 30;\n"
+                "radiusDamage = 30;\n"
+                "damageRadius = 5;\n"
+                "areaImpulse = 2000;\n"
 
-		   "explosion = GrenadeLauncherExplosion;\n"
-		   "waterExplosion = GrenadeLauncherWaterExplosion;\n"
+                "explosion = GrenadeLauncherExplosion;\n"
+                "waterExplosion = GrenadeLauncherWaterExplosion;\n"
 
-		   "decal = ScorchRXDecal;\n"
-		   "splash = GrenadeSplash;\n"
+                "decal = ScorchRXDecal;\n"
+                "splash = GrenadeSplash;\n"
 
-		   "particleEmitter = GrenadeProjSmokeTrailEmitter;\n"
-		   "particleWaterEmitter = GrenadeTrailWaterEmitter;\n"
+                "particleEmitter = GrenadeProjSmokeTrailEmitter;\n"
+                "particleWaterEmitter = GrenadeTrailWaterEmitter;\n"
 
-		   "muzzleVelocity = 30;\n"
-		   "velInheritFactor = 0.3;\n"
+                "muzzleVelocity = 30;\n"
+                "velInheritFactor = 0.3;\n"
 
-		   "armingDelay = 2000;\n"
-		   "lifetime = 10000;\n"
-		   "fadeDelay = 4500;\n"
+                "armingDelay = 2000;\n"
+                "lifetime = 10000;\n"
+                "fadeDelay = 4500;\n"
 
-		   "bounceElasticity = 0.4;\n"
-		   "bounceFriction = 0.3;\n"
-		   "isBallistic = true;\n"
-		   "gravityMod = 0.9;\n"
+                "bounceElasticity = 0.4;\n"
+                "bounceFriction = 0.3;\n"
+                "isBallistic = true;\n"
+                "gravityMod = 0.9;\n"
 
-		   "lightDesc = GrenadeLauncherLightDesc;\n"
+                "lightDesc = GrenadeLauncherLightDesc;\n"
 
-		   "damageType = \"GrenadeDamage\";\n"
-		"};\n"
-   "@endtsexample\n"
+                "damageType = \"GrenadeDamage\";\n"
+                "};\n"
+                "@endtsexample\n"
 
-   "@ingroup gameObjects\n"
-);
+                "@ingroup gameObjects\n"
+                );
 
 IMPLEMENT_CO_NETOBJECT_V1(Projectile);
 
 ConsoleDocClass( Projectile,
-   "@brief Base projectile class. Uses the ProjectileData class for properties of individual projectiles.\n"
-   "@ingroup gameObjects\n"
-);
+                "@brief Base projectile class. Uses the ProjectileData class for properties of individual projectiles.\n"
+                "@ingroup gameObjects\n"
+                );
 
 IMPLEMENT_CALLBACK( ProjectileData, onExplode, void, ( Projectile* proj, Point3F pos, F32 fade ), 
                    ( proj, pos, fade ),
-				   "@brief Called when a projectile explodes.\n\n"
+                   "@brief Called when a projectile explodes.\n\n"
                    "This function is only called on server objects.\n"
                    "@param proj The exploding projectile.\n"
-				   "@param pos The position of the explosion.\n"
-				   "@param fade The current fadeValue of the projectile, affects its visibility.\n\n"
-				   "@see Projectile\n"
-				  );
+                   "@param pos The position of the explosion.\n"
+                   "@param fade The current fadeValue of the projectile, affects its visibility.\n\n"
+                   "@see Projectile\n"
+                   );
 
 IMPLEMENT_CALLBACK( ProjectileData, onCollision, void, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ),
                    ( proj, col, fade, pos, normal ),
-				   "@brief Called when a projectile collides with another object.\n\n"
+                   "@brief Called when a projectile collides with another object.\n\n"
                    "This function is only called on server objects."
-				   "@param proj The projectile colliding with SceneObject col.\n"
-				   "@param col The SceneObject hit by the projectile.\n"
-				   "@param fade The current fadeValue of the projectile, affects its visibility.\n"
-				   "@param pos The position of the collision.\n"
+                   "@param proj The projectile colliding with SceneObject col.\n"
+                   "@param col The SceneObject hit by the projectile.\n"
+                   "@param fade The current fadeValue of the projectile, affects its visibility.\n"
+                   "@param pos The position of the collision.\n"
                    "@param normal The normal of the collision.\n"
-				   "@see Projectile\n"
-				  );
+                   "@see Projectile\n"
+                   );
 
 const U32 Projectile::csmStaticCollisionMask =  TerrainObjectType | StaticShapeObjectType;
 
@@ -159,11 +159,11 @@ ProjectileData::ProjectileData()
 
    isBallistic = false;
 
-	velInheritFactor = 1.0f;
-	muzzleVelocity = 50;
+   velInheritFactor = 1.0f;
+   muzzleVelocity = 50;
    impactForce = 0.0f;
 
-	armingDelay = 0;
+   armingDelay = 0;
    fadeDelay = 20000 / 32;
    lifetime = 20000 / 32;
 
@@ -243,7 +243,7 @@ void ProjectileData::initPersistFields()
       "This value is never modified by the engine.\n\n"
       "@note This value by default is not transmitted between the server and the client.\n\n"
       "@see velInheritFactor");
-   
+
    addField("impactForce", TypeF32, Offset(impactForce, ProjectileData));
 
    addProtectedField("lifetime", TypeS32, Offset(lifetime, ProjectileData), &setLifetime, &getScaledValue, 
@@ -293,7 +293,7 @@ bool ProjectileData::preload(bool server, String &errorStr)
 {
    if (Parent::preload(server, errorStr) == false)
       return false;
-      
+
    if( !server )
    {
       if (!particleEmitter && particleEmitterId != 0)
@@ -366,39 +366,39 @@ void ProjectileData::packData(BitStream* stream)
 
    if (stream->writeFlag(particleEmitter != NULL))
       stream->writeRangedU32(particleEmitter->getId(), DataBlockObjectIdFirst,
-                                                   DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    if (stream->writeFlag(particleWaterEmitter != NULL))
       stream->writeRangedU32(particleWaterEmitter->getId(), DataBlockObjectIdFirst,
-                                                   DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    if (stream->writeFlag(explosion != NULL))
       stream->writeRangedU32(explosion->getId(), DataBlockObjectIdFirst,
-                                                 DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    if (stream->writeFlag(waterExplosion != NULL))
       stream->writeRangedU32(waterExplosion->getId(), DataBlockObjectIdFirst,
-                                                      DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    if (stream->writeFlag(splash != NULL))
       stream->writeRangedU32(splash->getId(), DataBlockObjectIdFirst,
-                                              DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    if (stream->writeFlag(decal != NULL))
       stream->writeRangedU32(decal->getId(), DataBlockObjectIdFirst,
-                                              DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    sfxWrite( stream, sound );
 
    if ( stream->writeFlag(lightDesc != NULL))
       stream->writeRangedU32(lightDesc->getId(), DataBlockObjectIdFirst,
-                                                 DataBlockObjectIdLast);
+      DataBlockObjectIdLast);
 
    stream->write(impactForce);
-   
-//    stream->writeRangedU32(lifetime, 0, Projectile::MaxLivingTicks);
-//    stream->writeRangedU32(armingDelay, 0, Projectile::MaxLivingTicks);
-//    stream->writeRangedU32(fadeDelay, 0, Projectile::MaxLivingTicks);
+
+   //    stream->writeRangedU32(lifetime, 0, Projectile::MaxLivingTicks);
+   //    stream->writeRangedU32(armingDelay, 0, Projectile::MaxLivingTicks);
+   //    stream->writeRangedU32(fadeDelay, 0, Projectile::MaxLivingTicks);
 
    // [tom, 3/21/2007] Changing these to write all 32 bits as the previous
    // code limited these to a max value of 4095.
@@ -442,22 +442,22 @@ void ProjectileData::unpackData(BitStream* stream)
 
    if (stream->readFlag())
       waterExplosionId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
-   
+
    if (stream->readFlag())
       splashId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
 
    if (stream->readFlag())
       decalId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
-   
+
    sfxRead( stream, &sound );
 
    if (stream->readFlag())
       lightDescId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
-   
+
    // [tom, 3/21/2007] See comment in packData()
-//    lifetime = stream->readRangedU32(0, Projectile::MaxLivingTicks);
-//    armingDelay = stream->readRangedU32(0, Projectile::MaxLivingTicks);
-//    fadeDelay = stream->readRangedU32(0, Projectile::MaxLivingTicks);
+   //    lifetime = stream->readRangedU32(0, Projectile::MaxLivingTicks);
+   //    armingDelay = stream->readRangedU32(0, Projectile::MaxLivingTicks);
+   //    fadeDelay = stream->readRangedU32(0, Projectile::MaxLivingTicks);
 
    stream->read(&impactForce);
 
@@ -476,9 +476,9 @@ void ProjectileData::unpackData(BitStream* stream)
 
 bool ProjectileData::setLifetime( void *obj, const char *index, const char *data )
 {
-	S32 value = dAtoi(data);
+   S32 value = dAtoi(data);
    value = scaleValue(value);
-   
+
    ProjectileData *object = static_cast<ProjectileData*>(obj);
    object->lifetime = value;
 
@@ -487,7 +487,7 @@ bool ProjectileData::setLifetime( void *obj, const char *index, const char *data
 
 bool ProjectileData::setArmingDelay( void *obj, const char *index, const char *data )
 {
-	S32 value = dAtoi(data);
+   S32 value = dAtoi(data);
    value = scaleValue(value);
 
    ProjectileData *object = static_cast<ProjectileData*>(obj);
@@ -498,7 +498,7 @@ bool ProjectileData::setArmingDelay( void *obj, const char *index, const char *d
 
 bool ProjectileData::setFadeDelay( void *obj, const char *index, const char *data )
 {
-	S32 value = dAtoi(data);
+   S32 value = dAtoi(data);
    value = scaleValue(value);
 
    ProjectileData *object = static_cast<ProjectileData*>(obj);
@@ -510,7 +510,7 @@ bool ProjectileData::setFadeDelay( void *obj, const char *index, const char *dat
 const char *ProjectileData::getScaledValue( void *obj, const char *data)
 {
 
-	S32 value = dAtoi(data);
+   S32 value = dAtoi(data);
    value = scaleValue(value, false);
 
    String stringData = String::ToString(value);
@@ -524,19 +524,19 @@ S32 ProjectileData::scaleValue( S32 value, bool down )
 {
    S32 minV = 0;
    S32 maxV = Projectile::MaxLivingTicks;
-   
+
    // scale down to ticks before we validate
    if( down )
       value /= TickMs;
-   
+
    if(value < minV || value > maxV)
-	{
+   {
       Con::errorf("ProjectileData::scaleValue(S32 value = %d, bool down = %b) - Scaled value must be between %d and %d", value, down, minV, maxV);
-		if(value < minV)
-			value = minV;
-		else if(value > maxV)
-			value = maxV;
-	}
+      if(value < minV)
+         value = minV;
+      else if(value > maxV)
+         value = maxV;
+   }
 
    // scale up from ticks after we validate
    if( !down )
@@ -549,7 +549,7 @@ S32 ProjectileData::scaleValue( S32 value, bool down )
 //--------------------------------------
 //
 Projectile::Projectile()
- : mPhysicsWorld( NULL ),
+   : mPhysicsWorld( NULL ),
    mCurrPosition( 0, 0, 0 ),
    mCurrVelocity( 0, 0, 1 ),
    mSourceObjectId( -1 ),
@@ -619,12 +619,12 @@ bool Projectile::_setInitialPosition( void *object, const char *index, const cha
    Projectile* p = static_cast<Projectile*>( object );
    if ( p )
    {
-	   Point3F pos;
+      Point3F pos;
 
-	   S32 count = dSscanf( data, "%f %f %f", 
-		   &pos.x, &pos.y, &pos.z);
-   	
-	   if ( (count != 3) )
+      S32 count = dSscanf( data, "%f %f %f", 
+         &pos.x, &pos.y, &pos.z);
+
+      if ( (count != 3) )
       {
          Con::printf("Projectile: Failed to parse initial position \"px py pz\" from '%s'", data);
          return false;
@@ -646,12 +646,12 @@ bool Projectile::_setInitialVelocity( void *object, const char *index, const cha
    Projectile* p = static_cast<Projectile*>( object );
    if ( p )
    {
-	   Point3F vel;
+      Point3F vel;
 
-	   S32 count = dSscanf( data, "%f %f %f", 
-		   &vel.x, &vel.y, &vel.z);
-   	
-	   if ( (count != 3) )
+      S32 count = dSscanf( data, "%f %f %f", 
+         &vel.x, &vel.y, &vel.z);
+
+      if ( (count != 3) )
       {
          Con::printf("Projectile: Failed to parse initial velocity \"vx vy vz\" from '%s'", data);
          return false;
@@ -826,7 +826,7 @@ void Projectile::submitLights( LightManager *lm, bool staticLighting )
 {
    if ( staticLighting || mHasExploded || !mDataBlock->lightDesc )
       return;
-   
+
    mDataBlock->lightDesc->submitLight( &mLightState, getRenderTransform(), lm, this );   
 }
 
@@ -834,7 +834,7 @@ bool Projectile::pointInWater(const Point3F &point)
 {   
    // This is pretty much a hack so we can use the existing ContainerQueryInfo
    // and findObject router.
-   
+
    // We only care if we intersect with water at all 
    // so build a box at the point that has only 1 z extent.
    // And test if water coverage is anything other than zero.
@@ -845,7 +845,7 @@ bool Projectile::pointInWater(const Point3F &point)
    ContainerQueryInfo info;
    info.box = boundsBox;
    info.mass = 0.0f;
-   
+
    // Find and retreive physics info from intersecting WaterObject(s)
    if(mContainer != NULL)
    {
@@ -968,7 +968,7 @@ void Projectile::explode( const Point3F &p, const Point3F &n, const U32 collideT
       mExplosionNormal = n;
       mCollideHitType  = collideType;
 
-	   mDataBlock->onExplode_callback( this, mExplosionPosition, mFadeValue );
+      mDataBlock->onExplode_callback( this, mExplosionPosition, mFadeValue );
 
       setMaskBits(ExplosionMask);
 
@@ -987,34 +987,34 @@ void Projectile::explode( const Point3F &p, const Point3F &n, const U32 collideT
          pExplosion->onNewDataBlock(mDataBlock->waterExplosion, false);
       }
       else
-      if (mDataBlock->explosion)
-      {
-         pExplosion = new Explosion;
-         pExplosion->onNewDataBlock(mDataBlock->explosion, false);
-      }
-
-      if( pExplosion )
-      {
-         MatrixF xform(true);
-         xform.setPosition(explodePos);
-         pExplosion->setTransform(xform);
-         pExplosion->setInitialState(explodePos, n);
-         pExplosion->setCollideType( collideType );
-         if (pExplosion->registerObject() == false)
+         if (mDataBlock->explosion)
          {
-            Con::errorf(ConsoleLogEntry::General, "Projectile(%s)::explode: couldn't register explosion",
-                        mDataBlock->getName() );
-            delete pExplosion;
-            pExplosion = NULL;
+            pExplosion = new Explosion;
+            pExplosion->onNewDataBlock(mDataBlock->explosion, false);
          }
-      }
 
-      // Client (impact) decal.
-      if ( mDataBlock->decal )     
-         gDecalManager->addDecal( p, n, 0.0f, mDataBlock->decal );
+         if( pExplosion )
+         {
+            MatrixF xform(true);
+            xform.setPosition(explodePos);
+            pExplosion->setTransform(xform);
+            pExplosion->setInitialState(explodePos, n);
+            pExplosion->setCollideType( collideType );
+            if (pExplosion->registerObject() == false)
+            {
+               Con::errorf(ConsoleLogEntry::General, "Projectile(%s)::explode: couldn't register explosion",
+                  mDataBlock->getName() );
+               delete pExplosion;
+               pExplosion = NULL;
+            }
+         }
 
-      // Client object
-      updateSound();
+         // Client (impact) decal.
+         if ( mDataBlock->decal )     
+            gDecalManager->addDecal( p, n, 0.0f, mDataBlock->decal );
+
+         // Client object
+         updateSound();
    }
 
    /*
@@ -1022,8 +1022,8 @@ void Projectile::explode( const Point3F &p, const Point3F &n, const U32 collideT
    // within the explosion. 
    if ( false && mPhysicsWorld )
    {
-      F32 force = 200.0f;
-      mPhysicsWorld->explosion( p, 15.0f, force );
+   F32 force = 200.0f;
+   mPhysicsWorld->explosion( p, 15.0f, force );
    }
    */
 }
@@ -1063,7 +1063,7 @@ void Projectile::simulate( F32 dt )
       deleteObject();
       return;
    }
-   
+
    if ( mHasExploded )
       return;
 
@@ -1106,68 +1106,61 @@ void Projectile::simulate( F32 dt )
       if ( isServerObject() && ( rInfo.object->getTypeMask() & csmStaticCollisionMask ) == 0 )
          setMaskBits( BounceMask );
 
+      MatrixF xform( true );
+      xform.setColumn( 3, rInfo.point );
+      setTransform( xform );
+      mCurrPosition    = rInfo.point;
+      mCurrVelocity    = Point3F::Zero;
+
+      // Get the object type before the onCollision call, in case
+      // the object is destroyed.
+      U32 objectType = rInfo.object->getTypeMask();
+
+      // re-enable the collision response on the source object since
+      // we need to process the onCollision and explode calls
+      if ( disableSourceObjCollision )
+         mSourceObject->enableCollision();
+
+      // Ok, here is how this works:
+      // onCollision is called to notify the server scripts that a collision has occurred, then
+      // a call to explode is made to start the explosion process. The call to explode is made
+      // twice, once on the server and once on the client.
+      // The server process is responsible for two things:
+      //    1) setting the ExplosionMask network bit to guarantee that the client calls explode
+      //    2) initiate the explosion process on the server scripts
+      // The client process is responsible for only one thing:
+      //    1) drawing the appropriate explosion
+
+      // It is possible that during the processTick the server may have decided that a hit
+      // has occurred while the client prediction has decided that a hit has not occurred.
+      // In this particular scenario the client will have failed to call onCollision and
+      // explode during the processTick. However, the explode function will be called
+      // during the next packet update, due to the ExplosionMask network bit being set.
+      // onCollision will remain uncalled on the client however, therefore no client
+      // specific code should be placed inside the function!
+      onCollision( rInfo.point, rInfo.normal, rInfo.object );
       // Next order of business: do we explode on this hit?
       if ( mCurrTick > mDataBlock->armingDelay || mDataBlock->armingDelay == 0 )
-      {
-         MatrixF xform( true );
-         xform.setColumn( 3, rInfo.point );
-         setTransform( xform );
-         mCurrPosition    = rInfo.point;
-         mCurrVelocity    = Point3F::Zero;
-
-         // Get the object type before the onCollision call, in case
-         // the object is destroyed.
-         U32 objectType = rInfo.object->getTypeMask();
-
-         // re-enable the collision response on the source object since
-         // we need to process the onCollision and explode calls
-         if ( disableSourceObjCollision )
-            mSourceObject->enableCollision();
-
-         // Ok, here is how this works:
-         // onCollision is called to notify the server scripts that a collision has occurred, then
-         // a call to explode is made to start the explosion process. The call to explode is made
-         // twice, once on the server and once on the client.
-         // The server process is responsible for two things:
-         //    1) setting the ExplosionMask network bit to guarantee that the client calls explode
-         //    2) initiate the explosion process on the server scripts
-         // The client process is responsible for only one thing:
-         //    1) drawing the appropriate explosion
-
-         // It is possible that during the processTick the server may have decided that a hit
-         // has occurred while the client prediction has decided that a hit has not occurred.
-         // In this particular scenario the client will have failed to call onCollision and
-         // explode during the processTick. However, the explode function will be called
-         // during the next packet update, due to the ExplosionMask network bit being set.
-         // onCollision will remain uncalled on the client however, therefore no client
-         // specific code should be placed inside the function!
-         onCollision( rInfo.point, rInfo.normal, rInfo.object );
          explode( rInfo.point, rInfo.normal, objectType );
 
-         // break out of the collision check, since we've exploded
-         // we don't want to mess with the position and velocity
-      }
-      else
+      if ( mDataBlock->isBallistic )
       {
-         if ( mDataBlock->isBallistic )
-         {
-            // Otherwise, this represents a bounce.  First, reflect our velocity
-            //  around the normal...
-            Point3F bounceVel = mCurrVelocity - rInfo.normal * (mDot( mCurrVelocity, rInfo.normal ) * 2.0);
-            mCurrVelocity = bounceVel;
+         // Otherwise, this represents a bounce.  First, reflect our velocity
+         //  around the normal...
+         Point3F bounceVel = mCurrVelocity - rInfo.normal * (mDot( mCurrVelocity, rInfo.normal ) * 2.0);
+         mCurrVelocity = bounceVel;
 
-            // Add in surface friction...
-            Point3F tangent = bounceVel - rInfo.normal * mDot(bounceVel, rInfo.normal);
-            mCurrVelocity  -= tangent * mDataBlock->bounceFriction;
+         // Add in surface friction...
+         Point3F tangent = bounceVel - rInfo.normal * mDot(bounceVel, rInfo.normal);
+         mCurrVelocity  -= tangent * mDataBlock->bounceFriction;
 
-            // Now, take elasticity into account for modulating the speed of the grenade
-            mCurrVelocity *= mDataBlock->bounceElasticity;
+         // Now, take elasticity into account for modulating the speed of the grenade
+         mCurrVelocity *= mDataBlock->bounceElasticity;
 
-            // Set the new position to the impact and the bounce
-            // will apply on the next frame.
-            //F32 timeLeft = 1.0f - rInfo.t;
-            newPosition = oldPosition = rInfo.point + rInfo.normal * 0.05f;
-         }
+         // Set the new position to the impact and the bounce
+         // will apply on the next frame.
+         //F32 timeLeft = 1.0f - rInfo.t;
+         newPosition = oldPosition = rInfo.point + rInfo.normal * 0.05f;
       }
    }
 
@@ -1201,7 +1194,7 @@ void Projectile::advanceTime(F32 dt)
       return;
 
    if (mActivateThread &&
-         mProjectileShape->getDuration(mActivateThread) > mProjectileShape->getTime(mActivateThread) + dt)
+      mProjectileShape->getDuration(mActivateThread) > mProjectileShape->getTime(mActivateThread) + dt)
    {
       mProjectileShape->advanceTime(dt, mActivateThread);
    }
@@ -1237,7 +1230,7 @@ void Projectile::interpolateTick(F32 delta)
       dir.normalize();
 
    MatrixF xform(true);
-	xform = MathUtils::createOrientFromDir(dir);
+   xform = MathUtils::createOrientFromDir(dir);
    xform.setPosition(interpPos);
    setRenderTransform(xform);
 
@@ -1265,7 +1258,7 @@ void Projectile::onCollision(const Point3F& hitPosition, const Point3F& hitNorma
 
    if (hitObject != NULL && isServerObject())
    {
-	   mDataBlock->onCollision_callback( this, hitObject, mFadeValue, hitPosition, hitNormal );
+      mDataBlock->onCollision_callback( this, hitObject, mFadeValue, hitPosition, hitNormal );
    }
 }
 
@@ -1289,12 +1282,12 @@ U32 Projectile::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
          if ( stream->writeFlag( ghostIndex != -1 ) )
          {
             stream->writeRangedU32( U32(ghostIndex), 
-                                    0, 
-                                    NetConnection::MaxGhostCount );
+               0, 
+               NetConnection::MaxGhostCount );
 
             stream->writeRangedU32( U32(mSourceObjectSlot),
-                                    0, 
-                                    ShapeBase::MaxMountedImages - 1 );
+               0, 
+               ShapeBase::MaxMountedImages - 1 );
          }
          else 
             // have not recieved the ghost for the source object yet, try again later
@@ -1329,7 +1322,7 @@ U32 Projectile::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
 void Projectile::unpackUpdate(NetConnection* con, BitStream* stream)
 {
    Parent::unpackUpdate(con, stream);
-   
+
    if ( stream->readFlag() ) // InitialUpdateMask
    {
       mCurrTick = stream->readRangedU32( 0, MaxLivingTicks );
@@ -1349,7 +1342,7 @@ void Projectile::unpackUpdate(NetConnection* con, BitStream* stream)
          mSourceObject     = NULL;
       }
    }
-   
+
    if ( stream->readFlag() ) // ExplosionMask
    {
       Point3F explodePoint;
@@ -1389,12 +1382,12 @@ void Projectile::prepRenderImage( SceneRenderState* state )
    /*
    if ( mFlareData )
    {
-      mFlareState.fullBrightness = mDataBlock->lightDesc->mBrightness;
-      mFlareState.scale = mFlareScale;
-      mFlareState.lightInfo = mLight;
-      mFlareState.lightMat = getTransform();
+   mFlareState.fullBrightness = mDataBlock->lightDesc->mBrightness;
+   mFlareState.scale = mFlareScale;
+   mFlareState.lightInfo = mLight;
+   mFlareState.lightMat = getTransform();
 
-      mFlareData->prepRender( state, &mFlareState );
+   mFlareData->prepRender( state, &mFlareState );
    }
    */
 
@@ -1430,18 +1423,18 @@ void Projectile::prepBatchRender( SceneRenderState *state )
 }
 
 DefineEngineMethod(Projectile, presimulate, void, (F32 seconds), (1.0f), 
-                                       "@brief Updates the projectile's positional and collision information.\n\n"
-                                       "This function will first delete the projectile if it is a server object and is outside it's ProjectileData::lifetime. "
-                                       "Also responsible for applying gravity, determining collisions, triggering explosions, "
-                                       "emitting trail particles, and calculating bounces if necessary."
-									            "@param seconds Amount of time, in seconds since the simulation's start, to advance.\n"
-									            "@tsexample\n"
-									               "// Tell the projectile to process a simulation event, and provide the amount of time\n"
-										            "// that has passed since the simulation began.\n"
-										            "%seconds = 2.0;\n"
-										            "%projectile.presimulate(%seconds);\n"
-									            "@endtsexample\n"
-                                       "@note This function is not called if the SimObject::hidden is true.")
+                   "@brief Updates the projectile's positional and collision information.\n\n"
+                   "This function will first delete the projectile if it is a server object and is outside it's ProjectileData::lifetime. "
+                   "Also responsible for applying gravity, determining collisions, triggering explosions, "
+                   "emitting trail particles, and calculating bounces if necessary."
+                   "@param seconds Amount of time, in seconds since the simulation's start, to advance.\n"
+                   "@tsexample\n"
+                   "// Tell the projectile to process a simulation event, and provide the amount of time\n"
+                   "// that has passed since the simulation began.\n"
+                   "%seconds = 2.0;\n"
+                   "%projectile.presimulate(%seconds);\n"
+                   "@endtsexample\n"
+                   "@note This function is not called if the SimObject::hidden is true.")
 {
-	object->simulate( seconds );
+   object->simulate( seconds );
 }
