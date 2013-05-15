@@ -3170,7 +3170,7 @@ void Player::updateMove(const Move* move)
    // Update the PlayerPose
    Pose desiredPose = mPose;
 
-	if (!mIsAiControlled)//yorks new from here - leave the Player alone!
+	if (!mIsAiControlled)//Player Pose Input
 	{
 	   if ( mSwimming )
 		  desiredPose = SwimPose; 
@@ -3183,7 +3183,7 @@ void Player::updateMove(const Move* move)
 	   else if ( canStand() )
 		  desiredPose = StandPose;
 	}
-	else//yorks select for Ai using mAiPose
+	else//Ai using mAiPose via script input
 	{
 	   if ( mSwimming )
 		  desiredPose = SwimPose; 
@@ -3195,7 +3195,7 @@ void Player::updateMove(const Move* move)
 						desiredPose = SprintPose;
 					else if ( canStand() )
 							desiredPose = StandPose;
-	}//yorks end of changes
+	}
 
    setPose( desiredPose );
 }
@@ -6141,10 +6141,10 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    {
       stream->writeFlag(mFalling);
 	  
-	  //calls to update animations correctly
-		stream->writeFlag(mSwimming);//yorks start
-		stream->writeFlag(mJetting);
-		stream->writeInt(mPose, NumPoseBits);//yorks end
+	  //calls to update animations correctly for Ai
+	  stream->writeFlag(mSwimming);
+	  stream->writeFlag(mJetting);
+	  stream->writeInt(mPose, NumPoseBits);
 
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
@@ -6240,11 +6240,11 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
 	  
-	  //calls to update animations correctly
-		mSwimming = stream->readFlag();//yorks start
-		mJetting = stream->readFlag();
-		Pose newPose = (Pose)(stream->readInt(NumPoseBits));
-		setPose(newPose);//yorks end
+	  //calls to update animations correctly for Ai
+	  mSwimming = stream->readFlag();
+      mJetting = stream->readFlag();
+	  Pose newPose = (Pose)(stream->readInt(NumPoseBits));
+	  setPose(newPose);
 
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {

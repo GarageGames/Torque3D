@@ -451,7 +451,6 @@ bool AIPlayer::getAIMove(Move *movePtr)
    return true;
 }
 
-//yorks start
 void AIPlayer::setAiPose( F32 pose )
 {
    mAiPose = pose;
@@ -463,14 +462,12 @@ void AIPlayer::setAiPose( F32 pose )
 //2 = prone ... which has no stock animations
 //3 = sprint
 //fall, swim, etc are taken care of automatically by the engine
-
 //%your_aiplayer_name_or_id.setAiPose(%pose_number);
 
 F32 AIPlayer::getAiPose()
 {
    return mAiPose; 
 }
-//yorks end
 
 /**
  * Utility function to throw callbacks. Callbacks always occure
@@ -488,7 +485,6 @@ void AIPlayer::throwCallback( const char *name )
 // Console Functions
 // --------------------------------------------------------------------------------------------
 
-//yorks start
 DefineEngineMethod( AIPlayer, setAiPose, void, ( F32 pose ),,
    "@brief Sets the AiPose for an AI object.nn"
 
@@ -506,7 +502,6 @@ DefineEngineMethod( AIPlayer, getAiPose, F32, (),,
 {
    return object->getAiPose();
 }
-//yorks end
 
 DefineEngineMethod( AIPlayer, stop, void, ( ),,
    "@brief Tells the AIPlayer to stop moving.\n\n")
