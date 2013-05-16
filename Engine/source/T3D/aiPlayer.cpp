@@ -451,6 +451,16 @@ bool AIPlayer::getAIMove(Move *movePtr)
    return true;
 }
 
+void AIPlayer::setAiPose( F32 pose )
+{
+   mAiPose = pose;
+}
+
+F32 AIPlayer::getAiPose()
+{
+   return mAiPose; 
+}
+
 /**
  * Utility function to throw callbacks. Callbacks always occure
  * on the datablock class.
@@ -609,4 +619,22 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
 {
 	GameBase* obj = object->getAimObject();
    return obj? obj->getId(): -1;
+}
+
+DefineEngineMethod( AIPlayer, setAiPose, void, ( F32 pose ),,
+   "@brief Sets the AiPose for an AI object.nn"
+
+   "@param pose StandPose=0,CrouchPose=1,PronePose=2,SprintPose=3.  "
+   "Uses the new AiPose variable from shapebase (as defined in "
+   "its PlayerData datablock)nn")
+{
+	object->setAiPose(pose);
+}
+
+DefineEngineMethod( AIPlayer, getAiPose, F32, (),,
+   "@brief Get the object's current AiPose.nn"
+
+   "@return StandPose=0,CrouchPose=1,PronePose=2,SprintPose=3n")
+{
+   return object->getAiPose();
 }
