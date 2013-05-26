@@ -1763,6 +1763,12 @@ void Player::onRemove()
    setControlObject(0);
    scriptOnRemove();
    removeFromScene();
+   
+   if ( isGhost() )
+   {
+      SFX_DELETE( mMoveBubbleSound );
+      SFX_DELETE( mWaterBreathSound );
+   }
 
    U32 i;
    for( i=0; i<PlayerData::NUM_SPLASH_EMITTERS; i++ )
