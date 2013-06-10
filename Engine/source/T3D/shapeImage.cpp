@@ -3092,7 +3092,10 @@ TICKAGAIN:
    }
 
    if ( image.rDT > 0.0f && image.delayTime > 0.0f && imageData.useRemainderDT && dt != 0.0f )
+   {
+      dt = image.rDT;
       goto TICKAGAIN;
+   }
 }
 
 
