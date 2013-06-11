@@ -80,6 +80,7 @@ public:
    // SceneObject
    void prepRenderImage( SceneRenderState *state );
    void renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *mi );
+   void ChangeCoverage(F32 newCoverage);//ME Change
 
 protected:
 
