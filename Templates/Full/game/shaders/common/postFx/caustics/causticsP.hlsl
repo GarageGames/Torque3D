@@ -27,6 +27,7 @@ uniform float3    eyePosWorld;
 uniform float4    rtParams0;
 uniform float4    waterFogPlane;
 uniform float     accumTime;
+uniform float4    colorize;
 
 float4 main( PFXVertToPix IN, 
              uniform sampler2D prepassTex :register(S0),
@@ -57,6 +58,7 @@ float4 main( PFXVertToPix IN,
    //Sample caustics texture   
    float4 caustics = tex2D(causticsTex0, causticsUV0);   
    caustics *= tex2D(causticsTex1, causticsUV1);
+   caustics *= colorize;
    
    //Use normal Z to modulate caustics  
    float waterDepth = 1 - saturate(pos.z + waterFogPlane.w + 1);
