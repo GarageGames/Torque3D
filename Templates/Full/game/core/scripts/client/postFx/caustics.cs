@@ -68,11 +68,13 @@ singleton PostEffect( CausticsPFX )
 // this effects the timing of the animation -
 
 $CausticsPFX::refTime = getSimTime();
+$CausticsPFX::color = "1.0 1.0 1.0 1.0";//value is arbitrary; 1.0 1.0 1.0 1.0 doesn't change color of fx
 
 function CausticsPFX::setShaderConsts(%this)
 {
    //echo($Sim::time - %this.timeStart);
    //echo(%this.timeConst);
    %this.setShaderConst( "$refTime", $CausticsPFX::refTime ); 
+   %this.setShaderConst( "$colorize", $CausticsPFX::color );
 }
 
