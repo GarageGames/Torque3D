@@ -37,9 +37,9 @@ LPDIRECTINPUT8 DInputDevice::smDInputInterface;
 U8    DInputDevice::smDeviceCount[ NUM_INPUT_DEVICE_TYPES ];
 bool  DInputDevice::smInitialized = false;
 
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
 const char* getKeyName( U16 key );
-#endif
+#endif // LOG_INPUT_DEBUG
 
 //------------------------------------------------------------------------------
 DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
@@ -60,35 +60,124 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
    mForceFeedbackAxes[0]   = 0;
    mForceFeedbackAxes[1]   = 0;
 
-   const char* deviceTypeName = "unknown";
+   const char* deviceTypeName = "unknown"; // DX device type name
+   const char* deviceSubTypeName = "unknown"; // DX sub type name
+   const char* ourDeviceTypeName = "unknown"; // our type mapping
    U8 deviceType = UnknownDeviceType;
 
-   switch ( GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType ) )
+   int dType = GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType );
+   int dSubType = GET_DIDEVICE_SUBTYPE( mDeviceInstance.dwDevType );
+
+   // some interesting values from from dinput.h and MSDN below
+   switch ( dType )
    {
-      // [rene, 12/09/2008] why do we turn a gamepad into a joystick here?
-	  
-      case DI8DEVTYPE_DRIVING:
-      case DI8DEVTYPE_GAMEPAD:
       case DI8DEVTYPE_JOYSTICK:
-         deviceTypeName    = "joystick";
-         deviceType        = JoystickDeviceType;
-         break;
-
+         {
+            deviceType        = JoystickDeviceType;
+            deviceTypeName    = "Joystick";
+            ourDeviceTypeName = "joystick";
+            break;
+         }
+      case DI8DEVTYPE_GAMEPAD:
+         {
+            deviceType        = JoystickDeviceType;
+            deviceTypeName    = "Gamepad";
+            ourDeviceTypeName = "joystick";
+            switch ( dSubType )
+            {
+               case DI8DEVTYPEGAMEPAD_TILT: deviceSubTypeName = "Tilt: Gamepad that can report x-axis and y-axis data based on the attitude of the controller"; break;
+            }
+            break;
+         }
+      case DI8DEVTYPE_DRIVING:
+         {
+            deviceType        = JoystickDeviceType;
+            deviceTypeName    = "Device for steering";
+            ourDeviceTypeName = "joystick";
+            switch ( dSubType )
+            {
+               case DI8DEVTYPEDRIVING_COMBINEDPEDALS: deviceSubTypeName = "Combined Pedals: reports acceleration and brake pedal values from a single axis"; break;
+               case DI8DEVTYPEDRIVING_DUALPEDALS: deviceSubTypeName = "Dual Pedals: reports acceleration and brake pedal values from separate axes"; break;
+               case DI8DEVTYPEDRIVING_HANDHELD: deviceSubTypeName = "Hand-held steering device."; break;
+               case DI8DEVTYPEDRIVING_THREEPEDALS: deviceSubTypeName = "Three Pedals: reports acceleration, brake, and clutch pedal values from separate axes"; break;
+            }
+            break;
+         }
+      case DI8DEVTYPE_FLIGHT:
+         {
+            deviceType        = JoystickDeviceType;
+            deviceTypeName    = "Controller for flight simulation";
+            ourDeviceTypeName = "joystick";
+            switch ( dSubType )
+            {
+               case DI8DEVTYPEFLIGHT_RC: deviceSubTypeName = "RC: Flight device based on a remote control for model aircraft"; break;
+               case DI8DEVTYPEFLIGHT_STICK: deviceSubTypeName = "Joystick"; break;
+               case DI8DEVTYPEFLIGHT_YOKE: deviceSubTypeName = "Yoke"; break;
+            }
+            break;
+         }
+      case DI8DEVTYPE_1STPERSON:
+         {
+            deviceType        = JoystickDeviceType;
+            deviceTypeName    = "First-person action game device";
+            ourDeviceTypeName = "joystick";
+            switch ( dSubType )
+            {
+               case DI8DEVTYPE1STPERSON_SHOOTER: deviceSubTypeName = "Shooter: Device designed for first-person shooter games."; break;
+               case DI8DEVTYPE1STPERSON_SIXDOF: deviceSubTypeName = "6DOF: Device with six degrees of freedom; that is, three lateral axes and three rotational axes."; break;
+            }
+            break;
+         }
+      case DI8DEVTYPE_DEVICECTRL:
+         {
+            deviceType        = JoystickDeviceType;
+            deviceTypeName    = "Device";
+            ourDeviceTypeName = "joystick";
+            break;
+         }
       case DI8DEVTYPE_KEYBOARD:
-         deviceTypeName    = "keyboard";
-         deviceType        = KeyboardDeviceType;
-         break;
-
+         {
+            deviceType        = KeyboardDeviceType;
+            deviceTypeName    = "Keyboard";
+            ourDeviceTypeName = "keyboard";
+            break;
+         }
       case DI8DEVTYPE_MOUSE:
-         deviceTypeName    = "mouse";
-         deviceType        = MouseDeviceType;
-         break;
+         {
+            deviceType        = MouseDeviceType;
+            deviceTypeName    = "Mouse";
+            ourDeviceTypeName = "mouse";
+            switch ( dSubType )
+            {
+               case DI8DEVTYPEMOUSE_ABSOLUTE: deviceSubTypeName = "Mouse that returns absolute axis data."; break;
+               case DI8DEVTYPEMOUSE_FINGERSTICK: deviceSubTypeName = "Fingerstick"; break;
+               case DI8DEVTYPEMOUSE_TOUCHPAD: deviceSubTypeName = "Touchpad"; break;
+               case DI8DEVTYPEMOUSE_TRACKBALL: deviceSubTypeName = "Trackball"; break;
+            }
+            break;
+         }
+      case DI8DEVTYPE_SCREENPOINTER:
+         {
+            deviceType        = MouseDeviceType;
+            deviceTypeName    = "Screen pointer";
+            ourDeviceTypeName = "mouse";
+            break;
+         }
+#ifdef LOG_INPUT_DEBUG
+      default:
+         {
+            Con::printf("unknown and unsupported device type: %d", dType);
+         }
+#endif // LOG_INPUT_DEBUG
    }
-
+   
    mDeviceType    = deviceType;
    mDeviceID      = smDeviceCount[ deviceType ] ++;
 
-   dSprintf( mName, 29, "%s%d", deviceTypeName, mDeviceID );
+   dSprintf( mName, 29, "%s%d", ourDeviceTypeName, mDeviceID );
+#ifdef LOG_INPUT_DEBUG
+   Con::printf("Found input device: name: '%s', product name: '%s', GUID: '%s', type: %s ('%s') [%d], subtype: '%s' [%d], id: %d, name: '%s'", getName(), getProductName(), getProductGUID(),  ourDeviceTypeName, deviceTypeName, dType, deviceSubTypeName, dSubType, mDeviceID, mName);
+#endif // LOG_INPUT_DEBUG
 }
 
 //------------------------------------------------------------------------------
@@ -119,15 +208,14 @@ bool DInputDevice::create()
          if ( FAILED( mDevice->GetCapabilities( &mDeviceCaps ) ) )
          {
             Con::errorf( "  Failed to get the capabilities of the %s input device.", mName );
-#ifdef LOG_INPUT
-            Input::log( "Failed to get the capabilities of &s!\n", mName );
-#endif
             return false;
          }
 
-#ifdef LOG_INPUT
-         Input::log( "%s detected, created as %s (%s).\n", mDeviceInstance.tszProductName, mName, ( isPolled() ? "polled" : "asynchronous" ) );
-#endif
+#ifdef LOG_INPUT_DEBUG
+         UTF8 buf[512];
+         convertUTF16toUTF8(mDeviceInstance.tszProductName, buf, sizeof(buf));
+         Con::printf( "%s detected, created as %s (%s).", buf, mName, ( isPolled() ? "polled" : "asynchronous" ) );
+#endif // LOG_INPUT_DEBUG
 
          if ( enumerateObjects() )
          {
@@ -145,10 +233,7 @@ bool DInputDevice::create()
             if ( FAILED( result ) )
             {				
                Con::errorf( "  Failed to set the data format for the %s input device.", mName );
-#ifdef LOG_INPUT
-               Input::log( "Failed to set the data format for %s!\n", mName );
-#endif
-			   return false;
+               return false;
             }
 
             // Set up the data buffer for buffered input:
@@ -166,9 +251,6 @@ bool DInputDevice::create()
             if ( FAILED( result ) )
             {
                Con::errorf( "  Failed to set the buffer size property for the %s input device.", mName );
-#ifdef LOG_INPUT
-               Input::log( "Failed to set the buffer size property for %s!\n", mName );
-#endif
                return false;
             }
 
@@ -183,9 +265,6 @@ bool DInputDevice::create()
                if ( FAILED( result ) )
                {
                   Con::errorf( "  Failed to set relative axis mode for the %s input device.", mName );
-#ifdef LOG_INPUT
-                  Input::log( "Failed to set relative axis mode for %s!\n", mName );
-#endif
                   return false;
                }
             }
@@ -193,30 +272,30 @@ bool DInputDevice::create()
       }
       else
       {
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
          switch ( result )
          {
             case DIERR_DEVICENOTREG:
-               Input::log( "CreateDevice failed -- The device or device instance is not registered with DirectInput.\n" );
+               Con::printf( "CreateDevice failed -- The device or device instance is not registered with DirectInput." );
                break;
 
             case DIERR_INVALIDPARAM:
-               Input::log( "CreateDevice failed -- Invalid parameter.\n" );
+               Con::printf( "CreateDevice failed -- Invalid parameter." );
                break;
 
             case DIERR_NOINTERFACE:
-               Input::log( "CreateDevice failed -- The specified interface is not supported by the object.\n" );
+               Con::printf( "CreateDevice failed -- The specified interface is not supported by the object." );
                break;
 
             case DIERR_OUTOFMEMORY:
-               Input::log( "CreateDevice failed -- Out of memory.\n" );
+               Con::printf( "CreateDevice failed -- Out of memory." );
                break;
 
             default:
-               Input::log( "CreateDevice failed -- Unknown error.\n" );
+               Con::printf( "CreateDevice failed -- Unknown error." );
                break;
          };
-#endif // LOG_INPUT
+#endif // LOG_INPUT_DEBUG
          Con::printf( "  CreateDevice failed for the %s input device!", mName );
          return false;
       }
@@ -239,9 +318,9 @@ void DInputDevice::destroy()
          mForceFeedbackEffect->Release();
          mForceFeedbackEffect = NULL;
          mNumForceFeedbackAxes = 0;
-#ifdef LOG_INPUT
-         Input::log("DInputDevice::destroy - releasing constant force feeback effect\n"); 
-#endif
+#ifdef LOG_INPUT_DEBUG
+         Con::printf("DInputDevice::destroy - releasing constant force feeback effect");
+#endif // LOG_INPUT_DEBUG
       }
 
       mDevice->Release();
@@ -289,9 +368,6 @@ bool DInputDevice::acquire()
       if ( FAILED( result ) )
       {
          Con::errorf( "Failed to set the cooperative level for the %s input device.", mName );
-#ifdef LOG_INPUT
-         Input::log( "Failed to set the cooperative level for %s!\n", mName );
-#endif
          return false;
       }
 
@@ -315,9 +391,6 @@ bool DInputDevice::acquire()
       if ( result )
       {
          Con::printf( "%s input device acquired.", mName );
-#ifdef LOG_INPUT
-         Input::log( "%s acquired.\n", mName );
-#endif
          mAcquired = true;
 
          // If we were previously playing a force feedback effect, before
@@ -341,9 +414,6 @@ bool DInputDevice::acquire()
             default:                      reason = "Unknown error"; break;
          }
          Con::warnf( "%s input device NOT acquired: %s", mName, reason );
-#ifdef LOG_INPUT
-         Input::log( "Failed to acquire %s: %s\n", mName, reason );
-#endif
       }
 
       return( result );
@@ -365,17 +435,11 @@ bool DInputDevice::unacquire()
       if ( result )
       {
          Con::printf( "%s input device unacquired.", mName );
-#ifdef LOG_INPUT
-         Input::log( "%s unacquired.\n", mName );
-#endif
          mAcquired = false;
       }
       else
       {
          Con::warnf( ConsoleLogEntry::General, "%s input device NOT unacquired.", mName );
-#ifdef LOG_INPUT
-         Input::log( "Failed to unacquire %s!\n", mName );
-#endif
       }
 
       return( result );
@@ -566,19 +630,18 @@ bool DInputDevice::enumerateObjects()
       }
    }
 
-#ifdef LOG_INPUT
-   Input::log( "  %d total objects detected.\n", mObjCount );
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( "  %d total objects detected.", mObjCount );
    if ( buttonCount )
-      Input::log( "  %d buttons.\n", buttonCount );
+      Con::printf( "  %d buttons.", buttonCount );
    if ( povCount )
-      Input::log( "  %d POVs.\n", povCount );
+      Con::printf( "  %d POVs.", povCount );
 
    if ( keyCount )
-      Input::log( "  %d keys.\n", keyCount );
+      Con::printf( "  %d keys.", keyCount );
    if ( unknownCount )
-      Input::log( "  %d unknown objects.\n", unknownCount );
-   Input::log( "\n" );
-#endif
+      Con::printf( "  %d unknown objects.", unknownCount );
+#endif // LOG_INPUT_DEBUG
 
    return true;
 }
@@ -605,6 +668,21 @@ const char* DInputDevice::getProductName()
 #else
    return mDeviceInstance.tszProductName;
 #endif
+}
+
+//------------------------------------------------------------------------------
+const char* DInputDevice::getProductGUID()
+{
+    static UTF8 buf[512];
+    OLECHAR* guidStr;
+    StringFromCLSID(mDeviceInstance.guidProduct, &guidStr);
+#ifdef UNICODE
+    convertUTF16toUTF8(guidStr, buf, sizeof(buf));
+#else
+    strncpy(buf, (char*)guidStr, sizeof(buf));
+#endif // UNICODE
+    ::CoTaskMemFree(guidStr);
+    return (const char *)buf;
 }
 
 //------------------------------------------------------------------------------
@@ -647,9 +725,9 @@ bool DInputDevice::processAsync()
 
             case DIERR_INVALIDPARAM:
                Con::errorf( "DInputDevice::processAsync -- Invalid parameter passed to GetDeviceData of the %s input device!", mName );
-#ifdef LOG_INPUT
-               Input::log( "Invalid parameter passed to GetDeviceData for %s!\n", mName );
-#endif
+#ifdef LOG_INPUT_DEBUG
+               Con::printf( "Invalid parameter passed to GetDeviceData for %s!", mName );
+#endif // LOG_INPUT_DEBUG
                break;
 
             case DIERR_NOTACQUIRED:
@@ -657,9 +735,9 @@ bool DInputDevice::processAsync()
                mAcquired = false;
                // Don't error out - this is actually a natural occurrence...
                //Con::errorf( "DInputDevice::processAsync -- GetDeviceData called when %s input device is not acquired!", mName );
-#ifdef LOG_INPUT
-               Input::log( "GetDeviceData called when %s is not acquired!\n", mName );
-#endif
+#ifdef LOG_INPUT_DEBUG
+               Con::printf( "GetDeviceData called when %s is not acquired!", mName );
+#endif // LOG_INPUT_DEBUG
                break;
          }
 
@@ -675,9 +753,6 @@ bool DInputDevice::processAsync()
 	  {
          // This is a problem, but we can keep going...
          Con::errorf( "DInputDevice::processAsync -- %s input device's event buffer overflowed!", mName );
-#ifdef LOG_INPUT
-         Input::log( "%s event buffer overflowed!\n", mName );
-#endif
          mNeedSync = true; // Let it know to resync next time through...
       }
    }
@@ -708,23 +783,14 @@ bool DInputDevice::processImmediate()
 
          case DIERR_INVALIDPARAM:
             Con::errorf( "DInputDevice::processPolled -- invalid parameter passed to GetDeviceState on %s input device!", mName );
-#ifdef LOG_INPUT
-            Input::log( "Invalid parameter passed to GetDeviceState on %s.\n", mName );
-#endif
             break;
 
          case DIERR_NOTACQUIRED:
             Con::errorf( "DInputDevice::processPolled -- GetDeviceState called when %s input device is not acquired!", mName );
-#ifdef LOG_INPUT
-            Input::log( "GetDeviceState called when %s is not acquired!\n", mName );
-#endif
             break;
 
          case E_PENDING:
             Con::warnf( "DInputDevice::processPolled -- Data not yet available for the %s input device!", mName );
-#ifdef LOG_INPUT
-            Input::log( "Data pending for %s.", mName );
-#endif
             break;
       }
 
@@ -828,7 +894,7 @@ static U32 _Win32GetPOVDirs(U32 data)
    return dirs;
 }
 
-#if defined(LOG_INPUT)
+#if defined(LOG_INPUT_DEBUG)
 static void _Win32LogPOVInput(InputEventInfo &newEvent)
 {
 
@@ -850,11 +916,11 @@ static void _Win32LogPOVInput(InputEventInfo &newEvent)
    case SI_LPOV2:
       dir = "Left"; inst = (newEvent.objInst == SI_LPOV) ? 1 : 2; break;
    }
-   Con::printf( "EVENT (DInput): %s POV %d %s.\n", dir, inst, sstate);
+   Con::printf( "EVENT (DInput): %s POV %d %s.", dir, inst, sstate);
 }
 #else
 #define _Win32LogPOVInput( a )
-#endif
+#endif // LOG_INPUT_DEBUG
 
 //------------------------------------------------------------------------------
 bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
@@ -879,17 +945,17 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
          {
             newEvent.fValue = float( newData );
 
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
 #ifdef LOG_MOUSEMOVE
             if ( newEvent.objInst == SI_XAXIS )
-               Input::log( "EVENT (DInput): %s move (%.1f, 0.0).\n", mName, newEvent.fValue );
+               Con::printf( "EVENT (DInput): %s move (%.1f, 0.0).", mName, newEvent.fValue );
             else if ( newEvent.objInst == SI_YAXIS )
-               Input::log( "EVENT (DInput): %s move (0.0, %.1f).\n", mName, newEvent.fValue );
+               Con::printf( "EVENT (DInput): %s move (0.0, %.1f).", mName, newEvent.fValue );
             else
-#endif
+#endif // LOG_MOUSEMOVE
             if ( newEvent.objInst == SI_ZAXIS )
-               Input::log( "EVENT (DInput): %s wheel move %.1f.\n", mName, newEvent.fValue );
-#endif
+               Con::printf( "EVENT (DInput): %s wheel move %.1f.", mName, newEvent.fValue );
+#endif // LOG_INPUT_DEBUG
          }
          else  // Joystick or other device:
          {
@@ -902,36 +968,36 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
             else
                newEvent.fValue = (F32)newData;
 
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
             // Keep this commented unless you REALLY want these messages for something--
             // they come once per each iteration of the main game loop.
             //switch ( newEvent.objType )
             //{
                //case SI_XAXIS:
                   //if ( newEvent.fValue < -0.01f || newEvent.fValue > 0.01f )
-                     //Input::log( "EVENT (DInput): %s X-axis move %.2f.\n", mName, newEvent.fValue );
+                     //Con::printf( "EVENT (DInput): %s X-axis move %.2f.", mName, newEvent.fValue );
                   //break;
                //case SI_YAXIS:
                   //if ( newEvent.fValue < -0.01f || newEvent.fValue > 0.01f )
-                     //Input::log( "EVENT (DInput): %s Y-axis move %.2f.\n", mName, newEvent.fValue );
+                     //Con::printf( "EVENT (DInput): %s Y-axis move %.2f.", mName, newEvent.fValue );
                   //break;
                //case SI_ZAXIS:
-                  //Input::log( "EVENT (DInput): %s Z-axis move %.1f.\n", mName, newEvent.fValue );
+                  //Con::printf( "EVENT (DInput): %s Z-axis move %.1f.", mName, newEvent.fValue );
                   //break;
                //case SI_RXAXIS:
-                  //Input::log( "EVENT (DInput): %s R-axis move %.1f.\n", mName, newEvent.fValue );
+                  //Con::printf( "EVENT (DInput): %s R-axis move %.1f.", mName, newEvent.fValue );
                   //break;
                //case SI_RYAXIS:
-                  //Input::log( "EVENT (DInput): %s U-axis move %.1f.\n", mName, newEvent.fValue );
+                  //Con::printf( "EVENT (DInput): %s U-axis move %.1f.", mName, newEvent.fValue );
                   //break;
                //case SI_RZAXIS:
-                  //Input::log( "EVENT (DInput): %s V-axis move %.1f.\n", mName, newEvent.fValue );
+                  //Con::printf( "EVENT (DInput): %s V-axis move %.1f.", mName, newEvent.fValue );
                   //break;
                //case SI_SLIDER:
-                  //Input::log( "EVENT (DInput): %s slider move %.1f.\n", mName, newEvent.fValue );
+                  //Con::printf( "EVENT (DInput): %s slider move %.1f.", mName, newEvent.fValue );
                   //break;
             //};
-#endif
+#endif // LOG_INPUT_DEBUG
          }
 
          newEvent.postToSignal(Input::smInputEvent);
@@ -941,12 +1007,12 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
          newEvent.action   = ( newData & 0x80 ) ? SI_MAKE : SI_BREAK;
          newEvent.fValue   = ( newEvent.action == SI_MAKE ) ? 1.0f : 0.0f;
 
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
          if ( newEvent.action == SI_MAKE )
-            Input::log( "EVENT (DInput): %s button%d pressed.\n", mName, newEvent.objInst - KEY_BUTTON0 );
+            Con::printf( "EVENT (DInput): %s button%d pressed.", mName, newEvent.objInst - KEY_BUTTON0 );
          else
-            Input::log( "EVENT (DInput): %s button%d released.\n", mName, newEvent.objInst - KEY_BUTTON0 );
-#endif
+            Con::printf( "EVENT (DInput): %s button%d released.", mName, newEvent.objInst - KEY_BUTTON0 );
+#endif // LOG_INPUT_DEBUG
 
          newEvent.postToSignal(Input::smInputEvent);
          break;
@@ -1050,9 +1116,9 @@ void DInputDevice::rumble(float x, float y)
    // Now set the new parameters and start the effect immediately.
    if (!mForceFeedbackEffect)
    {
-#ifdef LOG_INPUT
-      Input::log("DInputDevice::rumbleJoystick - creating constant force feeback effect\n"); 
-#endif
+#ifdef LOG_INPUT_DEBUG
+      Con::printf("DInputDevice::rumbleJoystick - creating constant force feeback effect"); 
+#endif // LOG_INPUT_DEBUG
       DIEFFECT eff;
       ZeroMemory( &eff, sizeof(eff) );
       eff.dwSize                  = sizeof(DIEFFECT);
@@ -1073,18 +1139,12 @@ void DInputDevice::rumble(float x, float y)
       // Create the prepared effect
       if ( FAILED( result = mDevice->CreateEffect( GUID_ConstantForce, &eff, &mForceFeedbackEffect, NULL ) ) )
       {
-#ifdef LOG_INPUT
-         Input::log( "DInputDevice::rumbleJoystick - %s does not support force feedback.\n", mName );
-#endif
-	      Con::errorf( "DInputDevice::rumbleJoystick - %s does not support force feedback.\n", mName );
+	      Con::errorf( "DInputDevice::rumbleJoystick - %s does not support force feedback.", mName );
 	      return;
       }
       else
       {
-#ifdef LOG_INPUT
-         Input::log( "DInputDevice::rumbleJoystick - %s supports force feedback.\n", mName );
-#endif
-	      Con::printf( "DInputDevice::rumbleJoystick - %s supports force feedback.\n", mName );
+	      Con::printf( "DInputDevice::rumbleJoystick - %s supports force feedback.", mName );
       }
    }
 
@@ -1140,10 +1200,7 @@ void DInputDevice::rumble(float x, float y)
             errorString = "Unknown Error";
       }
 
-#ifdef LOG_INPUT
-      Input::log( "DInputDevice::rumbleJoystick - %s - Failed to start rumble effect\n", errorString );
-#endif
-      Con::errorf( "DInputDevice::rumbleJoystick - %s - Failed to start rumble effect\n", errorString );
+      Con::errorf( "DInputDevice::rumbleJoystick - %s - Failed to start rumble effect", errorString );
    }
 }
 
@@ -1448,7 +1505,7 @@ U8 Key_to_DIK( U16 keyCode )
    return 0;
 }
 
-#ifdef LOG_INPUT
+#ifdef LOG_INPUT_DEBUG
 //------------------------------------------------------------------------------
 const char* getKeyName( U16 key )
 {
@@ -1536,7 +1593,7 @@ const char* getKeyName( U16 key )
    dSprintf( returnString, sizeof( returnString ), "%c", Input::getAscii( key, STATE_UPPER ) );
    return returnString;
 }
-#endif // LOG_INPUT
+#endif // LOG_INPUT_DEBUG
 
 //------------------------------------------------------------------------------
 const char* DInputDevice::getJoystickAxesString()
@@ -1586,5 +1643,8 @@ bool DInputDevice::joystickDetected()
    return( smDeviceCount[ JoystickDeviceType ] > 0 );
 }
 
-
-
+//------------------------------------------------------------------------------
+S32 DInputDevice::getJoystickCount()
+{
+    return( smDeviceCount[ JoystickDeviceType ] );
+}

@@ -27,11 +27,7 @@
 #include "console/console.h"
 #include "core/util/journal/process.h"
 #include "windowManager/platformWindowMgr.h"
-
-#ifdef LOG_INPUT
-#include <time.h>
-#include <stdarg.h>
-#endif
+#include "core/strings/unicode.h"
 
 // Static class variables:
 InputManager*  Input::smManager;
@@ -41,10 +37,6 @@ bool           Input::smLastKeyboardActivated;
 bool           Input::smLastMouseActivated;
 bool           Input::smLastJoystickActivated;
 InputEvent     Input::smInputEvent;
-
-#ifdef LOG_INPUT
-static HANDLE gInputLog;
-#endif
 
 static void fillAsciiTable();
 
@@ -75,20 +67,9 @@ static AsciiData AsciiTable[NUM_KEYS];
 //------------------------------------------------------------------------------
 void Input::init()
 {
-   Con::printf( "Input Init:" );
+   Con::printf( "Input Initializing ..." );
 
    destroy();
-
-#ifdef LOG_INPUT
-   struct tm* newTime;
-   time_t aclock;
-   time( &aclock );
-   newTime = localtime( &aclock );
-   asctime( newTime );
-
-   gInputLog = CreateFile( L"input.log", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
-   log( "Input log opened at %s\n", asctime( newTime ) );
-#endif
 
    smActive = false;
    smLastKeyboardActivated = true;
@@ -100,30 +81,36 @@ void Input::init()
    OSVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
    if ( GetVersionEx( &OSVersionInfo ) )
    {
-#ifdef LOG_INPUT
-      log( "Operating System:\n" );
+#ifdef LOG_INPUT_DEBUG
+      Con::printf( "Operating System:" );
       switch ( OSVersionInfo.dwPlatformId )
       {
          case VER_PLATFORM_WIN32s:
-            log( "  Win32s on Windows 3.1 version %d.%d\n", OSVersionInfo.dwMajorVersion, OSVersionInfo.dwMinorVersion );
+            Con::printf( "  Win32s on Windows 3.1 version %d.%d", OSVersionInfo.dwMajorVersion, OSVersionInfo.dwMinorVersion );
             break;
 
          case VER_PLATFORM_WIN32_WINDOWS:
-            log( "  Windows 95 version %d.%d\n", OSVersionInfo.dwMajorVersion, OSVersionInfo.dwMinorVersion );
-            log( "  Build number %d\n", LOWORD( OSVersionInfo.dwBuildNumber ) );
+            Con::printf( "  Windows 95 version %d.%d", OSVersionInfo.dwMajorVersion, OSVersionInfo.dwMinorVersion );
+            Con::printf( "  Build number %d", LOWORD( OSVersionInfo.dwBuildNumber ) );
             break;
 
          case VER_PLATFORM_WIN32_NT:
-            log( "  WinNT version %d.%d\n", OSVersionInfo.dwMajorVersion, OSVersionInfo.dwMinorVersion );
-            log( "  Build number %d\n", OSVersionInfo.dwBuildNumber );
+            Con::printf( "  WinNT version %d.%d", OSVersionInfo.dwMajorVersion, OSVersionInfo.dwMinorVersion );
+            Con::printf( "  Build number %d", OSVersionInfo.dwBuildNumber );
             break;
       }
 
       if ( OSVersionInfo.szCSDVersion != NULL )
-         log( "  %s\n", OSVersionInfo.szCSDVersion );
-
-      log( "\n" );
-#endif
+      {
+#ifdef UNICODE
+         UTF8 buf[512];
+         convertUTF16toUTF8(OSVersionInfo.szCSDVersion, buf, sizeof(buf));
+         Con::printf( "  %s", (const char *)buf );
+#else
+         Con::printf( "  %s", OSVersionInfo.szCSDVersion );
+#endif // UNICODE
+      }
+#endif // LOG_INPUT_DEBUG
 
       if ( !( OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && OSVersionInfo.dwMajorVersion < 5 ) )
       {
@@ -147,11 +134,11 @@ void Input::init()
    // Init the current modifier keys
    setModifierKeys(0);
    fillAsciiTable();
-   Con::printf( "" );
 
    // Set ourselves to participate in per-frame processing.
    Process::notify(Input::process, PROCESS_INPUT_ORDER);
 
+   Con::printf( "Input initialized." );
 }
 
 //------------------------------------------------------------------------------
@@ -159,6 +146,46 @@ ConsoleFunction( isJoystickDetected, bool, 1, 1, "isJoystickDetected()" )
 {
    argc; argv;
    return( DInputDevice::joystickDetected() );
+}
+
+//------------------------------------------------------------------------------
+ConsoleFunction( getJoystickCount, S32, 1, 1, "getJoystickCount()" )
+{
+   argc; argv;
+   return( DInputDevice::getJoystickCount() );
+}
+
+//------------------------------------------------------------------------------
+ConsoleFunction( getJoystickProductName, const char*, 2, 2, "getJoystickProductName( instance )" )
+{
+	argc;
+	DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
+	if ( mgr )
+		return( mgr->getJoystickProductName( dAtoi( argv[1] ) ) );
+
+	return( "" );
+}
+
+//------------------------------------------------------------------------------
+ConsoleFunction( getJoystickProductGUID, const char*, 2, 2, "getJoystickProductGUID( instance )" )
+{
+   argc;
+   DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
+   if ( mgr )
+      return( mgr->getJoystickProductGUID( dAtoi( argv[1] ) ) );
+
+   return( "" );
+}
+
+//------------------------------------------------------------------------------
+ConsoleFunction( getJoystickUID, S32, 2, 2, "getJoystickUID( instance )" )
+{
+   argc;
+   DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
+   if ( mgr )
+      return( mgr->getJoystickID( dAtoi( argv[1] ) ) );
+
+   return( -1 );
 }
 
 //------------------------------------------------------------------------------
@@ -175,10 +202,9 @@ ConsoleFunction( getJoystickAxes, const char*, 2, 2, "getJoystickAxes( instance 
 //------------------------------------------------------------------------------
 static void fillAsciiTable()
 {
-#ifdef LOG_INPUT
-   char buf[256];
-   Input::log( "--- Filling the ASCII table! ---\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( "--- Filling the ASCII table! ---" );
+#endif // LOG_INPUT_DEBUG
 
    //HKL   layout = GetKeyboardLayout( 0 );
    U8    state[256];
@@ -229,21 +255,17 @@ static void fillAsciiTable()
       {
          //vKeyCode = MapVirtualKeyEx( dikCode, 1, layout );
          vKeyCode = MapVirtualKey( dikCode, 1 );
-#ifdef LOG_INPUT
-         dSprintf( buf, sizeof( buf ), "KC: %#04X DK: %#04X VK: %#04X\n",
-               keyCode, dikCode, vKeyCode );
-         Input::log( buf );
-#endif
+#ifdef LOG_INPUT_DEBUG
+         Con::printf("KC: %#04X DK: %#04X VK: %#04X", keyCode, dikCode, vKeyCode );
+#endif // LOG_INPUT_DEBUG
 
          // Lower case:
          ascii[0] = ascii[1] = 0;
          //result = ToAsciiEx( vKeyCode, dikCode, state, ascii, 0, layout );
          result = ToAscii( vKeyCode, dikCode, state, ascii, 0 );
-#ifdef LOG_INPUT
-         dSprintf( buf, sizeof( buf ), "  LOWER- R: %d A[0]: %#06X A[1]: %#06X\n",
-               result, ascii[0], ascii[1] );
-         Input::log( buf );
-#endif
+#ifdef LOG_INPUT_DEBUG
+         Con::printf("  LOWER- R: %d A[0]: %#06X A[1]: %#06X", result, ascii[0], ascii[1] );
+#endif // LOG_INPUT_DEBUG
          if ( result == 2 )
             AsciiTable[keyCode].lower.ascii = ascii[1] ? ascii[1] : ( ascii[0] >> 8 );
          else if ( result == 1 )
@@ -262,11 +284,9 @@ static void fillAsciiTable()
          state[VK_SHIFT] = 0x80;
          //result = ToAsciiEx( vKeyCode, dikCode, state, ascii, 0, layout );
          result = ToAscii( vKeyCode, dikCode, state, ascii, 0 );
-#ifdef LOG_INPUT
-         dSprintf( buf, sizeof( buf ), "  UPPER- R: %d A[0]: %#06X A[1]: %#06X\n",
-               result, ascii[0], ascii[1] );
-         Input::log( buf );
-#endif
+#ifdef LOG_INPUT_DEBUG
+         Con::printf( "  UPPER- R: %d A[0]: %#06X A[1]: %#06X", result, ascii[0], ascii[1] );
+#endif // LOG_INPUT_DEBUG
          if ( result == 2 )
             AsciiTable[keyCode].upper.ascii = ascii[1] ? ascii[1] : ( ascii[0] >> 8 );
          else if ( result == 1 )
@@ -287,11 +307,9 @@ static void fillAsciiTable()
          state[VK_MENU] = 0x80;
          //result = ToAsciiEx( vKeyCode, dikCode, state, ascii, 0, layout );
          result = ToAscii( vKeyCode, dikCode, state, ascii, 0 );
-#ifdef LOG_INPUT
-         dSprintf( buf, sizeof( buf ), "  GOOFY- R: %d A[0]: %#06X A[1]: %#06X\n",
-               result, ascii[0], ascii[1] );
-         Input::log( buf );
-#endif
+#ifdef LOG_INPUT_DEBUG
+         Con::printf( "  GOOFY- R: %d A[0]: %#06X A[1]: %#06X", result, ascii[0], ascii[1] );
+#endif // LOG_INPUT_DEBUG
          if ( result == 2 )
             AsciiTable[keyCode].goofy.ascii = ascii[1] ? ascii[1] : ( ascii[0] >> 8 );
          else if ( result == 1 )
@@ -309,9 +327,9 @@ static void fillAsciiTable()
       }
    }
 
-#ifdef LOG_INPUT
-   Input::log( "--- Finished filling the ASCII table! ---\n\n" );
-#endif
+#ifdef LOG_INPUT_DEBUG
+   Con::printf( "--- Finished filling the ASCII table! ---" );
+#endif // LOG_INPUT_DEBUG
 }
 
 //------------------------------------------------------------------------------
@@ -378,15 +396,6 @@ void Input::destroy()
 {
    Process::remove(Input::process);
 
-#ifdef LOG_INPUT
-   if ( gInputLog )
-   {
-      log( "*** CLOSING LOG ***\n" );
-      CloseHandle( gInputLog );
-      gInputLog = NULL;
-   }
-#endif
-
    if ( smManager && smManager->isEnabled() )
    {
       smManager->disable();
@@ -426,9 +435,6 @@ void Input::activate()
    if ( smManager && smManager->isEnabled() && !smActive )
    {
       Con::printf( "Activating DirectInput..." );
-#ifdef LOG_INPUT
-      Input::log( "Activating DirectInput...\n" );
-#endif
       smActive = true;
       DInputManager* dInputManager = dynamic_cast<DInputManager*>( smManager );
       if ( dInputManager )
@@ -444,9 +450,7 @@ void Input::deactivate()
 {
    if ( smManager && smManager->isEnabled() && smActive )
    {
-#ifdef LOG_INPUT
-      Input::log( "Deactivating DirectInput...\n" );
-#endif
+      Con::printf( "Deactivating DirectInput..." );
       DInputManager* dInputManager = dynamic_cast<DInputManager*>( smManager );
 
       if ( dInputManager )
@@ -486,32 +490,6 @@ InputManager* Input::getManager()
 {
    return( smManager );
 }
-
-#ifdef LOG_INPUT
-//------------------------------------------------------------------------------
-void Input::log( const char* format, ... )
-{
-   if ( !gInputLog )
-      return;
-
-   va_list argptr;
-   va_start( argptr, format );
-
-   char buffer[512];
-   dVsprintf( buffer, 511, format, argptr );
-   DWORD bytes;
-   WriteFile( gInputLog, buffer, dStrlen( buffer ), &bytes, NULL );
-
-   va_end( argptr );
-}
-
-ConsoleFunction( inputLog, void, 2, 2, "inputLog( string )" )
-{
-   argc;
-   Input::log( "%s\n", argv[1] );
-}
-#endif // LOG_INPUT
-
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

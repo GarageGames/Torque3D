@@ -41,7 +41,7 @@
 typedef DWORD (WINAPI* FN_XInputGetState)(DWORD dwUserIndex, XINPUT_STATE* pState);
 typedef DWORD (WINAPI* FN_XInputSetState)(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
 #define XINPUT_MAX_CONTROLLERS 4  // XInput handles up to 4 controllers 
-#define XINPUT_DEADZONE  ( 0.24f * FLOAT(0x7FFF) )  // Default to 24% of the +/- 32767 range.   This is a reasonable default value but can be altered if needed.
+#define XINPUT_DEADZONE_DEFAULT  ( 0.24f * FLOAT(0x7FFF) )  // Default to 24% of the +/- 32767 range.   This is a reasonable default value but can be altered if needed.
 struct XINPUT_CONTROLLER_STATE
 {
     XINPUT_STATE    state;
@@ -62,7 +62,8 @@ class DInputManager : public InputManager
       XINPUT_CONTROLLER_STATE mXInputStateNew[XINPUT_MAX_CONTROLLERS];
       U32                     mLastDisconnectTime[XINPUT_MAX_CONTROLLERS];
       bool                    mXInputStateReset;
-      bool                    mXInputDeadZoneOn;
+      static bool             mXInputDeadZoneEnabled;
+      static F32              mXInputDeadZone;
 
       /// Number of milliseconds to skip checking an xinput device if it was
       /// disconnected on last check.
@@ -125,6 +126,9 @@ class DInputManager : public InputManager
 
       // Console interface:
       const char* getJoystickAxesString( U32 deviceID );
+      const char* getJoystickProductName( U32 deviceID );
+      const char* getJoystickProductGUID( U32 deviceID );
+      S32 getJoystickID( U32 deviceID );
 
       bool rumble( const char *pDeviceName, float x, float y );
 };

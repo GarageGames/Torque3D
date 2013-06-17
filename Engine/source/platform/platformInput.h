@@ -118,9 +118,6 @@ public:
 
    static U8 getModifierKeys() {return smModifierKeys;}
    static void setModifierKeys(U8 mod) {smModifierKeys = mod;}
-#ifdef LOG_INPUT
-   static void log( const char* format, ... );
-#endif
 
 #ifdef TORQUE_OS_XENON
    static S32 getLockedController();

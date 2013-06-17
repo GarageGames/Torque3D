@@ -115,6 +115,7 @@ class DInputDevice : public InputDevice
 
       const char* getName();
       const char* getProductName();
+      const char* getProductGUID();
 
       // Constant Effect Force Feedback
       void rumble( float x, float y );
@@ -122,6 +123,7 @@ class DInputDevice : public InputDevice
       // Console interface functions:
       const char* getJoystickAxesString();
       static bool joystickDetected();
+      static S32 getJoystickCount();
       //
 
       bool process();
