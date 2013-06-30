@@ -217,13 +217,13 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
       _setBlendState( rpd->mBlendOp, result );
    }
 
-   if (mMaterial->isDoubleSided())
+   if (mMaterial && mMaterial->isDoubleSided())
    {
       result.cullDefined = true;
       result.cullMode = GFXCullNone;         
    }
 
-   if(mMaterial->mAlphaTest)
+   if(mMaterial && mMaterial->mAlphaTest)
    {
       result.alphaDefined = true;
       result.alphaTestEnable = mMaterial->mAlphaTest;
@@ -235,7 +235,7 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
    NamedTexTarget *texTarget;
 
    U32 maxAnisotropy = 1;
-   if ( mMaterial->mUseAnisotropic[ rpd->mStageNum ] )
+   if (mMaterial &&  mMaterial->mUseAnisotropic[ rpd->mStageNum ] )
       maxAnisotropy = MATMGR->getDefaultAnisotropy();
 
    for( U32 i=0; i < rpd->mNumTex; i++ )
