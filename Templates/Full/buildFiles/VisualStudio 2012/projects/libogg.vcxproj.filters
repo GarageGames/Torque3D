@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup>
+      <Filter Include="Source Files">
+         <UniqueIdentifier>{ebe57c9d-565f-4452-8c9c-3c875df351a6}</UniqueIdentifier>
+         <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;cc</Extensions>
+      </Filter>
+      <Filter Include="Source Files\lib">
+         <UniqueIdentifier>{c0f25e23-fe2f-4062-8b05-3e3ea67ee1bf}</UniqueIdentifier>
+      </Filter>
+      <Filter Include="Source Files\lib\include">
+         <UniqueIdentifier>{c9a05df9-0876-4053-98bc-ba1997eb0398}</UniqueIdentifier>
+      </Filter>
+      <Filter Include="Source Files\lib\src">
+         <UniqueIdentifier>{94cfd170-94a4-4dc4-9a59-d8dd841482fa}</UniqueIdentifier>
+      </Filter>
+   </ItemGroup>
+   <ItemGroup>
+    <ResourceCompile Include="Torque.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+   <ItemGroup>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\libogg\src\bitwise.c">
+         <Filter>Source Files\lib\src</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\libogg\src\framing.c">
+         <Filter>Source Files\lib\src</Filter>
+      </ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\libogg\include\ogg\ogg.h">
+         <Filter>Source Files\lib\include</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\libogg\include\ogg\os_types.h">
+         <Filter>Source Files\lib\include</Filter>
+      </ClInclude>
+   </ItemGroup>
+   <ItemGroup>
+   </ItemGroup>
+</Project>
