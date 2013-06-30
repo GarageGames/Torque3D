@@ -400,6 +400,7 @@ void SkyBox::_initRender()
    }
 
    GFXVertexPNTT *vertPtr = mVB.lock();
+   if(!vertPtr) return;
 
    dMemcpy( vertPtr, tmpVerts, sizeof ( GFXVertexPNTT ) * vertCount );
 
@@ -412,6 +413,7 @@ void SkyBox::_initRender()
       mFogBandVB.set( GFX, 48, GFXBufferTypeStatic );
 
    GFXVertexPC *bandVertPtr = mFogBandVB.lock();
+   if(!bandVertPtr) return;
 
    // Grab the fog color.
    ColorI fogColor( mLastFogColor.red * 255, mLastFogColor.green * 255, mLastFogColor.blue * 255 );

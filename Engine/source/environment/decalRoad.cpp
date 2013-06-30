@@ -1452,7 +1452,8 @@ void DecalRoad::_captureVerts()
    mPB.set( GFX, mTriangleCount * 3, 0, GFXBufferTypeStatic );
 
    // Lock the VertexBuffer
-   GFXVertexPNTBT *vertPtr = mVB.lock();   
+   GFXVertexPNTBT *vertPtr = mVB.lock();
+   if(!vertPtr) return;
    U32 vertIdx = 0;
 
    //

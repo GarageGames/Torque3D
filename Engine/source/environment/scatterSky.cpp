@@ -748,6 +748,7 @@ void ScatterSky::_initVBIB()
 
    mVB.set( GFX, mVertCount, GFXBufferTypeStatic );
    ScatterSkyVertex *pVert = mVB.lock();
+   if(!pVert) return;
 
    for ( U32 y = 0; y < vertStride; y++ )
    {
@@ -1072,6 +1073,7 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
    GFXVertexBufferHandle< GFXVertexPCT > vb;
    vb.set( GFX, 4, GFXBufferTypeVolatile );
    GFXVertexPCT *pVert = vb.lock();
+   if(!pVert) return;
 
    for ( S32 i = 0; i < 4; i++ )
    {
