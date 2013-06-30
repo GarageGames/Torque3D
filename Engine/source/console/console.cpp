@@ -653,6 +653,9 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
             // a lot of special case code to support this situation. -patw
             const bool save = Con::active;
             Con::active = false;
+            // this prevents a humongous infinite memory allocation problem
+            if(consoleLog.size() > 1000) // limit log buffer to 1000 entries
+               consoleLog.pop_front();
             consoleLog.push_back(entry);
             Con::active = save;
 #endif
