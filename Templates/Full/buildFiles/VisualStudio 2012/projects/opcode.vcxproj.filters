@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup>
+      <Filter Include="Source Files">
+         <UniqueIdentifier>{08d161dc-2f44-477f-b836-8ec26808abd0}</UniqueIdentifier>
+         <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;cc</Extensions>
+      </Filter>
+      <Filter Include="Source Files\lib">
+         <UniqueIdentifier>{214bb85f-59e3-4c18-a142-763e156826d4}</UniqueIdentifier>
+      </Filter>
+      <Filter Include="Source Files\lib\Ice">
+         <UniqueIdentifier>{af5af230-5134-4e31-b2f3-438bb7b4b26a}</UniqueIdentifier>
+      </Filter>
+   </ItemGroup>
+   <ItemGroup>
+    <ResourceCompile Include="Torque.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+   <ItemGroup>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Opcode.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBTree.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_BaseModel.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_BoxPruning.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Collider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Common.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_HybridModel.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_MeshInterface.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Model.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_OBBCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_OptimizedTree.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_Picking.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_SweepAndPrune.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeBuilders.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\OPC_VolumeCollider.cpp">
+         <Filter>Source Files\lib</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceAABB.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceContainer.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceHPoint.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceIndexedTriangle.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix3x3.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix4x4.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceOBB.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePlane.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePoint.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRandom.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRay.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRevisitedRadix.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceSegment.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTriangle.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+      <ClCompile Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceUtils.cpp">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Opcode.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_AABBTree.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_BaseModel.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_BoxBoxOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_BoxPruning.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Collider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Common.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_HybridModel.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_IceHook.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSAABBOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_LSSTriOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_MeshInterface.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Model.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_OBBCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_OptimizedTree.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Picking.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesAABBOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_PlanesTriOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayAABBOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_RayTriOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_Settings.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereAABBOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SphereTriOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_SweepAndPrune.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeBuilders.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TreeCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TriBoxOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_TriTriOverlap.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\OPC_VolumeCollider.h">
+         <Filter>Source Files\lib</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceAABB.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceAxes.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceBoundingSphere.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceContainer.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceFPU.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceHPoint.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceIndexedTriangle.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceLSS.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix3x3.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMatrix4x4.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceMemoryMacros.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceOBB.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePairs.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePlane.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePoint.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IcePreprocessor.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRandom.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRay.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceRevisitedRadix.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceSegment.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTriangle.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTriList.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceTypes.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+      <ClInclude Include="..\..\..\..\..\Engine\lib\opcode\Ice\IceUtils.h">
+         <Filter>Source Files\lib\Ice</Filter>
+      </ClInclude>
+   </ItemGroup>
+   <ItemGroup>
+   </ItemGroup>
+</Project>

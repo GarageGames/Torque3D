@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup>
+      <Filter Include="Source Files">
+         <UniqueIdentifier>{63f3e0b7-45a0-4034-b380-c3b67b4cafcd}</UniqueIdentifier>
+         <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;cc</Extensions>
+      </Filter>
+      <Filter Include="Source Files\source">
+         <UniqueIdentifier>{932cc9d9-880b-451c-b8cf-8607e719da8b}</UniqueIdentifier>
+      </Filter>
+   </ItemGroup>
+   <ItemGroup>
+    <ResourceCompile Include="Torque.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+   <ItemGroup>
+      <ClCompile Include="..\..\..\..\..\Engine\source\main\main.cpp">
+         <Filter>Source Files\source</Filter>
+      </ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+   </ItemGroup>
+   <ItemGroup>
+   </ItemGroup>
+</Project>
