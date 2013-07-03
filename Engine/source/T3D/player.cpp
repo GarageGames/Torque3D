@@ -2870,7 +2870,7 @@ void Player::updateMove(const Move* move)
       if (pvl)
          pv *= moveSpeed / pvl;
 
-      VectorF runAcc = pv - acc;
+      VectorF runAcc = pv - (mVelocity + acc);
       runAcc.z = 0;
       runAcc.x = runAcc.x * mDataBlock->airControl;
       runAcc.y = runAcc.y * mDataBlock->airControl;
