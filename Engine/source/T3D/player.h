@@ -398,16 +398,6 @@ protected:
       NextFreeMask = Parent::NextFreeMask << 3
    };
 
-   struct Range {
-      Range(F32 _min,F32 _max) {
-         min = _min;
-         max = _max;
-         delta = _max - _min;
-      };
-      F32 min,max;
-      F32 delta;
-   };
-
    SimObjectPtr<ParticleEmitter> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
    F32 mBubbleEmitterTime;
 
@@ -508,9 +498,6 @@ protected:
    TSThread* mHeadHThread;
    TSThread* mRecoilThread;
    TSThread* mImageStateThread;
-   static Range mArmRange;
-   static Range mHeadVRange;
-   static Range mHeadHRange;
    /// @}
 
    bool mInMissionArea;       ///< Are we in the mission area?

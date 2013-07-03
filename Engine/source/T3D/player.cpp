@@ -128,14 +128,6 @@ enum PlayerConstants {
 //----------------------------------------------------------------------------
 // Player shape animation sequences:
 
-// look     Used to control the upper body arm motion.  Must animate
-//          vertically +-80 deg.
-Player::Range Player::mArmRange(mDegToRad(-80.0f),mDegToRad(+80.0f));
-
-// head     Used to control the direction the head is looking.  Must
-//          animated vertically +-80 deg .
-Player::Range Player::mHeadVRange(mDegToRad(-80.0f),mDegToRad(+80.0f));
-
 // Action Animations:
 PlayerData::ActionAnimationDef PlayerData::ActionAnimationList[NumTableActionAnims] =
 {
@@ -3431,31 +3423,38 @@ void Player::updateDamageState()
 
 //----------------------------------------------------------------------------
 
-void Player::updateLookAnimation(F32 dT)
+void Player::updateLookAnimation(F32 dt)
 {
    // Calculate our interpolated head position.
-   Point3F renderHead = delta.head + delta.headVec * dT;
+   Point3F renderHead = delta.head + delta.headVec * dt;
 
    // Adjust look pos.  This assumes that the animations match
    // the min and max look angles provided in the datablock.
    if (mArmAnimation.thread) 
    {
-      // TG: Adjust arm position to avoid collision.
-      F32 tp = mControlObject? 0.5:
-         (renderHead.x - mArmRange.min) / mArmRange.delta;
-      mShapeInstance->setPos(mArmAnimation.thread,mClampF(tp,0,1));
+      if(mControlObject)
+      {
+         mShapeInstance->setPos(mArmAnimation.thread,0.5f);
+      }
+      else
+      {
+         F32 d = mDataBlock->maxLookAngle - mDataBlock->minLookAngle;
+         F32 tp = (renderHead.x - mDataBlock->minLookAngle) / d;
+         mShapeInstance->setPos(mArmAnimation.thread,mClampF(tp,0,1));
+      }
    }
    
    if (mHeadVThread) 
    {
-      F32 tp = (renderHead.x - mHeadVRange.min) / mHeadVRange.delta;
+      F32 d = mDataBlock->maxLookAngle - mDataBlock->minLookAngle;
+      F32 tp = (renderHead.x - mDataBlock->minLookAngle) / d;
       mShapeInstance->setPos(mHeadVThread,mClampF(tp,0,1));
    }
    
    if (mHeadHThread) 
    {
-      F32 dt = 2 * mDataBlock->maxFreelookAngle;
-      F32 tp = (renderHead.z + mDataBlock->maxFreelookAngle) / dt;
+      F32 d = 2 * mDataBlock->maxFreelookAngle;
+      F32 tp = (renderHead.z + mDataBlock->maxFreelookAngle) / d;
       mShapeInstance->setPos(mHeadHThread,mClampF(tp,0,1));
    }
 }
