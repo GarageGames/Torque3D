@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SOFT_SOFT_COLLISION_ALGORITHM_H
-#define SOFT_SOFT_COLLISION_ALGORITHM_H
+#ifndef BT_SOFT_SOFT_COLLISION_ALGORITHM_H
+#define BT_SOFT_SOFT_COLLISION_ALGORITHM_H
 
 #include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
@@ -38,7 +38,7 @@ public:
 	btSoftSoftCollisionAlgorithm(const btCollisionAlgorithmConstructionInfo& ci)
 		: btCollisionAlgorithm(ci) {}
 
-	virtual void processCollision (btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
+	virtual void processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
 	virtual btScalar calculateTimeOfImpact(btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
@@ -48,22 +48,22 @@ public:
 			manifoldArray.push_back(m_manifoldPtr);
 	}
 
-	btSoftSoftCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* body0,btCollisionObject* body1);
+	btSoftSoftCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap);
 
 	virtual ~btSoftSoftCollisionAlgorithm();
 
 	struct CreateFunc :public 	btCollisionAlgorithmCreateFunc
 	{
-		virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0,btCollisionObject* body1)
+		virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap)
 		{
 			int bbsize = sizeof(btSoftSoftCollisionAlgorithm);
 			void* ptr = ci.m_dispatcher1->allocateCollisionAlgorithm(bbsize);
-			return new(ptr) btSoftSoftCollisionAlgorithm(0,ci,body0,body1);
+			return new(ptr) btSoftSoftCollisionAlgorithm(0,ci,body0Wrap,body1Wrap);
 		}
 	};
 
 };
 
-#endif //SOFT_SOFT_COLLISION_ALGORITHM_H
+#endif //BT_SOFT_SOFT_COLLISION_ALGORITHM_H
 
 

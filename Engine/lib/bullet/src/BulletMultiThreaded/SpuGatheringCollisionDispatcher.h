@@ -12,8 +12,8 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef SPU_GATHERING_COLLISION__DISPATCHER_H
-#define SPU_GATHERING_COLLISION__DISPATCHER_H
+#ifndef BT_SPU_GATHERING_COLLISION__DISPATCHER_H
+#define BT_SPU_GATHERING_COLLISION__DISPATCHER_H
 
 #include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
 
@@ -23,9 +23,10 @@ subject to the following restrictions:
 ///Too big value might render some SPUs are idle, while a few other SPUs are doing all work.
 //#define SPU_BATCHSIZE_BROADPHASE_PAIRS 8
 //#define SPU_BATCHSIZE_BROADPHASE_PAIRS 16
-#define SPU_BATCHSIZE_BROADPHASE_PAIRS 64
-//#define SPU_BATCHSIZE_BROADPHASE_PAIRS 128
+//#define SPU_BATCHSIZE_BROADPHASE_PAIRS 64
+#define SPU_BATCHSIZE_BROADPHASE_PAIRS 128
 //#define SPU_BATCHSIZE_BROADPHASE_PAIRS 256
+//#define SPU_BATCHSIZE_BROADPHASE_PAIRS 512
 //#define SPU_BATCHSIZE_BROADPHASE_PAIRS 1024
 
 
@@ -66,4 +67,6 @@ public:
 
 
 
-#endif //SPU_GATHERING_COLLISION__DISPATCHER_H
+#endif //BT_SPU_GATHERING_COLLISION__DISPATCHER_H
+
+

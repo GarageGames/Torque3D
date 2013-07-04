@@ -48,7 +48,7 @@ PosixThreadSupport::~PosixThreadSupport()
 #endif
 
 // this semaphore will signal, if and how many threads are finished with their work
-static sem_t* mainSemaphore;
+static sem_t* mainSemaphore=0;
 
 static sem_t* createSem(const char* baseName)
 {
@@ -58,9 +58,10 @@ static sem_t* createSem(const char* baseName)
         char name[32];
         snprintf(name, 32, "/%s-%d-%4.4d", baseName, getpid(), semCount++); 
         sem_t* tempSem = sem_open(name, O_CREAT, 0600, 0);
+
         if (tempSem != reinterpret_cast<sem_t *>(SEM_FAILED))
         {
-        	//printf("Created \"%s\" Semaphore %x\n", name, tempSem);
+//        printf("Created \"%s\" Semaphore %p\n", name, tempSem);
         }
         else
 	{
@@ -172,7 +173,7 @@ void PosixThreadSupport::waitForResponse(unsigned int *puiArgument0, unsigned in
 	// get at least one thread which has finished
         size_t last = -1;
         
-        for(size_t t=0; t < m_activeSpuStatus.size(); ++t) {
+        for(size_t t=0; t < size_t(m_activeSpuStatus.size()); ++t) {
             if(2 == m_activeSpuStatus[t].m_status) {
                 last = t;
                 break;
@@ -199,7 +200,8 @@ void PosixThreadSupport::startThreads(ThreadConstructionInfo& threadConstruction
 	m_activeSpuStatus.resize(threadConstructionInfo.m_numThreads);
         
 	mainSemaphore = createSem("main");                
-        
+	//checkPThreadFunction(sem_wait(mainSemaphore));
+   
 	for (int i=0;i < threadConstructionInfo.m_numThreads;i++)
 	{
 		printf("starting thread %d\n",i);
@@ -233,17 +235,175 @@ void PosixThreadSupport::startSPU()
 ///tell the task scheduler we are done with the SPU tasks
 void PosixThreadSupport::stopSPU()
 {
-	for(size_t t=0; t < m_activeSpuStatus.size(); ++t) {
+	for(size_t t=0; t < size_t(m_activeSpuStatus.size()); ++t) 
+	{
             btSpuStatus&	spuStatus = m_activeSpuStatus[t];
-            printf("%s: Thread %i used: %ld\n", __FUNCTION__, t, spuStatus.threadUsed);
-        
-            destroySem(spuStatus.startSemaphore);
-            checkPThreadFunction(pthread_cancel(spuStatus.thread));
-        }
-        destroySem(mainSemaphore);
+            printf("%s: Thread %i used: %ld\n", __FUNCTION__, int(t), spuStatus.threadUsed);
 
+	spuStatus.m_userPtr = 0;       
+ 	checkPThreadFunction(sem_post(spuStatus.startSemaphore));
+	checkPThreadFunction(sem_wait(mainSemaphore));
+
+	printf("destroy semaphore\n"); 
+            destroySem(spuStatus.startSemaphore);
+            printf("semaphore destroyed\n");
+		checkPThreadFunction(pthread_join(spuStatus.thread,0));
+
+        }
+	printf("destroy main semaphore\n");
+        destroySem(mainSemaphore);
+	printf("main semaphore destroyed\n");
 	m_activeSpuStatus.clear();
 }
 
+class PosixCriticalSection : public btCriticalSection 
+{
+	pthread_mutex_t m_mutex;
+	
+public:
+	PosixCriticalSection() 
+	{
+		pthread_mutex_init(&m_mutex, NULL);
+	}
+	virtual ~PosixCriticalSection() 
+	{
+		pthread_mutex_destroy(&m_mutex);
+	}
+	
+	ATTRIBUTE_ALIGNED16(unsigned int mCommonBuff[32]);
+	
+	virtual unsigned int getSharedParam(int i)
+	{
+		return mCommonBuff[i];
+	}
+	virtual void setSharedParam(int i,unsigned int p)
+	{
+		mCommonBuff[i] = p;
+	}
+	
+	virtual void lock()
+	{
+		pthread_mutex_lock(&m_mutex);
+	}
+	virtual void unlock()
+	{
+		pthread_mutex_unlock(&m_mutex);
+	}
+};
+
+
+#if defined(_POSIX_BARRIERS) && (_POSIX_BARRIERS - 20012L) >= 0
+/* OK to use barriers on this platform */
+class PosixBarrier : public btBarrier 
+{
+	pthread_barrier_t m_barr;
+	int m_numThreads;
+public:
+	PosixBarrier()
+	:m_numThreads(0)	{	}
+	virtual ~PosixBarrier()	{
+		pthread_barrier_destroy(&m_barr);
+	}
+	
+	virtual void sync()
+	{
+		int rc = pthread_barrier_wait(&m_barr);
+		if(rc != 0 && rc != PTHREAD_BARRIER_SERIAL_THREAD)
+		{
+			printf("Could not wait on barrier\n");
+			exit(-1);
+		}
+	}
+	virtual void setMaxCount(int numThreads)
+	{
+		int result = pthread_barrier_init(&m_barr, NULL, numThreads);
+		m_numThreads = numThreads;
+		btAssert(result==0);
+	}
+	virtual int  getMaxCount()
+	{
+		return m_numThreads;
+	}
+};
+#else
+/* Not OK to use barriers on this platform - insert alternate code here */
+class PosixBarrier : public btBarrier 
+{
+	pthread_mutex_t m_mutex;
+	pthread_cond_t m_cond;
+	
+	int m_numThreads;
+	int	m_called;
+	
+public:
+	PosixBarrier()
+	:m_numThreads(0)
+	{
+	}
+	virtual ~PosixBarrier() 
+	{
+		if (m_numThreads>0)
+		{
+			pthread_mutex_destroy(&m_mutex);
+			pthread_cond_destroy(&m_cond);
+		}
+	}
+	
+	virtual void sync()
+	{		
+		pthread_mutex_lock(&m_mutex);
+		m_called++;
+		if (m_called == m_numThreads) {
+			m_called = 0;
+			pthread_cond_broadcast(&m_cond);
+		} else {
+			pthread_cond_wait(&m_cond,&m_mutex);
+		}
+		pthread_mutex_unlock(&m_mutex);
+		
+	}
+	virtual void setMaxCount(int numThreads)
+	{
+		if (m_numThreads>0)
+		{
+			pthread_mutex_destroy(&m_mutex);
+			pthread_cond_destroy(&m_cond);
+		}
+		m_called = 0;
+		pthread_mutex_init(&m_mutex,NULL);
+		pthread_cond_init(&m_cond,NULL);
+		m_numThreads = numThreads;
+	}
+	virtual int  getMaxCount()
+	{
+		return m_numThreads;
+	}
+};
+
+#endif//_POSIX_BARRIERS
+
+
+
+btBarrier* PosixThreadSupport::createBarrier()
+{
+	PosixBarrier* barrier = new PosixBarrier();
+	barrier->setMaxCount(getNumTasks());
+	return barrier;
+}
+
+btCriticalSection* PosixThreadSupport::createCriticalSection()
+{
+	return new PosixCriticalSection();
+}
+
+void	PosixThreadSupport::deleteBarrier(btBarrier* barrier)
+{
+	delete barrier;
+}
+
+void PosixThreadSupport::deleteCriticalSection(btCriticalSection* cs)
+{
+	delete cs;
+}
 #endif // USE_PTHREADS
 

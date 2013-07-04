@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef COLLISION_ALGORITHM_H
-#define COLLISION_ALGORITHM_H
+#ifndef BT_COLLISION_ALGORITHM_H
+#define BT_COLLISION_ALGORITHM_H
 
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btAlignedObjectArray.h"
@@ -23,6 +23,7 @@ struct btBroadphaseProxy;
 class btDispatcher;
 class btManifoldResult;
 class btCollisionObject;
+struct btCollisionObjectWrapper;
 struct btDispatcherInfo;
 class	btPersistentManifold;
 
@@ -44,7 +45,7 @@ struct btCollisionAlgorithmConstructionInfo
 	btDispatcher*	m_dispatcher1;
 	btPersistentManifold*	m_manifold;
 
-	int	getDispatcherId();
+//	int	getDispatcherId();
 
 };
 
@@ -59,7 +60,7 @@ protected:
 	btDispatcher*	m_dispatcher;
 
 protected:
-	int	getDispatcherId();
+//	int	getDispatcherId();
 	
 public:
 
@@ -69,7 +70,7 @@ public:
 
 	virtual ~btCollisionAlgorithm() {};
 
-	virtual void processCollision (btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut) = 0;
+	virtual void processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut) = 0;
 
 	virtual btScalar calculateTimeOfImpact(btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut) = 0;
 
@@ -77,4 +78,4 @@ public:
 };
 
 
-#endif //COLLISION_ALGORITHM_H
+#endif //BT_COLLISION_ALGORITHM_H

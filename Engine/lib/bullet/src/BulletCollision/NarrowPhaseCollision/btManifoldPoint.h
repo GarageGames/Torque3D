@@ -13,13 +13,27 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef MANIFOLD_CONTACT_POINT_H
-#define MANIFOLD_CONTACT_POINT_H
+#ifndef BT_MANIFOLD_CONTACT_POINT_H
+#define BT_MANIFOLD_CONTACT_POINT_H
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btTransformUtil.h"
 
-
+#ifdef PFX_USE_FREE_VECTORMATH
+	#include "physics_effects/base_level/solver/pfx_constraint_row.h"
+typedef sce::PhysicsEffects::PfxConstraintRow btConstraintRow;
+#else
+	// Don't change following order of parameters
+	ATTRIBUTE_ALIGNED16(struct) btConstraintRow {
+		btScalar m_normal[3];
+		btScalar m_rhs;
+		btScalar m_jacDiagInv;
+		btScalar m_lowerLimit;
+		btScalar m_upperLimit;
+		btScalar m_accumImpulse;
+	};
+	typedef btConstraintRow PfxConstraintRow;
+#endif //PFX_USE_FREE_VECTORMATH
 
 
 
@@ -30,10 +44,14 @@ class btManifoldPoint
 		public:
 			btManifoldPoint()
 				:m_userPersistentData(0),
-				m_appliedImpulse(0.f),
 				m_lateralFrictionInitialized(false),
-				m_appliedImpulseLateral1(0.f),
+                m_appliedImpulse(0.f),
+                m_appliedImpulseLateral1(0.f),
 				m_appliedImpulseLateral2(0.f),
+				m_contactMotion1(0.f),
+				m_contactMotion2(0.f),
+				m_contactCFM1(0.f),
+				m_contactCFM2(0.f),
 				m_lifeTime(0)
 			{
 			}
@@ -46,16 +64,20 @@ class btManifoldPoint
 					m_normalWorldOnB( normal ), 
 					m_distance1( distance ),
 					m_combinedFriction(btScalar(0.)),
+					m_combinedRollingFriction(btScalar(0.)),
 					m_combinedRestitution(btScalar(0.)),
 					m_userPersistentData(0),
-					m_appliedImpulse(0.f),
 					m_lateralFrictionInitialized(false),
-					m_appliedImpulseLateral1(0.f),
+                    m_appliedImpulse(0.f),
+                    m_appliedImpulseLateral1(0.f),
 					m_appliedImpulseLateral2(0.f),
+					m_contactMotion1(0.f),
+					m_contactMotion2(0.f),
+					m_contactCFM1(0.f),
+					m_contactCFM2(0.f),
 					m_lifeTime(0)
 			{
 				
-					
 			}
 
 			
@@ -69,24 +91,33 @@ class btManifoldPoint
 		
 			btScalar	m_distance1;
 			btScalar	m_combinedFriction;
+			btScalar	m_combinedRollingFriction;
 			btScalar	m_combinedRestitution;
 
-         //BP mod, store contact triangles.
-         int	   m_partId0;
-         int      m_partId1;
-         int      m_index0;
-         int      m_index1;
+			//BP mod, store contact triangles.
+			int			m_partId0;
+			int			m_partId1;
+			int			m_index0;
+			int			m_index1;
 				
 			mutable void*	m_userPersistentData;
-			btScalar		m_appliedImpulse;
-
 			bool			m_lateralFrictionInitialized;
+
+			btScalar		m_appliedImpulse;
 			btScalar		m_appliedImpulseLateral1;
 			btScalar		m_appliedImpulseLateral2;
+			btScalar		m_contactMotion1;
+			btScalar		m_contactMotion2;
+			btScalar		m_contactCFM1;
+			btScalar		m_contactCFM2;
+
 			int				m_lifeTime;//lifetime of the contactpoint in frames
 			
 			btVector3		m_lateralFrictionDir1;
 			btVector3		m_lateralFrictionDir2;
+
+
+
 
 			btScalar getDistance() const
 			{
@@ -122,4 +153,4 @@ class btManifoldPoint
 
 	};
 
-#endif //MANIFOLD_CONTACT_POINT_H
+#endif //BT_MANIFOLD_CONTACT_POINT_H
