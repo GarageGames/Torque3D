@@ -102,8 +102,17 @@ bool ITickable::advanceTime( U32 timeDelta )
 
    // Inform ALL objects that time was advanced
    dt = F32( timeDelta ) / 1000.f;
-   for( ProcessListIterator i = getProcessList().begin(); i != getProcessList().end(); i++ )
-      (*i)->advanceTime( dt );
+   for(int i = 0; i < getProcessList().size(); ){
+      ITickable* iTick = getProcessList()[i];
+      iTick->advanceTime( dt );
+      // Check if we should advance the iterator. Don't if the processed  
+      // object has deleted itself.  
+      if(iTick == getProcessList()[i])
+         ++i;
+      // Special case if the object was the last in the list
+      else if(i == getProcessList().size())
+         --i;
+   }
 
    smLastTime = targetTime;
 
