@@ -110,7 +110,7 @@ bool ITickable::advanceTime( U32 timeDelta )
       if(iTick == getProcessList()[i])
          ++i;
       // Special case if the object was the last in the list
-      else if((U32)getProcessList()[i] == 0xFEEEFEEE)
+      else if(i == getProcessList().size())
          --i;
    }
 
