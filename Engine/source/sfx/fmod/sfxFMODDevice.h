@@ -295,9 +295,6 @@ class SFXFMODDevice : public SFXDevice
       static bool smPrefUseSoftwareHRTF;
       
       ///
-      static bool smPrefUseSoftwareReverbLowmem;
-      
-      ///
       static bool smPrefEnableProfile;
       
       ///
