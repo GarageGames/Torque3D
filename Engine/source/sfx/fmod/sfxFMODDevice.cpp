@@ -33,7 +33,6 @@
 bool                 SFXFMODDevice::smPrefDisableSoftware = false;
 bool                 SFXFMODDevice::smPrefUseSoftwareOcclusion = true;
 bool                 SFXFMODDevice::smPrefUseSoftwareHRTF = true;
-bool                 SFXFMODDevice::smPrefUseSoftwareReverbLowmem = false;
 bool                 SFXFMODDevice::smPrefEnableProfile = false;
 bool                 SFXFMODDevice::smPrefGeometryUseClosest = false;
 const char*          SFXFMODDevice::smPrefDSoundHRTF = "full";
@@ -248,8 +247,6 @@ bool SFXFMODDevice::_init()
          flags |= FMOD_INIT_OCCLUSION_LOWPASS;
       if( smPrefUseSoftwareHRTF )
          flags |= FMOD_INIT_HRTF_LOWPASS;
-      if( smPrefUseSoftwareReverbLowmem )
-         flags |= FMOD_INIT_SOFTWARE_REVERB_LOWMEM;
       if( smPrefEnableProfile )
          flags |= FMOD_INIT_ENABLE_PROFILE;
       if( smPrefGeometryUseClosest )
