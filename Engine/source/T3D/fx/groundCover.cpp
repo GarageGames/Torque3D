@@ -1225,14 +1225,17 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          flipBB *= -1.0f;
 
          PROFILE_START( GroundCover_TerrainRayCast );
-         hit = terrainBlock->getNormalHeightMaterial( Point2F( cp.x - pos.x, cp.y - pos.y ), 
+         // Transform billboard point into terrain's frame of reference.
+         Point3F pp = Point3F(cp.x, cp.y, 0);
+         terrainBlock->getWorldTransform().mulP(pp);
+         hit = terrainBlock->getNormalHeightMaterial( Point2F ( pp.x, pp.y ),
                                                       &normal, &h, matName );
+         PROFILE_END(); // GroundCover_TerrainRayCast
          
          // TODO: When did we loose the world space elevation when
          // getting the terrain height?
          h += pos.z + mZOffset;
 
-         PROFILE_END(); // GroundCover_TerrainRayCast
          if ( !hit || h > typeMaxElevation || h < typeMinElevation || 
               ( typeLayer[0] && !typeInvertLayer && matName != typeLayer ) ||
               ( typeLayer[0] && typeInvertLayer && matName == typeLayer ) )
