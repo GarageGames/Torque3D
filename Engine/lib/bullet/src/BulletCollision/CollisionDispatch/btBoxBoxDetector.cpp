@@ -1,4 +1,3 @@
-
 /*
  * Box-Box collision detection re-distributed under the ZLib license with permission from Russell L. Smith
  * Original version is from Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.
@@ -25,7 +24,7 @@ subject to the following restrictions:
 #include <float.h>
 #include <string.h>
 
-btBoxBoxDetector::btBoxBoxDetector(btBoxShape* box1,btBoxShape* box2)
+btBoxBoxDetector::btBoxBoxDetector(const btBoxShape* box1,const btBoxShape* box2)
 : m_box1(box1),
 m_box2(box2)
 {
@@ -333,9 +332,9 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
 #undef TST
 #define TST(expr1,expr2,n1,n2,n3,cc) \
   s2 = btFabs(expr1) - (expr2); \
-  if (s2 > 0) return 0; \
+  if (s2 > SIMD_EPSILON) return 0; \
   l = btSqrt((n1)*(n1) + (n2)*(n2) + (n3)*(n3)); \
-  if (l > 0) { \
+  if (l > SIMD_EPSILON) { \
     s2 /= l; \
     if (s2*fudge_factor > s) { \
       s = s2; \
@@ -345,6 +344,20 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
       code = (cc); \
     } \
   }
+
+  btScalar fudge2 (1.0e-5f);
+
+  Q11 += fudge2;
+  Q12 += fudge2;
+  Q13 += fudge2;
+
+  Q21 += fudge2;
+  Q22 += fudge2;
+  Q23 += fudge2;
+
+  Q31 += fudge2;
+  Q32 += fudge2;
+  Q33 += fudge2;
 
   // separating axis = u1 x (v1,v2,v3)
   TST(pp[2]*R21-pp[1]*R31,(A[1]*Q31+A[2]*Q21+B[1]*Q13+B[2]*Q12),0,-R31,R21,7);
@@ -424,6 +437,7 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
 		output.addContactPoint(-normal,pointInWorld,-*depth);
 #else
 		output.addContactPoint(-normal,pb,-*depth);
+
 #endif //
 		*return_code = code;
 	}
@@ -593,21 +607,30 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
   if (maxc < 1) maxc = 1;
 
   if (cnum <= maxc) {
+
+	  if (code<4) 
+	  {
     // we have less contacts than we need, so we use them all
-    for (j=0; j < cnum; j++) {
-
-		//AddContactPoint...
-
-		//dContactGeom *con = CONTACT(contact,skip*j);
-      //for (i=0; i<3; i++) con->pos[i] = point[j*3+i] + pa[i];
-      //con->depth = dep[j];
-
+    for (j=0; j < cnum; j++) 
+	{
 		btVector3 pointInWorld;
 		for (i=0; i<3; i++) 
 			pointInWorld[i] = point[j*3+i] + pa[i];
 		output.addContactPoint(-normal,pointInWorld,-dep[j]);
 
     }
+	  } else
+	  {
+		  // we have less contacts than we need, so we use them all
+		for (j=0; j < cnum; j++) 
+		{
+			btVector3 pointInWorld;
+			for (i=0; i<3; i++) 
+				pointInWorld[i] = point[j*3+i] + pa[i]-normal[i]*dep[j];
+				//pointInWorld[i] = point[j*3+i] + pa[i];
+			output.addContactPoint(-normal,pointInWorld,-dep[j]);
+		}
+	  }
   }
   else {
     // we have more contacts than are wanted, some of them must be culled.
@@ -632,7 +655,13 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
 		btVector3 posInWorld;
 		for (i=0; i<3; i++) 
 			posInWorld[i] = point[iret[j]*3+i] + pa[i];
-		output.addContactPoint(-normal,posInWorld,-dep[iret[j]]);
+		if (code<4) 
+	   {
+			output.addContactPoint(-normal,posInWorld,-dep[iret[j]]);
+		} else
+		{
+			output.addContactPoint(-normal,posInWorld-normal*dep[iret[j]],-dep[iret[j]]);
+		}
     }
     cnum = maxc;
   }

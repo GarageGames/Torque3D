@@ -13,8 +13,8 @@ subject to the following restrictions:
 */
 
 
-#ifndef SIMD_TRANSFORM_UTIL_H
-#define SIMD_TRANSFORM_UTIL_H
+#ifndef BT_TRANSFORM_UTIL_H
+#define BT_TRANSFORM_UTIL_H
 
 #include "btTransform.h"
 #define ANGULAR_MOTION_THRESHOLD btScalar(0.5)*SIMD_HALF_PI
@@ -98,8 +98,6 @@ public:
 	{
 		btQuaternion orn1 = orn0.nearest(orn1a);
 		btQuaternion dorn = orn1 * orn0.inverse();
-		///floating point inaccuracy can lead to w component > 1..., which breaks 
-		dorn.normalize();
 		angle = dorn.getAngle();
 		axis = btVector3(dorn.x(),dorn.y(),dorn.z());
 		axis[3] = btScalar(0.);
@@ -188,7 +186,7 @@ public:
 			btTransformUtil::calculateVelocityQuaternion(m_posB,toPosB,m_ornB,toOrnB,btScalar(1.),linVelB,angVelB);
 			btScalar maxAngularProjectedVelocity = angVelA.length() * m_boundingRadiusA + angVelB.length() * m_boundingRadiusB;
 			btVector3 relLinVel = (linVelB-linVelA);
-			btScalar relLinVelocLength = (linVelB-linVelA).dot(m_separatingNormal);
+			btScalar relLinVelocLength = relLinVel.dot(m_separatingNormal);
 			if (relLinVelocLength<0.f)
 			{
 				relLinVelocLength = 0.f;
@@ -226,5 +224,5 @@ public:
 };
 
 
-#endif //SIMD_TRANSFORM_UTIL_H
+#endif //BT_TRANSFORM_UTIL_H
 

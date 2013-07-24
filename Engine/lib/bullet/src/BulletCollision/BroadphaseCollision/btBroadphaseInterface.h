@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef		BROADPHASE_INTERFACE_H
-#define 	BROADPHASE_INTERFACE_H
+#ifndef		BT_BROADPHASE_INTERFACE_H
+#define 	BT_BROADPHASE_INTERFACE_H
 
 
 
@@ -26,7 +26,14 @@ class btOverlappingPairCache;
 
 
 
-struct	btBroadphaseRayCallback
+struct	btBroadphaseAabbCallback
+{
+	virtual ~btBroadphaseAabbCallback() {}
+	virtual bool	process(const btBroadphaseProxy* proxy) = 0;
+};
+
+
+struct	btBroadphaseRayCallback : public btBroadphaseAabbCallback
 {
 	///added some cached data to accelerate ray-AABB tests
 	btVector3		m_rayDirectionInverse;
@@ -34,7 +41,6 @@ struct	btBroadphaseRayCallback
 	btScalar		m_lambda_max;
 
 	virtual ~btBroadphaseRayCallback() {}
-	virtual bool	process(const btBroadphaseProxy* proxy) = 0;
 };
 
 #include "LinearMath/btVector3.h"
@@ -54,6 +60,8 @@ public:
 
 	virtual void	rayTest(const btVector3& rayFrom,const btVector3& rayTo, btBroadphaseRayCallback& rayCallback, const btVector3& aabbMin=btVector3(0,0,0), const btVector3& aabbMax = btVector3(0,0,0)) = 0;
 
+	virtual void	aabbTest(const btVector3& aabbMin, const btVector3& aabbMax, btBroadphaseAabbCallback& callback) = 0;
+
 	///calculateOverlappingPairs is optional: incremental algorithms (sweep and prune) might do it during the set aabb
 	virtual void	calculateOverlappingPairs(btDispatcher* dispatcher)=0;
 
@@ -65,10 +73,10 @@ public:
 	virtual void getBroadphaseAabb(btVector3& aabbMin,btVector3& aabbMax) const =0;
 
 	///reset broadphase internal structures, to ensure determinism/reproducability
-	virtual void resetPool(btDispatcher* dispatcher) {};
+	virtual void resetPool(btDispatcher* dispatcher) { (void) dispatcher; };
 
 	virtual void	printStats() = 0;
 
 };
 
-#endif //BROADPHASE_INTERFACE_H
+#endif //BT_BROADPHASE_INTERFACE_H

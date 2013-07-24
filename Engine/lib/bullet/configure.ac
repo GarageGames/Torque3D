@@ -9,16 +9,12 @@ AC_PREREQ([2.54])
 #----------------------------------------------------------------------------
 AC_INIT(
     [bullet],
-    [2.75],
+    [2.81],
     [bullet@erwincoumans.com])
 AC_CANONICAL_HOST
-CS_PACKAGEINFO(
-    [Bullet Continuous Collision Detection and Physics Library],
-    [Copyright (c) 2005-2008  Erwin Coumans],
-    [http://www.bulletphysics.com])
 AC_CONFIG_SRCDIR([configure.ac])
 AM_INIT_AUTOMAKE
-AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
@@ -34,6 +30,7 @@ case "$host" in
                 PLATFORM_STRING="Linux"
                 ;;
         *-*-darwin*)
+		AC_MSG_WARN([Hello])
                 AC_DEFINE(PLATFORM_APPLE, 1, [Platform is Apple])
                 opengl_LIBS="-framework AGL -framework OpenGL -framework GLUT"
                 PLATFORM_STRING="Apple"
@@ -56,6 +53,7 @@ case "$host" in
                 ARCH_STRING="X86-64"
                 ;;
         ppc-* | powerpc-*)
+		AC_MSG_WARN([HI THERE!])
                 AC_DEFINE(ARCH_PPC, 1, [Architecture is PowerPC])
                 ARCH_SPECIFIC_CFLAGS=""
                 ARCH_STRING="PowerPC"
@@ -71,63 +69,6 @@ AC_C_BIGENDIAN
 # Setup for the configuration header.
 #----------------------------------------------------------------------------
 AC_CONFIG_HEADERS([config.h])
-
-#----------------------------------------------------------------------------
-# Check for tools.
-#----------------------------------------------------------------------------
-CS_PROG_CC
-AS_IF([test -z "$CC"],
-    [AC_MSG_ERROR([Could not find a usable C compiler.])])
-CS_PROG_CXX
-AS_IF([test -z "$CXX"],
-    [AC_MSG_ERROR([Could not find a usable C++ compiler.])])
-CS_PROG_LINK
-
-CS_CHECK_COMMON_TOOLS_LINK
-CS_CHECK_COMMON_TOOLS_BASIC
-CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN
-
-CS_CHECK_PROGS([PERL], [perl5 perl])
-CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
-
-CS_CHECK_TEMPLATE_TOOLKIT2([emit])
-
-#----------------------------------------------------------------------------
-# Check if C++ exceptions can be disabled.
-#----------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
-    [cs_cv_prog_cxx_disable_exceptions], [CS_CREATE_TUPLE([-fno-exceptions])],
-    [C++], [COMPILER.C++FLAGS.EXCEPTIONS.DISABLE], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
-	[$cs_cv_prog_cxx_disable_exceptions], [+])])
-
-
-#----------------------------------------------------------------------------
-# Determine system type
-#----------------------------------------------------------------------------
-CS_CHECK_HOST
-
-#----------------------------------------------------------------------------
-# Check for syntax problems / header files
-#----------------------------------------------------------------------------
-# Nothing yet.
-
-#----------------------------------------------------------------------------
-# Check for GLUT.
-#----------------------------------------------------------------------------
-AS_IF([test $cs_host_family = windows],
-    [# Tack the GLUT that comes with bullet onto compiler & linker flags.
-    _AC_SRCDIRS(["."])
-    glut_cflags="-I$ac_top_srcdir/Glut"
-    glut_lflags="-L$ac_top_srcdir/Glut"
-    CFLAGS="$CFLAGS $glut_cflags"
-    LDFLAGS="$LDFLAGS $glut_lflags"
-    CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$glut_cflags], [+])
-    CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$glut_lflags], [+])
-    ])
-CS_CHECK_GLUT
-
-
 #----------------------------------------------------------------------------
 # Package configuration switches.
 #----------------------------------------------------------------------------
@@ -142,10 +83,63 @@ AM_CONDITIONAL([CONDITIONAL_BUILD_MULTITHREADED], [test "$build_multithreaded" =
 
 AC_ARG_ENABLE([demos],
     [AS_HELP_STRING([--disable-demos],
-	    [disable Bullet demos])],
+            [disable Bullet demos])],
     [],
     [enable_demos=yes])
 AM_CONDITIONAL([CONDITIONAL_BUILD_DEMOS], [false])
+
+dnl Check for OpenGL and GLUT
+
+
+case "$host" in
+        *-*-darwin*)
+                  AC_DEFINE([HAVE_APPLE_OPENGL_FRAMEWORK], [1],
+                            [Use the Apple OpenGL framework.])
+                  GL_LIBS="-framework GLUT -framework OpenGL -framework Carbon -framework AGL"
+                  have_glut=yes
+                  have_glu=yes
+                  have_gl=yes
+                ;;
+        *)
+                     have_gl_headers=yes
+                      AC_CHECK_HEADERS(GL/gl.h GL/glu.h GL/glext.h GL/glut.h, ,
+                            [have_gl_headers=no],
+                           [[#ifdef WIN32
+                             #include <windows.h>
+                             #endif
+                             #if HAVE_GL_GL_H
+                             #include <GL/gl.h>
+                             #endif
+                                 #if HAVE_GL_GLU_H
+                             #include <GL/glu.h>
+                             #endif
+                           ]])
+                      have_gl=no
+                      have_glu=no
+                      have_glut=no
+                      TEMP_LDFLAGS="$LDFLAGS"
+                      AC_CHECK_LIB(GL, main, [GL_LIBS="-lGL"; have_gl=yes])
+                      AC_CHECK_LIB(GLU, main, [GL_LIBS="-lGLU $GL_LIBS"; have_glu=yes], , -lGL)
+                      AC_CHECK_LIB(GLUT, main, [GL_LIBS="-lGLUT -LGLU  $GL_LIBS"; have_glut=yes], ,-lGLUT)
+                      AC_CHECK_LIB(opengl32, main, [GL_LIBS="-lopengl32"; have_gl=yes])
+                      AC_CHECK_LIB(glu32, main, [GL_LIBS="-lglu32 $GL_LIBS"; have_glu=yes], , -lopengl32)
+                      LDFLAGS="$TEMP_LDFLAGS"
+                      if test $have_gl = no -o $have_glu = no -o $have_gl_headers = no; then
+                        if test x$enable_demos = xyes; then
+                          AC_MSG_WARN([Demos and Extras will not be built because OpenGL and GLUT doesn't seem to work. See `config.log' for details.])
+                        fi
+                        enable_demos=no
+                      else
+                      AC_MSG_NOTICE([Found OpenGL])
+                      fi
+                ;;
+esac
+
+
+
+AC_SUBST(GL_LIBS)
+
+
 if test "x$enable_demos" != xno; then
     AC_MSG_NOTICE([Building Bullet demos])
     AM_CONDITIONAL([CONDITIONAL_BUILD_DEMOS],[true])
@@ -162,13 +156,6 @@ AC_MSG_CHECKING([build mode])
 AS_IF([test $enable_debug = yes], [build_mode=debug], [build_mode=optimize])
 AC_MSG_RESULT([$build_mode])
 
-CS_EMIT_BUILD_PROPERTY([MODE], [$build_mode])
-
-#-----------------------------------------------------------------------------
-# Emit install paths and package information.
-#-----------------------------------------------------------------------------
-CS_OUTPUT_INSTALLDIRS
-CS_EMIT_PACKAGEINFO
 
 
 CFLAGS="$ARCH_SPECIFIC_CFLAGS $CFLAGS"
@@ -176,17 +163,10 @@ CXXFLAGS="$ARCH_SPECIFIC_CFLAGS $CXXFLAGS $CFLAGS"
 #----------------------------------------------------------------------------
 # Emit generated files.
 #----------------------------------------------------------------------------
-CS_JAMCONFIG_OUTPUT([Jamconfig])
-AC_CONFIG_FILES([bullet.pc Jamfile Makefile Demos/Makefile Demos/SoftDemo/Makefile Demos/AllBulletDemos/Makefile Demos/MultiThreadedDemo/Makefile Demos/ColladaDemo/Makefile Demos/OpenGL/Makefile Demos/BasicDemo/Makefile Demos/CcdPhysicsDemo/Makefile Demos/VehicleDemo/Makefile Demos/TerrainDemo/Makefile src/Makefile Extras/Makefile])
+AC_CONFIG_FILES([bullet.pc Makefile Demos/Makefile Demos/SoftDemo/Makefile Demos/AllBulletDemos/Makefile Demos/MultiThreadedDemo/Makefile  Demos/OpenGL/Makefile Demos/BasicDemo/Makefile Demos/CcdPhysicsDemo/Makefile Demos/VehicleDemo/Makefile Demos/TerrainDemo/Makefile src/Makefile Extras/Makefile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([
-You can type 'make' or 'jam' to build Bullet.
-Alternatively, you can use cmake or use the wksbullet.sln visual studio x solutions in the msvc/x folder.
-
-CMake home:http://cmake.org
-Jam home: http://www.perforce.com/jam/jam.html
-Jam source: ftp://ftp.perforce.com/jam/
 
 Please type 'make' to build Bullet
 ])
