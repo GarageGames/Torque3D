@@ -30,9 +30,13 @@
 #if defined(TORQUE_OS_MAC)
 #  include <OpenAL/al.h>
 #  include <OpenAL/alc.h>
+//Dushan - OpenAL SDK 1.1 have different folder structure
+#elif defined(TORQUE_OS_WIN32)
+#  include <al.h>
+#  include <alc.h>
 #else
-#  include <al/al.h>
-#  include <al/alc.h>
+#  include <AL/al.h>
+#  include <AL/alc.h>
 #endif
 
 #ifndef ALAPIENTRY
