@@ -1,1 +1,0 @@
-This directory is needed for smarty to store compiled templates.
