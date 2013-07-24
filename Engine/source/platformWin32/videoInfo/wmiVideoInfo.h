@@ -38,7 +38,7 @@ private:
    IWbemServices *mServices;
    bool mComInitialized;
 
-   void*             mDXGIModule;
+   HMODULE           hDXGI;
    IDXGIFactory*     mDXGIFactory;
    IDxDiagProvider*  mDxDiagProvider;
 
