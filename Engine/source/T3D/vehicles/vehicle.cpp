@@ -1358,12 +1358,22 @@ bool Vehicle::resolveCollision(Rigid&  ns,CollisionList& cList)
          // "constraints".
          if (vn < -mDataBlock->contactTol) 
          {
-
             // Apply impulses to the rigid body to keep it from
             // penetrating the surface.
-            ns.resolveCollision(cList[i].point,
-               cList[i].normal);
-            collided  = true;
+           if ( c.object->getTypeMask() & VehicleObjectType )
+           {
+               Vehicle* other = dynamic_cast<Vehicle*>( c.object );
+               if (other)
+                   ns.resolveCollision(cList[i].point , cList[i].normal, &other->mRigid );
+               else
+               {
+                   //handle rigidshapes. note: we would have handled those like vehicles,
+                   //but there's more wonkiness lurking there. baby steps -BJR
+                   ns.resolveCollision(cList[i].point, cList[i].normal);
+               }
+           }
+           else ns.resolveCollision(cList[i].point, cList[i].normal);
+           collided  = true;
 
             // Keep track of objects we collide with
             if (!isGhost() && c.object->getTypeMask() & ShapeBaseObjectType) 
