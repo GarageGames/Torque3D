@@ -65,6 +65,9 @@ function onStart()
    // a specific pixel shader version (0 is for fixed function)
    //$pref::Video::forcePixVersion = true;
    //$pref::Video::forcedPixVersion = 0;
+   
+   // Comment this in order to disable using Direct3D9Ex feature
+   $pref::Video::preferDirect3D9Ex = true;
 
    if ($platform $= "macos")
       $pref::Video::displayDevice = "OpenGL";
