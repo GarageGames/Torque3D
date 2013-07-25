@@ -56,7 +56,7 @@ struct OculusVRSensorData
    void reset();
 
    /// Set data based on given sensor fusion
-   void setData(const OVR::SensorFusion& data, const F32& maxAxisRadius);
+   void setData(OVR::SensorFusion& data, const F32& maxAxisRadius);
 
    /// Simulate valid data
    void simulateData(const F32& maxAxisRadius);
