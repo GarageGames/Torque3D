@@ -13,14 +13,14 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef MINKOWSKI_SUM_SHAPE_H
-#define MINKOWSKI_SUM_SHAPE_H
+#ifndef BT_MINKOWSKI_SUM_SHAPE_H
+#define BT_MINKOWSKI_SUM_SHAPE_H
 
 #include "btConvexInternalShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 
 /// The btMinkowskiSumShape is only for advanced users. This shape represents implicit based minkowski sum of two convex implicit shapes.
-class btMinkowskiSumShape : public btConvexInternalShape
+ATTRIBUTE_ALIGNED16(class) btMinkowskiSumShape : public btConvexInternalShape
 {
 
 	btTransform	m_transA;
@@ -29,6 +29,8 @@ class btMinkowskiSumShape : public btConvexInternalShape
 	const btConvexShape*	m_shapeB;
 
 public:
+
+BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	btMinkowskiSumShape(const btConvexShape* shapeA,const btConvexShape* shapeB);
 
@@ -57,4 +59,4 @@ public:
 	}
 };
 
-#endif //MINKOWSKI_SUM_SHAPE_H
+#endif //BT_MINKOWSKI_SUM_SHAPE_H
