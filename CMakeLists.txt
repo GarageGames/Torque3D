@@ -20,6 +20,7 @@ OPTION( USE_OPENGL                 "Use OpenGL renderer"                        
 OPTION( USE_LEAPMOTIONINPUT        "Use Leap Motion Input"                       OFF )
 OPTION( USE_RAZERHYDRAINPUT        "Use Razer Hydra Input"                       OFF )
 OPTION( USE_FMODSOUNDSYSTEM        "Use FMOD Sound System"                       OFF )
+OPTION( USE_OCULUSRIFT             "Use Oculus Rift"                             OFF )
 OPTION( USE_RECASTNAVITATION       "Use Recast Navigation"                       OFF )
 OPTION( TORQUE_HIFI_NET            "Use HiFi Net"                                OFF )
 OPTION( TORQUE_EXTENDED_MOVE       "Use Extended Move"                           OFF )
@@ -115,12 +116,17 @@ IF( USE_LEAPMOTIONINPUT )
     SET( PLATFORMINPUTLEAPMOTION_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/input/leapMotion )
 ENDIF( USE_LEAPMOTIONINPUT )
 
+IF( USE_OCULUSRIFT )
+    SET( PLATFORMOCULUS_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/input/oculusVR )
+ENDIF( USE_OCULUSRIFT )
+
 IF( USE_RAZERHYDRAINPUT )
     SET( PLATFORMINPUTRAZERHYDRA_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/input/razerHydra )
 ENDIF( USE_RAZERHYDRAINPUT )
 
 SET( PLATFORMMENUS_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/menus )
 SET( PLATFORMNATIVEDIALOGS_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/nativeDialogs )
+SET( PLATFORMOUTPUT_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/output )
 SET( PLATFORMTEST_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/test )
 SET( PLATFORMTHREADS_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platform/threads )
 SET( PLATFORMWIN32_DIR ${CMAKE_SOURCE_DIR}/Engine/source/platformWin32 )
@@ -1657,6 +1663,27 @@ IF( USE_LEAPMOTIONINPUT )
     )
 ENDIF( USE_LEAPMOTIONINPUT )
 
+IF( USE_OCULUSRIFT )
+    SET( PLATFORMOCULUSVR_HEADERS
+	    ${PLATFORMOCULUS_DIR}/barrelDistortionPostEffect.h
+		${PLATFORMOCULUS_DIR}/oculusVRConstants.h
+		${PLATFORMOCULUS_DIR}/oculusVRDevice.h
+		${PLATFORMOCULUS_DIR}/oculusVRHMDDevice.h
+		${PLATFORMOCULUS_DIR}/oculusVRSensorData.h
+		${PLATFORMOCULUS_DIR}/oculusVRSensorDevice.h
+		${PLATFORMOCULUS_DIR}/oculusVRUtil.h
+	)
+	
+	SET( PLATFORMOCULUSVR_SOURCES
+	    ${PLATFORMOCULUS_DIR}/barrelDistortionPostEffect.cpp
+		${PLATFORMOCULUS_DIR}/oculusVRDevice.cpp
+		${PLATFORMOCULUS_DIR}/oculusVRHMDDevice.cpp
+		${PLATFORMOCULUS_DIR}/oculusVRSensorData.cpp
+		${PLATFORMOCULUS_DIR}/oculusVRSensorDevice.cpp
+		${PLATFORMOCULUS_DIR}/oculusVRUtil.cpp
+	)
+ENDIF ( USE_OCULUSRIFT )
+
 IF( USE_RAZERHYDRAINPUT )
     SET( PLATFORMRAZERHYDRA_HEADERS
         ${PLATFORMINPUTRAZERHYDRA_DIR}/razerHydraConstants.h
@@ -1689,6 +1716,10 @@ SET( PLATFORMMENUS_SOURCES
 SET( PLATFORMNATIVEDIALOGS_HEADERS
     ${PLATFORMNATIVEDIALOGS_DIR}/fileDialog.h
 	${PLATFORMNATIVEDIALOGS_DIR}/msgBox.h
+)
+
+SET( PLATFORMOUTPUT_HEADERS
+    ${PLATFORMOUTPUT_DIR}/IDisplayDevice.h
 )
 
 SET( PLATFORMNATIVEDIALOGS_SOURCES
@@ -2836,14 +2867,22 @@ ENDIF( USE_RECASTNAVITATION )
 SOURCE_GROUP( Header\ Files\\platform                                 FILES ${PLATFORM_HEADERS} )
 SOURCE_GROUP( Header\ Files\\platform\\async                          FILES ${PLATFORMASYNC_HEADERS} )
 SOURCE_GROUP( Header\ Files\\platform\\input                          FILES ${PLATFORMINPUT_HEADERS} )
+
 IF( USE_LEAPMOTIONINPUT )
     SOURCE_GROUP( Header\ Files\\platform\\input\\leapMotion              FILES ${PLATFORMLEAPMOTION_HEADERS} )
 ENDIF( USE_LEAPMOTIONINPUT )
+
+IF( USE_OCULUSRIFT )
+    SOURCE_GROUP( Header\ Files\\platform\\input\\oculusVR                FILES ${PLATFORMOCULUSVR_HEADERS} )
+ENDIF( USE_OCULUSRIFT )	
+
 IF( USE_RAZERHYDRAINPUT )
     SOURCE_GROUP( Header\ Files\\platform\\input\\razerHydra              FILES ${PLATFORMRAZERHYDRA_HEADERS} )
 ENDIF( USE_RAZERHYDRAINPUT )
+
 SOURCE_GROUP( Header\ Files\\platform\\menus                          FILES ${PLATFORMMENUS_HEADERS} )
 SOURCE_GROUP( Header\ Files\\platform\\nativeDialogs                  FILES ${PLATFORMNATIVEDIALOGS_HEADERS} )
+SOURCE_GROUP( Header\ Files\\platform\\output                         FILES ${PLATFORMOUTPUT_HEADERS} )
 SOURCE_GROUP( Header\ Files\\platform\\threads                        FILES ${PLATFORMTHREADS_HEADERS} )
 SOURCE_GROUP( Header\ Files\\platformWin32                            FILES ${PLATFORMWIN32_HEADERS} )
 SOURCE_GROUP( Header\ Files\\platformWin32\\minidump                  FILES ${PLATFORMWIN32MINIDUMP_HEADERS} )
@@ -3001,6 +3040,10 @@ SOURCE_GROUP( Source\ Files\\platform\\input                          FILES ${PL
 IF( USE_LEAPMOTIONINPUT )
     SOURCE_GROUP( Source\ Files\\platform\\input\\leapMotion              FILES ${PLATFORMLEAPMOTION_SOURCES} )
 ENDIF( USE_LEAPMOTIONINPUT )
+
+IF( USE_OCULUSRIFT )
+    SOURCE_GROUP( Source\ Files\\platform\\input\\oculusVR                FILES ${PLATFORMOCULUSVR_SOURCES} )
+ENDIF( USE_OCULUSRIFT )
 
 IF( USE_RAZERHYDRAINPUT )
     SOURCE_GROUP( Source\ Files\\platform\\input\\razerHydra              FILES ${PLATFORMRAZERHYDRA_SOURCES} )
@@ -3234,12 +3277,15 @@ ADD_LIBRARY( dll SHARED
 	${PLATFORMINPUT_SOURCES}
 	${PLATFORMLEAPMOTION_HEADERS}
 	${PLATFORMLEAPMOTION_SOURCES}
+	${PLATFORMOCULUSVR_HEADERS}
+	${PLATFORMOCULUSVR_SOURCES}
 	${PLATFORMRAZERHYDRA_HEADERS}
 	${PLATFORMRAZERHYDRA_SOURCES}
 	${PLATFORMMENUS_HEADERS}
 	${PLATFORMMENUS_SOURCES}
 	${PLATFORMNATIVEDIALOGS_HEADERS}
 	${PLATFORMNATIVEDIALOGS_SOURCES}
+	${PLATFORMOUTPUT_HEADERS}
 	${PLATFORMTEST_SOURCES}
 	${PLATFORMTHREADS_HEADERS}
 	${PLATFORMTHREADS_SOURCES}
@@ -3395,6 +3441,13 @@ IF( USE_LEAPMOTIONINPUT )
 	TARGET_LINK_LIBRARIES( dll ${LEAP_LIBRARY} )
 ENDIF( USE_LEAPMOTIONINPUT )
 
+IF( USE_OCULUSRIFT )
+    FIND_PACKAGE( OculusSDK REQUIRED )
+	
+	INCLUDE_DIRECTORIES( dll ${OCULUS_SDK_INCLUDE_DIRS} )
+	TARGET_LINK_LIBRARIES( dll ${OCULUS_SDK_LIBRARIES} )
+ENDIF( USE_OCULUSRIFT )
+
 IF( USE_RAZERHYDRAINPUT )
     FIND_PACKAGE( Sixence REQUIRED )
 	
@@ -3436,3 +3489,7 @@ IF( WIN32 AND MSVC )
     SET_TARGET_PROPERTIES( exe PROPERTIES OUTPUT_NAME "Torque3D" )
 
 ENDIF( WIN32 AND MSVC )
+
+IF(UNIX)
+#Dushan TODO
+ENDIF(UNIX)
