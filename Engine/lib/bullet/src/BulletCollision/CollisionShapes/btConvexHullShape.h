@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONVEX_HULL_SHAPE_H
-#define CONVEX_HULL_SHAPE_H
+#ifndef BT_CONVEX_HULL_SHAPE_H
+#define BT_CONVEX_HULL_SHAPE_H
 
 #include "btPolyhedralConvexShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
@@ -73,6 +73,8 @@ public:
 	virtual void	batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const;
 	
 
+	virtual void project(const btTransform& trans, const btVector3& dir, btScalar& minProj, btScalar& maxProj, btVector3& witnesPtMin,btVector3& witnesPtMax) const;
+
 
 	//debugging
 	virtual const char*	getName()const {return "Convex";}
@@ -89,8 +91,32 @@ public:
 	///in case we receive negative scaling
 	virtual void	setLocalScaling(const btVector3& scaling);
 
+	virtual	int	calculateSerializeBufferSize() const;
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
+
+};
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btConvexHullShapeData
+{
+	btConvexInternalShapeData	m_convexInternalShapeData;
+
+	btVector3FloatData	*m_unscaledPointsFloatPtr;
+	btVector3DoubleData	*m_unscaledPointsDoublePtr;
+
+	int		m_numUnscaledPoints;
+	char m_padding3[4];
+
 };
 
 
-#endif //CONVEX_HULL_SHAPE_H
+SIMD_FORCE_INLINE	int	btConvexHullShape::calculateSerializeBufferSize() const
+{
+	return sizeof(btConvexHullShapeData);
+}
+
+
+#endif //BT_CONVEX_HULL_SHAPE_H
 

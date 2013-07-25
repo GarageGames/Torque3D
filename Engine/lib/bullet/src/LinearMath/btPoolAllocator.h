@@ -57,6 +57,16 @@ public:
 		return m_freeCount;
 	}
 
+	int getUsedCount() const
+	{
+		return m_maxElements - m_freeCount;
+	}
+
+	int getMaxCount() const
+	{
+		return m_maxElements;
+	}
+
 	void*	allocate(int size)
 	{
 		// release mode fix
@@ -96,6 +106,15 @@ public:
 		return m_elemSize;
 	}
 
+	unsigned char*	getPoolAddress()
+	{
+		return m_pool;
+	}
+
+	const unsigned char*	getPoolAddress() const
+	{
+		return m_pool;
+	}
 
 };
 

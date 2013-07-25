@@ -1,7 +1,7 @@
 #ifndef GIM_MEMORY_H_INCLUDED
 #define GIM_MEMORY_H_INCLUDED
 /*! \file gim_memory.h
-\author Francisco Len Nßjera
+\author Francisco Leon Najera
 */
 /*
 -----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void gim_free(void *ptr);
 
 
 
-#if defined (WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
+#if defined (_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
     #define GIM_SIMD_MEMORY 1
 #endif
 

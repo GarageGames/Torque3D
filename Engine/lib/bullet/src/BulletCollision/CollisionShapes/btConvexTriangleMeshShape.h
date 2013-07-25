@@ -12,8 +12,8 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef CONVEX_TRIANGLEMESH_SHAPE_H
-#define CONVEX_TRIANGLEMESH_SHAPE_H
+#ifndef BT_CONVEX_TRIANGLEMESH_SHAPE_H
+#define BT_CONVEX_TRIANGLEMESH_SHAPE_H
 
 
 #include "btPolyhedralConvexShape.h"
@@ -22,12 +22,14 @@ subject to the following restrictions:
 
 /// The btConvexTriangleMeshShape is a convex hull of a triangle mesh, but the performance is not as good as btConvexHullShape.
 /// A small benefit of this class is that it uses the btStridingMeshInterface, so you can avoid the duplication of the triangle mesh data. Nevertheless, most users should use the much better performing btConvexHullShape instead.
-class btConvexTriangleMeshShape : public btPolyhedralConvexAabbCachingShape
+ATTRIBUTE_ALIGNED16(class) btConvexTriangleMeshShape : public btPolyhedralConvexAabbCachingShape
 {
 
 	class btStridingMeshInterface*	m_stridingMesh;
 
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
 	btConvexTriangleMeshShape(btStridingMeshInterface* meshInterface, bool calcAabb = true);
 
 	class btStridingMeshInterface*	getMeshInterface()
@@ -69,7 +71,7 @@ public:
 
 
 
-#endif //CONVEX_TRIANGLEMESH_SHAPE_H
+#endif //BT_CONVEX_TRIANGLEMESH_SHAPE_H
 
 
 

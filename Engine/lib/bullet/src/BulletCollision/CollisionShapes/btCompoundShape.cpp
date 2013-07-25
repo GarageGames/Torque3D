@@ -16,6 +16,7 @@ subject to the following restrictions:
 #include "btCompoundShape.h"
 #include "btCollisionShape.h"
 #include "BulletCollision/BroadphaseCollision/btDbvt.h"
+#include "LinearMath/btSerializer.h"
 
 btCompoundShape::btCompoundShape(bool enableDynamicAabbTree)
 : m_localAabbMin(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT)),
@@ -51,6 +52,7 @@ void	btCompoundShape::addChildShape(const btTransform& localTransform,btCollisio
 	//m_childTransforms.push_back(localTransform);
 	//m_childShapes.push_back(shape);
 	btCompoundShapeChild child;
+	child.m_node = 0;
 	child.m_transform = localTransform;
 	child.m_childShape = shape;
 	child.m_childShapeType = shape->getShapeType();
@@ -83,7 +85,7 @@ void	btCompoundShape::addChildShape(const btTransform& localTransform,btCollisio
 
 }
 
-void	btCompoundShape::updateChildTransform(int childIndex, const btTransform& newChildTransform)
+void	btCompoundShape::updateChildTransform(int childIndex, const btTransform& newChildTransform,bool shouldRecalculateLocalAabb)
 {
 	m_children[childIndex].m_transform = newChildTransform;
 
@@ -97,7 +99,10 @@ void	btCompoundShape::updateChildTransform(int childIndex, const btTransform& ne
 		m_dynamicAabbTree->update(m_children[childIndex].m_node,bounds);
 	}
 
-	recalculateLocalAabb();
+	if (shouldRecalculateLocalAabb)
+	{
+		recalculateLocalAabb();
+	}
 }
 
 void btCompoundShape::removeChildShapeByIndex(int childShapeIndex)
@@ -109,6 +114,8 @@ void btCompoundShape::removeChildShapeByIndex(int childShapeIndex)
 		m_dynamicAabbTree->remove(m_children[childShapeIndex].m_node);
 	}
 	m_children.swap(childShapeIndex,m_children.size()-1);
+    if (m_dynamicAabbTree) 
+		m_children[childShapeIndex].m_node->dataAsInt = childShapeIndex;
 	m_children.pop_back();
 
 }
@@ -175,9 +182,7 @@ void btCompoundShape::getAabb(const btTransform& trans,btVector3& aabbMin,btVect
 
 	btVector3 center = trans(localCenter);
 
-	btVector3 extent = btVector3(abs_b[0].dot(localHalfExtents),
-		abs_b[1].dot(localHalfExtents),
-		abs_b[2].dot(localHalfExtents));
+    btVector3 extent = localHalfExtents.dot3(abs_b[0], abs_b[1], abs_b[2]);
 	aabbMin = center-extent;
 	aabbMax = center+extent;
 	
@@ -216,9 +221,13 @@ void btCompoundShape::calculatePrincipalAxisTransform(btScalar* masses, btTransf
 
 	for (k = 0; k < n; k++)
 	{
+		btAssert(masses[k]>0);
 		center += m_children[k].m_transform.getOrigin() * masses[k];
 		totalMass += masses[k];
 	}
+
+	btAssert(totalMass>0);
+
 	center /= totalMass;
 	principal.setOrigin(center);
 
@@ -263,4 +272,83 @@ void btCompoundShape::calculatePrincipalAxisTransform(btScalar* masses, btTransf
 }
 
 
+
+void btCompoundShape::setLocalScaling(const btVector3& scaling)
+{
+
+	for(int i = 0; i < m_children.size(); i++)
+	{
+		btTransform childTrans = getChildTransform(i);
+		btVector3 childScale = m_children[i].m_childShape->getLocalScaling();
+//		childScale = childScale * (childTrans.getBasis() * scaling);
+		childScale = childScale * scaling / m_localScaling;
+		m_children[i].m_childShape->setLocalScaling(childScale);
+		childTrans.setOrigin((childTrans.getOrigin())*scaling);
+		updateChildTransform(i, childTrans,false);
+	}
+	
+	m_localScaling = scaling;
+	recalculateLocalAabb();
+
+}
+
+
+void btCompoundShape::createAabbTreeFromChildren()
+{
+    if ( !m_dynamicAabbTree )
+    {
+        void* mem = btAlignedAlloc(sizeof(btDbvt),16);
+        m_dynamicAabbTree = new(mem) btDbvt();
+        btAssert(mem==m_dynamicAabbTree);
+
+        for ( int index = 0; index < m_children.size(); index++ )
+        {
+            btCompoundShapeChild &child = m_children[index];
+
+            //extend the local aabbMin/aabbMax
+            btVector3 localAabbMin,localAabbMax;
+            child.m_childShape->getAabb(child.m_transform,localAabbMin,localAabbMax);
+
+            const btDbvtVolume  bounds=btDbvtVolume::FromMM(localAabbMin,localAabbMax);
+            child.m_node = m_dynamicAabbTree->insert(bounds,(void*)index);
+        }
+    }
+}
+
+
+///fills the dataBuffer and returns the struct name (and 0 on failure)
+const char*	btCompoundShape::serialize(void* dataBuffer, btSerializer* serializer) const
+{
+
+	btCompoundShapeData* shapeData = (btCompoundShapeData*) dataBuffer;
+	btCollisionShape::serialize(&shapeData->m_collisionShapeData, serializer);
+
+	shapeData->m_collisionMargin = float(m_collisionMargin);
+	shapeData->m_numChildShapes = m_children.size();
+	shapeData->m_childShapePtr = 0;
+	if (shapeData->m_numChildShapes)
+	{
+		btChunk* chunk = serializer->allocate(sizeof(btCompoundShapeChildData),shapeData->m_numChildShapes);
+		btCompoundShapeChildData* memPtr = (btCompoundShapeChildData*)chunk->m_oldPtr;
+		shapeData->m_childShapePtr = (btCompoundShapeChildData*)serializer->getUniquePointer(memPtr);
+
+		for (int i=0;i<shapeData->m_numChildShapes;i++,memPtr++)
+		{
+			memPtr->m_childMargin = float(m_children[i].m_childMargin);
+			memPtr->m_childShape = (btCollisionShapeData*)serializer->getUniquePointer(m_children[i].m_childShape);
+			//don't serialize shapes that already have been serialized
+			if (!serializer->findPointer(m_children[i].m_childShape))
+			{
+				btChunk* chunk = serializer->allocate(m_children[i].m_childShape->calculateSerializeBufferSize(),1);
+				const char* structType = m_children[i].m_childShape->serialize(chunk->m_oldPtr,serializer);
+				serializer->finalizeChunk(chunk,structType,BT_SHAPE_CODE,m_children[i].m_childShape);
+			} 
+
+			memPtr->m_childShapeType = m_children[i].m_childShapeType;
+			m_children[i].m_transform.serializeFloat(memPtr->m_transform);
+		}
+		serializer->finalizeChunk(chunk,"btCompoundShapeChildData",BT_ARRAY_CODE,chunk->m_oldPtr);
+	}
+	return "btCompoundShapeData";
+}
 

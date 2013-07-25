@@ -1,7 +1,7 @@
 #ifndef GIM_ARRAY_H_INCLUDED
 #define GIM_ARRAY_H_INCLUDED
 /*! \file gim_array.h
-\author Francisco Len Nßjera
+\author Francisco Leon Najera
 */
 /*
 -----------------------------------------------------------------------------
@@ -285,18 +285,16 @@ public:
 	    m_data[index] = obj;
 	}
 
-	inline void resize(GUINT size, bool call_constructor = true)
+	inline void resize(GUINT size, bool call_constructor = true, const T& fillData=T())
 	{
-
 	    if(size>m_size)
 	    {
             reserve(size);
             if(call_constructor)
             {
-            	T obj;
                 while(m_size<size)
                 {
-                    m_data[m_size] = obj;
+                    m_data[m_size] = fillData;
                     m_size++;
                 }
             }
