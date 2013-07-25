@@ -34,7 +34,7 @@ void OculusVRSensorData::reset()
    mDataSet = false;
 }
 
-void OculusVRSensorData::setData(const OVR::SensorFusion& data, const F32& maxAxisRadius)
+void OculusVRSensorData::setData(OVR::SensorFusion& data, const F32& maxAxisRadius)
 {
    // Sensor rotation
    OVR::Quatf orientation;
