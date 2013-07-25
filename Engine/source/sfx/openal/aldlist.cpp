@@ -27,6 +27,9 @@
 #include "aldlist.h"
 #if defined(TORQUE_OS_MAC)
 #include <OpenAL/alc.h>
+//Dushan - OpenAL SDK 1.1 have different folder structure
+#elif defined(TORQUE_OS_WIN32)
+#include <alc.h>
 #else
 #include <al/alc.h>
 #endif

@@ -1,0 +1,13 @@
+
+INCLUDE_DIRECTORIES(
+${CMAKE_SOURCE_DIR}/Engine/lib/bullet/src
+)
+
+
+#SUBDIRS ( 
+#	OpenCL
+#)
+
+#IF( USE_DX11 )
+#	SUBDIRS( DX11 )
+#ENDIF( USE_DX11 )

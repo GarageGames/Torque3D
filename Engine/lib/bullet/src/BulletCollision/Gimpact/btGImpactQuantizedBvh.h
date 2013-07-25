@@ -2,7 +2,7 @@
 #define GIM_QUANTIZED_SET_H_INCLUDED
 
 /*! \file btGImpactQuantizedBvh.h
-\author Francisco Len Nßjera
+\author Francisco Leon Najera
 */
 /*
 This source file is part of GIMPACT Library.
@@ -359,12 +359,12 @@ public:
 		return m_box_tree.get_node_pointer(index);
 	}
 
-
+#ifdef TRI_COLLISION_PROFILING
 	static float getAverageTreeCollisionTime();
+#endif //TRI_COLLISION_PROFILING
 
-
-	static void find_collision(btGImpactQuantizedBvh * boxset1, const btTransform & trans1,
-		btGImpactQuantizedBvh * boxset2, const btTransform & trans2,
+	static void find_collision(const btGImpactQuantizedBvh * boxset1, const btTransform & trans1,
+		const btGImpactQuantizedBvh * boxset2, const btTransform & trans2,
 		btPairSet & collision_pairs);
 };
 

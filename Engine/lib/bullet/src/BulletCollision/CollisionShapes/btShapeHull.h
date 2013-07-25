@@ -15,8 +15,8 @@ subject to the following restrictions:
 
 ///btShapeHull implemented by John McCutchan.
 
-#ifndef _SHAPE_HULL_H
-#define _SHAPE_HULL_H
+#ifndef BT_SHAPE_HULL_H
+#define BT_SHAPE_HULL_H
 
 #include "LinearMath/btAlignedObjectArray.h"
 #include "BulletCollision/CollisionShapes/btConvexShape.h"
@@ -25,9 +25,20 @@ subject to the following restrictions:
 ///The btShapeHull class takes a btConvexShape, builds a simplified convex hull using btConvexHull and provides triangle indices and vertices.
 ///It can be useful for to simplify a complex convex object and for visualization of a non-polyhedral convex object.
 ///It approximates the convex hull using the supporting vertex of 42 directions.
-class btShapeHull
+ATTRIBUTE_ALIGNED16(class) btShapeHull
 {
+protected:
+
+	btAlignedObjectArray<btVector3> m_vertices;
+	btAlignedObjectArray<unsigned int> m_indices;
+	unsigned int m_numIndices;
+	const btConvexShape* m_shape;
+
+	static btVector3* getUnitSpherePoints();
+
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
 	btShapeHull (const btConvexShape* shape);
 	~btShapeHull ();
 
@@ -45,12 +56,6 @@ public:
 	{
 		return &m_indices[0];
 	}
-
-protected:
-	btAlignedObjectArray<btVector3> m_vertices;
-	btAlignedObjectArray<unsigned int> m_indices;
-	unsigned int m_numIndices;
-	const btConvexShape* m_shape;
 };
 
-#endif //_SHAPE_HULL_H
+#endif //BT_SHAPE_HULL_H

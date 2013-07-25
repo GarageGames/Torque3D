@@ -16,19 +16,12 @@ subject to the following restrictions:
 #include <string.h>
 
 #include "btConvexHull.h"
-#include "LinearMath/btAlignedObjectArray.h"
-#include "LinearMath/btMinMax.h"
-#include "LinearMath/btVector3.h"
+#include "btAlignedObjectArray.h"
+#include "btMinMax.h"
+#include "btVector3.h"
 
 
 
-template <class T>
-void Swap(T &a,T &b)
-{
-	T tmp = a;
-	a=b;
-	b=tmp;
-}
 
 
 //----------------------------------
@@ -518,7 +511,7 @@ int4 HullLibrary::FindSimplex(btVector3 *verts,int verts_count,btAlignedObjectAr
 	if(p3==p0||p3==p1||p3==p2) 
 		return int4(-1,-1,-1,-1);
 	btAssert(!(p0==p1||p0==p2||p0==p3||p1==p2||p1==p3||p2==p3));
-	if(btDot(verts[p3]-verts[p0],btCross(verts[p1]-verts[p0],verts[p2]-verts[p0])) <0) {Swap(p2,p3);}
+	if(btDot(verts[p3]-verts[p0],btCross(verts[p1]-verts[p0],verts[p2]-verts[p0])) <0) {btSwap(p2,p3);}
 	return int4(p0,p1,p2,p3);
 }
 
@@ -570,7 +563,7 @@ int HullLibrary::calchullgen(btVector3 *verts,int verts_count, int vlimit)
 	vlimit-=4;
 	while(vlimit >0 && ((te=extrudable(epsilon)) != 0))
 	{
-		int3 ti=*te;
+		//int3 ti=*te;
 		int v=te->vmax;
 		btAssert(v != -1);
 		btAssert(!isextreme[v]);  // wtf we've already done this vertex
@@ -1011,9 +1004,9 @@ bool  HullLibrary::CleanupVertices(unsigned int svcount,
 				btScalar y = v[1];
 				btScalar z = v[2];
 
-				btScalar dx = fabsf(x - px );
-				btScalar dy = fabsf(y - py );
-				btScalar dz = fabsf(z - pz );
+				btScalar dx = btFabs(x - px );
+				btScalar dy = btFabs(y - py );
+				btScalar dz = btFabs(z - pz );
 
 				if ( dx < normalepsilon && dy < normalepsilon && dz < normalepsilon )
 				{
@@ -1156,7 +1149,7 @@ void HullLibrary::BringOutYourDead(const btVector3* verts,unsigned int vcount, b
 
 			for (int k=0;k<m_vertexIndexMapping.size();k++)
 			{
-				if (tmpIndices[k]==v)
+				if (tmpIndices[k]==int(v))
 					m_vertexIndexMapping[k]=ocount;
 			}
 
