@@ -1552,20 +1552,22 @@ SET( MATHUTIL_SOURCES
 	${MATHUTIL_DIR}/tResponseCurve.cpp
 )
 
-SET( RECASTNAVITATION_SOURCES
-    ${NAVIGATION_DIR}/duDebugDrawTorque.cpp
-	${NAVIGATION_DIR}/navMesh.cpp
-	${NAVIGATION_DIR}/navPath.cpp
-	${NAVIGATION_DIR}/recastPolyList.cpp
-)
+IF( USE_RECASTNAVITATION )
+	SET( RECASTNAVITATION_SOURCES
+    	${NAVIGATION_DIR}/duDebugDrawTorque.cpp
+		${NAVIGATION_DIR}/navMesh.cpp
+		${NAVIGATION_DIR}/navPath.cpp
+		${NAVIGATION_DIR}/recastPolyList.cpp
+	)
 
-SET( RECASTNAVITATION_HEADERS
-    ${NAVIGATION_DIR}/duDebugDrawTorque.h
-	${NAVIGATION_DIR}/navMesh.h
-	${NAVIGATION_DIR}/navPath.h
-	${NAVIGATION_DIR}/recastPolyList.h
-	${NAVIGATION_DIR}/torqueRecast.h
-)
+	SET( RECASTNAVITATION_HEADERS
+    	${NAVIGATION_DIR}/duDebugDrawTorque.h
+		${NAVIGATION_DIR}/navMesh.h
+		${NAVIGATION_DIR}/navPath.h
+		${NAVIGATION_DIR}/recastPolyList.h
+		${NAVIGATION_DIR}/torqueRecast.h
+    )
+ENDIF( USE_RECASTNAVITATION )
 
 SET( PLATFORM_HEADERS
     ${PLATFORM_DIR}/platform.h
