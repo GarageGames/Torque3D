@@ -45,6 +45,7 @@
 #include "postFx/postEffectManager.h"
 #include "postFx/postEffectVis.h"
 
+using namespace Torque;
 
 ConsoleDocClass( PostEffect, 
    "@brief A fullscreen shader effect.\n\n"

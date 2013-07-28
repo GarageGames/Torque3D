@@ -35,6 +35,7 @@
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
 
+using namespace Torque;
 
 //#define DEBUG_SPEW
 

@@ -49,6 +49,8 @@
 #include "materials/materialFeatureTypes.h"
 #include "console/engineAPI.h"
 
+using namespace Torque;
+
 extern bool gEditingMission;
 
 IMPLEMENT_CO_NETOBJECT_V1(TSStatic);
