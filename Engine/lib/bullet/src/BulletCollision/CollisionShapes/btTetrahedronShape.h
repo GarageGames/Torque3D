@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef BU_SIMPLEX_1TO4_SHAPE
-#define BU_SIMPLEX_1TO4_SHAPE
+#ifndef BT_SIMPLEX_1TO4_SHAPE
+#define BT_SIMPLEX_1TO4_SHAPE
 
 
 #include "btPolyhedralConvexShape.h"
@@ -22,7 +22,7 @@ subject to the following restrictions:
 
 
 ///The btBU_Simplex1to4 implements tetrahedron, triangle, line, vertex collision shapes. In most cases it is better to use btConvexHullShape instead.
-class btBU_Simplex1to4 : public btPolyhedralConvexAabbCachingShape
+ATTRIBUTE_ALIGNED16(class) btBU_Simplex1to4 : public btPolyhedralConvexAabbCachingShape
 {
 protected:
 
@@ -30,6 +30,8 @@ protected:
 	btVector3	m_vertices[4];
 
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
 	btBU_Simplex1to4();
 
 	btBU_Simplex1to4(const btVector3& pt0);
@@ -71,4 +73,4 @@ public:
 
 };
 
-#endif //BU_SIMPLEX_1TO4_SHAPE
+#endif //BT_SIMPLEX_1TO4_SHAPE

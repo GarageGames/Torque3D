@@ -531,7 +531,7 @@
       selectionHidden = "1";
       renderVertexSelection = "1";
       processUsesBrush = "0";
-      maxBrushSize = "40 40";
+      maxBrushSize = "256 256";
       adjustHeightVal = "10";
       setHeightVal = "100";
       scaleVal = "1";

@@ -2,7 +2,7 @@
 #define GIM_BOX_SET_H_INCLUDED
 
 /*! \file gim_box_set.h
-\author Francisco Len Nßjera
+\author Francisco Leon Najera
 */
 /*
 This source file is part of GIMPACT Library.
@@ -383,9 +383,9 @@ public:
 		return m_box_tree.get_node_pointer(index);
 	}
 
-
+#ifdef TRI_COLLISION_PROFILING
 	static float getAverageTreeCollisionTime();
-
+#endif //TRI_COLLISION_PROFILING
 
 	static void find_collision(btGImpactBvh * boxset1, const btTransform & trans1,
 		btGImpactBvh * boxset2, const btTransform & trans2,

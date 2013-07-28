@@ -1070,6 +1070,9 @@ void TerrainBlock::setTransform(const MatrixF & mat)
 
    setRenderTransform( mat );
    setMaskBits( TransformMask );
+
+   if(isClientObject())
+      smUpdateSignal.trigger( HeightmapUpdate, this, Point2I::Zero, Point2I::Max );
 }
 
 void TerrainBlock::setScale( const VectorF &scale )

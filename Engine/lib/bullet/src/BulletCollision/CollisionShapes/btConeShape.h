@@ -13,14 +13,14 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONE_MINKOWSKI_H
-#define CONE_MINKOWSKI_H
+#ifndef BT_CONE_MINKOWSKI_H
+#define BT_CONE_MINKOWSKI_H
 
 #include "btConvexInternalShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 
 ///The btConeShape implements a cone shape primitive, centered around the origin and aligned with the Y axis. The btConeShapeX is aligned around the X axis and btConeShapeZ around the Z axis.
-class btConeShape : public btConvexInternalShape
+ATTRIBUTE_ALIGNED16(class) btConeShape : public btConvexInternalShape
 
 {
 
@@ -32,6 +32,8 @@ class btConeShape : public btConvexInternalShape
 
 
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
 	btConeShape (btScalar radius,btScalar height);
 	
 	virtual btVector3	localGetSupportingVertex(const btVector3& vec) const;
@@ -81,6 +83,14 @@ public:
 		{
 			return m_coneIndices[1];
 		}
+
+	virtual btVector3	getAnisotropicRollingFrictionDirection() const
+	{
+		return btVector3 (0,1,0);
+	}
+
+	virtual void	setLocalScaling(const btVector3& scaling);
+
 };
 
 ///btConeShape implements a Cone shape, around the X axis
@@ -88,6 +98,12 @@ class btConeShapeX : public btConeShape
 {
 	public:
 		btConeShapeX(btScalar radius,btScalar height);
+
+	virtual btVector3	getAnisotropicRollingFrictionDirection() const
+	{
+		return btVector3 (1,0,0);
+	}
+
 };
 
 ///btConeShapeZ implements a Cone shape, around the Z axis
@@ -95,6 +111,12 @@ class btConeShapeZ : public btConeShape
 {
 	public:
 		btConeShapeZ(btScalar radius,btScalar height);
+
+	virtual btVector3	getAnisotropicRollingFrictionDirection() const
+	{
+		return btVector3 (0,0,1);
+	}
+
 };
-#endif //CONE_MINKOWSKI_H
+#endif //BT_CONE_MINKOWSKI_H
 

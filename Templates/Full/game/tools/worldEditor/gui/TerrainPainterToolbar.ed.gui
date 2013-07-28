@@ -494,7 +494,7 @@ new GuiMouseEventCtrl(PaintBrushSizeSliderCtrlContainer,EditorGuiGroup) {
       canSave = "1";
       Visible = "1";
       AltCommand = "PaintBrushSizeTextEditContainer-->textEdit.setValue(mFloatLength( ($ThisControl.getValue()), 2 )); ETerrainEditor.setBrushSize( $ThisControl.value );";
-      range = "1 40";
+      range = "1 256";
       ticks = "0";
       value = "0";
    };

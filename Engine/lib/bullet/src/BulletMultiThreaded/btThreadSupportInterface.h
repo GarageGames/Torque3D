@@ -13,13 +13,38 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef THREAD_SUPPORT_INTERFACE_H
-#define THREAD_SUPPORT_INTERFACE_H
+#ifndef BT_THREAD_SUPPORT_INTERFACE_H
+#define BT_THREAD_SUPPORT_INTERFACE_H
 
 
-//#include <LinearMath/btScalar.h> //for uint32_t etc.
+#include <LinearMath/btScalar.h> //for ATTRIBUTE_ALIGNED16
 #include "PlatformDefinitions.h"
 #include "PpuAddressSpace.h"
+
+class btBarrier {
+public:
+	btBarrier() {}
+	virtual ~btBarrier() {}
+
+	virtual void sync() = 0;
+	virtual void setMaxCount(int n) = 0;
+	virtual int  getMaxCount() = 0;
+};
+
+class btCriticalSection {
+public:
+	btCriticalSection() {}
+	virtual ~btCriticalSection() {}
+
+	ATTRIBUTE_ALIGNED16(unsigned int mCommonBuff[32]);
+
+	virtual unsigned int getSharedParam(int i) = 0;
+	virtual void setSharedParam(int i,unsigned int p) = 0;
+
+	virtual void lock() = 0;
+	virtual void unlock() = 0;
+};
+
 
 class btThreadSupportInterface
 {
@@ -33,6 +58,10 @@ public:
 ///check for messages from SPUs
 	virtual	void waitForResponse(unsigned int *puiArgument0, unsigned int *puiArgument1) =0;
 
+
+	///non-blocking test if a task is completed. First implement all versions, and then enable this API
+	///virtual bool isTaskCompleted(unsigned int *puiArgument0, unsigned int *puiArgument1, int timeOutInMilliseconds)=0;
+
 ///start the spus (can be called at the beginning of each frame, to make sure that the right SPU program is loaded)
 	virtual	void startSPU() =0;
 
@@ -44,7 +73,17 @@ public:
 
 	virtual int		getNumTasks() const = 0;
 
+	virtual btBarrier*	createBarrier() = 0;
+
+	virtual btCriticalSection* createCriticalSection() = 0;
+
+	virtual void deleteBarrier(btBarrier* barrier)=0;
+
+    virtual void deleteCriticalSection(btCriticalSection* criticalSection)=0;
+	
+	virtual void*	getThreadLocalMemory(int taskId) { return 0; }
+
 };
 
-#endif //THREAD_SUPPORT_INTERFACE_H
+#endif //BT_THREAD_SUPPORT_INTERFACE_H
 
