@@ -1,30 +1,33 @@
 Bullet Collision Detection and Physics Library
 
+See also http://bulletphysics.org/mediawiki-1.5.8/index.php/Creating_a_project_from_scratch
+
 ** Windows Compilation **
 
-Under Windows, projectfiles for Visual Studio version 6,7,7.1 and 8 are 
-available in msvc/<version>.  For example, for Visual Studio 2005, open 
-msvc/8/wksbullet.sln
+	Open the Microsoft Visual Studio solution in msvc/20xx/BULLET_PHYSICS.sln
 
-The ColladaDemo and ConvexDecomposition demo needs to be able to locate the 
-data files (jenga.dae and file.obj) in the current directory. Make sure Visual 
-Studio points to the right folder (..\..).
-
-Alternatively use CMake to autogenerate a build system for Windows:
+Alternatively, use CMake to autogenerate a build system for Windows:
 	
 	- Download/install CMake from www.cmake.org or package manager
+	- Use cmake-gui or
 	- List available build systems by running 'cmake' in the Bullet root folder
+	- Use cmake-gui 
 	- Create a build system using the -G option for example:
 	
 	cmake . -G "Visual Studio 9 2008" or
 	cmake . -G "Visual Studio 9 2008 Win64"
-		 
+
 
 ** Linux Compilation **
 
   - Download/install CMake from www.cmake.org or package manager
     CMake is like autoconf in that it will create build scripts which are then 
     used for the actual compilation
+
+	- List available build systems by running 'cmake' in the Bullet root folder
+	- Create a build system using the -G option for example:
+
+	cmake . -G "Unix Makefiles"
 
   - There are some options for cmake builds:
       BUILD_SHARED_LIBS: default 'OFF', set to 'ON' to build .so libraries
@@ -33,6 +36,8 @@ Alternatively use CMake to autogenerate a build system for Windows:
       CMAKE_INSTALL_PREFIX: default '/usr/local', the installation path.
       CMAKE_INSTALL_RPATH: if you install outside a standard ld search path,
         then you should set this to the installation lib path.
+      CMAKE_BUILD_TYPE: default 'Release', can include debug symbols with
+        either 'Debug' or 'RelWithDebInfo'.
     Other options may be discovered by 'cmake --help-variable-list' and
     'cmake --help-variable OPTION'
 
@@ -41,7 +46,7 @@ Alternatively use CMake to autogenerate a build system for Windows:
     also produce Eclipse or KDevelop project files.  See 'cmake --help' to see 
     what "generators" are available in your environment, selected via '-G'.
         For example:
-        cmake -DBUILD_SHARED_LIBS=ON
+        cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebugInfo
 
   - Assuming using the default Makefile output from cmake, run 'make' to 
     build, and then 'make install' if you wish to install.
@@ -53,6 +58,12 @@ Alternatively use CMake to autogenerate a build system for Windows:
     CMake is like autoconf in that it will create build scripts which are then 
     used for the actual compilation
 
+	- List available build systems by running 'cmake' in the Bullet root folder
+	- Create a build system using the -G option for example:
+
+  cmake . -G Xcode
+  cmake . -G "Unix Makefiles"
+
   - There are some options for cmake builds:
       BUILD_SHARED_LIBS: default 'OFF', set to 'ON' to build .dylib libraries
       BUILD_EXTRAS: default 'ON', compiles additional libraries in 'Extras'
@@ -60,6 +71,10 @@ Alternatively use CMake to autogenerate a build system for Windows:
       CMAKE_INSTALL_PREFIX: default '/usr/local', the installation path.
       CMAKE_INSTALL_NAME_DIR: if you install outside a standard ld search 
         path, then you should set this to the installation lib/framework path. 
+      CMAKE_OSX_ARCHITECTURES: defaults to the native architecture, but can be
+        set to a semicolon separated list for fat binaries, e.g. ppc;i386;x86_64
+      CMAKE_BUILD_TYPE: default 'Release', can include debug symbols with
+        either 'Debug' or 'RelWithDebInfo'.
 
     To build framework bundles:
       FRAMEWORK: default 'OFF', also requires 'BUILD_SHARED_LIBS' set ON
@@ -78,23 +93,19 @@ Alternatively use CMake to autogenerate a build system for Windows:
         For example:
         cmake -DBUILD_SHARED_LIBS=ON -DFRAMEWORK=ON \
               -DCMAKE_INSTALL_PREFIX=/Library/Frameworks \
-              -DCMAKE_INSTALL_NAME_DIR=/Library/Frameworks
+              -DCMAKE_INSTALL_NAME_DIR=/Library/Frameworks \
+              -DCMAKE_OSX_ARCHITECTURES='ppc;i386;x86_64' \
+              -DCMAKE_BUILD_TYPE=RelWithDebugInfo
 
   - Assuming using the default Makefile output from cmake, run 'make' to build 
     and then 'make install'.
 
 
-** Alternative Mac OS X and Linux via 'jam' or autoconf/make **
+** Alternative Mac OS X and Linux via autoconf/make **
   - at the command line:
     ./autogen.sh
     ./configure
-  - 'jam' or 'make' depending on preference
-  - If jam is not available for your system, you can compile it, jam sources 
-    are included with the Bullet sources in jam-2.5
-      - compiling jam:
-        cd jam-2.5
-        make
-        sudo make install
+    make
 
 
-** For more help, visit http://www.bulletphysics.com **
+** For more help, visit http://www.bulletphysics.org **

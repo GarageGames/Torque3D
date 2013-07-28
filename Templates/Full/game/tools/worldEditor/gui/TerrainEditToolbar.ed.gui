@@ -517,7 +517,7 @@ new GuiMouseEventCtrl(TerrainBrushSizeSliderCtrlContainer,EditorGuiGroup) {
       canSave = "1";
       Visible = "1";
       AltCommand = "TerrainBrushSizeTextEditContainer-->textEdit.setValue(mCeil($ThisControl.getValue())); ETerrainEditor.setBrushSize( $ThisControl.value );";
-      range = "1 40";
+      range = "1 256";
       ticks = "0";
       value = "0";
    };
