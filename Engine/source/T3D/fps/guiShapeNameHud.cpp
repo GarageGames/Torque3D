@@ -144,10 +144,6 @@ void GuiShapeNameHud::initPersistFields()
 /// @param   updateRect   Extents of control.
 void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 {
-   // Background fill first
-   if (mShowFill)
-      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor);
-
    // Must be in a TS Control
    GuiTSCtrl *parent = dynamic_cast<GuiTSCtrl*>(getParent());
    if (!parent) return;
@@ -255,10 +251,6 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 
    // Restore control object collision
    control->enableCollision();
-
-   // Border last
-   if (mShowFrame)
-      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);
 }
 
 
@@ -274,14 +266,26 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 /// @param   opacity Opacity of name (a fraction).
 void GuiShapeNameHud::drawName(Point2I offset, const char *name, F32 opacity)
 {
+   F32 width = mProfile->mFont->getStrWidth((const UTF8 *)name);
+   F32 height = mProfile->mFont->getHeight();
+   Point2I extent = Point2I(width, height);
+
    // Center the name
-   offset.x -= mProfile->mFont->getStrWidth((const UTF8 *)name) / 2;
-   offset.y -= mProfile->mFont->getHeight();
+   offset.x -= width / 2;
+   offset.y -= height;
+
+   // Background fill first
+   if (mShowFill)
+      GFX->getDrawUtil()->drawRectFill(RectI(offset, extent), mFillColor);
 
    // Deal with opacity and draw.
    mTextColor.alpha = opacity;
    GFX->getDrawUtil()->setBitmapModulation(mTextColor);
    GFX->getDrawUtil()->drawText(mProfile->mFont, offset, name);
    GFX->getDrawUtil()->clearBitmapModulation();
+
+   // Border last
+   if (mShowFrame)
+      GFX->getDrawUtil()->drawRect(RectI(offset, extent), mFrameColor);
 }
 
