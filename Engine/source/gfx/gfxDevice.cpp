@@ -1260,7 +1260,7 @@ DefineEngineFunction( getPixelShaderVersion, F32, (),,
    return GFX->getPixelShaderVersion();
 }   
 
-DefineEngineFunction( setPixelShaderVersion, void, ( float version ),,
+DefineEngineFunction( setPixelShaderVersion, void, ( F32 version ),,
    "@brief Sets the pixel shader version for the active device.\n"
    "This can be used to force a lower pixel shader version than is supported by "
    "the device for testing or performance optimization.\n"

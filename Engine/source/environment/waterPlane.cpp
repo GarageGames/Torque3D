@@ -163,7 +163,7 @@ void WaterPlane::unpackUpdate(NetConnection* con, BitStream* stream)
 
    if( stream->readFlag() ) // UpdateMask
    {
-      float posZ;
+      F32 posZ;
       stream->read( &posZ );
       Point3F newPos = getPosition();
       newPos.z = posZ;

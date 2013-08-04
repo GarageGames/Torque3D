@@ -32,9 +32,9 @@
 
 
 const F32 TSShapeLoader::DefaultTime = -1.0f;
-const double TSShapeLoader::MinFrameRate = 15.0f;
-const double TSShapeLoader::MaxFrameRate = 60.0f;
-const double TSShapeLoader::AppGroundFrameRate = 10.0f;
+const F64 TSShapeLoader::MinFrameRate = 15.0f;
+const F64 TSShapeLoader::MaxFrameRate = 60.0f;
+const F64 TSShapeLoader::AppGroundFrameRate = 10.0f;
 Torque::Path TSShapeLoader::shapePath;
 
 //------------------------------------------------------------------------------

@@ -212,7 +212,7 @@ namespace Platform
    void debugBreak();
    
    // Random
-   float getRandom();
+   F32 getRandom();
    
    // Window state
    void setWindowLocked(bool locked);

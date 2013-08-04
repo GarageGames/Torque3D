@@ -511,7 +511,7 @@ void DInputManager::deactivateXInput()
 }
 
 //------------------------------------------------------------------------------
-bool DInputManager::rumble( const char *pDeviceName, float x, float y )
+bool DInputManager::rumble( const char *pDeviceName, F32 x, F32 y )
 {
    // Determine the device
    U32 deviceType;
@@ -566,7 +566,7 @@ bool DInputManager::rumble( const char *pDeviceName, float x, float y )
    }
 }
 
-void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue )
+void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, F32 fValue )
 {
    InputEventInfo newEvent;
 
@@ -597,7 +597,7 @@ inline void DInputManager::fireXInputConnectEvent( int controllerID, bool condit
    }
 }
 
-inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, float fValue )
+inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, F32 fValue )
 {
    if ( mXInputStateReset || condition )
    {

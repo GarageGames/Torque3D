@@ -2716,7 +2716,7 @@ bool collapseEscape(char *buf)
 static int Sc_ScanNum()
 {
    CMDtext[CMDleng] = 0;
-   CMDlval.f = MakeToken< double >( dAtof(CMDtext), lineIndex );
+   CMDlval.f = MakeToken< F64 >( dAtof(CMDtext), lineIndex );
    return(FLTCONST);
 }
 
