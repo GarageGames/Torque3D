@@ -306,7 +306,7 @@ typedef union YYSTYPE
    Token< int >            i;
    Token< const char* >    s;
    Token< char* >          str;
-   Token< double >         f;
+   Token< F64 >            f;
    StmtNode*               stmt;
    ExprNode*               expr;
    SlotAssignNode*         slist;

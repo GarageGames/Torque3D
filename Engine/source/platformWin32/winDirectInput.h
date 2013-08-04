@@ -85,9 +85,9 @@ class DInputManager : public InputManager
       void unacquire( U8 deviceType, U8 deviceID );
 
       // XInput worker functions
-      void buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue );
+      void buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, F32 fValue );
       void fireXInputConnectEvent( int controllerID, bool condition, bool connected );
-      void fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, float fValue );
+      void fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, F32 fValue );
       void fireXInputButtonEvent( int controllerID, bool forceFire, int button, InputObjectInstances objInst );
       void processXInput();
 
@@ -126,7 +126,7 @@ class DInputManager : public InputManager
       // Console interface:
       const char* getJoystickAxesString( U32 deviceID );
 
-      bool rumble( const char *pDeviceName, float x, float y );
+      bool rumble( const char *pDeviceName, F32 x, F32 y );
 };
 
 #endif  // _H_WINDIRECTINPUT_

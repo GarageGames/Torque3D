@@ -378,7 +378,7 @@ F32 score(const VertData &vertexData)
          AssertFatal(vertexData.cachePosition < MaxSizeVertexCache, "Out of range cache position for vertex");
 
          // Points for being high in the cache.
-         const float Scaler = 1.0f / (MaxSizeVertexCache - 3);
+         const F32 Scaler = 1.0f / (MaxSizeVertexCache - 3);
          Score = 1.0f - (vertexData.cachePosition - 3) * Scaler;
          Score = mPow(Score, FindVertexScore::CacheDecayPower);
       }
@@ -387,7 +387,7 @@ F32 score(const VertData &vertexData)
 
    // Bonus points for having a low number of tris still to
    // use the vert, so we get rid of lone verts quickly.
-   float ValenceBoost = mPow(vertexData.numUnaddedReferences, -FindVertexScore::ValenceBoostPower);
+   F32 ValenceBoost = mPow(vertexData.numUnaddedReferences, -FindVertexScore::ValenceBoostPower);
    Score += FindVertexScore::ValenceBoostScale * ValenceBoost;
 
    return Score;

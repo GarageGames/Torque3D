@@ -82,9 +82,9 @@ protected:
 
 public:
    static const F32 DefaultTime;
-   static const double MinFrameRate;
-   static const double MaxFrameRate;
-   static const double AppGroundFrameRate;
+   static const F64 MinFrameRate;
+   static const F64 MaxFrameRate;
+   static const F64 AppGroundFrameRate;
 
 protected:
    // Variables used during loading that must be held until the shape is deleted
