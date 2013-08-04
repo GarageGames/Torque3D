@@ -193,7 +193,7 @@ DefineEngineMethod( GuiMenuBar, setMenuMargins, void, (S32 horizontalMargin, S32
    object->mBitmapMargin = bitmapToTextSpacing;
 }
 
-DefineEngineMethod(GuiMenuBar, addMenu, void, (const char* menuText, int menuId),,
+DefineEngineMethod(GuiMenuBar, addMenu, void, (const char* menuText, S32 menuId),,
    "@brief Adds a new menu to the menu bar.\n\n"
    "@param menuText Text to display for the new menu item.\n"
    "@param menuId ID for the new menu item.\n"
@@ -215,7 +215,7 @@ DefineEngineMethod(GuiMenuBar, addMenu, void, (const char* menuText, int menuId)
    object->addMenu(menuText, menuId);
 }
 
-DefineEngineMethod(GuiMenuBar, addMenuItem, void, (const char* targetMenu, const char* menuItemText, int menuItemId, const char* accelerator, int checkGroup),
+DefineEngineMethod(GuiMenuBar, addMenuItem, void, (const char* targetMenu, const char* menuItemText, S32 menuItemId, const char* accelerator, int checkGroup),
 												 ("","",0,NULL,-1),
    "@brief Adds a menu item to the specified menu.  The menu argument can be either the text of a menu or its id.\n\n"
    "@param menu Menu name or menu Id to add the new item to.\n"
@@ -496,7 +496,7 @@ DefineEngineMethod(GuiMenuBar, setMenuItemVisible, void, (const char* menuTarget
    menuItem->visible = isVisible;
 }
 
-DefineEngineMethod(GuiMenuBar, setMenuItemBitmap, void, (const char* menuTarget, const char* menuItemTarget, int bitmapIndex),,
+DefineEngineMethod(GuiMenuBar, setMenuItemBitmap, void, (const char* menuTarget, const char* menuItemTarget, S32 bitmapIndex),,
    "@brief Sets the specified menu item bitmap index in the bitmap array.  Setting the item's index to -1 will remove any bitmap.\n\n"
    "@param menuTarget Menu to affect the menuItem in\n"
    "@param menuItem Menu item to affect\n"

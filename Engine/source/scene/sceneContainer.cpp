@@ -1197,7 +1197,7 @@ void SceneContainer::cleanupSearchVectors()
 //-----------------------------------------------------------------------------
 
 static Point3F sgSortReferencePoint;
-static int QSORT_CALLBACK cmpSearchPointers(const void* inP1, const void* inP2)
+static S32 QSORT_CALLBACK cmpSearchPointers(const void* inP1, const void* inP2)
 {
    SimObjectPtr<SceneObject>** p1 = (SimObjectPtr<SceneObject>**)inP1;
    SimObjectPtr<SceneObject>** p2 = (SimObjectPtr<SceneObject>**)inP2;

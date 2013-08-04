@@ -54,7 +54,7 @@ CreateUnitTest( TestThreadStaticPerformance, "Core/ThreadStaticPerformance" )
       // an array of values to standardize the tests on.
       U32 testValue[TEST_SIZE];
 
-      for( int i = 0; i < TEST_SIZE; i++ )
+      for( S32 i = 0; i < TEST_SIZE; i++ )
          testValue[i] = gRandGen.randI();
 
       // Reset the profiler, tell it to dump to console when done
@@ -68,7 +68,7 @@ CreateUnitTest( TestThreadStaticPerformance, "Core/ThreadStaticPerformance" )
       PROFILE_END();
 
       PROFILE_START(ThreadStaticPerf_InstanceStaticAssign);
-      for( int i = 0; i < TEST_SIZE; i++ )
+      for( S32 i = 0; i < TEST_SIZE; i++ )
          ATTS_( gInstancedStaticFoo, 1 ) = testValue[i];
       PROFILE_END();
 

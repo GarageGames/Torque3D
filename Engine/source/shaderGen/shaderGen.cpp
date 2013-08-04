@@ -389,7 +389,7 @@ void ShaderGen::_printDependencies(Stream &stream)
    {
       mPrinter->printLine(stream, "// Dependencies:");
 
-      for( int i = 0; i < dependencies.size(); i++ )
+      for( S32 i = 0; i < dependencies.size(); i++ )
          dependencies[i]->print( stream );
 
       mPrinter->printLine(stream, "");

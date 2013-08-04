@@ -34,9 +34,9 @@ namespace UnitTesting {
 
 struct UnitMargin
 {
-static void Push(int margin);
+static void Push(S32 margin);
 static void Pop();
-static int Current();
+static S32 Current();
 };
 
 void UnitPrint(const char* msg);
@@ -45,9 +45,9 @@ void UnitPrint(const char* msg);
 //-----------------------------------------------------------------------------
 
 class UnitTest {
-   int _testCount;
-   int _failureCount;
-   int _warningCount;
+   S32 _testCount;
+   S32 _failureCount;
+   S32 _warningCount;
 
    bool _lastTestResult;
 
@@ -70,9 +70,9 @@ public:
    /// Report a warning
    void warn(const char* msg);
 
-   int getTestCount() const { return _testCount; }
-   int getFailureCount() const { return _failureCount; }
-   int getWarningCount() const { return _warningCount; }
+   S32 getTestCount() const { return _testCount; }
+   S32 getFailureCount() const { return _failureCount; }
+   S32 getWarningCount() const { return _warningCount; }
    bool lastTestPassed() const { return _lastTestResult; }
 
    /// Implement this with the specific test.
@@ -139,10 +139,10 @@ public:
 //-----------------------------------------------------------------------------
 
 class TestRun {
-   int _testCount;
-   int _subCount;
-   int _failureCount;
-   int _warningCount;
+   S32 _testCount;
+   S32 _subCount;
+   S32 _failureCount;
+   S32 _warningCount;
    void test(TestRegistry* reg);
 public:
    TestRun();

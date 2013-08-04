@@ -358,7 +358,7 @@ bool PostEffect::onAdd()
    scriptPath.setExtension( String::EmptyString );
 
    // Find additional textures
-   for( int i = 0; i < NumTextures; i++ )
+   for( S32 i = 0; i < NumTextures; i++ )
    {
       String texFilename = mTexFilename[i];
 

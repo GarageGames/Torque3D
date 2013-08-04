@@ -635,13 +635,13 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
       document->addText(mValue);
    } else
    {
-	  for(int i=0; i<mSettingNodes.size(); i++)
+	  for(S32 i=0; i<mSettingNodes.size(); i++)
 	  {
          SettingSaveNode *node = mSettingNodes[i];
 		 node->buildDocument(document);
 	  }
 
-      for(int i=0; i<mGroupNodes.size(); i++)
+      for(S32 i=0; i<mGroupNodes.size(); i++)
 	  {
          SettingSaveNode *node = mGroupNodes[i];
 		 node->buildDocument(document);

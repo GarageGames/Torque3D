@@ -135,7 +135,7 @@ public:
          {
             if( del->mDelegate == dlg )
             {
-               for ( int i = 0; i < mTriggerNext.size(); i++ )
+               for ( S32 i = 0; i < mTriggerNext.size(); i++ )
                {
                   if( mTriggerNext[i] == ptr )
                      mTriggerNext[i] = ptr->next;

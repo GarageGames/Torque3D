@@ -260,7 +260,7 @@ bool GuiFileTreeCtrl::matchesFilters(const char* filename)
    if( !mFilters.size() )
       return true;
       
-   for(int i = 0; i < mFilters.size(); i++)
+   for(S32 i = 0; i < mFilters.size(); i++)
    {
       if(FindMatch::isMatch( mFilters[i], filename))
          return true;

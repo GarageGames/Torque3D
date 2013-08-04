@@ -38,7 +38,7 @@ void zero_vert_normal_bulk_C(const dsize_t count, U8 * __restrict const outPtr, 
 
    // TODO: Try prefetch w/ ptr de-reference
 
-   for(register int i = 0; i < count; i++)
+   for(register S32 i = 0; i < count; i++)
    {
       TSMesh::__TSMeshVertexBase *outElem = reinterpret_cast<TSMesh::__TSMeshVertexBase *>(outData);
       outElem->_vert.zero();
@@ -60,7 +60,7 @@ void m_matF_x_BatchedVertWeightList_C(const MatrixF &mat,
    register Point3F tempPt;
    register Point3F tempNrm;
 
-   for(register int i = 0; i < count; i++)
+   for(register S32 i = 0; i < count; i++)
    {
       const TSSkinMesh::BatchData::BatchedVertWeight &inElem = batch[i];
 

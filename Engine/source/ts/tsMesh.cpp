@@ -1188,7 +1188,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
 
    // set up bone transforms
    PROFILE_START(TSSkinMesh_UpdateTransforms);
-   for( int i=0; i<batchData.nodeIndex.size(); i++ )
+   for( S32 i=0; i<batchData.nodeIndex.size(); i++ )
    {
       S32 node = batchData.nodeIndex[i];
       sBoneTransforms[i].mul( transforms[node], batchData.initialTransforms[i] );
@@ -1218,7 +1218,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
          skinnedVert.zero();
          skinnedNorm.zero();
 
-         for( int tOp = 0; tOp < curVert.transformCount; tOp++ )
+         for( S32 tOp = 0; tOp < curVert.transformCount; tOp++ )
          {      
             const BatchData::TransformOp &transformOp = curVert.transform[tOp];
 
@@ -1402,7 +1402,7 @@ void TSSkinMesh::createBatchData()
       itr != batchOperations.end(); itr++ )
    {
       const BatchData::BatchedVertex &curTransform = *itr;
-      for( int i = 0; i < curTransform.transformCount; i++ )
+      for( S32 i = 0; i < curTransform.transformCount; i++ )
       {
          const BatchData::TransformOp &transformOp = curTransform.transform[i];
 
@@ -1427,8 +1427,8 @@ void TSSkinMesh::createBatchData()
 
    // Now iterate the resulting operations and convert the vectors to aligned
    // memory locations
-   const int numBatchOps = batchData.transformKeys.size();
-   for(int i = 0; i < numBatchOps; i++)
+   const S32 numBatchOps = batchData.transformKeys.size();
+   for(S32 i = 0; i < numBatchOps; i++)
    {
       BatchData::BatchedTransform &curTransform = *batchData.transformBatchOperations.retreive(batchData.transformKeys[i]);
       const S32 numVerts = curTransform._tmpVec->size();
@@ -1446,7 +1446,7 @@ void TSSkinMesh::createBatchData()
    }
 
    // Now sort the batch data so that the skin function writes close to linear output
-   for(int i = 0; i < numBatchOps; i++)
+   for(S32 i = 0; i < numBatchOps; i++)
    {
       BatchData::BatchedTransform &curTransform = *batchData.transformBatchOperations.retreive(batchData.transformKeys[i]);
       dQsort(curTransform.alignedMem, curTransform.numElements, sizeof(BatchData::BatchedVertWeight), _sort_BatchedVertWeight);
@@ -2541,7 +2541,7 @@ void TSMesh::assemble( bool skip )
       // need to copy to temporary arrays
       deleteInputArrays = true;
       primIn = new TSDrawPrimitive[szPrimIn];
-      for (int i = 0; i < szPrimIn; i++)
+      for (S32 i = 0; i < szPrimIn; i++)
       {
          primIn[i].start = prim16[i*2];
          primIn[i].numElements = prim16[i*2+1];

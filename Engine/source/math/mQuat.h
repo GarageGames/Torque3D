@@ -55,8 +55,8 @@ public:
    QuatF& set( const AngAxisF & a );
    QuatF& set( const EulerF & e );
 
-   int operator ==( const QuatF & c ) const;
-   int operator !=( const QuatF & c ) const;
+   S32 operator ==( const QuatF & c ) const;
+   S32 operator !=( const QuatF & c ) const;
    QuatF& operator *=( const QuatF & c );
    QuatF& operator /=( const QuatF & c );
    QuatF& operator +=( const QuatF & c );
@@ -75,7 +75,7 @@ public:
    QuatF& normalize();
    QuatF& inverse();
    QuatF& identity();
-   int    isIdentity() const;
+   S32    isIdentity() const;
    QuatF& slerp( const QuatF & q, F32 t );
    QuatF& extrapolate( const QuatF & q1, const QuatF & q2, F32 t );
    QuatF& interpolate( const QuatF & q1, const QuatF & q2, F32 t );

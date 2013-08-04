@@ -188,7 +188,7 @@ bool Trigger::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    F32 const *si = &start.x;
    F32 const *ei = &end.x;
 
-   for (int i = 0; i < 3; i++)
+   for (S32 i = 0; i < 3; i++)
    {
       if (*si < *ei)
       {

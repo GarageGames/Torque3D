@@ -103,7 +103,7 @@ GFXDevice::GFXDevice()
    mViewMatrix.identity();
    mProjectionMatrix.identity();
    
-   for( int i = 0; i < WORLD_STACK_MAX; i++ )
+   for( S32 i = 0; i < WORLD_STACK_MAX; i++ )
       mWorldMatrix[i].identity();
    
    AssertFatal(smGFXDevice == NULL, "Already a GFXDevice created! Bad!");
@@ -451,7 +451,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
 
    if( mTextureMatrixCheckDirty )
    {
-      for( int i = 0; i < getNumSamplers(); i++ )
+      for( S32 i = 0; i < getNumSamplers(); i++ )
       {
          if( mTextureMatrixDirty[i] )
          {

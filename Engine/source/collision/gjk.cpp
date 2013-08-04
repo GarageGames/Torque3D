@@ -69,21 +69,21 @@ void GjkCollisionState::swap()
 void GjkCollisionState::compute_det()
 {
    // Dot new point with current set
-   for (int i = 0, bit = 1; i < 4; ++i, bit <<=1)
+   for (S32 i = 0, bit = 1; i < 4; ++i, bit <<=1)
       if (bits & bit)
          dp[i][last] = dp[last][i] = mDot(y[i], y[last]);
    dp[last][last] = mDot(y[last], y[last]);
 
    // Calulate the determinent
    det[last_bit][last] = 1;
-   for (int j = 0, sj = 1; j < 4; ++j, sj <<= 1) {
+   for (S32 j = 0, sj = 1; j < 4; ++j, sj <<= 1) {
       if (bits & sj) {
-         int s2 = sj | last_bit;
+         S32 s2 = sj | last_bit;
          det[s2][j] = dp[last][last] - dp[last][j];
          det[s2][last] = dp[j][j] - dp[j][last];
-         for (int k = 0, sk = 1; k < j; ++k, sk <<= 1) {
+         for (S32 k = 0, sk = 1; k < j; ++k, sk <<= 1) {
             if (bits & sk) {
-              int s3 = sk | s2;
+              S32 s3 = sk | s2;
               det[s3][k] = det[s2][j] * (dp[j][j] - dp[j][k]) +
                            det[s2][last] * (dp[last][j] - dp[last][k]);
               det[s3][j] = det[sk | last_bit][k] * (dp[k][k] - dp[k][j]) +
@@ -114,11 +114,11 @@ void GjkCollisionState::compute_det()
 
 //----------------------------------------------------------------------------
 
-inline void GjkCollisionState::compute_vector(int bits, VectorF& v)
+inline void GjkCollisionState::compute_vector(S32 bits, VectorF& v)
 {
    F32 sum = 0;
    v.set(0, 0, 0);
-   for (int i = 0, bit = 1; i < 4; ++i, bit <<= 1) {
+   for (S32 i = 0, bit = 1; i < 4; ++i, bit <<= 1) {
       if (bits & bit) {
          sum += det[bits][i];
          v += y[i] * det[bits][i];
@@ -130,9 +130,9 @@ inline void GjkCollisionState::compute_vector(int bits, VectorF& v)
 
 //----------------------------------------------------------------------------
 
-inline bool GjkCollisionState::valid(int s)
+inline bool GjkCollisionState::valid(S32 s)
 {
-   for (int i = 0, bit = 1; i < 4; ++i, bit <<= 1) {
+   for (S32 i = 0, bit = 1; i < 4; ++i, bit <<= 1) {
       if (all_bits & bit) {
          if (s & bit) {
             if (det[s][i] <= 0)
@@ -152,7 +152,7 @@ inline bool GjkCollisionState::valid(int s)
 inline bool GjkCollisionState::closest(VectorF& v)
 {
    compute_det();
-   for (int s = bits; s; --s) {
+   for (S32 s = bits; s; --s) {
       if ((s & bits) == s) {
          if (valid(s | last_bit)) {
 	         bits = s | last_bit;
@@ -175,7 +175,7 @@ inline bool GjkCollisionState::closest(VectorF& v)
 
 inline bool GjkCollisionState::degenerate(const VectorF& w)
 {
-  for (int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+  for (S32 i = 0, bit = 1; i < 4; ++i, bit <<= 1)
    if ((all_bits & bit) && y[i] == w)
       return true;
   return false;
@@ -256,7 +256,7 @@ void GjkCollisionState::getClosestPoints(Point3F& p1, Point3F& p2)
    F32 sum = 0;
    p1.set(0, 0, 0);
    p2.set(0, 0, 0);
-   for (int i = 0, bit = 1; i < 4; ++i, bit <<= 1) {
+   for (S32 i = 0, bit = 1; i < 4; ++i, bit <<= 1) {
       if (bits & bit) {
          sum += det[bits][i];
          p1 += p[i] * det[bits][i];

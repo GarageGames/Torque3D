@@ -86,9 +86,9 @@ class DInputManager : public InputManager
 
       // XInput worker functions
       void buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue );
-      void fireXInputConnectEvent( int controllerID, bool condition, bool connected );
-      void fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, float fValue );
-      void fireXInputButtonEvent( int controllerID, bool forceFire, int button, InputObjectInstances objInst );
+      void fireXInputConnectEvent( S32 controllerID, bool condition, bool connected );
+      void fireXInputMoveEvent( S32 controllerID, bool condition, InputObjectInstances objInst, float fValue );
+      void fireXInputButtonEvent( S32 controllerID, bool forceFire, S32 button, InputObjectInstances objInst );
       void processXInput();
 
    public:
@@ -120,8 +120,8 @@ class DInputManager : public InputManager
       void deactivateXInput();
       bool isXInputActive()         { return( mXInputActive ); }
       void resetXInput()            { mXInputStateReset = true; }
-      bool isXInputConnected(int controllerID);
-      int getXInputState(int controllerID, int property, bool current);
+      bool isXInputConnected(S32 controllerID);
+      S32 getXInputState(S32 controllerID, S32 property, bool current);
 
       // Console interface:
       const char* getJoystickAxesString( U32 deviceID );

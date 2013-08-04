@@ -90,7 +90,7 @@ ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
    dFree( properties );
 
    // Create vector of transform elements
-   for (int iChild = 0; iChild < node->getContents().getCount(); iChild++) {
+   for (S32 iChild = 0; iChild < node->getContents().getCount(); iChild++) {
       switch (node->getContents()[iChild]->getElementType()) {
          case COLLADA_TYPE::TRANSLATE:
          case COLLADA_TYPE::ROTATE:
@@ -109,7 +109,7 @@ ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
 void ColladaAppNode::buildChildList()
 {
    // Process children: collect <node> and <instance_node> elements
-   for (int iChild = 0; iChild < p_domNode->getContents().getCount(); iChild++) {
+   for (S32 iChild = 0; iChild < p_domNode->getContents().getCount(); iChild++) {
 
       daeElement* child = p_domNode->getContents()[iChild];
       switch (child->getElementType()) {
@@ -139,7 +139,7 @@ void ColladaAppNode::buildChildList()
 void ColladaAppNode::buildMeshList()
 {
    // Process children: collect <instance_geometry> and <instance_controller> elements
-   for (int iChild = 0; iChild < p_domNode->getContents().getCount(); iChild++) {
+   for (S32 iChild = 0; iChild < p_domNode->getContents().getCount(); iChild++) {
 
       daeElement* child = p_domNode->getContents()[iChild];
       switch (child->getElementType()) {
@@ -167,7 +167,7 @@ bool ColladaAppNode::animatesTransform(const AppSequence* appSeq)
 {
    // Check if any of this node's transform elements are animated during the
    // sequence interval
-   for (int iTxfm = 0; iTxfm < nodeTransforms.size(); iTxfm++) {
+   for (S32 iTxfm = 0; iTxfm < nodeTransforms.size(); iTxfm++) {
       if (nodeTransforms[iTxfm].isAnimated(appSeq->getStart(), appSeq->getEnd()))
          return true;
    }
@@ -227,7 +227,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
    }
 
    // Multiply by local node transform elements
-   for (int iTxfm = 0; iTxfm < nodeTransforms.size(); iTxfm++) {
+   for (S32 iTxfm = 0; iTxfm < nodeTransforms.size(); iTxfm++) {
 
       MatrixF mat(true);
 

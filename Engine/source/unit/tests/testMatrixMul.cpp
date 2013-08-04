@@ -52,7 +52,7 @@ CreateUnitTest( TestMatrixMul, "Math/Matrix/Multiply" )
       // I am not positive that the best way to do this is to use random numbers
       // but I think that using some kind of standard matrix may not always catch
       // all problems.
-      for( int i = 0; i < 16; i++ )
+      for( S32 i = 0; i < 16; i++ )
       {
          m1[i] = gRandGen.randF();
          m2[i] = gRandGen.randF();
@@ -71,7 +71,7 @@ CreateUnitTest( TestMatrixMul, "Math/Matrix/Multiply" )
       {
          Athlon_MatrixF_x_MatrixF( m1, m2, mrAMD );
 
-         for( int i = 0; i < 16; i++ )
+         for( S32 i = 0; i < 16; i++ )
             same &= mIsEqual( mrC[i], mrAMD[i] );
 
          test( same, "Matrix multiplication verification failed. (C vs. 3D NOW!)" );
@@ -87,7 +87,7 @@ CreateUnitTest( TestMatrixMul, "Math/Matrix/Multiply" )
       {
          SSE_MatrixF_x_MatrixF( m1, m2, mrSSE );
 
-         for( int i = 0; i < 16; i++ )
+         for( S32 i = 0; i < 16; i++ )
             same &= mIsEqual( mrC[i], mrSSE[i] );
 
          test( same, "Matrix multiplication verification failed. (C vs. SSE)" );
@@ -105,7 +105,7 @@ CreateUnitTest( TestMatrixMul, "Math/Matrix/Multiply" )
 
       vec_MatrixF_x_MatrixF( m1, m2, mrVEC );
 
-      for( int i = 0; i < 16; i++ )
+      for( S32 i = 0; i < 16; i++ )
          same &= isEqual( mrC[i], mrVEC[i] );
 
       test( same, "Matrix multiplication verification failed. (C vs. Altivec)" );

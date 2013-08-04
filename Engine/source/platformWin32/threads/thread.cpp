@@ -68,7 +68,7 @@ public:
 //               Neccesary because Thread::run() is provided as a non-threaded
 //               way to execute the thread's run function. So we have to keep
 //               track of the thread's lock here.
-static unsigned int __stdcall ThreadRunHandler(void * arg)
+static U32 __stdcall ThreadRunHandler(void * arg)
 {
    PlatformThreadData* mData = reinterpret_cast<PlatformThreadData*>(arg);
    mData->mThreadID = GetCurrentThreadId();

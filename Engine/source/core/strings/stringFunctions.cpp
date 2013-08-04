@@ -97,10 +97,10 @@ nat_toupper( nat_char a )
 
 
 
-static int
+static S32
 compare_right(const nat_char* a, const nat_char* b)
 {
-   int bias = 0;
+   S32 bias = 0;
 
    /* The longest run of digits wins.  That aside, the greatest
    value wins, but we can't know that it will until we've scanned
@@ -149,11 +149,11 @@ compare_left(const nat_char* a, const nat_char* b)
 }
 
 
-static int strnatcmp0(const nat_char* a, const nat_char* b, int fold_case)
+static S32 strnatcmp0(const nat_char* a, const nat_char* b, S32 fold_case)
 {
-   int ai, bi;
+   S32 ai, bi;
    nat_char ca, cb;
-   int fractional, result;
+   S32 fractional, result;
 
    ai = bi = 0;
    while (1) {
@@ -200,13 +200,13 @@ static int strnatcmp0(const nat_char* a, const nat_char* b, int fold_case)
 }
 
 
-int dStrnatcmp(const nat_char* a, const nat_char* b) {
+S32 dStrnatcmp(const nat_char* a, const nat_char* b) {
    return strnatcmp0(a, b, 0);
 }
 
 
 /* Compare, recognizing numeric string and ignoring case. */
-int dStrnatcasecmp(const nat_char* a, const nat_char* b) {
+S32 dStrnatcasecmp(const nat_char* a, const nat_char* b) {
    return strnatcmp0(a, b, 1);
 }
 
@@ -328,12 +328,12 @@ char* dStrcpyl(char *dst, dsize_t dstSize, ...)
 }
 
 
-int dStrcmp( const UTF16 *str1, const UTF16 *str2)
+S32 dStrcmp( const UTF16 *str1, const UTF16 *str2)
 {
 #if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    return wcscmp( reinterpret_cast<const wchar_t *>( str1 ), reinterpret_cast<const wchar_t *>( str2 ) );
 #else
-   int ret;
+   S32 ret;
    const UTF16 *a, *b;
    a = str1;
    b = str2;

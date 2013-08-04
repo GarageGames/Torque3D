@@ -1139,7 +1139,7 @@ void LightningBolt::generateMinorNodes()
 {
    mMinorNodes.clear();
 
-   for( int i=0; i<mMajorNodes.numNodes - 1; i++ )
+   for( S32 i=0; i<mMajorNodes.numNodes - 1; i++ )
    {
       NodeManager segment;
       segment.startPoint = mMajorNodes.nodeList[i].point;

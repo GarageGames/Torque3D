@@ -203,7 +203,7 @@ ShapeBaseImageData::ShapeBaseImageData()
    scriptAnimTransitionTime = 0.25f;
 
    //
-   for (int i = 0; i < MaxStates; i++) {
+   for (S32 i = 0; i < MaxStates; i++) {
       stateName[i] = 0;
 
       stateTransitionLoaded[i] = 0;

@@ -422,7 +422,7 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
 
          // Build points
          Point3F* pos = cp->point;
-         for (int i = 0; i < 4 ; i++,pos++) {
+         for (S32 i = 0; i < 4 ; i++,pos++) {
             S32 dx = i >> 1;
             S32 dy = dx ^ (i & 1);
             pos->x = (F32)((x + dx) * mSquareSize);
@@ -562,7 +562,7 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
 
          // Add the missing points
          U32 vi[5];
-         for (int i = 0; i < 4 ; i++) 
+         for (S32 i = 0; i < 4 ; i++) 
          {
             S32 dx = i >> 1;
             S32 dy = dx ^ (i & 1);
@@ -669,10 +669,10 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
    Point3F pStart(start.x * invBlockWorldSize, start.y * invBlockWorldSize, start.z);
    Point3F pEnd(end.x * invBlockWorldSize, end.y * invBlockWorldSize, end.z);
 
-   int blockX = (S32)mFloor(pStart.x);
-   int blockY = (S32)mFloor(pStart.y);
+   S32 blockX = (S32)mFloor(pStart.x);
+   S32 blockY = (S32)mFloor(pStart.y);
 
-   int dx, dy;
+   S32 dx, dy;
 
    F32 invDeltaX;
    if(pEnd.x == pStart.x)
@@ -904,7 +904,7 @@ bool TerrainBlock::castRayBlock( const Point3F &pStart,
          }
          continue;
       }
-      int subSqWidth = 1 << (level - 1);
+      S32 subSqWidth = 1 << (level - 1);
       F32 xIntercept = (blockPos.x + subSqWidth) * invBlockSize;
       F32 xInt = calcInterceptX(pStart.x, invDeltaX, xIntercept);
       F32 yIntercept = (blockPos.y + subSqWidth) * invBlockSize;

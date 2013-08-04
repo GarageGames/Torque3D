@@ -622,7 +622,7 @@ bool ParticleData::reload(char errorBuffer[256])
 	}
    /*
    numFrames = 0;
-   for( int i=0; i<PDC_MAX_TEX; i++ )
+   for( S32 i=0; i<PDC_MAX_TEX; i++ )
    {
       if( textureNameList[i] && textureNameList[i][0] )
       {

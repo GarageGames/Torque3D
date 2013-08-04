@@ -440,7 +440,7 @@ void TSStatic::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for (int i = 0; i < skins.size(); i++)
+      for (S32 i = 0; i < skins.size(); i++)
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );

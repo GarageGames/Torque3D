@@ -74,7 +74,7 @@ F32 ColladaAppSequence::getBlendRefTime()
 
 void ColladaAppSequence::setActive(bool active)
 {
-   for (int iAnim = 0; iAnim < getClip()->getInstance_animation_array().getCount(); iAnim++) {
+   for (S32 iAnim = 0; iAnim < getClip()->getInstance_animation_array().getCount(); iAnim++) {
       domAnimation* anim = daeSafeCast<domAnimation>(getClip()->getInstance_animation_array()[iAnim]->getUrl().getElement());
       if (anim)
          setAnimationActive(anim, active);
@@ -84,7 +84,7 @@ void ColladaAppSequence::setActive(bool active)
 void ColladaAppSequence::setAnimationActive(const domAnimation* anim, bool active)
 {
    // Enabled/disable data channels for this animation
-   for (int iChannel = 0; iChannel < anim->getChannel_array().getCount(); iChannel++) {
+   for (S32 iChannel = 0; iChannel < anim->getChannel_array().getCount(); iChannel++) {
       domChannel* channel = anim->getChannel_array()[iChannel];
       AnimData* animData = reinterpret_cast<AnimData*>(channel->getUserData());
       if (animData)
@@ -92,6 +92,6 @@ void ColladaAppSequence::setAnimationActive(const domAnimation* anim, bool activ
    }
 
    // Recurse into child animations
-   for (int iAnim = 0; iAnim < anim->getAnimation_array().getCount(); iAnim++)
+   for (S32 iAnim = 0; iAnim < anim->getAnimation_array().getCount(); iAnim++)
       setAnimationActive(anim->getAnimation_array()[iAnim], active);
 }

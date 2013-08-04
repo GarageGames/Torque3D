@@ -214,7 +214,7 @@ class TSMesh
       }
 
       // Vector-like interface
-      __TSMeshVertexBase &operator[](int idx) const { AssertFatal(idx < numElements, "Out of bounds access!"); return *reinterpret_cast<__TSMeshVertexBase *>(base + idx * vertSz); }
+      __TSMeshVertexBase &operator[](S32 idx) const { AssertFatal(idx < numElements, "Out of bounds access!"); return *reinterpret_cast<__TSMeshVertexBase *>(base + idx * vertSz); }
       __TSMeshVertexBase *address() const { return reinterpret_cast<__TSMeshVertexBase *>(base); }
       U32 size() const { return numElements; }
       dsize_t mem_size() const { return numElements * vertSz; }

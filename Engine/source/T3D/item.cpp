@@ -893,7 +893,7 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
             // Pick the most resistant surface
             F32 bd = 0;
             const Collision* collision = 0;
-            for (int c = 0; c < collisionList.getCount(); c++) {
+            for (S32 c = 0; c < collisionList.getCount(); c++) {
                const Collision &cp = collisionList[c];
                F32 dot = -mDot(mVelocity,cp.normal);
                if (dot > bd) {
@@ -1204,7 +1204,7 @@ DefineEngineMethod( Item, isRotating, bool, (),,
    return object->isRotating();
 }
 
-DefineEngineMethod( Item, setCollisionTimeout, bool, (int ignoreColObj),(NULL), 
+DefineEngineMethod( Item, setCollisionTimeout, bool, (S32 ignoreColObj),(NULL), 
    "@brief Temporarily disable collisions against a specific ShapeBase object.\n\n"
 
    "This is useful to prevent a player from immediately picking up an Item they have "

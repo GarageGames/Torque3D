@@ -117,7 +117,7 @@ ConsoleDocClass( DecalManager,
 
 namespace {
 
-int QSORT_CALLBACK cmpDecalInstance(const void* p1, const void* p2)
+S32 QSORT_CALLBACK cmpDecalInstance(const void* p1, const void* p2)
 {
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
@@ -125,7 +125,7 @@ int QSORT_CALLBACK cmpDecalInstance(const void* p1, const void* p2)
    return int(((char *)(*pd1)->mDataBlock) - ((char *)(*pd2)->mDataBlock));
 }
 
-int QSORT_CALLBACK cmpPointsXY( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpPointsXY( const void *p1, const void *p2 )
 {
    const Point3F *pnt1 = (const Point3F*)p1;
    const Point3F *pnt2 = (const Point3F*)p2;
@@ -142,7 +142,7 @@ int QSORT_CALLBACK cmpPointsXY( const void *p1, const void *p2 )
       return 0;
 }
 
-int QSORT_CALLBACK cmpQuadPointTheta( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpQuadPointTheta( const void *p1, const void *p2 )
 {
    const Point4F *pnt1 = (const Point4F*)p1;
    const Point4F *pnt2 = (const Point4F*)p2;
@@ -157,7 +157,7 @@ int QSORT_CALLBACK cmpQuadPointTheta( const void *p1, const void *p2 )
 
 static Point3F gSortPoint;
 
-int QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
 {
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
@@ -168,7 +168,7 @@ int QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
    return mSign( dist1 - dist2 );
 }
 
-int QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
 {   
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
@@ -179,14 +179,14 @@ int QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
       return 1;
    else
    {
-      int priority = (*pd1)->getRenderPriority() - (*pd2)->getRenderPriority();
+      S32 priority = (*pd1)->getRenderPriority() - (*pd2)->getRenderPriority();
 
       if ( priority != 0 )
          return priority;
 
       if ( (*pd2)->mFlags & SaveDecal )
       {
-         int id = ( (*pd1)->mDataBlock->getMaterial()->getId() - (*pd2)->mDataBlock->getMaterial()->getId() );      
+         S32 id = ( (*pd1)->mDataBlock->getMaterial()->getId() - (*pd2)->mDataBlock->getMaterial()->getId() );      
          if ( id != 0 )
             return id;
 

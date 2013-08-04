@@ -1282,7 +1282,7 @@ void ShapeBase::processTick(const Move* move)
       {
          mMoveMotion = true;
       }
-      for (int i = 0; i < MaxMountedImages; i++)
+      for (S32 i = 0; i < MaxMountedImages; i++)
       {
          setImageMotionState(i, mMoveMotion);
       }
@@ -1305,7 +1305,7 @@ void ShapeBase::processTick(const Move* move)
    // Advance images
    if (isServerObject())
    {
-      for (int i = 0; i < MaxMountedImages; i++)
+      for (S32 i = 0; i < MaxMountedImages; i++)
       {
          if (mMountedImageList[i].dataBlock)
             updateImageState(i, TickSec);
@@ -1347,7 +1347,7 @@ void ShapeBase::advanceTime(F32 dt)
    // advanced at framerate.
    advanceThreads(dt);
    updateAudioPos();
-   for (int i = 0; i < MaxMountedImages; i++)
+   for (S32 i = 0; i < MaxMountedImages; i++)
       if (mMountedImageList[i].dataBlock)
       {
          updateImageState(i, dt);
@@ -2240,7 +2240,7 @@ void ShapeBase::stopAudio(U32 slot)
 void ShapeBase::updateServerAudio()
 {
    // Timeout non-looping sounds
-   for (int i = 0; i < MaxSoundThreads; i++) {
+   for (S32 i = 0; i < MaxSoundThreads; i++) {
       Sound& st = mSoundThread[i];
       if (st.play && st.timeout && st.timeout < Sim::getCurrentTime()) {
          clearMaskBits(SoundMaskN << i);
@@ -2280,7 +2280,7 @@ void ShapeBase::updateAudioState(Sound& st)
 
 void ShapeBase::updateAudioPos()
 {
-   for (int i = 0; i < MaxSoundThreads; i++)
+   for (S32 i = 0; i < MaxSoundThreads; i++)
    {
       SFXSource* source = mSoundThread[i].sound;
       if ( source )
@@ -3113,7 +3113,7 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    }
 
    if (stream->writeFlag(mask & ThreadMask)) {
-      for (int i = 0; i < MaxScriptThreads; i++) {
+      for (S32 i = 0; i < MaxScriptThreads; i++) {
          Thread& st = mScriptThread[i];
          if (stream->writeFlag( (st.sequence != -1 || st.state == Thread::Destroy) && (mask & (ThreadMaskN << i)) ) ) {
             stream->writeInt(st.sequence,ThreadSequenceBits);
@@ -3126,7 +3126,7 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    }
 
    if (stream->writeFlag(mask & SoundMask)) {
-      for (int i = 0; i < MaxSoundThreads; i++) {
+      for (S32 i = 0; i < MaxSoundThreads; i++) {
          Sound& st = mSoundThread[i];
          if (stream->writeFlag(mask & (SoundMaskN << i)))
             if (stream->writeFlag(st.play))
@@ -3136,7 +3136,7 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    }
 
    if (stream->writeFlag(mask & ImageMask)) {
-      for (int i = 0; i < MaxMountedImages; i++)
+      for (S32 i = 0; i < MaxMountedImages; i++)
          if (stream->writeFlag(mask & (ImageMaskN << i))) {
             MountedImage& image = mMountedImageList[i];
             if (stream->writeFlag(image.dataBlock))
@@ -3271,7 +3271,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
 
    // Mounted Images
    if (stream->readFlag()) {
-      for (int i = 0; i < MaxMountedImages; i++) {
+      for (S32 i = 0; i < MaxMountedImages; i++) {
          if (stream->readFlag()) {
             MountedImage& image = mMountedImageList[i];
             ShapeBaseImageData* imageData = 0;
@@ -3308,9 +3308,9 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
                image.genericTrigger[i] = stream->readFlag();
             }
 
-            int count = stream->readInt(3);
-            int altCount = stream->readInt(3);
-            int reloadCount = stream->readInt(3);
+            S32 count = stream->readInt(3);
+            S32 altCount = stream->readInt(3);
+            S32 reloadCount = stream->readInt(3);
 
             bool datablockChange = image.dataBlock != imageData;
             if (datablockChange || (image.skinNameHandle != skinDesiredNameHandle))
@@ -3742,7 +3742,7 @@ void ShapeBase::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for (int i = 0; i < skins.size(); i++)
+      for (S32 i = 0; i < skins.size(); i++)
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );

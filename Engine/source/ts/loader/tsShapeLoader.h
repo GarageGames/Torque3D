@@ -63,7 +63,7 @@ public:
       Load_Complete = NumLoadPhases
    };
 
-   static void updateProgress(int major, const char* msg, int numMinor=0, int minor=0);
+   static void updateProgress(S32 major, const char* msg, S32 numMinor=0, S32 minor=0);
 
 protected:
    struct Subshape

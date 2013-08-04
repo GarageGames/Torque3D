@@ -46,13 +46,13 @@ void m_matF_x_BatchedVertWeightList_SSE4(const MatrixF &mat,
 
    // pre-populate cache
    const TSSkinMesh::BatchData::BatchedVertWeight &firstElem = batch[0];
-   for(int i = 0; i < 8; i++)
+   for(S32 i = 0; i < 8; i++)
    {
       _mm_prefetch(reinterpret_cast<const char *>(iPtr +  inStride * i), _MM_HINT_T0);
       _mm_prefetch(reinterpret_cast<const char *>(outPtr +  outStride * (i + firstElem.vidx)), _MM_HINT_T0);
    }
 
-   for(int i = 0; i < count; i++)
+   for(S32 i = 0; i < count; i++)
    {
       const TSSkinMesh::BatchData::BatchedVertWeight &inElem = batch[i];
       TSMesh::__TSMeshVertexBase *outElem = reinterpret_cast<TSMesh::__TSMeshVertexBase *>(outPtr + inElem.vidx * outStride);

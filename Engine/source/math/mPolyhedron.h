@@ -229,7 +229,7 @@ struct PolyhedronUnmanagedVectorData : public PolyhedronData
 };
 
 /// Polyhedron data stored in fixed size arrays.
-template< int NUM_PLANES, int NUM_POINTS, int NUM_EDGES >
+template< S32 NUM_PLANES, S32 NUM_POINTS, S32 NUM_EDGES >
 struct PolyhedronFixedVectorData : public PolyhedronData
 {
       typedef FixedSizeVector< PlaneF, NUM_PLANES > PlaneListType;
@@ -479,7 +479,7 @@ inline PolyhedronVectorData::operator AnyPolyhedron() const
 
 //-----------------------------------------------------------------------------
 
-template< int NUM_PLANES, int NUM_POINTS, int NUM_EDGES >
+template< S32 NUM_PLANES, S32 NUM_POINTS, S32 NUM_EDGES >
 inline PolyhedronFixedVectorData< NUM_PLANES, NUM_POINTS, NUM_EDGES >::operator AnyPolyhedron() const
 {
    return AnyPolyhedron(

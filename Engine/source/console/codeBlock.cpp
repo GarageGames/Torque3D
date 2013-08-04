@@ -559,7 +559,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
 
 }
 
-const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, int setFrame)
+const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
 {
    // Check for a UTF8 script file
    char *string;

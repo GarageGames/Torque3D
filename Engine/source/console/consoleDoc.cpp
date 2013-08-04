@@ -223,7 +223,7 @@ void Namespace::printNamespaceEntries(Namespace * g, bool dumpScript, bool dumpE
    // Iterate through the methods of the namespace...
    for(Entry *ewalk = g->mEntryList; ewalk; ewalk = ewalk->mNext)
    {
-      int eType = ewalk->mType;
+      S32 eType = ewalk->mType;
       const char * funcName = ewalk->mFunctionName;
 
       if( ( eType == Entry::ConsoleFunctionType ) && !dumpScript )

@@ -470,7 +470,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
    const MatrixF &camView = state->getCameraTransform();
 
    // Finalize points
-   for(int i = 0; i < 4; i++)
+   for(S32 i = 0; i < 4; i++)
    {
       // align with camera
       camView.mulV(points[i]);

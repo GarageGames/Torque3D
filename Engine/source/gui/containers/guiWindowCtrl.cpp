@@ -1478,7 +1478,7 @@ void GuiWindowCtrl::positionButtons(void)
 
    // Until a pref, if alignment is LEFT, put buttons RIGHT justified.
    // ELSE, put buttons LEFT justified.
-   int closeLeft = mainOff.x, closeTop = mainOff.y, closeOff = buttonWidth + 2;
+   S32 closeLeft = mainOff.x, closeTop = mainOff.y, closeOff = buttonWidth + 2;
    if ( mProfile->mAlignment == GuiControlProfile::LeftJustify )
    {
       closeOff = -closeOff;

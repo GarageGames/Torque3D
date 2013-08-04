@@ -126,10 +126,10 @@ public:
             float xdone = ((float)getExtent().x/(float)texture->mBitmapSize.x)+1;
             float ydone = ((float)getExtent().y/(float)texture->mBitmapSize.y)+1;
 
-            int xshift = mStartPoint.x%texture->mBitmapSize.x;
-            int yshift = mStartPoint.y%texture->mBitmapSize.y;
-            for(int y = 0; y < ydone; ++y)
-               for(int x = 0; x < xdone; ++x)
+            S32 xshift = mStartPoint.x%texture->mBitmapSize.x;
+            S32 yshift = mStartPoint.y%texture->mBitmapSize.y;
+            for(S32 y = 0; y < ydone; ++y)
+               for(S32 x = 0; x < xdone; ++x)
                {
                   srcRegion.set(0,0,texture->mBitmapSize.x,texture->mBitmapSize.y);
                   dstRegion.set( ((texture->mBitmapSize.x*x)+offset.x)-xshift,

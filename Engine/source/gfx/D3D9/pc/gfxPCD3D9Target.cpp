@@ -330,7 +330,7 @@ void GFXPCD3D9TextureTarget::resolveTo( GFXTextureObject *tex )
 
 void GFXPCD3D9TextureTarget::zombify()
 {
-   for(int i = 0; i < MaxRenderSlotId; i++)
+   for(S32 i = 0; i < MaxRenderSlotId; i++)
       attachTexture(RenderSlot(i), NULL);
 }
 

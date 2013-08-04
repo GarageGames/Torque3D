@@ -58,7 +58,7 @@ protected:
    Box3F _calcClipSpaceAABB(const Frustum& f, const MatrixF& transform, F32 farDist);
    void _roundProjection(const MatrixF& lightMat, const MatrixF& cropMatrix, Point3F &offset, U32 splitNum);
 
-   static const int MAX_SPLITS = 4;
+   static const S32 MAX_SPLITS = 4;
    U32 mNumSplits;
    F32 mSplitDist[MAX_SPLITS+1];   // +1 because we store a cap
    RectI mViewports[MAX_SPLITS];

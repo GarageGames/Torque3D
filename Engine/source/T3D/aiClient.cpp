@@ -63,7 +63,7 @@ AIClient::AIClient() {
    mMoveTolerance = 0.25f;
 
    // Clear the triggers
-   for( int i = 0; i < MaxTriggerKeys; i++ )
+   for( S32 i = 0; i < MaxTriggerKeys; i++ )
       mTriggers[i] = false;
  
    mAimToDestination = true;
@@ -369,7 +369,7 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
    }
    
    // Copy over the trigger status
-   for( int i = 0; i < MaxTriggerKeys; i++ ) {
+   for( S32 i = 0; i < MaxTriggerKeys; i++ ) {
       mMove.trigger[i] = mTriggers[i];
       mTriggers[i] = false;
    }

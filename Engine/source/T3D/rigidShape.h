@@ -195,7 +195,7 @@ class RigidShape: public ShapeBase
    CollisionList mContacts;
    Rigid mRigid;
    ShapeBaseConvex mConvex;
-   int restCount;
+   S32 restCount;
 
    SimObjectPtr<ParticleEmitter> mDustEmitterList[RigidShapeData::VC_NUM_DUST_EMITTERS];
    SimObjectPtr<ParticleEmitter> mSplashEmitterList[RigidShapeData::VC_NUM_SPLASH_EMITTERS];
