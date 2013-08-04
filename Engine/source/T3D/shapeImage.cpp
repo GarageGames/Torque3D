@@ -3061,7 +3061,7 @@ TICKAGAIN:
 
       if (image.spinThread[i])
       {
-         float timeScale;
+         F32 timeScale;
 
          switch (stateData.spin) 
          {

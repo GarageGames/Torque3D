@@ -671,7 +671,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
 template<typename T> inline T convert(const char* value) { return value; }
 template<> inline bool convert(const char* value) { return dAtob(value); }
 template<> inline S32 convert(const char* value) { return dAtoi(value); }
-template<> inline double convert(const char* value) { return dAtof(value); }
+template<> inline F64 convert(const char* value) { return dAtof(value); }
 template<> inline F32 convert(const char* value) { return convert<double>(value); }
 
 //-----------------------------------------------------------------------------

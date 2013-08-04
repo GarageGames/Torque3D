@@ -500,7 +500,7 @@ void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEve
    newEvent.postToSignal(Input::smInputEvent);
 }
 
-void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue)
+void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, F32 fValue)
 {
    InputEventInfo newEvent;
 

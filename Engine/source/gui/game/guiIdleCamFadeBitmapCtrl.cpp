@@ -123,8 +123,8 @@ public:
             GFXTextureObject* texture = mTextureObject;
             RectI srcRegion;
             RectI dstRegion;
-            float xdone = ((float)getExtent().x/(float)texture->mBitmapSize.x)+1;
-            float ydone = ((float)getExtent().y/(float)texture->mBitmapSize.y)+1;
+            F32 xdone = ((F32)getExtent().x/(F32)texture->mBitmapSize.x)+1;
+            F32 ydone = ((F32)getExtent().y/(F32)texture->mBitmapSize.y)+1;
 
             S32 xshift = mStartPoint.x%texture->mBitmapSize.x;
             S32 yshift = mStartPoint.y%texture->mBitmapSize.y;

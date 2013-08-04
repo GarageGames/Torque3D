@@ -539,7 +539,7 @@ DefineEngineMethod( GuiTSCtrl, getWorldToScreenScale, Point2F, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiTSCtrl, calculateViewDistance, float, ( float radius ),,
+DefineEngineMethod( GuiTSCtrl, calculateViewDistance, F32, ( F32 radius ),,
    "Given the camera's current FOV, get the distance from the camera's viewpoint at which the given radius will fit in the render area.\n"
    "@param radius Radius in world-space units which should fit in the view.\n"
    "@return The distance from the viewpoint at which the given radius would be fully visible." )

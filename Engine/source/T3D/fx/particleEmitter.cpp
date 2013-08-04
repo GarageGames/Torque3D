@@ -100,9 +100,9 @@ ConsoleDocClass( ParticleEmitterData,
    "@see ParticleEmitterNode\n"
 );
 
-static const float sgDefaultEjectionOffset = 0.f;
-static const float sgDefaultPhiReferenceVel = 0.f;
-static const float sgDefaultPhiVariance = 360.f;
+static const F32 sgDefaultEjectionOffset = 0.f;
+static const F32 sgDefaultPhiReferenceVel = 0.f;
+static const F32 sgDefaultPhiVariance = 360.f;
 
 //-----------------------------------------------------------------------------
 // ParticleEmitterData

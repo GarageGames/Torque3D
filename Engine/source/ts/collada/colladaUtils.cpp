@@ -278,9 +278,9 @@ void AnimData::parseTargetString(const char* target, S32 fullCount, const char* 
 /// Solve the cubic spline B(s) = param for s
 F32 AnimData::invertParamCubic(F32 param, F32 x0, F32 x1, F32 x2, F32 x3) const
 {
-   const double INVERTPARAMCUBIC_TOL         = 1.0e-09;
-   const double INVERTPARAMCUBIC_SMALLERTOL  = 1.0e-20;
-   const double INVERTPARAMCUBIC_MAXIT       = 100;
+   const F64 INVERTPARAMCUBIC_TOL         = 1.0e-09;
+   const F64 INVERTPARAMCUBIC_SMALLERTOL  = 1.0e-20;
+   const F64 INVERTPARAMCUBIC_MAXIT       = 100;
 
    // check input value for outside range
    if ((param - x0) < INVERTPARAMCUBIC_SMALLERTOL)
@@ -295,12 +295,12 @@ F32 AnimData::invertParamCubic(F32 param, F32 x0, F32 x1, F32 x2, F32 x3) const
    F32 v = 1.0f;
 
    while (iterations < INVERTPARAMCUBIC_MAXIT) {
-      double a = (x0 + x1)*0.5f;
-      double b = (x1 + x2)*0.5f;
-      double c = (x2 + x3)*0.5f;
-      double d = (a + b)*0.5f;
-      double e = (b + c)*0.5f;
-      double f = (d + e)*0.5f;
+      F64 a = (x0 + x1)*0.5f;
+      F64 b = (x1 + x2)*0.5f;
+      F64 c = (x2 + x3)*0.5f;
+      F64 d = (a + b)*0.5f;
+      F64 e = (b + c)*0.5f;
+      F64 f = (d + e)*0.5f;
 
       if (mFabs(f - param) < INVERTPARAMCUBIC_TOL)
          break;
