@@ -232,14 +232,24 @@ void TSShapeInstance::animateNodes(S32 ss)
    if (inTransition())
       handleTransitionNodes(a,b);
 
-   // multiply transforms...
+   // multiply transforms...  
    for (i=a; i<b; i++)
    {
       S32 parentIdx = mShape->nodes[i].parentIndex;
-      if (parentIdx < 0)
-         mNodeTransforms[i] = smNodeLocalTransforms[i];
+      if (parentIdx < 0) {
+         if (!mHandsOffNodes.test(i)) {
+            mNodeTransforms[i] = smNodeLocalTransforms[i];
+          }
+      }
       else
-         mNodeTransforms[i].mul(mNodeTransforms[parentIdx],smNodeLocalTransforms[i]);
+      {
+          if (!mHandsOffNodes.test(i)) {
+            mNodeTransforms[i].mul(mNodeTransforms[parentIdx],smNodeLocalTransforms[i]);
+          } else {
+            MatrixF localMat = mNodeTransforms[i];
+            mNodeTransforms[i].mul(mNodeTransforms[parentIdx],localMat);
+          }
+      }
    }
 }
 
