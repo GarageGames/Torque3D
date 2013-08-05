@@ -4613,6 +4613,11 @@ DefineEngineMethod( ShapeBase, isEnabled, bool, (),,
    return object->getDamageState() == ShapeBase::Enabled;
 }
 
+DefineEngineMethod(ShapeBase, blowUp, void, (),, "@brief Explodes an object into pieces.")
+{
+	object->blowUp();
+}
+
 DefineEngineMethod( ShapeBase, applyDamage, void, ( F32 amount ),,
    "@brief Increment the current damage level by the specified amount.\n\n"
 
