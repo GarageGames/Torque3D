@@ -20,12 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+singleton GFXStateBlockData( PFX_TurbulenceStateBlock : PFX_DefaultStateBlock)  
+{  
+   zDefined = false;
+   zEnable = false;  
+   zWriteEnable = false;  
+        
+   samplersDefined = true;  
+   samplerStates[0] = SamplerClampLinear;
+};  
+  
 singleton ShaderData( PFX_TurbulenceShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/turbulenceP.hlsl";
            
-   samplerNames[0] = "$inputTex";
+   samplerNames[0] = "$inputTex";            
    pixVersion = 3.0;
 };
 
@@ -39,8 +49,8 @@ singleton PostEffect( TurbulenceFx )
    renderBin = "ObjTranslucentBin";     
      
    shader = PFX_TurbulenceShader;  
-   stateBlock = PFX_myShaderStateBlock;  
-   texture[0] = "$backBuffer";  
+   stateBlock=PFX_TurbulenceStateBlock;
+   texture[0] = "$backBuffer";      
       
    renderPriority = 0.1;  
  };
