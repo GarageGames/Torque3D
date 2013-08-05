@@ -652,7 +652,7 @@ breakContinue:
 
                AbstractClassRep* rep = AbstractClassRep::findClassRep( objectName );
                if (rep != NULL) {
-                  Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object %s the same name as a script class.",
+                  Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object [%s] the same name as a script class.",
                      getFileLine(ip), objectName);
                   ip = failJump;
                   STR.popFrame();
