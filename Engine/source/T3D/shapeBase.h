@@ -1121,7 +1121,6 @@ protected:
    virtual void ejectShellCasing( U32 imageSlot );
    virtual void updateDamageLevel();
    virtual void updateDamageState();
-   virtual void blowUp();
    virtual void onImpact(SceneObject* obj, VectorF vec);
    virtual void onImpact(VectorF vec);
    /// @}
@@ -1306,6 +1305,9 @@ public:
 
    /// Returns the recharge rate
    F32  getRechargeRate() { return mRechargeRate; }
+
+   /// Makes the shape explode.
+   virtual void blowUp();
 
    /// @}
 
