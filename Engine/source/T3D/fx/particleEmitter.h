@@ -73,7 +73,7 @@ class ParticleEmitterData : public GameBaseData
    F32   ejectionVelocity;                   ///< Ejection velocity
    F32   velocityVariance;                   ///< Variance for velocity between 0 and n
    F32   ejectionOffset;                     ///< Z offset from emitter point to eject from
-
+   F32   ejectionOffsetVariance;             ///< Z offset Variance from emitter point to eject 
    F32   thetaMin;                           ///< Minimum angle, from the horizontal plane, to eject from
    F32   thetaMax;                           ///< Maximum angle, from the horizontal plane, to eject from
 
