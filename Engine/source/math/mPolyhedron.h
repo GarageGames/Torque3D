@@ -328,7 +328,7 @@ struct PolyhedronImpl : public Base
       /// @{
 
       /// @see PlaneSet::isContained(const Point3F&,F32)
-      bool isContained( const Point3F& point, F32 epsilon = 0.f ) const
+      bool isContained( const Point3F& point, F32 epsilon = 0.0f ) const
       {
          return PlaneSetF( this->getPlanes(), this->getNumPlanes() ).isContained( point, epsilon );
       }

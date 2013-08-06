@@ -39,7 +39,7 @@ extern bool gEditingMission;
 
 SceneSimpleZone::SceneSimpleZone()
    : mUseAmbientLightColor( false ),
-     mAmbientLightColor( 0.1f, 0.1f, 0.1f, 1.f ),
+     mAmbientLightColor( 0.1f, 0.1f, 0.1f, 1.0f ),
      mIsRotated( false )
 {
    // Box zones are unit cubes that are scaled to fit.
@@ -199,7 +199,7 @@ bool SceneSimpleZone::getOverlappingZones( const Box3F& aabb, U32* outZones, U32
       // Check if the zone's OBB intersects the object's AABB.
 
       isOverlapped = aabb.collideOrientedBox(
-         getScale() / 2.f,
+         getScale() / 2.0f,
          getTransform()
       );
 

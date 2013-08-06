@@ -128,14 +128,14 @@ SFXDescription::SFXDescription()
       mConeInsideAngle( 360 ),
       mConeOutsideAngle( 360 ),
       mConeOutsideVolume( 1 ),
-      mRolloffFactor( -1.f ), // Deactivated
+      mRolloffFactor( -1.0f ), // Deactivated
       mFadeInTime( 0.0f ),
       mFadeOutTime( 0.0f ),
       mFadeLoops( false ),
       mStreamPacketSize( SFXInternal::SFXAsyncStream::DEFAULT_STREAM_PACKET_LENGTH ),
       mStreamReadAhead( SFXInternal::SFXAsyncStream::DEFAULT_STREAM_LOOKAHEAD ),
       mPriority( 1.0f ),
-      mScatterDistance( 0.f, 0.f, 0.f ),
+      mScatterDistance( 0.0f, 0.0f, 0.0f ),
       mSourceGroup( NULL )
 {
    dMemset( mParameters, 0, sizeof( mParameters ) );
@@ -483,11 +483,11 @@ void SFXDescription::validate()
       mFadeInTime = 0.0f;
    if( mFadeOutTime < 0.0f )
       mFadeOutTime = 0.0f;
-   if( mRolloffFactor < 0.f )
-      mRolloffFactor = -1.f;
+   if( mRolloffFactor < 0.0f )
+      mRolloffFactor = -1.0f;
 
-   if( mMinDistance < 0.f )
-      mMinDistance = 0.f;
+   if( mMinDistance < 0.0f )
+      mMinDistance = 0.0f;
    if( mMaxDistance <= mMinDistance )
       mMaxDistance = mMinDistance + 0.01f;
 

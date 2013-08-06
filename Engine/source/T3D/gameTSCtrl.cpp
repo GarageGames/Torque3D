@@ -168,7 +168,7 @@ void GameTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    // check if should bother with a render
    GameConnection * con = GameConnection::getConnectionToServer();
-   bool skipRender = !con || (con->getWhiteOut() >= 1.f) || (con->getDamageFlash() >= 1.f) || (con->getBlackOut() >= 1.f);
+   bool skipRender = !con || (con->getWhiteOut() >= 1.0f) || (con->getDamageFlash() >= 1.0f) || (con->getBlackOut() >= 1.0f);
 
    if(!skipRender || true)
       Parent::onRender(offset, updateRect);

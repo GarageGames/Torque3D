@@ -75,7 +75,7 @@ EndImplementEnumType;
 //-----------------------------------------------------------------------------
 
 GuiGraphCtrl::GuiGraphCtrl()
-   : mCenterY( 1.f )
+   : mCenterY( 1.0f )
 {
    dMemset( mAutoPlot, 0, sizeof( mAutoPlot ) );
    dMemset( mAutoPlotDelay, 0, sizeof( mAutoPlotDelay ) );
@@ -339,13 +339,13 @@ DefineEngineMethod( GuiGraphCtrl, getDatum, F32, ( S32 plotId, S32 index ),,
    if( plotId > object->MaxPlots )
    {
 	   Con::errorf( "GuiGraphCtrl::getDatum - 'plotId' out of range: %i", plotId );
-	   return -1.f;
+	   return -1.0f;
    }
    
    if( index > object->MaxDataPoints)
    {
 	   Con::errorf( "GuiGraphCtrl::getDatum - Data point index out of range: %i", index );
-	   return -1.f;
+	   return -1.0f;
    }
 
    return object->getDatum( plotId, index );

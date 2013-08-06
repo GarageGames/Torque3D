@@ -335,7 +335,7 @@ inline Box3F Box3F::getOverlap( const Box3F& otherBox ) const
 
    for( U32 i = 0; i < 3; ++ i )
       if( minExtents[ i ] > otherBox.maxExtents[ i ] || otherBox.minExtents[ i ] > maxExtents[ i ] )
-         overlap.minExtents[ i ] = 0.f;
+         overlap.minExtents[ i ] = 0.0f;
       else
          overlap.minExtents[ i ] = getMax( minExtents[ i ], otherBox.minExtents[ i ] );
 

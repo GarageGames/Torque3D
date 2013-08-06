@@ -213,7 +213,7 @@ void GuiTheoraCtrl::onRender(Point2I offset, const RectI &updateRect)
             String info = String::ToString( "Frame Number: %i | Frame Time: %.2fs | Playback Time: %.2fs | Dropped: %i",
                mTheoraTexture.getFrameNumber(),
                mTheoraTexture.getFrameTime(),
-               F32( mTheoraTexture.getPosition() ) / 1000.f,
+               F32( mTheoraTexture.getPosition() ) / 1000.0f,
                mTheoraTexture.getNumDroppedFrames() );
             
             drawUtil->setBitmapModulation( mProfile->mFontColors[ 0 ] );

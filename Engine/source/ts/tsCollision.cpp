@@ -672,7 +672,7 @@ bool TSShapeInstance::castRayOpcode( S32 dl, const Point3F & startPos, const Poi
 
    AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::castRayOpcode");
 
-   info->t = 100.f;
+   info->t = 100.0f;
 
    // get subshape and object detail
    const TSDetail * detail = &mShape->details[dl];
@@ -1634,7 +1634,7 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
 
          // compute axis
          S32		bestAxis = 0;
-         F32      best = 0.f;
+         F32      best = 0.0f;
 
          for (U32 i = 0 ; i < 6 ; i++)
          {
@@ -1673,20 +1673,20 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
             tv = x;
 
             if (yv.z < 0)
-               s[sv] = 1.f - s[sv];
+               s[sv] = 1.0f - s[sv];
          }
 
          if (bestAxis < 2)
          {
             if (yv.y < 0)
-               s[sv] = 1.f - s[sv];
+               s[sv] = 1.0f - s[sv];
          }
 
          if (bestAxis > 3)
          {
-            s[sv] = 1.f - s[sv];
+            s[sv] = 1.0f - s[sv];
             if (yv.z > 0)
-               s[tv] = 1.f - s[tv];
+               s[tv] = 1.0f - s[tv];
 
          }
 

@@ -63,7 +63,7 @@ struct GuiEvent
         mousePoint( 0, 0 ),
         mouseClickCount( 0 ),
         mouseAxis( 0 ),
-        fval( 0.f ) {}
+        fval( 0.0f ) {}
 };
 
 /// Represent a mouse event with a 3D position and vector.
@@ -75,8 +75,8 @@ struct Gui3DMouseEvent : public GuiEvent
    Point3F     pos;
    
    Gui3DMouseEvent()
-      : vec( 0.f, 0.f, 0.f ),
-        pos( 0.f, 0.f, 0.f ) {}
+      : vec( 0.0f, 0.0f, 0.0f ),
+        pos( 0.0f, 0.0f, 0.0f ) {}
 };
 
 
@@ -163,16 +163,16 @@ struct Edge
    Point2I extent;  ///< The X/Y extents of the edge
    F32     margin;   ///< The Size of the edge
 
-   Edge(): normal(0.f,0.f),
+   Edge(): normal(0.0f,0.0f),
       position(0,0),
       extent(0,0),
-      margin(1.f){};
+      margin(1.0f){};
    Edge( const Point2I &inPoint, const Point2F &inNormal )
    {
       normal = inNormal;
-      margin = 2.f;
+      margin = 2.0f;
 
-      if( normal.x == 1.f || normal.x == -1.f )  
+      if( normal.x == 1.0f || normal.x == -1.0f )  
       {
          // Vertical Edge
          position.x = inPoint.x;
@@ -181,7 +181,7 @@ struct Edge
          extent.x = 1;
          extent.y = 1;
       }
-      else if( normal.y == 1.f || normal.y == -1.f )
+      else if( normal.y == 1.0f || normal.y == -1.0f )
       {
          // Horizontal Edge
          position.y = inPoint.y;
@@ -206,7 +206,7 @@ struct Edge
    // RectI cast operator overload
    operator const RectI() const
    {
-      if( normal.x == 1.f || normal.x == -1.f )  
+      if( normal.x == 1.0f || normal.x == -1.0f )  
       {
          // Vertical Edge
          RectI retRect = RectI( position.x, position.y, 1, position.y + extent.y );
@@ -215,7 +215,7 @@ struct Edge
 
          return retRect;
       }
-      else if( normal.y == 1.f || normal.y == -1.f )
+      else if( normal.y == 1.0f || normal.y == -1.0f )
       {
          // Horizontal Edge
          RectI retRect =  RectI( position.x, position.y , position.x + extent.x,  1 );
@@ -252,28 +252,28 @@ struct EdgeRectI
    EdgeRectI( const RectI &inRect, F32 inMargin )
    {
       // Left Edge 
-      left.normal    = Point2F( -1.f, 0.f );
+      left.normal    = Point2F( -1.0f, 0.0f );
       left.position.x= inRect.point.x;
       left.position.y= 0;
       left.extent    = Point2I(inRect.point.y, inRect.point.y + inRect.extent.y);
       left.margin    = inMargin;
 
       // Right Edge
-      right.normal     = Point2F( 1.f, 0.f );
+      right.normal     = Point2F( 1.0f, 0.0f );
       right.position.x = inRect.point.x + inRect.extent.x;
       right.position.y = 0;
       right.extent     = Point2I(inRect.point.y, inRect.point.y + inRect.extent.y);
       right.margin     = inMargin;
 
       // Top Edge
-      top.normal   = Point2F( 0.f, 1.f );
+      top.normal   = Point2F( 0.0f, 1.0f );
       top.position.y = inRect.point.y;
       top.position.x = 0;
       top.extent   = Point2I(inRect.point.x + inRect.extent.x, inRect.point.x);
       top.margin   = inMargin;
 
       // Bottom Edge
-      bottom.normal   = Point2F( 0.f, -1.f );
+      bottom.normal   = Point2F( 0.0f, -1.0f );
       bottom.position.y= inRect.point.y + inRect.extent.y;
       bottom.position.x=0;
       bottom.extent   = Point2I(inRect.point.x + inRect.extent.x, inRect.point.x);

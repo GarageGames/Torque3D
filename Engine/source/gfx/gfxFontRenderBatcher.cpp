@@ -66,7 +66,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
 
    MatrixF rotMatrix;
 
-   bool doRotation = rot != 0.f;
+   bool doRotation = rot != 0.0f;
    if(doRotation)
       rotMatrix.set( EulerF( 0.0, 0.0, mDegToRad( rot ) ) );
 
@@ -116,7 +116,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
          // ugly as sin.
          Point3F tmp;
 
-         tmp.set( screenLeft, screenTop, 0.f );
+         tmp.set( screenLeft, screenTop, 0.0f );
          if(doRotation)
             rotMatrix.mulP( tmp, &verts[currentPt].point);
          else
@@ -125,7 +125,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
          verts[currentPt].texCoord.set( texLeft, texTop );
          currentPt++;
 
-         tmp.set( screenLeft, screenBottom, 0.f );
+         tmp.set( screenLeft, screenBottom, 0.0f );
          if(doRotation)
             rotMatrix.mulP( tmp, &verts[currentPt].point);
          else
@@ -134,7 +134,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
          verts[currentPt].texCoord.set( texLeft, texBottom );
          currentPt++;
 
-         tmp.set( screenRight, screenBottom, 0.f );
+         tmp.set( screenRight, screenBottom, 0.0f );
          if(doRotation)
             rotMatrix.mulP( tmp, &verts[currentPt].point);
          else
@@ -143,7 +143,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
          verts[currentPt].texCoord.set( texRight, texBottom );
          currentPt++;
 
-         tmp.set( screenRight, screenBottom, 0.f );
+         tmp.set( screenRight, screenBottom, 0.0f );
          if(doRotation)
             rotMatrix.mulP( tmp, &verts[currentPt].point);
          else
@@ -152,7 +152,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
          verts[currentPt].texCoord.set( texRight, texBottom );
          currentPt++;
 
-         tmp.set( screenRight, screenTop, 0.f );
+         tmp.set( screenRight, screenTop, 0.0f );
          if(doRotation)
             rotMatrix.mulP( tmp, &verts[currentPt].point);
          else
@@ -161,7 +161,7 @@ void FontRenderBatcher::render( F32 rot, const Point2F &offset )
          verts[currentPt].texCoord.set( texRight, texTop );
          currentPt++;
 
-         tmp.set( screenLeft, screenTop, 0.f );
+         tmp.set( screenLeft, screenTop, 0.0f );
          if(doRotation)
             rotMatrix.mulP( tmp, &verts[currentPt].point);
          else

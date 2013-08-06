@@ -73,7 +73,7 @@ GuiWindowCtrl::GuiWindowCtrl()
    :  mResizeEdge(edgeNone),
       mResizeWidth(true),
       mResizeHeight(true),
-      mResizeMargin(2.f),
+      mResizeMargin(2.0f),
       mCanMove(true),
       mCanClose(true),
       mCanMinimize(true),
@@ -613,8 +613,8 @@ S32 GuiWindowCtrl::findHitEdges( const Point2I &globalPoint )
    EdgeRectI edges = EdgeRectI(bounds, mResizeMargin);
 
    // Get Cursor Edges
-   Edge cursorVertEdge = Edge( globalPoint, Point2F( 1.f, 0.f ) );
-   Edge cursorHorzEdge = Edge( globalPoint, Point2F( 0.f, 1.f ) );
+   Edge cursorVertEdge = Edge( globalPoint, Point2F( 1.0f, 0.0f ) );
+   Edge cursorHorzEdge = Edge( globalPoint, Point2F( 0.0f, 1.0f ) );
 
    if( edges.left.hit( cursorVertEdge ) )
       edgeMask |= edgeLeft;

@@ -73,7 +73,7 @@ void GuiProgressCtrl::setScriptValue(const char *value)
       mProgress = dAtof(value);
 
    //validate the value
-   mProgress = mClampF(mProgress, 0.f, 1.f);
+   mProgress = mClampF(mProgress, 0.0f, 1.0f);
    setUpdate();
 }
 
@@ -82,7 +82,7 @@ void GuiProgressCtrl::onPreRender()
    const char * var = getVariable();
    if(var)
    {
-      F32 value = mClampF(dAtof(var), 0.f, 1.f);
+      F32 value = mClampF(dAtof(var), 0.0f, 1.0f);
       if(value != mProgress)
       {
          mProgress = value;

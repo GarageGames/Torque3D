@@ -165,14 +165,14 @@ EulerF MatrixF::toEuler() const
    EulerF r;
    r.x = mAsin(mat[MatrixF::idx(2,1)]);
 
-   if(mCos(r.x) != 0.f)
+   if(mCos(r.x) != 0.0f)
    {
       r.y = mAtan2(-mat[MatrixF::idx(2,0)], mat[MatrixF::idx(2,2)]);
       r.z = mAtan2(-mat[MatrixF::idx(0,1)], mat[MatrixF::idx(1,1)]);
    }
    else
    {
-      r.y = 0.f;
+      r.y = 0.0f;
       r.z = mAtan2(mat[MatrixF::idx(1,0)], mat[MatrixF::idx(0,0)]);
    }
 

@@ -1038,7 +1038,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
             U32 checkX = currXBin % csmNumBins;
 
             F32 subStartT = (subStartX - currStartX) / (currEndX - currStartX);
-            F32 subEndT   = getMin(F32((subEndX   - currStartX) / (currEndX - currStartX)), 1.f);
+            F32 subEndT   = getMin(F32((subEndX   - currStartX) / (currEndX - currStartX)), 1.0f);
 
             F32 subY1 = y1 + (y2 - y1) * subStartT;
             F32 subY2 = y1 + (y2 - y1) * subEndT;

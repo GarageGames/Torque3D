@@ -83,7 +83,7 @@ LevelInfo::LevelInfo()
       mSoundscape( NULL ),
       mSoundDistanceModel( SFXDistanceModelLinear ),
       mWorldSize( 10000.0f ),
-      mAmbientLightBlendPhase( 1.f )
+      mAmbientLightBlendPhase( 1.0f )
 {
    mFogData.density = 0.0f;
    mFogData.densityOffset = 0.0f;
@@ -305,7 +305,7 @@ void LevelInfo::_updateSceneGraph()
 
    // Set ambient lighting properties.
 
-   scene->setAmbientLightTransitionTime( mAmbientLightBlendPhase * 1000.f );
+   scene->setAmbientLightTransitionTime( mAmbientLightBlendPhase * 1000.0f );
    scene->setAmbientLightTransitionCurve( mAmbientLightBlendCurve );
 
    // Copy our AirFogData into the sceneGraph.

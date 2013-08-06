@@ -79,7 +79,7 @@ class SceneCullingVolume
 
       ///
       SceneCullingVolume( Type type, const PlaneSetF& planes )
-         : mType( type ), mClippingPlanes( planes ), mSortPoint( 1.f ) {}
+         : mType( type ), mClippingPlanes( planes ), mSortPoint( 1.0f ) {}
 
       /// Return the type of volume defined by this culling volume, i.e. whether it includes
       /// or excludes space.

@@ -118,7 +118,7 @@ ConsoleDocClass( GuiProgressBitmapCtrl,
 //-----------------------------------------------------------------------------
 
 GuiProgressBitmapCtrl::GuiProgressBitmapCtrl()
-   : mProgress( 0.f ),
+   : mProgress( 0.0f ),
      mBitmapName( StringTable->EmptyString() ),
      mUseVariable( false ),
      mTile( false )
@@ -174,7 +174,7 @@ void GuiProgressBitmapCtrl::setScriptValue(const char *value)
       mProgress = dAtof(value);
 
    //validate the value
-   mProgress = mClampF(mProgress, 0.f, 1.f);
+   mProgress = mClampF(mProgress, 0.0f, 1.0f);
    setUpdate();
 }
 
@@ -185,7 +185,7 @@ void GuiProgressBitmapCtrl::onPreRender()
    const char * var = getVariable();
    if(var)
    {
-      F32 value = mClampF(dAtof(var), 0.f, 1.f);
+      F32 value = mClampF(dAtof(var), 0.0f, 1.0f);
       if(value != mProgress)
       {
          mProgress = value;

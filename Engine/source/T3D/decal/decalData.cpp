@@ -405,10 +405,10 @@ void DecalData::reloadRects()
 	bool canRenderColsByFrame = false;
 	S32 id = 0;
 	
-	texRect[id].point.x = 0.f;
-	texRect[id].extent.x = 1.f;
-	texRect[id].point.y = 0.f;
-	texRect[id].extent.y = 1.f;
+	texRect[id].point.x = 0.0f;
+	texRect[id].extent.x = 1.0f;
+	texRect[id].point.y = 0.0f;
+	texRect[id].extent.y = 1.0f;
 	
 	texCoordCount = (texRows * texCols) - 1;
 
@@ -424,12 +424,12 @@ void DecalData::reloadRects()
 	// coordinates from. 
 	if( texRows > 1 )
 	{
-		rowsBase = ( 1.f / texRows );
+		rowsBase = ( 1.0f / texRows );
 		canRenderRowsByFrame = true;
 	}
 	if( texCols > 1 )
 	{
-		colsBase = ( 1.f / texCols );
+		colsBase = ( 1.0f / texCols );
 		canRenderColsByFrame = true;
 	}
 

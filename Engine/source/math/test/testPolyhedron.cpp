@@ -41,12 +41,12 @@ CreateUnitTest( TestMathPolyhedronBuildFromPlanes, "Math/Polyhedron/BuildFromPla
       // Build planes for a unit cube centered at the origin.
       // Note that the normals must be facing inwards.
 
-      planes.push_back( PlaneF( Point3F( -0.5f, 0.f, 0.f ), Point3F( 1.f, 0.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.5f, 0.f, 0.f ), Point3F( -1.f, 0.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, -0.5f, 0.f ), Point3F( 0.f, 1.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, 0.5f, 0.f ), Point3F( 0.f, -1.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, 0.f, -0.5f ), Point3F( 0.f, 0.f, 1.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, 0.f, 0.5f ), Point3F( 0.f, 0.f, -1.f ) ) );
+      planes.push_back( PlaneF( Point3F( -0.5f, 0.0f, 0.0f ), Point3F( 1.0f, 0.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.5f, 0.0f, 0.0f ), Point3F( -1.0f, 0.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, -0.5f, 0.0f ), Point3F( 0.0f, 1.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, 0.5f, 0.0f ), Point3F( 0.0f, -1.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, 0.0f, -0.5f ), Point3F( 0.0f, 0.0f, 1.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, 0.0f, 0.5f ), Point3F( 0.0f, 0.0f, -1.0f ) ) );
 
       // Turn it into a polyhedron.
 
@@ -69,16 +69,16 @@ CreateUnitTest( TestMathPolyhedronBuildFromPlanes, "Math/Polyhedron/BuildFromPla
       // Build planes for a unit cube centered at the origin.
       // Note that the normals must be facing inwards.
 
-      planes.push_back( PlaneF( Point3F( -0.5f, 0.f, 0.f ), Point3F( 1.f, 0.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.5f, 0.f, 0.f ), Point3F( -1.f, 0.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, -0.5f, 0.f ), Point3F( 0.f, 1.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, 0.5f, 0.f ), Point3F( 0.f, -1.f, 0.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, 0.f, -0.5f ), Point3F( 0.f, 0.f, 1.f ) ) );
-      planes.push_back( PlaneF( Point3F( 0.f, 0.f, 0.5f ), Point3F( 0.f, 0.f, -1.f ) ) );
+      planes.push_back( PlaneF( Point3F( -0.5f, 0.0f, 0.0f ), Point3F( 1.0f, 0.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.5f, 0.0f, 0.0f ), Point3F( -1.0f, 0.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, -0.5f, 0.0f ), Point3F( 0.0f, 1.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, 0.5f, 0.0f ), Point3F( 0.0f, -1.0f, 0.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, 0.0f, -0.5f ), Point3F( 0.0f, 0.0f, 1.0f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.0f, 0.0f, 0.5f ), Point3F( 0.0f, 0.0f, -1.0f ) ) );
 
       // Add extra plane that doesn't contribute a new edge.
 
-      planes.push_back( PlaneF( Point3F( 0.5f, 0.5f, 0.5f ), Point3F( -1.f, -1.f, -1.f ) ) );
+      planes.push_back( PlaneF( Point3F( 0.5f, 0.5f, 0.5f ), Point3F( -1.0f, -1.0f, -1.0f ) ) );
 
       // Turn it into a polyhedron.
 

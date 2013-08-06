@@ -337,7 +337,7 @@ ConsoleGetType( TypeMatrixPosition )
 {
    F32 *col = (F32 *) dptr + 3;
    char* returnBuffer = Con::getReturnBuffer(256);
-   if(col[12] == 1.f)
+   if(col[12] == 1.0f)
       dSprintf(returnBuffer, 256, "%g %g %g", col[0], col[4], col[8]);
    else
       dSprintf(returnBuffer, 256, "%g %g %g %g", col[0], col[4], col[8], col[12]);
@@ -349,8 +349,8 @@ ConsoleSetType( TypeMatrixPosition )
    F32 *col = ((F32 *) dptr) + 3;
    if (argc == 1)
    {
-      col[0] = col[4] = col[8] = 0.f;
-      col[12] = 1.f;
+      col[0] = col[4] = col[8] = 0.0f;
+      col[12] = 1.0f;
       dSscanf(argv[0], "%g %g %g %g", &col[0], &col[4], &col[8], &col[12]);
    }
    else if (argc <= 4) 

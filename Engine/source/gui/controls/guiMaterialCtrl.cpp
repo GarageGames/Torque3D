@@ -114,10 +114,10 @@ void GuiMaterialCtrl::onRender( Point2I offset, const RectI &updateRect )
    F32 screenBottom = (updateRect.point.y + updateRect.extent.y);
 
    const F32 fillConv = GFX->getFillConventionOffset();
-   verts[0].point.set( screenLeft  - fillConv, screenTop    - fillConv, 0.f );
-   verts[1].point.set( screenRight - fillConv, screenTop    - fillConv, 0.f );
-   verts[2].point.set( screenLeft  - fillConv, screenBottom - fillConv, 0.f );
-   verts[3].point.set( screenRight - fillConv, screenBottom - fillConv, 0.f );
+   verts[0].point.set( screenLeft  - fillConv, screenTop    - fillConv, 0.0f );
+   verts[1].point.set( screenRight - fillConv, screenTop    - fillConv, 0.0f );
+   verts[2].point.set( screenLeft  - fillConv, screenBottom - fillConv, 0.0f );
+   verts[3].point.set( screenRight - fillConv, screenBottom - fillConv, 0.0f );
 
    verts[0].color = verts[1].color = verts[2].color = verts[3].color = ColorI( 255, 255, 255, 255 );
 

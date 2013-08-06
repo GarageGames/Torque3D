@@ -286,13 +286,13 @@ void CameraSpline::value(F32 t, CameraSpline::Knot *result, bool skip_rotation)
       F32 oldT = t;
       if(oldT < 0.5f)
       {
-         t = 0.5f - (mSin( (0.5 - oldT) * M_PI ) / 2.f);
+         t = 0.5f - (mSin( (0.5 - oldT) * M_PI ) / 2.0f);
       }
 
-      if((F32(size()) - 1.5f) > 0.f && oldT - (F32(size()) - 1.5f) > 0.f)
+      if((F32(size()) - 1.5f) > 0.0f && oldT - (F32(size()) - 1.5f) > 0.0f)
       {
          oldT -= (F32(size()) - 1.5f);
-         t = (F32(size()) - 1.5f) + (mCos( (0.5f - oldT) * F32(M_PI) ) / 2.f);
+         t = (F32(size()) - 1.5f) + (mCos( (0.5f - oldT) * F32(M_PI) ) / 2.0f);
       }
    }
 

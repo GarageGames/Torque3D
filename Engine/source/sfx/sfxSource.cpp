@@ -191,17 +191,17 @@ SFXSource::SFXSource()
    : mStatus( SFXStatusStopped ),
      mSavedStatus( SFXStatusNull ),
      mStatusCallback( NULL ),
-     mPitch( 1.f ),
-     mModulativePitch( 1.f ),
-     mEffectivePitch( 1.f ),
-     mVolume( 1.f ),
-     mPreFadeVolume( 1.f ),
-     mFadedVolume( 1.f ),
-     mModulativeVolume( 1.f ),
-     mPreAttenuatedVolume( 1.f ),
-     mAttenuatedVolume( 1.f ),
+     mPitch( 1.0f ),
+     mModulativePitch( 1.0f ),
+     mEffectivePitch( 1.0f ),
+     mVolume( 1.0f ),
+     mPreFadeVolume( 1.0f ),
+     mFadedVolume( 1.0f ),
+     mModulativeVolume( 1.0f ),
+     mPreAttenuatedVolume( 1.0f ),
+     mAttenuatedVolume( 1.0f ),
      mPriority( 0 ),
-     mModulativePriority( 1.f ),
+     mModulativePriority( 1.0f ),
      mEffectivePriority( 0 ),
      mVelocity( 0, 0, 0 ),
      mTransform( true ),
@@ -214,15 +214,15 @@ SFXSource::SFXSource()
      mTransformScattered( false ),
      mPlayStartTick( 0 ),
      mFadeSegmentEase( NULL ),
-     mFadeInTime( 0.f ),
-     mFadeOutTime( 0.f ),
-     mFadeInPoint( -1.f ),
-     mFadeOutPoint( -1.f ),
+     mFadeInTime( 0.0f ),
+     mFadeOutTime( 0.0f ),
+     mFadeInPoint( -1.0f ),
+     mFadeOutPoint( -1.0f ),
      mFadeSegmentType( FadeSegmentNone ),
-     mFadeSegmentStartPoint( 0.f ),
-     mFadeSegmentEndPoint( 0.f ),
-     mSavedFadeTime( -1.f ),
-     mDistToListener( 0.f )
+     mFadeSegmentStartPoint( 0.0f ),
+     mFadeSegmentEndPoint( 0.0f ),
+     mSavedFadeTime( -1.0f ),
+     mDistToListener( 0.0f )
 {
    VECTOR_SET_ASSOCIATION( mParameters );
 }
@@ -235,17 +235,17 @@ SFXSource::SFXSource( SFXTrack* track, SFXDescription* description )
      mTrack( track ),
      mDescription( description ),
      mStatusCallback( NULL ),
-     mPitch( 1.f ),
-     mModulativePitch( 1.f ),
-     mEffectivePitch( 1.f ),
-     mVolume( 1.f ),
-     mPreFadeVolume( 1.f ),
-     mFadedVolume( 1.f ),
-     mModulativeVolume( 1.f ),
-     mPreAttenuatedVolume( 1.f ),
-     mAttenuatedVolume( 1.f ),
+     mPitch( 1.0f ),
+     mModulativePitch( 1.0f ),
+     mEffectivePitch( 1.0f ),
+     mVolume( 1.0f ),
+     mPreFadeVolume( 1.0f ),
+     mFadedVolume( 1.0f ),
+     mModulativeVolume( 1.0f ),
+     mPreAttenuatedVolume( 1.0f ),
+     mAttenuatedVolume( 1.0f ),
      mPriority( 0 ),
-     mModulativePriority( 1.f ),
+     mModulativePriority( 1.0f ),
      mEffectivePriority( 0 ),
      mVelocity( 0, 0, 0 ),
      mTransform( true ),
@@ -256,16 +256,16 @@ SFXSource::SFXSource( SFXTrack* track, SFXDescription* description )
      mConeOutsideVolume( 1 ),
      mTransformScattered( false ),
      mPlayStartTick( 0 ),
-     mFadeInTime( 0.f ),
-     mFadeOutTime( 0.f ),
+     mFadeInTime( 0.0f ),
+     mFadeOutTime( 0.0f ),
      mFadeSegmentEase( NULL ),
-     mFadeInPoint( -1.f ),
-     mFadeOutPoint( -1.f ),
+     mFadeInPoint( -1.0f ),
+     mFadeOutPoint( -1.0f ),
      mFadeSegmentType( FadeSegmentNone ),
-     mFadeSegmentStartPoint( 0.f ),
-     mFadeSegmentEndPoint( 0.f ),
-     mSavedFadeTime( -1.f ),
-     mDistToListener( 0.f )
+     mFadeSegmentStartPoint( 0.0f ),
+     mFadeSegmentEndPoint( 0.0f ),
+     mSavedFadeTime( -1.0f ),
+     mDistToListener( 0.0f )
 {
    VECTOR_SET_ASSOCIATION( mParameters );
    
@@ -458,7 +458,7 @@ SFXSource* SFXSource::getSourceGroup() const
 
 F32 SFXSource::getElapsedPlayTime() const
 {
-   return F32( mPlayTimer.getPosition() ) / 1000.f;
+   return F32( mPlayTimer.getPosition() ) / 1000.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -469,7 +469,7 @@ F32 SFXSource::getElapsedPlayTimeCurrentCycle() const
    // and thus cannot clamp the playtimer into range for the current cycle.
    // This needs to be done by subclasses.
    
-   return F32( mPlayTimer.getPosition() ) / 1000.f;
+   return F32( mPlayTimer.getPosition() ) / 1000.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -517,10 +517,10 @@ void SFXSource::play( F32 fadeInTime )
 
    // Add fades, if required.
    
-   if( fadeInTime == -1.f )
+   if( fadeInTime == -1.0f )
       fadeInTime = mFadeInTime;
       
-   if( status == SFXStatusPaused && fadeInTime > 0.f )
+   if( status == SFXStatusPaused && fadeInTime > 0.0f )
    {
       // Source is paused.  Set up temporary fade-in segment.
       
@@ -529,7 +529,7 @@ void SFXSource::play( F32 fadeInTime )
       mFadeSegmentStartPoint = getElapsedPlayTimeCurrentCycle();
       mFadeSegmentEndPoint = mFadeSegmentStartPoint + fadeInTime;
    }
-   else if( fadeInTime > 0.f )
+   else if( fadeInTime > 0.0f )
    {
       mFadeInPoint = fadeInTime;
       
@@ -537,7 +537,7 @@ void SFXSource::play( F32 fadeInTime )
       // if it is either not looping or has fading enabled on loops.
       
       F32 totalPlayTime = getTotalPlayTime();
-      if( !mIsInf_F( totalPlayTime ) && mDescription->mFadeOutTime > 0.f && ( !mDescription->mIsLooping || mDescription->mFadeLoops ) )
+      if( !mIsInf_F( totalPlayTime ) && mDescription->mFadeOutTime > 0.0f && ( !mDescription->mIsLooping || mDescription->mFadeLoops ) )
       {
          mFadeOutPoint = totalPlayTime - mDescription->mFadeOutTime;
 
@@ -555,8 +555,8 @@ void SFXSource::play( F32 fadeInTime )
    }
    else
    {
-      mFadeInPoint = -1.f;
-      mFadeOutPoint = -1.f;
+      mFadeInPoint = -1.0f;
+      mFadeOutPoint = -1.0f;
    }
    
    // Start playback.
@@ -585,10 +585,10 @@ void SFXSource::pause( F32 fadeOutTime )
    
    // Pause playback.
       
-   if( fadeOutTime == -1.f )
+   if( fadeOutTime == -1.0f )
       fadeOutTime = mFadeOutTime;
       
-   if( fadeOutTime > 0.f )
+   if( fadeOutTime > 0.0f )
       _setupFadeOutSegment( FadeSegmentPause, fadeOutTime );
    else
    {
@@ -619,10 +619,10 @@ void SFXSource::stop( F32 fadeOutTime )
       return;
    }
    
-   if( fadeOutTime == -1.f )
+   if( fadeOutTime == -1.0f )
       fadeOutTime = mFadeOutTime;
       
-   if( fadeOutTime > 0.f )
+   if( fadeOutTime > 0.0f )
       _setupFadeOutSegment( FadeSegmentStop, fadeOutTime );
    else
    {
@@ -693,12 +693,12 @@ void SFXSource::_pause()
       SFXSource* source = dynamic_cast< SFXSource* >( *iter );
       if( source && source->isPlaying() )
       {
-         source->pause( 0.f );
+         source->pause( 0.0f );
 
          // Save info for resuming playback.
 
          source->mSavedStatus = SFXStatusPlaying;
-         source->mSavedFadeTime = 0.f;
+         source->mSavedFadeTime = 0.0f;
       }
    }
    
@@ -715,7 +715,7 @@ void SFXSource::_stop()
    {
       SFXSource* source = dynamic_cast< SFXSource* >( *iter );
       if( source )
-         source->stop( 0.f );
+         source->stop( 0.0f );
    }
 
    mPlayTimer.stop();
@@ -812,7 +812,7 @@ void SFXSource::_updateVolume( const MatrixF& listener )
          {
             const F32 time = elapsed - mFadeSegmentStartPoint;
             mFadedVolume = mFadeSegmentEase->getValue
-               ( time, 0.f, mPreFadeVolume, duration );
+               ( time, 0.0f, mPreFadeVolume, duration );
          }
          else
          {
@@ -822,7 +822,7 @@ void SFXSource::_updateVolume( const MatrixF& listener )
             
             const F32 time = mFadeSegmentEndPoint - elapsed;
             mFadedVolume = mFadeSegmentEase->getValue
-               ( time, 0.f, mPreFadeVolume, duration );
+               ( time, 0.0f, mPreFadeVolume, duration );
          }
       }
       else
@@ -832,11 +832,11 @@ void SFXSource::_updateVolume( const MatrixF& listener )
          switch( mFadeSegmentType )
          {
             case FadeSegmentStop:
-               stop( 0.f );
+               stop( 0.0f );
                break;
                
             case FadeSegmentPause:
-               pause( 0.f );
+               pause( 0.0f );
                break;
                
             case FadeSegmentPlay: // Nothing to do.               
@@ -861,7 +861,7 @@ void SFXSource::_updateVolume( const MatrixF& listener )
       if( mFadeInPoint != -1 )
       {
          if( elapsed < mFadeInPoint )
-            mFadedVolume = mDescription->mFadeInEase.getValue( elapsed, 0.f, mPreFadeVolume, mFadeInPoint );
+            mFadedVolume = mDescription->mFadeInEase.getValue( elapsed, 0.0f, mPreFadeVolume, mFadeInPoint );
          else if( mDescription->mIsLooping && !mDescription->mFadeLoops )
          {
             // Deactivate fade-in so we don't see it on further loops.
@@ -877,7 +877,7 @@ void SFXSource::_updateVolume( const MatrixF& listener )
          const F32 duration = totalPlayTime - mFadeOutPoint;
          const F32 time = totalPlayTime - elapsed;
          
-         mFadedVolume = mDescription->mFadeOutEase.getValue( time, 0.f, mPreFadeVolume, duration );
+         mFadedVolume = mDescription->mFadeOutEase.getValue( time, 0.0f, mPreFadeVolume, duration );
       }
    }
 
@@ -953,7 +953,7 @@ void SFXSource::setFadeTimes( F32 fadeInTime, F32 fadeOutTime )
 {
    _setFadeTimes( fadeInTime, fadeOutTime );
    
-   if( mFadeInTime >= 0.f || mFadeOutTime >= 0.f )
+   if( mFadeInTime >= 0.0f || mFadeOutTime >= 0.0f )
       mFlags.set( CustomFadeFlag );
 }
 
@@ -961,13 +961,13 @@ void SFXSource::setFadeTimes( F32 fadeInTime, F32 fadeOutTime )
 
 void SFXSource::_setFadeTimes( F32 fadeInTime, F32 fadeOutTime )
 {
-   if( fadeInTime >= 0.f )
-      mFadeInTime = getMax( 0.f, fadeInTime );
+   if( fadeInTime >= 0.0f )
+      mFadeInTime = getMax( 0.0f, fadeInTime );
    else
       mFadeInTime = mDescription->mFadeInTime;
       
-   if( fadeOutTime >= 0.f )
-      mFadeOutTime = getMax( 0.f, fadeOutTime );
+   if( fadeOutTime >= 0.0f )
+      mFadeOutTime = getMax( 0.0f, fadeOutTime );
    else
       mFadeOutTime = mDescription->mFadeOutTime;
 }
@@ -1018,7 +1018,7 @@ void SFXSource::_setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )
 
 void SFXSource::_setVolume( F32 volume )
 {
-   mVolume = mClampF( volume, 0.f, 1.f );
+   mVolume = mClampF( volume, 0.0f, 1.0f );
    mPreFadeVolume = mVolume;
    _updateVolume( SFX->getListener( 0 ).getTransform() );
 }
@@ -1027,7 +1027,7 @@ void SFXSource::_setVolume( F32 volume )
 
 void SFXSource::setModulativeVolume( F32 value )
 {
-   mModulativeVolume = mClampF( value, 0.f, 1.f );
+   mModulativeVolume = mClampF( value, 0.0f, 1.0f );
    _updateVolume( SFX->getListener( 0 ).getTransform() );
 }
 
@@ -1329,7 +1329,7 @@ void SFXSource::_scatterTransform()
       for( U32 i = 0; i < 3; ++ i )
       {
          F32 scatterDist = mDescription->mScatterDistance[ i ];
-         if( scatterDist != 0.f )
+         if( scatterDist != 0.0f )
             position[ 0 ] += gRandGen.randF( - scatterDist, scatterDist );
       }
       mTransform.setPosition( position );
@@ -1345,7 +1345,7 @@ void SFXSource::_scatterTransform()
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SFXSource, play, void, ( F32 fadeInTime ), ( -1.f ),
+DefineEngineMethod( SFXSource, play, void, ( F32 fadeInTime ), ( -1.0f ),
    "Start playback of the source.\n"
    "If the sound data for the source has not yet been fully loaded, there will be a delay after calling "
    "play and playback will start after the data has become available.\n\n"
@@ -1358,7 +1358,7 @@ DefineEngineMethod( SFXSource, play, void, ( F32 fadeInTime ), ( -1.f ),
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SFXSource, stop, void, ( F32 fadeOutTime ), ( -1.f ),
+DefineEngineMethod( SFXSource, stop, void, ( F32 fadeOutTime ), ( -1.0f ),
    "Stop playback of the source.\n"
    "@param fadeOutTime Seconds for the sound to fade down to zero volume.  If -1, the SFXDescription::fadeOutTime "
       "set in the source's associated description is used.  Pass 0 to disable a fade-out effect that may be "
@@ -1371,7 +1371,7 @@ DefineEngineMethod( SFXSource, stop, void, ( F32 fadeOutTime ), ( -1.f ),
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SFXSource, pause, void, ( F32 fadeOutTime ), ( -1.f ),
+DefineEngineMethod( SFXSource, pause, void, ( F32 fadeOutTime ), ( -1.0f ),
    "Pause playback of the source.\n"
    "@param fadeOutTime Seconds for the sound to fade down to zero volume.  If -1, the SFXDescription::fadeOutTime "
       "set in the source's associated description is used.  Pass 0 to disable a fade-out effect that may be "

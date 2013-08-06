@@ -68,9 +68,9 @@ void OrientedBox3F::set( const MatrixF& transform, const Box3F& aabb )
    mAxes[ ForwardVector ] = transform.getForwardVector();
    mAxes[ UpVector ] = transform.getUpVector();
 
-   mHalfExtents[ 0 ] = aabb.len_x() / 2.f;
-   mHalfExtents[ 1 ] = aabb.len_y() / 2.f;
-   mHalfExtents[ 2 ] = aabb.len_z() / 2.f;
+   mHalfExtents[ 0 ] = aabb.len_x() / 2.0f;
+   mHalfExtents[ 1 ] = aabb.len_y() / 2.0f;
+   mHalfExtents[ 2 ] = aabb.len_z() / 2.0f;
 
    _initPoints();
 }

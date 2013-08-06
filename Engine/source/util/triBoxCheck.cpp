@@ -58,10 +58,10 @@ static bool planeBoxOverlap(const Point3F &normal, const Point3F &vert, const Po
       }
    }
 
-   if(mDot(normal, vmin) > 0.f)
+   if(mDot(normal, vmin) > 0.0f)
       return false;
 
-   if(mDot(normal, vmax) >= 0.f)
+   if(mDot(normal, vmax) >= 0.0f)
       return true;
 
    return false;

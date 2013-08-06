@@ -170,7 +170,7 @@ ShapeBaseData::ShapeBaseData()
    cameraMinDist( 0.2f ),
    cameraDefaultFov( 75.0f ),
    cameraMinFov( 5.0f ),
-   cameraMaxFov( 120.f ),
+   cameraMaxFov( 120.0f ),
    cameraCanBank( false ),
    mountedImagesBank( false ),
    isInvincible( false ),
@@ -216,9 +216,9 @@ struct ShapeBaseDataProto
       maxEnergy = 0;
       cameraMaxDist = 0;
       cameraMinDist = 0.2f;
-      cameraDefaultFov = 75.f;
+      cameraDefaultFov = 75.0f;
       cameraMinFov = 5.0f;
-      cameraMaxFov = 120.f;
+      cameraMaxFov = 120.0f;
    }
 };
 
@@ -939,8 +939,8 @@ ShapeBase::ShapeBase()
       mScriptThread[i].sound = 0;
       mScriptThread[i].state = Thread::Stop;
       mScriptThread[i].atEnd = false;
-	   mScriptThread[i].timescale = 1.f;
-	   mScriptThread[i].position = -1.f;
+	   mScriptThread[i].timescale = 1.0f;
+	   mScriptThread[i].position = -1.0f;
    }
 
    for (i = 0; i < MaxTriggerKeys; i++)
@@ -1247,7 +1247,7 @@ void ShapeBase::processTick(const Move* move)
    {
       F32 store = mDamage;
       mDamage -= mRepairRate;
-      mDamage = mClampF(mDamage, 0.f, mDataBlock->maxDamage);
+      mDamage = mClampF(mDamage, 0.0f, mDataBlock->maxDamage);
 
       if (mRepairReserve > mDamage)
          mRepairReserve = mDamage;
@@ -1533,13 +1533,13 @@ F32 ShapeBase::getEnergyValue()
    if ( mDataBlock->inheritEnergyFromMount && mShapeBaseMount )
    {
       F32 maxEnergy = mShapeBaseMount->mDataBlock->maxEnergy;
-      if ( maxEnergy > 0.f )
+      if ( maxEnergy > 0.0f )
          return (mShapeBaseMount->getEnergyLevel() / maxEnergy);
    }
    else
    {
       F32 maxEnergy = mDataBlock->maxEnergy;
-      if ( maxEnergy > 0.f )
+      if ( maxEnergy > 0.0f )
          return (mEnergy / mDataBlock->maxEnergy);   
    }
 
@@ -1566,7 +1566,7 @@ void ShapeBase::setDamageLevel(F32 damage)
 {
    if (!mDataBlock->isInvincible) {
       F32 store = mDamage;
-      mDamage = mClampF(damage, 0.f, mDataBlock->maxDamage);
+      mDamage = mClampF(damage, 0.0f, mDataBlock->maxDamage);
 
       if (store != mDamage) {
          updateDamageLevel();
@@ -2322,8 +2322,8 @@ bool ShapeBase::setThreadSequence(U32 slot, S32 seq, bool reset)
       if (reset) {
          st.state = Thread::Play;
          st.atEnd = false;
-		 st.timescale = 1.f;
-		 st.position = 0.f;
+		 st.timescale = 1.0f;
+		 st.position = 0.0f;
       }
       if (mShapeInstance) {
          if (!st.thread)
@@ -2343,19 +2343,19 @@ void ShapeBase::updateThread(Thread& st)
 	{
 		case Thread::Stop:
 			{
-				mShapeInstance->setTimeScale( st.thread, 1.f );
-				mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 0.0f : 1.0f );
+				mShapeInstance->setTimeScale( st.thread, 1.0f );
+				mShapeInstance->setPos( st.thread, ( st.timescale > 0.0f ) ? 0.0f : 1.0f );
 			} // Drop through to pause state
 
 		case Thread::Pause:
 			{
-				if ( st.position != -1.f )
+				if ( st.position != -1.0f )
 				{
-					mShapeInstance->setTimeScale( st.thread, 1.f );
+					mShapeInstance->setTimeScale( st.thread, 1.0f );
 					mShapeInstance->setPos( st.thread, st.position );
 				}
 
-				mShapeInstance->setTimeScale( st.thread, 0.f );
+				mShapeInstance->setTimeScale( st.thread, 0.0f );
 				stopThreadSound( st );
 			} break;
 
@@ -2364,16 +2364,16 @@ void ShapeBase::updateThread(Thread& st)
 				if (st.atEnd)
 				{
 					mShapeInstance->setTimeScale(st.thread,1);
-					mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
+					mShapeInstance->setPos( st.thread, ( st.timescale > 0.0f ) ? 1.0f : 0.0f );
 					mShapeInstance->setTimeScale(st.thread,0);
 					stopThreadSound(st);
                st.state = Thread::Stop;
 				}
 				else
 				{
-					if ( st.position != -1.f )
+					if ( st.position != -1.0f )
 					{
-						mShapeInstance->setTimeScale( st.thread, 1.f );
+						mShapeInstance->setTimeScale( st.thread, 1.0f );
 						mShapeInstance->setPos( st.thread, st.position );
 					}
 
@@ -2467,10 +2467,10 @@ bool ShapeBase::setThreadDir(U32 slot,bool forward)
 	Thread& st = mScriptThread[slot];
 	if (st.sequence != -1)
 	{
-		if ( ( st.timescale >= 0.f ) != forward )
+		if ( ( st.timescale >= 0.0f ) != forward )
 		{
 			setMaskBits(ThreadMaskN << slot);
-			st.timescale *= -1.f ;
+			st.timescale *= -1.0f ;
 			st.atEnd = false;
 			updateThread(st);
 		}
@@ -2514,7 +2514,7 @@ void ShapeBase::advanceThreads(F32 dt)
       Thread& st = mScriptThread[i];
       if (st.thread) {
          if (!mShapeInstance->getShape()->sequences[st.sequence].isCyclic() && !st.atEnd &&
-			 ( ( st.timescale > 0.f )? mShapeInstance->getPos(st.thread) >= 1.0:
+			 ( ( st.timescale > 0.0f )? mShapeInstance->getPos(st.thread) >= 1.0:
               mShapeInstance->getPos(st.thread) <= 0)) {
             st.atEnd = true;
             updateThread(st);
@@ -3107,7 +3107,7 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       return retMask;
 
    if (stream->writeFlag(mask & DamageMask)) {
-      stream->writeFloat(mClampF(mDamage / mDataBlock->maxDamage, 0.f, 1.f), DamageLevelBits);
+      stream->writeFloat(mClampF(mDamage / mDataBlock->maxDamage, 0.0f, 1.0f), DamageLevelBits);
       stream->writeInt(mDamageState,NumDamageStateBits);
       stream->writeNormalVector( damageDir, 8 );
    }
@@ -3222,7 +3222,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
       return;
 
    if (stream->readFlag()) {
-      mDamage = mClampF(stream->readFloat(DamageLevelBits) * mDataBlock->maxDamage, 0.f, mDataBlock->maxDamage);
+      mDamage = mClampF(stream->readFloat(DamageLevelBits) * mDataBlock->maxDamage, 0.0f, mDataBlock->maxDamage);
       DamageState prevState = mDamageState;
       mDamageState = DamageState(stream->readInt(NumDamageStateBits));
       stream->readNormalVector( &damageDir, 8 );

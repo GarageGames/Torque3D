@@ -33,18 +33,18 @@
 namespace {
    F32 round_local(F32 val)
    {
-      if(val >= 0.f)
+      if(val >= 0.0f)
       {
          F32 floor = mFloor(val);
          if((val - floor) >= 0.5f)
-            return(floor + 1.f);
+            return(floor + 1.0f);
          return(floor);
       }
       else
       {
          F32 ceil = mCeil(val);
          if((val - ceil) <= -0.5f)
-            return(ceil - 1.f);
+            return(ceil - 1.0f);
          return(ceil);
       }
    }
@@ -642,8 +642,8 @@ void GuiMissionAreaCtrl::onRender(Point2I offset, const RectI & updateRect)
       GameProcessCameraQuery(&camera);
 
       // farplane too far, 90' looks wrong...
-      camera.fov = mDegToRad(60.f);
-      camera.farPlane = 500.f;
+      camera.fov = mDegToRad(60.0f);
+      camera.farPlane = 500.0f;
 
       //
       F32 rot = camera.fov / 2;

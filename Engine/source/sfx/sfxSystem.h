@@ -345,11 +345,11 @@ class SFXSystem
       SFXSource* playOnce( SFXTrack* track, 
                            const MatrixF* transform = NULL,
                            const VectorF* velocity = NULL,
-                           F32 fadeInTime = -1.f );
+                           F32 fadeInTime = -1.0f );
       SFXSource* playOnce( SFXProfile* profile,
                            const MatrixF* transform = NULL,
                            const VectorF* velocity = NULL,
-                           F32 fadeInTime = -1.f )
+                           F32 fadeInTime = -1.0f )
       { // Avoids having to require inclusion of sfxProfile.h
          return playOnce( ( SFXTrack* ) profile, transform, velocity, fadeInTime );
       }

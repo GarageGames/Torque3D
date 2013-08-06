@@ -74,18 +74,18 @@ class BoxBase
       /// to the octant that @a p points to.
       static Points getPointIndexFromOctant( const Point3F& p )
       {
-         if( p.x > 0.f ) // Right
+         if( p.x > 0.0f ) // Right
          {
-            if( p.y > 0.f ) // Far
+            if( p.y > 0.0f ) // Far
             {
-               if( p.z > 0.f ) // Top
+               if( p.z > 0.0f ) // Top
                   return FarTopRight;
                else // Bottom
                   return FarBottomRight;
             }
             else // Near
             {
-               if( p.z > 0.f ) // Top
+               if( p.z > 0.0f ) // Top
                   return NearTopRight;
                else // Bottom
                   return NearBottomRight;
@@ -93,16 +93,16 @@ class BoxBase
          }
          else // Left
          {
-            if( p.y > 0.f ) // Far
+            if( p.y > 0.0f ) // Far
             {
-               if( p.z > 0.f ) // Top
+               if( p.z > 0.0f ) // Top
                   return FarTopLeft;
                else // Bottom
                   return FarBottomLeft;
             }
             else // Near
             {
-               if( p.z > 0.f ) // Top
+               if( p.z > 0.0f ) // Top
                   return NearTopLeft;
                else // Bottom
                   return NearBottomLeft;

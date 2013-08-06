@@ -403,8 +403,8 @@ public:
    virtual void setControlObject( GameBase * ) { }
    /// @}
 
-   virtual F32 getDefaultCameraFov() { return 90.f; }
-   virtual F32 getCameraFov() { return 90.f; }
+   virtual F32 getDefaultCameraFov() { return 90.0f; }
+   virtual F32 getCameraFov() { return 90.0f; }
    virtual void setCameraFov( F32 fov )   { }
    virtual bool isValidCameraFov( F32 fov ) { return true; }
    virtual bool useObjsEyePoint() const { return false; }

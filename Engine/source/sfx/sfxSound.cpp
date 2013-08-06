@@ -238,7 +238,7 @@ bool SFXSound::_allocVoice( SFXDevice* device )
    mVoice->setVolume( mPreAttenuatedVolume );
    mVoice->setPitch( mEffectivePitch );
    mVoice->setPriority( mEffectivePriority );
-   if( mDescription->mRolloffFactor != -1.f )
+   if( mDescription->mRolloffFactor != -1.0f )
       mVoice->setRolloffFactor( mDescription->mRolloffFactor );
       
    // Set 3D parameters.
@@ -302,7 +302,7 @@ void SFXSound::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent eve
          switch( parameter->getChannel() )
          {
             case SFXChannelCursor:
-               setPosition( parameter->getValue() * 1000.f );
+               setPosition( parameter->getValue() * 1000.0f );
                break;
                               
             default:
@@ -598,14 +598,14 @@ SFXProfile* SFXSound::getProfile() const
 
 F32 SFXSound::getElapsedPlayTimeCurrentCycle() const
 {
-   return F32( getPosition() ) / 1000.f;
+   return F32( getPosition() ) / 1000.0f;
 }
 
 //-----------------------------------------------------------------------------
 
 F32 SFXSound::getTotalPlayTime() const
 {
-   return F32( mDuration ) / 1000.f;
+   return F32( mDuration ) / 1000.0f;
 }
 
 //-----------------------------------------------------------------------------

@@ -278,7 +278,7 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
          // Cast a ray to do some AO-style shadowing.
          F32 &shadow = vert->depthData.y;
 
-         if(gClientContainer.castRay(worldPoint, worldPoint + sunVector * 9000.f, 
+         if(gClientContainer.castRay(worldPoint, worldPoint + sunVector * 9000.0f, 
             //StaticObjectType | 
             //InteriorObjectType | 
             //ShapeBaseObjectType | 
@@ -288,11 +288,11 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
             TerrainObjectType
             , &rInfo))
          {
-            shadow = 0.f;
+            shadow = 0.0f;
          }
          else
          {
-            shadow = 1.f;
+            shadow = 1.0f;
          }
          */
       }

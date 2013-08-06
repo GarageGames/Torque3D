@@ -1647,7 +1647,7 @@ U32 Vehicle::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    }
 
    
-   stream->writeFloat(mClampF(getEnergyValue(), 0.f, 1.f), 8);
+   stream->writeFloat(mClampF(getEnergyValue(), 0.0f, 1.0f), 8);
 
    return retMask;
 }

@@ -1076,7 +1076,7 @@ void PostEffect::process(  const SceneRenderState *state,
    }
 
    if ( clearTarget )
-      GFX->clear( GFXClearTarget, mTargetClearColor, 1.f, 0 );
+      GFX->clear( GFXClearTarget, mTargetClearColor, 1.0f, 0 );
 
    // Setup the shader and constants.
    if ( mShader )

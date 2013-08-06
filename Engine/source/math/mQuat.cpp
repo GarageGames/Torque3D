@@ -322,7 +322,7 @@ QuatF & QuatF::shortestArc( const VectorF &a, const VectorF &b )
    x = c.x / s;
    y = c.y / s;
    z = c.z / s;
-   w = s / 2.f; 
+   w = s / 2.0f; 
 
    return *this;
 }

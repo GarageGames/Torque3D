@@ -263,7 +263,7 @@ void WindowInputGenerator::handleCharInput( WindowId did, U32 modifier, U16 key 
    generateInputEvent(event);
 
    event.action = SI_BREAK;
-   event.fValue = 0.f;
+   event.fValue = 0.0f;
    generateInputEvent(event);
 }
 
@@ -285,17 +285,17 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
    {
    case IA_MAKE:
       event.action = SI_MAKE;
-      event.fValue = 1.f;
+      event.fValue = 1.0f;
       break;
 
    case IA_REPEAT:
       event.action = SI_REPEAT;
-      event.fValue = 1.f;
+      event.fValue = 1.0f;
       break;
 
    case IA_BREAK:
       event.action = SI_BREAK;
-      event.fValue = 0.f;
+      event.fValue = 0.0f;
       break;
 
       // If we encounter an unknown don't submit the event.

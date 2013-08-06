@@ -92,10 +92,10 @@ namespace {
 
    const  U32 MaxZoomSpeed             = 2000;     ///< max number of ms to reach target FOV
 
-   static F32 sConsoleCameraFov        = 90.f;     ///< updated to camera FOV each frame
-   static F32 sDefaultFov              = 90.f;     ///< normal FOV
-   static F32 sCameraFov               = 90.f;     ///< current camera FOV
-   static F32 sTargetFov               = 90.f;     ///< the desired FOV
+   static F32 sConsoleCameraFov        = 90.0f;     ///< updated to camera FOV each frame
+   static F32 sDefaultFov              = 90.0f;     ///< normal FOV
+   static F32 sCameraFov               = 90.0f;     ///< current camera FOV
+   static F32 sTargetFov               = 90.0f;     ///< the desired FOV
    static F32 sLastCameraUpdateTime    = 0;        ///< last time camera was updated
    static S32 sZoomSpeed               = 500;      ///< ms per 90deg fov change
 
@@ -237,12 +237,12 @@ void GameUpdateCameraFov()
       F32 delta = time - sLastCameraUpdateTime;
 
       // snap zoom?
-      if((sZoomSpeed == 0) || (delta <= 0.f))
+      if((sZoomSpeed == 0) || (delta <= 0.0f))
          sCameraFov = sTargetFov;
       else
       {
          // gZoomSpeed is time in ms to zoom 90deg
-         F32 step = 90.f * (delta / F32(sZoomSpeed));
+         F32 step = 90.0f * (delta / F32(sZoomSpeed));
 
          if(sCameraFov > sTargetFov)
          {

@@ -129,7 +129,7 @@ namespace {
          }
 
       AssertFatal(index >= 0, "Failed to get best normal");
-      if(max > 0.f)
+      if(max > 0.0f)
          index++;
 
       return(index);
@@ -231,13 +231,13 @@ namespace {
    //
    F32 snapFloat(F32 val, F32 snap)
    {
-      if(snap == 0.f)
+      if(snap == 0.0f)
          return(val);
 
       F32 a = mFmod(val, snap);
 
       if(mFabs(a) > (snap / 2))
-         val < 0.f ? val -= snap : val += snap;
+         val < 0.0f ? val -= snap : val += snap;
 
       return(val - a);
    }
@@ -250,14 +250,14 @@ namespace {
       EulerF r;
       r.x = mAsin(mat[MatrixF::idx(2,1)]);
 
-      if(mCos(r.x) != 0.f)
+      if(mCos(r.x) != 0.0f)
       {
          r.y = mAtan2(-mat[MatrixF::idx(2,0)], mat[MatrixF::idx(2,2)]);
          r.z = mAtan2(-mat[MatrixF::idx(0,1)], mat[MatrixF::idx(1,1)]);
       }
       else
       {
-         r.y = 0.f;
+         r.y = 0.0f;
          r.z = mAtan2(mat[MatrixF::idx(1,0)], mat[MatrixF::idx(0,0)]);
       }
 
@@ -643,10 +643,10 @@ void WorldEditor::dropSelection(Selection*  sel)
             Point3F offset = -boxCenter;
             offset.z += bounds.len_z() * 0.5f;
 
-            sel->offset( offset, mGridSnap ? mGridPlaneSize : 0.f );
+            sel->offset( offset, mGridSnap ? mGridPlaneSize : 0.0f );
          }
          else
-            sel->offset( Point3F( -centroid ), mGridSnap ? mGridPlaneSize : 0.f );
+            sel->offset( Point3F( -centroid ), mGridSnap ? mGridPlaneSize : 0.0f );
 
          break;
       }
@@ -657,7 +657,7 @@ void WorldEditor::dropSelection(Selection*  sel)
          if(mDropAtBounds && !sel->containsGlobalBounds())
             center = sel->getBoxBottomCenter();
 
-         sel->offset( Point3F( smCamPos - center ), mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset( Point3F( smCamPos - center ), mGridSnap ? mGridPlaneSize : 0.0f );
          sel->orient(smCamMatrix, center);
          break;
       }
@@ -668,7 +668,7 @@ void WorldEditor::dropSelection(Selection*  sel)
          if(mDropAtBounds && !sel->containsGlobalBounds())
             sel->getBoxBottomCenter();
 
-         sel->offset( Point3F( smCamPos - center ), mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset( Point3F( smCamPos - center ), mGridSnap ? mGridPlaneSize : 0.0f );
          break;
       }
 
@@ -680,7 +680,7 @@ void WorldEditor::dropSelection(Selection*  sel)
 
          Point3F offset = smCamPos - center;
          offset.z -= mDropBelowCameraOffset;
-         sel->offset( offset, mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset( offset, mGridSnap ? mGridPlaneSize : 0.0f );
          break;
       }
 
@@ -712,7 +712,7 @@ void WorldEditor::dropSelection(Selection*  sel)
          event.vec = wp - smCamPos;
          event.vec.normalizeSafe();
          event.vec *= viewdist;
-         sel->offset( Point3F( event.pos - center ) += event.vec, mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset( Point3F( event.pos - center ) += event.vec, mGridSnap ? mGridPlaneSize : 0.0f );
 
          break;
       }
@@ -746,7 +746,7 @@ void WorldEditor::dropBelowSelection(Selection*  sel, const Point3F & centroid, 
       start = centroid;
 
    Point3F end = start;
-   end.z -= 4000.f;
+   end.z -= 4000.0f;
       
    sel->disableCollision(); // Make sure we don't hit ourselves.
 
@@ -756,7 +756,7 @@ void WorldEditor::dropBelowSelection(Selection*  sel, const Point3F & centroid, 
    sel->enableCollision();
 
    if( hit )
-      sel->offset( ri.point - start, mGridSnap ? mGridPlaneSize : 0.f );
+      sel->offset( ri.point - start, mGridSnap ? mGridPlaneSize : 0.0f );
 }
 
 //------------------------------------------------------------------------------
@@ -783,7 +783,7 @@ void WorldEditor::terrainSnapSelection(Selection* sel, U8 modifier, Point3F gizm
    Point3F start = centroid;
    Point3F end = start;
    start.z -= 2000;
-   end.z += 2000.f;
+   end.z += 2000.0f;
       
    sel->disableCollision(); // Make sure we don't hit ourselves.
 
@@ -800,7 +800,7 @@ void WorldEditor::terrainSnapSelection(Selection* sel, U8 modifier, Point3F gizm
    {
       mStuckToGround = true;
 
-      sel->offset( ri.point - centroid, mGridSnap ? mGridPlaneSize : 0.f );
+      sel->offset( ri.point - centroid, mGridSnap ? mGridPlaneSize : 0.0f );
 
       if(mTerrainSnapAlignment != AlignNone)
       {
@@ -1026,7 +1026,7 @@ void WorldEditor::softSnapSelection(Selection* sel, U8 modifier, Point3F gizmoPo
       if ( minT <= 1.0f )
          foundPoint += ( end - start ) * (0.5f - minT);
 
-      sel->offset( foundPoint - sel->getCentroid(), mGridSnap ? mGridPlaneSize : 0.f );
+      sel->offset( foundPoint - sel->getCentroid(), mGridSnap ? mGridPlaneSize : 0.0f );
    }
 
    mSoftSnapIsStuck = found;
@@ -1611,7 +1611,7 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
          if( dist > mFadeIconsDist )
          {
             F32 iconDist = dist - mFadeIconsDist;
-            iconAlpha = mClampF( 255 - ( 255 * ( iconDist / 10.f ) ), 0.f, 255.f );
+            iconAlpha = mClampF( 255 - ( 255 * ( iconDist / 10.0f ) ), 0.0f, 255.0f );
          }
       }
 
@@ -1804,7 +1804,7 @@ WorldEditor::WorldEditor()
    mGridSnap = false;
    
    mFadeIcons = true;
-   mFadeIconsDist = 8.f;
+   mFadeIconsDist = 8.0f;
 }
 
 WorldEditor::~WorldEditor()
@@ -1944,8 +1944,8 @@ void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
 
       const Box3F& selBounds = getActiveSelectionSet()->getBoxBounds();
       const F32 maxDim = getMax( selBounds.len_x(), getMax( selBounds.len_y(), selBounds.len_z() ) );
-      const F32 size = mCeil( maxDim + 10.f );
-      const F32 spacing = mCeil( size / 20.f );
+      const F32 size = mCeil( maxDim + 10.0f );
+      const F32 spacing = mCeil( size / 20.0f );
 
      if( dynamic_cast< SceneObject* >( ( *mSelected )[0] ))
 	  {
@@ -3040,7 +3040,7 @@ void WorldEditor::transformSelection(bool position, Point3F& p, bool relativePos
    {
       if( relativePos )
       {
-         mSelected->offset( p, mGridSnap ? mGridPlaneSize : 0.f );
+         mSelected->offset( p, mGridSnap ? mGridPlaneSize : 0.0f );
       }
       else
       {
@@ -3763,7 +3763,7 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
    Point3F savedScale = geometryProvider->getScale();
 
    geometryProvider->setTransform( MatrixF::Identity );
-   geometryProvider->setScale( Point3F( 1.f, 1.f, 1.f ) );
+   geometryProvider->setScale( Point3F( 1.0f, 1.0f, 1.0f ) );
 
    // Extract the geometry.  Use the object-space bounding volumes
    // as we have moved the object to the origin for the moment.

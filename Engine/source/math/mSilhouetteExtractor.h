@@ -212,8 +212,8 @@ struct SilhouetteExtractorBaseOrtho : public SilhouetteExtractorBase< Polyhedron
          // to be pointing inwards, this means a reversal of the normal back facing
          // test and we're looking for a normal facing the *same* way as our projection.
 
-         const U32 frontFace = mFaceDotProducts[ face0 ] > 0.f ? face0 : face1;
-         if( mFaceDotProducts[ frontFace ] <= 0.f )
+         const U32 frontFace = mFaceDotProducts[ face0 ] > 0.0f ? face0 : face1;
+         if( mFaceDotProducts[ frontFace ] <= 0.0f )
             return false; // This face or other face is perpendicular to us.
 
          return true;

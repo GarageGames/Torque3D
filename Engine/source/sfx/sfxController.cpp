@@ -303,7 +303,7 @@ void SFXController::_initInsn()
    {
       case OP_Delay:
          mDelayEndTime = Platform::getVirtualMilliseconds()
-            + U32( insn.mArg.mDelayTime.getValue( 0, 0.0f ) * 1000.f );
+            + U32( insn.mArg.mDelayTime.getValue( 0, 0.0f ) * 1000.0f );
          break;
          
       default:
@@ -438,7 +438,7 @@ bool SFXController::_execInsn()
                   //    just cuts the current playback short
 
                   if( replayMode == SFXPlayList::REPLAY_RestartPlaying )
-                     src.mPtr->stop( 0.f );
+                     src.mPtr->stop( 0.0f );
                      
                   src.mPtr->play();
                   
@@ -485,9 +485,9 @@ bool SFXController::_execInsn()
                F32 fadeOutTime = -1;
                
                if( playList->getSlots().mFadeTimeIn.mValue[ insn.mSlotIndex ] != -1 )
-                  fadeInTime = playList->getSlots().mFadeTimeIn.getValue( insn.mSlotIndex, 0.f );
+                  fadeInTime = playList->getSlots().mFadeTimeIn.getValue( insn.mSlotIndex, 0.0f );
                if( playList->getSlots().mFadeTimeOut.mValue[ insn.mSlotIndex ] != -1 )
-                  fadeOutTime = playList->getSlots().mFadeTimeOut.getValue( insn.mSlotIndex, 0.f );
+                  fadeOutTime = playList->getSlots().mFadeTimeOut.getValue( insn.mSlotIndex, 0.0f );
                   
                if( fadeInTime != -1 || fadeOutTime != -1 )
                   source->setFadeTimes( fadeInTime, fadeOutTime );
@@ -496,7 +496,7 @@ bool SFXController::_execInsn()
                
                src.mPtr = source;
                src.mSlotIndex = insn.mSlotIndex;
-               src.mVolumeScale = playList->getSlots().mVolumeScale.getValue( insn.mSlotIndex, 0.f, 1.f );
+               src.mVolumeScale = playList->getSlots().mVolumeScale.getValue( insn.mSlotIndex, 0.0f, 1.0f );
                src.mPitchScale = playList->getSlots().mPitchScale.getValue( insn.mSlotIndex );
                src.mFadeInTime = fadeInTime;
                src.mFadeOutTime = fadeOutTime;
@@ -516,11 +516,11 @@ bool SFXController::_execInsn()
                const SFXPlayList::VariantFloat& minDistance = playList->getSlots().mMinDistance;
                const SFXPlayList::VariantFloat& maxDistance = playList->getSlots().mMaxDistance;
                
-               if(    minDistance.mValue[ insn.mSlotIndex ] >= 0.f
-                   && maxDistance.mValue[ insn.mSlotIndex ] >= 0.f )
+               if(    minDistance.mValue[ insn.mSlotIndex ] >= 0.0f
+                   && maxDistance.mValue[ insn.mSlotIndex ] >= 0.0f )
                   source->setMinMaxDistance(
-                     minDistance.getValue( insn.mSlotIndex, 0.f ),
-                     maxDistance.getValue( insn.mSlotIndex, 0.f )
+                     minDistance.getValue( insn.mSlotIndex, 0.0f ),
+                     maxDistance.getValue( insn.mSlotIndex, 0.0f )
                   );
                   
                // Start the source.
@@ -691,7 +691,7 @@ void SFXController::_play()
    if( mStatus == SFXStatusPaused )
       for( U32 i = 0; i < mSources.size(); ++ i )
          if( mSources[ i ].mPtr != NULL )
-            mSources[ i ].mPtr->play( 0.f ); // We want our fade values to take effect.
+            mSources[ i ].mPtr->play( 0.0f ); // We want our fade values to take effect.
          else
          {
             mSources.erase( i );
@@ -709,7 +709,7 @@ void SFXController::_pause()
    
    for( U32 i = 0; i < mSources.size(); ++ i )
       if( mSources[ i ].mPtr != NULL )
-         mSources[ i ].mPtr->pause( 0.f ); // We want our fade values to take effect.
+         mSources[ i ].mPtr->pause( 0.0f ); // We want our fade values to take effect.
       else
       {
          mSources.erase( i );
@@ -728,7 +728,7 @@ void SFXController::_stop()
    while( !mSources.empty() )
    {
       if( mSources.last().mPtr != NULL )
-         mSources.last().mPtr->stop( 0.f ); // We want our fade values to take effect.
+         mSources.last().mPtr->stop( 0.0f ); // We want our fade values to take effect.
       mSources.decrement();
    }
    

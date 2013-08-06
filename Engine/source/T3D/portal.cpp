@@ -627,7 +627,7 @@ void Portal::_updateGeometry()
 
       // Slice the polyhedron along the same plane in object space.
 
-      const PlaneF slicePlane = PlaneF( Point3F::Zero, Point3F( 0.f, 1.f, 0.f ) );
+      const PlaneF slicePlane = PlaneF( Point3F::Zero, Point3F( 0.0f, 1.0f, 0.0f ) );
 
       mPortalPolygonWS.setSize( mPolyhedron.getNumEdges() );
       U32 numPoints = mPolyhedron.constructIntersection( slicePlane, mPortalPolygonWS.address(), mPortalPolygonWS.size() );

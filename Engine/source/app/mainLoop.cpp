@@ -558,7 +558,7 @@ bool StandardMainLoop::doMainLoop()
    if( gStartupTimer )
    {
       Con::printf( "Started up in %.2f seconds...",
-         F32( gStartupTimer->getElapsedMs() ) / 1000.f );
+         F32( gStartupTimer->getElapsedMs() ) / 1000.0f );
       SAFE_DELETE( gStartupTimer );
    }
    #endif

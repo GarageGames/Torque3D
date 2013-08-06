@@ -294,8 +294,8 @@ void fxShapeReplicator::CreateShapes(void)
 
          // Initialise RayCast Search Start/End Positions.
          ShapeStart = ShapeEnd = ShapePosition;
-         ShapeStart.z = 2000.f;
-         ShapeEnd.z= -2000.f;
+         ShapeStart.z = 2000.0f;
+         ShapeEnd.z= -2000.0f;
 
          // Is this the Server?
          if (isServerObject())

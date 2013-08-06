@@ -4765,7 +4765,7 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
          mFalling = false;
 
          // Back off...
-         if ( velLen > 0.f ) {
+         if ( velLen > 0.0f ) {
             F32 newT = getMin(0.01f / velLen, dt);
             start -= mVelocity * newT;
             totalMotion -= velLen * newT;

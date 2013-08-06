@@ -183,9 +183,9 @@ ShapeBaseImageData::ShapeBaseImageData()
    cloakable = true;
 
    lightType = ShapeBaseImageData::NoLight;
-   lightColor.set(1.f,1.f,1.f,1.f);
+   lightColor.set(1.0f,1.0f,1.0f,1.0f);
    lightDuration = 1000;
-   lightRadius = 10.f;
+   lightRadius = 10.0f;
    lightBrightness = 1.0f;
 
    shapeName = "";

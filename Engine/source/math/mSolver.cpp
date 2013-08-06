@@ -35,10 +35,10 @@ static inline void swap(F32 & a, F32 & b)
 
 static inline F32 mCbrt(F32 val)
 {
-   if(val < 0.f)
-      return(-mPow(-val, F32(1.f/3.f)));
+   if(val < 0.0f)
+      return(-mPow(-val, F32(1.0f/3.0f)));
    else
-      return(mPow(val, F32(1.f/3.f)));
+      return(mPow(val, F32(1.0f/3.0f)));
 }
 
 static inline U32 mSolveLinear(F32 a, F32 b, F32 * x)
@@ -57,7 +57,7 @@ static U32 mSolveQuadratic_c(F32 a, F32 b, F32 c, F32 * x)
       return(mSolveLinear(b, c, x));
 
    // get the descriminant:   (b^2 - 4ac)
-   F32 desc = (b * b) - (4.f * a * c);
+   F32 desc = (b * b) - (4.0f * a * c);
 
    // solutions:
    // desc < 0:   two imaginary solutions
@@ -65,13 +65,13 @@ static U32 mSolveQuadratic_c(F32 a, F32 b, F32 c, F32 * x)
    // desc = 0:   one real solution (b / 2a)
    if(mIsZero(desc))
    {
-      x[0] = b / (2.f * a);
+      x[0] = b / (2.0f * a);
       return(1);
    }
-   else if(desc > 0.f)
+   else if(desc > 0.0f)
    {
       F32 sqrdesc = mSqrt(desc);
-      F32 den = (2.f * a);
+      F32 den = (2.0f * a);
       x[0] = (-b + sqrdesc) / den;
       x[1] = (-b - sqrdesc) / den;
 
@@ -101,8 +101,8 @@ U32 mSolveCubic_c(F32 a, F32 b, F32 c, F32 d, F32 * x)
    F32 A2 = A * A;
    F32 A3 = A2 * A;
 
-   F32 p = (1.f/3.f) * (((-1.f/3.f) * A2) + B);
-   F32 q = (1.f/2.f) * (((2.f/27.f) * A3) - ((1.f/3.f) * A * B) + C);
+   F32 p = (1.0f/3.0f) * (((-1.0f/3.0f) * A2) + B);
+   F32 q = (1.0f/2.0f) * (((2.0f/27.0f) * A3) - ((1.0f/3.0f) * A * B) + C);
 
    // use Cardano's fomula to solve the depressed cubic
    F32 p3 = p * p * p;
@@ -116,25 +116,25 @@ U32 mSolveCubic_c(F32 a, F32 b, F32 c, F32 d, F32 * x)
    {
       if(mIsZero(q)) // 1 triple solution
       {
-         x[0] = 0.f;
+         x[0] = 0.0f;
          num = 1;
       }
       else // 1 single and 1 double
       {
          F32 u = mCbrt(-q);
-         x[0] = 2.f * u;
+         x[0] = 2.0f * u;
          x[1] = -u;
          num = 2;
       }
    }
-   else if(D < 0.f)        // 3 solutions: casus irreducibilis
+   else if(D < 0.0f)        // 3 solutions: casus irreducibilis
    {
-      F32 phi = (1.f/3.f) * mAcos(-q / mSqrt(-p3));
-      F32 t = 2.f * mSqrt(-p);
+      F32 phi = (1.0f/3.0f) * mAcos(-q / mSqrt(-p3));
+      F32 t = 2.0f * mSqrt(-p);
 
       x[0] = t * mCos(phi);
-      x[1] = -t * mCos(phi + (M_PI / 3.f));
-      x[2] = -t * mCos(phi - (M_PI / 3.f));
+      x[1] = -t * mCos(phi + (M_PI / 3.0f));
+      x[2] = -t * mCos(phi - (M_PI / 3.0f));
       num = 3;
    }
    else                    // 1 solution
@@ -148,7 +148,7 @@ U32 mSolveCubic_c(F32 a, F32 b, F32 c, F32 d, F32 * x)
    }
 
    // resubstitute
-   F32 sub = (1.f/3.f) * A;
+   F32 sub = (1.0f/3.0f) * A;
    for(U32 i = 0; i < num; i++)
       x[i] -= sub;
 
@@ -180,25 +180,25 @@ U32 mSolveQuartic_c(F32 a, F32 b, F32 c, F32 d, F32 e, F32 * x)
    F32 A3 = A2 * A;
    F32 A4 = A2 * A2;
 
-   F32 p = ((-3.f/8.f) * A2) + B;
-   F32 q = ((1.f/8.f) * A3) - ((1.f/2.f) * A * B) + C;
-   F32 r = ((-3.f/256.f) * A4) + ((1.f/16.f) * A2 * B) - ((1.f/4.f) * A * C) + D;
+   F32 p = ((-3.0f/8.0f) * A2) + B;
+   F32 q = ((1.0f/8.0f) * A3) - ((1.0f/2.0f) * A * B) + C;
+   F32 r = ((-3.0f/256.0f) * A4) + ((1.0f/16.0f) * A2 * B) - ((1.0f/4.0f) * A * C) + D;
 
    U32 num = 0;
    if(mIsZero(r)) // no absolute term: y(y^3 + py + q) = 0
    {
-      num = mSolveCubic(1.f, 0.f, p, q, x);
-      x[num++] = 0.f;
+      num = mSolveCubic(1.0f, 0.0f, p, q, x);
+      x[num++] = 0.0f;
    }
    else
    {
       // solve the resolvent cubic
       F32 q2 = q * q;
 
-      a = 1.f;
-      b = (-1.f/2.f) * p;
+      a = 1.0f;
+      b = (-1.0f/2.0f) * p;
       c = -r;
-      d = ((1.f/2.f) * r * p) - ((1.f/8.f) * q2);
+      d = ((1.0f/2.0f) * r * p) - ((1.0f/8.0f) * q2);
 
       mSolveCubic(a, b, c, d, x);
 
@@ -206,36 +206,36 @@ U32 mSolveQuartic_c(F32 a, F32 b, F32 c, F32 d, F32 e, F32 * x)
 
       // build 2 quadratic equations from the one solution
       F32 u = (z * z) - r;
-      F32 v = (2.f * z) - p;
+      F32 v = (2.0f * z) - p;
 
       if(mIsZero(u))
-         u = 0.f;
-      else if(u > 0.f)
+         u = 0.0f;
+      else if(u > 0.0f)
          u = mSqrt(u);
       else
          return(0);
 
       if(mIsZero(v))
-         v = 0.f;
-      else if(v > 0.f)
+         v = 0.0f;
+      else if(v > 0.0f)
          v = mSqrt(v);
       else
          return(0);
 
       // solve the two quadratics
-      a = 1.f;
+      a = 1.0f;
       b = v;
       c = z - u;
       num = mSolveQuadratic(a, b, c, x);
 
-      a = 1.f;
+      a = 1.0f;
       b = -v;
       c = z + u;
       num += mSolveQuadratic(a, b, c, x + num);
    }
 
    // resubstitute
-   F32 sub = (1.f/4.f) * A;
+   F32 sub = (1.0f/4.0f) * A;
    for(U32 i = 0; i < num; i++)
       x[i] -= sub;
 

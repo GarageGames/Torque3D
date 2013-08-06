@@ -1342,10 +1342,10 @@ bool reduceFrustum( const Frustum& frustum, const RectI& viewport, const RectF& 
    Point2F normalizedMin;
    Point2F normalizedMax;
 
-   normalizedMin.x = ( ( clampedMin.x / viewport.extent.x ) * frustumXExtent ) - ( frustumXExtent / 2.f );
-   normalizedMin.y = ( ( clampedMin.y / viewport.extent.y ) * frustumYExtent ) - ( frustumYExtent / 2.f );
-   normalizedMax.x = ( ( clampedMax.x / viewport.extent.x ) * frustumXExtent ) - ( frustumXExtent / 2.f );
-   normalizedMax.y = ( ( clampedMax.y / viewport.extent.y ) * frustumYExtent ) - ( frustumYExtent / 2.f );
+   normalizedMin.x = ( ( clampedMin.x / viewport.extent.x ) * frustumXExtent ) - ( frustumXExtent / 2.0f );
+   normalizedMin.y = ( ( clampedMin.y / viewport.extent.y ) * frustumYExtent ) - ( frustumYExtent / 2.0f );
+   normalizedMax.x = ( ( clampedMax.x / viewport.extent.x ) * frustumXExtent ) - ( frustumXExtent / 2.0f );
+   normalizedMax.y = ( ( clampedMax.y / viewport.extent.y ) * frustumYExtent ) - ( frustumYExtent / 2.0f );
 
    // Make sure the generated frustum metrics are somewhat sane.
 
@@ -1614,9 +1614,9 @@ bool isConvexPolygon( const Point3F* vertices, U32 numVertices )
 
       const F32 crossProductLength = mCross( b - a, c - b ).len();
       
-      if( crossProductLength < 0.f )
+      if( crossProductLength < 0.0f )
          numNegative ++;
-      else if( crossProductLength > 0.f )
+      else if( crossProductLength > 0.0f )
          numPositive ++;
 
       if( numNegative && numPositive )

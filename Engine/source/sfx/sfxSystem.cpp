@@ -624,7 +624,7 @@ SFXSound* SFXSystem::createSourceFromStream( const ThreadSafeRef< SFXStream >& s
 
 void SFXSystem::stopAndDeleteSource( SFXSource* source )
 {
-   if( source->getFadeOutTime() > 0.f )
+   if( source->getFadeOutTime() > 0.0f )
    {
       // Fade-out.  Stop and put on play-once list to
       // ensure deletion when the source actually stops.
@@ -1564,7 +1564,7 @@ ConsoleFunction( sfxPlay, S32, 2, 5, "( SFXSource source | ( SFXTrack track [, f
       return 0;
    }
 
-   Point3F pos(0.f, 0.f, 0.f);
+   Point3F pos(0.0f, 0.0f, 0.0f);
    if ( argc == 3 )
       dSscanf( argv[2], "%g %g %g", &pos.x, &pos.y, &pos.z );
    else if(argc == 5)
@@ -1604,7 +1604,7 @@ static ConsoleDocFragment _sPlayOnce2(
    "@return A newly created temporary source in \"Playing\" state or 0 if the operation failed.\n\n"
    "@tsexample\n"
       "// Immediately start playing the given track.  Fade it in to full volume over 5 seconds.\n"
-      "sfxPlayOnce( MusicTrack, 0, 0, 0, 5.f );\n"
+      "sfxPlayOnce( MusicTrack, 0, 0, 0, 5.0f );\n"
    "@endtsexample\n\n"
    "@ref SFXSource_playonce\n\n"
    "@ingroup SFX",
@@ -1677,7 +1677,7 @@ ConsoleFunction( sfxPlayOnce, S32, 2, 6,
       {
          MatrixF transform;
          transform.set( EulerF( 0, 0, 0 ), Point3F( dAtof( argv[ 2 ] ), dAtof( argv[ 3 ] ),dAtof( argv[ 4 ] ) ) );
-         F32 fadeInTime = -1.f;
+         F32 fadeInTime = -1.0f;
          if( argc > 5 )
             fadeInTime = dAtof( argv[ 5 ] );
          source = SFX->playOnce( track, &transform, NULL, fadeInTime );
@@ -1699,7 +1699,7 @@ ConsoleFunction( sfxPlayOnce, S32, 2, 6,
          {
             MatrixF transform;
             transform.set(EulerF(0,0,0), Point3F( dAtof(argv[3]),dAtof(argv[4]),dAtof(argv[5]) ));
-            F32 fadeInTime = -1.f;
+            F32 fadeInTime = -1.0f;
             if( argc > 6 )
                fadeInTime = dAtof( argv[ 6 ] );
             source = SFX->playOnce( tempProfile, &transform, NULL, fadeInTime );

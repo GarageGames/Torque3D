@@ -102,7 +102,7 @@ void SoftSelectAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
    if(selChanged)
    {
       F32 radius = mTerrainEditor->mSoftSelectRadius;
-      if(radius == 0.f)
+      if(radius == 0.0f)
          return;
 
       S32 squareSize = terrBlock->getSquareSize();
@@ -525,10 +525,10 @@ void BrushAdjustHeightAction::process(Selection * sel, const Gui3DMouseEvent & e
          (*sel)[i].mHeight = (*sel)[i].mStartHeight + diff * (*sel)[i].mWeight;
 
          // clamp it
-         if((*sel)[i].mHeight < 0.f)
-            (*sel)[i].mHeight = 0.f;
-         if((*sel)[i].mHeight > 2047.f)
-            (*sel)[i].mHeight = 2047.f;
+         if((*sel)[i].mHeight < 0.0f)
+            (*sel)[i].mHeight = 0.0f;
+         if((*sel)[i].mHeight > 2047.0f)
+            (*sel)[i].mHeight = 2047.0f;
 
          mTerrainEditor->setGridInfoHeight((*sel)[i]);
       }
@@ -564,7 +564,7 @@ void FlattenHeightAction::process(Selection * sel, const Gui3DMouseEvent &, bool
 
    if(selChanged)
    {
-      F32 average = 0.f;
+      F32 average = 0.0f;
 
       // get the average height
       U32 cPrimary = 0;
@@ -606,7 +606,7 @@ void SmoothHeightAction::process(Selection * sel, const Gui3DMouseEvent &, bool 
 
    if(selChanged)
    {
-      F32 avgHeight = 0.f;
+      F32 avgHeight = 0.0f;
       for(U32 k = 0; k < sel->size(); k++)
       {
          mTerrainEditor->getUndoSel()->add((*sel)[k]);
@@ -616,10 +616,10 @@ void SmoothHeightAction::process(Selection * sel, const Gui3DMouseEvent &, bool 
       avgHeight /= sel->size();
 
       // clamp the terrain smooth factor...
-      if(mTerrainEditor->mSmoothFactor < 0.f)
-         mTerrainEditor->mSmoothFactor = 0.f;
-      if(mTerrainEditor->mSmoothFactor > 1.f)
-         mTerrainEditor->mSmoothFactor = 1.f;
+      if(mTerrainEditor->mSmoothFactor < 0.0f)
+         mTerrainEditor->mSmoothFactor = 0.0f;
+      if(mTerrainEditor->mSmoothFactor > 1.0f)
+         mTerrainEditor->mSmoothFactor = 1.0f;
 
       // linear
       for(U32 i = 0; i < sel->size(); i++)
@@ -640,10 +640,10 @@ void SmoothSlopeAction::process(Selection * sel, const Gui3DMouseEvent &, bool s
    {  
       // Perform simple 2d linear regression on x&z and y&z:  
       // b = (Avg(xz) - Avg(x)Avg(z))/(Avg(x^2) - Avg(x)^2)  
-      Point2F prod(0.f, 0.f);   // mean of product for covar  
-      Point2F avgSqr(0.f, 0.f); // mean sqr of x, y for var  
-      Point2F avgPos(0.f, 0.f);  
-      F32 avgHeight = 0.f;  
+      Point2F prod(0.0f, 0.0f);   // mean of product for covar  
+      Point2F avgSqr(0.0f, 0.0f); // mean sqr of x, y for var  
+      Point2F avgPos(0.0f, 0.0f);  
+      F32 avgHeight = 0.0f;  
       F32 z;  
       Point2F pos;  
       for(U32 k = 0; k < sel->size(); k++)  

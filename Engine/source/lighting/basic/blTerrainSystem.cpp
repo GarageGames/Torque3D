@@ -368,7 +368,7 @@ void blTerrainProxy::light(LightInfo * light)
 
    delete mShadowVolume;
 
-   Con::printf("    = terrain lit in %3.3f seconds", (Platform::getRealMilliseconds()-time)/1000.f);
+   Con::printf("    = terrain lit in %3.3f seconds", (Platform::getRealMilliseconds()-time)/1000.0f);
 }
 
 //------------------------------------------------------------------------------
@@ -569,7 +569,7 @@ void blTerrainProxy::lightVector(LightInfo * light)
          Point3F lightPos = light->getPosition();
          if(light->getType() == LightInfo::Vector)
          {
-            lightPos = 1000.f * lightDir;            
+            lightPos = 1000.0f * lightDir;            
             lightPos = pixelPos3F + lightPos;
          }
 

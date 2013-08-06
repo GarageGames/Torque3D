@@ -90,7 +90,7 @@ WheeledVehicleTire::WheeledVehicleTire()
    longitudinalForce = 10;
    longitudinalDamping = 1;
    longitudinalRelaxation = 1;
-   mass = 1.f;
+   mass = 1.0f;
 }
 
 bool WheeledVehicleTire::preload(bool server, String &errorStr)

@@ -384,10 +384,10 @@ SpawnSphere::SpawnSphere()
    mAutoSpawn = false;
    mSpawnTransform = false;
 
-   mRadius = 100.f;
-   mSphereWeight = 100.f;
-   mIndoorWeight = 100.f;
-   mOutdoorWeight = 100.f;
+   mRadius = 100.0f;
+   mSphereWeight = 100.0f;
+   mIndoorWeight = 100.0f;
+   mOutdoorWeight = 100.0f;
 }
 
 IMPLEMENT_CALLBACK( SpawnSphere, onAdd, void, ( U32 objectId ), ( objectId ),
@@ -486,7 +486,7 @@ void SpawnSphere::processTick( const Move *move )
    if ( isServerObject() && isMounted() )
    {
       MatrixF mat( true );
-      mMount.object->getRenderMountTransform( 0.f, mMount.node, mMount.xfm, &mat );
+      mMount.object->getRenderMountTransform( 0.0f, mMount.node, mMount.xfm, &mat );
       setTransform( mat );
    }
 }
@@ -496,7 +496,7 @@ void SpawnSphere::advanceTime( F32 timeDelta )
    if ( isMounted() )
    {
       MatrixF mat( true );
-      mMount.object->getRenderMountTransform( 0.f, mMount.node, mMount.xfm, &mat );
+      mMount.object->getRenderMountTransform( 0.0f, mMount.node, mMount.xfm, &mat );
       setTransform( mat );
    }
 }

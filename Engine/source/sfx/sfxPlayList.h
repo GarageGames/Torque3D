@@ -273,12 +273,12 @@ class SFXPlayList : public SFXTrack
             for( U32 i = 0; i < NUM_SLOTS; ++ i )
             {
                mTransitionOut[ i ]        = TRANSITION_Wait;
-               mVolumeScale.mValue[ i ]   = 1.f;
-               mPitchScale.mValue[ i ]    = 1.f;
-               mFadeTimeIn.mValue[ i ]    = -1.f;  // Don't touch by default.
-               mFadeTimeOut.mValue[ i ]   = -1.f;  // Don't touch by default.
-               mMinDistance.mValue[ i ]   = -1.f;  // Don't touch by default.
-               mMaxDistance.mValue[ i ]   = -1.f;  // Don't touch by default.
+               mVolumeScale.mValue[ i ]   = 1.0f;
+               mPitchScale.mValue[ i ]    = 1.0f;
+               mFadeTimeIn.mValue[ i ]    = -1.0f;  // Don't touch by default.
+               mFadeTimeOut.mValue[ i ]   = -1.0f;  // Don't touch by default.
+               mMinDistance.mValue[ i ]   = -1.0f;  // Don't touch by default.
+               mMaxDistance.mValue[ i ]   = -1.0f;  // Don't touch by default.
             }
          }
       };

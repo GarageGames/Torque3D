@@ -203,7 +203,7 @@ GameConnection::GameConnection()
    mCameraPos = 0;
    mCameraSpeed = 10;
 
-   mCameraFov = 90.f;
+   mCameraFov = 90.0f;
    mUpdateCameraFov = false;
 
    mAIControlled = false;

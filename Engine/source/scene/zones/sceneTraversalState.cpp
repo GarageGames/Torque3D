@@ -33,7 +33,7 @@
 
 SceneTraversalState::SceneTraversalState( SceneCullingState* cullingState )
    : mCullingState( cullingState ),
-     mTraversedArea( 0.f )
+     mTraversedArea( 0.0f )
 {
    VECTOR_SET_ASSOCIATION( mZoneStack );
    VECTOR_SET_ASSOCIATION( mCullingVolumeStack );

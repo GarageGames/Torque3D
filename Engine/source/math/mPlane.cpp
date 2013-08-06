@@ -72,7 +72,7 @@ bool PlaneF::clipSegment( const Point3F& start, const Point3F& end, Point3F& out
    // Intersect ray with plane.
 
    F32 dist = intersect( start, end );
-   if( dist == PARALLEL_PLANE || dist < 0.f || dist > 1.f )
+   if( dist == PARALLEL_PLANE || dist < 0.0f || dist > 1.0f )
       return false;
 
    // Compute distance to point on segment.

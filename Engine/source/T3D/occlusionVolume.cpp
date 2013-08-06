@@ -71,7 +71,7 @@ OcclusionVolume::OcclusionVolume()
 
    mObjectFlags.set( VisualOccluderFlag );
    
-   mObjScale.set( 1.f, 1.f, 1.f );
+   mObjScale.set( 1.0f, 1.0f, 1.0f );
    mObjBox.set(
       Point3F( -0.5f, -0.5f, -0.5f ),
       Point3F( 0.5f, 0.5f, 0.5f )

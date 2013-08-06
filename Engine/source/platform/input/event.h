@@ -391,10 +391,10 @@ struct InputEventInfo
    InputEventInfo()
    {
       deviceInst = 0;
-      fValue     = 0.f;
-      fValue2    = 0.f;
-      fValue3    = 0.f;
-      fValue4    = 0.f;
+      fValue     = 0.0f;
+      fValue2    = 0.0f;
+      fValue3    = 0.0f;
+      fValue4    = 0.0f;
       iValue     = 0;
       deviceType = (InputDeviceTypes)0;
       objType    = (InputEventType)0;

@@ -133,7 +133,7 @@ void GuiFilterCtrl::onMouseDown(const GuiEvent &event)
 
    // determine which knot (offset same as in onRender)
    F32 w = F32(getWidth()-4) / F32(mFilter.size()-1);
-   F32 val = (F32(p.x) + (w / 2.f)) / w;
+   F32 val = (F32(p.x) + (w / 2.0f)) / w;
    mCurKnot = S32(val);
 
    mFilter[mCurKnot] = 1.0f - F32(getMin(getMax(0, p.y), getHeight())/(F32)getHeight());
@@ -201,7 +201,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    verts.lock();
 
-   F32 scale = 1.f / F32( ext.x );
+   F32 scale = 1.0f / F32( ext.x );
    for ( U32 i = 0; i < ext.x; i++)
    {
       F32 index = F32(i) * scale;

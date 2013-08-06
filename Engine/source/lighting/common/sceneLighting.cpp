@@ -120,7 +120,7 @@ void SceneLighting::sgLightingCompleteEvent()
 			Con::printf("Successfully saved mission lighting file: '%s'", mFileName);
 	}
 
-	Con::printf("Scene lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp2)/1000.f);
+	Con::printf("Scene lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp2)/1000.0f);
 	Con::printf("//-----------------------------------------------");
 	Con::printf("");
 	
@@ -207,7 +207,7 @@ void SceneLighting::sgTGELightProcessEvent(U32 light, S32 object)
    mLitObjects[object]->processTGELightProcessEvent(object, mLitObjects.size(), li);
 
    sgTGESetProgress(light, object);
-   Con::printf("      Object lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-time)/1000.f);
+   Con::printf("      Object lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-time)/1000.0f);
 
 
    // kick off next object event
@@ -224,7 +224,7 @@ void SceneLighting::sgTGELightCompleteEvent(U32 light)
    if(light >= mLights.size())
    {
       sgTGESetProgress(mLights.size(), mLitObjects.size());
-      Con::printf("  TGE based scene lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp2)/1000.f);
+      Con::printf("  TGE based scene lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp2)/1000.0f);
 
       sgNewEvent(0, 0, sgSceneLightingProcessEvent::sgSGPassSetupEventType);
       //sgNewEvent(0, 0, sgSceneLightingProcessEvent::sgLightingCompleteEventType);
@@ -378,7 +378,7 @@ void SceneLighting::sgSGObjectCompleteEvent(S32 object)
    }
 
    // process post-lighting
-   Con::printf("    Object lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp)/1000.f);
+   Con::printf("    Object lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp)/1000.0f);
 
    // in case Atlas turned off rendering...
    GFX->setAllowRender(true);

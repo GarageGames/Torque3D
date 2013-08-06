@@ -3464,7 +3464,7 @@ void GuiTreeViewCtrl::onMouseDragged(const GuiEvent &event)
    // if the user moves the mouse a little while clicking, he/she does not
    // accidentally trigger a drag.
       
-   if( mFabs( ( mMouseDownPoint - event.mousePoint ).len() ) <= 4.f )
+   if( mFabs( ( mMouseDownPoint - event.mousePoint ).len() ) <= 4.0f )
       return;
       
    Point2I pt = globalToLocalCoord(event.mousePoint);
@@ -3893,7 +3893,7 @@ void GuiTreeViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       S32 tempY = mItemHeight*mCurrentDragCell+offset.y ;
       squarePt.y = (F32)tempY;
-      squarePt.x = 125.f+offset.x;
+      squarePt.x = 125.0f+offset.x;
       GFX->getDrawUtil()->drawLine(0+offset.x, tempY, 250+offset.x, tempY,greyLine);
       GFX->getDrawUtil()->draw2DSquare(squarePt, 6, 90 );
 
@@ -3902,7 +3902,7 @@ void GuiTreeViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       S32 tempY2 = mItemHeight*(mCurrentDragCell+1) +offset.y;
       squarePt.y = (F32)tempY2;
-      squarePt.x = 125.f+offset.x;
+      squarePt.x = 125.0f+offset.x;
       GFX->getDrawUtil()->drawLine(0+offset.x, tempY2, 250+offset.x, tempY2,greyLine);
       GFX->getDrawUtil()->draw2DSquare(squarePt,6, 90 );
    }

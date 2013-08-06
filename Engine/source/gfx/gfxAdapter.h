@@ -55,7 +55,7 @@ public:
    /// so we do not enumerate them here.
    Vector<GFXVideoMode> mAvailableModes;
 
-   /// Supported shader model. 0.f means none supported.
+   /// Supported shader model. 0.0f means none supported.
    F32 mShaderModel;
 
    const char * getName() const { return mName; }
@@ -70,7 +70,7 @@ public:
 
       mName[0] = 0;
       mOutputName[0] = 0;
-      mShaderModel = 0.f;
+      mShaderModel = 0.0f;
       mIndex = 0;
    }
 

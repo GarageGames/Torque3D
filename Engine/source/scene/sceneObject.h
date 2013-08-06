@@ -456,7 +456,7 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       virtual void setMomentum( const Point3F& momentum ) {}
 
       /// Returns the mass of this object
-      virtual F32 getMass() const { return 1.f; }
+      virtual F32 getMass() const { return 1.0f; }
 
       /// Displaces this object by a vector
       /// @param   displaceVector   Displacement vector

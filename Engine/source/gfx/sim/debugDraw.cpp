@@ -334,7 +334,7 @@ void DebugDrawer::drawPolyhedronDebugInfo( const AnyPolyhedron& polyhedron, cons
       transform.mulP( v1 );
       transform.mulP( v2 );
 
-      const Point3F midPoint = v1 + ( v2 - v1 ) / 2.f;
+      const Point3F midPoint = v1 + ( v2 - v1 ) / 2.0f;
 
       drawText( midPoint, String::ToString( "%i (%i, %i)", i, edge.face[ 0 ], edge.face[ 1 ] ), ColorI::WHITE );
 
@@ -343,7 +343,7 @@ void DebugDrawer::drawPolyhedronDebugInfo( const AnyPolyhedron& polyhedron, cons
       Point3F pushDir = midPoint - center;
       pushDir.normalize();
       const Point3F dirPoint = midPoint + pushDir;
-      const Point3F lineDir = ( v2 - v1 ) / 2.f;
+      const Point3F lineDir = ( v2 - v1 ) / 2.0f;
 
       drawLine( dirPoint, dirPoint + lineDir, ColorI::RED );
    }

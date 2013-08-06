@@ -202,7 +202,7 @@ bool OggTheoraDecoder::_init()
    
    mCurrentFrameTime = th_granule_time( mTheoraDecoder, granulePos );
    mCurrentFrameNumber = 0;
-   mFrameDuration = 1.f / getFramesPerSecond();
+   mFrameDuration = 1.0f / getFramesPerSecond();
    
    // Make sure we have a valid pitch.
    
@@ -232,7 +232,7 @@ bool OggTheoraDecoder::_packetin( ogg_packet* packet )
    TimeSourceRef timeSource = mTimeSource;
    if( timeSource )
    {
-      F32 currentTick = F32( timeSource->getPosition() ) / 1000.f;
+      F32 currentTick = F32( timeSource->getPosition() ) / 1000.0f;
 
       if( currentTick >= ( mCurrentFrameTime + mFrameDuration ) )
          dropThisFrame = true;

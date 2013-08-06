@@ -35,9 +35,9 @@ BiQuadToSqr::BiQuadToSqr(  const Point2F &p00,
    m_kD = p11 + p00 - p10 - p01; // diagonal dist
 
    if(mFabs(m_kD.x) < POINT_EPSILON)    
-      m_kD.x = 0.f;
+      m_kD.x = 0.0f;
    if(mFabs(m_kD.y) < POINT_EPSILON) 
-      m_kD.y = 0.f;  
+      m_kD.y = 0.0f;  
 
    m_fBC = mDotPerp( m_kB, m_kC );
    m_fBD = mDotPerp( m_kB, m_kD );   

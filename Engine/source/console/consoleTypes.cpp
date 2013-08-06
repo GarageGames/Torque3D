@@ -592,7 +592,7 @@ ConsoleSetType( TypeColorF )
       tmpColor->red    = dAtof(argv[0]);
       tmpColor->green  = dAtof(argv[1]);
       tmpColor->blue   = dAtof(argv[2]);
-      tmpColor->alpha  = 1.f;
+      tmpColor->alpha  = 1.0f;
    }
    else if(argc == 4)
    {

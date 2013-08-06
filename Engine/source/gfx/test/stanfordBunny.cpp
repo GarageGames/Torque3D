@@ -13612,9 +13612,9 @@ void setupBunny(GFXVertexPCN* v)
          v[vert].normal = Point3F(normals[ni][0], normals[ni][1], normals[ni][2]);
          v[vert].point = point;
          v[vert].color.set(
-            U8((point.x * 100.f) + 127.f),
-            U8((point.y * 100.f) + 127.f),
-            U8((point.z * 100.f) + 127.f));
+            U8((point.x * 100.0f) + 127.0f),
+            U8((point.y * 100.0f) + 127.0f),
+            U8((point.z * 100.0f) + 127.0f));
          vert++;
       }
    }

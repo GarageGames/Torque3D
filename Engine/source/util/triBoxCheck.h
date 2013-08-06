@@ -40,7 +40,7 @@ bool triBoxOverlap(const Point3F &boxcenter, const Point3F &boxhalfsize, const P
 /// just a helper function - use the other version if you want to be fast!
 inline bool triBoxOverlap(Box3F box, Point3F a, Point3F b, Point3F c)
 {
-   Point3F halfSize(box.len_x() / 2.f, box.len_y() / 2.f, box.len_z() / 2.f);
+   Point3F halfSize(box.len_x() / 2.0f, box.len_y() / 2.0f, box.len_z() / 2.0f);
 
    Point3F center;
    box.getCenter(&center);

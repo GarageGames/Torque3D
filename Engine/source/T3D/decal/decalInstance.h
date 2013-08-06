@@ -76,7 +76,7 @@ class DecalInstance
       
       Box3F getWorldBox() const
       {
-         return Box3F( mPosition - Point3F( mSize / 2.f ), mPosition + Point3F( mSize / 2.f ) );
+         return Box3F( mPosition - Point3F( mSize / 2.0f ), mPosition + Point3F( mSize / 2.0f ) );
       }
 
       U8 getRenderPriority() const

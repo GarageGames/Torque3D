@@ -163,11 +163,11 @@ void SFXFadeModifier::_onEnd()
    switch( mOnEnd )
    {
       case ON_END_Pause:
-         mSource->pause( 0.f ); // Pause without fade.
+         mSource->pause( 0.0f ); // Pause without fade.
          break;
          
       case ON_END_Stop:
-         mSource->stop( 0.f ); // Stop without fade.
+         mSource->stop( 0.0f ); // Stop without fade.
          break;
          
       case ON_END_Nop: ;
