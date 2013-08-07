@@ -112,7 +112,7 @@ protected:
 
 public:
 
-   enum { MaxBrushDim = 40 };
+   enum { MaxBrushDim = 256 };
 
    Brush(TerrainEditor * editor);
    virtual ~Brush(){};
