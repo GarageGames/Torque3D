@@ -226,7 +226,7 @@ TCPObject::~TCPObject()
    }
 }
 
-bool TCPObject::processArguments(S32 argc, const char **argv)
+bool TCPObject::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    if(argc == 0)
       return true;

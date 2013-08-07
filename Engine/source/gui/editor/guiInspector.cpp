@@ -777,7 +777,7 @@ ConsoleMethod( GuiInspector, inspect, void, 3, 3, "Inspect(Object)")
    if(!target)
    {
       if(dAtoi(argv[2]) > 0)
-         Con::warnf("%s::inspect(): invalid object: %s", argv[0], argv[2]);
+         Con::warnf("%s::inspect(): invalid object: %s", (const char*)argv[0], (const char*)argv[2]);
 
       object->clearInspectObjects();
       return;
@@ -793,7 +793,7 @@ ConsoleMethod( GuiInspector, addInspect, void, 3, 4, "( id object, (bool autoSyn
    SimObject* obj;
    if( !Sim::findObject( argv[ 2 ], obj ) )
    {
-      Con::errorf( "%s::addInspect(): invalid object: %s", argv[ 0 ], argv[ 2 ] );
+      Con::errorf( "%s::addInspect(): invalid object: %s", (const char*)argv[ 0 ], (const char*)argv[ 2 ] );
       return;
    }
 
@@ -810,7 +810,7 @@ ConsoleMethod( GuiInspector, removeInspect, void, 3, 3, "( id object ) - Remove 
    SimObject* obj;
    if( !Sim::findObject( argv[ 2 ], obj ) )
    {
-      Con::errorf( "%s::removeInspect(): invalid object: %s", argv[ 0 ], argv[ 2 ] );
+      Con::errorf( "%s::removeInspect(): invalid object: %s", (const char*)argv[ 0 ], (const char*)argv[ 2 ] );
       return;
    }
    

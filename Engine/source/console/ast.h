@@ -38,7 +38,8 @@ enum TypeReq
    TypeReqNone,
    TypeReqUInt,
    TypeReqFloat,
-   TypeReqString
+   TypeReqString,
+   TypeReqVar
 };
 
 /// Representation of a node for the scripting language parser.

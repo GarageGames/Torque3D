@@ -147,13 +147,13 @@ ConsoleFunction( physicsDestroy, void, 1, 1, "physicsDestroy()" )
 
 ConsoleFunction( physicsInitWorld, bool, 2, 2, "physicsInitWorld( String worldName )" )
 {
-   return PHYSICSMGR && PHYSICSMGR->createWorld( String( argv[1] ) );
+   return PHYSICSMGR && PHYSICSMGR->createWorld( (const char*)argv[1] );
 }
 
 ConsoleFunction( physicsDestroyWorld, void, 2, 2, "physicsDestroyWorld( String worldName )" )
 {
    if ( PHYSICSMGR )
-      PHYSICSMGR->destroyWorld( String( argv[1] ) );
+      PHYSICSMGR->destroyWorld( (const char*)argv[1] );
 }
 
 
@@ -162,13 +162,13 @@ ConsoleFunction( physicsDestroyWorld, void, 2, 2, "physicsDestroyWorld( String w
 ConsoleFunction( physicsStartSimulation, void, 2, 2, "physicsStartSimulation( String worldName )" )
 {
    if ( PHYSICSMGR )
-      PHYSICSMGR->enableSimulation( String( argv[1] ), true );
+      PHYSICSMGR->enableSimulation( (const char*)argv[1], true );
 }
 
 ConsoleFunction( physicsStopSimulation, void, 2, 2, "physicsStopSimulation( String worldName )" )
 {
    if ( PHYSICSMGR )
-      PHYSICSMGR->enableSimulation( String( argv[1] ), false );
+      PHYSICSMGR->enableSimulation( (const char*)argv[1], false );
 }
 
 ConsoleFunction( physicsSimulationEnabled, bool, 1, 1, "physicsSimulationEnabled()" )
@@ -182,7 +182,7 @@ ConsoleFunction( physicsSimulationEnabled, bool, 1, 1, "physicsSimulationEnabled
 ConsoleFunction( physicsSetTimeScale, void, 2, 2, "physicsSetTimeScale( F32 scale )" )
 {
    if ( PHYSICSMGR )
-      PHYSICSMGR->setTimeScale( dAtof( argv[1] ) );
+      PHYSICSMGR->setTimeScale( argv[1] );
 }
 
 // Get the currently set time scale.
@@ -212,5 +212,5 @@ ConsoleFunction( physicsRestoreState, void, 1, 1, "physicsRestoreState()" )
 ConsoleFunction( physicsDebugDraw, void, 2, 2, "physicsDebugDraw( bool enable )" )
 {
    if ( PHYSICSMGR )
-      PHYSICSMGR->enableDebugDraw( dAtoi( argv[1] ) );
+      PHYSICSMGR->enableDebugDraw( (S32)argv[1] );
 }

@@ -237,7 +237,9 @@ ConsoleFunction( commandToServer, void, 2, RemoteCommandEvent::MaxRemoteCommandA
    NetConnection *conn = NetConnection::getConnectionToServer();
    if(!conn)
       return;
-   sendRemoteCommand(conn, argc - 1, argv + 1);
+
+   StringStackWrapper args(argc - 1, argv + 1);
+   sendRemoteCommand(conn, args.count(), args);
 }
 
 ConsoleFunction( commandToClient, void, 3, RemoteCommandEvent::MaxRemoteCommandArgs + 2, "(NetConnection client, string func, ...)"
@@ -274,7 +276,8 @@ ConsoleFunction( commandToClient, void, 3, RemoteCommandEvent::MaxRemoteCommandA
    NetConnection *conn;
    if(!Sim::findObject(argv[1], conn))
       return;
-   sendRemoteCommand(conn, argc - 2, argv + 2);
+   StringStackWrapper args(argc - 2, argv + 2);
+   sendRemoteCommand(conn, args.count(), args);
 }
 
 
@@ -288,7 +291,7 @@ ConsoleFunction(removeTaggedString, void, 2, 2, "(int tag)"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
 {
-   gNetStringTable->removeString(dAtoi(argv[1]+1), true);
+   gNetStringTable->removeString(dAtoi(((const char*)argv[1])+1), true);
 }
 
 ConsoleFunction( addTaggedString, const char*, 2, 2, "(string str)"
@@ -304,7 +307,7 @@ ConsoleFunction( addTaggedString, const char*, 2, 2, "(string str)"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
 {
-   NetStringHandle s(argv[1]);
+   NetStringHandle s((const char*)argv[1]);
    gNetStringTable->incStringRefScript(s.getIndex());
 
    char *ret = Con::getReturnBuffer(10);
