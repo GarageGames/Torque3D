@@ -614,6 +614,11 @@ void queryFavoriteServers( U8 /*flags*/ )
 void querySingleServer( const NetAddress* addr, U8 /*flags*/ )
 {
    sgServerQueryActive = true;
+   gGotFirstListPacket = true;
+   sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, dStrlen( "any" ) + 1 );
+   dStrcpy( sActiveFilter.gameType, "any" );
+   sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, dStrlen( "any" ) + 1 );
+   dStrcpy( sActiveFilter.missionType, "any" );
    ServerInfo* si = findServerInfo( addr );
    if ( si )
       si->status = ServerInfo::Status_New | ServerInfo::Status_Updating;
