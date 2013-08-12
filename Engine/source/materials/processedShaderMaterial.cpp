@@ -1256,7 +1256,7 @@ MaterialParameterHandle* ProcessedShaderMaterial::getMaterialParameterHandle(con
 /// This is here to deal with the differences between ProcessedCustomMaterials and ProcessedShaderMaterials.
 GFXShaderConstBuffer* ProcessedShaderMaterial::_getShaderConstBuffer( const U32 pass )
 {   
-   if (pass < mPasses.size())
+   if (mCurrentParams && pass < mPasses.size())
    {
       return static_cast<ShaderMaterialParameters*>(mCurrentParams)->getBuffer(pass);
    }
