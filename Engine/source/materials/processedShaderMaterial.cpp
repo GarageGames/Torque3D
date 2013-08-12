@@ -1198,6 +1198,7 @@ void ProcessedShaderMaterial::setBuffers( GFXVertexBufferHandleBase *vertBuffer,
    GFXVertexBufferDataHandle instVB;
    instVB.set( GFX, instFormat->getSizeInBytes(), instFormat, instCount, GFXBufferTypeVolatile );
    U8 *dest = instVB.lock();
+   if(!dest) return;
    dMemcpy( dest, mInstancingState->getBuffer(), instFormat->getSizeInBytes() * instCount );
    instVB.unlock();
 

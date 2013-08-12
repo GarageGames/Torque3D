@@ -1254,6 +1254,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
 
       // Lock, and skin directly into the final memory destination
       outPtr = (U8 *)instanceVB.lock();
+      if(!outPtr) return;
 #endif
       // Set position/normal to zero so we can accumulate
       zero_vert_normal_bulk(mNumVerts, outPtr, outStride);
@@ -2379,6 +2380,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
 
       // Copy from aligned memory right into GPU memory
       U8 *vertData = (U8*)vb.lock();
+      if(!vertData) return;
 #if defined(TORQUE_OS_XENON)
       XMemCpyStreaming_WriteCombined( vertData, mVertexData.address(), mVertexData.mem_size() );
 #else
