@@ -121,10 +121,10 @@ DefineEngineMethod( GuiMLTextCtrl, getText, const char*, (),,
    return( object->getTextContent() );
 }
 
-DefineEngineMethod( GuiMLTextCtrl, addText, void, ( const char* text, bool reformat),,
+DefineEngineMethod( GuiMLTextCtrl, addText, void, ( const char* text, bool reformat), (true),
    "@brief Appends the text in the control with additional text. Also .\n\n"
    "@param text New text to append to the existing text.\n"
-   "@param reformat If true, the control will also be visually reset.\n"
+   "@param reformat If true, the control will also be visually reset (defaults to true).\n"
    "@tsexample\n"
    "// Define new text to add\n"
    "%text = \"New Text to Add\";\n\n"
