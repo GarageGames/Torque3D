@@ -1069,7 +1069,53 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"ejectionOffset\", $ThisControl.getText());";
-                        };             
+                        };
+					 };
+                     new GuiControl(){ // Emitter Offset Variance
+                        class = "AggregateControl";
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container ;
+                        Extent = $PE_guielement_ext_single_container ;
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_name;
+                           text = "OffsetVariance";
+                        };
+                        new GuiSliderCtrl(PEE_ejectionOffsetVariance) {
+                           internalName = "PEE_ejectionOffsetVariance_slider";
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiSliderProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_slider;
+                           Extent = $PE_guielement_ext_slider;
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "PE_EmitterEditor.updateEmitter( \"ejectionOffsetVariance\", $ThisControl.getValue(), true, true );";
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"ejectionOffsetVariance\", $ThisControl.getValue(), true, false );";
+                           hovertime = "1000";
+                           range = "0 25";
+                           ticks = "0";
+                           value = "0";
+                        };
+                        new GuiTextEditCtrl() {
+                           internalName = "PEE_ejectionOffsetVariance_textEdit";
+                           Profile = "ToolsGuiTextEditProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_value;
+                           Extent = $PE_guielement_ext_value;
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"ejectionOffsetVariance\", $ThisControl.getText());";
+                        };               
                      };
                   }; // end stack
                }; // end "spread" rollout
