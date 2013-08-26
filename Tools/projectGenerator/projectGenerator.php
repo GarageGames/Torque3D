@@ -70,7 +70,7 @@ if ( $argc >= 3 )
     $torqueRoot = str_replace( "\\", "/", $argv[2] );
 
 // Kick off the generator
-Generator::init( $torqueRoot );
+T3D_Generator::init( $torqueRoot );
 
 // Ready to read our config file.
 echo( "   - Loading config file " . realpath($argv[1])."\n" );
@@ -78,12 +78,12 @@ echo( "   - Loading config file " . realpath($argv[1])."\n" );
 require( $argv[ 1 ] );
 
 // Generate all projects
-Generator::generateProjects( $tpl );
+T3D_Generator::generateProjects( $tpl );
 
 // Now the solutions (if any)
 $tpl->clear_all_cache();
 
-Generator::generateSolutions( $tpl );
+T3D_Generator::generateSolutions( $tpl );
 
 // finally write out the sample.html for web deployment (if any)
 WebPlugin::writeSampleHtml();
