@@ -1296,7 +1296,7 @@ void ParticleEmitter::addParticle(const Point3F& pos,
    F32 initialVel = mDataBlock->ejectionVelocity;
    initialVel    += (mDataBlock->velocityVariance * 2.0f * gRandGen.randF()) - mDataBlock->velocityVariance;
 
-   pNew->pos = pos_start + (ejectionAxis * (mDataBlock->ejectionOffset + mDataBlock->ejectionOffsetVariance* gRandGen.randF()) );
+   pNew->pos = pos + (ejectionAxis * (mDataBlock->ejectionOffset + mDataBlock->ejectionOffsetVariance* gRandGen.randF()) );
    pNew->vel = ejectionAxis * initialVel;
    pNew->orientDir = ejectionAxis;
    pNew->acc.set(0, 0, 0);
