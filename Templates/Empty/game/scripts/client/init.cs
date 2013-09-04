@@ -110,7 +110,7 @@ function initClient()
    setDefaultFov( $pref::Player::defaultFov );
    setZoomSpeed( $pref::Player::zoomSpeed );
 
-   if( isFile( "./audioData.cs" ) )
+   if( isScriptFile( expandFilename("./audioData.cs") ) )
       exec( "./audioData.cs" );
 
    // Start up the main menu... this is separated out into a
