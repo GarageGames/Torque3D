@@ -171,7 +171,7 @@ U32 OggVorbisDecoder::read( RawData** buffer, U32 num )
       for( U32 n = 0; n < numSamples; ++ n )
          for( U32 c = 0; c < numChannels; ++ c )
          {
-            S32 val = S32( pcmData[ c ][ n ] * 32767.f );
+            S32 val = S32( pcmData[ c ][ n ] * 32767.0f );
             if( val > 32767 )
                val = 32767;
             else if( val < -34768 )

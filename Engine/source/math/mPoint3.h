@@ -430,7 +430,7 @@ inline Point3I& Point3I::operator/=(S32 div)
 //
 inline Point3F::Point3F()
 #if defined(TORQUE_OS_LINUX)
- : x(0.f), y(0.f), z(0.f)
+ : x(0.0f), y(0.0f), z(0.0f)
 #endif
 {
 // Uninitialized points are definitely a problem.

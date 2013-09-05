@@ -314,15 +314,15 @@ Gizmo::Gizmo()
   mLastWorldMat( true ),
   mLastProjMat( true ),
   mLastViewport( 0, 0, 10, 10 ),
-  mLastCameraFOV( 1.f ),
+  mLastCameraFOV( 1.0f ),
   mElipseCursorCollideVecSS( 1.0f, 0.0f, 0.0f ),
   mElipseCursorCollidePntSS( 0.0f, 0.0f, 0.0f ),
   mHighlightCentroidHandle( false ),
   mHighlightAll( false ),
   mGridPlaneEnabled( true ),
   mMoveGridEnabled( true ),
-  mMoveGridSize( 20.f ),
-  mMoveGridSpacing( 1.f )
+  mMoveGridSize( 20.0f ),
+  mMoveGridSpacing( 1.0f )
 {   
    mUniformHandleEnabled = true;   
    mAxisEnabled[0] = mAxisEnabled[1] = mAxisEnabled[2] = true;
@@ -627,7 +627,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
                VectorF vec1 = poly[k] - poly[j];
                VectorF vec2 = pos - poly[k];
 
-               if(mDot(vec1, vec2) > 0.f)
+               if(mDot(vec1, vec2) > 0.0f)
                   inside = false;
             }
 
@@ -688,7 +688,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
             VectorF vec1 = poly[k] - poly[j];
             VectorF vec2 = pos - poly[k];
 
-            if ( mDot(vec1, vec2) > 0.f )
+            if ( mDot(vec1, vec2) > 0.0f )
                inside = false;
          }
 

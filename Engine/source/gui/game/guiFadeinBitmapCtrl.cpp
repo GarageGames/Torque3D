@@ -74,7 +74,7 @@ IMPLEMENT_CALLBACK( GuiFadeinBitmapCtrl, onDone, void, (),(),
 //-----------------------------------------------------------------------------
 
 GuiFadeinBitmapCtrl::GuiFadeinBitmapCtrl()
-   : mFadeColor( 0.f, 0.f, 0.f ),
+   : mFadeColor( 0.0f, 0.0f, 0.0f ),
      mStartTime( 0 ),
      mFadeInTime( 1000 ),
      mWaitTime( 2000 ),
@@ -167,7 +167,7 @@ void GuiFadeinBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    if( elapsed < mFadeInTime )
    {
       // fade-in
-      alpha = 255.f * ( 1.0f - mFadeInEase.getValue( elapsed, 0.f, 1.f, mFadeInTime ) );
+      alpha = 255.0f * ( 1.0f - mFadeInEase.getValue( elapsed, 0.0f, 1.0f, mFadeInTime ) );
    }
    else if( elapsed < ( mFadeInTime + mWaitTime ) )
    {
@@ -178,7 +178,7 @@ void GuiFadeinBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       // fade out
       elapsed -= ( mFadeInTime + mWaitTime );
-      alpha = mFadeOutEase.getValue( elapsed, 0.f, 255.f, mFadeOutTime );
+      alpha = mFadeOutEase.getValue( elapsed, 0.0f, 255.0f, mFadeOutTime );
    }
    else
    {

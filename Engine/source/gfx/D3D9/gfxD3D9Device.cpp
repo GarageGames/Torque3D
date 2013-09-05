@@ -149,15 +149,15 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
    {
       mGenericShader[GSColor] =           createShader( "shaders/common/genericColorV.hlsl", 
          "shaders/common/genericColorP.hlsl", 
-         2.f );
+         2.0f );
 
       mGenericShader[GSModColorTexture] = createShader( "shaders/common/genericModColorTextureV.hlsl", 
          "shaders/common/genericModColorTextureP.hlsl", 
-         2.f );
+         2.0f );
 
       mGenericShader[GSAddColorTexture] = createShader( "shaders/common/genericAddColorTextureV.hlsl", 
          "shaders/common/genericAddColorTextureP.hlsl", 
-         2.f );
+         2.0f );
    }
 
    mGenericShader[type]->process();

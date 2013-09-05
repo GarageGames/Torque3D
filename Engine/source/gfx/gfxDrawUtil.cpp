@@ -129,12 +129,12 @@ U32 GFXDrawUtil::drawText( GFont *font, const Point2I &ptDraw, const UTF8 *in_st
    return drawTextN( font, ptDraw, in_string, dStrlen(in_string), colorTable, maxColorIndex, rot );
 }
 
-U32 GFXDrawUtil::drawText( GFont *font, const Point2F &ptDraw, const UTF8 *in_string, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.f */ )
+U32 GFXDrawUtil::drawText( GFont *font, const Point2F &ptDraw, const UTF8 *in_string, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.0f */ )
 {
    return drawText(font,Point2I((S32)ptDraw.x,(S32)ptDraw.y),in_string,colorTable,maxColorIndex,rot);
 }
 
-U32 GFXDrawUtil::drawText( GFont *font, const Point2F &ptDraw, const UTF16 *in_string, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.f */ )
+U32 GFXDrawUtil::drawText( GFont *font, const Point2F &ptDraw, const UTF16 *in_string, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.0f */ )
 {
    return drawText(font,Point2I((S32)ptDraw.x,(S32)ptDraw.y),in_string,colorTable,maxColorIndex,rot);
 }
@@ -289,12 +289,12 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
    return ptX + ptDraw.x;
 }
 
-U32 GFXDrawUtil::drawTextN( GFont *font, const Point2F &ptDraw, const UTF8 *in_string, U32 n, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.f */ )
+U32 GFXDrawUtil::drawTextN( GFont *font, const Point2F &ptDraw, const UTF8 *in_string, U32 n, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.0f */ )
 {
    return drawTextN(font,Point2I((S32)ptDraw.x,(S32)ptDraw.y),in_string,n,colorTable,maxColorIndex,rot);
 }
 
-U32 GFXDrawUtil::drawTextN( GFont *font, const Point2F &ptDraw, const UTF16 *in_string, U32 n, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.f */ )
+U32 GFXDrawUtil::drawTextN( GFont *font, const Point2F &ptDraw, const UTF16 *in_string, U32 n, const ColorI *colorTable /*= NULL*/, const U32 maxColorIndex /*= 9*/, F32 rot /*= 0.0f */ )
 {
    return drawTextN(font,Point2I((S32)ptDraw.x,(S32)ptDraw.y),in_string,n,colorTable,maxColorIndex,rot);
 }
@@ -337,7 +337,7 @@ void GFXDrawUtil::drawBitmapStretch( GFXTextureObject*texture, const RectF &dstR
 {
    AssertFatal( texture != 0, "No texture specified for drawBitmapStretch()" );
 
-   RectF subRegion( 0.f, 0.f, (F32)texture->mBitmapSize.x, (F32)texture->mBitmapSize.y );
+   RectF subRegion( 0.0f, 0.0f, (F32)texture->mBitmapSize.x, (F32)texture->mBitmapSize.y );
    drawBitmapStretchSR( texture, dstRect, subRegion, in_flip, filter, in_wrap );
 }
 
@@ -382,10 +382,10 @@ void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject* texture, const RectF &d
    }
 
    const F32 fillConv = mDevice->getFillConventionOffset();
-   verts[0].point.set( screenLeft  - fillConv, screenTop    - fillConv, 0.f );
-   verts[1].point.set( screenRight - fillConv, screenTop    - fillConv, 0.f );
-   verts[2].point.set( screenLeft  - fillConv, screenBottom - fillConv, 0.f );
-   verts[3].point.set( screenRight - fillConv, screenBottom - fillConv, 0.f );
+   verts[0].point.set( screenLeft  - fillConv, screenTop    - fillConv, 0.0f );
+   verts[1].point.set( screenRight - fillConv, screenTop    - fillConv, 0.0f );
+   verts[2].point.set( screenLeft  - fillConv, screenBottom - fillConv, 0.0f );
+   verts[3].point.set( screenRight - fillConv, screenBottom - fillConv, 0.0f );
 
    verts[0].color = verts[1].color = verts[2].color = verts[3].color = mBitmapModulation;
 
@@ -558,7 +558,7 @@ void GFXDrawUtil::draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinA
 
    verts[0].color = verts[1].color = verts[2].color = verts[3].color = mBitmapModulation;
 
-   if(spinAngle != 0.f)
+   if(spinAngle != 0.0f)
    {
       MatrixF rotMatrix( EulerF( 0.0, 0.0, spinAngle ) );
 
@@ -1039,7 +1039,7 @@ void GFXDrawUtil::_drawSolidPolyhedron( const GFXStateBlockDesc &desc, const Any
          // planes on the polyhedron to be facing *inwards*, we need to reverse
          // the logic here.
 
-         if( dot > 0.f )
+         if( dot > 0.0f )
             continue;
       }
 

@@ -87,14 +87,14 @@ IMPLEMENT_CALLBACK( GuiSliderCtrl, onMouseDragged, void, (), (),
 //----------------------------------------------------------------------------
 
 GuiSliderCtrl::GuiSliderCtrl()
-   : mRange( 0., 1.f ),
+   : mRange( 0., 1.0f ),
      mTicks( 10 ),
      mSnap( false ),
      mValue( 0.5f ),
      mThumbSize( 8, 20 ),
      mShiftPoint( 5 ),
      mShiftExtent( 10 ),
-     mIncAmount( 0.f ),
+     mIncAmount( 0.0f ),
      mDisplayValue( false ),
      mMouseOver( false ),
      mMouseDragged( false ),
@@ -372,7 +372,7 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
          Point2I oldpos = pos;
          pos += Point2I(1, 0);
 
-         PrimBuild::color4f( 0.f, 0.f, 0.f, 1.f );
+         PrimBuild::color4f( 0.0f, 0.0f, 0.0f, 1.0f );
          PrimBuild::begin( GFXLineList, ( mTicks + 2 ) * 2 );
          // tick marks
          for (U32 t = 0; t <= (mTicks+1); t++)
@@ -434,7 +434,7 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
       if(mDisplayValue)
          mid.set(ext.x, mThumbSize.y/2);
 
-      PrimBuild::color4f( 0.f, 0.f, 0.f, 1.f );
+      PrimBuild::color4f( 0.0f, 0.0f, 0.0f, 1.0f );
       PrimBuild::begin( GFXLineList, ( mTicks + 2 ) * 2 + 2);
          // horz rule
          PrimBuild::vertex2i( pos.x, pos.y + mid.y );
@@ -453,7 +453,7 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       Point2I mid(ext.x/2, ext.y);
 
-      PrimBuild::color4f( 0.f, 0.f, 0.f, 1.f );
+      PrimBuild::color4f( 0.0f, 0.0f, 0.0f, 1.0f );
       PrimBuild::begin( GFXLineList, ( mTicks + 2 ) * 2 + 2);
          // horz rule
          PrimBuild::vertex2i( pos.x + mid.x, pos.y );

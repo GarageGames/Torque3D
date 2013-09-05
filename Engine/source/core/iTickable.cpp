@@ -29,7 +29,7 @@ U32 ITickable::smLastDelta = 0;
 
 U32 ITickable::smTickShift = 5;
 U32 ITickable::smTickMs = ( 1 << smTickShift );
-F32 ITickable::smTickSec = ( F32( ITickable::smTickMs ) / 1000.f );
+F32 ITickable::smTickSec = ( F32( ITickable::smTickMs ) / 1000.0f );
 U32 ITickable::smTickMask = ( smTickMs - 1 );
 
 //------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void ITickable::init( const U32 tickShift )
     // Calculate tick constants.
     smTickShift = tickShift;
     smTickMs = ( 1 << smTickShift );
-    smTickSec = ( F32( smTickMs ) / 1000.f );
+    smTickSec = ( F32( smTickMs ) / 1000.0f );
     smTickMask = ( smTickMs - 1 );
 }
 
@@ -101,7 +101,7 @@ bool ITickable::advanceTime( U32 timeDelta )
 
 
    // Inform ALL objects that time was advanced
-   dt = F32( timeDelta ) / 1000.f;
+   dt = F32( timeDelta ) / 1000.0f;
    for( ProcessListIterator i = getProcessList().begin(); i != getProcessList().end(); i++ )
       (*i)->advanceTime( dt );
 

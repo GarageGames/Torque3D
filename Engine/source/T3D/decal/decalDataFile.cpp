@@ -344,7 +344,7 @@ void DecalDataFile::_addDecalToSpheres( DecalInstance* inst )
 
    // Didn't find a suitable existing sphere, so create a new one.
 
-   DecalSphere* sphere = new DecalSphere( inst->mPosition, inst->mSize / 2.f );
+   DecalSphere* sphere = new DecalSphere( inst->mPosition, inst->mSize / 2.0f );
 
    mSphereList.push_back( sphere );
    mSphereWithLastInsertion = sphere;

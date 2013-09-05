@@ -126,7 +126,7 @@ public:
    void drawText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
 
    /// Render a wireframe view of the given polyhedron.
-   void drawPolyhedron( const AnyPolyhedron& polyhedron, const ColorF& color = ColorF( 1.f, 1.f, 1.f ) );
+   void drawPolyhedron( const AnyPolyhedron& polyhedron, const ColorF& color = ColorF( 1.0f, 1.0f, 1.0f ) );
 
    /// Render the plane indices, edge indices, edge direction indicators, and point coordinates
    /// of the given polyhedron for debugging.

@@ -187,10 +187,10 @@ bool castRayTriangle(Point3F orig, Point3F dir,
    t = mDot(edge2, qvec) * inv_det;
    bary *= inv_det;
    
-   //AssertFatal((t >= 0.f && t <=1.f), "AtlasGeomTracer::castRayTriangle - invalid t!");
+   //AssertFatal((t >= 0.0f && t <=1.0f), "AtlasGeomTracer::castRayTriangle - invalid t!");
 
    // Hack, check the math here!
-   return (t >= 0.f && t <=1.f);
+   return (t >= 0.0f && t <=1.0f);
 }
 
 bool castRayTriangle(const Point3D &orig, const Point3D &dir,
@@ -257,9 +257,9 @@ bool castRayTriangle(const Point3D &orig, const Point3D &dir,
    t = mDot(edge2, qvec) * inv_det;
    bary *= inv_det;
    
-   //AssertFatal((t >= 0.f && t <=1.f), "AtlasGeomTracer::castRayTriangle - invalid t!");
+   //AssertFatal((t >= 0.0f && t <=1.0f), "AtlasGeomTracer::castRayTriangle - invalid t!");
 
    // Hack, check the math here!
-   return (t >= 0.f && t <=1.f);
+   return (t >= 0.0f && t <=1.0f);
 }
 

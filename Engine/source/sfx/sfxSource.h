@@ -446,7 +446,7 @@ class SFXSource : public SimGroup
       /// @param fadeInTime Seconds for sound to fade in.  If -1, fadeInTime from
       ///   SFXDescription is used.  Note that certain SFXSource classes may not
       ///   support values other than 0 and -1.
-      virtual void play( F32 fadeInTime = -1.f );
+      virtual void play( F32 fadeInTime = -1.0f );
 
       /// Stops playback and resets the playback position.
       ///
@@ -456,14 +456,14 @@ class SFXSource : public SimGroup
       /// @param fadeOutTime Seconds for sound to fade out.  If -1, fadeOutTime from
       ///   SFXDescription is used.  Note that certain SFXSource classes may not support
       ///   values other than 0 and -1.
-      virtual void stop( F32 fadeOutTime = -1.f );
+      virtual void stop( F32 fadeOutTime = -1.0f );
 
       /// Pauses the sound playback.
       ///
       /// @param fadeOutTime Seconds for sound to fade out.  If -1, fadeOutTime from
       ///   SFXDescription is used.  Note that certain SFXSource clsases may not support
       ///   values other than 0 and -1.
-      virtual void pause( F32 fadeOutTime = -1.f );
+      virtual void pause( F32 fadeOutTime = -1.0f );
       
       /// Return the elapsed play time of the current loop cycle so far in seconds.
       virtual F32 getElapsedPlayTimeCurrentCycle() const;

@@ -206,8 +206,8 @@ void PolyhedronBoxIntersector< Polyhedron >::_preprocess( const MatrixF& objToWo
          // to be pointing inwards, this means a reversal of the normal back facing
          // test and we're looking for a normal facing the *same* way as our projection.
 
-         const U32 frontFace = dotFace[ 0 ] > 0.f ? 0 : 1;
-         if( dotFace[ frontFace ] <= 0.f )
+         const U32 frontFace = dotFace[ 0 ] > 0.0f ? 0 : 1;
+         if( dotFace[ frontFace ] <= 0.0f )
             continue; // This face or other face is perpendicular to us.
 
          // Now we want to find the line equation for the edge.  For that, we first need
@@ -330,18 +330,18 @@ OverlapTestResult PolyhedronBoxIntersector< Polyhedron >::test( const Box3F& box
          switch( i )
          {
             case 0:
-               pVertex.x = - ( edgeLine.x < 0.f ? box.maxExtents[ xIndex ] : box.minExtents[ xIndex ] );
-               pVertex.y = edgeLine.y > 0.f ? box.maxExtents[ yIndex ] : box.minExtents[ yIndex ];
+               pVertex.x = - ( edgeLine.x < 0.0f ? box.maxExtents[ xIndex ] : box.minExtents[ xIndex ] );
+               pVertex.y = edgeLine.y > 0.0f ? box.maxExtents[ yIndex ] : box.minExtents[ yIndex ];
                break;
 
             case 1:
-               pVertex.x = edgeLine.x > 0.f ? box.maxExtents[ xIndex ] : box.minExtents[ xIndex ];
-               pVertex.y = edgeLine.y > 0.f ? box.maxExtents[ yIndex ] : box.minExtents[ yIndex ];
+               pVertex.x = edgeLine.x > 0.0f ? box.maxExtents[ xIndex ] : box.minExtents[ xIndex ];
+               pVertex.y = edgeLine.y > 0.0f ? box.maxExtents[ yIndex ] : box.minExtents[ yIndex ];
                break;
 
             case 2:
-               pVertex.x = edgeLine.x > 0.f ? box.maxExtents[ xIndex ] : box.minExtents[ xIndex ];
-               pVertex.y = - ( edgeLine.y < 0.f ? box.maxExtents[ yIndex ] : box.minExtents[ yIndex ] );
+               pVertex.x = edgeLine.x > 0.0f ? box.maxExtents[ xIndex ] : box.minExtents[ xIndex ];
+               pVertex.y = - ( edgeLine.y < 0.0f ? box.maxExtents[ yIndex ] : box.minExtents[ yIndex ] );
                break;
          }
 
@@ -350,7 +350,7 @@ OverlapTestResult PolyhedronBoxIntersector< Polyhedron >::test( const Box3F& box
          // this projection so we can conclude our search here.
 
          const F32 d = edgeLine.x * pVertex.x + edgeLine.y * pVertex.y + edgeLine.z;
-         if( d < 0.f )
+         if( d < 0.0f )
             return GeometryOutside;
       }
    }

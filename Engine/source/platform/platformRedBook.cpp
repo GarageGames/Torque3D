@@ -255,7 +255,7 @@ ConsoleFunction(redbookGetVolume, F32, 1, 1, "Get the volume."
 {
    F32 vol;
    if(!RedBook::getVolume(&vol))
-      return(0.f);
+      return(0.0f);
    else
       return(vol);
 }

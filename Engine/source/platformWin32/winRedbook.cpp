@@ -341,7 +341,7 @@ bool Win32RedBookDevice::getVolume(F32 * volume)
       auxGetVolume(mAuxVolumeDeviceId, (unsigned long *)&vol);
 
    vol &= 0xffff;
-   *volume = F32(vol) / 65535.f;
+   *volume = F32(vol) / 65535.0f;
 
    setLastError("");
    return(true);
@@ -362,7 +362,7 @@ bool Win32RedBookDevice::setVolume(F32 volume)
    }
 
    // move into a U32 - left/right U16 volumes
-   U32 vol = U32(volume * 65536.f);
+   U32 vol = U32(volume * 65536.0f);
    if(vol > 0xffff)
       vol = 0xffff;
 

@@ -140,7 +140,7 @@ void ExtrudedPolyList::adjustCollisionTime()
    if( !mCollisionList->getCount() )
       return;
 
-   mCollisionList->setTime( mClampF( mCollisionList->getTime(), 0.f, 1.f ) );
+   mCollisionList->setTime( mClampF( mCollisionList->getTime(), 0.0f, 1.0f ) );
 }
 
 
@@ -159,7 +159,7 @@ U32 ExtrudedPolyList::addPoint(const Point3F& p)
    // Build the plane mask, planes come in pairs
    v.mask = 0;
    for (U32 i = 0; i < mPlaneList.size(); i ++)
-      if (mPlaneList[i].distToPlane(v.point) >= 0.f)
+      if (mPlaneList[i].distToPlane(v.point) >= 0.0f)
          v.mask |= BIT(i);
 
    return mVertexList.size() - 1;
@@ -221,7 +221,7 @@ void ExtrudedPolyList::end()
 {
    // Anything facing away from the mVelocity is rejected  (and also
    // cap to max collisions)
-   if (mDot(mPoly.plane, mNormalVelocity) > 0.f ||
+   if (mDot(mPoly.plane, mNormalVelocity) > 0.0f ||
       mCollisionList->getCount() >= CollisionList::MaxCollisions)
       return;
 
@@ -243,7 +243,7 @@ void ExtrudedPolyList::end()
       face->faceDot = -mDot(face->plane,mPoly.plane);
       
       // Skip it if we're facing towards...
-      if(face->faceDot <= 0.f)
+      if(face->faceDot <= 0.0f)
          continue;
 
       // Test, and skip if colliding.
@@ -267,7 +267,7 @@ void ExtrudedPolyList::end()
             continue;
 
          // Skip it if we're facing away...
-         if(face->faceDot > 0.f)
+         if(face->faceDot > 0.0f)
             continue;
 
          // Do collision as above.
@@ -395,7 +395,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
                // Test against the remaining planes
                for (U32 i = p+1; i < mPlaneList.size(); i ++)
                {
-                  if (mPlaneList[i].distToPlane(iv.point) > 0.f)
+                  if (mPlaneList[i].distToPlane(iv.point) > 0.0f)
                      iv.mask |= BIT(i);
                }
             }

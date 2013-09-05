@@ -241,7 +241,7 @@ bool SceneObject::collideBox(const Point3F &start, const Point3F &end, RayInfo *
    }
 
    // fail if inside
-   if(maxStartTime < 0.f)
+   if(maxStartTime < 0.0f)
       return(false);
 
    //

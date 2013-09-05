@@ -655,9 +655,9 @@ void TheoraTexture::refresh()
          
       mPlaybackQueue->submitPacket(
          frame,
-         frame->mFrameDuration * 1000.f,
+         frame->mFrameDuration * 1000.0f,
          false,
-         frame->mFrameTime * 1000.f
+         frame->mFrameTime * 1000.0f
       );
       
       // See if we have dropped frames.

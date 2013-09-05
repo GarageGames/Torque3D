@@ -525,8 +525,8 @@ bool DInputManager::rumble( const char *pDeviceName, float x, float y )
    }
 
    // clamp (x, y) to the range of [0 ... 1] each
-   x = mClampF(x, 0.f, 1.f);
-   y = mClampF(y, 0.f, 1.f);
+   x = mClampF(x, 0.0f, 1.0f);
+   y = mClampF(y, 0.0f, 1.0f);
 
    //  Easy path for xinput devices.
    if(deviceType == GamepadDeviceType)

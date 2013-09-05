@@ -83,7 +83,7 @@ void GuiEaseViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    const F32 H = getExtent().y;
    const F32 plotW = W;
    const F32 plotH = H;
-   const F32 zeroX = offset.x + 1.f;
+   const F32 zeroX = offset.x + 1.0f;
    const F32 zeroY = offset.y;
    
    // Draw axis.

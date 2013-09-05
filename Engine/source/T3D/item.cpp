@@ -126,9 +126,9 @@ ItemData::ItemData()
 
    lightOnlyStatic = false;
    lightType = Item::NoLight;
-   lightColor.set(1.f,1.f,1.f,1.f);
+   lightColor.set(1.0f,1.0f,1.0f,1.0f);
    lightTime = 1000;
-   lightRadius = 10.f; 
+   lightRadius = 10.0f; 
 
    simpleServerCollision = true;
 }

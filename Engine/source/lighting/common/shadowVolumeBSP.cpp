@@ -450,7 +450,7 @@ void ShadowVolumeBSP::buildPolyVolume(SVPoly * poly, LightInfo * light)
       return;
 
    // build the poly
-   Point3F pointOffset = light->getDirection() * 10.f;
+   Point3F pointOffset = light->getDirection() * 10.0f;
 
    // create the shadow volume
    mShadowVolumes.increment();
@@ -603,7 +603,7 @@ void ShadowVolumeBSP::clipToSelf(SVNode * root, SVPoly ** store, SVPoly * poly)
 F32 ShadowVolumeBSP::getPolySurfaceArea(SVPoly * poly) const
 {
    if(!poly)
-      return(0.f);
+      return(0.0f);
 
    Point3F areaNorm(0,0,0);
    for(U32 i = 0; i < poly->mWindingCount; i++)
@@ -618,7 +618,7 @@ F32 ShadowVolumeBSP::getPolySurfaceArea(SVPoly * poly) const
 
    F32 area = mDot(poly->mPlane, areaNorm);
 
-   if(area < 0.f)
+   if(area < 0.0f)
       area *= -0.5f;
    else
       area *= 0.5f;

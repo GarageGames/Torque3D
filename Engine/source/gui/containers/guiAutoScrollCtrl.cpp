@@ -91,11 +91,11 @@ GuiAutoScrollCtrl::GuiAutoScrollCtrl()
    : mDirection( Up ),
      mIsLooping( true ),
      mCurrentPhase( PhaseComplete ),
-     mCurrentTime( 0.f ),
-     mStartDelay( 3.f ),
-     mResetDelay( 5.f ),
+     mCurrentTime( 0.0f ),
+     mStartDelay( 3.0f ),
+     mResetDelay( 5.0f ),
      mChildBorder( 10 ),
-     mScrollSpeed( 1.f ),
+     mScrollSpeed( 1.0f ),
      mScrollOutOfSight( false )
 {
    mIsContainer = true;

@@ -280,7 +280,7 @@ F32 Selection::getAvgHeight()
    if(!size())
       return(0);
 
-   F32 avg = 0.f;
+   F32 avg = 0.0f;
    for(U32 i = 0; i < size(); i++)
       avg += (*this)[i].mHeight;
 
@@ -736,7 +736,7 @@ TerrainEditor::TerrainEditor() :
    mSmoothFactor = 0.1f;
    mNoiseFactor = 1.0f;
    mMaterialGroup = 0;
-   mSoftSelectRadius = 50.f;
+   mSoftSelectRadius = 50.0f;
    mAdjustHeightMouseScale = 0.1f;
 
    mSoftSelectDefaultFilter = StringTable->insert("1.000000 0.833333 0.666667 0.500000 0.333333 0.166667 0.000000");
@@ -995,7 +995,7 @@ bool TerrainEditor::getGridInfo(const GridPoint & gPoint, GridInfo & info)
    info.mGridPoint = gPoint;
    info.mMaterial = getGridMaterial(gPoint);
    info.mHeight = getGridHeight(gPoint);
-   info.mWeight = 1.f;
+   info.mWeight = 1.0f;
    info.mPrimarySelect = true;
    info.mMaterialChanged = false;
 
@@ -1414,14 +1414,14 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
 
          if(center)
          {
-            if ( weight < 0.f || weight > 1.f )
+            if ( weight < 0.0f || weight > 1.0f )
                color = inColorFull;
             else
                color.interpolate( inColorNone, inColorFull, weight );
          }
          else
          {
-            if ( weight < 0.f || weight > 1.f)
+            if ( weight < 0.0f || weight > 1.0f)
                color = outColorFull;
             else
                color.interpolate( outColorFull, outColorNone, weight );
@@ -1464,14 +1464,14 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
          {
             if ( center )
             {
-               if ( weight < 0.f || weight > 1.f )
+               if ( weight < 0.0f || weight > 1.0f )
                   color = inColorFull;
                else
                   color.interpolate(inColorNone, inColorFull, weight );
             }
             else
             {
-               if( weight < 0.f || weight > 1.f )
+               if( weight < 0.0f || weight > 1.0f )
                   color = outColorFull;
                else
                   color.interpolate(outColorFull, outColorNone, weight );
@@ -1592,7 +1592,7 @@ void TerrainEditor::renderBorder()
          PrimBuild::vertex3f(max.x, min.y, 0);
          PrimBuild::vertex3f(max.x, min.y, height);
          PrimBuild::vertex3f(min.x, min.y, height);
-         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.f );
+         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.0f );
          PrimBuild::end();
 
          //
@@ -1601,7 +1601,7 @@ void TerrainEditor::renderBorder()
          PrimBuild::vertex3f(max.x, max.y, 0);
          PrimBuild::vertex3f(max.x, max.y, height);
          PrimBuild::vertex3f(min.x, max.y, height);
-         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.f );
+         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.0f );
          PrimBuild::end();
 
          //
@@ -1610,7 +1610,7 @@ void TerrainEditor::renderBorder()
          PrimBuild::vertex3f(min.x, max.y, 0);
          PrimBuild::vertex3f(min.x, max.y, height);
          PrimBuild::vertex3f(min.x, min.y, height);
-         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.f );
+         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.0f );
          PrimBuild::end();
 
          //
@@ -1619,7 +1619,7 @@ void TerrainEditor::renderBorder()
          PrimBuild::vertex3f(max.x, max.y, 0);
          PrimBuild::vertex3f(max.x, max.y, height);
          PrimBuild::vertex3f(max.x, min.y, height);
-         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.f );
+         if(!i) PrimBuild::vertex3f( min.x, min.y, 0.0f );
          PrimBuild::end();
       }
    }
@@ -2162,7 +2162,7 @@ void TerrainEditor::resetSelWeights(bool clear)
       for(U32 i = 0; i < mDefaultSel.size(); i++)
       {
          mDefaultSel[i].mPrimarySelect = false;
-         mDefaultSel[i].mWeight = 1.f;
+         mDefaultSel[i].mWeight = 1.0f;
       }
       return;
    }
@@ -2174,7 +2174,7 @@ void TerrainEditor::resetSelWeights(bool clear)
    {
       if(mDefaultSel[i].mPrimarySelect)
       {
-         mDefaultSel[i].mWeight = 1.f;
+         mDefaultSel[i].mWeight = 1.0f;
          sel.add(mDefaultSel[i]);
       }
    }

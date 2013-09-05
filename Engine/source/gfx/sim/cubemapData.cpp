@@ -231,7 +231,7 @@ void CubemapData::updateDynamic(SceneManager* sm, const Point3F& pos)
 
       mRenderTarget->attachTexture( GFXTextureTarget::Color0, mCubemap, i );
       GFX->setActiveRenderTarget( mRenderTarget );
-      GFX->clear( GFXClearStencil | GFXClearTarget | GFXClearZBuffer, ColorI( 64, 64, 64 ), 1.f, 0 );
+      GFX->clear( GFXClearStencil | GFXClearTarget | GFXClearZBuffer, ColorI( 64, 64, 64 ), 1.0f, 0 );
 
       // render scene
       sm->renderScene( SPT_Reflect, mDynamicObjectTypeMask );

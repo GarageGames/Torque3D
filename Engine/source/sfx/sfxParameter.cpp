@@ -101,10 +101,10 @@ IMPLEMENT_CALLBACK( SFXParameter, onUpdate, void, (), (),
 //-----------------------------------------------------------------------------
 
 SFXParameter::SFXParameter()
-   : mValue( 1.f ),
-     mRange( 0.f, 1.f ),
+   : mValue( 1.0f ),
+     mRange( 0.0f, 1.0f ),
      mChannel( SFXChannelVolume ),
-     mDefaultValue( 1.f )
+     mDefaultValue( 1.0f )
 {
 }
 
@@ -283,19 +283,19 @@ void SFXParameter::setChannel( SFXChannel channel )
    {
       case SFXChannelVolume:
       case SFXChannelConeOutsideVolume:
-         setRange( 0.f, 1.0f );
+         setRange( 0.0f, 1.0f );
          break;
          
       case SFXChannelConeInsideAngle:
       case SFXChannelConeOutsideAngle:
-         setRange( 0.f, 360.f );
+         setRange( 0.0f, 360.0f );
          break;
          
       case SFXChannelPitch:
       case SFXChannelMinDistance:
       case SFXChannelMaxDistance:
       case SFXChannelCursor:
-         setRange( 0.f, TypeTraits< F32 >::MAX );
+         setRange( 0.0f, TypeTraits< F32 >::MAX );
          break;
          
       case SFXChannelStatus:

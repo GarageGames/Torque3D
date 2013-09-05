@@ -304,7 +304,7 @@ void WorldEditorSelection::offset( const Point3F& offset, F32 gridSnap )
       // adjust
       wPos += offset;
       
-      if( gridSnap != 0.f )
+      if( gridSnap != 0.0f )
       {
          wPos.x -= mFmod( wPos.x, gridSnap );
          wPos.y -= mFmod( wPos.y, gridSnap );
@@ -667,7 +667,7 @@ ConsoleMethod( WorldEditorSelection, offset, void, 3, 4, "( vector delta, float 
    F32 x, y, z;
    dSscanf( argv[ 3 ], "%g %g %g", &x, &y, &z );
    
-   F32 gridSnap = 0.f;
+   F32 gridSnap = 0.0f;
    if( argc > 3 )
       gridSnap = dAtof( argv[ 3 ] );
       

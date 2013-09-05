@@ -60,7 +60,7 @@ int QSORT_CALLBACK cmpSortDistanceFieldSearchSpaceStruct(const void* p1, const v
 //   S32 targetToSourcePixOffsetY = targetToSourceScalarY / 2;
 //
 //   F32 range = getMin(sourceSizeX,sourceSizeY) * rangePct;
-//   F32 range2 = range * 2.f;
+//   F32 range2 = range * 2.0f;
 //
 //   {
 //      S32 intRange = mCeil(range);
@@ -141,7 +141,7 @@ void GFXUtil::DistanceField::makeDistanceField( const U8 * sourceData, S32 sourc
    S32 targetToSourcePixOffsetX = targetToSourceScalarX / 2;
    S32 targetToSourcePixOffsetY = targetToSourceScalarY / 2;
 
-   F32 radius2 = radius * 2.f;
+   F32 radius2 = radius * 2.0f;
 
    {
       S32 intRange = mCeil(radius);

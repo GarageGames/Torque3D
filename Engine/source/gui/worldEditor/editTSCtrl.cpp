@@ -591,7 +591,7 @@ bool EditTSCtrl::onMouseWheelUp( const GuiEvent &event )
    // Looks like this should be zooming based on a factor of the GuiEvent.fval
    if( isOrthoDisplayType() && !event.modifier )
    {
-      orthoZoom( -2.f );
+      orthoZoom( -2.0f );
       return true;
    }
 
@@ -606,7 +606,7 @@ bool EditTSCtrl::onMouseWheelDown( const GuiEvent &event )
    // Looks like this should be zooming based on a factor of the GuiEvent.fval
    if(mDisplayType != DisplayTypePerspective && !event.modifier)
    {
-      orthoZoom( 2.f );
+      orthoZoom( 2.0f );
       return true;
    }
 
@@ -1265,19 +1265,19 @@ DefineEngineMethod( EditTSCtrl, renderCircle, void, ( Point3F pos, Point3F norma
    {
       mCross( normal, Point3F(0,0,1), &aa.axis );
       aa.axis.normalizeSafe();
-      aa.angle = mAcos( mClampF( dotUp, -1.f, 1.f ) );
+      aa.angle = mAcos( mClampF( dotUp, -1.0f, 1.0f ) );
    }
 
    MatrixF mat;
    aa.setMatrix(&mat);
 
    F32 step = M_2PI / segments;
-   F32 angle = 0.f;
+   F32 angle = 0.0f;
 
    Vector<Point3F> points(segments);
    for(U32 i = 0; i < segments; i++)
    {
-      Point3F pnt(mCos(angle), mSin(angle), 0.f);
+      Point3F pnt(mCos(angle), mSin(angle), 0.0f);
 
       mat.mulP(pnt);
       pnt *= radius;

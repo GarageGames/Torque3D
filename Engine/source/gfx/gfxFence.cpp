@@ -86,9 +86,9 @@ void GFXGeneralFence::issue()
 
    // CodeReview: We can re-do this with a static vertex buffer at some point. [5/9/2007 Pat]
    PrimBuild::begin( GFXTriangleList, 3 );
-      PrimBuild::vertex2f( 0.f, 0.f );
-      PrimBuild::vertex2f( 0.f, 1.f );
-      PrimBuild::vertex2f( 1.f, 0.f );
+      PrimBuild::vertex2f( 0.0f, 0.0f );
+      PrimBuild::vertex2f( 0.0f, 1.0f );
+      PrimBuild::vertex2f( 1.0f, 0.0f );
    PrimBuild::end();
 
    GFX->popWorldMatrix();

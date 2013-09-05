@@ -358,10 +358,10 @@ void Sim3DAudioEvent::unpack(NetConnection *con, BitStream *bstream)
       F32 value = ((q.x * q.x) + (q.y * q.y) + (q.z * q.z));
 // #ifdef __linux
       // Hmm, this should never happen, but it does...
-      if ( value > 1.f )
-         value = 1.f;
+      if ( value > 1.0f )
+         value = 1.0f;
 // #endif
-      q.w = mSqrt(1.f - value);
+      q.w = mSqrt(1.0f - value);
       if (bstream->readFlag())
          q.w = -q.w;
       q.setMatrix(&mTransform);

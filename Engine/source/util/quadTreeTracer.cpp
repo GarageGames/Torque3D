@@ -51,7 +51,7 @@ bool QuadTreeTracer::castRay(const Point3F &start, const Point3F &end, RayInfo *
    }
    else
    {
-      invDeltaX = 1.f / (end.x - start.x);
+      invDeltaX = 1.0f / (end.x - start.x);
       calcInterceptX = calcInterceptV;
    }
 
@@ -63,12 +63,12 @@ bool QuadTreeTracer::castRay(const Point3F &start, const Point3F &end, RayInfo *
    }
    else
    {
-      invDeltaY = 1.f / (end.y - start.y);
+      invDeltaY = 1.0f / (end.y - start.y);
       calcInterceptY = calcInterceptV;
    }
 
    // Subdivide our space based on the size of the lowest level of the tree...
-   const F32 invSize   = 1.f / F32(BIT(mTreeDepth-1));
+   const F32 invSize   = 1.0f / F32(BIT(mTreeDepth-1));
 
    // Grab this off the frame allocator, we don't want to do a proper alloc
    // on every ray!
@@ -96,8 +96,8 @@ bool QuadTreeTracer::castRay(const Point3F &start, const Point3F &end, RayInfo *
       const F32 endT          = sn->endT;
       const Point2I squarePos = sn->squarePos;
 
-      AssertFatal((startT >= 0.f) && (startT <= 1.f),  "QuadTreeTracer::castRay - out of range startT on stack!");
-      AssertFatal((endT >= 0.f) && (endT <= 1.f),     "QuadTreeTracer::castRay - out of range endT   on stack!");
+      AssertFatal((startT >= 0.0f) && (startT <= 1.0f),  "QuadTreeTracer::castRay - out of range startT on stack!");
+      AssertFatal((endT >= 0.0f) && (endT <= 1.0f),     "QuadTreeTracer::castRay - out of range endT   on stack!");
 
       //Con::printf(" -- node(%d, %d @ %d), sT=%f, eT=%f", squarePos.x, squarePos.y, level, startT, endT);
 

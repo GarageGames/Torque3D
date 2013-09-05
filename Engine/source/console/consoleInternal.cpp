@@ -533,7 +533,7 @@ void Dictionary::Entry::setStringValue(const char * value)
       }
       else
       {
-         fval = 0.f;
+         fval = 0.0f;
          ival = 0;
       }
 

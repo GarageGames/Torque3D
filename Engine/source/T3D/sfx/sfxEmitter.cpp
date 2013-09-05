@@ -76,9 +76,9 @@ ConsoleDocClass( SFXEmitter,
 extern bool gEditingMission;
 bool SFXEmitter::smRenderEmitters;
 F32 SFXEmitter::smRenderPointSize = 0.8f;
-F32 SFXEmitter::smRenderRadialIncrements = 5.f;
-F32 SFXEmitter::smRenderSweepIncrements = 5.f;
-F32 SFXEmitter::smRenderPointDistance = 5.f;
+F32 SFXEmitter::smRenderRadialIncrements = 5.0f;
+F32 SFXEmitter::smRenderSweepIncrements = 5.0f;
+F32 SFXEmitter::smRenderPointDistance = 5.0f;
 ColorI SFXEmitter::smRenderColorPlayingInRange( 50, 255, 50, 255 );
 ColorI SFXEmitter::smRenderColorPlayingOutOfRange( 50, 128, 50, 255 );
 ColorI SFXEmitter::smRenderColorStoppedInRange( 0, 0, 0, 255 );
@@ -105,13 +105,13 @@ SFXEmitter::SFXEmitter()
    mDescription.mIs3D = true;
    mDescription.mIsLooping = true;
    mDescription.mIsStreaming = false;
-   mDescription.mFadeInTime = -1.f;
-   mDescription.mFadeOutTime = -1.f;
+   mDescription.mFadeInTime = -1.0f;
+   mDescription.mFadeOutTime = -1.0f;
    
    mLocalProfile._registerSignals();
 
-   mObjBox.minExtents.set( -1.f, -1.f, -1.f );
-   mObjBox.maxExtents.set( 1.f, 1.f, 1.f );
+   mObjBox.minExtents.set( -1.0f, -1.0f, -1.0f );
+   mObjBox.maxExtents.set( 1.0f, 1.0f, 1.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -874,7 +874,7 @@ void SFXEmitter::_render3DVisualFeedback()
    // Render the max range sphere.
    
    if( smRenderColorRangeSphere.alpha > 0 )
-      GFX->getDrawUtil()->drawSphere( desc, mDescription.mMaxDistance, Point3F( 0.f, 0.f, 0.f ), smRenderColorRangeSphere );
+      GFX->getDrawUtil()->drawSphere( desc, mDescription.mMaxDistance, Point3F( 0.0f, 0.0f, 0.0f ), smRenderColorRangeSphere );
    
    //TODO: some point size support in GFX would be nice
 
@@ -887,8 +887,8 @@ void SFXEmitter::_render3DVisualFeedback()
    F32 numPoints;
    while( 1 )
    {
-      numPoints = mCeil( 360.f / radialIncrements ) *
-                  mCeil( 360.f / sweepIncrements ) *
+      numPoints = mCeil( 360.0f / radialIncrements ) *
+                  mCeil( 360.0f / sweepIncrements ) *
                   ( mDescription.mMaxDistance / pointDistance );
                   
       if( numPoints < 65536 )
@@ -907,13 +907,13 @@ void SFXEmitter::_render3DVisualFeedback()
       radialIncrements,
       sweepIncrements,
       pointDistance,
-      mDescription.mConeInsideAngle, 0.f,
+      mDescription.mConeInsideAngle, 0.0f,
       mDescription.mVolume, mDescription.mVolume,
       smRenderColorInnerCone );
 
    // Outer Cone and Outside volume only get rendered if mConeOutsideVolume > 0
    
-   if( mDescription.mConeOutsideVolume > 0.f )
+   if( mDescription.mConeOutsideVolume > 0.0f )
    {
       const F32 outsideVolume = mDescription.mVolume * mDescription.mConeOutsideVolume;
       
@@ -933,7 +933,7 @@ void SFXEmitter::_render3DVisualFeedback()
          radialIncrements,
          sweepIncrements,
          pointDistance,
-         360.f, mDescription.mConeOutsideAngle,
+         360.0f, mDescription.mConeOutsideAngle,
          outsideVolume, outsideVolume,
          smRenderColorOutsideVolume );
    }
@@ -961,21 +961,21 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
    // Unit quaternions representing the start and end angle so we
    // can interpolate between the two without flipping.
    
-   QuatF rotateZStart( EulerF( 0.f, 0.f, startAngleRadians / 2.f ) );
-   QuatF rotateZEnd( EulerF( 0.f, 0.f, stopAngleRadians / 2.f ) );
+   QuatF rotateZStart( EulerF( 0.0f, 0.0f, startAngleRadians / 2.0f ) );
+   QuatF rotateZEnd( EulerF( 0.0f, 0.0f, stopAngleRadians / 2.0f ) );
    
    // Do an angular sweep on one side of our XY disc.  Since we do a full 360 radial sweep
    // around Y for each angle, we only need to sweep over one side.
    
-   const F32 increment = 1.f / ( ( ( startAngle / 2.f ) - ( stopAngle / 2.f ) ) / sweepIncrements );
-   for( F32 t = 0.f; t < 1.0f; t += increment )
+   const F32 increment = 1.0f / ( ( ( startAngle / 2.0f ) - ( stopAngle / 2.0f ) ) / sweepIncrements );
+   for( F32 t = 0.0f; t < 1.0f; t += increment )
    {
       // Quaternion to rotate point into place on XY disc.
       QuatF rotateZ;
       rotateZ.interpolate( rotateZStart, rotateZEnd, t );
       
       // Quaternion to rotate one position around Y axis.  Used for radial sweep.
-      QuatF rotateYOne( EulerF( 0.f, radialIncrementsRadians, 0.f ) );
+      QuatF rotateYOne( EulerF( 0.0f, radialIncrementsRadians, 0.0f ) );
 
       // Do a radial sweep each step along the distance axis.  For each step, volume is
       // the same for any point on the sweep circle.
@@ -989,7 +989,7 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
          // interpolation.  For the remaining angles, the cone volume is constant.
 
          F32 volume = mLerp( startVolume, stopVolume, t );
-         if( volume == 0.f )
+         if( volume == 0.0f )
             c.alpha = 0;
          else
          {         
@@ -1006,17 +1006,17 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
             // Fade alpha according to how much volume we
             // have left at the current point.
             
-            c.alpha = F32( c.alpha ) * ( attenuatedVolume / 1.f );
+            c.alpha = F32( c.alpha ) * ( attenuatedVolume / 1.0f );
          }
          
          PrimBuild::color( c );
          
          // Create points by doing a full 360 degree radial sweep around Y.
 
-         Point3F p( 0.f, y, 0.f );
+         Point3F p( 0.0f, y, 0.0f );
          rotateZ.mulP( p, &p );
          
-         for( F32 radialAngle = 0.f; radialAngle < 360.f; radialAngle += radialIncrements )
+         for( F32 radialAngle = 0.0f; radialAngle < 360.0f; radialAngle += radialIncrements )
          {
             PrimBuild::vertex3f( p.x, p.y, p.z );
             rotateYOne.mulP( p, &p );

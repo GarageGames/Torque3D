@@ -106,7 +106,7 @@ class WorldEditorSelection : public SimPersistSet
       const MatrixF& getTransform();
       
       //
-      void offset(const Point3F& delta, F32 gridSnap = 0.f );
+      void offset(const Point3F& delta, F32 gridSnap = 0.0f );
       void setPosition(const Point3F & pos);
       void setCentroidPosition(bool useBoxCenter, const Point3F & pos);
 

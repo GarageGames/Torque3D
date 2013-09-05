@@ -98,9 +98,9 @@ class GFXTextureManager;
 /// GFXVertexBufferHandle vb = GFX->allocVertexBuffer( 3, &verts, true ); 
 ///
 /// // Now set the information, we're making a triangle
-/// verts[0].point = Point3F( 200.f, 200.f, 0.f );
-/// verts[1].point = Point3F( 200.f, 400.f, 0.f );
-/// verts[2].point = Point3F( 400.f, 200.f, 0.f );
+/// verts[0].point = Point3F( 200.0f, 200.0f, 0.0f );
+/// verts[1].point = Point3F( 200.0f, 400.0f, 0.0f );
+/// verts[2].point = Point3F( 400.0f, 200.0f, 0.0f );
 ///
 /// // Tell GFX that the information is in and it should be made ready for use
 /// // Note that nothing is done with verts, this should not and MUST NOT be deleted

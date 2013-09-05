@@ -614,8 +614,8 @@ void fxFoliageReplicator::CreateFoliage(void)
 
          // Initialise RayCast Search Start/End Positions.
          FoliageStart = FoliageEnd = FoliagePosition;
-         FoliageStart.z = 2000.f;
-         FoliageEnd.z= -2000.f;
+         FoliageStart.z = 2000.0f;
+         FoliageEnd.z= -2000.0f;
 
          // Perform Ray Cast Collision on Client.
          CollisionResult = gClientContainer.castRay(	FoliageStart, FoliageEnd, FXFOLIAGEREPLICATOR_COLLISION_MASK, &RayEvent);

@@ -30,7 +30,7 @@ Point3F PolyhedronImpl< Base >::getCenterPoint() const
 {
    const U32 numPoints = this->getNumPoints();
    if( numPoints == 0 )
-      return Point3F( 0.f, 0.f, 0.f );
+      return Point3F( 0.0f, 0.0f, 0.0f );
 
    const typename Base::PointType* pointList = this->getPoints();
    Point3F center( pointList[ 0 ] );
@@ -464,7 +464,7 @@ void PolyhedronData::buildBoxData( Polyhedron& poly, const MatrixF& mat, const B
 
    typename Polyhedron::PlaneListType& planeList = poly.planeList;
 
-   const F32 pos = invertNormals ? -1.f : 1.f;
+   const F32 pos = invertNormals ? -1.0f : 1.0f;
    const F32 neg = - pos;
 
    planeList[ 0 ].set( pointList[ 0 ], xvec * pos ); // left

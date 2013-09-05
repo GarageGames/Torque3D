@@ -691,8 +691,8 @@ inline float sgn(float a)
 
 MatrixF PlaneReflector::getFrustumClipProj( MatrixF &modelview )
 {
-   static MatrixF rotMat(EulerF( static_cast<F32>(M_PI / 2.f), 0.0, 0.0));
-   static MatrixF invRotMat(EulerF( -static_cast<F32>(M_PI / 2.f), 0.0, 0.0));
+   static MatrixF rotMat(EulerF( static_cast<F32>(M_PI / 2.0f), 0.0, 0.0));
+   static MatrixF invRotMat(EulerF( -static_cast<F32>(M_PI / 2.0f), 0.0, 0.0));
 
 
    MatrixF revModelview = modelview;

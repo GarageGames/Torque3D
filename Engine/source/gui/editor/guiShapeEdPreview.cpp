@@ -1377,7 +1377,7 @@ void GuiShapeEdPreview::renderWorld(const RectI &updateRect)
       renderGrid();
 
       // Animate the model
-      updateThreads( (F32)dt / 1000.f );
+      updateThreads( (F32)dt / 1000.0f );
       mModel->animate();
 
       // Render the shape

@@ -476,7 +476,7 @@ void BitStream::readAffineTransform(MatrixF* matrix)
    read(&q.x);
    read(&q.y);
    read(&q.z);
-   q.w = mSqrt(1.0 - getMin(F32(((q.x * q.x) + (q.y * q.y) + (q.z * q.z))), 1.f));
+   q.w = mSqrt(1.0 - getMin(F32(((q.x * q.x) + (q.y * q.y) + (q.z * q.z))), 1.0f));
    if (readFlag())
       q.w = -q.w;
 

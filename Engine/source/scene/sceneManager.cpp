@@ -112,7 +112,7 @@ SceneManager::SceneManager( bool isClient )
      mUsePostEffectFog( true ),
      mDisplayTargetResolution( 0, 0 ),
      mDefaultRenderPass( NULL ),
-     mVisibleDistance( 500.f ),
+     mVisibleDistance( 500.0f ),
      mNearClip( 0.1f ),
      mAmbientLightColor( ColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
      mZoneManager( NULL )

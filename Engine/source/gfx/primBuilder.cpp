@@ -277,7 +277,7 @@ void vertex2fv( const F32 *data )
    VERTEX_BOUNDS_CHECK();
    GFXVertexPCT *vert = &mTempVertBuff[mCurVertIndex++];
 
-   vert->point.set( data[0], data[1], 0.f );
+   vert->point.set( data[0], data[1], 0.0f );
    vert->color = mCurColor;
    vert->texCoord = mCurTexCoord;
 }

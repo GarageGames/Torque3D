@@ -44,7 +44,7 @@ bool DecalSphere::tryAddItem( DecalInstance* inst )
    // better.
 
    const F32 distCenterToCenter = ( mWorldSphere.center - inst->mPosition ).len();
-   const F32 distBoundsToCenter = distCenterToCenter - inst->mSize / 2.f;
+   const F32 distBoundsToCenter = distCenterToCenter - inst->mSize / 2.0f;
 
    if( distBoundsToCenter > smDistanceTolerance )
       return false;
@@ -52,7 +52,7 @@ bool DecalSphere::tryAddItem( DecalInstance* inst )
    // Also, if adding the current decal to the sphere would make
    // it larger than our radius tolerance, don't use it.
 
-   const F32 newRadius = distCenterToCenter + inst->mSize / 2.f + 0.5f;
+   const F32 newRadius = distCenterToCenter + inst->mSize / 2.0f + 0.5f;
    if( newRadius > mWorldSphere.radius && newRadius > smRadiusTolerance )
       return false;
 

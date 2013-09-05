@@ -57,8 +57,8 @@ struct AuthInfo;
 
 #define GameString TORQUE_APP_NAME
 
-const F32 MinCameraFov              = 1.f;      ///< min camera FOV
-const F32 MaxCameraFov              = 179.f;    ///< max camera FOV
+const F32 MinCameraFov              = 1.0f;      ///< min camera FOV
+const F32 MaxCameraFov              = 179.0f;    ///< max camera FOV
 
 class GameConnection : public NetConnection
 {

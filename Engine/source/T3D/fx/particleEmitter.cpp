@@ -100,9 +100,9 @@ ConsoleDocClass( ParticleEmitterData,
    "@see ParticleEmitterNode\n"
 );
 
-static const float sgDefaultEjectionOffset = 0.f;
-static const float sgDefaultPhiReferenceVel = 0.f;
-static const float sgDefaultPhiVariance = 360.f;
+static const float sgDefaultEjectionOffset = 0.0f;
+static const float sgDefaultPhiReferenceVel = 0.0f;
+static const float sgDefaultPhiVariance = 360.0f;
 
 //-----------------------------------------------------------------------------
 // ParticleEmitterData
@@ -174,10 +174,10 @@ EndImplementEnumType;
 
 IRangeValidator ejectPeriodIValidator(1, 2047);
 IRangeValidator periodVarianceIValidator(0, 2047);
-FRangeValidator ejectionFValidator(0.f, 655.35f);
-FRangeValidator velVarianceFValidator(0.f, 163.83f);
-FRangeValidator thetaFValidator(0.f, 180.f);
-FRangeValidator phiFValidator(0.f, 360.f);
+FRangeValidator ejectionFValidator(0.0f, 655.35f);
+FRangeValidator velVarianceFValidator(0.0f, 163.83f);
+FRangeValidator thetaFValidator(0.0f, 180.0f);
+FRangeValidator phiFValidator(0.0f, 360.0f);
 
 //-----------------------------------------------------------------------------
 // initPersistFields

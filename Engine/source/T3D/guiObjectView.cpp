@@ -105,7 +105,7 @@ GuiObjectView::GuiObjectView()
       mCameraSpeed( 0.01f ),
       mLightColor( 1.0f, 1.0f, 1.0f ),
       mLightAmbient( 0.5f, 0.5f, 0.5f ),
-      mLightDirection( 0.f, 0.707f, -0.707f )
+      mLightDirection( 0.0f, 0.707f, -0.707f )
 {
    mCameraMatrix.identity();
    mCameraRot.set( 0.0f, 0.0f, 3.9f );
@@ -540,7 +540,7 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
    {
       if( mRunThread )
       {
-         mModel->advanceTime( dt / 1000.f, mRunThread );
+         mModel->advanceTime( dt / 1000.0f, mRunThread );
          mModel->animate();
       }
       
@@ -658,7 +658,7 @@ void GuiObjectView::_initAnimation()
       if( !mRunThread )
          mRunThread = mModel->addThread();
          
-      mModel->setSequence( mRunThread, mAnimationSeq, 0.f );
+      mModel->setSequence( mRunThread, mAnimationSeq, 0.0f );
    }
    
    mLastRenderTime = Platform::getVirtualMilliseconds();

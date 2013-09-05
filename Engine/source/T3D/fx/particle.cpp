@@ -67,10 +67,10 @@ ConsoleDocClass( ParticleData,
 );
 
 static const float sgDefaultWindCoefficient = 0.0f;
-static const float sgDefaultConstantAcceleration = 0.f;
-static const float sgDefaultSpinSpeed = 1.f;
-static const float sgDefaultSpinRandomMin = 0.f;
-static const float sgDefaultSpinRandomMax = 0.f;
+static const float sgDefaultConstantAcceleration = 0.0f;
+static const float sgDefaultSpinSpeed = 1.0f;
+static const float sgDefaultSpinRandomMin = 0.0f;
+static const float sgDefaultSpinRandomMax = 0.0f;
 
 
 //-----------------------------------------------------------------------------
@@ -128,9 +128,9 @@ ParticleData::~ParticleData()
    }
 }
 
-FRangeValidator dragCoefFValidator(0.f, 5.f);
-FRangeValidator gravCoefFValidator(-10.f, 10.f);
-FRangeValidator spinRandFValidator(-1000.f, 1000.f);
+FRangeValidator dragCoefFValidator(0.0f, 5.0f);
+FRangeValidator gravCoefFValidator(-10.0f, 10.0f);
+FRangeValidator spinRandFValidator(-1000.0f, 1000.0f);
 
 //-----------------------------------------------------------------------------
 // initPersistFields
@@ -359,7 +359,7 @@ bool ParticleData::protectedSetSizes( void *object, const char *index, const cha
    else
       i = dAtoui(index);
 
-   pData->sizes[i] = mClampF( val, 0.f, MaxParticleSize );
+   pData->sizes[i] = mClampF( val, 0.0f, MaxParticleSize );
 
    return false;
 }
@@ -375,7 +375,7 @@ bool ParticleData::protectedSetTimes( void *object, const char *index, const cha
    else
       i = dAtoui(index);
 
-   pData->times[i] = mClampF( val, 0.f, 1.f );
+   pData->times[i] = mClampF( val, 0.0f, 1.0f );
 
    return false;
 }
@@ -400,11 +400,11 @@ bool ParticleData::onAdd()
       Con::warnf(ConsoleLogEntry::General, "ParticleData(%s) lifetimeVariance >= lifetime", getName());
       lifetimeVarianceMS = lifetimeMS - 1;
    }
-   if (spinSpeed > 1000.f || spinSpeed < -1000.f) {
+   if (spinSpeed > 1000.0f || spinSpeed < -1000.0f) {
       Con::warnf(ConsoleLogEntry::General, "ParticleData(%s) spinSpeed invalid", getName());
       return false;
    }
-   if (spinRandomMin > 1000.f || spinRandomMin < -1000.f) {
+   if (spinRandomMin > 1000.0f || spinRandomMin < -1000.0f) {
       Con::warnf(ConsoleLogEntry::General, "ParticleData(%s) spinRandomMin invalid", getName());
       spinRandomMin = -360.0;
       return false;
@@ -414,7 +414,7 @@ bool ParticleData::onAdd()
       spinRandomMin = spinRandomMax - (spinRandomMin - spinRandomMax );
       return false;
    }
-   if (spinRandomMax > 1000.f || spinRandomMax < -1000.f) {
+   if (spinRandomMax > 1000.0f || spinRandomMax < -1000.0f) {
       Con::warnf(ConsoleLogEntry::General, "ParticleData(%s) spinRandomMax invalid", getName());
       spinRandomMax = 360.0;
       return false;

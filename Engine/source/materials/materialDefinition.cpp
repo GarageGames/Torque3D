@@ -191,7 +191,7 @@ Material::Material()
    mFootstepSoundCustom = 0;  mImpactSoundCustom = 0;
    mFriction = 0.0;
    
-   mDirectSoundOcclusion = 1.f;
+   mDirectSoundOcclusion = 1.0f;
    mReverbSoundOcclusion = 1.0;
 }
 

@@ -91,10 +91,10 @@
 //      i+=10;
 //
 //      // Set up the view...
-//      mDevice->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      mDevice->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //      
 //      //
-//      //mDevice->setOrtho(-4, 4, -4, 4, 0.1, 100.f);
+//      //mDevice->setOrtho(-4, 4, -4, 4, 0.1, 100.0f);
 //      MatrixF worldMatrix(1);
 //      worldMatrix.setPosition(Point3F(0, 0, 0));
 //
@@ -163,12 +163,12 @@
 //   {
 //      // Draw a cube.
 //      static F32 cubeDiddle = 0;
-//      d->getDrawUtil()->drawWireCube(Point3F(1.f * (0.5f + cubeDiddle),1.f - cubeDiddle,1), 
-//         Point3F( 0, 4.f + cubeDiddle * 2.f,0), ColorI(0x0,0xFF,0));
+//      d->getDrawUtil()->drawWireCube(Point3F(1.0f * (0.5f + cubeDiddle),1.0f - cubeDiddle,1), 
+//         Point3F( 0, 4.0f + cubeDiddle * 2.0f,0), ColorI(0x0,0xFF,0));
 //
 //      cubeDiddle += 0.01f;
 //      if(cubeDiddle > 0.9f)
-//         cubeDiddle = 0.f;
+//         cubeDiddle = 0.0f;
 //   }
 //   void run()
 //   {
@@ -226,9 +226,9 @@
 //      v->point = pos;
 //      v->normal = pos;
 //      v->color.set(
-//         U8((pos.x * 100.f) + 127.f),
-//         U8((pos.y * 100.f) + 127.f),
-//         U8((pos.z * 100.f) + 127.f));
+//         U8((pos.x * 100.0f) + 127.0f),
+//         U8((pos.y * 100.0f) + 127.0f),
+//         U8((pos.z * 100.0f) + 127.0f));
 //
 //      v->texCoord.set(pos.y * 0.5f + 0.5f, pos.z * 0.5f + 0.5f);
 //	  //v->texCoord2.set(pos.y * 0.5f + 0.5f, pos.z * 0.5f + 0.5f);
@@ -314,7 +314,7 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //
 //      MatrixF worldMatrix(1);
 //
@@ -375,8 +375,8 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      d->setWorldMatrix(worldMatrix);
@@ -432,8 +432,8 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      d->setWorldMatrix(worldMatrix);
@@ -494,8 +494,8 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      d->setWorldMatrix(worldMatrix);
@@ -540,8 +540,8 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      d->setWorldMatrix(worldMatrix);
@@ -599,8 +599,8 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      d->setWorldMatrix(worldMatrix);
@@ -653,8 +653,8 @@
 //      // to just do it here.
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      d->setWorldMatrix(worldMatrix);
@@ -721,20 +721,20 @@
 //      mCube.ensureValid(d, 1.0f);
 //
 //      // Set up the view...
-//      //d->setFrustum(90.0f, 1.0f, 0.1, 100.f);
-//      d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      //d->setFrustum(90.0f, 1.0f, 0.1, 100.0f);
+//      d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //
 //      // Get some cheesy spin going...
-//      static F32 spinDiddle = 0.f;
+//      static F32 spinDiddle = 0.0f;
 //
 //      worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
-//      worldMatrix.setPosition(Point3F(0.f, 5.f, 0.f));
+//      worldMatrix.setPosition(Point3F(0.0f, 5.0f, 0.0f));
 //
 //      //spinDiddle += 0.0001f;
 //
-//      if(spinDiddle > 90.f)
-//         spinDiddle = 0.f;
+//      if(spinDiddle > 90.0f)
+//         spinDiddle = 0.0f;
 //
 //      d->setWorldMatrix(worldMatrix);
 //
@@ -820,20 +820,20 @@
 //      mLightMaterial.diffuse = ColorF(1.0, 1.0, 1.0, 1.0);
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //      MatrixF projectionMatrix = d->getProjectionMatrix();
-//      //d->setOrtho(-10.f, 10.f, -10.f, 10.f, 0.1f, 10.f, false);
+//      //d->setOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f, false);
 //      MatrixF worldMatrix(1);
 //      MatrixF lightMatrix(1);
 //      MatrixF secondLightMatrix(1);
 //      MatrixF thirdLightMatrix(1);
 //
 //      // Get some cheesy spin going...
-//      static F32 spinDiddle = 0.f;
+//      static F32 spinDiddle = 0.0f;
 //
 //      // Bunny location
 //      worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
-//      worldMatrix.setPosition(Point3F(0.f, 1.5f, 0.f));
+//      worldMatrix.setPosition(Point3F(0.0f, 1.5f, 0.0f));
 //
 //      // Spinning cube of light
 //      lightMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
@@ -855,8 +855,8 @@
 //
 //      spinDiddle += 0.001f;
 //
-//      if(spinDiddle > 90.f)
-//         spinDiddle = 0.f;
+//      if(spinDiddle > 90.0f)
+//         spinDiddle = 0.0f;
 //
 //      // Cheat.  By keeping the view and world matrices as identity matrices
 //      // we trick D3D and OpenGL into accepting lights in object space and doing all
@@ -958,19 +958,19 @@
 //         mTex = d->getTextureManager()->createTexture("common/gui/images/GG_Icon.png", &GFXDefaultPersistentProfile);
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //      MatrixF worldMatrix(1);
 //
 //      // Get some cheesy spin going...
-//      static F32 spinDiddle = 0.f;
+//      static F32 spinDiddle = 0.0f;
 //
-//      worldMatrix *= MatrixF(EulerF(0.f,spinDiddle, 90.f - spinDiddle ));
-//      worldMatrix.setPosition(Point3F(0.f, 5.f, 0.f));
+//      worldMatrix *= MatrixF(EulerF(0.0f,spinDiddle, 90.0f - spinDiddle ));
+//      worldMatrix.setPosition(Point3F(0.0f, 5.0f, 0.0f));
 //
 //      spinDiddle += 0.001f;
 //
-//      if(spinDiddle > 90.f)
-//         spinDiddle = 0.f;
+//      if(spinDiddle > 90.0f)
+//         spinDiddle = 0.0f;
 //
 //      d->setWorldMatrix(worldMatrix);
 //
@@ -1051,19 +1051,19 @@
 //      mTex->unlock(0);
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //      MatrixF worldMatrix(1);
 //
 //      // Get some cheesy spin going...
-//      static F32 spinDiddle = 0.f;
+//      static F32 spinDiddle = 0.0f;
 //
-//      worldMatrix *= MatrixF(EulerF(0.f,spinDiddle, 90.f - spinDiddle ));
-//      worldMatrix.setPosition(Point3F(0.f, 3.f, 0.f));
+//      worldMatrix *= MatrixF(EulerF(0.0f,spinDiddle, 90.0f - spinDiddle ));
+//      worldMatrix.setPosition(Point3F(0.0f, 3.0f, 0.0f));
 //
 //      spinDiddle += 0.001f;
 //
-//      if(spinDiddle > 90.f)
-//         spinDiddle = 0.f;
+//      if(spinDiddle > 90.0f)
+//         spinDiddle = 0.0f;
 //
 //      d->setWorldMatrix(worldMatrix);
 //
@@ -1119,19 +1119,19 @@
 //			mTex1 = d->getTextureManager()->createTexture("common/gui/images/crossHair.png", &GFXDefaultPersistentProfile);
 //
 //		// Set up the view...
-//		d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//		d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //		MatrixF worldMatrix(1);
 //
 //		// Get some cheesy spin going...
-//		static F32 spinDiddle = 0.f;
+//		static F32 spinDiddle = 0.0f;
 //
-//		worldMatrix *= MatrixF(EulerF(0.f,spinDiddle, 90.f - spinDiddle ));
-//		worldMatrix.setPosition(Point3F(0.f, 5.f, 0.f));
+//		worldMatrix *= MatrixF(EulerF(0.0f,spinDiddle, 90.0f - spinDiddle ));
+//		worldMatrix.setPosition(Point3F(0.0f, 5.0f, 0.0f));
 //
 //		spinDiddle += 0.001f;
 //
-//		if(spinDiddle > 90.f)
-//			spinDiddle = 0.f;
+//		if(spinDiddle > 90.0f)
+//			spinDiddle = 0.0f;
 //
 //		d->setWorldMatrix(worldMatrix);
 //
@@ -1218,19 +1218,19 @@
 //         d->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, ColorI( 0, 0, 0 ), 1.0f, 0 );
 //
 //
-//         d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//         d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //         MatrixF worldMatrix(1);
 //
 //         // Get some cheesy spin going...
-//         static F32 spinDiddle = 45.f;
+//         static F32 spinDiddle = 45.0f;
 //
-//         worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.f - spinDiddle ));
+//         worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
 //         worldMatrix.setPosition(Point3F(0, 3, 0));
 //
 //         spinDiddle += 0.001f;
 //
-//         if(spinDiddle > 90.f)
-//            spinDiddle = 0.f;
+//         if(spinDiddle > 90.0f)
+//            spinDiddle = 0.0f;
 //
 //         d->setWorldMatrix(worldMatrix);
 //
@@ -1247,19 +1247,19 @@
 //         d->setTexture(0, mTex);
 //
 //         // Set up the view...
-//         d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//         d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //         MatrixF worldMatrix(1);
 //
 //         // Get some cheesy spin going...
-//         static F32 spinDiddle = 0.f;
+//         static F32 spinDiddle = 0.0f;
 //
-//         worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.f - spinDiddle ));
+//         worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
 //         worldMatrix.setPosition(Point3F(0, 5, 0));
 //
 //         spinDiddle += 0.001f;
 //
-//         if(spinDiddle > 90.f)
-//            spinDiddle = 0.f;
+//         if(spinDiddle > 90.0f)
+//            spinDiddle = 0.0f;
 //
 //         d->setWorldMatrix(worldMatrix);
 //         d->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, ColorI( 0, 0, 0 ), 1.0f, 0 );
@@ -1354,7 +1354,7 @@
 //      d->popActiveRenderTarget();
 //
 //      // Set up the view...
-//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      d->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //
 //      // Cheesy little positional offset table.
 //      F32 posOffsets[4][3] = 
@@ -1372,15 +1372,15 @@
 //         // Get some cheesy spin going...
 //         MatrixF worldMatrix(1);
 //
-//         static F32 spinDiddle = 0.f;
+//         static F32 spinDiddle = 0.0f;
 //
-//         worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.f - spinDiddle ));
+//         worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
 //         worldMatrix.setPosition(Point3F(posOffsets[i][0], posOffsets[i][1], posOffsets[i][2]));
 //
 //         spinDiddle += 0.001f;
 //
-//         if(spinDiddle > 90.f)
-//            spinDiddle = 0.f;
+//         if(spinDiddle > 90.0f)
+//            spinDiddle = 0.0f;
 //
 //         d->setWorldMatrix(worldMatrix);
 //         d->setTexture(0, mTex[i]);
@@ -1447,20 +1447,20 @@
 //      i+=10;
 //
 //      // Set up the view...
-//      mDevice->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
+//      mDevice->setFrustum(90.0f, 1.0f, 0.1f, 100.0f);
 //
 //      // Get some cheesy spin going...
 //      MatrixF worldMatrix(1);
 //
-//      static F32 spinDiddle = 0.f;
+//      static F32 spinDiddle = 0.0f;
 //
-//      worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.f - spinDiddle ));
+//      worldMatrix *= MatrixF(EulerF(0,spinDiddle, 90.0f - spinDiddle ));
 //      worldMatrix.setPosition(Point3F(-2, 5, -2));
 //
 //      spinDiddle += 0.001f;
 //
-//      if(spinDiddle > 90.f)
-//         spinDiddle = 0.f;
+//      if(spinDiddle > 90.0f)
+//         spinDiddle = 0.0f;
 //
 //      mDevice->setWorldMatrix(worldMatrix);
 //

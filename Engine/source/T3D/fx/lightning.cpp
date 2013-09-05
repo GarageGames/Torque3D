@@ -1112,7 +1112,7 @@ F32 LightningBolt::findHeight( Point3F &point, SceneManager *sceneManager )
          return h;
    }
 
-   return 0.f;
+   return 0.0f;
 }
 
 

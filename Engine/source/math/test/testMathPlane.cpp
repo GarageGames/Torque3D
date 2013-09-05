@@ -36,7 +36,7 @@ CreateUnitTest( TestMathPlane, "Math/Plane" )
 {
    static F32 randF()
    {
-      return gRandGen.randF( -1.f, 1.f );
+      return gRandGen.randF( -1.0f, 1.0f );
    }
 
    void test_whichSide()

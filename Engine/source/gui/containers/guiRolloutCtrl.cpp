@@ -423,9 +423,9 @@ void GuiRolloutCtrl::animateTo( S32 height )
 
    // Set Animation Step (Increment)
    if ( collapsing )
-      mAnimateStep = (S32)mFloor( (F32)( getHeight() - height ) / 3.f );
+      mAnimateStep = (S32)mFloor( (F32)( getHeight() - height ) / 3.0f );
    else
-      mAnimateStep = (S32)mFloor( (F32)( height - getHeight() ) / 3.f );
+      mAnimateStep = (S32)mFloor( (F32)( height - getHeight() ) / 3.0f );
 
    // Start our animation
    mIsAnimating = true;

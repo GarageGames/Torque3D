@@ -127,7 +127,7 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
             case Left:  return - mScrollSpeed;
             case Right: return mScrollSpeed;
          }
-         return 0.f;
+         return 0.0f;
       }
 
    public:

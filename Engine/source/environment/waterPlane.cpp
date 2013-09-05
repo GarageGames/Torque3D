@@ -811,7 +811,7 @@ bool WaterPlane::isUnderwater( const Point3F &pnt ) const
 F32 WaterPlane::distanceTo( const Point3F& point ) const
 {
    if( isUnderwater( point ) )
-      return 0.f;
+      return 0.0f;
    else
       return ( point.z - getPosition().z );
 }

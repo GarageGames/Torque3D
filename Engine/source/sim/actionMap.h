@@ -130,7 +130,7 @@ class ActionMap : public SimObject
    static const char* getModifierString(const U32 modifiers);
 
    /// Pass index to a break entry, and this function will fire it off.
-   static void fireBreakEvent(U32 idx, F32 value = 0.f);
+   static void fireBreakEvent(U32 idx, F32 value = 0.0f);
 
   public:
    ActionMap();

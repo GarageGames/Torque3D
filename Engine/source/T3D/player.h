@@ -606,7 +606,7 @@ protected:
    virtual bool updatePos(const F32 travelTime = TickSec);
 
    ///Update head animation
-   void updateLookAnimation(F32 dT = 0.f);
+   void updateLookAnimation(F32 dT = 0.0f);
 
    ///Update other animations
    void updateAnimation(F32 dt);

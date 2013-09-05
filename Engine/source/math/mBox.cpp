@@ -241,7 +241,7 @@ Point3F Box3F::computeVertex( U32 corner ) const
    }
 
    // Not reached.
-   return Point3F( 0.f, 0.f, 0.f );
+   return Point3F( 0.0f, 0.0f, 0.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -261,5 +261,5 @@ F32 Box3F::getGreatestDiagonalLength() const
 
 SphereF Box3F::getBoundingSphere() const
 {
-   return SphereF( getCenter(), getGreatestDiagonalLength() / 2.f );
+   return SphereF( getCenter(), getGreatestDiagonalLength() / 2.0f );
 }
