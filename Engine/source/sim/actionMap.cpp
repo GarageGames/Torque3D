@@ -1508,9 +1508,9 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
             else
             {
                if( value > 0 )
-                  value = ( value - pNode->deadZoneBegin ) * ( 1.f / ( 1.f - pNode->deadZoneBegin ) );
+                  value = ( value - pNode->deadZoneEnd ) * ( 1.f / ( 1.f - pNode->deadZoneEnd ) );
                else
-                  value = ( value + pNode->deadZoneBegin ) * ( 1.f / ( 1.f - pNode->deadZoneBegin ) );
+                  value = ( value - pNode->deadZoneBegin ) * ( 1.f / ( 1.f + pNode->deadZoneBegin ) );
             }
          }
 
