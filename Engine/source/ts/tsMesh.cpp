@@ -874,30 +874,44 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
    return false;
 }
 
-bool TSMesh::addToHull( U32 idx0, U32 idx1, U32 idx2 )
+bool TSMesh::addToHull(U32 idx0, U32 idx1, U32 idx2)
 {
-   Point3F normal;
-   mCross(mVertexData[idx2].vert()-mVertexData[idx0].vert(),mVertexData[idx1].vert()-mVertexData[idx0].vert(),&normal);
-   if ( mDot( normal, normal ) < 0.001f )
-   {
-      mCross( mVertexData[idx0].vert() - mVertexData[idx1].vert(), mVertexData[idx2].vert() - mVertexData[idx1].vert(), &normal );
-      if ( mDot( normal, normal ) < 0.001f )
-      {
-         mCross( mVertexData[idx1].vert() - mVertexData[idx2].vert(), mVertexData[idx0].vert() - mVertexData[idx2].vert(), &normal );
-         if ( mDot( normal, normal ) < 0.001f )
-            return false;
-      }
+   // calculate the normal of this triangle... remember, we lose precision
+   // when we subtract two large numbers that are very close to each other,
+   // so depending on how we calculate the normal, we could get a 
+   // different result. so, we will calculate the normal three different
+   // ways and take the one that gives us the largest vector before we
+   // normalize.
+   Point3F normal1, normal2, normal3;
+   mCross(mVertexData[idx2].vert()-mVertexData[idx0].vert(),mVertexData[idx1].vert()-mVertexData[idx0].vert(),&normal1);
+   mCross(mVertexData[idx0].vert()-mVertexData[idx1].vert(),mVertexData[idx2].vert()-mVertexData[idx1].vert(),&normal2);
+   mCross(mVertexData[idx1].vert()-mVertexData[idx2].vert(),mVertexData[idx0].vert()-mVertexData[idx2].vert(),&normal3);
+   Point3F normal = normal1;
+   F32 greatestMagSquared = mDot(normal1, normal1);
+   F32 magSquared = mDot(normal2, normal2);
+   if (magSquared > greatestMagSquared) {
+      normal = normal2;
+      greatestMagSquared = magSquared;
    }
+   magSquared = mDot(normal3, normal3);
+   if (magSquared > greatestMagSquared) {
+      normal = normal3;
+      greatestMagSquared = magSquared;
+   }
+   if (mDot(normal, normal) < 0.00000001f)
+       return false;
+
    normal.normalize();
-   F32 k = mDot( normal, mVertexData[idx0].vert() );
-   for ( S32 i = 0; i < planeNormals.size(); i++ ) 
+   F32 k = mDot(normal,mVertexData[idx0].vert());
+   for (S32 i=0; i<planeNormals.size(); i++)
    {
-      if ( mDot( planeNormals[i], normal ) > 0.99f && mFabs( k-planeConstants[i] ) < 0.01f )
-         return false;          // this is a repeat...
+      if (mDot(planeNormals[i],normal)>0.99f && mFabs(k-planeConstants[i])<0.01f)
+         // this is a repeat...
+         return false;
    }
    // new plane, add it to the list...
-   planeNormals.push_back( normal );
-   planeConstants.push_back( k );
+   planeNormals.push_back(normal);
+   planeConstants.push_back(k);
    return true;
 }
 
