@@ -101,7 +101,7 @@ function ShapeBase::clearDamageDt(%this)
 // ShapeBase datablock
 //-----------------------------------------------------------------------------
 
-function ShapeBaseData::damage(%this, %obj, %position, %source, %amount, %damageType)
+function ShapeBaseData::damage(%this, %obj, %source, %position, %amount, %damageType)
 {
    // Ignore damage by default. This empty method is here to
    // avoid console warnings.
