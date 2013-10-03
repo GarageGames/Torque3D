@@ -62,5 +62,5 @@ datablock ParticleEmitterData(DefaultEmitter)
    particles = "DefaultParticle";
    blendStyle = "ADDITIVE";
    softParticles = "0";
-   softnessDistance = "1000";
+   softnessDistance = "1";
 };
