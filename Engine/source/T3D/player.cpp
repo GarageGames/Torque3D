@@ -3122,7 +3122,7 @@ void Player::updateMove(const Move* move)
          if ( currHeight + mVelocity.z * TickSec * C > mLiquidHeight )
             buoyancyForce *= M;
                   
-         //mVelocity.z -= buoyancyForce;
+         mVelocity.z -= buoyancyForce;
       }
    }
 
