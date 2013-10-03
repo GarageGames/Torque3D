@@ -385,6 +385,7 @@ datablock ParticleData(LightPuff)
    times[0]      = 0.3;
    times[1]      = 1.0;
    times[2] = 1.0;
+   textureName = "art/particles/dustParticle.png";
 };
 
 datablock ParticleEmitterData(LightPuffEmitter)
