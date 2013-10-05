@@ -3262,7 +3262,7 @@ void ShapeBase::submitLights( LightManager *lm, bool staticLighting )
             {
             S32 elapsed = Sim::getCurrentTime() - image.lightStart;
             if ( elapsed > imageData->lightDuration )
-               return;
+               continue;
             intensity = ( 1.0 - (F32)elapsed / (F32)imageData->lightDuration ) * imageData->lightBrightness;
             break;
             }
