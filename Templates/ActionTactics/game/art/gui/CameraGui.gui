@@ -1,0 +1,109 @@
+
+
+//--- OBJECT WRITE BEGIN ---
+new GameTSCtrl(CameraGui) {
+   profile = "GuiContentProfile";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 8";
+   visible = "1";
+   cameraZRot = "0";
+   forceFOV = "0";
+      helpTag = "0";
+      noCursor = "1";
+
+   new GuiBitmapCtrl(CenterPrintDlg) {
+      profile = "CenterPrintProfile";
+      horizSizing = "center";
+      vertSizing = "center";
+      position = "45 230";
+      extent = "550 20";
+      minExtent = "8 8";
+      visible = "0";
+      bitmap = "./hudfill";
+      wrap = "0";
+         helpTag = "0";
+
+      new GuiMLTextCtrl(CenterPrintText) {
+         profile = "CenterPrintTextProfile";
+         horizSizing = "center";
+         vertSizing = "center";
+         position = "0 0";
+         extent = "546 12";
+         minExtent = "8 8";
+         visible = "1";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+            helpTag = "0";
+      };
+   };
+   new GuiBitmapCtrl(BottomPrintDlg) {
+      profile = "CenterPrintProfile";
+      horizSizing = "center";
+      vertSizing = "top";
+      position = "45 375";
+      extent = "550 20";
+      minExtent = "8 8";
+      visible = "0";
+      bitmap = "./hudfill";
+      wrap = "0";
+         helpTag = "0";
+
+      new GuiMLTextCtrl(BottomPrintText) {
+         profile = "CenterPrintTextProfile";
+         horizSizing = "center";
+         vertSizing = "center";
+         position = "0 0";
+         extent = "546 12";
+         minExtent = "8 8";
+         visible = "1";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+            helpTag = "0";
+      };
+   };
+   new GuiBitmapCtrl(LagIcon) {
+      profile = "GuiDefaultProfile";
+      horizSizing = "right";
+      vertSizing = "bottom";
+      position = "572 3";
+      extent = "32 32";
+      minExtent = "8 8";
+      visible = "0";
+      bitmap = "./lagIcon";
+      wrap = "0";
+         helpTag = "0";
+   };
+   new GuiBitmapCtrl() {
+      profile = "GuiDefaultProfile";
+      horizSizing = "right";
+      vertSizing = "bottom";
+      position = "9 8";
+      extent = "181 169";
+      minExtent = "8 2";
+      visible = "1";
+      bitmap = "./tse_float";
+      wrap = "0";
+         helpTag = "0";
+   };
+   new GuiMLTextCtrl() {
+      profile = "GuiTitleProfile";
+      horizSizing = "left";
+      vertSizing = "bottom";
+      position = "428 5";
+      extent = "378 14";
+      minExtent = "8 2";
+      visible = "1";
+      lineSpacing = "2";
+      allowColorChars = "0";
+      maxChars = "-1";
+      text = "<color:ffffff><shadowcolor:000000><shadow:1:1><font:arial bold:14>Version: MS4.2 demo";
+         helpTag = "0";
+         allowSelection = "1";
+   };
+};
+//--- OBJECT WRITE END ---

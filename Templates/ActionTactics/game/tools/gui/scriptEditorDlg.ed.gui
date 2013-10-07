@@ -1,0 +1,210 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(ScriptEditorDlg,EditorGuiGroup) {
+   isContainer = "1";
+   Profile = "ToolsGuiDefaultProfile";
+   HorizSizing = "width";
+   VertSizing = "height";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 2";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "ToolsGuiToolTipProfile";
+   hovertime = "1000";
+   canSaveDynamicFields = "0";
+
+   new GuiWindowCtrl() {
+      resizeWidth = "0";
+      resizeHeight = "0";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "1";
+      canMaximize = "1";
+      minSize = "50 50";
+      closeCommand = "ScriptEditorDlg.close();";
+      EdgeSnap = "1";
+      text = "Text Pad";
+      Margin = "0 0 0 0";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "0";
+      AnchorLeft = "1";
+      AnchorRight = "0";
+      isContainer = "1";
+      Profile = "ToolsGuiWindowProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "176 120";
+      Extent = "656 464";
+      MinExtent = "8 8";
+      canSave = "1";
+      Visible = "1";
+      Command = "ScriptEditorDlg.close();";
+      Accelerator = "escape";
+      tooltipprofile = "ToolsGuiToolTipProfile";
+      hovertime = "1000";
+      canSaveDynamicFields = "0";
+
+      new GuiControl() {
+         isContainer = "1";
+         Profile = "ToolsGuiDefaultProfile";
+         HorizSizing = "width";
+         VertSizing = "height";
+         position = "8 24";
+         Extent = "640 392";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+
+         new GuiControl() {
+            isContainer = "1";
+            Profile = "ToolsGuiDefaultProfile";
+            HorizSizing = "width";
+            VertSizing = "height";
+            position = "8 7";
+            Extent = "627 380";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+
+            new GuiScrollCtrl() {
+               willFirstRespond = "0";
+               hScrollBar = "dynamic";
+               vScrollBar = "dynamic";
+               lockHorizScroll = "0";
+               lockVertScroll = "0";
+               constantThumbHeight = "0";
+               childMargin = "1 1";
+               mouseWheelScrollSpeed = "-1";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "1";
+               Profile = "ToolsGuiScrollProfile";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 0";
+               Extent = "627 380";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+
+               new GuiMLTextEditCtrl() {
+                  lineSpacing = "2";
+                  allowColorChars = "0";
+                  maxChars = "-1";
+                  useURLMouseCursor = "0";
+                  isContainer = "0";
+                  Profile = "ToolsGuiTextPadProfile";
+                  HorizSizing = "width";
+                  VertSizing = "height";
+                  position = "2 2";
+                  Extent = "623 380";
+                  MinExtent = "8 2";
+                  canSave = "1";
+                  Visible = "1";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
+                  hovertime = "1000";
+                  internalName = "TextPad";
+                  canSaveDynamicFields = "0";
+               };
+            };
+         };
+      };
+      new GuiIconButtonCtrl() {
+         buttonMargin = "4 4";
+         iconBitmap = "tools/gui/images/iconCancel.png";
+         iconLocation = "Left";
+         sizeIconToButton = "0";
+         makeIconSquare = "0";
+         textLocation = "Center";
+         textMargin = "4";
+         autoSize = "0";
+         text = "Cancel";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "left";
+         VertSizing = "top";
+         position = "460 424";
+         Extent = "80 25";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         Command = "ScriptEditorDlg.close();";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+      };
+      new GuiIconButtonCtrl() {
+         buttonMargin = "4 4";
+         iconBitmap = "tools/gui/images/iconAccept.png";
+         iconLocation = "Left";
+         sizeIconToButton = "0";
+         makeIconSquare = "0";
+         textLocation = "Center";
+         textMargin = "4";
+         autoSize = "0";
+         text = "Ok";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "left";
+         VertSizing = "top";
+         position = "560 424";
+         Extent = "80 25";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         Command = "_TextPadOnOk();";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+
+function TextPad(%text, %callback, %root)
+{
+   ScriptEditorDlg-->textpad.setText(%text);
+   ScriptEditorDlg.callback = %callback;
+
+   if(!isObject(%root))
+      %root = Canvas;
+      
+   %root.pushDialog(ScriptEditorDlg);
+}
+
+function _TextPadOnOk()
+{
+   if(ScriptEditorDlg.callback !$= "")
+   {
+      %text = ScriptEditorDlg-->textpad.getText();
+      %command  = ScriptEditorDlg.callback @ "( %text );";
+      eval(%command);
+   }
+   ScriptEditorDlg.callback = "";
+   ScriptEditorDlg.getRoot().popDialog(ScriptEditorDlg);
+}
+
+function ScriptEditorDlg::close(%this)
+{
+   %this.getRoot().popDialog(%this);
+}

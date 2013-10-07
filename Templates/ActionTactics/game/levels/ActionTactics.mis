@@ -1,0 +1,780 @@
+//--- OBJECT WRITE BEGIN ---
+new SimGroup(MissionGroup) {
+   canSave = "1";
+   canSaveDynamicFields = "1";
+      enabled = "1";
+
+   new LevelInfo(theLevelInfo) {
+      nearClip = "0.1";
+      visibleDistance = "2000";
+      decalBias = "0.0015";
+      fogColor = "0.6 0.7 0.8 1";
+      fogDensity = "0.008";
+      fogDensityOffset = "50";
+      fogAtmosphereHeight = "0";
+      canvasClearColor = "0 0 0 255";
+      ambientLightBlendPhase = "1";
+      ambientLightBlendCurve = "0 0 -1 -1";
+      advancedLightmapSupport = "0";
+      soundAmbience = "AudioAmbienceDefault";
+      soundDistanceModel = "Linear";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         desc0 = "Torque Action-Tactics Template";
+         enabled = "1";
+         gameType = "ActionTactics";
+         levelName = "ActionTactics";
+   };
+   new SkyBox(theSky) {
+      Material = "DesertSkyMat";
+      drawBottom = "0";
+      fogBandHeight = "0.5";
+      position = "0 0 515.044";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new Sun(theSun) {
+      azimuth = "45";
+      elevation = "30";
+      color = "1 0.9 0.8 1";
+      ambient = "0.3 0.4 0.5 1";
+      brightness = "1";
+      castShadows = "1";
+      coronaEnabled = "0";
+      coronaMaterial = "Corona_Mat";
+      coronaScale = "0.2";
+      coronaTint = "1 1 1 1";
+      coronaUseLightColor = "1";
+      flareType = "NullLightFlare";
+      flareScale = "0.5";
+      attenuationRatio = "0 1 1";
+      shadowType = "PSSM";
+      texSize = "1024";
+      overDarkFactor = "8000 4000 1000 250";
+      shadowDistance = "200";
+      shadowSoftness = "0.15";
+      numSplits = "4";
+      logWeight = "0.96";
+      fadeStartDistance = "100";
+      lastSplitTerrainOnly = "0";
+      representedInLightmap = "0";
+      shadowDarkenColor = "0 0 0 -1";
+      includeLightmappedGeometryInShadow = "0";
+      position = "0 0 515.044";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new TerrainBlock() {
+      terrainFile = "art/terrains/Empty Room.ter";
+      castShadows = "1";
+      squareSize = "2";
+      baseTexSize = "1024";
+      lightMapSize = "256";
+      screenError = "16";
+      position = "-256 -256 2.96286";
+      rotation = "1 0 0 0";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         scale = "1 1 1";
+   };
+   new SimGroup(PlayerDropPoints) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         enabled = "1";
+
+      new SpawnSphere(PlayerSpawn3) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "5";
+         sphereWeight = "1";
+         indoorWeight = "1";
+         outdoorWeight = "1";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "236.874 -228 511.794";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            enabled = "1";
+            homingCount = "0";
+            lockCount = "0";
+      };
+      new SpawnSphere(PlayerSpawn2) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "5";
+         sphereWeight = "1";
+         indoorWeight = "1";
+         outdoorWeight = "1";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "233.103 -228.009 511.794";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            enabled = "1";
+            homingCount = "0";
+            lockCount = "0";
+      };
+      new SpawnSphere(PlayerSpawn1) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "5";
+         sphereWeight = "1";
+         indoorWeight = "1";
+         outdoorWeight = "1";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "229.236 -227.988 511.832";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            enabled = "1";
+            homingCount = "0";
+            lockCount = "0";
+      };
+   };
+   new SimGroup(props) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new TSStatic() {
+         shapeName = "art/shapes/station/station01.dts";
+         playAmbient = "1";
+         meshCulling = "0";
+         originSort = "0";
+         collisionType = "Visible Mesh";
+         decalType = "Collision Mesh";
+         allowPlayerStep = "1";
+         renderNormals = "0";
+         forceDetail = "-1";
+         position = "113.477 118.751 511.463";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new TSStatic() {
+         shapeName = "art/shapes/rocks/rock1.dts";
+         playAmbient = "1";
+         meshCulling = "0";
+         originSort = "0";
+         collisionType = "Collision Mesh";
+         decalType = "Collision Mesh";
+         allowPlayerStep = "1";
+         renderNormals = "0";
+         forceDetail = "-1";
+         position = "238.948 -181.406 507.824";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new TSStatic() {
+         shapeName = "art/shapes/rocks/rock1.dts";
+         playAmbient = "1";
+         meshCulling = "0";
+         originSort = "0";
+         collisionType = "Collision Mesh";
+         decalType = "Collision Mesh";
+         allowPlayerStep = "1";
+         renderNormals = "0";
+         forceDetail = "-1";
+         position = "186.045 -177.065 507.734";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new TSStatic() {
+         shapeName = "art/shapes/rocks/rock1.dts";
+         playAmbient = "1";
+         meshCulling = "0";
+         originSort = "0";
+         collisionType = "Collision Mesh";
+         decalType = "Collision Mesh";
+         allowPlayerStep = "1";
+         renderNormals = "0";
+         forceDetail = "-1";
+         position = "213.935 -106.381 508.177";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new TSStatic() {
+         shapeName = "art/shapes/rocks/rock1.dts";
+         playAmbient = "1";
+         meshCulling = "0";
+         originSort = "0";
+         collisionType = "Collision Mesh";
+         decalType = "Collision Mesh";
+         allowPlayerStep = "1";
+         renderNormals = "0";
+         forceDetail = "-1";
+         position = "276.262 -74.9951 508.341";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new TSStatic() {
+         shapeName = "art/shapes/rocks/rock1.dts";
+         playAmbient = "1";
+         meshCulling = "0";
+         originSort = "0";
+         collisionType = "Collision Mesh";
+         decalType = "Collision Mesh";
+         allowPlayerStep = "1";
+         renderNormals = "0";
+         forceDetail = "-1";
+         position = "212.074 -32.6002 508.874";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+   };
+   new SimGroup(level_items) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new Item() {
+         static = "1";
+         rotate = "1";
+         isAIControlled = "0";
+         dataBlock = "HealthKitPatch";
+         position = "240.121 -209.033 510.994";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new Item() {
+         static = "1";
+         rotate = "1";
+         isAIControlled = "0";
+         dataBlock = "HealthKitPatch";
+         position = "113.099 -151.346 510.994";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new Item() {
+         static = "1";
+         rotate = "1";
+         isAIControlled = "0";
+         dataBlock = "HealthKitPatch";
+         position = "330.317 -69.1292 510.994";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new Item() {
+         static = "1";
+         rotate = "1";
+         isAIControlled = "0";
+         dataBlock = "HealthKitPatch";
+         position = "217.63 14.359 510.994";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+   };
+   new SimGroup(BotDropPoints) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new SpawnSphere(botspawn1) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "181.368 -182.189 511.713";
+         rotation = "0 0 1 88.1921";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn2) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "114.089 -153.08 511.713";
+         rotation = "0 0 1 90";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn3) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "308.023 -71.8751 512.311";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn4) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "211.262 -24.5894 512.113";
+         rotation = "0 0 1 93.6591";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn5) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "208.906 -38.7801 511.914";
+         rotation = "0 0 1 90";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn6) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "188.597 13.1001 511.851";
+         rotation = "0 0 -1 80";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn7) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "166.663 119.143 511.819";
+         rotation = "0 0 1 205.422";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn10) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "140.572 115.392 512.644";
+         rotation = "0 0 1 122";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn9) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "86.503 115.024 512.709";
+         rotation = "0 0 1 122";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new SpawnSphere(botspawn8) {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "100";
+         sphereWeight = "100";
+         indoorWeight = "100";
+         outdoorWeight = "100";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "70.8657 104.983 512.105";
+         rotation = "0 0 1 122";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+   };
+   new SimGroup(level_triggers) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new Trigger(trig1) {
+         polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+         enterCommand = "if(trig1.triggerOff == 1)\nreturn;\nif(!isObject(bot1))\naiplayer::tacticsSpawn(bot1, botspawn1, 0);\nif(!isObject(bot2))\n{\naiplayer::tacticsSpawn(bot2, botspawn2, 0);\nbot2.goal=bot2goal;\n}\ntrig1.triggerOff = 1;";
+         dataBlock = "DefaultTrigger";
+         position = "233.65 -212.427 510.492";
+         rotation = "1 0 0 0";
+         scale = "25 5 5";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            triggerOff = "0";
+      };
+      new Trigger(trig2) {
+         polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+         enterCommand = "if(trig2.triggerOff == 1)\nreturn;\nif(!isObject(bot3))\naiplayer::tacticsSpawn(bot3, path1start, 0, botpath1);\nif(!isObject(bot4))\naiplayer::tacticsSpawn(bot4, path2start, 0, botpath2);\ntrig2.triggerOff = 1;\n\n";
+         dataBlock = "DefaultTrigger";
+         position = "170.513 -131.932 510.59";
+         rotation = "1 0 0 0";
+         scale = "25 5 5";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            triggerOff = "0";
+      };
+      new Trigger(trig3) {
+         polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+         enterCommand = "if(trig3.triggerOff == 1)\nreturn;\nif(!isObject(bot5))\naiplayer::tacticsSpawn(bot5, path1start, 0);\nif(!isObject(bot6))\naiplayer::tacticsSpawn(bot6, path2start, 0);\nif(!isObject(bot7))\naiplayer::tacticsSpawn(bot7, botspawn3, 0);\ntrig3.triggerOff = 1;\n\n";
+         dataBlock = "DefaultTrigger";
+         position = "210.262 -114.078 510.437";
+         rotation = "1 0 0 0";
+         scale = "5 25 5";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            triggerOff = "0";
+      };
+      new Trigger(trig4) {
+         polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+         enterCommand = "if(trig4.triggerOff == 1)\nreturn;\nif(!isObject(bot8))\naiplayer::tacticsSpawn(bot8, botspawn4, 0);\nif(!isObject(bot9))\naiplayer::tacticsSpawn(bot9, botspawn5, 0);\ntrig4.triggerOff = 1;\n\n";
+         dataBlock = "DefaultTrigger";
+         position = "275.588 -64.0858 509.16";
+         rotation = "1 0 0 0";
+         scale = "25 5 5";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            triggerOff = "0";
+      };
+      new Trigger(trig5) {
+         polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+         enterCommand = "if(trig5.triggerOff == 1)\nreturn;\nif(!isObject(bot10))\n{\naiplayer::tacticsSpawn(bot10, botspawn6, 0);\nbot10.goal=bot6goal;\n}\nif(!isObject(bot11))\naiplayer::tacticsSpawn(bot11, path3start, 0, botpath3);\nif(!isObject(bot12))\naiplayer::tacticsSpawn(bot12, path4start, 0, botpath4);\ntrig5.triggerOff = 1;\n\n";
+         dataBlock = "DefaultTrigger";
+         position = "151.566 -34.404 509.731";
+         rotation = "1 0 0 0";
+         scale = "30 30 5";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            triggerOff = "0";
+      };
+      new Trigger(final_trig) {
+         polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+         enterCommand = "if(final_trig.triggerOff == 1)\nreturn;\nfor(%x=0; %x < final_trig.getNUmObjects(); %x++)\n{\n%obj=final_trig.getObject(%x);\nif(%obj.team != 1)\nreturn;\necho(\"FINAL SPAWN *********************\");\nfinal_spawn();\nfinal_trig.triggerOff = 1;\n}";
+         dataBlock = "DefaultTrigger";
+         position = "137.416 39.1341 510.631";
+         rotation = "1 0 0 0";
+         scale = "30 30 5";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            triggerOff = "0";
+      };
+   };
+   new SimGroup(bot_paths) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new Path(botpath6) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker(path6start) {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "78.6689 139.514 512.466";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "91.7816 137.015 512.316";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "105.449 111.92 511.916";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+      new Path(botpath5) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker(path5start) {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "147.379 142.341 512.313";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "128.263 130.258 512.316";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "124.629 111.92 511.916";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+      new Path(botpath3) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker(path3start) {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "154.068 76.288 511.366";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "137.949 69.0466 512.46";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "141.108 16.5969 511.913";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+      new Path(botpath4) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker(path4start) {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "111.038 66.5701 511.537";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "126.775 65.2418 511.364";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "135.926 15.7764 511.758";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+      new Path(botpath1) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker(path1start) {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "267.206 -75.4003 511.77";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "266.889 -107.322 512.359";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "217.328 -109.91 512.019";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+      new WayPoint(bot6goal) {
+         team = "0";
+         isAIControlled = "0";
+         dataBlock = "WayPointMarker";
+         position = "148.072 14.616 511.826";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new WayPoint(bot2goal) {
+         team = "0";
+         isAIControlled = "0";
+         dataBlock = "WayPointMarker";
+         position = "173.803 -150.621 511.78";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new Path(botpath2) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker(path2start) {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "280.263 -75.4003 511.77";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "273.188 -112.018 512.359";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "217.328 -119.363 512.019";
+            rotation = "1 0 0 0";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+   };
+};
+//--- OBJECT WRITE END ---
