@@ -409,8 +409,8 @@ public:
    virtual bool isValidCameraFov( F32 fov ) { return true; }
    virtual bool useObjsEyePoint() const { return false; }
    virtual bool onlyFirstPerson() const { return false; }
-   virtual F32 getDamageFlash() const { return 1.0f; }
-   virtual F32 getWhiteOut() const { return 1.0f; }
+   virtual F32 getDamageFlash() const { return 0.0f; }
+   virtual F32 getWhiteOut() const { return 0.0f; }
    
    // Not implemented here, but should return the Camera to world transformation matrix
    virtual void getCameraTransform (F32 *pos, MatrixF *mat ) { *mat = MatrixF::Identity; }
