@@ -36,6 +36,8 @@
 #include "core/util/safeDelete.h"
 #include "console/console.h"
 
+using namespace Torque;
+
 extern bool gDisassembleAllShaders;
 
 /// D3DXInclude plugin

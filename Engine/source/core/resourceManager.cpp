@@ -29,6 +29,8 @@
 
 #include "console/engineAPI.h"
 
+using namespace Torque;
+
 static AutoPtr< ResourceManager > smInstance;
 
 ResourceManager::ResourceManager()

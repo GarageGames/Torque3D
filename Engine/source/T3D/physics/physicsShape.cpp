@@ -41,6 +41,7 @@
 #include "lighting/lightQuery.h"
 #include "console/engineAPI.h"
 
+using namespace Torque;
 
 bool PhysicsShape::smNoCorrections = false;
 bool PhysicsShape::smNoSmoothing = false;
@@ -240,7 +241,7 @@ void PhysicsShapeData::onRemove()
 
 void PhysicsShapeData::_onResourceChanged( const Torque::Path &path )
 {
-   if ( path != Path( shapeName ) )
+	if ( path != Path( shapeName ) )
       return;
 
    // Reload the changed shape.
