@@ -650,6 +650,15 @@ breakContinue:
                // IF we aren't looking at a local/internal object, then check if 
                // this object already exists in the global space
 
+               AbstractClassRep* rep = AbstractClassRep::findClassRep( objectName );
+               if (rep != NULL) {
+                  Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object [%s] the same name as a script class.",
+                     getFileLine(ip), objectName);
+                  ip = failJump;
+                  STR.popFrame();
+                  break;
+               }
+
                SimObject *obj = Sim::findObject( objectName );
                if (obj /*&& !obj->isLocalName()*/)
                {
