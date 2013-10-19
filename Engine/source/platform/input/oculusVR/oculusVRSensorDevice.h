@@ -50,6 +50,10 @@ public:
    static U32 OVR_SENSORROTAXISX[OculusVRConstants::MaxSensors];  // SI_AXIS
    static U32 OVR_SENSORROTAXISY[OculusVRConstants::MaxSensors];
 
+   static U32 OVR_SENSORACCELERATION[OculusVRConstants::MaxSensors];    // SI_POS
+   static U32 OVR_SENSORANGVEL[OculusVRConstants::MaxSensors];          // SI_POS but is EulerF
+   static U32 OVR_SENSORMAGNETOMETER[OculusVRConstants::MaxSensors];    // SI_POS
+
 protected:
    bool mIsValid;
 
@@ -68,6 +72,9 @@ protected:
    U16      mVendorId;
    U16      mProductId;
    String   mSerialNumber;
+
+   // Has yaw correction been disabled by the control panel
+   bool     mYawCorrectionDisabled;
 
    // Assigned by the OculusVRDevice
    S32 mActionCodeIndex;
@@ -99,7 +106,7 @@ public:
    bool isValid() const {return mIsValid;}
    bool isSimulated() {return mIsSimulation;}
 
-   bool process(U32 deviceType, bool generateRotAsAngAxis, bool generateRotAsEuler, bool generateRotationAsAxisEvents, F32 maxAxisRadius);
+   bool process(U32 deviceType, bool generateRotAsAngAxis, bool generateRotAsEuler, bool generateRotationAsAxisEvents, F32 maxAxisRadius, bool generateRawSensor);
 
    void reset();
 
@@ -109,6 +116,26 @@ public:
    // Set the prediction time for the sensor fusion.  The time is in seconds.
    void setPredictionTime(F32 dt);
 
+   // Is gravity correction enabled for pitch and roll
+   bool getGravityCorrection() const;
+
+   // Set the pitch and roll gravity correction
+   void setGravityCorrection(bool state);
+
+   // Has yaw correction been disabled using the control panel
+   bool getYawCorrectionUserDisabled() const { return mYawCorrectionDisabled; }
+
+   // Is yaw correction enabled
+   bool getYawCorrection() const;
+
+   // Set the yaw correction. Note: if magnetometer calibration data is not present,
+   // or user has disabled yaw correction in the control panel, this method will
+   // not enable it.
+   void setYawCorrection(bool state);
+
+   // Is magnetometer calibration data available for this sensor
+   bool getMagnetometerCalibrationAvailable() const;
+
    const char* getProductName() { return mProductName.c_str(); }
    const char* getManufacturer() { return mManufacturer.c_str(); }
    U32 getVersion() { return mVersion; }
@@ -116,7 +143,24 @@ public:
    U16 getProductId() { return mProductId; }
    const char* getSerialNumber() { return mSerialNumber; }
 
+   // Get the current rotation of the sensor.  Uses prediction if set.
    EulerF getEulerRotation();
+
+   // Get the current rotation of the sensor.
+   EulerF getRawEulerRotation();
+
+   // Get the current absolute acceleration reading, in m/s^2
+   VectorF getAcceleration();
+
+   // Get the current angular velocity reading, in rad/s
+   EulerF getAngularVelocity();
+
+   // Get the current magnetometer reading (direction and field strength), in Gauss.
+   // Uses magnetometer calibration if set.
+   VectorF getMagnetometer();
+
+   // Get the current raw magnetometer reading (direction and field strength), in Gauss
+   VectorF getRawMagnetometer();
 };
 
 #endif   // _OCULUSVRSENSORDEVICE_H_

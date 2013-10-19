@@ -37,6 +37,15 @@ namespace OculusVRUtil
 
    /// Calcualte a sensor's rotation as if it were a thumb stick axis
    void calculateAxisRotation(const MatrixF& inRotation, const F32& maxAxisRadius, Point2F& outRotation);
+
+   /// Convert an OVR sensor's acceleration to Torque 3D vector (in m/s^2)
+   void convertAcceleration(OVR::Vector3f& inAcceleration, VectorF& outAcceleration);
+
+   /// Convert OVR sensor's angular velocity to Torque 3D Euler angles (in radians/s)
+   void convertAngularVelocity(OVR::Vector3f& inAngVel, EulerF& outAngVel);
+
+   /// Convert an OVR sensor's magnetometer reading (direction and field strength) to Torque 3D vector (in Gauss)
+   void convertMagnetometer(OVR::Vector3f& inMagnetometer, VectorF& outMagnetometer);
 }
 
 #endif   // _OCULUSVRUTIL_H_

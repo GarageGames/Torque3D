@@ -54,6 +54,12 @@ protected:
    // Windows display device name used in EnumDisplaySettings/CreateDC
    String   mDisplayDeviceName;
 
+   // MacOS display ID
+   S32      mDisplayId;
+
+   // Desktop coordinate position of the screen (can be negative; may not be present on all platforms)
+   Point2I  mDesktopPosition;
+
    // Whole screen resolution
    Point2I  mResolution;
 
@@ -70,6 +76,9 @@ protected:
    // Physical distance between lens centers, in meters
    F32      mLensSeparation;
 
+   // Physical distance between the user's eye centers as defined in the current profile
+   F32      mProfileInterpupillaryDistance;
+
    // Physical distance between the user's eye centers
    F32      mInterpupillaryDistance;
 
@@ -78,6 +87,9 @@ protected:
 
    // Radial distortion correction coefficients used by the barrel distortion shader
    Point4F  mKDistortion;
+
+   // Chromatic aberration correction coefficients
+   Point4F mChromaticAbCorrection;
 
    // Calculated values of eye x offset from center in normalized (uv) coordinates
    // where each eye is 0..1.  Used for the mono to stereo postFX to simulate an
@@ -137,6 +149,12 @@ public:
    // Windows display device name used in EnumDisplaySettings/CreateDC
    const char* getDisplayDeviceName() const { return mDisplayDeviceName.c_str(); }
 
+   // MacOS display ID
+   S32 getDisplayDeviceId() const { return mDisplayId; }
+
+   // Desktop coordinate position of the screen (can be negative; may not be present on all platforms)
+   const Point2I& getDesktopPosition() const { return mDesktopPosition; }
+
    // Whole screen resolution
    const Point2I& getResolution() const { return mResolution; }
 
@@ -153,14 +171,23 @@ public:
    // Physical distance between lens centers, in meters
    F32 getLensSeparation() const { return mLensSeparation; }
 
+   // Physical distance between the user's eye centers as defined by the current profile
+   F32 getProfileIPD() const { return mProfileInterpupillaryDistance; }
+
    // Physical distance between the user's eye centers
    F32 getIPD() const { return mInterpupillaryDistance; }
+
+   // Set a new physical distance between the user's eye centers
+   void setIPD(F32 ipd, bool calculateDistortionScale);
 
    // Provides the IPD of one eye as a Point3F
    const Point3F& getEyeWorldOffset() const { return mEyeWorldOffset; }
 
    // Radial distortion correction coefficients used by the barrel distortion shader
    const Point4F& getKDistortion() const { return mKDistortion; }
+
+   // Chromatic aberration correction coefficients used by the barrel distortion shader
+   const Point4F& getChromaticAbCorrection() const { return mChromaticAbCorrection; }
 
    // Calculated values of eye x offset from center in normalized (uv) coordinates.
    const Point2F& getEyeUVOffset() const { return mEyeUVOffset; }

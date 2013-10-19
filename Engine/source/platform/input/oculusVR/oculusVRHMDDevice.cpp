@@ -58,6 +58,10 @@ void OculusVRHMDDevice::set(OVR::HMDDevice* hmd, OVR::HMDInfo& info, bool calcul
    mVersion = info.Version;
 
    mDisplayDeviceName = info.DisplayDeviceName;
+   mDisplayId = info.DisplayId;
+
+   mDesktopPosition.x = info.DesktopX;
+   mDesktopPosition.y = info.DesktopY;
 
    mResolution.x = info.HResolution;
    mResolution.y = info.VResolution;
@@ -68,12 +72,18 @@ void OculusVRHMDDevice::set(OVR::HMDDevice* hmd, OVR::HMDInfo& info, bool calcul
    mVerticalEyeCenter = info.VScreenCenter;
    mEyeToScreen = info.EyeToScreenDistance;
    mLensSeparation = info.LensSeparationDistance;
-   mInterpupillaryDistance = info.InterpupillaryDistance;
+   mProfileInterpupillaryDistance = info.InterpupillaryDistance;
+   mInterpupillaryDistance = mProfileInterpupillaryDistance;
 
    mKDistortion.x = info.DistortionK[0];
    mKDistortion.y = info.DistortionK[1];
    mKDistortion.z = info.DistortionK[2];
    mKDistortion.w = info.DistortionK[3];
+
+   mChromaticAbCorrection.x = info.ChromaAbCorrection[0];
+   mChromaticAbCorrection.y = info.ChromaAbCorrection[1];
+   mChromaticAbCorrection.z = info.ChromaAbCorrection[2];
+   mChromaticAbCorrection.w = info.ChromaAbCorrection[3];
 
    // Calculated values
    calculateValues(calculateDistortionScale);
@@ -109,13 +119,27 @@ void OculusVRHMDDevice::createSimulatedPreviewRift(bool calculateDistortionScale
    mVerticalEyeCenter = 0.046799999f;
    mEyeToScreen = 0.041000001f;
    mLensSeparation = 0.064000003f;
-   mInterpupillaryDistance = 0.064000003f;
+   mProfileInterpupillaryDistance = 0.064000003f;
+   mInterpupillaryDistance = mProfileInterpupillaryDistance;
 
    mKDistortion.x = 1.0000000f;
    mKDistortion.y = 0.22000000f;
    mKDistortion.z = 0.23999999f;
    mKDistortion.w = 0.00000000f;
 
+   mChromaticAbCorrection.x = 0.995999f;
+   mChromaticAbCorrection.y = -0.004f;
+   mChromaticAbCorrection.z = 1.014f;
+   mChromaticAbCorrection.z = 0.0f;
+
+   calculateValues(calculateDistortionScale);
+}
+
+void OculusVRHMDDevice::setIPD(F32 ipd, bool calculateDistortionScale)
+{
+   mInterpupillaryDistance = ipd;
+
+   // Recalculate as some values rely on the IPD
    calculateValues(calculateDistortionScale);
 }
 
