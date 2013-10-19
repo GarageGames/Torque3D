@@ -60,11 +60,15 @@ bool OculusVRDevice::smEnableDevice = true;
 
 bool OculusVRDevice::smSimulateHMD = true;
 
+bool OculusVRDevice::smUseChromaticAberrationCorrection = true;
+
 bool OculusVRDevice::smGenerateAngleAxisRotationEvents = true;
 bool OculusVRDevice::smGenerateEulerRotationEvents = false;
 
 bool OculusVRDevice::smGenerateRotationAsAxisEvents = false;
 F32 OculusVRDevice::smMaximumAxisAngle = 25.0f;
+
+bool OculusVRDevice::smGenerateSensorRawEvents = false;
 
 bool OculusVRDevice::smGenerateWholeFrameEvents = false;
 
@@ -99,6 +103,10 @@ void OculusVRDevice::staticInit()
       "@brief If true, the Oculus VR device will be enabled, if present.\n\n"
 	   "@ingroup Game");
 
+   Con::addVariable("pref::OculusVR::UseChromaticAberrationCorrection", TypeBool, &smUseChromaticAberrationCorrection, 
+      "@brief If true, Use the chromatic aberration correction version of the Oculus VR barrel distortion shader.\n\n"
+	   "@ingroup Game");
+
    Con::addVariable("OculusVR::GenerateAngleAxisRotationEvents", TypeBool, &smGenerateAngleAxisRotationEvents, 
       "@brief If true, broadcast sensor rotation events as angled axis.\n\n"
 	   "@ingroup Game");
@@ -112,6 +120,10 @@ void OculusVRDevice::staticInit()
    Con::addVariable("OculusVR::MaximumAxisAngle", TypeF32, &smMaximumAxisAngle, 
       "@brief The maximum sensor angle when used as an axis event as measured from a vector pointing straight up (in degrees).\n\n"
       "Should range from 0 to 90 degrees.\n\n"
+	   "@ingroup Game");
+
+   Con::addVariable("OculusVR::GenerateSensorRawEvents", TypeBool, &smGenerateSensorRawEvents, 
+      "@brief If ture, broadcast sensor raw data: acceleration, angular velocity, magnetometer reading.\n\n"
 	   "@ingroup Game");
 
    Con::addVariable("OculusVR::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents, 
@@ -313,7 +325,7 @@ bool OculusVRDevice::process()
    // Process each sensor
    for(U32 i=0; i<mSensorDevices.size(); ++i)
    {
-      mSensorDevices[i]->process(mDeviceType, smGenerateAngleAxisRotationEvents, smGenerateEulerRotationEvents, smGenerateRotationAsAxisEvents, maxAxisRadius);
+      mSensorDevices[i]->process(mDeviceType, smGenerateAngleAxisRotationEvents, smGenerateEulerRotationEvents, smGenerateRotationAsAxisEvents, maxAxisRadius, smGenerateSensorRawEvents);
    }
 
    return true;
@@ -391,6 +403,22 @@ const OculusVRHMDDevice* OculusVRDevice::getHMDDevice(U32 index) const
    return mHMDDevices[index];
 }
 
+F32 OculusVRDevice::getHMDCurrentIPD(U32 index)
+{
+   if(index >= mHMDDevices.size())
+      return -1.0f;
+
+   return mHMDDevices[index]->getIPD();
+}
+
+void OculusVRDevice::setHMDCurrentIPD(U32 index, F32 ipd)
+{
+   if(index >= mHMDDevices.size())
+      return;
+
+   return mHMDDevices[index]->setIPD(ipd, mScaleInputTexture);
+}
+
 //-----------------------------------------------------------------------------
 
 const OculusVRSensorDevice* OculusVRDevice::getSensorDevice(U32 index) const
@@ -407,6 +435,30 @@ EulerF OculusVRDevice::getSensorEulerRotation(U32 index)
       return Point3F::Zero;
 
    return mSensorDevices[index]->getEulerRotation();
+}
+
+VectorF OculusVRDevice::getSensorAcceleration(U32 index)
+{
+   if(index >= mSensorDevices.size())
+      return Point3F::Zero;
+
+   return mSensorDevices[index]->getAcceleration();
+}
+
+EulerF OculusVRDevice::getSensorAngularVelocity(U32 index)
+{
+   if(index >= mSensorDevices.size())
+      return Point3F::Zero;
+
+   return mSensorDevices[index]->getAngularVelocity();
+}
+
+VectorF OculusVRDevice::getSensorMagnetometer(U32 index)
+{
+   if(index >= mSensorDevices.size())
+      return Point3F::Zero;
+
+   return mSensorDevices[index]->getMagnetometer();
 }
 
 F32 OculusVRDevice::getSensorPredictionTime(U32 index)
@@ -436,6 +488,57 @@ void OculusVRDevice::setAllSensorPredictionTime(F32 dt)
    {
       mSensorDevices[i]->setPredictionTime(dt);
    }
+}
+
+bool OculusVRDevice::getSensorGravityCorrection(U32 index)
+{
+   const OculusVRSensorDevice* sensor = getSensorDevice(index);
+   if(!sensor || !sensor->isValid())
+      return false;
+
+   return sensor->getGravityCorrection();
+}
+
+void OculusVRDevice::setSensorGravityCorrection(U32 index, bool state)
+{
+   if(index >= mSensorDevices.size())
+      return;
+
+   OculusVRSensorDevice* sensor = mSensorDevices[index];
+   if(!sensor->isValid())
+      return;
+
+   sensor->setGravityCorrection(state);
+}
+
+bool OculusVRDevice::getSensorYawCorrection(U32 index)
+{
+   const OculusVRSensorDevice* sensor = getSensorDevice(index);
+   if(!sensor || !sensor->isValid())
+      return false;
+
+   return sensor->getYawCorrection();
+}
+
+void OculusVRDevice::setSensorYawCorrection(U32 index, bool state)
+{
+   if(index >= mSensorDevices.size())
+      return;
+
+   OculusVRSensorDevice* sensor = mSensorDevices[index];
+   if(!sensor->isValid())
+      return;
+
+   sensor->setYawCorrection(state);
+}
+
+bool OculusVRDevice::getSensorMagnetometerCalibrated(U32 index)
+{
+   const OculusVRSensorDevice* sensor = getSensorDevice(index);
+   if(!sensor || !sensor->isValid())
+      return false;
+
+   return sensor->getMagnetometerCalibrationAvailable();
 }
 
 void OculusVRDevice::resetAllSensors()
@@ -628,6 +731,46 @@ DefineEngineFunction(getOVRHMDDisplayDeviceName, const char*, (S32 index),,
    return hmd->getDisplayDeviceName();
 }
 
+DefineEngineFunction(getOVRHMDDisplayDeviceId, S32, (S32 index),,
+   "@brief MacOS display ID.\n\n"
+   "@param index The HMD index.\n"
+   "@return The ID of the HMD display device, if any.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return -1;
+   }
+
+   const OculusVRHMDDevice* hmd = OCULUSVRDEV->getHMDDevice(index);
+   if(!hmd)
+   {
+      return -1;
+   }
+
+   return hmd->getDisplayDeviceId();
+}
+
+DefineEngineFunction(getOVRHMDDisplayDesktopPos, Point2I, (S32 index),,
+   "@brief Desktop coordinate position of the screen (can be negative; may not be present on all platforms).\n\n"
+   "@param index The HMD index.\n"
+   "@return Position of the screen.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return Point2I::Zero;
+   }
+
+   const OculusVRHMDDevice* hmd = OCULUSVRDEV->getHMDDevice(index);
+   if(!hmd)
+   {
+      return Point2I::Zero;
+   }
+
+   return hmd->getDesktopPosition();
+}
+
 DefineEngineFunction(getOVRHMDResolution, Point2I, (S32 index),,
    "@brief Provides the OVR HMD screen resolution.\n\n"
    "@param index The HMD index.\n"
@@ -670,6 +813,78 @@ DefineEngineFunction(getOVRHMDDistortionCoefficients, String, (S32 index),,
    dSprintf(buf, 256, "%g %g %g %g", k.x, k.y, k.z, k.w);
 
    return buf;
+}
+
+DefineEngineFunction(getOVRHMDChromaticAbCorrection, String, (S32 index),,
+   "@brief Provides the OVR HMD chromatic aberration correction values.\n\n"
+   "@param index The HMD index.\n"
+   "@return A four component string with the chromatic aberration correction values.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return "1 0 1 0";
+   }
+
+   const OculusVRHMDDevice* hmd = OCULUSVRDEV->getHMDDevice(index);
+   if(!hmd)
+   {
+      return "1 0 1 0";
+   }
+
+   const Point4F& c = hmd->getChromaticAbCorrection();
+   char buf[256];
+   dSprintf(buf, 256, "%g %g %g %g", c.x, c.y, c.z, c.w);
+
+   return buf;
+}
+
+DefineEngineFunction(getOVRHMDProfileIPD, F32, (S32 index),,
+   "@brief Physical distance between the user's eye centers as defined by the current profile.\n\n"
+   "@param index The HMD index.\n"
+   "@return The profile IPD.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return -1.0f;
+   }
+
+   const OculusVRHMDDevice* hmd = OCULUSVRDEV->getHMDDevice(index);
+   if(!hmd)
+   {
+      return -1.0f;
+   }
+
+   return hmd->getProfileIPD();
+}
+
+DefineEngineFunction(getOVRHMDCurrentIPD, F32, (S32 index),,
+   "@brief Physical distance between the user's eye centers.\n\n"
+   "@param index The HMD index.\n"
+   "@return The current IPD.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return -1.0f;
+   }
+
+   return OCULUSVRDEV->getHMDCurrentIPD(index);
+}
+
+DefineEngineFunction(setOVRHMDCurrentIPD, void, (S32 index, F32 ipd),,
+   "@brief Set the physical distance between the user's eye centers.\n\n"
+   "@param index The HMD index.\n"
+   "@param ipd The IPD to use.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return;
+   }
+
+   OCULUSVRDEV->setHMDCurrentIPD(index, ipd);
 }
 
 DefineEngineFunction(getOVRHMDEyeXOffsets, Point2F, (S32 index),,
@@ -787,6 +1002,49 @@ DefineEngineFunction(getOVRSensorEulerRotation, Point3F, (S32 index),,
    return Point3F(mRadToDeg(rot.x), mRadToDeg(rot.y), mRadToDeg(rot.z));
 }
 
+DefineEngineFunction(getOVRSensorAcceleration, Point3F, (S32 index),,
+   "@brief Get the acceleration values for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@return The acceleration values of the Oculus VR sensor, in m/s^2.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return Point3F::Zero;
+   }
+
+   return OCULUSVRDEV->getSensorAcceleration(index);
+}
+
+DefineEngineFunction(getOVRSensorAngVelocity, Point3F, (S32 index),,
+   "@brief Get the angular velocity values for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@return The angular velocity values of the Oculus VR sensor, in degrees/s.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return Point3F::Zero;
+   }
+
+   EulerF rot = OCULUSVRDEV->getSensorAngularVelocity(index);
+   return Point3F(mRadToDeg(rot.x), mRadToDeg(rot.y), mRadToDeg(rot.z));
+}
+
+DefineEngineFunction(getOVRSensorMagnetometer, Point3F, (S32 index),,
+   "@brief Get the magnetometer reading (direction and field strength) for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@return The magnetometer reading (direction and field strength) of the Oculus VR sensor, in Gauss.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return Point3F::Zero;
+   }
+
+   return OCULUSVRDEV->getSensorMagnetometer(index);
+}
+
 DefineEngineFunction(getOVRSensorPredictionTime, F32, (S32 index),,
    "@brief Get the prediction time set for the given sensor index.\n\n"
    "@param index The sensor index.\n"
@@ -826,6 +1084,78 @@ DefineEngineFunction(setAllSensorPredictionTime, void, (F32 dt),,
    }
 
    OCULUSVRDEV->setAllSensorPredictionTime(dt);
+}
+
+DefineEngineFunction(getOVRSensorGravityCorrection, bool, (S32 index),,
+   "@brief Get the gravity correction state for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@return True if gravity correction (for pitch and roll) is active.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return false;
+   }
+
+   return OCULUSVRDEV->getSensorGravityCorrection(index);
+}
+
+DefineEngineFunction(setOVRSensorGravityCorrection, void, (S32 index, bool state),,
+   "@brief Set the gravity correction state for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@param state The gravity correction state to change to.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return;
+   }
+
+   OCULUSVRDEV->setSensorGravityCorrection(index, state);
+}
+
+DefineEngineFunction(getOVRSensorYawCorrection, bool, (S32 index),,
+   "@brief Get the yaw correction state for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@return True if yaw correction (using magnetometer calibration data) is active.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return false;
+   }
+
+   return OCULUSVRDEV->getSensorYawCorrection(index);
+}
+
+DefineEngineFunction(setOVRSensorYawCorrection, void, (S32 index, bool state),,
+   "@brief Set the yaw correction state for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@param state The yaw correction state to change to.\n"
+   "@note Yaw correction cannot be enabled if the user has disabled it through "
+   "the Oculus VR control panel.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return;
+   }
+
+   OCULUSVRDEV->setSensorYawCorrection(index, state);
+}
+
+DefineEngineFunction(getOVRSensorMagnetometerCalibrated, bool, (S32 index),,
+   "@brief Get the magnetometer calibrated data state for the given sensor index.\n\n"
+   "@param index The sensor index.\n"
+   "@return True if magnetometer calibration data is available.\n"
+   "@ingroup Game")
+{
+   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
+   {
+      return false;
+   }
+
+   return OCULUSVRDEV->getSensorMagnetometerCalibrated(index);
 }
 
 DefineEngineFunction(ovrResetAllSensors, void, (),,

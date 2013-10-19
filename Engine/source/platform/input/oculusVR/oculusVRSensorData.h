@@ -36,8 +36,12 @@ struct OculusVRSensorData
       DIFF_ROT             = (1<<0),
       DIFF_ROTAXISX        = (1<<1),
       DIFF_ROTAXISY        = (1<<2),
+      DIFF_ACCEL           = (1<<3),
+      DIFF_ANGVEL          = (1<<4),
+      DIFF_MAG             = (1<<5),
 
       DIFF_ROTAXIS = (DIFF_ROTAXISX | DIFF_ROTAXISY),
+      DIFF_RAW = (DIFF_ACCEL | DIFF_ANGVEL | DIFF_MAG),
    };
 
    bool mDataSet;
@@ -49,6 +53,11 @@ struct OculusVRSensorData
 
    // Controller rotation as axis x, y
    Point2F mRotAxis;
+
+   // Raw values
+   VectorF mAcceleration;
+   EulerF  mAngVelocity;
+   VectorF mMagnetometer;
 
    OculusVRSensorData();
 

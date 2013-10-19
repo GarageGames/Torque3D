@@ -42,6 +42,7 @@ IMPLEMENT_CONOBJECT(BarrelDistortionPostEffect);
 BarrelDistortionPostEffect::BarrelDistortionPostEffect() 
    :  PostEffect(),
       mHmdWarpParamSC(NULL),
+      mHmdChromaAbSC(NULL),
       mScaleSC(NULL),
       mScaleInSC(NULL),
       mLensCenterSC(NULL),
@@ -85,23 +86,22 @@ void BarrelDistortionPostEffect::onRemove()
 
 void BarrelDistortionPostEffect::_setupConstants( const SceneRenderState *state )
 {
+   // Test if setup is required before calling the parent method as the parent method
+   // will set up the shader constants buffer for us.
+   bool setupRequired = mShaderConsts.isNull();
+
    Parent::_setupConstants(state);
 
    // Define the shader constants
-   if(!mHmdWarpParamSC)
+   if(setupRequired)
+   {
       mHmdWarpParamSC = mShader->getShaderConstHandle( "$HmdWarpParam" );
-
-   if(!mScaleSC)
+      mHmdChromaAbSC = mShader->getShaderConstHandle( "$HmdChromaAbParam" );
       mScaleSC = mShader->getShaderConstHandle( "$Scale" );
-
-   if(!mScaleInSC)
       mScaleInSC = mShader->getShaderConstHandle( "$ScaleIn" );
-
-   if(!mLensCenterSC)
       mLensCenterSC = mShader->getShaderConstHandle( "$LensCenter" );
-
-   if(!mScreenCenterSC)
       mScreenCenterSC = mShader->getShaderConstHandle( "$ScreenCenter" );
+   }
 
    const Point2I &resolution = GFX->getActiveRenderTarget()->getSize();
    F32 widthScale = 0.5f;
@@ -117,6 +117,12 @@ void BarrelDistortionPostEffect::_setupConstants( const SceneRenderState *state 
       {
          const Point4F& distortion = hmd->getKDistortion();
          mShaderConsts->set( mHmdWarpParamSC, distortion );
+      }
+
+      if(mHmdChromaAbSC->isValid())
+      {
+         const Point4F& correction = hmd->getChromaticAbCorrection();
+         mShaderConsts->set( mHmdChromaAbSC, correction );
       }
 
       if(mScaleSC->isValid())
@@ -147,6 +153,11 @@ void BarrelDistortionPostEffect::_setupConstants( const SceneRenderState *state 
       if(mHmdWarpParamSC->isValid())
       {
          mShaderConsts->set( mHmdWarpParamSC, Point4F(0.0f, 0.0f, 0.0f, 0.0f) );
+      }
+
+      if(mHmdChromaAbSC->isValid())
+      {
+         mShaderConsts->set( mHmdChromaAbSC, Point4F(1.0f, 0.0f, 1.0f, 0.0f) );
       }
 
       if(mScaleSC->isValid())
