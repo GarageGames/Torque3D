@@ -35,7 +35,7 @@
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
-#define strtof       (float)strtod
+#define strtofloat   (float)strtod // _MSC_VER 1800 defines strtof now
 #endif
 
 
@@ -144,7 +144,7 @@ inline U32 dAtoui(const char *str, U32 base = 10)
 
 inline F32 dAtof(const char *str)
 {
-   return strtof(str, NULL);
+   return strtofloat(str, NULL);
 }
 
 
