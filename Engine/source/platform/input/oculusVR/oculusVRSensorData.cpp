@@ -95,7 +95,7 @@ void OculusVRSensorData::simulateData(const F32& maxAxisRadius)
    mDataSet = true;
 }
 
-U32 OculusVRSensorData::compare(OculusVRSensorData* other)
+U32 OculusVRSensorData::compare(OculusVRSensorData* other, bool doRawCompare)
 {
    S32 result = DIFF_NONE;
 
@@ -116,17 +116,20 @@ U32 OculusVRSensorData::compare(OculusVRSensorData* other)
    }
 
    // Check raw values
-   if(mAcceleration.x != other->mAcceleration.x || mAcceleration.y != other->mAcceleration.y || mAcceleration.z != other->mAcceleration.z || !mDataSet)
+   if(doRawCompare)
    {
-      result |= DIFF_ACCEL;
-   }
-   if(mAngVelocity.x != other->mAngVelocity.x || mAngVelocity.y != other->mAngVelocity.y || mAngVelocity.z != other->mAngVelocity.z || !mDataSet)
-   {
-      result |= DIFF_ANGVEL;
-   }
-   if(mMagnetometer.x != other->mMagnetometer.x || mMagnetometer.y != other->mMagnetometer.y || mMagnetometer.z != other->mMagnetometer.z || !mDataSet)
-   {
-      result |= DIFF_MAG;
+      if(mAcceleration.x != other->mAcceleration.x || mAcceleration.y != other->mAcceleration.y || mAcceleration.z != other->mAcceleration.z || !mDataSet)
+      {
+         result |= DIFF_ACCEL;
+      }
+      if(mAngVelocity.x != other->mAngVelocity.x || mAngVelocity.y != other->mAngVelocity.y || mAngVelocity.z != other->mAngVelocity.z || !mDataSet)
+      {
+         result |= DIFF_ANGVEL;
+      }
+      if(mMagnetometer.x != other->mMagnetometer.x || mMagnetometer.y != other->mMagnetometer.y || mMagnetometer.z != other->mMagnetometer.z || !mDataSet)
+      {
+         result |= DIFF_MAG;
+      }
    }
 
    return result;
