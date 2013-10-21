@@ -200,7 +200,7 @@ bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bo
    {
       currentBuffer->simulateData(maxAxisRadius);
    }
-   diff = mPrevData->compare(currentBuffer);
+   diff = mPrevData->compare(currentBuffer, generateRawSensor);
 
    // Update the previous data pointer.  We do this here in case someone calls our
    // console functions during one of the input events below.

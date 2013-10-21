@@ -71,7 +71,7 @@ struct OculusVRSensorData
    void simulateData(const F32& maxAxisRadius);
 
    /// Compare this data and given and return differences
-   U32 compare(OculusVRSensorData* other);
+   U32 compare(OculusVRSensorData* other, bool doRawCompare);
 };
 
 #endif   // _OCULUSVRSENSORDATA_H_
