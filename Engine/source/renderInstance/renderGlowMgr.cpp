@@ -151,6 +151,9 @@ void RenderGlowMgr::render( SceneRenderState *state )
 
    GFXTransformSaver saver;
 
+   // Respect the current viewport
+   mNamedTarget.setViewport(GFX->getViewport());
+
    // Tell the superclass we're about to render, preserve contents
    const bool isRenderingToTarget = _onPreRender( state, true );
 
