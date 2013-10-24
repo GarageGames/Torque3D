@@ -112,6 +112,14 @@ ImplementEnumType( PFXTargetClear,
    { PFXTargetClear_OnDraw, "PFXTargetClear_OnDraw", "Clear before every draw.\n" },
 EndImplementEnumType;
 
+ImplementEnumType( PFXTargetViewport,
+   "Specifies how the viewport should be set up for a PostEffect's target.\n"
+   "@note Applies to both the diffuse target and the depth target (if defined).\n"
+   "@ingroup Rendering\n\n")
+   { PFXTargetViewport_TargetSize, "PFXTargetViewport_TargetSize", "Set viewport to match target size (default).\n" },
+   { PFXTargetViewport_GFXViewport, "PFXTargetViewport_GFXViewport", "Use the current GFX viewport (scaled to match target size).\n" },
+EndImplementEnumType;
+
 
 GFXImplementVertexFormat( PFXVertex )
 {
@@ -235,6 +243,7 @@ PostEffect::PostEffect()
       mStateBlockData( NULL ),
       mAllowReflectPass( false ),
       mTargetClear( PFXTargetClear_None ),
+      mTargetViewport( PFXTargetViewport_TargetSize ),
       mTargetScale( Point2F::One ),
       mTargetSize( Point2I::Zero ),
       mTargetFormat( GFXFormatR8G8B8A8 ),
@@ -311,6 +320,9 @@ void PostEffect::initPersistFields()
 
    addField( "targetClear", TYPEID< PFXTargetClear >(), Offset( mTargetClear, PostEffect ),
       "Describes when the target texture should be cleared." );
+
+   addField( "targetViewport", TYPEID< PFXTargetViewport >(), Offset( mTargetViewport, PostEffect ),
+      "Specifies how the viewport should be set up for a target texture." );
 
    addField( "texture", TypeImageFilename, Offset( mTexFilename, PostEffect ), NumTextures,
       "Input textures to this effect ( samplers ).\n"
@@ -927,7 +939,23 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
          if ( mTargetClear == PFXTargetClear_OnCreate )
             *outClearTarget = true;
 
-         mNamedTarget.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         if(mTargetViewport == PFXTargetViewport_GFXViewport)
+         {
+            // We may need to scale the GFX viewport to fit within
+            // our target texture size
+            GFXTarget *oldTarget = GFX->getActiveRenderTarget();
+            const Point2I &oldTargetSize = oldTarget->getSize();
+            Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
+
+            const RectI viewport = GFX->getViewport();
+
+            mNamedTarget.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else
+         {
+            // PFXTargetViewport_TargetSize
+            mNamedTarget.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         }
       }
    }
    else
@@ -973,7 +1001,23 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
          if ( mTargetClear == PFXTargetClear_OnCreate )
             *outClearTarget = true;
 
-         mNamedTargetDepthStencil.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         if(mTargetViewport == PFXTargetViewport_GFXViewport)
+         {
+            // We may need to scale the GFX viewport to fit within
+            // our target texture size
+            GFXTarget *oldTarget = GFX->getActiveRenderTarget();
+            const Point2I &oldTargetSize = oldTarget->getSize();
+            Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
+
+            const RectI viewport = GFX->getViewport();
+
+            mNamedTargetDepthStencil.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else
+         {
+            // PFXTargetViewport_TargetSize
+            mNamedTargetDepthStencil.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         }
       }
    }
    else
@@ -1049,6 +1093,8 @@ void PostEffect::process(  const SceneRenderState *state,
    bool clearTarget = false;
    _setupTarget( state, &clearTarget );
 
+   RectI oldViewport = GFX->getViewport();
+
    if ( mTargetTex || mTargetDepthStencil )
    {
 
@@ -1064,6 +1110,8 @@ void PostEffect::process(  const SceneRenderState *state,
          GFX->getActiveRenderTarget()->preserve();
 #endif
 
+      GFXTarget *oldTarget = GFX->getActiveRenderTarget();
+
       GFX->pushActiveRenderTarget();
       mTarget->attachTexture( GFXTextureTarget::Color0, mTargetTex );
 
@@ -1074,6 +1122,20 @@ void PostEffect::process(  const SceneRenderState *state,
          mTarget->attachTexture( GFXTextureTarget::DepthStencil, mTargetDepthStencil );
 
       GFX->setActiveRenderTarget( mTarget );
+
+      // The setActiveRenderTarget() called above will change the viewport to cover the
+      // entire target area.  Restore the viewport as necessary.
+      if(mNamedTarget.isRegistered())
+      {
+         GFX->setViewport(mNamedTarget.getViewport());
+      }
+      else if(mTargetViewport == PFXTargetViewport_GFXViewport)
+      {
+         const Point2I &oldTargetSize = oldTarget->getSize();
+         const Point2I &targetSize = mTarget->getSize();
+         Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
+         GFX->setViewport( RectI( oldViewport.point.x*scale.x, oldViewport.point.y*scale.y, oldViewport.extent.x*scale.x, oldViewport.extent.y*scale.y ) );
+      }
    }
 
    if ( clearTarget )
