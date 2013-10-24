@@ -170,6 +170,7 @@ protected:
 
    PFXRenderTime mRenderTime;
    PFXTargetClear mTargetClear;
+   PFXTargetViewport mTargetViewport;
 
    String mRenderBin;
 
