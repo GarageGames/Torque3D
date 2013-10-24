@@ -118,6 +118,7 @@ ImplementEnumType( PFXTargetViewport,
    "@ingroup Rendering\n\n")
    { PFXTargetViewport_TargetSize, "PFXTargetViewport_TargetSize", "Set viewport to match target size (default).\n" },
    { PFXTargetViewport_GFXViewport, "PFXTargetViewport_GFXViewport", "Use the current GFX viewport (scaled to match target size).\n" },
+   { PFXTargetViewport_NamedInTexture0, "PFXTargetViewport_NamedInTexture0", "Use the input texture 0 if it is named (scaled to match target size), otherwise revert to PFXTargetViewport_TargetSize if there is none.\n" },
 EndImplementEnumType;
 
 
@@ -947,7 +948,17 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
             const Point2I &oldTargetSize = oldTarget->getSize();
             Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
 
-            const RectI viewport = GFX->getViewport();
+            const RectI &viewport = GFX->getViewport();
+
+            mNamedTarget.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else if(mTargetViewport == PFXTargetViewport_NamedInTexture0 && mActiveNamedTarget[0] && mActiveNamedTarget[0]->getTexture())
+         {
+            // Scale the named input texture's viewport to match our target
+            const Point3I &namedTargetSize = mActiveNamedTarget[0]->getTexture()->getSize();
+            Point2F scale(targetSize.x / F32(namedTargetSize.x), targetSize.y / F32(namedTargetSize.y));
+
+            const RectI &viewport = mActiveNamedTarget[0]->getViewport();
 
             mNamedTarget.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
          }
@@ -1009,7 +1020,17 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
             const Point2I &oldTargetSize = oldTarget->getSize();
             Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
 
-            const RectI viewport = GFX->getViewport();
+            const RectI &viewport = GFX->getViewport();
+
+            mNamedTargetDepthStencil.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else if(mTargetViewport == PFXTargetViewport_NamedInTexture0 && mActiveNamedTarget[0] && mActiveNamedTarget[0]->getTexture())
+         {
+            // Scale the named input texture's viewport to match our target
+            const Point3I &namedTargetSize = mActiveNamedTarget[0]->getTexture()->getSize();
+            Point2F scale(targetSize.x / F32(namedTargetSize.x), targetSize.y / F32(namedTargetSize.y));
+
+            const RectI &viewport = mActiveNamedTarget[0]->getViewport();
 
             mNamedTargetDepthStencil.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
          }
@@ -1093,8 +1114,6 @@ void PostEffect::process(  const SceneRenderState *state,
    bool clearTarget = false;
    _setupTarget( state, &clearTarget );
 
-   RectI oldViewport = GFX->getViewport();
-
    if ( mTargetTex || mTargetDepthStencil )
    {
 
@@ -1110,6 +1129,7 @@ void PostEffect::process(  const SceneRenderState *state,
          GFX->getActiveRenderTarget()->preserve();
 #endif
 
+      const RectI &oldViewport = GFX->getViewport();
       GFXTarget *oldTarget = GFX->getActiveRenderTarget();
 
       GFX->pushActiveRenderTarget();
@@ -1121,20 +1141,37 @@ void PostEffect::process(  const SceneRenderState *state,
       else
          mTarget->attachTexture( GFXTextureTarget::DepthStencil, mTargetDepthStencil );
 
-      GFX->setActiveRenderTarget( mTarget );
+      // Set the render target but not its viewport.  We'll do that below.
+      GFX->setActiveRenderTarget( mTarget, false );
 
-      // The setActiveRenderTarget() called above will change the viewport to cover the
-      // entire target area.  Restore the viewport as necessary.
       if(mNamedTarget.isRegistered())
       {
+         // Always use the name target's viewport, if available.  It was set up in _setupTarget().
          GFX->setViewport(mNamedTarget.getViewport());
       }
       else if(mTargetViewport == PFXTargetViewport_GFXViewport)
       {
+         // Go with the current viewport as scaled against our render target.
          const Point2I &oldTargetSize = oldTarget->getSize();
          const Point2I &targetSize = mTarget->getSize();
          Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
          GFX->setViewport( RectI( oldViewport.point.x*scale.x, oldViewport.point.y*scale.y, oldViewport.extent.x*scale.x, oldViewport.extent.y*scale.y ) );
+      }
+      else if(mTargetViewport == PFXTargetViewport_NamedInTexture0 && mActiveNamedTarget[0] && mActiveNamedTarget[0]->getTexture())
+      {
+         // Go with the first input texture, if it is named.  Scale the named input texture's viewport to match our target
+         const Point3I &namedTargetSize = mActiveNamedTarget[0]->getTexture()->getSize();
+         const Point2I &targetSize = mTarget->getSize();
+         Point2F scale(targetSize.x / F32(namedTargetSize.x), targetSize.y / F32(namedTargetSize.y));
+
+         const RectI &viewport = mActiveNamedTarget[0]->getViewport();
+
+         GFX->setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+      }
+      else
+      {
+         // Default to using the whole target as the viewport
+         GFX->setViewport( RectI( Point2I::Zero, mTarget->getSize() ) );
       }
    }
 

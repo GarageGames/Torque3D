@@ -695,7 +695,7 @@ public:
    void popActiveRenderTarget();
 
    /// Assign a new active render target.
-   void setActiveRenderTarget( GFXTarget *target );
+   void setActiveRenderTarget( GFXTarget *target, bool updateViewport=true );
 
    /// Returns the current active render target.
    inline GFXTarget* getActiveRenderTarget() { return mCurrentRT; }
