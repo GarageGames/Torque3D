@@ -77,6 +77,10 @@ enum PFXTargetViewport
 
    /// Use the current GFX viewport
    PFXTargetViewport_GFXViewport,
+
+   /// Use the input texture 0 if it is named, otherwise
+   /// revert to PFXTargetViewport_TargetSize if there is none
+   PFXTargetViewport_NamedInTexture0,
 };
 
 DefineEnumType( PFXTargetViewport );

@@ -849,7 +849,7 @@ void GFXDevice::popActiveRenderTarget()
    mRTStack.pop_back();
 }
 
-void GFXDevice::setActiveRenderTarget( GFXTarget *target )
+void GFXDevice::setActiveRenderTarget( GFXTarget *target, bool updateViewport )
 {
    AssertFatal( target, 
       "GFXDevice::setActiveRenderTarget - must specify a render target!" );
@@ -878,7 +878,10 @@ void GFXDevice::setActiveRenderTarget( GFXTarget *target )
    // We should consider removing this and making it the
    // responsibility of the caller to set a proper viewport
    // when the target is changed.   
-   setViewport( RectI( Point2I::Zero, mCurrentRT->getSize() ) );
+   if ( updateViewport )
+   {
+      setViewport( RectI( Point2I::Zero, mCurrentRT->getSize() ) );
+   }
 }
 
 /// Helper class for GFXDevice::describeResources.
