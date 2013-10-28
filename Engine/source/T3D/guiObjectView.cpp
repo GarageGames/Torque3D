@@ -103,6 +103,7 @@ GuiObjectView::GuiObjectView()
       mMountNodeName( "mount0" ),
       mMountNode( -1 ),
       mCameraSpeed( 0.01f ),
+	  mCameraRotation( 0.0f, 0.0f, 0.0f ),
       mLightColor( 1.0f, 1.0f, 1.0f ),
       mLightAmbient( 0.5f, 0.5f, 0.5f ),
       mLightDirection( 0.f, 0.707f, -0.707f )
