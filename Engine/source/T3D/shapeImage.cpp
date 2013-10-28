@@ -687,10 +687,6 @@ void ShapeBaseImageData::initPersistFields()
       "@see animateOnServer\n\n");
 
    addField( "correctMuzzleVector", TypeBool,  Offset(correctMuzzleVector, ShapeBaseImageData),
-      "@brief Flag to adjust the aiming vector to the eye's LOS point.\n\n"
-      "@see ShapeBase::getMuzzleVector()" );
-
-   addField( "correctMuzzleVector", TypeBool,  Offset(correctMuzzleVector, ShapeBaseImageData),
       "@brief Flag to adjust the aiming vector to the eye's LOS point when in 1st person view.\n\n"
       "@see ShapeBase::getMuzzleVector()" );
 
