@@ -517,6 +517,12 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
       specPow->constSortPos = cspPotentialPrimitive;
    }
 
+   Var *specStrength = new Var;
+   specStrength->setType( "float" );
+   specStrength->setName( "specularStrength" );
+   specStrength->uniform = true;
+   specStrength->constSortPos = cspPotentialPrimitive;
+
    Var *constSpecPow = new Var;
    constSpecPow->setType( "float" );
    constSpecPow->setName( "constantSpecularPower" );
@@ -527,7 +533,7 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    AssertFatal( lightInfoSamp, "Something hosed the deferred features! Can't find lightInfoSample" );
 
    // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * d_NL_Att;\r\n", specDecl, specPow, constSpecPow ) );
+   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * @;\r\n", specDecl, specPow, constSpecPow, specStrength ) );
 
    LangElement *specMul = new GenOp( "@ * @", specCol, specular );
    LangElement *final = specMul;
@@ -539,8 +545,7 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
       final = new GenOp( "@ * @.a", final, bumpSample );
    }
 
-   // add to color
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( final, Material::Add ) ) );
+   // add to color   meta->addStatement( new GenOp( "   @;\r\n", assignColor( final, Material::Add ) ) );
 
    output = meta;
 }
