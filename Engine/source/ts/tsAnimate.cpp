@@ -293,6 +293,7 @@ void TSShapeInstance::updateTransitionNodeTransforms(TSIntegerSet& transitionNod
    transitionNodes.overlap(mTransitionRotationNodes);
    transitionNodes.overlap(mTransitionTranslationNodes);
    transitionNodes.overlap(mTransitionScaleNodes);
+   transitionNodes.takeAway(mHandsOffNodes);
 
    // Decompose transforms for nodes affected by the transition. Only need to do
    // for blended or scale-animated nodes, as all others are already up to date
@@ -578,6 +579,7 @@ void TSShapeInstance::handleBlendSequence(TSThread * thread, S32 a, S32 b)
    TSIntegerSet nodeMatters = thread->getSequence()->translationMatters;
    nodeMatters.overlap(thread->getSequence()->rotationMatters);
    nodeMatters.overlap(thread->getSequence()->scaleMatters);
+   nodeMatters.takeAway(mHandsOffNodes);
    S32 start = nodeMatters.start();
    S32 end   = b;
    for (S32 nodeIndex=start; nodeIndex<end; nodeMatters.next(nodeIndex))
