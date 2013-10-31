@@ -213,7 +213,7 @@ float4 main(   ConvexConnectP IN,
    // Specular term
    float specular = AL_CalcSpecular(   lightVec, 
                                        normal, 
-                                       normalize( -eyeRay ) ) * lightColor.a;
+                                       normalize( -eyeRay ) ) * lightBrightness * atten * shadowed;
 
    float Sat_NL_Att = saturate( nDotL * atten * shadowed ) * lightBrightness;
    float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;

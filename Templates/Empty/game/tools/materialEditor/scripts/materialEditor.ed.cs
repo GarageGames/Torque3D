@@ -894,6 +894,8 @@ function MaterialEditorGui::guiSync( %this, %material )
    
    MaterialEditorPropertiesWindow-->specularPowerTextEdit.setText((%material).specularPower[%layer]);
    MaterialEditorPropertiesWindow-->specularPowerSlider.setValue((%material).specularPower[%layer]);
+   MaterialEditorPropertiesWindow-->specularStrengthTextEdit.setText((%material).specularStrength[%layer]);
+   MaterialEditorPropertiesWindow-->specularStrengthSlider.setValue((%material).specularStrength[%layer]);
    MaterialEditorPropertiesWindow-->pixelSpecularCheckbox.setValue((%material).pixelSpecular[%layer]);
    MaterialEditorPropertiesWindow-->glowCheckbox.setValue((%material).glow[%layer]);
    MaterialEditorPropertiesWindow-->emissiveCheckbox.setValue((%material).emissive[%layer]);
@@ -2142,9 +2144,7 @@ function MaterialEditorGui::changeMaterial(%this, %fromMaterial, %toMaterial)
       
       MaterialEditorGui.currentObject.changeMaterial( %materialTarget, %fromMaterial.getName(), %toMaterial.getName() );
       
-      if( MaterialEditorGui.currentObject.interiorFile !$= "" )
-         %sourcePath = MaterialEditorGui.currentObject.interiorFile;
-      else if( MaterialEditorGui.currentObject.shapeName !$= "" ) 
+      if( MaterialEditorGui.currentObject.shapeName !$= "" ) 
          %sourcePath = MaterialEditorGui.currentObject.shapeName;
       else if( MaterialEditorGui.currentObject.isMethod("getDatablock") )
       {

@@ -221,7 +221,7 @@ void main()
                                     normal, 
                                     normalize( -eyeRay ), 
                                     constantSpecularPower, 
-                                    lightColor.a * lightBrightness );
+                                    shadowed * atten * lightBrightness );
     
    // N.L * Attenuation
    float Sat_NL_Att = clamp( nDotL * atten * shadowed, 0.0, 1.0 );

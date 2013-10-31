@@ -116,6 +116,7 @@ Material::Material()
       mSpecular[i].set( 1.0f, 1.0f, 1.0f, 1.0f );
 
       mSpecularPower[i] = 8.0f;
+      mSpecularStrength[i] = 1.0f;
       mPixelSpecular[i] = false;
 
       mParallaxScale[i] = 0.0f;
@@ -239,7 +240,10 @@ void Material::initPersistFields()
          "The color of the specular highlight when not using a specularMap." );
 
       addField("specularPower", TypeF32, Offset(mSpecularPower, Material), MAX_STAGES,
-         "The intensity of the specular highlight when not using a specularMap." );
+         "The hardness of the specular highlight when not using a specularMap." );
+
+		addField("specularStrength", TypeF32, Offset(mSpecularStrength, Material), MAX_STAGES,
+         "The strength of the specular highlight when not using a specularMap." );
 
       addField("pixelSpecular", TypeBool, Offset(mPixelSpecular, Material), MAX_STAGES, 
          "This enables per-pixel specular highlights controlled by the alpha channel of the "
