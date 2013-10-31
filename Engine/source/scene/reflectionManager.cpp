@@ -290,6 +290,7 @@ bool ReflectionManager::_handleDeviceEvent( GFXDevice::GFXDeviceEventType evt )
    switch( evt )
    {
    case GFXDevice::deStartOfFrame:
+   case GFXDevice::deStartOfField:
 
       mUpdateRefract = true;
       break;

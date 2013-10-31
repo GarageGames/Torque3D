@@ -242,6 +242,9 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       Point2F projOffset = GFX->getCurrentProjectionOffset();
       Point3F eyeOffset = GFX->getStereoEyeOffset();
 
+      // Indicate that we're about to start a field
+      GFX->beginField();
+
       // Render left half of display
       RectI leftVP = originalVP;
       leftVP.extent.x *= 0.5;
@@ -263,6 +266,12 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       renderStateLeft.setSceneRenderField(0);
 
       renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone );
+
+      // Indicate that we've just finished a field
+      GFX->endField();
+
+      // Indicate that we're about to start a field
+      GFX->beginField();
 
       // Render right half of display
       RectI rightVP = originalVP;
@@ -286,6 +295,9 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       renderStateRight.setSceneRenderField(1);
 
       renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone );
+
+      // Indicate that we've just finished a field
+      GFX->endField();
 
       // Restore previous values
       GFX->setWorldMatrix(originalWorld);
