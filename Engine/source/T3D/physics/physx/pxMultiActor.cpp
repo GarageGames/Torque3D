@@ -570,7 +570,8 @@ bool PxMultiActorData::preload( bool server, String &errorBuffer )
 
    // Register for file change notification to reload the collection
    if ( server )
-      FS::AddChangeNotification( physXStream, this, &PxMultiActorData::_onFileChanged );
+      // Wouldn't compile in VS2010 as is, but compiles fine with the Torque namespace
+      Torque::FS::AddChangeNotification( physXStream, this, &PxMultiActorData::_onFileChanged );
 
    return true;
 }
