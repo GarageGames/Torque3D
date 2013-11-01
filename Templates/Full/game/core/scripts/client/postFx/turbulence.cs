@@ -35,7 +35,6 @@ singleton ShaderData( PFX_TurbulenceShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/turbulenceP.hlsl";
            
-   samplerNames[0] = "$inputTex";   
    pixVersion = 3.0;
 };
 
@@ -45,8 +44,9 @@ singleton PostEffect( TurbulenceFx )
    isEnabled = false;    
    allowReflectPass = true;  
          
-   renderTime = "PFXAfterDiffuse";  
-   renderBin = "ObjTranslucentBin";     
+   renderTime = "PFXAfterBin";
+   renderBin = "GlowBin";
+   renderPriority = 10; // Render after the glows themselves
      
    shader = PFX_TurbulenceShader;  
    stateBlock=PFX_TurbulenceStateBlock;

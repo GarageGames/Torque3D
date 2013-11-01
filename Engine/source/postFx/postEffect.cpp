@@ -256,6 +256,7 @@ PostEffect::PostEffect()
       mRTSizeSC( NULL ),
       mOneOverRTSizeSC( NULL ),
       mViewportOffsetSC( NULL ),
+      mTargetViewportSC( NULL ),
       mFogDataSC( NULL ),
       mFogColorSC( NULL ),
       mEyePosSC( NULL ),
@@ -265,6 +266,7 @@ PostEffect::PostEffect()
       mNearFarSC( NULL ),
       mInvNearFarSC( NULL ),
       mWorldToScreenScaleSC( NULL ),
+      mProjectionOffsetSC( NULL ),
       mWaterColorSC( NULL ),
       mWaterFogDataSC( NULL ),
       mAmbientColorSC( NULL ),
@@ -541,6 +543,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
 
       //mViewportSC = shader->getShaderConstHandle( "$viewport" );
 
+      mTargetViewportSC = mShader->getShaderConstHandle( "$targetViewport" );
+
       mFogDataSC = mShader->getShaderConstHandle( ShaderGenVars::fogData );
       mFogColorSC = mShader->getShaderConstHandle( ShaderGenVars::fogColor );
 
@@ -553,6 +557,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mMatWorldToScreenSC = mShader->getShaderConstHandle( "$matWorldToScreen" );
       mMatScreenToWorldSC = mShader->getShaderConstHandle( "$matScreenToWorld" );
       mMatPrevScreenToWorldSC = mShader->getShaderConstHandle( "$matPrevScreenToWorld" );
+
+      mProjectionOffsetSC = mShader->getShaderConstHandle( "$projectionOffset" );
 
       mWaterColorSC = mShader->getShaderConstHandle( "$waterColor" );
       mAmbientColorSC = mShader->getShaderConstHandle( "$ambientColor" );
@@ -619,6 +625,27 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       }
 
       mShaderConsts->set( mRenderTargetParamsSC[i], rtParams );
+   }
+
+   // Target viewport (in target space)
+   if ( mTargetViewportSC->isValid() )
+   {
+      const Point2I& targetSize = GFX->getActiveRenderTarget()->getSize();
+      Point3I size(targetSize.x, targetSize.y, 0);
+      const RectI& viewport = GFX->getViewport();
+
+      Point2F offset((F32)viewport.point.x / (F32)targetSize.x, (F32)viewport.point.y / (F32)targetSize.y );
+      Point2F scale((F32)viewport.extent.x / (F32)targetSize.x, (F32)viewport.extent.y / (F32)targetSize.y );
+
+      const Point2F halfPixel( 0.5f / targetSize.x, 0.5f / targetSize.y );
+
+      Point4F targetParams;
+      targetParams.x = offset.x + halfPixel.x;
+      targetParams.y = offset.y + halfPixel.y;
+      targetParams.z = offset.x + scale.x - halfPixel.x;
+      targetParams.w = offset.y + scale.y - halfPixel.y;
+
+      mShaderConsts->set( mTargetViewportSC, targetParams );
    }
 
    // Set the fog data.
@@ -692,6 +719,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mShaderConsts->setSafe( mNearFarSC, Point2F( state->getNearPlane(), state->getFarPlane() ) );
       mShaderConsts->setSafe( mInvNearFarSC, Point2F( 1.0f / state->getNearPlane(), 1.0f / state->getFarPlane() ) );
       mShaderConsts->setSafe( mWorldToScreenScaleSC, state->getWorldToScreenScale() );
+      mShaderConsts->setSafe( mProjectionOffsetSC, state->getFrustum().getProjectionOffset() );
       mShaderConsts->setSafe( mFogColorSC, state->getSceneManager()->getFogData().color );
 
       if ( mWaterColorSC->isValid() )
