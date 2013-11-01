@@ -118,6 +118,8 @@ protected:
 
    GFXShaderConstHandle *mViewportOffsetSC;
 
+   GFXShaderConstHandle *mTargetViewportSC;
+
    GFXShaderConstHandle *mFogDataSC;
    GFXShaderConstHandle *mFogColorSC;
    GFXShaderConstHandle *mEyePosSC;
@@ -127,6 +129,7 @@ protected:
    GFXShaderConstHandle *mNearFarSC;
    GFXShaderConstHandle *mInvNearFarSC;   
    GFXShaderConstHandle *mWorldToScreenScaleSC;
+   GFXShaderConstHandle *mProjectionOffsetSC;
    GFXShaderConstHandle *mWaterColorSC;
    GFXShaderConstHandle *mWaterFogDataSC;     
    GFXShaderConstHandle *mAmbientColorSC;
