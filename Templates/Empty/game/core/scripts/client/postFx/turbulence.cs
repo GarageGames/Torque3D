@@ -40,34 +40,14 @@ singleton ShaderData( PFX_TurbulenceShader )
 
 singleton PostEffect( TurbulenceFx )  
 {  
-   requirements = "None";
    isEnabled = false;    
    allowReflectPass = true;  
          
    renderTime = "PFXAfterBin";
    renderBin = "GlowBin";
-   renderPriority = 10; // Render after the glows themselves
+   renderPriority = 0.5; // Render after the glows themselves
      
    shader = PFX_TurbulenceShader;  
    stateBlock=PFX_TurbulenceStateBlock;
    texture[0] = "$backBuffer";      
-      
-   renderPriority = 0.1;  
  };
-
-function TurbulenceFx::setShaderConsts(%this)
-{
-   %this.setShaderConst(%this.timeConst, $Sim::time - %this.timeStart); 
-}
-
-function UnderwaterFogPostFx::onEnabled( %this )
-{
-   TurbulenceFx.enable();
-   return true;
-}
-
-function UnderwaterFogPostFx::onDisabled( %this )
-{
-   TurbulenceFx.disable();
-   return false;
-}
