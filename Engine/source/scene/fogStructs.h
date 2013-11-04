@@ -59,7 +59,7 @@ struct WaterFogData
       wetDepth = 0.0f;
       wetDarkening = 0.0f;
       color.set( 0.5f, 0.5f, 0.5f, 1.0f );
-      plane.set( 0.0f, 0.0f, 1.0f );
+      plane.set( 0.0f, 0.0f, 1.0f, 1e10 ); // Default to global bounds distance
       depthGradMax = 0.0f;
    }
 };
