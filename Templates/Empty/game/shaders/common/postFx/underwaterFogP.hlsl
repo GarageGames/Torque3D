@@ -132,7 +132,7 @@ float4 main( PFXVertToPix IN ) : COLOR
    inColor.rgb *= 1.0 - saturate( abs( planeDist ) / WET_DEPTH ) * WET_DARKENING;
    //return float4( inColor, 1 );
    
-   float3 outColor = lerp( inColor, fogColor, fogAmt );
+   float3 outColor = lerp( inColor, fogColor.rgb, fogAmt );
    
    return float4( hdrEncode( outColor ), 1 );        
 }

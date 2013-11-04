@@ -117,3 +117,16 @@ singleton PostEffect( UnderwaterFogPostFx )
    isEnabled = true;
 };
 
+function UnderwaterFogPostFx::onEnabled( %this )
+{
+   TurbulenceFx.enable();
+   CausticsPFX.enable();
+   return true;
+}
+
+function UnderwaterFogPostFx::onDisabled( %this )
+{
+   TurbulenceFx.disable();
+   CausticsPFX.disable();
+   return false;
+}
