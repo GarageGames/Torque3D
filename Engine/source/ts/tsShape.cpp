@@ -1177,6 +1177,11 @@ void TSShape::assembleShape()
       {
          TSMesh::smVertsList[i]  = mesh->verts.address();
          TSMesh::smTVertsList[i] = mesh->tverts.address();
+         if (smReadVersion >= 26)
+         {
+            TSMesh::smTVerts2List[i] = mesh->tverts2.address();
+            TSMesh::smColorsList[i] = mesh->colors.address();
+         }
          TSMesh::smNormsList[i]  = mesh->norms.address();
          TSMesh::smEncodedNormsList[i] = mesh->encodedNorms.address();
          TSMesh::smDataCopied[i] = !skip; // as long as we didn't skip this mesh, the data should be in shape now
