@@ -3098,6 +3098,8 @@ void Player::updateMove(const Move* move)
    }
 
    // Container buoyancy & drag
+/* Commented out until the buoyancy calculation can be reworked so that a container and
+** player with the same density will result in neutral buoyancy.
    if (mBuoyancy != 0)
    {     
       // Applying buoyancy when standing still causing some jitters-
@@ -3117,6 +3119,7 @@ void Player::updateMove(const Move* move)
          mVelocity.z -= buoyancyForce;
       }
    }
+*/
 
    // Apply drag
    if ( mSwimming )
