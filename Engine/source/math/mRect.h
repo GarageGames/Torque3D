@@ -405,7 +405,7 @@ inline bool RectF::intersectTriangle(const Point2F &a, const Point2F &b, const P
    // 3 point plus 12 edge tests.
 
    // Check each triangle point to see if it's in us.
-   if(contains(a) || contains(b) || contains(b))
+   if(contains(a) || contains(b) || contains(c))
       return true;
 
    // Check a-b against the rect.
