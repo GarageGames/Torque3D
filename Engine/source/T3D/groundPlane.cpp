@@ -352,7 +352,7 @@ void GroundPlane::prepRenderImage( SceneRenderState* state )
    PROFILE_SCOPE( GroundPlane_prepRender );
 
    // Update the geometry.
-   createGeometry( state->getFrustum() );
+   createGeometry( state->getCullingFrustum() );
    if( mVertexBuffer.isNull() )
       return;
 

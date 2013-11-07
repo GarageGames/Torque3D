@@ -68,17 +68,21 @@ SceneCullingState::SceneCullingState( SceneManager* sceneManager, const SceneCam
    mZoneVisibilityFlags.setSize( numZones );
    mZoneVisibilityFlags.clear();
 
+   // Culling frustum
+
+   mCullingFrustum = mCameraState.getFrustum();
+   mCullingFrustum.bakeProjectionOffset();
+
    // Construct the root culling volume from
-   // the camera's view frustum.  Omit the frustum's
+   // the culling frustum.  Omit the frustum's
    // near and far plane so we don't test it repeatedly.
 
-   const Frustum& frustum = mCameraState.getFrustum();
    PlaneF* planes = allocateData< PlaneF >( 4 );
 
-   planes[ 0 ] = frustum.getPlanes()[ Frustum::PlaneLeft ];
-   planes[ 1 ] = frustum.getPlanes()[ Frustum::PlaneRight ];
-   planes[ 2 ] = frustum.getPlanes()[ Frustum::PlaneTop];
-   planes[ 3 ] = frustum.getPlanes()[ Frustum::PlaneBottom ];
+   planes[ 0 ] = mCullingFrustum.getPlanes()[ Frustum::PlaneLeft ];
+   planes[ 1 ] = mCullingFrustum.getPlanes()[ Frustum::PlaneRight ];
+   planes[ 2 ] = mCullingFrustum.getPlanes()[ Frustum::PlaneTop];
+   planes[ 3 ] = mCullingFrustum.getPlanes()[ Frustum::PlaneBottom ];
 
    mRootVolume = SceneCullingVolume(
       SceneCullingVolume::Includer,
@@ -219,7 +223,7 @@ bool SceneCullingState::createCullingVolume( const Point3F* vertices, U32 numVer
 {
    const Point3F& viewPos = getCameraState().getViewPosition();
    const Point3F& viewDir = getCameraState().getViewDirection();
-   const bool isOrtho = getFrustum().isOrtho();
+   const bool isOrtho = getCullingFrustum().isOrtho();
 
    //TODO: check if we need to handle penetration of the near plane for occluders specially
 
@@ -440,8 +444,8 @@ bool SceneCullingState::createCullingVolume( const Point3F* vertices, U32 numVer
 
    if( type == SceneCullingVolume::Occluder )
    {
-      const F32 widthEstimatePercentage = widthEstimate / getFrustum().getWidth();
-      const F32 heightEstimatePercentage = heightEstimate / getFrustum().getHeight();
+      const F32 widthEstimatePercentage = widthEstimate / getCullingFrustum().getWidth();
+      const F32 heightEstimatePercentage = heightEstimate / getCullingFrustum().getHeight();
 
       if( widthEstimatePercentage < smOccluderMinWidthPercentage ||
           heightEstimatePercentage < smOccluderMinHeightPercentage )
@@ -614,7 +618,7 @@ inline SceneZoneCullingState::CullingTestResult SceneCullingState::_test( const 
 
    if( disableZoneCulling() )
    {
-      if( !OCCLUDERS_ONLY && !getFrustum().isCulled( bounds ) )
+      if( !OCCLUDERS_ONLY && !getCullingFrustum().isCulled( bounds ) )
          return SceneZoneCullingState::CullingTestPositiveByInclusion;
 
       return SceneZoneCullingState::CullingTestNegative;
@@ -631,7 +635,7 @@ inline SceneZoneCullingState::CullingTestResult SceneCullingState::_test( const 
    }
    else
    {
-      const PlaneF* frustumPlanes = getFrustum().getPlanes();
+      const PlaneF* frustumPlanes = getCullingFrustum().getPlanes();
 
       return _test(
          bounds,
@@ -715,8 +719,8 @@ U32 SceneCullingState::cullObjects( SceneObject** objects, U32 numObjects, U32 c
 
    // We test near and far planes separately in order to not do the tests
    // repeatedly, so fetch the planes now.
-   const PlaneF& nearPlane = getFrustum().getPlanes()[ Frustum::PlaneNear ];
-   const PlaneF& farPlane = getFrustum().getPlanes()[ Frustum::PlaneFar ];
+   const PlaneF& nearPlane = getCullingFrustum().getPlanes()[ Frustum::PlaneNear ];
+   const PlaneF& farPlane = getCullingFrustum().getPlanes()[ Frustum::PlaneFar ];
 
    for( U32 i = 0; i < numObjects; ++ i )
    {
@@ -766,7 +770,7 @@ U32 SceneCullingState::cullObjects( SceneObject** objects, U32 numObjects, U32 c
                ( object->getTypeMask() & CULLING_EXCLUDE_TYPEMASK ) ||
                disableZoneCulling() )
       {
-         isCulled = getFrustum().isCulled( object->getWorldBox() );
+         isCulled = getCullingFrustum().isCulled( object->getWorldBox() );
       }
 
       // Go through the zones that the object is assigned to and
@@ -881,8 +885,8 @@ void SceneCullingState::debugRenderCullingVolumes() const
    const ColorI occluderColor( 255, 0, 0, 255 );
    const ColorI includerColor( 0, 255, 0, 255 );
 
-   const PlaneF& nearPlane = getFrustum().getPlanes()[ Frustum::PlaneNear ];
-   const PlaneF& farPlane = getFrustum().getPlanes()[ Frustum::PlaneFar ];
+   const PlaneF& nearPlane = getCullingFrustum().getPlanes()[ Frustum::PlaneNear ];
+   const PlaneF& farPlane = getCullingFrustum().getPlanes()[ Frustum::PlaneFar ];
 
    DebugDrawer* drawer = DebugDrawer::get();
    const SceneZoneSpaceManager* zoneManager = mSceneManager->getZoneManager();

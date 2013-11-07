@@ -719,7 +719,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mShaderConsts->setSafe( mNearFarSC, Point2F( state->getNearPlane(), state->getFarPlane() ) );
       mShaderConsts->setSafe( mInvNearFarSC, Point2F( 1.0f / state->getNearPlane(), 1.0f / state->getFarPlane() ) );
       mShaderConsts->setSafe( mWorldToScreenScaleSC, state->getWorldToScreenScale() );
-      mShaderConsts->setSafe( mProjectionOffsetSC, state->getFrustum().getProjectionOffset() );
+      mShaderConsts->setSafe( mProjectionOffsetSC, state->getCameraFrustum().getProjectionOffset() );
       mShaderConsts->setSafe( mFogColorSC, state->getSceneManager()->getFogData().color );
 
       if ( mWaterColorSC->isValid() )
@@ -750,7 +750,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       {
          // Grab our projection matrix
          // from the frustum.
-         Frustum frust = state->getFrustum();
+         Frustum frust = state->getCameraFrustum();
          MatrixF proj( true );
          frust.getProjectionMatrix( &proj );
 
@@ -1219,7 +1219,7 @@ void PostEffect::process(  const SceneRenderState *state,
 
    Frustum frustum;
    if ( state )
-      frustum = state->getFrustum();
+      frustum = state->getCameraFrustum();
    else
    {
       // If we don't have a scene state then setup

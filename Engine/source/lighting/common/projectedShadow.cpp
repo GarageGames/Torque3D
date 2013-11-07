@@ -324,7 +324,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    bool shouldClip = lightDirChanged || hasMoved || hasScaled;
 
    // Now, check and see if the object is visible.
-   const Frustum &frust = state->getFrustum();
+   const Frustum &frust = state->getCullingFrustum();
    if ( frust.isCulled( SphereF( mDecalInstance->mPosition, mDecalInstance->mSize * mDecalInstance->mSize ) ) && !shouldClip )
       return false;
 

@@ -930,7 +930,7 @@ void ScatterSky::_render( ObjectRenderInst *ri, SceneRenderState *state, BaseMat
    Point3F camPos( 0, 0, smViewerHeight );
    Point4F miscParams( camPos.z, camPos.z * camPos.z, mScale, mScale / mRayleighScaleDepth );
 
-   Frustum frust = state->getFrustum();
+   Frustum frust = state->getCameraFrustum();
    frust.setFarDist( smEarthRadius + smAtmosphereRadius );
    MatrixF proj( true );
    frust.getProjectionMatrix( &proj );

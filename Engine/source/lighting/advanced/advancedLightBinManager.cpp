@@ -444,7 +444,7 @@ void AdvancedLightBinManager::_deleteLightMaterials()
 void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *state )
 {
    PROFILE_SCOPE( AdvancedLightBinManager_SetupPerFrameParameters );
-   const Frustum &frustum = state->getFrustum();
+   const Frustum &frustum = state->getCameraFrustum();
 
    MatrixF invCam( frustum.getTransform() );
    invCam.inverse();

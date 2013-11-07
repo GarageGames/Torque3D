@@ -191,7 +191,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
    // Get the lights for rendering the scene.
 
    PROFILE_START( SceneGraph_registerLights );
-      LIGHTMGR->registerGlobalLights( &renderState->getFrustum(), false );
+      LIGHTMGR->registerGlobalLights( &renderState->getCullingFrustum(), false );
    PROFILE_END();
 
    // If its a diffuse pass, update the current ambient light level.
@@ -404,7 +404,7 @@ void SceneManager::_renderScene( SceneRenderState* state, U32 objectMask, SceneZ
    // the opportunity to render editor visualizations even if
    // they are otherwise not in view.
 
-   if( !state->getFrustum().getBounds().isOverlapped( state->getRenderArea() ) )
+   if( !state->getCullingFrustum().getBounds().isOverlapped( state->getRenderArea() ) )
    {
       // This handles fringe cases like flying backwards into a zone where you
       // end up pretty much standing on a zone border and looking directly into
@@ -415,7 +415,7 @@ void SceneManager::_renderScene( SceneRenderState* state, U32 objectMask, SceneZ
       return;
    }
 
-   Box3F queryBox = state->getFrustum().getBounds();
+   Box3F queryBox = state->getCullingFrustum().getBounds();
    if( !gEditingMission )
    {
       queryBox.minExtents.setMax( state->getRenderArea().minExtents );
