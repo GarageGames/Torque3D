@@ -420,7 +420,7 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    reflectRenderState.disableAdvancedLightingBins(true);
 
    // render scene
-   LIGHTMGR->registerGlobalLights( &reflectRenderState.getFrustum(), false );
+   LIGHTMGR->registerGlobalLights( &reflectRenderState.getCullingFrustum(), false );
    gClientSceneGraph->renderSceneNoLights( &reflectRenderState, mDesc->objectTypeMask );
    LIGHTMGR->unregisterAllLights();
 

@@ -1539,7 +1539,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
 
    // Setup the frustum culler.
    if ( ( mCuller.getPosition().isZero() || !mDebugLockFrustum ) && !state->isShadowPass() )
-      mCuller = state->getFrustum();
+      mCuller = state->getCullingFrustum();
 
    // Update the cells, but only during the diffuse pass. 
    // We don't want cell generation to thrash when the reflection camera 

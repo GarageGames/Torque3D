@@ -145,8 +145,11 @@ class SceneRenderState
       const SceneCullingState& getCullingState() const { return mCullingState; }
       SceneCullingState& getCullingState() { return mCullingState; }
 
-      /// Returns the root frustum.
-      const Frustum& getFrustum() const { return getCullingState().getFrustum(); }
+      /// Returns the root culling frustum.
+      const Frustum& getCullingFrustum() const { return getCullingState().getCullingFrustum(); }
+
+      /// Returns the root camera frustum.
+      const Frustum& getCameraFrustum() const { return getCullingState().getCameraFrustum(); }
 
       /// @}
 
@@ -262,10 +265,10 @@ class SceneRenderState
       const MatrixF& getCameraTransform() const { return getCullingState().getCameraState().getViewWorldMatrix(); }
 
       /// Returns the minimum distance something must be from the camera to not be culled.
-      F32 getNearPlane() const { return getFrustum().getNearDist();   }
+      F32 getNearPlane() const { return getCullingFrustum().getNearDist();   }
 
       /// Returns the maximum distance something can be from the camera to not be culled.
-      F32 getFarPlane() const { return getFrustum().getFarDist();    }
+      F32 getFarPlane() const { return getCullingFrustum().getFarDist();    }
 
       /// Returns the camera vector normalized to 1 / far distance.
       const Point3F& getVectorEye() const { return mVectorEye; }

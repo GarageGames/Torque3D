@@ -525,7 +525,7 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    Frustum culler;
    if ( mMeshCulling )
    {
-      culler = state->getFrustum();
+      culler = state->getCullingFrustum();
       MatrixF xfm( true );
       xfm.scale( Point3F::One / getScale() );
       xfm.mul( getRenderWorldTransform() );

@@ -721,7 +721,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
    if ( !smShowRoad && smEditorOpen )
       return;
 
-   const Frustum &frustum = state->getFrustum();
+   const Frustum &frustum = state->getCameraFrustum();
 
    MeshRenderInst coreRI;
    coreRI.clear();

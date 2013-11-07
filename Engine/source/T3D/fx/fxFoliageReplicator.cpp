@@ -146,7 +146,7 @@ void fxFoliageRenderList::SetupClipPlanes( SceneRenderState* state, const F32 fa
    const F32 nearPlane = state->getNearPlane();
    const F32 farPlane = farClipPlane;
 
-   const Frustum& frustum = state->getFrustum();
+   const Frustum& frustum = state->getCullingFrustum();
 
    // [rene, 23-Feb-11] Why isn't this preserving the ortho state of the original frustum?
 

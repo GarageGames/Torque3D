@@ -279,7 +279,7 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
    const Point3F &lightPos = flareState->lightMat.getPosition();  
    const RectI &viewport = GFX->getViewport();
    MatrixF projMatrix;
-   state->getFrustum().getProjectionMatrix(&projMatrix);
+   state->getCameraFrustum().getProjectionMatrix(&projMatrix);
    if( state->isReflectPass() )
       projMatrix = state->getSceneManager()->getNonClipProjection();
    bool onScreen = MathUtils::mProjectWorldToScreen( lightPos, outLightPosSS, viewport, GFX->getWorldMatrix(), projMatrix );
@@ -465,7 +465,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
 
    // Take any projection offset into account so that the point where the flare's
    // elements converge is at the 'eye' point rather than the center of the viewport.
-   const Point2F& projOffset = state->getFrustum().getProjectionOffset();
+   const Point2F& projOffset = state->getCameraFrustum().getProjectionOffset();
    Point3F flareVec( -lightPosSS + Point3F(projOffset.x, projOffset.y, 0.0f) );
    const F32 flareLength = flareVec.len();
    if ( flareLength > 0.0f )
