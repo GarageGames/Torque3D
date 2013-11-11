@@ -1572,12 +1572,20 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
 
       mShaderConstData.gustInfo.set( mWindGustLength, mWindGustFrequency * simTime, mWindGustStrength );
       mShaderConstData.turbInfo.set( mWindTurbulenceFrequency * simTime, mWindTurbulenceStrength );      
-            
+
+      // Use the camera's forward vector to calculate the camera's right
+      // and up vectors.  This removes any camera banking from affecting
+      // the ground cover.
       const MatrixF &camMat = state->getDiffuseCameraTransform();
       Point3F camDir, camUp, camRight;
       camMat.getColumn( 1, &camDir );
-      camMat.getColumn( 2, &camUp );
-      camMat.getColumn( 0, &camRight );
+      mCross( camDir, Point3F::UnitZ, &camRight );
+      if ( camRight.magnitudeSafe() == 0.0f )
+      {
+         camRight.set( 0.0f, -1.0f, 0.0f );
+      }
+      camRight.normalizeSafe();
+      mCross( camRight, camDir, &camUp );
 
       // Limit the camera up vector to keep the billboards 
       // from leaning too far down into the terrain.
