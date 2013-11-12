@@ -130,7 +130,7 @@ void OculusVRHMDDevice::createSimulatedPreviewRift(bool calculateDistortionScale
    mChromaticAbCorrection.x = 0.995999f;
    mChromaticAbCorrection.y = -0.004f;
    mChromaticAbCorrection.z = 1.014f;
-   mChromaticAbCorrection.z = 0.0f;
+   mChromaticAbCorrection.w = 0.0f;
 
    calculateValues(calculateDistortionScale);
 }
