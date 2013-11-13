@@ -54,6 +54,7 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
    mToneMapTexSC = shader->getShaderConstHandle(ShaderGenVars::toneMap);
    mSpecularColorSC = shader->getShaderConstHandle(ShaderGenVars::specularColor);
    mSpecularPowerSC = shader->getShaderConstHandle(ShaderGenVars::specularPower);
+   mSpecularStrengthSC = shader->getShaderConstHandle(ShaderGenVars::specularStrength);
    mParallaxInfoSC = shader->getShaderConstHandle("$parallaxInfo");
    mFogDataSC = shader->getShaderConstHandle(ShaderGenVars::fogData);
    mFogColorSC = shader->getShaderConstHandle(ShaderGenVars::fogColor);
@@ -993,6 +994,7 @@ void ProcessedShaderMaterial::_setShaderConstants(SceneRenderState * state, cons
 
    shaderConsts->setSafe(handles->mSpecularColorSC, mMaterial->mSpecular[stageNum]);   
    shaderConsts->setSafe(handles->mSpecularPowerSC, mMaterial->mSpecularPower[stageNum]);
+   shaderConsts->setSafe(handles->mSpecularStrengthSC, mMaterial->mSpecularStrength[stageNum]);
 
    shaderConsts->setSafe(handles->mParallaxInfoSC, mMaterial->mParallaxScale[stageNum]);   
    shaderConsts->setSafe(handles->mMinnaertConstantSC, mMaterial->mMinnaertConstant[stageNum]);
@@ -1198,6 +1200,7 @@ void ProcessedShaderMaterial::setBuffers( GFXVertexBufferHandleBase *vertBuffer,
    GFXVertexBufferDataHandle instVB;
    instVB.set( GFX, instFormat->getSizeInBytes(), instFormat, instCount, GFXBufferTypeVolatile );
    U8 *dest = instVB.lock();
+   if(!dest) return;
    dMemcpy( dest, mInstancingState->getBuffer(), instFormat->getSizeInBytes() * instCount );
    instVB.unlock();
 
@@ -1256,7 +1259,7 @@ MaterialParameterHandle* ProcessedShaderMaterial::getMaterialParameterHandle(con
 /// This is here to deal with the differences between ProcessedCustomMaterials and ProcessedShaderMaterials.
 GFXShaderConstBuffer* ProcessedShaderMaterial::_getShaderConstBuffer( const U32 pass )
 {   
-   if (pass < mPasses.size())
+   if (mCurrentParams && pass < mPasses.size())
    {
       return static_cast<ShaderMaterialParameters*>(mCurrentParams)->getBuffer(pass);
    }

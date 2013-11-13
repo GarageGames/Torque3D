@@ -721,7 +721,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
    if ( !smShowRoad && smEditorOpen )
       return;
 
-   const Frustum &frustum = state->getFrustum();
+   const Frustum &frustum = state->getCameraFrustum();
 
    MeshRenderInst coreRI;
    coreRI.clear();
@@ -1452,7 +1452,8 @@ void DecalRoad::_captureVerts()
    mPB.set( GFX, mTriangleCount * 3, 0, GFXBufferTypeStatic );
 
    // Lock the VertexBuffer
-   GFXVertexPNTBT *vertPtr = mVB.lock();   
+   GFXVertexPNTBT *vertPtr = mVB.lock();
+   if(!vertPtr) return;
    U32 vertIdx = 0;
 
    //

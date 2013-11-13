@@ -16,8 +16,8 @@ subject to the following restrictions:
 
 
 
-#ifndef GJK_PAIR_DETECTOR_H
-#define GJK_PAIR_DETECTOR_H
+#ifndef BT_GJK_PAIR_DETECTOR_H
+#define BT_GJK_PAIR_DETECTOR_H
 
 #include "btDiscreteCollisionDetectorInterface.h"
 #include "BulletCollision/CollisionShapes/btCollisionMargin.h"
@@ -63,12 +63,12 @@ public:
 	void	getClosestPointsNonVirtual(const ClosestPointInput& input,Result& output,class btIDebugDraw* debugDraw);
 	
 
-	void setMinkowskiA(btConvexShape* minkA)
+	void setMinkowskiA(const btConvexShape* minkA)
 	{
 		m_minkowskiA = minkA;
 	}
 
-	void setMinkowskiB(btConvexShape* minkB)
+	void setMinkowskiB(const btConvexShape* minkB)
 	{
 		m_minkowskiB = minkB;
 	}
@@ -100,4 +100,4 @@ public:
 
 };
 
-#endif //GJK_PAIR_DETECTOR_H
+#endif //BT_GJK_PAIR_DETECTOR_H

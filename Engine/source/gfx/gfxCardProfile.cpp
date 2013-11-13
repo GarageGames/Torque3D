@@ -106,6 +106,7 @@ void GFXCardProfiler::init()
    Con::printf("   o Chipset : '%s'", getChipString().c_str());
    Con::printf("   o Card    : '%s'", getCardString().c_str());
    Con::printf("   o Version : '%s'", getVersionString().c_str());
+   Con::printf("   o VRAM    : %d MB", getVideoMemoryInMB());
 
    // Do card-specific setup...
    Con::printf("   - Scanning card capabilities...");

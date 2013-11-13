@@ -259,8 +259,10 @@ void TSShapeInstance::cloneMaterialList( const FeatureSet *features )
    if ( mOwnMaterialList )
       return;
 
+   Material::sAllowTextureTargetAssignment = true;
    mMaterialList = new TSMaterialList(mMaterialList);
    initMaterialList( features );
+   Material::sAllowTextureTargetAssignment = false;
 
    mOwnMaterialList = true;
 }

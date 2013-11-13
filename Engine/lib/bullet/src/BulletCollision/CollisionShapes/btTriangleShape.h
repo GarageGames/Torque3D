@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef OBB_TRIANGLE_MINKOWSKI_H
-#define OBB_TRIANGLE_MINKOWSKI_H
+#ifndef BT_OBB_TRIANGLE_MINKOWSKI_H
+#define BT_OBB_TRIANGLE_MINKOWSKI_H
 
 #include "btConvexShape.h"
 #include "btBoxShape.h"
@@ -24,6 +24,8 @@ ATTRIBUTE_ALIGNED16(class) btTriangleShape : public btPolyhedralConvexShape
 
 
 public:
+
+BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	btVector3	m_vertices1[3];
 
@@ -66,7 +68,7 @@ public:
 
 	btVector3 localGetSupportingVertexWithoutMargin(const btVector3& dir)const 
 	{
-		btVector3 dots(dir.dot(m_vertices1[0]), dir.dot(m_vertices1[1]), dir.dot(m_vertices1[2]));
+        btVector3 dots = dir.dot3(m_vertices1[0], m_vertices1[1], m_vertices1[2]);
 	  	return m_vertices1[dots.maxAxis()];
 
 	}
@@ -76,7 +78,7 @@ public:
 		for (int i=0;i<numVectors;i++)
 		{
 			const btVector3& dir = vectors[i];
-			btVector3 dots(dir.dot(m_vertices1[0]), dir.dot(m_vertices1[1]), dir.dot(m_vertices1[2]));
+            btVector3 dots = dir.dot3(m_vertices1[0], m_vertices1[1], m_vertices1[2]);
   			supportVerticesOut[i] = m_vertices1[dots.maxAxis()];
 		}
 
@@ -178,5 +180,5 @@ public:
 
 };
 
-#endif //OBB_TRIANGLE_MINKOWSKI_H
+#endif //BT_OBB_TRIANGLE_MINKOWSKI_H
 

@@ -100,8 +100,11 @@ class SceneCullingState
       /// The viewing state that defines how the scene is being viewed.
       SceneCameraState mCameraState;
 
-      /// The root culling volume corresponding to the camera frustum.
+      /// The root culling volume corresponding to the culling frustum.
       SceneCullingVolume mRootVolume;
+
+      /// The root culling frustum, which may be different from the camera frustum
+      Frustum mCullingFrustum;
 
       /// Occluders that have been added to this render state.  Adding an occluder does not
       /// necessarily result in an occluder volume being added.  To not repeatedly try to
@@ -136,7 +139,10 @@ class SceneCullingState
       SceneManager* getSceneManager() const { return mSceneManager; }
 
       /// Return the root frustum which is used to set up scene visibility.
-      const Frustum& getFrustum() const { return getCameraState().getFrustum(); }
+      const Frustum& getCullingFrustum() const { return mCullingFrustum; }
+
+      /// Return the root frustum which is used to set up scene visibility.
+      const Frustum& getCameraFrustum() const { return getCameraState().getFrustum(); }
 
       /// Return the viewing state that defines how the scene is being viewed.
       const SceneCameraState& getCameraState() const { return mCameraState; }

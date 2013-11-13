@@ -1727,6 +1727,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       // Do we need to relock the buffer?
       if ( !vertPtr )
          vertPtr = mRainVB.lock();
+      if(!vertPtr) return;
 
       // Set the proper texture coords... (it's fun!)
       tc = &mTexCoords[4*curr->texCoordIndex];
@@ -1817,6 +1818,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       // Do we need to relock the buffer?
       if ( !vertPtr )
          vertPtr = mRainVB.lock();
+      if(!vertPtr) return;
 
       vertPtr->point = pos + leftUp;
       vertPtr->texCoord = *tc;

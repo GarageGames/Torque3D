@@ -876,18 +876,33 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
 
 bool TSMesh::addToHull( U32 idx0, U32 idx1, U32 idx2 )
 {
-   Point3F normal;
-   mCross(mVertexData[idx2].vert()-mVertexData[idx0].vert(),mVertexData[idx1].vert()-mVertexData[idx0].vert(),&normal);
-   if ( mDot( normal, normal ) < 0.001f )
+   // calculate the normal of this triangle... remember, we lose precision
+   // when we subtract two large numbers that are very close to each other,
+   // so depending on how we calculate the normal, we could get a 
+   // different result. so, we will calculate the normal three different
+   // ways and take the one that gives us the largest vector before we
+   // normalize.
+   Point3F normal1, normal2, normal3;
+   mCross(mVertexData[idx2].vert()-mVertexData[idx0].vert(),mVertexData[idx1].vert()-mVertexData[idx0].vert(),&normal1);
+   mCross(mVertexData[idx0].vert()-mVertexData[idx1].vert(),mVertexData[idx2].vert()-mVertexData[idx1].vert(),&normal2);
+   mCross(mVertexData[idx1].vert()-mVertexData[idx2].vert(),mVertexData[idx0].vert()-mVertexData[idx2].vert(),&normal3);
+   Point3F normal = normal1;
+   F32 greatestMagSquared = mDot(normal1, normal1);
+   F32 magSquared = mDot(normal2, normal2);
+   if (magSquared > greatestMagSquared)
    {
-      mCross( mVertexData[idx0].vert() - mVertexData[idx1].vert(), mVertexData[idx2].vert() - mVertexData[idx1].vert(), &normal );
-      if ( mDot( normal, normal ) < 0.001f )
-      {
-         mCross( mVertexData[idx1].vert() - mVertexData[idx2].vert(), mVertexData[idx0].vert() - mVertexData[idx2].vert(), &normal );
-         if ( mDot( normal, normal ) < 0.001f )
-            return false;
-      }
+      normal = normal2;
+      greatestMagSquared = magSquared;
    }
+   magSquared = mDot(normal3, normal3);
+   if (magSquared > greatestMagSquared)
+   {
+      normal = normal3;
+      greatestMagSquared = magSquared;
+   }
+   if (mDot(normal, normal) < 0.00000001f)
+       return false;
+
    normal.normalize();
    F32 k = mDot( normal, mVertexData[idx0].vert() );
    for ( S32 i = 0; i < planeNormals.size(); i++ ) 
@@ -1254,6 +1269,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
 
       // Lock, and skin directly into the final memory destination
       outPtr = (U8 *)instanceVB.lock();
+      if(!outPtr) return;
 #endif
       // Set position/normal to zero so we can accumulate
       zero_vert_normal_bulk(mNumVerts, outPtr, outStride);
@@ -2379,6 +2395,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
 
       // Copy from aligned memory right into GPU memory
       U8 *vertData = (U8*)vb.lock();
+      if(!vertData) return;
 #if defined(TORQUE_OS_XENON)
       XMemCpyStreaming_WriteCombined( vertData, mVertexData.address(), mVertexData.mem_size() );
 #else

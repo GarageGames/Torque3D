@@ -29,6 +29,9 @@ U32 OculusVRSensorDevice::OVR_SENSORROT[OculusVRConstants::MaxSensors] = {0};
 U32 OculusVRSensorDevice::OVR_SENSORROTANG[OculusVRConstants::MaxSensors] = {0};
 U32 OculusVRSensorDevice::OVR_SENSORROTAXISX[OculusVRConstants::MaxSensors] = {0};
 U32 OculusVRSensorDevice::OVR_SENSORROTAXISY[OculusVRConstants::MaxSensors] = {0};
+U32 OculusVRSensorDevice::OVR_SENSORACCELERATION[OculusVRConstants::MaxSensors] = {0};
+U32 OculusVRSensorDevice::OVR_SENSORANGVEL[OculusVRConstants::MaxSensors] = {0};
+U32 OculusVRSensorDevice::OVR_SENSORMAGNETOMETER[OculusVRConstants::MaxSensors] = {0};
 
 OculusVRSensorDevice::OculusVRSensorDevice()
 {
@@ -74,6 +77,7 @@ void OculusVRSensorDevice::set(OVR::SensorDevice* sensor, OVR::SensorInfo& info,
 
    mDevice = sensor;
    mSensorFusion.AttachToSensor(sensor);
+   mYawCorrectionDisabled = !mSensorFusion.IsYawCorrectionEnabled();
 
    // DeviceInfo
    mProductName = info.ProductName;
@@ -110,6 +114,7 @@ void OculusVRSensorDevice::createSimulatedPreviewRift(S32 actionCodeIndex)
 {
    mIsValid = false;
    mIsSimulation = true;
+   mYawCorrectionDisabled = true;
 
    // DeviceInfo
    mProductName = "Tracker DK";
@@ -145,6 +150,10 @@ void OculusVRSensorDevice::buildCodeTable()
 
       OVR_SENSORROTAXISX[i] = INPUTMGR->getNextDeviceCode();
       OVR_SENSORROTAXISY[i] = INPUTMGR->getNextDeviceCode();
+
+      OVR_SENSORACCELERATION[i] = INPUTMGR->getNextDeviceCode();
+      OVR_SENSORANGVEL[i] = INPUTMGR->getNextDeviceCode();
+      OVR_SENSORMAGNETOMETER[i] = INPUTMGR->getNextDeviceCode();
    }
 
    // Build out the virtual map
@@ -155,16 +164,27 @@ void OculusVRSensorDevice::buildCodeTable()
       INPUTMGR->addVirtualMap( buffer, SI_ROT, OVR_SENSORROT[i] );
 
       dSprintf(buffer, 64, "ovr_sensorrotang%d", i);
-      INPUTMGR->addVirtualMap( buffer, SI_ROT, OVR_SENSORROTANG[i] );
+      INPUTMGR->addVirtualMap( buffer, SI_POS, OVR_SENSORROTANG[i] );
 
       dSprintf(buffer, 64, "ovr_sensorrotaxisx%d", i);
       INPUTMGR->addVirtualMap( buffer, SI_AXIS, OVR_SENSORROTAXISX[i] );
       dSprintf(buffer, 64, "ovr_sensorrotaxisy%d", i);
       INPUTMGR->addVirtualMap( buffer, SI_AXIS, OVR_SENSORROTAXISY[i] );
+
+      dSprintf(buffer, 64, "ovr_sensoracceleration%d", i);
+      INPUTMGR->addVirtualMap( buffer, SI_POS, OVR_SENSORACCELERATION[i] );
+
+      dSprintf(buffer, 64, "ovr_sensorangvel%d", i);
+      INPUTMGR->addVirtualMap( buffer, SI_POS, OVR_SENSORANGVEL[i] );
+
+      dSprintf(buffer, 64, "ovr_sensormagnetometer%d", i);
+      INPUTMGR->addVirtualMap( buffer, SI_POS, OVR_SENSORMAGNETOMETER[i] );
    }
 }
 
-bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bool generateRotAsEuler, bool generateRotationAsAxisEvents, F32 maxAxisRadius)
+//-----------------------------------------------------------------------------
+
+bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bool generateRotAsEuler, bool generateRotationAsAxisEvents, F32 maxAxisRadius, bool generateRawSensor)
 {
    if(!mIsValid)
       return false;
@@ -180,7 +200,7 @@ bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bo
    {
       currentBuffer->simulateData(maxAxisRadius);
    }
-   diff = mPrevData->compare(currentBuffer);
+   diff = mPrevData->compare(currentBuffer, generateRawSensor);
 
    // Update the previous data pointer.  We do this here in case someone calls our
    // console functions during one of the input events below.
@@ -215,8 +235,31 @@ bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bo
          INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_AXIS, OVR_SENSORROTAXISY[mActionCodeIndex], SI_MOVE, currentBuffer->mRotAxis.y);
    }
 
+   // Raw sensor event
+   if(generateRawSensor && diff & OculusVRSensorData::DIFF_RAW)
+   {
+      if(diff & OculusVRSensorData::DIFF_ACCEL)
+         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_POS, OVR_SENSORACCELERATION[mActionCodeIndex], SI_MOVE, currentBuffer->mAcceleration);
+
+      if(diff & OculusVRSensorData::DIFF_ANGVEL)
+      {
+         // Convert angles to degrees
+         VectorF angles;
+         for(U32 i=0; i<3; ++i)
+         {
+            angles[i] = mRadToDeg(currentBuffer->mAngVelocity[i]);
+         }
+         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_POS, OVR_SENSORANGVEL[mActionCodeIndex], SI_MOVE, angles);
+      }
+
+      if(diff & OculusVRSensorData::DIFF_MAG)
+         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_POS, OVR_SENSORMAGNETOMETER[mActionCodeIndex], SI_MOVE, currentBuffer->mMagnetometer);
+   }
+
    return true;
 }
+
+//-----------------------------------------------------------------------------
 
 void OculusVRSensorDevice::reset()
 {
@@ -242,6 +285,51 @@ void OculusVRSensorDevice::setPredictionTime(F32 dt)
    mSensorFusion.SetPrediction(dt);
 }
 
+bool OculusVRSensorDevice::getGravityCorrection() const
+{
+   if(!mIsValid)
+      return false;
+
+   return mSensorFusion.IsGravityEnabled();
+}
+
+void OculusVRSensorDevice::setGravityCorrection(bool state)
+{
+   if(!mIsValid)
+      return;
+
+   mSensorFusion.SetGravityEnabled(state);
+}
+
+bool OculusVRSensorDevice::getYawCorrection() const
+{
+   if(!mIsValid)
+      return false;
+
+   return mSensorFusion.IsYawCorrectionEnabled();
+}
+
+void OculusVRSensorDevice::setYawCorrection(bool state)
+{
+   if(!mIsValid)
+      return;
+
+   if(mYawCorrectionDisabled || !mSensorFusion.HasMagCalibration())
+      return;
+
+   mSensorFusion.SetYawCorrectionEnabled(state);
+}
+
+bool OculusVRSensorDevice::getMagnetometerCalibrationAvailable() const
+{
+   if(!mIsValid)
+      return false;
+
+   return mSensorFusion.HasMagCalibration();
+}
+
+//-----------------------------------------------------------------------------
+
 EulerF OculusVRSensorDevice::getEulerRotation()
 {
    if(!mIsValid)
@@ -262,4 +350,83 @@ EulerF OculusVRSensorDevice::getEulerRotation()
    OculusVRUtil::convertRotation(orientation, rot);
 
    return rot;
+}
+
+EulerF OculusVRSensorDevice::getRawEulerRotation()
+{
+   if(!mIsValid)
+      return Point3F::Zero;
+
+   OVR::Quatf orientation;
+   orientation = mSensorFusion.GetOrientation();
+
+   // Sensor rotation in Euler format
+   EulerF rot;
+   OculusVRUtil::convertRotation(orientation, rot);
+
+   return rot;
+}
+
+VectorF OculusVRSensorDevice::getAcceleration()
+{
+   if(!mIsValid)
+      return VectorF::Zero;
+
+   OVR::Vector3f a = mSensorFusion.GetAcceleration();
+   
+   // Sensor acceleration in VectorF format
+   VectorF acceleration;
+   OculusVRUtil::convertAcceleration(a, acceleration);
+
+   return acceleration;
+}
+
+EulerF OculusVRSensorDevice::getAngularVelocity()
+{
+   if(!mIsValid)
+      return EulerF::Zero;
+
+   OVR::Vector3f v = mSensorFusion.GetAngularVelocity();
+   
+   // Sensor angular velocity in EulerF format
+   EulerF vel;
+   OculusVRUtil::convertAngularVelocity(v, vel);
+
+   return vel;
+}
+
+VectorF OculusVRSensorDevice::getMagnetometer()
+{
+   if(!mIsValid)
+      return VectorF::Zero;
+
+   OVR::Vector3f m;
+   if(mSensorFusion.HasMagCalibration() && mSensorFusion.IsYawCorrectionEnabled())
+   {
+      m = mSensorFusion.GetCalibratedMagnetometer();
+   }
+   else
+   {
+      m = mSensorFusion.GetMagnetometer();
+   }
+   
+   // Sensor magnetometer reading in VectorF format
+   VectorF mag;
+   OculusVRUtil::convertMagnetometer(m, mag);
+
+   return mag;
+}
+
+VectorF OculusVRSensorDevice::getRawMagnetometer()
+{
+   if(!mIsValid)
+      return VectorF::Zero;
+
+   OVR::Vector3f m = mSensorFusion.GetMagnetometer();
+   
+   // Sensor magnetometer reading in VectorF format
+   VectorF mag;
+   OculusVRUtil::convertMagnetometer(m, mag);
+
+   return mag;
 }

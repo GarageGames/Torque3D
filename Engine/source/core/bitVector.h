@@ -158,6 +158,9 @@ inline BitVector::BitVector( U32 sizeInBits )
 
 inline BitVector::BitVector( const BitVector &r )
 {
+   mBits     = NULL;
+   mByteSize = 0;
+   mSize = 0;
    copy(r);
 }
 

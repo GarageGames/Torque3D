@@ -36,8 +36,12 @@ struct OculusVRSensorData
       DIFF_ROT             = (1<<0),
       DIFF_ROTAXISX        = (1<<1),
       DIFF_ROTAXISY        = (1<<2),
+      DIFF_ACCEL           = (1<<3),
+      DIFF_ANGVEL          = (1<<4),
+      DIFF_MAG             = (1<<5),
 
       DIFF_ROTAXIS = (DIFF_ROTAXISX | DIFF_ROTAXISY),
+      DIFF_RAW = (DIFF_ACCEL | DIFF_ANGVEL | DIFF_MAG),
    };
 
    bool mDataSet;
@@ -50,19 +54,24 @@ struct OculusVRSensorData
    // Controller rotation as axis x, y
    Point2F mRotAxis;
 
+   // Raw values
+   VectorF mAcceleration;
+   EulerF  mAngVelocity;
+   VectorF mMagnetometer;
+
    OculusVRSensorData();
 
    /// Reset the data
    void reset();
 
    /// Set data based on given sensor fusion
-   void setData(const OVR::SensorFusion& data, const F32& maxAxisRadius);
+   void setData(OVR::SensorFusion& data, const F32& maxAxisRadius);
 
    /// Simulate valid data
    void simulateData(const F32& maxAxisRadius);
 
    /// Compare this data and given and return differences
-   U32 compare(OculusVRSensorData* other);
+   U32 compare(OculusVRSensorData* other, bool doRawCompare);
 };
 
 #endif   // _OCULUSVRSENSORDATA_H_

@@ -1522,7 +1522,7 @@
                         profile = "ToolsGuiTransparentProfile";
                         isContainer = "1";
                         position = "0 0";
-                        Extent = "185 22";
+                        Extent = "185 44";
                         HorizSizing = "width";
                         
                         new GuiCheckBoxCtrl() {
@@ -1568,6 +1568,14 @@
                            useMouseEvents = "0";
                         };
                         
+                        new GuiTextCtrl() {
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "9 26";
+                           Extent = "72 16";
+                           text = "Spec strength";
+                        };
+
                         new GuiControl() {
                            class = "AggregateControl";
                            position = "91 4";
@@ -1589,7 +1597,7 @@
                               Command = "MaterialEditorGui.updateActiveMaterial(\"specularPower[\" @ MaterialEditorGui.currentLayer @ \"]\", mCeil($ThisControl.getValue()), true, true);";
                               AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"specularPower[\" @ MaterialEditorGui.currentLayer @ \"]\", mCeil($ThisControl.getValue()), true, false);";
                               tooltipprofile = "ToolsGuiDefaultProfile";
-                              ToolTip = "Sets the strength of the Pixel Specular value.";
+                              ToolTip = "Sets the hardness of the Pixel Specular value.";
                               hovertime = "1000";
                               range = "1 128";
                               ticks = "0";
@@ -1615,6 +1623,57 @@
                               AnchorLeft = "1";
                               AnchorRight = "0";
                               text = "32";
+                              maxLength = "3";
+                           };
+                        };
+
+                        new GuiControl() {
+                           class = "AggregateControl";
+                           position = "91 26";
+                           Extent = "96 20";
+
+                           new GuiSliderCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "specularStrengthSlider";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "ToolsGuiSliderProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "0 1";
+                              Extent = "61 14";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "MaterialEditorGui.updateActiveMaterial(\"specularStrength[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, true);";
+                              AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"specularStrength[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, false);";
+                              tooltipprofile = "ToolsGuiDefaultProfile";
+                              ToolTip = "Sets the strength of the Pixel Specular value.";
+                              hovertime = "1000";
+                              range = "0 5";
+                              ticks = "0";
+                              value = "1";
+                           };
+                           new GuiTextEditCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "specularStrengthTextEdit";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "ToolsGuiTextEditProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "64 0";
+                              Extent = "29 18";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"specularStrength[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                              hovertime = "1000";
+                              AnchorTop = "1";
+                              AnchorBottom = "0";
+                              AnchorLeft = "1";
+                              AnchorRight = "0";
+                              text = "1";
                               maxLength = "3";
                            };
                         };

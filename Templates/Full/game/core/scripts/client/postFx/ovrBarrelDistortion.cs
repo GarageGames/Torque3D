@@ -44,6 +44,14 @@ singleton ShaderData( OVRBarrelDistortionShader )
    pixVersion = 2.0;   
 };
 
+singleton ShaderData( OVRBarrelDistortionChromaShader )
+{
+   DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
+   DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/barrelDistortionChromaP.hlsl";
+
+   pixVersion = 2.0;   
+};
+
 //-----------------------------------------------------------------------------
 // GFX state blocks
 //-----------------------------------------------------------------------------
@@ -71,6 +79,32 @@ singleton BarrelDistortionPostEffect( OVRBarrelDistortionPostFX )
 
    // The barrel distortion   
    shader = OVRBarrelDistortionShader;
+   stateBlock = OVRBarrelDistortionStateBlock;
+   
+   texture[0] = "$backBuffer";
+   
+   scaleOutput = 1.25;
+};
+
+//-----------------------------------------------------------------------------
+// Barrel Distortion with Chromatic Aberration Correction PostFx
+//
+// To be used with the Oculus Rift.
+// Expects a stereo pair to exist on the back buffer and then applies the
+// appropriate barrel distortion.
+// This version applies a chromatic aberration correction during the
+// barrel distortion.
+//-----------------------------------------------------------------------------
+singleton BarrelDistortionPostEffect( OVRBarrelDistortionChromaPostFX )
+{
+   isEnabled = false;
+   allowReflectPass = false;
+   
+   renderTime = "PFXAfterDiffuse";
+   renderPriority = 100;
+
+   // The barrel distortion   
+   shader = OVRBarrelDistortionChromaShader;
    stateBlock = OVRBarrelDistortionStateBlock;
    
    texture[0] = "$backBuffer";

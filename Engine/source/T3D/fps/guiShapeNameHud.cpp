@@ -50,11 +50,17 @@ class GuiShapeNameHud : public GuiControl {
    ColorF   mFillColor;
    ColorF   mFrameColor;
    ColorF   mTextColor;
+   ColorF   mLabelFillColor;
+   ColorF   mLabelFrameColor;
 
    F32      mVerticalOffset;
    F32      mDistanceFade;
    bool     mShowFrame;
    bool     mShowFill;
+   bool     mShowLabelFrame;
+   bool     mShowLabelFill;
+
+   Point2I  mLabelPadding;
 
 protected:
    void drawName( Point2I offset, const char *buf, F32 opacity);
@@ -92,6 +98,10 @@ ConsoleDocClass( GuiShapeNameHud,
 		"	textColor = \"1.0 1.0 1.0 1.0\"; // Solid white text Color\n"
 		"	showFill = \"true\";\n"
 		"	showFrame = \"true\";\n"
+		"	labelFillColor = \"0.0 1.0 0.0 1.0\"; // Fills with a solid green color\n"
+		"	labelFrameColor = \"1.0 1.0 1.0 1.0\"; // Solid white frame color\n"
+		"	showLabelFill = \"true\";\n"
+		"	showLabelFrame = \"true\";\n"
 		"	verticalOffset = \"0.15\";\n"
 		"	distanceFade = \"15.0\";\n"
 		"};\n"
@@ -111,6 +121,7 @@ GuiShapeNameHud::GuiShapeNameHud()
    mShowFrame = mShowFill = true;
    mVerticalOffset = 0.5f;
    mDistanceFade = 0.1f;
+   mLabelPadding.set(0, 0);
 }
 
 void GuiShapeNameHud::initPersistFields()
@@ -119,11 +130,16 @@ void GuiShapeNameHud::initPersistFields()
    addField( "fillColor",  TypeColorF, Offset( mFillColor, GuiShapeNameHud ), "Standard color for the background of the control." );
    addField( "frameColor", TypeColorF, Offset( mFrameColor, GuiShapeNameHud ), "Color for the control's frame."  );
    addField( "textColor",  TypeColorF, Offset( mTextColor, GuiShapeNameHud ), "Color for the text on this control." );
+   addField( "labelFillColor",  TypeColorF, Offset( mLabelFillColor, GuiShapeNameHud ), "Color for the background of each shape name label." );
+   addField( "labelFrameColor", TypeColorF, Offset( mLabelFrameColor, GuiShapeNameHud ), "Color for the frames around each shape name label."  );
    endGroup("Colors");     
 
    addGroup("Misc");       
    addField( "showFill",   TypeBool, Offset( mShowFill, GuiShapeNameHud ), "If true, we draw the background color of the control." );
    addField( "showFrame",  TypeBool, Offset( mShowFrame, GuiShapeNameHud ), "If true, we draw the frame of the control."  );
+   addField( "showLabelFill",  TypeBool, Offset( mShowLabelFill, GuiShapeNameHud ), "If true, we draw a background for each shape name label." );
+   addField( "showLabelFrame", TypeBool, Offset( mShowLabelFrame, GuiShapeNameHud ), "If true, we draw a frame around each shape name label."  );
+   addField( "labelPadding", TypePoint2I, Offset( mLabelPadding, GuiShapeNameHud ), "The padding (in pixels) between the label text and the frame." );
    addField( "verticalOffset", TypeF32, Offset( mVerticalOffset, GuiShapeNameHud ), "Amount to vertically offset the control in relation to the ShapeBase object in focus." );
    addField( "distanceFade", TypeF32, Offset( mDistanceFade, GuiShapeNameHud ), "Visibility distance (how far the player must be from the ShapeBase object in focus) for this control to render." );
    endGroup("Misc");
@@ -274,14 +290,26 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 /// @param   opacity Opacity of name (a fraction).
 void GuiShapeNameHud::drawName(Point2I offset, const char *name, F32 opacity)
 {
+   F32 width = mProfile->mFont->getStrWidth((const UTF8 *)name) + mLabelPadding.x * 2;
+   F32 height = mProfile->mFont->getHeight() + mLabelPadding.y * 2;
+   Point2I extent = Point2I(width, height);
+
    // Center the name
-   offset.x -= mProfile->mFont->getStrWidth((const UTF8 *)name) / 2;
-   offset.y -= mProfile->mFont->getHeight();
+   offset.x -= width / 2;
+   offset.y -= height / 2;
+
+   // Background fill first
+   if (mShowLabelFill)
+      GFX->getDrawUtil()->drawRectFill(RectI(offset, extent), mLabelFillColor);
 
    // Deal with opacity and draw.
    mTextColor.alpha = opacity;
    GFX->getDrawUtil()->setBitmapModulation(mTextColor);
-   GFX->getDrawUtil()->drawText(mProfile->mFont, offset, name);
+   GFX->getDrawUtil()->drawText(mProfile->mFont, offset + mLabelPadding, name);
    GFX->getDrawUtil()->clearBitmapModulation();
+
+   // Border last
+   if (mShowLabelFrame)
+      GFX->getDrawUtil()->drawRect(RectI(offset, extent), mLabelFrameColor);
 }
 

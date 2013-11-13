@@ -44,6 +44,10 @@ public:
    // If no HMD is present simulate it being available
    static bool smSimulateHMD;
 
+   // Use the chromatic aberration correction version of the barrel
+   // distortion shader.
+   static bool smUseChromaticAberrationCorrection;
+
    // Type of rotation events to broadcast
    static bool smGenerateAngleAxisRotationEvents;
    static bool smGenerateEulerRotationEvents;
@@ -54,6 +58,9 @@ public:
    // The maximum sensor angle when used as an axis event
    // as measured from a vector pointing straight up (in degrees)
    static F32 smMaximumAxisAngle;
+
+   // Broadcast sensor raw data: acceleration, angular velocity, magnetometer reading
+   static bool smGenerateSensorRawEvents;
 
    // Indicates that a whole frame event should be generated and frames
    // should be buffered.
@@ -131,14 +138,24 @@ public:
    // HMDs
    U32 getHMDCount() const { return mHMDDevices.size(); }
    const OculusVRHMDDevice* getHMDDevice(U32 index) const;
+   F32 getHMDCurrentIPD(U32 index);
+   void setHMDCurrentIPD(U32 index, F32 ipd);
 
    // Sensors
    U32 getSensorCount() const { return mSensorDevices.size(); }
    const OculusVRSensorDevice* getSensorDevice(U32 index) const;
    EulerF getSensorEulerRotation(U32 index);
+   VectorF getSensorAcceleration(U32 index);
+   EulerF getSensorAngularVelocity(U32 index);
+   VectorF getSensorMagnetometer(U32 index);
    F32 getSensorPredictionTime(U32 index);
    void setSensorPredictionTime(U32 index, F32 dt);
    void setAllSensorPredictionTime(F32 dt);
+   bool getSensorGravityCorrection(U32 index);
+   void setSensorGravityCorrection(U32 index, bool state);
+   bool getSensorYawCorrection(U32 index);
+   void setSensorYawCorrection(U32 index, bool state);
+   bool getSensorMagnetometerCalibrated(U32 index);
    void resetAllSensors();
 
 public:

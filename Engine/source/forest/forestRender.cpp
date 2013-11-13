@@ -110,7 +110,7 @@ void Forest::prepRenderImage( SceneRenderState *state )
    // the forest, so pass down a LightQuery for it.
    LightQuery lightQuery;
    rdata.setLightQuery( &lightQuery );
-   Frustum culler = state->getFrustum();
+   Frustum culler = state->getCullingFrustum();
 
    // Adjust the far distance if the cull scale has changed.
    if ( !mIsEqual( cullScale, 1.0f ) )

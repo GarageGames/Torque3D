@@ -568,9 +568,20 @@ bool WMIVideoInfo::_queryPropertyWMI( const PVIQueryType queryType, const U32 ad
             LONG longVal = v.lVal;
 
             if( queryType == PVI_VRAM )
+            {
                longVal = longVal >> 20; // Convert to megabytes
 
-            *outValue = String::ToString( (S32)longVal );
+               // While this value is reported as a signed integer, it is possible
+               // for video cards to have 2GB or more.  In those cases the signed
+               // bit is set and will give us a negative number.  Treating this
+               // as unsigned will allows us to handle video cards with up to
+               // 4GB of memory.  After that we'll need a new solution from Microsoft.
+               *outValue = String::ToString( (U32)longVal );
+            }
+            else
+            {
+               *outValue = String::ToString( (S32)longVal );
+            }
             break;
          }
 

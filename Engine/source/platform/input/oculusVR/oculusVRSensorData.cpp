@@ -34,7 +34,7 @@ void OculusVRSensorData::reset()
    mDataSet = false;
 }
 
-void OculusVRSensorData::setData(const OVR::SensorFusion& data, const F32& maxAxisRadius)
+void OculusVRSensorData::setData(OVR::SensorFusion& data, const F32& maxAxisRadius)
 {
    // Sensor rotation
    OVR::Quatf orientation;
@@ -56,6 +56,24 @@ void OculusVRSensorData::setData(const OVR::SensorFusion& data, const F32& maxAx
    // Sensor rotation as axis
    OculusVRUtil::calculateAxisRotation(mRot, maxAxisRadius, mRotAxis);
 
+   // Sensor raw values
+   OVR::Vector3f accel = data.GetAcceleration();
+   OculusVRUtil::convertAcceleration(accel, mAcceleration);
+
+   OVR::Vector3f angVel = data.GetAngularVelocity();
+   OculusVRUtil::convertAngularVelocity(angVel, mAngVelocity);
+
+   OVR::Vector3f mag;
+   if(data.HasMagCalibration() && data.IsYawCorrectionEnabled())
+   {
+      mag = data.GetCalibratedMagnetometer();
+   }
+   else
+   {
+      mag = data.GetMagnetometer();
+   }
+   OculusVRUtil::convertMagnetometer(mag, mMagnetometer);
+
    mDataSet = true;
 }
 
@@ -69,10 +87,15 @@ void OculusVRSensorData::simulateData(const F32& maxAxisRadius)
    // Sensor rotation as axis
    OculusVRUtil::calculateAxisRotation(mRot, maxAxisRadius, mRotAxis);
 
+   // Sensor raw values
+   mAcceleration.zero();
+   mAngVelocity.zero();
+   mMagnetometer.zero();
+
    mDataSet = true;
 }
 
-U32 OculusVRSensorData::compare(OculusVRSensorData* other)
+U32 OculusVRSensorData::compare(OculusVRSensorData* other, bool doRawCompare)
 {
    S32 result = DIFF_NONE;
 
@@ -90,6 +113,23 @@ U32 OculusVRSensorData::compare(OculusVRSensorData* other)
    if(mRotAxis.y != other->mRotAxis.y || !mDataSet)
    {
       result |= DIFF_ROTAXISY;
+   }
+
+   // Check raw values
+   if(doRawCompare)
+   {
+      if(mAcceleration.x != other->mAcceleration.x || mAcceleration.y != other->mAcceleration.y || mAcceleration.z != other->mAcceleration.z || !mDataSet)
+      {
+         result |= DIFF_ACCEL;
+      }
+      if(mAngVelocity.x != other->mAngVelocity.x || mAngVelocity.y != other->mAngVelocity.y || mAngVelocity.z != other->mAngVelocity.z || !mDataSet)
+      {
+         result |= DIFF_ANGVEL;
+      }
+      if(mMagnetometer.x != other->mMagnetometer.x || mMagnetometer.y != other->mMagnetometer.y || mMagnetometer.z != other->mMagnetometer.z || !mDataSet)
+      {
+         result |= DIFF_MAG;
+      }
    }
 
    return result;

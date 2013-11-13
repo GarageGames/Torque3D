@@ -190,7 +190,8 @@ void CameraSpline::renderTimeMap()
    // Build vertex buffer
    GFXVertexBufferHandle<GFXVertexPC> vb;
    vb.set(GFX, mTimeMap.size(), GFXBufferTypeVolatile);
-   vb.lock();
+   void *ptr = vb.lock();
+   if(!ptr) return;
 
    MRandomLCG random(1376312589 * (U32)this);
    int index = 0;

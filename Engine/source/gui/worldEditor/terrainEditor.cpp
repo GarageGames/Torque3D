@@ -670,7 +670,7 @@ TerrainEditor::TerrainEditor() :
    mUndoSel(0),
    mGridUpdateMin( S32_MAX, S32_MAX ),
    mGridUpdateMax( 0, 0 ),
-   mMaxBrushSize(48,48),
+   mMaxBrushSize(256,256),
    mNeedsGridUpdate( false ),
    mNeedsMaterialUpdate( false ),
    mMouseDown( false )

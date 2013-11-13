@@ -20,7 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-
 singleton GFXStateBlockData( PFX_CausticsStateBlock : PFX_DefaultStateBlock )
 {
    blendDefined = true;
@@ -42,16 +41,11 @@ singleton ShaderData( PFX_CausticsShader )
    //OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
    //OGLPixelShaderFile   = "shaders/common/postFx/gl/passthruP.glsl";
       
-   samplerNames[0] = "$prepassTex";
-   samplerNames[1] = "$causticsTex1";
-   samplerNames[2] = "$causticsTex2";
-   
    pixVersion = 3.0;
 };
 
 singleton PostEffect( CausticsPFX )
 {
-   requirements = "None";
    isEnabled = false;
    renderTime = "PFXBeforeBin";
    renderBin = "ObjTranslucentBin";      
@@ -63,17 +57,4 @@ singleton PostEffect( CausticsPFX )
    texture[1] = "textures/caustics_1";
    texture[2] = "textures/caustics_2";
    target = "$backBuffer";
-   
 };
-
-// this effects the timing of the animation -
-
-$CausticsPFX::refTime = getSimTime();
-
-function CausticsPFX::setShaderConsts(%this)
-{
-   //echo($Sim::time - %this.timeStart);
-   //echo(%this.timeConst);
-   %this.setShaderConst( "$refTime", $CausticsPFX::refTime ); 
-}
-

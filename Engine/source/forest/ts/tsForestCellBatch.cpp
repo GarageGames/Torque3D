@@ -76,6 +76,8 @@ void TSForestCellBatch::_rebuildBatch()
 
    // Fill this puppy!
    ImposterState *vertPtr = mVB.lock();
+   if(!vertPtr) return;
+
    Vector<ForestItem>::const_iterator item = mItems.begin();
 
    const F32 radius = mDetail->getRadius();

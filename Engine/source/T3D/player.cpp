@@ -128,14 +128,6 @@ enum PlayerConstants {
 //----------------------------------------------------------------------------
 // Player shape animation sequences:
 
-// look     Used to control the upper body arm motion.  Must animate
-//          vertically +-80 deg.
-Player::Range Player::mArmRange(mDegToRad(-80.0f),mDegToRad(+80.0f));
-
-// head     Used to control the direction the head is looking.  Must
-//          animated vertically +-80 deg .
-Player::Range Player::mHeadVRange(mDegToRad(-80.0f),mDegToRad(+80.0f));
-
 // Action Animations:
 PlayerData::ActionAnimationDef PlayerData::ActionAnimationList[NumTableActionAnims] =
 {
@@ -1763,6 +1755,12 @@ void Player::onRemove()
    setControlObject(0);
    scriptOnRemove();
    removeFromScene();
+   
+   if ( isGhost() )
+   {
+      SFX_DELETE( mMoveBubbleSound );
+      SFX_DELETE( mWaterBreathSound );
+   }
 
    U32 i;
    for( i=0; i<PlayerData::NUM_SPLASH_EMITTERS; i++ )
@@ -2864,7 +2862,7 @@ void Player::updateMove(const Move* move)
       if (pvl)
          pv *= moveSpeed / pvl;
 
-      VectorF runAcc = pv - acc;
+      VectorF runAcc = pv - (mVelocity + acc);
       runAcc.z = 0;
       runAcc.x = runAcc.x * mDataBlock->airControl;
       runAcc.y = runAcc.y * mDataBlock->airControl;
@@ -3100,6 +3098,8 @@ void Player::updateMove(const Move* move)
    }
 
    // Container buoyancy & drag
+/* Commented out until the buoyancy calculation can be reworked so that a container and
+** player with the same density will result in neutral buoyancy.
    if (mBuoyancy != 0)
    {     
       // Applying buoyancy when standing still causing some jitters-
@@ -3116,9 +3116,10 @@ void Player::updateMove(const Move* move)
          if ( currHeight + mVelocity.z * TickSec * C > mLiquidHeight )
             buoyancyForce *= M;
                   
-         //mVelocity.z -= buoyancyForce;
+         mVelocity.z -= buoyancyForce;
       }
    }
+*/
 
    // Apply drag
    if ( mSwimming )
@@ -3425,31 +3426,38 @@ void Player::updateDamageState()
 
 //----------------------------------------------------------------------------
 
-void Player::updateLookAnimation(F32 dT)
+void Player::updateLookAnimation(F32 dt)
 {
    // Calculate our interpolated head position.
-   Point3F renderHead = delta.head + delta.headVec * dT;
+   Point3F renderHead = delta.head + delta.headVec * dt;
 
    // Adjust look pos.  This assumes that the animations match
    // the min and max look angles provided in the datablock.
    if (mArmAnimation.thread) 
    {
-      // TG: Adjust arm position to avoid collision.
-      F32 tp = mControlObject? 0.5:
-         (renderHead.x - mArmRange.min) / mArmRange.delta;
-      mShapeInstance->setPos(mArmAnimation.thread,mClampF(tp,0,1));
+      if(mControlObject)
+      {
+         mShapeInstance->setPos(mArmAnimation.thread,0.5f);
+      }
+      else
+      {
+         F32 d = mDataBlock->maxLookAngle - mDataBlock->minLookAngle;
+         F32 tp = (renderHead.x - mDataBlock->minLookAngle) / d;
+         mShapeInstance->setPos(mArmAnimation.thread,mClampF(tp,0,1));
+      }
    }
    
    if (mHeadVThread) 
    {
-      F32 tp = (renderHead.x - mHeadVRange.min) / mHeadVRange.delta;
+      F32 d = mDataBlock->maxLookAngle - mDataBlock->minLookAngle;
+      F32 tp = (renderHead.x - mDataBlock->minLookAngle) / d;
       mShapeInstance->setPos(mHeadVThread,mClampF(tp,0,1));
    }
    
    if (mHeadHThread) 
    {
-      F32 dt = 2 * mDataBlock->maxFreelookAngle;
-      F32 tp = (renderHead.z + mDataBlock->maxFreelookAngle) / dt;
+      F32 d = 2 * mDataBlock->maxFreelookAngle;
+      F32 tp = (renderHead.z + mDataBlock->maxFreelookAngle) / d;
       mShapeInstance->setPos(mHeadHThread,mClampF(tp,0,1));
    }
 }

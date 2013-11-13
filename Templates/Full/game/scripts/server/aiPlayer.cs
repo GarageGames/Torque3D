@@ -140,26 +140,31 @@ function AIPlayer::followPath(%this,%path,%node)
 
 function AIPlayer::moveToNextNode(%this)
 {
-   if (%this.targetNode < 0 || %this.currentNode < %this.targetNode)
-   {
-      if (%this.currentNode < %this.path.getCount() - 1)
-         %this.moveToNode(%this.currentNode + 1);
-      else
-         %this.moveToNode(0);
+   %pathNodeCount=%this.path.getCount();
+   %slowdown=0;
+
+   %targetNode=%this.currentNode + 1;
+
+   if (%this.path.isLooping) {
+      %targetNode %= %pathNodeCount;
+   } else {
+      if (%targetNode >= %pathNodeCount-1) {
+         %targetNode=%pathNodeCount-1;
+
+         if (%currentNode < %targetNode)
+            %slowdown=1;
+      }
    }
-   else
-      if (%this.currentNode == 0)
-         %this.moveToNode(%this.path.getCount() - 1);
-      else
-         %this.moveToNode(%this.currentNode - 1);
+
+   %this.moveToNode(%targetNode, %slowdown);
 }
 
-function AIPlayer::moveToNode(%this,%index)
+function AIPlayer::moveToNode(%this,%index,%slowdown)
 {
    // Move to the given path node index
    %this.currentNode = %index;
    %node = %this.path.getObject(%index);
-   %this.setMoveDestination(%node.getTransform());
+   %this.setMoveDestination(%node.getTransform(),%slowdown);
 }
 
 //-----------------------------------------------------------------------------

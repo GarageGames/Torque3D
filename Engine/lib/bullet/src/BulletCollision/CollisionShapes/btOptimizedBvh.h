@@ -15,8 +15,8 @@ subject to the following restrictions:
 
 ///Contains contributions from Disney Studio's
 
-#ifndef OPTIMIZED_BVH_H
-#define OPTIMIZED_BVH_H
+#ifndef BT_OPTIMIZED_BVH_H
+#define BT_OPTIMIZED_BVH_H
 
 #include "BulletCollision/BroadphaseCollision/btQuantizedBvh.h"
 
@@ -47,7 +47,7 @@ public:
 	void	updateBvhNodes(btStridingMeshInterface* meshInterface,int firstNode,int endNode,int index);
 
 	/// Data buffer MUST be 16 byte aligned
-	virtual bool serialize(void *o_alignedDataBuffer, unsigned i_dataBufferSize, bool i_swapEndian)
+	virtual bool serializeInPlace(void *o_alignedDataBuffer, unsigned i_dataBufferSize, bool i_swapEndian) const
 	{
 		return btQuantizedBvh::serialize(o_alignedDataBuffer,i_dataBufferSize,i_swapEndian);
 
@@ -60,6 +60,6 @@ public:
 };
 
 
-#endif //OPTIMIZED_BVH_H
+#endif //BT_OPTIMIZED_BVH_H
 
 

@@ -18,6 +18,7 @@ subject to the following restrictions:
 #include "btMultiSphereShape.h"
 #include "BulletCollision/CollisionShapes/btCollisionMargin.h"
 #include "LinearMath/btQuaternion.h"
+#include "LinearMath/btSerializer.h"
 
 btMultiSphereShape::btMultiSphereShape (const btVector3* positions,const btScalar* radi,int numSpheres)
 :btConvexInternalAabbCachingShape ()
@@ -38,10 +39,11 @@ btMultiSphereShape::btMultiSphereShape (const btVector3* positions,const btScala
 
 }
 
- 
+#ifndef MIN
+    #define MIN( _a, _b)    ((_a) < (_b) ? (_a) : (_b))
+#endif
  btVector3	btMultiSphereShape::localGetSupportingVertexWithoutMargin(const btVector3& vec0)const
 {
-	int i;
 	btVector3 supVec(0,0,0);
 
 	btScalar maxDot(btScalar(-BT_LARGE_FLOAT));
@@ -65,18 +67,23 @@ btMultiSphereShape::btMultiSphereShape (const btVector3* positions,const btScala
 	const btScalar* rad = &m_radiArray[0];
 	int numSpheres = m_localPositionArray.size();
 
-	for (i=0;i<numSpheres;i++)
-	{
-		vtx = (*pos) +vec*m_localScaling*(*rad) - vec * getMargin();
-		pos++;
-		rad++;
-		newDot = vec.dot(vtx);
-		if (newDot > maxDot)
+    for( int k = 0; k < numSpheres; k+= 128 )
+    {
+        btVector3 temp[128];
+        int inner_count = MIN( numSpheres - k, 128 );
+        for( long i = 0; i < inner_count; i++ )
+        {
+            temp[i] = (*pos) +vec*m_localScaling*(*rad) - vec * getMargin();
+            pos++;
+            rad++;
+        }
+        long i = vec.maxDot( temp, inner_count, newDot);
+        if( newDot > maxDot )
 		{
 			maxDot = newDot;
-			supVec = vtx;
+			supVec = temp[i];
 		}
-	}
+    }
 
 	return supVec;
 
@@ -97,18 +104,25 @@ btMultiSphereShape::btMultiSphereShape (const btVector3* positions,const btScala
 		const btVector3* pos = &m_localPositionArray[0];
 		const btScalar* rad = &m_radiArray[0];
 		int numSpheres = m_localPositionArray.size();
-		for (int i=0;i<numSpheres;i++)
-		{
-			vtx = (*pos) +vec*m_localScaling*(*rad) - vec * getMargin();
-			pos++;
-			rad++;
-			newDot = vec.dot(vtx);
-			if (newDot > maxDot)
-			{
-				maxDot = newDot;
-				supportVerticesOut[j] = vtx;
-			}
-		}
+
+        for( int k = 0; k < numSpheres; k+= 128 )
+        {
+            btVector3 temp[128];
+            int inner_count = MIN( numSpheres - k, 128 );
+            for( long i = 0; i < inner_count; i++ )
+            {
+                temp[i] = (*pos) +vec*m_localScaling*(*rad) - vec * getMargin();
+                pos++;
+                rad++;
+            }
+            long i = vec.maxDot( temp, inner_count, newDot);
+            if( newDot > maxDot )
+            {
+                maxDot = newDot;
+                supportVerticesOut[j] = temp[i];
+            }
+        }
+        
 	}
 }
 
@@ -135,6 +149,32 @@ void	btMultiSphereShape::calculateLocalInertia(btScalar mass,btVector3& inertia)
 					mass/(btScalar(12.0)) * (lx*lx + lz*lz),
 					mass/(btScalar(12.0)) * (lx*lx + ly*ly));
 
+}
+
+
+///fills the dataBuffer and returns the struct name (and 0 on failure)
+const char*	btMultiSphereShape::serialize(void* dataBuffer, btSerializer* serializer) const
+{
+	btMultiSphereShapeData* shapeData = (btMultiSphereShapeData*) dataBuffer;
+	btConvexInternalShape::serialize(&shapeData->m_convexInternalShapeData, serializer);
+
+	int numElem = m_localPositionArray.size();
+	shapeData->m_localPositionArrayPtr = numElem ? (btPositionAndRadius*)serializer->getUniquePointer((void*)&m_localPositionArray[0]):  0;
+	
+	shapeData->m_localPositionArraySize = numElem;
+	if (numElem)
+	{
+		btChunk* chunk = serializer->allocate(sizeof(btPositionAndRadius),numElem);
+		btPositionAndRadius* memPtr = (btPositionAndRadius*)chunk->m_oldPtr;
+		for (int i=0;i<numElem;i++,memPtr++)
+		{
+			m_localPositionArray[i].serializeFloat(memPtr->m_pos);
+			memPtr->m_radius = float(m_radiArray[i]);
+		}
+		serializer->finalizeChunk(chunk,"btPositionAndRadius",BT_ARRAY_CODE,(void*)&m_localPositionArray[0]);
+	}
+	
+	return "btMultiSphereShapeData";
 }
 
 

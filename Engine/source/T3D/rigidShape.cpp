@@ -774,7 +774,8 @@ void RigidShape::processTick(const Move* move)
 
       // Update the physics based on the integration rate
       S32 count = mDataBlock->integration;
-      updateWorkingCollisionSet(getCollisionMask());
+      if (!mDisableMove)
+         updateWorkingCollisionSet(getCollisionMask());
       for (U32 i = 0; i < count; i++)
          updatePos(TickSec / count);
 

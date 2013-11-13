@@ -67,7 +67,7 @@ void SingleLightShadowMap::_render( RenderPassManager* renderPass,
    GFXTransformSaver saver;
 
    MatrixF lightMatrix;
-   calcLightMatrices( lightMatrix, diffuseState->getFrustum() );
+   calcLightMatrices( lightMatrix, diffuseState->getCameraFrustum() );
    lightMatrix.inverse();
    GFX->setWorldMatrix(lightMatrix);
 

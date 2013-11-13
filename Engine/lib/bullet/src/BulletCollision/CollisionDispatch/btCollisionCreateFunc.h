@@ -13,13 +13,13 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef COLLISION_CREATE_FUNC
-#define COLLISION_CREATE_FUNC
+#ifndef BT_COLLISION_CREATE_FUNC
+#define BT_COLLISION_CREATE_FUNC
 
 #include "LinearMath/btAlignedObjectArray.h"
 class btCollisionAlgorithm;
 class btCollisionObject;
-
+struct btCollisionObjectWrapper;
 struct btCollisionAlgorithmConstructionInfo;
 
 ///Used by the btCollisionDispatcher to register and create instances for btCollisionAlgorithm
@@ -33,13 +33,13 @@ struct btCollisionAlgorithmCreateFunc
 	}
 	virtual ~btCollisionAlgorithmCreateFunc(){};
 
-	virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& , btCollisionObject* body0,btCollisionObject* body1)
+	virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& , const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap)
 	{
 		
-		(void)body0;
-		(void)body1;
+		(void)body0Wrap;
+		(void)body1Wrap;
 		return 0;
 	}
 };
-#endif //COLLISION_CREATE_FUNC
+#endif //BT_COLLISION_CREATE_FUNC
 
