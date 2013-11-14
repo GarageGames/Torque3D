@@ -2917,8 +2917,11 @@ inline void TSMesh::findTangent( U32 index1,
    F32 denom = (s1 * t2 - s2 * t1);
 
    if( mFabs( denom ) < 0.0001f )
-      return;  // handle degenerate triangles from strips
-
+   {
+	   // handle degenerate triangles from strips
+	   if (denom<0) denom = -0.0001f;
+	   else denom = 0.0001f;
+   }
    F32 r = 1.0f / denom;
 
    Point3F sdir(  (t2 * x1 - t1 * x2) * r, 
