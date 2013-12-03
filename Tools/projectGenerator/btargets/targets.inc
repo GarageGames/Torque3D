@@ -184,7 +184,7 @@ $c->setDontCompilePatterns( "*\.h*", "*win32*", "*\.win\.*", "/D3D.*/", "#/gl/#"
 
 ///////////////////////////// Build /////////////////////////////
 
-// 'buildManifest_'.$name.'_'.Generator::$platform.'.txt',
+// 'buildManifest_'.$name.'_'.TorqueGenerator::$platform.'.txt',
 
 $c = BuildTarget::add( 'build',						// Name         
                   'buildFiles',         			// Solution output directory
