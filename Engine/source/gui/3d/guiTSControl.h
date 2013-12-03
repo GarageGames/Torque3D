@@ -62,8 +62,6 @@ protected:
    /// most likely rendering.
    static Vector<GuiTSCtrl*> smAwakeTSCtrls;
 
-	RectI mViewport;
-
    /// A scalar which controls how much of the reflection
    /// update timeslice for this viewport to get.
    F32 mReflectPriority;
@@ -77,7 +75,7 @@ protected:
    MatrixF     mSaveModelview;
    MatrixF     mSaveProjection;
    RectI       mSaveViewport;
-   Frustum	   mSaveFrustum;
+	Frustum		mSaveFrustum;
    
    /// The saved world to screen space scale.
    /// @see getWorldToScreenScale
