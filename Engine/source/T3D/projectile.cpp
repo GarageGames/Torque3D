@@ -1110,7 +1110,6 @@ void Projectile::simulate( F32 dt )
       xform.setColumn( 3, rInfo.point );
       setTransform( xform );
       mCurrPosition    = rInfo.point;
-      mCurrVelocity    = Point3F::Zero;
 
       // Get the object type before the onCollision call, in case
       // the object is destroyed.
@@ -1141,7 +1140,10 @@ void Projectile::simulate( F32 dt )
       onCollision( rInfo.point, rInfo.normal, rInfo.object );
       // Next order of business: do we explode on this hit?
       if ( mCurrTick > mDataBlock->armingDelay || mDataBlock->armingDelay == 0 )
+      {
+         mCurrVelocity    = Point3F::Zero;
          explode( rInfo.point, rInfo.normal, objectType );
+      }
 
       if ( mDataBlock->isBallistic )
       {
@@ -1161,6 +1163,10 @@ void Projectile::simulate( F32 dt )
          // will apply on the next frame.
          //F32 timeLeft = 1.0f - rInfo.t;
          newPosition = oldPosition = rInfo.point + rInfo.normal * 0.05f;
+      }
+      else
+      {
+         mCurrVelocity    = Point3F::Zero;
       }
    }
 
