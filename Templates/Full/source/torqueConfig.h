@@ -169,6 +169,13 @@
 /// texture manager.
 #define TORQUE_FRAME_SIZE     16 << 20
 
+// Default keyboard layout for launching the game. It's fixed crash when a
+// game running with the extend unicode keyboard (cyrillic, for example).
+// Windows only.
+// @see For choice language >
+//      http://msdn.microsoft.com/en-us/library/windows/desktop/dd318693%28v=vs.85%29.aspx
+#define TORQUE_DEFAULT_KEYBOARD_LAYOUT  LANG_ENGLISH
+
 // Finally, we define some dependent #defines. This enables some subsidiary
 // functionality to get automatically turned on in certain configurations.
 
