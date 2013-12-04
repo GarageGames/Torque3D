@@ -81,7 +81,7 @@ void GFXCopyPixels(  GFXFormat fromFormat, U32 fromWidth, U32 fromHeight, U8* fr
 {
    if( fromFormat == toFormat
        && fromWidth == toWidth
-       && fromHeight == fromHeight )
+       && fromHeight == toHeight )
       dMemcpy( toData, fromData, fromWidth * fromHeight * GFXFormatInfo( fromFormat ).getBytesPerPixel() );
    else
    {
