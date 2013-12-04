@@ -37,6 +37,9 @@ class GuiScrollCtrl : public GuiContainer
 
       typedef GuiContainer Parent;
 
+	  // Event delegates
+	  Delegate<bool(GuiScrollCtrl* sender)> scrollEvent;
+
       enum Region
       {
          UpArrow,
@@ -177,7 +180,7 @@ class GuiScrollCtrl : public GuiContainer
       
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onScroll, () );
       
       /// @}
@@ -257,6 +260,7 @@ class GuiScrollCtrl : public GuiContainer
 
       virtual void onPreRender();
       virtual void onRender(Point2I offset, const RectI &updateRect);
+
       virtual void drawBorder(const Point2I &offset, bool isFirstResponder);
       virtual void drawVScrollBar(const Point2I &offset);
       virtual void drawHScrollBar(const Point2I &offset);

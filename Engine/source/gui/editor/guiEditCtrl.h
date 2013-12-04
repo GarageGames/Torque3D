@@ -42,6 +42,28 @@ class GuiEditCtrl : public GuiControl
       typedef GuiControl Parent;
       friend class GuiEditorRuler;
 
+	  // Event delegates
+	  Delegate<bool(GuiEditCtrl* sender)> hierarchyChangedEvent;
+	  Delegate<bool(GuiEditCtrl* sender)> deleteEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* selection)> preEditEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* selection)> postEditEvent;
+	  Delegate<bool(GuiEditCtrl* sender)> clearSelectedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, GuiControl* control)> selectEvent;
+	  Delegate<bool(GuiEditCtrl* sender, GuiControl* control)> addSelectedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, GuiControl* control)> removeSelectedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* selection)> preSelectionNudgedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* selection)> postSelectionNudgedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* control)> selectionMovedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* selection)> selectionClonedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* selection)> trashSelectionEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* control)> addNewCtrlEvent;
+	  Delegate<bool(GuiEditCtrl* sender, SimSet* set)> addNewCtrlSetEvent;
+	  Delegate<bool(GuiEditCtrl* sender, GuiControl* control)> selectionResizedEvent;
+	  Delegate<bool(GuiEditCtrl* sender, bool width, bool height)> fitIntoParentEvent;
+	  Delegate<bool(GuiEditCtrl* sender)> mouseModeChangeEvent;
+	  Delegate<bool(GuiEditCtrl* sender, GuiControl* control)> controlInspectPreApplyEvent;
+	  Delegate<bool(GuiEditCtrl* sender, GuiControl* control)> controlInspectPostApplyEvent;
+
       enum Justification
       {
          JUSTIFY_LEFT,

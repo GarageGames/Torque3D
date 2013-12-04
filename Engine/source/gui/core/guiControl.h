@@ -107,7 +107,30 @@ class GuiControl : public SimGroup
       friend class GuiCanvas;
       friend class GuiEditCtrl;
       friend class GuiDragAndDropControl; // drag callbacks
+	  friend class GuiMoveableControl; // drag callbacks
       
+	  // Event delegates
+	  Delegate<bool(GuiControl* sender)> addEvent;
+	  Delegate<bool(GuiControl* sender)> removeEvent;
+
+	  Delegate<bool(GuiControl* sender)> wakeEvent;
+	  Delegate<bool(GuiControl* sender)> sleepEvent;
+
+	  Delegate<bool(GuiControl* sender)> gainFirstResponderEvent;
+	  Delegate<bool(GuiControl* sender)> loseFirstResponderEvent;
+
+	  Delegate<bool(GuiControl* sender)> actionEvent;
+	  Delegate<bool(GuiControl* sender, bool value)> visibleEvent;
+	  Delegate<bool(GuiControl* sender, bool value)> activeEvent;
+
+	  Delegate<bool(GuiControl* sender)> dialogPushEvent;
+	  Delegate<bool(GuiControl* sender)> dialogPopEvent;
+
+	  Delegate<bool(GuiControl* sender, GuiControl* payload, const Point2I& position)> controlDragEnterEvent;
+	  Delegate<bool(GuiControl* sender, GuiControl* payload, const Point2I& position)> controlDragExitEvent;
+	  Delegate<bool(GuiControl* sender, GuiControl* payload, const Point2I& position)> controlDraggedEvent;
+	  Delegate<bool(GuiControl* sender, GuiControl* payload, const Point2I& position)> controlDroppedEvent;
+
       /// Additional write flags for GuiControls.
       enum
       {
@@ -136,10 +159,11 @@ class GuiControl : public SimGroup
    private:
    
       SimGroup               *mAddGroup;   ///< The internal name of a SimGroup child of the global GuiGroup in which to organize this gui on creation
-      RectI                   mBounds;     ///< The internal bounds of this control
       
    protected:
    
+	  String mDataString;
+	  RectI  mBounds;                      ///< The internal bounds of this control
       GuiControlProfile* mProfile;         ///< The profile for this gui (data settings that are likely to be shared by multiple guis)
       GuiControlProfile* mTooltipProfile;  ///< The profile for any tooltips
       
@@ -166,6 +190,7 @@ class GuiControl : public SimGroup
       bool    mIsContainer; ///< if true, then the GuiEditor can drag other controls into this one.
       bool    mCanResize;
       bool    mCanHit;
+	  bool    mAcceptDrops;
       
       S32     mLayer;
       Point2I mMinExtent;
@@ -241,9 +266,9 @@ class GuiControl : public SimGroup
       
       GFXStateBlockRef mDefaultGuiSB;
       
+	  
       /// @name Callbacks
       /// @{
-      
       DECLARE_CALLBACK( void, onAdd, () );
       DECLARE_CALLBACK( void, onRemove, () );
       
@@ -263,12 +288,15 @@ class GuiControl : public SimGroup
       DECLARE_CALLBACK( void, onControlDragEnter, ( GuiControl* control, const Point2I& dropPoint ) );
       DECLARE_CALLBACK( void, onControlDragExit, ( GuiControl* control, const Point2I& dropPoint ) );
       DECLARE_CALLBACK( void, onControlDragged, ( GuiControl* control, const Point2I& dropPoint ) );
-      DECLARE_CALLBACK( void, onControlDropped, ( GuiControl* control, const Point2I& dropPoint ) );
+      DECLARE_CALLBACK( bool, onControlDropped, ( GuiControl* control, const Point2I& dropPoint ) );
             
       /// @}
       
    public:
    
+	   const String& GetStringData() const { return mDataString; }
+	   void SetStringData(const String& value) { mDataString = value; }
+
       /// Set the name of the console variable which this GuiObject is bound to
       /// @param   variable   Variable name
       void setConsoleVariable(const char *variable);
@@ -377,6 +405,7 @@ class GuiControl : public SimGroup
       bool isActive() { return mActive; } ///< Returns true if this control is active
       
       bool isAwake() { return mAwake; } ///< Returns true if this control is awake
+	  bool acceptDrops();
       
       /// @}
       
@@ -438,7 +467,16 @@ class GuiControl : public SimGroup
       /// @param   newPosition   New position of this control
       virtual bool setPosition( const Point2I &newPosition );
       inline  void setPosition( const S32 x, const S32 y ) { setPosition(Point2I(x,y)); }
-      
+
+	  // Set position as close to desiredPosition as possible while keeping
+	  // control's entire bounds within validRegion
+	  void setPositionClamped(const Point2I& desiredPosition, RectI& validRegion);
+
+	  /// Changes the position of this control to fit the specified center
+	  /// @param   newPosition   New position of this control
+	  virtual bool setCenter( const Point2I &newCenter );
+	  inline  void setCenter( const S32 x, const S32 y ) { setCenter(Point2I(x,y)); }
+
       /// Changes the size of this control
       /// @param   newExtent   New size of this control
       virtual bool setExtent( const Point2I &newExtent );
@@ -779,6 +817,9 @@ class GuiControl : public SimGroup
       /// @param   prof   Control profile to apply
       void setControlProfile(GuiControlProfile *prof);
       
+	  /// Triggered when a guiMoveableCtrl is dropped on this control
+	  virtual bool onControlDropped(GuiControl* payload, Point2I position);
+
       /// Occurs when this control performs its "action"
       virtual void onAction();
       

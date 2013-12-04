@@ -215,6 +215,8 @@ void GuiSliderCtrl::onMouseDragged( const GuiEvent &event )
    F32 value = _getThumbValue( event );
    _updateThumb( value, mSnap || ( event.modifier & SI_SHIFT ) );
 
+   if (mouseDraggedEvent)
+      mouseDraggedEvent(this, event);
    onMouseDragged_callback();
 }
 

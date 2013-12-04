@@ -32,8 +32,26 @@ class GuiTabPageCtrl : public GuiTextCtrl
    private:
       typedef GuiTextCtrl Parent;
 
+	  enum {
+		  BorderTopLeft,
+		  BorderTop,
+		  BorderTopRight,
+		  BorderLeft,
+		  MiddleFill,
+		  BorderRight,
+		  BorderBottomLeft,
+		  BorderBottom,
+		  BorderBottomRight,
+		  NumBitmaps
+	  };
+
       bool           mFitBook;   ///< Resize to fit book when first added
       S32            mTabIndex;
+	  bool           mRenderPanel;
+
+	  RectI *mBitmapBounds;  ///< bmp is [3*n], bmpHL is [3*n + 1], bmpNA is [3*n + 2]
+	  GFXTexHandle mTextureObject;
+
 
    public:
       GuiTabPageCtrl();

@@ -108,6 +108,7 @@ GuiEditCtrl::GuiEditCtrl()
    VECTOR_SET_ASSOCIATION( mSnapHits[ 0 ] );
    VECTOR_SET_ASSOCIATION( mSnapHits[ 1 ] );
       
+   mAcceptDrops = true;
    mActive = true;
    mDotSB = NULL;
    
@@ -236,6 +237,9 @@ bool GuiEditCtrl::onKeyDown(const GuiEvent &event)
          case KEY_BACKSPACE:
          case KEY_DELETE:
             deleteSelection();
+
+			if (deleteEvent.valid())
+				deleteEvent(this);
             onDelete_callback();
             return true;
          default:
@@ -301,6 +305,8 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
          mLastDragPos = event.mousePoint;
          
          // undo
+		 if (preEditEvent.valid())
+			 preEditEvent(this, getSelectedSet());
          onPreEdit_callback( getSelectedSet() );
          return;
       }
@@ -459,7 +465,11 @@ void GuiEditCtrl::onMouseUp(const GuiEvent &event)
    // note: paxorr: this may need to be moved earlier, if the selection has changed.
    // undo
    if( mMouseDownMode == SizingSelection || ( mMouseDownMode == MovingSelection && mDragMoveUndo ) )
-      onPostEdit_callback( getSelectedSet() );
+   {
+	   if (postEditEvent.valid())
+		   postEditEvent(this, getSelectedSet());
+	   onPostEdit_callback( getSelectedSet() );
+   }
 
    //reset the mouse mode
    setFirstResponder();
@@ -935,6 +945,8 @@ void GuiEditCtrl::drawNut(const Point2I &nut, ColorI &outlineColor, ColorI &nutC
 void GuiEditCtrl::clearSelection(void)
 {
    mSelectedControls.clear();
+   if (clearSelectedEvent.valid())
+	   clearSelectedEvent(this);
    onClearSelected_callback();
 }
 
@@ -989,12 +1001,16 @@ void GuiEditCtrl::addSelection( GuiControl* ctrl )
             
          // Notify script.
 
+		 if (selectEvent.valid())
+			 selectEvent(this, ctrl);
          onSelect_callback( ctrl );
       }
       else
       {
          // Notify script.
          
+	     if (addSelectedEvent.valid())
+			 addSelectedEvent(this, ctrl);
          onAddSelected_callback( ctrl );
       }
    }
@@ -1019,6 +1035,8 @@ void GuiEditCtrl::removeSelection( GuiControl* ctrl )
       if ( i != mSelectedControls.end() )
          mSelectedControls.erase( i );
 
+	  if (removeSelectedEvent.valid())
+		  removeSelectedEvent(this, ctrl);
       onRemoveSelected_callback( ctrl );
    }
 }
@@ -1049,6 +1067,8 @@ void GuiEditCtrl::moveSelectionToCtrl( GuiControl *newParent, bool callback )
       ctrl->setPosition(newpos);
    }
    
+   if (hierarchyChangedEvent.valid())
+	   hierarchyChangedEvent(this);
    onHierarchyChanged_callback();
    
    //TODO: undo
@@ -1081,9 +1101,12 @@ void GuiEditCtrl::moveAndSnapSelection( const Point2I &delta, bool callback )
    // move / nudge gets a special callback so that multiple small moves can be
    // coalesced into one large undo action.
    // undo
-   
    if( callback )
-      onPreSelectionNudged_callback( getSelectedSet() );
+   {
+	   if (preSelectionNudgedEvent.valid())
+		   preSelectionNudgedEvent(this, getSelectedSet());
+	   onPreSelectionNudged_callback( getSelectedSet() );
+   }
 
    Vector<GuiControl *>::iterator i;
    Point2I newPos;
@@ -1100,11 +1123,19 @@ void GuiEditCtrl::moveAndSnapSelection( const Point2I &delta, bool callback )
 
    // undo
    if( callback )
-      onPostSelectionNudged_callback( getSelectedSet() );
+   {
+	   if (postSelectionNudgedEvent.valid())
+		   postSelectionNudgedEvent(this, getSelectedSet());
+	   onPostSelectionNudged_callback( getSelectedSet() );
+   }
 
    // allow script to update the inspector
    if( callback && mSelectedControls.size() > 0 )
-      onSelectionMoved_callback( mSelectedControls[ 0 ] );
+   {
+	   if (selectionMovedEvent.valid())
+		   selectionMovedEvent(this, getSelectedSet());
+	   onSelectionMoved_callback( mSelectedControls[ 0 ] );
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1121,7 +1152,11 @@ void GuiEditCtrl::moveSelection( const Point2I &delta, bool callback )
 
    // allow script to update the inspector
    if( callback )
-      onSelectionMoved_callback( mSelectedControls[ 0 ] );
+   {
+	   if (selectionMovedEvent.valid())
+		   selectionMovedEvent(this, getSelectedSet());
+	   onSelectionMoved_callback( mSelectedControls[ 0 ] );
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1268,7 +1303,8 @@ void GuiEditCtrl::cloneSelection()
       addSelection( newSelection[ i ] );
       
    // Callback for undo.
-      
+   if (selectionClonedEvent.valid())
+	   selectionClonedEvent(this, getSelectedSet());
    onSelectionCloned_callback( getSelectedSet() );
 }
 
@@ -1277,7 +1313,8 @@ void GuiEditCtrl::cloneSelection()
 void GuiEditCtrl::deleteSelection()
 {
    // Notify script for undo.
-   
+   if (trashSelectionEvent.valid())
+	   trashSelectionEvent(this, getSelectedSet());
    onTrashSelection_callback( getSelectedSet() );
    
    // Move all objects in selection to trash.
@@ -1294,7 +1331,8 @@ void GuiEditCtrl::deleteSelection()
    clearSelection();
    
    // Notify script it needs to update its views.
-   
+   if (hierarchyChangedEvent.valid())
+	   hierarchyChangedEvent(this);
    onHierarchyChanged_callback();
 }
 
@@ -1353,10 +1391,13 @@ void GuiEditCtrl::loadSelection( const char* filename )
       }
 
       // Undo 
+	  if (addNewCtrlEvent.valid())
+		  addNewCtrlEvent(this, getSelectedSet());
       onAddNewCtrlSet_callback( getSelectedSet() );
 
       // Notify the script it needs to update its treeview.
-
+	  if (hierarchyChangedEvent.valid())
+		  hierarchyChangedEvent(this);
       onHierarchyChanged_callback();
    }
    set->deleteObject();
@@ -1656,7 +1697,11 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
    }
    
    if( mSelectedControls.size() == 1 )
-      onSelectionResized_callback( mSelectedControls[ 0 ] );
+   {
+	   if (selectionResizedEvent.valid())
+		   selectionResizedEvent(this, mSelectedControls[ 0 ]);
+	   onSelectionResized_callback( mSelectedControls[ 0 ] );
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1664,7 +1709,8 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
 void GuiEditCtrl::fitIntoParents( bool width, bool height )
 {
    // Record undo.
-   
+   if (fitIntoParentEvent.valid())
+	   fitIntoParentEvent(this, width, height);
    onFitIntoParent_callback( width, height );
    
    // Fit.
@@ -2223,6 +2269,8 @@ void GuiEditCtrl::setMouseMode( mouseModes mode )
    {
       mMouseDownMode = mode;
 
+	  if (mouseModeChangeEvent.valid())
+		  mouseModeChangeEvent(this);
       onMouseModeChange_callback();
    }
 }
@@ -2258,6 +2306,8 @@ void GuiEditCtrl::addNewControl(GuiControl *ctrl)
    select( ctrl );
 
    // undo
+   if (addNewCtrlEvent.valid())
+	   addNewCtrlEvent(this, ctrl);
    onAddNewCtrl_callback( ctrl );
 }
 
@@ -2394,6 +2444,8 @@ void GuiEditCtrl::setSnapToGrid(U32 gridsize)
 void GuiEditCtrl::controlInspectPreApply(GuiControl* object)
 {
    // undo
+	if (controlInspectPreApplyEvent.valid())
+		controlInspectPreApplyEvent(this, object);
    onControlInspectPreApply_callback( object );
 }
 
@@ -2402,6 +2454,8 @@ void GuiEditCtrl::controlInspectPreApply(GuiControl* object)
 void GuiEditCtrl::controlInspectPostApply(GuiControl* object)
 {
    // undo
+	if (controlInspectPostApplyEvent.valid())
+		controlInspectPostApplyEvent(this, object);
    onControlInspectPostApply_callback( object );
 }
 
@@ -2426,6 +2480,8 @@ void GuiEditCtrl::startDragMove( const Point2I& startPoint )
    setMouseMode( MovingSelection );
    
    // undo
+   if (preEditEvent.valid())
+	   preEditEvent(this, getSelectedSet());
    onPreEdit_callback( getSelectedSet() );
 }
 

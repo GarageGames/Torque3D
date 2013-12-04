@@ -840,6 +840,8 @@ void GuiMLTextCtrl::onMouseUp(const GuiEvent& event)
 
       // Convert URL from UTF16 to UTF8.
       UTF8* url = mTextBuffer.createSubstring8(mHitURL->textStart, mHitURL->len);
+	  if (urlEvent.valid())
+		  urlEvent(this, url);
 	  onURL_callback(url);
 
       delete[] url;

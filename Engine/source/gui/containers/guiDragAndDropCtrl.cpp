@@ -157,6 +157,8 @@ ConsoleDocClass( GuiDragAndDropControl,
 
 void GuiDragAndDropControl::initPersistFields()
 {
+	addField( "offset", TypePoint2I, Offset( mOffset, GuiDragAndDropControl ),
+		"The mouse down offset from the upper left of the control" );
    addField( "deleteOnMouseUp", TypeBool, Offset( mDeleteOnMouseUp, GuiDragAndDropControl ),
       "If true, the control deletes itself when the left mouse button is released.\n\n"
       "If at this point, the drag&drop control still contains its payload, it will be deleted along with the control." );
@@ -203,20 +205,32 @@ void GuiDragAndDropControl::onMouseDragged( const GuiEvent& event )
    setPosition( event.mousePoint - mOffset );
    
    // Allow the control under the drag to react to a potential drop
-   GuiControl* enterTarget = findDragTarget( event.mousePoint, "onControlDragEnter" );
+   GuiControl* enterTarget = findDragTarget( event.mousePoint );
    if( mLastTarget != enterTarget )
    {
       if( mLastTarget )
-         mLastTarget->onControlDragExit_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+	  {
+		  if (controlDragExitEvent)
+		     mLastTarget->controlDragExitEvent(mLastTarget, dynamic_cast< GuiControl* >(at(0)), getDropPoint());
+		  mLastTarget->onControlDragExit_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+	  }
       if( enterTarget )
-         enterTarget->onControlDragEnter_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+	  {
+		  if (controlDragEnterEvent.valid())
+		     enterTarget->controlDragEnterEvent(enterTarget, dynamic_cast< GuiControl* >(at(0)), getDropPoint());
+		  enterTarget->onControlDragEnter_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+	  }
 
       mLastTarget = enterTarget;
    }
 
-   GuiControl* dragTarget = findDragTarget( event.mousePoint, "onControlDragged" );
+   GuiControl* dragTarget = findDragTarget( event.mousePoint );
    if( dragTarget )
-      dragTarget->onControlDragged_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+   {
+	   if (controlDraggedEvent.valid())
+	      dragTarget->controlDraggedEvent(dragTarget, dynamic_cast< GuiControl* >(at(0)), getDropPoint());
+	   dragTarget->onControlDragged_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -225,9 +239,11 @@ void GuiDragAndDropControl::onMouseUp(const GuiEvent& event)
 {
    mouseUnlock();
 
-   GuiControl* target = findDragTarget( event.mousePoint, "onControlDropped" );
+   GuiControl* target = findDragTarget( event.mousePoint );
    if( target )
-      target->onControlDropped_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+   {
+	   target->onControlDropped(dynamic_cast< GuiControl* >(at(0)), getDropPoint());
+   }
 
    if( mDeleteOnMouseUp )
       deleteObject();
@@ -235,7 +251,7 @@ void GuiDragAndDropControl::onMouseUp(const GuiEvent& event)
 
 //-----------------------------------------------------------------------------
 
-GuiControl* GuiDragAndDropControl::findDragTarget( Point2I mousePoint, const char* method )
+GuiControl* GuiDragAndDropControl::findDragTarget( Point2I mousePoint )
 {
    // If there are any children and we have a parent.
    GuiControl* parent = getParent();
@@ -246,13 +262,18 @@ GuiControl* GuiDragAndDropControl::findDragTarget( Point2I mousePoint, const cha
       mVisible = true;
       while( dropControl )
       {      
-         if (dropControl->isMethod(method))
+         if (dropControl->acceptDrops())
             return dropControl;
          else
             dropControl = dropControl->getParent();
       }
    }
    return NULL;
+}
+
+void GuiDragAndDropControl::onRender(Point2I offset, const RectI &updateRect)
+{
+	Parent::onRender(offset, updateRect);
 }
 
 //=============================================================================

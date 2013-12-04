@@ -60,6 +60,7 @@ ConsoleDocClass( GuiSwatchButtonCtrl,
 GuiSwatchButtonCtrl::GuiSwatchButtonCtrl()
  : mSwatchColor( 1, 1, 1, 1 )
 {
+   mAcceptDrops = true;
    mButtonText = StringTable->insert( "" );   
    setExtent(140, 30);
    

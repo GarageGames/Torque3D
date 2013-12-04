@@ -45,7 +45,7 @@ class GuiDragAndDropControl : public GuiControl
 
       typedef GuiControl Parent;
    
-   private:
+   protected:
    
       /// The mouse down offset from the upper left of the control.
       Point2I mOffset;
@@ -56,7 +56,7 @@ class GuiDragAndDropControl : public GuiControl
       /// Controls may want to react when they are dragged over, entered or exited.
       SimObjectPtr<GuiControl> mLastTarget;
       
-      GuiControl* findDragTarget(Point2I mousePoint, const char* method);
+      GuiControl* findDragTarget(Point2I mousePoint);
       
       Point2I getDropPoint() const
       {
@@ -67,9 +67,10 @@ class GuiDragAndDropControl : public GuiControl
    
       GuiDragAndDropControl() {}
 
-      void startDragging(Point2I offset = Point2I(0, 0));
+      virtual void startDragging(Point2I offset = Point2I(0, 0));
 
-      // GuiControl.
+      // GuiControl
+	  virtual void onRender(Point2I offset, const RectI &updateRect);
       virtual void onMouseDown(const GuiEvent& event);
       virtual void onMouseDragged(const GuiEvent& event);
       virtual void onMouseUp(const GuiEvent& event);

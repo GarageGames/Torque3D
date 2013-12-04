@@ -278,7 +278,8 @@ GuiPopUpMenuCtrl::GuiPopUpMenuCtrl(void)
    mReverseTextList = false; //  Added - Don't reverse text list if displaying up
    mBitmapName = StringTable->insert(""); //  Added
    mBitmapBounds.set(16, 16); //  Added
-	mIdMax = -1;
+   mIdMax = -1;
+   mAutoSize = true;
 }
 
 //------------------------------------------------------------------------------
@@ -294,6 +295,7 @@ void GuiPopUpMenuCtrl::initPersistFields(void)
    addField("reverseTextList",          TypeBool,         Offset(mReverseTextList, GuiPopUpMenuCtrl));
    addField("bitmap",                   TypeFilename,     Offset(mBitmapName, GuiPopUpMenuCtrl));
    addField("bitmapBounds",             TypePoint2I,      Offset(mBitmapBounds, GuiPopUpMenuCtrl));
+   addField("autoSize",					TypeBool,         Offset(mAutoSize, GuiPopUpMenuCtrl));
 
    Parent::initPersistFields();
 }
@@ -879,6 +881,31 @@ void GuiPopUpMenuCtrl::setNoneSelected()
 const char *GuiPopUpMenuCtrl::getScriptValue()
 {
    return getText();
+}
+
+//------------------------------------------------------------------------------
+bool GuiPopUpMenuCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
+{
+	Point2I autoSize = newExtent;
+
+	// Auto-size height of control based on bitmap array height
+	if (mAutoSize)
+	{
+		if (!mAwake)
+		{
+			mProfile->incLoadCount();
+			if( !mProfile->mBitmapArrayRects.size() )
+				mProfile->constructBitmapArray();
+		}
+
+		if (mProfile->mBitmapArrayRects.size() > 0)
+			autoSize.y = mProfile->mBitmapArrayRects[0].extent.y;
+
+		if (!mAwake)
+			mProfile->decLoadCount();
+	}
+
+	return Parent::resize(newPosition, autoSize);
 }
 
 //------------------------------------------------------------------------------

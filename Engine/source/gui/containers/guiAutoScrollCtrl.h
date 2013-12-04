@@ -37,7 +37,13 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
    public:
    
       typedef GuiTickCtrl Parent;
-      
+
+	  // Event delegates
+	  Delegate<bool(GuiAutoScrollCtrl* sender)> tickEvent;
+	  Delegate<bool(GuiAutoScrollCtrl* sender)> startEvent;
+	  Delegate<bool(GuiAutoScrollCtrl* sender)> completeEvent;
+	  Delegate<bool(GuiAutoScrollCtrl* sender)> resetEvent;
+
       /// Scrolling direction.
       enum Direction
       {

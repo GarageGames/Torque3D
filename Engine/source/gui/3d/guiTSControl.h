@@ -160,6 +160,9 @@ public:
    DECLARE_CONOBJECT(GuiTSCtrl);
    DECLARE_CATEGORY( "Gui 3D" );
    DECLARE_DESCRIPTION( "Abstract base class for controls that render a 3D viewport." );
+
+protected:
+   virtual void make3DMouseEvent(Gui3DMouseEvent& gui3DMouseEvent, const GuiEvent& event, bool orthographic);
 };
 
 typedef GuiTSCtrl::RenderStyles GuiTSRenderStyles;

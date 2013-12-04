@@ -30,8 +30,21 @@
 
 class GuiMouseEventCtrl : public GuiControl
 {
+	  typedef  GuiControl     Parent;
+	  
+   public: 
+	  // Event delegates
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> mouseDownEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> mouseUpEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> mouseMoveEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> mouseDraggedEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> mouseEnterEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> mouseLeaveEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> rightMouseDownEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> rightMouseUpEvent;
+	  Delegate<bool(GuiMouseEventCtrl* sender, const GuiEvent& event)> rightMouseDraggedEvent;
+
    private:
-      typedef  GuiControl     Parent;
       void sendMouseEvent(const char * name, const GuiEvent &);
 
       // field info

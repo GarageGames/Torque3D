@@ -35,6 +35,9 @@ class GuiSliderCtrl : public GuiControl
    
       typedef GuiControl Parent;
 
+	  // Event delegates
+	  Delegate<bool(GuiSliderCtrl* sender, const GuiEvent& event)> mouseDraggedEvent;
+
    protected:
 
       Point2F mRange;

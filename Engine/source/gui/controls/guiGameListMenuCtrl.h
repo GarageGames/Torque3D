@@ -35,6 +35,9 @@ public:
    typedef GuiControl Parent;
    typedef GuiGameListMenuProfile Profile;
 
+   // Event delegates
+   Delegate<bool(GuiGameListMenuCtrl* sender)> changeEvent;
+
 protected:
    /// \struct Row
    /// Internal data representation of a single row in the control.
@@ -223,6 +226,7 @@ protected:
 
    /// @name Callbacks
    /// @{
+
    DECLARE_CALLBACK( void, onChange, () );
    /// @}
 

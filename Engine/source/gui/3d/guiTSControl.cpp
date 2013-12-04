@@ -511,6 +511,39 @@ void GuiTSCtrl::drawLineList( const Vector<Point3F> &points, const ColorI color,
       drawLine( points[i], points[i+1], color, width );
 }
 
+//-----------------------------------------------------------------------------
+
+void GuiTSCtrl::make3DMouseEvent(Gui3DMouseEvent& gui3DMouseEvent, const GuiEvent& event, bool orthographic)
+{
+	(GuiEvent&)(gui3DMouseEvent) = event;
+	gui3DMouseEvent.mousePoint = event.mousePoint;
+
+	if (!orthographic)
+	{
+		// get the eye pos and the mouse vec from that...
+		Point3F screenPoint((F32)gui3DMouseEvent.mousePoint.x, (F32)gui3DMouseEvent.mousePoint.y, 1.0f);
+
+		Point3F wp;
+		unproject(screenPoint, &wp);
+
+		mLastCameraQuery.cameraMatrix.getColumn(3, &gui3DMouseEvent.pos);
+
+		gui3DMouseEvent.vec = wp - gui3DMouseEvent.pos;
+		gui3DMouseEvent.vec.normalizeSafe();
+	}
+	else
+	{
+		// get the eye pos and the mouse vec from that...
+		Point3F screenPoint((F32)gui3DMouseEvent.mousePoint.x, (F32)gui3DMouseEvent.mousePoint.y, 0.0f);
+
+		Point3F np, fp;
+		unproject(screenPoint, &np);
+
+		gui3DMouseEvent.pos = np;
+		mLastCameraQuery.cameraMatrix.getColumn( 1, &(gui3DMouseEvent.vec) );
+	}
+}
+
 //=============================================================================
 //    Console Methods.
 //=============================================================================

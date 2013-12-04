@@ -29,9 +29,15 @@
 
 class GuiScriptNotifyCtrl : public GuiControl
 {
-private:
    typedef GuiControl Parent;
+   
 public:
+   // Event delegates
+   Delegate<bool(GuiScriptNotifyCtrl* sender)> resizeEvent;
+   Delegate<bool(GuiScriptNotifyCtrl* sender, GuiControl* child)> childAddedEvent;
+   Delegate<bool(GuiScriptNotifyCtrl* sender, GuiControl* child)> childRemovedEvent;
+   Delegate<bool(GuiScriptNotifyCtrl* sender, GuiControl* child)> childResizedEvent;
+   Delegate<bool(GuiScriptNotifyCtrl* sender)> parentResizedEvent;
 
     /// @name Event Callbacks
     /// @{ 
@@ -69,9 +75,6 @@ public:
 	DECLARE_CALLBACK(void, onParentResized, (SimObjectId ID));
 	DECLARE_CALLBACK(void, onLoseFirstResponder, (SimObjectId ID));
 	DECLARE_CALLBACK(void, onGainFirstResponder, (SimObjectId ID));
-	
-	
-	
 	
     //virtual void onMouseUp(const GuiEvent &event);
     //virtual void onMouseDown(const GuiEvent &event);

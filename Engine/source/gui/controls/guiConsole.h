@@ -37,6 +37,9 @@ class GuiConsole : public GuiArrayCtrl
    private:
       typedef GuiArrayCtrl Parent;
 
+	  // Event delegates
+	  Delegate<bool(GuiConsole* sender, ConsoleLogEntry::Level level, const char* message)> messageSelectedEvent;
+
       Resource<GFont> mFont;
 
       S32 getMaxWidth(S32 startIndex, S32 endIndex);

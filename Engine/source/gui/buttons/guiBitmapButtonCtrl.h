@@ -51,10 +51,15 @@
 ///
 class GuiBitmapButtonCtrl : public GuiButtonCtrl
 {
-   public:
-   
-      typedef GuiButtonCtrl Parent;
-      
+	typedef GuiButtonCtrl Parent;
+
+	public:
+	  // Event delegates
+	  Delegate<bool(GuiBitmapButtonCtrl* sender)> defaultClickEvent;
+	  Delegate<bool(GuiBitmapButtonCtrl* sender)> ctrlClickEvent;
+	  Delegate<bool(GuiBitmapButtonCtrl* sender)> altClickEvent;
+	  Delegate<bool(GuiControl* sender)> shiftClickEvent;
+
       enum BitmapMode
       {
          BitmapStretched,

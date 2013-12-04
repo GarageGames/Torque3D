@@ -134,7 +134,11 @@ void GuiGradientSwatchCtrl::onMouseDown(const GuiEvent &event)
 	mMouseDownPosition = event.mousePoint;
 
    if(mUseMouseEvents)
-      onMouseDown_callback();
+   {
+	   if (mouseDownEvent.valid())
+	      mouseDownEvent(this, event);
+	   onMouseDown_callback();
+   }
 
    //lock the mouse
    mouseLock();
@@ -143,6 +147,8 @@ void GuiGradientSwatchCtrl::onMouseDown(const GuiEvent &event)
    // If we have a double click then execute the alt command.
    if ( event.mouseClickCount == 2 )
    {
+	  if (doubleClickEvent.valid())
+	     doubleClickEvent(this);
       onDoubleClick_callback();
 
       execAltConsoleCallback();

@@ -453,18 +453,26 @@ void GuiBitmapButtonCtrl::onAction()
       switch( getCurrentModifier() )
       {
          case ModifierNone:
+			if (defaultClickEvent.valid())
+				defaultClickEvent(this);
             onDefaultClick_callback();
             break;
          
          case ModifierCtrl:
+		    if (ctrlClickEvent.valid())
+				ctrlClickEvent(this);
             onCtrlClick_callback();
             break;
          
          case ModifierAlt:
+			if (altClickEvent.valid())
+				altClickEvent(this);
             onAltClick_callback();
             break;
          
          case ModifierShift:
+			if (shiftClickEvent.valid())
+				shiftClickEvent(this);
             onShiftClick_callback();
             break;
             

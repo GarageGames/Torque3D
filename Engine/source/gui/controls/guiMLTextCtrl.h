@@ -37,10 +37,12 @@ class SFXTrack;
 GFX_DeclareTextureProfile(GFXMLTextureProfile);
 class GuiMLTextCtrl : public GuiControl
 {
-   typedef GuiControl Parent;
+	typedef GuiControl Parent;
+
+public:
+	Delegate<bool(GuiMLTextCtrl* sender, const char* url)> urlEvent;
 
    //-------------------------------------- Public interfaces...
-  public:
    enum Justification
    {
       LeftJustify,

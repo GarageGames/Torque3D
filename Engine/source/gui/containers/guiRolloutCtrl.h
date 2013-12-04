@@ -44,6 +44,11 @@ class GuiRolloutCtrl : public GuiTickCtrl
    
       typedef GuiControl Parent;
 
+	  // Event delegates
+	  Delegate<bool(GuiRolloutCtrl* sender)> headerRightClickEvent;
+	  Delegate<bool(GuiRolloutCtrl* sender)> expandedEvent;
+	  Delegate<bool(GuiRolloutCtrl* sender)> collapsedEvent;
+
       // Theme Support
       enum
       {
@@ -112,10 +117,9 @@ class GuiRolloutCtrl : public GuiTickCtrl
       
       /// @name Callbacks
       /// @{
+
       DECLARE_CALLBACK( void, onHeaderRightClick, () );
-
       DECLARE_CALLBACK( void, onExpanded, () );
-
       DECLARE_CALLBACK( void, onCollapsed, () );
       /// @}
 

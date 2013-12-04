@@ -37,6 +37,10 @@ class GuiFadeinBitmapCtrl : public GuiBitmapCtrl
    public:
    
       typedef GuiBitmapCtrl Parent;
+
+	  // Event delegates
+	  Delegate<bool(GuiFadeinBitmapCtrl* sender)> clickEvent;
+	  Delegate<bool(GuiFadeinBitmapCtrl* sender)> doneEvent;
       
    protected:
    

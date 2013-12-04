@@ -472,7 +472,11 @@ void GuiTabBookCtrl::onRightMouseUp( const GuiEvent& event )
    {
       GuiTabPageCtrl* tab = findHitTab( localMouse );
       if( tab )
-         onTabRightClick_callback( tab->getText(), getPageNum( tab ) );
+	  {
+		  if (tabRightClickEvent.valid())
+		     tabRightClickEvent(this, tab->getText(), getPageNum(tab));
+		  onTabRightClick_callback( tab->getText(), getPageNum( tab ) );
+	  }
    }
 }
 
@@ -500,11 +504,11 @@ void GuiTabBookCtrl::onRender(Point2I offset, const RectI &updateRect)
    clippedTabRect.intersect( savedClipRect );
    GFX->setClipRect( clippedTabRect );
 
-   // Render our tabs
-   renderTabs( offset, tabRect );
-
    // Restore Rect.
    GFX->setClipRect( savedClipRect );
+
+   // Render our tabs
+   renderTabs( offset, tabRect );
 
    // Restore old modulation
    GFX->getDrawUtil()->setBitmapModulation( oldModulation );
@@ -524,6 +528,8 @@ void GuiTabBookCtrl::renderTabs( const Point2I &offset, const RectI &tabRect )
       const TabHeaderInfo &currentTabInfo = mPages[i];
       RectI tabBounds = mPages[i].TabRect;
       tabBounds.point += offset;
+	  tabBounds.point.y += mProfile->mBorderThickness;
+
       GuiTabPageCtrl *tab = mPages[i].Page;
       if( tab != NULL )
          renderTab( tabBounds, tab );
@@ -552,7 +558,7 @@ void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
 {
    StringTableEntry text = tab->getText();
    ColorI oldColor;
-
+ 
    GFX->getDrawUtil()->getBitmapModulation( &oldColor );
 
    // Is this a skinned control?
@@ -845,6 +851,8 @@ void GuiTabBookCtrl::selectPage( GuiTabPageCtrl *page )
          mSelectedPageNum = index;
          
          // Notify User
+		 if (tabSelectedEvent.valid())
+			tabSelectedEvent(this, tab->getText(), index);
          onTabSelected_callback( tab->getText(), index );
       }
       else

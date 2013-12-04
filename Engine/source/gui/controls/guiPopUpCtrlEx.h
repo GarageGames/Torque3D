@@ -121,6 +121,7 @@ class GuiPopUpMenuCtrlEx : public GuiTextCtrl
    GFXTexHandle mTextureNormal; //  Added
    GFXTexHandle mTextureDepressed; //  Added
 	S32 mIdMax;
+	bool mAutoSize;
 
    virtual void addChildren();
    virtual void repositionPopup();
@@ -162,6 +163,8 @@ class GuiPopUpMenuCtrlEx : public GuiTextCtrl
    S32 findText( const char* text );
    S32 getNumEntries()   { return( mEntries.size() ); }
    void replaceText(S32);
+
+   bool resize(const Point2I& newPosition, const Point2I& newExtent);
    
    DECLARE_CONOBJECT(GuiPopUpMenuCtrlEx);
    DECLARE_CATEGORY( "Gui Lists" );

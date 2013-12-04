@@ -501,6 +501,8 @@ void GuiWindowCtrl::handleCollapseGroup()
          }
       }
       
+	  if (collapseEvent.valid())
+	     collapseEvent(this);
       onCollapse_callback();
    }
    else // maximize the window to its previous position
@@ -534,7 +536,9 @@ void GuiWindowCtrl::handleCollapseGroup()
             }
          }
       }
-      
+   
+	  if (restoreEvent.valid())
+	     restoreEvent(this);
       onRestore_callback();
    }
 }
@@ -1031,6 +1035,9 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
       
       if( engineAPI::gUseConsoleInterop )
          evaluate( mCloseCommand );
+
+	  if (closeEvent.valid())
+	     closeEvent(this);
       onClose_callback();
    }
    else if (maximizing && mMaximizeButton.pointInRect(localPoint))
@@ -1044,6 +1051,8 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
          // Set the flag
          mMaximized = false;
          
+		 if (restoreEvent.valid())
+		    restoreEvent(this);
          onRestore_callback();
       }
       else
@@ -1060,6 +1069,8 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
          // Set the flag
          mMaximized = true;
          
+		 if (maximizeEvent.valid())
+		    maximizeEvent(this);
          onMaximize_callback();
       }
    }
@@ -1074,6 +1085,8 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
          // Set the flag
          mMinimized = false;
          
+		 if (restoreEvent.valid())
+		    restoreEvent(this);
          onRestore_callback();
       }
       else
@@ -1135,6 +1148,8 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
          // Set the flag
          mMinimized = true;
          
+		 if (minimizeEvent.valid())
+		    minimizeEvent(this);
          onMinimize_callback();
       }
    }

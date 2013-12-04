@@ -236,6 +236,8 @@ bool GuiFormCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
       mUseSmallCaption = false;
    }
 
+   if (resizeEvent.valid())
+      resizeEvent(this);
    onResize_callback();
 
    return true;

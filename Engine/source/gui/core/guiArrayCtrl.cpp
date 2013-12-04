@@ -136,6 +136,8 @@ void GuiArrayCtrl::onCellSelected(Point2I cell)
    // [rene, 21-Jan-11 ] clashes with callbacks defined in derived classes
    Con::executef(this, "onSelect", Con::getFloatArg(cell.x), Con::getFloatArg(cell.y));
 
+   if (cellSelectedEvent.valid())
+	   cellSelectedEvent(this, cell);
    onCellSelected_callback( cell );
 
    //call the console function
@@ -146,6 +148,8 @@ void GuiArrayCtrl::onCellSelected(Point2I cell)
 
 void GuiArrayCtrl::onCellHighlighted(Point2I cell)
 {
+   if (cellHighlightedEvent.valid())
+	   cellHighlightedEvent(this, cell);
    onCellHighlighted_callback( cell );
 }
 

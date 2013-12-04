@@ -556,6 +556,8 @@ void GuiGameListMenuCtrl::changeRow(S32 delta)
    setSelected(newRowIndex);
 
    // do the callback
+   if (changeEvent.valid())
+      changeEvent(this);
    onChange_callback();
 }
 
