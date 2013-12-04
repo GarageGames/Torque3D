@@ -408,7 +408,7 @@ String Path::getDirectory(U32 count) const
 
    U32 end = offset;
 
-   while (mPath[end] != '/' && end < mPath.length())
+   while (end < mPath.length() && mPath[end] != '/')
       end++;
 
    return mPath.substr(offset,end - offset);

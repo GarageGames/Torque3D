@@ -183,7 +183,7 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
 
    U32 i;
    UTF16 c;   
-   for(i = 0, c = in_string[i]; in_string[i] && i < n; i++, c = in_string[i])
+   for (i = 0, c = in_string[i]; i < n && in_string[i]; i++, c = in_string[i])
    {
       switch(c)
       {
@@ -445,7 +445,7 @@ void GFXDrawUtil::drawRect( const Point2F &upperLeft, const Point2F &lowerRight,
    // Into Triangle-Strip Outline
    //               v0-----------v2
    //               | a         x |
-   //					  |  v1-----v3  |
+   //               |  v1-----v3  |
    //               |   |     |   |
    //               |  v7-----v5  |
    //               | x         b |
@@ -512,7 +512,7 @@ void GFXDrawUtil::drawRectFill( const Point2F &upperLeft, const Point2F &lowerRi
    // Into Quad
    //               v0---------v1
    //               | a       x |
-   //					  |           |
+   //               |           |
    //               | x       b |
    //               v2---------v3
    //

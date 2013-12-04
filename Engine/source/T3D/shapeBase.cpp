@@ -3303,9 +3303,9 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
             image.triggerDown = stream->readFlag();
             image.altTriggerDown = stream->readFlag();
 
-            for (U32 i=0; i<ShapeBaseImageData::MaxGenericTriggers; ++i)
+            for (U32 j=0; j<ShapeBaseImageData::MaxGenericTriggers; ++j)
             {
-               image.genericTrigger[i] = stream->readFlag();
+               image.genericTrigger[j] = stream->readFlag();
             }
 
             int count = stream->readInt(3);
