@@ -27,6 +27,9 @@
 #include "math/mPoint2.h"
 #endif
 
+#ifndef _MATHTYPES_H_
+#include "math/mathTypes.h"
+#endif
 
 class RectI
 {
@@ -63,6 +66,20 @@ class RectI
    bool operator!=(const RectI&) const;
 
    bool isValidRect() const { return (extent.x > 0 && extent.y > 0); }
+   // Clip box against clipBox, clamping points that extend beyond the extent
+   // of clipBox to its edge. 
+   RectI& ClipTo(const RectI& clipBox);
+   // Clip box against clipBox plus specified margin, clamping points that extend
+   // beyond the extent to the margin edge
+   RectI& ClipTo(const RectI& clipBox, S32 margin);
+
+   // Align box inside reference according to alignment, preserving the 
+   // specified margin. If clip = true, clip box to border of reference and 
+   // margin; otherwise, leave size unchanged 
+   RectI& AlignInside(const RectI& reference, Align::Enum alignment = Align::CenterMiddle, S32 margin = 0, bool clip = false);
+   // Position box relative to reference in direction specified by alignment, 
+   // offset by specified margin
+   RectI& ArrangeOutside(const RectI& reference, Align::Enum alignment = Align::CenterMiddle, S32 margin = 0);
 
 public:
 
@@ -128,6 +145,13 @@ class RectF
    bool isValidRect() const { return (extent.x > 0.0f && extent.y > 0.0f); }
    inline bool intersectTriangle(const Point2F &a, const Point2F &b, const Point2F &c);
 
+   // Align box inside reference according to alignment, preserving the 
+   // specified margin. If clip = true, clip box to border of reference and 
+   // margin; otherwise, leave size unchanged 
+   RectF& AlignInside(const RectF& reference, Align::Enum alignment = Align::CenterMiddle, F32 margin = 0, bool clip = false);
+   // Position box relative to reference in direction specified by alignment, 
+   // offset by specified margin
+   RectF& ArrangeOutside(const RectF& reference, Align::Enum alignment = Align::CenterMiddle, F32 margin = 0);
 };
 
 class RectD
@@ -279,6 +303,259 @@ inline bool
 RectI::operator!=(const RectI& in_rCompare) const
 {
    return (operator==(in_rCompare) == false);
+}
+
+// Clip box against clipBox, clamping points that extend beyond the extent
+// of clipBox to its edge. 
+inline RectI& RectI::ClipTo(const RectI& clipBox)
+{
+	Point2I maxPoint = point + extent;
+	Point2I clipMaxPoint = clipBox.point + clipBox.extent;
+	if (point.x < clipBox.point.x)
+		point.x = clipBox.point.x;
+	if (point.y < clipBox.point.y)
+		point.y = clipBox.point.y;
+	if (maxPoint.x > clipMaxPoint.x)
+		maxPoint.x = clipMaxPoint.x;
+	if (maxPoint.y > clipMaxPoint.y)
+		maxPoint.y = clipMaxPoint.y;
+
+	extent.x = maxPoint.x - point.x;
+	extent.y = maxPoint.y - point.y;
+	return *this;
+}
+
+// Clip box against clipBox plus specified margin, clamping points that extend
+// beyond the extent to the margin edge
+inline RectI& RectI::ClipTo(const RectI& clipBox, S32 margin)
+{
+	Point2I maxPoint = point + extent;
+
+	// Reduce maximum clip by margin
+	Point2I clipMaxPoint = clipBox.point + clipBox.extent;
+	clipMaxPoint.x -= margin;
+	clipMaxPoint.y -= margin;
+
+	// Increase minimum clip by margin
+	Point2I clipMinPoint = clipBox.point;
+	clipMinPoint.x += margin;
+	clipMinPoint.y += margin;
+
+	// Clamp point and extent to margin
+	if (point.x < clipBox.point.x)
+		point.x = clipBox.point.x;
+	if (point.y < clipBox.point.y)
+		point.y = clipBox.point.y;
+	if (maxPoint.x > clipMaxPoint.x)
+		maxPoint.x = clipMaxPoint.x;
+	if (maxPoint.y > clipMaxPoint.y)
+		maxPoint.y = clipMaxPoint.y;
+
+	extent.x = maxPoint.x - point.x;
+	extent.y = maxPoint.y - point.y;
+	return *this;
+}
+
+// Align box inside reference according to alignment, preserving the 
+// specified margin. If clip = true, clip box to border of reference and 
+// margin; otherwise, leave extent unchanged 
+inline RectI& RectI::AlignInside(const RectI& reference, Align::Enum alignment /*= Align::CenterMiddle*/, S32 margin /*= 0*/, bool clip /*= false*/)
+{
+	// Align box
+	switch (alignment)
+	{
+		case Align::UpperLeft:
+		{
+			point.x = reference.point.x + margin;
+			point.y = reference.point.y + margin;
+			break;
+		}
+		case Align::CenterLeft:
+		{
+			point.x = reference.point.x + margin;
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::LowerLeft:
+		{
+			point.x = reference.point.x + margin;
+			point.y = reference.point.y + reference.extent.y - (extent.y + margin);
+			break;
+		}
+		case Align::UpperMiddle:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			point.y = reference.point.y + margin;
+			break;
+		}
+		case Align::CenterMiddle:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::LowerMiddle:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			point.y = reference.point.y + reference.extent.y - (extent.y + margin);
+			break;
+		}
+		case Align::UpperRight:
+		{
+			point.x = reference.point.x + reference.extent.x - (extent.x + margin);
+			point.y = reference.point.y + margin;
+			break;
+		}
+		case Align::CenterRight:
+		{
+			point.x = reference.point.x + reference.extent.x - (extent.x + margin);
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::LowerRight:
+		{
+			point.x = reference.point.x + reference.extent.x - (extent.x + margin);
+			point.y = reference.point.y + reference.extent.y - (extent.y + margin);
+			break;
+		}
+		case Align::UpperEdge:
+		{
+			point.y = reference.point.y + margin;
+			break;
+		}
+		case Align::LowerEdge:
+		{
+			point.y = reference.point.y + reference.extent.y + margin;
+			break;
+		}
+		case Align::LeftEdge:
+		{
+			point.x = reference.point.x + margin;
+			break;
+		}
+		case Align::RightEdge:
+		{
+			point.x = reference.point.x + reference.extent.x + margin;
+			break;
+		}
+		case Align::CenterVertically:
+		{
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::MiddleHorizontally:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			break;
+		}
+		default:
+		{
+			AssertFatal(false, "Unexpected Case");
+			break;
+		}
+	}
+
+	// Clip box extent (if specified)
+	if (clip)
+	{
+		this->ClipTo(reference);
+	}
+	return *this;
+}
+
+// Position box relative to reference in direction specified by alignment, 
+// offset by specified margin
+inline RectI& RectI::ArrangeOutside(const RectI& reference, Align::Enum alignment /*= Align::CenterMiddle*/, S32 margin /*= 0*/)
+{
+	// Align box
+	switch (alignment)
+	{
+		case Align::UpperLeft:
+		{
+			point.x = reference.point.x - (margin + extent.x);
+			point.y = reference.point.y - (margin + extent.y);
+			break;
+		}
+		case Align::CenterLeft:
+		{
+			point.x = reference.point.x - (margin + extent.x);
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::LowerLeft:
+		{
+			point.x = reference.point.x - (margin + extent.x);
+			point.y = reference.point.y + reference.extent.y + margin;
+			break;
+		}
+		case Align::UpperMiddle:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			point.y = reference.point.y - (margin + extent.y);
+			break;
+		}
+		case Align::CenterMiddle:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::LowerMiddle:
+		{
+			point.x = reference.point.x + (reference.extent.x / 2) - (extent.x / 2);
+			point.y = reference.point.y + reference.extent.y + margin;
+			break;
+		}
+		case Align::UpperRight:
+		{
+			point.x = reference.point.x + reference.extent.x + margin;
+			point.y = reference.point.y - (margin + extent.y);
+			break;
+		}
+		case Align::CenterRight:
+		{
+			point.x = reference.point.x + reference.extent.x + margin;
+			point.y = reference.point.y + (reference.extent.y / 2) - (extent.y / 2);
+			break;
+		}
+		case Align::LowerRight:
+		{
+			point.x = reference.point.x + reference.extent.x + margin;
+			point.y = reference.point.y + reference.extent.y + margin;
+			break;
+		}
+		case Align::UpperEdge:
+		{
+			point.x = reference.point.x;
+			point.y = reference.point.y - (margin + extent.y);
+			break;
+		}
+		case Align::LowerEdge:
+		{
+			point.x = reference.point.x;
+			point.y = reference.point.y + reference.extent.y + margin;
+			break;
+		}
+		case Align::LeftEdge:
+		{
+			point.x = reference.point.x - (margin + extent.x);
+			point.y = reference.point.y;
+			break;
+		}
+		case Align::RightEdge:
+		{
+			point.x = reference.point.x + reference.extent.x + margin;
+			point.y = reference.point.y;
+			break;
+		}
+		default:
+		{
+			AssertFatal(false, "Unexpected Case");
+			break;
+		}
+	}
+
+	return *this;
 }
 
 //------------------------------------------------------------------------------

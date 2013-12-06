@@ -8,7 +8,6 @@
 #include "gfx/gfxDrawUtil.h"
 
 #include "gui/controls/guiIconControl.h"
-#include "Sprite/DynamicSprite.h"
 #include "gui/containers/guiDragAndDropCtrl.h"
 #include "gui/core/guiCanvas.h"
 #include "gui/core/guiDefaultControlRender.h"
@@ -33,8 +32,6 @@ GuiIconSpawnerButtonCtrl::GuiIconSpawnerButtonCtrl()
 	mMakeIconSquare = false;
 	mAutoSize = true;
 	mCanDrag = true;
-	mHasProgress = false;
-
 
 	setExtent(32, 32);    
 
@@ -49,7 +46,6 @@ void GuiIconSpawnerButtonCtrl::initPersistFields()
 	addField( "sizeIconToButton", TypeBool,      Offset( mFitBitmapToButton, GuiIconSpawnerButtonCtrl ),"If true, the icon will be scaled to be the same size as the button.\n");
 	addField( "makeIconSquare",   TypeBool,      Offset( mMakeIconSquare, GuiIconSpawnerButtonCtrl ),"If true, will make sure the icon is square.\n");
 	addField( "autoSize",         TypeBool,      Offset( mAutoSize, GuiIconSpawnerButtonCtrl ),"If true, the text and icon will be automatically sized to the size of the control.\n");
-	addField( "progressBar",      TypeBool,      Offset( mHasProgress, GuiIconSpawnerButtonCtrl ),"If true, the spawned icon will have a progress bar\n");
 
 	Parent::Parent::initPersistFields();
 }
@@ -69,10 +65,7 @@ void GuiIconSpawnerButtonCtrl::onMouseDragged(const GuiEvent &event)
 	container->setDataField( StringTable->insert("hovertime"), NULL, "1000" );
 
 	GuiIconControl* icon;
-	if (mHasProgress)
-		icon = new DynamicSprite();
-	else
-		icon = new GuiIconControl();
+	icon = new GuiIconControl();
 	icon->registerObject();
 	icon->setBitmap(getBitmapName());
 	icon->setExtent(getExtent());

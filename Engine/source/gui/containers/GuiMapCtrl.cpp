@@ -9,7 +9,6 @@
 //- Headers -------------------------------------------------------------------
 #include "console/engineAPI.h"
 #include "GuiMapCtrl.h"
-#include "gui/containers/guiGridCtrl.h"
 #include "gui/core/guiCanvas.h"
 
 //- Class Implementation ------------------------------------------------------

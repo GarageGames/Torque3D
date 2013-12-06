@@ -19,7 +19,6 @@ public:
 
 protected:
 	GuiControl* mDragSourceControl;
-	bool mHasProgress;
 
 public:
 	GuiIconSpawnerButtonCtrl();
