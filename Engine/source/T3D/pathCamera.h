@@ -48,6 +48,7 @@ struct PathCameraData: public ShapeBaseData {
 //----------------------------------------------------------------------------
 class PathCamera: public ShapeBase
 {
+   typedef PathCamera privateThisClassType;
 public:
    enum State {
       Forward,
@@ -93,7 +94,7 @@ private:
 public:
    DECLARE_CONOBJECT(PathCamera);
    
-   DECLARE_CALLBACK( void, onNode, (const char* node));
+   DECLARE_SIMSIGNAL( public, onNode, (const char* node));
 
    PathCamera();
    ~PathCamera();

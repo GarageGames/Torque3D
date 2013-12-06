@@ -58,7 +58,7 @@ ConsoleDocClass( Prefab,
    "@ingroup enviroMisc"   
 );
 
-IMPLEMENT_CALLBACK( Prefab, onLoad, void, ( SimGroup *children ), ( children ),
+IMPLEMENT_SIMSIGNAL( Prefab, onLoad, ( SimGroup *children ), ( children ),
    "Called when the prefab file is loaded and children objects are created.\n"
    "@param children SimGroup containing all children objects.\n"
 );

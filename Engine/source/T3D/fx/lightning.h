@@ -151,6 +151,7 @@ struct LightningBolt
 // -------------------------------------------------------------------------
 class Lightning : public GameBase
 {
+   typedef Lightning privateThisClassType;
    typedef GameBase Parent;
 
   protected:
@@ -158,7 +159,7 @@ class Lightning : public GameBase
    void onRemove();
    bool onNewDataBlock( GameBaseData *dptr, bool reload );
 
-   DECLARE_CALLBACK( void, applyDamage, ( const Point3F& hitPosition, const Point3F& hitNormal, SceneObject* hitObject ));
+   DECLARE_SIMSIGNAL( protected, applyDamage, ( const Point3F& hitPosition, const Point3F& hitNormal, SceneObject* hitObject ));
 
    struct Strike {
       F32     xVal;             // Position in cloud layer of strike

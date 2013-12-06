@@ -97,7 +97,7 @@ ConsoleDocClass( GuiMenuBar,
    "@ingroup GuiCore\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMouseInMenu, void, (bool isInMenu),( isInMenu ),
+IMPLEMENT_SIMSIGNAL( GuiMenuBar, onMouseInMenu, (bool isInMenu),( isInMenu ),
    "@brief Called whenever the mouse enters, or persists is in the menu.\n\n"
    "@param isInMenu True if the mouse has entered the menu, otherwise is false.\n"
    "@note To receive this callback, call setProcessTicks(true) on the menu bar.\n"
@@ -111,7 +111,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMouseInMenu, void, (bool isInMenu),( isInMenu 
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( const char* menuId, const char* menuText ),( menuId , menuText ),
+IMPLEMENT_SIMSIGNAL( GuiMenuBar, onMenuSelect, ( const char* menuId, const char* menuText ),( menuId , menuText ),
    "@brief Called whenever a menu is selected.\n\n"
    "@param menuId Index id of the clicked menu\n"
    "@param menuText Text of the clicked menu\n\n"
@@ -125,7 +125,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( const char* menuId, const 
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText ),
+IMPLEMENT_SIMSIGNAL( GuiMenuBar, onMenuItemSelect, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText ),
 												   ( menuId, menuText, menuItemId, menuItemText ),
    "@brief Called whenever an item in a menu is selected.\n\n"
    "@param menuId Index id of the menu which contains the selected menu item\n"
@@ -142,7 +142,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( const char* menuId, co
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( const char* submenuId, const char* submenuText ),( submenuId, submenuText ),
+IMPLEMENT_SIMSIGNAL( GuiMenuBar, onSubmenuSelect, ( const char* submenuId, const char* submenuText ),( submenuId, submenuText ),
    "@brief Called whenever a submenu is selected.\n\n"
    "@param submenuId Id of the selected submenu\n"
    "@param submenuText Text of the selected submenu\n\n"

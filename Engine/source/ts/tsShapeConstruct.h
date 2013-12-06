@@ -47,6 +47,7 @@
 /// with the .dsqs to create a nice animated model.
 class TSShapeConstructor : public SimObject
 {
+   typedef TSShapeConstructor privateThisClassType;
    typedef SimObject Parent;
 
 public:
@@ -235,8 +236,8 @@ protected:
    
    /// @name Callbacks
    ///@{
-   DECLARE_CALLBACK( void, onLoad, () );
-   DECLARE_CALLBACK( void, onUnload, () );
+   DECLARE_SIMSIGNAL( protected, onLoad, () );
+   DECLARE_SIMSIGNAL( protected, onUnload, () );
    ///@}
 
    virtual void      _onLoad( TSShape* shape );

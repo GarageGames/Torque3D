@@ -55,11 +55,11 @@ ConsoleDocClass( PostEffect,
    "@ingroup Rendering\n"
 );
 
-IMPLEMENT_CALLBACK( PostEffect, onAdd, void, (), (),
+IMPLEMENT_SIMSIGNAL( PostEffect, onAdd, (), (),
    "Called when this object is first created and registered."
 );
 
-IMPLEMENT_CALLBACK( PostEffect, preProcess, void, (), (),
+IMPLEMENT_SIMSIGNAL( PostEffect, preProcess, (), (),
    "Called when an effect is processed but before textures are bound. This "
    "allows the user to change texture related paramaters or macros at runtime.\n"
    "@tsexample\n"   
@@ -78,19 +78,19 @@ IMPLEMENT_CALLBACK( PostEffect, preProcess, void, (), (),
    "@see setShaderMacro"
 );
 
-IMPLEMENT_CALLBACK( PostEffect, setShaderConsts, void, (), (),
+IMPLEMENT_SIMSIGNAL( PostEffect, setShaderConsts, (), (),
    "Called immediate before processing this effect. This is the user's chance "
    "to set the value of shader uniforms (constants).\n"
    "@see setShaderConst"
 );
 
-IMPLEMENT_CALLBACK( PostEffect, onEnabled, bool, (), (),
+IMPLEMENT_SIMDELEGATE( PostEffect, onEnabled, bool, (), (),
    "Called when this effect becomes enabled. If the user returns false from "
    "this callback the effect will not be enabled.\n"
    "@return True to allow this effect to be enabled."
 );
 
-IMPLEMENT_CALLBACK( PostEffect, onDisabled, void, (), (),
+IMPLEMENT_SIMSIGNAL( PostEffect, onDisabled, (), (),
    "Called when this effect becomes disabled."
 );
 

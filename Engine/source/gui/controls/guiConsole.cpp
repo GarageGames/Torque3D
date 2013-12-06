@@ -45,7 +45,7 @@ ConsoleDocClass( GuiConsole,
    "@ingroup GuiCore"
 );
 
-IMPLEMENT_CALLBACK( GuiConsole, onMessageSelected, void, ( ConsoleLogEntry::Level level, const char* message ), ( level, message ),
+IMPLEMENT_SIMSIGNAL( GuiConsole, onMessageSelected, ( ConsoleLogEntry::Level level, const char* message ), ( level, message ),
    "Called when a message in the log is clicked.\n\n"
    "@param level Diagnostic level of the message.\n"
    "@param message Message text.\n" );

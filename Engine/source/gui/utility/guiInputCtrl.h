@@ -32,6 +32,7 @@
 /// to script.  This is useful for implementing custom keyboard handling code.
 class GuiInputCtrl : public GuiMouseEventCtrl
 {
+   typedef GuiInputCtrl privateThisClassType;
    public:
 
       typedef GuiMouseEventCtrl Parent;
@@ -48,7 +49,7 @@ class GuiInputCtrl : public GuiMouseEventCtrl
       DECLARE_CATEGORY( "Gui Other Script" );
       DECLARE_DESCRIPTION( "A control that locks the mouse and reports all keyboard input events to script." );
 
-	  DECLARE_CALLBACK( void, onInputEvent, ( const char* device, const char* action, bool state ));
+	  DECLARE_SIMSIGNAL( public, onInputEvent, ( const char* device, const char* action, bool state ));
 };
 
 #endif // _GUI_INPUTCTRL_H

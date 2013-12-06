@@ -72,22 +72,22 @@ ConsoleDocClass( ShapeBaseData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onEnabled, void, ( ShapeBase* obj, const char* lastState ), ( obj, lastState ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onEnabled, ( ShapeBase* obj, const char* lastState ), ( obj, lastState ),
    "@brief Called when the object damage state changes to Enabled.\n\n"
    "@param obj The ShapeBase object\n"
    "@param lastState The previous damage state\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onDisabled, void, ( ShapeBase* obj, const char* lastState ), ( obj, lastState ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onDisabled, ( ShapeBase* obj, const char* lastState ), ( obj, lastState ),
    "@brief Called when the object damage state changes to Disabled.\n\n"
    "@param obj The ShapeBase object\n"
    "@param lastState The previous damage state\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onDestroyed, void, ( ShapeBase* obj, const char* lastState ), ( obj, lastState ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onDestroyed, ( ShapeBase* obj, const char* lastState ), ( obj, lastState ),
    "@brief Called when the object damage state changes to Destroyed.\n\n"
    "@param obj The ShapeBase object\n"
    "@param lastState The previous damage state\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onImpact, void, ( ShapeBase* obj, SceneObject *collObj, VectorF vec, F32 len ), ( obj, collObj, vec, len ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onImpact, ( ShapeBase* obj, SceneObject *collObj, VectorF vec, F32 len ), ( obj, collObj, vec, len ),
    "@brief Called when we collide with another object beyond some impact speed.\n\n"
    "The Player class makes use of this callback when a collision speed is more than PlayerData::minImpactSpeed.\n"
    "@param obj The ShapeBase object\n"
@@ -95,32 +95,32 @@ IMPLEMENT_CALLBACK( ShapeBaseData, onImpact, void, ( ShapeBase* obj, SceneObject
    "@param vec Collision impact vector\n"
    "@param len Length of the impact vector\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onCollision, void, ( ShapeBase* obj, SceneObject *collObj, VectorF vec, F32 len ), ( obj, collObj, vec, len ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onCollision, ( ShapeBase* obj, SceneObject *collObj, VectorF vec, F32 len ), ( obj, collObj, vec, len ),
    "@brief Called when we collide with another object.\n\n"
    "@param obj The ShapeBase object\n"
    "@param collObj The object we collided with\n"
    "@param vec Collision impact vector\n"
    "@param len Length of the impact vector\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onDamage, void, ( ShapeBase* obj, F32 delta ), ( obj, delta ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onDamage, ( ShapeBase* obj, F32 delta ), ( obj, delta ),
    "@brief Called when the object is damaged.\n\n"
    "@param obj The ShapeBase object\n"
    "@param obj The ShapeBase object\n"
    "@param delta The amount of damage received." );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onTrigger, void, ( ShapeBase* obj, S32 index, bool state ), ( obj, index, state ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onTrigger, ( ShapeBase* obj, S32 index, bool state ), ( obj, index, state ),
    "@brief Called when a move trigger input changes state.\n\n"
    "@param obj The ShapeBase object\n"
    "@param index Index of the trigger that changed\n"
    "@param state New state of the trigger\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onEndSequence, void, ( ShapeBase* obj, S32 slot ), ( obj, slot ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onEndSequence, ( ShapeBase* obj, S32 slot ), ( obj, slot ),
    "@brief Called when a thread playing a non-cyclic sequence reaches the end of the "
    "sequence.\n\n"
    "@param obj The ShapeBase object\n"
    "@param slot Thread slot that finished playing\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onForceUncloak, void, ( ShapeBase* obj, const char* reason ), ( obj, reason ),
+IMPLEMENT_SIMSIGNAL( ShapeBaseData, onForceUncloak, ( ShapeBase* obj, const char* reason ), ( obj, reason ),
    "@brief Called when the object is forced to uncloak.\n\n"
    "@param obj The ShapeBase object\n"
    "@param reason String describing why the object was uncloaked\n" );
@@ -853,7 +853,7 @@ ConsoleDocClass( ShapeBase,
    "@ingroup gameObjects"
 );
 
-IMPLEMENT_CALLBACK( ShapeBase, validateCameraFov, F32, (F32 fov), (fov),
+IMPLEMENT_SIMDELEGATE( ShapeBase, validateCameraFov, F32, (F32 fov), (fov),
    "@brief Called on the server when the client has requested a FOV change.\n\n"
 
    "When the client requests that its field of view should be changed (because "

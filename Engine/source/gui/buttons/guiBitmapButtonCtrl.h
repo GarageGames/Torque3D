@@ -51,6 +51,7 @@
 ///
 class GuiBitmapButtonCtrl : public GuiButtonCtrl
 {
+   typedef GuiBitmapButtonCtrl privateThisClassType;
    public:
    
       typedef GuiButtonCtrl Parent;
@@ -139,10 +140,10 @@ class GuiBitmapButtonCtrl : public GuiButtonCtrl
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onDefaultClick, () );
-      DECLARE_CALLBACK( void, onCtrlClick, () );
-      DECLARE_CALLBACK( void, onAltClick, () );
-      DECLARE_CALLBACK( void, onShiftClick, () );
+      DECLARE_SIMSIGNAL( protected, onDefaultClick, () );
+      DECLARE_SIMSIGNAL( protected, onCtrlClick, () );
+      DECLARE_SIMSIGNAL( protected, onAltClick, () );
+      DECLARE_SIMSIGNAL( protected, onShiftClick, () );
       
       /// @}
 

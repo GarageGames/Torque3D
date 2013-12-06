@@ -48,7 +48,6 @@
    #include "console/simObjectRef.h"
 #endif
 
-
 /// @file
 /// Legacy console object system.
 

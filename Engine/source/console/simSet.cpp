@@ -100,10 +100,10 @@ ConsoleDocClass( SimGroup,
    "@ingroup Scripting"
 );
 
-IMPLEMENT_CALLBACK( SimSet, onObjectAdded, void, ( SimObject* object ), ( object ),
+IMPLEMENT_SIMSIGNAL( SimSet, onObjectAdded, ( SimObject* object ), ( object ),
    "Called when an object is added to the set.\n"
    "@param object The object that was added." );
-IMPLEMENT_CALLBACK( SimSet, onObjectRemoved, void, ( SimObject* object ), ( object ),
+IMPLEMENT_SIMSIGNAL( SimSet, onObjectRemoved, ( SimObject* object ), ( object ),
    "Called when an object is removed from the set.\n"
    "@param object The object that was removed." );
    

@@ -41,45 +41,45 @@ ConsoleDocClass( GuiEditCtrl,
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiEditCtrl, onHierarchyChanged, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onHierarchyChanged, (), (),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onDelete, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onDelete, (), (),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onPreEdit, void, ( SimSet* selection ), ( selection ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onPreEdit, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onPostEdit, void, ( SimSet* selection ), ( selection ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onPostEdit, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onClearSelected, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onClearSelected, (), (),
    "" )
-IMPLEMENT_CALLBACK( GuiEditCtrl, onSelect, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onSelect, ( GuiControl* control ), ( control ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onAddSelected, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onAddSelected, ( GuiControl* control ), ( control ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onRemoveSelected, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onRemoveSelected, ( GuiControl* control ), ( control ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onPreSelectionNudged, void, ( SimSet* selection ), ( selection ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onPreSelectionNudged, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onPostSelectionNudged, void, ( SimSet* selection ), ( selection ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onPostSelectionNudged, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onSelectionMoved, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onSelectionMoved, ( GuiControl* control ), ( control ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onSelectionCloned, void, ( SimSet* selection ), ( selection ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onSelectionCloned, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onTrashSelection, void, ( SimSet* selection ), ( selection ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onTrashSelection, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onAddNewCtrl, void, ( GuiControl* control ), ( control ),   
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onAddNewCtrl, ( GuiControl* control ), ( control ),   
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onAddNewCtrlSet, void, ( SimSet* set ), ( set ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onAddNewCtrlSet, ( SimSet* set ), ( set ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onSelectionResized, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onSelectionResized, ( GuiControl* control ), ( control ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onFitIntoParent, void, ( bool width, bool height ), ( width, height ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onFitIntoParent, ( bool width, bool height ), ( width, height ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onMouseModeChange, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onMouseModeChange, (), (),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onControlInspectPreApply, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onControlInspectPreApply, ( GuiControl* control ), ( control ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onControlInspectPostApply, void, ( GuiControl* control ), ( control ),
+IMPLEMENT_SIMSIGNAL( GuiEditCtrl, onControlInspectPostApply, ( GuiControl* control ), ( control ),
    "" );
 
 

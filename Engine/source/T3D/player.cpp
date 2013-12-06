@@ -187,57 +187,57 @@ ConsoleDocClass( PlayerData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( PlayerData, onPoseChange, void, ( Player* obj, const char* oldPose, const char* newPose ), ( obj, oldPose, newPose ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onPoseChange, ( Player* obj, const char* oldPose, const char* newPose ), ( obj, oldPose, newPose ),
    "@brief Called when the player changes poses.\n\n"
    "@param obj The Player object\n"
    "@param oldPose The pose the player is switching from.\n"
    "@param newPose The pose the player is switching to.\n");
 
-IMPLEMENT_CALLBACK( PlayerData, onStartSwim, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onStartSwim, ( Player* obj ), ( obj ),
    "@brief Called when the player starts swimming.\n\n"
    "@param obj The Player object\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onStopSwim, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onStopSwim, ( Player* obj ), ( obj ),
    "@brief Called when the player stops swimming.\n\n"
    "@param obj The Player object\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onStartSprintMotion, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onStartSprintMotion, ( Player* obj ), ( obj ),
    "@brief Called when the player starts moving while in a Sprint pose.\n\n"
    "@param obj The Player object\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onStopSprintMotion, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onStopSprintMotion, ( Player* obj ), ( obj ),
    "@brief Called when the player stops moving while in a Sprint pose.\n\n"
    "@param obj The Player object\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, doDismount, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, doDismount, ( Player* obj ), ( obj ),
    "@brief Called when attempting to dismount the player from a vehicle.\n\n"
    "It is up to the doDismount() method to actually perform the dismount.  Often "
    "there are some conditions that prevent this, such as the vehicle moving too fast.\n"
    "@param obj The Player object\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onEnterLiquid, void, ( Player* obj, F32 coverage, const char* type ), ( obj, coverage, type ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onEnterLiquid, ( Player* obj, F32 coverage, const char* type ), ( obj, coverage, type ),
    "@brief Called when the player enters a liquid.\n\n"
    "@param obj The Player object\n"
    "@param coverage Percentage of the player's bounding box covered by the liquid\n"
    "@param type The type of liquid the player has entered\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onLeaveLiquid, void, ( Player* obj, const char* type ), ( obj, type ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onLeaveLiquid, ( Player* obj, const char* type ), ( obj, type ),
    "@brief Called when the player leaves a liquid.\n\n"
    "@param obj The Player object\n"
    "@param type The type of liquid the player has left\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, animationDone, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, animationDone, ( Player* obj ), ( obj ),
    "@brief Called on the server when a scripted animation completes.\n\n"
    "@param obj The Player object\n"
    "@see Player::setActionThread() for setting a scripted animation and its 'hold' parameter to "
    "determine if this callback is used.\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onEnterMissionArea, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onEnterMissionArea, ( Player* obj ), ( obj ),
    "@brief Called when the player enters the mission area.\n\n"
    "@param obj The Player object\n"
    "@see MissionArea\n" );
 
-IMPLEMENT_CALLBACK( PlayerData, onLeaveMissionArea, void, ( Player* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( PlayerData, onLeaveMissionArea, ( Player* obj ), ( obj ),
    "@brief Called when the player leaves the mission area.\n"
    "@param obj The Player object\n"
    "@see MissionArea\n" );

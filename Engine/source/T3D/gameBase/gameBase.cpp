@@ -55,7 +55,7 @@ ConsoleDocClass( GameBaseData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( GameBaseData, onAdd, void, ( GameBase* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( GameBaseData, onAdd, ( GameBase* obj ), ( obj ),
    "@brief Called when the object is added to the scene.\n\n"
 
    "@param obj the GameBase object\n\n"
@@ -87,31 +87,31 @@ IMPLEMENT_CALLBACK( GameBaseData, onAdd, void, ( GameBase* obj ), ( obj ),
       "}\n\n"
    "@endtsexample\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onNewDataBlock, void, ( GameBase* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( GameBaseData, onNewDataBlock, ( GameBase* obj ), ( obj ),
    "@brief Called when the object has a new datablock assigned.\n\n"
    "@param obj the GameBase object\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onRemove, void, ( GameBase* obj ), ( obj ),
+IMPLEMENT_SIMSIGNAL( GameBaseData, onRemove, ( GameBase* obj ), ( obj ),
    "@brief Called when the object is removed from the scene.\n\n"
    "@param obj the GameBase object\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onMount, void, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
+IMPLEMENT_SIMSIGNAL( GameBaseData, onMount, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
    "@brief Called when the object is mounted to another object in the scene.\n\n"
    "@param obj the GameBase object being mounted\n"
    "@param mountObj the object we are mounted to\n"
    "@param node the mountObj node we are mounted to\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onUnmount, void, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
+IMPLEMENT_SIMSIGNAL( GameBaseData, onUnmount, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
    "@brief Called when the object is unmounted from another object in the scene.\n\n"
    "@param obj the GameBase object being unmounted\n"
    "@param mountObj the object we are unmounted from\n"
    "@param node the mountObj node we are unmounted from\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBase, setControl, void, ( bool controlled ), ( controlled ),
+IMPLEMENT_SIMSIGNAL( GameBase, setControl, ( bool controlled ), ( controlled ),
    "@brief Called when the client controlling the object changes.\n\n"
    "@param controlled true if a client now controls this object, false if no "
    "client controls this object.\n" );

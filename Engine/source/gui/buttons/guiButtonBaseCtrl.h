@@ -33,6 +33,7 @@
 ///
 class GuiButtonBaseCtrl : public GuiControl
 {
+   typedef GuiButtonBaseCtrl privateThisClassType;
    public:
    
       typedef GuiControl Parent;
@@ -65,14 +66,14 @@ class GuiButtonBaseCtrl : public GuiControl
 	   /// @name Callbacks
 	   /// @{
 
-      DECLARE_CALLBACK( void, onMouseDown, () );   
-	   DECLARE_CALLBACK( void, onMouseUp, () );
-	   DECLARE_CALLBACK( void, onClick, () );
-	   DECLARE_CALLBACK( void, onRightClick, () );
-	   DECLARE_CALLBACK( void, onDoubleClick, () );    
-	   DECLARE_CALLBACK( void, onMouseEnter, () );   
-	   DECLARE_CALLBACK( void, onMouseLeave, () );      
-	   DECLARE_CALLBACK( void, onMouseDragged, () );   
+      DECLARE_SIMSIGNAL( protected, onMouseDown, () );   
+	   DECLARE_SIMSIGNAL( protected, onMouseUp, () );
+	   DECLARE_SIMSIGNAL( protected, onClick, () );
+	   DECLARE_SIMSIGNAL( protected, onRightClick, () );
+	   DECLARE_SIMSIGNAL( protected, onDoubleClick, () );    
+	   DECLARE_SIMSIGNAL( protected, onMouseEnter, () );   
+	   DECLARE_SIMSIGNAL( protected, onMouseLeave, () );      
+	   DECLARE_SIMSIGNAL( protected, onMouseDragged, () );   
 
       /// @}
 

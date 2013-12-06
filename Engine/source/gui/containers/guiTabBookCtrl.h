@@ -58,6 +58,7 @@
 /// @nosubgrouping
 class GuiTabBookCtrl : public GuiContainer
 {
+   typedef GuiTabBookCtrl privateThisClassType;
    public:
    
       typedef GuiContainer Parent;
@@ -115,8 +116,8 @@ class GuiTabBookCtrl : public GuiContainer
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onTabSelected, ( const String& text, U32 index ) );
-      DECLARE_CALLBACK( void, onTabRightClick, ( const String& text, U32 index ) );
+      DECLARE_SIMSIGNAL( protected, onTabSelected, ( const String& text, U32 index ) );
+      DECLARE_SIMSIGNAL( protected, onTabRightClick, ( const String& text, U32 index ) );
       
       /// @}
       

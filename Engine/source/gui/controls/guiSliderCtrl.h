@@ -31,6 +31,7 @@
 /// A slider control that selects out of a floating-point value range.
 class GuiSliderCtrl : public GuiControl
 {
+   typedef GuiSliderCtrl privateThisClassType;
    public:
    
       typedef GuiControl Parent;
@@ -69,7 +70,7 @@ class GuiSliderCtrl : public GuiControl
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onMouseDragged, () );
+      DECLARE_SIMSIGNAL( protected, onMouseDragged, () );
       
       /// @}
       

@@ -79,34 +79,34 @@ void GuiScriptNotifyCtrl::initPersistFields()
    Parent::initPersistFields();
 }
 
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onResize, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onResize, ( SimObjectId ID ), ( ID ),
 	"Called when this GUI is resized.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onChildAdded, void, ( SimObjectId ID, SimObjectId childID ), ( ID, childID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onChildAdded, ( SimObjectId ID, SimObjectId childID ), ( ID, childID ),
 	"Called when a child is added to this GUI.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 	"@param childID Unique object ID of child being added.\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onChildRemoved, void, ( SimObjectId ID, SimObjectId childID ), ( ID, childID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onChildRemoved, ( SimObjectId ID, SimObjectId childID ), ( ID, childID ),
 	"Called when a child is removed from this GUI.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 	"@param childID Unique object ID of child being removed.\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onChildResized, void, ( SimObjectId ID, SimObjectId childID ), ( ID, childID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onChildResized, ( SimObjectId ID, SimObjectId childID ), ( ID, childID ),
 	"Called when a child is of this GUI is being resized.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 	"@param childID Unique object ID of child being resized.\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onParentResized, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onParentResized, ( SimObjectId ID ), ( ID ),
 	"Called when this GUI's parent is resized.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onLoseFirstResponder, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onLoseFirstResponder, ( SimObjectId ID ), ( ID ),
 	"Called when this GUI loses focus.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onGainFirstResponder, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( GuiScriptNotifyCtrl, onGainFirstResponder, ( SimObjectId ID ), ( ID ),
 	"Called when this GUI gains focus.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );

@@ -100,48 +100,48 @@ ConsoleDocClass( GameConnection,
    "@ingroup Networking\n");
 
 //----------------------------------------------------------------------------
-IMPLEMENT_CALLBACK( GameConnection, onConnectionTimedOut, void, (), (),
+IMPLEMENT_SIMSIGNAL( GameConnection, onConnectionTimedOut, (), (),
    "@brief Called on the client when the connection to the server times out.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onConnectionAccepted, void, (), (),
+IMPLEMENT_SIMSIGNAL( GameConnection, onConnectionAccepted, (), (),
    "@brief Called on the client when the connection to the server has been established.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onConnectRequestTimedOut, void, (), (),
+IMPLEMENT_SIMSIGNAL( GameConnection, onConnectRequestTimedOut, (), (),
    "@brief Called when connection attempts have timed out.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onConnectionDropped, void, (const char* reason), (reason),
+IMPLEMENT_SIMSIGNAL( GameConnection, onConnectionDropped, (const char* reason), (reason),
    "@brief Called on the client when the connection to the server has been dropped.\n\n"
    "@param reason The reason why the connection was dropped.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onConnectRequestRejected, void, (const char* reason), (reason),
+IMPLEMENT_SIMSIGNAL( GameConnection, onConnectRequestRejected, (const char* reason), (reason),
    "@brief Called on the client when the connection to the server has been rejected.\n\n"
    "@param reason The reason why the connection request was rejected.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onConnectionError, void, (const char* errorString), (errorString),
+IMPLEMENT_SIMSIGNAL( GameConnection, onConnectionError, (const char* errorString), (errorString),
    "@brief Called on the client when there is an error with the connection to the server.\n\n"
    "@param errorString The connection error text.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onDrop, void, (const char* disconnectReason), (disconnectReason),
+IMPLEMENT_SIMSIGNAL( GameConnection, onDrop, (const char* disconnectReason), (disconnectReason),
    "@brief Called on the server when the client's connection has been dropped.\n\n"
    "@param disconnectReason The reason why the connection was dropped.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, initialControlSet, void, (), (),
+IMPLEMENT_SIMSIGNAL( GameConnection, initialControlSet, (), (),
    "@brief Called on the client when the first control object has been set by the "
    "server and we are now ready to go.\n\n"
    "A common action to perform when this callback is called is to switch the GUI "
    "canvas from the loading screen and over to the 3D game GUI.");
 
-IMPLEMENT_CALLBACK( GameConnection, onControlObjectChange, void, (), (),
+IMPLEMENT_SIMSIGNAL( GameConnection, onControlObjectChange, (), (),
    "@brief Called on the client when the control object has been changed by the "
    "server.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, setLagIcon, void, (bool state), (state),
+IMPLEMENT_SIMSIGNAL( GameConnection, setLagIcon, (bool state), (state),
    "@brief Called on the client to display the lag icon.\n\n"
    "When the connection with the server is lagging, this callback is called to "
    "allow the game GUI to display some indicator to the player.\n\n"
    "@param state Set to true if the lag icon should be displayed.\n\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onDataBlocksDone, void, (U32 sequence), (sequence),
+IMPLEMENT_SIMSIGNAL( GameConnection, onDataBlocksDone, (U32 sequence), (sequence),
    "@brief Called on the server when all datablocks has been sent to the client.\n\n"
    "During phase 1 of the mission download, all datablocks are sent from the server "
    "to the client.  Once all datablocks have been sent, this callback is called and "
@@ -153,7 +153,7 @@ IMPLEMENT_CALLBACK( GameConnection, onDataBlocksDone, void, (U32 sequence), (seq
    "the server every time a mission is loaded.\n\n"
    "@see GameConnection::transmitDataBlocks()\n\n");
 
-IMPLEMENT_GLOBAL_CALLBACK( onDataBlockObjectReceived, void, (U32 index, U32 total), (index, total),
+IMPLEMENT_GLOBAL_SIMSIGNAL( onDataBlockObjectReceived, (U32 index, U32 total), (index, total),
    "@brief Called on the client each time a datablock has been received.\n\n"
    "This callback is typically used to notify the player of how far along "
    "in the datablock download process they are.\n\n"
@@ -162,7 +162,7 @@ IMPLEMENT_GLOBAL_CALLBACK( onDataBlockObjectReceived, void, (U32 index, U32 tota
    "@see GameConnection, GameConnection::transmitDataBlocks(), GameConnection::onDataBlocksDone()\n\n"
    "@ingroup Networking\n");
 
-IMPLEMENT_CALLBACK( GameConnection, onFlash, void, (bool state), (state),
+IMPLEMENT_SIMSIGNAL( GameConnection, onFlash, (bool state), (state),
    "@brief Called on the client when the damage flash or white out states change.\n\n"
    "When the server changes the damage flash or white out values, this callback is called "
    "either is on or both are off.  Typically this is used to enable the flash postFx.\n\n"

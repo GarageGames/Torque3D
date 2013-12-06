@@ -32,8 +32,9 @@ class TurretShape;
 
 //----------------------------------------------------------------------------
 
-class TurretShapeData: public ItemData {
-
+class TurretShapeData: public ItemData 
+{
+   typedef TurretShapeData privateThisClassType;
    typedef ItemData Parent;
 
 public:
@@ -93,9 +94,9 @@ public:
 
    virtual bool preload(bool server, String &errorStr);
 
-   DECLARE_CALLBACK( void, onMountObject, ( TurretShape* turret, SceneObject* obj, S32 node ) );
-   DECLARE_CALLBACK( void, onUnmountObject, ( TurretShape* turret, SceneObject* obj ) );
-   DECLARE_CALLBACK( void, onStickyCollision, ( TurretShape* obj ) );
+   DECLARE_SIMSIGNAL( public, onMountObject, ( TurretShape* turret, SceneObject* obj, S32 node ) );
+   DECLARE_SIMSIGNAL( public, onUnmountObject, ( TurretShape* turret, SceneObject* obj ) );
+   DECLARE_SIMSIGNAL( public, onStickyCollision, ( TurretShape* obj ) );
 };
 
 typedef TurretShapeData::FireLinkType TurretShapeFireLinkType;

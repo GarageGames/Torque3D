@@ -34,6 +34,7 @@
 /// A control that fades a bitmap in and out.
 class GuiFadeinBitmapCtrl : public GuiBitmapCtrl
 {
+   typedef GuiFadeinBitmapCtrl privateThisClassType;
    public:
    
       typedef GuiBitmapCtrl Parent;
@@ -82,8 +83,8 @@ class GuiFadeinBitmapCtrl : public GuiBitmapCtrl
                            "then waits a set amount of time, and finally fades the bitmap back out in\n"
                            "another set amount of time." );
 
-	  DECLARE_CALLBACK( void, click, ());
-	  DECLARE_CALLBACK( void, onDone, ());
+	  DECLARE_SIMSIGNAL( public, click, ());
+	  DECLARE_SIMSIGNAL( public, onDone, ());
 };
 
 #endif // !_GUIFADEINBITMAPCTRL_H_

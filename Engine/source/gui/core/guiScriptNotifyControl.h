@@ -30,6 +30,7 @@
 class GuiScriptNotifyCtrl : public GuiControl
 {
 private:
+   typedef GuiScriptNotifyCtrl privateThisClassType;
    typedef GuiControl Parent;
 public:
 
@@ -62,13 +63,13 @@ public:
     virtual void onChildRemoved( GuiControl *child );
     virtual void onChildAdded( GuiControl *child );
 
-	DECLARE_CALLBACK(void, onResize, (SimObjectId ID) );
-	DECLARE_CALLBACK(void, onChildAdded, (SimObjectId ID, SimObjectId childID));
-	DECLARE_CALLBACK(void, onChildRemoved, (SimObjectId ID, SimObjectId childID));
-	DECLARE_CALLBACK(void, onChildResized, (SimObjectId ID, SimObjectId childID));
-	DECLARE_CALLBACK(void, onParentResized, (SimObjectId ID));
-	DECLARE_CALLBACK(void, onLoseFirstResponder, (SimObjectId ID));
-	DECLARE_CALLBACK(void, onGainFirstResponder, (SimObjectId ID));
+	DECLARE_SIMSIGNAL( public, onResize, (SimObjectId ID) );
+	DECLARE_SIMSIGNAL( public, onChildAdded, (SimObjectId ID, SimObjectId childID));
+	DECLARE_SIMSIGNAL( public, onChildRemoved, (SimObjectId ID, SimObjectId childID));
+	DECLARE_SIMSIGNAL( public, onChildResized, (SimObjectId ID, SimObjectId childID));
+	DECLARE_SIMSIGNAL( public, onParentResized, (SimObjectId ID));
+	DECLARE_SIMSIGNAL( public, onLoseFirstResponder, (SimObjectId ID));
+	DECLARE_SIMSIGNAL( public, onGainFirstResponder, (SimObjectId ID));
 	
 	
 	

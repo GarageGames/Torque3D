@@ -34,6 +34,7 @@
 /// A control that automatically scrolls its child control upwards.
 class GuiAutoScrollCtrl : public GuiTickCtrl
 {
+   typedef GuiAutoScrollCtrl privateThisClassType;
    public:
    
       typedef GuiTickCtrl Parent;
@@ -96,10 +97,10 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
       /// @name Callbacks
       /// @{
 
-      DECLARE_CALLBACK( void, onTick, () );
-      DECLARE_CALLBACK( void, onStart, () );
-      DECLARE_CALLBACK( void, onComplete, () );
-      DECLARE_CALLBACK( void, onReset, () );
+      DECLARE_SIMSIGNAL( protected, onTick, () );
+      DECLARE_SIMSIGNAL( protected, onStart, () );
+      DECLARE_SIMSIGNAL( protected, onComplete, () );
+      DECLARE_SIMSIGNAL( protected, onReset, () );
       
       /// @}
 

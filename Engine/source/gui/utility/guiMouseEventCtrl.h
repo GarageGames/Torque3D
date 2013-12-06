@@ -31,6 +31,7 @@
 class GuiMouseEventCtrl : public GuiControl
 {
    private:
+      typedef GuiMouseEventCtrl privateThisClassType;
       typedef  GuiControl     Parent;
       void sendMouseEvent(const char * name, const GuiEvent &);
 
@@ -41,15 +42,15 @@ class GuiMouseEventCtrl : public GuiControl
 
       GuiMouseEventCtrl();
 
-	  DECLARE_CALLBACK( void, onMouseDown, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseUp, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseMove, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseDragged, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseEnter, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseLeave, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-	  DECLARE_CALLBACK( void, onRightMouseDown, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-	  DECLARE_CALLBACK( void, onRightMouseUp, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-	  DECLARE_CALLBACK( void, onRightMouseDragged, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+	  DECLARE_SIMSIGNAL( public, onMouseDown, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+  	  DECLARE_SIMSIGNAL( public, onMouseUp, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+  	  DECLARE_SIMSIGNAL( public, onMouseMove, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+  	  DECLARE_SIMSIGNAL( public, onMouseDragged, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+  	  DECLARE_SIMSIGNAL( public, onMouseEnter, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+  	  DECLARE_SIMSIGNAL( public, onMouseLeave, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+	  DECLARE_SIMSIGNAL( public, onRightMouseDown, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+	  DECLARE_SIMSIGNAL( public, onRightMouseUp, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+	  DECLARE_SIMSIGNAL( public, onRightMouseDragged, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
 
       // GuiControl
       void onMouseDown(const GuiEvent & event);

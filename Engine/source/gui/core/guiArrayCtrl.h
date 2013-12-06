@@ -34,7 +34,7 @@
 class GuiArrayCtrl : public GuiControl
 {
    typedef GuiControl Parent;
-
+   typedef GuiArrayCtrl privateThisClassType;
 protected:
 
    Point2I mHeaderDim;
@@ -54,8 +54,8 @@ protected:
    /// @name Callbacks
    /// @{
 
-   DECLARE_CALLBACK( void, onCellHighlighted, ( const Point2I& cell ) );
-   DECLARE_CALLBACK( void, onCellSelected, ( const Point2I& cell ) );
+   DECLARE_SIMSIGNAL( protected, onCellHighlighted, ( const Point2I& cell ) );
+   DECLARE_SIMSIGNAL( protected, onCellSelected, ( const Point2I& cell ) );
 
    /// @}
 

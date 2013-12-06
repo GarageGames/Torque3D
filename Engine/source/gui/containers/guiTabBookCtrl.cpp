@@ -54,11 +54,11 @@ ImplementEnumType( GuiTabPosition,
    { GuiTabBookCtrl::AlignBottom,"Bottom",   "Tab headers on bottom edge." }
 EndImplementEnumType;
 
-IMPLEMENT_CALLBACK( GuiTabBookCtrl, onTabSelected, void, ( const String& text, U32 index ), ( text, index ),
+IMPLEMENT_SIMSIGNAL( GuiTabBookCtrl, onTabSelected, ( const String& text, U32 index ), ( text, index ),
    "Called when a new tab page is selected.\n\n"
    "@param text Text of the page header for the tab that is being selected.\n"
    "@param index Index of the tab page being selected." );
-IMPLEMENT_CALLBACK( GuiTabBookCtrl, onTabRightClick, void, ( const String& text, U32 index ), ( text, index ),
+IMPLEMENT_SIMSIGNAL( GuiTabBookCtrl, onTabRightClick, ( const String& text, U32 index ), ( text, index ),
    "Called when the user right-clicks on a tab page header.\n\n"
    "@param text Text of the page header for the tab that is being selected.\n"
    "@param index Index of the tab page being selected." );

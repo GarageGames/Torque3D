@@ -37,6 +37,7 @@ class SFXTrack;
 GFX_DeclareTextureProfile(GFXMLTextureProfile);
 class GuiMLTextCtrl : public GuiControl
 {
+   typedef GuiMLTextCtrl privateThisClassType;
    typedef GuiControl Parent;
 
    //-------------------------------------- Public interfaces...
@@ -127,8 +128,8 @@ class GuiMLTextCtrl : public GuiControl
    GuiMLTextCtrl();
    ~GuiMLTextCtrl();
 
-   DECLARE_CALLBACK( void, onURL, (const char* url));
-   DECLARE_CALLBACK( void, onResize, ( const char* width, const char* maxY ));
+   DECLARE_SIMSIGNAL( public, onURL, (const char* url));
+   DECLARE_SIMSIGNAL( public, onResize, ( const char* width, const char* maxY ));
 
    // Text retrieval functions
    U32 getNumChars() const;

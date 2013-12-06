@@ -175,10 +175,10 @@ ConsoleDocClass( SFXSource,
 );
 
 
-IMPLEMENT_CALLBACK( SFXSource, onStatusChange, void, ( SFXStatus newStatus ), ( newStatus ),
+IMPLEMENT_SIMSIGNAL( SFXSource, onStatusChange, ( SFXStatus newStatus ), ( newStatus ),
    "Called when the playback status of the source changes.\n"
    "@param newStatus The new playback status." );
-IMPLEMENT_CALLBACK( SFXSource, onParameterValueChange, void, ( SFXParameter* parameter ), ( parameter ),
+IMPLEMENT_SIMSIGNAL( SFXSource, onParameterValueChange, ( SFXParameter* parameter ), ( parameter ),
    "Called when a parameter attached to the source changes value.\n"
    "This callback will be triggered before the value change has actually been applied to the source.\n"
    "@param parameter The parameter that has changed value.\n"

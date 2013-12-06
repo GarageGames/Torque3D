@@ -29,6 +29,9 @@
 #ifndef _REFBASE_H_
    #include "core/util/refBase.h"
 #endif
+#ifndef TORQUE_SIM_EVENT_DECLARATION_H
+   #include "console/tSimEventDeclaration.h"
+#endif
 
 /// Disable TMM for this file.
 #include "platform/tmm_off.h"
@@ -111,7 +114,7 @@ class EngineObject;
 #define DECLARE_DISPOSABLE                                                             \
    protected:                                                                          \
       typedef ::TrueType __IsDisposableType;                                           \
-      DECLARE_CALLBACK( void, onDispose, () );                                         \
+      DECLARE_SIMSIGNAL( protected, onDispose, () );                                         \
    public:                                                                             \
       virtual void destroySelf()                                                       \
       {                                                                                \

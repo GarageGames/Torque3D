@@ -85,7 +85,7 @@ ConsoleDocClass( Message,
 );
 
 //-----------------------------------------------------------------------------
-IMPLEMENT_CALLBACK(Message, onAdd, void, (),(),
+IMPLEMENT_SIMSIGNAL(Message, onAdd, (),(),
 				   "Script callback when a message is first created and registered.\n\n"
 				   "@tsexample\n"
 				   "function Message::onAdd(%this)\n"
@@ -106,7 +106,7 @@ bool Message::onAdd()
    return true;
 }
 
-IMPLEMENT_CALLBACK(Message, onRemove, void, (),(),
+IMPLEMENT_SIMSIGNAL(Message, onRemove, (),(),
 				   "Script callback when a message is deleted.\n\n"
 				   "@tsexample\n"
 				   "function Message::onRemove(%this)\n"

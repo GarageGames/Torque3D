@@ -119,7 +119,7 @@ void LightManager::initLightFields()
    }
 }
 
-IMPLEMENT_GLOBAL_CALLBACK( onLightManagerActivate, void, ( const char *name ), ( name ),
+IMPLEMENT_GLOBAL_SIMSIGNAL( onLightManagerActivate, ( const char *name ), ( name ),
    "A callback called by the engine when a light manager is activated.\n"
    "@param name The name of the light manager being activated.\n"
    "@ingroup Lighting\n" );
@@ -137,7 +137,7 @@ void LightManager::activate( SceneManager *sceneManager )
    onLightManagerActivate_callback( getName() );
 }
 
-IMPLEMENT_GLOBAL_CALLBACK( onLightManagerDeactivate, void, ( const char *name ), ( name ),
+IMPLEMENT_GLOBAL_SIMSIGNAL( onLightManagerDeactivate, ( const char *name ), ( name ),
    "A callback called by the engine when a light manager is deactivated.\n"
    "@param name The name of the light manager being deactivated.\n"
    "@ingroup Lighting\n" );

@@ -139,6 +139,7 @@ class RigidShapeData : public ShapeBaseData
 
 class RigidShape: public ShapeBase
 {
+   typedef RigidShape privateThisClassType;
    typedef ShapeBase Parent;
 
   private:
@@ -296,8 +297,8 @@ public:
    void unpackUpdate(NetConnection *conn,           BitStream *stream);
 
    DECLARE_CONOBJECT(RigidShape);
-   DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objId, const char* waterCoverage, const char* liquidType ));
-   DECLARE_CALLBACK( void, onLeaveLiquid, ( const char* objId, const char* liquidType ));
+   DECLARE_SIMSIGNAL( public, onEnterLiquid, ( const char* objId, const char* waterCoverage, const char* liquidType ));
+   DECLARE_SIMSIGNAL( public, onLeaveLiquid, ( const char* objId, const char* liquidType ));
 };
 
 

@@ -36,6 +36,7 @@ class GuiConsole : public GuiArrayCtrl
 {
    private:
       typedef GuiArrayCtrl Parent;
+      typedef GuiConsole privateThisClassType;
 
       Resource<GFont> mFont;
 
@@ -46,7 +47,7 @@ class GuiConsole : public GuiArrayCtrl
       /// @name Callbacks
       /// @{
 
-      DECLARE_CALLBACK( void, onMessageSelected, ( ConsoleLogEntry::Level level, const char* message ) );
+      DECLARE_SIMSIGNAL( protected, onMessageSelected, ( ConsoleLogEntry::Level level, const char* message ) );
 
       /// @}
 

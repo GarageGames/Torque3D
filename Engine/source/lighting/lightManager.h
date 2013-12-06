@@ -35,6 +35,9 @@
 #ifndef _LIGHTQUERY_H_
 #include "lighting/lightQuery.h"
 #endif
+#ifndef TORQUE_SIM_EVENT_DECLARATION_H
+   #include "console/tSimEventDeclaration.h"
+#endif
 
 class SimObject;
 class LightManager;
@@ -228,5 +231,8 @@ protected:
 
 /// Returns the current active light manager.
 #define LIGHTMGR LightManager::getActiveLM()
+
+DECLARE_GLOBAL_SIMSIGNAL( onLightManagerActivate, ( const char *name ));
+DECLARE_GLOBAL_SIMSIGNAL( onLightManagerDeactivate, ( const char *name ));
 
 #endif // _LIGHTMANAGER_H_

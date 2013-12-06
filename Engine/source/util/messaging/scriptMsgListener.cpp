@@ -70,7 +70,7 @@ ConsoleDoc("@class ScriptMsgListener\n"
 );
 
 //-----------------------------------------------------------------------------
-IMPLEMENT_CALLBACK(ScriptMsgListener, onAdd, void, (),(),
+IMPLEMENT_SIMSIGNAL(ScriptMsgListener, onAdd, (),(),
 				   "Script callback when a listener is first created and registered.\n\n"
 				   "@tsexample\n"
 				   "function ScriptMsgListener::onAdd(%this)\n"
@@ -91,7 +91,7 @@ bool ScriptMsgListener::onAdd()
    return true;
 }
 
-IMPLEMENT_CALLBACK(ScriptMsgListener, onRemove, void, (),(),
+IMPLEMENT_SIMSIGNAL(ScriptMsgListener, onRemove, (),(),
 				   "Script callback when a listener is deleted.\n\n"
 				   "@tsexample\n"
 				   "function ScriptMsgListener::onRemove(%this)\n"
@@ -113,7 +113,7 @@ void ScriptMsgListener::onRemove()
 //-----------------------------------------------------------------------------
 // Public Methods
 //-----------------------------------------------------------------------------
-IMPLEMENT_CALLBACK( ScriptMsgListener, onMessageReceived, bool, ( const char* queue, const char* event, const char* data ), ( queue, event, data ),
+IMPLEMENT_SIMDELEGATE( ScriptMsgListener, onMessageReceived, bool, ( const char* queue, const char* event, const char* data ), ( queue, event, data ),
    "Called when the listener has received a message.\n"
    "@param queue The name of the queue the message was dispatched to\n"
    "@param event The name of the event (function) that was triggered\n"
@@ -126,7 +126,7 @@ bool ScriptMsgListener::onMessageReceived(StringTableEntry queue, const char* ev
    //return dAtob(Con::executef(this, "onMessageReceived", queue, event, data));
 }
 
-IMPLEMENT_CALLBACK( ScriptMsgListener, onMessageObjectReceived, bool, ( const char* queue, Message *msg ), ( queue, msg ),
+IMPLEMENT_SIMDELEGATE( ScriptMsgListener, onMessageObjectReceived, bool, ( const char* queue, Message *msg ), ( queue, msg ),
    "Called when a message object (not just the message data) is passed to a listener.\n"
    "@param queue The name of the queue the message was dispatched to\n"
    "@param msg The message object\n"
@@ -141,7 +141,7 @@ bool ScriptMsgListener::onMessageObjectReceived(StringTableEntry queue, Message 
 }
 
 //-----------------------------------------------------------------------------
-IMPLEMENT_CALLBACK( ScriptMsgListener, onAddToQueue, void, ( const char* queue), ( queue),
+IMPLEMENT_SIMSIGNAL( ScriptMsgListener, onAddToQueue, ( const char* queue), ( queue),
 	"@brief Callback for when the listener is added to a queue\n\n"
 	"The default implementation of onAddToQueue() and onRemoveFromQueue() "
 	"provide tracking of the queues this listener is added to through the "
@@ -167,7 +167,7 @@ void ScriptMsgListener::onAddToQueue(StringTableEntry queue)
    /// @param queue The name of the queue the listener was removed from
    /// @see onAddToQueue()
    //-----------------------------------------------------------------------------
-IMPLEMENT_CALLBACK( ScriptMsgListener, onRemoveFromQueue, void, ( const char* queue), ( queue),
+IMPLEMENT_SIMSIGNAL( ScriptMsgListener, onRemoveFromQueue, ( const char* queue), ( queue),
 	"@brief Callback for when the listener is removed from a queue\n\n"
 	"The default implementation of onAddToQueue() and onRemoveFromQueue() "
 	"provide tracking of the queues this listener is added to through the "

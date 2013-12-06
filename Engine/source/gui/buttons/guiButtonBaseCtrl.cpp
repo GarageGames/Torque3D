@@ -51,34 +51,34 @@ ConsoleDocClass( GuiButtonBaseCtrl,
    "@ingroup GuiButtons"
 );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseDown, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onMouseDown, (), (),
    "If #useMouseEvents is true, this is called when the left mouse button is pressed on an (active) "
    "button." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseUp, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onMouseUp, (), (),
    "If #useMouseEvents is true, this is called when the left mouse button is release over an (active) "
    "button.\n\n"
    "@note To trigger actions, better use onClick() since onMouseUp() will also be called when the mouse was "
       "not originally pressed on the button." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onClick, (), (),
    "Called when the primary action of the button is triggered (e.g. by a left mouse click)." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onDoubleClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onDoubleClick, (), (),
    "Called when the left mouse button is double-clicked on the button." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onRightClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onRightClick, (), (),
    "Called when the right mouse button is clicked on the button." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseEnter, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onMouseEnter, (), (),
    "If #useMouseEvents is true, this is called when the mouse cursor moves over the button (only if the button "
    "is the front-most visible control, though)." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseLeave, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onMouseLeave, (), (),
    "If #useMouseEvents is true, this is called when the mouse cursor moves off the button (only if the button "
    "had previously received an onMouseEvent() event)." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseDragged, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiButtonBaseCtrl, onMouseDragged, (), (),
    "If #useMouseEvents is true, this is called when a left mouse button drag is detected, i.e. when the user "
    "pressed the left mouse button on the control and then moves the mouse over a certain distance threshold with "
    "the mouse button still pressed." );

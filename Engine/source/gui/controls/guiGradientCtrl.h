@@ -32,15 +32,16 @@
 
 class GuiGradientSwatchCtrl : public GuiSwatchButtonCtrl
 {
-private:		
+private:
+   typedef GuiGradientSwatchCtrl privateThisClassType;
 	typedef GuiSwatchButtonCtrl Parent;
 private:
 	Point2I mMouseDownPosition;
 	RectI mOrigBounds;
 public:
 	DECLARE_CONOBJECT(GuiGradientSwatchCtrl);
-	DECLARE_CALLBACK( void, onMouseDown, ());
-	DECLARE_CALLBACK( void, onDoubleClick, ());
+	DECLARE_SIMSIGNAL( public, onMouseDown, ());
+	DECLARE_SIMSIGNAL( public, onDoubleClick, ());
 	GuiGradientSwatchCtrl();
 	void onMouseDown(const GuiEvent &);
 	void onRightMouseDown(const GuiEvent &);

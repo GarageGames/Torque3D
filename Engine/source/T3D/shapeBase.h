@@ -130,6 +130,7 @@ class ShapeBaseConvex : public Convex
 
 struct ShapeBaseImageData: public GameBaseData {
   private:
+   typedef ShapeBaseImageData privateThisClassType;
    typedef GameBaseData Parent;
 
   public:
@@ -488,8 +489,8 @@ struct ShapeBaseImageData: public GameBaseData {
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onMount, ( ShapeBase* obj, S32 slot, F32 dt ) );
-   DECLARE_CALLBACK( void, onUnmount, ( ShapeBase* obj, S32 slot, F32 dt ) );
+   DECLARE_SIMSIGNAL( public, onMount, ( ShapeBase* obj, S32 slot, F32 dt ) );
+   DECLARE_SIMSIGNAL( public, onUnmount, ( ShapeBase* obj, S32 slot, F32 dt ) );
    /// @}
 };
 
@@ -507,6 +508,7 @@ DefineEnumType( ShapeBaseImageRecoilState );
 /// @nosubgrouping
 struct ShapeBaseData : public GameBaseData {
   private:
+   typedef ShapeBaseData privateThisClassType;
    typedef GameBaseData Parent;
    
    static bool _setMass( void* object, const char* index, const char* data );
@@ -641,15 +643,15 @@ public:
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onEnabled, ( ShapeBase* obj, const char* lastState ) );
-   DECLARE_CALLBACK( void, onDisabled, ( ShapeBase* obj, const char* lastState ) );
-   DECLARE_CALLBACK( void, onDestroyed, ( ShapeBase* obj, const char* lastState ) );
-   DECLARE_CALLBACK( void, onImpact, ( ShapeBase* obj, SceneObject* collObj, VectorF vec, F32 len ) );
-   DECLARE_CALLBACK( void, onCollision, ( ShapeBase* obj, SceneObject* collObj, VectorF vec, F32 len ) );
-   DECLARE_CALLBACK( void, onDamage, ( ShapeBase* obj, F32 delta ) );
-   DECLARE_CALLBACK( void, onTrigger, ( ShapeBase* obj, S32 index, bool state ) );
-   DECLARE_CALLBACK( void, onEndSequence, ( ShapeBase* obj, S32 slot ) );
-   DECLARE_CALLBACK( void, onForceUncloak, ( ShapeBase* obj, const char* reason ) );
+   DECLARE_SIMSIGNAL( public, onEnabled, ( ShapeBase* obj, const char* lastState ) );
+   DECLARE_SIMSIGNAL( public, onDisabled, ( ShapeBase* obj, const char* lastState ) );
+   DECLARE_SIMSIGNAL( public, onDestroyed, ( ShapeBase* obj, const char* lastState ) );
+   DECLARE_SIMSIGNAL( public, onImpact, ( ShapeBase* obj, SceneObject* collObj, VectorF vec, F32 len ) );
+   DECLARE_SIMSIGNAL( public, onCollision, ( ShapeBase* obj, SceneObject* collObj, VectorF vec, F32 len ) );
+   DECLARE_SIMSIGNAL( public, onDamage, ( ShapeBase* obj, F32 delta ) );
+   DECLARE_SIMSIGNAL( public, onTrigger, ( ShapeBase* obj, S32 index, bool state ) );
+   DECLARE_SIMSIGNAL( public, onEndSequence, ( ShapeBase* obj, S32 slot ) );
+   DECLARE_SIMSIGNAL( public, onForceUncloak, ( ShapeBase* obj, const char* reason ) );
    /// @}
 };
 
@@ -667,6 +669,7 @@ class CameraShake;
 /// @nosubgrouping
 class ShapeBase : public GameBase, public ISceneLight
 {
+   typedef ShapeBase privateThisClassType;
    friend class ShapeBaseConvex;
    friend struct ShapeBaseImageData;
    friend void waterFind(SceneObject*, void*);
@@ -1886,7 +1889,8 @@ public:
    DECLARE_CONOBJECT(ShapeBase);
 
 protected:
-   DECLARE_CALLBACK( F32, validateCameraFov, (F32 fov) );
+   DECLARE_SIMDELEGATE( protected,  F32, validateCameraFov, (F32 fov) );
+
 
 };
 

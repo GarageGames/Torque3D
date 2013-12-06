@@ -57,13 +57,13 @@ ConsoleDocClass( TriggerData,
    "@ingroup Datablocks\n"
 );
 
-IMPLEMENT_CALLBACK( TriggerData, onEnterTrigger, void, ( Trigger* trigger, GameBase* obj ), ( trigger, obj ),
+IMPLEMENT_SIMSIGNAL( TriggerData, onEnterTrigger, ( Trigger* trigger, GameBase* obj ), ( trigger, obj ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerData, onTickTrigger, void, ( Trigger* trigger ), ( trigger ),
+IMPLEMENT_SIMSIGNAL( TriggerData, onTickTrigger, ( Trigger* trigger ), ( trigger ),
    "@brief Called every tickPeriodMS number of milliseconds (as specified in the TriggerData) whenever "
    "one or more objects are inside the volume of the trigger.\n\n"
 
@@ -76,7 +76,7 @@ IMPLEMENT_CALLBACK( TriggerData, onTickTrigger, void, ( Trigger* trigger ), ( tr
    "@see Trigger::getNumObjects()\n"
    "@see Trigger::getObject()\n");
 
-IMPLEMENT_CALLBACK( TriggerData, onLeaveTrigger, void, ( Trigger* trigger, GameBase* obj ), ( trigger, obj ),
+IMPLEMENT_SIMSIGNAL( TriggerData, onLeaveTrigger, ( Trigger* trigger, GameBase* obj ), ( trigger, obj ),
    "@brief Called when an object leaves the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object left\n"
@@ -143,11 +143,11 @@ ConsoleDocClass( Trigger,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( Trigger, onAdd, void, ( U32 objectId ), ( objectId ),
+IMPLEMENT_SIMSIGNAL( Trigger, onAdd, ( U32 objectId ), ( objectId ),
    "@brief Called when the Trigger is being created.\n\n"
    "@param objectId the object id of the Trigger being created\n" );
 
-IMPLEMENT_CALLBACK( Trigger, onRemove, void, ( U32 objectId ), ( objectId ),
+IMPLEMENT_SIMSIGNAL( Trigger, onRemove, ( U32 objectId ), ( objectId ),
    "@brief Called just before the Trigger is deleted.\n\n"
    "@param objectId the object id of the Trigger being deleted\n" );
 

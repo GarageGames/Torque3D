@@ -37,7 +37,7 @@ ConsoleDocClass( GuiFormCtrl,
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiFormCtrl, onResize, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiFormCtrl, onResize, (), (),
    "Called when the control is resized." );
 
 GuiFormCtrl::GuiFormCtrl()

@@ -66,13 +66,13 @@ ConsoleDocClass( GuiAutoScrollCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiAutoScrollCtrl, onTick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiAutoScrollCtrl, onTick, (), (),
    "Called every 32ms on the control." );
-IMPLEMENT_CALLBACK( GuiAutoScrollCtrl, onStart, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiAutoScrollCtrl, onStart, (), (),
    "Called when the control starts to scroll." );
-IMPLEMENT_CALLBACK( GuiAutoScrollCtrl, onComplete, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiAutoScrollCtrl, onComplete, (), (),
    "Called when the child control has been scrolled in entirety." );
-IMPLEMENT_CALLBACK( GuiAutoScrollCtrl, onReset, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiAutoScrollCtrl, onReset, (), (),
    "Called when the child control is reset to its initial position and the cycle starts again." );
 
 

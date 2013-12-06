@@ -31,6 +31,7 @@ class GuiGameListMenuProfile;
 /// A base class for cross platform menu controls that are gamepad friendly.
 class GuiGameListMenuCtrl : public GuiControl
 {
+   typedef GuiGameListMenuCtrl privateThisClassType;
 public:
    typedef GuiControl Parent;
    typedef GuiGameListMenuProfile Profile;
@@ -223,7 +224,7 @@ protected:
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onChange, () );
+   DECLARE_SIMSIGNAL( protected, onChange, () );
    /// @}
 
    /// Evaluates some script. If the command is empty then nothing is evaluated.

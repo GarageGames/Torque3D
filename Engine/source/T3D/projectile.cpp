@@ -104,7 +104,7 @@ ConsoleDocClass( Projectile,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( ProjectileData, onExplode, void, ( Projectile* proj, Point3F pos, F32 fade ), 
+IMPLEMENT_SIMSIGNAL( ProjectileData, onExplode, ( Projectile* proj, Point3F pos, F32 fade ), 
                    ( proj, pos, fade ),
 				   "@brief Called when a projectile explodes.\n\n"
                    "This function is only called on server objects.\n"
@@ -114,7 +114,7 @@ IMPLEMENT_CALLBACK( ProjectileData, onExplode, void, ( Projectile* proj, Point3F
 				   "@see Projectile\n"
 				  );
 
-IMPLEMENT_CALLBACK( ProjectileData, onCollision, void, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ),
+IMPLEMENT_SIMSIGNAL( ProjectileData, onCollision, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ),
                    ( proj, col, fade, pos, normal ),
 				   "@brief Called when a projectile collides with another object.\n\n"
                    "This function is only called on server objects."

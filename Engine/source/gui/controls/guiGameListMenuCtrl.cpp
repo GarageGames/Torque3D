@@ -617,7 +617,7 @@ ConsoleDocClass( GuiGameListMenuCtrl,
    "@ingroup GuiGame"
 );
 
-IMPLEMENT_CALLBACK( GuiGameListMenuCtrl, onChange, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiGameListMenuCtrl, onChange, (), (),
    "Called when the selected row changes." );
 
 void GuiGameListMenuCtrl::initPersistFields()

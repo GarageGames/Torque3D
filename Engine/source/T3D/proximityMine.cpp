@@ -55,7 +55,7 @@ ConsoleDocClass( ProximityMineData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( ProximityMineData, onTriggered, void, ( ProximityMine* obj, SceneObject *target ),( obj, target ),
+IMPLEMENT_SIMSIGNAL( ProximityMineData, onTriggered, ( ProximityMine* obj, SceneObject *target ),( obj, target ),
    "Callback invoked when an object triggers the ProximityMine.\n\n"
    "@param obj The ProximityMine object\n"
    "@param target The object that triggered the mine\n"
@@ -63,7 +63,7 @@ IMPLEMENT_CALLBACK( ProximityMineData, onTriggered, void, ( ProximityMine* obj, 
    "@see ProximityMine\n"
 );
 
-IMPLEMENT_CALLBACK( ProximityMineData, onExplode, void, ( ProximityMine* obj, Point3F pos ),( obj, pos ),
+IMPLEMENT_SIMSIGNAL( ProximityMineData, onExplode, ( ProximityMine* obj, Point3F pos ),( obj, pos ),
    "Callback invoked when a ProximityMine is about to explode.\n\n"
    "@param obj The ProximityMine object\n"
    "@param pos The position of the mine explosion\n"

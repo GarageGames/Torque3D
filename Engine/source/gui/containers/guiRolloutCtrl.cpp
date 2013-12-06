@@ -43,14 +43,14 @@ ConsoleDocClass( GuiRolloutCtrl,
    "@ingroup GuiContainers"
 );
 
-IMPLEMENT_CALLBACK( GuiRolloutCtrl, onHeaderRightClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiRolloutCtrl, onHeaderRightClick, (), (),
    "Called when the user right-clicks on the rollout's header.  This is useful for implementing "
    "context menus for rollouts." );
 
-IMPLEMENT_CALLBACK( GuiRolloutCtrl, onExpanded, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiRolloutCtrl, onExpanded, (), (),
    "Called when the rollout is expanded." );
 
-IMPLEMENT_CALLBACK( GuiRolloutCtrl, onCollapsed, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiRolloutCtrl, onCollapsed, (), (),
    "Called when the rollout is collapsed." );
 
 //-----------------------------------------------------------------------------

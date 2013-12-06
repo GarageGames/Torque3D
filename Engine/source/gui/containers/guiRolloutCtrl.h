@@ -40,6 +40,7 @@
 /// be collapsed using an animated effet.
 class GuiRolloutCtrl : public GuiTickCtrl
 {
+   typedef GuiRolloutCtrl privateThisClassType;
    public:
    
       typedef GuiControl Parent;
@@ -112,11 +113,11 @@ class GuiRolloutCtrl : public GuiTickCtrl
       
       /// @name Callbacks
       /// @{
-      DECLARE_CALLBACK( void, onHeaderRightClick, () );
+      DECLARE_SIMSIGNAL( protected, onHeaderRightClick, () );
 
-      DECLARE_CALLBACK( void, onExpanded, () );
+      DECLARE_SIMSIGNAL( protected, onExpanded, () );
 
-      DECLARE_CALLBACK( void, onCollapsed, () );
+      DECLARE_SIMSIGNAL( protected, onCollapsed, () );
       /// @}
 
    public:

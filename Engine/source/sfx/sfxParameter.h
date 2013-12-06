@@ -59,6 +59,7 @@ enum SFXParameterEvent
 ///
 class SFXParameter : public SimObject
 {
+   typedef SFXParameter privateThisClassType;
    public:
    
       typedef SimObject Parent;
@@ -87,7 +88,7 @@ class SFXParameter : public SimObject
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onUpdate, () );
+      DECLARE_SIMSIGNAL( protected, onUpdate, () );
       
       /// @}
       

@@ -37,6 +37,7 @@
 /// Native side of the GUI editor.
 class GuiEditCtrl : public GuiControl
 {
+   typedef GuiEditCtrl privateThisClassType;
    public:
    
       typedef GuiControl Parent;
@@ -147,26 +148,26 @@ class GuiEditCtrl : public GuiControl
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onHierarchyChanged, () );
-      DECLARE_CALLBACK( void, onDelete, () );
-      DECLARE_CALLBACK( void, onPreEdit, ( SimSet* selection ) );
-      DECLARE_CALLBACK( void, onPostEdit, ( SimSet* selection ) );
-      DECLARE_CALLBACK( void, onClearSelected, () );
-      DECLARE_CALLBACK( void, onSelect, ( GuiControl* control ) );
-      DECLARE_CALLBACK( void, onAddSelected, ( GuiControl* control ) );
-      DECLARE_CALLBACK( void, onRemoveSelected, ( GuiControl* control ) );
-      DECLARE_CALLBACK( void, onPreSelectionNudged, ( SimSet* selection ) );
-      DECLARE_CALLBACK( void, onPostSelectionNudged, ( SimSet* selection ) );
-      DECLARE_CALLBACK( void, onSelectionMoved, ( GuiControl* control ) ); //FIXME: this should be a selection SimSet
-      DECLARE_CALLBACK( void, onSelectionCloned, ( SimSet* selection ) );
-      DECLARE_CALLBACK( void, onTrashSelection, ( SimSet* selection ) );
-      DECLARE_CALLBACK( void, onAddNewCtrl, ( GuiControl* control ) );
-      DECLARE_CALLBACK( void, onAddNewCtrlSet, ( SimSet* set ) );
-      DECLARE_CALLBACK( void, onSelectionResized, ( GuiControl* control ) );
-      DECLARE_CALLBACK( void, onFitIntoParent, ( bool width, bool height ) );
-      DECLARE_CALLBACK( void, onMouseModeChange, () );
-      DECLARE_CALLBACK( void, onControlInspectPreApply, ( GuiControl* control ) );
-      DECLARE_CALLBACK( void, onControlInspectPostApply, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onHierarchyChanged, () );
+      DECLARE_SIMSIGNAL( protected, onDelete, () );
+      DECLARE_SIMSIGNAL( protected, onPreEdit, ( SimSet* selection ) );
+      DECLARE_SIMSIGNAL( protected, onPostEdit, ( SimSet* selection ) );
+      DECLARE_SIMSIGNAL( protected, onClearSelected, () );
+      DECLARE_SIMSIGNAL( protected, onSelect, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onAddSelected, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onRemoveSelected, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onPreSelectionNudged, ( SimSet* selection ) );
+      DECLARE_SIMSIGNAL( protected, onPostSelectionNudged, ( SimSet* selection ) );
+      DECLARE_SIMSIGNAL( protected, onSelectionMoved, ( GuiControl* control ) ); //FIXME: this should be a selection SimSet
+      DECLARE_SIMSIGNAL( protected, onSelectionCloned, ( SimSet* selection ) );
+      DECLARE_SIMSIGNAL( protected, onTrashSelection, ( SimSet* selection ) );
+      DECLARE_SIMSIGNAL( protected, onAddNewCtrl, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onAddNewCtrlSet, ( SimSet* set ) );
+      DECLARE_SIMSIGNAL( protected, onSelectionResized, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onFitIntoParent, ( bool width, bool height ) );
+      DECLARE_SIMSIGNAL( protected, onMouseModeChange, () );
+      DECLARE_SIMSIGNAL( protected, onControlInspectPreApply, ( GuiControl* control ) );
+      DECLARE_SIMSIGNAL( protected, onControlInspectPostApply, ( GuiControl* control ) );
       
       /// @}
       

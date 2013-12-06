@@ -31,16 +31,17 @@
 
 class TCPObject : public SimObject
 {
+   typedef TCPObject privateThisClassType;
 public:
    enum State {Disconnected, DNSResolved, Connected, Listening };
 
-	DECLARE_CALLBACK(void, onConnectionRequest, (const char* address, const char* ID));
-	DECLARE_CALLBACK(void, onLine, (const char* line));
-	DECLARE_CALLBACK(void, onDNSResolved,());
-	DECLARE_CALLBACK(void, onDNSFailed, ());
-	DECLARE_CALLBACK(void, onConnected, ());
-	DECLARE_CALLBACK(void, onConnectFailed, ());
-	DECLARE_CALLBACK(void, onDisconnect, ());
+	DECLARE_SIMSIGNAL( protected, onConnectionRequest, (const char* address, const char* ID));
+	DECLARE_SIMSIGNAL( protected, onLine, (const char* line));
+	DECLARE_SIMSIGNAL( protected, onDNSResolved,());
+	DECLARE_SIMSIGNAL( protected, onDNSFailed, ());
+	DECLARE_SIMSIGNAL( protected, onConnected, ());
+	DECLARE_SIMSIGNAL( protected, onConnectFailed, ());
+	DECLARE_SIMSIGNAL( protected, onDisconnect, ());
 
 private:
    NetSocket mTag;

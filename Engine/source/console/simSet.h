@@ -91,6 +91,7 @@
 ///
 class SimSet: public SimObject
 {
+   typedef SimSet privateThisClassType;
    public:
 
       typedef SimObject Parent;
@@ -122,8 +123,8 @@ class SimSet: public SimObject
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onObjectAdded, ( SimObject* object ) );
-      DECLARE_CALLBACK( void, onObjectRemoved, ( SimObject* object ) );
+      DECLARE_SIMSIGNAL( protected, onObjectAdded, ( SimObject* object ) );
+      DECLARE_SIMSIGNAL( protected, onObjectRemoved, ( SimObject* object ) );
       
       /// @}
 

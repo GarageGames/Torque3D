@@ -72,6 +72,7 @@ GFX_DeclareTextureProfile( PostFxTargetProfile );
 ///
 class PostEffect : public SimGroup
 {
+   typedef PostEffect privateThisClassType;
    typedef SimGroup Parent;
 
    friend class PostEffectVis;
@@ -293,11 +294,12 @@ public:
    /// @name Callbacks
    /// @{
 
-   DECLARE_CALLBACK( void, onAdd, () );
-   DECLARE_CALLBACK( void, preProcess, () );
-   DECLARE_CALLBACK( void, setShaderConsts, () );
-   DECLARE_CALLBACK( bool, onEnabled, () );
-   DECLARE_CALLBACK( void, onDisabled, () );
+   DECLARE_SIMSIGNAL( public, onAdd, () );
+   DECLARE_SIMSIGNAL( public, preProcess, () );
+   DECLARE_SIMSIGNAL( public, setShaderConsts, () );
+   DECLARE_SIMDELEGATE( protected,  bool, onEnabled, () );
+
+   DECLARE_SIMSIGNAL( public, onDisabled, () );
 
    /// @}
 

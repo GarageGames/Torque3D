@@ -66,7 +66,7 @@ ConsoleDocClass( GuiTextEditCtrl,
    "@ingroup GuiControls\n"
 );
 
-IMPLEMENT_CALLBACK( GuiTextEditCtrl, onTabComplete, void, (const char* val),( val ),
+IMPLEMENT_SIMSIGNAL( GuiTextEditCtrl, onTabComplete, (const char* val),( val ),
    "@brief Called if tabComplete is true, and the 'tab' key is pressed.\n\n"
    "@param val Input to mimick the '1' sent by the actual tab key button press.\n"
    "@tsexample\n"
@@ -80,7 +80,7 @@ IMPLEMENT_CALLBACK( GuiTextEditCtrl, onTabComplete, void, (const char* val),( va
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiTextEditCtrl, onReturn, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiTextEditCtrl, onReturn, (),(),
    "@brief Called when the 'Return' or 'Enter' key is pressed.\n\n"
    "@tsexample\n"
    "// Return or Enter key was pressed, causing the callback to occur.\n"
@@ -93,7 +93,7 @@ IMPLEMENT_CALLBACK( GuiTextEditCtrl, onReturn, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiTextEditCtrl, onValidate, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiTextEditCtrl, onValidate, (),(),
    "@brief Called whenever the control is validated.\n\n"
    "@tsexample\n"
    "// The control gets validated, causing the callback to occur\n"

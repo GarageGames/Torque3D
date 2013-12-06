@@ -23,6 +23,10 @@
 #ifndef _UTIL_DELEGATE_H_
 #define _UTIL_DELEGATE_H_
 
+#ifndef _PLATFORM_H_
+#include "platform/platform.h"
+#endif
+
 #include "core/util/FastDelegate.h"
 
 /// @def Delegate

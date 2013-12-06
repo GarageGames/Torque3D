@@ -49,7 +49,7 @@ ImplementEnumType( GuiScrollBarBehavior,
    { GuiScrollCtrl::ScrollBarDynamic,      "dynamic",    "Only visible when actually needed, i.e. when the child control(s) exceed the visible space on the given axis." },
 EndImplementEnumType;
 
-IMPLEMENT_CALLBACK( GuiScrollCtrl, onScroll, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiScrollCtrl, onScroll, (), (),
    "Called each time the child controls are scrolled by some amount." );
 
 //-----------------------------------------------------------------------------

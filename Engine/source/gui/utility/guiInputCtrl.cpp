@@ -116,7 +116,7 @@ static bool isModifierKey( U16 keyCode )
    return( false );
 }
 
-IMPLEMENT_CALLBACK( GuiInputCtrl, onInputEvent, void, (const char* device, const char* action, bool state ),
+IMPLEMENT_SIMSIGNAL( GuiInputCtrl, onInputEvent, (const char* device, const char* action, bool state ),
 														  ( device, action, state),
 	"@brief Callback that occurs when an input is triggered on this control\n\n"
 	"@param device The device type triggering the input, such as keyboard, mouse, etc\n"

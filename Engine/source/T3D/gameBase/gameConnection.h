@@ -63,6 +63,7 @@ const F32 MaxCameraFov              = 179.f;    ///< max camera FOV
 class GameConnection : public NetConnection
 {
 private:
+   typedef GameConnection privateThisClassType;
    typedef NetConnection Parent;
 
    SimObjectPtr<GameBase> mControlObject;
@@ -349,18 +350,20 @@ public:
    static Signal<void()> smPlayingDemo;
 
 protected:
-   DECLARE_CALLBACK( void, onConnectionTimedOut, () );
-   DECLARE_CALLBACK( void, onConnectionAccepted, () );
-   DECLARE_CALLBACK( void, onConnectRequestTimedOut, () );
-   DECLARE_CALLBACK( void, onConnectionDropped, (const char* reason) );
-   DECLARE_CALLBACK( void, onConnectRequestRejected, (const char* reason) );
-   DECLARE_CALLBACK( void, onConnectionError, (const char* errorString) );
-   DECLARE_CALLBACK( void, onDrop, (const char* disconnectReason) );
-   DECLARE_CALLBACK( void, initialControlSet, () );
-   DECLARE_CALLBACK( void, onControlObjectChange, () );
-   DECLARE_CALLBACK( void, setLagIcon, (bool state) );
-   DECLARE_CALLBACK( void, onDataBlocksDone, (U32 sequence) );
-   DECLARE_CALLBACK( void, onFlash, (bool state) );
+   DECLARE_SIMSIGNAL( protected, onConnectionTimedOut, () );
+   DECLARE_SIMSIGNAL( protected, onConnectionAccepted, () );
+   DECLARE_SIMSIGNAL( protected, onConnectRequestTimedOut, () );
+   DECLARE_SIMSIGNAL( protected, onConnectionDropped, (const char* reason) );
+   DECLARE_SIMSIGNAL( protected, onConnectRequestRejected, (const char* reason) );
+   DECLARE_SIMSIGNAL( protected, onConnectionError, (const char* errorString) );
+   DECLARE_SIMSIGNAL( protected, onDrop, (const char* disconnectReason) );
+   DECLARE_SIMSIGNAL( protected, initialControlSet, () );
+   DECLARE_SIMSIGNAL( protected, onControlObjectChange, () );
+   DECLARE_SIMSIGNAL( protected, setLagIcon, (bool state) );
+   DECLARE_SIMSIGNAL( protected, onDataBlocksDone, (U32 sequence) );
+   DECLARE_SIMSIGNAL( protected, onFlash, (bool state) );
 };
+
+DECLARE_GLOBAL_SIMSIGNAL( onDataBlockObjectReceived, (U32 index, U32 total));
 
 #endif

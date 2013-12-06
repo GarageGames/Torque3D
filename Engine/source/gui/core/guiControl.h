@@ -99,6 +99,7 @@ typedef Delegate<bool( const Point2I &hoverPos, const Point2I &cursorPos, const 
 /// @{
 class GuiControl : public SimGroup
 {
+   typedef GuiControl privateThisClassType;
    public:
    
       typedef SimGroup Parent;
@@ -244,26 +245,26 @@ class GuiControl : public SimGroup
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onAdd, () );
-      DECLARE_CALLBACK( void, onRemove, () );
+      DECLARE_SIMSIGNAL( protected, onAdd, () );
+      DECLARE_SIMSIGNAL( protected, onRemove, () );
       
-      DECLARE_CALLBACK( void, onWake, () );
-      DECLARE_CALLBACK( void, onSleep, () );
+      DECLARE_SIMSIGNAL( protected, onWake, () );
+      DECLARE_SIMSIGNAL( protected, onSleep, () );
       
-      DECLARE_CALLBACK( void, onLoseFirstResponder, () );
-      DECLARE_CALLBACK( void, onGainFirstResponder, () );
+      DECLARE_SIMSIGNAL( protected, onLoseFirstResponder, () );
+      DECLARE_SIMSIGNAL( protected, onGainFirstResponder, () );
       
-      DECLARE_CALLBACK( void, onAction, () );
-      DECLARE_CALLBACK( void, onVisible, ( bool state ) );
-      DECLARE_CALLBACK( void, onActive, ( bool state ) );
+      DECLARE_SIMSIGNAL( protected, onAction, () );
+      DECLARE_SIMSIGNAL( protected, onVisible, ( bool state ) );
+      DECLARE_SIMSIGNAL( protected, onActive, ( bool state ) );
       
-      DECLARE_CALLBACK( void, onDialogPush, () );
-      DECLARE_CALLBACK( void, onDialogPop, () );
+      DECLARE_SIMSIGNAL( protected, onDialogPush, () );
+      DECLARE_SIMSIGNAL( protected, onDialogPop, () );
       
-      DECLARE_CALLBACK( void, onControlDragEnter, ( GuiControl* control, const Point2I& dropPoint ) );
-      DECLARE_CALLBACK( void, onControlDragExit, ( GuiControl* control, const Point2I& dropPoint ) );
-      DECLARE_CALLBACK( void, onControlDragged, ( GuiControl* control, const Point2I& dropPoint ) );
-      DECLARE_CALLBACK( void, onControlDropped, ( GuiControl* control, const Point2I& dropPoint ) );
+      DECLARE_SIMSIGNAL( protected, onControlDragEnter, ( GuiControl* control, const Point2I& dropPoint ) );
+      DECLARE_SIMSIGNAL( protected, onControlDragExit, ( GuiControl* control, const Point2I& dropPoint ) );
+      DECLARE_SIMSIGNAL( protected, onControlDragged, ( GuiControl* control, const Point2I& dropPoint ) );
+      DECLARE_SIMSIGNAL( protected, onControlDropped, ( GuiControl* control, const Point2I& dropPoint ) );
             
       /// @}
       
