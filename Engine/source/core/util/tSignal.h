@@ -786,4 +786,53 @@ class Signal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)> : public SignalBaseT<void(A,B,C,D,
       }
 };
 
+namespace Torque
+{
+   /// ISignals (Public Interface Signal Wrapper)
+   /// 
+   /// This wrapper is used to expose only methods necessary for subscribers.
+   ///
+   /// Example:
+   ///
+   /// class MyClass
+   /// {
+   /// public:
+   ///    Torque::ISignal<void()> getMySignalInterface() { return mProtectedSignal; }
+   /// protected:
+   ///    Signal<void()> mProtectedSignal;
+   /// };
+
+	template<typename SIGNATURE>
+	class ISignal
+	{
+	protected:
+		Signal<SIGNATURE> &_signal;
+	public:
+		typedef fastdelegate::FastDelegate<SIGNATURE> DelegateSig;
+
+		ISignal(Signal<SIGNATURE>& signal) : _signal(signal) { }
+
+		bool contains( const DelegateSig &dlg ) const   { return  _signal.contains(dlg); }
+
+		//Notify
+		template<typename CLASS_PTR, typename MEMBER_FN_PTR>
+		void notify(CLASS_PTR obj_ptr, MEMBER_FN_PTR fn_ptr, F32 order = 0.5f) { _signal.notify(obj_ptr, fn_ptr, order); }
+
+		template<typename FN_PTR>
+		void notify(FN_PTR fn_ptr, F32 order = 0.5f) { _signal.notify(fn_ptr, order); }
+		
+		void notify(DelegateSig &dlg, F32 order = 0.5f) { _signal.notify(dlg, order); }
+
+		//Remove
+		template<typename CLASS_PTR, typename MEMBER_FN_PTR>
+		void remove(CLASS_PTR obj_ptr, MEMBER_FN_PTR fn_ptr) { _signal.remove(obj_ptr,fn_ptr); }
+
+		template<typename FN_PTR>
+		void remove(FN_PTR fn_ptr) { _signal.remove(fn_ptr); }
+		
+      void remove(DelegateSig  dlg) { _signal.remove(dlg); }
+	};
+
+};
+
 #endif // _TSIGNAL_H_
