@@ -28,6 +28,7 @@
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 // Helper definitions for the vector class.
@@ -180,6 +181,9 @@ class Vector
    /// @param count  The number of elements in the array to merge.
    ///
    void merge( const T *addr, U32 count );
+
+   // Reverses the order of elements.
+   void reverse();
 
    /// @}
 };
@@ -758,6 +762,12 @@ template<class T> inline void Vector<T>::merge( const T *addr, U32 count )
       constructInPlace( dest++, addr++ );
 
    mElementCount = newSize;
+}
+
+template<class T> inline void Vector<T>::reverse()
+{
+   for (U32 i = 0, j = size();  (i != j) && (i != --j);  ++i)
+      std::swap( mArray[ i ],  mArray[ j ] );
 }
 
 //-----------------------------------------------------------------------------
