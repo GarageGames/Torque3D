@@ -469,7 +469,7 @@ namespace { // Utility functions
 		int result = 0;
 		for (size_t i = 0; i < tokens.size(); i++) {
 			int tokenLength = int(tokens[i].length() > 0 ? tokens[i].length()+2 : 0);
-			result = max(tokenLength, result);
+			result = std::max(tokenLength, result);
 		}
 		return result;
 	}

@@ -1910,8 +1910,13 @@ extern int isatty (int );
         b->yy_bs_column = 0;
     }
 
-        b->yy_is_interactive = file ? (isatty( _fileno(file) ) > 0) : 0;
-    
+#ifdef _MSC_VER
+    const int fe = _fileno( file );
+#else
+    const int fe = fileno( file );
+#endif
+    b->yy_is_interactive = file ? (isatty( fe ) > 0) : 0;
+
 	errno = oerrno;
 }
 
