@@ -519,7 +519,7 @@ char* dStristr( char* str1, const char* str2 )
    U32 str2len = strlen( str2 );
    while( *str1 )
    {
-      if( strncasecmp( str1, str2, str2len ) == 0 )
+      if( _strnicmp( str1, str2, str2len ) == 0 )
          return str1;
 
       ++ str1;
