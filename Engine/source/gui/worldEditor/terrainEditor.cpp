@@ -34,6 +34,7 @@
 #include "gui/core/guiCanvas.h"
 #include "gui/worldEditor/terrainActions.h"
 #include "terrain/terrMaterial.h"
+#include <ctime>
 
 
 
@@ -2868,15 +2869,21 @@ ConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, 3, 3, 0)
 }
 
 //------------------------------------------------------------------------------  
-void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope )  
+void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage )  
 {  
    if (!mActiveTerrain)  
-      return;  
+      return; 
   
    S32 mat = getPaintMaterialIndex();  
    if (mat == -1)  
       return;  
-  
+
+
+   //setup for randomized coverage
+   mCoverage*=100;
+   srand((unsigned)time(0));
+   int randomNumber;
+
    mUndoSel = new Selection;  
           
    U32 terrBlocks = mActiveTerrain->getBlockSize();  
@@ -2893,7 +2900,12 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
          getGridInfo(gp, gi);  
   
          if (gi.mMaterial == mat)  
-            continue;  
+            continue;
+
+
+         randomNumber = (rand() % 10000);
+         if (randomNumber > mCoverage)
+            continue;
   
          Point3F wp;  
          gridToWorld(gp, wp);  
@@ -2933,7 +2945,7 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
    scheduleMaterialUpdate();     
 }  
   
-ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 6, 6, "(float minHeight, float maxHeight, float minSlope, float maxSlope)")  
+ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 7, 7, "(float minHeight, float maxHeight, float minSlope, float maxSlope, float coverage)")  
 {  
-   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]) );  
+   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]), dAtof(argv[6]));  
 }  
