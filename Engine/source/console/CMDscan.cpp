@@ -1911,13 +1911,12 @@ extern int isatty (int );
     }
 
 #ifdef _MSC_VER
-    const int fe = _fileno( file );
+    b->yy_is_interactive = file ? (isatty( _fileno( file ) ) > 0) : 0;
 #else
-    const int fe = fileno( file );
+    b->yy_is_interactive = file ? (isatty(  fileno( file ) ) > 0) : 0;
 #endif
-    b->yy_is_interactive = file ? (isatty( fe ) > 0) : 0;
 
-	errno = oerrno;
+    errno = oerrno; 
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
