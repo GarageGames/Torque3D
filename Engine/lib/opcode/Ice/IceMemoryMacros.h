@@ -47,7 +47,11 @@
 	//!	\warning	writes nb*4 bytes !
 	inline_ void StoreDwords(udword* dest, udword nb, udword value)
 	{
-#ifdef _WIN32
+#ifdef _WIN64
+      while ( nb-- )
+         *dest++ = value;
+
+#elif _WIN32
 		// The asm code below **SHOULD** be equivalent to one of those C versions
 		// or the other if your compiled is good: (checked on VC++ 6.0)
 		//
@@ -65,8 +69,9 @@
 		_asm pop edi
 		_asm pop ecx
 		_asm pop eax
+
 #else
-	while(nb--)
+	while ( nb-- )
 		*dest++ = value;
 #endif
 	}
