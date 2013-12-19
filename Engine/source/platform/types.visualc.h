@@ -26,6 +26,12 @@
 
 // For more information on VisualC++ predefined macros
 // http://support.microsoft.com/default.aspx?scid=kb;EN-US;q65472
+// @copy _WIN32  Defined for WIN32 applications.Always defined. Microsoft specific.
+/* @todo ? Undef _WIN32 for catch all dirt places in the code.
+#if defined( _WIN64 )
+#  undef _WIN32
+#endif
+*/
 
 //--------------------------------------
 // Types
