@@ -70,7 +70,11 @@ typedef unsigned _int64 U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(_M_IX86)
+#if defined(_M_X64)
+#  define TORQUE_CPU_STRING "x64"
+#  define TORQUE_CPU_X64
+#  define TORQUE_LITTLE_ENDIAN
+#elif defined(_M_IX86)
 #  define TORQUE_CPU_STRING "x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
