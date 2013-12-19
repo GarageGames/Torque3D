@@ -31,10 +31,13 @@
 #include "platform/types.h"
 #endif
 
-#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
+#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
+#endif
+
+#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
 #define strtof       (float)strtod
 #endif
 
@@ -64,20 +67,12 @@ inline int  dStrncmp(const char *str1, const char *str2, dsize_t len)
 
 inline int  dStricmp(const char *str1, const char *str2)
 {
-#if (_MSC_VER < 1800)
    return strcasecmp( str1, str2 );
-#else
-   return _stricmp(str1, str2);
-#endif
 }
 
 inline int  dStrnicmp(const char *str1, const char *str2, dsize_t len)
 {
-#if (_MSC_VER < 1800)
    return strncasecmp( str1, str2, len );
-#else
-   return _strnicmp(str1, str2, len);
-#endif
 }
 
 inline char *dStrcpy(char *dst, const char *src)
