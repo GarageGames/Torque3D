@@ -164,7 +164,9 @@ U32 Thread::getId()
 
 void Thread::_setName( const char* name )
 {
-#if defined( TORQUE_DEBUG ) && defined( TORQUE_COMPILER_VISUALC ) && defined( TORQUE_OS_WIN32 )
+#if defined( TORQUE_DEBUG ) \
+ && defined( TORQUE_COMPILER_VISUALC ) \
+ && (defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 ))
 
    // See http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 

@@ -37,7 +37,7 @@
 #define strncasecmp  _strnicmp
 #endif
 
-#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
+#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
 #define strtof       (float)strtod
 #endif
 

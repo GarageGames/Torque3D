@@ -42,25 +42,28 @@ EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
 #else
 
 #ifdef TORQUE_OS_LINUX
-// 	The Linux source code listing can be compiled using Linux kernel verison 2.6 
+// The Linux source code listing can be compiled using Linux kernel verison 2.6 
 //	or higher (e.g. RH 4AS-2.8 using GCC 3.4.4). 
 //	Due to syntax variances of Linux affinity APIs with earlier kernel versions 
 //	and dependence on glibc library versions, compilation on Linux environment 
 //	with older kernels and compilers may require kernel patches or compiler upgrades.
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sched.h>
 #define DWORD unsigned long
-#elif defined( TORQUE_OS_WIN32 )
+
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
 #include <windows.h>
+
 #elif defined( TORQUE_OS_MAC )
 #  include <sys/types.h>
 #  include <sys/sysctl.h>
+
 #else
 #error Not implemented on platform.
 #endif
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -474,7 +477,7 @@ next:
             if ( CPU_ISSET(i, &allowedCPUs) == 0 )
                return CONFIG_UserConfigIssue;
          }
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
          DWORD dwProcessAffinity, dwSystemAffinity;
          GetProcessAffinityMask(GetCurrentProcess(), 
             &dwProcessAffinity,
@@ -502,7 +505,7 @@ next:
             if ( sched_setaffinity (0, sizeof(currentCPU), &currentCPU) == 0 )
             {
                sleep(0);  // Ensure system to switch to the right CPU
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
          while (dwAffinityMask && dwAffinityMask <= dwSystemAffinity)
          {
             if (SetThreadAffinityMask(GetCurrentThread(), dwAffinityMask))
@@ -547,7 +550,7 @@ next:
 #ifdef TORQUE_OS_LINUX
          sched_setaffinity (0, sizeof(allowedCPUs), &allowedCPUs);
          sleep(0);
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
          SetThreadAffinityMask(GetCurrentThread(), dwProcessAffinity);
          Sleep(0);
 #else
