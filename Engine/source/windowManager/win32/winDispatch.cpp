@@ -561,7 +561,7 @@ private:
 static WinMessageQueue _MessageQueue;
 
 
-void RemoveMessages(HWND hWnd,UINT msgBegin,WPARAM msgEnd )
+void RemoveMessages(HWND hWnd,UINT msgBegin,UINT msgEnd)
 {
 	_MessageQueue.remove( hWnd, msgBegin, msgEnd );
 }
