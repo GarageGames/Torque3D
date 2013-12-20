@@ -94,23 +94,20 @@ void Platform::setMathControlStateKnown()
 
 #else
 
-// @source http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
 U32 Platform::getMathControlState( )
 {
-   U32 control_word;
-   const errno_t err = _controlfp_s( &control_word, 0, 0 );
-   return err ? 0 : control_word;
+   // @todo See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+   return 0;
 }
 
 void Platform::setMathControlState( U32 state )
 {
-   U32 control_word;
-   const errno_t err = _controlfp_s( &control_word, state, MCW_PC );
+   // @todo See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
 }
 
 void Platform::setMathControlStateKnown( )
 {
-   // @todo ...
+   // @todo See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
 }
 
 #endif
