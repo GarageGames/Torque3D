@@ -92,8 +92,30 @@ void Platform::setMathControlStateKnown()
    }
 }
 
+#else
+
+// @source http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+U32 Platform::getMathControlState( )
+{
+   U32 control_word;
+   const errno_t err = _controlfp_s( &control_word, 0, 0 );
+   return err ? 0 : control_word;
+}
+
+void Platform::setMathControlState( U32 state )
+{
+   U32 control_word;
+   const errno_t err = _controlfp_s( &control_word, state, MCW_PC );
+}
+
+void Platform::setMathControlStateKnown( )
+{
+   // @todo ...
+}
 
 #endif
+
+
 
 //------------------------------------------------------------------------------
 void mInstallLibrary_ASM()
