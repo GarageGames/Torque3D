@@ -218,10 +218,7 @@ namespace Compiler
 
    //------------------------------------------------------------
 
-   inline StringTableEntry U32toSTE(U32 u)
-   {
-      return *((StringTableEntry *) &u);
-   }
+   StringTableEntry U32toSTE(U32 u);
 
    extern U32 (*STEtoU32)(StringTableEntry ste, U32 ip);
 
