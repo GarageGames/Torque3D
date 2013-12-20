@@ -15,6 +15,7 @@
 
  ********************************************************************/
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include "../codec_internal.h"
