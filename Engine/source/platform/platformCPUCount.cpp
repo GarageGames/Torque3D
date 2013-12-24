@@ -389,9 +389,10 @@ next:
       {
          EConfig StatusFlag = CONFIG_UserConfigIssue;
 
-         g_s3Levels[0] = 0;
-         TotAvailCore = 1;
-         PhysicalNum  = 1;
+         g_s3Levels[0]   = 0;
+         TotAvailLogical = 1;
+         TotAvailCore    = 1;
+         PhysicalNum     = 1;
          
          unsigned int numLPEnabled = 0;
          int MaxLPPerCore = 1;
