@@ -293,7 +293,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
 
 void Win32WindowManager::setParentWindow(void* newParent)
 {
-   Con::printf( "Setting parent HWND: %d", newParent );
+   Con::printf( "Setting parent HWND: %p", newParent );
    mParentWindow = (HWND)newParent;
    if( mWindowListHead && mWindowListHead->mWindowHandle )
       ::SetParent( mWindowListHead->mWindowHandle, mParentWindow);
