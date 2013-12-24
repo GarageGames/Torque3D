@@ -18,6 +18,7 @@
 /* general handling of the header and the vorbis_info structure (and
    substructures) */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -67,7 +68,8 @@ void vorbis_comment_add(vorbis_comment *vc,const char *comment){
                             (vc->comments+2)*sizeof(*vc->user_comments));
   vc->comment_lengths=_ogg_realloc(vc->comment_lengths,
                                   (vc->comments+2)*sizeof(*vc->comment_lengths));
-  vc->comment_lengths[vc->comments]=strlen(comment);
+  assert( (strlen( comment ) <= INT_MAX) && "Huge data." );
+  vc->comment_lengths[vc->comments]=(int)strlen(comment);
   vc->user_comments[vc->comments]=_ogg_malloc(vc->comment_lengths[vc->comments]+1);
   strcpy(vc->user_comments[vc->comments], comment);
   vc->comments++;
@@ -97,17 +99,18 @@ static int tagcompare(const char *s1, const char *s2, int n){
 char *vorbis_comment_query(vorbis_comment *vc, const char *tag, int count){
   long i;
   int found = 0;
-  int taglen = strlen(tag)+1; /* +1 for the = we append */
+  const size_t taglen = strlen(tag)+1; /* +1 for the = we append */
   char *fulltag = alloca(taglen+ 1);
 
   strcpy(fulltag, tag);
   strcat(fulltag, "=");
 
+  assert( (taglen <= INT_MAX) && "Huge data." );
   for(i=0;i<vc->comments;i++){
-    if(!tagcompare(vc->user_comments[i], fulltag, taglen)){
+    if(!tagcompare(vc->user_comments[i], fulltag, (int)taglen)){
       if(count == found)
         /* We return a pointer to the data, not a copy */
-              return vc->user_comments[i] + taglen;
+              return vc->user_comments[i] + (int)taglen;
       else
         found++;
     }
@@ -117,13 +120,14 @@ char *vorbis_comment_query(vorbis_comment *vc, const char *tag, int count){
 
 int vorbis_comment_query_count(vorbis_comment *vc, const char *tag){
   int i,count=0;
-  int taglen = strlen(tag)+1; /* +1 for the = we append */
+  const size_t taglen = strlen(tag)+1; /* +1 for the = we append */
   char *fulltag = alloca(taglen+1);
   strcpy(fulltag,tag);
   strcat(fulltag, "=");
 
+  assert( (taglen <= INT_MAX) && "Huge data." );
   for(i=0;i<vc->comments;i++){
-    if(!tagcompare(vc->user_comments[i], fulltag, taglen))
+    if(!tagcompare(vc->user_comments[i], fulltag, (int)taglen))
       count++;
   }
 
@@ -459,15 +463,16 @@ static int _vorbis_pack_info(oggpack_buffer *opb,vorbis_info *vi){
 }
 
 static int _vorbis_pack_comment(oggpack_buffer *opb,vorbis_comment *vc){
-  int bytes = strlen(ENCODE_VENDOR_STRING);
+  const size_t bytes = strlen(ENCODE_VENDOR_STRING);
 
   /* preamble */
   oggpack_write(opb,0x03,8);
   _v_writestring(opb,"vorbis", 6);
 
   /* vendor */
-  oggpack_write(opb,bytes,32);
-  _v_writestring(opb,ENCODE_VENDOR_STRING, bytes);
+  assert( (bytes <= INT_MAX) && "Huge data." );
+  oggpack_write(opb,(unsigned long)bytes,32);
+  _v_writestring(opb,ENCODE_VENDOR_STRING, (int)bytes);
 
   /* comments */
 
