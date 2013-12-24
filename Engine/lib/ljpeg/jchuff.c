@@ -79,7 +79,7 @@ typedef huff_entropy_encoder * huff_entropy_ptr;
 
 typedef struct {
   JOCTET * next_output_byte;	/* => next byte to write in buffer */
-  size_t free_in_buffer;	/* # of byte spaces remaining in buffer */
+  jpeg_size_t free_in_buffer;	/* # of byte spaces remaining in buffer */
   savable_state cur;		/* Current bit buffer & DC state */
   j_compress_ptr cinfo;		/* dump_buffer needs access to this */
 } working_state;
