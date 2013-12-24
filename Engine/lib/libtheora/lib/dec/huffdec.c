@@ -99,7 +99,7 @@ static oc_huff_node *oc_huff_node_alloc(int _nbits){
   oc_huff_node *ret;
   size_t        size;
   size=_ogg_offsetof(oc_huff_node,nodes);
-  if(_nbits>0)size+=sizeof(oc_huff_node *)*(1<<_nbits);
+  if(_nbits>0) size+=sizeof(oc_huff_node *)*(size_t)(1<<_nbits);
   ret=_ogg_calloc(1,size);
   ret->nbits=(unsigned char)_nbits;
   return ret;
@@ -223,7 +223,7 @@ static void oc_huff_node_fill(oc_huff_node **_nodes,
   else{
     _level--;
     oc_huff_node_fill(_nodes,_binode->nodes[0],_level,_depth);
-    oc_huff_node_fill(_nodes+(1<<_level),_binode->nodes[1],_level,_depth);
+    oc_huff_node_fill(_nodes+(size_t)(1<<_level),_binode->nodes[1],_level,_depth);
     oc_huff_node_free(_binode);
   }
 }
