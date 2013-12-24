@@ -1301,9 +1301,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          {
             StringTableEntry varName = U32toSTE( code[ ip ] );
             U32 failIp = code[ ip + 1 ];
-            
-            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", varName, failIp );
-
+            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", ip - 1, varName, failIp );
             ++ ip;
          }
 
@@ -1312,7 +1310,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
             StringTableEntry varName = U32toSTE( code[ ip ] );
             U32 failIp = code[ ip + 1 ];
             
-            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", varName, failIp );
+            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", ip - 1, varName, failIp );
 
             ip += 2;
          }
@@ -1321,7 +1319,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          {
             U32 breakIp = code[ ip ];
             
-            Con::printf( "%i: OP_ITER breakIp=%i", breakIp );
+            Con::printf( "%i: OP_ITER breakIp=%i", ip - 1, breakIp );
 
             ++ ip;
          }

@@ -45,9 +45,13 @@ void GFXPrimitiveBuffer::dumpActivePBs()
    for(GFXPrimitiveBuffer *walk = smHead; walk; walk=walk->mDebugNext)
    {
 #if defined(TORQUE_ENABLE_PROFILER)
-      Con::printf(" %x  %6d %6d %s %d", walk, walk->mIndexCount, walk->mPrimitiveCount, walk->mDebugCreationPath.c_str(), walk->getRefCount());
+      Con::printf(" %p  %6d %6d %s %d",
+         walk, walk->mIndexCount, walk->mPrimitiveCount,
+         walk->mDebugCreationPath.c_str(), walk->getRefCount());
 #else      
-      Con::printf(" %x  %6d %6d %s %d", walk, walk->mIndexCount, walk->mPrimitiveCount, "", walk->getRefCount());
+      Con::printf(" %p  %6d %6d %s %d",
+         walk, walk->mIndexCount, walk->mPrimitiveCount,
+         "", walk->getRefCount());
 #endif      
    }
    Con::printf("----- dump complete -------------------------------------------");

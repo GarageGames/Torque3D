@@ -57,6 +57,7 @@ public:
    /// This memory is word-aligned.
    /// @param   size    Size of chunk to return. This must be less than chunkSize or else
    ///                  an assertion will occur.
+   // @todo Change S32 to size_t?
    void *alloc(S32 size);
 
    /// Free all allocated memory blocks.

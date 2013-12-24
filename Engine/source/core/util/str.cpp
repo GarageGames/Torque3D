@@ -491,12 +491,14 @@ ConsoleFunction( dumpStringMemStats, void, 1, 1, "()"
 void* String::StringData::operator new( size_t size, U32 len )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
+   const size_t bs = size + len * sizeof(StringChar);
+   AssertFatal( bs <= S32_MAX, "Huge data." );
+   StringData *str = reinterpret_cast<StringData*>(dMalloc( bs ));
 
-   str->mLength      = len;
+   str->mLength = len;
 
 #ifdef TORQUE_DEBUG
-   dFetchAndAdd( sgStringMemBytes, size + len * sizeof(StringChar) );
+   dFetchAndAdd( sgStringMemBytes, (S32)bs );
    dFetchAndAdd( sgStringInstances, 1 );
 #endif
 
@@ -519,12 +521,14 @@ void String::StringData::operator delete(void *ptr)
 void* String::StringData::operator new( size_t size, U32 len, DataChunker& chunker )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
+   const size_t bs = size + len * sizeof(StringChar);
+   AssertFatal( bs <= S32_MAX, "Huge data." );
+   StringData *str = reinterpret_cast<StringData*>(chunker.alloc( (S32)bs ));
 
-   str->mLength      = len;
+   str->mLength = len;
 
 #ifdef TORQUE_DEBUG
-   dFetchAndAdd( sgStringMemBytes, size + len * sizeof(StringChar) );
+   dFetchAndAdd( sgStringMemBytes, (S32)bs );
    dFetchAndAdd( sgStringInstances, 1 );
 #endif
 

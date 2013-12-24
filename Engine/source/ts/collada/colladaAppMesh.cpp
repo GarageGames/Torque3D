@@ -512,7 +512,8 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
       if (!pTriData)
          continue;
 
-      U32 numTriangles = pTriData->getCount() / meshPrims[iPrim]->getStride() / 3;
+      const size_t numTriangles =
+         pTriData->getCount() / meshPrims[iPrim]->getStride() / 3;
       if (!numTriangles)
          continue;
 
@@ -533,7 +534,8 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
          appMat->effectExt->double_sided = true;
 
       // Pre-allocate triangle indices
-      primitive.numElements = numTriangles * 3;
+      AssertFatal( (numTriangles * 3) < S32_MAX, "Huge data." );
+      primitive.numElements = (S32)numTriangles * 3;
       indices.setSize(indices.size() + primitive.numElements);
       U32* dstIndex = indices.end() - primitive.numElements;
 
@@ -563,7 +565,7 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
                vertTuples.push_back(VertTuple(vertTuples.last()));
 
             // Split the primitive at the current triangle
-            S32 indicesRemaining = (numTriangles - iTri) * 3;
+            const S32 indicesRemaining = ((S32)numTriangles - iTri) * 3;
             if (iTri > 0)
             {
                daeErrorHandler::get()->handleWarning(avar("Splitting primitive "

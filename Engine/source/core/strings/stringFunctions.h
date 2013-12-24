@@ -223,8 +223,8 @@ char* dStripPath(const char* filename);
 
 extern void   dPrintf(const char *format, ...);
 extern int    dVprintf(const char *format, void *arglist);
-extern int    dSprintf(char *buffer, U32 bufferSize, const char *format, ...);
-extern int    dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist);
+extern int    dSprintf(char *buffer, size_t bufferSize, const char *format, ...);
+extern int    dVsprintf(char *buffer, size_t bufferSize, const char *format, void *arglist);
 extern int    dSscanf(const char *buffer, const char *format, ...);
 
 #endif

@@ -72,11 +72,12 @@ static void pngReadDataFn(png_structp png_ptr,
                     png_bytep   data,
                     png_size_t  length)
 {
-   AssertFatal(png_get_io_ptr(png_ptr) != NULL, "No stream?");
+   AssertFatal( png_get_io_ptr(png_ptr) != NULL, "No stream?" );
+   AssertFatal( length <= U32_MAX, "Huge data." );
 
-   Stream *strm = (Stream*)png_get_io_ptr(png_ptr);
-   bool success = strm->read(length, data);
-   AssertFatal(success, "pngReadDataFn - failed to read from stream!");
+   Stream *strm = (Stream*)png_get_io_ptr( png_ptr );
+   const bool success = strm->read( (U32)length, data );
+   AssertFatal( success, "pngReadDataFn - failed to read from stream!" );
 }
 
 
@@ -85,11 +86,12 @@ static void pngWriteDataFn(png_structp png_ptr,
                      png_bytep   data,
                      png_size_t  length)
 {
-   AssertFatal(png_get_io_ptr(png_ptr) != NULL, "No stream?");
+   AssertFatal( png_get_io_ptr(png_ptr) != NULL, "No stream?" );
+   AssertFatal( length <= U32_MAX, "Huge data." );
 
-   Stream *strm = (Stream*)png_get_io_ptr(png_ptr);
-   bool success = strm->write(length, data);
-   AssertFatal(success, "pngWriteDataFn - failed to write to stream!");
+   Stream *strm = (Stream*)png_get_io_ptr( png_ptr );
+   const bool success = strm->write( (U32)length, data );
+   AssertFatal( success, "pngWriteDataFn - failed to write to stream!" );
 }
 
 
@@ -101,7 +103,8 @@ static void pngFlushDataFn(png_structp /*png_ptr*/)
 
 static png_voidp pngMallocFn(png_structp /*png_ptr*/, png_size_t size)
 {
-   return FrameAllocator::alloc(size);
+   AssertFatal( size <= U32_MAX, "Huge data." );
+   return FrameAllocator::alloc( (U32)size );
 }
 
 static void pngFreeFn(png_structp /*png_ptr*/, png_voidp /*mem*/)
@@ -110,7 +113,8 @@ static void pngFreeFn(png_structp /*png_ptr*/, png_voidp /*mem*/)
 
 static png_voidp pngRealMallocFn(png_structp /*png_ptr*/, png_size_t size)
 {
-   return (png_voidp)dMalloc(size);
+   AssertFatal( size <= U32_MAX, "Huge data." );
+   return (png_voidp)dMalloc( (U32)size );
 }
 
 static void pngRealFreeFn(png_structp /*png_ptr*/, png_voidp mem)
@@ -264,7 +268,7 @@ static bool sReadPNG(Stream &stream, GBitmap *bitmap)
    //  above...
    png_read_update_info(png_ptr, info_ptr);
 
-   png_uint_32 rowBytes = png_get_rowbytes(png_ptr, info_ptr);
+   const png_size_t rowBytes = png_get_rowbytes(png_ptr, info_ptr);
    if (format == GFXFormatR8G8B8) 
    {
       AssertFatal(rowBytes == width * 3,

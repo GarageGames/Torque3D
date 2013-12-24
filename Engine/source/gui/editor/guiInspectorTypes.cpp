@@ -873,13 +873,14 @@ void GuiInspectorTypeCommand::_setCommand( GuiButtonCtrl *ctrl, StringTableEntry
       // expandEscape isn't length-limited, so while this _should_ work
       // in most circumstances, it may still fail if getData() has lots of
       // non-printable characters
-      S32 len = 2 * dStrlen(command) + 512;
+      const S32 len = 2 * dStrlen(command) + 512;
 
       FrameTemp<char> szBuffer(len);
 
 	   S32 written = dSprintf( szBuffer, len, "%s(\"", mTextEditorCommand );
-      expandEscape(szBuffer.address() + written, command);
-      written = strlen(szBuffer);
+      expandEscape( szBuffer.address() + written, command );
+      AssertFatal( strlen( szBuffer ) <= U32_MAX, "Huge data." );
+      written = (S32)strlen( szBuffer );
       dSprintf( szBuffer.address() + written, len - written, "\", \"%d.apply\", %d.getRoot());", getId(), getId() );
 
 	   ctrl->setField( "Command", szBuffer );

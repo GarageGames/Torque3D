@@ -33,6 +33,7 @@
 // hierarchy
 struct SceneStats
 {
+   // @todo fine Change S32 to size_t?
    S32 numNodes;
    S32 numMeshes;
    S32 numPolygons;
@@ -192,8 +193,11 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
    // Get material count
    for (S32 i = 0; i < root->getLibrary_materials_array().getCount(); i++)
    {
-      const domLibrary_materials* libraryMats = root->getLibrary_materials_array()[i];
-      stats.numMaterials += libraryMats->getMaterial_array().getCount();
+      const domLibrary_materials* libraryMats =
+         root->getLibrary_materials_array()[i];
+      const size_t mc = libraryMats->getMaterial_array().getCount();
+      AssertFatal( mc <= S32_MAX, "Huge data." );
+      stats.numMaterials += (S32)mc;
       for (S32 j = 0; j < libraryMats->getMaterial_array().getCount(); j++)
       {
          domMaterial* mat = libraryMats->getMaterial_array()[j];
@@ -204,8 +208,11 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
    // Get animation count
    for (S32 i = 0; i < root->getLibrary_animation_clips_array().getCount(); i++)
    {
-      const domLibrary_animation_clips* libraryClips = root->getLibrary_animation_clips_array()[i];
-      stats.numClips += libraryClips->getAnimation_clip_array().getCount();
+      const domLibrary_animation_clips* libraryClips =
+         root->getLibrary_animation_clips_array()[i];
+      const size_t ac = libraryClips->getAnimation_clip_array().getCount();
+      AssertFatal( ac <= S32_MAX, "Huge data." );
+      stats.numClips += (S32)ac;
       for (S32 j = 0; j < libraryClips->getAnimation_clip_array().getCount(); j++)
       {
          domAnimation_clip* clip = libraryClips->getAnimation_clip_array()[j];

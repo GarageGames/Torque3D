@@ -825,8 +825,9 @@ const char* Platform::getClipboard()
 
    hGlobal = GetClipboardData(CF_TEXT);
    pGlobal = GlobalLock(hGlobal);
-	S32 cbLength = strlen((char *)pGlobal);
-   char  *returnBuf = Con::getReturnBuffer(cbLength + 1);
+	const size_t cbLength = strlen((char *)pGlobal);
+   AssertFatal( cbLength < U32_MAX, "Huge data." )
+   char  *returnBuf = Con::getReturnBuffer((U32)cbLength + 1);
 	strcpy(returnBuf, (char *)pGlobal);
 	returnBuf[cbLength] = '\0';
    GlobalUnlock(hGlobal);
@@ -846,7 +847,8 @@ bool Platform::setClipboard(const char *text)
    if (!OpenClipboard(NULL))
 		return false;
 
-	S32 cbLength = strlen(text);
+	const size_t cbLength = strlen(text);
+   AssertFatal( cbLength < U32_MAX, "Huge data." )
 
 	HGLOBAL hGlobal;
 	LPVOID  pGlobal;

@@ -396,7 +396,7 @@ S32 dVprintf(const char *format, void *arglist)
    return vprintf(format, (char*)arglist);
 }
 
-S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
+S32 dSprintf(char *buffer, size_t bufferSize, const char *format, ...)
 {
    va_list args;
    va_start(args, format);
@@ -409,7 +409,7 @@ S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
 }
 
 
-S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist)
+S32 dVsprintf(char *buffer, size_t bufferSize, const char *format, void *arglist)
 {
    S32 len = vsnprintf(buffer, bufferSize, format, (char*)arglist);
    
@@ -516,7 +516,7 @@ char* dStristr( char* str1, const char* str2 )
 
    // Slow but at least we have it.
 
-   const U32 str2len = strlen( str2 );
+   const size_t str2len = strlen( str2 );
    while( *str1 )
    {
       if ( strncasecmp( str1, str2, str2len ) == 0 )

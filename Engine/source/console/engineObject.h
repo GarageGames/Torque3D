@@ -456,7 +456,7 @@ class IEngineObjectPool
    
       /// Allocate a new object memory block of the given size.
       /// @return Pointer to a new memory block or NULL on failure.
-      virtual void* allocateObject( U32 size TORQUE_TMM_ARGS_DECL ) = 0;
+      virtual void* allocateObject( size_t size TORQUE_TMM_ARGS_DECL ) = 0;
       
       /// Return the member for the object at the given address to the
       /// allocator for reuse.
@@ -485,7 +485,7 @@ class EngineCRuntimeObjectPool : public IEngineObjectPool
       static EngineCRuntimeObjectPool* instance() { return &smInstance; }
       
       // IEngineObjectPool
-      virtual void* allocateObject( U32 size TORQUE_TMM_ARGS_DECL );
+      virtual void* allocateObject( size_t size TORQUE_TMM_ARGS_DECL );
       virtual void freeObject( void* ptr );
 };
 
