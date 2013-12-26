@@ -434,7 +434,10 @@ class SFXSource : public SimGroup
       virtual bool isVirtualized() const { return false; }
       
       /// Returns true if this is a looping source.
-      bool isLooping() const { return mDescription->mIsLooping; }
+      bool isLooping() const {
+         AssertFatal( mDescription, "SFXSource::isLooping() Don't initialized." );
+         return mDescription->mIsLooping;
+      }
 
       /// @}
       

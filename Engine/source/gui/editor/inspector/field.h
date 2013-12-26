@@ -91,7 +91,7 @@ class GuiInspectorField : public GuiControl
       
    public:
 
-      explicit GuiInspectorField();
+      GuiInspectorField();
 
       ///
       GuiInspectorField( GuiInspector *inspector, GuiInspectorGroup* parent, AbstractClassRep::Field* field );

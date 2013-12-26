@@ -93,9 +93,7 @@ bool GuiInspectorGroup::onAdd()
    if(!createContent())
       return false;
 
-   inspectGroup();
-
-   return true;
+   return inspectGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -230,7 +228,7 @@ void GuiInspectorGroup::clearFields()
 bool GuiInspectorGroup::inspectGroup()
 {
    // We can't inspect a group without a target!
-   if( !mParent->getNumInspectObjects() )
+   if( !mParent || !mParent->getNumInspectObjects() )
       return false;
 
    // to prevent crazy resizing, we'll just freeze our stack for a sec..

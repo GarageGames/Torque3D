@@ -49,7 +49,11 @@ GuiInspectorVariableField::~GuiInspectorVariableField()
 }
 
 bool GuiInspectorVariableField::onAdd()
-{    
+{
+   if ( !mInspector ) {
+      return false;
+   }
+
    setInspectorProfile();   
 
    // Hack: skip our immediate parent

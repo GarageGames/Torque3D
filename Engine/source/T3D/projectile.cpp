@@ -550,6 +550,7 @@ S32 ProjectileData::scaleValue( S32 value, bool down )
 //
 Projectile::Projectile()
  : mPhysicsWorld( NULL ),
+   mDataBlock( NULL ),
    mCurrPosition( 0, 0, 0 ),
    mCurrVelocity( 0, 0, 1 ),
    mSourceObjectId( -1 ),
@@ -694,7 +695,10 @@ F32 Projectile::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32
 
 bool Projectile::onAdd()
 {
-   if(!Parent::onAdd())
+   if ( !Parent::onAdd() )
+      return false;
+
+   if ( !mDataBlock )
       return false;
 
    if (isServerObject())

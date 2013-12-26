@@ -607,6 +607,7 @@ bool SceneManager::addObjectToScene( SceneObject* object )
 
 void SceneManager::removeObjectFromScene( SceneObject* obj )
 {
+   AssertFatal( obj, "SceneManager::removeObjectFromScene - Object is not declared" );
    AssertFatal( obj->getSceneManager() == this, "SceneManager::removeObjectFromScene - Object not part of SceneManager" );
 
    // Notify the object.
@@ -615,7 +616,8 @@ void SceneManager::removeObjectFromScene( SceneObject* obj )
 
    // Remove the object from the container.
 
-   getContainer()->removeObject( obj );
+   if( getContainer() )
+      getContainer()->removeObject( obj );
 
    // Remove the object from the zoning system.
 
