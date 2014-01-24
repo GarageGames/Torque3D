@@ -190,6 +190,8 @@ public:
 
    void setHeight( U32 x, U32 y, U16 height );
 
+   void setHeight( U32 i, U16 height );
+
    const U16* getHeightAddress( U32 x, U32 y ) const;
 
    U16 getHeight( U32 x, U32 y ) const;
@@ -270,7 +272,12 @@ inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
 inline void TerrainFile::setHeight( U32 x, U32 y, U16 height )
 {
    clamp( &x, &y );
-   mHeightMap[ x + ( y * mSize ) ] = height;
+   setHeight( x + y * mSize,  height );
+}
+
+inline void TerrainFile::setHeight( U32 i, U16 height )
+{
+   mHeightMap[ i ] = height;
 }
 
 inline const U16* TerrainFile::getHeightAddress( U32 x, U32 y ) const

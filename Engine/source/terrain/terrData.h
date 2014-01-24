@@ -47,6 +47,9 @@
 
 
 
+TerrainBlock* getTerrainUnderWorldPoint(const Point3F&);
+
+
 class GBitmap;
 class TerrainBlock;
 class TerrCell;

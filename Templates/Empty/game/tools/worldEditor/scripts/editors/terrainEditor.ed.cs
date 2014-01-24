@@ -348,6 +348,15 @@ function TerrainEditor::onSmoothHeightmap( %this )
    %action.addToManager( Editor.getUndoManager() );
 }
 
+function TerrainEditor::onSolderEdges( %this )
+{
+   // # Work with all terrains on the loaded level.
+   %action = new TerrainSolderEdgesAction();
+   %action.solder();
+   %action.addToManager( Editor.getUndoManager() );
+   ETerrainEditor.isDirty = true;
+}
+
 function TerrainEditor::onMaterialUndo( %this )
 {
    // Update the gui to reflect the current materials.
