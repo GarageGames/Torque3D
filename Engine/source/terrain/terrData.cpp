@@ -896,13 +896,12 @@ bool TerrainBlock::onAdd()
 
    if (terr->mFileVersion != TerrainFile::FILE_VERSION || terr->mNeedsResaving)
    {
-      Con::errorf(" *********************************************************");
-      Con::errorf(" *********************************************************");
-      Con::errorf(" *********************************************************");
-      Con::errorf(" PLEASE RESAVE THE TERRAIN FILE FOR THIS MISSION!  THANKS!");
-      Con::errorf(" *********************************************************");
-      Con::errorf(" *********************************************************");
-      Con::errorf(" *********************************************************");
+      Con::warnf(
+         "*********************************************************\n"
+         "         THE TERRAIN SAVED IN THE OLDER VERSION.         \n"
+         "             RESAVE IT FOR OPTIMIZE LOADING.             \n"
+         "*********************************************************\n"
+      );
    }
 
    _updateBounds();
