@@ -348,7 +348,7 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
    // terrain elevation range.
    const Point3F &terrainPos = getPosition();
    if (  box.maxExtents.z - terrainPos.z < -TerrainThickness || 
-         box.minExtents.z - terrainPos.z > fixedToFloat( mFile->getMaxHeight() ) )
+         box.minExtents.z - terrainPos.z > mFile->getMaxHeight() )
       return;
 
    // Transform the bounding sphere into the object's coord space.  Note that this
@@ -365,8 +365,8 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
    if (xExt > MaxExtent)
       xExt = MaxExtent;
 
-   U16 heightMax = floatToFixed(osBox.maxExtents.z);
-   U16 heightMin = (osBox.minExtents.z < 0)? 0: floatToFixed(osBox.minExtents.z);
+   const F32 heightMax = osBox.maxExtents.z;
+   const F32 heightMin = (osBox.minExtents.z < 0) ? 0 : osBox.minExtents.z;
 
    const U32 BlockMask = mFile->mSize - 1;
 
@@ -414,10 +414,14 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
          cp->mObject = this;
          cp->squareId = sid;
          cp->material = mFile->getLayerIndex( xi, yi );
-         cp->box.minExtents.set((F32)(x * mSquareSize), (F32)(y * mSquareSize), fixedToFloat( sq->minHeight ));
+         cp->box.minExtents.set(
+             (F32)(x * mSquareSize),
+             (F32)(y * mSquareSize),
+             sq->minHeight
+         );
          cp->box.maxExtents.x = cp->box.minExtents.x + mSquareSize;
          cp->box.maxExtents.y = cp->box.minExtents.y + mSquareSize;
-         cp->box.maxExtents.z = fixedToFloat( sq->maxHeight );
+         cp->box.maxExtents.z = sq->maxHeight;
          mObjToWorld.mul(cp->box);
 
          // Build points
@@ -427,7 +431,7 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
             S32 dy = dx ^ (i & 1);
             pos->x = (F32)((x + dx) * mSquareSize);
             pos->y = (F32)((y + dy) * mSquareSize);
-            pos->z = fixedToFloat( mFile->getHeight(xi + dx, yi + dy) );
+            pos->z = mFile->getHeight(xi + dx, yi + dy);
          }
 
          // Build normals, then split into two Convex objects if the
@@ -488,7 +492,7 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
    // terrain elevation range.
    const Point3F &terrainPos = getPosition();
    if (  box.maxExtents.z - terrainPos.z < -TerrainThickness || 
-         box.minExtents.z - terrainPos.z > fixedToFloat( mFile->getMaxHeight() ) )
+         box.minExtents.z - terrainPos.z > mFile->getMaxHeight() )
       return false;
 
    // Transform the bounding sphere into the object's coord 
@@ -512,8 +516,8 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
       xExt = MaxExtent;
    xEnd = xStart + xExt;
 
-   U32 heightMax = floatToFixed(osBox.maxExtents.z);
-   U32 heightMin = (osBox.minExtents.z < 0.0f)? 0.0f: floatToFixed(osBox.minExtents.z);
+   const F32 heightMax = osBox.maxExtents.z;
+   const F32 heightMin = (osBox.minExtents.z < 0.0f) ? 0.0f : osBox.minExtents.z;
 
    // Index of shared points
    U32 bp[(MaxExtent + 1) * 2],*vb[2];
@@ -572,7 +576,7 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
                Point3F pos;
                pos.x = (F32)((x + dx) * mSquareSize);
                pos.y = (F32)((y + dy) * mSquareSize);
-               pos.z = fixedToFloat( mFile->getHeight(xi + dx, yi + dy) );
+               pos.z = mFile->getHeight(xi + dx, yi + dy);
                *vp = polyList->addPoint(pos);
             }
             vi[i] = *vp;
@@ -808,11 +812,11 @@ bool TerrainBlock::castRayBlock( const Point3F &pStart,
       F32 startZ = startT * (pEnd.z - pStart.z) + pStart.z;
       F32 endZ = endT * (pEnd.z - pStart.z) + pStart.z;
 
-      F32 minHeight = fixedToFloat(sq->minHeight);
+      const F32 minHeight = sq->minHeight;
       if(startZ <= minHeight && endZ <= minHeight)
          continue;
 
-      F32 maxHeight = fixedToFloat(sq->maxHeight);
+      const F32 maxHeight = sq->maxHeight;
       if(startZ >= maxHeight && endZ >= maxHeight)
          continue;
 
@@ -822,13 +826,13 @@ bool TerrainBlock::castRayBlock( const Point3F &pStart,
 
       if(level == 0)
       {
-         F32 xs = blockPos.x * invBlockSize;
-         F32 ys = blockPos.y * invBlockSize;
+         const F32 xs = blockPos.x * invBlockSize;
+         const F32 ys = blockPos.y * invBlockSize;
 
-         F32 zBottomLeft = fixedToFloat( mFile->getHeight(blockPos.x, blockPos.y) );
-         F32 zBottomRight= fixedToFloat( mFile->getHeight(blockPos.x + 1, blockPos.y) );
-         F32 zTopLeft =    fixedToFloat( mFile->getHeight(blockPos.x, blockPos.y + 1) );
-         F32 zTopRight =   fixedToFloat( mFile->getHeight(blockPos.x + 1, blockPos.y + 1) );
+         const F32 zBottomLeft  = mFile->getHeight(blockPos.x, blockPos.y);
+         const F32 zBottomRight = mFile->getHeight(blockPos.x + 1, blockPos.y);
+         const F32 zTopLeft     = mFile->getHeight(blockPos.x, blockPos.y + 1);
+         const F32 zTopRight    = mFile->getHeight(blockPos.x + 1, blockPos.y + 1);
 
          PlaneF p1, p2;
          PlaneF divider;

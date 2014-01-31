@@ -352,8 +352,7 @@ void TerrainBlock::_onZoningChanged( SceneZoneSpaceManager *zoneManager )
 
 void TerrainBlock::setHeight( const Point2I &pos, F32 height )
 {
-   U16 ht = floatToFixed( height );
-   mFile->setHeight( pos.x, pos.y, ht );
+   mFile->setHeight( pos.x, pos.y, height );
 
    // Note: We do not update the grid here as this could
    // be called several times in a loop.  We depend on the
@@ -362,8 +361,7 @@ void TerrainBlock::setHeight( const Point2I &pos, F32 height )
 
 F32 TerrainBlock::getHeight( const Point2I &pos )
 {
-   U16 ht = mFile->getHeight( pos.x, pos.y );
-   return fixedToFloat( ht );
+   return mFile->getHeight( pos.x, pos.y );
 }
 
 void TerrainBlock::updateGridMaterials( const Point2I &minPt, const Point2I &maxPt )
@@ -480,10 +478,10 @@ bool TerrainBlock::getHeight( const Point2F &pos, F32 *height ) const
    if ( sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft = fixedToFloat( mFile->getHeight( x, y ) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight( x + 1, y ) );
-   F32 zTopLeft = fixedToFloat( mFile->getHeight( x, y + 1 ) );
-   F32 zTopRight = fixedToFloat( mFile->getHeight( x + 1, y + 1 ) );
+   const F32 zBottomLeft  = mFile->getHeight( x, y );
+   const F32 zBottomRight = mFile->getHeight( x + 1, y );
+   const F32 zTopLeft     = mFile->getHeight( x, y + 1 );
+   const F32 zTopRight    = mFile->getHeight( x + 1, y + 1 );
 
    if ( sq->flags & TerrainSquare::Split45 )
    {
@@ -531,10 +529,10 @@ bool TerrainBlock::getNormal( const Point2F &pos, Point3F *normal, bool normaliz
    if ( skipEmpty && sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft = fixedToFloat( mFile->getHeight( x, y ) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight( x + 1, y ) );
-   F32 zTopLeft = fixedToFloat( mFile->getHeight( x, y + 1 ) );
-   F32 zTopRight = fixedToFloat( mFile->getHeight( x + 1, y + 1 ) );
+   const F32 zBottomLeft  = mFile->getHeight( x, y );
+   const F32 zBottomRight = mFile->getHeight( x + 1, y );
+   const F32 zTopLeft     = mFile->getHeight( x, y + 1 );
+   const F32 zTopRight    = mFile->getHeight( x + 1, y + 1 );
 
    if ( sq->flags & TerrainSquare::Split45 )
    {
@@ -586,10 +584,10 @@ bool TerrainBlock::getSmoothNormal( const Point2F &pos,
    if ( skipEmpty && sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 h1 = fixedToFloat( mFile->getHeight( x + 1, y ) );
-   F32 h2 = fixedToFloat( mFile->getHeight( x, y + 1 ) );
-   F32 h3 = fixedToFloat( mFile->getHeight( x - 1, y ) );
-   F32 h4 = fixedToFloat( mFile->getHeight( x, y - 1 ) );
+   const F32 h1 = mFile->getHeight( x + 1, y );
+   const F32 h2 = mFile->getHeight( x, y + 1 );
+   const F32 h3 = mFile->getHeight( x - 1, y );
+   const F32 h4 = mFile->getHeight( x, y - 1 );
 
    normal->set( h3 - h1, h4 - h2, mSquareSize * 2.0f );
 
@@ -623,10 +621,10 @@ bool TerrainBlock::getNormalAndHeight( const Point2F &pos, Point3F *normal, F32 
    if ( sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft  = fixedToFloat( mFile->getHeight(x, y) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight(x + 1, y) );
-   F32 zTopLeft     = fixedToFloat( mFile->getHeight(x, y + 1) );
-   F32 zTopRight    = fixedToFloat( mFile->getHeight(x + 1, y + 1) );
+   const F32 zBottomLeft  = mFile->getHeight(x, y);
+   const F32 zBottomRight = mFile->getHeight(x + 1, y);
+   const F32 zTopLeft     = mFile->getHeight(x, y + 1);
+   const F32 zTopRight    = mFile->getHeight(x + 1, y + 1);
 
    if ( sq->flags & TerrainSquare::Split45 )
    {
@@ -695,10 +693,10 @@ bool TerrainBlock::getNormalHeightMaterial(  const Point2F &pos,
    if ( sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft  = fixedToFloat( mFile->getHeight(x, y) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight(x + 1, y) );
-   F32 zTopLeft     = fixedToFloat( mFile->getHeight(x, y + 1) );
-   F32 zTopRight    = fixedToFloat( mFile->getHeight(x + 1, y + 1) );
+   const F32 zBottomLeft  = mFile->getHeight(x, y);
+   const F32 zBottomRight = mFile->getHeight(x + 1, y);
+   const F32 zTopLeft     = mFile->getHeight(x, y + 1);
+   const F32 zTopRight    = mFile->getHeight(x + 1, y + 1);
 
    matName = mFile->getMaterialName( xm, ym );
 
@@ -1233,8 +1231,8 @@ void TerrainBlock::getMinMaxHeight( F32 *minHeight, F32 *maxHeight ) const
 {
    // We can get the bound height from the last grid level.
    const TerrainSquare *sq = mFile->findSquare( mFile->mGridLevels, 0, 0 );
-   *minHeight = fixedToFloat( sq->minHeight );
-   *maxHeight = fixedToFloat( sq->maxHeight );
+   *minHeight = sq->minHeight;
+   *maxHeight = sq->maxHeight;
 }
 
 //-----------------------------------------------------------------------------

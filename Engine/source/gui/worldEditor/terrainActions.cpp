@@ -727,7 +727,7 @@ void ThermalErosionAction::process(Selection * sel, const Gui3DMouseEvent &, boo
       {
          for ( U32 y = 0; y < TerrainBlock::BlockSize; y++ )
          {
-            height = fixedToFloat( tblock->getHeight( x, y ) );
+            height = tblock->getHeight( x, y );
             mTerrainHeights[ x + (y << 8)] = height;
 
             if ( height > maxHeight )

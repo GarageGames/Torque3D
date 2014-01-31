@@ -455,7 +455,7 @@ void TerrCell::_updateVertexBuffer()
          // Setup this point.
          point.x = (F32)gridPt.x * squareSize;
          point.y = (F32)gridPt.y * squareSize;
-         height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+         height = file->getHeight( gridPt.x, gridPt.y );
          vert->point.x = point.x;
          vert->point.y = point.y;
          vert->point.z = height;
@@ -465,7 +465,7 @@ void TerrCell::_updateVertexBuffer()
          vert->normal = normal;
 
          // Get the tangent z.
-         vert->tangentZ = fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) ) - height;
+         vert->tangentZ = file->getHeight( gridPt.x + 1, gridPt.y ) - height;
 
          // Test the empty state for this vert.
          if ( file->isEmptyAt( gridPt.x, gridPt.y ) )
@@ -492,7 +492,7 @@ void TerrCell::_updateVertexBuffer()
       
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      height = file->getHeight( gridPt.x, gridPt.y );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -502,7 +502,7 @@ void TerrCell::_updateVertexBuffer()
       vert->normal = normal;
 
       // Get the tangent.
-      vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
+      vert->tangentZ = height - file->getHeight( gridPt.x + 1, gridPt.y );
 
       vbcounter++;
       ++vert;      
@@ -516,7 +516,7 @@ void TerrCell::_updateVertexBuffer()
 
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      height = file->getHeight( gridPt.x, gridPt.y );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -526,7 +526,7 @@ void TerrCell::_updateVertexBuffer()
       vert->normal = normal;
 
       // Get the tangent.
-      vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
+      vert->tangentZ = height - file->getHeight( gridPt.x + 1, gridPt.y );
 
       vbcounter++;
       ++vert;      
@@ -540,7 +540,7 @@ void TerrCell::_updateVertexBuffer()
 
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      height = file->getHeight( gridPt.x, gridPt.y );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -550,7 +550,7 @@ void TerrCell::_updateVertexBuffer()
       vert->normal = normal;
 
       // Get the tangent.
-      vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
+      vert->tangentZ = height - file->getHeight( gridPt.x + 1, gridPt.y );
 
       vbcounter++;
       ++vert;      
@@ -564,7 +564,7 @@ void TerrCell::_updateVertexBuffer()
 
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      height = file->getHeight( gridPt.x, gridPt.y );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -574,7 +574,7 @@ void TerrCell::_updateVertexBuffer()
       vert->normal = normal;
 
       // Get the tangent.
-      vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
+      vert->tangentZ = height - file->getHeight( gridPt.x + 1, gridPt.y );
 
       vbcounter++;
       ++vert;      
@@ -883,8 +883,7 @@ void TerrCell::_updateBounds()
          // Setup this point.
          vert.x = (F32)( mPoint.x + x * stepSize ) * squareSize;
          vert.y = (F32)( mPoint.y + y * stepSize ) * squareSize;
-         vert.z = fixedToFloat( file->getHeight(   mPoint.x + x,
-                                                   mPoint.y + y ) );
+         vert.z = file->getHeight( mPoint.x + x, mPoint.y + y );
 
          // HACK: Call it twice to deal with the inverted
          // inital bounds state... shouldn't be a perf issue.

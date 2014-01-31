@@ -97,13 +97,8 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
       {
          for ( S32 x = 0; x < blockSize; x++ )
          {
-            // Very important to subtract the min
-            // noise value when using the noise functions
-            // for terrain, otherwise floatToFixed() will
-            // wrap negative values to U16_MAX, creating
-            // a very ugly terrain.
             height = (floatHeights[ x + (y * blockSize) ] - omin) * terrscale + 30.0f;
-            file->setHeight( x, y, floatToFixed( height ) );
+            file->setHeight( x, y, height );
          }
       }
 

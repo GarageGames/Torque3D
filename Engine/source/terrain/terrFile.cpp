@@ -31,6 +31,9 @@
 #include "platform/profiler.h"
 #include "math/mPlane.h"
 
+#include <algorithm>
+#include <utility>
+
 
 template<>
 void* Resource<TerrainFile>::create( const Torque::Path &path )
@@ -60,24 +63,12 @@ TerrainFile::~TerrainFile()
 {
 }
 
-static U16 calcDev( const PlaneF &pl, const Point3F &pt )
+static F32 calcDev( const PlaneF &pl, const Point3F &pt )
 {
-   F32 z = (pl.d + pl.x * pt.x + pl.y * pt.y) / -pl.z;
-   F32 diff = z - pt.z;
-   if(diff < 0.0f)
-      diff = -diff;
-
-   if(diff > 0xFFFF)
-      return 0xFFFF;
-   else
-      return U16(diff);
+   const F32 z = (pl.d + pl.x * pt.x + pl.y * pt.y) / -pl.z;
+   const F32 diff = (z > pt.z) ? (z - pt.z) : (pt.z - z);
+   return diff;
 }
-
-static U16 Umax( U16 u1, U16 u2 )
-{
-   return u1 > u2 ? u1 : u2;
-}
-
 
 inline U32 getMostSignificantBit( U32 v )
 {
@@ -126,10 +117,10 @@ void TerrainFile::_buildGridMap()
       {
          for ( S32 squareY = 0; squareY < squareCount; squareY++ )
          {
-            U16 min = 0xFFFF;
-            U16 max = 0;
-            U16 mindev45 = 0;
-            U16 mindev135 = 0;
+            F32 min =  std::numeric_limits< F32 >::max();
+            F32 max = -std::numeric_limits< F32 >::max();
+            F32 mindev45 = 0;
+            F32 mindev135 = 0;
 
             // determine max error for both possible splits.
 
@@ -170,21 +161,21 @@ void TerrainFile::_buildGridMap()
                         hasEmpty = true;
                   }
 
-                  U16 ht = getHeight( x, y );
+                  const F32 ht = getHeight( x, y );
                   if ( ht < min )
                      min = ht;
                   if( ht > max )
                      max = ht;
 
                   Point3F pt( (F32)sizeX, (F32)sizeY, (F32)ht );
-                  U16 dev;
+                  F32 dev;
 
                   if(sizeX < sizeY)
                      dev = calcDev(pl1, pt);
                   else if(sizeX > sizeY)
                      dev = calcDev(pl2, pt);
                   else
-                     dev = Umax(calcDev(pl1, pt), calcDev(pl2, pt));
+                     dev = std::max(calcDev(pl1, pt), calcDev(pl2, pt));
 
                   if(dev > mindev45)
                      mindev45 = dev;
@@ -194,7 +185,7 @@ void TerrainFile::_buildGridMap()
                   else if(sizeX + sizeY > squareSize)
                      dev = calcDev(pl4, pt);
                   else
-                     dev = Umax(calcDev(pl3, pt), calcDev(pl4, pt));
+                     dev = std::max(calcDev(pl3, pt), calcDev(pl4, pt));
 
                   if(dev > mindev135)
                      mindev135 = dev;
@@ -267,6 +258,7 @@ void TerrainFile::_initMaterialInstMapping()
 
 bool TerrainFile::save( const char *filename )
 {
+   // @see Enum Constants for details.
    FileStream stream;
    stream.open( filename, Torque::FS::File::Write );
    if ( stream.getStatus() != Stream::Ok )
@@ -292,14 +284,33 @@ bool TerrainFile::save( const char *filename )
    return stream.getStatus() == FileStream::Ok;
 }
 
+U8 TerrainFile::version( const Torque::Path &path )
+{
+   FileStream stream;
+
+   const auto fullPath = path.getFullPath();
+   stream.open( fullPath, Torque::FS::File::Read );
+   if ( stream.getStatus() != Stream::Ok )
+   {
+      Con::errorf( "Resource<TerrainFile>::create - could not open '%s'", fullPath.c_str() );
+      return 0;
+   }
+
+   U8 version;
+   stream.read( &version );
+
+   return version;
+}
+
 TerrainFile* TerrainFile::load( const Torque::Path &path )
 {
    FileStream stream;
 
-   stream.open( path.getFullPath(), Torque::FS::File::Read );
+   const auto  fullPath = path.getFullPath();
+   stream.open( fullPath, Torque::FS::File::Read );
    if ( stream.getStatus() != Stream::Ok )
    {
-      Con::errorf( "Resource<TerrainFile>::create - could not open '%s'", path.getFullPath().c_str() );
+      Con::errorf( "Resource<TerrainFile>::create - could not open '%s'", fullPath.c_str() );
       return NULL;
    }
 
@@ -315,10 +326,13 @@ TerrainFile* TerrainFile::load( const Torque::Path &path )
    ret->mFileVersion = version;
    ret->mFilePath = path;
 
-   if ( version >= 7 )
+   if (version >= 8) {
       ret->_load( stream );
-   else
+   } else if (version == 7) {
+      ret->_loadV7( stream );
+   } else {
       ret->_loadLegacy( stream );
+   }
 
    // Update the collision structures.
    ret->_buildGridMap();
@@ -337,10 +351,45 @@ void TerrainFile::_load( FileStream &stream )
 
    stream.read( &mSize );
 
-   // Load the heightmap.
+   // Load the heightmap with native heights.
    mHeightMap.setSize( mSize * mSize );
    for ( U32 i=0; i < mHeightMap.size(); i++ )
       stream.read( &mHeightMap[i] );
+
+   // Load the layer index map.
+   mLayerMap.setSize( mSize * mSize );
+   for ( U32 i=0; i < mLayerMap.size(); i++ )
+      stream.read( &mLayerMap[i] );
+
+   // Get the material name count.
+   U32 materialCount;
+   stream.read( &materialCount );
+   Vector<String> materials;
+   materials.setSize( materialCount );
+
+   // Load the material names.
+   for ( U32 i=0; i < materialCount; i++ )
+      stream.read( &materials[i] );
+
+   // Resolve the TerrainMaterial objects from the names.
+   _resolveMaterials( materials );
+}
+
+void TerrainFile::_loadV7( FileStream &stream )
+{
+   // NOTE: We read using a loop instad of in one large chunk
+   // because the stream will do endian conversions for us when
+   // reading one type at a time.
+
+   stream.read( &mSize );
+
+   // Load the heightmap with converted to U16 heights.
+   mHeightMap.setSize( mSize * mSize );
+   for ( U32 i=0; i < mHeightMap.size(); i++ ) {
+      U16 height;
+      stream.read( &height );
+      mHeightMap[i] = (F32)height / getKFixedToFloat();
+   }
 
    // Load the layer index map.
    mLayerMap.setSize( mSize * mSize );
@@ -586,7 +635,7 @@ void TerrainFile::setSize( U32 newSize, bool clear )
 
       // Initialize the elevation to something above
       // zero so that we have room to excavate by default.
-      U16 elev = floatToFixed( 512.0f );
+      const F32 elev = 512.0f;
 
       mHeightMap.setSize( newSize * newSize );
       mHeightMap.compact();
@@ -671,7 +720,7 @@ void TerrainFile::smooth( F32 factor, U32 steps, bool updateCollision )
       _buildGridMap();
 }
 
-void TerrainFile::setHeightMap( const Vector<U16> &heightmap, bool updateCollision )
+void TerrainFile::setHeightMap( const Vector<F32> &heightmap, bool updateCollision )
 {
    AssertFatal( mHeightMap.size() == heightmap.size(), "TerrainFile::setHeightMap - Incorrect heightmap size!" );
    dMemcpy( mHeightMap.address(), heightmap.address(), mHeightMap.size() ); 
@@ -698,17 +747,16 @@ void TerrainFile::import(  const GBitmap &heightMap,
    }
 
    // Convert the height map to heights.
-   U16 *oBits = mHeightMap.address();
+   F32 *oBits = mHeightMap.address();
    if ( heightMap.getFormat() == GFXFormatR5G6B5 )
    {
-      const F32 toFixedPoint = ( 1.0f / (F32)U16_MAX ) * floatToFixed( heightScale );
       const U16 *iBits = (const U16*)heightMap.getBits();
       if ( flipYAxis )
       {
          for ( U32 i = 0; i < mSize * mSize; i++ )
          {
-            U16 height = convertBEndianToHost( *iBits );
-            *oBits = (U16)mCeil( (F32)height * toFixedPoint );
+            const U16 height = convertBEndianToHost( *iBits );
+            *oBits = (F32)height * heightScale;
             ++oBits;
             ++iBits;
          }
@@ -717,8 +765,8 @@ void TerrainFile::import(  const GBitmap &heightMap,
       {
          for(S32 y = mSize - 1; y >= 0; y--) {
             for(U32 x = 0; x < mSize; x++) {
-               U16 height = convertBEndianToHost( *iBits );
-               mHeightMap[x + y * mSize] = (U16)mCeil( (F32)height * toFixedPoint );
+               const U16 height = convertBEndianToHost( *iBits );
+               mHeightMap[x + y * mSize] = (F32)height * heightScale;
                ++iBits;
             }
          }
@@ -726,13 +774,13 @@ void TerrainFile::import(  const GBitmap &heightMap,
    }
    else
    {
-      const F32 toFixedPoint = ( 1.0f / (F32)U8_MAX ) * floatToFixed( heightScale );
       const U8 *iBits = heightMap.getBits();
       if ( flipYAxis )
       {
          for ( U32 i = 0; i < mSize * mSize; i++ )
          {
-            *oBits = (U16)mCeil( ((F32)*iBits) * toFixedPoint );
+            const U16 height = *iBits;
+            *oBits = (F32)height * heightScale;
             ++oBits;
             iBits += heightMap.getBytesPerPixel();
          }
@@ -741,7 +789,8 @@ void TerrainFile::import(  const GBitmap &heightMap,
       {
          for(S32 y = mSize - 1; y >= 0; y--) {
             for(U32 x = 0; x < mSize; x++) {
-               mHeightMap[x + y * mSize] = (U16)mCeil( ((F32)*iBits) * toFixedPoint );
+               const U16 height = *iBits;
+               mHeightMap[x + y * mSize] = (F32)height * heightScale;
                iBits += heightMap.getBytesPerPixel();
             }
          }
@@ -794,7 +843,7 @@ void TerrainFile::create(  String *inOutFilename,
    delete file;
 }
 
-inline void getMinMax( U16 &inMin, U16 &inMax, U16 height )
+inline void getMinMax( F32 &inMin, F32 &inMax, F32 height )
 {
    if ( height < inMin )
       inMin = height;
@@ -838,8 +887,8 @@ void TerrainFile::updateGrid( const Point2I &minPt, const Point2I &maxPt )
             py += mSize;
 
          TerrainSquare *sq = findSquare( 0, px, py );
-         sq->minHeight = 0xFFFF;
-         sq->maxHeight = 0;
+         sq->minHeight =  std::numeric_limits< F32 >::max();
+         sq->maxHeight = -std::numeric_limits< F32 >::max();
 
          // Update the empty state.
          if ( isEmptyAt( x, y ) )
@@ -869,8 +918,8 @@ void TerrainFile::updateGrid( const Point2I &minPt, const Point2I &maxPt )
             S32 py = y << level;
 
             TerrainSquare *sq = findSquare(level, px, py);
-            sq->minHeight = 0xFFFF;
-            sq->maxHeight = 0;
+            sq->minHeight =  std::numeric_limits< F32 >::max();
+            sq->maxHeight = -std::numeric_limits< F32 >::max();
             sq->flags &= ~( TerrainSquare::Empty | TerrainSquare::HasEmpty );
 
             checkSquare( sq, findSquare( level - 1, px, py ) );
