@@ -157,18 +157,19 @@ bool BtCollision::addTriangleMesh(  const Point3F *vert,
    return true;
 }
 
-bool BtCollision::addHeightfield(   const U16 *heights,
+bool BtCollision::addHeightfield(   const F32 *heights,
                                     const bool *holes,   // TODO: Bullet height fields do not support holes
                                     U32 blockSize,
                                     F32 metersPerSample,
                                     const MatrixF &localXfm )
 {
-   // We pass the absolute maximum and minimum of a U16 height
-   // field and not the actual min and max.  This helps with
-   // placement.
-   const F32 heightScale = 0.03125f;
+   // We pass the absolute maximum and minimum of a height field
+   // and not the actual min and max. This helps with placement.
+   // @todo optimize Escape collision-clases from the 'heightScale'.
+   const F32 heightScale = 1.0f;
    const F32 minHeight = 0;
-   const F32 maxHeight = 65535 * heightScale;
+   // @todo fine Move this const to the configure.
+   const F32 maxHeight = 10000.0f;
 
    btHeightfieldTerrainShape *shape = new btHeightfieldTerrainShape( blockSize, blockSize,
                                                                      (void*)heights,
