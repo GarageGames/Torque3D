@@ -1,7 +1,7 @@
 Torque 3D v3.5 - PhysX 3.3 Basic Plugin
 ==========================
 
-This is a basic PhysX 3.3 plugin that does not contain any added features like cloth,particles and CCD. This plugin provides no more features than the bullet plugin and can therefore be used as a direct alternative. It does not modify any files outside of the physx3 folder. A far more advanced physx3 plugin with CCD, cloth and particles can be found on this repository under the physx branch.
+This is a basic PhysX 3.3 plugin that does not contain any added features like cloth,particles and CCD. This plugin provides no more features than the bullet plugin and can therefore be used as a drop in alternative. It does not modify any files outside of the physx3 folder. A far more advanced physx3 plugin with CCD, cloth and particles can be found on this repository under the physx3 branch.
 
 Setting up PhysX 3.3 using the Torque 3D Project Manager
 ------------------------------------------
