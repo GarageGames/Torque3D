@@ -1,5 +1,5 @@
-Torque 3D v3.5
-==============
+Torque 3D v3.5.1
+================
 
 MIT Licensed Open Source version of [Torque 3D](http://www.garagegames.com/products/torque-3d) from [GarageGames](http://www.garagegames.com)
 
