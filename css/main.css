@@ -19,7 +19,19 @@
   background: none;
   background-image: none;
   opacity: 1.0;
+  text-shadow: none;
 }
+
+.site .carousel-indicators {
+  bottom: -40px;
+}
+
+.site .carousel-indicators li {
+  border-radius: 3px;
+}
+
+.site h1 { font-size: 24px; }
+.site h2 { font-size: 20px; }
 
 /*-----------------------------------------------------------------------------
  * Site
@@ -30,7 +42,6 @@
 }
 
 .site {
-  text-align: justify;
   margin: 51px auto 2em;
   line-height: 1.5em;
 }
@@ -40,8 +51,17 @@
   color: white;
 }
 
+.site .banner table {
+  margin: 0 auto;
+}
+
 .site .banner table td {
   padding-right: 50px;
+}
+
+.site .carousel-control i {
+  position: absolute;
+  top: 50%;
 }
 
 .footer {
@@ -57,7 +77,6 @@
 }
 
 .footer .contact a {
-  color: #8085C1;
 }
 
 .footer .rss {
@@ -68,6 +87,10 @@
 
 .footer .rss img {
   border: 0;
+}
+
+.site ol ol {
+  list-style-type: lower-alpha;
 }
 
 /*-----------------------------------------------------------------------------
