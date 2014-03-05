@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>{{page.title}}</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/font-awesome.min.css">
+
+        <script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="site">
+            <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/">Torque 3D</a>
+                    </div>
+
+                    <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="/engine" class="dropdown-toggle" data-toggle="dropdown">Engine<i class="fa fa-angle-down"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/engine#features">Features</a></li>
+                                    <li><a href="/engine#roadmap">Roadmap</a></li>
+                                    <li><a href="/engine#made-with-torque">Made with Torque</a></li>
+                                    <li><a href="/engine#history">History</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="dropdown">
+                                <a href="/start" class="dropdown-toggle" data-toggle="dropdown">Get started<i class="fa fa-angle-down"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/start#download">Download</a></li>
+                                    <li><a href="/start#tutorials">Tutorials</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="dropdown">
+                                <a href="/committee" class="dropdown-toggle" data-toggle="dropdown">Committee<i class="fa fa-angle-down"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/committee#what-is-the-steering-committee">What is the Steering Committee?</a></li>
+                                    <li><a href="/committee#current-membership">Current Membership</a></li>
+                                    <li><a href="/committee#charter">Charter</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="dropdown">
+                                <a href="/contribute" class="dropdown-toggle" data-toggle="dropdown">Contribute<i class="fa fa-angle-down"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/contribute#pull-request-guide">Pull-request guide</a></li>
+                                    <li><a href="/contribute#versions">Versions</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="dropdown">
+                                <a href="/community" class="dropdown-toggle" data-toggle="dropdown">Community<i class="fa fa-angle-down"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/community#forum">Forum</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            {{ content }}
+
+            <div class="footer">
+                <div class="container">
+                    <div class="contact">
+                        <p>
+                            Your Name<br />
+                            What You Are<br />
+                            you@example.com
+                        </p>
+                    </div>
+                    <div class="contact">
+                        <p>
+                            <a href="https://github.com/yourusername">github.com/yourusername</a><br />
+                            <a href="https://twitter.com/yourusername">twitter.com/yourusername</a><br />
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

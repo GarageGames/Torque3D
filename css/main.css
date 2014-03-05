@@ -1,0 +1,89 @@
+/*-----------------------------------------------------------------------------
+ * Bootstrap overrides
+ */
+
+.site .navbar-default {
+  background-color: white;
+}
+
+.site p {
+  margin-top: 10px;
+}
+
+.site .media:first-child {
+  margin-top: 15px;
+}
+
+.site .carousel-control.right,
+.site .carousel-control.left {
+  background: none;
+  background-image: none;
+  opacity: 1.0;
+}
+
+/*-----------------------------------------------------------------------------
+ * Site
+ */
+
+.dropdown-toggle i {
+  margin-left: 0.3em;
+}
+
+.site {
+  text-align: justify;
+  margin: 51px auto 2em;
+  line-height: 1.5em;
+}
+
+.site .banner {
+  background-color: #a00;
+  color: white;
+}
+
+.site .banner table td {
+  padding-right: 50px;
+}
+
+.footer {
+  font-size: 80%;
+  color: #666;
+  margin-top: 2em;
+  overflow: hidden;
+}
+
+.footer .contact {
+  float: left;
+  margin-right: 3em;
+}
+
+.footer .contact a {
+  color: #8085C1;
+}
+
+.footer .rss {
+  margin-top: 1.1em;
+  margin-right: -.2em;
+  float: right;
+}
+
+.footer .rss img {
+  border: 0;
+}
+
+/*-----------------------------------------------------------------------------
+ * Static pages
+ */
+
+.page h2 {
+  color: #555;
+}
+
+.page .banner {
+  margin-top: 1em;
+}
+
+.page .banner h1 {
+  /* Fixes scrolling to anchors with the fixed navbar. */
+  margin-top: -60px;
+  padding-top: 70px;
+}
