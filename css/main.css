@@ -30,6 +30,11 @@
   border-radius: 3px;
 }
 
+.site .carousel-inner .item {
+  width: 80%;
+  margin: 0 auto;
+}
+
 .site h1 { font-size: 24px; }
 .site h2 { font-size: 20px; }
 
@@ -51,12 +56,8 @@
   color: white;
 }
 
-.site .banner table {
-  margin: 0 auto;
-}
-
-.site .banner table td {
-  padding-right: 50px;
+.site .banner .col-sm-4 {
+  text-align: center;
 }
 
 .site .carousel-control i {
@@ -74,9 +75,6 @@
 .footer .contact {
   float: left;
   margin-right: 3em;
-}
-
-.footer .contact a {
 }
 
 .footer .rss {
