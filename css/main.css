@@ -42,6 +42,11 @@
  * Site
  */
 
+h4 a,
+h4 a:hover {
+  color: rgb(51, 51, 51);
+}
+
 .dropdown-toggle i {
   margin-left: 0.3em;
 }
@@ -107,4 +112,14 @@
   /* Fixes scrolling to anchors with the fixed navbar. */
   margin-top: -60px;
   padding-top: 70px;
+}
+
+img.made-with-torque {
+  width: 128px;
+  border-radius: 3px;
+}
+
+img.feature {
+  width: 128px;
+  border-radius: 3px;
 }
