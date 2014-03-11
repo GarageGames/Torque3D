@@ -25,48 +25,54 @@
 #ifdef WIN32
 
 #include <windows.h>
-#include <stdio.h>
+#include <string>
 
 extern "C"
 {
-   int (*torque_winmain)( HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow) = NULL;
+    int (*torque_winmain)(HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow) = NULL;
 };
+
+bool getDllName(std::wstring& dllName)
+{
+    wchar_t filenameBuf[MAX_PATH];
+    DWORD length = GetModuleFileNameW( NULL, filenameBuf, MAX_PATH );
+    if(length == 0) return false;
+    dllName = std::wstring(filenameBuf);
+    size_t dotPos = dllName.find_last_of(L".");
+    if(dotPos == std::wstring::npos) return false;
+    dllName.erase(dotPos);
+    dllName += L".dll";
+    return true;
+}
 
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
 {
-   char filename[4096];
-   char gameLib[4096];
+    std::wstring dllName = std::wstring();
+    if(!getDllName(dllName)) {
+        MessageBoxW(NULL, L"Unable to find game dll", L"Error",  MB_OK|MB_ICONWARNING);
+        return -1;
+    }
+    
+    HMODULE hGame = LoadLibraryW(dllName.c_str());
+    if (!hGame) {
+        wchar_t error[4096];
+        _swprintf_l(error, sizeof(error), L"Unable to load game library: %s.  Please make sure it exists and the latest DirectX is installed.", _get_current_locale(), dllName.c_str());
+        MessageBoxW(NULL, error, L"Error",  MB_OK|MB_ICONWARNING);
+        return -1;
+    }
 
-   GetModuleFileNameA(NULL, filename, 4096);
-   filename[strlen(filename)-4] = 0;
-   sprintf(gameLib, "%s.dll", filename);
+    torque_winmain = (int (*)(HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow))GetProcAddress(hGame, "torque_winmain");
+    if (!torque_winmain) {
+        wchar_t error[4096];
+        _swprintf_l(error, sizeof(error), L"Missing torque_winmain export in game library: %s.  Please make sure that it exists and the latest DirectX is installed.", _get_current_locale(), dllName.c_str());
+        MessageBoxW(NULL, error, L"Error",  MB_OK|MB_ICONWARNING);
+        return -1;
+    }
 
-   HMODULE hGame = LoadLibraryA(gameLib);
+    int ret = torque_winmain(hInstance, hPrevInstance, lpszCmdLine, nCommandShow);
 
-   if (hGame)
-      torque_winmain = (int (*)(HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow))GetProcAddress(hGame, "torque_winmain");
-
-   char error[4096];
-   if (!hGame)
-   {
-      sprintf(error, "Unable to load game library: %s.  Please make sure it exists and the latest DirectX is installed.", gameLib);
-      MessageBoxA(NULL, error, "Error",  MB_OK|MB_ICONWARNING);
-      return -1;
-   }
-
-   if (!torque_winmain)
-   {
-      sprintf(error, "Missing torque_winmain export in game library: %s.  Please make sure that it exists and the latest DirectX is installed.", gameLib);
-      MessageBoxA(NULL, error, "Error",  MB_OK|MB_ICONWARNING);
-      return -1;
-   }
-
-   int ret = torque_winmain(hInstance, hPrevInstance, lpszCmdLine, nCommandShow );
-
-   FreeLibrary(hGame);
-
-   return ret;
-
+    FreeLibrary(hGame);
+    return ret;
 }
 #endif // WIN32
 
@@ -80,113 +86,113 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 
 extern "C" {
 
-   int (*torque_macmain)(int argc, const char **argv) = 0;
+    int (*torque_macmain)(int argc, const char **argv) = 0;
 
 }
 
 void GetBasePath(const char** cpath, const char** cname)
 {
-   static char path[2049];
-   static char name[2049];
+    static char path[2049];
+    static char name[2049];
 
-   ProcessSerialNumber PSN;
-   ProcessInfoRec pinfo;
-   FSSpec pspec;
-   FSRef fsr;
-   OSStatus err;
+    ProcessSerialNumber PSN;
+    ProcessInfoRec pinfo;
+    FSSpec pspec;
+    FSRef fsr;
+    OSStatus err;
 
-   path[0] = 0;
-   name[0] = 0;
+    path[0] = 0;
+    name[0] = 0;
 
-   *cpath = path;
-   *cname = name;
+    *cpath = path;
+    *cname = name;
 
-   // set up process serial number
-   PSN.highLongOfPSN = 0;
-   PSN.lowLongOfPSN = kCurrentProcess;
+    // set up process serial number
+    PSN.highLongOfPSN = 0;
+    PSN.lowLongOfPSN = kCurrentProcess;
 
-   // set up info block
-   pinfo.processInfoLength = sizeof(pinfo);
-   pinfo.processName = NULL;
-   pinfo.processAppSpec = &pspec;
+    // set up info block
+    pinfo.processInfoLength = sizeof(pinfo);
+    pinfo.processName = NULL;
+    pinfo.processAppSpec = &pspec;
 
-   // grab the vrefnum and directory
-   err = GetProcessInformation(&PSN, &pinfo);
-   if (! err ) {
+    // grab the vrefnum and directory
+    err = GetProcessInformation(&PSN, &pinfo);
+    if (! err ) {
 
-      FSSpec fss2;
+        FSSpec fss2;
 
-      strcpy(name, &pspec.name[1]);
+        strcpy(name, &pspec.name[1]);
 
-      err = FSMakeFSSpec(pspec.vRefNum, pspec.parID, 0, &fss2);
+        err = FSMakeFSSpec(pspec.vRefNum, pspec.parID, 0, &fss2);
 
-      if ( ! err ) {
-         err = FSpMakeFSRef(&fss2, &fsr);
-         if ( ! err ) {
+        if ( ! err ) {
+            err = FSpMakeFSRef(&fss2, &fsr);
+            if ( ! err ) {
             err = (OSErr)FSRefMakePath(&fsr, (UInt8*)path, 2048);
-         }
-      }
-   }
+            }
+        }
+    }
 }
 
 int main(int argc, const char **argv)
 {
-   void *gameBundle = 0;
-   char gameBundleFilename[2049];
+    void *gameBundle = 0;
+    char gameBundleFilename[2049];
 
-   const char* basePath;
-   const char* appName;
+    const char* basePath;
+    const char* appName;
 
-   // Get the path to our app binary and the app name
+    // Get the path to our app binary and the app name
 
-   GetBasePath(&basePath, &appName);
+    GetBasePath(&basePath, &appName);
 
-   if (!basePath[0] || !appName[0])
-      return;
+    if (!basePath[0] || !appName[0])
+        return;
 
-   char appNameNoDebug[2049];
+    char appNameNoDebug[2049];
 
-   strcpy(appNameNoDebug, appName);
+    strcpy(appNameNoDebug, appName);
 
-   int i = strlen(appName);
-   while (i > 0)
-   {
-      if (!strcmp(&appName[i], "_DEBUG"))
-      {
-         appNameNoDebug[i] = 0;
-         break;
-      }
+    int i = strlen(appName);
+    while (i > 0)
+    {
+        if (!strcmp(&appName[i], "_DEBUG"))
+        {
+            appNameNoDebug[i] = 0;
+            break;
+        }
 
-      i--;
-   }
+        i--;
+    }
 
-   sprintf(gameBundleFilename, "%s.app/Contents/Frameworks/%s Bundle.bundle/Contents/MacOS/%s Bundle", appName, appNameNoDebug, appNameNoDebug);
+    sprintf(gameBundleFilename, "%s.app/Contents/Frameworks/%s Bundle.bundle/Contents/MacOS/%s Bundle", appName, appNameNoDebug, appNameNoDebug);
 
-   // first see if the current directory is set properly
-   gameBundle = dlopen(gameBundleFilename, RTLD_LAZY | RTLD_LOCAL);
+    // first see if the current directory is set properly
+    gameBundle = dlopen(gameBundleFilename, RTLD_LAZY | RTLD_LOCAL);
 
-   if (!gameBundle)
-   {
-      // Couldn't load the game bundle... so, using the path to the bundle binary fix up the cwd
+    if (!gameBundle)
+    {
+        // Couldn't load the game bundle... so, using the path to the bundle binary fix up the cwd
 
-      if (basePath[0]) {
-         chdir( basePath );
-         chdir( "../../../" );
-      }
+        if (basePath[0]) {
+            chdir( basePath );
+            chdir( "../../../" );
+        }
 
-      // and try again
-      gameBundle = dlopen( gameBundleFilename, RTLD_LAZY | RTLD_LOCAL);
-   }
+        // and try again
+        gameBundle = dlopen( gameBundleFilename, RTLD_LAZY | RTLD_LOCAL);
+    }
 
-   if (!gameBundle)
-      return -1;
+    if (!gameBundle)
+        return -1;
 
-   torque_macmain = (int (*)(int argc, const char **argv)) dlsym(gameBundle, "torque_macmain");
+    torque_macmain = (int (*)(int argc, const char **argv)) dlsym(gameBundle, "torque_macmain");
 
-   if (!torque_macmain)
-      return -1;
+    if (!torque_macmain)
+        return -1;
 
-   return torque_macmain(argc, argv);
+    return torque_macmain(argc, argv);
 }
 
 #endif // __MACOSX
@@ -200,49 +206,49 @@ int main(int argc, const char **argv)
 
 extern "C"
 {
-   int (*torque_unixmain)(int argc, const char **argv) = NULL;
-   void(*setExePathName)(const char *exePathName) = NULL;
+    int (*torque_unixmain)(int argc, const char **argv) = NULL;
+    void(*setExePathName)(const char *exePathName) = NULL;
 }
 
 int main(int argc, const char **argv)
 {
-   // assume bin name is in argv[0]
-   int len = strlen(argv[0]);
-   char *libName = new char[len+4]; // len + .so + NUL
+    // assume bin name is in argv[0]
+    int len = strlen(argv[0]);
+    char *libName = new char[len+4]; // len + .so + NUL
 
-   strcpy(libName, argv[0]);
-   strcat(libName, ".so");
+    strcpy(libName, argv[0]);
+    strcat(libName, ".so");
 
-   // try to load the game lib
-   void *gameLib = dlopen(libName, RTLD_LAZY | RTLD_LOCAL);
-   delete [] libName;
+    // try to load the game lib
+    void *gameLib = dlopen(libName, RTLD_LAZY | RTLD_LOCAL);
+    delete [] libName;
 
-   if(gameLib == NULL)
-   {
-      printf("%s\n", dlerror());
-      return -1;
-   }
+    if(gameLib == NULL)
+    {
+        printf("%s\n", dlerror());
+        return -1;
+    }
 
-   // set the filename of the exe image
-   setExePathName = (void(*)(const char *)) dlsym(gameLib, "setExePathName");
-   if(setExePathName == NULL)
-   {
-      printf("%s\n", dlerror());
-      return -1;
-   }
-   setExePathName(argv[0]);
+    // set the filename of the exe image
+    setExePathName = (void(*)(const char *)) dlsym(gameLib, "setExePathName");
+    if(setExePathName == NULL)
+    {
+        printf("%s\n", dlerror());
+        return -1;
+    }
+    setExePathName(argv[0]);
 
-   // try to load the lib entry point
-   torque_unixmain = (int(*)(int argc, const char **argv)) dlsym(gameLib, "torque_unixmain");
+    // try to load the lib entry point
+    torque_unixmain = (int(*)(int argc, const char **argv)) dlsym(gameLib, "torque_unixmain");
 
-   if(torque_unixmain == NULL)
-   {
-      printf("%s\n", dlerror());
-      return -1;
-   }
+    if(torque_unixmain == NULL)
+    {
+        printf("%s\n", dlerror());
+        return -1;
+    }
 
-   // Go!
-   return torque_unixmain(argc, argv);
+    // Go!
+    return torque_unixmain(argc, argv);
 }
 #endif // __linux__
 
@@ -260,39 +266,39 @@ int main(int argc, const char **argv)
 // will need to merge against future changes to the SML code if you do this.
 S32 TorqueMain(S32 argc, const char **argv)
 {
-   // Some handy debugging code:
-   //   if (argc == 1) {
-   //      static const char* argvFake[] = { "dtest.exe", "-jload", "test.jrn" };
-   //      argc = 3;
-   //      argv = argvFake;
-   //   }
+    // Some handy debugging code:
+    //   if (argc == 1) {
+    //      static const char* argvFake[] = { "dtest.exe", "-jload", "test.jrn" };
+    //      argc = 3;
+    //      argv = argvFake;
+    //   }
 
-   //   Memory::enableLogging("testMem.log");
-   //   Memory::setBreakAlloc(104717);
+    //   Memory::enableLogging("testMem.log");
+    //   Memory::setBreakAlloc(104717);
 
-   // Initialize the subsystems.
-   StandardMainLoop::init();
+    // Initialize the subsystems.
+    StandardMainLoop::init();
 
-   // Handle any command line args.
-   if(!StandardMainLoop::handleCommandLine(argc, argv))
-   {
-      Platform::AlertOK("Error", "Failed to initialize game, shutting down.");
+    // Handle any command line args.
+    if(!StandardMainLoop::handleCommandLine(argc, argv))
+    {
+        Platform::AlertOK("Error", "Failed to initialize game, shutting down.");
 
-      return 1;
-   }
+        return 1;
+    }
 
-   // Main loop
-   while(StandardMainLoop::doMainLoop());
+    // Main loop
+    while(StandardMainLoop::doMainLoop());
 
-   // Clean everything up.
-   StandardMainLoop::shutdown();
+    // Clean everything up.
+    StandardMainLoop::shutdown();
 
-   // Do we need to restart?
-   if( StandardMainLoop::requiresRestart() )
-      Platform::restartInstance();
+    // Do we need to restart?
+    if( StandardMainLoop::requiresRestart() )
+        Platform::restartInstance();
 
-   // Return.
-   return 0;
+    // Return.
+    return 0;
 }
 
 #endif //TORQUE_SHARED
