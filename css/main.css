@@ -114,12 +114,13 @@ h4 a:hover {
   padding-top: 70px;
 }
 
+img.history,
+img.feature,
 img.made-with-torque {
   width: 128px;
   border-radius: 3px;
 }
 
-img.feature {
-  width: 128px;
-  border-radius: 3px;
+img.history {
+  margin: 1em;
 }
