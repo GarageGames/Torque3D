@@ -298,7 +298,7 @@ void HTTPObject::onDisconnect()
    Parent::onDisconnect();
 }
 
-bool HTTPObject::processLine(U8 *line)
+bool HTTPObject::processLine(UTF8 *line)
 {
    if(mParseState == ParsingStatusLine)
    {
