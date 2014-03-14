@@ -89,7 +89,7 @@ If this is the first time you will compile Torque 3D, or if you have added or re
 
 Compiling Torque 3D (Linux)
 -----------------------------
-This version of Torque 3D supports being run as a dedicated server under Linux.  As with a Windows build you will need to run your project's *generateProjects.command* file to properly generate the required make file.
+This version of Torque 3D supports being run as a dedicated server under Linux.  As with a Windows build you will need to run your project's *generateProjects.sh* file to properly generate the required make file.
 
 Prior to compiling Torque 3D under Linux, you will need to make sure you have the appropriate libraries and tools installed.  The exact packages will depend on which Linux distribution you are using.  For example, under Ubuntu you will need:
 

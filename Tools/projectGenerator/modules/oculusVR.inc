@@ -61,7 +61,7 @@ beginModule( 'oculusVR' );
    }
 
    // Only Windows is supported at this time
-   if ( Generator::$platform == "win32" )
+   if ( T3D_Generator::$platform == "win32" )
    {
       // Source
       addEngineSrcDir( "platform/input/oculusVR" );

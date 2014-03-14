@@ -85,7 +85,7 @@ class Solution
 		// Look up each project ref and add its info to the list
 		foreach( $refs as $pname ) 
 		{
-			$project = Generator::lookupProjectByName( $pname );
+			$project = T3D_Generator::lookupProjectByName( $pname );
 	
 			if( isset( $project ) )
 			{

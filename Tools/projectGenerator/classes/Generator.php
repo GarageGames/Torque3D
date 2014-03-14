@@ -37,7 +37,7 @@ require_once( "NPWebPlugin.php");
 require_once( "SafariWebPlugin.php");
 
 
-class Generator
+class T3D_Generator
 {
     public static $app_name;
     public static $paths            = array();
@@ -275,14 +275,14 @@ class Generator
         array_push( self::$libGuard, $lib );
         
         // if currently in a project, delay the include
-        if (Generator::inProjectConfig())
+        if (T3D_Generator::inProjectConfig())
         {
             array_push( self::$project_cur->lib_includes, $lib );
             return;
         }
 
         // otherwise include it immediately
-        require( Generator::getGeneratorLibsPath() . $lib . '.conf' );                
+        require( T3D_Generator::getGeneratorLibsPath() . $lib . '.conf' );                
     }
         
     static function addProjectDependency( $pd )
@@ -335,7 +335,7 @@ class Generator
         if( !self::$module_cur )
             self::$module_cur = $name;
         else
-            echo( "Generator::beginModule() - already in module!" );   
+            echo( "T3D_Generator::beginModule() - already in module!" );   
     }
     
     static function endModule()
@@ -343,7 +343,7 @@ class Generator
         if( self::$module_cur )
             self::$module_cur = null;
         else
-            trigger_error( "Generator::endModule() - no active module!", E_USER_ERROR );
+            trigger_error( "T3D_Generator::endModule() - no active module!", E_USER_ERROR );
     }
     
     static function inProjectConfig()
@@ -367,7 +367,7 @@ class Generator
             self::$config_projects[ $name ] = self::$project_cur;
         }
         else
-            trigger_error( "Generator::beginProjectConfig() - a project is already open!", E_USER_ERROR );
+            trigger_error( "T3D_Generator::beginProjectConfig() - a project is already open!", E_USER_ERROR );
     }
     
     static function endProjectConfig( $type )
@@ -424,14 +424,14 @@ class Generator
                 
                 // Now include any libraries included in the modules
                 foreach( $p->lib_includes as $libName )
-                    require( Generator::getGeneratorLibsPath() . $libName . '.conf' );
+                    require( T3D_Generator::getGeneratorLibsPath() . $libName . '.conf' );
                 
             }
             else
-                trigger_error( "Generator::endProjectConfig() - closing type mismatch!", E_USER_ERROR );
+                trigger_error( "T3D_Generator::endProjectConfig() - closing type mismatch!", E_USER_ERROR );
         }
         else
-            trigger_error( "Generator::endProjectConfig() - no currently open project!", E_USER_ERROR );	 	   
+            trigger_error( "T3D_Generator::endProjectConfig() - no currently open project!", E_USER_ERROR );	 	   
     }
 
     static function beginActiveXConfig( $lib_name, $guid = '', $game_dir = 'game', $output_name = '' )
@@ -571,7 +571,7 @@ class Generator
             self::$solutions[ $name ] = self::$solution_cur;
         }
         else
-           trigger_error( "Generator::beginSolution() - tried to start $name but already in the ".self::$solution_cur->name." solution!", E_USER_ERROR );
+           trigger_error( "T3D_Generator::beginSolution() - tried to start $name but already in the ".self::$solution_cur->name." solution!", E_USER_ERROR );
     }
     
     static function addSolutionProjectRef( $pname )
@@ -579,7 +579,7 @@ class Generator
         if( isset( self::$solution_cur ) )	
             self::$solution_cur->addProjectRef( $pname );
         else
-            trigger_error( "Generator::addSolutionProjectRef(): no such project - " . $pname . "\n", E_USER_ERROR );
+            trigger_error( "T3D_Generator::addSolutionProjectRef(): no such project - " . $pname . "\n", E_USER_ERROR );
     }
     
     static function addSolutionProjectRefExt( $pname, $ppath, $pguid )
@@ -587,7 +587,7 @@ class Generator
         if( isset( self::$solution_cur ) )	
             self::$solution_cur->addSolutionProjectRefExt( $pname, $ppath, $pguid );
         else
-            trigger_error( "Generator::addSolutionProjectRefExt(): no such project - " . $pname . "\n", E_USER_ERROR );
+            trigger_error( "T3D_Generator::addSolutionProjectRefExt(): no such project - " . $pname . "\n", E_USER_ERROR );
     }
     
     static function endSolution()
@@ -599,7 +599,7 @@ class Generator
             self::$solution_cur = null;
         }    
         else
-            trigger_error( "Generator::endSolution(): no active solution!\n", E_USER_ERROR );
+            trigger_error( "T3D_Generator::endSolution(): no active solution!\n", E_USER_ERROR );
     }
     
     static function generateSolutions( $tpl ) 
