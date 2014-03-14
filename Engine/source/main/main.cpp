@@ -52,7 +52,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
         MessageBoxW(NULL, L"Unable to find game dll", L"Error",  MB_OK|MB_ICONWARNING);
         return -1;
     }
-
+    
     HMODULE hGame = LoadLibraryW(dllName.c_str());
     if (!hGame) {
         wchar_t error[4096];
