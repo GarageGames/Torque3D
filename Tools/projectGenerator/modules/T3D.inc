@@ -74,7 +74,7 @@ else
 	addEngineSrcDir('T3D/gameBase/std');
 
 // Plstform specific stuff.
-switch( Generator::$platform )
+switch( TorqueGenerator::$platform )
 {
    case "360":
       addEngineSrcDir('ts/arch/360');

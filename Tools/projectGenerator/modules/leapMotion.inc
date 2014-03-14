@@ -61,7 +61,7 @@ beginModule( 'leapMotion' );
    }
 
    // Only Windows is supported at this time
-   if ( Generator::$platform == "win32" )
+   if ( TorqueGenerator::$platform == "win32" )
    {
       // Source
       addEngineSrcDir( "platform/input/leapMotion" );

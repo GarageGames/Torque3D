@@ -31,7 +31,7 @@ addEngineSrcDir('component');
 addEngineSrcDir('component/interfaces');
 
 // Core
-if (Generator::isApp())
+if ( TorqueGenerator::isApp() )
 	addSrcDir( '../source' );
     
 addEngineSrcDir('console');
@@ -59,7 +59,7 @@ addEngineSrcDir('math/test');
 addEngineSrcDir('platform');
 addEngineSrcDir('cinterface');
 
-switch( Generator::$platform )
+switch( TorqueGenerator::$platform )
 {
    case "win32":
    case "mac":
@@ -80,7 +80,7 @@ addEngineSrcDir('app/net');
 // Moved this here temporarily because PopupMenu uses on it and is currently in core
 addEngineSrcDir('util/messaging');
 
-switch( Generator::$platform )
+switch( TorqueGenerator::$platform )
 {
    case "win32":
      addEngineSrcDir('platformWin32');
@@ -132,7 +132,7 @@ addEngineSrcDir( 'gfx/video' );
 addEngineSrcDir( 'gfx' );
 addEngineSrcDir( 'shaderGen' );
 
-switch( Generator::$platform )
+switch( TorqueGenerator::$platform )
 {
    case "win32":
       //addEngineSrcDir( 'gfx/D3D8' );
@@ -199,7 +199,7 @@ addIncludePath( '../../source' );		   // product source (relative to solution ou
 addIncludePath( getAppEngineSrcDir() );	// main engine source dir relative to app project file 
 addIncludePath( getAppLibSrcDir() ); 	   // main lib source dir relative to app project file
 
-if ( Generator::$platform == "win32" )
+if ( TorqueGenerator::$platform == "win32" )
 {
    addIncludePath( getAppLibSrcDir() . 'directx8' );
    addIncludePath( getAppLibSrcDir() . 'openal/win32' );
