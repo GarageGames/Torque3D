@@ -47,7 +47,7 @@
 #ifdef TORQUE_MULTITHREAD
 void * gMemMutex = NULL;
 #endif
-   
+
 //-------------------------------------- Make sure we don't have the define set
 #ifdef new
 #undef new
@@ -1052,7 +1052,7 @@ S32 countUnflaggedAllocs(const char * filename, S32 *outUnflaggedRealloc, EFlag 
    return unflaggedAllocCount;
 }
 
-DefineEngineFunction(dumpUnflaggedAllocs, void, ( const char* fileName ), ( "" ), 
+DefineEngineFunction(dumpUnflaggedAllocs, void, ( const char* fileName ), ( "" ),
    "@brief Dumps all unflagged memory allocations.\n\n"
    "Dumps all memory allocations that were made after a call to flagCurrentAllocs(). "
    "Helpful when used with flagCurrentAllocs() for detecting memory leaks and analyzing general memory usage.\n\n"
@@ -1172,7 +1172,7 @@ void disableLogging()
 //
 //   if (numLeaks && !gNeverLogLeaks)
 //   {
-//      if (gAlwaysLogLeaks || Platform::AlertOKCancel("Memory Status", "Memory leaks detected.  Write to memoryLeaks.log?") == true) 
+//      if (gAlwaysLogLeaks || Platform::AlertOKCancel("Memory Status", "Memory leaks detected.  Write to memoryLeaks.log?") == true)
 //      {
 //         char buffer[1024];
 //         FileStream logFile;
@@ -1507,8 +1507,8 @@ static void* realloc(void* mem, dsize_t size, const char* fileName, const U32 li
    if (gEnableLogging)
       logRealloc(hdr, size);
 
-   // Add reallocated flag, note header changes will not persist if the realloc 
-   // decides tofree, and then perform a fresh allocation for the memory. The flag will 
+   // Add reallocated flag, note header changes will not persist if the realloc
+   // decides tofree, and then perform a fresh allocation for the memory. The flag will
    // be manually set again after this takes place, down at the bottom of this fxn.
    hdr->flags |= Reallocated;
 
@@ -1559,9 +1559,9 @@ static void* realloc(void* mem, dsize_t size, const char* fileName, const U32 li
    dMemcpy(ret, mem, oldSize);
    free(mem, false);
    PROFILE_END();
-   
+
    // Re-enable the 'Reallocated' flag so that this allocation can be ignored by
-   // a non-strict run of the flag/dumpunflagged. 
+   // a non-strict run of the flag/dumpunflagged.
    hdr = ((AllocatedHeader *)ret) - 1;
    hdr->flags |= Reallocated;
 
@@ -1594,7 +1594,7 @@ DefineEngineFunction( dumpAlloc, void, ( int allocNum ),,
 				"@note Available in debug builds only. "
 				"In torqueConfig.h, TORQUE_DISABLE_MEMORY_MANAGER must be undefined to use this function.\n\n"
 				"@ingroup Debugging")
-{ 
+{
    PageRecord* walk;
    for( walk = gPageList; walk; walk = walk->prevPage )
       for( Header* probe = walk->headerList; probe; probe = probe->next )
@@ -1614,9 +1614,9 @@ DefineEngineFunction( dumpAlloc, void, ( int allocNum ),,
                         pah->allocNum,
                         pah->flags & Reallocated ? "yes" : "no"
                );
-               
+
                // Dump the profile path, if we have one.
-               
+
                #ifdef TORQUE_ENABLE_PROFILE_PATH
                if( pah->profilePath && pah->profilePath[ 0 ] )
                   Con::printf( "profilepath: %s", pah->profilePath );
@@ -1646,15 +1646,15 @@ DefineEngineFunction( dumpMemSnapshot, void, ( const char* fileName ),,
       for(Header *probe = walk->headerList; probe; probe = probe->next)
          if (probe->flags & Allocated) {
             AllocatedHeader* pah = (AllocatedHeader*)probe;
-            
+
             dSprintf( buffer, sizeof( buffer ), "%s%s\t%d\t%d\t%d\r\n",
                      pah->flags & Reallocated ? "[R] " : "",
                      pah->fileName != NULL ? pah->fileName : "Undetermined",
                      pah->line, pah->realSize, pah->allocNum);
             fws.write(dStrlen(buffer), buffer);
-            
+
             // Dump the profile path, if we have one.
-            
+
             #ifdef TORQUE_ENABLE_PROFILE_PATH
             if( pah->profilePath )
             {
@@ -1678,9 +1678,9 @@ dsize_t getMemoryAllocated()
 void getMemoryInfo( void* ptr, Info& info )
 {
    #ifndef TORQUE_DISABLE_MEMORY_MANAGER
-   
+
    AllocatedHeader* header = ( ( AllocatedHeader* ) ptr ) - 1;
-   
+
    info.mAllocSize      = header->size;
    #ifdef TORQUE_DEBUG_GUARD
    info.mAllocNumber    = header->allocNum;
@@ -1690,7 +1690,7 @@ void getMemoryInfo( void* ptr, Info& info )
    info.mIsArray        = header->flags & Array;
    info.mIsGlobal       = header->flags & GlobalFlag;
    info.mIsStatic       = header->flags & StaticFlag;
-   
+
    #endif
 }
 

@@ -47,7 +47,7 @@ MODULE_BEGIN( RazerHydraDevice )
       // Register the device with the Input Event Manager
       INPUTMGR->registerDevice(RAZERHYDRADEV);
    }
-   
+
    MODULE_SHUTDOWN
    {
       INPUTMGR->unregisterDevice(RAZERHYDRADEV);
@@ -132,30 +132,30 @@ RazerHydraDevice::~RazerHydraDevice()
 
 void RazerHydraDevice::staticInit()
 {
-   Con::addVariable("pref::RazerHydra::EnableDevice", TypeBool, &smEnableDevice, 
+   Con::addVariable("pref::RazerHydra::EnableDevice", TypeBool, &smEnableDevice,
       "@brief If true, the Razer Hydra device will be enabled, if present.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("RazerHydra::ProcessWhenDocked", TypeBool, &smProcessWhenDocked, 
+   Con::addVariable("RazerHydra::ProcessWhenDocked", TypeBool, &smProcessWhenDocked,
       "@brief If true, events will still be sent when a controller is docked.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("RazerHydra::SeparatePositionEvents", TypeBool, &smSeparatePositionEvents, 
+   Con::addVariable("RazerHydra::SeparatePositionEvents", TypeBool, &smSeparatePositionEvents,
       "@brief If true, separate position events will be sent for each component.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("RazerHydra::CombinedPositionEvents", TypeBool, &smCombinedPositionEvents, 
+   Con::addVariable("RazerHydra::CombinedPositionEvents", TypeBool, &smCombinedPositionEvents,
       "@brief If true, one position event will be sent that includes one component per argument.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("RazerHydra::RotationAsAxisEvents", TypeBool, &smRotationAsAxisEvents, 
+   Con::addVariable("RazerHydra::RotationAsAxisEvents", TypeBool, &smRotationAsAxisEvents,
       "@brief If true, broadcast controller rotation as axis events.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("RazerHydra::MaximumAxisAngle", TypeF32, &smMaximumAxisAngle, 
+   Con::addVariable("RazerHydra::MaximumAxisAngle", TypeF32, &smMaximumAxisAngle,
       "@brief The maximum controller angle when used as an axis event as measured from a vector pointing straight up (in degrees).\n\n"
       "Shoud range from 0 to 90 degrees.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("RazerHydra::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents, 
+   Con::addVariable("RazerHydra::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents,
       "@brief Indicates that a whole frame event should be generated and frames should be buffered.\n\n"
 	   "@ingroup Game");
 }

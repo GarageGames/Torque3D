@@ -112,20 +112,20 @@ void AIPlayer::initPersistFields()
 {
    addGroup( "AI" );
 
-      addField( "mMoveTolerance", TypeF32, Offset( mMoveTolerance, AIPlayer ), 
+      addField( "mMoveTolerance", TypeF32, Offset( mMoveTolerance, AIPlayer ),
          "@brief Distance from destination before stopping.\n\n"
          "When the AIPlayer is moving to a given destination it will move to within "
          "this distance of the destination and then stop.  By providing this tolerance "
          "it helps the AIPlayer from never reaching its destination due to minor obstacles, "
          "rounding errors on its position calculation, etc.  By default it is set to 0.25.\n");
 
-      addField( "moveStuckTolerance", TypeF32, Offset( mMoveStuckTolerance, AIPlayer ), 
+      addField( "moveStuckTolerance", TypeF32, Offset( mMoveStuckTolerance, AIPlayer ),
          "@brief Distance tolerance on stuck check.\n\n"
          "When the AIPlayer is moving to a given destination, if it ever moves less than "
          "this tolerance during a single tick, the AIPlayer is considered stuck.  At this point "
          "the onMoveStuck() callback is called on the datablock.\n");
 
-      addField( "moveStuckTestDelay", TypeS32, Offset( mMoveStuckTestDelay, AIPlayer ), 
+      addField( "moveStuckTestDelay", TypeS32, Offset( mMoveStuckTestDelay, AIPlayer ),
          "@brief The number of ticks to wait before testing if the AIPlayer is stuck.\n\n"
          "When the AIPlayer is asked to move, this property is the number of ticks to wait "
          "before the AIPlayer starts to check if it is stuck.  This delay allows the AIPlayer "
@@ -258,7 +258,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
 
    // Orient towards the aim point, aim object, or towards
    // our destination.
-   if (mAimObject || mAimLocationSet || mMoveState != ModeStop) 
+   if (mAimObject || mAimLocationSet || mMoveState != ModeStop)
    {
       // Update the aim position if we're aiming for an object
       if (mAimObject)
@@ -270,7 +270,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
       F32 xDiff = mAimLocation.x - location.x;
       F32 yDiff = mAimLocation.y - location.y;
 
-      if (!mIsZero(xDiff) || !mIsZero(yDiff)) 
+      if (!mIsZero(xDiff) || !mIsZero(yDiff))
       {
          // First do Yaw
          // use the cur yaw between -Pi and Pi
@@ -299,13 +299,13 @@ bool AIPlayer::getAIMove(Move *movePtr)
          movePtr->yaw = yawDiff;
 
          // Next do pitch.
-         if (!mAimObject && !mAimLocationSet) 
+         if (!mAimObject && !mAimLocationSet)
          {
             // Level out if were just looking at our next way point.
             Point3F headRotation = getHeadRotation();
             movePtr->pitch = -headRotation.x;
          }
-         else 
+         else
          {
             // This should be adjusted to run from the
             // eye point to the object's center position. Though this
@@ -313,7 +313,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
             F32 vertDist = mAimLocation.z - location.z;
             F32 horzDist = mSqrt(xDiff * xDiff + yDiff * yDiff);
             F32 newPitch = mAtan2( horzDist, vertDist ) - ( M_PI_F / 2.0f );
-            if (mFabs(newPitch) > 0.01f) 
+            if (mFabs(newPitch) > 0.01f)
             {
                Point3F headRotation = getHeadRotation();
                movePtr->pitch = newPitch - headRotation.x;
@@ -321,7 +321,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
          }
       }
    }
-   else 
+   else
    {
       // Level out if we're not doing anything else
       Point3F headRotation = getHeadRotation();
@@ -329,18 +329,18 @@ bool AIPlayer::getAIMove(Move *movePtr)
    }
 
    // Move towards the destination
-   if (mMoveState != ModeStop) 
+   if (mMoveState != ModeStop)
    {
       F32 xDiff = mMoveDestination.x - location.x;
       F32 yDiff = mMoveDestination.y - location.y;
 
       // Check if we should mMove, or if we are 'close enough'
-      if (mFabs(xDiff) < mMoveTolerance && mFabs(yDiff) < mMoveTolerance) 
+      if (mFabs(xDiff) < mMoveTolerance && mFabs(yDiff) < mMoveTolerance)
       {
          mMoveState = ModeStop;
          throwCallback("onReachDestination");
       }
-      else 
+      else
       {
          // Build move direction in world space
          if (mIsZero(xDiff))
@@ -349,13 +349,13 @@ bool AIPlayer::getAIMove(Move *movePtr)
             if (mIsZero(yDiff))
                movePtr->x = (location.x > mMoveDestination.x) ? -1.0f : 1.0f;
             else
-               if (mFabs(xDiff) > mFabs(yDiff)) 
+               if (mFabs(xDiff) > mFabs(yDiff))
                {
                   F32 value = mFabs(yDiff / xDiff);
                   movePtr->y = (location.y > mMoveDestination.y) ? -value : value;
                   movePtr->x = (location.x > mMoveDestination.x) ? -1.0f : 1.0f;
                }
-               else 
+               else
                {
                   F32 value = mFabs(xDiff / yDiff);
                   movePtr->x = (location.x > mMoveDestination.x) ? -value : value;
@@ -373,7 +373,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
 
          // Set movement speed.  We'll slow down once we get close
          // to try and stop on the spot...
-         if (mMoveSlowdown) 
+         if (mMoveSlowdown)
          {
             F32 speed = mMoveSpeed;
             F32 dist = mSqrt(xDiff*xDiff + yDiff*yDiff);
@@ -385,7 +385,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
 
             mMoveState = ModeSlowing;
          }
-         else 
+         else
          {
             movePtr->x *= mMoveSpeed;
             movePtr->y *= mMoveSpeed;
@@ -399,7 +399,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
          {
             // We should check to see if we are stuck...
             F32 locationDelta = (location - mLastLocation).len();
-            if (locationDelta < mMoveStuckTolerance && mDamageState == Enabled) 
+            if (locationDelta < mMoveStuckTolerance && mDamageState == Enabled)
             {
                // If we are slowing down, then it's likely that our location delta will be less than
                // our move stuck tolerance. Because we can be both slowing and stuck
@@ -475,7 +475,7 @@ DefineEngineMethod( AIPlayer, stop, void, ( ),,
 
 DefineEngineMethod( AIPlayer, clearAim, void, ( ),,
    "@brief Use this to stop aiming at an object or a point.\n\n"
-   
+
    "@see setAimLocation()\n"
    "@see setAimObject()\n")
 {
@@ -488,7 +488,7 @@ DefineEngineMethod( AIPlayer, setMoveSpeed, void, ( F32 speed ),,
    "@param speed A speed multiplier between 0.0 and 1.0.  "
    "This is multiplied by the AIPlayer's base movement rates (as defined in "
    "its PlayerData datablock)\n\n"
-   
+
    "@see getMoveDestination()\n")
 {
 	object->setMoveSpeed(speed);
@@ -514,7 +514,7 @@ DefineEngineMethod( AIPlayer, setMoveDestination, void, ( Point3F goal, bool slo
 
    "@note Upon reaching a move destination, the bot will clear its move destination and "
    "calls to getMoveDestination will return \"0 0 0\"."
-   
+
    "@see getMoveDestination()\n")
 {
    object->setMoveDestination( goal, slowDown);
@@ -526,7 +526,7 @@ DefineEngineMethod( AIPlayer, getMoveDestination, Point3F, (),,
    "@return Returns a point containing the \"x y z\" position "
    "of the AIPlayer's current move destination. If no move destination "
    "has yet been set, this returns \"0 0 0\"."
-   
+
    "@see setMoveDestination()\n")
 {
 	return object->getMoveDestination();
@@ -536,7 +536,7 @@ DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
    "@brief Tells the AIPlayer to aim at the location provided.\n\n"
 
    "@param target An \"x y z\" position in the game world to target.\n\n"
-   
+
    "@see getAimLocation()\n")
 {
 	object->setAimLocation(target);
@@ -551,7 +551,7 @@ DefineEngineMethod( AIPlayer, getAimLocation, Point3F, (),,
    "change to whatever point the bot's current line-of-sight intercepts."
 
    "@return World space coordinates of the object AI is aiming at. Formatted as \"X Y Z\".\n\n"
-   
+
    "@see setAimLocation()\n"
    "@see setAimObject()\n")
 {
@@ -572,7 +572,7 @@ ConsoleDocFragment _setAimObject(
    "// offset (0, 0, 1) so you don't aim at the target's feet\n"
    "%ai.setAimObject(%target, \"0 0 1\");\n"
    "@endtsexample\n\n"
-   
+
    "@see getAimLocation()\n"
    "@see getAimObject()\n"
    "@see clearAim()\n",
@@ -604,7 +604,7 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
 
    "@return Returns -1 if no object is being aimed at, "
    "or the SimObjectID of the object the AIPlayer is aiming at.\n\n"
-   
+
    "@see setAimObject()\n")
 {
 	GameBase* obj = object->getAimObject();

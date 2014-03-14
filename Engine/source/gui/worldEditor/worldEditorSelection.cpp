@@ -65,12 +65,12 @@ void WorldEditorSelection::setCanSave( bool value )
 {
    if( getCanSave() == value )
       return;
-      
+
    Parent::setCanSave( value );
-   
+
    // If we went from being transient to being persistent,
    // make sure all objects in the selection have persistent IDs.
-   
+
    if( getCanSave() )
       for( iterator iter = begin(); iter != end(); ++ iter )
          ( *iter )->getOrCreatePersistentId();
@@ -82,9 +82,9 @@ bool WorldEditorSelection::objInSet( SimObject* obj )
 {
    if( !mIsResolvingPIDs )
       resolvePIDs();
-      
+
    lock();
-      
+
    bool result = false;
    for( iterator iter = begin(); iter != end(); ++ iter )
    {
@@ -93,7 +93,7 @@ bool WorldEditorSelection::objInSet( SimObject* obj )
          result = true;
          break;
       }
-         
+
       WorldEditorSelection* set = dynamic_cast< WorldEditorSelection* >( *iter );
       if( set && set->objInSet( obj ) )
       {
@@ -101,9 +101,9 @@ bool WorldEditorSelection::objInSet( SimObject* obj )
          break;
       }
    }
-   
+
    unlock();
-   
+
    return result;
 }
 
@@ -112,37 +112,37 @@ bool WorldEditorSelection::objInSet( SimObject* obj )
 void WorldEditorSelection::addObject( SimObject* obj )
 {
    // Return if object is already in selection.
-   
+
    if( objInSet( obj ) )
       return;
-      
+
    // Refuse to add object if this selection is locked.
-      
+
    if( isLocked() )
       return;
-      
+
    // Prevent adding us to ourselves.
-      
+
    if( obj == this )
       return;
-      
+
    // If the object is itself a selection set, make sure we
    // don't create a cycle.
-   
+
    WorldEditorSelection* selection = dynamic_cast< WorldEditorSelection* >( obj );
    if( selection && !selection->objInSet( this ) )
       return;
-      
+
    // Refuse to add any of our parents.
-   
+
    for( SimGroup* group = getGroup(); group != NULL; group = group->getGroup() )
       if( obj == group )
          return;
-      
+
    invalidateCentroid();
-   
+
    Parent::addObject( obj );
-      
+
    if( mAutoSelect )
       WorldEditor::markAsSelected( obj, true );
 
@@ -155,14 +155,14 @@ void WorldEditorSelection::removeObject( SimObject* obj )
 {
    if( !objInSet( obj ) )
       return;
-      
+
    // Refuse to remove object if this selection is locked.
-      
+
    if( isLocked() )
       return;
 
    invalidateCentroid();
-   
+
    Parent::removeObject( obj );
 
    if( mAutoSelect )
@@ -185,7 +185,7 @@ void WorldEditorSelection::updateCentroid()
 {
    if( mCentroidValid )
       return;
-      
+
    resolvePIDs();
 
    mCentroidValid = true;
@@ -256,10 +256,10 @@ const Box3F & WorldEditorSelection::getBoxBounds()
 Point3F WorldEditorSelection::getBoxBottomCenter()
 {
    updateCentroid();
-   
+
    Point3F bottomCenter = mBoxCentroid;
    bottomCenter.z -= mBoxBounds.len_z() * 0.5f;
-   
+
    return bottomCenter;
 }
 
@@ -303,14 +303,14 @@ void WorldEditorSelection::offset( const Point3F& offset, F32 gridSnap )
 
       // adjust
       wPos += offset;
-      
+
       if( gridSnap != 0.f )
       {
          wPos.x -= mFmod( wPos.x, gridSnap );
          wPos.y -= mFmod( wPos.y, gridSnap );
          wPos.z -= mFmod( wPos.z, gridSnap );
       }
-      
+
       mat.setColumn(3, wPos);
       obj->setTransform(mat);
    }
@@ -359,7 +359,7 @@ void WorldEditorSelection::orient(const MatrixF & rot, const Point3F & center)
       SceneObject* object = dynamic_cast< SceneObject* >( *iter );
       if( !object )
          continue;
-         
+
       MatrixF mat = rot;
       mat.setPosition( object->getPosition() );
       object->setTransform(mat);
@@ -423,7 +423,7 @@ void WorldEditorSelection::rotate(const EulerF & rot, const Point3F & center)
          SceneObject* object = dynamic_cast< SceneObject* >( *iter );
          if( !object )
             continue;
-            
+
          MatrixF mat = object->getTransform();
 
          Point3F pos;
@@ -490,7 +490,7 @@ void WorldEditorSelection::scale(const VectorF & scale)
       SceneObject* object = dynamic_cast< SceneObject* >( *iter );
       if( !object )
          continue;
-         
+
       VectorF current = object->getScale();
       current.convolve(scale);
 
@@ -569,7 +569,7 @@ void WorldEditorSelection::setScale(const VectorF & scale, const Point3F & cente
       SceneObject* object = dynamic_cast< SceneObject* >( *iter );
       if( !object )
          continue;
-         
+
       MatrixF mat = object->getTransform();
 
       Point3F pos;
@@ -644,7 +644,7 @@ ConsoleMethod( WorldEditorSelection, getCentroid, const char*, 2, 2, "() - Retur
 {
    char* buffer = Con::getReturnBuffer( 256 );
    const Point3F& centroid = object->getCentroid();
-   
+
    dSprintf( buffer, 256, "%g %g %g", centroid.x, centroid.y, centroid.z );
    return buffer;
 }
@@ -655,7 +655,7 @@ ConsoleMethod( WorldEditorSelection, getBoxCentroid, const char*, 2, 2, "() - Re
 {
    char* buffer = Con::getReturnBuffer( 256 );
    const Point3F& boxCentroid = object->getBoxCentroid();
-   
+
    dSprintf( buffer, 256, "%g %g %g", boxCentroid.x, boxCentroid.y, boxCentroid.z );
    return buffer;
 }
@@ -666,11 +666,11 @@ ConsoleMethod( WorldEditorSelection, offset, void, 3, 4, "( vector delta, float 
 {
    F32 x, y, z;
    dSscanf( argv[ 3 ], "%g %g %g", &x, &y, &z );
-   
+
    F32 gridSnap = 0.f;
    if( argc > 3 )
       gridSnap = dAtof( argv[ 3 ] );
-      
+
    object->offset( Point3F( x, y, z ), gridSnap );
    WorldEditor::updateClientTransforms( object );
 }
@@ -685,7 +685,7 @@ ConsoleMethod( WorldEditorSelection, union, void, 3, 3, "( SimSet set ) - Add al
       Con::errorf( "WorldEditorSelection::union - no SimSet '%s'", argv[ 2 ] );
       return;
    }
-   
+
    const U32 numObjects = selection->size();
    for( U32 i = 0; i < numObjects; ++ i )
       object->addObject( selection->at( i ) );
@@ -701,7 +701,7 @@ ConsoleMethod( WorldEditorSelection, subtract, void, 3, 3, "( SimSet ) - Remove 
       Con::errorf( "WorldEditorSelection::subtract - no SimSet '%s'", argv[ 2 ] );
       return;
    }
-   
+
    const U32 numObjects = selection->size();
    for( U32 i = 0; i < numObjects; ++ i )
       object->removeObject( selection->at( i ) );

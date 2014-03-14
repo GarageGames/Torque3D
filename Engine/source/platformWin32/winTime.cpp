@@ -62,19 +62,19 @@ String Platform::localTimeToString( const LocalTime &lt )
    st.wDay           = lt.monthday;
    st.wDayOfWeek     = lt.weekday;
    st.wMonth         = lt.month + 1;
-   st.wYear          = lt.year + 1900;   
-   
+   st.wYear          = lt.year + 1900;
+
    TCHAR buffer[1024] = {0};
 
    int result = 0;
 
    String outStr;
 
-   // Note: The 'Ex' version of GetDateFormat and GetTimeFormat are preferred 
-   // and have better support for supplemental locales but are not supported 
-   // for version of windows prior to Vista. 
+   // Note: The 'Ex' version of GetDateFormat and GetTimeFormat are preferred
+   // and have better support for supplemental locales but are not supported
+   // for version of windows prior to Vista.
    //
-   // Would be nice if Torque was more aware of the OS version and 
+   // Would be nice if Torque was more aware of the OS version and
    // take full advantage of it.
 
    result = GetDateFormat( LOCALE_USER_DEFAULT,
@@ -100,9 +100,9 @@ String Platform::localTimeToString( const LocalTime &lt )
                            1024 );
 
    AssertWarn( result != 0, "Platform::localTimeToString, error occured!" );
-   
+
    outStr += buffer;
-   
+
    return outStr;
 }
 

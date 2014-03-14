@@ -152,7 +152,7 @@ class TSMesh
    S32 numMatFrames;
    S32 vertsPerFrame;
 
-   /// @name Aligned Vertex Data 
+   /// @name Aligned Vertex Data
    /// @{
    #pragma pack(1)
    struct __TSMeshVertexBase
@@ -204,13 +204,13 @@ class TSMesh
       TSMeshVertexArray() : base(NULL), vertexDataReady(false), numElements(0) {}
       virtual ~TSMeshVertexArray() { set(NULL, 0, 0); }
 
-      virtual void set(void *b, dsize_t s, U32 n, bool autoFree = true ) 
+      virtual void set(void *b, dsize_t s, U32 n, bool autoFree = true )
       {
-         if(base && autoFree) 
-            dFree_aligned(base); 
-         base = reinterpret_cast<U8 *>(b); 
-         vertSz = s; 
-         numElements = n; 
+         if(base && autoFree)
+            dFree_aligned(base);
+         base = reinterpret_cast<U8 *>(b);
+         vertSz = s;
+         numElements = n;
       }
 
       // Vector-like interface
@@ -248,7 +248,7 @@ class TSMesh
    FreeableVector<Point3F> norms;
    FreeableVector<Point2F> tverts;
    FreeableVector<Point4F> tangents;
-   
+
    // Optional second texture uvs.
    FreeableVector<Point2F> tverts2;
 
@@ -277,14 +277,14 @@ class TSMesh
    /// @name Render Methods
    /// @{
 
-   /// This is used by sgShadowProjector to render the 
+   /// This is used by sgShadowProjector to render the
    /// mesh directly, skipping the render manager.
    virtual void render( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb );
    void innerRender( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb );
-   virtual void render( TSMaterialList *, 
+   virtual void render( TSMaterialList *,
                         const TSRenderState &data,
                         bool isSkinDirty,
-                        const Vector<MatrixF> &transforms, 
+                        const Vector<MatrixF> &transforms,
                         TSVertexBufferHandle &vertexBuffer,
                         GFXPrimitiveBufferHandle &primitiveBuffer );
 
@@ -333,10 +333,10 @@ class TSMesh
 
    void createVBIB();
    void createTangents(const Vector<Point3F> &_verts, const Vector<Point3F> &_norms);
-   void findTangent( U32 index1, 
-                     U32 index2, 
-                     U32 index3, 
-                     Point3F *tan0, 
+   void findTangent( U32 index1,
+                     U32 index2,
+                     U32 index3,
+                     Point3F *tan0,
                      Point3F *tan1,
                      const Vector<Point3F> &_verts);
 
@@ -374,7 +374,7 @@ class TSMesh
    static Vector<Point3F*> smVertsList;
    static Vector<Point3F*> smNormsList;
    static Vector<U8*>      smEncodedNormsList;
-   
+
    static Vector<Point2F*> smTVertsList;
 
    // Optional second texture uvs.
@@ -391,7 +391,7 @@ class TSMesh
 
    TSMesh();
    virtual ~TSMesh();
-   
+
    Opcode::Model *mOptTree;
    Opcode::MeshInterface* mOpMeshInterface;
    IceMaths::IndexedTriangle* mOpTris;
@@ -402,7 +402,7 @@ class TSMesh
    bool buildPolyListOpcode( const S32 od, AbstractPolyList *polyList, const Box3F &nodeBox, TSMaterialList *materials );
    bool castRayOpcode( const Point3F &start, const Point3F &end, RayInfo *rayInfo, TSMaterialList *materials );
 
-   static const F32 VISIBILITY_EPSILON; 
+   static const F32 VISIBILITY_EPSILON;
 };
 
 
@@ -471,11 +471,11 @@ public:
          Vector<BatchedVertWeight> *_tmpVec;
 
          BatchedTransform() : alignedMem(NULL), numElements(0), _tmpVec(NULL) {}
-         virtual ~BatchedTransform() 
-         { 
-            if(alignedMem) 
-               dFree_aligned(alignedMem); 
-            alignedMem = NULL; 
+         virtual ~BatchedTransform()
+         {
+            if(alignedMem)
+               dFree_aligned(alignedMem);
+            alignedMem = NULL;
             SAFE_DELETE(_tmpVec);
          }
       };
@@ -503,7 +503,7 @@ public:
    /// Structure containing data needed to batch skinning
    BatchData batchData;
    bool batchDataInitialized;
-   
+
    /// vectors that define the vertex, weight, bone tuples
    Vector<F32> weight;
    Vector<S32> boneIndex;
@@ -514,10 +514,10 @@ public:
 
    // render methods..
    void render( TSVertexBufferHandle &instanceVB, GFXPrimitiveBufferHandle &instancePB );
-   void render(   TSMaterialList *, 
+   void render(   TSMaterialList *,
                   const TSRenderState &data,
                   bool isSkinDirty,
-                  const Vector<MatrixF> &transforms, 
+                  const Vector<MatrixF> &transforms,
                   TSVertexBufferHandle &vertexBuffer,
                   GFXPrimitiveBufferHandle &primitiveBuffer );
 

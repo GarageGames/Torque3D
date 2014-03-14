@@ -23,17 +23,17 @@
 //-----------------------------------------------------------------------------
 // Menu Builder Helper Class
 //-----------------------------------------------------------------------------
-/// @class MenuBuilder 
+/// @class MenuBuilder
 /// @brief Create Dynamic Context and MenuBar Menus
 ///
 ///
 /// Summary : The MenuBuilder script class exists merely as a helper for creating
-///           popup menu's for use in torque editors.  It is setup as a single 
+///           popup menu's for use in torque editors.  It is setup as a single
 ///           object with dynamic fields starting with item[0]..[n] that describe
 ///           how to create the menu in question.  An example is below.
 ///
 /// isPopup : isPopup is a persistent field on PopupMenu console class which
-///           when specified to true will allow you to perform .showPopup(x,y) 
+///           when specified to true will allow you to perform .showPopup(x,y)
 ///           commands which allow popupmenu's to be used/reused as menubar menus
 ///           as well as context menus.
 ///
@@ -47,10 +47,10 @@
 /// canvas  : The GuiCanvas object the menu should be attached to. This defaults to
 ///           the global Canvas object if unspecified.
 ///
-/// Remarks : If you wish to use a menu as a context popup menu, isPopup must be 
+/// Remarks : If you wish to use a menu as a context popup menu, isPopup must be
 ///           specified as true at the creation time of the menu.
 ///
-/// 
+///
 /// @li @b item[n] (String) TAB (String) TAB (String) : <c>A Menu Item Definition.</c>
 /// @code item[0] = "Open File..." TAB "Ctrl O" TAB "Something::OpenFile"; @endcode
 ///
@@ -113,18 +113,18 @@ function MenuBuilder::addItem(%this, %pos, %item)
 {
    if(%item $= "")
       %item = %this.item[%pos];
-   
+
    if(%item !$= %this.item[%pos])
       %this.item[%pos] = %item;
-   
+
    %name = getField(%item, 0);
    %accel = getField(%item, 1);
    %cmd = getField(%item, 2);
-   
+
    // We replace the [this] token with our object ID
    %cmd = strreplace( %cmd, "[this]", %this );
    %this.item[%pos] = setField( %item, 2, %cmd );
-   
+
    if(isObject(%accel))
    {
       // If %accel is an object, we want to add a sub menu
@@ -145,7 +145,7 @@ function MenuBuilder::onAdd(%this)
 {
    if(! isObject(%this.canvas))
       %this.canvas = Canvas;
-      
+
    for(%i = 0;%this.item[%i] !$= "";%i++)
    {
       %this.addItem(%i);
@@ -186,7 +186,7 @@ function MenuBuilder::setItemCommand( %this, %id, %command )
 
 /// (SimID this)
 /// Wraps the attachToMenuBar call so that it does not require knowledge of
-/// barName or barIndex to be removed/attached.  This makes the individual 
+/// barName or barIndex to be removed/attached.  This makes the individual
 /// MenuBuilder items very easy to add and remove dynamically from a bar.
 ///
 function MenuBuilder::attachToMenuBar( %this )
@@ -196,13 +196,13 @@ function MenuBuilder::attachToMenuBar( %this )
       error("MenuBuilder::attachToMenuBar - Menu property 'barName' not specified.");
       return false;
    }
-   
+
    if( %this.barPosition < 0 )
    {
       error("MenuBuilder::attachToMenuBar - Menu " SPC %this.barName SPC "property 'barPosition' is invalid, must be zero or greater.");
       return false;
    }
-   
+
    Parent::attachToMenuBar( %this, %this.canvas, %this.barPosition, %this.barName );
 }
 
@@ -231,7 +231,7 @@ function MenuBuilder::setupDefaultState(%this)
       %name = getField(%this.item[%i], 0);
       %accel = getField(%this.item[%i], 1);
       %cmd = getField(%this.item[%i], 2);
-      
+
       // Pass on to sub menus
       if(isObject(%accel))
          %accel.setupDefaultState();

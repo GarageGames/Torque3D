@@ -83,7 +83,7 @@ void Forest::prepRenderImage( SceneRenderState *state )
 
    const F32 cullScale = isReflectPass ? mReflectionLodScalar : 1.0f;
 
-   // If we need to update our cached 
+   // If we need to update our cached
    // zone state then do it now.
    if ( mZoningDirty )
    {
@@ -97,7 +97,7 @@ void Forest::prepRenderImage( SceneRenderState *state )
 
    // TODO: Move these into the TSForestItemData as something we
    // setup once and don't do per-instance.
-   
+
    // Set up the TS render state.
    TSRenderState rdata;
    rdata.setSceneState( state );
@@ -128,13 +128,13 @@ void Forest::prepRenderImage( SceneRenderState *state )
    // Go thru the visible cells.
    const Box3F &cullerBounds = culler.getBounds();
    const Point3F &camPos = state->getDiffuseCameraPosition();
-   
+
    U32 clipMask;
    smAverageItemsPerCell = 0.0f;
    U32 cellsProcessed = 0;
    ForestCell *cell;
-   
-   // First get all the top level cells which 
+
+   // First get all the top level cells which
    // intersect the frustum.
    Vector<ForestCell*> cellStack;
    mData->getCells( culler, &cellStack );
@@ -161,14 +161,14 @@ void Forest::prepRenderImage( SceneRenderState *state )
       if ( clipMask == -1 )
          continue;
 
-      // Test cell visibility for interior zones.      
+      // Test cell visibility for interior zones.
       const bool visibleInside = !cell->getZoneOverlap().empty() ? zoneState.testAny( cell->getZoneOverlap() ) : false;
 
       // Test cell visibility for outdoor zone, but only
       // if we need to.
       bool visibleOutside = false;
       if( !cell->mIsInteriorOnly && !visibleInside )
-      {         
+      {
          U32 outdoorZone = SceneZoneSpaceManager::RootZoneId;
          visibleOutside = !state->getCullingState().isCulled( cellBounds, &outdoorZone, 1 );
       }
@@ -190,7 +190,7 @@ void Forest::prepRenderImage( SceneRenderState *state )
       // at the cell distance to the camera... then the whole
       // cell can be billboarded.
       //
-      if (  smForceImposters || 
+      if (  smForceImposters ||
             ( dist > 0.0f && cell->getLargestItem().canBillboard( state, dist ) ) )
       {
          // If imposters are disabled then skip out.
@@ -235,7 +235,7 @@ void Forest::prepRenderImage( SceneRenderState *state )
 
       // Use the cell bounds as the light query volume.
       //
-      // This means all forward lit items in this cell will 
+      // This means all forward lit items in this cell will
       // get the same lights, but it performs much better.
       lightQuery.init( cellBounds );
 
@@ -280,8 +280,8 @@ void Forest::_renderCellBounds( ObjectRenderInst *ri, SceneRenderState *state, B
    mData->getCells( &cellStack );
 
    // Holds child cells we need to render as we encounter them.
-   Vector<ForestCell*> frontier;   
-   
+   Vector<ForestCell*> frontier;
+
    GFXDrawUtil *drawer = GFX->getDrawUtil();
 
    GFXStateBlockDesc desc;
@@ -292,10 +292,10 @@ void Forest::_renderCellBounds( ObjectRenderInst *ri, SceneRenderState *state, B
    while ( !cellStack.empty() )
    {
       while ( !cellStack.empty() )
-      {      
+      {
          const ForestCell *cell = cellStack.last();
          cellStack.pop_back();
-         
+
          Box3F box = cell->getBounds();
 
          drawer->drawCube( desc, box, ColorI( 0, 255, 0 ) );
@@ -303,13 +303,13 @@ void Forest::_renderCellBounds( ObjectRenderInst *ri, SceneRenderState *state, B
          RectF rect = cell->getRect();
 
          box.minExtents.set( rect.point.x, rect.point.y, box.minExtents.z );
-         box.maxExtents.set( rect.point.x + rect.extent.x, rect.point.y + rect.extent.y, box.minExtents.z );         
+         box.maxExtents.set( rect.point.x + rect.extent.x, rect.point.y + rect.extent.y, box.minExtents.z );
 
          drawer->drawCube( desc, box, ColorI::RED );
 
          // If this cell has children, add them to the frontier.
-         if ( !cell->isLeaf() )      
-            cell->getChildren( &frontier );      
+         if ( !cell->isLeaf() )
+            cell->getChildren( &frontier );
       }
 
       // Now the frontier becomes the cellStack and we empty the frontier.

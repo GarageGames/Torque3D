@@ -52,7 +52,7 @@ class SFXSource;
 ///
 /// A few tips:
 ///
-/// Make sure that server SFXDescription are defined with the 
+/// Make sure that server SFXDescription are defined with the
 /// datablock keyword, and that client SFXDescription are defined
 /// with the 'new' or 'singleton' keyword.
 ///
@@ -61,7 +61,7 @@ class SFXDescription : public SimDataBlock
       typedef SimDataBlock Parent;
 
    public:
-   
+
       enum
       {
          MaxNumParameters = 8,
@@ -69,7 +69,7 @@ class SFXDescription : public SimDataBlock
 
       /// The 0 to 1 volume scale.
       F32 mVolume;
-      
+
       /// The pitch scale.
       F32 mPitch;
 
@@ -82,13 +82,13 @@ class SFXDescription : public SimDataBlock
 
       /// If true the sound will be 3D positional.
       bool mIs3D;
-      
+
       /// If this sound is allowed to be mixed in hardware.
       bool mUseHardware;
 
       /// If true the sound uses custom reverb properties.
       bool mUseReverb;
-      
+
       /// The distance from the emitter at which the
       /// sound volume is unchanged.  Beyond this distance
       /// the volume begins to falloff.
@@ -119,11 +119,11 @@ class SFXDescription : public SimDataBlock
       ///
       /// This is only valid for 3D sounds.
       F32 mConeOutsideVolume;
-      
+
       /// Local logarithmic distance attenuation rolloff factor.  -1 to use global setting.
       /// Per-sound rolloff settings only supported with some SFX providers.
       F32 mRolloffFactor;
-      
+
       /// Max distance in both directions along each axis by which the
       /// sound position of a 3D sound will be randomly scattered.
       ///
@@ -134,21 +134,21 @@ class SFXDescription : public SimDataBlock
       /// The source to which sources playing with this description will
       /// be added.
       SFXSource* mSourceGroup;
-      
+
       /// Number of seconds until playback reaches full volume after starting/resuming.
       /// Zero to deactivate (default).
       F32 mFadeInTime;
-      
+
       /// Number of seconds to fade out fading before stopping/pausing.
       /// Zero to deactivate (default).
       F32 mFadeOutTime;
-      
+
       /// Easing curve for fade-in.
       EaseF mFadeInEase;
-      
+
       /// Easing curve for fade-out.
       EaseF mFadeOutEase;
-      
+
       /// When mIsLooping is true, the fades will apply to each cycle.  Otherwise, only
       /// the first cycle will have a fade-in applied and no fade-out happens when a cycle
       /// ends.
@@ -169,11 +169,11 @@ class SFXDescription : public SimDataBlock
 
       /// Reverb properties for sound playback.
       SFXSoundReverbProperties mReverb;
-            
+
       /// Parameters to which sources playing with this description should automatically
       /// connect when created.
       StringTableEntry mParameters[ MaxNumParameters ];
-      
+
       /// Priority level for sounds.  Higher priority sounds are less likely to be
       /// culled.
       F32 mPriority;

@@ -56,7 +56,7 @@
       Profile = "ToolsGuiWindowCollapseProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
-      Position = getWord($pref::Video::mode, 0) - 209 
+      Position = getWord($pref::Video::mode, 0) - 209
          SPC getWord(EditorGuiToolbar.extent, 1)-1;
       Extent = "210 252";
       MinExtent = "210 100";

@@ -34,7 +34,7 @@
 
 const MatInstanceHookType ReflectionMaterialHook::Type( "Reflection" );
 
-ReflectionMaterialHook::ReflectionMaterialHook() : 
+ReflectionMaterialHook::ReflectionMaterialHook() :
    mReflectMat(NULL)
 {
 
@@ -62,7 +62,7 @@ void ReflectionMaterialHook::init( BaseMatInstance *inMat )
 
    // Always z-read, and z-write if the material isn't translucent
    refractState.setZReadWrite( true, reflectMat->isTranslucent() ? false : true );
-   
+
    // Create reflection material instance.
    BaseMatInstance *newMat = new ReflectionMatInstance( reflectMat );
    newMat->setUserObject( inMat->getUserObject() );
@@ -73,13 +73,13 @@ void ReflectionMaterialHook::init( BaseMatInstance *inMat )
       SAFE_DELETE( newMat );
       newMat = MATMGR->createWarningMatInstance();
    }
-   
+
    mReflectMat = newMat;
 }
 
 void ReflectionMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
                                              U32 stageNum,
-                                             MaterialFeatureData &fd, 
+                                             MaterialFeatureData &fd,
                                              const FeatureSet &features )
 {
    // First stage only in reflections
@@ -96,7 +96,7 @@ void ReflectionMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
 
 //------------------------------------------------------------------------------
 
-ReflectionMatInstance::ReflectionMatInstance( Material *mat ) 
+ReflectionMatInstance::ReflectionMatInstance( Material *mat )
  : MatInstance( *mat )
 {
 

@@ -40,7 +40,7 @@ MODULE_BEGIN( Sim )
    {
       Sim::init();
    }
-   
+
    MODULE_SHUTDOWN
    {
       Sim::shutdown();
@@ -214,7 +214,7 @@ ConsoleFunction(schedule, S32, 4, 0, "schedule(time, refobject|0, command, <arg1
    return ret;
 }
 
-ConsoleFunction(getUniqueName, const char*, 2, 2, 
+ConsoleFunction(getUniqueName, const char*, 2, 2,
 	"( String baseName )\n"
 	"@brief Returns a unique unused SimObject name based on a given base name.\n\n"
 	"@baseName Name to conver to a unique string if another instance exists\n"
@@ -223,7 +223,7 @@ ConsoleFunction(getUniqueName, const char*, 2, 2,
 	"@internal")
 {
    String outName = Sim::getUniqueName( argv[1] );
-   
+
    if ( outName.isEmpty() )
       return NULL;
 

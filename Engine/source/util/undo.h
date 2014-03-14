@@ -51,15 +51,15 @@ public:
    typedef SimObject Parent;
    DECLARE_CONOBJECT(UndoAction);
    static void initPersistFields();
-   
+
    /// Create a new action, assigning it a name for display in menus et cetera.
    UndoAction(const UTF8 *actionName = " ");
    virtual ~UndoAction();
 
-   /// Implement these methods to perform your specific undo & redo tasks. 
+   /// Implement these methods to perform your specific undo & redo tasks.
    virtual void undo() { };
    virtual void redo() { };
-   
+
    /// Adds the action to the undo stack of the default UndoManager, or the provided manager.
    void addToManager(UndoManager* theMan = NULL);
 };
@@ -85,9 +85,9 @@ public:
    virtual void addAction( UndoAction *action );
    virtual void undo();
    virtual void redo();
-   
+
    virtual void onDeleteNotify( SimObject* object );
-   
+
    U32 getNumChildren() const { return mChildren.size(); }
 };
 
@@ -101,10 +101,10 @@ private:
    /// The stacks of undo & redo actions. They will be capped at size mNumLevels.
    Vector<UndoAction*> mUndoStack;
    Vector<UndoAction*> mRedoStack;
-   
+
    /// Stack for assembling compound actions.
    Vector< CompoundUndoAction* > mCompoundStack;
-   
+
    /// Deletes all the UndoActions in a stack, then clears it.
    void clearStack(Vector<UndoAction*> &stack);
    /// Clamps a Vector to mNumLevels entries.
@@ -112,7 +112,7 @@ private:
 
    /// Run the removal logic on the action.
    void doRemove( UndoAction* action, bool noDelete );
-   
+
 public:
    /// Number of undo & redo levels.
    // not private because we're exposing it to the console.
@@ -129,12 +129,12 @@ public:
    ~UndoManager();
    /// Accessor to the default undo manager singleton. Creates one if needed.
    static UndoManager& getDefaultManager();
-   
+
    /// Undo last action, and put it on the redo stack.
    void undo();
    /// Redo the last action, and put it on the undo stack.
    void redo();
-   
+
    /// Clears the undo and redo stacks.
    void clearAll();
 
@@ -154,7 +154,7 @@ public:
    /// Add an action to the top of the undo stack, and clear the redo stack.
    void addAction(UndoAction* action);
    void removeAction(UndoAction* action, bool noDelete = false);
-   
+
    /// @name Compound Actions
    ///
    /// The compound action stack allows to redirect undos to a CompoundUndoAction
@@ -163,43 +163,43 @@ public:
    /// will be moved onto the undo stack.
    ///
    /// @{
-   
+
    /// Push a compound action called "name" onto the compound stack.  While the
    /// compound stack is not empty, all undos that are queued on the undo manager will
    /// go to the topmost compound instead of the undo stack.
    CompoundUndoAction* pushCompound( const String& name );
-   
+
    /// Pop the topmost compound off the compound stack and add it to the undo manager.
    /// If the compound stack is still not empty, the compound will be added to the next
    /// lower compound on the stack.  Otherwise it will be recorded as a regular undo.
    void popCompound( bool discard = false );
-   
+
    /// Return the current nesting depth of the compound stack.
    U32 getCompoundStackDepth() const { return mCompoundStack.size(); }
-      
+
    /// @}
 };
 
 
 /// Script Undo Action Creation
-/// 
+///
 /// Undo actions can be created in script like this:
-/// 
+///
 /// ...
 /// %undo = new UndoScriptAction() { class = SampleUndo; actionName = "Sample Undo"; };
 /// %undo.addToManager(UndoManager);
 /// ...
-/// 
+///
 /// function SampleUndo::undo()
 /// {
 ///    ...
 /// }
-/// 
+///
 /// function SampleUndo::redo()
 /// {
 ///    ...
 /// }
-/// 
+///
 class UndoScriptAction : public UndoAction
 {
 public:

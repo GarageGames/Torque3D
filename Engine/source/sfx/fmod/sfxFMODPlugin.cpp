@@ -32,6 +32,6 @@ SFXSource* SFXFMODPlugin::createSource( SFXTrack* track )
    SFXFMODEvent* event = dynamic_cast< SFXFMODEvent* >( track );
    if( !event )
       return NULL;
-         
+
    return SFXFMODEventSource::create( event );
 }

@@ -50,7 +50,7 @@ $PE_guielement_ext_colorpicker = "18 18";
    closeCommand = "";
    EdgeSnap = "0";
    text = "Particle Editor";
-      
+
    new GuiTabBookCtrl(PE_TabBook) {
       canSaveDynamicFields = "0";
       isContainer = "1";
@@ -74,7 +74,7 @@ $PE_guielement_ext_colorpicker = "18 18";
       TabPosition = "Top";
       TabMargin = "0";
       MinTabWidth = "64";
-      
+
       new GuiTabPageCtrl(PE_EmitterEditor) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -96,7 +96,7 @@ $PE_guielement_ext_colorpicker = "18 18";
          AnchorRight = "0";
          text = "Emitter";
          maxLength = "1024";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -117,7 +117,7 @@ $PE_guielement_ext_colorpicker = "18 18";
             lockVertScroll = "false";
             constantThumbHeight = "0";
             childMargin = "0 0";
-            
+
             new GuiStackControl() {
                StackingType = "Vertical";
                HorizStacking = "Left to Right";
@@ -137,7 +137,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                Visible = "1";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
-               
+
                new GuiControl(PEE_EmitterSelector_Control){ // PEE_EmitterSelector
                   class = "QuickEditDropDownTextEditCtrl";
                   isContainer = "1";
@@ -145,7 +145,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   VertSizing = "bottom";
                   Position = $PE_guielement_pos_single_container ;
                   Extent = "197 26" ;
-                        
+
                   new GuiPopUpMenuCtrl(PEE_EmitterSelector) {
                      internalName = "PopUpMenu";
                      canSaveDynamicFields = "0";
@@ -196,7 +196,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      text = "None";
                      maxLength = "1024";
                      AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl);";
-                  }; 
+                  };
                   new GuiBitmapButtonCtrl() {
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -273,7 +273,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -293,7 +293,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Emitter PEE_lifetimeMS
                         isContainer = "1";
                         class = "AggregateControl";
@@ -301,7 +301,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            canSaveDynamicFields = "0";
                            Enabled = "1";
@@ -354,7 +354,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            Extent = $PE_guielement_ext_value;
                         };
                      };
-                     
+
                      new GuiControl(){ // Emitter PEE_lifetimeVarianceMS
                         isContainer = "1";
                         class = "AggregateControl";
@@ -362,7 +362,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            canSaveDynamicFields = "0";
                            Enabled = "1";
@@ -415,14 +415,14 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateLifeFields( true, $ThisControl.getValue() );";
                         };
                      };
-                     
+
                      new GuiControl(){ // Emitter Infinite Loop
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -442,15 +442,15 @@ $PE_guielement_ext_colorpicker = "18 18";
                            text = "";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Emitter Amount
                         class = "AggregateControl";
                         isContainer = "1";
@@ -458,7 +458,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -504,7 +504,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -559,7 +559,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -579,7 +579,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Emitter speed
                         class = "AggregateControl";
                         isContainer = "1";
@@ -587,7 +587,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -633,7 +633,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -672,22 +672,22 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateSpeedFields( true, $ThisControl.getValue() );";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Emitter Orient to Movment Direction
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -713,7 +713,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -739,7 +739,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -775,7 +775,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -795,7 +795,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Emitter Angle Min
                         isContainer = "1";
                         class = "AggregateControl";
@@ -803,7 +803,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiBitmapCtrl(){ // 0 Degrees
                            HorizSizing = "left";
                            position = getWord($PE_guielement_pos_slider,0)+4 SPC "0";
@@ -844,7 +844,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            bitmap = "tools/gui/images/separator-h";
                            tooltip = "360 Degrees ( Up )";
                         };
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -881,7 +881,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"thetaMin\", $ThisControl.getText());";
-                        };             
+                        };
                      };
                      new GuiControl(){ // Emitter Angle Max
                         isContainer = "1";
@@ -890,7 +890,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiBitmapCtrl(){ // 0 Degrees
                            HorizSizing = "left";
                            position = getWord($PE_guielement_pos_slider,0)+4 SPC "0";
@@ -931,7 +931,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            bitmap = "tools/gui/images/separator-h";
                            tooltip = "360 Degrees ( Up )";
                         };
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -968,17 +968,17 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"thetaMax\", $ThisControl.getText());";
-                        };             
+                        };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Emitter Depth
                         isContainer = "1";
                         class = "AggregateControl";
@@ -986,7 +986,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1023,7 +1023,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"phiVariance\", $ThisControl.getText());";
-                        };             
+                        };
                      };
                      new GuiControl(){ // Emitter Offset
                         class = "AggregateControl";
@@ -1032,7 +1032,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1078,7 +1078,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1115,7 +1115,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"ejectionOffsetVariance\", $ThisControl.getText());";
-                        };               
+                        };
                      };
                   }; // end stack
                }; // end "spread" rollout
@@ -1133,7 +1133,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -1153,14 +1153,14 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(PEE_EmitterParticle1){ // emmiter particle 1
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1178,7 +1178,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            Extent = $PE_guielement_ext_textedit;
                            text = "";
                            command = "PE_EmitterEditor.updateParticlesFields($ThisControl);";
-                        };  
+                        };
                      };
                      new GuiControl(PEE_EmitterParticle2){ // emmiter particle 2
                         isContainer = "1";
@@ -1186,7 +1186,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1218,7 +1218,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            MinExtent = "8 2";
                            canSave = "1";
                            Visible = "1";
-                           Command = "%particleId = PEE_EmitterParticle2-->PopUpMenu.findText( \"None\" ); PEE_EmitterParticle2-->PopUpMenu.setSelected( %particleId );PE_EmitterEditor.updateParticlesFields();"; 
+                           Command = "%particleId = PEE_EmitterParticle2-->PopUpMenu.findText( \"None\" ); PEE_EmitterParticle2-->PopUpMenu.setSelected( %particleId );PE_EmitterEditor.updateParticlesFields();";
                            hovertime = "1000";
                            tooltip = "Clear Particle 2 from Emitter";
                            text = "";
@@ -1226,7 +1226,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            groupNum = "-1";
                            buttonType = "PushButton";
                            useMouseEvents = "0";
-                        }; 
+                        };
                      };
                      new GuiControl(PEE_EmitterParticle3){ // emmiter particle 3
                         isContainer = "1";
@@ -1234,7 +1234,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1266,7 +1266,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            MinExtent = "8 2";
                            canSave = "1";
                            Visible = "1";
-                           Command = "%particleId = PEE_EmitterParticle3-->PopUpMenu.findText( \"None\" ); PEE_EmitterParticle3-->PopUpMenu.setSelected( %particleId );PE_EmitterEditor.updateParticlesFields();"; 
+                           Command = "%particleId = PEE_EmitterParticle3-->PopUpMenu.findText( \"None\" ); PEE_EmitterParticle3-->PopUpMenu.setSelected( %particleId );PE_EmitterEditor.updateParticlesFields();";
                            hovertime = "1000";
                            tooltip = "Clear Particle 3 from Emitter";
                            text = "";
@@ -1274,7 +1274,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            groupNum = "-1";
                            buttonType = "PushButton";
                            useMouseEvents = "0";
-                        }; 
+                        };
                      };
                      new GuiControl(PEE_EmitterParticle4){ // emmiter particle 4
                         isContainer = "1";
@@ -1282,7 +1282,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1314,7 +1314,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            MinExtent = "8 2";
                            canSave = "1";
                            Visible = "1";
-                           Command = "%particleId = PEE_EmitterParticle4-->PopUpMenu.findText( \"None\" ); PEE_EmitterParticle4-->PopUpMenu.setSelected( %particleId );PE_EmitterEditor.updateParticlesFields();"; 
+                           Command = "%particleId = PEE_EmitterParticle4-->PopUpMenu.findText( \"None\" ); PEE_EmitterParticle4-->PopUpMenu.setSelected( %particleId );PE_EmitterEditor.updateParticlesFields();";
                            hovertime = "1000";
                            tooltip = "Clear Particle 4 from Emitter";
                            text = "";
@@ -1322,7 +1322,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            groupNum = "-1";
                            buttonType = "PushButton";
                            useMouseEvents = "0";
-                        }; 
+                        };
                      };
                   }; // end stack
                }; // end "particles" rollout
@@ -1340,7 +1340,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -1360,14 +1360,14 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Blend type
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1384,15 +1384,15 @@ $PE_guielement_ext_colorpicker = "18 18";
                            Extent = $PE_guielement_ext_textedit;
                            command = "PE_EmitterEditor.updateEmitter( \"blendStyle\", $ThisControl.getText());";
                         };
-                     };  
-                     new GuiControl(){ // softness Distance 
+                     };
+                     new GuiControl(){ // softness Distance
                         class = "AggregateControl";
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1432,14 +1432,14 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"softnessDistance\", $ThisControl.getText());";
                         };
                      };
-                     new GuiControl(){ // Ambient Factor 
+                     new GuiControl(){ // Ambient Factor
                         class = "AggregateControl";
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1479,22 +1479,22 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"ambientFactor\", $ThisControl.getText));";
                         };
                      };
-                        
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Sort Particles
                         isContainer = "1";
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1520,7 +1520,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1546,7 +1546,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1572,7 +1572,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -1618,7 +1618,7 @@ $PE_guielement_ext_colorpicker = "18 18";
          AnchorRight = "0";
          text = "Particle";
          maxLength = "1024";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -1639,7 +1639,7 @@ $PE_guielement_ext_colorpicker = "18 18";
             lockVertScroll = "false";
             constantThumbHeight = "0";
             childMargin = "0 0";
-            
+
             new GuiStackControl() {
                StackingType = "Vertical";
                HorizStacking = "Left to Right";
@@ -1659,7 +1659,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                Visible = "1";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
-               
+
                new GuiControl(PEP_ParticleSelector_Control){ // PEP_ParticleSelector
                   isContainer = "1";
                   class = "QuickEditDropDownTextEditCtrl";
@@ -1667,7 +1667,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   VertSizing = "bottom";
                   Position = $PE_guielement_pos_single_container ;
                   Extent = "197 26" ;
-                  
+
                   new GuiPopUpMenuCtrl(PEP_ParticleSelector) {
                      internalName =  "PopUpMenu";
                      canSaveDynamicFields = "0";
@@ -1718,7 +1718,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      text = "None";
                      maxLength = "1024";
                      altCommand = "$ThisControl.getParent().updateFromChild($ThisControl);";
-                  }; 
+                  };
                   new GuiBitmapButtonCtrl( PEP_NewParticleButton ) {
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -1794,7 +1794,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -1814,14 +1814,14 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiContainer(){ // particle texture map
                         profile="ToolsGuiDefaultProfile";
                         isContainer = "1";
                         position = "0 0";
                         Extent = "185 52";
                         HorizSizing = "width";
-                        
+
                         new GuiBitmapCtrl() {
                            canSaveDynamicFields = "0";
                            Enabled = "1";
@@ -1941,23 +1941,23 @@ $PE_guielement_ext_colorpicker = "18 18";
                            profile="ToolsGuiButtonProfile";
                            text ="Edit";
                            HorizSizing = "left";
-                           VertSizing = "bottom"; 
+                           VertSizing = "bottom";
                            position = "138 0";
                            Extent = "36 18" ;
                            buttonType = "PushButton";
                            Command = "PE_ParticleEditor.updateParticleTexture(1);";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         //visible = false;
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // particle life
                         class = "AggregateControl";
                         isContainer = "1";
@@ -1965,7 +1965,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            canSaveDynamicFields = "0";
                            Enabled = "1";
@@ -2000,7 +2000,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            Extent = $PE_guielement_ext_slider;
                            MinExtent = "8 2";
                            canSave = "1";
-                           Visible = "1"; 
+                           Visible = "1";
                            Command = "PE_ParticleEditor.updateLifeFields( false, $ThisControl.getValue(), true, true );";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateLifeFields( false, $ThisControl.getValue(), true, false );";
                            hovertime = "1000";
@@ -2025,7 +2025,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            canSaveDynamicFields = "0";
                            Enabled = "1";
@@ -2094,7 +2094,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -2114,7 +2114,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Particle Initial speed
                         class = "AggregateControl";
                         isContainer = "1";
@@ -2122,7 +2122,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2168,7 +2168,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2207,15 +2207,15 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"constantAcceleration\", $ThisControl.getText());";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Particle Gravity
                         class = "AggregateControl";
                         isContainer = "1";
@@ -2223,7 +2223,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiBitmapCtrl(){ // 0 Gravity
                            HorizSizing = "left";
                            position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0)/2)-1 SPC "0";
@@ -2232,7 +2232,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            bitmap = "tools/gui/images/separator-h";
                            tooltip = "0 Gravity";
                         };
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2278,7 +2278,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2333,7 +2333,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -2353,7 +2353,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Particle spin Min
                         class = "AggregateControl";
                         isContainer = "1";
@@ -2361,7 +2361,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiBitmapCtrl(){ // No Spin
                            HorizSizing = "left";
                            position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0)/2)-1 SPC "0";
@@ -2370,7 +2370,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            bitmap = "tools/gui/images/separator-h";
                            tooltip = "No Spin";
                         };
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2416,7 +2416,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiBitmapCtrl(){ // No Spin
                            HorizSizing = "left";
                            position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0)/2)-1 SPC "0";
@@ -2425,7 +2425,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            bitmap = "tools/gui/images/separator-h";
                            tooltip = "No Spin";
                         };
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2464,15 +2464,15 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateSpinFields( false, $ThisControl.getText() );";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Particle spin Speed
                         class = "AggregateControl";
                         isContainer = "1";
@@ -2480,7 +2480,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2535,7 +2535,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                   container = true;
                   parentRollout = %this.rollout;
                   object = %behavior;
-                  
+
                   new GuiStackControl() {
                      StackingType = "Vertical";
                      HorizStacking = "Left to Right";
@@ -2555,7 +2555,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                      Visible = "1";
                      tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
-                     
+
                      new GuiControl(){ // Particle Point Colors
                         class = "";
                         isContainer = "1";
@@ -2563,7 +2563,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2657,15 +2657,15 @@ $PE_guielement_ext_colorpicker = "18 18";
                            class = "PE_ColorTintSwatch";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Particle Point Size
                         class = "AggregateControl";
                         isContainer = "1";
@@ -2673,7 +2673,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2720,7 +2720,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2767,7 +2767,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2814,7 +2814,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2854,15 +2854,15 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"sizes[3]\", $ThisControl.getText());";
                         };
                      };
-                     
+
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
                            position="0 3"; extent ="188 2"; HorizSizing = "width";
-                           bitmap ="tools/gui/images/separator-v"; 
+                           bitmap ="tools/gui/images/separator-v";
                         };
                      };// end spacer ----------------------------------------
-                     
+
                      new GuiControl(){ // Particle Point Time
                         class = "AggregateControl";
                         isContainer = "1";
@@ -2870,7 +2870,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2917,7 +2917,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -2964,7 +2964,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -3011,7 +3011,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                         VertSizing = "bottom";
                         Position = $PE_guielement_pos_single_container ;
                         Extent = $PE_guielement_ext_single_container ;
-                        
+
                         new GuiTextCtrl() {
                            Profile = "ToolsGuiTextProfile";
                            HorizSizing = "width";
@@ -3079,7 +3079,7 @@ $PE_guielement_ext_colorpicker = "18 18";
       text = "";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl() {
       canSaveDynamicFields = "0";
       Enabled = "1";

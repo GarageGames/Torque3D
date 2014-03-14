@@ -84,10 +84,10 @@ class SceneObjectRef : public SceneObjectRefBase< SceneObjectRef > {};
 /// allows it to return the appropriate geometry.
 enum PolyListContext
 {
-   /// A hint that the polyist is intended 
+   /// A hint that the polyist is intended
    /// for collision testing.
    PLC_Collision,
-   
+
    /// A hint that the polyist is for decal
    /// geometry generation.
    PLC_Decal,
@@ -103,7 +103,7 @@ enum PolyListContext
 
    /// A hint that the polyist will be used
    /// to export geometry and would like to have
-   /// texture coords and materials.   
+   /// texture coords and materials.
    PLC_Export
 };
 
@@ -115,7 +115,7 @@ class SimpleQueryList
 
       Vector< SceneObject* > mList;
 
-      SimpleQueryList() 
+      SimpleQueryList()
       {
          VECTOR_SET_ASSOCIATION( mList );
       }
@@ -153,7 +153,7 @@ class SceneContainer
          void linkAfter(Link* ptr);
       };
 
-      struct CallbackInfo 
+      struct CallbackInfo
       {
          PolyListContext context;
          AbstractPolyList* polyList;
@@ -253,9 +253,9 @@ class SceneContainer
       /// @{
 
       ///
-      bool buildPolyList(  PolyListContext context, 
-                           const Box3F &box, 
-                           U32 typeMask, 
+      bool buildPolyList(  PolyListContext context,
+                           const Box3F &box,
+                           U32 typeMask,
                            AbstractPolyList *polylist );
 
       /// @}
@@ -301,7 +301,7 @@ class SceneContainer
       bool _castRay( U32 type, const Point3F &start, const Point3F &end, U32 mask, RayInfo* info, CastRayCallback callback );
 
       void _findSpecialObjects( const Vector< SceneObject* >& vector, U32 mask, FindCallback, void *key = NULL );
-      void _findSpecialObjects( const Vector< SceneObject* >& vector, const Box3F &box, U32 mask, FindCallback callback, void *key = NULL );   
+      void _findSpecialObjects( const Vector< SceneObject* >& vector, const Box3F &box, U32 mask, FindCallback callback, void *key = NULL );
 
       static void getBinRange( const F32 min, const F32 max, U32& minBin, U32& maxBin );
 };

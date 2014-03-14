@@ -57,7 +57,7 @@ const String ShaderGenVars::targetSize("$targetSize");
 const String ShaderGenVars::oneOverTargetSize("$oneOverTargetSize");
 
 const String ShaderGenVars::lightPosition("$inLightPos");
-const String ShaderGenVars::lightDiffuse("$inLightColor"); 
+const String ShaderGenVars::lightDiffuse("$inLightColor");
 const String ShaderGenVars::lightAmbient("$ambient");
 const String ShaderGenVars::lightInvRadiusSq("$inLightInvRadiusSq");
 const String ShaderGenVars::lightSpotDir("$inLightSpotDir");

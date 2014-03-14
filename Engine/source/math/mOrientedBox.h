@@ -74,7 +74,7 @@ class OrientedBox3F : public BoxBase
       /// Return the center point of the bounding box.
       const Point3F& getCenter() const { return mCenter; }
 
-      /// Return the normalized axis vector for the given world-space axis. 
+      /// Return the normalized axis vector for the given world-space axis.
       const Point3F& getAxis( U32 i ) const
       {
          AssertFatal( i < 3, "OrientedBox3F::getAxis - Index out of range" );

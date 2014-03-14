@@ -51,13 +51,13 @@ void GFXD3D9PrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
       AssertFatal( mVolatileBuffer, "GFXD3D9PrimitiveBuffer::lock - No dynamic primitive buffer was available!");
 
       // We created the pool when we requested this volatile buffer, so assume it exists...
-      if( mVolatileBuffer->mIndexCount + indexEnd > MAX_DYNAMIC_INDICES ) 
+      if( mVolatileBuffer->mIndexCount + indexEnd > MAX_DYNAMIC_INDICES )
       {
          flags |= D3DLOCK_DISCARD;
          mVolatileStart = indexStart  = 0;
          indexEnd       = indexEnd;
       }
-      else 
+      else
       {
          flags |= D3DLOCK_NOOVERWRITE;
          mVolatileStart = indexStart  = mVolatileBuffer->mIndexCount;
@@ -74,7 +74,7 @@ void GFXD3D9PrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
       "GFXD3D9PrimitiveBuffer::lock - Could not lock primitive buffer.");
 
    #ifdef TORQUE_DEBUG
-   
+
       // Allocate a debug buffer large enough for the lock
       // plus space for over and under run guard strings.
       mLockedSize = (indexEnd - indexStart) * sizeof(U16);
@@ -82,8 +82,8 @@ void GFXD3D9PrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
       mDebugGuardBuffer = new U8[mLockedSize+(guardSize*2)];
 
       // Setup the guard strings.
-      dMemcpy( mDebugGuardBuffer, _PBGuardString, guardSize ); 
-      dMemcpy( mDebugGuardBuffer + mLockedSize + guardSize, _PBGuardString, guardSize ); 
+      dMemcpy( mDebugGuardBuffer, _PBGuardString, guardSize );
+      dMemcpy( mDebugGuardBuffer + mLockedSize + guardSize, _PBGuardString, guardSize );
 
       // Store the real lock pointer and return our debug pointer.
       mLockedBuffer = *indexPtr;

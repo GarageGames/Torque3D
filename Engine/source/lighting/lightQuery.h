@@ -50,7 +50,7 @@ public:
 
    /// Set the query volume from a camera position and direction.
    void init(  const Point3F &cameraPos,
-               const Point3F &cameraDir, 
+               const Point3F &cameraDir,
                F32 viewDist );
 
    /// Set the query volume from a sphere.

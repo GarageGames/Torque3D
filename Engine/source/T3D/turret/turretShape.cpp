@@ -828,7 +828,7 @@ void TurretShape::_updateNodes(const Point3F& rot)
 
       QuatF qrot(zRot);
       qrot *= defaultRot.getQuatF();
-      qrot.setMatrix( mat );      
+      qrot.setMatrix( mat );
       mat->setColumn(3, defaultPos);
    }
 
@@ -842,7 +842,7 @@ void TurretShape::_updateNodes(const Point3F& rot)
 
       QuatF qrot(xRot);
       qrot *= defaultRot.getQuatF();
-      qrot.setMatrix( mat );    
+      qrot.setMatrix( mat );
       mat->setColumn(3, defaultPos);
    }
 
@@ -854,11 +854,11 @@ void TurretShape::_updateNodes(const Point3F& rot)
       {
          MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
          Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-         Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];         
+         Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
 
          QuatF qrot(xRot);
          qrot *= defaultRot.getQuatF();
-         qrot.setMatrix( mat );    
+         qrot.setMatrix( mat );
          mat->setColumn(3, defaultPos);
       }
 
@@ -871,7 +871,7 @@ void TurretShape::_updateNodes(const Point3F& rot)
 
          QuatF qrot(zRot);
          qrot *= defaultRot.getQuatF();
-         qrot.setMatrix( mat );      
+         qrot.setMatrix( mat );
          mat->setColumn(3, defaultPos);
       }
    }
@@ -1013,7 +1013,7 @@ void TurretShape::getCameraTransform(F32* pos,MatrixF* mat)
 
    // Use the camera node as the starting position if it exists.
    Point3F osp,sp;
-   if (mDataBlock->cameraNode != -1) 
+   if (mDataBlock->cameraNode != -1)
    {
       mShapeInstance->mNodeTransforms[mDataBlock->cameraNode].getColumn(3,&osp);
       getRenderTransform().mulP(osp,&sp);
@@ -1174,7 +1174,7 @@ void TurretShape::getWeaponMountTransform( S32 index, const MatrixF &xfm, Matrix
    }
 
    // Then let SceneObject handle it.
-   GrandParent::getMountTransform( index, xfm, outMat );      
+   GrandParent::getMountTransform( index, xfm, outMat );
 }
 
 void TurretShape::getRenderWeaponMountTransform( F32 delta, S32 mountPoint, const MatrixF &xfm, MatrixF *outMat )
@@ -1200,7 +1200,7 @@ void TurretShape::getRenderWeaponMountTransform( F32 delta, S32 mountPoint, cons
    }
 
    // Then let SceneObject handle it.
-   GrandParent::getRenderMountTransform( delta, mountPoint, xfm, outMat );   
+   GrandParent::getRenderMountTransform( delta, mountPoint, xfm, outMat );
 }
 
 void TurretShape::getImageTransform(U32 imageSlot,MatrixF* mat)
@@ -1228,17 +1228,17 @@ void TurretShape::getRenderImageTransform( U32 imageSlot, MatrixF* mat, bool noE
 {
    // Image transform in world space
    MountedImage& image = mMountedImageList[imageSlot];
-   if (image.dataBlock) 
+   if (image.dataBlock)
    {
       ShapeBaseImageData& data = *image.dataBlock;
 
       MatrixF nmat;
-      if ( !noEyeOffset && data.useEyeOffset && isFirstPerson() ) 
+      if ( !noEyeOffset && data.useEyeOffset && isFirstPerson() )
       {
          getRenderEyeTransform(&nmat);
          mat->mul(nmat,data.eyeOffset);
       }
-      else 
+      else
       {
          getRenderWeaponMountTransform( 0.0f, imageSlot, MatrixF::Identity, &nmat );
          mat->mul(nmat,data.mountTransform[getImageShapeIndex(image)]);
@@ -1325,13 +1325,13 @@ void TurretShape::getRenderImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
 
             mmat.mul(emat, mountTransform);
          }
-         else if ( data.useEyeOffset && isFirstPerson() ) 
+         else if ( data.useEyeOffset && isFirstPerson() )
          {
             MatrixF emat;
             getRenderEyeTransform(&emat);
             mmat.mul(emat,data.eyeOffset);
          }
-         else 
+         else
          {
             MatrixF emat;
             getRenderWeaponMountTransform( 0.0f, imageSlot, MatrixF::Identity, &emat );
@@ -1427,12 +1427,12 @@ DefineEngineMethod( TurretShape, getTurretEulerRotation, Point3F, (),,
    "form of rotations around the X, Y and Z axes in degrees.\n" )
 {
    Point3F euler = object->getTurretRotation();
-   
+
    // Convert to degrees.
    euler.x = mRadToDeg( euler.x );
    euler.y = mRadToDeg( euler.y );
    euler.z = mRadToDeg( euler.z );
-   
+
    return euler;
 }
 

@@ -35,11 +35,11 @@
 class GuiWindowCtrl : public GuiContainer
 {
 	public:
-   
+
 		typedef GuiContainer Parent;
-      
+
    protected:
-   
+
       enum
       {
          /// Pixel distance across which snapping takes effect.
@@ -84,10 +84,10 @@ class GuiWindowCtrl : public GuiContainer
          BorderBottomRight,
          NumBitmaps
       };
-      
+
       /// Window Edge Bit Masks
       ///
-      /// Edges can be combined to create a mask of multiple edges.  
+      /// Edges can be combined to create a mask of multiple edges.
       /// This is used for hit detection throughout this class.
       enum Edges
       {
@@ -100,33 +100,33 @@ class GuiWindowCtrl : public GuiContainer
 
       /// @name Flags
       /// @{
-		
+
       /// Allow resizing width of window.
       bool mResizeWidth;
-      
+
       /// Allow resizing height of window.
       bool mResizeHeight;
-      
+
       /// Allow moving window.
       bool mCanMove;
-      
+
       /// Display close button.
       bool mCanClose;
-      
+
       /// Display minimize button.
       bool mCanMinimize;
-      
+
       /// Display maximize button.
       bool mCanMaximize;
-      
+
       ///
       bool mCanCollapse;
-      
+
       bool mCanDock; ///< Show a docking button on the title bar?
       bool mEdgeSnap; ///< Should this window snap to other windows edges?
-            
+
       /// @}
-      
+
       bool mCloseButtonPressed;
       bool mMinimizeButtonPressed;
       bool mMaximizeButtonPressed;
@@ -136,10 +136,10 @@ class GuiWindowCtrl : public GuiContainer
 		bool mSnapSignal;
 
       StringTableEntry mCloseCommand;
-      
+
       /// Window title string.
       String mText;
-      
+
       S32 mResizeEdge; ///< Resizing Edges Mask (See Edges Enumeration)
 
       S32 mTitleHeight;
@@ -151,7 +151,7 @@ class GuiWindowCtrl : public GuiContainer
       bool mMouseResizeHeight;
       bool mMinimized;
       bool mMaximized;
-		
+
 		Point2I mMousePosition;
       Point2I mMouseDownPosition;
       RectI mOrigBounds;
@@ -167,12 +167,12 @@ class GuiWindowCtrl : public GuiContainer
 
       RectI *mBitmapBounds;  //bmp is [3*n], bmpHL is [3*n + 1], bmpNA is [3*n + 2]
       GFXTexHandle mTextureObject;
-      
+
       /// @name Collapsing
       /// @{
 
       typedef Vector< GuiWindowCtrl *>	CollapseGroupNumVec;
-      
+
 		S32 mCollapseGroup;
 		S32 mCollapseGroupNum;
 		S32 mPreCollapsedYExtent;
@@ -185,27 +185,27 @@ class GuiWindowCtrl : public GuiContainer
 
 		void moveFromCollapseGroup();
 		void moveWithCollapseGroup(Point2I windowPosition);
-	   
+
 		bool resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resizePos, Point2I resizeWidth);
 		void refreshCollapseGroups();
 
       void handleCollapseGroup();
 
       /// @}
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onClose, () );
       DECLARE_CALLBACK( void, onMinimize, () );
       DECLARE_CALLBACK( void, onMaximize, () );
       DECLARE_CALLBACK( void, onCollapse, () );
       DECLARE_CALLBACK( void, onRestore, () );
-      
+
       /// @}
 
    public:
-   
+
       GuiWindowCtrl();
 
       bool isMinimized(S32 &index);
@@ -256,14 +256,14 @@ class GuiWindowCtrl : public GuiContainer
       {
          mText = text;
       }
-      
+
       /// @name Collapsing
       /// @{
-      
+
       void setCollapseGroup( bool state );
 		void toggleCollapseGroup();
 		void moveToCollapseGroup( GuiWindowCtrl* hitWindow, bool orientation );
-      
+
       /// @}
 
       // GuiContainer.

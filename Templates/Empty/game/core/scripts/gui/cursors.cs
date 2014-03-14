@@ -28,8 +28,8 @@ if($platform $= "macos")
       renderOffset = "0 0";
       bitmapName = "~/art/gui/images/macCursor";
    };
-} 
-else 
+}
+else
 {
    new GuiCursor(DefaultCursor)
    {

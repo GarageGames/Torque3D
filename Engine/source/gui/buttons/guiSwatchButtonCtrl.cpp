@@ -35,14 +35,14 @@ IMPLEMENT_CONOBJECT( GuiSwatchButtonCtrl );
 
 ConsoleDocClass( GuiSwatchButtonCtrl,
    "@brief A button that is used to represent color; often used in correlation with a color picker.\n\n"
-   
+
    "A swatch button is a push button that uses its color field to designate the color drawn over an image, on top of a button.\n\n"
-   
+
    "The color itself is a float value stored inside the GuiSwatchButtonCtrl::color field. The texture path that represents\n"
    "the image underlying the color is stored inside the GuiSwatchButtonCtrl::gridBitmap field.\n"
    "The default value assigned toGuiSwatchButtonCtrl::color is \"1 1 1 1\"( White ). The default/fallback image assigned to \n"
    "GuiSwatchButtonCtrl::gridBitmap is \"tools/gui/images/transp_grid\".\n\n"
-   
+
    "@tsexample\n"
    "// Create a GuiSwatchButtonCtrl that calls randomFunction with its current color when clicked\n"
    "%swatchButton = new GuiSwatchButtonCtrl()\n"
@@ -51,7 +51,7 @@ ConsoleDocClass( GuiSwatchButtonCtrl,
    "   command = \"randomFunction( $ThisControl.color );\";\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiButtons"
 );
 
@@ -60,9 +60,9 @@ ConsoleDocClass( GuiSwatchButtonCtrl,
 GuiSwatchButtonCtrl::GuiSwatchButtonCtrl()
  : mSwatchColor( 1, 1, 1, 1 )
 {
-   mButtonText = StringTable->insert( "" );   
+   mButtonText = StringTable->insert( "" );
    setExtent(140, 30);
-   
+
    static StringTableEntry sProfile = StringTable->insert( "profile" );
    setDataField( sProfile, NULL, "GuiInspectorSwatchButtonProfile" );
 
@@ -74,12 +74,12 @@ void GuiSwatchButtonCtrl::initPersistFields()
    addField( "color", TypeColorF, Offset( mSwatchColor, GuiSwatchButtonCtrl ), "The foreground color of GuiSwatchButtonCtrl" );
 
    addField( "gridBitmap", TypeString, Offset( mGridBitmap, GuiSwatchButtonCtrl ), "The bitmap used for the transparent grid" );
-   
+
    Parent::initPersistFields();
 }
 
 bool GuiSwatchButtonCtrl::onWake()
-{      
+{
    if ( !Parent::onWake() )
       return false;
 
@@ -98,7 +98,7 @@ void GuiSwatchButtonCtrl::onRender( Point2I offset, const RectI &updateRect )
 
    RectI renderRect( offset, getExtent() );
    if ( !highlight )
-      renderRect.inset( 1, 1 );      
+      renderRect.inset( 1, 1 );
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
    drawer->clearBitmapModulation();

@@ -34,7 +34,7 @@ private:
    static U32 smIdx;
    U32 mIdx;
    U32 mData;
-   
+
 public:
    TestStruct( const S32 data = -1 ) : mData( data ), mIdx( smIdx++ ) {};
 
@@ -75,7 +75,7 @@ CreateUnitTest(TestSwizzle, "Utils/Swizzle")
       U8 bgraTest[] = { 2, 1, 0, 3 };
       bgraSwizzle.InPlace( simpleTest, sizeof( simpleTest ) );
       test( dMemcmp( simpleTest, bgraTest, sizeof( bgraTest ) ) == 0, "U8 RGBA->BGRA test failed" );
-      
+
       //------------------------------------------------------------------------
       // Reverse test
       bgraSwizzle.InPlace( simpleTest, sizeof( simpleTest ) );

@@ -266,8 +266,8 @@ void MaterialList::clearMatInstList()
          delete current;
          mMatInstList[i] = NULL;
 
-         // ok, since ts material lists can remap difference indexes to the same object 
-         // we need to make sure that we don't delete the same memory twice.  walk the 
+         // ok, since ts material lists can remap difference indexes to the same object
+         // we need to make sure that we don't delete the same memory twice.  walk the
          // rest of the list and null out any pointers that match the one we deleted.
          for (U32 j=0; j<mMatInstList.size(); j++)
             if (mMatInstList[j] == current)
@@ -380,7 +380,7 @@ void MaterialList::mapMaterial( U32 i )
    }
 }
 
-void MaterialList::initMatInstances(   const FeatureSet &features, 
+void MaterialList::initMatInstances(   const FeatureSet &features,
                                        const GFXVertexFormat *vertexFormat )
 {
    for( U32 i=0; i < mMatInstList.size(); i++ )

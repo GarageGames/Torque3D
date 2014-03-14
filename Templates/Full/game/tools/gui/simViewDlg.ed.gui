@@ -264,18 +264,18 @@
 //--- OBJECT WRITE END ---
 
 function Inspect(%obj)
-{ 
+{
    // Don't inspect the root group.
    if( %obj == -1 )
       return;
-   
+
    InspectFields.inspect(%obj);
-   
+
    // Update selected object properties
    InspectObjectName.setValue(%obj.getName());
    InspectObjectInternalName.setValue( %obj.getInternalName() );
    InspectObjectSimID.setValue( %obj.getId() );
-   
+
    // Store Object Reference
    InspectObjectName.refObj = %obj;
 
@@ -286,11 +286,11 @@ function InspectApply()
    %obj = InspectObjectName.refObj;
    if( !isObject( %obj ) )
       return;
-       
+
    // Update name and internal name
    %obj.setName( InspectObjectName.getValue() );
    %obj.setInternalName( InspectObjectInternalName.getValue() );
-   
+
    // Update inspected object information.
    InspectFields.inspect( %obj );
 }
@@ -301,16 +301,16 @@ function InspectDelete()
    if( !isObject( %obj ) )
       return;
 
-   %obj.delete();       
-   
+   %obj.delete();
+
    // Update inspected object information.
    InspectFields.inspect( 0 );
-   
+
    // Update selected object properties
    InspectObjectName.setValue("");
    InspectObjectInternalName.setValue( "" );
    InspectObjectSimID.setValue( 0 );
-   
+
 
 }
 

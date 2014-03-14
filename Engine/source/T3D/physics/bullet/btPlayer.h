@@ -47,7 +47,7 @@ protected:
 
    ///
    //btKinematicCharacterController *mController;
-   
+
    ///
    btPairCachingGhostObject *mGhostObject;
 
@@ -74,23 +74,23 @@ protected:
 public:
 
    BtPlayer();
-   virtual ~BtPlayer();	
+   virtual ~BtPlayer();
 
    // PhysicsObject
    virtual PhysicsWorld* getWorld();
    virtual void setTransform( const MatrixF &transform );
    virtual MatrixF& getTransform( MatrixF *outMatrix );
-   virtual void setScale( const Point3F &scale );   
+   virtual void setScale( const Point3F &scale );
    virtual Box3F getWorldBounds() { return Box3F::Invalid; }
    virtual void setSimulationEnabled( bool enabled ) {}
    virtual bool isSimulationEnabled() { return true; }
 
    // PhysicsPlayer
-   virtual void init(   const char *type, 
+   virtual void init(   const char *type,
                         const Point3F &size,
                         F32 runSurfaceCos,
                         F32 stepHeight,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world );
    virtual Point3F move( const VectorF &displacement, CollisionList &outCol );
    virtual void findContact( SceneObject **contactObject, VectorF *contactNormal, Vector<SceneObject*> *outOverlapObjects ) const;

@@ -58,7 +58,7 @@ public:
 
    DECLARE_CONOBJECT( MECreateUndoAction );
    static void initPersistFields();
-   
+
    MECreateUndoAction( const UTF8* actionName = " " );
    virtual ~MECreateUndoAction();
 
@@ -95,7 +95,7 @@ public:
 
    DECLARE_CONOBJECT( MEDeleteUndoAction );
    static void initPersistFields();
-   
+
    MEDeleteUndoAction( const UTF8* actionName = "Delete Object" );
    virtual ~MEDeleteUndoAction();
 
@@ -122,10 +122,10 @@ public:
 
    GuiInspector *mInspector;
    SimObjectId mObjId;
-   SimObjectPtr<GuiInspectorField> mField; 
+   SimObjectPtr<GuiInspectorField> mField;
    StringTableEntry mSlotName;
    StringTableEntry mArrayIdx;
-   String mData;         
+   String mData;
 
    // UndoAction
    virtual void undo();

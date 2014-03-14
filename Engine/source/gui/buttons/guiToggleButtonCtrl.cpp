@@ -35,12 +35,12 @@ IMPLEMENT_CONOBJECT(GuiToggleButtonCtrl);
 
 ConsoleDocClass( GuiToggleButtonCtrl,
    "@brief Deprecated gui control.\n\n"
-   
+
    "@deprecated GuiToggleButtonCtrl's functionality is solely based on GuiButtonBaseCtrl's ButtonTypeCheck type.\n\n"
-   
+
    "@see GuiButtonCtrl\n"
    "@see GuiCheckBoxCtrl\n"
-   
+
    "@ingroup GuiButtons"
 );
 

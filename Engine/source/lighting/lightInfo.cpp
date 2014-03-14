@@ -40,13 +40,13 @@ LightInfoExType::LightInfoExType( const char *type )
 }
 
 
-LightInfo::LightInfo() 
-   :  mTransform( true ), 
-      mColor( 0.0f, 0.0f, 0.0f, 1.0f ), 
+LightInfo::LightInfo()
+   :  mTransform( true ),
+      mColor( 0.0f, 0.0f, 0.0f, 1.0f ),
       mBrightness( 1.0f ),
-      mAmbient( 0.0f, 0.0f, 0.0f, 1.0f ), 
+      mAmbient( 0.0f, 0.0f, 0.0f, 1.0f ),
       mRange( 1.0f, 1.0f, 1.0f ),
-      mInnerConeAngle( 90.0f ), 
+      mInnerConeAngle( 90.0f ),
       mOuterConeAngle( 90.0f ),
       mType( Vector ),
       mCastShadows( false ),
@@ -147,7 +147,7 @@ LightInfoEx* LightInfo::getExtended( const LightInfoExType &type ) const
 void LightInfo::addExtended( LightInfoEx *lightInfoEx )
 {
    AssertFatal( lightInfoEx, "LightInfo::addExtended() - Got null extended light info!" );
-   
+
    const LightInfoExType &type = lightInfoEx->getType();
 
    while ( mExtended.size() <= type )
@@ -160,14 +160,14 @@ void LightInfo::addExtended( LightInfoEx *lightInfoEx )
 void LightInfo::packExtended( BitStream *stream ) const
 {
    for ( U32 i = 0; i < mExtended.size(); i++ )
-      if ( mExtended[ i ] ) 
+      if ( mExtended[ i ] )
          mExtended[ i ]->packUpdate( stream );
 }
 
 void LightInfo::unpackExtended( BitStream *stream )
 {
    for ( U32 i = 0; i < mExtended.size(); i++ )
-      if ( mExtended[ i ] ) 
+      if ( mExtended[ i ] )
          mExtended[ i ]->unpackUpdate( stream );
 }
 
@@ -180,7 +180,7 @@ void LightInfo::getWorldToLightProj( MatrixF *outMatrix ) const
       F32 range = getRange().x;
       MatrixF proj;
       MathUtils::makeProjection( &proj, fov, 1.0f, range * 0.01f, range, true );
-      
+
       MatrixF light = getTransform();
       light.inverse();
 

@@ -293,7 +293,7 @@ public:
    void addRemoveField(SimObject* object, const char* fieldName);
 
    // Test to see if an object is on the dirty list
-   bool isDirty(SimObject* object);   
+   bool isDirty(SimObject* object);
 
    // Returns whether or not there are dirty objects
    bool hasDirty() const { return !mDirtyObjects.empty(); }

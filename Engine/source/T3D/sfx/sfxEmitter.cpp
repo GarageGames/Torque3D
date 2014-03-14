@@ -42,12 +42,12 @@ IMPLEMENT_CO_NETOBJECT_V1( SFXEmitter );
 
 ConsoleDocClass( SFXEmitter,
    "@brief An invisible 3D object that emits sound.\n\n"
-   
+
    "Sound emitters are used to place sounds in the level.  They are full 3D objects with their own position and orientation and "
    "when assigned 3D sounds, the transform and velocity of the sound emitter object will be applied to the 3D sound.\n\n"
-   
+
    "Sound emitters can be set up of in either of two ways:\n"
-   
+
    "<ul>\n"
    "<li><p>By assigning an existing SFXTrack to the emitter's #track property.</p>\n"
    "<p>In this case the general sound setup (3D, streaming, looping, etc.) will be taken from #track.  However, the emitter's "
@@ -55,20 +55,20 @@ ConsoleDocClass( SFXEmitter,
    "<li><p>By directly assigning a sound file to the emitter's #fileName property.</p>\n"
    "<p>In this case, the sound file will be set up for playback according to the properties defined on the emitter.</p>\n"
    "</ul>\n\n"
-   
+
    "Using #playOnAdd emitters can be configured to start playing immediately when they are added to the system (e.g. when the level "
    "objects are loaded from the mission file).\n\n"
-      
+
    "@note A sound emitter need not necessarily emit a 3D sound.  Instead, sound emitters may also be used to play "
       "non-positional sounds.  For placing background audio to a level, however, it is usually easier to use LevelInfo::soundAmbience.\n\n"
-      
+
    "@section SFXEmitter_networking Sound Emitters and Networking\n\n"
-   
+
    "It is important to be aware of the fact that sounds will only play client-side whereas SFXEmitter objects are server-side "
    "entities.  This means that a server-side object has no connection to the actual sound playing on the client.  It is thus "
    "not possible for the server-object to perform queries about playback status and other source-related properties as these "
    "may in fact differ from client to client.\n\n"
-   
+
    "@ingroup SFX\n"
 );
 
@@ -107,7 +107,7 @@ SFXEmitter::SFXEmitter()
    mDescription.mIsStreaming = false;
    mDescription.mFadeInTime = -1.f;
    mDescription.mFadeOutTime = -1.f;
-   
+
    mLocalProfile._registerSignals();
 
    mObjBox.minExtents.set( -1.f, -1.f, -1.f );
@@ -119,7 +119,7 @@ SFXEmitter::SFXEmitter()
 SFXEmitter::~SFXEmitter()
 {
    mLocalProfile._unregisterSignals();
-   
+
    if( mSource )
       SFX_DELETE( mSource );
 }
@@ -131,10 +131,10 @@ void SFXEmitter::consoleInit()
    Con::addVariable( "$SFXEmitter::renderEmitters", TypeBool, &smRenderEmitters,
       "Whether to render enhanced range feedback in the editor on all emitters regardless of selection state.\n"
 	  "@ingroup SFX\n");
-      
+
    //TODO: not implemented ATM
    //Con::addVariable( "$SFXEmitter::renderPointSize", TypeF32, &smRenderPointSize );
-   
+
    Con::addVariable( "$SFXEmitter::renderPointDistance", TypeF32, &smRenderPointDistance,
       "The distance between individual points in the sound emitter rendering in the editor as the points move from the emitter's center away to maxDistance.\n"
 	  "@ingroup SFX\n");
@@ -175,7 +175,7 @@ void SFXEmitter::consoleInit()
 void SFXEmitter::initPersistFields()
 {
    addGroup( "Media" );
-   
+
       addField( "track",               TypeSFXTrackName,          Offset( mTrack, SFXEmitter),
          "The track which the emitter should play.\n"
          "@note If assigned, this field will take precedence over a #fileName that may also be assigned to the "
@@ -184,7 +184,7 @@ void SFXEmitter::initPersistFields()
          "The sound file to play.\n"
          "Use @b either this property @b or #track.  If both are assigned, #track takes precendence.  The primary purpose of this "
          "field is to avoid the need for the user to define SFXTrack datablocks for all sounds used in a level." );
-   
+
    endGroup( "Media");
 
    addGroup( "Sound" );
@@ -228,7 +228,7 @@ void SFXEmitter::initPersistFields()
    endGroup( "Sound");
 
    addGroup( "3D Sound" );
-   
+
       addField( "is3D",                TypeBool,      Offset( mDescription.mIs3D, SFXEmitter ),
          "Whether to play #fileName as a positional (3D) sound or not.\n"
          "If a #track is assigned, the value of this field is ignored.\n\n"
@@ -257,7 +257,7 @@ void SFXEmitter::initPersistFields()
          "Volume scale factor of outside of outer volume 3D sound cone.\n"
          "@note This field is ignored if #useTrackDescriptionOnly is true.\n\n"
          "@see SFXDescription::coneOutsideVolume" );
-   
+
    endGroup( "3D Sound" );
 
    Parent::initPersistFields();
@@ -298,7 +298,7 @@ U32 SFXEmitter::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
    // volume
    if( stream->writeFlag( mDirty.test( Volume ) ) )
       stream->write( mDescription.mVolume );
-      
+
    // pitch
    if( stream->writeFlag( mDirty.test( Pitch ) ) )
       stream->write( mDescription.mPitch );
@@ -306,7 +306,7 @@ U32 SFXEmitter::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
    // islooping
    if( stream->writeFlag( mDirty.test( IsLooping ) ) )
       stream->writeFlag( mDescription.mIsLooping );
-      
+
    // isStreaming
    if( stream->writeFlag( mDirty.test( IsStreaming ) ) )
       stream->writeFlag( mDescription.mIsStreaming );
@@ -338,26 +338,26 @@ U32 SFXEmitter::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
    // sourcegroup
    if( stream->writeFlag( mDirty.test( SourceGroup ) ) )
       sfxWrite( stream, mDescription.mSourceGroup );
-      
+
    // fadein
    if( stream->writeFlag( mDirty.test( FadeInTime ) ) )
       stream->write( mDescription.mFadeInTime );
-      
+
    // fadeout
    if( stream->writeFlag( mDirty.test( FadeOutTime ) ) )
       stream->write( mDescription.mFadeOutTime );
-      
+
    // scatterdistance
    if( stream->writeFlag( mDirty.test( ScatterDistance ) ) )
       mathWrite( *stream, mDescription.mScatterDistance );
 
    mDirty.clear();
-   
+
    stream->writeFlag( mUseTrackDescriptionOnly );
 
-   // We should never have both source masks 
+   // We should never have both source masks
    // enabled at the same time!
-   AssertFatal( ( mask & AllSourceMasks ) != AllSourceMasks, 
+   AssertFatal( ( mask & AllSourceMasks ) != AllSourceMasks,
       "SFXEmitter::packUpdate() - Bad source mask!" );
 
    // Write the source playback state.
@@ -412,7 +412,7 @@ void SFXEmitter::unpackUpdate( NetConnection *conn, BitStream *stream )
    // volume
    if ( _readDirtyFlag( stream, Volume ) )
       stream->read( &mDescription.mVolume );
-      
+
    // pitch
    if( _readDirtyFlag( stream, Pitch ) )
       stream->read( &mDescription.mPitch );
@@ -420,7 +420,7 @@ void SFXEmitter::unpackUpdate( NetConnection *conn, BitStream *stream )
    // islooping
    if ( _readDirtyFlag( stream, IsLooping ) )
       mDescription.mIsLooping = stream->readFlag();
-      
+
    if( _readDirtyFlag( stream, IsStreaming ) )
       mDescription.mIsStreaming = stream->readFlag();
 
@@ -458,19 +458,19 @@ void SFXEmitter::unpackUpdate( NetConnection *conn, BitStream *stream )
       if( !sfxReadAndResolve( stream, &mDescription.mSourceGroup, errorStr ) )
          Con::errorf( "%s", errorStr.c_str() );
    }
-      
+
    // fadein
    if ( _readDirtyFlag( stream, FadeInTime ) )
       stream->read( &mDescription.mFadeInTime );
-      
+
    // fadeout
    if( _readDirtyFlag( stream, FadeOutTime ) )
       stream->read( &mDescription.mFadeOutTime );
-      
+
    // scatterdistance
    if( _readDirtyFlag( stream, ScatterDistance ) )
       mathRead( *stream, &mDescription.mScatterDistance );
-      
+
    mUseTrackDescriptionOnly = stream->readFlag();
 
    // update the emitter now?
@@ -488,7 +488,7 @@ void SFXEmitter::unpackUpdate( NetConnection *conn, BitStream *stream )
 
 void SFXEmitter::onStaticModified( const char* slotName, const char* newValue )
 {
-   // NOTE: The signature for this function is very 
+   // NOTE: The signature for this function is very
    // misleading... slotName is a StringTableEntry.
 
    // We don't check for changes on the client side.
@@ -496,7 +496,7 @@ void SFXEmitter::onStaticModified( const char* slotName, const char* newValue )
       return;
 
    // Lookup and store the property names once here
-   // and we can then just do pointer compares. 
+   // and we can then just do pointer compares.
    static StringTableEntry slotPosition   = StringTable->lookup( "position" );
    static StringTableEntry slotRotation   = StringTable->lookup( "rotation" );
    static StringTableEntry slotScale      = StringTable->lookup( "scale" );
@@ -533,13 +533,13 @@ void SFXEmitter::onStaticModified( const char* slotName, const char* newValue )
 
    else if( slotName == slotVolume )
       mDirty.set( Volume );
-      
+
    else if( slotName == slotPitch )
       mDirty.set( Pitch );
 
    else if( slotName == slotIsLooping )
       mDirty.set( IsLooping );
-      
+
    else if( slotName == slotIsStreaming )
       mDirty.set( IsStreaming );
 
@@ -560,19 +560,19 @@ void SFXEmitter::onStaticModified( const char* slotName, const char* newValue )
 
    else if( slotName == slotConeOutVol )
       mDirty.set( ConeOutsideVolume );
-      
+
    else if( slotName == slotFadeInTime )
       mDirty.set( FadeInTime );
-      
+
    else if( slotName == slotFadeOutTime )
       mDirty.set( FadeOutTime );
-      
+
    else if( slotName == slotScatterDistance )
       mDirty.set( ScatterDistance );
-      
+
    else if( slotName == slotSourceGroup )
       mDirty.set( SourceGroup );
-      
+
    else if( slotName == slotUseTrackDescriptionOnly )
       mDirty.set( TrackOnly );
 
@@ -585,13 +585,13 @@ void SFXEmitter::onStaticModified( const char* slotName, const char* newValue )
 void SFXEmitter::inspectPostApply()
 {
    // Parent will call setScale so sync up scale with distance.
-   
+
    F32 maxDistance = mDescription.mMaxDistance;
    if( mUseTrackDescriptionOnly && mTrack )
       maxDistance = mTrack->getDescription()->mMaxDistance;
-      
+
    mObjScale.set( maxDistance, maxDistance, maxDistance );
-   
+
    Parent::inspectPostApply();
 }
 
@@ -607,9 +607,9 @@ bool SFXEmitter::onAdd()
       // Validate the data we'll be passing across
       // the network to the client.
       mDescription.validate();
-      
+
       // Read an old 'profile' field for backwards-compatibility.
-      
+
       if( !mTrack )
       {
          static const char* sProfile = StringTable->insert( "profile" );
@@ -627,7 +627,7 @@ bool SFXEmitter::onAdd()
       }
 
       // Convert a legacy 'channel' field, if we have one.
-      
+
       static const char* sChannel = StringTable->insert( "channel" );
       const char* channelValue = getDataField( sChannel, NULL );
       if( channelValue && channelValue[ 0 ] )
@@ -640,7 +640,7 @@ bool SFXEmitter::onAdd()
          {
             static const char* sSourceGroup = StringTable->insert( "sourceGroup" );
             setDataField( sSourceGroup, NULL, sourceGroup->getIdString() );
-            
+
             // Remove the old 'channel' field.
             setDataField( sChannel, NULL, "" );
          }
@@ -654,7 +654,7 @@ bool SFXEmitter::onAdd()
       if( mPlayOnAdd && mSource )
          mSource->play();
    }
-   
+
    // Setup the bounds.
 
    mObjScale.set( mDescription.mMaxDistance, mDescription.mMaxDistance, mDescription.mMaxDistance );
@@ -689,7 +689,7 @@ void SFXEmitter::_update()
 
    const MatrixF& transform = getTransform();
    const VectorF& velocity = getVelocity();
-   
+
    // Did we change the source?
    if( mDirty.test( Track | Filename | Is3D | IsLooping | IsStreaming | TrackOnly ) )
    {
@@ -703,16 +703,16 @@ void SFXEmitter::_update()
             Con::errorf( "SFXEmitter::_update() - failed to create sound for track %i (%s)",
                mTrack->getId(), mTrack->getName() );
 
-         // If we're supposed to play when the emitter is 
-         // added to the scene then also restart playback 
+         // If we're supposed to play when the emitter is
+         // added to the scene then also restart playback
          // when the profile changes.
          prevState = mPlayOnAdd ? SFXStatusPlaying : prevState;
-         
+
          // Force an update of properties set on the local description.
-         
+
          mDirty.set( AllDirtyMask );
       }
-      
+
       // Else take the local profile
       else
       {
@@ -728,11 +728,11 @@ void SFXEmitter::_update()
             if( !mSource )
                Con::errorf( "SFXEmitter::_update() - failed to create sound for: %s",
                   mLocalProfile.mFilename.c_str() );
-            
+
             prevState = mPlayOnAdd ? SFXStatusPlaying : prevState;
          }
       }
-      
+
       mDirty.clear( Track | Filename | Is3D | IsLooping | IsStreaming | TrackOnly );
    }
 
@@ -740,11 +740,11 @@ void SFXEmitter::_update()
    // is toggled on a local profile sound.  It makes the
    // editor feel responsive and that things are working.
    if(  gEditingMission &&
-        !mTrack && 
-        mPlayOnAdd && 
+        !mTrack &&
+        mPlayOnAdd &&
         mDirty.test( IsLooping ) )
       prevState = SFXStatusPlaying;
-      
+
    bool useTrackDescriptionOnly = ( mUseTrackDescriptionOnly && mTrack );
 
    // The rest only applies if we have a source.
@@ -753,13 +753,13 @@ void SFXEmitter::_update()
       // Set the volume irrespective of the profile.
       if( mDirty.test( Volume ) && !useTrackDescriptionOnly )
          mSource->setVolume( mDescription.mVolume );
-         
+
       if( mDirty.test( Pitch ) && !useTrackDescriptionOnly )
          mSource->setPitch( mDescription.mPitch );
-         
+
       if( mDirty.test( FadeInTime | FadeOutTime ) && !useTrackDescriptionOnly )
          mSource->setFadeTimes( mDescription.mFadeInTime, mDescription.mFadeOutTime );
-         
+
       if( mDirty.test( SourceGroup ) && mDescription.mSourceGroup && !useTrackDescriptionOnly )
          mDescription.mSourceGroup->addObject( mSource );
 
@@ -771,7 +771,7 @@ void SFXEmitter::_update()
             mSource->setTransform( transform );
             mSource->setVelocity( velocity );
          }
-         
+
          if( mDirty.test( MinDistance | MaxDistance ) && !useTrackDescriptionOnly )
          {
             mSource->setMinMaxDistance(   mDescription.mMinDistance,
@@ -784,14 +784,14 @@ void SFXEmitter::_update()
                               F32( mDescription.mConeOutsideAngle ),
                               mDescription.mConeOutsideVolume );
          }
-         
+
          mDirty.clear( Transform | MinDistance | MaxDistance | ConeInsideAngle | ConeOutsideAngle | ConeOutsideVolume );
-      }     
+      }
 
       // Restore the pre-update playback state.
       if( prevState == SFXStatusPlaying )
          mSource->play();
-         
+
       mDirty.clear( Volume | Pitch | Transform | FadeInTime | FadeOutTime | SourceGroup );
    }
 }
@@ -817,7 +817,7 @@ void SFXEmitter::prepRenderImage( SceneRenderState* state )
 //-----------------------------------------------------------------------------
 
 void SFXEmitter::_renderObject( ObjectRenderInst* ri, SceneRenderState* state, BaseMatInstance* overrideMat )
-{   
+{
    // Check to see if the emitter is in range and playing
    // and assign a proper color depending on this.
 
@@ -838,7 +838,7 @@ void SFXEmitter::_renderObject( ObjectRenderInst* ri, SceneRenderState* state, B
    }
 
    // Draw the cube.
-   
+
    GFXStateBlockDesc desc;
    desc.setZReadWrite( true, false );
    desc.setBlend( true );
@@ -846,9 +846,9 @@ void SFXEmitter::_renderObject( ObjectRenderInst* ri, SceneRenderState* state, B
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
    drawer->drawCube( desc,  Point3F( 0.5f, 0.5f, 0.5f ), getBoxCenter(), color );
-   
+
    // Render visual feedback for 3D sounds.
-   
+
    if( ( smRenderEmitters || isSelected() ) && is3D() )
       _render3DVisualFeedback();
 }
@@ -858,9 +858,9 @@ void SFXEmitter::_renderObject( ObjectRenderInst* ri, SceneRenderState* state, B
 void SFXEmitter::_render3DVisualFeedback()
 {
    GFXTransformSaver saver;
-   
+
    GFX->multWorld( getRenderTransform() );
-   
+
    GFXStateBlockDesc desc;
    desc.setZReadWrite( true, false );
    desc.setBlend( true );
@@ -868,41 +868,41 @@ void SFXEmitter::_render3DVisualFeedback()
 
    if( mRenderSB == NULL )
       mRenderSB = GFX->createStateBlock( desc );
-   
+
    GFX->setStateBlock( mRenderSB );
-   
+
    // Render the max range sphere.
-   
+
    if( smRenderColorRangeSphere.alpha > 0 )
       GFX->getDrawUtil()->drawSphere( desc, mDescription.mMaxDistance, Point3F( 0.f, 0.f, 0.f ), smRenderColorRangeSphere );
-   
+
    //TODO: some point size support in GFX would be nice
 
    // Prepare primitive list.  Make sure we stay within limits.
-   
+
    F32 radialIncrements = smRenderRadialIncrements;
    F32 sweepIncrements = smRenderSweepIncrements;
    F32 pointDistance = smRenderPointDistance;
-   
+
    F32 numPoints;
    while( 1 )
    {
       numPoints = mCeil( 360.f / radialIncrements ) *
                   mCeil( 360.f / sweepIncrements ) *
                   ( mDescription.mMaxDistance / pointDistance );
-                  
+
       if( numPoints < 65536 )
          break;
-         
+
       radialIncrements *= 1.1f;
       sweepIncrements *= 1.1f;
       pointDistance *= 1.5;
    }
-                           
+
    PrimBuild::begin( GFXPointList, numPoints );
 
    // Render inner cone.
-   
+
    _renderCone(
       radialIncrements,
       sweepIncrements,
@@ -912,13 +912,13 @@ void SFXEmitter::_render3DVisualFeedback()
       smRenderColorInnerCone );
 
    // Outer Cone and Outside volume only get rendered if mConeOutsideVolume > 0
-   
+
    if( mDescription.mConeOutsideVolume > 0.f )
    {
       const F32 outsideVolume = mDescription.mVolume * mDescription.mConeOutsideVolume;
-      
+
       // Render outer cone.
-      
+
       _renderCone(
          radialIncrements,
          sweepIncrements,
@@ -926,9 +926,9 @@ void SFXEmitter::_render3DVisualFeedback()
          mDescription.mConeOutsideAngle, mDescription.mConeInsideAngle,
          outsideVolume, mDescription.mVolume,
          smRenderColorOuterCone );
-      
+
       // Render outside volume.
-      
+
       _renderCone(
          radialIncrements,
          sweepIncrements,
@@ -937,9 +937,9 @@ void SFXEmitter::_render3DVisualFeedback()
          outsideVolume, outsideVolume,
          smRenderColorOutsideVolume );
    }
-   
+
    // Commit primitive list.
-   
+
    PrimBuild::end();
 }
 
@@ -953,27 +953,27 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
 {
    if( startAngle == stopAngle )
       return;
-      
+
    const F32 startAngleRadians = mDegToRad( startAngle );
    const F32 stopAngleRadians = mDegToRad( stopAngle );
    const F32 radialIncrementsRadians = mDegToRad( radialIncrements );
-      
+
    // Unit quaternions representing the start and end angle so we
    // can interpolate between the two without flipping.
-   
+
    QuatF rotateZStart( EulerF( 0.f, 0.f, startAngleRadians / 2.f ) );
    QuatF rotateZEnd( EulerF( 0.f, 0.f, stopAngleRadians / 2.f ) );
-   
+
    // Do an angular sweep on one side of our XY disc.  Since we do a full 360 radial sweep
    // around Y for each angle, we only need to sweep over one side.
-   
+
    const F32 increment = 1.f / ( ( ( startAngle / 2.f ) - ( stopAngle / 2.f ) ) / sweepIncrements );
    for( F32 t = 0.f; t < 1.0f; t += increment )
    {
       // Quaternion to rotate point into place on XY disc.
       QuatF rotateZ;
       rotateZ.interpolate( rotateZStart, rotateZEnd, t );
-      
+
       // Quaternion to rotate one position around Y axis.  Used for radial sweep.
       QuatF rotateYOne( EulerF( 0.f, radialIncrementsRadians, 0.f ) );
 
@@ -983,7 +983,7 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
       for( F32 y = pointDistance; y <= mDescription.mMaxDistance; y += pointDistance )
       {
          ColorI c = color;
-         
+
          // Compute volume at current point.  First off, find the interpolated volume
          // in the cone.  Only for the outer cone will this actually result in
          // interpolation.  For the remaining angles, the cone volume is constant.
@@ -992,9 +992,9 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
          if( volume == 0.f )
             c.alpha = 0;
          else
-         {         
+         {
             // Apply distance attenuation.
-            
+
             F32 attenuatedVolume = SFXDistanceAttenuation(
                SFX->getDistanceModel(),
                mDescription.mMinDistance,
@@ -1005,17 +1005,17 @@ void SFXEmitter::_renderCone( F32 radialIncrements, F32 sweepIncrements,
 
             // Fade alpha according to how much volume we
             // have left at the current point.
-            
+
             c.alpha = F32( c.alpha ) * ( attenuatedVolume / 1.f );
          }
-         
+
          PrimBuild::color( c );
-         
+
          // Create points by doing a full 360 degree radial sweep around Y.
 
          Point3F p( 0.f, y, 0.f );
          rotateZ.mulP( p, &p );
-         
+
          for( F32 radialAngle = 0.f; radialAngle < 360.f; radialAngle += radialIncrements )
          {
             PrimBuild::vertex3f( p.x, p.y, p.z );
@@ -1034,7 +1034,7 @@ void SFXEmitter::play()
    else
    {
       // By clearing the playback masks first we
-      // ensure the last playback command called 
+      // ensure the last playback command called
       // within a single tick is the one obeyed.
       clearMaskBits( AllSourceMasks );
 
@@ -1051,7 +1051,7 @@ void SFXEmitter::stop()
    else
    {
       // By clearing the playback masks first we
-      // ensure the last playback command called 
+      // ensure the last playback command called
       // within a single tick is the one obeyed.
       clearMaskBits( AllSourceMasks );
 
@@ -1068,7 +1068,7 @@ SFXStatus SFXEmitter::_getPlaybackStatus() const
    // We only have a source playing on client objects, so if this is a server
    // object, we want to know the playback status on the local client connection's
    // version of this emitter.
-   
+
    if( isServerObject() )
    {
       S32 index = NetConnection::getLocalClientConnection()->getGhostIndex( ( NetObject* ) this );
@@ -1077,10 +1077,10 @@ SFXStatus SFXEmitter::_getPlaybackStatus() const
       else
          emitter = NULL;
    }
-   
+
    if( emitter && emitter->mSource )
       return emitter->mSource->getStatus();
-      
+
    return SFXStatusNull;
 }
 
@@ -1100,12 +1100,12 @@ bool SFXEmitter::isInRange() const
 {
    if( !mDescription.mIs3D )
       return false;
-   
+
    const SFXListenerProperties& listener = SFX->getListener();
    const Point3F listenerPos = listener.getTransform().getPosition();
    const Point3F emitterPos = getPosition();
    const F32 dist = mDescription.mMaxDistance;
-   
+
    return ( ( emitterPos - listenerPos ).len() <= dist );
 }
 
@@ -1113,7 +1113,7 @@ bool SFXEmitter::isInRange() const
 
 void SFXEmitter::setTransform( const MatrixF &mat )
 {
-   // Set the transform directly from the 
+   // Set the transform directly from the
    // matrix created by inspector.
    Parent::setTransform( mat );
    setMaskBits( TransformUpdateMask );
@@ -1124,7 +1124,7 @@ void SFXEmitter::setTransform( const MatrixF &mat )
 void SFXEmitter::setScale( const VectorF &scale )
 {
    F32 maxDistance;
-   
+
    if( mUseTrackDescriptionOnly && mTrack )
       maxDistance = mTrack->getDescription()->mMaxDistance;
    else
@@ -1132,9 +1132,9 @@ void SFXEmitter::setScale( const VectorF &scale )
       // Use the average of the three coords.
       maxDistance = ( scale.x + scale.y + scale.z ) / 3.0f;
       maxDistance = getMax( maxDistance, mDescription.mMinDistance );
-      
+
       mDescription.mMaxDistance = maxDistance;
-      
+
       mDirty.set( MaxDistance );
       setMaskBits( DirtyUpdateMask );
    }

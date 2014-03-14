@@ -40,7 +40,7 @@ class ZipFileNode : public Torque::FS::File, public Noncopyable
    // ZipFileNode class (Internal)
    //--------------------------------------------------------------------------
 public:
-   ZipFileNode(StrongRefPtr<ZipArchive>& archive, String zipFilename, Stream* zipStream, ZipArchive::ZipEntry* ze) 
+   ZipFileNode(StrongRefPtr<ZipArchive>& archive, String zipFilename, Stream* zipStream, ZipArchive::ZipEntry* ze)
    {
       mZipStream = zipStream;
       mArchive = archive;
@@ -56,8 +56,8 @@ public:
 
    virtual Path   getName() const { return mZipFilename; }
    virtual Status getStatus() const
-   { 
-      if (mZipStream) 
+   {
+      if (mZipStream)
       {
          // great, Stream Status is different from FileNode Status...
          switch (mZipStream->getStatus())
@@ -76,8 +76,8 @@ public:
          return FileNode::Closed;
    }
 
-   virtual bool   getAttributes(Attributes* attr) 
-   { 
+   virtual bool   getAttributes(Attributes* attr)
+   {
       if (!attr)
          return false;
 
@@ -88,7 +88,7 @@ public:
       attr->atime = ZipArchive::DOSTimeToTime(mZipEntry->mCD.mModTime, mZipEntry->mCD.mModDate);
       attr->size = mZipEntry->mCD.mUncompressedSize;
 
-      return true; 
+      return true;
    }
 
    virtual U32 getPosition()
@@ -103,7 +103,7 @@ public:
    {
       if (!mZipStream || mode != Begin)
          return 0;
-      else 
+      else
          return mZipStream->setPosition(pos);
    }
 
@@ -112,7 +112,7 @@ public:
       // stream is already open so just check to make sure that they are using a valid mode
       if (mode == Read)
          return mZipStream != NULL;
-      else 
+      else
       {
          Con::errorf("ZipFileSystem: Write access denied for file %s", mZipFilename.c_str());
          return false;
@@ -199,7 +199,7 @@ public:
       attr->atime = ZipArchive::DOSTimeToTime(mZipEntry->mCD.mModTime, mZipEntry->mCD.mModDate);
       attr->size = mZipEntry->mCD.mUncompressedSize;
 
-      return true; 
+      return true;
    }
 
    bool open()
@@ -242,7 +242,7 @@ public:
    }
 
 private:
-   U32 calculateChecksum() 
+   U32 calculateChecksum()
    {
       return 0;
    }
@@ -287,13 +287,13 @@ public:
       attr->flags = FileNode::Directory | FileNode::Compressed | FileNode::ReadOnly;
       attr->name = mPath.getFullPath();
       // use the mod time for both mod and access time, since we only have mod time in the CD
-      
+
       ZipArchive::ZipEntry* zipEntry = mArchive->getRoot();
       attr->mtime = ZipArchive::DOSTimeToTime(zipEntry->mCD.mModTime, zipEntry->mCD.mModDate);
       attr->atime = ZipArchive::DOSTimeToTime(zipEntry->mCD.mModTime, zipEntry->mCD.mModDate);
       attr->size = zipEntry->mCD.mUncompressedSize;
 
-      return true; 
+      return true;
    }
 
    bool open()
@@ -333,7 +333,7 @@ public:
    }
 
 private:
-   U32 calculateChecksum() 
+   U32 calculateChecksum()
    {
       return 0;
    }
@@ -365,9 +365,9 @@ ZipFileSystem::ZipFileSystem(String& zipFilename, bool zipNameIsDir /* = false *
    // can be umounted without affecting this file system.
    mZipArchiveStream = new FileStream();
    mZipArchiveStream->open(mZipFilename, Torque::FS::File::Read);
-   
-   // As far as the mount system is concerned, ZFSes are read only write now (even though 
-   // ZipArchive technically support read-write, we don't expose this to the mount system because we 
+
+   // As far as the mount system is concerned, ZFSes are read only write now (even though
+   // ZipArchive technically support read-write, we don't expose this to the mount system because we
    // don't want to support that as a standard run case right now.)
    mReadOnly = true;
 }

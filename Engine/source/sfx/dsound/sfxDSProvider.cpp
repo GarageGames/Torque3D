@@ -48,10 +48,10 @@ protected:
       DSCAPS caps;
    };
 
-   static BOOL CALLBACK dsEnumProc( 
-      LPGUID lpGUID, 
-      LPCTSTR lpszDesc, 
-      LPCTSTR lpszDrvName, 
+   static BOOL CALLBACK dsEnumProc(
+      LPGUID lpGUID,
+      LPCTSTR lpszDesc,
+      LPCTSTR lpszDrvName,
       LPVOID lpContext );
 
    void addDeviceDesc( GUID* guid, const String& name, const String& desc );
@@ -66,14 +66,14 @@ MODULE_BEGIN( DirectSound )
 
    MODULE_INIT_BEFORE( SFX )
    MODULE_SHUTDOWN_AFTER( SFX )
-   
+
    SFXDSProvider* mProvider;
-   
+
    MODULE_INIT
    {
       mProvider = new SFXDSProvider;
    }
-   
+
    MODULE_SHUTDOWN
    {
       delete mProvider;
@@ -112,7 +112,7 @@ void SFXDSProvider::init()
 
    AssertISV( mDSound.isLoaded, "DirectSound failed to load." );
 
-   // All we need to do to init is enumerate the 
+   // All we need to do to init is enumerate the
    // devices... if this fails then don't register
    // the provider as it's broken in some way.
    if ( FAILED( mDSound.DirectSoundEnumerate( dsEnumProc, (VOID*)this ) ) )
@@ -133,10 +133,10 @@ void SFXDSProvider::init()
 }
 
 
-BOOL CALLBACK SFXDSProvider::dsEnumProc( 
-   LPGUID lpGUID, 
-   LPCTSTR lpszDesc, 
-   LPCTSTR lpszDrvName, 
+BOOL CALLBACK SFXDSProvider::dsEnumProc(
+   LPGUID lpGUID,
+   LPCTSTR lpszDesc,
+   LPCTSTR lpszDrvName,
    LPVOID lpContext )
 {
    SFXDSProvider* provider = (SFXDSProvider*)lpContext;
@@ -148,13 +148,13 @@ void SFXDSProvider::addDeviceDesc( GUID* guid, const String& name, const String&
 {
    // Create a dummy device to get the caps.
    IDirectSound8* dsound;
-   HRESULT hr = mDSound.DirectSoundCreate8( guid, &dsound, NULL );   
+   HRESULT hr = mDSound.DirectSoundCreate8( guid, &dsound, NULL );
    if ( FAILED( hr ) || !dsound )
       return;
 
    // Init the caps structure and have the device fill it out.
    DSCAPS caps;
-   dMemset( &caps, 0, sizeof( caps ) ); 
+   dMemset( &caps, 0, sizeof( caps ) );
    caps.dwSize = sizeof( caps );
    hr = dsound->GetCaps( &caps );
 
@@ -184,11 +184,11 @@ SFXDevice* SFXDSProvider::createDevice( const String& deviceName, bool useHardwa
    if( !info )
       return NULL;
 
-   SFXDSDevice* device = new SFXDSDevice( this, 
+   SFXDSDevice* device = new SFXDSDevice( this,
                                  &mDSound,
                                  info->guid,
-                                 info->name, 
-                                 useHardware, 
+                                 info->name,
+                                 useHardware,
                                  maxBuffers );
 
    if( !device->_init() )

@@ -32,7 +32,7 @@ function GuiEditorPrefsDlgOkBtn::onAction(%this)
    GuiEditor.snap2gridsize = GuiEditorPrefsDlgGridEdit.getValue();
    if( GuiEditor.snap2grid )
       GuiEditor.setSnapToGrid( GuiEditor.snap2gridsize );
-      
+
    Canvas.popDialog( GuiEditorPrefsDlg );
 }
 
@@ -63,7 +63,7 @@ function GuiEditorPrefsDlgGridEdit::onAction( %this )
          %value = $GuiEditor::minGridSize;
          %this.setValue( %value );
    }
-   
+
    GuiEditorPrefsDlgGridSlider.setValue( %value );
 }
 
@@ -80,6 +80,6 @@ function GuiEditorPrefsDlgGridSlider::onAction(%this)
       %value = $GuiEditor::minGridSize;
       %this.setValue( %value );
    }
-      
+
    GuiEditorPrefsDlgGridEdit.setvalue( mCeil( %value ) );
 }

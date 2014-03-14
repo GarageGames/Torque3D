@@ -59,7 +59,7 @@ protected:
 
    /// This parameter is used to
    /// adjust the far plane out for our
-   /// orthographic render in order to 
+   /// orthographic render in order to
    /// force our object towards one end of the
    /// the eye space depth range.
    static F32 smDepthAdjust;
@@ -101,7 +101,7 @@ protected:
    bool _updateDecal( const SceneRenderState *sceneState );
 
    void _calcScore( const SceneRenderState *state );
- 
+
    /// Returns a spotlight shadow material for use when
    /// rendering meshes into the projected shadow.
    static BaseMatInstance* _getShadowMaterial( BaseMatInstance *inMat );

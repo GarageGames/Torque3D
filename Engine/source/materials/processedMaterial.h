@@ -55,12 +55,12 @@ public:
 
    struct TexSlotT
    {
-      /// This is the default type of texture which 
+      /// This is the default type of texture which
       /// is valid with most texture types.
       /// @see mTexType
       GFXTexHandle texObject;
 
-      /// Only valid when the texture type is set 
+      /// Only valid when the texture type is set
       /// to Material::TexTarget.
       /// @see mTexType
      NamedTexTargetRef texTarget;
@@ -86,14 +86,14 @@ public:
 
    U32 mStageNum;
 
-   /// State permutations, used to index into 
+   /// State permutations, used to index into
    /// the render states array.
    /// @see mRenderStates
-   enum 
+   enum
    {
       STATE_REFLECT = 1,
       STATE_TRANSLUCENT = 2,
-      STATE_GLOW = 4,      
+      STATE_GLOW = 4,
       STATE_WIREFRAME = 8,
       STATE_MAX = 16
    };
@@ -140,28 +140,28 @@ public:
 
    /// Sets the transformation matrix, i.e. Model * View * Projection
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state, const U32 pass) = 0;
-   
+
    /// Sets the scene info like lights for the given pass.
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData, U32 pass) = 0;
 
    /// Sets the given vertex and primitive buffers so we can render geometry
-   virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer); 
-   
+   virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer);
+
    /// @see BaseMatInstance::setUserObject
    virtual void setUserObject( SimObject *userObject ) { mUserObject = userObject; }
 
-   /// 
+   ///
    virtual bool stepInstance();
 
    /// @}
 
    /// Initializes us (eg. loads textures, creates passes, generates shaders)
-   virtual bool init(   const FeatureSet& features, 
+   virtual bool init(   const FeatureSet& features,
                         const GFXVertexFormat *vertexFormat,
                         const MatFeaturesDelegate &featuresDelegate ) = 0;
 
-   /// Returns the state hint which can be used for 
-   /// sorting and fast comparisions of the equality 
+   /// Returns the state hint which can be used for
+   /// sorting and fast comparisions of the equality
    /// of a material instance.
    virtual const MatStateHint& getStateHint() const { return mStateHint; }
 
@@ -172,7 +172,7 @@ public:
    // Material parameter methods
    virtual MaterialParameters* allocMaterialParameters() = 0;
    virtual MaterialParameters* getDefaultMaterialParameters() = 0;
-   virtual void setMaterialParameters(MaterialParameters* param, S32 pass) { mCurrentParams = param; }; 
+   virtual void setMaterialParameters(MaterialParameters* param, S32 pass) { mCurrentParams = param; };
    virtual MaterialParameters* getMaterialParameters() { return mCurrentParams; }
    virtual MaterialParameterHandle* getMaterialParameterHandle(const String& name) = 0;
 
@@ -233,7 +233,7 @@ protected:
 
    MaterialParameters* mCurrentParams;
 
-   /// Material::StageData is used here because the shader 
+   /// Material::StageData is used here because the shader
    /// generator throws a fit if it's passed anything else.
    Material::StageData mStages[Material::MAX_STAGES];
 
@@ -249,25 +249,25 @@ protected:
    /// The vertex format on which this material will render.
    const GFXVertexFormat *mVertexFormat;
 
-   ///  Set by addStateBlockDesc, should be considered 
+   ///  Set by addStateBlockDesc, should be considered
    /// when initPassStateBlock is called.
-   GFXStateBlockDesc mUserDefined;   
+   GFXStateBlockDesc mUserDefined;
 
-   /// The user defined macros to pass to the 
+   /// The user defined macros to pass to the
    /// shader initialization.
    Vector<GFXShaderMacro> mUserMacros;
 
    /// The user defined object to pass to ShaderFeature::createConstHandles.
    SimObject *mUserObject;
 
-   /// The state hint used for material sorting 
+   /// The state hint used for material sorting
    /// and quick equality comparision.
    MatStateHint mStateHint;
 
    /// Loads all the textures for all of the stages in the Material
    virtual void _setStageData();
 
-   /// Sets the blend state for rendering   
+   /// Sets the blend state for rendering
    void _setBlendState(Material::BlendOp blendOp, GFXStateBlockDesc& desc );
 
    /// Returns the path the material will attempt to load for a given texture filename.
@@ -293,12 +293,12 @@ protected:
    virtual void _initRenderPassDataStateBlocks();
 
    /// This returns the index into the renderState array based on the sgData passed in.
-   virtual U32 _getRenderStateIndex(   const SceneRenderState *state, 
+   virtual U32 _getRenderStateIndex(   const SceneRenderState *state,
                                        const SceneData &sgData );
 
    /// Activates the correct mPasses[currPass].renderState based on scene graph info
-   virtual void _setRenderState( const SceneRenderState *state, 
-                                 const SceneData &sgData, 
+   virtual void _setRenderState( const SceneRenderState *state,
+                                 const SceneData &sgData,
                                  U32 pass );
    /// @
 };

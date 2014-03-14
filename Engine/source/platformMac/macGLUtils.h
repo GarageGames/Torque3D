@@ -27,7 +27,7 @@ static Vector<NSOpenGLPixelFormatAttribute> _beginPixelFormatAttributesForDispla
 {
    Vector<NSOpenGLPixelFormatAttribute> attributes;
    attributes.reserve(16); // Most attribute lists won't exceed this
-   
+
    attributes.push_back(NSOpenGLPFAScreenMask);
    attributes.push_back((NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(display));
    attributes.push_back(NSOpenGLPFANoRecovery);
@@ -61,7 +61,7 @@ static Vector<NSOpenGLPixelFormatAttribute> _createStandardPixelFormatAttributes
    Vector<NSOpenGLPixelFormatAttribute> attributes = _beginPixelFormatAttributesForDisplay(display);
    _addColorAlphaDepthStencilAttributes(attributes, 24, 8, 24, 8);
    _endAttributeList(attributes);
-   
+
    return attributes;
 }
 
@@ -69,7 +69,7 @@ static Vector<NSOpenGLPixelFormatAttribute> _createStandardPixelFormatAttributes
 static NSOpenGLPixelFormat* _createStandardPixelFormat()
 {
    Vector<NSOpenGLPixelFormatAttribute> attributes = _createStandardPixelFormatAttributesForDisplay(kCGDirectMainDisplay);
- 
+
    NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes.address()];
 
    return fmt;

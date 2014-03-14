@@ -136,45 +136,45 @@ GuiObjectView::~GuiObjectView()
 void GuiObjectView::initPersistFields()
 {
    addGroup( "Model" );
-   
+
       addField( "shapeFile", TypeStringFilename, Offset( mModelName, GuiObjectView ),
          "The object model shape file to show in the view." );
       addField( "skin", TypeRealString, Offset( mSkinName, GuiObjectView ),
          "The skin to use on the object model." );
-   
+
    endGroup( "Model" );
-   
+
    addGroup( "Animation" );
-   
+
       addField( "animSequence", TypeRealString, Offset( mAnimationSeqName, GuiObjectView ),
          "The animation sequence to play on the model." );
 
    endGroup( "Animation" );
-   
+
    addGroup( "Mounting" );
-   
+
       addField( "mountedShapeFile", TypeStringFilename, Offset( mMountedModelName, GuiObjectView ),
          "Optional shape file to mount on the primary model (e.g. weapon)." );
       addField( "mountedSkin", TypeRealString, Offset( mMountSkinName, GuiObjectView ),
          "Skin name used on mounted shape file." );
       addField( "mountedNode", TypeRealString, Offset( mMountNodeName, GuiObjectView ),
          "Name of node on primary model to which to mount the secondary shape." );
-   
+
    endGroup( "Mounting" );
-   
+
    addGroup( "Lighting" );
-   
+
       addField( "lightColor", TypeColorF, Offset( mLightColor, GuiObjectView ),
          "Diffuse color of the sunlight used to render the model." );
       addField( "lightAmbient", TypeColorF, Offset( mLightAmbient, GuiObjectView ),
          "Ambient color of the sunlight used to render the model." );
       addField( "lightDirection", TypePoint3F, Offset( mLightDirection, GuiObjectView ),
          "Direction from which the model is illuminated." );
-   
+
    endGroup( "Lighting" );
-   
+
    addGroup( "Camera" );
-   
+
       addField( "orbitDiststance", TypeF32, Offset( mOrbitDist, GuiObjectView ),
          "Distance from which to render the model." );
       addField( "minOrbitDiststance", TypeF32, Offset( mMinOrbitDist, GuiObjectView ),
@@ -186,7 +186,7 @@ void GuiObjectView::initPersistFields()
       addField( "cameraRotation", TypePoint3F, Offset( mCameraRotation, GuiObjectView ),
          "Set the camera rotation." );
    endGroup( "Camera" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -195,7 +195,7 @@ void GuiObjectView::initPersistFields()
 void GuiObjectView::onStaticModified( StringTableEntry slotName, const char* newValue )
 {
    Parent::onStaticModified( slotName, newValue );
-   
+
    static StringTableEntry sShapeFile = StringTable->insert( "shapeFile" );
    static StringTableEntry sSkin = StringTable->insert( "skin" );
    static StringTableEntry sMountedShapeFile = StringTable->insert( "mountedShapeFile" );
@@ -209,7 +209,7 @@ void GuiObjectView::onStaticModified( StringTableEntry slotName, const char* new
    static StringTableEntry sMaxOrbitDistance = StringTable->insert( "maxOrbitDistance" );
    static StringTableEntry sCameraRotation = StringTable->insert( "cameraRotation" );
    static StringTableEntry sAnimSequence = StringTable->insert( "animSequence" );
-   
+
    if( slotName == sShapeFile )
       setObjectModel( String( mModelName ) );
    else if( slotName == sSkin )
@@ -243,7 +243,7 @@ bool GuiObjectView::onWake()
 
    if( !mLight )
    {
-      mLight = LIGHTMGR->createLightInfo();   
+      mLight = LIGHTMGR->createLightInfo();
 
       mLight->setColor( mLightColor );
       mLight->setAmbient( mLightAmbient );
@@ -323,7 +323,7 @@ void GuiObjectView::setObjectAnimation( S32 index )
 {
    mAnimationSeq = index;
    mAnimationSeqName = String();
-   
+
    if( mModel )
       _initAnimation();
 }
@@ -334,7 +334,7 @@ void GuiObjectView::setObjectAnimation( const String& sequenceName )
 {
    mAnimationSeq = -1;
    mAnimationSeqName = sequenceName;
-   
+
    if( mModel )
       _initAnimation();
 }
@@ -346,7 +346,7 @@ void GuiObjectView::setObjectModel( const String& modelName )
    SAFE_DELETE( mModel );
    mRunThread = 0;
    mModelName = String::EmptyString;
-   
+
    // Load the shape.
 
    Resource< TSShape > model = ResourceManager::get().load( modelName );
@@ -355,22 +355,22 @@ void GuiObjectView::setObjectModel( const String& modelName )
       Con::warnf( "GuiObjectView::setObjectModel - Failed to load model '%s'", modelName.c_str() );
       return;
    }
-   
+
    // Instantiate it.
 
    mModel = new TSShapeInstance( model, true );
    mModelName = modelName;
-   
+
    if( !mSkinName.isEmpty() )
       mModel->reSkin( mSkinName );
 
    // Initialize camera values.
-   
+
    mOrbitPos = mModel->getShape()->center;
    mMinOrbitDist = mModel->getShape()->radius;
 
    // Initialize animation.
-   
+
    _initAnimation();
    _initMount();
 }
@@ -381,7 +381,7 @@ void GuiObjectView::setSkin( const String& name )
 {
    if( mModel )
       mModel->reSkin( name, mSkinName );
-      
+
    mSkinName = name;
 }
 
@@ -391,7 +391,7 @@ void GuiObjectView::setMountSkin( const String& name )
 {
    if( mMountedModel )
       mMountedModel->reSkin( name, mMountSkinName );
-      
+
    mMountSkinName = name;
 }
 
@@ -407,7 +407,7 @@ void GuiObjectView::setMountNode( S32 index )
 void GuiObjectView::setMountNode( const String& name )
 {
    mMountNodeName = name;
-   
+
    if( mModel )
       _initMount();
 }
@@ -420,7 +420,7 @@ void GuiObjectView::setMountedObject( const String& modelName )
    mMountedModelName = String::EmptyString;
 
    // Load the model.
-   
+
    Resource< TSShape > model = ResourceManager::get().load( modelName );
    if( !model )
    {
@@ -431,10 +431,10 @@ void GuiObjectView::setMountedObject( const String& modelName )
 
    mMountedModel = new TSShapeInstance( model, true );
    mMountedModelName = modelName;
-   
+
    if( !mMountSkinName.isEmpty() )
       mMountedModel->reSkin( mMountSkinName );
-   
+
    if( mModel )
       _initMount();
 }
@@ -444,7 +444,7 @@ void GuiObjectView::setMountedObject( const String& modelName )
 bool GuiObjectView::processCameraQuery( CameraQuery* query )
 {
    // Adjust the camera so that we are still facing the model.
-   
+
    Point3F vec;
    MatrixF xRot, zRot;
    xRot.set( EulerF( mCameraRot.x, 0.0f, 0.0f ) );
@@ -484,11 +484,11 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
 {
    if( !mModel )
       return;
-      
+
    GFXTransformSaver _saveTransforms;
 
    // Determine the camera position, and store off render state.
-   
+
    MatrixF modelview;
    MatrixF mv;
    Point3F cp;
@@ -507,7 +507,7 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
 
    LIGHTMGR->unregisterAllLights();
    LIGHTMGR->setSpecialLight( LightManager::slSunLightType, mLight );
-  
+
    GFX->setStateBlock( mDefaultGuiSB );
 
    F32 left, right, top, bottom, nearPlane, farPlane;
@@ -525,7 +525,7 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
       false
    );
 
-   // Set up our TS render state here.   
+   // Set up our TS render state here.
    TSRenderState rdata;
    rdata.setSceneState( &state );
 
@@ -544,10 +544,10 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
          mModel->advanceTime( dt / 1000.f, mRunThread );
          mModel->animate();
       }
-      
+
       mModel->render( rdata );
    }
-   
+
    // Render mounted model.
 
    if( mMountedModel && mMountNode != -1 )
@@ -555,7 +555,7 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
       GFX->pushWorldMatrix();
       GFX->multWorld( mModel->mNodeTransforms[ mMountNode ] );
       GFX->multWorld( mMountTransform );
-      
+
       mMountedModel->render( rdata );
 
       GFX->popWorldMatrix();
@@ -620,29 +620,29 @@ void GuiObjectView::setLightDirection( const Point3F& direction )
 void GuiObjectView::_initAnimation()
 {
    AssertFatal( mModel, "GuiObjectView::_initAnimation - No model loaded!" );
-   
+
    if( mAnimationSeqName.isEmpty() && mAnimationSeq == -1 )
       return;
-      
+
    // Look up sequence by name.
-            
+
    if( !mAnimationSeqName.isEmpty() )
    {
       mAnimationSeq = mModel->getShape()->findSequence( mAnimationSeqName );
-      
+
       if( mAnimationSeq == -1 )
       {
          Con::errorf( "GuiObjectView::_initAnimation - Cannot find animation sequence '%s' on '%s'",
             mAnimationSeqName.c_str(),
             mModelName.c_str()
          );
-         
+
          return;
       }
    }
-   
+
    // Start sequence.
-      
+
    if( mAnimationSeq != -1 )
    {
       if( mAnimationSeq >= mModel->getShape()->sequences.size() )
@@ -651,17 +651,17 @@ void GuiObjectView::_initAnimation()
             mAnimationSeq,
             mModelName.c_str()
          );
-         
+
          mAnimationSeq = -1;
          return;
       }
-      
+
       if( !mRunThread )
          mRunThread = mModel->addThread();
-         
+
       mModel->setSequence( mRunThread, mAnimationSeq, 0.f );
    }
-   
+
    mLastRenderTime = Platform::getVirtualMilliseconds();
 }
 
@@ -670,14 +670,14 @@ void GuiObjectView::_initAnimation()
 void GuiObjectView::_initMount()
 {
    AssertFatal( mModel, "GuiObjectView::_initMount - No model loaded!" );
-      
+
    if( !mMountedModel )
       return;
-      
+
    mMountTransform.identity();
 
    // Look up the node to which to mount to.
-   
+
    if( !mMountNodeName.isEmpty() )
    {
       mMountNode = mModel->getShape()->findNode( mMountNodeName );
@@ -687,24 +687,24 @@ void GuiObjectView::_initMount()
             mMountNodeName.c_str(),
             mModelName.c_str()
          );
-         
+
          return;
       }
    }
-   
+
    // Make sure mount node is valid.
-   
+
    if( mMountNode != -1 && mMountNode >= mModel->getShape()->nodes.size() )
    {
       Con::errorf( "GuiObjectView::_initMount - Mount node index '%i' out of range for '%s'",
          mMountNode,
          mModelName.c_str()
       );
-      
+
       mMountNode = -1;
       return;
    }
-   
+
    // Look up node on the mounted model from
    // which to mount to the primary model's node.
 
@@ -885,7 +885,7 @@ DefineEngineMethod( GuiObjectView, setMount, void, ( const char* shapeName, cons
       object->setMountNode( dAtoi( mountNodeIndexOrName ) );
    else
       object->setMountNode( mountNodeIndexOrName );
-      
+
    object->setMountedObject( shapeName );
 }
 
@@ -962,7 +962,7 @@ DefineEngineMethod( GuiObjectView, setLightColor, void, ( ColorF color),,
    "%thisGuiObjectView.setLightColor(%color);\n"
    "@endtsexample\n\n"
    "@see GuiControl")
-{  
+{
    object->setLightColor( color );
 }
 

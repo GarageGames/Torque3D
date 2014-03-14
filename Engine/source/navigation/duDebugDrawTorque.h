@@ -84,7 +84,7 @@ public:
 
    /// Delete buffered primitive.
    void clear();
-      
+
 private:
    GFXStateBlockDesc mDesc;
 

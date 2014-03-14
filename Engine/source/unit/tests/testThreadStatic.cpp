@@ -53,7 +53,7 @@ CreateUnitTest( TestThreadStatic, "Core/ThreadStatic" )
       test( _TorqueThreadStaticReg::getStaticList( 0 ).size() == testInstance->size(), "Spawned static list has a different size from master copy." );
 
       // Make sure the size test passed before this is attempted
-      if( lastTestPassed() ) 
+      if( lastTestPassed() )
       {
          // Traverse the list and compare it to the initial value copy (index 0)
          for( int i = 0; i < _TorqueThreadStaticReg::getStaticList().size(); i++ )

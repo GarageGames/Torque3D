@@ -47,7 +47,7 @@
 #include <al/eax_func.h>
 #undef AL_FUNCTION
 
-// Declarations for the "emulated" functions (al functions that don't 
+// Declarations for the "emulated" functions (al functions that don't
 // exist in the loki openal implementation)
 ALboolean emu_alGetBoolean(ALenum param);
 ALint emu_alGetInteger(ALenum param);
@@ -84,7 +84,7 @@ static bool bindEmulatedFunction(void *&fnAddress, const char *name)
    return fnAddress != NULL;
 }
 
-/*!   Get a function address from the OpenAL DLL and bind it to the 
+/*!   Get a function address from the OpenAL DLL and bind it to the
 *     function pointer
 */
 static bool bindFunction( void *&fnAddress, const char *name )
@@ -98,7 +98,7 @@ static bool bindFunction( void *&fnAddress, const char *name )
    return (fnAddress != NULL);
 }
 
-/*!   Get a function address for an OpenAL extension function and bind it 
+/*!   Get a function address for an OpenAL extension function and bind it
 *     to it's function pointer
 */
 static bool bindExtensionFunction( void *&fnAddress, const char *name )
@@ -109,7 +109,7 @@ static bool bindExtensionFunction( void *&fnAddress, const char *name )
    return (fnAddress != NULL);
 }
 
-/*!   Bind the functions in the OpenAL DLL to the al interface functions  
+/*!   Bind the functions in the OpenAL DLL to the al interface functions
 */
 static bool bindOpenALFunctions()
 {
@@ -121,7 +121,7 @@ static bool bindOpenALFunctions()
    return result;
 }
 
-/*!   Bind the stub functions to the al interface functions  
+/*!   Bind the stub functions to the al interface functions
 */
 static void unbindOpenALFunctions()
 {
@@ -132,7 +132,7 @@ static void unbindOpenALFunctions()
    #undef AL_FUNCTION
 }
 
-/*!   Bind the EAX Extension functions to the EAX interface functions  
+/*!   Bind the EAX Extension functions to the EAX interface functions
 */
 static bool bindEAXFunctions()
 {
@@ -199,7 +199,7 @@ ALCdevice* emu_alcGetContextsDevice(ALCcontext *context)
 namespace Audio
 {
 
-/*!   Shutdown and Unload the OpenAL DLL  
+/*!   Shutdown and Unload the OpenAL DLL
 */
 void OpenALDLLShutdown()
 {
@@ -212,8 +212,8 @@ void OpenALDLLShutdown()
    }
    dlHandle = NULL;
 
-   unbindOpenALFunctions();   
-}   
+   unbindOpenALFunctions();
+}
 
 /*!   Dynamically Loads the OpenAL DLL if present and binds all the functions.
 *     If there is no DLL or an unexpected error occurs binding functions the
@@ -231,16 +231,16 @@ bool OpenALDLLInit()
       "tplib", // superceeded by "lib", here for backass compatibility
       "", // i.e.: current working directory
       NULL // this must be last
-   }; 
+   };
 
    char openalPath[4096];
    for (int i = 0; searchPath[i] != NULL; ++i)
-   {   
+   {
       dSprintf(openalPath, sizeof(openalPath), "%s/%s/%s",
-         Platform::getWorkingDirectory(), 
+         Platform::getWorkingDirectory(),
          searchPath[i],
          libName);
-         
+
       Con::printf("		Searching for OpenAl at location : %s", openalPath);
       dlHandle = dlopen(openalPath, RTLD_NOW);
       if (dlHandle != NULL)
@@ -250,7 +250,7 @@ bool OpenALDLLInit()
          break;
       }
    }
-   
+
    if (dlHandle == NULL)
    {
       // couldn't find it in our searchPath, try the system path

@@ -117,15 +117,15 @@ bool StdClientProcessList::advanceTime( SimTime timeDelta )
 
    if ( doBacklogged( timeDelta ) )
       return false;
- 
+
    bool ret = Parent::advanceTime( timeDelta );
    ProcessObject *obj = NULL;
 
    AssertFatal( mLastDelta >= 0.0f && mLastDelta <= 1.0f, "mLastDelta is not zero to one.");
-   
+
    obj = mHead.mProcessLink.next;
    while ( obj != &mHead )
-   {      
+   {
       if ( obj->isTicking() )
          obj->interpolateTick( mLastDelta );
 
@@ -141,11 +141,11 @@ bool StdClientProcessList::advanceTime( SimTime timeDelta )
 
    obj = mHead.mProcessLink.next;
    while ( obj != &mHead )
-   {      
+   {
       obj->advanceTime( dt );
       obj = obj->mProcessLink.next;
    }
-   
+
    return ret;
 }
 
@@ -189,7 +189,7 @@ void StdClientProcessList::onTickObject( ProcessObject *obj )
    PROFILE_SCOPE( StdClientProcessList_OnTickObject );
 
    // In case the object deletes itself during its processTick.
-   SimObjectPtr<SceneObject> safePtr = static_cast<SceneObject*>( obj );   
+   SimObjectPtr<SceneObject> safePtr = static_cast<SceneObject*>( obj );
 
    // Each object is either advanced a single tick, or if it's
    // being controlled by a client, ticked once for each pending move.
@@ -276,7 +276,7 @@ void StdClientProcessList::clientCatchup( GameConnection *  connection )
 //--------------------------------------------------------------------------
 // ServerProcessList
 //--------------------------------------------------------------------------
-   
+
 StdServerProcessList::StdServerProcessList()
 {
 }
@@ -301,7 +301,7 @@ void StdServerProcessList::onPreTickObject( ProcessObject *pobj )
          {
    #ifdef TORQUE_DEBUG_NET_MOVES
             Con::printf("no moves on object %i, skip tick",obj->getId());
-   #endif         
+   #endif
             return;
          }
       }
@@ -313,7 +313,7 @@ void StdServerProcessList::onPreTickObject( ProcessObject *pobj )
 void StdServerProcessList::onTickObject( ProcessObject *pobj )
 {
    PROFILE_SCOPE( StdServerProcessList_OnTickObject );
-   
+
    // Each object is either advanced a single tick, or if it's
    // being controlled by a client, ticked once for each pending move.
 
@@ -334,11 +334,11 @@ void StdServerProcessList::onTickObject( ProcessObject *pobj )
 
       // Do we really need to test the control object each iteration? Does it change?
       for ( m = 0; m < numMoves && con && con->getControlObject() == obj; m++, movePtr++ )
-      {         
+      {
          #ifdef TORQUE_DEBUG_NET_MOVES
          U32 sum = Move::ChecksumMask & obj->getPacketDataChecksum(obj->getControllingClient());
          #endif
-      
+
          if ( obj->isTicking() )
             obj->processTick( movePtr );
 

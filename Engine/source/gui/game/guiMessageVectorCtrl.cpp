@@ -89,7 +89,7 @@ DefineEngineMethod( GuiMessageVectorCtrl, attach, bool, ( MessageVector* item),,
 		Con::errorf(ConsoleLogEntry::General, "Could not find MessageVector: %s", item);
 		return false;
 	}
-	
+
 	return object->attach(item);
 }
 
@@ -474,7 +474,7 @@ void GuiMessageVectorCtrl::createLineWrapping(LineWrapping& rWrapping, const cha
          U32 breakPos = 0;
          for (currPos = 0; currPos < rLine.end-rLine.start+1; currPos++) {
             U32 currLength = mProfile->mFont->getStrNWidthPrecise((const UTF8 *)&string[rLine.start], currPos+1);
-            if (currLength > splitWidth) 
+            if (currLength > splitWidth)
             {
                // Make sure that the currPos has advanced, then set the breakPoint.
                breakPos = currPos != 0 ? currPos - 1 : 0;
@@ -788,7 +788,7 @@ void GuiMessageVectorCtrl::findSpecialFromCoord(const Point2I& point, S32* speci
    }
 
    U32 linePixels = mProfile->mFont->getHeight() + mLineSpacingPixels;
-   
+
    if ((point.x < 0 || point.x >= getWidth()) ||
        (point.y < 0 || point.y >= getHeight())) {
       *specialLine = -1;

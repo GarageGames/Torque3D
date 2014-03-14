@@ -37,7 +37,7 @@ LightQuery::~LightQuery()
 }
 
 void LightQuery::init(  const Point3F &cameraPos,
-                        const Point3F &cameraDir, 
+                        const Point3F &cameraDir,
                         F32 viewDist )
 {
    mVolume.center = cameraPos;
@@ -118,11 +118,11 @@ void LightQuery::_scoreLights()
 
          F32 radiusSq = mSquared( light->getRange().x + mVolume.radius );
          F32 distSq = radiusSq - lenSq;
-         
+
          if ( distSq > 0.0f )
             dist = mClampF( distSq / ( 1000.0f * 1000.0f ), 0.0f, 1.0f );
 
-         // TODO: This culling is broken... it culls spotlights 
+         // TODO: This culling is broken... it culls spotlights
          // that are actually visible.
          if ( false && isSpot && dist > 0.0f )
          {
@@ -140,7 +140,7 @@ void LightQuery::_scoreLights()
       }
       else
       {
-         // The sun always goes first 
+         // The sun always goes first
          // regardless of the settings.
          if ( light == sun )
          {
@@ -150,11 +150,11 @@ void LightQuery::_scoreLights()
          }
          else
          {
-            // TODO: When we have multiple directional 
+            // TODO: When we have multiple directional
             // lights we should score them here.
          }
       }
-      
+
       // TODO: Manager ambient lights here too!
 
       light->setScore( luminace * weight * dist );

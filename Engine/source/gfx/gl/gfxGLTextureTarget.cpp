@@ -29,7 +29,7 @@
 #include "gfx/gl/gfxGLUtils.h"
 
 /// Internal struct used to track texture information for FBO attachments
-/// This serves as an abstract base so we can deal with cubemaps and standard 
+/// This serves as an abstract base so we can deal with cubemaps and standard
 /// 2D/Rect textures through the same interface
 class _GFXGLTargetDesc
 {
@@ -38,19 +38,19 @@ public:
       mipLevel(_mipLevel), zOffset(_zOffset)
    {
    }
-   
+
    virtual ~_GFXGLTargetDesc() {}
-   
+
    virtual U32 getHandle() = 0;
    virtual U32 getWidth() = 0;
    virtual U32 getHeight() = 0;
    virtual U32 getDepth() = 0;
    virtual bool hasMips() = 0;
    virtual GLenum getBinding() = 0;
-   
+
    U32 getMipLevel() { return mipLevel; }
    U32 getZOffset() { return zOffset; }
-   
+
 private:
    U32 mipLevel;
    U32 zOffset;
@@ -60,20 +60,20 @@ private:
 class _GFXGLTextureTargetDesc : public _GFXGLTargetDesc
 {
 public:
-   _GFXGLTextureTargetDesc(GFXGLTextureObject* tex, U32 _mipLevel, U32 _zOffset) 
+   _GFXGLTextureTargetDesc(GFXGLTextureObject* tex, U32 _mipLevel, U32 _zOffset)
       : _GFXGLTargetDesc(_mipLevel, _zOffset), mTex(tex)
    {
    }
-   
+
    virtual ~_GFXGLTextureTargetDesc() {}
-   
+
    virtual U32 getHandle() { return mTex->getHandle(); }
    virtual U32 getWidth() { return mTex->getWidth(); }
    virtual U32 getHeight() { return mTex->getHeight(); }
    virtual U32 getDepth() { return mTex->getDepth(); }
    virtual bool hasMips() { return mTex->mMipLevels != 1; }
    virtual GLenum getBinding() { return mTex->getBinding(); }
-   
+
 private:
    StrongRefPtr<GFXGLTextureObject> mTex;
 };
@@ -82,20 +82,20 @@ private:
 class _GFXGLCubemapTargetDesc : public _GFXGLTargetDesc
 {
 public:
-   _GFXGLCubemapTargetDesc(GFXGLCubemap* tex, U32 _face, U32 _mipLevel, U32 _zOffset) 
+   _GFXGLCubemapTargetDesc(GFXGLCubemap* tex, U32 _face, U32 _mipLevel, U32 _zOffset)
       : _GFXGLTargetDesc(_mipLevel, _zOffset), mTex(tex), mFace(_face)
    {
    }
-   
+
    virtual ~_GFXGLCubemapTargetDesc() {}
-   
+
    virtual U32 getHandle() { return mTex->getHandle(); }
    virtual U32 getWidth() { return mTex->getWidth(); }
    virtual U32 getHeight() { return mTex->getHeight(); }
    virtual U32 getDepth() { return 0; }
    virtual bool hasMips() { return mTex->getNumMipLevels() != 1; }
    virtual GLenum getBinding() { return GFXGLCubemap::getEnumForFaceNumber(mFace); }
-   
+
 private:
    StrongRefPtr<GFXGLCubemap> mTex;
    U32 mFace;
@@ -106,9 +106,9 @@ class _GFXGLTextureTargetImpl
 {
 public:
    GFXGLTextureTarget* mTarget;
-   
+
    virtual ~_GFXGLTextureTargetImpl() {}
-   
+
    virtual void applyState() = 0;
    virtual void makeActive() = 0;
    virtual void finish() = 0;
@@ -119,17 +119,17 @@ class _GFXGLTextureTargetFBOImpl : public _GFXGLTextureTargetImpl
 {
 public:
    GLuint mFramebuffer;
-   
+
    _GFXGLTextureTargetFBOImpl(GFXGLTextureTarget* target);
    virtual ~_GFXGLTextureTargetFBOImpl();
-   
+
    virtual void applyState();
    virtual void makeActive();
    virtual void finish();
 };
 
-// Handy macro for checking the status of a framebuffer.  Framebuffers can fail in 
-// all sorts of interesting ways, these are just the most common.  Further, no existing GL profiling 
+// Handy macro for checking the status of a framebuffer.  Framebuffers can fail in
+// all sorts of interesting ways, these are just the most common.  Further, no existing GL profiling
 // tool catches framebuffer errors when the framebuffer is created, so we actually need this.
 #define CHECK_FRAMEBUFFER_STATUS()\
 {\
@@ -167,11 +167,11 @@ _GFXGLTextureTargetFBOImpl::~_GFXGLTextureTargetFBOImpl()
 }
 
 void _GFXGLTextureTargetFBOImpl::applyState()
-{   
+{
    // REMINDER: When we implement MRT support, check against GFXGLDevice::getNumRenderTargets()
-   
+
    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFramebuffer);
-   
+
    _GFXGLTargetDesc* color0 = mTarget->getTargetDesc(GFXTextureTarget::Color0);
    if(color0)
    {
@@ -185,7 +185,7 @@ void _GFXGLTextureTargetFBOImpl::applyState()
       // Clears the texture (note that the binding is irrelevent)
       glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
    }
-   
+
    _GFXGLTargetDesc* depthStecil = mTarget->getTargetDesc(GFXTextureTarget::DepthStencil);
    if(depthStecil)
    {
@@ -200,7 +200,7 @@ void _GFXGLTextureTargetFBOImpl::applyState()
       // Clears the texture (note that the binding is irrelevent)
       glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
    }
-   
+
    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
@@ -214,11 +214,11 @@ void _GFXGLTextureTargetFBOImpl::finish()
 {
    glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
    glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-   
+
    _GFXGLTargetDesc* color0 = mTarget->getTargetDesc(GFXTextureTarget::Color0);
    if(!color0 || !(color0->hasMips()))
       return;
-   
+
    // Generate mips if necessary
    // Assumes a 2D texture.
    glActiveTexture(GL_TEXTURE0);
@@ -232,7 +232,7 @@ class _GFXGLTextureTargetAUXBufferImpl : public _GFXGLTextureTargetImpl
 {
 public:
    _GFXGLTextureTargetAUXBufferImpl(GFXGLTextureTarget* target);
-   
+
    virtual void applyState();
    virtual void makeActive();
    virtual void finish();
@@ -245,7 +245,7 @@ _GFXGLTextureTargetAUXBufferImpl::_GFXGLTextureTargetAUXBufferImpl(GFXGLTextureT
 
 void _GFXGLTextureTargetAUXBufferImpl::applyState()
 {
-   
+
 }
 
 void _GFXGLTextureTargetAUXBufferImpl::makeActive()
@@ -258,13 +258,13 @@ void _GFXGLTextureTargetAUXBufferImpl::finish()
 {
    // Bind the Color0 texture
    _GFXGLTargetDesc* color0 = mTarget->getTargetDesc(GFXTextureTarget::Color0);
-   
+
    glActiveTexture(GL_TEXTURE0);
    // Assume we're a 2D texture for now.
    PRESERVE_2D_TEXTURE();
    glBindTexture(color0->getBinding(), color0->getHandle());
    glCopyTexSubImage2D(color0->getBinding(), 0, 0, 0, 0, 0, color0->getWidth(), color0->getHeight());
-   
+
    glDrawBuffer(GL_BACK);
    glReadBuffer(GL_BACK);
 }
@@ -274,7 +274,7 @@ GFXGLTextureTarget::GFXGLTextureTarget()
 {
    for(U32 i=0; i<MaxRenderSlotId; i++)
       mTargets[i] = NULL;
-   
+
    GFXTextureManager::addEventDelegate( this, &GFXGLTextureTarget::_onTextureEvent );
 
    _impl = new _GFXGLTextureTargetFBOImpl(this);
@@ -305,10 +305,10 @@ void GFXGLTextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *tex, 
    // GFXTextureTarget::sDefaultDepthStencil is a hint that we want the window's depth buffer.
    if(tex == GFXTextureTarget::sDefaultDepthStencil)
       _needsAux = true;
-   
+
    if(slot == DepthStencil && tex != GFXTextureTarget::sDefaultDepthStencil)
       _needsAux = false;
-   
+
    // Triggers an update when we next render
    invalidateState();
 
@@ -326,10 +326,10 @@ void GFXGLTextureTarget::attachTexture( RenderSlot slot, GFXCubemap *tex, U32 fa
    AssertFatal(slot != DepthStencil, "GFXGLTextureTarget::attachTexture (cube) - Cube depth textures not supported!");
    if(slot == DepthStencil)
       return;
-    
+
    // Triggers an update when we next render
    invalidateState();
-   
+
    // We stash the texture and info into an internal struct.
    GFXGLCubemap* glTexture = static_cast<GFXGLCubemap*>(tex);
    if(tex)
@@ -348,7 +348,7 @@ void GFXGLTextureTarget::clearAttachments()
 void GFXGLTextureTarget::zombify()
 {
    invalidateState();
-   
+
    // Will be recreated in applyState
    _impl = NULL;
 }
@@ -375,13 +375,13 @@ void GFXGLTextureTarget::applyState()
 
    // So we don't do this over and over again
    stateApplied();
-   
+
    // Ensure we have the proper implementation (consider changing to an enum?)
    if(_needsAux && dynamic_cast<_GFXGLTextureTargetAUXBufferImpl*>(_impl.ptr()) == NULL)
       _impl = new _GFXGLTextureTargetAUXBufferImpl(this);
    else if(!_needsAux && dynamic_cast<_GFXGLTextureTargetFBOImpl*>(_impl.ptr()) == NULL)
       _impl = new _GFXGLTextureTargetFBOImpl(this);
-           
+
    _impl->applyState();
 }
 
@@ -400,7 +400,7 @@ const String GFXGLTextureTarget::describeSelf() const
 {
    String ret = String::ToString("   Color0 Attachment: %i", mTargets[Color0].isValid() ? mTargets[Color0]->getHandle() : 0);
    ret += String::ToString("   Depth Attachment: %i", mTargets[DepthStencil].isValid() ? mTargets[DepthStencil]->getHandle() : 0);
-   
+
    return ret;
 }
 
@@ -414,25 +414,25 @@ void GFXGLTextureTarget::resolveTo(GFXTextureObject* obj)
    GFXGLTextureObject* glTexture = static_cast<GFXGLTextureObject*>(obj);
 
    PRESERVE_FRAMEBUFFER();
-   
+
    GLuint dest;
    GLuint src;
-   
+
    glGenFramebuffersEXT(1, &dest);
    glGenFramebuffersEXT(1, &src);
-   
+
    glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, dest);
    glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, glTexture->getHandle(), 0);
-   
+
    glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, src);
    glFramebufferTexture2DEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,mTargets[Color0]->getHandle(), 0);
-   
+
    glBlitFramebufferEXT(0, 0, mTargets[Color0]->getWidth(), mTargets[Color0]->getHeight(),
       0, 0, glTexture->getWidth(), glTexture->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-   
+
    glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
    glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-   
+
    glDeleteFramebuffersEXT(1, &dest);
    glDeleteFramebuffersEXT(1, &src);
 }

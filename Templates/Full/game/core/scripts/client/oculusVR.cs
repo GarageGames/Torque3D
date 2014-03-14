@@ -28,7 +28,7 @@ if(!isFunction(isOculusVRDeviceActive))
 
 function oculusSensorMetricsCallback()
 {
-   return "  | OVR Sensor 0 |" @ 
+   return "  | OVR Sensor 0 |" @
           "  rot: " @ getOVRSensorEulerRotation(0);
 }
 
@@ -60,7 +60,7 @@ function enableOculusVRDisplay(%gameConnection, %trueStereoRendering)
 {
    setOVRHMDAsGameConnectionDisplayDevice(%gameConnection);
    PlayGui.renderStyle = "stereo side by side";
-   
+
    if(%trueStereoRendering)
    {
       if($pref::OculusVR::UseChromaticAberrationCorrection)
@@ -76,7 +76,7 @@ function enableOculusVRDisplay(%gameConnection, %trueStereoRendering)
    {
       OVRBarrelDistortionMonoPostFX.isEnabled = true;
    }
-   
+
    // Reset all sensors
    ovrResetAllSensors();
 }

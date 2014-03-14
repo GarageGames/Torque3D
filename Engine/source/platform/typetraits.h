@@ -410,10 +410,10 @@ template< typename T >
 struct ValueHolder
 {
    T value;
-   
+
    ValueHolder( const T& value )
       : value( value ) {}
-      
+
    operator T() const { return value; }
 };
 template<>

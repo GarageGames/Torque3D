@@ -82,7 +82,7 @@ function EditorCameraBookmarksMenu::onAdd( %this )
 {
    if(! isObject(%this.canvas))
       %this.canvas = Canvas;
-   
+
    // Add any existing bookmarks
    %this.rebuildBookmarks();
 }
@@ -94,7 +94,7 @@ function EditorCameraBookmarksMenu::addItem( %this, %pos, %name )
       %this.NoneItem = false;
       %this.removeItem( 0 );
    }
-   
+
    %accel = "";
    %this.insertItem(%pos, %name !$= "-" ? %name : "", %accel);
 }
@@ -129,7 +129,7 @@ function EditorCameraBookmarksMenu::rebuildBookmarks( %this )
    {
       %this.removeItem( 0 );
    }
-   
+
    // Add back in all of the bookmarks
    if( isObject(CameraBookmarks) && CameraBookmarks.getCount() > 0 )
    {
@@ -154,7 +154,7 @@ function ManageBookmarksContainer::onOK( %this )
 {
    %name = EAddBookmarkWindowName.getText();
    EAddBookmarkWindowName.clearFirstResponder();
-   
+
    if( %name $= "" )
    {
       // look for a NewCamera name to grab
@@ -165,10 +165,10 @@ function ManageBookmarksContainer::onOK( %this )
          }
       }
    }
-   
+
    // Check if the new bookmark name already exists
    if( isObject(CameraBookmarks) && CameraBookmarks.findObjectByInternalName(%name) )
-   { 
+   {
       %userName = %name;
       for(%i = 0; ; %i++){
          %name = %userName @ "_" @ %i;
@@ -177,7 +177,7 @@ function ManageBookmarksContainer::onOK( %this )
          }
       }
    }
-   
+
    EditorGui.addCameraBookmark( %name );
    EAddBookmarkWindowName.text = "";
    //%this.CloseWindow();
@@ -248,7 +248,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
          internalName = "goToBookmark";
          canSaveDynamicFields = "0";
       };
-      
+
       new GuiTextEditCtrl() {
          class = "EManageBookmarksTextEdit";
          internalName = "BookmarkName";
@@ -285,7 +285,7 @@ function EManageBookmarks::addBookmark( %this, %mark, %index )
          canSaveDynamicFields = "0";
       };
    };
-   
+
    EManageBookmarks-->ManageBookmarksWindowStack.addGuiControl( %gui );
 }
 
@@ -328,11 +328,11 @@ function EManageBookmarksTextEdit::onValidate( %this )
    %mark = %this.getParent().Bookmark;
    %oldname = %mark.getInternalName();
    %newname = %this.getText();
-   
+
    // If the new name is the same as the old, do nothing
    if( %newname $= %oldname )
       return;
-   
+
    // Make sure the new name doesn't conflict with a current bookmark
    if( isObject(CameraBookmarks) && CameraBookmarks.findObjectByInternalName(%newname) )
    {
@@ -341,7 +341,7 @@ function EManageBookmarksTextEdit::onValidate( %this )
       MessageBoxOK("Create Bookmark", "You must provide a unique name for the new bookmark.", %callback);
       return;
    }
-   
+
    // Rename the bookmark and update
    %this.getParent().setInternalName( %newname );
    %mark.setInternalName( %newname );

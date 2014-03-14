@@ -40,7 +40,7 @@ class PostEffectVis
    // Protected constructor.
    // Use PFXVIS define to access singleton.
    PostEffectVis();
-   friend class ManagedSingleton<PostEffectVis>;   
+   friend class ManagedSingleton<PostEffectVis>;
 
 public:
 
@@ -57,12 +57,12 @@ public:
 
    /// Callback from PostEffectManager at the start of a frame.
    void onStartOfFrame();
-   
+
    /// Callback from PostEffect to update visualization.
    void onPFXProcessed( PostEffect *pfx );
-      
+
    /// Callback when a visualization window is closed.
-   void onWindowClosed( GuiWindowCtrl *ctrl );      
+   void onWindowClosed( GuiWindowCtrl *ctrl );
 
 protected:
 
@@ -74,10 +74,10 @@ protected:
    enum TexIndex
    {
       Target = 0,
-      Input1, 
-      Input2, 
-      Input3, 
-      Input4,       
+      Input1,
+      Input2,
+      Input3,
+      Input4,
       TexCount
    };
 
@@ -93,11 +93,11 @@ protected:
    void _setDefaultCaption( VisWindow &vis, U32 texIndex );
 
    typedef Vector< VisWindow > VisVector;
-   
+
    VisVector mWindows;
 
    GuiControl *mContent;
-   
+
 public:
 
    // For ManagedSingleton.

@@ -43,7 +43,7 @@ GFXDeclareVertexFormat( DecalVertex )
    Point3F normal;
    Point3F tangent;
    GFXVertexColor color;
-   Point2F texCoord;   
+   Point2F texCoord;
 };
 
 /// DataBlock implementation for decals.
@@ -56,10 +56,10 @@ class DecalData : public SimDataBlock
       enum { MAX_TEXCOORD_COUNT = 16 };
 
       F32 size;
-      
+
       /// Milliseconds for decal to expire.
       U32 lifeSpan;
-      
+
       /// Milliseconds for decal to fade after expiration.
       U32 fadeTime;
 
@@ -77,17 +77,17 @@ class DecalData : public SimDataBlock
 
       /// Name of material to use.
       String materialName;
-      
+
       /// Render material for decal.
       SimObjectPtr<Material> material;
-      
+
       /// Material instance for decal.
       BaseMatInstance *matInst;
 
       String lookupName;
 
       U8 renderPriority;
-      
+
       S32 clippingMasks;
 
       /// The angle in degress used to clip geometry
@@ -105,14 +105,14 @@ class DecalData : public SimDataBlock
       DECLARE_CONOBJECT(DecalData);
       static void initPersistFields();
       virtual void onStaticModified( const char *slotName, const char *newValue = NULL );
-      
+
       virtual bool onAdd();
       virtual void onRemove();
 
       virtual bool preload( bool server, String &errorStr );
       virtual void packData( BitStream* );
-      virtual void unpackData( BitStream* );      
-      
+      virtual void unpackData( BitStream* );
+
       Material* getMaterial();
       BaseMatInstance* getMaterialInstance();
 
@@ -129,10 +129,10 @@ class DecalData : public SimDataBlock
 };
 
 inline SimSet* DecalData::getSet()
-{   
+{
    SimSet *set = NULL;
    if ( !Sim::findObject( "DecalDataSet", set ) )
-   {      
+   {
       set = new SimSet;
       set->registerObject( "DecalDataSet" );
       Sim::getRootGroup()->addObject( set );

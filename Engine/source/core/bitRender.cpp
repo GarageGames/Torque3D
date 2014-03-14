@@ -830,7 +830,7 @@ void BitRender::bitTo8Bit_3(U32 * bits, U32 * eightBits, S32 dim)
 		*src32++ = *(U32*)&bitTable[0x0F & currVal];  currVal >>= 4;
 		*src32++ = *(U32*)&bitTable[currVal];
 	}
-	
+
 	src32 = (U32*)(src1);
 	for(i=0; i<(dimS2>>3); i++)
 	{
@@ -868,7 +868,7 @@ void BitRender::bitTo8Bit_3(U32 * bits, U32 * eightBits, S32 dim)
 			*src32++ = *(U32*)&bitTable[0x0F & currVal];  currVal >>= 4;
 			*src32++ = *(U32*)&bitTable[currVal];
 		}
-		
+
 		// blur & copy current src1 to current dest
 #if NO_BLUR
 		// test for basic functionality.
@@ -918,7 +918,7 @@ void BitRender::bitTo8Bit_3(U32 * bits, U32 * eightBits, S32 dim)
 			// put samples into dest buffer.
 			*eightBits++ = currVal;
 		}
-#endif		
+#endif
 
 		// flip around ptrs for next row processing.
 		openBuf++;

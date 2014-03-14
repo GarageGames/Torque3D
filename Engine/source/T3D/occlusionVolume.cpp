@@ -70,7 +70,7 @@ OcclusionVolume::OcclusionVolume()
    VECTOR_SET_ASSOCIATION( mWSPoints );
 
    mObjectFlags.set( VisualOccluderFlag );
-   
+
    mObjScale.set( 1.f, 1.f, 1.f );
    mObjBox.set(
       Point3F( -0.5f, -0.5f, -0.5f ),

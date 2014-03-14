@@ -38,7 +38,7 @@ protected:
 
 public:
    virtual ~MRandomGenerator() {}
-   
+
    void setSeed();
    S32  getSeed() { return mSeed; }
    virtual void setSeed(S32 s) = 0;

@@ -26,7 +26,7 @@
 #include "gui/buttons/guiIconButtonCtrl.h"
 
 //-----------------------------------------------------------------------------
-// GuiInspectorDynamicField - Child class of GuiInspectorField 
+// GuiInspectorDynamicField - Child class of GuiInspectorField
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT( GuiInspectorDynamicField );
 
@@ -37,7 +37,7 @@ ConsoleDocClass( GuiInspectorDynamicField,
 );
 
 GuiInspectorDynamicField::GuiInspectorDynamicField( GuiInspector *inspector,
-                                                    GuiInspectorGroup* parent, 
+                                                    GuiInspectorGroup* parent,
                                                     SimFieldDictionary::Entry* field )
  : mRenameCtrl( NULL ),
    mDeleteButton( NULL )
@@ -45,21 +45,21 @@ GuiInspectorDynamicField::GuiInspectorDynamicField( GuiInspector *inspector,
    mInspector = inspector;
    mParent = parent;
    mDynField = field;
-   setBounds(0,0,100,20);   
+   setBounds(0,0,100,20);
 }
 
 void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
 {
    if ( mDynField == NULL )
       return;
-   
+
    const U32 numTargets = mInspector->getNumInspectObjects();
    if( callbacks && numTargets > 1 )
       Con::executef( mInspector, "beginCompoundUndo" );
-      
+
    // Setting an empty string will kill the field.
    const bool isRemoval = !data[ 0 ];
-      
+
    for( U32 i = 0; i < numTargets; ++ i )
    {
       SimObject* target = mInspector->getInspectObject( i );
@@ -72,7 +72,7 @@ void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
       if ( dStrcmp( oldData, data ) != 0 )
       {
          target->inspectPreApply();
-         
+
          if( callbacks )
          {
             if( isRemoval )
@@ -87,7 +87,7 @@ void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
          target->inspectPostApply();
       }
    }
-   
+
    if( callbacks && numTargets > 1 )
       Con::executef( mInspector, "endCompoundUndo" );
 
@@ -106,7 +106,7 @@ const char* GuiInspectorDynamicField::getData( U32 inspectObjectIndex )
 void GuiInspectorDynamicField::renameField( const char* newFieldName )
 {
    newFieldName = StringTable->insert( newFieldName );
-   
+
    if ( mDynField == NULL || mParent == NULL || mEdit == NULL )
    {
       Con::warnf("GuiInspectorDynamicField::renameField - No target object or dynamic field data found!" );
@@ -122,7 +122,7 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
    // Only proceed if the name has changed
    if ( dStricmp( newFieldName, getFieldName() ) == 0 )
       return;
-      
+
    // Grab a pointer to our parent and cast it to GuiInspectorDynamicGroup
    GuiInspectorDynamicGroup *group = dynamic_cast<GuiInspectorDynamicGroup*>(mParent);
    if ( group == NULL )
@@ -130,55 +130,55 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
       Con::warnf("GuiInspectorDynamicField::renameField - Unable to locate GuiInspectorDynamicGroup parent!" );
       return;
    }
-   
+
    const U32 numTargets = mInspector->getNumInspectObjects();
    if( numTargets > 1 )
       Con::executef( mInspector, "onBeginCompoundEdit" );
-      
+
    const char* oldFieldName = getFieldName();
    SimFieldDictionary::Entry* newEntry = NULL;
-   
+
    for( U32 i = 0; i < numTargets; ++ i )
    {
       SimObject* target = mInspector->getInspectObject( i );
-      
+
       // Make sure the new field is not already defined as a static field
       // on the object.
-      
+
       if( target->isField( newFieldName ) )
       {
          // New field is already defined.  If we can, let the scripts handle
          // the error.  Otherwise, just emit an error on the console and proceed.
-         
+
          if( numTargets == 1 && mInspector->isMethod( "onFieldRenameAlreadyDefined" ) )
             Con::executef( mInspector, "onFieldRenameAlreadyDefined", target->getIdString(), oldFieldName, newFieldName );
          else
             Con::errorf( "GuiInspectorDynamicField::renameField - field '%s' is already defined on %i:%s (%s)",
                newFieldName, target->getId(), target->getClassName(), target->getName() );
-               
+
          // Reset the text entry.
-               
+
          if( mRenameCtrl )
             mRenameCtrl->setText( oldFieldName );
-            
+
          continue;
       }
-      
+
       char currentValue[1024] = {0};
       // Grab our current dynamic field value (we use a temporary buffer as this gets corrupted upon Con::eval)
       dSprintf( currentValue, sizeof( currentValue ), "%s", target->getDataField( oldFieldName, NULL ) );
 
       // Unset the old field and set the new field.
-      
+
       target->setDataField( oldFieldName, NULL, "" );
       target->setDataField( newFieldName, NULL, currentValue );
 
       // Notify script.
-      
+
       Con::executef( mInspector, "onFieldRenamed", target->getIdString(), oldFieldName, newFieldName );
-      
+
       // Look up the new SimFieldDictionary entry.
-      
+
       if( !newEntry )
       {
          newEntry = target->getFieldDictionary()->findDynamicField( newFieldName );
@@ -187,14 +187,14 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
             Con::warnf( "GuiInspectorDynamicField::renameField - could not find new field '%s' on object %i:%s (%s)",
                newFieldName, target->getId(), target->getClassName(), target->getName() );
          }
-         
+
          mDynField = newEntry;
       }
    }
 
    if( numTargets > 1 )
       Con::executef( mInspector, "onEndCompoundEdit" );
-      
+
    // Lastly we need to reassign our validate field for our value edit control
    char szBuffer[1024];
    dSprintf( szBuffer, sizeof( szBuffer ), "%d.apply(%d.getText());", getId(), mEdit->getId() );
@@ -269,8 +269,8 @@ bool GuiInspectorDynamicField::onAdd()
 }
 
 bool GuiInspectorDynamicField::updateRects()
-{   
-   Point2I fieldExtent = getExtent();   
+{
+   Point2I fieldExtent = getExtent();
    S32 dividerPos, dividerMargin;
    mInspector->getDivider( dividerPos, dividerMargin );
 
@@ -294,14 +294,14 @@ bool GuiInspectorDynamicField::updateRects()
    return ( sized0 || sized1 || sized2 );
 }
 
-void GuiInspectorDynamicField::setInspectorField( AbstractClassRep::Field *field, 
-                                                  StringTableEntry caption, 
-                                                  const char*arrayIndex ) 
+void GuiInspectorDynamicField::setInspectorField( AbstractClassRep::Field *field,
+                                                  StringTableEntry caption,
+                                                  const char*arrayIndex )
 {
    // Override the base just to be sure it doesn't get called.
    // We don't use an AbstractClassRep::Field...
 
-//    mField = field; 
+//    mField = field;
 //    mCaption = StringTable->EmptyString();
 //    mRenameCtrl->setText( getFieldName() );
 }

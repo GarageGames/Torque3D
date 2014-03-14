@@ -46,7 +46,7 @@ private:
    SceneObject* mParentObject;
 
    static Vector<BasicSceneObjectLightingPlugin*> smPluginInstances;
-   
+
 public:
    BasicSceneObjectLightingPlugin(SceneObject* parent);
    ~BasicSceneObjectLightingPlugin();
@@ -75,8 +75,8 @@ protected:
 
    /// Called from the light manager on activation.
    /// @see LightManager::addActivateCallback
-   void _onLMActivate( const char *lm, bool enable );   
-   
+   void _onLMActivate( const char *lm, bool enable );
+
    void _onDecalManagerClear();
 
    void removeLightPlugin(SceneObject* obj);
@@ -89,10 +89,10 @@ public:
 
    BasicSceneObjectPluginFactory();
    ~BasicSceneObjectPluginFactory();
-   
+
    // For ManagedSingleton.
    static const char* getSingletonName() { return "BasicSceneObjectPluginFactory"; }
-   
+
    void _setEnabled();
 };
 

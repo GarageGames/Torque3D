@@ -54,7 +54,7 @@ class PhysicsPlayer;
 class PhysicsCollision;
 
 
-typedef Delegate<PhysicsObject*( const SceneObject *)> CreatePhysicsObjectFn; 
+typedef Delegate<PhysicsObject*( const SceneObject *)> CreatePhysicsObjectFn;
 typedef Map<StringNoCase, CreatePhysicsObjectFn> CreateFnMap;
 
 
@@ -77,7 +77,7 @@ protected:
 
    /// A SimSet of objects to delete before the
    /// physics reset/restore event occurs.
-   SimObjectPtr<SimSet> mPhysicsCleanup;      
+   SimObjectPtr<SimSet> mPhysicsCleanup;
 
    /// Delegate method for debug drawing.
    static void _debugDraw( SceneManager *graph, const SceneRenderState *state );
@@ -87,7 +87,7 @@ public:
    /// Note this should go away when we have "real" singleplayer.
    static bool smSinglePlayer;
    static bool isSinglePlayer() { return smSinglePlayer; }
-   
+
    /// Number of threads to use if supported by the plugin.
    static U32 smThreadCount;
    static U32 getThreadCount() { return smThreadCount; }
@@ -108,7 +108,7 @@ public:
    virtual void reset() = 0;
 
    /// Returns the physics cleanup set.
-   SimSet* getPhysicsCleanup() const { return mPhysicsCleanup; }      
+   SimSet* getPhysicsCleanup() const { return mPhysicsCleanup; }
 
    void enableDebugDraw( bool enabled );
 
@@ -124,7 +124,7 @@ public:
    virtual void setTimeScale( const F32 timeScale ) = 0;
    virtual const F32 getTimeScale() const = 0;
 
-   static PhysicsResetSignal& getPhysicsResetSignal() { return smPhysicsResetSignal; } 
+   static PhysicsResetSignal& getPhysicsResetSignal() { return smPhysicsResetSignal; }
 
    virtual bool createWorld( const String &worldName ) = 0;
    virtual void destroyWorld( const String &worldName ) = 0;

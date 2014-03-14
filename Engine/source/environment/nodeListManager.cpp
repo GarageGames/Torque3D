@@ -200,7 +200,7 @@ bool NodeListManager::findListById(U32 id, NodeList** list, bool completeOnly)
             return false;
          }
 
-         // Return the node list (complete or not) and remove 
+         // Return the node list (complete or not) and remove
          // it from our list of lists
          *list = mNodeLists[i];
          mNodeLists.erase(i);

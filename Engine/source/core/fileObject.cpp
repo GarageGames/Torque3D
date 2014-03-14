@@ -108,7 +108,7 @@ bool FileObject::openForWrite(const char *fileName, const bool append)
    Con::expandScriptFilename( buffer, sizeof( buffer ), fileName );
 
    close();
-   
+
    if( !buffer[ 0 ] )
       return false;
 
@@ -215,11 +215,11 @@ void FileObject::writeObject( SimObject* object, const U8* objectPrepend )
 
 DefineEngineMethod( FileObject, openForRead, bool, ( const char* filename ),,
    "@brief Open a specified file for reading\n\n"
-   
+
    "There is no limit as to what kind of file you can read. Any format and data contained within is accessible, not just text\n\n"
 
    "@param filename Path, name, and extension of file to be read"
-   
+
    "@tsexample\n"
    "// Create a file object for reading\n"
    "%fileRead = new FileObject();\n\n"
@@ -234,11 +234,11 @@ DefineEngineMethod( FileObject, openForRead, bool, ( const char* filename ),,
 
 DefineEngineMethod( FileObject, openForWrite, bool, ( const char* filename ),,
    "@brief Open a specified file for writing\n\n"
-   
+
    "There is no limit as to what kind of file you can write. Any format and data is allowable, not just text\n\n"
 
    "@param filename Path, name, and extension of file to write to"
-   
+
    "@tsexample\n"
    "// Create a file object for writing\n"
    "%fileWrite = new FileObject();\n\n"
@@ -253,12 +253,12 @@ DefineEngineMethod( FileObject, openForWrite, bool, ( const char* filename ),,
 
 DefineEngineMethod( FileObject, openForAppend, bool, ( const char* filename ),,
    "@brief Open a specified file for writing, adding data to the end of the file\n\n"
-   
+
    "There is no limit as to what kind of file you can write. Any format and data is allowable, not just text. Unlike openForWrite(), "
    "which will erase an existing file if it is opened, openForAppend() preserves data in an existing file and adds to it.\n\n"
 
    "@param filename Path, name, and extension of file to append to"
-   
+
    "@tsexample\n"
    "// Create a file object for writing\n"
    "%fileWrite = new FileObject();\n\n"
@@ -274,7 +274,7 @@ DefineEngineMethod( FileObject, openForAppend, bool, ( const char* filename ),,
 
 DefineEngineMethod( FileObject, isEOF, bool, (),,
    "@brief Determines if the parser for this FileObject has reached the end of the file\n\n"
-   
+
    "@tsexample\n"
    "// Create a file object for reading\n"
    "%fileRead = new FileObject();\n\n"
@@ -297,10 +297,10 @@ DefineEngineMethod( FileObject, isEOF, bool, (),,
 
 DefineEngineMethod( FileObject, readLine, const char*, (),,
    "@brief Read a line from file.\n\n"
-   
+
    "Emphasis on *line*, as in you cannot parse individual characters or chunks of data.  "
    "There is no limitation as to what kind of data you can read.\n\n"
-   
+
    "@tsexample\n"
    "// Create a file object for reading\n"
    "%fileRead = new FileObject();\n\n"
@@ -319,12 +319,12 @@ DefineEngineMethod( FileObject, readLine, const char*, (),,
 
 DefineEngineMethod( FileObject, peekLine, const char*, (),,
    "@brief Read a line from the file without moving the stream position.\n\n"
-   
+
    "Emphasis on *line*, as in you cannot parse individual characters or chunks of data.  "
    "There is no limitation as to what kind of data you can read. Unlike readLine, the parser does not move forward after reading.\n\n"
 
    "@param filename Path, name, and extension of file to be read"
-   
+
    "@tsexample\n"
    "// Create a file object for reading\n"
    "%fileRead = new FileObject();\n\n"
@@ -350,12 +350,12 @@ DefineEngineMethod( FileObject, peekLine, const char*, (),,
 
 DefineEngineMethod( FileObject, writeLine, void, ( const char* text ),,
    "@brief Write a line to the file, if it was opened for writing.\n\n"
-   
+
    "There is no limit as to what kind of text you can write. Any format and data is allowable, not just text. "
    "Be careful of what you write, as whitespace, current values, and literals will be preserved.\n\n"
 
    "@param text The data we are writing out to file."
-   
+
    "@tsexample\n"
    "// Create a file object for writing\n"
    "%fileWrite = new FileObject();\n\n"
@@ -372,11 +372,11 @@ DefineEngineMethod( FileObject, writeLine, void, ( const char* text ),,
 
 DefineEngineMethod( FileObject, close, void, (),,
    "@brief Close the file.\n\n"
-   
+
    "It is EXTREMELY important that you call this function when you are finished reading or writing to a file. "
    "Failing to do so is not only a bad programming practice, but could result in bad data or corrupt files. "
    "Remember: Open, Read/Write, Close, Delete...in that order!\n\n"
-   
+
    "@tsexample\n"
    "// Create a file object for reading\n"
    "%fileRead = new FileObject();\n\n"
@@ -402,13 +402,13 @@ DefineEngineMethod( FileObject, close, void, (),,
 
 static ConsoleDocFragment _FileObjectwriteObject1(
    "@brief Write an object to a text file.\n\n"
-   
+
    "Unlike a simple writeLine using specified strings, this function writes an entire object "
    "to file, preserving its type, name, and properties. This is similar to the save() functionality of "
    "the SimObject class, but with a bit more control.\n\n"
-   
+
    "@param object The SimObject being written to file, properties, name, and all.\n"
-   
+
    "@tsexample\n"
    "// Let's assume this SpawnSphere was created and currently\n"
    "// exists in the running level\n"
@@ -434,7 +434,7 @@ static ConsoleDocFragment _FileObjectwriteObject1(
    "// Write out the TestSphere\n"
    "%fileWrite.writeObject(TestSphere);\n\n"
    "// Close the text file\n"
-   "%fileWrite.close();\n\n"   
+   "%fileWrite.close();\n\n"
    "// Cleanup\n"
    "%fileWrite.delete();\n"
    "@endtsexample\n\n\n",
@@ -443,14 +443,14 @@ static ConsoleDocFragment _FileObjectwriteObject1(
 
 static ConsoleDocFragment _FileObjectwriteObject2(
    "@brief Write an object to a text file, with some data added first.\n\n"
-   
+
    "Unlike a simple writeLine using specified strings, this function writes an entire object "
    "to file, preserving its type, name, and properties. This is similar to the save() functionality of "
    "the SimObject class, but with a bit more control.\n\n"
-   
+
    "@param object The SimObject being written to file, properties, name, and all.\n"
    "@param prepend Data or text that is written out before the SimObject.\n\n"
-   
+
    "@tsexample\n"
    "// Let's assume this SpawnSphere was created and currently\n"
    "// exists in the running level\n"
@@ -476,14 +476,14 @@ static ConsoleDocFragment _FileObjectwriteObject2(
    "// Write out the TestSphere, with a prefix\n"
    "%fileWrite.writeObject(TestSphere, \"$mySphere = \");\n\n"
    "// Close the text file\n"
-   "%fileWrite.close();\n\n"   
+   "%fileWrite.close();\n\n"
    "// Cleanup\n"
    "%fileWrite.delete();\n"
    "@endtsexample\n\n\n",
    "FileObject",
    "void writeObject( SimObject* object, string prepend);");
 
-ConsoleMethod( FileObject, writeObject, void, 3, 4, "FileObject.writeObject(SimObject, object prepend)" 
+ConsoleMethod( FileObject, writeObject, void, 3, 4, "FileObject.writeObject(SimObject, object prepend)"
 			  "@hide")
 {
    SimObject* obj = Sim::findObject( argv[2] );

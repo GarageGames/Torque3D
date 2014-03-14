@@ -34,7 +34,7 @@
 #endif
 #ifndef _FORESTITEM_H_
 #include "forest/forestItem.h"
-#endif 
+#endif
 #ifndef _TSINGLETON_H_
 #include "core/util/tSingleton.h"
 #endif
@@ -43,9 +43,9 @@ struct TreePlacementInfo
 {
    F32 scale;
    Point3F pos;
-   ForestItemKey itemKey; 
+   ForestItemKey itemKey;
    ForestItemData *dataBlock;
-}; 
+};
 
 class ForestWindMgr : public virtual ITickable
 {
@@ -64,7 +64,7 @@ protected:
 
    virtual void interpolateTick( F32 delta ) {};
    virtual void processTick();
-   virtual void advanceTime( F32 timeDelta ) {};   
+   virtual void advanceTime( F32 timeDelta ) {};
 
 public:
 
@@ -75,7 +75,7 @@ public:
 
    void removeEmitter( ForestWindEmitter *emitter );
 
-   void updateWind(  const Point3F &camPos, 
+   void updateWind(  const Point3F &camPos,
                      const TreePlacementInfo &info,
                      F32 timeDelta );
 
@@ -92,7 +92,7 @@ public:
    static void initConsole();
 
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "ForestWindMgr"; }    
+   static const char* getSingletonName() { return "ForestWindMgr"; }
 };
 
 /// Returns the ReflectionManager singleton.

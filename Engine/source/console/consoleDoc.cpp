@@ -62,7 +62,7 @@ DefineConsoleFunction(dumpConsoleFunctions, void, ( bool dumpScript, bool dumpEn
 ConsoleFunctionGroupEnd(ConsoleDoc);
 
 /// Helper table to convert type ids to human readable names.
-const char *typeNames[] = 
+const char *typeNames[] =
 {
       "Script",
       "string",
@@ -77,7 +77,7 @@ const char *typeNames[] =
 
 void printClassHeader(const char* usage, const char * className, const char * superClassName, const bool stub)
 {
-   if(stub) 
+   if(stub)
    {
       Con::printf("/// Stub class");
       Con::printf("/// ");
@@ -100,7 +100,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
       // fetch first line end
       char *newLine = dStrchr( usageStr, '\n' );
       char *usagePtr = usageStr;
-      do 
+      do
       {
          // Copy of one line
          static char lineStr[2048] = {0};
@@ -115,7 +115,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
             *newLine = '\0';
             newLine ++;
          }
-         
+
          // Copy line and update usagePtr
          dStrcpy( lineStr, usagePtr );
          usagePtr = (newLine != NULL ) ? newLine : usagePtr;
@@ -242,7 +242,7 @@ void Namespace::printNamespaceEntries(Namespace * g, bool dumpScript, bool dumpE
       {
          if(!inGroup)
             printGroupStart(ewalk->cb.mGroupName, ewalk->mUsage);
-         else 
+         else
             printGroupEnd();
 
          inGroup = !inGroup;
@@ -530,7 +530,7 @@ void Namespace::dumpFunctions( bool dumpScript, bool dumpEngine )
 
    printClassHeader(NULL, NULL,NULL, false);
 
-   while(g) 
+   while(g)
    {
       printNamespaceEntries(g, dumpScript, dumpEngine );
       g = g->mParent;

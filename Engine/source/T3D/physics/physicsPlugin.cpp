@@ -46,11 +46,11 @@ String PhysicsPlugin::smClientWorldName( "client" );
 
 AFTER_MODULE_INIT( Sim )
 {
-   Con::addVariable( "$Physics::isSinglePlayer", TypeBool, &PhysicsPlugin::smSinglePlayer, 
+   Con::addVariable( "$Physics::isSinglePlayer", TypeBool, &PhysicsPlugin::smSinglePlayer,
       "@brief Informs the physics simulation if only a single player exists.\n\n"
       "If true, optimizations will be implemented to better cater to a single player environmnent.\n\n"
 	   "@ingroup Physics\n");
-   Con::addVariable( "$pref::Physics::threadCount", TypeS32, &PhysicsPlugin::smThreadCount, 
+   Con::addVariable( "$pref::Physics::threadCount", TypeS32, &PhysicsPlugin::smThreadCount,
       "@brief Number of threads to use in a single pass of the physics engine.\n\n"
       "Defaults to 2 if not set.\n\n"
 	   "@ingroup Physics\n");
@@ -62,7 +62,7 @@ bool PhysicsPlugin::activate( const char *library )
    if ( smSingleton )
    {
       smSingleton->destroyPlugin();
-      AssertFatal( smSingleton == NULL, 
+      AssertFatal( smSingleton == NULL,
          "PhysicsPlugin::activate - destroyPlugin didn't delete the plugin!" );
    }
 
@@ -85,13 +85,13 @@ PhysicsPlugin::PhysicsPlugin()
    mPhysicsCleanup = new SimSet();
    mPhysicsCleanup->assignName( "PhysicsCleanupSet" );
    mPhysicsCleanup->registerObject();
-   Sim::getRootGroup()->addObject( mPhysicsCleanup );   
+   Sim::getRootGroup()->addObject( mPhysicsCleanup );
 }
 
 PhysicsPlugin::~PhysicsPlugin()
 {
    AssertFatal( smSingleton == this, "PhysicsPlugin::~PhysicsPlugin() - Wrong active plugin!" );
-   
+
    if ( mPhysicsCleanup )
       mPhysicsCleanup->deleteObject();
 

@@ -51,7 +51,7 @@ struct TriggerData: public GameBaseData {
    bool isClientSide;
 
    TriggerData();
-   
+
    DECLARE_CONOBJECT(TriggerData);
 
    DECLARE_CALLBACK( void, onEnterTrigger, ( Trigger* trigger, GameBase* obj ) );
@@ -144,7 +144,7 @@ class Trigger : public GameBase
 
    void      potentialEnterObject(GameBase*);
    U32       getNumTriggeringObjects() const;
-   GameBase* getObject(const U32);   
+   GameBase* getObject(const U32);
    const Vector<GameBase*>& getObjects() const { return mObjects; }
 
    void renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );

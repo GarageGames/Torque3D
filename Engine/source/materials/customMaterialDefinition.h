@@ -41,18 +41,18 @@ public:
       MAX_PASSES = 8,
       NUM_FALLBACK_VERSIONS = 2,
    };
-   
+
    FileName mTexFilename[MAX_TEX_PER_PASS];
    String mSamplerNames[MAX_TEX_PER_PASS];
    String mOutputTarget;
    Material* mFallback;
    bool mForwardLit;
 
-   F32 mVersion;   // 0 = legacy, 1 = DX 8.1, 2 = DX 9.0   
-   bool mRefract;   
+   F32 mVersion;   // 0 = legacy, 1 = DX 8.1, 2 = DX 9.0
+   bool mRefract;
    ShaderData* mShaderData;
 
-   CustomMaterial();       
+   CustomMaterial();
    const GFXStateBlockData* getStateBlockData() const;
 
    //
@@ -69,7 +69,7 @@ public:
 protected:
    U32 mMaxTex;
    String mShaderDataName;
-   U32 mFlags[MAX_TEX_PER_PASS];   
+   U32 mFlags[MAX_TEX_PER_PASS];
    GFXStateBlockData* mStateBlockData;
 
    virtual void _mapMaterial();

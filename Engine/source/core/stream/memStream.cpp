@@ -175,7 +175,7 @@ bool MemStream::_write(const U32 in_numBytes, const void *in_pBuffer)
    if (in_numBytes == 0)
       return true;
 
-   if (hasCapability(StreamWrite) == false) 
+   if (hasCapability(StreamWrite) == false)
    {
       AssertWarn(0, "Writing is disallowed on this stream");
       setStatus(IllegalCall);
@@ -184,14 +184,14 @@ bool MemStream::_write(const U32 in_numBytes, const void *in_pBuffer)
 
    bool success     = true;
    U32  actualBytes = in_numBytes;
-   if ((mCurrentPosition + in_numBytes) > mBufferSize) 
+   if ((mCurrentPosition + in_numBytes) > mBufferSize)
    {
-      if ( mGrowSize > 0 ) 
+      if ( mGrowSize > 0 )
       {
          U32 growSize = (mCurrentPosition + in_numBytes) - mBufferSize;
          mBufferSize += growSize + ( mGrowSize - ( growSize % mGrowSize ) );
          mBufferBase = dRealloc( mBufferBase, mBufferSize );
-      } 
+      }
       else
       {
          success = false;
@@ -221,7 +221,7 @@ bool MemStream::_write(const U32 in_numBytes, const void *in_pBuffer)
 void *MemStream::takeBuffer()
 {
    void *buffer = mBufferBase;
-   
+
    mBufferBase = NULL;
    mBufferSize = 0;
    mStreamSize = 0;

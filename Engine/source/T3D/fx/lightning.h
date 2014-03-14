@@ -111,7 +111,7 @@ struct LightningBolt
 
    NodeManager mMajorNodes;
    Vector< NodeManager > mMinorNodes;
-   
+
    typedef Torque::List<LightningBolt> LightingBoltList;
    LightingBoltList splitList;
 

@@ -52,7 +52,7 @@ class SimObjectList : public VectorPtr<SimObject*>
    /// The SimObjectId comparision sort callback.
    /// @see sortId
    static S32 QSORT_CALLBACK _compareId( const void *a, const void *b );
-   
+
 public:
 
    bool pushBack(SimObject*);       ///< Add the SimObject* to the end of the list, unless it's already in the list.
@@ -61,13 +61,13 @@ public:
    bool remove(SimObject*);         ///< Remove the SimObject* from the list; may disrupt order of the list.
 
    SimObject* at(S32 index) const {  if(index >= 0 && index < size()) return (*this)[index]; return NULL; }
-   
+
    /// Remove the SimObject* from the list; guaranteed to preserve list order.
    bool removeStable(SimObject* pObject);
 
    /// Performs a simple sort by SimObjectId.
    void sortId();
-   
+
    /// Performs a sort of the objects in the set using a script
    /// callback function to do the comparision.
    /// @see SimSet::scriptSort

@@ -57,7 +57,7 @@ class TagDictionary
 public:
    TagDictionary();
    ~TagDictionary();
-   
+
 	//IO functions
 	//
    bool writeHeader(Stream &);
@@ -66,13 +66,13 @@ public:
    //
 
    bool addEntry(S32 value, StringTableEntry define, StringTableEntry string);
-   
+
    StringTableEntry defineToString(StringTableEntry tag);
    StringTableEntry idToString(S32 tag);
    StringTableEntry idToDefine(S32 tag);
    S32 defineToId(StringTableEntry tag);
 
-   // get IDs such that minID < IDs < maxID 
+   // get IDs such that minID < IDs < maxID
    void findIDs( Vector<S32> &v, const S32 minID, const S32 maxID );
 	void findStrings( Vector<S32> &v, const char *pattern);
 	void findDefines( Vector<S32> &v, const char *pattern);

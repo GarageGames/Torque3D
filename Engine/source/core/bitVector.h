@@ -35,7 +35,7 @@ class BitVector
       /// The allocated size of the bit array.
       U32 mByteSize;
 
-      /// The size of the vector in bits. 
+      /// The size of the vector in bits.
       U32 mSize;
 
       /// Returns a size in bytes which is 32bit aligned
@@ -52,14 +52,14 @@ class BitVector
       /// Default constructor which creates an bit
       /// vector with a bit size of zero.
       BitVector();
-      
+
       /// Constructs a bit vector with the desired size.
       /// @note The resulting vector is not cleared.
       BitVector( U32 sizeInBits );
 
       /// Copy constructor
       BitVector( const BitVector &r);
-      
+
       /// Destructor.
       ~BitVector();
 
@@ -68,9 +68,9 @@ class BitVector
 
       /// Return true if the bit vector is empty.
       bool empty() const { return ( mSize == 0 ); }
-      
+
       /// Resizes the bit vector.
-      /// @note The new bits in the vector are not cleared and 
+      /// @note The new bits in the vector are not cleared and
       /// contain random garbage bits.
       void setSize( U32 sizeInBits );
 
@@ -133,7 +133,7 @@ class BitVector
 
       /// Return true if all bits are set.
       bool testAll() const;
-      
+
       /// Return true if all bits are clear.
       bool testAllClear() const;
 

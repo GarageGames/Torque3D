@@ -71,7 +71,7 @@
       minSize = "50 50";
       EdgeSnap = "1";
       text = "Rivers";
-      
+
       /*
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
@@ -96,7 +96,7 @@
          text = "";
          useMouseEvents = "0";
       };
-   
+
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "DeleteSelection";
@@ -120,7 +120,7 @@
          text = "";
          useMouseEvents = "0";
       };
-      
+
       */
       new GuiContainer(){
          profile = "ToolsGuiDefaultProfile";
@@ -131,7 +131,7 @@
          HorizSizing = "width";
          VertSizing = "height";
          isContainer = "1";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -199,7 +199,7 @@
       Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
-      Position = getWord($pref::Video::mode, 0) - 209 
+      Position = getWord($pref::Video::mode, 0) - 209
          SPC getWord(EditorGuiToolbar.extent, 1) + getWord(RiverEditorTreeWindow.extent, 1) - 2;
       Extent = "210 530";
       MinExtent = "210 300";
@@ -222,7 +222,7 @@
       minSize = "50 50";
       EdgeSnap = "1";
       text = "Properties";
-      
+
       new GuiContainer(){ //Node Properties
          isContainer = "1";
          Profile = "inspectorStyleRolloutDarkProfile";
@@ -232,7 +232,7 @@
          Extent = "202 85";
          Docking = "Top";
          Margin = "3 3 3 3";
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
@@ -241,7 +241,7 @@
             Extent = "86 18";
             text = "Node Properties";
          };
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiTextRightProfile";
             HorizSizing = "right";
@@ -324,7 +324,7 @@
          Extent = "202 31";
          Docking = "Top";
          Margin = "0 0 3 3";
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
@@ -406,7 +406,7 @@
          useURLMouseCursor = "0";
       };
    };
-   
+
 };
 
 //--- OBJECT WRITE END ---

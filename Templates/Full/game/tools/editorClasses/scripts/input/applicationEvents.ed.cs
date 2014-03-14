@@ -36,7 +36,7 @@ function onClosePressed()
 function onPreExit()
 {
    //error("% Application Close - quit called or quit message received"");
-   Input::GetEventManager().postEvent( "BeginShutdown" );   
+   Input::GetEventManager().postEvent( "BeginShutdown" );
 }
 
 function onWindowFocusChange( %focused )

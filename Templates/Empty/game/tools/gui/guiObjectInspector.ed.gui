@@ -92,7 +92,7 @@
             class = "GuiObjectInspectorTreeFilter";
             internalName = "FilterText";
          };
-         
+
          new GuiBitmapButtonCtrl() {
             bitmap = "tools/gui/images/clear-icon";
             groupNum = "-1";
@@ -113,7 +113,7 @@
             superClass = "GuiTreeViewFilterClearButton";
             class = "GuiObjectInspectorTreeFilterClearButton";
          };
-         
+
          new GuiScrollCtrl() {
             willFirstRespond = "1";
             hScrollBar = "dynamic";
@@ -141,7 +141,7 @@
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
-                     
+
             new GuiTreeViewCtrl() {
                tabSize = "16";
                textOffset = "2";

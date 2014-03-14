@@ -37,18 +37,18 @@ ConsoleDocClass( EventManager,
 
    "@tsexample\n"
   "// Create the EventManager.\n"
-  "$MyEventManager = new EventManager() { queue = \"MyEventManager\"; };\n\n" 
-  "// Create an event.\n" 
-  "$MyEventManager.registerEvent( \"SomeCoolEvent\" );\n\n"  
-  "// Create a listener and subscribe.\n" 
-  "$MyListener = new ScriptMsgListener() { class = MyListener; };\n" 
-  "$MyEventManager.subscribe( $MyListener, \"SomeCoolEvent\" );\n\n"  
-  "function MyListener::onSomeCoolEvent( %this, %data )\n" 
-  "{\n" 
-  "	  echo( \"onSomeCoolEvent Triggered\" );\n" 
-  "}\n\n"  
-  "// Trigger the event.\n" 
-  "$MyEventManager.postEvent( \"SomeCoolEvent\", \"Data\" );\n" 
+  "$MyEventManager = new EventManager() { queue = \"MyEventManager\"; };\n\n"
+  "// Create an event.\n"
+  "$MyEventManager.registerEvent( \"SomeCoolEvent\" );\n\n"
+  "// Create a listener and subscribe.\n"
+  "$MyListener = new ScriptMsgListener() { class = MyListener; };\n"
+  "$MyEventManager.subscribe( $MyListener, \"SomeCoolEvent\" );\n\n"
+  "function MyListener::onSomeCoolEvent( %this, %data )\n"
+  "{\n"
+  "	  echo( \"onSomeCoolEvent Triggered\" );\n"
+  "}\n\n"
+  "// Trigger the event.\n"
+  "$MyEventManager.postEvent( \"SomeCoolEvent\", \"Data\" );\n"
    "@endtsexample\n\n"
 
    "@see ScriptMsgListener\n\n"
@@ -61,7 +61,7 @@ Vector<EventManager*> EventManager::smEventManagers;
 //-----------------------------------------------------------------------------
 /// Gets a list of all listeners of a specific event type and executes a
 /// callback on each one.
-/// 
+///
 /// @param event The name of the event that was triggered.
 /// @param data The data associated with the event.
 /// @return true to allow other listeners to receive the event, false otherwise
@@ -129,7 +129,7 @@ void EventManager::initPersistFields()
 
 //-----------------------------------------------------------------------------
 /// Registers the message queue and listener with the messaging system.
-/// 
+///
 /// @param queue The name of the queue. Set to "" to destroy the queue.
 //-----------------------------------------------------------------------------
 void EventManager::setMessageQueue( const char* queue )
@@ -153,7 +153,7 @@ void EventManager::setMessageQueue( const char* queue )
 
 //-----------------------------------------------------------------------------
 /// Determines whether or not an event is registered with the EventManager.
-/// 
+///
 /// @param event the event to check.
 //-----------------------------------------------------------------------------
 bool EventManager::isRegisteredEvent( const char* event )
@@ -173,7 +173,7 @@ bool EventManager::isRegisteredEvent( const char* event )
 
 //-----------------------------------------------------------------------------
 /// Register an event with the EventManager.
-/// 
+///
 /// @param event The event to register.
 /// @return Whether or not the event was successfully registered.
 //-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ void EventManager::unregisterAllEvents()
 
 //-----------------------------------------------------------------------------
 /// Removes an event from the EventManager.
-/// 
+///
 /// @param event The event to remove.
 //-----------------------------------------------------------------------------
 void EventManager::unregisterEvent( const char* event )
@@ -244,7 +244,7 @@ void EventManager::unregisterEvent( const char* event )
 
 //-----------------------------------------------------------------------------
 /// Post an event to the EventManager's queue.
-/// 
+///
 /// @param event The event to post.
 /// @param data Various data associated with the event.
 /// @return Whether or not the message was dispatched successfully.
@@ -257,7 +257,7 @@ bool EventManager::postEvent( const char* event, const char* data )
 
 //-----------------------------------------------------------------------------
 /// Subscribe a listener to an event.
-/// 
+///
 /// @param listener The listener to subscribe.
 /// @param event The event to subscribe to.
 /// @param callback Optional callback name to be called when the event is
@@ -316,7 +316,7 @@ bool EventManager::subscribe(SimObject *callbackObj, const char* event, const ch
 
 //-----------------------------------------------------------------------------
 /// remove a listener from an event.
-/// 
+///
 /// @param listener The listener to remove from an event callback list.
 /// @param event The event to remove the listener from.
 //-----------------------------------------------------------------------------
@@ -382,7 +382,7 @@ void EventManager::dumpEvents()
 
 //-----------------------------------------------------------------------------
 /// Print the subscribers to an event.
-/// 
+///
 /// @param event The event whose subscribers are to be printed.
 //-----------------------------------------------------------------------------
 void EventManager::dumpSubscribers( const char* event )

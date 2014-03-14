@@ -161,7 +161,7 @@ void CameraFXManager::removeFX( CameraFX *fx )
          return;
       }
    }
-   
+
    return;
 }
 

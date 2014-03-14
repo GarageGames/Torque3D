@@ -15,7 +15,7 @@
    hovertime = "1000";
    isClosed = "0";
    isDynamic = "0";
-  
+
    new GuiDynamicCtrlArrayControl(ToolsToolbarArray) {
       canSaveDynamicFields = "0";
       Enabled = "1";

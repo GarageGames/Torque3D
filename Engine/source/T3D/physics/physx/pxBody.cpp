@@ -67,10 +67,10 @@ void PxBody::_releaseActor()
    mColShape = NULL;
 }
 
-bool PxBody::init(   PhysicsCollision *shape, 
+bool PxBody::init(   PhysicsCollision *shape,
                      F32 mass,
                      U32 bodyFlags,
-                     SceneObject *obj, 
+                     SceneObject *obj,
                      PhysicsWorld *world )
 {
    AssertFatal( obj, "PxBody::init - Got a null scene object!" );
@@ -79,7 +79,7 @@ bool PxBody::init(   PhysicsCollision *shape,
    AssertFatal( shape, "PxBody::init - Got a null collision shape!" );
    AssertFatal( dynamic_cast<PxCollision*>( shape ), "PxBody::init - The collision shape is the wrong type!" );
    AssertFatal( !((PxCollision*)shape)->getShapes().empty(), "PxBody::init - Got empty collision shape!" );
-	 
+
    // Cleanup any previous actor.
    _releaseActor();
 
@@ -118,7 +118,7 @@ bool PxBody::init(   PhysicsCollision *shape,
    {
       NxShapeDesc *desc = shapes[i];
 
-      // If this hits then something is broken with 
+      // If this hits then something is broken with
       // this descrption... check all the fields to be
       // sure their values are correctly filled out.
       AssertFatal( desc->isValid(), "PxBody::init - Got invalid shape description!" );
@@ -150,7 +150,7 @@ bool PxBody::init(   PhysicsCollision *shape,
 }
 
 void PxBody::setMaterial(  F32 restitution,
-                           F32 friction, 
+                           F32 friction,
                            F32 staticFriction )
 {
    AssertFatal( mActor, "PxBody::setMaterial - The actor is null!" );
@@ -209,8 +209,8 @@ void PxBody::getState( PhysicsState *outState )
 
    outState->position = pxCast<Point3F>( mActor->getGlobalPosition() );
    outState->orientation = pxCast<QuatF>( mActor->getGlobalOrientationQuat() );
-   outState->linVelocity = pxCast<Point3F>( mActor->getLinearVelocity() ); 
-   outState->angVelocity = pxCast<Point3F>( mActor->getAngularVelocity() ); 
+   outState->linVelocity = pxCast<Point3F>( mActor->getLinearVelocity() );
+   outState->angVelocity = pxCast<Point3F>( mActor->getAngularVelocity() );
    outState->sleeping = mActor->isSleeping();
    outState->momentum = pxCast<Point3F>( mActor->getLinearMomentum() );
 }
@@ -276,14 +276,14 @@ bool PxBody::isDynamic() const
    return mActor->isDynamic() && ( mBodyFlags & BF_KINEMATIC ) == 0;
 }
 
-PhysicsWorld* PxBody::getWorld() 
+PhysicsWorld* PxBody::getWorld()
 {
-   return mWorld; 
+   return mWorld;
 }
 
-PhysicsCollision* PxBody::getColShape() 
-{ 
-   return mColShape; 
+PhysicsCollision* PxBody::getColShape()
+{
+   return mColShape;
 }
 
 MatrixF& PxBody::getTransform( MatrixF *outMatrix )
@@ -298,9 +298,9 @@ MatrixF& PxBody::getTransform( MatrixF *outMatrix )
 Box3F PxBody::getWorldBounds()
 {
    AssertFatal( mActor, "PxBody::getTransform - The actor is null!" );
-   
+
    NxBounds3 bounds;
-   bounds.setEmpty();   
+   bounds.setEmpty();
    NxBounds3 shapeBounds;
 
    NxShape *const* pShapeArray = mActor->getShapes();
@@ -312,7 +312,7 @@ Box3F PxBody::getWorldBounds()
       pShapeArray[i]->getWorldBounds( shapeBounds );
 
       // Combine them into the total bounds.
-      bounds.combine( shapeBounds );   
+      bounds.combine( shapeBounds );
    }
 
    return pxCast<Box3F>( bounds );
@@ -322,13 +322,13 @@ void PxBody::setSimulationEnabled( bool enabled )
 {
    if ( mIsEnabled == enabled )
       return;
-  
+
    // This sucks, but it has to happen if we want
    // to avoid write lock errors from PhysX right now.
    mWorld->releaseWriteLock();
 
    if ( enabled )
-   {      
+   {
       mIsEnabled = true;
       mActor->clearActorFlag( NX_AF_DISABLE_RESPONSE );
       mActor->clearActorFlag( NX_AF_DISABLE_COLLISION );
@@ -363,7 +363,7 @@ void PxBody::setTransform( const MatrixF &transform )
 
    NxMat34 xfm;
    xfm.setRowMajor44( transform );
-   mActor->setGlobalPose( xfm ); 
+   mActor->setGlobalPose( xfm );
 
    // If its dynamic we have more to do.
    if ( mActor->isDynamic() && !mActor->readBodyFlag( NX_BF_KINEMATIC ) )
@@ -385,7 +385,7 @@ void PxBody::applyCorrection( const MatrixF &transform )
 
    NxMat34 xfm;
    xfm.setRowMajor44( transform );
-   mActor->setGlobalPose( xfm ); 
+   mActor->setGlobalPose( xfm );
 }
 
 void PxBody::applyImpulse( const Point3F &origin, const Point3F &force )
@@ -397,7 +397,7 @@ void PxBody::applyImpulse( const Point3F &origin, const Point3F &force )
    mWorld->releaseWriteLock();
 
    if ( mIsEnabled && isDynamic() )
-      mActor->addForceAtPos(  pxCast<NxVec3>( force ), 
+      mActor->addForceAtPos(  pxCast<NxVec3>( force ),
                               pxCast<NxVec3>( origin ),
                               NX_IMPULSE );
 }

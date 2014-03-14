@@ -24,7 +24,7 @@
       VertSizing = "windowRelative";
       Extent = "210 251 ";
       MinExtent = "210 150";
-      Position = getWord($pref::Video::mode, 0) - 209 
+      Position = getWord($pref::Video::mode, 0) - 209
          SPC getWord(EditorGuiToolbar.extent, 1)-1;
       canSave = "1";
       Visible = "1";
@@ -45,7 +45,7 @@
       minSize = "50 50";
       EdgeSnap = "1";
       text = "Material Preview";
-      
+
       /*new GuiContainer(MaterialEditorPreviewPane) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -67,7 +67,7 @@
          AnchorBottom = "0";
          AnchorLeft = "1";
          AnchorRight = "0";*/
-         
+
          new GuiContainer(matEd_previewPanel) {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -83,7 +83,7 @@
             hovertime = "1000";
             Docking = "Client";
             Margin = "24 1 3 3 ";
-            
+
 
             new GuiSwatchButtonCtrl(matEd_previewBackground) {
                canSaveDynamicFields = "0";
@@ -132,7 +132,7 @@
             };
          //};
       };
-      
+
       new GuiPopUpMenuCtrl(matEd_quickPreview_Popup) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -173,14 +173,14 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         Command = "getColorF($thisControl.color, \"MaterialEditorGui.updatePreviewBackground\");"; 
+         Command = "getColorF($thisControl.color, \"MaterialEditorGui.updatePreviewBackground\");";
          color = "0 0 0 .8";
          hovertime = "1000";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       // Ambient light color picker
       new GuiSwatchButtonCtrl(matEd_ambientLightColorPicker) {
          canSaveDynamicFields = "0";
@@ -223,7 +223,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiCheckboxCtrl(){
          position = "108 25";
          Extent = "98 18";

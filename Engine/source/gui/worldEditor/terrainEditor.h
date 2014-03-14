@@ -107,7 +107,7 @@ protected:
 
    TerrainEditor *   mTerrainEditor;
    Point2I           mSize;
-   GridPoint         mGridPoint;         
+   GridPoint         mGridPoint;
    Vector<S32>       mRenderList;
 
 public:
@@ -131,10 +131,10 @@ public:
    virtual void setSize(const Point2I & size){mSize = size;}
 
    void update();
-   void render();            
+   void render();
 
-   virtual void rebuild() = 0;            
-   virtual void _renderOutline() = 0;      
+   virtual void rebuild() = 0;
+   virtual void _renderOutline() = 0;
 };
 
 class BoxBrush : public Brush
@@ -142,7 +142,7 @@ class BoxBrush : public Brush
 public:
 
    BoxBrush(TerrainEditor * editor) : Brush(editor){}
-   
+
    const char *getType() const { return "box"; }
    void rebuild();
 
@@ -156,7 +156,7 @@ class EllipseBrush : public Brush
 public:
 
    EllipseBrush(TerrainEditor * editor) : Brush(editor){}
-   
+
    const char *getType() const { return "ellipse"; }
    void rebuild();
 
@@ -190,7 +190,7 @@ class TerrainEditor : public EditTSCtrl
 	public:
 		void attachTerrain(TerrainBlock *terrBlock);
       void detachTerrain(TerrainBlock *terrBlock);
-		
+
       S32 getTerrainBlockCount() {return mTerrainBlocks.size();}
       TerrainBlock* getTerrainBlock(S32 index);
       void getTerrainBlocksMaterialList(Vector<StringTableEntry>& list);   // Returns consolidated list of all materials used on all terrain blocks
@@ -201,38 +201,38 @@ class TerrainEditor : public EditTSCtrl
 		void setBrushSize(S32 w, S32 h);
 		const char* getBrushPos();
 		void setBrushPos(Point2I pos);
-		
+
 		void setAction(const char* action);
 		const char* getActionName(U32 index);
 		const char* getCurrentAction() const;
 		S32 getNumActions();
 		void processAction(const char* sAction);
-			
+
 		void resetSelWeights(bool clear);
 		void clearSelection();
-		
+
 		S32 getNumTextures();
 
 		void markEmptySquares();
-		
+
 		void mirrorTerrain(S32 mirrorIndex);
-		
+
       TerrainBlock* getActiveTerrain() { return mActiveTerrain; };
 
       void scheduleGridUpdate() { mNeedsGridUpdate = true; }
       void scheduleMaterialUpdate() { mNeedsMaterialUpdate = true; }
-      void setGridUpdateMinMax() 
-      { 
+      void setGridUpdateMinMax()
+      {
          mGridUpdateMax.set( S32_MAX, S32_MAX );
          mGridUpdateMin.set( 0, 0 );
       }
-      
+
       void submitMaterialUndo( String actionName );
       void onMaterialUndo( TerrainBlock *terr );
 
       void autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope );
 
-	private:	
+	private:
 
       typedef EditTSCtrl Parent;
 
@@ -240,7 +240,7 @@ class TerrainEditor : public EditTSCtrl
 
       // A list of all of the TerrainBlocks this editor can edit
       VectorPtr<TerrainBlock*> mTerrainBlocks;
-      
+
       Point2I  mGridUpdateMin;
       Point2I  mGridUpdateMax;
       U32 mMouseDownSeq;
@@ -265,8 +265,8 @@ class TerrainEditor : public EditTSCtrl
       TerrainAction *            mCurrentAction;
       bool                       mInAction;
       Selection                  mDefaultSel;
-      bool                       mSelectionLocked;      
-      
+      bool                       mSelectionLocked;
+
       S32                        mPaintIndex;
 
       Selection *                mCurrentSel;
@@ -275,7 +275,7 @@ class TerrainEditor : public EditTSCtrl
       {
       public:
 
-         TerrainEditorUndoAction( const UTF8* actionName ) 
+         TerrainEditorUndoAction( const UTF8* actionName )
             :  UndoAction( actionName ),
                mTerrainEditor( NULL ),
                mSel( NULL )
@@ -290,7 +290,7 @@ class TerrainEditor : public EditTSCtrl
          TerrainEditor *mTerrainEditor;
 
          Selection *mSel;
-         
+
          virtual void undo();
          virtual void redo() { undo(); }
       };
@@ -312,7 +312,7 @@ class TerrainEditor : public EditTSCtrl
 
          TerrainEditor *mEditor;
          TerrainBlock *mTerrain;
-         Vector<U8> mLayerMap;         
+         Vector<U8> mLayerMap;
          Vector<TerrainMaterial*> mMaterials;
 
          virtual void undo();
@@ -377,12 +377,12 @@ class TerrainEditor : public EditTSCtrl
 
       void setBrushPressure( F32 pressure );
       F32 getBrushPressure() const { return mBrushPressure; }
-      
+
       void setBrushSoftness( F32 softness );
       F32 getBrushSoftness() const { return mBrushSoftness; }
 
       Point2I getBrushSize() { return(mBrushSize); }
-      
+
       TerrainBlock* getTerrainBlock() const { return mActiveTerrain; }
       TerrainBlock* getClientTerrain( TerrainBlock *serverTerrain = NULL ) const;
       bool terrainBlockValid() { return(mActiveTerrain ? true : false); }
@@ -413,7 +413,7 @@ class TerrainEditor : public EditTSCtrl
       void setGridMaterialGroup(const GridPoint & gPoint, U8 group);
 
       //
-      void updateBrush(Brush & brush, const Point2I & gPos);      
+      void updateBrush(Brush & brush, const Point2I & gPos);
 
       //
       void renderSelection(const Selection & sel, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone, bool renderFill, bool renderFrame);
@@ -421,7 +421,7 @@ class TerrainEditor : public EditTSCtrl
       void renderBorder();
 
    public:
-      
+
       // persist field data - these are dynamic
       bool                 mRenderBorder;
       F32                  mBorderHeight;
@@ -459,7 +459,7 @@ class TerrainEditor : public EditTSCtrl
 
       // GuiControl
       bool onWake();
-      void onSleep();      
+      void onSleep();
 
       // EditTSCtrl
       bool onInputEvent( const InputEventInfo & evt );
@@ -468,8 +468,8 @@ class TerrainEditor : public EditTSCtrl
       void on3DMouseMove( const Gui3DMouseEvent & evt );
       void on3DMouseDragged( const Gui3DMouseEvent & evt );
       bool onMouseWheelUp( const GuiEvent & evt );
-      bool onMouseWheelDown( const GuiEvent & evt );            
-      void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &evt );   
+      bool onMouseWheelDown( const GuiEvent & evt );
+      void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &evt );
       void onPreRender();
       void renderScene(const RectI & updateRect);
       void renderGui( Point2I offset, const RectI &updateRect );
@@ -488,7 +488,7 @@ class TerrainEditor : public EditTSCtrl
       void renderPoints( const Vector<GFXVertexPCT> &pointList );
 
 
-      DECLARE_CONOBJECT(TerrainEditor);     
+      DECLARE_CONOBJECT(TerrainEditor);
 };
 
 inline void TerrainEditor::setGridInfoHeight(const GridInfo & info)

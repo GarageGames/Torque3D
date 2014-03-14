@@ -58,8 +58,8 @@ void SingleLightShadowMap::_render( RenderPassManager* renderPass,
    {
       mTexSize = texSize;
 
-      mShadowMapTex.set(   mTexSize, mTexSize, 
-                           ShadowMapFormat, &ShadowMapProfile, 
+      mShadowMapTex.set(   mTexSize, mTexSize,
+                           ShadowMapFormat, &ShadowMapProfile,
                            "SingleLightShadowMap" );
    }
 
@@ -77,13 +77,13 @@ void SingleLightShadowMap::_render( RenderPassManager* renderPass,
    // Render the shadowmap!
    GFX->pushActiveRenderTarget();
    mTarget->attachTexture( GFXTextureTarget::Color0, mShadowMapTex );
-   mTarget->attachTexture( GFXTextureTarget::DepthStencil, 
+   mTarget->attachTexture( GFXTextureTarget::DepthStencil,
       _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() ) );
    GFX->setActiveRenderTarget(mTarget);
    GFX->clear(GFXClearStencil | GFXClearZBuffer | GFXClearTarget, ColorI(255,255,255), 1.0f, 0);
 
    SceneManager* sceneManager = diffuseState->getSceneManager();
-   
+
    SceneRenderState shadowRenderState
    (
       sceneManager,
@@ -109,16 +109,16 @@ void SingleLightShadowMap::_render( RenderPassManager* renderPass,
 void SingleLightShadowMap::setShaderParameters(GFXShaderConstBuffer* params, LightingShaderConstants* lsc)
 {
    if ( lsc->mTapRotationTexSC->isValid() )
-      GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(), 
+      GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(),
                         SHADOWMGR->getTapRotationTex() );
 
    ShadowMapParams *p = mLight->getExtended<ShadowMapParams>();
 
    if ( lsc->mLightParamsSC->isValid() )
    {
-      Point4F lightParams( mLight->getRange().x, 
-                           p->overDarkFactor.x, 
-                           0.0f, 
+      Point4F lightParams( mLight->getRange().x,
+                           p->overDarkFactor.x,
+                           0.0f,
                            0.0f );
       params->set(lsc->mLightParamsSC, lightParams);
    }

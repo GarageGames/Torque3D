@@ -50,7 +50,7 @@
 #include "core/util/zip/zipVolume.h"
 #include "gfx/bitmap/gBitmap.h"
 
-// 
+//
 static DAE sDAE;                 // Collada model database (holds the last loaded file)
 static Torque::Path sLastPath;   // Path of the last loaded Collada file
 static FileTime sLastModTime;    // Modification time of the last loaded Collada file
@@ -293,7 +293,7 @@ void ColladaShapeLoader::enumerateScene()
       case ColladaUtils::ImportOptions::TrailingNumber:
          singleDetail = false;
          break;
-         
+
       default:
          break;
    }

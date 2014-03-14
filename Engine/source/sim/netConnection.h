@@ -235,7 +235,7 @@ public:
 
    DECLARE_ABSTRACT_CLASS( NetEvent, ConsoleObject );
    DECLARE_INSCOPE( NetAPI );
-   
+
    /// @name Implementation Details
    ///
    /// These are internal fields which you won't need to manipulate, except for mGuaranteeType.
@@ -481,9 +481,9 @@ private:
    /// @name Statistics
    /// @{
 
-   /// Last time a packet was sent in milliseconds. 
+   /// Last time a packet was sent in milliseconds.
    /// @see Platform::getVirtualMilliseconds()
-   U32 mLastUpdateTime; 
+   U32 mLastUpdateTime;
 
    F32 mRoundTripTime;
    F32 mPacketLoss;
@@ -810,7 +810,7 @@ protected:
    virtual void ghostWriteExtra(NetObject *,BitStream *) {}
    virtual void ghostReadExtra(NetObject *,BitStream *, bool newGhost) {}
    virtual void ghostPreRead(NetObject *, bool newGhost) {}
-   
+
    /// Called when 'EndGhosting' message is received from server.
    virtual void onEndGhosting() {}
 

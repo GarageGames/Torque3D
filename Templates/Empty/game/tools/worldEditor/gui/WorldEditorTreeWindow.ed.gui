@@ -44,7 +44,7 @@
       closeCommand = "EWTreeWindow.setVisible(false);";
       EdgeSnap = "1";
       text = "Scene Tree";
-      
+
       new GuiTabBookCtrl(EditorTreeTabBook) {
          canSaveDynamicFields = "0";
          isContainer = "1";
@@ -68,7 +68,7 @@
          TabPosition = "Top";
          TabMargin = "0";
          MinTabWidth = "64";
-         
+
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -100,7 +100,7 @@
                class = "GuiTreeViewFilterText";
                treeView = EditorTree;
             };
-            
+
             new GuiBitmapButtonCtrl() {
                bitmap = "tools/gui/images/clear-icon";
                groupNum = "-1";
@@ -121,7 +121,7 @@
                class = "GuiTreeViewFilterClearButton";
                textCtrl = EditorTreeFilter;
             };
-                              
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -198,7 +198,7 @@
             AnchorRight = "0";
             text = "Library";
             maxLength = "1024";
-            
+
             new GuiControl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -349,7 +349,7 @@
                   hovertime = "1000";
                   groupNum = "0";
                   buttonType = "PushButton";
-                  
+
                   Bitmap = "tools/gui/images/folderUp";
                   autoSize = "0";
                };
@@ -524,7 +524,7 @@
          text = "";
          useMouseEvents = "0";
       };
-      
+
       new GuiBitmapButtonCtrl(EWAddSimGroupButton) {
          canSaveDynamicFields = "0";
          internalName = "AddSimGroup";
@@ -548,7 +548,7 @@
          useMouseEvents = "0";
          useModifiers = "1";
       };
-      
+
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "DeleteSelection";

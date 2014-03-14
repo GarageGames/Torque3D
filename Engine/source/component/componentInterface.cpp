@@ -51,7 +51,7 @@ void ComponentInterfaceCache::clear()
 
 //------------------------------------------------------------------------------
 
-U32 ComponentInterfaceCache::enumerate( ComponentInterfaceList *list, const char *type /* = NULL */, 
+U32 ComponentInterfaceCache::enumerate( ComponentInterfaceList *list, const char *type /* = NULL */,
                                        const char *name /* = NULL  */, const SimComponent *owner /* = NULL */, bool notOwner /* = false */ ) const
 {
    U32 numMatches = 0;

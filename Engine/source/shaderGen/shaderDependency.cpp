@@ -27,7 +27,7 @@
 #include "core/frameAllocator.h"
 
 
-ShaderIncludeDependency::ShaderIncludeDependency( const Torque::Path &pathToInclude ) 
+ShaderIncludeDependency::ShaderIncludeDependency( const Torque::Path &pathToInclude )
    : mIncludePath( pathToInclude )
 {
 }

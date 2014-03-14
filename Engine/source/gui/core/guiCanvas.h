@@ -185,13 +185,13 @@ protected:
 
    static bool setProtectedNumFences( void *object, const char *index, const char *data );
    virtual void setupFences();
-   
+
    void checkLockMouseMove( const GuiEvent& event );
 
 public:
    DECLARE_CONOBJECT(GuiCanvas);
    DECLARE_CATEGORY( "Gui Core" );
-   
+
    GuiCanvas();
    virtual ~GuiCanvas();
 
@@ -215,7 +215,7 @@ public:
    /// Repaints the canvas skipping rendering if the target time
    /// has not yet elapsed.
    /// @param  elapsedMS The time since the last frame.
-   virtual void repaint(U32 elapsedMS);  
+   virtual void repaint(U32 elapsedMS);
 
    /// This signal is triggered at the beginning and end of each render frame
    ///
@@ -254,8 +254,8 @@ public:
 
    /// This returns the PlatformWindow owned by this Canvas
    virtual PlatformWindow *getPlatformWindow()
-   { 
-      return mPlatformWindow; 
+   {
+      return mPlatformWindow;
    }
 
    /// This sets the content control to something different
@@ -329,7 +329,7 @@ public:
 
    ///used by the tooltip resource
    Point2I getCursorExtent() { return mDefaultCursor->getExtent(); }
- 
+
    /// @name Input Processing
    /// @{
 
@@ -422,7 +422,7 @@ public:
    virtual void setNativeAcceleratorsEnabled( bool enabled );
    /// @}
 
-   /// 
+   ///
    virtual Point2I getWindowSize();
 
    virtual void enableKeyboardTranslation();

@@ -35,7 +35,7 @@ singleton ShaderData( LightRayOccludeShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/lightRay/lightRayOccludeP.hlsl";
 
-   pixVersion = 3.0;   
+   pixVersion = 3.0;
 };
 
 singleton ShaderData( LightRayShader )
@@ -43,32 +43,32 @@ singleton ShaderData( LightRayShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/lightRay/lightRayP.hlsl";
 
-   pixVersion = 3.0;   
+   pixVersion = 3.0;
 };
 
 singleton GFXStateBlockData( LightRayStateBlock : PFX_DefaultStateBlock )
 {
    samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;
-   samplerStates[1] = SamplerClampLinear;     
+   samplerStates[1] = SamplerClampLinear;
 };
 
 singleton PostEffect( LightRayPostFX )
 {
    isEnabled = false;
    allowReflectPass = false;
-        
+
    renderTime = "PFXBeforeBin";
    renderBin = "EditorBin";
    renderPriority = 10;
-      
+
    shader = LightRayOccludeShader;
    stateBlock = LightRayStateBlock;
    texture[0] = "$backBuffer";
    texture[1] = "#prepass";
    target = "$outTex";
    targetFormat = "GFXFormatR16G16B16A16F";
-      
+
    new PostEffect()
    {
       shader = LightRayShader;
@@ -81,14 +81,14 @@ singleton PostEffect( LightRayPostFX )
 };
 
 function LightRayPostFX::preProcess( %this )
-{   
+{
    %this.targetScale = $LightRayPostFX::resolutionScale SPC $LightRayPostFX::resolutionScale;
 }
 
 function LightRayPostFX::setShaderConsts( %this )
 {
    %this.setShaderConst( "$brightScalar", $LightRayPostFX::brightScalar );
-   
+
    %pfx = %this-->final;
    %pfx.setShaderConst( "$numSamples", $LightRayPostFX::numSamples );
    %pfx.setShaderConst( "$density", $LightRayPostFX::density );

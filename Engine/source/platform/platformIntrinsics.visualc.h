@@ -40,7 +40,7 @@
 // not all platforms (damn you OSX) can do that.
 //
 inline void dFetchAndAdd( volatile U32& ref, U32 val )
-{  
+{
    _InterlockedExchangeAdd( ( volatile long* ) &ref, val );
 }
 inline void dFetchAndAdd( volatile S32& ref, S32 val )

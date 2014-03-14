@@ -52,8 +52,8 @@ class Stream;
 
 
 /// This class defines the memory layout for a GenericConstBuffer.
-class GenericConstBufferLayout 
-{   
+class GenericConstBufferLayout
+{
 public:
    /// Describes the parameters we contain
    struct ParamDesc
@@ -114,10 +114,10 @@ public:
    /// Get the number of parameters
    inline U32 getParameterCount() const { return mParams.size(); }
 
-   /// Returns the ParamDesc of a parameter 
+   /// Returns the ParamDesc of a parameter
    bool getDesc(const String& name, ParamDesc& param) const;
 
-   /// Returns the ParamDesc of a parameter 
+   /// Returns the ParamDesc of a parameter
    bool getDesc(const U32 index, ParamDesc& param) const;
 
    /// Set a parameter, given a base pointer
@@ -139,7 +139,7 @@ protected:
 
    /// Vector of parameter descriptions.
    typedef Vector<ParamDesc> Params;
-   
+
    /// Vector of parameter descriptions.
    Params mParams;
    U32 mBufferSize;
@@ -151,7 +151,7 @@ protected:
 
 
 /// This class manages shader constant data in a system memory buffer.  It is
-/// used by device specific classes for batching together many constant changes 
+/// used by device specific classes for batching together many constant changes
 /// which are then copied to the device thru a single API call.
 ///
 /// @see GenericConstBufferLayout
@@ -188,9 +188,9 @@ public:
 
    inline void set( const GenericConstBufferLayout::ParamDesc& pd, const MatrixF& mat, const GFXShaderConstType matrixType )
    {
-      AssertFatal(   matrixType == GFXSCT_Float2x2 || 
-                     matrixType == GFXSCT_Float3x3 || 
-                     matrixType == GFXSCT_Float4x4, 
+      AssertFatal(   matrixType == GFXSCT_Float2x2 ||
+                     matrixType == GFXSCT_Float3x3 ||
+                     matrixType == GFXSCT_Float4x4,
          "GenericConstBuffer::set() - Invalid matrix type!" );
 
       internalSet( pd, matrixType, sizeof(MatrixF), &mat );
@@ -198,9 +198,9 @@ public:
 
    inline void set( const GenericConstBufferLayout::ParamDesc& pd, const MatrixF* mat, const U32 arraySize, const GFXShaderConstType matrixType )
    {
-      AssertFatal(   matrixType == GFXSCT_Float2x2 || 
-                     matrixType == GFXSCT_Float3x3 || 
-                     matrixType == GFXSCT_Float4x4, 
+      AssertFatal(   matrixType == GFXSCT_Float2x2 ||
+                     matrixType == GFXSCT_Float3x3 ||
+                     matrixType == GFXSCT_Float4x4,
          "GenericConstBuffer::set() - Invalid matrix type!" );
 
       internalSet( pd, matrixType, sizeof(MatrixF)*arraySize, mat );
@@ -213,7 +213,7 @@ public:
    /// Sets the entire buffer as dirty or clears the dirty state.
    inline void setDirty( bool dirty );
 
-   /// Returns true if the buffer has been modified since the 
+   /// Returns true if the buffer has been modified since the
    /// last call to getDirtyBuffer or setDirty.  The buffer is
    /// not dirty on initial creation.
    ///
@@ -221,7 +221,7 @@ public:
    /// @see setDirty
    inline bool isDirty() const { return mDirtyEnd != 0; }
 
-   /// Returns true if have the same layout and hold the same 
+   /// Returns true if have the same layout and hold the same
    /// data as the input buffer.
    inline bool isEqual( const GenericConstBuffer *buffer ) const;
 
@@ -229,7 +229,7 @@ public:
    inline GenericConstBufferLayout* getLayout() const { return mLayout; }
 
    #ifdef TORQUE_DEBUG
-   
+
       /// Helper function used to assert on unset constants.
       void assertUnassignedConstants( const char *shaderName );
 
@@ -243,9 +243,9 @@ protected:
    /// Called by the inlined set functions above to do the
    /// real dirty work of copying the data to the right location
    /// within the buffer.
-   inline void internalSet(   const GenericConstBufferLayout::ParamDesc &pd, 
-                              const GFXShaderConstType constType, 
-                              const U32 size, 
+   inline void internalSet(   const GenericConstBufferLayout::ParamDesc &pd,
+                              const GFXShaderConstType constType,
+                              const U32 size,
                               const void *data );
 
    /// The buffer layout.
@@ -267,8 +267,8 @@ protected:
 
 
    #ifdef TORQUE_DEBUG
-   
-      /// A vector used to keep track if a constant 
+
+      /// A vector used to keep track if a constant
       /// has beed assigned a value or not.
       ///
       /// @see assertUnassignedConstants
@@ -284,13 +284,13 @@ protected:
 //
 // You need a very good reason to consider changing them.
 
-inline void GenericConstBuffer::internalSet( const GenericConstBufferLayout::ParamDesc &pd, 
-                                             const GFXShaderConstType constType, 
-                                             const U32 size, 
+inline void GenericConstBuffer::internalSet( const GenericConstBufferLayout::ParamDesc &pd,
+                                             const GFXShaderConstType constType,
+                                             const U32 size,
                                              const void *data )
-{   
-   // NOTE: We should have never gotten here if the buffer 
-   // was null as no valid shader constant could have been 
+{
+   // NOTE: We should have never gotten here if the buffer
+   // was null as no valid shader constant could have been
    // assigned.
    //
    // If this happens its a bug in another part of the code.
@@ -300,7 +300,7 @@ inline void GenericConstBuffer::internalSet( const GenericConstBufferLayout::Par
    if ( mLayout->set( pd, constType, size, data, mBuffer ) )
    {
       #ifdef TORQUE_DEBUG
-         
+
          // Update the debug assignment tracking.
          mWasAssigned[ pd.index ] = true;
 
@@ -314,7 +314,7 @@ inline void GenericConstBuffer::internalSet( const GenericConstBufferLayout::Par
 }
 
 inline void GenericConstBuffer::setDirty( bool dirty )
-{ 
+{
    if ( !mBuffer )
       return;
 
@@ -349,7 +349,7 @@ inline const U8* GenericConstBuffer::getDirtyBuffer( U32 *start, U32 *size )
 }
 
 inline bool GenericConstBuffer::isEqual( const GenericConstBuffer *buffer ) const
-{      
+{
    U32 bsize = mLayout->getBufferSize();
    if ( bsize != buffer->mLayout->getBufferSize() )
       return false;

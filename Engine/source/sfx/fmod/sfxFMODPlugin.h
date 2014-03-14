@@ -38,9 +38,9 @@
 class SFXFMODPlugin : public SFXSystemPlugin
 {
    public:
-   
+
       typedef SFXSystemPlugin Parent;
-      
+
       ///
       virtual SFXSource* createSource( SFXTrack* track );
 };

@@ -34,26 +34,26 @@
 class BanList
 {
    public:
-   
+
       DECLARE_STATIC_CLASS( BanList );
-   
+
       struct BanInfo
       {
          S32      uniqueId;
          char     transportAddress[128];
          S32      bannedUntil;
       };
-      
+
    protected:
 
       Vector< BanInfo > list;
-      
+
       static BanList* smInstance;
 
    public:
 
       BanList();
-      
+
       static BanList* instance() { return smInstance; }
 
       void addBan(S32 uniqueId, const char *TA, S32 banTime);

@@ -63,56 +63,56 @@ class SFXSource;
 class SFXSoundscape
 {
    public:
-   
+
       typedef void Parent;
       friend class SFXSoundscapeManager;
-      
+
       enum Flags
       {
          FlagOverridden    = BIT( 0 ),    ///< Same ambience is pushed lower down onto the stack.
          FlagUnique        = BIT( 1 ),    ///< No other instance of this ambience on stack.
       };
-      
+
       enum DirtyBits
       {
          AmbienceDirty = BIT( 0 ),        ///< Associated ambience has changed.
          AllDirty = 0xFFFFFFFF
       };
-      
+
    protected:
-   
+
       ///
       BitSet32 mFlags;
-   
+
       ///
       BitSet32 mDirtyBits;
 
       /// The current soundtrack playing in this soundscape.  This is either the
       /// ambient track or the surround sound track depending on whether
       SimObjectPtr< SFXSource > mSource;
-      
+
       /// The ambient space assigned to this soundscape.
       SFXAmbience* mAmbience;
-      
+
       /// States activated by this soundscape.
       SFXState* mStates[ SFXAmbience::MaxStates ];
-      
+
       /// Return true if another soundscape lower down the stack is using the same
       /// ambient space as this soundscape.
       bool _isOverridden() const { return mFlags.test( FlagOverridden ); }
-      
+
       /// Return true if this soundscape is the only soundscape using the assigned
       /// ambient space.
       bool _isUnique() const { return mFlags.test( FlagUnique ); }
 
    public:
-   
+
       /// Create a soundscape associated with the given ambient space.
       SFXSoundscape( SFXAmbience* ambience );
 
       /// Return the ambient space associated with this soundscape.
       SFXAmbience* getAmbience() const { return mAmbience; }
-      
+
       /// Set the ambient space associated with this soundscape.  Triggers corresponding
       /// recomputations on the next soundscape manager update.
       void setAmbience( SFXAmbience* ambience );
@@ -126,15 +126,15 @@ class SFXSoundscape
 class SFXSoundscapeManager
 {
    public:
-   
+
       typedef void Parent;
-      
+
    protected:
 
       /// Linear stack of soundscapes.  Evaluated bottom to top.  Scapes
       /// being faded out are always last on the stack.
       Vector< SFXSoundscape* > mStack;
-      
+
       /// Stack of soundscape that are currently being faded out.  These are
       /// kept around so that when their ambient spaces are activated again,
       /// they can be brought back with their fades simply being reversed.
@@ -148,45 +148,45 @@ class SFXSoundscapeManager
 
       /// Memory manager of soundscape instances.
       FreeListChunker< SFXSoundscape > mChunker;
-      
+
       /// Default global SFXAmbience.  Not a registered object.
       SFXAmbience* mDefaultGlobalAmbience;
-      
+
       /// Found the topmost instance on the given stack associated with the given
       /// ambient space.
       S32 _findOnStack( SFXAmbience* ambience, const Vector< SFXSoundscape* >& stack );
-      
+
       /// Find the topmost soundscape on the given stack that has a reverb environment
       /// defined on its ambient space.
       S32 _findTopmostReverbOnStack( const Vector< SFXSoundscape* >& stack );
-      
+
       /// Method hooked up to the SFXAmbience change signal to automatically
       /// make soundscapes using the given ambience as dirty and trigger
       /// a recomputation of their properties.
       void _notifyAmbienceChanged( SFXAmbience* ambience );
 
    public:
-   
+
       ///
       SFXSoundscapeManager();
-      
+
       ///
       ~SFXSoundscapeManager();
-   
+
       /// Update the current soundscape mix.
       void update();
-      
+
       /// Return the total number of soundscape instances currently on the stack.
       /// Always >=1.
       U32 getNumTotalSoundscapes() const { return mStack.size(); }
-   
+
       /// Insert a new soundscape instance associated with the given ambient space
       /// at the given stack index.
       SFXSoundscape* insertSoundscape( U32 index, SFXAmbience* ambience );
-      
+
       /// Remove the given soundscape from the stack.
       void removeSoundscape( SFXSoundscape* soundscape );
-      
+
       /// Return the topmost soundscape.  This soundscape is always defined and cannot
       /// be removed.
       SFXSoundscape* getGlobalSoundscape() const { return mStack[ 0 ]; }

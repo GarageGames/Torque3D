@@ -63,7 +63,7 @@ Zip::ZipArchive *openEmbeddedVFSArchive()
 
    if(hRsrc == NULL)
       return NULL;
-   
+
    if((gVFSState.mResData = LoadResource(NULL, hRsrc)) == NULL)
       return NULL;
 
@@ -101,7 +101,7 @@ void closeEmbeddedVFSArchive()
    {
       SAFE_DELETE(gVFSState.mZip);
       SAFE_DELETE(gVFSState.mZipStream);
-      
+
       if(gVFSState.mResData)
       {
          FreeResource(gVFSState.mResData);

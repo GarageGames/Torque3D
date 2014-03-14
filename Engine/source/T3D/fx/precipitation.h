@@ -38,7 +38,7 @@ class SFXSource;
 
 //--------------------------------------------------------------------------
 /// Precipitation datablock.
-class PrecipitationData : public GameBaseData 
+class PrecipitationData : public GameBaseData
 {
    typedef GameBaseData Parent;
 
@@ -52,7 +52,7 @@ class PrecipitationData : public GameBaseData
 
    S32  mDropsPerSide;     ///< How many drops are on a side of the raindrop texture.
    S32  mSplashesPerSide;  ///< How many splash are on a side of the splash texture.
-   
+
    PrecipitationData();
    DECLARE_CONOBJECT(PrecipitationData);
    bool preload( bool server, String& errorStr );
@@ -160,7 +160,7 @@ class Precipitation : public GameBase
    bool mUseLighting;            ///< This enables shading of the drops and splashes
                                  ///< by the sun color.
 
-   ColorF mGlowIntensity;        ///< Set it to 0 to disable the glow or use it to control 
+   ColorF mGlowIntensity;        ///< Set it to 0 to disable the glow or use it to control
                                  ///< the intensity of each channel.
 
    bool mReflect;                ///< This enables the precipitation to be rendered
@@ -185,14 +185,14 @@ class Precipitation : public GameBase
    GFXStateBlockRef mDistantSB;
 
    GFXShaderConstBufferRef mDropShaderConsts;
-   
+
    GFXShaderConstHandle* mDropShaderModelViewSC;
    GFXShaderConstHandle* mDropShaderFadeStartEndSC;
    GFXShaderConstHandle* mDropShaderCameraPosSC;
    GFXShaderConstHandle* mDropShaderAmbientSC;
 
    GFXShaderConstBufferRef mSplashShaderConsts;
-   
+
    GFXShaderConstHandle* mSplashShaderModelViewSC;
    GFXShaderConstHandle* mSplashShaderFadeStartEndSC;
    GFXShaderConstHandle* mSplashShaderCameraPosSC;
@@ -207,7 +207,7 @@ class Precipitation : public GameBase
       F32 endPct;
 
    } mStormData;
-   
+
    struct
    {
       bool valid;
@@ -231,10 +231,10 @@ class Precipitation : public GameBase
    void initMaterials();                      ///< Re-inits the textures and shaders
    void spawnDrop(Raindrop *drop);            ///< Fills drop info with random velocity, x/y positions, and mass
    void spawnNewDrop(Raindrop *drop);         ///< Same as spawnDrop except also does z position
-   
+
    void findDropCutoff(Raindrop *drop, const Box3F &box, const VectorF &windVel);   ///< Casts a ray to see if/when a drop will collide
    void wrapDrop(Raindrop *drop, const Box3F &box, const U32 currTime, const VectorF &windVel);         ///< Wraps a drop within the specified box
-   
+
    void createSplash(Raindrop *drop);        ///< Adds a drop to the splash list
    void destroySplash(Raindrop *drop);       ///< Removes a drop from the splash list
 
@@ -269,7 +269,7 @@ class Precipitation : public GameBase
    bool onNewDataBlock( GameBaseData *dptr, bool reload );
    DECLARE_CONOBJECT(Precipitation);
    static void initPersistFields();
-   
+
    U32  packUpdate(NetConnection*, U32 mask, BitStream* stream);
    void unpackUpdate(NetConnection*, BitStream* stream);
 

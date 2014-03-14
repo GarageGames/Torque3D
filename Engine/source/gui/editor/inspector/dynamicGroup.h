@@ -42,7 +42,7 @@ public:
       : GuiInspectorGroup( groupName, parent) { /*mNeedScroll=false;*/};
 
    //-----------------------------------------------------------------------------
-   // inspectGroup is overridden in GuiInspectorDynamicGroup to inspect an 
+   // inspectGroup is overridden in GuiInspectorDynamicGroup to inspect an
    // objects FieldDictionary (dynamic fields) instead of regular persistent
    // fields.
    bool inspectGroup();

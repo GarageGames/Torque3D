@@ -89,7 +89,7 @@ ProximityMineData::ProximityMineData()
 void ProximityMineData::initPersistFields()
 {
    addGroup( "Arming" );
-   addField( "armingDelay", TypeF32, Offset(armingDelay, ProximityMineData), 
+   addField( "armingDelay", TypeF32, Offset(armingDelay, ProximityMineData),
       "Delay (in seconds) from when the mine is placed to when it becomes active." );
    addField( "armingSound", TypeSFXTrackName, Offset(armingSound, ProximityMineData),
       "Sound to play when the mine is armed (starts at the same time as "
@@ -523,8 +523,8 @@ void ProximityMine::explode()
 
       // Wait till the timeout to self delete. This gives the server object time
       // to get ghosted to the client
-   } 
-   else 
+   }
+   else
    {
       // Client just plays the explosion effect at the right place
       if ( mDataBlock->explosion )

@@ -159,13 +159,13 @@ class ActionMap : public SimObject
    static const char* buildActionString( const InputEventInfo* event );
 
    bool processAction(const InputEventInfo*);
-   
+
    /// Return true if the given event triggers is bound to an action in this map.
    bool isAction( U32 deviceType, U32 deviceInst, U32 modifiers, U32 action );
 
    /// Returns the global ActionMap.
    static ActionMap* getGlobalMap();
-   
+
    static bool checkBreakTable(const InputEventInfo*);
    static bool handleEvent(const InputEventInfo*);
    static bool handleEventGlobal(const InputEventInfo*);

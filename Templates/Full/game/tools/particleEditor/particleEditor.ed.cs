@@ -40,7 +40,7 @@
 function ParticleEditor::initEditor( %this )
 {
    echo( "Initializing ParticleEmitterData and ParticleData DataBlocks..." );
-   
+
    datablock ParticleEmitterData(PE_EmitterEditor_NotDirtyEmitter)
    {
       particles = "DefaultParticle";
@@ -49,35 +49,35 @@ function ParticleEditor::initEditor( %this )
    {
       textureName = "art/particles/defaultParticle";
    };
-   
+
    PE_UnlistedEmitters.add( PE_EmitterEditor_NotDirtyEmitter );
    PE_UnlistedEmitters.add( PE_ParticleEditor_NotDirtyParticle );
-   
+
    PEE_EmitterSelector.clear();
    PEE_EmitterParticleSelector1.clear();
    PEE_EmitterParticleSelector2.clear();
    PEE_EmitterParticleSelector3.clear();
    PEE_EmitterParticleSelector4.clear();
-   
+
    PEP_ParticleSelector.clear();
-   
+
    ParticleEditor.createParticleList();
-         
+
    PEE_EmitterParticleSelector2.add( "None", 0 );
    PEE_EmitterParticleSelector3.add( "None", 0 );
    PEE_EmitterParticleSelector4.add( "None", 0 );
-   
+
    PEE_EmitterParticleSelector1.sort();
    PEE_EmitterParticleSelector2.sort();
    PEE_EmitterParticleSelector3.sort();
    PEE_EmitterParticleSelector4.sort();
-         
+
    PE_EmitterEditor-->PEE_blendType.clear();
    PE_EmitterEditor-->PEE_blendType.add( "NORMAL", 0 );
    PE_EmitterEditor-->PEE_blendType.add( "ADDITIVE", 1 );
    PE_EmitterEditor-->PEE_blendType.add( "SUBTRACTIVE", 2 );
    PE_EmitterEditor-->PEE_blendType.add( "PREMULTALPHA", 3 );
-   
+
 
    PEE_EmitterSelector.setFirstSelected();
 
@@ -87,16 +87,16 @@ function ParticleEditor::initEditor( %this )
 function ParticleEditor::createParticleList( %this )
 {
    // This function creates the list of all particles and particle emitters
-   
+
    %emitterCount = 0;
    %particleCount = 0;
-   
+
    foreach( %obj in DatablockGroup )
    {
       if( %obj.isMemberOfClass( "ParticleEmitterData" ) )
       {
          // Filter out emitters on the PE_UnlistedEmitters list.
-         
+
          %unlistedFound = false;
          foreach( %unlisted in PE_UnlistedEmitters )
             if( %unlisted.getId() == %obj.getId() )
@@ -104,16 +104,16 @@ function ParticleEditor::createParticleList( %this )
                %unlistedFound = true;
                break;
             }
-      
+
          if( %unlistedFound )
             continue;
-            
+
          // To prevent our default emitters from getting changed,
          // prevent them from populating the list. Default emitters
          // should only be used as a template for creating new ones.
          if ( %obj.getName() $= "DefaultEmitter")
             continue;
-         
+
          PEE_EmitterSelector.add( %obj.getName(), %obj.getId() );
          %emitterCount ++;
       }
@@ -126,33 +126,33 @@ function ParticleEditor::createParticleList( %this )
                %unlistedFound = true;
                break;
             }
-      
+
          if( %unlistedFound )
             continue;
-            
+
          %name = %obj.getName();
          %id = %obj.getId();
-         
+
          if ( %name $= "DefaultParticle")
             continue;
 
          // Add to particle dropdown selectors.
-         
+
          PEE_EmitterParticleSelector1.add( %name, %id );
          PEE_EmitterParticleSelector2.add( %name, %id );
          PEE_EmitterParticleSelector3.add( %name, %id );
          PEE_EmitterParticleSelector4.add( %name, %id );
-                  
+
          %particleCount ++;
       }
    }
-   
+
    PEE_EmitterSelector.sort();
-   PEE_EmitterParticleSelector1.sort();   
+   PEE_EmitterParticleSelector1.sort();
    PEE_EmitterParticleSelector2.sort();
    PEE_EmitterParticleSelector3.sort();
-   PEE_EmitterParticleSelector4.sort();   
-   
+   PEE_EmitterParticleSelector4.sort();
+
    echo( "Found" SPC %emitterCount SPC "emitters and" SPC %particleCount SPC "particles." );
 }
 
@@ -163,7 +163,7 @@ function ParticleEditor::openEmitterPane( %this )
    PE_Window.text = "Particle Editor - Emitters";
    PE_EmitterEditor.guiSync();
    ParticleEditor.activeEditor = PE_EmitterEditor;
-   
+
    if( !PE_EmitterEditor.dirty )
       PE_EmitterEditor.setEmitterNotDirty();
 }
@@ -173,10 +173,10 @@ function ParticleEditor::openEmitterPane( %this )
 function ParticleEditor::openParticlePane( %this )
 {
    PE_Window.text = "Particle Editor - Particles";
-   
+
    PE_ParticleEditor.guiSync();
    ParticleEditor.activeEditor = PE_ParticleEditor;
-   
+
    if( !PE_ParticleEditor.dirty )
       PE_ParticleEditor.setParticleNotDirty();
 }
@@ -215,11 +215,11 @@ function ParticleEditor::resetEmitterNode( %this )
    else
    {
       $ParticleEditor::emitterNode.setTransform( %tform );
-      
+
       %clientObject = $ParticleEditor::emitterNode.getClientObject();
       if( isObject( %clientObject ) )
          %clientObject.setTransform( %tform );
-      
+
       ParticleEditor.updateEmitterNode();
    }
 }
@@ -231,7 +231,7 @@ function ParticleEditor::updateEmitterNode( %this )
    if( isObject( $ParticleEditor::emitterNode ) )
    {
       %id = PEE_EmitterSelector_Control-->PopUpMenu.getSelected();
-      
+
       %clientObject = $ParticleEditor::emitterNode.getClientObject();
       if( isObject( %clientObject ) )
          %clientObject.setEmitterDataBlock( %id );

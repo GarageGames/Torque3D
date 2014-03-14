@@ -30,7 +30,7 @@ SimComponent::SimComponent() : mOwner( NULL )
 {
    mComponentList.clear();
    mMutex = Mutex::createMutex();
-   
+
    mEnabled = true;
    mTemplate = false;
 }
@@ -190,15 +190,15 @@ void SimComponent::initPersistFields()
 {
     addGroup("Component");
 
-        addProtectedField( "Template", TypeBool, Offset(mTemplate, SimComponent), 
-           &setIsTemplate, &defaultProtectedGetFn, 
+        addProtectedField( "Template", TypeBool, Offset(mTemplate, SimComponent),
+           &setIsTemplate, &defaultProtectedGetFn,
            "Places the object in a component set for later use in new levels." );
 
     endGroup("Component");
 
     // Call Parent.
     Parent::initPersistFields();
-} 
+}
 
 //------------------------------------------------------------------------------
 
@@ -240,7 +240,7 @@ bool SimComponent::addComponentFromField( void* obj, const char* data )
 {
    SimComponent *pComponent = dynamic_cast<SimComponent*>( Sim::findObject( data ) );
    if( pComponent != NULL )
-      static_cast<SimComponent*>(obj)->addComponent( pComponent ); 
+      static_cast<SimComponent*>(obj)->addComponent( pComponent );
    return false;
 }
 
@@ -309,7 +309,7 @@ void SimComponent::onComponentRemove(SimComponent *target)
 
 //////////////////////////////////////////////////////////////////////////
 
-ComponentInterface *SimComponent::getInterface(const char *type /* = NULL */, const char *name /* = NULL */, 
+ComponentInterface *SimComponent::getInterface(const char *type /* = NULL */, const char *name /* = NULL */,
                                                const SimComponent *owner /* = NULL */, bool notOwner /* = false  */)
 {
    ComponentInterfaceList iLst;

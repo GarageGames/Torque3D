@@ -25,7 +25,7 @@
 #include "gfx/D3D9/gfxD3D9EnumTranslate.h"
 
 // Cut and paste from console.log into GFXD3D9Device::initStates()
-void GFXD3D9Device::regenStates() 
+void GFXD3D9Device::regenStates()
 {
    DWORD temp;
    Con::printf( "   //-------------------------------------" );
@@ -34,7 +34,7 @@ void GFXD3D9Device::regenStates()
    Con::printf( "" );
    Con::printf( "   // Render states" );
 
-   for( U32 state = GFXRenderState_FIRST; state < GFXRenderState_COUNT; state++ ) 
+   for( U32 state = GFXRenderState_FIRST; state < GFXRenderState_COUNT; state++ )
    {
       if( GFXD3D9RenderState[state] == GFX_UNSUPPORTED_VAL )
          continue;
@@ -44,11 +44,11 @@ void GFXD3D9Device::regenStates()
       Con::printf( "   mD3DDevice->SetRenderState( GFXD3D9RenderState[%d], %d );", state, temp );
    }
 
-#ifndef TORQUE_OS_XENON 
+#ifndef TORQUE_OS_XENON
    Con::printf( "" );
    Con::printf( "   // Texture Stage states" );
 
-   for( U32 stage = 0; stage < TEXTURE_STAGE_COUNT; stage++ ) 
+   for( U32 stage = 0; stage < TEXTURE_STAGE_COUNT; stage++ )
    {
       if( stage >= GFX->getNumSamplers() )
       {
@@ -56,7 +56,7 @@ void GFXD3D9Device::regenStates()
          break;
       }
 
-      for( U32 state = GFXTSS_FIRST; state < GFXTSS_COUNT; state++ ) 
+      for( U32 state = GFXTSS_FIRST; state < GFXTSS_COUNT; state++ )
       {
          if( GFXD3D9TextureStageState[state] == GFX_UNSUPPORTED_VAL )
             continue;
@@ -70,7 +70,7 @@ void GFXD3D9Device::regenStates()
 
    Con::printf( "" );
    Con::printf( "   // Sampler states" );
-   for( U32 stage = 0; stage < TEXTURE_STAGE_COUNT; stage++ ) 
+   for( U32 stage = 0; stage < TEXTURE_STAGE_COUNT; stage++ )
    {
       if( stage >= GFX->getNumSamplers() )
       {
@@ -78,7 +78,7 @@ void GFXD3D9Device::regenStates()
          break;
       }
 
-      for( U32 state = GFXSAMP_FIRST; state < GFXSAMP_COUNT; state++ ) 
+      for( U32 state = GFXSAMP_FIRST; state < GFXSAMP_COUNT; state++ )
       {
          if( GFXD3D9SamplerState[state] == GFX_UNSUPPORTED_VAL )
             continue;

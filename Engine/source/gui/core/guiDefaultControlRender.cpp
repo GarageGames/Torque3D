@@ -137,10 +137,10 @@ void renderBorder( const RectI &bounds, GuiControlProfile *profile )
    case 5:
       renderFilledBorder( bounds, profile );
       break;
-      // 
+      //
    case -1:
       // Draw a simple sizable border with corners
-      // Taken from the 'Skinnable GUI Controls in TGE' resource by Justin DuJardin       
+      // Taken from the 'Skinnable GUI Controls in TGE' resource by Justin DuJardin
       if(profile->mBitmapArrayRects.size() >= 8)
       {
          drawer->clearBitmapModulation();
@@ -249,7 +249,7 @@ void renderFilledBorder( const RectI &bounds, const ColorI &borderColor, const C
    RectI fillBounds = bounds;
    fillBounds.inset( thickness, thickness );
 
-   GFX->getDrawUtil()->drawRectFill( bounds, borderColor ); 
+   GFX->getDrawUtil()->drawRectFill( bounds, borderColor );
    GFX->getDrawUtil()->drawRectFill( fillBounds, fillColor );
 }
 

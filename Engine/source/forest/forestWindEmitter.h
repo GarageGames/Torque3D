@@ -122,7 +122,7 @@ protected:
    /// Controls how often the wind gust peaks per second.
    F32 mWindGustFrequency;
 
-   /// The maximum distance in meters that the peak wind 
+   /// The maximum distance in meters that the peak wind
    /// gust will displace an element.
    F32 mWindGustStrength;
 
@@ -185,7 +185,7 @@ public:
 
    F32 getWindRadiusSquared() const { return mWindRadius * mWindRadius; }
 
-   void setWindRadius( F32 radius ) { mWindRadius = radius; } 
+   void setWindRadius( F32 radius ) { mWindRadius = radius; }
 
    F32 getStrength() const;
    void setStrength( F32 strength );

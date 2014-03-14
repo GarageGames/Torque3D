@@ -76,7 +76,7 @@ D3DX_FUNCTION( D3DXCreateVolumeTexture, HRESULT,
                D3DPOOL                   Pool,
                LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture) )
 
-D3DX_FUNCTION( D3DXCreateTexture, HRESULT, 
+D3DX_FUNCTION( D3DXCreateTexture, HRESULT,
                (LPDIRECT3DDEVICE9         pDevice,
                UINT                      Width,
                UINT                      Height,

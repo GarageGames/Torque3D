@@ -55,7 +55,7 @@ function onServerCreated()
    %datablockFiles.add( "art/decals/managedDecalData.cs" );
    %datablockFiles.add( "art/datablocks/managedDatablocks.cs" );
    %datablockFiles.add( "art/forest/managedItemData.cs" );
-   %datablockFiles.add( "art/datablocks/datablockExec.cs" );   
+   %datablockFiles.add( "art/datablocks/datablockExec.cs" );
    loadDatablockFiles( %datablockFiles, true );
 
    // Run the other gameplay scripts in this folder
@@ -125,7 +125,7 @@ function onCyclePauseEnd()
 
    %search = $Server::MissionFileSpec;
    %oldMissionFile = makeRelativePath( $Server::MissionFile );
-      
+
    for( %file = findFirstFile( %search ); %file !$= ""; %file = findNextFile( %search ) )
    {
       if( %file $= %oldMissionFile )

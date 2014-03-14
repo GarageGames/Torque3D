@@ -23,13 +23,13 @@
 function EWToolsPaletteWindow::loadToolsPalettes()
 {
    %filespec = "tools/worldEditor/gui/ToolsPaletteGroups/*.ed.gui";
-   
+
    // were executing each gui file and adding them to the ToolsPaletteArray
    for( %file = findFirstFile(%filespec); %file !$= ""; %file = findNextFile(%filespec))
    {
       exec( %file );
-      %paletteGroup = 0;      
-      
+      %paletteGroup = 0;
+
       %i = %paletteId.getCount();
       for( ; %i != 0; %i--)
       {
@@ -42,13 +42,13 @@ function EWToolsPaletteWindow::loadToolsPalettes()
    }
 
    %filespec = "tools/worldEditor/gui/ToolsPaletteGroups/*.ed.gui.edso";
-   
+
    // were executing each gui file and adding them to the ToolsPaletteArray
    for( %file = findFirstFile(%filespec); %file !$= ""; %file = findNextFile(%filespec))
    {
       exec( %file );
-      %paletteGroup = 0;      
-      
+      %paletteGroup = 0;
+
       %i = %paletteId.getCount();
       for( ; %i != 0; %i--)
       {
@@ -71,10 +71,10 @@ function EWToolsPaletteWindow::togglePalette(%this, %paletteName)
    // since the palette window ctrl auto adjusts to child ctrls being visible,
    // loop through the array and pick out the children that belong to a certain tool
    // and label them visible or not visible
-   
+
    for( %i = 0; %i < ToolsPaletteArray.getCount(); %i++ )
       ToolsPaletteArray.getObject(%i).visible = 0;
-   
+
    %windowMultiplier = 0;
    %paletteNameWordCount = getWordCount( %paletteName );
    for(%pallateNum = 0; %pallateNum < %paletteNameWordCount; %pallateNum++)
@@ -89,8 +89,8 @@ function EWToolsPaletteWindow::togglePalette(%this, %paletteName)
          }
       }
    }
-   
-   // auto adjust the palette window extent according to how many 
+
+   // auto adjust the palette window extent according to how many
    // children controls we found; if none found, the palette window becomes invisible
    if( %windowMultiplier == 0 || %paletteName $= "")
       EWToolsPaletteWindow.visible = 0;

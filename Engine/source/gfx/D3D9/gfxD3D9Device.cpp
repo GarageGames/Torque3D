@@ -39,7 +39,7 @@
 
 D3DXFNTable GFXD3D9Device::smD3DX;
 
-GFXD3D9Device::GFXD3D9Device( LPDIRECT3D9 d3d, U32 index ) 
+GFXD3D9Device::GFXD3D9Device( LPDIRECT3D9 d3d, U32 index )
 {
    mDeviceSwizzle32 = &Swizzles::bgra;
    GFXVertexColor::setSwizzle( mDeviceSwizzle32 );
@@ -94,7 +94,7 @@ GFXD3D9Device::GFXD3D9Device( LPDIRECT3D9 d3d, U32 index )
 
 //-----------------------------------------------------------------------------
 
-GFXD3D9Device::~GFXD3D9Device() 
+GFXD3D9Device::~GFXD3D9Device()
 {
    // Release our refcount on the current stateblock object
    mCurrentStateBlock = NULL;
@@ -147,16 +147,16 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
 #ifdef WANT_TO_SIMULATE_UI_ON_360
    if( mGenericShader[GSColor] == NULL )
    {
-      mGenericShader[GSColor] =           createShader( "shaders/common/genericColorV.hlsl", 
-         "shaders/common/genericColorP.hlsl", 
+      mGenericShader[GSColor] =           createShader( "shaders/common/genericColorV.hlsl",
+         "shaders/common/genericColorP.hlsl",
          2.f );
 
-      mGenericShader[GSModColorTexture] = createShader( "shaders/common/genericModColorTextureV.hlsl", 
-         "shaders/common/genericModColorTextureP.hlsl", 
+      mGenericShader[GSModColorTexture] = createShader( "shaders/common/genericModColorTextureV.hlsl",
+         "shaders/common/genericModColorTextureP.hlsl",
          2.f );
 
-      mGenericShader[GSAddColorTexture] = createShader( "shaders/common/genericAddColorTextureV.hlsl", 
-         "shaders/common/genericAddColorTextureP.hlsl", 
+      mGenericShader[GSAddColorTexture] = createShader( "shaders/common/genericAddColorTextureV.hlsl",
+         "shaders/common/genericAddColorTextureP.hlsl",
          2.f );
    }
 
@@ -191,7 +191,7 @@ void GFXD3D9Device::setStateBlockInternal(GFXStateBlock* block, bool force)
    GFXD3D9StateBlock* d3dCurrent = static_cast<GFXD3D9StateBlock*>(mCurrentStateBlock.getPointer());
    if (force)
       d3dCurrent = NULL;
-   d3dBlock->activate(d3dCurrent);   
+   d3dBlock->activate(d3dCurrent);
 }
 
 /// Called by base GFXDevice to actually set a const buffer
@@ -212,7 +212,7 @@ void GFXD3D9Device::setShaderConstBufferInternal(GFXShaderConstBuffer* buffer)
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::clear( U32 flags, ColorI color, F32 z, U32 stencil ) 
+void GFXD3D9Device::clear( U32 flags, ColorI color, F32 z, U32 stencil )
 {
    // Make sure we have flushed our render target state.
    _updateRenderTargets();
@@ -229,24 +229,24 @@ void GFXD3D9Device::clear( U32 flags, ColorI color, F32 z, U32 stencil )
    if( flags & GFXClearStencil )
       realflags |= D3DCLEAR_STENCIL;
 
-   mD3DDevice->Clear( 0, NULL, realflags, 
-      D3DCOLOR_ARGB( color.alpha, color.red, color.green, color.blue ), 
+   mD3DDevice->Clear( 0, NULL, realflags,
+      D3DCOLOR_ARGB( color.alpha, color.red, color.green, color.blue ),
       z, stencil );
 }
 
 //-----------------------------------------------------------------------------
 
-bool GFXD3D9Device::beginSceneInternal() 
+bool GFXD3D9Device::beginSceneInternal()
 {
    HRESULT hr = mD3DDevice->BeginScene();
    D3D9Assert(hr, "GFXD3D9Device::beginSceneInternal - failed to BeginScene");
    mCanCurrentlyRender = SUCCEEDED(hr);
-   return mCanCurrentlyRender;      
+   return mCanCurrentlyRender;
 }
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::endSceneInternal() 
+void GFXD3D9Device::endSceneInternal()
 {
    mD3DDevice->EndScene();
    mCanCurrentlyRender = false;
@@ -259,7 +259,7 @@ void GFXD3D9Device::_updateRenderTargets()
       if ( mRTDeactivate )
       {
          mRTDeactivate->deactivate();
-         mRTDeactivate = NULL;   
+         mRTDeactivate = NULL;
       }
 
       // NOTE: The render target changes are not really accurate
@@ -271,7 +271,7 @@ void GFXD3D9Device::_updateRenderTargets()
       mCurrentRT->activate();
 
       mRTDirty = false;
-   }  
+   }
 
    if ( mViewportDirty )
    {
@@ -283,7 +283,7 @@ void GFXD3D9Device::_updateRenderTargets()
       viewport.MinZ    = 0.0;
       viewport.MaxZ    = 1.0;
 
-      D3D9Assert( mD3DDevice->SetViewport( &viewport ), 
+      D3D9Assert( mD3DDevice->SetViewport( &viewport ),
          "GFXD3D9Device::_updateRenderTargets() - Error setting viewport!" );
 
       mViewportDirty = false;
@@ -293,7 +293,7 @@ void GFXD3D9Device::_updateRenderTargets()
 
 #ifdef TORQUE_DEBUG
 
-void GFXD3D9Device::logVertexBuffers() 
+void GFXD3D9Device::logVertexBuffers()
 {
 
    // NOTE: This function should be called on the destructor of this class and ONLY then
@@ -313,7 +313,7 @@ void GFXD3D9Device::logVertexBuffers()
 
    GFXD3D9VertexBuffer *walk = mVBListHead;
 
-   while( walk != NULL ) 
+   while( walk != NULL )
    {
       dSprintf( (char *)&buff, sizeof( buff ), "[Name: %s] Size: %d", walk->name, walk->mNumVerts );
       fs.writeLine( (U8 *)buff );
@@ -328,19 +328,19 @@ void GFXD3D9Device::logVertexBuffers()
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::addVertexBuffer( GFXD3D9VertexBuffer *buffer ) 
+void GFXD3D9Device::addVertexBuffer( GFXD3D9VertexBuffer *buffer )
 {
    mNumAllocatedVertexBuffers++;
 
-   if( mVBListHead == NULL ) 
+   if( mVBListHead == NULL )
    {
       mVBListHead = buffer;
    }
-   else 
+   else
    {
       GFXD3D9VertexBuffer *walk = mVBListHead;
 
-      while( walk->next != NULL ) 
+      while( walk->next != NULL )
       {
          walk = walk->next;
       }
@@ -353,12 +353,12 @@ void GFXD3D9Device::addVertexBuffer( GFXD3D9VertexBuffer *buffer )
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::removeVertexBuffer( GFXD3D9VertexBuffer *buffer ) 
+void GFXD3D9Device::removeVertexBuffer( GFXD3D9VertexBuffer *buffer )
 {
    mNumAllocatedVertexBuffers--;
 
    // Quick check to see if this is head of list
-   if( mVBListHead == buffer ) 
+   if( mVBListHead == buffer )
    {
       mVBListHead = mVBListHead->next;
       return;
@@ -366,9 +366,9 @@ void GFXD3D9Device::removeVertexBuffer( GFXD3D9VertexBuffer *buffer )
 
    GFXD3D9VertexBuffer *walk = mVBListHead;
 
-   while( walk->next != NULL ) 
+   while( walk->next != NULL )
    {
-      if( walk->next == buffer ) 
+      if( walk->next == buffer )
       {
          walk->next = walk->next->next;
          return;
@@ -384,13 +384,13 @@ void GFXD3D9Device::removeVertexBuffer( GFXD3D9VertexBuffer *buffer )
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::releaseDefaultPoolResources() 
+void GFXD3D9Device::releaseDefaultPoolResources()
 {
    // Release all the dynamic vertex buffer arrays
    // Forcibly clean up the pools
    for( U32 i=0; i<mVolatileVBList.size(); i++ )
    {
-      // Con::printf("Trying to release volatile vb with COM refcount of %d and internal refcount of %d", mVolatileVBList[i]->vb->AddRef() - 1, mVolatileVBList[i]->mRefCount);  
+      // Con::printf("Trying to release volatile vb with COM refcount of %d and internal refcount of %d", mVolatileVBList[i]->vb->AddRef() - 1, mVolatileVBList[i]->mRefCount);
       // mVolatileVBList[i]->vb->Release();
 
       mVolatileVBList[i]->vb->Release();
@@ -401,7 +401,7 @@ void GFXD3D9Device::releaseDefaultPoolResources()
 
    // We gotta clear the current const buffer else the next
    // activate may erroneously think the device is still holding
-   // this state and fail to set it.   
+   // this state and fail to set it.
    mCurrentConstBuffer = NULL;
 
    // Set current VB to NULL and set state dirty
@@ -425,7 +425,7 @@ void GFXD3D9Device::releaseDefaultPoolResources()
    mPrimitiveBufferDirty = true;
 
    // Zombify texture manager (for D3D this only modifies default pool textures)
-   if( mTextureManager ) 
+   if( mTextureManager )
       mTextureManager->zombify();
 
    // Kill off other potentially dangling references...
@@ -447,13 +447,13 @@ void GFXD3D9Device::releaseDefaultPoolResources()
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::reacquireDefaultPoolResources() 
+void GFXD3D9Device::reacquireDefaultPoolResources()
 {
    // Now do the dynamic index buffers
    if( mDynamicPB == NULL )
       mDynamicPB = new GFXD3D9PrimitiveBuffer(this, 0, 0, GFXBufferTypeDynamic);
 
-   D3D9Assert( mD3DDevice->CreateIndexBuffer( sizeof( U16 ) * MAX_DYNAMIC_INDICES, 
+   D3D9Assert( mD3DDevice->CreateIndexBuffer( sizeof( U16 ) * MAX_DYNAMIC_INDICES,
 #ifdef TORQUE_OS_XENON
       D3DUSAGE_WRITEONLY,
 #else
@@ -462,9 +462,9 @@ void GFXD3D9Device::reacquireDefaultPoolResources()
       GFXD3D9IndexFormat[GFXIndexFormat16], D3DPOOL_DEFAULT, &mDynamicPB->ib, NULL ), "Failed to allocate dynamic IB" );
 
    // Grab the depth-stencil...
-   SAFE_RELEASE(mDeviceDepthStencil);   
-   D3D9Assert(mD3DDevice->GetDepthStencilSurface(&mDeviceDepthStencil), 
-      "GFXD3D9Device::reacquireDefaultPoolResources - couldn't grab reference to device's depth-stencil surface.");  
+   SAFE_RELEASE(mDeviceDepthStencil);
+   D3D9Assert(mD3DDevice->GetDepthStencilSurface(&mDeviceDepthStencil),
+      "GFXD3D9Device::reacquireDefaultPoolResources - couldn't grab reference to device's depth-stencil surface.");
 
    SAFE_RELEASE(mDeviceBackbuffer);
    mD3DDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &mDeviceBackbuffer );
@@ -518,25 +518,25 @@ GFXD3D9VertexBuffer * GFXD3D9Device::createVBPool( const GFXVertexFormat *vertex
 
    //   Con::printf("Created buff with type %x", vertFlags);
 
-   D3D9Assert( mD3DDevice->CreateVertexBuffer( vertSize * MAX_DYNAMIC_VERTS, 
+   D3D9Assert( mD3DDevice->CreateVertexBuffer( vertSize * MAX_DYNAMIC_VERTS,
 #ifdef TORQUE_OS_XENON
       D3DUSAGE_WRITEONLY,
 #else
       D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC,
 #endif
-      0, 
-      D3DPOOL_DEFAULT, 
-      &newBuff->vb, 
-      NULL ), 
+      0,
+      D3DPOOL_DEFAULT,
+      &newBuff->vb,
+      NULL ),
       "Failed to allocate dynamic VB" );
    return newBuff;
 }
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::setClipRect( const RectI &inRect ) 
+void GFXD3D9Device::setClipRect( const RectI &inRect )
 {
-	// We transform the incoming rect by the view 
+	// We transform the incoming rect by the view
    // matrix first, so that it can be used to pan
    // and scale the clip rect.
    //
@@ -544,7 +544,7 @@ void GFXD3D9Device::setClipRect( const RectI &inRect )
 	Point3F pos( inRect.point.x, inRect.point.y, 0.0f );
    Point3F extent( inRect.extent.x, inRect.extent.y, 0.0f );
    getViewMatrix().mulP( pos );
-   getViewMatrix().mulV( extent );  
+   getViewMatrix().mulV( extent );
    RectI rect( pos.x, pos.y, extent.x, extent.y );
 
    // Clip the rect against the renderable size.
@@ -560,8 +560,8 @@ void GFXD3D9Device::setClipRect( const RectI &inRect )
    F32 b = F32( mClipRect.point.y + mClipRect.extent.y );
    F32 t = F32( mClipRect.point.y );
 
-   // Set up projection matrix, 
-   static Point4F pt;   
+   // Set up projection matrix,
+   static Point4F pt;
    pt.set(2.0f / (r - l), 0.0f, 0.0f, 0.0f);
    mTempMatrix.setColumn(0, pt);
 
@@ -577,7 +577,7 @@ void GFXD3D9Device::setClipRect( const RectI &inRect )
    setProjectionMatrix( mTempMatrix );
 
    // Set up world/view matrix
-   mTempMatrix.identity();   
+   mTempMatrix.identity();
    setWorldMatrix( mTempMatrix );
 
    setViewport( mClipRect );
@@ -589,7 +589,7 @@ void GFXD3D9Device::setVertexStream( U32 stream, GFXVertexBuffer *buffer )
 
    if ( stream == 0 )
    {
-      // Set the volatile buffer which is used to 
+      // Set the volatile buffer which is used to
       // offset the start index when doing draw calls.
       if ( d3dBuffer && d3dBuffer->mVolatileStart > 0 )
          mVolatileVB = d3dBuffer;
@@ -598,15 +598,15 @@ void GFXD3D9Device::setVertexStream( U32 stream, GFXVertexBuffer *buffer )
    }
 
    // NOTE: We do not use the stream offset here for stream 0
-   // as that feature is *supposedly* not as well supported as 
+   // as that feature is *supposedly* not as well supported as
    // using the start index in drawPrimitive.
    //
    // If we can verify that this is not the case then we should
    // start using this method exclusively for all streams.
-   
-   D3D9Assert( mD3DDevice->SetStreamSource(  stream, 
+
+   D3D9Assert( mD3DDevice->SetStreamSource(  stream,
                                              d3dBuffer ? d3dBuffer->vb : NULL,
-                                             d3dBuffer && stream != 0 ? d3dBuffer->mVolatileStart * d3dBuffer->mVertexSize : 0, 
+                                             d3dBuffer && stream != 0 ? d3dBuffer->mVolatileStart * d3dBuffer->mVertexSize : 0,
                                              d3dBuffer ? d3dBuffer->mVertexSize : 0 ),
                                              "GFXD3D9Device::setVertexStream - Failed to set stream source." );
 }
@@ -627,14 +627,14 @@ void GFXD3D9Device::setVertexStreamFrequency( U32 stream, U32 frequency )
       "GFXD3D9Device::setVertexStreamFrequency - Failed to set stream frequency." );
 }
 
-void GFXD3D9Device::_setPrimitiveBuffer( GFXPrimitiveBuffer *buffer ) 
+void GFXD3D9Device::_setPrimitiveBuffer( GFXPrimitiveBuffer *buffer )
 {
    mCurrentPB = static_cast<GFXD3D9PrimitiveBuffer *>( buffer );
 
    D3D9Assert( mD3DDevice->SetIndices( mCurrentPB->ib ), "Failed to set indices" );
 }
 
-void GFXD3D9Device::drawPrimitive( GFXPrimitiveType primType, U32 vertexStart, U32 primitiveCount ) 
+void GFXD3D9Device::drawPrimitive( GFXPrimitiveType primType, U32 vertexStart, U32 primitiveCount )
 {
    // This is done to avoid the function call overhead if possible
    if( mStateDirty )
@@ -645,7 +645,7 @@ void GFXD3D9Device::drawPrimitive( GFXPrimitiveType primType, U32 vertexStart, U
    if ( mVolatileVB )
       vertexStart += mVolatileVB->mVolatileStart;
 
-   D3D9Assert( mD3DDevice->DrawPrimitive( GFXD3D9PrimType[primType], vertexStart, primitiveCount ), "Failed to draw primitives" );  
+   D3D9Assert( mD3DDevice->DrawPrimitive( GFXD3D9PrimType[primType], vertexStart, primitiveCount ), "Failed to draw primitives" );
 
    mDeviceStatistics.mDrawCalls++;
    if ( mVertexBufferFrequency[0] > 1 )
@@ -656,12 +656,12 @@ void GFXD3D9Device::drawPrimitive( GFXPrimitiveType primType, U32 vertexStart, U
 
 //-----------------------------------------------------------------------------
 
-void GFXD3D9Device::drawIndexedPrimitive( GFXPrimitiveType primType, 
-                                          U32 startVertex, 
-                                          U32 minIndex, 
-                                          U32 numVerts, 
-                                          U32 startIndex, 
-                                          U32 primitiveCount ) 
+void GFXD3D9Device::drawIndexedPrimitive( GFXPrimitiveType primType,
+                                          U32 startVertex,
+                                          U32 minIndex,
+                                          U32 numVerts,
+                                          U32 startIndex,
+                                          U32 primitiveCount )
 {
    // This is done to avoid the function call overhead if possible
    if( mStateDirty )
@@ -674,11 +674,11 @@ void GFXD3D9Device::drawIndexedPrimitive( GFXPrimitiveType primType,
    if ( mVolatileVB )
       startVertex += mVolatileVB->mVolatileStart;
 
-   D3D9Assert( mD3DDevice->DrawIndexedPrimitive(   GFXD3D9PrimType[primType], 
-      startVertex, 
+   D3D9Assert( mD3DDevice->DrawIndexedPrimitive(   GFXD3D9PrimType[primType],
+      startVertex,
       /* mCurrentPB->mVolatileStart + */ minIndex,
-      numVerts, 
-      mCurrentPB->mVolatileStart + startIndex, 
+      numVerts,
+      mCurrentPB->mVolatileStart + startIndex,
       primitiveCount ), "Failed to draw indexed primitive" );
 
    mDeviceStatistics.mDrawCalls++;
@@ -730,8 +730,8 @@ void GFXD3D9Device::setShader( GFXShader *shader )
 //-----------------------------------------------------------------------------
 // allocPrimitiveBuffer
 //-----------------------------------------------------------------------------
-GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices, 
-                                                            U32 numPrimitives, 
+GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices,
+                                                            U32 numPrimitives,
                                                             GFXBufferType bufferType )
 {
    // Allocate a buffer to return
@@ -789,17 +789,17 @@ GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices,
 //-----------------------------------------------------------------------------
 // allocVertexBuffer
 //-----------------------------------------------------------------------------
-GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts, 
-                                                      const GFXVertexFormat *vertexFormat, 
-                                                      U32 vertSize, 
+GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
+                                                      const GFXVertexFormat *vertexFormat,
+                                                      U32 vertSize,
                                                       GFXBufferType bufferType )
 {
    PROFILE_SCOPE( GFXD3D9Device_allocVertexBuffer );
 
-   GFXD3D9VertexBuffer *res = new GFXD3D9VertexBuffer(   this, 
-                                                         numVerts, 
-                                                         vertexFormat, 
-                                                         vertSize, 
+   GFXD3D9VertexBuffer *res = new GFXD3D9VertexBuffer(   this,
+                                                         numVerts,
+                                                         vertexFormat,
+                                                         vertSize,
                                                          bufferType );
 
    // Determine usage flags
@@ -837,7 +837,7 @@ GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
    {
       // NOTE: Volatile VBs are pooled and will be allocated at lock time.
 
-      AssertFatal( numVerts <= MAX_DYNAMIC_VERTS, 
+      AssertFatal( numVerts <= MAX_DYNAMIC_VERTS,
          "GFXD3D9Device::allocVertexBuffer - Volatile vertex buffer is too big... see MAX_DYNAMIC_VERTS!" );
    }
    else
@@ -846,7 +846,7 @@ GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
       vertexFormat->getDecl();
 
       // Get a new buffer...
-      D3D9Assert( mD3DDevice->CreateVertexBuffer( vertSize * numVerts, usage, 0, pool, &res->vb, NULL ), 
+      D3D9Assert( mD3DDevice->CreateVertexBuffer( vertSize * numVerts, usage, 0, pool, &res->vb, NULL ),
          "Failed to allocate VB" );
    }
 
@@ -881,7 +881,7 @@ GFXVertexDecl* GFXD3D9Device::allocVertexDecl( const GFXVertexFormat *vertexForm
    for ( U32 i=0; i < elemCount; i++ )
    {
       const GFXVertexElement &element = vertexFormat->getElement( i );
-      
+
       stream = element.getStreamIndex();
 
       vd[i].Stream = stream;
@@ -889,7 +889,7 @@ GFXVertexDecl* GFXD3D9Device::allocVertexDecl( const GFXVertexFormat *vertexForm
       vd[i].Type = GFXD3D9DeclType[element.getType()];
       vd[i].Method = D3DDECLMETHOD_DEFAULT;
 
-      // We force the usage index of 0 for everything but 
+      // We force the usage index of 0 for everything but
       // texture coords for now... this may change later.
       vd[i].UsageIndex = 0;
 
@@ -917,7 +917,7 @@ GFXVertexDecl* GFXD3D9Device::allocVertexDecl( const GFXVertexFormat *vertexForm
    vd[elemCount] = declEnd;
 
    decl = new D3D9VertexDecl();
-   D3D9Assert( mD3DDevice->CreateVertexDeclaration( vd, &decl->decl ), 
+   D3D9Assert( mD3DDevice->CreateVertexDeclaration( vd, &decl->decl ),
       "GFXD3D9Device::allocVertexDecl - Failed to create vertex declaration!" );
 
    delete [] vd;
@@ -976,7 +976,7 @@ void GFXD3D9Device::setLightInternal(U32 lightStage, const GFXLightInfo light, b
       d3dLight.Type = D3DLIGHT_POINT;
       break;
 
-   case GFXLightInfo::Spot:      
+   case GFXLightInfo::Spot:
       d3dLight.Type = D3DLIGHT_SPOT;
       break;
 
@@ -1002,7 +1002,7 @@ void GFXD3D9Device::setLightInternal(U32 lightStage, const GFXLightInfo light, b
    d3dLight.Phi = light.mOuterConeAngle;
 
    mD3DDevice->SetLight(lightStage, &d3dLight);
-   mD3DDevice->LightEnable(lightStage, true); 
+   mD3DDevice->LightEnable(lightStage, true);
 #endif
 }
 
@@ -1080,7 +1080,7 @@ void GFXD3D9Device::doParanoidStateCheck()
       else
       {
          AssertFatal(mCurrentTexture[i] || mCurrentCubemap[i], "GFXD3D9Device::doParanoidStateCheck - got null texture in expected non-null slot!");
-         if (mCurrentCubemap[i])         
+         if (mCurrentCubemap[i])
          {
             IDirect3DCubeTexture9 *cur= static_cast<GFXD3D9Cubemap*>(mCurrentCubemap[i].getPointer())->mCubeTex;
             AssertFatal(cur == b, "GFXD3D9Device::doParanoidStateCheck - mismatched cubemap!");
@@ -1116,7 +1116,7 @@ GFXFence *GFXD3D9Device::createFence()
    }
 
    // CodeReview: At some point I would like a specialized D3D9 implementation of
-   // the method used by the general fence, only without the overhead incurred 
+   // the method used by the general fence, only without the overhead incurred
    // by using the GFX constructs. Primarily the lock() method on texture handles
    // will do a data copy, and this method doesn't require a copy, just a lock
    // [5/10/2007 Pat]
@@ -1126,12 +1126,12 @@ GFXFence *GFXD3D9Device::createFence()
 }
 
 GFXOcclusionQuery* GFXD3D9Device::createOcclusionQuery()
-{  
+{
    GFXOcclusionQuery *query;
    if (mOcclusionQuerySupported)
       query = new GFXD3D9OcclusionQuery( this );
    else
-      return NULL;      
+      return NULL;
 
    query->registerResourceWithDevice(this);
    return query;

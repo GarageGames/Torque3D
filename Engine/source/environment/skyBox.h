@@ -81,7 +81,7 @@ public:
    virtual bool onAdd();
    virtual void onRemove();
    static void initPersistFields();
-   virtual void inspectPostApply();      
+   virtual void inspectPostApply();
 
    // NetObject
    virtual U32 packUpdate( NetConnection *conn, U32 mask, BitStream *stream );
@@ -98,13 +98,13 @@ public:
 
 protected:
 
-   // Material 
+   // Material
    String mMatName;
    BaseMatInstance *mMatInstance;
    SkyMatParams mMatParamHandle;
 
    SimObjectPtr<Material> mMaterial;
-   
+
    GFXVertexBufferHandle<GFXVertexPNTT> mVB;
 
    GFXVertexBufferHandle<GFXVertexPC> mFogBandVB;
@@ -119,7 +119,7 @@ protected:
 
    MatrixSet *mMatrixSet;
 
-   F32 mFogBandHeight;   
+   F32 mFogBandHeight;
 
    void _updateMaterial();
    void _initMaterial();

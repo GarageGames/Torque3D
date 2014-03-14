@@ -775,8 +775,8 @@ void GuiShapeEdPreview::setAllMeshesHidden( bool hidden )
    }
 }
 
-void GuiShapeEdPreview::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void GuiShapeEdPreview::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    cursor = NULL;
@@ -794,7 +794,7 @@ void GuiShapeEdPreview::get3DCursor( GuiCursor *&cursor,
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
 
-   // We've already changed the cursor, 
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if ( root->mCursorChanged != -1 )
       controller->popCursor();
@@ -1580,7 +1580,7 @@ void GuiShapeEdPreview::renderNodes() const
       {
          // Render the selected and hover nodes last (so they are on top)
          if ( ( i == mSelectedNode ) || ( i == mHoverNode ) )
-            continue;   
+            continue;
 
          renderNodeAxes( i, ColorF::WHITE );
       }

@@ -287,13 +287,13 @@ void Marker::initGFXResources()
 {
    if(smVertexBuffer != NULL)
       return;
-      
+
    GFXStateBlockDesc d;
    d.cullDefined = true;
    d.cullMode = GFXCullNone;
-   
+
    smStateBlock = GFX->createStateBlock(d);
-   
+
    smVertexBuffer.set(GFX, 4, GFXBufferTypeStatic);
    GFXVertexPC* verts = smVertexBuffer.lock();
    verts[0].point = wedgePoints[0] * 0.25f;
@@ -302,7 +302,7 @@ void Marker::initGFXResources()
    verts[3].point = wedgePoints[3] * 0.25f;
    verts[0].color = verts[1].color = verts[2].color = verts[3].color = GFXVertexColor(ColorI(0, 255, 0, 255));
    smVertexBuffer.unlock();
-   
+
    smPrimitiveBuffer.set(GFX, 24, 12, GFXBufferTypeStatic);
    U16* prims;
    smPrimitiveBuffer.lock(&prims);
@@ -312,21 +312,21 @@ void Marker::initGFXResources()
    prims[3] = 1;
    prims[4] = 1;
    prims[5] = 0;
-   
+
    prims[6] = 3;
    prims[7] = 1;
    prims[8] = 1;
    prims[9] = 2;
    prims[10] = 2;
    prims[11] = 3;
-   
+
    prims[12] = 0;
    prims[13] = 3;
    prims[14] = 3;
    prims[15] = 2;
    prims[16] = 2;
    prims[17] = 0;
-   
+
    prims[18] = 0;
    prims[19] = 2;
    prims[20] = 2;
@@ -486,14 +486,14 @@ void Marker::prepRenderImage( SceneRenderState* state )
 void Marker::renderObject(ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance* overrideMat)
 {
    initGFXResources();
-   
+
    for(U32 i = 0; i < GFX->getNumSamplers(); i++)
       GFX->setTexture(i, NULL);
    GFXTransformSaver saver;
    MatrixF mat = getRenderTransform();
    mat.scale(mObjScale);
    GFX->multWorld(mat);
-   
+
    GFX->setStateBlock(smStateBlock);
    GFX->setVertexBuffer(smVertexBuffer);
    GFX->setPrimitiveBuffer(smPrimitiveBuffer);

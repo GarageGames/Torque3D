@@ -169,12 +169,12 @@ function checkSaveChangesOld( %data, %saveCallback, %dontSaveCallback )
       warn("Save Changes Dialog already Awake, NOT creating second instance.");
       return;
    }
-   
+
    // Set Proper State
    MessageBoxSaveChangesDlg.SaveCallback = %saveCallback;
    MessageBoxSaveChangesDlg.DontSaveCallback = %dontSaveCallback;
    MessageBoxSaveChangesDlg.Data = %data;
-   
+
    // Show Dialog
    Canvas.pushDialog( MessageBoxSaveChangesDlg );
 }

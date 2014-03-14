@@ -259,9 +259,9 @@ bool StackWalker::LoadModules()
 
    // First Init the whole stuff...
    bool bRet = Init(szSymPath);
-   if (szSymPath != NULL) 
+   if (szSymPath != NULL)
    {
-      free(szSymPath); 
+      free(szSymPath);
       szSymPath = NULL;
    }
    if (bRet == false)
@@ -271,7 +271,7 @@ bool StackWalker::LoadModules()
       return false;
    }
 
-   if(GetModuleListTH32(m_hProcess, m_dwProcessId)) 
+   if(GetModuleListTH32(m_hProcess, m_dwProcessId))
    {
       m_modulesLoaded = true;
       return true;
@@ -508,7 +508,7 @@ bool StackWalker::ShowCallstack(HANDLE hThread, CONTEXT const & context, PReadPr
 
          // show module info
          if( GetModuleInfo(this->m_hProcess, s.AddrPC.Offset, &Module) )
-         { 
+         {
             switch ( Module.SymType )
             {
             case SymNone:
@@ -780,7 +780,7 @@ void StackWalker::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &ent
       }
       else
       {
-         _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s (%d): %s\n", entry.lineFileName, entry.lineNumber, entry.name);	
+         _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s (%d): %s\n", entry.lineFileName, entry.lineNumber, entry.name);
       }
       OnOutput(buffer);
    }
@@ -814,7 +814,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
    ver.dwOSVersionInfoSize = sizeof(ver);
    if (GetVersionEx( (OSVERSIONINFO*) &ver) != FALSE)
    {
-      _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n", 
+      _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n",
          ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
          ver.szCSDVersion, ver.wSuiteMask, ver.wProductType);
       if(OutputOS & m_options) OnOutput(buffer);

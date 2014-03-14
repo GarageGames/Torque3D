@@ -87,7 +87,7 @@ NamedTexTarget::NamedTexTarget()
    :  mViewport( RectI::One ),
       mIsRegistered( false ),
       mConditioner( NULL )
-{   
+{
 }
 
 NamedTexTarget::~NamedTexTarget()
@@ -115,7 +115,7 @@ void NamedTexTarget::getShaderMacros( Vector<GFXShaderMacro> *outMacros )
    if ( !cond )
       return;
 
-   // TODO: No check for duplicates is 
+   // TODO: No check for duplicates is
    // going on here which might be a problem?
 
    String targetName = String::ToLower( mName );
@@ -132,7 +132,7 @@ void NamedTexTarget::getShaderMacros( Vector<GFXShaderMacro> *outMacros )
 
    const String &uncondMethod = cond->getShaderMethodName( ConditionerFeature::UnconditionMethod );
    if ( uncondMethod.isNotEmpty() )
-   {   
+   {
       GFXShaderMacro macro;
       macro.name = targetName + "Uncondition";
       macro.value = uncondMethod;

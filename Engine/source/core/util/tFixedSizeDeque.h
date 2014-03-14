@@ -66,7 +66,7 @@ class FixedSizeDeque
          // Don't use new() so we don't get a buffer full of instances.
          mBuffer = ( ValueType* ) dMalloc( sizeof( ValueType ) * bufferSize );
       }
-      
+
       ~FixedSizeDeque()
       {
          // Destruct remaining instances.
@@ -98,7 +98,7 @@ class FixedSizeDeque
       {
          return ( mBufferSize - size() );
       }
-      
+
       ///
       void clear()
       {
@@ -152,7 +152,7 @@ class FixedSizeDeque
          AssertFatal( !isEmpty(), "FixedSizeDeque::popFront() - queue is empty" );
          ValueType value = mBuffer[ mStart ];
          destructInPlace( &mBuffer[ mStart ] );
-         
+
          mStart ++;
          if( mStart == mBufferSize )
             mStart = 0;
@@ -165,7 +165,7 @@ class FixedSizeDeque
       ValueType popBack()
       {
          AssertFatal( !isEmpty(), "FixedSizeDeque::popBack() - queue is empty" );
-         
+
          U32 idx;
          if( !mEnd )
             idx = mBufferSize - 1;

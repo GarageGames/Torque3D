@@ -44,7 +44,7 @@ protected:
 
 public:
    GuiConsoleEditCtrl();
-   
+
    DECLARE_CONOBJECT(GuiConsoleEditCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
 

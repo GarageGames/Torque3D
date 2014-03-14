@@ -101,13 +101,13 @@ IterStmtNode* IterStmtNode::alloc( S32 lineNumber, StringTableEntry varName, Exp
 {
    IterStmtNode* ret = ( IterStmtNode* ) consoleAlloc( sizeof( IterStmtNode ) );
    constructInPlace( ret );
-   
+
    ret->dbgLineNumber = lineNumber;
    ret->varName = varName;
    ret->containerExpr = containerExpr;
    ret->body = body;
    ret->isStringIter = isStringIter;
-   
+
    return ret;
 }
 
@@ -227,7 +227,7 @@ FloatNode *FloatNode::alloc( S32 lineNumber, F64 value )
 {
    FloatNode *ret = (FloatNode *) consoleAlloc(sizeof(FloatNode));
    constructInPlace(ret);
-   
+
    ret->dbgLineNumber = lineNumber;
    ret->value = value;
    return ret;
@@ -330,15 +330,15 @@ FuncCallExprNode *FuncCallExprNode::alloc( S32 lineNumber, StringTableEntry func
 
 AssertCallExprNode *AssertCallExprNode::alloc( S32 lineNumber,  ExprNode *testExpr, const char *message )
 {
-   #ifdef TORQUE_ENABLE_SCRIPTASSERTS      
+   #ifdef TORQUE_ENABLE_SCRIPTASSERTS
 
       AssertCallExprNode *ret = (AssertCallExprNode *) consoleAlloc(sizeof(FuncCallExprNode));
       constructInPlace(ret);
       ret->dbgLineNumber = lineNumber;
       ret->testExpr = testExpr;
-      ret->message = message ? message : "TorqueScript assert!";   
+      ret->message = message ? message : "TorqueScript assert!";
       return ret;
-   
+
    #else
 
       return NULL;

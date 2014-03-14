@@ -50,7 +50,7 @@
          VertSizing = "bottom";
          Position = "6 25";
          Extent = "189 64";
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
@@ -948,7 +948,7 @@
                canSaveDynamicFields = "0";
             };
          };
-         
+
          new GuiBitmapCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
@@ -1365,7 +1365,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiBitmapCtrl() { // inactive overlay
          internalName = "inactiveOverlay";
          Profile = "ToolsGuiDefaultProfile";
@@ -1376,7 +1376,7 @@
          isContainer = true;
          Visible = false;
          bitmap = "tools/gui/images/inactive-overlay";
-         
+
          new GuiTextCtrl(){
             internalName = "inactiveOverlayDlg";
             Profile = "ToolsGuiTextCenterProfile";

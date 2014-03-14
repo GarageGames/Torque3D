@@ -37,7 +37,7 @@
       visible = "0";
       Margin = "5 5 5 5";
       Padding = "5 5 5 5";
-            
+
       new GuiScrollCtrl() {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -87,7 +87,7 @@
             Visible = "1";
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            
+
             new GuiControl() {
                Enabled = "1";
                Profile = "ToolsGuiDefaultProfile";
@@ -97,7 +97,7 @@
                Extent = "140 106";
                MinExtent = "16 16";
                Visible = "1";
-               
+
                new GuiCheckBoxCtrl(){
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "DoPosition";
@@ -111,7 +111,7 @@
                   text = "Position";
                   Command = "";
                };
-               
+
                new GuiButtonCtrl() {
                   class = "ETransformSelectionButtonClass";
                   internalName = "GetPosButton";
@@ -135,7 +135,7 @@
                   buttonType = "PushButton";
                   useMouseEvents = "0";
                };
-               
+
                new GuiTextCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -158,7 +158,7 @@
                   text = "X:";
                   maxLength = "1024";
                };
-               
+
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "PosX";
@@ -171,7 +171,7 @@
                   maxLength = "1024";
                   AltCommand = "";
                };
-               
+
                new GuiTextCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -194,7 +194,7 @@
                   text = "Y:";
                   maxLength = "1024";
                };
-               
+
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "PosY";
@@ -207,7 +207,7 @@
                   maxLength = "1024";
                   AltCommand = "";
                };
-               
+
                new GuiTextCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -230,7 +230,7 @@
                   text = "Z:";
                   maxLength = "1024";
                };
-               
+
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "PosZ";
@@ -243,7 +243,7 @@
                   maxLength = "1024";
                   AltCommand = "";
                };
-               
+
                new GuiCheckBoxCtrl(){
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "PosRelative";
@@ -258,7 +258,7 @@
                   Command = "";
                };
             };
-            
+
             new GuiBitmapCtrl() {
                Enabled = "1";
                Profile = "ToolsGuiDefaultProfile";
@@ -277,7 +277,7 @@
                Extent = "140 128";
                MinExtent = "16 16";
                Visible = "1";
-               
+
                new GuiCheckBoxCtrl(){
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "DoRotation";
@@ -291,7 +291,7 @@
                   text = "Rotation";
                   Command = "";
                };
-               
+
                new GuiButtonCtrl() {
                   class = "ETransformSelectionButtonClass";
                   internalName = "GetRotButton";
@@ -315,7 +315,7 @@
                   buttonType = "PushButton";
                   useMouseEvents = "0";
                };
-               
+
                new GuiTextCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -338,7 +338,7 @@
                   text = "H:";
                   maxLength = "1024";
                };
-               
+
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "Heading";
@@ -351,7 +351,7 @@
                   maxLength = "1024";
                   AltCommand = "";
                };
-               
+
                new GuiTextCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -374,7 +374,7 @@
                   text = "P:";
                   maxLength = "1024";
                };
-               
+
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "Pitch";
@@ -387,7 +387,7 @@
                   maxLength = "1024";
                   AltCommand = "";
                };
-               
+
                new GuiTextCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -410,7 +410,7 @@
                   text = "B:";
                   maxLength = "1024";
                };
-               
+
                new GuiTextEditCtrl() {
                   class = "ETransformSelectionTextEdit";
                   internalName = "Bank";
@@ -423,7 +423,7 @@
                   maxLength = "1024";
                   AltCommand = "";
                };
-               
+
                new GuiCheckBoxCtrl(){
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "RotRelative";
@@ -437,7 +437,7 @@
                   text = "Relative";
                   Command = "ETransformSelection.RotRelativeChanged();";
                };
-               
+
                new GuiCheckBoxCtrl(){
                   class = "ETransformSelectionCheckBoxClass";
                   internalName = "RotLocal";
@@ -452,7 +452,7 @@
                   Command = "ETransformSelection.RotLocalChanged();";
                };
             };
-            
+
             new GuiBitmapCtrl() {
                Enabled = "1";
                Profile = "ToolsGuiDefaultProfile";
@@ -506,7 +506,7 @@
                   AnchorRight = "0";
                   text = "Scale";
                   maxLength = "1024";
-         
+
                   new GuiBitmapBorderCtrl() {
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -521,7 +521,7 @@
                      Visible = "1";
                      hovertime = "1000";
                   };
-                  
+
                   new GuiControl() {
                      Enabled = "1";
                      Profile = "ToolsGuiDefaultProfile";
@@ -531,7 +531,7 @@
                      Extent = "134 156";
                      MinExtent = "16 16";
                      Visible = "1";
-                     
+
                      new GuiCheckBoxCtrl(){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "DoScale";
@@ -545,7 +545,7 @@
                         text = "Scale";
                         Command = "";
                      };
-                     
+
                      new GuiButtonCtrl() {
                         class = "ETransformSelectionButtonClass";
                         internalName = "GetScaleButton";
@@ -569,7 +569,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                      };
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -592,7 +592,7 @@
                         text = "X:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "ScaleX";
@@ -605,7 +605,7 @@
                         maxLength = "1024";
                         AltCommand = "";
                      };
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -628,7 +628,7 @@
                         text = "Y:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "ScaleY";
@@ -641,7 +641,7 @@
                         maxLength = "1024";
                         AltCommand = "";
                      };
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -664,7 +664,7 @@
                         text = "Z:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "ScaleZ";
@@ -677,7 +677,7 @@
                         maxLength = "1024";
                         AltCommand = "";
                      };
-                     
+
                      new GuiCheckBoxCtrl(){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "ScaleRelative";
@@ -691,7 +691,7 @@
                         text = "Relative";
                         Command = "";
                      };
-                     
+
                      new GuiCheckBoxCtrl(){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "ScaleLocal";
@@ -705,7 +705,7 @@
                         text = "Local Center";
                         Command = "";
                      };
-                     
+
                      new GuiCheckBoxCtrl(ETransformSelectionScaleProportional){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "ScaleProportional";
@@ -743,7 +743,7 @@
                   AnchorRight = "0";
                   text = "Size";
                   maxLength = "1024";
-         
+
                   new GuiBitmapBorderCtrl() {
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -758,7 +758,7 @@
                      Visible = "1";
                      hovertime = "1000";
                   };
-                  
+
                   new GuiControl() {
                      Enabled = "1";
                      Profile = "ToolsGuiDefaultProfile";
@@ -768,7 +768,7 @@
                      Extent = "134 156";
                      MinExtent = "16 16";
                      Visible = "1";
-                     
+
                      new GuiCheckBoxCtrl(){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "DoSize";
@@ -782,7 +782,7 @@
                         text = "Size";
                         Command = "";
                      };
-                     
+
                      new GuiButtonCtrl() {
                         class = "ETransformSelectionButtonClass";
                         internalName = "GetSizeButton";
@@ -806,7 +806,7 @@
                         buttonType = "PushButton";
                         useMouseEvents = "0";
                      };
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -829,7 +829,7 @@
                         text = "X:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "SizeX";
@@ -842,7 +842,7 @@
                         maxLength = "1024";
                         AltCommand = "";
                      };
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -865,7 +865,7 @@
                         text = "Y:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "SizeY";
@@ -878,7 +878,7 @@
                         maxLength = "1024";
                         AltCommand = "";
                      };
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -901,7 +901,7 @@
                         text = "Z:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         class = "ETransformSelectionTextEdit";
                         internalName = "SizeZ";
@@ -914,7 +914,7 @@
                         maxLength = "1024";
                         AltCommand = "";
                      };
-                     
+
                      new GuiCheckBoxCtrl(){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "SizeRelative";
@@ -928,7 +928,7 @@
                         text = "Relative";
                         Command = "";
                      };
-                     
+
                      new GuiCheckBoxCtrl(){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "SizeLocal";
@@ -942,7 +942,7 @@
                         text = "Local Center";
                         Command = "";
                      };
-                     
+
                      new GuiCheckBoxCtrl(ETransformSelectionSizeProportional){
                         class = "ETransformSelectionCheckBoxClass";
                         internalName = "SizeProportional";
@@ -959,7 +959,7 @@
                   };
                };
             };
-         };      
+         };
       };
 
       new GuiContainer(){
@@ -1021,6 +1021,6 @@
             useMouseEvents = "0";
          };
       };
-      
+
    };
 };

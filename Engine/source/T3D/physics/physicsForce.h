@@ -52,8 +52,8 @@ public:
    // SimObject
    static void initPersistFields();
    bool onAdd();
-   void onRemove();   
-   
+   void onRemove();
+
    // SceneObject
    void onMount( SceneObject *obj, S32 node );
    void onUnmount( SceneObject *obj, S32 node );

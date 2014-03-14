@@ -47,9 +47,9 @@ class RigidShapeData : public ShapeBaseData
    //-------------------------------------- Console set variables
   public:
 
-   struct Body 
+   struct Body
    {
-      enum Sounds 
+      enum Sounds
       {
          SoftImpactSound,
          HardImpactSound,
@@ -68,7 +68,7 @@ class RigidShapeData : public ShapeBaseData
       VC_BUBBLE_EMITTER = VC_NUM_BUBBLE_EMITTERS,
    };
 
-  enum Sounds 
+  enum Sounds
   {
       ExitWater,
       ImpactSoft,
@@ -83,12 +83,12 @@ class RigidShapeData : public ShapeBaseData
    F32 softSplashSoundVel;
    F32 medSplashSoundVel;
    F32 hardSplashSoundVel;
- 
+
    F32 minImpactSpeed;
    F32 softImpactSpeed;
    F32 hardImpactSpeed;
    F32 minRollSpeed;
-   
+
    bool cameraRoll;           ///< Roll the 3rd party camera
    F32 cameraLag;             ///< Amount of camera lag (lag += car velocity * lag)
    F32 cameraDecay;           ///< Rate at which camera returns to target pos.
@@ -115,7 +115,7 @@ class RigidShapeData : public ShapeBaseData
 
    F32 dragForce;
    F32 vertFactor;
-   
+
    ParticleEmitterData * dustTrailEmitter;
    S32                   dustTrailID;
 
@@ -146,7 +146,7 @@ class RigidShape: public ShapeBase
    SimObjectPtr<ParticleEmitter> mDustTrailEmitter;
 
   protected:
-   enum CollisionFaceFlags 
+   enum CollisionFaceFlags
    {
       BodyCollision =  BIT(0),
       WheelCollision = BIT(1),
@@ -162,7 +162,7 @@ class RigidShape: public ShapeBase
    void updateDustTrail( F32 dt );
 
 
-   struct StateDelta 
+   struct StateDelta
    {
       Move move;                    ///< Last move from server
       F32 dt;                       ///< Last interpolation time
@@ -247,7 +247,7 @@ public:
    void processTick(const Move *move);
    bool onAdd();
    void onRemove();
-   
+
    /// Interpolates between move ticks @see processTick
    /// @param   dt   Change in time between the last call and this call to the function
    void interpolateTick(F32 dt);
@@ -255,7 +255,7 @@ public:
 
    /// Disables collisions for this shape
    void disableCollision();
-   
+
    /// Enables collisions for this shape
    void enableCollision();
 
@@ -263,7 +263,7 @@ public:
    Point3F getVelocity() const;
 
    void setEnergyLevel(F32 energy);
-   
+
    void prepBatchRender(  SceneRenderState *state, S32 mountedImageIndex );
 
    // xgalaxy cool hacks
@@ -272,14 +272,14 @@ public:
 
    ///@name Rigid body methods
    ///@{
-   
+
    /// This method will get the velocity of the object, taking into account
    /// angular velocity.
    /// @param   r   Point on the object you want the velocity of, relative to Center of Mass
    /// @param   vel   Velocity (out)
    void getVelocity(const Point3F& r, Point3F* vel);
-   
-   /// Applies an impulse force 
+
+   /// Applies an impulse force
    /// @param   r   Point on the object to apply impulse to, r is relative to Center of Mass
    /// @param   impulse   Impulse vector to apply.
    void applyImpulse(const Point3F &r, const Point3F &impulse);

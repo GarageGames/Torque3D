@@ -1217,7 +1217,7 @@ void ColladaUtils::exportColladaTriangles(TiXmlElement* meshNode, const Optimize
          {
             tempIndices[0] = 0;
             U32 idx = 1;
-            
+
             for (U32 k = 1; k < poly.vertexCount; k += 2)
                tempIndices[idx++] = k;
 

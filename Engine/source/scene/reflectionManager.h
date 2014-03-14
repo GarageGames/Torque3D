@@ -49,10 +49,10 @@ enum ReflectMode
 {
    ReflectNever = 0,
    ReflectDynamic,
-   ReflectAlways        
+   ReflectAlways
 };
 
-typedef Delegate<bool(bool)> ReflectDelegate;     
+typedef Delegate<bool(bool)> ReflectDelegate;
 class SceneObject;
 
 struct Reflector
@@ -79,7 +79,7 @@ class ReflectionManager
 public:
 
    ReflectionManager();
-   virtual ~ReflectionManager();     
+   virtual ~ReflectionManager();
 
    static void initConsole();
 
@@ -89,17 +89,17 @@ public:
    /// Returns the current reflection format.
    GFXFormat getReflectFormat() const { return mReflectFormat; }
 
-   /// Doll out callbacks to registered objects based on 
-   /// scoring and elapsed time.  This should be called 
+   /// Doll out callbacks to registered objects based on
+   /// scoring and elapsed time.  This should be called
    /// once for each viewport that renders.
-   void update(   F32 timeSlice, 
-                  const Point2I &resolution, 
+   void update(   F32 timeSlice,
+                  const Point2I &resolution,
                   const CameraQuery &query );
 
    void registerReflector( ReflectorBase *reflector );
    void unregisterReflector( ReflectorBase *reflector );
 
-   GFXTexHandle allocRenderTarget( const Point2I &size );  
+   GFXTexHandle allocRenderTarget( const Point2I &size );
 
    GFXTextureObject* getRefractTex( bool forceUpdate = false );
 
@@ -112,7 +112,7 @@ protected:
    bool _handleDeviceEvent( GFXDevice::GFXDeviceEventType evt );
 
 protected:
-   
+
    /// ReflectionManager tries not to spend more than this amount of time
    /// updating reflections per frame.
    static U32 smFrameReflectionMS;
@@ -141,10 +141,10 @@ protected:
 
    /// Platform time in milliseconds of the last update.
    U32 mLastUpdateMs;
-   
+
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "ReflectionManager"; }   
+   static const char* getSingletonName() { return "ReflectionManager"; }
 };
 
 

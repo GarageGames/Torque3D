@@ -180,11 +180,11 @@ bool GuiDynamicCtrlArrayControl::resize(const Point2I &newPosition, const Point2
    if ( size() == 0 )
       return Parent::resize( newPosition, newExtent );
 
-   if ( mResizing ) 
+   if ( mResizing )
       return false;
 
    mResizing = true;
-   
+
    // Calculate the cellSize based on our widest/tallest child control
    // if the flag to do so is set.
    if ( mAutoCellSize )
@@ -211,7 +211,7 @@ bool GuiDynamicCtrlArrayControl::resize(const Point2I &newPosition, const Point2
    {
       GuiControl *child = dynamic_cast<GuiControl*>(operator [](i));
       if ( child && child->isVisible() )
-         numChildren++;         
+         numChildren++;
    }
 
    // Calculate number of rows and columns.
@@ -234,7 +234,7 @@ bool GuiDynamicCtrlArrayControl::resize(const Point2I &newPosition, const Point2
       mRows = numChildren / mCols;
       if ( numChildren % mCols > 0 )
          mRows++;
-   }       
+   }
 
    // Place each child...
    S32 childcount = 0;
@@ -244,7 +244,7 @@ bool GuiDynamicCtrlArrayControl::resize(const Point2I &newPosition, const Point2
       GuiControl *gc = dynamic_cast<GuiControl*>(operator [](i));
 
       // Added check if child is visible.  Invisible children don't take part
-      if ( gc && gc->isVisible() ) 
+      if ( gc && gc->isVisible() )
       {
          S32 curCol, curRow;
 
@@ -272,12 +272,12 @@ bool GuiDynamicCtrlArrayControl::resize(const Point2I &newPosition, const Point2
 
    if ( mDynamicSize )
    {
-      if ( mFillRowFirst )      
+      if ( mFillRowFirst )
          realExtent.y = mRows * mRowSize + ( mRows - 1 ) * mRowSpacing + ( mPadding.top + mPadding.bottom );
       else
          realExtent.x = mCols * mColSize + ( mCols - 1 ) * mColSpacing + ( mPadding.left + mPadding.right );
    }
-   
+
    mResizing = false;
 
    return Parent::resize( newPosition, realExtent );

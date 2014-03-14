@@ -119,7 +119,7 @@ void SFXWavStream::_close()
 bool SFXWavStream::_readHeader()
 {
    // We read the wav chunks to gather than header info
-   // and find the start and end position of the data chunk. 
+   // and find the start and end position of the data chunk.
    mDataStart = -1;
 
    WAVFileHdr fileHdr;
@@ -197,7 +197,7 @@ bool SFXWavStream::_readHeader()
 
          // This has never been hooked up and its usefulness is
          // dubious.  Do we really want the audio file overriding
-         // the SFXDescription setting?    
+         // the SFXDescription setting?
          //mLooping = ( smplHdr.loops ? true : false );
 
          chunkRemaining -= sizeof(WAVSmplHdr);
@@ -260,29 +260,29 @@ U32 SFXWavStream::read( U8 *buffer, U32 bytes )
    AssertFatal( mStream, "SFXWavStream::seek() - Stream is null!" );
 
    // Read in even sample chunks.
-   
+
    bytes -= bytes % mFormat.getBytesPerSample();
 
    // Read the data and determine how much we've read.
    // FileStreams apparently report positions past
    // the actual stream length, so manually cap the
    // numbers here.
-   
+
    const U32 oldPosition = mStream->getPosition();
    mStream->read( bytes, buffer );
    U32 newPosition = mStream->getPosition();
    const U32 maxPosition = getDataLength() + mDataStart;
    if( newPosition > maxPosition )
       newPosition = maxPosition;
-      
+
    const U32 numBytesRead = newPosition - oldPosition;
 
-   // TODO: Is it *just* 16 bit samples that needs to 
+   // TODO: Is it *just* 16 bit samples that needs to
    // be flipped?  What about 32 bit samples?
    #ifdef TORQUE_BIG_ENDIAN
 
       // We need to endian-flip 16-bit data.
-      if ( getFormat().getBytesPerChannel() == 2 ) 
+      if ( getFormat().getBytesPerChannel() == 2 )
       {
          U16 *ds = (U16*)buffer;
          U16 *de = (U16*)(buffer+bytes);

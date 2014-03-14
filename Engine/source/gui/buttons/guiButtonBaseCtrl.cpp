@@ -35,10 +35,10 @@ IMPLEMENT_CONOBJECT( GuiButtonBaseCtrl );
 
 ConsoleDocClass( GuiButtonBaseCtrl,
    "@brief The base class for the various button controls.\n\n"
-   
+
    "This is the base class for the various types of button controls.  If no more specific functionality is required than "
    "offered by this class, then it can be instantiated and used directly.  Otherwise, its subclasses should be used:\n"
-   
+
    "- GuiRadioCtrl (radio buttons)\n"
    "- GuiCheckBoxCtrl (checkboxes)\n"
    "- GuiButtonCtrl (push buttons with text labels)\n"
@@ -47,7 +47,7 @@ ConsoleDocClass( GuiButtonBaseCtrl,
    "- GuiToggleButtonCtrl (toggle buttons, i.e. push buttons with \"sticky\" behavior)\n"
    "- GuiSwatchButtonCtrl (color swatch buttons)\n"
    "- GuiBorderButtonCtrl (push buttons for surrounding child controls)\n\n"
-   
+
    "@ingroup GuiButtons"
 );
 
@@ -115,7 +115,7 @@ GuiButtonBaseCtrl::GuiButtonBaseCtrl()
 void GuiButtonBaseCtrl::initPersistFields()
 {
    addGroup( "Button" );
-   	
+
       addField( "text", TypeCaseString, Offset(mButtonText, GuiButtonBaseCtrl),
          "Text label to display on button (if button class supports text labels)." );
       addField( "textID", TypeString, Offset(mButtonTextID, GuiButtonBaseCtrl),
@@ -126,15 +126,15 @@ void GuiButtonBaseCtrl::initPersistFields()
       addField( "groupNum", TypeS32, Offset(mRadioGroup, GuiButtonBaseCtrl),
          "Radio button toggle group number.  All radio buttons that are assigned the same #groupNum and that "
          "are parented to the same control will synchronize their toggle state, i.e. if one radio button is toggled on "
-         "all other radio buttons in its group will be toggled off.\n\n" 
+         "all other radio buttons in its group will be toggled off.\n\n"
          "The default group is -1." );
       addField( "buttonType", TYPEID< ButtonType >(), Offset(mButtonType, GuiButtonBaseCtrl),
          "Button behavior type.\n" );
       addField( "useMouseEvents", TypeBool, Offset(mUseMouseEvents, GuiButtonBaseCtrl),
          "If true, mouse events will be passed on to script.  Default is false.\n" );
-      
+
    endGroup( "Button" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -205,7 +205,7 @@ void GuiButtonBaseCtrl::setStateOn( bool bStateOn )
    {
       messageSiblings(mRadioGroup);
       mStateOn = bStateOn;
-   }		
+   }
    setUpdate();
 }
 
@@ -254,7 +254,7 @@ void GuiButtonBaseCtrl::onMouseDown(const GuiEvent &event)
 
    if (mProfile->mSoundButtonDown)
       SFX->playOnce(mProfile->mSoundButtonDown);
-      
+
    mMouseDownPoint = event.mousePoint;
    mMouseDragged = false;
 
@@ -320,7 +320,7 @@ void GuiButtonBaseCtrl::onMouseUp(const GuiEvent &event)
 
    if( !mActive )
       return;
-   
+
    setUpdate();
 
    if( mUseMouseEvents )
@@ -350,18 +350,18 @@ void GuiButtonBaseCtrl::onMouseDragged( const GuiEvent& event )
    {
       // If we haven't started a drag yet, find whether we have moved past
       // the tolerance value.
-      
+
       if( !mMouseDragged )
       {
          Point2I delta = mMouseDownPoint - event.mousePoint;
          if( mAbs( delta.x ) > 2 || mAbs( delta.y ) > 2 )
             mMouseDragged = true;
       }
-      
+
       if( mMouseDragged )
          onMouseDragged_callback();
    }
-      
+
    Parent::onMouseDragged( event );
 }
 

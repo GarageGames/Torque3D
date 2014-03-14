@@ -21,11 +21,11 @@
 //-----------------------------------------------------------------------------
 
 // This file merely contains the base functionality for creating your own
-// 'subclassed' script namkespaces that define the visual appearance of 
+// 'subclassed' script namkespaces that define the visual appearance of
 // a thumbnail for a guiThumnailPopup list.
 //
 // All border creation and callback click functionality is also defined in
-// this file and may be overriden in your namespaces provided that you 
+// this file and may be overriden in your namespaces provided that you
 // properly invoke the Parent::onMethodName( %parameterList ) to all this
 // base namespace to do it's dependent processing.
 
@@ -54,7 +54,7 @@ function GuiDefaultThumbnail::onClick( %this )
 
 function GuiDefaultThumbnail::onRightClick( %this )
 {
-   // Nothing Here.   
+   // Nothing Here.
 }
 
 function GuiDefaultThumbnail::onMouseLeave( %this )
@@ -71,6 +71,6 @@ function GuiDefaultThumbnail::onDoubleClick( %this )
 {
    // By Default if the base funcitonality is called
    // in onClick, we will never get here.  However, if
-   // you want to override this functionality, simply 
+   // you want to override this functionality, simply
    // override onClick and don't call the parent.
 }

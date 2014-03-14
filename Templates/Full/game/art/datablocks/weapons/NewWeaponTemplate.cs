@@ -101,7 +101,7 @@ datablock ProjectileData( BulletProjectile )
 function BulletProjectile::onCollision(%this,%obj,%col,%fade,%pos,%normal)
 {
    // Apply impact force from the projectile.
-   
+
    // Apply damage to the object all shape base objects
    if ( %col.getType() & $TypeMasks::GameBaseObjectType )
       %col.damage(%obj,%pos,%this.directDamage,"BulletProjectile");
@@ -133,7 +133,7 @@ datablock ProjectileData( WeaponTemplateProjectile )
 function WeaponTemplateProjectile::onCollision(%this,%obj,%col,%fade,%pos,%normal)
 {
    // Apply impact force from the projectile.
-   
+
    // Apply damage to the object all shape base objects
    if ( %col.getType() & $TypeMasks::GameBaseObjectType )
       %col.damage(%obj,%pos,%this.directDamage,"WeaponTemplateProjectile");
@@ -194,11 +194,11 @@ datablock ItemData(WeaponTemplateItem)
 datablock ShapeBaseImageData(WeaponTemplateImage)
 {
    // FP refers to first person specific features
-   
+
    // Defines what art file to use.
    shapeFile = "art/shapes/weapons/Lurker/TP_Lurker.DAE";
    shapeFileFP = "art/shapes/weapons/Lurker/FP_Lurker.DAE";
-   
+
    // Whether or not to enable environment mapping
    //emap                           = true;
 
@@ -209,7 +209,7 @@ datablock ShapeBaseImageData(WeaponTemplateImage)
    mountPoint                       = 0;
    //firstPerson                    = true;
    //eyeOffset                      = "0.001 -0.05 -0.065";
-   
+
    // When firing from a point offset from the eye, muzzle correction
    // will adjust the muzzle vector to point to the eye LOS point.
    // Since this weapon doesn't actually fire from the muzzle point,
@@ -228,7 +228,7 @@ datablock ShapeBaseImageData(WeaponTemplateImage)
    //projectile                     = BulletProjectile;
    //projectileType                 = Projectile;
    //projectileSpread               = "0.005";
-   
+
    // Properties associated with the shell casing that gets ejected during firing
    //casing = BulletShell;
    //shellExitDir                   = "1.0 0.3 1.0";
@@ -388,7 +388,7 @@ datablock ShapeBaseImageData(WeaponTemplateImage)
    stateSequenceTransitionOut[11]   = true;
    stateAllowImageChange[11]        = false;
    stateSequence[11]                = "sprint";
-   
+
    // Stop Sprinting
    stateName[12]                    = "SprintExit";
    stateTransitionGeneric0In[12]    = "SprintEnter";

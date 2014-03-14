@@ -156,7 +156,7 @@ QuatF & QuatF::set( const MatrixF & mat )
    F32 const *m = mat;
 
    F32 trace = m[idx(0, 0)] + m[idx(1, 1)] + m[idx(2, 2)];
-   if (trace > 0.0f) 
+   if (trace > 0.0f)
    {
       F32 s = mSqrt(trace + F32(1));
       w = s * 0.5f;
@@ -164,8 +164,8 @@ QuatF & QuatF::set( const MatrixF & mat )
       x = (m[idx(1,2)] - m[idx(2,1)]) * s;
       y = (m[idx(2,0)] - m[idx(0,2)]) * s;
       z = (m[idx(0,1)] - m[idx(1,0)]) * s;
-   } 
-   else 
+   }
+   else
    {
       F32* q = &x;
       U32 i = 0;
@@ -322,7 +322,7 @@ QuatF & QuatF::shortestArc( const VectorF &a, const VectorF &b )
    x = c.x / s;
    y = c.y / s;
    z = c.z / s;
-   w = s / 2.f; 
+   w = s / 2.f;
 
    return *this;
 }

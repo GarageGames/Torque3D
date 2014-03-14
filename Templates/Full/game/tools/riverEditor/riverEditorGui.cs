@@ -25,9 +25,9 @@ $River::wireframe = true;
 $River::showSpline = true;
 $River::showRiver = true;
 $River::showWalls = true;
-   
+
 function RiverEditorGui::onEditorActivated( %this )
-{   
+{
    %count = EWorldEditor.getSelectionSize();
    for ( %i = 0; %i < %count; %i++ )
    {
@@ -36,9 +36,9 @@ function RiverEditorGui::onEditorActivated( %this )
          EWorldEditor.unselectObject( %obj );
       else
          %this.setSelectedRiver( %obj );
-   }      
-   
-   %this.onRiverSelected( %this.getSelectedRiver() );   
+   }
+
+   %this.onRiverSelected( %this.getSelectedRiver() );
    %this.onNodeSelected(-1);
 }
 
@@ -75,12 +75,12 @@ function RiverEditorGui::createRiver( %this )
       waveMagnitude[2] = "0.2";
 
       baseColor = "45 108 171 255";
-      
+
       rippleTex = "art/water/ripple.dds";
       foamTex = "art/water/foam";
       depthGradientTex = "art/water/depthcolor_ramp";
    };
-   
+
    return %river;
 }
 
@@ -88,7 +88,7 @@ function RiverEditorGui::paletteSync( %this, %mode )
 {
    %evalShortcut = "ToolsPaletteArray-->" @ %mode @ ".setStateOn(1);";
    eval(%evalShortcut);
-} 
+}
 
 function RiverEditorGui::onEscapePressed( %this )
 {
@@ -103,59 +103,59 @@ function RiverEditorGui::onEscapePressed( %this )
 function RiverEditorGui::onRiverSelected( %this, %river )
 {
    %this.river = %river;
-   RiverInspector.inspect( %river );  
+   RiverInspector.inspect( %river );
    RiverTreeView.buildVisibleTree(true);
    if( RiverTreeView.getSelectedObject() != %river )
    {
       RiverTreeView.clearSelection();
       %treeId = RiverTreeView.findItemByObjectId( %river );
-      RiverTreeView.selectItem( %treeId );  
+      RiverTreeView.selectItem( %treeId );
    }
 }
 
 function RiverEditorGui::onNodeSelected( %this, %nodeIdx )
-{   
+{
    if ( %nodeIdx == -1 )
    {
       RiverEditorOptionsWindow-->position.setActive( false );
-      RiverEditorOptionsWindow-->position.setValue( "" );    
-      
+      RiverEditorOptionsWindow-->position.setValue( "" );
+
       RiverEditorOptionsWindow-->rotation.setActive( false );
       RiverEditorOptionsWindow-->rotation.setValue( "" );
-      
+
       RiverEditorOptionsWindow-->width.setActive( false );
-      RiverEditorOptionsWindow-->width.setValue( "" ); 
-      
+      RiverEditorOptionsWindow-->width.setValue( "" );
+
       RiverEditorOptionsWindow-->depth.setActive( false );
-      RiverEditorOptionsWindow-->depth.setValue( "" );  
+      RiverEditorOptionsWindow-->depth.setValue( "" );
    }
    else
    {
       RiverEditorOptionsWindow-->position.setActive( true );
-      RiverEditorOptionsWindow-->position.setValue( %this.getNodePosition() );    
-      
+      RiverEditorOptionsWindow-->position.setValue( %this.getNodePosition() );
+
       RiverEditorOptionsWindow-->rotation.setActive( true );
       RiverEditorOptionsWindow-->rotation.setValue( %this.getNodeNormal() );
-      
+
       RiverEditorOptionsWindow-->width.setActive( true );
-      RiverEditorOptionsWindow-->width.setValue( %this.getNodeWidth() ); 
-      
+      RiverEditorOptionsWindow-->width.setValue( %this.getNodeWidth() );
+
       RiverEditorOptionsWindow-->depth.setActive( true );
-      RiverEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );  
+      RiverEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );
    }
 }
 
 function RiverEditorGui::onNodeModified( %this, %nodeIdx )
-{   
-   RiverEditorOptionsWindow-->position.setValue( %this.getNodePosition() );    
+{
+   RiverEditorOptionsWindow-->position.setValue( %this.getNodePosition() );
    RiverEditorOptionsWindow-->rotation.setValue( %this.getNodeNormal() );
-   RiverEditorOptionsWindow-->width.setValue( %this.getNodeWidth() ); 
-   RiverEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );   
+   RiverEditorOptionsWindow-->width.setValue( %this.getNodeWidth() );
+   RiverEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );
 }
 
 function RiverEditorGui::editNodeDetails( %this )
 {
-   
+
    %this.setNodePosition( RiverEditorOptionsWindow-->position.getText() );
    %this.setNodeNormal( RiverEditorOptionsWindow-->rotation.getText() );
    %this.setNodeWidth( RiverEditorOptionsWindow-->width.getText() );
@@ -166,18 +166,18 @@ function RiverInspector::inspect( %this, %obj )
 {
    %name = "";
    if ( isObject( %obj ) )
-      %name = %obj.getName();   
+      %name = %obj.getName();
    else
       RiverFieldInfoControl.setText( "" );
-   
+
    //RiverInspectorNameEdit.setValue( %name );
-   Parent::inspect( %this, %obj );  
+   Parent::inspect( %this, %obj );
 }
 
 function RiverInspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // Same work to do as for the regular WorldEditor Inspector.
-   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );   
+   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );
 }
 
 function RiverInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %fieldDoc )
@@ -187,12 +187,12 @@ function RiverInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %fie
 
 function RiverTreeView::onInspect(%this, %obj)
 {
-   RiverInspector.inspect(%obj);   
+   RiverInspector.inspect(%obj);
 }
 
 function RiverTreeView::onSelect(%this, %obj)
 {
-   RiverEditorGui.road = %obj; 
+   RiverEditorGui.road = %obj;
    RiverInspector.inspect( %obj );
    if(%obj != RiverEditorGui.getSelectedRiver())
    {
@@ -203,13 +203,13 @@ function RiverTreeView::onSelect(%this, %obj)
 function RiverEditorGui::prepSelectionMode( %this )
 {
    %mode = %this.getMode();
-   
+
    if ( %mode $= "RiverEditorAddNodeMode"  )
    {
       if ( isObject( %this.getSelectedRiver() ) )
          %this.deleteNode();
    }
-   
+
    %this.setMode( "RiverEditorSelectMode" );
    ToolsPaletteArray-->RiverEditorSelectMode.setStateOn(1);
 }

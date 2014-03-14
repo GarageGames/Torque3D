@@ -98,32 +98,32 @@ AFTER_MODULE_INIT( SFX )
 
 ConsoleDocClass( SFXEnvironment,
    "@brief Description of a reverb environment.\n\n"
-   
+
    "A reverb environment specifies how the audio mixer should render advanced environmental audio "
    "effects.  \n\n"
-   
+
    "To use reverb environments in your level, set up one or more ambient audio spaces, assign "
    "reverb environments appropriately, and then attach the SFXAmbiences to your LevelInfo (taking effect "
    "globally) or Zone objects (taking effect locally).\n\n"
-   
+
    "To define your own custom reverb environments, it is usually easiest to adapt one of the pre-existing "
    "reverb definitions:\n"
-   
+
    "@tsexample_nopar\n"
    "singleton SFXEnvironment( AudioEnvCustomUnderwater : AudioEnvUnderwater )\n"
    "{\n"
    "   // Override select properties from AudioEnvUnderwater here.\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "In the Datablock Editor, this can be done by selecting an existing environment to copy from when creating "
    "the SFXEnvironment datablock.\n\n"
-   
+
    "For a precise description of reverb audio and the properties of this class, please consult the EAX "
    "documentation.\n\n"
-   
+
    "All SFXEnvironment instances are automatically added to the global @c SFXEnvironmentSet.\n\n"
-   
+
    "@see http://www.atc.creative.com/algorithms/eax20.pdf\n"
    "@see http://connect.creativelabs.com/developer/Gaming/Forms/AllItems.aspx\n"
    "@see SFXAmbience::environment\n\n"
@@ -143,7 +143,7 @@ SFXEnvironment::SFXEnvironment()
 void SFXEnvironment::initPersistFields()
 {
    addGroup( "Reverb" );
-   
+
       addField( "envSize",             TypeF32,    Offset( mReverb.mEnvSize, SFXEnvironment ),
          "Environment size in meters." );
       addField( "envDiffusion",        TypeF32,    Offset( mReverb.mEnvDiffusion, SFXEnvironment ),
@@ -218,9 +218,9 @@ bool SFXEnvironment::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    Sim::getSFXEnvironmentSet()->addObject( this );
-      
+
    return true;
 }
 
@@ -230,9 +230,9 @@ bool SFXEnvironment::preload( bool server, String& errorStr )
 {
    if( !Parent::preload( server, errorStr ) )
       return false;
-      
+
    validate();
-   
+
    return true;
 }
 
@@ -293,7 +293,7 @@ void SFXEnvironment::packData( BitStream* stream )
 void SFXEnvironment::unpackData( BitStream* stream )
 {
    Parent::unpackData( stream );
-   
+
    stream->read( &mReverb.mEnvSize );
    stream->read( &mReverb.mEnvDiffusion );
    stream->read( &mReverb.mRoom );

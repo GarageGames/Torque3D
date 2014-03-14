@@ -29,7 +29,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
       EdgeSnap = "0";
       canCollapse = "0";
       visible = "0";
-      
+
       new GuiContainer(){
          isContainer = "1";
          HorizSizing = "right";
@@ -53,7 +53,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          HorizSizing = "right";
          VertSizing = "height";
          isContainer = "1";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -84,8 +84,8 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
             constantThumbHeight = "0";
             childMargin = "0 0";
             mouseWheelScrollSpeed = "-1";
-            
-            
+
+
             new GuiDynamicCtrlArrayControl() {
                canSaveDynamicFields = "0";
                internalName = "filterArray";
@@ -141,7 +141,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -162,7 +162,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiContainer(){ // Materials
          profile = "ToolsGuiDefaultProfile";
          Position = "128 39";
@@ -170,7 +170,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          HorizSizing = "width";
          VertSizing = "height";
          isContainer = "1";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -201,7 +201,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
             constantThumbHeight = "0";
             childMargin = "0 0";
             mouseWheelScrollSpeed = "-1";
-            
+
             new GuiStackControl(){
                HorizSizing = "width";
                VertSizing = "bottom";
@@ -209,7 +209,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
                Extent = "128 0";
                changeChildPosition = 0;
                changeChildSizeToFit = 1;
-               
+
                new GuiControl(){
                   Extent = "0 4";
                };
@@ -262,7 +262,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
                reverseTextList = "0";
                Text = "16";
             };
-               
+
             new GuiStackControl(){
                internalName = "materialPreviewButtonStack";
                HorizSizing = "left";
@@ -275,7 +275,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
                changeChildPosition = 1;
                changeChildSizeToFit = 1;
                padding = 2;
-               
+
                new GuiButtonCtrl() {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
@@ -386,7 +386,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          Extent = "150 31";
          HorizSizing = "left";
          VertSizing = "bottom";
-         isContainer = "1";      
+         isContainer = "1";
       };
       new GuiTextCtrl(){
          profile = "ToolsGuiDefaultProfile";
@@ -403,7 +403,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          HorizSizing = "left";
          VertSizing = "height";
          isContainer = "1";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -460,7 +460,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          HorizSizing = "left";
          VertSizing = "bottom";
          isContainer = "1";
-         
+
          new GuiBitmapCtrl(){
             internalName = "previewSelection";
             HorizSizing = "left";
@@ -479,7 +479,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          extent = "84 16";
          text = "Diffuse Preview";
       };
-      
+
       new GuiBitmapCtrl(){
          HorizSizing = "left";
          VertSizing = "bottom";
@@ -518,7 +518,7 @@ new GuiControl(MaterialSelectorOverlay, EditorGuiGroup) {
          command = "MaterialSelector.hideDialog();";
       };
    };
-   
+
    new GuiWindowCtrl(MaterialSelector_addFilterWindow) {
       canSaveDynamicFields = "0";
       isContainer = "1";
@@ -651,12 +651,12 @@ UnlistedMaterials.add( "unlistedMaterials", notDirtyMaterial );
 UnlistedMaterials.add( "unlistedMaterials", materialEd_cubemapEd_cubeMapPreview );
 UnlistedMaterials.add( "unlistedMaterials", matEdCubeMapPreviewMat );
 UnlistedMaterials.add( "unlistedMaterials", materialEd_justAlphaMaterial );
-UnlistedMaterials.add( "unlistedMaterials", materialEd_justAlphaShader ); 
-   
+UnlistedMaterials.add( "unlistedMaterials", materialEd_justAlphaShader );
+
 function MaterialSelector::selectMaterial( %this, %material )
 {
    %name = "";
-   
+
    if( MaterialSelector.terrainMaterials )
    {
       %name = %material;
@@ -666,7 +666,7 @@ function MaterialSelector::selectMaterial( %this, %material )
    {
       %name = %material.getName();
    }
-   
+
    // The callback function should be ready to intake the returned material
    //eval("materialEd_previewMaterial." @ %propertyField @ " = " @ %value @ ";");
    if( MaterialSelector.returnType $= "name" )
@@ -701,7 +701,7 @@ function MaterialSelector::selectMaterial( %this, %material )
             }
          }
       }
-      
+
       eval( "" @ MaterialSelector.selectCallback @ "(" @ %index  @ ");");
    }
    else
@@ -713,7 +713,7 @@ function MaterialSelector::showDialog( %this, %selectCallback, %returnType)
 {
    if( MaterialSelector.isVisible() )
       return;
-      
+
    %this.showDialogBase(%selectCallback, %returnType, false);
 }
 
@@ -727,12 +727,12 @@ function MaterialSelector::showDialogBase( %this, %selectCallback, %returnType, 
    // Set the select callback
    MaterialSelector.selectCallback = %selectCallback;
    MaterialSelector.returnType = %returnType;
-   
+
    MaterialSelector.currentStaticFilter = $Pref::MaterialSelector::CurrentStaticFilter;
    MaterialSelector.currentFilter = $Pref::MaterialSelector::CurrentFilter;
 
    MaterialSelector.terrainMaterials = %useTerrainMaterials;
-   
+
    MaterialSelector-->materialPreviewCountPopup.clear();
    MaterialSelector-->materialPreviewCountPopup.add( "10",  0 );
    MaterialSelector-->materialPreviewCountPopup.add( "15",  1 );
@@ -741,11 +741,11 @@ function MaterialSelector::showDialogBase( %this, %selectCallback, %returnType, 
    MaterialSelector-->materialPreviewCountPopup.add( "75",  4 );
    MaterialSelector-->materialPreviewCountPopup.add( "100", 5 );
    MaterialSelector-->materialPreviewCountPopup.setSelected( $Pref::MaterialSelector::ThumbnailCountIndex );
-   
+
    Canvas.pushDialog(MaterialSelectorOverlay);
    MaterialSelector.setVisible(1);
-   MaterialSelector.buildStaticFilters();   
-   
+   MaterialSelector.buildStaticFilters();
+
    MaterialSelector.selectedMaterial = "";
    MaterialSelector.loadMaterialFilters();
 }
@@ -761,23 +761,23 @@ function MaterialSelector::breakdown( %this )
 {
    $Pref::MaterialSelector::CurrentStaticFilter = MaterialSelector.currentStaticFilter;
    $Pref::MaterialSelector::CurrentFilter = MaterialSelector.currentFilter;
-   
+
    MaterialSelector-->filterArray.deleteAllObjects();
    MaterialSelector-->materialSelection.deleteAllObjects();
    MatEdPreviewArray.delete();
-   
+
    MaterialSelector-->materialCategories.deleteAllObjects();
    MaterialFilterAllArray.delete();
    MaterialFilterMappedArray.delete();
    MaterialFilterUnmappedArray.delete();
-   
+
 }
 
 function MaterialSelector::buildStaticFilters( %this )
 {
    // if you want to add any more containers to staticFilterObjects, here's
    // where to do it
-   
+
    %staticFilterContainer = new GuiControl (){
       new GuiContainer(){
          profile = "ToolsGuiDefaultProfile";
@@ -787,7 +787,7 @@ function MaterialSelector::buildStaticFilters( %this )
          VertSizing = "bottom";
          isContainer = "1";
          parentGroup = %filterArray;
-         
+
          new GuiContainer(){
             profile = "inspectorStyleRolloutDarkProfile";
             Position = "-1 0";
@@ -802,7 +802,7 @@ function MaterialSelector::buildStaticFilters( %this )
             Extent = "118 18";
             text = "Types";
          };
-      };   
+      };
       new GuiContainer(){ // All
          profile = "ToolsGuiDefaultProfile";
          Position = "415 191";
@@ -811,7 +811,7 @@ function MaterialSelector::buildStaticFilters( %this )
          VertSizing = "bottom";
          isContainer = "1";
          parentGroup = %filterArray;
-         
+
          new GuiCheckBoxCtrl(MaterialFilterAllArrayCheckbox){
             Profile = "ToolsGuiCheckBoxListProfile";
             position = "5 2";
@@ -828,7 +828,7 @@ function MaterialSelector::buildStaticFilters( %this )
          VertSizing = "bottom";
          isContainer = "1";
          parentGroup = %filterArray;
-         
+
          new GuiCheckBoxCtrl(MaterialFilterMappedArrayCheckbox){
             Profile = "ToolsGuiCheckBoxListProfile";
             position = "5 2";
@@ -845,7 +845,7 @@ function MaterialSelector::buildStaticFilters( %this )
          VertSizing = "bottom";
          isContainer = "1";
          parentGroup = %filterArray;
-         
+
          new GuiCheckBoxCtrl(MaterialFilterUnmappedArrayCheckbox){
             Profile = "ToolsGuiCheckBoxListProfile";
             position = "5 2";
@@ -862,7 +862,7 @@ function MaterialSelector::buildStaticFilters( %this )
          VertSizing = "bottom";
          isContainer = "1";
          parentGroup = %filterArray;
-         
+
          new GuiContainer(){
             profile = "inspectorStyleRolloutDarkProfile";
             Position = "-1 0";
@@ -871,7 +871,7 @@ function MaterialSelector::buildStaticFilters( %this )
             VertSizing = "bottom";
             isContainer = "1";
          };
-         
+
          new GuiTextCtrl(){
             Profile = "EditorTextProfile";
             position = "5 0";
@@ -919,23 +919,23 @@ function MaterialSelector::buildStaticFilters( %this )
             buttonType = "PushButton";
             useMouseEvents = "0";
          };
-      }; 
+      };
    };
 
    %i = %staticFilterContainer.getCount();
    for( ; %i != 0; %i--)
       MaterialSelector-->filterArray.addGuiControl(%staticFilterContainer.getObject(0));
-      
+
    MaterialSelector.staticFilterObjects = MaterialSelector-->filterArray.getCount();
-   
+
    %staticFilterContainer.delete();
-   
+
    // Create our category array used in the selector, this code should be taken out
    // in order to make the material selector agnostic
    new ArrayObject(MaterialFilterAllArray);
    new ArrayObject(MaterialFilterMappedArray);
    new ArrayObject(MaterialFilterUnmappedArray);
-   
+
    %mats = "";
    %count = 0;
    if( MaterialSelector.terrainMaterials )
@@ -947,7 +947,7 @@ function MaterialSelector::buildStaticFilters( %this )
    {
       %count = materialSet.getCount();
    }
-   
+
    for(%i = 0; %i < %count; %i++)
    {
       // Process terrain materials
@@ -955,21 +955,21 @@ function MaterialSelector::buildStaticFilters( %this )
       {
          %matInternalName = getRecord( %mats, %i );
          %material = TerrainMaterialSet.findObjectByInternalName( %matInternalName );
-         
+
          // Is there no material info for this slot?
          if ( !isObject( %material ) )
             continue;
-         
+
          // Add to the appropriate filters
          MaterialFilterMappedArray.add( "", %material );
          MaterialFilterAllArray.add( "", %material );
-         
+
          continue;
       }
 
       // Process regular materials here
       %material = materialSet.getObject(%i);
-      
+
       for( %k = 0; %k < UnlistedMaterials.count(); %k++ )
       {
          %unlistedFound = 0;
@@ -979,10 +979,10 @@ function MaterialSelector::buildStaticFilters( %this )
             break;
          }
       }
-      
+
       if( %unlistedFound )
          continue;
-      
+
       if( %material.mapTo $= "" || %material.mapTo $= "unmapped_mat" )
       {
          MaterialFilterUnmappedArray.add( "", %material.name );
@@ -996,13 +996,13 @@ function MaterialSelector::buildStaticFilters( %this )
          for( %j = 0; %material.getFieldValue("materialTag" @ %j) !$= ""; %j++ )
             MaterialFilterMappedArray.add( %material.getFieldValue("materialTag" @ %j), %material.name );
       }
-      
+
       MaterialFilterAllArray.add( "", %material.name );
       for( %j = 0; %material.getFieldValue("materialTag" @ %j) !$= ""; %j++ )
          MaterialFilterAllArray.add( %material.getFieldValue("materialTag" @ %j), %material.name );
-      
+
    }
-   
+
    MaterialFilterAllArrayCheckbox.setText("All ( " @ MaterialFilterAllArray.count() @" ) ");
    MaterialFilterMappedArrayCheckbox.setText("Mapped ( " @ MaterialFilterMappedArray.count() @" ) ");
    MaterialFilterUnmappedArrayCheckbox.setText("Unmapped ( " @ MaterialFilterUnmappedArray.count() @" ) ");
@@ -1029,35 +1029,35 @@ function MaterialSelector::loadFilter( %this, %selectedFilter, %staticFilter )
    // manage schedule array properly
    if(!isObject(MatEdScheduleArray))
       new ArrayObject(MatEdScheduleArray);
-   
-   // if we select another list... delete all schedules that were created by 
+
+   // if we select another list... delete all schedules that were created by
    // previous load
    for( %i = 0; %i < MatEdScheduleArray.count(); %i++ )
       cancel(MatEdScheduleArray.getKey(%i));
-   
+
    // we have to empty out the list; so when we create new schedules, these dont linger
    MatEdScheduleArray.empty();
-   
+
    // manage preview array
    if(!isObject(MatEdPreviewArray))
       new ArrayObject(MatEdPreviewArray);
-      
+
    // we have to empty out the list; so when we create new guicontrols, these dont linger
    MatEdPreviewArray.empty();
    MaterialSelector-->materialSelection.deleteAllObjects();
    MaterialSelector-->materialPreviewPagesStack.deleteAllObjects();
-   
+
    // changed to accomadate tagging. dig through the array for each tag name,
    // call unique value, sort, and we have a perfect set of materials
    if( %staticFilter !$= "" )
       MaterialSelector.currentStaticFilter = %staticFilter;
-      
+
    MaterialSelector.currentFilter = %selectedFilter;
-   
+
    %filteredObjectsArray = new ArrayObject();
-   
+
    %previewsPerPage = MaterialSelector-->materialPreviewCountPopup.getTextById( MaterialSelector-->materialPreviewCountPopup.getSelected() );
-   
+
    %tagCount = getWordCount( MaterialSelector.currentFilter );
    if( %tagCount != 0 )
    {
@@ -1070,59 +1070,59 @@ function MaterialSelector::loadFilter( %this, %selectedFilter, %staticFilter )
                %filteredObjectsArray.add( MaterialSelector.currentStaticFilter.getKey(%i), MaterialSelector.currentStaticFilter.getValue(%i) );
          }
       }
-      
+
       %filteredObjectsArray.uniqueValue();
       %filteredObjectsArray.sortd();
-      
+
       MaterialSelector.totalPages = mCeil( %filteredObjectsArray.count() / %previewsPerPage );
-      
+
       //Can we maintain the current preview page, or should we go to page 1?
       if( (MaterialSelector.currentPreviewPage * %previewsPerPage) >= %filteredObjectsArray.count() )
          MaterialSelector.currentPreviewPage = 0;
-      
+
       // Build out the pages buttons
       MaterialSelector.buildPagesButtons( MaterialSelector.currentPreviewPage, MaterialSelector.totalPages );
-      
+
       %previewCount = %previewsPerPage;
       %possiblePreviewCount = %filteredObjectsArray.count() - MaterialSelector.currentPreviewPage * %previewsPerPage;
       if( %possiblePreviewCount < %previewCount )
          %previewCount = %possiblePreviewCount;
-      
+
       %start = MaterialSelector.currentPreviewPage * %previewsPerPage;
       for( %i = %start; %i < %start + %previewCount; %i++ )
          MaterialSelector.buildPreviewArray( %filteredObjectsArray.getValue(%i) );
-   
+
       %filteredObjectsArray.delete();
    }
    else
    {
       MaterialSelector.currentStaticFilter.sortd();
-   
+
       // Rebuild the static filter list without tagged materials
       %noTagArray = new ArrayObject();
       for( %i = 0; %i < MaterialSelector.currentStaticFilter.count(); %i++ )
       {
          if( MaterialSelector.currentStaticFilter.getKey(%i) !$= "")
             continue;
-         
+
          %material = MaterialSelector.currentStaticFilter.getValue(%i);
-         
+
          // CustomMaterials are not available for selection
          if ( !isObject( %material ) || %material.isMemberOfClass( "CustomMaterial" ) )
             continue;
-      
+
          %noTagArray.add( "", %material );
       }
-      
+
       MaterialSelector.totalPages = mCeil( %noTagArray.count() / %previewsPerPage );
-      
+
       //Can we maintain the current preview page, or should we go to page 1?
       if( (MaterialSelector.currentPreviewPage * %previewsPerPage) >= %noTagArray.count() )
          MaterialSelector.currentPreviewPage = 0;
-      
+
       // Build out the pages buttons
       MaterialSelector.buildPagesButtons( MaterialSelector.currentPreviewPage, MaterialSelector.totalPages );
-         
+
       %previewCount = %previewsPerPage;
       %possiblePreviewCount = %noTagArray.count() - MaterialSelector.currentPreviewPage * %previewsPerPage;
       if( %possiblePreviewCount < %previewCount )
@@ -1134,8 +1134,8 @@ function MaterialSelector::loadFilter( %this, %selectedFilter, %staticFilter )
          MaterialSelector.buildPreviewArray( %noTagArray.getValue(%i) );
       }
    }
-   
-   
+
+
    MaterialSelector.loadImages( 0 );
 }
 
@@ -1152,7 +1152,7 @@ function MaterialSelector::buildPreviewArray( %this, %material )
    if( %material.isMemberOfClass("TerrainMaterial") )
    {
       %matName = %material.getInternalName();
-      
+
       if( %material.diffuseMap $= "")
          %previewImage = "core/art/warnmat";
       else
@@ -1166,22 +1166,22 @@ function MaterialSelector::buildPreviewArray( %this, %material )
    else
    {
       %matName = %material.name;
-      
+
       if( %material.toneMap[0] !$= "" )
          %previewImage = %material.toneMap[0];
       else if( %material.diffuseMap[0] !$= "" )
          %previewImage = %material.diffuseMap[0];
       else if( %material.cubemap.cubeFace[0] !$= "" )
          %previewImage = %material.cubemap.cubeFace[0];
-      
+
       //%previewImage = MaterialEditorGui.searchForTexture( %material,  %previewImage );
-      
+
       // were going to use a couple of string commands in order to properly
-      // find out what the img src path is 
+      // find out what the img src path is
       // **NEW** this needs to be updated with the above, but has some timing issues
       %materialDiffuse =  %previewImage;
       %materialPath = %material.getFilename();
-      
+
       if( strchr( %materialDiffuse, "/") $= "" )
       {
          %k = 0;
@@ -1190,18 +1190,18 @@ function MaterialSelector::buildPreviewArray( %this, %material )
             %foo = strpos( %materialPath, "/", %k );
             %k = %foo + 1;
          }
-      
+
          %foobar = getSubStr( %materialPath , %k , 99 );
          %previewImage =  strreplace( %materialPath, %foobar, %previewImage );
       }
       else
          %previewImage =  strreplace( %materialPath, %materialPath, %previewImage );
    }
-   
+
    // it may seem goofy why the checkbox can't be instanciated inside the container
    // reason being its because we need to store the checkbox ctrl in order to make changes
-   // on it later in the function. 
-   
+   // on it later in the function.
+
    %container = new GuiControl(){
       profile = "ToolsGuiDefaultProfile";
       Position = "0 0";
@@ -1209,7 +1209,7 @@ function MaterialSelector::buildPreviewArray( %this, %material )
       HorizSizing = "right";
       VertSizing = "bottom";
       isContainer = "1";
-      
+
       new GuiTextCtrl(){
          position = "7 71";
          profile = "ToolsGuiTextCenterProfile";
@@ -1217,7 +1217,7 @@ function MaterialSelector::buildPreviewArray( %this, %material )
          text = %matName;
       };
    };
-   
+
    %previewButton = new GuiBitmapButtonCtrl(){
       internalName = %matName;
       HorizSizing = "right";
@@ -1230,7 +1230,7 @@ function MaterialSelector::buildPreviewArray( %this, %material )
       Command = "";
       text = "Loading...";
       useStates = false;
-      
+
       new GuiBitmapButtonCtrl(){
             HorizSizing = "right";
             VertSizing = "bottom";
@@ -1242,9 +1242,9 @@ function MaterialSelector::buildPreviewArray( %this, %material )
             bitmap = "tools/materialEditor/gui/cubemapBtnBorder";
             groupNum = "0";
             text = "";
-         }; 
-   }; 
-   
+         };
+   };
+
    %previewBorder = new GuiButtonCtrl(){
          internalName = %matName@"Border";
          HorizSizing = "right";
@@ -1255,16 +1255,16 @@ function MaterialSelector::buildPreviewArray( %this, %material )
          Variable = "";
          buttonType = "toggleButton";
          tooltip = %matName;
-         Command = "MaterialSelector.updateSelection( $ThisControl.getParent().getObject(1).internalName, $ThisControl.getParent().getObject(1).bitmap );"; 
+         Command = "MaterialSelector.updateSelection( $ThisControl.getParent().getObject(1).internalName, $ThisControl.getParent().getObject(1).bitmap );";
          groupNum = "0";
          text = "";
    };
-   
-   %container.add(%previewButton);  
-   %container.add(%previewBorder); 
+
+   %container.add(%previewButton);
+   %container.add(%previewBorder);
    // add to the gui control array
    MaterialSelector-->materialSelection.add(%container);
-   
+
    // add to the array object for reference later
    MatEdPreviewArray.add( %previewButton, %previewImage );
 }
@@ -1274,16 +1274,16 @@ function MaterialSelector::loadImages( %this, %materialNum )
    // this will save us from spinning our wheels in case we don't exist
    if( !MaterialSelector.visible )
       return;
-   
+
    // this schedule is here to dynamically load images
    %previewButton = MatEdPreviewArray.getKey(%materialNum);
    %previewImage = MatEdPreviewArray.getValue(%materialNum);
-   
+
    %previewButton.setBitmap(%previewImage);
    %previewButton.setText("");
-   
+
    %materialNum++;
-   
+
    if( %materialNum < MatEdPreviewArray.count() )
    {
       %tempSchedule = %this.schedule(64, "loadImages", %materialNum);
@@ -1295,31 +1295,31 @@ function MaterialSelector::clearMaterialFilters( %this )
 {
    for( %i = MaterialSelector.staticFilterObjects; %i < MaterialSelector-->filterArray.getCount(); %i++ )
       MaterialSelector-->filterArray.getObject(%i).getObject(0).setStateOn(0);
-      
+
    MaterialSelector.loadFilter( "", "" );
 }
 
 function MaterialSelector::loadMaterialFilters( %this )
 {
    %filteredTypesArray = new ArrayObject();
-      
+
    %filteredTypesArray.duplicate( MaterialFilterAllArray );
    %filteredTypesArray.uniqueKey();
-   
+
    // sort the the keys before we do anything
    %filteredTypesArray.sortkd();
-   
+
    eval( MaterialSelector.currentStaticFilter @ "Checkbox.setStateOn(1);" );
    // it may seem goofy why the checkbox can't be instanciated inside the container
    // reason being its because we need to store the checkbox ctrl in order to make changes
-   // on it later in the function. 
+   // on it later in the function.
    %selectedFilter = "";
    for( %i = 0; %i < %filteredTypesArray.count(); %i++ )
    {
       %filter = %filteredTypesArray.getKey(%i);
       if(%filter $= "")
          continue;
-         
+
       %container = new GuiControl(){
          profile = "ToolsGuiDefaultProfile";
          Position = "0 0";
@@ -1328,7 +1328,7 @@ function MaterialSelector::loadMaterialFilters( %this )
          VertSizing = "bottom";
          isContainer = "1";
       };
-      
+
       %checkbox = new GuiCheckBoxCtrl(){
          Profile = "ToolsGuiCheckBoxListProfile";
          position = "5 1";
@@ -1342,7 +1342,7 @@ function MaterialSelector::loadMaterialFilters( %this )
       };
       %container.add( %checkbox );
       MaterialSelector-->filterArray.add( %container );
-      
+
       %tagCount = getWordCount( MaterialSelector.currentFilter );
       for( %j = 0; %j < %tagCount; %j++ )
       {
@@ -1352,14 +1352,14 @@ function MaterialSelector::loadMaterialFilters( %this )
                %selectedFilter = %filter;
             else
                %selectedFilter = %selectedFilter @ " " @ %filter;
-               
+
             %checkbox.setStateOn(1);
          }
       }
    }
-      
+
    MaterialSelector.loadFilter( %selectedFilter );
-   
+
    %filteredTypesArray.delete();
 }
 
@@ -1371,7 +1371,7 @@ function MaterialSelector::createFilter( %this, %filter )
       MessageBoxOK( "Error", "Can not create blank filter.");
       return;
    }
-      
+
    for( %i = MaterialSelector.staticFilterObjects; %i < MaterialSelector-->filterArray.getCount() ; %i++ )
    {
       %existingFilters = MaterialSelector-->filterArray.getObject(%i).getObject(0).filter;
@@ -1388,7 +1388,7 @@ function MaterialSelector::createFilter( %this, %filter )
       HorizSizing = "right";
       VertSizing = "bottom";
       isContainer = "1";
-         
+
       new GuiCheckBoxCtrl(){
          Profile = "ToolsGuiCheckBoxListProfile";
          position = "5 1";
@@ -1401,13 +1401,13 @@ function MaterialSelector::createFilter( %this, %filter )
          Command = "MaterialSelector.preloadFilter();";
       };
    };
-   
+
    MaterialSelector-->filterArray.add( %container );
-   
+
    // if selection exists, lets reselect it to refresh it
    if( isObject(MaterialSelector.selectedMaterial) )
       MaterialSelector.updateSelection( MaterialSelector.selectedMaterial, MaterialSelector.selectedPreviewImagePath );
-   
+
    // material category text field to blank
    MaterialSelector_addFilterWindow-->tagName.setText("");
 }
@@ -1417,33 +1417,33 @@ function MaterialSelector::updateSelection( %this, %material, %previewImagePath 
    // the material selector will visually update per material information
    // after we move away from the material. eg: if we remove a field from the material,
    // the empty checkbox will still be there until you move fro and to the material again
-   
+
    %isMaterialBorder = 0;
    eval("%isMaterialBorder = isObject(MaterialSelector-->"@%material@"Border);");
    if( %isMaterialBorder )
    {
       eval( "MaterialSelector-->"@%material@"Border.setStateOn(1);");
    }
-      
+
    %isMaterialBorderPrevious = 0;
    eval("%isMaterialBorderPrevious = isObject(MaterialSelector-->"@$prevSelectedMaterialHL@"Border);");
    if( %isMaterialBorderPrevious )
    {
       eval( "MaterialSelector-->"@$prevSelectedMaterialHL@"Border.setStateOn(0);");
    }
-   
+
    MaterialSelector-->materialCategories.deleteAllObjects();
    MaterialSelector.selectedMaterial = %material;
    MaterialSelector.selectedPreviewImagePath = %previewImagePath;
    MaterialSelector-->previewSelectionText.setText( %material );
    MaterialSelector-->previewSelection.setBitmap( %previewImagePath );
-   
+
    // running through the existing list of categorynames in the left, so yes
    // some might exist on the left only temporary if not given a home
    for( %i = MaterialSelector.staticFilterObjects; %i < MaterialSelector-->filterArray.getCount() ; %i++ )
    {
       %filter = MaterialSelector-->filterArray.getObject(%i).getObject(0).filter;
-      
+
       %checkbox = new GuiCheckBoxCtrl(){
          materialName = %material.name;
          Profile = "ToolsGuiCheckBoxListProfile";
@@ -1452,27 +1452,27 @@ function MaterialSelector::updateSelection( %this, %material, %previewImagePath 
          Command = "MaterialSelector.updateMaterialTags( $ThisControl.materialName, $ThisControl.getText(), $ThisControl.getValue() );";
          text = %filter;
       };
-      
+
       MaterialSelector-->materialCategories.add( %checkbox );
       // crawl through material for categories in order to check or not
       %filterFound = 0;
       for( %j = 0; %material.getFieldValue("materialTag" @ %j) !$= ""; %j++ )
       {
          %tag = %material.getFieldValue("materialTag" @ %j);
-         
+
          if( %tag  $= %filter )
          {
             %filterFound = 1;
             break;
          }
       }
-      
+
       if( %filterFound  )
          %checkbox.setStateOn(1);
       else
          %checkbox.setStateOn(0);
    }
-   
+
    $prevSelectedMaterialHL = %material;
 }
 
@@ -1485,9 +1485,9 @@ function MaterialSelector::updateMaterialTags( %this, %material, %tag, %tagValue
          %secondStaticFilter = MaterialFilterUnmappedArray;
       else
          %secondStaticFilter = MaterialFilterMappedArray;
-         
+
       %secondStaticFilter.add( %tag, %material );
-      
+
       %createdTag = 0;
       for( %i = 0; %createdTag == 0; %i++ )
       {
@@ -1496,7 +1496,7 @@ function MaterialSelector::updateMaterialTags( %this, %material, %tag, %tagValue
          {
             eval( %material @ ".materialTag" @ %i @ "=" @ %tag @ ";" );
             %createdTag = 1;
-            
+
             for( %j = MaterialSelector.staticFilterObjects; %j < MaterialSelector-->filterArray.getCount() ; %j++ )
             {
                if( %tag $= MaterialSelector-->filterArray.getObject(%j).getObject(0).filter )
@@ -1506,11 +1506,11 @@ function MaterialSelector::updateMaterialTags( %this, %material, %tag, %tagValue
                   MaterialSelector-->filterArray.getObject(%j).getObject(0).setText( %tag @ " ( "@ %count @ " )");
                }
             }
-            
+
             break;
          }
       }
-   
+
    }
    else
    {
@@ -1526,13 +1526,13 @@ function MaterialSelector::updateMaterialTags( %this, %material, %tag, %tagValue
             }
          }
       }
-         
+
       // Figure out what the material's other category is
       if( %material.mapTo $= "" || %material.mapTo $= "unmapped_mat" )
          %secondStaticFilter = MaterialFilterUnmappedArray;
       else
          %secondStaticFilter = MaterialFilterMappedArray;
-      
+
       // Remove the material from its other category
       for( %i = 0; %i < %secondStaticFilter.count(); %i++ )
       {
@@ -1545,40 +1545,40 @@ function MaterialSelector::updateMaterialTags( %this, %material, %tag, %tagValue
             }
          }
       }
-      
-      
+
+
       MaterialSelector.updateFilterCount( %tag, false );
-      
+
       %tagField = MaterialSelector.getTagField( %material, %tag );
       %lastTagField = MaterialSelector.getLastTagField( %material );
       %lastValidTagField = MaterialSelector.getLastValidTagField( %material, %tag );
-      
+
       if( %tagField $= %lastValidTagField || %lastValidTagField $= "" )
       {
-         MaterialSelectorPerMan.removeField( %material, %tagField ); 
+         MaterialSelectorPerMan.removeField( %material, %tagField );
       }
       else
       {
          // Replace the current tagFieldValue with the last tagFieldValue
          %lastValidTag = %material.getFieldValue( %lastValidTagField );
          %material.setFieldValue( %tagField, %lastValidTag );
-         
+
          // Remove the last tagFieldValue
-         MaterialSelectorPerMan.removeField( %material, %lastTagField ); 
+         MaterialSelectorPerMan.removeField( %material, %lastTagField );
       }
    }
 
    // so were not going to save materials that dont current exist...
    // technically all the data is stored in dynamic fields if the user feels like saving
    // their auto-generated or new material
-   if( %material.getFilename() !$= "" && 
+   if( %material.getFilename() !$= "" &&
          %material.getFilename() !$= "tools/gui/MaterialSelector.ed.gui" &&
          %material.getFilename() !$= "tools/materialEditor/scripts/materialEditor.ed.cs"  )
    {
       MaterialSelectorPerMan.setDirty( %material );
       MaterialSelectorPerMan.saveDirty();
       MaterialSelectorPerMan.removeDirty( %material );
-      
+
       if(!%tagValue)
          %material.setFieldValue( %lastTagField, "" );
    }
@@ -1592,12 +1592,12 @@ function MaterialSelector::updateFilterCount( %this, %tag, %add )
       {
          // Get the filter count and apply the operation
          %idx = getWord( MaterialSelector-->filterArray.getObject(%i).getObject(0).getText(), 2 );
-         
+
          if( %add )
             %idx++;
          else
             %idx--;
-            
+
          MaterialSelector-->filterArray.getObject(%i).getObject(0).setText( %tag @ " ( "@ %idx @ " )");
       }
    }
@@ -1608,21 +1608,21 @@ function MaterialSelector::createNewMaterial( %this )
 {
    // look for a newMaterial name to grab
    %material = getUniqueName( "newMaterial" );
-      
-   new Material(%material) 
+
+   new Material(%material)
    {
       diffuseMap[0] = "core/art/warnMat";
       mapTo = "unmapped_mat";
       parentGroup = RootGroup;
    };
-   
+
    // add one to All filter
    MaterialFilterAllArray.add( "", %material.name );
    MaterialFilterAllArrayCheckbox.setText("All ( " @ MaterialFilterAllArray.count() + 1 @ " ) ");
 
    MaterialFilterUnmappedArray.add( "", %material.name );
    MaterialFilterUnmappedArrayCheckbox.setText("Unmapped ( " @ MaterialFilterUnmappedArray.count() + 1 @ " ) ");
-   
+
    if( MaterialSelector.currentStaticFilter !$= "MaterialFilterMappedArray" )
    {
       // create the new material gui
@@ -1640,7 +1640,7 @@ function MaterialSelector::createNewMaterial( %this )
             text = %material.name;
          };
       };
-      
+
       %previewButton = new GuiBitmapButtonCtrl(){
          internalName = %material.name;
          HorizSizing = "right";
@@ -1653,7 +1653,7 @@ function MaterialSelector::createNewMaterial( %this )
          Command = "";
          text = "Loading...";
          useStates = false;
-         
+
          new GuiBitmapButtonCtrl(){
             HorizSizing = "right";
             VertSizing = "bottom";
@@ -1665,9 +1665,9 @@ function MaterialSelector::createNewMaterial( %this )
             bitmap = "tools/materialEditor/gui/cubemapBtnBorder";
             groupNum = "0";
             text = "";
-         }; 
-      }; 
-    
+         };
+      };
+
       %previewBorder = new GuiButtonCtrl(){
          internalName = %material.name@"Border";
          HorizSizing = "right";
@@ -1678,17 +1678,17 @@ function MaterialSelector::createNewMaterial( %this )
          Variable = "";
          buttonType = "toggleButton";
          tooltip = %material.name;
-         Command = "MaterialSelector.updateSelection( $ThisControl.getParent().getObject(1).internalName, $ThisControl.getParent().getObject(1).bitmap );"; 
+         Command = "MaterialSelector.updateSelection( $ThisControl.getParent().getObject(1).internalName, $ThisControl.getParent().getObject(1).bitmap );";
          groupNum = "0";
          text = "";
       };
-   
-      %container.add(%previewButton);  
-      %container.add(%previewBorder); 
+
+      %container.add(%previewButton);
+      %container.add(%previewBorder);
       // add to the gui control array
       MaterialSelector-->materialSelection.add(%container);
    }
-   
+
    // select me
    MaterialSelector.updateSelection( %material, "core/art/warnMat.png" );
 }
@@ -1700,7 +1700,7 @@ function MaterialSelector::showDeleteDialog( %this )
    %material = MaterialSelector.selectedMaterial;
    %secondFilter = "MaterialFilterMappedArray";
    %secondFilterName = "Mapped";
-   
+
    for( %i = 0; %i < MaterialFilterUnmappedArray.count(); %i++ )
    {
       if( MaterialFilterUnmappedArray.getValue(%i) $= %material )
@@ -1710,13 +1710,13 @@ function MaterialSelector::showDeleteDialog( %this )
          break;
       }
    }
-   
+
    if( isObject( %material ) )
    {
-      MessageBoxYesNoCancel("Delete Material?", 
-         "Are you sure you want to delete<br><br>" @ %material.getName() @ "<br><br> Material deletion won't take affect until the engine is quit.", 
-         "MaterialSelector.deleteMaterial( " @ %material @ ", " @ %secondFilter @ ", " @ %secondFilterName @" );", 
-         "", 
+      MessageBoxYesNoCancel("Delete Material?",
+         "Are you sure you want to delete<br><br>" @ %material.getName() @ "<br><br> Material deletion won't take affect until the engine is quit.",
+         "MaterialSelector.deleteMaterial( " @ %material @ ", " @ %secondFilter @ ", " @ %secondFilterName @" );",
+         "",
          "" );
    }
 }
@@ -1725,14 +1725,14 @@ function MaterialSelector::deleteMaterial( %this, %materialName, %secondFilter, 
 {
    if( !isObject( %materialName ) )
       return;
-   
+
    for( %i = 0; %i <= MaterialFilterAllArray.countValue( %materialName ); %i++)
    {
       %index = MaterialFilterAllArray.getIndexFromValue( %materialName );
       MaterialFilterAllArray.erase( %index );
    }
    MaterialFilterAllArrayCheckbox.setText("All ( " @ MaterialFilterAllArray.count() - 1 @ " ) ");
-   
+
    %checkbox = %secondFilter @ "Checkbox";
    for( %k = 0; %k <= %secondFilter.countValue( %materialName ); %k++)
    {
@@ -1740,11 +1740,11 @@ function MaterialSelector::deleteMaterial( %this, %materialName, %secondFilter, 
       %secondFilter.erase( %index );
    }
    %checkbox.setText( %secondFilterName @ " ( " @ %secondFilter.count() - 1 @ " ) ");
-   
+
    for( %i = 0; %materialName.getFieldValue("materialTag" @ %i) !$= ""; %i++ )
    {
       %materialTag = %materialName.getFieldValue("materialTag" @ %i);
-         
+
          for( %j = MaterialSelector.staticFilterObjects; %j < MaterialSelector-->filterArray.getCount() ; %j++ )
          {
             if( %materialTag $= MaterialSelector-->filterArray.getObject(%j).getObject(0).filter )
@@ -1754,19 +1754,19 @@ function MaterialSelector::deleteMaterial( %this, %materialName, %secondFilter, 
                MaterialSelector-->filterArray.getObject(%j).getObject(0).setText( %materialTag @ " ( "@ %count @ " )");
             }
          }
-      
+
    }
-   
+
    UnlistedMaterials.add( "unlistedMaterials", %materialName );
-   
-   if( %materialName.getFilename() !$= "" && 
+
+   if( %materialName.getFilename() !$= "" &&
          %materialName.getFilename() !$= "tools/gui/MaterialSelector.ed.gui" &&
          %materialName.getFilename() !$= "tools/materialEditor/scripts/materialEditor.ed.cs" )
    {
       MaterialSelectorPerMan.removeObjectFromFile(%materialName);
       MaterialSelectorPerMan.saveDirty();
    }
-      
+
    MaterialSelector.preloadFilter();
    //MaterialSelector.selectMaterial( "WarningMaterial" );
 }
@@ -1788,10 +1788,10 @@ function MaterialSelector::switchStaticFilters( %this, %staticFilter)
       case "MaterialFilterUnmappedArray":
          MaterialFilterUnmappedArrayCheckbox.setStateOn(1);
 
-         MaterialFilterAllArrayCheckbox.setStateOn(0); 
+         MaterialFilterAllArrayCheckbox.setStateOn(0);
          MaterialFilterMappedArrayCheckbox.setStateOn(0);
    }
-   
+
    // kinda goofy were passing a class variable... we can't do an empty check right now
    // on load filter because we actually pass "" as a filter...
    MaterialSelector.loadFilter( MaterialSelector.currentFilter, %staticFilter );
@@ -1810,17 +1810,17 @@ function MaterialSelector::getTagField( %this, %material, %tag )
          break;
       }
    }
-   
+
    return %tagField;
 }
 
 function MaterialSelector::getLastTagField( %this, %material )
-{ 
+{
    for( %i = 0; %material.getFieldValue("materialTag" @ %i) !$= ""; %i++ )
    {
       %tagField = "materialTag" @ %i;
    }
-   
+
    return %tagField;
 }
 
@@ -1832,11 +1832,11 @@ function MaterialSelector::getLastValidTagField( %this, %material, %invalidTag )
       // Can't equal our invalid tag
       if( %tag $= %invalidTag )
          continue;
-         
+
       // Set our last found tag
       %tagField = "materialTag" @ %i;
    }
-   
+
    return %tagField;
 }
 
@@ -1853,7 +1853,7 @@ function MaterialSelector::previousPage(%this)
    MaterialSelector.currentPreviewPage--;
    if( MaterialSelector.currentPreviewPage < 0)
       MaterialSelector.currentPreviewPage = 0;
-      
+
    MaterialSelector.LoadFilter( MaterialSelector.currentFilter, MaterialSelector.currentStaticFilter );
 }
 
@@ -1864,7 +1864,7 @@ function MaterialSelector::nextPage(%this)
       MaterialSelector.currentPreviewPage = MaterialSelector.totalPages - 1;
    if( MaterialSelector.currentPreviewPage < 0)
       MaterialSelector.currentPreviewPage = 0;
-      
+
    MaterialSelector.LoadFilter( MaterialSelector.currentFilter, MaterialSelector.currentStaticFilter );
 }
 
@@ -1873,7 +1873,7 @@ function MaterialSelector::lastPage(%this)
    MaterialSelector.currentPreviewPage = MaterialSelector.totalPages - 1;
    if( MaterialSelector.currentPreviewPage < 0)
       MaterialSelector.currentPreviewPage = 0;
-      
+
    MaterialSelector.LoadFilter( MaterialSelector.currentFilter, MaterialSelector.currentStaticFilter );
 }
 
@@ -1905,13 +1905,13 @@ function MaterialSelector::buildPagesButtons(%this, %currentPage, %totalPages)
       {
          %startbracket = true;
       }
-      
+
       if( (%totalPages - %start) < 8 )
       {
          // Move %start closer to the beginning to maintain 8 pages
          %start = %totalPages - 8;
       }
-      
+
       %end = %start + 8;
       if( %end >= %totalPages )
       {
@@ -1930,7 +1930,7 @@ function MaterialSelector::buildPagesButtons(%this, %currentPage, %totalPages)
       %startbracket = false;
       %endbracket = false;
    }
-   
+
    if( %startbracket )
    {
       %control =  new GuiTextCtrl(){
@@ -1944,7 +1944,7 @@ function MaterialSelector::buildPagesButtons(%this, %currentPage, %totalPages)
                   };
       MaterialSelector-->materialPreviewPagesStack.add( %control );
    }
-   
+
    for( %i = %start; %i < %end; %i++ )
    {
       if( %i != %currentPage )
@@ -1986,7 +1986,7 @@ function MaterialSelector::buildPagesButtons(%this, %currentPage, %totalPages)
 
       MaterialSelector-->materialPreviewPagesStack.add( %control );
    }
-   
+
    if( %endbracket )
    {
       %control =  new GuiTextCtrl(){

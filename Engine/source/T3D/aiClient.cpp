@@ -65,7 +65,7 @@ AIClient::AIClient() {
    // Clear the triggers
    for( int i = 0; i < MaxTriggerKeys; i++ )
       mTriggers[i] = false;
- 
+
    mAimToDestination = true;
    mTargetInLOS = false;
 
@@ -85,10 +85,10 @@ AIClient::~AIClient() {
  *
  * @param targetObject The object to target
  */
-void AIClient::setTargetObject( ShapeBase *targetObject ) {   
+void AIClient::setTargetObject( ShapeBase *targetObject ) {
    if ( !targetObject || !bool( mTargetObject ) || targetObject->getId() != mTargetObject->getId() )
       mTargetInLOS = false;
-   
+
    mTargetObject = targetObject;
 }
 
@@ -148,7 +148,7 @@ void AIClient::setMoveMode( S32 mode ) {
 /**
  * Sets how far away from the move location is considered
  * "on target"
- * 
+ *
  * @param tolerance Movement tolerance for error
  */
 void AIClient::setMoveTolerance( const F32 tolerance ) {
@@ -172,7 +172,7 @@ void AIClient::setMoveDestination( const Point3F &location ) {
 
 /**
  * Sets the location for the bot to aim at
- * 
+ *
  * @param location Point to aim at
  */
 void AIClient::setAimLocation( const Point3F &location ) {
@@ -211,19 +211,19 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
    if( !mPlayer )
       return 1;
 
-   
+
    // What is The Matrix?
    MatrixF moveMatrix;
    moveMatrix.set( EulerF( 0, 0, 0 ) );
    moveMatrix.setColumn( 3, Point3F( 0, 0, 0 ) );
    moveMatrix.transpose();
-      
+
    // Position / rotation variables
    F32 curYaw, curPitch;
    F32 newYaw, newPitch;
    F32 xDiff, yDiff;
 
-   
+
    F32 moveSpeed = mMoveSpeed;
 
    switch( mMoveMode ) {
@@ -235,11 +235,11 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
    case ModeStuck:
       // Fall through, so we still try to move
    case ModeMove:
-   
+
       // Get my location
       MatrixF const& myTransform = mPlayer->getTransform();
       myTransform.getColumn( 3, &mLocation );
-   
+
       // Set rotation variables
       Point3F rotation = mPlayer->getRotation();
       Point3F headRotation = mPlayer->getHeadRotation();
@@ -247,7 +247,7 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
       curPitch = headRotation.x;
       xDiff = mAimLocation.x - mLocation.x;
       yDiff = mAimLocation.y - mLocation.y;
-   
+
       // first do Yaw
       if( !mIsZero( xDiff ) || !mIsZero( yDiff ) ) {
          // use the cur yaw between -Pi and Pi
@@ -255,53 +255,53 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
             curYaw -= M_2PI_F;
          while( curYaw < -M_2PI_F )
             curYaw += M_2PI_F;
-      
+
          // find the new yaw
          newYaw = mAtan2( xDiff, yDiff );
-      
-         // find the yaw diff 
+
+         // find the yaw diff
          F32 yawDiff = newYaw - curYaw;
-      
+
          // make it between 0 and 2PI
          if( yawDiff < 0.0f )
             yawDiff += M_2PI_F;
          else if( yawDiff >= M_2PI_F )
             yawDiff -= M_2PI_F;
-      
+
          // now make sure we take the short way around the circle
          if( yawDiff > M_2PI_F )
             yawDiff -= M_2PI_F;
          else if( yawDiff < -M_2PI_F )
             yawDiff += M_2PI_F;
-      
+
          mMove.yaw = yawDiff;
-      
+
          // set up the movement matrix
          moveMatrix.set( EulerF( 0.0f, 0.0f, newYaw ) );
       }
       else
          moveMatrix.set( EulerF( 0.0f, 0.0f, curYaw ) );
-   
+
       // next do pitch
       F32 horzDist = Point2F( mAimLocation.x, mAimLocation.y ).len();
 
       if( !mIsZero( horzDist ) ) {
          //we shoot from the gun, not the eye...
          F32 vertDist = mAimLocation.z;
-      
+
          newPitch = mAtan2( horzDist, vertDist ) - ( M_2PI_F / 2.0f );
-      
+
          F32 pitchDiff = newPitch - curPitch;
          mMove.pitch = pitchDiff;
       }
-   
+
       // finally, mMove towards mMoveDestination
       xDiff = mMoveDestination.x - mLocation.x;
       yDiff = mMoveDestination.y - mLocation.y;
 
 
       // Check if we should mMove, or if we are 'close enough'
-      if( ( ( mFabs( xDiff ) > mMoveTolerance ) || 
+      if( ( ( mFabs( xDiff ) > mMoveTolerance ) ||
             ( mFabs( yDiff ) > mMoveTolerance ) ) && ( !mIsZero( mMoveSpeed ) ) )
       {
          if( mIsZero( xDiff ) )
@@ -318,18 +318,18 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
             mMove.x = ( mLocation.x > mMoveDestination.x ? -value : value );
             mMove.y = ( mLocation.y > mMoveDestination.y ? -moveSpeed : moveSpeed );
          }
-      
+
          //now multiply the mMove vector by the transpose of the object rotation matrix
          moveMatrix.transpose();
          Point3F newMove;
          moveMatrix.mulP( Point3F( mMove.x, mMove.y, 0.0f ), &newMove );
-      
+
          //and sub the result back in the mMove structure
          mMove.x = newMove.x;
          mMove.y = newMove.y;
 
          // We should check to see if we are stuck...
-         if( mLocation.x == mLastLocation.x && 
+         if( mLocation.x == mLastLocation.x &&
              mLocation.y == mLastLocation.y &&
              mLocation.z == mLastLocation.z ) {
 
@@ -355,7 +355,7 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
    Point3F targetLoc = mMoveDestination; // Change this
 
    if( mPlayer ) {
-      if( !mPlayer->getContainer()->castRay( mLocation, targetLoc, 
+      if( !mPlayer->getContainer()->castRay( mLocation, targetLoc,
                                                 StaticShapeObjectType | StaticObjectType |
                                                 TerrainObjectType, &dummy ) ) {
          if( !mTargetInLOS )
@@ -364,10 +364,10 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
       else {
          if( mTargetInLOS )
             throwCallback( "onTargetExitLOS" );
-            
+
       }
    }
-   
+
    // Copy over the trigger status
    for( int i = 0; i < MaxTriggerKeys; i++ ) {
       mMove.trigger[i] = mTriggers[i];
@@ -481,7 +481,7 @@ ConsoleMethod( AIClient, getMoveDestination, const char *, 2, 2, "ai.getMoveDest
  */
 ConsoleMethod( AIClient, setTargetObject, void, 3, 3, "ai.setTargetObject( obj );" ) {
    AIClient *ai = static_cast<AIClient *>( object );
-   
+
    // Find the target
    ShapeBase *targetObject;
    if( Sim::findObject( argv[2], targetObject ) )
@@ -540,7 +540,7 @@ ConsoleFunction( aiAddPlayer, S32 , 2, 3, "aiAddPlayer( 'playerName'[, 'AIClassT
    aiPlayer->setSendingEvents(false);
    aiPlayer->setTranslatesStrings(true);
    aiPlayer->setEstablished();
-   
+
    // Add the connection to the client group
    SimGroup *g = Sim::getClientGroup();
    g->addObject( aiPlayer );
@@ -551,7 +551,7 @@ ConsoleFunction( aiAddPlayer, S32 , 2, 3, "aiAddPlayer( 'playerName'[, 'AIClassT
    dStrcpy( name, argv[1] );
    dStrcpy( ns, argv[2] );
 
-   // Execute the connect console function, this is the same 
+   // Execute the connect console function, this is the same
    // onConnect function invoked for normal client connections
    Con::executef( aiPlayer, "onConnect", name );
 
@@ -569,7 +569,7 @@ ConsoleFunction( aiAddPlayer, S32 , 2, 3, "aiAddPlayer( 'playerName'[, 'AIClassT
  * Tells the AI to move forward 100 units...TEST FXN
  */
 ConsoleMethod( AIClient, moveForward, void, 2, 2, "ai.moveForward();" ) {
-   
+
    AIClient *ai = static_cast<AIClient *>( object );
    ShapeBase *player = dynamic_cast<ShapeBase*>(ai->getControlObject());
    Point3F location;
@@ -577,6 +577,6 @@ ConsoleMethod( AIClient, moveForward, void, 2, 2, "ai.moveForward();" ) {
    myTransform.getColumn( 3, &location );
 
    location.y += 100.0f;
-   
+
    ai->setMoveDestination( location );
 } // *** /TEST FXN

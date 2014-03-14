@@ -28,13 +28,13 @@
 #endif
 #ifndef _TDICTIONARY_H_
 #include "core/util/tDictionary.h"
-#endif 
+#endif
 
 class SimObject;
 class AbstractClassRep;
 
 
-/// This class is used to find the correct icon file 
+/// This class is used to find the correct icon file
 /// path for different SimObject class types.  It is
 /// typically used by the editors.
 class EditorIconRegistry
@@ -58,7 +58,7 @@ public:
    GFXTexHandle findIcon( AbstractClassRep *classRep );
 
    /// Looks up an icon given a SimObject.
-   GFXTexHandle findIcon( const SimObject *object );   
+   GFXTexHandle findIcon( const SimObject *object );
 
    /// Looks up an icon given a className.
    GFXTexHandle findIcon( const char *className );
@@ -68,7 +68,7 @@ public:
    bool hasIconNoRecurse( const SimObject *object );
 
 protected:
- 
+
    typedef HashTable<StringNoCase,GFXTexHandle> IconMap;
    IconMap mIcons;
 

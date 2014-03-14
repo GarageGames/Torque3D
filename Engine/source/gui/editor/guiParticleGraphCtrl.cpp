@@ -105,7 +105,7 @@ GuiParticleGraphCtrl::GuiParticleGraphCtrl()
 
 ImplementEnumType( GuiParticleGraphType,
    "\n\n"
-   "@ingroup GuiCore" 
+   "@ingroup GuiCore"
    "@internal")
    { GuiParticleGraphCtrl::Bar,        "bar"      },
    { GuiParticleGraphCtrl::Filled,     "filled"   },
@@ -129,7 +129,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 	if (mProfile->mBorder)
 	{
 		const RectI bounds = getBounds();
-		RectI rect(offset.x, offset.y, bounds.extent.x, bounds.extent.y);		
+		RectI rect(offset.x, offset.y, bounds.extent.x, bounds.extent.y);
 		pDrawUtil->drawRect(rect, mProfile->mBorderColor);
 	}
 
@@ -145,7 +145,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		// Nothing to graph
 		if ((mPlots[k].mGraphData.size() == 0) || (mPlots[k].mHidden == true))
 			continue;
-	
+
         Point2F graphExtent = getGraphExtent(k);
 
 		// Adjust scale to max value + 5% so we can see high value
@@ -214,13 +214,13 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
                F32 blue = mPlots[k].mGraphColor.blue;
 
                // invert the colors for the nut since this is a selected nut
-               red = 1.0 - red; 
+               red = 1.0 - red;
                green = 1.0 - green;
                blue = 1.0 - blue;
                // nut color
 
                nutColor = ColorI(ColorF(red, green, blue));
-            } 
+            }
 
             // draw the seleciton nut
 				drawNut( Point2I(posX, posY), 3, mOutlineColor, nutColor );
@@ -249,8 +249,8 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 				      if((((S32)posY) < comparePos.y) || (((S32)posY - textWidth) <= 0))
 				      {
                       posY += 40;
-				      } 
-				
+				      }
+
 					  pDrawUtil->setBitmapModulation( profile->mFontColor );
 					  pDrawUtil->drawText( font, Point2I(posX, posY + 5) - Point2I(size >> 1, size), number );
 					  pDrawUtil->clearBitmapModulation();
@@ -263,7 +263,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 	if(mRenderNextGraphTooltip == true && mRenderGraphTooltip == true)
 	{
        char argBuffer[1][32];
-   
+
        dSprintf(argBuffer[0], 32, "%s", getGraphName(mTooltipSelectedPlot));
 
 	   renderGraphTooltip(mCursorPos, argBuffer[0]);
@@ -281,7 +281,7 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
       if(v.x < mPlots[plotID].mGraphMin.x)
       {
          v.x = mPlots[plotID].mGraphMin.x;
-      } 
+      }
 
       if(v.x > mPlots[plotID].mGraphMax.x)
       {
@@ -291,7 +291,7 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
       if(v.y < mPlots[plotID].mGraphMin.y)
       {
          v.y = mPlots[plotID].mGraphMin.y;
-      } 
+      }
 
       if(v.y > mPlots[plotID].mGraphMax.y)
       {
@@ -300,7 +300,7 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
    }
 
    for(S32 i = 0; i < mPlots[plotID].mGraphData.size(); i++)
-   {         
+   {
 	   if(mFabs(v.x - mPlots[plotID].mGraphData[i].x) < 0.001)
 	   {
 	      if(mAutoRemove == true)
@@ -312,13 +312,13 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
 		   {
             mPlotIndex = -1;
 		   }
-			
+
 		   plotAdded = true;
-		  
+
 		   break;
 	   } else if(v.x < mPlots[plotID].mGraphData[i].x)
 	   {
-          insertPlotPoint(plotID, i, v); 
+          insertPlotPoint(plotID, i, v);
 		  plotAdded = true;
 		  mPlotIndex = i;
 		  break;
@@ -343,7 +343,7 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
 
    if(plotChanged == true)
    {
-      mPointWasAdded = false;  
+      mPointWasAdded = false;
    } else if(mPlotIndex != -1 && setAdded)
    {
       mPointWasAdded = true;
@@ -374,7 +374,7 @@ void GuiParticleGraphCtrl::insertPlotPoint(S32 plotID, S32 i, Point2F v)
 
    // Argument Buffer.
    char argBuffer[2][32];
-   
+
    dSprintf(argBuffer[0], 32, "%d", plotID);
    dSprintf(argBuffer[1], 32, "%f %f", v.x, v.y);
 
@@ -391,14 +391,14 @@ S32 GuiParticleGraphCtrl::changePlotPoint(S32 plotID, S32 i, Point2F v)
 
    // Argument Buffer.
    char argBuffer[3][32];
-   
+
    dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
    dSprintf(argBuffer[1], 32, "%d", point);
    dSprintf(argBuffer[2], 32, "%f %f", v.x, v.y);
 
    // Call Scripts.
    Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
-   
+
    // call the insert function
    S32 index = addPlotPoint(plotID, v);
 
@@ -465,7 +465,7 @@ S32 GuiParticleGraphCtrl::getPlotIndex(S32 plotID, F32 x, F32 y)
    if ((plotID < 0) || (plotID > MaxPlots))
    {
       return -1;
-   } 
+   }
 
    F32 compareX = 0.0;
    F32 compareY = 0.0;
@@ -504,7 +504,7 @@ void GuiParticleGraphCtrl::setSelectedPlot(S32 plotID)
 
    // Argument Buffer.
    char argBuffer[32];
-   
+
    dSprintf(argBuffer, 32, "%d", plotID);
 
    // Call Scripts.
@@ -594,7 +594,7 @@ Point2I GuiParticleGraphCtrl::findHitNut( Point2I hitPoint )
       {
 	     if( inNut (Point2I( mPlots[i].mNutList[j].x, mPlots[i].mNutList[j].y), hitPoint.x, hitPoint.y) )
 		 {
-            mTooltipSelectedPlot = i; 
+            mTooltipSelectedPlot = i;
 			return Point2I(i,j);
 		 }
 	  }
@@ -610,7 +610,7 @@ Point2F GuiParticleGraphCtrl::convertToGraphCoord(S32 plotID, Point2I v)
    v = globalToLocalCoord( v );
    v.y = getExtent().y - v.y;
    resultV = Point2F(v.x, v.y);
-   resultV.x /= getExtent().x; 
+   resultV.x /= getExtent().x;
    resultV.y /= getExtent().y;
    resultV.x *= getGraphExtent(plotID).x;
    resultV.y *= getGraphExtent(plotID).y;
@@ -626,7 +626,7 @@ Point2F GuiParticleGraphCtrl::convertToGraphCoord(S32 plotID, Point2I v)
       if(resultV.x < mPlots[plotID].mGraphMin.x)
       {
          resultV.x = mPlots[plotID].mGraphMin.x;
-      } 
+      }
 
       if(resultV.x > mPlots[plotID].mGraphMax.x)
       {
@@ -636,7 +636,7 @@ Point2F GuiParticleGraphCtrl::convertToGraphCoord(S32 plotID, Point2I v)
       if(resultV.y < mPlots[plotID].mGraphMin.y)
       {
          resultV.y = mPlots[plotID].mGraphMin.y;
-      } 
+      }
 
       if(resultV.y > mPlots[plotID].mGraphMax.y)
       {
@@ -717,7 +717,7 @@ StringTableEntry GuiParticleGraphCtrl::getGraphName(S32 plotID)
 void GuiParticleGraphCtrl::onMouseMove(const GuiEvent &event)
 {
    mCursorPos = event.mousePoint;
-	
+
    Point2I hitNut = findHitNut(event.mousePoint);
 
    if( hitNut != Point2I(-1,-1) )
@@ -730,7 +730,7 @@ void GuiParticleGraphCtrl::onMouseMove(const GuiEvent &event)
 
    // Argument Buffer.
    char argBuffer[32];
-   
+
    dSprintf(argBuffer, 32, "%f %f", convertToGraphCoord(mSelectedPlot, event.mousePoint).x, convertToGraphCoord(mSelectedPlot, event.mousePoint).y);
 
 
@@ -752,12 +752,12 @@ void GuiParticleGraphCtrl::onMouseDown(const GuiEvent &event)
 
         // Argument Buffer.
         char argBuffer[3][32];
-   
+
         dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
         dSprintf(argBuffer[1], 32, "%d", point);
 		  dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
 
-		 
+
 
          // Call Scripts.
          Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
@@ -774,14 +774,14 @@ void GuiParticleGraphCtrl::onMouseDown(const GuiEvent &event)
         // Call Scripts.
         Con::executef(this, "onPlotPointSelectedMouseDown", argBuffer);
 	  }
-   } else if( mSelectedPlot != -1 ) 
-   {  
+   } else if( mSelectedPlot != -1 )
+   {
 	   Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
 	   mLastSelectedPoint = addPlotPoint(mSelectedPlot, mousePos);
 
 	   // Argument Buffer.
       char argBuffer[32];
-   
+
       dSprintf(argBuffer, 32, "%f %f", convertToGraphCoord(mSelectedPlot, event.mousePoint).x, convertToGraphCoord(mSelectedPlot, event.mousePoint).y);
 
       // Call Scripts.
@@ -802,18 +802,18 @@ void GuiParticleGraphCtrl::onMouseUp(const GuiEvent &event)
 	   {
 	     // Argument Buffer.
          char argBuffer[3][32];
-   
+
          dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
          dSprintf(argBuffer[1], 32, "%f %f", mAddedPoint.x, mAddedPoint.y);
 		   dSprintf(argBuffer[2], 32, "%d", mAddedPointIndex);
-         
+
          // Call Scripts.
          Con::executef(this, "onPlotPointAdded", argBuffer[0], argBuffer[1], argBuffer[2]);
 	   } else
 	   {
          // Argument Buffer.
          char argBuffer[4][32];
-   
+
          dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
          dSprintf(argBuffer[1], 32, "%f %f", mAddedPoint.x, mAddedPoint.y);
 		   dSprintf(argBuffer[2], 32, "%d", mOriginalSelectedPoint);
@@ -855,7 +855,7 @@ void GuiParticleGraphCtrl::onMouseDragged(const GuiEvent &event)
 
          // Argument Buffer.
          char argBuffer[3][32];
-   
+
          dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
          dSprintf(argBuffer[1], 32, "%f %f", mAddedPoint.x, mAddedPoint.y);
 	      dSprintf(argBuffer[2], 32, "%d", point);
@@ -870,7 +870,7 @@ void GuiParticleGraphCtrl::onMouseDragged(const GuiEvent &event)
 
    // Argument Buffer.
    char argBuffer[32];
-   
+
    dSprintf(argBuffer, 32, "%f %f", convertToGraphCoord(mSelectedPlot, event.mousePoint).x, convertToGraphCoord(mSelectedPlot, event.mousePoint).y);
 
    // Call Scripts.
@@ -890,14 +890,14 @@ void GuiParticleGraphCtrl::onRightMouseDown(const GuiEvent &event)
 
       // Argument Buffer.
       char argBuffer[3][32];
-   
+
       dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
       dSprintf(argBuffer[1], 32, "%d", point);
 	   dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
 
       // Call Scripts.
       Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
-   } 
+   }
 }
 
 void GuiParticleGraphCtrl::onRightMouseUp(const GuiEvent &event)
@@ -918,14 +918,14 @@ void GuiParticleGraphCtrl::onRightMouseDragged(const GuiEvent &event)
 
 	   // Argument Buffer.
       char argBuffer[3][32];
-   
+
       dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
       dSprintf(argBuffer[1], 32, "%d", point);
 	   dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
 
       // Call Scripts.
       Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
-   } 
+   }
 }
 
 void GuiParticleGraphCtrl::clearAllGraphs()
@@ -945,7 +945,7 @@ void GuiParticleGraphCtrl::clearGraph(S32 plotID)
 bool GuiParticleGraphCtrl::renderGraphTooltip(Point2I cursorPos, StringTableEntry tooltip)
 {
    // Short Circuit.
-   if (!mAwake) 
+   if (!mAwake)
       return false;
    if ( dStrlen( tooltip ) == 0 )
       return false;
@@ -968,7 +968,7 @@ bool GuiParticleGraphCtrl::renderGraphTooltip(Point2I cursorPos, StringTableEntr
    //Offset to get position of cursor
    //textBounds for text extent.
    Point2I screensize = pCanvas->getWindowSize();
-   Point2I offset = cursorPos; 
+   Point2I offset = cursorPos;
    Point2I textBounds;
    S32 textWidth = font->getStrWidth(tooltip);
 
@@ -1077,7 +1077,7 @@ ConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, const char*, 5, 6, "(int plotI
       pointAdded = object->addPlotPoint( plotID, Point2F(dAtof(argv[3]), dAtof(argv[4])), dAtob(argv[5]));
    }
 
-   
+
    dSprintf(retBuffer, 32, "%d", pointAdded);
 
    return retBuffer;

@@ -33,7 +33,7 @@ function EditorInspectorBase::onAdd( %this )
       {
          superClass = "MenuBuilder";
          isPopup = true;
-         
+
          item[ 0 ] = "Edit Datablock" TAB "" TAB "DatablockEditorPlugin.openDatablock( %this.inspectorField.getData() );";
          Item[ 1 ] = "Jump to Definition in Torsion" TAB "" TAB "EditorOpenDeclarationInTorsion( %this.inspectorField.getData() );";
          item[ 2 ] = "Inspect Object" TAB "" TAB "inspectObject( %this.inspectorField.getData() );";
@@ -41,7 +41,7 @@ function EditorInspectorBase::onAdd( %this )
          item[ 4 ] = "Copy Value" TAB "" TAB "setClipboard( %this.inspectorField.getData() );";
          item[ 5 ] = "Paste Value" TAB "" TAB "%this.inspectorField.apply( getClipboard() );";
          item[ 6 ] = "Reset to Default" TAB "" TAB "%this.inspectorField.reset();";
-         
+
          inspectorField = -1;
       };
 
@@ -131,7 +131,7 @@ function EditorInspectorBase::onFieldRightClick( %this, %field )
    %openFolderIndex = -1;
 
    // Find out if this is a TypeFilename field referring to a shape file.
-   
+
    %isShapeFilenameField = false;
    if( %field.getInspectedFieldName() $= "shapeName" )
    {
@@ -150,13 +150,13 @@ function EditorInspectorBase::onFieldRightClick( %this, %field )
          %obj.isMemberOfClass( "RenderShapeExample" ) ||
          %obj.isMemberOfClass( "DebrisData" );
    }
-   
+
    // Select the popup.
-   
+
    if( %isShapeFilenameField )
    {
       %popup = EditorInspectorBaseShapeFieldPopup;
-      
+
       %openFileIndex = 2;
       %openFolderIndex = 3;
    }
@@ -164,7 +164,7 @@ function EditorInspectorBase::onFieldRightClick( %this, %field )
    {
       %popup = EditorInspectorBaseFileFieldPopup;
       %openFileIndex = 0;
-      %openFolderIndex = 1;      
+      %openFolderIndex = 1;
    }
    else
    {
@@ -173,35 +173,35 @@ function EditorInspectorBase::onFieldRightClick( %this, %field )
          case "GuiInspectorCustomField":
             if( %field.getInspectedFieldName() !$= "parentGroup" )
                return;
-               
+
          case "GuiInspectorTypeGuiProfile":
-            
+
             %popup = EditorInspectorBaseProfileFieldPopup;
-            
+
             %popup.enableItem( 0, isObject( %fieldValue ) );
             %inspectIndex = 2;
             %jumpToIndex = 1;
-         
+
          case "GuiInspectorDatablockField" or
               "GuiInspectorTypeSFXDescriptionName" or
               "GuiInspectorTypeSFXEnvironmentName" or
               "GuiInspectorTypeSFXTrackName" or
               "GuiInspectorTypeSFXAmbienceName" or
               "GuiInspectorTypeSFXSourceName":
-           
+
             %popup = EditorInspectorBaseDatablockFieldPopup;
             %popup.enableItem( 0, isObject( %fieldValue ) );
             %inspectIndex = 2;
             %jumpToIndex = 1;
-         
+
          default:
-      
+
             %popup = EditorInspectorBaseFieldPopup;
             %inspectIndex = 0;
             %jumpToIndex = 1;
       }
    }
-      
+
    if( %inspectIndex != -1 )
    {
       %isObject = false;
@@ -211,16 +211,16 @@ function EditorInspectorBase::onFieldRightClick( %this, %field )
       %popup.enableItem( %inspectIndex, %isObject );
       %popup.enableItem( %jumpToIndex, %isObject );
    }
-      
+
    if( %openFileIndex != -1 || %openFolderIndex != -1 )
    {
       %fullPath = EditorInspectorBase::getFullFilePath( %field );
       %popup.filePath = %fullPath;
       %popup.folderPath = filePath( %fullPath );
-   
+
       if( %openFileIndex != -1 )
          %popup.enableItem( 0, isFile( %fullPath ) );
-         
+
       if( %openFolderIndex != -1 )
          %popup.enableItem( 1, isDirectory( %popup.folderPath ) );
    }
@@ -234,7 +234,7 @@ function EditorInspectorBase::onFieldRightClick( %this, %field )
 function EditorInspectorBase::isObjectTypeField( %field )
 {
    // Inspector field types that refer to objects.
-   
+
    switch$( %field.getClassName() )
    {
       case "GuiInspectorDatablockField" or
@@ -246,9 +246,9 @@ function EditorInspectorBase::isObjectTypeField( %field )
            "GuiInspectorTypeGuiProfile":
          return true;
    }
-   
+
    // Other console types that refer to objects.
-   
+
    switch$( %field.getInspectedFieldType() )
    {
       case "TypeSimObject" or
@@ -258,7 +258,7 @@ function EditorInspectorBase::isObjectTypeField( %field )
            "TypeGuiProfile":
          return true;
    }
-   
+
    return false;
 }
 
@@ -276,11 +276,11 @@ function EditorInspectorBase::getFullFilePath( %field )
    %fileName = %field.getData();
    %inspector = %field.getInspector();
    %object = %inspector.getInspectObject();
-   
+
    if( %object.isMemberOfClass( "Material" ) )
    {
       // Image filenames in materials are relative to the material's file.
-      
+
       %objectPath = filePath( makeFullPath( %object.getFilename(), getMainDotCsDir() ) );
       return makeFullPath( %fileName, %objectPath );
    }

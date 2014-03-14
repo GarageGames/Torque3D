@@ -53,16 +53,16 @@ bool Forest::castRayI( const Point3F &start, const Point3F &end, ForestRayInfo *
 }
 
 ScriptMethod( Forest, forestRayCast, const char*, 4, 4, "( Point3F start, Point3F end )"
-                "Cast a ray from start to end, checking for collision against trees in this forest.\n\n"                
+                "Cast a ray from start to end, checking for collision against trees in this forest.\n\n"
                 "@returns A string containing either null, if nothing was struck, or these fields:\n"
                 "            - The ID of the tree type datablock.\n"
-                "            - The tree ID (not a normal object id).\n" 
-                "            - t, The time during the raycast at which the collision occured." )                
+                "            - The tree ID (not a normal object id).\n"
+                "            - t, The time during the raycast at which the collision occured." )
 {
 
    Point3F start, end;
    dSscanf(argv[2], "%g %g %g", &start.x, &start.y, &start.z);
-   dSscanf(argv[3], "%g %g %g", &end.x,   &end.y,   &end.z);   
+   dSscanf(argv[3], "%g %g %g", &end.x,   &end.y,   &end.z);
 
    char *returnBuffer = Con::getReturnBuffer(256);
    returnBuffer[0] = '0';
@@ -107,10 +107,10 @@ Point3F ForestConvex::support(const VectorF& v) const
 
    F32 currMaxDP = mDot(pAccel->vertexList[0], v);
    U32 index = 0;
-   for (U32 i = 1; i < pAccel->numVerts; i++) 
+   for (U32 i = 1; i < pAccel->numVerts; i++)
    {
       F32 dp = mDot(pAccel->vertexList[i], v);
-      if (dp > currMaxDP) 
+      if (dp > currMaxDP)
       {
          currMaxDP = dp;
          index = i;
@@ -134,10 +134,10 @@ void ForestConvex::getFeatures( const MatrixF &mat, const VectorF &n, ConvexFeat
    F32 currMaxDP = mDot(pAccel->vertexList[0], n);
    U32 index = 0;
    U32 i;
-   for (i = 1; i < pAccel->numVerts; i++) 
+   for (i = 1; i < pAccel->numVerts; i++)
    {
       F32 dp = mDot(pAccel->vertexList[i], n);
-      if (dp > currMaxDP) 
+      if (dp > currMaxDP)
       {
          currMaxDP = dp;
          index = i;
@@ -147,7 +147,7 @@ void ForestConvex::getFeatures( const MatrixF &mat, const VectorF &n, ConvexFeat
    const U8* emitString = pAccel->emitStrings[index];
    U32 currPos = 0;
    U32 numVerts = emitString[currPos++];
-   for (i = 0; i < numVerts; i++) 
+   for (i = 0; i < numVerts; i++)
    {
       cf->mVertexList.increment();
       U32 index = emitString[currPos++];
@@ -155,7 +155,7 @@ void ForestConvex::getFeatures( const MatrixF &mat, const VectorF &n, ConvexFeat
    }
 
    U32 numEdges = emitString[currPos++];
-   for (i = 0; i < numEdges; i++) 
+   for (i = 0; i < numEdges; i++)
    {
       U32 ev0 = emitString[currPos++];
       U32 ev1 = emitString[currPos++];
@@ -165,7 +165,7 @@ void ForestConvex::getFeatures( const MatrixF &mat, const VectorF &n, ConvexFeat
    }
 
    U32 numFaces = emitString[currPos++];
-   for (i = 0; i < numFaces; i++) 
+   for (i = 0; i < numFaces; i++)
    {
       cf->mFaceList.increment();
       U32 plane = emitString[currPos++];
@@ -210,25 +210,25 @@ void Forest::buildConvex( const Box3F &box, Convex *convex )
       // JCF: is this really necessary if we already got this ForestItem
       // as a result from getItems?
       if ( realBox.isOverlapped( getObjBox() ) == false )
-         continue;      
+         continue;
 
       TSForestItemData *data = (TSForestItemData*)forestItem.getData();
 
       // Find CollisionDetail(s) that are defined...
       const Vector<S32> &details = data->getCollisionDetails();
-      for ( U32 j = 0; j < details.size(); j++ ) 
+      for ( U32 j = 0; j < details.size(); j++ )
       {
          // JCFHACK: need to fix this if we want this to work with speedtree
          // or other cases in which we don't have a TSForestItemData.
          // Most likely via preventing this method and other torque collision
          // specific stuff from ever getting called.
-         if ( details[j] == -1 ) 
-            continue;         
+         if ( details[j] == -1 )
+            continue;
 
          // See if this convex exists in the working set already...
          Convex* cc = 0;
          CollisionWorkingList& wl = convex->getWorkingList();
-         for ( CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext ) 
+         for ( CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext )
          {
             if ( itr->mConvex->getType() == ForestConvexType )
             {
@@ -284,7 +284,7 @@ bool Forest::buildPolyList( PolyListContext context, AbstractPolyList* polyList,
 bool ForestItem::buildPolyList( AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere ) const
 {
    TSForestItemData *data = (TSForestItemData*)mDataBlock;
-   
+
    bool ret = false;
 
    MatrixF xfm = getTransform();
@@ -294,25 +294,25 @@ bool ForestItem::buildPolyList( AbstractPolyList* polyList, const Box3F &box, co
 
    const Vector<S32> &details = data->getCollisionDetails();
    S32 detail;
-   for  (U32 i = 0; i < details.size(); i++ ) 
+   for  (U32 i = 0; i < details.size(); i++ )
    {
       detail = details[i];
-      if (detail != -1) 
-         ret |= si->buildPolyList( polyList, detail );         
+      if (detail != -1)
+         ret |= si->buildPolyList( polyList, detail );
    }
 
-   return ret;   
+   return ret;
 }
 
 bool Forest::collideBox( const Point3F &start, const Point3F &end, RayInfo *outInfo )
-{   
+{
    //Con::warnf( "Forest::collideBox() - not yet implemented!" );
    return Parent::collideBox( start, end, outInfo );
 }
 
 bool Forest::castRay( const Point3F &start, const Point3F &end, RayInfo *outInfo )
 {
-   return castRayBase( start, end, outInfo, false );   
+   return castRayBase( start, end, outInfo, false );
 }
 
 bool Forest::castRayRendered( const Point3F &start, const Point3F &end, RayInfo *outInfo )
@@ -358,8 +358,8 @@ bool ForestData::castRay( const Point3F &start, const Point3F &end, RayInfo *out
    {
       if ( iter->value->castRay( start, end, outInfo, rendered ) )
       {
-         if ( outInfo->t < shortest.t )         
-            shortest = *outInfo;         
+         if ( outInfo->t < shortest.t )
+            shortest = *outInfo;
       }
    }
 
@@ -394,7 +394,7 @@ bool ForestCell::castRay( const Point3F &start, const Point3F &end, RayInfo *out
    else
    {
       for ( U32 i = 0; i < mItems.size(); i++ )
-      {     
+      {
          if ( mItems[i].castRay( start, end, outInfo, rendered ) )
          {
             if ( outInfo->t < shortest.t )
@@ -424,9 +424,9 @@ bool ForestItem::castRay( const Point3F &start, const Point3F &end, RayInfo *out
    TSForestItemData *data = (TSForestItemData*)mDataBlock;
    TSShapeInstance *si = data->getShapeInstance();
 
-   if ( !si ) 
+   if ( !si )
       return false;
-   
+
    if ( rendered )
    {
       // Always raycast against detail level zero
@@ -440,25 +440,25 @@ bool ForestItem::castRay( const Point3F &start, const Point3F &end, RayInfo *out
       return true;
    }
 
-   RayInfo shortest;  
+   RayInfo shortest;
    shortest.t = 1e8;
    bool gotMatch = false;
    S32 detail;
 
    const Vector<S32> &details = data->getLOSDetails();
-   for (U32 i = 0; i < details.size(); i++) 
+   for (U32 i = 0; i < details.size(); i++)
    {
       detail = details[i];
-      if (detail != -1) 
+      if (detail != -1)
       {
          //si->animate(data->mLOSDetails[i]);
 
-         if ( si->castRayOpcode( detail, s, e, outInfo ) )         
+         if ( si->castRayOpcode( detail, s, e, outInfo ) )
          {
             if (outInfo->t < shortest.t)
             {
                gotMatch = true;
-               shortest = *outInfo;      
+               shortest = *outInfo;
             }
          }
       }
@@ -473,5 +473,5 @@ bool ForestItem::castRay( const Point3F &start, const Point3F &end, RayInfo *out
    if ( outInfo->userData != NULL )
       *(ForestItem*)(outInfo->userData) = *this;
 
-   return true;   
+   return true;
 }

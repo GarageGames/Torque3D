@@ -48,9 +48,9 @@ new GuiControlProfile (GuiDefaultProfile)
 
    // border color
    border = 0;
-   borderColor   = "100 100 100"; 
+   borderColor   = "100 100 100";
    borderColorHL = "50 50 50 50";
-   borderColorNA = "75 75 75"; 
+   borderColorNA = "75 75 75";
 
    // font
    fontType = "Arial";
@@ -200,7 +200,7 @@ new GuiControlProfile (GuiAutoSizeTextProfile)
 {
    fontColor = "0 0 0";
    autoSizeWidth = true;
-   autoSizeHeight = true;   
+   autoSizeHeight = true;
    category = "Core";
 };
 
@@ -224,7 +224,7 @@ new GuiControlProfile( GuiMLTextProfile )
    fontColorLink = "100 100 100";
    fontColorLinkHL = "255 255 255";
    autoSizeWidth = true;
-   autoSizeHeight = true;  
+   autoSizeHeight = true;
    border = false;
    category = "Core";
 };
@@ -247,7 +247,7 @@ new GuiControlProfile( GuiTextEditProfile )
 {
    opaque = true;
    bitmap = "./images/textEdit";
-   hasBitmapArray = true; 
+   hasBitmapArray = true;
    border = -2; // fix to display textEdit img
    //borderWidth = "1";  // fix to display textEdit img
    //borderColor = "100 100 100";
@@ -262,7 +262,7 @@ new GuiControlProfile( GuiTextEditProfile )
    autoSizeHeight = true;
    justify = "left";
    tab = true;
-   canKeyFocus = true;   
+   canKeyFocus = true;
    category = "Core";
 };
 
@@ -292,7 +292,7 @@ new GuiControlProfile( GuiProgressTextProfile )
 	fontType = "Arial";
    fontColor = "0 0 0";
    justify = "center";
-   category = "Core";   
+   category = "Core";
 };
 
 if( !isObject( GuiButtonProfile ) )
@@ -300,7 +300,7 @@ new GuiControlProfile( GuiButtonProfile )
 {
    opaque = true;
    border = true;
-	 
+
    fontColor = "50 50 50";
    fontColorHL = "0 0 0";
 	 fontColorNA = "200 200 200";
@@ -507,12 +507,12 @@ new GuiControlProfile( GuiConsoleProfile )
 
 if( !isObject( GuiConsoleTextProfile ) )
 new GuiControlProfile( GuiConsoleTextProfile )
-{   
+{
    fontColor = "0 0 0";
    autoSizeWidth = true;
-   autoSizeHeight = true;   
+   autoSizeHeight = true;
    textOffset = "2 2";
-   opaque = true;   
+   opaque = true;
    fillColor = "255 255 255";
    border = true;
    borderThickness = 1;
@@ -537,7 +537,7 @@ if( !isObject( ConsoleTextEditProfile ) )
 new GuiControlProfile( ConsoleTextEditProfile : GuiTextEditProfile )
 {
    fillColor = "242 241 240 255";
-   fillColorHL = "255 255 255";   
+   fillColorHL = "255 255 255";
    category = "Core";
 };
 

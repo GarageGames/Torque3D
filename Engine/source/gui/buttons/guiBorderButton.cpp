@@ -44,14 +44,14 @@ IMPLEMENT_CONOBJECT(GuiBorderButtonCtrl);
 
 ConsoleDocClass( GuiBorderButtonCtrl,
    "@brief A push button that renders only a border.\n\n"
-   
+
    "A border button consists of a border rendered along its extents according to the border thickness defined in its profile "
    "(GuiControlProfile::border).  For the border color, a color is selected from the profile according to current button state:\n"
-   
+
    "- Default state: GuiControlProfile::borderColor\n"
    "- Highlighted (mouse is over the button): GuiControlProfile::fontColorHL\n"
    "- Depressed (mouse button down but not yet released): GuiControlProfile::fontColorSEL\n"
-   
+
    "@ingroup GuiButtons\n"
 );
 
@@ -64,7 +64,7 @@ void GuiBorderButtonCtrl::onRender(Point2I offset, const RectI &updateRect)
       {
          GFX->getDrawUtil()->drawRect( bounds, mProfile->mBorderColor );
          bounds.inset( 1, 1 );
-      }      
+      }
    }
 
    if ( mActive )

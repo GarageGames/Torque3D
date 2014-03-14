@@ -55,7 +55,7 @@ FMOD_FUNCTION( FMOD_Sound_GetMode, (FMOD_SOUND *sound, FMOD_MODE *mode))
 FMOD_FUNCTION( FMOD_Sound_SetLoopCount, (FMOD_SOUND *sound, int loopcount))
 FMOD_FUNCTION( FMOD_Sound_GetFormat, ( FMOD_SOUND* sound, FMOD_SOUND_TYPE* type, FMOD_SOUND_FORMAT* format, int* channels, int* bits ) )
 FMOD_FUNCTION( FMOD_Sound_GetLength, ( FMOD_SOUND* sound, unsigned int* length, FMOD_TIMEUNIT lengthtype ) )
-FMOD_FUNCTION( FMOD_Sound_GetDefaults, ( FMOD_SOUND* sound, float* frequency, float* volume, float* pan, int* priority ) ) 
+FMOD_FUNCTION( FMOD_Sound_GetDefaults, ( FMOD_SOUND* sound, float* frequency, float* volume, float* pan, int* priority ) )
 FMOD_FUNCTION( FMOD_Sound_GetMemoryInfo, ( FMOD_SOUND* sound, unsigned int memorybits, unsigned int event_memorybits, unsigned int* memoryused, unsigned int* memoryused_array ) );
 
 FMOD_FUNCTION( FMOD_Geometry_AddPolygon, ( FMOD_GEOMETRY* geometry, float directocclusion, float reverbocclusion, FMOD_BOOL doublesided, int numvertices, const FMOD_VECTOR* vertices, int* polygonindex ) )

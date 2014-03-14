@@ -41,7 +41,7 @@ public:
    MatStateHint() {}
 
    /// Constructor for building special hints.
-   MatStateHint( const String &state ) 
+   MatStateHint( const String &state )
 	   : mState( state.intern() )
    {
    }
@@ -71,7 +71,7 @@ protected:
    /// An interned string of the combined material shader and state info
    /// for evert pass of the processed material.
    String mState;
-   
+
 };
 
 #endif // _MATSTATEHINT_H_

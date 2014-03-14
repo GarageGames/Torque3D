@@ -401,7 +401,7 @@ void CreatorTree::onMouseDragged(const GuiEvent & event)
 }
 
 //------------------------------------------------------------------------------
-void CreatorTree::onRenderCell(Point2I offset, Point2I cell, bool, bool) 
+void CreatorTree::onRenderCell(Point2I offset, Point2I cell, bool, bool)
 {
    Point2I cellOffset = offset;
 
@@ -421,8 +421,8 @@ void CreatorTree::onRenderCell(Point2I offset, Point2I cell, bool, bool)
    GFXDrawUtil *drawer = GFX->getDrawUtil();
 
    // Start drawing stuff
-   if( node->isGroup() ) 
-   { 
+   if( node->isGroup() )
+   {
       // If we need a box...
       drawer->drawRectFill( boxStart, boxEnd, mProfile->mFillColor ); // Box background
       drawer->drawRect( boxStart, boxEnd, mProfile->mFontColor );     // Border
@@ -433,7 +433,7 @@ void CreatorTree::onRenderCell(Point2I offset, Point2I cell, bool, bool)
       if( !node->isExpanded() ) // If it's a [+] draw down line
          drawer->drawLine( boxStart.x + 4, boxStart.y + 2, boxStart.x + 4, boxStart.y + 7, mProfile->mFontColor );
    }
-   else 
+   else
    {
       // Draw horizontal line
       drawer->drawLine( boxStart.x + 4, boxStart.y + 4, boxStart.x + 9, boxStart.y + 4, mProfile->mFontColor );
@@ -447,9 +447,9 @@ void CreatorTree::onRenderCell(Point2I offset, Point2I cell, bool, bool)
    //draw in all the required continuation lines
    Node *parent = node->mParent;
 
-   while( !parent->isRoot() ) 
+   while( !parent->isRoot() )
    {
-      if( !parent->isLast() ) 
+      if( !parent->isLast() )
       {
          drawer->drawLine( cellOffset.x + ( parent->mTab * mTabSize ) + 6,
                       cellOffset.y - 2,

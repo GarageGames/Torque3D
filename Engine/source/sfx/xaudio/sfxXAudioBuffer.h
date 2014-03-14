@@ -40,7 +40,7 @@ class SFXXAudioBuffer : public SFXBuffer
    public:
 
       typedef SFXBuffer Parent;
-      
+
       friend class SFXXAudioDevice;
       friend class SFXXAudioVoice;
 

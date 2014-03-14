@@ -37,14 +37,14 @@ class GuiInspector;
 
 /// The GuiInspectorField control is a representation of a single abstract
 /// field for a given ConsoleObject derived object.  It handles creation
-/// getting and setting of it's fields data and editing control.  
+/// getting and setting of it's fields data and editing control.
 ///
 /// Creation of custom edit controls is done through this class and is
 /// dependent upon the dynamic console type, which may be defined to be
 /// custom for different types.
 ///
 /// @note GuiInspectorField controls must have a GuiInspectorGroup as their
-///        parent.  
+///        parent.
 class GuiInspectorField : public GuiControl
 {
    public:
@@ -56,56 +56,56 @@ class GuiInspectorField : public GuiControl
 
       /// The text to display as the field name.
       StringTableEntry mCaption;
-      
+
       /// The group to which this field belongs.
       GuiInspectorGroup* mParent;
-      
+
       /// The GuiInspector that the group is in to which this field belongs.
       GuiInspector* mInspector;
-      
+
       ///
       AbstractClassRep::Field* mField;
-      
+
       ///
       StringTableEntry mFieldArrayIndex;
-      
+
       ///
       String mFieldDocs;
-      
+
       ///
       GuiControl* mEdit;
-      
+
       ///
       RectI mCaptionRect;
-      
+
       ///
       RectI mEditCtrlRect;
-      
+
       ///
       bool mHighlighted;
 
       virtual void _registerEditControl( GuiControl *ctrl );
       virtual void _executeSelectedCallback();
-      
+
       void _setFieldDocs( StringTableEntry docs );
-      
+
    public:
 
       explicit GuiInspectorField();
 
       ///
       GuiInspectorField( GuiInspector *inspector, GuiInspectorGroup* parent, AbstractClassRep::Field* field );
-      
+
       virtual ~GuiInspectorField();
 
       ///
-      virtual void init( GuiInspector *inspector, GuiInspectorGroup *group );      
-      
+      virtual void init( GuiInspector *inspector, GuiInspectorGroup *group );
+
       ///
-      virtual void setInspectorField( AbstractClassRep::Field *field, 
-                                      StringTableEntry caption = NULL, 
+      virtual void setInspectorField( AbstractClassRep::Field *field,
+                                      StringTableEntry caption = NULL,
                                       const char *arrayIndex = NULL );
-      
+
       ///
       virtual GuiControl* constructEditControl();
 
@@ -128,16 +128,16 @@ class GuiInspectorField : public GuiControl
 
       /// Update this controls value to reflect that of the inspected field.
       virtual void updateValue();
-      
+
       /// Return the name of the field being edited.
       virtual StringTableEntry getFieldName();
-      
+
       /// Return the name of the console type that this field uses.
       virtual StringTableEntry getFieldType();
-      
+
       /// Return the name without the array index that may potentially be present.
       virtual StringTableEntry getRawFieldName();
-      
+
       ///
       StringTableEntry getArrayIndex() const { return mFieldArrayIndex; }
 
@@ -147,7 +147,7 @@ class GuiInspectorField : public GuiControl
 
       /// Set value of the field we are inspecting
       virtual void setData( const char* data, bool callbacks = true );
-      
+
       /// Reset the field value to its default value based on default-constructed objects.
       ///
       /// @note If multiple objects are inspected, this will take the default value from
@@ -167,18 +167,18 @@ class GuiInspectorField : public GuiControl
       virtual void updateData() {};
 
       ///
-      virtual bool updateRects();   
+      virtual bool updateRects();
 
       ///
       virtual void setHLEnabled( bool enabled );
-      
+
       /// Return true if all inspected objects have the same value for this
       /// field.
       bool hasSameValueInAllObjects();
-      
+
       /// Return the inspector object that this field belongs to.
       GuiInspector* getInspector() const { return mInspector; }
-      
+
       // GuiControl.
       virtual bool onAdd();
       virtual bool resize(const Point2I &newPosition, const Point2I &newExtent);

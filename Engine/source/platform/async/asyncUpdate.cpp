@@ -76,7 +76,7 @@ void AsyncUpdateThread::run( void* )
    while( !checkForStop() )
    {
       _waitForEventAndReset();
-      
+
       if( !checkForStop() )
          mUpdateList->process();
    }

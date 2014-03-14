@@ -28,7 +28,7 @@ MatrixSet::MatrixSet()
 {
    // [9/4/2009 Pat] Until we get better control over heap allocations in Torque
    // this class will provide a place where aligned/specalized matrix math can take place.
-   // We should be able to plug in any kind of platform-specific optimization 
+   // We should be able to plug in any kind of platform-specific optimization
    // behind the delgates.
    AssertFatal( ((int)this & 0xF) == 0, "MatrixSet has been allocated off a 16-byte boundary!" );
 

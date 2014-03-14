@@ -52,16 +52,16 @@ ImplementEnumType( ShadowFilterMode,
    "The shadow filtering modes for Advanced Lighting shadows.\n"
    "@ingroup AdvancedLighting" )
 
-   { ShadowFilterMode_None, "None", 
+   { ShadowFilterMode_None, "None",
       "@brief Simple point sampled filtering.\n"
       "This is the fastest and lowest quality mode." },
 
-   { ShadowFilterMode_SoftShadow, "SoftShadow", 
+   { ShadowFilterMode_SoftShadow, "SoftShadow",
       "@brief A variable tap rotated poisson disk soft shadow filter.\n"
       "It performs 4 taps to classify the point as in shadow, out of shadow, or along a "
       "shadow edge.  Samples on the edge get an additional 8 taps to soften them." },
 
-   { ShadowFilterMode_SoftShadowHighQuality, "SoftShadowHighQuality", 
+   { ShadowFilterMode_SoftShadowHighQuality, "SoftShadowHighQuality",
       "@brief A 12 tap rotated poisson disk soft shadow filter.\n"
       "It performs all the taps for every point without any early rejection." },
 
@@ -112,19 +112,19 @@ ConsoleDocClass( AdvancedLightBinManager,
    "@ingroup Lighting"
 );
 
-AdvancedLightBinManager::AdvancedLightBinManager( AdvancedLightManager *lm /* = NULL */, 
-                                                 ShadowMapManager *sm /* = NULL */, 
+AdvancedLightBinManager::AdvancedLightBinManager( AdvancedLightManager *lm /* = NULL */,
+                                                 ShadowMapManager *sm /* = NULL */,
                                                  GFXFormat lightBufferFormat /* = GFXFormatR8G8B8A8 */ )
-   :  RenderTexTargetBinManager( RIT_LightInfo, 1.0f, 1.0f, lightBufferFormat ), 
-      mNumLightsCulled(0), 
-      mLightManager(lm), 
+   :  RenderTexTargetBinManager( RIT_LightInfo, 1.0f, 1.0f, lightBufferFormat ),
+      mNumLightsCulled(0),
+      mLightManager(lm),
       mShadowManager(sm),
       mConditioner(NULL)
 {
    // Create an RGB conditioner
-   mConditioner = new AdvancedLightBufferConditioner( getTargetFormat(), 
+   mConditioner = new AdvancedLightBufferConditioner( getTargetFormat(),
                                                       AdvancedLightBufferConditioner::RGB );
-   mNamedTarget.setConditioner( mConditioner ); 
+   mNamedTarget.setConditioner( mConditioner );
    mNamedTarget.registerWithName( smBufferName );
 
    // We want a full-resolution buffer
@@ -148,14 +148,14 @@ AdvancedLightBinManager::~AdvancedLightBinManager()
    Con::NotifyDelegate callback( this, &AdvancedLightBinManager::_deleteLightMaterials );
    Con::removeVariableNotify( "$pref::shadows::filterMode", callback );
    Con::removeVariableNotify( "$AL::PSSMDebugRender", callback );
-   Con::removeVariableNotify( "$AL::UseSSAOMask", callback );  
+   Con::removeVariableNotify( "$AL::UseSSAOMask", callback );
 }
 
 void AdvancedLightBinManager::consoleInit()
 {
    Parent::consoleInit();
 
-   Con::addVariable( "$pref::shadows::filterMode", 
+   Con::addVariable( "$pref::shadows::filterMode",
       TYPEID<ShadowFilterMode>(), &smShadowFilterMode,
       "The filter mode to use for shadows.\n"
       "@ingroup AdvancedLighting\n" );
@@ -185,7 +185,7 @@ void AdvancedLightBinManager::addLight( LightInfo *light )
    // Get the light type.
    const LightInfo::Type lightType = light->getType();
 
-   AssertFatal(   lightType == LightInfo::Point || 
+   AssertFatal(   lightType == LightInfo::Point ||
                   lightType == LightInfo::Spot, "Bogus light type." );
 
    // Find a shadow map for this light, if it has one
@@ -194,7 +194,7 @@ void AdvancedLightBinManager::addLight( LightInfo *light )
 
    // Get the right shadow type.
    ShadowType shadowType = ShadowType_None;
-   if (  light->getCastShadows() && 
+   if (  light->getCastShadows() &&
          lsm && lsm->hasShadowTex() &&
          !ShadowMapPass::smDisableShadows )
       shadowType = lsm->getShadowType();
@@ -210,7 +210,7 @@ void AdvancedLightBinManager::addLight( LightInfo *light )
    else
       lEntry.vertBuffer = mLightManager->getSphereMesh( lEntry.numPrims, lEntry.primBuffer );
 
-   // If it's a point light, push front, spot 
+   // If it's a point light, push front, spot
    // light, push back. This helps batches.
    Vector<LightBinEntry> &curBin = mLightBin;
    if ( light->getType() == LightInfo::Point )
@@ -284,7 +284,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
    // Initialize and set the per-frame parameters after getting
    // the vector light material as we use lazy creation.
    _setupPerFrameParameters( state );
-   
+
    // Draw sunlight/ambient
    if ( sunLight && vectorMatInfo )
    {
@@ -294,7 +294,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       setupSGData( sgData, state, sunLight );
       vectorMatInfo->setLightParameters( sunLight, state, worldToCameraXfm );
 
-      // Set light holds the active shadow map.       
+      // Set light holds the active shadow map.
       mShadowManager->setLightShadowMapForLight( sunLight );
 
       // Set geometry
@@ -368,8 +368,8 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
    _onPostRender();
 }
 
-AdvancedLightBinManager::LightMaterialInfo* AdvancedLightBinManager::_getLightMaterial(   LightInfo::Type lightType, 
-                                                                                          ShadowType shadowType, 
+AdvancedLightBinManager::LightMaterialInfo* AdvancedLightBinManager::_getLightMaterial(   LightInfo::Type lightType,
+                                                                                          ShadowType shadowType,
                                                                                           bool useCookieTex )
 {
    PROFILE_SCOPE( AdvancedLightBinManager_GetLightMaterial );
@@ -381,8 +381,8 @@ AdvancedLightBinManager::LightMaterialInfo* AdvancedLightBinManager::_getLightMa
    LightMatTable::Iterator iter = mLightMaterials.find( key );
    if ( iter != mLightMaterials.end() )
       return iter->value;
-   
-   // If we got here we need to build a material for 
+
+   // If we got here we need to build a material for
    // this light+shadow combination.
 
    LightMaterialInfo *info = NULL;
@@ -405,13 +405,13 @@ AdvancedLightBinManager::LightMaterialInfo* AdvancedLightBinManager::_getLightMa
          if ( smShadowFilterMode != ShadowFilterMode_None )
          {
             shadowMacros.push_back( GFXShaderMacro( "SOFTSHADOW" ) );
-           
+
             const F32 SM = GFX->getPixelShaderVersion();
             if ( SM >= 3.0f && smShadowFilterMode == ShadowFilterMode_SoftShadowHighQuality )
                shadowMacros.push_back( GFXShaderMacro( "SOFTSHADOW_HIGH_QUALITY" ) );
          }
       }
-   
+
       if ( useCookieTex )
          shadowMacros.push_back( GFXShaderMacro( "USE_COOKIE_TEX" ) );
 
@@ -437,7 +437,7 @@ void AdvancedLightBinManager::_deleteLightMaterials()
    LightMatTable::Iterator iter = mLightMaterials.begin();
    for ( ; iter != mLightMaterials.end(); iter++ )
       delete iter->value;
-      
+
    mLightMaterials.clear();
 }
 
@@ -515,10 +515,10 @@ void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *
    for ( ; iter != mLightMaterials.end(); iter++ )
    {
       if ( iter->value )
-         iter->value->setViewParameters(  frustum.getNearDist(), 
-                                          frustum.getFarDist(), 
-                                          frustum.getPosition(), 
-                                          farPlane, 
+         iter->value->setViewParameters(  frustum.getNearDist(),
+                                          frustum.getFarDist(),
+                                          frustum.getPosition(),
+                                          farPlane,
                                           vsFarPlane);
    }
 }
@@ -536,10 +536,10 @@ void AdvancedLightBinManager::setupSGData( SceneData &data, const SceneRenderSta
       if ( light->getType() == LightInfo::Point )
       {
          // The point light volume gets some flat spots along
-         // the perimiter mostly visible in the constant and 
+         // the perimiter mostly visible in the constant and
          // quadradic falloff modes.
          //
-         // To account for them slightly increase the scale 
+         // To account for them slightly increase the scale
          // instead of greatly increasing the polycount.
 
          mLightMat = light->getTransform();
@@ -599,18 +599,18 @@ AdvancedLightBinManager::LightMaterialInfo::LightMaterialInfo( const String &mat
                                                                const Vector<GFXShaderMacro> &macros )
 :  matInstance(NULL),
    zNearFarInvNearFar(NULL),
-   farPlane(NULL), 
+   farPlane(NULL),
    vsFarPlane(NULL),
    negFarPlaneDotEye(NULL),
-   lightPosition(NULL), 
-   lightDirection(NULL), 
-   lightColor(NULL), 
+   lightPosition(NULL),
+   lightDirection(NULL),
+   lightColor(NULL),
    lightAttenuation(NULL),
-   lightRange(NULL), 
-   lightAmbient(NULL), 
-   lightTrilight(NULL), 
+   lightRange(NULL),
+   lightAmbient(NULL),
+   lightTrilight(NULL),
    lightSpotParams(NULL)
-{   
+{
    Material *mat = MATMGR->getMaterialDefinitionByName( matName );
    if ( !mat )
       return;
@@ -642,9 +642,9 @@ AdvancedLightBinManager::LightMaterialInfo::~LightMaterialInfo()
    SAFE_DELETE(matInstance);
 }
 
-void AdvancedLightBinManager::LightMaterialInfo::setViewParameters(  const F32 _zNear, 
-                                                                     const F32 _zFar, 
-                                                                     const Point3F &_eyePos, 
+void AdvancedLightBinManager::LightMaterialInfo::setViewParameters(  const F32 _zNear,
+                                                                     const F32 _zFar,
+                                                                     const Point3F &_eyePos,
                                                                      const PlaneF &_farPlane,
                                                                      const PlaneF &_vsFarPlane)
 {
@@ -722,9 +722,9 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
          const F32 innerCone = getMin( lightInfo->getInnerConeAngle(), outerCone );
          const F32 outerCos = mCos( mDegToRad( outerCone / 2.0f ) );
          const F32 innerCos = mCos( mDegToRad( innerCone / 2.0f ) );
-         Point4F spotParams(  outerCos, 
-                              innerCos - outerCos, 
-                              mCos( mDegToRad( outerCone ) ), 
+         Point4F spotParams(  outerCos,
+                              innerCos - outerCos,
+                              mCos( mDegToRad( outerCone ) ),
                               0.0f );
 
          matParams->setSafe( lightSpotParams, spotParams );
@@ -767,13 +767,13 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
 bool LightMatInstance::setupPass( SceneRenderState *state, const SceneData &sgData )
 {
    // Go no further if the material failed to initialize properly.
-   if (  !mProcessedMaterial || 
+   if (  !mProcessedMaterial ||
          mProcessedMaterial->getNumPasses() == 0 )
       return false;
 
    // Fetch the lightmap params
    const LightMapParams *lmParams = sgData.lights[0]->getExtended<LightMapParams>();
-   
+
    // If no Lightmap params, let parent handle it
    if(lmParams == NULL)
       return Parent::setupPass(state, sgData);
@@ -792,7 +792,7 @@ bool LightMatInstance::setupPass( SceneRenderState *state, const SceneData &sgDa
    }
    else
    {
-      // If this light is represented in a lightmap, it has already done it's 
+      // If this light is represented in a lightmap, it has already done it's
       // job for non-lightmapped geometry. Now render the lightmapped geometry
       // pass (specular + shadow-darkening)
       if(!mInternalPass && lmParams->representedInLightmap)
@@ -823,7 +823,7 @@ bool LightMatInstance::setupPass( SceneRenderState *state, const SceneData &sgDa
          GFX->setStateBlock(mLitState[StaticLightNonLMGeometry]);
       else // This is a normal, dynamic light.
          GFX->setStateBlock(mLitState[DynamicLight]);
-      
+
    }
    else // Internal pass, this is the add-specular/multiply-darken-color pass
       GFX->setStateBlock(mLitState[StaticLightLMGeometry]);
@@ -834,9 +834,9 @@ bool LightMatInstance::setupPass( SceneRenderState *state, const SceneData &sgDa
 bool LightMatInstance::init( const FeatureSet &features, const GFXVertexFormat *vertexFormat )
 {
    bool success = Parent::init(features, vertexFormat);
-   
+
    // If the initialization failed don't continue.
-   if ( !success || !mProcessedMaterial || mProcessedMaterial->getNumPasses() == 0 )   
+   if ( !success || !mProcessedMaterial || mProcessedMaterial->getNumPasses() == 0 )
       return false;
 
    mLightMapParamsSC = getMaterialParameterHandle("$lightMapParams");
@@ -847,7 +847,7 @@ bool LightMatInstance::init( const FeatureSet &features, const GFXVertexFormat *
    const RenderPassData *rpd = mProcessedMaterial->getPass(0);
    AssertFatal(rpd, "No render pass data!");
    AssertFatal(rpd->mRenderStates[0], "No render state 0!");
-   
+
    // Get state block desc for normal (not wireframe, not translucent, not glow, etc)
    // render state
    GFXStateBlockDesc litState = rpd->mRenderStates[0]->getDesc();
@@ -869,7 +869,7 @@ bool LightMatInstance::init( const FeatureSet &features, const GFXVertexFormat *
    mLitState[StaticLightNonLMGeometry] = GFX->createStateBlock(litState);
 
    // StaticLightLMGeometry State: This will add specular information (alpha) but
-   // multiply-darken color information. 
+   // multiply-darken color information.
    litState.blendDest = GFXBlendSrcColor;
    litState.blendSrc = GFXBlendZero;
    litState.stencilMask = RenderPrePassMgr::OpaqueStaticLitMask;

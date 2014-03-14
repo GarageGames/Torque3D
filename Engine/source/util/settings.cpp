@@ -39,7 +39,7 @@ Settings::Settings()
 
 Settings::~Settings()
 {
-   
+
 }
 
 void Settings::initPersistFields()
@@ -86,7 +86,7 @@ const UTF8 *Settings::value(const UTF8 *settingName, const UTF8 *defaultValue)
 
    // we do this setModStaticFields call to make sure our get/set calls
    // don't grab a regular field, don't want to stomp anything
-   setModStaticFields(false);  
+   setModStaticFields(false);
    const UTF8 *value = getDataField(nameEntry, NULL);
    const UTF8 *storedDefaultValue = getDataField(defaultNameEntry, NULL);
    setModStaticFields(true);
@@ -123,7 +123,7 @@ void Settings::remove(const UTF8 *settingName, bool includeDefaults)
         SimFieldDictionary::Entry* fieldEntry = *itr;
 
         // is this a field of our current group
-        if ( (dStrcmp(nameEntry, "") == 0) || 
+        if ( (dStrcmp(nameEntry, "") == 0) ||
 					dStrcmp( nameEntry, fieldEntry->slotName ) == 0 ||
 					(includeDefaults && dStrcmp( nameEntryDefault, fieldEntry->slotName ) == 0) )
         {
@@ -253,7 +253,7 @@ bool Settings::write()
    if(saved)
       return true;
    else
-	   return false;   
+	   return false;
 }
 
 bool Settings::read()
@@ -292,7 +292,7 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 	  const UTF8 *type = document->elementValue();
 	  const UTF8 *name = document->attribute("name");
 	  const UTF8 *value = document->getText();
-	  
+
 	  if(dStrcmp(type, "Group") == 0)
 	  {
 		 String newStack = groupStack;
@@ -306,14 +306,14 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 	  } else if(dStrcmp(type, "Setting") == 0)
 	  {
 		 String nameString = groupStack;
-         
+
 		 if(!groupStack.isEmpty())
 		    nameString += "/";
 
          nameString += name;
          setDataField(StringTable->insert(nameString.c_str()), NULL, value);
 	  }
-	  
+
 	  document->popElement();
    }
 }
@@ -374,7 +374,7 @@ S32 Settings::buildSearchList( const char* pattern, bool deepSearch, bool includ
 	{
 		// Fetch Field Entry.
       SimFieldDictionary::Entry* fieldEntry = *itr;
-		
+
 		// Compare strings, store proper results in vector
 		String extendedPath = String::ToString(fieldEntry->slotName);
 		String::SizeType start(0);
@@ -427,7 +427,7 @@ const char* Settings::findFirstValue( const char* pattern, bool deepSearch, bool
 	{
 		// Fetch Field Entry.
       SimFieldDictionary::Entry* fieldEntry = *itr;
-		
+
 		// Compare strings, store proper results in vector
 		String extendedPath = String::ToString(fieldEntry->slotName);
 		String::SizeType start(0);
@@ -463,7 +463,7 @@ const char* Settings::findFirstValue( const char* pattern, bool deepSearch, bool
 			}
 		}
 	}
-	
+
 	if( mSearchResults.size() < 1 )
    {
 		Con::errorf("findFirstValue() : Pattern not found");
@@ -534,10 +534,10 @@ void SettingSaveNode::addValue(const UTF8 *name, const UTF8 *value)
                break;
 			}
 		 }
-         
+
 		 // not found, so we create it
 		 if(!found)
-		 {   
+		 {
 			SettingSaveNode *node = new SettingSaveNode(groupName, true);
             parentNode->mGroupNodes.push_back(node);
 		    parentNode = node;
@@ -593,7 +593,7 @@ String SettingSaveNode::getGroup(const String &name, S32 num)
 	  }
 
 	  count++;
-   }   
+   }
 
    return String("");
 }
@@ -647,7 +647,7 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
 		 node->buildDocument(document);
 	  }
    }
-   
+
    if(!skipWrite)
       document->popElement();
 }
@@ -655,7 +655,7 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
 ConsoleMethod(Settings, setValue, void, 3, 4, "settingObj.setValue(settingName, value);")
 {
    const char *fieldName = StringTable->insert( argv[2] );
-   
+
    if(argc == 3)
       object->setValue( fieldName);
    else if(argc == 4)
@@ -671,7 +671,7 @@ ConsoleMethod(Settings, setDefaultValue, void, 4, 4, "settingObj.setDefaultValue
 ConsoleMethod(Settings, value, const char*, 3, 4, "settingObj.value(settingName, defaultValue);")
 {
    const char *fieldName = StringTable->insert( argv[2] );
-   
+
    if(argc == 3)
       return object->value( fieldName );
    if(argc == 4)

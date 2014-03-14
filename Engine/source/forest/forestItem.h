@@ -60,13 +60,13 @@ protected:
    virtual void _preload() {}
 
 public:
-   
+
    /// Shape file for this item type.
-   StringTableEntry mShapeFile;   
+   StringTableEntry mShapeFile;
 
    /// This is the radius used during placement to ensure
    /// the element isn't crowded up against other trees.
-   F32 mRadius;   
+   F32 mRadius;
 
    /// Overall scale to the effect of wind.
    F32 mWindScale;
@@ -106,9 +106,9 @@ public:
    virtual ~ForestItemData() {}
 
    DECLARE_CONOBJECT( ForestItemData );
-   
+
    static void  consoleInit();
-   static void  initPersistFields();   
+   static void  initPersistFields();
 
    virtual void onNameChange(const char *name);
    virtual bool onAdd();
@@ -117,9 +117,9 @@ public:
 
    /// Called from Forest the first time a datablock is used
    /// in order to lazy load content.
-   void preload() 
-   { 
-      if ( !mNeedPreload ) 
+   void preload()
+   {
+      if ( !mNeedPreload )
          return;
 
       _preload();
@@ -136,8 +136,8 @@ public:
 
    typedef Signal<void(void)> ReloadSignal;
 
-   static ReloadSignal& getReloadSignal() 
-   { 
+   static ReloadSignal& getReloadSignal()
+   {
       static ReloadSignal theSignal;
       return theSignal;
    }
@@ -156,7 +156,7 @@ class ForestItem
 protected:
 
    ForestItemData *mDataBlock;
-   
+
    // The unique identifier used when querying forest items.
    ForestItemKey mKey;
 
@@ -180,7 +180,7 @@ public:
 
    // Constructs an invalid item.
    ForestItem();
-  
+
    // Note: We keep this non-virtual to save vtable space.
    ~ForestItem();
 
@@ -211,7 +211,7 @@ public:
    F32 getRadius() const { return mRadius; }
 
    Point3F getCenterPoint() const { return mWorldBox.getCenter(); }
-  
+
    void setTransform( const MatrixF &xfm, F32 scale );
 
    F32 getSqDistanceToPoint( const Point2F &point ) const;
@@ -222,8 +222,8 @@ public:
 
    const Box3F& getWorldBox() const { return mWorldBox; }
 
-   Point3F getSize() const 
-   { 
+   Point3F getSize() const
+   {
       if ( !mDataBlock )
          return Point3F::One;
 
@@ -241,15 +241,15 @@ public:
 
    /// Collision
    /// @{
-   
-      bool castRay( const Point3F &start, const Point3F &end, RayInfo *outInfo, bool rendered ) const;         
+
+      bool castRay( const Point3F &start, const Point3F &end, RayInfo *outInfo, bool rendered ) const;
 
       bool buildPolyList( AbstractPolyList *polyList, const Box3F &box, const SphereF &sphere ) const;
 
       //ForestConvex* buildConvex( const Box3F &box, Convex *convex ) const;
 
    /// @}
-   
+
 };
 
 typedef Vector<ForestItem> ForestItemVector;

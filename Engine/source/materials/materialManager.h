@@ -49,7 +49,7 @@ public:
 
    Material * allocateAndRegister(const String &objectName, const String &mapToName = String());
    Material * getMaterialDefinitionByName(const String &matName);
-   SimSet * getMaterialSet();   
+   SimSet * getMaterialSet();
 
    // map textures to materials
    void mapMaterial(const String & textureName, const String & materialName);
@@ -58,7 +58,7 @@ public:
    // Return instance of named material caller is responsible for memory
    BaseMatInstance * createMatInstance( const String &matName );
 
-   // Create a BaseMatInstance with the default feature flags. 
+   // Create a BaseMatInstance with the default feature flags.
    BaseMatInstance * createMatInstance( const String &matName, const GFXVertexFormat *vertexFormat );
    BaseMatInstance * createMatInstance( const String &matName, const FeatureSet &features, const GFXVertexFormat *vertexFormat );
 
@@ -102,11 +102,11 @@ public:
    F32 getDeltaTime() const { return mDt; }
    U32 getLastUpdateTime() const { return mLastTime; }
 
-   /// Signal used to notify systems that 
+   /// Signal used to notify systems that
    /// procedural shaders have been flushed.
    typedef Signal<void()> FlushSignal;
 
-   /// Returns the signal used to notify systems that the 
+   /// Returns the signal used to notify systems that the
    /// procedural shaders have been flushed.
    FlushSignal& getFlushSignal() { return mFlushSignal; }
 
@@ -117,7 +117,7 @@ public:
    // Flush the instance
    void flushInstance( BaseMaterialDefinition *target );
 
-   /// Re-initializes the material instances for a specific target material.   
+   /// Re-initializes the material instances for a specific target material.
    void reInitInstance( BaseMaterialDefinition *target );
 
 protected:
@@ -141,7 +141,7 @@ protected:
    /// The feature exclusion set.
    FeatureSet mExclusionFeatures;
 
-   /// Signal used to notify systems that 
+   /// Signal used to notify systems that
    /// procedural shaders have been flushed.
    FlushSignal mFlushSignal;
 

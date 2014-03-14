@@ -152,7 +152,7 @@ void CameraSpline::buildTimeMap()
    F32 epsilon = Con::getFloatVariable("CameraSpline::epsilon", 0.90f);
    const F32 Step = 0.05f;
    F32 lt = 0,time = 0;
-   do  
+   do
    {
       if ((time += Step) > F32(mSize - 1))
          time = (F32)mSize - 1.0f;
@@ -161,7 +161,7 @@ void CameraSpline::buildTimeMap()
       length += (ki.mPosition - kj.mPosition).len();
       F32 segment = (ki.mPosition - ka.mPosition).len();
 
-      if ((segment / length) < epsilon || time == (mSize - 1) || mFloor(lt) != mFloor(time)) 
+      if ((segment / length) < epsilon || time == (mSize - 1) || mFloor(lt) != mFloor(time))
       {
          map.mTime = time;
          map.mDistance = length;
@@ -338,24 +338,24 @@ void CameraSpline::value(F32 t, CameraSpline::Knot *result, bool skip_rotation)
       end++;
    }
 
-   if (start == end) 
+   if (start == end)
    {
       result->mRotation = p1->mRotation;
       result->mSpeed = p1->mSpeed;
    }
-   else 
+   else
    {
-      
+
       F32 c = getDistance(t);
       F32 d1 = getDistance((F32)start);
       F32 d2 = getDistance((F32)end);
-      
-      if (d1 == d2) 
+
+      if (d1 == d2)
       {
          result->mRotation = p2->mRotation;
          result->mSpeed    = p2->mSpeed;
       }
-      else 
+      else
       {
          i  = (c-d1)/(d2-d1);
 
@@ -371,7 +371,7 @@ void CameraSpline::value(F32 t, CameraSpline::Knot *result, bool skip_rotation)
 
             QuatF a; a.interpolate(p0->mRotation, p1->mRotation, q);
             QuatF b; b.interpolate(p2->mRotation, p3->mRotation, w);
-            
+
             result->mRotation.interpolate(a, b, e);
             result->mSpeed = mCatmullrom(i, p0->mSpeed, p1->mSpeed, p2->mSpeed, p3->mSpeed);
          }

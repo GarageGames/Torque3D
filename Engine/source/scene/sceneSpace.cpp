@@ -81,7 +81,7 @@ void SceneSpace::onRemove()
 //-----------------------------------------------------------------------------
 
 void SceneSpace::setTransform(const MatrixF & mat)
-{  
+{
    Parent::setTransform( mat );
 
    if( isServerObject() )
@@ -111,7 +111,7 @@ void SceneSpace::onEditorDisable()
 BaseMatInstance* SceneSpace::_createEditorRenderMaterial()
 {
    String materialName = String::ToString( "Editor%sMaterial", getClassName() );
-   
+
    Material* material;
    if( !Sim::findObject( materialName, material ) )
       return NULL;
@@ -181,7 +181,7 @@ U32 SceneSpace::packUpdate( NetConnection* connection, U32 mask, BitStream* stre
 {
    U32 retMask = Parent::packUpdate( connection, mask, stream );
 
-   if( stream->writeFlag( mask & TransformMask ) ) 
+   if( stream->writeFlag( mask & TransformMask ) )
    {
       mathWrite( *stream, mObjToWorld );
       mathWrite( *stream, mObjScale );

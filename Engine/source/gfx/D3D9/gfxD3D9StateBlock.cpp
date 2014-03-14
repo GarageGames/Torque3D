@@ -40,7 +40,7 @@ GFXD3D9StateBlock::GFXD3D9StateBlock(const GFXStateBlockDesc& desc, LPDIRECT3DDE
    mD3DDevice = d3dDevice;
 
    // Color writes
-   mColorMask = 0; 
+   mColorMask = 0;
    mColorMask |= ( mDesc.colorWriteRed   ? GFXCOLORWRITEENABLE_RED   : 0 );
    mColorMask |= ( mDesc.colorWriteGreen ? GFXCOLORWRITEENABLE_GREEN : 0 );
    mColorMask |= ( mDesc.colorWriteBlue  ? GFXCOLORWRITEENABLE_BLUE  : 0 );
@@ -53,7 +53,7 @@ GFXD3D9StateBlock::GFXD3D9StateBlock(const GFXStateBlockDesc& desc, LPDIRECT3DDE
 
 GFXD3D9StateBlock::~GFXD3D9StateBlock()
 {
-   
+
 }
 
 /// Returns the hash value of the desc that created this block
@@ -65,7 +65,7 @@ U32 GFXD3D9StateBlock::getHashValue() const
 /// Returns a GFXStateBlockDesc that this block represents
 const GFXStateBlockDesc& GFXD3D9StateBlock::getDesc() const
 {
-   return mDesc;      
+   return mDesc;
 }
 
 /// Called by D3D9 device to active this state block.
@@ -75,7 +75,7 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
    PROFILE_SCOPE( GFXD3D9StateBlock_Activate );
 
    // Little macro to save some typing, SD = state diff, checks for null source state block, then
-   // checks to see if the states differ 
+   // checks to see if the states differ
 #if defined(TORQUE_OS_XENON)
    #define SD(x, y)  if (!oldState || oldState->mDesc.x != mDesc.x) \
                      mD3DDevice->SetRenderState_Inline(y, mDesc.x)
@@ -117,9 +117,9 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
    SDD(cullMode, D3DRS_CULLMODE, GFXD3D9CullMode[mDesc.cullMode]);
 
    // Depth
-   SD(zEnable, D3DRS_ZENABLE);   
+   SD(zEnable, D3DRS_ZENABLE);
    SD(zWriteEnable, D3DRS_ZWRITEENABLE);
-   SDD(zFunc, D3DRS_ZFUNC, GFXD3D9CmpFunc[mDesc.zFunc]);   
+   SDD(zFunc, D3DRS_ZFUNC, GFXD3D9CmpFunc[mDesc.zFunc]);
    if ((!oldState) || (mZBias != oldState->mZBias))
       mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS, mZBias);
    if ((!oldState) || (mZSlopeBias != oldState->mZSlopeBias))
@@ -161,7 +161,7 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
    #define TSS(x, y, z) if (!oldState || oldState->mDesc.samplers[i].x != mDesc.samplers[i].x) \
                         mD3DDevice->SetTextureStageState(i, y, z)
    for ( U32 i = 0; i < 8; i++ )
-   {   
+   {
       TSS(textureColorOp, D3DTSS_COLOROP, GFXD3D9TextureOp[mDesc.samplers[i].textureColorOp]);
       TSS(colorArg1, D3DTSS_COLORARG1, mDesc.samplers[i].colorArg1);
       TSS(colorArg2, D3DTSS_COLORARG2, mDesc.samplers[i].colorArg2);
@@ -184,7 +184,7 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
                         mD3DDevice->SetSamplerState(i, y, z)
 #endif
    for ( U32 i = 0; i < getOwningDevice()->getNumSamplers(); i++ )
-   {      
+   {
       SS(minFilter, D3DSAMP_MINFILTER, GFXD3D9TextureFilter[mDesc.samplers[i].minFilter]);
       SS(magFilter, D3DSAMP_MAGFILTER, GFXD3D9TextureFilter[mDesc.samplers[i].magFilter]);
       SS(mipFilter, D3DSAMP_MIPFILTER, GFXD3D9TextureFilter[mDesc.samplers[i].mipFilter]);

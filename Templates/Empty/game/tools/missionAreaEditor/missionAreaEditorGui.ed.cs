@@ -19,17 +19,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-   
+
 function MissionAreaEditorGui::onEditorActivated( %this )
 {
    EWorldEditor.clearSelection();
-   
+
    %ma = getMissionAreaServerObject();
    EWorldEditor.selectObject( %ma );
    EWorldEditor.syncGui();
    MissionAreaEditorTerrainEditor.updateTerrain();
    %this.setSelectedMissionArea( %ma );
-   %this.onMissionAreaSelected( %this.getSelectedMissionArea() );   
+   %this.onMissionAreaSelected( %this.getSelectedMissionArea() );
 }
 
 function MissionAreaEditorGui::onEditorDeactivated( %this )
@@ -40,7 +40,7 @@ function MissionAreaEditorGui::onMissionAreaSelected( %this, %missionArea )
 {
    %this.missionArea = %missionArea;
    MissionAreaEditorTerrainEditor.setMissionArea( %missionArea );
-   MissionAreaInspector.inspect( %missionArea );  
+   MissionAreaInspector.inspect( %missionArea );
 }
 
 //-----------------------------------------------------------------------------
@@ -61,18 +61,18 @@ function MissionAreaInspector::inspect( %this, %obj )
 {
    %name = "";
    if ( isObject( %obj ) )
-      %name = %obj.getName();   
+      %name = %obj.getName();
    else
       MissionAreaFieldInfoControl.setText( "" );
-   
+
    //RiverInspectorNameEdit.setValue( %name );
-   Parent::inspect( %this, %obj );  
+   Parent::inspect( %this, %obj );
 }
 
 function MissionAreaInspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // Same work to do as for the regular WorldEditor Inspector.
-   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );   
+   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );
 }
 
 function MissionAreaInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %fieldDoc )

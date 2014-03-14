@@ -52,13 +52,13 @@ void GuiMissionAreaEditorCtrl::initPersistFields()
    Parent::initPersistFields();
 }
 
-void GuiMissionAreaEditorCtrl::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void GuiMissionAreaEditorCtrl::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    //cursor = mAddNodeCursor;
    //visible = false;
-   
+
    cursor = NULL;
    visible = false;
 
@@ -73,15 +73,15 @@ void GuiMissionAreaEditorCtrl::get3DCursor( GuiCursor *&cursor,
 
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
-   
-   // We've already changed the cursor, 
+
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if( root->mCursorChanged != -1)
       controller->popCursor();
 
    // Now change the cursor shape
    controller->pushCursor(currCursor);
-   root->mCursorChanged = currCursor;   
+   root->mCursorChanged = currCursor;
 }
 
 void GuiMissionAreaEditorCtrl::setSelectedMissionArea( MissionArea *missionArea )

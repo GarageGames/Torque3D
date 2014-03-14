@@ -54,7 +54,7 @@ class SFXXAudioDevice : public SFXDevice
 
    protected:
 
-      /// The XAudio engine interface passed 
+      /// The XAudio engine interface passed
       /// on creation from the provider.
       IXAudio2 *mXAudio;
 
@@ -76,7 +76,7 @@ class SFXXAudioDevice : public SFXDevice
 
    public:
 
-      SFXXAudioDevice(  SFXProvider* provider, 
+      SFXXAudioDevice(  SFXProvider* provider,
                         const String& name,
                         IXAudio2 *xaudio,
                         U32 deviceIndex,

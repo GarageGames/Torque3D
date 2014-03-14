@@ -57,7 +57,7 @@ class GuiMLTextEditCtrl : public GuiMLTextCtrl
 
    DECLARE_CONOBJECT(GuiMLTextEditCtrl);
    DECLARE_DESCRIPTION( "A control that allows to edit multiple lines of text." );
-   
+
    static void initPersistFields();
 };
 

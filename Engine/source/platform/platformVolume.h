@@ -45,7 +45,7 @@ namespace FS
 
    bool MountDefaults();
    bool MountZips(const String &root);
-   
+
    bool Touch( const Path &path );
 
 } // Namespace FS

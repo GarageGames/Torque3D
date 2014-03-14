@@ -40,7 +40,7 @@ public:
 
    EventHandlerRef mMenuEventHandlerRef;
    EventHandlerRef mCommandEventHandlerRef;
-   
+
    /// More evil hacking for OSX.  There seems to be no way to disable menu shortcuts and
    /// they are automatically routed within that Cocoa thing outside of our control.  Also,
    /// there's no way of telling what triggered a command event and thus no way of knowing
@@ -67,9 +67,9 @@ static OSStatus _OnMenuEvent(EventHandlerCallRef nextHandler, EventRef theEvent,
    MenuRef menu;
 
    GetEventParameter(theEvent, kEventParamDirectObject, typeMenuRef, NULL, sizeof(MenuRef), NULL, &menu);
-   
+
    // Count open/close for the sake of hotkey disabling.
-   
+
    UInt32 kind = GetEventKind( theEvent );
    if( kind == kEventMenuOpening )
       mbData->mMenuOpenCount ++;
@@ -78,9 +78,9 @@ static OSStatus _OnMenuEvent(EventHandlerCallRef nextHandler, EventRef theEvent,
       AssertWarn( mbData->mMenuOpenCount > 0, "Unbalanced menu open/close events in _OnMenuEvent" );
       if( mbData->mMenuOpenCount )
          mbData->mMenuOpenCount --;
-         
+
       // Initial menu closed.  Capture time.
-         
+
       if( !mbData->mMenuOpenCount )
          mbData->mLastCloseTime = GetEventTime( theEvent );
    }
@@ -108,23 +108,23 @@ static OSStatus _OnMenuEvent(EventHandlerCallRef nextHandler, EventRef theEvent,
 static bool MacCarbHandleMenuCommand( void* hiCommand, PlatformMenuBarData* mbData )
 {
    HICommand *cmd = (HICommand*)hiCommand;
-      
+
    if(cmd->commandID != kHICommandTorque)
       return false;
-      
+
    MenuRef menu = cmd->menu.menuRef;
    MenuItemIndex item = cmd->menu.menuItemIndex;
-   
+
    // Run the command handler.
-   
+
    PopupMenu* torqueMenu;
    OSStatus err = GetMenuItemProperty(menu, item, 'GG2d', 'ownr', sizeof(PopupMenu*), NULL, &torqueMenu);
    AssertFatal(err == noErr, "Could not resolve the PopupMenu stored on a native menu item");
-   
+
    UInt32 command;
    err = GetMenuItemRefCon(menu, item, &command);
    AssertFatal(err == noErr, "Could not find the tag of a native menu item");
-   
+
    if(!torqueMenu->canHandleID(command))
       Con::errorf("menu claims it cannot handle that id. how odd.");
 
@@ -142,20 +142,20 @@ static bool MacCarbHandleMenuCommand( void* hiCommand, PlatformMenuBarData* mbDa
 static OSStatus _OnCommandEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void* userData)
 {
    PlatformMenuBarData* mbData = ( PlatformMenuBarData* ) userData;
-   
+
    HICommand commandStruct;
 
    OSStatus result = eventNotHandledErr;
-   
+
    GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(HICommand), NULL, &commandStruct);
-   
+
    // pass menu command events to a more specific handler.
    if(commandStruct.attributes & kHICommandFromMenu)
    {
       bool handleEvent = true;
-      
+
       // Do menu-close check hack.
-      
+
       PlatformWindow* window = PlatformWindowManager::get()->getFocusedWindow();
       if( !window || !window->getAcceleratorsEnabled() )
       {
@@ -163,11 +163,11 @@ static OSStatus _OnCommandEvent(EventHandlerCallRef nextHandler, EventRef theEve
          if( deltaTime > 0.1f )
             handleEvent = false;
       }
-      
+
       if( handleEvent && MacCarbHandleMenuCommand(&commandStruct, mbData) )
             result = noErr;
    }
-   
+
    return result;
 }
 
@@ -179,14 +179,14 @@ static OSStatus _OnCommandEvent(EventHandlerCallRef nextHandler, EventRef theEve
 
 void MenuBar::createPlatformPopupMenuData()
 {
-   
+
    mData = new PlatformMenuBarData;
 
 }
 
 void MenuBar::deletePlatformPopupMenuData()
 {
-   
+
     SAFE_DELETE(mData);
 }
 
@@ -196,10 +196,10 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
 {
    if(owner == NULL || isAttachedToCanvas())
       return;
-      
+
    mCanvas = owner;
-   
-   
+
+
   // Add the items
    for(S32 i = 0;i < size();++i)
    {
@@ -215,24 +215,24 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
 
       mnu->attachToMenuBar(owner, pos + i, mnu->getBarTitle());
    }
-   
+
    // register as listener for menu opening events
    static EventTypeSpec menuEventTypes[ 2 ];
-   
+
    menuEventTypes[ 0 ].eventClass = kEventClassMenu;
    menuEventTypes[ 0 ].eventKind = kEventMenuOpening;
    menuEventTypes[ 1 ].eventClass = kEventClassMenu;
    menuEventTypes[ 1 ].eventKind = kEventMenuClosed;
 
    EventHandlerUPP menuEventHandlerUPP;
-   menuEventHandlerUPP = NewEventHandlerUPP(_OnMenuEvent);   
+   menuEventHandlerUPP = NewEventHandlerUPP(_OnMenuEvent);
    InstallEventHandler(GetApplicationEventTarget(), menuEventHandlerUPP, 2, menuEventTypes, mData, &mData->mMenuEventHandlerRef);
-   
+
    // register as listener for process command events
    static EventTypeSpec comEventTypes[1];
    comEventTypes[0].eventClass = kEventClassCommand;
    comEventTypes[0].eventKind = kEventCommandProcess;
-   
+
    EventHandlerUPP commandEventHandlerUPP;
    commandEventHandlerUPP = NewEventHandlerUPP(_OnCommandEvent);
    InstallEventHandler(GetApplicationEventTarget(), commandEventHandlerUPP, 1, comEventTypes, mData, &mData->mCommandEventHandlerRef);
@@ -244,11 +244,11 @@ void MenuBar::removeFromCanvas()
 {
    if(mCanvas == NULL || ! isAttachedToCanvas())
       return;
-   
+
    if(mData->mCommandEventHandlerRef != NULL)
       RemoveEventHandler( mData->mCommandEventHandlerRef );
    mData->mCommandEventHandlerRef = NULL;
-   
+
    if(mData->mMenuEventHandlerRef != NULL)
       RemoveEventHandler( mData->mMenuEventHandlerRef );
    mData->mMenuEventHandlerRef = NULL;
@@ -275,16 +275,16 @@ void MenuBar::updateMenuBar(PopupMenu* menu)
 {
    if(! isAttachedToCanvas())
       return;
-   
+
    menu->removeFromMenuBar();
    SimSet::iterator itr = find(begin(), end(), menu);
    if(itr == end())
       return;
-   
+
    // Get the item currently at the position we want to add to
    S32 pos = itr - begin();
    S16 posID = 0;
-   
+
    PopupMenu *nextMenu = NULL;
    for(S32 i = pos + 1; i < size(); i++)
    {
@@ -298,6 +298,6 @@ void MenuBar::updateMenuBar(PopupMenu* menu)
 
    if(nextMenu)
       posID = GetMenuID(nextMenu->mData->mMenu);
-   
+
    menu->attachToMenuBar(mCanvas, posID, menu->mBarTitle);
 }

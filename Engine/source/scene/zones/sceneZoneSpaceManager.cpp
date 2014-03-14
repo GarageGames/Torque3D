@@ -65,7 +65,7 @@ SceneZoneSpaceManager::~SceneZoneSpaceManager()
    SAFE_DELETE( mRootZone );
 
    mNumTotalAllocatedZones = 0;
-   mNumActiveZones = 0; 
+   mNumActiveZones = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void SceneZoneSpaceManager::registerZones( SceneZoneSpace* object, U32 numZones 
 void SceneZoneSpaceManager::unregisterZones( SceneZoneSpace* object )
 {
    S32 zoneSpaceIndex = _getZoneSpaceIndex( object );
-   
+
    AssertFatal( zoneSpaceIndex != -1, "SceneZoneSpaceManager::unregisterZones - Object not registered as zone space" );
    AssertFatal( mNumActiveZones >= object->mNumZones, "SceneZoneSpaceManager::unregisterZones - Too many zones removed");
 
@@ -218,7 +218,7 @@ void SceneZoneSpaceManager::_compactZonesCheck()
 
    const U32 numZoneSpaces = mZoneSpaces.size();
    U32 nextZoneId = 0;
-   
+
    Vector< SceneObject::ZoneRef* > newZoneLists;
    newZoneLists.setSize( mNumActiveZones );
 
@@ -288,7 +288,7 @@ void SceneZoneSpaceManager::findZone( const Point3F& p, SceneZoneSpace*& owner, 
 
       return;
    }
-   
+
    PROFILE_SCOPE( SceneZoneSpaceManager_findZone );
 
    // Query the scene container for zones with a query
@@ -361,7 +361,7 @@ U32 SceneZoneSpaceManager::findZones( const Box3F& area, Vector< U32 >& outZones
       outsideIncluded |= zoneSpace->getOverlappingZones( area, zones, numZones );
 
       // Add overlapped zones.
-      
+
       for( U32 n = 0; n < numZones; n ++ )
       {
          outZones.push_back( zones[ n ] );
@@ -537,7 +537,7 @@ void SceneZoneSpaceManager::updateZoningState()
    {
       SceneZoneSpace* zoneSpace = mDirtyZoneSpaces.last();
       mDirtyZoneSpaces.decrement();
-      
+
       // Remove the zoning state of the object.
 
       _zoneRemove( zoneSpace );
@@ -596,7 +596,7 @@ void SceneZoneSpaceManager::updateZoningState()
 
 //-----------------------------------------------------------------------------
 
-void SceneZoneSpaceManager::_zoneInsert( SceneObject* object, bool queryListInitialized ) 
+void SceneZoneSpaceManager::_zoneInsert( SceneObject* object, bool queryListInitialized )
 {
    PROFILE_SCOPE( SceneZoneSpaceManager_zoneInsert );
 

@@ -67,7 +67,7 @@ enum ePixelMap
    MapUpperRight     = 3,
 };
 
-static void tga_write_pixel_to_mem( U8 * dat, U8 img_spec, U32 number, 
+static void tga_write_pixel_to_mem( U8 * dat, U8 img_spec, U32 number,
                                    U32 w, U32 h, U32 pixel, U32 bppOut )
 {
    // write the pixel to the data regarding how the
@@ -105,7 +105,7 @@ static void tga_write_pixel_to_mem( U8 * dat, U8 img_spec, U32 number,
       dat[addy + j] = (U8)((pixel >> (j * 8)) & 0xFF);
 }
 
-static U32 tga_get_pixel( Stream& stream, U8 bppIn, 
+static U32 tga_get_pixel( Stream& stream, U8 bppIn,
                             U8 * colormap, U8 cmapBytesEntry )
 {
    /* get the image data value out */
@@ -233,7 +233,7 @@ static bool sReadTGA(Stream &stream, GBitmap *bitmap)
       U8    idLength;         // length of the image_id string below.
       U8    cmapType;         // paletted image <=> cmapType
       U8    imageType;        // can be any of the IMG_TYPE constants above.
-      U16   cmapFirst;        // 
+      U16   cmapFirst;        //
       U16   cmapLength;       // how long the colormap is
       U8    cmapEntrySize;    // how big a palette entry is.
       U16   xOrigin;          // the x origin of the image in the image data.
@@ -312,7 +312,7 @@ static bool sReadTGA(Stream &stream, GBitmap *bitmap)
       }
 
       /* ensure colormap entry size is something we support */
-      if ( !(header.cmapEntrySize == 15 || 
+      if ( !(header.cmapEntrySize == 15 ||
           header.cmapEntrySize == 16 ||
           header.cmapEntrySize == 24 ||
           header.cmapEntrySize == 32) )
@@ -409,7 +409,7 @@ static bool sReadTGA(Stream &stream, GBitmap *bitmap)
          tmp_col = tga_convert_color( tmp_col, trueBitsPerPixel, alphabits, outBytesPerPixel );
 
          // now write the data out.
-         tga_write_pixel_to_mem( bitmap->getAddress( 0, 0 ), header.imageDesc, 
+         tga_write_pixel_to_mem( bitmap->getAddress( 0, 0 ), header.imageDesc,
             i, header.width, header.height, tmp_col, outBytesPerPixel );
       }
       break;
@@ -441,7 +441,7 @@ static bool sReadTGA(Stream &stream, GBitmap *bitmap)
             /* write all the data out */
             for ( U32 j = 0; j < repcount; j++ )
             {
-               tga_write_pixel_to_mem( bitmap->getAddress( 0, 0 ), header.imageDesc, 
+               tga_write_pixel_to_mem( bitmap->getAddress( 0, 0 ), header.imageDesc,
                    i + j, header.width, header.height, tmp_col, outBytesPerPixel );
             }
 
@@ -459,7 +459,7 @@ static bool sReadTGA(Stream &stream, GBitmap *bitmap)
                U32 tmp_col = tga_get_pixel( stream, inBytesPerPixel, colormap, cmapBytesEntry );
                tmp_col = tga_convert_color( tmp_col, trueBitsPerPixel, alphabits, outBytesPerPixel );
 
-               tga_write_pixel_to_mem( bitmap->getAddress( 0, 0 ), header.imageDesc, 
+               tga_write_pixel_to_mem( bitmap->getAddress( 0, 0 ), header.imageDesc,
                    i + j, header.width, header.height, tmp_col, outBytesPerPixel );
             }
 

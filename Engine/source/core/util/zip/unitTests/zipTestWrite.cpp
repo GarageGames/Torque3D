@@ -56,7 +56,7 @@ public:
 
       // Clean up from a previous run
       cleanup();
-      
+
       // Test writing to zip files without the zip file existing
       testWriting(mWriteFilename, ZipArchive::Read);
       testWriting(mWriteFilename, ZipArchive::ReadWrite);
@@ -96,7 +96,7 @@ private:
          // Find a unique filename
          U32 count = 1;
          dStrcpy(fileBuf, filename);
-         
+
          while(zip->findFileInfo(fileBuf))
          {
             dSprintf(fileBuf, bufSize, "%s.%04x", filename, count++);
@@ -133,12 +133,12 @@ private:
       if(! zip->openArchive(zipfile, mode))
       {
          delete zip;
-         
+
          // This is only an error if we're not trying to open as read
 
          if(mode != ZipArchive::Read)
             fail("Unable to open zip file");
-         
+
          return mode == ZipArchive::Read;
       }
 
@@ -172,7 +172,7 @@ private:
          fail("Unable to re-open zip file. Strange!");
          return false;
       }
-      
+
       // Use the file we already overwrote since we are sure of it's filename
       if(!writeFile(zip, fileBuf, NULL, 0, false, "This is a test of overwriting the file again."))
       {
@@ -200,11 +200,11 @@ private:
             zip->closeFile(stream1);
          }
       }
-      
+
 bail:
       zip->closeArchive();
       delete zip;
-      
+
       return true;
    }
 

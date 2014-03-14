@@ -36,7 +36,7 @@ MODULE_BEGIN( RazerHydraFrameStore )
       RazerHydraFrameStore::staticInit();
       ManagedSingleton< RazerHydraFrameStore >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< RazerHydraFrameStore >::deleteSingleton();
@@ -68,7 +68,7 @@ RazerHydraFrameStore::~RazerHydraFrameStore()
 
 void RazerHydraFrameStore::staticInit()
 {
-   Con::addVariable("RazerHydra::MaximumFramesStored", TypeS32, &smMaximumFramesStored, 
+   Con::addVariable("RazerHydra::MaximumFramesStored", TypeS32, &smMaximumFramesStored,
       "@brief The maximum number of frames to keep when $RazerHydra::GenerateWholeFrameEvents is true.\n\n"
 	   "@ingroup Game");
 }

@@ -29,7 +29,7 @@ bool ConsoleLogger::smInitialized = false;
 IMPLEMENT_CONOBJECT( ConsoleLogger );
 ConsoleDocClass( ConsoleLogger,
    "A class designed to be used as a console consumer and log the data it receives to a file.\n\n"
-   
+
    "@see dumpConsoleFunctions\n"
    "@see dumpConsoleClasses\n"
    "@ingroup Logging\n"
@@ -61,7 +61,7 @@ ConsoleLogger::ConsoleLogger( const char *fileName, bool append )
 //-----------------------------------------------------------------------------
 
 ImplementEnumType( LogLevel,
-   "@brief Priority levels for logging entries\n\n" 
+   "@brief Priority levels for logging entries\n\n"
    "@ingroup Logging")
    { ConsoleLogEntry::Normal,     "normal", "Lowest priority level, no highlighting."  },
    { ConsoleLogEntry::Warning,    "warning", "Mid level priority, tags and highlights possible issues in blue." },
@@ -160,9 +160,9 @@ bool ConsoleLogger::detach()
 {
 
    // Make sure this is valid before messing with it
-   if( !smInitialized ) 
+   if( !smInitialized )
    {
-      if( !init() ) 
+      if( !init() )
       {
          return false;
       }
@@ -175,9 +175,9 @@ bool ConsoleLogger::detach()
    mStream.close();
 
    // Remove this object from the list of active loggers
-   for( int i = 0; i < mActiveLoggers.size(); i++ ) 
+   for( int i = 0; i < mActiveLoggers.size(); i++ )
    {
-      if( mActiveLoggers[i] == this ) 
+      if( mActiveLoggers[i] == this )
       {
          mActiveLoggers.erase( i );
          mLogging = false;
@@ -196,7 +196,7 @@ void ConsoleLogger::logCallback( U32 level, const char *consoleLine )
    ConsoleLogger *curr;
 
    // Loop through active consumers and send them the message
-   for( int i = 0; i < mActiveLoggers.size(); i++ ) 
+   for( int i = 0; i < mActiveLoggers.size(); i++ )
    {
       curr = mActiveLoggers[i];
 
@@ -211,9 +211,9 @@ void ConsoleLogger::logCallback( U32 level, const char *consoleLine )
 void ConsoleLogger::log( const char *consoleLine )
 {
    // Check to see if this is intalized before using it
-   if( !smInitialized ) 
+   if( !smInitialized )
    {
-      if( !init() ) 
+      if( !init() )
       {
          Con::errorf( "I don't know how this happened, but log called on this without it being initialized" );
          return;

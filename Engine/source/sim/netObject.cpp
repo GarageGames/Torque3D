@@ -186,7 +186,7 @@ DefineEngineMethod( NetObject, scopeToClient, void, ( NetConnection* client),,
       "	}\n"
       "}\n"
    "@endtsexample\n\n"
-   
+
    "@see clearScopeToClient()\n")
 {
 	if(!client)
@@ -214,7 +214,7 @@ DefineEngineMethod( NetObject, clearScopeToClient, void, ( NetConnection* client
    "@brief Undo the effects of a scopeToClient() call.\n\n"
 
    "@param client The connection to remove this object's scoping from \n\n"
-   
+
    "@see scopeToClient()\n")
 {
    if(!client)
@@ -386,13 +386,13 @@ DefineEngineMethod( NetObject, getClientObject, S32, (),,
       "if(isObject(%clientObject)\n"
       "	%clientObject.setTransform(\"0 0 0\");\n\n"
    "@endtsexample\n\n"
-   
+
    "@see @ref local_connections")
 {
 	NetObject *obj = object->getClientObject();
 	if ( obj )
 		return obj->getId();
-	
+
 	return NULL;
 }
 
@@ -409,7 +409,7 @@ DefineEngineMethod( NetObject, getServerObject, S32, (),,
    "@brief Returns a pointer to the client object when on a local connection.\n\n"
 
    "Short-Circuit-Netorking: this is only valid for a local-client / singleplayer situation.\n\n"
-   
+
    "@returns The SimObject ID of the server object.\n"
    "@tsexample\n"
       "// Psuedo-code, some values left out for this example\n"
@@ -418,13 +418,13 @@ DefineEngineMethod( NetObject, getServerObject, S32, (),,
       "if(isObject(%serverObject)\n"
       "	%serverObject.setTransform(\"0 0 0\");\n\n"
    "@endtsexample\n\n"
-   
+
    "@see @ref local_connections")
 {
 	NetObject *obj = object->getServerObject();
 	if ( obj )
 		return obj->getId();
-	
+
 	return NULL;
 }
 

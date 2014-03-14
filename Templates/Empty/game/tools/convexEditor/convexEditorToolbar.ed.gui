@@ -20,7 +20,7 @@
    resizeHeight = "0";
    EdgeSnap = "0";
    text ="";
-   
+
    new GuiContainer() {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -74,7 +74,7 @@
          groupNum = "-1";
          buttonType = "pushButton";
          useMouseEvents = "0";
-      }; 
+      };
       new GuiBitmapButtonCtrl(ConvexEditorSplitFaceBtn) {
          canSaveDynamicFields = "0";
          isContainer = "0";
@@ -95,7 +95,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-      }; 
+      };
       new GuiBitmapButtonCtrl(ConvexEditorDeleteFaceBtn) {
          canSaveDynamicFields = "0";
          isContainer = "0";
@@ -116,6 +116,6 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-      }; 
+      };
    };
 };

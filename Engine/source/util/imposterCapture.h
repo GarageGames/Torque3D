@@ -52,7 +52,7 @@ class RenderMeshMgr;
 
 class ImposterCapture
 {
-   
+
 protected:
 
    S32 mDl;
@@ -61,7 +61,7 @@ protected:
    /// The bounding radius of the shape used to size the billboard.
    F32 mRadius;
 
-   /// 
+   ///
    Point3F mCenter;
 
    GBitmap *mBlackBmp;
@@ -81,7 +81,7 @@ protected:
    RenderMeshMgr     *mMeshRenderBin;
 
    void _colorAverageFilter(  U32 dimensions, const U8 *inBmpBits, U8 *outBmpBits );
-   void _renderToTexture( GFXTexHandle texHandle, GBitmap *outBitmap, const ColorI &color ); 
+   void _renderToTexture( GFXTexHandle texHandle, GBitmap *outBitmap, const ColorI &color );
 
    void _separateAlpha( GBitmap *imposterOut );
 
@@ -94,12 +94,12 @@ public:
    ~ImposterCapture();
 
    void begin( TSShapeInstance *shapeInst,
-               S32 dl, 
+               S32 dl,
                S32 dim,
                F32 radius,
                const Point3F &center );
 
-   void capture(  const MatrixF &rotMatrix, 
+   void capture(  const MatrixF &rotMatrix,
                   GBitmap **imposterOut,
                   GBitmap **normalMapOut );
 

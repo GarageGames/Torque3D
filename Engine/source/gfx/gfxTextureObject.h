@@ -58,7 +58,7 @@ class RectI;
 /// @note D3DLOCKED_RECT and this structure match up. If you change this
 ///       assumption, be sure to revisit the D3D GFX implementation.
 ///
-/// @see GFXTextureObject::lock() 
+/// @see GFXTextureObject::lock()
 struct GFXLockedRect
 {
    /// Pitch of the lock. This is the spacing in bytes of the start
@@ -81,7 +81,7 @@ public:
       static U32 dumpActiveTOs();
 
       String            mDebugCreationPath;
-      String            mDebugDescription;   
+      String            mDebugDescription;
       GFXTextureObject *mDebugNext;
       GFXTextureObject *mDebugPrev;
    #endif
@@ -93,7 +93,7 @@ public:
    bool mDead;
 
    /// The device this texture belongs to.
-   GFXDevice *mDevice;   
+   GFXDevice *mDevice;
 
    /// The next texture in the linked list.
    /// @see GFXTextureManager::mListHead
@@ -107,7 +107,7 @@ public:
    /// @see GFXTextureManager::mHashTable
    GFXTextureObject *mHashNext;
 
-   /// This is the file name or other unique string used 
+   /// This is the file name or other unique string used
    /// to hash this texture object.
    String mTextureLookupName;
 
@@ -129,7 +129,7 @@ public:
    // object, or data buffer. Something more generic. -patw
    GBitmap           *mBitmap;   ///< GBitmap we are backed by.
    DDSFile           *mDDS;      ///< DDSFile we're backed by.
-      
+
    U32 getFormatByteSize() const { return GFXFormat_getByteSize( mFormat ); }
 
    GFXTextureProfile *mProfile;
@@ -161,7 +161,7 @@ public:
    virtual F32 getMaxUCoord() const;
    virtual F32 getMaxVCoord() const;
 
-   /// Returns the estimated video memory usage 
+   /// Returns the estimated video memory usage
    /// in bytes including mipmaps.
    U32 getEstimatedSizeInBytes() const;
 
@@ -173,9 +173,9 @@ public:
    /// must match the corresponding lock!
    virtual void unlock( U32 mipLevel = 0) = 0;
 
-   // copy the texture data into the specified bitmap.  
+   // copy the texture data into the specified bitmap.
    //   - this texture object must be a render target.  the function will assert if this is not the case.
-   //   - you must have called allocateBitmap() on the input bitmap first.  the bitmap should have the 
+   //   - you must have called allocateBitmap() on the input bitmap first.  the bitmap should have the
    //   same dimensions as this texture.  the bitmap format can be RGB or RGBA (in the latter case
    //   the alpha values from the texture are copied too)
    //   - returns true if successful, false otherwise

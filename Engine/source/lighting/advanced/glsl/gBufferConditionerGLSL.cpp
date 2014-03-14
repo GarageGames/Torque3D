@@ -37,14 +37,14 @@ GBufferConditionerGLSL::GBufferConditionerGLSL( const GFXFormat bufferFormat ) :
    mNormalStorageType = CartesianXYZ;
 
    // Note:  We clear to a depth 1 (the w component) so
-   // that the unrendered parts of the scene end up 
+   // that the unrendered parts of the scene end up
    // farthest to the camera.
 
    switch(bufferFormat)
    {
       case GFXFormatR8G8B8A8:
          // TODO: Some kind of logic here. Spherical is better, but is more
-         // expensive. 
+         // expensive.
          mNormalStorageType = Spherical;
          mBitsPerChannel = 8;
          break;
@@ -57,7 +57,7 @@ GBufferConditionerGLSL::GBufferConditionerGLSL( const GFXFormat bufferFormat ) :
          break;
 
       // Store a 32bit depth with a sperical normal in the
-      // integer 16 format.  This gives us perfect depth 
+      // integer 16 format.  This gives us perfect depth
       // precision and high quality normals within a 64bit
       // buffer format.
       case GFXFormatR16G16B16A16:
@@ -80,7 +80,7 @@ GBufferConditionerGLSL::~GBufferConditionerGLSL()
 {
 }
 
-void GBufferConditionerGLSL::processVert( Vector<ShaderComponent*> &componentList, 
+void GBufferConditionerGLSL::processVert( Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
 {
    output = NULL;
@@ -105,7 +105,7 @@ void GBufferConditionerGLSL::processVert( Vector<ShaderComponent*> &componentLis
          objToWorld->setType( "mat4" );
          objToWorld->setName( "objTrans" );
          objToWorld->uniform = true;
-         objToWorld->constSortPos = cspPrimitive;   
+         objToWorld->constSortPos = cspPrimitive;
       }
 
       // Kick out the world-space normal
@@ -114,9 +114,9 @@ void GBufferConditionerGLSL::processVert( Vector<ShaderComponent*> &componentLis
    }
 }
 
-void GBufferConditionerGLSL::processPix(  Vector<ShaderComponent*> &componentList, 
+void GBufferConditionerGLSL::processPix(  Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
-{     
+{
    // sanity
    AssertFatal( fd.features[MFT_EyeSpaceDepthOut], "No depth-out feature enabled! Bad news!" );
 
@@ -164,7 +164,7 @@ ShaderFeature::Resources GBufferConditionerGLSL::getResources( const MaterialFea
    // - world space normal (gbNormal)
    res.numTexReg = 1;
 
-   return res; 
+   return res;
 }
 
 Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const String &methodName, Stream &stream, MultiLine *meta )
@@ -196,7 +196,7 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
       Var *bufferSample = new Var;
       bufferSample->setName("bufferSample");
       bufferSample->setType("vec4");
-      DecOp *bufferSampleDecl = new DecOp(bufferSample); 
+      DecOp *bufferSampleDecl = new DecOp(bufferSample);
 
       meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
 
@@ -204,7 +204,7 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
 
       meta->addStatement( new GenOp( "   // Sampler g-buffer\r\n" ) );
 
-      // The gbuffer has no mipmaps, so use tex2dlod when 
+      // The gbuffer has no mipmaps, so use tex2dlod when
       // so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   @ = texture2DLod(@, @, 0.0);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
 
@@ -237,20 +237,20 @@ Var* GBufferConditionerGLSL::_conditionOutput( Var *unconditionedOutput, MultiLi
    {
       case CartesianXYZ:
          meta->addStatement( new GenOp( "   // g-buffer conditioner: vec4(normal.xyz, depth)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl, 
+         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl,
             _posnegEncode(new GenOp("@.xyz", unconditionedOutput)), unconditionedOutput ) );
          break;
 
       case CartesianXY:
          meta->addStatement( new GenOp( "   // g-buffer conditioner: vec4(normal.xy, depth Hi + z-sign, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);", outputDecl, 
+         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);", outputDecl,
             _posnegEncode(new GenOp("vec3(@.xy, sign(@.z))", unconditionedOutput, unconditionedOutput)), unconditionedOutput ) );
          break;
 
       case Spherical:
          meta->addStatement( new GenOp( "   // g-buffer conditioner: vec4(normal.theta, normal.phi, depth Hi, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, 0.0, @.a);\r\n", outputDecl, 
-            _posnegEncode(new GenOp("vec2(atan2(@.y, @.x) / 3.14159265358979323846f, @.z)", unconditionedOutput, unconditionedOutput, unconditionedOutput ) ), 
+         meta->addStatement( new GenOp( "   @ = vec4(@, 0.0, @.a);\r\n", outputDecl,
+            _posnegEncode(new GenOp("vec2(atan2(@.y, @.x) / 3.14159265358979323846f, @.z)", unconditionedOutput, unconditionedOutput, unconditionedOutput ) ),
             unconditionedOutput ) );
          break;
    }
@@ -261,14 +261,14 @@ Var* GBufferConditionerGLSL::_conditionOutput( Var *unconditionedOutput, MultiLi
       const U64 maxValPerChannel = 1 << mBitsPerChannel;
       const U64 extraVal = (maxValPerChannel * maxValPerChannel - 1) - (maxValPerChannel - 1) * 2;
       meta->addStatement( new GenOp( "   \r\n   // Encode depth into hi/lo\r\n" ) );
-      meta->addStatement( new GenOp( avar( "   vec3 _tempDepth = fract(@.a * vec3(1.0, %llu.0, %llu.0));\r\n", maxValPerChannel - 1, extraVal ), 
+      meta->addStatement( new GenOp( avar( "   vec3 _tempDepth = fract(@.a * vec3(1.0, %llu.0, %llu.0));\r\n", maxValPerChannel - 1, extraVal ),
          unconditionedOutput ) );
-      meta->addStatement( new GenOp( avar( "   @.zw = _tempDepth.xy - _tempDepth.yz * vec2(1.0/%llu.0, 1.0/%llu.0);\r\n\r\n", maxValPerChannel - 1, maxValPerChannel - 1  ), 
+      meta->addStatement( new GenOp( avar( "   @.zw = _tempDepth.xy - _tempDepth.yz * vec2(1.0/%llu.0, 1.0/%llu.0);\r\n\r\n", maxValPerChannel - 1, maxValPerChannel - 1  ),
          retVar ) );
    }
 
    AssertFatal( retVar != NULL, avar( "Cannot condition output to buffer format: %s", GFXStringTextureFormat[getBufferFormat()] ) );
-   return retVar; 
+   return retVar;
 }
 
 Var* GBufferConditionerGLSL::_unconditionInput( Var *conditionedInput, MultiLine *meta )
@@ -282,13 +282,13 @@ Var* GBufferConditionerGLSL::_unconditionInput( Var *conditionedInput, MultiLine
    {
       case CartesianXYZ:
          meta->addStatement( new GenOp( "   // g-buffer unconditioner: vec4(normal.xyz, depth)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl, 
+         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl,
             _posnegDecode(new GenOp("@.xyz", conditionedInput)), conditionedInput ) );
          break;
 
       case CartesianXY:
          meta->addStatement( new GenOp( "   // g-buffer unconditioner: vec4(normal.xy, depth Hi + z-sign, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl, 
+         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl,
             _posnegDecode(new GenOp("@.xyz", conditionedInput)), conditionedInput ) );
          meta->addStatement( new GenOp( "   @.z *= sqrt(1.0 - dot(@.xy, @.xy));\r\n", retVar, retVar, retVar ) );
          break;
@@ -309,12 +309,12 @@ Var* GBufferConditionerGLSL::_unconditionInput( Var *conditionedInput, MultiLine
    {
       const U64 maxValPerChannel = 1 << mBitsPerChannel;
       meta->addStatement( new GenOp( "   \r\n   // Decode depth\r\n" ) );
-      meta->addStatement( new GenOp( avar( "   @.w = dot( @.zw, vec2(1.0, 1.0/%llu.0));\r\n", maxValPerChannel - 1 ), 
+      meta->addStatement( new GenOp( avar( "   @.w = dot( @.zw, vec2(1.0, 1.0/%llu.0));\r\n", maxValPerChannel - 1 ),
          retVar, conditionedInput ) );
    }
 
 
    AssertFatal( retVar != NULL, avar( "Cannot uncondition input from buffer format: %s", GFXStringTextureFormat[getBufferFormat()] ) );
-   return retVar; 
+   return retVar;
 }
 

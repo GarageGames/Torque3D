@@ -24,9 +24,9 @@ function validateDatablockName(%name)
 {
    // remove whitespaces at beginning and end
    %name = trim( %name );
-   
+
    // remove numbers at the beginning
-   %numbers = "0123456789";   
+   %numbers = "0123456789";
    while( strlen(%name) > 0 )
    {
       // the first character
@@ -40,17 +40,17 @@ function validateDatablockName(%name)
       else
          break;
    }
-   
+
    // replace whitespaces with underscores
    %name = strreplace( %name, " ", "_" );
-   
+
    // remove any other invalid characters
    %invalidCharacters = "-+*/%$&§=()[].?\"#,;!~<>|°^{}";
    %name = stripChars( %name, %invalidCharacters );
-   
+
    if( %name $= "" )
       %name = "Unnamed";
-   
+
    return %name;
 }
 
@@ -61,7 +61,7 @@ function validateDatablockName(%name)
 function wordPos(%text, %word, %start)
 {
    if (%start $= "") %start = 0;
-   
+
    if (strpos(%text, %word, 0) == -1) return -1;
    %count = getWordCount(%text);
    if (%start >= %count) return -1;
@@ -79,7 +79,7 @@ function wordPos(%text, %word, %start)
 function fieldPos(%text, %field, %start)
 {
    if (%start $= "") %start = 0;
-   
+
    if (strpos(%text, %field, 0) == -1) return -1;
    %count = getFieldCount(%text);
    if (%start >= %count) return -1;
@@ -117,7 +117,7 @@ function setValueSafe(%dest, %val)
    %dest.altCommand = "";
 
    %dest.setValue(%val);
-   
+
    %dest.command = %cmd;
    %dest.altCommand = %alt;
 }
@@ -134,11 +134,11 @@ function shareValueSafeDelay(%source, %dest, %delayMs)
 
 
 //------------------------------------------------------------------------------
-// An Aggregate Control is a plain GuiControl that contains other controls, 
+// An Aggregate Control is a plain GuiControl that contains other controls,
 // which all share a single job or represent a single value.
 //------------------------------------------------------------------------------
 
-// AggregateControl.setValue( ) propagates the value to any control that has an 
+// AggregateControl.setValue( ) propagates the value to any control that has an
 // internal name.
 function AggregateControl::setValue(%this, %val, %child)
 {
@@ -147,7 +147,7 @@ function AggregateControl::setValue(%this, %val, %child)
       %obj = %this.getObject(%i);
       if( %obj == %child )
          continue;
-         
+
       if(%obj.internalName !$= "")
          setValueSafe(%obj, %val);
    }
@@ -198,7 +198,7 @@ function AggregateControl::updateFromChild(%this, %child)
 }
 
 // default onAction stub, here only to prevent console spam warnings.
-function AggregateControl::onAction(%this) 
+function AggregateControl::onAction(%this)
 {
 }
 
@@ -214,7 +214,7 @@ function AggregateControl::callMethod(%this, %method, %args)
 
 }
 
-// A function used in order to easily parse the MissionGroup for classes . I'm pretty 
+// A function used in order to easily parse the MissionGroup for classes . I'm pretty
 // sure at this point the function can be easily modified to search the any group as well.
 function parseMissionGroup( %className, %childGroup )
 {
@@ -222,18 +222,18 @@ function parseMissionGroup( %className, %childGroup )
       %currentGroup = "MissionGroup";
    else
       %currentGroup = %childGroup;
-      
+
    for(%i = 0; %i < (%currentGroup).getCount(); %i++)
-   {      
+   {
       if( (%currentGroup).getObject(%i).getClassName() $= %className )
          return true;
-      
+
       if( (%currentGroup).getObject(%i).getClassName() $= "SimGroup" )
       {
          if( parseMissionGroup( %className, (%currentGroup).getObject(%i).getId() ) )
-            return true;         
+            return true;
       }
-   } 
+   }
 }
 
 // A variation of the above used to grab ids from the mission group based on classnames
@@ -243,15 +243,15 @@ function parseMissionGroupForIds( %className, %childGroup )
       %currentGroup = "MissionGroup";
    else
       %currentGroup = %childGroup;
-      
+
    for(%i = 0; %i < (%currentGroup).getCount(); %i++)
-   {      
+   {
       if( (%currentGroup).getObject(%i).getClassName() $= %className )
          %classIds = %classIds @ (%currentGroup).getObject(%i).getId() @ " ";
-      
+
       if( (%currentGroup).getObject(%i).getClassName() $= "SimGroup" )
          %classIds = %classIds @ parseMissionGroupForIds( %className, (%currentGroup).getObject(%i).getId());
-   } 
+   }
    return %classIds;
 }
 

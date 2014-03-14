@@ -150,10 +150,10 @@ bool gglBindExtensions(GLExtensionFlags* gl)
 void gglPerformBinds()
 {
    // Some of the following code is copied from the Apple Opengl Documentation.
-  
+
    // Load and bind OpenGL bundle functions
    if (!_openglFrameworkRef) {
-   
+
       // Load OpenGL.framework
       _openglFrameworkRef = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
       if (!_openglFrameworkRef) {

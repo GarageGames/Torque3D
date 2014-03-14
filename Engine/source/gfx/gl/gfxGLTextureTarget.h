@@ -56,21 +56,21 @@ public:
 
    /// Functions to query internal state
    /// @{
-   
+
    /// Returns the internal structure for the given slot.  This should only be called by our internal implementations.
    _GFXGLTargetDesc* getTargetDesc(RenderSlot slot) const;
 
    /// @}
-   
+
    void deactivate();
    void zombify();
    void resurrect();
    virtual const String describeSelf() const;
-   
+
    virtual void resolve();
-   
+
    virtual void resolveTo(GFXTextureObject* obj);
-   
+
 protected:
 
    friend class GFXGLDevice;
@@ -78,10 +78,10 @@ protected:
    /// The callback used to get texture events.
    /// @see GFXTextureManager::addEventDelegate
    void _onTextureEvent( GFXTexCallbackCode code );
-   
+
    /// If true our implementation should use AUX buffers
    bool _needsAux;
-   
+
    /// Pointer to our internal implementation
    AutoPtr<_GFXGLTextureTargetImpl> _impl;
 
@@ -90,10 +90,10 @@ protected:
 
    /// These redirect to our internal implementation
    /// @{
-   
+
    void applyState();
    void makeActive();
-   
+
    /// @}
 
 };

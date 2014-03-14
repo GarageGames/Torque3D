@@ -31,10 +31,10 @@
 
 class VideoFrameGrabberD3D9 : public VideoFrameGrabber
 {
-protected:   
+protected:
    enum CaptureStage {
-      eReadyToCapture,         
-      eInVideoMemory,       
+      eReadyToCapture,
+      eInVideoMemory,
       eInSystemMemory,
       eNumStages
    };
@@ -50,7 +50,7 @@ protected:
       CaptureResource() : stage(eReadyToCapture) {};
       ~CaptureResource()
       {
-         vidMemTex.free();         
+         vidMemTex.free();
          sysMemTex.free();
       }
    };
@@ -60,7 +60,7 @@ protected:
 
    // Current capture index
    S32 mCurrentCapture;
-   
+
    // Copies a capture's video memory content to system memory
    void copyToSystemMemory(CaptureResource &capture);
 
@@ -68,7 +68,7 @@ protected:
    void copyToBitmap(CaptureResource &capture);
 
    bool _handleGFXEvent(GFXDevice::GFXDeviceEventType event);
-      
+
    //------------------------------------------------
    // Overloaded from VideoFrameGrabber
    //------------------------------------------------

@@ -52,8 +52,8 @@ PhysicsForce::~PhysicsForce()
 }
 
 void PhysicsForce::initPersistFields()
-{   
-   Parent::initPersistFields();   
+{
+   Parent::initPersistFields();
 }
 
 
@@ -101,7 +101,7 @@ void PhysicsForce::detach( const Point3F &force )
 {
    if ( mBody && !force.isZero() )
    {
-      Point3F cMass = mBody->getCMassPosition();      
+      Point3F cMass = mBody->getCMassPosition();
       F32 mass = mBody->getMass();
 
       Point3F impulse = ( mass * force ) / TickSec;
@@ -112,14 +112,14 @@ void PhysicsForce::detach( const Point3F &force )
 }
 
 void PhysicsForce::onMount( SceneObject *obj, S32 node )
-{      
+{
    Parent::onMount( obj, node );
 
    processAfter( obj );
 
    MatrixF mat( true );
    mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-   setTransform( mat );   
+   setTransform( mat );
 }
 
 void PhysicsForce::onUnmount( SceneObject *obj, S32 node )
@@ -192,7 +192,7 @@ void PhysicsForce::processTick( const Move * )
 
 DefineEngineMethod( PhysicsForce, attach, void, ( Point3F start, Point3F direction, F32 maxDist ),,
    "@brief Attempts to associate the PhysicsForce with a PhysicsBody.\n\n"
-   "Performs a physics ray cast of the provided length and direction. The %PhysicsForce " 
+   "Performs a physics ray cast of the provided length and direction. The %PhysicsForce "
    "will attach itself to the first dynamic PhysicsBody the ray collides with. "
    "On every tick, the attached body will be attracted towards the position of the %PhysicsForce.\n\n"
    "A %PhysicsForce can only be attached to one body at a time.\n\n"

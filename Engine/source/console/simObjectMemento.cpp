@@ -64,7 +64,7 @@ void SimObjectMemento::save( SimObject *object )
 
       writeFlags |= SimObject::NoName;
    }
-	
+
    object->write( stream, 0, writeFlags );
    stream.write( (UTF8)0 );
 

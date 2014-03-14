@@ -32,17 +32,17 @@
 class GuiCheckBoxCtrl : public GuiButtonBaseCtrl
 {
    public:
-   
+
       typedef GuiButtonBaseCtrl Parent;
 
    protected:
 
       S32 mIndent;
-       
+
    public:
-   
+
       GuiCheckBoxCtrl();
-      
+
       S32 getIndent() const { return mIndent; }
       void setIndent( S32 value ) { mIndent = value; }
 

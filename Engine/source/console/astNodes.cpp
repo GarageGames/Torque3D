@@ -424,7 +424,7 @@ U32 LoopStmtNode::compileStmt(U32 *codeStream, U32 ip, U32, U32)
 U32 IterStmtNode::precompileStmt( U32 loopCount )
 {
    addBreakCount();
-   
+
    // Instruction sequence:
    //
    //   containerExpr
@@ -439,8 +439,8 @@ U32 IterStmtNode::precompileStmt( U32 loopCount )
 
    U32 exprSize = containerExpr->precompile( TypeReqString );
    bodySize = precompileBlock( body, loopCount + 1 );
-   
-   return 
+
+   return
         exprSize
       + 3 // OP_ITER_BEGIN
       + 2 // OP_ITER
@@ -453,28 +453,28 @@ U32 IterStmtNode::precompileStmt( U32 loopCount )
 U32 IterStmtNode::compileStmt( U32* codeStream, U32 ip, U32 continuePoint, U32 breakPoint )
 {
    addBreakLine( ip );
-   
+
    const U32 startIp = ip;
    const U32 iterBeginIp = containerExpr->compile( codeStream, startIp, TypeReqString );
-      
+
    const U32 continueIp = iterBeginIp + 3;
    const U32 bodyIp = continueIp + 2;
    const U32 jmpIp = bodyIp + bodySize;
    const U32 breakIp = jmpIp + 2;
    const U32 finalIp = breakIp + 1;
-   
+
    codeStream[ iterBeginIp ] = isStringIter ? OP_ITER_BEGIN_STR : OP_ITER_BEGIN;
    codeStream[ iterBeginIp + 1 ] = STEtoU32( varName, iterBeginIp + 1 );
    codeStream[ iterBeginIp + 2 ] = finalIp;
    codeStream[ continueIp ] = OP_ITER;
    codeStream[ continueIp + 1 ] = breakIp;
-      
+
    compileBlock( body, codeStream, bodyIp, continueIp, breakIp );
-   
+
    codeStream[ jmpIp ] = OP_JMP;
    codeStream[ jmpIp + 1 ] = continueIp;
    codeStream[ breakIp ] = OP_ITER_END;
-   
+
    return finalIp;
 }
 
@@ -499,7 +499,7 @@ U32 ConditionalExprNode::precompile(TypeReq type)
       exprSize = testExpr->precompile(TypeReqFloat);
       integer = false;
    }
-   return exprSize + 
+   return exprSize +
       trueExpr->precompile(type) +
       falseExpr->precompile(type) + 4;
 }
@@ -1018,7 +1018,7 @@ U32 StrConstNode::compile(U32 *codeStream, U32 ip, TypeReq type)
    case TypeReqFloat:
       codeStream[ip++] = OP_LOADIMMED_FLT;
       codeStream[ip++] = index;
-      break;         
+      break;
    case TypeReqNone:
       break;
    }
@@ -1209,7 +1209,7 @@ static void getAssignOpTypeOp(S32 op, TypeReq &type, U32 &operand)
       type = TypeReqUInt;
       operand = OP_SHR;
       break;
-   }   
+   }
 }
 
 U32 AssignOpExprNode::precompile(TypeReq type)
@@ -1453,9 +1453,9 @@ U32 SlotAccessNode::compile(U32 *codeStream, U32 ip, TypeReq type)
    }
    ip = objectExpr->compile(codeStream, ip, TypeReqString);
    codeStream[ip++] = OP_SETCUROBJECT;
-   
+
    codeStream[ip++] = OP_SETCURFIELD;
-   
+
    codeStream[ip] = STEtoU32(slotName, ip);
    ip++;
 
@@ -1464,7 +1464,7 @@ U32 SlotAccessNode::compile(U32 *codeStream, U32 ip, TypeReq type)
       codeStream[ip++] = OP_TERMINATE_REWIND_STR;
       codeStream[ip++] = OP_SETCURFIELD_ARRAY;
    }
-   
+
    switch(type)
    {
       case TypeReqUInt:
@@ -1495,7 +1495,7 @@ U32 InternalSlotAccessNode::precompile(TypeReq type)
       return 0;
 
    U32 size = 3;
-   
+
    // eval object expression sub + 3 (op_setCurField + OP_SETCUROBJECT)
    size += objectExpr->precompile(TypeReqString);
    size += slotExpr->precompile(TypeReqString);
@@ -1806,7 +1806,7 @@ U32 ObjectDeclNode::compile(U32 *codeStream, U32 ip, TypeReq type)
    if(type != TypeReqUInt)
       codeStream[ip++] = conversionOp(TypeReqUInt, type);
    return ip;
-}   
+}
 TypeReq ObjectDeclNode::getPreferredType()
 {
    return TypeReqUInt;
@@ -1832,13 +1832,13 @@ U32 FunctionDeclStmtNode::precompileStmt(U32)
    argc = 0;
    for(VarNode *walk = args; walk; walk = (VarNode *)((StmtNode*)walk)->getNext())
       argc++;
-   
+
    CodeBlock::smInFunction = true;
-   
+
    precompileIdent(fnName);
    precompileIdent(nameSpace);
    precompileIdent(package);
-   
+
    U32 subSize = precompileBlock(stmts, 0);
    CodeBlock::smInFunction = false;
 
@@ -1870,7 +1870,7 @@ U32 FunctionDeclStmtNode::compileStmt(U32 *codeStream, U32 ip, U32, U32)
       ip++;
    }
    CodeBlock::smInFunction = true;
-   ip = compileBlock(stmts, codeStream, ip, 0, 0); 
+   ip = compileBlock(stmts, codeStream, ip, 0, 0);
 
    // Add break so breakpoint can be set at closing brace or
    // in empty function.

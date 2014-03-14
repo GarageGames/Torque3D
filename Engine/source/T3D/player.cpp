@@ -107,9 +107,9 @@ const F32 sAnchorMaxDistance = 32.0f;
 
 //
 static U32 sCollisionMoveMask =  TerrainObjectType       |
-                                 WaterObjectType         | 
+                                 WaterObjectType         |
                                  PlayerObjectType        |
-                                 StaticShapeObjectType   | 
+                                 StaticShapeObjectType   |
                                  VehicleObjectType       |
                                  PhysicalZoneObjectType;
 
@@ -316,7 +316,7 @@ PlayerData::PlayerData()
    sprintCanJump = true;
 
    // Swimming
-   swimForce = 55.0f * 9.0f;  
+   swimForce = 55.0f * 9.0f;
    maxUnderwaterForwardSpeed = 6.0f;
    maxUnderwaterBackwardSpeed = 6.0f;
    maxUnderwaterSideSpeed = 6.0f;
@@ -325,13 +325,13 @@ PlayerData::PlayerData()
    crouchForce = 45.0f * 9.0f;
    maxCrouchForwardSpeed = 4.0f;
    maxCrouchBackwardSpeed = 4.0f;
-   maxCrouchSideSpeed = 4.0f;    
+   maxCrouchSideSpeed = 4.0f;
 
    // Prone
-   proneForce = 45.0f * 9.0f;            
-   maxProneForwardSpeed = 2.0f;  
-   maxProneBackwardSpeed = 2.0f; 
-   maxProneSideSpeed = 0.0f;     
+   proneForce = 45.0f * 9.0f;
+   maxProneForwardSpeed = 2.0f;
+   maxProneBackwardSpeed = 2.0f;
+   maxProneSideSpeed = 0.0f;
 
    // Jetting
    jetJumpForce = 0;
@@ -437,7 +437,7 @@ bool PlayerData::preload(bool server, String &errorStr)
    runSurfaceCos = mCos(mDegToRad(runSurfaceAngle));
    jumpSurfaceCos = mCos(mDegToRad(jumpSurfaceAngle));
    if (minJumpEnergy < jumpEnergyDrain)
-      minJumpEnergy = jumpEnergyDrain;   
+      minJumpEnergy = jumpEnergyDrain;
 
    // Jetting
    if (jetMinJumpEnergy < jetJumpEnergyDrain)
@@ -529,7 +529,7 @@ bool PlayerData::preload(bool server, String &errorStr)
 
    // Convert pickupRadius to a delta of boundingBox
    //
-   // NOTE: it is not really correct to precalculate a pickupRadius based 
+   // NOTE: it is not really correct to precalculate a pickupRadius based
    // on boxSize since the actual player's bounds can vary by "pose".
    //
    F32 dr = (boxSize.x > boxSize.y)? boxSize.x: boxSize.y;
@@ -765,7 +765,7 @@ void PlayerData::initPersistFields()
          "@see upResistSpeed\n" );
 
    endGroup( "Movement" );
-   
+
    addGroup( "Movement: Jumping" );
 
       addField( "jumpForce", TypeF32, Offset(jumpForce, PlayerData),
@@ -799,9 +799,9 @@ void PlayerData::initPersistFields()
          "jumps are in the direction of the ground normal so long as the player is not "
          "directly facing the surface.  If the player is directly facing the surface, then "
          "they will jump straight up.\n" );
-   
+
    endGroup( "Movement: Jumping" );
-   
+
    addGroup( "Movement: Sprinting" );
 
       addField( "sprintForce", TypeF32, Offset(sprintForce, PlayerData),
@@ -969,7 +969,7 @@ void PlayerData::initPersistFields()
          "@see Player::getDamageLocation" );
 
    endGroup( "Collision" );
-   
+
    addGroup( "Interaction: Footsteps" );
 
       addField( "footPuffEmitter", TYPEID< ParticleEmitterData >(), Offset(footPuffEmitter, PlayerData),
@@ -1182,7 +1182,7 @@ void PlayerData::packData(BitStream* stream)
 
    stream->writeFlag(renderFirstPerson);
    stream->writeFlag(firstPersonShadows);
-   
+
    stream->write(minLookAngle);
    stream->write(maxLookAngle);
    stream->write(maxFreelookAngle);
@@ -1232,19 +1232,19 @@ void PlayerData::packData(BitStream* stream)
    stream->writeFlag(sprintCanJump);
 
    // Swimming
-   stream->write(swimForce);   
+   stream->write(swimForce);
    stream->write(maxUnderwaterForwardSpeed);
    stream->write(maxUnderwaterBackwardSpeed);
    stream->write(maxUnderwaterSideSpeed);
 
    // Crouching
-   stream->write(crouchForce);   
+   stream->write(crouchForce);
    stream->write(maxCrouchForwardSpeed);
    stream->write(maxCrouchBackwardSpeed);
    stream->write(maxCrouchSideSpeed);
 
    // Prone
-   stream->write(proneForce);   
+   stream->write(proneForce);
    stream->write(maxProneForwardSpeed);
    stream->write(maxProneBackwardSpeed);
    stream->write(maxProneSideSpeed);
@@ -1416,7 +1416,7 @@ void PlayerData::unpackData(BitStream* stream)
    stream->read(&swimForce);
    stream->read(&maxUnderwaterForwardSpeed);
    stream->read(&maxUnderwaterBackwardSpeed);
-   stream->read(&maxUnderwaterSideSpeed);   
+   stream->read(&maxUnderwaterSideSpeed);
 
    // Crouching
    stream->read(&crouchForce);
@@ -1621,7 +1621,7 @@ Player::Player()
    mLastPos.set( 0.0f, 0.0f, 0.0f );
 
    mMoveBubbleSound = 0;
-   mWaterBreathSound = 0;   
+   mWaterBreathSound = 0;
 
    mConvex.init(this);
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
@@ -1715,7 +1715,7 @@ bool Player::onAdd()
       U32 i;
       for( i=0; i<PlayerData::NUM_SPLASH_EMITTERS; i++ )
       {
-         if ( mDataBlock->splashEmitterList[i] ) 
+         if ( mDataBlock->splashEmitterList[i] )
          {
             mSplashEmitter[i] = new ParticleEmitter;
             mSplashEmitter[i]->onNewDataBlock( mDataBlock->splashEmitterList[i], false );
@@ -1742,7 +1742,7 @@ bool Player::onAdd()
                            mDataBlock->boxSize,
                            mDataBlock->runSurfaceCos,
                            mDataBlock->maxStepHeight,
-                           this, 
+                           this,
                            world );
       mPhysicsRep->setTransform( getTransform() );
    }
@@ -1755,7 +1755,7 @@ void Player::onRemove()
    setControlObject(0);
    scriptOnRemove();
    removeFromScene();
-   
+
    if ( isGhost() )
    {
       SFX_DELETE( mMoveBubbleSound );
@@ -1775,7 +1775,7 @@ void Player::onRemove()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
 
-   SAFE_DELETE( mPhysicsRep );		
+   SAFE_DELETE( mPhysicsRep );
 
    Parent::onRemove();
 }
@@ -1950,7 +1950,7 @@ void Player::reSkin()
          String newSkin( skins[i] );
 
          // Check if the skin handle contains an explicit "old" base string. This
-         // allows all models to support skinning, even if they don't follow the 
+         // allows all models to support skinning, even if they don't follow the
          // "base_xxx" material naming convention.
          S32 split = newSkin.find( '=' );    // "old=new" format skin?
          if ( split != String::NPos )
@@ -2254,7 +2254,7 @@ void Player::setState(ActionState state, U32 recoverTicks)
                }
                break;
             }
-            
+
             default:
                break;
          }
@@ -2313,7 +2313,7 @@ void Player::updateState()
             }
          }
          break;
-      
+
       default:
          break;
    }
@@ -2420,7 +2420,7 @@ const char* Player::getPoseName() const
 void Player::setPose( Pose pose )
 {
    // Already the set pose, return.
-   if ( pose == mPose ) 
+   if ( pose == mPose )
       return;
 
    Pose oldPose = mPose;
@@ -2428,23 +2428,23 @@ void Player::setPose( Pose pose )
    mPose = pose;
 
    // Not added yet, just assign the pose and return.
-   if ( !isProperlyAdded() )   
+   if ( !isProperlyAdded() )
       return;
-        
+
    Point3F boxSize(1,1,1);
 
    // Resize the player boxes
-   switch (pose) 
+   switch (pose)
    {
       case StandPose:
       case SprintPose:
          boxSize = mDataBlock->boxSize;
          break;
       case CrouchPose:
-         boxSize = mDataBlock->crouchBoxSize;         
+         boxSize = mDataBlock->crouchBoxSize;
          break;
       case PronePose:
-         boxSize = mDataBlock->proneBoxSize;         
+         boxSize = mDataBlock->proneBoxSize;
          break;
       case SwimPose:
          boxSize = mDataBlock->swimBoxSize;
@@ -2494,7 +2494,7 @@ void Player::updateMove(const Move* move)
 
    // Is waterCoverage high enough to be 'swimming'?
    {
-      bool swimming = mWaterCoverage > 0.65f && canSwim();      
+      bool swimming = mWaterCoverage > 0.65f && canSwim();
 
       if ( swimming != mSwimming )
       {
@@ -2511,7 +2511,7 @@ void Player::updateMove(const Move* move)
    }
 
    // Trigger images
-   if (mDamageState == Enabled) 
+   if (mDamageState == Enabled)
    {
       setImageTriggerState( 0, move->trigger[sImageTrigger0] );
 
@@ -2558,9 +2558,9 @@ void Player::updateMove(const Move* move)
             }
 
             // Constrain the range of mHead.x
-            while (mHead.x < -M_PI_F) 
+            while (mHead.x < -M_PI_F)
                mHead.x += M_2PI_F;
-            while (mHead.x > M_PI_F) 
+            while (mHead.x > M_PI_F)
                mHead.x -= M_2PI_F;
 
             // Rotate (heading) head or body?
@@ -2613,7 +2613,7 @@ void Player::updateMove(const Move* move)
             mHead.y = emove->rotY[emoveIndex];
 
             // Constrain the range of mHead.y
-            while (mHead.y > M_PI_F) 
+            while (mHead.y > M_PI_F)
                mHead.y -= M_2PI_F;
          }
       }
@@ -2622,7 +2622,7 @@ void Player::updateMove(const Move* move)
       if(doStandardMove)
       {
          F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
-         if (p > M_PI_F) 
+         if (p > M_PI_F)
             p -= M_2PI_F;
          mHead.x = mClampF(mHead.x + p,mDataBlock->minLookAngle,
                            mDataBlock->maxLookAngle);
@@ -2716,10 +2716,10 @@ void Player::updateMove(const Move* move)
                                mDataBlock->maxProneSideSpeed * mFabs(move->x));
          else if ( mPose == CrouchPose )
             moveSpeed = getMax(mDataBlock->maxCrouchBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxCrouchSideSpeed * mFabs(move->x));         
+                               mDataBlock->maxCrouchSideSpeed * mFabs(move->x));
          else if ( mPose == SprintPose )
             moveSpeed = getMax(mDataBlock->maxSprintBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxSprintSideSpeed * mFabs(move->x));         
+                               mDataBlock->maxSprintSideSpeed * mFabs(move->x));
          else // StandPose
             moveSpeed = getMax(mDataBlock->maxBackwardSpeed * mFabs(move->y),
                                mDataBlock->maxSideSpeed * mFabs(move->x));
@@ -2748,14 +2748,14 @@ void Player::updateMove(const Move* move)
       findContact( &runSurface, &jumpSurface, &contactNormal );
    if ( jumpSurface )
       mJumpSurfaceNormal = contactNormal;
-   
+
    // If we don't have a runSurface but we do have a contactNormal,
    // then we are standing on something that is too steep.
    // Deflect the force of gravity by the normal so we slide.
    // We could also try aligning it to the runSurface instead,
    // but this seems to work well.
-   if ( !runSurface && !contactNormal.isZero() )  
-      acc = ( acc - 2 * contactNormal * mDot( acc, contactNormal ) );   
+   if ( !runSurface && !contactNormal.isZero() )
+      acc = ( acc - 2 * contactNormal * mDot( acc, contactNormal ) );
 
    // Acceleration on run surface
    if (runSurface && !mSwimming) {
@@ -2875,8 +2875,8 @@ void Player::updateMove(const Move* move)
 
       acc += runAcc;
 
-      // There are no special air control animations 
-      // so... increment this unless you really want to 
+      // There are no special air control animations
+      // so... increment this unless you really want to
       // play the run anims in the air.
       mContactTimer++;
    }
@@ -2913,7 +2913,7 @@ void Player::updateMove(const Move* move)
       // move energy if we're moving.
       VectorF swimVec;
       if (mEnergy >= mDataBlock->minRunEnergy) {
-         if (moveSpeed)         
+         if (moveSpeed)
             mEnergy -= mDataBlock->runEnergyDrain;
          swimVec = moveVec;
       }
@@ -2923,7 +2923,7 @@ void Player::updateMove(const Move* move)
       // If we are swimming but close enough to the shore/ground
       // we can still have a surface-normal. In this case align the
       // velocity to the normal to make getting out of water easier.
-      
+
       moveVec.normalize();
       F32 isSwimUp = mDot( moveVec, contactNormal );
 
@@ -2953,17 +2953,17 @@ void Player::updateMove(const Move* move)
       // Clamp acceleration.
       F32 maxAcc = (mDataBlock->swimForce / getMass()) * TickSec;
       if ( false && swimSpeed > maxAcc )
-         swimAcc *= maxAcc / swimSpeed;      
+         swimAcc *= maxAcc / swimSpeed;
 
       acc += swimAcc;
 
       mContactTimer++;
    }
    else
-      mContactTimer++;   
+      mContactTimer++;
 
    // Acceleration from Jumping
-   if (move->trigger[sJumpTrigger] && canJump())// !isMounted() && 
+   if (move->trigger[sJumpTrigger] && canJump())// !isMounted() &&
    {
       // Scale the jump impulse base on maxJumpSpeed
       F32 zSpeedScale = mVelocity.z;
@@ -3008,9 +3008,9 @@ void Player::updateMove(const Move* move)
          mEnergy -= mDataBlock->jumpEnergyDrain;
 
          // If we don't have a StandJumpAnim, just play the JumpAnim...
-         S32 seq = (mVelocity.len() < 0.5) ? PlayerData::StandJumpAnim: PlayerData::JumpAnim; 
+         S32 seq = (mVelocity.len() < 0.5) ? PlayerData::StandJumpAnim: PlayerData::JumpAnim;
          if ( mDataBlock->actionList[seq].sequence == -1 )
-            seq = PlayerData::JumpAnim;         
+            seq = PlayerData::JumpAnim;
          setActionThread( seq, true, false, true );
 
          mJumpSurfaceLastContact = JumpSkipContactsMax;
@@ -3018,7 +3018,7 @@ void Player::updateMove(const Move* move)
    }
    else
    {
-      if (jumpSurface) 
+      if (jumpSurface)
       {
          if (mJumpDelay > 0)
             mJumpDelay--;
@@ -3101,7 +3101,7 @@ void Player::updateMove(const Move* move)
 /* Commented out until the buoyancy calculation can be reworked so that a container and
 ** player with the same density will result in neutral buoyancy.
    if (mBuoyancy != 0)
-   {     
+   {
       // Applying buoyancy when standing still causing some jitters-
       if (mBuoyancy > 1.0 || !mVelocity.isZero() || !runSurface)
       {
@@ -3112,10 +3112,10 @@ void Player::updateMove(const Move* move)
          F32 currHeight = getPosition().z;
          const F32 C = 2.0f;
          const F32 M = 0.1f;
-         
+
          if ( currHeight + mVelocity.z * TickSec * C > mLiquidHeight )
             buoyancyForce *= M;
-                  
+
          mVelocity.z -= buoyancyForce;
       }
    }
@@ -3141,21 +3141,21 @@ void Player::updateMove(const Move* move)
       mWorldToObj.mulV(mVelocity,&vel);
       mFalling = vel.z < mDataBlock->fallingSpeedThreshold;
    }
-   
-   // Vehicle Dismount   
+
+   // Vehicle Dismount
    if ( !isGhost() && move->trigger[sVehicleDismountTrigger] && canJump())
       mDataBlock->doDismount_callback( this );
 
    // Enter/Leave Liquid
-   if ( !mInWater && mWaterCoverage > 0.0f ) 
-   {      
+   if ( !mInWater && mWaterCoverage > 0.0f )
+   {
       mInWater = true;
 
       if ( !isGhost() )
          mDataBlock->onEnterLiquid_callback( this, mWaterCoverage, mLiquidType.c_str() );
    }
-   else if ( mInWater && mWaterCoverage <= 0.0f ) 
-   {      
+   else if ( mInWater && mWaterCoverage <= 0.0f )
+   {
       mInWater = false;
 
       if ( !isGhost() )
@@ -3163,8 +3163,8 @@ void Player::updateMove(const Move* move)
       else
       {
          // exit-water splash sound happens for client only
-         if ( getSpeed() >= mDataBlock->exitSplashSoundVel && !isMounted() )         
-            SFX->playOnce( mDataBlock->sound[PlayerData::ExitWater], &getTransform() );                     
+         if ( getSpeed() >= mDataBlock->exitSplashSoundVel && !isMounted() )
+            SFX->playOnce( mDataBlock->sound[PlayerData::ExitWater], &getTransform() );
       }
    }
 
@@ -3172,8 +3172,8 @@ void Player::updateMove(const Move* move)
    Pose desiredPose = mPose;
 
    if ( mSwimming )
-      desiredPose = SwimPose; 
-   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
+      desiredPose = SwimPose;
+   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )
       desiredPose = CrouchPose;
    else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
       desiredPose = PronePose;
@@ -3248,7 +3248,7 @@ bool Player::canJetJump()
 }
 
 bool Player::canSwim()
-{  
+{
    // Not used!
    //return mState == MoveState && mDamageState == Enabled && !isMounted() && mEnergy >= mDataBlock->minSwimEnergy && mWaterCoverage >= 0.8f;
    return mAllowSwimming;
@@ -3259,16 +3259,16 @@ bool Player::canCrouch()
    if (!mAllowCrouching)
       return false;
 
-   if ( mState != MoveState || 
-        mDamageState != Enabled || 
-        isMounted() || 
+   if ( mState != MoveState ||
+        mDamageState != Enabled ||
+        isMounted() ||
         mSwimming ||
         mFalling )
       return false;
 
    // Can't crouch if no crouch animation!
    if ( mDataBlock->actionList[PlayerData::CrouchRootAnim].sequence == -1 )
-      return false;       
+      return false;
 
 	// We are already in this pose, so don't test it again...
 	if ( mPose == CrouchPose )
@@ -3314,10 +3314,10 @@ bool Player::canCrouch()
 }
 
 bool Player::canStand()
-{   
-   if ( mState != MoveState || 
-        mDamageState != Enabled || 
-        isMounted() || 
+{
+   if ( mState != MoveState ||
+        mDamageState != Enabled ||
+        isMounted() ||
         mSwimming )
       return false;
 
@@ -3371,9 +3371,9 @@ bool Player::canProne()
    if (!mAllowProne)
       return false;
 
-   if ( mState != MoveState || 
-        mDamageState != Enabled || 
-        isMounted() || 
+   if ( mState != MoveState ||
+        mDamageState != Enabled ||
+        isMounted() ||
         mSwimming ||
         mFalling )
       return false;
@@ -3433,7 +3433,7 @@ void Player::updateLookAnimation(F32 dt)
 
    // Adjust look pos.  This assumes that the animations match
    // the min and max look angles provided in the datablock.
-   if (mArmAnimation.thread) 
+   if (mArmAnimation.thread)
    {
       if(mControlObject)
       {
@@ -3446,15 +3446,15 @@ void Player::updateLookAnimation(F32 dt)
          mShapeInstance->setPos(mArmAnimation.thread,mClampF(tp,0,1));
       }
    }
-   
-   if (mHeadVThread) 
+
+   if (mHeadVThread)
    {
       F32 d = mDataBlock->maxLookAngle - mDataBlock->minLookAngle;
       F32 tp = (renderHead.x - mDataBlock->minLookAngle) / d;
       mShapeInstance->setPos(mHeadVThread,mClampF(tp,0,1));
    }
-   
-   if (mHeadHThread) 
+
+   if (mHeadHThread)
    {
       F32 d = 2 * mDataBlock->maxFreelookAngle;
       F32 tp = (renderHead.z + mDataBlock->maxFreelookAngle) / d;
@@ -3778,7 +3778,7 @@ void Player::updateActionThread()
    {
       bool triggeredLeft = false;
       bool triggeredRight = false;
-      
+
       F32 offset = 0.0f;
       if( mShapeInstance->getTriggerState( 1 ) )
       {
@@ -3816,7 +3816,7 @@ void Player::updateActionThread()
                mObjToWorld.getColumn( 2, &normal );
                gDecalManager->addDecal( rInfo.point, normal, tangent, mDataBlock->decalData, getScale().y );
             }
-            
+
             // Emit footpuffs.
 
             if( rInfo.t <= 0.5 && mWaterCoverage == 0.0
@@ -3852,7 +3852,7 @@ void Player::updateActionThread()
             }
 
             // Play footstep sound.
-            
+
             playFootstepSound( triggeredLeft, material, rInfo.object );
          }
       }
@@ -3916,7 +3916,7 @@ void Player::pickBestMoveAction(U32 startAnim, U32 endAnim, U32 * action, bool *
       for (U32 i = startAnim+1; i <= endAnim; i++)
       {
          const PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
-         if (anim.sequence != -1 && anim.speed) 
+         if (anim.sequence != -1 && anim.speed)
          {
             F32 d = mDot(vel, anim.dir);
             if (d > curMax)
@@ -3962,7 +3962,7 @@ void Player::pickActionAnimation()
    bool forward = true;
    U32 action = PlayerData::RootAnim;
    bool fsp = false;
-   
+
    // Jetting overrides the fall animation condition
    if (mJetting)
    {
@@ -4559,10 +4559,10 @@ bool Player::step(Point3F *pos,F32 *maxStep,F32 time)
    CollisionWorkingList* pList = rList.wLink.mNext;
    while (pList != &rList) {
       Convex* pConvex = pList->mConvex;
-      
-      // Alright, here's the deal... a polysoup mesh really needs to be 
+
+      // Alright, here's the deal... a polysoup mesh really needs to be
       // designed with stepping in mind.  If there are too many smallish polygons
-      // the stepping system here gets confused and allows you to run up walls 
+      // the stepping system here gets confused and allows you to run up walls
       // or on the edges/seams of meshes.
 
       TSStatic *st = dynamic_cast<TSStatic *> (pConvex->getObject());
@@ -4613,7 +4613,7 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
 {
    // Try and move to new pos
    F32 totalMotion  = 0.0f;
-   
+
    // TODO: not used?
    //F32 initialSpeed = mVelocity.len();
 
@@ -4744,7 +4744,7 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
       }
 
       // Take into account any physical zones...
-      for (U32 j = 0; j < physZoneCollisionList.getCount(); j++) 
+      for (U32 j = 0; j < physZoneCollisionList.getCount(); j++)
       {
          AssertFatal(dynamic_cast<PhysicalZone*>(physZoneCollisionList[j].object), "Bad phys zone!");
          const PhysicalZone* pZone = (PhysicalZone*)physZoneCollisionList[j].object;
@@ -4752,7 +4752,7 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
             mVelocity *= pZone->getVelocityMod();
       }
 
-      if (collisionList.getCount() != 0 && collisionList.getTime() < 1.0f) 
+      if (collisionList.getCount() != 0 && collisionList.getTime() < 1.0f)
       {
          // Set to collision point
          F32 velLen = mVelocity.len();
@@ -4774,10 +4774,10 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
          }
 
          // Try stepping if there is a vertical surface
-         if (collisionList.getMaxHeight() < start.z + mDataBlock->maxStepHeight * scale.z) 
+         if (collisionList.getMaxHeight() < start.z + mDataBlock->maxStepHeight * scale.z)
          {
             bool stepped = false;
-            for (U32 c = 0; c < collisionList.getCount(); c++) 
+            for (U32 c = 0; c < collisionList.getCount(); c++)
             {
                const Collision& cp = collisionList[c];
                // if (mFabs(mDot(cp.normal,VectorF(0,0,1))) < sVerticalStepDot)
@@ -4878,13 +4878,13 @@ F32 Player::_doCollisionImpact( const Collision *collision, bool fallingCollisio
       gCamFXMgr.addFX( groundImpactShake );
    }
 
-   if ( ((bd > mDataBlock->minImpactSpeed && fallingCollision) || bd > mDataBlock->minLateralImpactSpeed) 
+   if ( ((bd > mDataBlock->minImpactSpeed && fallingCollision) || bd > mDataBlock->minLateralImpactSpeed)
       && !mMountPending )
    {
       if ( !isGhost() )
          onImpact( collision->object, collision->normal * bd );
 
-      if (mDamageState == Enabled && mState != RecoverState) 
+      if (mDamageState == Enabled && mState != RecoverState)
       {
          // Scale how long we're down for
          if (mDataBlock->landSequenceTime > 0.0f)
@@ -4907,8 +4907,8 @@ F32 Player::_doCollisionImpact( const Collision *collision, bool fallingCollisio
       }
    }
 
-   if ( isServerObject() && 
-      (bd > (mDataBlock->minImpactSpeed / 3.0f) || bd > (mDataBlock->minLateralImpactSpeed / 3.0f )) ) 
+   if ( isServerObject() &&
+      (bd > (mDataBlock->minImpactSpeed / 3.0f) || bd > (mDataBlock->minLateralImpactSpeed / 3.0f )) )
    {
       mImpactSound = PlayerData::ImpactNormal;
       setMaskBits(ImpactMask);
@@ -4920,8 +4920,8 @@ F32 Player::_doCollisionImpact( const Collision *collision, bool fallingCollisio
 void Player::_handleCollision( const Collision &collision )
 {
    // Track collisions
-   if (  !isGhost() && 
-         collision.object && 
+   if (  !isGhost() &&
+         collision.object &&
          collision.object != mContactInfo.contactObject )
       queueCollision( collision.object, mVelocity - collision.object->getVelocity() );
 }
@@ -5024,7 +5024,7 @@ bool Player::updatePos(const F32 travelTime)
          newPos = delta.posVec;
       else
          newPos = _move( travelTime, &col );
-   
+
       _handleCollision( col );
    }
 
@@ -5047,7 +5047,7 @@ bool Player::updatePos(const F32 travelTime)
    setMaskBits( MoveMask );
    updateContainer();
 
-   if (!isGhost())  
+   if (!isGhost())
    {
       // Collisions are only queued on the server and can be
       // generated by either updateMove or updatePos
@@ -5067,9 +5067,9 @@ bool Player::updatePos(const F32 travelTime)
 
 
 //----------------------------------------------------------------------------
- 
-void Player::_findContact( SceneObject **contactObject, 
-                           VectorF *contactNormal, 
+
+void Player::_findContact( SceneObject **contactObject,
+                           VectorF *contactNormal,
                            Vector<SceneObject*> *outOverlapObjects )
 {
    Point3F pos;
@@ -5112,7 +5112,7 @@ void Player::_findContact( SceneObject **contactObject,
       Convex* pConvex = pList->mConvex;
 
       U32 objectMask = pConvex->getObject()->getTypeMask();
-      
+
       if (  ( objectMask & sCollisionMoveMask ) &&
             !( objectMask & PhysicalZoneObjectType ) )
       {
@@ -5186,7 +5186,7 @@ void Player::findContact( bool *run, bool *jump, VectorF *contactNormal )
          // If we've overlapped the worldbounding boxes, then that's it...
          Item* item = static_cast<Item*>( obj );
          if (  getWorldBox().isOverlapped(item->getWorldBox()) &&
-               item->getCollisionObject() != this && 
+               item->getCollisionObject() != this &&
                !item->isHidden() )
             queueCollision(item,getVelocity() - item->getVelocity());
       }
@@ -5197,7 +5197,7 @@ void Player::findContact( bool *run, bool *jump, VectorF *contactNormal )
    *jump = vd > mDataBlock->jumpSurfaceCos;
 
    mContactInfo.clear();
-  
+
    mContactInfo.contacted = contactObject != NULL;
    mContactInfo.contactObject = contactObject;
 
@@ -5384,7 +5384,7 @@ void Player::getEyeTransform(MatrixF* mat)
    for (U32 i=0; i<ShapeBase::MaxMountedImages; ++i)
    {
       image = &(mMountedImageList[i]);
-      if (image->dataBlock) 
+      if (image->dataBlock)
       {
          data = image->dataBlock;
          shapeIndex = getImageShapeIndex(*image);
@@ -5417,7 +5417,7 @@ void Player::getEyeBaseTransform(MatrixF* mat, bool includeBank)
    // from the animation and supply our own rotation.
    MatrixF pmat,xmat,zmat;
 
-   if(!isGhost()) 
+   if(!isGhost())
       mShapeInstance->animate();
 
    xmat.set(EulerF(mHead.x, 0.0f, 0.0f));
@@ -5472,7 +5472,7 @@ void Player::getRenderEyeTransform(MatrixF* mat)
    for (U32 i=0; i<ShapeBase::MaxMountedImages; ++i)
    {
       MountedImage& image = mMountedImageList[i];
-      if (image.dataBlock) 
+      if (image.dataBlock)
       {
          ShapeBaseImageData& data = *image.dataBlock;
          U32 shapeIndex = getImageShapeIndex(image);
@@ -5580,7 +5580,7 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    enableCollision();
 
    enableHeadZCalc();
-  
+
    *mat = nmat;
 }
 
@@ -5622,7 +5622,7 @@ void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)
    enableCollision();
 
    enableHeadZCalc();
-  
+
    *mat = nmat;
 }
 
@@ -5672,7 +5672,7 @@ void Player::renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRend
       imageShapeIndex = getImageShapeIndex(image);
    }
 
-   if ( !state->isShadowPass() && isFirstPerson() && (data.useEyeOffset || (data.useEyeNode && data.eyeMountNode[imageShapeIndex] != -1)) ) 
+   if ( !state->isShadowPass() && isFirstPerson() && (data.useEyeOffset || (data.useEyeNode && data.eyeMountNode[imageShapeIndex] != -1)) )
    {
       if (data.useEyeNode && data.eyeMountNode[imageShapeIndex] != -1)
       {
@@ -5694,7 +5694,7 @@ void Player::renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRend
          MatrixF nmat;
          MatrixF smat;
 
-         getRenderRetractionTransform(0,&nmat);         
+         getRenderRetractionTransform(0,&nmat);
          getRenderImageTransform(0,&smat);
 
          // See if we are pushed into a wall...
@@ -5707,7 +5707,7 @@ void Player::renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRend
          world.setPosition( world.getPosition() + displace );
       }
    }
-   else 
+   else
    {
       MatrixF nmat;
       getRenderMountTransform( 0.0f, data.mountPoint, MatrixF::Identity, &nmat);
@@ -6247,7 +6247,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       {
          mVelocity.set(0.0f, 0.0f, 0.0f);
       }
-      
+
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
       mHead.x = stream->readSignedFloat(6) * mDataBlock->maxLookAngle;
@@ -6293,7 +6293,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
             // Adjust the frame interpolation to move smoothly to the
             // new position within the current tick.
             Point3F cp = delta.pos + delta.posVec * delta.dt;
-            if (delta.dt == 0) 
+            if (delta.dt == 0)
             {
                delta.posVec.set(0.0f, 0.0f, 0.0f);
                delta.rotVec.set(0.0f, 0.0f, 0.0f);
@@ -6316,7 +6316,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
             setPosition(pos,rot);
          }
       }
-      else 
+      else
       {
          // Set the player to the server position
          delta.pos = pos;
@@ -6530,7 +6530,7 @@ DefineEngineMethod( Player, setActionThread, bool, ( const char* name, bool hold
    "@param fsp True if first person and none of the spine nodes in the shape should animate.  False will allow the shape's "
    "spine nodes to animate.\n"
    "@return True if succesful, false if failed\n"
-   
+
    "@note The spine nodes for the Player's shape are named as follows:\n\n<ul>"
    "<li>Bip01 Pelvis</li>"
    "<li>Bip01 Spine</li>"
@@ -6538,7 +6538,7 @@ DefineEngineMethod( Player, setActionThread, bool, ( const char* name, bool hold
    "<li>Bip01 Spine2</li>"
    "<li>Bip01 Neck</li>"
    "<li>Bip01 Head</li></ul>\n\n"
-   
+
    "You cannot use setActionThread() to have the Player play one of the motion "
    "determined action animation sequences.  These sequences are chosen based on how "
    "the Player moves and the Player's current pose.  The names of these sequences are:\n\n<ul>"
@@ -6564,12 +6564,12 @@ DefineEngineMethod( Player, setActionThread, bool, ( const char* name, bool hold
    "<li>standjump</li>"
    "<li>land</li>"
    "<li>jet</li></ul>\n\n"
-   
+
    "If the player moves in any direction then the animation sequence set using this "
    "method will be cancelled and the chosen mation-based sequence will take over.  This makes "
    "great for times when the Player cannot move, such as when mounted, or when it doesn't matter "
    "if the action sequence changes, such as waving and saluting.\n"
-   
+
    "@tsexample\n"
       "// Place the player in a sitting position after being mounted\n"
       "%player.setActionThread( \"sitting\", true, true );\n"
@@ -6650,7 +6650,7 @@ DefineEngineMethod( Player, checkDismountPoint, bool, ( Point3F oldPos, Point3F 
    "@param oldPos The player's current position\n"
    "@param pos The dismount position to check\n"
    "@return True if the dismount position is clear, false if not\n"
-   
+
    "@note The player must be already mounted for this method to not assert.\n")
 {
    MatrixF oldPosMat(true);
@@ -6689,55 +6689,55 @@ void Player::consoleInit()
       "Used on the client side to disable the rendering of all Player mounted objects.  This is "
       "mainly used for the tools or debugging.\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::renderCollision", TypeBool, &sRenderPlayerCollision, 
+   Con::addVariable("$player::renderCollision", TypeBool, &sRenderPlayerCollision,
       "@brief Determines if the player's collision mesh should be rendered.\n\n"
       "This is mainly used for the tools and debugging.\n"
 	   "@ingroup GameObjects\n");
 
-   Con::addVariable("$player::minWarpTicks",TypeF32,&sMinWarpTicks, 
+   Con::addVariable("$player::minWarpTicks",TypeF32,&sMinWarpTicks,
       "@brief Fraction of tick at which instant warp occures on the client.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::maxWarpTicks",TypeS32,&sMaxWarpTicks, 
+   Con::addVariable("$player::maxWarpTicks",TypeS32,&sMaxWarpTicks,
       "@brief When a warp needs to occur due to the client being too far off from the server, this is the "
       "maximum number of ticks we'll allow the client to warp to catch up.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::maxPredictionTicks",TypeS32,&sMaxPredictionTicks, 
+   Con::addVariable("$player::maxPredictionTicks",TypeS32,&sMaxPredictionTicks,
       "@brief Maximum number of ticks to predict on the client from the last known move obtained from the server.\n\n"
 	   "@ingroup GameObjects\n");
 
-   Con::addVariable("$player::maxImpulseVelocity", TypeF32, &sMaxImpulseVelocity, 
+   Con::addVariable("$player::maxImpulseVelocity", TypeF32, &sMaxImpulseVelocity,
       "@brief The maximum velocity allowed due to a single impulse.\n\n"
 	   "@ingroup GameObjects\n");
 
    // Move triggers
-   Con::addVariable("$player::jumpTrigger", TypeS32, &sJumpTrigger, 
+   Con::addVariable("$player::jumpTrigger", TypeS32, &sJumpTrigger,
       "@brief The move trigger index used for player jumping.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::crouchTrigger", TypeS32, &sCrouchTrigger, 
+   Con::addVariable("$player::crouchTrigger", TypeS32, &sCrouchTrigger,
       "@brief The move trigger index used for player crouching.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::proneTrigger", TypeS32, &sProneTrigger, 
+   Con::addVariable("$player::proneTrigger", TypeS32, &sProneTrigger,
       "@brief The move trigger index used for player prone pose.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::sprintTrigger", TypeS32, &sSprintTrigger, 
+   Con::addVariable("$player::sprintTrigger", TypeS32, &sSprintTrigger,
       "@brief The move trigger index used for player sprinting.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::imageTrigger0", TypeS32, &sImageTrigger0, 
+   Con::addVariable("$player::imageTrigger0", TypeS32, &sImageTrigger0,
       "@brief The move trigger index used to trigger mounted image 0.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::imageTrigger1", TypeS32, &sImageTrigger1, 
+   Con::addVariable("$player::imageTrigger1", TypeS32, &sImageTrigger1,
       "@brief The move trigger index used to trigger mounted image 1 or alternate fire "
       "on mounted image 0.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::jumpJetTrigger", TypeS32, &sJumpJetTrigger, 
+   Con::addVariable("$player::jumpJetTrigger", TypeS32, &sJumpJetTrigger,
       "@brief The move trigger index used for player jump jetting.\n\n"
 	   "@ingroup GameObjects\n");
-   Con::addVariable("$player::vehicleDismountTrigger", TypeS32, &sVehicleDismountTrigger, 
+   Con::addVariable("$player::vehicleDismountTrigger", TypeS32, &sVehicleDismountTrigger,
       "@brief The move trigger index used to dismount player.\n\n"
 	   "@ingroup GameObjects\n");
 
    // ExtendedMove support
-   Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
+   Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex,
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
 	   "@ingroup GameObjects\n");
 }
@@ -6963,18 +6963,18 @@ void Player::updateFroth( F32 dt )
    }
 
    F32 speed = moveDir.len();
-   if ( speed < mDataBlock->splashVelEpsilon ) 
+   if ( speed < mDataBlock->splashVelEpsilon )
       speed = 0.0;
 
    U32 emitRate = (U32) (speed * mDataBlock->splashFreqMod * dt);
 
    // If we're in the water, swimming, but not
    // moving, then lets emit some particles because
-   // we're treading water.  
+   // we're treading water.
    if ( mSwimming && speed == 0.0 )
    {
       emitRate = (U32) (2.0f * mDataBlock->splashFreqMod * dt);
-   }   
+   }
 
    U32 i;
    for ( i=0; i<PlayerData::BUBBLE_EMITTER; i++ ) {
@@ -7029,7 +7029,7 @@ bool Player::collidingWithWater( Point3F &waterHeight )
 {
    if ( !mCurrentWaterObject )
       return false;
-   
+
    Point3F curPos = getPosition();
 
    if ( mWorldBox.maxExtents.z < mLiquidHeight )
@@ -7119,11 +7119,11 @@ void Player::prepRenderImage( SceneRenderState* state )
          renderItems = false;
    }
 
-   // Call the protected base class to do the work 
+   // Call the protected base class to do the work
    // now that we know if we're rendering the player
    // and mounted shapes.
-   return ShapeBase::_prepRenderImage( state, 
-                                       renderPlayer, 
+   return ShapeBase::_prepRenderImage( state,
+                                       renderPlayer,
                                        renderItems );
 }
 

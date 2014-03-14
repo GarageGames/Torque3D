@@ -40,17 +40,17 @@ public:
    ShaderMaterialParameterHandle(const String& name);
    ShaderMaterialParameterHandle(const String& name, Vector<GFXShader*>& shaders);
 
-   virtual const String& getName() const { return mName; } 
+   virtual const String& getName() const { return mName; }
    virtual S32 getSamplerRegister( U32 pass ) const;
 
    // NOTE: We always return true here instead of querying the
    // children... often there is only one element, so lets just
    // hit the loop once on the set.
-   virtual bool isValid() const { return true; };      
+   virtual bool isValid() const { return true; };
 
 protected:
-   Vector< GFXShaderConstHandle* > mHandles;   
-   String mName;   
+   Vector< GFXShaderConstHandle* > mHandles;
+   String mName;
 };
 
 // This is the union of all of the shaders contained in a material
@@ -60,7 +60,7 @@ public:
    ShaderMaterialParameters();
    virtual ~ShaderMaterialParameters();
 
-   void setBuffers(Vector<GFXShaderConstDesc>& constDesc, Vector<GFXShaderConstBufferRef>& buffers);   
+   void setBuffers(Vector<GFXShaderConstDesc>& constDesc, Vector<GFXShaderConstBufferRef>& buffers);
    GFXShaderConstBuffer* getBuffer(U32 i) { return mBuffers[i]; }
 
    ///
@@ -92,7 +92,7 @@ public:
    virtual U32 getAlignmentValue(const GFXShaderConstType constType);
 
 private:
-   Vector<GFXShaderConstBufferRef> mBuffers;   
+   Vector<GFXShaderConstBufferRef> mBuffers;
 
    void releaseBuffers();
 };

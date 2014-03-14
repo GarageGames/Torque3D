@@ -137,10 +137,10 @@ U32 Platform::getMathControlState()
 
 void Platform::setMathControlStateKnown()
 {
-   
+
 }
 
 void Platform::setMathControlState(U32 state)
 {
-   
+
 }

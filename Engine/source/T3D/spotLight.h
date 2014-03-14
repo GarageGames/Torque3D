@@ -58,7 +58,7 @@ public:
 
    // NetObject
    U32 packUpdate( NetConnection *conn, U32 mask, BitStream *stream );
-   void unpackUpdate( NetConnection *conn, BitStream *stream );  
+   void unpackUpdate( NetConnection *conn, BitStream *stream );
 };
 
 #endif // _SPOTLIGHT_H_

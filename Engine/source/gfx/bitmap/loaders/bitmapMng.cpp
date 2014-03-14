@@ -57,7 +57,7 @@ static struct _privateRegisterMNG
 } sStaticRegisterMNG;
 
 
-typedef struct 
+typedef struct
 {
    GBitmap*    image;
 	Stream*     stream;
@@ -91,7 +91,7 @@ static mng_bool mngReadDataFn(mng_handle mng, mng_ptr data, mng_uint32 length, m
 
    bool success = mymng->stream->read(length, data);
    *bytesread = length; // stupid hack
-   
+
    AssertFatal(success, "MNG read catastrophic error!");
    if(success)
       return MNG_TRUE;
@@ -108,7 +108,7 @@ static mng_bool mngWriteDataFn(mng_handle mng, mng_ptr data, mng_uint32 length, 
 
    bool success = mymng->stream->write(length, data);
    *iWritten = length; // stupid hack
-   
+
    AssertFatal(success, "MNG write catastrophic error!");
    if(success)
       return MNG_TRUE;
@@ -199,7 +199,7 @@ static mng_bool mngSetTimerFn(mng_handle mng, mng_uint32 msecs)
 static mng_bool mngFatalErrorFn(mng_handle mng, mng_int32 code, mng_int8 severity, mng_chunkid chunktype, mng_uint32 chunkseq, mng_int32 extra1, mng_int32 extra2, mng_pchar text)
 {
    mng_cleanup(&mng);
-   
+
    AssertISV(false, avar("Error reading MNG file:\n %s", (const char*)text));
    return MNG_FALSE;
 }
@@ -212,7 +212,7 @@ static bool sReadMNG(Stream &stream, GBitmap *bitmap)
    mng_handle mng = mng_initialize(&mnginfo, mngMallocFn, mngFreeFn, MNG_NULL);
    if(mng == NULL)
       return false;
-   
+
    // setup the callbacks
    mng_setcb_errorproc(mng, mngFatalErrorFn);
    mng_setcb_openstream(mng, mngOpenDataFn);
@@ -223,15 +223,15 @@ static bool sReadMNG(Stream &stream, GBitmap *bitmap)
    mng_setcb_refresh(mng, mngRefreshFn);
    mng_setcb_gettickcount(mng, mngGetTicksFn);
    mng_setcb_settimer(mng, mngSetTimerFn);
-   
+
    mnginfo.image = bitmap;
    mnginfo.stream = &stream;
-   
+
    mng_read(mng);
    mng_display(mng);
 
    // hacks :(
-   // libmng doesn't support returning data in gray/gray alpha format, 
+   // libmng doesn't support returning data in gray/gray alpha format,
    // so we grab as RGB/RGBA and just cut off the g and b
    mng_uint8 colorType = mng_get_colortype(mng);
    switch(colorType)
@@ -242,7 +242,7 @@ static bool sReadMNG(Stream &stream, GBitmap *bitmap)
             GBitmap temp(*bitmap);
             bitmap->deleteImage();
             bitmap->allocateBitmap(temp.getWidth(), temp.getHeight(), false, GFXFormatA8);
-            
+
             // force getColor to read in in the same color value for each channel
             // since the gray colortype has the real alpha in the first channel
             temp.setFormat( GFXFormatA8 );
@@ -281,109 +281,109 @@ static bool sWriteMNG(GBitmap *bitmap, Stream &stream, U32 compressionLevel)
    AssertFatal(getFormat() == GFXFormatR8G8B8 || getFormat() == GFXFormatR8G8B8A8 || getFormat() == GFXFormatA8, "GBitmap::writeMNG: ONLY RGB bitmap writing supported at this time.");
    if(getFormat() != GFXFormatR8G8B8 && getFormat() != GFXFormatR8G8B8A8 && getFormat() != GFXFormatA8)
       return (false);
-      
+
    // maximum image size allowed
    #define MAX_HEIGHT 4096
    if(getHeight() >= MAX_HEIGHT)
       return false;
-      
+
    mngstuff mnginfo;
    dMemset(&mnginfo, 0, sizeof(mngstuff));
    mng_handle mng = mng_initialize(&mnginfo, mngMallocFn, mngFreeFn, MNG_NULL);
    if(mng == NULL) {
       return false;
    }
-   
+
    // setup the callbacks
    mng_setcb_openstream(mng, mngOpenDataFn);
    mng_setcb_closestream(mng, mngCloseDataFn);
    mng_setcb_writedata(mng, mngWriteDataFn);
-   
+
    // create the file in memory
    mng_create(mng);
-   
+
    mng_putchunk_defi(mng, 0, 0, 0, MNG_FALSE, 0, 0, MNG_FALSE, 0, getWidth(), 0, getHeight());
-   
+
    mnginfo.image = (GBitmap*)this;
    mnginfo.stream = &stream;
-   
+
    switch(getFormat()) {
       case GFXFormatA8:
-         mng_putchunk_ihdr(mng, getWidth(), getHeight(), 
-            MNG_BITDEPTH_8, 
-            MNG_COLORTYPE_GRAY, 
-            MNG_COMPRESSION_DEFLATE, 
-            MNG_FILTER_ADAPTIVE, 
+         mng_putchunk_ihdr(mng, getWidth(), getHeight(),
+            MNG_BITDEPTH_8,
+            MNG_COLORTYPE_GRAY,
+            MNG_COMPRESSION_DEFLATE,
+            MNG_FILTER_ADAPTIVE,
             MNG_INTERLACE_NONE);
-         
+
          // not implemented in lib yet
-         //mng_putimgdata_ihdr(mng, getWidth(), getHeight(), 
-         //   MNG_COLORTYPE_GRAY, 
-         //   MNG_BITDEPTH_8, 
-         //   MNG_COMPRESSION_DEFLATE, 
-         //   MNG_FILTER_ADAPTIVE, 
-         //   MNG_INTERLACE_NONE, 
+         //mng_putimgdata_ihdr(mng, getWidth(), getHeight(),
+         //   MNG_COLORTYPE_GRAY,
+         //   MNG_BITDEPTH_8,
+         //   MNG_COMPRESSION_DEFLATE,
+         //   MNG_FILTER_ADAPTIVE,
+         //   MNG_INTERLACE_NONE,
          //   MNG_CANVAS_GRAY8, mngCanvasLineFn);
          break;
      case GFXFormatR8G8B8:
-         mng_putchunk_ihdr(mng, getWidth(), getHeight(), 
-            MNG_BITDEPTH_8, 
-            MNG_COLORTYPE_RGB, 
-            MNG_COMPRESSION_DEFLATE, 
-            MNG_FILTER_ADAPTIVE, 
+         mng_putchunk_ihdr(mng, getWidth(), getHeight(),
+            MNG_BITDEPTH_8,
+            MNG_COLORTYPE_RGB,
+            MNG_COMPRESSION_DEFLATE,
+            MNG_FILTER_ADAPTIVE,
             MNG_INTERLACE_NONE);
-            
+
          // not implemented in lib yet
-         //mng_putimgdata_ihdr(mng, getWidth(), getHeight(), 
-         //   MNG_COLORTYPE_RGB, 
-         //   MNG_BITDEPTH_8, 
-         //   MNG_COMPRESSION_DEFLATE, 
-         //   MNG_FILTER_ADAPTIVE, 
-         //   MNG_INTERLACE_NONE, 
+         //mng_putimgdata_ihdr(mng, getWidth(), getHeight(),
+         //   MNG_COLORTYPE_RGB,
+         //   MNG_BITDEPTH_8,
+         //   MNG_COMPRESSION_DEFLATE,
+         //   MNG_FILTER_ADAPTIVE,
+         //   MNG_INTERLACE_NONE,
          //   MNG_CANVAS_RGB8, mngCanvasLineFn);
          break;
      case GFXFormatR8G8B8A8:
-         mng_putchunk_ihdr(mng, getWidth(), getHeight(), 
-            MNG_BITDEPTH_8, 
-            MNG_COLORTYPE_RGBA, 
-            MNG_COMPRESSION_DEFLATE, 
-            MNG_FILTER_ADAPTIVE, 
+         mng_putchunk_ihdr(mng, getWidth(), getHeight(),
+            MNG_BITDEPTH_8,
+            MNG_COLORTYPE_RGBA,
+            MNG_COMPRESSION_DEFLATE,
+            MNG_FILTER_ADAPTIVE,
             MNG_INTERLACE_NONE);
-            
+
          // not implemented in lib yet
-         //mng_putimgdata_ihdr(mng, getWidth(), getHeight(), 
-         //   MNG_COLORTYPE_RGBA, 
-         //   MNG_BITDEPTH_8, 
-         //   MNG_COMPRESSION_DEFLATE, 
-         //   MNG_FILTER_ADAPTIVE, 
-         //   MNG_INTERLACE_NONE, 
+         //mng_putimgdata_ihdr(mng, getWidth(), getHeight(),
+         //   MNG_COLORTYPE_RGBA,
+         //   MNG_BITDEPTH_8,
+         //   MNG_COMPRESSION_DEFLATE,
+         //   MNG_FILTER_ADAPTIVE,
+         //   MNG_INTERLACE_NONE,
          //   MNG_CANVAS_RGBA8, mngCanvasLineFn);
          break;
    }
-   
-   
+
+
    // below is a hack until libmng is mature enough to handle this itself
    //-----------------------------------------------------------------------------
-   
-  
+
+
    U8 *tmpbuffer = new U8[this->byteSize + getHeight()];
 	if(tmpbuffer == 0)
 	{
 	   mng_cleanup(&mng);
 	   return false;
 	}
-	
+
 	// transfer data, add filterbyte
    U32 effwdt = getWidth() * this->bytesPerPixel;
    for(U32 Row = 0; Row < getHeight(); Row++)
    {
       // first Byte in each scanline is filterbyte: currently 0 -> no filter
-      tmpbuffer[Row * (effwdt + 1)] = 0; 
-      
+      tmpbuffer[Row * (effwdt + 1)] = 0;
+
       // copy the scanline
       dMemcpy(tmpbuffer + Row * (effwdt + 1) + 1, getAddress(0, Row), effwdt);
-   } 
-   
+   }
+
    // compress data with zlib
    U8 *dstbuffer = new U8[this->byteSize + getHeight()];
    if(dstbuffer == 0)
@@ -401,21 +401,21 @@ static bool sWriteMNG(GBitmap *bitmap, Stream &stream, U32 compressionLevel)
       mng_cleanup(&mng);
       return false;
    }
-   
+
    mng_putchunk_idat(mng, dstbufferSize, (mng_ptr*)dstbuffer);
-   
-   
+
+
    //-----------------------------------------------------------------------------
-   
-   
+
+
    mng_putchunk_iend(mng);
-   
+
    delete [] tmpbuffer;
    delete [] dstbuffer;
-   
+
    mng_write(mng);
    mng_cleanup(&mng);
-   
+
    return true;
 #endif
 }

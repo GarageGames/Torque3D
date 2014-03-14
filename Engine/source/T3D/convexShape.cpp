@@ -47,13 +47,13 @@ IMPLEMENT_CO_NETOBJECT_V1( ConvexShape );
 
 ConsoleDocClass( ConvexShape,
    "@brief A renderable, collidable convex shape defined by a collection of surface planes.\n\n"
-   
+
    "%ConvexShape is intended to be used as a temporary asset for quickly "
    "blocking out a scene or filling in approximate shapes to be later replaced "
    "with final assets. This is most easily done by using the WorldEditor's "
    "Sketch Tool.\n\n"
-   
-   "@ingroup enviroMisc"   
+
+   "@ingroup enviroMisc"
 );
 
 
@@ -63,7 +63,7 @@ Point3F ConvexShapeCollisionConvex::support( const VectorF &vec ) const
 
 	if ( pointList.empty() )
 		return pShape->getObjBox().getCenter();
-	
+
 	// This doesn't deal with the case that the farthest plane along vec is also
 	// perpendicular to it, but in that case maybe it doesn't matter which point we return
 	// anyway.
@@ -104,15 +104,15 @@ void ConvexShapeCollisionConvex::getFeatures( const MatrixF &mat, const VectorF 
 	// Points...
 
 	S32 firstVert = cf->mVertexList.size();
-	
+
 	const Vector< Point3F > &pointList = pShape->mGeometry.points;
 	const U32 pointListCount = pointList.size();
 
 	cf->mVertexList.increment( pointListCount );
 
-	for ( S32 i = 0; i < pointListCount; i++ )	
-		mat.mulP( pointList[i], &(cf->mVertexList[ firstVert + i ]) );	
-	
+	for ( S32 i = 0; i < pointListCount; i++ )
+		mat.mulP( pointList[i], &(cf->mVertexList[ firstVert + i ]) );
+
 
 	// Edges and Triangles for each face...
 
@@ -122,7 +122,7 @@ void ConvexShapeCollisionConvex::getFeatures( const MatrixF &mat, const VectorF 
 	{
 		// Add this Face's Edges.
 
-		const Vector< ConvexShape::Edge > &edgeList = faceList[i].edges;		
+		const Vector< ConvexShape::Edge > &edgeList = faceList[i].edges;
 		const U32 edgeCount = edgeList.size();
 		const S32 firstEdge = cf->mEdgeList.size();
 
@@ -134,11 +134,11 @@ void ConvexShapeCollisionConvex::getFeatures( const MatrixF &mat, const VectorF 
 			cf->mEdgeList[ firstEdge + j ].vertex[1] = faceList[i].points[ edgeList[j].p1 ];
 		}
 
-		// Add this face's Triangles. 
+		// Add this face's Triangles.
 
 		// Note that ConvexFeature calls triangles 'faces' but a ConvexShape 'Face' is not
 		// necessarily a single triangle.
-				
+
 		const Vector< ConvexShape::Triangle > &triangleList = faceList[i].triangles;
 		const U32 triangleCount = triangleList.size();
 		S32 firstTriangle = cf->mFaceList.size();
@@ -146,7 +146,7 @@ void ConvexShapeCollisionConvex::getFeatures( const MatrixF &mat, const VectorF 
 		cf->mFaceList.increment( triangleCount );
 
 		for ( S32 j = 0; j < triangleCount; j++ )
-		{			
+		{
 			ConvexFeature::Face &cft = cf->mFaceList[ firstTriangle + j ];
 
 			cft.normal = faceList[i].normal;
@@ -154,15 +154,15 @@ void ConvexShapeCollisionConvex::getFeatures( const MatrixF &mat, const VectorF 
 			cft.vertex[1] = triangleList[j].p1;
 			cft.vertex[2] = triangleList[j].p2;
 		}
-	}	
+	}
 }
 
 
 void ConvexShapeCollisionConvex::getPolyList( AbstractPolyList* list )
 {
 	SphereF sphere( Point3F::Zero, 0.0f );
-	
-	pShape->buildPolyList( PLC_Collision, list, Box3F::Invalid, sphere );	
+
+	pShape->buildPolyList( PLC_Collision, list, Box3F::Invalid, sphere );
 }
 
 
@@ -176,7 +176,7 @@ GFXImplementVertexFormat( ConvexVert )
 };
 
 static const U32 sgConvexFaceColorCount = 16;
-static const ColorI sgConvexFaceColors[ sgConvexFaceColorCount ] = 
+static const ColorI sgConvexFaceColors[ sgConvexFaceColorCount ] =
 {
    ColorI( 239, 131, 201 ),
    ColorI( 124, 255, 69 ),
@@ -207,9 +207,9 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
 	//MatrixF mat;
 
 	/*
-   dSscanf( data, "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g", 
-      &mat[0], &mat[1], &mat[2], &mat[3], 
-      &mat[4], &mat[5], &mat[6], &mat[7], 
+   dSscanf( data, "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g",
+      &mat[0], &mat[1], &mat[2], &mat[3],
+      &mat[4], &mat[5], &mat[6], &mat[7],
       &mat[8], &mat[9], &mat[10], &mat[11],
       &mat[12], &mat[13], &mat[14], &mat[15] );
 	*/
@@ -220,24 +220,24 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
 	quat.setMatrix( &surface );
 	surface.setPosition( pos );
 
-   shape->mSurfaces.push_back( surface );   
+   shape->mSurfaces.push_back( surface );
 
    return false;
 }
 
 
 ConvexShape::ConvexShape()
- : mMaterialInst( NULL ),   
+ : mMaterialInst( NULL ),
    mNormalLength( 0.3f ),
    mVertCount( 0 ),
    mPrimCount( 0 ),
    mMaterialName( "Grid512_OrangeLines_Mat" ),
    mPhysicsRep( NULL )
-{   
+{
    mNetFlags.set( Ghostable | ScopeAlways );
-   
-   mTypeMask |= StaticObjectType | 
-                StaticShapeObjectType;    
+
+   mTypeMask |= StaticObjectType |
+                StaticShapeObjectType;
 
    mConvexList = new Convex;
 }
@@ -261,7 +261,7 @@ void ConvexShape::initPersistFields()
 
    addGroup( "Internal" );
 
-      addProtectedField( "surface", TypeRealString, NULL, &protectedSetSurface, &defaultProtectedGetFn, 
+      addProtectedField( "surface", TypeRealString, NULL, &protectedSetSurface, &defaultProtectedGetFn,
          "Do not modify, for internal use.", AbstractClassRep::FIELD_HideInInspectors );
 
    endGroup( "Internal" );
@@ -282,9 +282,9 @@ bool ConvexShape::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
-   
+
    //mObjBox.set( -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f );
-   //resetWorldBox();   
+   //resetWorldBox();
 
    // Face Order:
    // Top, Bottom, Front, Back, Left, Right
@@ -297,7 +297,7 @@ bool ConvexShape::onAdd()
       Point3F( 1,  0,  0 ),
       Point3F(-1,  0,  0 ),
       Point3F( 0,  1,  0 ),
-      Point3F( 0, -1,  0 )      
+      Point3F( 0, -1,  0 )
    };
 
    // Y Axis
@@ -312,35 +312,35 @@ bool ConvexShape::onAdd()
    };
 
    // Z Axis
-   static const Point3F cubeNormals[6] = 
+   static const Point3F cubeNormals[6] =
    {
       Point3F( 0,  0,  1),
       Point3F( 0,  0, -1),
       Point3F( 0,  1,  0),
       Point3F( 0, -1,  0),
       Point3F(-1,  0,  0),
-      Point3F( 1,  0,  0),      
+      Point3F( 1,  0,  0),
    };
 
    if ( mSurfaces.empty() )
-   {      
+   {
       for ( S32 i = 0; i < 6; i++ )
       {
          mSurfaces.increment();
          MatrixF &surf = mSurfaces.last();
 
          surf.identity();
-         
+
          surf.setColumn( 0, cubeTangents[i] );
          surf.setColumn( 1, cubeBinormals[i] );
          surf.setColumn( 2, cubeNormals[i] );
-         surf.setPosition( cubeNormals[i] * 0.5f );         
+         surf.setPosition( cubeNormals[i] * 0.5f );
       }
    }
 
-   if ( isClientObject() )   
-      _updateMaterial();      
-   
+   if ( isClientObject() )
+      _updateMaterial();
+
    _updateGeometry( true );
 
    addToScene();
@@ -365,7 +365,7 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
 
    // Now write all planes.
 
-   stream.write(2, "\r\n");   
+   stream.write(2, "\r\n");
 
    S32 count = mSurfaces.size();
    if ( count > smMaxSurfaces )
@@ -375,7 +375,7 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
    }
 
    for ( U32 i = 0; i < count; i++ )
-   {      
+   {
       const MatrixF &mat = mSurfaces[i];
 
 		QuatF quat( mat );
@@ -384,17 +384,17 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
       stream.writeTabs(tabStop);
 
       char buffer[1024];
-      dMemset( buffer, 0, 1024 );      
-      
-      dSprintf( buffer, 1024, "surface = \"%g %g %g %g %g %g %g\";", 
-         quat.x, quat.y, quat.z, quat.w, pos.x, pos.y, pos.z );      
+      dMemset( buffer, 0, 1024 );
+
+      dSprintf( buffer, 1024, "surface = \"%g %g %g %g %g %g %g\";",
+         quat.x, quat.y, quat.z, quat.w, pos.x, pos.y, pos.z );
 
       stream.writeLine( (const U8*)buffer );
    }
 }
 
 bool ConvexShape::writeField( StringTableEntry fieldname, const char *value )
-{   
+{
    if ( fieldname == StringTable->insert("surface") )
       return false;
 
@@ -408,19 +408,19 @@ void ConvexShape::onScaleChanged()
 }
 
 void ConvexShape::setTransform( const MatrixF &mat )
-{   
+{
    Parent::setTransform( mat );
 
    if ( mPhysicsRep )
       mPhysicsRep->setTransform( mat );
- 
+
    setMaskBits( TransformMask );
 }
 
 U32 ConvexShape::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
 {
    U32 retMask = Parent::packUpdate( conn, mask, stream );
-   
+
    if ( stream->writeFlag( mask & TransformMask ) )
    {
       mathWrite(*stream, getTransform());
@@ -430,17 +430,17 @@ U32 ConvexShape::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
    if ( stream->writeFlag( mask & UpdateMask ) )
    {
       stream->write( mMaterialName );
-      
+
       U32 surfCount = mSurfaces.size();
       stream->writeInt( surfCount, 32 );
 
-      for ( S32 i = 0; i < surfCount; i++ )    
+      for ( S32 i = 0; i < surfCount; i++ )
       {
          QuatF quat( mSurfaces[i] );
 		 Point3F pos( mSurfaces[i].getPosition() );
 
          mathWrite( *stream, quat );
-         mathWrite( *stream, pos );                    
+         mathWrite( *stream, pos );
       }
    }
 
@@ -462,7 +462,7 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
 
    if ( stream->readFlag() ) // UpdateMask
    {
-      stream->read( &mMaterialName );      
+      stream->read( &mMaterialName );
 
       if ( isProperlyAdded() )
          _updateMaterial();
@@ -479,7 +479,7 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
          Point3F pos;
 
          mathRead( *stream, &quat );
-         mathRead( *stream, &pos ); 
+         mathRead( *stream, &pos );
 
          quat.setMatrix( &mat );
          mat.setPosition( pos );
@@ -491,7 +491,7 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
 }
 
 void ConvexShape::prepRenderImage( SceneRenderState *state )
-{   
+{
    /*
    if ( state->isDiffusePass() )
    {
@@ -505,7 +505,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
    if ( mVertexBuffer.isNull() )
       return;
 
-   // If we don't have a material instance after the override then 
+   // If we don't have a material instance after the override then
    // we can skip rendering all together.
    BaseMatInstance *matInst = state->getOverrideMaterial( mMaterialInst ? mMaterialInst : MATMGR->getWarningMatInstance() );
    if ( !matInst )
@@ -525,9 +525,9 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
    {
       // Calculate our sort point manually.
       const Box3F& rBox = getRenderWorldBox();
-      ri->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );      
-   } 
-   else 
+      ri->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );
+   }
+   else
       ri->sortDistSq = 0.0f;
 
    // Set up our transforms
@@ -597,13 +597,13 @@ void ConvexShape::buildConvex( const Box3F &box, Convex *convex )
    // See if this convex exists in the working set already...
    Convex *cc = 0;
    CollisionWorkingList &wl = convex->getWorkingList();
-   for ( CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext ) 
+   for ( CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext )
    {
       if ( itr->mConvex->getType() == ConvexShapeCollisionConvexType )
       {
          ConvexShapeCollisionConvex *pConvex = static_cast<ConvexShapeCollisionConvex*>(itr->mConvex);
 
-         if ( pConvex->pShape == this )              
+         if ( pConvex->pShape == this )
          {
             cc = itr->mConvex;
             return;
@@ -619,12 +619,12 @@ void ConvexShape::buildConvex( const Box3F &box, Convex *convex )
    convex->addToWorkingList( cp );
 
    cp->mObject = this;
-   cp->pShape  = this;   
+   cp->pShape  = this;
 }
 
 bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plist, const Box3F &box, const SphereF &sphere )
 {
-   if ( mGeometry.points.empty() )	
+   if ( mGeometry.points.empty() )
       return false;
 
    // If we're exporting deal with that first.
@@ -645,7 +645,7 @@ bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plis
 
    S32 base = plist->addPoint( pointList[0] );
 
-   for ( S32 i = 1; i < pointList.size(); i++ )	
+   for ( S32 i = 1; i < pointList.size(); i++ )
       plist->addPoint( pointList[i] );
 
 
@@ -678,7 +678,7 @@ bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plis
 
    for ( S32 i = 0; i < faceList.size(); i++ )
    {
-      const ConvexShape::Face &face = faceList[i];		
+      const ConvexShape::Face &face = faceList[i];
 
       plist->begin( 0, i );
 
@@ -689,7 +689,7 @@ bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plis
          plist->vertex( base + face.points[ face.triangles[j].p0 ] );
          plist->vertex( base + face.points[ face.triangles[j].p1 ] );
          plist->vertex( base + face.points[ face.triangles[j].p2 ] );
-      }      
+      }
 
       plist->end();
    }
@@ -702,33 +702,33 @@ void ConvexShape::_export( OptimizedPolyList *plist, const Box3F &box, const Sph
    BaseMatInstance *matInst = mMaterialInst;
    if ( isServerObject() && getClientObject() )
       matInst = dynamic_cast<ConvexShape*>(getClientObject())->mMaterialInst;
-   
+
    MatrixF saveMat;
    Point3F saveScale;
    plist->getTransform( &saveMat, &saveScale );
 
    plist->setTransform( &mObjToWorld, mObjScale );
-   plist->setObject( this );   
+   plist->setObject( this );
 
    const Vector< ConvexShape::Face > faceList = mGeometry.faces;
    const Vector< Point3F > &pointList = mGeometry.points;
 
    for ( S32 i = 0; i < faceList.size(); i++ )
    {
-      const ConvexShape::Face &face = faceList[i];		
+      const ConvexShape::Face &face = faceList[i];
 
       plist->begin( matInst, i, OptimizedPolyList::TriangleList );
 
       plist->plane( PlaneF( face.centroid, face.normal ) );
 
       for ( S32 j = 0; j < face.triangles.size(); j++ )
-      {                  
-         for ( S32 k = 0; k < 3; k++ )         
+      {
+         for ( S32 k = 0; k < 3; k++ )
          {
             U32 vertId = face.triangles[j][k];
-            plist->vertex( pointList[ face.points[ vertId ] ], face.normal, face.texcoords[ vertId ] );         
+            plist->vertex( pointList[ face.points[ vertId ] ], face.normal, face.texcoords[ vertId ] );
          }
-      }      
+      }
 
       plist->end();
    }
@@ -739,10 +739,10 @@ void ConvexShape::_export( OptimizedPolyList *plist, const Box3F &box, const Sph
 bool ConvexShape::castRay( const Point3F &start, const Point3F &end, RayInfo *info )
 {
    if ( mPlanes.empty() )
-      return false;   
+      return false;
 
    const Vector< PlaneF > &planeList = mPlanes;
-   const U32 planeCount = planeList.size();  
+   const U32 planeCount = planeList.size();
 
    F32 t;
    F32 tmin = F32_MAX;
@@ -796,7 +796,7 @@ bool ConvexShape::castRay( const Point3F &start, const Point3F &end, RayInfo *in
    if ( hitFace == -1 )
       return false;
 
-   info->face = hitFace;            
+   info->face = hitFace;
    info->material = mMaterialInst;
    info->normal = planeList[ hitFace ];
    info->object = this;
@@ -825,9 +825,9 @@ void ConvexShape::updateBounds( bool recenter )
 
    F32 faceCount = mGeometry.faces.size();
 
-   for ( S32 i = 0; i < faceCount; i++ )   
+   for ( S32 i = 0; i < faceCount; i++ )
    {
-      volumnCenter += mGeometry.faces[i].centroid * mGeometry.faces[i].area;         
+      volumnCenter += mGeometry.faces[i].centroid * mGeometry.faces[i].area;
       areaSum += mGeometry.faces[i].area;
    }
 
@@ -835,11 +835,11 @@ void ConvexShape::updateBounds( bool recenter )
       return;
 
    volumnCenter /= areaSum;
-   
+
    mObjBox.minExtents = mObjBox.maxExtents = Point3F::Zero;
    mObjBox.setCenter( volumnCenter );
 
-   for ( S32 i = 0; i < pointCount; i++ )      
+   for ( S32 i = 0; i < pointCount; i++ )
       mObjBox.extend( pointListOS[i] );
 
    resetWorldBox();
@@ -849,23 +849,23 @@ void ConvexShape::recenter()
 {
    if ( mGeometry.points.size() == 0 )
       return;
-  
+
    Point3F volCenterOS( 0,0,0 );
    F32 areaSum = 0.0f;
 
    F32 faceCount = mGeometry.faces.size();
 
-   for ( S32 i = 0; i < faceCount; i++ )   
+   for ( S32 i = 0; i < faceCount; i++ )
    {
-      volCenterOS += mGeometry.faces[i].centroid * mGeometry.faces[i].area;         
+      volCenterOS += mGeometry.faces[i].centroid * mGeometry.faces[i].area;
       areaSum += mGeometry.faces[i].area;
    }
 
    volCenterOS /= areaSum;
 
-   for ( S32 i = 0; i < mSurfaces.size(); i++ )   
+   for ( S32 i = 0; i < mSurfaces.size(); i++ )
       mSurfaces[i].setPosition( mSurfaces[i].getPosition() - volCenterOS );
-   
+
    Point3F volCenterWS;
    MatrixF objToWorld( mObjToWorld );
    objToWorld.scale( mObjScale );
@@ -873,13 +873,13 @@ void ConvexShape::recenter()
 
    setPosition( volCenterWS );
 
-   _updateGeometry(true);   
+   _updateGeometry(true);
 }
 
 MatrixF ConvexShape::getSurfaceWorldMat( S32 surfId, bool scaled ) const
 {
    if ( surfId < 0 || surfId >= mSurfaces.size() )
-      return MatrixF::Identity;      
+      return MatrixF::Identity;
 
    MatrixF objToWorld( mObjToWorld );
 
@@ -887,7 +887,7 @@ MatrixF ConvexShape::getSurfaceWorldMat( S32 surfId, bool scaled ) const
       objToWorld.scale( mObjScale );
 
    MatrixF surfMat;
-   surfMat.mul( objToWorld, mSurfaces[surfId] );   
+   surfMat.mul( objToWorld, mSurfaces[surfId] );
 
    return surfMat;
 }
@@ -914,7 +914,7 @@ void ConvexShape::cullEmptyPlanes( Vector< U32 > *removedPlanes )
 
    S32 *used = new S32[ startPlaneCount ];
 
-   for ( S32 i = 0; i < startPlaneCount; i++ )   
+   for ( S32 i = 0; i < startPlaneCount; i++ )
       used[i] = i;
 
    for ( S32 i = 0; i < faceCount; i++ )
@@ -925,16 +925,16 @@ void ConvexShape::cullEmptyPlanes( Vector< U32 > *removedPlanes )
 
    for ( S32 i = 0; i < startPlaneCount; i++ )
    {
-      if ( used[i] != -1 )      
+      if ( used[i] != -1 )
          removedPlanes->push_back( used[i] );
    }
-   
+
    dQsort( removedPlanes->address(), removedPlanes->size(), sizeof( U32 ), sortDescendingU32 );
 
    for ( S32 i = 0; i < removedPlanes->size(); i++ )
    {
       mPlanes.erase( (*removedPlanes)[i] );
-      mSurfaces.erase( (*removedPlanes)[i] );      
+      mSurfaces.erase( (*removedPlanes)[i] );
    }
 
    delete [] used;
@@ -964,11 +964,11 @@ void ConvexShape::resizePlanes( const Point3F &size )
 
       F32 sign = ( mPlanes[i].d > 0.0f ) ? 1.0f : -1.0f;
       mPlanes[i].d = mFabs(lim.z) * 0.5f * sign;
-      
-      //mPlanes[i].d = -lim.z * 0.5f;      
+
+      //mPlanes[i].d = -lim.z * 0.5f;
 
       mSurfaces[i].setPosition( mPlanes[i].getPosition() );
-   }   
+   }
 }
 
 void ConvexShape::getSurfaceLineList( S32 surfId, Vector< Point3F > &lineList )
@@ -996,14 +996,14 @@ void ConvexShape::getSurfaceLineList( S32 surfId, Vector< Point3F > &lineList )
    if ( pointList.size() == 0 )
       return;
 
-   for ( S32 i = 0; i < face.winding.size(); i++ )   
+   for ( S32 i = 0; i < face.winding.size(); i++ )
       lineList.push_back( pointList[ face.points[ face.winding[i] ] ] );
-   
+
    lineList.push_back( pointList[ face.points[ face.winding.first() ] ] );
 }
 
 void ConvexShape::_updateMaterial()
-{   
+{
    // If the material name matches then don't bother updating it.
    if ( mMaterialInst && mMaterialName.equal( mMaterialInst->getMaterial()->getName(), String::NoCase ) )
       return;
@@ -1011,7 +1011,7 @@ void ConvexShape::_updateMaterial()
    SAFE_DELETE( mMaterialInst );
 
    Material *material;
-   
+
    if ( !Sim::findObject( mMaterialName, material ) )
       Sim::findObject( "WarningMaterial", material );
 
@@ -1038,13 +1038,13 @@ void ConvexShape::_updateGeometry( bool updateCollision )
 {
    mPlanes.clear();
 
-   for ( S32 i = 0; i < mSurfaces.size(); i++ )   
+   for ( S32 i = 0; i < mSurfaces.size(); i++ )
       mPlanes.push_back( PlaneF( mSurfaces[i].getPosition(), mSurfaces[i].getUpVector() ) );
 
 	Vector< Point3F > tangents;
 	for ( S32 i = 0; i < mSurfaces.size(); i++ )
 		tangents.push_back( mSurfaces[i].getRightVector() );
-   
+
    mGeometry.generate( mPlanes, tangents );
 
    AssertFatal( mGeometry.faces.size() <= mSurfaces.size(), "Got more faces than planes?" );
@@ -1059,10 +1059,10 @@ void ConvexShape::_updateGeometry( bool updateCollision )
 
    mPlanes.clear();
 
-   for ( S32 i = 0; i < mSurfaces.size(); i++ )   
+   for ( S32 i = 0; i < mSurfaces.size(); i++ )
       mPlanes.push_back( PlaneF( mSurfaces[i].getPosition(), mSurfaces[i].getUpVector() ) );
 
-   // Update bounding box.   
+   // Update bounding box.
    updateBounds( false );
 
 	mVertexBuffer = NULL;
@@ -1077,17 +1077,17 @@ void ConvexShape::_updateGeometry( bool updateCollision )
    if ( isServerObject() )
       return;
 
-   if ( faceList.empty() )   
+   if ( faceList.empty() )
       return;
 
 
 	// Get total vert and prim count.
 
-	for ( S32 i = 0; i < faceList.size(); i++ )	
+	for ( S32 i = 0; i < faceList.size(); i++ )
 	{
 		U32 count = faceList[i].triangles.size();
 		mPrimCount += count;
-		mVertCount += count * 3;		
+		mVertCount += count * 3;
 	}
 
 	// Allocate VB and copy in data.
@@ -1110,14 +1110,14 @@ void ConvexShape::_updateGeometry( bool updateCollision )
 			{
 				pVert->normal = face.normal;
 				pVert->tangent = face.tangent;
-				pVert->color = faceColor;			
+				pVert->color = faceColor;
 				pVert->point = pointList[ facePntMap[ triangles[j][k] ] ];
 				pVert->texCoord = face.texcoords[ triangles[j][k] ];
 
 				pVert++;
 			}
-		}		
-	}	
+		}
+	}
 
 	mVertexBuffer.unlock();
 
@@ -1157,10 +1157,10 @@ void ConvexShape::_updateCollision()
       rawPoints.push_back( p );
    }
 
-   // The convex generation from a point cloud 
+   // The convex generation from a point cloud
    // can fail at times... give up in that case.
-   if ( !colShape->addConvex(    mGeometry.points.address(), 
-                                 mGeometry.points.size(), 
+   if ( !colShape->addConvex(    mGeometry.points.address(),
+                                 mGeometry.points.size(),
                                  MatrixF::Identity ) )
    {
       delete colShape;
@@ -1176,7 +1176,7 @@ void ConvexShape::_updateCollision()
 }
 
 void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *mat )
-{   
+{
    GFXDrawUtil *drawer = GFX->getDrawUtil();
 
    GFX->setTexture( 0, NULL );
@@ -1185,8 +1185,8 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    if ( false )
    {
       Box3F wbox( mWorldBox );
-      //if ( getServerObject() )      
-      //   Box3F wbox = static_cast<ConvexShape*>( getServerObject() )->mWorldBox;      
+      //if ( getServerObject() )
+      //   Box3F wbox = static_cast<ConvexShape*>( getServerObject() )->mWorldBox;
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
       desc.setFillModeWireframe();
@@ -1219,28 +1219,28 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 
 
       for ( S32 i = 0; i < faceList.size(); i++ )
-      {         
+      {
          const ConvexShape::Face &face = faceList[i];
-         
+
          const Vector< ConvexShape::Edge > &edgeList = face.edges;
 
          const Vector< U32 > &facePntList = face.points;
 
          PrimBuild::begin( GFXLineList, edgeList.size() * 2 );
-         
+
          PrimBuild::color( ColorI::WHITE * 0.8f );
 
-         for ( S32 j = 0; j < edgeList.size(); j++ )         
+         for ( S32 j = 0; j < edgeList.size(); j++ )
          {
             PrimBuild::vertex3fv( pointList[ facePntList[ edgeList[j].p0 ] ] - camFvec * 0.001f );
             PrimBuild::vertex3fv( pointList[ facePntList[ edgeList[j].p1 ] ] - camFvec * 0.001f );
          }
-         
+
          PrimBuild::end();
       }
    }
 
-   ColorI faceColorsx[4] = 
+   ColorI faceColorsx[4] =
    {
       ColorI( 255, 0, 0 ),
       ColorI( 0, 255, 0 ),
@@ -1256,7 +1256,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    {
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
-      
+
       Point3F size( 0.1f );
 
       for ( S32 i = 0; i < faceList.size(); i++ )
@@ -1266,7 +1266,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
          if ( div > 0 )
             color /= div;
          color.alpha = 255;
-         
+
          Point3F pnt;
          objToWorld.mulP( faceList[i].centroid, &pnt );
          drawer->drawCube( desc, size, pnt, color, NULL );
@@ -1279,14 +1279,14 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
       desc.setZReadWrite( true, false );
-      GFX->setStateBlockByDesc( desc );  
+      GFX->setStateBlockByDesc( desc );
 
       U32 pointCount = 0;
-      for ( S32 i = 0; i < faceList.size(); i++ )      
-         pointCount += faceList[i].winding.size();      
+      for ( S32 i = 0; i < faceList.size(); i++ )
+         pointCount += faceList[i].winding.size();
 
       PrimBuild::begin( GFXLineList, pointCount * 2 );
-      
+
       for ( S32 i = 0; i < faceList.size(); i++ )
       {
          for ( S32 j = 0; j < faceList[i].winding.size(); j++ )
@@ -1302,11 +1302,11 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
             if ( div > 0 )
                color /= div;
             color.alpha = 255;
-            
+
             PrimBuild::color( color );
-            PrimBuild::vertex3fv( p0 );            
+            PrimBuild::vertex3fv( p0 );
             PrimBuild::color( color );
-            PrimBuild::vertex3fv( p1 );                        
+            PrimBuild::vertex3fv( p1 );
          }
       }
 
@@ -1315,7 +1315,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 
    // Render Points.
    if ( false )
-   {      
+   {
       /*
       GFXTransformSaver saver;
 
@@ -1346,7 +1346,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
          renderMat.mul( objToWorld, mSurfaces[i] );
 
          renderMat.setPosition( renderMat.getPosition() + renderMat.getUpVector() * 0.001f );
-              
+
          drawer->drawTransform( desc, renderMat, &scale, NULL );
       }
    }
@@ -1393,7 +1393,7 @@ void ConvexShape::renderFaceEdges( S32 faceid, const ColorI &color /*= ColorI::W
 
       PrimBuild::color( color );
 
-      for ( S32 j = 0; j < edgeList.size(); j++ )         
+      for ( S32 j = 0; j < edgeList.size(); j++ )
       {
          PrimBuild::vertex3fv( pointList[ facePntList[ edgeList[j].p0 ] ] );
          PrimBuild::vertex3fv( pointList[ facePntList[ edgeList[j].p1 ] ] );
@@ -1432,7 +1432,7 @@ void ConvexShape::getSurfaceTriangles( S32 surfId, Vector< Point3F > *outPoints,
       for ( S32 j = 0; j < 3; j++ )
       {
          Point3F pnt( pointList[ face.points[ face.triangles[i][j] ] ] );
-         
+
          objToSurf.mulP( pnt );
          pnt *= surfScale;
          surfToObj.mulP( pnt );
@@ -1449,8 +1449,8 @@ void ConvexShape::getSurfaceTriangles( S32 surfId, Vector< Point3F > *outPoints,
       MatrixF objToWorld( mObjToWorld );
       objToWorld.scale( mObjScale );
 
-      for ( S32 i = 0; i < outPoints->size(); i++ )      
-         objToWorld.mulP( (*outPoints)[i] );      
+      for ( S32 i = 0; i < outPoints->size(); i++ )
+         objToWorld.mulP( (*outPoints)[i] );
    }
 }
 void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vector< Point3F > &tangents )
@@ -1458,7 +1458,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
    PROFILE_SCOPE( Geometry_generate );
 
    points.clear();
-   faces.clear();	
+   faces.clear();
 
    AssertFatal( planes.size() == tangents.size(), "ConvexShape - incorrect plane/tangent count." );
 
@@ -1473,16 +1473,16 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 
    const U32 planeCount = planes.size();
 
-   Point3F linePt, lineDir;   
+   Point3F linePt, lineDir;
 
    for ( S32 i = 0; i < planeCount; i++ )
-   {      
+   {
       Vector< MathUtils::Line > collideLines;
 
       // Find the lines defined by the intersection of this plane with all others.
 
       for ( S32 j = 0; j < planeCount; j++ )
-      {         
+      {
          if ( i == j )
             continue;
 
@@ -1491,8 +1491,8 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
             collideLines.increment();
             MathUtils::Line &line = collideLines.last();
             line.origin = linePt;
-            line.direction = lineDir;   
-         }         
+            line.direction = lineDir;
+         }
       }
 
       if ( collideLines.empty() )
@@ -1501,7 +1501,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
       // Find edges and points defined by the intersection of these lines.
       // As we find them we fill them into our working ConvexShape::Face
       // structure.
-      
+
       Face newFace;
 
       for ( S32 j = 0; j < collideLines.size(); j++ )
@@ -1539,7 +1539,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 
          // Push back collision points into our points vector
          // if they are not duplicates and determine the id
-         // index for those points to be used by Edge(s).    
+         // index for those points to be used by Edge(s).
 
          const Point3F &pnt0 = collidePoints[0];
          const Point3F &pnt1 = collidePoints[1];
@@ -1566,7 +1566,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 
          if ( idx0 == -1 )
          {
-            points.push_back( pnt0 );               
+            points.push_back( pnt0 );
             idx0 = points.size() - 1;
          }
 
@@ -1585,7 +1585,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
          ConvexShape::Edge &newEdge = newFace.edges.last();
          newEdge.p0 = localIdx0;
          newEdge.p1 = localIdx1;
-      }    
+      }
 
       if ( newFace.points.size() < 3 )
          continue;
@@ -1602,7 +1602,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 
 		// Make a working array of Point3Fs on this face.
 
-		U32 pntCount = newFace.points.size();		
+		U32 pntCount = newFace.points.size();
 		Point3F *workPoints = new Point3F[ pntCount ];
 
 		for ( S32 j = 0; j < pntCount; j++ )
@@ -1616,7 +1616,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 		for ( S32 j = 0; j < pntCount; j++ )
 			averagePnt += workPoints[j];
 
-		averagePnt /= pntCount;		
+		averagePnt /= pntCount;
 
 
 		// Sort points in correct winding order.
@@ -1630,7 +1630,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
       quadMat.setColumn( 2, newFace.normal );
 		quadMat.inverse();
 
-      // Transform working points into quad space 
+      // Transform working points into quad space
       // so we can work with them as 2D points.
 
       for ( S32 j = 0; j < pntCount; j++ )
@@ -1651,20 +1651,20 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
          S32 k = ( j + 1 ) % pntCount;
          const Point3F &p0 = workPoints[ vertMap[j] ];
          const Point3F &p1 = workPoints[ vertMap[k] ];
-         
+
          // Note that this calculation returns positive area for clockwise winding
          // and negative area for counterclockwise winding.
          newFace.area += p0.y * p1.x;
-         newFace.area -= p0.x * p1.y;                  
+         newFace.area -= p0.x * p1.y;
       }
 
       //AssertFatal( newFace.area > 0.0f, "ConvexShape - face area was not positive." );
       if ( newFace.area > 0.0f )
-         newFace.area /= 2.0f;      
+         newFace.area /= 2.0f;
 
       F32 factor;
       F32 cx = 0.0f, cy = 0.0f;
-      
+
       for ( S32 j = 0; j < pntCount; j++ )
       {
          S32 k = ( j + 1 ) % pntCount;
@@ -1675,7 +1675,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
          cx += ( p0.x + p1.x ) * factor;
          cy += ( p0.y + p1.y ) * factor;
       }
-      
+
       factor = 1.0f / ( newFace.area * 6.0f );
       newFace.centroid.set( cx * factor, cy * factor, 0.0f );
       quadMat.inverse();
@@ -1736,7 +1736,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
       /*
       for ( S32 j = 0; j < triCount; j++ )
       {
-         F32 area = MathUtils::mTriangleArea( points[ newFace.points[ newFace.triangles[j][0] ] ], 
+         F32 area = MathUtils::mTriangleArea( points[ newFace.points[ newFace.triangles[j][0] ] ],
                                               points[ newFace.points[ newFace.triangles[j][1] ] ],
                                               points[ newFace.points[ newFace.triangles[j][2] ] ] );
          AssertFatal( area > 0.0f, "ConvexShape - triangle winding bad." );
@@ -1745,7 +1745,7 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 
 
       // Done with this Face.
-      
+
       faces.push_back( newFace );
    }
 }

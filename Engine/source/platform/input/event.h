@@ -262,7 +262,7 @@ enum InputObjectInstancesEnum
    XI_DPAD_DOWN      = 0x308,
    XI_DPAD_LEFT      = 0x309,
    XI_DPAD_RIGHT     = 0x310,*/
-   
+
    XI_START          = 0x311,
    XI_BACK           = 0x312,
    XI_LEFT_THUMB     = 0x313,
@@ -427,7 +427,7 @@ struct InputEventInfo
 
    /// ASCII character code if this is a keyboard event.
    U16 ascii;
-   
+
    /// Modifiers to action: SI_LSHIFT, SI_LCTRL, etc.
    InputModifiers modifier;
 
@@ -521,7 +521,7 @@ protected:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "InputEventManager"; }   
+   static const char* getSingletonName() { return "InputEventManager"; }
 };
 
 /// Returns the InputEventManager singleton.

@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(ERoadEditorSelectModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "RoadEditorSelectMode";
@@ -32,8 +32,8 @@
       bitmap = "tools/gui/images/menubar/arrow";
       buttonType = "RadioButton";
       useMouseEvents = "0";
-   }; 
-   
+   };
+
    new GuiBitmapButtonCtrl(ERoadEditorMoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "RoadEditorMoveMode";
@@ -55,7 +55,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(ERoadEditorScaleModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "RoadEditorScaleMode";
@@ -119,7 +119,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(ERoadEditorRemoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "RoadEditorRemovePointMode";

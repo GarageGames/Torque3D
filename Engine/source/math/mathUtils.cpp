@@ -54,9 +54,9 @@ F32 segmentSegmentNearest(const Point3F & p1, const Point3F & q1, const Point3F 
    F32 a = mDot(d1,d1);
    F32 e = mDot(d2,d2);
    F32 f = mDot(d2,r);
-   
+
    const F32 EPSILON = 0.001f;
-   
+
    if (a <= EPSILON && e <= EPSILON)
    {
       s = t = 0.0f;
@@ -64,7 +64,7 @@ F32 segmentSegmentNearest(const Point3F & p1, const Point3F & q1, const Point3F 
       c2 = p2;
       return mDot(c1-c2,c1-c2);
    }
-   
+
    if (a <= EPSILON)
    {
       s = 0.0f;
@@ -101,7 +101,7 @@ F32 segmentSegmentNearest(const Point3F & p1, const Point3F & q1, const Point3F 
             t = tnom/e;
       }
    }
-   
+
    c1 = p1 + d1*s;
    c2 = p2 + d2*t;
    return mDot(c1-c2,c1-c2);
@@ -145,7 +145,7 @@ bool capsuleSphereNearestOverlap(const Point3F & A0, const Point3F A1, F32 radA,
       t=0;
       return true;
    }
-   return false;   
+   return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ void vectorRotateZAxis( Point3F &vector, F32 radians )
    F32 x = cos * vector.x - sin * vector.y;
    F32 y = sin * vector.x + cos * vector.y;
    vector.x = x;
-   vector.y = y;     
+   vector.y = y;
 }
 
 void vectorRotateZAxis( F32 radians, Point3F *vectors, U32 count )
@@ -172,7 +172,7 @@ void vectorRotateZAxis( F32 radians, Point3F *vectors, U32 count )
       x = cos * vectors->x - sin * vectors->y;
       y = sin * vectors->x + cos * vectors->y;
       vectors->x = x;
-      vectors->y = y;      
+      vectors->y = y;
    }
 }
 
@@ -192,7 +192,7 @@ MatrixF createOrientFromDir( const Point3F &direction )
 	Point3F j = direction;
 	Point3F k(0.0f, 0.0f, 1.0f);
 	Point3F i;
-	
+
 	mCross( j, k, &i );
 
 	if( i.magnitudeSafe() == 0.0f )
@@ -408,10 +408,10 @@ void transformBoundingBox(const Box3F &sbox, const MatrixF &mat, const Point3F s
 
 //-----------------------------------------------------------------------------
 
-bool mProjectWorldToScreen(   const Point3F &in, 
-                              Point3F *out, 
-                              const RectI &view, 
-                              const MatrixF &world, 
+bool mProjectWorldToScreen(   const Point3F &in,
+                              Point3F *out,
+                              const RectI &view,
+                              const MatrixF &world,
                               const MatrixF &projection )
 {
    MatrixF worldProjection = projection;
@@ -422,9 +422,9 @@ bool mProjectWorldToScreen(   const Point3F &in,
 
 //-----------------------------------------------------------------------------
 
-bool mProjectWorldToScreen(   const Point3F &in, 
-                              Point3F *out, 
-                              const RectI &view, 
+bool mProjectWorldToScreen(   const Point3F &in,
+                              Point3F *out,
+                              const RectI &view,
                               const MatrixF &worldProjection )
 {
    Point4F temp(in.x,in.y,in.z,1.0f);
@@ -444,7 +444,7 @@ bool mProjectWorldToScreen(   const Point3F &in,
    out->y = (1.0f - temp.y) / 2.0f * view.extent.y + view.point.y;
    out->z = temp.z;
 
-   if ( out->z < 0.0f || out->z > 1.0f || 
+   if ( out->z < 0.0f || out->z > 1.0f ||
         out->x < (F32)view.point.x || out->x > (F32)view.point.x + (F32)view.extent.x ||
         out->y < (F32)view.point.y || out->y > (F32)view.point.y + (F32)view.extent.y )
       return false;
@@ -454,12 +454,12 @@ bool mProjectWorldToScreen(   const Point3F &in,
 
 //-----------------------------------------------------------------------------
 
-void mProjectScreenToWorld(   const Point3F &in, 
-                              Point3F *out, 
-                              const RectI &view, 
-                              const MatrixF &world, 
-                              const MatrixF &projection, 
-                              F32 zfar, 
+void mProjectScreenToWorld(   const Point3F &in,
+                              Point3F *out,
+                              const RectI &view,
+                              const MatrixF &world,
+                              const MatrixF &projection,
+                              F32 zfar,
                               F32 znear )
 {
    MatrixF invWorldProjection = projection;
@@ -483,17 +483,17 @@ void mProjectScreenToWorld(   const Point3F &in,
 bool pointInPolygon( const Point2F *verts, U32 vertCount, const Point2F &testPt )
 {
   U32 i, j, c = 0;
-  for ( i = 0, j = vertCount-1; i < vertCount; j = i++ ) 
+  for ( i = 0, j = vertCount-1; i < vertCount; j = i++ )
   {
     if ( ( ( verts[i].y > testPt.y ) != ( verts[j].y > testPt.y ) ) &&
-	         ( testPt.x <   ( verts[j].x - verts[i].x ) * 
-                           ( testPt.y - verts[i].y ) / 
+	         ( testPt.x <   ( verts[j].x - verts[i].x ) *
+                           ( testPt.y - verts[i].y ) /
                            ( verts[j].y - verts[i].y ) + verts[i].x ) )
        c = !c;
   }
-  
+
   return c != 0;
-}  
+}
 
 //-----------------------------------------------------------------------------
 
@@ -790,7 +790,7 @@ Point3F mClosestPointOnSegment( const Point3F &a, const Point3F &b, const Point3
 //-----------------------------------------------------------------------------
 
 void mShortestSegmentBetweenLines( const Line &line0, const Line &line1, LineSegment *outSegment )
-{   
+{
    // compute intermediate parameters
    Point3F w0 = line0.origin - line1.origin;
    F32 a = mDot( line0.direction, line0.direction );
@@ -818,7 +818,7 @@ void mShortestSegmentBetweenLines( const Line &line0, const Line &line1, LineSeg
 U32 greatestCommonDivisor( U32 u, U32 v )
 {
    // http://en.wikipedia.org/wiki/Binary_GCD_algorithm
-      
+
    int shift;
 
    /* GCD(0,x) := x */
@@ -857,7 +857,7 @@ U32 greatestCommonDivisor( U32 u, U32 v )
 
 //-----------------------------------------------------------------------------
 
-bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2, 
+bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2,
                            const Point3F &t1, const Point3F &t2, const Point3F &t3,
                            Point3F *outUVW, F32 *outT )
 {
@@ -872,7 +872,7 @@ bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2,
    // Compute denominator d. If d <= 0, segment is parallel to or points
    // away from triangle, so exit early
    F32 d = mDot( qp, n );
-   if ( d <= 0.0f ) 
+   if ( d <= 0.0f )
       return false;
 
    // Compute intersection t value of pq with plane of triangle. A ray
@@ -880,9 +880,9 @@ bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2,
    // dividing by d until intersection has been found to pierce triangle
    VectorF ap = p1 - t1;
    F32 t = mDot( ap, n );
-   if ( t < 0.0f ) 
-      return false;      
-   if ( t > d ) 
+   if ( t < 0.0f )
+      return false;
+   if ( t > d )
       return false; // For segment; exclude this code line for a ray test
 
    // Compute barycentric coordinate components and test if within bounds
@@ -891,16 +891,16 @@ bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2,
    if ( v < 0.0f || v > d )
       return false;
    F32 w = -mDot( ab, e );
-   if ( w < 0.0f || v + w > d ) 
+   if ( w < 0.0f || v + w > d )
       return false;
 
    // Segment/ray intersects triangle. Perform delayed division and
    // compute the last barycentric coordinate component
    const F32 ood = 1.0f / d;
-   
+
    if ( outT )
       *outT = t * ood;
-      
+
    if ( outUVW )
    {
       v *= ood;
@@ -913,8 +913,8 @@ bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2,
 
 //-----------------------------------------------------------------------------
 
-bool mRayQuadCollide(   const Quad &quad, 
-                        const Ray &ray, 
+bool mRayQuadCollide(   const Quad &quad,
+                        const Ray &ray,
                         Point2F *outUV,
                         F32 *outT )
 {
@@ -934,8 +934,8 @@ bool mRayQuadCollide(   const Quad &quad,
    VectorF e01 = quad.p10 - quad.p00;
    VectorF e03 = quad.p01 - quad.p00;
 
-   // If the ray is perfectly perpendicular to e03, which 
-   // represents the entire planes tangent, then the 
+   // If the ray is perfectly perpendicular to e03, which
+   // represents the entire planes tangent, then the
    // result of this cross product (P) will equal e01
    // If it is parallel it will result in a vector opposite e01.
 
@@ -953,7 +953,7 @@ bool mRayQuadCollide(   const Quad &quad,
 
    // Take a Abs of the dot because we do not care if the ray is heading up or down,
    // but if it is perfectly parallel to the quad we want to reject it.
-   if ( mFabs(det) < eps ) 
+   if ( mFabs(det) < eps )
       return false;
 
    F32 inv_det = 1.0f / det;
@@ -965,7 +965,7 @@ bool mRayQuadCollide(   const Quad &quad,
    // P is the cross product of the ray and e01, which should be "roughly"
    // parallel with e03 but might be of either positive or negative magnitude.
    F32 alpha = mDot(T, P) * inv_det;
-   if ( alpha < 0.0f ) 
+   if ( alpha < 0.0f )
       return false;
 
    // if (alpha > real(1.0)) return false; // Uncomment if VR is used.
@@ -974,12 +974,12 @@ bool mRayQuadCollide(   const Quad &quad,
    // and of either positive or negative magnitude.
    VectorF Q = mCross(T, e01);
    F32 beta = mDot(ray.direction, Q) * inv_det;
-   if ( beta < 0.0f ) 
-      return false; 
+   if ( beta < 0.0f )
+      return false;
 
    // if (beta > real(1.0)) return false; // Uncomment if VR is used.
 
-   if ( alpha + beta > 1.0f ) 
+   if ( alpha + beta > 1.0f )
    //if ( false )
    {
       // Rejects rays that intersect the plane of Q either on the
@@ -989,16 +989,16 @@ bool mRayQuadCollide(   const Quad &quad,
       VectorF e21 = quad.p10 - quad.p11;
       VectorF P_prime = mCross(ray.direction, e21);
       F32 det_prime = mDot(e23, P_prime);
-      if ( mFabs(det_prime) < eps) 
+      if ( mFabs(det_prime) < eps)
          return false;
       F32 inv_det_prime = 1.0f / det_prime;
       VectorF T_prime = ray.origin - quad.p11;
       F32 alpha_prime = mDot(T_prime, P_prime) * inv_det_prime;
-      if (alpha_prime < 0.0f) 
+      if (alpha_prime < 0.0f)
          return false;
       VectorF Q_prime = mCross(T_prime, e23);
       F32 beta_prime = mDot(ray.direction, Q_prime) * inv_det_prime;
-      if (beta_prime < 0.0f) 
+      if (beta_prime < 0.0f)
          return false;
    }
 
@@ -1006,31 +1006,31 @@ bool mRayQuadCollide(   const Quad &quad,
    // reject the ray if it does not hit Q.
 
    F32 t = mDot(e03, Q) * inv_det;
-   if ( t < 0.0f ) 
-      return false; 
+   if ( t < 0.0f )
+      return false;
 
 
    // Compute the barycentric coordinates of the fourth vertex.
    // These do not depend on the ray, and can be precomputed
-   // and stored with the quadrilateral.  
+   // and stored with the quadrilateral.
 
    F32 alpha_11, beta_11;
    VectorF e02 = quad.p11 - quad.p00;
    VectorF n = mCross(e01, e03);
 
-   if ( mFabs(n.x) >= mFabs(n.y) && 
+   if ( mFabs(n.x) >= mFabs(n.y) &&
       mFabs(n.x) >= mFabs(n.z) )
    {
       alpha_11 = ( e02.y * e03.z - e02.z * e03.y ) / n.x;
       beta_11  = ( e01.y * e02.z - e01.z * e02.y ) / n.x;
    }
-   else if ( mFabs(n.y) >= mFabs(n.x) && 
-      mFabs(n.y) >= mFabs(n.z) ) 
-   {  
+   else if ( mFabs(n.y) >= mFabs(n.x) &&
+      mFabs(n.y) >= mFabs(n.z) )
+   {
       alpha_11 = ((e02.z * e03.x) - (e02.x * e03.z)) / n.y;
       beta_11  = ((e01.z * e02.x) - (e01.x * e02.z)) / n.y;
    }
-   else 
+   else
    {
       alpha_11 = ((e02.x * e03.y) - (e02.y * e03.x)) / n.z;
       beta_11  = ((e01.x * e02.y) - (e01.y * e02.x)) / n.z;
@@ -1040,22 +1040,22 @@ bool mRayQuadCollide(   const Quad &quad,
 
    F32 u,v;
 
-   if ( mFabs(alpha_11 - 1.0f) < eps) 
-   {    
+   if ( mFabs(alpha_11 - 1.0f) < eps)
+   {
       // Q is a trapezium.
       u = alpha;
-      if ( mFabs(beta_11 - 1.0f) < eps) 
+      if ( mFabs(beta_11 - 1.0f) < eps)
          v = beta; // Q is a parallelogram.
-      else 
+      else
          v = beta / ((u * (beta_11 - 1.0f)) + 1.0f); // Q is a trapezium.
    }
-   else if ( mFabs(beta_11 - 1.0f) < eps) 
+   else if ( mFabs(beta_11 - 1.0f) < eps)
    {
       // Q is a trapezium.
       v = beta;
       u = alpha / ((v * (alpha_11 - 1.0f)) + 1.0f);
    }
-   else 
+   else
    {
       F32 A = 1.0f - beta_11;
       F32 B = (alpha * (beta_11 - 1.0f))
@@ -1065,15 +1065,15 @@ bool mRayQuadCollide(   const Quad &quad,
       F32 Q = -0.5f * (B + (B < 0.0f ? -1.0f : 1.0f) ) * mSqrt(D);
       u = Q / A;
       if ((u < 0.0f) || (u > 1.0f)) u = C / Q;
-      v = beta / ((u * (beta_11 - 1.0f)) + 1.0f); 
+      v = beta / ((u * (beta_11 - 1.0f)) + 1.0f);
    }
 
    if ( outUV )
-      outUV->set( u, v );  
+      outUV->set( u, v );
    if ( outT )
       *outT = t;
 
-   return true;  
+   return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1089,7 +1089,7 @@ struct QuadSortPoint
 int QSORT_CALLBACK cmpAngleAscending( const void *a, const void *b )
 {
    const QuadSortPoint *p0 = (const QuadSortPoint*)a;
-   const QuadSortPoint *p1 = (const QuadSortPoint*)b;   
+   const QuadSortPoint *p1 = (const QuadSortPoint*)b;
 
 	F32 diff = p1->theta - p0->theta;
 
@@ -1098,14 +1098,14 @@ int QSORT_CALLBACK cmpAngleAscending( const void *a, const void *b )
 	else if ( diff < 0.0f )
 		return 1;
 	else
-		return 0;   
+		return 0;
 }
 
 // Used by sortQuadWindingOrder.
 int QSORT_CALLBACK cmpAngleDescending( const void *a, const void *b )
 {
 	const QuadSortPoint *p0 = (const QuadSortPoint*)a;
-	const QuadSortPoint *p1 = (const QuadSortPoint*)b;   
+	const QuadSortPoint *p1 = (const QuadSortPoint*)b;
 
 	F32 diff = p1->theta - p0->theta;
 
@@ -1114,7 +1114,7 @@ int QSORT_CALLBACK cmpAngleDescending( const void *a, const void *b )
 	else if ( diff < 0.0f )
 		return -1;
 	else
-		return 0;   
+		return 0;
 }
 
 void sortQuadWindingOrder( const MatrixF &quadMat, bool clockwise, const Point3F *verts, U32 *vertMap, U32 count )
@@ -1122,12 +1122,12 @@ void sortQuadWindingOrder( const MatrixF &quadMat, bool clockwise, const Point3F
    PROFILE_SCOPE( MathUtils_sortQuadWindingOrder );
 
    if ( count == 0 )
-      return;   
-   
+      return;
+
    Point3F *quadPoints = new Point3F[count];
-   
-   for ( S32 i = 0; i < count; i++ )   
-	{		
+
+   for ( S32 i = 0; i < count; i++ )
+	{
       quadMat.mulP( verts[i], &quadPoints[i] );
 		quadPoints[i].normalizeSafe();
 	}
@@ -1156,7 +1156,7 @@ void sortQuadWindingOrder( bool clockwise, const Point3F *verts, U32 *vertMap, U
       sortPnt.theta = theta;
    }
 
-   dQsort( sortPoints, count, sizeof( QuadSortPoint ), clockwise ? cmpAngleDescending : cmpAngleAscending ); 
+   dQsort( sortPoints, count, sizeof( QuadSortPoint ), clockwise ? cmpAngleDescending : cmpAngleAscending );
 
    for ( S32 i = 0; i < count; i++ )
       vertMap[i] = sortPoints[i].id;
@@ -1167,13 +1167,13 @@ void sortQuadWindingOrder( bool clockwise, const Point3F *verts, U32 *vertMap, U
 //-----------------------------------------------------------------------------
 
 void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec, const VectorF *pos, MatrixF *outMat )
-{     
+{
    /// Work in Progress
 
    /*
-   AssertFatal( !rvec || rvec->isUnitLength(), "MathUtils::buildMatrix() - Right vector was not normalized!" );  
-   AssertFatal( !fvec || fvec->isUnitLength(), "MathUtils::buildMatrix() - Forward vector was not normalized!" );  
-   AssertFatal( !uvec || uvec->isUnitLength(), "MathUtils::buildMatrix() - Up vector was not normalized!" ); 
+   AssertFatal( !rvec || rvec->isUnitLength(), "MathUtils::buildMatrix() - Right vector was not normalized!" );
+   AssertFatal( !fvec || fvec->isUnitLength(), "MathUtils::buildMatrix() - Forward vector was not normalized!" );
+   AssertFatal( !uvec || uvec->isUnitLength(), "MathUtils::buildMatrix() - Up vector was not normalized!" );
 
    // Note this relationship:
    //
@@ -1182,7 +1182,7 @@ void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec,
    // Rvec     Fvec     Uvec
    //
 
-   enum 
+   enum
    {
       RVEC = 1,
       FVEC = 1 << 1,
@@ -1197,12 +1197,12 @@ void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec,
    if ( rvec )
    {
       mask |= RVEC;
-      axis0 == 0;      
+      axis0 == 0;
       count++;
    }
    if ( fvec )
    {
-      mask |= FVEC;      
+      mask |= FVEC;
       if ( count == 0 )
          axis0 = 1;
       else
@@ -1211,7 +1211,7 @@ void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec,
    }
    if ( uvec )
    {
-      mask |= UVEC;      
+      mask |= UVEC;
       count++;
    }
 
@@ -1223,10 +1223,10 @@ void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec,
    U8 bFU = bF | bU;
    U8 bRFU = bR | bF | bU;
 
-   
+
 
    // Cross product map.
-   U8 cpdMap[3][2] = 
+   U8 cpdMap[3][2] =
    {
       { 1, 2 },
       { 2, 0 },
@@ -1237,7 +1237,7 @@ void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec,
    {
       if ( mask == bR )
       {
-         
+
       }
       else if ( mask == bF )
       {
@@ -1276,8 +1276,8 @@ void buildMatrix( const VectorF *rvec, const VectorF *fvec, const VectorF *uvec,
       {
          outMat->setColumn( 1, *fvec );
 
-         if ( uvec )         
-            outMat->setColumn( 2, *uvec );         
+         if ( uvec )
+            outMat->setColumn( 2, *uvec );
          else
          {
             // Set uvec from rvec/fvec
@@ -1326,7 +1326,7 @@ bool reduceFrustum( const Frustum& frustum, const RectI& viewport, const RectF& 
 
    // If we have ended up without a visible region on the screen,
    // terminate now.
-   
+
    if(   mFloor( clampedMin.x ) == mFloor( clampedMax.x ) ||
          mFloor( clampedMin.y ) == mFloor( clampedMax.y ) )
       return false;
@@ -1352,7 +1352,7 @@ bool reduceFrustum( const Frustum& frustum, const RectI& viewport, const RectF& 
    if( normalizedMax.x - normalizedMin.x < 0.001f ||
        normalizedMax.y - normalizedMin.y < 0.001f )
       return false;
-   
+
    // Finally, create the new frustum using the original's frustum
    // information except its left/right/top/bottom planes.
    //
@@ -1380,8 +1380,8 @@ void makeFrustum( F32 *outLeft,
                   F32 *outRight,
                   F32 *outTop,
                   F32 *outBottom,
-                  F32 fovYInRadians, 
-                  F32 aspectRatio, 
+                  F32 fovYInRadians,
+                  F32 aspectRatio,
                   F32 nearPlane )
 {
    F32 top = nearPlane * mTan( fovYInRadians / 2.0 );
@@ -1395,10 +1395,10 @@ void makeFrustum( F32 *outLeft,
 
 //-----------------------------------------------------------------------------
 
-void makeProjection( MatrixF *outMatrix, 
-                     F32 fovYInRadians, 
-                     F32 aspectRatio, 
-                     F32 nearPlane, 
+void makeProjection( MatrixF *outMatrix,
+                     F32 fovYInRadians,
+                     F32 aspectRatio,
+                     F32 nearPlane,
                      F32 farPlane,
                      bool gfxRotate )
 {
@@ -1416,12 +1416,12 @@ void makeProjection( MatrixF *outMatrix,
 ///
 static const MatrixF sGFXProjRotMatrix( EulerF( (M_PI_F / 2.0f), 0.0f, 0.0f ) );
 
-void makeProjection( MatrixF *outMatrix, 
-                     F32 left, 
-                     F32 right, 
-                     F32 top, 
-                     F32 bottom, 
-                     F32 nearPlane, 
+void makeProjection( MatrixF *outMatrix,
+                     F32 left,
+                     F32 right,
+                     F32 top,
+                     F32 bottom,
+                     F32 nearPlane,
                      F32 farPlane,
                      bool gfxRotate )
 {
@@ -1459,12 +1459,12 @@ void makeProjection( MatrixF *outMatrix,
 
 //-----------------------------------------------------------------------------
 
-void makeOrthoProjection(  MatrixF *outMatrix, 
-                           F32 left, 
-                           F32 right, 
-                           F32 top, 
-                           F32 bottom, 
-                           F32 nearPlane, 
+void makeOrthoProjection(  MatrixF *outMatrix,
+                           F32 left,
+                           F32 right,
+                           F32 top,
+                           F32 bottom,
+                           F32 nearPlane,
                            F32 farPlane,
                            bool gfxRotate )
 {
@@ -1485,9 +1485,9 @@ void makeOrthoProjection(  MatrixF *outMatrix,
    row.y = 0.0f;
    row.w = 0.0f;
 
-   // This may need be modified to work with OpenGL (d3d has 0..1 
+   // This may need be modified to work with OpenGL (d3d has 0..1
    // projection for z, vs -1..1 in OpenGL)
-   row.z = 1.0f / (nearPlane - farPlane); 
+   row.z = 1.0f / (nearPlane - farPlane);
 
    outMatrix->setRow( 2, row );
 
@@ -1505,7 +1505,7 @@ void makeOrthoProjection(  MatrixF *outMatrix,
 
 //-----------------------------------------------------------------------------
 
-bool edgeFaceIntersect( const Point3F &edgeA, const Point3F &edgeB, 
+bool edgeFaceIntersect( const Point3F &edgeA, const Point3F &edgeB,
                         const Point3F &faceA, const Point3F &faceB, const Point3F &faceC, const Point3F &faceD, Point3F *intersection )
 {
    VectorF edgeAB = edgeB - edgeA;
@@ -1567,12 +1567,12 @@ bool isPlanarPolygon( const Point3F* vertices, U32 numVertices )
 
    // Triangles are always planar.  Letting smaller numVertices
    // slip through provides robustness for errors in release builds.
-   
+
    if( numVertices <= 3 )
       return true;
 
    // Compute the normal of the first triangle in the polygon.
-   
+
    Point3F triangle1Normal = mTriangleNormal( vertices[ 0 ], vertices[ 1 ], vertices[ 2 ] );
 
    // Now go through all the remaining vertices and build triangles
@@ -1613,7 +1613,7 @@ bool isConvexPolygon( const Point3F* vertices, U32 numVertices )
       const Point3F& c = vertices[ ( i + 2 ) % numVertices ];
 
       const F32 crossProductLength = mCross( b - a, c - b ).len();
-      
+
       if( crossProductLength < 0.f )
          numNegative ++;
       else if( crossProductLength > 0.f )
@@ -1795,7 +1795,7 @@ U32 extrudePolygonEdgesFromPoint( const Point3F* vertices, U32 numVertices, cons
          outPlanes[ numPlanes ] = PlaneF( v1, fromPoint, v2 );
       else
          outPlanes[ numPlanes ] = PlaneF( v2, fromPoint, v1 );
-      
+
       numPlanes ++;
 
       // If this is the first plane that we have created, find out whether

@@ -192,6 +192,6 @@ void Processor::init()
          Platform::SystemInfo.processor.numLogicalProcessors,
          Platform::SystemInfo.processor.numPhysicalProcessors );
    Con::printf(" ");
-   
+
    PlatformBlitInit();
 }

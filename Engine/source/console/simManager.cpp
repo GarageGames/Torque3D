@@ -117,15 +117,15 @@ U32 postEvent(SimObject *destObject, SimEvent* event,U32 time)
    event->sequenceCount = gEventSequence++;
    SimEvent **walk = &gEventQueue;
    SimEvent *current;
-   
+
    while((current = *walk) != NULL && (current->time < event->time))
       walk = &(current->nextEvent);
-   
+
    // [tom, 6/24/2005] This ensures that SimEvents are dispatched in the same order that they are posted.
    // This is needed to ensure Con::threadSafeExecute() executes script code in the correct order.
    while((current = *walk) != NULL && (current->time == event->time))
       walk = &(current->nextEvent);
-   
+
    event->nextEvent = current;
    *walk = event;
 
@@ -145,7 +145,7 @@ void cancelEvent(U32 eventSequence)
 
    SimEvent **walk = &gEventQueue;
    SimEvent *current;
-   
+
    while((current = *walk) != NULL)
    {
       if(current->sequenceCount == eventSequence)
@@ -168,7 +168,7 @@ void cancelPendingEvents(SimObject *obj)
 
    SimEvent **walk = &gEventQueue;
    SimEvent *current;
-   
+
    while((current = *walk) != NULL)
    {
       if(current->destObject == obj)
@@ -213,7 +213,7 @@ U32 getEventTimeLeft(U32 eventSequence)
 
    Mutex::unlockMutex(gEventQueueMutex);
 
-   return 0;   
+   return 0;
 }
 
 U32 getScheduleDuration(U32 eventSequence)
@@ -237,7 +237,7 @@ U32 getTimeSinceStart(U32 eventSequence)
 
 void advanceToTime(SimTime targetTime)
 {
-   AssertFatal(targetTime >= getCurrentTime(), 
+   AssertFatal(targetTime >= getCurrentTime(),
       "Sim::advanceToTime() - Target time is less than the current time." );
 
    Mutex::lockMutex(gEventQueueMutex);
@@ -291,7 +291,7 @@ static void initRoot()
 
    gRootGroup = new SimGroup();
    gRootGroup->incRefCount();
- 
+
    gRootGroup->setId(RootGroupId);
    gRootGroup->assignName("RootGroup");
    gRootGroup->registerObject();
@@ -450,11 +450,11 @@ String getUniqueName( const char *inName )
    #define MAX_TRIES 100
 
    for ( U32 i = 0; i < MAX_TRIES; i++ )
-   {   
+   {
       outName = String::ToString( "%s%d", nameStr.c_str(), suffixNumb );
 
       if ( !Sim::findObject( outName, dummy ) )
-         return outName;         
+         return outName;
 
       suffixNumb++;
    }
@@ -465,33 +465,33 @@ String getUniqueName( const char *inName )
 
 String getUniqueInternalName( const char *inName, SimSet *inSet, bool searchChildren )
 {
-   // Since SimSet::findObjectByInternalName operates with StringTableEntry(s) 
-   // we have to muck up the StringTable with our attempts. 
+   // Since SimSet::findObjectByInternalName operates with StringTableEntry(s)
+   // we have to muck up the StringTable with our attempts.
    // But then again, so does everywhere else.
 
    StringTableEntry outName = StringTable->insert( inName );
 
-   if ( !outName || !outName[0] )   
+   if ( !outName || !outName[0] )
       return String::EmptyString;
 
-   if ( !inSet->findObjectByInternalName( outName, searchChildren ) )   
+   if ( !inSet->findObjectByInternalName( outName, searchChildren ) )
       return String(outName);
 
    S32 suffixNumb = -1;
    String nameStr( String::GetTrailingNumber( outName, suffixNumb ) );
-   suffixNumb++;   
+   suffixNumb++;
 
    static char tempStr[512];
 
 #define MAX_TRIES 100
 
    for ( U32 i = 0; i < MAX_TRIES; i++ )
-   {   
+   {
       dSprintf( tempStr, 512, "%s%d", nameStr.c_str(), suffixNumb );
       outName = StringTable->insert( tempStr );
 
       if ( !inSet->findObjectByInternalName( outName, searchChildren ) )
-         return String(outName);         
+         return String(outName);
 
       suffixNumb++;
    }
@@ -504,14 +504,14 @@ bool isValidObjectName( const char* name )
 {
    if( !name || !name[ 0 ] )
       return true; // Anonymous object.
-      
+
    if( !dIsalpha( name[ 0 ] ) && name[ 0 ] != '_' )
       return false;
-      
+
    for( U32 i = 1; name[ i ]; ++ i )
       if( !dIsalnum( name[ i ] ) && name[ i ] != '_' )
          return false;
-         
+
    return true;
 }
 
@@ -562,17 +562,17 @@ void init()
    gDataBlockGroup = new SimDataBlockGroup();
    gDataBlockGroup->registerObject("DataBlockGroup");
    gRootGroup->addObject(gDataBlockGroup);
-   
+
    SimPersistID::init();
 }
 
 void shutdown()
 {
    sgIsShuttingDown = true;
-   
+
    shutdownRoot();
    shutdownEventQueue();
-   
+
    SimPersistID::shutdown();
 }
 

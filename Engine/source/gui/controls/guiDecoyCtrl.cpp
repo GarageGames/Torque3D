@@ -37,8 +37,8 @@ it can be used for other things, but to do anything more in depth; it has to be 
 Make sure you know a little about how guiCanvas hands out signals to gui controls before you tinker
 in this class.
 
-Been thinking about this class a little more. I tried pretty hard to protect this class into being 
-guiControl like agnostic. But I ended up adding a check specifically for buttons in the 
+Been thinking about this class a little more. I tried pretty hard to protect this class into being
+guiControl like agnostic. But I ended up adding a check specifically for buttons in the
 onMouseUp function. Its been protected with a dynamic_cast and a NULL check; but in the end, the only way
 too solve the main problem, that GuiCanvas cannot process more than one mouse action for more than one
 gui control at a time, is for it to get a rewrite.
@@ -71,10 +71,10 @@ void GuiDecoyCtrl::initPersistFields()
 void GuiDecoyCtrl::onMouseUp(const GuiEvent &event)
 {
 	mouseUnlock();
-	setUpdate();  
+	setUpdate();
 
 	//this code is pretty hacky. right now there is no way that guiCanvas will allow sending more than
-    //one signal to one gui control at a time. 
+    //one signal to one gui control at a time.
 	if(mIsDecoy == true)
 	{
 		mVisible = false;
@@ -103,7 +103,7 @@ void GuiDecoyCtrl::onMouseDown(const GuiEvent &event)
 {
 	if ( !mVisible || !mAwake )
       return;
-	
+
 	mouseLock();
 
 	if(mIsDecoy == true)
@@ -118,7 +118,7 @@ void GuiDecoyCtrl::onMouseDown(const GuiEvent &event)
 
 		mVisible = true;
 	}
-	
+
    execConsoleCallback();
    setUpdate();
 }
@@ -155,7 +155,7 @@ void GuiDecoyCtrl::onMouseMove(const GuiEvent &event)
 			mDecoyReference->onMouseLeave(event);
 			mMouseOverDecoy = false;
 		}
-		
+
 		mDecoyReference = tempControl;
 		mVisible = true;
    }

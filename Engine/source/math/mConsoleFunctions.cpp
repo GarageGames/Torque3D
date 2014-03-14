@@ -55,7 +55,7 @@ DefineConsoleFunction( mSolveCubic, const char*, ( F32 a, F32 b, F32 c, F32 d ),
     "@returns A 4-tuple, containing: (sol x0 x1 x2). (sol) is the number of solutions"
     "(being 0, 1, 2 or 3), and (x0), (x1) and (x2) are the solutions, if any."
     "@ingroup Math" )
-{    
+{
    F32 x[3];
    U32 sol = mSolveCubic( a, b, c, d, x );
 

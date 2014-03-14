@@ -74,14 +74,14 @@ function GuiEditorSelectDlg::onVisible( %this, %visible )
 {
    if( !%visible )
       return;
-      
+
    if( !%this.isInitialized )
    {
       %this.init();
       %this.isInitialized = true;
    }
-   
+
    // Re-initialize the group list on each wake.
-   
+
    %this.initGroupList();
 }

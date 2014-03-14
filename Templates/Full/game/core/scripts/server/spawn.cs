@@ -53,7 +53,7 @@ function pickCameraSpawnPoint(%spawnGroups)
    for (%i = 0; %i < getWordCount(%spawnGroups); %i++)
    {
       %group = getWord(%spawnGroups, %i);
-      
+
       %count = getWordCount(%group);
 
       if (isObject(%group))
@@ -151,7 +151,7 @@ function pickPlayerSpawnPoint(%spawnGroups)
       //%this.PathCamera.followPath(MenuPath);
       //MissionCleanup.add( %this.PathCamera);
       //%this.PathCamera.scopeToClient(%this);
-      //%this.setControlObject(%this.PathCamera);      
+      //%this.setControlObject(%this.PathCamera);
    //}
    //// If we have a camera then set up some properties
    //if (isObject(%this.camera))
@@ -263,7 +263,7 @@ function GameConnection::spawnPlayer(%this, %spawnPoint, %noControl)
          if (isDefined("%spawnDatablock"))
          {
                MessageBoxOK("Spawn Player Failed",
-                             "Unable to create a player with class " @ %spawnClass @ 
+                             "Unable to create a player with class " @ %spawnClass @
                              " and datablock " @ %spawnDatablock @ ".\n\nStarting as an Observer instead.",
                              %this @ ".spawnCamera();");
          }
@@ -280,7 +280,7 @@ function GameConnection::spawnPlayer(%this, %spawnPoint, %noControl)
    {
       // Create a default player
       %player = spawnObject($Game::DefaultPlayerClass, $Game::DefaultPlayerDataBlock);
-      
+
       if (!%player.isMemberOfClass("Player"))
          warn("Trying to spawn a class that does not derive from Player.");
 
@@ -334,7 +334,7 @@ function GameConnection::spawnPlayer(%this, %spawnPoint, %noControl)
    }
    else
       %control = %player;
-      
+
    if(!isDefined("%noControl"))
       %this.setControlObject(%control);
 }

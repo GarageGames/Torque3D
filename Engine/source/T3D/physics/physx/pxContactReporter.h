@@ -45,7 +45,7 @@ public:
 class PxUserNotify : public NxUserNotify
 {
 public:
-   virtual bool onJointBreak( NxReal breakingForce, NxJoint &brokenJoint );   
+   virtual bool onJointBreak( NxReal breakingForce, NxJoint &brokenJoint );
    virtual void onWake( NxActor **actors, NxU32 count ) {}
    virtual void onSleep ( NxActor **actors, NxU32 count ) {}
 };

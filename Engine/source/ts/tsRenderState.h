@@ -53,7 +53,7 @@ class LightQuery;
 /// @section TSRenderState_functionality What Does TSRenderState Do?
 ///
 /// TSRenderState is a simple class that performs the function of passing along
-/// (from the prep function(s) to the actual submission) the data 
+/// (from the prep function(s) to the actual submission) the data
 /// needed for the desired state of rendering.
 ///
 /// @section TSRenderState_example Usage Example
@@ -65,7 +65,7 @@ class LightQuery;
 class TSRenderState
 {
 protected:
-   
+
    const SceneRenderState *mState;
 
    GFXCubemap *mCubemap;
@@ -86,7 +86,7 @@ protected:
    bool mNoRenderNonTranslucent;
 
    /// A generic hint value passed from the game
-   /// code down to the material for use by shader 
+   /// code down to the material for use by shader
    /// features.
    void *mMaterialHint;
 

@@ -53,7 +53,7 @@ public:
    };
    RequestCounts *rc;
    #endif
-   
+
    StringBuffer();
    StringBuffer(const StringBuffer &copy);
    StringBuffer(const StringBuffer *in);
@@ -66,12 +66,12 @@ public:
    void append(const UTF8*  in);
    void append(const UTF16* in);
    void append(const UTF16* in, U32 len);
-   
+
    void insert(const U32 charOffset, const StringBuffer &in);
    void insert(const U32 charOffset, const UTF8*  in);
    void insert(const U32 charOffset, const UTF16* in);
    void insert(const U32 charOffset, const UTF16* in, const U32 len);
-   
+
    /// Get a StringBuffer substring of length 'len' starting from 'start'.
    /// Returns a new StringBuffer by value;
    StringBuffer substring(const U32 start, const U32 len) const;
@@ -82,20 +82,20 @@ public:
    /// This follows the "create rule".
    UTF8*        createSubstring8(const U32 start, const U32 len) const;
    UTF16*       createSubstring16(const U32 start, const U32 len) const;
-   
+
    void    cut(const U32 start, const U32 len);
 //   UTF8*   cut8(const U32 start, const U32 len);
 //   UTF16*  cut16(const U32 start, const U32 len);
 
    const UTF16 getChar(const U32 offset) const;
    void setChar(const U32 offset, UTF16 c);
-   
+
    void set(const StringBuffer *in);
    void set(const UTF8  *in);
    void set(const UTF16 *in);
 
-   inline const U32 length() const 
-   { 
+   inline const U32 length() const
+   {
       return mBuffer.size() - 1; // Don't count the NULL of course.
    }
 
@@ -108,13 +108,13 @@ public:
 
    void getCopy8(UTF8 *buff, const U32 buffSize) const;
    void getCopy(UTF16 *buff, const U32 buffSize) const;
-   
+
    /// Get a copy of the contents of the string buffer.
    /// You must delete[] the returned copy when you are done with it.
    /// This follows the "create rule".
    UTF8*  createCopy8() const;
    UTF16* createCopy() const;
-   
+
    /// Get a pointer to the StringBuffer's data store.
    /// Use this in situations where you can be sure that the StringBuffer will
    /// not be modified out from under you.
@@ -128,7 +128,7 @@ private:
    #if defined(TORQUE_DEBUG)
    void clearRequestCounts() { rc->requestCount16 = 0; rc->requestCount8 = 0; }
    #endif
-   
+
 };
 
 #endif

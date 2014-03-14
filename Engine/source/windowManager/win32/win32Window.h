@@ -61,7 +61,7 @@ private:
 
    /// Which window comes next in list?
    Win32Window *mNextWindow;
-   
+
    /// @}
 
    /// @name Window Information
@@ -142,7 +142,7 @@ public:
       return mMenuHandle;
    }
 
-   void setMenuHandle( HMENU menuHandle ) 
+   void setMenuHandle( HMENU menuHandle )
    {
       mMenuHandle = menuHandle;
       if(!mFullscreen)
@@ -162,20 +162,20 @@ public:
 
    virtual GFXDevice *getGFXDevice();
    virtual GFXWindowTarget *getGFXTarget();
-   
+
    virtual void setVideoMode(const GFXVideoMode &mode);
    virtual const GFXVideoMode &getVideoMode();
    virtual bool clearFullscreen();
    virtual bool isFullscreen();
    virtual void _setFullscreen(const bool fullscreen);
-   
+
    virtual bool setCaption(const char *cap);
    virtual const char *getCaption();
-   
+
    // Window Client Area Extent
    virtual void setClientExtent( const Point2I newExtent );
    virtual const Point2I getClientExtent();
-  
+
    // Window Bounds
    virtual void setBounds(const RectI &newBounds);
    virtual const RectI getBounds() const;
@@ -185,7 +185,7 @@ public:
    virtual const Point2I getPosition();
    virtual void centerWindow();
    virtual bool setSize(const Point2I &newSize);
-   
+
    // Coordinate space conversion.
    virtual Point2I clientToScreen( const Point2I& pos );
    virtual Point2I screenToClient( const Point2I& pos );

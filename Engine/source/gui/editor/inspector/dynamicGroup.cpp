@@ -57,7 +57,7 @@ bool GuiInspectorDynamicGroup::createContent()
       SimObject* profilePtr = Sim::findObject("InspectorDynamicFieldButton");
       if( profilePtr != NULL )
          addFieldBtn->setControlProfile( dynamic_cast<GuiControlProfile*>(profilePtr) );
-		
+
 		// FIXME Hardcoded image
       addFieldBtn->setBitmap("tools/gui/images/iconAdd.png");
 
@@ -108,12 +108,12 @@ bool GuiInspectorDynamicGroup::inspectGroup()
 
    // Create a vector of the fields
    Vector< FieldEntry > flist;
-   
+
    const U32 numTargets = mParent->getNumInspectObjects();
    for( U32 i = 0; i < numTargets; ++ i )
    {
       SimObject* target = mParent->getInspectObject( i );
-      
+
       // Then populate with fields
       SimFieldDictionary * fieldDictionary = target->getFieldDictionary();
       for(SimFieldDictionaryIterator ditr(fieldDictionary); *ditr; ++ditr)
@@ -214,7 +214,7 @@ void GuiInspectorDynamicGroup::addDynamicField()
       return;
    }
 
-   // find a field name that is not in use. 
+   // find a field name that is not in use.
    // But we wont try more than 100 times to find an available field.
    U32 uid = 1;
    char buf[64] = "dynamicField";
@@ -224,7 +224,7 @@ void GuiInspectorDynamicGroup::addDynamicField()
       dSprintf(buf, sizeof(buf), "dynamicField%03d", uid++);
       entry = findDynamicFieldInDictionary(buf);
    }
-   
+
    const U32 numTargets = mParent->getNumInspectObjects();
    if( numTargets > 1 )
       Con::executef( mParent, "onBeginCompoundEdit" );
@@ -232,14 +232,14 @@ void GuiInspectorDynamicGroup::addDynamicField()
    for( U32 i = 0; i < numTargets; ++ i )
    {
       SimObject* target = mParent->getInspectObject( i );
-      
+
       Con::evaluatef( "%d.dynamicField = \"defaultValue\";", target->getId(), buf );
- 
+
       // Notify script.
-   
+
       Con::executef( mParent, "onFieldAdded", target->getIdString(), buf );
    }
-   
+
    if( numTargets > 1 )
       Con::executef( mParent, "onEndCompoundEdit" );
 

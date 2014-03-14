@@ -63,7 +63,7 @@ MODULE_BEGIN( BasicLightManager )
    {
       ManagedSingleton< BasicLightManager >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< BasicLightManager >::deleteSingleton();
@@ -81,8 +81,8 @@ F32 BasicLightManager::smProjectedShadowFilterDistance = 40.0f;
 static S32 QSORT_CALLBACK comparePluginScores( const void *a, const void *b )
 {
    const BasicSceneObjectLightingPlugin *A = *((BasicSceneObjectLightingPlugin**)a);
-   const BasicSceneObjectLightingPlugin *B = *((BasicSceneObjectLightingPlugin**)b);     
-   
+   const BasicSceneObjectLightingPlugin *B = *((BasicSceneObjectLightingPlugin**)b);
+
    F32 dif = B->getScore() - A->getScore();
    return (S32)mFloor( dif );
 }
@@ -93,39 +93,39 @@ BasicLightManager::BasicLightManager()
      mLastConstants(NULL)
 {
    mTimer = PlatformTimer::create();
-   
+
    mTerrainSystem = new blTerrainSystem;
-   
+
    getSceneLightingInterface()->registerSystem( mTerrainSystem );
 
-   Con::addVariable( "$BasicLightManagerStats::activePlugins", 
+   Con::addVariable( "$BasicLightManagerStats::activePlugins",
       TypeS32, &smActiveShadowPlugins,
       "The number of active Basic Lighting SceneObjectLightingPlugin objects this frame.\n"
       "@ingroup BasicLighting\n" );
 
-   Con::addVariable( "$BasicLightManagerStats::shadowsUpdated", 
+   Con::addVariable( "$BasicLightManagerStats::shadowsUpdated",
       TypeS32, &smShadowsUpdated,
       "The number of Basic Lighting shadows updated this frame.\n"
       "@ingroup BasicLighting\n" );
 
-   Con::addVariable( "$BasicLightManagerStats::elapsedUpdateMs", 
+   Con::addVariable( "$BasicLightManagerStats::elapsedUpdateMs",
       TypeS32, &smElapsedUpdateMs,
       "The number of milliseconds spent this frame updating Basic Lighting shadows.\n"
       "@ingroup BasicLighting\n" );
 
-   Con::addVariable( "$BasicLightManager::shadowFilterDistance", 
+   Con::addVariable( "$BasicLightManager::shadowFilterDistance",
       TypeF32, &smProjectedShadowFilterDistance,
       "The maximum distance in meters that projected shadows will get soft filtering.\n"
       "@ingroup BasicLighting\n" );
 
-   Con::addVariable( "$pref::ProjectedShadow::fadeStartPixelSize", 
+   Con::addVariable( "$pref::ProjectedShadow::fadeStartPixelSize",
       TypeF32, &ProjectedShadow::smFadeStartPixelSize,
       "A size in pixels at which BL shadows begin to fade out. "
       "This should be a larger value than fadeEndPixelSize.\n"
       "@see DecalData\n"
       "@ingroup BasicLighting\n" );
 
-   Con::addVariable( "$pref::ProjectedShadow::fadeEndPixelSize", 
+   Con::addVariable( "$pref::ProjectedShadow::fadeEndPixelSize",
       TypeF32, &ProjectedShadow::smFadeEndPixelSize,
       "A size in pixels at which BL shadows are fully faded out. "
       "This should be a smaller value than fadeStartPixelSize.\n"
@@ -202,7 +202,7 @@ void BasicLightManager::activate( SceneManager *sceneManager )
          true,
          false );
 
-      // Uncomment this for a no-color-write z-fill pass. 
+      // Uncomment this for a no-color-write z-fill pass.
       //linearDepthFormat = GFXFormat_COUNT;
 
       prePassBin = new RenderPrePassMgr( linearDepthFormat != GFXFormat_COUNT, linearDepthFormat );
@@ -335,7 +335,7 @@ void BasicLightManager::LightingShaderConstants::init(GFXShader* shader)
    mLightPosition = shader->getShaderConstHandle( ShaderGenVars::lightPosition );
    mLightDiffuse = shader->getShaderConstHandle( ShaderGenVars::lightDiffuse);
    mLightInvRadiusSq = shader->getShaderConstHandle( ShaderGenVars::lightInvRadiusSq );
-   mLightAmbient = shader->getShaderConstHandle( ShaderGenVars::lightAmbient );   
+   mLightAmbient = shader->getShaderConstHandle( ShaderGenVars::lightAmbient );
    mLightSpotDir = shader->getShaderConstHandle( ShaderGenVars::lightSpotDir );
    mLightSpotAngle = shader->getShaderConstHandle( ShaderGenVars::lightSpotAngle );
    mLightSpotFalloff = shader->getShaderConstHandle( ShaderGenVars::lightSpotFalloff );
@@ -349,12 +349,12 @@ void BasicLightManager::LightingShaderConstants::_onShaderReload()
       init( mShader );
 }
 
-void BasicLightManager::setLightInfo(  ProcessedMaterial* pmat, 
-                                       const Material* mat, 
-                                       const SceneData& sgData, 
+void BasicLightManager::setLightInfo(  ProcessedMaterial* pmat,
+                                       const Material* mat,
+                                       const SceneData& sgData,
                                        const SceneRenderState *state,
-                                       U32 pass, 
-                                       GFXShaderConstBuffer* shaderConsts ) 
+                                       U32 pass,
+                                       GFXShaderConstBuffer* shaderConsts )
 {
    PROFILE_SCOPE( BasicLightManager_SetLightInfo );
 
@@ -362,21 +362,21 @@ void BasicLightManager::setLightInfo(  ProcessedMaterial* pmat,
 
    // Check to see if this is the same shader.  Since we
    // sort by material we should get hit repeatedly by the
-   // same one.  This optimization should save us many 
+   // same one.  This optimization should save us many
    // hash table lookups.
    if ( mLastShader.getPointer() != shader )
    {
-      LightConstantMap::Iterator iter = mConstantLookup.find(shader);   
+      LightConstantMap::Iterator iter = mConstantLookup.find(shader);
       if ( iter != mConstantLookup.end() )
       {
          mLastConstants = iter->value;
-      } 
-      else 
-      {     
+      }
+      else
+      {
          LightingShaderConstants* lsc = new LightingShaderConstants();
          mConstantLookup[shader] = lsc;
 
-         mLastConstants = lsc;      
+         mLastConstants = lsc;
       }
 
       // Set our new shader

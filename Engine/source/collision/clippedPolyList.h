@@ -37,10 +37,10 @@
 #define CLIPPEDPOLYLIST_FLAG_ALLOWCLIPPING		0x01
 
 
-/// The clipped polylist class takes the geometry passed to it and clips 
+/// The clipped polylist class takes the geometry passed to it and clips
 /// it against the PlaneList set.
 ///
-/// It also contains helper functions for 
+/// It also contains helper functions for
 /// @see AbstractPolyList
 class ClippedPolyList : public AbstractPolyList
 {
@@ -98,16 +98,16 @@ public:
    ///
    /// This should be set before filling the polylist.
    PlaneList mPlaneList;
-   
-   /// If non-zero any poly facing away from this 
+
+   /// If non-zero any poly facing away from this
    /// normal is removed from the list.
-   /// 
+   ///
    /// This should be set before filling the polylist.
    VectorF mNormal;
 
-   /// If the dot product result between a poly's normal and mNormal is greater 
+   /// If the dot product result between a poly's normal and mNormal is greater
    /// than this value it will be rejected.
-   /// The default value is 0.  
+   /// The default value is 0.
    /// 90 degrees = mCos( mDegToRad( 90.0f ) = 0
    F32 mNormalTolCosineRadians;
 
@@ -132,10 +132,10 @@ public:
    /// that are unused by the poly list.  This removes these unused
    /// verts and updates the index list.
    void cullUnusedVerts();
-   
+
    /// This breaks all polys in the polylist into triangles.
    void triangulate();
-   
+
    /// Generates averaged normals from the poly normals.
    /// @see mNormalList
    void generateNormals();

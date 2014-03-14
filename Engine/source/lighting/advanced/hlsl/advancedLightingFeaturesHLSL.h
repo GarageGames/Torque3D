@@ -30,8 +30,8 @@
 class ConditionerMethodDependency;
 
 
-/// Lights the pixel by sampling from the light prepass 
-/// buffer.  It will fall back to forward lighting 
+/// Lights the pixel by sampling from the light prepass
+/// buffer.  It will fall back to forward lighting
 /// functionality for non-deferred rendered surfaces.
 ///
 /// Also note that this feature is only used in the
@@ -52,10 +52,10 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros, 
+   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros,
                                     const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
@@ -74,7 +74,7 @@ public:
 };
 
 
-/// This is used during the 
+/// This is used during the
 class DeferredBumpFeatHLSL : public BumpFeatHLSL
 {
    typedef BumpFeatHLSL Parent;
@@ -83,7 +83,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp() { return Material::LerpAlpha; }
@@ -102,7 +102,7 @@ public:
 };
 
 
-/// Generates specular highlights in the forward pass 
+/// Generates specular highlights in the forward pass
 /// from the light prepass buffer.
 class DeferredPixelSpecularHLSL : public PixelSpecularHLSL
 {
@@ -112,7 +112,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -128,14 +128,14 @@ public:
 class DeferredMinnaertHLSL : public ShaderFeatureHLSL
 {
    typedef ShaderFeatureHLSL Parent;
-   
+
 public:
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros, 
+   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros,
                                     const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -158,7 +158,7 @@ class DeferredSubSurfaceHLSL : public ShaderFeatureHLSL
    typedef ShaderFeatureHLSL Parent;
 
 public:
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual String getName()

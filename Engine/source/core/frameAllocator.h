@@ -32,7 +32,7 @@
 /// on other platforms as well. Use this #define anywhere alignment is needed.
 ///
 /// NOTE: Do not change this value per-platform unless you have a very good
-/// reason for doing so. It has the potential to cause inconsistencies in 
+/// reason for doing so. It has the potential to cause inconsistencies in
 /// memory which is allocated and expected to be contiguous.
 #define FRAMEALLOCATOR_BYTE_ALIGNMENT 4
 
@@ -272,7 +272,7 @@ public:
 
    operator T() { return *mMemory; }
    operator const T() const { return *mMemory; }
-   
+
    T& operator []( U32 i ) { return mMemory[ i ]; }
    const T& operator []( U32 i ) const { return mMemory[ i ]; }
 

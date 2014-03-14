@@ -48,14 +48,14 @@ class SFXALVoice : public SFXVoice
    protected:
 
       SFXALVoice( const OPENALFNTABLE &oalft,
-                  SFXALBuffer *buffer, 
+                  SFXALBuffer *buffer,
                   ALuint sourceName );
 
       ALuint mSourceName;
 
       /// Buggy OAL jumps around when pausing.  Save playback cursor here.
       F32 mResumeAtSampleOffset;
-      
+
       /// Amount by which OAL's reported sample position is offset.
       ///
       /// OAL's sample position is relative to the current queue state,
@@ -72,7 +72,7 @@ class SFXALVoice : public SFXVoice
       {
          return ( SFXALBuffer* ) mBuffer.getPointer();
       }
-      
+
       /// For non-streaming buffers, late-bind the audio buffer
       /// to the source as OAL will not accept writes to buffers
       /// already bound.

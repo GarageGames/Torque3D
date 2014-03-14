@@ -33,7 +33,7 @@ const String GFXStateBlock::describeSelf() const
    return String::ToString("hashvalue: 0x%x", getDesc().getHashValue());
 }
 
-/// 
+///
 /// GFXStateBlockDesc
 ///
 GFXStateBlockDesc::GFXStateBlockDesc()
@@ -54,7 +54,7 @@ GFXStateBlockDesc::GFXStateBlockDesc()
 
    // Alpha test
    alphaDefined = false;
-   alphaTestEnable = false;   
+   alphaTestEnable = false;
    alphaTestRef = 0;
    alphaTestFunc = GFXCmpGreaterEqual;
 
@@ -101,7 +101,7 @@ GFXStateBlockDesc::GFXStateBlockDesc()
 
 // This method just needs to return a unique value based on its contents.
 U32 GFXStateBlockDesc::getHashValue() const
-{   
+{
    return CRC::calculateCRC(this, sizeof(GFXStateBlockDesc));
 }
 
@@ -130,7 +130,7 @@ void GFXStateBlockDesc::addDesc(const GFXStateBlockDesc& desc)
    }
 
    // Alpha test
-   if (desc.alphaDefined)   
+   if (desc.alphaDefined)
    {
       alphaDefined = true;
       alphaTestEnable = desc.alphaTestEnable;
@@ -139,7 +139,7 @@ void GFXStateBlockDesc::addDesc(const GFXStateBlockDesc& desc)
    }
 
    // Color Writes
-   if (desc.colorWriteDefined)   
+   if (desc.colorWriteDefined)
    {
       colorWriteDefined = true;
       colorWriteRed = desc.colorWriteRed;
@@ -150,14 +150,14 @@ void GFXStateBlockDesc::addDesc(const GFXStateBlockDesc& desc)
 
    // Rasterizer
    if (desc.cullDefined)
-   {   
+   {
       cullDefined = true;
       cullMode = desc.cullMode;
    }
 
    // Depth
    if (desc.zDefined)
-   {   
+   {
       zDefined = true;
       zEnable = desc.zEnable;
       zWriteEnable = desc.zWriteEnable;
@@ -168,7 +168,7 @@ void GFXStateBlockDesc::addDesc(const GFXStateBlockDesc& desc)
 
    // Stencil
    if (desc.stencilDefined)
-   {   
+   {
       stencilDefined = true;
       stencilEnable = desc.stencilEnable;
       stencilFailOp = desc.stencilFailOp;
@@ -200,19 +200,19 @@ const String GFXStateBlockDesc::describeSelf() const
    GFXStringEnumTranslate::init();
 
    String ret;
-   ret = String::ToString("  AlphaBlend: %d, BlendSrc: %s, BlendDest: %s, BlendOp: %s\n", 
+   ret = String::ToString("  AlphaBlend: %d, BlendSrc: %s, BlendDest: %s, BlendOp: %s\n",
       blendEnable, GFXStringBlend[blendSrc], GFXStringBlend[blendDest], GFXStringBlendOp[blendOp]);
-   ret += String::ToString("  SeparateAlphaBlend: %d, SeparateAlphaBlendSrc: %s, SeparateAlphaBlendDest: %s, SeparateAlphaBlendOp: %s\n", 
+   ret += String::ToString("  SeparateAlphaBlend: %d, SeparateAlphaBlendSrc: %s, SeparateAlphaBlendDest: %s, SeparateAlphaBlendOp: %s\n",
       separateAlphaBlendEnable, GFXStringBlend[separateAlphaBlendSrc], GFXStringBlend[separateAlphaBlendDest], GFXStringBlendOp[separateAlphaBlendOp]);
    ret += String::ToString("  AlphaTest: %d, AlphaTestFunc: %s, AlphaTestRef: %d\n",
       alphaTestEnable, GFXStringCmpFunc[alphaTestFunc], alphaTestRef);
-   ret += String::ToString("  ColorWrites: r: %d g: %d b: %d a: %d", 
+   ret += String::ToString("  ColorWrites: r: %d g: %d b: %d a: %d",
       colorWriteRed, colorWriteGreen, colorWriteBlue, colorWriteAlpha);
    ret += String::ToString("  CullMode: %s\n", GFXStringCullMode[cullMode]);
-   ret += String::ToString("  ZEnable: %d, ZWriteEnable: %d, ZFunc: %s, ZBias: %f, ZSlopeBias: %f\n", 
+   ret += String::ToString("  ZEnable: %d, ZWriteEnable: %d, ZFunc: %s, ZBias: %f, ZSlopeBias: %f\n",
       zEnable, zWriteEnable, GFXStringCmpFunc[zFunc], zBias, zSlopeBias);
    ret += String::ToString("  Stencil: %d, StencilFailOp: %s, StencilZFailOp: %s, StencilPassOp: %s, \n  stencilFunc: %s, stencilRef: %d, stencilMask: 0x%x, stencilWriteMask: 0x%x\n",
-      stencilEnable, GFXStringCmpFunc[stencilFailOp], GFXStringCmpFunc[stencilZFailOp], GFXStringCmpFunc[stencilPassOp], 
+      stencilEnable, GFXStringCmpFunc[stencilFailOp], GFXStringCmpFunc[stencilZFailOp], GFXStringCmpFunc[stencilPassOp],
       GFXStringCmpFunc[stencilFunc], stencilRef, stencilMask, stencilWriteMask);
    ret += String::ToString("  FF Lighting: %d, VertexColors: %d, fillMode: %s",
       ffLighting, vertexColorEnable, GFXStringFillMode[fillMode]);
@@ -220,46 +220,46 @@ const String GFXStateBlockDesc::describeSelf() const
    return ret;
 }
 
-// 
+//
 // Utility functions
 //
 
-void GFXStateBlockDesc::setCullMode( GFXCullMode m ) 
-{ 
-   cullDefined = true; 
-   cullMode = m; 
+void GFXStateBlockDesc::setCullMode( GFXCullMode m )
+{
+   cullDefined = true;
+   cullMode = m;
 }
 
 void GFXStateBlockDesc::setZReadWrite( bool read, bool write )
-{ 
-   zDefined = true; 
-   zEnable = read; 
+{
+   zDefined = true;
+   zEnable = read;
    zWriteEnable = write;
 }
 
-void GFXStateBlockDesc::setAlphaTest( bool enable, GFXCmpFunc func, S32 alphaRef ) 
-{ 
-   alphaDefined = true; 
-   alphaTestEnable = enable; 
-   alphaTestFunc = func; 
-   alphaTestRef = alphaRef; 
+void GFXStateBlockDesc::setAlphaTest( bool enable, GFXCmpFunc func, S32 alphaRef )
+{
+   alphaDefined = true;
+   alphaTestEnable = enable;
+   alphaTestFunc = func;
+   alphaTestRef = alphaRef;
 }
 
-void GFXStateBlockDesc::setBlend( bool enable, GFXBlend src, GFXBlend dest, GFXBlendOp op ) 
-{ 
-   blendDefined = true; 
-   blendEnable = enable; 
-   blendSrc = src; 
-   blendDest = dest; 
+void GFXStateBlockDesc::setBlend( bool enable, GFXBlend src, GFXBlend dest, GFXBlendOp op )
+{
+   blendDefined = true;
+   blendEnable = enable;
+   blendSrc = src;
+   blendDest = dest;
    blendOp = op;
 }
 
-void GFXStateBlockDesc::setSeparateAlphaBlend( bool enable, GFXBlend src, GFXBlend dest, GFXBlendOp op ) 
-{ 
-   separateAlphaBlendDefined = true; 
-   separateAlphaBlendEnable = enable; 
-   separateAlphaBlendSrc = src; 
-   separateAlphaBlendDest = dest; 
+void GFXStateBlockDesc::setSeparateAlphaBlend( bool enable, GFXBlend src, GFXBlend dest, GFXBlendOp op )
+{
+   separateAlphaBlendDefined = true;
+   separateAlphaBlendEnable = enable;
+   separateAlphaBlendSrc = src;
+   separateAlphaBlendDest = dest;
    separateAlphaBlendOp = op;
 }
 

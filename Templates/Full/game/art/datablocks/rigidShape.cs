@@ -21,9 +21,9 @@
 //-----------------------------------------------------------------------------
 
 datablock RigidShapeData( BouncingBoulder )
-{	
+{
    category = "RigidShape";
-	
+
    shapeFile = "art/shapes/rocks/boulder.dts";
    emap = true;
 
@@ -41,9 +41,9 @@ datablock RigidShapeData( BouncingBoulder )
    integration = 4;           // Physics integration: TickSec/Rate
    collisionTol = 0.1;        // Collision distance tolerance
    contactTol = 0.1;          // Contact velocity tolerance
-   
+
    minRollSpeed = 10;
-   
+
    maxDrag = 0.5;
    minDrag = 0.01;
 

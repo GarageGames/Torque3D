@@ -60,7 +60,7 @@ protected:
    bool mDynamic;
    U32  mTexSize;
    GFXFormat mFaceFormat;
-   
+
    void fillCubeTextures( GFXTexHandle *faces, LPDIRECT3DDEVICE9 D3DDevice );
    void releaseSurfaces();
 

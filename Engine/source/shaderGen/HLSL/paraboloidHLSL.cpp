@@ -30,7 +30,7 @@
 #include "gfx/gfxShader.h"
 
 
-void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
+void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &componentList,
                                                 const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
@@ -55,7 +55,7 @@ void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &compon
    atlasScale->setType( "float2" );
    atlasScale->setName( "atlasScale" );
    atlasScale->uniform = true;
-   atlasScale->constSortPos = cspPass;  
+   atlasScale->constSortPos = cspPass;
 
    // Transform into camera space
    Var *worldViewOnly = getWorldView( componentList, fd.features[MFT_UseInstancing], meta );
@@ -67,7 +67,7 @@ void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &compon
 
    // Swizzle z and y post-transform
    meta->addStatement( new GenOp( "   @ = mul(@, float4(@.xyz,1)).xzyw;\r\n", outPosition, worldViewOnly, inPosition ) );
-   meta->addStatement( new GenOp( "   float L = length(@.xyz);\r\n", outPosition ) ); 
+   meta->addStatement( new GenOp( "   float L = length(@.xyz);\r\n", outPosition ) );
 
    if ( isSinglePass )
    {
@@ -77,39 +77,39 @@ void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &compon
       outIsBack->setName( "isBack" );
       outIsBack->setStructName( "OUT" );
 
-      meta->addStatement( new GenOp( "   bool isBack = @.z < 0.0;\r\n", outPosition ) ); 
-      meta->addStatement( new GenOp( "   @ = isBack ? -1.0 : 1.0;\r\n", outIsBack ) ); 
+      meta->addStatement( new GenOp( "   bool isBack = @.z < 0.0;\r\n", outPosition ) );
+      meta->addStatement( new GenOp( "   @ = isBack ? -1.0 : 1.0;\r\n", outIsBack ) );
       meta->addStatement( new GenOp( "   if ( isBack ) @.z = -@.z;\r\n", outPosition, outPosition ) );
    }
 
-   meta->addStatement( new GenOp( "   @ /= L;\r\n", outPosition ) ); 
-   meta->addStatement( new GenOp( "   @.z = @.z + 1.0;\r\n", outPosition, outPosition ) ); 
-   meta->addStatement( new GenOp( "   @.xy /= @.z;\r\n", outPosition, outPosition ) ); 
+   meta->addStatement( new GenOp( "   @ /= L;\r\n", outPosition ) );
+   meta->addStatement( new GenOp( "   @.z = @.z + 1.0;\r\n", outPosition, outPosition ) );
+   meta->addStatement( new GenOp( "   @.xy /= @.z;\r\n", outPosition, outPosition ) );
 
    // Get the light parameters.
    Var *lightParams = new Var;
    lightParams->setType( "float4" );
    lightParams->setName( "lightParams" );
    lightParams->uniform = true;
-   lightParams->constSortPos = cspPass;  
+   lightParams->constSortPos = cspPass;
 
    // TODO: If we change other shadow shaders to write out
    // linear depth, than fix this as well!
    //
    // (L - zNear)/(lightParams.x - zNear);
    //
-   meta->addStatement( new GenOp( "   @.z = L / @.x;\r\n", outPosition, lightParams ) ); 
-   meta->addStatement( new GenOp( "   @.w = 1.0;\r\n", outPosition ) ); 
+   meta->addStatement( new GenOp( "   @.z = L / @.x;\r\n", outPosition, lightParams ) );
+   meta->addStatement( new GenOp( "   @.w = 1.0;\r\n", outPosition ) );
 
    // Pass unmodified to pixel shader to allow it to clip properly.
    Var *outPosXY = connectComp->getElement( RT_TEXCOORD );
    outPosXY->setType( "float2" );
    outPosXY->setName( "posXY" );
    outPosXY->setStructName( "OUT" );
-   meta->addStatement( new GenOp( "   @ = @.xy;\r\n", outPosXY, outPosition ) ); 
+   meta->addStatement( new GenOp( "   @ = @.xy;\r\n", outPosXY, outPosition ) );
 
    // Scale and offset so it shows up in the atlas properly.
-   meta->addStatement( new GenOp( "   @.xy *= @.xy;\r\n", outPosition, atlasScale ) ); 
+   meta->addStatement( new GenOp( "   @.xy *= @.xy;\r\n", outPosition, atlasScale ) );
 
    if ( isSinglePass )
       meta->addStatement( new GenOp( "   @.x += isBack ? 0.5 : -0.5;\r\n", outPosition ) );
@@ -119,7 +119,7 @@ void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &compon
       atlasOffset->setType( "float2" );
       atlasOffset->setName( "atlasXOffset" );
       atlasOffset->uniform = true;
-      atlasOffset->constSortPos = cspPass;  
+      atlasOffset->constSortPos = cspPass;
 
       meta->addStatement( new GenOp( "   @.xy += @;\r\n", outPosition, atlasOffset ) );
    }
@@ -127,9 +127,9 @@ void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &compon
    output = meta;
 }
 
-void ParaboloidVertTransformHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
+void ParaboloidVertTransformHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                                 const MaterialFeatureData &fd )
-{      
+{
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
 
    MultiLine *meta = new MultiLine;
@@ -159,5 +159,5 @@ ShaderFeature::Resources ParaboloidVertTransformHLSL::getResources( const Materi
 {
    Resources temp;
    temp.numTexReg = 2;
-   return temp; 
+   return temp;
 }

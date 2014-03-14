@@ -43,7 +43,7 @@ inline void Swizzle<U8, 4>::InPlace( void *memory, const dsize_t size ) const
       BYTESWAP( *dest++, src[mMap[1]] );
       BYTESWAP( *dest++, src[mMap[2]] );
       BYTESWAP( *dest++, src[mMap[3]] );
-      
+
       src += 4;
    }
 }
@@ -63,7 +63,7 @@ inline void Swizzle<U8, 4>::ToBuffer( void *destination, const void *source, con
       *dest++ = src[mMap[1]];
       *dest++ = src[mMap[2]];
       *dest++ = src[mMap[3]];
-      
+
       src += 4;
    }
 }
@@ -85,7 +85,7 @@ inline void Swizzle<U8, 3>::InPlace( void *memory, const dsize_t size ) const
       BYTESWAP( *dest++, src[mMap[0]] );
       BYTESWAP( *dest++, src[mMap[1]] );
       BYTESWAP( *dest++, src[mMap[2]] );
-      
+
       src += 3;
    }
 }
@@ -103,7 +103,7 @@ inline void Swizzle<U8, 3>::ToBuffer( void *destination, const void *source, con
       *dest++ = src[mMap[0]];
       *dest++ = src[mMap[1]];
       *dest++ = src[mMap[2]];
-      
+
       src += 3;
    }
 }

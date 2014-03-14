@@ -36,14 +36,14 @@ protected:
    PlatformTimer();
 public:
    virtual ~PlatformTimer();
-   
+
    /// Get the number of MS that have elapsed since creation or the last
    /// reset call.
    virtual const S32 getElapsedMs()=0;
-   
+
    /// Reset elapsed ms back to zero.
    virtual void reset()=0;
-   
+
    /// Create a new PlatformTimer.
    static PlatformTimer *create();
 };
@@ -65,19 +65,19 @@ class TimeManager
    PlatformTimer *mTimer;
    S32 mForegroundThreshold, mBackgroundThreshold;
    bool mBackground;
-   
+
    void _updateTime();
 
 public:
 
    TimeManagerEvent timeEvent;
-   
-   TimeManager();   
+
+   TimeManager();
    ~TimeManager();
-   
+
    void setForegroundThreshold(const S32 msInterval);
    const S32 getForegroundThreshold() const;
-   
+
    void setBackgroundThreshold(const S32 msInterval);
    const S32 getBackgroundThreshold() const;
 
@@ -89,19 +89,19 @@ public:
 class DefaultPlatformTimer : public PlatformTimer
 {
    S32 mLastTime, mNextTime;
-   
+
 public:
    DefaultPlatformTimer()
    {
       mLastTime = mNextTime = Platform::getRealMilliseconds();
    }
-   
+
    const S32 getElapsedMs()
    {
       mNextTime = Platform::getRealMilliseconds();
       return (mNextTime - mLastTime);
    }
-   
+
    void reset()
    {
       mLastTime = mNextTime;

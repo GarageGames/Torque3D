@@ -57,7 +57,7 @@ void WindDeformationConstHandles::setConsts( SceneRenderState *state,
    const ForestItem *item = (const ForestItem*)sgData.materialHint;
 
    ForestWindAccumulator *wind = NULL;
-   if ( item ) 
+   if ( item )
    {
       // First setup the per-datablock shader constants.
       //
@@ -77,7 +77,7 @@ void WindDeformationConstHandles::setConsts( SceneRenderState *state,
 
    if ( wind )
    {
-      // Calculate distance to camera fade.   
+      // Calculate distance to camera fade.
       F32 toCamLen = ( state->getDiffuseCameraPosition() - wind->getPosition()).len();
       F32 toCamInterp = 1.0f - (toCamLen / ForestWindMgr::smWindEffectRadius);
       toCamInterp = mClampF( toCamInterp, 0.0f, 1.0f );
@@ -89,7 +89,7 @@ void WindDeformationConstHandles::setConsts( SceneRenderState *state,
       // of geometry i need to scale it up for smaller
       // trees so it looks like its affecting it more.
       //
-      // TODO: This is possibly a side effect of not 
+      // TODO: This is possibly a side effect of not
       // properly doing the displacement physics in the
       // first place.
       //
@@ -102,7 +102,7 @@ void WindDeformationConstHandles::setConsts( SceneRenderState *state,
       windSpeed *= toCamInterp;
 
       MatrixF invXfm( item->getTransform() );
-      invXfm.inverse();      
+      invXfm.inverse();
       invXfm.mulV( windDir );
    }
    else
@@ -115,9 +115,9 @@ void WindDeformationConstHandles::setConsts( SceneRenderState *state,
       // Maybe add a generic 'id' value to SceneData that is set
       // by the RenderInst that can be any unique identifier for that
       // object that we can used down here to fetch an item id.
-            
+
       // TODO: This is horrible... we should avoid access to the script
-      // system while rendering as its really slow!            
+      // system while rendering as its really slow!
       if ( Con::getBoolVariable( "$tsStaticWindHack", false ) )
       {
          VectorF windVec( mSin( Sim::getCurrentTime() / 1000.0f ) * 0.25f, 0.0f, 0.0f );

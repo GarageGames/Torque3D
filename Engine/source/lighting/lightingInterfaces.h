@@ -35,7 +35,7 @@ class ObjectProxyList;
 class SceneLightingInterface;
 
 template <class T> class Vector;
-typedef Vector<SceneLightingInterface*> SceneLightingInterfaces; 
+typedef Vector<SceneLightingInterface*> SceneLightingInterfaces;
 
 // List of available "systems" that the lighting kit can use
 class AvailableSLInterfaces
@@ -43,7 +43,7 @@ class AvailableSLInterfaces
 protected:
 
    bool mDirty;
-   
+
 public:
    AvailableSLInterfaces()
       :  mAvailableObjectTypes( 0 ),
@@ -51,17 +51,17 @@ public:
          mZoneLightSkipMask( 0 ),
          mDirty( true )
    {
-      VECTOR_SET_ASSOCIATION( mAvailableSystemInterfaces );      
+      VECTOR_SET_ASSOCIATION( mAvailableSystemInterfaces );
    }
-      
-   // Register a system 
+
+   // Register a system
    void registerSystem(SceneLightingInterface* si);
 
    // Init the interfaces
    void initInterfaces();
-   
+
    // The actual list of SceneLightingInterfaces
-   SceneLightingInterfaces mAvailableSystemInterfaces;  
+   SceneLightingInterfaces mAvailableSystemInterfaces;
 
    // Object types that are registered with the system
    U32 mAvailableObjectTypes;
@@ -109,7 +109,7 @@ public:
 
    // Allows for processing/validating of the scene list after loading cached persistant info, return false if a relight is required or true if the data looks good.
    virtual bool postProcessLoad(PersistInfo* pi, SceneLighting::ObjectProxyList* sceneObjects) { return true; }
-   
+
    virtual void processLightingBegin() { }
    virtual void processLightingCompleted(bool success) { }
 

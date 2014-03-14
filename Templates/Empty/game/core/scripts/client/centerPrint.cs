@@ -32,7 +32,7 @@ $CenterPrintSizes[3] = 56;
 function clientCmdCenterPrint( %message, %time, %size )
 {
    // if centerprint already visible, reset text and time.
-   if ($centerPrintActive) {   
+   if ($centerPrintActive) {
       if (centerPrintDlg.removePrint !$= "")
          cancel(centerPrintDlg.removePrint);
    }
@@ -43,7 +43,7 @@ function clientCmdCenterPrint( %message, %time, %size )
 
    CenterPrintText.setText( "<just:center>" @ %message );
    CenterPrintDlg.extent = firstWord(CenterPrintDlg.extent) @ " " @ $CenterPrintSizes[%size];
-   
+
    if (%time > 0)
       centerPrintDlg.removePrint = schedule( ( %time * 1000 ), 0, "clientCmdClearCenterPrint" );
 }
@@ -52,7 +52,7 @@ function clientCmdCenterPrint( %message, %time, %size )
 function clientCmdBottomPrint( %message, %time, %size )
 {
    // if bottomprint already visible, reset text and time.
-   if ($bottomPrintActive) {   
+   if ($bottomPrintActive) {
       if( bottomPrintDlg.removePrint !$= "")
          cancel(bottomPrintDlg.removePrint);
    }
@@ -60,7 +60,7 @@ function clientCmdBottomPrint( %message, %time, %size )
       bottomPrintDlg.setVisible(true);
       $bottomPrintActive = 1;
    }
-   
+
    bottomPrintText.setText( "<just:center>" @ %message );
    bottomPrintDlg.extent = firstWord(bottomPrintDlg.extent) @ " " @ $CenterPrintSizes[%size];
 

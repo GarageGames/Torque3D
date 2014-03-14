@@ -54,7 +54,7 @@ GuiRiverEditorCtrl::GuiRiverEditorCtrl()
  : mDefaultNormal( 0, 0, 1 ),
    mDefaultWidth( 10.0f ),
    mDefaultDepth( 5.0f )
-{   
+{
 	// Each of the mode names directly correlates with the River Editor's
 	// tool palette
    mSelectRiverMode = "RiverEditorSelectMode";
@@ -65,10 +65,10 @@ GuiRiverEditorCtrl::GuiRiverEditorCtrl()
 	mAddNodeMode = "RiverEditorAddNodeMode";
 	mInsertPointMode = "RiverEditorInsertPointMode";
 	mRemovePointMode = "RiverEditorRemovePointMode";
-   
+
 	mMode = mSelectRiverMode;
-   
-   mRiverSet = NULL;   
+
+   mRiverSet = NULL;
    mSelNode = -1;
    mSelRiver = NULL;
    mHoverRiver = NULL;
@@ -112,7 +112,7 @@ void GuiRiverEditorUndoAction::undo()
 
    // Temporarily save the Rivers current data.
    F32 metersPerSeg = river->mMetersPerSegment;
-   Vector<RiverNode> nodes;   
+   Vector<RiverNode> nodes;
    nodes.merge( river->mNodes );
 
    // Restore the River properties saved in the UndoAction
@@ -122,7 +122,7 @@ void GuiRiverEditorUndoAction::undo()
    river->mNodes.clear();
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
-      river->_addNode( mNodes[i].point, mNodes[i].width, mNodes[i].depth, mNodes[i].normal );      
+      river->_addNode( mNodes[i].point, mNodes[i].width, mNodes[i].depth, mNodes[i].normal );
    }
 
    // Regenerate the River
@@ -147,10 +147,10 @@ bool GuiRiverEditorCtrl::onAdd()
    mRiverSet = River::getServerSet();
 
    GFXStateBlockDesc desc;
-   desc.fillMode = GFXFillSolid;      
+   desc.fillMode = GFXFillSolid;
    desc.setBlend( false );
    desc.setZReadWrite( false, false );
-   desc.setCullMode( GFXCullNone );   
+   desc.setCullMode( GFXCullNone );
 
    mZDisableSB = GFX->createStateBlock(desc);
 
@@ -183,7 +183,7 @@ void GuiRiverEditorCtrl::onSleep()
 {
    Parent::onSleep();
 
-   mMode = mSelectRiverMode;  
+   mMode = mSelectRiverMode;
    mHoverNode = -1;
    mHoverRiver = NULL;
    setSelectedNode(-1);
@@ -191,13 +191,13 @@ void GuiRiverEditorCtrl::onSleep()
    //mSelNode = -1;
 }
 
-void GuiRiverEditorCtrl::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void GuiRiverEditorCtrl::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    //cursor = mAddNodeCursor;
    //visible = false;
-   
+
    cursor = NULL;
    visible = false;
 
@@ -212,15 +212,15 @@ void GuiRiverEditorCtrl::get3DCursor( GuiCursor *&cursor,
 
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
-   
-   // We've already changed the cursor, 
+
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if( root->mCursorChanged != -1)
       controller->popCursor();
 
    // Now change the cursor shape
    controller->pushCursor(currCursor);
-   root->mCursorChanged = currCursor;   
+   root->mCursorChanged = currCursor;
 }
 
 void GuiRiverEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
@@ -238,8 +238,8 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
 	// Get the raycast collision position
    Point3F tPos;
    if ( !getStaticPos( event, tPos ) )
-		return;  
-		
+		return;
+
    mouseLock();
 
    // Construct a LineSegment from the camera position to 1000 meters away in
@@ -247,12 +247,12 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
    // If that segment hits the terrain, truncate the ray to only be that length.
 
    // We will use a LineSegment/Sphere intersection test to determine if a RiverNode
-   // was clicked.   
+   // was clicked.
 
    Point3F startPnt = event.pos;
    Point3F endPnt = event.pos + event.vec * 1000.0f;
 
-   RayInfo ri;   
+   RayInfo ri;
 
    if ( gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri) )
       endPnt = ri.point;
@@ -286,7 +286,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
    }
 
    // Did we click on a riverNode?
-   bool nodeClicked = false;   
+   bool nodeClicked = false;
    S32 clickedNodeIdx = -1;
    F32 clickedNodeDist = mNodeSphereRadius;
 
@@ -319,7 +319,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
          // Do not select or edit a River within a Prefab.
          if ( Prefab::getPrefabByChild(riverPtr) )
             continue;
-         
+
          for ( U32 i = 0; i < riverPtr->mNodes.size(); i++ )
          {
             const Point3F &nodePos = riverPtr->mNodes[i].point;
@@ -340,11 +340,11 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
          }
       }
    }
-	
+
 	// shortcuts
 	bool dblClick = ( event.mouseClickCount > 1 );
 	if( dblClick )
-   { 
+   {
 		if( mMode == mSelectRiverMode )
 		{
 			setMode( mAddRiverMode, true );
@@ -374,7 +374,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
       {
          setSelectedRiver( NULL );
          setSelectedNode( -1 );
-         
+
          return;
       }
 
@@ -398,14 +398,14 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
    {
 		if ( nodeClicked )
       {
-			// A double-click on a node in Normal mode means set AddNode mode.  
+			// A double-click on a node in Normal mode means set AddNode mode.
          if ( clickedNodeIdx == 0 )
          {
 				setSelectedRiver( clickedRiverPtr );
 				setSelectedNode( clickedNodeIdx );
 
 				mAddNodeIdx = clickedNodeIdx;
-            mMode = mAddNodeMode; 
+            mMode = mAddNodeMode;
 
             mSelNode = mSelRiver->insertNode( tPos, mDefaultWidth, mDefaultDepth, mDefaultNormal, mAddNodeIdx );
             mIsDirty = true;
@@ -425,7 +425,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
 				setSelectedNode( mSelNode );
 
 				return;
-         } 
+         }
 		}
 
 		if ( !isMethod( "createRiver" ) )
@@ -441,11 +441,11 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
       {
          Con::errorf( "GuiRiverEditorCtrl::on3DMouseDown - createRiver method did not return a river object." );
          return;
-      }                
+      }
 
-      // Add to MissionGroup                              
+      // Add to MissionGroup
       SimGroup *missionGroup;
-      if ( !Sim::findObject( "MissionGroup", missionGroup ) )               
+      if ( !Sim::findObject( "MissionGroup", missionGroup ) )
          Con::errorf( "GuiRiverEditorCtrl - could not find MissionGroup to add new River" );
       else
          missionGroup->addObject( newRiver );
@@ -458,8 +458,8 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
 
       // Always add to the end of the road, the first node is the start.
       mAddNodeIdx = U32_MAX;
-      
-      setSelectedRiver( newRiver );      
+
+      setSelectedRiver( newRiver );
       setSelectedNode( newNode );
 
       mMode = mAddNodeMode;
@@ -473,14 +473,14 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
       if ( !Sim::findObject( "EUndoManager", undoMan ) )
       {
          Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
-         return;           
+         return;
       }
 
       // Create the UndoAction.
       MECreateUndoAction *action = new MECreateUndoAction("Create MeshRoad");
       action->addObject( newRiver );
 
-      // Submit it.               
+      // Submit it.
       undoMan->addAction( action );
 
 		return;
@@ -491,7 +491,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
       // Back to NormalMode.
       if ( mSelRiver )
       {
-			// A double-click on a node in Normal mode means set AddNode mode.  
+			// A double-click on a node in Normal mode means set AddNode mode.
          if ( clickedNodeIdx == 0 )
          {
 				submitUndo( "Add Node" );
@@ -510,7 +510,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
 					submitUndo( "Add Node" );
 					mAddNodeIdx = U32_MAX;
 					mMode = mAddNodeMode;
-					U32 newNode = mSelRiver->addNode( tPos, mDefaultWidth, mDefaultDepth, mDefaultNormal);  
+					U32 newNode = mSelRiver->addNode( tPos, mDefaultWidth, mDefaultDepth, mDefaultNormal);
                mIsDirty = true;
 					setSelectedNode( newNode );
 
@@ -608,7 +608,7 @@ void GuiRiverEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
    // Keep the Gizmo up to date.
    mGizmo->on3DMouseUp( event );
 
-   mStartWidth = -1.0f;     
+   mStartWidth = -1.0f;
    mStartHeight = -1.0f;
    mSavedDrag = false;
 
@@ -620,7 +620,7 @@ void GuiRiverEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
    if ( mSelRiver != NULL && mMode == mAddNodeMode )
    {
       Point3F pos;
-      if ( getStaticPos( event, pos ) )         
+      if ( getStaticPos( event, pos ) )
       {
          pos.z += mSelRiver->getNodeDepth(mSelNode) * 0.5f;
          mSelRiver->setNodePosition( mSelNode, pos );
@@ -641,7 +641,7 @@ void GuiRiverEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
       Point3F startPnt = event.pos;
       Point3F endPnt = event.pos + event.vec * 1000.0f;
 
-      RayInfo ri;   
+      RayInfo ri;
 
       if ( gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri) )
          endPnt = ri.point;
@@ -661,12 +661,12 @@ void GuiRiverEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
             mHoverRiver = pRiver;
             break;
          }
-      }      
+      }
    }
 
    // Is cursor hovering over a RiverNode?
    if ( mHoverRiver )
-   {      
+   {
       River *pRiver = mHoverRiver;
 
       S32 hoverNodeIdx = -1;
@@ -689,9 +689,9 @@ void GuiRiverEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
                // we found a hit!
                hoverNodeDist = dist;
                hoverNodeIdx = i;
-            }           
-         }      
-      //}  
+            }
+         }
+      //}
 
       mHoverNode = hoverNodeIdx;
    }
@@ -718,7 +718,7 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    if ( mGizmo->isDirty() )
    {
       Point3F pos = mGizmo->getPosition();
-      Point3F scale = mGizmo->getScale();      
+      Point3F scale = mGizmo->getScale();
       const MatrixF &mat = mGizmo->getTransform();
       VectorF normal;
       mat.getColumn( 2, &normal );
@@ -726,7 +726,7 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       mSelRiver->setNode( pos, scale.x, scale.z, normal, mSelNode );
       mIsDirty = true;
    }
-   Con::executef( this, "onNodeModified", Con::getIntArg(mSelNode) );	
+   Con::executef( this, "onNodeModified", Con::getIntArg(mSelNode) );
    /*
    // If we are just starting a new drag,
    // we need to save the starting screen position of the mouse,
@@ -749,7 +749,7 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
    MathUtils::mShortestSegmentBetweenLines( clickLine, axisLine, segment );
 
-   // Segment.p1 is the closest point on the axis line, 
+   // Segment.p1 is the closest point on the axis line,
    // We want to put the selected gizmo handle at that point,
    // So calculate the offset from the handle to the centerPoint to
    // determine the gizmo's position.
@@ -761,8 +761,8 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    // into world space.
    Point2I deltaScreen = event.mousePoint - mStartDragMousePoint;
 
-   F32 worldDist = ( event.pos - mStartDragNodePos ).len();      
-   
+   F32 worldDist = ( event.pos - mStartDragNodePos ).len();
+
    Point2F deltaWorld;
    deltaWorld.x = GFX->unprojectRadius( worldDist, deltaScreen.x );
    deltaWorld.y = GFX->unprojectRadius( worldDist, deltaScreen.y );
@@ -771,25 +771,25 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    if ( mGizmoSelection == Gizmo::Axis_X )
    {
       Point3F newPos = mStartDragNodePos;
-      newPos.x += deltaWorld.x;      
+      newPos.x += deltaWorld.x;
       mSelRiver->setNodePosition( mSelNode, newPos );
    }
    else if ( mGizmoSelection == Gizmo::Axis_Y )
    {
       Point3F newPos = mStartDragNodePos;
-      newPos.y += deltaWorld.x;      
+      newPos.y += deltaWorld.x;
       mSelRiver->setNodePosition( mSelNode, newPos );
    }
    else if ( mGizmoSelection == Gizmo::Axis_Z )
    {
       Point3F newPos = mStartDragNodePos;
-      newPos.z += deltaWorld.y;      
+      newPos.z += deltaWorld.y;
       mSelRiver->setNodePosition( mSelNode, newPos );
    }
    */
 
    /*
-   F32 height = mStartHeight + deltaWorldX;    
+   F32 height = mStartHeight + deltaWorldX;
    Con::printf( "height = %g", height );
 
    mSelRiver->setNodeHeight( mSelNode, height );
@@ -801,7 +801,7 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    {
       //Point3F tPos;
       //if ( !getStaticPos( event, tPos ) )
-      //   return;  
+      //   return;
 
       if ( mStartHeight == -1.0f )
       {
@@ -813,11 +813,11 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
       S32 deltaScreenX = event.mousePoint.x - mStartX;
 
-      F32 worldDist = ( event.pos - mStartWorld ).len();      
+      F32 worldDist = ( event.pos - mStartWorld ).len();
 
       F32 deltaWorldX = GFX->unprojectRadius( worldDist, deltaScreenX );
 
-      F32 height = mStartHeight + deltaWorldX;    
+      F32 height = mStartHeight + deltaWorldX;
       Con::printf( "height = %g", height );
 
       mSelRiver->setNodeHeight( mSelNode, height );
@@ -828,41 +828,41 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    {
       Point3F tPos;
       if ( !getStaticPos( event, tPos ) )
-         return;   
+         return;
 
       if ( mStartWidth == -1.0f )
       {
          mStartWidth = mSelRiver->mNodes[mSelNode].width;
-         
+
          mStartX = event.mousePoint.x;
          mStartWorld = tPos;
       }
 
       S32 deltaScreenX = event.mousePoint.x - mStartX;
-      
-      F32 worldDist = ( event.pos - mStartWorld ).len();      
+
+      F32 worldDist = ( event.pos - mStartWorld ).len();
 
       F32 deltaWorldX = GFX->unprojectRadius( worldDist, deltaScreenX );
 
-      F32 width = mStartWidth + deltaWorldX;      
+      F32 width = mStartWidth + deltaWorldX;
 
       mSelRiver->setNodeWidth( mSelNode, width );
 
       Con::executef( this, "onNodeWidthModified", Con::getFloatArg(width) );
    }
    else
-   {    
+   {
       Point3F tPos;
       if ( !getStaticPos( event, tPos ) )
-         return; 
+         return;
       else if ( mGizmoSelection == Gizmo::Axis_Y )
       {
          Point3F newPos = mStartDragNodePos;
-         newPos.y += deltaWorld.x;      
+         newPos.y += deltaWorld.x;
          mSelRiver->setNodePosition( mSelNode, newPos );
       }
       mSelRiver->setNodePosition( mSelNode, tPos );
-   }   
+   }
    */
 }
 
@@ -893,7 +893,7 @@ void GuiRiverEditorCtrl::updateGuiInfo()
 {
    // nothing to do
 }
-      
+
 void GuiRiverEditorCtrl::onRender( Point2I offset, const RectI &updateRect )
 {
    PROFILE_SCOPE( GuiRiverEditorCtrl_OnRender );
@@ -901,10 +901,10 @@ void GuiRiverEditorCtrl::onRender( Point2I offset, const RectI &updateRect )
    Parent::onRender( offset, updateRect );
    return;
 }
-      
+
 void GuiRiverEditorCtrl::renderScene(const RectI & updateRect)
 {
-   //GFXDrawUtil *drawer = GFX->getDrawUtil();            
+   //GFXDrawUtil *drawer = GFX->getDrawUtil();
 
    GFX->setStateBlock( mZDisableSB );
 
@@ -928,7 +928,7 @@ void GuiRiverEditorCtrl::renderScene(const RectI & updateRect)
 
    if ( mSelRiver )
    {
-      _drawRiverSpline( mSelRiver, mSelectedSplineColor );            
+      _drawRiverSpline( mSelRiver, mSelectedSplineColor );
 
       // Render Gizmo for selected node if were in either of the three transform modes
       if ( mSelNode != -1 && ( mMode == mMovePointMode || mMode == mScalePointMode || mMode == mRotatePointMode ) )
@@ -948,28 +948,28 @@ void GuiRiverEditorCtrl::renderScene(const RectI & updateRect)
 
          const RiverNode &node = mSelRiver->mNodes[mSelNode];
 
-         MatrixF objMat = mSelRiver->getNodeTransform(mSelNode);      
+         MatrixF objMat = mSelRiver->getNodeTransform(mSelNode);
          Point3F objScale( node.width, 1.0f, node.depth );
          Point3F worldPos = node.point;
 
          mGizmo->set( objMat, worldPos, objScale );
 
          mGizmo->renderGizmo( mLastCameraQuery.cameraMatrix, mLastCameraQuery.fov );
-			
+
 			// Render Gizmo text
-			//mGizmo->renderText( mSaveViewport, mSaveModelview, mSaveProjection ); 
-      }    
+			//mGizmo->renderText( mSaveViewport, mSaveModelview, mSaveProjection );
+      }
    }
 
    // Now draw all the 2d stuff!
-   GFX->setClipRect(updateRect); 
+   GFX->setClipRect(updateRect);
 
    // Draw Control nodes for selecting and highlighted rivers
    if ( mHoverRiver )
       _drawRiverControlNodes( mHoverRiver, mHoverSplineColor );
    if ( mSelRiver )
       _drawRiverControlNodes( mSelRiver, mSelectedSplineColor );
-} 
+}
 
 void GuiRiverEditorCtrl::_drawRiverSpline( River *river, const ColorI &color )
 {
@@ -980,43 +980,43 @@ void GuiRiverEditorCtrl::_drawRiverSpline( River *river, const ColorI &color )
 	{
 		// Render the River center-line
 		PrimBuild::color( color );
-		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );            
+		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
-			PrimBuild::vertex3fv( river->mSlices[i].p1 );		      
+		{
+			PrimBuild::vertex3fv( river->mSlices[i].p1 );
 		}
 		PrimBuild::end();
 	}
-   
+
 	if ( River::smWireframe )
 	{
 		// Left-side line
 		PrimBuild::color3i( 100, 100, 100 );
-		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );            
+		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
-			PrimBuild::vertex3fv( river->mSlices[i].p0 );		      
+		{
+			PrimBuild::vertex3fv( river->mSlices[i].p0 );
 		}
 		PrimBuild::end();
 
 		// Right-side line
-		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );            
+		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
-			PrimBuild::vertex3fv( river->mSlices[i].p2 );		      
+		{
+			PrimBuild::vertex3fv( river->mSlices[i].p2 );
 		}
 		PrimBuild::end();
 
 		// Cross-sections
-		PrimBuild::begin( GFXLineList, river->mSlices.size() * 2 );            
+		PrimBuild::begin( GFXLineList, river->mSlices.size() * 2 );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
+		{
 			PrimBuild::vertex3fv( river->mSlices[i].p0 );
-			PrimBuild::vertex3fv( river->mSlices[i].p2 );		      
+			PrimBuild::vertex3fv( river->mSlices[i].p2 );
 		}
 		PrimBuild::end();
 	}
-   // Segment 
+   // Segment
 }
 
 void GuiRiverEditorCtrl::_drawRiverControlNodes( River *river, const ColorI &color )
@@ -1039,7 +1039,7 @@ void GuiRiverEditorCtrl::_drawRiverControlNodes( River *river, const ColorI &col
       const Point3F &wpos = river->mNodes[i].point;
 
       Point3F spos;
-      project( wpos, &spos );                  
+      project( wpos, &spos );
 
       if ( spos.z > 1.0f )
          continue;
@@ -1061,7 +1061,7 @@ void GuiRiverEditorCtrl::_drawRiverControlNodes( River *river, const ColorI &col
       }
 
       if ( isSelected )
-      {   
+      {
          if ( mSelNode == i )
          {
             theColor.set(0,0,255);
@@ -1073,7 +1073,7 @@ void GuiRiverEditorCtrl::_drawRiverControlNodes( River *river, const ColorI &col
          else if ( i == river->mNodes.size() - 1 )
          {
             theColor.set(255,0,0);
-         }         
+         }
       }
 
       drawer->drawRectFill( posi - nodeHalfSize, posi + nodeHalfSize, theColor );
@@ -1081,30 +1081,30 @@ void GuiRiverEditorCtrl::_drawRiverControlNodes( River *river, const ColorI &col
 }
 
 bool GuiRiverEditorCtrl::getStaticPos( const Gui3DMouseEvent & event, Point3F &tpos )
-{     
+{
    // Find clicked point on the terrain
 
    Point3F startPnt = event.pos;
    Point3F endPnt = event.pos + event.vec * 1000.0f;
 
    RayInfo ri;
-   bool hit;         
-         
-   hit = gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri);    
+   bool hit;
+
+   hit = gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri);
    tpos = ri.point;
-   
+
    return hit;
 }
 
 void GuiRiverEditorCtrl::deleteSelectedNode()
-{    
+{
    if ( !mSelRiver || mSelNode == -1 )
       return;
-   
+
    // If the River has only two nodes remaining,
    // delete the whole River.
    if ( mSelRiver->mNodes.size() <= 2 )
-   {      
+   {
       deleteSelectedRiver( mMode != mAddNodeMode );
    }
    else
@@ -1130,7 +1130,7 @@ void GuiRiverEditorCtrl::deleteSelectedNode()
       }
    }
 
-   // If you were in addNodeMode, 
+   // If you were in addNodeMode,
    // deleting a node should ends it.
    //mMode = smNormalMode;
 }
@@ -1155,7 +1155,7 @@ void GuiRiverEditorCtrl::deleteSelectedRiver( bool undoAble )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       // Couldn't find it? Well just delete the River.
-      Con::errorf( "GuiRiverEditorCtrl::on3DMouseDown() - EUndoManager not found!" );    
+      Con::errorf( "GuiRiverEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
       return;
    }
    else
@@ -1165,14 +1165,14 @@ void GuiRiverEditorCtrl::deleteSelectedRiver( bool undoAble )
       action->deleteObject( mSelRiver );
       mIsDirty = true;
 
-      // Submit it.               
+      // Submit it.
       undoMan->addAction( action );
    }
 
    // ScriptCallback with 'NULL' parameter for no River currently selected.
    Con::executef( this, "onRiverSelected" );
 
-   // Clear the SelectedNode (it has been deleted along with the River).  
+   // Clear the SelectedNode (it has been deleted along with the River).
 	setSelectedNode( -1 );
    mSelNode = -1;
 
@@ -1214,7 +1214,7 @@ F32 GuiRiverEditorCtrl::getNodeWidth()
    if ( mSelRiver && mSelNode != -1 )
       return mSelRiver->getNodeWidth( mSelNode );
 
-   return 0.0f;   
+   return 0.0f;
 }
 
 void GuiRiverEditorCtrl::setNodeDepth(F32 depth)
@@ -1248,7 +1248,7 @@ Point3F GuiRiverEditorCtrl::getNodePosition()
    if ( mSelRiver && mSelNode != -1 )
       return mSelRiver->getNodePosition( mSelNode );
 
-   return Point3F( 0, 0, 0 );   
+   return Point3F( 0, 0, 0 );
 }
 
 void GuiRiverEditorCtrl::setNodeNormal( const VectorF &normal )
@@ -1278,13 +1278,13 @@ void GuiRiverEditorCtrl::setSelectedNode( S32 node )
    {
       const RiverNode &node = mSelRiver->mNodes[mSelNode];
 
-      MatrixF objMat = mSelRiver->getNodeTransform(mSelNode);      
+      MatrixF objMat = mSelRiver->getNodeTransform(mSelNode);
       Point3F objScale( node.width, 1.0f, node.depth );
       Point3F worldPos = node.point;
 
       mGizmo->set( objMat, worldPos, objScale );
    }
-   
+
    if ( mSelNode != -1 )
       Con::executef( this, "onNodeSelected", Con::getIntArg(mSelNode) );
    else
@@ -1298,7 +1298,7 @@ void GuiRiverEditorCtrl::submitUndo( const UTF8 *name )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       Con::errorf( "GuiRiverEditorCtrl::submitUndo() - EUndoManager not found!" );
-      return;           
+      return;
    }
 
    // Setup the action.
@@ -1306,14 +1306,14 @@ void GuiRiverEditorCtrl::submitUndo( const UTF8 *name )
 
    action->mObjId = mSelRiver->getId();
    action->mMetersPerSegment = mSelRiver->mMetersPerSegment;
-   action->mSegmentsPerBatch = mSelRiver->mSegmentsPerBatch;   
+   action->mSegmentsPerBatch = mSelRiver->mSegmentsPerBatch;
    action->mRiverEditor = this;
 
    for( U32 i = 0; i < mSelRiver->mNodes.size(); i++ )
    {
-      action->mNodes.push_back( mSelRiver->mNodes[i] );      
+      action->mNodes.push_back( mSelRiver->mNodes[i] );
    }
-      
+
    undoMan->addAction( action );
 }
 
@@ -1342,7 +1342,7 @@ void GuiRiverEditorCtrl::_renderSelectedRiver( ObjectRenderInst *ri, SceneRender
    {
       Point3F offset(0,0,1);
 
-      // Render the River volume      
+      // Render the River volume
       PrimBuild::begin( GFXTriangleList, 18 * mSelRiver->mSlices.size() - 1 );
 
       for ( U32 i = 0; i < mSelRiver->mSlices.size() - 1; i++ )
@@ -1358,7 +1358,7 @@ void GuiRiverEditorCtrl::_renderSelectedRiver( ObjectRenderInst *ri, SceneRender
          //PrimBuild::vertex3fv( nextSlice.p2 );
          //PrimBuild::vertex3fv( slice.p0 );
          //PrimBuild::vertex3fv( nextSlice.p2 );
-         //PrimBuild::vertex3fv( slice.p2 );         
+         //PrimBuild::vertex3fv( slice.p2 );
 
          // Bottom face
          PrimBuild::color3i( 0, 255, 0 );
@@ -1366,26 +1366,26 @@ void GuiRiverEditorCtrl::_renderSelectedRiver( ObjectRenderInst *ri, SceneRender
          PrimBuild::vertex3fv( nextSlice.pb0 );
          PrimBuild::vertex3fv( nextSlice.pb2 );
          PrimBuild::vertex3fv( slice.pb0 );
-         PrimBuild::vertex3fv( nextSlice.pb2 );         
-         PrimBuild::vertex3fv( slice.pb2 );         
+         PrimBuild::vertex3fv( nextSlice.pb2 );
+         PrimBuild::vertex3fv( slice.pb2 );
 
          // Left face
          PrimBuild::color3i( 255, 0, 0 );
          PrimBuild::vertex3fv( slice.pb0 );
-         PrimBuild::vertex3fv( nextSlice.pb0 );         
+         PrimBuild::vertex3fv( nextSlice.pb0 );
          PrimBuild::vertex3fv( nextSlice.p0 );
          PrimBuild::vertex3fv( slice.pb0 );
          PrimBuild::vertex3fv( nextSlice.p0 );
-         PrimBuild::vertex3fv( slice.p0 );         
+         PrimBuild::vertex3fv( slice.p0 );
 
          // Right face
          PrimBuild::color3i( 255, 0, 0 );
-         PrimBuild::vertex3fv( slice.p2 );         
+         PrimBuild::vertex3fv( slice.p2 );
          PrimBuild::vertex3fv( nextSlice.p2 );
          PrimBuild::vertex3fv( nextSlice.pb2 );
-         PrimBuild::vertex3fv( slice.p2 );    
+         PrimBuild::vertex3fv( slice.p2 );
          PrimBuild::vertex3fv( nextSlice.pb2 );
-         PrimBuild::vertex3fv( slice.pb2 );         
+         PrimBuild::vertex3fv( slice.pb2 );
       }
 
       PrimBuild::end();
@@ -1442,9 +1442,9 @@ ConsoleMethod( GuiRiverEditorCtrl, setNodePosition, void, 3, 3, "" )
 {
 	Point3F pos;
 
-	S32 count = dSscanf( argv[2], "%f %f %f", 
+	S32 count = dSscanf( argv[2], "%f %f %f",
 		&pos.x, &pos.y, &pos.z);
-	
+
 	if ( (count != 3) )
    {
 		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
@@ -1468,9 +1468,9 @@ ConsoleMethod( GuiRiverEditorCtrl, setNodeNormal, void, 3, 3, "" )
 {
    VectorF normal;
 
-	S32 count = dSscanf( argv[2], "%f %f %f", 
+	S32 count = dSscanf( argv[2], "%f %f %f",
 		&normal.x, &normal.y, &normal.z);
-	
+
 	if ( (count != 3) )
    {
 		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);

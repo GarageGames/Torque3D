@@ -154,7 +154,7 @@ public:
             U32 index = test->mProducerIndex;
             if( index == test->mValues.size() )
                break;
-               
+
             if( dCompareAndSwap( test->mProducerIndex, index, index + 1 ) )
             {
                F32 priority = Platform::getRandom();

@@ -41,7 +41,7 @@ MODULE_BEGIN( DebugDrawer )
 
    MODULE_INIT_AFTER( Sim )
    MODULE_INIT_AFTER( GFX )
-   
+
    // DebugDrawer will register itself as a SimObject and
    // thus get automatically shut down with Sim.
 
@@ -57,7 +57,7 @@ DebugDrawer* DebugDrawer::sgDebugDrawer = NULL;
 
 IMPLEMENT_CONOBJECT(DebugDrawer);
 
-ConsoleDocClass( DebugDrawer, 
+ConsoleDocClass( DebugDrawer,
    "@brief A debug helper for rendering debug primitives to the scene.\n\n"
 
    "The DebugDrawer is used to render debug primitives to the scene for testing.  It is "
@@ -88,7 +88,7 @@ DebugDrawer::DebugDrawer()
    mHead = NULL;
    isFrozen = false;
    shouldToggleFreeze = false;
-   
+
 #ifdef ENABLE_DEBUGDRAW
    isDrawing = true;
 #else
@@ -105,7 +105,7 @@ DebugDrawer::~DebugDrawer()
 DebugDrawer* DebugDrawer::get()
 {
    if (sgDebugDrawer)
-   {   
+   {
       return sgDebugDrawer;
    } else {
       DebugDrawer::init();
@@ -129,7 +129,7 @@ void DebugDrawer::setupStateBlocks()
 
    d.setCullMode(GFXCullNone);
    mRenderZOnSB = GFX->createStateBlock(d);
-   
+
    d.setZReadWrite(false);
    mRenderZOffSB = GFX->createStateBlock(d);
 }
@@ -150,9 +150,9 @@ void DebugDrawer::render()
    }
 
    SimTime curTime = Sim::getCurrentTime();
-  
-   GFX->disableShaders();   
-   
+
+   GFX->disableShaders();
+
    for(DebugPrim **walk = &mHead; *walk; )
    {
       DebugPrim *p = *walk;
@@ -197,12 +197,12 @@ void DebugDrawer::render()
          break;
       case DebugPrim::Text:
          {
-            GFXTransformSaver saver;            
+            GFXTransformSaver saver;
             Point3F result;
             if (MathUtils::mProjectWorldToScreen(p->a, &result, GFX->getViewport(), GFX->getWorldMatrix(), GFX->getProjectionMatrix()))
             {
                GFX->setClipRect(GFX->getViewport());
-               GFX->getDrawUtil()->setBitmapModulation(p->color); 
+               GFX->getDrawUtil()->setBitmapModulation(p->color);
                GFX->getDrawUtil()->drawText(mFont, Point2I(result.x, result.y), p->mText);
             }
          }
@@ -373,7 +373,7 @@ void DebugDrawer::drawText(const Point3F& pos, const String& text, const ColorF 
    n->dieTime = 0;
    n->a = pos;
    n->color = color;
-   dStrncpy(n->mText, text.c_str(), 256);   
+   dStrncpy(n->mText, text.c_str(), 256);
    n->type = DebugPrim::Text;
 
    n->next = mHead;

@@ -154,8 +154,8 @@ void GuiTextEditSliderCtrl::onMouseDown(const GuiEvent &event)
       setValue();
       mouseLock();
 
-      // We should get the focus and set the 
-      // cursor to the start of the text to 
+      // We should get the focus and set the
+      // cursor to the start of the text to
       // mimic the standard Windows behavior.
       setFirstResponder();
       mCursorPos = mBlockStart = mBlockEnd = 0;
@@ -192,14 +192,14 @@ void GuiTextEditSliderCtrl::onMouseDragged(const GuiEvent &event)
             maxDis = (F32)point.y;
 
          val = point.y - maxDis;
-         
+
          if(point.y > 0)
             mMulInc= 1.0f-(((float)camPos.y - val) / maxDis);
          else
             mMulInc = 1.0f;
-         
+
          checkIncValue();
-         
+
          return;
       }
       else if(camPos.y > point.y + getExtent().y)
@@ -241,7 +241,7 @@ void GuiTextEditSliderCtrl::onMouseUp(const GuiEvent &event)
 
    //if we didn't release the mouse within this control, then perform the action
    // if (!cursorInControl())
-   execConsoleCallback();   
+   execConsoleCallback();
    execAltConsoleCallback();
 
    //Set the cursor position to where the user clicked
@@ -268,7 +268,7 @@ bool GuiTextEditSliderCtrl::onMouseWheelUp(const GuiEvent &event)
 
    checkRange();
    setValue();
-   
+
    setFirstResponder();
    mCursorPos = mBlockStart = mBlockEnd = 0;
    setUpdate();
@@ -288,7 +288,7 @@ bool GuiTextEditSliderCtrl::onMouseWheelDown(const GuiEvent &event)
          return parent->onMouseWheelUp( event );
 
       return false;
-   }   
+   }
 
    mValue -= mIncAmount;
 

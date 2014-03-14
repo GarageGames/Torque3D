@@ -63,7 +63,7 @@ template< typename P = U32 >
 class IPositionable
 {
    public:
-   
+
       typedef void Parent;
 
       /// The type used to indicate positions.
@@ -71,7 +71,7 @@ class IPositionable
 
       /// @return the current position.
       virtual PositionType getPosition() const = 0;
-      
+
       /// Set the current position to be "pos".
       /// @param pos The new position.
       virtual void setPosition( PositionType pos ) = 0;
@@ -81,9 +81,9 @@ class IPositionable
 class IResettable
 {
    public:
-   
+
       typedef void Parent;
-   
+
       /// Reset to the initial state.
       virtual void reset() = 0;
 };
@@ -93,7 +93,7 @@ template< typename T = U32 >
 class ISizeable
 {
    public:
-   
+
       typedef void Parent;
 
       /// The type used to indicate the structure's size.
@@ -107,7 +107,7 @@ class ISizeable
 class IProcess
 {
    public:
-   
+
       typedef void Parent;
 
       /// Start the process.
@@ -127,7 +127,7 @@ class IPolled
    public:
 
       typedef void Parent;
-   
+
       /// Update the object state.
       virtual bool update() = 0;
 };
@@ -150,7 +150,7 @@ class IInputStream
 
       /// The element type of this input stream.
       typedef T ElementType;
-      
+
       /// Read the next "num" elements into "buffer".
       ///
       /// @param buffer The buffer into which the elements are stored.
@@ -234,7 +234,7 @@ class IOutputStream
 {
    public:
 
-      typedef void Parent;      
+      typedef void Parent;
 
       /// The element type of this input stream.
       typedef T ElementType;

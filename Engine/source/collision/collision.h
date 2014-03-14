@@ -45,9 +45,9 @@ struct Collision
    VectorF normal;
    BaseMatInstance* material;
 
-   // generate UV coordinate across (TSStatic) mesh based on 
-   // matching normals, this isn't done by default and is 
-   // primarily of interest in matching a collision point to 
+   // generate UV coordinate across (TSStatic) mesh based on
+   // matching normals, this isn't done by default and is
+   // primarily of interest in matching a collision point to
    // either a GUI control coordinate or finding a hit pixel in texture space
    bool generateTexCoord;
 
@@ -60,7 +60,7 @@ struct Collision
    U32 face;                  // Which face was hit
    F32 faceDot;               // -Dot of face with poly normal
    F32 distance;
-   
+
    Collision() :
       object( NULL ),
       material( NULL ),
@@ -154,14 +154,14 @@ typedef Chunker<BSPNode> BSPTree;
 
 /// Extension of the collision structure to allow use with raycasting.
 /// @see Collision
-struct RayInfo : public Collision 
+struct RayInfo : public Collision
 {
    RayInfo() : userData( NULL ) {}
 
    // The collision struct has object, point, normal & material.
 
    /// Distance along ray to contact point.
-   F32 t; 
+   F32 t;
 
    /// Set the point of intersection according to t and the given ray.
    ///
@@ -176,8 +176,8 @@ struct RayInfo : public Collision
    }
 
    /// A generic data void pointer.
-   /// Passing a void* around to random objects of unknown class types that may 
-   /// interpret it differently would be very dangerous.  Only use userData when 
+   /// Passing a void* around to random objects of unknown class types that may
+   /// interpret it differently would be very dangerous.  Only use userData when
    /// you call castRay/etc on an individual object of a known type.
    void *userData;
 };

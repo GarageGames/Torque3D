@@ -28,7 +28,7 @@
 
 class GuiInspectorCustomField : public GuiInspectorField
 {
-   typedef GuiInspectorField Parent;   
+   typedef GuiInspectorField Parent;
 
 public:
 
@@ -48,10 +48,10 @@ public:
 
    virtual bool onAdd();
 
-   virtual void setInspectorField( AbstractClassRep::Field *field, 
+   virtual void setInspectorField( AbstractClassRep::Field *field,
                                    StringTableEntry caption = NULL,
                                    const char *arrayIndex = NULL );
-   
+
    virtual GuiControl* constructEditControl();
 
    virtual void setValue( const char* newValue );

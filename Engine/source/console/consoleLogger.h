@@ -47,7 +47,7 @@ class ConsoleLogger : public SimObject
    typedef SimObject Parent;
 
    private:
-   
+
       bool mLogging;                   ///< True if it is currently consuming and logging
       FileStream mStream;              ///< File stream this object writes to
       static bool smInitialized;                ///< This is for use with the default constructor

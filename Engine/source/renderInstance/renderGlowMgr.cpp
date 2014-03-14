@@ -37,7 +37,7 @@
 IMPLEMENT_CONOBJECT( RenderGlowMgr );
 
 
-ConsoleDocClass( RenderGlowMgr, 
+ConsoleDocClass( RenderGlowMgr,
    "@brief A render bin for the glow pass.\n\n"
    "When the glow buffer PostEffect is enabled this bin gathers mesh render "
    "instances with glow materials and renders them to the #glowbuffer offscreen "
@@ -54,7 +54,7 @@ RenderGlowMgr::GlowMaterialHook::GlowMaterialHook( BaseMatInstance *matInst )
 {
    mGlowMatInst = (MatInstance*)matInst->getMaterial()->createMatInstance();
    mGlowMatInst->getFeaturesDelegate().bind( &GlowMaterialHook::_overrideFeatures );
-   mGlowMatInst->init(  matInst->getRequestedFeatures(), 
+   mGlowMatInst->init(  matInst->getRequestedFeatures(),
                         matInst->getVertexFormat() );
 }
 
@@ -65,23 +65,23 @@ RenderGlowMgr::GlowMaterialHook::~GlowMaterialHook()
 
 void RenderGlowMgr::GlowMaterialHook::_overrideFeatures( ProcessedMaterial *mat,
                                                          U32 stageNum,
-                                                         MaterialFeatureData &fd, 
+                                                         MaterialFeatureData &fd,
                                                          const FeatureSet &features )
 {
    // If this isn't a glow pass... then add the glow mask feature.
-   if (  mat->getMaterial() && 
+   if (  mat->getMaterial() &&
          !mat->getMaterial()->mGlow[stageNum] )
       fd.features.addFeature( MFT_GlowMask );
 
-   // Don't allow fog or HDR encoding on 
+   // Don't allow fog or HDR encoding on
    // the glow materials.
    fd.features.removeFeature( MFT_Fog );
    fd.features.removeFeature( MFT_HDROut );
 }
 
 RenderGlowMgr::RenderGlowMgr()
-   : RenderTexTargetBinManager(  RenderPassManager::RIT_Mesh, 
-                                 1.0f, 
+   : RenderTexTargetBinManager(  RenderPassManager::RIT_Mesh,
+                                 1.0f,
                                  1.0f,
                                  GFXFormatR8G8B8A8,
                                  Point2I( 512, 512 ) )
@@ -101,7 +101,7 @@ PostEffect* RenderGlowMgr::getGlowEffect()
 {
    if ( !mGlowEffect )
       mGlowEffect = dynamic_cast<PostEffect*>( Sim::findObject( "GlowPostFx" ) );
-   
+
    return mGlowEffect;
 }
 
@@ -112,7 +112,7 @@ bool RenderGlowMgr::isGlowEnabled()
 
 void RenderGlowMgr::addElement( RenderInst *inst )
 {
-   // Skip out if we don't have the glow post 
+   // Skip out if we don't have the glow post
    // effect enabled at this time.
    if ( !isGlowEnabled() )
       return;
@@ -124,7 +124,7 @@ void RenderGlowMgr::addElement( RenderInst *inst )
 
    // Skip it if we don't have a glowing material.
    BaseMatInstance *matInst = getMaterial( inst );
-   if ( !matInst || !matInst->hasGlow() )   
+   if ( !matInst || !matInst->hasGlow() )
       return;
 
    internalAddElement(inst);
@@ -133,7 +133,7 @@ void RenderGlowMgr::addElement( RenderInst *inst )
 void RenderGlowMgr::render( SceneRenderState *state )
 {
    PROFILE_SCOPE( RenderGlowMgr_Render );
-   
+
    if ( !isGlowEnabled() )
       return;
 

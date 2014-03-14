@@ -44,27 +44,27 @@ class GuiDragAndDropControl : public GuiControl
    public:
 
       typedef GuiControl Parent;
-   
+
    private:
-   
+
       /// The mouse down offset from the upper left of the control.
       Point2I mOffset;
-      
+
       /// If true, the control deletes itself when the left mouse button is released.
       bool mDeleteOnMouseUp;
 
       /// Controls may want to react when they are dragged over, entered or exited.
       SimObjectPtr<GuiControl> mLastTarget;
-      
+
       GuiControl* findDragTarget(Point2I mousePoint, const char* method);
-      
+
       Point2I getDropPoint() const
       {
          return getPosition() + (getExtent() / 2);
       }
 
    public:
-   
+
       GuiDragAndDropControl() {}
 
       void startDragging(Point2I offset = Point2I(0, 0));

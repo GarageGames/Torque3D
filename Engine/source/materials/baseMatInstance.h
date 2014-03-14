@@ -66,7 +66,7 @@ class BaseMatInstance
 {
 protected:
 
-   /// The array of active material hooks indexed 
+   /// The array of active material hooks indexed
    /// by a MatInstanceHookType.
    Vector<MatInstanceHook*> mHooks;
 
@@ -84,13 +84,13 @@ public:
 
    virtual ~BaseMatInstance();
 
-   /// @param features The features you want to allow for this material.  
+   /// @param features The features you want to allow for this material.
    ///
    /// @param vertexFormat The vertex format on which this material will be rendered.
    ///
    /// @see GFXVertexFormat
    /// @see FeatureSet
-   virtual bool init(   const FeatureSet &features, 
+   virtual bool init(   const FeatureSet &features,
                         const GFXVertexFormat *vertexFormat ) = 0;
 
    /// Reinitializes the material using the previous
@@ -102,7 +102,7 @@ public:
    /// It is up to the derived class to set this value properly.
    bool isValid() { return mIsValid; }
 
-   /// Adds this stateblock to the base state block 
+   /// Adds this stateblock to the base state block
    /// used during initialization.
    /// @see init
    virtual void addStateBlockDesc(const GFXStateBlockDesc& desc) = 0;
@@ -115,7 +115,7 @@ public:
    /// @see init
    virtual void addShaderMacro( const String &name, const String &value ) = 0;
 
-   /// Get a MaterialParameters block for this BaseMatInstance, 
+   /// Get a MaterialParameters block for this BaseMatInstance,
    /// caller is responsible for freeing it.
    virtual MaterialParameters* allocMaterialParameters() = 0;
 
@@ -143,8 +143,8 @@ public:
    ///@endcode
    ///
    virtual bool setupPass( SceneRenderState *state, const SceneData &sgData ) = 0;
-   
-   /// This initializes the material transforms and should be 
+
+   /// This initializes the material transforms and should be
    /// called after setupPass() within the pass loop.
    /// @see setupPass
    virtual void setTransforms( const MatrixSet &matrixSet, SceneRenderState *state ) = 0;
@@ -160,7 +160,7 @@ public:
    /// @see setupPass
    virtual void setTextureStages(SceneRenderState *, const SceneData &sgData ) = 0;
 
-   /// Sets the vertex and primitive buffers as well as the instancing 
+   /// Sets the vertex and primitive buffers as well as the instancing
    /// stream buffer for the current material if the material is instanced.
    virtual void setBuffers( GFXVertexBufferHandleBase *vertBuffer, GFXPrimitiveBufferHandle *primBuffer ) = 0;
 
@@ -185,15 +185,15 @@ public:
 
    // BTRTODO: This stuff below should probably not be in BaseMatInstance
    virtual bool hasGlow() = 0;
-   
+
    virtual U32 getCurPass() = 0;
 
    virtual U32 getCurStageNum() = 0;
 
    virtual RenderPassData *getPass(U32 pass) = 0;
 
-   /// Returns the state hint which can be used for 
-   /// sorting and fast comparisions of the equality 
+   /// Returns the state hint which can be used for
+   /// sorting and fast comparisions of the equality
    /// of a material instance.
    virtual const MatStateHint& getStateHint() const = 0;
 

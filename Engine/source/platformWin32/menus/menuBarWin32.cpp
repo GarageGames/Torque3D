@@ -34,7 +34,7 @@
 
 // class PlatformMenuBarData
 // {
-// 
+//
 // };
 
 //-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void MenuBar::updateMenuBar(PopupMenu *menu /* = NULL */)
    menu->attachToMenuBar(mCanvas, itr - begin());
 
    Win32Window *pWindow = dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow());
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return;
 
    HWND hWindow = pWindow->getHWND();
@@ -102,7 +102,7 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
    mCanvas = owner;
 
    Win32Window *pWindow = dynamic_cast<Win32Window*>(owner->getPlatformWindow());
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return;
 
    // Setup the native menu bar
@@ -143,7 +143,7 @@ void MenuBar::removeFromCanvas()
       return;
 
    Win32Window *pWindow = dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow());
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return;
 
    // Setup the native menu bar

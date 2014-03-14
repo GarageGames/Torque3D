@@ -36,25 +36,25 @@ using namespace MathUtils;
 
 // Developer Notes:
 
-// How to... Calculate the SelectionAxis index representing the normal 
+// How to... Calculate the SelectionAxis index representing the normal
 // of a plane, given a SelectionPlane index
-// normal = axisVector[2 - (planeIdx - 3 )];  
+// normal = axisVector[2 - (planeIdx - 3 )];
 
 // How to... Get the two AxisVectors of a selected plane
 // vec0 = mProjAxisVector[mAxisGizmoPlanarVectors[mSelectionIdx-3][0]];
-// vec1 = mProjAxisVector[mAxisGizmoPlanarVectors[mSelectionIdx-3][1]]; 
+// vec1 = mProjAxisVector[mAxisGizmoPlanarVectors[mSelectionIdx-3][1]];
 
 ImplementEnumType(GizmoAlignment,
    "Whether the gizmo should be aligned with the world, or with the object.\n"
    "@internal\n\n")
    { World, "World", "Align the gizmo with the world.\n" },
-   { Object, "Object", "Align the gizmo with the object.\n" }      
+   { Object, "Object", "Align the gizmo with the object.\n" }
 EndImplementEnumType;
 
 ImplementEnumType( GizmoMode,
    "@internal" )
    { NoneMode, "None" },
-   { MoveMode, "Move" },      
+   { MoveMode, "Move" },
    { RotateMode, "Rotate" },
    { ScaleMode, "Scale" }
 EndImplementEnumType;
@@ -83,7 +83,7 @@ namespace {
       { 0, 2 }, // XZ
       { 1, 2 }  // YZ
    };
-      
+
    static Point3F sgBoxPnts[] = {
       Point3F(0.0f,0.0f,0.0f),
       Point3F(0.0f,0.0f,1.0f),
@@ -180,7 +180,7 @@ GizmoProfile::GizmoProfile()
    renderSolid = false;
    renderMoveGrid = true;
    gridColor.set(255,255,255,20);
-   planeDim = 500.0f;   
+   planeDim = 500.0f;
 
    gridSize.set(10,10,10);
    snapToGrid = false;
@@ -192,9 +192,9 @@ GizmoProfile::GizmoProfile()
    rotateScalar = 0.8f;
    scaleScalar = 0.8f;
 
-   axisColors[0].set( 255, 0, 0 );   
-   axisColors[1].set( 0, 255, 0 );   
-   axisColors[2].set( 0, 0, 255 );      
+   axisColors[0].set( 255, 0, 0 );
+   axisColors[1].set( 0, 255, 0 );
+   axisColors[2].set( 0, 0, 255 );
 
    activeColor.set( 237, 219, 0 );
    inActiveColor.set( 170, 170, 170 );
@@ -206,8 +206,8 @@ GizmoProfile::GizmoProfile()
 }
 
 void GizmoProfile::restoreDefaultState()
-{   
-   flags = U32_MAX;  
+{
+   flags = U32_MAX;
    flags &= ~CanRotateUniform;
    allAxesScaleUniform = false;
 }
@@ -221,7 +221,7 @@ ConsoleDocClass( GizmoProfile,
 				"@internal");
 
 bool GizmoProfile::onAdd()
-{   
+{
    if ( !Parent::onAdd() )
       return false;
 
@@ -257,7 +257,7 @@ void GizmoProfile::initPersistFields()
    addField( "gridSize",            TypePoint3F, Offset(gridSize, GizmoProfile) );
    addField( "screenLength",        TypeS32,    Offset(screenLen, GizmoProfile) );
    addField( "rotateScalar",        TypeF32,    Offset(rotateScalar, GizmoProfile) );
-   addField( "scaleScalar",         TypeF32,    Offset(scaleScalar, GizmoProfile) );   
+   addField( "scaleScalar",         TypeF32,    Offset(scaleScalar, GizmoProfile) );
    addField( "flags",               TypeS32,    Offset(flags, GizmoProfile) );
 }
 
@@ -281,7 +281,7 @@ void GizmoProfile::consoleInit()
    Con::setIntVariable( "$GizmoFlag::CanTranslateY", CanTranslateY );
    Con::setIntVariable( "$GizmoFlag::CanTranslateZ", CanTranslateZ );
    Con::setIntVariable( "$GizmoFlag::CanTranslateUniform", CanTranslateUniform );
-   Con::setIntVariable( "$GizmoFlag::PlanarHandlesOn", PlanarHandlesOn );   
+   Con::setIntVariable( "$GizmoFlag::PlanarHandlesOn", PlanarHandlesOn );
 }
 
 //-------------------------------------------------------------------------
@@ -323,8 +323,8 @@ Gizmo::Gizmo()
   mMoveGridEnabled( true ),
   mMoveGridSize( 20.f ),
   mMoveGridSpacing( 1.f )
-{   
-   mUniformHandleEnabled = true;   
+{
+   mUniformHandleEnabled = true;
    mAxisEnabled[0] = mAxisEnabled[1] = mAxisEnabled[2] = true;
 }
 
@@ -365,24 +365,24 @@ void Gizmo::initPersistFields()
 {
    Parent::initPersistFields();
 
-   //addField( "profile",)  
+   //addField( "profile",)
 }
 
 // Gizmo Accessors and Mutators...
 
 void Gizmo::set( const MatrixF &objMat, const Point3F &worldPos, const Point3F &objScale )
-{   
+{
    if ( mMouseDown )
       return;
 
-   mCurrentAlignment = _filteredAlignment();   
+   mCurrentAlignment = _filteredAlignment();
 
    if ( mCurrentAlignment == World )
    {
       mTransform.identity();
       mTransform.setPosition( worldPos );
 		mScale = objScale;
-      mObjectMat = objMat;         
+      mObjectMat = objMat;
    }
    else
    {
@@ -393,7 +393,7 @@ void Gizmo::set( const MatrixF &objMat, const Point3F &worldPos, const Point3F &
    }
 
    mCurrentTransform = objMat;
-   mObjectMat.invertTo( &mObjectMatInv );   
+   mObjectMat.invertTo( &mObjectMatInv );
 }
 
 Gizmo::Selection Gizmo::getSelection()
@@ -413,7 +413,7 @@ VectorF Gizmo::selectionToAxisVector( Selection axis )
 }
 
 bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
-{   
+{
    if ( mProfile->mode == NoneMode )
       return false;
 
@@ -426,7 +426,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
       return false;
    if ( mProfile->mode == ScaleMode && !(mProfile->flags & GizmoProfile::CanScale ) )
       return false;
-      
+
    VectorF camPos;
    if( GFX->isFrustumOrtho() )
       camPos = event.pos;
@@ -436,10 +436,10 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
    VectorF toGizmoVec;
 
    // get the projected size...
-   
-   toGizmoVec = mOrigin - mCameraPos;   
+
+   toGizmoVec = mOrigin - mCameraPos;
    toGizmoVec.normalizeSafe();
-   
+
    PlaneF clipPlane( mOrigin, toGizmoVec );
 
    mSelectionIdx = -1;
@@ -467,7 +467,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
             mSelectionIdx = Custom1;
 
             Point3F normal = mousePntSS - originSS;
-            normal.normalizeSafe();            
+            normal.normalizeSafe();
             Point3F tangent = mCross( -normal, Point3F(0,0,1) );
             tangent.normalizeSafe();
 
@@ -478,18 +478,18 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
 
             return true;
          }
-         
+
       }
-      
+
       // Check for x/y/z axis ellipse handle collision.
       // We do this as a screen-space pixel distance test between
       // the cursor position and the ellipse handle projected to the screen
       // as individual segments.
-      {         
+      {
          const F32 ellipseRadiusWS = mProjLen * 0.5f;
          const U32 segments = 40;
          const F32 stepRadians = mDegToRad(360.0f) / segments;
-         
+
          U32 x,y,z;
          F32 ang0, ang1, distSS;
          Point3F temp, pnt0, pnt1, closestPntSS;
@@ -499,12 +499,12 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
          worldToGizmo.inverse();
          PlaneF clipPlaneGS; // Clip plane in gizmo space.
          mTransformPlane( worldToGizmo, Point3F(1,1,1), clipPlane, &clipPlaneGS );
- 
+
          for ( U32 i = 0; i < 3; i++ )
-         {                  
+         {
             if ( !mAxisEnabled[i] )
                continue;
-            
+
             x = sgAxisRemap[i][0];
             y = sgAxisRemap[i][1];
             z = sgAxisRemap[i][2];
@@ -513,7 +513,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
             {
                ang0 = (j-1) * stepRadians;
                ang1 = j * stepRadians;
-               
+
                temp.x = 0.0f;
                temp.y = mCos(ang0) * ellipseRadiusWS;
                temp.z = mSin(ang0) * ellipseRadiusWS;
@@ -559,7 +559,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
          }
       }
 
-      // Check for sphere surface collision               
+      // Check for sphere surface collision
       if ( originDistSS <= (F32)mProfile->screenLen * 0.5f )
       {
          // If this style manipulation is desired it must also be implemented in onMouseDragged.
@@ -671,7 +671,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
          Point3F(mOrigin + a),
          Point3F(mOrigin + a + b),
          Point3F(mOrigin - a + b),
-         Point3F(mOrigin - a)   
+         Point3F(mOrigin - a)
       };
 
       F32 t = plane.intersect(camPos, end);
@@ -700,7 +700,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
             return true;
          }
       }
-   }   
+   }
 
    return false;
 }
@@ -710,7 +710,7 @@ void Gizmo::on3DMouseDown( const Gui3DMouseEvent & event )
    _updateState();
 
    mMouseDown = true;
-   
+
    if ( mProfile->mode == NoneMode )
       return;
 
@@ -751,7 +751,7 @@ void Gizmo::on3DMouseDown( const Gui3DMouseEvent & event )
          mMouseCollideLine = axisLine;
 
          LineSegment segment;
-         mShortestSegmentBetweenLines( clickLine, axisLine, &segment );   
+         mShortestSegmentBetweenLines( clickLine, axisLine, &segment );
 
          mMouseDownProjPnt = segment.p1;
       }
@@ -792,7 +792,7 @@ void Gizmo::on3DMouseDown( const Gui3DMouseEvent & event )
          VectorF normal;
          mCameraMat.getColumn(1,&normal);
          normal = -normal;
-         
+
          PlaneF plane( mOrigin, normal );
 
          mMouseCollidePlane = plane;
@@ -811,18 +811,18 @@ void Gizmo::on3DMouseDown( const Gui3DMouseEvent & event )
          camPos = event.pos;
       else
          camPos = mCameraPos;
-         
+
       Point3F end = camPos + event.vec * smProjectDistance;
 
       if ( 0 <= mSelectionIdx && mSelectionIdx <= 2 )
-      {       
+      {
          // Nothing to do, we already have mElipseCursorCollidePntSS
-         // and mElipseCursorCollideVecSS set.         
+         // and mElipseCursorCollideVecSS set.
       }
       else if ( mSelectionIdx == Custom1 )
       {
          // Nothing to do, we already have mElipseCursorCollidePntSS
-         // and mElipseCursorCollideVecSS set.    
+         // and mElipseCursorCollideVecSS set.
       }
       else if ( mSelectionIdx == Centroid )
       {
@@ -858,11 +858,11 @@ void Gizmo::on3DMouseMove( const Gui3DMouseEvent & event )
 
    collideAxisGizmo( event );
 
-   mLastMouseEvent = event;   
+   mLastMouseEvent = event;
 }
 
 void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
-{   
+{
    _updateState( false );
 
    if ( !mProfile || mProfile->mode == NoneMode || mSelectionIdx == None )
@@ -876,7 +876,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
 	_calcAxisInfo();
 
    if ( mProfile->mode == MoveMode || mProfile->mode == ScaleMode )
-   {      
+   {
       Point3F projPnt = mOrigin;
 
       // Project the mouse position onto the line/plane of manipulation...
@@ -886,10 +886,10 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          MathUtils::Line clickLine;
          clickLine.origin = event.pos;
          clickLine.direction = event.vec;
-         
+
          LineSegment segment;
-         mShortestSegmentBetweenLines( clickLine, mMouseCollideLine, &segment );            
-         
+         mShortestSegmentBetweenLines( clickLine, mMouseCollideLine, &segment );
+
          projPnt = segment.p1;
 
          // snap to the selected axisIdx, if required
@@ -903,7 +903,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          {
             projPnt[sgPlanarVectors[mSelectionIdx-3][0]] = snapPnt[sgPlanarVectors[mSelectionIdx-3][0]];
             projPnt[sgPlanarVectors[mSelectionIdx-3][1]] = snapPnt[sgPlanarVectors[mSelectionIdx-3][1]];
-         }         
+         }
       }
       else if ( 3 <= mSelectionIdx && mSelectionIdx <= 5 )
       {
@@ -911,7 +911,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          {
             Point3F intersectPnt;
             if ( mMouseCollidePlane.intersect( event.pos, event.vec, &intersectPnt ) )
-            {                    
+            {
                projPnt = intersectPnt;
 
                // snap to the selected axisIdx, if required
@@ -927,7 +927,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
             clickLine.direction = event.vec;
 
             LineSegment segment;
-            mShortestSegmentBetweenLines( clickLine, mMouseCollideLine, &segment );            
+            mShortestSegmentBetweenLines( clickLine, mMouseCollideLine, &segment );
 
             projPnt = segment.p1;
          }
@@ -958,10 +958,10 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          }
          else
          {
-            mDeltaTotalPos = projPnt - mMouseDownProjPnt;  
+            mDeltaTotalPos = projPnt - mMouseDownProjPnt;
             newPosition = mSavedTransform.getPosition() + mDeltaTotalPos;
          }
-         
+
          mDeltaPos = newPosition - mTransform.getPosition();
          mTransform.setPosition( newPosition );
 
@@ -969,7 +969,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
       }
       else // ScaleMode
       {
-         // This is the world-space axis we want to scale      
+         // This is the world-space axis we want to scale
          //VectorF axis = sgAxisVectors[mSelectionIdx];
 
          // Find its object-space components...
@@ -988,7 +988,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          mDeltaRot.zero();
          mDeltaPos.zero();
 
-         
+
          // Calculate the deltaScale...
          VectorF deltaScale(0,0,0);
 
@@ -997,7 +997,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
             // Are we above or below the starting position relative to this axis?
             PlaneF plane( mMouseDownProjPnt, mProjAxisVector[mSelectionIdx] );
             F32 sign = ( plane.whichSide( projPnt ) == PlaneF::Front ) ? 1 : -1;
-            F32 diff = ( projPnt - mMouseDownProjPnt ).len();    
+            F32 diff = ( projPnt - mMouseDownProjPnt ).len();
 
             if ( mProfile->allAxesScaleUniform )
             {
@@ -1033,7 +1033,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
             PlaneF plane( mMouseDownProjPnt, normal );
 
             F32 sign = ( plane.whichSide( projPnt ) == PlaneF::Front ) ? 1 : -1;
-            F32 diff = ( projPnt - mMouseDownProjPnt ).len();    
+            F32 diff = ( projPnt - mMouseDownProjPnt ).len();
             deltaScale.set(1,1,1);
             deltaScale = deltaScale * sign * diff;
          }
@@ -1055,7 +1055,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
       mDirty = true;
    }
    else if ( mProfile->mode == RotateMode &&
-             mSelectionIdx != Centroid )      
+             mSelectionIdx != Centroid )
    {
       // Clear deltas we aren't using...
       mDeltaScale.zero();
@@ -1064,22 +1064,22 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
       bool doScreenRot = ( mSelectionIdx == Custom1 );
 
       U32 rotAxisIdx = ( doScreenRot ) ? 1 : mSelectionIdx;
-      
+
       Point3F mousePntSS( event.mousePoint.x, event.mousePoint.y, 0.0f );
-      
+
       Point3F pntSS0 = mElipseCursorCollidePntSS + mElipseCursorCollideVecSS * 10000.0f;
       Point3F pntSS1 = mElipseCursorCollidePntSS - mElipseCursorCollideVecSS * 10000.0f;
 
-      Point3F closestPntSS = MathUtils::mClosestPointOnSegment( pntSS0, pntSS1, mousePntSS );  
+      Point3F closestPntSS = MathUtils::mClosestPointOnSegment( pntSS0, pntSS1, mousePntSS );
 
       Point3F offsetDir = closestPntSS - mElipseCursorCollidePntSS;
       F32 offsetDist = offsetDir.len();
-      offsetDir.normalizeSafe();                  
+      offsetDir.normalizeSafe();
 
       F32 dot = mDot( mElipseCursorCollideVecSS, offsetDir );
-      mSign = mIsZero( dot ) ? 0.0f : ( dot > 0.0f ) ? -1.0f : 1.0f;  
+      mSign = mIsZero( dot ) ? 0.0f : ( dot > 0.0f ) ? -1.0f : 1.0f;
 
-      // The angle that we will rotate the (saved) gizmo transform by to 
+      // The angle that we will rotate the (saved) gizmo transform by to
       // generate the current gizmo transform.
       F32 angle = offsetDist * mSign * mProfile->rotateScalar;
       angle *= 0.02f; // scale down to not require rotate scalar to be microscopic
@@ -1089,32 +1089,32 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          angle = mDegToRad( _snapFloat( mRadToDeg( angle ), mProfile->rotationSnap ) );
 
       mDeltaAngle = angle - mLastAngle;
-      mLastAngle = angle;         
+      mLastAngle = angle;
 
       if ( doScreenRot )
-      {         
+      {
          // Rotate relative to the camera.
          // We rotate around the y/forward vector pointing from the camera
          // to the gizmo.
-                
+
          // NOTE: This does NOT work
 
          // Calculate mDeltaAngle and mDeltaTotalRot
          //{
          //   VectorF fvec( mOrigin - mCameraPos );
-         //   fvec.normalizeSafe();        
+         //   fvec.normalizeSafe();
 
          //   AngAxisF aa( fvec, mDeltaAngle );
          //   MatrixF mat;
          //   aa.setMatrix( &mat );
 
-         //   mDeltaRot = mat.toEuler();                
+         //   mDeltaRot = mat.toEuler();
 
-         //   aa.set( fvec, mLastAngle );            
+         //   aa.set( fvec, mLastAngle );
          //   aa.setMatrix( &mat );
          //   mDeltaTotalRot = mat.toEuler();
          //}
-     
+
          //MatrixF rotMat( mDeltaTotalRot );
 
          //if ( mCurrentAlignment == World )
@@ -1126,7 +1126,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          //   rotMat.inverse();
          //   mCurrentTransform = mObjectMatInv * rotMat;
          //   mCurrentTransform.inverse();
-         //   mCurrentTransform.setPosition( mOrigin ); 
+         //   mCurrentTransform.setPosition( mOrigin );
          //}
          //else
          //{
@@ -1134,27 +1134,27 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
 
          //   MatrixF m0;
          //   mSavedTransform.invertTo(&m0);
-         //   
+         //
          //   mTransform = m0 * rotMat;
          //   mTransform.inverse();
          //   mTransform.setPosition( mOrigin );
 
          //   mCurrentTransform = mTransform;
-         //}    
-      }      
+         //}
+      }
       else
-      {        
+      {
          // Normal rotation, eg, not screen relative.
 
-         mDeltaRot.set(0,0,0);      
-         mDeltaRot[rotAxisIdx] = mDeltaAngle;            
+         mDeltaRot.set(0,0,0);
+         mDeltaRot[rotAxisIdx] = mDeltaAngle;
 
          mDeltaTotalRot.set(0,0,0);
-         mDeltaTotalRot[rotAxisIdx] = angle; 
+         mDeltaTotalRot[rotAxisIdx] = angle;
 
          MatrixF rotMat( mDeltaTotalRot );
 
-         mTransform = mSavedTransform * rotMat;      
+         mTransform = mSavedTransform * rotMat;
          mTransform.setPosition( mSavedTransform.getPosition() );
 
          if ( mCurrentAlignment == World )
@@ -1164,7 +1164,7 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
             rotMat.inverse();
             mCurrentTransform = mObjectMatInv * rotMat;
             mCurrentTransform.inverse();
-            mCurrentTransform.setPosition( mOrigin );         
+            mCurrentTransform.setPosition( mOrigin );
 
             MatrixF mat1 = mCurrentTransform;
             mat0.inverse();
@@ -1176,10 +1176,10 @@ void Gizmo::on3DMouseDragged( const Gui3DMouseEvent & event )
          {
             mCurrentTransform = mTransform;
          }
-      }            
+      }
 
       mDirty = true;
-   }   
+   }
 
    mLastMouseEvent = event;
 }
@@ -1196,7 +1196,7 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
 
    // Save the Camera transform matrix, used all over...
    mCameraMat = cameraTransform;
-   mCameraPos = mCameraMat.getPosition();   
+   mCameraPos = mCameraMat.getPosition();
 
    GFXFrustumSaver fsaver;
 
@@ -1205,11 +1205,11 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
    frustum.setFarDist( 100000.0f );
    GFX->setFrustum( frustum );
 
-   _updateEnabledAxices();   
+   _updateEnabledAxices();
 
    _updateState();
 
-   _calcAxisInfo();   
+   _calcAxisInfo();
 
    if( mMouseDown )
    {
@@ -1255,15 +1255,15 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
          return;
    }
 
-   mHighlightAll = mProfile->allAxesScaleUniform && mSelectionIdx >= 0 && mSelectionIdx <= 3;      
+   mHighlightAll = mProfile->allAxesScaleUniform && mSelectionIdx >= 0 && mSelectionIdx <= 3;
 
    // Render plane (if set to render) behind the gizmo
    if ( mProfile->mode != NoneMode )
       _renderPlane();
 
-   _setStateBlock(); 
+   _setStateBlock();
 
-   // Special case for NoneMode, 
+   // Special case for NoneMode,
    // we only render the primary axis with no tips.
    if ( mProfile->mode == NoneMode )
    {
@@ -1277,7 +1277,7 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
 
       // Render the primary axisIdx
       for(U32 i = 0; i < 3; i++)
-      {         
+      {
          PrimBuild::color( ( mHighlightAll || i == mSelectionIdx ) ? mProfile->axisColors[i] : mProfile->inActiveColor );
          PrimBuild::vertex3fv( mOrigin );
          PrimBuild::vertex3fv( mOrigin + mProjAxisVector[i] * mProjLen * 0.25f );
@@ -1296,11 +1296,11 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
       // Render the tips based on current operation.
 
       GFXTransformSaver saver( true, false );
-      
+
       GFX->multWorld(mTransform);
 
       if ( mProfile->mode == ScaleMode )
-      {      
+      {
          _renderAxisBoxes();
       }
       else if ( mProfile->mode == MoveMode )
@@ -1309,12 +1309,12 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
       }
 
       saver.restore();
-   }         
+   }
 
    // Render the planar handles...
 
    if ( mCurrentMode != RotateMode )
-   {   
+   {
       Point3F midpnt[3];
       for(U32 i = 0; i < 3; i++)
          midpnt[i] = mProjAxisVector[i] * mProjLen * 0.5f;
@@ -1331,17 +1331,17 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
 
          bool selected0 = false;
          bool selected1 = false;
-         
+
          if ( i + 3 == mSelectionIdx )
             selected0 = selected1 = true;
 
          bool inactive = !mAxisEnabled[axis0] || !mAxisEnabled[axis1] || !(mProfile->flags & GizmoProfile::PlanarHandlesOn);
-         
+
          if ( inactive )
             PrimBuild::color( mProfile->hideDisabledAxes ? ColorI::ZERO : mProfile->inActiveColor );
          else
             PrimBuild::color( selected0 ? mProfile->activeColor : mProfile->axisColors[axis0] );
-          
+
          PrimBuild::vertex3fv( mOrigin + p0 );
          PrimBuild::vertex3fv( mOrigin + p0 + p1 );
 
@@ -1376,7 +1376,7 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
             PrimBuild::color( planeColorSEL );
          else
             PrimBuild::color( planeColorNA );
-         
+
          PrimBuild::vertex3fv( mOrigin );
          PrimBuild::vertex3fv( mOrigin + p0 );
          PrimBuild::vertex3fv( mOrigin + p0 + p1 );
@@ -1390,8 +1390,8 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
    }
 
    // Render Centroid Handle...
-   if ( mUniformHandleEnabled )   
-   {      
+   if ( mUniformHandleEnabled )
+   {
       F32 tipScale = mProjLen * 0.075f;
       GFXTransformSaver saver;
       GFX->multWorld( mTransform );
@@ -1474,19 +1474,19 @@ void Gizmo::renderText( const RectI &viewPort, const MatrixF &modelView, const M
 // Gizmo Internal Methods...
 
 void Gizmo::_calcAxisInfo()
-{   
+{
    mOrigin = mTransform.getPosition();
 
    for ( U32 i = 0; i < 3; i++ )
-   {      
+   {
       VectorF tmp;
       mTransform.mulV(sgAxisVectors[i], &tmp);
       mProjAxisVector[i] = tmp;
       mProjAxisVector[i].normalizeSafe();
-   }     
+   }
 
    // get the projected size...
-   
+
    mProjLen = _getProjectionLength( mProfile->screenLen );
 }
 
@@ -1517,7 +1517,7 @@ void Gizmo::_renderPrimaryAxis()
                color = mProfile->activeColor;
          }
          else if ( mSelectionIdx == 6 )
-            color = mProfile->activeColor;      
+            color = mProfile->activeColor;
       }
 
       if ( mHighlightAll )
@@ -1530,7 +1530,7 @@ void Gizmo::_renderPrimaryAxis()
          color.alpha = saveAlpha;
       }
 
-      PrimBuild::begin( GFXLineList, 2 );    
+      PrimBuild::begin( GFXLineList, 2 );
       PrimBuild::color( color );
       PrimBuild::vertex3fv( mOrigin );
       PrimBuild::vertex3fv( mOrigin + mProjAxisVector[i] * mProjLen );
@@ -1558,7 +1558,7 @@ void Gizmo::_renderAxisArrows()
 
       x = sgAxisRemap[axisIdx][0];
       y = sgAxisRemap[axisIdx][1];
-      z = sgAxisRemap[axisIdx][2];      
+      z = sgAxisRemap[axisIdx][2];
 
       for ( U32 i = 0; i < sizeof(sgConeVerts) / (sizeof(U32)*3); ++i )
       {
@@ -1619,7 +1619,7 @@ void Gizmo::_renderAxisCircles()
    // Setup the WorldMatrix for rendering in camera space.
    // Honestly not sure exactly why this works but it does...
    GFX->pushWorldMatrix();
-   MatrixF cameraXfm = GFX->getWorldMatrix();   
+   MatrixF cameraXfm = GFX->getWorldMatrix();
    cameraXfm.inverse();
    const Point3F cameraPos = cameraXfm.getPosition();
    cameraXfm.setPosition( mOrigin );
@@ -1652,11 +1652,11 @@ void Gizmo::_renderAxisCircles()
 
    // Render the gizmo/sphere bounding circle...
    {
-      F32 radius = mProjLen * 0.5f;   
+      F32 radius = mProjLen * 0.5f;
       U32 segments = 40;
       F32 step = mDegToRad(360.0f) / segments;
       Point3F pnt;
-      
+
       // Render as solid (with transparency) when the sphere is selected
       if ( mSelectionIdx == Custom2 )
       {
@@ -1664,7 +1664,7 @@ void Gizmo::_renderAxisCircles()
          color.alpha = 100;
          PrimBuild::color( color );
          PrimBuild::begin( GFXTriangleFan, segments+2 );
-         
+
          PrimBuild::vertex3fv( Point3F(0,0,0) );
 
          for(U32 i = 0; i <= segments; i++)
@@ -1755,7 +1755,7 @@ void Gizmo::_renderAxisCircles()
             temp.y = mCos(ang1) * radius;
             temp.z = mSin(ang1) * radius;
             Point3F pnt1( temp[x], temp[y], temp[z] );
-            
+
             bool valid0 = ( clipPlane.whichSide(pnt0) == PlaneF::Back );
             bool valid1 = ( clipPlane.whichSide(pnt1) == PlaneF::Back );
 
@@ -1787,7 +1787,7 @@ void Gizmo::_renderAxisCircles()
 
       F32 worldZDist = ( mMouseCollideLine.origin - mCameraPos ).len();
       F32 hintArrowLen = ( hintArrowScreenLength * worldZDist ) / mLastWorldToScreenScale.y;
-      F32 hintArrowTipLen = ( hintArrowTipScreenLength * worldZDist ) / mLastWorldToScreenScale.y;            
+      F32 hintArrowTipLen = ( hintArrowTipScreenLength * worldZDist ) / mLastWorldToScreenScale.y;
 
       Point3F p0 = mMouseCollideLine.origin - mMouseCollideLine.direction * hintArrowLen;
       Point3F p1 = mMouseCollideLine.origin;
@@ -1797,7 +1797,7 @@ void Gizmo::_renderAxisCircles()
       // positive size of the MouseCollideLine direction.
       ColorI color0 = ( mSign > 0.0f ) ? mProfile->activeColor : mProfile->inActiveColor;
       ColorI color1 = ( mSign < 0.0f ) ? mProfile->activeColor : mProfile->inActiveColor;
-            
+
       PrimBuild::color( color0 );
       PrimBuild::vertex3fv( p1 );
       PrimBuild::vertex3fv( p0 );
@@ -1822,7 +1822,7 @@ void Gizmo::_renderPlane()
 {
    if( !mGridPlaneEnabled )
       return;
-      
+
    Point2F size( mProfile->planeDim, mProfile->planeDim );
 
    GFXStateBlockDesc desc;
@@ -1837,7 +1837,7 @@ void Gizmo::_renderPlane()
 
    if ( mProfile->renderPlaneHashes )
    {
-      // TODO: This wasn't specified before... so it was 
+      // TODO: This wasn't specified before... so it was
       // rendering lines that were invisible.  Maybe we need
       // a new field for grid line color?
       ColorI gridColor( mProfile->gridColor );
@@ -1874,7 +1874,7 @@ void Gizmo::_setStateBlock()
 }
 
 Point3F Gizmo::_snapPoint( const Point3F &pnt ) const
-{   
+{
    if ( !mProfile->snapToGrid )
       return pnt;
 
@@ -1887,7 +1887,7 @@ Point3F Gizmo::_snapPoint( const Point3F &pnt ) const
 }
 
 F32 Gizmo::_snapFloat( const F32 &val, const F32 &snap ) const
-{   
+{
    if ( snap == 0.0f )
       return val;
 
@@ -1913,7 +1913,7 @@ GizmoAlignment Gizmo::_filteredAlignment()
 }
 
 void Gizmo::_updateState( bool collideGizmo )
-{   
+{
    if ( !mProfile )
       return;
 
@@ -1945,26 +1945,26 @@ void Gizmo::_updateState( bool collideGizmo )
       return;
 
    GizmoAlignment desired = _filteredAlignment();
-   
-   if ( desired == World && 
+
+   if ( desired == World &&
         mCurrentAlignment == Object )
    {
       mObjectMat = mTransform;
       mTransform.identity();
       mTransform.setPosition( mObjectMat.getPosition() );
    }
-   else if ( desired == Object && 
+   else if ( desired == Object &&
              mCurrentAlignment == World )
    {
       Point3F pos = mTransform.getPosition();
       mTransform = mObjectMat;
       mTransform.setPosition( pos );
-      mObjectMat.identity();        
+      mObjectMat.identity();
       mObjectMat.setPosition( pos );
    }
 
    mCurrentAlignment = desired;
-   
+
    mObjectMat.invertTo( &mObjectMatInv );
 }
 
@@ -2000,7 +2000,7 @@ void Gizmo::_updateEnabledAxices()
       mAxisEnabled[0] = mAxisEnabled[1] = mAxisEnabled[2] = false;
       return;
    }
-   
+
    for ( U32 i = 0; i < 3; i++ )
    {
       mAxisEnabled[i] = false;
@@ -2017,5 +2017,5 @@ void Gizmo::_updateEnabledAxices()
          continue;
 
       mAxisEnabled[i] = true;
-   }   
+   }
 }

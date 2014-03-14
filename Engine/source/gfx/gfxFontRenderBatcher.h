@@ -31,11 +31,11 @@
 
 class FontRenderBatcher
 {
-   struct CharMarker 
+   struct CharMarker
    {
       S32 c;
       F32 x;
-      GFXVertexColor color; 
+      GFXVertexColor color;
       PlatformFont::CharInfo *ci;
    };
 

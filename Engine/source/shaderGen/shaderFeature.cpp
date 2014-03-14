@@ -40,8 +40,8 @@ void ShaderFeature::addDependency( const ShaderDependency *dependsOn )
 
 ShaderFeature::Resources ShaderFeature::getResources( const MaterialFeatureData &fd )
 {
-   Resources temp; 
-   return temp; 
+   Resources temp;
+   return temp;
 }
 
 const char* ShaderFeature::getOutputTargetVarName( OutputTarget target ) const
@@ -56,8 +56,8 @@ const char* ShaderFeature::getOutputTargetVarName( OutputTarget target ) const
    return targName;
 }
 
-Var* ShaderFeature::findOrCreateLocal( const char *name, 
-                                       const char *type, 
+Var* ShaderFeature::findOrCreateLocal( const char *name,
+                                       const char *type,
                                        MultiLine *multi )
 {
    Var *outVar = (Var*)LangElement::find( name );

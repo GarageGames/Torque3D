@@ -40,14 +40,14 @@ extern "C" {
    {
       const char* nameSpace;
       const char* name;
-      Namespace::Entry* entry; 
+      Namespace::Entry* entry;
       S32 minArgs;
       S32 maxArgs;
       S32 cbType;
    };
 
 
-   static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)                                          
+   static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)
    {
       Namespace* ns = NULL;
 
@@ -78,7 +78,7 @@ extern "C" {
 
       const char* argv[] = {"consoleExportXML", 0};
 
-      return entry->cb.mStringCallbackFunc(NULL, 1, argv);      
+      return entry->cb.mStringCallbackFunc(NULL, 1, argv);
    }
 
    MarshalNativeEntry* script_get_namespace_entry(const char* nameSpace, const char* name)
@@ -215,7 +215,7 @@ extern "C" {
             return "";
       }
 
-      return entry->cb.mStringCallbackFunc(o, argc, argv);      
+      return entry->cb.mStringCallbackFunc(o, argc, argv);
    }
 
    bool script_call_namespace_entry_bool(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -233,7 +233,7 @@ extern "C" {
             return "";
       }
 
-      return entry->cb.mBoolCallbackFunc(o, argc, argv);      
+      return entry->cb.mBoolCallbackFunc(o, argc, argv);
    }
 
    S32 script_call_namespace_entry_int(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -251,7 +251,7 @@ extern "C" {
             return 0;
       }
 
-      return entry->cb.mIntCallbackFunc(o, argc, argv);      
+      return entry->cb.mIntCallbackFunc(o, argc, argv);
    }
 
    F32 script_call_namespace_entry_float(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -269,7 +269,7 @@ extern "C" {
             return 0.0f;
       }
 
-      return entry->cb.mFloatCallbackFunc(o, argc, argv);      
+      return entry->cb.mFloatCallbackFunc(o, argc, argv);
    }
 
 
@@ -288,7 +288,7 @@ extern "C" {
             return;
       }
 
-      entry->cb.mVoidCallbackFunc(o, argc, argv);      
+      entry->cb.mVoidCallbackFunc(o, argc, argv);
    }
 
    int script_simobject_get_id(SimObject* so)
@@ -406,7 +406,7 @@ extern "C" {
 
          }
 
-      }      
+      }
 
    }
 #endif

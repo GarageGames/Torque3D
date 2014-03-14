@@ -31,7 +31,7 @@ function onServerCreated()
    // Server::GameType is sent to the master server.
    // This variable should uniquely identify your game and/or mod.
    $Server::GameType = "Test App";
-   
+
    // Load up any objects or datablocks saved to the editor managed scripts
    %datablockFiles = new ArrayObject();
    %datablockFiles.add( "art/particles/managedParticleData.cs" );
@@ -39,7 +39,7 @@ function onServerCreated()
    %datablockFiles.add( "art/decals/managedDecalData.cs" );
    %datablockFiles.add( "art/datablocks/managedDatablocks.cs" );
    %datablockFiles.add( "art/forest/managedItemData.cs" );
-   %datablockFiles.add( "art/datablocks/datablockExec.cs" );   
+   %datablockFiles.add( "art/datablocks/datablockExec.cs" );
    loadDatablockFiles( %datablockFiles, true );
 
    // Run the other gameplay scripts in this folder
@@ -56,17 +56,17 @@ function loadDatablockFiles( %datablockFiles, %recurse )
       recursiveLoadDatablockFiles( %datablockFiles, 9999 );
       return;
    }
-   
+
    %count = %datablockFiles.count();
    for ( %i=0; %i < %count; %i++ )
    {
       %file = %datablockFiles.getKey( %i );
       if ( !isScriptFile( %file ) )
          continue;
-                  
+
       exec( %file );
    }
-      
+
    // Destroy the incoming list.
    %datablockFiles.delete();
 }
@@ -75,23 +75,23 @@ function recursiveLoadDatablockFiles( %datablockFiles, %previousErrors )
 {
    %reloadDatablockFiles = new ArrayObject();
 
-   // Keep track of the number of datablocks that 
+   // Keep track of the number of datablocks that
    // failed during this pass.
    %failedDatablocks = 0;
-   
+
    // Try re-executing the list of datablock files.
    %count = %datablockFiles.count();
    for ( %i=0; %i < %count; %i++ )
-   {      
+   {
       %file = %datablockFiles.getKey( %i );
       if ( !isScriptFile( %file ) )
          continue;
-         
+
       // Start counting copy constructor creation errors.
       $Con::objectCopyFailures = 0;
-                                       
+
       exec( %file );
-                                    
+
       // If errors occured then store this file for re-exec later.
       if ( $Con::objectCopyFailures > 0 )
       {
@@ -99,36 +99,36 @@ function recursiveLoadDatablockFiles( %datablockFiles, %previousErrors )
          %failedDatablocks = %failedDatablocks + $Con::objectCopyFailures;
       }
    }
-            
+
    // Clear the object copy failure counter so that
    // we get console error messages again.
    $Con::objectCopyFailures = -1;
-                  
+
    // Delete the old incoming list... we're done with it.
    %datablockFiles.delete();
-               
+
    // If we still have datablocks to retry.
    %newCount = %reloadDatablockFiles.count();
    if ( %newCount > 0 )
    {
       // If the datablock failures have not been reduced
       // from the last pass then we must have a real syntax
-      // error and not just a bad dependancy.         
+      // error and not just a bad dependancy.
       if ( %lastFailures > %failedDatablocks )
          recursiveLoadDatablockFiles( %reloadDatablockFiles, %failedDatablocks );
-                  
+
       else
-      {      
-         // Since we must have real syntax errors do one 
+      {
+         // Since we must have real syntax errors do one
          // last normal exec to output error messages.
          loadDatablockFiles( %reloadDatablockFiles, false );
       }
-      
+
       return;
    }
-                  
+
    // Cleanup the empty reload list.
-   %reloadDatablockFiles.delete();         
+   %reloadDatablockFiles.delete();
 }
 
 function onServerDestroyed()

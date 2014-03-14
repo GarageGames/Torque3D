@@ -137,7 +137,7 @@ class AsyncPeriodicUpdateThread : public AsyncUpdateThread
 
       /// Platform-dependent timer event.
       void* mUpdateTimer;
-      
+
       /// Time between periodic updates in milliseconds.
       U32 mIntervalMS;
 

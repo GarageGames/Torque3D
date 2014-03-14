@@ -48,19 +48,19 @@ class ProcessedMaterial;
 
 ///
 class MatInstance : public BaseMatInstance
-{   
+{
 public:
    virtual ~MatInstance();
 
    // BaseMatInstance
-   virtual bool init(   const FeatureSet &features, 
+   virtual bool init(   const FeatureSet &features,
                         const GFXVertexFormat *vertexFormat );
    virtual bool reInit();
    virtual void addStateBlockDesc(const GFXStateBlockDesc& desc);
    virtual void updateStateBlocks();
    virtual void addShaderMacro( const String &name, const String &value );
    virtual MaterialParameters* allocMaterialParameters();
-   virtual void setMaterialParameters(MaterialParameters* param); 
+   virtual void setMaterialParameters(MaterialParameters* param);
    virtual MaterialParameters* getMaterialParameters();
    virtual MaterialParameterHandle* getMaterialParameterHandle(const String& name);
    virtual bool setupPass(SceneRenderState *, const SceneData &sgData );
@@ -77,13 +77,13 @@ public:
    virtual bool hasGlow();
    virtual U32 getCurPass() { return getMax( mCurPass, 0 ); }
    virtual U32 getCurStageNum();
-   virtual RenderPassData *getPass(U32 pass);   
+   virtual RenderPassData *getPass(U32 pass);
    virtual const MatStateHint& getStateHint() const;
    virtual const GFXVertexFormat* getVertexFormat() const { return mVertexFormat; }
    virtual const FeatureSet& getFeatures() const;
    virtual const FeatureSet& getRequestedFeatures() const { return mFeatureList; }
    virtual void dumpShaderInfo() const;
-   
+
 
    ProcessedMaterial *getProcessedMaterial() const { return mProcessedMaterial; }
 
@@ -120,19 +120,19 @@ protected:
    Vector<GFXShaderMacro> mUserMacros;
 
    SimObject *mUserObject;
-   
+
    Vector<MatInstanceParameterHandle*> mCurrentHandles;
    Vector<MatInstParameters*> mCurrentParameters;
    MatInstParameters* mActiveParameters;
    MatInstParameters* mDefaultParameters;
-   
+
    bool mCreatedFromCustomMaterial;
 private:
-   void construct();  
+   void construct();
 };
 
 //
-// MatInstParameters 
+// MatInstParameters
 //
 class MatInstParameters : public MaterialParameters
 {
@@ -140,7 +140,7 @@ public:
    MatInstParameters();
    MatInstParameters(MaterialParameters* matParams);
    virtual ~MatInstParameters();
-   
+
    void loadParameters(ProcessedMaterial* pmat);
 
    /// Returns our list of shader constants, the material can get this and just set the constants it knows about

@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #ifndef _UTIL_JOURNAL_JOURNAL_H_
-#define _UTIL_JOURNAL_JOURNAL_H_ 
+#define _UTIL_JOURNAL_JOURNAL_H_
 
 #include "platform/platform.h"
 #include "core/stream/stream.h"
@@ -43,7 +43,7 @@
 ///
 /// For the journals to play back correctly, journal events cannot
 /// be triggered during the processing of another event.
-class Journal 
+class Journal
 {
    Journal() {}
    ~Journal();
@@ -55,7 +55,7 @@ class Journal
    typedef void (Journal::*VoidMethod)();
 
    /// Functor base classes
-   struct Functor 
+   struct Functor
    {
       Functor() {}
       virtual ~Functor() {}
@@ -437,7 +437,7 @@ public:
       AssertFatal(IsRecording(), "Journal::Write - not recording right now.");
       bool r = mFile->write(size, buffer);
       AssertFatal(r, "Journal::Write - failed to write!");
-      return r;   
+      return r;
    }
 
    static void WriteString(const char str[256])

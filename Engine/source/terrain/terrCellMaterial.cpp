@@ -58,17 +58,17 @@ TerrainCellMaterial::TerrainCellMaterial()
 TerrainCellMaterial::~TerrainCellMaterial()
 {
    SAFE_DELETE( mPrePassMat );
-   SAFE_DELETE( mReflectMat );   
+   SAFE_DELETE( mReflectMat );
    smAllMaterials.remove( this );
 }
 
 void TerrainCellMaterial::_updateDefaultAnisotropy()
 {
    // TODO: We need to split the stateblock initialization
-   // from the shader constant lookup and pass setup in a 
+   // from the shader constant lookup and pass setup in a
    // future version of terrain materials.
    //
-   // For now use some custom code in a horrible loop to 
+   // For now use some custom code in a horrible loop to
    // change the anisotropy directly and fast.
    //
 
@@ -142,7 +142,7 @@ void TerrainCellMaterial::_updateDefaultAnisotropy()
 
 }
 
-void TerrainCellMaterial::setTransformAndEye(   const MatrixF &modelXfm, 
+void TerrainCellMaterial::setTransformAndEye(   const MatrixF &modelXfm,
                                                 const MatrixF &viewXfm,
                                                 const MatrixF &projectXfm,
                                                 F32 farPlane )
@@ -150,17 +150,17 @@ void TerrainCellMaterial::setTransformAndEye(   const MatrixF &modelXfm,
    PROFILE_SCOPE( TerrainCellMaterial_SetTransformAndEye );
 
    MatrixF modelViewProj = projectXfm * viewXfm * modelXfm;
-  
+
    MatrixF invViewXfm( viewXfm );
    invViewXfm.inverse();
    Point3F eyePos = invViewXfm.getPosition();
-   
+
    MatrixF invModelXfm( modelXfm );
    invModelXfm.inverse();
 
    Point3F objEyePos = eyePos;
    invModelXfm.mulP( objEyePos );
-   
+
    VectorF vEye = invViewXfm.getForwardVector();
    vEye.normalize( 1.0f / farPlane );
 
@@ -180,7 +180,7 @@ void TerrainCellMaterial::setTransformAndEye(   const MatrixF &modelXfm,
          {
             worldViewOnly.affineInverse();
             pass.consts->set( pass.viewToObj, worldViewOnly);
-         } 
+         }
       }
 
       pass.consts->setSafe( pass.eyePosWorldConst, eyePos );
@@ -214,7 +214,7 @@ TerrainCellMaterial* TerrainCellMaterial::getReflectMat()
 }
 
 void TerrainCellMaterial::init(  TerrainBlock *block,
-                                 U64 activeMaterials, 
+                                 U64 activeMaterials,
                                  bool prePassMat,
                                  bool reflectMat,
                                  bool baseOnly )
@@ -243,15 +243,15 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
    mCurrPass = 0;
    mPasses.clear();
 
-   // Ok... loop till we successfully generate all 
+   // Ok... loop till we successfully generate all
    // the shader passes for the materials.
    while ( materials.size() > 0 || baseOnly )
    {
       mPasses.increment();
 
-      if ( !_createPass(   &materials, 
-                           &mPasses.last(), 
-                           mPasses.size() == 1, 
+      if ( !_createPass(   &materials,
+                           &mPasses.last(),
+                           mPasses.size() == 1,
                            prePassMat,
                            reflectMat,
                            baseOnly ) )
@@ -279,8 +279,8 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
       mReflectMat->init( mTerrain, mMaterials, false, true, baseOnly );
 }
 
-bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials, 
-                                       Pass *pass, 
+bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
+                                       Pass *pass,
                                        bool firstPass,
                                        bool prePassMat,
                                        bool reflectMat,
@@ -289,7 +289,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    if ( GFX->getPixelShaderVersion() < 3.0f )
       baseOnly = true;
 
-   // NOTE: At maximum we only try to combine 3 materials 
+   // NOTE: At maximum we only try to combine 3 materials
    // into a single pass.  This is sub-optimal for the simplest
    // cases, but the most common case results in much fewer
    // shader generation failures and permutations leading to
@@ -310,7 +310,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    const bool disableNormalMaps = MATMGR->getExclusionFeatures().hasFeature( MFT_NormalMap ) || useBLM;
 
    // How about parallax?
-   const bool disableParallaxMaps = GFX->getPixelShaderVersion() < 3.0f || 
+   const bool disableParallaxMaps = GFX->getPixelShaderVersion() < 3.0f ||
                                     MATMGR->getExclusionFeatures().hasFeature( MFT_Parallax );
 
    // Has advanced lightmap support been enabled for prepass.
@@ -373,12 +373,12 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          if ( mat == NULL )
             continue;
 
-         // We only include materials that 
+         // We only include materials that
          // have more than a base texture.
          if (  mat->getDetailSize() <= 0 ||
                mat->getDetailDistance() <= 0 ||
                mat->getDetailMap().isEmpty() )
-            continue;         
+            continue;
 
          S32 featureIndex = pass->materials.size();
 
@@ -396,7 +396,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          {
             features.addFeature( MFT_TerrainNormalMap, featureIndex );
 
-            normalMaps.last().set( mat->getNormalMap(), 
+            normalMaps.last().set( mat->getNormalMap(),
                &GFXDefaultStaticNormalMapProfile, "TerrainCellMaterial::_createPass() - NormalMap" );
 
             if ( normalMaps.last().getFormat() == GFXFormatDXT5 )
@@ -418,7 +418,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       featureData.features = features;
       featureData.materialFeatures = features;
 
-      // Check to see how many vertex shader output 
+      // Check to see how many vertex shader output
       // registers we're gonna need.
       U32 numTex = 0;
       U32 numTexReg = 0;
@@ -427,7 +427,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          S32 index;
          const FeatureType &type = features.getAt( i, &index );
          ShaderFeature* sf = FEATUREMGR->getByType( type );
-         if ( !sf ) 
+         if ( !sf )
             continue;
 
          sf->setProcessIndex( index );
@@ -439,13 +439,13 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
       // Can we build the shader?
       //
-      // NOTE: The 10 is sort of an abitrary SM 3.0 
+      // NOTE: The 10 is sort of an abitrary SM 3.0
       // limit.  Its really supposed to be 11, but that
       // always fails to compile so far.
       //
       if (  numTex < GFX->getNumSamplers() &&
             numTexReg <= 10 )
-      {         
+      {
          // NOTE: We really shouldn't be getting errors building the shaders,
          // but we can generate more instructions than the ps_2_x will allow.
          //
@@ -453,7 +453,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          // letting the compile fail then recovering by trying to build it
          // with fewer materials.
          //
-         // We normally disable the shader error logging so that the user 
+         // We normally disable the shader error logging so that the user
          // isn't fooled into thinking there is a real bug.  That is until
          // we get down to a single material.  If a single material case
          // fails it means it cannot generate any passes at all!
@@ -489,8 +489,8 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    pass->vEyeConst = pass->shader->getShaderConstHandle( "$vEye" );
    pass->layerSizeConst = pass->shader->getShaderConstHandle( "$layerSize" );
    pass->objTransConst = pass->shader->getShaderConstHandle( "$objTrans" );
-   pass->worldToObjConst = pass->shader->getShaderConstHandle( "$worldToObj" );  
-   pass->lightInfoBufferConst = pass->shader->getShaderConstHandle( "$lightInfoBuffer" );   
+   pass->worldToObjConst = pass->shader->getShaderConstHandle( "$worldToObj" );
+   pass->lightInfoBufferConst = pass->shader->getShaderConstHandle( "$lightInfoBuffer" );
    pass->baseTexMapConst = pass->shader->getShaderConstHandle( "$baseTexMap" );
    pass->layerTexConst = pass->shader->getShaderConstHandle( "$layerTex" );
    pass->fogDataConst = pass->shader->getShaderConstHandle( "$fogData" );
@@ -518,7 +518,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       // write to the last two color channels (where
       // depth is usually encoded).
       //
-      // This trick works in combination with the 
+      // This trick works in combination with the
       // MFT_TerrainAdditive feature to lerp the
       // output normal with the previous pass.
       //
@@ -530,7 +530,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    // material or if the prepass is disabled.
    // We also write the zbuffer if we're using OpenGL, because in OpenGL the prepass
    // cannot share the same zbuffer as the backbuffer.
-   desc.setZReadWrite( true,  !MATMGR->getPrePassEnabled() || 
+   desc.setZReadWrite( true,  !MATMGR->getPrePassEnabled() ||
                               GFX->getAdapterType() == OpenGL ||
                               prePassMat ||
                               reflectMat );
@@ -550,7 +550,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
    const U32 maxAnisotropy = MATMGR->getDefaultAnisotropy();
 
-   // Finally setup the material specific shader 
+   // Finally setup the material specific shader
    // constants and stateblock state.
    //
    // NOTE: If this changes be sure to check TerrainCellMaterial::_updateDefaultAnisotropy
@@ -580,7 +580,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          else
             desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
 
-         matInfo->detailTex.set( matInfo->mat->getDetailMap(), 
+         matInfo->detailTex.set( matInfo->mat->getDetailMap(),
             &GFXDefaultStaticDiffuseProfile, "TerrainCellMaterial::_createPass() - DetailMap" );
       }
 
@@ -604,7 +604,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          else
             desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
 
-         matInfo->macroTex.set( matInfo->mat->getMacroMap(), 
+         matInfo->macroTex.set( matInfo->mat->getMacroMap(),
             &GFXDefaultStaticDiffuseProfile, "TerrainCellMaterial::_createPass() - MacroMap" );
       }
 	  //end macro texture
@@ -636,11 +636,11 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    {
       MaterialInfo *matInfo = materials->first();
       if ( baseOnly || pass->materials.find_next( matInfo ) == -1 )
-         delete matInfo;     
+         delete matInfo;
       materials->pop_front();
    }
 
-   // If we're doing prepass it requires some 
+   // If we're doing prepass it requires some
    // special stencil settings for it to work.
    if ( prePassMat )
       desc.addDesc( RenderPrePassMgr::getOpaqueStenciWriteDesc( false ) );
@@ -675,7 +675,7 @@ void TerrainCellMaterial::_updateMaterialConsts( Pass *pass )
       // Scale the distance by the global scalar.
       const F32 distance = mTerrain->smDetailScale * matInfo->mat->getDetailDistance();
 
-      // NOTE: The negation of the y scale is to make up for 
+      // NOTE: The negation of the y scale is to make up for
       // my mistake early in development and passing the wrong
       // y texture coord into the system.
       //
@@ -687,7 +687,7 @@ void TerrainCellMaterial::_updateMaterialConsts( Pass *pass )
       //
       Point4F detailScaleAndFade(   detailScale,
                                     -detailScale,
-                                    distance, 
+                                    distance,
                                     0 );
 
       if ( !mIsZero( distance ) )
@@ -712,7 +712,7 @@ void TerrainCellMaterial::_updateMaterialConsts( Pass *pass )
 
       Point4F macroScaleAndFade(   macroScale,
                                     -macroScale,
-                                    macroDistance, 
+                                    macroDistance,
                                     0 );
 
       if ( !mIsZero( macroDistance ) )
@@ -727,7 +727,7 @@ void TerrainCellMaterial::_updateMaterialConsts( Pass *pass )
    }
 }
 
-bool TerrainCellMaterial::setupPass(   const SceneRenderState *state, 
+bool TerrainCellMaterial::setupPass(   const SceneRenderState *state,
                                        const SceneData &sceneData )
 {
    PROFILE_SCOPE( TerrainCellMaterial_SetupPass );
@@ -794,7 +794,7 @@ bool TerrainCellMaterial::setupPass(   const SceneRenderState *state,
       Point3F fogData;
       fogData.x = sceneData.fogDensity;
       fogData.y = sceneData.fogDensityOffset;
-      fogData.z = sceneData.fogHeightFalloff;     
+      fogData.z = sceneData.fogHeightFalloff;
       pass.consts->set( pass.fogDataConst, fogData );
    }
 
@@ -807,11 +807,11 @@ bool TerrainCellMaterial::setupPass(   const SceneRenderState *state,
          mLightInfoTarget = NamedTexTarget::find( "lightinfo" );
 
       GFXTextureObject *texObject = mLightInfoTarget->getTexture();
-      
+
       // TODO: Sometimes during reset of the light manager we get a
       // NULL texture here.  This is corrected on the next frame, but
       // we should still investigate why that happens.
-      
+
       if ( texObject )
       {
          GFX->setTexture( pass.lightInfoBufferConst->getSamplerRegister(), texObject );

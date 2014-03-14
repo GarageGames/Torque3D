@@ -39,9 +39,9 @@
 class GuiProgressBitmapCtrl : public GuiTextCtrl
 {
    public:
-   
+
       typedef GuiTextCtrl Parent;
-      
+
    protected:
 
       F32 mProgress;
@@ -50,7 +50,7 @@ class GuiProgressBitmapCtrl : public GuiTextCtrl
       bool mTile;
       S32 mNumberOfBitmaps;
       S32 mDim;
-      
+
       static bool _setBitmap( void* object, const char* index, const char* data )
       {
          static_cast< GuiProgressBitmapCtrl* >( object )->setBitmap( data );
@@ -58,11 +58,11 @@ class GuiProgressBitmapCtrl : public GuiTextCtrl
       }
 
    public:
-         
+
       GuiProgressBitmapCtrl();
 
       void setBitmap( const char* name );
-      
+
       //console related methods
       virtual const char *getScriptValue();
       virtual void setScriptValue(const char *value);

@@ -47,7 +47,7 @@
       closeCommand = "";
       EdgeSnap = "1";
       text = "";
-      
+
       new GuiTabBookCtrl(EVisibilityTabBook) {
          canSaveDynamicFields = "0";
          Profile = "ToolsGuiTabBookProfile";
@@ -81,7 +81,7 @@
             hovertime = "1000";
             text = "Visual";
             maxLength = "255";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -150,7 +150,7 @@
             hovertime = "1000";
             text = "Visible";
             maxLength = "255";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -219,7 +219,7 @@
             hovertime = "1000";
             text = "Select";
             maxLength = "255";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";

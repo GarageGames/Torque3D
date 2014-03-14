@@ -54,10 +54,10 @@ class RenderBinManager : public SimObject
 public:
 
    RenderBinManager( const RenderInstType& ritype = RenderInstType::Invalid,
-                     F32 renderOrder = 1.0f, 
+                     F32 renderOrder = 1.0f,
                      F32 processAddOrder  = 1.0f );
    virtual ~RenderBinManager() {}
-   
+
    // SimObject
    void onRemove();
 
@@ -69,7 +69,7 @@ public:
    // Manager info
    F32 getProcessAddOrder() const { return mProcessAddOrder; }
    void setProcessAddOrder(F32 processAddOrder) { mProcessAddOrder = processAddOrder; }
-   F32 getRenderOrder() const { return mRenderOrder; } 
+   F32 getRenderOrder() const { return mRenderOrder; }
    void setRenderOrder(F32 renderOrder) { mRenderOrder = renderOrder; }
 
    /// Returns the primary render instance type.
@@ -108,7 +108,7 @@ protected:
    /// The primary render instance type this bin supports.
    RenderInstType mRenderInstType;
 
-   /// The list of additional render instance types 
+   /// The list of additional render instance types
    /// this bin wants to process.
    Vector<RenderInstType> mOtherTypes;
 
@@ -120,11 +120,11 @@ protected:
    virtual void setupSGData(MeshRenderInst *ri, SceneData &data );
    virtual void internalAddElement(RenderInst* inst);
 
-   /// A inlined helper method for testing if the next 
+   /// A inlined helper method for testing if the next
    /// MeshRenderInst requires a new batch/pass.
    inline bool newPassNeeded( MeshRenderInst *ri, MeshRenderInst* nextRI ) const;
 
-   /// Inlined utility function which gets the material from the 
+   /// Inlined utility function which gets the material from the
    /// RenderInst if available, otherwise, return NULL.
    inline BaseMatInstance* getMaterial( RenderInst *inst ) const;
 
@@ -158,12 +158,12 @@ inline bool RenderBinManager::newPassNeeded( MeshRenderInst *ri, MeshRenderInst*
 
 inline BaseMatInstance* RenderBinManager::getMaterial( RenderInst *inst ) const
 {
-   if (  inst->type == RenderPassManager::RIT_Mesh || 
+   if (  inst->type == RenderPassManager::RIT_Mesh ||
          inst->type == RenderPassManager::RIT_Decal ||
          inst->type == RenderPassManager::RIT_Translucent )
       return static_cast<MeshRenderInst*>(inst)->matInst;
 
-   return NULL;      
+   return NULL;
 }
 
 #endif // _RENDERBINMANAGER_H_

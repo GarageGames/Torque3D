@@ -71,7 +71,7 @@ typedef Vector<RoadNode> RoadNodeVector;
 
 struct RoadEdge
 {
-   RoadEdge() 
+   RoadEdge()
    {
       p0.zero();
       p1.zero();
@@ -88,13 +88,13 @@ struct RoadEdge
 
    Point3F p0;
    Point3F p1;
-   Point3F p2;      
+   Point3F p2;
 
    VectorF uvec;
    VectorF fvec;
    VectorF rvec;
 
-   F32 width;      
+   F32 width;
 
    U32 parentNodeIdx;
 };
@@ -133,17 +133,17 @@ protected:
       GFXVertexPT v0, v1, v2;
    };
 
-   enum 
-   { 
+   enum
+   {
       DecalRoadMask        = Parent::NextFreeMask,
-      NodeMask             = Parent::NextFreeMask << 1,      
+      NodeMask             = Parent::NextFreeMask << 1,
       GenEdgesMask         = Parent::NextFreeMask << 2,
       ReClipMask           = Parent::NextFreeMask << 3,
       TerrainChangedMask   = Parent::NextFreeMask << 4,
       NextFreeMask         = Parent::NextFreeMask << 5,
-   };   
+   };
 
-   #define StepSize_Normal 10.0f  
+   #define StepSize_Normal 10.0f
    #define MIN_METERS_PER_SEGMENT 1.0f
 
 public:
@@ -157,7 +157,7 @@ public:
 	static void initPersistFields();
    static void consoleInit();
 
-	// SimObject      
+	// SimObject
 	bool onAdd();
 	void onRemove();
 	void onEditorEnable();
@@ -166,21 +166,21 @@ public:
    void onStaticModified(const char* slotName, const char*newValue = NULL);
    void writeFields(Stream &stream, U32 tabStop);
    bool writeField( StringTableEntry fieldname, const char *value );
-   
+
 	// NetObject
 	U32 packUpdate(NetConnection *, U32, BitStream *);
-	void unpackUpdate(NetConnection *, BitStream *);	
+	void unpackUpdate(NetConnection *, BitStream *);
 
    // SceneObject
 	virtual void prepRenderImage( SceneRenderState* state );
    virtual void setTransform( const MatrixF &mat );
    virtual void setScale( const VectorF &scale );
-   virtual bool containsPoint( const Point3F& point ) const { return containsPoint( point, NULL ); } 
+   virtual bool containsPoint( const Point3F& point ) const { return containsPoint( point, NULL ); }
 
    // fxRoad Public Methods
    void scheduleUpdate( U32 updateMask );
    void scheduleUpdate( U32 updateMask, U32 delayMs, bool restartTimer );
-   void regenerate();   
+   void regenerate();
    void setTextureLength( F32 meters );
    void setBreakAngle( F32 degrees );
 
@@ -188,7 +188,7 @@ public:
    /// Pass idx zero to add to the front and idx U32_MAX to add to the end
    U32 insertNode( const Point3F &pos, const F32 &width, const U32 &idx );
 
-   U32 addNode( const Point3F &pos, F32 width = 10.0f );   
+   U32 addNode( const Point3F &pos, F32 width = 10.0f );
    void deleteNode( U32 idx );
 
    void buildNodesFromList( DecalRoadNodeList* list );
@@ -197,23 +197,23 @@ public:
 
    bool containsPoint( const Point3F &worldPos, U32 *nodeIdx ) const;
    bool castray( const Point3F &start, const Point3F &end ) const;
-   
+
    Point3F getNodePosition( U32 idx );
    void setNodePosition( U32 idx, const Point3F &pos );
 
    F32 getNodeWidth( U32 idx );
-   void setNodeWidth( U32 idx, F32 width );   
+   void setNodeWidth( U32 idx, F32 width );
 
    /// Protected 'Node' Field setter that will add a node to the list.
-   static bool addNodeFromField( void *object, const char *index, const char *data );  
+   static bool addNodeFromField( void *object, const char *index, const char *data );
 
    static SimSet* getServerSet();
-  
-protected:
-         
-   // Internal Helper Methods   
 
-   void _initMaterial();   
+protected:
+
+   // Internal Helper Methods
+
+   void _initMaterial();
    void _debugRender( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *matInst );
 
    U32 _insertNode( const Point3F &pos, const F32 &width, const U32 &idx );
@@ -230,7 +230,7 @@ protected:
    // static protected field set methods
    static bool ptSetBreakAngle( void *object, const char *index, const char *data );
    static bool ptSetTextureLength( void *object, const char *index, const char *data );
-  
+
 protected:
 
    // Field Vars
@@ -244,11 +244,11 @@ protected:
    static bool smEditorOpen;
    static bool smWireframe;
    static bool smShowBatches;
-   static bool smDiscardAll;   
+   static bool smDiscardAll;
    static bool smShowSpline;
-   static bool smShowRoad; 
+   static bool smShowRoad;
    static S32 smUpdateDelay;
-   
+
    static SimObjectPtr<SimSet> smServerDecalRoadSet;
 
    // Other Internal Vars
@@ -256,9 +256,9 @@ protected:
    RoadEdgeVector mEdges;
    RoadNodeVector mNodes;
    RoadBatchVector mBatches;
-   
+
    bool mLoadRenderData;
-   
+
    SimObjectPtr<Material> mMaterial;
    BaseMatInstance *mMatInst;
 
@@ -268,7 +268,7 @@ protected:
    U32 mTriangleCount;
    U32 mVertCount;
 
-   S32 mUpdateEventId;   
+   S32 mUpdateEventId;
    DecalRoadUpdateEvent *mLastEvent;
 
    Box3F mTerrainUpdateRect;

@@ -32,11 +32,11 @@ function sfxGetActiveStateInGroup( %group )
       %obj = %group.getObject( %i );
       if( !%obj.isMemberOfClass( "SFXState" ) )
          continue;
-         
+
       if( %obj.isActive() )
          return %obj;
    }
-   
+
    return 0;
 }
 
@@ -71,10 +71,10 @@ function SFXState::onDeactivate( %this )
 function AudioStateExclusive::onActivate( %this )
 {
    Parent::onActivate( %this );
-   
+
    %group = %this.parentGroup;
    %count = %group.getCount();
-   
+
    for( %i = 0; %i < %count; %i ++ )
    {
       %obj = %group.getObject( %i );

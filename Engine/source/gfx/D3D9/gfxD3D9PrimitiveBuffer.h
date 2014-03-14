@@ -47,9 +47,9 @@ class GFXD3D9PrimitiveBuffer : public GFXPrimitiveBuffer
       bool mLocked;
       bool                  mIsFirstLock;
 
-      GFXD3D9PrimitiveBuffer( GFXDevice *device, 
-                              U32 indexCount, 
-                              U32 primitiveCount, 
+      GFXD3D9PrimitiveBuffer( GFXDevice *device,
+                              U32 indexCount,
+                              U32 primitiveCount,
                               GFXBufferType bufferType );
 
       virtual ~GFXD3D9PrimitiveBuffer();
@@ -57,7 +57,7 @@ class GFXD3D9PrimitiveBuffer : public GFXPrimitiveBuffer
       virtual void lock(U32 indexStart, U32 indexEnd, void **indexPtr);
       virtual void unlock();
 
-      virtual void prepare();      
+      virtual void prepare();
 
 #ifdef TORQUE_DEBUG
    //GFXD3D9PrimitiveBuffer *next;
@@ -68,10 +68,10 @@ class GFXD3D9PrimitiveBuffer : public GFXPrimitiveBuffer
       virtual void resurrect();
 };
 
-inline GFXD3D9PrimitiveBuffer::GFXD3D9PrimitiveBuffer(   GFXDevice *device, 
-                                                         U32 indexCount, 
-                                                         U32 primitiveCount, 
-                                                         GFXBufferType bufferType ) 
+inline GFXD3D9PrimitiveBuffer::GFXD3D9PrimitiveBuffer(   GFXDevice *device,
+                                                         U32 indexCount,
+                                                         U32 primitiveCount,
+                                                         GFXBufferType bufferType )
    : GFXPrimitiveBuffer( device, indexCount, primitiveCount, bufferType )
 {
    mVolatileStart = 0;

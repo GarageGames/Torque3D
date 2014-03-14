@@ -42,7 +42,7 @@ public:
    /// Clear stats
    void clear();
 
-   /// Copy from source (should just be a memcpy, but that may change later) used in 
+   /// Copy from source (should just be a memcpy, but that may change later) used in
    /// conjunction with end to get a subset of statistics.  For example, statistics
    /// for a particular render bin.
    void start(GFXDeviceStatistics * source);

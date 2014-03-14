@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platformWin32/platformWin32.h" 
+#include "platformWin32/platformWin32.h"
 #include "platform/platformInput.h"
 #include "platform/nativeDialogs/msgBox.h"
 
@@ -88,8 +88,8 @@ S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons butto
    // Get us rendering while we're blocking.
    winState.renderThreadBlocked = true;
 
-   // We don't keep a locked mouse or else we're going 
-   // to end up possibly locking our mouse out of the 
+   // We don't keep a locked mouse or else we're going
+   // to end up possibly locking our mouse out of the
    // message box area
    bool cursorLocked = pWindow && pWindow->isMouseLocked();
    if( cursorLocked )

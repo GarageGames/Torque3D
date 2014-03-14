@@ -185,7 +185,7 @@ bool SceneCullingState::addCullingVolumeToZone( U32 zoneId, const SceneCullingVo
    zoneState.mHaveSortedVolumes = false;
 
    // Set the visibility flag for the zone.
-   
+
    if( volume.isIncluder() )
       mZoneVisibilityFlags.set( zoneId );
 
@@ -204,7 +204,7 @@ bool SceneCullingState::addCullingVolumeToZone( U32 zoneId, SceneCullingVolume::
    // Copy the planes over.
 
    dMemcpy( planes, polyhedron.getPlanes(), numPlanes * sizeof( planes[ 0 ] ) );
-   
+
    // Create a culling volume.
 
    SceneCullingVolume volume(
@@ -406,13 +406,13 @@ bool SceneCullingState::createCullingVolume( const Point3F* vertices, U32 numVer
    // However, while not as accurate, a faster way is to just project the axial vectors
    // of the bounding box onto both the camera right and up vector.  This gives us a rough
    // estimate of the camera-space size of the polygon we're looking at.
-   
+
    const MatrixF& cameraTransform = getCameraState().getViewWorldMatrix();
    const Point3F cameraRight = cameraTransform.getRightVector();
    const Point3F cameraUp = cameraTransform.getUpVector();
 
    const Point3F wsPolyBoundsExtents = wsPolyBounds.getExtents();
-   
+
    F32 widthEstimate =
       getMax( mFabs( wsPolyBoundsExtents.x * cameraRight.x ),
          getMax( mFabs( wsPolyBoundsExtents.y * cameraRight.y ),

@@ -40,11 +40,11 @@ GFXTexHandle::GFXTexHandle( GFXTextureObject *obj )
 GFXTexHandle::GFXTexHandle( const GFXTexHandle &handle, const String &desc )
 {
    StrongObjectRef::set( handle.getPointer() );
-   
+
    #ifdef TORQUE_DEBUG
       if ( getPointer() )
          getPointer()->mDebugDescription = desc;
-   #endif   
+   #endif
 }
 
 GFXTexHandle::GFXTexHandle( const String &texName, GFXTextureProfile *profile, const String &desc )
@@ -57,16 +57,16 @@ bool GFXTexHandle::set( const String &texName, GFXTextureProfile *profile, const
    // Clear the existing texture first, so that
    // its memory is free for the new allocation.
    free();
-   
+
    // Create and set the new texture.
    AssertFatal( texName.isNotEmpty(), "Texture name is empty" );
    StrongObjectRef::set( TEXMGR->createTexture( texName, profile ) );
-   
+
    #ifdef TORQUE_DEBUG
       if ( getPointer() )
          getPointer()->mDebugDescription = desc;
    #endif
-   
+
    return isValid();
 }
 
@@ -80,7 +80,7 @@ bool GFXTexHandle::set( GBitmap *bmp, GFXTextureProfile *profile, bool deleteBmp
    // Clear the existing texture first, so that
    // its memory is free for the new allocation.
    free();
-   
+
    // Create and set the new texture.
    AssertFatal( bmp, "Bitmap is NULL" );
    StrongObjectRef::set( TEXMGR->createTexture( bmp, String(), profile, deleteBmp ) );

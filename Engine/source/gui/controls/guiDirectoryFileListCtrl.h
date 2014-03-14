@@ -40,7 +40,7 @@ protected:
    StringTableEntry mFilter;
 
    void openDirectory();
-   
+
    static bool _setFilePath( void *object, const char *index, const char *data )
    {
       GuiDirectoryFileListCtrl* ctrl = ( GuiDirectoryFileListCtrl* ) object;
@@ -53,16 +53,16 @@ protected:
       ctrl->setCurrentFilter( data );
       return false;
    }
-   
+
 public:
    GuiDirectoryFileListCtrl();
-   
+
    DECLARE_CONOBJECT(GuiDirectoryFileListCtrl);
    DECLARE_DESCRIPTION( "A control that displays a list of files from within a single\n"
                         "directory in the game file system." );
-   
+
    static void initPersistFields();
-   
+
    void update() { openDirectory(); }
 
    /// Set the current path to grab files from

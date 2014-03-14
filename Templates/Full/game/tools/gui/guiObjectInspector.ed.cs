@@ -33,20 +33,20 @@ function inspectObject( %object )
       error( "inspectObject: no object '" @ %object @ "'" );
       return;
    }
-      
+
    // Create a new object inspector window.
    exec( "./guiObjectInspector.ed.gui" );
-   
+
    if( !isObject( %guiContent) )
    {
       error( "InspectObject: failed to create GUI from 'guiObjectInspector.ed.gui'" );
       return;
    }
-   
+
    // Initialize the inspector.
-   
+
    %guiContent.init( %object );
-      
+
    Canvas.getContent().add( %guiContent );
 }
 
@@ -57,12 +57,12 @@ function inspectObject( %object )
 //---------------------------------------------------------------------------------------------
 
 function GuiObjectInspector::init( %this, %object )
-{   
+{
    if( !%object.isMemberOfClass( "SimSet" ) )
    {
       // Complete deletely the splitter and the left-side part of the inspector
       // leaving only the field inspector.
-      
+
       %this.add( %this-->panel2 );
       %this-->splitter.delete();
       %this-->inspector.inspect( %object );
@@ -76,15 +76,15 @@ function GuiObjectInspector::init( %this, %object )
 
       %treeView.open( %object );
    }
-   
+
    // Set window caption.
-   
+
    %caption = "Object Inspector - " @ %object.getId() @ " : " @ %object.getClassName();
-   
+
    %name = %object.getName();
    if( %name !$= "" )
       %caption = %caption @ " - " @ %name;
-      
+
    %this.text = %caption;
 }
 
@@ -125,7 +125,7 @@ function GuiObjectInspectorTree::onRightMouseUp( %this, %itemId, %mousePos, %obj
 
          object = "";
       };
-      
+
    GuiObjectInspectorTreePopup.object = %object;
    GuiObjectInspectorTreePopup.showPopup( Canvas );
 }
@@ -139,13 +139,13 @@ function GuiObjectInspectorTree::onRightMouseUp( %this, %itemId, %mousePos, %obj
 function GuiObjectInspectorMethodList::init( %this, %object )
 {
    %this.clear();
-   
+
    %methods = %object.dumpMethods();
    %count = %methods.count();
    %methodsGroup = %this.insertItem( 0, "Methods" );
    %parentScripted = %this.insertItem( %methodsGroup, "Scripted" );
    %parentNative = %this.insertItem( %methodsGroup, "Native" );
-   
+
    for( %i = 0; %i < %count; %i ++ )
    {
       %name = %methods.getKey( %i );
@@ -154,7 +154,7 @@ function GuiObjectInspectorMethodList::init( %this, %object )
       %fileName = getRecord( %value, 3 );
       %lineNumber = getRecord( %value, 4 );
       %usage = getRecords( %value, 5 );
-            
+
       %tooltip = %prototype;
       if( isFile( %fileName ) )
       {
@@ -163,24 +163,24 @@ function GuiObjectInspectorMethodList::init( %this, %object )
       }
       else
          %parent = %parentNative;
-         
+
       %tooltip = %tooltip @ "\n\n" @ %usage;
 
       %id = %this.insertItem( %parent, %prototype, %fileName NL %lineNumber );
       %this.setItemTooltip( %id, %tooltip );
    }
-      
+
    %methods.delete();
-   
+
    if( %object.isMethod( "getDebugInfo" ) )
    {
-      %debugInfo = %object.getDebugInfo();      
+      %debugInfo = %object.getDebugInfo();
       %count = %debugInfo.count();
       %parent = %this.insertItem( 0, "Debug Info" );
-      
+
       for( %i = 0; %i < %count; %i ++ )
          %id = %this.insertItem( %parent, %debugInfo.getKey( %i ) @ ": " @ %debugInfo.getValue( %i ) );
-      
+
       %debugInfo.delete();
    }
 
@@ -194,7 +194,7 @@ function GuiObjectInspectorMethodList::onRightMouseUp( %this, %item, %mousePos )
    %value = %this.getItemValue( %item );
    if( %value $= "" )
       return;
-      
+
    %fileName = getRecord( %value, 0 );
    %lineNumber = getRecord( %value, 1 );
 
@@ -211,10 +211,10 @@ function GuiObjectInspectorMethodList::onRightMouseUp( %this, %item, %mousePos )
             jumpFileName = "";
             jumpLineNumber = "";
          };
-         
+
       GuiInspectorMethodListPopup.jumpFileName = %fileName;
       GuiInspectorMethodListPopup.jumpLineNumber = %lineNumber;
-      
+
       GuiInspectorMethodListPopup.showPopup( Canvas );
    }
 }
@@ -230,7 +230,7 @@ function GuiObjectInspectorTreeFilter::onWake( %this )
    %treeView = %this.getParent()-->TreeView;
    if( isObject( %treeView ) )
       %this.treeView = %treeView;
-      
+
    Parent::onWake( %this );
 }
 

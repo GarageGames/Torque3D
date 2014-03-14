@@ -33,7 +33,7 @@
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/winDispatch.h"
 extern void createFontInit(void);
-extern void createFontShutdown(void);   
+extern void createFontShutdown(void);
 #endif
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -51,7 +51,7 @@ void torque_mac_engineinit(int argc, const char **argv);
 void  torque_mac_enginetick();
 void torque_mac_engineshutdown();
 
-#endif 
+#endif
 
 extern bool LinkConsoleFunctions;
 
@@ -117,7 +117,7 @@ extern "C" {
 		torque_mac_enginetick();
 #endif
 
-		bool ret = StandardMainLoop::doMainLoop(); 
+		bool ret = StandardMainLoop::doMainLoop();
       return ret;
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -128,7 +128,7 @@ extern "C" {
 		}
 #endif
 
-      
+
 
 	}
 
@@ -166,7 +166,7 @@ extern "C" {
 		}
 #endif
 
-		// Return.  
+		// Return.
 		return true;
 
 	}
@@ -196,13 +196,13 @@ extern "C" {
 	const char* torque_getexecutablepath()
 	{
 		return gExecutablePath;
-	} 
+	}
 
 	void torque_setexecutablepath(const char* directory)
 	{
 		gExecutablePath = new char[strlen(directory)+1];
 		strcpy(gExecutablePath, directory);
-	} 
+	}
 
    // set Torque 3D into web deployment mode (disable fullscreen exlusive mode, etc)
 	void torque_setwebdeployment()
@@ -222,7 +222,7 @@ extern "C" {
 		Con::setVariable(StringTable->insert(name), StringTable->insert(value));
 	}
 
-	static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)                                          
+	static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)
 	{
 		Namespace* ns = NULL;
 
@@ -245,7 +245,7 @@ extern "C" {
 	}
 
    // Export a function to the Torque 3D console system which matches the StringCallback function prototype
-   // specify the nameSpace, functionName, usage, min and max arguments 
+   // specify the nameSpace, functionName, usage, min and max arguments
 	void torque_exportstringcallback(StringCallback cb, const char *nameSpace, const char *funcName, const char* usage,  S32 minArgs, S32 maxArgs)
 	{
 		if (!nameSpace || !dStrlen(nameSpace))
@@ -262,7 +262,7 @@ extern "C" {
 		if (!entry)
 			return;
 
-		entry->cb.mVoidCallbackFunc(NULL, argc, argv);      
+		entry->cb.mVoidCallbackFunc(NULL, argc, argv);
 	}
 
 	F32 torque_callfloatfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -273,7 +273,7 @@ extern "C" {
 		if (!entry)
 			return 0.0f;
 
-		return entry->cb.mFloatCallbackFunc(NULL, argc, argv);      
+		return entry->cb.mFloatCallbackFunc(NULL, argc, argv);
 	}
 
 	S32 torque_callintfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -284,7 +284,7 @@ extern "C" {
 		if (!entry)
 			return 0;
 
-		return entry->cb.mIntCallbackFunc(NULL, argc, argv);      
+		return entry->cb.mIntCallbackFunc(NULL, argc, argv);
 	}
 
 
@@ -295,7 +295,7 @@ extern "C" {
 		if (!entry)
 			return "";
 
-		return entry->cb.mStringCallbackFunc(NULL, argc, argv);      
+		return entry->cb.mStringCallbackFunc(NULL, argc, argv);
 	}
 
 	bool torque_callboolfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -305,7 +305,7 @@ extern "C" {
 		if (!entry)
 			return "";
 
-		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);      
+		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);
 	}
 
 
@@ -429,7 +429,7 @@ extern "C" {
    }
 
    // directly add a message to the Torque 3D event queue, bypassing the Windows event queue
-   // this is useful in the case of the IE plugin, where we are hooking into an application 
+   // this is useful in the case of the IE plugin, where we are hooking into an application
    // level message, and posting to the windows queue would cause a hang
    void torque_directmessage(U32 message, U32 wparam, U32 lparam)
    {
@@ -437,9 +437,9 @@ extern "C" {
       {
          Win32Window* w = (Win32Window*) PlatformWindowManager::get()->getFirstWindow();
          Dispatch(DelayedDispatch,w->getHWND(),message,wparam,lparam);
-      }      
+      }
    }
-   
+
 #endif
 }
 

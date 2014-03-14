@@ -57,7 +57,7 @@ public:
 
       bool result = bitmap->writeBitmap("png", fs, 0);
       pushProcessedBitmap(bitmap);
- 
+
       return result;
    }
 
@@ -67,9 +67,9 @@ public:
       return true;
    }
 
-   void setResolution( Point2I* resolution ) 
-   {      
-      mResolution = *resolution; 
+   void setResolution( Point2I* resolution )
+   {
+      mResolution = *resolution;
    }
 };
 

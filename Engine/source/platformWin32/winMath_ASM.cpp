@@ -101,7 +101,7 @@ void mInstallLibrary_ASM()
 #if defined(TORQUE_SUPPORTS_VC_INLINE_X86_ASM)
    m_mulDivS32              = m_mulDivS32_ASM;
    m_mulDivU32              = m_mulDivU32_ASM;
-   
+
    m_sincos = m_sincos_ASM;
 #endif
 }

@@ -241,11 +241,11 @@ class Vehicle: public ShapeBase
    void updateFroth( F32 dt );
    bool collidingWithWater( Point3F &waterHeight );
 
-   /// ObjectRenderInst delegate hooked up in prepBatchRender 
+   /// ObjectRenderInst delegate hooked up in prepBatchRender
    /// if GameBase::gShowBoundingBox is true.
    void _renderMassAndContacts( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );
 
-   /// ObjectRenderInst delegate hooked up in prepBatchRender 
+   /// ObjectRenderInst delegate hooked up in prepBatchRender
    /// if GameBase::gShowBoundingBox is true.
    void _renderMuzzleVector( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );
 

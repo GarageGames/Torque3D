@@ -55,7 +55,7 @@ class SFXDSBuffer : public SFXInternal::SFXWrapAroundBuffer
 
       /// The buffer used when duplication is allowed.
       IDirectSoundBuffer8 *mBuffer;
-    
+
       /// We set this to true when the original buffer has
       /// been handed out and duplicates need to be made.
       bool mDuplicate;
@@ -85,7 +85,7 @@ class SFXDSBuffer : public SFXInternal::SFXWrapAroundBuffer
 public:
 
       ///
-      static SFXDSBuffer* create(   IDirectSound8* dsound, 
+      static SFXDSBuffer* create(   IDirectSound8* dsound,
                                     const ThreadSafeRef< SFXStream >& stream,
                                     SFXDescription* description,
                                     bool useHardware );

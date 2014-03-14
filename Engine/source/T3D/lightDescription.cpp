@@ -43,7 +43,7 @@ LightDescription::LightDescription()
    flareData( NULL ),
    flareDataId( 0 ),
    flareScale( 1.0f )
-{   
+{
 }
 
 LightDescription::~LightDescription()
@@ -91,7 +91,7 @@ void LightDescription::initPersistFields()
    addGroup( "Light" );
 
       addField( "color", TypeColorF, Offset( color, LightDescription ), "Changes the base color hue of the light." );
-      addField( "brightness", TypeF32, Offset( brightness, LightDescription ), "Adjusts the lights power, 0 being off completely." );      
+      addField( "brightness", TypeF32, Offset( brightness, LightDescription ), "Adjusts the lights power, 0 being off completely." );
       addField( "range", TypeF32, Offset( range, LightDescription ), "Controls the size (radius) of the light" );
       addField( "castShadows", TypeBool, Offset( castShadows, LightDescription ), "Enables/disabled shadow casts by this light." );
 
@@ -142,7 +142,7 @@ bool LightDescription::preload( bool server, String &errorStr )
    if ( !Parent::preload( server, errorStr ) )
       return false;
 
-   return _preload( server, errorStr );  
+   return _preload( server, errorStr );
 }
 
 void LightDescription::packData( BitStream *stream )
@@ -161,14 +161,14 @@ void LightDescription::packData( BitStream *stream )
    if ( stream->writeFlag( animationData ) )
    {
       stream->writeRangedU32( animationData->getId(),
-         DataBlockObjectIdFirst, 
+         DataBlockObjectIdFirst,
          DataBlockObjectIdLast );
    }
 
    if ( stream->writeFlag( flareData ) )
    {
       stream->writeRangedU32( flareData->getId(),
-         DataBlockObjectIdFirst, 
+         DataBlockObjectIdFirst,
          DataBlockObjectIdLast );
    }
 }
@@ -178,39 +178,39 @@ void LightDescription::unpackData( BitStream *stream )
    Parent::unpackData( stream );
 
    stream->read( &color );
-   stream->read( &brightness );     
+   stream->read( &brightness );
    stream->read( &range );
    castShadows = stream->readFlag();
 
    stream->read( &animationPeriod );
    stream->read( &animationPhase );
    stream->read( &flareScale );
-   
-   if ( stream->readFlag() )   
-      animationDataId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );  
 
    if ( stream->readFlag() )
-      flareDataId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );  
+      animationDataId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
+
+   if ( stream->readFlag() )
+      flareDataId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
 }
 
 void LightDescription::submitLight( LightState *state, const MatrixF &xfm, LightManager *lm, SimObject *object )
 {
    LightInfo *li = state->lightInfo;
-   
+
    li->setRange( range );
    li->setColor( color );
    li->setCastShadows( castShadows );
    li->setTransform( xfm );
 
    if ( animationData )
-   {      
-      LightAnimState *animState = &state->animState;   
+   {
+      LightAnimState *animState = &state->animState;
 
       animState->brightness = brightness;
       animState->transform = xfm;
       animState->color = color;
       animState->animationPeriod = animationPeriod;
-      animState->animationPhase = animationPhase;      
+      animState->animationPhase = animationPhase;
 
       animationData->animate( li, animState );
    }
@@ -240,14 +240,14 @@ bool LightDescription::_preload( bool server, String &errorStr )
 
    if (!flareData && flareDataId != 0)
       if (Sim::findObject(flareDataId, flareData) == false)
-         Con::errorf(ConsoleLogEntry::General, "LightDescription::onAdd: Invalid packet, bad datablockId(flareData): %d", flareDataId); 
+         Con::errorf(ConsoleLogEntry::General, "LightDescription::onAdd: Invalid packet, bad datablockId(flareData): %d", flareDataId);
 
    return true;
 }
 
 DefineEngineMethod( LightDescription, apply, void, (),,
    "@brief Force an inspectPostApply call for the benefit of tweaking via the console\n\n"
-   
+
    "Normally this functionality is only exposed to objects via the World Editor, once changes have been made. "
    "Exposing apply to script allows you to make changes to it on the fly without the World Editor.\n\n"
 
@@ -258,7 +258,7 @@ DefineEngineMethod( LightDescription, apply, void, (),,
    "RocketLauncherLightDesc.brightness = 10;\n\n"
    "// Make it so\n"
    "RocketLauncherLightDesc.apply();\n"
-   
+
    "@endtsexample\n\n"
 )
 {

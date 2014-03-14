@@ -25,7 +25,7 @@
 
 
 void AvailableSLInterfaces::registerSystem(SceneLightingInterface* si)
-{   
+{
    mAvailableSystemInterfaces.push_back(si);
    mDirty = true;
 }

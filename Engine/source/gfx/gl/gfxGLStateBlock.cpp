@@ -46,19 +46,19 @@ U32 GFXGLStateBlock::getHashValue() const
 /// Returns a GFXStateBlockDesc that this block represents
 const GFXStateBlockDesc& GFXGLStateBlock::getDesc() const
 {
-   return mDesc;   
+   return mDesc;
 }
 
 /// Called by OpenGL device to active this state block.
 /// @param oldState  The current state, used to make sure we don't set redundant states on the device.  Pass NULL to reset all states.
 void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 {
-   // Big scary warning copied from Apple docs 
+   // Big scary warning copied from Apple docs
    // http://developer.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_performance/chapter_13_section_2.html#//apple_ref/doc/uid/TP40001987-CH213-SW12
    // Don't set a state that's already set. Once a feature is enabled, it does not need to be enabled again.
-   // Calling an enable function more than once does nothing except waste time because OpenGL does not check 
-   // the state of a feature when you call glEnable or glDisable. For instance, if you call glEnable(GL_LIGHTING) 
-   // more than once, OpenGL does not check to see if the lighting state is already enabled. It simply updates 
+   // Calling an enable function more than once does nothing except waste time because OpenGL does not check
+   // the state of a feature when you call glEnable or glDisable. For instance, if you call glEnable(GL_LIGHTING)
+   // more than once, OpenGL does not check to see if the lighting state is already enabled. It simply updates
    // the state value even if that value is identical to the current value.
 
 #define STATE_CHANGE(state) (!oldState || oldState->mDesc.state != mDesc.state)
@@ -73,14 +73,14 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
       glBlendEquation(GFXGLBlendOp[mDesc.blendOp]);
 
    // Alpha testing
-   CHECK_TOGGLE_STATE(alphaTestEnable, GL_ALPHA_TEST);      
+   CHECK_TOGGLE_STATE(alphaTestEnable, GL_ALPHA_TEST);
    if(STATE_CHANGE(alphaTestFunc) || STATE_CHANGE(alphaTestRef))
       glAlphaFunc(GFXGLCmpFunc[mDesc.alphaTestFunc], (F32) mDesc.alphaTestRef * 1.0f/255.0f);
 
    // Color write masks
    if(STATE_CHANGE(colorWriteRed) || STATE_CHANGE(colorWriteBlue) || STATE_CHANGE(colorWriteGreen) || STATE_CHANGE(colorWriteAlpha))
       glColorMask(mDesc.colorWriteRed, mDesc.colorWriteBlue, mDesc.colorWriteGreen, mDesc.colorWriteAlpha);
-   
+
    // Culling
    if(STATE_CHANGE(cullMode))
    {
@@ -90,10 +90,10 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 
    // Depth
    CHECK_TOGGLE_STATE(zEnable, GL_DEPTH_TEST);
-   
+
    if(STATE_CHANGE(zFunc))
       glDepthFunc(GFXGLCmpFunc[mDesc.zFunc]);
-   
+
    if(STATE_CHANGE(zBias))
    {
       if (mDesc.zBias == 0)
@@ -103,9 +103,9 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
          F32 bias = mDesc.zBias * 10000.0f;
          glEnable(GL_POLYGON_OFFSET_FILL);
          glPolygonOffset(bias, bias);
-      } 
+      }
    }
-   
+
    if(STATE_CHANGE(zWriteEnable))
       glDepthMask(mDesc.zWriteEnable);
 
@@ -164,7 +164,7 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 
 #define SSF(state, enum, value, tex) if(!oldState || oldState->mDesc.samplers[i].state != mDesc.samplers[i].state) glTexParameteri(tex->getBinding(), enum, value)
 #define SSW(state, enum, value, tex) if(!oldState || oldState->mDesc.samplers[i].state != mDesc.samplers[i].state) glTexParameteri(tex->getBinding(), enum, !tex->mIsNPoT2 ? value : GL_CLAMP_TO_EDGE)
-      // Per object texture mode states. 
+      // Per object texture mode states.
       // TODO: Check dirty flag of samplers[i] and don't do this if it's dirty (it'll happen in the texture bind)
       if (updateTexParam && tex)
       {
@@ -180,7 +180,7 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 
          if( ( !oldState || oldState->mDesc.samplers[i].mipLODBias != ssd.mipLODBias ) )
             glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, ssd.mipLODBias);
-      }     
+      }
    }
 #undef SSF
 #undef SSW

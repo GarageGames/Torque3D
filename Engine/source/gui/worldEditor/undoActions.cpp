@@ -86,7 +86,7 @@ void MECreateUndoAction::undo()
       // We got what we need... delete it.
       object->deleteObject();
    }
-   
+
    Con::executef( this, "onUndone" );
 }
 
@@ -107,7 +107,7 @@ void MECreateUndoAction::redo()
       if ( Sim::findObject( state.groupId, group ) )
          group->addObject( object );
    }
-   
+
    Con::executef( this, "onRedone" );
 }
 
@@ -136,7 +136,7 @@ void MEDeleteUndoAction::initPersistFields()
 void MEDeleteUndoAction::deleteObject( SimObject *object )
 {
    AssertFatal( object, "MEDeleteUndoAction::deleteObject() - Got null object!" );
-   AssertFatal( object->isProperlyAdded(), 
+   AssertFatal( object->isProperlyAdded(),
       "MEDeleteUndoAction::deleteObject() - Object should be registered!" );
 
    mObjects.increment();
@@ -187,7 +187,7 @@ void MEDeleteUndoAction::undo()
       if ( Sim::findObject( state.groupId, group ) )
          group->addObject( object );
    }
-   
+
    Con::executef( this, "onUndone" );
 }
 
@@ -200,7 +200,7 @@ void MEDeleteUndoAction::redo()
       if ( object )
          object->deleteObject();
    }
-   
+
    Con::executef( this, "onRedone" );
 }
 
@@ -214,7 +214,7 @@ ConsoleDocClass( InspectorFieldUndoAction,
 InspectorFieldUndoAction::InspectorFieldUndoAction()
 {
    mObjId = 0;
-   mField = NULL; 
+   mField = NULL;
    mSlotName = StringTable->insert("");
    mArrayIdx = StringTable->insert("");
 }
@@ -224,7 +224,7 @@ InspectorFieldUndoAction::InspectorFieldUndoAction( const UTF8 *actionName )
 {
    mInspector = NULL;
    mObjId = 0;
-   mField = NULL; 
+   mField = NULL;
    mSlotName = StringTable->insert("");
    mArrayIdx = StringTable->insert("");
 }
@@ -256,7 +256,7 @@ void InspectorFieldUndoAction::undo()
    obj->inspectPreApply();
 
    // Restore the data from the UndoAction
-   obj->setDataField( mSlotName, mArrayIdx, mData.c_str() );   
+   obj->setDataField( mSlotName, mArrayIdx, mData.c_str() );
 
    // Call this to mirror the way field changes are done through the inspector.
    obj->inspectPostApply();

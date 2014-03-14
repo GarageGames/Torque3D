@@ -37,11 +37,11 @@ struct CameraQuery;
 /// scene ONLY - new guis, no damage flashes.
 void GameRenderWorld();
 
-/// Renders overlays such as damage flashes, white outs, and water masks.  
+/// Renders overlays such as damage flashes, white outs, and water masks.
 /// These are usually a color applied over the entire screen.
 void GameRenderFilters(const CameraQuery& camq);
 
-/// Does the same thing as GameGetCameraTransform, but fills in other data 
+/// Does the same thing as GameGetCameraTransform, but fills in other data
 /// including information about the far and near clipping planes.
 bool GameProcessCameraQuery(CameraQuery *query);
 
@@ -54,7 +54,7 @@ F32 GameGetCameraFov();
 /// Sets the field of view angle of the camera.
 void GameSetCameraFov(F32 fov);
 
-/// Sets where the camera fov will be change to.  This is for 
+/// Sets where the camera fov will be change to.  This is for
 /// non-instantaneous zooms/retractions.
 void GameSetCameraTargetFov(F32 fov);
 

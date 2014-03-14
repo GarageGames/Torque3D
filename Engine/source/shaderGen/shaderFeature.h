@@ -50,7 +50,7 @@ public:
 
    virtual void init( GFXShader *shader ) = 0;
 
-   virtual void setConsts( SceneRenderState *state, 
+   virtual void setConsts( SceneRenderState *state,
                            const SceneData &sgData,
                            GFXShaderConstBuffer *buffer ) = 0;
 };
@@ -58,9 +58,9 @@ public:
 //**************************************************************************
 /*!
    The ShaderFeature class is the base class for every procedurally generated
-   feature. Each feature the engine recognizes is part of the MaterialFeatureType 
+   feature. Each feature the engine recognizes is part of the MaterialFeatureType
    enum.  That structure is used to indicate which features are present in a shader
-   to be generated.  This is useful as many ShaderFeatures will output different 
+   to be generated.  This is useful as many ShaderFeatures will output different
    code depending on what other features are going to be in the shader.
 
    Shaders are generated using the ShaderFeature interface, so all of the
@@ -134,7 +134,7 @@ public:
    //-----------------------------------------------------------------------
    // Base functions
    //-----------------------------------------------------------------------
-   
+
    ShaderFeature()
       :  output( NULL ),
          mProcessIndex( 0 ),
@@ -146,7 +146,7 @@ public:
 
    /// returns output from a processed vertex or pixel shader
    LangElement* getOutput() const { return output; }
-   
+
    ///
    void setProcessIndex( S32 index ) { mProcessIndex = index; }
 
@@ -156,16 +156,16 @@ public:
    //-----------------------------------------------------------------------
    // Virtual Functions
    //-----------------------------------------------------------------------
-   
+
    /// Get the incoming base texture coords - useful for bumpmap and detail maps
    virtual Var* getVertTexCoord( const String &name ) = 0;
 
    /// Set up a texture space matrix - to pass into pixel shader
-   virtual LangElement * setupTexSpaceMat(  Vector<ShaderComponent*> &componentList, 
+   virtual LangElement * setupTexSpaceMat(  Vector<ShaderComponent*> &componentList,
       Var **texSpaceMat ) = 0;
 
    /// Expand and assign a normal map. This takes care of compressed normal maps as well.
-   virtual LangElement * expandNormalMap( LangElement *sampleNormalOp, 
+   virtual LangElement * expandNormalMap( LangElement *sampleNormalOp,
       LangElement *normalDecl, LangElement *normalVar, const MaterialFeatureData &fd ) = 0;
 
    /// Helper function for applying the color to shader output.
@@ -174,11 +174,11 @@ public:
    ///
    /// @param blend        The type of blending to perform.
    ///
-   /// @param lerpElem     The optional lerp parameter when doing a LerpAlpha blend, 
+   /// @param lerpElem     The optional lerp parameter when doing a LerpAlpha blend,
    ///                     if not set then the elem is used.
    ///
-   virtual LangElement* assignColor(   LangElement *elem, 
-                                       Material::BlendOp blend, 
+   virtual LangElement* assignColor(   LangElement *elem,
+                                       Material::BlendOp blend,
                                        LangElement *lerpElem = NULL,
                                        ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget ) = 0;
 
@@ -217,8 +217,8 @@ public:
       features are present for the shader being generated.
    */
    //-----------------------------------------------------------------------
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
-                            const MaterialFeatureData &fd ) 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
+                            const MaterialFeatureData &fd )
                             { output = NULL; }
 
    /// Allows the feature to add macros to pixel shader compiles.
@@ -231,7 +231,7 @@ public:
    /// group features with the same blend operation together in a multipass
    /// situation.
    virtual Material::BlendOp getBlendOp() { return Material::Add; }
-   
+
    /// Returns the resource requirements of this feature based on what
    /// other features are present.  The "resources" are things such as
    /// texture units, and texture registers of which there can be
@@ -241,9 +241,9 @@ public:
 
    /// Fills texture related info in RenderPassData for this feature.  It
    /// takes into account the current pass (passData) as well as what other
-   /// data is available to the material stage (stageDat).  
+   /// data is available to the material stage (stageDat).
    ///
-   /// For instance, ReflectCubeFeatHLSL would like to modulate its output 
+   /// For instance, ReflectCubeFeatHLSL would like to modulate its output
    /// by the alpha channel of another texture.  If the current pass does
    /// not contain a diffuse or bump texture, but the Material does, then
    /// this function allows it to use one of those textures in the current
@@ -252,7 +252,7 @@ public:
                             const MaterialFeatureData &fd,
                             RenderPassData &passData,
                             U32 &texIndex ){};
-                            
+
    /// Returns the name of this feature.
    virtual String getName() = 0;
 
@@ -272,7 +272,7 @@ public:
    const char* getOutputTargetVarName( OutputTarget target = DefaultTarget ) const;
 
    // Called from ProcessedShaderMaterial::determineFeatures to enable/disable features.
-   virtual void determineFeature(   Material *material, 
+   virtual void determineFeature(   Material *material,
                                     const GFXVertexFormat *vertexFormat,
                                     U32 stageNum,
                                     const FeatureType &type,
@@ -282,14 +282,14 @@ public:
    //
    virtual ShaderFeatureConstHandles* createConstHandles( GFXShader *shader, SimObject *userObject ) { return NULL; }
 
-   /// Called after processing the vertex and processing the pixel 
+   /// Called after processing the vertex and processing the pixel
    /// to cleanup any temporary structures stored in the feature.
    virtual void reset() { output = NULL; mProcessIndex = 0; mInstancingFormat = NULL; }
 
    /// A simpler helper function which either finds
    /// the existing local var or creates one.
-   static Var* findOrCreateLocal(   const char *name, 
-                                    const char *type, 
+   static Var* findOrCreateLocal(   const char *name,
+                                    const char *type,
                                     MultiLine *multi );
 };
 

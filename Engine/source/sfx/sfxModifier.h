@@ -36,19 +36,19 @@ class SFXSource;
 class SFXModifier : public IPolled
 {
    protected:
-      
+
       /// The source that this effect works on.
       SFXSource* mSource;
-      
+
       /// If true, the effect is removed from the effects stack
       bool mRemoveWhenDone;
-            
+
    public:
-   
+
       /// Create an effect that operates on "source".
       SFXModifier( SFXSource* source, bool removeWhenDone = false )
          : mSource( source ) {}
-   
+
       virtual ~SFXModifier() {}
 };
 
@@ -56,22 +56,22 @@ class SFXModifier : public IPolled
 class SFXOneShotModifier : public SFXModifier
 {
    public:
-   
+
       typedef SFXModifier Parent;
-      
+
    protected:
-   
+
       /// Playback position that triggers the effect.
       F32 mTriggerPos;
-      
+
       ///
       virtual void _onTrigger() = 0;
-      
+
    public:
-   
+
       /// Create an effect that triggers when playback of "source" passes "triggerPos".
       SFXOneShotModifier( SFXSource* source, F32 triggerPos, bool removeWhenDone = false );
-   
+
       // IPolled.
       virtual bool update();
 };
@@ -82,40 +82,40 @@ class SFXRangeModifier : public SFXModifier
    public:
 
       typedef SFXModifier Parent;
-      
+
    protected:
-   
+
       /// If true, the effect is currently being applied to the source.
       bool mIsActive;
-         
+
       /// Playback position in milliseconds when this effect becomes active.
       F32 mStartTime;
-      
+
       /// Playback position in milliseconds when this effect becomes inactive.
       F32 mEndTime;
-      
+
       /// Called when the play cursor passes mStartTime.
       /// @note There may be latency between the cursor actually passing mStartTime
       ///   and this method being called.
       virtual void _onStart() {}
-      
+
       /// Called on each update() while the play cursor is in range.
       virtual void _onUpdate() {}
-      
+
       /// Called when the play cursor passes mEndTime.
       /// @note There may be latency between the cursor actually passing mEndTime
       ///   and this method being called.
       virtual void _onEnd() {}
-      
+
    public:
-   
+
       /// Create an effect that operates on "source" between "startTime" seconds
       /// (inclusive) and "endTime" seconds (exclusive).
       SFXRangeModifier( SFXSource* source, F32 startTime, F32 endTime, bool removeWhenDone = false );
-         
+
       ///
       bool isActive() const { return mIsActive; }
-      
+
       // IPolled.
       virtual bool update();
 };
@@ -124,42 +124,42 @@ class SFXRangeModifier : public SFXModifier
 class SFXFadeModifier : public SFXRangeModifier
 {
    public:
-   
+
       typedef SFXRangeModifier Parent;
-      
+
       enum EOnEnd
       {
          ON_END_Nop,       ///< Do nothing with source when fade is complete.
          ON_END_Stop,      ///< Stop source when fade is complete.
          ON_END_Pause,     ///< Pause source when fade is complete.
       };
-      
+
    protected:
-      
+
       /// Volume when beginning fade.  Set when effect is activated.
       F32 mStartVolume;
-      
+
       /// Volume when ending fade.
       F32 mEndVolume;
-      
+
       /// Current volume level.
       F32 mCurrentVolume;
-      
+
       /// Action to perform when the fade has been completed.  Defaults to no action.
       EOnEnd mOnEnd;
-      
+
       // SFXModifier.
       virtual void _onStart();
       virtual void _onUpdate();
       virtual void _onEnd();
-      
+
    public:
-   
+
       /// Create an effect that fades the volume of "source" to "endVolume" over the
       /// period of  "time" seconds.  The fade will start at "referenceTime" using the
       /// source's current volume at the time as the start.
       SFXFadeModifier( SFXSource* source, F32 time, F32 endVolume, F32 startTime, EOnEnd onEndDo = ON_END_Nop, bool removeWhenDone = false );
-      
+
       virtual ~SFXFadeModifier();
 };
 
@@ -172,19 +172,19 @@ class SFXFadeModifier : public SFXRangeModifier
 class SFXMarkerModifier : public SFXOneShotModifier
 {
    public:
-   
+
       typedef SFXOneShotModifier Parent;
-      
+
    protected:
-   
+
       /// Symbolic marker name that is passed to the "onMarkerPassed" callback.
       String mMarkerName;
-      
+
       // SFXOneShotModifier
       virtual void _onTrigger();
-   
+
    public:
-   
+
       SFXMarkerModifier( SFXSource* source, const String& name, F32 pos, bool removeWhenDone = false );
 };
 

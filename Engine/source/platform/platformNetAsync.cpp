@@ -91,8 +91,8 @@ protected:
       }
       else
       {
-         // copy the stuff we need from the hostent 
-         dMemset(mRequest.out_h_addr, 0, 
+         // copy the stuff we need from the hostent
+         dMemset(mRequest.out_h_addr, 0,
             sizeof(mRequest.out_h_addr));
          dMemcpy(mRequest.out_h_addr, hostent->h_addr, hostent->h_length);
 
@@ -104,7 +104,7 @@ protected:
       HANDLE hEvent = CreateEvent(NULL, false, false, NULL);
       XNetDnsLookup(mRequest.remoteAddr, hEvent, &pxndns);
 
-      while(pxndns->iStatus == WSAEINPROGRESS) 
+      while(pxndns->iStatus == WSAEINPROGRESS)
          WaitForSingleObject(hEvent, INFINITE);
 
       if(pxndns->iStatus == 0 && pxndns->cina > 0)
@@ -112,7 +112,7 @@ protected:
          dMemset(mRequest.out_h_addr, 0, sizeof(mRequest.out_h_addr));
 
          // This is a suspect section. I need to revisit. [2/22/2010 Pat]
-         dMemcpy(mRequest.out_h_addr, pxndns->aina, sizeof(IN_ADDR)); 
+         dMemcpy(mRequest.out_h_addr, pxndns->aina, sizeof(IN_ADDR));
          mRequest.out_h_length = sizeof(IN_ADDR);
       }
 
@@ -139,7 +139,7 @@ NetAsync::NetAsync()
 void NetAsync::queueLookup(const char* remoteAddr, NetSocket socket)
 {
    // do we have it already?
-   
+
    unsigned int i = 0;
    for (i = 0; i < mLookupRequests.size(); ++i)
    {
@@ -159,15 +159,15 @@ void NetAsync::queueLookup(const char* remoteAddr, NetSocket socket)
    ThreadPool::GLOBAL().queueWorkItem( workItem );
 }
 
-bool NetAsync::checkLookup(NetSocket socket, char* out_h_addr, 
+bool NetAsync::checkLookup(NetSocket socket, char* out_h_addr,
                            int* out_h_length, int out_h_addr_size)
 {
    bool found = false;
 
    // search for the socket
    RequestIterator iter;
-   for (iter = mLookupRequests.begin(); 
-        iter != mLookupRequests.end(); 
+   for (iter = mLookupRequests.begin();
+        iter != mLookupRequests.end();
         ++iter)
       // if we found it and it is complete...
       if (socket == iter->sock && iter->complete)

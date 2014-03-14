@@ -29,9 +29,9 @@ function initBaseClient()
    exec( "./actionMap.cs" );
    exec( "./renderManager.cs" );
    exec( "./lighting.cs" );
-   
+
    initRenderManager();
-   initLightingSystems();   
+   initLightingSystems();
 }
 
 /// A helper function which will return the ghosted client object
@@ -39,13 +39,13 @@ function initBaseClient()
 function serverToClientObject( %serverObject )
 {
    assert( isObject( LocalClientConnection ), "serverToClientObject() - No local client connection found!" );
-   assert( isObject( ServerConnection ), "serverToClientObject() - No server connection found!" );      
-         
+   assert( isObject( ServerConnection ), "serverToClientObject() - No server connection found!" );
+
    %ghostId = LocalClientConnection.getGhostId( %serverObject );
    if ( %ghostId == -1 )
       return 0;
-                
-   return ServerConnection.resolveGhostID( %ghostId );   
+
+   return ServerConnection.resolveGhostID( %ghostId );
 }
 
 //----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ function netSimulateLag( %msDelay, %packetLossPercent )
 {
    if ( %packetLossPercent $= "" )
       %packetLossPercent = 0;
-                  
+
    commandToServer( 'NetSimulateLag', %msDelay, %packetLossPercent );
 }
 

@@ -129,7 +129,7 @@ public:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "LeapMotionDevice"; }   
+   static const char* getSingletonName() { return "LeapMotionDevice"; }
 };
 
 /// Returns the LeapMotionDevice singleton.

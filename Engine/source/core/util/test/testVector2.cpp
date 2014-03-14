@@ -49,17 +49,17 @@ CreateUnitTest( TestVector, "Util/Vector" )
    void testDestruction()
    {
       Vector< Dtor > v;
-      
+
       for( U32 i = 0; i < 9; ++ i )
          v.push_back( Dtor( &dtorVals[ i ] ) );
-         
+
       v.decrement();
       v.decrement( 2 );
       v.pop_back();
       v.increment();
       v.last() = Dtor( &dtorVals[ 9 ] );
       v.clear();
-      
+
       TEST( dtorVals[ 0 ] );
       TEST( dtorVals[ 1 ] );
       TEST( dtorVals[ 2 ] );
@@ -71,12 +71,12 @@ CreateUnitTest( TestVector, "Util/Vector" )
       TEST( dtorVals[ 8 ] );
       TEST( dtorVals[ 9 ] );
    }
-   
+
    static S32 QSORT_CALLBACK sortInts( const int* a, const int* b )
    {
       int av = *a;
       int bv = *b;
-      
+
       if( av < bv )
          return -1;
       else if( av > bv )
@@ -84,11 +84,11 @@ CreateUnitTest( TestVector, "Util/Vector" )
       else
          return 0;
    }
-   
+
    void testSort()
    {
       Vector< int > v;
-      
+
       v.push_back( 0 );
       v.push_back( 10 );
       v.push_back( 2 );
@@ -106,9 +106,9 @@ CreateUnitTest( TestVector, "Util/Vector" )
       v.push_back( 13 );
       v.push_back( 9 );
       v.push_back( 15 );
-      
+
       v.sort( sortInts );
-      
+
       TEST( v[ 0 ] == 0 );
       TEST( v[ 1 ] == 1 );
       TEST( v[ 2 ] == 2 );
@@ -127,7 +127,7 @@ CreateUnitTest( TestVector, "Util/Vector" )
       TEST( v[ 15 ] == 15 );
       TEST( v[ 16 ] == 16 );
    }
-   
+
    void run()
    {
       testSort();

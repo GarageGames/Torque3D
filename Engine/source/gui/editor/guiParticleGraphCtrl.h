@@ -95,7 +95,7 @@ public:
 	//creation methods
    DECLARE_CONOBJECT(GuiParticleGraphCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
-   
+
    GuiParticleGraphCtrl();
    virtual ~GuiParticleGraphCtrl() { };
 
@@ -119,7 +119,7 @@ public:
    S32 changePlotPoint(S32 plotID, S32 i, Point2F v);
    S32 removePlotPoint(S32 plotID, S32 i);
    Point2F convertToGraphCoord(S32 plotID, Point2I v);
-   
+
    // Set Graph specific functions
    void setGraphType(S32 plotID, const char *graphType);
    void setSelectedPlot(S32 plotID);
@@ -147,7 +147,7 @@ public:
    bool isExistingPoint(S32 plotID, S32 point);
 
    StringTableEntry getGraphName(S32 plotID);
-  
+
    // Set Graph Min and MaxFunctions
    void setGraphMin(S32 plotID, Point2F graphMin);
    void setGraphMinX(S32 plotID, F32 graphMinX);
@@ -158,7 +158,7 @@ public:
 
    // Other set functions for graphs
    void setGraphName(S32 plotID, StringTableEntry graphName);
-  
+
 
    // Clear Functions
    void clearGraph(S32 plotID);

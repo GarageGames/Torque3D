@@ -36,7 +36,7 @@ void ShaderGenPrinterHLSL::printShaderHeader(Stream& stream)
    stream.write( dStrlen(header2), header2 );
    stream.write( dStrlen(header1), header1 );
 
-   const char* header3 = "\r\n";      
+   const char* header3 = "\r\n";
    stream.write( dStrlen(header3), header3 );
 }
 
@@ -121,7 +121,7 @@ ShaderComponent* ShaderGenComponentFactoryHLSL::createVertexInputConnector( cons
    for ( U32 i=0; i < vertexFormat.getElementCount(); i++ )
    {
       const GFXVertexElement &element = vertexFormat.getElement( i );
-      
+
       Var *var = NULL;
 
       if ( element.isSemantic( GFXSemantic::POSITION ) )

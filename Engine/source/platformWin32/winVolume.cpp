@@ -161,16 +161,16 @@ bool Win32FileSystemChangeNotifier::internalAddNotification( const Path &dir )
 
 //   Con::printf( "[Win32FileSystemChangeNotifier::internalAddNotification] : [%s]", osPath.c_str() );
 
-   HANDLE   changeHandle = ::FindFirstChangeNotificationW( 
-                                 osPath.utf16(),      // directory to watch 
-                                 FALSE,                           // do not watch subtree 
+   HANDLE   changeHandle = ::FindFirstChangeNotificationW(
+                                 osPath.utf16(),      // directory to watch
+                                 FALSE,                           // do not watch subtree
                                  FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_ATTRIBUTES);  // watch file write changes
 
-   if (changeHandle == INVALID_HANDLE_VALUE || changeHandle == NULL) 
+   if (changeHandle == INVALID_HANDLE_VALUE || changeHandle == NULL)
    {
       Con::errorf("[Win32FileSystemChangeNotifier::internalAddNotification] : failed on [%s] [%d]", osPath.c_str(), GetLastError());
-      
-      return false; 
+
+      return false;
    }
 
    mDirs.push_back( dir );
@@ -198,7 +198,7 @@ bool Win32FileSystemChangeNotifier::internalRemoveNotification( const Path &dir 
 
 void  Win32FileSystemChangeNotifier::internalProcessOnce()
 {
-   // WaitForMultipleObjects has a limit of MAXIMUM_WAIT_OBJECTS (64 at 
+   // WaitForMultipleObjects has a limit of MAXIMUM_WAIT_OBJECTS (64 at
    // the moment), so we have to loop till we've handled the entire set.
 
    for ( U32 i=0; i < mHandleList.size(); i += MAXIMUM_WAIT_OBJECTS )
@@ -303,7 +303,7 @@ Path Win32FileSystem::mapTo(const Path& path)
 Path Win32FileSystem::mapFrom(const Path& path)
 {
    const String::SizeType  volumePathLen = mVolume.length();
-   
+
    String   pathStr = path.getFullPath();
 
    if ( mVolume.compare( pathStr, volumePathLen, String::NoCase ))
@@ -382,7 +382,7 @@ U32 Win32File::calculateChecksum()
    U32 crc = CRC::INITIAL_CRC_VALUE;
 
    while ( fileSize > 0 )
-   {      
+   {
       U32 bytesRead = getMin( fileSize, bufSize );
       if ( read( buf, bytesRead ) != bytesRead )
       {
@@ -392,7 +392,7 @@ U32 Win32File::calculateChecksum()
 
       fileSize -= bytesRead;
       crc = CRC::calculateCRC(buf, bytesRead, crc);
-   }   
+   }
 
    close();
 
@@ -648,7 +648,7 @@ bool FS::VerifyWriteAccess(const Path &path)
    String temp = path.getFullPath();
    temp += "\\torque_writetest.tmp";
 
-   // first, (try and) delete the file if it exists   
+   // first, (try and) delete the file if it exists
    ::DeleteFileW(temp.utf16());
 
    // now, create the file
@@ -775,7 +775,7 @@ bool Platform::FS::InstallFileSystems()
       buffer[0] = dToupper(buffer[0]);
 
    String   wd = buffer;
-   
+
    wd += '/';
 
    Platform::FS::SetCwd(wd);

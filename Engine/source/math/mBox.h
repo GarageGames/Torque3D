@@ -70,25 +70,25 @@ class Box3F : public BoxBase
       ///
       /// No checking is performed as to the validity of these
       /// extents, unlike the other constructor.
-      Box3F( const F32 &xMin, const F32 &yMin, const F32 &zMin, 
+      Box3F( const F32 &xMin, const F32 &yMin, const F32 &zMin,
              const F32 &xMax, const F32 &yMax, const F32 &zMax );
 
       Box3F(F32 cubeSize);
 
       void set( const Point3F& in_rMin, const Point3F& in_rMax );
 
-      void set( const F32 &xMin, const F32 &yMin, const F32 &zMin, 
+      void set( const F32 &xMin, const F32 &yMin, const F32 &zMin,
                 const F32 &xMax, const F32 &yMax, const F32 &zMax );
 
       /// Create box around origin given lengths
-      void set( const Point3F& in_Length );   
+      void set( const Point3F& in_Length );
 
       /// Recenter the box
       void setCenter( const Point3F& center );
 
       /// Check to see if a point is contained in this box.
       bool isContained( const Point3F& in_rContained ) const;
-      
+
       /// Check if the Point2F is within the box xy extents.
       bool isContained( const Point2F &pt ) const;
 
@@ -203,10 +203,10 @@ class Box3F : public BoxBase
       /// Scale the box by a Point3F or F32
       void scale( const Point3F &amt );
       void scale( F32 amt );
-      
+
       /// Equality operator.
       bool operator ==( const Box3F &b ) const;
-      
+
       /// Inequality operator.
       bool operator !=( const Box3F &b ) const;
 
@@ -239,7 +239,7 @@ inline Box3F::Box3F(const Point3F& in_rMin, const Point3F& in_rMax, const bool i
    }
 }
 
-inline Box3F::Box3F( const F32 &xMin, const F32 &yMin, const F32 &zMin, 
+inline Box3F::Box3F( const F32 &xMin, const F32 &yMin, const F32 &zMin,
                     const F32 &xMax, const F32 &yMax, const F32 &zMax )
    : minExtents(xMin,yMin,zMin),
      maxExtents(xMax,yMax,zMax)
@@ -258,7 +258,7 @@ inline void Box3F::set(const Point3F& in_rMin, const Point3F& in_rMax)
    maxExtents.set(in_rMax);
 }
 
-inline void Box3F::set( const F32 &xMin, const F32 &yMin, const F32 &zMin, 
+inline void Box3F::set( const F32 &xMin, const F32 &yMin, const F32 &zMin,
                         const F32 &xMax, const F32 &yMax, const F32 &zMax  )
 {
    minExtents.set( xMin, yMin, zMin );
@@ -291,7 +291,7 @@ inline bool Box3F::isContained(const Point3F& in_rContained) const
 inline bool Box3F::isContained( const Point2F &pt ) const
 {
    return ( pt.x >= minExtents.x && pt.x < maxExtents.x ) &&
-          ( pt.y >= minExtents.y && pt.y < maxExtents.y );      
+          ( pt.y >= minExtents.y && pt.y < maxExtents.y );
 }
 
 inline bool Box3F::isOverlapped(const Box3F& in_rOverlap) const
@@ -436,7 +436,7 @@ inline bool Box3F::operator ==( const Box3F &b ) const
 
 inline bool Box3F::operator !=( const Box3F &b ) const
 {
-   return !minExtents.equal( b.minExtents ) || !maxExtents.equal( b.maxExtents );   
+   return !minExtents.equal( b.minExtents ) || !maxExtents.equal( b.maxExtents );
 }
 
 //------------------------------------------------------------------------------
@@ -598,11 +598,11 @@ public:
    /// Check that the box is valid.
    ///
    /// Currently, this just means that min < max.
-   bool isValidBox() const 
-   { 
+   bool isValidBox() const
+   {
       return (minExtents.x <= maxExtents.x) &&
          (minExtents.y <= maxExtents.y) &&
-         (minExtents.z <= maxExtents.z); 
+         (minExtents.z <= maxExtents.z);
    }
 
    void extend(const Point3I & p);
@@ -612,7 +612,7 @@ inline Box3I::Box3I(const Point3I& in_rMin, const Point3I& in_rMax, const bool i
 : minExtents(in_rMin),
 maxExtents(in_rMax)
 {
-   if (in_overrideCheck == false) 
+   if (in_overrideCheck == false)
    {
       minExtents.setMin(in_rMax);
       maxExtents.setMax(in_rMin);

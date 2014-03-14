@@ -49,7 +49,7 @@ void zero_vert_normal_bulk_C(const dsize_t count, U8 * __restrict const outPtr, 
 
 //------------------------------------------------------------------------------
 
-void m_matF_x_BatchedVertWeightList_C(const MatrixF &mat, 
+void m_matF_x_BatchedVertWeightList_C(const MatrixF &mat,
                                     const dsize_t count,
                                     const TSSkinMesh::BatchData::BatchedVertWeight * __restrict batch,
                                     U8 * const __restrict outPtr,
@@ -81,7 +81,7 @@ void m_matF_x_BatchedVertWeightList_C(const MatrixF &mat,
 MODULE_BEGIN( TSMeshIntrinsics )
 
    MODULE_INIT_AFTER( 3D )
-   
+
    MODULE_INIT
    {
       // Assign defaults (C++ versions)
@@ -96,7 +96,7 @@ MODULE_BEGIN( TSMeshIntrinsics )
       if(Platform::SystemInfo.processor.properties & CPU_PROP_SSE)
       {
    #if defined(TORQUE_CPU_X86)
-         
+
          zero_vert_normal_bulk = zero_vert_normal_bulk_SSE;
          m_matF_x_BatchedVertWeightList = m_matF_x_BatchedVertWeightList_SSE;
 

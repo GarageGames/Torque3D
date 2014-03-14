@@ -45,7 +45,7 @@ CentralDir::CentralDir()
    mExternalFileAttr = 0;
 
    mLocalHeadOffset = 0;
-   
+
    mVersionMadeBy = 0;
 
    mFileComment = NULL;
@@ -109,7 +109,7 @@ bool CentralDir::read(Stream *stream)
    fn[fnLen] = 0;
    mFilename = String(fn);
    SAFE_DELETE_ARRAY(fn);
-   
+
 
    // [tom, 10/28/2006] We currently only need the extra fields when we want to
    // open the file, so we won't bother reading them here. This avoids keeping
@@ -220,7 +220,7 @@ bool EndOfCentralDir::read(Stream *stream)
    stream->read(&mCDOffset);
 
    stream->read(&mCommentSize);
-   
+
    char *comment = new char[mCommentSize + 1];
    stream->read(mCommentSize, comment);
    comment[mCommentSize] = 0;

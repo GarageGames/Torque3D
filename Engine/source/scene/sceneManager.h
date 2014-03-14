@@ -83,7 +83,7 @@ enum ScenePassType
    /// The scene pass made for shadow map rendering.
    SPT_Shadow,
 
-   /// A scene pass that isn't one of the other 
+   /// A scene pass that isn't one of the other
    /// predefined scene pass types.
    SPT_Other,
 };
@@ -230,7 +230,7 @@ class SceneManager
 
       /// Set the default render pass for the scene.
       void setDefaultRenderPass( RenderPassManager* rpm ) { mDefaultRenderPass = rpm; }
-      
+
       /// Render the scene with the default render pass.
       /// @note This uses the current GFX state (transforms, viewport, frustum) to initialize
       ///   the render state.
@@ -245,14 +245,14 @@ class SceneManager
       /// Returns the currently active scene state or NULL if no state is currently active.
       SceneRenderState* getCurrentRenderState() const { return mCurrentRenderState; }
 
-      static RenderSignal& getPreRenderSignal() 
-      { 
+      static RenderSignal& getPreRenderSignal()
+      {
          static RenderSignal theSignal;
          return theSignal;
       }
 
-      static RenderSignal& getPostRenderSignal() 
-      { 
+      static RenderSignal& getPostRenderSignal()
+      {
          static RenderSignal theSignal;
          return theSignal;
       }
@@ -288,7 +288,7 @@ class SceneManager
       /// @name Fog/Visibility Management
       /// @{
 
-      void setPostEffectFog( bool enable ) { mUsePostEffectFog = enable; }   
+      void setPostEffectFog( bool enable ) { mUsePostEffectFog = enable; }
       bool usePostEffectFog() const { return mUsePostEffectFog; }
 
       /// Accessor for the FogData structure.
@@ -317,7 +317,7 @@ class SceneManager
       /// Returns the default visible distance for the scene.
       F32 getVisibleDistance() { return mVisibleDistance; }
 
-      /// Used by LevelInfo to set the default near clip plane 
+      /// Used by LevelInfo to set the default near clip plane
       /// for rendering the scene.
       ///
       /// @see GameProcessCameraQuery

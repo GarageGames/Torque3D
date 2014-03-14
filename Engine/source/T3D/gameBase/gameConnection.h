@@ -220,7 +220,7 @@ protected:
    void ghostWriteExtra(NetObject *,BitStream *);
    void ghostReadExtra(NetObject *,BitStream *, bool newGhost);
    void ghostPreRead(NetObject *, bool newGhost);
-   
+
    virtual void onEndGhosting();
 
 public:
@@ -230,7 +230,7 @@ public:
    void preloadDataBlock(SimDataBlock *block);
    void fileDownloadSegmentComplete();
    void preloadNextDataBlock(bool hadNew);
-   
+
    static void consoleInit();
 
    void setDisconnectReason(const char *reason);
@@ -240,14 +240,14 @@ public:
    bool onAdd();
    void onRemove();
 
-   static GameConnection *getConnectionToServer() 
-   { 
-      return dynamic_cast<GameConnection*>((NetConnection *) mServerConnection); 
+   static GameConnection *getConnectionToServer()
+   {
+      return dynamic_cast<GameConnection*>((NetConnection *) mServerConnection);
    }
-   
-   static GameConnection *getLocalClientConnection() 
-   { 
-      return dynamic_cast<GameConnection*>((NetConnection *) mLocalClientConnection); 
+
+   static GameConnection *getLocalClientConnection()
+   {
+      return dynamic_cast<GameConnection*>((NetConnection *) mLocalClientConnection);
    }
 
    /// @name Control object
@@ -257,10 +257,10 @@ public:
    void setControlObject(GameBase *);
    GameBase* getControlObject() {  return  mControlObject; }
    const GameBase* getControlObject() const {  return  mControlObject; }
-   
+
    void setCameraObject(GameBase *);
    GameBase* getCameraObject();
-   
+
    bool getControlCameraTransform(F32 dt,MatrixF* mat);
    bool getControlCameraVelocity(Point3F *vel);
 
@@ -268,12 +268,12 @@ public:
    bool getControlCameraFov(F32 *fov);
    bool setControlCameraFov(F32 fov);
    bool isValidControlCameraFov(F32 fov);
-   
+
    // Used by editor
    bool isControlObjectRotDampedCamera();
 
    void setFirstPerson(bool firstPerson);
-   
+
    bool hasDisplayDevice() const { return mDisplayDevice != NULL; }
    const IDisplayDevice* getDisplayDevice() const { return mDisplayDevice; }
    void setDisplayDevice(IDisplayDevice* display) { mDisplayDevice = display; }
@@ -300,7 +300,7 @@ public:
    /// The datablock sequence number is synchronized to the mission sequence number
    /// on each datablock transmission.
    U32 getDataBlockSequence() { return mDataBlockSequence; }
-   
+
    /// Set the datablock sequence number.
    void setDataBlockSequence(U32 seq) { mDataBlockSequence = seq; }
 

@@ -34,10 +34,10 @@
 class PxMemStream : public NxStream
 {
 public:
-   
+
    PxMemStream();
 	virtual ~PxMemStream();
-			
+
    void resetPosition();
 
    // NxStream

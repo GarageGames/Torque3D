@@ -49,7 +49,7 @@ ConsoleDocClass( GuiMouseEventCtrl,
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDown, void, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ),
 														  ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is pressed down while in this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -73,7 +73,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDown, void, ( U8 modifier, Point2I
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseUp, void, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ),
 													    ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is released while in this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -97,7 +97,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseUp, void, ( U8 modifier, Point2I m
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseMove, void, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is moved (without dragging) while in this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -121,7 +121,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseMove, void, ( U8 modifier, Point2I
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDragged, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is dragged while in this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -145,7 +145,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDragged, void, (  U8 modifier, Poi
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseEnter, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse enters this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -169,7 +169,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseEnter, void, (  U8 modifier, Point
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseLeave, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse leaves this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -193,7 +193,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseLeave, void, (  U8 modifier, Point
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDown, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the right mouse button is pressed while in this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -217,7 +217,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDown, void, (  U8 modifier, P
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseUp, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the right mouse button is released while in this control.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -241,7 +241,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseUp, void, (  U8 modifier, Poi
 IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDragged, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is dragged in this control while the right mouse button is pressed.\n\n"
-   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "@param modifier Key that was pressed during this callback. Values are:\n\n"
    "$EventModifier::RSHIFT\n\n"
    "$EventModifier::SHIFT\n\n"
    "$EventModifier::LCTRL\n\n"
@@ -299,10 +299,10 @@ void GuiMouseEventCtrl::sendMouseEvent(const char * name, const GuiEvent & event
 void GuiMouseEventCtrl::initPersistFields()
 {
    addGroup( "Input" );
-   
+
       addField("lockMouse", TypeBool, Offset(mLockMouse, GuiMouseEventCtrl),
          "Whether the control should lock the mouse between up and down button events." );
-      
+
    endGroup( "Input" );
 
    Parent::initPersistFields();

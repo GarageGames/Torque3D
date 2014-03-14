@@ -54,7 +54,7 @@
 //	   GFXVideoMode vm;
 //	   vm.resolution.x = 400;
 //	   vm.resolution.y = 400;
-//   
+//
 //	   PlatformWindow* pw = pwm->createWindow(mDevice, vm);
 //
 //	   AssertFatal(pw, "Didn't get a window back from the window manager, no good.");
@@ -76,7 +76,7 @@
 //class SimpleGFXRenderFramework
 //{
 //public:
-//   
+//
 //   OldSignal<GFXDevice *> renderSignal;
 //
 //   PlatformWindow *mWindow;
@@ -92,7 +92,7 @@
 //
 //      // Set up the view...
 //      mDevice->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
-//      
+//
 //      //
 //      //mDevice->setOrtho(-4, 4, -4, 4, 0.1, 100.f);
 //      MatrixF worldMatrix(1);
@@ -163,7 +163,7 @@
 //   {
 //      // Draw a cube.
 //      static F32 cubeDiddle = 0;
-//      d->getDrawUtil()->drawWireCube(Point3F(1.f * (0.5f + cubeDiddle),1.f - cubeDiddle,1), 
+//      d->getDrawUtil()->drawWireCube(Point3F(1.f * (0.5f + cubeDiddle),1.f - cubeDiddle,1),
 //         Point3F( 0, 4.f + cubeDiddle * 2.f,0), ColorI(0x0,0xFF,0));
 //
 //      cubeDiddle += 0.01f;
@@ -185,7 +185,7 @@
 //public:
 //
 //   GFXVertexBufferHandle<GFXVertexPCN> mBunnyVB;
-//   
+//
 //   void ensureValid(GFXDevice *d)
 //   {
 //      if(mBunnyVB.isValid())
@@ -220,7 +220,7 @@
 //
 //      setupVB(d, size);
 //   }
-//   
+//
 //   inline void setupVert(GFXVertexPCNT *v, Point3F pos)
 //   {
 //      v->point = pos;
@@ -361,7 +361,7 @@
 //};
 //
 //
-//// This test uses GFXDevice::drawLine to draw a line.  To ensure that both versions of 
+//// This test uses GFXDevice::drawLine to draw a line.  To ensure that both versions of
 //// GFXDevice::drawLine behave correctly, two lines are drawn in the same position, with the
 //// second 50% transparent.  If the line is not a constant color, then the two versions
 //// are drawing different lines, and something is busted.
@@ -417,7 +417,7 @@
 //   }
 //};
 //
-//// This test uses GFXDevice::drawRect to draw a rect.  To ensure that both versions of 
+//// This test uses GFXDevice::drawRect to draw a rect.  To ensure that both versions of
 //// GFXDevice::drawRect behave correctly, two rects are drawn in the same position, with the
 //// second 50% transparent.  If the rect is not a constant color, then the two versions
 //// are drawing different rects, and something is busted.
@@ -464,7 +464,7 @@
 //	   d->setViewport(rect);
 //
 //      d->getDrawUtil()->drawRect(RectI(startPoint/1000, startPoint/1000, extent/1000, extent/1000), ColorI(0, 255, 0, 127));
-//      d->getDrawUtil()->drawRect(Point2I(startPoint/1000, startPoint/1000), 
+//      d->getDrawUtil()->drawRect(Point2I(startPoint/1000, startPoint/1000),
 //                  Point2I(startPoint/1000 + extent/1000, startPoint/1000 + extent/1000), ColorI(255, 0, 0, 127));
 //   }
 //
@@ -584,7 +584,7 @@
 //   }
 //};
 //
-//// This test uses GFXDevice::drawRectFill to draw a rect.  To ensure that both versions of 
+//// This test uses GFXDevice::drawRectFill to draw a rect.  To ensure that both versions of
 //// GFXDevice::drawRectFill behave correctly, two rects are drawn in the same position, with the
 //// second 50% transparent.  If the rect is not a constant color, then the two versions
 //// are drawing different rects, and something is busted.
@@ -629,7 +629,7 @@
 //      d->setClipRect(rect);
 //
 //      d->getDrawUtil()->drawRectFill(RectI(startPoint/1000, startPoint/1000, extent/1000, extent/1000), ColorI(0, 255, 0, 127));
-//      d->getDrawUtil()->drawRectFill(Point2I(startPoint/1000, startPoint/1000), 
+//      d->getDrawUtil()->drawRectFill(Point2I(startPoint/1000, startPoint/1000),
 //                  Point2I(startPoint/1000 + extent/1000, startPoint/1000 + extent/1000), ColorI(255, 0, 0, 127));
 //   }
 //
@@ -641,7 +641,7 @@
 //   }
 //};
 //
-//// This test sets a 2x2 viewport and loops through the entire window rendering green quads.  If 
+//// This test sets a 2x2 viewport and loops through the entire window rendering green quads.  If
 //// viewport setting works, it should result in a window full of green.
 //CreateInteractiveTest(TestGFXViewport, "GFX/Viewport")
 //{
@@ -689,7 +689,7 @@
 //
 //            PrimBuild::vertex3f(  1.0,  1.0, 0.0 );
 //
-//            PrimBuild::vertex3f(  1.0, -1.0, 0.0 ); 
+//            PrimBuild::vertex3f(  1.0, -1.0, 0.0 );
 //            PrimBuild::end();
 //            viewport.point.y += 2;
 //         }
@@ -774,7 +774,7 @@
 //
 //   void setupLights()
 //   {
-//      // Point light      
+//      // Point light
 //      mLightInfo.mType = GFXLightInfo::Point;
 //
 //      // Simple color
@@ -1334,7 +1334,7 @@
 //
 //      // Render to our different target textures.
 //      d->pushActiveRenderTarget();
-//      
+//
 //      // Set a starting texture so we can bind w/o any nulls.
 //      mRenderTarget->attachTexture(GFXTextureTarget::Color0, mTex[0]);
 //
@@ -1357,7 +1357,7 @@
 //      d->setFrustum(90.0f, 1.0f, 0.1f, 100.f);
 //
 //      // Cheesy little positional offset table.
-//      F32 posOffsets[4][3] = 
+//      F32 posOffsets[4][3] =
 //      {
 //         { -2, 5, -2},
 //         { -2, 5,  2},
@@ -1440,7 +1440,7 @@
 //   {
 //      mDevice->beginScene();
 //      mDevice->setActiveRenderTarget(mWindow->getGFXTarget());
-// 
+//
 //      // Fill this in an interesting way...
 //      static U32 i=10;
 //      mDevice->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, ColorI( 0, i, 0 ), 1.0f, 0 );
@@ -1502,15 +1502,15 @@
 //      // For each reported adapter...
 //      for(S32 i=0; i<adapters.size(); i++)
 //      {
-//         UnitPrint(avar("Testing adapter #%d (%s) in %s.", 
-//                     adapters[i]->mIndex, 
-//                     adapters[i]->mName, 
+//         UnitPrint(avar("Testing adapter #%d (%s) in %s.",
+//                     adapters[i]->mIndex,
+//                     adapters[i]->mName,
 //                     GFXInit::getAdapterNameFromType(adapters[i]->mType)));
 //
 //         // Init the device.
 //         mDevice = GFXInit::createDevice(adapters[i]);
 //         test(mDevice, "Failed to create a device!");
-//         
+//
 //         if(!mDevice)
 //            continue;
 //
@@ -1532,7 +1532,7 @@
 //         // - a texture
 //         mTex = new GFXTexHandle();
 //         if((*mTex).isNull())
-//            (*mTex) = mDevice->getTextureManager()->createTexture("common/gui/images/GG_Icon.png", 
+//            (*mTex) = mDevice->getTextureManager()->createTexture("common/gui/images/GG_Icon.png",
 //                           &GFXDefaultPersistentProfile);
 //
 //         // Hook in our events.

@@ -60,7 +60,7 @@ inline MRandomDeck<T>::MRandomDeck( MRandomLCG *randGen )
 {
 }
 
-template<class T> 
+template<class T>
 inline void MRandomDeck<T>::shuffle()
 {
    // Move everything to the pile.
@@ -89,14 +89,14 @@ inline void MRandomDeck<T>::shuffle()
    }
 }
 
-template<class T> 
+template<class T>
 inline S32 MRandomDeck<T>::draw( T *item, bool reshuffle )
-{ 
+{
    if ( mDeck.size() == 0 )
    {
       if ( mPile.size() == 0 )
          return -1;
-      
+
       if ( reshuffle )
          shuffle();
       else
@@ -105,7 +105,7 @@ inline S32 MRandomDeck<T>::draw( T *item, bool reshuffle )
 
    *item = mDeck.last();
    mPile.push_back( *item );
-   mDeck.pop_back();   
+   mDeck.pop_back();
 
    return mDeck.size();
 }

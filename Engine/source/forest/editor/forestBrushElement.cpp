@@ -52,18 +52,18 @@ ForestBrushElement::ForestBrushElement()
   mSlopeMax( 90.0f ),
   mSlopeMin( 0.0f ),
   mElevationMin( -10000.0f ),
-  mElevationMax( 10000.0f ) 
+  mElevationMax( 10000.0f )
 {
 }
 
 
 void ForestBrushElement::initPersistFields()
-{   
+{
    Parent::initPersistFields();
 
    addGroup( "ForestBrushElement" );
 
-      addField( "forestItemData", TYPEID< ForestItemData >(), Offset( mData, ForestBrushElement ), 
+      addField( "forestItemData", TYPEID< ForestItemData >(), Offset( mData, ForestBrushElement ),
          "The type of ForestItem this element holds placement parameters for." );
 
       addField( "probability",   TypeF32, Offset( mProbability, ForestBrushElement ),
@@ -105,7 +105,7 @@ void ForestBrushElement::initPersistFields()
       addField( "elevationMax",   TypeF32, Offset( mElevationMax, ForestBrushElement ),
          "The max world space elevation this item will be placed." );
 
-   endGroup( "ForestBrushElement" );      
+   endGroup( "ForestBrushElement" );
 }
 
 
@@ -151,7 +151,7 @@ void ForestBrush::addObject( SimObject *inObj )
 }
 
 SimGroup* ForestBrush::getGroup()
-{   
+{
    if ( !smGroup )
    {
       SimGroup *dummy;
@@ -182,7 +182,7 @@ bool ForestBrush::containsItemData( const ForestItemData *inData )
 
       if ( pElement->mData == inData )
          return true;
-   }   
+   }
 
    return false;
 }

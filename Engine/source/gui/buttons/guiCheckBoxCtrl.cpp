@@ -37,11 +37,11 @@ IMPLEMENT_CONOBJECT( GuiCheckBoxCtrl );
 
 ConsoleDocClass( GuiCheckBoxCtrl,
    "@brief A named checkbox that can be toggled on and off.\n\n"
-   
+
    "A GuiCheckBoxCtrl displays a text label next to a checkbox that can be toggled on and off by the user. "
    "Checkboxes are usually used to present boolean choices like, for example, a switch to toggle fullscreen "
    "video on and off.\n\n"
-   
+
    "@tsexample\n"
    "// Create a checkbox that allows to toggle fullscreen on and off.\n"
    "new GuiCheckBoxCtrl( FullscreenToggle )\n"
@@ -58,7 +58,7 @@ ConsoleDocClass( GuiCheckBoxCtrl,
    "   Canvas.toggleFullscreen();\n"
    "}\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiButtons"
 );
 
@@ -136,7 +136,7 @@ void GuiCheckBoxCtrl::onRender(Point2I offset, const RectI &updateRect)
       S32 y = (getHeight() - mProfile->mBitmapArrayRects[0].extent.y) / 2;
       GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, offset + Point2I(mIndent, y), mProfile->mBitmapArrayRects[index]);
    }
-   
+
    if(mButtonText[0] != '\0')
    {
 	  GFX->getDrawUtil()->setBitmapModulation( fontColor );
@@ -154,11 +154,11 @@ void GuiCheckBoxCtrl::autoSize()
 {
    U32 width, height;
    U32 bmpArrayRect0Width = 0;
-   
+
    if( !mAwake )
    {
       mProfile->incLoadCount();
-            
+
       if( !mProfile->mBitmapArrayRects.size() )
          mProfile->constructBitmapArray();
       if( mProfile->mBitmapArrayRects.size() )
@@ -176,7 +176,7 @@ void GuiCheckBoxCtrl::autoSize()
    height = getMax( bmpHeight, fontHeight ) + 4;
 
    setExtent( width, height );
-   
+
    if( !mAwake )
       mProfile->decLoadCount();
 }

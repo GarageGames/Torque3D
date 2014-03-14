@@ -128,7 +128,7 @@ class Marker : public SceneObject
 
    void onEditorEnable();
    void onEditorDisable();
-   
+
    static void initGFXResources();
 
    static GFXStateBlockRef smStateBlock;

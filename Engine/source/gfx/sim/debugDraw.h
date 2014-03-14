@@ -100,7 +100,7 @@ public:
    ~DebugDrawer();
 
    static DebugDrawer* get();
-   
+
    /// Called at engine init to set up the global debug draw object.
    static void init();
 
@@ -108,7 +108,7 @@ public:
    void render();
 
    void toggleFreeze()  { shouldToggleFreeze = true; };
-   void toggleDrawing() 
+   void toggleDrawing()
    {
 #ifdef ENABLE_DEBUGDRAW
       isDrawing = !isDrawing;
@@ -121,7 +121,7 @@ public:
    /// @{
 
    void drawBox(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-   void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));	
+   void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawTri(const Point3F &a, const Point3F &b, const Point3F &c, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
 
@@ -172,7 +172,7 @@ private:
       } type;	   ///< Type of the primitive. The meanings of a,b,c are determined by this.
 
       SimTime dieTime;   ///< Time at which we should remove this from the list.
-      bool useZ; ///< If true, do z-checks for this primitive.      
+      bool useZ; ///< If true, do z-checks for this primitive.
       char mText[256];      // Text to display
 
       DebugPrim *next;
@@ -184,7 +184,7 @@ private:
 
    bool isFrozen;
    bool shouldToggleFreeze;
-   bool isDrawing;   
+   bool isDrawing;
 
    GFXStateBlockRef mRenderZOffSB;
    GFXStateBlockRef mRenderZOnSB;

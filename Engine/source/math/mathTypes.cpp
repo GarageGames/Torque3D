@@ -77,12 +77,12 @@ END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( Point4F,
    Point4F, MathTypes,
    "" )
-   
+
       FIELD( x, x, 1, "X coordinate." )
       FIELD( y, y, 1, "Y coordinate." )
       FIELD( z, z, 1, "Z coordinate." )
       FIELD( w, w, 1, "W coordinate." )
-      
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( RectI,
    RectI, MathTypes,
@@ -316,13 +316,13 @@ ConsoleSetType( TypeMatrixF )
       Con::errorf( "MatrixF must be set as \"c0x c0y c0z c1x c1y c1z c2x c2y c2z\"" );
       return;
    }
-   
+
    Point3F col0, col1, col2;
    dSscanf( argv[ 0 ], "%g %g %g %g %g %g %g %g %g",
             &col0.x, &col0.y, &col0.z, &col1.x, &col1.y, &col1.z, &col2.x, &col2.y, &col2.z );
 
    MatrixF* mat = ( MatrixF* ) dptr;
-   
+
    mat->setColumn( 0, col0 );
    mat->setColumn( 1, col1 );
    mat->setColumn( 2, col2 );
@@ -353,7 +353,7 @@ ConsoleSetType( TypeMatrixPosition )
       col[12] = 1.f;
       dSscanf(argv[0], "%g %g %g %g", &col[0], &col[4], &col[8], &col[12]);
    }
-   else if (argc <= 4) 
+   else if (argc <= 4)
    {
       for (S32 i = 0; i < argc; i++)
          col[i << 2] = dAtof(argv[i]);
@@ -386,7 +386,7 @@ ConsoleSetType( TypeMatrixRotation )
       dSscanf(argv[0], "%g %g %g %g", &aa.axis.x, &aa.axis.y, &aa.axis.z, &aa.angle);
       aa.angle = mDegToRad(aa.angle);
    }
-   else if (argc == 4) 
+   else if (argc == 4)
    {
          for (S32 i = 0; i < argc; i++)
             ((F32*)&aa)[i] = dAtof(argv[i]);
@@ -430,7 +430,7 @@ ConsoleSetType( TypeAngAxisF )
       dSscanf(argv[0], "%g %g %g %g", &aa->axis.x, &aa->axis.y, &aa->axis.z, &aa->angle);
       aa->angle = mDegToRad(aa->angle);
    }
-   else if (argc == 4) 
+   else if (argc == 4)
    {
       for (S32 i = 0; i < argc; i++)
          ((F32*)&aa)[i] = dAtof(argv[i]);
@@ -509,14 +509,14 @@ ConsoleSetType( TypeBox3F )
 {
    Box3F* pDst = (Box3F*)dptr;
 
-   if (argc == 1) 
+   if (argc == 1)
    {
       U32 args = dSscanf(argv[0], "%g %g %g %g %g %g",
                          &pDst->minExtents.x, &pDst->minExtents.y, &pDst->minExtents.z,
                          &pDst->maxExtents.x, &pDst->maxExtents.y, &pDst->maxExtents.z);
       AssertWarn(args == 6, "Warning, box probably not read properly");
-   } 
-   else 
+   }
+   else
    {
       Con::printf("Box3F must be set as \"xMin yMin zMin xMax yMax zMax\"");
    }
@@ -732,7 +732,7 @@ DefineConsoleFunction( VectorCross, VectorF, ( VectorF a, VectorF b ),,
 	"// %r = \"( ( 1 * 1 ) - ( 0 * 0 ), ( 0 * 2 ) - ( 1 * 1 ), ( 1 * 0 ) - ( 1 * 2 ) )\";\n"
 	"// %r = \"1 -1 -2\";\n"
 	"%r = VectorCross( %a, %b );\n"
-   "@endtsexample\n\n"	
+   "@endtsexample\n\n"
    "@ingroup Vectors" )
 {
    VectorF v;
@@ -849,7 +849,7 @@ DefineConsoleFunction( VectorLerp, VectorF, ( VectorF a, VectorF b, F32 t ),,
 {
    VectorF c;
    c.interpolate( a, b, t );
-   
+
    return c;
 }
 
@@ -1003,11 +1003,11 @@ ConsoleFunction( getRandom, F32, 1, 3,
       return F32(gRandGen.randI(0,getMax( dAtoi(argv[1]), 0 )));
    else
    {
-      if (argc == 3) 
+      if (argc == 3)
       {
          S32 min = dAtoi(argv[1]);
          S32 max = dAtoi(argv[2]);
-         if (min > max) 
+         if (min > max)
          {
             S32 t = min;
             min = max;

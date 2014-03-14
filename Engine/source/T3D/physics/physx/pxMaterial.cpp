@@ -34,7 +34,7 @@
 IMPLEMENT_CO_DATABLOCK_V1( PxMaterial );
 
 ConsoleDocClass( PxMaterial,
-   
+
    "@brief Defines a PhysX material assignable to a PxMaterial.\n\n"
 
    "When two actors collide, the collision behavior that results depends on the material properties "
@@ -71,31 +71,31 @@ void PxMaterial::initPersistFields()
 {
    Parent::initPersistFields();
 
-   addGroup("PxMaterial");		
+   addGroup("PxMaterial");
 
       addField( "restitution", TypeF32, Offset( restitution, PxMaterial ),
          "@brief Coeffecient of a bounce applied to the shape in response to a collision.\n\n"
          "A value of 0 makes the object bounce as little as possible, while higher values up to 1.0 result in more bounce.\n\n"
          "@note Values close to or above 1.0 may cause stability problems and/or increasing energy.");
       addField( "staticFriction", TypeF32, Offset( staticFriction, PxMaterial ),
-         "@brief Coefficient of static %friction to be applied.\n\n" 
+         "@brief Coefficient of static %friction to be applied.\n\n"
          "Static %friction determines the force needed to start moving an at-rest object in contact with a surface. "
          "If the force applied onto shape cannot overcome the force of static %friction, the shape will remain at rest. "
          "A higher coefficient will require a larger force to start motion. "
          "@note This value should be larger than 0.\n\n");
       addField( "dynamicFriction", TypeF32,	Offset( dynamicFriction, PxMaterial ),
-         "@brief Coefficient of dynamic %friction to be applied.\n\n" 
+         "@brief Coefficient of dynamic %friction to be applied.\n\n"
          "Dynamic %friction reduces the velocity of a moving object while it is in contact with a surface. "
          "A higher coefficient will result in a larger reduction in velocity. "
          "A shape's dynamicFriction should be equal to or larger than 0.\n\n");
 
-   endGroup("PxMaterial");		
+   endGroup("PxMaterial");
 }
 
 void PxMaterial::onStaticModified( const char *slotName, const char *newValue )
 {
    if ( isProperlyAdded() && mNxMat != NULL )
-   {      
+   {
       mNxMat->setRestitution( restitution );
       mNxMat->setStaticFriction( staticFriction );
       mNxMat->setDynamicFriction( dynamicFriction );
@@ -106,13 +106,13 @@ bool PxMaterial::preload( bool server, String &errorBuffer )
 {
    mServer = server;
 
-   PxWorld *world = dynamic_cast<PxWorld*>( PHYSICSMGR->getWorld( server ? "server" : "client" ) );   
+   PxWorld *world = dynamic_cast<PxWorld*>( PHYSICSMGR->getWorld( server ? "server" : "client" ) );
 
    if ( !world )
    {
       // TODO: Error... in error buffer?
       return false;
-   }   
+   }
 
    NxMaterialDesc	material;
    material.restitution = restitution;
@@ -134,7 +134,7 @@ bool PxMaterial::preload( bool server, String &errorBuffer )
 void PxMaterial::packData( BitStream* stream )
 {
    Parent::packData( stream );
-   
+
    stream->write( restitution );
    stream->write( staticFriction );
    stream->write( dynamicFriction );

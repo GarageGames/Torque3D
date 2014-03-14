@@ -54,11 +54,11 @@ FrustumData::EdgeListType FrustumData::smEdges
 //-----------------------------------------------------------------------------
 
 Frustum::Frustum( bool isOrtho,
-                  F32 nearLeft, 
-                  F32 nearRight, 
-                  F32 nearTop, 
-                  F32 nearBottom, 
-                  F32 nearDist,                  
+                  F32 nearLeft,
+                  F32 nearRight,
+                  F32 nearTop,
+                  F32 nearBottom,
+                  F32 nearDist,
                   F32 farDist,
                   const MatrixF &transform )
 {
@@ -84,9 +84,9 @@ Frustum::Frustum( bool isOrtho,
 //-----------------------------------------------------------------------------
 
 void Frustum::set(   bool isOrtho,
-                     F32 fovYInRadians, 
-                     F32 aspectRatio, 
-                     F32 nearDist, 
+                     F32 fovYInRadians,
+                     F32 aspectRatio,
+                     F32 nearDist,
                      F32 farDist,
                      const MatrixF &transform )
 {
@@ -100,11 +100,11 @@ void Frustum::set(   bool isOrtho,
 //-----------------------------------------------------------------------------
 
 void Frustum::set(   bool isOrtho,
-                     F32 nearLeft, 
-                     F32 nearRight, 
-                     F32 nearTop, 
-                     F32 nearBottom, 
-                     F32 nearDist, 
+                     F32 nearLeft,
+                     F32 nearRight,
+                     F32 nearTop,
+                     F32 nearBottom,
+                     F32 nearDist,
                      F32 farDist,
                      const MatrixF &transform )
 {
@@ -126,46 +126,46 @@ void Frustum::set(   bool isOrtho,
 
 #if 0
 void Frustum::set( const MatrixF &projMat, bool normalize )
-{ 
+{
    // From "Fast Extraction of Viewing Frustum Planes from the World-View-Projection Matrix"
    // by Gil Gribb and Klaus Hartmann.
    //
    // http://www2.ravensoft.com/users/ggribb/plane%20extraction.pdf
 
    // Right clipping plane.
-   mPlanes[ PlaneRight ].set(  projMat[3] - projMat[0], 
-                                             projMat[7] - projMat[4], 
+   mPlanes[ PlaneRight ].set(  projMat[3] - projMat[0],
+                                             projMat[7] - projMat[4],
                                              projMat[11] - projMat[8],
                                              projMat[15] - projMat[12] );
 
    // Left clipping plane.
-   mPlanes[ PlaneLeft ].set(   projMat[3] + projMat[0], 
-                                             projMat[7] + projMat[4], 
-                                             projMat[11] + projMat[8], 
+   mPlanes[ PlaneLeft ].set(   projMat[3] + projMat[0],
+                                             projMat[7] + projMat[4],
+                                             projMat[11] + projMat[8],
                                              projMat[15] + projMat[12] );
 
    // Bottom clipping plane.
-   mPlanes[ PlaneBottom ].set( projMat[3] + projMat[1], 
-                                             projMat[7] + projMat[5], 
-                                             projMat[11] + projMat[9], 
+   mPlanes[ PlaneBottom ].set( projMat[3] + projMat[1],
+                                             projMat[7] + projMat[5],
+                                             projMat[11] + projMat[9],
                                              projMat[15] + projMat[13] );
 
    // Top clipping plane.
-   mPlanes[ PlaneTop ].set(    projMat[3] - projMat[1], 
-                                             projMat[7] - projMat[5], 
-                                             projMat[11] - projMat[9], 
+   mPlanes[ PlaneTop ].set(    projMat[3] - projMat[1],
+                                             projMat[7] - projMat[5],
+                                             projMat[11] - projMat[9],
                                              projMat[15] - projMat[13] );
 
    // Near clipping plane
-   mPlanes[ PlaneNear ].set(   projMat[3] + projMat[2], 
-                                             projMat[7] + projMat[6], 
+   mPlanes[ PlaneNear ].set(   projMat[3] + projMat[2],
+                                             projMat[7] + projMat[6],
                                              projMat[11] + projMat[10],
                                              projMat[15] + projMat[14] );
 
    // Far clipping plane.
-   mPlanes[ PlaneFar ].set(    projMat[3] - projMat[2], 
-                                             projMat[7] - projMat[6], 
-                                             projMat[11] - projMat[10], 
+   mPlanes[ PlaneFar ].set(    projMat[3] - projMat[2],
+                                             projMat[7] - projMat[6],
+                                             projMat[11] - projMat[10],
                                              projMat[15] - projMat[14] );
 
    if( normalize )
@@ -212,7 +212,7 @@ void Frustum::setNearFarDist( F32 nearDist, F32 farDist )
       return;
 
    // Recalculate the frustum.
-   MatrixF xfm( mTransform ); 
+   MatrixF xfm( mTransform );
    set( mIsOrtho, getFov(), getAspectRatio(), nearDist, farDist, xfm );
 }
 
@@ -222,7 +222,7 @@ void Frustum::cropNearFar(F32 newNearDist, F32 newFarDist)
 {
    const F32 newOverOld = newNearDist / mNearDist;
 
-   set( mIsOrtho, mNearLeft * newOverOld, mNearRight * newOverOld, mNearTop * newOverOld, mNearBottom * newOverOld, 
+   set( mIsOrtho, mNearLeft * newOverOld, mNearRight * newOverOld, mNearTop * newOverOld, mNearBottom * newOverOld,
       newNearDist, newFarDist, mTransform);
 }
 
@@ -363,7 +363,7 @@ void FrustumData::_update() const
    for( U32 i = 0; i < mPoints.size(); ++ i )
       mTransform.mulP( mPoints[ i ] );
 
-   // Update the axis aligned bounding box from 
+   // Update the axis aligned bounding box from
    // the newly transformed points.
 
    mBounds = Box3F::aroundPoints( mPoints.address(), mPoints.size() );
@@ -372,54 +372,54 @@ void FrustumData::_update() const
 
    if( mIsOrtho )
    {
-      mPlanes[ PlaneLeft ].set(   mPoints[ NearBottomLeft ], 
-                                  mPoints[ FarTopLeft ], 
+      mPlanes[ PlaneLeft ].set(   mPoints[ NearBottomLeft ],
+                                  mPoints[ FarTopLeft ],
                                   mPoints[ FarBottomLeft ] );
 
-      mPlanes[ PlaneRight ].set(  mPoints[ NearTopRight ], 
-                                  mPoints[ FarBottomRight ], 
+      mPlanes[ PlaneRight ].set(  mPoints[ NearTopRight ],
+                                  mPoints[ FarBottomRight ],
                                   mPoints[ FarTopRight ] );
 
-      mPlanes[ PlaneTop ].set(    mPoints[ FarTopRight ], 
-                                  mPoints[ NearTopLeft ], 
+      mPlanes[ PlaneTop ].set(    mPoints[ FarTopRight ],
+                                  mPoints[ NearTopLeft ],
                                   mPoints[ NearTopRight ] );
 
-      mPlanes[ PlaneBottom ].set( mPoints[ NearBottomRight ], 
-                                  mPoints[ FarBottomLeft ], 
+      mPlanes[ PlaneBottom ].set( mPoints[ NearBottomRight ],
+                                  mPoints[ FarBottomLeft ],
                                   mPoints[ FarBottomRight ] );
 
-      mPlanes[ PlaneNear ].set(   mPoints[ NearTopLeft ], 
-                                  mPoints[ NearBottomLeft ], 
+      mPlanes[ PlaneNear ].set(   mPoints[ NearTopLeft ],
+                                  mPoints[ NearBottomLeft ],
                                   mPoints[ NearTopRight ] );
 
-      mPlanes[ PlaneFar ].set(    mPoints[ FarTopLeft ], 
-                                  mPoints[ FarTopRight ], 
+      mPlanes[ PlaneFar ].set(    mPoints[ FarTopLeft ],
+                                  mPoints[ FarTopRight ],
                                   mPoints[ FarBottomLeft ] );
    }
    else
    {
       mPlanes[ PlaneLeft ].set(   cameraPos,
-                                  mPoints[ NearTopLeft ], 
+                                  mPoints[ NearTopLeft ],
                                   mPoints[ NearBottomLeft ] );
 
       mPlanes[ PlaneRight ].set(  cameraPos,
-                                  mPoints[ NearBottomRight ], 
+                                  mPoints[ NearBottomRight ],
                                   mPoints[ NearTopRight ] );
 
       mPlanes[ PlaneTop ].set(    cameraPos,
-                                  mPoints[ NearTopRight ], 
+                                  mPoints[ NearTopRight ],
                                   mPoints[ NearTopLeft ] );
 
       mPlanes[ PlaneBottom ].set( cameraPos,
-                                  mPoints[ NearBottomLeft ], 
+                                  mPoints[ NearBottomLeft ],
                                   mPoints[ NearBottomRight ] );
 
       mPlanes[ PlaneNear ].set(   mPoints[ NearTopLeft ],
-                                  mPoints[ NearBottomLeft ], 
+                                  mPoints[ NearBottomLeft ],
                                   mPoints[ NearTopRight ] );
 
       mPlanes[ PlaneFar ].set(    mPoints[ FarTopLeft ],
-                                  mPoints[ FarTopRight ], 
+                                  mPoints[ FarTopRight ],
                                   mPoints[ FarBottomLeft ] );
    }
 
@@ -441,34 +441,34 @@ void FrustumData::_update() const
 
    // And now the center points which are mostly just used in debug rendering.
 
-   mPlaneCenters[ PlaneLeftCenter ] = (   mPoints[ NearTopLeft ] + 
-                                          mPoints[ NearBottomLeft ] + 
-                                          mPoints[ FarTopLeft ] + 
+   mPlaneCenters[ PlaneLeftCenter ] = (   mPoints[ NearTopLeft ] +
+                                          mPoints[ NearBottomLeft ] +
+                                          mPoints[ FarTopLeft ] +
                                           mPoints[ FarBottomLeft ] ) / 4.0f;
 
-   mPlaneCenters[ PlaneRightCenter ] = (  mPoints[ NearTopRight ] + 
-                                          mPoints[ NearBottomRight ] + 
-                                          mPoints[ FarTopRight ] + 
+   mPlaneCenters[ PlaneRightCenter ] = (  mPoints[ NearTopRight ] +
+                                          mPoints[ NearBottomRight ] +
+                                          mPoints[ FarTopRight ] +
                                           mPoints[ FarBottomRight ] ) / 4.0f;
 
-   mPlaneCenters[ PlaneTopCenter ] = ( mPoints[ NearTopLeft ] + 
-                                       mPoints[ NearTopRight ] + 
-                                       mPoints[ FarTopLeft ] + 
+   mPlaneCenters[ PlaneTopCenter ] = ( mPoints[ NearTopLeft ] +
+                                       mPoints[ NearTopRight ] +
+                                       mPoints[ FarTopLeft ] +
                                        mPoints[ FarTopRight ] ) / 4.0f;
 
-   mPlaneCenters[ PlaneBottomCenter ] = ( mPoints[ NearBottomLeft ] + 
-                                          mPoints[ NearBottomRight ] + 
-                                          mPoints[ FarBottomLeft ] + 
+   mPlaneCenters[ PlaneBottomCenter ] = ( mPoints[ NearBottomLeft ] +
+                                          mPoints[ NearBottomRight ] +
+                                          mPoints[ FarBottomLeft ] +
                                           mPoints[ FarBottomRight ] ) / 4.0f;
 
-   mPlaneCenters[ PlaneNearCenter ] = (   mPoints[ NearTopLeft ] + 
-                                          mPoints[ NearTopRight ] + 
-                                          mPoints[ NearBottomLeft ] + 
+   mPlaneCenters[ PlaneNearCenter ] = (   mPoints[ NearTopLeft ] +
+                                          mPoints[ NearTopRight ] +
+                                          mPoints[ NearBottomLeft ] +
                                           mPoints[ NearBottomRight ] ) / 4.0f;
 
-   mPlaneCenters[ PlaneFarCenter ] = ( mPoints[ FarTopLeft ] + 
-                                       mPoints[ FarTopRight ] + 
-                                       mPoints[ FarBottomLeft ] + 
+   mPlaneCenters[ PlaneFarCenter ] = ( mPoints[ FarTopLeft ] +
+                                       mPoints[ FarTopRight ] +
+                                       mPoints[ FarBottomLeft ] +
                                        mPoints[ FarBottomRight ] ) / 4.0f;
 
    // Done.
@@ -558,10 +558,10 @@ void Frustum::getProjectionMatrix( MatrixF *proj, bool gfxRotate ) const
 void Frustum::tileFrustum(U32 numTiles, const Point2I& curTile, Point2F overlap)
 {
    //These will be stored to re-tile the frustum if needed
-   mNumTiles = numTiles; 
-   mCurrTile = curTile; 
+   mNumTiles = numTiles;
+   mCurrTile = curTile;
    mTileOverlap = overlap;
-   
+
    tile(&mNearLeft, &mNearRight, &mNearTop, &mNearBottom, mNumTiles, mCurrTile, mTileOverlap);
 }
 
@@ -572,9 +572,9 @@ void Frustum::tile( F32 *left, F32 *right, F32 *top, F32 *bottom, U32 numTiles, 
    if (numTiles == 1)
       return;
 
-   Point2F tileSize( ( *right - *left ) / (F32)numTiles, 
+   Point2F tileSize( ( *right - *left ) / (F32)numTiles,
                      ( *top - *bottom ) / (F32)numTiles );
-   
+
    F32 leftOffset   = tileSize.x*overlap.x;
    F32 rightOffset  = tileSize.x*overlap.x*2;
    F32 bottomOffset = tileSize.y*overlap.y;

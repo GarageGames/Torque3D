@@ -43,7 +43,7 @@ class NodeListNotify;
 class NodeListManager
 {
 public:
-   
+
    struct NodeList
    {
       U32   mId;

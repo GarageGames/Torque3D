@@ -48,7 +48,7 @@ public:
 
    //-----------------------------------------------------------------------------
    /// @brief Open a file
-   /// 
+   ///
    /// @param filename Name of file to open
    /// @param mode One of #Torque::FS::File::Read, #Torque::FS::File::Write, #Torque::FS::File::ReadWrite or #Torque::FS::File::WriteAppend
    /// @return true for success, false for failure
@@ -58,7 +58,7 @@ public:
 
    //-----------------------------------------------------------------------------
    /// @brief Close the file
-   /// 
+   ///
    /// @see open()
    //-----------------------------------------------------------------------------
    void close();

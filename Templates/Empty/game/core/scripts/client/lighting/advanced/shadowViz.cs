@@ -24,10 +24,10 @@ new ShaderData( AL_ShadowVisualizeShader )
 {
    DXVertexShaderFile = "shaders/common/guiMaterialV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgShadowVisualizeP.hlsl";
-   
+
    OGLVertexShaderFile = "shaders/common/gl/guiMaterialV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgShadowVisualizeP.glsl";
-   
+
    pixVersion = 2.0;
 };
 
@@ -35,7 +35,7 @@ new CustomMaterial( AL_ShadowVisualizeMaterial )
 {
    shader = AL_ShadowVisualizeShader;
    stateBlock = AL_DepthVisualizeState;
-   
+
    sampler["shadowMap"] = "#AL_ShadowVizTexture";
    sampler["depthViz"] = "depthviz";
 
@@ -69,31 +69,31 @@ function toggleShadowViz()
 /// Called from the WorldEditor when an object is selected.
 function _setShadowVizLight( %light, %force )
 {
-   if ( !AL_ShadowVizOverlayCtrl.isAwake() )   
+   if ( !AL_ShadowVizOverlayCtrl.isAwake() )
       return;
-      
+
    if ( AL_ShadowVizOverlayCtrl.isLocked && !%force )
       return;
-      
+
    // Resolve the object to the client side.
    if ( isObject( %light ) )
-   {      
+   {
       %clientLight = serverToClientObject( %light );
       %sizeAndAspect = setShadowVizLight( %clientLight );
-   }      
-   
-   AL_ShadowVizOverlayCtrl-->MatCtrl.setMaterial( "AL_ShadowVisualizeMaterial" );      
-   
+   }
+
+   AL_ShadowVizOverlayCtrl-->MatCtrl.setMaterial( "AL_ShadowVisualizeMaterial" );
+
    %text = "ShadowViz";
    if ( isObject( %light ) )
       %text = %text @ " : " @ getWord( %sizeAndAspect, 0 ) @ " x " @ getWord( %sizeAndAspect, 1 );
-      
-   AL_ShadowVizOverlayCtrl-->WindowCtrl.text = %text;   
+
+   AL_ShadowVizOverlayCtrl-->WindowCtrl.text = %text;
 }
 
 /// For convenience, push the viz dialog and set the light manually from the console.
 function showShadowVizForLight( %light )
-{   
+{
    if ( !AL_ShadowVizOverlayCtrl.isAwake() )
       Canvas.pushDialog( AL_ShadowVizOverlayCtrl, 100 );
    _setShadowVizLight( %light, true );

@@ -27,7 +27,7 @@
 
 FeatureTypeVector& FeatureType::_getTypes()
 {
-   // We create it as a method static so that 
+   // We create it as a method static so that
    // its available to other statics regardless
    // of initialization order.
    static FeatureTypeVector theTypes;
@@ -41,7 +41,7 @@ void FeatureType::addDefaultTypes( FeatureSet *outFeatures )
    {
       if ( types[i]->isDefault() )
          outFeatures->addFeature( *types[i] );
-   }   
+   }
 }
 
 FeatureType::FeatureType( const char *name, U32 group, F32 order, bool isDefault )

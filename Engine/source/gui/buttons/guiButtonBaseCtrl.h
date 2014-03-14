@@ -34,7 +34,7 @@
 class GuiButtonBaseCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
       enum ButtonType
@@ -45,7 +45,7 @@ class GuiButtonBaseCtrl : public GuiControl
       };
 
    protected:
-   
+
       StringTableEntry mButtonText;
       StringTableEntry mButtonTextID;
       bool mDepressed;
@@ -54,25 +54,25 @@ class GuiButtonBaseCtrl : public GuiControl
       S32 mButtonType;
       S32 mRadioGroup;
       bool mUseMouseEvents;
-      
+
       /// Point where left mouse button was pressed down.  Used to find when to start
       /// a mouse drag.
       Point2I mMouseDownPoint;
-      
+
       ///
       bool mMouseDragged;
-      
+
 	   /// @name Callbacks
 	   /// @{
 
-      DECLARE_CALLBACK( void, onMouseDown, () );   
+      DECLARE_CALLBACK( void, onMouseDown, () );
 	   DECLARE_CALLBACK( void, onMouseUp, () );
 	   DECLARE_CALLBACK( void, onClick, () );
 	   DECLARE_CALLBACK( void, onRightClick, () );
-	   DECLARE_CALLBACK( void, onDoubleClick, () );    
-	   DECLARE_CALLBACK( void, onMouseEnter, () );   
-	   DECLARE_CALLBACK( void, onMouseLeave, () );      
-	   DECLARE_CALLBACK( void, onMouseDragged, () );   
+	   DECLARE_CALLBACK( void, onDoubleClick, () );
+	   DECLARE_CALLBACK( void, onMouseEnter, () );
+	   DECLARE_CALLBACK( void, onMouseLeave, () );
+	   DECLARE_CALLBACK( void, onMouseDragged, () );
 
       /// @}
 
@@ -84,7 +84,7 @@ class GuiButtonBaseCtrl : public GuiControl
       DECLARE_CONOBJECT( GuiButtonBaseCtrl );
       DECLARE_CATEGORY( "Gui Buttons" );
       DECLARE_DESCRIPTION( "A basic button control." );
-      
+
       static void initPersistFields();
 
       void setText(const char *text);
@@ -116,7 +116,7 @@ class GuiButtonBaseCtrl : public GuiControl
 
       void onMessage(GuiControl *,S32 msg);
       void onAction();
-      
+
       bool usesMouseEvents() const { return mUseMouseEvents; }
       void setUseMouseEvents( bool val ) { mUseMouseEvents = val; }
 };

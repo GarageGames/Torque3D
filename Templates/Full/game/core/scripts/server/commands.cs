@@ -31,7 +31,7 @@
 function serverCmdNetSimulateLag( %client, %msDelay, %packetLossPercent )
 {
    if ( %client.isAdmin )
-      %client.setSimulatedNetParams( %packetLossPercent / 100.0, %msDelay );   
+      %client.setSimulatedNetParams( %packetLossPercent / 100.0, %msDelay );
 }
 
 //----------------------------------------------------------------------------
@@ -217,7 +217,7 @@ function serverCmdSAD( %client, %password )
       %client.isAdmin = true;
       %client.isSuperAdmin = true;
       %name = getTaggedString( %client.playerName );
-      MessageAll( 'MsgAdminForce', "\c2" @ %name @ " has become Admin by force.", %client );   
+      MessageAll( 'MsgAdminForce', "\c2" @ %name @ " has become Admin by force.", %client );
    }
 }
 

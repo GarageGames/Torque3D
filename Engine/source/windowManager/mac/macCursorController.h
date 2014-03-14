@@ -33,15 +33,15 @@ public:
    {
       pushCursor(PlatformCursorController::curArrow);
    }
-   
+
    virtual void setCursorPosition(S32 x, S32 y);
    virtual void getCursorPosition(Point2I &point);
    virtual void setCursorVisible(bool visible);
    virtual bool isCursorVisible();
-   
+
    virtual void setCursorShape(U32 cursorID);
    virtual void setCursorShape( const UTF8 *fileName, bool reload );
-   
+
    virtual U32 getDoubleClickTime();
    virtual S32 getDoubleClickWidth();
    virtual S32 getDoubleClickHeight();

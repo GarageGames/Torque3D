@@ -103,10 +103,10 @@ static void copyStatAttributes(const struct stat& info, FileNode::Attributes* at
    attr->flags = 0;
    if (S_ISDIR(info.st_mode))
       attr->flags |= FileNode::Directory;
-      
+
    if (S_ISREG(info.st_mode))
       attr->flags |= FileNode::File;
-      
+
    if (info.st_uid == _Uid)
    {
       if (!(info.st_mode & S_IWUSR))
@@ -158,11 +158,11 @@ FileNodeRef PosixFileSystem::resolve(const Path& path)
       // Construct the appropriate object
       if (S_ISREG(info.st_mode))
          return new PosixFile(path,file);
-         
+
       if (S_ISDIR(info.st_mode))
          return new PosixDirectory(path,file);
    }
-   
+
    return 0;
 }
 
@@ -177,11 +177,11 @@ FileNodeRef PosixFileSystem::create(const Path& path, FileNode::Mode mode)
    if (mode & FileNode::Directory)
    {
       String file = buildFileName(_volume,path);
-      
+
       if (mkdir(file.c_str(),S_IRWXU | S_IRWXG | S_IRWXO))
          return new PosixDirectory(path,file);
    }
-   
+
    return 0;
 }
 
@@ -197,7 +197,7 @@ bool PosixFileSystem::remove(const Path& path)
 
    if (S_ISDIR(info.st_mode))
       return !rmdir(file);
-   
+
    return !unlink(file);
 }
 
@@ -205,10 +205,10 @@ bool PosixFileSystem::rename(const Path& from,const Path& to)
 {
    String fa = buildFileName(_volume,from);
    String fb = buildFileName(_volume,to);
-   
+
    if (!rename(fa.c_str(),fb.c_str()))
       return true;
-      
+
    return false;
 }
 
@@ -260,7 +260,7 @@ bool PosixFile::getAttributes(Attributes* attr)
 {
    struct stat info;
    int error = _handle? fstat(fileno(_handle),&info): stat(_name.c_str(),&info);
-   
+
    if (error < 0)
    {
       _updateStatus();
@@ -269,7 +269,7 @@ bool PosixFile::getAttributes(Attributes* attr)
 
    copyStatAttributes(info,attr);
    attr->name = _path;
-   
+
    return true;
 }
 
@@ -291,7 +291,7 @@ U32 PosixFile::calculateChecksum()
          close();
          return 0;
       }
-      
+
       fileSize -= bytesRead;
       crc = CRC::calculateCRC( buf, bytesRead, crc );
    }
@@ -304,7 +304,7 @@ U32 PosixFile::calculateChecksum()
 bool PosixFile::open(AccessMode mode)
 {
    close();
-      
+
    if (_name.isEmpty())
    {
       return _status;
@@ -336,7 +336,7 @@ bool PosixFile::open(AccessMode mode)
       _updateStatus();
       return false;
    }
-   
+
    _status = Open;
    return true;
 }
@@ -348,12 +348,12 @@ bool PosixFile::close()
       #ifdef DEBUG_SPEW
       Platform::outputDebugString( "[PosixFile] closing '%s'", _name.c_str() );
       #endif
-      
+
       fflush(_handle);
       fclose(_handle);
       _handle = 0;
    }
-   
+
    _status = Closed;
    return true;
 }
@@ -362,7 +362,7 @@ U32 PosixFile::getPosition()
 {
    if (_status == Open || _status == EndOfFile)
       return ftell(_handle);
-      
+
    return 0;
 }
 
@@ -379,15 +379,15 @@ U32 PosixFile::setPosition(U32 delta, SeekMode mode)
       case End:      fmode = SEEK_END; break;
       default:       break;
    }
-   
+
    if (fseek(_handle, delta, fmode))
    {
       _status = UnknownError;
       return 0;
    }
-   
+
    _status = Open;
-   
+
    return ftell(_handle);
 }
 
@@ -397,7 +397,7 @@ U32 PosixFile::read(void* dst, U32 size)
       return 0;
 
    U32 bytesRead = fread(dst, 1, size, _handle);
-   
+
    if (bytesRead != size)
    {
       if (feof(_handle))
@@ -405,7 +405,7 @@ U32 PosixFile::read(void* dst, U32 size)
       else
          _updateStatus();
    }
-   
+
    return bytesRead;
 }
 
@@ -415,10 +415,10 @@ U32 PosixFile::write(const void* src, U32 size)
       return 0;
 
    U32 bytesWritten = fwrite(src, 1, size, _handle);
-   
+
    if (bytesWritten != size)
       _updateStatus();
-      
+
    return bytesWritten;
 }
 
@@ -464,7 +464,7 @@ bool PosixDirectory::open()
       _updateStatus();
       return false;
    }
-   
+
    _status = Open;
    return true;
 }
@@ -477,7 +477,7 @@ bool PosixDirectory::close()
       _handle = NULL;
       return true;
    }
-   
+
    return false;
 }
 
@@ -487,7 +487,7 @@ bool PosixDirectory::read(Attributes* entry)
       return false;
 
    struct dirent* de = readdir(_handle);
-   
+
    if (!de)
    {
       _status = EndOfFile;
@@ -503,9 +503,9 @@ bool PosixDirectory::read(Attributes* entry)
    // the name, so we must call stat for more info.
    struct stat info;
    String file = _name + "/" + de->d_name;
-   
+
    int error = stat(file.c_str(),&info);
-   
+
    if (error < 0)
    {
       _updateStatus();
@@ -586,10 +586,10 @@ bool Platform::FS::InstallFileSystems()
       // add trailing '/' if it isn't there
       if (buffer[dStrlen(buffer) - 1] != '/')
          dStrcat(buffer, "/");
-         
+
       Platform::FS::SetCwd(buffer);
    }
-   
+
    // Mount the home directory
    if (char* home = getenv("HOME"))
       Platform::FS::Mount( "home", Platform::FS::createNativeFS(home) );

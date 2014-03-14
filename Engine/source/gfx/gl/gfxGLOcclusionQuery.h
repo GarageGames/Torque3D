@@ -38,10 +38,10 @@ public:
    virtual OcclusionQueryStatus getStatus( bool block, U32 *data = NULL );
 
    // GFXResource
-   virtual void zombify(); 
+   virtual void zombify();
    virtual void resurrect();
    virtual const String describeSelf() const;
-   
+
 private:
    U32 mQuery;
 };

@@ -126,18 +126,18 @@ function StartupGui::onDone(%this)
       {
          // Clear our data and load the main menu
          %this.done = true;
-         
+
          // NOTE: Don't ever ever delete yourself during a callback from C++.
          //
-         // Deleting the whole gui itself seems a bit excessive, what if we want 
-         // to return to the startup gui at a later time?  Any bitmaps set on 
-         // the controls should be unloaded automatically if the control is not 
+         // Deleting the whole gui itself seems a bit excessive, what if we want
+         // to return to the startup gui at a later time?  Any bitmaps set on
+         // the controls should be unloaded automatically if the control is not
          // awake, if this is not the case then that's what needs to be fixed.
-         
+
          //%this.delete();
          //BlankGui.delete();
          //flushTextureCache();
-         
+
          loadMainMenu();
       }
       else

@@ -53,14 +53,14 @@ struct TerrainRenderInst : public RenderInst
 
    TerrainCellMaterial *cellMat;
 
-   /// The lights we pass to the material for 
+   /// The lights we pass to the material for
    /// this cell in order light importance.
    LightInfo *lights[8];
 
    void clear()
    {
-      dMemset( this, 0, sizeof( TerrainRenderInst ) );   
-      type = RenderPassManager::RIT_Terrain;      
+      dMemset( this, 0, sizeof( TerrainRenderInst ) );
+      type = RenderPassManager::RIT_Terrain;
    }
 };
 

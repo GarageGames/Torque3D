@@ -27,28 +27,28 @@ function ETransformSelection::onWake( %this )
    ETransformSelection-->RotRelative.setStateOn( true );
    ETransformSelection-->ScaleRelative.setStateOn( true );
    ETransformSelection-->SizeRelative.setStateOn( false );
-   
+
    ETransformSelection-->GetPosButton.setActive( false );
    ETransformSelection-->GetRotButton.setActive( false );
    ETransformSelection-->GetScaleButton.setActive( false );
    ETransformSelection-->GetSizeButton.setActive( false );
-   
+
    // Size is always local
    ETransformSelection-->SizeLocal.setStateOn( true );
    ETransformSelection-->SizeLocal.setActive( false );
-   
+
    ETransformSelection-->ScaleTabBook.selectPage( 0 );   // Scale page
-   
+
    ETransformSelection-->ApplyButton.setActive( false );
 
-   EWorldEditor.ETransformSelectionDisplayed = false;   
+   EWorldEditor.ETransformSelectionDisplayed = false;
 }
 
 function ETransformSelection::onVisible( %this, %state )
 {
    // If we are made visible, sync to the world editor
    // selection.
-   
+
    if( %state )
       %this.onSelectionChanged();
 }
@@ -81,7 +81,7 @@ function ETransformSelection::disableAllButtons( %this )
    ETransformSelection-->GetRotButton.setActive( false );
    ETransformSelection-->GetScaleButton.setActive( false );
    ETransformSelection-->GetSizeButton.setActive( false );
-   
+
    ETransformSelection-->ApplyButton.setActive( false );
 }
 
@@ -99,14 +99,14 @@ function ETransformSelection::onSelectionChanged( %this )
       if( %obj.isMemberOfClass("SceneObject") )
       {
          %sceneObjects++;
-         
+
          if( %obj.isGlobalBounds() )
          {
             %globalBoundsObjects++;
          }
       }
    }
-   
+
    if( %sceneObjects == 0 )
    {
       // With nothing selected, disable all Get buttons
@@ -117,7 +117,7 @@ function ETransformSelection::onSelectionChanged( %this )
       // With one selected, all Get buttons are active
       ETransformSelection-->GetPosButton.setActive( true );
       ETransformSelection-->GetRotButton.setActive( true );
-      
+
       // Special case for Scale and Size for global bounds objects
       if( %globalBoundsObjects == 1 )
       {
@@ -129,7 +129,7 @@ function ETransformSelection::onSelectionChanged( %this )
          ETransformSelection-->GetSizeButton.setActive( true );
          ETransformSelection-->GetScaleButton.setActive( true );
       }
-      
+
       ETransformSelection-->ApplyButton.setActive( true );
    }
    else
@@ -140,9 +140,9 @@ function ETransformSelection::onSelectionChanged( %this )
       ETransformSelection-->GetRotButton.setActive( false );
       ETransformSelection-->GetScaleButton.setActive( false );
       ETransformSelection-->GetSizeButton.setActive( false );
-      
+
       ETransformSelection-->ApplyButton.setActive( true );
-      
+
       // If both RotRelative and RotLocal are unchecked, then go with RotLocal
       if( ETransformSelection-->RotRelative.getValue() == 0 && ETransformSelection-->RotLocal.getValue() == 0 )
       {
@@ -156,12 +156,12 @@ function ETransformSelection::apply( %this )
    %position = ETransformSelection-->DoPosition.getValue();
    %p = ETransformSelection-->PosX.getValue() SPC ETransformSelection-->PosY.getValue() SPC ETransformSelection-->PosZ.getValue();
    %relativePos = ETransformSelection-->PosRelative.getValue();
-   
+
    %rotate = ETransformSelection-->DoRotation.getValue();
    %r = mDegToRad(ETransformSelection-->Pitch.getValue()) SPC mDegToRad(ETransformSelection-->Bank.getValue()) SPC mDegToRad(ETransformSelection-->Heading.getValue());
    %relativeRot = ETransformSelection-->RotRelative.getValue();
    %rotLocal = ETransformSelection-->RotLocal.getValue();
-   
+
    // We need to check which Tab page is active
    if( ETransformSelection-->ScaleTabBook.getSelectedPage() == 0 )
    {
@@ -170,7 +170,7 @@ function ETransformSelection::apply( %this )
       %s = ETransformSelection-->ScaleX.getValue() SPC ETransformSelection-->ScaleY.getValue() SPC ETransformSelection-->ScaleZ.getValue();
       %sRelative = ETransformSelection-->ScaleRelative.getValue();
       %sLocal = ETransformSelection-->ScaleLocal.getValue();
-      
+
       %size = false;
    }
    else
@@ -180,10 +180,10 @@ function ETransformSelection::apply( %this )
       %s = ETransformSelection-->SizeX.getValue() SPC ETransformSelection-->SizeY.getValue() SPC ETransformSelection-->SizeZ.getValue();
       %sRelative = ETransformSelection-->SizeRelative.getValue();
       %sLocal = ETransformSelection-->SizeLocal.getValue();
-      
+
       %scale = false;
    }
-   
+
    EWorldEditor.transformSelection(%position, %p, %relativePos, %rotate, %r, %relativeRot, %rotLocal, %scale ? 1 : (%size ? 2 : 0), %s, %sRelative, %sLocal);
 }
 
@@ -193,10 +193,10 @@ function ETransformSelection::getAbsPosition( %this )
    ETransformSelection-->PosX.setText(getWord(%pos, 0));
    ETransformSelection-->PosY.setText(getWord(%pos, 1));
    ETransformSelection-->PosZ.setText(getWord(%pos, 2));
-   
+
    // Turn off relative as we're populating absolute values
    ETransformSelection-->PosRelative.setValue(0);
-   
+
    // Finally, set the Position check box as active.  The user
    // likely wants this if they're getting the position.
    ETransformSelection-->DoPosition.setValue(1);
@@ -216,30 +216,30 @@ function ETransformSelection::getAbsRotation( %this )
       {
          if( %obj != -1 )
             return;
-         
+
          %obj = %test;
       }
    }
-   
+
    if( %obj == -1 )
    {
       // No SceneObjects selected
       return;
    }
-      
+
    %rot = %obj.getEulerRotation();
    ETransformSelection-->Pitch.setText(getWord(%rot, 0));
    ETransformSelection-->Bank.setText(getWord(%rot, 1));
    ETransformSelection-->Heading.setText(getWord(%rot, 2));
-   
+
    // Turn off relative as we're populating absolute values.
    // Of course this means that we need to set local on.
    ETransformSelection-->RotRelative.setValue(0);
    ETransformSelection-->RotLocal.setValue(1);
-   
+
    // Finally, set the Rotation check box as active.  The user
    // likely wants this if they're getting the position.
-   ETransformSelection-->DoRotation.setValue(1);   
+   ETransformSelection-->DoRotation.setValue(1);
 }
 
 function ETransformSelection::getAbsScale( %this )
@@ -256,17 +256,17 @@ function ETransformSelection::getAbsScale( %this )
       {
          if( %obj != -1 )
             return;
-         
+
          %obj = %test;
       }
    }
-   
+
    if( %obj == -1 )
    {
       // No SceneObjects selected
       return;
    }
-   
+
    %scale = %obj.scale;
    %scalex = getWord(%scale, 0);
    ETransformSelection-->ScaleX.setText(%scalex);
@@ -280,13 +280,13 @@ function ETransformSelection::getAbsScale( %this )
       ETransformSelection-->ScaleY.setText(%scalex);
       ETransformSelection-->ScaleZ.setText(%scalex);
    }
-   
+
    // Turn off relative as we're populating absolute values
    ETransformSelection-->ScaleRelative.setValue(0);
-   
+
    // Finally, set the Scale check box as active.  The user
    // likely wants this if they're getting the position.
-   ETransformSelection-->DoScale.setValue(1);   
+   ETransformSelection-->DoScale.setValue(1);
 }
 
 function ETransformSelection::getAbsSize( %this )
@@ -303,20 +303,20 @@ function ETransformSelection::getAbsSize( %this )
       {
          if( %obj != -1 )
             return;
-         
+
          %obj = %test;
       }
    }
-   
+
    if( %obj == -1 )
    {
       // No SceneObjects selected
       return;
    }
-      
+
    %size = %obj.getObjectBox();
    %scale = %obj.getScale();
-   
+
    %sizex = (getWord(%size, 3) - getWord(%size, 0)) * getWord(%scale, 0);
    ETransformSelection-->SizeX.setText( %sizex );
    if( ETransformSelectionSizeProportional.getValue() == false )
@@ -329,10 +329,10 @@ function ETransformSelection::getAbsSize( %this )
       ETransformSelection-->SizeY.setText( %sizex );
       ETransformSelection-->SizeZ.setText( %sizex );
    }
-   
+
    // Turn off relative as we're populating absolute values
    ETransformSelection-->SizeRelative.setValue(0);
-   
+
    // Finally, set the Size check box as active.  The user
    // likely wants this if they're getting the position.
    ETransformSelection-->DoSize.setValue(1);
@@ -365,7 +365,7 @@ function ETransformSelectionScaleProportional::onClick( %this )
       %scalex = ETransformSelection-->ScaleX.getValue();
       ETransformSelection-->ScaleY.setValue( %scalex );
       ETransformSelection-->ScaleZ.setValue( %scalex );
-      
+
       ETransformSelection-->ScaleY.setActive( false );
       ETransformSelection-->ScaleZ.setActive( false );
    }
@@ -374,7 +374,7 @@ function ETransformSelectionScaleProportional::onClick( %this )
       ETransformSelection-->ScaleY.setActive( true );
       ETransformSelection-->ScaleZ.setActive( true );
    }
-   
+
    Parent::onClick(%this);
 }
 
@@ -385,7 +385,7 @@ function ETransformSelectionSizeProportional::onClick( %this )
       %scalex = ETransformSelection-->SizeX.getValue();
       ETransformSelection-->SizeY.setValue( %scalex );
       ETransformSelection-->SizeZ.setValue( %scalex );
-      
+
       ETransformSelection-->SizeY.setActive( false );
       ETransformSelection-->SizeZ.setActive( false );
    }
@@ -394,7 +394,7 @@ function ETransformSelectionSizeProportional::onClick( %this )
       ETransformSelection-->SizeY.setActive( true );
       ETransformSelection-->SizeZ.setActive( true );
    }
-   
+
    Parent::onClick(%this);
 }
 
@@ -437,7 +437,7 @@ function ETransformSelectionTextEdit::onValidate( %this )
       ETransformSelection-->ScaleY.setValue( %scalex );
       ETransformSelection-->ScaleZ.setValue( %scalex );
    }
-   
+
    if( %this.getInternalName() $= "SizeX" && ETransformSelectionSizeProportional.getValue() == true )
    {
       // Set the Y and Z values to match

@@ -56,7 +56,7 @@ class SceneTraversalState
 
       /// Stack of culling volumes.  Topmost is current volume.
       Vector< SceneCullingVolume > mCullingVolumeStack;
-      
+
       /// Area of scene visited in traversal.
       Box3F mTraversedArea;
 

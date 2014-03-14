@@ -51,16 +51,16 @@ function onStart()
 
    // Uncomment to disable ShaderGen, useful when debugging
    //$ShaderGen::GenNewShaders = false;
-   
+
    // Uncomment to dump disassembly for any shader that is compiled to disk.
    // These will appear as shadername_dis.txt in the same path as the
-   // hlsl or glsl shader.   
+   // hlsl or glsl shader.
    //$gfx::disassembleAllShaders = true;
 
    // Uncomment useNVPerfHud to allow you to start up correctly
    // when you drop your executable onto NVPerfHud
    //$Video::useNVPerfHud = true;
-   
+
    // Uncomment these to allow you to force your app into using
    // a specific pixel shader version (0 is for fixed function)
    //$pref::Video::forcePixVersion = true;
@@ -70,17 +70,17 @@ function onStart()
       $pref::Video::displayDevice = "OpenGL";
    else
       $pref::Video::displayDevice = "D3D9";
-   
+
    // Initialise stuff.
    exec("./scripts/client/core.cs");
    initializeCore();
 
    exec("./scripts/client/client.cs");
    exec("./scripts/server/server.cs");
-   
+
    exec("./scripts/gui/guiTreeViewCtrl.cs");
    exec("./scripts/gui/messageBoxes/messageBox.ed.cs");
-   
+
    echo(" % - Initialized Core");
 }
 
@@ -89,7 +89,7 @@ function onStart()
 // Called when the engine is shutting down. Shutdowns this mod.
 //---------------------------------------------------------------------------------------------
 function onExit()
-{   
+{
    // Shutdown stuff.
    shutdownCore();
 
@@ -137,7 +137,7 @@ function parseArgs()
       %arg = $Game::argv[%i];
       %nextArg = $Game::argv[%i+1];
       %hasNextArg = $Game::argc - %i > 1;
-   
+
       switch$ (%arg)
       {
          case "-fullscreen":

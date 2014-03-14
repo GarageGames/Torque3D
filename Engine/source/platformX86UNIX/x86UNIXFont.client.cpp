@@ -123,7 +123,7 @@ XftFont *loadFont(const char *name, S32 size, Display *display)
 //                    DefaultColormap(display, screen),
 //                    "white",
 //                    &white);
-//  
+//
 //  // The font.
 //  GOldFont *retFont = new GOldFont;
 //  static U8 scratchPad[65536];
@@ -169,7 +169,7 @@ XftFont *loadFont(const char *name, S32 size, Display *display)
 //			  0,                   // xOrigin
 //			  font->ascent,        // yOrigin
 //			  extent.xOff);        // xIncrement
-//    
+//
 //  }
 //  retFont->pack(font->height, font->ascent);
 //  XftFontClose(display, font);
@@ -211,7 +211,7 @@ bool x86UNIXFont::create(const char *name, U32 size, U32 charset)
     AssertFatal(false, "createFont: cannot connect to X server");
 
   XftFont *font = loadFont(name, size, display);
-  
+
   if (!font)
   {
     Con::errorf("Error: Could not load font -%s-", name);
@@ -293,11 +293,11 @@ PlatformFont::CharInfo &x86UNIXFont::getCharInfo(const UTF16 ch) const
                     DefaultColormap(display, screen),
                     "white",
                     &white);
-  
+
   XGlyphInfo charinfo;
   XftTextExtents16(display, fontInfo, &ch, 1, &charinfo);
   c.height     = fontInfo->height;
-  c.xOrigin    = 0; 
+  c.xOrigin    = 0;
   c.yOrigin    = fontInfo->ascent;
   c.xIncrement = charinfo.xOff;
   c.width      = charinfo.xOff;
@@ -314,8 +314,8 @@ PlatformFont::CharInfo &x86UNIXFont::getCharInfo(const UTF16 ch) const
   XftDrawString16 (draw, &white, fontInfo, 0, fontInfo->ascent, &ch, 1);
   // grab the pixmap image
 
-  XImage *ximage = XGetImage(display, pixmap, 0, 0, 
-			     charinfo.xOff, fontInfo->height, 
+  XImage *ximage = XGetImage(display, pixmap, 0, 0,
+			     charinfo.xOff, fontInfo->height,
 			     AllPlanes, XYPixmap);
   if (!ximage)
     AssertFatal(false, "cannot get x image");

@@ -207,7 +207,7 @@ inline void TorqueVectorToFMODVector( const Point3F& torque, FMOD_VECTOR& fmod )
 inline void TorqueTransformToFMODVectors( const MatrixF& transform, FMOD_VECTOR& position, FMOD_VECTOR& forward, FMOD_VECTOR& up )
 {
    Point3F _pos, _fwd, _up;
-   
+
    transform.getColumn( 3, &_pos );
 	transform.getColumn( 1, &_fwd );
 	transform.getColumn( 2, &_up );
@@ -220,7 +220,7 @@ inline void TorqueTransformToFMODVectors( const MatrixF& transform, FMOD_VECTOR&
 inline int TorquePriorityToFMODPriority( F32 priority )
 {
    // Map [-2,2] to [256,0].
-   
+
    F32 n = mClampF( priority, -2.0f, 2.0f ) + 2.0f;
    return ( n * 256.0f / 4.0f );
 }
@@ -269,59 +269,59 @@ class SFXFMODDevice : public SFXDevice
 
       FMOD_MODE m3drolloffmode;
       int mDeviceIndex;
-      
+
       /// The FMOD SFXSystemPlugin instance.
       SFXFMODPlugin mPlugin;
-      
+
       /// @name Console Variables
       /// @{
-      
+
       /// Current core FMOD memory usage in bytes.
       static U32 smStatMemUsageCore;
-      
+
       /// Current FMOD Event DLL memory usage in bytes.
       static U32 smStatMemUsageEvents;
-      
+
       /// Current number of SFXFMODEventSource instances.
       static U32 smStatNumEventSources;
-      
+
       ///
       static bool smPrefDisableSoftware;
-      
+
       ///
       static bool smPrefUseSoftwareOcclusion;
-      
+
       ///
       static bool smPrefUseSoftwareHRTF;
-      
+
       ///
       static bool smPrefEnableProfile;
-      
+
       ///
       static bool smPrefGeometryUseClosest;
-      
+
       ///
       static const char* smPrefDSoundHRTF;
-      
+
       ///
       static const char* smPrefPluginPath;
-      
+
       /// @}
-      
+
       bool _init();
-      
+
       static SFXFMODDevice* smInstance;
-      
+
    public:
-   
+
       static SFXFMODDevice* instance() { return smInstance; }
-   
+
       FMOD_MODE get3dRollOffMode() { return m3drolloffmode; }
 
       static FMOD_SYSTEM* smSystem;
       static FMOD_EVENTSYSTEM* smEventSystem;
       static FModFNTable* smFunc;
-      
+
       // Update memory usage stats for metrics display.
       void updateMemUsageStats();
 

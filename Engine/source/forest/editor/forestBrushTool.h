@@ -70,7 +70,7 @@ public:
    virtual void on3DMouseUp( const Gui3DMouseEvent &evt );
    virtual void on3DMouseMove( const Gui3DMouseEvent &evt );
    virtual void on3DMouseDragged( const Gui3DMouseEvent &evt );
-   virtual bool onMouseWheel(const GuiEvent &evt );   
+   virtual bool onMouseWheel(const GuiEvent &evt );
    virtual void onRender3D();
    virtual void onRender2D();
    virtual void onActivated( const Gui3DMouseEvent &lastEvent );
@@ -84,14 +84,14 @@ public:
    void collectElements() { _collectElements(); }
    bool getGroundAt( const Point3F &worldPt, float *zValueOut, VectorF *normalOut );
 
-protected:      
+protected:
 
    void _onStroke();
    virtual void _action( const Point3F &point );
    virtual void _paint( const Point3F &point );
    virtual void _erase( const Point3F &point );
-      
-   bool _updateBrushPoint( const Gui3DMouseEvent &event_ );   
+
+   bool _updateBrushPoint( const Gui3DMouseEvent &event_ );
    virtual void _collectElements();
 
    static bool protectedSetSize( void *object, const char *index, const char *data );
@@ -128,7 +128,7 @@ protected:
    Point3F mLastBrushNormal;
 
    /// The creation action we're actively filling.
-   ForestUndoAction *mCurrAction;  
+   ForestUndoAction *mCurrAction;
 };
 
 typedef ForestBrushTool::BrushMode ForestBrushMode;

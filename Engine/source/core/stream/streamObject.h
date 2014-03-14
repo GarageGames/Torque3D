@@ -32,10 +32,10 @@
 
 //-----------------------------------------------------------------------------
 /// @brief Script wrapper for the Stream class
-/// 
+///
 /// It is not possible to instantiate StreamObject in script. Instead,
 /// it is instantiated in C++ code and returned to script.
-/// 
+///
 /// This was mainly intended to allow the \ref zip_group "zip code" to
 /// provide the stream interface to script.
 //-----------------------------------------------------------------------------

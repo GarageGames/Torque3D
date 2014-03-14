@@ -46,7 +46,7 @@ class RenderTerrainMgr;
 class PlatformTimer;
 class ShadowRenderPassManager;
 
-/// ShadowMapPass, this is plugged into the SceneManager to generate 
+/// ShadowMapPass, this is plugged into the SceneManager to generate
 /// ShadowMaps for the scene.
 class ShadowMapPass
 {
@@ -61,8 +61,8 @@ public:
    //
 
    /// Called to render a scene.
-   void render(   SceneManager *sceneGraph, 
-                  const SceneRenderState *diffuseState, 
+   void render(   SceneManager *sceneGraph,
+                  const SceneRenderState *diffuseState,
                   U32 objectMask );
 
    /// Return the type of pass this is

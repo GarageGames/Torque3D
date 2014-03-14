@@ -30,7 +30,7 @@
 class PlatformAssert
 {
 public:
-   enum Type 
+   enum Type
    {
       Warning   = 3,
       Fatal     = 2,

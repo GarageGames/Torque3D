@@ -29,7 +29,7 @@
    %this.addSequence("art/shapes/weapons/Ryder/FP_Ryder.DAE reload", "Pistol_reload");
    %this.addSequence("art/shapes/weapons/Ryder/FP_Ryder.DAE switch_out", "Pistol_switch_out");
    %this.addSequence("art/shapes/weapons/Ryder/FP_Ryder.DAE switch_in", "Pistol_switch_in");
-   
+
    %this.setSequenceCyclic("Pistol_fire", "0");
    %this.setSequenceCyclic("Pistol_reload", "0");
    %this.setSequenceCyclic("Pistol_switch_out", "0");

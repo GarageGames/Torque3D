@@ -48,7 +48,7 @@ bool TSForestCellBatch::_prepBatch( const ForestItem &item )
    // a single combined texture map.  Till then we have to
    // do one batch per-detail type.
 
-   // If the detail type doesn't match then 
+   // If the detail type doesn't match then
    // we need to start a new batch.
    if ( data->getLastDetail() != mDetail )
       return false;
@@ -121,7 +121,7 @@ void TSForestCellBatch::_rebuildBatch()
 
 void TSForestCellBatch::_render( const SceneRenderState *state )
 {
-   if (  !mVB.isValid() || 
+   if (  !mVB.isValid() ||
          ( state->isShadowPass() && !TSLastDetail::smCanShadow ) )
       return;
 
@@ -139,7 +139,7 @@ void TSForestCellBatch::_render( const SceneRenderState *state )
    inst->mat = mat;
    inst->vertBuff = &mVB;
 
-   // We sort by the imposter type first so that RIT_Imposter and 
+   // We sort by the imposter type first so that RIT_Imposter and
    // RIT_ImposterBatches do not get mixed together.
    //
    // We then sort by material.

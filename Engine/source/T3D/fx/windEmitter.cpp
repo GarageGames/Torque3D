@@ -83,7 +83,7 @@ S32 QSORT_CALLBACK WindEmitter::_sortByScore(const void* a, const void* b)
 	return mSign((*(WindEmitter**)b)->mScore - (*(WindEmitter**)a)->mScore);
 }
 
-bool WindEmitter::findBest(   const Point3F& cameraPos, 
+bool WindEmitter::findBest(   const Point3F& cameraPos,
                               const VectorF& cameraDir,
                               F32 viewDistance,
                               U32 maxResults,
@@ -100,7 +100,7 @@ bool WindEmitter::findBest(   const Point3F& cameraPos,
    WindEmitterList best;
    WindEmitterList::iterator iter = smAllEmitters.begin();
    for ( ; iter != smAllEmitters.end(); iter++ )
-   {        
+   {
       const SphereF& sphere = *(*iter);
 
       // Skip any spheres outside of our camera range or that are disabled.

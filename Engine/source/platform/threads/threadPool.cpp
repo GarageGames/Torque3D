@@ -104,7 +104,7 @@ void ThreadPool::Context::updateAccumulatedPriorityBiases()
    mAccumulatedPriorityBias = mPriorityBias;
    for( Context* context = getParent(); context != 0; context = context->getParent() )
       mAccumulatedPriorityBias *= context->getPriorityBias();
-   
+
    // Update our children.
 
    for( Context* child = getChildren(); child != 0; child = child->getSibling() )
@@ -249,7 +249,7 @@ void ThreadPool::WorkerThread::run( void* arg )
    XSetThreadProcessor( GetCurrentThread(), sCoreAssignment );
    sCoreAssignment = sCoreAssignment < 6 ? sCoreAssignment + 1 : 2;
 #endif
-      
+
    while( 1 )
    {
       if( checkForStop() )
@@ -327,20 +327,20 @@ ThreadPool::ThreadPool( const char* name, U32 numThreads )
    {
       // Use platformCPUInfo directly as in the case of the global pool,
       // Platform::SystemInfo will not yet have been initialized.
-      
+
       U32 numLogical;
       U32 numPhysical;
       U32 numCores;
 
       CPUInfo::CPUCount( numLogical, numCores, numPhysical );
-      
+
       const U32 baseCount = getMax( numLogical, numCores );
       if( baseCount )
          mNumThreads = baseCount;
       else
          mNumThreads = 2;
    }
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[ThreadPool] spawning %i threads", mNumThreads );
    #endif
@@ -368,7 +368,7 @@ ThreadPool::~ThreadPool()
 void ThreadPool::shutdown()
 {
    const U32 numThreads = mNumThreads;
-   
+
 	// Tell our worker threads to stop.
 
 	for( WorkerThread* thread = mThreads; thread != 0; thread = thread->getNext() )
@@ -432,7 +432,7 @@ void ThreadPool::queueWorkItem( WorkItem* item )
 void ThreadPool::flushWorkItems( S32 timeOut )
 {
    AssertFatal( mNumThreads, "ThreadPool::flushWorkItems() - no worker threads in pool" );
-   
+
    U32 endTime = 0;
    if( timeOut != -1 )
       endTime = Platform::getRealMilliseconds() + timeOut;

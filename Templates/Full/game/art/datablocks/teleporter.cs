@@ -24,21 +24,21 @@
 // DefaultTrigger is used by the mission editor.  This is also an example
 // of trigger methods and callbacks.
 
-// A 3D sound played by the server at the location of the 
+// A 3D sound played by the server at the location of the
 // teleporter after an object has teleported.
-datablock SFXProfile(TeleportEntrance)  
-{  
-   fileName = "art/sound/orc_pain"; 
-   description = AudioDefault3D;  
+datablock SFXProfile(TeleportEntrance)
+{
+   fileName = "art/sound/orc_pain";
+   description = AudioDefault3D;
    preload = true;
-}; 
+};
 
 // The 2D sound played by the client after a teleport.
-datablock SFXProfile(TeleportSound)  
-{  
-   fileName = "art/sound/orc_death"; 
-   description = Audio2D;  
-   preload = true;  
+datablock SFXProfile(TeleportSound)
+{
+   fileName = "art/sound/orc_death";
+   description = Audio2D;
+   preload = true;
 };
 
 datablock ParticleData(TeleporterFlash : DefaultParticle)
@@ -123,14 +123,14 @@ datablock ParticleEmitterData(TeleportEmitter)
 // is really an effect that plays a SFXProfile, particle emitters,
 // point light, debris, and camera shake. Things normally associated with
 // an explosion, such as damage and pushback, are calculated outside of the
-// explosion object itself. Because of this, we use an ExplosionDatablock to 
+// explosion object itself. Because of this, we use an ExplosionDatablock to
 // attach visual effects to our teleporter.
 datablock ExplosionData(EntranceEffect)
 {
    soundProfile = TeleportEntrance;
 
    particleEmitter = "TeleportEmitter";
-   
+
    lifeTimeMS = "288";
 
    lightStartRadius = "0";
@@ -152,25 +152,25 @@ datablock TriggerData(TeleporterTrigger : DefaultTrigger)
    // Amount of time, in milliseconds, to wait before allowing another
    // object to use this teleportat.
 	teleporterCooldown = 0;
-	
+
 	// Amount to scale the object's exit velocity. Larger values will
 	// propel the object with greater force.
 	exitVelocityScale = 0;
-	
+
 	// If true, the object will be oriented to the front
 	// of the exit teleporter. Otherwise the player will retain their original
 	// orientation.
 	reorientPlayer = true;
-	
+
 	// If true, the teleporter will only trigger if the object
 	// enters the front of the teleporter.
 	oneSided = false;
-	
+
 	// Effects to play at the entrance of the teleporter.
 	entranceEffect = EntranceEffect;
 	exiteffect = EntranceEffect;
-	
+
 	// 2D Sound to play for the client being teleported.
 	teleportSound = TeleportSound;
-	
+
 };

@@ -50,7 +50,7 @@ U32 GuiImageList::Insert( const char* texturePath, GFXTextureProfile *Type )
   if ( ! t ) return -1;
 
   t->TexturePath = StringTable->insert(texturePath);
-  if ( *t->TexturePath ) 
+  if ( *t->TexturePath )
   {
     t->Handle = GFXTexHandle(t->TexturePath, Type, avar("%s() - t->Handle (line %d)", __FUNCTION__, __LINE__));
 

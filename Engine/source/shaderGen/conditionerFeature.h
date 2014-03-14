@@ -52,8 +52,8 @@ public:
    virtual ~ConditionerFeature();
 
    virtual Material::BlendOp getBlendOp()
-   { 
-      return Material::None; 
+   {
+      return Material::None;
    }
 
    virtual GFXFormat getBufferFormat() const { return mBufferFormat; }
@@ -68,7 +68,7 @@ public:
    // conditioned output
    virtual LangElement *assignOutput( Var *unconditionedOutput, ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget );
 
-   // Get an HLSL/GLSL method name that will be available for the 
+   // Get an HLSL/GLSL method name that will be available for the
    // shader to read or write data to a conditioned buffer.
    virtual const String &getShaderMethodName( MethodType methodType );
 

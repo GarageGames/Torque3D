@@ -98,11 +98,11 @@ void ShaderData::initPersistFields()
 	   "Valid numbers at the time of this writing are 1.1, 1.4, 2.0, and 3.0. "
 	   "The shader will not run properly if the hardware does not support the "
 	   "level of shader compiled.");
-   
-   addField("defines",              TypeRealString,      Offset(mDefines,   ShaderData), 
+
+   addField("defines",              TypeRealString,      Offset(mDefines,   ShaderData),
 	   "@brief String of case-sensitive defines passed to the shader compiler.\n\n"
       "The string should be delimited by a semicolon, tab, or newline character."
-      
+
       "@tsexample\n"
        "singleton ShaderData( FlashShader )\n"
           "{\n"
@@ -146,12 +146,12 @@ void ShaderData::onRemove()
 
 const Vector<GFXShaderMacro>& ShaderData::_getMacros()
 {
-   // If they have already been processed then 
+   // If they have already been processed then
    // return the cached result.
    if ( mShaderMacros.size() != 0 || mDefines.isEmpty() )
       return mShaderMacros;
 
-   mShaderMacros.clear();  
+   mShaderMacros.clear();
    GFXShaderMacro macro;
    const U32 defineCount = StringUnit::getUnitCount( mDefines, ";\n\t" );
    for ( U32 i=0; i < defineCount; i++ )
@@ -177,7 +177,7 @@ GFXShader* ShaderData::getShader( const Vector<GFXShaderMacro> &macros )
 
    // Convert the final macro list to a string.
    String cacheKey;
-   GFXShaderMacro::stringize( macros, &cacheKey );   
+   GFXShaderMacro::stringize( macros, &cacheKey );
 
    // Lookup the shader for this instance.
    ShaderCache::Iterator iter = mShaders.find( cacheKey );
@@ -213,8 +213,8 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
       case Direct3D9_360:
       case Direct3D9:
       {
-         success = shader->init( mDXVertexShaderName, 
-                                 mDXPixelShaderName, 
+         success = shader->init( mDXVertexShaderName,
+                                 mDXPixelShaderName,
                                  pixver,
                                  macros );
          break;
@@ -228,7 +228,7 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
                                  macros );
          break;
       }
-         
+
       default:
          // Other device types are assumed to not support shaders.
          success = false;

@@ -48,7 +48,7 @@ Profiler *gProfiler = NULL;
 //#define TORQUE_PROFILER_DEBUG
 
 // Machinery to record the stack of node names, as a debugging aid to find
-// mismatched PROFILE_START and PROFILE_END blocks. We profile from the 
+// mismatched PROFILE_START and PROFILE_END blocks. We profile from the
 // beginning to catch profile block errors that occur when torque is starting up.
 #ifdef TORQUE_PROFILER_DEBUG
 Vector<StringTableEntry> gProfilerNodeStack;
@@ -144,8 +144,8 @@ void startHighResolutionTimer(U32 time[2]) {
 U32 endHighResolutionTimer(U32 time[2])  {
    UnsignedWide t;
    Microseconds(&t);
-   return t.lo - time[0]; 
-   // given that we're returning a 32 bit integer, and this is unsigned subtraction... 
+   return t.lo - time[0];
+   // given that we're returning a 32 bit integer, and this is unsigned subtraction...
    // it will just wrap around, we don't need the upper word of the time.
    // NOTE: the code assumes that more than 3 hrs will not go by between calls to startHighResolutionTimer() and endHighResolutionTimer().
    // I mean... that damn well better not happen anyway.
@@ -183,7 +183,7 @@ Profiler::Profiler()
    mCurrentProfilerData->mInvokeCount = 0;
    mCurrentProfilerData->mTotalTime = 0;
    mCurrentProfilerData->mSubTime = 0;
-#ifdef TORQUE_ENABLE_PROFILE_PATH   
+#ifdef TORQUE_ENABLE_PROFILE_PATH
    mCurrentProfilerData->mPath = "";
 #endif
    mRootProfilerData = mCurrentProfilerData;
@@ -193,7 +193,7 @@ Profiler::Profiler()
 
    mProfileList = NULL;
 
-   mEnabled = TORQUE_PROFILE_AT_ENGINE_START;   
+   mEnabled = TORQUE_PROFILE_AT_ENGINE_START;
    mNextEnable = TORQUE_PROFILE_AT_ENGINE_START;
    mStackDepth = 0;
    gProfiler = this;
@@ -314,9 +314,9 @@ const char * Profiler::constructProfilePath(ProfilerData * pd)
       dStrcat(buf,pd->mRoot->mName);
       const char * ret = StringTable->insert(buf);
       FrameAllocator::setWaterMark(mark);
-      
+
       gProfiler->mEnabled = saveEnable;
-      
+
       return ret;
    }
    return "root";
@@ -435,7 +435,7 @@ void Profiler::hashPop(ProfilerRootData *expected)
          mCurrentProfilerData->mSubDepth--;
          return;
       }
-      
+
       if(expected)
       {
          AssertISV(expected == mCurrentProfilerData->mRoot, "Profiler::hashPop - didn't get expected ProfilerRoot!");
@@ -696,7 +696,7 @@ void Profiler::enableMarker(const char *marker, bool enable)
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool enable ), ( true ),   
+DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool enable ), ( true ),
    "@brief Enable or disable a specific profile.\n\n"
    "@param enable     Optional paramater to enable or disable the profile.\n"
    "@param markerName Name of a specific marker to enable or disable.\n"

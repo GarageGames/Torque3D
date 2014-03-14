@@ -74,9 +74,9 @@ protected:
    void _onStaticChanged();
 
 public:
-   
+
 	PxPlayer();
-	virtual ~PxPlayer();	
+	virtual ~PxPlayer();
 
    // PhysicsObject
    virtual PhysicsWorld* getWorld();
@@ -88,11 +88,11 @@ public:
    virtual bool isSimulationEnabled() { return true; }
 
    // PhysicsPlayer
-   virtual void init(   const char *type, 
+   virtual void init(   const char *type,
                         const Point3F &size,
                         F32 runSurfaceCos,
                         F32 stepHeight,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world );
    virtual Point3F move( const VectorF &displacement, CollisionList &outCol );
    virtual void findContact( SceneObject **contactObject, VectorF *contactNormal, Vector<SceneObject*> *outOverlapObjects ) const;

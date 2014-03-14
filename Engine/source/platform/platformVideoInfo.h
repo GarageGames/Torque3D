@@ -30,7 +30,7 @@
 // The purpose of this class is to abstract the gathering of video adapter information.
 // This information is not specific to the API being used to do the rendering, or
 // the capabilities of that renderer. That information is queried in a different
-// class. 
+// class.
 
 class PlatformVideoInfo
 {
@@ -79,12 +79,12 @@ protected:
    /// This method will be called before any queries are made. All initialization,
    /// for example Win32 COM startup, should be done in this method. If the return
    /// value is false, no querys will be made.
-   virtual bool _initialize() = 0; 
+   virtual bool _initialize() = 0;
 
    /// This is the query method which subclasses must implement. The querys made
    /// are all found in the PVIQueryType enum. If NULL is specified for outValue,
    /// the sub class should simply return true if the query type is supported, and
-   /// false otherwise. 
+   /// false otherwise.
    virtual bool _queryProperty( const PVIQueryType queryType, const U32 adapterId, String *outValue ) = 0;
 
 public:

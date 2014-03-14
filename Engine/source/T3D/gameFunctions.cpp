@@ -41,11 +41,11 @@ MODULE_BEGIN( 3D )
 
    MODULE_INIT_AFTER( Process )
    MODULE_INIT_AFTER( Scene )
-   
+
    MODULE_SHUTDOWN_BEFORE( Process )
    MODULE_SHUTDOWN_BEFORE( Sim )
    MODULE_SHUTDOWN_AFTER( Scene )
-   
+
    MODULE_INIT
    {
       Process::notify(Process3D, PROCESS_TIME_ORDER);
@@ -54,7 +54,7 @@ MODULE_BEGIN( 3D )
 
       RegisterGameFunctions();
    }
-   
+
    MODULE_SHUTDOWN
    {
       GameConnection::smFovUpdate.remove(GameSetCameraFov);
@@ -79,7 +79,7 @@ static S32 gEaseExponential = Ease::Exponential;
 static S32 gEaseCircular = Ease::Circular;
 static S32 gEaseElastic = Ease::Elastic;
 static S32 gEaseBack = Ease::Back;
-static S32 gEaseBounce = Ease::Bounce;	
+static S32 gEaseBounce = Ease::Bounce;
 
 
 extern bool gEditingMission;
@@ -351,7 +351,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
       query->object = dynamic_cast<ShapeBase*>(connection->getControlObject());
       query->nearPlane = gClientSceneGraph->getNearClip();
 
-      // Scale the normal visible distance by the performance 
+      // Scale the normal visible distance by the performance
       // tuning scale which we never let over 1.
       sVisDistanceScale = mClampF( sVisDistanceScale, 0.01f, 1.0f );
       query->farPlane = gClientSceneGraph->getVisibleDistance() * sVisDistanceScale;
@@ -421,19 +421,19 @@ void GameRenderWorld()
 static void Process3D()
 {
    MATMGR->updateTime();
-   
+
    // Update the SFX world, if there is one.
-   
+
    if( gSFX3DWorld )
       gSFX3DWorld->update();
 }
 
 static void RegisterGameFunctions()
 {
-   Con::addVariable( "$pref::Camera::distanceScale", TypeF32, &sVisDistanceScale, 
+   Con::addVariable( "$pref::Camera::distanceScale", TypeF32, &sVisDistanceScale,
       "A scale to apply to the normal visible distance, typically used for tuning performance.\n"
 	   "@ingroup Game");
-   Con::addVariable( "$cameraFov", TypeF32, &sConsoleCameraFov, 
+   Con::addVariable( "$cameraFov", TypeF32, &sConsoleCameraFov,
       "The camera's Field of View.\n\n"
 	   "@ingroup Game" );
 
@@ -460,47 +460,47 @@ static void RegisterGameFunctions()
    Con::setIntVariable("$TypeMasks::PhysicalZoneObjectType",   PhysicalZoneObjectType);
    Con::setIntVariable("$TypeMasks::LightObjectType",          LightObjectType);
 
-   Con::addVariable("Ease::InOut", TypeS32, &gEaseInOut, 
+   Con::addVariable("Ease::InOut", TypeS32, &gEaseInOut,
       "InOut ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::In", TypeS32, &gEaseIn, 
+   Con::addVariable("Ease::In", TypeS32, &gEaseIn,
       "In ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Out", TypeS32, &gEaseOut, 
+   Con::addVariable("Ease::Out", TypeS32, &gEaseOut,
       "Out ease for curve movement.\n"
 	   "@ingroup Game");
 
-   Con::addVariable("Ease::Linear", TypeS32, &gEaseLinear, 
+   Con::addVariable("Ease::Linear", TypeS32, &gEaseLinear,
       "Linear ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Quadratic", TypeS32, &gEaseQuadratic, 
+   Con::addVariable("Ease::Quadratic", TypeS32, &gEaseQuadratic,
       "Quadratic ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Cubic", TypeS32, &gEaseCubic, 
+   Con::addVariable("Ease::Cubic", TypeS32, &gEaseCubic,
       "Cubic ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Quartic", TypeS32, &gEaseQuartic, 
+   Con::addVariable("Ease::Quartic", TypeS32, &gEaseQuartic,
       "Quartic ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Quintic", TypeS32, &gEaseQuintic, 
+   Con::addVariable("Ease::Quintic", TypeS32, &gEaseQuintic,
       "Quintic ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Sinusoidal", TypeS32, &gEaseSinusoidal, 
+   Con::addVariable("Ease::Sinusoidal", TypeS32, &gEaseSinusoidal,
       "Sinusoidal ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Exponential", TypeS32, &gEaseExponential, 
+   Con::addVariable("Ease::Exponential", TypeS32, &gEaseExponential,
       "Exponential ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Circular", TypeS32, &gEaseCircular, 
+   Con::addVariable("Ease::Circular", TypeS32, &gEaseCircular,
       "Circular ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Elastic", TypeS32, &gEaseElastic, 
+   Con::addVariable("Ease::Elastic", TypeS32, &gEaseElastic,
       "Elastic ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Back", TypeS32, &gEaseBack, 
+   Con::addVariable("Ease::Back", TypeS32, &gEaseBack,
       "Backwards ease for curve movement.\n"
 	   "@ingroup Game");
-   Con::addVariable("Ease::Bounce", TypeS32, &gEaseBounce, 
+   Con::addVariable("Ease::Bounce", TypeS32, &gEaseBounce,
       "Bounce ease for curve movement.\n"
 	   "@ingroup Game");
 }

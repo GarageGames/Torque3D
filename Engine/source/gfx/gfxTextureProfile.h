@@ -94,7 +94,7 @@ public:
       /// the pool to contain unused textures which will remain
       /// in memory until a flush occurs.
       ///
-      Pooled = BIT(9), 
+      Pooled = BIT(9),
 
       /// A hint that the device is not allowed to discard the content
       /// of a target texture after presentation or deactivated.
@@ -130,7 +130,7 @@ public:
    const U32 getDownscale() const { return mDownscale; }
    void setDownscale(const U32 shift) { mDownscale = shift; }
    void incActiveCopies() { mStats.activeCount++; }
-   void decActiveCopies() { AssertFatal( mStats.activeCount != 0, "Ran out of extant copies!"); mStats.activeCount--; }   
+   void decActiveCopies() { AssertFatal( mStats.activeCount != 0, "Ran out of extant copies!"); mStats.activeCount--; }
 
    // And static interface...
    static void init();
@@ -187,7 +187,7 @@ private:
 
    /// The texture profile stats.
    GFXTextureProfileStats mStats;
-   
+
    /// The number of profiles in the system.
    static U32 smProfileCount;
 

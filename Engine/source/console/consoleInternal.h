@@ -71,9 +71,9 @@ class Namespace
       Namespace *mNext;
       AbstractClassRep *mClassRep;
       U32 mRefCountToParent;
-      
+
       const char* mUsage;
-      
+
       /// Script defined usage strings need to be cleaned up. This
       /// field indicates whether or not the usage was set from script.
       bool mCleanUpUsage;
@@ -81,7 +81,7 @@ class Namespace
       /// A function entry in the namespace.
       struct Entry
       {
-         enum 
+         enum
          {
             ScriptCallbackType           = -3,
             GroupMarker                  = -2,
@@ -96,45 +96,45 @@ class Namespace
 
          /// Link back to the namespace to which the entry belongs.
          Namespace* mNamespace;
-         
+
          /// Next function entry in the hashtable link chain of the namespace.
          Entry* mNext;
-         
+
          /// Name of this function.
          StringTableEntry mFunctionName;
-         
+
          ///
          S32 mType;
-         
+
          /// Min number of arguments expected by this function.
          S32 mMinArgs;
-         
+
          /// Max number of arguments expected by this function.  If zero,
          /// function takes an arbitrary number of arguments.
          S32 mMaxArgs;
-         
+
          /// Name of the package to which this function belongs.
          StringTableEntry mPackage;
-         
+
          /// Whether this function is included only in TORQUE_TOOLS builds.
          bool mToolOnly;
 
          /// Usage string for documentation.
          const char* mUsage;
-         
+
          /// Extended console function information.
          ConsoleFunctionHeader* mHeader;
 
          /// The compiled script code if this is a script function.
          CodeBlock* mCode;
-         
+
          /// The offset in the compiled script code at which this function begins.
          U32 mFunctionOffset;
 
          /// If it's a script function, this is the line of the declaration in code.
          /// @note 0 for functions read from legacy DSOs that have no line number information.
          U32 mFunctionLineNumber;
-         
+
          union CallbackUnion {
             StringCallback mStringCallbackFunc;
             IntCallback mIntCallbackFunc;
@@ -144,21 +144,21 @@ class Namespace
             const char *mGroupName;
             const char *mCallbackName;
          } cb;
-         
+
          Entry();
-         
+
          ///
          void clear();
 
          ///
          const char *execute( S32 argc, const char** argv, ExprEvalState* state );
-         
+
          /// Return a one-line documentation text string for the function.
          String getBriefDescription( String* outRemainingDocText = NULL ) const;
-         
+
          /// Get the auto-doc string for this function.  This string does not included prototype information.
          String getDocString() const;
-         
+
          /// Return a string describing the arguments the function takes including default argument values.
          String getArgumentsString() const;
 
@@ -166,11 +166,11 @@ class Namespace
          /// and arguments.
          String getPrototypeString() const;
       };
-      
+
       Entry* mEntryList;
 
       Entry** mHashTable;
-      
+
       U32 mHashSize;
       U32 mHashSequence;   ///< @note The hash sequence is used by the autodoc console facility
                            ///        as a means of testing reference state.
@@ -299,10 +299,10 @@ public:
       /// The optional notification signal called when
       /// a value is assigned to this variable.
       NotifySignal *notify;
-      
+
       /// Usage doc string.
       const char* mUsage;
-      
+
       /// Whether this is a constant that cannot be assigned to.
       bool mIsConstant;
 
@@ -381,7 +381,7 @@ public:
             Con::errorf( "Cannot assign value to constant '%s'.", name );
             return;
          }
-            
+
          if(type <= TypeInternalString)
          {
             fval = (F32)val;
@@ -444,7 +444,7 @@ public:
         S32 count;
         Entry **data;
         FreeListChunker< Entry > mChunker;
-        
+
         HashTableData( Dictionary* owner )
            : owner( owner ), size( 0 ), count( 0 ), data( NULL ) {}
     };
@@ -452,7 +452,7 @@ public:
     HashTableData* hashTable;
     HashTableData ownHashTable;
     ExprEvalState *exprState;
-    
+
     StringTableEntry scopeName;
     Namespace *scopeNamespace;
     CodeBlock *code;
@@ -473,7 +473,7 @@ public:
 
     void setVariable(StringTableEntry name, const char *value);
     const char *getVariable(StringTableEntry name, bool *valid = NULL);
-    
+
     U32 getCount() const
     {
       return hashTable->count;
@@ -484,9 +484,9 @@ public:
     }
 
     /// @see Con::addVariable
-    Entry* addVariable(    const char *name, 
-                           S32 type, 
-                           void *dataPtr, 
+    Entry* addVariable(    const char *name,
+                           S32 type,
+                           void *dataPtr,
                            const char* usage );
 
     /// @see Con::removeVariable
@@ -501,7 +501,7 @@ public:
     /// Return the best tab completion for prevText, with the length
     /// of the pre-tab string in baseLen.
     const char *tabComplete(const char *prevText, S32 baseLen, bool);
-    
+
     /// Run integrity checks for debugging.
     void validate();
 };
@@ -516,7 +516,7 @@ public:
     SimObject *thisObject;
     Dictionary::Entry *currentVariable;
     bool traceOn;
-    
+
     U32 mStackDepth;
 
     ExprEvalState();
@@ -533,7 +533,7 @@ public:
 
     ///
     Dictionary globalVars;
-    
+
     void setCurVarName(StringTableEntry name);
     void setCurVarNameCreate(StringTableEntry name);
     S32 getIntVariable();
@@ -549,19 +549,19 @@ public:
     /// Puts a reference to an existing stack frame
     /// on the top of the stack.
     void pushFrameRef(S32 stackIndex);
-    
+
     U32 getStackDepth() const
     {
        return mStackDepth;
     }
-    
+
     Dictionary& getCurrentFrame()
     {
       return *( stack[ mStackDepth - 1 ] );
     }
 
     /// @}
-    
+
     /// Run integrity checks for debugging.
     void validate();
 };

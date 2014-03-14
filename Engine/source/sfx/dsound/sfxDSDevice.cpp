@@ -29,9 +29,9 @@
 #include "console/console.h"
 
 
-SFXDSDevice::SFXDSDevice(  SFXProvider* provider, 
+SFXDSDevice::SFXDSDevice(  SFXProvider* provider,
                            DSoundFNTable *dsFnTbl,
-                           GUID* guid, 
+                           GUID* guid,
                            String name,
                            bool useHardware,
                            S32 maxBuffers )
@@ -46,7 +46,7 @@ SFXDSDevice::SFXDSDevice(  SFXProvider* provider,
 
 bool SFXDSDevice::_init()
 {
-   HRESULT hr = mDSoundTbl->DirectSoundCreate8( mGUID, &mDSound, NULL );   
+   HRESULT hr = mDSoundTbl->DirectSoundCreate8( mGUID, &mDSound, NULL );
    if ( FAILED( hr ) || !mDSound )
    {
       Con::errorf( "SFXDSDevice::SFXDSDevice() - DirectSoundCreate8 failed" );
@@ -61,8 +61,8 @@ bool SFXDSDevice::_init()
    }
 
    // Get the primary buffer.
-   DSBUFFERDESC dsbd;   
-   dMemset( &dsbd, 0, sizeof( DSBUFFERDESC ) ); 
+   DSBUFFERDESC dsbd;
+   dMemset( &dsbd, 0, sizeof( DSBUFFERDESC ) );
    dsbd.dwSize = sizeof( DSBUFFERDESC );
    dsbd.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_PRIMARYBUFFER;
    hr = mDSound->CreateSoundBuffer( &dsbd, &mPrimaryBuffer, NULL );
@@ -77,13 +77,13 @@ bool SFXDSDevice::_init()
    S32 bitrate = Con::getIntVariable( "$pref::SFX::bitrate", 32 );
 
    WAVEFORMATEX wfx;
-   dMemset( &wfx, 0, sizeof( WAVEFORMATEX ) ); 
-   wfx.wFormatTag = WAVE_FORMAT_PCM; 
-   wfx.nChannels = 2; 
+   dMemset( &wfx, 0, sizeof( WAVEFORMATEX ) );
+   wfx.wFormatTag = WAVE_FORMAT_PCM;
+   wfx.nChannels = 2;
    wfx.nSamplesPerSec = frequency;
-   wfx.wBitsPerSample = bitrate; 
+   wfx.wBitsPerSample = bitrate;
    wfx.nBlockAlign = ( wfx.nChannels * wfx.wBitsPerSample ) / 8;
-   wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign; 
+   wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
    hr = mPrimaryBuffer->SetFormat( &wfx );
    if( FAILED( hr ) )
    {
@@ -137,9 +137,9 @@ SFXBuffer* SFXDSDevice::createBuffer( const ThreadSafeRef< SFXStream >& stream, 
    AssertFatal( stream, "SFXDSDevice::createBuffer() - Got null stream!" );
    AssertFatal( description, "SFXDSDevice::createBuffer() - Got null description!" );
 
-   SFXDSBuffer* buffer = SFXDSBuffer::create(   mDSound, 
+   SFXDSBuffer* buffer = SFXDSBuffer::create(   mDSound,
                                                 stream,
-                                                description, 
+                                                description,
                                                 mUseHardware );
 
    if( buffer )
@@ -150,7 +150,7 @@ SFXBuffer* SFXDSDevice::createBuffer( const ThreadSafeRef< SFXStream >& stream, 
 
 SFXVoice* SFXDSDevice::createVoice( bool is3D, SFXBuffer *buffer )
 {
-   // Don't bother going any further if we've 
+   // Don't bother going any further if we've
    // exceeded the maximum voices.
    if ( mVoices.size() >= mMaxBuffers )
       return NULL;

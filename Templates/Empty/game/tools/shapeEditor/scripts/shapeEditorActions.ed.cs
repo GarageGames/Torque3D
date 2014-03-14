@@ -61,10 +61,10 @@ function ShapeEdUndoManager::updateUndoMenu( %this, %editMenu )
 {
    %undoName = %this.getNextUndoName();
    %redoName = %this.getNextRedoName();
-   
+
    %editMenu.setItemName( 0, "Undo " @ %undoName );
    %editMenu.setItemName( 1, "Redo " @ %redoName );
-   
+
    %editMenu.enableItem( 0, %undoName !$= "" );
    %editMenu.enableItem( 1, %redoName !$= "" );
 }
@@ -1186,7 +1186,7 @@ function ActionEditImposter::doit( %this )
    // Unpack new imposter settings
    for ( %i = 0; %i < 7; %i++ )
       %val[%i] = getField( %this.newImposter, %i );
-  
+
    ShapeEdWaitGui.show( "Generating imposter bitmaps..." );
 
    // Need to de-highlight the current material, or the imposter will have the

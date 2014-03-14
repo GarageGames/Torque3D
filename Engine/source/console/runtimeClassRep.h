@@ -33,7 +33,7 @@
 /// however it doesn't get added to the dictionary until it is told to
 /// add itself. It can be removed, as well, though no safe-execution
 /// assurances are made by this class. If an object type is removed
-/// behavior of existing console objects of that type is undefined. 
+/// behavior of existing console objects of that type is undefined.
 /// (aka bad stuff will probably happen but I don't know exactly what)
 template <class T>
 class RuntimeClassRep : public AbstractClassRep
@@ -137,16 +137,16 @@ public:
       else
          Con::errorf( "Cannot set multiple args to a single ConsoleObject*.");
    }
-   
+
    virtual const char* getData( void* dptr, const EnumTable* tbl, BitSet32 flag )
    {
       T** obj = ( T** ) dptr;
       return Con::getReturnBuffer( T::__getObjectId( *obj ) );
    }
-   
+
    virtual const char* getTypeClassName() { return mClassName; }
    virtual const bool isDatablock() { return T::__smIsDatablock; };
-   
+
    /// @}
 };
 

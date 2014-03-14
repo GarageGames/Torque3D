@@ -28,7 +28,7 @@
 #include "core/strings/stringFunctions.h"
 
 
-PxMemStream::PxMemStream() 
+PxMemStream::PxMemStream()
    :  mMemStream( 1024 )
 {
 }
@@ -42,43 +42,43 @@ void PxMemStream::resetPosition()
    mMemStream.setPosition( 0 );
 }
 
-NxU8 PxMemStream::readByte() const 
-{ 
+NxU8 PxMemStream::readByte() const
+{
    NxU8 out;
    mMemStream.read( &out );
    return out;
 }
 
 NxU16	PxMemStream::readWord() const
-{ 
+{
    NxU16 out;
    mMemStream.read( &out );
    return out;
 }
 
 NxU32	PxMemStream::readDword() const
-{ 
+{
    NxU32 out;
    mMemStream.read( &out );
    return out;
 }
 
 float	PxMemStream::readFloat()	const
-{ 
+{
    float out;
    mMemStream.read( &out );
    return out;
 }
 
 double PxMemStream::readDouble() const
-{ 
+{
    double out;
    mMemStream.read( &out );
    return out;
 }
 
 void PxMemStream::readBuffer( void *buffer, NxU32 size ) const
-{ 
+{
    mMemStream.read( size, buffer );
 }
 

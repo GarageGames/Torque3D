@@ -462,8 +462,8 @@ class TSShape
    /// @return The collision object or NULL if no collision data could be generated.
    ///
    PhysicsCollision* buildColShape( bool useVisibleMesh, const Point3F &scale );
-   
-   /// Like buildColShape except we build one PhysicsCollision object per 
+
+   /// Like buildColShape except we build one PhysicsCollision object per
    /// collision node.
    ///
    /// Results are returned by filling in the CollisionShapeInfo Vector, which also
@@ -479,16 +479,16 @@ class TSShape
 
    /// Returns index into the name vector that equals the passed name.
    S32 findName( const String &name ) const;
-   
+
    /// Returns name string at the passed name vector index.
    const String& getName( S32 nameIndex ) const;
-   
+
    /// Returns name string for mesh at the passed index.
    const String& getMeshName( S32 meshIndex ) const;
-   
+
    /// Returns name string for node at the passed index.
    const String& getNodeName( S32 nodeIndex ) const;
-   
+
    /// Returns name string for sequence at the passed index.
    const String& getSequenceName( S32 seqIndex ) const;
 

@@ -36,7 +36,7 @@
 #include "gfx/gfxDebugEvent.h"
 #include "gfx/gfxOcclusionQuery.h"
 #include "renderInstance/renderPassManager.h"
-#include "sim/netConnection.h"   
+#include "sim/netConnection.h"
 #include "scene/reflectionManager.h"
 #include "ts/tsShapeInstance.h"
 #include "postFx/postEffect.h"
@@ -45,10 +45,10 @@
 IMPLEMENT_CO_NETOBJECT_V1(WaterBlock);
 
 ConsoleDocClass( WaterBlock,
-   "@brief A block shaped water volume defined by a 3D scale and orientation.\n\n"      
+   "@brief A block shaped water volume defined by a 3D scale and orientation.\n\n"
 
    "@see WaterObject for inherited functionality.\n\n"
-   
+
    "@ingroup Water"
 );
 
@@ -62,7 +62,7 @@ WaterBlock::WaterBlock()
    mObjBox.minExtents.set( -0.5f, -0.5f, -0.5f );
    mObjBox.maxExtents.set(  0.5f,  0.5f,  0.5f );
 
-   mElapsedTime = 0.0f;   
+   mElapsedTime = 0.0f;
    mGenerateVB = true;
 }
 
@@ -74,7 +74,7 @@ bool WaterBlock::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
-   
+
    resetWorldBox();
    addToScene();
 
@@ -104,7 +104,7 @@ U32 WaterBlock::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
       // This is set to allow the user to modify the size of the water dynamically
       // in the editor
       mathWrite( *stream, mObjScale );
-      stream->writeAffineTransform( mObjToWorld );      
+      stream->writeAffineTransform( mObjToWorld );
    }
 
    return retMask;
@@ -126,14 +126,14 @@ void WaterBlock::unpackUpdate(NetConnection* con, BitStream* stream)
    {
       Point3F scale;
       mathRead( *stream, &scale );
-            
+
       setScale( scale );
 
       MatrixF objToWorld;
-      stream->readAffineTransform( &objToWorld );      
+      stream->readAffineTransform( &objToWorld );
 
       setTransform( objToWorld );
-   } 
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -158,14 +158,14 @@ void WaterBlock::setupVBIB()
    // Add one to width and height for the edge.
    mWidth   = (U32)mCeil(div.x) + 1;
    mHeight  = (U32)mCeil(div.y) + 1;
-   
+
    if( mWidth > maxIndexedVerts / 2 )
       mWidth = maxIndexedVerts / 2;
 
    // figure out how many blocks are needed and their size
    U32 maxBlockRows = maxIndexedVerts / mWidth;
    U32 rowOffset = 0;
-   
+
    while( (rowOffset+1) < mHeight )
    {
       U32 numRows = mHeight - rowOffset;
@@ -241,11 +241,11 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
          // currently just testing for terrain and atlas
          // objects, but potentially any object that responds
          // to a ray cast could detected.
-         if(gClientContainer.castRay(start, end, 
-            //StaticObjectType | 
-            //InteriorObjectType | 
-            //ShapeBaseObjectType | 
-            //StaticShapeObjectType | 
+         if(gClientContainer.castRay(start, end,
+            //StaticObjectType |
+            //InteriorObjectType |
+            //ShapeBaseObjectType |
+            //StaticShapeObjectType |
             //ItemObjectType |
             //StaticTSObjectType |
             TerrainObjectType
@@ -278,11 +278,11 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
          // Cast a ray to do some AO-style shadowing.
          F32 &shadow = vert->depthData.y;
 
-         if(gClientContainer.castRay(worldPoint, worldPoint + sunVector * 9000.f, 
-            //StaticObjectType | 
-            //InteriorObjectType | 
-            //ShapeBaseObjectType | 
-            //StaticShapeObjectType | 
+         if(gClientContainer.castRay(worldPoint, worldPoint + sunVector * 9000.f,
+            //StaticObjectType |
+            //InteriorObjectType |
+            //ShapeBaseObjectType |
+            //StaticShapeObjectType |
             //ItemObjectType |
             //StaticTSObjectType |
             TerrainObjectType
@@ -306,20 +306,20 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
    dMemcpy( vbVerts, verts, sizeof(GFXWaterVertex) * numVerts );
    vertBuff->unlock();
    mVertBuffList.push_back( vertBuff );
-   
+
 
    delete [] verts;
 
 }
 
 //-----------------------------------------------------------------------------
-// Set up a block of indices to match the block of vertices. The width is 
+// Set up a block of indices to match the block of vertices. The width is
 // always the width of the entire waterBlock, so this is a block of full rows.
 //-----------------------------------------------------------------------------
 void WaterBlock::setupPrimitiveBlock( U32 width, U32 height )
 {
    AssertFatal( height > 1, "WaterBlock::setupPrimitiveBlock() - invalid height" );
-   
+
    // setup vertex / primitive buffers
    U32 numIndices = (width-1) * (height-1) * 6;
    U16 *indices = new U16[ numIndices ];
@@ -327,7 +327,7 @@ void WaterBlock::setupPrimitiveBlock( U32 width, U32 height )
 
    // This uses indexed triangle lists instead of strips, but it shouldn't be
    // significantly slower if the indices cache well.
-   
+
    // Rough diagram of the index order
    //   0----2----+ ...
    //   |  / |    |
@@ -356,7 +356,7 @@ void WaterBlock::setupPrimitiveBlock( U32 width, U32 height )
    }
 
    GFXPrimitiveBufferHandle *indexBuff = new GFXPrimitiveBufferHandle;
-   
+
    GFXPrimitive pInfo;
    pInfo.type = GFXTriangleList;
    pInfo.numPrimitives = numIndices / 3;
@@ -410,16 +410,16 @@ void WaterBlock::setShaderParams( SceneRenderState *state, BaseMatInstance *mat,
 
    mUndulateMaxDist = F32_MAX;
 
-   Parent::setShaderParams( state, mat, paramHandles );   
+   Parent::setShaderParams( state, mat, paramHandles );
 
    // Now set the rest of the shader consts that are either unique to this
    // class or that WaterObject leaves to us to handle...
 
    MaterialParameters* matParams = mat->getMaterialParameters();
-   
+
    // set vertex shader constants
-   //-----------------------------------   
-   
+   //-----------------------------------
+
    MatrixF modelMat( getRenderTransform() );
    if ( paramHandles.mModelMatSC->isValid() )
       matParams->set(paramHandles.mModelMatSC, modelMat, GFXSCT_Float4x4);
@@ -430,26 +430,26 @@ void WaterBlock::setShaderParams( SceneRenderState *state, BaseMatInstance *mat,
 
    ColorF c( mWaterFogData.color );
    matParams->setSafe( paramHandles.mBaseColorSC, c );
-      
+
    // By default we need to show a true reflection is fullReflect is enabled and
    // we are above water.
    F32 reflect = mPlaneReflector.isEnabled() && !isUnderwater( state->getCameraPosition() );
-   
+
    // If we were occluded the last frame a query was fetched ( not necessarily last frame )
    // and we weren't updated last frame... we don't have a valid texture to show
    // so use the cubemap / fake reflection color this frame.
    if ( mPlaneReflector.lastUpdateMs != REFLECTMGR->getLastUpdateMs() && mPlaneReflector.isOccluded() )
       reflect = false;
 
-   Point4F reflectParams( mWaterPos.z, 0.0f, 1000.0f, !reflect );   
+   Point4F reflectParams( mWaterPos.z, 0.0f, 1000.0f, !reflect );
    matParams->setSafe( paramHandles.mReflectParamsSC, reflectParams );
 
    VectorF reflectNorm = mReflectNormalUp ? VectorF(0,0,1) : static_cast<VectorF>(mPlaneReflector.refplane);
-   matParams->setSafe(paramHandles.mReflectNormalSC, reflectNorm ); 
+   matParams->setSafe(paramHandles.mReflectNormalSC, reflectNorm );
 }
 
 void WaterBlock::innerRender( SceneRenderState *state )
-{      
+{
    GFXDEBUGEVENT_SCOPE( WaterBlock_innerRender, ColorI( 255, 0, 0 ) );
 
    if ( mGenerateVB )
@@ -482,7 +482,7 @@ void WaterBlock::innerRender( SceneRenderState *state )
       setShaderParams( state, mat, matParams );
 
       while ( mat->setupPass( state, sgData ) )
-      {      
+      {
          mat->setSceneInfo(state, sgData);
          mat->setTransforms(*mMatrixSet, state);
          setCustomTextures( matIdx, mat->getCurPass(), matParams );
@@ -495,31 +495,31 @@ void WaterBlock::innerRender( SceneRenderState *state )
             GFX->drawPrimitives();
          }
       }
-   }   
+   }
 }
 
 bool WaterBlock::setGridSizeProperty( void *obj, const char *index, const char *data )
 {
    WaterBlock* object = static_cast<WaterBlock*>(obj);
    F32 gridSize = dAtof(data);
-   
+
    Point3F scale = object->getScale();
-   
+
    if(gridSize < 0.001f)
    {
       object->logWarning("gridSize cannot be <= 0, clamping to scale");
       gridSize = getMin(scale.x, scale.y);
    }
-   
+
    if(gridSize > scale.x || gridSize > scale.y)
    {
-      object->logWarning("gridSize cannot be > scale.  Your scale is (%g, %g) and your gridsize is %g", 
+      object->logWarning("gridSize cannot be > scale.  Your scale is (%g, %g) and your gridsize is %g",
                  scale.x, scale.y, gridSize);
       gridSize = getMin(scale.x, scale.y);
    }
-   
+
    object->mGridElementSize = gridSize;
-               
+
    // This is a hack so the console system doesn't go in and set our variable
    // again, after we've already set it (possibly with a different value...)
    return false;
@@ -531,14 +531,14 @@ bool WaterBlock::setGridSizeProperty( void *obj, const char *index, const char *
 void WaterBlock::initPersistFields()
 {
    addGroup( "WaterBlock" );
-      addProtectedField( "gridElementSize", TypeF32,  Offset( mGridElementSize, WaterBlock ), 
+      addProtectedField( "gridElementSize", TypeF32,  Offset( mGridElementSize, WaterBlock ),
          &setGridSizeProperty, &defaultProtectedGetFn, "Spacing between vertices in the WaterBlock mesh" );
-      addProtectedField( "gridSize", TypeF32,  Offset( mGridElementSize, WaterBlock ), 
+      addProtectedField( "gridSize", TypeF32,  Offset( mGridElementSize, WaterBlock ),
          &setGridSizeProperty, &defaultProtectedGetFn, "Duplicate of gridElementSize for backwards compatility" );
    endGroup( "WaterBlock" );
 
    Parent::initPersistFields();
-}     
+}
 
 bool WaterBlock::isUnderwater( const Point3F &pnt ) const
 {
@@ -549,13 +549,13 @@ bool WaterBlock::isUnderwater( const Point3F &pnt ) const
    mWorldToObj.mulP( pnt, &objPnt );
 
    objPnt.z -= 0.1f;
-         
+
    Box3F testBox = mObjBox;
-   testBox.scale( mObjScale );     
+   testBox.scale( mObjScale );
 
    // We already tested if below the surface plane,
    // so clamping the z height of the box is not really necessary.
-   testBox.maxExtents.z = testBox.getCenter().z;      
+   testBox.maxExtents.z = testBox.getCenter().z;
 
    if ( testBox.isContained( objPnt ) )
       return true;
@@ -583,7 +583,7 @@ void WaterBlock::inspectPostApply()
       scale.x = mGridElementSize;
    if( scale.y < mGridElementSize )
       scale.y = mGridElementSize;
-   
+
    if( scale != getScale() )
       setScale( scale );
 
@@ -592,29 +592,29 @@ void WaterBlock::inspectPostApply()
 
 void WaterBlock::setTransform( const MatrixF &mat )
 {
-   // If our transform changes we need to recalculate the 
+   // If our transform changes we need to recalculate the
    // per vertex depth/shadow info.  Would be nice if this could
-   // be done independently of generating the whole VBIB...   
-   
+   // be done independently of generating the whole VBIB...
+
    MatrixF oldMat = mObjToWorld;
 
    Parent::setTransform( mat );
 
    // We don't need to regen our vb anymore since we aren't calculating
    // per vert depth/shadow on the cpu anymore.
-   //if ( oldMat != mObjToWorld )   
-   //   mGenerateVB = true;   
+   //if ( oldMat != mObjToWorld )
+   //   mGenerateVB = true;
 
    // Keep mWaterPlane up to date.
-   mWaterFogData.plane.set( 0, 0, 1, -getPosition().z ); 
+   mWaterFogData.plane.set( 0, 0, 1, -getPosition().z );
 }
 
 void WaterBlock::setScale( const Point3F &scale )
 {
    Point3F oldScale = mObjScale;
-   
+
    Parent::setScale( scale );
-   
+
    if ( oldScale != mObjScale )
       mGenerateVB = true;
 }
@@ -642,7 +642,7 @@ bool WaterBlock::castRay( const Point3F &start, const Point3F &end, RayInfo *inf
    F32 hit = plane.intersect( start, end );
    if ( hit < 0.0f || hit > 1.0f )
       return false;
-   
+
    info->t = hit;
    info->object = this;
    info->point = start + ( ( end - start ) * hit );
@@ -656,10 +656,10 @@ F32 WaterBlock::getWaterCoverage( const Box3F &testBox ) const
 {
    Box3F wbox = getWorldBox();
    wbox.maxExtents.z = wbox.getCenter().z;
-   
+
    F32 coverage = 0.0f;
 
-   if ( wbox.isOverlapped(testBox) ) 
+   if ( wbox.isOverlapped(testBox) )
    {
       if (wbox.maxExtents.z < testBox.maxExtents.z)
          coverage = (wbox.maxExtents.z - testBox.minExtents.z) / (testBox.maxExtents.z - testBox.minExtents.z);
@@ -675,7 +675,7 @@ F32 WaterBlock::getSurfaceHeight( const Point2F &pos ) const
    if ( !mWorldBox.isContained( pos ) )
       return -1.0f;
 
-   return getPosition().z;   
+   return getPosition().z;
 }
 
 void WaterBlock::_getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &outPos )
@@ -695,6 +695,6 @@ F32 WaterBlock::distanceTo( const Point3F& point ) const
 {
    Box3F waterBox = getWorldBox();
    waterBox.maxExtents.z = getPosition().z;
-   
+
    return waterBox.getDistanceToPoint( point );
 }

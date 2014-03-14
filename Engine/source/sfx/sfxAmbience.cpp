@@ -34,29 +34,29 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXAmbience );
 
 ConsoleDocClass( SFXAmbience,
    "@brief A datablock that describes an ambient sound space.\n\n"
-   
+
    "Each ambience datablock captures the properties of a unique ambient sound space.  A sound space is comprised of:\n"
-   
+
    "- an ambient audio track that is played when the listener is inside the space,\n"
    "- a reverb environment that is active inside the space, and\n"
    "- a number of SFXStates that are activated when entering the space and deactivated when exiting it.\n"
    "\n"
-   
+
    "Each of these properties is optional.\n\n"
-   
+
    "An important characteristic of ambient audio spaces is that their unique nature is not determined by their location "
    "in space but rather by their SFXAmbience datablock.  This means that the same SFXAmbience datablock assigned to "
    "multiple locations in a level represents the same unique audio space to the sound system.\n\n"
-   
+
    "This is an important distinction for the ambient sound mixer which will activate a given ambient audio space only "
    "once at any one time regardless of how many intersecting audio spaces with the same SFXAmbience datablock assigned "
    "the listener may currently be in.\n\n"
-   
+
    "All SFXAmbience instances are automatically added to the global @c SFXAmbienceSet.\n\n"
 
    "At the moment, transitions between reverb environments are not blended and different reverb environments from multiple "
    "active SFXAmbiences will not be blended together.  This will be added in a future version.\n\n"
-   
+
    "@tsexample\n"
    "singleton SFXAmbience( Underwater )\n"
    "{\n"
@@ -65,7 +65,7 @@ ConsoleDocClass( SFXAmbience,
    "   states[ 0 ] = AudioLocationUnderwater;\n"
    "};\n"
    "@endtsexample\n\n"
-      
+
    "@see SFXEnvironment\n"
    "@see SFXTrack\n"
    "@see SFXState\n"
@@ -96,7 +96,7 @@ SFXAmbience::SFXAmbience()
 void SFXAmbience::initPersistFields()
 {
    addGroup( "Sound" );
-   
+
       addField( "environment",            TypeSFXEnvironmentName, Offset( mEnvironment, SFXAmbience ),
          "Reverb environment active in the ambience zone.\n"
          "@ref SFX_reverb" );
@@ -117,9 +117,9 @@ void SFXAmbience::initPersistFields()
          "When the ambient sound state is entered, all states associated with the state will "
          "be activated (given that they are not disabled) and deactivated when the space "
          "is exited again." );
-               
+
    endGroup( "Sound" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -129,9 +129,9 @@ bool SFXAmbience::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    Sim::getSFXAmbienceSet()->addObject( this );
-      
+
    return true;
 }
 
@@ -141,24 +141,24 @@ bool SFXAmbience::preload( bool server, String& errorStr )
 {
    if( !Parent::preload( server, errorStr ) )
       return false;
-      
+
    validate();
-      
+
    // Resolve datablocks on client.
-   
+
    if( !server )
    {
       if( !sfxResolve( &mEnvironment, errorStr ) )
          return false;
-         
+
       if( !sfxResolve( &mSoundTrack, errorStr ) )
          return false;
-         
+
       for( U32 i = 0; i < MaxStates; ++ i )
          if( !sfxResolve( &mState[ i ], errorStr ) )
             return false;
    }
-         
+
    return true;
 }
 
@@ -167,10 +167,10 @@ bool SFXAmbience::preload( bool server, String& errorStr )
 void SFXAmbience::packData( BitStream* stream )
 {
    Parent::packData( stream );
-      
+
    sfxWrite( stream, mEnvironment );
    sfxWrite( stream, mSoundTrack );
-   
+
    stream->write( mRolloffFactor );
    stream->write( mDopplerFactor );
 
@@ -183,10 +183,10 @@ void SFXAmbience::packData( BitStream* stream )
 void SFXAmbience::unpackData( BitStream* stream )
 {
    Parent::unpackData( stream );
-      
+
    sfxRead( stream, &mEnvironment );
    sfxRead( stream, &mSoundTrack );
-   
+
    stream->read( &mRolloffFactor );
    stream->read( &mDopplerFactor );
 
@@ -199,9 +199,9 @@ void SFXAmbience::unpackData( BitStream* stream )
 void SFXAmbience::inspectPostApply()
 {
    Parent::inspectPostApply();
-   
+
    validate();
-   
+
    smChangeSignal.trigger( this );
 }
 

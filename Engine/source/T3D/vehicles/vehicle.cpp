@@ -840,11 +840,11 @@ void Vehicle::processTick(const Move* move)
       mDelta.posVec.y = -mDelta.warpOffset.y;
       mDelta.posVec.z = -mDelta.warpOffset.z;
    }
-   else 
+   else
    {
-      if (!move) 
+      if (!move)
       {
-         if (isGhost()) 
+         if (isGhost())
          {
             // If we haven't run out of prediction time,
             // predict using the last known move.
@@ -937,7 +937,7 @@ bool Vehicle::onNewDataBlock(GameBaseData* dptr,bool reload)
    // can set what they want.
    mRigid.setObjectInertia();
 
-   if (isGhost()) 
+   if (isGhost())
    {
       // Create the sound ahead of time.  This reduces runtime
       // costs and makes the system easier to understand.
@@ -991,7 +991,7 @@ void Vehicle::getCameraTransform(F32* pos,MatrixF* mat)
    // but where the Z axis is always up.
    if (mDataBlock->cameraRoll)
       mat->mul(eye,rot);
-   else 
+   else
    {
       MatrixF cam(1);
       VectorF x,y,z(0,0,1);
@@ -1016,7 +1016,7 @@ void Vehicle::getCameraTransform(F32* pos,MatrixF* mat)
 
    // Use the camera node as the starting position if it exists.
    Point3F osp,sp;
-   if (mDataBlock->cameraNode != -1) 
+   if (mDataBlock->cameraNode != -1)
    {
       mShapeInstance->mNodeTransforms[mDataBlock->cameraNode].getColumn(3,&osp);
       getRenderTransform().mulP(osp,&sp);
@@ -1206,7 +1206,7 @@ void Vehicle::updatePos(F32 dt)
       // the vehicles is less than some percentage of the energy added
       // by gravity for a short period, we're considered at rest.
       // This should really be part of the rigid class...
-      if (mCollisionList.getCount()) 
+      if (mCollisionList.getCount())
       {
          F32 k = mRigid.getKineticEnergy();
          F32 G = sVehicleGravity * dt;
@@ -1318,7 +1318,7 @@ bool Vehicle::updateCollision(F32 dt)
 
    mCollisionList.clear();
    CollisionState *state = mConvex.findClosestState(cmat, getScale(), mDataBlock->collisionTol);
-   if (state && state->dist <= mDataBlock->collisionTol) 
+   if (state && state->dist <= mDataBlock->collisionTol)
    {
       //resolveDisplacement(ns,state,dt);
       mConvex.getCollisionInfo(cmat, getScale(), &mCollisionList, mDataBlock->collisionTol);
@@ -1342,10 +1342,10 @@ bool Vehicle::resolveCollision(Rigid&  ns,CollisionList& cList)
 
    // Apply impulses to resolve collision
    bool collided = false;
-   for (S32 i = 0; i < cList.getCount(); i++) 
+   for (S32 i = 0; i < cList.getCount(); i++)
    {
       Collision& c = cList[i];
-      if (c.distance < mDataBlock->collisionTol) 
+      if (c.distance < mDataBlock->collisionTol)
       {
          // Velocity into surface
          Point3F v,r;
@@ -1356,7 +1356,7 @@ bool Vehicle::resolveCollision(Rigid&  ns,CollisionList& cList)
          // Only interested in velocities greater than sContactTol,
          // velocities less than that will be dealt with as contacts
          // "constraints".
-         if (vn < -mDataBlock->contactTol) 
+         if (vn < -mDataBlock->contactTol)
          {
 
             // Apply impulses to the rigid body to keep it from
@@ -1366,7 +1366,7 @@ bool Vehicle::resolveCollision(Rigid&  ns,CollisionList& cList)
             collided  = true;
 
             // Keep track of objects we collide with
-            if (!isGhost() && c.object->getTypeMask() & ShapeBaseObjectType) 
+            if (!isGhost() && c.object->getTypeMask() & ShapeBaseObjectType)
             {
                ShapeBase* col = static_cast<ShapeBase*>(c.object);
                queueCollision(col,v - col->getVelocity());
@@ -1390,10 +1390,10 @@ bool Vehicle::resolveContacts(Rigid& ns,CollisionList& cList,F32 dt)
    // Use spring forces to manage contact constraints.
    bool collided = false;
    Point3F t,p(0,0,0),l(0,0,0);
-   for (S32 i = 0; i < cList.getCount(); i++) 
+   for (S32 i = 0; i < cList.getCount(); i++)
    {
       const Collision& c = cList[i];
-      if (c.distance < mDataBlock->collisionTol) 
+      if (c.distance < mDataBlock->collisionTol)
       {
 
          // Velocity into the surface
@@ -1404,7 +1404,7 @@ bool Vehicle::resolveContacts(Rigid& ns,CollisionList& cList,F32 dt)
 
          // Only interested in velocities less than mDataBlock->contactTol,
          // velocities greater than that are dealt with as collisions.
-         if (mFabs(vn) < mDataBlock->contactTol) 
+         if (mFabs(vn) < mDataBlock->contactTol)
          {
             collided = true;
 
@@ -1419,7 +1419,7 @@ bool Vehicle::resolveContacts(Rigid& ns,CollisionList& cList,F32 dt)
             // perpendicular to the normal.
             Point3F uv = v - (c.normal * vn);
             F32 ul = uv.len();
-            if (s > 0 && ul) 
+            if (s > 0 && ul)
             {
                uv /= -ul;
                F32 u = ul * ns.getZeroImpulse(r,uv);
@@ -1646,7 +1646,7 @@ U32 Vehicle::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFlag(mRigid.atRest);
    }
 
-   
+
    stream->writeFloat(mClampF(getEnergyValue(), 0.f, 1.f), 8);
 
    return retMask;
@@ -1667,7 +1667,7 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
    mSteering.y = (2 * pitch * mDataBlock->maxSteeringAngle) - mDataBlock->maxSteeringAngle;
    mDelta.move.unpack(stream);
 
-   if (stream->readFlag()) 
+   if (stream->readFlag())
    {
       mPredictionCount = sMaxPredictionTicks;
       F32 speed = mRigid.linVelocity.len();
@@ -1681,7 +1681,7 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
       mRigid.atRest = stream->readFlag();
       mRigid.updateVelocity();
 
-      if (isProperlyAdded()) 
+      if (isProperlyAdded())
       {
          // Determine number of ticks to warp based on the average
          // of the client and server velocities.
@@ -1713,7 +1713,7 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
          // Calculated multi-tick warp
          mDelta.warpCount = 0;
          mDelta.warpTicks = (S32)(mFloor(dt));
-         if (mDelta.warpTicks) 
+         if (mDelta.warpTicks)
          {
             mDelta.warpOffset = mRigid.linPosition - mDelta.pos;
             mDelta.warpOffset /= (F32)mDelta.warpTicks;
@@ -1721,7 +1721,7 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
             mDelta.warpRot[1] = mRigid.angPosition;
          }
       }
-      else 
+      else
       {
          // Set the vehicle to the server position
          mDelta.dt  = 0;
@@ -1742,7 +1742,7 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
 
 void Vehicle::consoleInit()
 {
-   Con::addVariable("$vehicle::workingQueryBoxStaleThreshold",TypeS32,&sWorkingQueryBoxStaleThreshold, 
+   Con::addVariable("$vehicle::workingQueryBoxStaleThreshold",TypeS32,&sWorkingQueryBoxStaleThreshold,
       "@brief The maximum number of ticks that go by before the mWorkingQueryBox is considered stale and needs updating.\n\n"
       "Other factors can cause the collision working query box to become invalidated, such as the vehicle moving far "
       "enough outside of this cached box.  The smaller this number, the more times the working list of triangles that are "
@@ -1750,7 +1750,7 @@ void Vehicle::consoleInit()
       "@note Set to -1 to disable any time-based forced check.\n\n"
 	   "@ingroup GameObjects\n");
 
-   Con::addVariable("$vehicle::workingQueryBoxSizeMultiplier",TypeF32,&sWorkingQueryBoxSizeMultiplier, 
+   Con::addVariable("$vehicle::workingQueryBoxSizeMultiplier",TypeF32,&sWorkingQueryBoxSizeMultiplier,
       "@brief How much larger the mWorkingQueryBox should be made when updating the working collision list.\n\n"
       "The larger this number the less often the working list will be updated due to motion, but any non-static shape that "
       "moves into the query box will not be noticed.\n\n"
@@ -1772,11 +1772,11 @@ void Vehicle::mountObject(SceneObject *obj, S32 node, const MatrixF &xfm )
 
    // Clear objects off the working list that are from objects mounted to us.
    //  (This applies mostly to players...)
-   for ( CollisionWorkingList* itr = mConvex.getWorkingList().wLink.mNext; 
-         itr != &mConvex.getWorkingList(); 
-         itr = itr->wLink.mNext) 
+   for ( CollisionWorkingList* itr = mConvex.getWorkingList().wLink.mNext;
+         itr != &mConvex.getWorkingList();
+         itr = itr->wLink.mNext)
    {
-      if (itr->mConvex->getObject() == obj) 
+      if (itr->mConvex->getObject() == obj)
       {
          CollisionWorkingList* cl = itr;
          itr = itr->wLink.mPrev;
@@ -1931,7 +1931,7 @@ void Vehicle::_renderMassAndContacts( ObjectRenderInst *ri, SceneRenderState *st
    desc.setZReadWrite(false,true);
    desc.fillMode = GFXFillWireframe;
 
-   // Render the mass center.   
+   // Render the mass center.
    GFX->getDrawUtil()->drawCube(desc, Point3F(0.1f,0.1f,0.1f),mDataBlock->massCenter, ColorI(255, 255, 255), &mRenderObjToWorld);
 
    // Now render all the contact points.

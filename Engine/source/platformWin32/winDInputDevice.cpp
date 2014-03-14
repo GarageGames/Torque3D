@@ -66,7 +66,7 @@ DInputDevice::DInputDevice( const DIDEVICEINSTANCE* dii )
    switch ( GET_DIDEVICE_TYPE( mDeviceInstance.dwDevType ) )
    {
       // [rene, 12/09/2008] why do we turn a gamepad into a joystick here?
-	  
+
       case DI8DEVTYPE_DRIVING:
       case DI8DEVTYPE_GAMEPAD:
       case DI8DEVTYPE_JOYSTICK:
@@ -139,11 +139,11 @@ bool DInputDevice::create()
 			   dataFormat.dwFlags      = ( mDeviceType == MouseDeviceType ) ? DIDF_RELAXIS : DIDF_ABSAXIS;
             dataFormat.dwDataSize   = mObjBufferSize;
             dataFormat.dwNumObjs    = mObjCount;
-            dataFormat.rgodf        = mObjFormat;		
-			
+            dataFormat.rgodf        = mObjFormat;
+
             result = mDevice->SetDataFormat( &dataFormat );
             if ( FAILED( result ) )
-            {				
+            {
                Con::errorf( "  Failed to set the data format for the %s input device.", mName );
 #ifdef LOG_INPUT
                Input::log( "Failed to set the data format for %s!\n", mName );
@@ -240,7 +240,7 @@ void DInputDevice::destroy()
          mForceFeedbackEffect = NULL;
          mNumForceFeedbackAxes = 0;
 #ifdef LOG_INPUT
-         Input::log("DInputDevice::destroy - releasing constant force feeback effect\n"); 
+         Input::log("DInputDevice::destroy - releasing constant force feeback effect\n");
 #endif
       }
 
@@ -322,7 +322,7 @@ bool DInputDevice::acquire()
 
          // If we were previously playing a force feedback effect, before
          // losing acquisition, we do not automatically restart it. This is
-         // where you could call mForceFeedbackEffect->Start( INFINITE, 0 ); 
+         // where you could call mForceFeedbackEffect->Start( INFINITE, 0 );
          // if you want that behavior.
 
          // Update all of the key states:
@@ -634,7 +634,7 @@ bool DInputDevice::processAsync()
    do
    {
       result = mDevice->GetDeviceData( sizeof( DIDEVICEOBJECTDATA ), eventBuffer, &numEvents, 0 );
-	
+
       if ( !SUCCEEDED( result ) )
       {
          switch ( result )
@@ -734,9 +734,9 @@ bool DInputDevice::processImmediate()
    // Loop through all of the objects and produce events where
    // the states have changed:
 
-   // (oldData = 0 prevents a crashing bug in Torque. There is a case where 
+   // (oldData = 0 prevents a crashing bug in Torque. There is a case where
    //  Torque accessed oldData without it ever being set.)
-   S32 newData, oldData = 0;                          
+   S32 newData, oldData = 0;
    for ( DWORD i = 0; i < mObjCount; i++ )
    {
       if ( mObjFormat[i].dwType & DIDFT_BUTTON )
@@ -813,10 +813,10 @@ enum Win32POVDirsInQuadrant
    POVq_upleft    = POV_up | POV_left,
 };
 
-static const U32 Win32POVQuadrantMap[] = 
+static const U32 Win32POVQuadrantMap[] =
 {
-   POVq_up,    POVq_upright, 
-   POVq_right, POVq_downright, 
+   POVq_up,    POVq_upright,
+   POVq_right, POVq_downright,
    POVq_down,  POVq_downleft,
    POVq_left,  POVq_upleft
 };
@@ -965,7 +965,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
 
          newData = _Win32GetPOVDirs(newData);
          oldData = _Win32GetPOVDirs(oldData);
-         
+
          U32 setkeys = newData & (~oldData);
          U32 clearkeys = oldData & (~newData);
          U32 objInst = newEvent.objInst;
@@ -1051,7 +1051,7 @@ void DInputDevice::rumble(float x, float y)
    if (!mForceFeedbackEffect)
    {
 #ifdef LOG_INPUT
-      Input::log("DInputDevice::rumbleJoystick - creating constant force feeback effect\n"); 
+      Input::log("DInputDevice::rumbleJoystick - creating constant force feeback effect\n");
 #endif
       DIEFFECT eff;
       ZeroMemory( &eff, sizeof(eff) );

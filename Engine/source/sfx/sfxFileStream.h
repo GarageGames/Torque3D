@@ -57,7 +57,7 @@ class SFXFileStream : public SFXStream
       bool mOwnStream;
 
       /// The format of the data in the stream.
-      SFXFormat mFormat;    
+      SFXFormat mFormat;
 
       /// The number of samples in the data stream.
       U32 mSamples;
@@ -68,12 +68,12 @@ class SFXFileStream : public SFXStream
       ///
       SFXFileStream( const SFXFileStream& cloneFrom );
 
-      /// Overloaded in the derived classes to read 
-      /// the file header.  It should initialize 
+      /// Overloaded in the derived classes to read
+      /// the file header.  It should initialize
       /// mFormat and mSamples.
       virtual bool _readHeader() = 0;
 
-      /// Overloaded for cleanup of file format 
+      /// Overloaded for cleanup of file format
       /// specific structures.
       virtual void _close() = 0;
 
@@ -84,7 +84,7 @@ class SFXFileStream : public SFXStream
 
       ///
       static void unregisterExtension( String ext );
-   
+
       /// This is a helper function used to create an appropriate SFXStream
       /// for the requested sound file.
       ///

@@ -33,7 +33,7 @@
 ///
 /// The engine DLL exposes a well-defined API that the control layer can
 /// use to interface with the engine.  The structure of this API is accessible
-/// through 
+/// through
 ///
 /// The system is primarily meant to allow mechanical extraction and processing
 /// of the API.  It is not meant to be used as a direct means to actually interface
@@ -67,25 +67,25 @@ class EngineExport : public StaticEngineObject
       DECLARE_ABSTRACT_CLASS( EngineExport, StaticEngineObject );
       DECLARE_INSCOPE( ReflectionAPI );
       friend class EngineExportScope; // Default constructor.
-   
+
    protected:
-   
+
       /// Name of the export.  Never NULL but will be an empty string for anonymous
       /// exports such as function types.
       const char* mExportName;
 
       /// Kind of export.
       EngineExportKind mExportKind;
-   
+
       /// The scope in which this export is defined.
       EngineExportScope* mExportScope;
-      
+
       /// Documentation string.
       const char* mDocString;
 
       /// Next export in the link chain of the export's scope.
       EngineExport* mNextExport;
-            
+
       /// Protected constructor as this is an abstract class.
       ///
       /// @param name Export name.
@@ -93,19 +93,19 @@ class EngineExport : public StaticEngineObject
       /// @param scope Scope to export to.
       /// @param docString Documentation string.
       EngineExport( const char* name, EngineExportKind kind, EngineExportScope* scope, const char* docString );
-            
+
    public:
-   
+
       /// Return the name of the export.
       const char* getExportName() const { return mExportName; }
-      
+
       /// Return the fully qualified name of this export starting from the global export scope.
       /// Qualifiers are separated with "::".
       String getFullyQualifiedExportName() const;
-      
+
       /// Return the kind of entity being exported.
       EngineExportKind getExportKind() const { return mExportKind; }
-      
+
       /// Return the scope that contains this export.  All exports except the global scope
       /// itself are contained in a scope.
       EngineExportScope* getExportScope() const { return mExportScope; }
@@ -117,7 +117,7 @@ class EngineExport : public StaticEngineObject
       const char* getDocString() const { return mDocString; }
 
    private:
-   
+
       /// Special constructor for the global scope instance.
       EngineExport()
          : mExportName( "" ),
@@ -131,39 +131,39 @@ class EngineExport : public StaticEngineObject
 class EngineExportScope : public EngineExport
 {
    public:
-   
+
       DECLARE_CLASS( EngineExportScope, EngineExport );
       friend class EngineExport; // mExports
       friend struct _GLOBALSCOPE; // smGlobalScope
       template< typename T > friend T* constructInPlace( T* );
-   
+
    protected:
-      
+
       /// Head of the link chain of exports for this scope.
       EngineExport* mExports;
-      
+
       /// The global export scope singleton.
       static EngineExportScope smGlobalScope;
-   
+
    public:
-   
+
       /// Construct a new export scope.
       ///
       /// @param name Name of the scope inside its parent scope.
       /// @param scope Parent scope.
       /// @param docString Documentation string.
       EngineExportScope( const char* name, EngineExportScope* scope, const char* docString );
-   
+
       /// Return the global export scope singleton.  This is the root of the
       /// export hierarchy and thus directly or indirectly contains all
       /// entities exported by the engine.
       static EngineExportScope* getGlobalScope() { return &smGlobalScope; }
-            
+
       /// Return the chain of exports associated with this scope.
       EngineExport* getExports() const { return mExports; }
-      
+
    private:
-   
+
       /// Constructor for the global scope.
       EngineExportScope() {}
 };

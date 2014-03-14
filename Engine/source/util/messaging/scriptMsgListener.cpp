@@ -106,7 +106,7 @@ void ScriptMsgListener::onRemove()
    onRemove_callback();
    //Con::executef(this, "onRemove");
    unlinkNamespaces();
-   
+
    Parent::onRemove();
 }
 
@@ -130,7 +130,7 @@ IMPLEMENT_CALLBACK( ScriptMsgListener, onMessageObjectReceived, bool, ( const ch
    "Called when a message object (not just the message data) is passed to a listener.\n"
    "@param queue The name of the queue the message was dispatched to\n"
    "@param msg The message object\n"
-   "@return false to prevent other listeners receiving this message, true otherwise\n" 
+   "@return false to prevent other listeners receiving this message, true otherwise\n"
    "@see Message\n"
    "@see onMessageReceived");
 
@@ -158,12 +158,12 @@ void ScriptMsgListener::onAddToQueue(StringTableEntry queue)
 }
 
 /// @brief Callback for when the listener is removed from a queue
-   /// 
+   ///
    /// The default implementation of onAddToQueue() and onRemoveFromQueue()
    /// provide tracking of the queues this listener is added to through the
    /// #mQueues member. Overrides of onAddToQueue() or onRemoveFromQueue()
    /// should ensure they call the parent implementation in any overrides.
-   /// 
+   ///
    /// @param queue The name of the queue the listener was removed from
    /// @see onAddToQueue()
    //-----------------------------------------------------------------------------

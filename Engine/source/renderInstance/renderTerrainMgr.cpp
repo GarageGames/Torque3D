@@ -46,7 +46,7 @@ S32 RenderTerrainMgr::smDrawCalls = 0;
 IMPLEMENT_CONOBJECT(RenderTerrainMgr);
 
 
-ConsoleDocClass( RenderTerrainMgr, 
+ConsoleDocClass( RenderTerrainMgr,
    "@brief A render bin for terrain mesh rendering.\n\n"
    "This bin renders terrain render instances from a TerrainBlock. "
    "Normally a mesh would render via the RenderMeshMgr, but terrain uses "
@@ -145,7 +145,7 @@ void RenderTerrainMgr::render( SceneRenderState *state )
    // this will all be replaced by a normal mesh render bin.
    //
    if ( state->isShadowPass() )
-   {      
+   {
       PROFILE_SCOPE( RenderTerrainMgr_Render_Shadow );
 
       Vector<TerrainRenderInst*>::iterator inst = mInstVector.begin();

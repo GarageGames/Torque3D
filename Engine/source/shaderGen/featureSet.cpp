@@ -59,7 +59,7 @@ void FeatureSet::_rebuildDesc()
    String desc;
 
    for ( U32 i=0; i < mFeatures.size(); i++ )
-      desc +=  String::ToString( "%s,%d\n", 
+      desc +=  String::ToString( "%s,%d\n",
                mFeatures[i].type->getName().c_str(),
                mFeatures[i].index );
 
@@ -69,7 +69,7 @@ void FeatureSet::_rebuildDesc()
    mDescription = desc.intern();
 }
 
-const FeatureType& FeatureSet::getAt( U32 index, S32 *outIndex ) const 
+const FeatureType& FeatureSet::getAt( U32 index, S32 *outIndex ) const
 {
    // We want to make sure we access the features in the
    // correct order.  By asking for the description we ensure
@@ -79,7 +79,7 @@ const FeatureType& FeatureSet::getAt( U32 index, S32 *outIndex ) const
    if ( outIndex )
       *outIndex = mFeatures[index].index;
 
-   return *mFeatures[index].type; 
+   return *mFeatures[index].type;
 }
 
 void FeatureSet::clear()
@@ -143,7 +143,7 @@ void FeatureSet::addFeature( const FeatureType &type, S32 index )
    for ( U32 i=0; i < mFeatures.size(); i++ )
    {
       const FeatureInfo &info = mFeatures[i];
-      if (  info.type == &type && 
+      if (  info.type == &type &&
             info.index == index )
          return;
    }
@@ -219,7 +219,7 @@ void FeatureSet::merge( const FeatureSet &features )
    }
 
    for ( U32 i=0; i < features.mFeatures.size(); i++ )
-      addFeature( *features.mFeatures[i].type, 
+      addFeature( *features.mFeatures[i].type,
                   features.mFeatures[i].index );
 }
 

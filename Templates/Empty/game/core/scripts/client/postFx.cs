@@ -26,21 +26,21 @@ singleton GFXStateBlockData( PFX_DefaultStateBlock )
    zDefined = true;
    zEnable = false;
    zWriteEnable = false;
-      
+
    samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;
 };
 
 singleton ShaderData( PFX_PassthruShader )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/passthruP.hlsl";
-         
+
 //   OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
 //   OGLPixelShaderFile   = "shaders/common/postFx/gl/passthruP.glsl";
-      
+
    samplerNames[0] = "$inputTex";
-   
+
    pixVersion = 2.0;
 };
 
@@ -48,8 +48,8 @@ function initPostEffects()
 {
    // First exec the scripts for the different light managers
    // in the lighting folder.
-   
-   %pattern = "./postFx/*.cs";   
+
+   %pattern = "./postFx/*.cs";
    %file = findFirstFile( %pattern );
    if ( %file $= "" )
    {
@@ -57,9 +57,9 @@ function initPostEffects()
       %pattern = "./postFx/*.cs.dso";
       %file = findFirstFile( %pattern );
    }
-   
+
    while( %file !$= "" )
-   {      
+   {
       exec( %file );
       %file = findNextFile( %pattern );
    }
@@ -67,18 +67,18 @@ function initPostEffects()
 
 function PostEffect::inspectVars( %this )
 {
-   %name = %this.getName(); 
+   %name = %this.getName();
    %globals = "$" @ %name @ "::*";
-   inspectVars( %globals );   
+   inspectVars( %globals );
 }
 
 function PostEffect::viewDisassembly( %this )
 {
-   %file = %this.dumpShaderDisassembly();  
-   
+   %file = %this.dumpShaderDisassembly();
+
    if ( %file $= "" )
    {
-      echo( "PostEffect::viewDisassembly - no shader disassembly found." );  
+      echo( "PostEffect::viewDisassembly - no shader disassembly found." );
    }
    else
    {
@@ -90,6 +90,6 @@ function PostEffect::viewDisassembly( %this )
 // Return true if we really want the effect enabled.
 // By default this is the case.
 function PostEffect::onEnabled( %this )
-{   
+{
    return true;
 }

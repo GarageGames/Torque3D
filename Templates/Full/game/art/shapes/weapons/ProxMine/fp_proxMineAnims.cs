@@ -30,7 +30,7 @@
    %this.addSequence("art/shapes/weapons/ProxMine/FP_ProxMine.DAE fire_release", "ProxMine_fire_release");
    %this.addSequence("art/shapes/weapons/ProxMine/FP_ProxMine.DAE switch_out", "ProxMine_switch_out");
    %this.addSequence("art/shapes/weapons/ProxMine/FP_ProxMine.DAE switch_in", "ProxMine_switch_in");
-   
+
    %this.setSequenceCyclic("ProxMine_fire", "0");
    %this.setSequenceCyclic("ProxMine_fire_release", "0");
    %this.setSequenceCyclic("ProxMine_switch_out", "0");

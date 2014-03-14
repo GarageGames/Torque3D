@@ -27,7 +27,7 @@
 #include "forest/editor/forestEditorCtrl.h"
 
 
-ForestUndoAction::ForestUndoAction( const Resource<ForestData> &data, 
+ForestUndoAction::ForestUndoAction( const Resource<ForestData> &data,
                                     ForestEditorCtrl *editor,
                                     const char *description )
  : UndoAction( description ),
@@ -117,7 +117,7 @@ void ForestDeleteUndoAction::removeItem( const ForestItem &item )
 void ForestDeleteUndoAction::removeItem( const Vector<ForestItem> &itemList )
 {
    for ( S32 i = 0; i < itemList.size(); i++ )
-      removeItem( itemList[i] );   
+      removeItem( itemList[i] );
 }
 
 void ForestDeleteUndoAction::redo()
@@ -157,7 +157,7 @@ void ForestDeleteUndoAction::undo()
 
 
 
-ForestUpdateAction::ForestUpdateAction( const Resource<ForestData> &data, 
+ForestUpdateAction::ForestUpdateAction( const Resource<ForestData> &data,
                                         ForestEditorCtrl *editor )
  : ForestUndoAction( data, editor, "Update Forest Items" )
 {
@@ -170,15 +170,15 @@ void ForestUpdateAction::saveItem( const ForestItem &item )
 
    // We store the datablock ID rather than the actual pointer
    // since the pointer could go bad.
-   SimObjectId dataId = item.getData()->getId();   
-   mItems.last().setData( (ForestItemData*)dataId );   
+   SimObjectId dataId = item.getData()->getId();
+   mItems.last().setData( (ForestItemData*)dataId );
 }
 
 void ForestUpdateAction::_swapState()
 {
    Vector<ForestItem> prevItems = mItems;
    mItems.clear();
-   
+
    for ( U32 i=0; i < prevItems.size(); i++ )
    {
       const ForestItem &item = prevItems[i];
@@ -209,12 +209,12 @@ void ForestUpdateAction::_swapState()
 
       // Now revert to the old state.
       mData->updateItem( item.getKey(),
-                         item.getPosition(), 
+                         item.getPosition(),
                          data,
                          item.getTransform(),
                          item.getScale() );
 
-      // Save the state before this swap for the next swap.      
+      // Save the state before this swap for the next swap.
       newItem.setData( (ForestItemData*)data->getId() );
       mItems.push_back( newItem );
    }

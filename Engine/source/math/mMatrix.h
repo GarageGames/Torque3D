@@ -94,13 +94,13 @@ public:
 
    /// Take inverse of matrix assuming it is affine (rotation,
    /// scale, sheer, translation only).
-   MatrixF& affineInverse();           
+   MatrixF& affineInverse();
 
    /// Swap rows and columns.
    MatrixF& transpose();
 
    /// M * Matrix(p) -> M
-   MatrixF& scale( const Point3F &s );            
+   MatrixF& scale( const Point3F &s );
    MatrixF& scale( F32 s ) { return scale( Point3F( s, s, s ) ); }
 
    /// Return scale assuming scale was applied via mat.scale(s).
@@ -181,13 +181,13 @@ public:
    /// Get the y axis of the matrix.
    ///
    /// This is the 2nd column of the matrix and is
-   /// normally considered the forward vector.   
-   VectorF getForwardVector() const;   
+   /// normally considered the forward vector.
+   VectorF getForwardVector() const;
 
    /// Get the z axis of the matrix.
    ///
    /// This is the 3rd column of the matrix and is
-   /// normally considered the up vector.   
+   /// normally considered the up vector.
    VectorF getUpVector() const;
 
    MatrixF&  mul(const MatrixF &a);                    ///< M * a -> M
@@ -206,7 +206,7 @@ public:
    void mulV( const VectorF &p, Point3F *d) const;     ///< M * v -> d (assume w = 0.0f)
 
    void mul(Box3F& b) const;                           ///< Axial box -> Axial Box
-   
+
    MatrixF& add( const MatrixF& m );
 
    /// Convenience function to allow people to treat this like an array.
@@ -459,7 +459,7 @@ inline MatrixF& MatrixF::add( const MatrixF& a )
 {
    for( U32 i = 0; i < 16; ++ i )
       m[ i ] += a.m[ i ];
-      
+
    return *this;
 }
 

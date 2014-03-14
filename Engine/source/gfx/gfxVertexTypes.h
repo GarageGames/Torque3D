@@ -123,7 +123,7 @@ GFXDeclareVertexFormat( GFXVertexPNTBT )
 
 /*
 
-DEFINE_VERT( GFXVertexPCNT, 
+DEFINE_VERT( GFXVertexPCNT,
             GFXVertexFlagXYZ | GFXVertexFlagNormal | GFXVertexFlagDiffuse | GFXVertexFlagTextureCount1 | GFXVertexFlagUV0)
 {
    Point3F point;
@@ -132,7 +132,7 @@ DEFINE_VERT( GFXVertexPCNT,
    Point2F texCoord;
 };
 
-DEFINE_VERT( GFXVertexPCNTT, 
+DEFINE_VERT( GFXVertexPCNTT,
             GFXVertexFlagXYZ | GFXVertexFlagNormal | GFXVertexFlagDiffuse | GFXVertexFlagTextureCount2 | GFXVertexFlagUV0 | GFXVertexFlagUV1)
 {
    Point3F point;
@@ -154,7 +154,7 @@ GFXDeclareVertexFormat( GFXVertexPNTTB )
 
 /*
 DEFINE_VERT( GFXVertexPNTB,
-            GFXVertexFlagXYZ | GFXVertexFlagNormal | GFXVertexFlagTextureCount2 | 
+            GFXVertexFlagXYZ | GFXVertexFlagNormal | GFXVertexFlagTextureCount2 |
             GFXVertexFlagUV0 | GFXVertexFlagUVW1 )
 {
    Point3F point;

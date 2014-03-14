@@ -43,10 +43,10 @@
 
 //----------------------------------------------------------------------------
 
-const static U32 sCollisionMoveMask = ( TerrainObjectType | WaterObjectType          | 
-                                        PlayerObjectType  | StaticShapeObjectType    | 
+const static U32 sCollisionMoveMask = ( TerrainObjectType | WaterObjectType          |
+                                        PlayerObjectType  | StaticShapeObjectType    |
                                         VehicleObjectType | VehicleBlockerObjectType );
-                                        
+
 static U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
 static U32 sClientCollisionMask = sCollisionMoveMask;
 
@@ -363,7 +363,7 @@ bool FlyingVehicle::onNewDataBlock(GameBaseData* dptr, bool reload)
       return false;
 
    // Sounds
-   if ( isGhost() ) 
+   if ( isGhost() )
    {
       // Create the sounds ahead of time.  This reduces runtime
       // costs and makes the system easier to understand.
@@ -695,9 +695,9 @@ void FlyingVehicle::updateJet(F32 dt)
    if ( !mJetSound )
       return;
 
-   if ( !mJetting ) 
+   if ( !mJetting )
       mJetSound->stop();
-   else 
+   else
    {
       if ( !mJetSound->isPlaying() )
          mJetSound->play();

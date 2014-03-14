@@ -93,7 +93,7 @@ protected:
    typedef ThreadSafeRef< Node > NodePtr;
    friend class ThreadSafeRefCount< Node >;
    friend struct DeleteSingle;
-   
+
    /// A queue node.
    ///
    /// Nodes are reference-counted to coordinate memory management
@@ -103,7 +103,7 @@ protected:
    /// Reference-counting and deletion requests are kept separate.
    /// A given node is marked for deletion and will then have its references
    /// progressively disappear and eventually be reclaimed once the
-   /// reference count drops to zero.  
+   /// reference count drops to zero.
    ///
    /// Note that 'Next' references are released by the destructor which
    /// is only called when the reference count to the node itself drops to
@@ -124,7 +124,7 @@ protected:
 
       bool           isMarkedForDeletion();
       bool           tryMarkForDeletion();
-      
+
       void           clearValue()                  { mValue = ValueType(); }
 
       static U32     randomLevel();
@@ -211,14 +211,14 @@ void ThreadSafePriorityQueue< T, K, SORT_MIN_TO_MAX, MAX_LEVEL, PROBABILISTIC_BI
    // we'll insert nodes with NULL pointers at their lower levels.
 
    U32 currentLevel = 0;
-   do 
+   do
    {
       while( 1 )
       {
          NodePtr nextNode;
          NodePtr prevNode;
-         
-         scanFromHead( prevNode, nextNode, currentLevel, priority );        
+
+         scanFromHead( prevNode, nextNode, currentLevel, priority );
 
          outResult->getNext( currentLevel ) = nextNode;
          if( prevNode->getNext( currentLevel ).trySetFromTo( nextNode, outResult, NodePtr::TAG_FailIfSet ) )
@@ -518,14 +518,14 @@ void ThreadSafePriorityQueue< T, K, SORT_MIN_TO_MAX, MAX_LEVEL, PROBABILISTIC_BI
 
       Node* freeList = smFreeLists[ level ].mNodes;
       node->mNext[ 0 ] = freeList;
-      
+
       if( dCompareAndSwap( smFreeLists[ level ].mNodes, freeList, node ) )
       {
          node = NULL;
          break;
       }
    }
-   
+
    if( node )
       dFree( node );
 }
@@ -678,7 +678,7 @@ bool ThreadSafePriorityQueueWithUpdate< T, K, SORT_MIN_TO_MAX, MAX_LEVEL, PROBAB
       result = Parent::takeNext( outValue, upToPriority );
    }
    while( result && !outValue.isAlive() );
-   
+
    return result;
 }
 

@@ -43,8 +43,8 @@ void drawActor( NxActor *inActor )
    U8 renderAlpha = inActor->readActorFlag( NX_AF_DISABLE_COLLISION ) ? disabledAlpha : enabledAlpha;
 
    // Determine color we render actors and shapes with.
-   ColorI actorColor( 0, 0, 255, 200 );   
-   ColorI shapeColor = ( inActor->isSleeping() ? ColorI( 0, 0, 255, renderAlpha ) : ColorI( 255, 0, 255, renderAlpha ) );      
+   ColorI actorColor( 0, 0, 255, 200 );
+   ColorI shapeColor = ( inActor->isSleeping() ? ColorI( 0, 0, 255, renderAlpha ) : ColorI( 255, 0, 255, renderAlpha ) );
 
    MatrixF actorMat(true);
    inActor->getGlobalPose().getRowMajor44( actorMat );
@@ -56,7 +56,7 @@ void drawActor( NxActor *inActor )
 
    // Draw an xfm gizmo for the actor's globalPose...
    //drawer->drawTransform( desc, actorMat, Point3F::One, actorColor );
-   
+
    // Loop through and render all the actor's shapes....
 
    NxShape *const*pShapeArray = inActor->getShapes();
@@ -75,7 +75,7 @@ void drawActor( NxActor *inActor )
       {
          case NX_SHAPE_SPHERE:
          {
-            NxSphereShape *sphere = (NxSphereShape*)shape;     
+            NxSphereShape *sphere = (NxSphereShape*)shape;
             drawer->drawSphere( desc, sphere->getRadius(), shapePos, shapeColor );
 
             break;
@@ -83,8 +83,8 @@ void drawActor( NxActor *inActor )
          case NX_SHAPE_BOX:
          {
             NxBoxShape *box = (NxBoxShape*)shape;
-            Point3F size = pxCast<Point3F>( box->getDimensions() );            
-            drawer->drawCube( desc, size*2, shapePos, shapeColor, &shapeMat );            
+            Point3F size = pxCast<Point3F>( box->getDimensions() );
+            drawer->drawCube( desc, size*2, shapePos, shapeColor, &shapeMat );
             break;
          }
          case NX_SHAPE_CAPSULE:

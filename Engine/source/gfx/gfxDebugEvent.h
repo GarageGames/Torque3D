@@ -31,7 +31,7 @@
 #ifdef TORQUE_ENABLE_GFXDEBUGEVENTS
 
 
-/// You shouldn't use this class directly... use the 
+/// You shouldn't use this class directly... use the
 /// following macros:
 ///
 /// GFXDEBUGEVENT_START / GFXDEBUGEVENT_END
@@ -40,12 +40,12 @@
 class GFXDebugEventScope
 {
 public:
-   GFXDebugEventScope( const char* name, const ColorI &color ) 
+   GFXDebugEventScope( const char* name, const ColorI &color )
    {
       GFX->enterDebugEvent( color, name );
    }
 
-   ~GFXDebugEventScope() 
+   ~GFXDebugEventScope()
    {
       GFX->leaveDebugEvent();
    }
@@ -59,7 +59,7 @@ public:
 
 
 ///
-/// Will add start/end GFX debug events around the 
+/// Will add start/end GFX debug events around the
 /// current scope.
 ///
 /// @param name   The unquoted name for the event.

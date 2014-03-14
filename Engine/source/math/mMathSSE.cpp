@@ -212,7 +212,7 @@ void SSE_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result)
    (
       "movss      (%%edx),%%xmm0\n"
       "movups     (%%ecx),%%xmm1\n"
-      "shufps     $0,%%xmm0,%%xmm0\n"      
+      "shufps     $0,%%xmm0,%%xmm0\n"
       "movss      4(%%edx),%%xmm2\n"
       "mulps      %%xmm1,%%xmm0\n"
       "shufps     $0,%%xmm2,%%xmm2\n"
@@ -281,7 +281,7 @@ void SSE_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result)
       "mulps      %%xmm5,%%xmm7\n"
       "addps      %%xmm7,%%xmm2\n"
       "movups     %%xmm2,0x30(%%eax)\n"
-      
+
       :
       : "d" ( matA ),
         "c" ( matB ),
@@ -295,7 +295,7 @@ void SSE_MatrixF_x_MatrixF_Aligned(const F32 *matA, const F32 *matB, F32 *result
       (
       "movss      (%%edx),%%xmm0\n"
       "movaps     (%%ecx),%%xmm1\n"
-      "shufps     $0,%%xmm0,%%xmm0\n"      
+      "shufps     $0,%%xmm0,%%xmm0\n"
       "movss      4(%%edx),%%xmm2\n"
       "mulps      %%xmm1,%%xmm0\n"
       "shufps     $0,%%xmm2,%%xmm2\n"

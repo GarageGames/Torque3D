@@ -86,7 +86,7 @@ protected:
    StringTableEntry     mPasswordMask;
 
    /// If set, any non-ESC key is handled here or not at all
-   bool    mSinkAllKeyEvents;   
+   bool    mSinkAllKeyEvents;
    UTF16   **mHistoryBuf;
    void updateHistory(StringBuffer *txt, bool moveIndex);
 
@@ -95,8 +95,8 @@ protected:
 
    virtual void handleCharInput( U16 ascii );
 
-   S32 findNextWord();   
-   S32 findPrevWord();   
+   S32 findNextWord();
+   S32 findPrevWord();
 
 public:
    GuiTextEditCtrl();
@@ -118,7 +118,7 @@ public:
    virtual void setText(const UTF16* txt);
    S32   getCursorPos()   { return( mCursorPos ); }
    void  setCursorPos( const S32 newPos );
-   
+
    bool isAllTextSelected();
    void selectAllText();
    void clearSelectedText();
@@ -134,7 +134,7 @@ public:
    virtual void onMouseDown(const GuiEvent &event);
    virtual void onMouseDragged(const GuiEvent &event);
    virtual void onMouseUp(const GuiEvent &event);
-   
+
    void onCopy(bool andCut);
    void onPaste();
    void onUndo();
@@ -150,7 +150,7 @@ public:
    void onRender(Point2I offset, const RectI &updateRect);
    virtual void drawText( const RectI &drawRect, bool isFocused );
 
-	bool dealWithEnter( bool clearResponder ); 
+	bool dealWithEnter( bool clearResponder );
 };
 
 #endif //_GUI_TEXTEDIT_CTRL_H

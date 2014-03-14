@@ -54,7 +54,7 @@ class ShaderGenPrinter
 {
 public:
    virtual ~ShaderGenPrinter() {}
-   
+
    /// Prints a simple header, including the engine name, language type, and
    /// the fact that the shader was procedurally generated
    virtual void printShaderHeader(Stream& stream) = 0;
@@ -70,7 +70,7 @@ public:
 
    /// Prints the final line of the pixel shader.
    virtual void printPixelShaderCloser(Stream& stream) = 0;
-   
+
    // Prints a line into the shader adding the proper terminator.
    virtual void printLine(Stream& stream, const String& line) = 0;
 };
@@ -96,10 +96,10 @@ public:
 
 //**************************************************************************
 /*!
-   The ShaderGen class takes shader feature data (usually created by 
+   The ShaderGen class takes shader feature data (usually created by
    MatInstance) and creates a vertex/pixel shader pair in text files
    to be later compiled by a shader manager.
-   
+
    It accomplishes this task by creating a group of shader "components" and
    "features" that output bits of high level shader code.  Shader components
    translate to structures in HLSL that indicate incoming vertex data,
@@ -108,14 +108,14 @@ public:
    from the app.
 
    Shader features are separable shader functions that can be turned on or
-   off.  Examples would be bumpmapping and specular highlights.  See 
+   off.  Examples would be bumpmapping and specular highlights.  See
    MaterialFeatureData for the current list of features supported.
 
    ShaderGen processes all of the features that are present for a desired
    shader, and then prints them out to the respective vertex or pixel
    shader file.
-   
-   For more information on shader features and components see the 
+
+   For more information on shader features and components see the
    ShaderFeature and ShaderComponent classes.
 */
 //**************************************************************************
@@ -142,13 +142,13 @@ public:
    /// Returns the signal used to notify systems to register features.
    FeatureInitSignal& getFeatureInitSignal() { return mFeatureInitSignal; }
 
-   /// vertFile and pixFile are filled in by this function.  They point to 
+   /// vertFile and pixFile are filled in by this function.  They point to
    /// the vertex and pixel shader files.  pixVersion is also filled in by
    /// this function.
-   /// @param assignNum used to assign a specific number as the filename   
+   /// @param assignNum used to assign a specific number as the filename
    void generateShader( const MaterialFeatureData &featureData,
-                        char *vertFile, 
-                        char *pixFile, 
+                        char *vertFile,
+                        char *pixFile,
                         F32 *pixVersion,
                         const GFXVertexFormat *vertexFormat,
                         const char* cacheName,
@@ -165,14 +165,14 @@ public:
    void setComponentFactory(ShaderGenComponentFactory* factory) { mComponentFactory = factory; }
    void setFileEnding(String ending) { mFileEnding = ending; }
 
-protected:   
+protected:
 
    friend class ManagedSingleton<ShaderGen>;
 
-   // Shader generation 
+   // Shader generation
    MaterialFeatureData  mFeatureData;
    const GFXVertexFormat *mVertexFormat;
-   
+
    Vector< ShaderComponent *> mComponents;
 
    AutoPtr<ShaderGenPrinter> mPrinter;
@@ -184,13 +184,13 @@ protected:
    MultiLine *mOutput;
    GFXVertexFormat mInstancingFormat;
 
-   /// Init 
+   /// Init
    bool mInit;
    ShaderGenInitDelegate mInitDelegates[GFXAdapterType_Count];
    FeatureInitSignal mFeatureInitSignal;
    bool mRegisteredWithGFX;
    Torque::FS::FileSystemRef mMemFS;
-   
+
    /// Map of cache string -> shaders
    typedef Map<String, GFXShaderRef> ShaderMap;
    ShaderMap mProcShaders;
@@ -198,14 +198,14 @@ protected:
    ShaderGen();
 
    bool _handleGFXEvent(GFXDevice::GFXDeviceEventType event);
-   
+
    /// Causes the init delegate to be called.
    void initShaderGen();
 
    void _init();
    void _uninit();
 
-   /// Creates all the various shader components that will be filled in when 
+   /// Creates all the various shader components that will be filled in when
    /// the shader features are processed.
    void _createComponents();
 
@@ -223,7 +223,7 @@ protected:
    void _printVertShader( Stream &stream );
 
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "ShaderGen"; }   
+   static const char* getSingletonName() { return "ShaderGen"; }
 };
 
 

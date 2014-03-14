@@ -67,7 +67,7 @@ class RawDataT
          ownMemory = false;
       }
 
-      ~RawDataT() 
+      ~RawDataT()
       {
          reset();
       }

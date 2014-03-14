@@ -51,8 +51,8 @@ void SFXFileStream::unregisterExtension( String ext )
 SFXFileStream* SFXFileStream::create( String filename )
 {
    //RDTODO: if original file has an extension, we should try that first
-   
-   // First strip off our current extension (validating 
+
+   // First strip off our current extension (validating
    // against a list of known extensions so that we don't
    // strip off the last part of a file name with a dot in it.
 
@@ -60,7 +60,7 @@ SFXFileStream* SFXFileStream::create( String filename )
 
    SFXFileStream *sfxStream = NULL;
 
-   for( U32 i = 0; i < smExtensions.size(); i++ ) 
+   for( U32 i = 0; i < smExtensions.size(); i++ )
    {
       String testName = noExtension + smExtensions[ i ];
 
@@ -68,7 +68,7 @@ SFXFileStream* SFXFileStream::create( String filename )
       if ( !stream )
          continue;
 
-      // Note that the creation function swallows up the 
+      // Note that the creation function swallows up the
       // resource stream and will take care of deleting it.
       sfxStream = smCreateFns[i]( stream );
       if ( sfxStream )
@@ -80,13 +80,13 @@ SFXFileStream* SFXFileStream::create( String filename )
 
 bool SFXFileStream::exists( String filename )
 {
-   // First strip off our current extension (validating 
+   // First strip off our current extension (validating
    // against a list of known extensions so that we don't
    // strip off the last part of a file name with a dot in it.
 
    String noExtension = Platform::stripExtension( filename, smExtensions );
 
-   for( U32 i = 0; i < smExtensions.size(); i++ ) 
+   for( U32 i = 0; i < smExtensions.size(); i++ )
    {
       String testName = noExtension + smExtensions[ i ];
       if( Torque::FS::IsFile( testName ) )
@@ -124,14 +124,14 @@ SFXFileStream::~SFXFileStream()
    // If the stream is still open, close it now.  _close()
    // should usually be called by the destructor of derived classes,
    // but it their constructor fails, these won't even run.
-   
+
    if( mStream && mOwnStream )
       SAFE_DELETE( mStream );
 }
 
 bool SFXFileStream::open( Stream *stream, bool ownStream )
 {
-   AssertFatal( stream, "SFXFileStream::open() - Got null stream!" );   
+   AssertFatal( stream, "SFXFileStream::open() - Got null stream!" );
 
    close();
 

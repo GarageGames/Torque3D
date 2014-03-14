@@ -67,7 +67,7 @@ protected:
    GFXTextureTargetRef mTargetChain[TargetChainLength];
 
    GFXTexHandle mStoredPassZTarget;
-   
+
    void _updateTargets();
    void _teardownTargets();
 
@@ -79,7 +79,7 @@ protected:
    static const char* _getResolvePostEffect( void* object, const char* data );
    static bool _setCopyPostEffect( void* object, const char* index, const char* data );
    static bool _setResolvePostEffect( void* object, const char* index, const char* data );
-   
+
 public:
 
    DECLARE_CONOBJECT(RenderFormatToken);

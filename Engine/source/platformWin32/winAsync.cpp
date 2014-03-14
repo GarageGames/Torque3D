@@ -76,7 +76,7 @@ AsyncPeriodicUpdateThread::~AsyncPeriodicUpdateThread()
 void AsyncPeriodicUpdateThread::_waitForEventAndReset()
 {
    HANDLE handles[ 2 ];
-   
+
    handles[ 0 ] = ( HANDLE ) mUpdateEvent;
    handles[ 1 ] = ( HANDLE ) mUpdateTimer;
 

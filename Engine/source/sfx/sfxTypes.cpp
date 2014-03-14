@@ -58,9 +58,9 @@ inline void sRead( BitStream* stream, T** ptr )
       if( stream->readFlag() )
       {
          StringTableEntry name = stream->readSTString();
-         
+
          AssertFatal( !( U32( name ) & 0x1 ), "sRead - misaligned pointer" ); // StringTableEntry pointers are always word-aligned.
-         
+
          *( ( StringTableEntry* ) ptr ) = name;
       }
       else
@@ -76,7 +76,7 @@ inline bool sResolve( T** ptr, String& errorString )
    else if( *reinterpret_cast< U32* >( ptr ) & 0x1 )
    {
       U32 id = *reinterpret_cast< U32* >( ptr ) >> 1;
-      
+
       T* p;
       if( !Sim::findObject( id, p ) )
       {
@@ -85,13 +85,13 @@ inline bool sResolve( T** ptr, String& errorString )
          *ptr = NULL;
          return false;
       }
-      
+
       *ptr = p;
    }
    else
    {
       StringTableEntry name = *( ( StringTableEntry* ) ptr );
-         
+
       T* p;
       if( !Sim::findObject( name, p ) )
       {
@@ -100,10 +100,10 @@ inline bool sResolve( T** ptr, String& errorString )
          *ptr = NULL;
          return false;
       }
-      
+
       *ptr = p;
    }
-   
+
    return true;
 }
 
@@ -414,7 +414,7 @@ bool sfxReadAndResolve( BitStream* stream, SFXSource** source, String& errorStri
       *source = NULL;
       return true;
    }
-   
+
    const char* name = stream->readSTString();
 
    SFXSource* object;
@@ -423,7 +423,7 @@ bool sfxReadAndResolve( BitStream* stream, SFXSource** source, String& errorStri
       errorString = String::ToString( "sfxReadAndResolve - no SFXSource '%s'", name );
       return false;
    }
-   
+
    *source = object;
    return true;
 }

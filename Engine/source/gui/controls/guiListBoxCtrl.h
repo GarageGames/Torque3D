@@ -86,7 +86,7 @@ public:
    LBItem*              mLastClickItem;
 
    // Persistence
-   static void       initPersistFields();   
+   static void       initPersistFields();
 
    // Item Accessors
    S32               getItemCount();
@@ -96,7 +96,7 @@ public:
    S32               getItemIndex( LBItem *item );
    StringTableEntry  getItemText( S32 index );
    SimObject*        getItemObject( S32 index );
-   
+
    void              setCurSel( S32 index );
    void              setCurSelRange( S32 start, S32 stop );
    void              setItemText( S32 index, StringTableEntry text );
@@ -118,7 +118,7 @@ public:
    void              addSelection( LBItem *item, S32 index );
    void              addSelection( S32 index );
    inline void       setMultipleSelection( bool allowMultipleSelect = true ) { mMultipleSelections = allowMultipleSelect; };
-   
+
    bool              hitTest( const Point2I& point, S32& outItem );
 
    // Sizing
@@ -137,12 +137,12 @@ public:
    virtual void      onMouseDown( const GuiEvent &event );
    virtual void      onMouseDragged(const GuiEvent &event);
    virtual void      onMouseUp( const GuiEvent& event );
-   virtual bool      onKeyDown( const GuiEvent &event );   
+   virtual bool      onKeyDown( const GuiEvent &event );
 
    // String Utility
    static U32        getStringElementCount( const char *string );
    static const char* getStringElement( const char* inString, const U32 index );
-   
+
    // SimSet Mirroring Stuff
    void setMirrorObject( SimSet *inObj );
    void _mirror();

@@ -48,7 +48,7 @@ enum GFXBufferType
                    ///< allowed.
       GFXBufferTypeVolatile, ///< Volatile vertex or index buffers are meant for vertices or indices that are essentially
                    ///< only used once.  They can be resized without any performance penalty.
-      
+
       GFXBufferType_COUNT ///< Number of buffer types.
 };
 
@@ -59,7 +59,7 @@ enum GFXTexCallbackCode
 };
 
 
-enum GFXPrimitiveType 
+enum GFXPrimitiveType
 {
    GFXPT_FIRST = 0,
    GFXPointList = 0,
@@ -71,7 +71,7 @@ enum GFXPrimitiveType
    GFXPT_COUNT
 };
 
-enum GFXTextureType 
+enum GFXTextureType
 {
    GFXTextureType_Normal,
    GFXTextureType_KeepBitmap,
@@ -80,7 +80,7 @@ enum GFXTextureType
    GFXTextureType_Count
 };
 
-enum GFXBitmapFlip 
+enum GFXBitmapFlip
 {
    GFXBitmapFlip_None = 0,
    GFXBitmapFlip_X    = 1 << 0,
@@ -88,7 +88,7 @@ enum GFXBitmapFlip
    GFXBitmapFlip_XY   = GFXBitmapFlip_X | GFXBitmapFlip_Y
 };
 
-enum GFXTextureOp 
+enum GFXTextureOp
 {
    GFXTOP_FIRST = 0,
    GFXTOPDisable = 0,
@@ -101,7 +101,7 @@ enum GFXTextureOp
    GFXTOPAddSigned,
    GFXTOPAddSigned2X,
    GFXTOPSubtract,
-   GFXTOPAddSmooth, 
+   GFXTOPAddSmooth,
    GFXTOPBlendDiffuseAlpha,
    GFXTOPBlendTextureAlpha,
    GFXTOPBlendFactorAlpha,
@@ -119,7 +119,7 @@ enum GFXTextureOp
    GFXTOP_COUNT
 };
 
-enum GFXTextureAddressMode 
+enum GFXTextureAddressMode
 {
    GFXAddress_FIRST = 0,
    GFXAddressWrap = 0,
@@ -130,7 +130,7 @@ enum GFXTextureAddressMode
    GFXAddress_COUNT
 };
 
-enum GFXTextureFilterType 
+enum GFXTextureFilterType
 {
    GFXTextureFilter_FIRST = 0,
    GFXTextureFilterNone = 0,
@@ -142,7 +142,7 @@ enum GFXTextureFilterType
    GFXTextureFilter_COUNT
 };
 
-enum GFXFillMode 
+enum GFXFillMode
 {
    GFXFill_FIRST = 1,
    GFXFillPoint = 1,
@@ -151,7 +151,7 @@ enum GFXFillMode
    GFXFill_COUNT
 };
 
-enum GFXFormat 
+enum GFXFormat
 {
    // when adding formats make sure to place
    // them in the correct group!
@@ -187,7 +187,7 @@ enum GFXFormat
    GFXFormatR10G10B10A2,
    GFXFormatD32,
    GFXFormatD24X8,
-   GFXFormatD24S8,   
+   GFXFormatD24S8,
    GFXFormatD24FS8,
 
    // 64 bit texture formats...
@@ -218,7 +218,7 @@ enum GFXFormat
 /// Returns the byte size of the pixel for non-compressed formats.
 inline U32 GFXFormat_getByteSize( GFXFormat format )
 {
-   AssertFatal( format < GFXFormat_UNKNOWNSIZE, 
+   AssertFatal( format < GFXFormat_UNKNOWNSIZE,
       "GFXDevice::formatByteSize - Cannot size a compressed format!" );
 
    if ( format < GFXFormat_16BIT )
@@ -232,19 +232,19 @@ inline U32 GFXFormat_getByteSize( GFXFormat format )
    else if ( format < GFXFormat_128BIT )
       return 8;// 64 bit...
 
-   // This should be 128bits... else its a DDS and 
+   // This should be 128bits... else its a DDS and
    // the assert should have gone off above.
    return 16;
 }
 
-enum GFXShadeMode 
+enum GFXShadeMode
 {
    GFXShadeFlat = 1,
    GFXShadeGouraud,
    GFXShadePhong,
 };
 
-enum GFXClearFlags 
+enum GFXClearFlags
 {
    GFXClearTarget = 1 << 0,
    GFXClearZBuffer = 1 << 1,
@@ -252,7 +252,7 @@ enum GFXClearFlags
 };
 
 /// The supported blend modes.
-enum GFXBlend 
+enum GFXBlend
 {
    GFXBlend_FIRST = 0,
    GFXBlendZero = 0, /// (0, 0, 0, 0)
@@ -272,7 +272,7 @@ enum GFXBlend
 /// Constants that name each GFXDevice type. Any new GFXDevice subclass must be
 /// added to this enum. A string representing its name must also be added to
 /// GFXInit::getAdapterNameFromType().
-enum GFXAdapterType 
+enum GFXAdapterType
 {
    OpenGL = 0,
    Direct3D9,
@@ -291,7 +291,7 @@ enum GFXCullMode
    GFXCull_COUNT
 };
 
-enum GFXCmpFunc 
+enum GFXCmpFunc
 {
    GFXCmp_FIRST = 0,
    GFXCmpNever = 0,
@@ -305,7 +305,7 @@ enum GFXCmpFunc
    GFXCmp_COUNT
 };
 
-enum GFXStencilOp 
+enum GFXStencilOp
 {
    GFXStencilOp_FIRST = 0,
    GFXStencilOpKeep = 0,
@@ -319,15 +319,15 @@ enum GFXStencilOp
    GFXStencilOp_COUNT
 };
 
-enum GFXMaterialColorSource 
+enum GFXMaterialColorSource
 {
    GFXMCSMaterial = 0,
    GFXMCSColor1,
    GFXMCSColor2,
 };
 
-enum GFXBlendOp 
-{ 
+enum GFXBlendOp
+{
    GFXBlendOp_FIRST = 0,
    GFXBlendOpAdd = 0,
    GFXBlendOpSubtract,
@@ -337,7 +337,7 @@ enum GFXBlendOp
    GFXBlendOp_COUNT
 };
 
-enum GFXRenderState 
+enum GFXRenderState
 {
    GFXRenderState_FIRST = 0,
    GFXRSZEnable = 0,
@@ -451,7 +451,7 @@ enum GFXRenderState
 #define GFXCOLORWRITEENABLE_BLUE    4
 #define GFXCOLORWRITEENABLE_ALPHA   8
 
-enum GFXTextureStageState 
+enum GFXTextureStageState
 {
    GFXTSS_FIRST = 0,
    GFXTSSColorOp = 0,
@@ -489,7 +489,7 @@ enum GFXTextureTransformFlags
 // should *not* be used for any run-time purposes [7/2/2007 Pat]
 #define TEXTURE_STAGE_COUNT 16
 
-enum GFXSamplerState 
+enum GFXSamplerState
 {
    GFXSAMP_FIRST = 0,
    GFXSAMPAddressU = 0,
@@ -508,7 +508,7 @@ enum GFXSamplerState
    GFXSAMP_COUNT          ///< Don't use this one, this is a counter
 };
 
-enum GFXTextureArgument 
+enum GFXTextureArgument
 {
    GFXTA_FIRST = 0,
    GFXTADiffuse = 0,
@@ -526,7 +526,7 @@ enum GFXTextureArgument
 // Matrix stuff
 #define WORLD_STACK_MAX 24
 
-enum GFXMatrixType 
+enum GFXMatrixType
 {
    GFXMatrixWorld = 256,
    GFXMatrixView = 2,
@@ -547,18 +547,18 @@ enum GFXMatrixType
 
 #define GFXVERTEXFLAG_F32     3
 #define GFXVERTEXFLAG_POINT2F 0
-#define GFXVERTEXFLAG_POINT3F 1 
+#define GFXVERTEXFLAG_POINT3F 1
 #define GFXVERTEXFLAG_POINT4F 2
 
-#define GFXVERTEXFLAG_TEXCOORD_F32(CoordIndex)     ( GFXVERTEXFLAG_F32     << ( CoordIndex * 2 + 16 ) ) 
-#define GFXVERTEXFLAG_TEXCOORD_POINT2F(CoordIndex) ( GFXVERTEXFLAG_POINT2F ) 
-#define GFXVERTEXFLAG_TEXCOORD_POINT3F(CoordIndex) ( GFXVERTEXFLAG_POINT3F << ( CoordIndex * 2 + 16 ) ) 
+#define GFXVERTEXFLAG_TEXCOORD_F32(CoordIndex)     ( GFXVERTEXFLAG_F32     << ( CoordIndex * 2 + 16 ) )
+#define GFXVERTEXFLAG_TEXCOORD_POINT2F(CoordIndex) ( GFXVERTEXFLAG_POINT2F )
+#define GFXVERTEXFLAG_TEXCOORD_POINT3F(CoordIndex) ( GFXVERTEXFLAG_POINT3F << ( CoordIndex * 2 + 16 ) )
 #define GFXVERTEXFLAG_TEXCOORD_POINT4F(CoordIndex) ( GFXVERTEXFLAG_POINT4F << ( CoordIndex * 2 + 16 ) )
 
 #define STATE_STACK_SIZE 32
 
 // Index Formats
-enum GFXIndexFormat 
+enum GFXIndexFormat
 {
    GFXIndexFormat_FIRST = 0,
    GFXIndexFormat16 = 0,
@@ -570,21 +570,21 @@ enum GFXShaderConstType
 {
    /// GFX"S"hader"C"onstant"T"ype
    // Scalar
-   GFXSCT_Float, 
+   GFXSCT_Float,
    // Vectors
-   GFXSCT_Float2, 
-   GFXSCT_Float3, 
-   GFXSCT_Float4, 
+   GFXSCT_Float2,
+   GFXSCT_Float3,
+   GFXSCT_Float4,
    // Matrices
-   GFXSCT_Float2x2, 
-   GFXSCT_Float3x3, 
-   GFXSCT_Float4x4, 
+   GFXSCT_Float2x2,
+   GFXSCT_Float3x3,
+   GFXSCT_Float4x4,
    // Scalar
-   GFXSCT_Int, 
+   GFXSCT_Int,
    // Vectors
-   GFXSCT_Int2, 
-   GFXSCT_Int3, 
-   GFXSCT_Int4, 
+   GFXSCT_Int2,
+   GFXSCT_Int3,
+   GFXSCT_Int4,
    // Samplers
    GFXSCT_Sampler,
    GFXSCT_SamplerCube
@@ -605,7 +605,7 @@ enum GFXDeclType
    /// @see Point2F
    GFXDeclType_Float2,
 
-   /// A three-component F32. 
+   /// A three-component F32.
    /// @see Point3F
    GFXDeclType_Float3,
 

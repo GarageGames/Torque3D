@@ -63,7 +63,7 @@ void GFXPCD3D9Device::createDirect3D9(LPDIRECT3D9 &d3d9, LPDIRECT3D9EX &d3d9ex)
    {
 
       HRESULT (WINAPI *pfnCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = (HRESULT ( WINAPI *)(UINT SDKVersion, IDirect3D9Ex**)) GetProcAddress(hD3D, "Direct3DCreate9Ex");
-      
+
       if (pfnCreate9Ex)
       {
          if (!FAILED(pfnCreate9Ex(D3D_SDK_VERSION, &d3d9ex)) && d3d9ex)
@@ -89,9 +89,9 @@ GFXDevice *GFXPCD3D9Device::createInstance( U32 adapterIndex )
 {
    LPDIRECT3D9 d3d9;
    LPDIRECT3D9EX d3d9ex;
-   
+
    createDirect3D9(d3d9, d3d9ex);
-   
+
    GFXPCD3D9Device* dev = new GFXPCD3D9Device( d3d9, adapterIndex );
    dev->mD3DEx = d3d9ex;
    return dev;
@@ -144,21 +144,21 @@ HRESULT GFXPCD3D9Device::createDevice(U32 adapter, D3DDEVTYPE deviceType, HWND h
 
    if (mD3DEx)
    {
-      hres = mD3DEx->CreateDeviceEx( adapter, deviceType, 
+      hres = mD3DEx->CreateDeviceEx( adapter, deviceType,
          hFocusWindow,
-         behaviorFlags, 
-         pPresentationParameters, NULL, &mD3DDeviceEx ); 
+         behaviorFlags,
+         pPresentationParameters, NULL, &mD3DDeviceEx );
 
       if (!FAILED(hres) && mD3DDeviceEx)
-         hres = mD3DDeviceEx->QueryInterface(__uuidof(IDirect3DDevice9), reinterpret_cast<void**>(&mD3DDevice));  
+         hres = mD3DDeviceEx->QueryInterface(__uuidof(IDirect3DDevice9), reinterpret_cast<void**>(&mD3DDevice));
    }
    else
    {
-      hres = mD3D->CreateDevice( adapter, deviceType, 
+      hres = mD3D->CreateDevice( adapter, deviceType,
          hFocusWindow,
-         behaviorFlags, 
-         pPresentationParameters, &mD3DDevice ); 
-   }   
+         behaviorFlags,
+         pPresentationParameters, &mD3DDevice );
+   }
 
    return hres;
 
@@ -172,7 +172,7 @@ HRESULT GFXPCD3D9Device::createDevice(U32 adapter, D3DDEVTYPE deviceType, HWND h
 D3DPRESENT_PARAMETERS GFXPCD3D9Device::setupPresentParams( const GFXVideoMode &mode, const HWND &hwnd ) const
 {
    // Create D3D Presentation params
-   D3DPRESENT_PARAMETERS d3dpp; 
+   D3DPRESENT_PARAMETERS d3dpp;
    dMemset( &d3dpp, 0, sizeof( d3dpp ) );
 
    D3DFORMAT fmt = D3DFMT_X8R8G8B8; // 32 bit
@@ -183,21 +183,21 @@ D3DPRESENT_PARAMETERS GFXPCD3D9Device::setupPresentParams( const GFXVideoMode &m
    D3DMULTISAMPLE_TYPE aatype;
    DWORD aalevel;
 
-   // Setup the AA flags...  If we've been ask to 
+   // Setup the AA flags...  If we've been ask to
    // disable  hardware AA then do that now.
    if ( mode.antialiasLevel == 0 || Con::getBoolVariable( "$pref::Video::disableHardwareAA", false ) )
    {
       aatype = D3DMULTISAMPLE_NONE;
       aalevel = 0;
-   } 
-   else 
+   }
+   else
    {
       aatype = D3DMULTISAMPLE_NONMASKABLE;
       aalevel = mode.antialiasLevel-1;
    }
-  
+
    _validateMultisampleParams(fmt, aatype, aalevel);
-   
+
    d3dpp.BackBufferWidth  = mode.resolution.x;
    d3dpp.BackBufferHeight = mode.resolution.y;
    d3dpp.BackBufferFormat = fmt;
@@ -210,7 +210,7 @@ D3DPRESENT_PARAMETERS GFXPCD3D9Device::setupPresentParams( const GFXVideoMode &m
    d3dpp.EnableAutoDepthStencil = TRUE;
    d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
    d3dpp.Flags            = 0;
-   d3dpp.FullScreen_RefreshRateInHz = (mode.refreshRate == 0 || !mode.fullScreen) ? 
+   d3dpp.FullScreen_RefreshRateInHz = (mode.refreshRate == 0 || !mode.fullScreen) ?
                                        D3DPRESENT_RATE_DEFAULT : mode.refreshRate;
    d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
@@ -228,7 +228,7 @@ void GFXPCD3D9Device::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
    // Grab a D3D9 handle here to first get the D3D9 devices
    LPDIRECT3D9 d3d9;
    LPDIRECT3D9EX d3d9ex;
-   createDirect3D9( d3d9, d3d9ex); 
+   createDirect3D9( d3d9, d3d9ex);
 
    // If we could not create the d3d9 object then either the system
    // is corrupt or they need to update the directx runtime.
@@ -242,7 +242,7 @@ void GFXPCD3D9Device::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
       Platform::forceShutdown( -1 );
    }
 
-   for( U32 adapterIndex = 0; adapterIndex < d3d9->GetAdapterCount(); adapterIndex++ ) 
+   for( U32 adapterIndex = 0; adapterIndex < d3d9->GetAdapterCount(); adapterIndex++ )
    {
       GFXAdapter *toAdd = new GFXAdapter;
       toAdd->mType  = Direct3D9;
@@ -270,12 +270,12 @@ void GFXPCD3D9Device::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
       formats.push_back( D3DFMT_R5G6B5 );    // D3DFMT_R5G6B5 - 16bit format
       formats.push_back( D3DFMT_X8R8G8B8 );  // D3DFMT_X8R8G8B8 - 32bit format
 
-      for( S32 i = 0; i < formats.size(); i++ ) 
+      for( S32 i = 0; i < formats.size(); i++ )
       {
          DWORD MaxSampleQualities;
          d3d9->CheckDeviceMultiSampleType(adapterIndex, D3DDEVTYPE_HAL, formats[i], FALSE, D3DMULTISAMPLE_NONMASKABLE, &MaxSampleQualities);
 
-         for( U32 j = 0; j < d3d9->GetAdapterModeCount( adapterIndex, formats[i] ); j++ ) 
+         for( U32 j = 0; j < d3d9->GetAdapterModeCount( adapterIndex, formats[i] ); j++ )
          {
             D3DDISPLAYMODE mode;
             d3d9->EnumAdapterModes( adapterIndex, formats[i], j, &mode );
@@ -298,15 +298,15 @@ void GFXPCD3D9Device::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
    d3d9->Release();
 }
 
-void GFXPCD3D9Device::enumerateVideoModes() 
+void GFXPCD3D9Device::enumerateVideoModes()
 {
    Vector<D3DFORMAT> formats( __FILE__, __LINE__ );
    formats.push_back( D3DFMT_R5G6B5 );    // D3DFMT_R5G6B5 - 16bit format
    formats.push_back( D3DFMT_X8R8G8B8 );  // D3DFMT_X8R8G8B8 - 32bit format
 
-   for( S32 i = 0; i < formats.size(); i++ ) 
+   for( S32 i = 0; i < formats.size(); i++ )
    {
-      for( U32 j = 0; j < mD3D->GetAdapterModeCount( mAdapterIndex, formats[i] ); j++ ) 
+      for( U32 j = 0; j < mD3D->GetAdapterModeCount( mAdapterIndex, formats[i] ); j++ )
       {
          D3DDISPLAYMODE mode;
          mD3D->EnumAdapterModes( mAdapterIndex, formats[i], j, &mode );
@@ -341,19 +341,19 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
    D3DPRESENT_PARAMETERS d3dpp = setupPresentParams( mode, winHwnd );
    mMultisampleType = d3dpp.MultiSampleType;
    mMultisampleLevel = d3dpp.MultiSampleQuality;
-      
+
 #ifndef TORQUE_SHIPPING
-   bool usePerfHud = GFXPCD3D9Device::mEnableNVPerfHUD || Con::getBoolVariable("$Video::useNVPerfHud", false);   
+   bool usePerfHud = GFXPCD3D9Device::mEnableNVPerfHUD || Con::getBoolVariable("$Video::useNVPerfHud", false);
 #else
    bool usePerfHud = false;
 #endif
 
    HRESULT hres = E_FAIL;
    if ( usePerfHud )
-   {  
+   {
       hres = createDevice(  mD3D->GetAdapterCount() - 1, D3DDEVTYPE_REF, winHwnd, D3DCREATE_MIXED_VERTEXPROCESSING, &d3dpp);
    }
-   else 
+   else
    {
       // Vertex processing was changed from MIXED to HARDWARE because of the switch to a pure D3D device.
 
@@ -387,7 +387,7 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
       //
       // The down side is we supposedly loose some performance, but so far i've not
       // seen a measurable impact.
-      // 
+      //
       deviceFlags |= D3DCREATE_FPU_PRESERVE;
 
       // Try to do pure, unless we're doing debug (and thus doing more paranoid checking).
@@ -406,17 +406,17 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
          // try mixed mode
          deviceFlags &= (~D3DCREATE_HARDWARE_VERTEXPROCESSING);
          deviceFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
-         hres = createDevice( mAdapterIndex, D3DDEVTYPE_HAL, 
-            winHwnd, deviceFlags, 
+         hres = createDevice( mAdapterIndex, D3DDEVTYPE_HAL,
+            winHwnd, deviceFlags,
             &d3dpp);
 
-         // try software 
+         // try software
          if (FAILED(hres) && hres != D3DERR_OUTOFVIDEOMEMORY)
          {
             Con::errorf("   Failed to create mixed mode device, trying software device");
             deviceFlags &= (~D3DCREATE_MIXED_VERTEXPROCESSING);
             deviceFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-            hres = createDevice( mAdapterIndex, D3DDEVTYPE_HAL, 
+            hres = createDevice( mAdapterIndex, D3DDEVTYPE_HAL,
                winHwnd, deviceFlags,
                &d3dpp);
 
@@ -448,16 +448,16 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
    // Check up on things
    Con::printf("   Cur. D3DDevice ref count=%d", mD3DDevice->AddRef() - 1);
    mD3DDevice->Release();
-   
+
    mTextureManager = new GFXD3D9TextureManager( mD3DDevice, mAdapterIndex );
 
    // Now reacquire all the resources we trashed earlier
    reacquireDefaultPoolResources();
-      
+
    // Setup default states
    initStates();
 
-   //-------- Output init info ---------   
+   //-------- Output init info ---------
    D3DCAPS9 caps;
    mD3DDevice->GetDeviceCaps( &caps );
 
@@ -492,27 +492,27 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
    else if ( mPixVersion > 0.0f )
       mNumSamplers = 4;
    else
-      mNumSamplers = caps.MaxSimultaneousTextures;      
+      mNumSamplers = caps.MaxSimultaneousTextures;
 
    // This shouldn't happen until SM5 or some other
    // radical change in GPU hardware occurs.
-   AssertFatal( mNumSamplers <= TEXTURE_STAGE_COUNT, 
+   AssertFatal( mNumSamplers <= TEXTURE_STAGE_COUNT,
       "GFXPCD3D9Device::init - Sampler count greater than TEXTURE_STAGE_COUNT!" );
-            
+
    Con::printf( "   Maximum number of simultaneous samplers: %d", mNumSamplers );
 
    // detect max number of simultaneous render targets
    mNumRenderTargets = caps.NumSimultaneousRTs;
    Con::printf( "   Number of simultaneous render targets: %d", mNumRenderTargets );
-   
+
    // detect occlusion query support
    if (SUCCEEDED(mD3DDevice->CreateQuery( D3DQUERYTYPE_OCCLUSION, NULL )))
 	   mOcclusionQuerySupported = true;
-      
-   Con::printf( "   Hardware occlusion query detected: %s", mOcclusionQuerySupported ? "Yes" : "No" );      
+
+   Con::printf( "   Hardware occlusion query detected: %s", mOcclusionQuerySupported ? "Yes" : "No" );
 
    Con::printf( "   Using Direct3D9Ex: %s", isD3D9Ex() ? "Yes" : "No" );
-   
+
    mCardProfiler = new GFXD3D9CardProfiler(mAdapterIndex);
    mCardProfiler->init();
 
@@ -524,7 +524,7 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
 
    // Grab the depth-stencil...
    SAFE_RELEASE(mDeviceDepthStencil);
-   D3D9Assert(mD3DDevice->GetDepthStencilSurface(&mDeviceDepthStencil), "GFXD3D9Device::init - couldn't grab reference to device's depth-stencil surface.");  
+   D3D9Assert(mD3DDevice->GetDepthStencilSurface(&mDeviceDepthStencil), "GFXD3D9Device::init - couldn't grab reference to device's depth-stencil surface.");
 
    mInitialized = true;
 
@@ -558,13 +558,13 @@ void GFXPCD3D9Device::setDebugMarker(ColorI color, const char *name)
    WCHAR  eventName[260];
    MultiByteToWideChar( CP_ACP, 0, name, -1, eventName, 260 );
 
-   D3DPERF_SetMarker(D3DCOLOR_ARGB(color.alpha, color.red, color.green, color.blue), 
+   D3DPERF_SetMarker(D3DCOLOR_ARGB(color.alpha, color.red, color.green, color.blue),
       (LPCWSTR)&eventName);
 }
 
 //-----------------------------------------------------------------------------
 
-void GFXPCD3D9Device::setMatrix( GFXMatrixType mtype, const MatrixF &mat ) 
+void GFXPCD3D9Device::setMatrix( GFXMatrixType mtype, const MatrixF &mat )
 {
    mat.transposeTo( mTempMatrix );
 
@@ -573,7 +573,7 @@ void GFXPCD3D9Device::setMatrix( GFXMatrixType mtype, const MatrixF &mat )
 
 //-----------------------------------------------------------------------------
 
-void GFXPCD3D9Device::_setTextureStageState( U32 stage, U32 state, U32 value ) 
+void GFXPCD3D9Device::_setTextureStageState( U32 stage, U32 state, U32 value )
 {
    switch( state )
    {
@@ -590,7 +590,7 @@ void GFXPCD3D9Device::_setTextureStageState( U32 stage, U32 state, U32 value )
 
 //------------------------------------------------------------------------------
 
-void GFXPCD3D9Device::initStates() 
+void GFXPCD3D9Device::initStates()
 {
    //-------------------------------------
    // Auto-generated default states, see regenStates() for details
@@ -958,14 +958,14 @@ void GFXPCD3D9Device::_validateMultisampleParams(D3DFORMAT format, D3DMULTISAMPL
 {
    if (aatype != D3DMULTISAMPLE_NONE)
    {
-      DWORD MaxSampleQualities;      
+      DWORD MaxSampleQualities;
       mD3D->CheckDeviceMultiSampleType(mAdapterIndex, D3DDEVTYPE_HAL, format, FALSE, D3DMULTISAMPLE_NONMASKABLE, &MaxSampleQualities);
       aatype = D3DMULTISAMPLE_NONMASKABLE;
       aalevel = getMin((U32)aalevel, (U32)MaxSampleQualities-1);
    }
 }
 
-bool GFXPCD3D9Device::beginSceneInternal() 
+bool GFXPCD3D9Device::beginSceneInternal()
 {
    // Make sure we have a device
    HRESULT res = mD3DDevice->TestCooperativeLevel();
@@ -1022,7 +1022,7 @@ GFXWindowTarget * GFXPCD3D9Device::allocWindowTarget( PlatformWindow *window )
 {
    AssertFatal(window,"GFXD3D9Device::allocWindowTarget - no window provided!");
 #ifndef TORQUE_OS_XENON
-   AssertFatal(dynamic_cast<Win32Window*>(window), 
+   AssertFatal(dynamic_cast<Win32Window*>(window),
       "GFXD3D9Device::allocWindowTarget - only works with Win32Windows!");
 #endif
 
@@ -1050,7 +1050,7 @@ GFXWindowTarget * GFXPCD3D9Device::allocWindowTarget( PlatformWindow *window )
       // And the second case:
       // Initialized device, create an additional swap chain.
       gdwt->mImplicit = false;
-      gdwt->createAdditionalSwapChain();         
+      gdwt->createAdditionalSwapChain();
    }
 
    gdwt->registerResourceWithDevice(this);
@@ -1155,7 +1155,7 @@ static void sgPCD3D9DeviceHandleCommandLine( S32 argc, const char **argv )
          GFXPCD3D9Device::mEnableNVPerfHUD = true;
          break;
       }
-   }   
+   }
 }
 
 // Register the command line parsing hook
@@ -1164,7 +1164,7 @@ static ProcessRegisterCommandLine sgCommandLine( sgPCD3D9DeviceHandleCommandLine
 extern "C" HRESULT WINAPI D3D_GetBackBufferNoRef(IDirect3DSurface9 **ppSurface)
 {
     HRESULT hr = S_OK;
-  
+
     GFXD3D9Device *dev = static_cast<GFXD3D9Device *>(GFX);
 
     if (!dev)

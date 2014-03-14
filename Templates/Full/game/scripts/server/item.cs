@@ -122,7 +122,7 @@ function ItemData::onPickup(%this, %obj, %user, %amount)
              %count = 1;
        }
     }
-    
+
     %user.incInventory(%this, %count);
 
     // Inform the client what they got.

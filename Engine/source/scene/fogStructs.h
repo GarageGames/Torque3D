@@ -25,7 +25,7 @@
 
 /// The aerial fog settings.
 struct FogData
-{   
+{
    F32 density;
    F32 densityOffset;
    F32 atmosphereHeight;
@@ -43,9 +43,9 @@ struct FogData
 
 /// The water fog settings.
 struct WaterFogData
-{   
+{
    F32 density;
-   F32 densityOffset;   
+   F32 densityOffset;
    F32 wetDepth;
    F32 wetDarkening;
    ColorI color;
@@ -55,7 +55,7 @@ struct WaterFogData
    WaterFogData()
    {
       density = 0.0f;
-      densityOffset = 0.0f;     
+      densityOffset = 0.0f;
       wetDepth = 0.0f;
       wetDarkening = 0.0f;
       color.set( 0.5f, 0.5f, 0.5f, 1.0f );

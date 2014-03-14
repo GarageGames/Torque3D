@@ -129,7 +129,7 @@ private:
 
    /// Bounce the debris - returns true if debris bounces.
    bool bounce( const Point3F &nextPos, F32 dt );
-   
+
    /// Compute state of debris as if it hasn't collided with anything.
    void computeNewState( Point3F &newPos, Point3F &newVel, F32 dt );
 

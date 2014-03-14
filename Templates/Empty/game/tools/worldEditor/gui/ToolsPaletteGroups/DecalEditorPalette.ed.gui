@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(EDecalEditorSelectDecalBtn) {
       canSaveDynamicFields = "0";
       internalName = "SelectDecalMode";
@@ -33,7 +33,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(EDecalEditorMoveDecalBtn) {
       canSaveDynamicFields = "0";
       internalName = "MoveDecalMode";

@@ -43,12 +43,12 @@ MODULE_BEGIN( BasicSceneObjectLightingPlugin )
    {
       BasicSceneObjectPluginFactory::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       BasicSceneObjectPluginFactory::deleteSingleton();
    }
-   
+
 MODULE_END;
 
 
@@ -67,7 +67,7 @@ BasicSceneObjectLightingPlugin::BasicSceneObjectLightingPlugin(SceneObject* pare
 BasicSceneObjectLightingPlugin::~BasicSceneObjectLightingPlugin()
 {
    SAFE_DELETE( mShadow );
-   
+
    // Delete us from the list.
    smPluginInstances.remove( this );
 }
@@ -86,7 +86,7 @@ void BasicSceneObjectLightingPlugin::cleanupPluginInstances()
       delete plug;
       i--;
    }
-   
+
    smPluginInstances.clear();
 }
 
@@ -97,8 +97,8 @@ void BasicSceneObjectLightingPlugin::resetAll()
 }
 
 const F32 BasicSceneObjectLightingPlugin::getScore() const
-{ 
-   return mShadow ? mShadow->getScore() : 0.0f; 
+{
+   return mShadow ? mShadow->getScore() : 0.0f;
 }
 
 void BasicSceneObjectLightingPlugin::updateShadow( SceneRenderState *state )
@@ -113,16 +113,16 @@ void BasicSceneObjectLightingPlugin::renderShadow( SceneRenderState *state )
 {
    // hack until new scenegraph in place
    GFXTransformSaver ts;
-   
+
    TSRenderState rstate;
    rstate.setSceneState(state);
 
    F32 camDist = (state->getCameraPosition() - mParentObject->getRenderPosition()).len();
-   
+
    // Make sure the shadow wants to be rendered
    if( mShadow->shouldRender( state ) )
    {
-      // Render! (and note the time)      
+      // Render! (and note the time)
       mShadow->render( camDist, rstate );
    }
 }
@@ -153,9 +153,9 @@ void BasicSceneObjectPluginFactory::_setEnabled()
 
    // Enabled if using basic lighting.
    LightManager *lm = LightManager::getActiveLM();
-   if ( lm && dStricmp( lm->getName(), "Basic Lighting" ) == 0 )   
+   if ( lm && dStricmp( lm->getName(), "Basic Lighting" ) == 0 )
       enable = true;
-   
+
    // Disabled if all shadows are explictly disabled.
    if ( ShadowMapPass::smDisableShadows )
       enable = false;
@@ -163,25 +163,25 @@ void BasicSceneObjectPluginFactory::_setEnabled()
    // Already at the desired state.
    if ( enable == mEnabled )
       return;
-   
+
    if ( enable )
    {
       SceneObject::smSceneObjectAdd.notify(this, &BasicSceneObjectPluginFactory::addLightPlugin);
       SceneObject::smSceneObjectRemove.notify(this, &BasicSceneObjectPluginFactory::removeLightPlugin);
-      
+
       if( gDecalManager )
          gDecalManager->getClearDataSignal().notify( this, &BasicSceneObjectPluginFactory::_onDecalManagerClear );
-         
+
       addToExistingObjects();
-   } 
-   else 
+   }
+   else
    {
       SceneObject::smSceneObjectAdd.remove(this, &BasicSceneObjectPluginFactory::addLightPlugin);
       SceneObject::smSceneObjectRemove.remove(this, &BasicSceneObjectPluginFactory::removeLightPlugin);
-      
+
       if( gDecalManager )
          gDecalManager->getClearDataSignal().remove( this, &BasicSceneObjectPluginFactory::_onDecalManagerClear );
-         
+
       BasicSceneObjectLightingPlugin::cleanupPluginInstances();
    }
 
@@ -222,9 +222,9 @@ void BasicSceneObjectPluginFactory::addLightPlugin(SceneObject* obj)
 // plugin to existing scene objects
 void BasicSceneObjectPluginFactory::addToExistingObjects()
 {
-   SimpleQueryList sql;  
+   SimpleQueryList sql;
    gClientContainer.findObjects( shadowObjectTypeMask, SimpleQueryList::insertionCallback, &sql);
    for (SceneObject** i = sql.mList.begin(); i != sql.mList.end(); i++)
       addLightPlugin(*i);
 }
-                                                                                                         
+

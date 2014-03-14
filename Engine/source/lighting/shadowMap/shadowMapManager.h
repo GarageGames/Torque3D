@@ -60,7 +60,7 @@ public:
 
    /// Sets the current shadowmap (used in setLightInfo/setTextureStage calls)
    void setLightShadowMap( LightShadowMap *lm ) { mCurrentShadowMap = lm; }
-   
+
    /// Looks up the shadow map for the light then sets it.
    void setLightShadowMapForLight( LightInfo *light );
 
@@ -96,7 +96,7 @@ protected:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "ShadowMapManager"; }   
+   static const char* getSingletonName() { return "ShadowMapManager"; }
 };
 
 

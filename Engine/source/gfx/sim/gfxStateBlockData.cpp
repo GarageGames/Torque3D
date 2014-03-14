@@ -29,7 +29,7 @@
 
 IMPLEMENT_CONOBJECT( GFXStateBlockData );
 
-ConsoleDocClass(  GFXStateBlockData, 
+ConsoleDocClass(  GFXStateBlockData,
                   "@brief A state block description for rendering.\n\n"
                   "This object is used with ShaderData in CustomMaterial and PostEffect to define the "
                   "render state.\n"
@@ -49,7 +49,7 @@ ConsoleDocClass(  GFXStateBlockData,
                   "   samplerStates[2] = new GFXSamplerStateData( : SamplerClampLinear )\n"
                   "   {\n"
                   "      addressModeU = GFXAddressWrap;\n"
-                  "   };\n"                  
+                  "   };\n"
                   "};\n"
                   "@endtsexample\n"
                   "@note The 'xxxxDefined' fields are used to know what groups of fields are modified "
@@ -80,7 +80,7 @@ void GFXStateBlockData::initPersistFields()
          "The destination blend state.  The default is GFXBlendZero." );
 
       addField("blendOp", TypeGFXBlendOp, Offset(mState.blendOp, GFXStateBlockData),
-         "The arithmetic operation applied to alpha blending.  The default is GFXBlendOpAdd." );   
+         "The arithmetic operation applied to alpha blending.  The default is GFXBlendOpAdd." );
 
    endGroup( "Alpha Blending" );
 
@@ -100,7 +100,7 @@ void GFXStateBlockData::initPersistFields()
          "The destination blend state.  The default is GFXBlendZero." );
 
       addField( "separateAlphaBlendOp", TypeGFXBlendOp, Offset(mState.separateAlphaBlendOp, GFXStateBlockData),
-         "The arithmetic operation applied to separate alpha blending.  The default is GFXBlendOpAdd." );   
+         "The arithmetic operation applied to separate alpha blending.  The default is GFXBlendOpAdd." );
 
    endGroup( "Separate Alpha Blending" );
 
@@ -147,7 +147,7 @@ void GFXStateBlockData::initPersistFields()
       addField("cullDefined", TypeBool, Offset(mState.cullDefined, GFXStateBlockData),
          "Set to true if the culling state is not all defaults." );
 
-      addField("cullMode", TypeGFXCullMode, Offset(mState.cullMode, GFXStateBlockData),        
+      addField("cullMode", TypeGFXCullMode, Offset(mState.cullMode, GFXStateBlockData),
          "Defines how back facing triangles are culled if at all.  The default is GFXCullCCW." );
 
    endGroup( "Culling" );
@@ -186,13 +186,13 @@ void GFXStateBlockData::initPersistFields()
 
       addField( "stencilFailOp", TypeGFXStencilOp, Offset(mState.stencilFailOp, GFXStateBlockData),
          "The stencil operation to perform if the stencil test fails.  The default is GFXStencilOpKeep." );
-      
+
       addField( "stencilZFailOp", TypeGFXStencilOp, Offset(mState.stencilZFailOp, GFXStateBlockData),
          "The stencil operation to perform if the stencil test passes and the depth test fails.  The default is GFXStencilOpKeep." );
-      
-      addField( "stencilPassOp", TypeGFXStencilOp, Offset(mState.stencilPassOp, GFXStateBlockData), 
+
+      addField( "stencilPassOp", TypeGFXStencilOp, Offset(mState.stencilPassOp, GFXStateBlockData),
          "The stencil operation to perform if both the stencil and the depth tests pass.  The default is GFXStencilOpKeep." );
-      
+
       addField( "stencilFunc", TypeGFXCmpFunc, Offset(mState.stencilFunc, GFXStateBlockData),
          "The comparison function to test the reference value to a stencil buffer entry.  The default is GFXCmpNever." );
 
@@ -244,7 +244,7 @@ bool GFXStateBlockData::onAdd()
       return false;
 
    for (U32 i = 0; i < TEXTURE_STAGE_COUNT; i++)
-   {  
+   {
       if (mSamplerStates[i])
          mSamplerStates[i]->setSamplerState(mState.samplers[i]);
    }
@@ -254,7 +254,7 @@ bool GFXStateBlockData::onAdd()
 
 IMPLEMENT_CONOBJECT( GFXSamplerStateData );
 
-ConsoleDocClass(  GFXSamplerStateData, 
+ConsoleDocClass(  GFXSamplerStateData,
                   "@brief A sampler state used by GFXStateBlockData.\n\n"
                   "The samplers define how a texture will be sampled when used from the shader "
                   "or fixed function device\n"

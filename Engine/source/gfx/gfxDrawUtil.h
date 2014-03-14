@@ -92,7 +92,7 @@ public:
 
    //-----------------------------------------------------------------------------
    // Draw Bitmaps
-   //-----------------------------------------------------------------------------  
+   //-----------------------------------------------------------------------------
    void drawBitmap( GFXTextureObject*texture, const Point2F &in_rAt, const GFXBitmapFlip in_flip = GFXBitmapFlip_None, const GFXTextureFilterType filter = GFXTextureFilterPoint , bool in_wrap = true );
    void drawBitmapSR( GFXTextureObject*texture, const Point2F &in_rAt, const RectF &srcRect, const GFXBitmapFlip in_flip = GFXBitmapFlip_None, const GFXTextureFilterType filter = GFXTextureFilterPoint , bool in_wrap = true );
    void drawBitmapStretch( GFXTextureObject*texture, const RectF &dstRect, const GFXBitmapFlip in_flip = GFXBitmapFlip_None, const GFXTextureFilterType filter = GFXTextureFilterPoint , bool in_wrap = true );
@@ -108,15 +108,15 @@ public:
    //-----------------------------------------------------------------------------
    void drawTriangle( const GFXStateBlockDesc &desc, const Point3F &p0, const Point3F &p1, const Point3F &p2, const ColorI &color, const MatrixF *xfm = NULL );
    void drawPolygon( const GFXStateBlockDesc& desc, const Point3F* points, U32 numPoints, const ColorI& color, const MatrixF* xfm = NULL );
-   void drawCube( const GFXStateBlockDesc &desc, const Point3F &size, const Point3F &pos, const ColorI &color, const MatrixF *xfm = NULL );   
-   void drawCube( const GFXStateBlockDesc &desc, const Box3F &box, const ColorI &color, const MatrixF *xfm = NULL );   
-   void drawObjectBox( const GFXStateBlockDesc &desc, const Point3F &size, const Point3F &pos, const MatrixF &objMat, const ColorI &color );   
-   void drawSphere( const GFXStateBlockDesc &desc, F32 radius, const Point3F &pos, const ColorI &color, bool drawTop = true, bool drawBottom = true, const MatrixF *xfm = NULL );      
+   void drawCube( const GFXStateBlockDesc &desc, const Point3F &size, const Point3F &pos, const ColorI &color, const MatrixF *xfm = NULL );
+   void drawCube( const GFXStateBlockDesc &desc, const Box3F &box, const ColorI &color, const MatrixF *xfm = NULL );
+   void drawObjectBox( const GFXStateBlockDesc &desc, const Point3F &size, const Point3F &pos, const MatrixF &objMat, const ColorI &color );
+   void drawSphere( const GFXStateBlockDesc &desc, F32 radius, const Point3F &pos, const ColorI &color, bool drawTop = true, bool drawBottom = true, const MatrixF *xfm = NULL );
    void drawCapsule( const GFXStateBlockDesc &desc, const Point3F &center, F32 radius, F32 height, const ColorI &color, const MatrixF *xfm = NULL );
-   void drawCone( const GFXStateBlockDesc &desc, const Point3F &basePnt, const Point3F &tipPnt, F32 baseRadius, const ColorI &color );      
-   void drawCylinder( const GFXStateBlockDesc &desc, const Point3F &basePnt, const Point3F &tipPnt, F32 baseRadius, const ColorI &color );      
+   void drawCone( const GFXStateBlockDesc &desc, const Point3F &basePnt, const Point3F &tipPnt, F32 baseRadius, const ColorI &color );
+   void drawCylinder( const GFXStateBlockDesc &desc, const Point3F &basePnt, const Point3F &tipPnt, F32 baseRadius, const ColorI &color );
    void drawArrow( const GFXStateBlockDesc &desc, const Point3F &start, const Point3F &end, const ColorI &color );
-   void drawFrustum( const Frustum& f, const ColorI &color );   
+   void drawFrustum( const Frustum& f, const ColorI &color );
 
    /// Draw a solid or wireframe (depending on fill mode of @a desc) polyhedron with the given color.
    ///
@@ -128,7 +128,7 @@ public:
 
    /// Draws a solid XY plane centered on the point with the specified dimensions.
    void drawSolidPlane( const GFXStateBlockDesc &desc, const Point3F &pos, const Point2F &size, const ColorI &color );
-   
+
    enum Plane
    {
       PlaneXY,
@@ -142,7 +142,7 @@ public:
    /// Draws axis lines representing the passed matrix.
    /// If scale is NULL axes will be drawn the length they exist within the MatrixF.
    /// If colors is NULL the default colors are RED, GREEEN, BLUE ( x, y, z ).
-   void drawTransform( const GFXStateBlockDesc &desc, const MatrixF &mat, const Point3F *scale = NULL, const ColorI colors[3] = NULL );  
+   void drawTransform( const GFXStateBlockDesc &desc, const MatrixF &mat, const Point3F *scale = NULL, const ColorI colors[3] = NULL );
 
 protected:
 
@@ -174,7 +174,7 @@ protected:
    GFXStateBlockRef mBitmapStretchWrapSB;
    GFXStateBlockRef mBitmapStretchWrapLinearSB;
    GFXStateBlockRef mRectFillSB;
-   
+
    FontRenderBatcher* mFontRenderBatcher;
 };
 

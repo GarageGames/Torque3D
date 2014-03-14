@@ -39,7 +39,7 @@
 #define SUB(dest,v1,v2) \
           dest[0]=v1[0]-v2[0]; \
           dest[1]=v1[1]-v2[1]; \
-          dest[2]=v1[2]-v2[2]; 
+          dest[2]=v1[2]-v2[2];
 
 bool intersect_triangle(Point3F orig, Point3F dir,
                    Point3F vert0, Point3F vert1, Point3F vert2,
@@ -178,7 +178,7 @@ bool castRayTriangle(Point3F orig, Point3F dir,
       if (bary.y > 0.0 || (bary.x + bary.y) < det)
          return false;
    }
-   else 
+   else
       return false;  // ray is parallel to the plane of the triangle.
 
    const F32 inv_det = 1.0 / det;
@@ -186,7 +186,7 @@ bool castRayTriangle(Point3F orig, Point3F dir,
    // calculate t, ray intersects triangle
    t = mDot(edge2, qvec) * inv_det;
    bary *= inv_det;
-   
+
    //AssertFatal((t >= 0.f && t <=1.f), "AtlasGeomTracer::castRayTriangle - invalid t!");
 
    // Hack, check the math here!
@@ -248,7 +248,7 @@ bool castRayTriangle(const Point3D &orig, const Point3D &dir,
       if (bary.y > 0.0 || (bary.x + bary.y) < det)
          return false;
    }
-   else 
+   else
       return false;  // ray is parallel to the plane of the triangle.
 
    const F32 inv_det = 1.0 / det;
@@ -256,7 +256,7 @@ bool castRayTriangle(const Point3D &orig, const Point3D &dir,
    // calculate t, ray intersects triangle
    t = mDot(edge2, qvec) * inv_det;
    bary *= inv_det;
-   
+
    //AssertFatal((t >= 0.f && t <=1.f), "AtlasGeomTracer::castRayTriangle - invalid t!");
 
    // Hack, check the math here!

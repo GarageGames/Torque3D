@@ -85,7 +85,7 @@ public:
 class ScriptGroup : public SimGroup
 {
    typedef SimGroup Parent;
-   
+
 public:
    ScriptGroup();
    bool onAdd();

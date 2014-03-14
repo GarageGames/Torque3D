@@ -26,7 +26,7 @@
 
 GFXDeviceStatistics::GFXDeviceStatistics()
 {
-   clear();   
+   clear();
 }
 
 void GFXDeviceStatistics::setPrefix(const String& prefix)
@@ -46,7 +46,7 @@ void GFXDeviceStatistics::clear()
    mRenderTargetChanges = 0;
 }
 
-/// Copy from source (should just be a memcpy, but that may change later) used in 
+/// Copy from source (should just be a memcpy, but that may change later) used in
 /// conjunction with end to get a subset of statistics.  For example, statistics
 /// for a particular render bin.
 void GFXDeviceStatistics::start(GFXDeviceStatistics * source)
@@ -62,7 +62,7 @@ void GFXDeviceStatistics::end(GFXDeviceStatistics * source)
 {
    mPolyCount = source->mPolyCount - mPolyCount;
    mDrawCalls = source->mDrawCalls - mDrawCalls;
-   mRenderTargetChanges = source->mRenderTargetChanges - mRenderTargetChanges;   
+   mRenderTargetChanges = source->mRenderTargetChanges - mRenderTargetChanges;
 }
 
 /// Exports the stats to the console

@@ -93,14 +93,14 @@ EndImplementEnumType;
 void GuiColorPickerCtrl::initPersistFields()
 {
    addGroup("ColorPicker");
-   
+
       addField("baseColor", TypeColorF, Offset(mBaseColor, GuiColorPickerCtrl));
       addField("pickColor", TypeColorF, Offset(mPickColor, GuiColorPickerCtrl));
-      addField("selectorGap", TypeS32,  Offset(mSelectorGap, GuiColorPickerCtrl)); 
+      addField("selectorGap", TypeS32,  Offset(mSelectorGap, GuiColorPickerCtrl));
       addField("displayMode", TYPEID< PickMode >(), Offset(mDisplayMode, GuiColorPickerCtrl) );
       addField("actionOnMove", TypeBool,Offset(mActionOnMove, GuiColorPickerCtrl));
       addField("showReticle", TypeBool, Offset(mShowReticle, GuiColorPickerCtrl));
-   
+
    endGroup("ColorPicker");
 
    Parent::initPersistFields();
@@ -114,7 +114,7 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
 
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y;
-   
+
    //A couple of checks to determine if color blend
    if(c1 == colorWhite && c3 == colorAlpha && c4 == colorBlack)
    {
@@ -148,7 +148,7 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
 		PrimBuild::vertex2i( l, t );
 		PrimBuild::end();
 
-		//Black 
+		//Black
 		PrimBuild::begin( GFXTriangleFan, 4 );
 		PrimBuild::color( c3 );
 		PrimBuild::vertex2i( r, t );
@@ -187,15 +187,15 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
 {
 
    GFX->setStateBlock(mStateBlock);
-   
+
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x + 4;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y + 4;
-   
+
    // Calculate increment value
    S32 x_inc = int(mFloor((r - l) / F32(numColors-1)));
    S32 y_inc = int(mFloor((b - t) / F32(numColors-1)));
 
-   for( U16 i = 0;i < numColors - 1; i++ ) 
+   for( U16 i = 0;i < numColors - 1; i++ )
    {
       // This is not efficent, but then again it doesn't really need to be. -pw
       PrimBuild::begin( GFXTriangleFan, 4 );
@@ -233,7 +233,7 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
 void GuiColorPickerCtrl::drawSelector(RectI &bounds, Point2I &selectorPos, SelectorMode mode)
 {
 	if( !mShowReticle )
-		return; 
+		return;
 
 	U16 sMax = mSelectorGap*2;
 	switch (mode)
@@ -244,16 +244,16 @@ void GuiColorPickerCtrl::drawSelector(RectI &bounds, Point2I &selectorPos, Selec
 			if (selectorPos.y != bounds.point.y+1)
 				GFX->getDrawUtil()->drawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, colorWhiteBlend);
 			// Down -> Pos
-			if (selectorPos.y != bounds.point.y+bounds.extent.y) 
+			if (selectorPos.y != bounds.point.y+bounds.extent.y)
 				GFX->getDrawUtil()->drawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, colorWhiteBlend);
 		break;
 		case sHorizontal:
 			// Now draw the horizontal selector
 			// Left -> Pos
-			if (selectorPos.x != bounds.point.x) 
+			if (selectorPos.x != bounds.point.x)
             GFX->getDrawUtil()->drawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, colorWhiteBlend);
 			// Right -> Pos
-			if (selectorPos.x != bounds.point.x) 
+			if (selectorPos.x != bounds.point.x)
             GFX->getDrawUtil()->drawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, colorWhiteBlend);
 		break;
 	}
@@ -268,10 +268,10 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    pickerBounds.point.y = bounds.point.y+1;
    pickerBounds.extent.x = bounds.extent.x-1;
    pickerBounds.extent.y = bounds.extent.y-1;
-   
+
    if (mProfile->mBorder)
       GFX->getDrawUtil()->drawRect(bounds, mProfile->mBorderColor);
-      
+
    Point2I selectorPos = Point2I(bounds.point.x+mSelectorPos.x+1, bounds.point.y+mSelectorPos.y+1);
 
    // Draw color box differently depending on mode
@@ -312,11 +312,11 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    break;
    case pVertAlphaRange:
       drawBlendBox( pickerBounds, colorBlack, colorBlack, colorWhite, colorWhite );
-      drawSelector( pickerBounds, selectorPos, sHorizontal ); 
+      drawSelector( pickerBounds, selectorPos, sHorizontal );
    break;
    case pBlendColorRange:
       drawBlendBox( pickerBounds, colorWhite, mBaseColor, colorAlpha, colorBlack );
-      drawSelector( pickerBounds, selectorPos, sHorizontal );      
+      drawSelector( pickerBounds, selectorPos, sHorizontal );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
    case pDropperBackground:
@@ -340,10 +340,10 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
       mStateBlock = GFX->createStateBlock( desc );
    }
 
-   RectI boundsRect(offset, getExtent()); 
+   RectI boundsRect(offset, getExtent());
    renderColorBox(boundsRect);
 
-   if (mPositionChanged) 
+   if (mPositionChanged)
    {
       mPositionChanged = false;
       Point2I extent = getRoot()->getExtent();
@@ -357,19 +357,19 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          if(GFX->getAdapterType() != OpenGL)
             buf_y = resolution.y - buf_y;
 
-         GFXTexHandle bb( resolution.x, 
-                          resolution.y, 
+         GFXTexHandle bb( resolution.x,
+                          resolution.y,
                           GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
-         
+
          Point2I tmpPt( buf_x, buf_y );
 
          GFXTarget *targ = GFX->getActiveRenderTarget();
          targ->resolveTo( bb );
-         
+
          GBitmap bmp( bb.getWidth(), bb.getHeight() );
 
          bb.copyToBmp( &bmp );
-         
+
          //bmp.writePNGDebug( "foo.png" );
 
          ColorI tmp;
@@ -378,12 +378,12 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          mPickColor = (ColorF)tmp;
 
          // Now do onAction() if we are allowed
-         if (mActionOnMove) 
+         if (mActionOnMove)
             onAction();
       }
-      
+
    }
-   
+
    //render the children
    renderChildControls( offset, updateRect);
 }
@@ -393,7 +393,7 @@ void GuiColorPickerCtrl::setSelectorPos(const Point2I &pos)
 {
    Point2I extent = getExtent();
    RectI rect;
-   if (mDisplayMode != pDropperBackground) 
+   if (mDisplayMode != pDropperBackground)
    {
       extent.x -= 3;
       extent.y -= 2;
@@ -403,8 +403,8 @@ void GuiColorPickerCtrl::setSelectorPos(const Point2I &pos)
    {
       rect = RectI(Point2I(0,0), extent);
    }
-   
-   if (rect.pointInRect(pos)) 
+
+   if (rect.pointInRect(pos))
    {
       mSelectorPos = pos;
       mPositionChanged = true;
@@ -438,22 +438,22 @@ void GuiColorPickerCtrl::onMouseDown(const GuiEvent &event)
 {
    if (!mActive)
       return;
-   
+
    if (mDisplayMode == pDropperBackground)
       return;
 
    mouseLock(this);
-   
+
    if (mProfile->mCanKeyFocus)
       setFirstResponder();
-	
-	if (mActive && (mDisplayMode != pDropperBackground)) 
+
+	if (mActive && (mDisplayMode != pDropperBackground))
       onAction();
 
    // Update the picker cross position
    if (mDisplayMode != pPallet)
-      setSelectorPos(globalToLocalCoord(event.mousePoint)); 
-   
+      setSelectorPos(globalToLocalCoord(event.mousePoint));
+
    mMouseDown = true;
 }
 
@@ -497,15 +497,15 @@ void GuiColorPickerCtrl::onMouseLeave(const GuiEvent &)
 void GuiColorPickerCtrl::onMouseUp(const GuiEvent &)
 {
    //if we released the mouse within this control, perform the action
-	if (mActive && mMouseDown && (mDisplayMode != pDropperBackground)) 
+	if (mActive && mMouseDown && (mDisplayMode != pDropperBackground))
       mMouseDown = false;
 
-   if (mActive && (mDisplayMode == pDropperBackground)) 
+   if (mActive && (mDisplayMode == pDropperBackground))
    {
       // In a dropper, the alt command executes the mouse up action (to signal stopping)
       execAltConsoleCallback();
    }
-   
+
    mouseUnlock();
 }
 
@@ -515,10 +515,10 @@ const char *GuiColorPickerCtrl::getScriptValue()
    static char temp[256];
    ColorF color = getValue();
    dSprintf(temp,256,"%f %f %f %f",color.red, color.green, color.blue, color.alpha);
-   return temp; 
+   return temp;
 }
 
-//--------------------------------------------------------------------------    
+//--------------------------------------------------------------------------
 void GuiColorPickerCtrl::setScriptValue(const char *value)
 {
    ColorF newValue;
@@ -531,7 +531,7 @@ ConsoleMethod(GuiColorPickerCtrl, getSelectorPos, const char*, 2, 2, "Gets the c
    char *temp = Con::getReturnBuffer(256);
    Point2I pos;
    pos = object->getSelectorPos();
-   dSprintf(temp,256,"%d %d",pos.x, pos.y); 
+   dSprintf(temp,256,"%d %d",pos.x, pos.y);
    return temp;
 }
 

@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "gfx/D3D9/gfxD3D9VertexBuffer.h"
 
-GFXD3D9VertexBuffer::~GFXD3D9VertexBuffer() 
+GFXD3D9VertexBuffer::~GFXD3D9VertexBuffer()
 {
 #ifdef TORQUE_DEBUG
    SAFE_DELETE( name );
@@ -80,7 +80,7 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
       AssertFatal(mVolatileBuffer->lockedVertexStart == 0 && mVolatileBuffer->lockedVertexEnd == 0, "Got more than one lock on the volatile pool.");
 
       // We created the pool when we requested this volatile buffer, so assume it exists...
-      if( mVolatileBuffer->mNumVerts + vertexEnd > MAX_DYNAMIC_VERTS ) 
+      if( mVolatileBuffer->mNumVerts + vertexEnd > MAX_DYNAMIC_VERTS )
       {
 #ifdef TORQUE_OS_XENON
          AssertFatal( false, "This should never, ever happen. findVBPool should have returned NULL" );
@@ -90,7 +90,7 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
          mVolatileStart = vertexStart  = 0;
          vertexEnd      = vertexEnd;
       }
-      else 
+      else
       {
          flags |= D3DLOCK_NOOVERWRITE;
          mVolatileStart = vertexStart  = mVolatileBuffer->mNumVerts;
@@ -118,7 +118,7 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
       d->setVertexBuffer( NULL );
       d->mD3DDevice->SetStreamSource( 0, NULL, 0, 0 );
    }
-   
+
    // As of October 2006 XDK, range locking is no longer supported. Lock the whole buffer
    // and then manually offset the pointer to simulate the subrange. -patw
    D3D9Assert( vb->Lock( 0, 0, vertexPtr, flags),
@@ -134,15 +134,15 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
       "Unable to lock vertex buffer.");
 
    #ifdef TORQUE_DEBUG
-   
+
       // Allocate a debug buffer large enough for the lock
       // plus space for over and under run guard strings.
       const U32 guardSize = sizeof( _VBGuardString );
       mDebugGuardBuffer = new U8[sizeToLock+(guardSize*2)];
 
       // Setup the guard strings.
-      dMemcpy( mDebugGuardBuffer, _VBGuardString, guardSize ); 
-      dMemcpy( mDebugGuardBuffer + sizeToLock + guardSize, _VBGuardString, guardSize ); 
+      dMemcpy( mDebugGuardBuffer, _VBGuardString, guardSize );
+      dMemcpy( mDebugGuardBuffer + sizeToLock + guardSize, _VBGuardString, guardSize );
 
       // Store the real lock pointer and return our debug pointer.
       mLockedBuffer = *vertexPtr;
@@ -158,7 +158,7 @@ void GFXD3D9VertexBuffer::unlock()
    PROFILE_SCOPE(GFXD3D9VertexBuffer_unlock);
 
    #ifdef TORQUE_DEBUG
-   
+
       if ( mDebugGuardBuffer )
       {
          const U32 guardSize = sizeof( _VBGuardString );
@@ -169,7 +169,7 @@ void GFXD3D9VertexBuffer::unlock()
             "GFXD3D9VertexBuffer::unlock - Caught lock memory underrun!" );
          AssertFatal( dMemcmp( mDebugGuardBuffer + sizeLocked + guardSize, _VBGuardString, guardSize ) == 0,
             "GFXD3D9VertexBuffer::unlock - Caught lock memory overrun!" );
-                        
+
          // Copy the debug content down to the real VB.
          dMemcpy( mLockedBuffer, mDebugGuardBuffer + guardSize, sizeLocked );
 
@@ -218,9 +218,9 @@ void GFXD3D9VertexBuffer::resurrect()
 #ifdef TORQUE_OS_XENON
          D3DUSAGE_WRITEONLY,
 #else
-         D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 
+         D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
 #endif
-         0, 
+         0,
          D3DPOOL_DEFAULT,
          &vb,
          NULL ),

@@ -32,16 +32,16 @@ static inline GLenum minificationFilter(U32 minFilter, U32 mipFilter, U32 mipLev
       return GFXGLTextureFilter[minFilter];
 
    // the compiler should interpret this as array lookups
-   switch( minFilter ) 
+   switch( minFilter )
    {
       case GFXTextureFilterLinear:
-         switch( mipFilter ) 
+         switch( mipFilter )
          {
          case GFXTextureFilterLinear:
             return GL_LINEAR_MIPMAP_LINEAR;
          case GFXTextureFilterPoint:
             return GL_LINEAR_MIPMAP_NEAREST;
-         default: 
+         default:
             return GL_LINEAR;
          }
       default:
@@ -57,7 +57,7 @@ static inline GLenum minificationFilter(U32 minFilter, U32 mipFilter, U32 mipLev
 }
 
 /// Simple class which preserves a given GL integer.
-/// This class determines the integer to preserve on construction and restores 
+/// This class determines the integer to preserve on construction and restores
 /// it on destruction.
 class GFXGLPreserveInteger
 {
@@ -75,7 +75,7 @@ public:
       AssertFatal(mBinder, "GFXGLPreserveInteger - Need a valid binder function");
       glGetIntegerv(getBinding, &mPreserved);
    }
-   
+
    /// Restores the integer.
    ~GFXGLPreserveInteger()
    {

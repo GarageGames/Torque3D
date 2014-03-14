@@ -52,11 +52,11 @@ public:
    virtual ~GFXD3D9OcclusionQuery();
 
    virtual bool begin();
-   virtual void end();   
+   virtual void end();
    virtual OcclusionQueryStatus getStatus( bool block, U32 *data = NULL );
 
    // GFXResource
-   virtual void zombify();   
+   virtual void zombify();
    virtual void resurrect();
    virtual const String describeSelf() const;
 };

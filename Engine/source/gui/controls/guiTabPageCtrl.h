@@ -37,11 +37,11 @@ class GuiTabPageCtrl : public GuiTextCtrl
 
    public:
       GuiTabPageCtrl();
-      
+
       DECLARE_CONOBJECT(GuiTabPageCtrl);
       DECLARE_CATEGORY( "Gui Containers" );
       DECLARE_DESCRIPTION( "A page in a GuiTabBookCtrl." );
-      
+
       static void initPersistFields();
 
       bool onWake();    ///< The page awakens (becomes active)!

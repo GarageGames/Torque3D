@@ -61,10 +61,10 @@ struct EngineTypeTraits< String > : public _EnginePrimitiveTypeTraits< String >
 
    //FIXME: this needs to be sorted out; for now, we store default value literals in ASCII
    typedef const char* DefaultArgumentValueStoreType;
-   
+
    static const UTF16* ReturnValue( const String& str )
    {
-      static String sTemp;      
+      static String sTemp;
       sTemp = str;
       return sTemp.utf16();
    }

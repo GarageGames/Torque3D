@@ -47,7 +47,7 @@ IMPLEMENT_CO_NETOBJECT_V1(Sun);
 ConsoleDocClass( Sun,
    "@brief A global light affecting your entire scene and optionally renders a corona effect.\n\n"
 
-   "Sun is both the directional and ambient light for your entire scene.\n\n"   
+   "Sun is both the directional and ambient light for your entire scene.\n\n"
 
    "@ingroup Atmosphere"
 );
@@ -109,7 +109,7 @@ bool Sun::onAdd()
    // Register as listener to TimeOfDay update events
    TimeOfDay::getTimeOfDayUpdateSignal().notify( this, &Sun::_updateTimeOfDay );
 
-	// Make this thing have a global bounds so that its 
+	// Make this thing have a global bounds so that its
    // always returned from spatial light queries.
 	setGlobalBounds();
 	resetWorldBox();
@@ -127,7 +127,7 @@ bool Sun::onAdd()
 }
 
 void Sun::onRemove()
-{   
+{
    TimeOfDay::getTimeOfDayUpdateSignal().remove( this, &Sun::_updateTimeOfDay );
 
    removeFromScene();
@@ -138,13 +138,13 @@ void Sun::initPersistFields()
 {
    addGroup( "Orbit" );
 
-      addField( "azimuth", TypeF32, Offset( mSunAzimuth, Sun ), 
+      addField( "azimuth", TypeF32, Offset( mSunAzimuth, Sun ),
          "The horizontal angle of the sun measured clockwise from the positive Y world axis." );
 
       addField( "elevation", TypeF32, Offset( mSunElevation, Sun ),
          "The elevation angle of the sun above or below the horizon." );
 
-   endGroup( "Orbit" );	
+   endGroup( "Orbit" );
 
    // We only add the basic lighting options that all lighting
    // systems would use... the specific lighting system options
@@ -152,23 +152,23 @@ void Sun::initPersistFields()
 
    addGroup( "Lighting" );
 
-      addField( "color", TypeColorF, Offset( mLightColor, Sun ), 
+      addField( "color", TypeColorF, Offset( mLightColor, Sun ),
          "Color shading applied to surfaces in direct contact with light source.");
 
       addField( "ambient", TypeColorF, Offset( mLightAmbient, Sun ), "Color shading applied to surfaces not "
-         "in direct contact with light source, such as in the shadows or interiors.");       
+         "in direct contact with light source, such as in the shadows or interiors.");
 
-      addField( "brightness", TypeF32, Offset( mBrightness, Sun ), 
-         "Adjust the Sun's global contrast/intensity");      
+      addField( "brightness", TypeF32, Offset( mBrightness, Sun ),
+         "Adjust the Sun's global contrast/intensity");
 
-      addField( "castShadows", TypeBool, Offset( mCastShadows, Sun ), 
-         "Enables/disables shadows cast by objects due to Sun light");      
+      addField( "castShadows", TypeBool, Offset( mCastShadows, Sun ),
+         "Enables/disables shadows cast by objects due to Sun light");
 
    endGroup( "Lighting" );
 
    addGroup( "Corona" );
 
-      addField( "coronaEnabled", TypeBool, Offset( mCoronaEnabled, Sun ), 
+      addField( "coronaEnabled", TypeBool, Offset( mCoronaEnabled, Sun ),
          "Enable or disable rendering of the corona sprite." );
 
       addField( "coronaMaterial", TypeMaterialName, Offset( mCoronaMatName, Sun ),
@@ -188,10 +188,10 @@ void Sun::initPersistFields()
 
    addGroup( "Misc" );
 
-      addField( "flareType", TYPEID< LightFlareData >(), Offset( mFlareData, Sun ), 
+      addField( "flareType", TYPEID< LightFlareData >(), Offset( mFlareData, Sun ),
          "Datablock for the flare produced by the Sun" );
 
-      addField( "flareScale", TypeF32, Offset( mFlareScale, Sun ), 
+      addField( "flareScale", TypeF32, Offset( mFlareScale, Sun ),
          "Changes the size and intensity of the flare." );
 
    endGroup( "Misc" );
@@ -218,14 +218,14 @@ U32 Sun::packUpdate(NetConnection *conn, U32 mask, BitStream *stream )
       stream->write( mSunElevation );
       stream->write( mLightColor );
       stream->write( mLightAmbient );
-      stream->write( mBrightness );      
+      stream->write( mBrightness );
       stream->writeFlag( mCastShadows );
       stream->write( mFlareScale );
 
       if ( stream->writeFlag( mFlareData ) )
       {
          stream->writeRangedU32( mFlareData->getId(),
-            DataBlockObjectIdFirst, 
+            DataBlockObjectIdFirst,
             DataBlockObjectIdLast );
       }
 
@@ -235,7 +235,7 @@ U32 Sun::packUpdate(NetConnection *conn, U32 mask, BitStream *stream )
       stream->write( mCoronaTint );
       stream->writeFlag( mCoronaUseLightColor );
 
-      mLight->packExtended( stream ); 
+      mLight->packExtended( stream );
    }
 
    return retMask;
@@ -251,13 +251,13 @@ void Sun::unpackUpdate( NetConnection *conn, BitStream *stream )
       stream->read( &mSunElevation );
       stream->read( &mLightColor );
       stream->read( &mLightAmbient );
-      stream->read( &mBrightness );      
+      stream->read( &mBrightness );
       mCastShadows = stream->readFlag();
       stream->read( &mFlareScale );
 
       if ( stream->readFlag() )
       {
-         SimObjectId id = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );  
+         SimObjectId id = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
          LightFlareData *datablock = NULL;
 
          if ( Sim::findObject( id, datablock ) )
@@ -277,7 +277,7 @@ void Sun::unpackUpdate( NetConnection *conn, BitStream *stream )
       stream->read( &mCoronaTint );
       mCoronaUseLightColor = stream->readFlag();
 
-      mLight->unpackExtended( stream ); 
+      mLight->unpackExtended( stream );
    }
 
    if ( isProperlyAdded() )
@@ -332,14 +332,14 @@ void Sun::prepRenderImage( SceneRenderState *state )
    if( !state->isDiffusePass() &&
        !state->isReflectPass() )
       return;
-   
+
    mLightWorldPos = state->getCameraPosition() - state->getFarPlane() * mLight->getDirection() * 0.9f;
    F32 dist = ( mLightWorldPos - state->getCameraPosition() ).len();
 
    F32 screenRadius = GFX->getViewport().extent.y * mCoronaScale * 0.5f;
-   mCoronaWorldRadius = screenRadius * dist / state->getWorldToScreenScale().y;   
+   mCoronaWorldRadius = screenRadius * dist / state->getWorldToScreenScale().y;
 
-   // Render instance for Corona effect.   
+   // Render instance for Corona effect.
    if ( mCoronaEnabled && mCoronaMatInst )
    {
       mMatrixSet->setSceneProjection( GFX->getProjectionMatrix() );
@@ -348,7 +348,7 @@ void Sun::prepRenderImage( SceneRenderState *state )
 
       ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
       ri->renderDelegate.bind( this, &Sun::_renderCorona );
-      ri->type = RenderPassManager::RIT_Sky;      
+      ri->type = RenderPassManager::RIT_Sky;
       // Render after sky objects and before CloudLayer!
       ri->defaultKey = 5;
       ri->defaultKey2 = 0;
@@ -421,9 +421,9 @@ void Sun::_conformLights()
    mLightAmbient.clamp();
    mLight->setAmbient( mLightAmbient );
 
-   // Optimization... disable shadows if the ambient and 
+   // Optimization... disable shadows if the ambient and
    // directional color are the same.
-   bool castShadows = mLightColor != mLightAmbient && mCastShadows; 
+   bool castShadows = mLightColor != mLightAmbient && mCastShadows;
    mLight->setCastShadows( castShadows );
 }
 
@@ -431,21 +431,21 @@ void Sun::_initCorona()
 {
    if ( isServerObject() )
       return;
-      
+
    SAFE_DELETE( mCoronaMatInst );
 
-   if ( mCoronaMatName.isNotEmpty() )      
-      mCoronaMatInst = MATMGR->createMatInstance( mCoronaMatName, MATMGR->getDefaultFeatures(), getGFXVertexFormat<GFXVertexPCT>() );         
+   if ( mCoronaMatName.isNotEmpty() )
+      mCoronaMatInst = MATMGR->createMatInstance( mCoronaMatName, MATMGR->getDefaultFeatures(), getGFXVertexFormat<GFXVertexPCT>() );
 }
 
 void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat )
-{   
+{
    // Calculate Billboard Radius (in world units) to be constant, independent of distance.
    // Takes into account distance, viewport size, and specified size in editor
    F32 BBRadius = mCoronaWorldRadius;
 
-   mMatrixSet->restoreSceneViewProjection();   
-   
+   mMatrixSet->restoreSceneViewProjection();
+
    if ( state->isReflectPass() )
       mMatrixSet->setProjection( state->getSceneManager()->getNonClipProjection() );
 
@@ -458,10 +458,10 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
    points[2] = Point3F( BBRadius, 0.0,  BBRadius);
    points[3] = Point3F( BBRadius, 0.0,  -BBRadius);
 
-   static const Point2F sCoords[4] = 
+   static const Point2F sCoords[4] =
    {
       Point2F( 0.0f, 0.0f ),
-      Point2F( 0.0f, 1.0f ),      
+      Point2F( 0.0f, 1.0f ),
       Point2F( 1.0f, 1.0f ),
       Point2F( 1.0f, 0.0f )
    };
@@ -512,7 +512,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
       mCoronaMatInst->setTransforms( *mMatrixSet, state );
       mCoronaMatInst->setSceneInfo( state, sgData );
 
-      GFX->setVertexBuffer( vb );      
+      GFX->setVertexBuffer( vb );
       GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
    }
 }

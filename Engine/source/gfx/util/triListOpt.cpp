@@ -53,7 +53,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
       TriData &curTri = triangleData[tri];
 
       for(int c = 0; c < 3; c++)
-      {  
+      {
          const U32 &curVIdx = indices[curIdx];
          AssertFatal(curVIdx < numVerts, "Out of range index.");
 
@@ -94,7 +94,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
       TriData &curTri = triangleData[tri];
 
       for(int c = 0; c < 3; c++)
-      {  
+      {
          const U32 &curVIdx = indices[curIdx];
          AssertFatal(curVIdx < numVerts, "Out of range index.");
          VertData &curVert = vertexData[curVIdx];
@@ -279,7 +279,7 @@ void LRUCacheModel::enforceSize(const dsize_t maxSize, Vector<U32> &outTrisToUpd
    dsize_t length = 0;
    LRUCacheEntry *next = mCacheHead;
    LRUCacheEntry *last = NULL;
-   
+
    // Run through list, up to the max size
    while(next != NULL && length < MaxSizeVertexCache)
    {
@@ -335,7 +335,7 @@ S32 LRUCacheModel::getCachePosition(const U32 vIdx)
    {
       if(next->vIdx == vIdx)
          return length;
-      
+
       length++;
       next = next->next;
    }

@@ -44,7 +44,7 @@ namespace Torque
 class Time
 {
    class Tester;
-   
+
 public:
    struct DateTime
    {
@@ -56,7 +56,7 @@ public:
       S32 second;
       S32 microsecond;
    };
- 
+
    static void getCurrentDateTime(DateTime &dateTime);
    static Time getCurrentTime();
 
@@ -81,7 +81,7 @@ public:
    S64 operator/(const Time &time) const;
    const Time& operator+=(const Time time);
    const Time& operator-=(const Time time);
-   
+
    template<typename T> Time operator*(T scaler) const { return Time(_time * scaler); }
    template<typename T> Time operator/(T scaler) const { return Time(_time / scaler); }
    template<typename T> friend Time operator*(T scaler,Time t) { return t * scaler; }

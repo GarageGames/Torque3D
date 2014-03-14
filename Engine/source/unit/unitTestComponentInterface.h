@@ -55,12 +55,12 @@ public:
    {
       delete mTestReg;
    }
-   
+
    // ComponentInterface overrides
 public:
-   virtual bool isValid() const 
-   { 
-      return Parent::isValid() && ( mTestReg != NULL ); 
+   virtual bool isValid() const
+   {
+      return Parent::isValid() && ( mTestReg != NULL );
    }
 
    // UnitTest overrides

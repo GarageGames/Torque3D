@@ -30,7 +30,7 @@
 
 ///
 enum ShadowType
-{   
+{
    ShadowType_None = -1,
 
    ShadowType_Spot,
@@ -47,7 +47,7 @@ enum ShadowType
 DefineEnumType( ShadowType );
 
 
-/// The different shadow filter modes used when rendering 
+/// The different shadow filter modes used when rendering
 /// shadowed lights.
 /// @see setShadowFilterMode
 enum ShadowFilterMode

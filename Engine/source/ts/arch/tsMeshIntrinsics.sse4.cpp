@@ -25,7 +25,7 @@
 #include "ts/tsMeshIntrinsics.h"
 #include <smmintrin.h>
 
-void m_matF_x_BatchedVertWeightList_SSE4(const MatrixF &mat, 
+void m_matF_x_BatchedVertWeightList_SSE4(const MatrixF &mat,
                                     const dsize_t count,
                                     const TSSkinMesh::BatchData::BatchedVertWeight * __restrict batch,
                                     U8 * const __restrict outPtr,
@@ -61,7 +61,7 @@ void m_matF_x_BatchedVertWeightList_SSE4(const MatrixF &mat,
       inPos = _mm_load_ps(inElem.vert);
       inNrm = _mm_load_ps(inElem.normal);
 
-      // prefetch input 
+      // prefetch input
 #define INPUT_PREFETCH_LOOKAHEAD 64
       const char *prefetchInput = reinterpret_cast<const char *>(batch) + inStride * (i + INPUT_PREFETCH_LOOKAHEAD);
       _mm_prefetch(prefetchInput, _MM_HINT_T0);
@@ -75,7 +75,7 @@ void m_matF_x_BatchedVertWeightList_SSE4(const MatrixF &mat,
       tempPos = _mm_dp_ps(inPos, sseMat[0], 0xF1);
       temp0 = _mm_dp_ps(inPos, sseMat[1], 0xF2);
       temp1 = _mm_dp_ps(inPos, sseMat[2], 0xF4);
-      
+
       temp0 = _mm_or_ps(temp0, temp1);
       tempPos = _mm_or_ps(tempPos, temp0);
 

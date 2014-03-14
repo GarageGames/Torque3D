@@ -49,21 +49,21 @@ bool VirtualMountSystem::mount(String root, FileSystemRef fs)
 //       rootDict = new PathFSMap();
 //       mMountMap[root] = rootDict;
 //    }
-// 
+//
 //    U32 start = Platform::getRealMilliseconds();
-// 
+//
 //    // get the paths from the fs and add them to the rootDict
 //    Vector<String> paths;
-// 
+//
 //    // we'll use the mount system's findByPattern function to build the path list.
 //    // but, we want to override its default behavior so that it searches only the desired fs.
 //    _setFindByPatternOverrideFS(fs);
-// 
+//
 //    Torque::Path basePath;
-//    // we use an empty root so that the resulting filenames don't have the root filename in them.  
-//    // we don't want to include the root in the dict has entries.  we can omit the root because we have 
+//    // we use an empty root so that the resulting filenames don't have the root filename in them.
+//    // we don't want to include the root in the dict has entries.  we can omit the root because we have
 //    // specified an override FS; the search would fail otherwise.
-//    //basePath.setRoot(root); 
+//    //basePath.setRoot(root);
 //    basePath.setRoot("");
 //    basePath.setPath("/");
 //    mUseParentFind = true;
@@ -75,14 +75,14 @@ bool VirtualMountSystem::mount(String root, FileSystemRef fs)
 //       mUseParentFind = false;
 //       return false;
 //    }
-// 
+//
 //    _setFindByPatternOverrideFS(NULL);
 //    mUseParentFind = false;
-// 
+//
 //    for (S32 i = 0; i < paths.size(); ++i)
 //    {
 //       String path = String::ToLower(paths[i]);
-// 
+//
 //       // is it a directory? if so remove dir prefix
 //       String dirPrefix = "DIR:";
 //       String::SizeType dIdx = path.find(dirPrefix, 0, String::NoCase);
@@ -91,17 +91,17 @@ bool VirtualMountSystem::mount(String root, FileSystemRef fs)
 //       // omit leading /
 //       if (path[(String::SizeType)0] == '/')
 //          path = path.substr(1);
-// 
+//
 //       // warn about duplicate files (not directories)
-//       // JMQ: disabled this, it false alarms at startup because the mount doc always mounts the 
-//       // root before other processing mounts.  still, would be useful, maybe change the mount doc to 
+//       // JMQ: disabled this, it false alarms at startup because the mount doc always mounts the
+//       // root before other processing mounts.  still, would be useful, maybe change the mount doc to
 //       // not mount root?
 //       if (dIdx != 0 && (*rootDict)[path].size() > 0)
 //          _log(String::ToString("Duplicate file path detected, first volume containing file will be used: %s", path.c_str()));
-//       
+//
 //       (*rootDict)[path].push_back(fs);
 //    }
-// 
+//
 //    if (gVMSVerboseLog)
 //       _log(String::ToString("Indexed virtual file system in %ums", Platform::getRealMilliseconds() - start));
 
@@ -125,7 +125,7 @@ FileSystemRef VirtualMountSystem::unmount(String root)
 //    root = String::ToLower(root);
 //    if (!mMountMap.tryGetValue(root, rootDict))
 //       return ret;
-// 
+//
 //    // buh bye
 //    mMountMap.erase(root);
 //    delete rootDict;
@@ -148,10 +148,10 @@ bool VirtualMountSystem::unmount(FileSystemRef fs)
             vec.erase(i);
       }
    }
-   
-   // this is a linear time operation, because we have to search every path in all roots 
+
+   // this is a linear time operation, because we have to search every path in all roots
    // to remove references to the fs.
-   // contant time operation can be achieved be using the unmount(string) version, which unmounts all 
+   // contant time operation can be achieved be using the unmount(string) version, which unmounts all
    // filesystems for a given root and so doesn't need to do any searching.
 //    U32 start = Platform::getRealMilliseconds();
 //    for (RootToPathFSMap::Iterator riter = mMountMap.begin();
@@ -173,7 +173,7 @@ bool VirtualMountSystem::unmount(FileSystemRef fs)
 //          }
 //       }
 //    }
-// 
+//
 //    if (gVMSVerboseLog)
 //       _log(String::ToString("Unmounted virtual file system in %ums", Platform::getRealMilliseconds() - start));
 
@@ -216,13 +216,13 @@ bool VirtualMountSystem::createPath(const Path& path)
 //       // in its search table (so that we can open the file, if it is new)
 //       String root = String::ToLower(path.getRoot());
 //       FileSystemRef fsRef = getFileSystem(path);
-// 
+//
 //       PathFSMap* rootDict = mMountMap[root];
 //       if (rootDict)
 //       {
 //          // add all directories in the path
 //          // add the filename
-// 
+//
 //          // Start from the top and work our way down
 //          Path sub,dir;
 //          dir.setPath("");
@@ -230,18 +230,18 @@ bool VirtualMountSystem::createPath(const Path& path)
 //          {
 //             sub.setPath(path.getDirectory(i));
 //             dir.appendPath(sub);
-// 
+//
 //             Vector<FileSystemRef>& fsList = (*rootDict)[String::ToLower(dir.getPath())];
 //             Vector<FileSystemRef>::iterator iter = ::find(fsList.begin(), fsList.end(), fsRef);
-// 
+//
 //             if (iter == fsList.end())
 //                fsList.push_back(fsRef);
 //          }
-// 
+//
 //          // add full file path
 //          Vector<FileSystemRef>& fsList = (*rootDict)[String::ToLower(path.getFullPath(false))];
 //          Vector<FileSystemRef>::iterator iter = ::find(fsList.begin(), fsList.end(), fsRef);
-//          
+//
 //          if (iter == fsList.end())
 //             fsList.push_back(fsRef);
 //       }
@@ -261,7 +261,7 @@ FileSystemRef VirtualMountSystem::_removeMountFromList(String root)
    return Parent::_removeMountFromList(root);
 }
 
-FileSystemRef VirtualMountSystem::_getFileSystemFromList(const Path& fullpath) const 
+FileSystemRef VirtualMountSystem::_getFileSystemFromList(const Path& fullpath) const
 {
    String root = String::ToLower(fullpath.getRoot());
    String path = fullpath.getFullPathWithoutRoot();
@@ -275,14 +275,14 @@ FileSystemRef VirtualMountSystem::_getFileSystemFromList(const Path& fullpath) c
 //    PathFSMap* rootDict = NULL;
 //    if (!mMountMap.tryGetValue(root, rootDict))
 //       return NULL;
-// 
+//
 //    // see if we have a FS list for this path
 //    Vector<FileSystemRef>& fsList = (*rootDict)[path];
-   
+
    RootToFSVec fsList;
    if(! mRootMap.tryGetValue(root, fsList))
       return NULL;
-   
+
    if (fsList.size() == 0)
    {
       // no exact match for path, defer to parent
@@ -302,7 +302,7 @@ FileSystemRef VirtualMountSystem::_getFileSystemFromList(const Path& fullpath) c
             return fsList[i];
       }
 
-      return fsList[0];      
+      return fsList[0];
    }
 }
 

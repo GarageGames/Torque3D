@@ -244,9 +244,9 @@ void GuiTerrPreviewCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    for(U32 i = 0; i < GFX->getNumSamplers(); i++)
       GFX->setTexture(i, NULL);
-   
+
    GFX->disableShaders();
-   
+
    Point2F terrPos(terrBlock->getPosition().x, terrBlock->getPosition().y);
 
    mTerrainSize = terrBlock->getWorldBlockSize();
@@ -274,7 +274,7 @@ void GuiTerrPreviewCtrl::onRender(Point2I offset, const RectI &updateRect)
             PrimBuild::texCoord2f(textureP1.x, textureP2.y);
             PrimBuild::vertex2f(screenP1.x, screenP2.y);       // left bottom
 
-            
+
             PrimBuild::texCoord2f(textureP2.x, textureP2.y);
             PrimBuild::vertex2f(screenP2.x, screenP2.y);       // right bottom
             PrimBuild::texCoord2f(textureP2.x, textureP1.y);

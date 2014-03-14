@@ -23,29 +23,29 @@
 function WorldEditor::onSelect( %this, %obj )
 {
    EditorTree.addSelection( %obj );
-   
+
    _setShadowVizLight( %obj );
-   
+
    //Inspector.inspect( %obj );
-      
+
    if ( isObject( %obj ) && %obj.isMethod( "onEditorSelect" ) )
       %obj.onEditorSelect( %this.getSelectionSize() );
-      
-   EditorGui.currentEditor.onObjectSelected( %obj );   
+
+   EditorGui.currentEditor.onObjectSelected( %obj );
 
    // Inform the camera
    commandToServer('EditorOrbitCameraSelectChange', %this.getSelectionSize(), %this.getSelectionCentroid());
 
    EditorGuiStatusBar.setSelectionObjectsByCount(%this.getSelectionSize());
-   
+
    // Update the materialEditorList
    $Tools::materialEditorList = %obj.getId();
-   
+
    // Used to help the Material Editor( the M.E doesn't utilize its own TS control )
    // so this dirty extension is used to fake it
    if ( MaterialEditorPreviewWindow.isVisible() )
       MaterialEditorGui.prepareActiveObject();
-   
+
    // Update the Transform Selection window
    ETransformSelection.onSelectionChanged();
 }
@@ -55,28 +55,28 @@ function WorldEditor::onMultiSelect( %this, %set )
    // This is called when completing a drag selection ( on3DMouseUp )
    // so we can avoid calling onSelect for every object. We can only
    // do most of this stuff, like inspecting, on one object at a time anyway.
-   
+
    %count = %set.getCount();
    %i = 0;
-   
+
    foreach( %obj in %set )
    {
       if ( %obj.isMethod( "onEditorSelect" ) )
-         %obj.onEditorSelect( %count ); 
-      
+         %obj.onEditorSelect( %count );
+
       %i ++;
       EditorTree.addSelection( %obj, %i == %count );
       EditorGui.currentEditor.onObjectSelected( %obj );
    }
-      
+
    // Inform the camera
    commandToServer( 'EditorOrbitCameraSelectChange', %count, %this.getSelectionCentroid() );
 
    EditorGuiStatusBar.setSelectionObjectsByCount( EWorldEditor.getSelectionSize() );
-  
+
    // Update the Transform Selection window, if it is
    // visible.
-   
+
    if( ETransformSelection.isVisible() )
       ETransformSelection.onSelectionChanged();
 }
@@ -85,17 +85,17 @@ function WorldEditor::onUnSelect( %this, %obj )
 {
    if ( isObject( %obj ) && %obj.isMethod( "onEditorUnselect" ) )
       %obj.onEditorUnselect();
-      
+
    EditorGui.currentEditor.onObjectDeselected( %obj );
-      
+
    Inspector.removeInspect( %obj );
    EditorTree.removeSelection(%obj);
-   
+
    // Inform the camera
    commandToServer('EditorOrbitCameraSelectChange', %this.getSelectionSize(), %this.getSelectionCentroid());
 
    EditorGuiStatusBar.setSelectionObjectsByCount(%this.getSelectionSize());
-   
+
    // Update the Transform Selection window
    ETransformSelection.onSelectionChanged();
 }
@@ -110,7 +110,7 @@ function WorldEditor::onClearSelection( %this )
    commandToServer('EditorOrbitCameraSelectChange', %this.getSelectionSize(), %this.getSelectionCentroid());
 
    EditorGuiStatusBar.setSelectionObjectsByCount(%this.getSelectionSize());
-   
+
    // Update the Transform Selection window
    ETransformSelection.onSelectionChanged();
 }
@@ -119,7 +119,7 @@ function WorldEditor::onSelectionCentroidChanged( %this )
 {
    // Inform the camera
    commandToServer('EditorOrbitCameraSelectChange', %this.getSelectionSize(), %this.getSelectionCentroid());
-   
+
    // Refresh inspector.
    Inspector.refresh();
 }
@@ -318,7 +318,7 @@ function WorldEditor::onWorldEditorUndo( %this )
 function Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // The instant group will try to add our
-   // UndoAction if we don't disable it.   
+   // UndoAction if we don't disable it.
    pushInstantGroup();
 
    %nameOrClass = %object.getName();
@@ -328,28 +328,28 @@ function Inspector::onInspectorFieldModified( %this, %object, %fieldName, %array
    %action = new InspectorFieldUndoAction()
    {
       actionName = %nameOrClass @ "." @ %fieldName @ " Change";
-      
+
       objectId = %object.getId();
       fieldName = %fieldName;
       fieldValue = %oldValue;
       arrayIndex = %arrayIndex;
-                  
+
       inspectorGui = %this;
    };
-   
+
    // If it's a datablock, initiate a retransmit.  Don't do so
    // immediately so as the actual field value will only be set
    // by the inspector code after this method has returned.
-   
+
    if( %object.isMemberOfClass( "SimDataBlock" ) )
       %object.schedule( 1, "reloadOnLocalClient" );
-   
+
    // Restore the instant group.
    popInstantGroup();
-         
+
    %action.addToManager( Editor.getUndoManager() );
    EWorldEditor.isDirty = true;
-   
+
    // Update the selection
    if(EWorldEditor.getSelectionSize() > 0 && (%fieldName $= "position" || %fieldName $= "rotation" || %fieldName $= "scale"))
    {
@@ -370,15 +370,15 @@ function Inspector::onInspectorPreFieldModification( %this, %fieldName, %arrayIn
 {
    pushInstantGroup();
    %undoManager = Editor.getUndoManager();
-   
+
    %numObjects = %this.getNumInspectObjects();
    if( %numObjects > 1 )
    %action = %undoManager.pushCompound( "Multiple Field Edit" );
-      
+
    for( %i = 0; %i < %numObjects; %i ++ )
    {
       %object = %this.getInspectObject( %i );
-      
+
       %nameOrClass = %object.getName();
       if ( %nameOrClass $= "" )
          %nameOrClass = %object.getClassname();
@@ -394,7 +394,7 @@ function Inspector::onInspectorPreFieldModification( %this, %fieldName, %arrayIn
 
          inspectorGui = %this;
       };
-      
+
       if( %numObjects > 1 )
          %undo.addToManager( %undoManager );
       else
@@ -403,7 +403,7 @@ function Inspector::onInspectorPreFieldModification( %this, %fieldName, %arrayIn
          break;
       }
    }
-      
+
    %this.currentFieldEditAction = %action;
    popInstantGroup();
 }
@@ -420,7 +420,7 @@ function Inspector::onInspectorPostFieldModification( %this )
       // Queue single field undo.
       %this.currentFieldEditAction.addToManager( Editor.getUndoManager() );
    }
-   
+
    %this.currentFieldEditAction = "";
    EWorldEditor.isDirty = true;
 }
@@ -428,7 +428,7 @@ function Inspector::onInspectorPostFieldModification( %this )
 function Inspector::onInspectorDiscardFieldModification( %this )
 {
    %this.currentFieldEditAction.undo();
-   
+
    if( %this.currentFieldEditAction.isMemberOfClass( "CompoundUndoAction" ) )
    {
       // Multiple field editor.  Pop and discard.
@@ -439,7 +439,7 @@ function Inspector::onInspectorDiscardFieldModification( %this )
       // Single field edit.  Just kill undo action.
       %this.currentFieldEditAction.delete();
    }
-   
+
    %this.currentFieldEditAction = "";
 }
 
@@ -449,12 +449,12 @@ function Inspector::inspect( %this, %obj )
 
    %name = "";
    if ( isObject( %obj ) )
-      %name = %obj.getName();   
+      %name = %obj.getName();
    else
       FieldInfoControl.setText( "" );
-   
+
    //InspectorNameEdit.setValue( %name );
-   Parent::inspect( %this, %obj );  
+   Parent::inspect( %this, %obj );
 }
 
 function Inspector::onBeginCompoundEdit( %this )

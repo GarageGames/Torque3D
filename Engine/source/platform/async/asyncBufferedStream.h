@@ -59,13 +59,13 @@ class AsyncBufferedInputStream : public IInputStreamFilter< T, Stream >,
    public:
 
       typedef IInputStreamFilter< T, Stream > Parent;
-      
+
       /// Type of elements read, buffered, and returned by this stream.
       typedef typename Parent::ElementType ElementType;
-      
+
       /// Type of the source stream being read by this stream.
       typedef typename Parent::SourceStreamType SourceStreamType;
-      
+
       /// Type of elements being read from the source stream.
       ///
       /// @note This does not need to correspond to the type of elements buffered
@@ -77,7 +77,7 @@ class AsyncBufferedInputStream : public IInputStreamFilter< T, Stream >,
          /// The number of elements to buffer in advance by default.
          DEFAULT_STREAM_LOOKAHEAD = 3
       };
-      
+
       friend class AsyncBufferedReadItem< T, Stream >; // _onArrival
 
    protected:
@@ -136,7 +136,7 @@ class AsyncBufferedInputStream : public IInputStreamFilter< T, Stream >,
                                  ThreadContext* context = ThreadContext::ROOT_CONTEXT() );
 
       virtual ~AsyncBufferedInputStream();
-      
+
       /// @return true if the stream is looping infinitely.
       bool isLooping() const { return mIsLooping; }
 
@@ -176,20 +176,20 @@ AsyncBufferedInputStream< T, Stream >::AsyncBufferedInputStream
    if( mIsLooping )
    {
       // Stream is looping so we don't count down source elements.
-      
+
       mNumRemainingSourceElements = 0;
    }
    else if( !mNumRemainingSourceElements )
    {
       // If not given number of elements to read, see if the source
       // stream is sizeable.  If so, take its size as the number of elements.
-      
+
       if( dynamic_cast< ISizeable<>* >( &Deref( stream ) ) )
          mNumRemainingSourceElements = ( ( ISizeable<>* ) &Deref( stream ) )->getSize();
       else
       {
          // Can't tell how many source elements there are.
-         
+
          mNumRemainingSourceElements = U32_MAX;
       }
    }
@@ -211,7 +211,7 @@ template< typename T, typename Stream >
 void AsyncBufferedInputStream< T, Stream >::_onArrival( const ElementType& element )
 {
    mBufferedElements.pushBack( element );
-   
+
    // Adjust buffer count.
 
    while( 1 )
@@ -221,10 +221,10 @@ void AsyncBufferedInputStream< T, Stream >::_onArrival( const ElementType& eleme
       {
          // If we haven't run against the lookahead limit and haven't reached
          // the end of the stream, immediately trigger a new request.
-         
+
          if( !mIsStopped && ( numBuffered + 1 ) < mMaxBufferedElements )
             _requestNext();
-            
+
          break;
       }
    }
@@ -242,7 +242,7 @@ U32 AsyncBufferedInputStream< T, Stream >::read( ElementType* buffer, U32 num )
    for( U32 i = 0; i < num; ++ i )
    {
       // Try to pop a element off the buffered element list.
-   
+
       ElementType element;
       if( mBufferedElements.tryPopFront( element ) )
       {
@@ -254,17 +254,17 @@ U32 AsyncBufferedInputStream< T, Stream >::read( ElementType* buffer, U32 num )
    }
 
    // Get the request chain going again, if it has stopped.
-   
+
    while( 1 )
    {
       U32 numBuffered = mNumBufferedElements;
       U32 newNumBuffered = numBuffered - numRead;
-      
+
       if( dCompareAndSwap( mNumBufferedElements, numBuffered, newNumBuffered ) )
       {
          if( numBuffered == mMaxBufferedElements )
             _requestNext();
-         
+
          break;
       }
    }
@@ -286,12 +286,12 @@ class AsyncBufferedReadItem : public ThreadWorkItem
 
       typedef ThreadWorkItem Parent;
       typedef ThreadSafeRef< AsyncBufferedInputStream< T, Stream > > AsyncStreamRef;
-      
+
    protected:
 
       /// The issueing async state.
       AsyncStreamRef mAsyncStream;
-      
+
       ///
       Stream mSourceStream;
 
@@ -302,7 +302,7 @@ class AsyncBufferedReadItem : public ThreadWorkItem
       virtual void execute()
       {
          if( Deref( mSourceStream ).read( &mElement, 1 ) )
-         {                  
+         {
             // Buffer the element.
 
             if( this->cancellationPoint() ) return;
@@ -315,7 +315,7 @@ class AsyncBufferedReadItem : public ThreadWorkItem
          destructSingle( mElement );
          mAsyncStream = NULL;
       }
-      
+
    public:
 
       ///
@@ -350,9 +350,9 @@ class AsyncSingleBufferedInputStream : public AsyncBufferedInputStream< T, Strea
       typedef typename Parent::ElementType ElementType;
       typedef typename Parent::SourceElementType SourceElementType;
       typedef typename Parent::SourceStreamType SourceStreamType;
-      
+
    protected:
-         
+
       // AsyncBufferedInputStream.
       virtual void _requestNext();
 
@@ -361,7 +361,7 @@ class AsyncSingleBufferedInputStream : public AsyncBufferedInputStream< T, Strea
       {
          outRef = new ReadItem( this, this->mThreadContext );
       }
-            
+
    public:
 
       /// Construct a new buffered stream reading from "source".
@@ -408,7 +408,7 @@ void AsyncSingleBufferedInputStream< T, Stream, ReadItem >::_requestNext()
 
    if( !this->mIsLooping && this->mNumRemainingSourceElements != U32_MAX )
       -- this->mNumRemainingSourceElements;
-      
+
    ThreadSafeRef< ThreadWorkItem > workItem;
    _newReadItem( workItem );
    this->mThreadPool->queueWorkItem( workItem );

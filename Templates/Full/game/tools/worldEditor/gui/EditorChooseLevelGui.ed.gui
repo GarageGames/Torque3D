@@ -48,7 +48,7 @@
    Visible = "1";
    tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
-   
+
    new GuiWindowCtrl(EditorChooseLevelWindow) {
       canSaveDynamicFields = "0";
       Enabled = "1";

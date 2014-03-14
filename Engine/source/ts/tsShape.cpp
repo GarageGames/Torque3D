@@ -170,7 +170,7 @@ const String& TSShape::getMeshName( S32 meshIndex ) const
 }
 
 const String& TSShape::getNodeName( S32 nodeIndex ) const
-{   
+{
    S32 nameIdx = nodes[nodeIndex].nameIndex;
    if ( nameIdx < 0 )
       return String::EmptyString;
@@ -196,7 +196,7 @@ S32 TSShape::findName(const String &name) const
       if (names[i].equal( name, String::NoCase ))
          return i;
    }
-  
+
    return -1;
 }
 
@@ -262,7 +262,7 @@ S32 TSShape::findSequence(S32 nameIndex) const
 bool TSShape::findMeshIndex(const String& meshName, S32& objIndex, S32& meshIndex)
 {
    // Determine the object name and detail size from the mesh name
-   S32 detailSize = 999;  
+   S32 detailSize = 999;
    objIndex = findObject(String::GetTrailingNumber(meshName, detailSize));
    if (objIndex < 0)
       return false;
@@ -577,7 +577,7 @@ void TSShape::initVertexFeatures()
 
    mVertSize = ( hasTexcoord2 || hasColors ) ? sizeof(TSMesh::__TSMeshVertex_3xUVColor) : sizeof(TSMesh::__TSMeshVertexBase);
    mVertexFormat.clear();
-  
+
    mVertexFormat.addElement( GFXSemantic::POSITION, GFXDeclType_Float3 );
    mVertexFormat.addElement( GFXSemantic::TANGENTW, GFXDeclType_Float, 3 );
    mVertexFormat.addElement( GFXSemantic::NORMAL, GFXDeclType_Float3 );
@@ -880,7 +880,7 @@ void TSShape::assembleShape()
    // Note that we are recalculating these values later on for safety.
    mSmallestVisibleSize = (F32)tsalloc.get32();
    mSmallestVisibleDL   = tsalloc.get32();
-   
+
    tsalloc.checkGuard();
 
    // get bounds...
@@ -1071,7 +1071,7 @@ void TSShape::assembleShape()
       {
          Detail *det = &(details[i]);
 
-         // Clear the struct... we don't want to leave 
+         // Clear the struct... we don't want to leave
          // garbage in the parts that are unfilled.
          U32 alignedSize32 = sizeof( Detail );
          dMemset( det, 0, alignedSize32 );
@@ -1082,7 +1082,7 @@ void TSShape::assembleShape()
          // If this is an autobillboard then we need to
          // fill in the new part of the struct.
          if ( det->subShapeNum >= 0 )
-            continue; 
+            continue;
 
          S32 lastDetailOpts = det->objectDetailNum;
          det->bbEquatorSteps = lastDetailOpts & 0x7F; // bits 0..6
@@ -1141,13 +1141,13 @@ void TSShape::assembleShape()
    {
       TSMesh::smVertsList[i]=NULL;
       TSMesh::smTVertsList[i]=NULL;
-      
+
       if ( smReadVersion >= 26 )
       {
          TSMesh::smTVerts2List[i] = NULL;
          TSMesh::smColorsList[i] = NULL;
       }
-      
+
       TSMesh::smNormsList[i]=NULL;
       TSMesh::smEncodedNormsList[i]=NULL;
       TSMesh::smDataCopied[i]=false;
@@ -2009,7 +2009,7 @@ template<> void *Resource<TSShape>::create(const Torque::Path &path)
       // No COLLADA support => attempt to load the cached DTS file instead
       Torque::Path cachedPath = path;
       cachedPath.setExtension("cached.dts");
-       
+
       FileStream stream;
       stream.open( cachedPath.getFullPath(), Torque::FS::File::Read );
       if ( stream.getStatus() != Stream::Ok )
@@ -2049,7 +2049,7 @@ TSShape::ConvexHullAccelerator* TSShape::getAccelerator(S32 dl)
    if (dl == -1)
       return NULL;
 
-   AssertFatal( detailCollisionAccelerators.size() == details.size(), 
+   AssertFatal( detailCollisionAccelerators.size() == details.size(),
       "TSShape::getAccelerator() - mismatched array sizes!" );
 
    if (detailCollisionAccelerators[dl] == NULL)

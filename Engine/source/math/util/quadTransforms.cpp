@@ -24,9 +24,9 @@
 #include "math/util/quadTransforms.h"
 
 
-BiQuadToSqr::BiQuadToSqr(  const Point2F &p00, 
-                           const Point2F &p10, 
-                           const Point2F &p11, 
+BiQuadToSqr::BiQuadToSqr(  const Point2F &p00,
+                           const Point2F &p10,
+                           const Point2F &p11,
                            const Point2F &p01 )
    : m_kP00( p00 )
 {
@@ -34,20 +34,20 @@ BiQuadToSqr::BiQuadToSqr(  const Point2F &p00,
    m_kC = p01 - p00;   // height
    m_kD = p11 + p00 - p10 - p01; // diagonal dist
 
-   if(mFabs(m_kD.x) < POINT_EPSILON)    
+   if(mFabs(m_kD.x) < POINT_EPSILON)
       m_kD.x = 0.f;
-   if(mFabs(m_kD.y) < POINT_EPSILON) 
-      m_kD.y = 0.f;  
+   if(mFabs(m_kD.y) < POINT_EPSILON)
+      m_kD.y = 0.f;
 
    m_fBC = mDotPerp( m_kB, m_kC );
-   m_fBD = mDotPerp( m_kB, m_kD );   
+   m_fBD = mDotPerp( m_kB, m_kD );
    m_fCD = mDotPerp( m_kC, m_kD );
 }
 
 Point2F BiQuadToSqr::transform( const Point2F &p ) const
 {
    Point2F kA = m_kP00 - p;
-   
+
    F32 fAB = mDotPerp( kA, m_kB );
    F32 fAC = mDotPerp( kA, m_kC);
 
@@ -135,7 +135,7 @@ F32 BiQuadToSqr::deviation( const Point2F &sp )
 
 
 BiSqrToQuad3D::BiSqrToQuad3D( const Point3F& pnt00,
-                              const Point3F& pnt10, 
+                              const Point3F& pnt10,
                               const Point3F& pnt11,
                               const Point3F& pnt01)
 {
@@ -146,7 +146,7 @@ BiSqrToQuad3D::BiSqrToQuad3D( const Point3F& pnt00,
 }
 
 Point3F BiSqrToQuad3D::transform( const Point2F &p ) const
-{   
+{
    //Let p00, p10, p01, and p11 be your 3-tuples that are the quad's
    //vertices.  You can parameterize the quad as follows.
 
@@ -160,6 +160,6 @@ Point3F BiSqrToQuad3D::transform( const Point2F &p ) const
    const F32 &t = p.y;
 
    Point3F result = (1.0f-s)*((1.0f-t)*p00 + t*p01) + s*((1.0f-t)*p10 + t*p11);
-   return result;   
+   return result;
 }
 

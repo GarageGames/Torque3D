@@ -43,7 +43,7 @@ MODULE_BEGIN( VideoCapture )
    {
       ManagedSingleton< VideoCapture >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       VIDCAP->end();
@@ -52,7 +52,7 @@ MODULE_BEGIN( VideoCapture )
 
 MODULE_END;
 
-VideoCapture::VideoCapture() : 
+VideoCapture::VideoCapture() :
    mEncoder(NULL),
    mIsRecording(false),
    mCanvas(NULL),
@@ -63,7 +63,7 @@ VideoCapture::VideoCapture() :
    mEncoderName("THEORA"),
    mFileName(""),
    mMsPerFrameError(0)
-{     
+{
 }
 
 S32 VideoCapture::getMsPerFrame()
@@ -73,7 +73,7 @@ S32 VideoCapture::getMsPerFrame()
 
    //Accumulate the rounding errors
    mMsPerFrameError += mMsPerFrame - roundTime;
-      
+
    return (S32)roundTime;
 }
 
@@ -109,12 +109,12 @@ void VideoCapture::begin( GuiCanvas* canvas )
 
    // Set the encoder file, framerate and resolution
    mEncoder->setFile(mFileName);
-   mEncoder->setFramerate( &mFrameRate );   
-   mEncoder->setResolution( &mResolution );   
+   mEncoder->setFramerate( &mFrameRate );
+   mEncoder->setResolution( &mResolution );
 
    // The frame grabber must know about the resolution as well, since it'll do the resizing for us
    mFrameGrabber->setOutResolution( mResolution );
-   
+
    // Calculate the ms per frame
    mMsPerFrame = 1000.0f / mFrameRate;
 
@@ -137,7 +137,7 @@ void VideoCapture::end()
 
    // Garbage collect the processed bitmaps
    deleteProcessedBitmaps();
-   
+
    delete mEncoder;
    mEncoder = NULL;
 
@@ -145,8 +145,8 @@ void VideoCapture::end()
 }
 
 void VideoCapture::capture()
-{   
-   // If this is the first frame, capture and encode it right away   
+{
+   // If this is the first frame, capture and encode it right away
    if (mNextFramePosition == 0.0f)
    {
       mVideoCaptureStartTime = Platform::getVirtualMilliseconds();
@@ -160,19 +160,19 @@ void VideoCapture::capture()
    // Repeat until the current frame is captured
    while (framePosition > mCapturedFramePos)
    {
-      // If the frame position is closer to the next frame position 
+      // If the frame position is closer to the next frame position
       // than the previous one capture it
       if ( mFabs(framePosition - mNextFramePosition) < mFabs(mCapturedFramePos - mNextFramePosition) )
       {
-         mFrameGrabber->captureBackBuffer();      
+         mFrameGrabber->captureBackBuffer();
          mCapturedFramePos  = framePosition;
       }
-      
+
       // If the new frame position is greater or equal than the next frame time
       // tell the framegrabber to make bitmaps out from the last captured backbuffer until the video catches up
       while ( framePosition >= mNextFramePosition )
       {
-         mFrameGrabber->makeBitmap();        
+         mFrameGrabber->makeBitmap();
          mNextFramePosition++;
       }
    }
@@ -180,8 +180,8 @@ void VideoCapture::capture()
    // Fetch bitmaps from the framegrabber and encode them
    GBitmap *bitmap = NULL;
    while ( (bitmap = mFrameGrabber->fetchBitmap()) != NULL )
-   {     
-      //mEncoder->pushProcessedBitmap(bitmap);                 
+   {
+      //mEncoder->pushProcessedBitmap(bitmap);
       if (!mEncoder->pushFrame(bitmap))
       {
           Con::errorf("VideoCapture: an error occurred while encoding a frame. Recording aborted.");
@@ -244,7 +244,7 @@ void VideoCapture::deleteProcessedBitmaps()
 
       // Delete the bitmap only if it's the different than the next one (or it's the last one).
       // This is done because repeated frames re-use the same GBitmap object
-      // and thus their pointers will appearl multiple times in the list      
+      // and thus their pointers will appearl multiple times in the list
       if (mBitmapDeleteList.size() == 0 || bitmap != mBitmapDeleteList[0])
          delete bitmap;
    }
@@ -263,7 +263,7 @@ GBitmap* VideoEncoder::getProcessedBitmap()
 {
    GBitmap* bitmap = NULL;
    if (mProcessedBitmaps.tryPopFront(bitmap))
-      return bitmap;   
+      return bitmap;
    return NULL;
 }
 
@@ -280,7 +280,7 @@ GBitmap* VideoFrameGrabber::fetchBitmap()
 {
    if (mBitmapList.size() == 0)
       return NULL;
-   
+
    GBitmap *bitmap = mBitmapList.first();
    mBitmapList.pop_front();
    return bitmap;
@@ -306,7 +306,7 @@ void VideoFrameGrabber::_onTextureEvent(GFXTexCallbackCode code)
 
 ///----------------------------------------------------------------------
 
-DefineEngineFunction( startVideoCapture, void, 
+DefineEngineFunction( startVideoCapture, void,
    ( GuiCanvas *canvas, const char *filename, const char *encoder, F32 framerate, Point2I resolution ),
    ( "THEORA", 30.0f, Point2I( 0, 0 ) ),
    "Begins a video capture session.\n"
@@ -319,10 +319,10 @@ DefineEngineFunction( startVideoCapture, void,
       return;
    }
 
-   VIDCAP->setFilename( filename );   
-   VIDCAP->setEncoderName( encoder );   
+   VIDCAP->setFilename( filename );
+   VIDCAP->setEncoderName( encoder );
    VIDCAP->setFramerate( framerate );
-   
+
    if ( !resolution.isZero() )
       VIDCAP->setResolution(resolution);
 
@@ -331,13 +331,13 @@ DefineEngineFunction( startVideoCapture, void,
 
 DefineEngineFunction( stopVideoCapture, void, (),,
    "Stops the video capture session.\n"
-   "@see startVideoCapture\n"   
+   "@see startVideoCapture\n"
    "@ingroup Rendering\n" )
 {
    VIDCAP->end();
 }
 
-DefineEngineFunction( playJournalToVideo, void, 
+DefineEngineFunction( playJournalToVideo, void,
    ( const char *journalFile, const char *videoFile, const char *encoder, F32 framerate, Point2I resolution ),
    ( NULL, "THEORA", 30.0f, Point2I( 0, 0 ) ),
    "Load a journal file and capture it video.\n"
@@ -346,8 +346,8 @@ DefineEngineFunction( playJournalToVideo, void,
    if ( !videoFile )
       videoFile = journalFile;
 
-   VIDCAP->setFilename( Torque::Path( videoFile ).getFileName() );   
-   VIDCAP->setEncoderName( encoder );   
+   VIDCAP->setFilename( Torque::Path( videoFile ).getFileName() );
+   VIDCAP->setEncoderName( encoder );
    VIDCAP->setFramerate( framerate );
 
    if ( !resolution.isZero() )

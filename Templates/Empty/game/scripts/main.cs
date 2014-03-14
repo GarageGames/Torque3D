@@ -48,7 +48,7 @@ function parseArgs()
       %arg = $Game::argv[%i];
       %nextArg = $Game::argv[%i+1];
       %hasNextArg = $Game::argc - %i > 1;
-   
+
       switch$ (%arg)
       {
          //--------------------
@@ -85,20 +85,20 @@ function parseArgs()
 function onStart()
 {
    // The core does initialization which requires some of
-   // the preferences to loaded... so do that first.  
+   // the preferences to loaded... so do that first.
    exec( "./client/defaults.cs" );
    exec( "./server/defaults.cs" );
-             
+
    Parent::onStart();
    echo("\n--------- Initializing Directory: scripts ---------");
 
    // Load the scripts that start it all...
    exec("./client/init.cs");
    exec("./server/init.cs");
-   
+
    // Init the physics plugin.
    physicsInit();
-      
+
    // Start up the audio system.
    sfxStartup();
 
@@ -122,10 +122,10 @@ function onExit()
       destroyServer();
    else
       disconnect();
-   
+
    // Destroy the physics plugin.
    physicsDestroy();
-      
+
    echo("Exporting client prefs");
    export("$pref::*", "./client/prefs.cs", False);
 

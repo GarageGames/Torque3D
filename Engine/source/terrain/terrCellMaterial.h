@@ -61,7 +61,7 @@ protected:
       {
       }
 
-      ~MaterialInfo() 
+      ~MaterialInfo()
       {
       }
 
@@ -88,12 +88,12 @@ protected:
    {
    public:
 
-      Pass() 
-         :  shader( NULL )                     
+      Pass()
+         :  shader( NULL )
       {
       }
 
-      ~Pass() 
+      ~Pass()
       {
          for ( U32 i=0; i < materials.size(); i++ )
             delete materials[i];
@@ -159,8 +159,8 @@ protected:
    /// A vector of all terrain cell materials loaded in the system.
    static Vector<TerrainCellMaterial*> smAllMaterials;
 
-   bool _createPass( Vector<MaterialInfo*> *materials, 
-                     Pass *pass, 
+   bool _createPass( Vector<MaterialInfo*> *materials,
+                     Pass *pass,
                      bool firstPass,
                      bool prePassMat,
                      bool reflectMat,
@@ -169,11 +169,11 @@ protected:
    void _updateMaterialConsts( Pass *pass );
 
 public:
-   
+
    TerrainCellMaterial();
    ~TerrainCellMaterial();
 
-   void init(  TerrainBlock *block, 
+   void init(  TerrainBlock *block,
                U64 activeMaterials,
                bool prePassMat = false,
                bool reflectMat = false,
@@ -185,7 +185,7 @@ public:
    /// Returns the reflection material from this material.
    TerrainCellMaterial* getReflectMat();
 
-   void setTransformAndEye(   const MatrixF &modelXfm, 
+   void setTransformAndEye(   const MatrixF &modelXfm,
                               const MatrixF &viewXfm,
                               const MatrixF &projectXfm,
                               F32 farPlane );
@@ -197,7 +197,7 @@ public:
    ///
    static BaseMatInstance* getShadowMat();
 
-   /// 
+   ///
    static void _updateDefaultAnisotropy();
 };
 

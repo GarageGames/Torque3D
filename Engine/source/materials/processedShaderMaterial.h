@@ -49,16 +49,16 @@ public:
    GFXShaderConstHandle* mSpecularStrengthSC;
    GFXShaderConstHandle* mParallaxInfoSC;
    GFXShaderConstHandle* mFogDataSC;
-   GFXShaderConstHandle* mFogColorSC;   
+   GFXShaderConstHandle* mFogColorSC;
    GFXShaderConstHandle* mDetailScaleSC;
    GFXShaderConstHandle* mVisiblitySC;
    GFXShaderConstHandle* mColorMultiplySC;
    GFXShaderConstHandle* mAlphaTestValueSC;
    GFXShaderConstHandle* mModelViewProjSC;
-   GFXShaderConstHandle* mWorldViewOnlySC;     
+   GFXShaderConstHandle* mWorldViewOnlySC;
    GFXShaderConstHandle* mWorldToCameraSC;
-   GFXShaderConstHandle* mWorldToObjSC;         
-   GFXShaderConstHandle* mViewToObjSC;         
+   GFXShaderConstHandle* mWorldToObjSC;
+   GFXShaderConstHandle* mViewToObjSC;
    GFXShaderConstHandle* mCubeTransSC;
    GFXShaderConstHandle* mObjTransSC;
    GFXShaderConstHandle* mCubeEyePosSC;
@@ -114,18 +114,18 @@ public:
    ~ProcessedShaderMaterial();
 
    // ProcessedMaterial
-   virtual bool init(   const FeatureSet &features, 
+   virtual bool init(   const FeatureSet &features,
                         const GFXVertexFormat *vertexFormat,
                         const MatFeaturesDelegate &featuresDelegate );
    virtual bool setupPass(SceneRenderState *, const SceneData& sgData, U32 pass);
    virtual void setTextureStages(SceneRenderState *, const SceneData &sgData, U32 pass );
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state, const U32 pass);
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData, U32 pass);
-   virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer); 
+   virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer);
    virtual bool stepInstance();
    virtual void dumpMaterialInfo();
-   virtual MaterialParameters* allocMaterialParameters();    
-   virtual MaterialParameters* getDefaultMaterialParameters() { return mDefaultParameters; }   
+   virtual MaterialParameters* allocMaterialParameters();
+   virtual MaterialParameters* getDefaultMaterialParameters() { return mDefaultParameters; }
    virtual MaterialParameterHandle* getMaterialParameterHandle(const String& name);
    virtual U32 getNumStages();
 
@@ -135,7 +135,7 @@ protected:
    MaterialParameters* mDefaultParameters;
    Vector<ShaderMaterialParameterHandle*> mParameterHandles;
 
-   /// Hold the instancing state data for the material.   
+   /// Hold the instancing state data for the material.
    class InstancingState
    {
       const static U32 COUNT = 200;
@@ -197,7 +197,7 @@ protected:
    protected:
 
       GFXVertexFormat mDeclFormat;
-      const GFXVertexFormat *mInstFormat;  
+      const GFXVertexFormat *mInstFormat;
       U8 *mBuffer;
       S32 mCount;
 
@@ -206,14 +206,14 @@ protected:
    /// The instancing state if this material
    /// supports instancing.
    InstancingState *mInstancingState;
-   
+
    /// @name Internal functions
    ///
    /// @{
 
    /// Adds a pass for the given stage.
-   virtual bool _addPass( ShaderRenderPassData &rpd, 
-      U32 &texIndex, 
+   virtual bool _addPass( ShaderRenderPassData &rpd,
+      U32 &texIndex,
       MaterialFeatureData &fd,
       U32 stageNum,
       const FeatureSet &features);
@@ -230,8 +230,8 @@ protected:
    virtual bool _createPasses( MaterialFeatureData &fd, U32 stageNum, const FeatureSet &features );
 
    /// Fills in the MaterialFeatureData for the given stage
-   virtual void _determineFeatures( U32 stageNum, 
-                                    MaterialFeatureData &fd, 
+   virtual void _determineFeatures( U32 stageNum,
+                                    MaterialFeatureData &fd,
                                     const FeatureSet &features );
 
    /// Do we have a cubemap on pass?

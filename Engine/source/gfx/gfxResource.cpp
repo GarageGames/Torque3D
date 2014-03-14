@@ -35,7 +35,7 @@ GFXResource::~GFXResource()
    // Make sure we're not the head of the list and referencd on the device.
    if(mOwningDevice && mOwningDevice->mResourceListHead == this)
    {
-      AssertFatal(mPrevResource == NULL, 
+      AssertFatal(mPrevResource == NULL,
          "GFXResource::~GFXResource - head of list but have a previous item!");
       mOwningDevice->mResourceListHead = mNextResource;
    }

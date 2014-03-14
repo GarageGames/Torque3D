@@ -101,7 +101,7 @@
                class = "GuiTreeViewFilterText";
                treeView = DatablockEditorTree;
             };
-            
+
             new GuiBitmapButtonCtrl() {
                bitmap = "tools/gui/images/clear-icon";
                groupNum = "-1";
@@ -122,7 +122,7 @@
                class = "GuiTreeViewFilterClearButton";
                textCtrl = DatablockEditorTreeFilter;
             };
-            
+
             new GuiScrollCtrl() {
                willFirstRespond = "1";
                hScrollBar = "dynamic";

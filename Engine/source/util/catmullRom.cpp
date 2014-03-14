@@ -28,7 +28,7 @@
 
 const F32 CatmullRomBase::smX[] =
 {
-   0.0000000000f, 0.5384693101f, -0.5384693101f, 0.9061798459f, -0.9061798459f 
+   0.0000000000f, 0.5384693101f, -0.5384693101f, 0.9061798459f, -0.9061798459f
 };
 
 const F32 CatmullRomBase::smC[] =
@@ -37,13 +37,13 @@ const F32 CatmullRomBase::smC[] =
 };
 
 
-CatmullRomBase::CatmullRomBase() 
+CatmullRomBase::CatmullRomBase()
 : mTimes( NULL ),
   mLengths( NULL ),
   mTotalLength( 0.0f ),
   mCount( 0 )
 {
-} 
+}
 
 void CatmullRomBase::_initialize( U32 count, const F32 *times )
 {
@@ -164,7 +164,7 @@ U32 CatmullRomBase::getPrevNode( F32 t )
 
    AssertFatal( i >= 0 && i < mCount, "CatmullRomBase::getPrevNode - Got bad output index!" );
 
-   return i;   
+   return i;
 }
 
 F32 CatmullRomBase::getTime( U32 idx )

@@ -31,13 +31,13 @@
 class ColorI;
 
 
-class GFXVertexColor 
+class GFXVertexColor
 {
 
 private:
    U32 packedColorData;
    static Swizzle<U8, 4> *mDeviceSwizzle;
-   
+
 public:
    static void setSwizzle( Swizzle<U8, 4> *val ) { mDeviceSwizzle = val; }
 
@@ -62,7 +62,7 @@ public:
    void getColor( ColorI *color ) const
    {
       mDeviceSwizzle->ToBuffer( color, &packedColorData, sizeof( packedColorData ) );
-   }      
+   }
 };
 
 #endif

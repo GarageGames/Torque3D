@@ -43,13 +43,13 @@ class ForestConvex : public Convex
 
 public:
 
-   ForestConvex() 
-   { 
-      mType = ForestConvexType; 
-      mTransform.identity(); 
+   ForestConvex()
+   {
+      mType = ForestConvexType;
+      mTransform.identity();
    }
 
-   ForestConvex( const ForestConvex &cv ) 
+   ForestConvex( const ForestConvex &cv )
    {
       mType          = ForestConvexType;
       mObject        = cv.mObject;

@@ -32,7 +32,7 @@
 
 class GuiGradientSwatchCtrl : public GuiSwatchButtonCtrl
 {
-private:		
+private:
 	typedef GuiSwatchButtonCtrl Parent;
 private:
 	Point2I mMouseDownPosition;
@@ -56,20 +56,20 @@ protected:
 class GuiGradientCtrl : public GuiControl
 {
    typedef GuiControl Parent;
-   
+
 public:
    enum PickMode
    {
 		pHorizColorRange,		///< We have a range of base colors going horizontally
 		pHorizAlphaRange,		///< We have a box which shows a range in alpha going horizontally
    };
-   
+
    enum SelectorMode
    {
 		sHorizontal = 0,		///< Horizontal selector with small gap
 		sVertical,			///< Vertical selector with small gap
    };
-	
+
 	struct ColorRange
 	{
 		GuiGradientSwatchCtrl* swatch;
@@ -83,7 +83,7 @@ public:
 	RectI mBlendRangeBox;
 
 private:
-   
+
    /// @name Core Rendering functions
    /// @{
    void renderColorBox(RectI &bounds);			///< Function that draws the actual color box
@@ -104,7 +104,7 @@ private:
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
    GFXStateBlockRef mStateBlock;
-	
+
 	ColorF colorWhite;
 	ColorF colorWhiteBlend;
 	ColorF colorBlack;
@@ -112,12 +112,12 @@ private:
 	ColorF colorAlphaW;
    /// @}
 	String mColorFunction;
-	
-public:   
-   
+
+public:
+
    DECLARE_CONOBJECT(GuiGradientCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
-   
+
    GuiGradientCtrl();
 
    static void initPersistFields();
@@ -131,7 +131,7 @@ public:
    ColorF getValue() {return mPickColor;}
    void updateColor() {mPositionChanged = true;}
    /// @}
-   
+
    /// @name Input Events
    /// @{
    void onMouseDown(const GuiEvent &);

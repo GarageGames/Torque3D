@@ -28,7 +28,7 @@
 #endif
 
 
-/// 
+///
 enum PFXRenderTime
 {
    /// Before a RenderInstManager bin.
@@ -91,7 +91,7 @@ struct PFXFrameState
    MatrixF worldToCamera;
    MatrixF cameraToScreen;
 
-   PFXFrameState() 
+   PFXFrameState()
       :  worldToCamera( true ),
          cameraToScreen( true )
    {
@@ -110,7 +110,7 @@ GFXDeclareVertexFormat( PFXVertex )
    /// The screen space texture coord.
    Point2F texCoord;
 
-   /// 
+   ///
    Point3F wsEyeRay;
 };
 

@@ -95,7 +95,7 @@ public:
    // parent/child methods
 
    Transform3D * getParentTransform() const
-   { 
+   {
       return _parentTransform;
    }
 

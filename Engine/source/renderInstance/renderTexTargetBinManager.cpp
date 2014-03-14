@@ -33,7 +33,7 @@
 
 IMPLEMENT_CONOBJECT(RenderTexTargetBinManager);
 
-ConsoleDocClass( RenderTexTargetBinManager, 
+ConsoleDocClass( RenderTexTargetBinManager,
    "@brief An abstract base class for render bin managers that render to a named textue target.\n\n"
    "This bin itself doesn't do any rendering work.  It offers functionality to manage "
    "a texture render target which derived render bin classes can render into.\n\n"
@@ -41,22 +41,22 @@ ConsoleDocClass( RenderTexTargetBinManager,
    "@ingroup RenderBin\n" );
 
 
-RenderTexTargetBinManager::RenderTexTargetBinManager( const RenderInstType& ritype, 
-                                                      F32 renderOrder, 
+RenderTexTargetBinManager::RenderTexTargetBinManager( const RenderInstType& ritype,
+                                                      F32 renderOrder,
                                                       F32 processAddOrder,
                                                       const GFXFormat targetFormat,
                                                       const Point2I &targetSize,
                                                       const U32 targetChainLength )
 
-   :  Parent( ritype, renderOrder, processAddOrder ),      
-      mTargetFormat(targetFormat), 
-      mTargetSize(targetSize), 
-      mTargetScale(1.0f, 1.0f), 
+   :  Parent( ritype, renderOrder, processAddOrder ),
+      mTargetFormat(targetFormat),
+      mTargetSize(targetSize),
+      mTargetScale(1.0f, 1.0f),
       mTargetSizeType(FixedSize),
-      mTargetChainLength(targetChainLength), 
-      mTargetChainIdx(0), 
+      mTargetChainLength(targetChainLength),
+      mTargetChainIdx(0),
       mNumRenderTargets(1),
-      mTargetChain(NULL), 
+      mTargetChain(NULL),
       mTargetChainTextures(NULL)
       #ifndef TORQUE_SHIPPING
          ,m_NeedsOnPostRender(false)

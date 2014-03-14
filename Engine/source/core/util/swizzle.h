@@ -28,7 +28,7 @@
 
 /// This class will swizzle 'sizeof( T )' length chunks of memory into different
 /// patterns which are user described. The pattern is described by an instance
-/// of Swizzle and this swizzle can then be executed on buffers. The following 
+/// of Swizzle and this swizzle can then be executed on buffers. The following
 /// must be true of the buffer size:
 ///    size % ( sizeof( T ) * mapLength ) == 0
 template<class T, dsize_t mapLength>
@@ -37,10 +37,10 @@ class Swizzle
 private:
    /// This is an array from 0..n. Each entry in the array is a dsize_t with values
    /// in the range 0..n. Each value in the range 0..n can occur any number of times.
-   /// 
+   ///
    /// For example:
    /// This is our data set, an array of characters with 4 elements
-   /// { 'a', 'b', 'c', 'd' } 
+   /// { 'a', 'b', 'c', 'd' }
    ///
    /// If the map { 3, 2, 1, 0 } was applied to this set, the result would be:
    /// { 'd', 'c', 'b', 'a' }
@@ -90,14 +90,14 @@ public:
 };
 
 //------------------------------------------------------------------------------
-// Common Swizzles 
+// Common Swizzles
 namespace Swizzles
 {
    extern Swizzle<U8, 4> bgra;
    extern Swizzle<U8, 4> argb;
    extern Swizzle<U8, 4> rgba;
    extern Swizzle<U8, 4> abgr;
-   
+
    extern Swizzle<U8, 3> bgr;
    extern Swizzle<U8, 3> rgb;
 
@@ -132,7 +132,7 @@ inline void Swizzle<T, mapLength>::ToBuffer( void *destination, const void *sour
 
       for( int j = 0; j < mapLength; j++ )
          *dest++ = src[mMap[j]];
-      
+
       src += mapLength;
    }
 }

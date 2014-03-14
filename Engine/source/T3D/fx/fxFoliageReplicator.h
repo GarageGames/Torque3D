@@ -64,16 +64,16 @@
 class fxFoliageItem
 {
 public:
-   MatrixF     Transform;		
-   F32         Width;			
-   F32         Height;			
-   Box3F			FoliageBox;		
-   bool			Flipped;			
-   F32         SwayPhase;     
-   F32         SwayTimeRatio; 
-   F32         LightPhase;		
-   F32         LightTimeRatio; 
-	U32         LastFrameSerialID; 
+   MatrixF     Transform;
+   F32         Width;
+   F32         Height;
+   Box3F			FoliageBox;
+   bool			Flipped;
+   F32         SwayPhase;
+   F32         SwayTimeRatio;
+   F32         LightPhase;
+   F32         LightTimeRatio;
+	U32         LastFrameSerialID;
 };
 
 //------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ public:
 };
 
 
-// Define a vertex 
+// Define a vertex
 GFXDeclareVertexFormat( GFXVertexFoliage )
 {
    Point3F point;
@@ -223,7 +223,7 @@ protected:
 
 
    bool              mDirty;
-	
+
    void SetupShader();
 	void SetupBuffers();
    void renderObject(ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance*);
@@ -384,5 +384,5 @@ public:
    // Declare Console Object.
    DECLARE_CONOBJECT(fxFoliageReplicator);
 };
-#pragma warning( pop ) 
+#pragma warning( pop )
 #endif // _FOLIAGEREPLICATOR_H_

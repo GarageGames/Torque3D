@@ -889,7 +889,7 @@ PersistenceManager::ParsedObject* PersistenceManager::findParsedObject(SimObject
          {
             const ParsedProperty &prop = testObj->properties[j];
 
-            if (	dStrcmp( prop.name, "internalName" ) == 0 && 
+            if (	dStrcmp( prop.name, "internalName" ) == 0 &&
                dStrcmp( prop.value, object->getInternalName() ) == 0 )
                return testObj;
             else if ( dStrcmp(prop.name, "internalName") == 0)
@@ -1315,12 +1315,12 @@ PersistenceManager::ParsedObject* PersistenceManager::writeNewObject(SimObject* 
 
    mObjectBuffer.push_back(parsedObject);
 
-   // Update the SimObject to reflect its saved name and declaration line.   
+   // Update the SimObject to reflect its saved name and declaration line.
    // These values should always reflect what is in the file, even if the object
    // has not actually been re-created from an execution of that file yet.
    object->setOriginalName( object->getName() );
    object->setDeclarationLine( currInsertLine );
-   
+
    if (mCurrentFile)
       object->setFilename(mCurrentFile);
 
@@ -1332,7 +1332,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
    // Create a default object of the same type
    ConsoleObject *defaultConObject = ConsoleObject::create(object->getClassName());
    SimObject* defaultObject = dynamic_cast<SimObject*>(defaultConObject);
-   
+
    // ***Really*** shouldn't happen
    if (!defaultObject)
       return;
@@ -1345,15 +1345,15 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
    // and the SimObject then go ahead and create it
    if (parsedObject && parsedObject->simObject.isNull())
       parsedObject->simObject = object;
-      
+
    // Kill all fields on the remove list.
-   
+
    for( U32 i = 0; i < mRemoveFields.size(); ++ i )
    {
       RemoveField& field = mRemoveFields[ i ];
       if( field.object != object )
          continue;
-         
+
       S32 propertyIndex = getPropertyIndex( parsedObject, field.fieldName, field.arrayPos );
       if( propertyIndex != -1 )
          removeField( parsedObject->properties[ propertyIndex ] );
@@ -1402,7 +1402,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
             // As for copy-sources, we just assume here that if a property setting
             // is there in the file, the user does not want it inherited from the copy-source
             // even in the case the actual values are identical.
-            
+
             if( dStricmp(value, evalue) != 0 )
             {
                if( value[ 0 ] == '\0' &&
@@ -1439,7 +1439,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
                dFree( value );
                continue;
             }
-            
+
             bool mustUpdate = false;
 
             // If we didn't find the property in the ParsedObject
@@ -1451,13 +1451,13 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
             {
                // Value differs.  Check whether it also differs from the
                // value in the copy source if there is one.
-               
+
                if( object->getCopySource() )
                {
                   const char* copySourceValue = getFieldValue( object->getCopySource(), f->pFieldname, j );
                   if( !copySourceValue || dStricmp( copySourceValue, value ) != 0 )
                      mustUpdate = true;
-                     
+
                   if( copySourceValue )
                      dFree( copySourceValue );
                }
@@ -1469,13 +1469,13 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
                // Value does not differ.  If it differs from the copy source's value,
                // though, we still want to write it out as otherwise we'll see the
                // copy source's value override us.
-               
+
                if( object->getCopySource() )
                {
                   const char* copySourceValue = getFieldValue( object->getCopySource(), f->pFieldname, j );
                   if( copySourceValue && dStricmp( copySourceValue, value ) != 0 )
                      mustUpdate = true;
-                     
+
                   if( copySourceValue )
                      dFree( copySourceValue );
                }
@@ -1489,7 +1489,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
             //   continue;
 
             // If the object's value is different from the default
-            // value then add it to the ParsedObject's newLines                        
+            // value then add it to the ParsedObject's newLines
             if ( mustUpdate )
             {
                // TODO: This should be wrapped in a helper method... probably.
@@ -1506,7 +1506,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
                   newLines.push_back(createNewProperty(f->pFieldname, fnBuf, f->elementCount > 1, j));
                }
                else
-                  newLines.push_back(createNewProperty(f->pFieldname, value, f->elementCount > 1, j));              
+                  newLines.push_back(createNewProperty(f->pFieldname, value, f->elementCount > 1, j));
             }
 
             if (defaultValue)
@@ -1553,7 +1553,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
          const char* evalue = prop.value;
 
          const char *entryVal = entry->value;
-         if ( entryVal[0] == StringTagPrefixByte )           
+         if ( entryVal[0] == StringTagPrefixByte )
             entryVal = gNetStringTable->lookupString( dAtoi( entryVal+1 ) );
          else
          {
@@ -1582,9 +1582,9 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
          newLines.push_back(createNewProperty(entry->slotName, entry->value));
       }
    }
-   
+
    // If we have a parsedObject and the name changed
-   // then update the parsedObject to the new name.   
+   // then update the parsedObject to the new name.
    // NOTE: an object 'can' have a NULL name which crashes in dStricmp.
    if (parsedObject && parsedObject->name != StringTable->insert(object->getName(), true) )
    {
@@ -1701,7 +1701,7 @@ void PersistenceManager::updateObject(SimObject* object, ParsedObject* parentObj
    // Flag this as an updated object
    if (parsedObject)
       parsedObject->updated = true;
-   
+
    // Cleanup our created default object
    delete defaultConObject;
 }
@@ -1779,7 +1779,7 @@ S32 QSORT_CALLBACK PersistenceManager::compareFiles(const void* a,const void* b)
 bool PersistenceManager::setDirty(SimObject* inObject, const char* inFileName)
 {
    // Check if the object is already in the dirty list...
-   DirtyObject *pDirty = findDirtyObject( inObject );   
+   DirtyObject *pDirty = findDirtyObject( inObject );
 
    // The filename we will save this object to (later)..
    String saveFile;
@@ -1793,13 +1793,13 @@ bool PersistenceManager::setDirty(SimObject* inObject, const char* inFileName)
    }
 
    // If no filename was passed in, and the object was already dirty,
-   // we have nothing to do.   
+   // we have nothing to do.
    if ( saveFile.isEmpty() && pDirty )
       return true;
 
    // Otherwise default to the simObject's filename.
    if ( saveFile.isEmpty() )
-      saveFile = inObject->getFilename();   
+      saveFile = inObject->getFilename();
 
    // Error if still no filename.
    if ( saveFile.isEmpty() )
@@ -1818,7 +1818,7 @@ bool PersistenceManager::setDirty(SimObject* inObject, const char* inFileName)
    if ( pDirty )
       pDirty->fileName = StringTable->insert( saveFile );
    else
-   {    
+   {
       // Add the newly dirty object.
       mDirtyObjects.increment();
       mDirtyObjects.last().setObject( inObject );
@@ -2054,7 +2054,7 @@ bool PersistenceManager::saveDirtyObject(SimObject* object)
 		      updateObject(object);
             saveDirtyFile();
 		   }
-         
+
          break;
       }
    }
@@ -2074,7 +2074,7 @@ void PersistenceManager::removeObjectFromFile(SimObject* object, const char* fil
 
       return;
    }
-   
+
    const char* file = object->getFilename();
    if (fileName)
    {
@@ -2085,7 +2085,7 @@ void PersistenceManager::removeObjectFromFile(SimObject* object, const char* fil
    }
 
    bool success = false;
-   
+
    if ( file && file[ 0 ] )
       success = parseFile(file);
 
@@ -2101,8 +2101,8 @@ void PersistenceManager::removeObjectFromFile(SimObject* object, const char* fil
 
       if ( !file )
          Con::errorf("PersistenceManager::removeObjectFromFile(): File was null trying to save %s", errorNameStr.c_str() );
-      else            
-         Con::errorf("PersistenceManager::removeObjectFromFile(): Unable to open %s to save %s", file, errorNameStr.c_str() );            
+      else
+         Con::errorf("PersistenceManager::removeObjectFromFile(): Unable to open %s to save %s", file, errorNameStr.c_str() );
 
       // Reset everything
       clearAll();
@@ -2208,9 +2208,9 @@ ConsoleMethod( PersistenceManager, setDirty, void, 3, 4, "(SimObject object, [fi
          return;
       }
    }
-   
+
    // Prevent ourselves from shooting us in the foot.
-   
+
    if( dirtyObject == Sim::getRootGroup() )
    {
       Con::errorf( "%s(): Cannot save RootGroup", argv[ 0 ] );

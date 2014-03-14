@@ -32,14 +32,14 @@ IMPLEMENT_CONOBJECT( GuiSplitContainer );
 
 ConsoleDocClass( GuiSplitContainer,
    "@brief A container that splits its area between two child controls.\n\n"
-   
+
    "A GuiSplitContainer can be used to dynamically subdivide an area between two child controls.  "
    "A splitter bar is placed between the two controls and allows to dynamically adjust the sizing "
    "ratio between the two sides.  Splitting can be either horizontal (subdividing top and bottom) "
    "or vertical (subdividing left and right) depending on #orientation.\n\n"
-   
+
    "By using #fixedPanel, one of the panels can be chosen to remain at a fixed size (#fixedSize)."
-   
+
    "@tsexample\n"
    "// Create a vertical splitter with a fixed-size left panel.\n"
    "%splitter = new GuiSplitContainer()\n"
@@ -65,9 +65,9 @@ ConsoleDocClass( GuiSplitContainer,
    "   };\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@note The children placed inside GuiSplitContainers must be GuiContainers.\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -76,7 +76,7 @@ ImplementEnumType( GuiSplitOrientation,
    "Axis along which to divide the container's space.\n\n"
    "@ingroup GuiContainers" )
    { GuiSplitContainer::Vertical, "Vertical", "Divide vertically placing one child left and one child right." },
-   { GuiSplitContainer::Horizontal, "Horizontal", "Divide horizontally placing one child on top and one child below." }   
+   { GuiSplitContainer::Horizontal, "Horizontal", "Divide horizontally placing one child on top and one child below." }
 EndImplementEnumType;
 
 ImplementEnumType( GuiSplitFixedPanel,
@@ -114,7 +114,7 @@ GuiSplitContainer::GuiSplitContainer()
 void GuiSplitContainer::initPersistFields()
 {
    addGroup( "Splitter", "Options to configure split panels contained by this control" );
-   
+
       addField( "orientation",   TYPEID< Orientation >(),   Offset( mOrientation, GuiSplitContainer),
          "Whether to split between top and bottom (horizontal) or between left and right (vertical)." );
       addField( "splitterSize",  TypeS32,    Offset( mSplitterSize, GuiSplitContainer),
@@ -126,7 +126,7 @@ void GuiSplitContainer::initPersistFields()
          "Which (if any) side of the splitter to keep at a fixed size." );
       addField( "fixedSize",     TypeS32,    Offset( mFixedPanelSize, GuiSplitContainer),
          "Width of the fixed panel specified by #fixedPanel (if any)." );
-      
+
    endGroup( "Splitter" );
 
    Parent::initPersistFields();
@@ -233,14 +233,14 @@ void GuiSplitContainer::onRender( Point2I offset, const RectI &updateRect )
       // Splitter Rectangle (will adjust positioning only)
       RectI splitterRect = mSplitRect;
 
-      // Currently being dragged to Rect 
+      // Currently being dragged to Rect
       Point2I splitterPoint = localToGlobalCoord( mSplitRect.point );
       splitterRect.point = localToGlobalCoord( mSplitPoint );
 
       RectI clientRect = getClientRect();
       clientRect.point = localToGlobalCoord( clientRect.point );
 
-      if ( mOrientation == Horizontal ) 
+      if ( mOrientation == Horizontal )
       {
          splitterRect.point.y -= mSplitterSize;
          splitterRect.point.x = splitterPoint.x;
@@ -305,7 +305,7 @@ void GuiSplitContainer::parentResized( const RectI &oldParentRect, const RectI &
 
    // GuiSplitContainer overrides parentResized to make sure that the proper fixed frame's width/height
    // is not compromised in the call
-   
+
    if ( size() < 2 )
       return;
 
@@ -326,12 +326,12 @@ void GuiSplitContainer::parentResized( const RectI &oldParentRect, const RectI &
       newDragPos -= Point2I( mSplitterSize, mSplitterSize );
    }
    else // None
-      newDragPos.set( 1, 1);   
-  
+      newDragPos.set( 1, 1);
+
    RectI clientRect = getClientRect();
    solvePanelConstraints( newDragPos, panelOne, panelTwo, clientRect );
 
-   setUpdateLayout(); 
+   setUpdateLayout();
    */
 }
 
@@ -348,16 +348,16 @@ bool GuiSplitContainer::resize( const Point2I &newPosition, const Point2I &newEx
 
    GuiContainer *panelOne = dynamic_cast<GuiContainer*>( at(0) );
    GuiContainer *panelTwo = dynamic_cast<GuiContainer*>( at(1) );
-	
-   // 
+
+   //
    AssertFatal( panelOne && panelTwo, "GuiSplitContainer::resize - Missing/Invalid Subordinate Controls! Split contained controls must derive from GuiContainer!" );
 
-   // We only need to update the split point if our second panel is fixed.  
+   // We only need to update the split point if our second panel is fixed.
    // If the first is fixed, then we can leave the split point alone because
    // the remainder of the size will be added to or taken from the second panel
    Point2I newDragPos;
    if ( mFixedPanel == SecondPanel )
-   {      
+   {
       S32 deltaX = newExtent.x - oldExtent.x;
       S32 deltaY = newExtent.y - oldExtent.y;
 
@@ -381,7 +381,7 @@ bool GuiSplitContainer::layoutControls( RectI &clientRect )
    GuiContainer *panelOne = dynamic_cast<GuiContainer*>( at(0) );
    GuiContainer *panelTwo = dynamic_cast<GuiContainer*>( at(1) );
 
-   // 
+   //
    AssertFatal( panelOne && panelTwo, "GuiSplitContainer::layoutControl - Missing/Invalid Subordinate Controls! Split contained controls must derive from GuiContainer!" );
 
    RectI panelOneRect = RectI( clientRect.point, Point2I( 0, 0 ) );
@@ -436,9 +436,9 @@ bool GuiSplitContainer::layoutControls( RectI &clientRect )
    if( !( mFixedPanel == FirstPanel && !panelOne->isVisible() ) )
       dockControl( panelOne, panelOne->getDocking(), panelOneRect );
    if( !( mFixedPanel == FirstPanel && !panelTwo->isVisible() ) )
-      dockControl( panelTwo, panelOne->getDocking(), panelTwoRect );   
+      dockControl( panelTwo, panelOne->getDocking(), panelTwoRect );
 
-   // 
+   //
    return false;
 }
 
@@ -453,7 +453,7 @@ void GuiSplitContainer::solvePanelConstraints( Point2I newDragPos, GuiContainer 
    {
       // Constrain based on Y axis (Horizontal Splitter)
 
-      // This accounts for the splitter width 
+      // This accounts for the splitter width
       S32 splitterSize = (S32)(mSplitRect.extent.y * 0.5);
 
       // Collapsed fixed panel
@@ -468,7 +468,7 @@ void GuiSplitContainer::solvePanelConstraints( Point2I newDragPos, GuiContainer 
       else // Normal constraints
       {
          //newDragPos.y -= splitterSize;
-         S32 newPosition = mClamp( newDragPos.y, 
+         S32 newPosition = mClamp( newDragPos.y,
                                    firstPanel->getMinExtent().y + splitterSize,
                                    getExtent().y - secondPanel->getMinExtent().y - splitterSize );
          newDragPos = Point2I( mSplitPoint.x, newPosition );
@@ -478,7 +478,7 @@ void GuiSplitContainer::solvePanelConstraints( Point2I newDragPos, GuiContainer 
    {
       // Constrain based on X axis (Vertical Splitter)
 
-      // This accounts for the splitter width 
+      // This accounts for the splitter width
       S32 splitterSize = (S32)(mSplitRect.extent.x * 0.5);
 
       // Collapsed fixed panel
@@ -577,7 +577,7 @@ void GuiSplitContainer::onMouseDown( const GuiEvent &event )
 
 void GuiSplitContainer::onMouseUp( const GuiEvent &event )
 {
-   // If we've been dragging, we need to update the fixed panel extent.  
+   // If we've been dragging, we need to update the fixed panel extent.
    // NOTE : This should ONLY ever happen in this function.  the Fixed panel
    // is to REMAIN FIXED unless the user changes it.
    if ( mDragging )

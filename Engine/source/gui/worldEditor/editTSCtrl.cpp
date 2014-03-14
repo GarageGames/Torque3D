@@ -219,7 +219,7 @@ void EditTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 void EditTSCtrl::initPersistFields()
 {
    addGroup( "Grid" );
-   
+
       addField( "gridSize", TypeF32, Offset( mGridPlaneSize, EditTSCtrl ) );
       addField( "gridColor", TypeColorI, Offset( mGridPlaneColor, EditTSCtrl ) );
       addField( "gridOriginColor", TypeColorI, Offset( mGridPlaneOriginColor, EditTSCtrl ) );
@@ -228,38 +228,38 @@ void EditTSCtrl::initPersistFields()
          "Whether to render the grid in orthographic axial projections." );
       addField( "renderOrthoGridPixelBias", TypeF32, Offset( mGridPlaneSizePixelBias, EditTSCtrl ),
          "Grid patch pixel size below which to switch to coarser grid resolutions." );
-   
+
    endGroup( "Grid" );
-   
-   addGroup("Mission Area");	
-   
+
+   addGroup("Mission Area");
+
       addField("renderMissionArea", TypeBool, Offset(mRenderMissionArea, EditTSCtrl));
       addField("missionAreaFillColor", TypeColorI, Offset(mMissionAreaFillColor, EditTSCtrl));
       addField("missionAreaFrameColor", TypeColorI, Offset(mMissionAreaFrameColor, EditTSCtrl));
       addField("missionAreaHeightAdjust", TypeF32, Offset(mMissionAreaHeightAdjust, EditTSCtrl),
          "How high above and below the terrain to render the mission area bounds." );
-      
-   endGroup("Mission Area");	
 
-   addGroup("BorderMovement");	
-   
+   endGroup("Mission Area");
+
+   addGroup("BorderMovement");
+
       addField("allowBorderMove", TypeBool, Offset(mAllowBorderMove, EditTSCtrl));
       addField("borderMovePixelSize", TypeS32, Offset(mMouseMoveBorder, EditTSCtrl));
       addField("borderMoveSpeed", TypeF32, Offset(mMouseMoveSpeed, EditTSCtrl));
-      
-   endGroup("BorderMovement");	
 
-   addGroup("Misc");	
-   
+   endGroup("BorderMovement");
+
+   addGroup("Misc");
+
       addField("consoleFrameColor", TypeColorI, Offset(mConsoleFrameColor, EditTSCtrl));
       addField("consoleFillColor", TypeColorI, Offset(mConsoleFillColor, EditTSCtrl));
       addField("consoleSphereLevel", TypeS32, Offset(mConsoleSphereLevel, EditTSCtrl));
       addField("consoleCircleSegments", TypeS32, Offset(mConsoleCircleSegments, EditTSCtrl));
       addField("consoleLineWidth", TypeS32, Offset(mConsoleLineWidth, EditTSCtrl));
       addField("gizmoProfile", TYPEID< GizmoProfile >(), Offset(mGizmoProfile, EditTSCtrl));
-      
+
    endGroup("Misc");
-   
+
    Parent::initPersistFields();
 }
 
@@ -267,10 +267,10 @@ void EditTSCtrl::consoleInit()
 {
    Con::addVariable("pref::WorldEditor::visibleDistanceScale", TypeF32, &EditTSCtrl::smVisibleDistanceScale, "Scale factor for the visible render distance.\n"
 	   "@ingroup ");
-   
+
    Con::addVariable("pref::WorldEditor::cameraFOV", TypeF32, &EditTSCtrl::smCamFOV, "Field of view for editor's perspective camera, in degrees.\n"
 	   "@ingroup ");
-   
+
    Con::setIntVariable( "$EditTsCtrl::DisplayTypeTop", DisplayTypeTop);
    Con::setIntVariable( "$EditTsCtrl::DisplayTypeBottom", DisplayTypeBottom);
    Con::setIntVariable( "$EditTsCtrl::DisplayTypeFront", DisplayTypeFront);
@@ -334,18 +334,18 @@ TerrainBlock* EditTSCtrl::getActiveTerrain()
 void EditTSCtrl::setDisplayType( S32 type )
 {
    mDisplayType = type;
-   
+
    // Disable middle-mouse pass-thru in ortho views so we can
    // use the middle mouse button for navigation.
 
    mMiddleMousePassThru = !isOrthoDisplayType();
-   
+
    if( mGizmo )
    {
       // Disable gizmo's grid plane in the isometric views since
       // they will render with the grid from EditTSCtrl.  Also disable
       // the move grid as it doesn't make sense in ortho views.
-      
+
       if( type != DisplayTypePerspective )
       {
          mGizmo->setGridPlaneEnabled( false );
@@ -387,7 +387,7 @@ void EditTSCtrl::onMouseDown(const GuiEvent & event)
    mLastBorderMoveTime = 0;
    make3DMouseEvent(mLastEvent, event);
    on3DMouseDown(mLastEvent);
-   
+
    setFirstResponder();
 }
 
@@ -522,7 +522,7 @@ void EditTSCtrl::onRightMouseDragged(const GuiEvent & event)
    on3DRightMouseDragged(mLastEvent);
 
    // Handle zoom of orthographic views.
-   
+
    if( isOrthoDisplayType() )
    {
       orthoZoom( ( event.mousePoint.y - mLastMousePos.y ) * 0.5f );
@@ -578,7 +578,7 @@ void EditTSCtrl::onMiddleMouseUp(const GuiEvent & event)
 void EditTSCtrl::onMiddleMouseDragged(const GuiEvent & event)
 {
    // Handle translation of orthographic views.
-   
+
    if( isOrthoDisplayType() )
    {
       calcOrthoCamOffset((event.mousePoint.x - mLastMousePos.x), (event.mousePoint.y - mLastMousePos.y), event.modifier);
@@ -678,7 +678,7 @@ bool EditTSCtrl::onInputEvent(const InputEventInfo & event)
 void EditTSCtrl::orthoZoom( F32 steps )
 {
    //TODO: this really should be proportional
-   
+
    mOrthoFOV += steps;
 
    if( mOrthoFOV < 1.0f )
@@ -760,8 +760,8 @@ void EditTSCtrl::renderWorld(const RectI & updateRect)
 
    gClientSceneGraph->setDisplayTargetResolution(getExtent());
 
-   // Use a render instance to do editor 3D scene 
-   // rendering after HDR is processed and while the depth 
+   // Use a render instance to do editor 3D scene
+   // rendering after HDR is processed and while the depth
    // buffer is still intact.
    RenderPassManager *rpm = gClientSceneGraph->getDefaultRenderPass();
    ObjectRenderInst *inst = rpm->allocInst<ObjectRenderInst>();
@@ -802,7 +802,7 @@ void EditTSCtrl::_renderScene( ObjectRenderInst*, SceneRenderState *state, BaseM
 
       // [ rene, 27-Jan-10 ] This calls onEditorRender on the server objects instead
       //    of on the client objects which seems a bit questionable to me.
- 
+
       for(SimSetIterator itr(missionGroup); *itr; ++itr)
       {
          SceneObject* object = dynamic_cast< SceneObject* >( *itr );
@@ -811,7 +811,7 @@ void EditTSCtrl::_renderScene( ObjectRenderInst*, SceneRenderState *state, BaseM
             char buf[2][16];
             dSprintf(buf[0], 16, object->isSelected() ? "true" : "false");
             dSprintf(buf[1], 16, object->isExpanded() ? "true" : "false");
-            
+
             Con::executef( object, "onEditorRender", getIdString(), buf[0], buf[1] );
          }
       }
@@ -1010,7 +1010,7 @@ void EditTSCtrl::renderGrid()
       case DisplayTypeBack:
          plane = GFXDrawUtil::PlaneXZ;
          break;
-         
+
       default:
          break;
    }
@@ -1233,7 +1233,7 @@ DefineEngineMethod(EditTSCtrl, renderSphere, void, ( Point3F pos, F32 radius, S3
 
    MatrixF camera = GFX->getWorldMatrix();
    camera.inverse();
-   
+
    SphereF sphere( pos, radius );
    if( sphere.isContained( camera.getPosition() ) )
       desc.setCullMode( GFXCullNone );
@@ -1346,7 +1346,7 @@ DefineEngineMethod( EditTSCtrl, renderTriangle, void, ( Point3F a, Point3F b, Po
    if( object->mConsoleFrameColor.alpha )
    {
       PrimBuild::color( object->mConsoleFrameColor );
-  
+
       // TODO: Set GFX line width (when it exists) to the value of 'object->mConsoleLineWidth'
 
       PrimBuild::begin( GFXLineStrip, 4 );

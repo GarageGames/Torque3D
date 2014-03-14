@@ -74,14 +74,14 @@ void ExtrudedPolyList::extrude(const Polyhedron& pt, const VectorF& vector)
    // Determine which faces will be extruded.
    mExtrudedList.setSize(pt.planeList.size());
 
-   for (U32 f = 0; f < pt.planeList.size(); f++) 
+   for (U32 f = 0; f < pt.planeList.size(); f++)
    {
       const PlaneF& face = pt.planeList[f];
       ExtrudedFace& eface = mExtrudedList[f];
       F32 dot = mDot(face,vector);
       eface.active = dot > EqualEpsilon;
-      
-      if (eface.active) 
+
+      if (eface.active)
       {
          eface.maxDistance = dot;
          eface.plane = face;
@@ -96,12 +96,12 @@ void ExtrudedPolyList::extrude(const Polyhedron& pt, const VectorF& vector)
    }
 
    // Produce extruded planes for bounding and internal edges
-   for (U32 e = 0; e < pt.edgeList.size(); e++) 
+   for (U32 e = 0; e < pt.edgeList.size(); e++)
    {
       Polyhedron::Edge const& edge = pt.edgeList[e];
       ExtrudedFace& ef1 = mExtrudedList[edge.face[0]];
       ExtrudedFace& ef2 = mExtrudedList[edge.face[1]];
-      if (ef1.active || ef2.active) 
+      if (ef1.active || ef2.active)
       {
 
          // Assumes that the edge points are clockwise
@@ -189,7 +189,7 @@ void ExtrudedPolyList::plane(U32 v1, U32 v2, U32 v3)
    mPoly.plane.set(mVertexList[v1].point,
                    mVertexList[v2].point,
                    mVertexList[v3].point);
-                   
+
    // We hope this isn't needed but we're leaving it in anyway -- BJG/EGH
    mPoly.plane.normalizeSafe();
 }
@@ -241,7 +241,7 @@ void ExtrudedPolyList::end()
 
       // Update the dot product.
       face->faceDot = -mDot(face->plane,mPoly.plane);
-      
+
       // Skip it if we're facing towards...
       if(face->faceDot <= 0.f)
          continue;
@@ -249,7 +249,7 @@ void ExtrudedPolyList::end()
       // Test, and skip if colliding.
       if (!testPoly(*face))
          continue;
- 
+
       // Note collision.
       cFace[cFaceCount]       = face;
       cEdgeColl[cFaceCount++] = false;
@@ -304,7 +304,7 @@ void ExtrudedPolyList::end()
    if (face->time > mCollisionList->getTime() + EqualEpsilon || face->time >= 1.0)
       return;
 
-   if (face->time < mCollisionList->getTime() - EqualEpsilon) 
+   if (face->time < mCollisionList->getTime() - EqualEpsilon)
    {
       // If this is significantly closer than before, then clear out the
       // list, as it's a better match than the old stuff.
@@ -312,7 +312,7 @@ void ExtrudedPolyList::end()
       mCollisionList->setTime( face->time );
       mCollisionList->setMaxHeight( face->height );
    }
-   else 
+   else
    {
       // Otherwise, just update some book-keeping stuff.
       if ( face->height > mCollisionList->getMaxHeight() )
@@ -341,7 +341,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
    U32 oIndexSize = mIndexList.size();
 
    U32 frontMask = 0,backMask = 0;
-   for (U32 i = indexStart; i < indexEnd; i++) 
+   for (U32 i = indexStart; i < indexEnd; i++)
    {
       U32 mask = mVertexList[mIndexList[i]].mask & face.planeMask;
       frontMask |= mask;
@@ -351,7 +351,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
    // Clip the mPoly against the planes that bound the face...
    // Trivial accept if all the vertices are on the backsides of
    // all the planes.
-   if (frontMask) 
+   if (frontMask)
    {
       // Trivial reject if any plane not crossed has all it's points
       // on the front.
@@ -360,7 +360,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
          return false;
 
       // Need to do some clipping
-      for (U32 p=0; p < mPlaneList.size(); p++) 
+      for (U32 p=0; p < mPlaneList.size(); p++)
       {
          U32 pmask    = BIT(p);
          U32 newStart = mIndexList.size();
@@ -373,7 +373,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
          U32 i1 = indexEnd - 1;
          U32 mask1 = mVertexList[mIndexList[i1]].mask;
 
-         for (U32 i2 = indexStart; i2 < indexEnd; i2++) 
+         for (U32 i2 = indexStart; i2 < indexEnd; i2++)
          {
             const U32 mask2 = mVertexList[mIndexList[i2]].mask;
             if ((mask1 ^ mask2) & pmask)
@@ -400,7 +400,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
                }
             }
 
-            if (!(mask2 & pmask)) 
+            if (!(mask2 & pmask))
             {
                U32 index = mIndexList[i2];
                mIndexList.push_back(index);
@@ -413,7 +413,7 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
          // Check for degenerate
          indexStart = newStart;
          indexEnd = mIndexList.size();
-         if (mIndexList.size() - indexStart < 3) 
+         if (mIndexList.size() - indexStart < 3)
          {
             mVertexList.setSize(oVertexSize);
             mIndexList.setSize(oIndexSize);
@@ -426,22 +426,22 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
    Point3F bp(0.0f, 0.0f, 0.0f);
    F32 bd = 1E30f;
    F32 height = -1E30f;
-   for (U32 b = indexStart; b < indexEnd; b++) 
+   for (U32 b = indexStart; b < indexEnd; b++)
    {
       Vertex& vertex = mVertexList[mIndexList[b]];
       F32 dist = face.plane.distToPlane(vertex.point);
-      if (dist <= bd) 
+      if (dist <= bd)
       {
          bd = (dist < 0)? 0: dist;
          bp = vertex.point;
       }
-      
+
       // Since we don't clip against the back plane, we'll
       // only include vertex heights that are within range.
       if (vertex.point.z > height && dist < face.maxDistance)
          height = vertex.point.z;
    }
-   
+
    // hack for not jetting up through the cieling
    F32 fudge = 0.01f;
    F32 fudgeB = 0.2f;
@@ -450,17 +450,17 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
       fudge = 0.01f; //0.015;
       fudgeB = 0.2f;
    }
-   
+
    // Do extruded points for back-off.
    F32 oldBd=bd;
-   for (U32 b = indexStart; b < indexEnd; b++) 
+   for (U32 b = indexStart; b < indexEnd; b++)
    {
       Vertex& vertex = mVertexList[mIndexList[b]];
-      
+
       // Extrude out just a tad to make sure we don't end up getting too close to the
       // geometry and getting stuck - but cap it so we don't introduce error into long
       // sweeps.
-      F32 dist = face.plane.distToPlane( vertex.point 
+      F32 dist = face.plane.distToPlane( vertex.point
                           + Point3F(mPoly.plane) * getMin(face.maxDistance * fudgeB, fudge));
 
       if (dist <= bd)
@@ -481,12 +481,12 @@ bool ExtrudedPolyList::testPoly(ExtrudedFace& face)
    // Update our info and indicate we should add to the model.
    F32 oldT = oldBd / face.maxDistance;
    F32 pushBackT = bd / face.maxDistance;
-   
+
    if(oldT - pushBackT > 0.1)
       face.time = oldT - fudge;
    else
       face.time = pushBackT;
-      
+
    face.height = height;
    face.point  = bp;
    return true;

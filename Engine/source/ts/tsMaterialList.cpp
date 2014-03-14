@@ -177,7 +177,7 @@ bool TSMaterialList::write(Stream & s)
       for (i=0; i<size(); i++)
          s.write(0xFFFFFFFF);
    }
-      
+
    for (i=0; i<size(); i++)
       s.write(mDetailScales[i]);
 
@@ -267,8 +267,8 @@ bool TSMaterialList::read(Stream & s)
 }
 
 //--------------------------------------------------------------------------
-// Sets the specified material in the list to the specified texture.  also 
-// remaps mat instances based on the new texture name.  Returns false if 
+// Sets the specified material in the list to the specified texture.  also
+// remaps mat instances based on the new texture name.  Returns false if
 // the specified texture is not valid.
 //--------------------------------------------------------------------------
 bool TSMaterialList::renameMaterial(U32 i, const String& newName)

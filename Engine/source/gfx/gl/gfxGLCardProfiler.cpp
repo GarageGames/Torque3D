@@ -46,11 +46,11 @@ void GFXGLCardProfiler::init()
 
    mCardDescription = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
    mVersionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-   
+
    mVideoMemory = static_cast<GFXGLDevice*>(GFX)->getTotalVideoMemory();
 
    Parent::init();
-   
+
    // Set new enums here so if our profile script forces this to be false we keep the GL_ZEROs.
    if(queryProfile("GL::suppFloatTexture"))
    {
@@ -69,7 +69,7 @@ void GFXGLCardProfiler::setupCardCapabilities()
 
    const char* versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
    F32 glVersion = dAtof(versionString);
-   
+
    // OpenGL doesn't have separate maximum width/height.
    setCapability("maxTextureWidth", maxTexSize);
    setCapability("maxTextureHeight", maxTexSize);
@@ -82,10 +82,10 @@ void GFXGLCardProfiler::setupCardCapabilities()
    // check if render to texture supported is available
    bool suppRTT = gglHasExtension(GL_EXT_framebuffer_object);
    setCapability("GL::suppRenderTexture", suppRTT);
-   
+
    bool suppBlit = gglHasExtension(GL_EXT_framebuffer_blit);
    setCapability("GL::suppRTBlit", suppBlit);
-   
+
    bool suppFloatTex = gglHasExtension(GL_ATI_texture_float);
    setCapability("GL::suppFloatTexture", suppFloatTex);
 
@@ -98,10 +98,10 @@ void GFXGLCardProfiler::setupCardCapabilities()
    F32 glslVersion = dAtof(reinterpret_cast<const char*>(glGetString( GL_SHADING_LANGUAGE_VERSION)));
    bool suppSPU = (gglHasExtension(GL_ARB_fragment_shader) || glVersion >= 1.999f) && glslVersion >= 1.0999;
    setCapability("GL::suppFragmentShader", suppSPU);
-   
+
    bool suppAppleFence = gglHasExtension(GL_APPLE_fence);
    setCapability("GL::APPLE::suppFence", suppAppleFence);
-   
+
    // When enabled, call glGenerateMipmapEXT() to generate mipmaps instead of relying on GL_GENERATE_MIPMAP
    setCapability("GL::Workaround::needsExplicitGenerateMipmap", false);
    // When enabled, binds and unbinds a texture target before doing the depth buffer copy.  Failure to do
@@ -110,7 +110,7 @@ void GFXGLCardProfiler::setupCardCapabilities()
    // When enabled, does not copy the last column and row of the depth buffer in a depth buffer copy.  Failure
    // to do so will cause a kernel panic on Mac OS 10.5(.1) with a Radeon HD 2600 (fixed in 10.5.2)
    setCapability("GL::Workaround::HD2600DepthBufferCopy", false);
-   
+
    // Certain Intel drivers have a divide by 0 crash if mipmaps are specified with
    // glTexSubImage2D.
    setCapability("GL::Workaround::noManualMips", false);
@@ -125,7 +125,7 @@ bool GFXGLCardProfiler::_queryCardCap(const String& query, U32& foundResult)
 bool GFXGLCardProfiler::_queryFormat(const GFXFormat fmt, const GFXTextureProfile *profile, bool &inOutAutogenMips)
 {
 	// We assume if the format is valid that we can use it for any purpose.
-   // This may not be the case, but we have no way to check short of in depth 
+   // This may not be the case, but we have no way to check short of in depth
    // testing of every format for every purpose.  And by testing, I mean sitting
    // down and doing it by hand, because there is no OpenGL API to check these
    // things.

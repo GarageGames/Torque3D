@@ -24,10 +24,10 @@ function EditorGui::buildMenus(%this)
 {
    if(isObject(%this.menuBar))
       return;
-   
+
    //set up %cmdctrl variable so that it matches OS standards
    if( $platform $= "macos" )
-   {   
+   {
       %cmdCtrl = "Cmd";
       %menuCmdCtrl = "Cmd";
       %quitShortcut = "Cmd Q";
@@ -48,7 +48,7 @@ function EditorGui::buildMenus(%this)
    {
       superClass = "MenuBuilder";
       class = "EditorCameraSpeedMenu";
-      
+
       item[0] = "Slowest" TAB %cmdCtrl @ "-Shift 1" TAB "5";
       item[1] = "Slow" TAB %cmdCtrl @ "-Shift 2" TAB "35";
       item[2] = "Slower" TAB %cmdCtrl @ "-Shift 3" TAB "70";
@@ -61,7 +61,7 @@ function EditorGui::buildMenus(%this)
    {
       superClass = "MenuBuilder";
       class = "EditorFreeCameraTypeMenu";
-      
+
       item[0] = "Standard" TAB "Ctrl 1" TAB "EditorGuiStatusBar.setCamera(\"Standard Camera\");";
       item[1] = "Orbit Camera" TAB "Ctrl 2" TAB "EditorGuiStatusBar.setCamera(\"Orbit Camera\");";
       Item[2] = "-";
@@ -72,7 +72,7 @@ function EditorGui::buildMenus(%this)
    {
       superClass = "MenuBuilder";
       class = "EditorPlayerCameraTypeMenu";
-      
+
       Item[0] = "First Person" TAB "" TAB "EditorGuiStatusBar.setCamera(\"1st Person Camera\");";
       Item[1] = "Third Person" TAB "" TAB "EditorGuiStatusBar.setCamera(\"3rd Person Camera\");";
    };
@@ -80,13 +80,13 @@ function EditorGui::buildMenus(%this)
    {
       superClass = "MenuBuilder";
       class = "EditorCameraBookmarksMenu";
-      
+
       //item[0] = "None";
    };
    %this.viewTypeMenu = new PopupMenu()
    {
       superClass = "MenuBuilder";
-      
+
       item[ 0 ] = "Top" TAB "Alt 2" TAB "EditorGuiStatusBar.setCamera(\"Top View\");";
       item[ 1 ] = "Bottom" TAB "Alt 5" TAB "EditorGuiStatusBar.setCamera(\"Bottom View\");";
       item[ 2 ] = "Front" TAB "Alt 3" TAB "EditorGuiStatusBar.setCamera(\"Front View\");";
@@ -96,13 +96,13 @@ function EditorGui::buildMenus(%this)
       item[ 6 ] = "Perspective" TAB "Alt 1" TAB "EditorGuiStatusBar.setCamera(\"Standard Camera\");";
       item[ 7 ] = "Isometric" TAB "Alt 8" TAB "EditorGuiStatusBar.setCamera(\"Isometric View\");";
    };
-      
+
    // Menu bar
    %this.menuBar = new MenuBar()
    {
       dynamicItemInsertPos = 3;
    };
-   
+
    // File Menu
    %fileMenu = new PopupMenu()
    {
@@ -111,7 +111,7 @@ function EditorGui::buildMenus(%this)
 
       barTitle = "File";
    };
-   
+
    if(!isWebDemo())
    {
       %fileMenu.appendItem("New Level" TAB "" TAB "schedule( 1, 0, \"EditorNewLevel\" );");
@@ -127,10 +127,10 @@ function EditorGui::buildMenus(%this)
          %fileMenu.appendItem( "-" );
       }
    }
-   
-   %fileMenu.appendItem("Create Blank Terrain" TAB "" TAB "Canvas.pushDialog( CreateNewTerrainGui );");        
+
+   %fileMenu.appendItem("Create Blank Terrain" TAB "" TAB "Canvas.pushDialog( CreateNewTerrainGui );");
    %fileMenu.appendItem("Import Terrain Heightmap" TAB "" TAB "Canvas.pushDialog( TerrainImportGui );");
-   
+
    if(!isWebDemo())
    {
       %fileMenu.appendItem("Export Terrain Heightmap" TAB "" TAB "Canvas.pushDialog( TerrainExportGui );");
@@ -141,29 +141,29 @@ function EditorGui::buildMenus(%this)
          //item[7] = "-";
          //item[8] = "Export Terraform Data..." TAB "" TAB "Heightfield::saveBitmap(\"\");";
    }
-   
+
    %fileMenu.appendItem( "-" );
    %fileMenu.appendItem( "Add FMOD Designer Audio..." TAB "" TAB "AddFMODProjectDlg.show();" );
-   
+
    %fileMenu.appendItem("-");
    %fileMenu.appendItem("Play Level" TAB "F11" TAB "Editor.close(\"PlayGui\");");
-      
+
    if(!isWebDemo())
    {
       %fileMenu.appendItem("Exit Level" TAB "" TAB "EditorExitMission();");
       %fileMenu.appendItem("Quit" TAB %quitShortcut TAB "EditorQuitGame();");
    }
    %this.menuBar.insert(%fileMenu, %this.menuBar.getCount());
-   
+
    // Edit Menu
    %editMenu = new PopupMenu()
    {
       superClass = "MenuBuilder";
       class = "EditorEditMenu";
       internalName = "EditMenu";
-         
+
       barTitle = "Edit";
-         
+
       item[0] = "Undo" TAB %cmdCtrl SPC "Z" TAB "Editor.getUndoManager().undo();";
       item[1] = "Redo" TAB %redoShortcut TAB "Editor.getUndoManager().redo();";
       item[2] = "-";
@@ -171,7 +171,7 @@ function EditorGui::buildMenus(%this)
       item[4] = "Copy" TAB %cmdCtrl SPC "C" TAB "EditorMenuEditCopy();";
       item[5] = "Paste" TAB %cmdCtrl SPC "V" TAB "EditorMenuEditPaste();";
       item[6] = "Delete" TAB "Delete" TAB "EditorMenuEditDelete();";
-      item[7] = "-";      
+      item[7] = "-";
       item[8] = "Deselect" TAB "X" TAB "EditorMenuEditDeselect();";
       Item[9] = "Select..." TAB "" TAB "EditorGui.toggleObjectSelectionsWindow();";
       item[10] = "-";
@@ -183,7 +183,7 @@ function EditorGui::buildMenus(%this)
       item[16] = "PostEffect Manager" TAB "" TAB "Canvas.pushDialog(PostFXManager);";
    };
    %this.menuBar.insert(%editMenu, %this.menuBar.getCount());
-      
+
    // View Menu
    %viewMenu = new PopupMenu()
    {
@@ -192,12 +192,12 @@ function EditorGui::buildMenus(%this)
       internalName = "viewMenu";
 
       barTitle = "View";
-         
+
       item[ 0 ] = "Visibility Layers" TAB "Alt V" TAB "VisibilityDropdownToggle();";
       item[ 1 ] = "Show Grid in Ortho Views" TAB %cmdCtrl @ "-Shift-Alt G" TAB "EditorGui.toggleOrthoGrid();";
    };
    %this.menuBar.insert(%viewMenu, %this.menuBar.getCount());
-      
+
    // Camera Menu
    %cameraMenu = new PopupMenu()
    {
@@ -205,7 +205,7 @@ function EditorGui::buildMenus(%this)
       class = "EditorCameraMenu";
 
       barTitle = "Camera";
-         
+
       item[0] = "World Camera" TAB %this.freeCameraTypeMenu;
       item[1] = "Player Camera" TAB %this.playerCameraTypeMenu;
       item[2] = "-";
@@ -225,7 +225,7 @@ function EditorGui::buildMenus(%this)
       item[16] = "Jump to Bookmark" TAB %this.cameraBookmarksMenu;
    };
    %this.menuBar.insert(%cameraMenu, %this.menuBar.getCount());
-      
+
    // Editors Menu
    %editorsMenu = new PopupMenu()
    {
@@ -233,7 +233,7 @@ function EditorGui::buildMenus(%this)
       class = "EditorToolsMenu";
 
       barTitle = "Editors";
-         
+
          //item[0] = "Object Editor" TAB "F1" TAB WorldEditorInspectorPlugin;
          //item[1] = "Material Editor" TAB "F2" TAB MaterialEditorPlugin;
          //item[2] = "-";
@@ -242,7 +242,7 @@ function EditorGui::buildMenus(%this)
          //item[5] = "-";
    };
    %this.menuBar.insert(%editorsMenu, %this.menuBar.getCount());
-      
+
    // Lighting Menu
    %lightingMenu = new PopupMenu()
    {
@@ -250,16 +250,16 @@ function EditorGui::buildMenus(%this)
       class = "EditorLightingMenu";
 
       barTitle = "Lighting";
-         
+
       item[0] = "Full Relight" TAB "Alt L" TAB "Editor.lightScene(\"\", forceAlways);";
       item[1] = "Toggle ShadowViz" TAB "" TAB "toggleShadowViz();";
       item[2] = "-";
-         
+
          // NOTE: The light managers will be inserted as the
          // last menu items in EditorLightingMenu::onAdd().
    };
    %this.menuBar.insert(%lightingMenu, %this.menuBar.getCount());
-      
+
    // Help Menu
    %helpMenu = new PopupMenu()
    {
@@ -274,9 +274,9 @@ function EditorGui::buildMenus(%this)
       item[3] = "Torque 3D Forums..." TAB "" TAB "gotoWebPage(EWorldEditor.forumURL);";
    };
    %this.menuBar.insert(%helpMenu, %this.menuBar.getCount());
-   
+
    // Menus that are added/removed dynamically (temporary)
-   
+
    // World Menu
    if(! isObject(%this.worldMenu))
    {
@@ -296,7 +296,7 @@ function EditorGui::buildMenus(%this)
          item[6] = "to Terrain" TAB "" TAB "toTerrain";
          item[7] = "Below Selection" TAB "" TAB "belowSelection";
       };
-      
+
       %this.alignBoundsMenu = new PopupMenu()
       {
          superClass = "MenuBuilder";
@@ -311,7 +311,7 @@ function EditorGui::buildMenus(%this)
          item[4] = "-Y Axis" TAB "" TAB "4";
          item[5] = "-Z Axis" TAB "" TAB "5";
       };
-      
+
       %this.alignCenterMenu = new PopupMenu()
       {
          superClass = "MenuBuilder";
@@ -323,14 +323,14 @@ function EditorGui::buildMenus(%this)
          item[1] = "Y Axis" TAB "" TAB "1";
          item[2] = "Z Axis" TAB "" TAB "2";
       };
-      
+
       %this.worldMenu = new PopupMenu()
       {
          superClass = "MenuBuilder";
          class = "EditorWorldMenu";
 
          barTitle = "Object";
-         
+
          item[0] = "Lock Selection" TAB %cmdCtrl @ " L" TAB "EWorldEditor.lockSelection(true); EWorldEditor.syncGui();";
          item[1] = "Unlock Selection" TAB %cmdCtrl @ "-Shift L" TAB "EWorldEditor.lockSelection(false); EWorldEditor.syncGui();";
          item[2] = "-";
@@ -373,16 +373,16 @@ function EditorGui::detachMenus(%this)
 }
 
 function EditorGui::setMenuDefaultState(%this)
-{  
+{
    if(! isObject(%this.menuBar))
       return 0;
-      
+
    for(%i = 0;%i < %this.menuBar.getCount();%i++)
    {
       %menu = %this.menuBar.getObject(%i);
       %menu.setupDefaultState();
    }
-   
+
    %this.worldMenu.setupDefaultState();
 }
 
@@ -392,14 +392,14 @@ function EditorGui::findMenu(%this, %name)
 {
    if(! isObject(%this.menuBar))
       return 0;
-      
+
    for(%i = 0;%i < %this.menuBar.getCount();%i++)
    {
       %menu = %this.menuBar.getObject(%i);
-      
+
       if(%name $= %menu.barTitle)
          return %menu;
    }
-   
+
    return 0;
 }

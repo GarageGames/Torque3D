@@ -41,7 +41,7 @@ function LoadingGui::onSleep(%this)
    {
       for ( %line = 0; %line < %this.qLineCount; %line++ )
          %this.qLine[%line] = "";
-   }      
+   }
    %this.qLineCount = 0;
 
    LoadingProgress.setValue( 0 );

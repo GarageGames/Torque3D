@@ -26,12 +26,12 @@
 //------------------------------------------------------------------------------
 
 datablock LightAnimData( NullLightAnim )
-{   
+{
    animEnabled = false;
 };
 
 datablock LightAnimData( PulseLightAnim )
-{   
+{
    brightnessA = 0;
    brightnessZ = 1;
    brightnessPeriod = 1;
@@ -113,11 +113,11 @@ datablock LightFlareData( NullLightFlare )
 };
 
 datablock LightFlareData( SunFlareExample )
-{      
+{
    overallScale = 4.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "art/lights/lensFlareSheet0";  
+   flareTexture = "art/lights/lensFlareSheet0";
 
    elementRect[0] = "512 0 512 512";
    elementDist[0] = 0.0;
@@ -125,45 +125,45 @@ datablock LightFlareData( SunFlareExample )
    elementTint[0] = "0.6 0.6 0.6";
    elementRotate[0] = true;
    elementUseLightColor[0] = true;
-   
+
    elementRect[1] = "1152 0 128 128";
    elementDist[1] = 0.3;
    elementScale[1] = 0.7;
    elementTint[1] = "1.0 1.0 1.0";
    elementRotate[1] = true;
    elementUseLightColor[1] = true;
-   
+
    elementRect[2] = "1024 0 128 128";
    elementDist[2] = 0.5;
-   elementScale[2] = 0.25;   
+   elementScale[2] = 0.25;
    elementTint[2] = "1.0 1.0 1.0";
    elementRotate[2] = true;
    elementUseLightColor[2] = true;
-   
+
    elementRect[3] = "1024 128 128 128";
    elementDist[3] = 0.8;
-   elementScale[3] = 0.7;   
+   elementScale[3] = 0.7;
    elementTint[3] = "1.0 1.0 1.0";
    elementRotate[3] = true;
    elementUseLightColor[3] = true;
-   
+
    elementRect[4] = "1024 0 128 128";
    elementDist[4] = 1.18;
-   elementScale[4] = 0.5;   
+   elementScale[4] = 0.5;
    elementTint[4] = "1.0 1.0 1.0";
    elementRotate[4] = true;
    elementUseLightColor[4] = true;
-   
+
    elementRect[5] = "1152 128 128 128";
    elementDist[5] = 1.25;
-   elementScale[5] = 0.25;   
+   elementScale[5] = 0.25;
    elementTint[5] = "1.0 1.0 1.0";
    elementRotate[5] = true;
    elementUseLightColor[5] = true;
-   
+
    elementRect[6] = "1024 0 128 128";
    elementDist[6] = 2.0;
-   elementScale[6] = 0.25;      
+   elementScale[6] = 0.25;
    elementTint[6] = "1.0 1.0 1.0";
    elementRotate[6] = true;
    elementUseLightColor[6] = true;
@@ -171,43 +171,43 @@ datablock LightFlareData( SunFlareExample )
 };
 
 datablock LightFlareData( SunFlareExample2 )
-{      
+{
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "art/lights/lensFlareSheet0";  
-   
+   flareTexture = "art/lights/lensFlareSheet0";
+
    elementRect[0] = "1024 0 128 128";
    elementDist[0] = 0.5;
-   elementScale[0] = 0.25;   
+   elementScale[0] = 0.25;
    elementTint[0] = "1.0 1.0 1.0";
    elementRotate[0] = true;
    elementUseLightColor[0] = true;
-   
+
    elementRect[1] = "1024 128 128 128";
    elementDist[1] = 0.8;
-   elementScale[1] = 0.7;   
+   elementScale[1] = 0.7;
    elementTint[1] = "1.0 1.0 1.0";
    elementRotate[1] = true;
    elementUseLightColor[1] = true;
-   
+
    elementRect[2] = "1024 0 128 128";
    elementDist[2] = 1.18;
-   elementScale[2] = 0.5;   
+   elementScale[2] = 0.5;
    elementTint[2] = "1.0 1.0 1.0";
    elementRotate[2] = true;
    elementUseLightColor[2] = true;
-   
+
    elementRect[3] = "1152 128 128 128";
    elementDist[3] = 1.25;
-   elementScale[3] = 0.25;   
+   elementScale[3] = 0.25;
    elementTint[3] = "1.0 1.0 1.0";
    elementRotate[3] = true;
    elementUseLightColor[3] = true;
-   
+
    elementRect[4] = "1024 0 128 128";
    elementDist[4] = 2.0;
-   elementScale[4] = 0.25;      
+   elementScale[4] = 0.25;
    elementTint[4] = "0.7 0.7 0.7";
    elementRotate[4] = true;
    elementUseLightColor[4] = true;
@@ -219,39 +219,39 @@ datablock LightFlareData(SunFlareExample3)
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "art/lights/lensflareSheet3.png";  
-   
+   flareTexture = "art/lights/lensflareSheet3.png";
+
    elementRect[0] = "0 256 256 256";
    elementDist[0] = "-0.6";
-   elementScale[0] = "3.5";   
+   elementScale[0] = "3.5";
    elementTint[0] = "0.537255 0.537255 0.537255 1";
    elementRotate[0] = true;
    elementUseLightColor[0] = true;
-   
+
    elementRect[1] = "128 128 128 128";
    elementDist[1] = "0.1";
-   elementScale[1] = "1.5";   
+   elementScale[1] = "1.5";
    elementTint[1] = "0.996078 0.976471 0.721569 1";
    elementRotate[1] = true;
    elementUseLightColor[1] = true;
-   
+
    elementRect[2] = "0 0 64 64";
    elementDist[2] = "0.4";
-   elementScale[2] = "0.25";   
+   elementScale[2] = "0.25";
    elementTint[2] = "0 0 1 1";
    elementRotate[2] = true;
    elementUseLightColor[2] = true;
-   
+
    elementRect[3] = "0 0 64 64";
    elementDist[3] = "0.45";
-   elementScale[3] = 0.25;   
+   elementScale[3] = 0.25;
    elementTint[3] = "0 1 0 1";
    elementRotate[3] = true;
    elementUseLightColor[3] = true;
-   
+
    elementRect[4] = "0 0 64 64";
    elementDist[4] = "0.5";
-   elementScale[4] = 0.25;      
+   elementScale[4] = 0.25;
    elementTint[4] = "1 0 0 1";
    elementRotate[4] = true;
    elementUseLightColor[4] = true;
@@ -361,39 +361,39 @@ datablock LightFlareData(SunFlarePacificIsland)
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = false;
-   flareTexture = "art/lights/lensflareSheet3.png";  
-   
+   flareTexture = "art/lights/lensflareSheet3.png";
+
    elementRect[0] = "0 256 256 256";
    elementDist[0] = "-0.6";
-   elementScale[0] = "3.5";   
+   elementScale[0] = "3.5";
    elementTint[0] = "0.537255 0.537255 0.537255 1";
    elementRotate[0] = true;
    elementUseLightColor[0] = true;
-   
+
    elementRect[1] = "128 128 128 128";
    elementDist[1] = "0.1";
-   elementScale[1] = "1.5";   
+   elementScale[1] = "1.5";
    elementTint[1] = "0.996078 0.976471 0.721569 1";
    elementRotate[1] = true;
    elementUseLightColor[1] = true;
-   
+
    elementRect[2] = "0 0 64 64";
    elementDist[2] = "0.4";
-   elementScale[2] = "0.25";   
+   elementScale[2] = "0.25";
    elementTint[2] = "0 0 1 1";
    elementRotate[2] = true;
    elementUseLightColor[2] = true;
-   
+
    elementRect[3] = "0 0 64 64";
    elementDist[3] = "0.45";
-   elementScale[3] = 0.25;   
+   elementScale[3] = 0.25;
    elementTint[3] = "0 1 0 1";
    elementRotate[3] = true;
    elementUseLightColor[3] = true;
-   
+
    elementRect[4] = "0 0 64 64";
    elementDist[4] = "0.5";
-   elementScale[4] = 0.25;      
+   elementScale[4] = 0.25;
    elementTint[4] = "1 0 0 1";
    elementRotate[4] = true;
    elementUseLightColor[4] = true;
@@ -503,14 +503,14 @@ datablock LightFlareData( LightFlareExample0 )
    flareEnabled = true;
    renderReflectPass = true;
    flareTexture = "art/lights/lensFlareSheet1";
-   
+
    elementRect[0] = "0 512 512 512";
    elementDist[0] = 0.0;
    elementScale[0] = 0.5;
    elementTint[0] = "1.0 1.0 1.0";
    elementRotate[0] = false;
    elementUseLightColor[0] = false;
-   
+
    elementRect[1] = "512 0 512 512";
    elementDist[1] = 0.0;
    elementScale[1] = 2.0;
@@ -526,14 +526,14 @@ datablock LightFlareData( LightFlareExample1 )
    flareEnabled = true;
    renderReflectPass = true;
    flareTexture = "art/lights/lensFlareSheet1";
-   
+
    elementRect[0] = "512 512 512 512";
    elementDist[0] = 0.0;
    elementScale[0] = 0.5;
    elementTint[0] = "1.0 1.0 1.0";
    elementRotate[0] = false;
    elementUseLightColor[0] = false;
-   
+
    elementRect[1] = "512 0 512 512";
    elementDist[1] = 0.0;
    elementScale[1] = 2.0;
@@ -548,7 +548,7 @@ datablock LightFlareData( LightFlareExample2 )
    overallScale = 2.0;
    flareEnabled = true;
    renderReflectPass = true;
-   flareTexture = "art/lights/lensFlareSheet0";  
+   flareTexture = "art/lights/lensFlareSheet0";
 
    elementRect[0] = "512 512 512 512";
    elementDist[0] = 0.0;
@@ -556,52 +556,52 @@ datablock LightFlareData( LightFlareExample2 )
    elementTint[0] = "1.0 1.0 1.0";
    elementRotate[0] = true;
    elementUseLightColor[0] = true;
-   
+
    elementRect[1] = "512 0 512 512";
    elementDist[1] = 0.0;
    elementScale[1] = 2.0;
    elementTint[1] = "0.7 0.7 0.7";
    elementRotate[1] = true;
    elementUseLightColor[1] = true;
-   
+
    elementRect[2] = "1152 0 128 128";
    elementDist[2] = 0.3;
    elementScale[2] = 0.5;
    elementTint[2] = "1.0 1.0 1.0";
    elementRotate[2] = true;
    elementUseLightColor[2] = true;
-   
+
    elementRect[3] = "1024 0 128 128";
    elementDist[3] = 0.5;
-   elementScale[3] = 0.25;   
+   elementScale[3] = 0.25;
    elementTint[3] = "1.0 1.0 1.0";
    elementRotate[3] = true;
    elementUseLightColor[3] = true;
-   
+
    elementRect[4] = "1024 128 128 128";
    elementDist[4] = 0.8;
-   elementScale[4] = 0.6;   
+   elementScale[4] = 0.6;
    elementTint[4] = "1.0 1.0 1.0";
    elementRotate[4] = true;
    elementUseLightColor[4] = true;
-   
+
    elementRect[5] = "1024 0 128 128";
    elementDist[5] = 1.18;
-   elementScale[5] = 0.5;   
+   elementScale[5] = 0.5;
    elementTint[5] = "0.7 0.7 0.7";
    elementRotate[5] = true;
    elementUseLightColor[5] = true;
-   
+
    elementRect[6] = "1152 128 128 128";
    elementDist[6] = 1.25;
-   elementScale[6] = 0.35;   
+   elementScale[6] = 0.35;
    elementTint[6] = "0.8 0.8 0.8";
    elementRotate[6] = true;
    elementUseLightColor[6] = true;
-   
+
    elementRect[7] = "1024 0 128 128";
    elementDist[7] = 2.0;
-   elementScale[7] = 0.25;      
+   elementScale[7] = 0.25;
    elementTint[7] = "1.0 1.0 1.0";
    elementRotate[7] = true;
    elementUseLightColor[7] = true;

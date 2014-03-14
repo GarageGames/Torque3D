@@ -70,7 +70,7 @@ void MenuBar::removeObject(SimObject *obj)
 void MenuBar::insertObject(SimObject *obj, S32 pos)
 {
    Parent::addObject(obj);
-   
+
    if(pos >= size())
       pos = size() - 1;
 

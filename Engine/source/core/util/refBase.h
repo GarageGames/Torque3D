@@ -37,7 +37,7 @@ class WeakRefBase
 {
 public:
 
-   /// Weak reference to WeakRefBase. 
+   /// Weak reference to WeakRefBase.
    class WeakReference
    {
    public:
@@ -62,7 +62,7 @@ public:
       WeakRefBase *mObject;
 
       // reference count for this structure (not WeakObjectRef itself)
-      U32 mRefCount; 
+      U32 mRefCount;
    };
 
 public:
@@ -91,7 +91,7 @@ public:
    WeakRefPtr()  { mReference = NULL; }
    WeakRefPtr(T *ptr)  { mReference = NULL; set(ptr); }
    WeakRefPtr(const WeakRefPtr<T> & ref) { mReference = NULL; set(ref.mReference); }
-   
+
    ~WeakRefPtr() { set((WeakRefBase::WeakReference*)NULL); }
 
    WeakRefPtr<T>& operator=(const WeakRefPtr<T>& ref)
@@ -107,14 +107,14 @@ public:
 
    /// Returns true if the pointer is not set.
    bool isNull() const { return mReference == NULL || mReference->get() == NULL; }
-   
+
    /// Returns true if the pointer is set.
    bool isValid() const { return mReference && mReference->get(); }
-   
+
    T* operator->() const { return getPointer(); }
    T& operator*() const { return *getPointer(); }
    operator T*() const { return getPointer(); }
-   
+
    /// Returns the pointer.
    T* getPointer() const { return mReference ? ( T* ) mReference->get() : NULL; }
 

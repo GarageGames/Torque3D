@@ -58,7 +58,7 @@ class SFXSound : public SFXSource,
       friend class SFXSystem;
 
       typedef SFXSource Parent;
-   
+
    protected:
 
       /// Used by SFXSystem to create sources.
@@ -67,13 +67,13 @@ class SFXSound : public SFXSource,
 
       /// Internal constructor used for sources.
       SFXSound( SFXProfile* profile, SFXDescription* description );
-      
+
       /// The device specific voice which is used during
       /// playback.  By making it a SafePtr it will NULL
       /// automatically when the device is deleted.
       StrongWeakRefPtr< SFXVoice > mVoice;
 
-      /// The reference counted device specific buffer used by 
+      /// The reference counted device specific buffer used by
       /// the voice for playback.
       StrongWeakRefPtr< SFXBuffer > mBuffer;
 
@@ -86,10 +86,10 @@ class SFXSound : public SFXSource,
 
       /// Release the voice if the source has one.
       bool _releaseVoice();
-      
+
       ///
       void _setBuffer( SFXBuffer* buffer );
-      
+
       /// Reload the sound buffer.  Temporarily goes to virtualized playback when necessary.
       void _reloadBuffer();
 
@@ -99,7 +99,7 @@ class SFXSound : public SFXSource,
          if( profile == mTrack )
             _reloadBuffer();
       }
-      
+
       // SFXSource.
       virtual void _play();
       virtual void _pause();
@@ -121,7 +121,7 @@ class SFXSound : public SFXSource,
       /// create a valid source!
       explicit SFXSound();
 
-      /// This is normally called from the system to 
+      /// This is normally called from the system to
       /// detect if this source has been assigned a
       /// voice for playback.
       bool hasVoice() const { return mVoice != NULL; }
@@ -138,7 +138,7 @@ class SFXSound : public SFXSource,
 
       /// Return true if the sound stream tied to the source is currently in a buffer underrun situation.
       bool isBlocked() const { return ( mVoice && mVoice->getStatus() == SFXStatusBlocked ); }
-      
+
       /// Returns true if this is a continuously streaming source.
       bool isStreaming() const { return mDescription->mIsStreaming; }
 

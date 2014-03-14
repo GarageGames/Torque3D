@@ -72,7 +72,7 @@ class ParticleData : public SimDataBlock
    F32    times[ PDC_NUM_KEYS ];
 
    Point2F*          animTexUVs;
-   Point2F           texCoords[4];   // default: {{0.0,0.0}, {0.0,1.0}, {1.0,1.0}, {1.0,0.0}} 
+   Point2F           texCoords[4];   // default: {{0.0,0.0}, {0.0,1.0}, {1.0,1.0}, {1.0,0.0}}
    Point2I           animTexTiling;
    StringTableEntry  animTexFramesString;
    Vector<U8>        animTexFrames;
@@ -101,7 +101,7 @@ class ParticleData : public SimDataBlock
 
 //*****************************************************************************
 // Particle
-// 
+//
 // This structure should be as small as possible.
 //*****************************************************************************
 struct Particle

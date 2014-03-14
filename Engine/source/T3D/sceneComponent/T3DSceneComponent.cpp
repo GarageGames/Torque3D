@@ -49,7 +49,7 @@ void T3DSceneComponent::setParentTransformName(const char * name)
 void T3DSceneComponent::setObjectType(U32 objectTypeMask)
 {
    _objectType = objectTypeMask;
-   setUseOwnerObjectType(true); 
+   setUseOwnerObjectType(true);
 }
 
 void T3DSceneComponent::setDirtyObjectBox(bool val)
@@ -122,7 +122,7 @@ Box3F T3DSceneComponent::getObjectBox()
    if (DirtyObjectBox && !LockObjectBox)
       _ComputeObjectBox();
 
-   return _objectBox->get(); 
+   return _objectBox->get();
 }
 
 Box3F T3DSceneComponent::getWorldBox()

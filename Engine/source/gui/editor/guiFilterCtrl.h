@@ -61,7 +61,7 @@ public:
    DECLARE_CATEGORY( "Gui Other" );
    DECLARE_DESCRIPTION( "A control that displays a Catmull-Rom spline through a number of control points\n"
       "and allows to edit the Y-coordinates of the control points to adjust the curve." );
-   
+
    GuiFilterCtrl();
    static void initPersistFields();
 

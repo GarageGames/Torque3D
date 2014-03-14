@@ -66,7 +66,7 @@ struct FrustumData : public PolyhedronData
 
       /// Indices for the planes in a frustum.
       ///
-      /// Note the planes are ordered left, right, near, 
+      /// Note the planes are ordered left, right, near,
       /// far, top, bottom for getting early rejections
       /// from the typical horizontal scene.
       enum
@@ -99,7 +99,7 @@ struct FrustumData : public PolyhedronData
       };
 
       /// Indices for the center points of the frustum planes.
-      enum PlaneCenters 
+      enum PlaneCenters
       {
          PlaneLeftCenter,
          PlaneRightCenter,
@@ -110,7 +110,7 @@ struct FrustumData : public PolyhedronData
       };
 
       /// Used to mask out planes for testing.
-      enum 
+      enum
       {
          PlaneMaskLeft     = ( 1 << PlaneLeft ),
          PlaneMaskRight    = ( 1 << PlaneRight ),
@@ -264,11 +264,11 @@ class Frustum : public PolyhedronImpl< FrustumData >
       ///   will still be non-inverted.  Use invert() to actually cause
       ///   the frustum to be inverted.
       Frustum( bool orthographic = false,
-               F32 nearLeft = -1.0f, 
-               F32 nearRight = 1.0f, 
-               F32 nearTop = 1.0f, 
-               F32 nearBottom = -1.0f, 
-               F32 nearDist = 0.1f, 
+               F32 nearLeft = -1.0f,
+               F32 nearRight = 1.0f,
+               F32 nearTop = 1.0f,
+               F32 nearBottom = -1.0f,
+               F32 nearDist = 0.1f,
                F32 farDist = 1.0f,
                const MatrixF &transform = MatrixF( true ) );
 
@@ -299,25 +299,25 @@ class Frustum : public PolyhedronImpl< FrustumData >
       /// Functions used to initialize the frustum.
       ///
       /// @{
-      
+
       /// Sets the frustum from the field of view, screen aspect
       /// ratio, and the near and far distances.  You can pass an
       /// matrix to transform the frustum.
       void set(   bool isOrtho,
-                  F32 fovYInRadians, 
-                  F32 aspectRatio, 
-                  F32 nearDist, 
+                  F32 fovYInRadians,
+                  F32 aspectRatio,
+                  F32 nearDist,
                   F32 farDist,
                   const MatrixF &mat = MatrixF( true ) );
 
       /// Sets the frustum from the near plane dimensions and
       /// near and far distances.
       void set(   bool isOrtho,
-                  F32 nearLeft, 
-                  F32 nearRight, 
-                  F32 nearTop, 
-                  F32 nearBottom, 
-                  F32 nearDist, 
+                  F32 nearLeft,
+                  F32 nearRight,
+                  F32 nearTop,
+                  F32 nearBottom,
+                  F32 nearDist,
                   F32 farDist,
                   const MatrixF &transform = MatrixF( true ) );
 
@@ -337,11 +337,11 @@ class Frustum : public PolyhedronImpl< FrustumData >
       ///
       void cropNearFar(F32 newNearDist, F32 newFarDist);
 
-      /// Returns the far clip distance used to create 
+      /// Returns the far clip distance used to create
       /// the frustum planes.
       F32 getFarDist() const { return mFarDist; }
 
-      /// Returns the far clip distance used to create 
+      /// Returns the far clip distance used to create
       /// the frustum planes.
       F32 getNearDist() const { return mNearDist; }
 
@@ -456,7 +456,7 @@ class Frustum : public PolyhedronImpl< FrustumData >
       /// @{
 
       bool isOrtho() const { return mIsOrtho; }
-      
+
       /// @}
 
       /// @name Tile settings

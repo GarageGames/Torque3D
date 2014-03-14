@@ -33,7 +33,7 @@ void GFXD3D9PrimitiveBuffer::prepare()
 void GFXD3D9PrimitiveBuffer::unlock()
 {
    #ifdef TORQUE_DEBUG
-   
+
       if ( mDebugGuardBuffer )
       {
          const U32 guardSize = sizeof( _PBGuardString );
@@ -62,7 +62,7 @@ void GFXD3D9PrimitiveBuffer::unlock()
    mVolatileBuffer = NULL;
 }
 
-GFXD3D9PrimitiveBuffer::~GFXD3D9PrimitiveBuffer() 
+GFXD3D9PrimitiveBuffer::~GFXD3D9PrimitiveBuffer()
 {
    if( mBufferType != GFXBufferTypeVolatile )
    {
@@ -80,13 +80,13 @@ void GFXD3D9PrimitiveBuffer::zombify()
 {
    if(mBufferType == GFXBufferTypeStatic)
       return;
-            
+
    AssertFatal(!mLocked, "GFXD3D9PrimitiveBuffer::zombify - Cannot zombify a locked buffer!");
 
    if (mBufferType == GFXBufferTypeVolatile)
    {
       // We must null the volatile buffer else we're holding
-      // a dead pointer which can be set on the device.      
+      // a dead pointer which can be set on the device.
       ib = NULL;
       return;
    }
@@ -99,7 +99,7 @@ void GFXD3D9PrimitiveBuffer::resurrect()
 {
    if ( mBufferType != GFXBufferTypeDynamic )
       return;
-      
+
    U32 usage = D3DUSAGE_WRITEONLY;
 
 #ifndef TORQUE_OS_XENON
@@ -108,7 +108,7 @@ void GFXD3D9PrimitiveBuffer::resurrect()
 
    D3DPOOL pool = D3DPOOL_DEFAULT;
 
-   D3D9Assert(static_cast<GFXD3D9Device*>(mDevice)->mD3DDevice->CreateIndexBuffer( sizeof(U16) * mIndexCount , 
+   D3D9Assert(static_cast<GFXD3D9Device*>(mDevice)->mD3DDevice->CreateIndexBuffer( sizeof(U16) * mIndexCount ,
         usage , GFXD3D9IndexFormat[GFXIndexFormat16], pool, &ib, 0),
         "GFXD3D9PrimitiveBuffer::resurrect - Failed to allocate an index buffer.");
 }

@@ -31,7 +31,7 @@
 /// Helper class to store viewport and matrix stack state, and restore it
 /// later.
 ///
-/// When doing complex out-of-scene rendering, for instance, doing a 
+/// When doing complex out-of-scene rendering, for instance, doing a
 /// render to texture operation that needs its own transform state, it
 /// is very easy to nuke important rendering state, like the viewport
 /// or the projection matrix stored in vertex shader constant zero.
@@ -69,7 +69,7 @@
 ///    saver.restore();
 /// }
 /// @endcode
-/// 
+///
 class GFXTransformSaver
 {
 protected:
@@ -94,7 +94,7 @@ public:
 
       if(saveDataNow)
          save();
- 
+
       mRestoreSavedDataOnDestruct = restoreDataOnDestruct;
    }
 

@@ -40,10 +40,10 @@ class Box3F;
 
 
 ///
-class PhysicsObject : public WeakRefBase 
+class PhysicsObject : public WeakRefBase
 {
 public:
-   
+
    virtual ~PhysicsObject();
 
    /// Returns the physics world this object is a member of.
@@ -56,14 +56,14 @@ public:
    ///
    virtual void setTransform( const MatrixF &transform ) = 0;
 
-   /// Returns the transform of the physics body at 
+   /// Returns the transform of the physics body at
    /// the last processed simulation tick.
    virtual MatrixF& getTransform( MatrixF *outMatrix ) = 0;
 
    /// Returns the world aligned bounding box containing the PhysicsObject.
    virtual Box3F getWorldBounds() = 0;
 
-   /// 
+   ///
    void queueCallback( U32 ms, Delegate<void()> callback );
 
    const PhysicsUserData& getUserData() const { return mUserData; }

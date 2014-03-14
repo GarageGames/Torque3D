@@ -38,16 +38,16 @@ class MacCarbPlatState
 public:
    GDHandle          hDisplay;
    CGDirectDisplayID cgDisplay;
-   
+
    bool              captureDisplay;
    bool              fadeWindows;
 
-   WindowPtr         appWindow;   
+   WindowPtr         appWindow;
    char              appWindowTitle[256];
    WindowGroupRef    torqueWindowGroup;
 
    bool              quit;
-   
+
    AGLContext        ctx;
    bool              ctxNeedsUpdate;
 
@@ -56,35 +56,35 @@ public:
    S32               desktopHeight;
    U32               currentTime;
    bool              isFullScreen;
-   
+
    U32               osVersion;
-   
+
    TSMDocumentID     tsmDoc;
    bool              tsmActive;
-   
+
    U32               firstThreadId;
-   
+
    void*             alertSemaphore;
    S32               alertHit;
    DialogRef         alertDlg;
    EventQueueRef     mainEventQueue;
-   
+
    MRandomLCG        platRandom;
-   
+
    bool              mouseLocked;
    bool              backgrounded;
-   
+
    U32               sleepTicks;
 
    Point2I           windowSize;
-   
+
    U32               appReturn;
-   
+
    U32               argc;
    char**            argv;
-   
+
    U32               lastTimeTick;
-   
+
    MacCarbPlatState();
 };
 
@@ -154,7 +154,7 @@ class PlatformPopupMenuData
          static S32 lastTag = 'TORQ';
          return ++lastTag;
       }
-      
+
       MenuRef mMenu;
       S32 tag;
       PlatformPopupMenuData()
@@ -162,7 +162,7 @@ class PlatformPopupMenuData
          mMenu = NULL;
          tag = getTag();
       }
-      
+
       ~PlatformPopupMenuData()
       {
          if(mMenu)

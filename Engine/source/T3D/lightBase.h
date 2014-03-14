@@ -61,19 +61,19 @@ protected:
 
    LightInfo *mLight;
 
-   LightAnimData *mAnimationData; 
+   LightAnimData *mAnimationData;
    LightAnimState mAnimState;
 
    LightFlareData *mFlareData;
-   LightFlareState mFlareState;   
+   LightFlareState mFlareState;
    F32 mFlareScale;
 
    static bool smRenderViz;
 
    virtual void _conformLights() {}
 
-   void _onRenderViz(   ObjectRenderInst *ri, 
-                        SceneRenderState *state, 
+   void _onRenderViz(   ObjectRenderInst *ri,
+                        SceneRenderState *state,
                         BaseMatInstance *overrideMat );
 
    virtual void _renderViz( SceneRenderState *state ) {}
@@ -84,7 +84,7 @@ protected:
       EnabledMask       = Parent::NextFreeMask << 1,
       TransformMask     = Parent::NextFreeMask << 2,
       UpdateMask        = Parent::NextFreeMask << 3,
-      DatablockMask     = Parent::NextFreeMask << 4,      
+      DatablockMask     = Parent::NextFreeMask << 4,
       NextFreeMask      = Parent::NextFreeMask << 5
    };
 
@@ -108,7 +108,7 @@ public:
 
    // NetObject
    U32 packUpdate( NetConnection *conn, U32 mask, BitStream *stream );
-   void unpackUpdate( NetConnection *conn, BitStream *stream );  
+   void unpackUpdate( NetConnection *conn, BitStream *stream );
 
    // ISceneLight
    virtual void submitLights( LightManager *lm, bool staticLighting );

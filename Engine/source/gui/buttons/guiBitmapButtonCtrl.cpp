@@ -48,47 +48,47 @@ IMPLEMENT_CONOBJECT(GuiBitmapButtonCtrl);
 
 ConsoleDocClass( GuiBitmapButtonCtrl,
    "@brief A button that renders its various states (mouse over, pushed, etc.) from separate bitmaps.\n\n"
-   
+
    "A bitmapped button is a push button that uses one or more texture images for rendering its individual states.\n\n"
-   
+
    "To find the individual textures associated with the button, a naming scheme is used.  For each state "
    "a suffix is appended to the texture file name given in the GuiBitmapButtonCtrl::bitmap field:\n"
-   
+
    "- \"_n\": Normal state.  This one will be active when no other state applies.\n"
    "- \"_h\": Highlighted state.  This applies when the mouse is hovering over the button.\n"
    "- \"_d\": Depressed state.  This applies when the left mouse button has been clicked on the button but not yet released.\n"
    "- \"_i\": Inactive state.  This applies when the button control has been deactivated (GuiControl::setActive())\n\n"
-   
+
    "If a bitmap for a particular state cannot be found, the default bitmap will be used.  To disable all state-based "
    "bitmap functionality, set useStates to false which will make the control solely render from the bitmap specified "
    "in the bitmap field.\n\n"
 
    "@section guibitmapbutton_modifiers Per-Modifier Button Actions\n"
-   
+
    "If GuiBitmapButtonCtrl::useModifiers is set to true, per-modifier button actions and textures are enabled.  This functionality "
    "allows to associate different images and different actions with a button depending on which modifiers are pressed "
    "on the keyboard by the user.\n\n"
-   
+
    "When enabled, this functionality alters the texture lookup above by prepending the following strings to the "
    "suffixes listed above:\n"
-   
+
    "- \"\": Default.  No modifier is pressed.\n"
    "- \"_ctrl\": Image to use when CTRL/CMD is down.\n"
    "- \"_alt\": Image to use when ALT is down.\n"
    "- \"_shift\": Image to use when SHIFT is down\n\n"
-   
+
    "When this functionality is enabled, a new set of callbacks is used:\n"
-   
+
    "- onDefaultClick: Button was clicked without a modifier being presssed.\n"
    "- onCtrlClick: Button was clicked with the CTRL/CMD key down.\n"
    "- onAltClick: Button was clicked with the ALT key down.\n"
    "- onShiftClick: Button was clicked with the SHIFT key down.\n\n"
-   
+
    "GuiControl::command or GuiControl::onAction() still work as before when per-modifier functionality is enabled.\n\n"
-   
+
    "Note that modifiers cannot be mixed.  If two or more modifiers are pressed, a single one will take precedence over "
    "the remaining modifiers.  The order of precedence corresponds to the order listed above.\n\n"
-   
+
    "@tsexample\n"
    "// Create an OK button that will trigger an onOk() call on its parent when clicked:\n"
    "%okButton = new GuiBitmapButtonCtrl()\n"
@@ -98,7 +98,7 @@ ConsoleDocClass( GuiBitmapButtonCtrl,
    "   command = \"$ThisControl.getParent().onOk();\";\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiButtons"
 );
 
@@ -131,7 +131,7 @@ GuiBitmapButtonCtrl::GuiBitmapButtonCtrl()
 void GuiBitmapButtonCtrl::initPersistFields()
 {
    addGroup( "Bitmap" );
-   
+
       addProtectedField( "bitmap", TypeStringFilename, Offset( mBitmapName, GuiBitmapButtonCtrl ),
          &_setBitmap, &defaultProtectedGetFn,
          "Texture file to display on this button.\n"
@@ -157,9 +157,9 @@ void GuiBitmapButtonCtrl::initPersistFields()
          "Defaults to true.\n\n"
          "If you do not use per-state images on this button set this to false to speed up the loading process "
          "by inhibiting searches for the individual images." );
-         
+
    endGroup( "Bitmap" );
-      
+
    Parent::initPersistFields();
 }
 
@@ -169,10 +169,10 @@ bool GuiBitmapButtonCtrl::onWake()
 {
    if (! Parent::onWake())
       return false;
-      
+
    setActive( true );
    setBitmap( mBitmapName );
-   
+
    return true;
 }
 
@@ -228,19 +228,19 @@ void GuiBitmapButtonCtrl::inspectPostApply()
 
    Torque::Path path( mBitmapName );
    const String& fileName = path.getFileName();
-   
+
    if( mUseStates )
    {
       // If the filename points to a single state, automatically
       // cut off the state part.  Makes it easy to select files in
       // the editor without having to go in and manually cut off the
       // state parts all the time.
-      
+
       static String s_n = "_n";
       static String s_d = "_d";
       static String s_h = "_h";
       static String s_i = "_i";
-      
+
       if(    fileName.endsWith( s_n )
           || fileName.endsWith( s_d )
           || fileName.endsWith( s_h )
@@ -250,7 +250,7 @@ void GuiBitmapButtonCtrl::inspectPostApply()
          path.setExtension( String::EmptyString );
       }
    }
-   
+
    setBitmap( path.getFullPath() );
 
    // if the extent is set to (0,0) in the gui editor and appy hit, this control will
@@ -276,7 +276,7 @@ void GuiBitmapButtonCtrl::setAutoFitExtents( bool state )
 void GuiBitmapButtonCtrl::setBitmap( const String& name )
 {
    PROFILE_SCOPE( GuiBitmapButtonCtrl_setBitmap );
-   
+
    mBitmapName = name;
    if( !isAwake() )
       return;
@@ -295,7 +295,7 @@ void GuiBitmapButtonCtrl::setBitmap( const String& name )
                "_alt",
                "_shift"
             };
-            
+
             static String s_n = "_n";
             static String s_d = "_d";
             static String s_h = "_h";
@@ -306,16 +306,16 @@ void GuiBitmapButtonCtrl::setBitmap( const String& name )
                baseName += modifiers[ i ];
 
             mTextures[ i ].mTextureNormal = GFXTexHandle( baseName, &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
-            
+
             if( mUseStates )
             {
                if( !mTextures[ i ].mTextureNormal )
                   mTextures[ i ].mTextureNormal = GFXTexHandle( baseName + s_n, &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
-               
+
                mTextures[ i ].mTextureHilight = GFXTexHandle( baseName + s_h, &GFXDefaultPersistentProfile, avar("%s() - mTextureHighlight (line %d)", __FUNCTION__, __LINE__));
                if( !mTextures[ i ].mTextureHilight )
                   mTextures[ i ].mTextureHilight = mTextures[ i ].mTextureNormal;
-                  
+
                mTextures[ i ].mTextureDepressed = GFXTexHandle( baseName + s_d, &GFXDefaultPersistentProfile, avar("%s() - mTextureDepressed (line %d)", __FUNCTION__, __LINE__));
                if( !mTextures[ i ].mTextureDepressed )
                   mTextures[ i ].mTextureDepressed = mTextures[ i ].mTextureHilight;
@@ -333,7 +333,7 @@ void GuiBitmapButtonCtrl::setBitmap( const String& name )
             }
          }
       }
-      
+
       if( mAutoFitExtents && !mTextures[ 0 ].mTextureNormal.isNull() )
          setExtent( mTextures[ 0 ].mTextureNormal.getWidth(), mTextures[ 0 ].mTextureNormal.getHeight() );
    }
@@ -347,7 +347,7 @@ void GuiBitmapButtonCtrl::setBitmap( const String& name )
          mTextures[ i ].mTextureInactive = NULL;
       }
    }
-   
+
    setUpdate();
 }
 
@@ -374,7 +374,7 @@ void GuiBitmapButtonCtrl::setBitmapHandles(GFXTexHandle normal, GFXTexHandle hig
       {
          Con::warnf("GuiBitmapButtonCtrl::setBitmapHandles() - Invalid texture handles");
          setBitmap( GFXTextureManager::getUnavailableTexturePath() );
-         
+
          return;
       }
    }
@@ -385,7 +385,7 @@ void GuiBitmapButtonCtrl::setBitmapHandles(GFXTexHandle normal, GFXTexHandle hig
 //------------------------------------------------------------------------------
 
 GuiBitmapButtonCtrl::Modifier GuiBitmapButtonCtrl::getCurrentModifier()
-{   
+{
    U8 modifierKeys = Input::getModifierKeys();
 
    if( modifierKeys & SI_PRIMARY_CTRL )
@@ -394,7 +394,7 @@ GuiBitmapButtonCtrl::Modifier GuiBitmapButtonCtrl::getCurrentModifier()
       return ModifierAlt;
    else if( modifierKeys & SI_SHIFT )
       return ModifierShift;
-   
+
    return ModifierNone;
 }
 
@@ -405,7 +405,7 @@ GFXTexHandle& GuiBitmapButtonCtrl::getTextureForCurrentState()
    U32 index = ModifierNone;
    if( mUseModifiers )
       index = getCurrentModifier();
-         
+
    if( !mUseStates )
    {
       if( mTextures[ index ].mTextureNormal )
@@ -421,19 +421,19 @@ GFXTexHandle& GuiBitmapButtonCtrl::getTextureForCurrentState()
             return mTextures[ 0 ].mTextureNormal;
          else
             return mTextures[ index ].mTextureNormal;
-            
+
       case HILIGHT:
          if( !mTextures[ index ].mTextureHilight )
             return mTextures[ 0 ].mTextureHilight;
          else
             return mTextures[ index ].mTextureHilight;
-            
+
       case DEPRESSED:
          if( !mTextures[ index ].mTextureDepressed )
             return mTextures[ 0 ].mTextureDepressed;
          else
             return mTextures[ index ].mTextureDepressed;
-            
+
       default:
          if( !mTextures[ index ].mTextureInactive )
             return mTextures[ 0 ].mTextureInactive;
@@ -447,7 +447,7 @@ GFXTexHandle& GuiBitmapButtonCtrl::getTextureForCurrentState()
 void GuiBitmapButtonCtrl::onAction()
 {
    Parent::onAction();
-   
+
    if( mUseModifiers )
    {
       switch( getCurrentModifier() )
@@ -455,19 +455,19 @@ void GuiBitmapButtonCtrl::onAction()
          case ModifierNone:
             onDefaultClick_callback();
             break;
-         
+
          case ModifierCtrl:
             onCtrlClick_callback();
             break;
-         
+
          case ModifierAlt:
             onAltClick_callback();
             break;
-         
+
          case ModifierShift:
             onShiftClick_callback();
             break;
-            
+
          default:
             break;
       }
@@ -493,7 +493,7 @@ void GuiBitmapButtonCtrl::onRender(Point2I offset, const RectI& updateRect)
 void GuiBitmapButtonCtrl::renderButton( GFXTexHandle &texture, const Point2I &offset, const RectI& updateRect )
 {
    GFX->getDrawUtil()->clearBitmapModulation();
-   
+
    switch( mBitmapMode )
    {
       case BitmapStretched:
@@ -502,14 +502,14 @@ void GuiBitmapButtonCtrl::renderButton( GFXTexHandle &texture, const Point2I &of
          GFX->getDrawUtil()->drawBitmapStretch( texture, rect );
          break;
       }
-         
+
       case BitmapCentered:
       {
          Point2I p = offset;
-         
+
          p.x += getExtent().x / 2 - texture.getWidth() / 2;
          p.y += getExtent().y / 2 - texture.getHeight() / 2;
-         
+
          GFX->getDrawUtil()->drawBitmap( texture, p );
          break;
       }
@@ -524,12 +524,12 @@ IMPLEMENT_CONOBJECT( GuiBitmapButtonTextCtrl);
 
 ConsoleDocClass( GuiBitmapButtonTextCtrl,
    "@brief An extension of GuiBitmapButtonCtrl that additionally renders a text label on the bitmapped button.\n\n"
-   
+
    "The text for the label is taken from the GuiButtonBaseCtrl::text property.\n\n"
-   
+
    "For rendering, the label is placed, relative to the control's upper left corner, at the text offset specified in the "
    "control's profile (GuiControlProfile::textOffset) and justified according to the profile's setting (GuiControlProfile::justify).\n\n"
-   
+
    "@see GuiControlProfile::textOffset\n"
    "@see GuiControlProfile::justify\n"
    "@ingroup GuiButtons"

@@ -47,15 +47,15 @@ protected:
    S32               mTextLocation;
    S32               mTextMargin;
    Point2I           mButtonMargin;
-   
+
    /// Make the bitmap fill the button extent.
    bool mFitBitmapToButton;
-   
+
    /// Keep a square aspect ration on the icon.
    bool mMakeIconSquare;
 
    /// Calculate extent based on icon size, text width, and layout options.
-   bool mAutoSize;          
+   bool mAutoSize;
 
    //  Optional bitmap to be displayed when the proper bitmap cannot be found
    StringTableEntry mErrorBitmapName;
@@ -63,7 +63,7 @@ protected:
 
    void renderButton( Point2I &offset, const RectI& updateRect);
 
-   enum 
+   enum
    {
       stateNormal,
       stateMouseOver,
@@ -73,7 +73,7 @@ protected:
 
    void renderBitmapArray(RectI &bounds, S32 state);
 
-public:   
+public:
    enum TextLocation
    {
       TextLocNone,
@@ -89,14 +89,14 @@ public:
       IconLocNone,
       IconLocLeft,
       IconLocRight,
-      IconLocCenter      
+      IconLocCenter
    };
 
 
    DECLARE_CONOBJECT(GuiIconButtonCtrl);
    DECLARE_DESCRIPTION( "A button control that displays an icon on the button in addition\n"
                         "to the optional text label." );
-                        
+
    GuiIconButtonCtrl();
 
    static void initPersistFields();

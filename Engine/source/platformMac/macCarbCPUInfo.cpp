@@ -86,72 +86,72 @@ void Processor::init()
 	char buf[20];
 	unsigned long lraw;
 	unsigned long long llraw;
-	
+
 	Con::printf( "System & Processor Information:" );
-   
+
    SInt32 MacVersion;
    if( Gestalt( gestaltSystemVersion, &MacVersion ) == noErr )
    {
       U32 revision = MacVersion & 0xf;
       U32 minorVersion = ( MacVersion & 0xf0 ) >> 4;
       U32 majorVersion = ( MacVersion & 0xff00 ) >> 8;
-      
+
       Con::printf( "   OSX Version: %x.%x.%x", majorVersion, minorVersion, revision );
    }
-	
-	err = _getSysCTLstring("kern.ostype", buf, sizeof(buf));	
+
+	err = _getSysCTLstring("kern.ostype", buf, sizeof(buf));
 	if (err)
 		Con::printf( "   Unable to determine OS type\n" );
 	else
 		Con::printf( "   Mac OS Kernel name: %s", buf);
-	
-	err = _getSysCTLstring("kern.osrelease", buf, sizeof(buf));	
+
+	err = _getSysCTLstring("kern.osrelease", buf, sizeof(buf));
 	if (err)
 		Con::printf( "   Unable to determine OS release number\n" );
 	else
 		Con::printf( "   Mac OS Kernel version: %s", buf );
-	
-	err = _getSysCTLvalue<unsigned long long>("hw.memsize", &llraw);	
+
+	err = _getSysCTLvalue<unsigned long long>("hw.memsize", &llraw);
 	if (err)
 		Con::printf( "   Unable to determine amount of physical RAM\n" );
 	else
 		Con::printf( "   Physical memory installed: %d MB", (llraw >> 20));
-	
-	err = _getSysCTLvalue<unsigned long>("hw.usermem", &lraw);	
+
+	err = _getSysCTLvalue<unsigned long>("hw.usermem", &lraw);
 	if (err)
 		Con::printf( "   Unable to determine available user address space\n");
 	else
 		Con::printf( "   Addressable user memory: %d MB", (lraw >> 20));
-	
+
 	////////////////////////////////
 	// Values for the Family Type, CPU Type and CPU Subtype are defined in the
 	// SDK files for the Mach Kernel ==>  mach/machine.h
 	////////////////////////////////
-	
+
 	// CPU Family, Type, and Subtype
 	cpufam = 0;
 	cputype = 0;
 	cpusub = 0;
-	err = _getSysCTLvalue<unsigned long>("hw.cpufamily", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.cpufamily", &lraw);
 	if (err)
 		Con::printf( "   Unable to determine 'family' of CPU\n");
 	else {
 		cpufam = (int) lraw;
-		err = _getSysCTLvalue<unsigned long>("hw.cputype", &lraw);	
+		err = _getSysCTLvalue<unsigned long>("hw.cputype", &lraw);
 		if (err)
 			Con::printf( "   Unable to determine CPU type\n");
 		else {
 			cputype = (int) lraw;
-			err = _getSysCTLvalue<unsigned long>("hw.cpusubtype", &lraw);	
+			err = _getSysCTLvalue<unsigned long>("hw.cpusubtype", &lraw);
 			if (err)
 				Con::printf( "   Unable to determine CPU subtype\n");
 			else
 				cpusub = (int) lraw;
-			// If we've made it this far, 
+			// If we've made it this far,
 			Con::printf( "   Installed processor ID: Family 0x%08x  Type %d  Subtype %d",cpufam, cputype,cpusub);
 		}
 	}
-	
+
 	// The Gestalt version was known to have issues with some Processor Upgrade cards
 	// but it is uncertain whether this version has similar issues.
 	err = _getSysCTLvalue<unsigned long long>("hw.cpufrequency", &llraw);
@@ -163,7 +163,7 @@ void Processor::init()
 		Con::printf( "   Installed processor clock frequency: %d MHz", llraw);
 	}
 	Platform::SystemInfo.processor.mhz = (unsigned int)llraw;
-	
+
 	// Here's one that the original version of this routine couldn't do -- number
 	// of processors (cores)
    U32 ncpu = 1;
@@ -175,7 +175,7 @@ void Processor::init()
       ncpu = lraw;
 		Con::printf( "   Installed/available processor cores: %d", lraw);
    }
-	
+
 	// Now use CPUFAM to determine and then store the processor type
 	// and 'friendly name' in GG-accessible structure. Note that since
 	// we have access to the Family code, the Type and Subtypes are useless.
@@ -213,14 +213,14 @@ void Processor::init()
          else
             Platform::SystemInfo.processor.name = StringTable->insert("Intel Core 2 Duo");
 			break;
-         
+
       #ifdef CPUFAMILY_INTEL_6_26
       case CPUFAMILY_INTEL_6_26:
          Platform::SystemInfo.processor.type = CPU_Intel_Core2;
          Platform::SystemInfo.processor.name = StringTable->insert( "Intel 'Nehalem' Core Processor" );
          break;
       #endif
-      
+
 		default:
 			// explain why we can't get the processor type.
 			Con::warnf( "   Unknown Processor (family, type, subtype): 0x%x\t%d  %d", cpufam, cputype, cpusub);
@@ -231,41 +231,41 @@ void Processor::init()
 	}
    // Now we can directly query the system about a litany of "Optional" processor capabilities
 	// and determine the status by using BOTH the 'err' value and the 'lraw' value. If we request
-	// a non-existant feature from SYSCTL(), the 'err' result will be -1; 0 denotes it exists 
+	// a non-existant feature from SYSCTL(), the 'err' result will be -1; 0 denotes it exists
 	// >>>> BUT <<<<<
-	// it may not be supported, only defined. Thus we need to check 'lraw' to determine if it's 
+	// it may not be supported, only defined. Thus we need to check 'lraw' to determine if it's
 	// actually supported/implemented by the processor: 0 = no, 1 = yes, others are undefined.
 	procflags = 0;
 	// Seriously this one should be an Assert()
-	err = _getSysCTLvalue<unsigned long>("hw.optional.floatingpoint", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.floatingpoint", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_FPU;
 	// List of chip-specific features
-	err = _getSysCTLvalue<unsigned long>("hw.optional.mmx", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.mmx", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_MMX;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.sse", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.sse", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_SSE;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.sse2", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.sse2", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_SSE2;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.sse3", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.sse3", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_SSE3;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.supplementalsse3", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.supplementalsse3", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_SSE3xt;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.sse4_1", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.sse4_1", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_SSE4_1;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.sse4_2", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.sse4_2", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_SSE4_2;
-	err = _getSysCTLvalue<unsigned long>("hw.optional.altivec", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.optional.altivec", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_ALTIVEC;
 	// Finally some architecture-wide settings
-	err = _getSysCTLvalue<unsigned long>("hw.ncpu", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.ncpu", &lraw);
 	if ((err==0)&&(lraw>1)) procflags |= CPU_PROP_MP;
-	err = _getSysCTLvalue<unsigned long>("hw.cpu64bit_capable", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.cpu64bit_capable", &lraw);
 	if ((err==0)&&(lraw==1)) procflags |= CPU_PROP_64bit;
-	err = _getSysCTLvalue<unsigned long>("hw.byteorder", &lraw);	
+	err = _getSysCTLvalue<unsigned long>("hw.byteorder", &lraw);
 	if ((err==0)&&(lraw==1234)) procflags |= CPU_PROP_LE;
 
 	Platform::SystemInfo.processor.properties = procflags;
-	
+
 	Con::printf( "%s, %2.2f GHz", Platform::SystemInfo.processor.name, F32( Platform::SystemInfo.processor.mhz ) / 1000.0 );
 	if (Platform::SystemInfo.processor.properties & CPU_PROP_MMX)
 		Con::printf( "   MMX detected");
@@ -277,9 +277,9 @@ void Processor::init()
 		Con::printf( "   SSE3 detected");
 	if (Platform::SystemInfo.processor.properties & CPU_PROP_ALTIVEC)
 		Con::printf( "   AltiVec detected");
-	
+
 	Con::printf( "" );
-   
+
    // Trigger the signal
    Platform::SystemInfoReady.trigger();
 }

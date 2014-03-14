@@ -74,10 +74,10 @@ struct LightingShaderConstants
 
    GFXShaderConstHandle* mLightParamsSC;
    GFXShaderConstHandle* mLightSpotParamsSC;
-   
-   // NOTE: These are the shader constants used for doing 
-   // lighting  during the forward pass.  Do not confuse 
-   // these for the prepass lighting constants which are 
+
+   // NOTE: These are the shader constants used for doing
+   // lighting  during the forward pass.  Do not confuse
+   // these for the prepass lighting constants which are
    // used from AdvancedLightBinManager.
    GFXShaderConstHandle *mLightPositionSC;
    GFXShaderConstHandle *mLightDiffuseSC;
@@ -178,7 +178,7 @@ public:
    U32 getTexSize() const { return mTexSize; }
 
    /// Returns the best texture size based on the user
-   /// texture size, the last light screen size, and 
+   /// texture size, the last light screen size, and
    /// global shadow tweak parameters.
    U32 getBestTexSize( U32 scale = 1 ) const;
 
@@ -200,7 +200,7 @@ public:
    static void releaseAllTextures();
 
    /// Releases any shadow maps that have not been culled
-   /// in a while and returns the count of the remaing 
+   /// in a while and returns the count of the remaing
    /// shadow maps in use.
    static U32 releaseUnusedTextures();
 
@@ -218,7 +218,7 @@ protected:
 
    /// All the shadow maps that have been recently rendered to.
    static Vector<LightShadowMap*> smUsedShadowMaps;
-   
+
    virtual void _render(   RenderPassManager* renderPass,
                            const SceneRenderState *diffuseState ) = 0;
 
@@ -261,7 +261,7 @@ protected:
    GFXTexHandle mShadowMapTex;
 
    // The light we are rendering.
-   LightInfo *mLight;   
+   LightInfo *mLight;
 
    // Used for blur
    GFXShader* mLastShader;
@@ -272,7 +272,7 @@ protected:
 
    /// The callback used to get texture events.
    /// @see GFXTextureManager::addEventDelegate
-   void _onTextureEvent( GFXTexCallbackCode code );  
+   void _onTextureEvent( GFXTexCallbackCode code );
 };
 
 GFX_DeclareTextureProfile( ShadowMapProfile );
@@ -323,16 +323,16 @@ protected:
 
 public:
 
-   // We're leaving these public for easy access 
+   // We're leaving these public for easy access
    // for console protected fields.
 
    /// @name Shadow Map
    /// @{
-   
+
    ///
    U32 texSize;
 
-   /// 
+   ///
    FileName cookie;
 
    /// @}
@@ -350,13 +350,13 @@ public:
    /// @name Exponential Shadow Map Parameters
    /// @{
    Point4F overDarkFactor;
-   /// @}   
+   /// @}
 
    /// @name Parallel Split Shadow Map
    /// @{
 
    ///
-   F32 shadowDistance;  
+   F32 shadowDistance;
 
    ///
    F32 shadowSoftness;
@@ -364,7 +364,7 @@ public:
    /// The number of splits in the shadow map.
    U32 numSplits;
 
-   /// 
+   ///
    F32 logWeight;
 
    /// At what distance do we start fading the shadows out completely.

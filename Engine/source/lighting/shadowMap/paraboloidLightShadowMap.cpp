@@ -39,7 +39,7 @@ ParaboloidLightShadowMap::ParaboloidLightShadowMap( LightInfo *light )
    :  Parent( light ),
       mShadowMapScale( 1, 1 ),
       mShadowMapOffset( 0, 0 )
-{   
+{
 }
 
 ParaboloidLightShadowMap::~ParaboloidLightShadowMap()
@@ -56,7 +56,7 @@ ShadowType ParaboloidLightShadowMap::getShadowType() const
 void ParaboloidLightShadowMap::setShaderParameters(GFXShaderConstBuffer* params, LightingShaderConstants* lsc)
 {
    if ( lsc->mTapRotationTexSC->isValid() )
-      GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(), 
+      GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(),
                         SHADOWMGR->getTapRotationTex() );
 
    ShadowMapParams *p = mLight->getExtended<ShadowMapParams>();
@@ -84,19 +84,19 @@ void ParaboloidLightShadowMap::_render(   RenderPassManager* renderPass,
 
    const U32 texSize = getBestTexSize();
 
-   if (  mShadowMapTex.isNull() || 
+   if (  mShadowMapTex.isNull() ||
          mTexSize != texSize )
    {
       mTexSize = texSize;
 
-      mShadowMapTex.set(   mTexSize, mTexSize, 
-                           ShadowMapFormat, &ShadowMapProfile, 
+      mShadowMapTex.set(   mTexSize, mTexSize,
+                           ShadowMapFormat, &ShadowMapProfile,
                            "ParaboloidLightShadowMap" );
    }
 
    GFXFrustumSaver frustSaver;
    GFXTransformSaver saver;
-   
+
    // Render the shadowmap!
    GFX->pushActiveRenderTarget();
 
@@ -110,14 +110,14 @@ void ParaboloidLightShadowMap::_render(   RenderPassManager* renderPass,
 
    // Set up target
    mTarget->attachTexture( GFXTextureTarget::Color0, mShadowMapTex );
-   mTarget->attachTexture( GFXTextureTarget::DepthStencil, 
+   mTarget->attachTexture( GFXTextureTarget::DepthStencil,
       _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() ) );
    GFX->setActiveRenderTarget(mTarget);
    GFX->clear(GFXClearTarget | GFXClearStencil | GFXClearZBuffer, ColorI(255,255,255,255), 1.0f, 0);
 
    // Create scene state, prep it
    SceneManager* sceneManager = diffuseState->getSceneManager();
-   
+
    SceneRenderState shadowRenderState
    (
       sceneManager,
@@ -135,7 +135,7 @@ void ParaboloidLightShadowMap::_render(   RenderPassManager* renderPass,
    sceneManager->renderSceneNoLights( &shadowRenderState, SHADOW_TYPEMASK );
 
    _debugRender( &shadowRenderState );
- 
+
    mTarget->resolve();
-   GFX->popActiveRenderTarget();   
+   GFX->popActiveRenderTarget();
 }

@@ -91,7 +91,7 @@ bool TagDictionary::addEntry(S32 value, StringTableEntry define, StringTableEntr
       return false;
    }
    TagEntry *newEntry = (TagEntry *) mempool.alloc(sizeof(TagEntry));
-   
+
    newEntry->id = value;
    newEntry->define = define;
    newEntry->string = string;
@@ -109,7 +109,7 @@ bool TagDictionary::addEntry(S32 value, StringTableEntry define, StringTableEntr
          idHashBuckets[i] = NULL;
       }
       TagEntry *walk = entryChain;
-   
+
       while(walk)
       {
          S32 index = hashId(walk->id, numBuckets);
@@ -154,16 +154,16 @@ bool TagDictionary::writeHeader(Stream& io_sio)
 
    io_sio.write( sizeof(TAG_ASCII_HEADER)-1, TAG_ASCII_HEADER);
    io_sio.write( 4, "\r\n\r\n");
-   
+
    char exclude[256];
    char tempBuf[256];
    dSprintf(exclude, sizeof(exclude), "_TD%10.10u_H_", Platform::getVirtualMilliseconds() / 4);
-   
+
    dSprintf(tempBuf, sizeof(tempBuf), "#ifndef %s\r\n", exclude);
    io_sio.write(dStrlen(tempBuf), tempBuf);
    dSprintf(tempBuf, sizeof(tempBuf), "#define %s\r\n\r\n", exclude);
    io_sio.write(dStrlen(tempBuf), tempBuf);
-   
+
    for (U32 i = 0; i < v.size(); i++)
    {
       dSprintf(buff, sizeof(buff), "#define %s (%d)\r\n", idToDefine(v[i]), v[i]);
@@ -272,7 +272,7 @@ void TagDictionary::findStrings(Vector<S32>& out_v, const char*  in_pPattern)
 //------------------------------------------------------------------------------
 void TagDictionary::findDefines(Vector<S32>& out_v, const char*  in_pPattern)
 {
-   //locate all define strings that match the pattern and add their ID 
+   //locate all define strings that match the pattern and add their ID
    //to the given vector
    //
    TagEntry *walk = entryChain;

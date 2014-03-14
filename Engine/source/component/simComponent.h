@@ -66,10 +66,10 @@ private:
    void _unregisterComponents();
 
 protected:
-   ComponentInterfaceCache mInterfaceCache;  ///< Stores the interfaces exposed by this component. 
-   
+   ComponentInterfaceCache mInterfaceCache;  ///< Stores the interfaces exposed by this component.
+
    bool mEnabled;
-   
+
    bool mTemplate;
 
    // Non-const getOwner for derived classes
@@ -100,7 +100,7 @@ protected:
    /// other components, it will not receive an onComponentRegister call.
    ///
    /// Overloads of this method must pass the call along to their parent, as is
-   /// shown in the example below. 
+   /// shown in the example below.
    ///
    /// @code
    /// bool FooComponent::onComponentRegister( SimComponent *owner )
@@ -151,9 +151,9 @@ public:
    static void initPersistFields();
 
    virtual bool processArguments(S32 argc, const char **argv);
-   
+
    bool isEnabled() const { return mEnabled; }
-   
+
    void setEnabled( bool value ) { mEnabled = value; }
 
    /// Will return true if this object contains components.
@@ -188,7 +188,7 @@ public:
       return ::find(first, last, value);
    }
 
-   static bool setIsTemplate( void *object, const char *index, const char *data ) 
+   static bool setIsTemplate( void *object, const char *index, const char *data )
       { static_cast<SimComponent*>(object)->setIsTemplate( dAtob( data ) ); return false; };
    virtual void setIsTemplate( const bool pTemplate ) { mTemplate = pTemplate; }
    bool getIsTemplate() const { return mTemplate; }
@@ -211,7 +211,7 @@ public:
    /// @param notOwner If set to true, this will enumerate only interfaces NOT owned by 'owner'
    virtual bool getInterfaces( ComponentInterfaceList *list, const char *type = NULL, const char *name = NULL, const SimComponent *owner = NULL, bool notOwner = false ); // const omission intentional
 
-   
+
    /// These two methods allow for easy query of component interfaces if you know
    /// exactly what you are looking for, and don't mind being passed back the first
    /// matching result.
@@ -223,7 +223,7 @@ public:
    /// Add an interface to the cache. This function will return true if the interface
    /// is added successfully. An interface will not be added successfully if an entry
    /// in this components cache with the same values for 'type' and 'name' is present.
-   /// 
+   ///
    /// @param type Type of the interface being added. If NULL is passed, it will match any type string queried.
    /// @param name Name of interface being added. If NULL is passed, it will match any name string queried.
    /// @param interfaceOwner The component which owns the interface being cached
@@ -234,7 +234,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 template <class T>
-T *SimComponent::getInterface( const char *type /* = NULL */, const char *name /* = NULL */, 
+T *SimComponent::getInterface( const char *type /* = NULL */, const char *name /* = NULL */,
                               const SimComponent *owner /* = NULL */, bool notOwner /* = false  */ )
 {
    ComponentInterfaceList iLst;

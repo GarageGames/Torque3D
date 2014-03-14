@@ -62,7 +62,7 @@ class MemStream : public Stream
 
    public:
 
-      /// This constructs an empty memory stream that will grow 
+      /// This constructs an empty memory stream that will grow
       /// in increments as needed.
       MemStream(  U32 growSize,
                   bool allowRead  = true,

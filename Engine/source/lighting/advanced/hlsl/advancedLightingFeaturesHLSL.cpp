@@ -32,7 +32,7 @@
 #include "materials/materialFeatureTypes.h"
 
 
-void DeferredRTLightingFeatHLSL::processPixMacros( Vector<GFXShaderMacro> &macros, 
+void DeferredRTLightingFeatHLSL::processPixMacros( Vector<GFXShaderMacro> &macros,
                                                    const MaterialFeatureData &fd  )
 {
    // Skip deferred features, and use forward shading instead
@@ -52,7 +52,7 @@ void DeferredRTLightingFeatHLSL::processPixMacros( Vector<GFXShaderMacro> &macro
    }
 }
 
-void DeferredRTLightingFeatHLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void DeferredRTLightingFeatHLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                                 const MaterialFeatureData &fd )
 {
    // Skip deferred features, and use forward shading instead
@@ -111,7 +111,7 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
 
    meta->addStatement( new GenOp( "   @ = @.xy / @.w;\r\n", uvSceneDecl, ssPos, ssPos ) ); // get the screen coord... its -1 to +1
    meta->addStatement( new GenOp( "   @ = ( @ + 1.0 ) / 2.0;\r\n", uvScene, uvScene ) ); // get the screen coord to 0 to 1
-   meta->addStatement( new GenOp( "   @.y = 1.0 - @.y;\r\n", uvScene, uvScene ) ); // flip the y axis 
+   meta->addStatement( new GenOp( "   @.y = 1.0 - @.y;\r\n", uvScene, uvScene ) ); // flip the y axis
    meta->addStatement( new GenOp( "   @ = ( @ * @.zw ) + @.xy;\r\n", uvScene, uvScene, rtParams, rtParams) ); // scale it down and offset it to the rt size
 
    Var *lightInfoSamp = new Var;
@@ -136,11 +136,11 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
 
    Var *d_specular = new Var( "d_specular", "float" );
    meta->addStatement( new GenOp( "   @;\r\n", new DecOp( d_specular ) ) );
-   
+
 
    // Perform the uncondition here.
    String unconditionLightInfo = String::ToLower( AdvancedLightBinManager::smBufferName ) + "Uncondition";
-   meta->addStatement( new GenOp( avar( "   %s(tex2D(@, @), @, @, @);\r\n", 
+   meta->addStatement( new GenOp( avar( "   %s(tex2D(@, @), @, @, @);\r\n",
       unconditionLightInfo.c_str() ), lightInfoBuffer, uvScene, d_lightcolor, d_NL_Att, d_specular ) );
 
    // If this has an interlaced pre-pass, do averaging here
@@ -157,7 +157,7 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
       }
 
       meta->addStatement( new GenOp( "   float id_NL_Att, id_specular;\r\n   float3 id_lightcolor;\r\n" ) );
-      meta->addStatement( new GenOp( avar( "   %s(tex2D(@, @ + float2(0.0, @.y)), id_lightcolor, id_NL_Att, id_specular);\r\n", 
+      meta->addStatement( new GenOp( avar( "   %s(tex2D(@, @ + float2(0.0, @.y)), id_lightcolor, id_NL_Att, id_specular);\r\n",
          unconditionLightInfo.c_str() ), lightInfoBuffer, uvScene, oneOverTargetSize ) );
 
       meta->addStatement( new GenOp("   @ = lerp(@, id_lightcolor, 0.5);\r\n", d_lightcolor, d_lightcolor ) );
@@ -181,15 +181,15 @@ ShaderFeature::Resources DeferredRTLightingFeatHLSL::getResources( const Materia
    // HACK: See DeferredRTLightingFeatHLSL::setTexData.
    mLastTexIndex = 0;
 
-   Resources res; 
+   Resources res;
    res.numTex = 1;
    res.numTexReg = 1;
    return res;
 }
 
 void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
-                                             const MaterialFeatureData &fd, 
-                                             RenderPassData &passData, 
+                                             const MaterialFeatureData &fd,
+                                             RenderPassData &passData,
                                              U32 &texIndex )
 {
    // Skip deferred features, and use forward shading instead
@@ -212,13 +212,13 @@ void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
 }
 
 
-void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
 {
    if( fd.features[MFT_PrePassConditioner] )
    {
       // There is an output conditioner active, so we need to supply a transform
-      // to the pixel shader. 
+      // to the pixel shader.
       MultiLine *meta = new MultiLine;
 
       // We need the view to tangent space transform in the pixel shader.
@@ -229,23 +229,23 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
       {
          const bool useTexAnim = fd.features[MFT_TexAnim];
 
-         getOutTexCoord(   "texCoord", 
-                           "float2", 
-                           true, 
-                           useTexAnim, 
-                           meta, 
+         getOutTexCoord(   "texCoord",
+                           "float2",
+                           true,
+                           useTexAnim,
+                           meta,
                            componentList );
 
          if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
-            addOutDetailTexCoord( componentList, 
+            addOutDetailTexCoord( componentList,
                                   meta,
                                   useTexAnim );
       }
 
       output = meta;
    }
-   else if (   fd.materialFeatures[MFT_NormalsOut] || 
-               fd.features[MFT_ForwardShading] || 
+   else if (   fd.materialFeatures[MFT_NormalsOut] ||
+               fd.features[MFT_ForwardShading] ||
                !fd.features[MFT_RTLighting] )
    {
       Parent::processVert( componentList, fd );
@@ -257,7 +257,7 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
    }
 }
 
-void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // NULL output in case nothing gets handled
@@ -310,7 +310,7 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
          meta->addStatement( new GenOp( "   @.xy += @.xy * @;\r\n", bumpNorm, detailBump, detailBumpScale ) );
       }
 
-      // This var is read from GBufferConditionerHLSL and 
+      // This var is read from GBufferConditionerHLSL and
       // used in the prepass output.
       //
       // By using the 'half' type here we get a bunch of partial
@@ -322,15 +322,15 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
       gbNormal->setType( "half3" );
       LangElement *gbNormalDecl = new DecOp( gbNormal );
 
-      // Normalize is done later... 
+      // Normalize is done later...
       // Note: The reverse mul order is intentional. Affine matrix.
       meta->addStatement( new GenOp( "   @ = (half3)mul( @.xyz, @ );\r\n", gbNormalDecl, bumpNorm, viewToTangent ) );
 
       output = meta;
       return;
    }
-   else if (   fd.materialFeatures[MFT_NormalsOut] || 
-               fd.features[MFT_ForwardShading] || 
+   else if (   fd.materialFeatures[MFT_NormalsOut] ||
+               fd.features[MFT_ForwardShading] ||
                !fd.features[MFT_RTLighting] )
    {
       Parent::processPix( componentList, fd );
@@ -360,13 +360,13 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
 
 ShaderFeature::Resources DeferredBumpFeatHLSL::getResources( const MaterialFeatureData &fd )
 {
-   if (  fd.materialFeatures[MFT_NormalsOut] || 
-         fd.features[MFT_ForwardShading] || 
+   if (  fd.materialFeatures[MFT_NormalsOut] ||
+         fd.features[MFT_ForwardShading] ||
          fd.features[MFT_Parallax] ||
          !fd.features[MFT_RTLighting] )
       return Parent::getResources( fd );
 
-   Resources res; 
+   Resources res;
    if(!fd.features[MFT_SpecularMap])
    {
       res.numTex = 1;
@@ -385,12 +385,12 @@ ShaderFeature::Resources DeferredBumpFeatHLSL::getResources( const MaterialFeatu
 }
 
 void DeferredBumpFeatHLSL::setTexData( Material::StageData &stageDat,
-                                       const MaterialFeatureData &fd, 
-                                       RenderPassData &passData, 
+                                       const MaterialFeatureData &fd,
+                                       RenderPassData &passData,
                                        U32 &texIndex )
 {
-   if (  fd.materialFeatures[MFT_NormalsOut] || 
-         fd.features[MFT_ForwardShading] || 
+   if (  fd.materialFeatures[MFT_NormalsOut] ||
+         fd.features[MFT_ForwardShading] ||
          !fd.features[MFT_RTLighting] )
    {
       Parent::setTexData( stageDat, fd, passData, texIndex );
@@ -414,7 +414,7 @@ void DeferredBumpFeatHLSL::setTexData( Material::StageData &stageDat,
 }
 
 
-void DeferredPixelSpecularHLSL::processVert( Vector<ShaderComponent*> &componentList, 
+void DeferredPixelSpecularHLSL::processVert( Vector<ShaderComponent*> &componentList,
                                              const MaterialFeatureData &fd )
 {
    if( fd.features[MFT_ForwardShading] || !fd.features[MFT_RTLighting] )
@@ -425,7 +425,7 @@ void DeferredPixelSpecularHLSL::processVert( Vector<ShaderComponent*> &component
    output = NULL;
 }
 
-void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &componentList, 
+void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &componentList,
                                              const MaterialFeatureData &fd )
 {
    if( fd.features[MFT_ForwardShading] || !fd.features[MFT_RTLighting] )
@@ -479,13 +479,13 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
       "DeferredPixelSpecularHLSL::processPix - Something hosed the deferred features!" );
 
    // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
+   meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n",
       specDecl, d_specular, specPow, specStrength ) );
 
    LangElement *specMul = new GenOp( "float4( @.rgb, 0 ) * @", specCol, specular );
    LangElement *final = specMul;
 
-   // We we have a normal map then mask the specular 
+   // We we have a normal map then mask the specular
    if( !fd.features[MFT_SpecularMap] && fd.features[MFT_NormalMap] )
    {
       Var *bumpSample = (Var*)LangElement::find( "bumpSample" );
@@ -503,7 +503,7 @@ ShaderFeature::Resources DeferredPixelSpecularHLSL::getResources( const Material
    if( fd.features[MFT_ForwardShading] || !fd.features[MFT_RTLighting] )
       return Parent::getResources( fd );
 
-   Resources res; 
+   Resources res;
    return res;
 }
 
@@ -520,8 +520,8 @@ ShaderFeature::Resources DeferredMinnaertHLSL::getResources( const MaterialFeatu
 }
 
 void DeferredMinnaertHLSL::setTexData( Material::StageData &stageDat,
-                                       const MaterialFeatureData &fd, 
-                                       RenderPassData &passData, 
+                                       const MaterialFeatureData &fd,
+                                       RenderPassData &passData,
                                        U32 &texIndex )
 {
    if( !fd.features[MFT_ForwardShading] && fd.features[MFT_RTLighting] )
@@ -535,7 +535,7 @@ void DeferredMinnaertHLSL::setTexData( Material::StageData &stageDat,
    }
 }
 
-void DeferredMinnaertHLSL::processPixMacros( Vector<GFXShaderMacro> &macros, 
+void DeferredMinnaertHLSL::processPixMacros( Vector<GFXShaderMacro> &macros,
                                              const MaterialFeatureData &fd  )
 {
    if( !fd.features[MFT_ForwardShading] && fd.features[MFT_RTLighting] )
@@ -568,7 +568,7 @@ void DeferredMinnaertHLSL::processVert(   Vector<ShaderComponent*> &componentLis
    output = meta;
 }
 
-void DeferredMinnaertHLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void DeferredMinnaertHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // If there is no deferred information, bail on this feature
@@ -614,7 +614,7 @@ void DeferredMinnaertHLSL::processPix( Vector<ShaderComponent*> &componentList,
 }
 
 
-void DeferredSubSurfaceHLSL::processPix(  Vector<ShaderComponent*> &componentList, 
+void DeferredSubSurfaceHLSL::processPix(  Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
 {
    // If there is no deferred information, bail on this feature

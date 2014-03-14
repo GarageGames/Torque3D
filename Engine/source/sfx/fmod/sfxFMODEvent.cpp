@@ -35,7 +35,7 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXFMODEvent );
 
 ConsoleDocClass( SFXFMODEvent,
    "@brief A playable sound event in an FMOD Designer audio project.\n\n"
-   
+
    "@ingroup SFXFMOD\n"
    "@ingroup Datablocks"
 );
@@ -63,20 +63,20 @@ SFXFMODEvent::SFXFMODEvent( SFXFMODEventGroup* group, FMOD_EVENT* handle )
 {
    dMemset( mParameterRanges, 0, sizeof( mParameterRanges ) );
    dMemset( mParameterValues, 0, sizeof( mParameterValues ) );
-   
+
    // Fetch name.
-   
+
    int index;
    char* name = NULL;
-   
+
    SFXFMODDevice::smFunc->FMOD_Event_GetInfo( mHandle, &index, &name, ( FMOD_EVENT_INFO* ) 0 );
-   
+
    mName = name;
-   
+
    // Read out the parameter info so we can immediately create
    // the events on the client-side without having to open and
    // read all the project info there.
-   
+
    int numParameters;
    SFXFMODDevice::smFunc->FMOD_Event_GetNumParameters( mHandle, &numParameters );
    if( numParameters > MaxNumParameters )
@@ -87,27 +87,27 @@ SFXFMODEvent::SFXFMODEvent( SFXFMODEventGroup* group, FMOD_EVENT* handle )
          MaxNumParameters );
       numParameters = MaxNumParameters;
    }
-   
+
    for( U32 i = 0; i < numParameters; ++ i )
    {
       FMOD_EVENTPARAMETER* parameter;
       SFXFMODDevice::smFunc->FMOD_Event_GetParameterByIndex( mHandle, i, &parameter );
-      
+
       SFXFMODDevice::smFunc->FMOD_EventParameter_GetInfo( parameter, &index, &name );
       setParameter( i, name );
-         
+
       // Get value and range of parameter.
-      
+
       SFXFMODDevice::smFunc->FMOD_EventParameter_GetValue( parameter, &mParameterValues[ i ] );
       SFXFMODDevice::smFunc->FMOD_EventParameter_GetRange( parameter, &mParameterRanges[ i ].x, &mParameterRanges[ i ].y );
    }
-   
+
    // Read out the properties and create a custom SFXDescription for the event.
-   
+
    mDescription = new SFXDescription;
    if( !group->isClientOnly() )
       mDescription->assignId();
-      
+
    mDescription->registerObject(
       String::ToString( "%s_%s_Description",
          group->getName(),
@@ -116,10 +116,10 @@ SFXFMODEvent::SFXFMODEvent( SFXFMODEventGroup* group, FMOD_EVENT* handle )
    );
    if( group->isClientOnly() )
       Sim::getRootGroup()->addObject( mDescription );
-   
+
    FMOD_MODE modeValue;
    float floatValue;
-   
+
    if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_MODE, &modeValue, true ) == FMOD_OK )
       mDescription->mIs3D = ( modeValue == FMOD_3D );
    if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_VOLUME, &floatValue, true ) == FMOD_OK )
@@ -136,7 +136,7 @@ SFXFMODEvent::SFXFMODEvent( SFXFMODEventGroup* group, FMOD_EVENT* handle )
       mDescription->mConeOutsideAngle = floatValue;
    if( SFXFMODDevice::smFunc->FMOD_Event_GetPropertyByIndex( mHandle, FMOD_EVENTPROPERTY_3D_CONEOUTSIDEVOLUME, &floatValue, true ) == FMOD_OK )
       mDescription->mConeOutsideVolume = floatValue;
-      
+
    // Don't read out fade values as we want to leave fade-effects to
    // FMOD rather than having the fading system built into SFX pick
    // these values up.
@@ -158,7 +158,7 @@ void SFXFMODEvent::initPersistFields()
    addField( "fmodParameterRanges", TypePoint2F, Offset( mParameterRanges, SFXFMODEvent ), MaxNumParameters, "DO NOT MODIFY!!" );
    addField( "fmodParameterValues", TypeF32, Offset( mParameterValues, SFXFMODEvent ), MaxNumParameters, "DO NOT MODIFY!!" );
    endGroup( "DO NOT MODIFY!!" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -168,22 +168,22 @@ bool SFXFMODEvent::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    if( !mGroup )
    {
       Con::errorf( "SFXFMODEvent::onAdd - no group set; this event was not properly constructed" );
       return false;
    }
-   
+
    mGroup->_addEvent( this );
    mGroup->mProject->_addEvent( this );
-   
+
    // For non-networked event datablocks, create the parameter
    // instances now.
-   
+
    if( isClientOnly() )
       _createParameters();
-      
+
    return true;
 }
 
@@ -192,10 +192,10 @@ bool SFXFMODEvent::onAdd()
 void SFXFMODEvent::onRemove()
 {
    Parent::onRemove();
-   
+
    if( !mGroup )
       return;
-   
+
    release();
    mGroup->_removeEvent( this );
 }
@@ -206,7 +206,7 @@ bool SFXFMODEvent::preload( bool server, String& errorStr )
 {
    if( !Parent::preload( server, errorStr ) )
       return false;
-      
+
    if( !server )
    {
       if( !Sim::findObject( mGroupId, mGroup ) )
@@ -219,7 +219,7 @@ bool SFXFMODEvent::preload( bool server, String& errorStr )
 
       _createParameters();
    }
-      
+
    return true;
 }
 
@@ -228,10 +228,10 @@ bool SFXFMODEvent::preload( bool server, String& errorStr )
 void SFXFMODEvent::packData( BitStream* stream )
 {
    Parent::packData( stream );
-   
+
    stream->write( mName );
    stream->writeRangedS32( mGroup->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast );
-   
+
    for( U32 i = 0; i < MaxNumParameters; ++ i )
       if( stream->writeFlag( mParameters[ i ] ) )
       {
@@ -249,7 +249,7 @@ void SFXFMODEvent::unpackData( BitStream* stream )
 
    stream->read( &mName );
    mGroupId = stream->readRangedS32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
-   
+
    for( U32 i = 0; i < MaxNumParameters; ++ i )
       if( stream->readFlag() )
       {
@@ -271,7 +271,7 @@ void SFXFMODEvent::acquire()
 {
    if( mHandle )
       return;
-      
+
    mGroup->acquire();
    if( SFXFMODDevice::smFunc->FMOD_EventGroup_GetEvent(
          mGroup->mHandle, mName.c_str(), FMOD_EVENT_INFOONLY, &mHandle ) != FMOD_OK )
@@ -287,7 +287,7 @@ void SFXFMODEvent::release()
 {
    if( !mHandle )
       return;
-      
+
    SFXFMODDevice::smFunc->FMOD_Event_Release( mHandle, true, false );
    mHandle = NULL;
 }
@@ -306,30 +306,30 @@ void SFXFMODEvent::_createParameters()
    const String& projectFileName = getEventGroup()->getProject()->getFileName();
    const String qualifiedGroupName = getEventGroup()->getQualifiedName();
    const String description = String::ToString( "FMOD Event Parameter (%s)", projectFileName.c_str() );
-   
+
    for( U32 i = 0; i < MaxNumParameters; ++ i )
    {
       StringTableEntry name = getParameter( i );
       if( !name )
          continue;
-         
+
       SFXParameter* parameter = SFXParameter::find( name );
       if( !parameter )
       {
          parameter = new SFXParameter();
          parameter->setInternalName( name );
          parameter->registerObject();
-         
+
          // Set up parameter.
-         
+
          parameter->setChannel( SFXChannelUser0 );
          parameter->setRange( mParameterRanges[ i ] );
          parameter->setDefaultValue( mParameterValues[ i ] );
          parameter->setValue( mParameterValues[ i ] );
          parameter->setDescription( description );
-         
+
          // Set categories for easy filtering.
-         
+
          static StringTableEntry sCategories = StringTable->insert( "categories" );
          parameter->setDataField( sCategories, "0", "FMOD" );
          parameter->setDataField( sCategories, "1", avar( "FMOD Project: %s", projectFileName.c_str() ) );

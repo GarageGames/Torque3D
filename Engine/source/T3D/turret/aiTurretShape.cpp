@@ -37,9 +37,9 @@ static U32 sScanTypeMask =       PlayerObjectType     |
                                  VehicleObjectType;
 
 static U32 sAimTypeMask =        TerrainObjectType       |
-                                 WaterObjectType         | 
+                                 WaterObjectType         |
                                  PlayerObjectType        |
-                                 StaticShapeObjectType   | 
+                                 StaticShapeObjectType   |
                                  VehicleObjectType       |
                                  ItemObjectType;
 
@@ -57,7 +57,7 @@ AITurretShapeData::StateData::StateData()
    fire = false;
    scan = false;
    script = 0;
-   
+
    scaleAnimation = false;
    direction = false;
 
@@ -632,7 +632,7 @@ void AITurretShape::setTurretState(U32 newState, bool force)
    mStateDelayTime = stateData.timeoutValue;
 
    // Play animation
-   if (mStateAnimThread && stateData.sequence != -1) 
+   if (mStateAnimThread && stateData.sequence != -1)
    {
       mShapeInstance->setSequence(mStateAnimThread,stateData.sequence, stateData.direction ? 0.0f : 1.0f);
       F32 timeScale = (stateData.scaleAnimation && stateData.timeoutValue) ?
@@ -664,17 +664,17 @@ void AITurretShape::_updateTurretState(F32 dt)
 
    // Check for transitions. On some states we must wait for the
    // full timeout value before moving on.
-   if (mStateDelayTime <= 0 || !stateData.waitForTimeout) 
+   if (mStateDelayTime <= 0 || !stateData.waitForTimeout)
    {
       S32 ns;
 
-      if ((ns = stateData.transition.rest[mAtRest]) != -1) 
+      if ((ns = stateData.transition.rest[mAtRest]) != -1)
          setTurretState(ns);
-      else if ((ns = stateData.transition.target[mTarget.isValid()]) != -1) 
+      else if ((ns = stateData.transition.target[mTarget.isValid()]) != -1)
          setTurretState(ns);
       else if ((ns = stateData.transition.activated[mStateActive]) != -1)
          setTurretState(ns);
-      else if (mStateDelayTime <= 0 && (ns = stateData.transition.timeout) != -1) 
+      else if (mStateDelayTime <= 0 && (ns = stateData.transition.timeout) != -1)
          setTurretState(ns);
    }
 }
@@ -828,7 +828,7 @@ void AITurretShape::_trackTarget(F32 dt)
          _cleanupTargetAndTurret();
          return;
       }
-      
+
       // Use last known information to attempt to
       // continue to track target for a while.
       targetPos = mTarget.lastPos + mTarget.lastVel * F32(curTime - mTarget.lastSightTime) / 1000.0f;
@@ -953,7 +953,7 @@ bool AITurretShape::_testTargetLineOfSight(Point3F& aimPoint, ShapeBase* target,
    bool hit = false;
 
    target->disableCollision();
-   
+
    // First check for a clear line of sight to the target's center
    Point3F testPoint =  targetCenter;
    hit = gServerContainer.castRay(aimPoint, testPoint, sAimTypeMask, &ri);
@@ -998,7 +998,7 @@ bool AITurretShape::_testTargetLineOfSight(Point3F& aimPoint, ShapeBase* target,
          hit = gServerContainer.castRay(aimPoint, testPoint, sAimTypeMask, &ri);
       }
    }
-   
+
    target->enableCollision();
 
    if (!hit)
@@ -1136,9 +1136,9 @@ void AITurretShape::advanceTime(F32 dt)
 
    // Update any state thread
    AITurretShapeData::StateData& stateData = *mState;
-   if (mStateAnimThread && stateData.sequence != -1) 
+   if (mStateAnimThread && stateData.sequence != -1)
    {
-      mShapeInstance->advanceTime(dt,mStateAnimThread); 
+      mShapeInstance->advanceTime(dt,mStateAnimThread);
 
       updateNodes = true;
    }

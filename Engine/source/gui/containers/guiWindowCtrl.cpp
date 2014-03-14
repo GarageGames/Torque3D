@@ -40,7 +40,7 @@ ConsoleDocClass( GuiWindowCtrl,
 
    "The GuiWindowCtrl class implements windows that can be freely placed within the render window.  Additionally, "
    "the windows can be resized and maximized/minimized.\n\n"
-   
+
    "@tsexample\n"
    "new GuiWindowCtrl( MyWindow )\n"
    "{\n"
@@ -52,7 +52,7 @@ ConsoleDocClass( GuiWindowCtrl,
    "   canMaximize = true; // Display a maximize button in the title bar.\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -124,7 +124,7 @@ GuiWindowCtrl::GuiWindowCtrl()
 void GuiWindowCtrl::initPersistFields()
 {
    addGroup( "Window" );
-   
+
       addField( "text",              TypeRealString,   Offset( mText, GuiWindowCtrl ),
          "Text label to display in titlebar." );
       addField( "resizeWidth",       TypeBool,         Offset( mResizeWidth, GuiWindowCtrl ),
@@ -145,7 +145,7 @@ void GuiWindowCtrl::initPersistFields()
          "Script code to execute when the window is closed." );
       addField( "edgeSnap",          TypeBool,         Offset( mEdgeSnap,GuiWindowCtrl ),
          "If true, the window will snap to the edges of other windows when moved close to them." );
-         
+
    endGroup( "Window" );
 
    Parent::initPersistFields();
@@ -200,7 +200,7 @@ void GuiWindowCtrl::moveFromCollapseGroup()
             if((*iter)->mCollapseGroupNum >= vecPos)
                collapseGroupNumVec.push_back((*iter));
          }
-         
+
          // Iterate through the newly created array; delete my references in the old group, create a new group and organize me accord.
          S32 assignWindowNumber = 0;
          CollapseGroupNumVec::iterator iter2 = collapseGroupNumVec.begin();
@@ -210,7 +210,7 @@ void GuiWindowCtrl::moveFromCollapseGroup()
             parent->mCollapseGroupVec[groupVec].setSize(groupVecCount);
             (*iter2)->mCollapseGroup = (parent->mCollapseGroupVec.size());
             (*iter2)->mCollapseGroupNum = assignWindowNumber;
-            
+
             assignWindowNumber++;
             groupVecCount--;
          }
@@ -231,10 +231,10 @@ void GuiWindowCtrl::moveFromCollapseGroup()
          parent->mCollapseGroupVec[groupVec].first()->mCollapseGroupNum = -1;
          parent->mCollapseGroupVec[groupVec].erase(U32(0));
          parent->mCollapseGroupVec[groupVec].setSize(groupVecCount - 1);
-         parent->mCollapseGroupVec.erase(groupVec);	
+         parent->mCollapseGroupVec.erase(groupVec);
       }
    }
-   
+
    // Re id collapse groups
    refreshCollapseGroups();
 }
@@ -249,24 +249,24 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
    GuiControl *parent = getParent();
    if( !parent )
       return;
-   
+
    S32 groupVec = mCollapseGroup;
    S32 attatchedGroupVec = hitWindow->mCollapseGroup;
    S32 vecPos = mCollapseGroupNum;
-   
+
    if(mCollapseGroup == attatchedGroupVec && vecPos != -1)
       return;
 
    CollapseGroupNumVec collapseGroupNumVec;
 
    // Window colliding with is not in a collapse group
-   if(hitWindow->mCollapseGroup < 0) 
+   if(hitWindow->mCollapseGroup < 0)
    {
       // We(the collider) are in a group of windows
-      if(mCollapseGroup >= 0) 
+      if(mCollapseGroup >= 0)
       {
          S32 groupVecCount = parent->mCollapseGroupVec[groupVec].size() - 1;
-            
+
          // Copy pointer window data in my array, and store in a temp array
          CollapseGroupNumVec::iterator iter = parent->mCollapseGroupVec[groupVec].begin();
          for(; iter != parent->mCollapseGroupVec[groupVec].end(); iter++ )
@@ -320,11 +320,11 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
    }
    else // Window colliding with *IS* in a collapse group
    {
-   
+
       if(mCollapseGroup >= 0)
       {
          S32 groupVecCount = parent->mCollapseGroupVec[groupVec].size() - 1;
-            
+
          CollapseGroupNumVec::iterator iter = parent->mCollapseGroupVec[groupVec].begin();
          for(; iter != parent->mCollapseGroupVec[groupVec].end(); iter++ )
          {
@@ -349,7 +349,7 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
             if(groupVec > 0)
                parent->mCollapseGroupVec.setSize(groupVec);
          }
-         
+
          // Since we killed my old array group, run in case the guiControl array moved me down a notch
          if(attatchedGroupVec > groupVec )
             attatchedGroupVec--;
@@ -358,14 +358,14 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
       else
       {
          S32 groupVec = hitWindow->mCollapseGroup;
-         
+
          if(orientation == 0)
             parent->mCollapseGroupVec[groupVec].push_front(this);
          else
             parent->mCollapseGroupVec[groupVec].push_back(this);
       }
    }
-   
+
    // Re id collapse groups
    refreshCollapseGroups();
 
@@ -380,7 +380,7 @@ void GuiWindowCtrl::refreshCollapseGroups()
    GuiControl *parent = getParent();
    if( !parent )
       return;
-   
+
    CollapseGroupNumVec	collapseGroupNumVec;
 
    // iterate through the collided array, renumbering the windows pointers
@@ -396,7 +396,7 @@ void GuiWindowCtrl::refreshCollapseGroups()
          (*iter2)->mCollapseGroupNum = assignWindowNumber;
          assignWindowNumber++;
       }
-            
+
       assignGroupNum++;
    }
 }
@@ -467,7 +467,7 @@ void GuiWindowCtrl::handleCollapseGroup()
 
    if( mIsCollapsed ) // minimize window up to its header bar
    {
-      //save settings 
+      //save settings
       mPreCollapsedYExtent = getExtent().y;
       mPreCollapsedYMinExtent = getMinExtent().y;
 
@@ -500,7 +500,7 @@ void GuiWindowCtrl::handleCollapseGroup()
             }
          }
       }
-      
+
       onCollapse_callback();
    }
    else // maximize the window to its previous position
@@ -508,9 +508,9 @@ void GuiWindowCtrl::handleCollapseGroup()
       //create and load settings
       mResizeHeight = true;
       setMinExtent( Point2I( getMinExtent().x, mPreCollapsedYMinExtent ) );
-      
+
       resize( getPosition(), Point2I( getExtent().x, mPreCollapsedYExtent ) );
-      
+
       iterator i;
       for(i = begin(); i != end(); i++)
       {
@@ -529,12 +529,12 @@ void GuiWindowCtrl::handleCollapseGroup()
             if((*iter)->mCollapseGroupNum > mCollapseGroupNum)
             {
                Point2I newChildPosition =  (*iter)->getPosition();
-               newChildPosition.y += moveChildYBy;					
+               newChildPosition.y += moveChildYBy;
                (*iter)->resize(newChildPosition, (*iter)->getExtent());
             }
          }
       }
-      
+
       onRestore_callback();
    }
 }
@@ -554,8 +554,8 @@ bool GuiWindowCtrl::resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resi
    for(; iter != parent->mCollapseGroupVec[mCollapseGroup].end(); iter++ )
    {
       if((*iter) == this)
-         continue; 
-      
+         continue;
+
       Point2I newChildPosition = (*iter)->getPosition();
       Point2I newChildExtent = (*iter)->getExtent();
 
@@ -563,7 +563,7 @@ bool GuiWindowCtrl::resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resi
       {
          newChildPosition.x -= resizePos.x;
          newChildExtent.x -= resizeExtent.x;
-         
+
       }
       if( resizeY == true )
       {
@@ -651,7 +651,7 @@ void GuiWindowCtrl::getSnappableWindows( Vector<GuiWindowCtrl*> &windowOutVector
       GuiWindowCtrl *childWindow = dynamic_cast<GuiWindowCtrl*>(parent->at(i));
       if( !childWindow || !childWindow->isVisible() || childWindow == this || childWindow->mEdgeSnap == false)
          continue;
-      
+
       if( canCollapse && !childWindow->mCanCollapse )
          continue;
 
@@ -786,7 +786,7 @@ void GuiWindowCtrl::onMouseDown(const GuiEvent &event)
          S32 docking = getDocking();
          if( docking == Docking::dockInvalid || docking == Docking::dockNone )
             mMouseMovingWin = mCanMove;
-      
+
          mMouseResizeWidth = false;
          mMouseResizeHeight = false;
       }
@@ -813,7 +813,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
 {
    GuiControl *parent = getParent();
    GuiCanvas *root = getRoot();
-   if ( !root ) 
+   if ( !root )
       return;
 
    mMousePosition = globalToLocalCoord(event.mousePoint);
@@ -846,7 +846,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
          RectI bounds = getGlobalBounds();
          bounds.point = mOrigBounds.point + deltaMousePosition;
          EdgeRectI edges = EdgeRectI( bounds, mResizeMargin );
-         
+
          // Create a global-space rectangle that covers the snapping
          // zone of this window. Double the space in which snapping occurs
          // for top and bottom.
@@ -855,18 +855,18 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
          snapZone.point.y -= SnapDistance;
          snapZone.extent.x += SnapDistance + SnapDistance;
          snapZone.extent.y += SnapDistance + SnapDistance;
-         
+
          // Build valid snap and window vectors to compare against
          Vector< GuiWindowCtrl* > windowList;
          getSnappableWindows( windowList );
 
          for( S32 i =0; i < windowList.size(); i++ )
-         {            
+         {
             // Make sure the window is both horizontally and vertically
             // within the snap zone for this window.
             if( !snapZone.overlaps( windowList[i]->getGlobalBounds() ) )
                continue;
-            
+
             // Build edges for snap detection
             EdgeRectI snapRect( windowList[i]->getGlobalBounds(), mResizeMargin );
 
@@ -874,7 +874,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
                snapRect.right.position.x >= edges.left.position.x - SnapDistance )
             {
                newPosition.x = snapRect.right.position.x;
-            }           
+            }
             else if( snapRect.left.position.x <= edges.right.position.x + SnapDistance &&
                snapRect.left.position.x >= edges.right.position.x - SnapDistance )
             {
@@ -898,14 +898,14 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
                if( mCollapseGroup == -1 || ( mCollapseGroup >= 0 && mCollapseGroup != windowList[i]->mCollapseGroup ) )
                {
                   // If the window checked is in a group, if its anything but the last, its n/a
-                  if( windowList[i]->mCollapseGroup >= 0 && 
+                  if( windowList[i]->mCollapseGroup >= 0 &&
                         windowList[i] != parent->mCollapseGroupVec[windowList[i]->mCollapseGroup].last() )
                      continue;
                }
                else  // We are in the same group, we can't obviously be [0]
                {
                   // If we are [-1/0] we have a serious problem. Also, we only allow connection to the window directly above us
-                  if( mCollapseGroupNum <= 0 || 
+                  if( mCollapseGroupNum <= 0 ||
                         windowList[i] != parent->mCollapseGroupVec[mCollapseGroup][mCollapseGroupNum-1] )
                      continue;
                }
@@ -948,7 +948,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
          }
          resizeY = true;
       }
-      
+
       if( mResizeEdge & edgeRight )
       {
          newExtent.x = getMin(parent->getWidth(), mOrigBounds.extent.x + deltaMousePosition.x);
@@ -980,7 +980,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
       moveWithCollapseGroup(newPosition);
 
    if(mCanCollapse && mCollapseGroup >= 0 && mResizeWindow == true )
-   {	
+   {
       // Resize the window if allowed
       if( newExtent.y >= getMinExtent().y && newExtent.x >= getMinExtent().x)
       {
@@ -1028,7 +1028,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
       // Here is where were going to put our other if statement
       // if the window closes, and there were only 2 windows in the array, then just delete the array and default there params
       // if not, delete the window from the array, default its params, and renumber the windows
-      
+
       if( engineAPI::gUseConsoleInterop )
          evaluate( mCloseCommand );
       onClose_callback();
@@ -1043,7 +1043,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
                         mStandardBounds.extent);
          // Set the flag
          mMaximized = false;
-         
+
          onRestore_callback();
       }
       else
@@ -1059,7 +1059,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
 
          // Set the flag
          mMaximized = true;
-         
+
          onMaximize_callback();
       }
    }
@@ -1073,7 +1073,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
                         mStandardBounds.extent);
          // Set the flag
          mMinimized = false;
-         
+
          onRestore_callback();
       }
       else
@@ -1134,7 +1134,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
 
          // Set the flag
          mMinimized = true;
-         
+
          onMinimize_callback();
       }
    }
@@ -1161,7 +1161,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
       RectI bounds = getGlobalBounds();
       bounds.point = mOrigBounds.point + deltaMousePosition;
       EdgeRectI edges = EdgeRectI( bounds, mResizeMargin );
-      
+
       RectI snapZone = bounds;
       snapZone.point.x -= SnapDistance;
       snapZone.point.y -= SnapDistance;
@@ -1170,9 +1170,9 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
 
       Vector<EdgeRectI> snapList;
       Vector<GuiWindowCtrl*> windowList;
-      
+
       getSnappableWindows( windowList, true );
-      
+
       for( S32 i =0; i < windowList.size(); i++ )
       {
          if( !snapZone.overlaps( windowList[i]->getGlobalBounds() ) )
@@ -1180,8 +1180,8 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
 
          // Build edges for snap detection
          EdgeRectI snapRect( windowList[i]->getGlobalBounds(), mResizeMargin );
-         
-         if( windowList[i]->mCollapseGroupNum == -1 ) 
+
+         if( windowList[i]->mCollapseGroupNum == -1 )
          {
             // BECOMES "PARENT"
             if( snapRect.top.position.y <= edges.bottom.position.y + SnapDistance + SnapDistance &&
@@ -1193,7 +1193,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
                break;
             }
          }
-         
+
          if( (windowList[i]->mCollapseGroupNum == -1) || (windowList[i]->mCollapseGroupNum == mCollapseGroupNum - 1) ||
                (!parent->mCollapseGroupVec.empty() && parent->mCollapseGroupVec[windowList[i]->mCollapseGroup].last() ==  windowList[i]) )
          {
@@ -1208,13 +1208,13 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
             }
          }
       }
-      
+
       // We're either moving out of a collapse group or moving to another one
       // Not valid for windows not previously in a group
-      if( mCollapseGroup >= 0 && 
+      if( mCollapseGroup >= 0 &&
          ( snapType == -1 || ( snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup) ) )
          moveFromCollapseGroup();
-      
+
       // No window to connect to
       if( !hitWindow )
          return;
@@ -1291,7 +1291,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    winRect.extent.x -= mBitmapBounds[BorderLeft].extent.x + mBitmapBounds[BorderRight].extent.x;
    winRect.extent.y -= mBitmapBounds[topBase + 2].extent.y + mBitmapBounds[BorderBottom].extent.y;
-   
+
    winRect.extent.x += 1;
 
    GFX->getDrawUtil()->drawRectFill(winRect, mProfile->mFillColor);
@@ -1438,7 +1438,7 @@ const RectI GuiWindowCtrl::getClientRect()
 {
    if( !mProfile || mProfile->mBitmapArrayRects.size() < NumBitmaps )
       return Parent::getClientRect();
-      
+
    if( !mBitmapBounds )
       mBitmapBounds = mProfile->mBitmapArrayRects.address();
 
@@ -1450,7 +1450,7 @@ const RectI GuiWindowCtrl::getClientRect()
    winRect.extent.x = getWidth() - ( winRect.point.x  + mBitmapBounds[BorderRight].extent.x );
 
    // Finally, inset it by padding
-   // Inset by padding.  margin is specified for all t/b/l/r but 
+   // Inset by padding.  margin is specified for all t/b/l/r but
    // uses only pointx pointy uniformly on both ends. This should be fixed. - JDD
    // winRect.inset( mSizingOptions.mPadding.point.x, mSizingOptions.mPadding.point.y );
 
@@ -1697,7 +1697,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 
    Point2I newPosition = getPosition();
    Point2I newExtent = getExtent();
-         
+
    bool doCollapse = false;
 
    S32 deltaX = newParentRect.extent.x - oldParentRect.extent.x;
@@ -1713,7 +1713,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
       {
          // Setup parsing mechanisms
          CollapseGroupNumVec collapseGroupNumVec;
-         
+
          // Lets grab the information we need (this should probably be already stored on each individual window object)
          S32 groupNum = mCollapseGroup;
          S32 groupMax = parent->mCollapseGroupVec[ groupNum ].size() - 1;
@@ -1737,7 +1737,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 
             groupExtent += (*iter)->getExtent().y;
          }
-         
+
          // Use the information we just gatherered; only enter this block if we need to
          tempGroupExtent = groupPos + groupExtent;
          if( tempGroupExtent > ( newParentRect.extent.y / 2 ) )
@@ -1747,7 +1747,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
             bool secondLoop = false;
             while( tempGroupExtent >= newParentRect.extent.y )
             {
-               
+
                if( windowParser == -1)
                {
                   if( !secondLoop )
@@ -1765,7 +1765,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
                   windowParser--;
                   continue;
                }
-               
+
                // Resizing block for the loop... if we can get away with just resizing the bottom window do it before
                // resizing the whole block. else, go through the group and start setting min extents. if that doesnt work
                // on the second go around, start collpsing the windows.
@@ -1773,7 +1773,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
                {
                   if( this == tempWindow )
                      newExtent.y = newExtent.y - ( tempGroupExtent - newParentRect.extent.y );
-                     
+
                   tempGroupExtent = tempGroupExtent - newParentRect.extent.y;
                }
                else
@@ -1812,7 +1812,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
       if( (newPosition.x + newExtent.x) > newParentRect.extent.x + 4 )
       {
          if( (newPosition.x + newExtent.x) > (getPosition().x + getExtent().x) )
-         { 
+         {
             newPosition.x = getPosition().x;
             newExtent.x = getExtent().x;
          }
@@ -1828,9 +1828,9 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 
       // Only for collpasing groups, if were not, then do it like normal windows
       if( mCanCollapse && mCollapseGroup >= 0 )
-      {	
+      {
          bool resizeMe = false;
-         
+
          // Only the group window should control positioning
          if( mCollapseGroupNum == 0 )
          {
@@ -1921,7 +1921,7 @@ DefineEngineStaticMethod( GuiWindowCtrl, attach, void, ( GuiWindowCtrl* bottomWi
    "Attach @a bottomWindow to @topWindow so that @a bottomWindow moves along with @a topWindow when it is dragged.\n\n"
    "@param bottomWindow \n"
    "@param topWindow " )
-{   
+{
    if(bottomWindow == NULL || topWindow == NULL)
    {
       Con::warnf("Warning: AttachWindows - could not find windows");

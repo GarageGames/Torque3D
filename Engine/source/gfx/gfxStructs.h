@@ -51,7 +51,7 @@
 
 //-----------------------------------------------------------------------------
 // This class is used to interact with an API's fixed function lights.  See GFX->setLight
-class GFXLightInfo 
+class GFXLightInfo
 {
 public:
    enum Type {
@@ -97,7 +97,7 @@ struct GFXLightMaterial
 
 //-----------------------------------------------------------------------------
 
-struct GFXVideoMode 
+struct GFXVideoMode
 {
    GFXVideoMode();
 
@@ -109,7 +109,7 @@ struct GFXVideoMode
    // When this is returned from GFX, it's the max, otherwise it's the desired AA level.
    U32 antialiasLevel;
 
-   inline bool operator == ( const GFXVideoMode &otherMode ) const 
+   inline bool operator == ( const GFXVideoMode &otherMode ) const
    {
       if( otherMode.fullScreen != fullScreen )
          return false;
@@ -126,13 +126,13 @@ struct GFXVideoMode
 
       return true;
    }
-   
+
    inline bool operator !=( const GFXVideoMode& otherMode ) const
    {
       return !( *this == otherMode );
    }
 
-   /// Fill whatever fields we can from the passed string, which should be 
+   /// Fill whatever fields we can from the passed string, which should be
    /// of form "width height [bitDepth [refreshRate] [antialiasLevel]]" Unspecified fields
    /// aren't modified, so you may want to set defaults before parsing.
    void parseFromString( const char *str );
@@ -169,14 +169,14 @@ struct GFXShaderMacro
    GFXShaderMacro() {}
 
    GFXShaderMacro( const GFXShaderMacro &macro )
-      :  name( macro.name ), 
-         value( macro.value ) 
+      :  name( macro.name ),
+         value( macro.value )
       {}
 
-   GFXShaderMacro(   const String &name_, 
+   GFXShaderMacro(   const String &name_,
                      const String &value_ = String::EmptyString )
-      :  name( name_ ), 
-         value( value_ ) 
+      :  name( name_ ),
+         value( value_ )
       {}
 
    ~GFXShaderMacro() {}

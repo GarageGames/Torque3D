@@ -28,7 +28,7 @@
 #include "gfx/gl/gfxGLUtils.h"
 
 GFXGLPrimitiveBuffer::GFXGLPrimitiveBuffer(GFXDevice *device, U32 indexCount, U32 primitiveCount, GFXBufferType bufferType) :
-GFXPrimitiveBuffer(device, indexCount, primitiveCount, bufferType), mZombieCache(NULL) 
+GFXPrimitiveBuffer(device, indexCount, primitiveCount, bufferType), mZombieCache(NULL)
 {
    PRESERVE_INDEX_BUFFER();
 	// Generate a buffer and allocate the needed memory
@@ -41,7 +41,7 @@ GFXGLPrimitiveBuffer::~GFXGLPrimitiveBuffer()
 {
 	// This is heavy handed, but it frees the buffer memory
 	glDeleteBuffersARB(1, &mBuffer);
-   
+
    if( mZombieCache )
       delete [] mZombieCache;
 }
@@ -50,11 +50,11 @@ void GFXGLPrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
 {
 	// Preserve previous binding
    PRESERVE_INDEX_BUFFER();
-   
+
    // Bind ourselves and map
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexCount * sizeof(U16), NULL, GFXGLBufferType[mBufferType]);
-   
+
    // Offset the buffer to indexStart
 	*indexPtr = (void*)((U8*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY) + (indexStart * sizeof(U16)));
 }
@@ -63,7 +63,7 @@ void GFXGLPrimitiveBuffer::unlock()
 {
 	// Preserve previous binding
    PRESERVE_INDEX_BUFFER();
-   
+
    // Bind ourselves and unmap
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
 	bool res = glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
@@ -92,7 +92,7 @@ void GFXGLPrimitiveBuffer::zombify()
 {
    if(mZombieCache)
       return;
-      
+
    mZombieCache = new U8[mIndexCount * sizeof(U16)];
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
    glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, mIndexCount * sizeof(U16), mZombieCache);
@@ -105,12 +105,12 @@ void GFXGLPrimitiveBuffer::resurrect()
 {
    if(!mZombieCache)
       return;
-   
+
    glGenBuffers(1, &mBuffer);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexCount * sizeof(U16), mZombieCache, GFXGLBufferType[mBufferType]);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-   
+
    delete[] mZombieCache;
    mZombieCache = NULL;
 }

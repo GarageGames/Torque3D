@@ -25,7 +25,7 @@
 
 IMPLEMENT_CONOBJECT(RenderObjectMgr);
 
-ConsoleDocClass( RenderObjectMgr, 
+ConsoleDocClass( RenderObjectMgr,
    "@brief A render bin which uses object callbacks for rendering.\n\n"
    "This render bin gathers object render instances and calls its delegate "
    "method to perform rendering.  It is used infrequently for specialized "
@@ -41,7 +41,7 @@ RenderObjectMgr::RenderObjectMgr()
 
 RenderObjectMgr::RenderObjectMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder)
  : RenderBinManager(riType, renderOrder, processAddOrder)
-{  
+{
    mOverrideMat = NULL;
 }
 
@@ -51,8 +51,8 @@ void RenderObjectMgr::initPersistFields()
 }
 
 void RenderObjectMgr::setOverrideMaterial(BaseMatInstance* overrideMat)
-{ 
-   mOverrideMat = overrideMat; 
+{
+   mOverrideMat = overrideMat;
 }
 
 //-----------------------------------------------------------------------------
@@ -70,6 +70,6 @@ void RenderObjectMgr::render( SceneRenderState *state )
    {
       ObjectRenderInst *ri = static_cast<ObjectRenderInst*>(mElementList[i].inst);
       if ( ri->renderDelegate )
-         ri->renderDelegate( ri, state, mOverrideMat );      
+         ri->renderDelegate( ri, state, mOverrideMat );
    }
 }

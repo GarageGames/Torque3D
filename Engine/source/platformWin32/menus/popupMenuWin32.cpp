@@ -114,10 +114,10 @@ void PlatformPopupMenuData::removeAccelerator(U32 id)
 }
 
 void PlatformPopupMenuData::setAccelleratorEnabled( U32 id, bool enabled )
-{   
+{
    Win32Window::AcceleratorList *src = NULL;
    Win32Window::AcceleratorList *dst = NULL;
-   
+
    if ( enabled )
    {
       src = &mDisabledAccelerators;
@@ -185,7 +185,7 @@ S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator)
       mi.fType = MFT_STRING;
    else
       mi.fType = MFT_SEPARATOR;
-   
+
    char buf[1024];
    if(accelerator && *accelerator)
    {
@@ -329,7 +329,7 @@ void PopupMenu::removeItem(S32 itemPos)
    bool isAttached = isAttachedToMenuBar();
    if(isAttached && pWindow == NULL)
       return;
-   
+
    MENUITEMINFOA mi;
    mi.cbSize = sizeof(mi);
    mi.fMask = MIIM_DATA|MIIM_ID;
@@ -393,10 +393,10 @@ void PopupMenu::enableItem( S32 pos, bool enable )
    // Update accelerators.
 
    // NOTE: This really DOES need to happen. A disabled menu item
-   // should not still have an accelerator mapped to it. 
+   // should not still have an accelerator mapped to it.
    //
-   // Unfortunately, the editors currently only set menu items 
-   // enabled/disabled when the menu itself is selected which means our 
+   // Unfortunately, the editors currently only set menu items
+   // enabled/disabled when the menu itself is selected which means our
    // accelerators would be out of synch.
 
    /*
@@ -511,7 +511,7 @@ bool PopupMenu::handleSelect(U32 command, const char *text /* = NULL */)
                mi.dwTypeData = buf;
                mi.cch++;
                GetMenuItemInfoA(mData->mMenu, i, TRUE, &mi);
-               
+
                // [tom, 5/11/2007] Don't do anything if the menu item is disabled
                if(mi.fState & MFS_DISABLED)
                   return false;
@@ -544,7 +544,7 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
       return;
    }
 
-   // [tom, 6/4/2007] showPopup() blocks until the menu is closed by the user, 
+   // [tom, 6/4/2007] showPopup() blocks until the menu is closed by the user,
    // so the canvas pointer is not needed beyond the scope of this function
    // when working with context menus. Setting mCanvas here will cause undesired
    // behavior in relation to the menu bar.
@@ -581,7 +581,7 @@ void PopupMenu::attachToMenuBar(GuiCanvas *owner, S32 pos, const char *title)
    mCanvas = owner;
 
    Win32Window *pWindow = dynamic_cast<Win32Window*>(owner->getPlatformWindow());
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return;
 
    HMENU hWindowMenu = pWindow->getMenuHandle();
@@ -630,7 +630,7 @@ void PopupMenu::attachToMenuBar(GuiCanvas *owner, S32 pos, const char *title)
 void PopupMenu::attachToMenuBar(GuiCanvas *owner, S32 pos)
 {
    Win32Window *pWindow = dynamic_cast<Win32Window*>(owner->getPlatformWindow());
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return;
 
 	//When playing a journal, the system menu is not actually shown
@@ -712,7 +712,7 @@ S32 PopupMenu::getPosOnMenuBar()
       return -1;
 
    Win32Window *pWindow = mCanvas ? dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow()) : NULL;
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return -1;
 
    HMENU hMenuHandle = pWindow->getMenuHandle();

@@ -30,8 +30,8 @@ singleton GuiControlProfile( RiverEditorProfile )
 
 singleton GuiControlProfile (GuiSimpleBorderProfile)
 {
-   opaque = false;   
-   border = 1;   
+   opaque = false;
+   border = 1;
    category = "Editor";
 };
- 
+

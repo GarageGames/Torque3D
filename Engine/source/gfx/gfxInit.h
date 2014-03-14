@@ -34,10 +34,10 @@
 /// Interface for tracking GFX adapters and initializing them into devices.
 /// @note Implement this class per platform.
 /// @note This is just a class so it can be friends with GFXDevice)
-class GFXInit 
+class GFXInit
 {
    DECLARE_STATIC_CLASS( GFXInit );
-   
+
 public:
    /// Allows device to register themselves as available
    typedef Signal<void (Vector<GFXAdapter*>&)> RegisterDeviceSignal;
@@ -48,7 +48,7 @@ public:
 
    /// Cleans out the adapter list.
    static void cleanup();
-      
+
    /// Creates a GFXDevice based on an adapter from the
    /// enumerateAdapters method.
    ///
@@ -64,7 +64,7 @@ public:
 
    /// Get the number of available adapters.
    static S32 getAdapterCount();
-   
+
    /// Compares the adapter's output display device with the given output display device
    static bool compareAdapterOutputDevice(const GFXAdapter* adapter, const char* outputDevice);
 
@@ -78,13 +78,13 @@ public:
    /// from the list of enumerated adapters. Should only call this after a call to
    /// enumerateAdapters.
    static GFXAdapter *getAdapterOfType( GFXAdapterType type, const char* outputDevice );
-      
+
    /// Converts a GFXAdapterType to a string name. Useful for writing out prefs
    static const char *getAdapterNameFromType( GFXAdapterType type );
-   
+
    /// Converts a string to a GFXAdapterType. Useful for reading in prefs.
    static GFXAdapterType getAdapterTypeFromName( const char* name );
-   
+
    /// Returns a GFXVideoMode that describes the current state of the main monitor.
    /// This should probably move to the abstract window manager
    static GFXVideoMode getDesktopResolution();

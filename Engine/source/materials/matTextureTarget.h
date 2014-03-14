@@ -50,7 +50,7 @@ class ConditionerFeature;
 class NamedTexTarget : public WeakRefBase
 {
 public:
-   
+
    ///
    static NamedTexTarget* find( const String &name );
 
@@ -59,7 +59,7 @@ public:
 
    ///
    virtual ~NamedTexTarget();
-   
+
    ///
    bool registerWithName( const String &name );
 
@@ -73,12 +73,12 @@ public:
    const String& getName() const { return mName; }
 
    // Register the passed texture with our name, unregistering "anyone"
-   // priorly registered with that name.   
+   // priorly registered with that name.
    // Pass NULL to only unregister.
    void setTexture( GFXTextureObject *tex ) { setTexture( 0, tex ); }
 
    ///
-   void setTexture( U32 index, GFXTextureObject *tex );   
+   void setTexture( U32 index, GFXTextureObject *tex );
 
    ///
    GFXTextureObject* getTexture( U32 index = 0 ) const;
@@ -87,7 +87,7 @@ public:
    /// @see getTexture
    typedef Delegate<GFXTextureObject*(U32)> TexDelegate;
 
-   /// 
+   ///
    /// @see getTexture
    TexDelegate& getTextureDelegate() { return mTexDelegate; }
    const TexDelegate& getTextureDelegate() const { return mTexDelegate; }
@@ -118,7 +118,7 @@ public:
    void getShaderMacros( Vector<GFXShaderMacro> *outMacros );
 
 protected:
-   
+
    typedef Map<String,NamedTexTarget*> TargetMap;
 
    ///
@@ -137,7 +137,7 @@ protected:
    TexDelegate mTexDelegate;
 
    ///
-   RectI mViewport; 
+   RectI mViewport;
 
    ///
    GFXSamplerStateDesc mSamplerDesc;

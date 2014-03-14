@@ -26,16 +26,16 @@
 //---------------------------------------------------------------------------------------------
 
 function GuiEditorToolbox::initialize( %this )
-{   
+{
    // Set up contents.
-   
+
    %viewType = %this.currentViewType;
    if( %viewType $= "" )
       %viewType = "Categorized";
-      
+
    %this.currentViewType = "";
    %this.setViewType( %viewType );
-      
+
    %this.isInitialized = true;
 }
 
@@ -64,22 +64,22 @@ function GuiEditorToolbox::setViewTypeAlphabetical( %this )
 {
    %controls = enumerateConsoleClassesByCategory( "Gui" );
    %classes = new ArrayObject();
-   
+
    // Collect relevant classes.
-   
+
    foreach$( %className in %controls )
    {
       if( GuiEditor.isFilteredClass( %className )
           || !isMemberOfClass( %className, "GuiControl" ) )
          continue;
-         
+
       %classes.push_back( %className );
    }
-   
+
    // Sort classes alphabetically.
-   
+
    %classes.sortk( true );
-   
+
    // Add toolbox buttons.
 
    %numClasses = %classes.count();
@@ -196,7 +196,7 @@ function GuiEditorToolbox::setViewTypeCategorized( %this )
       %rollout.classes = "";
       %classes.delete();
    }
-   
+
    %this.currentViewType = "Categorized";
 }
 
@@ -205,13 +205,13 @@ function GuiEditorToolbox::setViewTypeCategorized( %this )
 function GuiEditorToolbox::getOrCreateRolloutForCategory( %this, %category )
 {
    // Try to find an existing rollout.
-   
+
    %ctrl = %this.getRolloutForCategory( %category );
    if( %ctrl != 0 )
       return %ctrl;
-      
+
    // None there.  Create a new one.
-   
+
    %ctrl = new GuiRolloutCtrl() {
       Margin = "0 0 0 0";
       DefaultHeight = "40";
@@ -255,14 +255,14 @@ function GuiEditorToolbox::getOrCreateRolloutForCategory( %this, %category )
          internalName = "array";
       };
    };
-   
+
    %this.add( %ctrl );
    %ctrl.collapse();
-   
+
    // Sort the rollouts by their caption.
-   
+
    %this.sort( "_GuiEditorToolboxSortRollouts" );
-   
+
    return %ctrl;
 }
 
@@ -274,11 +274,11 @@ function GuiEditorToolbox::getRolloutForCategory( %this, %category )
    {
       if( !%obj.isMemberOfClass( "GuiRolloutCtrl" ) )
          continue;
-         
+
       if( stricmp( %obj.caption, %category ) == 0 )
          return %obj;
    }
-   
+
    return 0;
 }
 
@@ -287,22 +287,22 @@ function GuiEditorToolbox::getRolloutForCategory( %this, %category )
 function GuiEditorToolbox::startGuiControlDrag( %this, %class )
 {
    // Create a new control of the given class.
-   
+
    %payload = eval( "return new " @ %class @ "();" );
    if( !isObject( %payload ) )
       return;
-   
+
    // this offset puts the cursor in the middle of the dragged object.
    %xOffset = getWord( %payload.extent, 0 ) / 2;
-   %yOffset = getWord( %payload.extent, 1 ) / 2;  
-   
+   %yOffset = getWord( %payload.extent, 1 ) / 2;
+
    // position where the drag will start, to prevent visible jumping.
    %cursorpos = Canvas.getCursorPos();
    %xPos = getWord( %cursorpos, 0 ) - %xOffset;
    %yPos = getWord( %cursorpos, 1 ) - %yOffset;
-   
+
    // Create drag&drop control.
-   
+
    %dragCtrl = new GuiDragAndDropControl()
    {
       canSaveDynamicFields    = "0";
@@ -318,10 +318,10 @@ function GuiEditorToolbox::startGuiControlDrag( %this, %class )
       deleteOnMouseUp         = true;
       class                   = "GuiDragAndDropControlType_GuiControl";
    };
-   
+
    %dragCtrl.add( %payload );
    Canvas.getContent().add( %dragCtrl );
-   
+
    // Start drag.
 
    %dragCtrl.startDragging( %xOffset, %yOffset );
@@ -340,11 +340,11 @@ function GuiEditorToolboxRolloutCtrl::onHeaderRightClick( %this )
       {
          superClass = "MenuBuilder";
          isPopup = true;
-         
+
          item[ 0 ] = "Expand All" TAB "" TAB %this @ ".expandAll();";
          item[ 1 ] = "Collapse All" TAB "" TAB %this @ ".collapseAll();";
       };
-      
+
    GuiEditorToolboxRolloutCtrlMenu.showPopup( %this.getRoot() );
 }
 

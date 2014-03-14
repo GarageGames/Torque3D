@@ -163,7 +163,7 @@ void PolyhedronBoxIntersector< Polyhedron >::_preprocess( const MatrixF& objToWo
 
    const U32 numPlanes = this->mTester.getNumPlanes();
    const typename Polyhedron::PlaneType* planes = this->mTester.getPlanes();
-   
+
    PlaneTransformer transformer;
    transformer.set( objToWorld, scale );
 
@@ -238,11 +238,11 @@ void PolyhedronBoxIntersector< Polyhedron >::_preprocess( const MatrixF& objToWo
          const F32 c = mDot( - q, normal );
 
          // Add the edge.
-         
+
          mEdgeLines.push_back(
             Point3F( normal.x, normal.y, c )
          );
-         
+
          numEdgesThisProj ++;
       }
 
@@ -267,12 +267,12 @@ OverlapTestResult PolyhedronBoxIntersector< Polyhedron >::test( const Box3F& box
 
    // If the polyhedron's bounding box is fully contained in the given box,
    // the box is intersecting.
-   
+
    if( box.isContained( mBounds ) )
       return GeometryIntersecting;
 
    // -- Face-plane tests. --
-   
+
    bool insideAll = true;
 
    // Test each of the planes to see if the bounding box lies

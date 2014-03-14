@@ -48,7 +48,7 @@ class DecalInstance
       Point3F mPosition;
       Point3F mNormal;
       Point3F mTangent;
-      F32 mRotAroundNormal;   
+      F32 mRotAroundNormal;
       F32 mSize;
 
       U32 mCreateTime;
@@ -56,7 +56,7 @@ class DecalInstance
 
       F32 mLastAlpha;
 
-      U32 mTextureRectIdx;      
+      U32 mTextureRectIdx;
 
       DecalVertex *mVerts;
       U16 *mIndices;
@@ -73,7 +73,7 @@ class DecalInstance
       GFXTexHandle *mCustomTex;
 
       void getWorldMatrix( MatrixF *outMat, bool flip = false );
-      
+
       Box3F getWorldBox() const
       {
          return Box3F( mPosition - Point3F( mSize / 2.f ), mPosition + Point3F( mSize / 2.f ) );
@@ -86,8 +86,8 @@ class DecalInstance
 
       /// Calculates the size of this decal onscreen in pixels, used for LOD.
       F32 calcPixelSize( U32 viewportHeight, const Point3F &cameraPos, F32 worldToScreenScaleY ) const;
-   		
-	   DecalInstance() : mId(-1) {}   
+
+	   DecalInstance() : mId(-1) {}
 };
 
 #endif // _DECALINSTANCE_H_

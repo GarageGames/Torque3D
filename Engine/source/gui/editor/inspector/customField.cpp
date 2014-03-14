@@ -24,7 +24,7 @@
 #include "gui/editor/guiInspector.h"
 
 //-----------------------------------------------------------------------------
-// GuiInspectorCustomField - Child class of GuiInspectorField 
+// GuiInspectorCustomField - Child class of GuiInspectorField
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT( GuiInspectorCustomField );
 
@@ -35,12 +35,12 @@ ConsoleDocClass( GuiInspectorCustomField,
 );
 
 GuiInspectorCustomField::GuiInspectorCustomField( GuiInspector *inspector,
-                                                    GuiInspectorGroup* parent, 
+                                                    GuiInspectorGroup* parent,
                                                     SimFieldDictionary::Entry* field )
 {
    mInspector = inspector;
    mParent = parent;
-   setBounds(0,0,100,20);   
+   setBounds(0,0,100,20);
 }
 
 GuiInspectorCustomField::GuiInspectorCustomField()
@@ -77,7 +77,7 @@ void GuiInspectorCustomField::setToolTip( StringTableEntry data )
    static StringTableEntry sTooltipProfile = StringTable->insert( "tooltipProfile" );
    static StringTableEntry sHoverTime = StringTable->insert( "hovertime" );
    static StringTableEntry sTooltip = StringTable->insert( "tooltip" );
-   
+
    mEdit->setDataField( sTooltipProfile, NULL, "GuiToolTipProfile" );
    mEdit->setDataField( sHoverTime, NULL, "1000" );
    mEdit->setDataField( sTooltip, NULL, data );
@@ -91,14 +91,14 @@ bool GuiInspectorCustomField::onAdd()
    return true;
 }
 
-void GuiInspectorCustomField::setInspectorField( AbstractClassRep::Field *field, 
-                                                  StringTableEntry caption, 
-                                                  const char*arrayIndex ) 
+void GuiInspectorCustomField::setInspectorField( AbstractClassRep::Field *field,
+                                                  StringTableEntry caption,
+                                                  const char*arrayIndex )
 {
    // Override the base just to be sure it doesn't get called.
    // We don't use an AbstractClassRep::Field...
 
-//    mField = field; 
+//    mField = field;
 //    mCaption = StringTable->EmptyString();
 //    mRenameCtrl->setText( getFieldName() );
 }

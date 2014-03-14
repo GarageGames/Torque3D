@@ -39,7 +39,7 @@
          {
             VECTOR_SET_ASSOCIATION( strings );
          }
-         
+
          void add(StringBuffer* s);
          void remove(StringBuffer* s);
          void updateStats();
@@ -182,14 +182,14 @@ void StringBuffer::append(const UTF8* in)
 {
    incRequestCount8();
    decRequestCount16(); // because we're about to inc it when we go through append(utf16)
-   
+
    // convert to UTF16, because that's our internal format.
    // if the conversion fails, exit.
    UTF16* tmp = convertUTF8toUTF16(in);
    AssertFatal(tmp, "StringBuffer::append(UTF8) - could not convert UTF8 string!");
    if(!tmp)
       return;
-      
+
    append(tmp);
    delete[] tmp;
 }
@@ -203,17 +203,17 @@ void StringBuffer::append(const UTF16* in)
 void StringBuffer::append(const UTF16* in, const U32 len)
 {
    incRequestCount16();
-   
+
    // Stick in onto the end of us - first make space.
    U32 oldSize = length();
    mBuffer.increment(len);
- 
+
    // Copy it in, ignoring both our terminator and theirs.
    dMemcpy(&mBuffer[oldSize], in, sizeof(UTF16) * len);
 
    // Terminate the string.
    mBuffer.last() = 0;
-   
+
    // mark utf8 buffer dirty
    mDirty8 = true;
 }
@@ -227,14 +227,14 @@ void StringBuffer::insert(const U32 charOffset, const UTF8* in)
 {
    incRequestCount8();
    decRequestCount16();
-   
+
    // convert to UTF16, because that's our internal format.
    // if the conversion fails, exit.
    UTF16* tmp = convertUTF8toUTF16(in);
    AssertFatal(tmp, "StringBuffer::insert(UTF8) - could not convert UTF8 string!");
    if(!tmp)
       return;
-      
+
    insert(charOffset, tmp);
    delete[] tmp;
 }
@@ -248,7 +248,7 @@ void StringBuffer::insert(const U32 charOffset, const UTF16* in)
 void StringBuffer::insert(const U32 charOffset, const UTF16* in, const U32 len)
 {
    incRequestCount16();
-   
+
    // Deal with append case.
    if(charOffset >= length())
    {
@@ -257,7 +257,7 @@ void StringBuffer::insert(const U32 charOffset, const UTF16* in, const U32 len)
    }
 
    // Append was easy, now we have to do some work.
-   
+
    // Copy everything we have that comes after charOffset past where the new
    // string data will be.
 
@@ -282,7 +282,7 @@ void StringBuffer::insert(const U32 charOffset, const UTF16* in, const U32 len)
 
    // All done!
    AssertFatal(mBuffer.last() == 0, "StringBuffer::insert - not a null terminated string!");
-   
+
    // mark utf8 buffer dirty
    mDirty8 = true;
 }
@@ -306,9 +306,9 @@ StringBuffer StringBuffer::substring(const U32 start, const U32 len) const
    for(S32 i=0; i<len; i++)
       tmp.mBuffer.push_back(mBuffer[start+i]);
    if(tmp.mBuffer.last() != 0) tmp.mBuffer.push_back(0);
-   
+
    // Make sure this shit is terminated; we might get a totally empty string.
-   if(!tmp.mBuffer.size()) 
+   if(!tmp.mBuffer.size())
       tmp.mBuffer.push_back(0);
 
    return tmp;
@@ -317,7 +317,7 @@ StringBuffer StringBuffer::substring(const U32 start, const U32 len) const
 UTF8* StringBuffer::createSubstring8(const U32 start, const U32 len) const
 {
    incRequestCount8();
-   
+
    StringBuffer sub = this->substring(start, len);
    return sub.createCopy8();
 }
@@ -337,7 +337,7 @@ void StringBuffer::cut(const U32 start, const U32 len)
    mBuffer.compact();
 
    AssertFatal(mBuffer.last() == 0, "StringBuffer::cut - not a null terminated string! (post)");
-   
+
    // mark utf8 buffer dirty
    mDirty8 = true;
 }
@@ -345,7 +345,7 @@ void StringBuffer::cut(const U32 start, const U32 len)
 const UTF16 StringBuffer::getChar(const U32 offset) const
 {
    incRequestCount16();
-   
+
    // Allow them to grab the null terminator if they want.
    AssertFatal(offset<mBuffer.size(), "StringBuffer::getChar - outside of range.");
 
@@ -416,13 +416,13 @@ void StringBuffer::updateBuffer8()
 
 #if defined(TORQUE_DEBUG)
 StringBufferManager& StringBufferManager::getManager()
-{ 
+{
    static StringBufferManager _sbm; return _sbm;
 }
 
 void StringBufferManager::add(StringBuffer* s)
 {
-   strings.push_back(s); 
+   strings.push_back(s);
 }
 
 void StringBufferManager::remove(StringBuffer* s)

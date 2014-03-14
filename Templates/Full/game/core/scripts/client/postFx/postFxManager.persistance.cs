@@ -48,13 +48,13 @@ function PostFXManager::loadPresetHandler( %filename )
       postVerbose("% - PostFX Manager - Executing " @ %filename);
       exec(%filename);
 
-      PostFXManager.settingsApplyFromPreset();      
+      PostFXManager.settingsApplyFromPreset();
    }
 }
 
 //Save a preset file to the specified file. The extension used
 //is specified by $PostFXManager::fileExtension for on the fly
-//name changes to the extension used. 
+//name changes to the extension used.
 
 function PostFXManager::savePresetFile(%this)
 {
@@ -68,10 +68,10 @@ function PostFXManager::savePresetHandler( %filename )
    %filename = makeRelativePath( %filename, getMainDotCsDir() );
    if(strStr(%filename, ".") == -1)
       %filename = %filename @ $PostFXManager::fileExtension;
-               
+
    //Apply the current settings to the preset
    PostFXManager.settingsApplyAll();
-   
+
    export("$PostFXManager::Settings::*", %filename, false);
 
    postVerbose("% - PostFX Manager - Save complete. Preset saved at : " @ %filename);

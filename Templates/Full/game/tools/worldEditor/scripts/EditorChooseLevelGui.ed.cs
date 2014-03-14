@@ -24,7 +24,7 @@ function EditorChooseLevelGui::onWake()
 {
    // first check if we have a level file to load, then we'll bypass this
    if ($levelToLoad !$= "")
-   {      
+   {
       // First try using the file path raw... it may already be good.
       %file = findFirstFile( $levelToLoad );
       if ( %file $= "" )
@@ -35,7 +35,7 @@ function EditorChooseLevelGui::onWake()
             %levelFile = %levelFile @ $levelToLoad @ ".mis";
          else
             %levelFile = %levelFile @ $levelToLoad;
-                       
+
          // let's make sure the file exists
          %file = findFirstFile(%levelFile);
       }
@@ -47,14 +47,14 @@ function EditorChooseLevelGui::onWake()
       if(%file !$= "")
       {
          WE_EditLevel(%file);
-         return;      
+         return;
       }
    }
-   
+
    //If no valid name, then push the level chooser
    Canvas.pushDialog(EditorChooseLevelContainer);
-}  
- 
+}
+
 function EditorChooseLevelContainer::onWake(%this)
 {
    // Build the text lists
@@ -111,45 +111,45 @@ function WE_TemplateList::onURL(%this, %url)
    EditorGui.saveAs = true;
 }
 
-function getLevelDisplayName( %levelFile ) 
+function getLevelDisplayName( %levelFile )
 {
    %file = new FileObject();
-   
+
    %MissionInfoObject = "";
-   
+
    if ( %file.openForRead( %levelFile ) ) {
 		%inInfoBlock = false;
-		
+
 		while ( !%file.isEOF() ) {
 			%line = %file.readLine();
 			%line = trim( %line );
-			
+
 			if( %line $= "new ScriptObject(MissionInfo) {" )
 				%inInfoBlock = true;
          else if( %line $= "new LevelInfo(theLevelInfo) {" )
 				%inInfoBlock = true;
 			else if( %inInfoBlock && %line $= "};" ) {
 				%inInfoBlock = false;
-				%MissionInfoObject = %MissionInfoObject @ %line; 
+				%MissionInfoObject = %MissionInfoObject @ %line;
 				break;
 			}
-			
+
 			if( %inInfoBlock )
-			   %MissionInfoObject = %MissionInfoObject @ %line @ " "; 	
+			   %MissionInfoObject = %MissionInfoObject @ %line @ " ";
 		}
-		
+
 		%file.close();
 	}
 	%MissionInfoObject = "%MissionInfoObject = " @ %MissionInfoObject;
 	eval( %MissionInfoObject );
-	
+
    %file.delete();
    if( %MissionInfoObject.levelName !$= "" )
       %name = %MissionInfoObject.levelName;
    else
-      %name = fileBase(%levelFile); 
-      
+      %name = fileBase(%levelFile);
+
    %MissionInfoObject.delete();
-   
+
    return %name;
 }

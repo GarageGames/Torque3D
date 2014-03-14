@@ -35,7 +35,7 @@
 class GuiBubbleTextCtrl : public GuiTextCtrl
 {
    private:
-   
+
       typedef GuiTextCtrl Parent;
 
   protected:
@@ -47,7 +47,7 @@ class GuiBubbleTextCtrl : public GuiTextCtrl
       void popBubble();
 
   public:
-  
+
       DECLARE_CONOBJECT(GuiBubbleTextCtrl);
       DECLARE_DESCRIPTION( "A single-line text control that displays its text in a multi-line\n"
          "popup when clicked." );

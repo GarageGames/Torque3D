@@ -82,7 +82,7 @@ void GuiFormCtrl::initPersistFields()
    addField("contentLibrary",TypeString,     Offset(mContentLibrary, GuiFormCtrl));
    addField("content",       TypeString,     Offset(mContent,        GuiFormCtrl));
    addField("movable",        TypeBool,       Offset(mCanMove,        GuiFormCtrl));
-   
+
    addProtectedField( "hasMenu", TypeBool,  Offset(mHasMenu, GuiFormCtrl),
       &_setHasMenu, &defaultProtectedGetFn,
       "" );
@@ -94,7 +94,7 @@ void GuiFormCtrl::setHasMenu( bool value )
 {
    if( mHasMenu == value )
       return;
-      
+
    if( !value )
    {
       mMenuBar->deleteObject();
@@ -116,10 +116,10 @@ void GuiFormCtrl::setHasMenu( bool value )
          mMenuBar->registerObject();
          mMenuBar->setProcessTicks(true); // Activate the processing of ticks to track if the mouse pointer has been hovering within the menu
       }
-      
+
       addObject( mMenuBar ); // Add the menu bar to the form
    }
-   
+
    mHasMenu = value;
 }
 
@@ -155,7 +155,7 @@ void GuiFormCtrl::addObject(SimObject *newObj )
    if( ( mHasMenu && size() > 1) || (!mHasMenu && size() > 0 ) )
    {
       Con::warnf("GuiFormCtrl::addObject - Forms may only have one *direct* child - Placing on Parent!");
-      
+
       GuiControl* parent = getParent();
       if ( parent )
    	   parent->addObject( newObj );
@@ -165,7 +165,7 @@ void GuiFormCtrl::addObject(SimObject *newObj )
 
    GuiControl *newCtrl = dynamic_cast<GuiControl*>( newObj );
    GuiFormCtrl*formCtrl = dynamic_cast<GuiFormCtrl*>( newObj );
-   
+
    if( newCtrl && formCtrl )
       newCtrl->setCanSave( true );
    else if ( newCtrl )
@@ -181,7 +181,7 @@ void GuiFormCtrl::removeObject( SimObject* object )
       mHasMenu = false;
       mMenuBar = NULL;
    }
-   
+
    Parent::removeObject( object );
 }
 
@@ -199,7 +199,7 @@ void GuiFormCtrl::onSleep()
 
 bool GuiFormCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
 {
-   if( !Parent::resize(newPosition, newExtent) ) 
+   if( !Parent::resize(newPosition, newExtent) )
       return false;
 
    if( !mAwake || !mProfile->mBitmapArrayRects.size() )
@@ -379,7 +379,7 @@ void GuiFormCtrl::onMouseUp(const GuiEvent &event)
 {
    // Make sure we only get events we ought to be getting...
    if (! mActive)
-      return; 
+      return;
 
    mouseUnlock();
    setUpdate();

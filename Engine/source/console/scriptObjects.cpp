@@ -34,7 +34,7 @@
 IMPLEMENT_CONOBJECT(ScriptObject);
 
 ConsoleDocClass( ScriptObject,
-   "@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.\n\n"   
+   "@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.\n\n"
 
    "ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have\n"
    "a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.\n\n"
@@ -82,7 +82,7 @@ void ScriptObject::onRemove()
    //
    // Call onRemove in script!
    onRemove_callback(getId());
-   
+
    Parent::onRemove();
 }
 
@@ -93,7 +93,7 @@ void ScriptObject::onRemove()
 IMPLEMENT_CONOBJECT(ScriptTickObject);
 
 ConsoleDocClass( ScriptTickObject,
-   "@brief A ScriptObject that responds to tick and frame events.\n\n"   
+   "@brief A ScriptObject that responds to tick and frame events.\n\n"
 
    "ScriptTickObject is a ScriptObject that adds callbacks for tick and frame events.  Use "
    "setProcessTicks() to enable or disable the onInterpolateTick() and onProcessTick() callbacks.  "
@@ -227,12 +227,12 @@ ScriptGroup::ScriptGroup()
 
 IMPLEMENT_CALLBACK( ScriptGroup, onAdd, void, ( SimObjectId ID ), ( ID ),
 	"Called when this ScriptGroup is added to the system.\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n" 
+	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
 
 IMPLEMENT_CALLBACK( ScriptGroup, onRemove, void, ( SimObjectId ID ), ( ID ),
 	"Called when this ScriptObject is removed from the system.\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n" 
+	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
 
 bool ScriptGroup::onAdd()

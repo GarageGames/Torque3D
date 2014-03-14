@@ -134,7 +134,7 @@ void GuiMaterialCtrl::onRender( Point2I offset, const RectI &updateRect )
    matSet.setWorld(GFX->getWorldMatrix());
    matSet.setView(GFX->getViewMatrix());
    matSet.setProjection(GFX->getProjectionMatrix());
-   
+
    MatrixF cameraMatrix( true );
    F32 left, right, top, bottom, nearPlane, farPlane;
    bool isOrtho;

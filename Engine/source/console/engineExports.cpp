@@ -27,14 +27,14 @@
 
 IMPLEMENT_SCOPE( ReflectionAPI, Reflection,,
    "Metadata for the exported engine API." );
-   
+
 IMPLEMENT_NONINSTANTIABLE_CLASS( EngineExport,
    "Abstract base class of entities exported through the engine API." )
 END_IMPLEMENT_CLASS;
 IMPLEMENT_NONINSTANTIABLE_CLASS( EngineExportScope,
    "A scope contained a collection of exported engine API entities." )
 END_IMPLEMENT_CLASS;
-   
+
 EngineExportScope EngineExportScope::smGlobalScope;
 
 
@@ -49,9 +49,9 @@ EngineExport::EngineExport( const char* name, EngineExportKind kind, EngineExpor
 {
    AssertFatal( name != NULL, "EngineExport - export without name!" );
    AssertFatal( scope != NULL, avar( "EngineExport - export '%s' is in no scope" ) );
-   
+
    // Link to scope's export chain.
-   
+
    mNextExport = scope->mExports;
    scope->mExports = this;
 }
@@ -65,10 +65,10 @@ String EngineExport::getFullyQualifiedExportName() const
       String parentQualifiedName = getExportScope()->getFullyQualifiedExportName();
       if( parentQualifiedName.isEmpty() )
          return getExportName();
-         
+
       return String::ToString( "%s::%s", parentQualifiedName.c_str(), getExportName() );
    }
-      
+
    return getExportName();
 }
 

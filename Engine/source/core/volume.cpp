@@ -38,8 +38,8 @@ using namespace FS;
 
 bool FileSystemChangeNotifier::addNotification( const Path &path, ChangeDelegate callback )
 {
-   // Notifications are for files... if the path is empty 
-   // then there is nothing to do. 
+   // Notifications are for files... if the path is empty
+   // then there is nothing to do.
    if ( path.isEmpty() )
       return false;
 
@@ -50,15 +50,15 @@ bool FileSystemChangeNotifier::addNotification( const Path &path, ChangeDelegate
 
    dir.setFileName( String() );
    dir.setExtension( String () );
-   
+
    // first lookup the dir to see if we already have an entry for it...
    DirMap::Iterator   itr = mDirMap.find( dir );
 
    FileInfoList   *fileList = NULL;
    bool           addedDir = false;
 
-   // Note that GetFileAttributes can fail here if the file doesn't 
-   // exist, but thats ok and expected.  You can have notifications 
+   // Note that GetFileAttributes can fail here if the file doesn't
+   // exist, but thats ok and expected.  You can have notifications
    // on files that don't exist yet.
    FileNode::Attributes attr;
    GetFileAttributes(path, &attr);
@@ -213,9 +213,9 @@ void FileSystemChangeNotifier::internalNotifyDirChanged( const Path &dir )
       FileNode::Attributes attr;
       bool success = GetFileAttributes(fInfo.filePath, &attr);
 
-      // Ignore the file if we couldn't get the attributes (it must have 
+      // Ignore the file if we couldn't get the attributes (it must have
       // been deleted) or the last modification time isn't newer.
-      if ( !success || attr.mtime <= fInfo.savedLastModTime )       
+      if ( !success || attr.mtime <= fInfo.savedLastModTime )
          continue;
 
       // Store the new mod time.
@@ -298,7 +298,7 @@ U32 FileNode::getChecksum()
 
    if ( calculateCRC )
       mChecksum = calculateChecksum();
-   
+
    if ( mChecksum )
       mLastChecksum = Time::getCurrentTime();
 
@@ -322,7 +322,7 @@ public:
    bool rename(const Path& a,const Path& b);
    Path mapTo(const Path& path);
    Path mapFrom(const Path& path);
-   
+
 private:
    Path _merge(const Path& path);
 
@@ -336,7 +336,7 @@ public:
 
    FileSystemRedirectChangeNotifier( FileSystem *fs );
 
-   bool addNotification( const Path &path, ChangeDelegate callback );   
+   bool addNotification( const Path &path, ChangeDelegate callback );
    bool removeNotification( const Path &path, ChangeDelegate callback );
 
 protected:
@@ -346,18 +346,18 @@ protected:
    virtual bool  internalRemoveNotification( const Path &dir ) { return false; }
 };
 
-FileSystemRedirectChangeNotifier::FileSystemRedirectChangeNotifier( FileSystem *fs ) 
+FileSystemRedirectChangeNotifier::FileSystemRedirectChangeNotifier( FileSystem *fs )
 : FileSystemChangeNotifier( fs )
 {
 
-}   
+}
 
 bool FileSystemRedirectChangeNotifier::addNotification( const Path &path, ChangeDelegate callback )
-{   
+{
    FileSystemRedirect *rfs = (FileSystemRedirect*)mFS;
    Path redirectPath = rfs->_merge( path );
 
-   FileSystemRef fs = rfs->mMFS->getFileSystem( redirectPath );   
+   FileSystemRef fs = rfs->mMFS->getFileSystem( redirectPath );
    if ( !fs || !fs->getChangeNotifier() )
       return false;
 
@@ -369,7 +369,7 @@ bool FileSystemRedirectChangeNotifier::removeNotification( const Path &path, Cha
    FileSystemRedirect *rfs = (FileSystemRedirect*)mFS;
    Path redirectPath = rfs->_merge( path );
 
-  FileSystemRef fs = rfs->mMFS->getFileSystem( redirectPath ); 
+  FileSystemRef fs = rfs->mMFS->getFileSystem( redirectPath );
    if ( !fs || !fs->getChangeNotifier() )
       return false;
 
@@ -487,7 +487,7 @@ Path MountSystem::_normalize(const Path& path)
 {
    Path po = path;
 
-   // Assign to cwd root if none is specified.   
+   // Assign to cwd root if none is specified.
    if( po.getRoot().isEmpty() )
       po.setRoot( mCWD.getRoot() );
 
@@ -638,7 +638,7 @@ FileSystemRef MountSystem::unmount(String root)
    // remove remaining FSes on this root
    while (!_removeMountFromList(root).isNull())
       ;
-   
+
    return first;
 }
 
@@ -762,13 +762,13 @@ S32 MountSystem::findByPattern( const Path &inBasePath, const String &inFilePatt
          String   path = Path::Join( inBasePath, '/', name );
          recurseDirs.push_back( path );
       }
-      
+
       if ( !multiMatch && FindMatch::isMatch( inFilePattern, attrs.name, false ) )
       {
          String   path = Path::Join( inBasePath, '/', name );
          outList.push_back( path );
       }
-      
+
       if ( multiMatch && FindMatch::isMatchMultipleExprs( inFilePattern, attrs.name, false ) )
       {
          String   path = Path::Join( inBasePath, '/', name );
@@ -860,21 +860,21 @@ bool MountSystem::createPath(const Path& path)
 {
    if (path.getPath().isEmpty())
       return true;
-   
+
    // See if the pathectory exists
    Path dir;
    dir.setRoot(path.getRoot());
    dir.setPath(path.getPath());
 
    // in a virtual mount system, isDirectory may return true if the directory exists in a read only FS,
-   // but the directory may not exist on a writeable filesystem that is also mounted.  
+   // but the directory may not exist on a writeable filesystem that is also mounted.
    // So get the target filesystem that will
    // be used for the full writable path and and make sure the directory exists on it.
    FileSystemRef fsRef = getFileSystem(path);
-   
+
    if (isDirectory(dir,fsRef))
       return true;
-   
+
    // Start from the top and work our way down
    Path sub;
    dir.setPath(path.isAbsolute()? String("/"): String());
@@ -923,11 +923,11 @@ FileRef OpenFile(const Path &path, File::AccessMode mode)
 bool ReadFile(const Path &inPath, void *&outData, U32 &outSize, bool inNullTerminate )
 {
    FileRef  fileR = OpenFile( inPath, File::Read );
- 
+
    outData = NULL;
    outSize = 0;
 
-   // We'll get a NULL file reference if 
+   // We'll get a NULL file reference if
    // the file failed to open.
    if ( fileR == NULL )
       return false;

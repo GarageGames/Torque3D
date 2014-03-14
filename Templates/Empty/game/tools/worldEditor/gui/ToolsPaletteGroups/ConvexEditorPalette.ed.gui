@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(ConvexEditorNoneModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "";
@@ -33,7 +33,7 @@
       useMouseEvents = "0";
       Command = "GlobalGizmoProfile.mode = \"None\";";
    };
-   
+
    new GuiBitmapButtonCtrl(ConvexEditorMoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "";
@@ -55,7 +55,7 @@
       useMouseEvents = "0";
       Command = "GlobalGizmoProfile.mode = \"Move\";";
    };
-   
+
    new GuiBitmapButtonCtrl(ConvexEditorRotateModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "";
@@ -77,7 +77,7 @@
       useMouseEvents = "0";
       Command = "GlobalGizmoProfile.mode = \"Rotate\";";
    };
-   
+
    new GuiBitmapButtonCtrl(ConvexEditorScaleModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "";

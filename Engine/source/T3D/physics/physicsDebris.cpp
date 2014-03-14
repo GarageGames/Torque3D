@@ -51,9 +51,9 @@ F32 PhysicsDebris::smLifetimeScale = 1.0f;
 IMPLEMENT_CO_DATABLOCK_V1( PhysicsDebrisData );
 
 ConsoleDocClass( PhysicsDebrisData,
-   
+
    "@brief Defines the properties of a PhysicsDebris object.\n\n"
-   "@see PhysicsDebris.\n"   
+   "@see PhysicsDebris.\n"
    "@ingroup Physics"
 );
 
@@ -118,7 +118,7 @@ void PhysicsDebrisData::initPersistFields()
          "@brief Path to the .DAE or .DTS file to use for this shape.\n\n"
          "Compatable with Live-Asset Reloading.");
 
-      addField( "castShadows", TypeBool, Offset( castShadows, PhysicsDebrisData ), 
+      addField( "castShadows", TypeBool, Offset( castShadows, PhysicsDebrisData ),
         "@brief Determines if the shape's shadow should be cast onto the environment.\n\n" );
 
    endGroup( "Display" );
@@ -141,14 +141,14 @@ void PhysicsDebrisData::initPersistFields()
          "@note All PhysicsDebris objects are dynamic.");
 
       addField( "friction", TypeF32, Offset( dynamicFriction, PhysicsDebrisData ),
-         "@brief Coefficient of kinetic %friction to be applied to the shape.\n\n" 
+         "@brief Coefficient of kinetic %friction to be applied to the shape.\n\n"
          "Kinetic %friction reduces the velocity of a moving object while it is in contact with a surface. "
          "A larger coefficient will result in a larger reduction in velocity. "
          "A shape's friction should be smaller than it's staticFriction, but greater than 0.\n\n"
          "@note This value is only applied while an object is in motion. For an object starting at rest, see PhysicsDebrisData::staticFriction");
 
       addField( "staticFriction", TypeF32, Offset( staticFriction, PhysicsDebrisData ),
-         "@brief Coefficient of static %friction to be applied to the shape.\n\n" 
+         "@brief Coefficient of static %friction to be applied to the shape.\n\n"
          "Static %friction determines the force needed to start moving an at-rest object in contact with a surface. "
          "If the force applied onto shape cannot overcome the force of static %friction, the shape will remain at rest. "
          "A higher coefficient will require a larger force to start motion. "
@@ -237,7 +237,7 @@ void PhysicsDebrisData::unpackData(BitStream* stream)
    shapeName   = stream->readSTString();
 }
 
-ConsoleMethod( PhysicsDebrisData, preload, void, 2, 2, 
+ConsoleMethod( PhysicsDebrisData, preload, void, 2, 2,
    "@brief Loads some information to have readily available at simulation time.\n\n"
    "Forces generation of shaders, materials, and other data used by the %PhysicsDebris object. "
    "This function should be used while a level is loading in order to shorten "
@@ -254,7 +254,7 @@ ConsoleMethod( PhysicsDebrisData, preload, void, 2, 2,
 IMPLEMENT_CO_NETOBJECT_V1( PhysicsDebris );
 
 ConsoleDocClass( PhysicsDebris,
-   
+
    "@brief Represents one or more rigid bodies defined in a single mesh file with "
    "a limited lifetime.\n\n"
 
@@ -281,7 +281,7 @@ ConsoleDocClass( PhysicsDebris,
    " - Col (convex).\n\n"
 
    "%PhysicsDebris should NOT be created on the server.\n\n"
-   
+
    "@ingroup Physics"
 );
 
@@ -292,8 +292,8 @@ PhysicsDebris* PhysicsDebris::create(  PhysicsDebrisData *datablock,
    // Skip out if we don't have a datablock or the
    // global lifetime scale has it living less than
    // a second.
-   if (  !datablock || 
-         (  datablock->lifetime > 0.0f && 
+   if (  !datablock ||
+         (  datablock->lifetime > 0.0f &&
             datablock->lifetime * smLifetimeScale < 1.0f ) )
       return NULL;
 
@@ -307,7 +307,7 @@ PhysicsDebris* PhysicsDebris::create(  PhysicsDebrisData *datablock,
       return NULL;
    }
 
-   return debris; 
+   return debris;
 }
 
 PhysicsDebris::PhysicsDebris()
@@ -319,7 +319,7 @@ PhysicsDebris::PhysicsDebris()
    mTypeMask |= DebrisObjectType | DynamicShapeObjectType;
 
    // Only allocated client side.
-   mNetFlags.set( IsGhost );   
+   mNetFlags.set( IsGhost );
 }
 
 PhysicsDebris::~PhysicsDebris()
@@ -339,8 +339,8 @@ bool PhysicsDebris::onAdd()
 {
    AssertFatal( isClientObject(), "PhysicsDebris::onAdd - This shouldn't be added on the server!" );
 
-   if ( !Parent::onAdd() )  
-      return false;  
+   if ( !Parent::onAdd() )
+      return false;
 
    // If it has a fixed lifetime then calculate it.
    if ( mDataBlock->lifetime > 0.0f )
@@ -350,7 +350,7 @@ bool PhysicsDebris::onAdd()
    }
 
    // Setup our bounding box
-   mObjBox = mDataBlock->shape->bounds;   
+   mObjBox = mDataBlock->shape->bounds;
    resetWorldBox();
 
    // Add it to the client scene.
@@ -384,7 +384,7 @@ bool PhysicsDebris::onNewDataBlock( GameBaseData *dptr, bool reload )
 }
 
 void PhysicsDebris::onRemove()
-{   
+{
    PhysicsPlugin::getPhysicsResetSignal().remove( this, &PhysicsDebris::_onPhysicsReset );
 
    _deleteFragments();
@@ -399,7 +399,7 @@ void PhysicsDebris::processTick( const Move* )
    PROFILE_SCOPE( PhysicsDebris_processTick );
 
    // Delete the debris if our lifetime has expired.
-   if (  mDataBlock->lifetime > 0.0f && 
+   if (  mDataBlock->lifetime > 0.0f &&
          mIsZero( mLifetime ) )
    {
       deleteObject();
@@ -412,7 +412,7 @@ void PhysicsDebris::processTick( const Move* )
 
    FragmentVector::iterator fragment = mFragments.begin();
    for ( ; fragment != mFragments.end(); fragment++ )
-   {      
+   {
       // Store the last position.
       fragment->lastPos = fragment->pos;
       fragment->lastRot = fragment->rot;
@@ -478,10 +478,10 @@ void PhysicsDebris::_updateForces( PhysicsBody *body, const Box3F &bounds )
       // Based on this blog post:
       // (http://reinot.blogspot.com/2005/11/oh-yes-they-float-georgie-they-all.html)
 
-      buoyancy = ( info.waterDensity / density ) * mPow( info.waterCoverage, 2.0f );            
-      
+      buoyancy = ( info.waterDensity / density ) * mPow( info.waterCoverage, 2.0f );
+
       Point3F buoyancyForce = buoyancy * -mWorld->getGravity() * TickSec * mDataBlock->mass;
-      body->applyImpulse( cmass, buoyancyForce );      
+      body->applyImpulse( cmass, buoyancyForce );
    }
 
    // Update the dampening as the container might have changed.
@@ -519,7 +519,7 @@ void PhysicsDebris::interpolateTick( F32 dt )
 
    FragmentVector::iterator fragment = mFragments.begin();
    for ( ; fragment != mFragments.end(); fragment++ )
-   {      
+   {
       // Do the interpolation.
       newRot.interpolate( fragment->rot, fragment->lastRot, dt );
       newRot.setMatrix( &globalXfm );
@@ -542,7 +542,7 @@ void PhysicsDebris::prepRenderImage( SceneRenderState *state )
       return;
 
    // Skip shadow rendering if this debris doesn't support it.
-   if (  state->isShadowPass() && 
+   if (  state->isShadowPass() &&
          !mDataBlock->castShadows )
       return;
 
@@ -566,11 +566,11 @@ void PhysicsDebris::prepRenderImage( SceneRenderState *state )
    query.init( getWorldSphere() );
    rdata.setLightQuery( &query );
 
-   GFXTransformSaver saver;   
+   GFXTransformSaver saver;
 
    MatrixF mat = getRenderTransform();
    mat.scale( getScale() );
-   GFX->setWorldMatrix( mat );       
+   GFX->setWorldMatrix( mat );
 
    mShapeInstance->animate();
    mShapeInstance->render( rdata );
@@ -617,10 +617,10 @@ void PhysicsDebris::_createFragments()
 
    mShapeInstance = new TSShapeInstance( shape, true );
    mShapeInstance->animate();
-   
+
    Vector< CollisionShapeInfo > infoList;
    shape->buildColShapes( false, Point3F::One, &infoList );
-      
+
    mFragments.setSize( infoList.size() );
    dMemset( mFragments.address(), 0, mFragments.memSize() );
 
@@ -633,15 +633,15 @@ void PhysicsDebris::_createFragments()
    mWorldBox = Box3F::Invalid;
 
    for ( S32 i = 0; i < infoList.size(); i++ )
-   {      
-      const CollisionShapeInfo &info = infoList[i];      
+   {
+      const CollisionShapeInfo &info = infoList[i];
 
       Fragment &fragment = mFragments[i];
 
-      if ( info.colNode == -1 )      
-         Con::errorf( "PhysicsDebris::_createFragments, Missing or couldnt find a colNode." );                  
+      if ( info.colNode == -1 )
+         Con::errorf( "PhysicsDebris::_createFragments, Missing or couldnt find a colNode." );
       else
-         _findNodes( info.colNode, fragment.nodeIds );               
+         _findNodes( info.colNode, fragment.nodeIds );
 
       PhysicsBody *body = PHYSICSMGR->createBody();
       body->init( info.colShape, mDataBlock->mass, bodyFlags, this, mWorld );
@@ -660,7 +660,7 @@ void PhysicsDebris::_createFragments()
 
       // Update the bounds.
       mWorldBox.intersect( body->getWorldBounds() );
-   }   
+   }
 
    // Finish up updating the bounds.
    mWorldSphere.radius = (mWorldBox.maxExtents - mWorldSphere.center).len();
@@ -682,7 +682,7 @@ void PhysicsDebris::_deleteFragments()
 }
 
 void PhysicsDebris::_findNodes( U32 colNode, Vector<U32> &nodeIds )
-{   
+{
    // Two possible cases:
    // 1. Visible mesh nodes are siblings of the collision node under a common parent dummy node
    // 2. Collision node is a child of its visible mesh node

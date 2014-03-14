@@ -47,7 +47,7 @@ const UTF16* _CurtainWindowClassName = L"TorqueJuggernaughtCurtainWindow";
 
 #define SCREENSAVER_QUERY_DENY 0 // Disable screensaver
 
-#ifndef IDI_ICON1 
+#ifndef IDI_ICON1
 #define IDI_ICON1 107
 #endif
 
@@ -236,7 +236,7 @@ bool Win32Window::clearFullscreen()
 }
 
 bool Win32Window::isFullscreen()
-{   
+{
 	return mFullscreen;
 }
 
@@ -258,13 +258,13 @@ void Win32Window::_setFullscreen(const bool fullscreen)
       if (!mOffscreenRender)
       {
 	      SetWindowLong( getHWND(), GWL_STYLE, mWindowedWindowStyle);
-	      SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, mVideoMode.resolution.x, mVideoMode.resolution.y, SWP_FRAMECHANGED | SWP_SHOWWINDOW);         
+	      SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, mVideoMode.resolution.x, mVideoMode.resolution.y, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
       }
 
       setSize(mVideoMode.resolution);
 
 	}
-	Con::printf("Win32Window::setFullscreen exit");   
+	Con::printf("Win32Window::setFullscreen exit");
 }
 
 bool Win32Window::setCaption( const char *cap )
@@ -292,7 +292,7 @@ void Win32Window::setClientExtent( const Point2I newExtent )
 {
 	Point2I oldExtent = getClientExtent();
 	if (oldExtent == newExtent)
-		return;   
+		return;
 
 	RECT rtClient;
 	DWORD Style, ExStyle;
@@ -301,9 +301,9 @@ void Win32Window::setClientExtent( const Point2I newExtent )
 	ExStyle = GetWindowLong( mWindowHandle, GWL_EXSTYLE );
 
 	AdjustWindowRectEx( &rtClient, Style, getMenuHandle() != NULL, ExStyle );
-	if( Style & WS_VSCROLL ) 
+	if( Style & WS_VSCROLL )
 		rtClient.right += GetSystemMetrics( SM_CXVSCROLL );
-	if( Style & WS_HSCROLL ) 
+	if( Style & WS_HSCROLL )
 		rtClient.bottom += GetSystemMetrics( SM_CYVSCROLL );
 
 	SetWindowPos( mWindowHandle, NULL, 0, 0, rtClient.right - rtClient.left, rtClient.bottom - rtClient.top, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
@@ -337,7 +337,7 @@ const RectI Win32Window::getBounds() const
 	::GetWindowRect(mWindowHandle, &windowRect);
 
 	// Return as a Torque RectI
-	return RectI(windowRect.left,windowRect.top,windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);   
+	return RectI(windowRect.left,windowRect.top,windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
 }
 
 void Win32Window::setPosition( const Point2I newPosition )
@@ -357,7 +357,7 @@ const Point2I Win32Window::getPosition()
 Point2I Win32Window::clientToScreen( const Point2I& pos )
 {
    POINT p = { pos.x, pos.y };
-   
+
    ClientToScreen( mWindowHandle, &p );
    return Point2I( p.x, p.y );
 }
@@ -365,7 +365,7 @@ Point2I Win32Window::clientToScreen( const Point2I& pos )
 Point2I Win32Window::screenToClient( const Point2I& pos )
 {
    POINT p = { pos.x, pos.y };
-   
+
    ScreenToClient( mWindowHandle, &p );
    return Point2I( p.x, p.y );
 }
@@ -512,7 +512,7 @@ bool Win32Window::isVisible()
    if (mOffscreenRender)
       return true;
 
-	return IsWindowVisible(mWindowHandle) 
+	return IsWindowVisible(mWindowHandle)
 		&& !IsIconic(mWindowHandle)
 		&& !isScreenSaverRunning();
 }
@@ -706,7 +706,7 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 
 		// Associate the window pointer with this window
 	case WM_CREATE:
-		// CodeReview [tom, 4/30/2007] Why don't we just cast this to a LONG 
+		// CodeReview [tom, 4/30/2007] Why don't we just cast this to a LONG
 		//            instead of having a ton of essentially pointless casts ?
 		SetWindowLong(hWnd, GWL_USERDATA,
 			(LONG)((PlatformWindow*)((CREATESTRUCT*)lParam)->lpCreateParams));
@@ -737,7 +737,7 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 			break;
 
 		// This is dispatched immediately to prevent a race condition with journaling and window minimizing
-		if (wParam != SIZE_MINIMIZED && !Journal::IsPlaying()) 
+		if (wParam != SIZE_MINIMIZED && !Journal::IsPlaying())
 			Dispatch( ImmediateDispatch, hWnd,message,wParam,lParam );
 
 		if(wParam != SIZE_MINIMIZED && window != NULL )
@@ -762,12 +762,12 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 	case WM_GETMINMAXINFO:
 		MINMAXINFO *winfo;
 		winfo = (MINMAXINFO*)(lParam);
-		
+
 		if(window && window->mMinimumSize.lenSquared() > 0)
 		{
 			winfo->ptMinTrackSize.x = window->mMinimumSize.x;
 			winfo->ptMinTrackSize.y = window->mMinimumSize.y;
-		}		
+		}
 
 		//Is the window size locked?
 		if (window && window->isSizeLocked())
@@ -890,7 +890,7 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 #endif
 
 		// CodeReview This fixes some issues with inappropriate event handling
-		//            around device resets and in full-screen mode but feels 
+		//            around device resets and in full-screen mode but feels
 		//            heavy-handed. Is it clobbering something important?
 		//            [bjg 6/13/07]
 	case WM_KEYUP:
@@ -1082,7 +1082,7 @@ void Win32Window::setMouseLocked( bool enable )
    if (mOffscreenRender)
       return;
 
-	// Maintain a good state without unnecessary 
+	// Maintain a good state without unnecessary
 	//  cursor hides/modifications
 	if( enable && mMouseLocked && mShouldLockMouse )
 		return;
@@ -1090,7 +1090,7 @@ void Win32Window::setMouseLocked( bool enable )
 		return;
 
 	// Need to be focused to enable mouse lock
-	// but we can disable it no problem if we're 
+	// but we can disable it no problem if we're
 	// not focused
 	if( !isFocused() && enable )
 	{

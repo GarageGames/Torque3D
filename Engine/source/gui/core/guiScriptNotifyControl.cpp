@@ -160,7 +160,7 @@ void GuiScriptNotifyCtrl::parentResized(const RectI &oldParentRect, const RectI 
    if( mOnParentResized )
       onParentResized_callback(getId());
 }
- 
+
 void GuiScriptNotifyCtrl::onLoseFirstResponder()
 {
    Parent::onLoseFirstResponder();

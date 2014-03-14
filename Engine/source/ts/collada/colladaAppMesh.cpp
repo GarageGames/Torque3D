@@ -374,7 +374,7 @@ bool ColladaAppMesh::animatesMatFrame(const AppSequence* appSeq)
          return true;
    }
 
-   // Check that the morph weights are animated within the sequence interval, 
+   // Check that the morph weights are animated within the sequence interval,
    // and that the morph targets have different UVs to the base geometry.
    bool animated = false;
    bool differentUVs = false;
@@ -624,8 +624,8 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
 }
 
 void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const MatrixF& objectOffset,
-                                   Vector<Point3F>& v_points, 
-                                   Vector<Point3F>& v_norms, 
+                                   Vector<Point3F>& v_points,
+                                   Vector<Point3F>& v_norms,
                                    Vector<ColorI>& v_colors,
                                    Vector<Point2F>& v_uvs,
                                    Vector<Point2F>& v_uv2s,
@@ -721,7 +721,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
       }
 
-      if ( (tuple.color >= 0) && (tuple.color < streams.colors.size())) 
+      if ( (tuple.color >= 0) && (tuple.color < streams.colors.size()))
       {
          if ( !colors_array && iVert == 0 )
          {
@@ -733,7 +733,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
             colors_array[iVert] = streams.colors.getColorIValue(tuple.color);
       }
 
-      if ( (tuple.uv2 >= 0) && (tuple.uv2 < streams.uv2s.size()) ) 
+      if ( (tuple.uv2 >= 0) && (tuple.uv2 < streams.uv2s.size()) )
       {
          if ( !uv2s_array && iVert == 0 )
          {
@@ -756,9 +756,9 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 }
 
 void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const MatrixF& objectOffset,
-                                        Vector<Point3F>& v_points, 
-                                        Vector<Point3F>& v_norms, 
-                                        Vector<ColorI>& v_colors, 
+                                        Vector<Point3F>& v_points,
+                                        Vector<Point3F>& v_norms,
+                                        Vector<ColorI>& v_colors,
                                         Vector<Point2F>& v_uvs,
                                         Vector<Point2F>& v_uv2s)
 {

@@ -57,15 +57,15 @@ function formatSessionNumber(%number)
 //---------------------------------------------------------------------------------------------
 function recordMovie(%movieName, %fps, %encoder)
 {
-   // If the canvas doesn't exist yet, setup a flag so it'll 
+   // If the canvas doesn't exist yet, setup a flag so it'll
    // start capturing as soon as it's created
-   if (!isObject(Canvas))   
+   if (!isObject(Canvas))
       return;
-   
-   if (%encoder $= "") 
-      %encoder = "THEORA";   
+
+   if (%encoder $= "")
+      %encoder = "THEORA";
    %resolution = Canvas.getVideoMode();
-   startVideoCapture(Canvas, %movieName, %encoder, %fps); 
+   startVideoCapture(Canvas, %movieName, %encoder, %fps);
 }
 
 function stopMovie()
@@ -79,8 +79,8 @@ function doScreenShot( %val )
 {
    // This can be bound, so skip key up events.
    if ( %val == 0 )
-      return;      
-      
+      return;
+
    _screenShot( 1 );
 }
 
@@ -93,23 +93,23 @@ function _screenShot( %tiles, %overlap )
 {
    if ( $pref::Video::screenShotSession $= "" )
       $pref::Video::screenShotSession = 0;
-            
+
    if ( $screenshotNumber == 0 )
       $pref::Video::screenShotSession++;
-            
+
    if ( $pref::Video::screenShotSession > 999 )
       $pref::Video::screenShotSession = 1;
-                  
+
    %name = "screenshot_" @ formatSessionNumber($pref::Video::screenShotSession) @ "-" @
-            formatImageNumber($screenshotNumber);            
+            formatImageNumber($screenshotNumber);
    %name = expandFileName( %name );
-   
+
    $screenshotNumber++;
-   
+
    if (  ( $pref::Video::screenShotFormat $= "JPEG" ) ||
-         ( $pref::video::screenShotFormat $= "JPG" ) )         
-      screenShot( %name, "JPEG", %tiles, %overlap );      
-   else   
+         ( $pref::video::screenShotFormat $= "JPG" ) )
+      screenShot( %name, "JPEG", %tiles, %overlap );
+   else
       screenShot( %name, "PNG", %tiles, %overlap );
 }
 
@@ -123,6 +123,6 @@ function tiledScreenShot( %tiles, %overlap )
 {
    // Pop the console off before we take the shot.
    Canvas.popDialog( ConsoleDlg );
-   
+
    _screenShot( %tiles, %overlap );
 }

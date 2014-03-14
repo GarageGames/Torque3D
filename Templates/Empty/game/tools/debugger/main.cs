@@ -31,10 +31,10 @@
 function initializeDebugger()
 {
    echo(" % - Initializing Debugger");
-   
+
    // Load the scripts.
    exec("./Scripts/debugger.ed.cs");
-   
+
    // And the guis.
    exec("./Gui/breakConditionDlg.ed.gui");
    exec("./Gui/connectDlg.ed.gui");
@@ -54,14 +54,14 @@ function startDebugger()
 {
    // Clean up first.
    destroyDebugger();
-   
+
    // Create a TCP object named TCPDebugger.
    new TCPObject(TCPDebugger);
-   
+
    // Used to get unique IDs for breakpoints and watch expressions.
    $DbgBreakId = 0;
    $DbgWatchSeq = 1;
-   
+
    // Set up the GUI.
    DebuggerConsoleView.setActive(false);
    Canvas.pushDialog(DebuggerGui);

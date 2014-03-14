@@ -27,14 +27,14 @@
 
 //-----------------------------------------------------------------------------
 
-SFXALDevice::SFXALDevice(  SFXProvider *provider, 
-                           const OPENALFNTABLE &openal, 
-                           String name, 
-                           bool useHardware, 
+SFXALDevice::SFXALDevice(  SFXProvider *provider,
+                           const OPENALFNTABLE &openal,
+                           String name,
+                           bool useHardware,
                            S32 maxBuffers )
    :  Parent( name, provider, useHardware, maxBuffers ),
-      mOpenAL( openal ), 
-      mDevice( NULL ), 
+      mOpenAL( openal ),
+      mDevice( NULL ),
       mContext( NULL )
 {
    mMaxBuffers = getMax( maxBuffers, 8 );
@@ -44,15 +44,15 @@ SFXALDevice::SFXALDevice(  SFXProvider *provider,
 
    mDevice = mOpenAL.alcOpenDevice( name );
    mOpenAL.alcGetError( mDevice );
-   if( mDevice ) 
+   if( mDevice )
    {
       mContext = mOpenAL.alcCreateContext( mDevice, NULL );
 
-      if( mContext ) 
+      if( mContext )
          mOpenAL.alcMakeContextCurrent( mContext );
 
       U32 err = mOpenAL.alcGetError( mDevice );
-      
+
       if( err != ALC_NO_ERROR )
          Con::errorf( "SFXALDevice - Initialization Error: %s", mOpenAL.alcGetString( mDevice, err ) );
    }
@@ -60,7 +60,7 @@ SFXALDevice::SFXALDevice(  SFXProvider *provider,
    AssertFatal( mDevice != NULL && mContext != NULL, "Failed to create OpenAL device and/or context!" );
 
    // Start the update thread.
-   
+
    if( !Con::getBoolVariable( "$_forceAllMainThread" ) )
    {
       SFXInternal::gUpdateThread = new AsyncPeriodicUpdateThread
@@ -88,9 +88,9 @@ SFXBuffer* SFXALDevice::createBuffer( const ThreadSafeRef< SFXStream >& stream, 
    AssertFatal( stream, "SFXALDevice::createBuffer() - Got null stream!" );
    AssertFatal( description, "SFXALDevice::createBuffer() - Got null description!" );
 
-   SFXALBuffer* buffer = SFXALBuffer::create(   mOpenAL, 
+   SFXALBuffer* buffer = SFXALBuffer::create(   mOpenAL,
                                                 stream,
-                                                description, 
+                                                description,
                                                 mUseHardware );
    if ( !buffer )
       return NULL;
@@ -103,7 +103,7 @@ SFXBuffer* SFXALDevice::createBuffer( const ThreadSafeRef< SFXStream >& stream, 
 
 SFXVoice* SFXALDevice::createVoice( bool is3D, SFXBuffer *buffer )
 {
-   // Don't bother going any further if we've 
+   // Don't bother going any further if we've
    // exceeded the maximum voices.
    if ( mVoices.size() >= mMaxBuffers )
       return NULL;
@@ -128,7 +128,7 @@ void SFXALDevice::setListener( U32 index, const SFXListenerProperties& listener 
    if( index != 0 )
       return;
 
-   // Torque and OpenAL are both right handed 
+   // Torque and OpenAL are both right handed
    // systems, so no coordinate flipping is needed.
 
    const MatrixF &transform = listener.getTransform();
@@ -155,17 +155,17 @@ void SFXALDevice::setDistanceModel( SFXDistanceModel model )
          if( mRolloffFactor != 1.0f )
             _setRolloffFactor( 1.0f ); // No rolloff on linear.
          break;
-         
+
       case SFXDistanceModelLogarithmic:
          mOpenAL.alDistanceModel( AL_INVERSE_DISTANCE_CLAMPED );
          if( mUserRolloffFactor != mRolloffFactor )
             _setRolloffFactor( mUserRolloffFactor );
          break;
-         
+
       default:
          AssertWarn( false, "SFXALDevice::setDistanceModel - distance model not implemented" );
    }
-   
+
    mDistanceModel = model;
 }
 
@@ -181,7 +181,7 @@ void SFXALDevice::setDopplerFactor( F32 factor )
 void SFXALDevice::_setRolloffFactor( F32 factor )
 {
    mRolloffFactor = factor;
-   
+
    for( U32 i = 0, num = mVoices.size(); i < num; ++ i )
       mOpenAL.alSourcef( ( ( SFXALVoice* ) mVoices[ i ] )->mSourceName, AL_ROLLOFF_FACTOR, factor );
 }
@@ -194,6 +194,6 @@ void SFXALDevice::setRolloffFactor( F32 factor )
       Con::errorf( "SFXALDevice::setRolloffFactor - rolloff factor <> 1.0f ignored in linear distance model" );
    else
       _setRolloffFactor( factor );
-      
+
    mUserRolloffFactor = factor;
 }

@@ -25,7 +25,7 @@ function EditorGui::init(%this)
    EWorldEditor.isDirty = false;
    ETerrainEditor.isDirty = false;
    ETerrainEditor.isMissionDirty = false;
-   
+
    if( %this.isInitialized )
       return;
 
@@ -42,7 +42,7 @@ function EditorGui::init(%this)
       // Load Creator/Inspector GUI
       exec("~/worldEditor/gui/ToolsPaletteGroups/init.cs");
       exec("~/worldEditor/gui/ToolsPaletteWindow.ed.gui");
-      
+
       if( isObject( EWToolsPaletteWindow ) )
       {
          %this.add( EWToolsPaletteWindow );
@@ -50,7 +50,7 @@ function EditorGui::init(%this)
          EWToolsPaletteWindow.setVisible( false );
       }
    }
-   
+
    if( !isObject( %this-->TreeWindow ) )
    {
       // Load Creator/Inspector GUI
@@ -62,7 +62,7 @@ function EditorGui::init(%this)
          EWTreeWindow.setVisible( false );
       }
    }
-   
+
    if( !isObject( %this-->InspectorWindow ) )
    {
       // Load Creator/Inspector GUI
@@ -73,8 +73,8 @@ function EditorGui::init(%this)
          %this.add( EWInspectorWindow );
          EWInspectorWindow.setVisible( false );
       }
-   }   
-   
+   }
+
    if( !isObject( %this-->WorldEditorToolbar ) )
    {
       // Load Creator/Inspector GUI
@@ -84,8 +84,8 @@ function EditorGui::init(%this)
          %this.add( EWorldEditorToolbar );
          EWorldEditorToolbar.setVisible( false );
       }
-   }  
-   
+   }
+
    if ( !isObject( %this-->TerrainEditToolbar ) )
    {
       // Load Terrain Edit GUI
@@ -96,7 +96,7 @@ function EditorGui::init(%this)
          EWTerrainEditToolbar.setVisible( false );
       }
    }
-   
+
    if( !isObject( %this-->TerrainPainter ) )
    {
       // Load Terrain Painter GUI
@@ -105,9 +105,9 @@ function EditorGui::init(%this)
          %this.add( %guiContent->TerrainPainter );
          %this.add( %guiContent->TerrainPainterPreview );
       }
-         
-      exec("~/worldEditor/gui/guiTerrainMaterialDlg.ed.gui"); 
-      exec("~/worldEditor/gui/TerrainBrushSoftnessCurveDlg.ed.gui");        
+
+      exec("~/worldEditor/gui/guiTerrainMaterialDlg.ed.gui");
+      exec("~/worldEditor/gui/TerrainBrushSoftnessCurveDlg.ed.gui");
    }
    if ( !isObject( %this-->TerrainPainterToolbar) )
    {
@@ -128,10 +128,10 @@ function EditorGui::init(%this)
       {
          %this.add( EWToolsToolbar );
          EWToolsToolbar.setVisible( true );
-         
+
       }
    }
-   
+
    // Visibility Layer Window
    if( !isObject( %this-->VisibilityLayerWindow ) )
    {
@@ -139,7 +139,7 @@ function EditorGui::init(%this)
       EVisibility.setVisible(false);
       EVisibilityTabBook.selectPage(0);
    }
-      
+
    // Editor Settings Window
    if( !isObject( %this-->EditorSettingsWindow ) )
    {
@@ -147,7 +147,7 @@ function EditorGui::init(%this)
       exec("~/worldEditor/scripts/editorSettingsWindow.ed.cs");
       %this.add( ESettingsWindow );
       ESettingsWindow.setVisible(false);
-      
+
       // Start the standard settings tabs pages
       exec( "~/worldEditor/gui/GeneralSettingsTab.ed.gui" );
       ESettingsWindow.addTabPage( EGeneralSettingsPage );
@@ -170,7 +170,7 @@ function EditorGui::init(%this)
       ESnapOptions.setVisible(false);
       ESnapOptionsTabBook.selectPage(0);
    }
-   
+
    // Transform Selection Window
    if( !isObject( %this-->TransformSelectionWindow ) )
    {
@@ -179,21 +179,21 @@ function EditorGui::init(%this)
       %this.add( ETransformSelection );
       ETransformSelection.setVisible(false);
    }
-   
+
    // Manage Bookmarks Window
    if( !isObject( %this-->ManageBookmarksWindow ) )
    {
       %this.add( EManageBookmarks );
       EManageBookmarks.setVisible(false);
    }
-   
+
    // Manage SFXParameters Window
    if( !isObject( %this-->ManageSFXParametersWindow ) )
    {
       %this.add( EManageSFXParameters );
       EManageSFXParameters.setVisible( false );
    }
-   
+
    // Select Objects Window
    if( !isObject( %this->SelectObjectsWindow ) )
    {
@@ -209,9 +209,9 @@ function EditorGui::init(%this)
    ObjectBuilderGui.init();
 
    %this.setMenuDefaultState();
-   
+
    EWorldEditorToggleCamera.setBitmap("tools/worldEditor/images/toolbar/player");
-   
+
    /*
    EWorldEditorCameraSpeed.clear();
    EWorldEditorCameraSpeed.add("Slowest - Camera 1",0);
@@ -223,50 +223,50 @@ function EditorGui::init(%this)
    EWorldEditorCameraSpeed.add("Fastest - Camera 7",6);
    EWorldEditorCameraSpeed.setSelected(3);
    */
-   
+
    EWorldEditorAlignPopup.clear();
    EWorldEditorAlignPopup.add("World",0);
    EWorldEditorAlignPopup.add("Object",1);
    EWorldEditorAlignPopup.setSelected(0);
-   
-   
+
+
    // sync camera gui
    EditorGui.syncCameraGui();
-   
+
    // this will brind CameraTypesDropdown to front so that it goes over the menubar
-   EditorGui.pushToBack(CameraTypesDropdown); 
-   EditorGui.pushToBack(VisibilityDropdown); 
-   
+   EditorGui.pushToBack(CameraTypesDropdown);
+   EditorGui.pushToBack(VisibilityDropdown);
+
    // dropdowns out so that they display correctly in editor gui
-   objectTransformDropdown.parentGroup = editorGui; 
-   objectCenterDropdown.parentGroup = editorGui; 
-   objectSnapDropdown.parentGroup = editorGui; 
-   
+   objectTransformDropdown.parentGroup = editorGui;
+   objectCenterDropdown.parentGroup = editorGui;
+   objectSnapDropdown.parentGroup = editorGui;
+
    // make sure to show the default world editor guis
    EditorGui.bringToFront( EWorldEditor );
-   EWorldEditor.setVisible( false );       
-   
-   // Call the startup callback on the editor plugins.   
+   EWorldEditor.setVisible( false );
+
+   // Call the startup callback on the editor plugins.
    for ( %i = 0; %i < EditorPluginSet.getCount(); %i++ )
    {
       %obj = EditorPluginSet.getObject( %i );
-      %obj.onWorldEditorStartup();      
+      %obj.onWorldEditorStartup();
    }
 
    // With everything loaded, start up the settings window
    ESettingsWindow.startup();
-   
+
    // Start up initial editor plugin.
-   
+
    %initialEditor = %this.currentEditor; // Read from prefs.
    %this.currentEditor = "";
 
    if( %initialEditor $= "" )
       %initialEditor = "WorldEditorInspectorPlugin";
    %this.setEditor( %initialEditor, true, true );
-   
+
    // Done.
-   
+
    %this.isInitialized = true;
 }
 
@@ -276,7 +276,7 @@ function EditorGui::init(%this)
 function EditorGui::setupDefaultCameraSettings( %this )
 {
    EditorSettings.beginGroup( "LevelInformation/levels/" @ %this.levelName );
-   
+
    EditorSettings.setDefaultValue(  "cameraSpeedMin",         "5"         );
    EditorSettings.setDefaultValue(  "cameraSpeedMax",         "200"         );
 
@@ -287,14 +287,14 @@ function EditorGui::readCameraSettings( %this, %levelName )
 {
    if( %levelName !$= %this.levelName )
       return;
-      
+
    EditorCameraSpeedOptions.setupGuiControls();
 }
 
 function EditorGui::writeCameraSettings( %this )
 {
    EditorSettings.beginGroup( "LevelInformation/levels/" @ %this.levelName );
-   
+
    EditorSettings.setValue( "cameraSpeed",               $Camera::movementSpeed );
 
    EditorSettings.endGroup();
@@ -303,14 +303,14 @@ function EditorGui::writeCameraSettings( %this )
 //------------------------------------------------------------------------------
 
 function EditorGui::shutdown( %this )
-{   
+{
    // Store settings.
    %this.writeWorldEditorSettings();
-   
+
    // Deactivate current editor.
    %this.setEditor( "" );
 
-   // Call the shutdown callback on the editor plugins.   
+   // Call the shutdown callback on the editor plugins.
    foreach( %plugin in EditorPluginSet )
       %plugin.onWorldEditorShutdown();
 }
@@ -319,46 +319,46 @@ function EditorGui::shutdown( %this )
 /// will take over the default world editor window.
 function EditorGui::addToEditorsMenu( %this, %displayName, %accel, %newPlugin )
 {
-   %windowMenu = %this.findMenu( "Editors" );   
-   %count = %windowMenu.getItemCount();      
-   
-   
+   %windowMenu = %this.findMenu( "Editors" );
+   %count = %windowMenu.getItemCount();
+
+
    %alreadyExists = false;
    for ( %i = 0; %i < %count; %i++ )
-   {      
+   {
       %existingPlugins = getField(%windowMenu.Item[%i], 2);
-      
+
       if(%newPlugin $= %existingPlugins)
          %alreadyExists = true;
    }
-   
+
    if( %accel $= "" && %count < 9 )
       %accel = "F" @ %count + 1;
    else
       %accel = "";
-         
+
    if(!%alreadyExists)
       %windowMenu.addItem( %count, %displayName TAB %accel TAB %newPlugin );
-      
+
    return %accel;
 }
 
 function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitmap, %tooltip )
-{   
-   %count = ToolsToolbarArray.getCount();      
-   
+{
+   %count = ToolsToolbarArray.getCount();
+
    %alreadyExists = false;
    for ( %i = 0; %i < %count; %i++ )
-   {      
+   {
       %existingInternalName = ToolsToolbarArray.getObject(%i).getFieldValue("internalName");
-      
+
       if(%internalName $= %existingInternalName)
       {
          %alreadyExists = true;
          break;
       }
    }
-      
+
    if(!%alreadyExists)
    {
       %button = new GuiBitmapButtonCtrl() {
@@ -421,25 +421,25 @@ function EditorGui::setEditor( %this, %newEditor, %dontActivate )
 
       if( %this.currentEditor.isActivated )
          %this.currentEditor.onDeactivated();
-         
+
       if( isObject( %this.currentEditor.editorGui ) )
          %this.currentOrthoFOV = %this.currentEditor.editorGui.getOrthoFOV();
    }
-   
+
    if( !isObject( %newEditor ) )
    {
       %this.currentEditor = "";
       return;
    }
-      
+
    // If we have a special set editor function, run that instead
    if( %newEditor.isMethod( "setEditorFunction" ) )
    {
-      if( %newEditor.setEditorFunction() ) 
+      if( %newEditor.setEditorFunction() )
       {
          %this.syncEditor( %newEditor );
          %this.currentEditor = %newEditor;
-         
+
          if (!%dontActivate)
             %this.currentEditor.onActivated();
       }
@@ -451,9 +451,9 @@ function EditorGui::setEditor( %this, %newEditor, %dontActivate )
             %this.currentEditor = "WorldEditorInspectorPlugin";
          else if( %this.currentEditor.getId() == %newEditor.getId() )
             %this.currentEditor = "WorldEditorInspectorPlugin";
-            
+
          %this.syncEditor( %this.currentEditor, true );
-         
+
          if( !%dontActivate )
             %this.currentEditor.onActivated();
       }
@@ -461,14 +461,14 @@ function EditorGui::setEditor( %this, %newEditor, %dontActivate )
    else
    {
       %this.syncEditor( %newEditor );
-      %this.currentEditor = %newEditor; 
-      
+      %this.currentEditor = %newEditor;
+
       if( !%dontActivate )
          %this.currentEditor.onActivated();
    }
-   
+
    // Sync display type.
-   
+
    %gui = %this.currentEditor.editorGui;
    if( isObject( %gui ) )
    {
@@ -482,21 +482,21 @@ function EditorGui::syncEditor( %this, %newEditor, %newEditorFailed )
 {
    // Sync with menu bar
    %menu = %this.findMenu( "Editors" );
-   %count = %menu.getItemCount();      
+   %count = %menu.getItemCount();
    for ( %i = 0; %i < %count; %i++ )
    {
       %pluginObj = getField( %menu.item[%i], 2 );
       if ( %pluginObj $= %newEditor )
       {
          %menu.checkRadioItem( 0, %count, %i );
-         break;  
+         break;
       }
-   }   
-   
+   }
+
    // In order to hook up a palette, the word Palette must be able to be
    // switched out in order to read correctly, if not, no palette will be used
    %paletteName = strreplace(%newEditor, "Plugin", "Palette");
-   
+
    // Sync with ToolsToolbar
    for ( %i = 0; %i < ToolsToolbarArray.getCount(); %i++ )
    {
@@ -506,8 +506,8 @@ function EditorGui::syncEditor( %this, %newEditor, %newEditorFailed )
          ToolsToolbarArray.getObject(%i).setStateOn(1);
          break;
       }
-   } 
-   
+   }
+
    // Handles quit game and gui editor changes in wierd scenarios
    if( %newEditorFailed && EWToolsToolbar.isDynamic )
    {
@@ -515,7 +515,7 @@ function EditorGui::syncEditor( %this, %newEditor, %newEditorFailed )
          EWToolsToolbar.reset();
       EWToolsToolbar.toggleSize();
    }
-            
+
    // Toggle the editor specific palette; we define special cases here
    switch$ ( %paletteName )
    {
@@ -524,28 +524,28 @@ function EditorGui::syncEditor( %this, %newEditor, %newEditorFailed )
       case "DatablockEditorPalette":
          %paletteName = "WorldEditorInspectorPalette";
       case "ParticleEditorPalette":
-         %paletteName = "WorldEditorInspectorPalette";      
+         %paletteName = "WorldEditorInspectorPalette";
    }
-      
+
    %this-->ToolsPaletteWindow.togglePalette(%paletteName);
 }
 
 function EditorGui::onWake( %this )
 {
    EHWorldEditor.setStateOn( 1 );
-   
+
    // Notify the editor plugins that the editor has started.
-   
+
    foreach( %plugin in EditorPluginSet )
       %plugin.onEditorWake();
-   
+
    // Push the ActionMaps in the order that we want to have them
    // before activating an editor plugin, so that if the plugin
    // installs an ActionMap, it will be highest on the stack.
-   
+
    MoveMap.push();
    EditorMap.push();
-   
+
    // Active the current editor plugin.
 
    if( !%this.currentEditor.isActivated )
@@ -556,11 +556,11 @@ function EditorGui::onWake( %this )
    {
       %slashPos = strpos( $Server::MissionFile, "/", %slashPos ) + 1;
    }
-   %levelName = getSubStr( $Server::MissionFile , %slashPos , 99 );   
-   
+   %levelName = getSubStr( $Server::MissionFile , %slashPos , 99 );
+
    if( %levelName !$= %this.levelName )
       %this.onNewLevelLoaded( %levelName );
-      
+
    if (isObject(DemoEditorAlert) && DemoEditorAlert.helpTag<2)
       Canvas.pushDialog(DemoEditorAlert);
 }
@@ -568,20 +568,20 @@ function EditorGui::onWake( %this )
 function EditorGui::onSleep( %this )
 {
    // Deactivate the current editor plugin.
-   
+
    if( %this.currentEditor.isActivated )
       %this.currentEditor.onDeactivated();
-      
+
    // Remove the editor's ActionMaps.
-      
+
    EditorMap.pop();
    MoveMap.pop();
 
    // Notify the editor plugins that the editor will be closing.
-   
+
    foreach( %plugin in EditorPluginSet )
       %plugin.onEditorSleep();
-            
+
    if(isObject($Server::CurrentScene))
       $Server::CurrentScene.open();
 }
@@ -592,7 +592,7 @@ function EditorGui::onNewLevelLoaded( %this, %levelName )
    %this.setupDefaultCameraSettings();
    ECameraSettingsPage.init();
    EditorCameraSpeedOptions.setupDefaultState();
-   
+
    new ScriptObject( EditorMissionCleanup )
    {
       parentGroup = "MissionCleanup";
@@ -647,7 +647,7 @@ function EditorGui::addCameraBookmark( %this, %name )
 
    %cam = LocalClientConnection.camera.getTransform();
    %obj.setTransform( %cam );
-   
+
    EWorldEditor.isDirty = true;
    EditorTree.buildVisibleTree(true);
 }
@@ -688,7 +688,7 @@ function EditorGui::jumpToBookmark( %this, %name )
    %mark = CameraBookmarks.findObjectByInternalName( %name, true );
    if( %mark == 0 )
       return;
-      
+
    LocalClientConnection.camera.setTransform( %mark.getTransform() );
    return;
 }
@@ -801,7 +801,7 @@ function EditorGui::syncCameraGui( %this )
          %flyModeRadioItem = 0;
          EditorGuiStatusBar.setCamera("Standard Camera");
       }
-      
+
       //quick way select menu bar options
       %this.findMenu( "Camera" ).checkRadioItem( 0, 1, 0 );
       EditorFreeCameraTypeOptions.checkRadioItem( 0, 4, %flyModeRadioItem);
@@ -827,12 +827,12 @@ function EditorGui::syncCameraGui( %this )
       EditorPlayerCameraTypeOptions.checkRadioItem( 0, 2, %flyModeRadioItem);
       EditorFreeCameraTypeOptions.checkRadioItem( 0, 4, -1);
       EditorGuiStatusBar.setCamera("1st Person Camera");
-   }      
+   }
  }
-  
-/// @name EditorPlugin Methods 
+
+/// @name EditorPlugin Methods
 /// @{
- 
+
 //------------------------------------------------------------------------------
 // WorldEditorPlugin
 //------------------------------------------------------------------------------
@@ -849,13 +849,13 @@ function WorldEditorPlugin::onActivated( %this )
    EWorldEditor.syncGui();
 
    EditorGuiStatusBar.setSelectionObjectsByCount(EWorldEditor.getSelectionSize());
-   
+
    // Should the Transform Selection window open?
    if( EWorldEditor.ETransformSelectionDisplayed )
    {
       ETransformSelection.setVisible(true);
    }
-   
+
    Parent::onActivated(%this);
 }
 
@@ -863,11 +863,11 @@ function WorldEditorPlugin::onDeactivated( %this )
 {
    // Hide the Transform Selection window from other editors
    ETransformSelection.setVisible(false);
-   
-   EWorldEditor.setVisible( false );            
+
+   EWorldEditor.setVisible( false );
    EditorGui.menuBar.remove( EditorGui.worldMenu );
-   
-   Parent::onDeactivated(%this);    
+
+   Parent::onDeactivated(%this);
 }
 
 //------------------------------------------------------------------------------
@@ -877,18 +877,18 @@ function WorldEditorPlugin::onDeactivated( %this )
 function WorldEditorInspectorPlugin::onWorldEditorStartup( %this )
 {
    Parent::onWorldEditorStartup( %this );
-   
+
    // Add ourselves to the window menu.
    %accel = EditorGui.addToEditorsMenu( "Object Editor", "", WorldEditorInspectorPlugin );
-   
+
    // Add ourselves to the ToolsToolbar
-   %tooltip = "Object Editor (" @ %accel @ ")";   
+   %tooltip = "Object Editor (" @ %accel @ ")";
    EditorGui.addToToolsToolbar( "WorldEditorInspectorPlugin", "WorldEditorInspectorPalette", expandFilename("tools/worldEditor/images/toolbar/transform-objects"), %tooltip );
-   
+
    //connect editor windows
    GuiWindowCtrl::attach( EWInspectorWindow, EWTreeWindow);
-   
-   %map = new ActionMap();   
+
+   %map = new ActionMap();
    %map.bindCmd( keyboard, "1", "EWorldEditorNoneModeBtn.performClick();", "" );  // Select
    %map.bindCmd( keyboard, "2", "EWorldEditorMoveModeBtn.performClick();", "" );  // Move
    %map.bindCmd( keyboard, "3", "EWorldEditorRotateModeBtn.performClick();", "" );  // Rotate
@@ -905,26 +905,26 @@ function WorldEditorInspectorPlugin::onWorldEditorStartup( %this )
    %map.bindCmd( keyboard, "p", "objectCenterDropdown->objectBoundsBtn.performClick(); objectCenterDropdown.toggle();", "" );// Bounds Center
    %map.bindCmd( keyboard, "k", "objectTransformDropdown->objectTransformBtn.performClick(); objectTransformDropdown.toggle();", "" );// Object Transform
    %map.bindCmd( keyboard, "l", "objectTransformDropdown->worldTransformBtn.performClick(); objectTransformDropdown.toggle();", "" );// World Transform
-   
-   WorldEditorInspectorPlugin.map = %map; 
+
+   WorldEditorInspectorPlugin.map = %map;
 }
 
 function WorldEditorInspectorPlugin::onActivated( %this )
-{   
+{
    Parent::onActivated( %this );
 
-   EditorGui-->InspectorWindow.setVisible( true );   
+   EditorGui-->InspectorWindow.setVisible( true );
    EditorGui-->TreeWindow.setVisible( true );
    EditorGui-->WorldEditorToolbar.setVisible( true );
    %this.map.push();
 }
 
 function WorldEditorInspectorPlugin::onDeactivated( %this )
-{   
+{
    Parent::onDeactivated( %this );
 
-   EditorGui-->InspectorWindow.setVisible( false );  
-   EditorGui-->TreeWindow.setVisible( false ); 
+   EditorGui-->InspectorWindow.setVisible( false );
+   EditorGui-->TreeWindow.setVisible( false );
    EditorGui-->WorldEditorToolbar.setVisible( false );
    %this.map.pop();
 }
@@ -933,29 +933,29 @@ function WorldEditorInspectorPlugin::onEditMenuSelect( %this, %editMenu )
 {
    %canCutCopy = EWorldEditor.getSelectionSize() > 0;
    %editMenu.enableItem( 3, %canCutCopy ); // Cut
-   %editMenu.enableItem( 4, %canCutCopy ); // Copy      
+   %editMenu.enableItem( 4, %canCutCopy ); // Copy
    %editMenu.enableItem( 5, EWorldEditor.canPasteSelection() ); // Paste
-   
+
    %selSize = EWorldEditor.getSelectionSize();
    %lockCount = EWorldEditor.getSelectionLockCount();
-   %hideCount = EWorldEditor.getSelectionHiddenCount();   
+   %hideCount = EWorldEditor.getSelectionHiddenCount();
    %editMenu.enableItem( 6, %selSize > 0 && %lockCount != %selSize ); // Delete Selection
-   
-   %editMenu.enableItem( 8, %canCutCopy ); // Deselect  
+
+   %editMenu.enableItem( 8, %canCutCopy ); // Deselect
 }
 
 function WorldEditorInspectorPlugin::handleDelete( %this )
 {
    // The tree handles deletion and notifies the
-   // world editor to clear its selection.  
+   // world editor to clear its selection.
    //
    // This is because non-SceneObject elements like
    // SimGroups also need to be destroyed.
    //
    // See EditorTree::onObjectDeleteCompleted().
    %selSize = EWorldEditor.getSelectionSize();
-   if( %selSize > 0 )   
-      EditorTree.deleteSelection();   
+   if( %selSize > 0 )
+      EditorTree.deleteSelection();
 }
 
 function WorldEditorInspectorPlugin::handleDeselect()
@@ -985,15 +985,15 @@ function WorldEditorInspectorPlugin::handlePaste()
 function TerrainEditorPlugin::onWorldEditorStartup( %this )
 {
    Parent::onWorldEditorStartup( %this );
-   
+
    // Add ourselves to the window menu.
    %accel = EditorGui.addToEditorsMenu( "Terrain Editor", "", TerrainEditorPlugin );
-   
+
    // Add ourselves to the ToolsToolbar
-   %tooltip = "Terrain Editor (" @ %accel @ ")";   
+   %tooltip = "Terrain Editor (" @ %accel @ ")";
    EditorGui.addToToolsToolbar( "TerrainEditorPlugin", "TerrainEditorPalette", expandFilename("tools/worldEditor/images/toolbar/sculpt-terrain"), %tooltip );
-   
-   %map = new ActionMap();   
+
+   %map = new ActionMap();
    %map.bindCmd( keyboard, "1", "ToolsPaletteArray->brushAdjustHeight.performClick();", "" );    //Grab Terrain
    %map.bindCmd( keyboard, "2", "ToolsPaletteArray->raiseHeight.performClick();", "" );     // Raise Height
    %map.bindCmd( keyboard, "3", "ToolsPaletteArray->lowerHeight.performClick();", "" );     // Lower Height
@@ -1015,17 +1015,17 @@ function TerrainEditorPlugin::onWorldEditorStartup( %this )
    %map.bindCmd( keyboard, "[", "TerrainBrushPressureTextEditContainer->textEdit.text -= 5", "" );// -5 Pressure
    %map.bindCmd( keyboard, "'", "TerrainBrushSoftnessTextEditContainer->textEdit.text += 5", "" );// +5 Softness
    %map.bindCmd( keyboard, ";", "TerrainBrushSoftnessTextEditContainer->textEdit.text -= 5", "" );// -5 Softness*/
-   
-   TerrainEditorPlugin.map = %map;  
-   
+
+   TerrainEditorPlugin.map = %map;
+
    %this.terrainMenu = new PopupMenu()
    {
       superClass = "MenuBuilder";
 
       barTitle = "Terrain";
-               
+
       item[0] = "Smooth Heightmap" TAB "" TAB "ETerrainEditor.onSmoothHeightmap();";
-   };   
+   };
 }
 
 function TerrainEditorPlugin::onActivated( %this )
@@ -1033,20 +1033,20 @@ function TerrainEditorPlugin::onActivated( %this )
    Parent::onActivated( %this );
 
    EditorGui.readTerrainEditorSettings();
-   
+
    %action = EditorSettings.value("TerrainEditor/currentAction");
    ETerrainEditor.switchAction( %action );
    ToolsPaletteArray.findObjectByInternalName( %action, true ).setStateOn( true );
 
    EWTerrainEditToolbarBrushType->ellipse.performClick(); // Circle Brush
-   
+
    EditorGui.menuBar.insert( %this.terrainMenu, EditorGui.menuBar.dynamicItemInsertPos );
-         
+
    EditorGui.bringToFront( ETerrainEditor );
    ETerrainEditor.setVisible( true );
    ETerrainEditor.attachTerrain();
    ETerrainEditor.makeFirstResponder( true );
-        
+
    EWTerrainEditToolbar.setVisible( true );
    ETerrainEditor.onBrushChanged();
    ETerrainEditor.setup();
@@ -1114,7 +1114,7 @@ function TerrainTextureEditorTool::onActivated( %this )
    ETerrainEditor.setVisible( true );
    ETerrainEditor.attachTerrain();
    ETerrainEditor.makeFirstResponder( true );
-   
+
    EditorGui-->TextureEditor.setVisible(true);
 
    EditorGuiStatusBar.setSelection("");
@@ -1122,8 +1122,8 @@ function TerrainTextureEditorTool::onActivated( %this )
 
 function TerrainTextureEditorTool::onDeactivated( %this )
 {
-   EditorGui-->TextureEditor.setVisible(false); 
-       
+   EditorGui-->TextureEditor.setVisible(false);
+
    ETerrainEditor.setVisible( false );
 }
 
@@ -1134,15 +1134,15 @@ function TerrainTextureEditorTool::onDeactivated( %this )
 function TerrainPainterPlugin::onWorldEditorStartup( %this )
 {
    Parent::onWorldEditorStartup( %this );
-   
+
    // Add ourselves to the window menu.
    %accel = EditorGui.addToEditorsMenu( "Terrain Painter", "", TerrainPainterPlugin );
-   
+
    // Add ourselves to the ToolsToolbar
-   %tooltip = "Terrain Painter (" @ %accel @ ")"; 
+   %tooltip = "Terrain Painter (" @ %accel @ ")";
    EditorGui.addToToolsToolbar( "TerrainPainterPlugin", "TerrainPainterPalette", expandFilename("tools/worldEditor/images/toolbar/paint-terrain"), %tooltip );
 
-   %map = new ActionMap();   
+   %map = new ActionMap();
    %map.bindCmd( keyboard, "v", "EWTerrainPainterToolbarBrushType->ellipse.performClick();", "" );// Circle Brush
    %map.bindCmd( keyboard, "b", "EWTerrainPainterToolbarBrushType->box.performClick();", "" );// Box Brush
    %map.bindCmd( keyboard, "=", "TerrainPainterPlugin.keyboardModifyBrushSize(1);", "" );// +1 Brush Size
@@ -1160,8 +1160,8 @@ function TerrainPainterPlugin::onWorldEditorStartup( %this )
       %map.bindCmd( keyboard, %i, "TerrainPainterPlugin.keyboardSetMaterial(" @ (%i-1) @ ");", "" );
    }
    %map.bindCmd( keyboard, 0, "TerrainPainterPlugin.keyboardSetMaterial(10);", "" );
-   
-   TerrainPainterPlugin.map = %map;  
+
+   TerrainPainterPlugin.map = %map;
    GuiWindowCtrl::attach( EPainter, EPainterPreview);
 }
 
@@ -1228,13 +1228,13 @@ function TerrainPainterPlugin::validateBrushSize( %this )
 function TerrainPainterPlugin::validateSlopeMaxAngle( %this )
 {
    %maxval = ETerrainEditor.getSlopeLimitMaxAngle();
-   PaintBrushSlopeControl-->SlopeMaxAngle.setText(%maxval); 
+   PaintBrushSlopeControl-->SlopeMaxAngle.setText(%maxval);
 }
 
 function TerrainPainterPlugin::validateSlopeMinAngle( %this )
 {
    %minval = ETerrainEditor.getSlopeLimitMinAngle();
-   PaintBrushSlopeControl-->SlopeMinAngle.setText(%minval);  
+   PaintBrushSlopeControl-->SlopeMinAngle.setText(%minval);
 }
 
 function TerrainPainterPlugin::keyboardModifyBrushSize( %this, %amt)
@@ -1255,7 +1255,7 @@ function TerrainPainterPlugin::keyboardSetMaterial( %this, %mat)
       %ctrl.performClick();
    }
 }
-   
+
 /// @} End of EditorPlugin Methods
 
 
@@ -1337,7 +1337,7 @@ function EWorldEditor::setGridSize( %this, %value )
 {
    GlobalGizmoProfile.gridSize = %value SPC %value SPC %value;
    %this.gridSize = %value;
-   
+
    %this.syncGui();
 }
 
@@ -1348,7 +1348,7 @@ function EWorldEditor::areAllSelectedObjectsOfType( %this, %className )
    %activeSelection = %this.getActiveSelection();
    if( !isObject( %activeSelection ) )
       return false;
-      
+
    %count = %activeSelection.getCount();
    for( %i = 0; %i < %count; %i ++ )
    {
@@ -1356,7 +1356,7 @@ function EWorldEditor::areAllSelectedObjectsOfType( %this, %className )
       if( !%obj.isMemberOfClass( %className ) )
          return false;
    }
-      
+
    return true;
 }
 
@@ -1398,7 +1398,7 @@ function EWorldEditorCameraSpeed::updateMenuBar(%this, %editorBarCtrl)
          $Camera::movementSpeed = %value;
       }
    }
-   
+
    // Update Editor
    EditorCameraSpeedOptions.checkRadioItem(0, 6, -1);
 }
@@ -1412,8 +1412,8 @@ function EWorldEditorAlignPopup::onSelect(%this, %id, %text)
       EWorldEditorAlignPopup.setSelected(1);
       return;
    }
-   
-   GlobalGizmoProfile.alignment = %text;   
+
+   GlobalGizmoProfile.alignment = %text;
 }
 
 //-----------------------------------------------------------------------------
@@ -1424,32 +1424,32 @@ function EWorldEditorAlignPopup::onSelect(%this, %id, %text)
 function EWorldEditorNoneModeBtn::onClick(%this)
 {
    GlobalGizmoProfile.mode = "None";
-   
+
    EditorGuiStatusBar.setInfo("Selection arrow.");
 }
 
 function EWorldEditorMoveModeBtn::onClick(%this)
 {
    GlobalGizmoProfile.mode = "Move";
-   
+
    %cmdCtrl = "CTRL";
    if( $platform $= "macos" )
       %cmdCtrl = "CMD";
-   
+
    EditorGuiStatusBar.setInfo( "Move selection.  SHIFT while dragging duplicates objects.  " @ %cmdCtrl @ " to toggle soft snap.  ALT to toggle grid snap." );
 }
 
 function EWorldEditorRotateModeBtn::onClick(%this)
 {
    GlobalGizmoProfile.mode = "Rotate";
-   
+
    EditorGuiStatusBar.setInfo("Rotate selection.");
 }
 
 function EWorldEditorScaleModeBtn::onClick(%this)
 {
    GlobalGizmoProfile.mode = "Scale";
-   
+
    EditorGuiStatusBar.setInfo("Scale selection.");
 }
 
@@ -1457,7 +1457,7 @@ function EWorldEditorScaleModeBtn::onClick(%this)
 
 function EditorTree::onDeleteSelection( %this )
 {
-   %this.undoDeleteList = "";   
+   %this.undoDeleteList = "";
 }
 
 function EditorTree::onDeleteObject( %this, %object )
@@ -1465,13 +1465,13 @@ function EditorTree::onDeleteObject( %this, %object )
    // Don't delete locked objects
    if( %object.locked )
       return true;
-   
+
    if( %object == EWCreatorWindow.objectGroup )
       EWCreatorWindow.setNewObjectGroup( MissionGroup );
 
    // Append it to our list.
    %this.undoDeleteList = %this.undoDeleteList TAB %object;
-              
+
    // We're gonna delete this ourselves in the
    // completion callback.
    return true;
@@ -1482,10 +1482,10 @@ function EditorTree::onObjectDeleteCompleted( %this )
    // This can be called when a deletion is attempted but nothing was
    // actually deleted ( cannot delete the root of the tree ) so only submit
    // the undo if we really deleted something.
-   if ( %this.undoDeleteList !$= "" )   
+   if ( %this.undoDeleteList !$= "" )
       MEDeleteUndoAction::submit( %this.undoDeleteList );
-   
-   // Let the world editor know to 
+
+   // Let the world editor know to
    // clear its selection.
    EWorldEditor.clearSelection();
    EWorldEditor.isDirty = true;
@@ -1498,7 +1498,7 @@ function EditorTree::onClearSelected(%this)
 
 function EditorTree::onInspect(%this, %obj)
 {
-   Inspector.inspect(%obj);   
+   Inspector.inspect(%obj);
 }
 
 function EditorTree::toggleLock( %this )
@@ -1518,10 +1518,10 @@ function EditorTree::toggleLock( %this )
 function EditorTree::onAddSelection(%this, %obj, %isLastSelection)
 {
    EWorldEditor.selectObject( %obj );
-   
+
    %selSize = EWorldEditor.getSelectionSize();
    %lockCount = EWorldEditor.getSelectionLockCount();
-   
+
    if( %lockCount < %selSize )
    {
       EWTreeWindow-->LockSelection.setStateOn(0);
@@ -1532,17 +1532,17 @@ function EditorTree::onAddSelection(%this, %obj, %isLastSelection)
       EWTreeWindow-->LockSelection.setStateOn(1);
       EWTreeWindow-->LockSelection.command = "EWorldEditor.lockSelection(false); EditorTree.toggleLock();";
    }
-   
+
    if( %selSize > 0 && %lockCount == 0 )
       EWTreeWindow-->DeleteSelection.command = "EditorMenuEditDelete();";
    else
       EWTreeWindow-->DeleteSelection.command = "";
-   
+
    if( %isLastSelection )
       Inspector.addInspect( %obj );
-   else  
+   else
       Inspector.addInspect( %obj, false );
-      
+
 }
 function EditorTree::onRemoveSelection(%this, %obj)
 {
@@ -1572,7 +1572,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 {
    %haveObjectEntries = false;
    %haveLockAndHideEntries = true;
-   
+
    // Handle multi-selection.
    if( %this.getSelectedItemsCount() > 1 )
    {
@@ -1605,7 +1605,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
       ETCameraBookmarkContextPopup.bookmark = %obj;
    }
-   
+
    // Open context menu if this is set CameraBookmarks group.
    else if( %obj.name $= "CameraBookmarks" )
    {
@@ -1647,19 +1647,19 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
          };
 
       %popup.object = %obj;
-      
+
       %hasChildren = %obj.getCount() > 0;
       %popup.enableItem( 10, %hasChildren );
       %popup.enableItem( 11, %hasChildren );
-      
+
       %haveObjectEntries = true;
       %haveLockAndHideEntries = false;
    }
-   
+
    // Open generic context menu.
    else
    {
-      %popup = ETContextPopup;      
+      %popup = ETContextPopup;
       if( !isObject( %popup ) )
          %popup = new PopupMenu( ETContextPopup )
          {
@@ -1677,11 +1677,11 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
             object = -1;
          };
-     
-      // Specialized version for ConvexShapes. 
+
+      // Specialized version for ConvexShapes.
       if( %obj.isMemberOfClass( "ConvexShape" ) )
       {
-         %popup = ETConvexShapeContextPopup;      
+         %popup = ETConvexShapeContextPopup;
          if( !isObject( %popup ) )
             %popup = new PopupMenu( ETConvexShapeContextPopup : ETContextPopup )
             {
@@ -1695,14 +1695,14 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
                item[ 12 ] = "Convert to Sound Space" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"SFXSpace\" );";
             };
       }
-      
+
       // Specialized version for polyhedral objects.
       else if( %obj.isMemberOfClass( "Zone" ) ||
                %obj.isMemberOfClass( "Portal" ) ||
                %obj.isMemberOfClass( "OcclusionVolume" ) ||
                %obj.isMemberOfClass( "SFXSpace" ) )
       {
-         %popup = ETPolyObjectContextPopup;      
+         %popup = ETPolyObjectContextPopup;
          if( !isObject( %popup ) )
             %popup = new PopupMenu( ETPolyObjectContextPopup : ETContextPopup )
             {
@@ -1719,7 +1719,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
    }
 
    if( %haveObjectEntries )
-   {         
+   {
       %popup.enableItem( 0, %obj.isNameChangeAllowed() && %obj.getName() !$= "MissionGroup" );
       %popup.enableItem( 1, %obj.getName() !$= "MissionGroup" );
       if( %haveLockAndHideEntries )
@@ -1729,7 +1729,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
       }
       %popup.enableItem( 7, %this.isItemSelected( %itemId ) );
    }
-   
+
    %popup.showPopup( Canvas );
 }
 
@@ -1758,9 +1758,9 @@ function EditorTree::onBeginReparenting( %this )
 {
    if( isObject( %this.reparentUndoAction ) )
       %this.reparentUndoAction.delete();
-      
+
    %action = UndoActionReparentObjects::create( %this );
-   
+
    %this.reparentUndoAction = %action;
 }
 
@@ -1780,9 +1780,9 @@ function EditorTree::onEndReparenting( %this )
          %action.actionName = "Reparent Object";
       else
          %action.actionName = "Reparent Objects";
-         
+
       %action.addToManager( Editor.getUndoManager() );
-      
+
       EWorldEditor.syncGui();
    }
    else
@@ -1867,12 +1867,12 @@ function EditorTree::GetTooltipParticleEmitterNode( %this, %obj )
 function EditorTree::GetTooltipWorldEditorSelection( %this, %obj )
 {
    %text = "Objects: " @ %obj.getCount();
-   
+
    if( !%obj.getCanSave() )
       %text = %text NL "Persistent: No";
    else
       %text = %text NL "Persistent: Yes";
-      
+
    return %text;
 }
 
@@ -1901,12 +1901,12 @@ function Editor::open(%this)
    // prevent the mission editor from opening while the GuiEditor is open.
    if(Canvas.getContent() == GuiEditorGui.getId())
       return;
-      
+
    if( !EditorGui.isInitialized )
       EditorGui.init();
 
    %this.editorEnabled();
-   Canvas.setContent(EditorGui);   
+   Canvas.setContent(EditorGui);
    EditorGui.syncCameraGui();
 }
 
@@ -1915,7 +1915,7 @@ function Editor::close(%this, %gui)
    %this.editorDisabled();
    Canvas.setContent(%gui);
    if(isObject(MessageHud))
-      MessageHud.close();   
+      MessageHud.close();
    EditorGui.writeCameraSettings();
 }
 
@@ -1925,12 +1925,12 @@ function EditorLightingComplete()
 {
    $lightingMission = false;
    RelightStatus.visible = false;
-   
+
    if ($RelightCallback !$= "")
    {
       eval($RelightCallback);
    }
-   
+
    $RelightCallback = "";
 }
 
@@ -1945,15 +1945,15 @@ function Editor::lightScene(%this, %callback, %forceAlways)
 {
    if ($lightingMission)
       return;
-      
+
    $lightingMission = true;
    $RelightCallback = %callback;
    RelightStatus.visible = true;
    RelightProgress.setValue(0);
-   Canvas.repaint();  
+   Canvas.repaint();
    lightScene("EditorLightingComplete", %forceAlways);
    updateEditorLightingProgress();
-} 
+}
 
 //------------------------------------------------------------------------------
 
@@ -1962,7 +1962,7 @@ function EditorGui::handleEscape( %this )
    %result = false;
    if ( isObject( %this.currentEditor ) )
       %result = %this.currentEditor.handleEscape();
-      
+
    if ( !%result )
    {
      Editor.close("PlayGui");
@@ -1972,10 +1972,10 @@ function EditorGui::handleEscape( %this )
 function EditTSCtrl::updateGizmoMode( %this, %mode )
 {
    // Called when the gizmo mode is changed from C++
-   
+
    if ( %mode $= "None" )
       EditorGuiToolbar->NoneModeBtn.performClick();
-   else if ( %mode $= "Move" )   
+   else if ( %mode $= "Move" )
       EditorGuiToolbar->MoveModeBtn.performClick();
    else if ( %mode $= "Rotate" )
       EditorGuiToolbar->RotateModeBtn.performClick();
@@ -1988,15 +1988,15 @@ function EditTSCtrl::updateGizmoMode( %this, %mode )
 function EWorldEditor::syncGui( %this )
 {
    %this.syncToolPalette();
-   
+
    EditorTree.update();
    Editor.getUndoManager().updateUndoMenu( EditorGui.menuBar-->EditMenu );
    EditorGuiStatusBar.setSelectionObjectsByCount( %this.getSelectionSize() );
-   
+
    EWTreeWindow-->LockSelection.setStateOn( %this.getSelectionLockCount() > 0 );
-   
+
    EWorldEditorToolbar-->boundingBoxColBtn.setStateOn( EWorldEditor.boundingBoxCollision );
-      
+
    if( EWorldEditor.objectsUseBoxCenter )
    {
       EWorldEditorToolbar-->centerObject.setBitmap("tools/gui/images/menubar/bounds-center");
@@ -2007,19 +2007,19 @@ function EWorldEditor::syncGui( %this )
       EWorldEditorToolbar-->centerObject.setBitmap("tools/gui/images/menubar/object-center");
       objectCenterDropdown-->objectBoxBtn.setStateOn( 1 );
    }
-   
+
    if( GlobalGizmoProfile.getFieldValue(alignment) $= "Object" )
    {
       EWorldEditorToolbar-->objectTransform.setBitmap("tools/gui/images/menubar/object-transform");
       objectTransformDropdown-->objectTransformBtn.setStateOn( 1 );
-      
+
    }
    else
    {
       EWorldEditorToolbar-->objectTransform.setBitmap("tools/gui/images/menubar/world-transform");
       objectTransformDropdown-->worldTransformBtn.setStateOn( 1 );
    }
-   
+
    EWorldEditorToolbar-->renderHandleBtn.setStateOn( EWorldEditor.renderObjHandle );
    EWorldEditorToolbar-->renderTextBtn.setStateOn( EWorldEditor.renderObjText );
 
@@ -2027,7 +2027,7 @@ function EWorldEditor::syncGui( %this )
    EWorldEditorToolbar-->softSnapSizeTextEdit.setText( EWorldEditor.getSoftSnapSize() );
    ESnapOptions-->SnapSize.setText( EWorldEditor.getSoftSnapSize() );
    ESnapOptions-->GridSize.setText( EWorldEditor.getGridSize() );
-   
+
    ESnapOptions-->GridSnapButton.setStateOn( %this.getGridSnap() );
    SnapToBar-->objectGridSnapBtn.setStateOn( %this.getGridSnap() );
    ESnapOptions-->NoSnapButton.setStateOn( !%this.stickToGround && !%this.getSoftSnap() && !%this.getGridSnap() );
@@ -2068,27 +2068,27 @@ function EWorldEditor::addSimGroup( %this, %groupCurrentSelection )
       else if( %firstSelectedObject.getId() != MissionGroup.getId() )
          %parent = %firstSelectedObject.parentGroup;
    }
-   
+
    // If we are about to do a group-selected as well,
    // starting recording an undo compound.
-   
+
    if( %groupCurrentSelection )
       Editor.getUndoManager().pushCompound( "Group Selected" );
-   
+
    // Create the SimGroup.
-   
+
    %object = new SimGroup()
    {
       parentGroup = %parent;
    };
    MECreateUndoAction::submit( %object );
-   
+
    // Put selected objects into the group, if requested.
-   
+
    if( %groupCurrentSelection && isObject( %activeSelection ) )
    {
       %undo = UndoActionReparentObjects::create( EditorTree );
-      
+
       %numObjects = %activeSelection.getCount();
       for( %i = 0; %i < %numObjects; %i ++ )
       {
@@ -2096,18 +2096,18 @@ function EWorldEditor::addSimGroup( %this, %groupCurrentSelection )
          %undo.add( %sel, %sel.parentGroup, %object );
          %object.add( %sel );
       }
-      
+
       %undo.addToManager( Editor.getUndoManager() );
    }
-      
+
    // Stop recording for group-selected.
-   
+
    if( %groupCurrentSelection )
       Editor.getUndoManager().popCompound();
-   
+
    // When not grouping selection, make the newly created SimGroup the
    // current selection.
-   
+
    if( !%groupCurrentSelection )
    {
       EWorldEditor.clearSelection();
@@ -2115,7 +2115,7 @@ function EWorldEditor::addSimGroup( %this, %groupCurrentSelection )
    }
 
    // Refresh the Gui.
-   
+
    %this.syncGui();
 }
 
@@ -2128,7 +2128,7 @@ function EWorldEditor::toggleLockChildren( %this, %simGroup )
       else
          %child.setLocked( !%child.locked );
    }
-   
+
    EWorldEditor.syncGui();
 }
 
@@ -2141,7 +2141,7 @@ function EWorldEditor::toggleHideChildren( %this, %simGroup )
       else
          %this.hideObject( %child, !%child.hidden );
    }
-   
+
    EWorldEditor.syncGui();
 }
 
@@ -2149,7 +2149,7 @@ function EWorldEditor::convertSelectionToPolyhedralObjects( %this, %className )
 {
    %group = %this.getNewObjectGroup();
    %undoManager = Editor.getUndoManager();
-   
+
    %activeSelection = %this.getActiveSelection();
    while( %activeSelection.getCount() != 0 )
    {
@@ -2170,7 +2170,7 @@ function EWorldEditor::convertSelectionToConvexShape( %this )
 {
    %group = %this.getNewObjectGroup();
    %undoManager = Editor.getUndoManager();
-   
+
    %activeSelection = %this.getActiveSelection();
    while( %activeSelection.getCount() != 0 )
    {
@@ -2195,12 +2195,12 @@ function EWorldEditor::getNewObjectGroup( %this )
 function EWorldEditor::deleteMissionObject( %this, %object )
 {
    // Unselect in editor tree.
-   
-   %id = EditorTree.findItemByObjectId( %object );   
+
+   %id = EditorTree.findItemByObjectId( %object );
    EditorTree.selectItem( %id, false );
-   
+
    // Delete object.
-   
+
    MEDeleteUndoAction::submit( %object );
    EWorldEditor.isDirty = true;
    EditorTree.buildVisibleTree( true );
@@ -2210,7 +2210,7 @@ function EWorldEditor::selectAllObjectsInSet( %this, %set, %deselect )
 {
    if( !isObject( %set ) )
       return;
-      
+
    foreach( %obj in %set )
    {
       if( %deselect )
@@ -2232,7 +2232,7 @@ function toggleSnappingOptions( %var )
          SnapToBar->objectSnapBtn.setStateOn(0);
       }
       else
-      { 
+      {
          // soft snapping
          EWorldEditor.stickToGround = 0;
          EWorldEditor.setSoftSnap(true);
@@ -2248,34 +2248,34 @@ function toggleSnappingOptions( %var )
       ESnapOptionsTabBook.selectPage(0);
       SnapToBar->objectSnapDownBtn.setStateOn(1);
       SnapToBar->objectSnapBtn.setStateOn(0);
-      
+
    }
    else if( %var $= "soft" && EWorldEditor.getSoftSnap() == false )
-   { 
+   {
       // Object Snapping
       EWorldEditor.stickToGround = 0;
       EWorldEditor.setSoftSnap(true);
       ESnapOptionsTabBook.selectPage(1);
       SnapToBar->objectSnapBtn.setStateOn(1);
       SnapToBar->objectSnapDownBtn.setStateOn(0);
-      
+
    }
    else if( %var $= "grid" )
    {
       EWorldEditor.setGridSnap( !EWorldEditor.getGridSnap() );
    }
    else
-   { 
+   {
       // No snapping.
-      
+
       EWorldEditor.stickToGround = false;
       EWorldEditor.setGridSnap( false );
       EWorldEditor.setSoftSnap( false );
-      
+
       SnapToBar->objectSnapDownBtn.setStateOn(0);
       SnapToBar->objectSnapBtn.setStateOn(0);
    }
-   
+
    EWorldEditor.syncGui();
 }
 
@@ -2353,7 +2353,7 @@ function EWToolsToolbar::reset( %this )
    %this.setExtent((29 + 4) * %count + 12, 33);
    %this.isClosed = 0;
    EWToolsToolbar.isDynamic = 0;
-      
+
    EWToolsToolbarDecoy.setVisible(false);
    EWToolsToolbarDecoy.setExtent((29 + 4) * %count + 4, 31);
 
@@ -2362,29 +2362,29 @@ function EWToolsToolbar::reset( %this )
 
 function EWToolsToolbar::toggleSize( %this, %useDynamics )
 {
-   // toggles the size of the tooltoolbar. also goes through 
+   // toggles the size of the tooltoolbar. also goes through
    // and hides each control not currently selected. we hide the controls
    // in a very neat, spiffy way
 
    if ( %this.isClosed == 0 )
    {
       %image = "tools/gui/images/expand-toolbar";
-      
+
       for( %i = 0 ; %i < ToolsToolbarArray.getCount(); %i++ )
       {
          if( ToolsToolbarArray.getObject(%i).getValue() != 1 )
             ToolsToolbarArray.getObject(%i).setVisible(false);
       }
-         
+
       %this.setExtent(43, 33);
       %this.isClosed = 1;
-      
+
       if(!%useDynamics)
       {
          EWToolsToolbarDecoy.setVisible(true);
          EWToolsToolbar.isDynamic = 1;
       }
-         
+
       EWToolsToolbarDecoy.setExtent(35, 31);
    }
    else
@@ -2394,10 +2394,10 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
       %count = ToolsToolbarArray.getCount();
       for( %i = 0 ; %i < %count; %i++ )
          ToolsToolbarArray.getObject(%i).setVisible(true);
-      
+
       %this.setExtent((29 + 4) * %count + 12, 33);
       %this.isClosed = 0;
-      
+
       if(!%useDynamics)
       {
          EWToolsToolbarDecoy.setVisible(false);
@@ -2408,7 +2408,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
    }
 
   %this-->resizeArrow.setBitmap( %image );
-  
+
 }
 
 function EWToolsToolbarDecoy::onMouseEnter( %this )

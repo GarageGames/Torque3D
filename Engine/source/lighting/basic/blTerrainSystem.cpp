@@ -148,7 +148,7 @@ public:
    virtual void addToShadowVolume(ShadowVolumeBSP * shadowVolume, LightInfo * light, S32 level);
 
    // events
-   //virtual void processTGELightProcessEvent(U32 curr, U32 max, LightInfo* currlight); 
+   //virtual void processTGELightProcessEvent(U32 curr, U32 max, LightInfo* currlight);
    //virtual void processSGObjectProcessEvent(LightInfo* currLight);
 };
 
@@ -316,7 +316,7 @@ void blTerrainProxy::light(LightInfo * light)
       for(U32 x = 0; x < mLightMapSize; x++)
       {
          ColorI color(255, 255, 255, 255);
-         
+
          color.red   = mLightmap[x + y * mLightMapSize].red   * 255;
          color.green = mLightmap[x + y * mLightMapSize].green * 255;
          color.blue  = mLightmap[x + y * mLightMapSize].blue  * 255;
@@ -519,7 +519,7 @@ void blTerrainProxy::lightVector(LightInfo * light)
    Point3F lightDir = -light->getDirection();
    lightDir.normalize();
 
-   // Get the ratio between the light map pixel and world space (used below)   
+   // Get the ratio between the light map pixel and world space (used below)
    F32 lmTerrRatio = (F32)mTerrainBlockSize / (F32) mLightMapSize;
    lmTerrRatio *= terrain->getSquareSize();
 
@@ -534,11 +534,11 @@ void blTerrainProxy::lightVector(LightInfo * light)
          // Get the relative pixel position and scale it
          // by the ratio between lightmap and world space
          Point2F pixelPos(x, y);
-         pixelPos *= lmTerrRatio;         
-         
+         pixelPos *= lmTerrRatio;
+
          // Start with a default normal of straight up
          Point3F normal(0.0f, 0.0f, 1.0f);
-         
+
          // Try to get the actual normal from the terrain.
          // Note: this won't change the default normal if
          // it can't find a normal.
@@ -569,7 +569,7 @@ void blTerrainProxy::lightVector(LightInfo * light)
          Point3F lightPos = light->getPosition();
          if(light->getType() == LightInfo::Vector)
          {
-            lightPos = 1000.f * lightDir;            
+            lightPos = 1000.f * lightDir;
             lightPos = pixelPos3F + lightPos;
          }
 

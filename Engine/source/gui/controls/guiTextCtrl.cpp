@@ -93,23 +93,23 @@ void GuiTextCtrl::initPersistFields()
       "The text to show on the control.");
 
    addField( "textID",     TypeString,      Offset( mInitialTextID, GuiTextCtrl ),
-      "Maps the text of this control to a variable used in localization, rather than raw text.");   
+      "Maps the text of this control to a variable used in localization, rather than raw text.");
 
    addField( "maxLength",  TypeS32,         Offset( mMaxStrLen, GuiTextCtrl ),
       "Defines the maximum length of the text.  The default is 1024." );
 
-   Parent::initPersistFields();    
+   Parent::initPersistFields();
 }
 
 bool GuiTextCtrl::onAdd()
 {
    if(!Parent::onAdd())
       return false;
-      
+
    dStrncpy(mText, (UTF8*)mInitialText, MAX_STRING_LENGTH);
    mText[MAX_STRING_LENGTH] = '\0';
-   
-   
+
+
    return true;
 }
 
@@ -128,7 +128,7 @@ bool GuiTextCtrl::onWake()
 {
    if ( !Parent::onWake() )
       return false;
-   
+
    if( !mProfile->mFont )
    {
       Con::errorf( "GuiTextCtrl::onWake() - no valid font in profile '%s'", mProfile->getName() );
@@ -154,7 +154,7 @@ bool GuiTextCtrl::onWake()
             setScriptValue( txt );
       }
    }
-   
+
    //resize
    autoResize();
 
@@ -171,7 +171,7 @@ void GuiTextCtrl::autoResize()
          if( !mProfile->mFont )
             return;
       }
-         
+
       Point2I newExtents = getExtent();
       if ( mProfile->mAutoSizeWidth )
          newExtents.x = mProfile->mFont->getStrWidth((const UTF8 *) mText );
@@ -187,16 +187,16 @@ void GuiTextCtrl::setText(const char *txt)
    //make sure we don't call this before onAdd();
    if( !mProfile )
       return;
-   
+
    if (txt)
       dStrncpy(mText, (UTF8*)txt, MAX_STRING_LENGTH);
    mText[MAX_STRING_LENGTH] = '\0';
-   
+
    setVariable((char*)mText);
    setUpdate();
-   
+
    autoResize();
-} 
+}
 
 void GuiTextCtrl::setTextID(const char *id)
 {
@@ -218,7 +218,7 @@ void GuiTextCtrl::setTextID(S32 id)
 void GuiTextCtrl::onPreRender()
 {
    Parent::onPreRender();
-   
+
    const char * var = getVariable();
    if(var && var[0] && dStricmp((char*)mText, var))
       setText(var);

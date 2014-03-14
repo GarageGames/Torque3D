@@ -43,7 +43,7 @@
 #include "console/engineAPI.h"
 #include "particleEmitter.h"
 
-static const U32 dropHitMask = 
+static const U32 dropHitMask =
    TerrainObjectType |
    WaterObjectType |
    StaticShapeObjectType;
@@ -753,8 +753,8 @@ void Precipitation::unpackUpdate(NetConnection* con, BitStream* stream)
       mFollowCam = stream->readFlag();
       mAnimateSplashes = stream->readFlag();
 
-      mDropHitMask = dropHitMask | 
-         ( mDropHitPlayers ? PlayerObjectType : 0 ) | 
+      mDropHitMask = dropHitMask |
+         ( mDropHitPlayers ? PlayerObjectType : 0 ) |
          ( mDropHitVehicles ? VehicleObjectType : 0 );
 
       mTurbulenceData.valid = false;
@@ -973,7 +973,7 @@ void Precipitation::initRenderObjects()
    for( U32 i=0; i < mMaxVBDrops; i++ )
    {
       //
-      // The vertex pattern in the VB for each 
+      // The vertex pattern in the VB for each
       // particle is as follows...
       //
       //     0----1
@@ -1022,7 +1022,7 @@ void Precipitation::spawnDrop(Raindrop *drop)
    drop->position.x = Platform::getRandom() * mBoxWidth;
    drop->position.y = Platform::getRandom() * mBoxWidth;
 
-   // The start time should be randomized so that 
+   // The start time should be randomized so that
    // all the drops are not animating at the same time.
    drop->animStartTime = (SimTime)(Platform::getVirtualMilliseconds() * Platform::getRandom());
 
@@ -1106,7 +1106,7 @@ void Precipitation::findDropCutoff(Raindrop *drop, const Box3F &box, const Vecto
          mObjToWorld.mulP(end);
       }
 
-      // Look for a collision... make sure we don't 
+      // Look for a collision... make sure we don't
       // collide with backfaces.
       RayInfo rInfo;
       if (getContainer()->castRay(start, end, mDropHitMask, &rInfo))
@@ -1192,7 +1192,7 @@ void Precipitation::setPercentage(F32 pct)
    mPercentage = mClampF(pct, 0, 1);
    mStormData.valid = false;
 
-   if (isServerObject()) 
+   if (isServerObject())
    {
       setMaskBits(PercentageMask);
    }
@@ -1200,7 +1200,7 @@ void Precipitation::setPercentage(F32 pct)
 
 void Precipitation::modifyStorm(F32 pct, U32 ms)
 {
-   if ( ms == 0 ) 
+   if ( ms == 0 )
    {
       setPercentage( pct );
       return;
@@ -1223,7 +1223,7 @@ void Precipitation::modifyStorm(F32 pct, U32 ms)
 
 void Precipitation::setTurbulence(F32 max, F32 speed, U32 ms)
 {
-   if ( ms == 0 && !isServerObject() ) 
+   if ( ms == 0 && !isServerObject() )
    {
       mUseTurbulence = max > 0;
       mMaxTurbulence = max;
@@ -1334,8 +1334,8 @@ void Precipitation::processTick(const Move *)
       mUseTurbulence = mMaxTurbulence > 0;
    }
 
-   // If we're not being seen then pause the 
-   // simulation.  Precip is generally noisy 
+   // If we're not being seen then pause the
+   // simulation.  Precip is generally noisy
    // enough that no one should notice.
    if (mLastRenderFrame != ShapeBase::sLastRenderFrame)
       return;
@@ -1388,7 +1388,7 @@ void Precipitation::processTick(const Move *)
 
    //offset the renderbox in the direction of the camera direction
    //in order to have more of the drops actually rendered
-   if (mFollowCam) 
+   if (mFollowCam)
    {
       box.minExtents.x += camDir.x * mBoxWidth / 4;
       box.maxExtents.x += camDir.x * mBoxWidth / 4;
@@ -1432,7 +1432,7 @@ void Precipitation::processTick(const Move *)
          // The drop is dead.
          curr->valid = false;
 
-         // Convert the drop into a splash or let it 
+         // Convert the drop into a splash or let it
          // wrap around and respawn in wrapDrop().
          if (mSplashMS > 0)
             createSplash(curr);
@@ -1442,7 +1442,7 @@ NO_SPLASH:;
       }
 
       // We do not do cull individual drops when we're not
-      // following as it is usually a tight box and all of 
+      // following as it is usually a tight box and all of
       // the particles are in view.
       if (!mFollowCam)
          curr->toRender = true;
@@ -1539,7 +1539,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       world.mul( getRenderTransform() );
       world.scale( getScale() );
       GFX->setWorldMatrix( world );
-   }    
+   }
    proj.mul(world);
 
    //GFX2 doesn't require transpose?
@@ -1582,7 +1582,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       leftUp = -right + up;
    }
 
-   // We pass the sunlight as a constant to the 
+   // We pass the sunlight as a constant to the
    // shader.  Once the lighting and shadow systems
    // are added into TSE we can expand this to include
    // the N nearest lights to the camera + the ambient.
@@ -1632,7 +1632,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
    GFX->setVertexBuffer(mRainVB);
 
    // Set the constants used by the shaders.
-   if (mDropShader) 
+   if (mDropShader)
    {
       Point2F fadeStartEnd( mFadeDistance, mFadeDistanceEnd );
 
@@ -1643,7 +1643,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
    }
 
 
-   if (mSplashShader) 
+   if (mSplashShader)
    {
       Point2F fadeStartEnd( mFadeDistance, mFadeDistanceEnd );
 
@@ -1659,7 +1659,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
 
    GFX->setTexture(0, mDropHandle);
 
-   // Use the shader or setup the pipeline 
+   // Use the shader or setup the pipeline
    // for fixed function rendering.
    if (mDropShader)
    {
@@ -1676,8 +1676,8 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
 
    while (curr)
    {
-      // Skip ones that are not drops (hit something and 
-      // may have been converted into a splash) or they 
+      // Skip ones that are not drops (hit something and
+      // may have been converted into a splash) or they
       // are behind the camera.
       if (!curr->valid || !curr->toRender)
       {
@@ -1687,17 +1687,17 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
 
       pos = curr->renderPosition;
 
-      // two forms of billboards - true billboards (which we set 
+      // two forms of billboards - true billboards (which we set
       // above outside this loop) or axis-aligned with velocity
       // (this codeblock) the axis-aligned billboards are aligned
-      // with the velocity of the raindrop, and tilted slightly 
+      // with the velocity of the raindrop, and tilted slightly
       // towards the camera
       if (!useBillboards)
       {
          orthoDir = camPos - pos;
          distance = orthoDir.len();
 
-         // Inline the normalize so we don't 
+         // Inline the normalize so we don't
          // calculate the ortho len twice.
          if (distance > 0.0)
             orthoDir *= 1.0f / distance;

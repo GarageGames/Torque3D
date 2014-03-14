@@ -185,7 +185,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 
          backslash(fromFile);
          backslash(toFile);
-         
+
 #ifdef UNICODE
          convertUTF8toUTF16( tempBuf, wtempBuf, wtempBuf.size );
          convertUTF8toUTF16( tempBuf1, wtempBuf1, wtempBuf1.size );
@@ -593,7 +593,7 @@ static bool recurseDumpPath(const char *path, const char *pattern, Vector<Platfo
 #endif
 
    backslash( search );
-   
+
    HANDLE handle = FindFirstFile(search, &findData);
    if (handle == INVALID_HANDLE_VALUE)
       return false;
@@ -610,7 +610,7 @@ static bool recurseDumpPath(const char *path, const char *pattern, Vector<Platfo
       if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
          // make sure it is a directory
-         if (findData.dwFileAttributes & (FILE_ATTRIBUTE_OFFLINE|FILE_ATTRIBUTE_SYSTEM) )                             
+         if (findData.dwFileAttributes & (FILE_ATTRIBUTE_OFFLINE|FILE_ATTRIBUTE_SYSTEM) )
             continue;
 
          // skip . and .. directories
@@ -627,17 +627,17 @@ static bool recurseDumpPath(const char *path, const char *pattern, Vector<Platfo
             recurseDumpPath(child, pattern, fileVector, recurseDepth - 1);
          else if (recurseDepth == -1)
             recurseDumpPath(child, pattern, fileVector, -1);
-      }      
+      }
       else
       {
          // make sure it is the kind of file we're looking for
-         if (findData.dwFileAttributes & 
-             (FILE_ATTRIBUTE_DIRECTORY|                                      
+         if (findData.dwFileAttributes &
+             (FILE_ATTRIBUTE_DIRECTORY|
               FILE_ATTRIBUTE_OFFLINE|
               FILE_ATTRIBUTE_SYSTEM|
-              FILE_ATTRIBUTE_TEMPORARY) )                             
+              FILE_ATTRIBUTE_TEMPORARY) )
             continue;
-         
+
          // add it to the list
          fileVector.increment();
          Platform::FileInfo& rInfo = fileVector.last();
@@ -713,7 +713,7 @@ bool Platform::createPath(const char *file)
       TCHAR* pathptr = pathbuf;
       dMemcpy( pathptr + pathLen, fileName, ( dir - fileName ) * sizeof( TCHAR ) );
       pathbuf[pathLen + dir-fileName] = 0;
- 
+
       // ignore return value because we are fine with already existing directory
       CreateDirectory(pathbuf, NULL);
 
@@ -948,7 +948,7 @@ bool Platform::isFile(const char *pFilePath)
 
    if(handle == INVALID_HANDLE_VALUE)
    {
-    
+
       // Since file does not exist on disk see if it exists in a zip file loaded
       return Torque::FS::IsFile(pFilePath);
    }
@@ -1028,7 +1028,7 @@ bool Platform::isDirectory(const char *pDirPath)
       return false;
 
    FindClose(handle);
-   
+
    // if the file is a Directory, Offline, System or Temporary then FALSE
    if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
    {
@@ -1139,7 +1139,7 @@ void Platform::getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bO
 	char driveLetter[12];
 
    out_rNameVector.clear();
-		
+
 	for(int i = 0; i < 32; i++ )
 	{
 		dMemset(driveLetter,0,12);
@@ -1286,7 +1286,7 @@ bool Platform::hasSubDirectory(const char *pPath)
 
          result = true;
          break;
-      }      
+      }
    }
    while(FindNextFile(handle, &findData));
 
@@ -1432,7 +1432,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
             if( currentDepth < recurseDepth || recurseDepth == -1 )
                recurseDumpDirectories(basePath, child, directoryVector, currentDepth+1, recurseDepth, noBasePath );
          }
-      }      
+      }
    }
    while(FindNextFile(handle, &findData));
 

@@ -292,7 +292,7 @@ datablock ShapeBaseImageData(RyderWeaponImage)
    stateSequence[7]                 = "idle";
    stateScaleAnimation[7]           = false;
    stateScaleAnimationFP[7]         = false;
-   
+
    stateName[8]                     = "NoAmmoMotion";
    stateTransitionGeneric0In[8]     = "SprintEnter";
    stateTransitionOnNoMotion[8]     = "NoAmmo";
@@ -350,7 +350,7 @@ datablock ShapeBaseImageData(RyderWeaponImage)
    stateSequenceTransitionOut[12]   = true;
    stateAllowImageChange[12]        = false;
    stateSequence[12]                = "sprint";
-   
+
    // Stop Sprinting
    stateName[13]                    = "SprintExit";
    stateTransitionGeneric0In[13]    = "SprintEnter";

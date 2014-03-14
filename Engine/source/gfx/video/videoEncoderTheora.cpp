@@ -80,23 +80,23 @@ static void initLookupTables()
 class VideoEncoderTheora : public VideoEncoder, public Thread
 {
    U32 mCurrentFrame;
-   
-   ogg_stream_state to; // take physical pages, weld into a logical stream of packets   
+
+   ogg_stream_state to; // take physical pages, weld into a logical stream of packets
    th_enc_ctx      *td; // Theora encoder context
    th_info          ti; // Theora info structure
    th_comment       tc; // Theora comment structure
-   
+
    FileStream mFile;    // Output file
 
    th_ycbcr_buffer mBuffer; // YCbCr buffer
-      
+
    GBitmap* mLastFrame;
 
-   ThreadSafeDeque< GBitmap* > mFrameBitmapList; // List with unprocessed frame bitmaps   
+   ThreadSafeDeque< GBitmap* > mFrameBitmapList; // List with unprocessed frame bitmaps
    Semaphore  mSemaphore;    //Semaphore for preventing the encoder from being lagged behind the game
 
    bool mErrorStatus; //Status flag, true if OK, false if an error ocurred
-   
+
    /// Sets our error status
    bool setStatus(bool status)
    {
@@ -107,12 +107,12 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
 
    /// Encodes one frame
    void encodeFrame( GBitmap* bitmap, bool isLast=false )
-   {        
+   {
       PROFILE_SCOPE(Theora_encodeFrame);
-      
+
       //Copy bitmap to YUV buffer
-      copyBitmapToYUV420(bitmap);      
-            
+      copyBitmapToYUV420(bitmap);
+
       PROFILE_START(th_encode_ycbcr_in);
       //Submit frame for encoding
       if (th_encode_ycbcr_in(td, mBuffer))
@@ -121,9 +121,9 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
          setStatus(false);
          PROFILE_END();
          return;
-      }      
+      }
       PROFILE_END();
-            
+
       //Fetch the encoded packets
       ogg_packet packet;
       if (!th_encode_packetout(td, isLast, &packet))
@@ -139,8 +139,8 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
       //Increment
       mCurrentFrame++;
 
-      //Is there a video page flushed? 
-      ogg_page videopage;        
+      //Is there a video page flushed?
+      ogg_page videopage;
       while (ogg_stream_pageout(&to,&videopage))
       {
          //Write the video page to disk
@@ -149,7 +149,7 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
 
          F64 videotime = th_granule_time(td,ogg_page_granulepos(&videopage));
          if (videotime > 0)
-         {            
+         {
             int hundredths=(int)(videotime*100-(long)videotime*100);
             int seconds=(long)videotime%60;
             Platform::outputDebugString("Encoding time %g %02i.%02i", videotime, seconds, hundredths);
@@ -158,19 +158,19 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
 
       mSemaphore.release();
    }
-   
+
    bool process(bool ending)
    {
       if (!getStatus())
          return false;
 
-      //Try getting a bitmap for encoding         
-      GBitmap* bitmap = NULL;      
-      if (mFrameBitmapList.tryPopFront(bitmap))   
-      {         
+      //Try getting a bitmap for encoding
+      GBitmap* bitmap = NULL;
+      if (mFrameBitmapList.tryPopFront(bitmap))
+      {
          encodeFrame(bitmap, false);
       }
-            
+
       //Delete previous bitmap
       if (!ending && bitmap)
       {
@@ -182,7 +182,7 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
       //If we're stopping encoding, but didn't have a frame, re-encode the last frame
       if (ending && !bitmap && mLastFrame)
       {
-         encodeFrame(mLastFrame, true);         
+         encodeFrame(mLastFrame, true);
          pushProcessedBitmap(mLastFrame);
          mLastFrame = NULL;
       }
@@ -190,34 +190,34 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
       // We'll live while we have a last frame
       return (mLastFrame != NULL);
    }
-   
+
 public:
    VideoEncoderTheora() :
-      mLastFrame(NULL)      
+      mLastFrame(NULL)
    {
-      setStatus(false);      
+      setStatus(false);
    }
-      
+
    virtual void run( void* arg )
-   {      
+   {
       _setName( "TheoraEncoderThread" );
       while (!checkForStop())
          process(false);
 
       // Encode all pending frames and close the last one
       while (process(true));
-   }   
+   }
 
    /// Begins accepting frames for encoding
    bool begin()
    {
       mPath += ".ogv";
       mCurrentFrame = 0;
-            
+
       //Try opening the file for writing
       if ( !mFile.open( mPath, Torque::FS::File::Write ) )
       {
-         Platform::outputDebugString( "VideoEncoderTheora::begin() - Failed to open output file '%s'!", mPath.c_str() );         
+         Platform::outputDebugString( "VideoEncoderTheora::begin() - Failed to open output file '%s'!", mPath.c_str() );
          return setStatus(false);
       }
 
@@ -239,26 +239,26 @@ public:
       ti.aspect_numerator   = 0;
       ti.aspect_denominator = 0;
       ti.colorspace = TH_CS_UNSPECIFIED;
-      
+
       ti.target_bitrate = 0;
       ti.quality        = 63;
       ti.pixel_fmt      = TH_PF_420;
-            
+
       td = th_encode_alloc(&ti);
       if (td == NULL)
       {
-         Platform::outputDebugString("VideoEncoderTheora::begin() - Theora initialization error.");   
+         Platform::outputDebugString("VideoEncoderTheora::begin() - Theora initialization error.");
          return setStatus(false);
       }
 
-      th_info_clear(&ti);              
+      th_info_clear(&ti);
 
       // This is needed for youtube compatibility
       int vp3_compatible = 1;
-      th_encode_ctl(td, TH_ENCCTL_SET_VP3_COMPATIBLE, &vp3_compatible, sizeof(vp3_compatible));      
-      
+      th_encode_ctl(td, TH_ENCCTL_SET_VP3_COMPATIBLE, &vp3_compatible, sizeof(vp3_compatible));
+
       // Set the encoder to max speed
-      int speed_max;      
+      int speed_max;
       int ret;
       ret = th_encode_ctl(td, TH_ENCCTL_GET_SPLEVEL_MAX, &speed_max, sizeof(speed_max));
       if(ret<0){
@@ -280,16 +280,16 @@ public:
       ogg_page og;
       ogg_stream_packetin(&to,&op);
       if(ogg_stream_pageout(&to,&og) != 1)
-      {         
+      {
          Platform::outputDebugString("VideoEncoderTheora::begin() - Internal Ogg library error.");
          return setStatus(false);
       }
       mFile.write(og.header_len, og.header);
       mFile.write(og.body_len, og.body);
 
-      // create the remaining theora headers    
+      // create the remaining theora headers
       while((ret = th_encode_flushheader(td,&tc,&op)) != 0)
-      {         
+      {
          if(ret < 0)
          {
             Platform::outputDebugString("VideoEncoderTheora::begin() - Internal Theora library error.");
@@ -302,7 +302,7 @@ public:
       // the actual data in each stream will start
       // on a new page, as per spec.
       while((ret = ogg_stream_flush(&to,&og)) != 0)
-      {         
+      {
          if(ret < 0)
          {
             Platform::outputDebugString("VideoEncoderTheora::begin() - Internal Ogg library error.");
@@ -312,7 +312,7 @@ public:
          mFile.write(og.body_len, og.body);
       }
 
-      //Initialize the YUV buffer 
+      //Initialize the YUV buffer
       S32 decimation[] = {0,1,1};
       for (U32 i=0; i<3; i++)
       {
@@ -320,7 +320,7 @@ public:
          mBuffer[i].height = mResolution.y >> decimation[i];
          mBuffer[i].stride = mBuffer[i].width * sizeof(U8);
          mBuffer[i].data = new U8[mBuffer[i].width*mBuffer[i].height*sizeof(U8)];
-      }      
+      }
 
       //Initialize the YUV coefficient lookup tables
       initLookupTables();
@@ -330,14 +330,14 @@ public:
 #ifndef THEORA_ENCODER_SINGLE_THREAD
       start();
 #endif
-      
+
       return getStatus();
    }
 
    /// Pushes a new frame into the video stream
    bool pushFrame( GBitmap * bitmap )
-   {      
-                  
+   {
+
       // Push the bitmap into the frame list
       mFrameBitmapList.pushBack( bitmap );
 
@@ -346,13 +346,13 @@ public:
 #ifdef THEORA_ENCODER_SINGLE_THREAD
       process(false);
 #endif
-      
+
       return getStatus();
    }
 
    /// Finishes the encoding and closes the video
    bool end()
-   {  
+   {
       //Let's wait the thread stop doing whatever it needs to do
       stop();
       join();
@@ -360,7 +360,7 @@ public:
 #ifdef THEORA_ENCODER_SINGLE_THREAD
       while (process(true));
 #endif
-            
+
       th_encode_free(td);
       ogg_stream_clear(&to);
       th_comment_clear(&tc);
@@ -368,29 +368,29 @@ public:
       mFile.close();
       return true;
    }
-   
 
-   void setResolution( Point2I* resolution ) 
-   { 
+
+   void setResolution( Point2I* resolution )
+   {
       /* Theora has a divisible-by-sixteen restriction for the encoded frame size */
       /* scale the picture size up to the nearest /16 and calculate offsets */
       resolution->x = (resolution->x) + 15 & ~0xF;
       resolution->y = (resolution->y) + 15 & ~0xF;
 
-      mResolution = *resolution; 
+      mResolution = *resolution;
    }
-   
+
    /// Converts the bitmap to YUV420 and copies it into our internal buffer
    void copyBitmapToYUV420( GBitmap* bitmap )
    {
       PROFILE_SCOPE(copyBitmapToYUV420);
 
       // Convert luma
-      const U8* rgb = bitmap->getBits();           
-      
+      const U8* rgb = bitmap->getBits();
+
       // Chroma planes are half width and half height
       U32 w = mResolution.x / 2;
-      U32 h = mResolution.y / 2;      
+      U32 h = mResolution.y / 2;
 
       // We'll update two luminance rows at once
       U8* yuv_y0 = mBuffer[0].data;
@@ -405,9 +405,9 @@ public:
       const U8* row0 = rgb;
       const U8* row1 = row0 + rgbStride;
 
-      for(U32 y = 0; y < h; y++) 
-      {         
-         for(U32 x = 0; x < w; x++) 
+      for(U32 y = 0; y < h; y++)
+      {
+         for(U32 x = 0; x < w; x++)
          {
             // Fetch two RGB samples from each RGB row (for downsampling the chroma)
             U8 r0 = *row0++;
@@ -423,7 +423,7 @@ public:
             U8 g3 = *row1++;
             U8 b3 = *row1++;
 
-            // Convert the four RGB samples into four luminance samples            
+            // Convert the four RGB samples into four luminance samples
             *yuv_y0 = ( (sYRGB[r0][0] + sYRGB[g0][1] + sYRGB[b0][2]) >> 8);
             yuv_y0++;
             *yuv_y0 = ( (sYRGB[r1][0] + sYRGB[g1][1] + sYRGB[b1][2]) >> 8);
@@ -452,7 +452,7 @@ public:
          //Next luminance rows
          yuv_y0 += mBuffer[0].stride;
          yuv_y1 += mBuffer[0].stride;
-      }      
+      }
    }
 };
 

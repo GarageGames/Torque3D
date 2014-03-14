@@ -28,7 +28,7 @@
 
 U32 TerrainRender::testSquareLights(GridSquare *sq, S32 level, const Point2I &pos, U32 lightMask)
 {
-   
+
    // Calculate our Box3F for this GridSquare
    Point3F boxMin(pos.x * mSquareSize + mBlockPos.x, pos.y * mSquareSize + mBlockPos.y, fixedToFloat(sq->minHeight));
    F32 blockSize = F32(mSquareSize * (1 << level));
@@ -45,7 +45,7 @@ U32 TerrainRender::testSquareLights(GridSquare *sq, S32 level, const Point2I &po
       {
          if (mTerrainLights[i].light->mType != LightInfo::Vector)
          {
-            // test the visibility of this light to box         
+            // test the visibility of this light to box
             F32 dist = gridBox.getDistanceFromPoint(mTerrainLights[i].pos);
             static F32 minDist = 1e14f;
             minDist = getMin(minDist, dist);
@@ -68,7 +68,7 @@ void TerrainRender::buildLightArray(SceneState * state)
       return;
 
    static LightInfoList lights;
-   lights.clear();   
+   lights.clear();
 
    LIGHTMGR->getBestLights(lights);
    // create terrain lights from these...

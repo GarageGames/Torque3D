@@ -42,7 +42,7 @@ template <class T> class SimpleHashTable : public SparseArray<T>
    bool mCaseSensitive;
 
    char mCaseConvBuf[1024];
-   
+
    // [tom, 9/21/2006] This is incredibly lame and adds a pretty big speed penalty
    inline const char *caseConv(const char *str)
    {

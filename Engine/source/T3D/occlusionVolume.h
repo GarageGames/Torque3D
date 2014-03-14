@@ -53,7 +53,7 @@ class OcclusionVolume : public ScenePolyhedralSpace
 
       /// Silhouette extractor when using perspective projections.
       SilhouetteExtractorType mSilhouetteExtractor;
-      
+
       // SceneSpace.
       virtual void _renderObject( ObjectRenderInst* ri, SceneRenderState* state, BaseMatInstance* overrideMat );
 

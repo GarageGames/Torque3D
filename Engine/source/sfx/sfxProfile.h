@@ -52,13 +52,13 @@ class SFXDescription;
 ///
 /// A few tips:
 ///
-/// Make sure each of the defined SFXProfile's fileName doesn't specify 
+/// Make sure each of the defined SFXProfile's fileName doesn't specify
 /// an extension. An extension does not need to be specified and by not
-/// explicitly saying .ogg or .wav it will allow you to change from one 
+/// explicitly saying .ogg or .wav it will allow you to change from one
 /// format to the other without having to change the scripts.
 ///
-/// Make sure that server SFXProfiles are defined with the datablock 
-/// keyword, and that client SFXProfiles are defined with the 'new' 
+/// Make sure that server SFXProfiles are defined with the datablock
+/// keyword, and that client SFXProfiles are defined with the 'new'
 /// keyword.
 ///
 /// Make sure SFXDescriptions exist for your SFXProfiles. Also make sure
@@ -72,11 +72,11 @@ class SFXDescription;
 class SFXProfile : public SFXTrack
 {
    public:
-   
+
       friend class SFXEmitter; // For access to mFilename
-      
+
       typedef SFXTrack Parent;
-      
+
       typedef Signal< void( SFXProfile* ) > ChangedSignal;
 
    protected:
@@ -85,20 +85,20 @@ class SFXProfile : public SFXTrack
       /// @note ATM only valid if loaded through SFX's loading system rather than
       ///   through the SFXDevice's loading system.
       Resource< SFXResource > mResource;
-      
+
       /// The sound filename.  If no extension is specified
       /// the system will try .wav first then other formats.
       String mFilename;
 
       /// If true the sound data will be loaded from
-      /// disk and possibly cached with the active 
+      /// disk and possibly cached with the active
       /// device before the first call for playback.
       bool mPreload;
 
       /// The device specific data buffer.
       /// This is only used if for non-streaming sounds.
       StrongWeakRefPtr< SFXBuffer > mBuffer;
-      
+
       ///
       ChangedSignal mChangedSignal;
 
@@ -110,26 +110,26 @@ class SFXProfile : public SFXTrack
 
       ///
       SFXBuffer* _createBuffer();
-      
+
       ///
       void _onResourceChanged( const Torque::Path& path );
-      
+
       ///
       void _registerSignals();
-      
+
       ///
       void _unregisterSignals();
 
    public:
 
-      /// This is only here to allow DECLARE_CONOBJECT 
+      /// This is only here to allow DECLARE_CONOBJECT
       /// to create us from script.  You shouldn't use
       /// this constructor from C++.
       explicit SFXProfile();
 
       /// The constructor.
-      SFXProfile( SFXDescription* desc, 
-                  const String& filename = String(), 
+      SFXProfile( SFXDescription* desc,
+                  const String& filename = String(),
                   bool preload = false );
 
       /// The destructor.
@@ -138,11 +138,11 @@ class SFXProfile : public SFXTrack
       DECLARE_CONOBJECT( SFXProfile );
 
       static void initPersistFields();
-      
+
       // SFXTrack.
       virtual bool isLooping() const;
 
-      // SimObject 
+      // SimObject
       bool onAdd();
       void onRemove();
       void packData( BitStream* stream );
@@ -161,7 +161,7 @@ class SFXProfile : public SFXTrack
       /// @note May be NULL if file is loaded directly through SFXDevice.
       Resource<SFXResource>& getResource();
 
-      /// Returns the device specific buffer for this for this 
+      /// Returns the device specific buffer for this for this
       /// sound.  If it hasn't been preloaded it will be loaded
       /// at this time.
       ///
@@ -169,10 +169,10 @@ class SFXProfile : public SFXTrack
       /// returned must be deleted by the caller.
       SFXBuffer* getBuffer();
 
-      /// Gets the sound duration in milliseconds or 
+      /// Gets the sound duration in milliseconds or
       /// returns 0 if the resource was not found.
       U32 getSoundDuration();
-      
+
       ///
       ChangedSignal& getChangedSignal() { return mChangedSignal; }
 };

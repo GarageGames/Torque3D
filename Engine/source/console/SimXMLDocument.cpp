@@ -65,7 +65,7 @@ ConsoleDocClass( SimXMLDocument,
    "function readXmlExample(%filename)\n"
 	"{\n"
 	"   %xml = new SimXMLDocument() {};\n"
-	"   %xml.loadFile(%filename);\n\n"	   
+	"   %xml.loadFile(%filename);\n\n"
 	"   %xml.pushChildElement(\"DataTables\");\n"
 	"   %xml.pushFirstChildElement(\"table\");\n"
 	"   while(true)\n"
@@ -213,9 +213,9 @@ void SimXMLDocument::reset(void)
 
 DefineEngineMethod( SimXMLDocument, reset, void, (),,
    "@brief Set this document to its default state.\n\n"
-   
+
    "Clears all Elements from the documents.  Equivalent to using clear()\n\n"
-   
+
    "@see clear()")
 {
    object->reset();
@@ -295,9 +295,9 @@ void SimXMLDocument::clear(void)
 
 DefineEngineMethod( SimXMLDocument, clear, void, (),,
    "@brief Set this document to its default state.\n\n"
-   
+
    "Clears all Elements from the documents.  Equivalent to using reset()\n\n"
-   
+
    "@see reset()")
 {
    object->clear();
@@ -915,7 +915,7 @@ DefineEngineMethod( SimXMLDocument, setObjectAttributes, void, ( const char* obj
 // New element is placed on top of element stack.
 // -----------------------------------------------------------------------------
 void SimXMLDocument::pushNewElement(const char* rName)
-{    
+{
    TiXmlElement cElement( rName );
    TiXmlElement* pStackTop = 0;
    if(m_paNode.empty())
@@ -960,7 +960,7 @@ DefineEngineMethod( SimXMLDocument, pushNewElement, void, ( const char* name ),,
 // New element is placed on top of element stack.
 // -----------------------------------------------------------------------------
 void SimXMLDocument::addNewElement(const char* rName)
-{    
+{
    TiXmlElement cElement( rName );
    TiXmlElement* pStackTop = 0;
    if(m_paNode.empty())
@@ -993,7 +993,7 @@ void SimXMLDocument::addNewElement(const char* rName)
       if(!pNode)
       {
          return;
-      }   
+      }
       pStackTop = dynamic_cast<TiXmlElement*>
          (pNode->InsertEndChild( cElement ));
       if(!pStackTop)
@@ -1017,7 +1017,7 @@ DefineEngineMethod( SimXMLDocument, addNewElement, void, ( const char* name ),,
    "the new Element a sibling of the current one.\n\n"
 
    "@param name XML tag for the new Element.\n"
-   
+
    "@see pushNewElement()")
 {
    object->addNewElement( name );
@@ -1039,7 +1039,7 @@ DefineEngineMethod( SimXMLDocument, addHeader, void, (),,
    "the document before adding any elements.  SimXMLDocument always produces "
    "the following header:\n\n"
    "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>\n\n"
-  
+
    "@tsexample\n"
    "// Create a new XML document with just a header and single element.\n"
    "%x = new SimXMLDocument();\n"
@@ -1077,7 +1077,7 @@ DefineEngineMethod(SimXMLDocument, addComment, void, ( const char* comment ),,
    "// <!--This is a test comment-->\n"
    "// <NewElement />\n"
    "@endtsexample\n\n"
-   
+
    "@see readComment()")
 {
    object->addComment( comment );
@@ -1246,7 +1246,7 @@ DefineEngineMethod( SimXMLDocument, getText, const char*, (),,
    "%result = %x.getText();\n"
    "echo( %result );\n"
    "@endtsexample\n\n"
-   
+
    "@see addText()\n"
    "@see removeText()\n"
    "@see addData()\n"
@@ -1286,7 +1286,7 @@ DefineEngineMethod( SimXMLDocument, removeText, void, (),,
    "to add text to the current Element.  As getData() and addData() are equivalent "
    "to getText() and addText(), removeText() will also remove any data from the "
    "current Element.\n\n"
-   
+
    "@see addText()\n"
    "@see getText()\n"
    "@see addData()\n"
@@ -1389,7 +1389,7 @@ DefineEngineMethod( SimXMLDocument, getData, const char*, (),,
    "%result = %x.getData();\n"
    "echo( %result );\n"
    "@endtsexample\n\n"
-   
+
    "@see addData()\n"
    "@see addText()\n"
    "@see getText()\n"

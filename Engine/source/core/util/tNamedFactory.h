@@ -31,7 +31,7 @@
 #endif
 
 
-/// A helper template class for registering creation 
+/// A helper template class for registering creation
 /// methods to name strings.
 template <typename Type>
 class NamedFactory

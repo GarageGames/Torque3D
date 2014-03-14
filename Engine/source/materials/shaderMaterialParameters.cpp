@@ -52,7 +52,7 @@ ShaderMaterialParameterHandle::~ShaderMaterialParameterHandle()
 
 S32 ShaderMaterialParameterHandle::getSamplerRegister( U32 pass ) const
 {
-   AssertFatal( mHandles.size() > pass, "ShaderMaterialParameterHandle::getSamplerRegister - out of bounds" );   
+   AssertFatal( mHandles.size() > pass, "ShaderMaterialParameterHandle::getSamplerRegister - out of bounds" );
    return mHandles[pass]->getSamplerRegister();
 }
 
@@ -67,7 +67,7 @@ ShaderMaterialParameters::ShaderMaterialParameters()
 
 ShaderMaterialParameters::~ShaderMaterialParameters()
 {
-   releaseBuffers();   
+   releaseBuffers();
 }
 
 void ShaderMaterialParameters::setBuffers(Vector<GFXShaderConstDesc>& constDesc, Vector<GFXShaderConstBufferRef>& buffers)
@@ -104,7 +104,7 @@ U32 ShaderMaterialParameters::getAlignmentValue(const GFXShaderConstType constTy
    GFXShaderConstHandle* shaderHandle = h->mHandles[i]; \
    if (shaderHandle->isValid()) \
       mBuffers[i]->set(shaderHandle, f); \
-} 
+}
 
 void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const F32 f)
 {
@@ -208,7 +208,7 @@ void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const Matrix
       GFXShaderConstHandle* shaderHandle = h->mHandles[i];
       if (shaderHandle && shaderHandle->isValid())
          mBuffers[i]->set(shaderHandle, mat, matrixType);
-   } 
+   }
 }
 
 void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const MatrixF* mat, const U32 arraySize, const GFXShaderConstType matrixType)
@@ -223,7 +223,7 @@ void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const Matrix
       GFXShaderConstHandle* shaderHandle = h->mHandles[i];
       if (shaderHandle && shaderHandle->isValid())
          mBuffers[i]->set(shaderHandle, mat, arraySize, matrixType);
-   } 
+   }
 }
 
 #undef SHADERMATPARAM_SET

@@ -34,12 +34,12 @@
 //   is then done in the vertex shader.  This means we have a static vertex/primitive
 //   buffer that never changes!  How spiff!  Because of this, the culling code was
 //   changed to render out full quadtree nodes, we don't try to cull each individual
-//   node ourselves anymore.  This means to get good performance, you probably need to do the 
+//   node ourselves anymore.  This means to get good performance, you probably need to do the
 //   following:
 //     1.  If it's a small area to cover, turn off culling completely.
 //     2.  You want to tune the parameters to make sure there are a lot of billboards within
 //         each quadrant.
-// 
+//
 // POTENTIAL TODO LIST:
 //   TODO: Clamp item alpha to fog alpha
 
@@ -83,7 +83,7 @@ GFXImplementVertexFormat( GFXVertexFoliage )
 //------------------------------------------------------------------------------
 //
 //	Put this in /example/common/editor/EditorGui.cs in [function Creator::init( %this )]
-//	
+//
 //   %Environment_Item[8] = "fxFoliageReplicator";  <-- ADD THIS.
 //
 //------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ inline void fxFoliageRenderList::DrawQuadBox(const Box3F& QuadBox, const ColorF 
          ProjectionPoints[BoxVerts[x][0]].y,
          ProjectionPoints[BoxVerts[x][0]].z);
       PrimBuild::end();
-   } 
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -429,7 +429,7 @@ void fxFoliageReplicator::CreateFoliage(void)
    AssertFatal(isClientObject(), "Trying to create Foliage on Server, this is bad!")
 
       // Cannot continue without Foliage Texture!
-      if (dStrlen(mFieldData.mFoliageFile) == 0) 
+      if (dStrlen(mFieldData.mFoliageFile) == 0)
          return;
 
    // Check that we can position somewhere!
@@ -716,7 +716,7 @@ void fxFoliageReplicator::CreateFoliage(void)
          pFoliageItem->Flipped = (RandomGen.randF(0, 1000) < 500.0f) ? false : true;
       else
          // No, so turn-off flipping.
-         pFoliageItem->Flipped = false;		
+         pFoliageItem->Flipped = false;
 
       // Calculate Foliage Item World Box.
       // NOTE:-	We generate a psuedo-volume here.  It's basically the volume to which the
@@ -804,7 +804,7 @@ void fxFoliageReplicator::CreateFoliage(void)
 
       // Yes, so step through Foliage.
       for (U32 idx = 0; idx < mCurrentFoliageCount; idx++)
-      {			
+      {
          fxFoliageItem*	pFoliageItem;
 
          // Fetch the Foliage Item.
@@ -906,15 +906,15 @@ void fxFoliageReplicator::SetupShader()
    }
 
    Vector<GFXShaderMacro> macros;
-   if ( mFieldData.mUseTrueBillboards )   
+   if ( mFieldData.mUseTrueBillboards )
       macros.push_back( GFXShaderMacro( "TRUE_BILLBOARD" ) );
-   
+
    mShader = mShaderData->getShader( macros );
 
    if ( !mShader )
       return;
 
-   
+
    mFoliageShaderConsts = mShader->allocConstBuffer();
 
    mFoliageShaderProjectionSC          = mShader->getShaderConstHandle( "$projection" );
@@ -929,9 +929,9 @@ void fxFoliageReplicator::SetupShader()
    mFoliageShaderCameraPosSC           = mShader->getShaderConstHandle( "$CameraPos" );
    mFoliageShaderTrueBillboardSC       = mShader->getShaderConstHandle( "$TrueBillboard" );
    mFoliageShaderGroundAlphaSC         = mShader->getShaderConstHandle( "$groundAlpha" );
-   mFoliageShaderAmbientColorSC        = mShader->getShaderConstHandle( "$ambient" );     
+   mFoliageShaderAmbientColorSC        = mShader->getShaderConstHandle( "$ambient" );
    mDiffuseTextureSC							= mShader->getShaderConstHandle( "$diffuseMap" );
-   mAlphaMapTextureSC						= mShader->getShaderConstHandle( "$alphaMap" ); 
+   mAlphaMapTextureSC						= mShader->getShaderConstHandle( "$alphaMap" );
 }
 
 // Ok, what we do is let the older code setup the FoliageItem list and the QuadTree.
@@ -940,7 +940,7 @@ void fxFoliageReplicator::SetupShader()
 // want to sort the items within the buffer by the quadtreenodes
 void fxFoliageReplicator::SetupBuffers()
 {
-   // Following two arrays are used to build the vertex and primitive buffers.	
+   // Following two arrays are used to build the vertex and primitive buffers.
    Point3F basePoints[8];
    basePoints[0] = Point3F(-0.5f, 0.0f, 1.0f);
    basePoints[1] = Point3F(-0.5f, 0.0f, 0.0f);
@@ -951,7 +951,7 @@ void fxFoliageReplicator::SetupBuffers()
    texCoords[0] = Point2F(0.0, 0.0);
    texCoords[1] = Point2F(0.0, 1.0);
    texCoords[2] = Point2F(1.0, 1.0);
-   texCoords[3] = Point2F(1.0, 0.0);	
+   texCoords[3] = Point2F(1.0, 0.0);
 
    // Init our Primitive Buffer
    U32 indexSize = mFieldData.mFoliageCount * 6;
@@ -979,7 +979,7 @@ void fxFoliageReplicator::SetupBuffers()
    U32 currPrimitiveStartIndex = 0;
    mVertexBuffer.set(GFX, mFieldData.mFoliageCount * 4, GFXBufferTypeStatic);
    mVertexBuffer.lock();
-   U32 idx = 0;	
+   U32 idx = 0;
    for (S32 qtIdx = 0; qtIdx < mFoliageQuadTree.size(); qtIdx++) {
       fxFoliageQuadrantNode* quadNode = mFoliageQuadTree[qtIdx];
       if (quadNode->Level == 0) {
@@ -994,17 +994,17 @@ void fxFoliageReplicator::SetupBuffers()
                for (U32 vertIndex = 0; vertIndex < 4; vertIndex++) {
                   GFXVertexFoliage *vert = &mVertexBuffer[(idx*4) + vertIndex];
                   // This is the position of the billboard.
-                  vert->point = pFoliageItem->Transform.getPosition();			
+                  vert->point = pFoliageItem->Transform.getPosition();
                   // Normal contains the point of the billboard (except for the y component, see below)
                   vert->normal = basePoints[vertIndex];
 
                   vert->normal.x *= pFoliageItem->Width;
                   vert->normal.z *= pFoliageItem->Height;
                   // Handle texture coordinates
-                  vert->texCoord = texCoords[vertIndex];				
+                  vert->texCoord = texCoords[vertIndex];
                   if (pFoliageItem->Flipped)
                      vert->texCoord.x = 1.0f - vert->texCoord.x;
-                  // Handle sway. Sway is stored in a texture coord. The x coordinate is the sway phase multiplier, 
+                  // Handle sway. Sway is stored in a texture coord. The x coordinate is the sway phase multiplier,
                   // the y coordinate determines if this vertex actually sways or not.
                   if ((vertIndex == 0) || (vertIndex == 3)) {
                      vert->texCoord2.set(pFoliageItem->SwayTimeRatio / mGlobalSwayTimeRatio, 1.0f);
@@ -1016,12 +1016,12 @@ void fxFoliageReplicator::SetupBuffers()
                }
                idx++;
                quadNode->primitiveCount += 2;
-               currPrimitiveStartIndex += 6; 
+               currPrimitiveStartIndex += 6;
             }
          }
       }
    }
-   mVertexBuffer.unlock();	
+   mVertexBuffer.unlock();
 
    DestroyFoliageItems();
 }
@@ -1431,7 +1431,7 @@ void fxFoliageReplicator::renderArc(const F32 fRadiusX, const F32 fRadiusY)
 
       PrimBuild::vertex3f(XPos, YPos, -(F32)mFieldData.mPlacementBandHeight/2.0f);
       PrimBuild::vertex3f(XPos, YPos, +(F32)mFieldData.mPlacementBandHeight/2.0f);
-   }			
+   }
    PrimBuild::end();
 }
 
@@ -1489,7 +1489,7 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
    // Calculate Elapsed Time and take new Timestamp.
    S32 Time = Platform::getVirtualMilliseconds();
    F32 ElapsedTime = (Time - mLastRenderTime) * 0.001f;
-   mLastRenderTime = Time;	
+   mLastRenderTime = Time;
 
    renderPlacementArea(ElapsedTime);
 
@@ -1522,7 +1522,7 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
       }
 
       if (!mFieldData.mHideFoliage) {
-         // Animate Global Sway Phase (Modulus).  
+         // Animate Global Sway Phase (Modulus).
          mGlobalSwayPhase = mGlobalSwayPhase + (mGlobalSwayTimeRatio * ElapsedTime);
 
          // Animate Global Light Phase (Modulus).
@@ -1545,7 +1545,7 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
             mFoliageShaderConsts->setSafe(mFoliageShaderLuminanceMagnitudeSC, LuminanceMagnitude);
             mFoliageShaderConsts->setSafe(mFoliageShaderLuminanceMidpointSC, LuminanceMidPoint);
 
-            // Set up our shader constants	
+            // Set up our shader constants
             // Projection matrix
             MatrixF proj = GFX->getProjectionMatrix();
             //proj.transpose();
@@ -1589,24 +1589,24 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
          if (mFieldData.mUseCulling)
          {
             // Setup the Clip-Planes.
-            F32 FarClipPlane = getMin((F32)state->getFarPlane(), 
+            F32 FarClipPlane = getMin((F32)state->getFarPlane(),
                mFieldData.mViewDistance + mFieldData.mFadeInRegion);
             mFrustumRenderSet.SetupClipPlanes(state, FarClipPlane);
 
             renderQuad(mFoliageQuadTree[0], getRenderTransform(), false);
 
-            // Multipass, don't want to interrupt the vb state 
-            if (mFieldData.mUseDebugInfo) 
+            // Multipass, don't want to interrupt the vb state
+            if (mFieldData.mUseDebugInfo)
             {
                // hey man, we're done, so it doesn't matter if we kill it to render the next part
                GFX->setStateBlock(mDebugSB);
                renderQuad(mFoliageQuadTree[0], getRenderTransform(), true);
             }
          }
-         else 
-         {	
+         else
+         {
             // Draw the whole shebang!
-            GFX->drawIndexedPrimitive(GFXTriangleList, 0, 0, mVertexBuffer->mNumVerts, 
+            GFX->drawIndexedPrimitive(GFXTriangleList, 0, 0, mVertexBuffer->mNumVerts,
                0, mPrimBuffer->mIndexCount / 3);
          }
       }
@@ -1619,7 +1619,7 @@ void fxFoliageReplicator::renderQuad(fxFoliageQuadrantNode* quadNode, const Matr
       if (mFrustumRenderSet.IsQuadrantVisible(quadNode->QuadrantBox, RenderTransform))
       {
          // Draw the Quad Box (Debug Only).
-         if (UseDebug) 
+         if (UseDebug)
             mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, ColorF(0.0f, 1.0f, 0.1f, 1.0f));
          if (quadNode->Level != 0) {
             for (U32 i = 0; i < 4; i++)
@@ -1627,12 +1627,12 @@ void fxFoliageReplicator::renderQuad(fxFoliageQuadrantNode* quadNode, const Matr
          } else {
             if (!UseDebug)
                if(quadNode->primitiveCount)
-                  GFX->drawIndexedPrimitive(GFXTriangleList, 0, 0, mVertexBuffer->mNumVerts, 
+                  GFX->drawIndexedPrimitive(GFXTriangleList, 0, 0, mVertexBuffer->mNumVerts,
                   quadNode->startIndex, quadNode->primitiveCount);
          }
       } else {
          // Use a different color to say "I think I'm not visible!"
-         if (UseDebug) 
+         if (UseDebug)
             mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, ColorF(1.0f, 0.8f, 0.1f, 1.0f));
       }
    }
@@ -1746,7 +1746,7 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
       stream->read(&mFieldData.mFixSizeToMax);						// Foliage Fix Size to Max.
       stream->read(&mFieldData.mOffsetZ);								// Foliage Offset Z.
       mFieldData.mRandomFlip = stream->readFlag();					// Foliage Random Flip.
-      
+
       bool wasTrueBB = mFieldData.mUseTrueBillboards;
       mFieldData.mUseTrueBillboards = stream->readFlag();      // Foliage is camera facing (including z axis).
 

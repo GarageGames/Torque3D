@@ -81,41 +81,41 @@ class ZipTempStream;
 /// are two ways to accomplish it.
 ///
 /// <b>Opening from a file on the file system</b>
-/// 
+///
 /// The simplest method of opening a zip file is to use openArchive(const char *, AccessMode)
-/// to open a file that is on the disk. 
-/// 
+/// to open a file that is on the disk.
+///
 /// When opening a zip file on the file system, the filename is automatically set.
 ///
 /// <b>Opening a file from a stream</b>
-/// 
+///
 /// A more advanced way to open the zip file is from an arbitrary stream. The
 /// only requirements are that the stream supports seeking and was opened with
 /// the correct access mode. Use the openArchive(Stream *, AccessMode) method to
 /// do this.
-/// 
+///
 /// Opening zip files from arbitrary streams is a very powerful feature and
 /// opens many interesting doors. For example, combined with some small changes
 /// to the resource manager and startup code, it was possible to implement a
 /// VFS that allows the entire game to run from a single executable with no
 /// external files.
-/// 
+///
 /// Note that the filename is not automatically set when you open the zip file
 /// from a stream. The filename is used in error reporting and by the resource
 /// manager, so you may wish to set it to something meaningful.
-/// 
+///
 /// Regardless of which method you use to open the file, the #AccessMode controls
 /// what you can do with it. If you open the archive as #ReadWrite, you can both
 /// write to and read from files in the zip. However, it is not possible to open
 /// files in the zip as #ReadWrite.
-/// 
+///
 /// <b>Closing the zip file</b>
-/// 
+///
 /// When you are done with the zip file, call closeArchive() to free any resources
 /// and rebuild the zip file if it was open for #Write.
-/// 
+///
 /// <b>Example</b>
-/// 
+///
 /// @code
 /// Zip::ZipArchive za;
 /// if(za.openArchive("filename.zip", ZipArchive::Read))
@@ -126,16 +126,16 @@ class ZipTempStream;
 /// @endcode
 ///
 /// <h3>Archiver Interface</h3>
-/// 
+///
 /// The archiver style interface allows you to add, extract and delete files in
 /// the zip in a way similar to that of an standard archiver application.
-/// 
+///
 /// While the archiver interface is simple to use, it is blocking and thus
 /// difficult to use asynchronously. If you require zip file support and
 /// responsive UI then you should consider using the stream interface instead.
-/// 
+///
 /// See the following method documentation for more information:
-/// 
+///
 /// <ul>
 ///   <li> addFile()
 ///   <li> extractFile()
@@ -143,7 +143,7 @@ class ZipTempStream;
 /// </ul>
 ///
 /// <b>Example</b>
-/// 
+///
 /// @code
 /// Zip::ZipArchive za;
 /// if(za.openArchive("filename.zip", ZipArchive::ReadWrite))
@@ -158,12 +158,12 @@ class ZipTempStream;
 ///    za.closeArchive();
 /// }
 /// @endcode
-/// 
+///
 /// <h3>Stream Interface</h3>
-/// 
+///
 /// The stream based interface allows you to access files within the zip
 /// in a similar way to accessing the file system through the ResourceManager.
-/// 
+///
 /// There are a few small caveats to the stream interface:
 /// <ul>
 ///   <li> When writing files, the whole file must be written sequentially. You
@@ -185,23 +185,23 @@ class ZipTempStream;
 ///   <li> Only one file can be open for read at a time, but multiple files can
 ///        be open for write at a time. - [tom, 2/9/2007] Check this
 /// </ul>
-/// 
+///
 /// See the following method documentation for more information:
-/// 
+///
 /// <ul>
 ///   <li> openFile()
 ///   <li> closeFile()
 /// </ul>
 ///
 /// <b>CRC Checking</b>
-/// 
+///
 /// Unlike the archiver interface, there is no automatic CRC checking when
 /// reading from files using the stream interface. If you will only be
 /// reading files sequentially, see the documentation for ZipStatFilter
 /// for a useful trick to get easy CRC checking.
 ///
 /// <b>Example</b>
-/// 
+///
 /// @code
 /// Zip::ZipArchive za;
 /// if(za.openArchive("filename.zip", ZipArchive::Write))
@@ -217,54 +217,54 @@ class ZipTempStream;
 ///    za.closeArchive();
 /// }
 /// @endcode
-/// 
+///
 /// <h3>Compressed Files</h3>
-/// 
+///
 /// The zip code included with stock Torque supports "stored" (uncompressed) files
 /// and deflate compressed files. The code is easily extensible to support any
 /// compression format that the Zip file format supports.
-/// 
+///
 /// In addition to the deflate and stored formats, BZip2 is supported but not
 /// included with stock Torque. BZip2 support will be released as a resource in
 /// the future.
-/// 
+///
 /// <h3>Encrypted Files</h3>
-/// 
+///
 /// Preliminary support for Encrypted/Passworded files is included in TGB Pro only.
 /// Currently, only Zip 2.0 encryption is supported by the stock code. AES support
 /// exists and may be released as a resource in the future.
-/// 
+///
 /// To set the password used for zips, you need to modify the #DEFAULT_ZIP_PASSWORD
 /// define in core/zip/zipArchive.h. This password will be used for all zips that
 /// require a password. The default password is changeme. This may be used by
 /// TGB Binary users to test encrypted zips with their game. Shipping with the
 /// default password is not recommended for obvious reasons.
-/// 
+///
 /// The intended use of encrypted zips is for preventing casual copying of your
 /// game's assets. Zip 2.0 encryption has known weaknesses that allow an attacker
 /// to decrypt the contents of the zip. AES encryption is significantly more secure,
 /// but as the password must be stored in the executable it will not stop a
 /// determined attacker.
-/// 
+///
 /// A script accessible mechanism for setting the password does not currently exist.
 /// To use encrypted mod zips, if the password was in script then the password
 /// would be clearly visible to anyone that cared to poke around in your scripts.
-/// 
+///
 /// Encrypted zip support will be improved in a future version. For now, a more
 /// secure method of storing the password is left as an exercise for the reader.
-/// 
+///
 /// <h3>Accessing Zip files from script</h3>
-/// 
+///
 /// ZipArchive is a C++ class and thus cannot be used from script. However,
 /// a wrapper is provided to allow script access to zips. See the documentation
 /// on ZipObject for more information.
 ///
 /// <h3>More Examples</h3>
-/// 
+///
 /// More in depth example code than that featured here can be found in the
 /// unit tests for the zip code (in the core/zip/unitTests directory)
 /// and the script code for the packaging utility.
-/// 
+///
 //-----------------------------------------------------------------------------
 class ZipArchive : public StrongRefBase
 {
@@ -284,12 +284,12 @@ public:
    struct ZipEntry
    {
       ZipEntry *mParent;
-      
+
       String mName;
 
       bool mIsDirectory;
       CentralDir mCD;
-      
+
       Map<String,ZipEntry*> mChildren;
 
       ZipEntry()
@@ -320,7 +320,7 @@ protected:
 
    void insertEntry(ZipEntry *ze);
    void removeEntry(ZipEntry *ze);
-   
+
    Stream *createNewFile(const char *filename, Compressor *method);
    Stream *createNewFile(const char *filename, const char *method)
    {
@@ -352,7 +352,7 @@ public:
 
    /// @name Miscellaneous Methods
    // @{
-   
+
    //-----------------------------------------------------------------------------
    /// @brief Set the filename of the zip file.
    ///
@@ -364,9 +364,9 @@ public:
    //-----------------------------------------------------------------------------
    void setFilename(const char *filename);
 
-   /// Set the disk stream pointer.  The ZipArchive is then responsible for 
+   /// Set the disk stream pointer.  The ZipArchive is then responsible for
    /// deleting the stream when appropriate and the caller should not do the same.
-   /// This function should only be called after openArchive(Stream*) has been 
+   /// This function should only be called after openArchive(Stream*) has been
    /// successfully executed.
    void setDiskStream(FileStream* stream) { mDiskStream = stream; }
 
@@ -464,7 +464,7 @@ public:
    /// The returned stream must be freed with closeFile(). Do not delete it
    /// directly.
    ///
-   /// In verbose mode, openFile() will display additional error information 
+   /// In verbose mode, openFile() will display additional error information
    /// in the console when it fails.
    ///
    /// @param filename Filename of the file in the zip
@@ -500,7 +500,7 @@ public:
 
    /// @name Archiver Style File Access Methods
    // @{
-   
+
    //-----------------------------------------------------------------------------
    /// @brief Add a file to the zip
    ///

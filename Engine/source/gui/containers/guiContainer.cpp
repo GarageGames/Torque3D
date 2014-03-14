@@ -32,13 +32,13 @@ IMPLEMENT_CONOBJECT( GuiContainer );
 
 ConsoleDocClass( GuiContainer,
    "@brief Brief Desc.\n\n"
-   
+
    "@tsexample\n"
    "// Comment:\n"
    "%okButton = new ClassObject()\n"
    "instantiation\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -59,8 +59,8 @@ EndImplementEnumType;
 GuiContainer::GuiContainer()
 {
    mUpdateLayout = false;
-   mValidDockingMask =  Docking::dockNone | Docking::dockBottom | 
-      Docking::dockTop  | Docking::dockClient | 
+   mValidDockingMask =  Docking::dockNone | Docking::dockBottom |
+      Docking::dockTop  | Docking::dockClient |
       Docking::dockLeft | Docking::dockRight;
    mIsContainer = true;
 }
@@ -81,7 +81,7 @@ void GuiContainer::initPersistFields()
    Con::setIntVariable("$DOCKING_BOTTOM", Docking::dockBottom);
    Con::setIntVariable("$DOCKING_LEFT",   Docking::dockLeft);
    Con::setIntVariable("$DOCKING_RIGHT",  Docking::dockRight);
-   
+
    addGroup( "Layout" );
 
       addProtectedField("docking",  TYPEID< Docking::DockingType >(),   Offset(mSizingOptions.mDocking, GuiContainer), &setDockingField, &defaultProtectedGetFn, "" );
@@ -91,7 +91,7 @@ void GuiContainer::initPersistFields()
       addField("anchorBottom",   TypeBool,          Offset(mSizingOptions.mAnchorBottom, GuiContainer));
       addField("anchorLeft",     TypeBool,          Offset(mSizingOptions.mAnchorLeft, GuiContainer));
       addField("anchorRight",    TypeBool,          Offset(mSizingOptions.mAnchorRight, GuiContainer));
-      
+
    endGroup( "Layout" );
 
    Parent::initPersistFields();
@@ -133,7 +133,7 @@ bool GuiContainer::resize( const Point2I &newPosition, const Point2I &newExtent 
 
    if( !Parent::resize( newPosition, newExtent ) )
       return false;
-   
+
    RectI clientRect = getClientRect();
    layoutControls( clientRect );
 
@@ -209,7 +209,7 @@ void GuiContainer::childResized(GuiControl *child)
 
 bool GuiContainer::layoutControls(  RectI &clientRect )
 {
-   // This variable is set to the first 'Client' docking 
+   // This variable is set to the first 'Client' docking
    //  control that is found.  We defer client docking until
    //  after all other docks have been made since it will consume
    //  the remaining client area available.
@@ -221,7 +221,7 @@ bool GuiContainer::layoutControls(  RectI &clientRect )
    {
       // Layout Content with proper docking (Client Default)
       GuiControl *control = static_cast<GuiControl*>(*nI);
-      
+
       // If we're invisible we don't get counted in docking
       if( control == NULL || !control->isVisible() )
          continue;
@@ -272,7 +272,7 @@ bool GuiContainer::dockControl( GuiContainer *control, S32 dockingMode, RectI &c
    {
    case Docking::dockClient:
 
-      // Inset by padding 
+      // Inset by padding
       sizingOptions.mPadding.insetRect(clientRect);
 
       // Dock to entirety of client rectangle
@@ -281,7 +281,7 @@ bool GuiContainer::dockControl( GuiContainer *control, S32 dockingMode, RectI &c
       // Remove Client Rect, can only have one client dock
       clientRect.set(0,0,0,0);
       break;
-   case Docking::dockTop:         
+   case Docking::dockTop:
 
       dockRect = clientRect;
       dockRect.extent.y = getMin( control->getHeight() + sizingOptions.mPadding.top + sizingOptions.mPadding.bottom , clientRect.extent.y );
@@ -290,7 +290,7 @@ bool GuiContainer::dockControl( GuiContainer *control, S32 dockingMode, RectI &c
       clientRect.point.y += dockRect.extent.y;
       clientRect.extent.y -= dockRect.extent.y;
 
-      // Inset by padding 
+      // Inset by padding
       sizingOptions.mPadding.insetRect(dockRect);
 
       // Resize
@@ -306,7 +306,7 @@ bool GuiContainer::dockControl( GuiContainer *control, S32 dockingMode, RectI &c
       // Subtract our rect
       clientRect.extent.y -= dockRect.extent.y;
 
-      // Inset by padding 
+      // Inset by padding
       sizingOptions.mPadding.insetRect(dockRect);
 
       // Resize
@@ -322,7 +322,7 @@ bool GuiContainer::dockControl( GuiContainer *control, S32 dockingMode, RectI &c
       clientRect.point.x += dockRect.extent.x;
       clientRect.extent.x -= dockRect.extent.x;
 
-      // Inset by padding 
+      // Inset by padding
       sizingOptions.mPadding.insetRect(dockRect);
 
       // Resize
@@ -338,7 +338,7 @@ bool GuiContainer::dockControl( GuiContainer *control, S32 dockingMode, RectI &c
       // Subtract our rect
       clientRect.extent.x -= dockRect.extent.x;
 
-      // Inset by padding 
+      // Inset by padding
       sizingOptions.mPadding.insetRect(dockRect);
 
       // Resize
@@ -425,7 +425,7 @@ const RectI GuiContainer::getClientRect()
    RectI resRect = RectI( Point2I(0,0), getExtent() );
 
    // Inset by padding
-   mSizingOptions.mInternalPadding.insetRect( resRect ); 
+   mSizingOptions.mInternalPadding.insetRect( resRect );
 
    return resRect;
 }
@@ -434,6 +434,6 @@ const RectI GuiContainer::getClientRect()
 
 void GuiContainer::setDocking( S32 docking )
 {
-   mSizingOptions.mDocking = docking; 
+   mSizingOptions.mDocking = docking;
    setUpdateLayout( updateParent );
 }

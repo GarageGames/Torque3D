@@ -33,13 +33,13 @@
 
 static void sfxFormatToWAVEFORMATEX( const SFXFormat& format, WAVEFORMATEX *wfx )
 {
-   dMemset( wfx, 0, sizeof( WAVEFORMATEX ) ); 
-   wfx->wFormatTag = WAVE_FORMAT_PCM; 
+   dMemset( wfx, 0, sizeof( WAVEFORMATEX ) );
+   wfx->wFormatTag = WAVE_FORMAT_PCM;
    wfx->nChannels = format.getChannels();
    wfx->nSamplesPerSec = format.getSamplesPerSecond();
    wfx->wBitsPerSample = format.getBitsPerChannel();
    wfx->nBlockAlign = wfx->nChannels * wfx->wBitsPerSample / 8;
-   wfx->nAvgBytesPerSec = wfx->nSamplesPerSec * wfx->nBlockAlign; 
+   wfx->nAvgBytesPerSec = wfx->nSamplesPerSec * wfx->nBlockAlign;
 }
 
 
@@ -66,12 +66,12 @@ SFXXAudioVoice* SFXXAudioVoice::create(   IXAudio2 *xaudio,
 
    // Create the voice.
    IXAudio2SourceVoice *xaVoice;
-   HRESULT hr = xaudio->CreateSourceVoice(   &xaVoice, 
+   HRESULT hr = xaudio->CreateSourceVoice(   &xaVoice,
                                              (WAVEFORMATEX*)&wfx,
-                                             0, 
-                                             XAUDIO2_DEFAULT_FREQ_RATIO, 
-                                             voice, 
-                                             NULL, 
+                                             0,
+                                             XAUDIO2_DEFAULT_FREQ_RATIO,
+                                             voice,
+                                             NULL,
                                              NULL );
 
    if( FAILED( hr ) || !voice )
@@ -231,7 +231,7 @@ void SFXXAudioVoice::_seek( U32 sample )
    mNonStreamSampleStartPos = sample;
 
    bool wasPlaying = mIsPlaying;
-   
+
    _stop();
    if( wasPlaying )
       _play();
@@ -289,7 +289,7 @@ void SFXXAudioVoice::setMinMaxDistance( F32 min, F32 max )
    // Set the overall volume curve scale.
    mEmitter.CurveDistanceScaler = max;
 
-   // The curve uses normalized distances, so 
+   // The curve uses normalized distances, so
    // figure out the normalized min distance.
    F32 normMin = 0.0f;
    if ( min > 0.0f )
@@ -320,7 +320,7 @@ void SFXXAudioVoice::setMinMaxDistance( F32 min, F32 max )
          mEmitter.pVolumeCurve->PointCount = 6;
       }
 
-      // The first and last points are known 
+      // The first and last points are known
       // and will not change.
       mEmitter.pVolumeCurve->pPoints[ 0 ].Distance = 0.0f;
       mEmitter.pVolumeCurve->pPoints[ 0 ].DSPSetting = 1.0f;
@@ -334,7 +334,7 @@ void SFXXAudioVoice::setMinMaxDistance( F32 min, F32 max )
       mEmitter.pVolumeCurve->pPoints[1].Distance = normMin;
       mEmitter.pVolumeCurve->pPoints[1].DSPSetting = 1.0f;
 
-      // The next three points are calculated to 
+      // The next three points are calculated to
       // give the sound a rough logarithmic falloff.
       F32 distStep = ( 1.0f - normMin ) / 4.0f;
       for ( U32 i=0; i < 3; i++ )
@@ -356,7 +356,7 @@ void SFXXAudioVoice::OnBufferEnd( void* bufferContext )
 
 void SFXXAudioVoice::OnStreamEnd()
 {
-   // Warning:  This is being called within the XAudio 
+   // Warning:  This is being called within the XAudio
    // thread, so be sure you're thread safe!
 
    mHasStopped = true;
@@ -370,7 +370,7 @@ void SFXXAudioVoice::OnStreamEnd()
 void SFXXAudioVoice::play( bool looping )
 {
    // Give the device a chance to calculate our positional
-   // audio settings before we start playback... this is 
+   // audio settings before we start playback... this is
    // important else we get glitches.
    if( mIs3D )
       mXAudioDevice->_setOutputMatrix( this );
@@ -430,13 +430,13 @@ void SFXXAudioVoice::setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )
 
       // The inner volume is always 1... the overall
       // volume is what scales it.
-      mEmitter.pCone->InnerVolume = 1.0f; 
+      mEmitter.pCone->InnerVolume = 1.0f;
 
       // We don't use these yet.
-      mEmitter.pCone->InnerLPF = 0.0f; 
-      mEmitter.pCone->OuterLPF = 0.0f; 
-      mEmitter.pCone->InnerReverb = 0.0f; 
-      mEmitter.pCone->OuterReverb = 0.0f; 
+      mEmitter.pCone->InnerLPF = 0.0f;
+      mEmitter.pCone->OuterLPF = 0.0f;
+      mEmitter.pCone->InnerReverb = 0.0f;
+      mEmitter.pCone->OuterReverb = 0.0f;
    }
 
    mEmitter.pCone->InnerAngle = mDegToRad( innerAngle );

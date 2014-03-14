@@ -26,9 +26,9 @@
 #include "gfx/gfxStateBlock.h"
 
 class GFXGLStateBlock : public GFXStateBlock
-{   
+{
 public:
-   // 
+   //
    // GFXGLStateBlock interface
    //
    GFXGLStateBlock(const GFXStateBlockDesc& desc);
@@ -39,7 +39,7 @@ public:
    void activate(const GFXGLStateBlock* oldState);
 
 
-   // 
+   //
    // GFXStateBlock interface
    //
 
@@ -47,7 +47,7 @@ public:
    virtual U32 getHashValue() const;
 
    /// Returns a GFXStateBlockDesc that this block represents
-   virtual const GFXStateBlockDesc& getDesc() const;   
+   virtual const GFXStateBlockDesc& getDesc() const;
 
    //
    // GFXResource

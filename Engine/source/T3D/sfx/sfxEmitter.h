@@ -42,7 +42,7 @@ class SFXTrack;
 
 //RDTODO: make 3D sound emitters yield their source when being culled
 
-/// The SFXEmitter is used to place 2D or 3D sounds into a 
+/// The SFXEmitter is used to place 2D or 3D sounds into a
 /// mission.
 ///
 /// If the profile is set then the emitter plays that.  If the
@@ -55,13 +55,13 @@ class SFXTrack;
 class SFXEmitter : public SceneObject
 {
    public:
-   
+
       typedef SceneObject Parent;
 
    protected:
 
       /// Network update masks.
-      enum UpdateMasks 
+      enum UpdateMasks
       {
          InitialUpdateMask    = BIT(0),
          TransformUpdateMask  = BIT(1),
@@ -109,7 +109,7 @@ class SFXEmitter : public SceneObject
       /// The selected track or null if the local
       /// profile should be used.
       SFXTrack *mTrack;
-      
+
       /// Whether to leave sound setup exclusively to the assigned mTrack and not
       /// override part of the track's description with emitter properties.
       bool mUseTrackDescriptionOnly;
@@ -124,64 +124,64 @@ class SFXEmitter : public SceneObject
       /// If true playback starts when the emitter
       /// is added to the scene.
       bool mPlayOnAdd;
-      
+
       /// State block for cone rendering in editor.
       GFXStateBlockRef mRenderSB;
-      
+
       /// If true, render all emitters when in editor (not only selected one).
       static bool smRenderEmitters;
-      
+
       /// Point size for rendering point clouds of emitter cones in editor.
       /// @todo Currently not implemented.
       static F32 smRenderPointSize;
-      
+
       ///
       static F32 smRenderRadialIncrements;
-      
+
       ///
       static F32 smRenderSweepIncrements;
-      
+
       ///
       static F32 smRenderPointDistance;
-      
+
       /// Point color when emitter is playing and in range of listener.
       static ColorI smRenderColorPlayingInRange;
-      
+
       /// Point color when emitter is playing but out of range of listern.
       static ColorI smRenderColorPlayingOutOfRange;
-      
+
       /// Point color when emitter is not playing but in range of listener.
       static ColorI smRenderColorStoppedInRange;
-      
+
       /// Point color when emitter is not playing and not in range of listener.
       static ColorI smRenderColorStoppedOutOfRange;
-      
+
       ///
       static ColorI smRenderColorInnerCone;
-      
+
       ///
       static ColorI smRenderColorOuterCone;
-      
+
       ///
       static ColorI smRenderColorOutsideVolume;
-      
+
       ///
       static ColorI smRenderColorRangeSphere;
 
-      /// Helper which reads a flag from the stream and 
+      /// Helper which reads a flag from the stream and
       /// updates the mDirty bits.
       bool _readDirtyFlag( BitStream *stream, U32 flag );
 
       /// Called when the emitter state has been marked
       /// dirty and the source needs to be updated.
       void _update();
-      
+
       /// Render emitter object in editor.
       void _renderObject( ObjectRenderInst* ri, SceneRenderState* state, BaseMatInstance* overrideMat );
-      
+
       /// Render visual feedback for 3D sounds in editor.
       void _render3DVisualFeedback();
-      
+
       ///
       void _renderCone( F32 radialIncrements,
                         F32 sweepIncrements,
@@ -201,22 +201,22 @@ class SFXEmitter : public SceneObject
 
       SFXEmitter();
       virtual ~SFXEmitter();
-      
+
       /// Return the sound source object associated with the emitter.
       /// @note This will only return a meaningful result when called on ghost objects.
       SFXSource* getSource() const { return mSource; }
-            
+
       /// Return true if this object emits a 3D sound.
       bool is3D() const;
-            
+
       /// Return true if the SFX system's listener is in range of this emitter.
       bool isInRange() const;
-      
-      /// Sends network event to start playback if 
+
+      /// Sends network event to start playback if
       /// the emitter source is not already playing.
       void play();
 
-      /// Sends network event to stop emitter 
+      /// Sends network event to stop emitter
       /// playback on all ghosted clients.
       void stop();
 

@@ -35,7 +35,7 @@
 class GuiEaseViewCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
    protected:
@@ -44,9 +44,9 @@ class GuiEaseViewCtrl : public GuiControl
       ColorF mAxisColor;   // color to draw axis in
       ColorF mEaseColor;   // color to draw ease in
       F32 mEaseWidth;      // width of lines
-   
+
    public:
-   
+
       GuiEaseViewCtrl();
 
       bool onWake();
@@ -54,7 +54,7 @@ class GuiEaseViewCtrl : public GuiControl
 
       void onRender( Point2I, const RectI &);
       static void initPersistFields();
-      
+
       DECLARE_CONOBJECT( GuiEaseViewCtrl );
       DECLARE_CATEGORY( "Gui Editor" );
       DECLARE_DESCRIPTION( "Control that display an EaseF curve." );

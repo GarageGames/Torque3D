@@ -103,7 +103,7 @@ void GuiMaterialPreview::setLightColor( F32 r, F32 g, F32 b )
 }
 
 // This function is for moving the light in the scene. This needs to be adjusted to keep the light
-// from getting all out of whack. For now, we'll just rely on the reset function if we need it 
+// from getting all out of whack. For now, we'll just rely on the reset function if we need it
 // fixed.
 void GuiMaterialPreview::setLightTranslate(S32 modifier, F32 xstep, F32 ystep)
 {
@@ -360,7 +360,7 @@ void GuiMaterialPreview::renderWorld(const RectI &updateRect)
    //S32 dt = time - lastRenderTime;
    lastRenderTime = time;
 
-   
+
 
    F32 left, right, top, bottom, nearPlane, farPlane;
    bool isOrtho;

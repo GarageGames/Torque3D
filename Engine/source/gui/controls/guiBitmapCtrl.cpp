@@ -34,13 +34,13 @@ IMPLEMENT_CONOBJECT(GuiBitmapCtrl);
 
 ConsoleDocClass( GuiBitmapCtrl,
    "@brief A gui control that is used to display an image.\n\n"
-   
+
    "The image is stretched to the constraints of the control by default. However, the control can also\n"
    "tile the image as well.\n\n"
 
    "The image itself is stored inside the GuiBitmapCtrl::bitmap field. The boolean value that decides\n"
    "whether the image is stretched or tiled is stored inside the GuiBitmapCtrl::wrap field.\n"
-   
+
    "@tsexample\n"
    "// Create a tiling GuiBitmapCtrl that displays \"myImage.png\"\n"
    "%bitmapCtrl = new GuiBitmapCtrl()\n"
@@ -49,7 +49,7 @@ ConsoleDocClass( GuiBitmapCtrl,
    "   wrap = \"true\";\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiControls"
 );
 
@@ -57,7 +57,7 @@ GuiBitmapCtrl::GuiBitmapCtrl(void)
  : mBitmapName(),
    mStartPoint( 0, 0 ),
    mWrap( false )
-{	
+{
 }
 
 bool GuiBitmapCtrl::setBitmapName( void *object, const char *index, const char *data )
@@ -75,13 +75,13 @@ bool GuiBitmapCtrl::setBitmapName( void *object, const char *index, const char *
 void GuiBitmapCtrl::initPersistFields()
 {
    addGroup( "Bitmap" );
-   
+
       addProtectedField( "bitmap", TypeImageFilename, Offset( mBitmapName, GuiBitmapCtrl ),
          &setBitmapName, &defaultProtectedGetFn,
          "The bitmap file to display in the control." );
       addField( "wrap",   TypeBool,     Offset( mWrap, GuiBitmapCtrl ),
          "If true, the bitmap is tiled inside the control rather than stretched to fit." );
-      
+
    endGroup( "Bitmap" );
 
    Parent::initPersistFields();
@@ -157,7 +157,7 @@ void GuiBitmapCtrl::setBitmapHandle(GFXTexHandle handle, bool resize)
    mBitmapName = String("texhandle");
 
    // Resize the control to fit the bitmap
-   if (resize) 
+   if (resize)
    {
       setExtent(mTextureObject->getWidth(), mTextureObject->getHeight());
       updateSizing();
@@ -171,7 +171,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
       GFX->getDrawUtil()->clearBitmapModulation();
 		if(mWrap)
 		{
-         // We manually draw each repeat because non power of two textures will 
+         // We manually draw each repeat because non power of two textures will
          // not tile correctly when rendered with GFX->drawBitmapTile(). The non POT
          // bitmap will be padded by the hardware, and we'll see lots of slack
          // in the texture. So... lets do what we must: draw each repeat by itself:

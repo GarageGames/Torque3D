@@ -35,25 +35,25 @@ PixelSpecularHLSL::PixelSpecularHLSL()
    addDependency( &mDep );
 }
 
-void PixelSpecularHLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void PixelSpecularHLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
-   AssertFatal( fd.features[MFT_RTLighting], 
+   AssertFatal( fd.features[MFT_RTLighting],
       "PixelSpecularHLSL requires RTLighting to be enabled!" );
 
    // Nothing to do here... MFT_RTLighting should have
    // taken care of passing everything to the pixel shader.
 }
 
-void PixelSpecularHLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void PixelSpecularHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
-   AssertFatal( fd.features[MFT_RTLighting], 
+   AssertFatal( fd.features[MFT_RTLighting],
       "PixelSpecularHLSL requires RTLighting to be enabled!" );
 
    // RTLighting should have spit out the 4 specular
    // powers for the 4 potential lights on this pass.
-   // 
+   //
    // This can sometimes be NULL if RTLighting skips out
    // on us for lightmaps or missing normals.
    Var *specular = (Var*)LangElement::find( "specular" );
@@ -99,7 +99,7 @@ void PixelSpecularHLSL::processPix( Vector<ShaderComponent*> &componentList,
 
    // Add the specular to the final color.
    // search for color var
-   Var *color = (Var*)LangElement::find( "col" );   
+   Var *color = (Var*)LangElement::find( "col" );
    meta->addStatement( new GenOp( "   @.rgb += ( @ ).rgb;\r\n", color, final ) );
 
    output = meta;

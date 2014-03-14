@@ -36,7 +36,7 @@ if( isObject( MessageBoxOKDlg ) )
    MessageBoxOKDlg.delete();
 if( isObject( IODropdownDlg ) )
    IODropdownDlg.delete();
-   
+
 
 // Load Editor Dialogs
 exec("./messageBoxOk.ed.gui");
@@ -80,15 +80,15 @@ function messageCallback(%dlg, %callback)
    eval(%callback);
 }
 
-//The # in the function passed replaced with the output 
+//The # in the function passed replaced with the output
 //of the preset menu.
 function IOCallback(%dlg, %callback)
 {
    %id = IODropdownMenu.getSelected();
    %text = IODropdownMenu.getTextById(%id);
-   %callback = strreplace(%callback, "#", %text); 
+   %callback = strreplace(%callback, "#", %text);
    eval(%callback);
-   
+
    Canvas.popDialog(%dlg);
 }
 
@@ -109,20 +109,20 @@ function MBSetText(%text, %frame, %msg)
 
    // Get the vertical change in extent.
    %deltaY = getWord(%newExtent, 1) - getWord(%ext, 1);
-   
+
    // Resize the window housing the text box.
    %windowPos = %frame.getPosition();
    %windowExt = %frame.getExtent();
    %frame.resize(getWord(%windowPos, 0), getWord(%windowPos, 1) - (%deltaY / 2),
                  getWord(%windowExt, 0), getWord(%windowExt, 1) + %deltaY);
-                 
+
    %frame.canMove = "0";
    //%frame.canClose = "0";
    %frame.resizeWidth = "0";
    %frame.resizeHeight = "0";
    %frame.canMinimize = "0";
    %frame.canMaximize = "0";
-   
+
    //sfxPlayOnce( messageBoxBeep );
 }
 
@@ -159,34 +159,34 @@ function MessageBoxOKCancelDlg::onSleep( %this )
 }
 
 function MessageBoxOKCancelDetails(%title, %message, %details, %callback, %cancelCallback)
-{   
+{
    if(%details $= "")
    {
       MBOKCancelDetailsButton.setVisible(false);
    }
-   
+
    MBOKCancelDetailsScroll.setVisible(false);
-   
+
    MBOKCancelDetailsFrame.setText( %title );
-   
+
    Canvas.pushDialog(MessageBoxOKCancelDetailsDlg);
    MBSetText(MBOKCancelDetailsText, MBOKCancelDetailsFrame, %message);
    MBOKCancelDetailsInfoText.setText(%details);
-   
+
    %textExtent = MBOKCancelDetailsText.getExtent();
    %textExtentY = getWord(%textExtent, 1);
    %textPos = MBOKCancelDetailsText.getPosition();
    %textPosY = getWord(%textPos, 1);
-      
+
    %extentY = %textPosY + %textExtentY + 65;
-   
+
    MBOKCancelDetailsInfoText.setExtent(285, 128);
-   
+
    MBOKCancelDetailsFrame.setExtent(300, %extentY);
-   
+
    MessageBoxOKCancelDetailsDlg.callback = %callback;
    MessageBoxOKCancelDetailsDlg.cancelCallback = %cancelCallback;
-   
+
    MBOKCancelDetailsFrame.defaultExtent = MBOKCancelDetailsFrame.getExtent();
 }
 
@@ -200,20 +200,20 @@ function MBOKCancelDetailsToggleInfoFrame()
       %textExtentY = getWord(%textExtent, 1);
       %textPos = MBOKCancelDetailsText.getPosition();
       %textPosY = getWord(%textPos, 1);
-      
+
       %verticalStretch = %textExtentY;
-      
+
       if((%verticalStretch > 260) || (%verticalStretch < 0))
         %verticalStretch = 260;
-      
+
       %extent = MBOKCancelDetailsFrame.defaultExtent;
       %height = getWord(%extent, 1);
-      
+
       %posY = %textPosY + %textExtentY + 10;
       %posX = getWord(MBOKCancelDetailsScroll.getPosition(), 0);
       MBOKCancelDetailsScroll.setPosition(%posX, %posY);
       MBOKCancelDetailsScroll.setExtent(getWord(MBOKCancelDetailsScroll.getExtent(), 0), %verticalStretch);
-      MBOKCancelDetailsFrame.setExtent(300, %height + %verticalStretch + 10);    
+      MBOKCancelDetailsFrame.setExtent(300, %height + %verticalStretch + 10);
    } else
    {
       %extent = MBOKCancelDetailsFrame.defaultExtent;
@@ -281,17 +281,17 @@ function IODropdown(%title, %message, %simgroup, %callback, %cancelCallback)
    IODropdownFrame.text = %title;
    Canvas.pushDialog(IODropdownDlg);
    MBSetText(IODropdownText, IODropdownFrame, %message);
-   
+
    if(isObject(%simgroup))
    {
       for(%i = 0; %i < %simgroup.getCount(); %i++)
          IODropdownMenu.add(%simgroup.getObject(%i).getName());
-      
+
    }
-   
+
    IODropdownMenu.sort();
    IODropdownMenu.setFirstSelected(0);
-   
+
    IODropdownDlg.callback = %callback;
    IODropdownDlg.cancelCallback = %cancelCallback;
 }

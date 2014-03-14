@@ -33,19 +33,19 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXPlayList );
 
 ConsoleDocClass( SFXPlayList,
    "@brief A datablock describing a playback pattern of sounds.\n\n"
-   
+
    "Playlists allow to define intricate playback patterns of invidual tracks and thus allow the sound system to be "
    "easily used for playing multiple sounds in single operations.\n\n"
-   
+
    "As playlists are %SFXTracks, they can thus be used anywhere in the engine where sound data can be assigned.\n\n"
-   
+
    "Each playlist can hold a maximum of 16 tracks.  Longer playlists may be constructed by cascading lists, i.e. "
    "by creating a playlist that references other playlists.\n\n"
-      
+
    "Processing of a single playlist slot progresses in a fixed set of steps that are invariably "
    "iterated through for each slot (except the slot is assigned a state and its state is deactivated; in "
    "this case, the controller will exit out of the slot directly):\n\n"
-   
+
    "<ol>\n"
       "<li><b>delayIn:</b><p>Waits a set amount of time before processing the slot. This is 0 by default and "
          "is determined by the #delayTimeIn (seconds to wait) and #delayTimeInVariance (bounds on randomization) "
@@ -63,38 +63,38 @@ ConsoleDocClass( SFXPlayList,
          "same as @c delayIn and is set to 0 by default (i.e. no delay).</p></li>\n"
       "<li><b>#transitionOut:</b><p>Decides what to do @b after playing the slot. This works like #transitionIn.</p></li>\n"
    "</ol>\n\n"
-   
+
    "This is a key difference to playlists in normal music players where upon reaching a certain slot, the slot "
    "will immediately play and the player then wait for playback to finish before moving on to the next slot.\n\n"
-      
+
    "@note Be aware that time limits set on slot delays are soft limits.  The sound system updates sound sources in discrete "
       "(and equally system update frequency dependent) intervals which thus determines the granularity at which "
       "time-outs can be handled.\n\n"
-      
+
    "@section SFXPlayList_randomization Value Randomization\n\n"
-   
+
    "For greater variety, many of the values for individual slots may be given a randomization limit that will "
    "trigger a dynamic variance of the specified base value.\n\n"
-   
+
    "Any given field @c xyz that may be randomized has a corresponding field @c xyzVariance which is a two-dimensional "
    "vector.  The first number specifies the greatest value that may be subtracted from the given base value (i.e. the @c xyz field) "
    "whereas the second number specifies the greatest value that may be added to the base value.  Between these two limits, "
    "a random number is generated.\n\n"
-   
+
    "The default variance settings of \"0 0\" will thus not allow to add or subtract anything from the base value and "
    "effectively disable randomization.\n\n"
-      
+
    "Randomization is re-evaluated on each cycle through a list.\n\n"
 
    "@section SFXPlayList_states Playlists and States\n\n"
-   
+
    "A unique aspect of playlists is that they allow their playback to be tied to the changing set of active sound states. "
    "This feature enables playlists to basically connect to an extensible state machine that can be leveraged by the game "
    "code to signal a multitude of different gameplay states with the audio system then automatically reacting to state "
    "transitions.\n\n"
-   
+
    "Playlists react to states in three ways:\n"
-   
+
    "- Before a controller starts processing a slot it checks whether the slot is assigned a #state.  If this is the "
       "case, the controller checks whether the particular state is active.  If it is not, the entire slot is skipped.  "
       "If it is, the controller goes on to process the slot.\n"
@@ -103,13 +103,13 @@ ConsoleDocClass( SFXPlayList,
    "- Once the play stage has been processed for a slot that has a #state assigned, the slot's #stateMode will determine "
       "what happens with the playing sound source if the slot's state is deactivated while the sound is still playing.\n"
    "\n"
-   
+
    "A simple example of how to make use of states in combination with playlists would be to set up a playlist for background "
    "music that reacts to the mood of the current gameplay situation.  For example, during combat, tenser music could play than "
    "during normal exploration.  To set this up, different %SFXStates would represent different moods in the game and the "
    "background music playlist would have one slot set up for each such mood.  By making use of volume fades and the "
    "@c PauseWhenDeactivated #stateMode, smooth transitions between the various audio tracks can be produced.\n\n"
-   
+
    "@tsexample\n"
    "// Create a play list from two SFXProfiles.\n"
    "%playList = new SFXPlayList()\n"
@@ -126,7 +126,7 @@ ConsoleDocClass( SFXPlayList,
    "@endtsexample\n\n"
 
    "@ref SFX_interactive\n\n"
-   
+
    "@ingroup SFX"
 );
 
@@ -227,7 +227,7 @@ SFXPlayList::SFXPlayList()
 void SFXPlayList::initPersistFields()
 {
    addGroup( "Sound" );
-   
+
       addField( "random",           TYPEID< ERandomMode >(), Offset( mRandomMode, SFXPlayList ),
          "Slot playback order randomization pattern.\n"
          "By setting this field to something other than \"NotRandom\" to order in which slots of the "
@@ -244,9 +244,9 @@ void SFXPlayList::initPersistFields()
          "Up to a maximum of 16, this field determines the number of slots that are taken from the "
          "list for playback.  Only slots that have a valid #track assigned will be considered for "
          "this." );
-   
+
       addArray( "slots", NUM_SLOTS );
-      
+
          addField( "track",                  TypeSFXTrackName, Offset( mSlots.mTrack, SFXPlayList ), NUM_SLOTS,
             "Track to play in this slot.\n"
             "This must be set for the slot to be considered for playback.  Other settings for a slot "
@@ -319,17 +319,17 @@ void SFXPlayList::initPersistFields()
          addField( "stateMode",              TYPEID< EStateMode >(), Offset( mSlots.mStateMode, SFXPlayList ), NUM_SLOTS,
             "Behavior when assigned state is deactivated while slot is playing.\n\n"
             "@ref SFXPlayList_states" );
-   
+
       endArray( "slots" );
-   
+
    endGroup( "Sound" );
-   
+
    addGroup( "Debug" );
-   
+
       addField( "trace", TypeBool, Offset( mTrace, SFXPlayList ),
          "Enable/disable execution tracing for this playlist (local only).\n"
          "If this is true, SFXControllers attached to the list will automatically run in trace mode." );
-         
+
    endGroup( "Debug" );
 
    Parent::initPersistFields();
@@ -341,23 +341,23 @@ bool SFXPlayList::preload( bool server, String& errorStr )
 {
    if( !Parent::preload( server, errorStr ) )
       return false;
-      
+
    validate();
-      
+
    // Resolve SFXTracks and SFXStates on client.
-      
+
    if( !server )
    {
       for( U32 i = 0; i < NUM_SLOTS; ++ i )
       {
          if( !sfxResolve( &mSlots.mTrack[ i ], errorStr ) )
             return false;
-            
+
          if( !sfxResolve( &mSlots.mState[ i ], errorStr ) )
             return false;
       }
    }
-      
+
    return true;
 }
 
@@ -366,19 +366,19 @@ bool SFXPlayList::preload( bool server, String& errorStr )
 void SFXPlayList::packData( BitStream* stream )
 {
    Parent::packData( stream );
-   
+
    stream->writeInt( mRandomMode, NUM_RANDOM_MODE_BITS );
    stream->writeInt( mLoopMode, NUM_LOOP_MODE_BITS );
    stream->writeInt( mNumSlotsToPlay, NUM_SLOTS_TO_PLAY_BITS );
-   
+
    #define FOR_EACH_SLOT \
       for( U32 i = 0; i < NUM_SLOTS; ++ i )
-   
+
    FOR_EACH_SLOT stream->writeInt( mSlots.mReplayMode[ i ], NUM_REPLAY_MODE_BITS );
    FOR_EACH_SLOT stream->writeInt( mSlots.mTransitionIn[ i ], NUM_TRANSITION_MODE_BITS );
    FOR_EACH_SLOT stream->writeInt( mSlots.mTransitionOut[ i ], NUM_TRANSITION_MODE_BITS );
    FOR_EACH_SLOT stream->writeInt( mSlots.mStateMode[ i ], NUM_STATE_MODE_BITS );
-      
+
    FOR_EACH_SLOT stream->write( mSlots.mFadeTimeIn.mValue[ i ] );
    FOR_EACH_SLOT stream->write( mSlots.mFadeTimeIn.mVariance[ i ][ 0 ] );
    FOR_EACH_SLOT stream->write( mSlots.mFadeTimeIn.mVariance[ i ][ 1 ] );
@@ -398,7 +398,7 @@ void SFXPlayList::packData( BitStream* stream )
    FOR_EACH_SLOT stream->write( mSlots.mPitchScale.mVariance[ i ][ 0 ] );
    FOR_EACH_SLOT stream->write( mSlots.mPitchScale.mVariance[ i ][ 1 ] );
    FOR_EACH_SLOT stream->write( mSlots.mRepeatCount[ i ] );
-      
+
    FOR_EACH_SLOT sfxWrite( stream, mSlots.mState[ i ] );
    FOR_EACH_SLOT sfxWrite( stream, mSlots.mTrack[ i ] );
 }
@@ -408,16 +408,16 @@ void SFXPlayList::packData( BitStream* stream )
 void SFXPlayList::unpackData( BitStream* stream )
 {
    Parent::unpackData( stream );
-   
+
    mRandomMode          = ( ERandomMode ) stream->readInt( NUM_RANDOM_MODE_BITS );
    mLoopMode            = ( ELoopMode ) stream->readInt( NUM_LOOP_MODE_BITS );
    mNumSlotsToPlay      = stream->readInt( NUM_SLOTS_TO_PLAY_BITS );
-   
+
    FOR_EACH_SLOT mSlots.mReplayMode[ i ]     = ( EReplayMode ) stream->readInt( NUM_REPLAY_MODE_BITS );
    FOR_EACH_SLOT mSlots.mTransitionIn[ i ]   = ( ETransitionMode ) stream->readInt( NUM_TRANSITION_MODE_BITS );
    FOR_EACH_SLOT mSlots.mTransitionOut[ i ]  = ( ETransitionMode ) stream->readInt( NUM_TRANSITION_MODE_BITS );
    FOR_EACH_SLOT mSlots.mStateMode[ i ]      = ( EStateMode ) stream->readInt( NUM_STATE_MODE_BITS );
-      
+
    FOR_EACH_SLOT stream->read( &mSlots.mFadeTimeIn.mValue[ i ] );
    FOR_EACH_SLOT stream->read( &mSlots.mFadeTimeIn.mVariance[ i ][ 0 ] );
    FOR_EACH_SLOT stream->read( &mSlots.mFadeTimeIn.mVariance[ i ][ 1 ] );
@@ -437,10 +437,10 @@ void SFXPlayList::unpackData( BitStream* stream )
    FOR_EACH_SLOT stream->read( &mSlots.mPitchScale.mVariance[ i ][ 0 ] );
    FOR_EACH_SLOT stream->read( &mSlots.mPitchScale.mVariance[ i ][ 1 ] );
    FOR_EACH_SLOT stream->read( &mSlots.mRepeatCount[ i ] );
-      
+
    FOR_EACH_SLOT sfxRead( stream, &mSlots.mState[ i ] );
    FOR_EACH_SLOT sfxRead( stream, &mSlots.mTrack[ i ] );
-   
+
    #undef FOR_EACH_SLOT
 }
 
@@ -458,7 +458,7 @@ void SFXPlayList::validate()
 {
    if( mNumSlotsToPlay > NUM_SLOTS )
       mNumSlotsToPlay = NUM_SLOTS;
-      
+
    mSlots.mFadeTimeIn.validate();
    mSlots.mFadeTimeOut.validate();
    mSlots.mDelayTimeIn.validate();

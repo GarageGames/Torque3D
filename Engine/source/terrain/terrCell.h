@@ -60,8 +60,8 @@ GFXDeclareVertexFormat( TerrVertex )
    /// tangent vector on the GPU.
    F32 tangentZ;
 
-   /// The empty flag state which is either 
-   /// -1 or 1 so we can do the special 
+   /// The empty flag state which is either
+   /// -1 or 1 so we can do the special
    /// interpolation trick.
    F32 empty;
 };
@@ -72,7 +72,7 @@ class TerrCell
 {
 protected:
 
-   /// The handle to the static vertex buffer which holds the 
+   /// The handle to the static vertex buffer which holds the
    /// vertices for this cell.
    GFXVertexBufferHandle<TerrVertex> mVertexBuffer;
 
@@ -82,7 +82,7 @@ protected:
 
    ///
    Point2I mPoint;
-   
+
    ///
    U32 mSize;
 
@@ -90,7 +90,7 @@ protected:
    /// zero is the root and one is a direct child of the root, etc.
    U32 mLevel;
 
-   /// Statics used in VB and PB generation.   
+   /// Statics used in VB and PB generation.
    static const U32 smVBStride;
    static const U32 smMinCellSize;
    static const U32 smVBSize;
@@ -112,7 +112,7 @@ protected:
    /// The material used to render the cell.
    TerrainCellMaterial *mMaterial;
 
-   /// The bounding box of this cell in 
+   /// The bounding box of this cell in
    /// TerrainBlock object space.
    Box3F mBounds;
 
@@ -149,13 +149,13 @@ protected:
                U32 size,
                U32 level );
 
-   // 
+   //
    void _updateVertexBuffer();
 
    //
    void _updatePrimitiveBuffer();
 
-   // 
+   //
    void _updateMaterials();
 
    //
@@ -197,7 +197,7 @@ public:
 
    /// Returns a bit vector of what zones overlap this cell.
    const BitVector& getZoneOverlap() const { return mZoneOverlap; }
-   
+
    /// Forces the loading of the materials for this
    /// cell and all its child cells.
    void preloadMaterials();
@@ -207,14 +207,14 @@ public:
    /// Return true if this is a leaf cell, i.e. a cell without children.
    bool isLeaf() const { return !mChildren[ 0 ]; }
 
-   /// Deletes the materials for this cell 
+   /// Deletes the materials for this cell
    /// and all its children.  They will be
    /// recreate on the next request.
    void deleteMaterials();
 
    U32 getSize() const { return mSize; }
 
-   Point2I getPoint() const { return mPoint; }   
+   Point2I getPoint() const { return mPoint; }
 
    /// Initializes a primitive buffer for rendering any cell.
    static void createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer );

@@ -64,12 +64,12 @@ struct VertTuple
    Point2F dataUV, dataUV2;
 
    VertTuple(): prim(-1), vertex(-1), normal(-1), color(-1), uv(-1), uv2(-1) {}
-   bool operator==(const VertTuple& p) const 
+   bool operator==(const VertTuple& p) const
    {
       return   dataVertex == p.dataVertex &&
-               dataColor == p.dataColor &&  
-               dataNormal == p.dataNormal &&   
-               dataUV == p.dataUV &&  
+               dataColor == p.dataColor &&
+               dataNormal == p.dataNormal &&
+               dataUV == p.dataUV &&
                dataUV2 == p.dataUV2;
    }
 };
@@ -110,7 +110,7 @@ protected:
    void getPrimitives(const domGeometry* geometry);
 
    void getVertexData(  const domGeometry* geometry, F32 time, const MatrixF& objectOffset,
-                        Vector<Point3F>& points, Vector<Point3F>& norms, Vector<ColorI>& colors, 
+                        Vector<Point3F>& points, Vector<Point3F>& norms, Vector<ColorI>& colors,
                         Vector<Point2F>& uvs, Vector<Point2F>& uv2s, bool appendValues);
 
    void getMorphVertexData(   const domMorph* morph, F32 time, const MatrixF& objectOffset,

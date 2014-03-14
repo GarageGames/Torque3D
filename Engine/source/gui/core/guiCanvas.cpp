@@ -78,7 +78,7 @@ ConsoleDocClass( GuiCanvas,
 	"Every frame the canvas paints only the areas of the canvas that are 'dirty' "
 	"or need updating. In most cases, this only is the area under the mouse cursor. "
 	"This is why if you look in guiCanvas.cc the call to glClear is commented out. "
-	
+
 	"What you will see is a black screen, except in the dirty regions, where the "
 	"screen will be painted normally. If you are making an animated GuiControl "
 	"you need to add your control to the dirty areas of the canvas.\n\n"
@@ -163,7 +163,7 @@ bool GuiCanvas::setProtectedNumFences( void *object, const char *index, const ch
    GuiCanvas *canvas = reinterpret_cast<GuiCanvas *>( object );
    canvas->mNumFences = dAtoi( data );
    canvas->setupFences();
-   
+
    return false;
 }
 
@@ -187,7 +187,7 @@ bool GuiCanvas::onAdd()
 {
    // ensure that we have a cursor
    setCursor(dynamic_cast<GuiCursor*>(Sim::findObject("DefaultCursor")));
-   
+
    // Enumerate things for GFX before we have an active device.
    GFXInit::enumerateAdapters();
 
@@ -229,9 +229,9 @@ bool GuiCanvas::onAdd()
       mPlatformWindow = WindowManager->createWindow(newDevice, vm);
 
 		//Disable window resizing if recording ir playing a journal
-		if (Journal::IsRecording() || Journal::IsPlaying())					
+		if (Journal::IsRecording() || Journal::IsPlaying())
 			mPlatformWindow->lockSize(true);
-		
+
 		// Set a minimum on the window size so people can't break us by resizing tiny.
 		mPlatformWindow->setMinimumWindowSize(Point2I(640,480));
 
@@ -245,7 +245,7 @@ bool GuiCanvas::onAdd()
 
    // Need to get painted, too! :)
    Process::notify(this, &GuiCanvas::paint, PROCESS_RENDER_ORDER);
-   
+
    // Set up the fences
    setupFences();
 
@@ -297,7 +297,7 @@ void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 	if (Journal::IsPlaying() && mPlatformWindow)
 	{
 		mPlatformWindow->lockSize(false);
-		mPlatformWindow->setSize(Point2I(width, height));	
+		mPlatformWindow->setSize(Point2I(width, height));
 		mPlatformWindow->lockSize(true);
 	}
 
@@ -309,7 +309,7 @@ void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 void GuiCanvas::handlePaintEvent(WindowId did)
 {
    bool canRender = mPlatformWindow->isVisible() && GFX->allowRender() && !GFX->canCurrentlyRender();
-   
+
 	// Do the screenshot first.
    if ( gScreenShot != NULL && gScreenShot->isPending() && canRender )
 		gScreenShot->capture( this );
@@ -318,7 +318,7 @@ void GuiCanvas::handlePaintEvent(WindowId did)
    if ( VIDCAP->isWaitingForCanvas() && canRender )
       VIDCAP->begin( this );
 
-   // Now capture the video   
+   // Now capture the video
    if ( VIDCAP->isRecording() && canRender )
       VIDCAP->capture();
 
@@ -345,7 +345,7 @@ void GuiCanvas::handleAppEvent( WindowId did, S32 event )
 
       if(isMethod("onWindowClose"))
       {
-         // First see if there is a method on this window to handle 
+         // First see if there is a method on this window to handle
          //  it's closure
          Con::executef(this,"onWindowClose");
       }
@@ -419,10 +419,10 @@ void GuiCanvas::setCursorON(bool onOff)
 Point2I GuiCanvas::getCursorPos()
 {
    Point2I p( 0, 0 );
-   
+
    if( mPlatformWindow )
       mPlatformWindow->getCursorPosition( p );
-      
+
    return p;
 }
 
@@ -438,12 +438,12 @@ void GuiCanvas::setCursorPos(const Point2I &pt)
    else
    {
       Point2I screenPt( mPlatformWindow->clientToScreen( pt ) );
-      mPlatformWindow->setCursorPosition( screenPt.x, screenPt.y ); 
+      mPlatformWindow->setCursorPosition( screenPt.x, screenPt.y );
    }
 }
 
 void GuiCanvas::showCursor(bool state)
-{ 
+{
    mShowCursor = state;
    mPlatformWindow->setCursorVisible( state );
 }
@@ -511,7 +511,7 @@ bool GuiCanvas::tabPrev(void)
 		if ( newResponder && newResponder != oldResponder )
 		{
 			newResponder->setFirstResponder();
-	
+
          // CodeReview As with tabNext() above, looks like this can now go. DAW - 7/05/09
 	      //if ( oldResponder )
 	      //   oldResponder->onLoseFirstResponder();
@@ -541,7 +541,7 @@ bool GuiCanvas::processInputEvent(InputEventInfo &inputEvent)
       break;
 
    case MouseDeviceType:
-      if (mCursorEnabled || mForceMouseToGUI || 
+      if (mCursorEnabled || mForceMouseToGUI ||
          (mAlwaysHandleMouseButtons && inputEvent.objType == SI_BUTTON) )
       {
          return processMouseEvent(inputEvent);
@@ -658,7 +658,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
    //
    //    'mCursorPt' basically is an accumulation of errors and the number of bugs that have cropped up with
    //    the GUI clicking stuff where it is not supposed to are probably all to blame on this.
-   
+
    // Need to query platform for specific things
    AssertISV(mPlatformWindow, "GuiCanvas::processMouseEvent - no window present!");
    PlatformCursorController *pController = mPlatformWindow->getCursorController();
@@ -667,7 +667,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
       //copy the modifier into the new event
       mLastEvent.modifier = inputEvent.modifier;
 
-   if(inputEvent.objType == SI_AXIS && 
+   if(inputEvent.objType == SI_AXIS &&
       (inputEvent.objInst == SI_XAXIS || inputEvent.objInst == SI_YAXIS))
    {
 
@@ -737,7 +737,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
       mLastEvent.mousePoint.x = S32(mCursorPt.x);
       mLastEvent.mousePoint.y = S32(mCursorPt.y);
       mMouseDownPoint = mCursorPt;
-      
+
       if(inputEvent.objInst == KEY_BUTTON0) // left button
       {
          //see if button was pressed
@@ -986,7 +986,7 @@ bool GuiCanvas::processGamepadEvent(InputEventInfo &inputEvent)
             }
          }
       }
-   }  
+   }
    return false;
 }
 
@@ -1061,7 +1061,7 @@ void GuiCanvas::checkLockMouseMove( const GuiEvent& event )
          mMouseCapturedControl->onMouseLeave( event );
       else if( controlHit == mMouseCapturedControl )
          mMouseCapturedControl->onMouseEnter( event );
-         
+
       mMouseControl = controlHit;
    }
 }
@@ -1102,7 +1102,7 @@ void GuiCanvas::rootMouseDragged(const GuiEvent &event)
 }
 
 void GuiCanvas::rootMouseMove(const GuiEvent &event)
-{   
+{
    if (bool(mMouseCapturedControl))
    {
       mMouseCapturedControl->onMouseMove(event);
@@ -1375,7 +1375,7 @@ void GuiCanvas::pushDialogControl(GuiControl *gui, S32 layer, bool center)
 
    refreshMouseControl();
 
-   // I don't see the purpose of this, and it's causing issues when showing, for instance the 
+   // I don't see the purpose of this, and it's causing issues when showing, for instance the
    //  metrics dialog while in a 3d scene, causing the cursor to be shown even when the mouse
    //  is locked [4/25/2007 justind]
    //if(gui->mProfile && gui->mProfile->mModal)
@@ -1621,14 +1621,14 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    // Signal the interested parties.
    GuiCanvas::getGuiCanvasFrameSignal().trigger(true);
-      
-   // Gross hack to make sure we don't end up with advanced lighting and msaa 
-   // at the same time, which causes artifacts. At the same time we don't 
-   // want to just throw the settings the user has chosen if the light manager 
+
+   // Gross hack to make sure we don't end up with advanced lighting and msaa
+   // at the same time, which causes artifacts. At the same time we don't
+   // want to just throw the settings the user has chosen if the light manager
    // changes at a later time.
 
    GFXVideoMode mode = mPlatformWindow->getVideoMode();
-   if ( dStricmp( LIGHTMGR->getId(), "ADVLM" ) == 0 && mode.antialiasLevel > 0 )   
+   if ( dStricmp( LIGHTMGR->getId(), "ADVLM" ) == 0 && mode.antialiasLevel > 0 )
    {
       const char *pref = Con::getVariable( "$pref::Video::mode" );
       mode.parseFromString( pref );
@@ -1698,11 +1698,11 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    PROFILE_END();
 
-   // Can't render if waiting for device to reset.   
+   // Can't render if waiting for device to reset.
    if ( !beginSceneRes )
-   {      
+   {
       PROFILE_END(); // CanvasRenderControls
-      
+
       // Since we already triggered the signal once for begin-of-frame,
       // we should be consistent and trigger it again for end-of-frame.
       GuiCanvas::getGuiCanvasFrameSignal().trigger(false);
@@ -1716,8 +1716,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    resetUpdateRegions();
 
-	// Make sure we have a clean matrix state 
-   // before we start rendering anything!   
+	// Make sure we have a clean matrix state
+   // before we start rendering anything!
    GFX->setWorldMatrix( MatrixF::Identity );
    GFX->setViewMatrix( MatrixF::Identity );
    GFX->setProjectionMatrix( MatrixF::Identity );
@@ -1736,10 +1736,10 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       {
          // Get the control
          GuiControl *contentCtrl = static_cast<GuiControl*>(*i);
-         
+
          GFX->setClipRect( updateUnion );
          GFX->setStateBlock(mDefaultGuiSB);
-         
+
          contentCtrl->onRender(contentCtrl->getPosition(), updateUnion);
       }
 
@@ -1762,7 +1762,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
                mHoverPositionSet = mMouseControl->mRenderTooltipDelegate( mHoverPosition, cursorPos, NULL );
             }
 
-         } 
+         }
          else
          {
             if(mHoverPositionSet)
@@ -1785,7 +1785,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
 
       // CodeReview - Make sure our bitmap modulation is clear or else there's a black modulation
-      // that ruins rendering of textures at startup.. This was done in mouseCursor 
+      // that ruins rendering of textures at startup.. This was done in mouseCursor
       // onRender and so at startup when it wasn't called the modulation was black, ruining
       // the loading screen display. This fixes the issue, but is it only masking a deeper issue
       // in GFX with regard to gui rendering? [5/3/2007 justind]
@@ -1794,7 +1794,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       // Really draw the cursor. :)
       // Only if the platform cursor controller is missing or the platform cursor
       // isn't visible.
-      if (!mPlatformWindow->getCursorController() || (mCursorEnabled && mouseCursor && mShowCursor && 
+      if (!mPlatformWindow->getCursorController() || (mCursorEnabled && mouseCursor && mShowCursor &&
          !mPlatformWindow->getCursorController()->isCursorVisible()))
       {
          Point2I pos((S32)mCursorPt.x, (S32)mCursorPt.y);
@@ -1814,7 +1814,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
 #ifdef TORQUE_DEMO_TIMEOUT
    checkTimeOut();
-#endif  
+#endif
 
    PROFILE_END();
 
@@ -1825,7 +1825,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       mFences[mNextFenceIdx]->issue();
 
       mNextFenceIdx++;
-      
+
       // Wrap the next fence around to first if we're maxxed
       if( mNextFenceIdx >= mNumFences )
          mNextFenceIdx = 0;
@@ -1930,13 +1930,13 @@ void GuiCanvas::setFirstResponder( GuiControl* newResponder )
 {
 	GuiControl* oldResponder = mFirstResponder;
 	Parent::setFirstResponder( newResponder );
-   
+
    if( oldResponder == mFirstResponder )
       return;
 
 	if( oldResponder && ( oldResponder != newResponder ) )
 		oldResponder->onLoseFirstResponder();
-      
+
    if( newResponder && ( newResponder != oldResponder ) )
       newResponder->onGainFirstResponder();
 }
@@ -2014,7 +2014,7 @@ ConsoleMethod( GuiCanvas, pushDialog, void, 3, 5, "(GuiControl ctrl, int layer=0
    S32 layer = 0;
    if( argc > 3 )
       layer = dAtoi( argv[ 3 ] );
-      
+
    bool center = false;
    if( argc > 4 )
       center = dAtob( argv[ 4 ] );
@@ -2081,7 +2081,7 @@ ConsoleDocFragment _popLayer2(
 	"void popLayer(S32 layer);"
 );
 
-ConsoleMethod( GuiCanvas, popLayer, void, 2, 3, "(int layer)" 
+ConsoleMethod( GuiCanvas, popLayer, void, 2, 3, "(int layer)"
 			  "@hide")
 {
    S32 layer = 0;
@@ -2263,7 +2263,7 @@ DefineEngineMethod( GuiCanvas, getMouseControl, S32, (),,
 	GuiControl* control = object->getMouseControl();
    if (control)
       return control->getId();
-   
+
    return NULL;
 }
 
@@ -2389,7 +2389,7 @@ DefineEngineMethod( GuiCanvas, getModeCount, S32, (),,
       return 0;
 
    // Grab the available mode list from the device.
-   const Vector<GFXVideoMode>* const modeList = 
+   const Vector<GFXVideoMode>* const modeList =
       object->getPlatformWindow()->getGFXDevice()->getVideoModeList();
 
    // Return the number of resolutions.
@@ -2406,7 +2406,7 @@ DefineEngineMethod( GuiCanvas, getMode, const char*, (S32 modeId),,
       return 0;
 
    // Grab the available mode list from the device.
-   const Vector<GFXVideoMode>* const modeList = 
+   const Vector<GFXVideoMode>* const modeList =
       object->getPlatformWindow()->getGFXDevice()->getVideoModeList();
 
    // Get the desired index and confirm it's valid.
@@ -2417,7 +2417,7 @@ DefineEngineMethod( GuiCanvas, getMode, const char*, (S32 modeId),,
       return "";
    }
 
-   // Great - we got something valid, so convert the videomode into a 
+   // Great - we got something valid, so convert the videomode into a
    // string and return to the user.
    GFXVideoMode vm = (*modeList)[idx];
 
@@ -2440,19 +2440,19 @@ DefineEngineMethod( GuiCanvas, toggleFullscreen, void, (),,
    if (!object->getPlatformWindow())
       return;
 
-   if (Journal::IsRecording() || Journal::IsPlaying())   
+   if (Journal::IsRecording() || Journal::IsPlaying())
       return;
 
    // Get the window's video mode.
    GFXVideoMode origMode = object->getPlatformWindow()->getVideoMode();
-   
+
    // And grab the device its using.
    GFXDevice *device = object->getPlatformWindow()->getGFXDevice();
 
    // Toggle the fullscreen bit.
    GFXVideoMode newMode = origMode;
    newMode.fullScreen = !origMode.fullScreen;
-   
+
    // CodeReview Toggling might be better served by reading the fullscreen
    //            or windowed video mode pref and setting that instead [bjg 5/2/07]
 
@@ -2495,7 +2495,7 @@ DefineEngineMethod( GuiCanvas, clientToScreen, Point2I, ( Point2I coordinate ),,
 {
    if( !object->getPlatformWindow() )
       return coordinate;
-      
+
    return object->getPlatformWindow()->clientToScreen( coordinate );
 }
 
@@ -2506,7 +2506,7 @@ DefineEngineMethod( GuiCanvas, screenToClient, Point2I, ( Point2I coordinate ),,
 {
    if( !object->getPlatformWindow() )
       return coordinate;
-      
+
    return object->getPlatformWindow()->screenToClient( coordinate );
 }
 
@@ -2516,7 +2516,7 @@ DefineEngineMethod( GuiCanvas, getWindowPosition, Point2I, (),,
 {
    if( !object->getPlatformWindow() )
       return Point2I( 0, 0 );
-      
+
    return object->getPlatformWindow()->getPosition();
 }
 
@@ -2526,7 +2526,7 @@ DefineEngineMethod( GuiCanvas, setWindowPosition, void, ( Point2I position ),,
 {
    if( !object->getPlatformWindow() )
       return;
-      
+
    object->getPlatformWindow()->setPosition( position );
 }
 
@@ -2599,8 +2599,8 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
 {
    if (!object->getPlatformWindow())
       return;
-   
-   if (Journal::IsRecording() || Journal::IsPlaying())   
+
+   if (Journal::IsRecording() || Journal::IsPlaying())
       return;
 
    // Update the video mode and tell the window to reset.

@@ -47,7 +47,7 @@ MODULE_BEGIN( ReflectionManager )
       ManagedSingleton< ReflectionManager >::createSingleton();
       ReflectionManager::initConsole();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< ReflectionManager >::deleteSingleton();
@@ -56,14 +56,14 @@ MODULE_BEGIN( ReflectionManager )
 MODULE_END;
 
 
-GFX_ImplementTextureProfile( ReflectRenderTargetProfile, 
-                             GFXTextureProfile::DiffuseMap, 
-                             GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget | GFXTextureProfile::Pooled, 
+GFX_ImplementTextureProfile( ReflectRenderTargetProfile,
+                             GFXTextureProfile::DiffuseMap,
+                             GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget | GFXTextureProfile::Pooled,
                              GFXTextureProfile::None );
 
 GFX_ImplementTextureProfile( RefractTextureProfile,
                              GFXTextureProfile::DiffuseMap,
-                             GFXTextureProfile::PreserveSize | 
+                             GFXTextureProfile::PreserveSize |
                              GFXTextureProfile::RenderTarget |
                              GFXTextureProfile::Pooled,
                              GFXTextureProfile::None );
@@ -71,8 +71,8 @@ GFX_ImplementTextureProfile( RefractTextureProfile,
 static S32 QSORT_CALLBACK compareReflectors( const void *a, const void *b )
 {
    const ReflectorBase *A = *((ReflectorBase**)a);
-   const ReflectorBase *B = *((ReflectorBase**)b);     
-   
+   const ReflectorBase *B = *((ReflectorBase**)b);
+
    F32 dif = B->score - A->score;
    return (S32)mFloor( dif );
 }
@@ -81,7 +81,7 @@ static S32 QSORT_CALLBACK compareReflectors( const void *a, const void *b )
 U32 ReflectionManager::smFrameReflectionMS = 10;
 F32 ReflectionManager::smRefractTexScale = 0.5f;
 
-ReflectionManager::ReflectionManager() 
+ReflectionManager::ReflectionManager()
  : mUpdateRefract( true ),
    mReflectFormat( GFXFormatR8G8B8A8 )
 {
@@ -113,11 +113,11 @@ void ReflectionManager::registerReflector( ReflectorBase *reflector )
 
 void ReflectionManager::unregisterReflector( ReflectorBase *reflector )
 {
-   mReflectors.remove( reflector );   
+   mReflectors.remove( reflector );
 }
 
-void ReflectionManager::update(  F32 timeSlice, 
-                                 const Point2I &resolution, 
+void ReflectionManager::update(  F32 timeSlice,
+                                 const Point2I &resolution,
                                  const CameraQuery &query )
 {
    GFXDEBUGEVENT_SCOPE( UpdateReflections, ColorI::WHITE );
@@ -130,13 +130,13 @@ void ReflectionManager::update(  F32 timeSlice,
    // Calculate our target time from the slice.
    U32 targetMs = timeSlice * smFrameReflectionMS;
 
-   // Setup a culler for testing the 
+   // Setup a culler for testing the
    // visibility of reflectors.
    Frustum culler;
    culler.set( false,
                query.fov,
                (F32)resolution.x / (F32)resolution.y,
-               query.nearPlane, 
+               query.nearPlane,
                query.farPlane,
                query.cameraMatrix );
 
@@ -145,8 +145,8 @@ void ReflectionManager::update(  F32 timeSlice,
    if ( screenShotMode )
       gScreenShot->tileFrustum( culler );
 
-   // We use the frame time and not real time 
-   // here as this may be called multiple times 
+   // We use the frame time and not real time
+   // here as this may be called multiple times
    // within a frame.
    U32 startOfUpdateMs = Platform::getVirtualMilliseconds();
 
@@ -166,16 +166,16 @@ void ReflectionManager::update(  F32 timeSlice,
 
    // Sort them by the score.
    dQsort( mReflectors.address(), mReflectors.size(), sizeof(ReflectorBase*), compareReflectors );
-   
-   // Update as many reflections as we can 
+
+   // Update as many reflections as we can
    // within the target time limit.
    mTimer->getElapsedMs();
    mTimer->reset();
    U32 numUpdated = 0;
    reflectorIter = mReflectors.begin();
    for ( ; reflectorIter != mReflectors.end(); reflectorIter++ )
-   {      
-      // We're sorted by score... so once we reach 
+   {
+      // We're sorted by score... so once we reach
       // a zero score we have nothing more to update.
       if ( (*reflectorIter)->score <= 0.0f && !screenShotMode )
          break;
@@ -193,13 +193,13 @@ void ReflectionManager::update(  F32 timeSlice,
 
    // Set metric/debug related script variables...
 
-   U32 numEnabled = mReflectors.size();   
+   U32 numEnabled = mReflectors.size();
    U32 numVisible = 0;
    U32 numOccluded = 0;
 
    reflectorIter = mReflectors.begin();
    for ( ; reflectorIter != mReflectors.end(); reflectorIter++ )
-   {      
+   {
       ReflectorBase *pReflector = (*reflectorIter);
       if ( pReflector->isOccluded() )
          numOccluded++;
@@ -209,20 +209,20 @@ void ReflectionManager::update(  F32 timeSlice,
 
 #ifdef TORQUE_GATHER_METRICS
    const GFXTextureProfileStats &stats = ReflectRenderTargetProfile.getStats();
-   
+
    F32 mb = ( stats.activeBytes / 1024.0f ) / 1024.0f;
    char temp[256];
 
-   dSprintf( temp, 256, "%s %d %0.2f\n", 
+   dSprintf( temp, 256, "%s %d %0.2f\n",
       ReflectRenderTargetProfile.getName().c_str(),
       stats.activeCount,
-      mb );   
+      mb );
 
    Con::setVariable( "$Reflect::textureStats", temp );
    Con::setIntVariable( "$Reflect::renderTargetsAllocated", stats.allocatedTextures );
    Con::setIntVariable( "$Reflect::poolSize", stats.activeCount );
-   Con::setIntVariable( "$Reflect::numObjects", numEnabled );   
-   Con::setIntVariable( "$Reflect::numVisible", numVisible ); 
+   Con::setIntVariable( "$Reflect::numObjects", numEnabled );
+   Con::setIntVariable( "$Reflect::numVisible", numVisible );
    Con::setIntVariable( "$Reflect::numOccluded", numOccluded );
    Con::setIntVariable( "$Reflect::numUpdated", numUpdated );
    Con::setIntVariable( "$Reflect::elapsed", totalElapsed );
@@ -231,8 +231,8 @@ void ReflectionManager::update(  F32 timeSlice,
 
 GFXTexHandle ReflectionManager::allocRenderTarget( const Point2I &size )
 {
-   return GFXTexHandle( size.x, size.y, mReflectFormat, 
-                        &ReflectRenderTargetProfile, 
+   return GFXTexHandle( size.x, size.y, mReflectFormat,
+                        &ReflectRenderTargetProfile,
                         avar("%s() - mReflectTex (line %d)", __FUNCTION__, __LINE__) );
 }
 
@@ -252,18 +252,18 @@ GFXTextureObject* ReflectionManager::getRefractTex( bool forceUpdate )
    const U32 desHeight = mFloor( ( F32)targetSize.y * smRefractTexScale );
 #endif
 
-   if ( mRefractTex.isNull() || 
+   if ( mRefractTex.isNull() ||
         mRefractTex->getWidth() != desWidth ||
         mRefractTex->getHeight() != desHeight ||
         mRefractTex->getFormat() != targetFormat )
    {
-      mRefractTex.set( desWidth, desHeight, targetFormat, &RefractTextureProfile, "mRefractTex" );    
+      mRefractTex.set( desWidth, desHeight, targetFormat, &RefractTextureProfile, "mRefractTex" );
       mUpdateRefract = true;
    }
 
    if ( forceUpdate || mUpdateRefract )
    {
-      target->resolveTo( mRefractTex );   
+      target->resolveTo( mRefractTex );
       mUpdateRefract = false;
    }
 
@@ -296,10 +296,10 @@ bool ReflectionManager::_handleDeviceEvent( GFXDevice::GFXDeviceEventType evt )
       break;
 
    case GFXDevice::deDestroy:
-      
-      mRefractTex = NULL;      
-      break;  
-      
+
+      mRefractTex = NULL;
+      break;
+
    default:
       break;
    }

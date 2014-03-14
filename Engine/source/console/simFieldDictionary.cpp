@@ -312,7 +312,7 @@ void SimFieldDictionary::printFields(SimObject *obj)
       const char* type = "string";
       if( ( *itr )->type )
          type = ( *itr )->type->getTypeClassName();
-         
+
       dSprintf( expandedBuffer, sizeof( expandedBuffer ), "  %s %s = \"", type, ( *itr )->slotName );
       if ( (*itr)->value )
          expandEscape(expandedBuffer + dStrlen(expandedBuffer), (*itr)->value);

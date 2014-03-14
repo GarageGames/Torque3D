@@ -44,10 +44,10 @@ class Point4I
 
    void zero();   ///< Zero all values
 
-   S32 x;                                                   
-   S32 y;                                                   
-   S32 z;                                                   
-   S32 w;       
+   S32 x;
+   S32 y;
+   S32 z;
+   S32 w;
 
 	//-------------------------------------- Public static constants
   public:
@@ -91,7 +91,7 @@ class Point4F
 
    operator F32*() { return (&x); }
    operator const F32*() const { return &x; }
-   
+
    F32 len() const;
 
    Point4F operator/(F32) const;
@@ -99,12 +99,12 @@ class Point4F
    Point4F operator*(F32) const;
    Point4F  operator+(const Point4F&) const;
    Point4F& operator+=(const Point4F&);
-   Point4F  operator-(const Point4F&) const;      
+   Point4F  operator-(const Point4F&) const;
    Point4F operator*(const Point4F&) const;
    Point4F& operator*=(const Point4F&);
    Point4F& operator=(const Point3F&);
    Point4F& operator=(const Point4F&);
-   
+
    Point3F asPoint3F() const { return Point3F(x,y,z); }
 
 	//-------------------------------------- Public static constants
@@ -224,7 +224,7 @@ inline Point4F Point4F::operator /(F32 t) const
 //------------------------------------------------------------------------------
 //-------------------------------------- Point4F
 
-inline Point4I::Point4I(S32 _x, S32 _y, S32 _z, S32 _w) : x(_x), y(_y), z(_z), w(_w) 
+inline Point4I::Point4I(S32 _x, S32 _y, S32 _z, S32 _w) : x(_x), y(_y), z(_z), w(_w)
 {
 }
 

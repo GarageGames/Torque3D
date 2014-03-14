@@ -49,7 +49,7 @@ public:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "LeapMotionFrameStore"; }   
+   static const char* getSingletonName() { return "LeapMotionFrameStore"; }
 };
 
 /// Returns the LeapMotionFrameStore singleton.

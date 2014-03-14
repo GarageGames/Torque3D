@@ -39,7 +39,7 @@ public:
    //creation methods
    DECLARE_CONOBJECT(GuiBackgroundCtrl);
    DECLARE_CATEGORY( "Gui Containers" );
-   
+
    GuiBackgroundCtrl();
 
    void onRender(Point2I offset, const RectI &updateRect);

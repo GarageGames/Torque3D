@@ -96,7 +96,7 @@ void ForcedMaterialMeshMgr::render(SceneRenderState * state)
    setupSGData( ri, sgData );
 
    while (mOverrideInstance->setupPass(state, sgData))
-   {   
+   {
       for( U32 j=0; j<mElementList.size(); j++)
       {
          MeshRenderInst* passRI = static_cast<MeshRenderInst*>(mElementList[j].inst);
@@ -109,7 +109,7 @@ void ForcedMaterialMeshMgr::render(SceneRenderState * state)
          mOverrideInstance->setTransforms(getRenderPass()->getMatrixSet(), state);
 
          mOverrideInstance->setBuffers(passRI->vertBuff, passRI->primBuff);
-         GFX->drawPrimitive( passRI->primBuffIndex );                  
+         GFX->drawPrimitive( passRI->primBuffIndex );
       }
    }
 }
@@ -125,7 +125,7 @@ const char* ForcedMaterialMeshMgr::_getOverrideMat( void *object, const char *da
 
 bool ForcedMaterialMeshMgr::_setOverrideMat( void *object, const char *index, const char *data )
 {
-   ForcedMaterialMeshMgr &mgr = *reinterpret_cast<ForcedMaterialMeshMgr *>( object );   
+   ForcedMaterialMeshMgr &mgr = *reinterpret_cast<ForcedMaterialMeshMgr *>( object );
    BaseMatInstance* material;
    Sim::findObject( data, material );
    mgr.setOverrideMaterial( material );

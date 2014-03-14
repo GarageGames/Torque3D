@@ -43,7 +43,7 @@ MODULE_BEGIN( OculusVRDevice )
       // Register the device with the Input Event Manager
       INPUTMGR->registerDevice(OCULUSVRDEV);
    }
-   
+
    MODULE_SHUTDOWN
    {
       INPUTMGR->unregisterDevice(OCULUSVRDEV);
@@ -99,34 +99,34 @@ OculusVRDevice::~OculusVRDevice()
 
 void OculusVRDevice::staticInit()
 {
-   Con::addVariable("pref::OculusVR::EnableDevice", TypeBool, &smEnableDevice, 
+   Con::addVariable("pref::OculusVR::EnableDevice", TypeBool, &smEnableDevice,
       "@brief If true, the Oculus VR device will be enabled, if present.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("pref::OculusVR::UseChromaticAberrationCorrection", TypeBool, &smUseChromaticAberrationCorrection, 
+   Con::addVariable("pref::OculusVR::UseChromaticAberrationCorrection", TypeBool, &smUseChromaticAberrationCorrection,
       "@brief If true, Use the chromatic aberration correction version of the Oculus VR barrel distortion shader.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("OculusVR::GenerateAngleAxisRotationEvents", TypeBool, &smGenerateAngleAxisRotationEvents, 
+   Con::addVariable("OculusVR::GenerateAngleAxisRotationEvents", TypeBool, &smGenerateAngleAxisRotationEvents,
       "@brief If true, broadcast sensor rotation events as angled axis.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("OculusVR::GenerateEulerRotationEvents", TypeBool, &smGenerateEulerRotationEvents, 
+   Con::addVariable("OculusVR::GenerateEulerRotationEvents", TypeBool, &smGenerateEulerRotationEvents,
       "@brief If true, broadcast sensor rotation events as Euler angles about the X, Y and Z axis.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("OculusVR::GenerateRotationAsAxisEvents", TypeBool, &smGenerateRotationAsAxisEvents, 
+   Con::addVariable("OculusVR::GenerateRotationAsAxisEvents", TypeBool, &smGenerateRotationAsAxisEvents,
       "@brief If true, broadcast sensor rotation as axis events.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("OculusVR::MaximumAxisAngle", TypeF32, &smMaximumAxisAngle, 
+   Con::addVariable("OculusVR::MaximumAxisAngle", TypeF32, &smMaximumAxisAngle,
       "@brief The maximum sensor angle when used as an axis event as measured from a vector pointing straight up (in degrees).\n\n"
       "Should range from 0 to 90 degrees.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("OculusVR::GenerateSensorRawEvents", TypeBool, &smGenerateSensorRawEvents, 
+   Con::addVariable("OculusVR::GenerateSensorRawEvents", TypeBool, &smGenerateSensorRawEvents,
       "@brief If ture, broadcast sensor raw data: acceleration, angular velocity, magnetometer reading.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("OculusVR::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents, 
+   Con::addVariable("OculusVR::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents,
       "@brief Indicates that a whole frame event should be generated and frames should be buffered.\n\n"
 	   "@ingroup Game");
 }

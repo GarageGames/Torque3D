@@ -101,7 +101,7 @@ void PointLight::initPersistFields()
    // they show up that way in the inspector.
    Parent::initPersistFields();
 
-   // Remove the scale field... it's already 
+   // Remove the scale field... it's already
    // defined by the light radius.
    removeField( "scale" );
 }

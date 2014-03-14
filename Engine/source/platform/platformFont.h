@@ -72,9 +72,9 @@ public:
       S32  xIncrement;
       U8  *bitmapData;     ///< temp storage for bitmap data
    };
-   
+
    virtual ~PlatformFont() {}
-   
+
    /// Is the specified character valid for rendering?
    virtual bool isValidChar(const UTF16 ch) const = 0;
    virtual bool isValidChar(const UTF8 *str) const = 0;

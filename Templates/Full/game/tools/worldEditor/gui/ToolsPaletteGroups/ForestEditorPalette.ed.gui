@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(ForestEditorSelectModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "ForestEditorSelectMode";
@@ -32,7 +32,7 @@
       bitmap = "tools/gui/images/menubar/arrow";
       buttonType = "RadioButton";
       useMouseEvents = "0";
-   };    
+   };
    new GuiBitmapButtonCtrl(ForestEditorMoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "ForestEditorMoveMode";
@@ -130,7 +130,7 @@
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"Erase\";";      
+      Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"Erase\";";
       tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Erase (6)";
       hovertime = "1000";
@@ -138,7 +138,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(ForestEditorEraseSelectedModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "ForestEditorEraseSelectedMode";
@@ -152,7 +152,7 @@
       MinExtent = "8 2";
       canSave = "1";
       Visible = "1";
-      Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"EraseSelected\";";  
+      Command = "ForestEditorGui.setActiveTool( ForestTools->BrushTool ); ForestTools->BrushTool.mode = \"EraseSelected\";";
       tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Erase Selected (7)";
       hovertime = "1000";

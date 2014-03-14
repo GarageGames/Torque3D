@@ -462,7 +462,7 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
    {
       U32 startSize = names.size();
       S32 nameIndex = readName(s,true);
-      
+
       nodeMap[i] = findNode(nameIndex);
 
       if (nodeMap[i] < 0)

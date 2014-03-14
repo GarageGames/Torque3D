@@ -58,7 +58,7 @@ ConsoleDocClass( ActionMap,
 	"	moveMap.delete();\n"
 	"new ActionMap(moveMap);"
 	"@endtsexample\n\n\n"
-	
+
 	"@section ActionMap_binding Binding Functions\n"
 	"Once you have created an ActionMap, you can start binding functionality to events. Currently, Torque 3D supports the following devices out of the box\n\n"
 	"* Mouse\n\n"
@@ -106,7 +106,7 @@ ConsoleDocClass( ActionMap,
 	"// Bind the commands onSpaceDown and onSpaceUp to spacebar events\n"
 	"moveMap.bindCmd(keyboard, \"space\", \"onSpaceDown();\", \"onSpaceUp();\");\n"
 	"@endtsexample\n\n"
-	
+
 	"@section ActionMap_switching Switching ActionMaps\n"
 	"Let's say you want to have different ActionMaps activated based on game play situations. A classic example would be first person shooter controls and racing controls "
 	"in the same game. On foot, spacebar may cause your player to jump. In a vehicle, it may cause some kind of \"turbo charge\". You simply need to push/pop the ActionMaps appropriately:\n\n"
@@ -137,7 +137,7 @@ ConsoleDocClass( ActionMap,
 	"	  echo(\"Vehicle turbo charging!\");\n"
 	"}\n"
 	"@endtsexample\n\n"
-	
+
 	"You are now ready to bind functions to your ActionMaps' devices:\n\n"
 
 	"@tsexample\n"
@@ -167,7 +167,7 @@ ConsoleDocClass( ActionMap,
 	"@endtsexample\n\n\n"
 
 	"@ingroup Input"
-	
+
 );
 
 // This is used for determing keys that have ascii codes for the foreign keyboards. IsAlpha doesn't work on foreign keys.
@@ -542,7 +542,7 @@ ActionMap::Node* ActionMap::getNode(const U32 inDeviceType, const U32 inDeviceIn
    //
    DeviceMap* pDeviceMap = NULL;
    U32 i;
-   for (i = 0; i < mDeviceMaps.size(); i++) 
+   for (i = 0; i < mDeviceMaps.size(); i++)
    {
       if (mDeviceMaps[i]->deviceType == inDeviceType &&
           mDeviceMaps[i]->deviceInst == inDeviceInst) {
@@ -550,7 +550,7 @@ ActionMap::Node* ActionMap::getNode(const U32 inDeviceType, const U32 inDeviceIn
          break;
       }
    }
-   if (pDeviceMap == NULL) 
+   if (pDeviceMap == NULL)
    {
       mDeviceMaps.increment();
       mDeviceMaps.last() = new DeviceMap;
@@ -560,11 +560,11 @@ ActionMap::Node* ActionMap::getNode(const U32 inDeviceType, const U32 inDeviceIn
       pDeviceMap->deviceType = inDeviceType;
    }
 
-   for (i = 0; i < pDeviceMap->nodeMap.size(); i++) 
+   for (i = 0; i < pDeviceMap->nodeMap.size(); i++)
    {
       if (pDeviceMap->nodeMap[i].modifiers == inModifiers &&
           pDeviceMap->nodeMap[i].action    == inAction &&
-          ( (object != NULL) ? object == pDeviceMap->nodeMap[i].object : true )) // Check for an object match if the object exists 
+          ( (object != NULL) ? object == pDeviceMap->nodeMap[i].object : true )) // Check for an object match if the object exists
       {
          return &pDeviceMap->nodeMap[i];
       }
@@ -623,7 +623,7 @@ void ActionMap::removeNode(const U32 inDeviceType, const U32 inDeviceInst, const
    for (i = 0; i < pDeviceMap->nodeMap.size(); i++) {
       if (pDeviceMap->nodeMap[i].modifiers == realMods &&
           pDeviceMap->nodeMap[i].action    == inAction &&
-          ( (object != NULL) ? object == pDeviceMap->nodeMap[i].object : true )) 
+          ( (object != NULL) ? object == pDeviceMap->nodeMap[i].object : true ))
       {
           dFree(pDeviceMap->nodeMap[i].makeConsoleCommand);
           dFree(pDeviceMap->nodeMap[i].breakConsoleCommand);
@@ -665,13 +665,13 @@ const ActionMap::Node* ActionMap::findNode(const U32 inDeviceType, const U32 inD
    for (i = 0; i < pDeviceMap->nodeMap.size(); i++)
    {
       // Special case for an ANYKEY bind...
-      if (pDeviceMap->nodeMap[i].action == KEY_ANYKEY 
-         && pDeviceMap->nodeMap[i].modifiers == realMods 
+      if (pDeviceMap->nodeMap[i].action == KEY_ANYKEY
+         && pDeviceMap->nodeMap[i].modifiers == realMods
          && dIsDecentChar(inAction)
          && inAction <= U8_MAX)
          return &pDeviceMap->nodeMap[i];
 
-      if (pDeviceMap->nodeMap[i].modifiers == realMods 
+      if (pDeviceMap->nodeMap[i].modifiers == realMods
          && pDeviceMap->nodeMap[i].action == inAction)
          return &pDeviceMap->nodeMap[i];
    }
@@ -741,7 +741,7 @@ const char* ActionMap::getBinding( const char* command )
    char buffer[256];
    char deviceBuffer[32];
    char keyBuffer[64];
- 
+
    U32 devMapIndex = 0, nodeIndex = 0;
    while ( nextBoundNode( command, devMapIndex, nodeIndex ) )
    {
@@ -791,11 +791,11 @@ const char* ActionMap::getCommand( const char* device, const char* action )
 					char* returnString = Con::getReturnBuffer( bufferLen );
 					dSprintf( returnString, bufferLen, "%s\t%s",
 							( mapNode->makeConsoleCommand ? mapNode->makeConsoleCommand : "" ),
-							( mapNode->breakConsoleCommand ? mapNode->breakConsoleCommand : "" ) );					
+							( mapNode->breakConsoleCommand ? mapNode->breakConsoleCommand : "" ) );
 					return( returnString );
-				}					
+				}
 				else
-					return( mapNode->consoleFunction );					
+					return( mapNode->consoleFunction );
 			}
 		}
 	}
@@ -872,7 +872,7 @@ const char* ActionMap::getDeadZone( const char* device, const char* action )
 				   return( returnString );
 				}
 				else
-				   return( "0 0" );				   		
+				   return( "0 0" );
 			}
 		}
 	}
@@ -890,7 +890,7 @@ const char* ActionMap::buildActionString( const InputEventInfo* event )
 	if ( !getKeyString( event->objInst, objectBuffer ) )
 		return( "" );
 
-	U32 returnLen = dStrlen( modifierString ) + dStrlen( objectBuffer ) + 2;	
+	U32 returnLen = dStrlen( modifierString ) + dStrlen( objectBuffer ) + 2;
 	char* returnString = Con::getReturnBuffer( returnLen );
 	dSprintf( returnString, returnLen - 1, "%s%s", modifierString, objectBuffer );
 	return( returnString );
@@ -902,17 +902,17 @@ bool ActionMap::getDeviceTypeAndInstance(const char *pDeviceName, U32 &deviceTyp
    U32 offset = 0;
    U32 inputMgrDeviceType = 0;
 
-   if (dStrnicmp(pDeviceName, "keyboard", dStrlen("keyboard")) == 0) 
+   if (dStrnicmp(pDeviceName, "keyboard", dStrlen("keyboard")) == 0)
    {
       deviceType      = KeyboardDeviceType;
       offset = dStrlen("keyboard");
-   } 
-   else if (dStrnicmp(pDeviceName, "mouse", dStrlen("mouse")) == 0) 
+   }
+   else if (dStrnicmp(pDeviceName, "mouse", dStrlen("mouse")) == 0)
    {
       deviceType      = MouseDeviceType;
       offset = dStrlen("mouse");
-   } 
-   else if (dStrnicmp(pDeviceName, "joystick", dStrlen("joystick")) == 0) 
+   }
+   else if (dStrnicmp(pDeviceName, "joystick", dStrlen("joystick")) == 0)
    {
       deviceType      = JoystickDeviceType;
       offset = dStrlen("joystick");
@@ -926,22 +926,22 @@ bool ActionMap::getDeviceTypeAndInstance(const char *pDeviceName, U32 &deviceTyp
    {
       deviceType = inputMgrDeviceType;
    }
-   else 
+   else
    {
       return false;
    }
 
-   if (dStrlen(pDeviceName) > offset) 
+   if (dStrlen(pDeviceName) > offset)
    {
       const char* pInst = pDeviceName + offset;
       S32 instNum = dAtoi(pInst);
-      
+
       if (instNum < 0)
          deviceInstance = 0;
-      else   
+      else
          deviceInstance = instNum;
    }
-   else 
+   else
    {
       deviceInstance = 0;
    }
@@ -999,7 +999,7 @@ const char* ActionMap::getModifierString(const U32 modifiers)
 	if ( modifiers & SI_MAC_LOPT || modifiers & SI_MAC_ROPT )
 		realModifiers |= SI_MAC_OPT;
 
-   switch (realModifiers & (SI_SHIFT|SI_CTRL|SI_ALT|SI_MAC_OPT)) 
+   switch (realModifiers & (SI_SHIFT|SI_CTRL|SI_ALT|SI_MAC_OPT))
    {
 #if defined(TORQUE_OS_MAC)
       // optional code, to output alt as cmd on mac.
@@ -1061,7 +1061,7 @@ const char* ActionMap::getModifierString(const U32 modifiers)
 
      case (SI_MAC_OPT):
       return "opt ";
-      
+
      case 0:
       return "";
 
@@ -1077,7 +1077,7 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
    U16 asciiCode = 0;
 
    // This is a special case.... numpad keys do have ascii values
-   // but for the purposes of this method we want to return the 
+   // but for the purposes of this method we want to return the
    // description from the gVirtualMap.
    if ( !( KEY_NUMPAD0 <= action && action <= KEY_NUMPAD9 ) )
       asciiCode = Input::getAscii( action, STATE_LOWER );
@@ -1225,7 +1225,7 @@ bool ActionMap::processBind(const U32 argc, const char** argv, SimObject* object
    //  for the bind...
    //
    EventDescriptor eventDescriptor;
-   if (createEventDescriptor(pEvent, &eventDescriptor) == false) 
+   if (createEventDescriptor(pEvent, &eventDescriptor) == false)
    {
       Con::printf("Could not create a description for binding: %s", pEvent);
       return false;
@@ -1348,7 +1348,7 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
 
       if ( pNode->flags & Node::HasDeadZone )
       {
-         if ( value >= pNode->deadZoneBegin && value <= pNode->deadZoneEnd ) 
+         if ( value >= pNode->deadZoneBegin && value <= pNode->deadZoneEnd )
             value = 0.0f;
          else
          {
@@ -1473,7 +1473,7 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
 
          return true;
       }
-      else if ( pEvent->deviceType == JoystickDeviceType 
+      else if ( pEvent->deviceType == JoystickDeviceType
                 || pEvent->deviceType == GamepadDeviceType
                 || INPUTMGR->isRegisteredDevice(pEvent->deviceType)
               )
@@ -1641,11 +1641,11 @@ void ActionMap::enterBreakEvent(const InputEventInfo* pEvent, const Node* pNode)
 //------------------------------------------------------------------------------
 bool ActionMap::checkBreakTable(const InputEventInfo* pEvent)
 {
-   for (U32 i = 0; i < smBreakTable.size(); i++) 
+   for (U32 i = 0; i < smBreakTable.size(); i++)
    {
       if (smBreakTable[i].deviceType == U32(pEvent->deviceType) &&
           smBreakTable[i].deviceInst == U32(pEvent->deviceInst) &&
-          smBreakTable[i].objInst    == U32(pEvent->objInst)) 
+          smBreakTable[i].objInst    == U32(pEvent->objInst))
       {
          fireBreakEvent(i, pEvent->fValue);
          return true;
@@ -1664,19 +1664,19 @@ bool ActionMap::handleEvent(const InputEventInfo* pEvent)
    SimSet* pActionMapSet = Sim::getActiveActionMapSet();
    AssertFatal(pActionMapSet && pActionMapSet->size() != 0,
                "error, no ActiveMapSet or no global action map...");
-               
+
    for (SimSet::iterator itr = pActionMapSet->end() - 1;
         itr > pActionMapSet->begin(); itr--) {
       ActionMap* pMap = static_cast<ActionMap*>(*itr);
       if (pMap->processAction(pEvent) == true)
          return true;
    }
-   
+
    // Found no matching action.  Try with the modifiers stripped.
 
    InputEventInfo eventNoModifiers = *pEvent;
    eventNoModifiers.modifier = ( InputModifiers ) 0;
-   
+
    for (SimSet::iterator itr = pActionMapSet->end() - 1;
         itr > pActionMapSet->begin(); itr--) {
       ActionMap* pMap = static_cast<ActionMap*>(*itr);
@@ -1869,7 +1869,7 @@ static ConsoleDocFragment _ActionMapbind2(
    "ActionMap",
    "bool bind( string device, string action, string flag, string deadZone, string scale, string command );");
 
-ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier spec, mod...], command )" 
+ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier spec, mod...], command )"
 			  "@hide")
 {
    return object->processBind( argc - 2, argv + 2, NULL );
@@ -2065,7 +2065,7 @@ DefineEngineMethod( ActionMap, getBinding, const char*, ( const char* command ),
 	"@endtsexample\n\n"
    "@see getField")
 {
-	return object->getBinding( command );	
+	return object->getBinding( command );
 }
 
 DefineEngineMethod( ActionMap, getCommand, const char*, ( const char* device, const char* action ),,
@@ -2081,7 +2081,7 @@ DefineEngineMethod( ActionMap, getCommand, const char*, ( const char* device, co
 	"echo(%command)\n"
 	"@endtsexample\n\n")
 {
-	return object->getCommand( device, action );	
+	return object->getCommand( device, action );
 }
 
 DefineEngineMethod( ActionMap, isInverted, bool, ( const char* device, const char* action ),,
@@ -2095,7 +2095,7 @@ DefineEngineMethod( ActionMap, isInverted, bool, ( const char* device, const cha
    "   echo(\"Mouse's xAxis is inverted\");"
 	"@endtsexample\n\n")
 {
-	return object->isInverted( device, action );	
+	return object->isInverted( device, action );
 }
 
 DefineEngineMethod( ActionMap, getScale, F32, ( const char* device, const char* action ),,
@@ -2107,20 +2107,20 @@ DefineEngineMethod( ActionMap, getScale, F32, ( const char* device, const char* 
 	"%scale = %moveMap.getScale( \"gamepad\", \"thumbrx\");\n"
 	"@endtsexample\n\n")
 {
-	return object->getScale( device, action );	
+	return object->getScale( device, action );
 }
 
 DefineEngineMethod( ActionMap, getDeadZone, const char*, ( const char* device, const char* action ),,
    "@brief Gets the Dead zone for the specified device and action.\n\n"
    "@param device The device that was bound.  Can be a keyboard, mouse, joystick or a gamepad.\n"
    "@param action The device action that was bound. The action is dependant upon the device. Specify a key for keyboards.\n"
-   "@return The dead zone for the specified device and action. Returns \"0 0\" if there is no dead zone " 
+   "@return The dead zone for the specified device and action. Returns \"0 0\" if there is no dead zone "
    "or an empty string(\"\") if the mapping was not found.\n"
 	"@tsexample\n"
 	"%deadZone = moveMap.getDeadZone( \"gamepad\", \"thumbrx\");\n"
 	"@endtsexample\n\n")
 {
-	return object->getDeadZone( device, action );	
+	return object->getDeadZone( device, action );
 }
 
 //------------------------------------------------------------------------------

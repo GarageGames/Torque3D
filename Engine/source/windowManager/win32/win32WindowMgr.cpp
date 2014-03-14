@@ -69,7 +69,7 @@ Win32WindowManager::~Win32WindowManager()
 
 RectI Win32WindowManager::getPrimaryDesktopArea()
 {
-   RECT primaryWorkRect; 
+   RECT primaryWorkRect;
    SystemParametersInfo(SPI_GETWORKAREA, 0, &primaryWorkRect, 0);
 
    RectI res;
@@ -216,7 +216,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
 
    DWORD	dwExStyle;
    DWORD dwStyle = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-   dwStyle       |= WS_OVERLAPPEDWINDOW | WS_THICKFRAME | WS_CAPTION; 
+   dwStyle       |= WS_OVERLAPPEDWINDOW | WS_THICKFRAME | WS_CAPTION;
    dwExStyle     = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 
    // If we're parented, we want a different set of window styles.
@@ -276,7 +276,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
    {
       w32w->mDevice = device;
       w32w->mTarget = device->allocWindowTarget(w32w);
-      AssertISV(w32w->mTarget, 
+      AssertISV(w32w->mTarget,
          "Win32WindowManager::createWindow - failed to get a window target back from the device.");
    }
    else
@@ -315,10 +315,10 @@ void Win32WindowManager::_process()
    // needed ? If it is, this should be rewritten to use the one loop that
    // adjusts as needed based on _blocking and Journal::IsPlaying()
 
-   if (_blocking && !Journal::IsPlaying()) 
+   if (_blocking && !Journal::IsPlaying())
    {
       // In blocking mode, we process one message at a time.
-      if (GetMessage(&msg, NULL, 0, 0)) 
+      if (GetMessage(&msg, NULL, 0, 0))
       {
          bool noTranslate = false;
          Win32Window *w32w = mWindowListHead;
@@ -342,7 +342,7 @@ void Win32WindowManager::_process()
    else
    {
       // Process all queued up messages
-      while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
+      while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
       {
          bool translated = false;
 
@@ -359,7 +359,7 @@ void Win32WindowManager::_process()
          Win32Window* window = (Win32Window*)(GetWindowLong(msg.hwnd, GWL_USERDATA));
          if(window)
             translated = window->translateMessage(msg);
-         
+
          if(! translated)
          {
             // Win32Window::translateMessage() will post a WM_COMMAND event for
@@ -369,7 +369,7 @@ void Win32WindowManager::_process()
             DispatchMessage(&msg);
          }
 
-         if (msg.message == WM_QUIT) 
+         if (msg.message == WM_QUIT)
          {
             Dispatch(ImmediateDispatch,0,msg.message,msg.wParam,msg.lParam);
             break;
@@ -402,7 +402,7 @@ PlatformWindow * Win32WindowManager::getWindowById( WindowId id )
       win = win->mNextWindow;
    }
 
-   return NULL; 
+   return NULL;
 }
 
 PlatformWindow * Win32WindowManager::getFirstWindow()
@@ -475,7 +475,7 @@ void Win32WindowManager::_processCmdLineArgs( const S32 argc, const char **argv 
             mParentWindow = (HWND)hwnd;
             Con::printf( "HWND from command line: %d", hwnd );
          }
-         
+
          if ( dStrnicmp( argv[i], "-offscreen", 10 ) == 0 )
          {
             mOffscreenRender = true;
@@ -501,12 +501,12 @@ void Win32WindowManager::lowerCurtain()
    monInfo.cbSize = sizeof MONITORINFO;
 
    GetMonitorInfo(hMon, &monInfo);
- 
-   mCurtainWindow = CreateWindow(Win32Window::getCurtainWindowClassName(), 
+
+   mCurtainWindow = CreateWindow(Win32Window::getCurtainWindowClassName(),
                            dT(""), (WS_POPUP | WS_MAXIMIZE | WS_VISIBLE),
-                           monInfo.rcWork.left, monInfo.rcWork.top, 
-                           monInfo.rcWork.right - monInfo.rcWork.left, 
-                           monInfo.rcWork.bottom - monInfo.rcWork.top, 
+                           monInfo.rcWork.left, monInfo.rcWork.top,
+                           monInfo.rcWork.right - monInfo.rcWork.left,
+                           monInfo.rcWork.bottom - monInfo.rcWork.top,
                            NULL, NULL, NULL, NULL);
 
    if (!mOffscreenRender)

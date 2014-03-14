@@ -45,7 +45,7 @@ public:
 
    /// Copy constructor
    ByteBuffer(const ByteBuffer &theBuffer);
-   
+
    ByteBuffer  &operator=(const ByteBuffer &theBuffer);
 
    ~ByteBuffer();

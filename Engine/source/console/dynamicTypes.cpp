@@ -71,7 +71,7 @@ void ConsoleBaseType::initialize()
       const S32 id = walk->getTypeID();
       AssertFatal(gConsoleTypeTable[id]==NULL, "ConsoleBaseType::initialize - encountered a table slot that contained something!");
       gConsoleTypeTable[id] = walk;
-  
+
       walk = walk->getListNext();
    }
 }
@@ -82,7 +82,7 @@ ConsoleBaseType* ConsoleBaseType::getType(const S32 typeID)
 {
    if( typeID == -1 || gConsoleTypeTable.size() <= typeID )
       return NULL;
-      
+
    return gConsoleTypeTable[ typeID ];
 }
 

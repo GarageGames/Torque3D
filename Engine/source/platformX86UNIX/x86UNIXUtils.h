@@ -33,7 +33,7 @@ public:
 
    /**
       Returns true if we're running in the background, false otherwise.
-      There's no "standard" way to determine this in unix, but 
+      There's no "standard" way to determine this in unix, but
       modern job control unices should support the method described
       here:
 
@@ -75,7 +75,7 @@ class UnixCommandExecutor
       UnixCommandExecutor();
       ~UnixCommandExecutor();
 
-      // Runs the specified command.  
+      // Runs the specified command.
       // - args is a null terminated list of the command and its arguments,
       // e.g: "ps", "-aux", NULL
       // - stdoutCapture is the buffer where stdout data will be stored

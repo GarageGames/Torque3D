@@ -43,7 +43,7 @@ class IProcessInput;
 /// interfacing with multiple windows, tracking their state, etc. we provide
 /// this interface.
 ///
-/// This interface also allows the app to access the render target for the 
+/// This interface also allows the app to access the render target for the
 /// window it represents, as well as control mode switches, get mode info,
 /// and so on.
 ///
@@ -76,7 +76,7 @@ protected:
 
    /// Cursor Controller for this Window
    PlatformCursorController *mCursorController;
-   
+
    /// An opaque ID used to resolve references to this Window
    WindowId mWindowId;
 
@@ -110,7 +110,7 @@ public:
 
    /// To get rid of a window, just delete it. Make sure the GFXDevice is
    /// done with it first!
-   virtual ~PlatformWindow() 
+   virtual ~PlatformWindow()
    {
       SAFE_DELETE( mCursorController );
       SAFE_DELETE( mWindowInputGenerator );
@@ -161,14 +161,14 @@ public:
    void setFullscreen(const bool fullscreen);
 
    /// Set Idle State (Background)
-   /// 
-   /// This is called to put a window into idle state, which causes it's 
+   ///
+   /// This is called to put a window into idle state, which causes it's
    /// rendering priority to be toned down to prefer performance
    virtual void setBackground( bool val ) { mIsBackground = val; };
 
    /// Get Idle State (Background)
    ///
-   /// This is called to poll the window as to it's idle state.  
+   /// This is called to poll the window as to it's idle state.
    virtual bool getBackground() { return mIsBackground; };
 
    /// Set whether this window is intended for offscreen rendering
@@ -177,7 +177,7 @@ public:
 
    /// Set whether this window is intended for offscreen rendering
    ///
-   /// This is called to poll the window as to it's idle state.  
+   /// This is called to poll the window as to it's idle state.
    virtual bool getOffscreenRender() { return mOffscreenRender; };
 
 
@@ -228,9 +228,9 @@ public:
    ///
    /// @{
 
-   /// The Client Rectangle or "Render Area" of a window is the area that 
+   /// The Client Rectangle or "Render Area" of a window is the area that
    /// is occupied by a given client that is rendering to that window.
-   /// This does not include the area occupied by a title-bar, menu, 
+   /// This does not include the area occupied by a title-bar, menu,
    /// borders or other non-client elements.
    /// @{
 
@@ -241,10 +241,10 @@ public:
    virtual const Point2I getClientExtent() = 0;
 
    /// @}
-   /// The bounds of a Window are defined as the entire area occupied by 
+   /// The bounds of a Window are defined as the entire area occupied by
    /// that Window.  This includes the area needed for a title-bar, menu,
    /// borders, and other non-client elements.
-   /// 
+   ///
    /// @{
 
    /// Resize the window to have some new bounds.
@@ -254,8 +254,8 @@ public:
    virtual const RectI getBounds() const = 0;
 
    /// @}
-   /// The Position of a window is always in relation to the very upper left 
-   /// of the window.  This means that saying setPosition at 0,0 will put the 
+   /// The Position of a window is always in relation to the very upper left
+   /// of the window.  This means that saying setPosition at 0,0 will put the
    /// position of the window title-bar (if one exists) at 0,0 and the Client
    /// area will be offset from that point by the space needed for the Non-Client
    /// area.
@@ -273,16 +273,16 @@ public:
    virtual bool setSize(const Point2I &newSize)=0;
 
    /// @}
-   
+
    /// @name Coordinate Space Conversion
    /// @{
 
    /// Convert the coordinate given in this window space to screen coordinates.
    virtual Point2I clientToScreen( const Point2I& point ) = 0;
-   
+
    /// Convert the given screen coordinates to coordinates in this window space.
    virtual Point2I screenToClient( const Point2I& point ) = 0;
-   
+
    /// @}
 
    /// @name Windowed state
@@ -305,7 +305,7 @@ public:
 
    /// Returns true if the window is maximized
    virtual bool isMaximized() = 0;
-   
+
    /// @name Keyboard Translation
    ///
    /// When keyboard translation is on, keypress events that correspond to character input
@@ -326,10 +326,10 @@ public:
    {
       return mEnableKeyboardTranslation;
    }
-   
+
    /// Returns true if the given keypress event should not be translated.
    virtual bool shouldNotTranslate( U32 modifiers, U32 keyCode ) const;
-   
+
    /// @}
 
    /// Used to disable native OS keyboard accelerators.
@@ -406,9 +406,9 @@ public:
       if( mCursorController != NULL )
          mCursorController->getCursorPosition(point);
    }
-   
+
    /// Set the cursor visibility on this window
-   /// 
+   ///
    /// @param visible Whether the cursor should be visible or not
    virtual void setCursorVisible(bool visible)
    {
@@ -417,7 +417,7 @@ public:
    }
 
    /// Get the cursor visibility on this window
-   /// 
+   ///
    /// @return true if the cursor is visible or false if it's hidden
    virtual bool isCursorVisible()
    {
@@ -445,8 +445,8 @@ public:
    /// This flag is set to the current state of the mouse lock
    /// on a window, to specify the preferred lock status of the
    /// mouse in a platform window.
-   /// 
-   /// This is important for situations where a call is made 
+   ///
+   /// This is important for situations where a call is made
    /// to setMouseLocked, and the window is not in a state that
    /// it can be cleanly locked. Take for example if it was called
    /// while the window is in the background, then it is not appropriate
@@ -479,7 +479,7 @@ public:
    IdleEvent         idleEvent;
 
    /// @}
-   
+
    /// Get the platform specific object needed to create or attach an accelerated
    /// graohics drawing context on or to the window
    /// Win32 D3D and OpenGL typically needs an HWND

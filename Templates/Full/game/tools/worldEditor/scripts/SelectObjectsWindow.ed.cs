@@ -62,7 +62,7 @@ function ESelectObjectsWindow::includeClass( %this, %className )
        || %className $= "SimGroup"
        || %className $= "LevelInfo" ) // Derived directly from NetObject.
       return true;
-      
+
    return false;
 }
 
@@ -111,9 +111,9 @@ function ESelectObjectsWindow::onWake( %this )
       %this.init();
       %this.isInitialized = true;
    }
-   
+
    // Re-initialize the group list on each wake.
-   
+
    %this.initGroupList();
 }
 
@@ -122,13 +122,13 @@ function ESelectObjectsWindow::onWake( %this )
 function ESelectObjectsWindow::onSelectObjects( %this, %val, %reuseExistingSet )
 {
    // See if we should create an independent selection set.
-   
+
    if( %this-->createSelectionSet.isStateOn() )
    {
       %name = %this-->selectionSetName.getText();
-      
+
       // See if we should create or re-use a set.
-      
+
       if( isObject( %name ) )
       {
          if( !%name.isMemberOfClass( "WorldEditorSelection" ) )
@@ -164,15 +164,15 @@ function ESelectObjectsWindow::onSelectObjects( %this, %val, %reuseExistingSet )
             return;
          }
       }
-      
+
       %this.selectionSet = %sel;
    }
    else
       %this.selectionSet = "";
-   
+
    Parent::onSelectObjects( %this, %val );
-   
+
    // Refresh editor tree just in case.
-   
+
    EditorTree.buildVisibleTree();
 }

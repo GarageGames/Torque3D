@@ -89,7 +89,7 @@ datablock ProjectileData( TurretBulletProjectile )
    damageRadius        = 0.5;
    areaImpulse         = 0.5;
    impactForce         = 1;
-   
+
    damageType          = "TurretDamage";  // Type of damage applied by this weapon
 
    explosion           = BulletDirtExplosion;
@@ -110,7 +110,7 @@ datablock ProjectileData( TurretBulletProjectile )
 function TurretBulletProjectile::onCollision(%this,%obj,%col,%fade,%pos,%normal)
 {
    // Apply impact force from the projectile.
-   
+
    // Apply damage to the object all shape base objects
    if ( %col.getType() & $TypeMasks::GameBaseObjectType )
       %col.damage(%obj,%pos,%this.directDamage,%this.damageType);
@@ -311,11 +311,11 @@ datablock AITurretShapeData(AITurret)
    maxDamage = 70;
    destroyedLevel = 70;
    explosion = GrenadeExplosion;
-   
+
    simpleServerCollision = false;
 
    zRotOnly = false;
-   
+
    // Rotation settings
    minPitch = 15;
    maxPitch = 80;
@@ -347,7 +347,7 @@ datablock AITurretShapeData(AITurret)
    stateName[0]                     = "Preactivate";
    stateTransitionOnAtRest[0]       = "Scanning";
    stateTransitionOnNotAtRest[0]    = "Thrown";
-   
+
    // Scan for targets
    stateName[1]                     = "Scanning";
    stateScan[1]                     = true;
@@ -405,7 +405,7 @@ datablock AITurretShapeData(DeployableTurret : AITurret)
    className = "DeployableTurretWeapon";
 
    startLoaded = false;
-   
+
    // Basic Item properties
    mass = 1.5;
    elasticity = 0.1;
@@ -439,7 +439,7 @@ datablock ShapeBaseImageData(DeployableTurretImage)
 
    // Don't allow a player to sprint with a turret
    sprintDisallowed = true;
-   
+
    class = "DeployableTurretWeaponImage";
    className = "DeployableTurretWeaponImage";
 
@@ -545,7 +545,7 @@ datablock ShapeBaseImageData(DeployableTurretImage)
    stateSequenceTransitionOut[8]    = true;
    stateAllowImageChange[8]         = false;
    stateSequence[8]                 = "sprint";
-   
+
    // Stop Sprinting
    stateName[9]                     = "SprintExit";
    stateTransitionGeneric0In[9]     = "SprintEnter";

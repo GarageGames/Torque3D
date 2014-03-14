@@ -107,18 +107,18 @@ template<class T>
 class TestRegistration: public TestRegistry
 {
 public:
-   virtual ~TestRegistration() 
+   virtual ~TestRegistration()
    {
    }
 
    TestRegistration(const char* name, bool interactive, const char *className)
-      : TestRegistry(name, interactive, className) 
+      : TestRegistry(name, interactive, className)
    {
    }
 
-   virtual UnitTest* newTest() 
-   { 
-      return new T; 
+   virtual UnitTest* newTest()
+   {
+      return new T;
    }
 };
 

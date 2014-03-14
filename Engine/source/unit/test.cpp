@@ -81,7 +81,7 @@ void UnitPrint(const char* str)
    // Need to scan for '\n' in order to support margins
    const char* ptr = str, *itr = ptr;
    for (; *itr != 0; itr++)
-      if (*itr == '\n') 
+      if (*itr == '\n')
       {
          if (lineStart)
             _printMargin();
@@ -155,7 +155,7 @@ TestRegistry::TestRegistry(const char* name, bool interactive, const char *class
    // Add us to the list.
    _next = _list;
    _list = this;
-   
+
    // And fill in our fields.
    _name = name;
    _className = className;
@@ -256,7 +256,7 @@ bool TestRun::test(const char* module, bool skipInteractive)
       Con::printf("-- Running all unit tests %s", skipMsg);
    else
       Con::printf("-- Running %s tests %s",module, skipMsg);
-      
+
    for (TestRegistry* itr = TestRegistry::getFirst(); itr; itr = itr->getNext())
    {
       if (!len || !dStrnicmp(module,itr->getName(),len))
@@ -264,7 +264,7 @@ bool TestRun::test(const char* module, bool skipInteractive)
          // Skip the test if it's interactive and we're in skipinteractive mode.
          if(skipInteractive && itr->isInteractive())
             continue;
-         
+
          // Otherwise, run the test!
          Platform::setCurrentDirectory(Platform::getMainDotCsDir());
          test(itr);

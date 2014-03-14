@@ -40,7 +40,7 @@
 SFXALVoice* SFXALVoice::create( SFXALDevice* device, SFXALBuffer *buffer )
 {
    AssertFatal( buffer, "SFXALVoice::create() - Got null buffer!" );
- 
+
    ALuint sourceName;
    device->mOpenAL.alGenSources( 1, &sourceName );
    AssertFatal( device->mOpenAL.alIsSource( sourceName ), "AL Source Sanity Check Failed!" );
@@ -53,7 +53,7 @@ SFXALVoice* SFXALVoice::create( SFXALDevice* device, SFXALBuffer *buffer )
    // and the source's position is 0, 0, 0, then the source is directly on top of the listener at all times, which is what
    // we want for non-3d sounds.
    device->mOpenAL.alSourcei( sourceName, AL_SOURCE_RELATIVE, ( buffer->mIs3d ? AL_FALSE : AL_TRUE ) );
-   
+
    if( buffer->mIs3d )
       device->mOpenAL.alSourcef( sourceName, AL_ROLLOFF_FACTOR, device->mRolloffFactor );
 
@@ -65,11 +65,11 @@ SFXALVoice* SFXALVoice::create( SFXALDevice* device, SFXALBuffer *buffer )
 }
 
 SFXALVoice::SFXALVoice( const OPENALFNTABLE &oalft,
-                        SFXALBuffer *buffer, 
+                        SFXALBuffer *buffer,
                         ALuint sourceName )
 
    :  Parent( buffer ),
-      mOpenAL( oalft ), 
+      mOpenAL( oalft ),
       mResumeAtSampleOffset( -1.0f ),
       mSourceName( sourceName ),
       mSampleOffset( 0 )
@@ -118,12 +118,12 @@ void SFXALVoice::_play()
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXALVoice] Starting playback" );
    #endif
-   
+
    mOpenAL.alSourcePlay( mSourceName );
-   
+
    //WORKAROUND: Adjust play cursor for buggy OAL when resuming playback.  Do this after alSourcePlay
    // as it is the play function that will cause the cursor to jump.
-   
+
    if( mResumeAtSampleOffset != -1.0f )
    {
       mOpenAL.alSourcef( mSourceName, AL_SAMPLE_OFFSET, mResumeAtSampleOffset );
@@ -132,7 +132,7 @@ void SFXALVoice::_play()
 }
 
 void SFXALVoice::_pause()
-{   
+{
    AL_SANITY_CHECK();
 
    #ifdef DEBUG_SPEW
@@ -140,31 +140,31 @@ void SFXALVoice::_pause()
    #endif
 
    mOpenAL.alSourcePause( mSourceName );
-   
-   //WORKAROUND: Another workaround for buggy OAL.  Resuming playback of a paused source will cause the 
+
+   //WORKAROUND: Another workaround for buggy OAL.  Resuming playback of a paused source will cause the
    // play cursor to jump.  Save the cursor so we can manually move it into position in _play().  Sigh.
-   
+
    mOpenAL.alGetSourcef( mSourceName, AL_SAMPLE_OFFSET, &mResumeAtSampleOffset );
 }
 
 void SFXALVoice::_stop()
 {
    AL_SANITY_CHECK();
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXALVoice] Stopping playback" );
    #endif
 
    mOpenAL.alSourceStop( mSourceName );
    mSampleOffset = 0;
-   
+
    mResumeAtSampleOffset = -1.0f;
 }
 
 void SFXALVoice::_seek( U32 sample )
 {
    AL_SANITY_CHECK();
-   
+
    _lateBindStaticBufferIfNecessary();
    mOpenAL.alSourcei( mSourceName, AL_SAMPLE_OFFSET, sample );
 
@@ -207,7 +207,7 @@ void SFXALVoice::setVelocity( const VectorF& velocity )
 {
    AL_SANITY_CHECK();
 
-   // Torque and OpenAL are both right handed 
+   // Torque and OpenAL are both right handed
    // systems, so no coordinate flipping is needed.
 
    mOpenAL.alSourcefv( mSourceName, AL_VELOCITY, velocity );
@@ -217,7 +217,7 @@ void SFXALVoice::setTransform( const MatrixF& transform )
 {
    AL_SANITY_CHECK();
 
-   // Torque and OpenAL are both right handed 
+   // Torque and OpenAL are both right handed
    // systems, so no coordinate flipping is needed.
 
    Point3F pos, dir;
@@ -236,7 +236,7 @@ void SFXALVoice::setVolume( F32 volume )
 }
 
 void SFXALVoice::setPitch( F32 pitch )
-{ 
+{
    AL_SANITY_CHECK();
 
    mOpenAL.alSourcef( mSourceName, AL_PITCH, pitch );

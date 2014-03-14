@@ -48,7 +48,7 @@ const RenderInstType RenderPassManager::RIT_Mesh("Mesh");
 const RenderInstType RenderPassManager::RIT_Shadow("Shadow");
 const RenderInstType RenderPassManager::RIT_Sky("Sky");
 const RenderInstType RenderPassManager::RIT_Terrain("Terrain");
-const RenderInstType RenderPassManager::RIT_Object("Object");      
+const RenderInstType RenderPassManager::RIT_Object("Object");
 const RenderInstType RenderPassManager::RIT_ObjectTranslucent("ObjectTranslucent");
 const RenderInstType RenderPassManager::RIT_Decal("Decal");
 const RenderInstType RenderPassManager::RIT_Water("Water");
@@ -104,7 +104,7 @@ void OccluderRenderInst::clear()
 IMPLEMENT_CONOBJECT(RenderPassManager);
 
 
-ConsoleDocClass( RenderPassManager, 
+ConsoleDocClass( RenderPassManager,
    "@brief A grouping of render bin managers which forms a render pass.\n\n"
    "The render pass is used to order a set of RenderBinManager objects which are used "
    "when rendering a scene.  This class does little work itself other than managing "
@@ -125,7 +125,7 @@ void RenderPassManager::initPersistFields()
 }
 
 RenderPassManager::RenderPassManager()
-{   
+{
    mSceneManager = NULL;
    VECTOR_SET_ASSOCIATION( mRenderBins );
 
@@ -156,7 +156,7 @@ void RenderPassManager::_insertSort(Vector<RenderBinManager*>& list, RenderBinMa
    {
       bool renderCompare = mgr->getRenderOrder() < list[i]->getRenderOrder();
       bool processAddCompare = mgr->getProcessAddOrder() < list[i]->getProcessAddOrder();
-      if ((renderOrder && renderCompare) || (!renderOrder && processAddCompare))      
+      if ((renderOrder && renderCompare) || (!renderOrder && processAddCompare))
       {
          list.insert(i);
          list[i] = mgr;
@@ -240,7 +240,7 @@ void RenderPassManager::render(SceneRenderState * state)
    GFX->pushWorldMatrix();
    MatrixF proj = GFX->getProjectionMatrix();
 
-   
+
    for (Vector<RenderBinManager *>::iterator itr = mRenderBins.begin();
       itr != mRenderBins.end(); itr++)
    {
@@ -253,7 +253,7 @@ void RenderPassManager::render(SceneRenderState * state)
 
    GFX->popWorldMatrix();
    GFX->setProjectionMatrix( proj );
-      
+
    // Restore a clean state for subsequent rendering.
    GFX->disableShaders();
    for(S32 i = 0; i < GFX->getNumSamplers(); ++i)
@@ -275,12 +275,12 @@ GFXTextureObject *RenderPassManager::getDepthTargetTexture()
    {
       // If this is OpenGL, make sure the depth target matches up
       // with the active render target.  Otherwise recreate.
-      
+
       if( GFX->getAdapterType() == OpenGL )
       {
          GFXTarget* activeRT = GFX->getActiveRenderTarget();
          AssertFatal( activeRT, "Must be an active render target to call 'getDepthTargetTexture'" );
-         
+
          Point2I activeRTSize = activeRT->getSize();
          if( mDepthBuff.getWidth() == activeRTSize.x &&
              mDepthBuff.getHeight() == activeRTSize.y )
@@ -295,7 +295,7 @@ GFXTextureObject *RenderPassManager::getDepthTargetTexture()
       AssertFatal(GFX->getActiveRenderTarget(), "Must be an active render target to call 'getDepthTargetTexture'");
 
       const Point2I rtSize = GFX->getActiveRenderTarget()->getSize();
-      mDepthBuff.set(rtSize.x, rtSize.y, GFXFormatD24S8, 
+      mDepthBuff.set(rtSize.x, rtSize.y, GFXFormatD24S8,
          &GFXDefaultZTargetProfile, avar("%s() - mDepthBuff (line %d)", __FUNCTION__, __LINE__));
       return mDepthBuff.getPointer();
    }
@@ -333,7 +333,7 @@ void RenderPassManager::assignSharedXform( SharedTransformType stt, const Matrix
 
 // Script interface
 
-DefineEngineMethod(RenderPassManager, getManagerCount, S32, (),, 
+DefineEngineMethod(RenderPassManager, getManagerCount, S32, (),,
    "Returns the total number of bin managers." )
 {
    return object->getManagerCount();
@@ -348,14 +348,14 @@ DefineEngineMethod( RenderPassManager, getManager, RenderBinManager*, ( S32 inde
    return object->getManager(index);
 }
 
-DefineEngineMethod( RenderPassManager, addManager, void, ( RenderBinManager *renderBin ),, 
+DefineEngineMethod( RenderPassManager, addManager, void, ( RenderBinManager *renderBin ),,
    "Add as a render bin manager to the pass." )
 {
    if ( renderBin )
       object->addManager( renderBin );
 }
 
-DefineEngineMethod( RenderPassManager, removeManager, void, ( RenderBinManager *renderBin ),, 
+DefineEngineMethod( RenderPassManager, removeManager, void, ( RenderBinManager *renderBin ),,
    "Removes a render bin manager." )
 {
    if ( renderBin )

@@ -61,7 +61,7 @@ void MacDLibrary::close()
 {
    if(_handle)
       dlclose(_handle);
-   
+
    _handle = NULL;
 }
 
@@ -73,6 +73,6 @@ DLibraryRef OsLoadLibrary(const char* file)
       delete library;
       return NULL;
    }
-   
+
    return library;
 }

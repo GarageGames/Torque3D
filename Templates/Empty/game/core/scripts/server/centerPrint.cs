@@ -24,7 +24,7 @@ function centerPrintAll( %message, %time, %lines )
 {
    if( %lines $= "" || ((%lines > 3) || (%lines < 1)) )
       %lines = 1;
-   
+
    %count = ClientGroup.getCount();
    for (%i = 0; %i < %count; %i++)
 	{
@@ -38,7 +38,7 @@ function bottomPrintAll( %message, %time, %lines )
 {
    if( %lines $= "" || ((%lines > 3) || (%lines < 1)) )
       %lines = 1;
-   
+
    %count = ClientGroup.getCount();
 	for (%i = 0; %i < %count; %i++)
 	{
@@ -54,8 +54,8 @@ function centerPrint( %client, %message, %time, %lines )
 {
    if( %lines $= "" || ((%lines > 3) || (%lines < 1)) )
       %lines = 1;
-      
-   
+
+
    commandToClient( %client, 'CenterPrint', %message, %time, %lines );
 }
 

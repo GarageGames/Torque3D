@@ -70,7 +70,7 @@ class GFXTextureManager;
 // Global macro
 #define GFX GFXDevice::get()
 
-#define MAX_MRT_TARGETS 4 
+#define MAX_MRT_TARGETS 4
 
 //-----------------------------------------------------------------------------
 
@@ -86,7 +86,7 @@ class GFXTextureManager;
 /// by primitive buffers. Primitive buffers will be explained in detail later.
 /// Buffers are allocated and deallocated using their associated allocXBuffer and
 /// freeXBuffer methods on the device. When a buffer is allocated you pass in a
-/// pointer to, depending on the buffer, a vertex type pointer or a U16 pointer. 
+/// pointer to, depending on the buffer, a vertex type pointer or a U16 pointer.
 /// During allocation, this pointer is set to the address of where you should
 /// copy in the information for this buffer. You must the tell the GFXDevice
 /// that the information is in, and it should prepare the buffer for use by calling
@@ -95,7 +95,7 @@ class GFXTextureManager;
 /// GFXVertexP *verts;        // Making a buffer containing verticies with only position
 ///
 /// // Allocate a dynamic vertex buffer to hold 3 vertices and use *verts as the location to copy information into
-/// GFXVertexBufferHandle vb = GFX->allocVertexBuffer( 3, &verts, true ); 
+/// GFXVertexBufferHandle vb = GFX->allocVertexBuffer( 3, &verts, true );
 ///
 /// // Now set the information, we're making a triangle
 /// verts[0].point = Point3F( 200.f, 200.f, 0.f );
@@ -107,7 +107,7 @@ class GFXTextureManager;
 /// // stored, or otherwise used after prepare is called.
 /// GFX->prepare( vb );
 ///
-/// // Because this is a dynamic vertex buffer, it is only assured to be valid until someone 
+/// // Because this is a dynamic vertex buffer, it is only assured to be valid until someone
 /// // else allocates a dynamic vertex buffer, so we will render it now
 /// GFX->setVertexBuffer( vb );
 /// GFX->drawPrimitive( GFXTriangleStrip, 0, 1 );
@@ -115,7 +115,7 @@ class GFXTextureManager;
 /// // Now because this is a dynamic vertex buffer it MUST NOT BE FREED you are only
 /// // given a handle to a vertex buffer which belongs to the device
 /// @endcode
-/// 
+///
 /// To use a static vertex buffer, it is very similar, this is an example using a
 /// static primitive buffer:
 /// @n
@@ -155,10 +155,10 @@ class GFXTextureManager;
 ///
 /// // This sets the primitive buffer to the static buffer we allocated in the constructor
 /// GFX->setPrimitiveBuffer( mPB );
-/// 
+///
 /// // Draw the first primitive contained in the set primitive buffer, our primitive buffer
 /// // has only one primitive, so we could also technically call GFX->drawPrimitives(); and
-/// // get the same result. 
+/// // get the same result.
 /// GFX->drawPrimitive( 0 );
 /// @endcode
 /// If you need any more examples on how to use these buffers please see the rest of the engine.
@@ -197,16 +197,16 @@ public:
    {
       /// The device has been created, but not initialized
       deCreate,
-      
+
       /// The device has been initialized
       deInit,
-      
+
       /// The device is about to be destroyed.
       deDestroy,
-      
+
       /// The device has started rendering a frame
       deStartOfFrame,
-      
+
       /// The device is about to finish rendering a frame
       deEndOfFrame,
 
@@ -219,19 +219,19 @@ public:
 
    typedef Signal <bool (GFXDeviceEventType)> DeviceEventSignal;
    static DeviceEventSignal& getDeviceEventSignal();
-   
+
    static GFXDevice *get() { return smGFXDevice; }
 
    static void initConsole();
    static bool destroy();
-   
+
    static bool devicePresent() { return (smGFXDevice && smGFXDevice->getAdapterType() != NullDevice); }
 
 private:
    /// @name Device management variables
    /// @{
-   static GFXDevice * smGFXDevice; ///< Global GFXDevice 
- 
+   static GFXDevice * smGFXDevice; ///< Global GFXDevice
+
    /// @}
 
    //--------------------------------------------------------------------------
@@ -306,7 +306,7 @@ public:
    void setAllowRender( bool render ) { mAllowRender = render; }
 
    inline bool allowRender() const { return mAllowRender; }
-   
+
    /// Retrieve the current rendering style based on GFXDeviceRenderStyles
    U32 getCurrentRenderStyle() const { return mCurrentRenderStyle; }
 
@@ -346,7 +346,7 @@ public:
 
    /// @name Resource debug methods
    /// @{
-   
+
    /// Lists how many of each GFX resource (e.g. textures, texture targets, shaders, etc.) GFX is aware of
    /// @param unflaggedOnly   If true, this method only counts unflagged resources
    virtual void listResources(bool unflaggedOnly);
@@ -375,8 +375,8 @@ protected:
    /// GFXResource list and sorts it by item type, putting the resources into the proper vector.
    /// @see describeResources
    virtual void fillResourceVectors(const char* resNames, bool unflaggedOnly, Vector<GFXResource*> &textureObjects,
-      Vector<GFXResource*> &textureTargets, Vector<GFXResource*> &windowTargets, Vector<GFXResource*> &vertexBuffers, 
-      Vector<GFXResource*> &primitiveBuffers, Vector<GFXResource*> &fences, Vector<GFXResource*> &cubemaps, 
+      Vector<GFXResource*> &textureTargets, Vector<GFXResource*> &windowTargets, Vector<GFXResource*> &vertexBuffers,
+      Vector<GFXResource*> &primitiveBuffers, Vector<GFXResource*> &fences, Vector<GFXResource*> &cubemaps,
       Vector<GFXResource*> &shaders, Vector<GFXResource*> &stateblocks);
 public:
 
@@ -391,8 +391,8 @@ public:
    /// @see GFXVideoMode
    const Vector<GFXVideoMode>* const getVideoModeList() const { return &mVideoModes; }
 
-   /// Returns the first format from the list which meets all 
-   /// the criteria of the texture profile and query options.      
+   /// Returns the first format from the list which meets all
+   /// the criteria of the texture profile and query options.
    virtual GFXFormat selectSupportedFormat(GFXTextureProfile *profile,
 	   const Vector<GFXFormat> &formats, bool texture, bool mustblend, bool mustfilter) = 0;
 
@@ -405,14 +405,14 @@ protected:
    /// @{
 
    /// Set if ANY state is dirty, including matrices or primitive buffers.
-   bool mStateDirty;     
-   
+   bool mStateDirty;
+
    enum TexDirtyType
    {
       GFXTDT_Normal,
       GFXTDT_Cube
    };
-   
+
    GFXTexHandle mCurrentTexture[TEXTURE_STAGE_COUNT];
    GFXTexHandle mNewTexture[TEXTURE_STAGE_COUNT];
    GFXCubemapHandle mCurrentCubemap[TEXTURE_STAGE_COUNT];
@@ -442,7 +442,7 @@ protected:
    /// The forced shader model version if non-zero.
    static F32 smForcedPixVersion;
 
-   /// Disable all hardware occlusion queries causing 
+   /// Disable all hardware occlusion queries causing
    /// them to return only the visibile state.
    static bool smDisableOcclusionQuery;
 
@@ -451,7 +451,7 @@ protected:
    /// @name Light Tracking
    /// @{
 
-   GFXLightInfo  mCurrentLight[LIGHT_STAGE_COUNT]; 
+   GFXLightInfo  mCurrentLight[LIGHT_STAGE_COUNT];
    bool          mCurrentLightEnable[LIGHT_STAGE_COUNT];
    bool          mLightDirty[LIGHT_STAGE_COUNT];
    bool          mLightsDirty;
@@ -518,7 +518,7 @@ protected:
    /// Called by GFXDevice to create a device specific stateblock
    virtual GFXStateBlockRef createStateBlockInternal(const GFXStateBlockDesc& desc) = 0;
    /// Called by GFXDevice to actually set a stateblock.
-   /// @param force If true, set all states 
+   /// @param force If true, set all states
    virtual void setStateBlockInternal(GFXStateBlock* block, bool force) = 0;
    /// @}
 
@@ -561,7 +561,7 @@ protected:
 protected:
 
 
-   /// @name Buffer Allocation 
+   /// @name Buffer Allocation
    /// These methods are implemented per-device and are called by the GFX layer
    /// when a user calls an alloc
    ///
@@ -571,12 +571,12 @@ protected:
    /// This allocates a vertex buffer and returns a pointer to the allocated buffer.
    /// This function should not be called directly - rather it should be used by
    /// the GFXVertexBufferHandle class.
-   virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts, 
-                                                const GFXVertexFormat *vertexFormat, 
-                                                U32 vertSize, 
+   virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts,
+                                                const GFXVertexFormat *vertexFormat,
+                                                U32 vertSize,
                                                 GFXBufferType bufferType ) = 0;
 
-   /// Called from GFXVertexFormat to allocate the hardware 
+   /// Called from GFXVertexFormat to allocate the hardware
    /// specific vertex declaration for rendering.
    virtual GFXVertexDecl* allocVertexDecl( const GFXVertexFormat *vertexFormat ) = 0;
 
@@ -609,8 +609,8 @@ protected:
    /// always be preserved from call to call.
    ///
    /// @note All index buffers use unsigned 16-bit indices.
-   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
-                                                      U32 numPrimitives, 
+   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices,
+                                                      U32 numPrimitives,
                                                       GFXBufferType bufferType ) = 0;
 
    /// @}
@@ -626,19 +626,19 @@ protected:
    //---------------------------------------
    // Render target related
    //---------------------------------------
-   
+
    /// A stack of previously active render targets.
    Vector<GFXTargetRef> mRTStack;
 
-   /// The current render target which may or may not 
+   /// The current render target which may or may not
    /// not be yet activated.
    /// @see mRTDirty
    GFXTargetRef mCurrentRT;
-   
+
    /// This tracks a previously activated render target
-   /// which need to be deactivated. 
+   /// which need to be deactivated.
    GFXTargetRef mRTDeactivate;
-   
+
    /// This is set when the current and/or deactivate render
    /// targets have changed and the device need to update
    /// its state on the next draw/clear.
@@ -662,7 +662,7 @@ public:
 protected:
    GFXTextureManager * mTextureManager;
 
-public:   
+public:
    virtual GFXCubemap * createCubemap() = 0;
 
    inline GFXTextureManager *getTextureManager()
@@ -673,14 +673,14 @@ public:
    ///@}
 
    /// Swizzle to convert 32bpp bitmaps from RGBA to the native device format.
-   const Swizzle<U8, 4> *getDeviceSwizzle32() const 
-   { 
+   const Swizzle<U8, 4> *getDeviceSwizzle32() const
+   {
       return mDeviceSwizzle32;
    }
 
    /// Swizzle to convert 24bpp bitmaps from RGB to the native device format.
-   const Swizzle<U8, 3> *getDeviceSwizzle24() const 
-   { 
+   const Swizzle<U8, 3> *getDeviceSwizzle24() const
+   {
       return mDeviceSwizzle24;
    }
 
@@ -724,14 +724,14 @@ public:
 
    /// Set the buffer! (Actual set happens on the next draw call, just like textures, state blocks, etc)
    void setShaderConstBuffer(GFXShaderConstBuffer* buffer);
-   
-   /// Creates a new empty shader which must be initialized 
+
+   /// Creates a new empty shader which must be initialized
    /// and deleted by the caller.
    /// @see GFXShader::init
    virtual GFXShader* createShader() = 0;
-   
+
    /// @}
- 
+
    //-----------------------------------------------------------------------------
 
    /// @name Rendering methods
@@ -760,7 +760,7 @@ public:
 
    /// Sets the current vertex format.
    ///
-   /// This should only be used if the vertex format of the stream 0 vertex 
+   /// This should only be used if the vertex format of the stream 0 vertex
    /// buffer is different from the one associated to it.  Typically this
    /// is used when rendering from multiple vertex streams.
    ///
@@ -771,9 +771,9 @@ public:
    /// The parameters to drawIndexedPrimitive are somewhat complicated. From a raw-data stand point
    /// they evaluate to something like the following:
    /// @code
-   /// U16 indicies[] = { 0, 1, 2, 1, 0, 0, 2 }; 
+   /// U16 indicies[] = { 0, 1, 2, 1, 0, 0, 2 };
    /// Point3F verts[] = { Point3F( 0.0f, 0.0f, 0.0f ), Point3F( 0.0f, 1.0f, 0.0f ), Point3F( 0.0f, 0.0f, 1.0f ) };
-   /// 
+   ///
    /// GFX->drawIndexedPrimitive( GFXLineList, // Drawing a list of lines, each line is two verts
    ///                            0, // vertex 0 will be referenced so minIndex = 0
    ///                            3, // 3 verticies will be used for this draw call
@@ -799,7 +799,7 @@ public:
    ///                     or index buffer.
    ///
    /// @param  numVerts    The number of verticies which will be referenced in this draw call. This is not
-   ///                     the number of verticies which will be drawn. That is a function of 'primType' and 
+   ///                     the number of verticies which will be drawn. That is a function of 'primType' and
    ///                     'primitiveCount'.
    ///
    /// @param  startIndex  An offset from the start of the index buffer to specify where to start. If
@@ -808,11 +808,11 @@ public:
    ///
    /// @param  primitiveCount The number of primitives of type 'primType' to draw.
    ///
-   virtual void drawIndexedPrimitive(  GFXPrimitiveType primType, 
-                                       U32 startVertex, 
-                                       U32 minIndex, 
-                                       U32 numVerts, 
-                                       U32 startIndex, 
+   virtual void drawIndexedPrimitive(  GFXPrimitiveType primType,
+                                       U32 startVertex,
+                                       U32 minIndex,
+                                       U32 numVerts,
+                                       U32 startIndex,
                                        U32 primitiveCount ) = 0;
 
    void drawPrimitive( const GFXPrimitive &prim );
@@ -825,13 +825,13 @@ public:
 
    /// Allocate a fence. The API specific implementation of GFXDevice is responsible
    /// to make sure that the proper type is used. GFXGeneralFence should work in
-   /// all cases. 
+   /// all cases.
    virtual GFXFence *createFence() = 0;
 
    /// Returns a hardware occlusion query object or NULL
-   /// if this device does not support them.   
+   /// if this device does not support them.
    virtual GFXOcclusionQuery* createOcclusionQuery() { return NULL; }
-   
+
    /// @name Light Settings
    /// NONE of these should be overridden by API implementations
    /// because of the state caching stuff.
@@ -841,7 +841,7 @@ public:
    void setGlobalAmbientColor(ColorF color);
 
    /// @}
-   
+
    /// @name Texture State Settings
    /// NONE of these should be overridden by API implementations
    /// because of the state caching stuff.
@@ -927,7 +927,7 @@ public:
    /// Set an area of the target to render to.
    void setViewport( const RectI &rect );
 
-   /// Get the current area of the target we will render to.   
+   /// Get the current area of the target we will render to.
    const RectI &getViewport() const { return mViewport; }
 
    virtual void setClipRect( const RectI &rect ) = 0;
@@ -946,12 +946,12 @@ public:
                             bool bRotate = true );
 
    /// Get the projection frustum.
-   void getFrustum(  F32 *left, 
-                     F32 *right, 
-                     F32 *bottom, 
-                     F32 *top, 
-                     F32 *nearPlane, 
-                     F32 *farPlane, 
+   void getFrustum(  F32 *left,
+                     F32 *right,
+                     F32 *bottom,
+                     F32 *top,
+                     F32 *nearPlane,
+                     F32 *farPlane,
                      bool *isOrtho ) const;
 
    /// Get the projection frustum.
@@ -961,13 +961,13 @@ public:
    /// @param doRotate If set to true, the resulting matrix will be rotated PI/2 around the X axis
    //                  for support in tsShapeInstance. You probably want to leave this as 'false'.
    void setOrtho(F32 left, F32 right, F32 bottom, F32 top, F32 nearPlane, F32 farPlane, bool doRotate = false);
-   
+
    /// Return true if the current frustum uses orthographic projection rather than perspective projection.
    bool isFrustumOrtho() const { return mFrustum.isOrtho(); }
 
    /// @}
-   
-   /// Returns the scale for converting world space 
+
+   /// Returns the scale for converting world space
    /// units to screen space units... aka pixels.
    ///
    /// This is the true scale which is best used for GUI
@@ -1018,7 +1018,7 @@ public:
 #endif
    protected:
       GFXDrawUtil *mDrawer;
-}; 
+};
 
 //-----------------------------------------------------------------------------
 // Matrix interface
@@ -1099,7 +1099,7 @@ inline void GFXDevice::setVertexBuffer( GFXVertexBuffer *buffer, U32 stream, U32
       mVertexBufferFrequency[stream] = frequency;
       mVertexBufferFrequencyDirty[stream] = true;
       mStateDirty = true;
-   }   
+   }
 }
 
 inline void GFXDevice::setVertexFormat( const GFXVertexFormat *vertexFormat )

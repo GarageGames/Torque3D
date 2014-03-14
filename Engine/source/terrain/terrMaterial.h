@@ -28,7 +28,7 @@
 #endif
 
 
-/// The TerrainMaterial class orginizes the material settings 
+/// The TerrainMaterial class orginizes the material settings
 /// for a single terrain material layer.
 class TerrainMaterial : public SimObject
 {
@@ -39,7 +39,7 @@ protected:
    ///
    FileName mDiffuseMap;
 
-   /// The size of the diffuse base map in meters 
+   /// The size of the diffuse base map in meters
    /// used to generate its texture coordinates.
    F32 mDiffuseSize;
 
@@ -54,13 +54,13 @@ protected:
    /// detail and normal maps.
    F32 mDetailSize;
 
-   /// 
+   ///
    F32 mDetailStrength;
 
-   /// 
+   ///
    F32 mDetailDistance;
 
-   /// Normally the detail is projected on to the xy 
+   /// Normally the detail is projected on to the xy
    /// coordinates of the terrain.  If this flag is true
    /// then this detail is projected along the xz and yz
    /// planes.
@@ -84,7 +84,7 @@ public:
 
    DECLARE_CONOBJECT( TerrainMaterial );
 
-   /// This method locates the TerrainMaterial if it exists, tries 
+   /// This method locates the TerrainMaterial if it exists, tries
    /// to create a new one if a valid texture path was passed, or
    /// returns a debug material if all else fails.
    static TerrainMaterial* findOrCreate( const char *nameOrPath );

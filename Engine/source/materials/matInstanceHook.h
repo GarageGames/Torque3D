@@ -74,7 +74,7 @@ public:
    ///
    virtual ~MatInstanceHook() {}
 
-   /// 
+   ///
    virtual const MatInstanceHookType& getType() const = 0;
 };
 

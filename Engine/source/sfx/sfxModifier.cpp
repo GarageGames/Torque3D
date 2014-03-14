@@ -77,10 +77,10 @@ bool SFXRangeModifier::update()
          _onStart();
       }
    }
-   
+
    if( isActive() )
       _onUpdate();
-      
+
    if( isActive() )
    {
       SFXStatus status = mSource->getStatus();
@@ -89,11 +89,11 @@ bool SFXRangeModifier::update()
       {
          _onEnd();
          mIsActive = false;
-         
+
          return mRemoveWhenDone;
       }
    }
-   
+
    return true;
 }
 
@@ -108,7 +108,7 @@ SFXFadeModifier::SFXFadeModifier( SFXSource* source, F32 time, F32 endVolume, F3
      mEndVolume( endVolume ),
      mOnEnd( onEndDo )
 {
-   
+
 }
 
 //-----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ SFXFadeModifier::~SFXFadeModifier()
 {
    // If the fade is still ongoing, restore the source's volume.
    // For fade-in, set to end volume.  For fade-out, set to start volume.
-   
+
    if( isActive() )
    {
       if( mStartVolume > mEndVolume )
@@ -146,7 +146,7 @@ void SFXFadeModifier::_onUpdate()
       newVolume = mStartVolume - ( ( mStartVolume - mEndVolume ) * multiplier );
    else
       newVolume = mStartVolume + ( ( mEndVolume - mStartVolume ) * multiplier );
-      
+
    if( newVolume != mCurrentVolume )
    {
       mCurrentVolume = newVolume;
@@ -159,17 +159,17 @@ void SFXFadeModifier::_onUpdate()
 void SFXFadeModifier::_onEnd()
 {
    mSource->setVolume( mEndVolume );
-   
+
    switch( mOnEnd )
    {
       case ON_END_Pause:
          mSource->pause( 0.f ); // Pause without fade.
          break;
-         
+
       case ON_END_Stop:
          mSource->stop( 0.f ); // Stop without fade.
          break;
-         
+
       case ON_END_Nop: ;
    }
 }

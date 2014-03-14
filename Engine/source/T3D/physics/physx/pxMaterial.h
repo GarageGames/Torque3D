@@ -32,7 +32,7 @@
 
 class NxMaterial;
 
-class PxMaterial : public SimDataBlock 
+class PxMaterial : public SimDataBlock
 {
    typedef SimDataBlock Parent;
 

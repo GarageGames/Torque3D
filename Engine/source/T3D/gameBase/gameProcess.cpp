@@ -33,7 +33,7 @@ ClientProcessList* ClientProcessList::smClientProcessList = NULL;
 ServerProcessList* ServerProcessList::smServerProcessList = NULL;
 static U32 gNetOrderNextId = 0;
 
-ConsoleFunction( dumpProcessList, void, 1, 1, 
+ConsoleFunction( dumpProcessList, void, 1, 1,
    "Dumps all ProcessObjects in ServerProcessList and ClientProcessList to the console." )
 {
    Con::printf( "client process list:" );
@@ -50,11 +50,11 @@ ClientProcessList::ClientProcessList()
 {
 }
 
-void ClientProcessList::addObject( ProcessObject *pobj ) 
+void ClientProcessList::addObject( ProcessObject *pobj )
 {
    AssertFatal( static_cast<SceneObject*>( pobj )->isClientObject(), "Tried to add server object to ClientProcessList." );
 
-   GameBase *obj = getGameBase( pobj );   
+   GameBase *obj = getGameBase( pobj );
 
    if ( obj && obj->isNetOrdered() )
    {
@@ -81,7 +81,7 @@ void ClientProcessList::addObject( ProcessObject *pobj )
 
 bool ClientProcessList::doBacklogged( SimTime timeDelta )
 {
-   #ifdef TORQUE_DEBUG   
+   #ifdef TORQUE_DEBUG
    static bool backlogged = false;
    static U32 backloggedTime = 0;
    #endif
@@ -95,7 +95,7 @@ bool ClientProcessList::doBacklogged( SimTime timeDelta )
       // the simulation is frozen.
       if ( connection->mMoveList->isBacklogged() )
       {
-         #ifdef TORQUE_DEBUG   
+         #ifdef TORQUE_DEBUG
          if ( !backlogged )
          {
             Con::printf( "client is backlogged, time is frozen" );
@@ -109,7 +109,7 @@ bool ClientProcessList::doBacklogged( SimTime timeDelta )
       }
    }
 
-   #ifdef TORQUE_DEBUG   
+   #ifdef TORQUE_DEBUG
    if ( backlogged )
    {
       Con::printf( "client is no longer backlogged, time is unfrozen (%i ms elapsed)", backloggedTime );
@@ -131,16 +131,16 @@ void ClientProcessList::onPreTickObject( ProcessObject *pobj )
 //--------------------------------------------------------------------------
 // ServerProcessList
 //--------------------------------------------------------------------------
-   
+
 ServerProcessList::ServerProcessList()
 {
 }
 
-void ServerProcessList::addObject( ProcessObject *pobj ) 
+void ServerProcessList::addObject( ProcessObject *pobj )
 {
    AssertFatal( static_cast<SceneObject*>( pobj )->isServerObject(), "Tried to add client object to ServerProcessList." );
 
-   GameBase *obj = getGameBase( pobj );   
+   GameBase *obj = getGameBase( pobj );
 
    if ( obj && obj->isNetOrdered() )
    {

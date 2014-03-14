@@ -36,7 +36,7 @@ bool TerrainBlock::exportHeightMap( const UTF8 *filePath, const String &format )
                      false,
                      GFXFormatR5G6B5 );
 
-   // First capture the max height... we'll normalize 
+   // First capture the max height... we'll normalize
    // everything to this value.
    U16 maxHeight = 0;
 
@@ -79,8 +79,8 @@ bool TerrainBlock::exportHeightMap( const UTF8 *filePath, const String &format )
       return false;
    }
 
-   // Print out the map size in meters, so that the user 
-   // knows what values to use when importing it into 
+   // Print out the map size in meters, so that the user
+   // knows what values to use when importing it into
    // another terrain tool.
    S32 dim = mSquareSize * mFile->mSize;
    S32 height = fixedToFloat( maxHeight );
@@ -94,7 +94,7 @@ bool TerrainBlock::exportLayerMaps( const UTF8 *filePrefix, const String &format
    for(S32 i = 0; i < mFile->mMaterials.size(); i++)
    {
       Vector<const U8>::iterator iBits = mFile->mLayerMap.begin();
-      
+
       GBitmap output(   mFile->mSize,
                         mFile->mSize,
                         false,

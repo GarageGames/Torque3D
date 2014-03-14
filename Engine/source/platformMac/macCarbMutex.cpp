@@ -45,7 +45,7 @@ Mutex::Mutex(void)
    ok = pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
    ok = pthread_mutex_init(&(mData->mMutex),&attr);
    AssertFatal(ok == 0, "Mutex() failed: pthread_mutex_init() failed.");
-   
+
    mData->locked = false;
    mData->lockedByThread = 0;
 }
@@ -55,10 +55,10 @@ Mutex::~Mutex()
    int ok;
    ok = pthread_mutex_destroy( &(mData->mMutex) );
    AssertFatal(ok == 0, "~Mutex() failed: pthread_mutex_destroy() failed.");
-   
+
    delete mData;
 }
- 
+
 bool Mutex::lock( bool block)
 {
    int ok;
@@ -69,7 +69,7 @@ bool Mutex::lock( bool block)
       AssertFatal( ok != EINVAL, "Mutex::lockMutex() failed: invalid mutex.");
       AssertFatal( ok != EDEADLK, "Mutex::lockMutex() failed: system detected a deadlock!");
       AssertFatal( ok == 0, "Mutex::lockMutex() failed: pthread_mutex_lock() failed -- unknown reason.");
-   } 
+   }
    else {
       ok = pthread_mutex_trylock( &(mData->mMutex) );
       // returns EBUSY if mutex was locked by another thread,

@@ -27,7 +27,7 @@
 /// There are various callbacks you can overload to hook in your
 /// own functionality without changing the core editor code.
 ///
-/// At the moment this is primarily for the World/Mission 
+/// At the moment this is primarily for the World/Mission
 /// Editor and the callbacks mostly make sense in that context.
 ///
 /// Example:
@@ -37,7 +37,7 @@
 ///      superclass = "EditorPlugin";
 ///      class = "RoadEditor";
 ///   };
-///   
+///
 ///   EditorPlugin::register( %obj );
 ///
 /// For an a full example see: tools/roadEditor/main.cs
@@ -49,12 +49,12 @@
 /// If you do make sure you call the parent.
 function EditorPlugin::onAdd( %this )
 {
-   EditorPluginSet.add( %this );   
+   EditorPluginSet.add( %this );
 }
 
 
 /// Callback when the world editor is first started.  It
-/// is a good place to insert menus and menu items as well as 
+/// is a good place to insert menus and menu items as well as
 /// preparing guis.
 function EditorPlugin::onWorldEditorStartup( %this )
 {
@@ -83,7 +83,7 @@ function EditorPlugin::onActivated( %this )
 {
    if(isDemo())
       startToolTime(%this.getName());
-      
+
    %this.isActivated = true;
 }
 
@@ -93,7 +93,7 @@ function EditorPlugin::onDeactivated( %this )
 {
    if(isDemo())
       endToolTime(%this.getName());
-      
+
    %this.isActivated = false;
 }
 
@@ -103,7 +103,7 @@ function EditorPlugin::onToggleToolWindows( %this )
 {
 }
 
-/// Callback when the edit menu is clicked or prior to handling an accelerator 
+/// Callback when the edit menu is clicked or prior to handling an accelerator
 /// key event mapped to an edit menu item.
 /// It is up to the active editor to determine if these actions are
 /// appropriate in the current state.
@@ -111,16 +111,16 @@ function EditorPlugin::onEditMenuSelect( %this, %editMenu )
 {
    %editMenu.enableItem( 3, false ); // Cut
    %editMenu.enableItem( 4, false ); // Copy
-   %editMenu.enableItem( 5, false ); // Paste  
+   %editMenu.enableItem( 5, false ); // Paste
    %editMenu.enableItem( 6, false ); // Delete
-   %editMenu.enableItem( 8, false ); // Deselect     
+   %editMenu.enableItem( 8, false ); // Deselect
 }
 
 /// If this tool keeps track of changes that necessitate resaving the mission
 /// return true in that case.
 function EditorPlugin::isDirty( %this )
 {
-   return false;  
+   return false;
 }
 
 /// This gives tools a chance to clear whatever internal variables keep track of changes
@@ -158,11 +158,11 @@ function EditorPlugin::onObjectDeselected( %this, %object )
 function EditorPlugin::onSelectionCleared( %this )
 {
 }
-   
+
 /// Callback when the the delete item of the edit menu is selected or its
 /// accelerator is pressed.
 function EditorPlugin::handleDelete( %this )
-{   
+{
    warn( "EditorPlugin::handleDelete( " @ %this.getName() @ " )" NL
          "Was not implemented in child namespace, yet menu item was enabled." );
 }
@@ -170,7 +170,7 @@ function EditorPlugin::handleDelete( %this )
 /// Callback when the the deselect item of the edit menu is selected or its
 /// accelerator is pressed.
 function EditorPlugin::handleDeselect( %this )
-{   
+{
    warn( "EditorPlugin::handleDeselect( " @ %this.getName() @ " )" NL
          "Was not implemented in child namespace, yet menu item was enabled." );
 }
@@ -178,7 +178,7 @@ function EditorPlugin::handleDeselect( %this )
 /// Callback when the the cut item of the edit menu is selected or its
 /// accelerator is pressed.
 function EditorPlugin::handleCut( %this )
-{   
+{
    warn( "EditorPlugin::handleCut( " @ %this.getName() @ " )" NL
          "Was not implemented in child namespace, yet menu item was enabled." );
 }
@@ -186,7 +186,7 @@ function EditorPlugin::handleCut( %this )
 /// Callback when the the copy item of the edit menu is selected or its
 /// accelerator is pressed.
 function EditorPlugin::handleCopy( %this )
-{   
+{
    warn( "EditorPlugin::handleCopy( " @ %this.getName() @ " )" NL
          "Was not implemented in child namespace, yet menu item was enabled." );
 }
@@ -194,7 +194,7 @@ function EditorPlugin::handleCopy( %this )
 /// Callback when the the paste item of the edit menu is selected or its
 /// accelerator is pressed.
 function EditorPlugin::handlePaste( %this )
-{   
+{
    warn( "EditorPlugin::handlePaste( " @ %this.getName() @ " )" NL
          "Was not implemented in child namespace, yet menu item was enabled." );
 }

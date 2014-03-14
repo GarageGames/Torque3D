@@ -235,7 +235,7 @@ protected:
    void _cleanupTargetAndTurret();
    bool _testTargetLineOfSight(Point3F& aimPoint, ShapeBase* target, Point3F& sightPoint);
 
-   /// ObjectRenderInst delegate hooked up in prepBatchRender 
+   /// ObjectRenderInst delegate hooked up in prepBatchRender
    /// if GameBase::gShowBoundingBox is true.
    void _renderScanner( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );
 
@@ -249,7 +249,7 @@ public:
    AITurretShape();
    virtual ~AITurretShape();
 
-   static void initPersistFields();   
+   static void initPersistFields();
 
    bool onAdd();
    void onRemove();

@@ -110,7 +110,7 @@ public:
 
    GFXPCD3D9WindowTarget();
    ~GFXPCD3D9WindowTarget();
- 
+
    virtual const Point2I getSize();
    virtual GFXFormat getFormat();
    virtual bool present();
@@ -119,7 +119,7 @@ public:
    void setImplicitSwapChain();
    void createAdditionalSwapChain();
 
-   virtual void activate();   
+   virtual void activate();
 
    void zombify();
    void resurrect();

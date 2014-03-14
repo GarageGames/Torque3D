@@ -56,7 +56,7 @@ char* dStrrstr(char* dst, const char* src, const char* findStr, char* replaceStr
 {
    //see if str contains findStr, if not then return
    const char* findpos = strstr(src, findStr);
-   if(!findpos) 
+   if(!findpos)
    {
       strcpy(dst, src);
    }
@@ -95,7 +95,7 @@ INT CreateMiniDump( LPEXCEPTION_POINTERS ExceptionInfo)
    time(&theTime);
    tm* pLocalTime = localtime(&theTime);
    char crashFolder[2048];
-   dSprintf(crashFolder, 2048, "%s_%02d.%02d_%02d.%02d.%02d", 
+   dSprintf(crashFolder, 2048, "%s_%02d.%02d_%02d.%02d.%02d",
       Platform::getExecutableName(),
       pLocalTime->tm_mon+1, pLocalTime->tm_mday,
       pLocalTime->tm_hour, pLocalTime->tm_min, pLocalTime->tm_sec);
@@ -144,7 +144,7 @@ INT CreateMiniDump( LPEXCEPTION_POINTERS ExceptionInfo)
 
    //copy over the pdb file
    char pdbName[1024];
-   dStrcpy(pdbName, exeName);	
+   dStrcpy(pdbName, exeName);
    dStrncat(pdbName, ".pdb", 4);
    dSprintf(fromFile, 2048, "%s/%s", Platform::getCurrentDirectory(), pdbName );
    dSprintf(fileName, 2048, "%s/%s", crashPath, pdbName );
@@ -194,30 +194,30 @@ INT CreateMiniDump( LPEXCEPTION_POINTERS ExceptionInfo)
 const int ID_TEXT=200;
 const int ID_USERTEXT=300;
 const int ID_DONE=400;
-BOOL CALLBACK MiniDumpDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
-{ 
+BOOL CALLBACK MiniDumpDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
    char text[128]= "";
 
-   switch (message) 
-   { 
+   switch (message)
+   {
    case WM_INITDIALOG :
       SetDlgItemTextA ( hwndDlg, ID_USERTEXT, text );
       return TRUE ;
 
-   case WM_COMMAND: 
-      switch (LOWORD(wParam)) 
-      { 
+   case WM_COMMAND:
+      switch (LOWORD(wParam))
+      {
       case ID_DONE:
-         if( !GetDlgItemTextA(hwndDlg, ID_USERTEXT, gUserInput, 4096) )  gUserInput[0]='\0'; 
+         if( !GetDlgItemTextA(hwndDlg, ID_USERTEXT, gUserInput, 4096) )  gUserInput[0]='\0';
          strcat(gUserInput, "\n\n\n");
-         EndDialog(hwndDlg, wParam); 
-         return TRUE; 
+         EndDialog(hwndDlg, wParam);
+         return TRUE;
       default:
          return TRUE;
-      } 
-   } 
-   return FALSE; 
-} 
+      }
+   }
+   return FALSE;
+}
 
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -249,9 +249,9 @@ LRESULT DisplayMiniDumpDialog(HINSTANCE hinst, HWND hwndOwner)
    LPDLGTEMPLATE lpdt = (LPDLGTEMPLATE)GlobalLock(hgbl);
    lpdt->style = WS_POPUP | WS_BORDER | DS_MODALFRAME | WS_CAPTION;
    lpdt->cdit = 3;         // Number of controls
-   lpdt->x  = 100;  
+   lpdt->x  = 100;
    lpdt->y  = 100;
-   lpdt->cx = 300; 
+   lpdt->cx = 300;
    lpdt->cy = 90;
 
    LPWORD lpw = (LPWORD)(lpdt + 1);
@@ -267,9 +267,9 @@ LRESULT DisplayMiniDumpDialog(HINSTANCE hinst, HWND hwndOwner)
    //-----------------------------------------------------------------
    lpw = lpwAlign(lpw);    // Align DLGITEMTEMPLATE on DWORD boundary
    LPDLGITEMTEMPLATE lpdit = (LPDLGITEMTEMPLATE)lpw;
-   lpdit->x  = 10; 
+   lpdit->x  = 10;
    lpdit->y  = 10;
-   lpdit->cx = 290; 
+   lpdit->cx = 290;
    lpdit->cy = 10;
    lpdit->id = ID_TEXT;    // Text identifier
    lpdit->style = WS_CHILD | WS_VISIBLE | SS_LEFT;
@@ -282,16 +282,16 @@ LRESULT DisplayMiniDumpDialog(HINSTANCE hinst, HWND hwndOwner)
    for (lpwsz = (LPWSTR)lpw; *lpwsz++ = (WCHAR)*msg++;);
    lpw = (LPWORD)lpwsz;
 
-   *lpw++ = 0;             // No creation data        
+   *lpw++ = 0;             // No creation data
 
    //-----------------------------------------------------------------
    // Define a DONE button
    //-----------------------------------------------------------------
    lpw = lpwAlign(lpw);    // Align DLGITEMTEMPLATE on DWORD boundary
    lpdit = (LPDLGITEMTEMPLATE)lpw;
-   lpdit->x  = 265; 
+   lpdit->x  = 265;
    lpdit->y  = 75;
-   lpdit->cx = 25; 
+   lpdit->cx = 25;
    lpdit->cy = 12;
    lpdit->id = ID_DONE;       // OK button identifier
    lpdit->style = WS_CHILD | WS_VISIBLE | WS_TABSTOP;// | BS_DEFPUSHBUTTON;
@@ -310,9 +310,9 @@ LRESULT DisplayMiniDumpDialog(HINSTANCE hinst, HWND hwndOwner)
    //-----------------------------------------------------------------
    lpw = lpwAlign(lpw);    // Align DLGITEMTEMPLATE on DWORD boundary
    lpdit = (LPDLGITEMTEMPLATE)lpw;
-   lpdit->x  = 10; 
+   lpdit->x  = 10;
    lpdit->y  = 22;
-   lpdit->cx = 280; 
+   lpdit->cx = 280;
    lpdit->cy = 50;
    lpdit->id = ID_USERTEXT;    // Text identifier
    lpdit->style = ES_LEFT | WS_BORDER | WS_TABSTOP | WS_CHILD | WS_VISIBLE;
@@ -325,13 +325,13 @@ LRESULT DisplayMiniDumpDialog(HINSTANCE hinst, HWND hwndOwner)
 
 
 
-   GlobalUnlock(hgbl); 
-   LRESULT ret = DialogBoxIndirect(	hinst, 
-      (LPDLGTEMPLATE)hgbl, 
-      hwndOwner, 
-      (DLGPROC)MiniDumpDialogProc); 
-   GlobalFree(hgbl); 
-   return ret; 
+   GlobalUnlock(hgbl);
+   LRESULT ret = DialogBoxIndirect(	hinst,
+      (LPDLGTEMPLATE)hgbl,
+      hwndOwner,
+      (DLGPROC)MiniDumpDialogProc);
+   GlobalFree(hgbl);
+   return ret;
 }
 
 #endif

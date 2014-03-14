@@ -61,7 +61,7 @@ UndoAction::~UndoAction()
 //-----------------------------------------------------------------------------
 void UndoAction::initPersistFields()
 {
-   addField("actionName", TypeRealString, Offset(mActionName, UndoAction), 
+   addField("actionName", TypeRealString, Offset(mActionName, UndoAction),
       "A brief description of the action, for UI representation of this undo/redo action.");
 
    Parent::initPersistFields();
@@ -124,19 +124,19 @@ void CompoundUndoAction::addAction( UndoAction *action )
 void CompoundUndoAction::undo()
 {
    Vector<UndoAction*>::iterator itr = mChildren.end() - 1;
-   for ( ; itr != mChildren.begin() - 1; itr-- )   
+   for ( ; itr != mChildren.begin() - 1; itr-- )
       (*itr)->undo();
 }
 
 void CompoundUndoAction::redo()
 {
    Vector<UndoAction*>::iterator itr = mChildren.begin();
-   for ( ; itr != mChildren.end(); itr++ )   
-      (*itr)->redo();   
+   for ( ; itr != mChildren.end(); itr++ )
+      (*itr)->redo();
 }
 
 void CompoundUndoAction::onDeleteNotify( SimObject* object )
-{      
+{
    for( U32 i = 0; i < mChildren.size(); ++ i )
       if( mChildren[ i ] == object )
          mChildren.erase( i );
@@ -188,7 +188,7 @@ void UndoManager::initPersistFields()
    // arrange for the default undo manager to exist.
 //   UndoManager &def = getDefaultManager();
 //   Con::printf("def = %s undo manager created", def.getName());
-   
+
 }
 
 //-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ void UndoManager::clearAll()
 {
    clearStack(mUndoStack);
    clearStack(mRedoStack);
-   
+
    Con::executef(this, "onClear");
 }
 
@@ -309,12 +309,12 @@ void UndoManager::undo()
    // pop the action off the undo stack
    UndoAction *act = mUndoStack.last();
    mUndoStack.pop_back();
-   
+
    // add it to the redo stack
    mRedoStack.push_back(act);
    if(mRedoStack.size() > mNumLevels)
       mRedoStack.pop_front();
-   
+
    Con::executef(this, "onUndo");
 
    // perform the undo, whatever it may be.
@@ -331,14 +331,14 @@ void UndoManager::redo()
    // pop the action off the redo stack
    UndoAction *react = mRedoStack.last();
    mRedoStack.pop_back();
-   
+
    // add it to the undo stack
    mUndoStack.push_back(react);
    if(mUndoStack.size() > mNumLevels)
       mUndoStack.pop_front();
-   
+
    Con::executef(this, "onRedo");
-   
+
    // perform the redo, whatever it may be.
    (*react).redo();
 }
@@ -371,7 +371,7 @@ ConsoleMethod(UndoManager, getUndoAction, S32, 3, 3, "(index)")
    UndoAction * action = object->getUndoAction(dAtoi(argv[2]));
    if ( !action )
       return -1;
-   
+
    if ( !action->isProperlyAdded() )
       action->registerObject();
 
@@ -433,7 +433,7 @@ const char* UndoManager::getNextUndoName()
 {
    if(mUndoStack.size() < 1)
       return NULL;
-      
+
    UndoAction *act = mUndoStack.last();
    return (*act).mActionName;
 }
@@ -453,13 +453,13 @@ void UndoManager::addAction(UndoAction* action)
 {
    // If we are assembling a compound, redirect the action to it
    // and don't modify our current undo/redo state.
-   
+
    if( mCompoundStack.size() )
    {
       mCompoundStack.last()->addAction( action );
       return;
    }
-   
+
    // clear the redo stack
    clearStack(mRedoStack);
 
@@ -484,10 +484,10 @@ CompoundUndoAction* UndoManager::pushCompound( const String& name )
 void UndoManager::popCompound( bool discard )
 {
    AssertFatal( getCompoundStackDepth() > 0, "UndoManager::popCompound - no compound on stack!" );
-   
+
    CompoundUndoAction* undo = mCompoundStack.last();
    mCompoundStack.pop_back();
-   
+
    if( discard || undo->getNumChildren() == 0 )
    {
       if( undo->isProperlyAdded() )
@@ -567,14 +567,14 @@ ConsoleMethod( UndoManager, pushCompound, const char*, 2, 3, "( string name=\"\"
    String name;
    if( argc > 2 )
       name = argv[ 2 ];
-      
+
    CompoundUndoAction* action = object->pushCompound( name );
    if( !action )
       return "";
-      
+
    if( !action->isProperlyAdded() )
       action->registerObject();
-      
+
    return action->getIdString();
 }
 
@@ -587,10 +587,10 @@ ConsoleMethod( UndoManager, popCompound, void, 2, 3, "( bool discard=false ) - P
       Con::errorf( "%s::popCompound - no compound on stack", argv[ 0 ] );
       return;
    }
-   
+
    bool discard = false;
    if( argc > 2 )
       discard = dAtob( argv[ 2 ] );
-   
+
    object->popCompound( discard );
 }

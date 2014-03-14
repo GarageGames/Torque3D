@@ -45,7 +45,7 @@
 inline char *dStrcat(char *dst, const char *src)
 {
    return strcat(dst,src);
-}   
+}
 
 inline char *dStrncat(char *dst, const char *src, dsize_t len)
 {
@@ -54,13 +54,13 @@ inline char *dStrncat(char *dst, const char *src, dsize_t len)
 
 inline int  dStrcmp(const char *str1, const char *str2)
 {
-   return strcmp(str1, str2);   
+   return strcmp(str1, str2);
 }
 
 inline int  dStrncmp(const char *str1, const char *str2, dsize_t len)
 {
-   return strncmp(str1, str2, len);   
-}  
+   return strncmp(str1, str2, len);
+}
 
 inline int  dStricmp(const char *str1, const char *str2)
 {
@@ -75,27 +75,27 @@ inline int  dStrnicmp(const char *str1, const char *str2, dsize_t len)
 inline char *dStrcpy(char *dst, const char *src)
 {
    return strcpy(dst,src);
-}   
+}
 
 inline char *dStrncpy(char *dst, const char *src, dsize_t len)
 {
    return strncpy(dst,src,len);
-}   
+}
 
 inline dsize_t dStrlen(const char *str)
 {
    return strlen(str);
-}   
+}
 
 inline char *dStrchr(char *str, int c)
 {
    return strchr(str,c);
-}   
+}
 
 inline const char *dStrchr(const char *str, int c)
 {
    return strchr(str,c);
-}   
+}
 
 inline char *dStrrchr(char *str, int c)
 {
@@ -105,7 +105,7 @@ inline char *dStrrchr(char *str, int c)
 inline const char *dStrrchr(const char *str, int c)
 {
    return strrchr(str,c);
-}   
+}
 
 inline dsize_t dStrspn(const char *str, const char *set)
 {
@@ -115,7 +115,7 @@ inline dsize_t dStrspn(const char *str, const char *set)
 inline dsize_t dStrcspn(const char *str, const char *set)
 {
    return strcspn(str, set);
-}   
+}
 
 inline char *dStrstr(const char *str1, const char *str2)
 {

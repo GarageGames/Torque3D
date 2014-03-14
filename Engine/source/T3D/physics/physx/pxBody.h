@@ -52,7 +52,7 @@ protected:
    /// The physics actor.
    NxActor *mActor;
 
-   /// The unshared local material used on all the 
+   /// The unshared local material used on all the
    /// shapes on this actor.
    NxMaterial *mMaterial;
 
@@ -60,7 +60,7 @@ protected:
    /// allocated objects that we own and must free.
    StrongRefPtr<PxCollision> mColShape;
 
-   /// 
+   ///
    MatrixF mInternalTransform;
 
    /// The body flags set at creation time.
@@ -87,10 +87,10 @@ public:
    virtual bool isSimulationEnabled() { return mIsEnabled; }
 
    // PhysicsBody
-   virtual bool init(   PhysicsCollision *shape, 
+   virtual bool init(   PhysicsCollision *shape,
                         F32 mass,
                         U32 bodyFlags,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world );
    virtual bool isDynamic() const;
    virtual PhysicsCollision* getColShape();
@@ -105,7 +105,7 @@ public:
    virtual Point3F getAngVelocity() const;
    virtual void setSleeping( bool sleeping );
    virtual void setMaterial(  F32 restitution,
-                              F32 friction, 
+                              F32 friction,
                               F32 staticFriction );
    virtual void applyCorrection( const MatrixF &xfm );
    virtual void applyImpulse( const Point3F &origin, const Point3F &force );

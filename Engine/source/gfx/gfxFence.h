@@ -83,9 +83,9 @@ protected:
 
 public:
 
-   GFXGeneralFence( GFXDevice *device ) 
-      :  GFXFence( device ), 
-         mInitialized( false ) 
+   GFXGeneralFence( GFXDevice *device )
+      :  GFXFence( device ),
+         mInitialized( false )
    {
    }
 

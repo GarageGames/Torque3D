@@ -46,7 +46,7 @@ public:
    // Generic PrePass Render Instance Type
    static const RenderInstType RIT_PrePass;
 
-   RenderPrePassMgr( bool gatherDepth = true, 
+   RenderPrePassMgr( bool gatherDepth = true,
                      GFXFormat format = GFXFormatR16G16B16A16 );
 
    virtual ~RenderPrePassMgr();
@@ -65,7 +65,7 @@ public:
 
    typedef Signal<void(const SceneRenderState*, RenderPrePassMgr*, bool)> RenderSignal;
 
-   static RenderSignal& getRenderSignal();  
+   static RenderSignal& getRenderSignal();
 
    static const U32 OpaqueStaticLitMask = BIT(1);     ///< Stencil mask for opaque, lightmapped pixels
    static const U32 OpaqueDynamicLitMask = BIT(0);    ///< Stencil mask for opaque, dynamic lit pixels
@@ -100,8 +100,8 @@ protected:
 class ProcessedPrePassMaterial : public ProcessedShaderMaterial
 {
    typedef ProcessedShaderMaterial Parent;
-   
-public:   
+
+public:
    ProcessedPrePassMaterial(Material& mat, const RenderPrePassMgr *prePassMgr);
 
    virtual U32 getNumStages();
@@ -121,20 +121,20 @@ class PrePassMatInstance : public MatInstance
 {
    typedef MatInstance Parent;
 
-public:   
+public:
    PrePassMatInstance(MatInstance* root, const RenderPrePassMgr *prePassMgr);
    virtual ~PrePassMatInstance();
 
    bool init()
    {
       return init( mFeatureList, mVertexFormat );
-   }   
+   }
 
    // MatInstance
-   virtual bool init(   const FeatureSet &features, 
+   virtual bool init(   const FeatureSet &features,
                         const GFXVertexFormat *vertexFormat );
 
-protected:      
+protected:
    virtual ProcessedMaterial* getShaderMaterial();
 
    const RenderPrePassMgr *mPrePassMgr;
@@ -156,7 +156,7 @@ public:
    static const MatInstanceHookType Type;
 
 protected:
-   PrePassMatInstance *mHookedPrePassMatInst; 
+   PrePassMatInstance *mHookedPrePassMatInst;
    const RenderPrePassMgr *mPrePassManager;
 };
 
@@ -168,7 +168,7 @@ class LinearEyeDepthConditioner : public ConditionerFeature
    typedef ConditionerFeature Parent;
 
 public:
-   LinearEyeDepthConditioner(const GFXFormat bufferFormat) 
+   LinearEyeDepthConditioner(const GFXFormat bufferFormat)
       : Parent(bufferFormat)
    {
 

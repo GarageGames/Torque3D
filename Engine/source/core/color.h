@@ -24,10 +24,10 @@
 #define _COLOR_H_
 
 #ifndef _MPOINT3_H_
-#include "math/mPoint3.h" 
+#include "math/mPoint3.h"
 #endif
 #ifndef _MPOINT4_H_
-#include "math/mPoint4.h" 
+#include "math/mPoint4.h"
 #endif
 
 class ColorI;

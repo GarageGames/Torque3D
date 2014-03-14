@@ -25,7 +25,7 @@
 
 #ifndef _LIGHTMANAGER_H_
 #include "lighting/lightManager.h"
-#endif 
+#endif
 #ifndef _TDICTIONARY_H_
 #include "core/util/tDictionary.h"
 #endif
@@ -106,7 +106,7 @@ protected:
    LightConstantMap mConstantLookup;
    GFXShaderRef mLastShader;
    LightingShaderConstants* mLastConstants;
-   
+
    /// Statics used for light manager/projected shadow metrics.
    static U32 smActiveShadowPlugins;
    static U32 smShadowsUpdated;
@@ -119,12 +119,12 @@ protected:
 
    /// A timer used for tracking update time.
    PlatformTimer *mTimer;
-   
+
    blTerrainSystem* mTerrainSystem;
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "BasicLightManager"; }   
+   static const char* getSingletonName() { return "BasicLightManager"; }
 };
 
 #define BLM ManagedSingleton<BasicLightManager>::instance()

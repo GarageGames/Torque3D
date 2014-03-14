@@ -42,7 +42,7 @@ class GuiPopUpBackgroundCtrlEx : public GuiControl
 {
 protected:
    GuiPopUpMenuCtrlEx *mPopUpCtrl;
-   GuiPopupTextListCtrlEx *mTextList; 
+   GuiPopupTextListCtrlEx *mTextList;
 public:
    GuiPopUpBackgroundCtrlEx(GuiPopUpMenuCtrlEx *ctrl, GuiPopupTextListCtrlEx* textList);
    void onMouseDown(const GuiEvent &event);
@@ -127,7 +127,7 @@ class GuiPopUpMenuCtrlEx : public GuiTextCtrl
 
   public:
    GuiPopUpMenuCtrlEx(void);
-   ~GuiPopUpMenuCtrlEx();   
+   ~GuiPopUpMenuCtrlEx();
    GuiScrollCtrl::Region mScrollDir;
    bool onWake(); //  Added
    bool onAdd();
@@ -162,7 +162,7 @@ class GuiPopUpMenuCtrlEx : public GuiTextCtrl
    S32 findText( const char* text );
    S32 getNumEntries()   { return( mEntries.size() ); }
    void replaceText(S32);
-   
+
    DECLARE_CONOBJECT(GuiPopUpMenuCtrlEx);
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that allows to select a value from a drop-down list." );

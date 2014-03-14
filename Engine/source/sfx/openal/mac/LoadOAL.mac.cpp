@@ -434,8 +434,8 @@ ALboolean LoadOAL10Library(char *szOALFullPathName, LPOPENALFNTABLE lpOALFnTable
 		warn("Failed to retrieve 'alcGetEnumValue' function address\n");
 		return AL_FALSE;
 	}
-   
-   
+
+
 	return AL_TRUE;
 }
 

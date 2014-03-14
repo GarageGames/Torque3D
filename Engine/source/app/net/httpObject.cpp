@@ -32,13 +32,13 @@ IMPLEMENT_CONOBJECT(HTTPObject);
 
 ConsoleDocClass( HTTPObject,
    "@brief Allows communications between the game and a server using HTTP.\n\n"
-   
+
    "HTTPObject is derrived from TCPObject and makes use of the same callbacks for dealing with "
    "connections and received data.  However, the way in which you use HTTPObject to connect "
    "with a server is different than TCPObject.  Rather than opening a connection, sending data, "
    "waiting to receive data, and then closing the connection, you issue a get() or post() and "
    "handle the response.  The connection is automatically created and destroyed for you.\n\n"
-   
+
    "@tsexample\n"
       "// In this example we'll retrieve the weather in Las Vegas using\n"
       "// Google's API.  The response is in XML which could be processed\n"
@@ -104,8 +104,8 @@ ConsoleDocClass( HTTPObject,
 
       "// Send the GET command\n"
       "%feed.get(\"www.google.com:80\", \"/ig/api\", \"weather=Las-Vegas,US\");\n"
-	"@endtsexample\n\n" 
-   
+	"@endtsexample\n\n"
+
    "@see TCPObject\n"
 
    "@ingroup Networking\n"
@@ -403,7 +403,7 @@ DefineEngineMethod( HTTPObject, get, void, ( const char* Address, const char* re
    "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
    "@param query Optional. Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. "
    "If you were building the URL manually, this is the text that follows the question mark.  For example: http://www.google.com/ig/api?<b>weather=Las-Vegas,US</b>\n"
-   
+
    "@tsexample\n"
 	   "// Create an HTTP object for communications\n"
 	   "%httpObj = new HTTPObject();\n\n"
@@ -431,7 +431,7 @@ DefineEngineMethod( HTTPObject, post, void, ( const char* Address, const char* r
    "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
    "@param query Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. \n"
    "@param post Submission data to be processed.\n"
-   
+
    "@note The post() method is currently non-functional.\n"
 
    "@tsexample\n"

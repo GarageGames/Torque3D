@@ -88,9 +88,9 @@ IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( const char* width, const ch
 );
 
 GFX_ImplementTextureProfile(GFXMLTextureProfile,
-                            GFXTextureProfile::DiffuseMap, 
+                            GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::Static, 
+                            GFXTextureProfile::Static,
                             GFXTextureProfile::None);
 
 const U32 GuiMLTextCtrl::csmTextBufferGrowthSize = 1024;
@@ -226,20 +226,20 @@ DefineEngineMethod( GuiMLTextCtrl, forceReflow, void, (),,
 
 //--------------------------------------------------------------------------
 GuiMLTextCtrl::GuiMLTextCtrl()
-: mTabStops( NULL ), 
-  mTabStopCount( 0 ), 
-  mCurTabStop( 0 ), 
-  mCurStyle( NULL ), 
-  mCurLMargin( 0 ), 
-  mCurRMargin( 100 ), 
-  mCurJustify( LeftJustify ), 
+: mTabStops( NULL ),
+  mTabStopCount( 0 ),
+  mCurTabStop( 0 ),
+  mCurStyle( NULL ),
+  mCurLMargin( 0 ),
+  mCurRMargin( 100 ),
+  mCurJustify( LeftJustify ),
   mCurDiv( 0 ),
-  mCurY( 0 ), 
-  mCurClipX( 0 ), 
-  mLineAtoms( NULL ), 
-  mLineAtomPtr( &mLineAtoms ), 
+  mCurY( 0 ),
+  mCurClipX( 0 ),
+  mLineAtoms( NULL ),
+  mLineAtomPtr( &mLineAtoms ),
   mLineList( NULL ),
-  mLineInsert( &mLineList ), 
+  mLineInsert( &mLineList ),
   mScanPos( 0 ),
   mCurX( 0 ),
   mMaxY( 0 ),
@@ -260,12 +260,12 @@ GuiMLTextCtrl::GuiMLTextCtrl()
   mUseURLMouseCursor( false ),
   mBitmapList( 0 ),
   mBitmapRefList( 0 ),
-  mDirty( true ),  
+  mDirty( true ),
   mTagList( NULL ),
   mHitURL( 0 ),
   mAlpha( 1.0f ),
   mFontList( NULL )
-{   
+{
    mActive = true;
    //mInitialText = StringTable->insert("");
    Sim::findObject("InputDeniedSound", mDeniedSound);
@@ -286,7 +286,7 @@ GuiMLTextCtrl::~GuiMLTextCtrl()
 void GuiMLTextCtrl::initPersistFields()
 {
    addGroup( "Text" );
-   
+
       addField("lineSpacing",       TypeS32,    Offset(mLineSpacingPixels, GuiMLTextCtrl), "The number of blank pixels to place between each line.\n");
       addField("allowColorChars",   TypeBool,   Offset(mAllowColorChars,   GuiMLTextCtrl), "If true, the control will allow characters to have unique colors.");
       addField("maxChars",          TypeS32,    Offset(mMaxBufferSize,     GuiMLTextCtrl), "Maximum number of characters that the control will display.");
@@ -294,9 +294,9 @@ void GuiMLTextCtrl::initPersistFields()
       addField("text",              TypeCaseString,  Offset( mInitialText, GuiMLTextCtrl ), "Text to display in this control.");
       addField("useURLMouseCursor", TypeBool,   Offset(mUseURLMouseCursor,   GuiMLTextCtrl), "If true, the mouse cursor will turn into a hand cursor while over a link in the text.\n"
 																							 "This is dependant on the markup language used by the GuiMLTextCtrl\n");
-   
+
    endGroup( "Text" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -358,7 +358,7 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
 
    ColorI color;
    if(atom->url)
-   { 
+   {
       if(atom->url->mouseDown)
          color = atom->style->linkColorHL;
       else
@@ -366,7 +366,7 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
    }
    else
       color = atom->style->color;
-            
+
    const UTF16* tmp = mTextBuffer.getPtr() + start;
    U32 tmpLen = end-start;
 
@@ -379,7 +379,7 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
          ColorI shadowColor = atom->style->shadowColor;
          shadowColor.alpha = (S32)(mAlpha * shadowColor.alpha);
          drawer->setBitmapModulation(shadowColor);
-         drawer->drawTextN(font, drawPoint + atom->style->shadowOffset, 
+         drawer->drawTextN(font, drawPoint + atom->style->shadowOffset,
             tmp, tmpLen, mAllowColorChars ? mProfile->mFontColors : NULL);
       }
 
@@ -402,7 +402,7 @@ void GuiMLTextCtrl::drawAtomText(bool sel, U32 start, U32 end, Atom *atom, Line 
       rect.point.y = line->y + offset.y;
       rect.extent.x = font->getStrNWidth(tmp, tmpLen) + 1;
       rect.extent.y = line->height + 1;
-      
+
       drawer->drawRectFill(rect, mProfile->mFillColorHL);
       drawer->setBitmapModulation( mProfile->mFontColorHL );  // over-ride atom color:
       drawer->drawTextN(font, drawPoint, tmp, tmpLen, mAllowColorChars ? mProfile->mFontColors : NULL);
@@ -626,17 +626,17 @@ void GuiMLTextCtrl::addText(const char* textBuffer, const U32 numChars, bool ref
 //--------------------------------------------------------------------------
 bool GuiMLTextCtrl::setCursorPosition(const S32 newPosition)
 {
-   if (newPosition < 0) 
+   if (newPosition < 0)
    {
       mCursorPosition = 0;
       return true;
    }
-   else if (newPosition >= mTextBuffer.length()) 
+   else if (newPosition >= mTextBuffer.length())
    {
       mCursorPosition = mTextBuffer.length();
       return true;
    }
-   else 
+   else
    {
       mCursorPosition = newPosition;
       return false;
@@ -734,7 +734,7 @@ bool GuiMLTextCtrl::onKeyDown(const GuiEvent& event)
             }
             return true;
          }
-         
+
          default:
             break;
       }
@@ -801,17 +801,17 @@ void GuiMLTextCtrl::onMouseDragged(const GuiEvent& event)
       else if (newSelection > mTextBuffer.length())
          newSelection = mTextBuffer.length();
 
-      if (newSelection == mSelectionAnchor) 
+      if (newSelection == mSelectionAnchor)
       {
          mSelectionActive = false;
       }
-      else if (newSelection > mSelectionAnchor) 
+      else if (newSelection > mSelectionAnchor)
       {
          mSelectionActive = true;
          mSelectionStart  = mSelectionAnchor;
          mSelectionEnd    = newSelection - 1;
       }
-      else 
+      else
       {
          mSelectionStart  = newSelection;
          mSelectionEnd    = mSelectionAnchor - 1;
@@ -925,7 +925,7 @@ void GuiMLTextCtrl::insertChars(const char* inputChars,
 
    mTextBuffer.insert(position, inputChars );
 
-   if (mCursorPosition >= position) 
+   if (mCursorPosition >= position)
    {
       // Cursor was at or after the inserted text, move forward...
       mCursorPosition += numCharsToInsert;
@@ -949,16 +949,16 @@ void GuiMLTextCtrl::deleteChars(const U32 rangeStart,
    //  change?
    mTextBuffer.cut(rangeStart, rangeEnd - rangeStart);
 
-   if (mCursorPosition <= rangeStart) 
+   if (mCursorPosition <= rangeStart)
    {
       // Cursor placed before deleted text, ignore
    }
-   else if (mCursorPosition > rangeStart && mCursorPosition <= rangeEnd) 
+   else if (mCursorPosition > rangeStart && mCursorPosition <= rangeEnd)
    {
       // Cursor inside deleted text, set to start of range
       mCursorPosition = rangeStart;
    }
-   else 
+   else
    {
       // Cursor after deleted text, decrement by number of chars deleted
       mCursorPosition -= (rangeEnd - rangeStart) + 1;
@@ -1148,7 +1148,7 @@ GuiMLTextCtrl::Bitmap *GuiMLTextCtrl::allocBitmap(const char *bitmapName, U32 bi
    else
       ret->bitmapName[BitmapNameSize - 1] = 0;
    ret->bitmapNameLen = bitmapNameLen;
-      
+
    ret->bitmapObject.set(ret->bitmapName, &GFXMLTextureProfile, avar("%s() - ret->bitmapObject (line %d)", __FUNCTION__, __LINE__));
    //ret->bitmapObject.set(bitmapName, &GFXMLTextureProfile);
    if( bool(ret->bitmapObject) )
@@ -1462,7 +1462,7 @@ GuiMLTextCtrl::Atom *GuiMLTextCtrl::splitAtomListEmit(Atom *list, U32 width)
                clipAtom = NULL;
             }
          }
-      
+
          //otherwise no need to treat this atom any differently..
          else
          {
@@ -1485,10 +1485,10 @@ GuiMLTextCtrl::Atom *GuiMLTextCtrl::splitAtomListEmit(Atom *list, U32 width)
 
       //update the total width
       totalWidth += list->width;
-      
+
       // see if this is the last atom that will fit:
       Atom *emit = list;
-      
+
       *emitPtr = emit;
       emitPtr = &(emit->next);
       emitted = true;
@@ -1505,7 +1505,7 @@ GuiMLTextCtrl::Atom *GuiMLTextCtrl::splitAtomListEmit(Atom *list, U32 width)
          a->descent = list->descent;
          a->style = list->style;
          a->isClipped = false;
-         
+
          list = a;
          emit->len = breakPos;
          break;
@@ -1559,7 +1559,7 @@ GuiMLTextCtrl::Atom *GuiMLTextCtrl::splitAtomListEmit(Atom *list, U32 width)
       mLineAtomPtr = &(emitList->next);
       emitList = temp;
    }
-   
+
    return list;
 }
 
@@ -2134,7 +2134,7 @@ textemit:
    emitNewLine(mScanPos);
    setHeight( mMaxY );
    onResize_callback(Con::getIntArg( getWidth() ), Con::getIntArg( mMaxY ) );
-	
+
    //make sure the cursor is still visible - this handles if we're a child of a scroll ctrl...
    ensureCursorOnScreen();
 }
@@ -2160,7 +2160,7 @@ char* GuiMLTextCtrl::stripControlChars(const char *inString)
       {
          U32 walked;
          oneUTF8toUTF32(bufPtr,&walked);
-         bufPtr += walked; 
+         bufPtr += walked;
          continue;
       }
       if(*bufPtr == '\t')
@@ -2374,6 +2374,6 @@ bool GuiMLTextCtrl::resize( const Point2I& newPosition, const Point2I& newExtent
       mDirty = true;
       return true;
    }
-   
+
    return false;
 }

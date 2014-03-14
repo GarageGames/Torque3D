@@ -236,7 +236,7 @@ void Noise2D::rigidMultiFractal(Vector<F32> *dst, Vector<F32> *sig, U32 size, U3
          }
       }
    }
-   
+
    for (S32 k=0; k < (size*size); k++)
       (*dst)[k] = ((*dst)[k]-1.0f)/2.0f;
 }

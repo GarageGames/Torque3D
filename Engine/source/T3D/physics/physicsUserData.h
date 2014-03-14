@@ -85,7 +85,7 @@ public:
    static inline PhysicsUserData* cast( void *data )
    {
       PhysicsUserData *result = (PhysicsUserData*)data;
-      
+
       // If the typeid doesn't equal the value we assigned to it at
       // construction then this isn't a PhysicsUserData object.
       #ifdef TORQUE_DEBUG
@@ -117,4 +117,4 @@ protected:
    PhysicsBody *mBody;
 };
 
-#endif // _PHYSICS_PHYSICSUSERDATA_H_   
+#endif // _PHYSICS_PHYSICSUSERDATA_H_

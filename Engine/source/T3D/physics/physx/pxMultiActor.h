@@ -107,7 +107,7 @@ public:
    Vector<NxActor*> mUnbrokenActors;
    Vector<NxActor*> mBrokenActors;
    Vector<NxMat34> mRelXfm;
-   ParticleEmitterData *mParticleEmitterData;  
+   ParticleEmitterData *mParticleEmitterData;
    bool mIsBroken;
    JointBreakSignal mOnJointBreakSignal;
 };
@@ -125,15 +125,15 @@ public:
    virtual ~PxMultiActorData();
 
    DECLARE_CONOBJECT(PxMultiActorData);
-   
+
    static void initPersistFields();
-   
+
    void packData(BitStream* stream);
    void unpackData(BitStream* stream);
-   
+
    bool preload( bool server, String &errorBuffer );
    //bool onAdd();
-   
+
    void allocPrimBuffer( S32 overrideSize = -1 );
 
    bool _loadCollection( const UTF8 *path, bool isBinary );
@@ -158,7 +158,7 @@ public:
    StringTableEntry physXStream;
 
    enum
-   {      
+   {
       NumMountPoints = 32,
       MaxCorrectionNodes = 2
    };
@@ -168,7 +168,7 @@ public:
    S32 correctionNodes[MaxCorrectionNodes];
    S32 mountPointNode[NumMountPoints];  ///< Node index of mountPoint
 
-   /// If true no network corrections will 
+   /// If true no network corrections will
    /// be done during gameplay.
    bool noCorrection;
 
@@ -178,8 +178,8 @@ public:
 
    bool createActors(   NxScene *scene,
                         NxCompartment *compartment,
-                        const NxMat34 *nxMat, 
-                        const Point3F& scale, 
+                        const NxMat34 *nxMat,
+                        const Point3F& scale,
                         Vector<NxActor*> *outActors,
                         Vector<NxShape*> *outShapes,
                         Vector<NxJoint*> *outJoints,
@@ -206,7 +206,7 @@ public:
    bool singlePlayerOnly;
 
    /// When applyImpulse is passed a force of this magnitude or greater
-   /// any actors hit by the force vector that have broken versions 
+   /// any actors hit by the force vector that have broken versions
    /// will become 'broken'.
    F32 breakForce;
 };
@@ -216,7 +216,7 @@ class PxMultiActor : public GameBase
 {
    typedef GameBase Parent;
 
-   enum MaskBits 
+   enum MaskBits
    {
       MoveMask          = Parent::NextFreeMask << 0,
       WarpMask          = Parent::NextFreeMask << 1,
@@ -227,7 +227,7 @@ class PxMultiActor : public GameBase
       UpdateMask        = Parent::NextFreeMask << 6,
       MountedMask       = Parent::NextFreeMask << 7,
       NextFreeMask      = Parent::NextFreeMask << 8
-   };  
+   };
 
 public:
 
@@ -253,7 +253,7 @@ public:
    void setScale( const VectorF &scale );
    void setTransform( const MatrixF &mat );
    virtual void mountObject( SceneObject *obj, U32 node );
-   virtual void unmountObject( SceneObject *obj );   
+   virtual void unmountObject( SceneObject *obj );
    virtual void getMountTransform( U32 mountPoint, MatrixF *mat );
    virtual void getRenderMountTransform( U32 index, MatrixF *mat );
 
@@ -265,25 +265,25 @@ public:
    virtual void applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude );
 
    /// PxMultiActor
-   /// @{  
+   /// @{
 
    /// Set visibility of all broken/unbroken meshes to match this state.
    void setAllBroken( bool isBroken );
 
    /// Sets up actors and meshes associated with the passed joint to reflect
    /// the desired state.
-   void setBroken(   const NxMat34 &parentPose, 
+   void setBroken(   const NxMat34 &parentPose,
                      const NxVec3 &parentVel,
-                     PxUserData *userData, 
+                     PxUserData *userData,
                      bool isBroken );
 
-   /// 
+   ///
    void setMeshHidden( String namePrefix, bool hidden );
-   
+
    void setAllHidden( bool hide );
 
    void listMeshes( const String &state ) const;
-   
+
    void _onJointBreak( NxReal breakForce, NxJoint &brokenJoint );
 
    void _onContact(  PhysicsUserData *us,
@@ -293,7 +293,7 @@ public:
 
    void applyWarp( const MatrixF& mat, bool interpRender, bool sweep );
 
-   void getDynamicXfms( PxMultiActor *srcObj, F32 dt );        
+   void getDynamicXfms( PxMultiActor *srcObj, F32 dt );
 
    /// @}
 
@@ -313,8 +313,8 @@ protected:
 
    NxActor* _findActor( const String &actorName ) const;
 
-   /// Get the corresponding meshName for a given actor.   
-   String _getMeshName( const NxActor *actor ) const;   
+   /// Get the corresponding meshName for a given actor.
+   String _getMeshName( const NxActor *actor ) const;
 
    ///
    void _updateBounds();
@@ -346,7 +346,7 @@ protected:
 
    /// This is the root actor whose transform is the
    /// transform of this SceneObject.
-   NxActor *mRootActor;  
+   NxActor *mRootActor;
 
    TSShapeInstance *mShapeInstance;
    Resource<TSShape> mDebrisShape;
@@ -390,7 +390,7 @@ protected:
    /// is a singlePlayerOnly object.
    bool mIsDummy;
 
-   /// Helper for 
+   /// Helper for
    bool mBroken;
 };
 

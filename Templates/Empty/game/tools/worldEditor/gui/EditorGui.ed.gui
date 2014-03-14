@@ -18,7 +18,7 @@
    AnchorBottom = "0";
    AnchorLeft = "1";
    AnchorRight = "0";
-   
+
    new GuiContainer(EditorGuiToolbar) {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -32,8 +32,8 @@
       canSave = "1";
       Visible = "1";
       hovertime = "1000";
-      
-        
+
+
       new GuiBitmapButtonCtrl(EHWorldEditor) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -97,7 +97,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-     
+
       new GuiBitmapCtrl() {
       Enabled = "1";
       Profile = "ToolsGuiDefaultProfile";
@@ -106,7 +106,7 @@
       MinExtent = "1 1";
       bitmap = "tools/gui/images/separator-h.png";
       };
-      
+
       new GuiBitmapButtonCtrl(EWorldEditorToggleCamera) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -127,7 +127,7 @@
          groupNum = "-1";
          buttonType = "ToggleButton";
          useMouseEvents = "0";
-         
+
          new GuiBitmapCtrl(){
             HorizSizing = "left";
             VertSizing = "top";
@@ -261,7 +261,7 @@
          groupNum = "-1";
          buttonType = "ToggleButton";
          useMouseEvents = "0";
-         
+
          new GuiBitmapCtrl(){
             HorizSizing = "left";
             VertSizing = "top";
@@ -271,7 +271,7 @@
             bitmap = "tools/gui/images/dropdown-button-arrow";
          };
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -280,7 +280,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-            
+
       new GuiPopUpMenuCtrl(EWorldEditorAlignPopup) {
          canSaveDynamicFields = "0";
          internalName = "";
@@ -308,7 +308,7 @@
          bitmapBounds = "16 16";
       };
    };
-   
+
    new GuiContainer(EditorGuiStatusBar) {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -323,7 +323,7 @@
       Visible = "1";
       hovertime = "1000";
       Docking = "Bottom";
-      
+
       new GuiTextCtrl(EWorldEditorStatusBarInfo) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -346,7 +346,7 @@
          text = "Current Tool";
          maxLength = "255";
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -357,7 +357,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-      
+
       new GuiTextCtrl(EWorldEditorStatusBarSelection) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -380,7 +380,7 @@
          text = "";
          maxLength = "255";
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -391,7 +391,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-      
+
       new GuiPopUpMenuCtrl(EWorldEditorStatusBarCamera) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -412,7 +412,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -424,7 +424,7 @@
          bitmap = "tools/gui/images/separator-h.png";
       };
    };
-   
+
    new WorldEditor(EWorldEditor) {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -632,7 +632,7 @@
          maxLength = "255";
       };
    };
-    
+
    new GuiControl(RelightStatus) {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -646,7 +646,7 @@
       canSave = "1";
       Visible = "0";
       hovertime = "1000";
-       
+
 
       new GuiProgressBitmapCtrl(RelightProgress) {
          canSaveDynamicFields = "0";
@@ -849,8 +849,8 @@
       Position = getWord(EWorldEditorToggleCamera.position, 0)-5 SPC getWord(EditorGuiToolbar.extent, 1)-1;
       Extent = "137" SPC ((6*28)+6);//97";
       isContainer = "1";
-      visible = "0"; 
-         
+      visible = "0";
+
       new GuiDynamicCtrlArrayControl(cameraDropdownArray) {
         canSaveDynamicFields = "0";
          Enabled = "1";
@@ -873,7 +873,7 @@
          colSpacing = "3";
          autoCellSize = "1";
          fillRowFirst = "0";
-         
+
          new GuiIconButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "StandardCamera";
@@ -926,7 +926,7 @@
             buttonType = "RadioButton";
             useMouseEvents = "0";
          };
-         
+
          new GuiIconButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "PlayerCamera";
@@ -1032,7 +1032,7 @@
             useMouseEvents = "0";
          };
       };
-      
+
       new GuiDecoyCtrl(CameraTypesDropdownDecoy) {
          profile = "ToolsGuiDefaultProfile";
          horizSizing = "right";
@@ -1045,15 +1045,15 @@
          useMouseEvents = "1";
          isDecoy = "1";
       };
-      
+
    };
    new GuiContainer(VisibilityDropdown){
       Profile = "IconDropdownProfile";
       Position = getWord(visibilityToggleBtn.position, 0)-5 SPC getWord(EditorGuiToolbar.extent, 1)-1;
       Extent = "159 261"; //SPC ((6*28)+6);//97";
       isContainer = "1";
-      visible = "0"; 
-      
+      visible = "0";
+
       new GuiTabBookCtrl() {
          canSaveDynamicFields = "0";
          Profile = "ToolsGuiTabBookProfile";
@@ -1087,7 +1087,7 @@
             hovertime = "1000";
             text = "Viz Toggles";
             maxLength = "255";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -1156,7 +1156,7 @@
             hovertime = "1000";
             text = "Class Toggles";
             maxLength = "255";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -1214,7 +1214,7 @@
    };
 };
 
-   
+
 
 
 new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
@@ -1227,48 +1227,48 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiContainer(){
-      position = firstWord(CameraSpeedDropdownContainer.position) + firstWord(EditorGuiToolbar.position) + -6 SPC 
+      position = firstWord(CameraSpeedDropdownContainer.position) + firstWord(EditorGuiToolbar.position) + -6 SPC
             (getWord(CameraSpeedDropdownContainer, 1)) + 31;
-      extent = "146 39";  
+      extent = "146 39";
       isContainer = "1";
       Profile = "IconDropdownProfile";
       HorizSizing = "right";
-      VertSizing = "bottom"; 
-      
+      VertSizing = "bottom";
+
       new GuiBitmapCtrl(){ // Fast
          position = "105 15";
          extent = "2 8";
-         bitmap = "tools/gui/images/separator-h.png";  
+         bitmap = "tools/gui/images/separator-h.png";
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
-         VertSizing = "bottom"; 
+         VertSizing = "bottom";
       };
       new GuiBitmapCtrl(){ // normal
          position = "73 15";
          extent = "2 8";
-         bitmap = "tools/gui/images/separator-h.png";  
+         bitmap = "tools/gui/images/separator-h.png";
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
-         VertSizing = "bottom"; 
+         VertSizing = "bottom";
       };
       new GuiBitmapCtrl(){ // slow
          position = "41 15";
          extent = "2 8";
-         bitmap = "tools/gui/images/separator-h.png";  
+         bitmap = "tools/gui/images/separator-h.png";
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
-         VertSizing = "bottom"; 
+         VertSizing = "bottom";
       };
-         
+
          new GuiSliderCtrl(){ //camera speed slider
             internalName = "slider";
             position = "9 17";
             extent = "129 15";
-            bitmap = "tools/gui/images/separator-h.png";  
+            bitmap = "tools/gui/images/separator-h.png";
             HorizSizing = "width";
-            VertSizing = "bottom"; 
+            VertSizing = "bottom";
             range = "1 200";
             ticks = "0";
             value = "100";
@@ -1278,7 +1278,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
             internalName = "text";
             position = "54 3";
             extent = "39 18";
-            text = "Normal";  
+            text = "Normal";
             Profile = "ToolsGuiTextCenterProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
@@ -1286,7 +1286,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
       new GuiTextCtrl(){ // -
          position = "11 2";
          extent = "39 18";
-         text = "-";  
+         text = "-";
          Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
@@ -1294,7 +1294,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
       new GuiTextCtrl(){ // +
          position = "98 5";
          extent = "39 13";
-         text = "+";  
+         text = "+";
          Profile = "ToolsGuiTextRightProfile";
          HorizSizing = "right";
          VertSizing = "bottom";

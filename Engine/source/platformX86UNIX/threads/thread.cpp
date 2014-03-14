@@ -55,20 +55,20 @@ static void *ThreadRunHandler(void * arg)
    // can execute before pthread_create() returns and sets mThreadID.
    // The value from pthread_create() and pthread_self() are guaranteed to be equivalent (but not identical)
    mData->mThreadID = pthread_self();
-   
+
    ThreadManager::addThread(thread);
    thread->run(mData->mRunArg);
    ThreadManager::removeThread(thread);
 
    bool autoDelete = thread->autoDelete;
-   
+
    mData->mThreadID = 0;
    mData->mDead = true;
    mData->mGateway.release();
-   
+
    if( autoDelete )
       delete thread;
-      
+
    // return value for pthread lib's benefit
    return NULL;
    // the end of this function is where the created pthread will die.
@@ -99,15 +99,15 @@ Thread::~Thread()
 
 void Thread::start( void* arg )
 {
-   // cause start to block out other pthreads from using this Thread, 
+   // cause start to block out other pthreads from using this Thread,
    // at least until ThreadRunHandler exits.
    mData->mGateway.acquire();
 
    // reset the shouldStop flag, so we'll know when someone asks us to stop.
    shouldStop = false;
-   
+
    mData->mDead = false;
-   
+
    if( !mData->mRunArg )
       mData->mRunArg = arg;
 
@@ -118,11 +118,11 @@ bool Thread::join()
 {
    // not using pthread_join here because pthread_join cannot deal
    // with multiple simultaneous calls.
-   
+
    mData->mGateway.acquire();
    AssertFatal( !isAlive(), "Thread::join() - thread not dead after join()" );
    mData->mGateway.release();
-   
+
    return true;
 }
 

@@ -64,7 +64,7 @@ Signal<void()>    GameConnection::smPlayingDemo;
 
 ConsoleDocClass( GameConnection,
    "@brief The game-specific subclass of NetConnection.\n\n"
-   
+
    "The GameConnection introduces the concept of the control object.  The control object "
    "is simply the object that the client is associated with that network connection controls.  By "
    "default the control object is an instance of the Player class, but can also be an instance "
@@ -261,12 +261,12 @@ void GameConnection::setJoinPassword(const char *password)
 
 DefineEngineMethod( GameConnection, setJoinPassword, void, (const char* password),,
               "@brief On the client, set the password that will be passed to the server.\n\n"
-              
+
               "On the server, this password is compared with what is stored in $pref::Server::Password.  "
               "If $pref::Server::Password is empty then the client's sent password is ignored.  Otherwise, "
               "if the passed in client password and the server password do not match, the CHR_PASSWORD "
               "error string is sent back to the client and the connection is immediately terminated.\n\n"
-              
+
               "This password checking is performed quite early on in the connection request process so as "
               "to minimize the impact of multiple failed attempts -- also known as hacking.")
 {
@@ -275,10 +275,10 @@ DefineEngineMethod( GameConnection, setJoinPassword, void, (const char* password
 
 ConsoleMethod(GameConnection, setConnectArgs, void, 3, 17,
    "(const char* args) @brief On the client, pass along a variable set of parameters to the server.\n\n"
-   
+
    "Once the connection is established with the server, the server calls its onConnect() method "
    "with the client's passed in parameters as aruments.\n\n"
-   
+
    "@see GameConnection::onConnect()\n\n")
 {
    object->setConnectArgs(argc - 2, argv + 2);
@@ -325,7 +325,7 @@ void GameConnection::onConnectionEstablished(bool isInitiator)
       argv[0] = "onConnect";
       for(U32 i = 0; i < mConnectArgc; i++)
          argv[i + 2] = mConnectArgv[i];
-      // NOTE: Need to fallback to Con::execute() as IMPLEMENT_CALLBACK does not 
+      // NOTE: Need to fallback to Con::execute() as IMPLEMENT_CALLBACK does not
       // support variadic functions.
       Con::execute(this, mConnectArgc + 2, argv);
    }
@@ -612,15 +612,15 @@ bool GameConnection::getControlCameraTransform(F32 dt, MatrixF* mat)
          obj = cObj;
    }
 
-   if (dt) 
+   if (dt)
    {
-      if (mFirstPerson || obj->onlyFirstPerson()) 
+      if (mFirstPerson || obj->onlyFirstPerson())
       {
          if (mCameraPos > 0)
             if ((mCameraPos -= mCameraSpeed * dt) <= 0)
                mCameraPos = 0;
       }
-      else 
+      else
       {
          if (mCameraPos < 1)
             if ((mCameraPos += mCameraSpeed * dt) > 1)
@@ -630,13 +630,13 @@ bool GameConnection::getControlCameraTransform(F32 dt, MatrixF* mat)
 
    if (!sChaseQueueSize || mFirstPerson || obj->onlyFirstPerson())
       obj->getCameraTransform(&mCameraPos,mat);
-   else 
+   else
    {
       MatrixF& hm = sChaseQueue[sChaseQueueHead];
       MatrixF& tm = sChaseQueue[sChaseQueueTail];
       obj->getCameraTransform(&mCameraPos,&hm);
       *mat = tm;
-      if (dt) 
+      if (dt)
       {
          if ((sChaseQueueHead += 1) >= sChaseQueueSize)
             sChaseQueueHead = 0;
@@ -779,9 +779,9 @@ void GameConnection::onRemove()
    else if (isLocalConnection() && isConnectionToServer())
    {
       // We're a client-side but local connection
-      // delete the server side of the connection on our local server so that it updates 
+      // delete the server side of the connection on our local server so that it updates
       // clientgroup and what not (this is so that we can disconnect from a local server
-      // without needing to destroy and recreate the server before we can connect to it 
+      // without needing to destroy and recreate the server before we can connect to it
       // again).
 	   // Safe-delete as we don't know whether the server connection is currently being
 	   // worked on.
@@ -881,7 +881,7 @@ void GameConnection::writeDemoStartBlock(ResizeBitStream *stream)
       mControlObject->writePacketData(this, stream);
 #ifdef TORQUE_NET_STATS
 //      TYPEOF( mControlObject )->getNetInfo().updateNetStatWriteData( stream->getBitPosition() - beginPos );
-      
+
       mControlObject->getClassRep()->updateNetStatWriteData( stream->getBitPosition() - beginPos);
 #endif
    }
@@ -1045,7 +1045,7 @@ void GameConnection::readPacket(BitStream *bstream)
       }
 
       if ( bstream->readFlag() ) // gIndex != -1
-      {         
+      {
          if ( bstream->readFlag() ) // mMoveList->isMismatch() || mControlForceMismatch
          {
             // the control object is dirty...so we get an update:
@@ -1225,7 +1225,7 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       }
 
       // first person changed?
-      if(bstream->writeFlag(mUpdateFirstPerson)) 
+      if(bstream->writeFlag(mUpdateFirstPerson))
       {
          bstream->writeFlag(mFirstPerson);
          mUpdateFirstPerson = false;
@@ -1322,7 +1322,7 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       }
 
       // first person changed?
-      if(bstream->writeFlag(mUpdateFirstPerson)) 
+      if(bstream->writeFlag(mUpdateFirstPerson))
       {
          bstream->writeFlag(mFirstPerson);
          mUpdateFirstPerson = false;
@@ -1422,7 +1422,7 @@ void GameConnection::play3D(SFXProfile* profile, const MatrixF *transform)
       mControlObject->getTransform().getColumn(3,&ear);
       if ((ear - pos).len() < profile->getDescription()->mMaxDistance)
          postNetEvent(new Sim3DAudioEvent(profile,transform));
-   } 
+   }
 }
 
 void GameConnection::doneScopingScene()
@@ -1516,11 +1516,11 @@ void GameConnection::preloadNextDataBlock(bool hadNewFiles)
 void GameConnection::onEndGhosting()
 {
    Parent::onEndGhosting();
-   
+
    // Reset move list.  All the moves are obsolete now and furthermore,
    // if we don't clear out the list now we might run in danger of
    // getting backlogged later on what is a list full of obsolete moves.
-   
+
    mMoveList->reset();
 }
 
@@ -1584,7 +1584,7 @@ void GameConnection::handleConnectionMessage(U32 message, U32 sequence, U32 ghos
 
 DefineEngineMethod( GameConnection, transmitDataBlocks, void, (S32 sequence),,
    "@brief Sent by the server during phase 1 of the mission download to send the datablocks to the client.\n\n"
-   
+
    "SimDataBlocks, also known as just datablocks, need to be transmitted to the client "
    "prior to the client entering the game world.  These represent the static data that "
    "most objects in the world reference.  This is typically done during the standard "
@@ -1618,7 +1618,7 @@ DefineEngineMethod( GameConnection, transmitDataBlocks, void, (S32 sequence),,
    "   %client.transmitDataBlocks($missionSequence);\n"
    "}\n"
    "@endtsexample\n\n"
-   
+
    "@see GameConnection::onDataBlocksDone()\n\n")
 {
     // Set the datablock sequence.
@@ -1675,7 +1675,7 @@ DefineEngineMethod( GameConnection, transmitDataBlocks, void, (S32 sequence),,
             // Ensure that the client knows that the datablock send is done...
             object->sendConnectionMessage(GameConnection::DataBlocksDone, object->getDataBlockSequence());
         }
-    } 
+    }
     else
     {
         // Otherwise, store the current datablock modified key.
@@ -1722,7 +1722,7 @@ DefineEngineMethod( GameConnection, transmitDataBlocks, void, (S32 sequence),,
 
 DefineEngineMethod( GameConnection, activateGhosting, void, (),,
    "@brief Called by the server during phase 2 of the mission download to start sending ghosts to the client.\n\n"
-   
+
    "Ghosts represent objects on the server that are in scope for the client.  These need "
    "to be synchronized with the client in order for the client to see and interact with them.  "
    "This is typically done during the standard mission start phase 2 when following Torque's "
@@ -1849,7 +1849,7 @@ DefineEngineMethod( GameConnection, play2D, bool, (SFXProfile* profile),,
 
 DefineEngineMethod( GameConnection, play3D, bool, (SFXProfile* profile, TransformF location),,
    "@brief Used on the server to play a 3D sound that is not attached to any object.\n\n"
-   
+
    "@param profile The SFXProfile that defines the sound to play.\n"
    "@param location The position and orientation of the 3D sound given in the form of \"x y z ax ay az aa\".\n\n"
 
@@ -1876,14 +1876,14 @@ DefineEngineMethod( GameConnection, chaseCam, bool, (S32 size),,
    "@note This sets the queue size across all GameConnections.\n\n"
    "@note This is not currently hooked up.\n\n")
 {
-   if (size != sChaseQueueSize) 
+   if (size != sChaseQueueSize)
    {
       SAFE_DELETE_ARRAY(sChaseQueue);
 
       sChaseQueueSize = size;
       sChaseQueueHead = sChaseQueueTail = 0;
 
-      if (size) 
+      if (size)
       {
          sChaseQueue = new MatrixF[size];
          return true;
@@ -1985,9 +1985,9 @@ DefineEngineMethod( GameConnection, delete, void, (const char* reason), (""),
    "This method performs two operations: it disconnects a client connection from the server, "
    "and it deletes the connection object.  The optional reason is sent in the disconnect packet "
    "and is often displayed to the user so they know why they've been disconnected.\n\n"
-   
+
    "@param reason [optional] The reason why the user has been disconnected from the server.\n\n"
-   
+
    "@tsexample\n"
    "function kick(%client)\n"
    "{\n"
@@ -2023,15 +2023,15 @@ void GameConnection::consoleInit()
 
 DefineEngineMethod( GameConnection, startRecording, void, (const char* fileName),,
    "@brief On the client, starts recording the network connection's traffic to a demo file.\n\n"
-   
+
    "It is often useful to play back a game session.  This could be for producing a "
    "demo of the game that will be shown at a later time, or for debugging a game.  "
    "By recording the entire network stream it is possible to later play game the game "
    "exactly as it unfolded during the actual play session.  This is because all user "
    "control and server results pass through the connection.\n\n"
-   
+
    "@param fileName The file name to use for the demo recording.\n\n"
-   
+
    "@see GameConnection::stopRecording(), GameConnection::playDemo()")
 {
    char expFileName[1024];
@@ -2041,7 +2041,7 @@ DefineEngineMethod( GameConnection, startRecording, void, (const char* fileName)
 
 DefineEngineMethod( GameConnection, stopRecording, void, (),,
    "@brief On the client, stops the recording of a connection's network traffic to a file.\n\n"
-   
+
    "@see GameConnection::startRecording(), GameConnection::playDemo()")
 {
    object->stopRecording();
@@ -2049,7 +2049,7 @@ DefineEngineMethod( GameConnection, stopRecording, void, (),,
 
 DefineEngineMethod( GameConnection, playDemo, bool, (const char* demoFileName),,
    "@brief On the client, play back a previously recorded game session.\n\n"
-   
+
    "It is often useful to play back a game session.  This could be for producing a "
    "demo of the game that will be shown at a later time, or for debugging a game.  "
    "By recording the entire network stream it is possible to later play game the game "
@@ -2058,7 +2058,7 @@ DefineEngineMethod( GameConnection, playDemo, bool, (const char* demoFileName),,
 
    "@returns True if the playback was successful.  False if there was an issue, such as "
    "not being able to open the demo file for playback.\n\n"
-   
+
    "@see GameConnection::startRecording(), GameConnection::stopRecording()")
 {
    char filename[1024];
@@ -2084,7 +2084,7 @@ DefineEngineMethod( GameConnection, playDemo, bool, (const char* demoFileName),,
 
 DefineEngineMethod( GameConnection, isDemoPlaying, bool, (),,
    "@brief Returns true if a previously recorded demo file is now playing.\n\n"
-   
+
    "@see GameConnection::playDemo()")
 {
    return object->isPlayingBack();
@@ -2092,7 +2092,7 @@ DefineEngineMethod( GameConnection, isDemoPlaying, bool, (),,
 
 DefineEngineMethod( GameConnection, isDemoRecording, bool, (),,
    "@brief Returns true if a demo file is now being recorded.\n\n"
-   
+
    "@see GameConnection::startRecording(), GameConnection::stopRecording()")
 {
    return object->isRecording();
@@ -2133,7 +2133,7 @@ DefineEngineStaticMethod( GameConnection, getServerConnection, S32, (),,
 DefineEngineMethod( GameConnection, setCameraObject, bool, (GameBase* camera),,
    "@brief On the server, set the connection's camera object used when not viewing "
    "through the control object.\n\n"
-   
+
    "@see GameConnection::getCameraObject() and GameConnection::clearCameraObject()\n\n")
 {
    if(!camera)
@@ -2145,7 +2145,7 @@ DefineEngineMethod( GameConnection, setCameraObject, bool, (GameBase* camera),,
 
 DefineEngineMethod( GameConnection, getCameraObject, SimObject*, (),,
    "@brief Returns the connection's camera object used when not viewing through the control object.\n\n"
-   
+
    "@see GameConnection::setCameraObject() and GameConnection::clearCameraObject()\n\n")
 {
    SimObject *obj = dynamic_cast<SimObject*>(object->getCameraObject());
@@ -2154,7 +2154,7 @@ DefineEngineMethod( GameConnection, getCameraObject, SimObject*, (),,
 
 DefineEngineMethod( GameConnection, clearCameraObject, void, (),,
    "@brief Clear the connection's camera object reference.\n\n"
-   
+
    "@see GameConnection::setCameraObject() and GameConnection::getCameraObject()\n\n")
 {
    object->setCameraObject(NULL);
@@ -2173,7 +2173,7 @@ DefineEngineMethod( GameConnection, isFirstPerson, bool, (),,
 
 DefineEngineMethod( GameConnection, setFirstPerson, void, (bool firstPerson),,
    "@brief On the server, sets this connection into or out of first person mode.\n\n"
-   
+
    "@param firstPerson Set to true to put the connection into first person mode.\n\n")
 {
    object->setFirstPerson(firstPerson);
@@ -2181,7 +2181,7 @@ DefineEngineMethod( GameConnection, setFirstPerson, void, (bool firstPerson),,
 
 DefineEngineMethod( GameConnection, setControlSchemeParameters, void, (bool absoluteRotation, bool addYawToAbsRot, bool addPitchToAbsRot),,
    "@brief Set the control scheme that may be used by a connection's control object.\n\n"
-   
+
    "@param absoluteRotation Use absolute rotation values from client, likely through ExtendedMove.\n"
    "@param addYawToAbsRot Add relative yaw control to the absolute rotation calculation.  Only useful when absoluteRotation is true.\n\n" )
 {
@@ -2190,7 +2190,7 @@ DefineEngineMethod( GameConnection, setControlSchemeParameters, void, (bool abso
 
 DefineEngineMethod( GameConnection, getControlSchemeAbsoluteRotation, bool, (),,
    "@brief Get the connection's control scheme absolute rotation property.\n\n"
-   
+
    "@return True if the connection's control object should use an absolute rotation control scheme.\n\n"
    "@see GameConnection::setControlSchemeParameters()\n\n")
 {

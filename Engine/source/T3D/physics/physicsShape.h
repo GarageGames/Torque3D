@@ -61,13 +61,13 @@ public:
    virtual ~PhysicsShapeData();
 
    DECLARE_CONOBJECT(PhysicsShapeData);
-   static void initPersistFields();   
+   static void initPersistFields();
    bool onAdd();
    void onRemove();
-   
+
    // GameBaseData
    void packData(BitStream* stream);
-   void unpackData(BitStream* stream);   
+   void unpackData(BitStream* stream);
    bool preload(bool server, String &errorBuffer );
 
 public:
@@ -84,10 +84,10 @@ public:
    ///
    F32 mass;
 
-   /// 
+   ///
    F32 dynamicFriction;
 
-   /// 
+   ///
    F32 staticFriction;
 
    ///
@@ -99,7 +99,7 @@ public:
    ///
    F32 angularDamping;
 
-   /// 
+   ///
    F32 linearSleepThreshold;
 
    ///
@@ -131,9 +131,9 @@ public:
       SimType_Bits = 3,
 
    } simType;
-   
-   SimObjectRef< PhysicsDebrisData > debris;   
-   SimObjectRef< ExplosionData > explosion;   
+
+   SimObjectRef< PhysicsDebrisData > debris;
+   SimObjectRef< ExplosionData > explosion;
    SimObjectRef< PhysicsShapeData > destroyedShape;
 };
 
@@ -176,19 +176,19 @@ protected:
    /// True if the PhysicsShape has been destroyed ( gameplay ).
    bool mDestroyed;
 
-   /// Enables automatic playing of the animation named "ambient" (if it exists) 
+   /// Enables automatic playing of the animation named "ambient" (if it exists)
    /// when the PhysicsShape is loaded.
    bool mPlayAmbient;
    S32 mAmbientSeq;
    TSThread* mAmbientThread;
 
-   /// If a specified to create one in the PhysicsShape data, this is the 
+   /// If a specified to create one in the PhysicsShape data, this is the
    /// subshape created when this PhysicsShape is destroyed.
    /// Is only assigned (non null) on the serverside PhysicsShape.
    SimObjectPtr< PhysicsShape > mDestroyedShape;
 
    ///
-   enum MaskBits 
+   enum MaskBits
    {
       StateMask = Parent::NextFreeMask << 0,
       ResetPosMask = Parent::NextFreeMask << 1,
@@ -200,7 +200,7 @@ protected:
    bool _createShape();
 
    void _initAmbient();
-  
+
    ///
    void _applyCorrection( const MatrixF &mat );
 
@@ -208,7 +208,7 @@ protected:
 
    void _updateContainerForces();
 
-   /// If true then no corrections are sent from the server 
+   /// If true then no corrections are sent from the server
    /// and/or applied from the client.
    ///
    /// This is only ment for debugging.
@@ -237,8 +237,8 @@ public:
    static void initPersistFields();
    void inspectPostApply();
    bool onAdd();
-   void onRemove();   
-   
+   void onRemove();
+
    // SceneObject
    void prepRenderImage( SceneRenderState *state );
    void setTransform( const MatrixF &mat );

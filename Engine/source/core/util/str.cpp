@@ -261,7 +261,7 @@ class String::StringData : protected StringDataImpl
          mHashNoCase = U32_MAX;
          mUTF16 = NULL;
          mIsInterned = interned;
-         
+
          // mLength is initialized by operator new()
 
          if( data )
@@ -269,7 +269,7 @@ class String::StringData : protected StringDataImpl
             dMemcpy( mData, data, sizeof( StringChar ) * mLength );
             mData[ mLength ] = '\0';
          }
-         
+
 #ifdef TORQUE_DEBUG
          mString = &mData[0];
 #endif
@@ -344,7 +344,7 @@ class String::StringData : protected StringDataImpl
          if( !mUTF16 )
          {
             // Do this atomically to protect interned strings.
-            
+
             UTF16* utf16 = convertUTF8toUTF16( mData );
             if( !dCompareAndSwap( mUTF16,( UTF16* ) NULL, utf16 ) )
                delete [] utf16;
@@ -392,7 +392,7 @@ class String::StringData : protected StringDataImpl
       {
          if( mNumChars == U32_MAX )
             mNumChars = dStrlen( utf16() );
-         
+
          return mNumChars;
       }
 
@@ -409,7 +409,7 @@ class String::StringData : protected StringDataImpl
             #ifdef TORQUE_DEBUG
             "",            // mString
             #endif
-            
+
             U32_MAX,       // mRefCount
             0,             // mLength
             0,             // mNumChars
@@ -419,7 +419,7 @@ class String::StringData : protected StringDataImpl
             true,          // mIsInterned
             { 0 }          // mData
          };
-                        
+
          return ( StringData* ) &empty;
       }
 };
@@ -596,28 +596,28 @@ String String::intern() const
 {
    if( isInterned() )
       return *this;
-      
+
    // Create the intern table, if we haven't already.
-   
+
    if( !sInternTable )
       sInternTable = new StringInternTable;
-      
+
    // Lock the string table.
-         
+
    MutexHandle mutex;
    mutex.lock( &sInternTable->mMutex );
-   
+
    // Lookup.
-   
+
    StringInternTable::Iterator iter = sInternTable->find( _string );
    if( iter != sInternTable->end() )
       return ( *iter ).value;
-      
+
    // Create new.
-   
+
    StringData* data = new ( length(), sInternTable->mChunker ) StringData( c_str(), true );
    iter = sInternTable->insertUnique( data, data );
-   
+
    return ( *iter ).value;
 }
 
@@ -817,7 +817,7 @@ String& String::operator+=(const String &src)
 String operator+(const String &a, const String &b)
 {
    PROFILE_SCOPE( String_String_plus_String );
-   
+
    if( a.isEmpty() )
       return b;
    else if( b.isEmpty() )
@@ -959,7 +959,7 @@ bool String::operator>=(const String &str) const
 S32 String::compare(const StringChar *str, SizeType len, U32 mode) const
 {
    PROFILE_SCOPE( String_compare );
-   
+
    AssertFatal(str,"String:: Invalid null ptr argument");
 
    const StringChar  *p1 = _string->utf8();
@@ -1076,7 +1076,7 @@ String& String::insert(SizeType pos, const StringChar *str, SizeType len)
       return *this;
 
    AssertFatal( str, "String:: Invalid null ptr argument" );
-         
+
    SizeType lena = length();
    AssertFatal((pos <= lena),"Calling String::insert with position greater than length");
    U32 newlen = lena + len;
@@ -1162,11 +1162,11 @@ String& String::replace( StringChar c1, StringChar c2 )
 {
    if( isEmpty() )
       return *this;
-      
+
    // Create the new string lazily so that we don't needlessly
    // dup strings when there is nothing to replace.
 
-   StringData* sub = NULL;   
+   StringData* sub = NULL;
    bool foundReplacement = false;
 
    StringChar* c = _string->utf8();
@@ -1180,13 +1180,13 @@ String& String::replace( StringChar c1, StringChar c2 )
             c = &sub->utf8()[ c - _string->utf8() ];
             foundReplacement = true;
          }
-         
+
          *c = c2;
       }
 
       c++;
    }
- 
+
    if( foundReplacement )
    {
       _string->release();
@@ -1284,7 +1284,7 @@ String &String::replace(const String &s1, const String &s2)
 String String::substr(SizeType pos, SizeType len) const
 {
    //PROFILE_SCOPE( String_substr );
-   
+
    AssertFatal( pos <= length(), "String::substr - Invalid position!" );
 
    if ( len == -1 )
@@ -1307,20 +1307,20 @@ String String::trim() const
 {
    if( isEmpty() )
       return *this;
-   
+
    const StringChar* start = _string->utf8();
    while( *start && dIsspace( *start ) )
       start ++;
-   
+
    const StringChar* end = _string->utf8() + length() - 1;
    while( end > start && dIsspace( *end ) )
       end --;
    end ++;
-   
+
    const U32 len = end - start;
    if( len == length() )
       return *this;
-   
+
    StringData* sub;
    if( !len )
       sub = StringData::Empty();
@@ -1357,18 +1357,18 @@ String String::collapseEscapes() const
 void String::split( const char* delimiter, Vector< String >& outElements ) const
 {
    const char* ptr = _string->utf8();
-   
+
    const char* start = ptr;
    while( *ptr )
    {
       // Search for start of delimiter.
-      
+
       if( *ptr != delimiter[ 0 ] )
          ptr ++;
       else
       {
          // Skip delimiter.
-         
+
          const char* end = ptr;
          const char* del = delimiter;
          while( *del && *del == *ptr )
@@ -1376,22 +1376,22 @@ void String::split( const char* delimiter, Vector< String >& outElements ) const
             ptr ++;
             del ++;
          }
-         
+
          // If we didn't match all of delimiter,
          // continue with search.
-         
+
          if( *del != '\0' )
             continue;
-            
+
          // Extract component.
-         
+
          outElements.push_back( String( start, end - start ) );
          start = ptr;
       }
    }
-   
+
    // Add rest of string if there is any.
-   
+
    if( start != ptr )
       outElements.push_back( start );
 }
@@ -1513,7 +1513,7 @@ String String::ToString( bool value )
 {
    static String sTrue = "true";
    static String sFalse = "false";
-   
+
    if( value )
       return sTrue;
    return sFalse;
@@ -1555,7 +1555,7 @@ String   String::SpanToString(const char *start, const char *end)
 {
    if ( end == start )
       return String();
-   
+
    AssertFatal( end > start, "Invalid arguments to String::SpanToString - end is before start" );
 
    U32         len = U32(end - start);

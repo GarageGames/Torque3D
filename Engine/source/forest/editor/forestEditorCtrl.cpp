@@ -40,7 +40,7 @@ ConsoleDocClass( ForestEditorCtrl,
 );
 
 ForestEditorCtrl::ForestEditorCtrl()
-{   
+{
    dMemset( &mLastEvent, 0, sizeof(Gui3DMouseEvent) );
 }
 
@@ -97,7 +97,7 @@ void ForestEditorCtrl::onSleep()
 bool ForestEditorCtrl::updateActiveForest( bool createNew )
 {
    mForest = dynamic_cast<Forest*>( Sim::findObject( "theForest" ) );
-   Con::executef( this, "onActiveForestUpdated", mForest ? mForest->getIdString() : "", createNew ? "1" : "0" );  
+   Con::executef( this, "onActiveForestUpdated", mForest ? mForest->getIdString() : "", createNew ? "1" : "0" );
 
    if ( mTool )
       mTool->setActiveForest( mForest );
@@ -106,7 +106,7 @@ bool ForestEditorCtrl::updateActiveForest( bool createNew )
 }
 
 void ForestEditorCtrl::setActiveTool( ForestTool *tool )
-{ 
+{
    if ( mTool )
    {
       mTool->onDeactivated();
@@ -114,7 +114,7 @@ void ForestEditorCtrl::setActiveTool( ForestTool *tool )
 
    mTool = tool;
 
-   if ( mTool )   
+   if ( mTool )
    {
       mTool->setActiveForest( mForest );
       mTool->setParentEditor( this );
@@ -127,8 +127,8 @@ void ForestEditorCtrl::onMouseUp( const GuiEvent &event_ )
    Parent::onMouseUp( event_ );
 }
 
-void ForestEditorCtrl::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void ForestEditorCtrl::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    cursor = NULL;
@@ -145,19 +145,19 @@ void ForestEditorCtrl::get3DCursor( GuiCursor *&cursor,
 
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
-   
-   // We've already changed the cursor, 
+
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if( root->mCursorChanged != -1)
       controller->popCursor();
 
    // Now change the cursor shape
    controller->pushCursor(currCursor);
-   root->mCursorChanged = currCursor;   
+   root->mCursorChanged = currCursor;
 }
 
 void ForestEditorCtrl::on3DMouseDown( const Gui3DMouseEvent &evt )
-{   
+{
    if ( !mForest && !updateActiveForest( true ) )
       return;
 
@@ -188,7 +188,7 @@ void ForestEditorCtrl::on3DMouseMove( const Gui3DMouseEvent &evt )
 }
 
 void ForestEditorCtrl::on3DMouseDragged( const Gui3DMouseEvent &evt )
-{   
+{
    if ( mTool )
       mTool->on3DMouseDragged( evt );
 }
@@ -232,7 +232,7 @@ bool ForestEditorCtrl::onMouseWheelDown(const GuiEvent &event_)
 void ForestEditorCtrl::updateGuiInfo()
 {
    // Note: This is intended to be used for updating
-   // GuiControls with info before they are rendered.	
+   // GuiControls with info before they are rendered.
 
    SimObject *statusbar;
    Sim::findObject( "EditorGuiStatusBar", statusbar );
@@ -264,12 +264,12 @@ void ForestEditorCtrl::updateGuiInfo()
    if ( selectionBar )
       Con::executef( selectionBar, "setInfo", "" );
 }
-            
+
 void ForestEditorCtrl::renderScene( const RectI &updateRect )
 {
    if ( mTool )
       mTool->onRender3D();
-} 
+}
 
 void ForestEditorCtrl::updateGizmo()
 {
@@ -291,7 +291,7 @@ bool findMeshReferences( SimObject *obj )
 
    if ( element && element->mData == sKey )
       return true;
-   
+
    return false;
 }
 
@@ -309,16 +309,16 @@ void ForestEditorCtrl::deleteMeshSafe( ForestItemData *mesh )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       Con::errorf( "ForestEditorCtrl::deleteMeshSafe() - EUndoManager not found." );
-      return;     
+      return;
    }
 
    // CompoundUndoAction which will delete the ForestItemData, ForestItem(s), and ForestBrushElement(s).
    CompoundUndoAction *compoundAction = new CompoundUndoAction( "Delete Forest Mesh" );
-    
+
    // Find ForestItem(s) referencing this datablock and add their deletion
    // to the undo action.
    if ( mForest )
-   {      
+   {
       Vector<ForestItem> foundItems;
       mForest->getData()->getItems( mesh, &foundItems );
 
@@ -330,14 +330,14 @@ void ForestEditorCtrl::deleteMeshSafe( ForestItemData *mesh )
    // Find ForestBrushElement(s) referencing this datablock.
    SimGroup *brushGroup = ForestBrush::getGroup();
    sKey = mesh;
-   Vector<SimObject*> foundElements;   
-   brushGroup->findObjectByCallback( &findMeshReferences, foundElements );   
+   Vector<SimObject*> foundElements;
+   brushGroup->findObjectByCallback( &findMeshReferences, foundElements );
 
    // Add UndoAction to delete the ForestBrushElement(s) and the ForestItemData.
    MEDeleteUndoAction *elementAction = new MEDeleteUndoAction();
    elementAction->deleteObject( foundElements );
    elementAction->deleteObject( mesh );
-   
+
    // Add compound action to the UndoManager. Done.
    undoMan->addAction( compoundAction );
 
@@ -358,16 +358,16 @@ void ForestEditorCtrl::updateCollision()
 void FindDirtyForests( SceneObject *obj, void *key )
 {
    Forest *forest = dynamic_cast<Forest*>(obj);
-   if ( forest && forest->getData()->isDirty() )   
+   if ( forest && forest->getData()->isDirty() )
       *((bool*)(key)) = true;
 }
 
 bool ForestEditorCtrl::isDirty()
-{   
+{
    bool foundDirty = false;
    gServerContainer.findObjects( EnvironmentObjectType, FindDirtyForests, (void*)&foundDirty );
 
-   return foundDirty;   
+   return foundDirty;
 }
 
 ConsoleMethod( ForestEditorCtrl, updateActiveForest, void, 2, 2, "()" )
@@ -393,7 +393,7 @@ ConsoleMethod( ForestEditorCtrl, deleteMeshSafe, void, 3, 3, "( ForestItemData o
    if ( !Sim::findObject( argv[2], db ) )
       return;
 
-   object->deleteMeshSafe( db );   
+   object->deleteMeshSafe( db );
 }
 
 ConsoleMethod( ForestEditorCtrl, isDirty, bool, 2, 2, "" )

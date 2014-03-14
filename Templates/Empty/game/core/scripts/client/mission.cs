@@ -34,17 +34,17 @@ function clientStartMission()
    // The client recieves a mission start right before
    // being dropped into the game.
    physicsStartSimulation( "client" );
-   
+
    // Start game audio effects channels.
-   
+
    AudioChannelEffects.play();
-   
+
    // Create client mission cleanup group.
-      
+
    new SimGroup( ClientMissionCleanup );
 
    // Done.
-      
+
    $Client::missionRunning = true;
 }
 
@@ -56,18 +56,18 @@ function clientEndMission()
    physicsStopSimulation( "client" );
 
    // Stop game audio effects channels.
-   
+
    AudioChannelEffects.stop();
-   
+
    // Delete all the decals.
    decalManagerClear();
-  
-   // Delete client mission cleanup group. 
+
+   // Delete client mission cleanup group.
    if( isObject( ClientMissionCleanup ) )
       ClientMissionCleanup.delete();
-      
+
    clearClientPaths();
-      
+
    // Done.
    $Client::missionRunning = false;
 }
@@ -91,15 +91,15 @@ function clientCmdMissionEnd( %seq )
    }
 }
 
-/// Expands the name of a mission into the full 
+/// Expands the name of a mission into the full
 /// mission path and extension.
 function expandMissionFileName( %missionFile )
-{         
+{
    // Expand any escapes in it.
    %missionFile = expandFilename( %missionFile );
-                 
-   // If the mission file doesn't exist... try to fix up the string.      
-   if ( !isFile( %missionFile ) ) 
+
+   // If the mission file doesn't exist... try to fix up the string.
+   if ( !isFile( %missionFile ) )
    {
       // Does it need a .mis?
       if ( strStr( %missionFile, ".mis" ) == -1 )
@@ -118,7 +118,7 @@ function expandMissionFileName( %missionFile )
 
       %missionFile = %newMission;
    }
-   
+
    return %missionFile;
 }
 

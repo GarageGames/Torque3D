@@ -41,7 +41,7 @@ public:
    virtual FenceStatus getStatus() const;
    virtual void block();
 
-   
+
 
    // GFXResource interface
    virtual void zombify();

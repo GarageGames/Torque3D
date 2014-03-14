@@ -36,7 +36,7 @@
 
 IMPLEMENT_CO_NETOBJECT_V1(RenderMeshExample);
 
-ConsoleDocClass( RenderMeshExample, 
+ConsoleDocClass( RenderMeshExample,
    "@brief An example scene object which renders a mesh.\n\n"
    "This class implements a basic SceneObject that can exist in the world at a "
    "3D position and render itself. There are several valid ways to render an "
@@ -175,25 +175,25 @@ void RenderMeshExample::unpackUpdate(NetConnection *conn, BitStream *stream)
 //-----------------------------------------------------------------------------
 void RenderMeshExample::createGeometry()
 {
-   static const Point3F cubePoints[8] = 
+   static const Point3F cubePoints[8] =
    {
       Point3F( 1, -1, -1), Point3F( 1, -1,  1), Point3F( 1,  1, -1), Point3F( 1,  1,  1),
       Point3F(-1, -1, -1), Point3F(-1,  1, -1), Point3F(-1, -1,  1), Point3F(-1,  1,  1)
    };
 
-   static const Point3F cubeNormals[6] = 
+   static const Point3F cubeNormals[6] =
    {
       Point3F( 1,  0,  0), Point3F(-1,  0,  0), Point3F( 0,  1,  0),
       Point3F( 0, -1,  0), Point3F( 0,  0,  1), Point3F( 0,  0, -1)
    };
 
-   static const Point2F cubeTexCoords[4] = 
+   static const Point2F cubeTexCoords[4] =
    {
       Point2F( 0,  0), Point2F( 0, -1),
       Point2F( 1,  0), Point2F( 1, -1)
    };
 
-   static const U32 cubeFaces[36][3] = 
+   static const U32 cubeFaces[36][3] =
    {
       { 3, 0, 3 }, { 0, 0, 0 }, { 1, 0, 1 },
       { 2, 0, 2 }, { 0, 0, 0 }, { 3, 0, 3 },
@@ -235,8 +235,8 @@ void RenderMeshExample::createGeometry()
 
    mPrimitiveBuffer.set( GFX, 36, 12, GFXBufferTypeStatic );
 
-   mPrimitiveBuffer.lock(&pIdx);     
-   
+   mPrimitiveBuffer.lock(&pIdx);
+
    for (U16 i = 0; i < 36; i++)
       pIdx[i] = i;
 
@@ -269,7 +269,7 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
    if ( !mMaterialInst )
       return;
 
-   // If we don't have a material instance after the override then 
+   // If we don't have a material instance after the override then
    // we can skip rendering all together.
    BaseMatInstance *matInst = state->getOverrideMaterial( mMaterialInst );
    if ( !matInst )
@@ -296,9 +296,9 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
    {
       // Calculate our sort point manually.
       const Box3F& rBox = getRenderWorldBox();
-      ri->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );      
-   } 
-   else 
+      ri->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );
+   }
+   else
       ri->sortDistSq = 0.0f;
 
    // Set up our transforms
@@ -309,7 +309,7 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
    ri->worldToCamera = renderPass->allocSharedXform(RenderPassManager::View);
    ri->projection    = renderPass->allocSharedXform(RenderPassManager::Projection);
 
-	// If our material needs lights then fill the RIs 
+	// If our material needs lights then fill the RIs
    // light vector with the best lights.
    if ( matInst->isForwardLit() )
    {

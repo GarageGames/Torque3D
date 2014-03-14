@@ -43,7 +43,7 @@ public:
    MRandomSet( MRandomLCG *randGen = &gRandGen );
 
    void add( const T &item, F32 probability );
-   
+
    /// Return a random item from the set using the specified per
    /// item probability distribution.
    T get();
@@ -56,7 +56,7 @@ inline MRandomSet<T>::MRandomSet( MRandomLCG *randGen )
 {
 }
 
-template<class T> 
+template<class T>
 inline void MRandomSet<T>::add( const T &item, F32 probability )
 {
    AssertFatal( probability > 0.0f, "MRandomDeck - item probability must be positive." );
@@ -66,9 +66,9 @@ inline void MRandomSet<T>::add( const T &item, F32 probability )
    mSum += probability;
 }
 
-template<class T> 
+template<class T>
 inline T MRandomSet<T>::get()
-{ 
+{
    AssertFatal( mSum > 0.0f, "MRandomDeck - no items to get." );
 
    F32 rand = mRandGen->randF(0.0f, mSum);
@@ -82,10 +82,10 @@ inline T MRandomSet<T>::get()
 
       if ( rand > prev && rand <= curr )
          return mItems[i];
-         
+
       prev = curr;
    }
-   
+
    AssertFatal( false, "MRandomSet::get() has failed." );
    return NULL;
 }

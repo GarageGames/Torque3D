@@ -70,7 +70,7 @@ public:
    const VectorF& getVelocity() const { return mVelocity; }
 
 
-   static bool findBest( const Point3F& cameraPos, 
+   static bool findBest( const Point3F& cameraPos,
                          const VectorF& cameraDir,
                          F32 viewDistance,
                          U32 maxResults,

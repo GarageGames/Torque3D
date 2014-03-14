@@ -57,7 +57,7 @@ struct DDSFile
       CompressedData = BIT(7), ///< Indicates that this is compressed or otherwise
                                ///  exotic data.
 
-      /// These are the flags for which cubemap 
+      /// These are the flags for which cubemap
       /// surfaces are included in the file.
       CubeMap_PosX_Flag = BIT(8),
       CubeMap_NegX_Flag = BIT(9),
@@ -67,7 +67,7 @@ struct DDSFile
       CubeMap_NegZ_Flag = BIT(13),
    };
 
-   /// The index into mSurfaces for each 
+   /// The index into mSurfaces for each
    /// cubemap face.
    enum
    {
@@ -119,14 +119,14 @@ struct DDSFile
       bool readMipChain();
 
       void dumpImage(DDSFile *dds, U32 mip, const char *file);
-      
+
       /// Helper for reading a mip level.
       void readNextMip(DDSFile *dds, Stream &s, U32 height, U32 width, U32 mipLevel, bool skip);
-      
+
       /// Helper for writing a mip level.
       void writeNextMip(DDSFile *dds, Stream &s, U32 height, U32 width, U32 mipLevel);
    };
-   
+
    Vector<SurfaceData*> mSurfaces;
 
    /// Clear all our information; used before reading.

@@ -107,31 +107,31 @@ singleton SFXDescription( AudioMusic )
 /// This initializes the sound system device from
 /// the defaults in the $pref::SFX:: globals.
 function sfxStartup()
-{   
-   // The console builds should re-detect, by default, so that it plays nicely 
+{
+   // The console builds should re-detect, by default, so that it plays nicely
    // along side a PC build in the same script directory.
-   
+
    if( $platform $= "xenon" )
    {
-      if( $pref::SFX::provider $= "DirectSound" || 
+      if( $pref::SFX::provider $= "DirectSound" ||
           $pref::SFX::provider $= "OpenAL" )
       {
          $pref::SFX::provider = "";
       }
-      
+
       if( $pref::SFX::provider $= "" )
       {
          $pref::SFX::autoDetect = 1;
-         
-         warn( "Xbox360 is auto-detecting available sound providers..." ); 
+
+         warn( "Xbox360 is auto-detecting available sound providers..." );
          warn( "   - You may wish to alter this functionality before release (core/scripts/client/audio.cs)" );
       }
    }
 
    echo( "sfxStartup..." );
-   
+
    // If we have a provider set, try initialize a device now.
-   
+
    if( $pref::SFX::provider !$= "" )
    {
       if( sfxInit() )
@@ -148,14 +148,14 @@ function sfxStartup()
    if( ( !isDefined( "$pref::SFX::autoDetect" ) || $pref::SFX::autoDetect ) &&
        sfxAutodetect() )
       return;
-   
+
    // Failure.
 
    error( "   Failed to initialize device!\n\n" );
-   
+
    $pref::SFX::provider = "";
    $pref::SFX::device   = "";
-   
+
    return;
 }
 
@@ -165,10 +165,10 @@ function sfxStartup()
 function sfxInit()
 {
    // If already initialized, shut down the current device first.
-   
+
    if( sfxGetDeviceInfo() !$= "" )
       sfxShutdown();
-      
+
    // Start it up!
    %maxBuffers = $pref::SFX::useHardware ? -1 : $pref::SFX::maxSoftwareBuffers;
    if ( !sfxCreateDevice( $pref::SFX::provider, $pref::SFX::device, $pref::SFX::useHardware, %maxBuffers ) )
@@ -182,12 +182,12 @@ function sfxInit()
    $pref::SFX::useHardware    = getField( %info, 2 );
    %useHardware               = $pref::SFX::useHardware ? "Yes" : "No";
    %maxBuffers                = getField( %info, 3 );
-   
+
    echo( "   Provider: "    @ $pref::SFX::provider );
    echo( "   Device: "      @ $pref::SFX::device );
    echo( "   Hardware: "    @ %useHardware );
    echo( "   Buffers: "      @ %maxBuffers );
-   
+
    if( isDefined( "$pref::SFX::distanceModel" ) )
       sfxSetDistanceModel( $pref::SFX::distanceModel );
    if( isDefined( "$pref::SFX::dopplerFactor" ) )
@@ -196,14 +196,14 @@ function sfxInit()
       sfxSetRolloffFactor( $pref::SFX::rolloffFactor );
 
    // Restore master volume.
-   
+
    sfxSetMasterVolume( $pref::SFX::masterVolume );
 
    // Restore channel volumes.
-   
+
    for( %channel = 0; %channel <= 8; %channel ++ )
       sfxSetChannelVolume( %channel, $pref::SFX::channelVolume[ %channel ] );
-      
+
    return true;
 }
 
@@ -212,13 +212,13 @@ function sfxInit()
 function sfxShutdown()
 {
    // Store volume prefs.
-   
+
    $pref::SFX::masterVolume = sfxGetMasterVolume();
-   
+
    for( %channel = 0; %channel <= 8; %channel ++ )
       $pref::SFX::channelVolume[ %channel ] = sfxGetChannelVolume( %channel );
-   
-   // We're assuming here that a null info 
+
+   // We're assuming here that a null info
    // string means that no device is loaded.
    if( sfxGetDeviceInfo() $= "" )
       return;
@@ -232,20 +232,20 @@ function sfxCompareProvider( %providerA, %providerB )
 {
    if( %providerA $= %providerB )
       return 0;
-      
+
    switch$( %providerA )
    {
       // Always prefer FMOD over anything else.
       case "FMOD":
          return 1;
-         
+
       // Prefer OpenAL over anything but FMOD.
       case "OpenAL":
          if( %providerB $= "FMOD" )
             return -1;
          else
             return 1;
-            
+
       // As long as the XAudio SFX provider still has issues,
       // choose stable DSound over it.
       case "DirectSound":
@@ -253,13 +253,13 @@ function sfxCompareProvider( %providerA, %providerB )
             return -1;
          else
             return 0;
-            
+
       case "XAudio":
          if( %providerB !$= "FMOD" && %providerB !$= "OpenAL" && %providerB !$= "DirectSound" )
             return 1;
          else
             return -1;
-         
+
       default:
          return -1;
    }
@@ -270,11 +270,11 @@ function sfxCompareProvider( %providerA, %providerB )
 function sfxAutodetect()
 {
    // Get all the available devices.
-   
+
    %devices = sfxGetAvailableDevices();
 
    // Collect and sort the devices by preferentiality.
-   
+
    %deviceTrySequence = new ArrayObject();
    %bestMatch = -1;
    %count = getRecordCount( %devices );
@@ -282,24 +282,24 @@ function sfxAutodetect()
    {
       %info = getRecord( %devices, %i );
       %provider = getField( %info, 0 );
-         
+
       %deviceTrySequence.push_back( %provider, %info );
    }
-   
+
    %deviceTrySequence.sortfkd( "sfxCompareProvider" );
-         
+
    // Try the devices in order.
-   
+
    %count = %deviceTrySequence.count();
    for( %i = 0; %i < %count; %i ++ )
    {
       %provider = %deviceTrySequence.getKey( %i );
       %info = %deviceTrySequence.getValue( %i );
-      
+
       $pref::SFX::provider       = %provider;
       $pref::SFX::device         = getField( %info, 1 );
       $pref::SFX::useHardware    = getField( %info, 2 );
-      
+
       // By default we've decided to avoid hardware devices as
       // they are buggy and prone to problems.
       $pref::SFX::useHardware = false;
@@ -311,17 +311,17 @@ function sfxAutodetect()
          return true;
       }
    }
-   
+
    // Found no suitable device.
-   
+
    error( "sfxAutodetect - Could not initialize a valid SFX device." );
-   
+
    $pref::SFX::provider = "";
    $pref::SFX::device = "";
    $pref::SFX::useHardware = "";
-   
+
    %deviceTrySequence.delete();
-   
+
    return false;
 }
 
@@ -356,7 +356,7 @@ function sfxGroupToOldChannel( %group )
          return -1;
       else if( $AudioChannels[ %i ].getId() == %id )
          return %i;
-         
+
    return -1;
 }
 
@@ -374,7 +374,7 @@ function sfxStopAll( %channel )
 {
    // Don't stop channel itself since that isn't quite what the function
    // here intends.
-   
+
    %channel = sfxOldChannelToGroup( %channel );
    if (isObject(%channel))
    {
@@ -401,11 +401,11 @@ singleton SimSet( SFXPausedSet );
 
 
 /// Pauses the playback of active sound sources.
-/// 
-/// @param %channels    An optional word list of channel indices or an empty 
+///
+/// @param %channels    An optional word list of channel indices or an empty
 ///                     string to pause sources on all channels.
-/// @param %pauseSet    An optional SimSet which is filled with the paused 
-///                     sources.  If not specified the global SfxSourceGroup 
+/// @param %pauseSet    An optional SimSet which is filled with the paused
+///                     sources.  If not specified the global SfxSourceGroup
 ///                     is used.
 ///
 /// @deprecated
@@ -415,7 +415,7 @@ function sfxPause( %channels, %pauseSet )
    // Did we get a set to populate?
    if ( !isObject( %pauseSet ) )
       %pauseSet = SFXPausedSet;
-      
+
    %count = SFXSourceSet.getCount();
    for ( %i = 0; %i < %count; %i++ )
    {
@@ -432,9 +432,9 @@ function sfxPause( %channels, %pauseSet )
 
 
 /// Resumes the playback of paused sound sources.
-/// 
-/// @param %pauseSet    An optional SimSet which contains the paused sound 
-///                     sources to be resumed.  If not specified the global 
+///
+/// @param %pauseSet    An optional SimSet which contains the paused sound
+///                     sources to be resumed.  If not specified the global
 ///                     SfxSourceGroup is used.
 /// @deprecated
 ///
@@ -442,7 +442,7 @@ function sfxResume( %pauseSet )
 {
    if ( !isObject( %pauseSet ) )
       %pauseSet = SFXPausedSet;
-                  
+
    %count = %pauseSet.getCount();
    for ( %i = 0; %i < %count; %i++ )
    {

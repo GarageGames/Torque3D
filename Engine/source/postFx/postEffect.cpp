@@ -47,10 +47,10 @@
 
 using namespace Torque;
 
-ConsoleDocClass( PostEffect, 
+ConsoleDocClass( PostEffect,
    "@brief A fullscreen shader effect.\n\n"
 
-   "@section PFXTextureIdentifiers\n\n"   
+   "@section PFXTextureIdentifiers\n\n"
 
    "@ingroup Rendering\n"
 );
@@ -62,15 +62,15 @@ IMPLEMENT_CALLBACK( PostEffect, onAdd, void, (), (),
 IMPLEMENT_CALLBACK( PostEffect, preProcess, void, (), (),
    "Called when an effect is processed but before textures are bound. This "
    "allows the user to change texture related paramaters or macros at runtime.\n"
-   "@tsexample\n"   
+   "@tsexample\n"
    "function SSAOPostFx::preProcess( %this )\n"
-   "{\n"   
+   "{\n"
    "   if ( $SSAOPostFx::quality !$= %this.quality )\n"
    "   {\n"
    "      %this.quality = mClamp( mRound( $SSAOPostFx::quality ), 0, 2 );\n"
-   "      \n"         
+   "      \n"
    "      %this.setShaderMacro( \"QUALITY\", %this.quality );\n"
-   "   }\n"     
+   "   }\n"
    "   %this.targetScale = $SSAOPostFx::targetScale;\n"
    "}\n"
    "@endtsexample\n"
@@ -304,17 +304,17 @@ void PostEffect::initPersistFields()
    addField( "target", TypeRealString, Offset( mTargetName, PostEffect ),
       "String identifier of this effect's target texture.\n"
       "@see PFXTextureIdentifiers" );
-   
+
    addField( "targetDepthStencil", TypeRealString, Offset( mTargetDepthStencilName, PostEffect ),
       "Optional string identifier for this effect's target depth/stencil texture.\n"
       "@see PFXTextureIdentifiers" );
 
    addField( "targetScale", TypePoint2F, Offset( mTargetScale, PostEffect ),
        "If targetSize is zero this is used to set a relative size from the current target." );
-       
-   addField( "targetSize", TypePoint2I, Offset( mTargetSize, PostEffect ), 
-      "If non-zero this is used as the absolute target size." );   
-      
+
+   addField( "targetSize", TypePoint2I, Offset( mTargetSize, PostEffect ),
+      "If non-zero this is used as the absolute target size." );
+
    addField( "targetFormat", TypeGFXFormat, Offset( mTargetFormat, PostEffect ),
       "Format of the target texture, not applicable if writing to the backbuffer." );
 
@@ -337,23 +337,23 @@ void PostEffect::initPersistFields()
    addField( "renderBin", TypeRealString, Offset( mRenderBin, PostEffect ),
       "Name of a renderBin, used if renderTime is PFXBeforeBin or PFXAfterBin." );
 
-   addField( "renderPriority", TypeF32, Offset( mRenderPriority, PostEffect ), 
+   addField( "renderPriority", TypeF32, Offset( mRenderPriority, PostEffect ),
       "PostEffects are processed in DESCENDING order of renderPriority if more than one has the same renderBin/Time." );
 
-   addField( "allowReflectPass", TypeBool, Offset( mAllowReflectPass, PostEffect ), 
+   addField( "allowReflectPass", TypeBool, Offset( mAllowReflectPass, PostEffect ),
       "Is this effect processed during reflection render passes." );
 
    addProtectedField( "isEnabled", TypeBool, Offset( mEnabled, PostEffect),
       &PostEffect::_setIsEnabled, &defaultProtectedGetFn,
       "Is the effect on." );
 
-   addField( "onThisFrame", TypeBool, Offset( mOnThisFrame, PostEffect ), 
+   addField( "onThisFrame", TypeBool, Offset( mOnThisFrame, PostEffect ),
       "Allows you to turn on a PostEffect for only a single frame." );
 
-   addField( "oneFrameOnly", TypeBool, Offset( mOneFrameOnly, PostEffect ), 
+   addField( "oneFrameOnly", TypeBool, Offset( mOneFrameOnly, PostEffect ),
       "Allows you to turn on a PostEffect for only a single frame." );
 
-   addField( "skip", TypeBool, Offset( mSkip, PostEffect ), 
+   addField( "skip", TypeBool, Offset( mSkip, PostEffect ),
       "Skip processing of this PostEffect and its children even if its parent "
       "is enabled. Parent and sibling PostEffects in the chain are still processed." );
 
@@ -563,7 +563,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mWaterColorSC = mShader->getShaderConstHandle( "$waterColor" );
       mAmbientColorSC = mShader->getShaderConstHandle( "$ambientColor" );
       mWaterFogDataSC = mShader->getShaderConstHandle( "$waterFogData" );
-      mWaterFogPlaneSC = mShader->getShaderConstHandle( "$waterFogPlane" );      
+      mWaterFogPlaneSC = mShader->getShaderConstHandle( "$waterFogPlane" );
       mWaterDepthGradMaxSC = mShader->getShaderConstHandle( "$waterDepthGradMax" );
       mScreenSunPosSC = mShader->getShaderConstHandle( "$screenSunPos" );
       mLightDirectionSC = mShader->getShaderConstHandle( "$lightDirection" );
@@ -841,12 +841,12 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       dSscanf( buffer.c_str(), "%g %g", texSizeScriptConst.x, texSizeScriptConst.y );
    }
    */
-      
+
    {
       PROFILE_SCOPE( PostEffect_SetShaderConsts );
 
       // Pass some data about the current render state to script.
-      // 
+      //
       // TODO: This is pretty messy... it should go away.  This info
       // should be available from some other script accessible method
       // or field which isn't PostEffect specific.
@@ -854,11 +854,11 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       if ( state )
       {
          Con::setFloatVariable( "$Param::NearDist", state->getNearPlane() );
-         Con::setFloatVariable( "$Param::FarDist", state->getFarPlane() );   
+         Con::setFloatVariable( "$Param::FarDist", state->getFarPlane() );
       }
 
       setShaderConsts_callback();
-   }   
+   }
 
    EffectConstTable::Iterator iter = mEffectConsts.begin();
    for ( ; iter != mEffectConsts.end(); iter++ )
@@ -926,7 +926,7 @@ void PostEffect::_setupTransforms()
 
 void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarget )
 {
-   if (  mNamedTarget.isRegistered() || 
+   if (  mNamedTarget.isRegistered() ||
          mTargetName.compare( "$outTex", 0, String::NoCase ) == 0 )
    {
       // Size it relative to the texture of the first stage or
@@ -1030,10 +1030,10 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
 
       // Make sure its at least 1x1.
       targetSize.setMax( Point2I::One );
-      
+
       if (  mNamedTargetDepthStencil.isRegistered() &&
             mTargetDepthStencil.getWidthHeight() != targetSize )
-      {         
+      {
          mTargetDepthStencil.set( targetSize.x, targetSize.y, GFXFormatD24S8,
                      &GFXDefaultZTargetProfile, "PostEffect::_setupTarget" );
 
@@ -1128,7 +1128,7 @@ void PostEffect::process(  const SceneRenderState *state,
 
    GFXDEBUGEVENT_SCOPE_EX( PostEffect_Process, ColorI::GREEN, avar("PostEffect: %s", getName()) );
 
-   preProcess_callback();   
+   preProcess_callback();
 
    GFXTransformSaver saver;
 
@@ -1225,7 +1225,7 @@ void PostEffect::process(  const SceneRenderState *state,
       // If we don't have a scene state then setup
       // a dummy frustum... you better not be depending
       // on this being related to the camera in any way.
-      
+
       frustum = Frustum();
    }
 
@@ -1298,14 +1298,14 @@ void PostEffect::enable()
 
    mEnabled = true;
 
-   // We cannot really enable the effect 
+   // We cannot really enable the effect
    // until its been registed.
    if ( !isProperlyAdded() )
       return;
 
-   // If the enable callback returns 'false' then 
+   // If the enable callback returns 'false' then
    // leave the effect disabled.
-   if ( !onEnabled_callback() )   
+   if ( !onEnabled_callback() )
    {
       mEnabled = false;
       return;
@@ -1325,7 +1325,7 @@ void PostEffect::disable()
    if ( isProperlyAdded() )
    {
       PFXMGR->_removeEffect( this );
-      onDisabled_callback();      
+      onDisabled_callback();
    }
 }
 
@@ -1402,11 +1402,11 @@ void PostEffect::_checkRequirements()
       Vector<GFXFormat> formats;
       formats.push_back( mTargetFormat );
       GFXFormat format = GFX->selectSupportedFormat(  &PostFxTargetProfile,
-                                                      formats, 
+                                                      formats,
                                                       true,
                                                       false,
                                                       false );
-      
+
       // If we didn't get our format out then its unsupported!
       if ( format != mTargetFormat )
          return;
@@ -1434,7 +1434,7 @@ void PostEffect::_checkRequirements()
 
    // Finally find and load the shader.
    ShaderData *shaderData;
-   if ( Sim::findObject( mShaderName, shaderData ) )   
+   if ( Sim::findObject( mShaderName, shaderData ) )
       if ( shaderData->getPixVersion() <= GFX->getPixelShaderVersion() )
          mShader = shaderData->getShader( macros );
 
@@ -1452,7 +1452,7 @@ bool PostEffect::dumpShaderDisassembly( String &outFilename ) const
 
    if ( !mShader || !mShader->getDisassembly( data ) )
       return false;
-         
+
    outFilename = FS::MakeUniquePath( "", "ShaderDisassembly", "txt" );
 
    FileStream *fstream = FileStream::createAndOpen( outFilename, Torque::FS::File::Write );
@@ -1461,7 +1461,7 @@ bool PostEffect::dumpShaderDisassembly( String &outFilename ) const
 
    fstream->write( data );
    fstream->close();
-   delete fstream;   
+   delete fstream;
 
    return true;
 }
@@ -1537,10 +1537,10 @@ GFXTextureObject* PostEffect::_getTargetTexture( U32 )
    {
       GFXTexHandle chainTex;
       process( NULL, chainTex );
-      
+
       // TODO: We should add a conditional copy
       // to a non-RT texture here to reduce the
-      // amount of non-swappable RTs in use.      
+      // amount of non-swappable RTs in use.
    }
 
    return mTargetTex.getPointer();
@@ -1585,10 +1585,10 @@ DefineEngineMethod( PostEffect, isEnabled, bool, (),,
 DefineEngineMethod( PostEffect, setTexture, void, ( S32 index, const char *filePath ),,
    "This is used to set the texture file and load the texture on a running effect. "
    "If the texture file is not different from the current file nothing is changed.  If "
-   "the texture cannot be found a null texture is assigned.\n"    
-   "@param index The texture stage index.\n" 
+   "the texture cannot be found a null texture is assigned.\n"
+   "@param index The texture stage index.\n"
    "@param filePath The file name of the texture to set.\n" )
-{   
+{
 	if ( index > -1 && index < PostEffect::NumTextures )
 		object->setTexture( index, filePath );
 }
@@ -1596,8 +1596,8 @@ DefineEngineMethod( PostEffect, setTexture, void, ( S32 index, const char *fileP
 DefineEngineMethod( PostEffect, setShaderConst, void, ( const char* name, const char* value ),,
    "Sets the value of a uniform defined in the shader. This will usually "
    "be called within the setShaderConsts callback. Array type constants are "
-   "not supported.\n"    
-   "@param name Name of the constanst, prefixed with '$'.\n" 
+   "not supported.\n"
+   "@param name Name of the constanst, prefixed with '$'.\n"
    "@param value Value to set, space seperate values with more than one element.\n"
    "@tsexample\n"
    "function MyPfx::setShaderConsts( %this )\n"
@@ -1609,7 +1609,7 @@ DefineEngineMethod( PostEffect, setShaderConst, void, ( const char* name, const 
    "   // example integer uniform\n"
    "   %this.setShaderConst( \"$loops\", \"5\" );"
    "}\n"
-   "@endtsexample" )   
+   "@endtsexample" )
 {
    object->setShaderConst( name, value );
 }
@@ -1627,7 +1627,7 @@ DefineEngineMethod( PostEffect, dumpShaderDisassembly, String, (),,
    String fileName;
    object->dumpShaderDisassembly( fileName );
 
-   return fileName;   
+   return fileName;
 }
 
 DefineEngineMethod( PostEffect, setShaderMacro, void, ( const char* key, const char* value ), ( "" ),
@@ -1646,7 +1646,7 @@ DefineEngineMethod( PostEffect, setShaderMacro, void, ( const char* key, const c
    "   // #define HIGH_QUALITY_MODE\n"
    "}\n"
    "@endtsexample" )
-{   
+{
    object->setShaderMacro( key, value );
 }
 
@@ -1676,7 +1676,7 @@ DefineEngineFunction( dumpRandomNormalMap, void, (),,
    U8 *f = rect->bits;
 
    for ( U32 i = 0; i < 64*64; i++, f += 4 )
-   {               
+   {
       VectorF vec;
 
       vec.x = mRandF( -1.0f, 1.0f );
@@ -1694,5 +1694,5 @@ DefineEngineFunction( dumpRandomNormalMap, void, (),,
    tex.unlock();
 
    String path = Torque::FS::MakeUniquePath( "", "randNormTex", "png" );
-   tex->dumpToDisk( "png", path );   
+   tex->dumpToDisk( "png", path );
 }

@@ -28,7 +28,7 @@
    canSave = "1";
    canSaveDynamicFields = "0";
    minSize = "50 50";
-   
+
    new GuiTabBookCtrl() {
       TabPosition = "Top";
       TabMargin = "6";
@@ -157,7 +157,7 @@
                   canSaveDynamicFields = "0";
                };
                new GuiBitmapCtrl(){
-                  bitmap = "tools/gui/images/inactive-overlay"; 
+                  bitmap = "tools/gui/images/inactive-overlay";
                   position = "57 19";
                   Extent = "122 20";
                   tooltip = "Levels needs to be selected to enable the detail level slider";
@@ -720,14 +720,14 @@
          canSave = "1";
          canSaveDynamicFields = "0";
          isContainer = "1";
-         
+
          new GuiControl(){
             docking = "client";
             Margin = "0 0 0 0";
             Profile = "ToolsGuiScrollProfile";
             position = "0 0";
             extent = "202 224";
-            
+
          };
          new GuiContainer(ShapeEdMountWindow) {
             docking = "none";
@@ -772,7 +772,7 @@
                canSave = "1";
                canSaveDynamicFields = "0";
             };
-            
+
             new GuiScrollCtrl() {
                willFirstRespond = "1";
                hScrollBar = "alwaysOff";
@@ -833,7 +833,7 @@
                HorizSizing = "width";
                VertSizing = "top";
                Profile = "inspectorStyleRolloutDarkProfile";
-               
+
                new GuiTextCtrl() {
                   text = "Mount Item";
                   position = "5 1";
@@ -1031,7 +1031,7 @@
          isContainer = "1";
          canSave = "1";
          canSaveDynamicFields = "0";
-         
+
          new GuiContainer(ShapeEdThreadWindow) {
             docking = "client";
             Margin = "0 0 0 0";
@@ -1052,14 +1052,14 @@
             isContainer = "1";
             canSave = "1";
             canSaveDynamicFields = "0";
-            
+
             new GuiContainer() {
                position = "0 0";
                extent = "203 141";
                HorizSizing = "width";
                VertSizing = "height";
                Profile = "inspectorStyleRolloutDarkProfile";
-                  
+
                new GuiTextCtrl() {
                   text = "Thread";
                   position = "4 1";
@@ -1394,7 +1394,7 @@
          isContainer = "1";
          canSave = "1";
          canSaveDynamicFields = "0";
-         
+
          new GuiContainer(ShapeEdColWindow) {
             docking = "client";
             Margin = "0 0 0 0";
@@ -1415,7 +1415,7 @@
             isContainer = "1";
             canSave = "1";
             canSaveDynamicFields = "0";
-            
+
             new GuiTextCtrl() {
                text = "Fit Type";
                position = "5 5";
@@ -1832,13 +1832,13 @@ function ShapeEdWaitGui::onWake(%this)
    %res = %this.getExtent();
    %resX = getWord( %res, 0 );
    %resY = getWord( %res, 1 );
-   
+
    %dialog = %this-->Dialog;
    %dialogExtent = %dialog.getExtent();
    %dialogWidth = getWord( %dialogExtent, 0 );
    %dialogHeight = getWord( %dialogExtent, 1 );
    %dialogPostion = %dialog.getPosition();
-   
+
    %posX = ( %resX / 2 ) - ( %dialogWidth / 2 );
    %posY = ( %resY / 2 ) - ( %dialogHeight / 2 );
    %dialog.setPosition( %posX, %posY );

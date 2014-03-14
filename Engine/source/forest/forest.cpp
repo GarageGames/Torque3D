@@ -59,20 +59,20 @@ bool Forest::smDrawBounds = false;
 IMPLEMENT_CO_NETOBJECT_V1(Forest);
 
 ConsoleDocClass( Forest,
-   
+
    "@brief %Forest is a global-bounds scene object provides collision and rendering for a "
    "(.forest) data file.\n\n"
-   
+
    "%Forest is designed to efficiently render a large number of static meshes: trees, rocks "
    "plants, etc. These cannot be moved at game-time or play animations but do support wind "
    "effects using vertex shader transformations guided by vertex color in the asset and "
    "user placed wind emitters ( or weapon explosions ).\n\n"
-   
+
    "Script level manipulation of forest data is not possible through %Forest, it is only "
    "the rendering/collision. All editing is done through the world editor.\n\n"
-   
+
    "@see TSForestItemData Defines a tree type.\n"
-   "@see GuiForestEditorCtrl Used by the world editor to provide manipulation of forest data.\n" 
+   "@see GuiForestEditorCtrl Used by the world editor to provide manipulation of forest data.\n"
    "@ingroup Forest"
 );
 
@@ -102,7 +102,7 @@ void Forest::initPersistFields()
       "The source forest data file." );
 
    addGroup( "Lod" );
-      
+
       addField( "lodReflectScalar",      TypeF32,       Offset( mReflectionLodScalar, Forest ),
          "Scalar applied to the farclip distance when Forest renders into a reflection." );
 
@@ -157,7 +157,7 @@ bool Forest::onAdd()
    // populate the object with forest entries before creation.
    addToScene();
 
-   // If we don't have a file name and the editor is 
+   // If we don't have a file name and the editor is
    // enabled then create an empty forest data file.
    if ( isServerObject() && ( !mDataFileName || !mDataFileName[0] ) )
       createNewFile();
@@ -199,7 +199,7 @@ void Forest::onRemove()
       mData->clearPhysicsRep( this );
 
    mData = NULL;
-   
+
    if ( isClientObject() )
    {
       SceneZoneSpaceManager::getZoningChangedSignal().remove( this, &Forest::_onZoningChanged );
@@ -214,8 +214,8 @@ void Forest::onRemove()
 U32 Forest::packUpdate( NetConnection *connection, U32 mask, BitStream *stream )
 {
    U32 retMask = Parent::packUpdate( connection, mask, stream );
-   
-   if ( stream->writeFlag( mask & MediaMask ) ) 
+
+   if ( stream->writeFlag( mask & MediaMask ) )
       stream->writeString( mDataFileName );
 
    if ( stream->writeFlag( mask & LodMask ) )
@@ -229,7 +229,7 @@ U32 Forest::packUpdate( NetConnection *connection, U32 mask, BitStream *stream )
 void Forest::unpackUpdate(NetConnection *connection, BitStream *stream)
 {
    Parent::unpackUpdate(connection,stream);
-   
+
    if ( stream->readFlag() )
    {
       mDataFileName = stream->readSTString();
@@ -296,12 +296,12 @@ void Forest::getLocalWindTrees( const Point3F &camPos, F32 radius, Vector<TreePl
 }
 
 void Forest::applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude )
-{   
+{
    if ( isServerObject() )
-      return;   
+      return;
 
    // Find all the trees in the radius
-   // then get their accumulators and 
+   // then get their accumulators and
    // push our impulse into them.
    VectorF impulse( 0, 0, 0 );
    ForestWindAccumulator *accumulator = NULL;
@@ -360,7 +360,7 @@ void Forest::saveDataFile( const char *path )
 }
 
 ConsoleMethod( Forest, saveDataFile, bool, 2, 3, "saveDataFile( [path] )" )
-{   
+{
    object->saveDataFile( argc == 3 ? argv[2] : NULL );
    return true;
 }

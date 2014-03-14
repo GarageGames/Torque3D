@@ -47,13 +47,13 @@ struct GFXFormatInfo
       {
          /// Bytes per single pixel.
          U32 mBytesPerPixel;
-         
+
          /// If true, format has alpha channel.
          bool mHasAlpha;
-         
+
          /// If true, format uses compression.
          bool mIsCompressed;
-         
+
          /// If true, channels are in floating-point.
          bool mIsFloatingPoint;
 
@@ -64,9 +64,9 @@ struct GFXFormatInfo
               mIsCompressed( isCompressed ),
               mIsFloatingPoint( isFP ) {}
       };
-      
+
       GFXFormat mFormat;
-      
+
       static Data smFormatInfos[ GFXFormat_COUNT ];
 
    public:
@@ -81,7 +81,7 @@ struct GFXFormatInfo
 
       /// @return true if the format has an alpha channel.
       bool hasAlpha() const { return smFormatInfos[ mFormat ].mHasAlpha; }
-      
+
       /// @return true if format uses compression.
       bool isCompressed() const { return smFormatInfos[ mFormat ].mIsCompressed; }
 
@@ -118,7 +118,7 @@ inline void GFXPackPixel( GFXFormat format, U8*& ptr, U8 red, U8 green, U8 blue,
          }
          ptr += 4;
          break;
-         
+
       case GFXFormatR8G8B8:
          if( leastSignficantFirst )
          {
@@ -134,7 +134,7 @@ inline void GFXPackPixel( GFXFormat format, U8*& ptr, U8 red, U8 green, U8 blue,
          }
          ptr += 3;
          break;
-         
+
       default:
          AssertISV( false, "GFXPackPixel() - pixel format not implemented." );
    }

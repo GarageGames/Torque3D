@@ -36,7 +36,7 @@ OggVorbisDecoder::OggVorbisDecoder( const ThreadSafeRef< OggInputStream >& strea
 #endif
 {
    // Initialize.
-   
+
    vorbis_info_init( &mVorbisInfo );
    vorbis_comment_init( &mVorbisComment );
    dMemset( &mVorbisBlock, 0, sizeof( mVorbisBlock ) );
@@ -60,7 +60,7 @@ bool OggVorbisDecoder::_detect( ogg_page* startPage )
    _setStartPage( startPage );
 
    // Read initial header packet.
-   
+
    ogg_packet nextPacket;
    if( !_readNextPacket( &nextPacket )
        || vorbis_synthesis_headerin( &mVorbisInfo, &mVorbisComment, &nextPacket ) < 0 )
@@ -69,16 +69,16 @@ bool OggVorbisDecoder::_detect( ogg_page* startPage )
       vorbis_comment_clear( &mVorbisComment );
       return false;
    }
-   
+
    return true;
 }
 
 //-----------------------------------------------------------------------------
 
 bool OggVorbisDecoder::_init()
-{   
+{
    // Read header packets.
-   
+
    bool haveVorbisHeader = true;
    for( U32 i = 0; i < 2; ++ i )
    {
@@ -88,7 +88,7 @@ bool OggVorbisDecoder::_init()
          haveVorbisHeader = false;
          break;
       }
-          
+
       int result = vorbis_synthesis_headerin( &mVorbisInfo, &mVorbisComment, &nextPacket );
       if( result != 0 )
       {
@@ -96,24 +96,24 @@ bool OggVorbisDecoder::_init()
          break;
       }
    }
-   
+
    // Fail if we don't have a complete and valid Vorbis header.
-   
+
    if( !haveVorbisHeader )
    {
       vorbis_info_clear( &mVorbisInfo );
       vorbis_comment_clear( &mVorbisComment );
-      
+
       Con::errorf( "OggVorbisDecoder::_init() - Incorrect or corrupt Vorbis headers" );
-      
+
       return false;
    }
-   
+
    // Init synthesis.
-   
+
    vorbis_synthesis_init( &mVorbisDspState, &mVorbisInfo );
    vorbis_block_init( &mVorbisDspState, &mVorbisBlock );
-   
+
    return true;
 }
 
@@ -131,16 +131,16 @@ U32 OggVorbisDecoder::read( RawData** buffer, U32 num )
    #ifdef TORQUE_DEBUG
    AssertFatal( dCompareAndSwap( mLock, 0, 1 ), "OggVorbisDecoder::read() - simultaneous reads not thread-safe" );
    #endif
-   
+
    U32 numRead = 0;
-   
+
    for( U32 i = 0; i < num; ++ i )
    {
       float** pcmData;
       U32 numSamples;
-      
+
       // Read sample data.
-      
+
       while( 1 )
       {
          numSamples = vorbis_synthesis_pcmout( &mVorbisDspState, &pcmData );
@@ -150,23 +150,23 @@ U32 OggVorbisDecoder::read( RawData** buffer, U32 num )
          {
             if( !_nextPacket() )
                return numRead; // End of stream.
-               
+
             vorbis_synthesis_blockin( &mVorbisDspState, &mVorbisBlock );
          }
       }
       vorbis_synthesis_read( &mVorbisDspState, numSamples );
-      
+
       #ifdef DEBUG_SPEW
       Platform::outputDebugString( "[OggVorbisDecoder] read %i samples", numSamples );
       #endif
-      
+
       // Allocate a packet.
-      
+
       const U32 numChannels = getNumChannels();
       RawData* packet = constructSingle< RawData* >( numSamples * 2 * numChannels ); // Two bytes per channel.
-      
+
       // Convert and copy the samples.
-      
+
       S16* samplePtr = ( S16* ) packet->data;
       for( U32 n = 0; n < numSamples; ++ n )
          for( U32 c = 0; c < numChannels; ++ c )
@@ -176,20 +176,20 @@ U32 OggVorbisDecoder::read( RawData** buffer, U32 num )
                val = 32767;
             else if( val < -34768 )
                val = -32768;
-               
+
             *samplePtr = val;
             ++ samplePtr;
-         }         
-      
+         }
+
       // Success.
-      
+
       buffer[ i ] = packet;
       numRead ++;
    }
-   
+
    #ifdef TORQUE_DEBUG
    AssertFatal( dCompareAndSwap( mLock, 1, 0 ), "" );
    #endif
-   
+
    return numRead;
 }

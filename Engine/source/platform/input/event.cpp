@@ -37,7 +37,7 @@ MODULE_BEGIN( InputEventManager )
    {
       ManagedSingleton< InputEventManager >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< InputEventManager >::deleteSingleton();
@@ -385,7 +385,7 @@ CodeMapping gVirtualMap[] =
    //-------------------------------------- XINPUT EVENTS
    // Controller connect / disconnect:
    { "connect",       SI_BUTTON, XI_CONNECT     },
-   
+
    // L & R Thumbsticks:
    { "thumblx",       SI_AXIS,   XI_THUMBLX     },
    { "thumbly",       SI_AXIS,   XI_THUMBLY     },

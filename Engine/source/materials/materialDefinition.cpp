@@ -87,7 +87,7 @@ ImplementEnumType( MaterialBlendOp,
 EndImplementEnumType;
 
 ImplementEnumType( MaterialWaveType,
-   "When using the Wave material animation, one of these Wave Types will be used to determine the type of wave to display.\n" 
+   "When using the Wave material animation, one of these Wave Types will be used to determine the type of wave to display.\n"
    "@ingroup GFX\n")
    { Material::Sin,          "Sin", "Warps the material along a curved Sin Wave." },
    { Material::Triangle,     "Triangle", "Warps the material along a sharp Triangle Wave." },
@@ -128,20 +128,20 @@ Material::Material()
       mEmissive[i] = false;
 
       mDetailScale[i].set( 2.0f, 2.0f );
-      
+
       mDetailNormalMapStrength[i] = 1.0f;
 
       mMinnaertConstant[i] = -1.0f;
       mSubSurface[i] = false;
       mSubSurfaceColor[i].set( 1.0f, 0.2f, 0.2f, 1.0f );
       mSubSurfaceRolloff[i] = 0.2f;
-      
+
       mAnimFlags[i] = 0;
 
       mScrollDir[i].set( 0.0f, 0.0f );
       mScrollSpeed[i] = 0.0f;
       mScrollOffset[i].set( 0.0f, 0.0f );
-      
+
       mRotSpeed[i] = 0.0f;
       mRotPivotOffset[i].set( 0.0f, 0.0f );
       mRotPos[i] = 0.0f;
@@ -191,7 +191,7 @@ Material::Material()
    mFootstepSoundId = -1;     mImpactSoundId = -1;
    mFootstepSoundCustom = 0;  mImpactSoundCustom = 0;
    mFriction = 0.0;
-   
+
    mDirectSoundOcclusion = 1.f;
    mReverbSoundOcclusion = 1.0;
 }
@@ -245,7 +245,7 @@ void Material::initPersistFields()
 		addField("specularStrength", TypeF32, Offset(mSpecularStrength, Material), MAX_STAGES,
          "The strength of the specular highlight when not using a specularMap." );
 
-      addField("pixelSpecular", TypeBool, Offset(mPixelSpecular, Material), MAX_STAGES, 
+      addField("pixelSpecular", TypeBool, Offset(mPixelSpecular, Material), MAX_STAGES,
          "This enables per-pixel specular highlights controlled by the alpha channel of the "
          "normal map texture.  Note that if pixel specular is enabled the DXTnm format will not "
          "work with your normal map, unless you are also using a specular map." );
@@ -258,7 +258,7 @@ void Material::initPersistFields()
       addField( "parallaxScale", TypeF32, Offset(mParallaxScale, Material), MAX_STAGES,
          "Enables parallax mapping and defines the scale factor for the parallax effect.  Typically "
          "this value is less than 0.4 else the effect breaks down." );
-      
+
       addField( "useAnisotropic", TypeBool, Offset(mUseAnisotropic, Material), MAX_STAGES,
          "Use anisotropic filtering for the textures of this stage." );
 
@@ -334,29 +334,29 @@ void Material::initPersistFields()
       addField("bumpAtlas", TypeBool, Offset(mNormalMapAtlas, Material), MAX_STAGES,
          "@internal");
 
-      // For backwards compatibility.  
+      // For backwards compatibility.
       //
       // They point at the new 'map' fields, but reads always return
       // an empty string and writes only apply if the value is not empty.
       //
-      addProtectedField("baseTex",        TypeImageFilename,   Offset(mDiffuseMapFilename, Material), 
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
-         "For backwards compatibility.\n@see diffuseMap\n" ); 
-      addProtectedField("detailTex",      TypeImageFilename,   Offset(mDetailMapFilename, Material), 
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
-         "For backwards compatibility.\n@see detailMap\n"); 
+      addProtectedField("baseTex",        TypeImageFilename,   Offset(mDiffuseMapFilename, Material),
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
+         "For backwards compatibility.\n@see diffuseMap\n" );
+      addProtectedField("detailTex",      TypeImageFilename,   Offset(mDetailMapFilename, Material),
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
+         "For backwards compatibility.\n@see detailMap\n");
       addProtectedField("overlayTex",     TypeImageFilename,   Offset(mOverlayMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
-         "For backwards compatibility.\n@see overlayMap\n"); 
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
+         "For backwards compatibility.\n@see overlayMap\n");
       addProtectedField("bumpTex",        TypeImageFilename,   Offset(mNormalMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
-         "For backwards compatibility.\n@see normalMap\n"); 
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
+         "For backwards compatibility.\n@see normalMap\n");
       addProtectedField("envTex",         TypeImageFilename,   Offset(mEnvMapFilename, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
-         "For backwards compatibility.\n@see envMap\n"); 
+         "For backwards compatibility.\n@see envMap\n");
       addProtectedField("colorMultiply",  TypeColorF,          Offset(mDiffuse, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
-         "For backwards compatibility.\n@see diffuseColor\n"); 
+         "For backwards compatibility.\n@see diffuseColor\n");
 
    endArray( "Stages" );
 
@@ -391,16 +391,16 @@ void Material::initPersistFields()
       addField( "showFootprints", TypeBool, Offset( mShowFootprints, Material ),
          "Whether to show player footprint decals on this material.\n\n"
          "@see PlayerData::decalData" );
-         
+
       addField( "showDust", TypeBool, Offset( mShowDust, Material ),
          "Whether to emit dust particles from a shape moving over the material.  This is, for example, used by "
          "vehicles or players to decide whether to show dust trails." );
-         
+
       addField( "effectColor", TypeColorF, Offset( mEffectColor, Material ), NUM_EFFECT_COLOR_STAGES,
          "If #showDust is true, this is the set of colors to use for the ParticleData of the dust "
          "emitter.\n\n"
          "@see ParticleData::colors" );
-         
+
       addField( "footstepSoundId", TypeS32, Offset( mFootstepSoundId, Material ),
          "What sound to play from the PlayerData sound list when the player walks over the material.  -1 (default) to not play any sound.\n"
          "\n"
@@ -423,7 +423,7 @@ void Material::initPersistFields()
          "- 15: PlayerData::impactWaterMedium\n"
          "- 16: PlayerData::impactWaterHard\n"
          "- 17: PlayerData::exitingWater\n" );
-         
+
       addField( "customFootstepSound", TypeSFXTrackName, Offset( mFootstepSoundCustom, Material ),
          "The sound to play when the player walks over the material.  If this is set, it overrides #footstepSoundId.  This field is "
          "useful for directly assigning custom footstep sounds to materials without having to rely on the PlayerData sound assignment.\n\n"
@@ -437,9 +437,9 @@ void Material::initPersistFields()
          "If this is set, it overrides #impactSoundId.  This field is useful for directly assigning custom impact sounds to materials "
          "without having to rely on the PlayerData sound assignment.\n\n"
          "@warn Be aware that materials are client-side objects.  This means that the SFXTracks assigned to materials must be client-side, too." );
-      
+
       //Deactivate these for the moment as they are not used.
-      
+
       #if 0
       addField( "friction", TypeF32, Offset( mFriction, Material ) );
       addField( "directSoundOcclusion", TypeF32, Offset( mDirectSoundOcclusion, Material ) );
@@ -452,12 +452,12 @@ void Material::initPersistFields()
 }
 
 bool Material::writeField( StringTableEntry fieldname, const char *value )
-{   
+{
    // Never allow the old field names to be written.
    if (  fieldname == StringTable->insert("baseTex") ||
          fieldname == StringTable->insert("detailTex") ||
          fieldname == StringTable->insert("overlayTex") ||
-         fieldname == StringTable->insert("bumpTex") || 
+         fieldname == StringTable->insert("bumpTex") ||
          fieldname == StringTable->insert("envTex") ||
          fieldname == StringTable->insert("colorMultiply") )
       return false;
@@ -504,7 +504,7 @@ void Material::inspectPostApply()
 {
    Parent::inspectPostApply();
 
-   // Reload the material instances which 
+   // Reload the material instances which
    // use this material.
    if ( isProperlyAdded() )
       reload();
@@ -594,19 +594,19 @@ void Material::StageData::getFeatureSet( FeatureSet *outFeatures ) const
    }
 }
 
-ConsoleMethod( Material, flush, void, 2, 2, 
+ConsoleMethod( Material, flush, void, 2, 2,
    "Flushes all material instances that use this material." )
 {
    object->flush();
 }
 
-ConsoleMethod( Material, reload, void, 2, 2, 
+ConsoleMethod( Material, reload, void, 2, 2,
    "Reloads all material instances that use this material." )
 {
    object->reload();
 }
 
-ConsoleMethod( Material, dumpInstances, void, 2, 2, 
+ConsoleMethod( Material, dumpInstances, void, 2, 2,
    "Dumps a formatted list of the currently allocated material instances for this material to the console." )
 {
    MATMGR->dumpMaterialInstances( object );
@@ -659,13 +659,13 @@ ConsoleMethod(Material, getFilename, const char*, 2, 2, "Get filename of materia
    return material->getFilename();
 }
 
-ConsoleMethod( Material, isAutoGenerated, bool, 2, 2, 
+ConsoleMethod( Material, isAutoGenerated, bool, 2, 2,
               "Returns true if this Material was automatically generated by MaterialList::mapMaterials()" )
 {
    return object->isAutoGenerated();
 }
 
-ConsoleMethod( Material, setAutoGenerated, void, 3, 3, 
+ConsoleMethod( Material, setAutoGenerated, void, 3, 3,
               "setAutoGenerated(bool isAutoGenerated): Set whether or not the Material is autogenerated." )
 {
    object->setAutoGenerated(dAtob(argv[2]));

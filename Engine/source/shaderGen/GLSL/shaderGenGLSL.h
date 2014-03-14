@@ -45,7 +45,7 @@ class ShaderGenComponentFactoryGLSL : public ShaderGenComponentFactory
 {
 public:
 
-   /// Helper function for converting a vertex decl 
+   /// Helper function for converting a vertex decl
    /// type to an GLSL type string.
    static const char* typeToString( GFXDeclType type );
 

@@ -37,7 +37,7 @@ void DecalInstance::getWorldMatrix( MatrixF *outMat, bool flip )
 }
 
 F32 DecalInstance::calcPixelSize( U32 viewportHeight, const Point3F &cameraPos, F32 worldToScreenScaleY ) const
-{  
+{
    // If fadeStartPixelSize is set less than zero this is interpreted to mean
    // pixelSize based fading is disabled and the decal always renders.
    // Returning a value of F32_MAX should be treated by the caller as
@@ -52,7 +52,7 @@ F32 DecalInstance::calcPixelSize( U32 viewportHeight, const Point3F &cameraPos, 
    // the pixelScale ( see TSShapeInstance::setDetailFromDistance ).
    const F32 radius = mSize * 0.5f;
 
-   // Approximate distance to the decal.    
+   // Approximate distance to the decal.
    const F32 distance = ( cameraPos - mPosition ).len() - radius;
 
    // We are inside the decal's volume. There is no useful pixelSize for us

@@ -49,7 +49,7 @@ class RenderShapeExample : public SceneObject
    // client-side "ghost". We also need to implement a
    // maks for handling editor updates to our properties
    // (like material).
-   enum MaskBits 
+   enum MaskBits
    {
       TransformMask = Parent::NextFreeMask << 0,
       UpdateMask    = Parent::NextFreeMask << 1,

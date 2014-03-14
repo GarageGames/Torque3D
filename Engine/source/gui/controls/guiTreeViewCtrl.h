@@ -70,7 +70,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
                                         ///  Torque, which might have thousands of objects).
 
                RebuildVisited    = BIT( 9 ), ///< Rebuild traversal for virtual parents has visited and validated this item.
-               
+
                ShowObjectId      = BIT( 10 ),
                ShowClassName     = BIT( 11 ),
                ShowObjectName    = BIT( 12 ),
@@ -90,7 +90,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
             String mTooltip;
             S32 mIcon; //stores the icon that will represent the item in the tree
             S32 mDataRenderWidth; /// this stores the pixel width needed
-                                  /// to render the item's data in the 
+                                  /// to render the item's data in the
                                   /// onRenderCell function to optimize
                                   /// for speed.
 
@@ -173,7 +173,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
             /// and make the item interact with the mouse as if
             /// it were a parent.
             bool isParent() const;
-            
+
             /// Return true if text label for inspector item should include internal name only.
             bool showInternalNameOnly() const { return mState.test( ShowInternalName ) && !mState.test( ShowObjectName | ShowClassName | ShowObjectId ); }
 
@@ -184,7 +184,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
 
             /// @name Searching Methods
             /// @{
-            
+
             /// Find a regular data item by it's script name.
             Item* findChildByName( const char* name );
 
@@ -195,7 +195,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
             Item* findChildByValue(StringTableEntry Value);
 
             /// @}
-            
+
             /// Sort the childs of the item by their text.
             ///
             /// @param caseSensitive If true, sorting is case-sensitive.
@@ -236,10 +236,10 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
          SimGroup1,
          SimGroup2,
          SimGroup3,
-         SimGroup4,         
-         Hidden,         
+         SimGroup4,
+         Hidden,
          Lock1,
-         Lock2,         
+         Lock2,
          Default,
          Icon31,
          Icon32
@@ -258,7 +258,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
          OnIndent       = BIT(0),
          OnImage        = BIT(1),
          OnIcon         = BIT(2),
-         OnText         = BIT(3),         
+         OnText         = BIT(3),
          OnRow          = BIT(4),
       };
 
@@ -332,7 +332,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       S32 mMaxWidth;
       S32 mSelectedItem;
       S32 mDraggedToItem;
-      S32 mStart;      
+      S32 mStart;
 
       /// A combination of TreeState flags.
       BitSet32 mFlags;
@@ -362,19 +362,19 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       bool mDragToItemAllowed;
       bool mClearAllOnSingleSelection;   ///< When clicking on an already selected item, clear all other selections
       bool mCompareToObjectID;
-      
+
       /// Used to hide the root tree element, defaults to true.
       bool mShowRoot;
-      
+
       /// If true, object IDs will be included in inspector tree item labels.
       bool mShowObjectIds;
-      
+
       /// If true, class names will be included in inspector tree item labels.
       bool mShowClassNames;
-      
+
       /// If true, object names will be included in inspector tree item labels.
       bool mShowObjectNames;
-      
+
       /// If true, internal names will be included in inspector tree item labels.
       bool mShowInternalNames;
 
@@ -392,11 +392,11 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       /// If true clicking on a selected item ( that is an object )
       /// will allow you to rename it.
       bool mCanRenameObjects;
-      
+
       /// If true then object renaming operates on the internalName rather than
       /// the object name.
       bool mRenameInternal;
-      
+
       S32 mCurrentDragCell;
       S32 mPreviousDragCell;
       S32 mDragMidPoint;
@@ -438,9 +438,9 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       virtual void onClearSelection() {};
 
       Item* addInspectorDataItem(Item *parent, SimObject *obj);
-      
+
       virtual bool isValidDragTarget( Item* item );
-      
+
       bool _isRootLevelItem( Item* item ) const
       {
          return ( item == mRoot && mShowRoot ) || ( item->mParent == mRoot && !mShowRoot );
@@ -474,7 +474,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       {
          if ( !item )
             return false;
-         return mSelectedItems.contains( item );   
+         return mSelectedItems.contains( item );
       }
 
       void setDebug( bool value ) { mDebug = value; }
@@ -499,7 +499,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       bool editItem( S32 itemId, const char* newText, const char* newValue );
 
       bool markItem( S32 itemId, bool mark );
-      
+
       bool isItemSelected( S32 itemId );
 
       // insertion/removal
@@ -531,7 +531,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       bool scrollVisible( Item *item );
       bool scrollVisible( S32 itemId );
       bool scrollVisibleByObjectId( S32 objID );
-      
+
       void deleteSelection();
       void clearSelection();
 
@@ -586,7 +586,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       // GuiArrayCtrl
       void onRenderCell(Point2I offset, Point2I cell, bool, bool);
       void onRender(Point2I offset, const RectI &updateRect);
-      
+
       bool renderTooltip( const Point2I &hoverPos, const Point2I& cursorPos, const char* tipText );
 
       static void initPersistFields();

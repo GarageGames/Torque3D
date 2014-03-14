@@ -10,7 +10,7 @@
    setFirstResponder = "False";
    modal = "True";
    helpTag = "0";
-   
+
    new GuiButtonCtrl() {
       profile = "ToolsGuiButtonProfile";
       horizSizing = "right";
@@ -157,7 +157,7 @@
       borderWidth = "4";
       borderEnable = "dynamic";
       borderMovable = "dynamic";
-   
+
       new GuiFrameSetCtrl(DebuggerLeftFrame) {
          profile = "GuiContentProfile";
          horizSizing = "width";
@@ -174,7 +174,7 @@
          borderWidth = "4";
          borderEnable = "dynamic";
          borderMovable = "dynamic";
-   
+
          new GuiControl() {
             profile = "ToolsGuiDefaultProfile";
             horizSizing = "width";
@@ -186,7 +186,7 @@
             setFirstResponder = "True";
             modal = "True";
             helpTag = "0";
-   
+
             new GuiTextCtrl() {
                profile = "ToolsGuiTextProfile";
                horizSizing = "right";
@@ -230,7 +230,7 @@
                lockHorizScroll = "false";
                lockVertScroll = "false";
                constantThumbHeight = "False";
-   
+
                new DbgFileView(DebuggerFileView) {
                   profile = "ToolsGuiTextArrayProfile";
                   horizSizing = "right";
@@ -256,7 +256,7 @@
             setFirstResponder = "False";
             modal = "True";
             helpTag = "0";
-   
+
             new GuiButtonCtrl() {
                profile = "ToolsGuiButtonProfile";
                horizSizing = "right";
@@ -344,7 +344,7 @@
                lockHorizScroll = "false";
                lockVertScroll = "false";
                constantThumbHeight = "False";
-   
+
                new GuiTextListCtrl(DebuggerWatchView) {
                   profile = "ToolsGuiTextListProfile";
                   horizSizing = "right";
@@ -379,7 +379,7 @@
          borderWidth = "4";
          borderEnable = "dynamic";
          borderMovable = "dynamic";
-   
+
          new GuiScrollCtrl() {
             profile = "ToolsGuiScrollProfile";
             horizSizing = "width";
@@ -397,7 +397,7 @@
             lockHorizScroll = "false";
             lockVertScroll = "false";
             constantThumbHeight = "False";
-   
+
             new GuiTextListCtrl(DebuggerCallStack) {
                profile = "ToolsGuiTextListProfile";
                horizSizing = "right";
@@ -425,7 +425,7 @@
             setFirstResponder = "False";
             modal = "True";
             helpTag = "0";
-   
+
             new GuiButtonCtrl() {
                profile = "ToolsGuiButtonProfile";
                horizSizing = "right";
@@ -485,7 +485,7 @@
                lockHorizScroll = "false";
                lockVertScroll = "false";
                constantThumbHeight = "False";
-   
+
                new GuiTextListCtrl(DebuggerBreakPoints) {
                   profile = "ToolsGuiTextListProfile";
                   horizSizing = "right";
@@ -514,7 +514,7 @@
             setFirstResponder = "False";
             modal = "True";
             helpTag = "0";
-   
+
             new GuiScrollCtrl() {
                profile = "ToolsGuiScrollProfile";
                horizSizing = "width";
@@ -532,7 +532,7 @@
                lockHorizScroll = "false";
                lockVertScroll = "false";
                constantThumbHeight = "False";
-   
+
                new GuiTextListCtrl(DebuggerConsoleView) {
                   profile = "ToolsGuiTextListProfile";
                   horizSizing = "right";

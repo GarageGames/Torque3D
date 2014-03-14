@@ -99,7 +99,7 @@ class SFXXAudioVoice :  public SFXVoice,
       /// @}
 
       // IXAudio2VoiceCallback
-      void STDMETHODCALLTYPE OnStreamEnd();      
+      void STDMETHODCALLTYPE OnStreamEnd();
       void STDMETHODCALLTYPE OnVoiceProcessingPassStart( UINT32 BytesRequired ) {}
       void STDMETHODCALLTYPE OnVoiceProcessingPassEnd() {}
       void STDMETHODCALLTYPE OnBufferEnd( void *bufferContext );
@@ -109,7 +109,7 @@ class SFXXAudioVoice :  public SFXVoice,
 
       /// @deprecated This is only here for compatibility with
       /// the March 2008 SDK version of IXAudio2VoiceCallback.
-      void STDMETHODCALLTYPE OnVoiceProcessingPassStart() {} 
+      void STDMETHODCALLTYPE OnVoiceProcessingPassStart() {}
 
       void _flush();
       void _loadNonStreamed();

@@ -28,9 +28,9 @@
 
 
 void GFXVertexBufferHandleBase::set(   GFXDevice *theDevice,
-                                       U32 numVerts, 
+                                       U32 numVerts,
                                        const GFXVertexFormat *vertexFormat,
-                                       U32 vertexSize, 
+                                       U32 vertexSize,
                                        GFXBufferType type )
 {
    StrongRefPtr<GFXVertexBuffer>::operator=( theDevice->allocVertexBuffer( numVerts, vertexFormat, vertexSize, type ) );
@@ -56,5 +56,5 @@ const String GFXVertexBuffer::describeSelf() const
       break;
    }
 
-   return String::ToString("numVerts: %i vertSize: %i bufferType: %s", mNumVerts, mVertexSize, bufType);   
+   return String::ToString("numVerts: %i vertSize: %i bufferType: %s", mNumVerts, mVertexSize, bufType);
 }

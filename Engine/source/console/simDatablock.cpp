@@ -37,9 +37,9 @@ S32 SimDataBlock::sNextModifiedKey = 0;
 ConsoleDocClass( SimDataBlock,
    "@brief \n"
    "@ingroup \n"
-   
+
    "@section Datablock_Networking Datablocks and Networking\n"
-   
+
    "@section Datablock_ClientSide Client-Side Datablocks\n"
 );
 
@@ -71,7 +71,7 @@ bool SimDataBlock::onAdd()
    if ( !isClientOnly() )
       if (SimGroup* grp = Sim::getDataBlockGroup())
          grp->addObject(this);
-         
+
    Sim::getDataBlockSet()->addObject( this );
 
    return true;

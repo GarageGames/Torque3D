@@ -67,15 +67,15 @@ Vector<LightShadowMap*> LightShadowMap::smShadowMaps;
 
 GFX_ImplementTextureProfile( ShadowMapProfile,
                               GFXTextureProfile::DiffuseMap,
-                              GFXTextureProfile::PreserveSize | 
+                              GFXTextureProfile::PreserveSize |
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
                               GFXTextureProfile::None );
 
 GFX_ImplementTextureProfile( ShadowMapZProfile,
-                             GFXTextureProfile::DiffuseMap, 
-                             GFXTextureProfile::PreserveSize | 
-                             GFXTextureProfile::NoMipmap | 
+                             GFXTextureProfile::DiffuseMap,
+                             GFXTextureProfile::PreserveSize |
+                             GFXTextureProfile::NoMipmap |
                              GFXTextureProfile::ZTarget |
                              GFXTextureProfile::Pooled,
                              GFXTextureProfile::None );
@@ -105,8 +105,8 @@ LightShadowMap::LightShadowMap( LightInfo *light )
 LightShadowMap::~LightShadowMap()
 {
    mTarget = NULL;
-   SAFE_DELETE( mVizQuery );   
-   
+   SAFE_DELETE( mVizQuery );
+
    releaseTextures();
 
    smShadowMaps.remove( this );
@@ -140,7 +140,7 @@ U32 LightShadowMap::releaseUnusedTextures()
       {
          // Internally this will remove the map from the used
          // list, so don't increment the loop.
-         lsm->releaseTextures();         
+         lsm->releaseTextures();
          continue;
       }
 
@@ -169,8 +169,8 @@ void LightShadowMap::calcLightMatrices( MatrixF &outLightMatrix, const Frustum &
       {
          const ShadowMapParams *p = mLight->getExtended<ShadowMapParams>();
 
-         // Calculate the bonding box of the shadowed area 
-         // we're interested in... this is the shadow box 
+         // Calculate the bonding box of the shadowed area
+         // we're interested in... this is the shadow box
          // transformed by the frustum transform.
          Box3F viewBB( -p->shadowDistance, -p->shadowDistance, -p->shadowDistance,
                         p->shadowDistance, p->shadowDistance, p->shadowDistance );
@@ -206,7 +206,7 @@ void LightShadowMap::calcLightMatrices( MatrixF &outLightMatrix, const Frustum &
 
 
          // TODO: Width * 2... really isn't that pixels being used as
-         // meters?  Is a real physical metric of scene depth better?         
+         // meters?  Is a real physical metric of scene depth better?
          //SceneManager::setVisibleDistance(width * 2.0f);
 
 #if 0
@@ -260,7 +260,7 @@ GFXTextureObject* LightShadowMap::_getDepthTarget( U32 width, U32 height )
 {
    // Get a depth texture target from the pooled profile
    // which is returned as a temporary.
-   GFXTexHandle depthTex( width, height, GFXFormatD24S8, &ShadowMapZProfile, 
+   GFXTexHandle depthTex( width, height, GFXFormatD24S8, &ShadowMapZProfile,
       "LightShadowMap::_getDepthTarget()" );
 
    return depthTex;
@@ -347,8 +347,8 @@ BaseMatInstance* LightShadowMap::getShadowMaterial( BaseMatInstance *inMat ) con
 U32 LightShadowMap::getBestTexSize( U32 scale ) const
 {
    const ShadowMapParams *params = mLight->getExtended<ShadowMapParams>();
-   
-   // The view dependent shadows don't scale by screen size. 
+
+   // The view dependent shadows don't scale by screen size.
    U32 texSize;
    if ( isViewDependent() )
       texSize = params->texSize;
@@ -415,14 +415,14 @@ void LightShadowMap::updatePriority( const SceneRenderState *state, U32 currTime
    mLastScreenSize /= state->getViewport().extent.y;
 
    // Update the priority.
-   mLastPriority = mPow( mLastScreenSize * 50.0f, 2.0f );   
+   mLastPriority = mPow( mLastScreenSize * 50.0f, 2.0f );
    mLastPriority += timeSinceLastUpdate;
    mLastPriority *= mLight->getPriority();
 }
 
 S32 QSORT_CALLBACK LightShadowMap::cmpPriority( LightShadowMap *const *lsm1, LightShadowMap *const *lsm2 )
 {
-   F32 diff = (*lsm1)->getLastPriority() - (*lsm2)->getLastPriority(); 
+   F32 diff = (*lsm1)->getLastPriority() - (*lsm2)->getLastPriority();
    return diff > 0.0f ? -1 : ( diff < 0.0f ? 1 : 0 );
 }
 
@@ -445,35 +445,35 @@ void LightShadowMap::_debugRender( SceneRenderState* shadowRenderState )
 }
 
 
-LightingShaderConstants::LightingShaderConstants() 
+LightingShaderConstants::LightingShaderConstants()
    :  mInit( false ),
       mShader( NULL ),
-      mLightParamsSC(NULL), 
-      mLightSpotParamsSC(NULL), 
+      mLightParamsSC(NULL),
+      mLightSpotParamsSC(NULL),
       mLightPositionSC(NULL),
-      mLightDiffuseSC(NULL), 
-      mLightAmbientSC(NULL), 
+      mLightDiffuseSC(NULL),
+      mLightAmbientSC(NULL),
       mLightInvRadiusSqSC(NULL),
       mLightSpotDirSC(NULL),
       mLightSpotAngleSC(NULL),
 	  mLightSpotFalloffSC(NULL),
-      mShadowMapSC(NULL), 
-      mShadowMapSizeSC(NULL), 
+      mShadowMapSC(NULL),
+      mShadowMapSizeSC(NULL),
       mCookieMapSC(NULL),
       mRandomDirsConst(NULL),
-      mShadowSoftnessConst(NULL), 
-      mWorldToLightProjSC(NULL), 
+      mShadowSoftnessConst(NULL),
+      mWorldToLightProjSC(NULL),
       mViewToLightProjSC(NULL),
-      mScaleXSC(NULL), 
+      mScaleXSC(NULL),
       mScaleYSC(NULL),
-      mOffsetXSC(NULL), 
-      mOffsetYSC(NULL), 
-      mAtlasXOffsetSC(NULL), 
+      mOffsetXSC(NULL),
+      mOffsetYSC(NULL),
+      mAtlasXOffsetSC(NULL),
       mAtlasYOffsetSC(NULL),
-      mAtlasScaleSC(NULL), 
-      mFadeStartLength(NULL), 
+      mAtlasScaleSC(NULL),
+      mFadeStartLength(NULL),
       mFarPlaneScalePSSM(NULL),
-      mOverDarkFactorPSSM(NULL), 
+      mOverDarkFactorPSSM(NULL),
       mTapRotationTexSC(NULL)
 {
 }
@@ -501,7 +501,7 @@ void LightingShaderConstants::init(GFXShader* shader)
    mLightParamsSC = shader->getShaderConstHandle("$lightParams");
    mLightSpotParamsSC = shader->getShaderConstHandle("$lightSpotParams");
 
-   // NOTE: These are the shader constants used for doing lighting 
+   // NOTE: These are the shader constants used for doing lighting
    // during the forward pass.  Do not confuse these for the prepass
    // lighting constants which are used from AdvancedLightBinManager.
    mLightPositionSC = shader->getShaderConstHandle( ShaderGenVars::lightPosition );
@@ -556,7 +556,7 @@ MODULE_END;
 
 LightInfoExType ShadowMapParams::Type( "" );
 
-ShadowMapParams::ShadowMapParams( LightInfo *light ) 
+ShadowMapParams::ShadowMapParams( LightInfo *light )
    :  mLight( light ),
       mShadowMap( NULL )
 {
@@ -594,7 +594,7 @@ void ShadowMapParams::_validate()
          if ( shadowType < ShadowType_Paraboloid )
             shadowType = ShadowType_DualParaboloidSinglePass;
          break;
-      
+
       default:
          break;
    }
@@ -603,12 +603,12 @@ void ShadowMapParams::_validate()
    // be power of 2 in size.
    texSize = getNextPow2( texSize );
 
-   // The maximum shadow texture size setting we're 
-   // gonna allow... this doesn't use your hardware 
-   // settings as you may be on a lower end system 
+   // The maximum shadow texture size setting we're
+   // gonna allow... this doesn't use your hardware
+   // settings as you may be on a lower end system
    // than your target machine.
    //
-   // We apply the hardware specific limits during 
+   // We apply the hardware specific limits during
    // shadow rendering.
    //
    U32 maxTexSize = 4096;
@@ -616,8 +616,8 @@ void ShadowMapParams::_validate()
    if ( mLight->getType() == LightInfo::Vector )
    {
       numSplits = mClamp( numSplits, 1, 4 );
-      
-      // Adjust the shadow texture size for the PSSM 
+
+      // Adjust the shadow texture size for the PSSM
       // based on the split count to keep the total
       // shadow texture size within 4096.
       if ( numSplits == 2 || numSplits == 4 )
@@ -659,7 +659,7 @@ LightShadowMap* ShadowMapParams::getOrCreateShadowMap()
          else
             mShadowMap = new DualParaboloidLightShadowMap( mLight );
          break;
-   
+
       default:
          break;
    }
@@ -670,11 +670,11 @@ LightShadowMap* ShadowMapParams::getOrCreateShadowMap()
 GFXTextureObject* ShadowMapParams::getCookieTex()
 {
    if (  cookie.isNotEmpty() &&
-         (  mCookieTex.isNull() || 
+         (  mCookieTex.isNull() ||
             cookie != mCookieTex->getPath() ) )
    {
-      mCookieTex.set(   cookie, 
-                        &GFXDefaultStaticDiffuseProfile, 
+      mCookieTex.set(   cookie,
+                        &GFXDefaultStaticDiffuseProfile,
                         "ShadowMapParams::getCookieTex()" );
    }
    else if ( cookie.isEmpty() )
@@ -686,7 +686,7 @@ GFXTextureObject* ShadowMapParams::getCookieTex()
 GFXCubemap* ShadowMapParams::getCookieCubeTex()
 {
    if (  cookie.isNotEmpty() &&
-         (  mCookieCubeTex.isNull() || 
+         (  mCookieCubeTex.isNull() ||
             cookie != mCookieCubeTex->getPath() ) )
    {
       mCookieCubeTex.set( cookie );
@@ -704,15 +704,15 @@ void ShadowMapParams::set( const LightInfoEx *ex )
 
 void ShadowMapParams::packUpdate( BitStream *stream ) const
 {
-   // HACK: We need to work out proper parameter 
+   // HACK: We need to work out proper parameter
    // validation when any field changes on the light.
 
    ((ShadowMapParams*)this)->_validate();
 
    stream->writeInt( shadowType, 8 );
-   
+
    mathWrite( *stream, attenuationRatio );
-   
+
    stream->write( texSize );
 
    stream->write( cookie );
@@ -727,7 +727,7 @@ void ShadowMapParams::packUpdate( BitStream *stream ) const
 
    stream->write( shadowDistance );
 
-   stream->write( shadowSoftness );   
+   stream->write( shadowSoftness );
 }
 
 void ShadowMapParams::unpackUpdate( BitStream *stream )
@@ -754,7 +754,7 @@ void ShadowMapParams::unpackUpdate( BitStream *stream )
    stream->read( &fadeStartDist );
    lastSplitTerrainOnly = stream->readFlag();
 
-   stream->read( &shadowDistance );   
+   stream->read( &shadowDistance );
 
    stream->read( &shadowSoftness );
 }

@@ -38,7 +38,7 @@ public:
 
    DECLARE_CONOBJECT(GuiDecoyCtrl);
    DECLARE_CATEGORY( "Gui Other" );
-   
+
    static void initPersistFields();
 
    bool	mMouseOver;

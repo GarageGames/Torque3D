@@ -125,7 +125,7 @@ bool Transform3D::isChildOf(Transform3D * parent, bool recursive) const
 
 Point3F Transform3DInPlace::getPosition() const
 {
-   return _position; 
+   return _position;
 }
 
 void Transform3DInPlace::setPosition(const Point3F & position)
@@ -137,8 +137,8 @@ void Transform3DInPlace::setPosition(const Point3F & position)
 }
 
 QuatF Transform3DInPlace::getRotation() const
-{ 
-   return _rotation; 
+{
+   return _rotation;
 }
 
 void Transform3DInPlace::setRotation(const QuatF & rotation)
@@ -150,7 +150,7 @@ void Transform3DInPlace::setRotation(const QuatF & rotation)
 }
 
 Point3F Transform3DInPlace::getScale() const
-{ 
+{
    return _scale;
 }
 

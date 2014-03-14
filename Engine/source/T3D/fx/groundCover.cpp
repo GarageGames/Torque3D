@@ -72,8 +72,8 @@ GroundCoverShaderConstHandles::GroundCoverShaderConstHandles()
 }
 
 void GroundCoverShaderConstHandles::init( GFXShader *shader )
-{   
-   mTypeRectsSC = shader->getShaderConstHandle( "$gc_typeRects" );      
+{
+   mTypeRectsSC = shader->getShaderConstHandle( "$gc_typeRects" );
    mFadeSC = shader->getShaderConstHandle( "$gc_fadeParams" );
    mWindDirSC = shader->getShaderConstHandle( "$gc_windDir" );
    mGustInfoSC = shader->getShaderConstHandle( "$gc_gustInfo" );
@@ -83,16 +83,16 @@ void GroundCoverShaderConstHandles::init( GFXShader *shader )
 }
 
 void GroundCoverShaderConstHandles::setConsts( SceneRenderState *state, const SceneData &sgData, GFXShaderConstBuffer *buffer )
-{         
-   AlignedArray<Point4F> rectData( MAX_COVERTYPES, sizeof( Point4F ), (U8*)(mGroundCover->mBillboardRects), false );          
+{
+   AlignedArray<Point4F> rectData( MAX_COVERTYPES, sizeof( Point4F ), (U8*)(mGroundCover->mBillboardRects), false );
    buffer->setSafe( mTypeRectsSC, rectData );
-   
+
    const GroundCoverShaderConstData &data = mGroundCover->getShaderConstData();
-      
-   buffer->setSafe( mFadeSC, data.fadeInfo );   
+
+   buffer->setSafe( mFadeSC, data.fadeInfo );
    buffer->setSafe( mWindDirSC, mGroundCover->mWindDirection );
    buffer->setSafe( mGustInfoSC, data.gustInfo );
-   buffer->setSafe( mTurbInfoSC, data.turbInfo );    
+   buffer->setSafe( mTurbInfoSC, data.turbInfo );
    buffer->setSafe( mCamRightSC, data.camRight );
    buffer->setSafe( mCamUpSC, data.camUp );
 }
@@ -135,7 +135,7 @@ protected:
    typedef GFXVertexBufferHandle<GCVertex> VBHandle;
    typedef Vector< VBHandle > VBHandleVector;
 
-   /// The vertex buffers that hold all the 
+   /// The vertex buffers that hold all the
    /// prepared billboards for this cell.
    VBHandleVector mVBs;
 
@@ -150,13 +150,13 @@ public:
 
    GroundCoverCell() {}
 
-   ~GroundCoverCell() 
+   ~GroundCoverCell()
    {
       mVBs.clear();
    }
 
    const Point2I& shiftIndex( const Point2I& shift ) { return mIndex += shift; }
-   
+
    /// The worldspace bounding box this cell.
    const Box3F& getBounds() const { return mBounds; }
 
@@ -169,11 +169,11 @@ public:
    VectorF getSize() const { return VectorF( mBounds.len_x() / 2.0f,
                                              mBounds.len_y() / 2.0f,
                                              mBounds.len_z() / 2.0f ); }
-      
+
    void renderBillboards( SceneRenderState *state, BaseMatInstance *mat, GFXPrimitiveBufferHandle *pb );
 
-   U32 renderShapes(    const TSRenderState &rdata, 
-                        Frustum *culler, 
+   U32 renderShapes(    const TSRenderState &rdata,
+                        Frustum *culler,
                         TSShapeInstance** shapes );
 };
 
@@ -198,7 +198,7 @@ void GroundCoverCell::_rebuildVB()
    // Init the vertex buffer list to the right size.  Any
    // VBs already in there will remain unless we're truncating
    // the list... those are freed.
-   mVBs.setSize( batches ); 
+   mVBs.setSize( batches );
 
    // Get the iter to the first billboard.
    Vector<Placement>::const_iterator iter = mBillboards.begin();
@@ -228,7 +228,7 @@ void GroundCoverCell::_rebuildVB()
 
       // Fill this puppy!
       GCVertex* vertPtr = vb.lock( 0, verts );
-      
+
       GFXVertexColor color;
 
       Vector<Placement>::const_iterator last = iter + bb;
@@ -288,7 +288,7 @@ void GroundCoverCell::_rebuildVB()
 }
 
 U32 GroundCoverCell::renderShapes(  const TSRenderState &rdata,
-                                    Frustum *culler, 
+                                    Frustum *culler,
                                     TSShapeInstance** shapes )
 {
    MatrixF worldMat;
@@ -318,7 +318,7 @@ U32 GroundCoverCell::renderShapes(  const TSRenderState &rdata,
 
       worldMat.set( EulerF(0, 0, inst.rotation), inst.point );
 
-      // TSShapeInstance::render() uses the 
+      // TSShapeInstance::render() uses the
       // world matrix for the RenderInst.
       worldMat.scale( inst.size );
       GFX->setWorldMatrix( worldMat );
@@ -327,7 +327,7 @@ U32 GroundCoverCell::renderShapes(  const TSRenderState &rdata,
       // be tuned to lod out quickly for ground cover.
       //
       // Note: The profile doesn't indicate that lod selection is
-      // very expensive... in fact its less than 1/10th of the cost 
+      // very expensive... in fact its less than 1/10th of the cost
       // of the render() call below.
       PROFILE_START(GroundCover_RenderShapes_SelectDetail);
 
@@ -335,8 +335,8 @@ U32 GroundCoverCell::renderShapes(  const TSRenderState &rdata,
          shape->setDetailFromDistance( state, dist * invScale );
 
       PROFILE_END(); // GroundCover_RenderShapes_SelectDetail
-  
-      // Note: This is the most expensive call of this loop.  We 
+
+      // Note: This is the most expensive call of this loop.  We
       // need to rework the render call completely to optimize it.
       PROFILE_START(GroundCover_RenderShapes_Render);
 
@@ -368,7 +368,7 @@ void GroundCoverCell::renderBillboards( SceneRenderState *state, BaseMatInstance
    // then change shader consts.
 
    RenderPassManager *pass = state->getRenderPass();
-      
+
    // Draw each batch.
    U32 remaining = mBillboards.size();
    const U32 batches = mVBs.size();
@@ -529,7 +529,7 @@ IMPLEMENT_CO_NETOBJECT_V1(GroundCover);
 void GroundCover::initPersistFields()
 {
    addGroup( "GroundCover General" );
-      
+
       addField( "material",      TypeMaterialName, Offset( mMaterialName, GroundCover ),        "Material used by all GroundCover segments." );
 
       addField( "radius",        TypeF32,          Offset( mRadius, GroundCover ),              "Outer generation radius from the current camera position." );
@@ -543,7 +543,7 @@ void GroundCover::initPersistFields()
       addField( "maxElements",   TypeS32,          Offset( mMaxPlacement, GroundCover ),        "The maximum amount of cover elements to include in the grid at any one time." );
 
       addField( "maxBillboardTiltAngle", TypeF32,  Offset( mMaxBillboardTiltAngle, GroundCover ),"The maximum amout of degrees the billboard will tilt down to match the camera." );
-      addField( "shapeCullRadius", TypeF32,        Offset( mShapeCullRadius, GroundCover ),     "This is the distance at which DTS elements are  completely culled out." );      
+      addField( "shapeCullRadius", TypeF32,        Offset( mShapeCullRadius, GroundCover ),     "This is the distance at which DTS elements are  completely culled out." );
       addField( "shapesCastShadows", TypeBool,     Offset( mShapesCastShadows, GroundCover ),   "Whether DTS elements should cast shadows or not." );
 
       addArray( "Types", MAX_COVERTYPES );
@@ -573,7 +573,7 @@ void GroundCover::initPersistFields()
          addField( "maxElevation",  TypeF32,       Offset( mMaxElevation, GroundCover ), MAX_COVERTYPES,    "The maximum world space elevation for placement." );
 
          addField( "minClumpCount", TypeS32,       Offset( mMinClumpCount, GroundCover ), MAX_COVERTYPES,   "The minimum amount of elements in a clump." );
-      
+
          addField( "maxClumpCount", TypeS32,       Offset( mMaxClumpCount, GroundCover ), MAX_COVERTYPES,   "The maximum amount of elements in a clump." );
 
          addField( "clumpExponent", TypeF32,       Offset( mClumpCountExponent, GroundCover ), MAX_COVERTYPES, "An exponent used to bias between the minimum and maximum clump counts for a particular clump." );
@@ -604,14 +604,14 @@ void GroundCover::initPersistFields()
       addField( "noBillboards",     TypeBool,      Offset( mDebugNoBillboards, GroundCover ),         "Debug parameter for turning off billboard rendering." );
       addField( "noShapes",         TypeBool,      Offset( mDebugNoShapes, GroundCover ),             "Debug parameter for turning off shape rendering." );
 
-   endGroup( "GroundCover Debug" );  
+   endGroup( "GroundCover Debug" );
 
    Parent::initPersistFields();
 }
 
 void GroundCover::consoleInit()
-{     
-   Con::addVariable( "$pref::GroundCover::densityScale", TypeF32, &smDensityScale, "A global LOD scalar which can reduce the overall density of placed GroundCover.\n" 
+{
+   Con::addVariable( "$pref::GroundCover::densityScale", TypeF32, &smDensityScale, "A global LOD scalar which can reduce the overall density of placed GroundCover.\n"
 	   "@ingroup Foliage\n");
 
    Con::addVariable( "$GroundCover::renderedCells", TypeS32, &smStatRenderedCells, "Stat for number of rendered cells.\n"
@@ -638,7 +638,7 @@ bool GroundCover::onAdd()
 
    // Prepare some client side things.
    if ( isClientObject() )
-   {            
+   {
       _initMaterial();
 
       _initShapes();
@@ -658,10 +658,10 @@ void GroundCover::onRemove()
 
    _deleteCells();
    _deleteShapes();
-   
+
    if ( isClientObject() )
    {
-      TerrainBlock::smUpdateSignal.remove( this, &GroundCover::onTerrainUpdated );      
+      TerrainBlock::smUpdateSignal.remove( this, &GroundCover::onTerrainUpdated );
    }
 
    removeFromScene();
@@ -719,14 +719,14 @@ U32 GroundCover::packUpdate( NetConnection *connection, U32 mask, BitStream *str
          stream->write( mSizeMax[i] );
          stream->write( mSizeExponent[i] );
          stream->write( mWindScale[i] );
-         
+
          stream->write( mMaxSlope[i] );
-         
+
          stream->write( mMinElevation[i] );
-         stream->write( mMaxElevation[i] );     
+         stream->write( mMaxElevation[i] );
 
          stream->writeString( mLayer[i] );
-         stream->writeFlag( mInvertLayer[i] );      
+         stream->writeFlag( mInvertLayer[i] );
 
          stream->write( mMinClumpCount[i] );
          stream->write( mMaxClumpCount[i] );
@@ -747,7 +747,7 @@ U32 GroundCover::packUpdate( NetConnection *connection, U32 mask, BitStream *str
       stream->writeFlag( mDebugLockFrustum );
    }
 
-   return retMask;  
+   return retMask;
 }
 
 void GroundCover::unpackUpdate( NetConnection *connection, BitStream *stream )
@@ -763,7 +763,7 @@ void GroundCover::unpackUpdate( NetConnection *connection, BitStream *stream )
       stream->read( &mFadeRadius );
       stream->read( &mShapeCullRadius );
       mShapesCastShadows = stream->readFlag();
-      stream->read( &mReflectRadiusScale );   
+      stream->read( &mReflectRadiusScale );
       stream->read( &mGridSize );
       stream->read( &mRandomSeed );
       stream->read( &mMaxPlacement );
@@ -788,7 +788,7 @@ void GroundCover::unpackUpdate( NetConnection *connection, BitStream *stream )
          stream->read( &mMaxSlope[i] );
 
          stream->read( &mMinElevation[i] );
-         stream->read( &mMaxElevation[i] );     
+         stream->read( &mMaxElevation[i] );
 
          mLayer[i] = stream->readSTString();
          mInvertLayer[i] = stream->readFlag();
@@ -822,9 +822,9 @@ void GroundCover::unpackUpdate( NetConnection *connection, BitStream *stream )
 }
 
 void GroundCover::_initMaterial()
-{   
+{
    SAFE_DELETE( mMatInst );
-   
+
    if ( mMaterialName.isNotEmpty() )
       if ( !Sim::findObject( mMaterialName, mMaterial ) )
          Con::errorf( "GroundCover::_initMaterial - Material %s was not found.", mMaterialName.c_str() );
@@ -833,11 +833,11 @@ void GroundCover::_initMaterial()
       mMatInst = mMaterial->createMatInstance();
    else
       mMatInst = MATMGR->createMatInstance( "WarningMaterial" );
-   
+
    // Add our special feature that makes it all work...
    FeatureSet features = MATMGR->getDefaultFeatures();
    features.addFeature( MFT_Foliage );
-   
+
    // Our feature requires a pointer back to this object
    // to properly setup its shader consts.
    mMatInst->setUserObject( this );
@@ -955,7 +955,7 @@ void GroundCover::_initialize( U32 cellCount, U32 cellPlacementCount )
       }
    }
    for ( S32 i=0; i < MAX_COVERTYPES; i++ )
-   {  
+   {
       if ( mBillboardRects[i].extent.y > 0.0f )
       {
          mBillboardAspectScales[i] = textureAspect * mBillboardRects[i].extent.x / mBillboardRects[i].extent.y;
@@ -974,7 +974,7 @@ void GroundCover::_initialize( U32 cellCount, U32 cellPlacementCount )
    for ( U32 i=0; i < cellPlacementCount; i++ )
    {
       //
-      // The vertex pattern in the VB for each 
+      // The vertex pattern in the VB for each
       // billboard is as follows...
       //
       //     0----1
@@ -994,7 +994,7 @@ void GroundCover::_initialize( U32 cellCount, U32 cellPlacementCount )
       idxBuff[i*6+3] = 2 + offset;
       idxBuff[i*6+4] = 3 + offset;
       idxBuff[i*6+5] = 0 + offset;
-   }   
+   }
    mPrimBuffer.unlock();
 
    // Generate the normalized probability.
@@ -1021,8 +1021,8 @@ void GroundCover::_initialize( U32 cellCount, U32 cellPlacementCount )
    }
 }
 
-GroundCoverCell* GroundCover::_generateCell( const Point2I& index, 
-                                             const Box3F& bounds, 
+GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
+                                             const Box3F& bounds,
                                              U32 placementCount,
                                              S32 randSeed )
 {
@@ -1074,8 +1074,8 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
    cell->mShapes.clear();
    cell->mShapes.reserve( placementCount );
 
-   F32   terrainSquareSize, 
-         oneOverTerrainLength, 
+   F32   terrainSquareSize,
+         oneOverTerrainLength,
          oneOverTerrainSquareSize;
    const GBitmap* terrainLM = NULL;
 
@@ -1100,7 +1100,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          if ( dataLayer )
          {
             // Do an initial check to see if we can place any place anything
-            // at all...  if the layer area for this element is empty then 
+            // at all...  if the layer area for this element is empty then
             // there is nothing more to do.
 
             RectI area( (S32)mFloor( ( bounds.minExtents.x - pos.x ) * oneOverTerrainSquareSize ),
@@ -1114,7 +1114,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          }
       }
 
-      // If the layer is not inverted and we have no data 
+      // If the layer is not inverted and we have no data
       // then we have nothing to draw.
       if ( !typeInvertLayer && !dataLayer )
          continue;
@@ -1129,7 +1129,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
       S32 clumps = 0;
       Point2F clumpCenter(0.0f, 0.0f);
       const S32 clumpMin = getMax( 1, (S32)mMinClumpCount[type] );
-      F32 clumpExponent;   
+      F32 clumpExponent;
 
       // We mult this by -1 each billboard we make then use
       // it to scale the billboard x axis to flip them.  This
@@ -1155,11 +1155,11 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
       // Generate all the cover elements for this type.
       for ( S32 i=0; i < typeCount; i++ )
       {
-         // Do all the other random things here first as to not 
+         // Do all the other random things here first as to not
          // disturb the random sequence if the terrain geometry
          // or cover layers change.
 
-         // Get the random position.      
+         // Get the random position.
          cp.set( rand.randF(), rand.randF() );
 
          // Prepare the clump info.
@@ -1213,7 +1213,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          oneOverTerrainLength = 1.0f / terrainBlock->getWorldBlockSize();
          oneOverTerrainSquareSize = 1.0f / terrainSquareSize;
 
-         // The size is calculated using an exponent to control 
+         // The size is calculated using an exponent to control
          // the frequency between min and max sizes.
          sizeExponent = mClampF( mPow( rand.randF(), mSizeExponent[type] ), 0.0f, 1.0f );
          size = mSizeMin[type] + ( typeSizeRange * sizeExponent );
@@ -1231,12 +1231,12 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          hit = terrainBlock->getNormalHeightMaterial( Point2F ( pp.x, pp.y ),
                                                       &normal, &h, matName );
          PROFILE_END(); // GroundCover_TerrainRayCast
-         
+
          // TODO: When did we loose the world space elevation when
          // getting the terrain height?
          h += pos.z + mZOffset;
 
-         if ( !hit || h > typeMaxElevation || h < typeMinElevation || 
+         if ( !hit || h > typeMaxElevation || h < typeMinElevation ||
               ( typeLayer[0] && !typeInvertLayer && matName != typeLayer ) ||
               ( typeLayer[0] && typeInvertLayer && matName == typeLayer ) )
             continue;
@@ -1255,7 +1255,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
 
          // Grab the terrain lightmap color at this position.
          //
-         // TODO: Can't we remove this test?  The terrain 
+         // TODO: Can't we remove this test?  The terrain
          // lightmap should never be null... NEVER!
          //
          if ( terrainLM )
@@ -1298,7 +1298,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          else
          {
             p.size.y = size;
-            p.size.x = size * flipBB * mBillboardAspectScales[type]; 
+            p.size.x = size * flipBB * mBillboardAspectScales[type];
             p.worldBox.maxExtents = p.worldBox.minExtents = point;
 
             cell->mBillboards.push_back( p );
@@ -1319,7 +1319,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
       } // for ( S32 i=0; i < typeCount; i++ )
 
    } // for ( U32 type=0; type < NumCoverTypes; type++ )
-      
+
 
    cell->mRenderBounds = renderBounds;
    cell->mBounds.minExtents.z = renderBounds.minExtents.z;
@@ -1330,7 +1330,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
 
 void GroundCover::onTerrainUpdated( U32 flags, TerrainBlock *tblock, const Point2I& min, const Point2I& max )
 {
-   if ( isServerObject() ) 
+   if ( isServerObject() )
       return;
 
    // Free all the cells if we've gotten a lightmap update.
@@ -1344,7 +1344,7 @@ void GroundCover::onTerrainUpdated( U32 flags, TerrainBlock *tblock, const Point
 
    // If this is a height or opacity update only clear
    // the cells that have changed.
-   if (  flags & TerrainBlock::HeightmapUpdate || 
+   if (  flags & TerrainBlock::HeightmapUpdate ||
          flags & TerrainBlock::LayersUpdate ||
          flags & TerrainBlock::EmptyUpdate )
    {
@@ -1355,7 +1355,7 @@ void GroundCover::onTerrainUpdated( U32 flags, TerrainBlock *tblock, const Point
       // TODO: I don't think this works right with tiling!
       Box3F dirty(   F32( min.x * size ) + pos.x, F32( min.y * size ) + pos.y, 0.0f,
                      F32( max.x * size ) + pos.x, F32( max.y * size ) + pos.y, 0.0f );
-      
+
       // Now free any cells that overlap it!
       for ( S32 i = 0; i < mCellGrid.size(); i++ )
       {
@@ -1378,13 +1378,13 @@ void GroundCover::onTerrainUpdated( U32 flags, TerrainBlock *tblock, const Point
 void GroundCover::_updateCoverGrid( const Frustum &culler )
 {
    PROFILE_SCOPE( GroundCover_UpdateCoverGrid );
-   
+
    mGridSize = getMax( mGridSize, (U32)2 );
 
    // How many cells in the grid?
    const U32 cells = mGridSize * mGridSize;
 
-   // Whats the max placement count for each cell considering 
+   // Whats the max placement count for each cell considering
    // the grid size and quality scale LOD value.
    const S32 placementCount = getMax( ( (F32)mMaxPlacement * smDensityScale ) / F32( mGridSize * mGridSize ), 0.0f );
 
@@ -1415,7 +1415,7 @@ void GroundCover::_updateCoverGrid( const Frustum &culler )
    Point2I shift = mGridIndex - index;
 
    // If we've shifted more than one in either axis then we've warped.
-   bool didWarp = shift.x > 1 || shift.x < -1 || 
+   bool didWarp = shift.x > 1 || shift.x < -1 ||
                   shift.y > 1 || shift.y < -1 ? true : false;
 
    // Go thru the grid shifting each cell we find and
@@ -1442,7 +1442,7 @@ void GroundCover::_updateCoverGrid( const Frustum &culler )
    }
 
    // Get the terrain elevation range for setting the default cell bounds.
-   F32   terrainMinHeight = -5000.0f, 
+   F32   terrainMinHeight = -5000.0f,
          terrainMaxHeight = 5000.0f;
 
    // Go thru the scratch grid copying each cell back to the
@@ -1490,13 +1490,13 @@ void GroundCover::_updateCoverGrid( const Frustum &culler )
          // TorqueParallelProcess( cellsToGenerateQueue, _generateCell );
          //
          // Internally this function would pass the queue to some global pre-allocated
-         // worker threads which are locked to a particular core.  While the main 
+         // worker threads which are locked to a particular core.  While the main
          // thread waits for the worker threads to finish it will process cells itself.
-         // 
+         //
 
-         cell = _generateCell(   newIndex - index, 
-                                 bounds, 
-                                 placementCount, 
+         cell = _generateCell(   newIndex - index,
+                                 bounds,
+                                 placementCount,
                                  mRandomSeed + mAbs( newIndex.x ) + mAbs( newIndex.y ) );
 
          // Increment our generation count.
@@ -1541,8 +1541,8 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
    if ( ( mCuller.getPosition().isZero() || !mDebugLockFrustum ) && !state->isShadowPass() )
       mCuller = state->getCullingFrustum();
 
-   // Update the cells, but only during the diffuse pass. 
-   // We don't want cell generation to thrash when the reflection camera 
+   // Update the cells, but only during the diffuse pass.
+   // We don't want cell generation to thrash when the reflection camera
    // position doesn't match the diffuse camera!
    if ( state->isDiffusePass() )
       _updateCoverGrid( mCuller );
@@ -1562,16 +1562,16 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       F32 cullScale = 1.0f;
       if ( state->isReflectPass() )
          cullScale = mReflectRadiusScale;
-      
+
       // Setup our shader const data.
       // Must be done prior to submitting our render instance.
 
-      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale * screenScale, mRadius * cullScale * screenScale );    
+      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale * screenScale, mRadius * cullScale * screenScale );
 
       const F32 simTime = Sim::getCurrentTime() * 0.001f;
 
       mShaderConstData.gustInfo.set( mWindGustLength, mWindGustFrequency * simTime, mWindGustStrength );
-      mShaderConstData.turbInfo.set( mWindTurbulenceFrequency * simTime, mWindTurbulenceStrength );      
+      mShaderConstData.turbInfo.set( mWindTurbulenceFrequency * simTime, mWindTurbulenceStrength );
 
       // Use the camera's forward vector to calculate the camera's right
       // and up vectors.  This removes any camera banking from affecting
@@ -1587,7 +1587,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       camRight.normalizeSafe();
       mCross( camRight, camDir, &camUp );
 
-      // Limit the camera up vector to keep the billboards 
+      // Limit the camera up vector to keep the billboards
       // from leaning too far down into the terrain.
       VectorF lookDir( camDir.x, camDir.y, 0.0f );
       F32 angle;
@@ -1609,7 +1609,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       }
 
       mShaderConstData.camRight = camRight;
-      mShaderConstData.camUp = camUp;      
+      mShaderConstData.camUp = camUp;
 
 
       // Cull and submit render instances for cells.
@@ -1624,7 +1624,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
             continue;
 
          cell->renderBillboards( state, mMatInst, &mPrimBuffer );
-      }     
+      }
    }
 
    // Render TS shapes.
@@ -1661,15 +1661,15 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
 
          // Use the cell bounds as the light query volume.
          //
-         // This means all forward lit items in this cell will 
+         // This means all forward lit items in this cell will
          // get the same lights, but it performs much better.
          query.init( renderBounds );
 
          // Render the shapes in this cell... only pass the culler if the
          // cell wasn't fully within the frustum.
-         smStatRenderedShapes += cell->renderShapes(  
-                                    rdata, 
-                                    clipMask != 0 ? &mCuller : NULL, 
+         smStatRenderedShapes += cell->renderShapes(
+                                    rdata,
+                                    clipMask != 0 ? &mCuller : NULL,
                                     mShapeInstances );
       }
    }
@@ -1682,13 +1682,13 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       ri->type = RenderPassManager::RIT_Editor;
       ri->renderDelegate.bind( this, &GroundCover::_debugRender );
       pass->addInst( ri );
-   }    
+   }
 }
 
 void GroundCover::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat )
-{   
+{
    GFXDrawUtil* drawer = GFX->getDrawUtil();
- 
+
    GFXStateBlockDesc desc;
    desc.setZReadWrite( true, false );
    desc.setBlend( true );

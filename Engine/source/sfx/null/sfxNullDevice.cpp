@@ -25,9 +25,9 @@
 #include "sfx/sfxInternal.h"
 
 
-SFXNullDevice::SFXNullDevice( SFXProvider* provider, 
-                              String name, 
-                              bool useHardware, 
+SFXNullDevice::SFXNullDevice( SFXProvider* provider,
+                              String name,
+                              bool useHardware,
                               S32 maxBuffers )
 
    :  SFXDevice( name, provider, useHardware, maxBuffers )
@@ -49,7 +49,7 @@ SFXBuffer* SFXNullDevice::createBuffer( const ThreadSafeRef< SFXStream >& stream
 
 SFXVoice* SFXNullDevice::createVoice( bool is3D, SFXBuffer *buffer )
 {
-   // Don't bother going any further if we've 
+   // Don't bother going any further if we've
    // exceeded the maximum voices.
    if ( mVoices.size() >= mMaxBuffers )
       return NULL;

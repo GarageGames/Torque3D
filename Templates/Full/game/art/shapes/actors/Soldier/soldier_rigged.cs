@@ -60,7 +60,7 @@ function SoldierDAE::onLoad(%this)
    %this.addSequence( "./Anims/PlayerAnim_Lurker_Swim_Root.dae Swim_Root", "Swim_Root", 0, -1);
    %this.addSequence( "./Anims/PlayerAnim_Lurker_Swim_Left.dae Swim_Left", "Swim_Left", 0, -1);
    %this.addSequence( "./Anims/PlayerAnim_Lurker_Swim_Right.dae Swim_Right", "Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "Back", true);
    %this.setSequenceCyclic( "Celebrate_01", false);
    %this.setSequenceCyclic( "Crouch_Backward", true);
@@ -88,7 +88,7 @@ function SoldierDAE::onLoad(%this)
    %this.setSequenceBlend( "Head", "1", "Root", "0");
    %this.setSequenceBlend( "Look", "1", "Root", "0");
    %this.setSequenceBlend( "Reload", "1", "Root", "0");
-   
+
    %this.setSequenceGroundSpeed( "Back", "0 -3.6 0");
    %this.setSequenceGroundSpeed( "Run", "0 5.0 0");
    %this.setSequenceGroundSpeed( "Side", "-3.6 0 0");
@@ -125,7 +125,7 @@ function SoldierDAE::onLoad(%this)
    %this.addSequence( "art/shapes/weapons/Ryder/PlayerAnims/PlayerAnim_Pistol_Swim_Root.dae Swim_Root", "Pistol_Swim_Root", 0, -1);
    %this.addSequence( "art/shapes/weapons/Ryder/PlayerAnims/PlayerAnim_Pistol_Swim_Left.dae Swim_Left", "Pistol_Swim_Left", 0, -1);
    %this.addSequence( "art/shapes/weapons/Ryder/PlayerAnims/PlayerAnim_Pistol_Swim_Right.dae Swim_Right", "Pistol_Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "Pistol_Back", true);
    %this.setSequenceCyclic( "Pistol_Crouch_Backward", true);
    %this.setSequenceCyclic( "Pistol_Crouch_Forward", true);
@@ -152,7 +152,7 @@ function SoldierDAE::onLoad(%this)
    %this.setSequenceBlend( "Pistol_Head", "1", "Pistol_Root", "0");
    %this.setSequenceBlend( "Pistol_Look", "1", "Pistol_Root", "0");
    %this.setSequenceBlend( "Pistol_Reload", "1", "Pistol_Root", "0");
-   
+
    %this.setSequenceGroundSpeed( "Pistol_Back", "0 -3.6 0");
    %this.setSequenceGroundSpeed( "Pistol_Run", "0 5.0 0");
    %this.setSequenceGroundSpeed( "Pistol_Side", "3.6 0 0");
@@ -190,7 +190,7 @@ function SoldierDAE::onLoad(%this)
    %this.addSequence( "art/shapes/weapons/ProxMine/PlayerAnims/PlayerAnim_ProxMine_Swim_Root.dae Swim_Root", "ProxMine_Swim_Root", 0, -1);
    %this.addSequence( "art/shapes/weapons/ProxMine/PlayerAnims/PlayerAnim_ProxMine_Swim_Left.dae Swim_Left", "ProxMine_Swim_Left", 0, -1);
    %this.addSequence( "art/shapes/weapons/ProxMine/PlayerAnims/PlayerAnim_ProxMine_Swim_Right.dae Swim_Right", "ProxMine_Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "ProxMine_Back", true);
    %this.setSequenceCyclic( "ProxMine_Crouch_Backward", true);
    %this.setSequenceCyclic( "ProxMine_Crouch_Forward", true);
@@ -258,7 +258,7 @@ function SoldierDAE::onLoad(%this)
    %this.addSequence( "art/shapes/weapons/Turret/PlayerAnims/PlayerAnim_Turret_Swim_Root.dae Swim_Root", "Turret_Swim_Root", 0, -1);
    %this.addSequence( "art/shapes/weapons/Turret/PlayerAnims/PlayerAnim_Turret_Swim_Left.dae Swim_Left", "Turret_Swim_Left", 0, -1);
    %this.addSequence( "art/shapes/weapons/Turret/PlayerAnims/PlayerAnim_Turret_Swim_Right.dae Swim_Right", "Turret_Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "Turret_Back", true);
    %this.setSequenceCyclic( "Turret_Crouch_Backward", true);
    %this.setSequenceCyclic( "Turret_Crouch_Forward", true);
@@ -281,12 +281,12 @@ function SoldierDAE::onLoad(%this)
    %this.setSequenceCyclic( "Turret_Swim_Root", true);
    %this.setSequenceCyclic( "Turret_Swim_Left", true);
    %this.setSequenceCyclic( "Turret_Swim_Right", true);
-   
+
    %this.setSequenceBlend( "Turret_Head", "1", "Turret_Root", "0");
    %this.setSequenceBlend( "Turret_Look", "1", "Turret_Root", "0");
    %this.setSequenceBlend( "Turret_Recoil", "1", "Turret_Root", "0");
    %this.setSequenceBlend( "Turret_Fire_Release", "1", "Turret_Root", "0");
-   
+
    %this.setSequenceGroundSpeed( "Turret_Back", "0 -3.6 0");
    %this.setSequenceGroundSpeed( "Turret_Run", "0 5.0 0");
    %this.setSequenceGroundSpeed( "Turret_Side", "3.6 0 0");

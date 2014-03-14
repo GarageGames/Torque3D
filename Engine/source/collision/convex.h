@@ -86,7 +86,7 @@ enum ConvexType {
    ShapeBaseConvexType,
    TSStaticConvexType,
    AtlasChunkConvexType, ///< @deprecated
-   AtlasConvexType,   
+   AtlasConvexType,
    TSPolysoupConvexType,
    MeshRoadConvexType,
 	ConvexShapeCollisionConvexType,
@@ -167,12 +167,12 @@ class Convex {
 
    /// @name Linked list management
    /// @{
-   
+
    /// Next item in linked list of Convexes.
    Convex* mNext;
 
    /// Previous item in linked list of Convexes.
-   Convex* mPrev; 
+   Convex* mPrev;
 
    /// Insert this Convex after the provided convex
    /// @param   next
@@ -283,9 +283,9 @@ public:
 
    /// Render convex(s) for debugging purposes.
    virtual void renderWorkingList();
-   
+
    /// Render this convex for debugging purposes.
-   virtual void render();   
+   virtual void render();
 };
 
 #endif // _CONVEX_H_

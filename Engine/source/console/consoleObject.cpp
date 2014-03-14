@@ -105,7 +105,7 @@ AbstractClassRep* AbstractClassRep::findClassRep( U32 groupId, U32 typeId, U32 c
    // Look up the specified class and create it.
    if(classTable[groupId][typeId][classId])
       return classTable[groupId][typeId][classId];
-      
+
    return NULL;
 }
 
@@ -132,7 +132,7 @@ void AbstractClassRep::removeClassRep(AbstractClassRep* in_pRep)
    for( AbstractClassRep *walk = classLinkList; walk; walk = walk->nextClass )
    {
       // This is the case that will most likely get hit.
-      if( walk->nextClass == in_pRep ) 
+      if( walk->nextClass == in_pRep )
          walk->nextClass = walk->nextClass->nextClass;
       else if( walk == in_pRep )
       {
@@ -584,9 +584,9 @@ String ConsoleObject::_getLogMessage(const char* fmt, void* args) const
    String objClass = "UnknownClass";
    if(getClassRep())
       objClass = getClassRep()->getClassName();
-   
+
    String formattedMessage = String::VToString(fmt, args);
-   return String::ToString("%s - Object at %x - %s", 
+   return String::ToString("%s - Object at %x - %s",
       objClass.c_str(), this, formattedMessage.c_str());
 }
 
@@ -621,7 +621,7 @@ static const char* returnClassList( Vector< AbstractClassRep* >& classes, U32 bu
 {
    if( !classes.size() )
       return "";
-      
+
    dQsort( classes.address(), classes.size(), sizeof( AbstractClassRep* ), ACRCompare );
 
    char* ret = Con::getReturnBuffer( bufSize );
@@ -631,7 +631,7 @@ static const char* returnClassList( Vector< AbstractClassRep* >& classes, U32 bu
       dStrcat( ret, "\t" );
       dStrcat( ret, classes[ i ]->getClassName() );
    }
-   
+
    return ret;
 }
 
@@ -697,14 +697,14 @@ DefineEngineFunction( enumerateConsoleClasses, const char*, ( const char* classN
             "@ingroup Editors\n"
 				"@internal")
 {
-   AbstractClassRep *base = NULL;    
+   AbstractClassRep *base = NULL;
    if(className && *className)
    {
       base = AbstractClassRep::findClassRep(className);
       if(!base)
          return "";
    }
-   
+
    Vector<AbstractClassRep*> classes;
    U32 bufSize = 0;
    for(AbstractClassRep *rep = AbstractClassRep::getClassList(); rep; rep = rep->getNextClass())
@@ -727,14 +727,14 @@ DefineEngineFunction( enumerateConsoleClassesByCategory, const char*, ( String c
 				"@internal")
 {
    U32 categoryLength = category.length();
-   
+
    U32 bufSize = 0;
    Vector< AbstractClassRep* > classes;
-   
+
    for( AbstractClassRep* rep = AbstractClassRep::getClassList(); rep != NULL; rep = rep->getNextClass() )
    {
       const String& repCategory = rep->getCategory();
-      
+
       if( repCategory.length() >= categoryLength
           && ( repCategory.compare( category, categoryLength, String::NoCase ) == 0 )
           && ( repCategory[ categoryLength ] == ' ' || repCategory[ categoryLength ] == '\0' ) )

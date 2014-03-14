@@ -34,7 +34,7 @@
    so they became more generalized helper classes.  Along with LangElement
    classes, they are the building blocks for the procedurally generated
    shaders.
-   
+
    Each shader is a linked list of LangElements.  The list is generated
    when the features of the shader are processed.  When all the features
    are processed, then ShaderGen prints them out by traversing the linked
@@ -77,7 +77,7 @@ public:
    @endcode
 
    The output in the shader file would be:
-   
+
    @code
    float foo = 8.0 * 5.0;
    @endcode
@@ -118,21 +118,21 @@ public:
    take as many variables as you can throw at it.  It takes a string and parses
    it for the '@' symbol which it replaces with passed in parameters.  Similar
    to the C statement printf().  Here's an example:
-   
+
    @code
    ( assuming three variables var1, var2, var3 exist and their assigned names
      are var1Name, var2Name, and var3Name )
-   
+
    LangElement *statement = new GenOp( "  @ = @ * @.x + @.y;", var1, var1, var2, var3 );
-   
+
    @endcode
 
    The output in the shader file would be:
-   
+
    @code
-   
+
    var1Name = var1Name * var2Name.x + var3Name.y;
-   
+
    @endcode
 */
 //----------------------------------------------------------------------------

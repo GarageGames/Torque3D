@@ -55,7 +55,7 @@ BaseMatInstance* InstancingMaterialHook::getInstancingMat( BaseMatInstance *matI
 
       BaseMatInstance *instMat = matInst->getMaterial()->createMatInstance();
       FeatureSet features( matInst->getRequestedFeatures() );
-      features.addFeature( MFT_UseInstancing ); 
+      features.addFeature( MFT_UseInstancing );
 
       // Allow for named texture assignments
       Material::sAllowTextureTargetAssignment = true;

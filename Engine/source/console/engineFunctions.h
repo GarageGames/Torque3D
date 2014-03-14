@@ -61,7 +61,7 @@ struct EngineFunctionDefaultArguments
    /// @warn This is @b NOT the size of the memory block returned by getArgs() and also
    ///   not the number of elements it contains.
    U32 mNumDefaultArgs;
-   
+
    /// Return a pointer to the variable-sized array of default argument values.
    ///
    /// @warn The arguments must be stored @b IMMEDIATELY after #mNumDefaultArgs.
@@ -78,7 +78,7 @@ struct EngineFunctionDefaultArguments
 
 // Need byte-aligned packing for the default argument structures.
 #pragma pack( push, 1 )
-   
+
 
 // Structure encapsulating default arguments to an engine API function.
 template< typename T >
@@ -93,7 +93,7 @@ template< typename A >
 struct _EngineFunctionDefaultArguments< void( A ) > : public EngineFunctionDefaultArguments
 {
    typename EngineTypeTraits< A >::DefaultArgumentValueStoreType a;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( A a )
@@ -105,7 +105,7 @@ struct _EngineFunctionDefaultArguments< void( A, B ) > : public EngineFunctionDe
 {
    typename EngineTypeTraits< A >::DefaultArgumentValueStoreType a;
    typename EngineTypeTraits< B >::DefaultArgumentValueStoreType b;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( B b )
@@ -122,7 +122,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C ) > : public EngineFunctio
    typename EngineTypeTraits< A >::DefaultArgumentValueStoreType a;
    typename EngineTypeTraits< B >::DefaultArgumentValueStoreType b;
    typename EngineTypeTraits< C >::DefaultArgumentValueStoreType c;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( C c )
@@ -145,7 +145,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D ) > : public EngineFunc
    typename EngineTypeTraits< B >::DefaultArgumentValueStoreType b;
    typename EngineTypeTraits< C >::DefaultArgumentValueStoreType c;
    typename EngineTypeTraits< D >::DefaultArgumentValueStoreType d;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( D d )
@@ -175,7 +175,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D, E ) > : public EngineF
    typename EngineTypeTraits< C >::DefaultArgumentValueStoreType c;
    typename EngineTypeTraits< D >::DefaultArgumentValueStoreType d;
    typename EngineTypeTraits< E >::DefaultArgumentValueStoreType e;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( E e )
@@ -213,7 +213,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D, E, F ) > : public Engi
    typename EngineTypeTraits< D >::DefaultArgumentValueStoreType d;
    typename EngineTypeTraits< E >::DefaultArgumentValueStoreType e;
    typename EngineTypeTraits< F >::DefaultArgumentValueStoreType f;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( F f )
@@ -260,7 +260,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G ) > : public E
    typename EngineTypeTraits< E >::DefaultArgumentValueStoreType e;
    typename EngineTypeTraits< F >::DefaultArgumentValueStoreType f;
    typename EngineTypeTraits< G >::DefaultArgumentValueStoreType g;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( G g )
@@ -317,7 +317,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H ) > : publi
    typename EngineTypeTraits< F >::DefaultArgumentValueStoreType f;
    typename EngineTypeTraits< G >::DefaultArgumentValueStoreType g;
    typename EngineTypeTraits< H >::DefaultArgumentValueStoreType h;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( H h )
@@ -385,7 +385,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I ) > : pu
    typename EngineTypeTraits< G >::DefaultArgumentValueStoreType g;
    typename EngineTypeTraits< H >::DefaultArgumentValueStoreType h;
    typename EngineTypeTraits< I >::DefaultArgumentValueStoreType i;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( I i )
@@ -465,7 +465,7 @@ struct _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J ) > :
    typename EngineTypeTraits< H >::DefaultArgumentValueStoreType h;
    typename EngineTypeTraits< I >::DefaultArgumentValueStoreType i;
    typename EngineTypeTraits< J >::DefaultArgumentValueStoreType j;
-   
+
    _EngineFunctionDefaultArguments()
       { mNumDefaultArgs = 0; }
    _EngineFunctionDefaultArguments( J j )
@@ -839,7 +839,7 @@ enum EngineFunctionFlags
 ///
 /// Call-outs are exposed as pointer-sized memory locations into which the control layer needs
 /// to install addresses of functions that receive the call from the engine back into the control
-/// layer.  The function has to follow C calling conventions and 
+/// layer.  The function has to follow C calling conventions and
 ///
 /// A call-out will initially be set to NULL and while being NULL, will simply cause the engine
 /// to skip and ignore the call-out.  This allows the control layer to only install call-outs
@@ -848,39 +848,39 @@ enum EngineFunctionFlags
 class EngineFunctionInfo : public EngineExport
 {
    public:
-   
+
       DECLARE_CLASS( EngineFunctionInfo, EngineExport );
-   
+
    protected:
-   
+
       /// A combination of EngineFunctionFlags.
       BitSet32 mFunctionFlags;
-      
+
       /// The type of the function.
       const EngineTypeInfo* mFunctionType;
-         
+
       /// Default values for the function arguments.
       const EngineFunctionDefaultArguments* mDefaultArgumentValues;
-            
+
       /// Name of the DLL symbol denoting the address of the exported entity.
       const char* mBindingName;
-      
+
       /// Full function prototype string.  Useful for quick printing and most importantly,
       /// this will be the only place containing information about the argument names.
       const char* mPrototypeString;
-      
+
       /// Address of either the function implementation or the variable taking the address
       /// of a call-out.
       void* mAddress;
-      
+
       /// Next function in the global link chain of engine functions.
       EngineFunctionInfo* mNextFunction;
-      
+
       /// First function in the global link chain of engine functions.
       static EngineFunctionInfo* smFirstFunction;
-      
+
    public:
-   
+
       ///
       EngineFunctionInfo(  const char* name,
                            EngineExportScope* scope,
@@ -891,39 +891,39 @@ class EngineFunctionInfo : public EngineExport
                            const EngineFunctionDefaultArguments* defaultArgs,
                            void* address,
                            U32 flags );
-      
+
       /// Return the name of the function.
       const char* getFunctionName() const { return getExportName(); }
-      
+
       /// Return the function's full prototype string including the return type, function name,
       /// and argument list.
       const char* getPrototypeString() const { return mPrototypeString; }
-      
+
       /// Return the DLL export symbol name.
       const char* getBindingName() const { return mBindingName; }
-      
+
       /// Test whether this is a callout function.
       bool isCallout() const { return mFunctionFlags.test( EngineFunctionCallout ); }
-      
+
       /// Test whether the function is variadic, i.e. takes a variable number of arguments.
       bool isVariadic() const { return mFunctionType->isVariadic(); }
-         
+
       /// Return the type of this function.
       const EngineTypeInfo* getFunctionType() const { return mFunctionType; }
-      
+
       /// Return the return type of the function.
       const EngineTypeInfo* getReturnType() const { return getFunctionType()->getArgumentTypeTable()->getReturnType(); }
-      
+
       /// Return the number of arguments that this function takes.  If the function is variadic,
       /// this is the number of fixed arguments.
       U32 getNumArguments() const { return getFunctionType()->getArgumentTypeTable()->getNumArguments(); }
-      
+
       ///
       const EngineTypeInfo* getArgumentType( U32 index ) const { return ( *( getFunctionType()->getArgumentTypeTable() ) )[ index ]; }
-      
+
       /// Return the vector storing the default argument values.
       const EngineFunctionDefaultArguments* getDefaultArguments() const { return mDefaultArgumentValues; }
-      
+
       /// Reset all callout function pointers back to NULL.  This deactivates all callbacks.
       static void resetAllCallouts();
 };
@@ -932,7 +932,7 @@ class EngineFunctionInfo : public EngineExport
 ///
 ///
 /// Due to the given argument types and return type being directly used as is, it is not possible
-/// to use this macro with engine types that have more complex value passing semantics (like e.g. 
+/// to use this macro with engine types that have more complex value passing semantics (like e.g.
 /// String).  Use engineAPI in this case.
 ///
 /// @note The method of defining functions exposed by this macro is very low-level.  To more
@@ -956,8 +956,8 @@ class EngineFunctionInfo : public EngineExport
       );                                                                                                 \
    } }                                                                                                   \
    TORQUE_API returnType bindingName args
-   
-   
+
+
 ///
 ///
 /// Not all control layers may be able to access data variables in a DLL so this macro exposes
@@ -980,6 +980,6 @@ class EngineFunctionInfo : public EngineExport
          EngineFunctionCallout | EngineFunctionFlags( flags )                                            \
       );                                                                                                 \
    }
-   
+
 
 #endif // !_ENGINEFUNCTIONS_H_

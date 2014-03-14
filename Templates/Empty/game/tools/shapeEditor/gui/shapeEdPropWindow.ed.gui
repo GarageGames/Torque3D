@@ -187,7 +187,7 @@
             Visible = "1";
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            
+
             new GuiContainer(){ // Sequence Properties Container
                Profile = "inspectorStyleRolloutDarkProfile";
                HorizSizing = "width";
@@ -195,7 +195,7 @@
                position = "0 0";
                Extent = "202 103";
                isContainer = true;
-               
+
                new GuiTextCtrl() { // Header
                   HorizSizing = "right";
                   VertSizing = "bottom";
@@ -370,7 +370,7 @@
                   tooltip = "Blend reference sequence";
                   Command = "ShapeEdSequences.onEditBlend();";
                };
-               
+
                // Blend frame
                new GuiTextCtrl() {
                   Profile = "ToolsGuiTextRightProfile";
@@ -399,7 +399,7 @@
                position = "0 102";
                Extent = "202 106";
                isContainer = true;
-               
+
                // Triggers
                new GuiTextCtrl() {
                   HorizSizing = "right";
@@ -664,7 +664,7 @@
             position = "0 287";
             Extent = "202 131";
             isContainer = true;
-            
+
             new GuiTextCtrl() {
                HorizSizing = "right";
                VertSizing = "bottom";
@@ -1025,7 +1025,7 @@
                VertSizing = "bottom";
                Profile = "inspectorStyleRolloutDarkProfile";
                isContainer = "1";
-               
+
                new GuiTextCtrl() { // Header
                   text = "Detail/Object Properties";
                   position = "4 1";
@@ -1287,7 +1287,7 @@
             Position = "0 344";
             Extent = "202 74";
             isContainer = true;
-            
+
             new GuiTextCtrl() { // Header
                HorizSizing = "right";
                VertSizing = "bottom";

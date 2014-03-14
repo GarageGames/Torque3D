@@ -49,7 +49,7 @@ void* Resource<DecalDataFile>::create( const Torque::Path &path )
    return file;
 }
 
-template<> 
+template<>
 ResourceBase::Signature Resource<DecalDataFile>::signature()
 {
    return MakeFourCC('d','e','c','f');
@@ -101,8 +101,8 @@ bool DecalDataFile::write( Stream& stream )
    Vector<DecalInstance*> allDecals;
 
    // Gather all DecalInstances that should be saved.
-   for ( U32 i = 0; i < mSphereList.size(); i++ )  
-   {      
+   for ( U32 i = 0; i < mSphereList.size(); i++ )
+   {
       Vector<DecalInstance*>::const_iterator item = mSphereList[i]->mItems.begin();
       for ( ; item != mSphereList[i]->mItems.end(); item++ )
       {
@@ -133,12 +133,12 @@ bool DecalDataFile::write( Stream& stream )
 
       dataIter = find( allDatablocks.begin(), allDatablocks.end(), inst->mDataBlock );
       U8 dataIndex = dataIter - allDatablocks.begin();
-      
+
       stream.write( dataIndex );
       mathWrite( stream, inst->mPosition );
       mathWrite( stream, inst->mNormal );
       mathWrite( stream, inst->mTangent );
-		stream.write( inst->mTextureRectIdx );   
+		stream.write( inst->mTextureRectIdx );
       stream.write( inst->mSize );
       stream.write( inst->mRenderPriority );
    }
@@ -153,13 +153,13 @@ bool DecalDataFile::write( Stream& stream )
 
 bool DecalDataFile::read( Stream &stream )
 {
-   // NOTE: we are shortcutting by just saving out the DecalInst and 
+   // NOTE: we are shortcutting by just saving out the DecalInst and
    // using regular addDecal methods to add them, which will end up
    // generating the DecalSphere(s) in the process.
    // It would be more efficient however to just save out all the data
    // and read it all in with no calculation required.
 
-   // Read our identifier... so we know we're 
+   // Read our identifier... so we know we're
    // not reading in pure garbage.
    char id[4] = { 0 };
    stream.read( 4, id );
@@ -182,16 +182,16 @@ bool DecalDataFile::read( Stream &stream )
       return false;
    }
 
-   // Read in the lookupNames of the DecalData datablocks and recover the datablock.   
+   // Read in the lookupNames of the DecalData datablocks and recover the datablock.
    Vector<DecalData*> allDatablocks;
    U32 count;
    stream.read( &count );
    allDatablocks.setSize( count );
    for ( U32 i = 0; i < count; i++ )
-   {      
-      String lookupName;      
+   {
+      String lookupName;
       stream.read( &lookupName );
-      
+
       DecalData *data = DecalData::findDatablock( lookupName );
 
       if ( !data )
@@ -208,21 +208,21 @@ bool DecalDataFile::read( Stream &stream )
 				Sim::getRootGroup()->addObject( data );
 				data->materialName = "WarningMaterial";
 				data->material = dynamic_cast<Material*>(Sim::findObject("WarningMaterial"));
-			
+
 				Con::errorf( "DecalDataFile::read() - DecalData %s does not exist! Temporarily created %s_missing.", lookupName.c_str() );
 			}
       }
-		
+
 		allDatablocks[ i ] = data;
    }
 
-   U8 dataIndex;   
+   U8 dataIndex;
    DecalData *data;
 
    // Now read all the DecalInstance(s).
    stream.read( &count );
    for ( U32 i = 0; i < count; i++ )
-   {           
+   {
       DecalInstance *inst = _allocateInstance();
 
       stream.read( &dataIndex );
@@ -243,12 +243,12 @@ bool DecalDataFile::read( Stream &stream )
 
       data = allDatablocks[ dataIndex ];
 
-      if ( data )          
-      {         
+      if ( data )
+      {
          inst->mDataBlock = data;
 
          _addDecalToSpheres( inst );
-			
+
 			// onload set instances should get added to the appropriate vec
 			inst->mId = gDecalManager->mDecalInstanceVec.size();
 			gDecalManager->mDecalInstanceVec.push_back(inst);
@@ -331,7 +331,7 @@ void DecalDataFile::_addDecalToSpheres( DecalInstance* inst )
    for( U32 i = 0; i < mSphereList.size(); i++ )
    {
       DecalSphere* sphere = mSphereList[i];
-      
+
       if( sphere == mSphereWithLastInsertion )
          continue;
 
@@ -386,7 +386,7 @@ bool DecalDataFile::_removeDecalFromSpheres( DecalInstance *inst )
          if( mSphereWithLastInsertion == sphere )
             mSphereWithLastInsertion = NULL;
 
-         delete sphere;      
+         delete sphere;
          mSphereList.erase( i );
       }
       else

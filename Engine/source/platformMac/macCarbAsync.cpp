@@ -39,7 +39,7 @@ AsyncUpdateThread::~AsyncUpdateThread()
 
 void AsyncUpdateThread::_waitForEventAndReset()
 {
-   MPWaitForEvent( *( ( MPEventID* ) &mUpdateEvent ), NULL, kDurationForever ); 
+   MPWaitForEvent( *( ( MPEventID* ) &mUpdateEvent ), NULL, kDurationForever );
 }
 
 void AsyncUpdateThread::triggerUpdate()

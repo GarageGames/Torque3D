@@ -35,7 +35,7 @@ function constructRSSHeadline( %headline, %link )
       _headline = %headline;
       _link = %link;
    };
-   
+
    return %ret;
 }
 
@@ -67,23 +67,23 @@ function constructRSSHeadlineCollection()
    {
       class = "RSSHeadlineCollection";
    };
-   
+
    // Create sim group for it
    %ret._simGroup = new SimGroup();
-   
+
    return %ret;
 }
 
 function RSSHeadlineCollection::getObject( %this, %index )
 {
    %ret = %this._simGroup.getObject( %index );
-   
+
    if( !isObject( %ret ) )
    {
       warn( "No such index in headline collection." );
       return -1;
    }
-   
+
    return %ret;
 }
 
@@ -97,19 +97,19 @@ function RSSHeadlineCollection::addHeadline( %this, %headline, %skipReorder )
    for( %i = 0; %i < %this.getCount(); %i++ )
    {
       %obj = %this.getObject( %i );
-         
+
       if( %obj.sameAs( %headline ) )
       {
          //echo( "cache hit headline: " @ %headline.toString() );
          return false;
       }
    }
-   
+
    %this._simGroup.add( %headline );
-   
+
    if( !%skipReorder )
       %this._simGroup.bringToFront( %headline );
-      
+
    //echo( "adding headline: " @ %headline.toString() );
 
    return true;
@@ -118,23 +118,23 @@ function RSSHeadlineCollection::addHeadline( %this, %headline, %skipReorder )
 function RSSHeadlineCollection::writeToFile( %this, %file )
 {
    $rssHeadlineCollection::count = %this.getCount();
-   
+
    for( %i = 0; %i < %this.getCount(); %i++ )
    {
       %hdl = %this.getObject( %i );
       $rssHeadlineCollection::headline[%i] = %hdl.getHeadline();
       $rssHeadlineCollection::link[%i] = %hdl.getLink();
    }
-   
+
    export( "$rssHeadlineCollection::*", %file, false );
 }
 
 function RSSHeadlineCollection::loadFromFile( %this, %file )
 {
    %this._simGroup.clear();
-   
+
    $rssHeadlineCollection::count = 0;
-   
+
    %file = getPrefsPath(%file);
    if (isFile(%file) || isFile(%file @ ".dso"))
       exec( %file );
@@ -143,11 +143,11 @@ function RSSHeadlineCollection::loadFromFile( %this, %file )
    {
       //echo( "[LD: " @ %i @ "] Headline: " @ $rssHeadlineCollection::headline[%i] );
       //echo( "[LD: " @ %i @ "] Link: " @ $rssHeadlineCollection::link[%i] );
-      
+
       %hdl = constructRSSHeadline( $rssHeadlineCollection::headline[%i],
                                    $rssHeadlineCollection::link[%i] );
-                                   
-      // This does negate the cache check, but that is ok -pw                             
+
+      // This does negate the cache check, but that is ok -pw
       %this.addHeadline( %hdl, true );
    }
 }

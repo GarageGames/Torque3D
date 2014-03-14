@@ -69,7 +69,7 @@ public:
    virtual void onMouseUp(const GuiEvent &event);
    virtual bool onMouseWheelUp(const GuiEvent &event);
    virtual bool onMouseWheelDown(const GuiEvent &event);
-	
+
 	bool onWake();
    virtual void onPreRender();
    virtual void onRender(Point2I offset, const RectI &updateRect);

@@ -94,9 +94,9 @@ class ParticleEmitterNode : public GameBase
   public:
    ParticleEmitterNode();
    ~ParticleEmitterNode();
-   
+
    ParticleEmitter *getParticleEmitter() {return mEmitter;}
-   
+
    // Time/Move Management
   public:
    void processTick(const Move* move);

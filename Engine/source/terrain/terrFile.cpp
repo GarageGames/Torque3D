@@ -92,7 +92,7 @@ inline U32 getMostSignificantBit( U32 v )
 void TerrainFile::_buildGridMap()
 {
    // The grid level count is the same as the
-   // most significant bit of the size.  While 
+   // most significant bit of the size.  While
    // we loop we take the time to calculate the
    // grid memory pool size.
    mGridLevels = 0;
@@ -104,7 +104,7 @@ void TerrainFile::_buildGridMap()
       mGridLevels++;
    }
 
-   mGridMapPool.setSize( poolSize ); 
+   mGridMapPool.setSize( poolSize );
    mGridMapPool.compact();
    mGridMap.setSize( mGridLevels + 1 );
    mGridMap.compact();
@@ -255,13 +255,13 @@ void TerrainFile::_buildGridMap()
 void TerrainFile::_initMaterialInstMapping()
 {
    mMaterialInstMapping.clearMatInstList();
-   
+
    for( U32 i = 0; i < mMaterials.size(); ++ i )
    {
       Torque::Path path( mMaterials[ i ]->getDiffuseMap() );
       mMaterialInstMapping.push_back( path.getFileName() );
    }
-   
+
    mMaterialInstMapping.mapMaterials();
 }
 
@@ -322,10 +322,10 @@ TerrainFile* TerrainFile::load( const Torque::Path &path )
 
    // Update the collision structures.
    ret->_buildGridMap();
-   
+
    // Do the material mapping.
    ret->_initMaterialInstMapping();
-   
+
    return ret;
 }
 
@@ -364,7 +364,7 @@ void TerrainFile::_load( FileStream &stream )
 void TerrainFile::_loadLegacy(  FileStream &stream )
 {
    // Some legacy constants.
-   enum 
+   enum
    {
       MaterialGroups = 8,
       BlockSquareWidth = 256,
@@ -380,9 +380,9 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
 
    // Prior to version 7 we stored this weird material struct.
    const U32 MATERIAL_GROUP_MASK = 0x7;
-   struct Material 
+   struct Material
    {
-      enum Flags 
+      enum Flags
       {
          Plain          = 0,
          Rotate         = 1,
@@ -437,7 +437,7 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
 
       if ( mFileVersion > 3 && mFileVersion < 6 )
       {
-         // Between version 3 and 5 we store the texture file names 
+         // Between version 3 and 5 we store the texture file names
          // relative to the terrain file.  We restore the full path
          // here so that we can create a TerrainMaterial from it.
          materials.push_back( Torque::Path::CompressPath( mFilePath.getRoot() + mFilePath.getPath() + '/' + matName ) );
@@ -456,7 +456,7 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
       {
          if ( materials[i].isEmpty() )
             continue;
-            
+
          terrainMat.set( materials[i], &GFXDefaultPersistentProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
          if ( terrainMat )
             continue;
@@ -477,9 +477,9 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
                mNeedsResaving = true;
             }
          }
-         
+
       } // for (U32 i = 0; i < TerrainBlock::MaterialGroups; i++)
-      
+
    } // if ( mFileVersion <= 3 )
 
    if ( mFileVersion == 1 )
@@ -544,10 +544,10 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
          }
       }
 
-      // Set the layer index.   
+      // Set the layer index.
       mLayerMap[i] = getMin( layer, layerCount );
    }
-   
+
    // Cleanup.
    for ( U32 i=0; i < MaterialGroups; i++ )
       delete [] materialAlphaMap[i];
@@ -577,7 +577,7 @@ void TerrainFile::setSize( U32 newSize, bool clear )
    // Make sure the resolution is a power of two.
    newSize = getNextPow2( newSize );
 
-   // 
+   //
    if ( clear )
    {
       mLayerMap.setSize( newSize * newSize );
@@ -615,7 +615,7 @@ void TerrainFile::smooth( F32 factor, U32 steps, bool updateCollision )
    h1.setSize( blockSize );
    h2.setSize( blockSize );
 
-   // Fill the first buffer with the current heights.   
+   // Fill the first buffer with the current heights.
    for ( U32 i=0; i < blockSize; i++ )
       h1[i] = (F32)mHeightMap[i];
 
@@ -674,15 +674,15 @@ void TerrainFile::smooth( F32 factor, U32 steps, bool updateCollision )
 void TerrainFile::setHeightMap( const Vector<U16> &heightmap, bool updateCollision )
 {
    AssertFatal( mHeightMap.size() == heightmap.size(), "TerrainFile::setHeightMap - Incorrect heightmap size!" );
-   dMemcpy( mHeightMap.address(), heightmap.address(), mHeightMap.size() ); 
+   dMemcpy( mHeightMap.address(), heightmap.address(), mHeightMap.size() );
 
    if ( updateCollision )
       _buildGridMap();
 }
 
-void TerrainFile::import(  const GBitmap &heightMap, 
+void TerrainFile::import(  const GBitmap &heightMap,
                            F32 heightScale,
-                           const Vector<U8> &layerMap, 
+                           const Vector<U8> &layerMap,
                            const Vector<String> &materials,
                            bool flipYAxis )
 {
@@ -761,8 +761,8 @@ void TerrainFile::import(  const GBitmap &heightMap,
 }
 
 
-void TerrainFile::create(  String *inOutFilename, 
-                           U32 newSize, 
+void TerrainFile::create(  String *inOutFilename,
+                           U32 newSize,
                            const Vector<String> &materials )
 {
    // Determine the path and basename - first try using the input filename (mission name)
@@ -859,7 +859,7 @@ void TerrainFile::updateGrid( const Point2I &minPt, const Point2I &maxPt )
    for( S32 level = 1; level <= mGridLevels; level++ )
    {
       S32 size = 1 << level;
-      S32 halfSize = size >> 1;  
+      S32 halfSize = size >> 1;
 
       for( S32 y = (minPt.y - 1) >> level; y < (maxPt.y + size) >> level; y++ )
       {

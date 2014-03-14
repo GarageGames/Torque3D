@@ -373,7 +373,7 @@ VectorF OculusVRSensorDevice::getAcceleration()
       return VectorF::Zero;
 
    OVR::Vector3f a = mSensorFusion.GetAcceleration();
-   
+
    // Sensor acceleration in VectorF format
    VectorF acceleration;
    OculusVRUtil::convertAcceleration(a, acceleration);
@@ -387,7 +387,7 @@ EulerF OculusVRSensorDevice::getAngularVelocity()
       return EulerF::Zero;
 
    OVR::Vector3f v = mSensorFusion.GetAngularVelocity();
-   
+
    // Sensor angular velocity in EulerF format
    EulerF vel;
    OculusVRUtil::convertAngularVelocity(v, vel);
@@ -409,7 +409,7 @@ VectorF OculusVRSensorDevice::getMagnetometer()
    {
       m = mSensorFusion.GetMagnetometer();
    }
-   
+
    // Sensor magnetometer reading in VectorF format
    VectorF mag;
    OculusVRUtil::convertMagnetometer(m, mag);
@@ -423,7 +423,7 @@ VectorF OculusVRSensorDevice::getRawMagnetometer()
       return VectorF::Zero;
 
    OVR::Vector3f m = mSensorFusion.GetMagnetometer();
-   
+
    // Sensor magnetometer reading in VectorF format
    VectorF mag;
    OculusVRUtil::convertMagnetometer(m, mag);

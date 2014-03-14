@@ -39,15 +39,15 @@ class FeatureSet
 protected:
 
    struct FeatureInfo
-   {      
+   {
       const FeatureType* type;
       S32 index;
    };
 
-   /// The list of featurs.   
+   /// The list of featurs.
    Vector<FeatureInfo> mFeatures;
 
-   /// A string representation of all the 
+   /// A string representation of all the
    /// features used for comparisons.
    String mDescription;
 
@@ -65,7 +65,7 @@ public:
 
    FeatureSet( const FeatureSet &h )
       :  mFeatures( h.mFeatures ),
-         mDescription( h.mDescription ) 
+         mDescription( h.mDescription )
    {
    }
 
@@ -96,13 +96,13 @@ public:
    /// Returns true if this handle has this feature.
    bool hasFeature( const FeatureType &type, S32 index = -1 ) const;
 
-   /// 
+   ///
    void setFeature( const FeatureType &type, bool set, S32 index = -1 );
 
-   /// 
+   ///
    void addFeature( const FeatureType &type, S32 index = -1 );
 
-   /// 
+   ///
    void removeFeature( const FeatureType &type );
 
    ///
@@ -131,7 +131,7 @@ inline const String& FeatureSet::getDescription() const
    // Update the description if its empty and we have features.
    if ( mDescription.isEmpty() && !mFeatures.empty() )
       const_cast<FeatureSet*>(this)->_rebuildDesc();
-   
+
    return mDescription;
 }
 

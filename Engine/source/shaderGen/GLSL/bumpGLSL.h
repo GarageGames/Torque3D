@@ -32,7 +32,7 @@ class MultiLine;
 
 
 /// The Bumpmap feature will read the normal map and
-/// transform it by the inverse of the worldToTanget 
+/// transform it by the inverse of the worldToTanget
 /// matrix.  This normal is then used by subsequent
 /// shader features.
 class BumpFeatGLSL : public ShaderFeatureGLSL
@@ -42,9 +42,9 @@ public:
    // ShaderFeatureGLSL
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
-   virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }  
+   virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
    virtual Resources getResources( const MaterialFeatureData &fd );
    virtual void setTexData( Material::StageData &stageDat,
                             const MaterialFeatureData &fd,
@@ -56,7 +56,7 @@ public:
 
 
 /// This feature either generates the cheap yet effective offset
-/// mapping style parallax or the much more expensive occlusion 
+/// mapping style parallax or the much more expensive occlusion
 /// mapping technique based on the enabled feature flags.
 class ParallaxFeatGLSL : public ShaderFeatureGLSL
 {
@@ -69,7 +69,7 @@ public:
    // ShaderFeatureGLSL
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
    virtual Resources getResources( const MaterialFeatureData &fd );
    virtual void setTexData(   Material::StageData &stageDat,
@@ -81,18 +81,18 @@ public:
 
 
 
-/// This feature is used to render normals to the 
+/// This feature is used to render normals to the
 /// diffuse target for imposter rendering.
 class NormalsOutFeatGLSL : public ShaderFeatureGLSL
 {
 public:
-	
+
    // ShaderFeatureGLSL
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
 									 const MaterialFeatureData &fd );
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
 									const MaterialFeatureData &fd );
-   virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }  
+   virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
    virtual String getName() { return "NormalsOut"; }
 };
 

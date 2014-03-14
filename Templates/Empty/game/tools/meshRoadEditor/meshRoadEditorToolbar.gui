@@ -12,7 +12,7 @@
    canSave = "1";
    Visible = "0";
    hovertime = "1000";
-   
+
    new GuiTextCtrl() {
       profile = "ToolsGuiTextProfile";
       horizSizing = "right";
@@ -34,7 +34,7 @@
       RowSize = "27";
       rowSpacing = "2";
       colspacing = "4";
-      
+
       new GuiBitmapButtonCtrl(MeshRoadEditorShowSplineBtn) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -271,7 +271,7 @@ new GuiMouseEventCtrl(MeshRoadDefaultWidthSliderCtrlContainer, EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -279,7 +279,7 @@ new GuiMouseEventCtrl(MeshRoadDefaultWidthSliderCtrlContainer, EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(MeshRoadDefaultWidthTextEditContainer.position) + firstWord(MeshRoadEditorToolbar.position) + 10 SPC 
+      position = firstWord(MeshRoadDefaultWidthTextEditContainer.position) + firstWord(MeshRoadEditorToolbar.position) + 10 SPC
          (getWord(MeshRoadDefaultWidthTextEditContainer, 1)) + 25;
       Extent = "112 20";
       MinExtent = "8 2";
@@ -300,7 +300,7 @@ new GuiMouseEventCtrl(MeshRoadDefaultDepthSliderCtrlContainer, EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -308,7 +308,7 @@ new GuiMouseEventCtrl(MeshRoadDefaultDepthSliderCtrlContainer, EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(MeshRoadDefaultDepthTextEditContainer.position) + firstWord(MeshRoadEditorToolbar.position) + 10 SPC 
+      position = firstWord(MeshRoadDefaultDepthTextEditContainer.position) + firstWord(MeshRoadEditorToolbar.position) + 10 SPC
          (getWord(MeshRoadDefaultDepthTextEditContainer, 1)) + 25;
       Extent = "112 20";
       MinExtent = "8 2";

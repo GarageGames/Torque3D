@@ -24,7 +24,7 @@
 #include "gfx/gl/gfxGLOcclusionQuery.h"
 #include "gfx/gl/ggl/ggl.h"
 
-GFXGLOcclusionQuery::GFXGLOcclusionQuery(GFXDevice* device) : 
+GFXGLOcclusionQuery::GFXGLOcclusionQuery(GFXDevice* device) :
    GFXOcclusionQuery(device), mQuery(0)
 {
    glGenQueries(1, &mQuery);
@@ -48,26 +48,26 @@ void GFXGLOcclusionQuery::end()
 
 GFXOcclusionQuery::OcclusionQueryStatus GFXGLOcclusionQuery::getStatus(bool block, U32* data)
 {
-   // If this ever shows up near the top of a profile 
+   // If this ever shows up near the top of a profile
    // then your system is GPU bound.
    PROFILE_SCOPE(GFXGLOcclusionQuery_getStatus);
-   
+
    GLint numPixels = 0;
    GLint queryDone = false;
-   
+
    if (block)
       queryDone = true;
    else
       glGetQueryObjectiv(mQuery, GL_QUERY_RESULT_AVAILABLE, &queryDone);
-   
+
    if (queryDone)
       glGetQueryObjectiv(mQuery, GL_QUERY_RESULT, &numPixels);
    else
       return Waiting;
-   
+
    if (data)
       *data = numPixels;
-   
+
    return numPixels > 0 ? NotOccluded : Occluded;
 }
 

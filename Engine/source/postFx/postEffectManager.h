@@ -80,9 +80,9 @@ protected:
 
    bool _handleDeviceEvent( GFXDevice::GFXDeviceEventType evt );
 
-   void _handleBinEvent(   RenderBinManager *bin,                           
+   void _handleBinEvent(   RenderBinManager *bin,
                            const SceneRenderState* sceneState,
-                           bool isBinStart );  
+                           bool isBinStart );
 
    ///
    void _onPostRenderPass( SceneManager *sceneGraph, const SceneRenderState *sceneState );
@@ -104,14 +104,14 @@ public:
    virtual ~PostEffectManager();
 
    void renderEffects(  const SceneRenderState *state,
-                        const PFXRenderTime effectTiming, 
+                        const PFXRenderTime effectTiming,
                         const String &binName = String::EmptyString );
 
    /// Returns the current back buffer texture taking
    /// a copy of if the target has changed or the buffer
    /// was previously released.
    GFXTextureObject* getBackBufferTex();
-   
+
    /// Releases the current back buffer so that a
    /// new copy is made on the next request.
    void releaseBackBufferTex();
@@ -122,13 +122,13 @@ public:
       return _addEntry( effect, false, renderTime, afterBin );
    }
    */
-   
+
    // State interface
    const PFXFrameState &getFrameState() const { return mFrameState[mFrameStateSwitch]; }
    const PFXFrameState &getLastFrameState() const { return mFrameState[!mFrameStateSwitch]; }
 
    void setFrameMatrices( const MatrixF &worldToCamera, const MatrixF &cameraToScreen );
-   
+
    // For ManagedSingleton.
    static const char* getSingletonName() { return "PostEffectManager"; }
 };

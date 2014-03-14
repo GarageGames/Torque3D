@@ -96,7 +96,7 @@ SpotLight::~SpotLight()
 void SpotLight::initPersistFields()
 {
    addGroup( "Light" );
-      
+
       addField( "range", TypeF32, Offset( mRange, SpotLight ) );
       addField( "innerAngle", TypeF32, Offset( mInnerConeAngle, SpotLight ) );
       addField( "outerAngle", TypeF32, Offset( mOuterConeAngle, SpotLight ) );
@@ -107,7 +107,7 @@ void SpotLight::initPersistFields()
    // they show up that way in the inspector.
    Parent::initPersistFields();
 
-   // Remove the scale field... it's already 
+   // Remove the scale field... it's already
    // defined by the range and angle.
    removeField( "scale" );
 }
@@ -148,19 +148,19 @@ U32 SpotLight::packUpdate(NetConnection *conn, U32 mask, BitStream *stream )
       stream->write( mInnerConeAngle );
       stream->write( mOuterConeAngle );
    }
-   
+
    return Parent::packUpdate( conn, mask, stream );
 }
 
 void SpotLight::unpackUpdate( NetConnection *conn, BitStream *stream )
 {
    if ( stream->readFlag() ) // UpdateMask
-   {   
+   {
       stream->read( &mRange );
       stream->read( &mInnerConeAngle );
       stream->read( &mOuterConeAngle );
    }
-   
+
    Parent::unpackUpdate( conn, stream );
 }
 
@@ -182,7 +182,7 @@ void SpotLight::setScale( const VectorF &scale )
    //
    mInnerConeAngle = getMin( mInnerConeAngle, mOuterConeAngle );
 
-   // We changed a bunch of our settings 
+   // We changed a bunch of our settings
    // so notify the client.
    setMaskBits( UpdateMask );
 
@@ -204,7 +204,7 @@ void SpotLight::_renderViz( SceneRenderState *state )
    color.alpha = 16;
 
    F32 radius = mRange * mSin( mDegToRad( mOuterConeAngle * 0.5f ) );
-   draw->drawCone(   desc, 
+   draw->drawCone(   desc,
                      getPosition() + ( getTransform().getForwardVector() * mRange ),
                      getPosition(),
                      radius,

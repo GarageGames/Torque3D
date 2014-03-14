@@ -43,7 +43,7 @@ ForestItemData::ForestItemData()
    :  mNeedPreload( true ),
       mShapeFile( NULL ),
       mCollidable( true ),
-      mRadius( 1 ),      
+      mRadius( 1 ),
       mWindScale( 0.0f ),
       mTrunkBendScale( 0.0f ),
       mWindBranchAmp( 0.0f ),
@@ -52,7 +52,7 @@ ForestItemData::ForestItemData()
       mMass( 5.0f ),
       mRigidity( 10.0f ),
       mTightnessCoefficient( 0.4f ),
-      mDampingCoefficient( 0.7f )      
+      mDampingCoefficient( 0.7f )
 {
 }
 
@@ -61,7 +61,7 @@ void ForestItemData::initPersistFields()
    Parent::initPersistFields();
 
    addGroup( "Media" );
-      
+
       addField( "shapeFile",  TypeShapeFilename, Offset( mShapeFile, ForestItemData ),
          "Shape file for this item type" );
 
@@ -74,7 +74,7 @@ void ForestItemData::initPersistFields()
    endGroup( "Media" );
 
    addGroup( "Wind" );
-      
+
       addField( "mass", TypeF32, Offset( mMass, ForestItemData ),
          "Mass used in calculating spring forces on the trunk. Generally how "
          "springy a plant is." );
@@ -92,7 +92,7 @@ void ForestItemData::initPersistFields()
 
       addField( "windScale",   TypeF32, Offset( mWindScale, ForestItemData ),
          "Overall scale to the effect of wind." );
-      
+
       addField( "trunkBendScale",   TypeF32, Offset( mTrunkBendScale, ForestItemData ),
          "Overall bend amount of the tree trunk by wind and impacts." );
 
@@ -153,7 +153,7 @@ bool ForestItemData::onAdd()
 }
 
 void ForestItemData::packData(BitStream* stream)
-{ 
+{
    Parent::packData(stream);
 
    String localName = getInternalName();
@@ -163,7 +163,7 @@ void ForestItemData::packData(BitStream* stream)
    stream->write( localName );
 
    stream->writeString(mShapeFile);
-   
+
    stream->writeFlag( mCollidable );
 
    stream->write( mRadius );
@@ -192,7 +192,7 @@ void ForestItemData::unpackData(BitStream* stream)
 
    stream->readString(readBuffer);
    mShapeFile = StringTable->insert(readBuffer);
-   
+
    mCollidable = stream->readFlag();
 
    stream->read( &mRadius );

@@ -78,7 +78,7 @@ public:
    virtual void destroyWorld();
    virtual bool castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse );
    virtual PhysicsBody* castRay( const Point3F &start, const Point3F &end, U32 bodyTypes );
-   virtual void explosion( const Point3F &pos, F32 radius, F32 forceMagnitude );   
+   virtual void explosion( const Point3F &pos, F32 radius, F32 forceMagnitude );
    virtual void onDebugDraw( const SceneRenderState *state );
    virtual void reset();
    virtual bool isEnabled() const { return mIsEnabled; }

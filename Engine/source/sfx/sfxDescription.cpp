@@ -39,17 +39,17 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXDescription );
 
 ConsoleDocClass( SFXDescription,
    "@brief A description for how a sound should be played.\n\n"
-   
+
    "SFXDescriptions are used by the sound system to collect all parameters needed to set up a given "
    "sound for playback.  This includes information like its volume level, its pitch shift, etc. as well "
    "as more complex information like its fade behavior, 3D properties, and per-sound reverb properties.\n\n"
-   
+
    "Any sound playback will require a valid SFXDescription.\n\n"
-   
+
    "As datablocks, SFXDescriptions can be set up as either networked datablocks or non-networked datablocks, "
    "though it generally makes sense to keep all descriptions non-networked since they will be used exclusively "
    "by clients.\n\n"
-   
+
    "@tsexample\n"
    "// A description for a 3D sound with a reasonable default range setting.\n"
    "// The description is set up to assign sounds to the AudioChannelEffects source group\n"
@@ -64,7 +64,7 @@ ConsoleDocClass( SFXDescription,
    "  maxDistance       = 100.0;\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup SFX\n"
    "@ingroup Datablocks\n"
 );
@@ -179,7 +179,7 @@ SFXDescription::SFXDescription( const SFXDescription& desc )
 void SFXDescription::initPersistFields()
 {
    addGroup( "Playback" );
-   
+
       addField( "sourceGroup",         TypeSFXSourceName, Offset( mSourceGroup, SFXDescription ),
          "Group that sources playing with this description should be put into.\n\n"
          "When a sound source is allocated, it will be made a child of the source group that is listed in its \n"
@@ -218,11 +218,11 @@ void SFXDescription::initPersistFields()
          "Names of the parameters to which sources using this description will automatically be linked.\n\n"
          "Individual parameters are identified by their #internalName.\n\n"
          "@ref SFX_interactive" );
-   
+
    endGroup( "Playback" );
-   
+
    addGroup( "Fading" );
-   
+
       addField( "fadeInTime",          TypeF32,    Offset( mFadeInTime, SFXDescription ),
          "Number of seconds to gradually fade in volume from zero when playback starts.\n"
          "Must be >= 0.\n\n"
@@ -249,11 +249,11 @@ void SFXDescription::initPersistFields()
          "and a fade-out is only applied when the sound is explicitly paused or stopped, set this field to true.\n\n"
          "Default is false.\n\n"
          "@ref SFXSource_fades" );
-      
+
    endGroup( "Fading" );
 
    addGroup( "3D" );
-   
+
       addField( "is3D",                TypeBool,   Offset( mIs3D, SFXDescription ),
          "If true, sounds played with this description will have a position and orientation in space.\n"
          "Unlike a non-positional sound, a 3D sound will have its volume attenuated depending on the distance to the "
@@ -323,11 +323,11 @@ void SFXDescription::initPersistFields()
          "@note Per-sound rolloff is only supported on OpenAL and FMOD at the moment.  With other divices, the global rolloff setting "
             "is used for all sounds.\n"
          "@see LevelInfo::soundDistanceModel" );
-      
+
    endGroup( "3D" );
 
    addGroup( "Streaming" );
-   
+
       addField( "isStreaming",         TypeBool,   Offset( mIsStreaming, SFXDescription ),
          "If true, incrementally stream sounds; otherwise sounds are loaded in full.\n\n"
          "@ref SFX_streaming" );
@@ -349,11 +349,11 @@ void SFXDescription::initPersistFields()
          "@note This field only takes effect when Torque's own sound system performs the streaming. "
             "When FMOD is used, this field is ignored and streaming is performed by FMOD.\n\n"
          "@ref SFX_streaming" );
-         
+
    endGroup( "Streaming" );
 
    addGroup( "Reverb" );
-   
+
       addField( "useCustomReverb",     TypeBool,   Offset( mUseReverb, SFXDescription ),
          "If true, use the reverb properties defined here on sounds.\n"
          "By default, sounds will be assigned a generic reverb profile.  By setting this flag to true, "
@@ -437,9 +437,9 @@ void SFXDescription::initPersistFields()
          "@see REVERB_INSTANCE1\n"
          "@see REVERB_INSTANCE2\n"
          "@see REVERB_INSTANCE3\n" );
-      
+
    endGroup( "Reverb" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -449,11 +449,11 @@ bool SFXDescription::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
-      
+
    Sim::getSFXDescriptionSet()->addObject( this );
-   
+
    // Convert a legacy 'channel' field, if we have one.
-   
+
    static const char* sChannel = StringTable->insert( "channel" );
    const char* channelValue = getDataField( sChannel, NULL );
    if( channelValue && channelValue[ 0 ] )
@@ -462,8 +462,8 @@ bool SFXDescription::onAdd()
       if( !Sim::findObject( group, mSourceGroup ) )
          Con::errorf( "SFXDescription::onAdd - could not resolve channel '%s' to SFXSource", channelValue );
    }
-   
-   // Validate the data we'll be passing to 
+
+   // Validate the data we'll be passing to
    // the audio layer.
    validate();
 
@@ -476,7 +476,7 @@ void SFXDescription::validate()
 {
    // Validate the data we'll be passing to the audio layer.
    mVolume = mClampF( mVolume, 0, 1 );
-   
+
    if( mPitch <= 0.0f )
       mPitch = 1.0f;
    if( mFadeInTime < 0.0f )
@@ -494,10 +494,10 @@ void SFXDescription::validate()
    mConeInsideAngle     = mClamp( mConeInsideAngle, 0, 360 );
    mConeOutsideAngle    = mClamp( mConeOutsideAngle, mConeInsideAngle, 360 );
    mConeOutsideVolume   = mClampF( mConeOutsideVolume, 0, 1 );
-   
+
    if( !mIs3D )
       mUseReverb = false;
-   
+
    mReverb.validate();
 }
 
@@ -518,7 +518,7 @@ void SFXDescription::packData( BitStream *stream )
    stream->writeFlag( mIs3D );
    stream->writeFlag( mUseReverb );
    stream->writeFlag( mUseHardware );
-   
+
    sfxWrite( stream, mSourceGroup );
 
    if( mIs3D )
@@ -532,7 +532,7 @@ void SFXDescription::packData( BitStream *stream )
       stream->writeInt( mConeOutsideAngle, 9 );
 
       stream->writeFloat( mConeOutsideVolume, 6 );
-      
+
       if( mUseReverb )
       {
          stream->writeRangedS32( mReverb.mDirect, -10000, 1000 );
@@ -560,10 +560,10 @@ void SFXDescription::packData( BitStream *stream )
    stream->write( mFadeOutTime );
    stream->writeInt( mStreamPacketSize, 8 );
    stream->writeInt( mStreamReadAhead, 8 );
-   
+
    mathWrite( *stream, mFadeInEase );
    mathWrite( *stream, mFadeOutEase );
-   
+
    for( U32 i = 0; i < MaxNumParameters; ++ i )
       if( stream->writeFlag( mParameters[ i ] ) )
          stream->writeString( mParameters[ i ] );
@@ -586,7 +586,7 @@ void SFXDescription::unpackData( BitStream *stream )
    mIs3D          = stream->readFlag();
    mUseReverb     = stream->readFlag();
    mUseHardware   = stream->readFlag();
-   
+
    String errorStr;
    if( !sfxReadAndResolve( stream, &mSourceGroup, errorStr ) )
       Con::errorf( "SFXDescription::unpackData: %s", errorStr.c_str() );
@@ -602,7 +602,7 @@ void SFXDescription::unpackData( BitStream *stream )
       mConeOutsideAngle    = stream->readInt( 9 );
 
       mConeOutsideVolume   = stream->readFloat( 6 );
-      
+
       if( mUseReverb )
       {
          mReverb.mDirect               = stream->readRangedS32( -10000, 1000 );
@@ -630,10 +630,10 @@ void SFXDescription::unpackData( BitStream *stream )
    stream->read( &mFadeOutTime );
    mStreamPacketSize = stream->readInt( 8 );
    mStreamReadAhead = stream->readInt( 8 );
-   
+
    mathRead( *stream, &mFadeInEase );
    mathRead( *stream, &mFadeOutEase );
-   
+
    for( U32 i = 0; i < MaxNumParameters; ++ i )
       if( stream->readFlag() )
          mParameters[ i ] = stream->readSTString();
@@ -646,9 +646,9 @@ void SFXDescription::unpackData( BitStream *stream )
 void SFXDescription::inspectPostApply()
 {
    Parent::inspectPostApply();
-   
+
    validate();
-   
+
    if( SFX )
       SFX->notifyDescriptionChanged( this );
 }

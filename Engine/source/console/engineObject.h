@@ -54,7 +54,7 @@ class EngineObject;
 /// @endcode
 #define DECLARE_INSCOPE( name )                                                        \
    typedef name __DeclScope;
-   
+
 /// Declare that this class and all its subclasses cannot be instantiated through
 /// the API, i.e. objects of these classes can only be created inside the engine.
 ///
@@ -67,7 +67,7 @@ class EngineObject;
 /// @endcode
 #define DECLARE_NONINSTANTIABLE                                                       \
    typedef ::FalseType __IsInstantiableType;
-      
+
 /// Declare that this class and all its subclasses can be instantiated through the
 /// API using their respective create() functions.
 ///
@@ -125,7 +125,7 @@ class EngineObject;
 #define IMPLEMENT_DISPOSABLE( type )                                                   \
    IMPLEMENT_NEW_CALLBACK( type, onDispose, void, (), (),                              \
       "Called before the instance is disposed." );
-      
+
 /// Declare that the current class (and any of its descendents) can only have a single instance.
 ///
 /// @code
@@ -204,7 +204,7 @@ class EngineObject;
 /// };
 ///
 /// IMPLEMENT_STATIC_CLASS( MyFunctions,, "doc" );
-/// 
+///
 /// DefineStaticEngineMethod( MyFunctions, doSomething, void, (),, "" )
 /// {
 ///    // ...
@@ -221,7 +221,7 @@ class EngineObject;
          { return __engineExportScopeInst; }                                           \
    public:                                                                             \
       template< typename T > friend struct ::_SCOPE;                                   \
-      
+
 /// Matching implement for DECLARE_STATIC_CLASS.
 ///
 /// @param type The C++ type of the static class.  Also used as export name.
@@ -260,7 +260,7 @@ class EngineObject;
       static EnginePropertyTable& _smPropertyTable;                                    \
       virtual const EngineTypeInfo* __typeinfo() const;                                \
    public:
-   
+
 /// Declare an abstract class @a type derived from the class @a super.
 ///
 /// @code
@@ -344,7 +344,7 @@ class EngineObject;
       return ::_CREATE< type >();                                                      \
    }                                                                                   \
    IMPLEMENT_NONINSTANTIABLE_CLASS( type, doc )
-   
+
 /// Close an IMPLEMENT_CLASS or IMPLEMENT_NONINSTANTIABLE_CLASS block.
 #define END_IMPLEMENT_CLASS                                                            \
          { NULL }                                                                      \
@@ -352,7 +352,7 @@ class EngineObject;
       EnginePropertyTable _propertyTable                                               \
          ( sizeof( _properties ) / sizeof( _properties[ 0 ] ) - 1, _properties );      \
    } }
-   
+
 /// Define a property on the current class.
 ///
 /// A property named XXX must have a corresponding "getXXX" and/or "setXXX" accessor
@@ -394,7 +394,7 @@ class EngineObject;
 /// @see EnginePropertyFlags
 #define PROPERTY( name, numElements, doc, flags )                                      \
    { #name, doc, numElements, flags },
-   
+
 ///
 #define PROPERTY_GROUP( name, numElements, doc )                                       \
    { #name, doc, numElements, EnginePropertyGroupBegin },
@@ -453,16 +453,16 @@ inline T* _CREATE()
 class IEngineObjectPool
 {
    public:
-   
+
       /// Allocate a new object memory block of the given size.
       /// @return Pointer to a new memory block or NULL on failure.
       virtual void* allocateObject( U32 size TORQUE_TMM_ARGS_DECL ) = 0;
-      
+
       /// Return the member for the object at the given address to the
       /// allocator for reuse.
       /// @param ptr Pointer to an object memory block previously allocated with allocateObject().
       virtual void freeObject( void* ptr ) = 0;
-      
+
       /// Instance of the object pool to use by default.
       static IEngineObjectPool* DEFAULT;
 };
@@ -472,18 +472,18 @@ class IEngineObjectPool
 class EngineCRuntimeObjectPool : public IEngineObjectPool
 {
    public:
-   
+
       typedef IEngineObjectPool Parent;
-      
+
    protected:
-   
+
       static EngineCRuntimeObjectPool smInstance;
-      
+
    public:
 
       /// Return the singleton instance of this pool.
       static EngineCRuntimeObjectPool* instance() { return &smInstance; }
-      
+
       // IEngineObjectPool
       virtual void* allocateObject( U32 size TORQUE_TMM_ARGS_DECL );
       virtual void freeObject( void* ptr );
@@ -503,17 +503,17 @@ class EngineCRuntimeObjectPool : public IEngineObjectPool
 class EngineObject : public StrongRefBase
 {
    public:
-   
+
       DECLARE_ABSTRACT_CLASS( EngineObject, void );
       DECLARE_INSCOPE( _GLOBALSCOPE );
       DECLARE_INSTANTIABLE;
-   
+
       friend const EngineTypeInfo* TYPEOF( const EngineObject* ); // __typeinfo
       friend void*& _USERDATA( EngineObject* ); // mEngineObjectUserData
       friend class StaticEngineObject; // mEngineObjectPool
-      
+
    protected:
-   
+
       typedef ::FalseType __IsDisposableType;
       typedef ::FalseType __IsSingletonType;
 
@@ -521,34 +521,34 @@ class EngineObject : public StrongRefBase
       {
          T* object = new T;
          object->incRefCount();
-         return object; 
+         return object;
       }
 
       /// Subclasses should overload this method instead of the public destroySelf().
       virtual void _destroySelf() {}
-      
+
       ///
       static void* _allocateObject( size_t size, IEngineObjectPool* pool TORQUE_TMM_ARGS_DECL );
-            
+
    public:
-      
+
       EngineObject();
       virtual ~EngineObject();
 
       /// Return a string that describes this instance.  Meant primarily for debugging.
       virtual String describeSelf() const;
-                  
+
       #ifndef TORQUE_DISABLE_MEMORY_MANAGER
       // Make sure no matter what, we get the new/delete calls.
       void* operator new( size_t size );
       void* operator new( size_t size, IEngineObjectPool* pool );
       #endif
-      
+
       /// Allocate a new object in the default object pool.
       /// @param size Size of the object in bytes.
       /// @return Memory block for new object; never NULL.
       void* operator new( size_t size TORQUE_TMM_ARGS_DECL );
-      
+
       /// Allocate a new object in the given object pool.
       ///
       /// If the given pool's allocateObject returns NULL, the method will fall back
@@ -558,21 +558,21 @@ class EngineObject : public StrongRefBase
       /// @param pool Object pool to allocate the object in.
       /// @return Memory block for the new object; never NULL.
       void* operator new( size_t size, IEngineObjectPool* pool TORQUE_TMM_ARGS_DECL );
-      
+
       /// Placement new.
       void* operator new( size_t size, void* ptr ) { return ptr; }
-            
+
       /// Release the given object's memory in the pool it has been allocated from.
       void operator delete( void* ptr );
 
       /// Return the pool of EngineObjects to which this object belongs.
       IEngineObjectPool* getEngineObjectPool() const { return mEngineObjectPool; }
-      
+
       // StrongRefBase
       virtual void destroySelf();
-            
+
 #ifdef TORQUE_DEBUG
-      
+
       /// @name Instance Tracking (debugging only)
       ///
       /// In debug builds, all EngineObjects are kept on a global list so that it is easy
@@ -580,7 +580,7 @@ class EngineObject : public StrongRefBase
       ///
       /// @note This is @b NOT thread-safe.
       /// @{
-      
+
       /// Type of callback function for iterating over EngineObject instances.
       typedef void ( *DebugEnumInstancesCallback )( EngineObject* );
 
@@ -592,18 +592,18 @@ class EngineObject : public StrongRefBase
       /// over all instances of the given type.  This is useful for setting
       /// a breakpoint during debugging.
       static void debugEnumInstances( const std::type_info& type, DebugEnumInstancesCallback callback );
-      
+
       /// Same as above but uses an export class name and also includes
       /// inheritance (i.e. enumerates all instances of the given class and
       /// its subclasses).
       static void debugEnumInstances( const char* className, DebugEnumInstancesCallback callback );
 
    private:
-   
+
       /// Next object in global link chain of engine objects.
       /// @note Debug builds only.
       EngineObject* mNextEngineObject;
-      
+
       /// Previous object in global link chain of engine objects.
       /// @note Debug builds only.
       EngineObject* mPrevEngineObject;
@@ -611,22 +611,22 @@ class EngineObject : public StrongRefBase
       /// Total number of engine objects currently instantiated.
       /// @note Debug builds only.
       static U32 smNumEngineObjects;
-      
+
       /// First object in the global link chain of engine objects.
       /// @note Debug builds only.
       static EngineObject* smFirstEngineObject;
-      
+
       /// @}
-      
+
 #endif
 
    private:
-         
+
       /// Object pool to which this object belongs.  If this is NULL,
       /// the object will not deallocate itself when it is destructed.
       /// This is useful for inline allocation of objects.
       IEngineObjectPool* mEngineObjectPool;
-      
+
       /// Opaque user data pointer that the control layer may install
       /// on any engine object.  Most importantly, this allows control layers
       /// to very easily keep track of EngineObjects that they have already
@@ -649,9 +649,9 @@ class StaticEngineObject : public EngineObject
 
       DECLARE_ABSTRACT_CLASS( StaticEngineObject, EngineObject );
       DECLARE_NONINSTANTIABLE;
-      
+
       StaticEngineObject();
-      
+
       // EngineObject.
       virtual void destroySelf();
 };

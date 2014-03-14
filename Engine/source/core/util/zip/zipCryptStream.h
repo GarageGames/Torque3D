@@ -36,9 +36,9 @@ class ZipCryptRStream : public FilterStream
    S32 mStreamStartPos;
    S32 mFileStartPos;
    S32 mFileEndPos;
-   
+
    U32 mKeys[3]; // mKeys and it's usage is very unclear and has a ton of magic numbers -patw
-   
+
    const char *mPassword;
 
    U32 fillBuffer(const U32 in_attemptSize, void *pBuffer);

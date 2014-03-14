@@ -29,7 +29,7 @@ function isInList( %word, %list )
       if( %word $= %entry )
          return true;
    }
-   
+
    return false;
 }
 
@@ -42,6 +42,6 @@ function isInFieldList(%word, %list)
       if( %word $= %entry )
          return true;
    }
-   
+
    return false;
 }

@@ -21,9 +21,9 @@
 //-----------------------------------------------------------------------------
 
 function RoadEditorGui::onWake( %this )
-{   
-   $DecalRoad::EditorOpen = true;      
-   
+{
+   $DecalRoad::EditorOpen = true;
+
    %count = EWorldEditor.getSelectionSize();
    for ( %i = 0; %i < %count; %i++ )
    {
@@ -32,30 +32,30 @@ function RoadEditorGui::onWake( %this )
          EWorldEditor.unselectObject();
       else
          %this.setSelectedRoad( %obj );
-   }        
-   
+   }
+
    %this.onNodeSelected(-1);
 }
 
 function RoadEditorGui::onSleep( %this )
 {
-   $DecalRoad::EditorOpen = false;   
+   $DecalRoad::EditorOpen = false;
 }
 
 function RoadEditorGui::paletteSync( %this, %mode )
 {
    %evalShortcut = "ToolsPaletteArray-->" @ %mode @ ".setStateOn(1);";
    eval(%evalShortcut);
-}  
+}
 
 function RoadEditorGui::onDeleteKey( %this )
 {
    %road = %this.getSelectedRoad();
    %node = %this.getSelectedNode();
-   
+
    if ( !isObject( %road ) )
       return;
-      
+
    if ( %node != -1 )
    {
       %this.deleteNode();
@@ -63,7 +63,7 @@ function RoadEditorGui::onDeleteKey( %this )
    else
    {
       MessageBoxOKCancel( "Notice", "Delete selected DecalRoad?", "RoadEditorGui.deleteRoad();", "" );
-   }   
+   }
 }
 
 function RoadEditorGui::onEscapePressed( %this )
@@ -82,56 +82,56 @@ function RoadEditorGui::onRoadCreation( %this )
 }
 
 function RoadEditorGui::onRoadSelected( %this, %road )
-{      
+{
    %this.road = %road;
-   
+
    // Update the materialEditorList
    if(isObject( %road ))
       $Tools::materialEditorList = %road.getId();
-   
-   RoadInspector.inspect( %road );  
+
+   RoadInspector.inspect( %road );
    RoadTreeView.buildVisibleTree(true);
    if( RoadTreeView.getSelectedObject() != %road )
    {
       RoadTreeView.clearSelection();
       %treeId = RoadTreeView.findItemByObjectId( %road );
-      RoadTreeView.selectItem( %treeId );  
+      RoadTreeView.selectItem( %treeId );
    }
 }
 
 function RoadEditorGui::onNodeSelected( %this, %nodeIdx )
 {
-   
+
    if ( %nodeIdx == -1 )
    {
       RoadEditorProperties-->position.setActive( false );
-      RoadEditorProperties-->position.setValue( "" );    
-      
+      RoadEditorProperties-->position.setValue( "" );
+
       RoadEditorProperties-->width.setActive( false );
-      RoadEditorProperties-->width.setValue( "" );  
+      RoadEditorProperties-->width.setValue( "" );
    }
    else
    {
       RoadEditorProperties-->position.setActive( true );
-      RoadEditorProperties-->position.setValue( %this.getNodePosition() );    
-      
+      RoadEditorProperties-->position.setValue( %this.getNodePosition() );
+
       RoadEditorProperties-->width.setActive( true );
-      RoadEditorProperties-->width.setValue( %this.getNodeWidth() );  
+      RoadEditorProperties-->width.setValue( %this.getNodeWidth() );
    }
-   
+
 }
 
 function RoadEditorGui::onNodeModified( %this, %nodeIdx )
 {
-   
-   RoadEditorProperties-->position.setValue( %this.getNodePosition() );    
-   RoadEditorProperties-->width.setValue( %this.getNodeWidth() );  
+
+   RoadEditorProperties-->position.setValue( %this.getNodePosition() );
+   RoadEditorProperties-->width.setValue( %this.getNodeWidth() );
 
 }
 
 function RoadEditorGui::editNodeDetails( %this )
 {
-   
+
    %this.setNodePosition( RoadEditorProperties-->position.getText() );
    %this.setNodeWidth( RoadEditorProperties-->width.getText() );
 }
@@ -139,7 +139,7 @@ function RoadEditorGui::editNodeDetails( %this )
 function RoadEditorGui::onBrowseClicked( %this )
 {
    //%filename = RETextureFileCtrl.getText();
-         
+
    %dlg = new OpenFileDialog()
    {
       Filters        = "All Files (*.*)|*.*|";
@@ -148,7 +148,7 @@ function RoadEditorGui::onBrowseClicked( %this )
       ChangePath     = false;
       MustExist      = true;
    };
-         
+
    %ret = %dlg.Execute();
    if(%ret)
    {
@@ -157,7 +157,7 @@ function RoadEditorGui::onBrowseClicked( %this )
       RoadEditorGui.setTextureFile( %filename );
       RETextureFileCtrl.setText( %filename );
    }
-   
+
    %dlg.delete();
 }
 
@@ -165,18 +165,18 @@ function RoadInspector::inspect( %this, %obj )
 {
    %name = "";
    if ( isObject( %obj ) )
-      %name = %obj.getName();   
+      %name = %obj.getName();
    else
       RoadFieldInfoControl.setText( "" );
-   
+
    //RoadInspectorNameEdit.setValue( %name );
-   Parent::inspect( %this, %obj );  
+   Parent::inspect( %this, %obj );
 }
 
 function RoadInspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // Same work to do as for the regular WorldEditor Inspector.
-   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );   
+   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );
 }
 
 function RoadInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %fieldDoc )
@@ -186,12 +186,12 @@ function RoadInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %fiel
 
 function RoadTreeView::onInspect(%this, %obj)
 {
-   RoadInspector.inspect(%obj);   
+   RoadInspector.inspect(%obj);
 }
 
 function RoadTreeView::onSelect(%this, %obj)
 {
-   RoadEditorGui.road = %obj; 
+   RoadEditorGui.road = %obj;
    RoadInspector.inspect( %obj );
    if(%obj != RoadEditorGui.getSelectedRoad())
    {
@@ -202,13 +202,13 @@ function RoadTreeView::onSelect(%this, %obj)
 function RoadEditorGui::prepSelectionMode( %this )
 {
    %mode = %this.getMode();
-   
+
    if ( %mode $= "RoadEditorAddNodeMode"  )
    {
       if ( isObject( %this.getSelectedRoad() ) )
          %this.deleteNode();
    }
-   
+
    %this.setMode( "RoadEditorSelectMode" );
    ToolsPaletteArray-->RoadEditorSelectMode.setStateOn(1);
 }

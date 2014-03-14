@@ -69,7 +69,7 @@ class BoxBase
             case FarBottomLeft:     return NearTopRight;
          }
       }
-       
+
       /// Return the point index for the corner point that corresponds
       /// to the octant that @a p points to.
       static Points getPointIndexFromOctant( const Point3F& p )

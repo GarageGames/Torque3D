@@ -39,7 +39,7 @@ class SFXFMODBuffer : public SFXInternal::SFXWrapAroundBuffer
 
    protected:
 
-      FMOD_SOUND *mSound;	   
+      FMOD_SOUND *mSound;
       FMOD_MODE mMode;
 
       SFXFMODBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* description );

@@ -100,14 +100,14 @@ function defaultParseArgs()
 
          //--------------------
          // changed the default behavior of this command line arg. It now
-         // defaults to ONLY loading the game, not tools 
+         // defaults to ONLY loading the game, not tools
          // default auto-run already loads in tools --SRZ 11/29/07
          case "-game":
             $argUsed[$i]++;
             if ($hasNextArg)
             {
                // Set the selected dir --NOTE: we no longer allow tools with this argument
-               /* 
+               /*
                if( $isDedicated )
                {
                   $userDirs = $nextArg;
@@ -166,7 +166,7 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -jPlay <journal_name>");
-               
+
          //--------------------
          case "-jPlayToVideo":
             $argUsed[$i]++;
@@ -179,7 +179,7 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -jPlayToVideo <journal_name>");
-               
+
          //--------------------
          case "-vidCapFile":
             $argUsed[$i]++;
@@ -191,7 +191,7 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -vidCapFile <ouput_video_name>");
-               
+
          //--------------------
          case "-vidCapFPS":
             $argUsed[$i]++;
@@ -203,7 +203,7 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -vidCapFPS <ouput_video_framerate>");
-               
+
          //--------------------
          case "-vidCapEncoder":
             $argUsed[$i]++;
@@ -215,7 +215,7 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -vidCapEncoder <ouput_video_encoder>");
-               
+
          //--------------------
          case "-vidCapWidth":
             $argUsed[$i]++;
@@ -227,7 +227,7 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -vidCapWidth <ouput_video_width>");
-               
+
          //--------------------
          case "-vidCapHeight":
             $argUsed[$i]++;
@@ -261,12 +261,12 @@ function defaultParseArgs()
                if(%hasExt == -1)
                {
                   $levelToLoad = $nextArg @ " ";
-                  
+
                   for(%i = $i + 2; %i < $Game::argc; %i++)
                   {
                      %arg = $Game::argv[%i];
                      %hasExt = strpos(%arg, ".mis");
-                     
+
                      if(%hasExt == -1)
                      {
                         $levelToLoad = $levelToLoad @ %arg @ " ";
@@ -303,7 +303,7 @@ function defaultParseArgs()
          case "-compileAll":
             $compileAll = true;
             $argUsed[$i]++;
-            
+
          //-------------------
          case "-compileTools":
             $compileTools = true;
@@ -313,7 +313,7 @@ function defaultParseArgs()
          case "-genScript":
             $genScript = true;
             $argUsed[$i]++;
-            
+
          //-------------------
          default:
             $argUsed[$i]++;
@@ -321,28 +321,28 @@ function defaultParseArgs()
                $userDirs = $arg;
       }
    }
-   
+
    //-----------------------------------------------
    // Play journal to video file?
    if ($VideoCapture::captureFromJournal && $VideoCapture::journalName !$= "")
-   {         
+   {
       if ($VideoCapture::fileName $= "")
-         $VideoCapture::fileName = $VideoCapture::journalName;     
-      
+         $VideoCapture::fileName = $VideoCapture::journalName;
+
       if ($VideoCapture::encoder $= "")
          $VideoCapture::encoder = "THEORA";
-            
+
       if ($VideoCapture::fps $= "")
          $VideoCapture::fps = 30;
-               
+
       if ($videoCapture::width $= "")
          $videoCapture::width = 0;
-         
+
       if ($videoCapture::height $= "")
          $videoCapture::height = 0;
-         
-      playJournalToVideo(  $VideoCapture::journalName, $VideoCapture::fileName, 
-                           $VideoCapture::encoder, $VideoCapture::fps, 
+
+      playJournalToVideo(  $VideoCapture::journalName, $VideoCapture::fileName,
+                           $VideoCapture::encoder, $VideoCapture::fps,
                            $videoCapture::width SPC $videoCapture::height );
    }
 }

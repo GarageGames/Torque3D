@@ -36,12 +36,12 @@ typedef int NetConnectionId;
 /// Generic network address
 ///
 /// This is used to represent IP addresses.
-struct NetAddress 
+struct NetAddress
 {
    int type;        ///< Type of address (IPAddress currently)
 
    /// Acceptable NetAddress types.
-   enum 
+   enum
    {
       IPAddress,
    };
@@ -54,7 +54,7 @@ struct NetAddress
 typedef S32 NetSocket;
 const NetSocket InvalidSocket = -1;
 
-/// void event(NetSocket sock, U32 state) 
+/// void event(NetSocket sock, U32 state)
 typedef JournaledSignal<void(NetSocket,U32)> ConnectionNotifyEvent;
 
 /// void event(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress)

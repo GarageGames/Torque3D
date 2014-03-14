@@ -47,7 +47,7 @@ protected:
    void renderButton(GFXTexHandle &texture, Point2I &offset, const RectI& updateRect);
    void renderStateRect( GFXTexHandle &texture, const RectI& rect );
 
-public:   
+public:
    DECLARE_CONOBJECT(GuiToolboxButtonCtrl);
    GuiToolboxButtonCtrl();
 
@@ -61,7 +61,7 @@ public:
    void setNormalBitmap( StringTableEntry bitmapName );
    void setLoweredBitmap( StringTableEntry bitmapName );
    void setHoverBitmap( StringTableEntry bitmapName );
-   
+
 
    void onRender(Point2I offset, const RectI &updateRect);
 };

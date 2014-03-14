@@ -178,6 +178,6 @@ void AdvancedLightBufferConditioner::printMethodFooter( ConditionerFeature::Meth
    if(methodType == ConditionerFeature::ConditionMethod)
       meta->addStatement( new GenOp( "\r\n   return @;\r\n", retVar ) );
 
-   // Uncondition will assign output parameters 
+   // Uncondition will assign output parameters
    meta->addStatement( new GenOp( "}\r\n" ) );
 }

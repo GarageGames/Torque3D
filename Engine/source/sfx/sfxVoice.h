@@ -206,18 +206,18 @@ class SFXVoice :  public StrongRefBase,
       /// @param innerAngle Inner cone angle in degrees.
       /// @param outerAngle Outer cone angle in degrees.
       /// @param outerVolume Outer volume factor.
-      virtual void setCone(   F32 innerAngle, 
+      virtual void setCone(   F32 innerAngle,
                               F32 outerAngle,
                               F32 outerVolume ) = 0;
-                              
+
       /// Set the reverb properties for playback of this sound.
       /// @note Has no effect on devices that do not support reverb.
       virtual void setReverb( const SFXSoundReverbProperties& reverb ) {}
-      
+
       /// Set the priority of this voice.  Default 1.0.
       /// @note Has no effect on devices that do not support voice management.
       virtual void setPriority( F32 priority ) {}
-      
+
       /// Returns true if the voice is virtualized on the device.
       /// @note Always false on devices that do not support voice management.
       virtual bool isVirtual() const { return false; }

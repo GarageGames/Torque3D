@@ -44,19 +44,19 @@ class   FindMatch
    bool findMatch(const char *string, bool caseSensitive = false);
    void setExpression( const char *_expression );
 
-   S32  numMatches() const   
+   S32  numMatches() const
    {
-      return(matchList.size());                
+      return(matchList.size());
    }
 
-   bool isFull() const       
+   bool isFull() const
    {
-      return (matchList.size() >= S32(maxMatches)); 
+      return (matchList.size() >= S32(maxMatches));
    }
 
-   void clear()              
+   void clear()
    {
-      matchList.clear();                       
+      matchList.clear();
    }
 };
 

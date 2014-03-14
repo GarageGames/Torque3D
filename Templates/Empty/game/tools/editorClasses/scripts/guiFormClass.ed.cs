@@ -28,7 +28,7 @@
 // built frame control is returned
 function GuiFormClass::BuildEmptyFrame(%pos, %ext, %columns, %rows, %parentID)
 {
-   %frame = new GuiFrameSetCtrl() 
+   %frame = new GuiFrameSetCtrl()
    {
       profile = "ToolsGuiFrameSetProfile";
       horizSizing = "width";
@@ -43,7 +43,7 @@ function GuiFormClass::BuildEmptyFrame(%pos, %ext, %columns, %rows, %parentID)
       relativeResizing = "1";
       specialHighlighting = "1";
    };
-   
+
    %parentID.add(%frame);
 
    return %frame;
@@ -65,7 +65,7 @@ function GuiFormClass::BuildFormControl( %parentID, %ContentLibrary )
       return false;
    }
 
-   %newFormObj = new GuiFormCtrl() 
+   %newFormObj = new GuiFormCtrl()
    {
       class = "FormControlClass";
       profile = "ToolsGuiFormProfile";
@@ -138,18 +138,18 @@ function GuiFormClass::BuildFormMenu( %formObj )
 
    //*** Setup the check mark bitmap index to start at the third bitmap
    %formMenu.setCheckmarkBitmapIndex(1);
-   
+
    //*** Add a menu to the menubar
    %formMenu.addMenu( %menuName, %formObj);
    %formMenu.setMenuBitmapIndex( %menuName, 0, true, false);
    %formMenu.setMenuMargins(0, 0, 0);
-   
+
    // Build Division Control Menu Items.
    %formMenu.addMenuItem( %menuName, "Split This View Horizontally", 1);
    %formMenu.addMenuItem( %menuName, "Split This View Vertically", 2);
    %formMenu.addMenuItem( %menuName, "-", 0);
    %formMenu.addMenuItem( %menuName, "Remove This View", 3);
-   
+
 }
 
 //
@@ -191,10 +191,10 @@ function GuiFormClass::SetFormContent( %formObj, %contentObj )
 
          // Update form Caption
          %formObj.setCaption( $FormClassNoContentCaption );
-        
+
       }
    }
-   
+
    // Handle the Form content choices by obtaining the script build command
    if( %contentObj.CreateFunction !$= "" )
    {
@@ -202,11 +202,11 @@ function GuiFormClass::SetFormContent( %formObj, %contentObj )
       %name = %contentObj.Name;
       %formObj.setCaption(%name);
 
-      // We set the content ID prior to calling the create function so 
+      // We set the content ID prior to calling the create function so
       // that it may reference it's content to retrieve information about it.
       %oldContentId = %formObj.contentID;
       %formObj.contentID = %contentObj;
-      
+
       %result = eval( %contentObj.CreateFunction @ "(" @ %formObj @ ");" );
       if(!%result)
       {
@@ -214,16 +214,16 @@ function GuiFormClass::SetFormContent( %formObj, %contentObj )
          //*** do it like this to allow the form's contents to change the form caption
          //*** if the above command worked.
          %formObj.setCaption($FormClassNoContentCaption);
-         
+
          // Restore Content ID.
          %formObj.contentID = %oldContentID;
 
          // Notify Script of Failure.
          if( %formObj.isMethod("onContentChangeFailure") )
             %formObj.onContentChangeFailure();
-      } 
+      }
       else
-      {        
+      {
          // Add to Reference List.
          %currentContent = %formObj.getObject( 1 );
          if( isObject( %currentContent ) )
@@ -234,16 +234,16 @@ function GuiFormClass::SetFormContent( %formObj, %contentObj )
          // Notify Script of Content Change
          if( %formObj.isMethod("onContentChanged") )
             %formObj.onContentChanged( %contentObj );
-            
+
          return %result;
       }
-   }   
+   }
    return 0;
 }
 
 
 //
-// Create a given content library content instance on a given parent control and 
+// Create a given content library content instance on a given parent control and
 //  reference count it in the ref manager.
 //
 function GuiFormClass::SetControlContent( %controlObj, %contentLibrary, %contentObj )
@@ -261,7 +261,7 @@ function GuiFormClass::SetControlContent( %controlObj, %contentLibrary, %content
    {
       // Find Control of current content internal name on the control.
       %currentContent = %controlObj.findObjectByInternalName( %controlObj.ContentID.Name );
-      
+
       if( isObject( %currentContent ) )
       {
 
@@ -277,27 +277,27 @@ function GuiFormClass::SetControlContent( %controlObj, %contentLibrary, %content
 
       }
    }
-   
+
    // Handle the Form content choices by obtaining the script build command
    if( %contentObj.CreateFunction !$= "" )
    {
       %name = %contentObj.Name;
 
-      // We set the content ID prior to calling the create function so 
+      // We set the content ID prior to calling the create function so
       // that it may reference it's content to retrieve information about it.
       %oldContentId = %controlObj.contentID;
       %controlObj.contentID = %contentObj;
-      
+
       %currentContent = eval( %contentObj.CreateFunction @ "(" @ %controlObj @ ");" );
       if( !isObject( %currentContent ) )
-      {        
+      {
          // Restore Content ID.
          %controlObj.contentID = %oldContentID;
 
          // Notify Script of Failure.
          if( %controlObj.isMethod("onContentChangeFailure") )
             %controlObj.onContentChangeFailure();
-      } 
+      }
       else
       {
          // Add to Reference List.
@@ -312,10 +312,10 @@ function GuiFormClass::SetControlContent( %controlObj, %contentLibrary, %content
          // Notify Script of Content Change
          if( %controlObj.isMethod("onContentChanged") )
             %controlObj.onContentChanged( %contentObj );
-            
+
          return %currentContent;
       }
-   }   
+   }
    return 0;
 }
 
@@ -324,7 +324,7 @@ function GuiFormClass::SetControlContent( %controlObj, %contentLibrary, %content
 //
 function GuiFormClass::ClearControlContent( %controlObj, %contentLibrary )
 {
- 
+
    // Remove any other content from the Form
    if( isObject( %controlObj.ContentID ) )
    {
@@ -358,7 +358,7 @@ function GuiFormClass::ClearControlContent( %controlObj, %contentLibrary )
 function GuiFormClass::AddFrameSplitToForm(%formid, %horizontal)
 {
    %formparent = %formid.getGroup();
-   
+
    // Get form position and size
    %pos = %formid.position;
    %ext = %formid.extent;
@@ -368,13 +368,13 @@ function GuiFormClass::AddFrameSplitToForm(%formid, %horizontal)
    {
       %framesplit = getWord(%ext,1) / 2;
       %rows = "0 " @ %framesplit;
-   } 
+   }
    else
    {
       %framesplit = getWord(%ext,0) / 2;
       %columns = "0 " @ %framesplit;
    }
-         
+
    // If the form's parent is a frame control and this form is the first control then
    // we will need to move it to the front of the other children later on.  Otherwise
    // we'll be added to the bottom of the stack and the order will get messed up.
@@ -390,8 +390,8 @@ function GuiFormClass::AddFrameSplitToForm(%formid, %horizontal)
          %secondctrl = %formparent.getObject(1);
       }
    }
-                  
-   // If we're adding a frameset around the layout base, propogate the 
+
+   // If we're adding a frameset around the layout base, propogate the
    // layoutRef and layoutObj's to the new parent.
    if( %formID.LayoutRef !$= "" )
       %LayoutRef = %formID.LayoutRef;
@@ -421,10 +421,10 @@ function GuiFormClass::AddFrameSplitToForm(%formid, %horizontal)
       %formparent.add(%secondctrl);
    }
    %frame.add(%formid);
-         
+
    // Add a blank form to the bottom frame
    GuiFormClass::BuildFormControl(%frame, %formid.ContentLibrary );
-         
+
    //error("New parent: " @ %frame SPC "(" @ %frame.getClassName() @ ")");
 }
 
@@ -442,11 +442,11 @@ function GuiFormClass::RemoveFrameSplit(%formid, %keepform)
    %frameID = %formid.getGroup();
    if(%frameID.getClassName() !$= "GuiFrameSetCtrl")
       return;
-   
+
    //*** Get frame's position and size
    %pos = %frameID.position;
    %ext = %frameID.extent;
-   
+
    if(%keepform)
    {
       %form = %frameID.getObject(0);
@@ -456,8 +456,8 @@ function GuiFormClass::RemoveFrameSplit(%formid, %keepform)
          GuiFormManager::RemoveContentReference( %form.ContentLibrary, %form.contentID.Name, %form.getObject(1) );
 
       //*** Go through the frame's children and remove them (which includes our form)
-      %frameID.clear();    
-   } 
+      %frameID.clear();
+   }
    else
    {
 
@@ -482,10 +482,10 @@ function GuiFormClass::RemoveFrameSplit(%formid, %keepform)
       //*** Now remove all children from the frame.
       %frameID.clear();
    }
-   
+
    //*** Obtain the frame's parent
    %frameparentID = %frameID.getGroup();
-   
+
    //*** If the frame's parent is itself a frame, then track all of its children and add
    //*** our form into the correct location, and remove our frame in the process.  Otherwise
    //*** just delete our frame and add our form to the parent.
@@ -500,10 +500,10 @@ function GuiFormClass::RemoveFrameSplit(%formid, %keepform)
          if(%obj[%i] == %frameID)
             %check = %i;
       }
-      
+
       //*** Clear the existing children
       %frameparentID.clear();
-      
+
       //*** Now add them back, including our form
       for(%i=0; %i<%count; %i++)
       {
@@ -511,15 +511,15 @@ function GuiFormClass::RemoveFrameSplit(%formid, %keepform)
          {
             //*** Add our form
             %frameparentID.add(%formid);
-            
-         } 
+
+         }
          else
          {
             //*** Add the old child back
             %frameparentID.add(%obj[%i]);
          }
       }
-      
+
    } else
    {
       // If we're about to remove a frame that has a layout ref move it to the new object (%formID)
@@ -534,9 +534,9 @@ function GuiFormClass::RemoveFrameSplit(%formid, %keepform)
       //*** Remove old child and add our form to the parent
       %frameparentID.remove(%frameID);
       %frameparentID.add(%formid);
-      
+
    }
-   
+
    //*** Finally resize the form to fit
    %formid.resize(getWord(%pos,0),getWord(%pos,1),getWord(%ext,0),getWord(%ext,1));
 }
@@ -553,12 +553,12 @@ function FormControlClass::sizeContentsToFit(%this, %content, %margin)
    %formext = %this.getExtent();
    %menupos = %this.getObject(0).getPosition();
    %menuext = %this.getObject(0).getExtent();
-   
+
    %ctrlposx = getWord(%menupos,0) + %this.contentID.Margin;
    %ctrlposy = getWord(%menupos,1) + getWord(%menuext,1) + %this.contentID.Margin;
    %ctrlextx = getWord(%formext,0) - %ctrlposx - %this.contentID.Margin;
    %ctrlexty = getWord(%formext,1) - %ctrlposy - %this.contentID.Margin;
-   
+
    %content.resize(%ctrlposx,%ctrlposy,%ctrlextx,%ctrlexty);
 }
 
@@ -588,7 +588,7 @@ function FormControlClass::onResize(%this)
 function FormMenuBarClass::onMenuItemSelect(%this, %menuid, %menutext, %itemid, %itemtext)
 {
    %formId = %menuid; // %menuid should contain the form's ID
-   
+
    //error("FormMenuBarClass::onMenuSelect(): " @ %menuid SPC %menutext SPC %itemid SPC %itemtext SPC "parent: " @ %formparent);
 
    // If the ID is less than 1000, we know it's a layout menu item
@@ -599,16 +599,16 @@ function FormMenuBarClass::onMenuItemSelect(%this, %menuid, %menutext, %itemid, 
       {
          case "1": // Add horizontal split
             GuiFormClass::AddFrameSplitToForm(%formid, true);
-         
+
          case "2": // Add vertical split
-            GuiFormClass::AddFrameSplitToForm(%formid, false);        
+            GuiFormClass::AddFrameSplitToForm(%formid, false);
          case "3": // Remove split and keep other child
             GuiFormClass::RemoveFrameSplit(%formid, false);
       }
 
       // We're Done Here.
       return;
-   } 
+   }
    else
       GuiFormClass::SetFormContent( %formId, %itemId );
 

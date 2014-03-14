@@ -137,7 +137,7 @@ private:
    dtStatus mStatus;
    /// Filter that provides the movement costs for paths.
    dtQueryFilter mFilter;
-   
+
    /// List of points the path should visit (waypoints, if you will).
    Vector<Point3F> mVisitPoints;
    /// List of points in the final path.

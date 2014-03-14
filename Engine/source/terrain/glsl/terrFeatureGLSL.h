@@ -35,15 +35,15 @@
 class TerrainFeatGLSL : public ShaderFeatureGLSL
 {
 protected:
-   
+
    Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
-   
+
    Var* _getNormalMapTex();
-   
+
    static Var* _getUniformVar( const char *name, const char *type, ConstantSortPosition csp );
-   
+
    Var* _getDetailIdStrengthParallax();
-      
+
 };
 
 class TerrainBaseMapFeatGLSL : public TerrainFeatGLSL
@@ -53,9 +53,9 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
-          
+
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Base Texture"; }
@@ -74,7 +74,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -90,7 +90,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -107,15 +107,15 @@ protected:
 public:
 
    TerrainParallaxMapFeatGLSL();
-   
+
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
-   
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                            const MaterialFeatureData &fd );
-   
+
    virtual Resources getResources( const MaterialFeatureData &fd );
-   
+
    virtual String getName() { return "Terrain Parallax Texture"; }
 };
 
@@ -123,9 +123,9 @@ class TerrainLightMapFeatGLSL : public TerrainFeatGLSL
 {
 public:
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
-          
+
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Lightmap Texture"; }
@@ -136,7 +136,7 @@ class TerrainAdditiveFeatGLSL : public TerrainFeatGLSL
 {
 public:
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Additive"; }

@@ -61,7 +61,7 @@ class StaticShape: public ShapeBase
 
 protected:
    enum MaskBits {
-      PositionMask = Parent::NextFreeMask,	  
+      PositionMask = Parent::NextFreeMask,
       NextFreeMask = Parent::NextFreeMask << 1
    };
 
@@ -86,7 +86,7 @@ public:
    void setPowered(bool power)      {mPowered = power;}
    bool isPowered()                 {return(mPowered);}
 
-   static void initPersistFields();   
+   static void initPersistFields();
 };
 
 

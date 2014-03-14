@@ -32,7 +32,7 @@
 #include "windowManager/win32/win32Window.h"
 
 
-GFXPCD3D9TextureTarget::GFXPCD3D9TextureTarget() 
+GFXPCD3D9TextureTarget::GFXPCD3D9TextureTarget()
    :  mTargetSize( Point2I::Zero ),
       mTargetFormat( GFXFormatR8G8B8A8 )
 {
@@ -68,7 +68,7 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *t
 
    AssertFatal(slot < MaxRenderSlotId, "GFXPCD3D9TextureTarget::attachTexture - out of range slot.");
 
-   // TODO:  The way this is implemented... you can attach a texture 
+   // TODO:  The way this is implemented... you can attach a texture
    // object multiple times and it will release and reset it.
    //
    // We should rework this to detect when no change has occured
@@ -91,7 +91,7 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *t
    // Are we clearing?
    if(!tex)
    {
-      // Yup - just exit, it'll stay NULL.      
+      // Yup - just exit, it'll stay NULL.
       return;
    }
 
@@ -105,7 +105,7 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *t
    else
    {
       // Cast the texture object to D3D...
-      AssertFatal(dynamic_cast<GFXD3D9TextureObject*>(tex), 
+      AssertFatal(dynamic_cast<GFXD3D9TextureObject*>(tex),
          "GFXPCD3D9TextureTarget::attachTexture - invalid texture object.");
 
       GFXD3D9TextureObject *d3dto = static_cast<GFXD3D9TextureObject*>(tex);
@@ -124,10 +124,10 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *t
          // in the actual texture. This will happen with MSAA.
          if( d3dto->getSurface() == NULL )
          {
-            D3D9Assert(d3dto->get2DTex()->GetSurfaceLevel(mipLevel, &mTargets[slot]), 
+            D3D9Assert(d3dto->get2DTex()->GetSurfaceLevel(mipLevel, &mTargets[slot]),
                "GFXPCD3D9TextureTarget::attachTexture - could not get surface level for the passed texture!");
-         } 
-         else 
+         }
+         else
          {
             mTargets[slot] = d3dto->getSurface();
             mTargets[slot]->AddRef();
@@ -143,7 +143,7 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *t
                mTargetSize.set( tex->getSize().x, tex->getSize().y );
                mTargetFormat = tex->getFormat();
             }
-         }           
+         }
       }
 
       // Update surface size
@@ -179,7 +179,7 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXCubemap *tex, U3
    mResolveTargets[slot] = NULL;
 
    // Cast the texture object to D3D...
-   AssertFatal(!tex || dynamic_cast<GFXD3D9Cubemap*>(tex), 
+   AssertFatal(!tex || dynamic_cast<GFXD3D9Cubemap*>(tex),
       "GFXD3DTextureTarget::attachTexture - invalid cubemap object.");
 
    GFXD3D9Cubemap *cube = static_cast<GFXD3D9Cubemap*>(tex);
@@ -193,7 +193,7 @@ void GFXPCD3D9TextureTarget::attachTexture( RenderSlot slot, GFXCubemap *tex, U3
    // Are we clearing?
    if(!tex)
    {
-      // Yup - just exit, it'll stay NULL.      
+      // Yup - just exit, it'll stay NULL.
       return;
    }
 
@@ -221,7 +221,7 @@ void GFXPCD3D9TextureTarget::activate()
 {
    GFXDEBUGEVENT_SCOPE( GFXPCD3D9TextureTarget_activate, ColorI::RED );
 
-   AssertFatal( mTargets[GFXTextureTarget::Color0], 
+   AssertFatal( mTargets[GFXTextureTarget::Color0],
       "GFXPCD3D9TextureTarget::activate() - You can never have a NULL primary render target!" );
 
    const U32 NumRenderTargets = getMin( mDevice->getNumRenderTargets(), (U32)Color4 - Color0 );
@@ -232,19 +232,19 @@ void GFXPCD3D9TextureTarget::activate()
    stateApplied();
 
    IDirect3DSurface9 *depth = mTargets[GFXTextureTarget::DepthStencil];
-   
+
    // In debug lets do a complete test to be sure we don't
-   // have a bad depth format for this display mode.   
+   // have a bad depth format for this display mode.
    #ifdef TORQUE_DEBUG
 
       if ( depth && mTargets[GFXTextureTarget::Color0] )
       {
          D3DSURFACE_DESC desc;
-         D3D9Assert( mTargets[GFXTextureTarget::Color0]->GetDesc( &desc ), 
+         D3D9Assert( mTargets[GFXTextureTarget::Color0]->GetDesc( &desc ),
             "GFXPCD3D9TextureTarget::activate() - Failed to get surface description!");
          D3DFORMAT renderFormat = desc.Format;
 
-         D3D9Assert( depth->GetDesc( &desc ), 
+         D3D9Assert( depth->GetDesc( &desc ),
             "GFXPCD3D9TextureTarget::activate() - Failed to get surface description!");
          D3DFORMAT depthFormat = desc.Format;
 
@@ -253,7 +253,7 @@ void GFXPCD3D9TextureTarget::activate()
                                                                   mDevice->mDisplayMode.Format,
                                                                   renderFormat,
                                                                   depthFormat );
-                                                                  
+
          D3D9Assert( hr, "GFXPCD3D9TextureTarget::activate() - Bad depth format for this target!" );
       }
 
@@ -261,7 +261,7 @@ void GFXPCD3D9TextureTarget::activate()
 
    // First clear the non-primary targets to make the debug DX runtime happy.
    for(U32 i = 1; i < NumRenderTargets; i++)
-      D3D9Assert(d3dDevice->SetRenderTarget( i, NULL ), 
+      D3D9Assert(d3dDevice->SetRenderTarget( i, NULL ),
          avar("GFXPCD3D9TextureTarget::activate() - failed to clear texture target %d!", i) );
 
    // Now set all the new surfaces into the appropriate slots.
@@ -270,7 +270,7 @@ void GFXPCD3D9TextureTarget::activate()
       IDirect3DSurface9 *target = mTargets[GFXTextureTarget::Color0 + i];
       if ( target )
       {
-         D3D9Assert(d3dDevice->SetRenderTarget(i, target), 
+         D3D9Assert(d3dDevice->SetRenderTarget(i, target),
             avar("GFXPCD3D9TextureTarget::activate() - failed to set slot %d for texture target!", i) );
       }
    }
@@ -279,7 +279,7 @@ void GFXPCD3D9TextureTarget::activate()
    // render targets.  Are we getting performance hit from setting it
    // multiple times... aside from the function call?
 
-   D3D9Assert(d3dDevice->SetDepthStencilSurface( depth ), 
+   D3D9Assert(d3dDevice->SetDepthStencilSurface( depth ),
       "GFXPCD3D9TextureTarget::activate() - failed to set depthstencil target!" );
 }
 
@@ -325,7 +325,7 @@ void GFXPCD3D9TextureTarget::resolveTo( GFXTextureObject *tex )
    D3D9Assert( mDevice->getDevice()->StretchRect( mTargets[Color0], NULL, surf, NULL, D3DTEXF_NONE ),
       "GFXPCD3D9TextureTarget::resolveTo() - StretchRect failed!" );
 
-   surf->Release();     
+   surf->Release();
 }
 
 void GFXPCD3D9TextureTarget::zombify()
@@ -368,7 +368,7 @@ void GFXPCD3D9WindowTarget::initPresentationParams()
    // Do some validation...
    if(vm.fullScreen == true && mImplicit == false)
    {
-      AssertISV(false, 
+      AssertISV(false,
          "GFXPCD3D9WindowTarget::initPresentationParams - Cannot go fullscreen with secondary window!");
    }
 
@@ -391,11 +391,11 @@ void GFXPCD3D9WindowTarget::initPresentationParams()
 
 const Point2I GFXPCD3D9WindowTarget::getSize()
 {
-   return mWindow->getVideoMode().resolution; 
+   return mWindow->getVideoMode().resolution;
 }
 
 GFXFormat GFXPCD3D9WindowTarget::getFormat()
-{ 
+{
    S32 format = mPresentationParams.BackBufferFormat;
    GFXREVERSE_LOOKUP( GFXD3D9TextureFormat, GFXFormat, format );
    return (GFXFormat)format;
@@ -417,7 +417,7 @@ void GFXPCD3D9WindowTarget::setImplicitSwapChain()
       mDevice->getDevice()->GetSwapChain(0, &mSwapChain);
    if(!mDepthStencil)
       mDevice->getDevice()->GetDepthStencilSurface(&mDepthStencil);
-   if (!mBackbuffer)      
+   if (!mBackbuffer)
       mSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mBackbuffer);
 }
 
@@ -432,7 +432,7 @@ void GFXPCD3D9WindowTarget::createAdditionalSwapChain()
    SAFE_RELEASE(mBackbuffer);
 
    // If there's a fullscreen window active, don't try to create these additional swap chains.
-   // CodeReview, we need to store the window target with the implicit swap chain better, this line below 
+   // CodeReview, we need to store the window target with the implicit swap chain better, this line below
    // could fail if the current render target isn't what we expect.
    GFXPCD3D9WindowTarget* currTarget = dynamic_cast<GFXPCD3D9WindowTarget*>(mDevice->getActiveRenderTarget());
    if (currTarget && currTarget->getWindow()->getVideoMode().fullScreen)
@@ -445,10 +445,10 @@ void GFXPCD3D9WindowTarget::createAdditionalSwapChain()
    D3D9Assert(mDevice->getDevice()->CreateAdditionalSwapChain(&mPresentationParams, &mSwapChain),
       "GFXPCD3D9WindowTarget::createAdditionalSwapChain - couldn't reallocate additional swap chain!");
    D3D9Assert(mDevice->getDevice()->CreateDepthStencilSurface(mPresentationParams.BackBufferWidth, mPresentationParams.BackBufferHeight,
-      D3DFMT_D24S8, mPresentationParams.MultiSampleType, mPresentationParams.MultiSampleQuality, false, &mDepthStencil, NULL), 
+      D3DFMT_D24S8, mPresentationParams.MultiSampleType, mPresentationParams.MultiSampleQuality, false, &mDepthStencil, NULL),
       "GFXPCD3D9WindowTarget::createAdditionalSwapChain: Unable to create stencil/depth surface");
    D3D9Assert(mSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mBackbuffer),
-      "GFXPCD3D9WindowTarget::createAdditionalSwapChain: Unable to get backbuffer!");   
+      "GFXPCD3D9WindowTarget::createAdditionalSwapChain: Unable to get backbuffer!");
 }
 
 void GFXPCD3D9WindowTarget::resetMode()
@@ -459,25 +459,25 @@ void GFXPCD3D9WindowTarget::resetMode()
    {
       // The current video settings.
       D3DPRESENT_PARAMETERS pp;
-      mSwapChain->GetPresentParameters(&pp);      
+      mSwapChain->GetPresentParameters(&pp);
       bool ppFullscreen = !pp.Windowed;
       Point2I backbufferSize(pp.BackBufferWidth, pp.BackBufferHeight);
 
       // The settings we are now applying.
       const GFXVideoMode &mode = mWindow->getVideoMode();
-      
+
       // Convert the current multisample parameters into something
       // we can compare with our GFXVideoMode.antialiasLevel value.
       U32 ppAntiAliaseLevel = 0;
-      if ( pp.MultiSampleType != D3DMULTISAMPLE_NONE )      
+      if ( pp.MultiSampleType != D3DMULTISAMPLE_NONE )
          ppAntiAliaseLevel = pp.MultiSampleQuality + 1;
 
       // Early out if none of the settings which require a device reset
-      // have changed.      
-      if ( backbufferSize == getSize() && 
+      // have changed.
+      if ( backbufferSize == getSize() &&
            ppFullscreen == mode.fullScreen &&
            ppAntiAliaseLevel == mode.antialiasLevel )
-         return;   
+         return;
    }
 
    // So, the video mode has changed - if we're an additional swap chain
@@ -496,7 +496,7 @@ void GFXPCD3D9WindowTarget::resetMode()
    }
 
    // Update our size, too.
-   mSize = Point2I(mPresentationParams.BackBufferWidth, mPresentationParams.BackBufferHeight);      
+   mSize = Point2I(mPresentationParams.BackBufferWidth, mPresentationParams.BackBufferHeight);
 
    mWindow->setSuppressReset(false);
 }
@@ -526,19 +526,19 @@ void GFXPCD3D9WindowTarget::activate()
    GFXDEBUGEVENT_SCOPE( GFXPCD3D9WindowTarget_activate, ColorI::RED );
 
    LPDIRECT3DDEVICE9 d3dDevice = mDevice->getDevice();
-   
+
    // In debug lets do a complete test to be sure we don't
-   // have a bad depth format for this display mode.   
+   // have a bad depth format for this display mode.
    #ifdef TORQUE_DEBUG
       if ( mDepthStencil && mBackbuffer )
       {
 
          D3DSURFACE_DESC desc;
-         D3D9Assert( mBackbuffer->GetDesc( &desc ), 
+         D3D9Assert( mBackbuffer->GetDesc( &desc ),
             "GFXPCD3D9TextureTarget::activate() - Failed to get surface description!");
          D3DFORMAT renderFormat = desc.Format;
 
-         D3D9Assert( mDepthStencil->GetDesc( &desc ), 
+         D3D9Assert( mDepthStencil->GetDesc( &desc ),
             "GFXPCD3D9TextureTarget::activate() - Failed to get surface description!");
          D3DFORMAT depthFormat = desc.Format;
 
@@ -551,11 +551,11 @@ void GFXPCD3D9WindowTarget::activate()
          D3D9Assert( hr, "GFXPCD3D9WindowTarget::activate() - Bad depth format for this back buffer!" );
       }
    #endif
-   
-   D3D9Assert( d3dDevice->SetRenderTarget( 0, mBackbuffer ), 
+
+   D3D9Assert( d3dDevice->SetRenderTarget( 0, mBackbuffer ),
       "GFXPCD3D9WindowTarget::activate() - Failed to set backbuffer target!" );
 
-   D3D9Assert( d3dDevice->SetDepthStencilSurface( mDepthStencil ), 
+   D3D9Assert( d3dDevice->SetDepthStencilSurface( mDepthStencil ),
       "GFXPCD3D9WindowTarget::activate() - Failed to set depthstencil target!" );
 
    D3DPRESENT_PARAMETERS pp;
@@ -583,5 +583,5 @@ void GFXPCD3D9WindowTarget::resolveTo( GFXTextureObject *tex )
    D3D9Assert( mDevice->getDevice()->StretchRect( mBackbuffer, NULL, surf, NULL, D3DTEXF_NONE ),
       "GFXPCD3D9WindowTarget::resolveTo() - StretchRect failed!" );
 
-   surf->Release();    
+   surf->Release();
 }

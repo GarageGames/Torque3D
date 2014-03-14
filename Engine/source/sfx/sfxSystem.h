@@ -54,10 +54,10 @@ enum SFXSystemEventType
 {
    /// SFX is being updated.
    SFXSystemEvent_Update,
-   
+
    /// New SFXDevice has been created.
    SFXSystemEvent_CreateDevice,
-   
+
    /// SFXDevice is about to be destroyed.
    SFXSystemEvent_DestroyDevice,
 };
@@ -67,13 +67,13 @@ enum SFXSystemEventType
 class SFXSystemPlugin
 {
    public:
-   
+
       ///
       virtual void update() {}
-   
+
       ///
       virtual SFXSource* createSource( SFXTrack* track ) { return NULL; }
-      
+
       /// Filter the given reverb setup before it is set up on the device.  This
       /// allows to, for example, modify the current reverb depending on listener
       /// location.
@@ -103,11 +103,11 @@ class SFXSystem
       friend class SFXProfile;         // _createBuffer.
 
    public:
-   
+
       typedef Signal< void( SFXSystemEventType event ) > EventSignalType;
       typedef Vector< SFXSource* > SFXSourceVector;
       typedef Vector< SFXSound* > SFXSoundVector;
-      
+
    protected:
 
       /// The one and only instance of the SFXSystem.
@@ -126,44 +126,44 @@ class SFXSystem
       /// The current output sound device initialized
       /// and ready to play back.
       SFXDevice* mDevice;
-      
+
       ///
       SFXSoundVector mSounds;
 
       /// This is used to keep track of play once sources
       /// that must be released when they stop playing.
       SFXSourceVector mPlayOnceSources;
-            
+
       /// The last time the sources got an update.
       U32 mLastSourceUpdateTime;
-      
+
       ///
       U32 mLastAmbientUpdateTime;
-      
+
       ///
       U32 mLastParameterUpdateTime;
 
       /// The distance model used for rolloff curve computation on 3D sounds.
       SFXDistanceModel mDistanceModel;
-      
+
       /// The current doppler scale factor.
       F32 mDopplerFactor;
-      
+
       /// The current curve rolloff factor.
       F32 mRolloffFactor;
-            
+
       /// The current position and orientation of all listeners.
       Vector< SFXListenerProperties > mListeners;
-      
+
       /// Current global reverb properties.
       SFXReverbProperties mReverb;
-      
+
       /// SFX system event signal.
       EventSignalType mEventSignal;
-            
+
       /// Ambient soundscape manager.
       SFXSoundscapeManager* mSoundscapeMgr;
-      
+
       /// List of plugins currently linked to the SFX system.
       Vector< SFXSystemPlugin* > mPlugins;
 
@@ -185,7 +185,7 @@ class SFXSystem
       /// @}
 
       /// Called to reprioritize and reassign buffers as
-      /// sources change state, volumes are adjusted, and 
+      /// sources change state, volumes are adjusted, and
       /// the listener moves around.
       ///
       /// @see SFXSource::_update()
@@ -195,7 +195,7 @@ class SFXSystem
       /// This called to reprioritize and reassign
       /// voices to sources.
       void _assignVoices();
-      
+
       ///
       void _assignVoice( SFXSound* sound );
 
@@ -204,26 +204,26 @@ class SFXSystem
 
       /// Called from SFXSource::onAdd to register the source.
       void _onAddSource( SFXSource* source );
-                       
+
       /// Called from SFXSource::onRemove to unregister the source.
       void _onRemoveSource( SFXSource* source );
 
       /// Called from SFXProfile to create a device specific
       /// sound buffer used in conjunction with a voice in playback.
       SFXBuffer* _createBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* description );
-      
+
       /// Load file directly through SFXDevice.  Depends on
       /// availability with selected SFXDevice.
       ///
       /// @return Return new buffer or NULL.
       SFXBuffer* _createBuffer( const String& filename, SFXDescription* description );
-      
+
       ///
       SFXDevice* _getDevice() const { return mDevice; }
 
    public:
 
-      /// Returns the one an only instance of the SFXSystem 
+      /// Returns the one an only instance of the SFXSystem
       /// unless it hasn't been initialized or its been disabled
       /// in your build.
       ///
@@ -244,17 +244,17 @@ class SFXSystem
       /// singleton is null and any call to it will crash.
       static void destroy();
 
-      /// This is only public so that it can be called by 
-      /// the game update loop.  It updates the current 
+      /// This is only public so that it can be called by
+      /// the game update loop.  It updates the current
       /// device and all sources.
       void _update();
-      
+
       /// Register the given plugin with the system.
       void addPlugin( SFXSystemPlugin* plugin );
-      
+
       /// Unregister the given plugin with the system.
       void removePlugin( SFXSystemPlugin* plugin );
-      
+
       /// @name Device Management
       /// @{
 
@@ -263,12 +263,12 @@ class SFXSystem
       /// @param providerName    The name of the provider.
       /// @param deviceName      The name of the provider device.
       /// @param useHardware     Toggles the use of hardware processing when available.
-      /// @param maxBuffers      The maximum buffers for this device to use or -1 
+      /// @param maxBuffers      The maximum buffers for this device to use or -1
       ///                        for the device to pick its own reasonable default.
       /// @param changeDevice    Allows this to change the current device to a new one
       /// @return Returns true if the device was created.
-      bool createDevice(   const String& providerName, 
-                           const String& deviceName, 
+      bool createDevice(   const String& providerName,
+                           const String& deviceName,
                            bool useHardware,
                            S32 maxBuffers,
                            bool changeDevice = false);
@@ -276,7 +276,7 @@ class SFXSystem
       /// Returns the current device information or NULL if no
       /// device is present.  The information string is in the
       /// following format:
-      /// 
+      ///
       /// Provider Name\tDevice Name\tUse Hardware\tMax Buffers
       String getDeviceInfoString();
 
@@ -286,9 +286,9 @@ class SFXSystem
 
       /// Returns true if a device is allocated.
       bool hasDevice() const { return mDevice != NULL; }
-      
+
       /// @}
-      
+
       /// @name Source Creation
       /// @{
 
@@ -305,12 +305,12 @@ class SFXSystem
       /// @param velocity  The optional doppler velocity if creating a 3D source.
       ///
       /// @return The sound source or NULL if an error occured.
-      SFXSource* createSource(  SFXTrack* track, 
-                                const MatrixF* transform = NULL, 
+      SFXSource* createSource(  SFXTrack* track,
+                                const MatrixF* transform = NULL,
                                 const VectorF* velocity = NULL );
 
       /// Used to create a streaming sound source from a user supplied
-      /// stream object.  
+      /// stream object.
       ///
       /// It is only intended for memory based streams.  For sound file
       /// streaming use createSource() with a streaming SFXProfile.
@@ -342,7 +342,7 @@ class SFXSystem
       /// @param velocity  The optional doppler velocity if creating a 3D source.
       ///
       /// @return The sound source or NULL if an error occured.
-      SFXSource* playOnce( SFXTrack* track, 
+      SFXSource* playOnce( SFXTrack* track,
                            const MatrixF* transform = NULL,
                            const VectorF* velocity = NULL,
                            F32 fadeInTime = -1.f );
@@ -353,86 +353,86 @@ class SFXSystem
       { // Avoids having to require inclusion of sfxProfile.h
          return playOnce( ( SFXTrack* ) profile, transform, velocity, fadeInTime );
       }
-      
+
       /// Stop the source and delete it.  This method will take care of
       /// the fade-out time that the source may need before it will actually
       /// stop and may be deleted.
       void stopAndDeleteSource( SFXSource* source );
-      
+
       /// Mark source for deletion when it is moving into stopped state.
       /// This method is useful to basically make a source a play-once source
       /// after the fact.
       void deleteWhenStopped( SFXSource* source );
-      
+
       /// @}
-            
+
       /// @}
-      
+
       /// @name Listeners
       /// @{
 
       /// Return the number of listeners currently configured.
       U32 getNumListeners() const { return mListeners.size(); }
-      
+
       /// Set the number of concurrent listeners.
       /// @note It depends on the selected device if more than one listener is actually supported.
       void setNumListeners( U32 num );
 
       /// Set the property of the given listener.
       const SFXListenerProperties& getListener( U32 index = 0 ) const { return mListeners[ index ]; }
-      
+
       /// Set the 3D attributes of the given listener.
       void setListener( U32 index, const MatrixF& transform, const Point3F& velocity );
       void setListener( U32 index, const SFXListenerProperties& properties )
       {
          setListener( index, properties.getTransform(), properties.getVelocity() );
       }
-      
+
       /// @}
-      
+
       /// @name 3D Sound Configuration
       /// {
-      
+
       /// Return the curve model currently used distance attenuation of positional sounds.
       SFXDistanceModel getDistanceModel() const { return mDistanceModel; }
-      
+
       ///
       void setDistanceModel( SFXDistanceModel model );
-      
+
       ///
       F32 getDopplerFactor() const { return mDopplerFactor; }
-      
+
       ///
       void setDopplerFactor( F32 factor );
-      
+
       ///
       F32 getRolloffFactor() const { return mRolloffFactor; }
-      
+
       ///
       void setRolloffFactor( F32 factor );
-      
+
       ///
       const SFXReverbProperties& getReverb() const { return mReverb; }
-      
+
       ///
       void setReverb( const SFXReverbProperties& reverb );
-      
+
       /// @}
-      
+
       ///
       SFXSoundscapeManager* getSoundscapeManager() const { return mSoundscapeMgr; }
-      
+
       /// Dump information about all current SFXSources to the console or
       /// to the given StringBuilder.
       void dumpSources( StringBuilder* toString = NULL, bool excludeGroups = true );
-      
+
       /// Return the SFX system event signal.
       EventSignalType& getEventSignal() { return mEventSignal; }
-      
+
       /// Notify the SFX system that the given description has changed.
       /// All sources currently using the description will be updated.
       void notifyDescriptionChanged( SFXDescription* description);
-      
+
       ///
       void notifyTrackChanged( SFXTrack* track );
 };

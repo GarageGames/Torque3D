@@ -259,7 +259,7 @@ bool GL_EXT_Init( )
    } else {
       gGLState.suppARBMultitexture = false;
    }
-   
+
    // EXT_blend_color
    if(pExtString && dStrstr(pExtString, (const char*)"GL_EXT_blend_color") != NULL)
    {

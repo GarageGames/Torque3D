@@ -30,8 +30,8 @@ class GFXGLWindowTarget : public GFXWindowTarget
 public:
 
    GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d);
-   const Point2I getSize() 
-   { 
+   const Point2I getSize()
+   {
       return mWindow->getClientExtent();
    }
    virtual GFXFormat getFormat()
@@ -44,14 +44,14 @@ public:
    virtual void resetMode();
    virtual void zombify() { }
    virtual void resurrect() { }
-   
+
    virtual void resolveTo(GFXTextureObject* obj);
-   
+
    void _onAppSignal(WindowId wnd, S32 event);
-   
+
 private:
    friend class GFXGLDevice;
-   Point2I size;   
+   Point2I size;
    GFXDevice* mDevice;
    void* mContext;
    void* mFullscreenContext;

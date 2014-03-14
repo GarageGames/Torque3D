@@ -80,7 +80,7 @@ public:
       d.mCurBlock = mCurBlock;
       mCurBlock = temp;
    }
-   
+
 private:
    /// Block of allocated memory.
    ///
@@ -115,8 +115,8 @@ public:
 
 //----------------------------------------------------------------------------
 /// This class is similar to the Chunker<> class above.  But it allows for multiple
-/// types of structs to be stored.  
-/// CodeReview:  This could potentially go into DataChunker directly, but I wasn't sure if 
+/// types of structs to be stored.
+/// CodeReview:  This could potentially go into DataChunker directly, but I wasn't sure if
 /// CodeReview:  That would be polluting it.  BTR
 class MultiTypedChunker : private DataChunker
 {
@@ -163,9 +163,9 @@ public:
       mFreeListHead = elem;
    }
 
-   void freeBlocks( bool keepOne = false ) 
-   { 
-      DataChunker::freeBlocks( keepOne ); 
+   void freeBlocks( bool keepOne = false )
+   {
+      DataChunker::freeBlocks( keepOne );
       mFreeListHead = NULL;
    }
 
@@ -224,7 +224,7 @@ public:
       mChunker->freeBlocks( keepOne );
       mFreeListHead = NULL;
    }
-   
+
 private:
    DataChunker *mChunker;
    bool        mOwnChunker;
@@ -256,7 +256,7 @@ public:
    ~FreeListChunkerUntyped()
    {
       if ( mOwnChunker )
-         delete mChunker; 
+         delete mChunker;
    }
 
    void *alloc()

@@ -31,20 +31,20 @@
 class GuiBitmapCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
    protected:
-   
+
       /// Name of the bitmap file.  If this is 'texhandle' the bitmap is not loaded
       /// from a file but rather set explicitly on the control.
       String mBitmapName;
-      
+
       /// Loaded texture.
       GFXTexHandle mTextureObject;
-      
+
       Point2I mStartPoint;
-      
+
       /// If true, bitmap tiles inside control.  Otherwise stretches.
       bool mWrap;
 
@@ -52,7 +52,7 @@ class GuiBitmapCtrl : public GuiControl
       static const char *getBitmapName( void *obj, const char *data );
 
    public:
-      
+
       GuiBitmapCtrl();
       static void initPersistFields();
 

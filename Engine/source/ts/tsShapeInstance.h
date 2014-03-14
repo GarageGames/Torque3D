@@ -60,7 +60,7 @@ class TSCallback
 {
 public:
    virtual ~TSCallback() {}
-   
+
    virtual void setNodeTransform(TSShapeInstance * si, S32 nodeIndex, MatrixF & localTransform) = 0;
 };
 
@@ -109,13 +109,13 @@ class TSShapeInstance
    struct ObjectInstance
    {
       virtual ~ObjectInstance() {}
-   
+
       /// this needs to be set before using an objectInstance...tells us where to
       /// look for the transforms...gets set be shape instance 'setStatics' method
       const Vector<MatrixF> *mTransforms;
 
       S32 nodeIndex;
-     
+
       /// Gets the transform of this object
       inline const MatrixF& getTransform() const
       {
@@ -126,7 +126,7 @@ class TSShapeInstance
      /// @{
 
      /// Render!  This draws the base-textured object.
-      virtual void render( S32 objectDetail, TSMaterialList *, const TSRenderState &rdata, F32 alpha );      
+      virtual void render( S32 objectDetail, TSMaterialList *, const TSRenderState &rdata, F32 alpha );
      /// @}
 
      /// @name Collision Routines
@@ -153,15 +153,15 @@ class TSShapeInstance
       S32 frame;
       S32 matFrame;
       F32 visible;
-      
+
       /// If true this mesh is forced to be hidden
       /// regardless of the animation state.
       bool forceHidden;
 
       TSVertexBufferHandle mVertexBuffer;
       GFXPrimitiveBufferHandle mPrimitiveBuffer;
-      
-      /// The time at which this mesh 
+
+      /// The time at which this mesh
       /// was last rendered.
       U32 mLastTime;
 
@@ -236,7 +236,7 @@ class TSShapeInstance
    static Vector<TSThread*> smTranslationThreads;
    static Vector<TSThread*> smScaleThreads;
    /// @}
-	
+
 	TSMaterialList* mMaterialList;    ///< by default, points to hShape material list
 //-------------------------------------------------------------------------------------
 // Misc.
@@ -268,7 +268,7 @@ protected:
    /// equal mShapeResource if it was created from a resource.
    TSShape *mShape;
 
-   
+
    bool            mOwnMaterialList; ///< Does this own the material list pointer?
 
    bool           mAlphaAlways;
@@ -318,17 +318,17 @@ protected:
    TSShape* getShape() const { return mShape; }
 
    TSMaterialList* getMaterialList() const { return mMaterialList; }
-   
+
    /// Set the material list without taking ownership.
    /// @see cloneMaterialList
    void setMaterialList( TSMaterialList *matList );
 
-   /// Call this to own the material list -- i.e., we'll make a copy of the 
+   /// Call this to own the material list -- i.e., we'll make a copy of the
    /// currently set material list and be responsible for deleting it.  You
    /// can pass an optional feature set for initializing the cloned materials.
-   void cloneMaterialList( const FeatureSet *features = NULL ); 
+   void cloneMaterialList( const FeatureSet *features = NULL );
 
-   /// Initializes or re-initializes the material list with 
+   /// Initializes or re-initializes the material list with
    /// an optional feature set.
    void initMaterialList(  const FeatureSet *features = NULL );
 
@@ -453,7 +453,7 @@ protected:
    static F32 smDetailAdjust;
 
    /// If this is set to a positive pixel value shapes
-   /// with a smaller pixel size than this will skip 
+   /// with a smaller pixel size than this will skip
    /// rendering entirely.
    static F32 smSmallestVisiblePixelSize;
 
@@ -474,7 +474,7 @@ protected:
    void renderDebugNormals( F32 normalScalar, S32 dl );
 
    /// Render all node transforms as small axis gizmos.  It is recommended
-   /// that prior to calling this, shapeInstance::animate is called so that 
+   /// that prior to calling this, shapeInstance::animate is called so that
    /// nodes are in object space and that the GFX state is setup for
    /// rendering in model space.
    void renderDebugNodes();
@@ -500,7 +500,7 @@ protected:
    /// Sets the 'forceHidden' state on the named mesh.
    /// @see MeshObjectInstance::forceHidden
    void setMeshForceHidden( const char *meshName, bool hidden );
-   
+
    /// Sets the 'forceHidden' state on a mesh.
    /// @see MeshObjectInstance::forceHidden
    void setMeshForceHidden( S32 meshIndex, bool hidden );
@@ -540,8 +540,8 @@ protected:
    void setCurrentDetail( S32 dl, F32 intraDL = 1.0f );
 
    /// Helper function which internally calls setDetailFromDistance.
-   S32 setDetailFromPosAndScale( const SceneRenderState *state, 
-                                 const Point3F &pos, 
+   S32 setDetailFromPosAndScale( const SceneRenderState *state,
+                                 const Point3F &pos,
                                  const Point3F &scale );
 
    /// Selects the current detail level using the scaled

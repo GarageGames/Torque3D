@@ -132,8 +132,8 @@ GFXVertexBuffer * endToBuffer( U32 &numPrims )
 
 void end( bool useGenericShaders )
 {
-   if ( mCurVertIndex == 0 ) 
-      return; 
+   if ( mCurVertIndex == 0 )
+      return;
 
    VERTEX_SIZE_CHECK();
 
@@ -141,7 +141,7 @@ void end( bool useGenericShaders )
    U32 stripStart = 0;
 
    AssertFatal( mType >= GFXPT_FIRST && mType < GFXPT_COUNT, "PrimBuilder::end() - Bad primitive type!" );
-               
+
    switch( mType )
    {
       default:
@@ -184,7 +184,7 @@ void end( bool useGenericShaders )
 
    const GFXVertexPCT *srcVerts = mTempVertBuff.address();
    U32 numVerts = mCurVertIndex;
-   
+
    // Make sure we don't have a dirty prim buffer left.
    GFX->setPrimitiveBuffer( NULL );
 

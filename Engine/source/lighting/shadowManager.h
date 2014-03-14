@@ -48,7 +48,7 @@ public:
    // Should be short and contain no spaces and safe for filename use.
    //virtual const char* getId() const = 0;
 
-   // SceneManager manager   
+   // SceneManager manager
    virtual SceneManager* getSceneManager();
 
    // Called to find out if it is valid to activate this shadow system.  If not, we should print out

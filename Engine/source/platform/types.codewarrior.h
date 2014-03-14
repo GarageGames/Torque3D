@@ -63,7 +63,7 @@ typedef unsigned long long U64;     ///< Compiler independent Unsigned 64-bit in
 #     define TORQUE_OS_MAC
 #  endif
 #  include "platform/types.ppc.h"
-#else 
+#else
 #  error "CW: Unsupported Operating System"
 #endif
 

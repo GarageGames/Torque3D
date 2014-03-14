@@ -39,19 +39,19 @@ U32 Platform::getMathControlState()
 
 void Platform::setMathControlStateKnown()
 {
-   
+
 }
 
 void Platform::setMathControlState(U32 state)
 {
-   
+
 }
 
 //--------------------------------------
 ConsoleFunction( MathInit, void, 1, 10, "(DETECT|C|VEC|SSE)")
 {
    U32 properties = CPU_PROP_C;  // C entensions are always used
-   
+
    if (argc == 1)
    {
          Math::init(0);
@@ -59,17 +59,17 @@ ConsoleFunction( MathInit, void, 1, 10, "(DETECT|C|VEC|SSE)")
    }
    for (argc--, argv++; argc; argc--, argv++)
    {
-      if (dStricmp(*argv, "DETECT") == 0) { 
+      if (dStricmp(*argv, "DETECT") == 0) {
          Math::init(0);
          return;
       }
-      if (dStricmp(*argv, "C") == 0) { 
-         properties |= CPU_PROP_C; 
-         continue; 
+      if (dStricmp(*argv, "C") == 0) {
+         properties |= CPU_PROP_C;
+         continue;
       }
-      if (dStricmp(*argv, "VEC") == 0) { 
-         properties |= CPU_PROP_ALTIVEC; 
-         continue; 
+      if (dStricmp(*argv, "VEC") == 0) {
+         properties |= CPU_PROP_ALTIVEC;
+         continue;
       }
       if( dStricmp( *argv, "SSE" ) == 0 )
       {
@@ -88,15 +88,15 @@ void Math::init(U32 properties)
 {
    if (!properties)
       // detect what's available
-      properties = Platform::SystemInfo.processor.properties;  
+      properties = Platform::SystemInfo.processor.properties;
    else
       // Make sure we're not asking for anything that's not supported
-      properties &= Platform::SystemInfo.processor.properties;  
+      properties &= Platform::SystemInfo.processor.properties;
 
    Con::printf("Math Init:");
    Con::printf("   Installing Standard C extensions");
    mInstallLibrary_C();
-   
+
    #if defined(__VEC__)
    if (properties & CPU_PROP_ALTIVEC)
    {
@@ -111,9 +111,9 @@ void Math::init(U32 properties)
       mInstall_Library_SSE();
    }
    #endif
-   
+
    Con::printf(" ");
-}   
+}
 
 //------------------------------------------------------------------------------
 F32 Platform::getRandom()

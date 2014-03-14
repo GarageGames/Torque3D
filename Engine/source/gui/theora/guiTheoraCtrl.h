@@ -40,24 +40,24 @@
 class GuiTheoraCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
-      
+
    protected:
-   
+
       /// The Theora file we should play.
       String mFilename;
-      
+
       /// Theora video player backend.
       TheoraTexture mTheoraTexture;
-      
+
       /// If true, the control's extents will be matched to the video size.
       bool mMatchVideoSize;
-      
+
       /// If true, playback will start automatically when the control receives its
       /// onWake().
       bool mPlayOnWake;
-      
+
       /// Which transcoder to use on the Theora decoder.  This is mostly
       /// meant as a development aid.
       OggTheoraDecoder::ETranscoder mTranscoder;
@@ -75,29 +75,29 @@ class GuiTheoraCtrl : public GuiControl
 
       /// Are we done with playback?
       bool mDone;
-      
+
       /// If true, renders some text information into the frame.
       bool mRenderDebugInfo;
-      
+
       /// Our background color.
       ColorI mBackgroundColor;
 
    public:
-   
+
       GuiTheoraCtrl();
 
       /// Load the given Theora video file.  Does not start playback.
       void setFile( const String& filename );
-      
+
       /// Start video playback.
       void play();
-      
+
       /// Pause video playback.
       void pause();
-      
+
       /// Stop video playback.
       void stop();
-      
+
       /// Return true if the video has finished playing.
       bool isPlaybackDone() const { return mDone; }
 

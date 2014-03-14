@@ -99,7 +99,7 @@ singleton GuiControlProfile( EPainterBorderButtonProfile : ToolsGuiDefaultProfil
    border = true;
    borderColor = "0 0 0";
    borderThickness = 2;
-   
+
    fontColorHL = "255 0 0";
    fontColorSEL = "0 0 255";
    category = "Editor";
@@ -110,7 +110,7 @@ singleton GuiControlProfile( EPainterDragDropProfile )
    justify = "center";
    fontColor = "0 0 0";
    border = 0;
-   textOffset = "0 0";   
+   textOffset = "0 0";
    opaque = true;
    fillColor = "221 221 221 150";
    category = "Editor";
@@ -119,7 +119,7 @@ singleton GuiControlProfile( EPainterDragDropProfile )
 singleton GizmoProfile( GlobalGizmoProfile )
 {
    // This isnt a GuiControlProfile but fits in well here.
-   // Don't really have to initialize this now because that will be done later 
+   // Don't really have to initialize this now because that will be done later
    // based on the saved editor prefs.
    screenLength = 100;
    category = "Editor";

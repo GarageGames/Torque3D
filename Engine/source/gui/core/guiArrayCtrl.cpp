@@ -241,11 +241,11 @@ void GuiArrayCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // We render our fill, borders, and child controls ourself.
    // This allows us to render child controls after we render cells,
-   // so child controls appear on-top, as they should.   
+   // so child controls appear on-top, as they should.
 
    // Render our fill and borders.
    // This code from GuiControl::onRender().
-   {      
+   {
       RectI ctrlRect(offset, getExtent());
 
       //if opaque, fill the update rect with the fill color
@@ -383,7 +383,7 @@ void GuiArrayCtrl::onMouseUp( const GuiEvent &event )
    Point2I pt = globalToLocalCoord(event.mousePoint);
    pt.x -= mHeaderDim.x; pt.y -= mHeaderDim.y;
    Point2I cell(
-         (pt.x < 0 ? -1 : pt.x / mCellSize.x), 
+         (pt.x < 0 ? -1 : pt.x / mCellSize.x),
          (pt.y < 0 ? -1 : pt.y / mCellSize.y)
       );
 

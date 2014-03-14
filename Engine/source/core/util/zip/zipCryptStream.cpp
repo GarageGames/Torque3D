@@ -73,7 +73,7 @@ void ZipCryptRStream::setPassword(const char *password)
    mKeys[0] = 305419896;
    mKeys[1] = 591751049;
    mKeys[2] = 878082192;
-   
+
    mPassword = password;
    const char *pPtr = password;
    while(*pPtr)
@@ -99,7 +99,7 @@ bool ZipCryptRStream::attachStream(Stream* io_pSlaveStream)
       {
          updateKeys(buffer[i] ^= decryptByte());
       }
-      
+
       // if(buffer[11] !)
       mFileStartPos = mStream->getPosition();
 

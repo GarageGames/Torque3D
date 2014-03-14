@@ -35,7 +35,7 @@
 
 IMPLEMENT_CO_NETOBJECT_V1(RenderShapeExample);
 
-ConsoleDocClass( RenderShapeExample, 
+ConsoleDocClass( RenderShapeExample,
    "@brief An example scene object which renders a DTS.\n\n"
    "This class implements a basic SceneObject that can exist in the world at a "
    "3D position and render itself. There are several valid ways to render an "
@@ -204,8 +204,8 @@ void RenderShapeExample::createShape()
    }
 
    // Attempt to preload the Materials for this shape
-   if ( isClientObject() && 
-        !mShape->preloadMaterialList( mShape.getPath() ) && 
+   if ( isClientObject() &&
+        !mShape->preloadMaterialList( mShape.getPath() ) &&
         NetConnection::filesWereDownloaded() )
    {
       mShape = NULL;
@@ -249,7 +249,7 @@ void RenderShapeExample::prepRenderImage( SceneRenderState *state )
    // it goes out of scope at the end of the function
    GFXTransformSaver saver;
 
-   // Set up our TS render state      
+   // Set up our TS render state
    TSRenderState rdata;
    rdata.setSceneState( state );
    rdata.setFadeOverride( 1.0f );

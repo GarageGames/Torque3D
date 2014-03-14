@@ -38,27 +38,27 @@ class MacFileSystem;
 class MacFileSystemChangeNotifier : public Torque::FS::FileSystemChangeNotifier
 {
    public:
-   
+
       typedef Torque::FS::FileSystemChangeNotifier Parent;
-      
+
       struct Event;
 
-   protected:   
-   
+   protected:
+
       /// Array of FSEventStream events set up.  Uses pointers to dynamically
       /// allocated memory rather than allocating inline with the array to be
       /// able to pass around pointers without colliding with array reallocation.
       Vector< Event* > mEvents;
-   
+
       // FileSystemChangeNotifier.
       virtual void internalProcessOnce();
       virtual bool internalAddNotification( const Torque::Path& dir );
       virtual bool internalRemoveNotification( const Torque::Path& dir );
-         
+
    public:
-   
+
       MacFileSystemChangeNotifier( MacFileSystem* fs );
-      
+
       virtual ~MacFileSystemChangeNotifier();
 };
 
@@ -66,9 +66,9 @@ class MacFileSystemChangeNotifier : public Torque::FS::FileSystemChangeNotifier
 class MacFileSystem : public Torque::Posix::PosixFileSystem
 {
    public:
-   
+
       typedef Torque::Posix::PosixFileSystem Parent;
-      
+
       MacFileSystem( String volume )
          : Parent( volume )
       {

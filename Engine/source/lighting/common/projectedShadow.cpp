@@ -59,14 +59,14 @@ float ProjectedShadow::smFadeEndPixelSize = 35.0f;
 
 GFX_ImplementTextureProfile( BLProjectedShadowProfile,
                               GFXTextureProfile::DiffuseMap,
-                              GFXTextureProfile::PreserveSize | 
+                              GFXTextureProfile::PreserveSize |
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
                               GFXTextureProfile::None );
 
 GFX_ImplementTextureProfile( BLProjectedShadowZProfile,
                               GFXTextureProfile::DiffuseMap,
-                              GFXTextureProfile::PreserveSize | 
+                              GFXTextureProfile::PreserveSize |
                               GFXTextureProfile::ZTarget |
                               GFXTextureProfile::Pooled,
                               GFXTextureProfile::None );
@@ -87,7 +87,7 @@ ProjectedShadow::ProjectedShadow( SceneObject *object )
    mDecalData->skipVertexNormals = true;
 
    mDecalInstance = NULL;
-   
+
    mLastLightDir.set( 0, 0, 0 );
    mLastObjectPosition.set( object->getRenderPosition() );
    mLastObjectScale.set( object->getScale() );
@@ -114,7 +114,7 @@ ProjectedShadow::~ProjectedShadow()
       gDecalManager->removeDecal( mDecalInstance );
 
    delete mDecalData;
-   
+
    mShadowTexture = NULL;
    mRenderTarget = NULL;
 }
@@ -123,12 +123,12 @@ bool ProjectedShadow::shouldRender( const SceneRenderState *state )
 {
    // Don't render if our object has been removed from the
    // scene graph.
-      
+
    if( !mParentObject->getSceneManager() )
       return false;
 
-   // Don't render if the ShapeBase 
-   // object's fade value is greater 
+   // Don't render if the ShapeBase
+   // object's fade value is greater
    // than the visibility epsilon.
    bool shapeFade = mShapeBase && mShapeBase->getFadeVal() < TSMesh::VISIBILITY_EPSILON;
 
@@ -136,12 +136,12 @@ bool ProjectedShadow::shouldRender( const SceneRenderState *state )
    ShapeBaseData *data = NULL;
    if ( mShapeBase )
       data = static_cast<ShapeBaseData*>( mShapeBase->getDataBlock() );
-   
-   // Also don't render if 
+
+   // Also don't render if
    // the camera distance is greater
    // than the shadow length.
-   if (  shapeFade || !mDecalData || 
-         (  mDecalInstance && 
+   if (  shapeFade || !mDecalData ||
+         (  mDecalInstance &&
             mDecalInstance->calcPixelSize( state->getViewport().extent.y, state->getCameraPosition(), state->getWorldToScreenScale().y ) < mDecalInstance->mDataBlock->fadeEndPixelSize ) )
    {
       // Release our shadow texture
@@ -162,7 +162,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    if ( !LIGHTMGR )
       return false;
 
-   // Get the position of the decal first.   
+   // Get the position of the decal first.
    const Box3F &objBox = mParentObject->getObjBox();
    const Point3F boxCenter = objBox.getCenter();
    Point3F decalPos = boxCenter;
@@ -173,7 +173,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
       // multiplied by the render transform
       // of the object to ensure we benefit
       // from interpolation.
-      MatrixF t( renderTransform );   
+      MatrixF t( renderTransform );
       t.setColumn(2,Point3F::UnitZ);
       t.mulP( decalPos );
    }
@@ -204,7 +204,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    F32 fade = 0;
    for ( U32 i = 0; i < 4; i++ )
    {
-      // If we got a NULL light, 
+      // If we got a NULL light,
       // we're at the end of the list.
       if ( !lights[i] )
          break;
@@ -231,11 +231,11 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    }
 
    lightDir.normalize();
-   
+
    // No light... no shadow.
    if ( !lights[0] )
       return false;
-     
+
    // Has the light direction
    // changed since last update?
    bool lightDirChanged = !mLastLightDir.equal( lightDir );
@@ -257,7 +257,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    VectorF right( 0, 0, 0 );
    VectorF fwd( 0, 0, 0 );
    VectorF tmpFwd( 0, 0, 0 );
-   
+
    U32 idx = lightDir.getLeastComponentIndex();
 
    tmpFwd[idx] = 1.0f;
@@ -278,7 +278,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    mWorldToLight.setPosition( ( pos + boxCenter ) - ( ( (mRadius * smDepthAdjust) + 0.001f ) * lightDir ) );
    mWorldToLight.mul( sRotMat );
    mWorldToLight.inverse();
-   
+
    // Get the shapebase datablock if we have one.
    ShapeBaseData *data = NULL;
    if ( mShapeBase )
@@ -295,12 +295,12 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
 
    // Create the decal if we don't have one yet.
    if ( !mDecalInstance )
-      mDecalInstance = gDecalManager->addDecal( decalPos, 
-                                                lightDir, 
-                                                right, 
-                                                mDecalData, 
-                                                1.0f, 
-                                                0, 
+      mDecalInstance = gDecalManager->addDecal( decalPos,
+                                                lightDir,
+                                                right,
+                                                mDecalData,
+                                                1.0f,
+                                                0,
                                                 PermanentDecal | ClipDecal | CustomDecal );
 
    if ( !mDecalInstance )
@@ -315,11 +315,11 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    mDecalInstance->mRotAroundNormal = 0;
    mDecalInstance->mPosition = decalPos;
    mDecalInstance->mDataBlock = mDecalData;
-   
-   // If the position of the world 
+
+   // If the position of the world
    // space box center is the same
    // as the decal's position, and
-   // the light direction has not 
+   // the light direction has not
    // changed, we don't need to clip.
    bool shouldClip = lightDirChanged || hasMoved || hasScaled;
 
@@ -333,11 +333,11 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
       shadowLen = data->shadowProjectionDistance;
 
    const Point3F &boxExtents = objBox.getExtents();
-   
-   
+
+
    mShadowLength = shadowLen * mParentObject->getScale().z;
 
-   // Set up clip depth, and box half 
+   // Set up clip depth, and box half
    // offset for decal clipping.
    Point2F clipParams(  mShadowLength, (boxExtents.x + boxExtents.y) * 0.25f );
 
@@ -347,8 +347,8 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    // Clip!
    if ( shouldClip )
    {
-      clipSucceeded = gDecalManager->clipDecal( mDecalInstance, 
-                                                NULL, 
+      clipSucceeded = gDecalManager->clipDecal( mDecalInstance,
+                                                NULL,
                                                 &clipParams );
    }
 
@@ -373,8 +373,8 @@ void ProjectedShadow::_calcScore( const SceneRenderState *state )
    if ( !mDecalInstance )
       return;
 
-   F32 pixRadius = mDecalInstance->calcPixelSize( state->getViewport().extent.y, state->getCameraPosition(), state->getWorldToScreenScale().y ); 
- 
+   F32 pixRadius = mDecalInstance->calcPixelSize( state->getViewport().extent.y, state->getCameraPosition(), state->getWorldToScreenScale().y );
+
    F32 pct = pixRadius / mDecalInstance->mDataBlock->fadeStartPixelSize;
 
    U32 msSinceLastRender = Platform::getVirtualMilliseconds() - getLastRenderTime();
@@ -386,7 +386,7 @@ void ProjectedShadow::_calcScore( const SceneRenderState *state )
    // For every 1s this shadow hasn't been
    // updated we'll add 10 to the score.
    F32 secs = mFloor( (F32)msSinceLastRender / 1000.0f );
-   
+
    mScore = pct + secs;
    mClampF( mScore, 0.0f, 2000.0f );
 }
@@ -408,7 +408,7 @@ void ProjectedShadow::update( const SceneRenderState *state )
       // Release our shadow texture
       // so that others can grab it out
       // of the pool.
-      mShadowTexture = NULL;      
+      mShadowTexture = NULL;
       mUpdateTexture = false;
       return;
    }
@@ -423,7 +423,7 @@ void ProjectedShadow::update( const SceneRenderState *state )
 
    MaterialParameters *matParams = mDecalData->matInst->getMaterialParameters();
 
-   matParams->setSafe( mCasterPositionSC, mParentObject->getRenderPosition() );   
+   matParams->setSafe( mCasterPositionSC, mParentObject->getRenderPosition() );
    matParams->setSafe( mShadowLengthSC, mShadowLength / 4.0f );
 }
 
@@ -431,7 +431,7 @@ void ProjectedShadow::render( F32 camDist, const TSRenderState &rdata )
 {
    if ( !mUpdateTexture )
       return;
-            
+
    // Do the render to texture,
    // DecalManager handles rendering
    // the shadow onto the world.
@@ -446,7 +446,7 @@ BaseMatInstance* ProjectedShadow::_getShadowMaterial( BaseMatInstance *inMat )
    {
       // Create a hook and initialize it using the incoming material.
       hook = new ShadowMaterialHook;
-      hook->init( inMat ); 
+      hook->init( inMat );
       inMat->addHook( hook );
    }
 
@@ -464,12 +464,12 @@ void ProjectedShadow::_renderToTexture( F32 camDist, const TSRenderState &rdata 
       return;
 
    GFXTransformSaver saver;
-   
+
    // NOTE: GFXTransformSaver does not save/restore the frustum
    // so we must save it here before we modify it.
    F32 l, r, b, t, n, f;
    bool ortho;
-   GFX->getFrustum( &l, &r, &b, &t, &n, &f, &ortho );  
+   GFX->getFrustum( &l, &r, &b, &t, &n, &f, &ortho );
 
    // Set the orthographic projection
    // matrix up, to be based on the radius
@@ -518,7 +518,7 @@ void ProjectedShadow::_renderToTexture( F32 camDist, const TSRenderState &rdata 
    baseState.setDiffuseCameraTransform( diffuseState->getCameraTransform() );
    baseState.setWorldToScreenScale( diffuseState->getWorldToScreenScale() );
    baseState.getCullingState().disableZoneCulling( true );
-   
+
    mParentObject->prepRenderImage( &baseState );
    renderPass->renderPass( &baseState );
 
@@ -575,7 +575,7 @@ GFXTextureObject* ProjectedShadow::_getDepthTarget( U32 width, U32 height )
 {
    // Get a depth texture target from the pooled profile
    // which is returned as a temporary.
-   GFXTexHandle depthTex( width, height, GFXFormatD24S8, &BLProjectedShadowZProfile, 
+   GFXTexHandle depthTex( width, height, GFXFormatD24S8, &BLProjectedShadowZProfile,
       "ProjectedShadow::_getDepthTarget()" );
 
    return depthTex;

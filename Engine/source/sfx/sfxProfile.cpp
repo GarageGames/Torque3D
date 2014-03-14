@@ -38,28 +38,28 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXProfile );
 
 ConsoleDocClass( SFXProfile,
    "@brief Encapsulates a single sound file for playback by the sound system.\n\n"
-   
+
    "SFXProfile combines a sound description (SFXDescription) with a sound file such that it can be played "
    "by the sound system.  To be able to play a sound file, the sound system will always require a profile "
    "for it to be created.  However, several of the SFX functions (sfxPlayOnce(), sfxCreateSource()) perform "
    "this creation internally for convenience using temporary profile objects.\n\n"
-   
+
    "Sound files can be in either OGG or WAV format.  However, extended format support is available when using FMOD. "
    "See @ref SFX_formats.\n\n"
 
    "@section SFXProfile_loading Profile Loading\n\n"
-   
+
    "By default, the sound data referenced by a profile will be loaded when the profile is first played and the "
    "data then kept until either the profile is deleted or until the sound device on which the sound data is held "
    "is deleted.\n\n"
-   
+
    "This initial loading my incur a small delay when the sound is first played.  To avoid this, a profile may be "
    "expicitly set to load its sound data immediately when the profile is added to the system.  This is done by "
    "setting the #preload property to true.\n\n"
-   
+
    "@note Sounds using streamed playback (SFXDescription::isStreaming) cannot be preloaded and will thus "
       "ignore the #preload flag.\n\n"
-      
+
    "@tsexample\n"
       "datablock SFXProfile( Shore01Snd )\n"
       "{\n"
@@ -68,7 +68,7 @@ ConsoleDocClass( SFXProfile,
       "   preload      = true;\n"
       "};\n"
    "@endtsexample\n\n"
-      
+
    "@ingroup SFX\n"
    "@ingroup Datablocks\n"
 );
@@ -101,7 +101,7 @@ SFXProfile::~SFXProfile()
 void SFXProfile::initPersistFields()
 {
    addGroup( "Sound" );
-   
+
       addField( "filename",    TypeStringFilename,        Offset( mFilename, SFXProfile ),
          "%Path to the sound file.\n"
          "If the extension is left out, it will be inferred by the sound system.  This allows to "
@@ -111,7 +111,7 @@ void SFXProfile::initPersistFields()
          "Whether to preload sound data when the profile is added to system.\n"
          "@note This flag is ignored by streamed sounds.\n\n"
          "@ref SFXProfile_loading" );
-      
+
    endGroup( "Sound" );
 
    Parent::initPersistFields();
@@ -123,7 +123,7 @@ bool SFXProfile::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-         
+
    // If we're a streaming profile we don't preload
    // or need device events.
    if( SFX && !mDescription->mIsStreaming )
@@ -233,7 +233,7 @@ void SFXProfile::_onDeviceEvent( SFXSystemEventType evt )
             Con::errorf( "SFXProfile::_onDeviceEvent: The preload failed! %s", getName() );
          break;
       }
-      
+
       default:
          break;
    }
@@ -245,22 +245,22 @@ void SFXProfile::_onResourceChanged( const Torque::Path& path )
 {
    if( path != Path( mFilename ) )
       return;
-   
+
    // Let go of the old resource and buffer.
-            
+
    mResource = NULL;
    mBuffer = NULL;
-      
+
    // Load the new resource.
-      
+
    getResource();
-      
+
    if( mPreload && !mDescription->mIsStreaming )
    {
       if( !_preloadBuffer() )
          Con::errorf( "SFXProfile::_onResourceChanged() - failed to preload '%s'", mFilename.c_str() );
    }
-      
+
    mChangedSignal.trigger( this );
 }
 
@@ -290,7 +290,7 @@ SFXBuffer* SFXProfile::getBuffer()
 {
    if ( mDescription->mIsStreaming )
    {
-      // Streaming requires unique buffers per 
+      // Streaming requires unique buffers per
       // source, so this creates a new buffer.
       if ( SFX )
          return _createBuffer();
@@ -309,9 +309,9 @@ SFXBuffer* SFXProfile::getBuffer()
 SFXBuffer* SFXProfile::_createBuffer()
 {
    SFXBuffer* buffer = 0;
-   
+
    // Try to create through SFXDevie.
-   
+
    if( !mFilename.isEmpty() && SFX )
    {
       buffer = SFX->_createBuffer( mFilename, mDescription );
@@ -328,9 +328,9 @@ SFXBuffer* SFXProfile::_createBuffer()
          #endif
       }
    }
-   
+
    // If that failed, load through SFXResource.
-   
+
    if( !buffer )
    {
       Resource< SFXResource >& resource = getResource();

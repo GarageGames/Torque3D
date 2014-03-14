@@ -54,7 +54,7 @@ public:
    DECLARE_CONOBJECT(GuiTextCtrl);
    DECLARE_CATEGORY( "Gui Text" );
    DECLARE_DESCRIPTION( "A control that displays a single line of text." );
-   
+
    GuiTextCtrl();
    static void initPersistFields();
 
@@ -69,9 +69,9 @@ public:
    const char *getText() { return (const char*)mText; }
 
    // Text Property Accessors
-   static bool setText(void *object, const char *index, const char *data) 
+   static bool setText(void *object, const char *index, const char *data)
       { static_cast<GuiTextCtrl*>(object)->setText(data); return true; }
-   static const char* getTextProperty(void* obj, const char* data) 
+   static const char* getTextProperty(void* obj, const char* data)
       { return static_cast<GuiTextCtrl*>(obj)->getText(); }
 
 

@@ -75,7 +75,7 @@ void GFXD3D9QueryFence::block()
    while( ( hRes = mQuery->GetData( NULL, 0, D3DGETDATA_FLUSH ) ) == S_FALSE )
       ;
 
-   // Check for D3DERR_DEVICELOST, if we lost the device, the fence will get 
+   // Check for D3DERR_DEVICELOST, if we lost the device, the fence will get
    // re-created next issue()
    if( hRes == D3DERR_DEVICELOST )
       SAFE_RELEASE( mQuery );

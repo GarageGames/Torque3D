@@ -48,7 +48,7 @@ public:
    //creation methods
    DECLARE_CONOBJECT(GuiChunkedBitmapCtrl);
    DECLARE_CATEGORY( "Gui Images" );
-   
+
    GuiChunkedBitmapCtrl();
    static void initPersistFields();
 
@@ -92,7 +92,7 @@ ConsoleDocClass( GuiChunkedBitmapCtrl,
 
 void GuiChunkedBitmapCtrl::initPersistFields()
 {
-   addGroup("GuiChunkedBitmapCtrl");		
+   addGroup("GuiChunkedBitmapCtrl");
    addField( "bitmap",        TypeFilename,  Offset( mBitmapName, GuiChunkedBitmapCtrl ), "This is the bitmap to render to the control." );
    addField( "useVariable",   TypeBool,      Offset( mUseVariable, GuiChunkedBitmapCtrl ), "This decides whether to use the \"bitmap\" file "
 	                                                                                      "or a bitmap stored in \"variable\"");

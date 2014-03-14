@@ -49,7 +49,7 @@ class CollisionList;
 /// This class is used primarily for collision detection, by objects which need
 /// to check for obstructions along their path. You feed it a polytope to
 /// extrude along the direction of movement, and it gives you a list of collisions.
-/// 
+///
 /// @see AbstractPolyList
 class ExtrudedPolyList: public AbstractPolyList
 {
@@ -99,7 +99,7 @@ public:
    CollisionList* mCollisionList;
 
    PlaneList mPolyPlaneList;
-   
+
    //
 private:
    bool testPoly(ExtrudedFace&);

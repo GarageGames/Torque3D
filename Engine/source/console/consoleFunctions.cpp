@@ -88,7 +88,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       Con::errorf("strFormat: Invalid format string!\n");
       return pBuffer;
    }
-   
+
    switch(*pch)
    {
       case 'c':
@@ -253,7 +253,7 @@ DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring 
    const char* retpos = dStrstr( string, substring );
    if( !retpos )
       return -1;
-      
+
    return retpos - string;
 }
 
@@ -510,11 +510,11 @@ DefineConsoleFunction( strrepeat, const char*, ( const char* str, S32 numTimes, 
    {
       if( !isFirst )
          result.append( delimiter );
-         
+
       result.append( str );
       isFirst = false;
    }
-   
+
    return Con::getReturnBuffer( result );
 }
 
@@ -538,7 +538,7 @@ DefineConsoleFunction( getSubStr, const char*, ( const char* str, S32 start, S32
 
    if( numChars == -1 )
       numChars = baseLen - start;
-      
+
    if (start < 0 || numChars < 0) {
       Con::errorf(ConsoleLogEntry::Script, "getSubStr(...): error, starting position and desired length must be >= 0: (%d, %d)", start, numChars);
 
@@ -738,7 +738,7 @@ DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bo
       return false;
    else if( targetLen > srcLen )
       return false;
-      
+
    if( caseSensitive )
       return ( dStrcmp( &str[ srcLen - targetLen ], suffix ) == 0 );
 
@@ -782,7 +782,7 @@ DefineConsoleFunction( strchrpos, S32, ( const char* str, const char* chr, S32 s
 {
    if( start != 0 && start >= dStrlen( str ) )
       return -1;
-   
+
    const char* ret = dStrchr( &str[ start ], chr[ 0 ] );
    return ret ? ret - str : -1;
 }
@@ -806,11 +806,11 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
    const char* ret = dStrrchr( str, chr[ 0 ] );
    if( !ret )
       return -1;
-      
+
    S32 index = ret - str;
    if( index < start )
       return -1;
-      
+
    return index;
 }
 
@@ -1158,11 +1158,11 @@ DefineConsoleFunction( restWords, const char*, ( const char* text ),,
    const char* ptr = text;
    while( *ptr && *ptr != ' ' && *ptr != '\t' && *ptr != '\n' )
       ptr ++;
-      
+
    // Skip separator.
    if( *ptr )
       ptr ++;
-      
+
    return Con::getReturnBuffer( ptr );
 }
 
@@ -1228,7 +1228,7 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
          *str++ = 0;
 
       // set local variable if inside a function
-      if (gEvalState.getStackDepth() > 0 && 
+      if (gEvalState.getStackDepth() > 0 &&
          gEvalState.getCurrentFrame().scopeName)
          Con::setLocalVariable(token,tmp);
       else
@@ -1275,7 +1275,7 @@ DefineEngineFunction( detag, const char*, ( const char* str ),,
       const char* word = dStrchr( str, ' ' );
       if( word == NULL )
          return "";
-         
+
       char* ret = Con::getReturnBuffer( dStrlen( word + 1 ) + 1 );
       dStrcpy( ret, word + 1 );
       return ret;
@@ -1476,7 +1476,7 @@ DefineEngineFunction( setLogMode, void, ( S32 mode ),,
       "- 2: Keep the log file open and write to it continuously.  This will make the system operate faster but "
          "if the process crashes, parts of the output may not have been written to disk yet and will be missing from "
          "the log.\n\n"
-         
+
       "Additionally, when changing the log mode and thus opening a new log file, either of the two mode values may be "
       "combined by binary OR with 0x4 to cause the logging system to flush all console log messages that had already been "
       "issued to the console system into the newly created log file.\n\n"
@@ -1526,11 +1526,11 @@ DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
 {
    Con::errorf( message );
    Platform::AlertOK( "Error", message );
-   
+
    // [rene 03/30/10] This was previously using forceShutdown which is a bad thing
    //    as the script code should not be allowed to pretty much hard-crash the engine
    //    and prevent proper shutdown.  Changed this to use postQuitMessage.
-   
+
    Platform::postQuitMessage( -1 );
 }
 
@@ -1548,7 +1548,7 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 {
    // If there's a protocol prefix in the address, just invoke
    // the browser on the given address.
-   
+
    char* protocolSep = dStrstr( address,"://");
    if( protocolSep != NULL )
    {
@@ -1558,9 +1558,9 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 
    // If we don't see a protocol seperator, then we know that some bullethead
    // sent us a bad url. We'll first check to see if a file inside the sandbox
-   // with that name exists, then we'll just glom "http://" onto the front of 
+   // with that name exists, then we'll just glom "http://" onto the front of
    // the bogus url, and hope for the best.
-   
+
    String addr;
    if( Platform::isFile( address ) || Platform::isDirectory( address ) )
    {
@@ -1572,7 +1572,7 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
    }
    else
       addr = String::ToString( "http://%s", address );
-   
+
    Platform::openWebBrowser( addr );
    return;
 }
@@ -1610,17 +1610,17 @@ DefineEngineFunction( countBits, S32, ( S32 v ),,
 {
    S32 c = 0;
 
-   // from 
+   // from
    // http://graphics.stanford.edu/~seander/bithacks.html
 
    // for at most 32-bit values in v:
    c =  ((v & 0xfff) * 0x1001001001001ULL & 0x84210842108421ULL) % 0x1f;
-   c += (((v & 0xfff000) >> 12) * 0x1001001001001ULL & 0x84210842108421ULL) % 
+   c += (((v & 0xfff000) >> 12) * 0x1001001001001ULL & 0x84210842108421ULL) %
       0x1f;
    c += ((v >> 24) * 0x1001001001001ULL & 0x84210842108421ULL) % 0x1f;
 
 #ifndef TORQUE_SHIPPING
-   // since the above isn't very obvious, for debugging compute the count in a more 
+   // since the above isn't very obvious, for debugging compute the count in a more
    // traditional way and assert if it is different
    {
       S32 c2 = 0;
@@ -1646,7 +1646,7 @@ DefineEngineFunction( generateUUID, Torque::UUID, (),,
    "@ingroup Utilities" )
 {
    Torque::UUID uuid;
-   
+
    uuid.generate();
    return uuid;
 }
@@ -1689,11 +1689,11 @@ static StringTableEntry getDSOPath(const char *scriptPath)
    const char *slash = dStrrchr(scriptPath, '/');
    if(slash != NULL)
       return StringTable->insertn(scriptPath, slash - scriptPath, true);
-   
+
    slash = dStrrchr(scriptPath, ':');
    if(slash != NULL)
       return StringTable->insertn(scriptPath, (slash - scriptPath) + 1, true);
-   
+
    return "";
 
 #else
@@ -1749,7 +1749,7 @@ DefineConsoleFunction( getDSOPath, const char*, ( const char* scriptFileName ),,
    "@ingroup Scripting" )
 {
    Con::expandScriptFilename( scriptFilenameBuffer, sizeof(scriptFilenameBuffer), scriptFileName );
-   
+
    const char* filename = getDSOPath(scriptFilenameBuffer);
    if(filename == NULL || *filename == 0)
       return "";
@@ -1802,14 +1802,14 @@ DefineEngineFunction( compile, bool, ( const char* fileName, bool overrideNoDSO 
       ++filenameOnly;
    else
       filenameOnly = scriptFilenameBuffer;
- 
+
    char nameBuffer[512];
 
    if( isEditorScript )
       dStrcpyl(nameBuffer, sizeof(nameBuffer), dsoPath, "/", filenameOnly, ".edso", NULL);
    else
       dStrcpyl(nameBuffer, sizeof(nameBuffer), dsoPath, "/", filenameOnly, ".dso", NULL);
-   
+
    void *data = NULL;
    U32 dataSize = 0;
    Torque::FS::ReadFile(scriptFilenameBuffer, data, dataSize, true);
@@ -1823,7 +1823,7 @@ DefineEngineFunction( compile, bool, ( const char* fileName, bool overrideNoDSO 
 
 #ifdef TORQUE_DEBUG
    Con::printf("Compiling %s...", scriptFilenameBuffer);
-#endif 
+#endif
 
    CodeBlock *code = new CodeBlock();
    code->compile(nameBuffer, scriptFilenameBuffer, script, overrideNoDSO);
@@ -1962,7 +1962,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
    // Ok, we let's try to load and compile the script.
    Torque::FS::FileNodeRef scriptFile = Torque::FS::GetFileNode(scriptFileName);
    Torque::FS::FileNodeRef dsoFile;
-   
+
 //    ResourceObject *rScr = gResourceManager->find(scriptFileName);
 //    ResourceObject *rCom = NULL;
 
@@ -2006,7 +2006,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
 
       if(scriptFile != NULL)
          scriptModifiedTime = scriptFile->getModifiedTime();
-      
+
       if(dsoFile != NULL)
          dsoModifiedTime = dsoFile->getModifiedTime();
    }
@@ -2055,7 +2055,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
 
       if(journal && Journal::IsRecording())
          Journal::Write(bool(data != NULL));
-         
+
       if( data == NULL )
       {
          Con::errorf(ConsoleLogEntry::Script, "exec: invalid script file %s.", scriptFileName);
@@ -2069,7 +2069,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
             execDepth --;
             return false;
          }
-         
+
          script = (char *)data;
 
          if(journal && Journal::IsRecording())
@@ -2085,7 +2085,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
          // compile this baddie.
 #ifdef TORQUE_DEBUG
          Con::printf("Compiling %s...", scriptFileName);
-#endif   
+#endif
 
          CodeBlock *code = new CodeBlock();
          code->compile(nameBuffer, scriptFileName, script);
@@ -2123,7 +2123,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
       // We're all compiled, so let's run it.
 #ifdef TORQUE_DEBUG
       Con::printf("Loading compiled script %s.", scriptFileName);
-#endif   
+#endif
       CodeBlock *code = new CodeBlock;
       code->read(scriptFileName, *compiledStream);
       delete compiledStream;
@@ -2138,7 +2138,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
          // we're on a readonly volume.
 #ifdef TORQUE_DEBUG
          Con::printf("Executing %s.", scriptFileName);
-#endif   
+#endif
 
          CodeBlock *newCodeBlock = new CodeBlock();
          StringTableEntry name = StringTable->insert(scriptFileName);
@@ -2418,7 +2418,7 @@ ConsoleFunction(getPrefsPath, const char *, 1, 2, "([relativeFileName])"
    const char *filename = Platform::getPrefsPath(argc > 1 ? argv[1] : NULL);
    if(filename == NULL || *filename == 0)
       return "";
-     
+
    return filename;
 }
 

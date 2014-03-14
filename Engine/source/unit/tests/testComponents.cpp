@@ -53,7 +53,7 @@ public:
 
    virtual void registerInterfaces( const SimComponent *owner )
    {
-      // Register a cached interface for this 
+      // Register a cached interface for this
       registerCachedInterface( NULL, "aU32", this, &mMyId );
    }
 
@@ -66,7 +66,7 @@ public:
          return false;
 
       // We want to get an interface from another object in our containing component
-      // to simulate component interdependency. 
+      // to simulate component interdependency.
       ComponentInterfaceList list;
 
       // Enumerate the interfaces on the owner, only ignore interfaces that this object owns

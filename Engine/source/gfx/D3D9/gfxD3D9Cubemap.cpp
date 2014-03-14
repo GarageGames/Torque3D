@@ -24,8 +24,8 @@
 #include "gfx/gfxTextureManager.h"
 #include "gfx/D3D9/gfxD3D9EnumTranslate.h"
 
-_D3DCUBEMAP_FACES GFXD3D9Cubemap::faceList[6] = 
-{ 
+_D3DCUBEMAP_FACES GFXD3D9Cubemap::faceList[6] =
+{
    D3DCUBEMAP_FACE_POSITIVE_X, D3DCUBEMAP_FACE_NEGATIVE_X,
    D3DCUBEMAP_FACE_POSITIVE_Y, D3DCUBEMAP_FACE_NEGATIVE_Y,
    D3DCUBEMAP_FACE_POSITIVE_Z, D3DCUBEMAP_FACE_NEGATIVE_Z
@@ -67,9 +67,9 @@ void GFXD3D9Cubemap::releaseSurfaces()
 void GFXD3D9Cubemap::_onTextureEvent( GFXTexCallbackCode code )
 {
    // Can this happen?
-   if ( !mDynamic ) 
+   if ( !mDynamic )
       return;
-   
+
    if ( code == GFXZombify )
       releaseSurfaces();
    else if ( code == GFXResurrect )
@@ -87,7 +87,7 @@ void GFXD3D9Cubemap::initStatic( GFXTexHandle *faces )
    if( faces )
    {
       AssertFatal( faces[0], "empty texture passed to CubeMap::create" );
-   
+
       GFXD3D9Device *dev = static_cast<GFXD3D9Device *>(GFX);
 
       D3DPOOL pool = D3DPOOL_MANAGED;
@@ -95,8 +95,8 @@ void GFXD3D9Cubemap::initStatic( GFXTexHandle *faces )
       if (dev->isD3D9Ex())
          pool = D3DPOOL_DEFAULT;
 
-      LPDIRECT3DDEVICE9 D3D9Device = dev->getDevice();     
-      
+      LPDIRECT3DDEVICE9 D3D9Device = dev->getDevice();
+
       // NOTE - check tex sizes on all faces - they MUST be all same size
       mTexSize = faces[0].getWidth();
       mFaceFormat = faces[0].getFormat();
@@ -122,8 +122,8 @@ void GFXD3D9Cubemap::initStatic( DDSFile *dds )
    if (dev->isD3D9Ex())
       pool = D3DPOOL_DEFAULT;
 
-   LPDIRECT3DDEVICE9 D3D9Device = dev->getDevice();     
-   
+   LPDIRECT3DDEVICE9 D3D9Device = dev->getDevice();
+
    // NOTE - check tex sizes on all faces - they MUST be all same size
    mTexSize = dds->getWidth();
    mFaceFormat = dds->getFormat();
@@ -145,12 +145,12 @@ void GFXD3D9Cubemap::initStatic( DDSFile *dds )
       for( U32 l = 0; l < levels; l++ )
       {
          IDirect3DSurface9 *cubeSurf = NULL;
-         D3D9Assert( mCubeTex->GetCubeMapSurface( faceList[i], l, &cubeSurf ), 
+         D3D9Assert( mCubeTex->GetCubeMapSurface( faceList[i], l, &cubeSurf ),
             "GFXD3D9Cubemap::initStatic - Get cubemap surface failed!" );
 
          // Lock the dest surface.
          D3DLOCKED_RECT lockedRect;
-         D3D9Assert( cubeSurf->LockRect( &lockedRect, NULL, 0 ), 
+         D3D9Assert( cubeSurf->LockRect( &lockedRect, NULL, 0 ),
             "GFXD3D9Cubemap::initStatic - Failed to lock surface level for load!" );
 
          dMemcpy( lockedRect.pBits, dds->mSurfaces[i]->mMips[l], dds->getSurfaceSize(l) );
@@ -175,20 +175,20 @@ void GFXD3D9Cubemap::initDynamic( U32 texSize, GFXFormat faceFormat )
    mDynamic = true;
    mTexSize = texSize;
    mFaceFormat = faceFormat;
-   
+
    LPDIRECT3DDEVICE9 D3D9Device = reinterpret_cast<GFXD3D9Device *>(GFX)->getDevice();
 
    // might want to try this as a 16 bit texture...
    D3D9Assert( D3D9Device->CreateCubeTexture( texSize,
-                                            1, 
+                                            1,
 #ifdef TORQUE_OS_XENON
                                             0,
 #else
-                                            D3DUSAGE_RENDERTARGET, 
+                                            D3DUSAGE_RENDERTARGET,
 #endif
                                             GFXD3D9TextureFormat[faceFormat],
-                                            D3DPOOL_DEFAULT, 
-                                            &mCubeTex, 
+                                            D3DPOOL_DEFAULT,
+                                            &mCubeTex,
                                             NULL ), NULL );
 }
 
@@ -207,9 +207,9 @@ void GFXD3D9Cubemap::fillCubeTextures( GFXTexHandle *faces, LPDIRECT3DDEVICE9 D3
       GFXD3D9TextureObject *texObj = dynamic_cast<GFXD3D9TextureObject*>( (GFXTextureObject*)faces[i] );
       IDirect3DSurface9 *inSurf;
       D3D9Assert( texObj->get2DTex()->GetSurfaceLevel( 0, &inSurf ), NULL );
-      
+
       // copy incoming texture into cube face
-      D3D9Assert( GFXD3DX.D3DXLoadSurfaceFromSurface( cubeSurf, NULL, NULL, inSurf, NULL, 
+      D3D9Assert( GFXD3DX.D3DXLoadSurfaceFromSurface( cubeSurf, NULL, NULL, inSurf, NULL,
                                   NULL, D3DX_FILTER_NONE, 0 ), NULL );
       cubeSurf->Release();
       inSurf->Release();

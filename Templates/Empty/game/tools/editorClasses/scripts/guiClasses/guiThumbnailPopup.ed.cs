@@ -24,7 +24,7 @@
 // ContextDialogContainer Class - Example Use
 //-----------------------------------------------------------------------------
 //
-//%MyContextDialog = new ScriptObject() 
+//%MyContextDialog = new ScriptObject()
 //{
 //   class           = ContextDialogContainer;
 //   superClass      = GuiThumbnailPopup;
@@ -37,7 +37,7 @@
 //
 // NOTES
 //
-// - thumbType describes a script namespace that will be linked to the creation 
+// - thumbType describes a script namespace that will be linked to the creation
 //  of the actual thumbs in the list.  This allows you to override their display
 // - listType describes a script namespace that will be linked to the creation
 //  of the list and will have refresh and destroy called on it when you need
@@ -45,7 +45,7 @@
 //  get a refresh call.
 //
 //
-//function MyCallbackNamespace::onContextActivate( %this ) 
+//function MyCallbackNamespace::onContextActivate( %this )
 //{
 //    echo("Dialog has been pushed onto canvas, clicking outside of it will pop it!");
 //}
@@ -58,13 +58,13 @@
 // Object Hierarchy
 // [%scriptObject] ScriptObject (GuiThumbnailPopup)
 //   .superClass (ContextDialogContainer)
-// (%scriptObject)->[%dialogCtrl] 
+// (%scriptObject)->[%dialogCtrl]
 //                 | GuiScrollCtrl [%scrollCtrl] (GuiThumbnailArray)
 //                 | GuiDynamicCtrlArrayCtrl [%objectList] (GuiThumbnailCreator)
 //                   .superClass ( listType )
 //                   .thumbType = %thumbType
 //                   .base = %this
-// 
+//
 function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label )
 {
    %base = new GuiWindowCtrl()
@@ -85,7 +85,7 @@ function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label
       canMinimize = "0";
       canMaximize = "0";
     };
-   %scroll = new GuiScrollCtrl() 
+   %scroll = new GuiScrollCtrl()
    {
       canSaveDynamicFields = "0";
       Profile = "ToolsGuiScrollProfile";
@@ -108,7 +108,7 @@ function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label
       thumbType = %thumbType; // Special Tag - Class of thumbObject
    };
    %base.add(%scroll);
-   %objectList = new GuiDynamicCtrlArrayControl() 
+   %objectList = new GuiDynamicCtrlArrayControl()
    {
             canSaveDynamicFields = "0";
             Profile = "ToolsGuiScrollProfile";
@@ -133,9 +133,9 @@ function GuiThumbnailPopup::CreateThumbPopup( %this, %parent, %thumbType, %label
    };
    %scroll.add(%objectList);
    %parent.add(%base);
-  
+
    return %base;
-   
+
 }
 
 function GuiThumbnailPopup::onAdd(%this)
@@ -143,12 +143,12 @@ function GuiThumbnailPopup::onAdd(%this)
    // Call parent.
    if( !Parent::onAdd( %this ) )
       return false;
-   
+
    if( %this.thumbType $= "" )
       %this.thumbType = "GuiDefaultThumbnail";
-      
+
    %this.Dialog = %this.createThumbPopup( %this.base, %this.thumbType, %this.label );
-         
+
    if( !isObject( %this.Dialog ) )
    {
       warn("GuiThumbnailPopup::onAdd - Invalid Context Dialog Specified!");
@@ -160,17 +160,17 @@ function GuiThumbnailPopup::onAdd(%this)
 
 function GuiThumbnailArray::onRemove(%this)
 {
-   %this.destroy();      
+   %this.destroy();
 }
 
 function GuiThumbnailArray::onWake( %this )
-{ 
+{
    // Find objectList
    %objectList = %this.findObjectByInternalName("ObjectList");
 
    if( !isObject( %objectList ) )
       return;
-   
+
    %objectList.refreshList();
 }
 
@@ -181,14 +181,14 @@ function GuiThumbnailArray::refreshList(%this)
 
    if( !isObject( %objectList ) )
       return;
-   
-   // Parent will clear 
+
+   // Parent will clear
    %objectList.destroy();
-   
+
 }
 
 function GuiThumbnailArray::destroy(%this)
-{     
+{
    // Find objectList
    %objectList = %this.findObjectByInternalName("ObjectList");
 
@@ -212,13 +212,13 @@ function GuiThumbnailCreator::AddObject( %this, %object, %data, %tooltip )
 {
    // Add to group
    $LB::ObjectLibraryGroup.add( %object );
-    
+
    // Build Object Container
    %container = new GuiControl() { profile = ToolsGuiButtonProfile; };
-          
+
    // Add to list.
    %this.add( %container );
-   
+
    // Return Container
    return %container;
 }

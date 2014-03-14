@@ -66,7 +66,7 @@ namespace Con {
    void XMLExport::exportEntryTypes()
    {
 
-      const char *typeNames [] = { 
+      const char *typeNames [] = {
          "ScriptCallbackType", "GroupMarker", "OverloadMarker", "InvalidFunctionType",
          "ConsoleFunctionType", "StringCallbackType", "IntCallbackType", "FloatCallbackType",
          "VoidCallbackType", "BoolCallbackType"
@@ -284,7 +284,7 @@ namespace Con {
       }
 
       mXML->popElement(); // EnumTables
-      
+
    }
 
    void XMLExport::exportXML(String& str)

@@ -40,7 +40,7 @@
          lineSpacing = "2";
          allowColorChars = "0";
          maxChars = "-1";
-         
+
       };
       new GuiButtonCtrl() {
          profile = "GuiButtonProfile";

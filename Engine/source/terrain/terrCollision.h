@@ -43,7 +43,7 @@ class TerrainConvex : public Convex
   public:
 
    TerrainConvex();
-   
+
    TerrainConvex( const TerrainConvex& cv );
 
    // Convex

@@ -31,7 +31,7 @@
 /// @param outPtr    Pointer to index 0 of a TSMesh aligned vertex buffer
 /// @param outStride Size, in bytes, of one entry in the vertex buffer
 extern void (*m_matF_x_BatchedVertWeightList)
-                                   (const MatrixF &mat, 
+                                   (const MatrixF &mat,
                                     const dsize_t count,
                                     const TSSkinMesh::BatchData::BatchedVertWeight * __restrict batch,
                                     U8 * const __restrict outPtr,
@@ -43,8 +43,8 @@ extern void (*m_matF_x_BatchedVertWeightList)
 /// @param outPtr    Pointer to a TSMesh aligned vertex buffer
 /// @param outStride Size, in bytes, of one entry in the vertex buffer
 extern void (*zero_vert_normal_bulk)
-                          (const dsize_t count, 
-                           U8 * __restrict const outPtr, 
+                          (const dsize_t count,
+                           U8 * __restrict const outPtr,
                            const dsize_t outStride);
 
 #endif

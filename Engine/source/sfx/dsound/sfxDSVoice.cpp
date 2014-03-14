@@ -56,7 +56,7 @@ SFXDSVoice* SFXDSVoice::create( SFXDSDevice *device, SFXDSBuffer *buffer )
 
 SFXDSVoice::SFXDSVoice( SFXDSDevice *device,
                         SFXDSBuffer *buffer,
-                        IDirectSoundBuffer8 *dsBuffer, 
+                        IDirectSoundBuffer8 *dsBuffer,
                         IDirectSound3DBuffer8 *dsBuffer3d )
    :  Parent( buffer ),
       mDevice( device ),
@@ -93,7 +93,7 @@ SFXStatus SFXDSVoice::_status() const
 
 void SFXDSVoice::_play()
 {
-   DSAssert( mDSBuffer->Play( 0, 0, mIsLooping ? DSBPLAY_LOOPING : 0 ), 
+   DSAssert( mDSBuffer->Play( 0, 0, mIsLooping ? DSBPLAY_LOOPING : 0 ),
       "SFXDSVoice::_play() - Playback failed!" );
 }
 
@@ -137,13 +137,13 @@ void SFXDSVoice::play( bool looping )
    // to commit any deferred settings before
    // we start playback else we can get some
    // glitches.
-   
+
    if ( mDSBuffer3D )
       mDevice->_commitDeferred();
 
    // If this is a streaming buffer,
    // force looping.
-   
+
    const bool isStreaming = mBuffer->isStreaming();
    if( isStreaming )
       looping = true;
@@ -157,7 +157,7 @@ void SFXDSVoice::setVelocity( const VectorF& velocity )
    if ( !mDSBuffer3D )
       return;
 
-   DSAssert( mDSBuffer3D->SetVelocity( velocity.x, velocity.z, velocity.y, DS3D_DEFERRED ), 
+   DSAssert( mDSBuffer3D->SetVelocity( velocity.x, velocity.z, velocity.y, DS3D_DEFERRED ),
       "SFXDSVoice::setVelocity - couldn't update buffer!" );
 }
 
@@ -169,10 +169,10 @@ void SFXDSVoice::setTransform( const MatrixF& transform )
    Point3F pos, dir;
    transform.getColumn( 3, &pos );
    transform.getColumn( 1, &dir );
-   DSAssert( mDSBuffer3D->SetPosition( pos.x, pos.z, pos.y, DS3D_DEFERRED ), 
+   DSAssert( mDSBuffer3D->SetPosition( pos.x, pos.z, pos.y, DS3D_DEFERRED ),
       "SFXDSVoice::setTransform - couldn't set position of the buffer." );
 
-   DSAssert( mDSBuffer3D->SetConeOrientation( dir.x, dir.z, dir.y, DS3D_DEFERRED ), 
+   DSAssert( mDSBuffer3D->SetConeOrientation( dir.x, dir.z, dir.y, DS3D_DEFERRED ),
       "SFXDSVoice::setTransform - couldn't set cone orientation of the buffer." );
 }
 
@@ -202,11 +202,11 @@ void SFXDSVoice::setVolume( F32 volume )
 }
 
 void SFXDSVoice::setPitch( F32 pitch )
-{ 
+{
    F32 sampleRate = _getBuffer()->getFormat().getSamplesPerSecond();
    F32 frequency = mFloor( mClampF( sampleRate * pitch, DSBFREQUENCY_MIN, DSBFREQUENCY_MAX ) );
 
-   DSAssert( mDSBuffer->SetFrequency( ( U32 )frequency ), 
+   DSAssert( mDSBuffer->SetFrequency( ( U32 )frequency ),
       "SFXDSVoice::setPitch - couldn't set playback frequency.");
 }
 
@@ -215,15 +215,15 @@ void SFXDSVoice::setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )
    if ( !mDSBuffer3D )
       return;
 
-   DSAssert( mDSBuffer3D->SetConeAngles(  innerAngle, 
-                                          outerAngle, 
-                                          DS3D_DEFERRED ), 
+   DSAssert( mDSBuffer3D->SetConeAngles(  innerAngle,
+                                          outerAngle,
+                                          DS3D_DEFERRED ),
       "SFXDSVoice::setCone - couldn't set cone angles!" );
 
 
    LONG logVolume = _linearToLogVolume( outerVolume );
 
-   DSAssert( mDSBuffer3D->SetConeOutsideVolume( logVolume, 
-                                                DS3D_DEFERRED ), 
+   DSAssert( mDSBuffer3D->SetConeOutsideVolume( logVolume,
+                                                DS3D_DEFERRED ),
       "SFXDSVoice::setCone - couldn't set cone outside volume!" );
 }

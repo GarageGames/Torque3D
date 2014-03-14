@@ -43,7 +43,7 @@ class SimComponent;
 // ever be one thing doing something with a component at one time, but I can see
 // many situations where this wouldn't be the case. When we decide to address
 // the issues of locking, I believe it should be done here, at the ComponentInterface
-// level. I would like lock functionality to be as centralized as possible, and 
+// level. I would like lock functionality to be as centralized as possible, and
 // so this is the place for it. The functionality is critical for safe useage of
 // the ComponentProperty class, so implementation here would also be ideal.
 
@@ -59,15 +59,15 @@ public:
    ComponentInterface() : mOwner(NULL) {};
 
    /// Destructor
-   virtual ~ComponentInterface() 
-   { 
+   virtual ~ComponentInterface()
+   {
       mOwner = NULL;
    }
 
    /// This will return true if the interface is valid
-   virtual bool isValid() const 
-   { 
-      return mOwner != NULL; 
+   virtual bool isValid() const
+   {
+      return mOwner != NULL;
    }
 
    /// Get the owner of this interface
@@ -90,12 +90,12 @@ typedef VectorPtr<ComponentInterface *>::iterator ComponentInterfaceListIterator
 /// This class is designed to wrap an existing class or type easily to allow
 /// a SimComponent to expose a property with custom processing code in an efficient
 /// and safe way. Specialized templates could be written which include validation
-/// on sets, and processing on gets. 
+/// on sets, and processing on gets.
 ///
 /// This class has a lot of "blow your leg off" potential, if you have bad aim.
 /// I think that a lot of very intuitive functionality can be gained from using
 /// this properly, however when implementing a specialized template, be mindful
-/// of what you are doing, and 
+/// of what you are doing, and
 
 // CodeReview [patw, 2, 13, 2007] I am very interested in making this as thin as
 // possible. I really like the possibilities that it exposes as far as exposing
@@ -113,15 +113,15 @@ protected:
 public:
 
    // Override this to add a check for valid memory.
-   virtual bool isValid() const 
+   virtual bool isValid() const
    {
-      return ( mValuePtr != NULL ) && Parent::isValid(); 
+      return ( mValuePtr != NULL ) && Parent::isValid();
    }
 
    // Operator overloads
 public:
    /// Dereferencing a value interface will allow get to do any processing and
-   /// return the reference to that 
+   /// return the reference to that
    const T &operator*()
    {
       return get();
@@ -158,36 +158,36 @@ public:
       SAFE_DELETE( mValuePtr );
    }
 
-   // This is the ComponentProperty interface that specializations of the class 
+   // This is the ComponentProperty interface that specializations of the class
    // will be interested in.
 public:
 
    /// Get the value associated with this interface. Processing code can be done
-   /// here for specialized implementations. 
-   virtual const T &get() // 'const' is intentionally not used as a modifier here 
-   { 
-      return *mValuePtr; 
+   /// here for specialized implementations.
+   virtual const T &get() // 'const' is intentionally not used as a modifier here
+   {
+      return *mValuePtr;
    }
 
    /// Set the value associated with this interface. Validation/processing code
    /// can be done here. The copy-constructor uses the set method to do it's copy
    /// so be mindful of that, or specialize the copy-constructor.
    virtual const T &set( const T &t )
-   { 
+   {
       // CodeReview [patw, 2, 13, 2007] So I am using the = operator here. Do you
       // guys think that this should be the default behavior? I am trying to keep
       // everything as object friendly as possible, so I figured I'd use this.
-      *mValuePtr = t; 
-      return *mValuePtr; 
+      *mValuePtr = t;
+      return *mValuePtr;
    }
 };
 
 /// This class is just designed to isolate the functionality of querying for, and
-/// managing interfaces. 
+/// managing interfaces.
 class ComponentInterfaceCache
 {
    // CodeReview [patw, 2, 14, 2007] When we move this whole system to Juggernaught
-   // we may want to consider making safe pointers for ComponentInterfaces. Not 
+   // we may want to consider making safe pointers for ComponentInterfaces. Not
    // sure why I put this note here.
 private:
    struct _InterfaceEntry
@@ -205,7 +205,7 @@ public:
    /// Add an interface to the cache. This function will return true if the interface
    /// is added successfully. An interface will not be added successfully if an entry
    /// in the list with the same values for 'type' and 'name' is present in the list.
-   /// 
+   ///
    /// @param type Type of the interface being added. If NULL is passed, it will match any type string queried.
    /// @param name Name of interface being added. If NULL is passed, it will match any name string queried.
    /// @param owner The owner of the ComponentInterface being cached
@@ -213,11 +213,11 @@ public:
    virtual bool add( const char *type, const char *name, const SimComponent *owner, ComponentInterface *cinterface );
 
    /// Clear the interface cache. This does not perform any operations on the contents
-   /// of the list. 
+   /// of the list.
    virtual void clear();
 
    /// Query the list for all of the interfaces it stores references to that match
-   /// the 'type' and 'name' parameters. The results of the query will be appended 
+   /// the 'type' and 'name' parameters. The results of the query will be appended
    /// to the list specified. Pattern matching is done using core/findMatch.h; for
    /// more information on matching, see that code/header pair. Passing NULL for
    /// one of these fields will match all values for that field. The return value

@@ -66,7 +66,7 @@
          hovertime = "1000";
          canSave = "1";
          canSaveDynamicFields = "0";
-         
+
          new GuiStackControl() {
             StackingType = "Vertical";
             HorizStacking = "Left to Right";
@@ -84,7 +84,7 @@
             Visible = "1";
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            
+
             new GuiRolloutCtrl() {
                Profile = "GuiRolloutProfile";
                HorizSizing = "right";
@@ -95,7 +95,7 @@
                Margin = "0 0 0 -3";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -112,15 +112,15 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
-            
+                  hovertime = "1000";
+
                   new GuiContainer(){
                      HorizSizing = "right";
                      VertSizing = "bottom";
                      Position = "-1 0";
                      Extent = "208 79";
                      Docking = "none";
-                     
+
                      new GuiTextCtrl() {
                         text = "Rotate Scalar:";
                         maxLength = "1024";
@@ -292,7 +292,7 @@
                Margin = "0 0 0 -3";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -309,8 +309,8 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
-            
+                  hovertime = "1000";
+
                   new GuiContainer(){
                      HorizSizing = "right";
                      VertSizing = "bottom";

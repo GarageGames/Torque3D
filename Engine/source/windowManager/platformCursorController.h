@@ -64,7 +64,7 @@ public:
       mOwner = NULL;
    };
 
-   enum 
+   enum
    {
       curArrow = 0,
       curWait,

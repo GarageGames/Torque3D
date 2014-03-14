@@ -30,7 +30,7 @@ ConsoleDocClass( MessageVector,
 	"@brief Store a list of chat messages.\n\n"
 
 	"This is responsible for managing messages which appear in the chat HUD, not the actual control rendered to the screen\n\n"
-	
+
 	"@tsexample\n"
 	"// Declare ChatHud, which is what will display the actual chat from a MessageVector\n"
 	"new GuiMessageVectorCtrl(ChatHud) {\n"
@@ -233,9 +233,9 @@ DefineEngineMethod( MessageVector, deleteLine, bool, ( S32 deletePos),,
 //}
 static ConsoleDocFragment _MessageVectordump1(
    "@brief Dump the message vector to a file without a header.\n\n"
-   
+
    "@param filename Name and path of file to dump text to.\n"
-   
+
    "@tsexample\n"
    "// Dump the entire chat log to a text file\n"
    "HudMessageVector.dump(\"./chatLog.txt\");\n"
@@ -245,10 +245,10 @@ static ConsoleDocFragment _MessageVectordump1(
 
 static ConsoleDocFragment _MessageVectordump2(
    "@brief Dump the message vector to a file with a header.\n\n"
-   
+
    "@param filename Name and path of file to dump text to.\n"
    "@param header Prefix information for write out\n\n"
-   
+
    "@tsexample\n"
    "// Arbitrary header data\n"
    "%headerInfo = \"Ars Moriendi Chat Log\";\n\n"

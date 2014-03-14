@@ -82,7 +82,7 @@ public:
 
    // Light info Render Inst Type
    static const RenderInstType RIT_LightInfo;
-   
+
    // registered buffer name
    static const String smBufferName;
 
@@ -97,7 +97,7 @@ public:
    static bool smUseSSAOMask;
 
    // Used for console init
-   AdvancedLightBinManager( AdvancedLightManager *lm = NULL, 
+   AdvancedLightBinManager( AdvancedLightManager *lm = NULL,
                             ShadowMapManager *sm = NULL,
                             GFXFormat lightBufferFormat = GFXFormatR8G8B8A8 );
    virtual ~AdvancedLightBinManager();
@@ -163,16 +163,16 @@ protected:
       MaterialParameterHandle *lightTrilight;
       MaterialParameterHandle *lightSpotParams;
 
-      LightMaterialInfo(   const String &matName, 
+      LightMaterialInfo(   const String &matName,
                            const GFXVertexFormat *vertexFormat,
                            const Vector<GFXShaderMacro> &macros = Vector<GFXShaderMacro>() );
 
       virtual ~LightMaterialInfo();
 
 
-      void setViewParameters( const F32 zNear, 
-                              const F32 zFar, 
-                              const Point3F &eyePos, 
+      void setViewParameters( const F32 zNear,
+                              const F32 zFar,
+                              const Point3F &eyePos,
                               const PlaneF &farPlane,
                               const PlaneF &_vsFarPlane );
 
@@ -223,7 +223,7 @@ protected:
 
    AdvancedLightBufferConditioner *mConditioner;
 
-   typedef GFXVertexPNTT FarFrustumQuadVert; 
+   typedef GFXVertexPNTT FarFrustumQuadVert;
    GFXVertexBufferHandle<FarFrustumQuadVert> mFarFrustumQuadVerts;
 
 

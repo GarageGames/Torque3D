@@ -55,10 +55,10 @@
 
 ConsoleDocClass( River,
    "@brief A water volume defined by a 3D spline.\n\n"
-   
+
    "User may control width and depth per node and overall spline shape in three "
-   "dimensions.\n\n"   
-      
+   "dimensions.\n\n"
+
    "%River supports dynamic planar reflections (fullReflect) like all WaterObject "
    "classes, but keep in mind it is not necessarily a planar surface. For best "
    "visual quality a %River should be less reflective the more it twists and "
@@ -154,7 +154,7 @@ void RiverNodeEvent::pack(NetConnection* conn, BitStream* stream)
       mathWrite( *stream, mPositions[i] );
       stream->write( mWidths[i] );
       stream->write( mDepths[i] );
-      mathWrite( *stream, mNormals[i] );         
+      mathWrite( *stream, mNormals[i] );
    }
 }
 
@@ -175,7 +175,7 @@ void RiverNodeEvent::unpack(NetConnection* conn, BitStream* stream)
    for (U32 i=0; i<count; ++i)
    {
       mathRead( *stream, &pos );
-      stream->read( &width );   
+      stream->read( &width );
       stream->read( &depth );
       mathRead( *stream, &normal );
 
@@ -320,24 +320,24 @@ RiverSegment::RiverSegment( RiverSlice *rs0, RiverSlice *rs1 )
    // Will be used for intersection/buoyancy tests
     VectorF normal;
     mPlaneCount = 6;
- 
+
     sSegmentPointCompareReference = getFaceCenter(6);
 
     // left
     mPlanes[0] = _getBestPlane( &slice1->p0, &slice1->pb0, &slice0->pb0, &slice0->p0 );
-    
+
     // right
-    mPlanes[1] = _getBestPlane( &slice0->pb2, &slice1->pb2, &slice1->p2, &slice0->p2 );    
- 
-    // near    
+    mPlanes[1] = _getBestPlane( &slice0->pb2, &slice1->pb2, &slice1->p2, &slice0->p2 );
+
+    // near
     mPlanes[2] = _getBestPlane( &slice0->pb0, &slice0->pb2, &slice0->p2, &slice0->p0 );
- 
-    // far    
+
+    // far
     mPlanes[3] = _getBestPlane( &slice1->pb2, &slice1->pb0, &slice1->p0, &slice1->p2 );
- 
+
     // top
     mPlanes[4] = _getBestPlane( &slice0->p2, &slice1->p2, &slice1->p0, &slice0->p0 );
- 
+
     // bottom
     mPlanes[5] = _getBestPlane( &slice0->pb2, &slice0->pb0, &slice1->pb0, &slice1->pb2 );
 
@@ -358,40 +358,40 @@ RiverSegment::RiverSegment( RiverSlice *rs0, RiverSlice *rs1 )
       mCubePoints[1] = cornerPoint + (VectorF( 1.0f, 0.0f, 0.0f ) * size );
       mCubePoints[2] = cornerPoint + (VectorF( 0.0f, 1.0f, 0.0f ) * size );
       mCubePoints[3] = cornerPoint + (VectorF( 1.0f, 1.0f, 0.0f ) * size );
-   
+
       mCubePoints[4] = cornerPoint + (VectorF( 0.0f, 0.0f, 1.0f );
       mCubePoints[5] = cornerPoint + (VectorF( 1.0f, 0.0f, 1.0f );
       mCubePoints[6] = cornerPoint + (VectorF( 0.0f, 1.0f, 1.0f );
       mCubePoints[7] = cornerPoint + (VectorF( 1.0f, 1.0f, 1.0f );
-   
+
       // Center tetra.
       mTetras[0].p0 = &mCubePoints[1];
       mTetras[0].p1 = &mCubePoints[2];
       mTetras[0].p2 = &mCubePoints[4];
       mTetras[0].p3 = &mCubePoints[7];
-   
-   
-   
+
+
+
       mTetras[1].p0 = &mCubePoints[0]; // this is the tip
       mTetras[1].p1 = &mCubePoints[1];
       mTetras[1].p2 = &mCubePoints[2];
       mTetras[1].p3 = &mCubePoints[4];
-   
+
       mTetras[2].p0 = &mCubePoints[3]; // tip
       mTetras[2].p1 = &mCubePoints[2];
       mTetras[2].p2 = &mCubePoints[1];
       mTetras[2].p3 = &mCubePoints[7];
-   
+
       mTetras[3].p0 = &mCubePoints[6]; // tip
       mTetras[3].p1 = &mCubePoints[7];
       mTetras[3].p2 = &mCubePoints[4];
       mTetras[3].p3 = &mCubePoints[2];
-   
+
       mTetras[4].p0 = &mCubePoints[5]; // tip
       mTetras[4].p1 = &mCubePoints[7];
       mTetras[4].p2 = &mCubePoints[4];
       mTetras[4].p3 = &mCubePoints[3];*/
-   
+
 }
 
 void RiverSegment::set( RiverSlice *rs0, RiverSlice *rs1 )
@@ -414,14 +414,14 @@ static S32 QSORT_CALLBACK SegmentPointCompare(const void *aptr, const void *bptr
 {
    const U32 a = *(const U32*)aptr;
    const U32 b = *(const U32*)bptr;
-   
+
    F32 lenA = ( sSegmentPointCompareReference - sSegmentPointComparePoints[a] ).lenSquared();
    F32 lenB = ( sSegmentPointCompareReference - sSegmentPointComparePoints[b] ).lenSquared();
-   return ( lenB - lenA );   
+   return ( lenB - lenA );
 }
 
 PlaneF RiverSegment::_getBestPlane( const Point3F *p0, const Point3F *p1, const Point3F *p2, const Point3F *p3 )
-{   
+{
    sSegmentPointComparePoints[0] = *p0;
    sSegmentPointComparePoints[1] = *p1;
    sSegmentPointComparePoints[2] = *p2;
@@ -439,7 +439,7 @@ PlaneF RiverSegment::_getBestPlane( const Point3F *p0, const Point3F *p1, const 
 
    // Collect the best three points (in correct winding order)
    // To generate the plane's normal
-   Vector<Point3F> normalPnts;   
+   Vector<Point3F> normalPnts;
 
    for ( U32 i = 0; i < 4; i++ )
    {
@@ -467,22 +467,22 @@ Point3F RiverSegment::getFaceCenter( U32 faceIdx ) const
    case 1: // right
       center = slice0->p2 + slice1->p2 + slice1->pb2 + slice0->pb2;
       center *= 0.25f;
-      break;   
+      break;
 
-   case 2: // near    
+   case 2: // near
       center = slice0->p0 + slice0->p2 + slice0->pb2 + slice0->pb0;
       center *= 0.25f;
-      break;   
+      break;
 
-   case 3: // far    
+   case 3: // far
       center = slice1->pb0 + slice1->p0 + slice1->pb0 + slice1->pb2;
       center *= 0.25f;
-      break;   
+      break;
 
    case 4: // top
       center = slice0->p0 + slice1->p0 + slice1->p2 + slice0->p2;
       center *= 0.25f;
-      break;   
+      break;
 
    case 5: // bottom
       center = slice1->pb2 + slice1->pb0 + slice0->pb0 + slice0->pb2;
@@ -505,14 +505,14 @@ bool RiverSegment::intersectBox( const Box3F &bounds ) const
    Point3F maxPoint;
    F32 maxDot;
 
-   // Note the planes are ordered left, right, near, 
+   // Note the planes are ordered left, right, near,
    // far, top, bottom for getting early rejections
    // from the typical horizontal scene.
    for ( S32 i = 0; i < mPlaneCount; i++ )
    {
       // This is pretty much as optimal as you can
       // get for a plane vs AABB test...
-      // 
+      //
       // 4 comparisons
       // 3 multiplies
       // 2 adds
@@ -551,7 +551,7 @@ bool RiverSegment::containsPoint( const Point3F &pnt ) const
 
    F32 maxDot;
 
-   // Note the planes are ordered left, right, near, 
+   // Note the planes are ordered left, right, near,
    // far, top, bottom for getting early rejections
    // from the typical horizontal scene.
    for ( S32 i = 0; i < mPlaneCount; i++ )
@@ -560,7 +560,7 @@ bool RiverSegment::containsPoint( const Point3F &pnt ) const
 
       // This is pretty much as optimal as you can
       // get for a plane vs point test...
-      // 
+      //
       // 1 comparison
       // 2 multiplies
       // 1 adds
@@ -600,8 +600,8 @@ River::River()
    mMinDivisionSize(0.25f),
 	mColumnCount(5),
    mFlowMagnitude(1.0f),
-   mLodDistance( 50.0f )   
-{   
+   mLodDistance( 50.0f )
+{
    mNetFlags.set( Ghostable | ScopeAlways );
 
    mObjScale.set( 1, 1, 1 );
@@ -617,7 +617,7 @@ River::River()
 }
 
 River::~River()
-{      
+{
 }
 
 void River::initPersistFields()
@@ -626,7 +626,7 @@ void River::initPersistFields()
 
       addField( "SegmentLength",       TypeF32,    Offset( mMetersPerSegment, River ),
          "Divide the River lengthwise into segments of this length in meters. "
-         "These geometric volumes are used for spacial queries like determining containment." );      
+         "These geometric volumes are used for spacial queries like determining containment." );
 
       addField( "SubdivideLength",     TypeF32,    Offset( mMaxDivisionSize, River ),
          "For purposes of generating the renderable geometry River segments are further subdivided "
@@ -637,9 +637,9 @@ void River::initPersistFields()
 
       addField( "LowLODDistance",      TypeF32,    Offset( mLodDistance, River ),
          "Segments of the river at this distance in meters or greater will "
-         "render as a single unsubdivided without undulation effects." );      
+         "render as a single unsubdivided without undulation effects." );
 
-   endGroup( "River" );   
+   endGroup( "River" );
 
    addGroup( "Internal" );
 
@@ -673,12 +673,12 @@ bool River::addNodeFromField( void *object, const char *index, const char *data 
    River *pObj = static_cast<River*>(object);
 
    //if ( !pObj->isProperlyAdded() )
-   //{      
-   F32 x,y,z,width,depth;      
+   //{
+   F32 x,y,z,width,depth;
    VectorF normal;
-   U32 result = dSscanf( data, "%f %f %f %f %f %f %f %f", &x, &y, &z, &width, &depth, &normal.x, &normal.y, &normal.z );      
-   if ( result == 8 )   
-      pObj->_addNode( Point3F(x,y,z), width, depth, normal );      
+   U32 result = dSscanf( data, "%f %f %f %f %f %f %f %f", &x, &y, &z, &width, &depth, &normal.x, &normal.y, &normal.z );
+   if ( result == 8 )
+      pObj->_addNode( Point3F(x,y,z), width, depth, normal );
    //}
 
    return false;
@@ -686,7 +686,7 @@ bool River::addNodeFromField( void *object, const char *index, const char *data 
 
 bool River::onAdd()
 {
-   if ( !Parent::onAdd() ) 
+   if ( !Parent::onAdd() )
       return false;
 
    // Reset the World Box.
@@ -698,9 +698,9 @@ bool River::onAdd()
 
    // Add to Scene.
    addToScene();
-   
+
    if ( isServerObject() )
-      getServerSet()->addObject( this );   
+      getServerSet()->addObject( this );
 
    _regenerate();
 
@@ -722,7 +722,7 @@ void River::inspectPostApply()
    if ( mMetersPerSegment < MIN_METERS_PER_SEGMENT )
       mMetersPerSegment = MIN_METERS_PER_SEGMENT;
 
-   mMaxDivisionSize = getMax( mMaxDivisionSize, mMinDivisionSize );      
+   mMaxDivisionSize = getMax( mMaxDivisionSize, mMinDivisionSize );
 
    // Set fxPortal Mask.
    setMaskBits(RiverMask|RegenMask);
@@ -754,7 +754,7 @@ void River::writeFields( Stream &stream, U32 tabStop )
 
    // Now write all nodes
 
-   stream.write(2, "\r\n");   
+   stream.write(2, "\r\n");
 
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
@@ -764,16 +764,16 @@ void River::writeFields( Stream &stream, U32 tabStop )
 
       char buffer[1024];
       dMemset( buffer, 0, 1024 );
-      dSprintf( buffer, 1024, "Node = \"%f %f %f %f %f %f %f %f\";", node.point.x, node.point.y, node.point.z, 
-                                                                     node.width, 
-                                                                     node.depth, 
-                                                                     node.normal.x, node.normal.y, node.normal.z );      
+      dSprintf( buffer, 1024, "Node = \"%f %f %f %f %f %f %f %f\";", node.point.x, node.point.y, node.point.z,
+                                                                     node.width,
+                                                                     node.depth,
+                                                                     node.normal.x, node.normal.y, node.normal.z );
       stream.writeLine( (const U8*)buffer );
    }
 }
 
 bool River::writeField( StringTableEntry fieldname, const char *value )
-{   
+{
    if ( fieldname == StringTable->insert("node") )
       return false;
 
@@ -781,7 +781,7 @@ bool River::writeField( StringTableEntry fieldname, const char *value )
 }
 
 void River::innerRender( SceneRenderState *state )
-{   
+{
    GFXDEBUGEVENT_SCOPE( River_innerRender, ColorI( 255, 0, 0 ) );
 
    PROFILE_SCOPE( River_innerRender );
@@ -791,7 +791,7 @@ void River::innerRender( SceneRenderState *state )
    sgData.init( state );
    sgData.lights[0] = LIGHTMGR->getSpecialLight( LightManager::slSunLightType );
    sgData.backBuffTex = REFLECTMGR->getRefractTex();
-   sgData.reflectTex = mPlaneReflector.reflectTex; 
+   sgData.reflectTex = mPlaneReflector.reflectTex;
    sgData.wireframe |= smWireframe;
 
    const Point3F &camPosition = state->getCameraPosition();
@@ -806,7 +806,7 @@ void River::innerRender( SceneRenderState *state )
    BaseMatInstance *mat = mMatInstances[matIdx];
    WaterMatParams matParams = mMatParamHandles[matIdx];
 
-   if ( !mat )      
+   if ( !mat )
       return;
 
    // setup proj/world transform
@@ -816,11 +816,11 @@ void River::innerRender( SceneRenderState *state )
 
    _makeRenderBatches( camPosition );
 
-	if ( !River::smShowRiver )      
+	if ( !River::smShowRiver )
       return;
 
    // If no material... we're done.
-   if ( mLowLODBatches.empty() && mHighLODBatches.empty() )      
+   if ( mLowLODBatches.empty() && mHighLODBatches.empty() )
       return;
 
    if ( !mHighLODBatches.empty() )
@@ -834,7 +834,7 @@ void River::innerRender( SceneRenderState *state )
       mat->setSceneInfo(state, sgData);
       mat->setTransforms(*mMatrixSet, state);
 
-      setCustomTextures( matIdx, mat->getCurPass(), matParams );      
+      setCustomTextures( matIdx, mat->getCurPass(), matParams );
 
       GFX->setVertexBuffer( mVB_low );
       GFX->setPrimitiveBuffer( mPB_low );
@@ -847,22 +847,22 @@ void River::innerRender( SceneRenderState *state )
          U32 endVert = ( batch.endSegmentIdx + 1 ) * 2 + 1;
          U32 startIdx = batch.startSegmentIdx * 6;
          U32 endIdx = batch.endSegmentIdx * 6 + 5;
-          
+
          U32 vertCount = ( endVert - startVert ) + 1;
          U32 idxCount = ( endIdx - startIdx ) + 1;
          U32 triangleCount = idxCount / 3;
-         				
+
          AssertFatal( startVert < mLowVertCount, "River, bad draw call!" );
          AssertFatal( startVert + vertCount <= mLowVertCount, "River, bad draw call!" );
          AssertFatal( triangleCount <= mLowTriangleCount, "River, bad draw call!" );
 
          GFX->drawIndexedPrimitive( GFXTriangleList, 0, startVert, vertCount, startIdx, triangleCount );
       }
-      
+
       // Render all high detail batches.
       //
       // It is possible that the buffers could not be allocated because
-      // the max number of verts/indices was exceeded.  We don't want to 
+      // the max number of verts/indices was exceeded.  We don't want to
       // crash because that would be unhelpful for working in the editor.
       if ( mVB_high.isValid() && mPB_high.isValid() )
       {
@@ -874,21 +874,21 @@ void River::innerRender( SceneRenderState *state )
             const RiverRenderBatch &batch = mHighLODBatches[i];
 
             AssertFatal( batch.startVert < mHighVertCount, "River, bad draw call!" );
-            AssertFatal( batch.startVert + batch.vertCount <= mHighVertCount, "River, bad draw call!" );            
+            AssertFatal( batch.startVert + batch.vertCount <= mHighVertCount, "River, bad draw call!" );
             AssertFatal( batch.triangleCount <= mHighTriangleCount, "River, bad draw call!" );
             AssertFatal( batch.startIndex < mHighTriangleCount * 3, "River, bad draw call!" );
             AssertFatal( batch.startIndex + batch.triangleCount * 3 <= mHighTriangleCount * 3, "River, bad draw call!" );
 
-            GFX->drawIndexedPrimitive( GFXTriangleList, 
-                                       0, 
-                                       0, 
-                                       batch.vertCount, 
-                                       batch.startIndex, 
+            GFX->drawIndexedPrimitive( GFXTriangleList,
+                                       0,
+                                       0,
+                                       batch.vertCount,
+                                       batch.startIndex,
                                        batch.triangleCount );
          }
       }
 
-   } // while( mat->setupPass( sgData ) )      
+   } // while( mat->setupPass( sgData ) )
 }
 
 void River::updateUnderwaterEffect( SceneRenderState *state )
@@ -907,15 +907,15 @@ void River::setShaderParams( SceneRenderState *state, BaseMatInstance* mat, cons
 
    mUndulateMaxDist = mLodDistance;
 
-   Parent::setShaderParams( state, mat, paramHandles );   
+   Parent::setShaderParams( state, mat, paramHandles );
 
    // Now set the rest of the shader consts that are either unique to this
    // class or that WaterObject leaves to us to handle...
 
-   MaterialParameters* matParams = mat->getMaterialParameters();  
+   MaterialParameters* matParams = mat->getMaterialParameters();
 
    // set vertex shader constants
-   //-----------------------------------           
+   //-----------------------------------
 
    matParams->setSafe(paramHandles.mGridElementSizeSC, 1.0f);
    if ( paramHandles.mModelMatSC->isValid() )
@@ -930,7 +930,7 @@ void River::setShaderParams( SceneRenderState *state, BaseMatInstance* mat, cons
    // By default we need to show a true reflection is fullReflect is enabled and
    // we are above water.
    F32 reflect = mPlaneReflector.isEnabled() && !isUnderwater( state->getCameraPosition() );
-   
+
    // If we were occluded the last frame a query was fetched ( not necessarily last frame )
    // and we weren't updated last frame... we don't have a valid texture to show
    // so use the cubemap / fake reflection color this frame.
@@ -940,7 +940,7 @@ void River::setShaderParams( SceneRenderState *state, BaseMatInstance* mat, cons
    Point4F reflectParams( mWaterPos.z, 0.0f, 1000.0f, !reflect );
    matParams->setSafe(paramHandles.mReflectParamsSC, reflectParams );
 
-   matParams->setSafe(paramHandles.mReflectNormalSC, mPlaneReflector.refplane );   
+   matParams->setSafe(paramHandles.mReflectNormalSC, mPlaneReflector.refplane );
 }
 
 bool River::isUnderwater( const Point3F &pnt ) const
@@ -949,7 +949,7 @@ bool River::isUnderwater( const Point3F &pnt ) const
 }
 
 U32 River::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
-{  
+{
    // Pack Parent.
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
@@ -958,7 +958,7 @@ U32 River::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
       // Write Object Transform.
       stream->writeAffineTransform(mObjToWorld);
 
-      stream->write( mMetersPerSegment );      
+      stream->write( mMetersPerSegment );
       stream->write( mSegmentsPerBatch );
       stream->write( mDepthScale );
       stream->write( mMaxDivisionSize );
@@ -966,7 +966,7 @@ U32 River::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
 
       stream->write( mFlowMagnitude );
       stream->write( mLodDistance );
-   }   
+   }
 
    if ( stream->writeFlag( mask & NodeMask ) )
    {
@@ -1023,7 +1023,7 @@ U32 River::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
          stream->write( id );
       }
    }
-   
+
    if( stream->writeFlag( mask & ( RiverMask | InitialUpdateMask ) ) )
    {
       // This is set to allow the user to modify the size of the water dynamically
@@ -1048,8 +1048,8 @@ void River::unpackUpdate(NetConnection * con, BitStream * stream)
       MatrixF		ObjectMatrix;
       stream->readAffineTransform(&ObjectMatrix);
       Parent::setTransform(ObjectMatrix);
-     
-      stream->read( &mMetersPerSegment );    
+
+      stream->read( &mMetersPerSegment );
       stream->read( &mSegmentsPerBatch );
       stream->read( &mDepthScale );
       stream->read( &mMaxDivisionSize );
@@ -1076,10 +1076,10 @@ void River::unpackUpdate(NetConnection * con, BitStream * stream)
          for ( U32 i = 0; i < count; i++ )
          {
             mathRead( *stream, &pos );
-            stream->read( &width );         
+            stream->read( &width );
             stream->read( &depth );
             mathRead( *stream, &normal );
-            _addNode( pos, width, depth, normal );         
+            _addNode( pos, width, depth, normal );
          }
       }
       else
@@ -1116,13 +1116,13 @@ void River::unpackUpdate(NetConnection * con, BitStream * stream)
    }
 
    // RegenMask
-   if ( stream->readFlag() && isProperlyAdded() )  
+   if ( stream->readFlag() && isProperlyAdded() )
       regenerate();
 }
 
 void River::_getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &outPos )
 {
-   // Find the RiverSegment closest to the camera.   
+   // Find the RiverSegment closest to the camera.
    F32 closestDist = F32_MAX;
    S32 closestSegment = 0;
    Point3F projPnt(0.0f, 0.0f, 0.0f);
@@ -1158,7 +1158,7 @@ void River::_getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &ou
 
 void River::setTransform( const MatrixF &mat )
 {
-   
+
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
       mWorldToObj.mulP( mNodes[i].point );
@@ -1178,11 +1178,11 @@ void River::setTransform( const MatrixF &mat )
       mNodes[i].point += delta;
    }
 
-   // Assign the new position ( we ignore rotation )   
+   // Assign the new position ( we ignore rotation )
    MatrixF newMat( oldMat );
    newMat.setPosition( newPos );
    */
-   
+
    Parent::setTransform( mat );
 
    // Regenerate and update the client
@@ -1219,7 +1219,7 @@ bool River::castRay(const Point3F &s, const Point3F &e, RayInfo* info)
 		{
 			hitSegments.increment();
 			hitSegments.last().t = t;
-			hitSegments.last().idx = i;         
+			hitSegments.last().idx = i;
 		}
 	}
 
@@ -1253,7 +1253,7 @@ bool River::castRay(const Point3F &s, const Point3F &e, RayInfo* info)
             const Point3F &v1 = segment[idx1];
             const Point3F &v2 = segment[idx2];
 
-            if ( !MathUtils::mLineTriangleCollide( start, end, 
+            if ( !MathUtils::mLineTriangleCollide( start, end,
                                                    v2, v1, v0,
                                                    NULL,
                                                    &t ) )
@@ -1263,7 +1263,7 @@ bool River::castRay(const Point3F &s, const Point3F &e, RayInfo* info)
 				{
 					out = t;
 
-               // optimize this, can be calculated easily within 
+               // optimize this, can be calculated easily within
                // the collision test
                norm = PlaneF( v0, v1, v2 );
 				}
@@ -1316,7 +1316,7 @@ F32 River::getWaterCoverage( const Box3F &worldBox ) const
          continue;
 
       F32 distance = segment.distanceToSurface( bottomPnt );
-     
+
       if ( distance > farthest )
          farthest = distance;
    }
@@ -1325,7 +1325,7 @@ F32 River::getWaterCoverage( const Box3F &worldBox ) const
    F32 distance = mClampF( farthest, 0.0f, height );
    F32 coverage = distance / height;
 
-   return coverage;   
+   return coverage;
 }
 
 F32 River::getSurfaceHeight( const Point2F &pos ) const
@@ -1381,7 +1381,7 @@ void River::onReflectionInfoChanged()
 }
 
 void River::_regenerate()
-{               
+{
    if ( mNodes.size() == 0 )
       return;
 
@@ -1395,7 +1395,7 @@ void River::_regenerate()
 }
 
 void River::_generateSlices()
-{      
+{
    if ( mNodes.size() < 2 )
       return;
 
@@ -1425,12 +1425,12 @@ void River::_generateSlices()
       F32 t1 = spline.getTime( i );
 
       F32 segLength = spline.arcLength( t0, t1 );
-    
+
       U32 numSegments = mCeil( segLength / mMetersPerSegment );
       numSegments = getMax( numSegments, (U32)1 );
       F32 tstep = ( t1 - t0 ) / numSegments;
 
-      //AssertFatal( numSegments > 0, "River::_generateSlices, got zero segments!" );   
+      //AssertFatal( numSegments > 0, "River::_generateSlices, got zero segments!" );
 
       U32 startIdx = 0;
       U32 endIdx = ( i == nodeCount - 1 ) ? numSegments + 1 : numSegments;
@@ -1449,9 +1449,9 @@ void River::_generateSlices()
          slice.normal = val.normal;
          slice.normal.normalize();
          mSlices.push_back( slice );
-      }   
+      }
    }
-   
+
    //
    // Calculate fvec and rvec for all slices
    //
@@ -1466,9 +1466,9 @@ void River::_generateSlices()
       pSlice->fvec.normalize();
       pSlice->rvec = mCross( pSlice->fvec, pSlice->normal );
       pSlice->rvec.normalize();
-      pSlice->uvec = mCross( pSlice->rvec, pSlice->fvec );            
+      pSlice->uvec = mCross( pSlice->rvec, pSlice->fvec );
       pSlice->uvec.normalize();
-      pSlice->rvec = mCross( pSlice->fvec, pSlice->uvec );      
+      pSlice->rvec = mCross( pSlice->fvec, pSlice->uvec );
       pSlice->rvec.normalize();
    }
 
@@ -1483,7 +1483,7 @@ void River::_generateSlices()
       pSlice->rvec = mCross( pSlice->fvec, pSlice->normal );
       pSlice->rvec.normalize();
 
-      pSlice->uvec = mCross( pSlice->rvec, pSlice->fvec );      
+      pSlice->uvec = mCross( pSlice->rvec, pSlice->fvec );
       pSlice->uvec.normalize();
 
       pSlice->rvec = mCross( pSlice->fvec, pSlice->uvec );
@@ -1500,7 +1500,7 @@ void River::_generateSlices()
       lastSlice->rvec = mCross( lastSlice->fvec, lastSlice->normal );
       lastSlice->rvec.normalize();
 
-      lastSlice->uvec = mCross( lastSlice->rvec, lastSlice->fvec );      
+      lastSlice->uvec = mCross( lastSlice->rvec, lastSlice->fvec );
       lastSlice->uvec.normalize();
 
       lastSlice->rvec = mCross( lastSlice->fvec, lastSlice->uvec );
@@ -1510,7 +1510,7 @@ void River::_generateSlices()
 
    //
    // Calculate p0/p2/pb0/pb2 for all slices
-   //      
+   //
    for ( U32 i = 0; i < mSlices.size(); i++ )
    {
       RiverSlice *slice = &mSlices[i];
@@ -1519,7 +1519,7 @@ void River::_generateSlices()
       slice->pb0 = slice->p0 - slice->uvec * slice->depth;
       slice->pb2 = slice->p2 - slice->uvec * slice->depth;
    }
-   
+
    // Generate the object/world bounds
    Box3F box;
    for ( U32 i = 0; i < mSlices.size(); i++ )
@@ -1535,7 +1535,7 @@ void River::_generateSlices()
       }
       else
       {
-         box.extend( slice.p0 ); 
+         box.extend( slice.p0 );
          box.extend( slice.p2 );
          box.extend( slice.pb0 );
          box.extend( slice.pb2 );
@@ -1553,7 +1553,7 @@ void River::_generateSlices()
    if( getSceneManager() != NULL )
       getSceneManager()->notifyObjectDirty( this );
 
-   _generateSegments();   
+   _generateSegments();
 }
 
 void River::_generateSegments()
@@ -1563,7 +1563,7 @@ void River::_generateSegments()
    for ( U32 i = 0; i < mSlices.size() - 1; i++ )
    {
       RiverSegment seg( &mSlices[i], &mSlices[i+1] );
-      
+
       mSegments.push_back( seg );
    }
 
@@ -1572,7 +1572,7 @@ void River::_generateSegments()
 
       for ( U32 i = 0; i < mSegments.size(); i++ )
       {
-         const RiverSegment &segment = mSegments[i];         
+         const RiverSegment &segment = mSegments[i];
          PlaneF normal0 = MathUtils::mTriangleNormal( segment.slice0->p0, segment.slice1->p0, segment.slice1->p2 );
          PlaneF normal1 = MathUtils::mTriangleNormal( segment.slice0->p0, segment.slice1->p2, segment.slice0->p2 );
          AssertFatal( true || normal0 != normal1, "River::generateSegments, segment is not coplanar!" );
@@ -1582,8 +1582,8 @@ void River::_generateSegments()
    */
 
    // We have to go back and generate normals for each slice
-   // to be used in calculation of the reflect plane.  
-   // The slice-normal we calculate are relative to the surface normal 
+   // to be used in calculation of the reflect plane.
+   // The slice-normal we calculate are relative to the surface normal
    // of the segments adjacent to the slice.
    /*
    if ( mSlices.size() >= 2 )
@@ -1596,12 +1596,12 @@ void River::_generateSegments()
       mSlices.last().normal = mSegments.last().getSurfaceNormal();
    }
    */
-   
+
    _generateVerts();
 }
 
 void River::_generateVerts()
-{           
+{
    if ( isServerObject() )
       return;
 
@@ -1609,7 +1609,7 @@ void River::_generateVerts()
    // calculated below.
    mHighVertCount = 0;
 	mHighTriangleCount = 0;
-	
+
    // Calculate the number of row/column subdivisions per each
    // RiverSegment.
 
@@ -1629,8 +1629,8 @@ void River::_generateVerts()
       const RiverSlice *slice = segment.slice0;
 		const RiverSlice *nextSlice = segment.slice1;
 
-		// Calculate the size of divisions in the forward direction ( p00 -> p01 )      		
-		F32 segLength = (nextSlice->p1 - slice->p1).len();		
+		// Calculate the size of divisions in the forward direction ( p00 -> p01 )
+		F32 segLength = (nextSlice->p1 - slice->p1).len();
 
 		// A division count of one is actually NO subdivision,
 		// the segment corners are the only verts in this segment.
@@ -1639,13 +1639,13 @@ void River::_generateVerts()
       if ( segLength > 0.0f )
          numRows = mCeil( segLength / mMaxDivisionSize );
 
-      // The problem with calculating num columns per segment is 
+      // The problem with calculating num columns per segment is
       // two adjacent - high lod segments of different width can have
-      // verts that don't line up!  So even though RiverSegment HAS a 
+      // verts that don't line up!  So even though RiverSegment HAS a
       // column data member we initialize all segments in the river to
       // the same (River::mColumnCount)
 
-		// Calculate the size of divisions in the right direction ( p00 -> p10 ) 
+		// Calculate the size of divisions in the right direction ( p00 -> p10 )
 		// F32 segWidth = ( ( p11 - p01 ).len() + ( p10 - p00 ).len() ) * 0.5f;
 
 		// U32 numColumns = 5;
@@ -1656,11 +1656,11 @@ void River::_generateVerts()
 		//	numColumns++;
 		//	columnSize = segWidth / numColumns;
 		//}
-		
+
       // Save the calculated numb of columns / rows for this segment.
       segment.columns = mColumnCount;
       segment.rows = numRows;
-		
+
       // Save the corresponding number of verts/prims
       segment.numVerts = ( 1 + mColumnCount ) * ( 1 + numRows );
       segment.numTriangles = mColumnCount * numRows * 2;
@@ -1670,18 +1670,18 @@ void River::_generateVerts()
 	}
 
    // Number of low detail verts/prims.
-   mLowVertCount = mSlices.size() * 2;	
-	mLowTriangleCount = mSegments.size() * 2;   
+   mLowVertCount = mSlices.size() * 2;
+	mLowTriangleCount = mSegments.size() * 2;
 
-   // Allocate the low detail VertexBuffer, 
+   // Allocate the low detail VertexBuffer,
    // this will stay in memory and will never need to change.
-   mVB_low.set( GFX, mLowVertCount, GFXBufferTypeStatic );   
-   
-   GFXWaterVertex *lowVertPtr = mVB_low.lock(); 
+   mVB_low.set( GFX, mLowVertCount, GFXBufferTypeStatic );
+
+   GFXWaterVertex *lowVertPtr = mVB_low.lock();
    U32 vertCounter = 0;
 
 	// The texCoord.y value start/end for a segment
-	// as we loop through them.	
+	// as we loop through them.
    F32 textCoordV = 0;
 
    //
@@ -1689,18 +1689,18 @@ void River::_generateVerts()
    //
    for ( U32 i = 0; i < mSlices.size(); i++ )
    {
-      RiverSlice &slice = mSlices[i];      
+      RiverSlice &slice = mSlices[i];
 
-      lowVertPtr->point = slice.p0;    
-      lowVertPtr->normal = slice.normal;      
-      lowVertPtr->undulateData.set( -slice.width*0.5f, textCoordV );   
+      lowVertPtr->point = slice.p0;
+      lowVertPtr->normal = slice.normal;
+      lowVertPtr->undulateData.set( -slice.width*0.5f, textCoordV );
       lowVertPtr->horizonFactor.set( 0, 0, 0, 0 );
       lowVertPtr++;
       vertCounter++;
 
       lowVertPtr->point = slice.p2;
       lowVertPtr->normal = slice.normal;
-      lowVertPtr->undulateData.set( slice.width*0.5f, textCoordV );     
+      lowVertPtr->undulateData.set( slice.width*0.5f, textCoordV );
       lowVertPtr->horizonFactor.set( 0, 0, 0, 0 );
       lowVertPtr++;
       vertCounter++;
@@ -1709,37 +1709,37 @@ void River::_generateVerts()
       slice.texCoordV = textCoordV;
 
       if ( i < mSlices.size() - 1 )
-      {         
+      {
          // Increment the textCoordV for the next slice.
          F32 segLen = ( mSlices[i+1].p1 - slice.p1 ).len();
-		   textCoordV += segLen;         
+		   textCoordV += segLen;
       }
    }
 
    AssertFatal( vertCounter == mLowVertCount, "River, wrote incorrect number of verts in mBV_low!" );
-   
+
    // Unlock the low-detail VertexBuffer, we are done filling it.
    mVB_low.unlock();
 
    //
    // Create the low-detail prim buffer(s)
-   //	
+   //
 	mPB_low.set( GFX, mLowTriangleCount * 3, mLowTriangleCount, GFXBufferTypeStatic );
 
    U16 *lowIdxBuff;
-   mPB_low.lock(&lowIdxBuff);     
-   U32 curLowIdx = 0; 
+   mPB_low.lock(&lowIdxBuff);
+   U32 curLowIdx = 0;
 
    // Temporaries to hold indices for the corner points of a quad.
    U32 p00, p01, p11, p10;
 
    U32 offset = 0;
 
-   // Fill the low-detail PrimitiveBuffer   
+   // Fill the low-detail PrimitiveBuffer
 	for ( U32 i = 0; i < mSegments.size(); i++ )
-	{		
+	{
       //const RiverSegment &segment = mSegments[i];
-		
+
       // Two triangles formed by the corner points of this segment
       // into the the low detail primitive buffer.
 		p00 = offset;
@@ -1761,7 +1761,7 @@ void River::_generateVerts()
       lowIdxBuff[curLowIdx] = p11;
       curLowIdx++;
       lowIdxBuff[curLowIdx] = p10;
-      curLowIdx++;      
+      curLowIdx++;
 
       offset += 2;
    }
@@ -1783,7 +1783,7 @@ bool River::getClosestNode( const Point3F &pos, U32 &idx ) const
       {
          closestDist = dist;
          idx = i;
-      }      
+      }
    }
 
    return closestDist != F32_MAX;
@@ -1791,10 +1791,10 @@ bool River::getClosestNode( const Point3F &pos, U32 &idx ) const
 
 bool River::containsPoint( const Point3F &worldPos, U32 *nodeIdx ) const
 {
-   // If point isn't in the world box, 
+   // If point isn't in the world box,
    // it's definitely not in the River.
    //if ( !getWorldBox().isContained( worldPos ) )
-   //   return false;   
+   //   return false;
 
    // Look through all edges, does the polygon
    // formed from adjacent edge's contain the worldPos?
@@ -1807,7 +1807,7 @@ bool River::containsPoint( const Point3F &worldPos, U32 *nodeIdx ) const
          if ( nodeIdx )
             *nodeIdx = i;
          return true;
-      }      
+      }
    }
 
    return false;
@@ -1823,11 +1823,11 @@ bool River::collideRay( const Point3F &origin, const Point3F &direction, U32 *no
    Point3F p0 = origin;
    Point3F p1 = origin + direction * 2000.0f;
 
-   // If the line segment does not collide with the river's world box, 
+   // If the line segment does not collide with the river's world box,
    // it definitely does not collide with any part of the river.
    if ( !getWorldBox().collideLine( p0, p1 ) )
       return false;
-   
+
    if ( mSlices.size() < 2 )
       return false;
 
@@ -1850,20 +1850,20 @@ bool River::collideRay( const Point3F &origin, const Point3F &direction, U32 *no
       quad.p01 = slice1.p0;
       quad.p11 = slice1.p2;
       quad.p10 = slice0.p2;
-      
+
       ray.origin = origin;
       ray.direction = direction;
 
-      // NOTE: 
+      // NOTE:
       // mRayQuadCollide is designed for a "real" quad in which all four points
-      // are coplanar which is actually not the case here. The more twist 
-      // and turn in-between two neighboring river slices the more incorrect 
+      // are coplanar which is actually not the case here. The more twist
+      // and turn in-between two neighboring river slices the more incorrect
       // this calculation will be.
 
       if ( MathUtils::mRayQuadCollide( quad, ray, NULL, &t ) )
       {
          if ( nodeIdx )
-            *nodeIdx = slice0.parentNodeIdx;         
+            *nodeIdx = slice0.parentNodeIdx;
          if ( collisionPnt )
             *collisionPnt = ray.origin + ray.direction * t;
          return true;
@@ -1895,7 +1895,7 @@ void River::setNodePosition( U32 idx, const Point3F &pos )
 
 U32 River::addNode( const Point3F &pos, const F32 &width, const F32 &depth, const VectorF &normal )
 {
-   U32 idx = _addNode( pos, width, depth, normal );   
+   U32 idx = _addNode( pos, width, depth, normal );
 
    regenerate();
 
@@ -1921,7 +1921,7 @@ void River::setNode(const Point3F &pos, const F32 &width, const F32 &depth, cons
       return;
 
    RiverNode &node = mNodes[idx];
-   node.point = pos;   
+   node.point = pos;
    node.width = width;
    node.depth = depth;
    node.normal = normal;
@@ -1966,7 +1966,7 @@ F32 River::getNodeWidth( U32 idx ) const
 void River::setNodeDepth( U32 idx, F32 meters )
 {
    meters = mClampF( meters, MIN_NODE_DEPTH, MAX_NODE_DEPTH );
-   
+
    if ( mNodes.size() - 1 < idx )
       return;
 
@@ -2004,8 +2004,8 @@ VectorF River::getNodeNormal( U32 idx ) const
 }
 
 MatrixF River::getNodeTransform( U32 idx ) const
-{   
-   MatrixF mat(true);   
+{
+   MatrixF mat(true);
 
    if ( mNodes.size() - 1 < idx )
       return mat;
@@ -2013,13 +2013,13 @@ MatrixF River::getNodeTransform( U32 idx ) const
    bool hasNext = idx + 1 < mNodes.size();
    bool hasPrev = (S32)idx - 1 >= 0;
 
-   const RiverNode &node = mNodes[idx];   
+   const RiverNode &node = mNodes[idx];
 
    VectorF fvec( 0, 1, 0 );
 
    if ( hasNext )
    {
-      fvec = mNodes[idx+1].point - node.point;      
+      fvec = mNodes[idx+1].point - node.point;
       fvec.normalizeSafe();
    }
    else if ( hasPrev )
@@ -2029,7 +2029,7 @@ MatrixF River::getNodeTransform( U32 idx ) const
    }
    else
       fvec = mPerp( node.normal );
-   
+
    if ( fvec.isZero() )
       fvec = mPerp( node.normal );
 
@@ -2052,7 +2052,7 @@ MatrixF River::getNodeTransform( U32 idx ) const
 
    AssertFatal( m_matF_determinant( mat ) != 0.0f, "no inverse!");
 
-   return mat; 
+   return mat;
 }
 
 void River::deleteNode( U32 idx )
@@ -2060,7 +2060,7 @@ void River::deleteNode( U32 idx )
    if ( mNodes.size() - 1 < idx )
       return;
 
-   mNodes.erase(idx);   
+   mNodes.erase(idx);
    _regenerate();
 
    setMaskBits( RegenMask | NodeMask );
@@ -2083,7 +2083,7 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
    // Loop through each segment to determine if it is either 1 [not visible], 2 [high LOD], 3 [low LOD]
 
    mHighLODBatches.clear();
-   mLowLODBatches.clear();      
+   mLowLODBatches.clear();
 
    // Keeps track of what we batch type we are currently collecting.
    // -1 is uninitialized, 0 is low detail, 1 is high detail
@@ -2095,7 +2095,7 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
 
    F32 lodDistSquared = mLodDistance * mLodDistance;
 
-   for ( U32 i = 0; i < mSegments.size(); i++ )   
+   for ( U32 i = 0; i < mSegments.size(); i++ )
    {
       const RiverSegment &segment = mSegments[i];
       const RiverSlice *slice = segment.slice0;
@@ -2119,7 +2119,7 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
             RiverRenderBatch batch;
 
             batch.startSegmentIdx = startSegmentIdx;
-            batch.endSegmentIdx = endSegmentIdx;               
+            batch.endSegmentIdx = endSegmentIdx;
 
             if ( lastDetail == 0 )
             {
@@ -2147,7 +2147,7 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
 
          // Else we're extending the end batch index.
          else
-            ++endSegmentIdx; 
+            ++endSegmentIdx;
 
          // If this isn't the last batch then continue.
          if ( i < mSegments.size()-1 )
@@ -2163,7 +2163,7 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
       RiverRenderBatch batch;
 
       batch.startSegmentIdx = startSegmentIdx;
-      batch.endSegmentIdx = endSegmentIdx;               
+      batch.endSegmentIdx = endSegmentIdx;
 
       if ( lastDetail == 0 )
       {
@@ -2177,7 +2177,7 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
       // Reset the batching.
       startSegmentIdx = -1;
       lastDetail = -1;
-   }   
+   }
 }
 
 void River::_makeHighLODBuffers()
@@ -2213,7 +2213,7 @@ void River::_makeHighLODBuffers()
    mHighVertCount = numVerts;
 
    mVB_high.set( GFX, numVerts, GFXBufferTypeVolatile );
-   GFXWaterVertex *vertPtr = mVB_high.lock();   
+   GFXWaterVertex *vertPtr = mVB_high.lock();
    U32 vertCounter = 0;
 
    // NOTE: this will break if different segments have different number
@@ -2224,7 +2224,7 @@ void River::_makeHighLODBuffers()
    // that batch, and add their verts to the buffer.
    for ( U32 i = 0; i < mHighLODBatches.size(); i++ )
    {
-      RiverRenderBatch &batch = mHighLODBatches[i];                        
+      RiverRenderBatch &batch = mHighLODBatches[i];
 
       batch.startVert = vertCounter;
       batch.vertCount = 0;
@@ -2236,25 +2236,25 @@ void River::_makeHighLODBuffers()
          // Add the verts for this segment to the buffer.
          RiverSegment &segment = mSegments[j];
 
-         BiSqrToQuad3D squareToQuad( segment.getP00(), 
-                                     segment.getP10(), 
-                                     segment.getP11(), 
+         BiSqrToQuad3D squareToQuad( segment.getP00(),
+                                     segment.getP10(),
+                                     segment.getP11(),
                                      segment.getP01() );
 
          // We are duplicating the last row of verts in a segment on
-         // the first row of the next segment.  This could be optimized but 
+         // the first row of the next segment.  This could be optimized but
          // shouldn't cause any problems.
 
          VectorF normal = segment.getSurfaceNormal();
 
          for ( U32 k = 0; k <= segment.rows; k++ )
          {
-            VectorF vertNormal = ( k == 0 && j != batch.startSegmentIdx ) ? lastNormal : normal;    
+            VectorF vertNormal = ( k == 0 && j != batch.startSegmentIdx ) ? lastNormal : normal;
 
             F32 rowLen = mLerp( segment.slice0->width, segment.slice1->width, (F32)k / (F32)segment.rows );
 
             for ( U32 l = 0; l <= segment.columns; l++ )
-            {                                    
+            {
                // We are generating a "row" of verts along the forwardDivision
                // Each l iteration is a step to the right along with row.
 
@@ -2263,7 +2263,7 @@ void River::_makeHighLODBuffers()
                Point3F pnt = squareToQuad.transform( uv );
 
                // Assign the Vert
-               vertPtr->point = pnt;            
+               vertPtr->point = pnt;
                vertPtr->normal = vertNormal;
                vertPtr->undulateData.x = ( uv.x - 0.5f ) * rowLen;
                vertPtr->undulateData.y = ( segment.TexCoordEnd() - segment.TexCoordStart() ) * uv.y + segment.TexCoordStart();
@@ -2271,7 +2271,7 @@ void River::_makeHighLODBuffers()
 
                vertPtr++;
                vertCounter++;
-               batch.vertCount++;                     
+               batch.vertCount++;
             }
          }
 
@@ -2284,15 +2284,15 @@ void River::_makeHighLODBuffers()
    mVB_high.unlock();
 
    //
-   // Do the high lod primitive buffer.         
+   // Do the high lod primitive buffer.
    //
 
-   mPB_high.set( GFX, numTriangles * 3, numTriangles, GFXBufferTypeVolatile );         
+   mPB_high.set( GFX, numTriangles * 3, numTriangles, GFXBufferTypeVolatile );
    U16 *idxBuff;
-   mPB_high.lock(&idxBuff);     
-   U32 curIdx = 0; 
+   mPB_high.lock(&idxBuff);
+   U32 curIdx = 0;
 
-   U32 batchOffset = 0;         
+   U32 batchOffset = 0;
 
    // For each high lod batch, we must add indices to the buffer
    // for each segment it contains ( and the count will depend on
@@ -2303,25 +2303,25 @@ void River::_makeHighLODBuffers()
 
    for ( U32 i = 0; i < mHighLODBatches.size(); i++ )
    {
-      RiverRenderBatch &batch = mHighLODBatches[i];            
+      RiverRenderBatch &batch = mHighLODBatches[i];
 
       batch.indexCount = 0;
       batch.triangleCount = 0;
       batch.startIndex = curIdx;
 
       U32 temp = 0;
-      U32 segmentOffset = 0;            
+      U32 segmentOffset = 0;
 
       for ( U32 j = batch.startSegmentIdx; j <= batch.endSegmentIdx; j++ )
-      {               
-         const RiverSegment &segment = mSegments[j];               
+      {
+         const RiverSegment &segment = mSegments[j];
 
-         // Loop through all divisions adding the indices to the 
+         // Loop through all divisions adding the indices to the
          // high detail primitive buffer.
          for ( U32 k = 0; k < segment.rows; k++ )
-         {         
+         {
             for ( U32 l = 0; l < segment.columns; l++ )
-            {                     
+            {
                // The indices for this quad.
                p00 = batchOffset + segmentOffset + l + k * ( segment.columns + 1 );
                p01 = p00 + segment.columns + 1;
@@ -2347,19 +2347,19 @@ void River::_makeHighLODBuffers()
                idxBuff[curIdx] = p11;
                curIdx++;
                idxBuff[curIdx] = p10;
-               curIdx++;                     
+               curIdx++;
 
                batch.indexCount += 6;
                batch.triangleCount += 2;
             }
          }
 
-         // Increment the sliceOffset by the number of verts 
+         // Increment the sliceOffset by the number of verts
          // used by this segment.  So the next segment will index
          // into new verts.
-         segmentOffset += ( segment.columns + 1 ) * ( segment.rows + 1 );                              
+         segmentOffset += ( segment.columns + 1 ) * ( segment.rows + 1 );
          temp += ( segment.columns + 1 ) * ( segment.rows + 1 );
-      }            
+      }
 
       batchOffset += temp;
    }
@@ -2373,7 +2373,7 @@ U32 River::_addNode( const Point3F &pos, const F32 &width, const F32 &depth, con
    mNodes.increment();
    RiverNode &node = mNodes.last();
 
-   node.point = pos;   
+   node.point = pos;
    node.width = width;
    node.depth = depth;
    node.normal = normal;
@@ -2403,7 +2403,7 @@ U32 River::_insertNode( const Point3F &pos, const F32 &width, const F32 &depth, 
 
    node->point = pos;
    node->depth = depth;
-   node->width = width;     
+   node->width = width;
    node->normal = normal;
 
    return ret;
@@ -2441,7 +2441,7 @@ void River::setMaxDivisionSize( F32 meters )
    if ( meters < mMinDivisionSize )
       mMaxDivisionSize = mMinDivisionSize;
    else
-      mMaxDivisionSize = meters;      
+      mMaxDivisionSize = meters;
 
    _regenerate();
    setMaskBits( RiverMask | RegenMask );

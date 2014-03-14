@@ -152,7 +152,7 @@ bool WinFont::create(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARS
 
    String nameStr = name;
    nameStr = nameStr.trim();
-   
+
    bool haveModifier;
    do
    {
@@ -214,18 +214,18 @@ PlatformFont::CharInfo &WinFont::getCharInfo(const UTF16 ch) const
     SelectObject(fontHDC, mFont);
     SetBkColor(fontHDC, backgroundColorRef);
     SetTextColor(fontHDC, foregroundColorRef);
-    
+
     MAT2 matrix;
     GLYPHMETRICS metrics;
     RectI clip;
-    
+
     FIXED zero;
     zero.fract = 0;
     zero.value = 0;
     FIXED one;
     one.fract = 0;
     one.value = 1;
-    
+
     matrix.eM11 = one;
     matrix.eM12 = zero;
     matrix.eM21 = zero;
@@ -233,19 +233,19 @@ PlatformFont::CharInfo &WinFont::getCharInfo(const UTF16 ch) const
 
 
     if(GetGlyphOutline(
-            fontHDC,	// handle of device context 
-            ch,	// character to query 
-            GGO_GRAY8_BITMAP,	// format of data to return 
-            &metrics,	// address of structure for metrics 
-            sizeof(scratchPad),	// size of buffer for data 
-            scratchPad,	// address of buffer for data 
-            &matrix 	// address of transformation matrix structure  
+            fontHDC,	// handle of device context
+            ch,	// character to query
+            GGO_GRAY8_BITMAP,	// format of data to return
+            &metrics,	// address of structure for metrics
+            sizeof(scratchPad),	// size of buffer for data
+            scratchPad,	// address of buffer for data
+            &matrix 	// address of transformation matrix structure
             ) != GDI_ERROR)
     {
         U32 rowStride = (metrics.gmBlackBoxX + 3) & ~3; // DWORD aligned
         U32 size = rowStride * metrics.gmBlackBoxY;
-        
-        // [neo, 5/7/2007 - #3055] 
+
+        // [neo, 5/7/2007 - #3055]
         // If we get large font sizes rowStride * metrics.gmBlackBoxY will
         // be larger than scratch pad size and so overwrite mem, boom!
         // Added range check < scratchPad for now but we need to review what
@@ -264,7 +264,7 @@ PlatformFont::CharInfo &WinFont::getCharInfo(const UTF16 ch) const
         S32 inc = metrics.gmCellIncX;
         if(inc < 0)
             inc = -inc;
-        
+
         c.xOffset = 0;
         c.yOffset = 0;
         c.width = metrics.gmBlackBoxX;
@@ -280,7 +280,7 @@ PlatformFont::CharInfo &WinFont::getCharInfo(const UTF16 ch) const
             U32 x;
             for(x = 0; x < c.width; x++)
             {
-               // [neo, 5/7/2007 - #3055] 
+               // [neo, 5/7/2007 - #3055]
                // See comments above about scratchPad overrun
                S32 spi = y * rowStride + x;
 

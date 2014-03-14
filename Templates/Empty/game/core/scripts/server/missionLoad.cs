@@ -30,7 +30,7 @@ $MissionLoadPause = 5000;
 
 //-----------------------------------------------------------------------------
 
-function loadMission( %missionName, %isFirstMission ) 
+function loadMission( %missionName, %isFirstMission )
 {
    endMission();
    echo("*** LOADING MISSION: " @ %missionName);
@@ -76,7 +76,7 @@ function loadMission( %missionName, %isFirstMission )
 
 //-----------------------------------------------------------------------------
 
-function loadMissionStage2() 
+function loadMissionStage2()
 {
    echo("*** Stage 2 load");
 
@@ -85,7 +85,7 @@ function loadMissionStage2()
 
    // Make sure the mission exists
    %file = $Server::MissionFile;
-   
+
    if( !isFile( %file ) )
    {
       $Server::LoadFailMsg = "Could not find mission \"" @ %file @ "\"";
@@ -109,12 +109,12 @@ function loadMissionStage2()
    {
       // Inform clients that are already connected
       for (%clientIndex = 0; %clientIndex < ClientGroup.getCount(); %clientIndex++)
-         messageClient(ClientGroup.getObject(%clientIndex), 'MsgLoadFailed', $Server::LoadFailMsg);    
+         messageClient(ClientGroup.getObject(%clientIndex), 'MsgLoadFailed', $Server::LoadFailMsg);
       return;
    }
 
    // Set mission name.
-   
+
    if( isObject( theLevelInfo ) )
       $Server::MissionName = theLevelInfo.levelName;
 
@@ -124,13 +124,13 @@ function loadMissionStage2()
 
    // Make the MissionCleanup group the place where all new objects will automatically be added.
    $instantGroup = MissionCleanup;
-   
+
    // Construct MOD paths
    pathOnMissionLoadDone();
 
    // Mission loading done...
    echo("*** Mission loaded");
-   
+
    // Start all the clients in the mission
    $missionRunning = true;
    for( %clientIndex = 0; %clientIndex < ClientGroup.getCount(); %clientIndex++ )
@@ -149,7 +149,7 @@ function endMission()
       return;
 
    echo("*** ENDING MISSION");
-   
+
    // Inform the game code we're done.
    onMissionEnded();
 
@@ -161,11 +161,11 @@ function endMission()
       %cl.resetGhosting();
       %cl.clearPaths();
    }
-   
+
    // Delete everything
    MissionGroup.delete();
    MissionCleanup.delete();
-   
+
    clearServerPaths();
 }
 

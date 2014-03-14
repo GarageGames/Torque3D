@@ -33,7 +33,7 @@ singleton ShaderData( OVRMonoToStereoShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/monoToStereoP.hlsl";
 
-   pixVersion = 2.0;   
+   pixVersion = 2.0;
 };
 
 singleton ShaderData( OVRBarrelDistortionShader )
@@ -41,7 +41,7 @@ singleton ShaderData( OVRBarrelDistortionShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/barrelDistortionP.hlsl";
 
-   pixVersion = 2.0;   
+   pixVersion = 2.0;
 };
 
 singleton ShaderData( OVRBarrelDistortionChromaShader )
@@ -49,7 +49,7 @@ singleton ShaderData( OVRBarrelDistortionChromaShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/barrelDistortionChromaP.hlsl";
 
-   pixVersion = 2.0;   
+   pixVersion = 2.0;
 };
 
 //-----------------------------------------------------------------------------
@@ -73,16 +73,16 @@ singleton BarrelDistortionPostEffect( OVRBarrelDistortionPostFX )
 {
    isEnabled = false;
    allowReflectPass = false;
-   
+
    renderTime = "PFXAfterDiffuse";
    renderPriority = 100;
 
-   // The barrel distortion   
+   // The barrel distortion
    shader = OVRBarrelDistortionShader;
    stateBlock = OVRBarrelDistortionStateBlock;
-   
+
    texture[0] = "$backBuffer";
-   
+
    scaleOutput = 1.25;
 };
 
@@ -99,16 +99,16 @@ singleton BarrelDistortionPostEffect( OVRBarrelDistortionChromaPostFX )
 {
    isEnabled = false;
    allowReflectPass = false;
-   
+
    renderTime = "PFXAfterDiffuse";
    renderPriority = 100;
 
-   // The barrel distortion   
+   // The barrel distortion
    shader = OVRBarrelDistortionChromaShader;
    stateBlock = OVRBarrelDistortionStateBlock;
-   
+
    texture[0] = "$backBuffer";
-   
+
    scaleOutput = 1.25;
 };
 
@@ -124,25 +124,25 @@ singleton PostEffect( OVRBarrelDistortionMonoPostFX )
 {
    isEnabled = false;
    allowReflectPass = false;
-   
+
    renderTime = "PFXAfterDiffuse";
    renderPriority = 100;
 
-   // Converts the mono display to a stereo one   
+   // Converts the mono display to a stereo one
    shader = OVRMonoToStereoShader;
    stateBlock = OVRBarrelDistortionStateBlock;
-   
+
    texture[0] = "$backBuffer";
    target = "$outTex";
 
-   // The actual barrel distortion   
+   // The actual barrel distortion
    new BarrelDistortionPostEffect(OVRBarrelDistortionMonoStage2PostFX)
    {
       shader = OVRBarrelDistortionShader;
       stateBlock = OVRBarrelDistortionStateBlock;
       texture[0] = "$inTex";
       target = "$backBuffer";
-      
+
       scaleOutput = 1.25;
    };
 
@@ -151,7 +151,7 @@ singleton PostEffect( OVRBarrelDistortionMonoPostFX )
 function OVRBarrelDistortionMonoPostFX::setShaderConsts( %this )
 {
    %HMDIndex = 0;
-   
+
    %xOffsets = getOVRHMDEyeXOffsets(%HMDIndex);
    %this.setShaderConst( "$LensXOffsets", %xOffsets );
 }

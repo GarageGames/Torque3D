@@ -63,8 +63,8 @@ bool PersistInfo::read(Stream & stream)
 		if(i != 0 && chunkType == PersistChunk::MissionChunkType)
 			return(false);
 
-      // Create the right chunk for the system 
-      bool bChunkFound = false; 
+      // Create the right chunk for the system
+      bool bChunkFound = false;
       SceneLightingInterfaces sli = LIGHTMGR->getSceneLightingInterface()->mAvailableSystemInterfaces;
       for(SceneLightingInterface** itr = sli.begin(); itr != sli.end() && !bChunkFound; itr++)
       {
@@ -72,10 +72,10 @@ bool PersistInfo::read(Stream & stream)
          if (pc != NULL)
          {
             mChunks.push_back(pc);
-            bChunkFound = true;            
+            bChunkFound = true;
          }
       }
-         
+
       if (!bChunkFound)
       {
 		   // create the chunk

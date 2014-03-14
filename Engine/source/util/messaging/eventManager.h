@@ -70,28 +70,28 @@ public:
 /// The EventManager class is a wrapper for the standard messaging system. It
 /// provides functionality for management of event queues, events, and
 /// subscriptions.
-/// 
+///
 /// Creating an EventManager is as simple as calling <tt>new EventManager</tt>
 /// and specifying a queue name.
-/// 
+///
 /// Example Usage:
-/// 
+///
 /// @code
 /// // Create the EventManager.
 /// $MyEventManager = new EventManager() { queue = "MyEventManager"; };
-/// 
+///
 /// // Create an event.
 /// $MyEventManager.registerEvent( "SomeCoolEvent" );
-/// 
+///
 /// // Create a listener and subscribe.
 /// $MyListener = new ScriptMsgListener() { class = MyListener; };
 /// $MyEventManager.subscribe( $MyListener, "SomeCoolEvent" );
-/// 
+///
 /// function MyListener::onSomeCoolEvent( %this, %data )
 /// {
 ///    echo( "onSomeCoolEvent Triggered" );
 /// }
-/// 
+///
 /// // Trigger the event.
 /// $MyEventManager.postEvent( "SomeCoolEvent", "Data" );
 /// @endcode
@@ -207,7 +207,7 @@ public:
       for( Vector<EventManager*>::iterator iter = smEventManagers.begin(); iter != smEventManagers.end(); iter++ )
          ( *iter )->dumpSubscribers();
    }
-  
+
 
    /// @}
 };

@@ -38,7 +38,7 @@ public:
 
    // AbstractPolyList
    U32 addPoint(const Point3F& p);
-   U32 addPlane(const PlaneF& plane) { return 0; } 
+   U32 addPlane(const PlaneF& plane) { return 0; }
    void begin(BaseMatInstance* material,U32 surfaceKey) {}
    void plane(U32 v1,U32 v2,U32 v3) {}
    void plane(const PlaneF& p) {}

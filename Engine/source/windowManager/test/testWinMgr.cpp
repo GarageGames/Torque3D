@@ -188,7 +188,7 @@ CreateInteractiveTest(TestWinMgrGFXInitMultiWindow, "WindowManager/GFXMultiWindo
       mDevice->setActiveRenderTarget(w->getGFXTarget());
 
       // Vary clear color by window to discern which window is which.
-      mDevice->clear( GFXClearTarget, 
+      mDevice->clear( GFXClearTarget,
          ColorI( 255 - (id * 50), 255, id  * 100 ), 1.0f, 0 );
       mDevice->endScene();
 
@@ -201,7 +201,7 @@ CreateInteractiveTest(TestWinMgrGFXInitMultiWindow, "WindowManager/GFXMultiWindo
       if(event == WindowClose)
          Process::requestShutdown();
    }
-   
+
    void handleIdleEvent()
    {
       for(S32 i=0; i<NumWindows; i++)
@@ -277,7 +277,7 @@ CreateInteractiveTest(TestJournaledMultiWindowGFX, "WindowManager/GFXJournaledMu
       // Vary clear color by window to discern which window is which.
       static S32 timeVariance = 0;
 
-      mDevice->clear( GFXClearTarget, 
+      mDevice->clear( GFXClearTarget,
          ColorI( 0xFF - (++timeVariance * 5), 0xFF, win->getWindowId() * 0x0F ), 1.0f, 0 );
 
       mDevice->endScene();
@@ -291,7 +291,7 @@ CreateInteractiveTest(TestJournaledMultiWindowGFX, "WindowManager/GFXJournaledMu
    {
       // Which window are we getting this event on?
       PlatformWindow *w = mWindowManager->getWindowById(id);
-      
+
       drawToWindow(w);
    }
 
@@ -429,7 +429,7 @@ CreateInteractiveTest(GFXTestFullscreenToggle, "GFX/TestFullscreenToggle")
       // Vary clear color by window to discern which window is which.
       static S32 timeVariance = 0;
 
-      mDevice->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, 
+      mDevice->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget,
          ColorI( 0xFF - (++timeVariance * 5), 0xFF, win->getWindowId() * 0x40 ), 1.0f, 0 );
 
       mDevice->endScene();
@@ -477,7 +477,7 @@ CreateInteractiveTest(GFXTestFullscreenToggle, "GFX/TestFullscreenToggle")
       {
          winVm.fullScreen = true;
          winVm.resolution.set(800,600);
-      } 
+      }
       else
       {
          // If the window is full screen, then bump it to 400x400x32

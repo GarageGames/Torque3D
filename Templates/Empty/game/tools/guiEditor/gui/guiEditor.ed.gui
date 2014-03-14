@@ -15,7 +15,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiFrameSetCtrl() {
       canSaveDynamicFields = "0";
       isContainer = "1";
@@ -674,7 +674,7 @@
             refCtrl = "GuiEditorScroll";
             editCtrl = "GuiEditor";
          };
-         
+
          new GuiScrollCtrl(GuiEditorScroll) {
             canSaveDynamicFields = "0";
             isContainer = "1";
@@ -847,11 +847,11 @@
                   tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
-                  
+
                   new GuiPanel() {
                      position = "0 0";
                      extent = "222 337";
-                     
+
                      new GuiTextEditCtrl( GuiEditorTreeFilter ) {
                         position = "2 4";
                         extent = "200 18";
@@ -861,7 +861,7 @@
                         class = "GuiTreeViewFilterText";
                         treeView = GuiEditorTreeView;
                      };
-                     
+
                      new GuiBitmapButtonCtrl() {
                         bitmap = "tools/gui/images/clear-icon";
                         groupNum = "-1";
@@ -882,7 +882,7 @@
                         class = "GuiTreeViewFilterClearButton";
                         textCtrl = GuiEditorTreeFilter;
                      };
-                        
+
                      new GuiScrollCtrl() {
                         willFirstRespond = "1";
                         hScrollBar = "dynamic";
@@ -910,7 +910,7 @@
                         tooltipprofile = "ToolsGuiToolTipProfile";
                         hovertime = "1000";
                         canSaveDynamicFields = "0";
-                        
+
                         new GuiTreeViewCtrl(GuiEditorTreeView) {
                            tabSize = "16";
                            textOffset = "2";
@@ -1037,7 +1037,7 @@
                   };
                };
             };
-            
+
             new GuiTabPageCtrl() {
                fitBook = "1";
                text = "Library";
@@ -1107,7 +1107,7 @@
                   };
                };
             };
-         
+
             new GuiTabPageCtrl() {
                fitBook = "1";
                text = "Profiles";
@@ -1164,7 +1164,7 @@
                   new GuiPanel() {
                      position = "0 0";
                      extent = "222 337";
-                     
+
                      new GuiTextEditCtrl( GuiEditorProfilesTreeFilter ) {
                         position = "2 4";
                         extent = "200 18";
@@ -1174,7 +1174,7 @@
                         class = "GuiTreeViewFilterText";
                         treeView = GuiEditorProfilesTree;
                      };
-                     
+
                      new GuiBitmapButtonCtrl() {
                         bitmap = "tools/gui/images/clear-icon";
                         groupNum = "-1";
@@ -1195,7 +1195,7 @@
                         class = "GuiTreeViewFilterClearButton";
                         textCtrl = GuiEditorProfilesTreeFilter;
                      };
-                     
+
                      new GuiScrollCtrl() {
                         willFirstRespond = "1";
                         hScrollBar = "dynamic";
@@ -1504,7 +1504,7 @@
       visible = "1";
       isContainer = "1";
       profile = "menubarProfile";
-      
+
       new GuiTextCtrl( GuiEditorStatusBar ) {
          profile = "ToolsGuiTextProfile";
          position = "5 0";

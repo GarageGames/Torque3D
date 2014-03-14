@@ -75,7 +75,7 @@ ConsoleDocClass( GuiHealthBarHud,
    "The gui can be set to pulse if the health value drops below a set value. "
    "This control only works if a server connection exists and it's control object "
    "is a PlayerObjectType. If either of these requirements is false, the control is not rendered.\n\n"
-   
+
    "@tsexample\n"
 		"\n new GuiHealthBarHud()"
 		"{\n"
@@ -89,7 +89,7 @@ ConsoleDocClass( GuiHealthBarHud,
 		"	displayEnergy = \"false\";\n"
 		"};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiGame\n"
 );
 
@@ -109,18 +109,18 @@ GuiHealthBarHud::GuiHealthBarHud()
 
 void GuiHealthBarHud::initPersistFields()
 {
-   addGroup("Colors");		
+   addGroup("Colors");
    addField( "fillColor", TypeColorF, Offset( mFillColor, GuiHealthBarHud ), "Standard color for the background of the control." );
    addField( "frameColor", TypeColorF, Offset( mFrameColor, GuiHealthBarHud ), "Color for the control's frame." );
    addField( "damageFillColor", TypeColorF, Offset( mDamageFillColor, GuiHealthBarHud ), "As the health bar depletes, this color will represent the health loss amount." );
-   endGroup("Colors");		
+   endGroup("Colors");
 
-   addGroup("Pulse");		
+   addGroup("Pulse");
    addField( "pulseRate", TypeS32, Offset( mPulseRate, GuiHealthBarHud ), "Speed at which the control will pulse." );
    addField( "pulseThreshold", TypeF32, Offset( mPulseThreshold, GuiHealthBarHud ), "Health level the control must be under before the control will pulse." );
-   endGroup("Pulse");		
+   endGroup("Pulse");
 
-   addGroup("Misc");		
+   addGroup("Misc");
    addField( "showFill", TypeBool, Offset( mShowFill, GuiHealthBarHud ), "If true, we draw the background color of the control." );
    addField( "showFrame", TypeBool, Offset( mShowFrame, GuiHealthBarHud ), "If true, we draw the frame of the control." );
    addField( "displayEnergy", TypeBool, Offset( mDisplayEnergy, GuiHealthBarHud ), "If true, display the energy value rather than the damage value." );
@@ -163,7 +163,7 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
 
    // Pulse the damage fill if it's below the threshold
    if (mPulseRate != 0)
-      if (mValue < mPulseThreshold) 
+      if (mValue < mPulseThreshold)
       {
          U32 time = Platform::getVirtualMilliseconds();
          F32 alpha = 2.0f * F32(time % mPulseRate) / F32(mPulseRate);

@@ -58,7 +58,7 @@ function ConsoleEntry::eval()
    %text = trim( ConsoleEntry.getValue() );
    if( %text $= "" )
       return;
-   
+
    // If it's missing a trailing () and it's not a variable,
    // append the parentheses.
 
@@ -72,7 +72,7 @@ function ConsoleEntry::eval()
          }
       }
    }
-   
+
    // Append a semicolon if need be.
 
    %pos = strlen(%text) - 1;
@@ -80,16 +80,16 @@ function ConsoleEntry::eval()
    {
       %text = %text @ ";";
    }
-   
+
    // Turn off warnings for assigning from void
    // and evaluate the snippet.
-   
+
    if( !isDefined( "$Con::warnVoidAssignment" ) )
       %oldWarnVoidAssignment = true;
    else
       %oldWarnVoidAssignment = $Con::warnVoidAssignment;
    $Con::warnVoidAssignment = false;
-   
+
    echo("==>" @ %text);
    if(    !startsWith( %text, "function " )
        && !startsWith( %text, "datablock " )
@@ -104,11 +104,11 @@ function ConsoleEntry::eval()
    else
       eval( %text );
    $Con::warnVoidAssignment = %oldWarnVoidAssignment;
-   
+
    ConsoleEntry.setValue("");
-   
+
    // Echo result.
-   
+
    if( %result !$= "" )
       echo( %result );
 }
@@ -124,7 +124,7 @@ function ToggleConsole(%make)
       }
       else
       {
-         Canvas.pushDialog(ConsoleDlg, 99);         
+         Canvas.pushDialog(ConsoleDlg, 99);
       }
    }
 }
@@ -153,23 +153,23 @@ function ConsoleMessageLogView::onMessageSelected( %this, %level, %message )
 {
    if( !isFunction( "EditorOpenFileInTorsion" ) )
       return;
-      
+
    %fileText = getWord( %message, 0 );
    %lineText = getWord( %message, 1 );
-   
+
    if( %fileText $= "" || %lineText $= "" )
       return;
-   
+
    %fileName = makeFullPath( %fileText );
    if( !isFile( %fileName ) )
       return;
-      
+
    %lineTextLen = strlen( %lineText );
    if( !startsWith( %lineText, "(" ) ||
        !endsWith( %lineText, "):" ) )
       return;
-      
+
    %lineNumber = getSubStr( %lineText, 1, %lineTextLen - 2 );
-   
+
    EditorOpenFileInTorsion( %fileName, %lineNumber );
 }

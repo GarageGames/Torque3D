@@ -56,7 +56,7 @@ protected:
 
    // For Camera Panning.
    F32 mTransStep;	//*** Amount of translation with each mouse move
-   F32 mTranMult;	//*** With a modifier, how much faster to translate 
+   F32 mTranMult;	//*** With a modifier, how much faster to translate
 
    // For light translation.
    F32 mLightTransStep;
@@ -92,16 +92,16 @@ public:
    void onMiddleMouseUp(const GuiEvent &event);
    void onMiddleMouseDown(const GuiEvent &event);
    void onMiddleMouseDragged(const GuiEvent &event);
-   
+
    // For Camera Panning.
    void setTranslate(S32 modifier, F32 xstep, F32 ystep);
-   
+
    // For Light Translation.
    void setLightTranslate(S32 modifier, F32 xstep, F32 ystep);
-   
+
    // For changing the light color.
    void setLightColor( F32 r, F32 g, F32 b );
-   
+
    // For changing the ambient light color.
    void setAmbientLightColor( F32 r, F32 g, F32 b );
 

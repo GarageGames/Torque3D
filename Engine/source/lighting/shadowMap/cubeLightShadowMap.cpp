@@ -55,20 +55,20 @@ bool CubeLightShadowMap::setTextureStage( U32 currTexFlag, LightingShaderConstan
    return false;
 }
 
-void CubeLightShadowMap::setShaderParameters(   GFXShaderConstBuffer *params, 
+void CubeLightShadowMap::setShaderParameters(   GFXShaderConstBuffer *params,
                                                 LightingShaderConstants *lsc )
 {
    if ( lsc->mTapRotationTexSC->isValid() )
-      GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(), 
+      GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(),
                         SHADOWMGR->getTapRotationTex() );
 
    ShadowMapParams *p = mLight->getExtended<ShadowMapParams>();
 
    if ( lsc->mLightParamsSC->isValid() )
    {
-      Point4F lightParams( mLight->getRange().x, 
-                           p->overDarkFactor.x, 
-                           0.0f, 
+      Point4F lightParams( mLight->getRange().x,
+                           p->overDarkFactor.x,
+                           0.0f,
                            0.0f );
       params->set(lsc->mLightParamsSC, lightParams);
    }
@@ -93,7 +93,7 @@ void CubeLightShadowMap::_render(   RenderPassManager* renderPass,
 
    const U32 texSize = getBestTexSize();
 
-   if (  mCubemap.isNull() || 
+   if (  mCubemap.isNull() ||
          mTexSize != texSize )
    {
       mTexSize = texSize;
@@ -174,7 +174,7 @@ void CubeLightShadowMap::_render(   RenderPassManager* renderPass,
 
       // Create scene state, prep it
       SceneManager* sceneManager = diffuseState->getSceneManager();
-      
+
       SceneRenderState shadowRenderState
       (
          sceneManager,

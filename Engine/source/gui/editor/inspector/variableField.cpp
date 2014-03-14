@@ -40,7 +40,7 @@ ConsoleDocClass( GuiInspectorVariableField,
    "@internal"
 );
 
-GuiInspectorVariableField::GuiInspectorVariableField() 
+GuiInspectorVariableField::GuiInspectorVariableField()
 {
 }
 
@@ -49,12 +49,12 @@ GuiInspectorVariableField::~GuiInspectorVariableField()
 }
 
 bool GuiInspectorVariableField::onAdd()
-{    
-   setInspectorProfile();   
+{
+   setInspectorProfile();
 
    // Hack: skip our immediate parent
    if ( !Parent::Parent::onAdd() )
-      return false;  
+      return false;
 
    {
       GuiTextEditCtrl *edit = new GuiTextEditCtrl();
@@ -77,7 +77,7 @@ bool GuiInspectorVariableField::onAdd()
    addObject( mEdit );
 
    // Calculate Caption and EditCtrl Rects
-   updateRects();   
+   updateRects();
 
    // Force our editField to set it's value
    updateValue();
@@ -86,11 +86,11 @@ bool GuiInspectorVariableField::onAdd()
 }
 
 void GuiInspectorVariableField::setData( const char* data, bool callbacks )
-{   
+{
    if ( !mCaption || mCaption[0] == 0 )
       return;
 
-   Con::setVariable( mCaption, data );   
+   Con::setVariable( mCaption, data );
 
    // Force our edit to update
    updateValue();
@@ -100,7 +100,7 @@ const char* GuiInspectorVariableField::getData( U32 inspectObjectIndex )
 {
    if ( !mCaption || mCaption[0] == 0 )
       return "";
-      
+
    return Con::getVariable( mCaption );
 }
 
@@ -113,8 +113,8 @@ void GuiInspectorVariableField::setValue( const char* newValue )
 
 void GuiInspectorVariableField::updateValue()
 {
-   if ( !mCaption || mCaption[0] == 0 ) 
+   if ( !mCaption || mCaption[0] == 0 )
       return;
-   
+
    setValue( getData() );
 }

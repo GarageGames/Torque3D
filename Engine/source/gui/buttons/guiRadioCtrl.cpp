@@ -32,7 +32,7 @@ IMPLEMENT_CONOBJECT(GuiRadioCtrl);
 
 ConsoleDocClass( GuiRadioCtrl,
    "@brief A button based around the radio concept.\n\n"
-   
+
    "GuiRadioCtrl's functionality is based around GuiButtonBaseCtrl's ButtonTypeRadio type.\n\n"
 
    "A button control with a radio box and a text label.\n"
@@ -40,7 +40,7 @@ ConsoleDocClass( GuiRadioCtrl,
    "present a range of options out of which one can be chosen.\n"
    "A radio button automatically signals its siblings when it is\n"
    "toggled on.\n\n"
-   
+
    "@tsexample\n"
    "// Create a GuiCheckBoxCtrl that calls randomFunction with its current value when clicked.\n"
    "%radio = new GuiRadioCtrl()\n"
@@ -48,7 +48,7 @@ ConsoleDocClass( GuiRadioCtrl,
    "   profile = \"GuiRadioProfile\";\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiButtons"
 );
 

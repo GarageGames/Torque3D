@@ -57,7 +57,7 @@ void BtDebugDraw::drawLine( const btVector3 &fromBt, const btVector3 &toBt, cons
 void BtDebugDraw::drawTriangle(  const btVector3 &v0,
                                  const btVector3 &v1,
                                  const btVector3 &v2,
-                                 const btVector3 &color, 
+                                 const btVector3 &color,
                                  btScalar /*alpha*/ )
 {
 	drawLine(v0,v1,color);
@@ -65,10 +65,10 @@ void BtDebugDraw::drawTriangle(  const btVector3 &v0,
 	drawLine(v2,v0,color);
 }
 
-void BtDebugDraw::drawContactPoint( const btVector3 &pointOnB, 
-                                    const btVector3 &normalOnB, 
-                                    btScalar distance, 
-                                    int lifeTime, const 
+void BtDebugDraw::drawContactPoint( const btVector3 &pointOnB,
+                                    const btVector3 &normalOnB,
+                                    btScalar distance,
+                                    int lifeTime, const
                                     btVector3 &color )
 {
    drawLine( pointOnB, pointOnB+normalOnB*distance, color );

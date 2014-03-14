@@ -95,7 +95,7 @@ void AdvancedLightManager::activate( SceneManager *sceneManager )
 
    SHADOWMGR->activate();
 
-   // Find a target format that supports blending... 
+   // Find a target format that supports blending...
    // we prefer the floating point format if it works.
    Vector<GFXFormat> formats;
    formats.push_back( GFXFormatR16G16B16A16F );
@@ -242,7 +242,7 @@ void AdvancedLightManager::_initLightFields()
          ISceneLight *sceneLight = dynamic_cast<ISceneLight*>( (SimObject*)obj );
          if ( sceneLight )
          {
-            LightInfo *lightInfo = sceneLight->getLight();                           
+            LightInfo *lightInfo = sceneLight->getLight();
             if ( lightInfo )
                return lightInfo->getExtended<ShadowMapParams>();
          }
@@ -254,7 +254,7 @@ void AdvancedLightManager::_initLightFields()
          ISceneLight *sceneLight = dynamic_cast<ISceneLight*>( (SimObject*)obj );
          if ( sceneLight )
          {
-            LightInfo *lightInfo = sceneLight->getLight();                           
+            LightInfo *lightInfo = sceneLight->getLight();
             if ( lightInfo )
                return lightInfo->getExtended<LightMapParams>();
          }
@@ -266,14 +266,14 @@ void AdvancedLightManager::_initLightFields()
       DEFINE_LIGHT_FIELD( attenuationRatio, TypePoint3F, NULL );
       DEFINE_LIGHT_FIELD( shadowType, TYPEID< ShadowType >(), ConsoleBaseType::getType( TYPEID< ShadowType >() )->getEnumTable() );
       DEFINE_LIGHT_FIELD( texSize, TypeS32, NULL );
-      DEFINE_LIGHT_FIELD( cookie, TypeStringFilename, NULL );      
+      DEFINE_LIGHT_FIELD( cookie, TypeStringFilename, NULL );
       DEFINE_LIGHT_FIELD( numSplits, TypeS32, NULL );
       DEFINE_LIGHT_FIELD( logWeight, TypeF32, NULL );
       DEFINE_LIGHT_FIELD( overDarkFactor, TypePoint4F, NULL);
       DEFINE_LIGHT_FIELD( shadowDistance, TypeF32, NULL );
       DEFINE_LIGHT_FIELD( shadowSoftness, TypeF32, NULL );
       DEFINE_LIGHT_FIELD( fadeStartDist, TypeF32, NULL );
-      DEFINE_LIGHT_FIELD( lastSplitTerrainOnly, TypeBool, NULL );     
+      DEFINE_LIGHT_FIELD( lastSplitTerrainOnly, TypeBool, NULL );
 
       DEFINE_LIGHTMAP_FIELD( representedInLightmap, TypeBool, NULL );
       DEFINE_LIGHTMAP_FIELD( shadowDarkenColor, TypeColorF, NULL );
@@ -308,7 +308,7 @@ void AdvancedLightManager::_initLightFields()
          "The logrithmic PSSM split distance factor." );
 
       ADD_LIGHT_FIELD( "logWeight", TypeF32, logWeight,
-         "The logrithmic PSSM split distance factor." );      
+         "The logrithmic PSSM split distance factor." );
 
       ADD_LIGHT_FIELD( "fadeStartDistance", TypeF32, fadeStartDist,
          "Start fading shadows out at this distance.  0 = auto calculate this distance.");
@@ -335,11 +335,11 @@ void AdvancedLightManager::_initLightFields()
    #undef ADD_LIGHT_FIELD
 }
 
-void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat, 
-                                          const Material *mat, 
+void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
+                                          const Material *mat,
                                           const SceneData &sgData,
                                           const SceneRenderState *state,
-                                          U32 pass, 
+                                          U32 pass,
                                           GFXShaderConstBuffer *shaderConsts)
 {
    // Skip this if we're rendering from the prepass bin.
@@ -385,18 +385,18 @@ void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
    if ( lsm && light->getCastShadows() )
    {
       if (  lsc->mWorldToLightProjSC->isValid() )
-         shaderConsts->set(   lsc->mWorldToLightProjSC, 
-                              lsm->getWorldToLightProj(), 
+         shaderConsts->set(   lsc->mWorldToLightProjSC,
+                              lsm->getWorldToLightProj(),
                               lsc->mWorldToLightProjSC->getType() );
 
       if (  lsc->mViewToLightProjSC->isValid() )
       {
-         // TODO: Should probably cache these results and 
+         // TODO: Should probably cache these results and
          // not do this mul here on every material that needs
          // this transform.
 
-         shaderConsts->set(   lsc->mViewToLightProjSC, 
-                              lsm->getWorldToLightProj() * state->getCameraTransform(), 
+         shaderConsts->set(   lsc->mViewToLightProjSC,
+                              lsm->getWorldToLightProj() * state->getCameraTransform(),
                               lsc->mViewToLightProjSC->getType() );
       }
 
@@ -409,14 +409,14 @@ void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
    {
       if ( lsc->mViewToLightProjSC->isValid() )
       {
-         // TODO: Should probably cache these results and 
+         // TODO: Should probably cache these results and
          // not do this mul here on every material that needs
          // this transform.
          MatrixF proj;
          light->getWorldToLightProj( &proj );
 
-         shaderConsts->set(   lsc->mViewToLightProjSC, 
-                              proj * state->getCameraTransform(), 
+         shaderConsts->set(   lsc->mViewToLightProjSC,
+                              proj * state->getCameraTransform(),
                               lsc->mViewToLightProjSC->getType() );
       }
    }
@@ -443,8 +443,8 @@ void AdvancedLightManager::unregisterAllLights()
 
 bool AdvancedLightManager::setTextureStage(  const SceneData &sgData,
                                              const U32 currTexFlag,
-                                             const U32 textureSlot, 
-                                             GFXShaderConstBuffer *shaderConsts, 
+                                             const U32 textureSlot,
+                                             GFXShaderConstBuffer *shaderConsts,
                                              ShaderConstHandles *handles )
 {
    LightShadowMap* lsm = SHADOWMGR->getCurrentShadowMap();
@@ -498,17 +498,17 @@ LightingShaderConstants* AdvancedLightManager::getLightingShaderConstants(GFXSha
    // the same one due to the render bin loops.
    if ( mLastShader.getPointer() != shader )
    {
-      LightConstantMap::Iterator iter = mConstantLookup.find(shader);   
+      LightConstantMap::Iterator iter = mConstantLookup.find(shader);
       if ( iter != mConstantLookup.end() )
       {
          mLastConstants = iter->value;
-      } 
-      else 
-      {     
+      }
+      else
+      {
          LightingShaderConstants* lsc = new LightingShaderConstants();
          mConstantLookup[shader] = lsc;
 
-         mLastConstants = lsc;      
+         mLastConstants = lsc;
       }
 
       // Set our new shader
@@ -534,7 +534,7 @@ GFXVertexBufferHandle<AdvancedLightManager::LightVertex> AdvancedLightManager::g
       mSphereGeometry.set(GFX, numPoly*3, GFXBufferTypeStatic);
       mSphereGeometry.lock();
       S32 vertexIndex = 0;
-      
+
       for (S32 i=0; i<numPoly; i++)
       {
          mSpherePrimitiveCount++;
@@ -561,7 +561,7 @@ GFXVertexBufferHandle<AdvancedLightManager::LightVertex> AdvancedLightManager::g
 
 GFXVertexBufferHandle<AdvancedLightManager::LightVertex> AdvancedLightManager::getConeMesh(U32 &outNumPrimitives, GFXPrimitiveBuffer *&outPrimitives )
 {
-   static const Point2F circlePoints[] = 
+   static const Point2F circlePoints[] =
    {
       Point2F(0.707107f, 0.707107f),
       Point2F(0.923880f, 0.382683f),
@@ -665,7 +665,7 @@ ConsoleFunction( setShadowVizLight, const char*, 2, 2, "" )
    F32 aspect = (F32)size.x / (F32)size.y;
 
    char *result = Con::getReturnBuffer( 64 );
-   dSprintf( result, 64, "%d %d %g", size.x, size.y, aspect ); 
+   dSprintf( result, 64, "%d %d %g", size.x, size.y, aspect );
    return result;
 }
 

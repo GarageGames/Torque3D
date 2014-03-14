@@ -23,15 +23,15 @@
 // load gui used to display various metric outputs
 exec("~/art/gui/FrameOverlayGui.gui");
 
-// Note:  To implement your own metrics overlay 
-// just add a function with a name in the form 
+// Note:  To implement your own metrics overlay
+// just add a function with a name in the form
 // XXXXMetricsCallback which can be enabled via
 // metrics( XXXX )
 
 function fpsMetricsCallback()
 {
-   return "  | FPS |" @ 
-          "  " @ $fps::real @ 
+   return "  | FPS |" @
+          "  " @ $fps::real @
           "  max: " @ $fps::realMax @
           "  min: " @ $fps::realMin @
           "  mspf: " @ 1000 / $fps::real;
@@ -43,7 +43,7 @@ function gfxMetricsCallback()
           "  PolyCount: " @ $GFXDeviceStatistics::polyCount @
           "  DrawCalls: " @ $GFXDeviceStatistics::drawCalls @
           "  RTChanges: " @ $GFXDeviceStatistics::renderTargetChanges;
-          
+
 }
 
 function terrainMetricsCallback()
@@ -77,11 +77,11 @@ function forestMetricsCallback()
           "  Cells: " @ $Forest::totalCells @
           "  Cells Meshed: " @ $Forest::cellsRendered @
           "  Cells Billboarded: " @ $Forest::cellsBatched @
-          "  Meshes: " @ $Forest::cellItemsRendered @                          
+          "  Meshes: " @ $Forest::cellItemsRendered @
           "  Billboards: " @ $Forest::cellItemsBatched;
 }
 
-function sfxMetricsCallback() 
+function sfxMetricsCallback()
 {
    return "  | SFX |" @
           "  Sounds: " @ $SFX::numSounds @
@@ -97,7 +97,7 @@ function sfxMetricsCallback()
           "  Time/A: " @ $SFX::ambientUpdateTime;
 }
 
-function sfxSourcesMetricsCallback() 
+function sfxSourcesMetricsCallback()
 {
    return sfxDumpSourcesToString();
 }
@@ -109,25 +109,25 @@ function sfxStatesMetricsCallback()
 
 function timeMetricsCallback()
 {
-   return "  | Time |" @ 
-          "  Sim Time: " @ getSimTime() @ 
+   return "  | Time |" @
+          "  Sim Time: " @ getSimTime() @
           "  Mod: " @ getSimTime() % 32;
 }
 
 function reflectMetricsCallback()
 {
    return "  | REFLECT |" @
-          "  Objects: " @ $Reflect::numObjects @ 
+          "  Objects: " @ $Reflect::numObjects @
           "  Visible: " @ $Reflect::numVisible @
           "  Occluded: " @ $Reflect::numOccluded @
           "  Updated: " @ $Reflect::numUpdated @
           "  Elapsed: " @ $Reflect::elapsed NL
-             
+
           "  Allocated: " @ $Reflect::renderTargetsAllocated @
           "  Pooled: " @ $Reflect::poolSize NL
-          
+
           "  " @ getWord( $Reflect::textureStats, 1 ) TAB
-          "  " @ getWord( $Reflect::textureStats, 2 ) @ "MB" TAB                  
+          "  " @ getWord( $Reflect::textureStats, 2 ) @ "MB" TAB
           "  " @ getWord( $Reflect::textureStats, 0 );
 }
 
@@ -156,23 +156,23 @@ function renderMetricsCallback()
 }
 
 function shadowMetricsCallback()
-{   
+{
    return "  | Shadow |" @
           "  Active: " @ $ShadowStats::activeMaps @
           "  Updated: " @ $ShadowStats::updatedMaps @
           "  PolyCount: " @ $ShadowStats::polyCount @
-          "  DrawCalls: " @ $ShadowStats::drawCalls @          
-          "   RTChanges: " @ $ShadowStats::rtChanges @          
+          "  DrawCalls: " @ $ShadowStats::drawCalls @
+          "   RTChanges: " @ $ShadowStats::rtChanges @
           "   PoolTexCount: " @ $ShadowStats::poolTexCount @
-          "   PoolTexMB: " @ $ShadowStats::poolTexMemory @ "MB";         
+          "   PoolTexMB: " @ $ShadowStats::poolTexMemory @ "MB";
 }
 
 function basicShadowMetricsCallback()
-{   
+{
    return "  | Shadow |" @
           "  Active: " @ $BasicLightManagerStats::activePlugins @
           "  Updated: " @ $BasicLightManagerStats::shadowsUpdated @
-          "  Elapsed Ms: " @ $BasicLightManagerStats::elapsedUpdateMs;         
+          "  Elapsed Ms: " @ $BasicLightManagerStats::elapsedUpdateMs;
 }
 
 function lightMetricsCallback()
@@ -184,7 +184,7 @@ function lightMetricsCallback()
 
 function particleMetricsCallback()
 {
-   return "  | Particles |" @ 
+   return "  | Particles |" @
           "  # Simulated " @ $particle::numSimulated;
 }
 function partMetricsCallback()
@@ -196,7 +196,7 @@ function partMetricsCallback()
 // alias
 function audioMetricsCallback()
 {
-   return sfxMetricsCallback(); 
+   return sfxMetricsCallback();
 }
 
 // alias
@@ -236,11 +236,11 @@ function metrics( %expr )
             }
          }
       }
-      
+
       if( %metricsExpr !$= "" )
          %metricsExpr = %metricsExpr @ " @ \" \"";
    }
-   
+
    if( %metricsExpr !$= "" )
    {
       Canvas.pushDialog( FrameOverlayGui, 1000 );

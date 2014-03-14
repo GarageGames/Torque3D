@@ -39,9 +39,9 @@ namespace StringUnit
       AssertFatal( bufferSize, "StringUnit::getUnit - bufferSize cannot be zero!" );
       if( !bufferSize )
          return "";
-         
+
       buffer[0] = 0;
-      
+
       U32 sz;
       while(index--)
       {
@@ -51,7 +51,7 @@ namespace StringUnit
          sz = dStrcspn(string, set);
          if (string[sz] == 0)
             return buffer;
-            
+
          string += (sz + 1);
       }
       sz = dStrcspn(string, set);
@@ -92,7 +92,7 @@ namespace StringUnit
          if( i < endIndex )
             string ++;
       }
-      
+
       S32 totalSize = ( S32 )( string - startString );
       AssertWarn( totalSize + 1 < sizeof( _returnBuffer ), "Size of returned string too large for return buffer" );
       totalSize = getMin( totalSize, S32( sizeof( _returnBuffer ) - 1 ) );
@@ -102,7 +102,7 @@ namespace StringUnit
          char *ret = &_returnBuffer[0];
          dStrncpy( ret, startString, totalSize );
          ret[ totalSize ] = '\0';
-         
+
          return ret;
       }
 

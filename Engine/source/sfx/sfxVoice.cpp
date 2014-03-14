@@ -52,7 +52,7 @@ SFXVoice::SFXVoice( SFXBuffer* buffer )
 SFXVoice::~SFXVoice()
 {
    smVoiceDestroyedSignal.trigger( this );
-   
+
    if( mBuffer )
       mBuffer->mOnStatusChange.remove( this, &SFXVoice::_onBufferStatusChange );
 }
@@ -78,7 +78,7 @@ void SFXVoice::_attachToBuffer()
    }
 
    mBuffer->mOnStatusChange.notify( this, &SFXVoice::_onBufferStatusChange );
-   
+
    smVoiceCreatedSignal.trigger( this );
 }
 
@@ -107,7 +107,7 @@ void SFXVoice::_onBufferStatusChange( SFXBuffer* buffer, SFXBuffer::Status newSt
          break;
 
       case SFXBuffer::STATUS_AtEnd:
-         
+
          // Streaming voice has played to end of stream.
 
          if( dCompareAndSwap( ( U32& ) mStatus, SFXStatusPlaying, SFXStatusTransition ) )
@@ -149,7 +149,7 @@ void SFXVoice::_onBufferStatusChange( SFXBuffer* buffer, SFXBuffer::Status newSt
             #endif
          }
          break;
-      
+
       case SFXBuffer::STATUS_Null:
          AssertFatal( false, "SFXVoice::_onBufferStatusChange - Buffer changed to invalid NULL status" );
          break;
@@ -294,11 +294,11 @@ void SFXVoice::setPosition( U32 inSample )
 {
    // Clamp to sample range.
    const U32 sample = inSample % ( mBuffer->getFormat().getSampleCount( mBuffer->getDuration() ) - 1 );
-   
+
    // Don't perform a seek when we already are at the
    // given position.  Especially avoids a costly stream
    // clone when seeking on a streamed voice.
-   
+
    if( getPosition() == sample )
       return;
 
@@ -387,7 +387,7 @@ void SFXVoice::_resetStream( U32 sampleStartPos, bool triggerUpdate )
    }
 
    sfxPositionable->setPosition( sampleStartPos * sfxStream->getFormat().getBytesPerSample() );
-   
+
    ThreadSafeRef< SFXInternal::SFXAsyncStream > newStream =
       new SFXInternal::SFXAsyncStream
          ( sfxStream,

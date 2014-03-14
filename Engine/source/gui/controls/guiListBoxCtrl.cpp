@@ -165,7 +165,7 @@ GuiListBoxCtrl::GuiListBoxCtrl()
    mColorBullet = true;
    mItemSize = Point2I(10,20);
    mLastClickItem = NULL;
-   
+
    mRenderTooltipDelegate.bind( this, &GuiListBoxCtrl::renderTooltip );
 }
 
@@ -467,11 +467,11 @@ void GuiListBoxCtrl::getSelectedItems( Vector<S32> &Items )
 {
    // Clear our return vector
    Items.clear();
-   
+
    // If there are no selected items, return an empty vector
    if( mSelectedItems.empty() )
       return;
-   
+
    for( S32 i = 0; i < mItems.size(); i++ )
       if( mItems[i]->isSelected )
          Items.push_back( i );
@@ -890,8 +890,8 @@ StringTableEntry GuiListBoxCtrl::getItemText( S32 index )
       Con::warnf( "GuiListBoxCtrl::getItemText - index out of range!" );
       return StringTable->lookup("");
    }
-   
-   return mItems[ index ]->itemText;   
+
+   return mItems[ index ]->itemText;
 }
 
 DefineEngineMethod( GuiListBoxCtrl, getItemObject,  const char*, (S32 index),,
@@ -925,7 +925,7 @@ SimObject* GuiListBoxCtrl::getItemObject( S32 index )
    SimObject *outObj;
    Sim::findObject( (SimObjectId)(mItems[ index ]->itemData), outObj );
 
-   return outObj;   
+   return outObj;
 }
 
 DefineEngineMethod( GuiListBoxCtrl, setItemText, void, (S32 index, const char* newtext),,
@@ -982,7 +982,7 @@ DefineEngineMethod( GuiListBoxCtrl, setItemTooltip, void, (S32 index, const char
       Con::errorf( "GuiListBoxCtrl::setItemTooltip - index '%i' out of range", index );
       return;
    }
-   
+
    object->mItems[ index ]->itemTooltip = text;
 }
 
@@ -1112,7 +1112,7 @@ bool GuiListBoxCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& curs
    S32 hitItemIndex;
    if( hitTest( hoverPos, hitItemIndex ) )
       tipText = mItems[ hitItemIndex ]->itemTooltip;
-      
+
    return defaultTooltipRender( hoverPos, cursorPos, tipText );
 }
 
@@ -1123,7 +1123,7 @@ bool GuiListBoxCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& curs
 bool GuiListBoxCtrl::hitTest( const Point2I& point, S32& outItem )
 {
    Point2I localPoint = globalToLocalCoord( point );
-   
+
    S32 itemHit = ( localPoint.y < 0 ) ? -1 : (S32)mFloor( (F32)localPoint.y / (F32)mItemSize.y );
    if ( itemHit >= mItems.size() || itemHit == -1 )
       return false;
@@ -1131,7 +1131,7 @@ bool GuiListBoxCtrl::hitTest( const Point2I& point, S32& outItem )
    LBItem *hitItem = mItems[ itemHit ];
    if ( hitItem == NULL )
       return false;
-      
+
    outItem = itemHit;
    return true;
 }
@@ -1152,7 +1152,7 @@ void GuiListBoxCtrl::onMouseDown( const GuiEvent &event )
    S32 itemHit;
    if( !hitTest( event.mousePoint, itemHit ) )
       return;
-      
+
    LBItem* hitItem = mItems[ itemHit ];
 
    // If we're not a multiple selection listbox, we simply select/unselect an item
@@ -1180,7 +1180,7 @@ void GuiListBoxCtrl::onMouseDown( const GuiEvent &event )
       return;
 
    }
-   
+
    // Deal with multiple selections
    if( event.modifier & SI_MULTISELECT)
    {
@@ -1227,7 +1227,7 @@ void GuiListBoxCtrl::onMouseUp( const GuiEvent& event )
 
    // Execute console command
    execConsoleCallback();
-   
+
    Parent::onMouseUp( event );
 }
 
@@ -1276,7 +1276,7 @@ U32 GuiListBoxCtrl::getStringElementCount( const char* inString )
                 // Yes...
                 search = 0;
                 break;
-            }   
+            }
         }
 
         // Found a seperator?
@@ -1308,7 +1308,7 @@ U32 GuiListBoxCtrl::getStringElementCount( const char* inString )
                     // Yes...
                     search = 0;
                     break;
-                }   
+                }
             }
 
             // Found Seperator?
@@ -1365,7 +1365,7 @@ const char* GuiListBoxCtrl::getStringElement( const char* inString, const U32 in
                     // Yes...
                     search = 0;
                     break;
-                }   
+                }
             }
 
             // Found a seperator?
@@ -1404,7 +1404,7 @@ const char* GuiListBoxCtrl::getStringElement( const char* inString, const U32 in
                         // Yes...
                         search = 0;
                         break;
-                    }   
+                    }
                 }
 
                 // Found Seperator?
@@ -1454,19 +1454,19 @@ void GuiListBoxCtrl::_mirror()
 
    // Allow script to filter out objects if desired.
 
-   Vector<SimObjectId> workingSet;   
+   Vector<SimObjectId> workingSet;
 
    // If the method is not defined we assume user wants us to add
    // all objects.
    bool isObjMirroredDefined = isMethod( "isObjectMirrored" );
-   
+
    for ( S32 i = 0; i < mirrorSet->size(); i++ )
    {
       bool addObj = true;
-        
+
       if ( isObjMirroredDefined )
-         addObj = isObjectMirrored_callback(mirrorSet->at(i)->getIdString()); 
-        
+         addObj = isObjectMirrored_callback(mirrorSet->at(i)->getIdString());
+
       if ( addObj )
          workingSet.push_back( mirrorSet->at(i)->getId() );
    }
@@ -1489,8 +1489,8 @@ void GuiListBoxCtrl::_mirror()
       if ( curObj )
       {
          if ( workingSet.contains( curId ) )
-         {         
-            mItems[i]->itemText = _makeMirrorItemName( curObj );            
+         {
+            mItems[i]->itemText = _makeMirrorItemName( curObj );
             keep = true;
          }
       }
@@ -1500,7 +1500,7 @@ void GuiListBoxCtrl::_mirror()
          deleteItem( i );
          i--;
       }
-   }   
+   }
 
 
    // Add items that are in the SimSet but not yet in the list.
@@ -1520,7 +1520,7 @@ void GuiListBoxCtrl::_mirror()
             break;
          }
       }
-		
+
 		for ( U32 j = 0; j < mFilteredItems.size(); j++ )
       {
          if ( (SimObjectId)(mFilteredItems[j]->itemData) == curId )
@@ -1531,8 +1531,8 @@ void GuiListBoxCtrl::_mirror()
       }
 
       if ( !found )
-      {                  
-         addItem( _makeMirrorItemName( curObj ), (void*)curId );         
+      {
+         addItem( _makeMirrorItemName( curObj ), (void*)curId );
       }
    }
 }
@@ -1545,12 +1545,12 @@ StringTableEntry GuiListBoxCtrl::_makeMirrorItemName( SimObject *inObj )
    {
       Con::setIntVariable( "$ThisControl", getId() );
       Con::setIntVariable( "$ThisObject", inObj->getId() );
-      
-      outName = StringTable->insert( Con::evaluate( mMakeNameCallback ), true );      
+
+      outName = StringTable->insert( Con::evaluate( mMakeNameCallback ), true );
    }
    else if ( inObj->getName() )
       outName = StringTable->insert( inObj->getName() );
-   
+
    if ( !outName || !outName[0] )
       outName = StringTable->insert( "(no name)" );
 
@@ -1590,22 +1590,22 @@ DefineEngineMethod( GuiListBoxCtrl, addFilteredItem, void, (const char* newItem)
 void GuiListBoxCtrl::addFilteredItem( String item )
 {
 	// Delete from selected items list
-	for ( S32 i = 0; i < mSelectedItems.size(); i++ ) 
+	for ( S32 i = 0; i < mSelectedItems.size(); i++ )
 	{
 		String itemText = mSelectedItems[i]->itemText;
-		if ( dStrcmp( itemText.c_str(), item.c_str() ) == 0 ) 
+		if ( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
 		{
 			mSelectedItems.erase_fast( i );
 			break;
 		}
 	}
 
-	for ( S32 i = 0; i < mItems.size(); i++ ) 
+	for ( S32 i = 0; i < mItems.size(); i++ )
 	{
 		String itemText = mItems[i]->itemText;
 		if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
-		{	
-			mItems[i]->isSelected = false;		
+		{
+			mItems[i]->isSelected = false;
 			mFilteredItems.push_front( mItems[i] );
 			mItems.erase( &mItems[i] );
 			break;
@@ -1633,11 +1633,11 @@ DefineEngineMethod( GuiListBoxCtrl, removeFilteredItem, void, ( const char* item
 
 void GuiListBoxCtrl::removeFilteredItem( String item )
 {
-	for ( S32 i = 0; i < mFilteredItems.size(); i++ ) 
+	for ( S32 i = 0; i < mFilteredItems.size(); i++ )
 	{
 		String itemText = mFilteredItems[i]->itemText;
 		if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
-		{			
+		{
 			mItems.push_front( mFilteredItems[i] );
 			mFilteredItems.erase( &mFilteredItems[i] );
 			break;

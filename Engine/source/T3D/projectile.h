@@ -111,9 +111,9 @@ public:
    S32 decalId;                        // (impact) Decal ID
 
    SFXTrack* sound;                    // Projectile Sound
-   
+
    LightDescription *lightDesc;
-   S32 lightDescId;   
+   S32 lightDescId;
 
    // variables set on preload:
    Resource<TSShape> projectileShape;
@@ -141,7 +141,7 @@ public:
    static void initPersistFields();
    DECLARE_CONOBJECT(ProjectileData);
 
-   
+
    DECLARE_CALLBACK( void, onExplode, ( Projectile* proj, Point3F pos, F32 fade ) );
    DECLARE_CALLBACK( void, onCollision, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ) );
 };
@@ -171,7 +171,7 @@ public:
       NextFreeMask  = Parent::NextFreeMask << 2
    };
 
-   
+
    Projectile();
    ~Projectile();
 
@@ -189,16 +189,16 @@ public:
 
    // SceneObject
    Point3F getVelocity() const { return mCurrVelocity; }
-   void processTick( const Move *move );   
+   void processTick( const Move *move );
    void advanceTime( F32 dt );
-   void interpolateTick( F32 delta );   
+   void interpolateTick( F32 delta );
 
    // GameBase
-   bool onNewDataBlock( GameBaseData *dptr, bool reload );      
+   bool onNewDataBlock( GameBaseData *dptr, bool reload );
 
    // Rendering
    void prepRenderImage( SceneRenderState *state );
-   void prepBatchRender( SceneRenderState *state );   
+   void prepBatchRender( SceneRenderState *state );
 
    /// Updates velocity and position, and performs collision testing.
    void simulate( F32 dt );
@@ -208,12 +208,12 @@ public:
 
    /// What to do when this projectile explodes
    virtual void explode(const Point3F& p, const Point3F& n, const U32 collideType );
-      
+
    bool pointInWater(const Point3F &point);
 
    void emitParticles(const Point3F&, const Point3F&, const Point3F&, const U32);
 
-   void updateSound();    
+   void updateSound();
 
    virtual bool calculateImpact( float simTime,
                                  Point3F &pointOfImpact,
@@ -226,7 +226,7 @@ protected:
 
    static const U32 csmStaticCollisionMask;
    static const U32 csmDynamicCollisionMask;
-   static const U32 csmDamageableMask;   
+   static const U32 csmDamageableMask;
    static U32 smProjectileWarpTicks;
 
    PhysicsWorld *mPhysicsWorld;
@@ -259,9 +259,9 @@ protected:
    // ISceneLight
    virtual void submitLights( LightManager *lm, bool staticLighting );
    virtual LightInfo* getLight() { return mLight; }
-   
+
    LightInfo *mLight;
-   LightState mLightState;   
+   LightState mLightState;
 
    bool             mHasExploded;   ///< Prevent rendering, lighting, and duplicate explosions.
    F32              mFadeValue;     ///< set in processTick, interpolation between fadeDelay and lifetime
@@ -278,7 +278,7 @@ protected:
 
    Point3F mExplosionPosition;
    Point3F mExplosionNormal;
-   U32     mCollideHitType;   
+   U32     mCollideHitType;
 };
 
 #endif // _PROJECTILE_H_

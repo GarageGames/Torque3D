@@ -38,7 +38,7 @@ class TSShapeInstance;
 class TSLastDetail;
 
 
-class TSForestItemData : public ForestItemData 
+class TSForestItemData : public ForestItemData
 {
 protected:
 
@@ -53,7 +53,7 @@ protected:
 
    Vector<S32> mCollisionDetails;
    Vector<S32> mLOSDetails;
-   
+
    TSShapeInstance* _getShapeInstance() const;
 
    void _loadShape();
@@ -68,12 +68,12 @@ protected:
    void _preload() { _loadShape(); }
 
 public:
-  
+
    DECLARE_CONOBJECT(TSForestItemData);
    TSForestItemData();
    virtual ~TSForestItemData();
-   
-   bool preload( bool server, String &errorBuffer );   
+
+   bool preload( bool server, String &errorBuffer );
    void onRemove();
    bool onAdd();
 

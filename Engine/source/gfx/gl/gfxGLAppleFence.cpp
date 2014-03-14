@@ -42,7 +42,7 @@ GFXFence::FenceStatus GFXGLAppleFence::getStatus() const
 {
    if(!mIssued)
       return GFXFence::Unset;
-      
+
    GLboolean res = glTestFenceAPPLE(mHandle);
    return res ? GFXFence::Processed : GFXFence::Pending;
 }
@@ -51,7 +51,7 @@ void GFXGLAppleFence::block()
 {
    if(!mIssued)
       return;
-      
+
    glFinishFenceAPPLE(mHandle);
 }
 

@@ -34,7 +34,7 @@ function physicsToggleSimulation()
    {
       physicsStateText.setText( "Simulation is unpaused." );
       physicsStartSimulation( "client" );
-      physicsStartSimulation( "server" );   
+      physicsStartSimulation( "server" );
    }
 }
 
@@ -47,10 +47,10 @@ function initializePhysicsTools()
       echo( "No physics plugin exists." );
       return;
    }
-      
-   globalactionmap.bindCmd( keyboard, "alt t", "physicsToggleSimulation();", "" );      
-   globalactionmap.bindCmd( keyboard, "alt r", "physicsRestoreState();", "" );   
-      
+
+   globalactionmap.bindCmd( keyboard, "alt t", "physicsToggleSimulation();", "" );
+   globalactionmap.bindCmd( keyboard, "alt r", "physicsRestoreState();", "" );
+
    new ScriptObject( PhysicsEditorPlugin )
    {
       superClass = "EditorPlugin";
@@ -63,15 +63,15 @@ function destroyPhysicsTools()
 }
 
 function PhysicsEditorPlugin::onWorldEditorStartup( %this )
-{      
+{
    new PopupMenu( PhysicsToolsMenu )
    {
       superClass = "MenuBuilder";
       //class = "PhysXToolsMenu";
 
       barTitle = "Physics";
-                                 
-      item[0] = "Start Simulation" TAB "Ctrl-Alt P" TAB "physicsStartSimulation( \"client\" );physicsStartSimulation( \"server\" );";         
+
+      item[0] = "Start Simulation" TAB "Ctrl-Alt P" TAB "physicsStartSimulation( \"client\" );physicsStartSimulation( \"server\" );";
       //item[1] = "Stop Simulation" TAB "" TAB "physicsSetTimeScale( 0 );";
       item[1] = "-";
       item[2] = "Speed 25%" TAB "" TAB "physicsSetTimeScale( 0.25 );";
@@ -80,12 +80,12 @@ function PhysicsEditorPlugin::onWorldEditorStartup( %this )
       item[5] = "-";
       item[6] = "Reload NXBs" TAB "" TAB "";
    };
-      
+
    // Add our menu.
    EditorGui.menuBar.insert( PhysicsToolsMenu, EditorGui.menuBar.dynamicItemInsertPos );
-         
+
    // Add ourselves to the window menu.
-   //EditorGui.addToWindowMenu( "Road and Path Editor", "", "RoadEditor" );   
+   //EditorGui.addToWindowMenu( "Road and Path Editor", "", "RoadEditor" );
 }
 
 function PhysicsToolsMenu::onMenuSelect(%this)
@@ -94,7 +94,7 @@ function PhysicsToolsMenu::onMenuSelect(%this)
 
    %itemText = !%isEnabled ? "Start Simulation" : "Pause Simulation";
    %itemCommand = !%isEnabled ? "physicsStartSimulation( \"client\" );physicsStartSimulation( \"server\" );" : "physicsStopSimulation( \"client\" );physicsStopSimulation( \"server\" );";
-   
+
    %this.setItemName( 0, %itemText );
    %this.setItemCommand( 0, %itemCommand );
 }
@@ -106,17 +106,17 @@ function PhysicsEditorPlugin::onEditorWake( %this )
    // when the editor is closed.
    physicsStopSimulation( "client" );
    physicsStopSimulation( "server" );
-   physicsRestoreState(); 
+   physicsRestoreState();
 }
 
 function PhysicsEditorPlugin::onEditorSleep( %this )
 {
-   physicsStoreState();   
-   
+   physicsStoreState();
+
    %currentTimeScale = physicsGetTimeScale();
    if ( %currentTimeScale == 0.0 )
       physicsSetTimeScale( 1.0 );
-      
-   physicsStartSimulation( "client" );   
+
+   physicsStartSimulation( "client" );
    physicsStartSimulation( "server" );
 }

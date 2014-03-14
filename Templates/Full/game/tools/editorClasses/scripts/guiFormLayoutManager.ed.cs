@@ -77,7 +77,7 @@ function GuiFormManager::RegisterLayout( %libraryName, %layoutName, %layoutObj )
       layoutName    = %layoutName;
       layoutLibrary = %libraryObj;
       layoutObj     = %layoutObj;
-      layoutFile    = %libraryObj.basePath @ %layoutName @ ".cs";     
+      layoutFile    = %libraryObj.basePath @ %layoutName @ ".cs";
    };
 
    // Tag Layout Object Properly so it can reset itself.
@@ -119,14 +119,14 @@ function GuiFormManager::UnregisterLayout( %libraryName, %layoutName, %deleteFil
 
    // Delete the Object.
    if( isObject( %layoutObjRef.layoutObj ) )
-      %layoutObjRef.layoutObj.delete();  
+      %layoutObjRef.layoutObj.delete();
 
    // Delete the Reference
    %layoutObjRef.delete();
 
    // Layout Unregistered.
    return true;
-      
+
 }
 
 //-----------------------------------------------------------------------------
@@ -187,7 +187,7 @@ function GuiFormManager::SaveLayout( %library, %layoutName, %newName )
    {
       error("GuiFormManager::SaveLayout - Cannot find layout" SPC %layoutName );
       return false;
-   }  
+   }
 
    // Do any form layout specifics saving.
    GuiFormManager::SaveLayoutContent( %layoutObjRef.layoutObj );
@@ -216,7 +216,7 @@ function GuiFormManager::SaveLayout( %library, %layoutName, %newName )
    %layoutFile.writeLine("GuiFormManager::RegisterLayout(\"" @ %libraryObj.name @ "\",\"" @ %newName @ "\",%layoutObj);" );
    %layoutFile.close();
    %layoutFile.delete();
-    
+
    // Layout Saved
    return true;
 
@@ -288,7 +288,7 @@ function GuiFormManager::ActivateLayout( %library, %layoutName, %parent )
 
    // Add to parent.
    %parent.add( %layoutObj );
- 
+
    // Not Found
    return true;
 }
@@ -329,8 +329,8 @@ function GuiFormManager::DeactivateLayout( %library, %layoutName )
    GuiFormManager::ClearLayoutContent( %layoutObj );
 
    // Return layout to it's home.
-   %layoutGroup.add( %layoutObj );   
-   
+   %layoutGroup.add( %layoutObj );
+
    // Not Found
    return true;
 }
@@ -350,7 +350,7 @@ function GuiFormManager::SaveLayoutContent( %layoutObj )
          %formContent = 0;
          if (%object.getCount() > 0)
             %formContent = %object.getObject( 1 );
-         
+
          if( isObject( %formContent ) && %object.ContentLibrary !$= "" && %object.Content !$= "" )
          {
             %contentObj = GuiFormManager::FindFormContent( %object.ContentLibrary, %object.Content );
@@ -386,7 +386,7 @@ function GuiFormManager::ClearLayoutContent( %layoutObj )
 
          %formContent = %object.getObject( 1 );
          if( isObject( %formContent ) )
-            %formContent.delete();         
+            %formContent.delete();
       }
       else
          GuiFormManager::ClearLayoutContent( %object );

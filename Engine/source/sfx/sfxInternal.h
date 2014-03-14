@@ -209,7 +209,7 @@ class SFXVoiceTimeSource
             samplePos = mVoice->mBuffer->getNumSamples();
          else
             mLastPos = samplePos;
-         
+
          return samplePos;
       }
 };
@@ -302,10 +302,10 @@ class SFXWrapAroundBuffer : public SFXBuffer
       {
          if( !mBufferSize )
             return ( bufferOffset / getFormat().getBytesPerSample() );
-            
+
          const U32 writeOffset = mWriteOffset; // Concurrent writes on this one.
          const U32 writeOffsetRelative = writeOffset % mBufferSize;
-         
+
          U32 numBufferedBytes;
          if( !writeOffset )
             numBufferedBytes = 0;
@@ -316,7 +316,7 @@ class SFXWrapAroundBuffer : public SFXBuffer
             numBufferedBytes = mBufferSize - bufferOffset + writeOffsetRelative;
 
          const U32 bytePos = writeOffset - numBufferedBytes;
-         
+
          return ( bytePos / getFormat().getBytesPerSample() );
       }
 
@@ -325,7 +325,7 @@ class SFXWrapAroundBuffer : public SFXBuffer
       SFXWrapAroundBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* description );
       SFXWrapAroundBuffer( SFXDescription* description )
          : Parent( description ), mBufferSize( 0 ) {}
-         
+
       virtual U32 getMemoryUsed() const { return mBufferSize; }
 };
 
@@ -338,7 +338,7 @@ enum
    /// Soft limit on milliseconds to spend on updating sound buffers
    /// when doing buffer updates on the main thread.
    MAIN_THREAD_PROCESS_TIMEOUT = 512,
-   
+
    /// Default time interval between periodic sound updates in milliseconds.
    /// Only relevant for devices that perform periodic updates.
    DEFAULT_UPDATE_INTERVAL = 512,
@@ -361,13 +361,13 @@ enum
 class SFXThreadPool : public ThreadPool, public ManagedSingleton< SFXThreadPool >
 {
    public:
-   
+
       typedef ThreadPool Parent;
-      
+
       /// Create a ThreadPool called "SFX" with two threads.
       SFXThreadPool()
          : Parent( "SFX", 2 ) {}
-         
+
       // For ManagedSingleton.
       static const char* getSingletonName() { return "SFXThreadPool"; }
 };

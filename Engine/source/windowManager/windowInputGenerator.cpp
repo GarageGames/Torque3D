@@ -32,7 +32,7 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
-WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) : 
+WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
                                              mWindow(window),
                                              mInputController(NULL),
                                              mLastCursorPos(0,0),
@@ -107,12 +107,12 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
       return;
 
    // jddTODO : Clean this up
-   // CodeReview currently the Torque GuiCanvas deals with mouse input 
-   //  as relative movement, even when the cursor is visible.  Because 
+   // CodeReview currently the Torque GuiCanvas deals with mouse input
+   //  as relative movement, even when the cursor is visible.  Because
    //  of this there is an asinine bit of code in there that manages
    //  updating the cursor position on the class based on relative movement.
    //  Because of this we always have to generate and send off for processing
-   //  relative events, even if the mouse is not locked.  
+   //  relative events, even if the mouse is not locked.
    //  I'm considering removing this in the Canvas refactor, thoughts? [7/6/2007 justind]
 
    // Generate a base Movement along and Axis event
@@ -167,7 +167,7 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
 
       }
 
-      // When the window gains focus, we send a cursor position event 
+      // When the window gains focus, we send a cursor position event
       if( mNotifyPosition )
       {
          mNotifyPosition = false;
@@ -183,15 +183,15 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
          // Y Axis
          event.objInst = SI_YAXIS;
          event.fValue     = (F32)y;
-         generateInputEvent(event);      
+         generateInputEvent(event);
       }
 
       mLastCursorPos = Point2I(x,y);
 
    }
    else
-   {   
-      mLastCursorPos += Point2I(x,y);      
+   {
+      mLastCursorPos += Point2I(x,y);
       mNotifyPosition = true;
    }
 }
@@ -308,7 +308,7 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
 }
 
 //-----------------------------------------------------------------------------
-// Raw input 
+// Raw input
 //-----------------------------------------------------------------------------
 void WindowInputGenerator::handleInputEvent( U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier )
 {
@@ -330,7 +330,7 @@ void WindowInputGenerator::handleInputEvent( U32 deviceInst, F32 fValue, F32 fVa
    event.objInst     = (InputObjectInstances)objInst;
    event.action      = (InputActionType)action;
    event.modifier    = (InputModifiers)modifier;
-   
+
    generateInputEvent(event);
 }
 
@@ -364,7 +364,7 @@ void WindowInputGenerator::handleAppEvent( WindowId did, S32 event )
 bool WindowInputGenerator::wantAsKeyboardEvent( U32 modifiers, U32 keyCode )
 {
    // Disallow translation on keys that are bound in the global action map.
-   
+
    return ActionMap::getGlobalMap()->isAction(
       KeyboardDeviceType,
       0,

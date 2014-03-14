@@ -216,7 +216,7 @@ protected:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "RazerHydraDevice"; }   
+   static const char* getSingletonName() { return "RazerHydraDevice"; }
 };
 
 /// Returns the RazerHydraDevice singleton.

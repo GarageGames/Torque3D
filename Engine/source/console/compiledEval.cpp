@@ -66,10 +66,10 @@ struct IterStackRecord
 {
    /// If true, this is a foreach$ loop; if not, it's a foreach loop.
    bool mIsStringIter;
-   
+
    /// The iterator variable.
    Dictionary::Entry* mVariable;
-   
+
    /// Information for an object iterator loop.
    struct ObjectPos
    {
@@ -79,17 +79,17 @@ struct IterStackRecord
       /// Current index in the set.
       U32 mIndex;
    };
-   
+
    /// Information for a string iterator loop.
    struct StringPos
    {
       /// The raw string data on the string stack.
       const char* mString;
-      
+
       /// Current parsing position.
       U32 mIndex;
    };
-   
+
    union
    {
       ObjectPos mObj;
@@ -179,7 +179,7 @@ namespace Con
       char* buffer = Con::getReturnBuffer( str.length() + 1 );
       str.copy( buffer );
       buffer[ str.length() ] = '\0';
-      
+
       return buffer;
    }
 
@@ -201,7 +201,7 @@ namespace Con
       dSprintf(ret, 32, "%d", arg);
       return ret;
    }
-   
+
    char *getStringArg( const char *arg )
    {
       U32 len = dStrlen( arg ) + 1;
@@ -288,11 +288,11 @@ inline void ExprEvalState::setStringVariable(const char *val)
 static void getFieldComponent( SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, char val[] )
 {
    const char* prevVal = NULL;
-   
+
    // Grab value from object.
    if( object && field )
       prevVal = object->getDataField( field, array );
-   
+
    // Otherwise, grab from the string stack. The value coming in will always
    // be a string because that is how multicomponent variables are handled.
    else
@@ -301,7 +301,7 @@ static void getFieldComponent( SimObject* object, StringTableEntry field, const 
    // Make sure we got a value.
    if ( prevVal && *prevVal )
    {
-      static const StringTableEntry xyzw[] = 
+      static const StringTableEntry xyzw[] =
       {
          StringTable->insert( "x" ),
          StringTable->insert( "y" ),
@@ -309,7 +309,7 @@ static void getFieldComponent( SimObject* object, StringTableEntry field, const 
          StringTable->insert( "w" )
       };
 
-      static const StringTableEntry rgba[] = 
+      static const StringTableEntry rgba[] =
       {
          StringTable->insert( "r" ),
          StringTable->insert( "g" ),
@@ -317,7 +317,7 @@ static void getFieldComponent( SimObject* object, StringTableEntry field, const 
          StringTable->insert( "a" )
       };
 
-      // Translate xyzw and rgba into the indexed component 
+      // Translate xyzw and rgba into the indexed component
       // of the variable or field.
       if ( subField == xyzw[0] || subField == rgba[0] )
          dStrcpy( val, StringUnit::getUnit( prevVal, 0, " \t\n") );
@@ -361,7 +361,7 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
    if (!prevVal)
 	   return;
 
-   static const StringTableEntry xyzw[] = 
+   static const StringTableEntry xyzw[] =
    {
       StringTable->insert( "x" ),
       StringTable->insert( "y" ),
@@ -369,7 +369,7 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
       StringTable->insert( "w" )
    };
 
-   static const StringTableEntry rgba[] = 
+   static const StringTableEntry rgba[] =
    {
       StringTable->insert( "r" ),
       StringTable->insert( "g" ),
@@ -377,7 +377,7 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
       StringTable->insert( "a" )
    };
 
-   // Insert the value into the specified 
+   // Insert the value into the specified
    // component of the string.
    if ( subField == xyzw[0] || subField == rgba[0] )
 	  dStrcpy( val, StringUnit::setUnit( prevVal, 0, strValue, " \t\n") );
@@ -409,7 +409,7 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
 
    static char traceBuffer[1024];
    U32 i;
-   
+
    U32 iterDepth = 0;
 
    incRefCount();
@@ -488,8 +488,8 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
       else
       {
          // We want to copy a reference to an existing stack frame
-         // on to the top of the stack.  Any change that occurs to 
-         // the locals during this new frame will also occur in the 
+         // on to the top of the stack.  Any change that occurs to
+         // the locals during this new frame will also occur in the
          // original frame.
          S32 stackIndex = gEvalState.getStackDepth() - setFrame - 1;
          gEvalState.pushFrameRef( stackIndex );
@@ -514,7 +514,7 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
       SimObject *newObject;
       U32 failJump;
    } objectCreationStack[ objectCreationStackSize ];
-   
+
    SimObject *currentNewObject = 0;
    U32 failJump = 0;
    StringTableEntry prevField = NULL;
@@ -564,7 +564,7 @@ breakContinue:
                fnPackage    = U32toSTE(code[ip+2]);
                bool hasBody = ( code[ ip + 3 ] & 0x01 ) != 0;
                U32 lineNumber = code[ ip + 3 ] >> 1;
-               
+
                Namespace::unlinkPackages();
                ns = Namespace::find(fnNamespace, fnPackage);
                ns->addFunction(fnName, this, hasBody ? ip : 0, curFNDocBlock ? dStrdup( curFNDocBlock ) : NULL, lineNumber );// if no body, set the IP to 0
@@ -598,7 +598,7 @@ breakContinue:
             bool isSingleton =          code[ip + 3];
             U32  lineNumber  =          code[ip + 4];
             failJump         =          code[ip + 5];
-                        
+
             // If we don't allow calls, we certainly don't allow creating objects!
             // Moved this to after failJump is set. Engine was crashing when
             // noCalls = true and an object was being created at the beginning of
@@ -631,7 +631,7 @@ breakContinue:
 
                // Find the old one if any.
                SimObject *db = Sim::getDataBlockGroup()->findObject( objectName );
-               
+
                // Make sure we're not changing types on ourselves...
                if(db && dStricmp(db->getClassName(), callArgv[1]))
                {
@@ -647,7 +647,7 @@ breakContinue:
             }
             else if (!isInternal)
             {
-               // IF we aren't looking at a local/internal object, then check if 
+               // IF we aren't looking at a local/internal object, then check if
                // this object already exists in the global space
 
                AbstractClassRep* rep = AbstractClassRep::findClassRep( objectName );
@@ -681,16 +681,16 @@ breakContinue:
                   else
                   {
                      const char* redefineBehavior = Con::getVariable( "$Con::redefineBehavior" );
-                     
+
                      if( dStricmp( redefineBehavior, "replaceExisting" ) == 0 )
                      {
                         // Save our constructor args as the argv vector is stored on the
                         // string stack and may get stomped if deleteObject triggers
                         // script execution.
-                        
+
                         const char* savedArgv[ StringStack::MaxArgs ];
                         dMemcpy( savedArgv, callArgv, sizeof( savedArgv[ 0 ] ) * callArgc );
-                        
+
                         obj->deleteObject();
                         obj = NULL;
 
@@ -716,7 +716,7 @@ breakContinue:
                      {
                         const char* postfix = Con::getVariable( "$Con::redefineBehaviorPostfix" );
                         String newName = String::ToString( "%s%s", objectName, postfix );
-                        
+
                         if( Sim::findObject( newName ) )
                         {
                            Con::errorf( ConsoleLogEntry::General, "%s: Cannot re-declare object with postfix [%s].",
@@ -741,7 +741,7 @@ breakContinue:
             }
 
             STR.popFrame();
-            
+
             if(!currentNewObject)
             {
                // Well, looks like we have to create a new object.
@@ -857,7 +857,7 @@ breakContinue:
             // See OP_SETCURVAR for why we do this.
             curFNDocBlock = NULL;
             curNSDocBlock = NULL;
-            
+
             // Do we place this object at the root?
             bool placeAtRoot = code[ip++];
 
@@ -920,7 +920,7 @@ breakContinue:
                      if(!Sim::findObject(groupAddId, grp))
                         Sim::findObject(groupAddId, set);
                   }
-                  
+
                   if(placeAtRoot)
                   {
                      // Deal with the instantGroup if we're being put at the root or we're adding to a component.
@@ -937,7 +937,7 @@ breakContinue:
 
                // add to the parent group
                grp->addObject(currentNewObject);
-               
+
                // If for some reason the add failed, add the object to the
                // root group so it won't leak.
                if( !currentNewObject->getGroup() )
@@ -950,7 +950,7 @@ breakContinue:
 
             // store the new object's ID on the stack (overwriting the group/set
             // id, if one was given, otherwise getting pushed)
-            if(placeAtRoot) 
+            if(placeAtRoot)
                intStack[_UINT] = currentNewObject->getId();
             else
                intStack[++_UINT] = currentNewObject->getId();
@@ -1030,14 +1030,14 @@ breakContinue:
          case OP_JMP:
             ip = code[ip];
             break;
-            
+
          // This fixes a bug when not explicitly returning a value.
          case OP_RETURN_VOID:
       		STR.setStringValue("");
       		// We're falling thru here on purpose.
-            
+
          case OP_RETURN:
-         
+
             if( iterDepth > 0 )
             {
                // Clear iterator state.
@@ -1046,14 +1046,14 @@ breakContinue:
                   iterStack[ -- _ITER ].mIsStringIter = false;
                   -- iterDepth;
                }
-               
+
                const char* returnValue = STR.getStringValue();
                STR.rewind();
                STR.setStringValue( returnValue ); // Not nice but works.
             }
-               
+
             goto execFinished;
-            
+
          case OP_CMPEQ:
             intStack[_UINT+1] = bool(floatStack[_FLT] == floatStack[_FLT-1]);
             _UINT++;
@@ -1183,7 +1183,7 @@ breakContinue:
             gEvalState.setCurVarName(var);
 
             // In order to let docblocks work properly with variables, we have
-            // clear the current docblock when we do an assign. This way it 
+            // clear the current docblock when we do an assign. This way it
             // won't inappropriately carry forward to following function decls.
             curFNDocBlock = NULL;
             curNSDocBlock = NULL;
@@ -1458,7 +1458,7 @@ breakContinue:
             ip++;
             _FLT++;
             break;
-            
+
          case OP_TAG_TO_STR:
             code[ip-1] = OP_LOADIMMED_STR;
             // it's possible the string has already been converted
@@ -1551,7 +1551,7 @@ breakContinue:
 
             const char *componentReturnValue = "";
 
-            if(callType == FuncCallExprNode::FunctionCall) 
+            if(callType == FuncCallExprNode::FunctionCall)
             {
                if( !nsEntry )
                {
@@ -1574,7 +1574,7 @@ breakContinue:
                   STR.popFrame();
                   break;
                }
-               
+
                bool handlesMethod = gEvalState.thisObject->handlesConsoleMethod(fnName,&routingId);
                if( handlesMethod && routingId == MethodOnComponent )
                {
@@ -1582,7 +1582,7 @@ breakContinue:
                   if( pComponent )
                      componentReturnValue = pComponent->callMethodArgList( callArgc, callArgv, false );
                }
-               
+
                ns = gEvalState.thisObject->getNamespace();
                if(ns)
                   nsEntry = ns->lookup(fnName);
@@ -1640,7 +1640,7 @@ breakContinue:
                const char *ret = "";
                if(nsEntry->mFunctionOffset)
                   ret = nsEntry->mCode->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage);
-               
+
                STR.popFrame();
                STR.setStringValue(ret);
             }
@@ -1726,7 +1726,7 @@ breakContinue:
                         nsEntry->cb.mVoidCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         if( code[ ip ] != OP_STR_TO_NONE && Con::getBoolVariable( "$Con::warnVoidAssignment", true ) )
                            Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip-4), fnName, functionName);
-                        
+
                         STR.popFrame();
                         STR.setStringValue("");
                         break;
@@ -1803,9 +1803,9 @@ breakContinue:
                U32 breakLine, inst;
                findBreakLine( ip - 1, breakLine, inst );
 
-               if ( PlatformAssert::processAssert( PlatformAssert::Fatal, 
-                                                   name ? name : "eval", 
-                                                   breakLine,  
+               if ( PlatformAssert::processAssert( PlatformAssert::Fatal,
+                                                   name ? name : "eval",
+                                                   breakLine,
                                                    message ) )
                {
                   if ( TelDebugger && TelDebugger->isConnected() && breakLine > 0 )
@@ -1835,22 +1835,22 @@ breakContinue:
             TelDebugger->executionStopped(this, breakLine);
             goto breakContinue;
          }
-         
+
          case OP_ITER_BEGIN_STR:
          {
             iterStack[ _ITER ].mIsStringIter = true;
             /* fallthrough */
          }
-         
+
          case OP_ITER_BEGIN:
          {
             StringTableEntry varName = U32toSTE( code[ ip ] );
             U32 failIp = code[ ip + 1 ];
-            
+
             IterStackRecord& iter = iterStack[ _ITER ];
-            
+
             iter.mVariable = gEvalState.getCurrentFrame().add( varName );
-            
+
             if( iter.mIsStringIter )
             {
                iter.mData.mStr.mString = STR.getStringValue();
@@ -1859,7 +1859,7 @@ breakContinue:
             else
             {
                // Look up the object.
-               
+
                SimSet* set;
                if( !Sim::findObject( STR.getStringValue(), set ) )
                {
@@ -1868,34 +1868,34 @@ breakContinue:
                   ip = failIp;
                   continue;
                }
-               
+
                // Set up.
-               
+
                iter.mData.mObj.mSet = set;
                iter.mData.mObj.mIndex = 0;
             }
-            
+
             _ITER ++;
             iterDepth ++;
-            
+
             STR.push();
-            
+
             ip += 2;
             break;
          }
-         
+
          case OP_ITER:
          {
             U32 breakIp = code[ ip ];
             IterStackRecord& iter = iterStack[ _ITER - 1 ];
-            
+
             if( iter.mIsStringIter )
             {
                const char* str = iter.mData.mStr.mString;
-                              
+
                U32 startIndex = iter.mData.mStr.mIndex;
                U32 endIndex = startIndex;
-               
+
                // Break if at end.
 
                if( !str[ startIndex ] )
@@ -1905,19 +1905,19 @@ breakContinue:
                }
 
                // Find right end of current component.
-               
+
                if( !dIsspace( str[ endIndex ] ) )
                   do ++ endIndex;
                   while( str[ endIndex ] && !dIsspace( str[ endIndex ] ) );
-                  
+
                // Extract component.
-                  
+
                if( endIndex != startIndex )
                {
                   char savedChar = str[ endIndex ];
                   const_cast< char* >( str )[ endIndex ] = '\0'; // We are on the string stack so this is okay.
                   iter.mVariable->setStringValue( &str[ startIndex ] );
-                  const_cast< char* >( str )[ endIndex ] = savedChar;                  
+                  const_cast< char* >( str )[ endIndex ] = savedChar;
                }
                else
                   iter.mVariable->setStringValue( "" );
@@ -1925,39 +1925,39 @@ breakContinue:
                // Skip separator.
                if( str[ endIndex ] != '\0' )
                   ++ endIndex;
-               
+
                iter.mData.mStr.mIndex = endIndex;
             }
             else
             {
                U32 index = iter.mData.mObj.mIndex;
                SimSet* set = iter.mData.mObj.mSet;
-               
+
                if( index >= set->size() )
                {
                   ip = breakIp;
                   continue;
                }
-               
+
                iter.mVariable->setIntValue( set->at( index )->getId() );
                iter.mData.mObj.mIndex = index + 1;
             }
-            
+
             ++ ip;
             break;
          }
-         
+
          case OP_ITER_END:
          {
             -- _ITER;
             -- iterDepth;
-            
+
             STR.rewind();
-            
+
             iterStack[ _ITER ].mIsStringIter = false;
             break;
          }
-         
+
          case OP_INVALID:
 
          default:

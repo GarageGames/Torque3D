@@ -49,7 +49,7 @@ function GameConnection::initialControlSet(%this)
 
    // The first control object has been set by the server
    // and we are now ready to go.
-   
+
    // first check if the editor is active
    if (!isToolBuild() || !Editor::checkActiveLoadDone())
    {
@@ -61,7 +61,7 @@ function GameConnection::initialControlSet(%this)
 function GameConnection::onControlObjectChange(%this)
 {
    echo ("*** Control Object Changed");
-   
+
    // Reset the current FOV to match the new object
    // and turn off any current zoom.
    resetCurrentFOV();
@@ -73,7 +73,7 @@ function GameConnection::onConnectionAccepted(%this)
 {
    // Startup the physX world on the client before any
    // datablocks and objects are ghosted over.
-   physicsInitWorld( "client" );   
+   physicsInitWorld( "client" );
 }
 
 function GameConnection::onConnectionError(%this, %msg)
@@ -98,7 +98,7 @@ function disconnect()
    // Delete the connection if it's still there.
    if (isObject(ServerConnection))
       ServerConnection.delete();
-      
+
    disconnectedCleanup();
 
    // Call destroyServer in case we're hosting
@@ -108,13 +108,13 @@ function disconnect()
 function disconnectedCleanup()
 {
    // End mission, if it's running.
-   
+
    if( $Client::missionRunning )
       clientEndMission();
-      
+
    // Disable mission lighting if it's going, this is here
    // in case we're disconnected while the mission is loading.
-   
+
    $lightingMission = false;
    $sceneLighting::terminateLighting = true;
 
@@ -128,7 +128,7 @@ function disconnectedCleanup()
    {
       ServerConnection.deleteAllObjects();
    }
-   
+
    // We can now delete the client physics simulation.
-   physicsDestroyWorld( "client" );                 
+   physicsDestroyWorld( "client" );
 }

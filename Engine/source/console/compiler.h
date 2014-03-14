@@ -141,7 +141,7 @@ namespace Compiler
 
       OP_ASSERT,
       OP_BREAK,
-      
+
       OP_ITER_BEGIN,       ///< Prepare foreach iterator.
       OP_ITER_BEGIN_STR,   ///< Prepare foreach$ iterator.
       OP_ITER,             ///< Enter foreach loop.

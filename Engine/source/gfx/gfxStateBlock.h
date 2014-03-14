@@ -55,7 +55,7 @@ struct GFXSamplerStateDesc
    /// @see GFXTextureFilterType
    U32 maxAnisotropy;
 
-   /// Used to offset the mipmap selection by whole or 
+   /// Used to offset the mipmap selection by whole or
    /// fractional amounts either postively or negatively.
    ///
    /// Defaults to zero.
@@ -91,10 +91,10 @@ struct GFXSamplerStateDesc
    static GFXSamplerStateDesc getClampPoint();
 };
 
-/// GFXStateBlockDesc defines a render state, which is then used to create a GFXStateBlock instance.  
+/// GFXStateBlockDesc defines a render state, which is then used to create a GFXStateBlock instance.
 struct GFXStateBlockDesc
-{   
-   // Blending   
+{
+   // Blending
    bool blendDefined;
    bool blendEnable;
    GFXBlend blendSrc;
@@ -112,7 +112,7 @@ struct GFXStateBlockDesc
 
    // Alpha test
    bool alphaDefined;
-   bool alphaTestEnable;   
+   bool alphaTestEnable;
    S32 alphaTestRef;
    GFXCmpFunc alphaTestFunc;
 
@@ -171,26 +171,26 @@ struct GFXStateBlockDesc
    const String describeSelf() const;
 
    /// Utility functions to make setting up stateblock descriptions less wordy.
-   void setCullMode( GFXCullMode m ); 
+   void setCullMode( GFXCullMode m );
 
    /// Helpers for setting the fill modes.
    void setFillModePoint() { fillMode = GFXFillPoint; }
    void setFillModeWireframe() { fillMode = GFXFillWireframe; }
    void setFillModeSolid() { fillMode = GFXFillSolid; }
 
-   void setZReadWrite( bool read, bool write = true ); 
+   void setZReadWrite( bool read, bool write = true );
 
-   void setAlphaTest(   bool enable, 
-                        GFXCmpFunc func = GFXCmpGreaterEqual, 
+   void setAlphaTest(   bool enable,
+                        GFXCmpFunc func = GFXCmpGreaterEqual,
                         S32 alphaRef = 0 );
 
-   void setBlend( bool enable, 
-                  GFXBlend src = GFXBlendSrcAlpha, 
+   void setBlend( bool enable,
+                  GFXBlend src = GFXBlendSrcAlpha,
                   GFXBlend dest = GFXBlendInvSrcAlpha,
                   GFXBlendOp op = GFXBlendOpAdd );
 
-   void setSeparateAlphaBlend(   bool enable, 
-                                 GFXBlend src = GFXBlendOne, 
+   void setSeparateAlphaBlend(   bool enable,
+                                 GFXBlend src = GFXBlendOne,
                                  GFXBlend dest = GFXBlendZero,
                                  GFXBlendOp op = GFXBlendOpAdd );
 
@@ -210,10 +210,10 @@ public:
    /// Returns a GFXStateBlockDesc that this block represents
    virtual const GFXStateBlockDesc& getDesc() const = 0;
 
-   /// Default implementation for GFXResource::describeSelf   
+   /// Default implementation for GFXResource::describeSelf
    virtual const String describeSelf() const;
 };
 
 typedef StrongRefPtr<GFXStateBlock> GFXStateBlockRef;
 
-#endif 
+#endif

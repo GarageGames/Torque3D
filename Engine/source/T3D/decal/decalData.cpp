@@ -35,9 +35,9 @@ GFXImplementVertexFormat( DecalVertex )
 {
    addElement( "POSITION", GFXDeclType_Float3 );
    addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "TANGENT", GFXDeclType_Float3 );   
+   addElement( "TANGENT", GFXDeclType_Float3 );
    addElement( "COLOR", GFXDeclType_Color );
-   addElement( "TEXCOORD", GFXDeclType_Float2, 0 );   
+   addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
 }
 
 IMPLEMENT_CO_DATABLOCK_V1( DecalData );
@@ -98,7 +98,7 @@ DecalData::DecalData()
 
    texCoordCount = 1;
 
-   // TODO: We could in theory calculate if we can skip 
+   // TODO: We could in theory calculate if we can skip
    // normals on the decal by checking the material features.
    skipVertexNormals = false;
 
@@ -122,8 +122,8 @@ bool DecalData::onAdd()
    if (size < 0.0) {
       Con::warnf("DecalData::onAdd: size < 0");
       size = 0;
-   }   
-   
+   }
+
    getSet()->addObject( this );
 
 	if( texRows > 1 || texCols > 1 )
@@ -141,7 +141,7 @@ void DecalData::initPersistFields()
 {
    addGroup( "Decal" );
 
-      addField( "size", TypeF32, Offset( size, DecalData ), 
+      addField( "size", TypeF32, Offset( size, DecalData ),
          "Width and height of the decal in meters before scale is applied." );
 
       addField( "material", TypeMaterialName, Offset( materialName, DecalData ),
@@ -159,18 +159,18 @@ void DecalData::initPersistFields()
 
    addGroup( "Rendering" );
 
-      addField( "fadeStartPixelSize", TypeF32, Offset( fadeStartPixelSize, DecalData ), 
+      addField( "fadeStartPixelSize", TypeF32, Offset( fadeStartPixelSize, DecalData ),
          "@brief LOD value - size in pixels at which decals of this type begin "
          "to fade out.\n\n"
          "This should be a larger value than #fadeEndPixelSize. However, you may "
          "also set this to a negative value to disable lod-based fading." );
 
-      addField( "fadeEndPixelSize", TypeF32, Offset( fadeEndPixelSize, DecalData ), 
+      addField( "fadeEndPixelSize", TypeF32, Offset( fadeEndPixelSize, DecalData ),
          "@brief LOD value - size in pixels at which decals of this type are "
          "fully faded out.\n\n"
          "This should be a smaller value than #fadeStartPixelSize." );
 
-      addField( "renderPriority", TypeS8, Offset( renderPriority, DecalData ), 
+      addField( "renderPriority", TypeS8, Offset( renderPriority, DecalData ),
          "Default renderPriority for decals of this type (determines draw "
          "order when decals overlap)." );
 
@@ -272,7 +272,7 @@ void DecalData::packData( BitStream *stream )
    stream->write( renderPriority );
    stream->write( clippingMasks );
    stream->write( clippingAngle );
-   
+
 	stream->write( texRows );
    stream->write( texCols );
 	stream->write( frame );
@@ -284,7 +284,7 @@ void DecalData::unpackData( BitStream *stream )
    Parent::unpackData( stream );
 
    stream->read( &lookupName );
-   stream->read( &size );  
+   stream->read( &size );
    stream->read( &materialName );
    _updateMaterial();
    stream->read( &lifeSpan );
@@ -299,7 +299,7 @@ void DecalData::unpackData( BitStream *stream )
    stream->read( &renderPriority );
    stream->read( &clippingMasks );
    stream->read( &clippingAngle );
-   
+
 	stream->read( &texRows );
    stream->read( &texCols );
 	stream->read( &frame );
@@ -393,23 +393,23 @@ DecalData* DecalData::findDatablock( String searchName )
 }
 
 void DecalData::inspectPostApply()
-{ 
+{
 	reloadRects();
 }
 
 void DecalData::reloadRects()
-{ 
+{
 	F32 rowsBase = 0;
 	F32 colsBase = 0;
 	bool canRenderRowsByFrame = false;
 	bool canRenderColsByFrame = false;
 	S32 id = 0;
-	
+
 	texRect[id].point.x = 0.f;
 	texRect[id].extent.x = 1.f;
 	texRect[id].point.y = 0.f;
 	texRect[id].extent.y = 1.f;
-	
+
 	texCoordCount = (texRows * texCols) - 1;
 
 	if( texCoordCount > 16 )
@@ -421,7 +421,7 @@ void DecalData::reloadRects()
 	}
 
 	// use current datablock information in order to build a template to extract
-	// coordinates from. 
+	// coordinates from.
 	if( texRows > 1 )
 	{
 		rowsBase = ( 1.f / texRows );
@@ -458,7 +458,7 @@ void DecalData::reloadRects()
 					texRect[id].point.x = rowsBase * ( rowId - 1 );
 					texRect[id].extent.x = rowsBase;
 				}
-				
+
 				if( canRenderColsByFrame )
 				{
 					texRect[id].point.y = colsBase * ( colId - 1 );

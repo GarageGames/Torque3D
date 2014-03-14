@@ -40,7 +40,7 @@ ConsoleDocClass( GuiVariableInspector,
 );
 
 void GuiVariableInspector::loadVars( String searchStr )
-{     
+{
    clearGroups();
 
    GuiInspectorVariableGroup *group = new GuiInspectorVariableGroup();
@@ -56,7 +56,7 @@ void GuiVariableInspector::loadVars( String searchStr )
       group->registerObject();
       mGroups.push_back( group );
       addObject( group );
-   }   
+   }
 
    //group->inspectGroup();
 }

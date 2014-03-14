@@ -39,7 +39,7 @@ void Platform::getLocalTime(LocalTime &lt)
    time( &long_time );
    /// Convert to local time, thread safe.
    localtime_r( &long_time, &systime );
-   
+
    /// Fill the return struct
    lt.sec      = systime.tm_sec;
    lt.min      = systime.tm_min;
@@ -50,12 +50,12 @@ void Platform::getLocalTime(LocalTime &lt)
    lt.year     = systime.tm_year;
    lt.yearday  = systime.tm_yday;
    lt.isdst    = systime.tm_isdst;
-}   
+}
 
 String Platform::localTimeToString( const LocalTime &lt )
 {
    tm systime;
-   
+
    systime.tm_sec    = lt.sec;
    systime.tm_min    = lt.min;
    systime.tm_hour   = lt.hour;
@@ -75,7 +75,7 @@ U32 Platform::getTime()
    time_t epoch_time;
    time( &epoch_time );
    return epoch_time;
-}   
+}
 
 /// Gets the time in milliseconds since some epoch. In this case, system start time.
 /// Storing milliseconds in a U32 overflows every 49.71 days
@@ -88,21 +88,21 @@ U32 Platform::getRealMilliseconds()
    U32 ret;
    if( durTime < 0 )
       ret = durTime / -1000;
-   else 
+   else
       ret = durTime;
 
    return ret;
-}   
+}
 
 U32 Platform::getVirtualMilliseconds()
 {
-   return sgCurrentTime;   
-}   
+   return sgCurrentTime;
+}
 
 void Platform::advanceTime(U32 delta)
 {
    sgCurrentTime += delta;
-}   
+}
 
 /// Asks the operating system to put the process to sleep for at least ms milliseconds
 void Platform::sleep(U32 ms)
@@ -121,14 +121,14 @@ void Platform::fileToLocalTime(const FileTime & ft, LocalTime * lt)
 {
    if(!lt)
       return;
-      
+
    time_t long_time = ft;
 
    struct tm systime;
 
    /// Convert to local time, thread safe.
    localtime_r( &long_time, &systime );
-   
+
    /// Fill the return struct
    lt->sec      = systime.tm_sec;
    lt->min      = systime.tm_min;

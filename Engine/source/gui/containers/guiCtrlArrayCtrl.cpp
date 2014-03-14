@@ -28,13 +28,13 @@ IMPLEMENT_CONOBJECT(GuiControlArrayControl);
 
 ConsoleDocClass( GuiControlArrayControl,
    "@brief Brief Desc.\n\n"
-   
+
    "@tsexample\n"
    "// Comment:\n"
    "%okButton = new ClassObject()\n"
    "instantiation\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -54,7 +54,7 @@ GuiControlArrayControl::GuiControlArrayControl()
 void GuiControlArrayControl::initPersistFields()
 {
    addGroup( "Array" );
-   
+
       addField( "colCount",     TypeS32,       Offset(mCols,        GuiControlArrayControl),
          "Number of colums in the array." );
       addField( "colSizes",     TypeS32Vector, Offset(mColumnSizes, GuiControlArrayControl),
@@ -65,7 +65,7 @@ void GuiControlArrayControl::initPersistFields()
          "Padding to put between rows." );
       addField( "colSpacing",   TypeS32,       Offset(mColSpacing,  GuiControlArrayControl),
          "Padding to put between columns." );
-      
+
    endGroup( "Array" );
 
    Parent::initPersistFields();
@@ -125,7 +125,7 @@ bool GuiControlArrayControl::reOrder(SimObject* obj, SimObject* target)
 bool GuiControlArrayControl::updateArray()
 {
    // Prevent recursion
-   if(mResizing) 
+   if(mResizing)
       return false;
 
    // Set Resizing.
@@ -149,7 +149,7 @@ bool GuiControlArrayControl::updateArray()
          sizes[ i ] = 0;
       else
          sizes[i] = mColumnSizes[i];
-         
+
       offsets[i] = totalSize;
 
       // If it's an auto-size one, then... auto-size...

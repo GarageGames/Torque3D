@@ -66,7 +66,7 @@ protected:
    Vector<GBitmap*> mBitmapList; //List of bitmaps created from backbuffer captures
 
    /// Sets the output frame resolution
-   void setOutResolution( const Point2I& res ) { mResolution = res; }   
+   void setOutResolution( const Point2I& res ) { mResolution = res; }
 
    /// Pushes a fresh bitmap into our list
    void pushNewBitmap( GBitmap* bitmap ) { mBitmapList.push_back(bitmap); }
@@ -76,8 +76,8 @@ protected:
 
    /// Texture event callback
    void _onTextureEvent(GFXTexCallbackCode code);
-   
-   /// Captures the current backbuffer. If the last capture wasn't made into a bitmap, it will be overriden.   
+
+   /// Captures the current backbuffer. If the last capture wasn't made into a bitmap, it will be overriden.
    virtual void captureBackBuffer() = 0;
 
    /// Starts converting the last backbuffer capture to a bitmap
@@ -95,11 +95,11 @@ public:
 
 /// Video capture interface class
 class VideoCapture
-{   
+{
 private:
    struct EncoderFactory {
       const char* name;
-      VideoEncoderFactoryFn factory;      
+      VideoEncoderFactoryFn factory;
    };
 
    /// List of encoder factory functions
@@ -128,7 +128,7 @@ private:
 
    /// The per-frame time (in milliseconds)
    F32 mMsPerFrame;
-   
+
    /// The framerate we'll use to record
    F32 mFrameRate;
 
@@ -153,20 +153,20 @@ private:
    Vector< GBitmap* > mBitmapDeleteList;
 
    /// Initializes our encoder
-   bool initEncoder( const char* name );   
+   bool initEncoder( const char* name );
 
    /// Deletes processed bitmaps
    void deleteProcessedBitmaps();
-      
+
 public:
    VideoCapture();
-      
+
    /// Start a video capture session
    void begin( GuiCanvas* canvas );
 
    /// Captures a new frame
    void capture();
-   
+
    /// Ends a video capture
    void end();
 
@@ -191,16 +191,16 @@ public:
    /// Sets the video farme grabber (cannot record without one).
    void setFrameGrabber( VideoFrameGrabber* grabber ) { mFrameGrabber = grabber; }
 
-   /// This will make the video capture begin capturing 
+   /// This will make the video capture begin capturing
    /// as soon as a GuiCanvas is created
    void waitForCanvas() { mWaitingForCanvas = true; }
    bool isWaitingForCanvas() { return mWaitingForCanvas; }
 
    /// Registers an encoder
-   static void registerEncoder( const char* name, VideoEncoderFactoryFn factoryFn );    
+   static void registerEncoder( const char* name, VideoEncoderFactoryFn factoryFn );
 
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "VideoCapture"; }   
+   static const char* getSingletonName() { return "VideoCapture"; }
 };
 
 
@@ -223,7 +223,7 @@ protected:
 public:
    // Stores an encoded bitmap to be dealt with later
    void pushProcessedBitmap( GBitmap* bitmap );
-      
+
 public:
    /// Sets the file the encoder will write to
    void setFile( const char* path );

@@ -193,10 +193,10 @@ class EditTSCtrl : public GuiTSCtrl
 
       S32 getDisplayType() const {return mDisplayType;}
       virtual void setDisplayType(S32 type);
-      
+
       /// Return true if the current view is an ortho projection along one of the world axes.
       bool isOrthoDisplayType() const { return ( mDisplayType != DisplayTypePerspective && mDisplayType != DisplayTypeIsometric ); }
-      
+
       F32 getOrthoFOV() const { return mOrthoFOV; }
       void setOrthoFOV( F32 fov ) { mOrthoFOV = fov; }
 

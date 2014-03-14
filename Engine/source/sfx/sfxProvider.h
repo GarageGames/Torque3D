@@ -53,7 +53,7 @@ class SFXProvider
       /// The head of the linked list of avalible providers.
       static SFXProvider* smProviders;
 
-      /// The next provider in the linked list of available providers. 
+      /// The next provider in the linked list of available providers.
       SFXProvider* mNextProvider;
 
       /// The provider name which is passed by the concrete provider
@@ -85,10 +85,10 @@ class SFXProvider
       /// This is called from SFXSystem to create a new device.  Must be implemented
       /// by all contrete provider classes.
       ///
-      /// @param deviceName      The case sensitive name of the device or NULL to create the 
+      /// @param deviceName      The case sensitive name of the device or NULL to create the
       //                         default device.
       /// @param useHardware     Toggles the use of hardware processing when available.
-      /// @param maxBuffers      The maximum buffers for this device to use or -1 
+      /// @param maxBuffers      The maximum buffers for this device to use or -1
       ///                        for the device to pick a reasonable default for that device.
       ///
       /// @return Returns the created device or NULL for failure.
@@ -101,7 +101,7 @@ class SFXProvider
       /// for the first provider with the case sensitive name.
       static SFXProvider* findProvider( String providerName );
 
-      /// Returns the first provider in the provider list.  Use 
+      /// Returns the first provider in the provider list.  Use
       /// getNextProvider() to iterate over list.
       static SFXProvider* getFirstProvider() { return smProviders; }
 

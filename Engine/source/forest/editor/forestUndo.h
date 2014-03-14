@@ -42,7 +42,7 @@ class ForestUndoAction : public UndoAction
 
 public:
 
-   ForestUndoAction( const Resource<ForestData> &data, ForestEditorCtrl *editor, const char *description );   
+   ForestUndoAction( const Resource<ForestData> &data, ForestEditorCtrl *editor, const char *description );
 
    // UndoAction
    virtual void undo() {}
@@ -60,11 +60,11 @@ class ForestCreateUndoAction : public ForestUndoAction
    typedef ForestUndoAction Parent;
 
 public:
-  
+
    ForestCreateUndoAction( const Resource<ForestData> &data,
                            ForestEditorCtrl *editor );
 
-   /// Adds the item to the Forest and stores 
+   /// Adds the item to the Forest and stores
    /// its info for undo later.
    void addItem( ForestItemData *data,
                  const Point3F &position,
@@ -82,7 +82,7 @@ class ForestDeleteUndoAction : public ForestUndoAction
    typedef ForestUndoAction Parent;
 
 public:
-  
+
    ForestDeleteUndoAction( const Resource<ForestData> &data,
                            ForestEditorCtrl *editor );
 
@@ -101,7 +101,7 @@ class ForestUpdateAction : public ForestUndoAction
    typedef ForestUndoAction Parent;
 
 public:
-  
+
    ForestUpdateAction(  const Resource<ForestData> &data,
                         ForestEditorCtrl *editor );
 

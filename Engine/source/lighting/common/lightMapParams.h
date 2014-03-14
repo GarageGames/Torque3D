@@ -43,7 +43,7 @@ public:
    virtual void unpackUpdate( BitStream *stream );
 
 public:
-   // We're leaving these public for easy access 
+   // We're leaving these public for easy access
    // for console protected fields.
 
    bool representedInLightmap;   ///< This light is represented in lightmaps (static light, default: false)

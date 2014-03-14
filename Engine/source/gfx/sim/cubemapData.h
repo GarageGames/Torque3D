@@ -43,9 +43,9 @@
 /// A script interface for creating static or dynamic cubemaps.
 class CubemapData : public SimObject
 {
-   typedef SimObject Parent;   
+   typedef SimObject Parent;
 
-public:   
+public:
 
    GFXCubemapHandle  mCubemap;
 
@@ -58,15 +58,15 @@ public:
    DECLARE_CONOBJECT(CubemapData);
 
    // Force creation of cubemap
-   void createMap();   
+   void createMap();
 
    // Update a dynamic cubemap @ pos
    void updateDynamic(SceneManager* sm, const Point3F& pos);
 	void updateFaces();
-   
+
    // Dynamic cube map support
    bool mDynamic;
-   U32 mDynamicSize;   
+   U32 mDynamicSize;
    F32 mDynamicNearDist;
    F32 mDynamicFarDist;
    U32 mDynamicObjectTypeMask;

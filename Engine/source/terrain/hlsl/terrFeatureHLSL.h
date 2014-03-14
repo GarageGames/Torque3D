@@ -58,9 +58,9 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
-          
+
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Base Texture"; }
@@ -81,7 +81,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -104,7 +104,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -120,7 +120,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -132,9 +132,9 @@ class TerrainLightMapFeatHLSL : public TerrainFeatHLSL
 {
 public:
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
-          
+
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Lightmap Texture"; }
@@ -145,7 +145,7 @@ class TerrainAdditiveFeatHLSL : public TerrainFeatHLSL
 {
 public:
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Additive"; }

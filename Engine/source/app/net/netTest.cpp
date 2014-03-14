@@ -75,7 +75,7 @@ DefineEngineStaticMethod( SimpleMessageEvent, msg, void, (NetConnection* con, co
 
    "@param con The unique ID of the connection to transmit to\n"
    "@param message The string containing the message to transmit\n\n"
-   
+
    "@tsexample\n"
       "// Send a message to the other end of the given NetConnection\n"
       "SimpleMessageEvent::msg( %conn, \"A message from me!\");\n\n"
@@ -140,7 +140,7 @@ ConsoleDocClass( SimpleNetObject,
 	"geared toward developers that wish to understand the inner-working of "
 	"Torque 3D's networking system. This is not intended for actual game "
 	"development.\n\n "
-   
+
    "@tsexample\n"
       "// On the server, create a new SimpleNetObject.  This is a ghost always\n"
       "// object so it will be immediately ghosted to all connected clients.\n"
@@ -162,7 +162,7 @@ DefineEngineMethod( SimpleNetObject, setMessage, void, (const char* msg),,
    "all connected clients.  It will appear in the clients' console.\n"
 
    "@param msg The new message to send\n\n"
-   
+
    "@tsexample\n"
       "// On the server, create a new SimpleNetObject.  This is a ghost always\n"
       "// object so it will be immediately ghosted to all connected clients.\n"

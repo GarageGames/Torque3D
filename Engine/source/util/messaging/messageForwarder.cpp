@@ -45,7 +45,7 @@ ConsoleDocClass( MessageForwarder,
 
 	"MessageForwarder is a script class that can be used to forward messages "
 	"from one queue to another.\n\n"
-	
+
 	"@tsexample\n"
 	"%fwd = new MessageForwarder()\n"
 	"{\n"

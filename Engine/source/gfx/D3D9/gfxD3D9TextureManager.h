@@ -32,7 +32,7 @@
 //*****************************************************************************
 // GFX D3D Texture Manager
 //*****************************************************************************
-class GFXD3D9TextureManager : public GFXTextureManager 
+class GFXD3D9TextureManager : public GFXTextureManager
 {
    friend class GFXD3D9TextureObject;
 
@@ -45,7 +45,7 @@ public:
 protected:
 
    // GFXTextureManager
-   GFXTextureObject *_createTextureObject(   U32 height, 
+   GFXTextureObject *_createTextureObject(   U32 height,
                                              U32 width,
                                              U32 depth,
                                              GFXFormat format,
@@ -66,8 +66,8 @@ private:
    LPDIRECT3DDEVICE9 mD3DDevice;
    D3DCAPS9 mDeviceCaps;
 
-   void _innerCreateTexture(GFXD3D9TextureObject *obj, U32 height, U32 width, 
-      U32 depth, GFXFormat format, GFXTextureProfile *profile, U32 numMipLevels, 
+   void _innerCreateTexture(GFXD3D9TextureObject *obj, U32 height, U32 width,
+      U32 depth, GFXFormat format, GFXTextureProfile *profile, U32 numMipLevels,
       bool forceMips = false, S32 antialiasLevel = 0);
 };
 

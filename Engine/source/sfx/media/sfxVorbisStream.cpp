@@ -52,7 +52,7 @@ SFXVorbisStream::SFXVorbisStream( const SFXVorbisStream& cloneFrom )
       Con::errorf( "SFXVorbisStream::SFXVorbisStream() - Source stream does not allow seeking" );
       return;
    }
-   
+
    mStream->setPosition( 0 );
    if( !_readHeader() )
    {
@@ -61,7 +61,7 @@ SFXVorbisStream::SFXVorbisStream( const SFXVorbisStream& cloneFrom )
    }
 
    ov_pcm_seek( mVF, ov_pcm_tell( cloneFrom.mVF ) );
-   
+
    mBitstream = cloneFrom.mBitstream;
    mBytesRead = cloneFrom.mBytesRead;
 }
@@ -95,7 +95,7 @@ int SFXVorbisStream::_seek_func( void *datasource, ogg_int64_t offset, int whenc
 {
    Stream *stream = reinterpret_cast<Stream*>( datasource );
 
-   U32 newPos = 0; 
+   U32 newPos = 0;
    if ( whence == SEEK_CUR )
       newPos = stream->getPosition() + (U32)offset;
    else if ( whence == SEEK_END )
@@ -171,27 +171,27 @@ void SFXVorbisStream::_close()
 
 const vorbis_info* SFXVorbisStream::getInfo( S32 link )
 {
-   AssertFatal( mVF, "SFXVorbisStream::getInfo() - Stream is closed!" );   
+   AssertFatal( mVF, "SFXVorbisStream::getInfo() - Stream is closed!" );
    return ov_info( mVF, link );
 }
 
 const vorbis_comment* SFXVorbisStream::getComment( S32 link )
 {
-   AssertFatal( mVF, "SFXVorbisStream::getComment() - Stream is closed!" );   
+   AssertFatal( mVF, "SFXVorbisStream::getComment() - Stream is closed!" );
    return ov_comment( mVF, link );
 }
 
 U64 SFXVorbisStream::getPcmTotal( S32 link )
 {
-   AssertFatal( mVF, "SFXVorbisStream::getInfo() - Stream is closed!" );   
+   AssertFatal( mVF, "SFXVorbisStream::getInfo() - Stream is closed!" );
    return ov_pcm_total( mVF, link );
 }
 
-S32 SFXVorbisStream::read( U8 *buffer, 
-                           U32 length, 
+S32 SFXVorbisStream::read( U8 *buffer,
+                           U32 length,
                            S32 *bitstream )
 {
-   AssertFatal( mVF, "SFXVorbisStream::read() - Stream is closed!" );   
+   AssertFatal( mVF, "SFXVorbisStream::read() - Stream is closed!" );
 
    mBitstream = *bitstream;
 
@@ -201,7 +201,7 @@ S32 SFXVorbisStream::read( U8 *buffer,
       static const int isBigEndian = 0;
    #endif
 
-   // Vorbis doesn't seem to like reading 
+   // Vorbis doesn't seem to like reading
    // requests longer than this.
    const U32 MAXREAD = 4096;
 
@@ -209,7 +209,7 @@ S32 SFXVorbisStream::read( U8 *buffer,
    U32 offset = 0;
    U32 bytesToRead = 0;
 
-   // Since it only returns the result of one packet 
+   // Since it only returns the result of one packet
    // per call, you generally have to loop to read it all.
    while( offset < length )
    {

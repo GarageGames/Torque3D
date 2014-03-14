@@ -38,7 +38,7 @@
 class GuiEditCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
       friend class GuiEditorRuler;
 
@@ -53,23 +53,23 @@ class GuiEditCtrl : public GuiControl
          SPACING_HORIZONTAL,
          JUSTIFY_CENTER_HORIZONTAL,
       };
-      
+
       enum guideAxis { GuideVertical, GuideHorizontal };
-      
+
       enum mouseModes { Selecting, MovingSelection, SizingSelection, DragSelecting, DragGuide, DragClone };
       enum sizingModes { sizingNone = 0, sizingLeft = 1, sizingRight = 2, sizingTop = 4, sizingBottom = 8 };
-      
+
       enum snappingAxis { SnapVertical, SnapHorizontal };
       enum snappingEdges { SnapEdgeMin, SnapEdgeMid, SnapEdgeMax };
 
    protected:
-   
+
       enum
       {
          NUT_SIZE = 4,
          MIN_GRID_SIZE = 3
       };
-   
+
       typedef Vector< GuiControl* > GuiControlVector;
       typedef SimObjectPtr< GuiControl > GuiControlPtr;
 
@@ -89,20 +89,20 @@ class GuiEditCtrl : public GuiControl
       bool                 mDragMoveUndo;
 
       // Guides.
-      
+
       bool                 mSnapToGuides;       ///< If true, edge and center snapping will work against guides.
       bool                 mDragGuide[ 2 ];
       U32                  mDragGuideIndex[ 2 ];///< Indices of the guide's being dragged in DragGuide mouse mode.
       Vector< U32 >        mGuides[ 2 ];        ///< The guides defined on the current content control.
 
       // Snapping
-      
+
       bool                 mSnapToControls;     ///< If true, edge and center snapping will work against controls.
       bool                 mSnapToCanvas;       ///< If true, edge and center snapping will work against canvas (= content control).
       bool                 mSnapToEdges;        ///< If true, selection edges will snap to other control edges.
       bool                 mSnapToCenters;      ///< If true, selection centers will snap to other control centers.
       S32                  mSnapSensitivity;    ///< Snap distance in pixels.
-      
+
       bool                 mSnapped[ 2 ];       ///< Snap flag for each axis.  If true, we are currently snapped in a drag.
       S32                  mSnapOffset[ 2 ];    ///< Reference point on snap line for each axis.
       GuiControlVector     mSnapHits[ 2 ];      ///< Hit testing lists for each axis.
@@ -119,34 +119,34 @@ class GuiEditCtrl : public GuiControl
 
       mouseModes           mMouseDownMode;
       sizingModes          mSizingMode;
-      
+
       static StringTableEntry smGuidesPropertyName[ 2 ];
 
       // private methods
       void                 updateSelectedSet();
-      
+
       S32                  findGuide( guideAxis axis, const Point2I& point, U32 tolerance = 0 );
-      
-      RectI                getSnapRegion( snappingAxis axis, const Point2I& center ) const;   
+
+      RectI                getSnapRegion( snappingAxis axis, const Point2I& center ) const;
       void                 findSnaps( snappingAxis axis, const Point2I& mousePoint, const RectI& minRegion, const RectI& midRegion, const RectI& maxRegion );
       void                 registerSnap( snappingAxis axis, const Point2I& mousePoint, const Point2I& point, snappingEdges edge, GuiControl* ctrl = NULL );
-      
+
       void                 doSnapping( const GuiEvent& event, const RectI& selectionBounds, Point2I& delta );
       void                 doGuideSnap( const GuiEvent& event, const RectI& selectionBounds, const RectI& selectionBoundsGlobal, Point2I& delta );
       void                 doControlSnap( const GuiEvent& event, const RectI& selectionBounds, const RectI& selectionBoundsGlobal, Point2I& delta );
       void                 doGridSnap( const GuiEvent& event, const RectI& selectionBounds, const RectI& selectionBoundsGlobal, Point2I& delta );
       void                 snapToGrid( Point2I& point );
-      
+
       void                 startDragMove( const Point2I& startPoint );
-      void                 startDragRectangle( const Point2I& startPoint );      
+      void                 startDragRectangle( const Point2I& startPoint );
       void                 startDragClone( const Point2I& startPoint );
       void                 startMouseGuideDrag( guideAxis axis, U32 index, bool lockMouse = true );
-      
+
       void                 setMouseMode( mouseModes mode );
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onHierarchyChanged, () );
       DECLARE_CALLBACK( void, onDelete, () );
       DECLARE_CALLBACK( void, onPreEdit, ( SimSet* selection ) );
@@ -167,9 +167,9 @@ class GuiEditCtrl : public GuiControl
       DECLARE_CALLBACK( void, onMouseModeChange, () );
       DECLARE_CALLBACK( void, onControlInspectPreApply, ( GuiControl* control ) );
       DECLARE_CALLBACK( void, onControlInspectPostApply, ( GuiControl* control ) );
-      
+
       /// @}
-      
+
       static bool inNut( const Point2I &pt, S32 x, S32 y )
       {
          S32 dx = pt.x - x;
@@ -181,7 +181,7 @@ class GuiEditCtrl : public GuiControl
       {
          Point2I start;
          Point2I end;
-         
+
          if( axis == 0 )
          {
             start.x = end.x = offset;
@@ -194,10 +194,10 @@ class GuiEditCtrl : public GuiControl
             start.x = bounds.point.x;
             end.x = bounds.point.x + bounds.extent.x - 1;
          }
-         
+
          drawer->drawLine( start, end, color );
       }
-      
+
       static void snapDelta( snappingAxis axis, snappingEdges edge, S32 offset, const RectI& bounds, Point2I& delta )
       {
          switch( axis )
@@ -208,28 +208,28 @@ class GuiEditCtrl : public GuiControl
                   case SnapEdgeMin:
                      delta.x = offset - bounds.point.x;
                      break;
-                     
+
                   case SnapEdgeMid:
                      delta.x = offset - bounds.point.x - bounds.extent.x / 2;
                      break;
-                     
+
                   case SnapEdgeMax:
                      delta.x = offset - bounds.point.x - bounds.extent.x + 1;
                      break;
                }
                break;
-            
+
             case SnapHorizontal:
                switch( edge )
                {
                   case SnapEdgeMin:
                      delta.y = offset - bounds.point.y;
                      break;
-                     
+
                   case SnapEdgeMid:
                      delta.y = offset - bounds.point.y - bounds.extent.y / 2;
                      break;
-                     
+
                   case SnapEdgeMax:
                      delta.y = offset - bounds.point.y - bounds.extent.y + 1;
                      break;
@@ -241,14 +241,14 @@ class GuiEditCtrl : public GuiControl
    public:
 
       GuiEditCtrl();
-      
+
       DECLARE_CONOBJECT(GuiEditCtrl);
       DECLARE_CATEGORY( "Gui Editor" );
       DECLARE_DESCRIPTION( "Implements the framework for the GUI editor." );
 
       bool onWake();
       void onSleep();
-      
+
       static void initPersistFields();
 
       GuiControl*       getContentControl() const { return mContentControl; }
@@ -263,7 +263,7 @@ class GuiEditCtrl : public GuiControl
       void              addNewControl(GuiControl *ctrl);
       void              setCurrentAddSet(GuiControl *ctrl, bool clearSelection = true);
       GuiControl*       getCurrentAddSet();
-      
+
       // Selections.
 
       void              select( GuiControl *ctrl );
@@ -296,16 +296,16 @@ class GuiEditCtrl : public GuiControl
       void              selectChildren( bool addToSelection = false );
       void              cloneSelection();
       U32               getNumSelected() const { return mSelectedControls.size(); }
-      
+
       // Guides.
-      
+
       U32               addGuide( guideAxis axis, U32 offset ) { U32 index = mGuides[ axis ].size(); mGuides[ axis ].push_back( offset ); return index; }
       void              readGuides( guideAxis axis, GuiControl* ctrl );
       void              writeGuides( guideAxis axis, GuiControl* ctrl );
       void              clearGuides( guideAxis axis ) { mGuides[ axis ].clear(); }
 
       // Undo Access.
-      
+
       void              undo();
       void              redo();
 
@@ -327,7 +327,7 @@ class GuiEditCtrl : public GuiControl
       void              onMouseUp(const GuiEvent &event);
       void              onMouseDragged(const GuiEvent &event);
       void              onRightMouseDown(const GuiEvent &event);
-      
+
       mouseModes        getMouseMode() const { return mMouseDownMode; }
 
       virtual bool      onAdd();

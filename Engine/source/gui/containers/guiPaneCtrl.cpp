@@ -60,7 +60,7 @@ ConsoleDocClass( GuiPaneControl,
 GuiPaneControl::GuiPaneControl()
 {
    setMinExtent(Point2I(16,16));
-   
+
    mActive        = true;
    mCollapsable   = true;
    mCollapsed     = false;
@@ -79,7 +79,7 @@ GuiPaneControl::GuiPaneControl()
 void GuiPaneControl::initPersistFields()
 {
    addGroup( "Pane" );
-   
+
       addField("caption",       TypeRealString,  Offset(mCaption,        GuiPaneControl),
          "Text label to display as the pane header." );
       addField("captionID",     TypeString,      Offset(mCaptionID,      GuiPaneControl),
@@ -88,7 +88,7 @@ void GuiPaneControl::initPersistFields()
          "Whether the pane can be collapsed by clicking its header." );
       addField("barBehindText", TypeBool,        Offset(mBarBehindText,  GuiPaneControl),
          "Whether to draw the bitmapped pane bar behind the header text, too." );
-      
+
    endGroup( "Pane" );
 
    Parent::initPersistFields();

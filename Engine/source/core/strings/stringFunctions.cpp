@@ -223,38 +223,38 @@ char *dStrdup_r(const char *src, const char *fileName, dsize_t lineNumber)
 char* dStrichr( char* str, char ch )
 {
    AssertFatal( str != NULL, "dStrichr - NULL string" );
-   
+
    if( !ch )
-      return dStrchr( str, ch ); 
-   
+      return dStrchr( str, ch );
+
    char c = dToupper( ch );
    while( *str )
    {
       if( dToupper( *str ) == c )
          return str;
-         
+
       ++ str;
    }
-         
+
    return NULL;
 }
 
 const char* dStrichr( const char* str, char ch )
 {
    AssertFatal( str != NULL, "dStrichr - NULL string" );
-   
+
    if( !ch )
-      return dStrchr( str, ch ); 
+      return dStrchr( str, ch );
 
    char c = dToupper( ch );
    while( *str )
    {
       if( dToupper( *str ) == c )
          return str;
-         
+
       ++ str;
    }
-      
+
    return NULL;
 }
 
@@ -343,7 +343,7 @@ int dStrcmp( const UTF16 *str1, const UTF16 *str2)
 
    return ret;
 #endif
-}  
+}
 
 char* dStrupr(char *str)
 {
@@ -412,7 +412,7 @@ S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
 S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist)
 {
    S32 len = vsnprintf(buffer, bufferSize, format, (char*)arglist);
-   
+
    AssertWarn( len < bufferSize, "Buffer too small in call to dVsprintf!" );
 
    return (len);

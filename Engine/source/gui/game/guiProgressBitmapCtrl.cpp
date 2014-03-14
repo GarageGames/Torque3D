@@ -33,15 +33,15 @@ IMPLEMENT_CONOBJECT( GuiProgressBitmapCtrl );
 
 ConsoleDocClass( GuiProgressBitmapCtrl,
    "@brief A horizontal progress bar rendered from a repeating image.\n\n"
-   
+
    "This class is used give progress feedback to the user.  Unlike GuiProgressCtrl which simply "
    "renders a filled rectangle, GuiProgressBitmapCtrl renders the bar using a bitmap.\n\n"
-   
+
    "This bitmap can either be simple, plain image which is then stretched into the current extents of the bar "
    "as it fills up or it can be a bitmap array with three entries.  In the case of a bitmap array, the "
    "first entry in the array is used to render the left cap of the bar and the third entry in the array "
    "is used to render the right cap of the bar.  The second entry is streched in-between the two caps.\n\n"
-   
+
    "@tsexample\n"
       "// This example shows one way to break down a long-running computation into phases\n"
       "// and incrementally update a progress bar between the phases.\n"
@@ -108,9 +108,9 @@ ConsoleDocClass( GuiProgressBitmapCtrl,
       "   Progress.setValue( 1.0 );\n"
       "}\n"
    "@endtsexample\n\n"
-   
+
    "@see GuiProgressCtrl\n\n"
-   
+
    "@ingroup GuiValues"
 );
 
@@ -135,7 +135,7 @@ void GuiProgressBitmapCtrl::initPersistFields()
       "If the profile assigned to the control already has a bitmap assigned, this property need not be "
       "set in which case the bitmap from the profile is used."
    );
-   
+
    Parent::initPersistFields();
 }
 
@@ -150,7 +150,7 @@ void GuiProgressBitmapCtrl::setBitmap( const char* name )
    mBitmapName = StringTable->insert( name );
    if( awake )
       onWake();
-      
+
    setUpdate();
 }
 
@@ -197,15 +197,15 @@ void GuiProgressBitmapCtrl::onPreRender()
 //-----------------------------------------------------------------------------
 
 void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
-{	
+{
 	RectI ctrlRect(offset, getExtent());
-	
+
 	//grab lowest dimension
 	if(getHeight() <= getWidth())
 		mDim = getHeight();
 	else
 		mDim = getWidth();
-	
+
 	GFX->getDrawUtil()->clearBitmapModulation();
 
 	if(mNumberOfBitmaps == 1)
@@ -237,7 +237,7 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 			if (progressRect.extent.x < 0)
 				progressRect.extent.x = 0;
 			GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, progressRect, mProfile->mBitmapArrayRects[1]);
-		
+
 			//drawing right-end bitmap
 			RectI progressRectRight(progressRect.point.x + progressRect.extent.x, ctrlRect.point.y, mDim, mDim );
 			GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, progressRectRight, mProfile->mBitmapArrayRects[2]);
@@ -254,7 +254,7 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    //render the children
    renderChildControls(offset, updateRect);
-	
+
 }
 
 //-----------------------------------------------------------------------------

@@ -60,14 +60,14 @@ void BtBody::_releaseActor()
    SAFE_DELETE( mCompound );
    SAFE_DELETE( mCenterOfMass );
    SAFE_DELETE( mInvCenterOfMass );
-   
+
    mColShape = NULL;
 }
 
-bool BtBody::init(   PhysicsCollision *shape, 
+bool BtBody::init(   PhysicsCollision *shape,
                         F32 mass,
                         U32 bodyFlags,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world )
 {
    AssertFatal( obj, "BtBody::init - Got a null scene object!" );
@@ -76,7 +76,7 @@ bool BtBody::init(   PhysicsCollision *shape,
    AssertFatal( shape, "BtBody::init - Got a null collision shape!" );
    AssertFatal( dynamic_cast<BtCollision*>( shape ), "BtBody::init - The collision shape is the wrong type!" );
    AssertFatal( ((BtCollision*)shape)->getShape(), "BtBody::init - Got empty collision shape!" );
-	 
+
    // Cleanup any previous actor.
    _releaseActor();
 
@@ -85,7 +85,7 @@ bool BtBody::init(   PhysicsCollision *shape,
    mColShape = (BtCollision*)shape;
    btCollisionShape *btColShape = mColShape->getShape();
    MatrixF localXfm = mColShape->getLocalTransform();
-   btVector3 localInertia( 0, 0, 0 );   
+   btVector3 localInertia( 0, 0, 0 );
 
    // If we have a mass then we're dynamic.
    mIsDynamic = mass > 0.0f;
@@ -115,7 +115,7 @@ bool BtBody::init(   PhysicsCollision *shape,
          localXfm = btCast<MatrixF>( principal );
       }
 
-      // Note... this looks like we're changing the shape, but 
+      // Note... this looks like we're changing the shape, but
       // we're not.  All this does is ask the shape to calculate the
       // local inertia vector from the mass... the shape doesn't change.
       btColShape->calculateLocalInertia( mass, localInertia );
@@ -133,7 +133,7 @@ bool BtBody::init(   PhysicsCollision *shape,
 
    mMass = mass;
    mActor = new btRigidBody( mass, NULL, btColShape, localInertia );
-   
+
    int btFlags = mActor->getCollisionFlags();
 
    if ( bodyFlags & BF_TRIGGER )
@@ -157,14 +157,14 @@ bool BtBody::init(   PhysicsCollision *shape,
 }
 
 void BtBody::setMaterial(  F32 restitution,
-                           F32 friction, 
+                           F32 friction,
                            F32 staticFriction )
 {
    AssertFatal( mActor, "BtBody::setMaterial - The actor is null!" );
 
    mActor->setRestitution( restitution );
 
-   // TODO: Weird.. Bullet doesn't have seperate dynamic 
+   // TODO: Weird.. Bullet doesn't have seperate dynamic
    // and static friction.
    //
    // Either add it and submit it as an official patch
@@ -205,8 +205,8 @@ void BtBody::getState( PhysicsState *outState )
 
    outState->position = trans.getPosition();
    outState->orientation.set( trans );
-   outState->linVelocity = btCast<Point3F>( mActor->getLinearVelocity() ); 
-   outState->angVelocity = btCast<Point3F>( mActor->getAngularVelocity() ); 
+   outState->linVelocity = btCast<Point3F>( mActor->getLinearVelocity() );
+   outState->angVelocity = btCast<Point3F>( mActor->getAngularVelocity() );
    outState->sleeping = !mActor->isActive();
 
    // Bullet doesn't keep the momentum... recalc it.
@@ -269,12 +269,12 @@ void BtBody::setSleeping( bool sleeping )
    }
 }
 
-PhysicsWorld* BtBody::getWorld() 
+PhysicsWorld* BtBody::getWorld()
 {
-   return mWorld; 
+   return mWorld;
 }
 
-PhysicsCollision* BtBody::getColShape() 
+PhysicsCollision* BtBody::getColShape()
 {
    return mColShape;
 }
@@ -299,10 +299,10 @@ void BtBody::setTransform( const MatrixF &transform )
    {
       MatrixF xfm;
       xfm.mul( transform, *mCenterOfMass );
-      mActor->setCenterOfMassTransform( btCast<btTransform>( xfm ) ); 
+      mActor->setCenterOfMassTransform( btCast<btTransform>( xfm ) );
    }
    else
-      mActor->setCenterOfMassTransform( btCast<btTransform>( transform ) ); 
+      mActor->setCenterOfMassTransform( btCast<btTransform>( transform ) );
 
    // If its dynamic we have more to do.
    if ( isDynamic() )
@@ -324,10 +324,10 @@ void BtBody::applyCorrection( const MatrixF &transform )
    {
       MatrixF xfm;
       xfm.mul( transform, *mCenterOfMass );
-      mActor->setCenterOfMassTransform( btCast<btTransform>( xfm ) ); 
+      mActor->setCenterOfMassTransform( btCast<btTransform>( xfm ) );
    }
    else
-      mActor->setCenterOfMassTransform( btCast<btTransform>( transform ) ); 
+      mActor->setCenterOfMassTransform( btCast<btTransform>( transform ) );
 }
 
 void BtBody::applyImpulse( const Point3F &origin, const Point3F &force )
@@ -357,7 +357,7 @@ void BtBody::applyImpulse( const Point3F &origin, const Point3F &force )
 }
 
 Box3F BtBody::getWorldBounds()
-{   
+{
    btVector3 min, max;
    mActor->getAabb( min, max );
 

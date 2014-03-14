@@ -52,12 +52,12 @@ void Dispatch(DispatchType,HWND hWnd,UINT message,WPARAM wparam,WPARAM lparam);
 /// @li Both Begin and End are specified as message values, ex WM_MOUSEMOVE
 /// @li Specifying an identical set of begin/end will remove all messages matching that message value (WM_MOUSEMOVE)
 /// @li If you specify a range it will remove from that beginning value through the end value
-/// 
+///
 /// @note : The range is useful because on windows messages declared such that you can filter a block of
-///  messages just by specifying the beginning value and end.  
+///  messages just by specifying the beginning value and end.
 ///  ex. WM_MOUSEFIRST,WM_MOUSELAST range will match all mouse messages.
 
-/// 
+///
 /// @param hWnd The HWND to filter by, this cannot be combined with a msg range filter currently
 /// @param msgBegin The beginning msg value to filter from
 /// @param msgEnd The ending msg value to filter to

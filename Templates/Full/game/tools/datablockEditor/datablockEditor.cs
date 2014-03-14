@@ -43,9 +43,9 @@ function DatablockEditorPlugin::onWorldEditorStartup( %this )
 {
    // Add ourselves to the window menu.
    %accel = EditorGui.addToEditorsMenu( "Datablock Editor", "", DatablockEditorPlugin );
-   
+
    // Add ourselves to the ToolsToolbar
-   %tooltip = "Datablock Editor (" @ %accel @ ")"; 
+   %tooltip = "Datablock Editor (" @ %accel @ ")";
    EditorGui.addToToolsToolbar( "DatablockEditorPlugin", "DatablockEditorPalette", expandFilename("tools/worldEditor/images/toolbar/datablock-editor"), %tooltip );
 
    //connect editor windows
@@ -58,25 +58,25 @@ function DatablockEditorPlugin::onActivated( %this )
 {
    EditorGui-->WorldEditorToolbar.setVisible(false);
    EditorGui.bringToFront( DatablockEditorPlugin );
-   
+
    DatablockEditorTreeWindow.setVisible( true );
    DatablockEditorInspectorWindow.setVisible( true );
    DatablockEditorInspectorWindow.makeFirstResponder( true );
-   
+
    %this.map.push();
 
    // Set the status bar here until all tool have been hooked up
    EditorGuiStatusBar.setInfo( "Datablock editor." );
-   
+
    %numSelected = %this.getNumSelectedDatablocks();
    if( !%numSelected )
       EditorGuiStatusBar.setSelection( "" );
    else
       EditorGuiStatusBar.setSelection( %numSelected @ " datablocks selected" );
-      
+
    %this.init();
    DatablockEditorPlugin.readSettings();
-   
+
    if( EWorldEditor.getSelectionSize() == 1 )
       %this.onObjectSelected( EWorldEditor.getSelectedObject( 0 ) );
 
@@ -88,11 +88,11 @@ function DatablockEditorPlugin::onActivated( %this )
 function DatablockEditorPlugin::onDeactivated( %this )
 {
    DatablockEditorPlugin.writeSettings();
-   
+
    DatablockEditorInspectorWindow.setVisible( false );
    DatablockEditorTreeWindow.setVisible( false );
    %this.map.pop();
-   
+
    Parent::onDeactivated(%this);
 }
 
@@ -125,7 +125,7 @@ function DatablockEditorPlugin::setEditorFunction( %this )
 function DatablockEditorPlugin::onObjectSelected( %this, %object )
 {
    // Select datablock of object if this is a GameBase object.
-   
+
    if( %object.isMemberOfClass( "GameBase" ) )
       %this.selectDatablock( %object.getDatablock() );
    else if( %object.isMemberOfClass( "SFXEmitter" ) && isObject( %object.track ) )
@@ -139,47 +139,47 @@ function DatablockEditorPlugin::onObjectSelected( %this, %object )
 function DatablockEditorPlugin::populateTrees(%this)
 {
    // Populate datablock tree.
-      
+
    if( %this.excludeClientOnlyDatablocks )
       %set = DataBlockGroup;
    else
       %set = DataBlockSet;
 
    DatablockEditorTree.clear();
-   
+
    foreach( %datablock in %set )
    {
       %unlistedFound = false;
       %id = %datablock.getId();
-      
+
       foreach( %obj in UnlistedDatablocks )
          if( %obj.getId() == %id )
          {
             %unlistedFound = true;
             break;
          }
-   
+
       if( %unlistedFound )
          continue;
-         
+
       %this.addExistingItem( %datablock, true );
    }
-   
+
    DatablockEditorTree.sort( 0, true, false, false );
-   
+
    // Populate datablock type tree.
-   
+
    %classList = enumerateConsoleClasses( "SimDatablock" );
    DatablockEditorTypeTree.clear();
-   
+
    foreach$( %datablockClass in %classList )
    {
       if(    !%this.isExcludedDatablockType( %datablockClass )
           && DatablockEditorTypeTree.findItemByName( %datablockClass ) == 0 )
          DatablockEditorTypeTree.insertItem( 0, %datablockClass );
    }
-   
-   DatablockEditorTypeTree.sort( 0, false, false, false );   
+
+   DatablockEditorTypeTree.sort( 0, false, false, false );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -187,9 +187,9 @@ function DatablockEditorPlugin::populateTrees(%this)
 function DatablockEditorPlugin::addExistingItem( %this, %datablock, %dontSort )
 {
    %tree = DatablockEditorTree;
-   
+
    // Look up class at root level.  Create if needed.
-   
+
    %class = %datablock.getClassName();
    %parentID = %tree.findItemByName( %class );
    if( %parentID == 0 )
@@ -197,21 +197,21 @@ function DatablockEditorPlugin::addExistingItem( %this, %datablock, %dontSort )
 
    // If the datablock is already there, don't
    // do anything.
-   
+
    if( %tree.findItemByValue( %datablock.getId() ) )
       return;
-      
+
    // It doesn't exist so add it.
 
    %name = %datablock.getName();
    if( %this.PM.isDirty( %datablock ) )
       %name = %name @ " *";
-         
+
    %id = DatablockEditorTree.insertItem( %parentID, %name, %datablock.getId() );
    if( !%dontSort )
       DatablockEditorTree.sort( %parentID, false, false, false );
-         
-   return %id;   
+
+   return %id;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ function DatablockEditorPlugin::isExcludedDatablockType( %this, %className )
       case "SimDatablock":
          return true;
       case "SFXTrack": // Abstract.
-         return true;  
+         return true;
       case "SFXFMODEvent": // Internally created.
          return true;
       case "SFXFMODEventGroup": // Internally created.
@@ -241,9 +241,9 @@ function DatablockEditorPlugin::isExcludedDatablockType( %this, %className )
 function DatablockEditorPlugin::initSettings( %this )
 {
    EditorSettings.beginGroup("DatablockEditor", true);
-   
+
       EditorSettings.setDefaultValue("libraryTab", "0");
-   
+
    EditorSettings.endGroup();
 }
 
@@ -252,13 +252,13 @@ function DatablockEditorPlugin::initSettings( %this )
 function DatablockEditorPlugin::readSettings( %this )
 {
    EditorSettings.beginGroup("DatablockEditor", true);
-   
+
       DatablockEditorTreeTabBook.selectPage( EditorSettings.value( "libraryTab" ) );
       %db = EditorSettings.value( "selectedDatablock" );
       if( isObject( %db ) && %db.isMemberOfClass( "SimDatablock" ) )
          %this.selectDatablock( %db );
-   
-   EditorSettings.endGroup();  
+
+   EditorSettings.endGroup();
 }
 
 //---------------------------------------------------------------------------------------------
@@ -266,7 +266,7 @@ function DatablockEditorPlugin::readSettings( %this )
 function DatablockEditorPlugin::writeSettings( %this )
 {
    EditorSettings.beginGroup( "DatablockEditor", true );
-   
+
       EditorSettings.setValue( "libraryTab", DatablockEditorTreeTabBook.getSelectedPage() );
       if( %this.getNumSelectedDatablocks() > 0 )
          EditorSettings.setValue( "selectedDatablock", %this.getSelectedDatablock().getName() );
@@ -292,17 +292,17 @@ function DatablockEditorPlugin::isDirty( %this )
 function DatablockEditorPlugin::selectedDatablockIsDirty( %this )
 {
    %tree = DatablockEditorTree;
-   
+
    %count = %tree.getSelectedItemsCount();
    %selected = %tree.getSelectedItemList();
-   
+
    foreach$( %id in %selected )
    {
       %db = %tree.getItemValue( %id );
       if( %this.PM.isDirty( %db ) )
          return true;
    }
-   
+
    return false;
 }
 
@@ -347,13 +347,13 @@ function DatablockEditorPlugin::flagInspectorAsDirty( %this, %dirty )
 function DatablockEditorPlugin::flagDatablockAsDirty(%this, %datablock, %dirty )
 {
    %tree = DatablockEditorTree;
-   
+
    %id = %tree.findItemByValue( %datablock.getId() );
    if( %id == 0 )
       return;
 
    // Tag the item caption and sync the persistence manager.
-      
+
    if( %dirty )
    {
       DatablockEditorTree.editItem( %id, %datablock.getName() @ " *", %datablock.getId() );
@@ -364,9 +364,9 @@ function DatablockEditorPlugin::flagDatablockAsDirty(%this, %datablock, %dirty )
       DatablockEditorTree.editItem( %id, %datablock.getName(), %datablock.getId() );
       %this.PM.removeDirty( %datablock );
    }
-   
+
    // Sync the inspector dirty state.
-   
+
    %this.flagInspectorAsDirty( %this.PM.hasDirty() );
 }
 
@@ -395,25 +395,25 @@ function DatablockEditorPlugin::saveNewFileFinish( %this, %newFileName )
    {
       %db = %tree.getItemValue( %id );
       %db = %this.getSelectedDatablock();
-   
+
       // Remove from current file.
-   
+
       %oldFileName = %db.getFileName();
       if( %oldFileName !$= "" )
          %this.PM.removeObjectFromFile( %db, %oldFileName );
-   
+
       // Save to new file.
 
       %this.PM.setDirty( %db, %newFileName );
       if( %this.PM.saveDirtyObject( %db ) )
       {
          // Clear dirty state.
-   
+
          %this.flagDatablockAsDirty( %db, false );
       }
    }
-   
-   DatablockEditorInspectorWindow-->DatablockFile.setText( %newFileName );   
+
+   DatablockEditorInspectorWindow-->DatablockFile.setText( %newFileName );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -428,12 +428,12 @@ function DatablockEditorPlugin::save( %this )
    %tree = DatablockEditorTree;
    %count = %tree.getSelectedItemsCount();
    %selected = %tree.getSelectedItemList();
-   
+
    for( %i = 0; %i < %count; %i ++ )
    {
       %id = getWord( %selected, %i );
       %db = %tree.getItemValue( %id );
-      
+
       if( %this.PM.isDirty( %db ) )
       {
          %this.PM.saveDirtyObject( %db );
@@ -460,12 +460,12 @@ function DatablockEditorPlugin::getSelectedDatablock( %this, %index )
    %tree = DatablockEditorTree;
    if( !%tree.getSelectedItemsCount() )
       return 0;
-      
+
    if( !%index )
       %id = %tree.getSelectedItem();
    else
       %id = getWord( %tree.getSelectedItemList(), %index );
-      
+
    return %tree.getItemValue( %id );
 }
 
@@ -474,8 +474,8 @@ function DatablockEditorPlugin::getSelectedDatablock( %this, %index )
 function DatablockEditorPlugin::resetSelectedDatablock( %this )
 {
    DatablockEditorTree.clearSelection();
-   DatablockEditorInspector.inspect(0);   
-   DatablockEditorInspectorWindow-->DatablockFile.setText("");     
+   DatablockEditorInspector.inspect(0);
+   DatablockEditorInspectorWindow-->DatablockFile.setText("");
 
    EditorGuiStatusBar.setSelection( "" );
 }
@@ -498,25 +498,25 @@ function DatablockEditorPlugin::selectDatablock( %this, %datablock, %add, %dontS
       DatablockEditorInspector.addInspect( %datablock );
    else
       DatablockEditorInspector.inspect( %datablock );
-   
+
    if( !%dontSyncTree )
    {
       %id = DatablockEditorTree.findItemByValue( %datablock.getId() );
-   
+
       if( !%add )
          DatablockEditorTree.clearSelection();
-      
+
       DatablockEditorTree.selectItem( %id, true );
       DatablockEditorTree.scrollVisible( %id );
    }
-   
+
    %this.syncDirtyState();
-                  
+
    // Update the filename text field.
-   
+
    %numSelected = %this.getNumSelectedDatablocks();
    %fileNameField = DatablockEditorInspectorWindow-->DatablockFile;
-   
+
    if( %numSelected == 1 )
    {
       %fileName = %datablock.getFilename();
@@ -538,18 +538,18 @@ function DatablockEditorPlugin::selectDatablock( %this, %datablock, %add, %dontS
 function DatablockEditorPlugin::unselectDatablock( %this, %datablock, %dontSyncTree )
 {
    DatablockEditorInspector.removeInspect( %datablock );
-   
+
    if( !%dontSyncTree )
    {
       %id = DatablockEditorTree.findItemByValue( %datablock.getId() );
       DatablockEditorTree.selectItem( %id, false );
    }
-   
+
    %this.syncDirtyState();
 
    // If we have exactly one selected datablock remaining, re-enable
    // the save-as button.
-   
+
    %numSelected = %this.getNumSelectedDatablocks();
    if( %numSelected == 1 )
    {
@@ -572,34 +572,34 @@ function DatablockEditorPlugin::unselectDatablock( %this, %datablock, %dontSyncT
 function DatablockEditorPlugin::deleteDatablock( %this )
 {
    %tree = DatablockEditorTree;
-   
+
    // If we have more than single datablock selected,
    // turn our undos into a compound undo.
-   
+
    %numSelected = %tree.getSelectedItemsCount();
    if( %numSelected > 1 )
       Editor.getUndoManager().pushCompound( "Delete Multiple Datablocks" );
-      
+
    for( %i = 0; %i < %numSelected; %i ++ )
    {
       %id = %tree.getSelectedItem( %i );
       %db = %tree.getItemValue( %id );
-      
+
       %fileName = %db.getFileName();
-      
+
       // Remove the datablock from the tree.
-      
+
       DatablockEditorTree.removeItem( %id );
-      
+
       // Create undo.
 
-      %action = %this.createUndo( ActionDeleteDatablock, "Delete Datablock" ); 
+      %action = %this.createUndo( ActionDeleteDatablock, "Delete Datablock" );
       %action.db = %db;
       %action.dbName = %db.getName();
       %action.fname = %fileName;
-      
+
       %this.submitUndo( %action );
-      
+
       // Kill the datablock in the file.
 
       if( %fileName !$= "" )
@@ -613,19 +613,19 @@ function DatablockEditorPlugin::deleteDatablock( %this )
          MessageBoxOk( "Datablock Deleted", "The datablock (" @ %db.getName() @ ") has been removed from " @
                        "it's file (" @ %db.getFilename() @ ") and upon restart will cease to exist" );
    }
-   
+
    // Close compound, if we were deleting multiple datablocks.
-   
+
    if( %numSelected > 1 )
       Editor.getUndoManager().popCompound();
-   
+
    // Show confirmation for multiple datablocks.
-   
+
    if( %numSelected > 1 )
       MessageBoxOk( "Datablocks Deleted", "The datablocks have been deleted and upon restart will cease to exist." );
 
    // Clear selection.
-      
+
    DatablockEditorPlugin.resetSelectedDatablock();
 }
 
@@ -635,40 +635,40 @@ function DatablockEditorPlugin::createDatablock(%this)
 {
    %class = DatablockEditorTypeTree.getItemText(DatablockEditorTypeTree.getSelectedItem());
    if( %class !$= "" )
-   {  
+   {
       // Need to prompt for a name.
-      
+
       DatablockEditorCreatePrompt-->CreateDatablockName.setText("Name");
       DatablockEditorCreatePrompt-->CreateDatablockName.selectAllText();
-      
+
       // Populate the copy source dropdown.
-      
+
       %list = DatablockEditorCreatePrompt-->CopySourceDropdown;
       %list.clear();
       %list.add( "", 0 );
-      
+
       %set = DataBlockSet;
       %count = %set.getCount();
       for( %i = 0; %i < %count; %i ++ )
       {
          %datablock = %set.getObject( %i );
          %datablockClass = %datablock.getClassName();
-         
+
          if( !isMemberOfClass( %datablockClass, %class ) )
             continue;
-            
+
          %list.add( %datablock.getName(), %i + 1 );
       }
-      
+
       // Set up state of client-side checkbox.
-      
+
       %clientSideCheckBox = DatablockEditorCreatePrompt-->ClientSideCheckBox;
       %canBeClientSide = DatablockEditorPlugin::canBeClientSideDatablock( %class );
       %clientSideCheckBox.setStateOn( %canBeClientSide );
       %clientSideCheckBox.setActive( %canBeClientSide );
-      
+
       // Show the dialog.
-      
+
       canvas.pushDialog( DatablockEditorCreatePrompt, 0, true );
    }
 }
@@ -680,14 +680,14 @@ function DatablockEditorPlugin::createPromptNameCheck(%this)
    %name = DatablockEditorCreatePrompt-->CreateDatablockName.getText();
    if( !Editor::validateObjectName( %name, true ) )
       return;
-      
+
    // Fetch the copy source and clear the list.
-   
+
    %copySource = DatablockEditorCreatePrompt-->copySourceDropdown.getText();
    DatablockEditorCreatePrompt-->copySourceDropdown.clear();
-   
+
    // Remove the dialog and create the datablock.
-   
+
    canvas.popDialog( DatablockEditorCreatePrompt );
    %this.createDatablockFinish( %name, %copySource );
 }
@@ -698,27 +698,27 @@ function DatablockEditorPlugin::createDatablockFinish( %this, %name, %copySource
 {
    %class = DatablockEditorTypeTree.getItemText(DatablockEditorTypeTree.getSelectedItem());
    if( %class !$= "" )
-   {  
+   {
       %action = %this.createUndo( ActionCreateDatablock, "Create New Datablock" );
-      
+
       if( DatablockEditorCreatePrompt-->ClientSideCheckBox.isStateOn() )
          %dbType = "singleton ";
       else
          %dbType = "datablock ";
-      
+
       if( %copySource !$= "" )
          %eval = %dbType @ %class @ "(" @ %name @ " : " @ %copySource @ ") { canSaveDynamicFields = \"1\"; };";
       else
          %eval = %dbType @ %class @ "(" @ %name @ ") { canSaveDynamicFields = \"1\"; };";
-         
+
       %res = eval( %eval );
-      
+
       %action.db = %name.getId();
       %action.dbName = %name;
       %action.fname = $DATABLOCK_EDITOR_DEFAULT_FILENAME;
-      
+
       %this.submitUndo( %action );
-      
+
       %action.redo();
    }
 }
@@ -737,7 +737,7 @@ function DatablockEditorPlugin::canBeClientSideDatablock( %className )
            "SFXDescription" or
            "SFXFMODProject":
          return true;
-         
+
       default:
          return false;
    }
@@ -752,8 +752,8 @@ function DatablockEditorPlugin::canBeClientSideDatablock( %className )
 function DatablockEditorInspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // Same work to do as for the regular WorldEditor Inspector.
-   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );   
-   
+   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );
+
    DatablockEditorPlugin.flagDatablockAsDirty( %object, true );
 }
 
@@ -789,7 +789,7 @@ function DatablockEditorInspector::onClear( %this )
 
 function DatablockEditorTree::onDeleteSelection( %this )
 {
-   %this.undoDeleteList = "";   
+   %this.undoDeleteList = "";
 }
 
 //---------------------------------------------------------------------------------------------
@@ -798,7 +798,7 @@ function DatablockEditorTree::onDeleteObject( %this, %object )
 {
    // Append it to our list.
    %this.undoDeleteList = %this.undoDeleteList TAB %object;
-              
+
    // We're gonna delete this ourselves in the
    // completion callback.
    return true;
@@ -809,8 +809,8 @@ function DatablockEditorTree::onDeleteObject( %this, %object )
 function DatablockEditorTree::onObjectDeleteCompleted( %this )
 {
    //MEDeleteUndoAction::submit( %this.undoDeleteList );
-   
-   // Let the world editor know to 
+
+   // Let the world editor know to
    // clear its selection.
    //EWorldEditor.clearSelection();
    //EWorldEditor.isDirty = true;
@@ -828,7 +828,7 @@ function DatablockEditorTree::onClearSelected(%this)
 function DatablockEditorTree::onAddSelection( %this, %id )
 {
    %obj = %this.getItemValue( %id );
-   
+
    if( !isObject( %obj ) )
       %this.selectItem( %id, false );
    else
@@ -851,19 +851,19 @@ function DatablockEditorTree::onRightMouseUp( %this, %id, %mousePos )
    %datablock = %this.getItemValue( %id );
    if( !isObject( %datablock ) )
       return;
-      
+
    if( !isObject( DatablockEditorTreePopup ) )
       new PopupMenu( DatablockEditorTreePopup )
       {
          superClass = "MenuBuilder";
          isPopup = true;
-         
+
          item[ 0 ] = "Delete" TAB "" TAB "DatablockEditorPlugin.selectDatablock( %this.datablockObject ); DatablockEditorPlugin.deleteDatablock( %this.datablockObject );";
          item[ 1 ] = "Jump to Definition in Torsion" TAB "" TAB "EditorOpenDeclarationInTorsion( %this.datablockObject );";
-         
+
          datablockObject = "";
       };
-      
+
    DatablockEditorTreePopup.datablockObject = %datablock;
    DatablockEditorTreePopup.showPopup( Canvas );
 }
@@ -877,9 +877,9 @@ function DatablockEditorTreeTabBook::onTabSelected(%this, %text, %id)
       case 0:
          DatablockEditorTreeWindow-->DeleteSelection.visible = true;
          DatablockEditorTreeWindow-->CreateSelection.visible = false;
-      
+
       case 1:
          DatablockEditorTreeWindow-->DeleteSelection.visible = false;
-         DatablockEditorTreeWindow-->CreateSelection.visible = true;               
+         DatablockEditorTreeWindow-->CreateSelection.visible = true;
    }
 }

@@ -30,8 +30,8 @@ singleton GuiControlProfile( RoadEditorProfile )
 
 singleton GuiControlProfile (GuiSimpleBorderProfile)
 {
-   opaque = false;   
-   border = 1;   
+   opaque = false;
+   border = 1;
    category = "Editor";
 };
 
@@ -41,7 +41,7 @@ singleton GuiCursor(RoadEditorMoveCursor)
    renderOffset = "0 0";
    bitmapName = "~/gui/images/macCursor";
    category = "Editor";
-};  
+};
 
 singleton GuiCursor( RoadEditorMoveNodeCursor )
 {

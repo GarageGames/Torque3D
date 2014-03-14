@@ -37,7 +37,7 @@ SFXFMODVoice* SFXFMODVoice::create( SFXFMODDevice *device,
    return new SFXFMODVoice( device, buffer );
 }
 
-SFXFMODVoice::SFXFMODVoice(   SFXFMODDevice *device, 
+SFXFMODVoice::SFXFMODVoice(   SFXFMODDevice *device,
                               SFXFMODBuffer *buffer )
    :  Parent( buffer ),
       mDevice( device ),
@@ -66,7 +66,7 @@ SFXStatus SFXFMODVoice::_status() const
       if ( isTrue )
          return SFXStatusPlaying;
    }
-   
+
    SFXFMODDevice::smFunc->FMOD_Channel_Stop( mChannel );
    mChannel = NULL;
 
@@ -91,7 +91,7 @@ void SFXFMODVoice::_stop()
 {
    if( mChannel )
       SFXFMODDevice::smFunc->FMOD_Channel_Stop(mChannel);
-      
+
 	mChannel = NULL;
 }
 
@@ -112,12 +112,12 @@ bool SFXFMODVoice::_assignChannel()
    // depend on having a channel (position, volume, etc).  According to the FMod docs
    // it is ok to do this.
    bool success = SFXFMODDevice::smFunc->FMOD_System_PlaySound(
-      SFXFMODDevice::smSystem, 
-      FMOD_CHANNEL_FREE, 
-      _getBuffer()->mSound, 
-      true, 
+      SFXFMODDevice::smSystem,
+      FMOD_CHANNEL_FREE,
+      _getBuffer()->mSound,
+      true,
       &mChannel ) == FMOD_OK;
-      
+
    if( success )
    {
       SFXFMODDevice::smFunc->FMOD_Channel_SetMode( mChannel, mMode );
@@ -137,8 +137,8 @@ bool SFXFMODVoice::_assignChannel()
       if( mSetFlags.test( SET_Pitch ) )
          SFXFMODDevice::smFunc->FMOD_Channel_SetFrequency( mChannel, mFrequency );
       if( mSetFlags.test( SET_Cone ) )
-         SFXFMODDevice::smFunc->FMOD_Channel_Set3DConeSettings( 
-            mChannel, 
+         SFXFMODDevice::smFunc->FMOD_Channel_Set3DConeSettings(
+            mChannel,
             mConeInnerAngle,
             mConeOuterAngle,
             mConeOuterVolume );
@@ -147,7 +147,7 @@ bool SFXFMODVoice::_assignChannel()
       if( mSetFlags.test( SET_Reverb ) )
          SFXFMODDevice::smFunc->FMOD_Channel_SetReverbProperties( mChannel, &mReverb );
    }
-   
+
    return success;
 }
 
@@ -165,10 +165,10 @@ void SFXFMODVoice::setMinMaxDistance( F32 min, F32 max )
 {
 	if ( !( _getBuffer()->mMode & FMOD_3D ) )
 		return;
-      
+
    mMinDistance = min;
    mMaxDistance = max;
-   
+
    mSetFlags.set( SET_MinMaxDistance );
 
    if( mChannel )
@@ -179,7 +179,7 @@ void SFXFMODVoice::play( bool looping )
 {
    if( mBuffer->isStreaming() )
       looping = true;
-   
+
    mMode = mDevice->get3dRollOffMode();
    mMode |= (looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 
@@ -191,12 +191,12 @@ void SFXFMODVoice::setVelocity( const VectorF& velocity )
 	if( !( _getBuffer()->mMode & FMOD_3D ) )
 		return;
 
-	// Note we have to do a handedness swap; see the 
+	// Note we have to do a handedness swap; see the
    // listener update code in SFXFMODDevice for details.
 	mVelocity.x = velocity.x;
    mVelocity.y = velocity.z;
 	mVelocity.z = velocity.y;
-   
+
    mSetFlags.set( SET_Velocity );
 
    if( mChannel )
@@ -211,11 +211,11 @@ void SFXFMODVoice::setTransform( const MatrixF& transform )
    transform.getColumn( 3, (Point3F*)&mPosition );
    transform.getColumn( 1, (Point3F*)&mDirection );
 
-   // Note we have to do a handedness swap; see the 
+   // Note we have to do a handedness swap; see the
    // listener update code in SFXFMODDevice for details.
    swap( mPosition.y, mPosition.z );
    swap( mDirection.y, mDirection.z );
-   
+
    mSetFlags.set( SET_Transform );
 
    if( mChannel )
@@ -230,7 +230,7 @@ void SFXFMODVoice::setVolume( F32 volume )
 {
    mVolume = volume;
    mSetFlags.set( SET_Volume );
-   
+
    if( mChannel )
       SFXFMODDevice::smFunc->FMOD_Channel_SetVolume( mChannel, volume );
 }
@@ -239,7 +239,7 @@ void SFXFMODVoice::setPriority( F32 priority )
 {
    mPriority = priority;
    mSetFlags.set( SET_Priority );
-   
+
    if( mChannel )
       SFXFMODDevice::smFunc->FMOD_Channel_SetPriority( mChannel, TorquePriorityToFMODPriority( priority ) );
 }
@@ -250,9 +250,9 @@ void SFXFMODVoice::setPitch( F32 pitch )
    F32 frequency = _getBuffer()->getFormat().getSamplesPerSecond();
    if ( frequency == 0 )
       return;
-      
+
    mFrequency = frequency * pitch;
-   
+
    mSetFlags.set( SET_Pitch );
 
 	// Scale the original frequency by the pitch factor.
@@ -265,12 +265,12 @@ void SFXFMODVoice::setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )
    mConeInnerAngle = innerAngle;
    mConeOuterAngle = outerAngle;
    mConeOuterVolume = outerVolume;
-   
+
    mSetFlags.set( SET_Cone );
 
    if( mChannel )
-      SFXFMODDevice::smFunc->FMOD_Channel_Set3DConeSettings( 
-         mChannel, 
+      SFXFMODDevice::smFunc->FMOD_Channel_Set3DConeSettings(
+         mChannel,
          mConeInnerAngle,
          mConeOuterAngle,
          mConeOuterVolume );
@@ -279,13 +279,13 @@ void SFXFMODVoice::setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )
 void SFXFMODVoice::setReverb( const SFXSoundReverbProperties& reverb )
 {
    dMemset( &mReverb, 0, sizeof( mReverb ) );
-   
+
    mReverb.Direct                = reverb.mDirect;
    mReverb.Room                  = reverb.mRoom;
    mReverb.Flags                 = reverb.mFlags;
-   
+
    mSetFlags.set( SET_Reverb );
-   
+
    if( mChannel )
       SFXFMODDevice::smFunc->FMOD_Channel_SetReverbProperties( mChannel, &mReverb );
 }

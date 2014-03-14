@@ -36,7 +36,7 @@
 
 IMPLEMENT_CONOBJECT(RenderMeshMgr);
 
-ConsoleDocClass( RenderMeshMgr, 
+ConsoleDocClass( RenderMeshMgr,
    "@brief A render bin for mesh rendering.\n\n"
    "This is the primary render bin in Torque which does most of the "
    "work of rendering DTS shapes and arbitrary mesh geometry.  It knows "
@@ -128,7 +128,7 @@ void RenderMeshMgr::render(SceneRenderState * state)
       setupSGData( ri, sgData );
       BaseMatInstance *mat = ri->matInst;
 
-      // If we have an override delegate then give it a 
+      // If we have an override delegate then give it a
       // chance to swap the material with another.
       if ( mMatOverrideDelegate )
       {

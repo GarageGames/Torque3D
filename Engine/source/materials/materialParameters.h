@@ -27,8 +27,8 @@
 #endif
 
 ///
-/// Similar class to GFXShaderConsts, but this is to describe generic material parameters.  
-/// 
+/// Similar class to GFXShaderConsts, but this is to describe generic material parameters.
+///
 class MaterialParameterHandle
 {
 public:
@@ -92,7 +92,7 @@ public:
    /// Returns the alignment value for the constType in bytes.
    virtual U32 getAlignmentValue(const GFXShaderConstType constType) { return 0; }
 
-protected:   
+protected:
    Vector<GFXShaderConstDesc> mShaderConstDesc;
 };
 

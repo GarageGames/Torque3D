@@ -93,7 +93,7 @@ function serverCmdMissionStartPhase2Ack(%client, %seq, %playerDB)
    if (%client.currentPhase != 1.5)
       return;
    %client.currentPhase = 2;
-   
+
    // Set the player datablock choice
    %client.playerDB = %playerDB;
 
@@ -102,7 +102,7 @@ function serverCmdMissionStartPhase2Ack(%client, %seq, %playerDB)
 
    // Start ghosting objects to the client
    %client.activateGhosting();
-   
+
 }
 
 function GameConnection::clientWantsGhostAlwaysRetry(%client)
@@ -130,9 +130,9 @@ function serverCmdMissionStartPhase3Ack(%client, %seq)
    if(%client.currentPhase != 2)
       return;
    %client.currentPhase = 3;
-   
+
    // Server is ready to drop into the game
-   
+
    if ( $Pref::Server::MinPlayers > 1 )
    {
       PlayerReady(%client);

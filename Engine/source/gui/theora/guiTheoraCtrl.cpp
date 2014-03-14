@@ -34,10 +34,10 @@ IMPLEMENT_CONOBJECT( GuiTheoraCtrl );
 
 ConsoleDocClass( GuiTheoraCtrl,
    "@brief A control to playing Theora videos.\n\n"
-   
+
    "This control can be used to play videos in the Theora video format.  The videos may include audio in Vorbis format.  The "
    "codecs for both formats are integrated with the engine and no codecs must be present on the user's machine.\n\n"
-   
+
    "@tsexample\n"
    "%video = new GuiTheoraCtrl()\n"
    "{\n"
@@ -49,7 +49,7 @@ ConsoleDocClass( GuiTheoraCtrl,
    "Canvas.setContent( %video );\n"
    "%video.play();\n"
    "@endtsexample\n\n"
-   
+
    "@see http://www.theora.org\n\n"
    "@ingroup GuiImages"
 );
@@ -73,7 +73,7 @@ GuiTheoraCtrl::GuiTheoraCtrl()
    mPlayOnWake       = true;
    mRenderDebugInfo  = false;
    mTranscoder       = OggTheoraDecoder::TRANSCODER_Auto;
-   
+
    mBackgroundColor.set( 0, 0, 0, 255);
 }
 
@@ -113,7 +113,7 @@ void GuiTheoraCtrl::setFile( const String& filename )
 	mDone = false;
    mFilename = filename;
    mTheoraTexture.setFile( filename );
-   
+
    if( mMatchVideoSize && mTheoraTexture.isReady() )
       setExtent( Point2I( mTheoraTexture.getWidth(), mTheoraTexture.getHeight() ) );
 
@@ -128,7 +128,7 @@ void GuiTheoraCtrl::play()
 {
    if( mFilename.isEmpty() )
       return;
-   
+
    if( !mTheoraTexture.isPlaying() )
    {
       mDone = false;
@@ -145,7 +145,7 @@ void GuiTheoraCtrl::pause()
       Con::errorf( "GuiTheoraCtrl::pause - not playing" );
       return;
    }
-   
+
    mTheoraTexture.pause();
 }
 
@@ -166,7 +166,7 @@ bool GuiTheoraCtrl::onWake()
 
    if( !mTheoraTexture.isReady() )
       setFile( mFilename );
-   
+
    if( mPlayOnWake && !mTheoraTexture.isPlaying() )
       play();
 
@@ -201,13 +201,13 @@ void GuiTheoraCtrl::onRender(Point2I offset, const RectI &updateRect)
           || mTheoraTexture.isPaused() )
       {
          // Draw the frame.
-         
+
          GFXDrawUtil* drawUtil = GFX->getDrawUtil();
          drawUtil->clearBitmapModulation();
          drawUtil->drawBitmapStretch( mTheoraTexture.getTexture(), rect );
-         
+
          // Draw frame info, if requested.
-         
+
          if( mRenderDebugInfo )
          {
             String info = String::ToString( "Frame Number: %i | Frame Time: %.2fs | Playback Time: %.2fs | Dropped: %i",
@@ -215,7 +215,7 @@ void GuiTheoraCtrl::onRender(Point2I offset, const RectI &updateRect)
                mTheoraTexture.getFrameTime(),
                F32( mTheoraTexture.getPosition() ) / 1000.f,
                mTheoraTexture.getNumDroppedFrames() );
-            
+
             drawUtil->setBitmapModulation( mProfile->mFontColors[ 0 ] );
             drawUtil->drawText( mProfile->mFont, localToGlobalCoord( Point2I( 0, 0 ) ), info, mProfile->mFontColors );
          }
@@ -237,18 +237,18 @@ void GuiTheoraCtrl::inspectPostApply()
    {
       stop();
       setFile( mFilename );
-      
+
       if( mPlayOnWake && !mTheoraTexture.isPlaying() )
          play();
    }
-   
+
    if( mMatchVideoSize && mTheoraTexture.isReady() )
       setExtent( Point2I( mTheoraTexture.getWidth(), mTheoraTexture.getHeight() ) );
 
    OggTheoraDecoder* decoder = mTheoraTexture._getTheora();
    if( decoder != NULL )
       decoder->setTranscoder( mTranscoder );
-      
+
    Parent::inspectPostApply();
 }
 

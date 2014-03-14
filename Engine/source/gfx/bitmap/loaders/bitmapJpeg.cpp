@@ -209,7 +209,7 @@ static bool sWriteJPG(GBitmap *bitmap, Stream &stream, U32 compressionLevel)
    cinfo.image_width = bitmap->getWidth();           // image width
    cinfo.image_height = bitmap->getHeight();         // image height
    cinfo.input_components = bitmap->getBytesPerPixel();   // samples per pixel(RGB:3, Alpha:1)
-   
+
    switch (format)
    {
       case GFXFormatA8:  // no alpha support in JPEG format, so turn it into a grayscale

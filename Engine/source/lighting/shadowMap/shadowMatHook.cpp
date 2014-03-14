@@ -64,9 +64,9 @@ void ShadowMaterialHook::init( BaseMatInstance *inMat )
    // like wind/deformation effects will also affect the shadow.
    const FeatureSet &inFeatures = inMat->getFeatures();
    for ( U32 i = 0; i < inFeatures.getCount(); i++ )
-   {      
+   {
       const FeatureType& ft = inFeatures.getAt(i);
-      
+
       if ( ft.getGroup() == MFG_PreTransform )
          features.addFeature( ft );
    }
@@ -93,9 +93,9 @@ void ShadowMaterialHook::init( BaseMatInstance *inMat )
    // We should force on zwrite as the prepass
    // will disable it by default.
    forced.setZReadWrite( true, true );
-   
-   // TODO: Should we render backfaces for 
-   // shadows or does the ESM take care of 
+
+   // TODO: Should we render backfaces for
+   // shadows or does the ESM take care of
    // all our acne issues?
    //forced.setCullMode( GFXCullCW );
 
@@ -109,19 +109,19 @@ void ShadowMaterialHook::init( BaseMatInstance *inMat )
       SAFE_DELETE( newMat );
       newMat = MATMGR->createWarningMatInstance();
    }
-   
+
    mShadowMat[ShadowType_Spot] = newMat;
 
    newMat = new ShadowMatInstance( shadowMat );
    newMat->setUserObject( inMat->getUserObject() );
    newMat->getFeaturesDelegate().bind( &ShadowMaterialHook::_overrideFeatures );
-   forced.setCullMode( GFXCullCW );   
+   forced.setCullMode( GFXCullCW );
    newMat->addStateBlockDesc( forced );
    forced.cullDefined = false;
    newMat->addShaderMacro( "CUBE_SHADOW_MAP", "" );
    newMat->init( features, inMat->getVertexFormat() );
    mShadowMat[ShadowType_CubeMap] = newMat;
-   
+
    // A dual paraboloid shadow rendered in a single draw call.
    features.addFeature( MFT_ParaboloidVertTransform );
    features.addFeature( MFT_IsSinglePassParaboloid );
@@ -159,22 +159,22 @@ void ShadowMaterialHook::init( BaseMatInstance *inMat )
 }
 
 BaseMatInstance* ShadowMaterialHook::getShadowMat( ShadowType type ) const
-{ 
+{
    AssertFatal( type < ShadowType_Count, "ShadowMaterialHook::getShadowMat() - Bad light type!" );
 
    // The cubemap and pssm shadows use the same
    // spotlight material for shadows.
-   if (  type == ShadowType_Spot ||         
+   if (  type == ShadowType_Spot ||
          type == ShadowType_PSSM )
-      return mShadowMat[ShadowType_Spot];   
+      return mShadowMat[ShadowType_Spot];
 
    // Get the specialized shadow material.
-   return mShadowMat[type]; 
+   return mShadowMat[type];
 }
 
 void ShadowMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
                                              U32 stageNum,
-                                             MaterialFeatureData &fd, 
+                                             MaterialFeatureData &fd,
                                              const FeatureSet &features )
 {
    if ( stageNum != 0 )
@@ -183,7 +183,7 @@ void ShadowMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
       return;
    }
 
-   // Disable the base texture if we don't 
+   // Disable the base texture if we don't
    // have alpha test enabled.
    if ( !fd.features[ MFT_AlphaTest ] )
    {
@@ -191,23 +191,23 @@ void ShadowMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
       fd.features.removeFeature( MFT_DiffuseMap );
    }
 
-   // HACK: Need to figure out how to enable these 
+   // HACK: Need to figure out how to enable these
    // suckers without this override call!
 
-   fd.features.setFeature( MFT_ParaboloidVertTransform, 
+   fd.features.setFeature( MFT_ParaboloidVertTransform,
       features.hasFeature( MFT_ParaboloidVertTransform ) );
-   fd.features.setFeature( MFT_IsSinglePassParaboloid, 
+   fd.features.setFeature( MFT_IsSinglePassParaboloid,
       features.hasFeature( MFT_IsSinglePassParaboloid ) );
-      
+
    // The paraboloid transform outputs linear depth, so
    // it needs to use the plain depth out feature.
-   if ( fd.features.hasFeature( MFT_ParaboloidVertTransform ) ) 
-      fd.features.addFeature( MFT_DepthOut );      
+   if ( fd.features.hasFeature( MFT_ParaboloidVertTransform ) )
+      fd.features.addFeature( MFT_DepthOut );
    else
       fd.features.addFeature( MFT_EyeSpaceDepthOut );
 }
 
-ShadowMatInstance::ShadowMatInstance( Material *mat ) 
+ShadowMatInstance::ShadowMatInstance( Material *mat )
  : MatInstance( *mat )
 {
    mLightmappedMaterial = mMaterial->isLightmapped();

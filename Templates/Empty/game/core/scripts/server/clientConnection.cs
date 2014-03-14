@@ -56,7 +56,7 @@ function GameConnection::onConnect( %client, %name )
    // %client.guid = getField( %authInfo, 3 );
    %client.guid = 0;
    addToServerGuidList( %client.guid );
-   
+
    // Set admin status
    if (%client.getAddress() $= "local") {
       %client.isAdmin = true;
@@ -76,7 +76,7 @@ function GameConnection::onConnect( %client, %name )
    %client.team = "";
    %client.score = 0;
 
-   // 
+   //
    echo("CADD: " @ %client @ " " @ %client.getAddress());
 
    // Inform the client of all the other clients
@@ -85,39 +85,39 @@ function GameConnection::onConnect( %client, %name )
       %other = ClientGroup.getObject(%cl);
       if ((%other != %client)) {
          // These should be "silent" versions of these messages...
-         messageClient(%client, 'MsgClientJoin', "", 
+         messageClient(%client, 'MsgClientJoin', "",
                %other.playerName,
                %other,
                %other.sendGuid,
                %other.team,
-               %other.score, 
+               %other.score,
                %other.isAIControlled(),
-               %other.isAdmin, 
+               %other.isAdmin,
                %other.isSuperAdmin);
       }
    }
 
    // Inform the client we've joined up
    messageClient(%client,
-      'MsgClientJoin', 'Welcome to a Torque application %1.', 
-      %client.playerName, 
+      'MsgClientJoin', 'Welcome to a Torque application %1.',
+      %client.playerName,
       %client,
       %client.sendGuid,
       %client.team,
       %client.score,
-      %client.isAiControlled(), 
-      %client.isAdmin, 
+      %client.isAiControlled(),
+      %client.isAdmin,
       %client.isSuperAdmin);
 
    // Inform all the other clients of the new guy
-   messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.', 
-      %client.playerName, 
+   messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.',
+      %client.playerName,
       %client,
       %client.sendGuid,
       %client.team,
       %client.score,
-      %client.isAiControlled(), 
-      %client.isAdmin, 
+      %client.isAiControlled(),
+      %client.isAdmin,
       %client.isSuperAdmin);
 
    // If the mission is running, go ahead download it to the client
@@ -181,14 +181,14 @@ function isNameUnique(%name)
 function GameConnection::onDrop(%client, %reason)
 {
    %client.onClientLeaveGame();
-   
+
    removeFromServerGuidList( %client.guid );
    messageAllExcept(%client, -1, 'MsgClientDrop', '\c1%1 has left the game.', %client.playerName, %client);
 
    removeTaggedString(%client.playerName);
    echo("CDROP: " @ %client @ " " @ %client.getAddress());
    $Server::PlayerCount--;
-   
+
    // Reset the server if everyone has left the game
    if( $Server::PlayerCount == 0 && $Server::Dedicated)
       schedule(0, 0, "resetServerDefaults");

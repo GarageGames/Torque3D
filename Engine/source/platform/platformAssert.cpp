@@ -128,7 +128,7 @@ bool PlatformAssert::process(Type         assertType,
 #endif
       if(!retry)
          Platform::forceShutdown(1);
-      
+
       ret = askToEnterDebugger(message);
    }
 

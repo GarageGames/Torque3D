@@ -63,7 +63,7 @@ public:
    static FreeListChunker<ResourceHolderBase> smHolderFactory;
 
    virtual ~ResourceHolderBase() {}
-   
+
    // Return void pointer to resource data.
    void *getResource() const { return mRes; }
 
@@ -84,7 +84,7 @@ protected:
 class ResourceBase
 {
    friend class ResourceManager;
- 
+
 protected:
    class Header;
 
@@ -130,7 +130,7 @@ protected:
       virtual void destroySelf();
 
    private:
-      
+
       friend class ResourceBase;
       friend class ResourceManager;
 
@@ -181,7 +181,7 @@ protected:
 
       return sLoadSignal;
    }
-   
+
    virtual void _triggerPostLoadSignal() {}
    virtual NotifyUnloadFn _getNotifyUnloadFn() { return ( NotifyUnloadFn ) NULL; }
 };
@@ -233,7 +233,7 @@ public:
       static Signal<bool(const Torque::Path &, void**)>   sLoadSignal;
       return sLoadSignal;
    }
-   
+
    /// Register with this signal to get notified when resources of this type
    /// have been loaded.
    static Signal< void( Resource< T >& ) >& getPostLoadSignal()
@@ -241,7 +241,7 @@ public:
       static Signal< void( Resource< T >& ) > sPostLoadSignal;
       return sPostLoadSignal;
    }
-   
+
    /// Register with this signal to get notified when resources of this type
    /// are about to get unloaded.
    static Signal< void( const Torque::Path&, T* ) >& getUnloadSignal()
@@ -259,9 +259,9 @@ private:
    ResourceHolderBase   *createHolder(void *);
 
    Signal<bool(const Torque::Path &, void**)>   &getStaticLoadSignal() { return getLoadSignal(); }
-   
+
    static void _notifyUnload( const Torque::Path& path, void* resource ) { getUnloadSignal().trigger( path, ( T* ) resource ); }
-   
+
    virtual void _triggerPostLoadSignal() { getPostLoadSignal().trigger( *this ); }
    virtual NotifyUnloadFn _getNotifyUnloadFn() { return ( NotifyUnloadFn ) &_notifyUnload; }
 
@@ -302,7 +302,7 @@ template< class T >
 class ResourceRegisterPostLoadSignal
 {
    public:
-   
+
       ResourceRegisterPostLoadSignal( Delegate< void( Resource< T >& ) > func )
       {
          Resource< T >::getPostLoadSignal().notify( func );
@@ -313,7 +313,7 @@ template< class T >
 class ResourceRegisterUnloadSignal
 {
    public:
-   
+
       ResourceRegisterUnloadSignal( Delegate< void( const Torque::Path&, T* ) > func )
       {
          Resource< T >::getUnloadSignal().notify( func );

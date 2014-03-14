@@ -28,8 +28,8 @@
 #include "gfx/gfxDevice.h"
 
 
-Var * ShaderConnectorHLSL::getElement( RegisterType type, 
-                                       U32 numElements, 
+Var * ShaderConnectorHLSL::getElement( RegisterType type,
+                                       U32 numElements,
                                        U32 numRegisters )
 {
    Var *ret = getIndexedElement( mCurTexElem, type, numElements, numRegisters );
@@ -49,7 +49,7 @@ Var * ShaderConnectorHLSL::getElement( RegisterType type,
 Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 numElements /*= 1*/, U32 numRegisters /*= -1 */ )
 {
    switch( type )
-   { 
+   {
    case RT_POSITION:
       {
          Var *newVar = new Var;
@@ -126,7 +126,7 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
 
 void ShaderConnectorHLSL::sortVars()
 {
-   if ( GFX->getPixelShaderVersion() >= 2.0 ) 
+   if ( GFX->getPixelShaderVersion() >= 2.0 )
       return;
 
    // Sort connector variables - They must be sorted on hardware that is running
@@ -140,7 +140,7 @@ void ShaderConnectorHLSL::sortVars()
 
    // create list of just the texCoords, sorting by 'mapsToSampler'
    Vector< Var * > texCoordList;
-   
+
    // - first pass is just coords mapped to a sampler
    for( U32 i=0; i<mElementList.size(); i++ )
    {
@@ -150,7 +150,7 @@ void ShaderConnectorHLSL::sortVars()
          texCoordList.push_back( var );
       }
    }
-   
+
    // - next pass is for the others
    for( U32 i=0; i<mElementList.size(); i++ )
    {
@@ -161,7 +161,7 @@ void ShaderConnectorHLSL::sortVars()
          texCoordList.push_back( var );
       }
    }
-   
+
    // rename the connectNames
    for( U32 i=0; i<texCoordList.size(); i++ )
    {
@@ -174,7 +174,7 @@ void ShaderConnectorHLSL::sortVars()
    if( texCoordList.size() )
    {
       U32 index = 0;
-   
+
       for( U32 i=0; i<mElementList.size(); i++ )
       {
          Var *var = mElementList[i];
@@ -234,18 +234,18 @@ void ShaderConnectorHLSL::print( Stream &stream )
 void ParamsDefHLSL::assignConstantNumbers()
 {
 
-   // Here we assign constant number to uniform vars, sorted 
+   // Here we assign constant number to uniform vars, sorted
    // by their update frequency.
 
    U32 mCurrConst = 0;
    for (U32 bin = cspUninit+1; bin < csp_Count; bin++)
-   {   
+   {
       // Find all the uniform variables that are part of this group and assign constant numbers
       for( U32 i=0; i<LangElement::elementList.size(); i++)
       {
          Var *var = dynamic_cast<Var*>(LangElement::elementList[i]);
          if( var )
-         {            
+         {
             bool shaderConst = var->uniform && !var->sampler;
             AssertFatal((!shaderConst) || var->constSortPos != cspUninit, "Const sort position has not been set, variable will not receive a constant number!!");
             if( shaderConst && var->constSortPos == bin)
@@ -285,7 +285,7 @@ void VertexParamsDefHLSL::print( Stream &stream )
          if( var->uniform )
          {
             const char* nextVar = ",\r\n                  ";
-            stream.write( dStrlen(nextVar), nextVar );            
+            stream.write( dStrlen(nextVar), nextVar );
 
             U8 varNum[64];
             dSprintf( (char*)varNum, sizeof(varNum), "register(C%d)", var->constNum );

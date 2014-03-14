@@ -32,11 +32,11 @@ class FileDownloadRequestEvent : public NetEvent
 {
 public:
    typedef NetEvent Parent;
-   enum 
+   enum
    {
       MaxFileNames = 31,
    };
-   
+
    U32 nameCount;
    char mFileNames[MaxFileNames][256];
 
@@ -111,43 +111,43 @@ public:
 
    U8 chunkData[ChunkSize];
    U32 chunkLen;
-   
+
    FileChunkEvent(U8 *data = NULL, U32 len = 0)
    {
       if(data)
          dMemcpy(chunkData, data, len);
       chunkLen = len;
    }
-   
+
    virtual void pack(NetConnection *, BitStream *bstream)
    {
       bstream->writeRangedU32(chunkLen, 0, ChunkSize);
       bstream->write(chunkLen, chunkData);
    }
-   
+
    virtual void write(NetConnection *, BitStream *bstream)
    {
       bstream->writeRangedU32(chunkLen, 0, ChunkSize);
       bstream->write(chunkLen, chunkData);
    }
-   
+
    virtual void unpack(NetConnection *, BitStream *bstream)
    {
       chunkLen = bstream->readRangedU32(0, ChunkSize);
       bstream->read(chunkLen, chunkData);
    }
-   
+
    virtual void process(NetConnection *connection)
    {
       connection->chunkReceived(chunkData, chunkLen);
    }
-   
+
    virtual void notifyDelivered(NetConnection *nc, bool madeIt)
    {
       if(!nc->isRemoved())
         nc->sendFileChunk();
    }
-   
+
    DECLARE_CONOBJECT(FileChunkEvent);
 };
 

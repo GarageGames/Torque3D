@@ -25,23 +25,23 @@
 function initializeMaterialEditor()
 {
    echo(" % - Initializing Material Editor");
-   
+
    // Load Preview Window
    exec("~/materialEditor/gui/guiMaterialPreviewWindow.ed.gui");
-   
+
    // Load Properties Window
    exec("~/materialEditor/gui/guiMaterialPropertiesWindow.ed.gui");
-   
+
    // Load Client Scripts.
    exec("./scripts/materialEditor.ed.cs");
    exec("./scripts/materialEditorUndo.ed.cs");
    //exec("./gui/profiles.ed.cs");
-   
+
    MaterialEditorPreviewWindow.setVisible( false );
    matEd_cubemapEditor.setVisible( false );
    matEd_addCubemapWindow.setVisible( false );
    MaterialEditorPropertiesWindow.setVisible( false );
-   
+
    EditorGui.add( MaterialEditorPreviewWindow );
    EditorGui.add( matEd_cubemapEditor );
    EditorGui.add( matEd_addCubemapWindow );
@@ -57,15 +57,15 @@ function MaterialEditorPlugin::onWorldEditorStartup( %this )
 {
    // Add ourselves to the window menu.
    %accel = EditorGui.addToEditorsMenu( "Material Editor", "", MaterialEditorPlugin );
-   
+
    // Add ourselves to the ToolsToolbar
-   %tooltip = "Material Editor (" @ %accel @ ")"; 
+   %tooltip = "Material Editor (" @ %accel @ ")";
    EditorGui.addToToolsToolbar( "MaterialEditorPlugin", "MaterialEditorPalette", expandFilename("tools/worldEditor/images/toolbar/matterial-editor"), %tooltip );
 
    //connect editor windows
    GuiWindowCtrl::attach( MaterialEditorPropertiesWindow, MaterialEditorPreviewWindow);
-   
-   %map = new ActionMap();   
+
+   %map = new ActionMap();
    %map.bindCmd( keyboard, "1", "EWorldEditorNoneModeBtn.performClick();", "" );  // Select
    %map.bindCmd( keyboard, "2", "EWorldEditorMoveModeBtn.performClick();", "" );  // Move
    %map.bindCmd( keyboard, "3", "EWorldEditorRotateModeBtn.performClick();", "" );  // Rotate
@@ -84,13 +84,13 @@ function MaterialEditorPlugin::onWorldEditorStartup( %this )
    %map.bindCmd( keyboard, "p", "objectCenterDropdown->objectBoundsBtn.performClick(); objectCenterDropdown.toggle();", "" );// Bounds Center
    %map.bindCmd( keyboard, "k", "objectTransformDropdown->objectTransformBtn.performClick(); objectTransformDropdown.toggle();", "" );// Object Transform
    %map.bindCmd( keyboard, "l", "objectTransformDropdown->worldTransformBtn.performClick(); objectTransformDropdown.toggle();", "" );// World Transform
-   
-   MaterialEditorPlugin.map = %map; 
-   
+
+   MaterialEditorPlugin.map = %map;
+
    MaterialEditorGui.fileSpec = "Torque Material Files (materials.cs)|materials.cs|All Files (*.*)|*.*|";
    MaterialEditorGui.textureFormats = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";
    MaterialEditorGui.modelFormats = "DTS Files (*.dts)|*.dts";
-   MaterialEditorGui.lastTexturePath = "";   
+   MaterialEditorGui.lastTexturePath = "";
    MaterialEditorGui.lastTextureFile = "";
    MaterialEditorGui.lastModelPath = "";
    MaterialEditorGui.lastModelFile = "";
@@ -98,16 +98,16 @@ function MaterialEditorPlugin::onWorldEditorStartup( %this )
    MaterialEditorGui.lastMaterial = "";
    MaterialEditorGui.currentCubemap = "";
    MaterialEditorGui.currentObject = "";
-   
+
    MaterialEditorGui.livePreview = "1";
    MaterialEditorGui.currentLayer = "0";
    MaterialEditorGui.currentMode = "Material";
    MaterialEditorGui.currentMeshMode = "EditorShape";
-   
+
    new ArrayObject(UnlistedCubemaps);
    UnlistedCubemaps.add( "unlistedCubemaps", matEdCubeMapPreviewMat );
    UnlistedCubemaps.add( "unlistedCubemaps", WarnMatCubeMap );
-   
+
    //MaterialEditor persistence manager
    new PersistenceManager(matEd_PersistMan);
 }
@@ -115,10 +115,10 @@ function MaterialEditorPlugin::onWorldEditorStartup( %this )
 function MaterialEditorPlugin::onActivated( %this )
 {
    if($gfx::wireframe){
-      $wasInWireFrameMode = true;   
+      $wasInWireFrameMode = true;
       $gfx::wireframe = false;
    }else{
-      $wasInWireFrameMode = false;  
+      $wasInWireFrameMode = false;
    }
    advancedTextureMapsRollout.Expanded = false;
    materialAnimationPropertiesRollout.Expanded = false;
@@ -128,12 +128,12 @@ function MaterialEditorPlugin::onActivated( %this )
    EditorGui-->MatEdPropertiesWindow.setVisible( true );
    EditorGui-->MatEdPreviewWindow.setVisible( true );
    EditorGui-->WorldEditorToolbar.setVisible( true );
-   
+
    MaterialEditorGui.currentObject = $Tools::materialEditorList;
    // Execute the back end scripts that actually do the work.
    MaterialEditorGui.open();
    %this.map.push();
-   
+
    Parent::onActivated(%this);
 }
 
@@ -146,15 +146,15 @@ function MaterialEditorPlugin::onDeactivated( %this )
 {
    if($wasInWireFrameMode)
       $gfx::wireframe = true;
-      
+
    WorldEditorPlugin.onDeactivated();
 
    MaterialEditorGui.quit();
-   
+
    EditorGui-->MatEdPropertiesWindow.setVisible( false );
    EditorGui-->MatEdPreviewWindow.setVisible( false );
    EditorGui-->WorldEditorToolbar.setVisible( false );
    %this.map.pop();
-   
+
    Parent::onDeactivated(%this);
 }

@@ -39,7 +39,7 @@
 #include "core/stream/fileStream.h"
 
 
-/// A material hook used to hold imposter generation 
+/// A material hook used to hold imposter generation
 /// rendering materials for an object.
 class ImposterCaptureMaterialHook : public MatInstanceHook
 {
@@ -56,22 +56,22 @@ public:
 
    void init( BaseMatInstance *mat );
 
-   static BaseMatInstance* getDiffuseInst( BaseMatInstance *inMat ) 
+   static BaseMatInstance* getDiffuseInst( BaseMatInstance *inMat )
       { return _getOrCreateHook( inMat )->mDiffuseMatInst; }
 
-   static BaseMatInstance* getNormalsInst( BaseMatInstance *inMat ) 
+   static BaseMatInstance* getNormalsInst( BaseMatInstance *inMat )
       { return _getOrCreateHook( inMat )->mNormalsMatInst; }
 
 protected:
 
    static void _overrideFeatures(   ProcessedMaterial *mat,
                                     U32 stageNum,
-                                    MaterialFeatureData &fd, 
+                                    MaterialFeatureData &fd,
                                     const FeatureSet &features );
 
    static ImposterCaptureMaterialHook* _getOrCreateHook( BaseMatInstance *inMat );
 
-   /// 
+   ///
    BaseMatInstance *mDiffuseMatInst;
 
    ///
@@ -117,7 +117,7 @@ void ImposterCaptureMaterialHook::init( BaseMatInstance *inMat )
    mDiffuseMatInst = MATMGR->createMatInstance( matName );
    mDiffuseMatInst->getFeaturesDelegate().bind( &ImposterCaptureMaterialHook::_overrideFeatures );
    mDiffuseMatInst->init( features, inMat->getVertexFormat() );
-   
+
    features.addFeature( MFT_IsDXTnm );
    features.addFeature( MFT_NormalMap );
    features.addFeature( MFT_NormalsOut );
@@ -128,7 +128,7 @@ void ImposterCaptureMaterialHook::init( BaseMatInstance *inMat )
 
 void ImposterCaptureMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
                                                       U32 stageNum,
-                                                      MaterialFeatureData &fd, 
+                                                      MaterialFeatureData &fd,
                                                       const FeatureSet &features )
 {
    if ( features.hasFeature( MFT_NormalsOut) )
@@ -164,8 +164,8 @@ ImposterCapture::ImposterCapture()
    mWhiteBmp( NULL ),
    mState( NULL ),
    mRenderTarget( NULL )
-{     
-}                                   
+{
+}
 
 ImposterCapture::~ImposterCapture()
 {
@@ -261,7 +261,7 @@ void ImposterCapture::_separateAlpha( GBitmap *imposterOut )
       // simpler, probably faster...
       for ( U32 i=0; i < pixCount; i++ )
       {
-         // Shape on black background is alpha * color, shape on white 
+         // Shape on black background is alpha * color, shape on white
          // background is alpha * color + (1-alpha) * 255 we want 255 *
          // alpha, or 255 - (white - black).
          //
@@ -282,7 +282,7 @@ void ImposterCapture::_separateAlpha( GBitmap *imposterOut )
 
          if ( alpha != 0 )
          {
-            F32 floatAlpha = ((F32)alpha)/(3.0f*255.0f); 
+            F32 floatAlpha = ((F32)alpha)/(3.0f*255.0f);
             dst[i*4+0] = (U8)(bbmp[i*3+0] / floatAlpha);
             dst[i*4+1] = (U8)(bbmp[i*3+1] / floatAlpha);
             dst[i*4+2] = (U8)(bbmp[i*3+2] / floatAlpha);
@@ -300,18 +300,18 @@ void ImposterCapture::_separateAlpha( GBitmap *imposterOut )
       }
 
    PROFILE_END(); // TSShapeInstance_snapshot_sb_separate
-  
+
    PROFILE_START(TSShapeInstance_snapshot_sb_filter);
 
       // We now run a special kernel filter over the image that
       // averages color into the transparent areas.  This should
-      // in essence give us a border around the edges of the 
+      // in essence give us a border around the edges of the
       // imposter silhouette which fixes the artifacts around the
       // alpha test billboards.
       U8* dst2 = (U8*)imposterOut->getBits(0);
 
       _colorAverageFilter( mDim, dst, dst2 );
-      
+
       if ( 0 )
       {
          FileStream fs;
@@ -325,7 +325,7 @@ void ImposterCapture::_separateAlpha( GBitmap *imposterOut )
 
          fs.close();
       }
-   
+
 
    PROFILE_END(); // TSShapeInstance_snapshot_sb_filter
 
@@ -359,7 +359,7 @@ void ImposterCapture::_convertDXT5nm( GBitmap *normalsOut )
 }
 
 void ImposterCapture::begin(  TSShapeInstance *shapeInst,
-                              S32 dl, 
+                              S32 dl,
                               S32 dim,
                               F32 radius,
                               const Point3F &center )
@@ -370,9 +370,9 @@ void ImposterCapture::begin(  TSShapeInstance *shapeInst,
    mRadius = radius;
    mCenter = center;
 
-   mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
-   mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
-   mNormalTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
+   mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mNormalTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
 
    // copy the black render target data into a bitmap
    mBlackBmp = new GBitmap;
@@ -393,13 +393,13 @@ void ImposterCapture::begin(  TSShapeInstance *shapeInst,
    cameraMatrix.setColumn( 1, Point3F( 1, 0, 0 ) );
    cameraMatrix.setColumn( 2, Point3F( 0, 1, 0 ) );
 
-   // setup scene state required for TS mesh render...this is messy and inefficient; 
-   // should have a mode where most of this is done just once (and then 
+   // setup scene state required for TS mesh render...this is messy and inefficient;
+   // should have a mode where most of this is done just once (and then
    // only the camera matrix changes between snapshots).
-   // note that we use getFrustum here, but we set up an ortho projection above.  
-   // it doesn't seem like the scene state object pays attention to whether the projection is 
-   // ortho or not.  this could become a problem if some code downstream tries to 
-   // reconstruct the projection matrix using the dimensions and doesn't 
+   // note that we use getFrustum here, but we set up an ortho projection above.
+   // it doesn't seem like the scene state object pays attention to whether the projection is
+   // ortho or not.  this could become a problem if some code downstream tries to
+   // reconstruct the projection matrix using the dimensions and doesn't
    // realize it should be ortho.  at the moment no code is doing that.
    F32 left, right, top, bottom, nearPlane, farPlane;
    bool isOrtho;
@@ -434,13 +434,13 @@ void ImposterCapture::begin(  TSShapeInstance *shapeInst,
 
 }
 
-void ImposterCapture::capture(   const MatrixF &rotMatrix, 
+void ImposterCapture::capture(   const MatrixF &rotMatrix,
                                  GBitmap **imposterOut,
                                  GBitmap **normalMapOut )
 {
    GFXTransformSaver saver;
 
-   // this version of the snapshot function renders the shape to a black texture, then to white, then reads bitmaps 
+   // this version of the snapshot function renders the shape to a black texture, then to white, then reads bitmaps
    // back for both renders and combines them, restoring the alpha and color values.  this is based on the
    // TGE implementation.  it is not fast due to the copy and software combination operations.  the generated bitmaps
    // are upside-down (which is how TGE generated them...)
@@ -507,11 +507,11 @@ void ImposterCapture::end()
    GFX->popActiveRenderTarget();
 
    mBlackTex.free();
-   mWhiteTex.free(); 
+   mWhiteTex.free();
    mNormalTex.free();
 
    mShapeInstance = NULL;
-   
+
    mRenderTarget = NULL;
    mMeshRenderBin = NULL; // Deleted by mRenderPass
    SAFE_DELETE( mState );

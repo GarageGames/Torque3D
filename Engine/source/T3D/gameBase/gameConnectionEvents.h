@@ -55,22 +55,22 @@ class QuitEvent : public SimEvent
 class SimDataBlockEvent : public NetEvent
 {
    public:
-   
+
       typedef NetEvent Parent;
-      
+
    protected:
-   
+
       /// Id of the datablock object to be sent.  This must be a datablock ID
       /// (as opposed to a normal object ID).
       SimObjectId id;
-      
+
       ///
       U32 mIndex;
-      
+
       /// Total number of datablocks that are part of this datablock transmission.
       /// Each datablock is transmitted in an independent datablock event.
       U32 mTotal;
-      
+
       /// The mission sequence number to which this datablock transmission
       /// belongs.
       ///
@@ -79,25 +79,25 @@ class SimDataBlockEvent : public NetEvent
 
       /// Datablock object constructed on the client side.
       SimDataBlock *mObj;
-      
+
       ///
       bool mProcess;
-  
+
    public:
-   
+
       SimDataBlockEvent(SimDataBlock* obj = NULL, U32 index = 0, U32 total = 0, U32 missionSequence = 0);
       ~SimDataBlockEvent();
-      
+
       void pack(NetConnection *, BitStream *bstream);
       void write(NetConnection *, BitStream *bstream);
       void unpack(NetConnection *cptr, BitStream *bstream);
       void process(NetConnection*);
       void notifyDelivered(NetConnection *, bool);
-      
+
       #ifdef TORQUE_DEBUG_NET
       const char *getDebugName();
       #endif
-      
+
       DECLARE_CONOBJECT( SimDataBlockEvent );
       DECLARE_CATEGORY( "Game Networking" );
 };

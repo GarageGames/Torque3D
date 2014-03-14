@@ -62,7 +62,7 @@ EngineTypeInfo::EngineTypeInfo( const char* typeName, EngineExportScope* scope, 
      mSuperType( NULL )
 {
    mExportKind = EngineExportKindType;
-   
+
    smFirst = this;
    smNumTypes ++;
 }
@@ -74,7 +74,7 @@ const EngineTypeInfo* EngineTypeInfo::getTypeInfoByName( const char* typeName )
    for( const EngineTypeInfo* typeInfo = getFirstType(); typeInfo != NULL; typeInfo = typeInfo->getNextType() )
       if( dStricmp( typeInfo->getTypeName(), typeName ) == 0 )
          return typeInfo;
-         
+
    return NULL;
 }
 
@@ -88,13 +88,13 @@ U32 EngineTypeInfo::getValueSize() const
       case EngineTypeKindEnum:
       case EngineTypeKindBitfield:
          return mInstanceSize;
-         
+
       case EngineTypeKindStruct:
       case EngineTypeKindFunction:
       case EngineTypeKindClass:
          return sizeof( void* );
    }
-   
+
    AssertFatal( false, "EngineTypeInfo - unknown type kind!" );
    return U32( -1 );
 }
@@ -106,7 +106,7 @@ bool EngineTypeInfo::isSubtypeOf( const EngineTypeInfo* type ) const
    for( const EngineTypeInfo* p = this; p != NULL; p = p->getSuperType() )
       if( p == type )
          return true;
-         
+
    return false;
 }
 

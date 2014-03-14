@@ -43,9 +43,9 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
    typedef EditTSCtrl Parent;
 
    public:
-   
+
       friend class GuiMeshRoadEditorUndoAction;
-		
+
 		String mSelectMeshRoadMode;
 		String mAddMeshRoadMode;
 		String mAddNodeMode;
@@ -67,7 +67,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       // GuiControl
       virtual void onSleep();
 
-      // EditTSCtrl      
+      // EditTSCtrl
 		bool onKeyDown(const GuiEvent& event);
       void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
       void on3DMouseDown(const Gui3DMouseEvent & event);
@@ -78,10 +78,10 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       void on3DMouseLeave(const Gui3DMouseEvent & event);
       void on3DRightMouseDown(const Gui3DMouseEvent & event);
       void on3DRightMouseUp(const Gui3DMouseEvent & event);
-      void updateGuiInfo();      
+      void updateGuiInfo();
       void renderScene(const RectI & updateRect);
 
-      // GuiRiverEditorCtrl      
+      // GuiRiverEditorCtrl
       bool getStaticPos( const Gui3DMouseEvent & event, Point3F &tpos );
       void deleteSelectedNode();
       void deleteSelectedRoad( bool undoAble = true );
@@ -98,7 +98,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
 
       F32 getNodeDepth();
       void setNodeDepth( F32 depth );
-		
+
 		Point3F getNodePosition();
 		void setNodePosition( Point3F pos );
 
@@ -108,10 +108,10 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       void matchTerrainToRoad();
 
    protected:
-		
-		enum { 
-			Top = 0, 
-			Bottom = 1, 
+
+		enum {
+			Top = 0,
+			Bottom = 1,
 			Side = 2,
 			SurfaceCount = 3
 		};
@@ -132,7 +132,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       S32 mSelNode;
       S32 mHoverNode;
       U32 mAddNodeIdx;
-      SimObjectPtr<MeshRoad> mSelRoad;      
+      SimObjectPtr<MeshRoad> mSelRoad;
       SimObjectPtr<MeshRoad> mHoverRoad;
 
       String mMode;
@@ -141,7 +141,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       F32 mDefaultDepth;
       VectorF mDefaultNormal;
 
-      Point2I mNodeHalfSize;      
+      Point2I mNodeHalfSize;
 
       ColorI mHoverSplineColor;
       ColorI mSelectedSplineColor;
@@ -149,7 +149,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
 
       bool mHasCopied;
 	public:
-		
+
 		StringTableEntry mMaterialName[SurfaceCount];
 };
 
@@ -161,7 +161,7 @@ class GuiMeshRoadEditorUndoAction : public UndoAction
       {
       }
 
-      GuiMeshRoadEditorCtrl *mEditor;         
+      GuiMeshRoadEditorCtrl *mEditor;
 
       Vector<MeshRoadNode> mNodes;
 

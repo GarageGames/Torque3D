@@ -110,7 +110,7 @@ ParticleData::ParticleData()
    texCoords[1].set(0.0,1.0);   // of particle quad
    texCoords[2].set(1.0,1.0);   // (defaults to entire particle)
    texCoords[3].set(1.0,0.0);
-   animTexTiling.set(0,0);      // tiling dimensions 
+   animTexTiling.set(0,0);      // tiling dimensions
    animTexFramesString = NULL;  // string of animation frame indices
    animTexUVs = NULL;           // array of tile vertex UVs
    textureName = NULL;          // texture filename
@@ -204,12 +204,12 @@ void ParticleData::initPersistFields()
       "@brief Particle RGBA color keyframe values.\n\n"
       "The particle color will linearly interpolate between the color/time keys "
       "over the lifetime of the particle." );
-   addProtectedField( "sizes", TYPEID< F32 >(), Offset(sizes, ParticleData), &protectedSetSizes, 
+   addProtectedField( "sizes", TYPEID< F32 >(), Offset(sizes, ParticleData), &protectedSetSizes,
       &defaultProtectedGetFn, PDC_NUM_KEYS,
       "@brief Particle size keyframe values.\n\n"
       "The particle size will linearly interpolate between the size/time keys "
       "over the lifetime of the particle." );
-   addProtectedField( "times", TYPEID< F32 >(), Offset(times, ParticleData), &protectedSetTimes, 
+   addProtectedField( "times", TYPEID< F32 >(), Offset(times, ParticleData), &protectedSetTimes,
       &defaultProtectedGetFn, PDC_NUM_KEYS,
       "@brief Time keys used with the colors and sizes keyframes.\n\n"
       "Values are from 0.0 (particle creation) to 1.0 (end of lifespace)." );
@@ -228,7 +228,7 @@ void ParticleData::packData(BitStream* stream)
    if( stream->writeFlag(windCoefficient != sgDefaultWindCoefficient ) )
       stream->write(windCoefficient);
    if (stream->writeFlag(gravityCoefficient != 0.0f))
-     stream->writeSignedFloat(gravityCoefficient / 10, 12); 
+     stream->writeSignedFloat(gravityCoefficient / 10, 12);
    stream->writeFloat(inheritedVelFactor, 9);
    if( stream->writeFlag( constantAcceleration != sgDefaultConstantAcceleration ) )
       stream->write(constantAcceleration);
@@ -293,10 +293,10 @@ void ParticleData::unpackData(BitStream* stream)
       stream->read(&windCoefficient);
    else
       windCoefficient = sgDefaultWindCoefficient;
-   if (stream->readFlag()) 
-     gravityCoefficient = stream->readSignedFloat(12)*10; 
-   else 
-     gravityCoefficient = 0.0f; 
+   if (stream->readFlag())
+     gravityCoefficient = stream->readSignedFloat(12)*10;
+   else
+     gravityCoefficient = 0.0f;
    inheritedVelFactor = stream->readFloat(9);
    if(stream->readFlag())
       stream->read(&constantAcceleration);
@@ -338,7 +338,7 @@ void ParticleData::unpackData(BitStream* stream)
    textureName = (stream->readFlag()) ? stream->readSTString() : 0;
    for (i = 0; i < 4; i++)
       mathRead(*stream, &texCoords[i]);
-   
+
    animateTexture = stream->readFlag();
    if (animateTexture)
    {
@@ -348,7 +348,7 @@ void ParticleData::unpackData(BitStream* stream)
    }
 }
 
-bool ParticleData::protectedSetSizes( void *object, const char *index, const char *data) 
+bool ParticleData::protectedSetSizes( void *object, const char *index, const char *data)
 {
    ParticleData *pData = static_cast<ParticleData*>( object );
    F32 val = dAtof(data);
@@ -364,7 +364,7 @@ bool ParticleData::protectedSetSizes( void *object, const char *index, const cha
    return false;
 }
 
-bool ParticleData::protectedSetTimes( void *object, const char *index, const char *data) 
+bool ParticleData::protectedSetTimes( void *object, const char *index, const char *data)
 {
    ParticleData *pData = static_cast<ParticleData*>( object );
    F32 val = dAtof(data);
@@ -435,13 +435,13 @@ bool ParticleData::onAdd()
    }
 
    // Here we validate parameters
-   if (animateTexture) 
+   if (animateTexture)
    {
      // Tiling dimensions must be positive and non-zero
      if (animTexTiling.x <= 0 || animTexTiling.y <= 0)
      {
-       Con::warnf(ConsoleLogEntry::General, 
-                  "ParticleData(%s) bad value(s) for animTexTiling [%d or %d <= 0], invalid datablock", 
+       Con::warnf(ConsoleLogEntry::General,
+                  "ParticleData(%s) bad value(s) for animTexTiling [%d or %d <= 0], invalid datablock",
                   animTexTiling.x, animTexTiling.y, getName());
        return false;
      }
@@ -449,21 +449,21 @@ bool ParticleData::onAdd()
      // Indices must fit into a byte so these are also bad
      if (animTexTiling.x * animTexTiling.y > 256)
      {
-       Con::warnf(ConsoleLogEntry::General, 
-                  "ParticleData(%s) bad values for animTexTiling [%d*%d > %d], invalid datablock", 
+       Con::warnf(ConsoleLogEntry::General,
+                  "ParticleData(%s) bad values for animTexTiling [%d*%d > %d], invalid datablock",
                   animTexTiling.x, animTexTiling.y, 256, getName());
        return false;
      }
 
      // A list of frames is required
-     if (!animTexFramesString || !animTexFramesString[0]) 
+     if (!animTexFramesString || !animTexFramesString[0])
      {
        Con::warnf(ConsoleLogEntry::General, "ParticleData(%s) no animTexFrames, invalid datablock", getName());
        return false;
      }
 
      // The frame list cannot be too long.
-     if (animTexFramesString && dStrlen(animTexFramesString) > 255) 
+     if (animTexFramesString && dStrlen(animTexFramesString) > 255)
      {
        Con::errorf(ConsoleLogEntry::General, "ParticleData(%s) animTexFrames string too long [> 255 chars]", getName());
        return false;
@@ -496,12 +496,12 @@ bool ParticleData::preload(bool server, String &errorStr)
         }
       }
 
-      if (animateTexture) 
+      if (animateTexture)
       {
         // Here we parse animTexFramesString into byte-size frame numbers in animTexFrames.
         // Each frame token must be separated by whitespace.
         // A frame token must be a positive integer frame number or a range of frame numbers
-        // separated with a '-'. 
+        // separated with a '-'.
         // The range separator, '-', cannot have any whitspace around it.
         // Ranges can be specified to move through the frames in reverse as well as forward.
         // Frame numbers exceeding the number of tiles will wrap.
@@ -517,11 +517,11 @@ bool ParticleData::preload(bool server, String &errorStr)
         dStrcpy(tokCopy, animTexFramesString);
 
         char* currTok = dStrtok(tokCopy, " \t");
-        while (currTok != NULL) 
+        while (currTok != NULL)
         {
           char* minus = dStrchr(currTok, '-');
           if (minus)
-          { 
+          {
             // add a range of frames
             *minus = '\0';
             S32 range_a = dAtoi(currTok);

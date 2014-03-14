@@ -37,7 +37,7 @@
       visible = "0";
       Margin = "5 5 5 5";
       Padding = "5 5 5 5";
-               
+
       new GuiTabBookCtrl(ESnapOptionsTabBook) {
          canSaveDynamicFields = "0";
          isContainer = "1";
@@ -77,7 +77,7 @@
             text = "Terrain";
             maxLength = "255";
             command = "toggleSnappingOptions(\"terrain\");";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -127,7 +127,7 @@
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
-                  
+
                   new GuiDynamicCtrlArrayControl() {
                      canSaveDynamicFields = "0";
                      internalName = "TerrainSnapAlignment";
@@ -149,7 +149,7 @@
                      rowSpacing = "2";
                      colSpacing = "2";
                      dynamicSize = true;
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -384,7 +384,7 @@
             text = "Soft";
             maxLength = "255";
             command = "toggleSnappingOptions(\"soft\");";
-            
+
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -435,7 +435,7 @@
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
-                  
+
                   new GuiControl() {
                      Enabled = "1";
                      Profile = "ToolsGuiDefaultProfile";
@@ -444,7 +444,7 @@
                      Extent = "190 18";
                      MinExtent = "16 16";
                      Visible = "1";
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -467,7 +467,7 @@
                         text = "Snap Size:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         internalName = "SnapSize";
                         profile="ToolsGuiNumericTextEditProfile";
@@ -479,7 +479,7 @@
                         AltCommand = "ESnapOptions.setSoftSnapSize();";
                      };
                   };
-                  
+
                   new GuiControl() {
                      Enabled = "1";
                      Profile = "ToolsGuiDefaultProfile";
@@ -487,7 +487,7 @@
                      Extent = "190 90";
                      MinExtent = "16 16";
                      Visible = "1";
-                  
+
                      new GuiDynamicCtrlArrayControl() {
                         canSaveDynamicFields = "0";
                         internalName = "SoftSnapAlignment";
@@ -508,7 +508,7 @@
                         rowSize = "20";
                         rowSpacing = "2";
                         colSpacing = "2";
-                        
+
                         new GuiTextCtrl() {
                            canSaveDynamicFields = "0";
                            Enabled = "1";
@@ -706,7 +706,7 @@
                         };
                      };
                   };
-                  
+
                   new GuiCheckBoxCtrl(){
                      internalName = "RenderSnapBounds";
                      Enabled = "1";
@@ -716,7 +716,7 @@
                      text = "Render Snap Bounds";
                      Command = "ESnapOptions.toggleRenderSnapBounds();";
                   };
-                  
+
                   new GuiCheckBoxCtrl(){
                      internalName = "RenderSnappedTriangle";
                      Enabled = "1";
@@ -726,7 +726,7 @@
                      text = "Render Snapped Triangle";
                      Command = "ESnapOptions.toggleRenderSnappedTriangle();";
                   };
-                  
+
                   new GuiControl() {
                      Enabled = "1";
                      Profile = "ToolsGuiDefaultProfile";
@@ -735,7 +735,7 @@
                      Extent = "190 18";
                      MinExtent = "16 16";
                      Visible = "1";
-                     
+
                      new GuiTextCtrl() {
                         canSaveDynamicFields = "0";
                         Enabled = "1";
@@ -758,7 +758,7 @@
                         text = "Backface Tolerance:";
                         maxLength = "1024";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         internalName = "SnapBackfaceTolerance";
                         profile="ToolsGuiNumericTextEditProfile";

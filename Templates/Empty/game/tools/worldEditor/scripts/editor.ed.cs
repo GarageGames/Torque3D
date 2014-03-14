@@ -35,7 +35,7 @@
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Mission Editor 
+// Mission Editor
 //------------------------------------------------------------------------------
 
 function Editor::create()
@@ -104,44 +104,44 @@ function toggleEditor(%make)
       MessageBoxOK("Windowed Mode Required", "Please switch to windowed mode to access the Mission Editor.");
       return;
    }
-   
+
    if (%make)
-   {      
+   {
       %timerId = startPrecisionTimer();
-      
+
       if( $InGuiEditor )
          GuiEdit();
-         
+
       if( !$missionRunning )
       {
          // Flag saying, when level is chosen, launch it with the editor open.
          ChooseLevelDlg.launchInEditor = true;
-         Canvas.pushDialog( ChooseLevelDlg );         
+         Canvas.pushDialog( ChooseLevelDlg );
       }
       else
       {
          pushInstantGroup();
-         
+
          if ( !isObject( Editor ) )
          {
             Editor::create();
             MissionCleanup.add( Editor );
             MissionCleanup.add( Editor.getUndoManager() );
          }
-         
+
          if( EditorIsActive() )
          {
-            if (theLevelInfo.type $= "DemoScene") 
+            if (theLevelInfo.type $= "DemoScene")
             {
                commandToServer('dropPlayerAtCamera');
-               Editor.close("SceneGui");   
-            } 
-            else 
+               Editor.close("SceneGui");
+            }
+            else
             {
                Editor.close("PlayGui");
             }
          }
-         else 
+         else
          {
             if ( !$GuiEditorBtnPressed )
             {
@@ -152,24 +152,24 @@ function toggleEditor(%make)
             {
                $GuiEditorBtnPressed = false;
             }
-            
+
             Editor.open();
-			
+
 			// Cancel the scheduled event to prevent
 			// the level from cycling after it's duration
 			// has elapsed.
             cancel($Game::Schedule);
-            
+
             if (theLevelInfo.type $= "DemoScene")
                commandToServer('dropCameraAtPlayer', true);
-               
-            
+
+
             canvas.popDialog(EditorLoadingGui);
          }
-         
+
          popInstantGroup();
       }
-      
+
       %elapsed = stopPrecisionTimer( %timerId );
       warn( "Time spent in toggleEditor() : " @ %elapsed / 1000.0 @ " s" );
    }
@@ -208,8 +208,8 @@ package EditorDisconnectOverride
          if (isObject( MainMenuGui ))
             Editor.close("MainMenuGui");
       }
-      
-      Parent::disconnect();  
+
+      Parent::disconnect();
    }
 };
 activatePackage( EditorDisconnectOverride );

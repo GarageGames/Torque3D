@@ -61,7 +61,7 @@ ConsoleDocClass( SimSet,
 );
 ConsoleDocClass( SimGroup,
    "@brief A collection of SimObjects that are owned by the group.\n\n"
-   
+
    "A SimGroup is a stricter form of SimSet. SimObjects may only be a member "
    "of a single SimGroup at a time. The SimGroup will automatically enforce "
    "the single-group-membership rule (ie. adding an object to a SimGroup will "
@@ -106,7 +106,7 @@ IMPLEMENT_CALLBACK( SimSet, onObjectAdded, void, ( SimObject* object ), ( object
 IMPLEMENT_CALLBACK( SimSet, onObjectRemoved, void, ( SimObject* object ), ( object ),
    "Called when an object is removed from the set.\n"
    "@param object The object that was removed." );
-   
+
 
 //=============================================================================
 //    SimSet.
@@ -135,13 +135,13 @@ void SimSet::addObject( SimObject* obj )
    // Prevent SimSet being added to itself.
    if( obj == this )
       return;
-      
+
    lock();
-   
+
    const bool added = objectList.pushBack( obj );
    if( added )
       deleteNotify( obj );
-   
+
    unlock();
 
    if( added )
@@ -157,11 +157,11 @@ void SimSet::addObject( SimObject* obj )
 void SimSet::removeObject( SimObject* obj )
 {
    lock();
-   
+
    const bool removed = objectList.remove( obj );
    if( removed )
       clearNotify( obj );
-   
+
    unlock();
 
    if( removed )
@@ -178,13 +178,13 @@ void SimSet::pushObject( SimObject* obj )
 {
    if( obj == this )
       return;
-      
+
    lock();
-   
+
    bool added = objectList.pushBackForce( obj );
    if( added )
       deleteNotify( obj );
-      
+
    unlock();
 
    if( added )
@@ -211,7 +211,7 @@ void SimSet::popObject()
 
    clearNotify( object );
    unlock();
-   
+
    getSetModificationSignal().trigger( SetObjectRemoved, this, object );
    if( object->isProperlyAdded() )
       onObjectRemoved_callback( object );
@@ -282,16 +282,16 @@ bool SimSet::reOrder( SimObject *obj, SimObject *target )
    if ( (itrS = find(begin(),end(),obj)) == end() )
    {
       // object must be in list
-      return false; 
+      return false;
    }
 
    if ( obj == target )
    {
       // don't reorder same object but don't indicate error
-      return true;   
+      return true;
    }
 
-   if ( !target )    
+   if ( !target )
    {
       // if no target, then put to back of list
 
@@ -299,7 +299,7 @@ bool SimSet::reOrder( SimObject *obj, SimObject *target )
       if ( itrS != (end()-1) )
       {
          // remove object from its current location and push to back of list
-         objectList.erase(itrS);    
+         objectList.erase(itrS);
          objectList.push_back(obj);
       }
    }
@@ -312,14 +312,14 @@ bool SimSet::reOrder( SimObject *obj, SimObject *target )
 
       objectList.erase(itrS);
 
-      // once itrS has been erased, itrD won't be pointing at the 
+      // once itrS has been erased, itrD won't be pointing at the
       // same place anymore - re-find...
       itrD = find(begin(),end(),target);
       objectList.insert(itrD, obj);
    }
 
    return true;
-}   
+}
 
 //-----------------------------------------------------------------------------
 
@@ -339,10 +339,10 @@ void SimSet::onRemove()
    if( !objectList.empty() )
    {
       objectList.sortId();
-      
+
       // This backwards iterator loop doesn't work if the
       // list is empty, check the size first.
-      
+
       for( SimObjectList::iterator ptr = objectList.end() - 1;
             ptr >= objectList.begin(); ptr -- )
          clearNotify( *ptr );
@@ -396,10 +396,10 @@ void SimSet::write(Stream &stream, U32 tabStop, U32 flags)
 void SimSet::clear()
 {
    lock();
-   
+
    while( !empty() )
       popObject();
-      
+
    unlock();
 
    getSetModificationSignal().trigger( SetCleared, this, NULL );
@@ -434,10 +434,10 @@ SimObject* SimSet::findObject( SimObject* object )
          break;
       }
    unlock();
-   
+
    if( found )
       return object;
-      
+
    return NULL;
 }
 
@@ -542,7 +542,7 @@ SimObject* SimSet::getRandom()
 SimSet* SimSet::clone()
 {
    // Clone the set object.
-   
+
    SimObject* object = Parent::clone();
    SimSet* set = dynamic_cast< SimSet* >( object );
    if( !set )
@@ -550,12 +550,12 @@ SimSet* SimSet::clone()
       object->deleteObject();
       return NULL;
    }
-   
+
    // Add all object in the set.
-   
+
    for( iterator iter = begin(); iter != end(); ++ iter )
       set->addObject( *iter );
-   
+
    return set;
 }
 
@@ -625,31 +625,31 @@ void SimGroup::_addObject( SimObject* obj, bool forcePushBack )
       Con::errorf( "SimGroup::addObject - (%d) can't add self!", getIdString() );
       return;
    }
-   
+
    if( obj->getGroup() == this )
       return;
 
    lock();
-   
+
    obj->incRefCount();
-   
+
    if( obj->getGroup() )
       obj->getGroup()->removeObject( obj );
-      
+
    if( forcePushBack ? objectList.pushBack( obj ) : objectList.pushBackForce( obj ) )
    {
       mNameDictionary.insert( obj );
       obj->mGroup = this;
-      
+
       obj->onGroupAdd();
-      
+
       getSetModificationSignal().trigger( SetObjectAdded, this, obj );
       if( obj->isProperlyAdded() )
          onObjectAdded_callback( obj );
    }
    else
       obj->decRefCount();
-   
+
    unlock();
 
    // SimObjects will automatically remove them from their group
@@ -679,7 +679,7 @@ void SimGroup::_removeObjectNoLock( SimObject* obj )
    if( obj->mGroup == this )
    {
       obj->onGroupRemove();
-      
+
       mNameDictionary.remove( obj );
       objectList.remove( obj );
       obj->mGroup = 0;
@@ -719,11 +719,11 @@ void SimGroup::popObject()
 
    clearNotify( object );
    mNameDictionary.remove( object );
-      
+
    getSetModificationSignal().trigger( SetObjectAdded, this, object );
    if( object->isProperlyAdded() )
       onObjectRemoved_callback( object );
-   
+
    object->decRefCount();
 }
 
@@ -750,7 +750,7 @@ void SimGroup::clear()
    {
       SimObject* object = objectList.last();
       object->onGroupRemove();
-      
+
       objectList.pop_back();
       mNameDictionary.remove( object );
       object->mGroup = 0;
@@ -762,7 +762,7 @@ void SimGroup::clear()
       if( engineAPI::gUseConsoleInterop )
          object->deleteObject();
       else
-         object->decRefCount();      
+         object->decRefCount();
    }
    unlock();
 
@@ -798,7 +798,7 @@ SimGroup* SimGroup::clone()
 {
    // Skip SimSet::clone since we do not want to steal the child objects
    // from this group.
-   
+
    SimObject* object = SimObject::clone();
    SimGroup* group = dynamic_cast< SimGroup* >( object );
    if( !group )
@@ -806,7 +806,7 @@ SimGroup* SimGroup::clone()
       object->deleteObject();
       return NULL;
    }
-   
+
    return group;
 }
 
@@ -815,7 +815,7 @@ SimGroup* SimGroup::clone()
 SimGroup* SimGroup::deepClone()
 {
    // Clone the group object.
-   
+
    SimObject* object = Parent::deepClone();
    SimGroup* group = dynamic_cast< SimGroup* >( object );
    if( !group )
@@ -823,12 +823,12 @@ SimGroup* SimGroup::deepClone()
       object->deleteObject();
       return NULL;
    }
-   
+
    // Clone all child objects.
-   
+
    for( iterator iter = begin(); iter != end(); ++ iter )
       group->addObject( ( *iter )->deepClone() );
-   
+
    return group;
 }
 
@@ -1040,7 +1040,7 @@ DefineEngineMethod( SimSet, getObject, SimObject*, ( U32 index ),,
       Con::errorf( "Set::getObject - index out of range." );
       return NULL;
    }
-   
+
    return ( *object )[ index ];
 }
 
@@ -1133,6 +1133,6 @@ DefineEngineMethod( SimSet, acceptsAsChild, bool, ( SimObject* obj ),,
 {
    if( !obj )
       return false;
-   
+
    return object->acceptsAsChild( obj );
 }

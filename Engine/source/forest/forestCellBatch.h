@@ -28,13 +28,13 @@
 class ForestItem;
 
 
-class ForestCellBatch 
+class ForestCellBatch
 {
 protected:
 
-   /// Used to detect when the batch rendering 
+   /// Used to detect when the batch rendering
    /// objects need to be repacked.
-   bool mDirty; 
+   bool mDirty;
 
    /// The items in the batch.
    Vector<ForestItem> mItems;
@@ -47,7 +47,7 @@ protected:
    virtual void _render( const SceneRenderState *state ) = 0;
 
 public:
-   
+
    ForestCellBatch();
    virtual ~ForestCellBatch();
 

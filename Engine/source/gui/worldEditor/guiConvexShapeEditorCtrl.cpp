@@ -74,7 +74,7 @@ GuiConvexEditorCtrl::GuiConvexEditorCtrl()
    mHasCopied( false ),
    mSavedGizmoFlags( -1 ),
    mCtrlDown( false )
-{   
+{
 	mMaterialName = StringTable->insert("Grid512_OrangeLines_Mat");
 }
 
@@ -85,7 +85,7 @@ GuiConvexEditorCtrl::~GuiConvexEditorCtrl()
 bool GuiConvexEditorCtrl::onAdd()
 {
    if ( !Parent::onAdd() )
-      return false;   
+      return false;
 
    SceneManager::getPreRenderSignal().notify( this, &GuiConvexEditorCtrl::_prepRenderImage );
 
@@ -104,7 +104,7 @@ void GuiConvexEditorCtrl::onRemove()
 }
 
 void GuiConvexEditorCtrl::initPersistFields()
-{   
+{
    addField( "isDirty", TypeBool, Offset( mIsDirty, GuiConvexEditorCtrl ) );
 	addField( "materialName", TypeString, Offset(mMaterialName, GuiConvexEditorCtrl) );
 
@@ -131,7 +131,7 @@ bool GuiConvexEditorCtrl::onWake()
       }
    }
 
-   return true;   
+   return true;
 }
 
 void GuiConvexEditorCtrl::onSleep()
@@ -139,7 +139,7 @@ void GuiConvexEditorCtrl::onSleep()
    Parent::onSleep();
 
    mConvexSEL = NULL;
-   mConvexHL = NULL;   
+   mConvexHL = NULL;
 }
 
 void GuiConvexEditorCtrl::setVisible( bool val )
@@ -149,9 +149,9 @@ void GuiConvexEditorCtrl::setVisible( bool val )
    if ( isProperlyAdded() )
    {
       if ( !val )
-      {         
+      {
          mFaceHL = -1;
-         mConvexHL = NULL;			
+         mConvexHL = NULL;
 
          setSelection( NULL, -1 );
 
@@ -163,7 +163,7 @@ void GuiConvexEditorCtrl::setVisible( bool val )
       }
       else
       {
-			mConvexHL = NULL;			
+			mConvexHL = NULL;
 			mFaceHL = -1;
 
          setSelection( NULL, -1 );
@@ -178,7 +178,7 @@ void GuiConvexEditorCtrl::setVisible( bool val )
 					ConvexShape *pShape;
 					if ( Sim::findObject( objId, pShape ) )
 					{
-						mConvexSEL = pShape;						
+						mConvexSEL = pShape;
 						wedit->clearSelection();
 						wedit->selectObject( String::ToString("%i",objId) );
 						break;
@@ -195,7 +195,7 @@ void GuiConvexEditorCtrl::setVisible( bool val )
 
 void GuiConvexEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 {
-   mouseLock();   
+   mouseLock();
 
    mMouseDown = true;
 
@@ -206,22 +206,22 @@ void GuiConvexEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
       return;
    }
 
-   if ( mConvexSEL && isShapeValid( mConvexSEL ) )      
-      mLastValidShape = mConvexSEL->mSurfaces;  
+   if ( mConvexSEL && isShapeValid( mConvexSEL ) )
+      mLastValidShape = mConvexSEL->mSurfaces;
 
    if ( mConvexSEL &&
         mFaceSEL != -1 &&
         mGizmo->getMode() == RotateMode &&
         mGizmo->getSelection() == Gizmo::Centroid )
-   {      
-      mSettingPivot = true;      
+   {
+      mSettingPivot = true;
       mSavedPivotPos = mGizmo->getPosition();
       setPivotPos( mConvexSEL, mFaceSEL, event );
       updateGizmoPos();
       return;
    }
 
-   mGizmo->on3DMouseDown( event );   
+   mGizmo->on3DMouseDown( event );
 }
 
 void GuiConvexEditorCtrl::on3DRightMouseDown(const Gui3DMouseEvent & event)
@@ -239,7 +239,7 @@ void GuiConvexEditorCtrl::on3DRightMouseDown(const Gui3DMouseEvent & event)
 
       MatrixF rotMat( EulerF( 0.0f, mDegToRad( 2.0f ), 0.0f ) );
 
-      newSurf *= rotMat;           
+      newSurf *= rotMat;
 
       mConvexSEL->mSurfaces.insert( mFaceSEL+1, newSurf );
    }
@@ -261,28 +261,28 @@ void GuiConvexEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
    mMouseDown = false;
 
    mHasCopied = false;
-   mHasGeometry = false;   
+   mHasGeometry = false;
 
    if ( mActiveTool )
    {
       ConvexEditorTool::EventResult result = mActiveTool->on3DMouseUp( event );
 
-      if ( result == ConvexEditorTool::Done )      
-         setActiveTool( NULL );         
-      
+      if ( result == ConvexEditorTool::Done )
+         setActiveTool( NULL );
+
       return;
    }
 
    if ( !mSettingPivot && !mDragging && ( mGizmo->getSelection() == Gizmo::None || !mConvexSEL ) )
    {
       if ( mConvexSEL != mConvexHL )
-      {         
+      {
          setSelection( mConvexHL, -1 );
       }
       else
       {
-         if ( mFaceSEL != mFaceHL )         
-            setSelection( mConvexSEL, mFaceHL );         
+         if ( mFaceSEL != mFaceHL )
+            setSelection( mConvexSEL, mFaceHL );
          else
             setSelection( mConvexSEL, -1 );
       }
@@ -292,7 +292,7 @@ void GuiConvexEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
 
    mSettingPivot = false;
    mSavedPivotPos = mGizmo->getPosition();
-   mSavedUndo = false;   
+   mSavedUndo = false;
 
    mGizmo->on3DMouseUp( event );
 
@@ -301,7 +301,7 @@ void GuiConvexEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
       mDragging = false;
 
       if ( mConvexSEL )
-      {         
+      {
          Vector< U32 > removedPlanes;
          mConvexSEL->cullEmptyPlanes( &removedPlanes );
 
@@ -316,14 +316,14 @@ void GuiConvexEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
                prevFaceHL = mFaceHL = -1;
             if ( removedPlanes.contains( mFaceSEL ) )
                prevFaceSEL = mFaceSEL = -1;
-            
+
             for ( S32 i = 0; i < removedPlanes.size(); i++ )
             {
                if ( (S32)removedPlanes[i] < prevFaceSEL )
-                  mFaceSEL--;               
+                  mFaceSEL--;
                if ( (S32)removedPlanes[i] < prevFaceHL )
-                  mFaceHL--;     
-            }        
+                  mFaceHL--;
+            }
 
             setSelection( mConvexSEL, mFaceSEL );
 
@@ -333,7 +333,7 @@ void GuiConvexEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
       }
    }
 
-   updateGizmoPos();   
+   updateGizmoPos();
 }
 
 void GuiConvexEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
@@ -348,7 +348,7 @@ void GuiConvexEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
 
    ConvexShape *hitShape = NULL;
    S32 hitFace = -1;
-   
+
    _cursorCast( event, &hitShape, &hitFace );
 
    if ( !mConvexSEL )
@@ -360,7 +360,7 @@ void GuiConvexEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
    {
       if ( mConvexSEL == hitShape )
       {
-         mConvexHL = hitShape;        
+         mConvexHL = hitShape;
          mFaceHL = hitFace;
       }
       else
@@ -375,7 +375,7 @@ void GuiConvexEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
          {
             mConvexHL = hitShape;
             mFaceHL = -1;
-         } 
+         }
       }
    }
 
@@ -384,7 +384,7 @@ void GuiConvexEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
 }
 
 void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
-{      
+{
    if ( mActiveTool )
    {
       // If we have an active tool pass this event to it.
@@ -401,15 +401,15 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
    if ( mGizmo->getMode() == RotateMode &&
         mGizmo->getSelection() == Gizmo::Centroid )
-   {            
-      setPivotPos( mConvexSEL, mFaceSEL, event );      
+   {
+      setPivotPos( mConvexSEL, mFaceSEL, event );
       mDragging = true;
       return;
    }
 
    mGizmo->on3DMouseDragged( event );
-      
-   if ( event.modifier & SI_SHIFT && 
+
+   if ( event.modifier & SI_SHIFT &&
        ( mGizmo->getMode() == MoveMode || mGizmo->getMode() == RotateMode ) &&
         !mHasCopied )
    {
@@ -419,7 +419,7 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
          //newShape->_updateGeometry();
 
          submitUndo( CreateShape, newShape );
-         setSelection( newShape, 0 );         
+         setSelection( newShape, 0 );
          updateGizmoPos();
 
          mGizmo->on3DMouseDown( event );
@@ -434,7 +434,7 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
          newShape->setScale( mConvexSEL->getScale() );
          newShape->mSurfaces.clear();
          newShape->mSurfaces.merge( mConvexSEL->mSurfaces );
-         
+
          setupShape( newShape );
 
          submitUndo( CreateShape, newShape );
@@ -455,7 +455,7 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
         !mHasCopied &&
         mFaceSEL != -1 )
    {
-      // Can must verify that splitting the face at the current angle 
+      // Can must verify that splitting the face at the current angle
       // ( of the gizmo ) will generate a valid shape.  If not enough rotation
       // has occurred we will have two faces that are coplanar and must wait
       // until later in the drag to perform the split.
@@ -475,12 +475,12 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
       MatrixF worldToObj( mConvexSEL->getTransform() );
       worldToObj.scale( mConvexSEL->getScale() );
-      worldToObj.inverse();      
+      worldToObj.inverse();
 
       mConvexSEL->mSurfaces.increment();
       MatrixF &newSurf = mConvexSEL->mSurfaces.last();
       newSurf = mConvexSEL->mSurfaces[mFaceSEL] * rotMat;
-      
+
       //worldToObj.mul( mGizmo->getTransform() );
       //Point3F pos( mPivotPos );
       //worldToObj.mulP( pos );
@@ -500,13 +500,13 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
          mLastValidShape = mConvexSEL->mSurfaces;
 
-         submitUndo( ModifyShape, mConvexSEL );           
+         submitUndo( ModifyShape, mConvexSEL );
 
          setSelection( mConvexSEL, mConvexSEL->mSurfaces.size() - 1 );
 
          updateGizmoPos();
-      }      
-      
+      }
+
       return;
    }
 
@@ -521,7 +521,7 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
       _cursorCast( event, &hitShape, &hitFace );
       mFaceHL = hitFace;
-      mConvexHL = hitShape;      
+      mConvexHL = hitShape;
 
       return;
    }
@@ -536,7 +536,7 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       {
          mSavedUndo = true;
          submitUndo( ModifyShape, mConvexSEL );
-      }      
+      }
 
       if ( mGizmo->getMode() == ScaleMode )
       {
@@ -545,15 +545,15 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       else
       {
          // Why does this have to be so ugly.
-         if ( mGizmo->getMode() == RotateMode || 
-              ( mGizmo->getMode() == MoveMode  && 
+         if ( mGizmo->getMode() == RotateMode ||
+              ( mGizmo->getMode() == MoveMode  &&
                 ( event.modifier & SI_CTRL  ||
-                  ( mGizmo->getSelection() == Gizmo::Axis_Z && mHasCopied ) 
+                  ( mGizmo->getSelection() == Gizmo::Axis_Z && mHasCopied )
                 )
               )
             )
          {
-            const MatrixF &gMat = mGizmo->getTransform();      
+            const MatrixF &gMat = mGizmo->getTransform();
             MatrixF surfMat;
             surfMat.mul( mConvexSEL->mWorldToObj, gMat );
 
@@ -561,18 +561,18 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
             worldToObj.scale( mConvexSEL->getScale() );
             worldToObj.inverse();
 
-            Point3F newPos;            
-            newPos = gMat.getPosition();      
+            Point3F newPos;
+            newPos = gMat.getPosition();
 
             worldToObj.mulP( newPos );
             surfMat.setPosition( newPos );
-            
+
             // Clear out floating point errors.
             cleanMatrix( surfMat );
 
             mConvexSEL->mSurfaces[mFaceSEL] = surfMat;
 
-            updateShape( mConvexSEL, mFaceSEL );         
+            updateShape( mConvexSEL, mFaceSEL );
          }
          else
          {
@@ -582,10 +582,10 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
          }
       }
 
-      if ( isShapeValid( mConvexSEL ) )          
+      if ( isShapeValid( mConvexSEL ) )
       {
          AssertFatal( mConvexSEL->mSurfaces.size() > mFaceSEL, "mFaceSEL out of range." );
-         mLastValidShape = mConvexSEL->mSurfaces; 
+         mLastValidShape = mConvexSEL->mSurfaces;
       }
       else
       {
@@ -610,20 +610,20 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       mConvexSEL->setPosition( mGizmo->getPosition() );
    }
    else if ( mGizmo->getMode() == RotateMode )
-   {   
-      mConvexSEL->setTransform( mGizmo->getTransform() );      
+   {
+      mConvexSEL->setTransform( mGizmo->getTransform() );
    }
    else
    {
       mConvexSEL->setScale( mGizmo->getScale() );
-   }   
+   }
 
    if ( mConvexSEL->getClientObject() )
    {
       ConvexShape *clientObj = static_cast< ConvexShape* >( mConvexSEL->getClientObject() );
       clientObj->setTransform( mConvexSEL->getTransform() );
       clientObj->setScale( mConvexSEL->getScale() );
-   }      
+   }
 }
 
 void GuiConvexEditorCtrl::on3DMouseEnter(const Gui3DMouseEvent & event)
@@ -643,8 +643,8 @@ bool GuiConvexEditorCtrl::onKeyDown( const GuiEvent &evt )
    switch ( evt.keyCode )
    {
    case KEY_ESCAPE:
-      handled = handleEscape();      
-      break;   
+      handled = handleEscape();
+      break;
    case KEY_A:
       if ( evt.modifier & SI_ALT )
       {
@@ -658,11 +658,11 @@ bool GuiConvexEditorCtrl::onKeyDown( const GuiEvent &evt )
       break;
    case KEY_LCONTROL:
       //mCtrlDown = true;
-      break;  
+      break;
    default:
       break;
    }
-   
+
    return handled;
 }
 
@@ -671,10 +671,10 @@ bool GuiConvexEditorCtrl::onKeyUp( const GuiEvent &evt )
    bool handled = false;
 
    switch ( evt.keyCode )
-   {      
+   {
    case KEY_LCONTROL:
       //mCtrlDown = false;
-      break;   
+      break;
    default:
       break;
    }
@@ -682,8 +682,8 @@ bool GuiConvexEditorCtrl::onKeyUp( const GuiEvent &evt )
    return handled;
 }
 
-void GuiConvexEditorCtrl::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void GuiConvexEditorCtrl::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    //cursor = mAddNodeCursor;
@@ -704,20 +704,20 @@ void GuiConvexEditorCtrl::get3DCursor( GuiCursor *&cursor,
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
 
-   // We've already changed the cursor, 
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if( root->mCursorChanged != -1)
       controller->popCursor();
 
    // Now change the cursor shape
    controller->pushCursor(currCursor);
-   root->mCursorChanged = currCursor;   
+   root->mCursorChanged = currCursor;
 }
 
 void GuiConvexEditorCtrl::updateGizmo()
 {
    mGizmoProfile->restoreDefaultState();
-   
+
    const GizmoMode &mode = mGizmoProfile->mode;
    S32 &flags = mGizmoProfile->flags;
    GizmoAlignment &align = mGizmoProfile->alignment;
@@ -736,7 +736,7 @@ void GuiConvexEditorCtrl::updateGizmo()
 
    if ( mFaceSEL != -1 )
    {
-      align = Object;    
+      align = Object;
       flags |= GizmoProfile::CanRotateUniform;
       flags &= ~GizmoProfile::CanRotateScreen;
    }
@@ -749,19 +749,19 @@ void GuiConvexEditorCtrl::updateGizmo()
    if ( mFaceSEL != -1 && mode == ScaleMode )
       flags &= ~GizmoProfile::CanScaleZ;
    else
-      flags |= GizmoProfile::CanScaleZ;         
+      flags |= GizmoProfile::CanScaleZ;
 
    if ( mFaceSEL != -1 && mode == MoveMode )
    {
-      if ( mCtrlDown )      
-         flags &= ~( GizmoProfile::CanTranslateX | GizmoProfile::CanTranslateY | GizmoProfile::PlanarHandlesOn );      
-      else      
-         flags |= ( GizmoProfile::CanTranslateX | GizmoProfile::CanTranslateY | GizmoProfile::PlanarHandlesOn );      
+      if ( mCtrlDown )
+         flags &= ~( GizmoProfile::CanTranslateX | GizmoProfile::CanTranslateY | GizmoProfile::PlanarHandlesOn );
+      else
+         flags |= ( GizmoProfile::CanTranslateX | GizmoProfile::CanTranslateY | GizmoProfile::PlanarHandlesOn );
    }
 }
 
 void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
-{      
+{
 	// Synch selected ConvexShape with the WorldEditor.
 
 	WorldEditor *wedit;
@@ -784,14 +784,14 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
 				wedit->selectObject( mConvexSEL->getIdString() );
 			}
 		}
-	}   
+	}
 
    // Update status bar text.
 
    SimObject *statusbar;
    if ( Sim::findObject( "EditorGuiStatusBar", statusbar ) )
    {
-      String text( "Sketch Tool." );      
+      String text( "Sketch Tool." );
       GizmoMode mode = mGizmo->getMode();
 
       if ( mMouseDown && mGizmo->getSelection() != Gizmo::None && mConvexSEL )
@@ -799,22 +799,22 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
          Point3F delta;
          String qualifier;
 
-         if ( mode == RotateMode )   
+         if ( mode == RotateMode )
          {
-            if ( mSettingPivot )            
+            if ( mSettingPivot )
                delta = mGizmo->getPosition() - mSavedPivotPos;
             else
-               delta = mGizmo->getDeltaTotalRot();         
+               delta = mGizmo->getDeltaTotalRot();
          }
-         else if ( mode == MoveMode )         
-            delta = mGizmo->getTotalOffset();         
+         else if ( mode == MoveMode )
+            delta = mGizmo->getTotalOffset();
          else if ( mode == ScaleMode )
-            delta = mGizmo->getDeltaTotalScale();            
-         
-         if ( mGizmo->getAlignment() == Object && 
+            delta = mGizmo->getDeltaTotalScale();
+
+         if ( mGizmo->getAlignment() == Object &&
               mode != ScaleMode )
-         {            
-            mConvexSEL->mWorldToObj.mulV( delta );            
+         {
+            mConvexSEL->mWorldToObj.mulV( delta );
             if ( mFaceSEL != -1 && mode != RotateMode )
             {
                MatrixF objToSurf( mConvexSEL->mSurfaces[ mFaceSEL ] );
@@ -830,48 +830,48 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
             delta.y = 0.0f;
          if ( mIsZero( delta.z, 0.0001f ) )
             delta.z = 0.0f;
-         
-         if ( mode == RotateMode )         
+
+         if ( mode == RotateMode )
          {
-            if ( mSettingPivot )            
-               text = String::ToString( "Delta position ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+            if ( mSettingPivot )
+               text = String::ToString( "Delta position ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
             else
             {
                delta.x = mRadToDeg( delta.x );
                delta.y = mRadToDeg( delta.y );
                delta.z = mRadToDeg( delta.z );
-               text = String::ToString( "Delta angle ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+               text = String::ToString( "Delta angle ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
             }
          }
-         else if ( mode == MoveMode )     
-            text = String::ToString( "Delta position ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+         else if ( mode == MoveMode )
+            text = String::ToString( "Delta position ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
          else if ( mode == ScaleMode )
-            text = String::ToString( "Delta scale ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+            text = String::ToString( "Delta scale ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
       }
-      else 
-      {     
+      else
+      {
          if ( !mConvexSEL )
             text = "Sketch Tool.  ALT + Click-Drag to create a new ConvexShape.";
          else if ( mFaceSEL == -1 )
          {
-            if ( mode == MoveMode )            
+            if ( mode == MoveMode )
                text = "Move selection.  SHIFT while dragging duplicates objects.";
-            else if ( mode == RotateMode )            
+            else if ( mode == RotateMode )
                text = "Rotate selection.";
-            else if ( mode == ScaleMode )            
-               text = "Scale selection.";        
+            else if ( mode == ScaleMode )
+               text = "Scale selection.";
          }
-         else 
+         else
          {
-            if ( mode == MoveMode )            
+            if ( mode == MoveMode )
                text = "Move face.  SHIFT while beginning a drag EXTRUDES a new convex. Press CTRL for alternate translation mode.";
-            else if ( mode == RotateMode )            
+            else if ( mode == RotateMode )
                text = "Rotate face.  Gizmo/Pivot is draggable. CTRL while dragging splits/folds a new face. SHIFT while dragging extrudes a new convex.";
-            else if ( mode == ScaleMode )            
+            else if ( mode == ScaleMode )
             text = "Scale face.";
          }
       }
-   
+
       // Issue a warning in the status bar
       // if this convex has an excessive number of surfaces...
       if ( mConvexSEL && mConvexSEL->getSurfaces().size() > ConvexShape::smMaxSurfaces )
@@ -882,7 +882,7 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
       Con::executef( statusbar, "setInfo", text.c_str() );
 
 	Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mConvexSEL == NULL ? 0 : 1 ) );
-   }   
+   }
 
    if ( mActiveTool )
       mActiveTool->renderScene( updateRect );
@@ -908,19 +908,19 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
 
          Point3F boxPos = objBox.getCenter();
          objMat.mulP( boxPos );
-         
+
          drawer->drawObjectBox( desc, objBox.getExtents(), boxPos, objMat, ColorI::WHITE );
       }
       else
       {
-         mConvexSEL->renderFaceEdges( -1, colorNA );     
+         mConvexSEL->renderFaceEdges( -1, colorNA );
 
-         drawFacePlane( mConvexSEL, mFaceSEL );         
+         drawFacePlane( mConvexSEL, mFaceSEL );
       }
 
       if ( mConvexHL == mConvexSEL &&
-           mFaceHL != -1 && 
-           mFaceHL != mFaceSEL && 
+           mFaceHL != -1 &&
+           mFaceHL != mFaceSEL &&
            mGizmo->getSelection() == Gizmo::None )
       {
          mConvexSEL->renderFaceEdges( mFaceHL, colorHL );
@@ -929,7 +929,7 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
 
    if ( mConvexHL && mConvexHL != mConvexSEL )
    {
-      mConvexHL->renderFaceEdges( -1 );      
+      mConvexHL->renderFaceEdges( -1 );
    }
 
    if ( mGizmo->getMode() != RotateMode && mUsingPivot )
@@ -955,18 +955,18 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
    {
       GFXTransformSaver saver;
       // Now draw all the 2d stuff!
-      GFX->setClipRect(updateRect); 
+      GFX->setClipRect(updateRect);
 
       if ( mConvexSEL && mFaceSEL != -1 )
-      {      
+      {
          Vector< Point3F > lineList;
          mConvexSEL->getSurfaceLineList( mFaceSEL, lineList );
 
          MatrixF objToWorld( mConvexSEL->getTransform() );
-         objToWorld.scale( mConvexSEL->getScale() );      
+         objToWorld.scale( mConvexSEL->getScale() );
 
-         for ( S32 i = 0; i < lineList.size(); i++ )     
-            objToWorld.mulP( lineList[i] );			
+         for ( S32 i = 0; i < lineList.size(); i++ )
+            objToWorld.mulP( lineList[i] );
 
          for ( S32 i = 0; i < lineList.size() - 1; i++ )
          {
@@ -980,16 +980,16 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
       if ( gizmoAlpha == 1.0f )
       {
          if ( mGizmoProfile->mode != NoneMode )
-            mGizmo->renderText( mSaveViewport, mSaveModelview, mSaveProjection );   	
+            mGizmo->renderText( mSaveViewport, mSaveModelview, mSaveProjection );
       }
 
       if ( mActiveTool )
          mActiveTool->render2D();
    }
 
-   if ( gizmoAlpha == 1.0f )   
+   if ( gizmoAlpha == 1.0f )
       mGizmo->renderGizmo( mLastCameraQuery.cameraMatrix, mLastCameraQuery.fov );
-} 
+}
 
 void GuiConvexEditorCtrl::drawFacePlane( ConvexShape *shape, S32 faceId )
 {
@@ -1047,9 +1047,9 @@ void GuiConvexEditorCtrl::scaleFace( ConvexShape *shape, S32 faceId, Point3F sca
    if ( !mHasGeometry )
    {
       mHasGeometry = true;
-      
+
       mSavedGeometry = shape->mGeometry;
-      mSavedSurfaces = shape->mSurfaces;      
+      mSavedSurfaces = shape->mSurfaces;
    }
    else
    {
@@ -1059,13 +1059,13 @@ void GuiConvexEditorCtrl::scaleFace( ConvexShape *shape, S32 faceId, Point3F sca
 
    if ( shape->mGeometry.faces.size() <= faceId )
       return;
-   
+
    ConvexShape::Face &face = shape->mGeometry.faces[faceId];
 
    Vector< Point3F > &pointList = shape->mGeometry.points;
 
    AssertFatal( shape->mSurfaces[ face.id ].isAffine(), "ConvexShapeEditor - surface not affine." );
-      
+
    Point3F projScale;
    scale.z = 1.0f;
 
@@ -1074,8 +1074,8 @@ void GuiConvexEditorCtrl::scaleFace( ConvexShape *shape, S32 faceId, Point3F sca
    objToSurf.inverse();
 
    for ( S32 i = 0; i < face.points.size(); i++ )
-   {                  
-      Point3F &pnt = pointList[ face.points[i] ];   
+   {
+      Point3F &pnt = pointList[ face.points[i] ];
 
       objToSurf.mulP( pnt );
       pnt *= scale;
@@ -1092,7 +1092,7 @@ void GuiConvexEditorCtrl::translateFace( ConvexShape *shape, S32 faceId, const P
       mHasGeometry = true;
 
       mSavedGeometry = shape->mGeometry;
-      mSavedSurfaces = shape->mSurfaces;      
+      mSavedSurfaces = shape->mSurfaces;
    }
    else
    {
@@ -1109,7 +1109,7 @@ void GuiConvexEditorCtrl::translateFace( ConvexShape *shape, S32 faceId, const P
 
    AssertFatal( shape->mSurfaces[ face.id ].isAffine(), "ConvexShapeEditor - surface not affine." );
 
-   // Transform displacement into object space.    
+   // Transform displacement into object space.
    MatrixF worldToObj( shape->getTransform() );
    worldToObj.scale( shape->getScale() );
    worldToObj.inverse();
@@ -1118,9 +1118,9 @@ void GuiConvexEditorCtrl::translateFace( ConvexShape *shape, S32 faceId, const P
    worldToObj.mulV( displace, &displaceOS );
 
    for ( S32 i = 0; i < face.points.size(); i++ )
-   {                  
-      Point3F &pnt = pointList[ face.points[i] ];   
-      pnt += displaceOS;      
+   {
+      Point3F &pnt = pointList[ face.points[i] ];
+      pnt += displaceOS;
    }
 
    updateModifiedFace( shape, faceId );
@@ -1139,7 +1139,7 @@ void GuiConvexEditorCtrl::updateModifiedFace( ConvexShape *shape, S32 faceId )
 
    for ( S32 i = 0; i < faceList.size(); i++ )
    {
-      ConvexShape::Face &curFace = faceList[i];      
+      ConvexShape::Face &curFace = faceList[i];
       MatrixF &curSurface = shape->mSurfaces[ curFace.id ];
 
       U32 curPntCount = curFace.points.size();
@@ -1159,7 +1159,7 @@ void GuiConvexEditorCtrl::updateModifiedFace( ConvexShape *shape, S32 faceId )
             pId0 = j;
             break;
          }
-      }         
+      }
 
       if ( pId0 == -1 )
          continue;
@@ -1198,7 +1198,7 @@ void GuiConvexEditorCtrl::updateModifiedFace( ConvexShape *shape, S32 faceId )
 
       curSurface.setColumn( 0, rvec );
       curSurface.setColumn( 1, fvec );
-      curSurface.setColumn( 2, uvec );   
+      curSurface.setColumn( 2, uvec );
       curSurface.setPosition( newPlane.getPosition() );
    }
 
@@ -1236,8 +1236,8 @@ bool GuiConvexEditorCtrl::isShapeValid( ConvexShape *shape )
       for ( S32 j = i + 1; j < shape->mPlanes.size(); j++ )
       {
          F32 d = mDot( shape->mPlanes[i], shape->mPlanes[j] );
-         if ( d > 0.999f )         
-            return false;         
+         if ( d > 0.999f )
+            return false;
       }
    }
 
@@ -1297,7 +1297,7 @@ void GuiConvexEditorCtrl::updateGizmoPos()
    {
       if ( mFaceSEL != -1 )
       {
-         MatrixF surfMat = mConvexSEL->getSurfaceWorldMat( mFaceSEL );  
+         MatrixF surfMat = mConvexSEL->getSurfaceWorldMat( mFaceSEL );
 
          MatrixF objToWorld( mConvexSEL->getTransform() );
          objToWorld.scale( mConvexSEL->getScale() );
@@ -1318,18 +1318,18 @@ void GuiConvexEditorCtrl::updateGizmoPos()
             gizmoPos = faceCenterPnt;
          }
 
-         mGizmo->set( surfMat, gizmoPos, Point3F::One );        
+         mGizmo->set( surfMat, gizmoPos, Point3F::One );
       }
       else
       {
          mGizmoMatOffset = Point3F::Zero;
-         mGizmo->set( mConvexSEL->getTransform(), mConvexSEL->getPosition(), mConvexSEL->getScale() ); 
+         mGizmo->set( mConvexSEL->getTransform(), mConvexSEL->getPosition(), mConvexSEL->getScale() );
       }
-   }   
+   }
 }
 
 bool GuiConvexEditorCtrl::setActiveTool( ConvexEditorTool *tool )
-{   
+{
    if ( mActiveTool == tool )
       return false;
 
@@ -1364,7 +1364,7 @@ bool GuiConvexEditorCtrl::handleEscape()
    }
 
    if ( mConvexSEL )
-   {         
+   {
       setSelection( NULL, -1 );
       return true;
    }
@@ -1407,8 +1407,8 @@ bool GuiConvexEditorCtrl::handleDelete()
          // Grab the mission editor undo manager.
          UndoManager *undoMan = NULL;
          if ( !Sim::findObject( "EUndoManager", undoMan ) )
-         {            
-            Con::errorf( "GuiConvexEditorCtrl::on3DMouseDown() - EUndoManager not found!" );    
+         {
+            Con::errorf( "GuiConvexEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
          }
          else
          {
@@ -1416,12 +1416,12 @@ bool GuiConvexEditorCtrl::handleDelete()
             MEDeleteUndoAction *action = new MEDeleteUndoAction("Deleted ConvexShape");
             action->deleteObject( mConvexSEL );
             mIsDirty = true;
-            
-            mFaceHL = -1; 
+
+            mFaceHL = -1;
 
             setSelection( NULL, -1 );
 
-            // Submit it.               
+            // Submit it.
             undoMan->addAction( action );
          }
       }
@@ -1432,7 +1432,7 @@ bool GuiConvexEditorCtrl::handleDelete()
 
 bool GuiConvexEditorCtrl::hasSelection() const
 {
-   return mConvexSEL != NULL;   
+   return mConvexSEL != NULL;
 }
 
 void GuiConvexEditorCtrl::clearSelection()
@@ -1465,7 +1465,7 @@ void GuiConvexEditorCtrl::setSelection( ConvexShape *shape, S32 faceId )
 }
 
 void GuiConvexEditorCtrl::_prepRenderImage( SceneManager* sceneGraph, const SceneRenderState* state )
-{   
+{
    if ( !isAwake() )
       return;
 
@@ -1474,12 +1474,12 @@ void GuiConvexEditorCtrl::_prepRenderImage( SceneManager* sceneGraph, const Scen
    ri->type = RenderPassManager::RIT_Editor;
    ri->renderDelegate.bind( this, &GuiConvexEditorCtrl::_renderObject );
    ri->defaultKey = 100;
-   state->getRenderPass()->addInst( ri );   
+   state->getRenderPass()->addInst( ri );
    */
 }
 
 void GuiConvexEditorCtrl::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *matInst )
-{  
+{
 }
 
 void GuiConvexEditorCtrl::submitUndo( UndoType type, ConvexShape *shape )
@@ -1490,14 +1490,14 @@ void GuiConvexEditorCtrl::submitUndo( UndoType type, ConvexShape *shape )
 }
 
 void GuiConvexEditorCtrl::submitUndo( UndoType type, const Vector<ConvexShape*> &shapes )
-{   
+{
    // Grab the mission editor undo manager.
-   Sim::findObject( "EUndoManager", mUndoManager );   
-   
-   if ( !mUndoManager )   
+   Sim::findObject( "EUndoManager", mUndoManager );
+
+   if ( !mUndoManager )
    {
       Con::errorf( "GuiConvexEditorCtrl::submitUndo() - EUndoManager not found!" );
-      return;           
+      return;
    }
 
    if ( type == ModifyShape )
@@ -1507,11 +1507,11 @@ void GuiConvexEditorCtrl::submitUndo( UndoType type, const Vector<ConvexShape*> 
 
       ConvexShape *shape = shapes.first();
 
-      action->mObjId = shape->getId();   
-      action->mEditor = this;   
+      action->mObjId = shape->getId();
+      action->mEditor = this;
       action->mSavedObjToWorld = shape->getTransform();
       action->mSavedScale = shape->getScale();
-      action->mSavedSurfaces.merge( shape->mSurfaces );             
+      action->mSavedSurfaces.merge( shape->mSurfaces );
       action->mUndoManager = mUndoManager;
 
       mUndoManager->addAction( action );
@@ -1524,9 +1524,9 @@ void GuiConvexEditorCtrl::submitUndo( UndoType type, const Vector<ConvexShape*> 
 
       for ( S32 i = 0; i < shapes.size(); i++ )
          action->addObject( shapes[i] );
-         
+
       mUndoManager->addAction( action );
-      
+
       mLastUndo = action;
    }
    else if ( type == DeleteShape )
@@ -1534,7 +1534,7 @@ void GuiConvexEditorCtrl::submitUndo( UndoType type, const Vector<ConvexShape*> 
       MEDeleteUndoAction *action = new MEDeleteUndoAction( "Deleted ConvexShape" );
 
       for ( S32 i = 0; i < shapes.size(); i++ )
-         action->deleteObject( shapes[i] );         
+         action->deleteObject( shapes[i] );
 
       mUndoManager->addAction( action );
 
@@ -1548,10 +1548,10 @@ void GuiConvexEditorCtrl::submitUndo( UndoType type, const Vector<ConvexShape*> 
       MEDeleteUndoAction *deleteAction = new MEDeleteUndoAction();
 
       deleteAction->deleteObject( shapes.first() );
-      
-      for ( S32 i = 1; i < shapes.size(); i++ )      
+
+      for ( S32 i = 1; i < shapes.size(); i++ )
          createAction->addObject( shapes[i] );
-      
+
       action->addAction( deleteAction );
       action->addAction( createAction );
 
@@ -1572,7 +1572,7 @@ bool GuiConvexEditorCtrl::_cursorCastCallback( RayInfo* ri )
 bool GuiConvexEditorCtrl::_cursorCast( const Gui3DMouseEvent &event, ConvexShape **hitShape, S32 *hitFace )
 {
    RayInfo ri;
-   
+
    if ( gServerContainer.castRay( event.pos, event.pos + event.vec * 10000.0f, StaticShapeObjectType, &ri, &GuiConvexEditorCtrl::_cursorCastCallback ) &&
         dynamic_cast< ConvexShape* >( ri.object ) )
    {
@@ -1659,7 +1659,7 @@ S32 GuiConvexEditorCtrl::getEdgeByPoints( ConvexShape *shape, S32 faceId, S32 p0
       if ( edge.p1 != p0 && edge.p1 != p1 )
          continue;
 
-      return i;      
+      return i;
    }
 
    return -1;
@@ -1667,7 +1667,7 @@ S32 GuiConvexEditorCtrl::getEdgeByPoints( ConvexShape *shape, S32 faceId, S32 p0
 
 bool GuiConvexEditorCtrl::getEdgesTouchingPoint( ConvexShape *shape, S32 faceId, S32 pId, Vector< U32 > &edgeIdxList, S32 excludeEdge )
 {
-   const ConvexShape::Face &face = shape->mGeometry.faces[faceId];   
+   const ConvexShape::Face &face = shape->mGeometry.faces[faceId];
    const Vector< ConvexShape::Edge > &edgeList = face.edges;
 
    for ( S32 i = 0; i < edgeList.size(); i++ )
@@ -1677,7 +1677,7 @@ bool GuiConvexEditorCtrl::getEdgesTouchingPoint( ConvexShape *shape, S32 faceId,
 
       const ConvexShape::Edge &curEdge = edgeList[i];
 
-      if ( curEdge.p0 == pId || curEdge.p1 == pId )      
+      if ( curEdge.p0 == pId || curEdge.p1 == pId )
          edgeIdxList.push_back(i);
    }
 
@@ -1690,15 +1690,15 @@ void GuiConvexEditorUndoAction::undo()
    if ( !Sim::findObject( mObjId, object ) )
       return;
 
-   // Temporarily save the ConvexShape current data.   
-   Vector< MatrixF > tempSurfaces;   
+   // Temporarily save the ConvexShape current data.
+   Vector< MatrixF > tempSurfaces;
    tempSurfaces.merge( object->mSurfaces );
    MatrixF tempObjToWorld( object->getTransform() );
    Point3F tempScale( object->getScale() );
 
    // Restore the Object to the UndoAction state.
    object->mSurfaces.clear();
-   object->mSurfaces.merge( mSavedSurfaces );   
+   object->mSurfaces.merge( mSavedSurfaces );
    object->setScale( mSavedScale );
    object->setTransform( mSavedObjToWorld );
 
@@ -1707,17 +1707,17 @@ void GuiConvexEditorUndoAction::undo()
    GuiConvexEditorCtrl::synchClientObject( object );
 
    // If applicable set the selected ConvexShape and face
-   // on the editor.   
+   // on the editor.
    mEditor->setSelection( object, -1 );
    mEditor->updateGizmoPos();
 
    // Now save the previous ConvexShape data in this UndoAction
    // since an undo action must become a redo action and vice-versa
-   
+
    mSavedObjToWorld = tempObjToWorld;
    mSavedScale = tempScale;
    mSavedSurfaces.clear();
-   mSavedSurfaces.merge( tempSurfaces );   
+   mSavedSurfaces.merge( tempSurfaces );
 }
 
 ConvexEditorCreateTool::ConvexEditorCreateTool( GuiConvexEditorCtrl *editor )
@@ -1752,9 +1752,9 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDown( const Gui3D
       mEditor->mouseLock();
 
       Point3F start( event.pos );
-      Point3F end( event.pos + event.vec * 10000.0f );      
+      Point3F end( event.pos + event.vec * 10000.0f );
       RayInfo ri;
-      
+
       bool hit = gServerContainer.castRay( event.pos, end, STATIC_COLLISION_TYPEMASK, &ri );
 
       MatrixF objMat( true );
@@ -1764,7 +1764,7 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDown( const Gui3D
 
       if ( !hit )
       {
-         objMat.setPosition( event.pos + event.vec * 100.0f );      
+         objMat.setPosition( event.pos + event.vec * 100.0f );
       }
       else
       {
@@ -1802,18 +1802,18 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDown( const Gui3D
          }
       }
 
-      mNewConvex = new ConvexShape();                       
+      mNewConvex = new ConvexShape();
 
-      mNewConvex->setTransform( objMat );   
-		
+      mNewConvex->setTransform( objMat );
+
 		mNewConvex->setField( "material", Parent::mEditor->mMaterialName );
-		
+
       mNewConvex->registerObject();
       mPlaneSizes.set( 0.1f, 0.1f, 0.1f );
       mNewConvex->resizePlanes( mPlaneSizes );
       mEditor->updateShape( mNewConvex );
-      
-      mTransform = objMat;     
+
+      mTransform = objMat;
 
       mCreatePlane.set( objMat.getPosition(), objMat.getUpVector() );
    }
@@ -1821,7 +1821,7 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDown( const Gui3D
    {
       // Handle this on mouseUp
    }
-   
+
    return Handled;
 }
 
@@ -1829,11 +1829,11 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseUp( const Gui3DMo
 {
    if ( mNewConvex && mStage == -1 )
    {
-      mStage = 0;      
+      mStage = 0;
 
       mCreatePlane = PlaneF( mNewConvex->getPosition(), mNewConvex->getTransform().getForwardVector() );
 
-      mTransform.setPosition( mNewConvex->getPosition() );      
+      mTransform.setPosition( mNewConvex->getPosition() );
 
       return Handled;
    }
@@ -1852,19 +1852,19 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseUp( const Gui3DMo
       {
          Con::errorf( "ConvexEditorCreateTool::on3DMouseDown() - EUndoManager not found!" );
          mNewConvex = NULL;
-         return Failed;           
+         return Failed;
       }
 
       // Create the UndoAction.
       MECreateUndoAction *action = new MECreateUndoAction("Create ConvexShape");
       action->addObject( mNewConvex );
 
-      // Submit it.               
+      // Submit it.
       undoMan->addAction( action );
 
       mEditor->setField( "isDirty", "1" );
 
-      mEditor->setSelection( mNewConvex, -1 );      
+      mEditor->setSelection( mNewConvex, -1 );
 
       mNewConvex = NULL;
 
@@ -1882,7 +1882,7 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseMove( const Gui3D
    {
       Point3F start( event.pos );
       Point3F end( start + event.vec * 10000.0f );
-      
+
       F32 t = mCreatePlane.intersect( start, end );
 
       Point3F hitPos;
@@ -1890,7 +1890,7 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseMove( const Gui3D
       if ( t < 0.0f || t > 1.0f )
          return Handled;
 
-      hitPos.interpolate( start, end, t );      
+      hitPos.interpolate( start, end, t );
 
       MatrixF worldToObj( mTransform );
       worldToObj.inverse();
@@ -1927,11 +1927,11 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDragged( const Gu
 
    Point3F hitPos;
    hitPos.interpolate( start, end, t );
-   
+
    MatrixF xfm( mTransform );
-   xfm.inverse();      
-   xfm.mulP( hitPos);      
-   
+   xfm.inverse();
+   xfm.mulP( hitPos);
+
    Point3F scale;
    scale.x = getMax( mFabs( hitPos.x ), 0.1f );
    scale.y = getMax( mFabs( hitPos.y ), 0.1f );
@@ -1939,7 +1939,7 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDragged( const Gu
 
    mNewConvex->resizePlanes( scale );
    mPlaneSizes = scale;
-   mEditor->updateShape( mNewConvex );   
+   mEditor->updateShape( mNewConvex );
 
    Point3F pos( mTransform.getPosition() );
    pos += mTransform.getRightVector() * hitPos.x * 0.5f;
@@ -1952,7 +1952,7 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseDragged( const Gu
 
 void ConvexEditorCreateTool::renderScene( const RectI &updateRect )
 {
-  
+
 }
 
 ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape, S32 inFaceId )
@@ -1961,9 +1961,9 @@ ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape,
    ConvexShape::Face &inFace = inShapeGeometry.faces[inFaceId];
    Vector< Point3F > &inShapePointList = inShapeGeometry.points;
    Vector< MatrixF > &inShapeSurfaces = inShape->getSurfaces();
-   
-   S32 shapeFaceCount = inFace.edges.size() + 2;   
-   
+
+   S32 shapeFaceCount = inFace.edges.size() + 2;
+
    MatrixF inShapeToWorld( inShape->getTransform() );
    inShapeToWorld.scale( inShape->getScale() );
    //MatrixF inWorldToShape( inShapeToWorld );
@@ -1978,27 +1978,27 @@ ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape,
    worldToShape.inverse();
 
    MatrixF inShapeToNewShape;
-   inShapeToNewShape.mul( inShapeToWorld, worldToShape );   
+   inShapeToNewShape.mul( inShapeToWorld, worldToShape );
 
-   ConvexShape *newShape = new ConvexShape;   
-   newShape->setTransform( shapeToWorld );   
+   ConvexShape *newShape = new ConvexShape;
+   newShape->setTransform( shapeToWorld );
 
    Vector< MatrixF > &shapeSurfaces = newShape->getSurfaces();
    shapeSurfaces.setSize( shapeFaceCount );
    //shapeSurfaces.setSize( 2 );
 
    const Point3F &shapePos = shapeToWorld.getPosition();
-   
+
    shapeSurfaces[0].identity();
-   shapeSurfaces[1].identity();   
+   shapeSurfaces[1].identity();
    shapeSurfaces[1].setColumn( 0, -shapeSurfaces[1].getColumn3F(0) );
    shapeSurfaces[1].setColumn( 2, -shapeSurfaces[1].getColumn3F(2) );
 
    for ( S32 i = 0; i < inFace.winding.size(); i++ )
-   {      
+   {
       Point3F p0 = inShapePointList[ inFace.points[ inFace.winding[ i ] ] ];
       Point3F p1;
-      
+
       if ( i+1 < inFace.winding.size() )
          p1 = inShapePointList[ inFace.points[ inFace.winding[ i+1 ] ] ];
       else
@@ -2007,21 +2007,21 @@ ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape,
       inShapeToWorld.mulP( p0 );
       inShapeToWorld.mulP( p1 );
 
-      Point3F newPos = MathUtils::mClosestPointOnSegment( p0, p1, shapePos );      
+      Point3F newPos = MathUtils::mClosestPointOnSegment( p0, p1, shapePos );
 
       Point3F rvec = p0 - p1;
       rvec.normalizeSafe();
 
       Point3F fvec = shapeToWorld.getUpVector();
 
-      Point3F uvec = mCross( rvec, fvec );      
+      Point3F uvec = mCross( rvec, fvec );
 
       if ( i + 2 >= shapeSurfaces.size() )
          continue;
-      
+
       //F32 dt = mDot( shapeToWorld.getUpVector(), rvec );
       //AssertFatal( mIsZero( dt ), "bad" );
-      
+
       MatrixF &surf = shapeSurfaces[i+2];
       surf.identity();
       surf.setColumn( 0, rvec );
@@ -2029,7 +2029,7 @@ ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape,
       surf.setColumn( 2, uvec );
       surf.setPosition( newPos );
 
-      surf.mulL( worldToShape );      
+      surf.mulL( worldToShape );
    }
 
 	newShape->setField( "material", Parent::mEditor->mMaterialName );
@@ -2056,7 +2056,7 @@ void GuiConvexEditorCtrl::hollowShape( ConvexShape *shape, F32 thickness )
    {
       ConvexShape *faceShape = mCreateTool->extrudeShapeFromFace( shape, i );
       MatrixF &inwardFace = faceShape->mSurfaces[1];
-      //MatrixF &outwardFace = faceShape->mSurfaces[0];      
+      //MatrixF &outwardFace = faceShape->mSurfaces[0];
 
       Point3F invec = inwardFace.getUpVector();
 
@@ -2068,7 +2068,7 @@ void GuiConvexEditorCtrl::hollowShape( ConvexShape *shape, F32 thickness )
    }
 
    convexList.push_front( shape );
-   submitUndo( HollowShape, convexList );   
+   submitUndo( HollowShape, convexList );
 }
 
 void GuiConvexEditorCtrl::hollowSelection()
@@ -2076,15 +2076,15 @@ void GuiConvexEditorCtrl::hollowSelection()
    if ( mConvexSEL )
    {
       hollowShape( mConvexSEL, 0.15f );
-      setSelection( NULL, -1 );      
+      setSelection( NULL, -1 );
    }
 }
 
 void GuiConvexEditorCtrl::recenterSelection()
 {
-   if ( mConvexSEL )    
+   if ( mConvexSEL )
    {
-      recenterShape( mConvexSEL );   
+      recenterShape( mConvexSEL );
       updateGizmoPos();
    }
 }
@@ -2118,7 +2118,7 @@ void GuiConvexEditorCtrl::dropSelectionAtScreenCenter()
    if(viewdist > 100.0f )
       viewdist = 100.0f;
 
-   // Position the selection   
+   // Position the selection
    mConvexSEL->setPosition( smCamPos + smCamMatrix.getForwardVector() * viewdist );
 
    synchClientObject( mConvexSEL );
@@ -2141,7 +2141,7 @@ void GuiConvexEditorCtrl::splitSelectedFace()
    MatrixF rotMat( true );
 
    mConvexSEL->mSurfaces.increment();
-   MatrixF &dstMat = mConvexSEL->mSurfaces.last();   
+   MatrixF &dstMat = mConvexSEL->mSurfaces.last();
    const MatrixF &srcMat = mConvexSEL->mSurfaces[mFaceSEL];
 
    for ( S32 i = 0; i < 6; i++ )
@@ -2162,7 +2162,7 @@ void GuiConvexEditorCtrl::splitSelectedFace()
          mSavedSurfaces = mConvexSEL->mSurfaces;
          mConvexSEL->mSurfaces = mLastValidShape;
 
-         submitUndo( ModifyShape, mConvexSEL );  
+         submitUndo( ModifyShape, mConvexSEL );
 
          mConvexSEL->mSurfaces = mSavedSurfaces;
          mLastValidShape = mSavedSurfaces;
@@ -2170,7 +2170,7 @@ void GuiConvexEditorCtrl::splitSelectedFace()
          setSelection( mConvexSEL, mConvexSEL->mSurfaces.size() - 1 );
 
          return;
-      }      
+      }
    }
 
    mConvexSEL->mSurfaces = mLastValidShape;
@@ -2211,7 +2211,7 @@ ConsoleMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, 2, 2, "" 
 ConsoleMethod( GuiConvexEditorCtrl, selectConvex, void, 3, 3, "( ConvexShape )" )
 {
    ConvexShape *convex;
-   if ( Sim::findObject( argv[2], convex ) )   
+   if ( Sim::findObject( argv[2], convex ) )
       object->setSelection( convex, -1 );
 }
 

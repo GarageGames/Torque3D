@@ -42,11 +42,11 @@ class SFXNullVoice : public SFXVoice
       friend class SFXNullDevice;
 
    protected:
-   
+
       typedef GenericTimeSource< VirtualMSTimer > TimeSource;
 
       SFXNullVoice( SFXNullBuffer* buffer );
-      
+
       /// The virtual play timer.
       mutable TimeSource mPlayTimer;
 

@@ -63,9 +63,9 @@ namespace MathUtils
    {
       Point3F p0;
       Point3F p1;
-   };   
+   };
 
-   /// A simple helper struct to define a clockwise 
+   /// A simple helper struct to define a clockwise
    /// winding quad.
    struct Quad
    {
@@ -83,8 +83,8 @@ namespace MathUtils
    };
 
    /// Rotate the passed vector around the world-z axis by the passed radians.
-   void vectorRotateZAxis( Point3F &vector, F32 radians ); 
-   void vectorRotateZAxis( F32 radians, Point3F *vectors, U32 count ); 
+   void vectorRotateZAxis( Point3F &vector, F32 radians );
+   void vectorRotateZAxis( F32 radians, Point3F *vectors, U32 count );
 
    /// Generates a projection matrix with the near plane
    /// moved forward by the bias amount.  This function is a helper primarily
@@ -106,7 +106,7 @@ namespace MathUtils
    /// @param up     The non-zero unit length up vector.
    /// @param outMat The output matrix which must be initialized prior to the call.
    ///
-   void getMatrixFromUpVector( const VectorF &up, MatrixF *outMat );   
+   void getMatrixFromUpVector( const VectorF &up, MatrixF *outMat );
 
    /// Creates an orthonormal basis matrix with the unit length
    /// input vector in column 1 (forward vector).
@@ -114,7 +114,7 @@ namespace MathUtils
    /// @param forward   The non-zero unit length forward vector.
    /// @param outMat    The output matrix which must be initialized prior to the call.
    ///
-   void getMatrixFromForwardVector( const VectorF &forward, MatrixF *outMat );   
+   void getMatrixFromForwardVector( const VectorF &forward, MatrixF *outMat );
 
    /// Creates random direction given angle parameters similar to the particle system.
    ///
@@ -124,7 +124,7 @@ namespace MathUtils
    /// Returns a random 3D point within a sphere of the specified radius
    /// centered at the origin.
    Point3F randomPointInSphere( F32 radius );
-   
+
    /// Returns a random 2D point within a circle of the specified radius
    /// centered at the origin.
    Point2F randomPointInCircle( F32 radius );
@@ -160,7 +160,7 @@ namespace MathUtils
    /// Collide two capsules (sphere swept lines) against each other, reporting only if they intersect or not.
    /// Based on routine from "Real Time Collision Detection" by Christer Ericson pp 114.
    bool capsuleCapsuleOverlap(const Point3F & a1, const Point3F & b1, F32 radius1, const Point3F & a2, const Point3F & b2, F32 radius2);
-   
+
    /// Return capsule-sphere overlap.  Returns time of first overlap, where time
    /// is viewed as a sphere of radius radA moving from point A0 to A1.
    bool capsuleSphereNearestOverlap(const Point3F & A0, const Point3F A1, F32 radA, const Point3F & B, F32 radB, F32 & t);
@@ -172,22 +172,22 @@ namespace MathUtils
    /// Transform bounding box making sure to keep original box entirely contained.
    void transformBoundingBox(const Box3F &sbox, const MatrixF &mat, const Point3F scale, Box3F &dbox);
 
-   bool mProjectWorldToScreen(   const Point3F &in, 
+   bool mProjectWorldToScreen(   const Point3F &in,
                                  Point3F *out,
                                  const RectI &view,
-                                 const MatrixF &world, 
+                                 const MatrixF &world,
                                  const MatrixF &projection );
-   bool mProjectWorldToScreen(   const Point3F &in, 
+   bool mProjectWorldToScreen(   const Point3F &in,
                                  Point3F *out,
                                  const RectI &view,
                                  const MatrixF &worldProjection );
 
-   void mProjectScreenToWorld(   const Point3F &in, 
-                                 Point3F *out, 
-                                 const RectI &view, 
-                                 const MatrixF &world, 
-                                 const MatrixF &projection, 
-                                 F32 far, 
+   void mProjectScreenToWorld(   const Point3F &in,
+                                 Point3F *out,
+                                 const RectI &view,
+                                 const MatrixF &world,
+                                 const MatrixF &projection,
+                                 F32 far,
                                  F32 near);
 
    /// Clip @a inFrustum by the given polygon.
@@ -226,14 +226,14 @@ namespace MathUtils
    U32 removeShortPolygonEdges( const Point3F* verts, U32 vertCount, F32 epsilon );
 
    /// Calculates the shortest line segment between two lines.
-   /// 
+   ///
    /// @param outSegment   The result where .p0 is the point on line0 and .p1 is the point on line1.
    ///
    void mShortestSegmentBetweenLines( const Line &line0, const Line &line1, LineSegment *outSegment );
-   
+
    /// Returns the greatest common divisor of two positive integers.
    U32 greatestCommonDivisor( U32 u, U32 v );
-   
+
    /// Returns the barycentric coordinates and time of intersection between
    /// a line segment and a triangle.
    ///
@@ -247,12 +247,12 @@ namespace MathUtils
    ///
    /// @return Returns true if a collision occurs.
    ///
-   bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2, 
+   bool mLineTriangleCollide( const Point3F &p1, const Point3F &p2,
                               const Point3F &t1, const Point3F &t2, const Point3F &t3,
                               Point3F *outUVW = NULL,
                               F32 *outT = NULL );
 
-   /// Returns the uv coords and time of intersection between 
+   /// Returns the uv coords and time of intersection between
    /// a ray and a quad.
    ///
    /// @param quad The quad.
@@ -262,27 +262,27 @@ namespace MathUtils
    ///
    /// @return Returns true if a collision occurs.
    ///
-   bool mRayQuadCollide(   const Quad &quad, 
-                           const Ray &ray, 
+   bool mRayQuadCollide(   const Quad &quad,
+                           const Ray &ray,
                            Point2F *outUV = NULL,
                            F32 *outT = NULL );
 
    /// Returns the distance between a point and triangle 'abc'.
    F32 mTriangleDistance( const Point3F &a, const Point3F &b, const Point3F &c, const Point3F &p, IntersectInfo* info=NULL );
-   
+
    /// Returns the normal of the passed triangle 'abc'.
-   /// 
+   ///
    /// If we assume counter-clockwise triangle culling, normal will point
    /// out from the 'solid' side of the triangle.
    ///
    Point3F mTriangleNormal( const Point3F &a, const Point3F &b, const Point3F &c );
 
    /// Returns the closest point on the segment defined by
-   /// points a, b to the point p.   
-   Point3F mClosestPointOnSegment(  const Point3F &a, 
-                                    const Point3F &b, 
+   /// points a, b to the point p.
+   Point3F mClosestPointOnSegment(  const Point3F &a,
+                                    const Point3F &b,
                                     const Point3F &p );
-  
+
 	/// Sort the passed verts ( Point3F ) in a clockwise or counter-clockwise winding order.
 	/// Verts must be co-planar and non-collinear.
 	///
@@ -290,7 +290,7 @@ namespace MathUtils
 	/// @param clockwise	Sort clockwise or counter-clockwise
 	/// @param verts		Array of Point3F verts.
 	/// @param vertMap	Output - Array of vert element ids sorted by winding order.
-	/// @param count		Element count of the verts and vertMap arrays which must be allocated prior to this call.				
+	/// @param count		Element count of the verts and vertMap arrays which must be allocated prior to this call.
 	///
 	void sortQuadWindingOrder( const MatrixF &quadMat, bool clockwise, const Point3F *verts, U32 *vertMap, U32 count );
 
@@ -303,7 +303,7 @@ namespace MathUtils
    /// WORK IN PROGRESS
    ///
    /// Creates an orthonormal basis matrix from one, two, or three unit length
-   /// input vectors. If more than one input vector is provided they must be 
+   /// input vectors. If more than one input vector is provided they must be
    /// mutually perpendicular.
    ///
    /// @param rvec   Optional unit length right vector.
@@ -322,38 +322,38 @@ namespace MathUtils
                      F32 *outRight,
                      F32 *outTop,
                      F32 *outBottom,
-                     F32 fovYInRadians, 
-                     F32 aspectRatio, 
+                     F32 fovYInRadians,
+                     F32 aspectRatio,
                      F32 nearPlane );
 
    /// Build a GFX projection matrix from the frustum parameters
    /// including the optional rotation required by GFX.
-   void makeProjection( MatrixF *outMatrix, 
-                        F32 fovYInRadians, 
-                        F32 aspectRatio, 
-                        F32 nearPlane, 
+   void makeProjection( MatrixF *outMatrix,
+                        F32 fovYInRadians,
+                        F32 aspectRatio,
+                        F32 nearPlane,
                         F32 farPlane,
                         bool gfxRotate );
 
    /// Build a projection matrix from the frustum near plane dimensions
    /// including the optional rotation required by GFX.
-   void makeProjection( MatrixF *outMatrix, 
-                        F32 left, 
-                        F32 right, 
-                        F32 top, 
-                        F32 bottom, 
-                        F32 nearPlane, 
+   void makeProjection( MatrixF *outMatrix,
+                        F32 left,
+                        F32 right,
+                        F32 top,
+                        F32 bottom,
+                        F32 nearPlane,
                         F32 farPlane,
                         bool gfxRotate );
 
    /// Build an orthographic projection matrix from the frustum near
    /// plane dimensions including the optional rotation required by GFX.
-   void makeOrthoProjection(  MatrixF *outMatrix, 
-                              F32 left, 
-                              F32 right, 
-                              F32 top, 
-                              F32 bottom, 
-                              F32 nearPlane, 
+   void makeOrthoProjection(  MatrixF *outMatrix,
+                              F32 left,
+                              F32 right,
+                              F32 top,
+                              F32 bottom,
+                              F32 nearPlane,
                               F32 farPlane,
                               bool gfxRotate );
 
@@ -367,7 +367,7 @@ namespace MathUtils
    /// @param intersection If there is an intersection, the point of intersection on the triangle's
    ///   face is stored here.
    /// @param True if there is an intersection, false otherwise.
-   bool edgeFaceIntersect( const Point3F &edgeA, const Point3F &edgeB, 
+   bool edgeFaceIntersect( const Point3F &edgeA, const Point3F &edgeB,
       const Point3F &faceA, const Point3F &faceB, const Point3F &faceC, const Point3F &faceD, Point3F *intersection );
 
    /// Find out whether the given polygon is planar.

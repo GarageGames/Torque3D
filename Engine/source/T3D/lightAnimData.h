@@ -44,7 +44,7 @@ class LightInfo;
 
 /// The light animation state required by LightAnimData.
 struct LightAnimState
-{  
+{
    /// Constructor.
    LightAnimState()
       :  active( true ),
@@ -59,13 +59,13 @@ struct LightAnimState
    /// If true light animation should be performed.
    bool active;
 
-   /// The phase used to offset the animation start 
+   /// The phase used to offset the animation start
    /// time to vary the animation of nearby lights.
    F32 animationPhase;
 
    /// The length of time in seconds for a single playback
    /// of the light animation.
-   F32 animationPeriod;   
+   F32 animationPeriod;
 
    /// The set light brightness before animation occurs.
    F32 brightness;
