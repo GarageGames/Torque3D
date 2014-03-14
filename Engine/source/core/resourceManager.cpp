@@ -64,7 +64,7 @@ ResourceBase ResourceManager::load(const Torque::Path &path)
    {
       pair.value = new ResourceBase::Header;
 
-      // TODO: This can fail if the file doesn't exist 
+      // TODO: This can fail if the file doesn't exist
       // at all which is possible.
       //
       // The problem is the templated design in ResourceManager
@@ -122,7 +122,7 @@ void ResourceManager::dumpToConsole()
    for( iter = mResourceHeaderMap.begin(); iter != mResourceHeaderMap.end(); ++iter )
    {
       ResourceBase::Header	*header = (*iter).value;
-            
+
       char fourCC[ 5 ];
       *( ( U32* ) fourCC ) = header->getSignature();
       fourCC[ 4 ] = 0;
@@ -184,8 +184,8 @@ void ResourceManager::reloadResource( const Torque::Path &path, bool showMessage
       iter = mPrevResourceHeaderMap.findOrInsert( path );
       iter->value = header;
    }
-	
-   // Now notify users of the resource change so they 
+
+   // Now notify users of the resource change so they
    // can release and reload.
    mChangeSignal.trigger( path );
 }
@@ -215,7 +215,7 @@ ResourceBase ResourceManager::nextResource()
       if ( header->getSignature() == mIterSigFilter )
          return ResourceBase(header);
    }
-   
+
    return ResourceBase();
 }
 

@@ -52,7 +52,7 @@ struct TerrainSquare
 
    U16 flags;
 
-   enum 
+   enum
    {
       Split45  = BIT(0),
 
@@ -68,7 +68,7 @@ struct TerrainSquare
 typedef U16 TerrainHeight;
 
 
-/// 
+///
 class TerrainFile
 {
 protected:
@@ -97,16 +97,16 @@ protected:
    /// The grid map layers used to accelerate collision
    /// queries for the height map data.
    Vector<TerrainSquare*> mGridMap;
-   
+
    /// MaterialList used to map terrain materials to material instances for the
    /// sake of collision (physics, etc.).
    MaterialList mMaterialInstMapping;
 
    /// The file version.
-   U32 mFileVersion;     
+   U32 mFileVersion;
 
    /// The dirty flag.
-   bool mNeedsResaving;  
+   bool mNeedsResaving;
 
    /// The full path and name of the TerrainFile
    Torque::Path mFilePath;
@@ -117,13 +117,13 @@ protected:
    /// The legacy file loading code.
    void _loadLegacy( FileStream &stream );
 
-   /// Used to populate the materail vector by finding the 
+   /// Used to populate the materail vector by finding the
    /// TerrainMaterial objects by name.
    void _resolveMaterials( const Vector<String> &materials );
 
-   /// 
+   ///
    void _buildGridMap();
-   
+
    ///
    void _initMaterialInstMapping();
 
@@ -139,8 +139,8 @@ public:
    virtual ~TerrainFile();
 
    ///
-   static void create(  String *inOutFilename, 
-                        U32 newSize, 
+   static void create(  String *inOutFilename,
+                        U32 newSize,
                         const Vector<String> &materials );
 
    ///
@@ -149,9 +149,9 @@ public:
    bool save( const char *filename );
 
    ///
-   void import(   const GBitmap &heightMap, 
+   void import(   const GBitmap &heightMap,
                   F32 heightScale,
-                  const Vector<U8> &layerMap, 
+                  const Vector<U8> &layerMap,
                   const Vector<String> &materials,
                   bool flipYAxis = true );
 
@@ -164,9 +164,9 @@ public:
    void setSize( U32 newResolution, bool clear );
 
    TerrainSquare* findSquare( U32 level, U32 x, U32 y ) const;
-   
+
    BaseMatInstance* getMaterialMapping( U32 index ) const;
-   
+
    StringTableEntry getMaterialName( U32 x, U32 y) const;
 
    void setLayerIndex( U32 x, U32 y, U8 index );
@@ -280,4 +280,4 @@ inline bool TerrainFile::isPointInTerrain( U32 x, U32 y ) const
    return false;
 }
 
-#endif // _TERRFILE_H_ 
+#endif // _TERRFILE_H_

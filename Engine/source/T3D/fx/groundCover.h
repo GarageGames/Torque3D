@@ -93,7 +93,7 @@ public:
 
    virtual void init( GFXShader *shader );
 
-   virtual void setConsts( SceneRenderState *state, 
+   virtual void setConsts( SceneRenderState *state,
                            const SceneData &sgData,
                            GFXShaderConstBuffer *buffer );
 
@@ -135,7 +135,7 @@ public:
 
    // Rendering
    void prepRenderImage( SceneRenderState *state );
-   
+
    // Editor
    void onTerrainUpdated( U32 flags, TerrainBlock *tblock, const Point2I& min, const Point2I& max );
 
@@ -151,16 +151,16 @@ public:
    /// Returns the current quality scale... see above.
    static F32 getQualityScale() { return smDensityScale; }
 
-protected:      
+protected:
 
-   enum MaskBits 
-   {      
+   enum MaskBits
+   {
       TerrainBlockMask  = Parent::NextFreeMask << 0,
       NextFreeMask      = Parent::NextFreeMask << 1
    };
 
    MaterialParameters *mMatParams;
-   MaterialParameterHandle *mTypeRectsParam;   
+   MaterialParameterHandle *mTypeRectsParam;
    MaterialParameterHandle *mFadeParams;
    MaterialParameterHandle *mWindDirParam;
    MaterialParameterHandle *mGustInfoParam;
@@ -183,14 +183,14 @@ protected:
    /// defines when fading of cover elements begins.
    F32 mFadeRadius;
 
-   /// This is the distance at which DTS elements are 
+   /// This is the distance at which DTS elements are
    /// completely culled out.
    F32 mShapeCullRadius;
 
    /// Whether shapes rendered by the GroundCover should cast shadows.
    bool mShapesCastShadows;
 
-   /// This is used to scale the various culling radii 
+   /// This is used to scale the various culling radii
    /// when rendering a reflection... typically for water.
    F32 mReflectRadiusScale;
 
@@ -218,7 +218,7 @@ protected:
    /// less than this based on randomization.
    S32 mMaxPlacement;
 
-   /// Used to detect changes in cell placement count from 
+   /// Used to detect changes in cell placement count from
    /// the global quality scale so we can regen the cells.
    S32 mLastPlacementCount;
 
@@ -254,7 +254,7 @@ protected:
    /// the percentage of the maximum amount of cover to put
    /// down.  It scales both rendering cost and placement
    /// CPU performance.
-   static F32 smDensityScale;   
+   static F32 smDensityScale;
 
    String mMaterialName;
    Material *mMaterial;
@@ -295,7 +295,7 @@ protected:
    /// left empty to cover entire terrain.
    StringTableEntry mLayer[MAX_COVERTYPES];
 
-   /// Inverts the data layer test making the 
+   /// Inverts the data layer test making the
    /// layer an exclusion mask.
    bool mInvertLayer[MAX_COVERTYPES];
 
@@ -325,7 +325,7 @@ protected:
    TSShapeInstance* mShapeInstances[MAX_COVERTYPES];
 
    /// This is the same as mProbability, but normalized for use
-   /// during the cover placement process. 
+   /// during the cover placement process.
    F32 mNormalizedProbability[MAX_COVERTYPES];
 
    /// A shared primitive buffer setup for drawing the maximum amount
@@ -338,7 +338,7 @@ protected:
    /// Controls how often the wind gust peaks per second.
    F32 mWindGustFrequency;
 
-   /// The maximum distance in meters that the peak wind 
+   /// The maximum distance in meters that the peak wind
    /// gust will displace an element.
    F32 mWindGustStrength;
 
@@ -365,7 +365,7 @@ protected:
    void _initialize( U32 cellCount, U32 cellPlacementCount );
 
    /// Updates the cover grid by removing cells that
-   /// have fallen outside of mRadius and adding new 
+   /// have fallen outside of mRadius and adding new
    /// ones that have come into view.
    void _updateCoverGrid( const Frustum &culler );
 
@@ -381,7 +381,7 @@ protected:
 
    /// Generates a new cell using the recycle list when possible.
    GroundCoverCell* _generateCell(  const Point2I& index,
-                                    const Box3F& bounds, 
+                                    const Box3F& bounds,
                                     U32 placementCount,
                                     S32 randSeed );
 

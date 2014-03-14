@@ -330,9 +330,9 @@ void init()
    setVariable("Con::prompt", "% ");
    addVariable("Con::logBufferEnabled", TypeBool, &logBufferEnabled, "If true, the log buffer will be enabled.\n"
 	   "@ingroup Console\n");
-   addVariable("Con::printLevel", TypeS32, &printLevel, 
+   addVariable("Con::printLevel", TypeS32, &printLevel,
       "@brief This is deprecated.\n\n"
-      "It is no longer in use and does nothing.\n"      
+      "It is no longer in use and does nothing.\n"
 	   "@ingroup Console\n");
    addVariable("Con::warnUndefinedVariables", TypeBool, &gWarnUndefinedScriptVariables, "If true, a warning will be displayed in the console whenever a undefined variable is used in script.\n"
 	   "@ingroup Console\n");
@@ -341,7 +341,7 @@ void init()
 
    addVariable("Con::objectCopyFailures", TypeS32, &gObjectCopyFailures, "If greater than zero then it counts the number of object creation "
       "failures based on a missing copy object and does not report an error..\n"
-	   "@ingroup Console\n");   
+	   "@ingroup Console\n");
 
    // Current script file name and root
    addVariable( "Con::File", TypeString, &gCurrentFile, "The currently executing script file.\n"
@@ -349,17 +349,17 @@ void init()
    addVariable( "Con::Root", TypeString, &gCurrentRoot, "The mod folder for the currently executing script file.\n"
 	   "@ingroup FileSystem\n" );
 
-   // alwaysUseDebugOutput determines whether to send output to the platform's 
-   // "debug" system.  see winConsole for an example.  
+   // alwaysUseDebugOutput determines whether to send output to the platform's
+   // "debug" system.  see winConsole for an example.
    // in ship builds we don't expose this variable to script
    // and we set it to false by default (don't want to provide more information
-   // to potential hackers).  platform code should also ifdef out the code that 
-   // pays attention to this in ship builds (see winConsole.cpp) 
-   // note that enabling this can slow down your game 
+   // to potential hackers).  platform code should also ifdef out the code that
+   // pays attention to this in ship builds (see winConsole.cpp)
+   // note that enabling this can slow down your game
    // if you are running from the debugger and printing a lot of console messages.
 #ifndef TORQUE_SHIPPING
-   addVariable("Con::alwaysUseDebugOutput", TypeBool, &alwaysUseDebugOutput, 
-      "@brief Determines whether to send output to the platform's \"debug\" system.\n\n" 
+   addVariable("Con::alwaysUseDebugOutput", TypeBool, &alwaysUseDebugOutput,
+      "@brief Determines whether to send output to the platform's \"debug\" system.\n\n"
       "@note This is disabled in shipping builds.\n"
 	   "@ingroup Console");
 #else
@@ -421,19 +421,19 @@ void unlockLog()
 U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forwardTab)
 {
    // Check for null input.
-   if (!inputBuffer[0]) 
+   if (!inputBuffer[0])
    {
       return cursorPos;
    }
 
    // Cap the max result length.
-   if (maxResultLength > MaxCompletionBufferSize) 
+   if (maxResultLength > MaxCompletionBufferSize)
    {
       maxResultLength = MaxCompletionBufferSize;
    }
 
    // See if this is the same partial text as last checked.
-   if (dStrcmp(tabBuffer, inputBuffer)) 
+   if (dStrcmp(tabBuffer, inputBuffer))
    {
       // If not...
       // Save it for checking next time.
@@ -447,10 +447,10 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
       completionBaseStart = p;
       completionBaseLen = cursorPos - p;
       // Is this function being invoked on an object?
-      if (inputBuffer[p - 1] == '.') 
+      if (inputBuffer[p - 1] == '.')
       {
          // If so...
-         if (p <= 1) 
+         if (p <= 1)
          {
             // Bail if no object identifier.
             return cursorPos;
@@ -458,12 +458,12 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
 
          // Find the object identifier.
          S32 objLast = --p;
-         while ((p > 0) && (inputBuffer[p - 1] != ' ') && (inputBuffer[p - 1] != '(')) 
+         while ((p > 0) && (inputBuffer[p - 1] != ' ') && (inputBuffer[p - 1] != '('))
          {
             p--;
          }
 
-         if (objLast == p) 
+         if (objLast == p)
          {
             // Bail if no object identifier.
             return cursorPos;
@@ -473,13 +473,13 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
          dStrncpy(completionBuffer, inputBuffer + p, objLast - p);
          completionBuffer[objLast - p] = 0;
          tabObject = Sim::findObject(completionBuffer);
-         if (tabObject == NULL) 
+         if (tabObject == NULL)
          {
             // Bail if not found.
             return cursorPos;
          }
       }
-      else 
+      else
       {
          // Not invoked on an object; we'll use the global namespace.
          tabObject = 0;
@@ -496,20 +496,20 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
    {
       newText = tabObject->tabComplete(inputBuffer + completionBaseStart, completionBaseLen, forwardTab);
    }
-   else 
+   else
    {
       // In the global namespace, we can complete on global vars as well as functions.
       if (inputBuffer[completionBaseStart] == '$')
       {
          newText = gEvalState.globalVars.tabComplete(inputBuffer + completionBaseStart, completionBaseLen, forwardTab);
       }
-      else 
+      else
       {
          newText = Namespace::global()->tabComplete(inputBuffer + completionBaseStart, completionBaseLen, forwardTab);
       }
    }
 
-   if (newText) 
+   if (newText)
    {
       // If we got something, append it to the input text.
       S32 len = dStrlen(newText);
@@ -534,23 +534,23 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
 static void log(const char *string)
 {
    // Bail if we ain't logging.
-   if (!consoleLogMode) 
+   if (!consoleLogMode)
    {
       return;
    }
 
    // In mode 1, we open, append, close on each log write.
-   if ((consoleLogMode & 0x3) == 1) 
+   if ((consoleLogMode & 0x3) == 1)
    {
       consoleLogFile.open(defLogFileName, Torque::FS::File::ReadWrite);
    }
 
    // Write to the log if its status is hunky-dory.
-   if ((consoleLogFile.getStatus() == Stream::Ok) || (consoleLogFile.getStatus() == Stream::EOS)) 
+   if ((consoleLogFile.getStatus() == Stream::Ok) || (consoleLogFile.getStatus() == Stream::EOS))
    {
       consoleLogFile.setPosition(consoleLogFile.getStreamSize());
       // If this is the first write...
-      if (newLogFile) 
+      if (newLogFile)
       {
          // Make a header.
          Platform::LocalTime lt;
@@ -565,14 +565,14 @@ static void log(const char *string)
                lt.sec);
          consoleLogFile.write(dStrlen(buffer), buffer);
          newLogFile = false;
-         if (consoleLogMode & 0x4) 
+         if (consoleLogMode & 0x4)
          {
             // Dump anything that has been printed to the console so far.
             consoleLogMode -= 0x4;
             U32 size, line;
             ConsoleLogEntry *log;
             getLockLog(log, size);
-            for (line = 0; line < size; line++) 
+            for (line = 0; line < size; line++)
             {
                consoleLogFile.write(dStrlen(log[line].mString), log[line].mString);
                consoleLogFile.write(2, "\r\n");
@@ -585,7 +585,7 @@ static void log(const char *string)
       consoleLogFile.write(2, "\r\n");
    }
 
-   if ((consoleLogMode & 0x3) == 1) 
+   if ((consoleLogMode & 0x3) == 1)
    {
       consoleLogFile.close();
    }
@@ -597,7 +597,7 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
 {
    if (!active)
 	   return;
-   Con::active = false; 
+   Con::active = false;
 
    char buffer[8192];
    U32 offset = 0;
@@ -642,12 +642,12 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
             ConsoleLogEntry entry;
             entry.mLevel  = level;
             entry.mType   = type;
-#ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build            
+#ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build
             entry.mString = (const char *)consoleLogChunker.alloc(dStrlen(pos) + 1);
             dStrcpy(const_cast<char*>(entry.mString), pos);
-            
+
             // This prevents infinite recursion if the console itself needs to
-            // re-allocate memory to accommodate the new console log entry, and 
+            // re-allocate memory to accommodate the new console log entry, and
             // LOG_PAGE_ALLOCS is defined. It is kind of a dirty hack, but the
             // uses for LOG_PAGE_ALLOCS are limited, and it is not worth writing
             // a lot of special case code to support this situation. -patw
@@ -801,21 +801,21 @@ void stripColorChars(char* line)
 {
    char* c = line;
    char cp = *c;
-   while (cp) 
+   while (cp)
    {
-      if (cp < 18) 
+      if (cp < 18)
       {
          // Could be a color control character; let's take a closer look.
-         if ((cp != 8) && (cp != 9) && (cp != 10) && (cp != 13)) 
+         if ((cp != 8) && (cp != 9) && (cp != 10) && (cp != 13))
          {
             // Yep... copy following chars forward over this.
             char* cprime = c;
             char cpp;
-            do 
+            do
             {
                cpp = *++cprime;
                *(cprime - 1) = cpp;
-            } 
+            }
             while (cpp);
             // Back up 1 so we'll check this position again post-copy.
             c--;
@@ -892,17 +892,17 @@ F32 getFloatVariable(const char *varName, F32 def)
 
 //---------------------------------------------------------------------------
 
-void addVariable(    const char *name, 
-                     S32 type, 
-                     void *dptr, 
+void addVariable(    const char *name,
+                     S32 type,
+                     void *dptr,
                      const char* usage )
 {
    gEvalState.globalVars.addVariable( name, type, dptr, usage );
 }
 
-void addConstant(    const char *name, 
-                     S32 type, 
-                     const void *dptr, 
+void addConstant(    const char *name,
+                     S32 type,
+                     const void *dptr,
                      const char* usage )
 {
    Dictionary::Entry* entry = gEvalState.globalVars.addVariable( name, type, const_cast< void* >( dptr ), usage );
@@ -1058,7 +1058,7 @@ const char *execute(S32 argc, const char *argv[])
       SimConsoleThreadExecCallback cb;
       SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(argc, argv, false, &cb);
       Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
-      
+
       return cb.waitForResult();
    }
 #endif
@@ -1072,7 +1072,7 @@ const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCa
       return "";
 
    // [neo, 10/05/2007 - #3010]
-   // Make sure we don't get recursive calls, respect the flag!   
+   // Make sure we don't get recursive calls, respect the flag!
    // Should we be calling handlesMethod() first?
    if( !thisCallOnly )
    {
@@ -1119,7 +1119,7 @@ const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCa
 
 #define B( a ) const char* a = NULL
 #define A const char*
-inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc, 
+inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc,
                             A a, B(b), B(c), B(d), B(e), B(f), B(g), B(h), B(i), B(j), B(k))
 {
 #undef A
@@ -1181,7 +1181,7 @@ inline const char*_executef(S32 checkArgc, S32 argc, A a, B(b), B(c), B(d), B(e)
    argv[9] = j;
    return execute(argc, argv);
 }
-   
+
 #define A const char*
 const char *executef(A a)                                    { return _executef(1, 1, a); }
 const char *executef(A a, A b)                               { return _executef(2, 2, a, b); }
@@ -1291,7 +1291,7 @@ const char *getFormattedData(S32 type, const char *data, const EnumTable *tbl, B
    ConsoleBaseType *cbt = ConsoleBaseType::getType( type );
    AssertFatal(cbt, "Con::getData - could not resolve type ID!");
 
-   // Datablock types are just a datablock 
+   // Datablock types are just a datablock
    // name and don't ever need formatting.
    if ( cbt->isDatablock() )
       return data;

@@ -44,7 +44,7 @@
    %this.addSequence( "art/shapes/weapons/Ryder/PlayerAnims/PlayerAnim_Pistol_Swim_Root.dae Swim_Root", "Pistol_Swim_Root", 0, -1);
    %this.addSequence( "art/shapes/weapons/Ryder/PlayerAnims/PlayerAnim_Pistol_Swim_Left.dae Swim_Left", "Pistol_Swim_Left", 0, -1);
    %this.addSequence( "art/shapes/weapons/Ryder/PlayerAnims/PlayerAnim_Pistol_Swim_Right.dae Swim_Right", "Pistol_Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "Pistol_Back", true);
    %this.setSequenceCyclic( "Pistol_Crouch_Backward", true);
    %this.setSequenceCyclic( "Pistol_Crouch_Forward", true);
@@ -71,7 +71,7 @@
    %this.setSequenceBlend( "Pistol_Head", "1", "Pistol_Root", "0");
    %this.setSequenceBlend( "Pistol_Look", "1", "Pistol_Root", "0");
    %this.setSequenceBlend( "Pistol_Reload", "1", "Pistol_Root", "0");
-   
+
    %this.setSequenceGroundSpeed( "Pistol_Back", "0 -3.6 0");
    %this.setSequenceGroundSpeed( "Pistol_Run", "0 5.0 0");
    %this.setSequenceGroundSpeed( "Pistol_Side", "3.6 0 0");

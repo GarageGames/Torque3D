@@ -188,8 +188,8 @@ void GuiTextEditSliderBitmapCtrl::onMouseDown(const GuiEvent &event)
       setValue();
       mouseLock();
 
-      // We should get the focus and set the 
-      // cursor to the start of the text to 
+      // We should get the focus and set the
+      // cursor to the start of the text to
       // mimic the standard Windows behavior.
       setFirstResponder();
       mCursorPos = mBlockStart = mBlockEnd = 0;
@@ -226,14 +226,14 @@ void GuiTextEditSliderBitmapCtrl::onMouseDragged(const GuiEvent &event)
             maxDis = (F32)point.y;
 
          val = point.y - maxDis;
-         
+
          if(point.y > 0)
             mMulInc= 1.0f-(((float)camPos.y - val) / maxDis);
          else
             mMulInc = 1.0f;
-         
+
          checkIncValue();
-         
+
          return;
       }
       else if(camPos.y > point.y + getExtent().y)
@@ -274,7 +274,7 @@ void GuiTextEditSliderBitmapCtrl::onMouseUp(const GuiEvent &event)
 
    //if we didn't release the mouse within this control, then perform the action
    // if (!cursorInControl())
-   execConsoleCallback();   
+   execConsoleCallback();
 
    execAltConsoleCallback();
 
@@ -293,7 +293,7 @@ bool GuiTextEditSliderBitmapCtrl::onMouseWheelUp(const GuiEvent &event)
 
    checkRange();
    setValue();
-   
+
    setFirstResponder();
    mCursorPos = mBlockStart = mBlockEnd = 0;
    setUpdate();
@@ -409,14 +409,14 @@ void GuiTextEditSliderBitmapCtrl::onRender(Point2I offset, const RectI &updateRe
 
 	Point2I arrowDownStart(offset.x + getWidth() - 14, offset.y + 1 + getExtent().y/2);
 	Point2I arrowDownEnd(13, getExtent().y/2);
-	
+
 	// Draw the line that splits the number and bitmaps
 	GFX->getDrawUtil()->drawLine(Point2I(offset.x + getWidth() - 14 -2, offset.y + 1 ),
 		Point2I(arrowUpStart.x -2, arrowUpStart.y + getExtent().y),
 		mProfile->mBorderColor);
 
 	GFX->getDrawUtil()->clearBitmapModulation();
-	
+
 	if(mNumberOfBitmaps == 0)
 		Con::warnf("No image provided for GuiTextEditSliderBitmapCtrl; do not render");
 	else

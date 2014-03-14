@@ -34,7 +34,7 @@ ConsoleDocClass( RenderPassStateToken,
    "You cannot actually instantiate RenderPassToken, only its child: RenderFormatToken. "
    "RenderFormatToken is an implementation which changes the format of the "
    "back buffer and/or the depth buffer.\n\n"
-   
+
    "The RenderPassStateBin manager changes the rendering state associated with "
    "a token it is declared with. In stock Torque 3D, a single example exists in the "
    "way of AL_FormatToken (found in renderManager.cs). In that script file, all the "
@@ -100,14 +100,14 @@ ConsoleDocClass( RenderPassStateBin,
    "@brief A non-rendering render bin used to enable/disable a RenderPassStateToken.\n\n"
 
    "This is a utility RenderBinManager which does not render any render instances.  Its only "
-   "used to define a point in the render bin order at which a RenderPassStateToken is triggered.\n\n"   
+   "used to define a point in the render bin order at which a RenderPassStateToken is triggered.\n\n"
 
    "@see RenderPassStateToken\n"
 
    "@ingroup RenderBin\n"
 );
 
-RenderPassStateBin::RenderPassStateBin() 
+RenderPassStateBin::RenderPassStateBin()
    : Parent()
 {
 }
@@ -138,7 +138,7 @@ void RenderPassStateBin::initPersistFields()
 {
    addProtectedField( "stateToken", TYPEID< RenderPassStateToken >(), Offset( mStateToken, RenderPassStateBin ),
       _setStateToken, _getStateToken );
-   
+
    Parent::initPersistFields();
 }
 

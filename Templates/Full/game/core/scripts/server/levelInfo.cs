@@ -49,25 +49,25 @@ function buildLoadInfo( %mission ) {
 
 	if ( %file.openForRead( %mission ) ) {
 		%inInfoBlock = false;
-		
+
 		while ( !%file.isEOF() ) {
 			%line = %file.readLine();
 			%line = trim( %line );
-			
+
 			if( %line $= "new ScriptObject(MissionInfo) {" )
 				%inInfoBlock = true;
          else if( %line $= "new LevelInfo(theLevelInfo) {" )
 				%inInfoBlock = true;
 			else if( %inInfoBlock && %line $= "};" ) {
 				%inInfoBlock = false;
-				%infoObject = %infoObject @ %line; 
+				%infoObject = %infoObject @ %line;
 				break;
 			}
-			
+
 			if( %inInfoBlock )
 			   %infoObject = %infoObject @ %line @ " ";
 		}
-		
+
 		%file.close();
 	}
 	else
@@ -87,7 +87,7 @@ function dumpLoadInfo()
 {
 	echo( "Level Name: " @ theLevelInfo.name );
    echo( "Level Description:" );
-   
+
    for( %i = 0; theLevelInfo.desc[%i] !$= ""; %i++ )
       echo ("   " @ theLevelInfo.desc[%i]);
 }

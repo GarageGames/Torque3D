@@ -306,14 +306,14 @@ public:
 };
 
 ConsoleDocClass( PxMultiActorData,
-   
+
    "@brief Defines the properties of a type of PxMultiActor.\n\n"
 
    "Usually it is prefered to use PhysicsShape rather than PxMultiActor because "
    "a PhysicsShape is not PhysX specific and can be much easier to setup.\n\n"
 
    "For more information, refer to Nvidia's PhysX docs.\n\n"
-   
+
    "@ingroup Physics"
 );
 
@@ -555,7 +555,7 @@ bool PxMultiActorData::preload( bool server, String &errorBuffer )
    }
 
    // Resolve mount point node indexes
-   for ( S32 i = 0; i < NumMountPoints; i++) 
+   for ( S32 i = 0; i < NumMountPoints; i++)
    {
       char fullName[256];
 
@@ -563,9 +563,9 @@ bool PxMultiActorData::preload( bool server, String &errorBuffer )
       {
          dSprintf(fullName,sizeof(fullName),"mount%d",i);
          mountPointNode[i] = shape->findNode(fullName);
-      }  
-      else      
-         mountPointNode[i] = shape->findNode(mountNodeNames[i]);            
+      }
+      else
+         mountPointNode[i] = shape->findNode(mountNodeNames[i]);
    }
 
    // Register for file change notification to reload the collection
@@ -657,13 +657,13 @@ bool PxMultiActorData::createActors(   NxScene *scene,
 }
 
 ConsoleDocClass( PxMultiActor,
-   
+
    "@brief Represents a destructible physical object simulated using PhysX.\n\n"
 
    "Usually it is prefered to use PhysicsShape and not PxMultiActor because "
    "it is not PhysX specific and much easier to setup.\n"
-   
-   "@see PxMultiActorData.\n"   
+
+   "@see PxMultiActorData.\n"
    "@ingroup Physics"
 );
 
@@ -1740,7 +1740,7 @@ void PxMultiActor::unmountObject( SceneObject *obj )
 }
 
 bool PxMultiActor::_getNodeTransform( U32 nodeIdx, MatrixF *outXfm )
-{   
+{
    if ( !mShapeInstance )
       return false;
 
@@ -1792,7 +1792,7 @@ bool PxMultiActor::_getNodeTransform( U32 nodeIdx, MatrixF *outXfm )
    QuatF q;
    TSTransform::setMatrix( shape->defaultRotations[nodeIdx].getQuatF(&q),shape->defaultTranslations[nodeIdx],&nmat);
    *outXfm->mul( actorMat, nmat );
-   
+
    return true;
 }
 
@@ -2278,7 +2278,7 @@ void PxMultiActor::_applyActorRadialForce( NxActor *inActor, const NxVec3 &origi
    if ( dist == 0.0f )
       force *= magnitude;
    else
-      force *= mClampF( radius / dist, 0.0f, 1.0f ) * magnitude;      
+      force *= mClampF( radius / dist, 0.0f, 1.0f ) * magnitude;
 
    // HACK: Make the position we push the force thru between the
    // actor pos and its center of mass.  This gives us some
@@ -2614,7 +2614,7 @@ void PxMultiActorData::dumpModel()
       Con::errorf( "PxMultiActor::dumpModel, error opening dump file." );
 }
 
-ConsoleMethod( PxMultiActorData, dumpModel, void, 2, 2, 
+ConsoleMethod( PxMultiActorData, dumpModel, void, 2, 2,
              "@brief Dumps model hierarchy and details to a file.\n\n"
              "The file will be created as \'model.dump\' in the game folder. "
              "If model.dump already exists, it will be overwritten.\n\n")

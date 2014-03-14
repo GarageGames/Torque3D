@@ -40,11 +40,11 @@ IMPLEMENT_CONOBJECT( GuiTSCtrl );
 
 ConsoleDocClass( GuiTSCtrl,
    "@brief Abstract base class for controls that render 3D scenes.\n\n"
-   
+
    "GuiTSCtrl is the base class for controls that render 3D camera views in Torque.  The class itself "
    "does not implement a concrete scene rendering.  Use GuiObjectView to display invidiual shapes in "
    "the Gui and GameTSCtrl to render full scenes.\n\n"
-   
+
    "@see GameTSCtrl\n"
    "@see GuiObjectView\n"
    "@ingroup Gui3D\n"
@@ -63,7 +63,7 @@ EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
 
-namespace 
+namespace
 {
    void _drawLine( const Point3F &p0, const Point3F &p1, const ColorI &color, F32 width )
    {
@@ -162,16 +162,16 @@ GuiTSCtrl::GuiTSCtrl()
 void GuiTSCtrl::initPersistFields()
 {
    addGroup( "Camera" );
-   
+
       addField("cameraZRot", TypeF32, Offset(mCameraZRot, GuiTSCtrl),
          "Z rotation angle of camera." );
       addField("forceFOV",   TypeF32, Offset(mForceFOV,   GuiTSCtrl),
          "The vertical field of view in degrees or zero to use the normal camera FOV." );
-         
+
    endGroup( "Camera" );
-   
+
    addGroup( "Rendering" );
-   
+
       addField( "reflectPriority", TypeF32, Offset( mReflectPriority, GuiTSCtrl ),
          "The share of the per-frame reflection update work this control's rendering should run.\n"
          "The reflect update priorities of all visible GuiTSCtrls are added together and each control is assigned "
@@ -181,7 +181,7 @@ void GuiTSCtrl::initPersistFields()
          "Indicates how this control should render its contents." );
 
    endGroup( "Rendering" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -201,7 +201,7 @@ bool GuiTSCtrl::onWake()
       return false;
 
    // Add ourselves to the active viewport list.
-   AssertFatal( !smAwakeTSCtrls.contains( this ), 
+   AssertFatal( !smAwakeTSCtrls.contains( this ),
       "GuiTSCtrl::onWake - This control is already in the awake list!" );
    smAwakeTSCtrls.push_back( this );
 
@@ -214,7 +214,7 @@ void GuiTSCtrl::onSleep()
 {
    Parent::onSleep();
 
-   AssertFatal( smAwakeTSCtrls.contains( this ), 
+   AssertFatal( smAwakeTSCtrls.contains( this ),
       "GuiTSCtrl::onSleep - This control is not in the awake list!" );
    smAwakeTSCtrls.remove( this );
 }
@@ -246,7 +246,7 @@ F32 GuiTSCtrl::projectRadius( F32 dist, F32 radius ) const
    // Fixup any negative or zero distance so we
    // don't get a divide by zero.
    dist = dist > 0.0f ? dist : 0.001f;
-   return ( radius / dist ) * mSaveWorldToScreenScale.y;   
+   return ( radius / dist ) * mSaveWorldToScreenScale.y;
 }
 
 //-----------------------------------------------------------------------------
@@ -274,7 +274,7 @@ F32 GuiTSCtrl::calculateViewDistance(F32 radius)
    F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
    F32 renderHeight = F32(getHeight());
    F32 aspectRatio = renderWidth / renderHeight;
-   
+
    // Use the FOV to calculate the viewport height scale
    // then generate the width scale from the aspect ratio.
    if(!mLastCameraQuery.ortho)
@@ -288,10 +288,10 @@ F32 GuiTSCtrl::calculateViewDistance(F32 radius)
       wwidth = aspectRatio * wheight;
    }
 
-   // Now determine if we should use the width 
+   // Now determine if we should use the width
    // fov or height fov.
    //
-   // If the window is taller than it is wide, use the 
+   // If the window is taller than it is wide, use the
    // width fov to keep the object completely in view.
    if (wheight > wwidth)
       fov = mAtan( wwidth / mLastCameraQuery.nearPlane ) * 2.0f;
@@ -309,7 +309,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    if(!processCameraQuery(&mLastCameraQuery))
    {
-      // We have no camera, but render the GUI children 
+      // We have no camera, but render the GUI children
       // anyway.  This makes editing GuiTSCtrl derived
       // controls easier in the GuiEditor.
       renderChildControls( offset, updateRect );
@@ -359,7 +359,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
    F32 renderHeight = F32(getHeight());
    F32 aspectRatio = renderWidth / renderHeight;
-   
+
    // Use the FOV to calculate the viewport height scale
    // then generate the width scale from the aspect ratio.
    if(!mLastCameraQuery.ortho)
@@ -400,12 +400,12 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 	const bool screenShotMode = gScreenShot && gScreenShot->isPending();
    if ( screenShotMode )
    {
-      gScreenShot->tileFrustum( frustum );      
+      gScreenShot->tileFrustum( frustum );
       GFX->setViewMatrix(MatrixF::Identity);
    }
-      
+
    RectI tempRect = updateRect;
-   
+
 #ifdef TORQUE_OS_MAC
    Point2I screensize = getRoot()->getWindowSize();
    tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
@@ -428,8 +428,8 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    // correctly for that final display result.
    gClientSceneGraph->setDisplayTargetResolution(getExtent());
 
-   // Set the GFX world matrix to the world-to-camera transform, but don't 
-   // change the cameraMatrix in mLastCameraQuery. This is because 
+   // Set the GFX world matrix to the world-to-camera transform, but don't
+   // change the cameraMatrix in mLastCameraQuery. This is because
    // mLastCameraQuery.cameraMatrix is supposed to contain the camera-to-world
    // transform. In-place invert would save a copy but mess up any GUIs that
    // depend on that value.
@@ -444,7 +444,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    mSaveFrustum = GFX->getFrustum();
    mSaveFrustum.setTransform( mLastCameraQuery.cameraMatrix );
 
-   // Set the default non-clip projection as some 
+   // Set the default non-clip projection as some
    // objects depend on this even in non-reflect cases.
    gClientSceneGraph->setNonClipProjection( mSaveProjection );
 
@@ -474,12 +474,12 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 //-----------------------------------------------------------------------------
 
 void GuiTSCtrl::drawLine( Point3F p0, Point3F p1, const ColorI &color, F32 width )
-{   
+{
    if ( !mSaveFrustum.clipSegment( p0, p1 ) )
       return;
 
-   MathUtils::mProjectWorldToScreen( p0, &p0, mSaveViewport, mSaveModelview, mSaveProjection );   
-   MathUtils::mProjectWorldToScreen( p1, &p1, mSaveViewport, mSaveModelview, mSaveProjection );   
+   MathUtils::mProjectWorldToScreen( p0, &p0, mSaveViewport, mSaveModelview, mSaveProjection );
+   MathUtils::mProjectWorldToScreen( p1, &p1, mSaveViewport, mSaveModelview, mSaveProjection );
 
    p0.x = mClampF( p0.x, 0.0f, mSaveViewport.extent.x );
    p0.y = mClampF( p0.y, 0.0f, mSaveViewport.extent.y );

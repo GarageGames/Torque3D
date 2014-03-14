@@ -44,7 +44,7 @@
    %this.addSequence( "art/shapes/weapons/Turret/PlayerAnims/PlayerAnim_Turret_Swim_Root.dae Swim_Root", "Turret_Swim_Root", 0, -1);
    %this.addSequence( "art/shapes/weapons/Turret/PlayerAnims/PlayerAnim_Turret_Swim_Left.dae Swim_Left", "Turret_Swim_Left", 0, -1);
    %this.addSequence( "art/shapes/weapons/Turret/PlayerAnims/PlayerAnim_Turret_Swim_Right.dae Swim_Right", "Turret_Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "Turret_Back", true);
    %this.setSequenceCyclic( "Turret_Crouch_Backward", true);
    %this.setSequenceCyclic( "Turret_Crouch_Forward", true);
@@ -67,12 +67,12 @@
    %this.setSequenceCyclic( "Turret_Swim_Root", true);
    %this.setSequenceCyclic( "Turret_Swim_Left", true);
    %this.setSequenceCyclic( "Turret_Swim_Right", true);
-   
+
    %this.setSequenceBlend( "Turret_Head", "1", "Turret_Root", "0");
    %this.setSequenceBlend( "Turret_Look", "1", "Turret_Root", "0");
    %this.setSequenceBlend( "Turret_Recoil", "1", "Turret_Root", "0");
    %this.setSequenceBlend( "Turret_Fire_Release", "1", "Turret_Root", "0");
-   
+
    %this.setSequenceGroundSpeed( "Turret_Back", "0 -3.6 0");
    %this.setSequenceGroundSpeed( "Turret_Run", "0 5.0 0");
    %this.setSequenceGroundSpeed( "Turret_Side", "3.6 0 0");

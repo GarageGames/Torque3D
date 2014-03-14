@@ -55,7 +55,7 @@ void GuiDirectoryFileListCtrl::initPersistFields()
                       &_setFilePath, &defaultProtectedGetFn, "Path in game directory from which to list files." );
    addProtectedField( "fileFilter", TypeString, Offset( mFilter, GuiDirectoryFileListCtrl ),
                       &_setFilter, &defaultProtectedGetFn, "Tab-delimited list of file name patterns. Only matched files will be displayed." );
-                      
+
    Parent::initPersistFields();
 }
 
@@ -63,9 +63,9 @@ bool GuiDirectoryFileListCtrl::onWake()
 {
    if( !Parent::onWake() )
       return false;
-      
+
    update();
-   
+
    return true;
 }
 
@@ -85,7 +85,7 @@ void GuiDirectoryFileListCtrl::openDirectory()
       path = String::ToString( "%s/%s", Platform::getMainDotCsDir(), mFilePath );
    else
       path = Platform::getMainDotCsDir();
-   
+
    Vector<Platform::FileInfo> fileVector;
    Platform::dumpPath( path, fileVector, 0 );
 

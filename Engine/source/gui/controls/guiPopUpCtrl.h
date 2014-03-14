@@ -45,7 +45,7 @@ class GuiPopUpBackgroundCtrl : public GuiControl
 {
 protected:
    GuiPopUpMenuCtrl *mPopUpCtrl;
-   GuiPopupTextListCtrl *mTextList; 
+   GuiPopupTextListCtrl *mTextList;
 public:
    GuiPopUpBackgroundCtrl(GuiPopUpMenuCtrl *ctrl, GuiPopupTextListCtrl* textList);
    void onMouseDown(const GuiEvent &event);
@@ -126,7 +126,7 @@ protected:
 
 public:
    GuiPopUpMenuCtrl(void);
-   ~GuiPopUpMenuCtrl();   
+   ~GuiPopUpMenuCtrl();
    GuiScrollCtrl::Region mScrollDir;
    bool onWake(); //  Added
    bool onAdd();
@@ -166,7 +166,7 @@ public:
    DECLARE_CONOBJECT( GuiPopUpMenuCtrl );
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that allows to select a value from a drop-down list." );
-   
+
    static void initPersistFields(void);
 
 };

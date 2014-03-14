@@ -50,7 +50,7 @@ $SSAOPostFx::quality = 0;
 ///
 $SSAOPostFx::blurDepthTol = 0.001;
 
-/// 
+///
 $SSAOPostFx::blurNormalTol = 0.95;
 
 ///
@@ -58,29 +58,29 @@ $SSAOPostFx::targetScale = "0.5 0.5";
 
 
 function SSAOPostFx::onAdd( %this )
-{  
+{
    %this.wasVis = "Uninitialized";
    %this.quality = "Uninitialized";
 }
 
 function SSAOPostFx::preProcess( %this )
-{   
+{
    if ( $SSAOPostFx::quality !$= %this.quality )
    {
       %this.quality = mClamp( mRound( $SSAOPostFx::quality ), 0, 2 );
-      
-      %this.setShaderMacro( "QUALITY", %this.quality );      
-   }      
-   
+
+      %this.setShaderMacro( "QUALITY", %this.quality );
+   }
+
    %this.targetScale = $SSAOPostFx::targetScale;
 }
 
 function SSAOPostFx::setShaderConsts( %this )
-{      
+{
    %this.setShaderConst( "$overallStrength", $SSAOPostFx::overallStrength );
 
-   // Abbreviate is s-small l-large.   
-   
+   // Abbreviate is s-small l-large.
+
    %this.setShaderConst( "$sRadius",      $SSAOPostFx::sRadius );
    %this.setShaderConst( "$sStrength",    $SSAOPostFx::sStrength );
    %this.setShaderConst( "$sDepthMin",    $SSAOPostFx::sDepthMin );
@@ -88,7 +88,7 @@ function SSAOPostFx::setShaderConsts( %this )
    %this.setShaderConst( "$sDepthPow",    $SSAOPostFx::sDepthPow );
    %this.setShaderConst( "$sNormalTol",   $SSAOPostFx::sNormalTol );
    %this.setShaderConst( "$sNormalPow",   $SSAOPostFx::sNormalPow );
-   
+
    %this.setShaderConst( "$lRadius",      $SSAOPostFx::lRadius );
    %this.setShaderConst( "$lStrength",    $SSAOPostFx::lStrength );
    %this.setShaderConst( "$lDepthMin",    $SSAOPostFx::lDepthMin );
@@ -96,30 +96,30 @@ function SSAOPostFx::setShaderConsts( %this )
    %this.setShaderConst( "$lDepthPow",    $SSAOPostFx::lDepthPow );
    %this.setShaderConst( "$lNormalTol",   $SSAOPostFx::lNormalTol );
    %this.setShaderConst( "$lNormalPow",   $SSAOPostFx::lNormalPow );
-   
+
    %blur = %this->blurY;
    %blur.setShaderConst( "$blurDepthTol", $SSAOPostFx::blurDepthTol );
-   %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );   
-   
+   %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );
+
    %blur = %this->blurX;
    %blur.setShaderConst( "$blurDepthTol", $SSAOPostFx::blurDepthTol );
-   %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );   
-   
+   %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );
+
    %blur = %this->blurY2;
    %blur.setShaderConst( "$blurDepthTol", $SSAOPostFx::blurDepthTol );
    %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );
-      
+
    %blur = %this->blurX2;
    %blur.setShaderConst( "$blurDepthTol", $SSAOPostFx::blurDepthTol );
-   %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );         
+   %blur.setShaderConst( "$blurNormalTol", $SSAOPostFx::blurNormalTol );
 }
 
 function SSAOPostFx::onEnabled( %this )
 {
    // This tells the AL shaders to reload and sample
-   // from our #ssaoMask texture target. 
+   // from our #ssaoMask texture target.
    $AL::UseSSAOMask = true;
-   
+
    return true;
 }
 
@@ -134,7 +134,7 @@ function SSAOPostFx::onDisabled( %this )
 //-----------------------------------------------------------------------------
 
 singleton GFXStateBlockData( SSAOStateBlock : PFX_DefaultStateBlock )
-{   
+{
    samplersDefined = true;
    samplerStates[0] = SamplerClampPoint;
    samplerStates[1] = SamplerWrapLinear;
@@ -142,26 +142,26 @@ singleton GFXStateBlockData( SSAOStateBlock : PFX_DefaultStateBlock )
 };
 
 singleton GFXStateBlockData( SSAOBlurStateBlock : PFX_DefaultStateBlock )
-{   
+{
    samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;
    samplerStates[1] = SamplerClampPoint;
 };
 
 singleton ShaderData( SSAOShader )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
-   DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_P.hlsl";            
+   DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_P.hlsl";
    pixVersion = 3.0;
 };
 
 singleton ShaderData( SSAOBlurYShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/ssao/SSAO_Blur_V.hlsl";
-   DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_Blur_P.hlsl";   
-   pixVersion = 3.0;      
-   
-   defines = "BLUR_DIR=float2(0.0,1.0)";         
+   DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_Blur_P.hlsl";
+   pixVersion = 3.0;
+
+   defines = "BLUR_DIR=float2(0.0,1.0)";
 };
 
 singleton ShaderData( SSAOBlurXShader : SSAOBlurYShader )
@@ -174,98 +174,98 @@ singleton ShaderData( SSAOBlurXShader : SSAOBlurYShader )
 //-----------------------------------------------------------------------------
 
 singleton PostEffect( SSAOPostFx )
-{     
+{
    allowReflectPass = false;
-     
+
    renderTime = "PFXBeforeBin";
-   renderBin = "AL_LightBinMgr";   
+   renderBin = "AL_LightBinMgr";
    renderPriority = 10;
-   
+
    shader = SSAOShader;
    stateBlock = SSAOStateBlock;
-         
-   texture[0] = "#prepass";         
+
+   texture[0] = "#prepass";
    texture[1] = "noise.png";
    texture[2] = "#ssao_pow_table";
-   
+
    target = "$outTex";
    targetScale = "0.5 0.5";
    targetViewport = "PFXTargetViewport_NamedInTexture0";
-   
+
    singleton PostEffect()
    {
       internalName = "blurY";
-      
+
       shader = SSAOBlurYShader;
       stateBlock = SSAOBlurStateBlock;
-      
+
       texture[0] = "$inTex";
       texture[1] = "#prepass";
-      
-      target = "$outTex"; 
+
+      target = "$outTex";
    };
-      
+
    singleton PostEffect()
    {
       internalName = "blurX";
-      
+
       shader = SSAOBlurXShader;
       stateBlock = SSAOBlurStateBlock;
-      
+
       texture[0] = "$inTex";
       texture[1] = "#prepass";
-      
-      target = "$outTex"; 
-   };   
-   
+
+      target = "$outTex";
+   };
+
    singleton PostEffect()
    {
       internalName = "blurY2";
-      
+
       shader = SSAOBlurYShader;
       stateBlock = SSAOBlurStateBlock;
-            
+
       texture[0] = "$inTex";
       texture[1] = "#prepass";
-      
-      target = "$outTex"; 
+
+      target = "$outTex";
    };
-   
+
    singleton PostEffect()
    {
       internalName = "blurX2";
-            
+
       shader = SSAOBlurXShader;
       stateBlock = SSAOBlurStateBlock;
-            
+
       texture[0] = "$inTex";
       texture[1] = "#prepass";
-            
+
       // We write to a mask texture which is then
       // read by the lighting shaders to mask ambient.
-      target = "#ssaoMask";   
-   };  
+      target = "#ssaoMask";
+   };
 };
 
 
-/// Just here for debug visualization of the 
+/// Just here for debug visualization of the
 /// SSAO mask texture used during lighting.
 singleton PostEffect( SSAOVizPostFx )
-{      
+{
    allowReflectPass = false;
-        
+
    shader = PFX_PassthruShader;
    stateBlock = PFX_DefaultStateBlock;
-   
+
    texture[0] = "#ssaoMask";
-   
+
    target = "$backbuffer";
 };
 
 singleton ShaderData( SSAOPowTableShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/ssao/SSAO_PowerTable_V.hlsl";
-   DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_PowerTable_P.hlsl";            
+   DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_PowerTable_P.hlsl";
    pixVersion = 2.0;
 };
 
@@ -273,11 +273,11 @@ singleton PostEffect( SSAOPowTablePostFx )
 {
    shader = SSAOPowTableShader;
    stateBlock = PFX_DefaultStateBlock;
-   
+
    renderTime = "PFXTexGenOnDemand";
-   
-   target = "#ssao_pow_table"; 
-   
-   targetFormat = "GFXFormatR16F";   
+
+   target = "#ssao_pow_table";
+
+   targetFormat = "GFXFormatR16F";
    targetSize = "256 1";
 };

@@ -43,14 +43,14 @@ struct Move;
 
 class ProcessObject
 {
-   
+
 public:
 
    ProcessObject();
    virtual ~ProcessObject() { removeFromProcessList(); }
 
    /// Removes this object from the tick-processing list
-   void removeFromProcessList() { plUnlink(); }   
+   void removeFromProcessList() { plUnlink(); }
 
    /// Set the status of tick processing.
    ///
@@ -65,7 +65,7 @@ public:
 
    /// This is really implemented in GameBase and is only here to avoid
    /// casts within ProcessList.
-   virtual GameConnection* getControllingClient() { return NULL; }   
+   virtual GameConnection* getControllingClient() { return NULL; }
 
    /// This is really implemented in GameBase and is only here to avoid
    /// casts within ProcessList.
@@ -73,13 +73,13 @@ public:
 
    /// Force this object to process after some other object.
    ///
-   /// For example, a player mounted to a vehicle would want to process after 
-   /// the vehicle to prevent a visible 'lagging' from occurring when the 
+   /// For example, a player mounted to a vehicle would want to process after
+   /// the vehicle to prevent a visible 'lagging' from occurring when the
    /// vehicle moves. So the player would be set to processAfter(theVehicle).
    ///
    /// @param   obj   Object to process after
    virtual void processAfter( ProcessObject *obj ) {}
-  
+
    /// Clears the effects of a call to processAfter()
    virtual void clearProcessAfter() {}
 
@@ -105,7 +105,7 @@ public:
    ///
    /// @param   dt   Time since last advance call
    virtual void advanceTime( F32 dt ) {}
-   
+
    /// Allow object to modify the Move before it is ticked or sent to the server.
    /// This is only called for the control object on the client-side.
    virtual void preprocessMove( Move *move ) {}
@@ -148,7 +148,7 @@ public:
    virtual ~ProcessList() {}
 
    void markDirty()  { mDirty = true; }
-   bool isDirty()  { return mDirty; }   
+   bool isDirty()  { return mDirty; }
 
    SimTime getLastTime() { return mLastTime; }
    F32 getLastDelta() { return mLastDelta; }
@@ -158,21 +158,21 @@ public:
 
    PreTickSignal& preTickSignal() { return mPreTick; }
    PostTickSignal& postTickSignal() { return mPostTick; }
-   
+
    virtual void addObject( ProcessObject *obj );
-   
+
    /// Returns true if a tick was processed.
    virtual bool advanceTime( SimTime timeDelta );
 
 protected:
- 
+
    void orderList();
    GameBase* getGameBase( ProcessObject *obj );
 
    virtual void advanceObjects();
    virtual void onAdvanceObjects() { advanceObjects(); }
    virtual void onPreTickObject( ProcessObject* ) {}
-   virtual void onTickObject( ProcessObject* ) {}   
+   virtual void onTickObject( ProcessObject* ) {}
 
 protected:
 

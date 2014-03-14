@@ -89,8 +89,8 @@ void GuiBubbleTextCtrl::onMouseDown(const GuiEvent &event)
    AssertFatal(mMLText, "Failed to create the GuiMLTextCtrl for the BubbleTextCtrl");
 	mMLText->setDataField( StringTable->insert("profile"), NULL, "GuiBubbleTextProfile");
 	mMLText->setField("position", "2 2");
-	mMLText->setField("extent", "296 51");	
-	
+	mMLText->setField("extent", "296 51");
+
 	mMLText->setText((char*)mText,dStrlen(mText));
 
 	mMLText->registerObject();

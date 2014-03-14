@@ -63,8 +63,8 @@ GFXImplementVertexFormat( GFXCloudVertex )
    addElement( "POSITION", GFXDeclType_Float3 );
    addElement( "NORMAL", GFXDeclType_Float3 );
    addElement( "BINORMAL", GFXDeclType_Float3 );
-   addElement( "TANGENT", GFXDeclType_Float3 );   
-   addElement( "TEXCOORD", GFXDeclType_Float2, 0 );   
+   addElement( "TANGENT", GFXDeclType_Float3 );
+   addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
 }
 
 U32 CloudLayer::smVertStride = 50;
@@ -121,7 +121,7 @@ bool CloudLayer::onAdd()
 
       // Find ShaderData
       ShaderData *shaderData;
-      mShader = Sim::findObject( "CloudLayerShader", shaderData ) ? 
+      mShader = Sim::findObject( "CloudLayerShader", shaderData ) ?
                   shaderData->getShader() : NULL;
       if ( !mShader )
       {
@@ -158,7 +158,7 @@ bool CloudLayer::onAdd()
       desc.samplers[0].mipFilter = GFXTextureFilterLinear;
       desc.samplers[0].textureColorOp = GFXTOPModulate;
 
-      mStateblock = GFX->createStateBlock( desc );   
+      mStateblock = GFX->createStateBlock( desc );
    }
 
    return true;
@@ -173,8 +173,8 @@ void CloudLayer::onRemove()
 
 void CloudLayer::initPersistFields()
 {
-   addGroup( "CloudLayer" );	   
-      
+   addGroup( "CloudLayer" );
+
       addField( "texture", TypeImageFilename, Offset( mTextureName, CloudLayer ),
          "An RGBA texture which should contain normals and opacity (density)." );
 
@@ -196,7 +196,7 @@ void CloudLayer::initPersistFields()
 
       addField( "exposure", TypeF32, Offset( mExposure, CloudLayer ),
          "Brightness scale so CloudLayer can be overblown if desired." );
-      
+
       addField( "coverage", TypeF32, Offset( mCoverage, CloudLayer ),
          "Fraction of sky covered by clouds 0-1." );
 
@@ -226,10 +226,10 @@ U32 CloudLayer::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
    U32 retMask = Parent::packUpdate( conn, mask, stream );
 
    stream->write( mTextureName );
-   
+
    for ( U32 i = 0; i < TEX_COUNT; i++ )
    {
-      stream->write( mTexScale[i] );      
+      stream->write( mTexScale[i] );
       stream->write( mTexSpeed[i] );
       mathWrite( *stream, mTexDirection[i] );
    }
@@ -252,7 +252,7 @@ void CloudLayer::unpackUpdate( NetConnection *conn, BitStream *stream )
 
    for ( U32 i = 0; i < TEX_COUNT; i++ )
    {
-      stream->read( &mTexScale[i] );      
+      stream->read( &mTexScale[i] );
       stream->read( &mTexSpeed[i] );
       mathRead( *stream, &mTexDirection[i] );
    }
@@ -320,7 +320,7 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
    const Point3F &camPos = state->getCameraPosition();
    MatrixF xfm(true);
    xfm.setPosition(camPos);
-   GFX->multWorld(xfm);   
+   GFX->multWorld(xfm);
 
    if ( state->isReflectPass() )
       GFX->setProjectionMatrix( state->getSceneManager()->getNonClipProjection() );
@@ -343,7 +343,7 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
    const ColorF &sunlight = state->getAmbientLightColor();
 
    Point3F ambientColor( sunlight.red, sunlight.green, sunlight.blue );
-   mShaderConsts->setSafe( mAmbientColorSC, ambientColor );   
+   mShaderConsts->setSafe( mAmbientColorSC, ambientColor );
 
    const ColorF &sunColor = lightinfo->getColor();
    Point3F data( sunColor.red, sunColor.green, sunColor.blue );
@@ -351,7 +351,7 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
 
    mShaderConsts->setSafe( mSunVecSC, lightinfo->getDirection() );
 
-   for ( U32 i = 0; i < TEX_COUNT; i++ )         
+   for ( U32 i = 0; i < TEX_COUNT; i++ )
       mShaderConsts->setSafe( mTexOffsetSC[i], mTexOffset[i] );
 
    Point3F scale( mTexScale[0], mTexScale[1], mTexScale[2] );
@@ -365,8 +365,8 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
 
    mShaderConsts->setSafe( mExposureSC, mExposure );
 
-   GFX->setTexture( 0, mTexture );                            
-   GFX->setVertexBuffer( mVB );            
+   GFX->setTexture( 0, mTexture );
+   GFX->setVertexBuffer( mVB );
    GFX->setPrimitiveBuffer( mPB );
 
    GFX->drawIndexedPrimitive( GFXTriangleList, 0, 0, smVertCount, 0, smTriangleCount );
@@ -392,14 +392,14 @@ void CloudLayer::_initTexture()
 }
 
 void CloudLayer::_initBuffers()
-{      
+{
    // Vertex Buffer...
 
    Point3F vertScale( 16.0f, 16.0f, mHeight );
    F32 zOffset = -( mCos( mSqrt( 1.0f ) ) + 0.01f );
-   
-   mVB.set( GFX, smVertCount, GFXBufferTypeStatic );   
-   GFXCloudVertex *pVert = mVB.lock(); 
+
+   mVB.set( GFX, smVertCount, GFXBufferTypeStatic );
+   GFXCloudVertex *pVert = mVB.lock();
    if(!pVert) return;
 
    for ( U32 y = 0; y < smVertStride; y++ )
@@ -449,7 +449,7 @@ void CloudLayer::_initBuffers()
          pVert->normal.normalize();
          pVert->binormal = fvec;
          pVert->tangent = rvec;
-         pVert->texCoord.set( u, v );   
+         pVert->texCoord.set( u, v );
          pVert++;
       }
    }
@@ -457,13 +457,13 @@ void CloudLayer::_initBuffers()
    mVB.unlock();
 
 
-   // Primitive Buffer...   
+   // Primitive Buffer...
 
    mPB.set( GFX, smTriangleCount * 3, smTriangleCount, GFXBufferTypeStatic );
 
-   U16 *pIdx = NULL;   
-   mPB.lock(&pIdx);     
-   U32 curIdx = 0; 
+   U16 *pIdx = NULL;
+   mPB.lock(&pIdx);
+   U32 curIdx = 0;
 
    for ( U32 y = 0; y < smStrideMinusOne; y++ )
    {
@@ -487,5 +487,5 @@ void CloudLayer::_initBuffers()
       }
    }
 
-   mPB.unlock();   
+   mPB.unlock();
 }

@@ -88,7 +88,7 @@ bool DDSUtil::squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat )
       PROFILE_START(SQUISH_DXT_COMPRESS);
 
       // Compress with Squish
-      squish::CompressImage( srcBits, srcDDS->getWidth(i), srcDDS->getHeight(i), 
+      squish::CompressImage( srcBits, srcDDS->getWidth(i), srcDDS->getHeight(i),
          dstBits, squishFlags );
 
       PROFILE_END();

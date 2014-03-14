@@ -92,7 +92,7 @@ private:
 
 public:
    DECLARE_CONOBJECT(PathCamera);
-   
+
    DECLARE_CALLBACK( void, onNode, (const char* node));
 
    PathCamera();

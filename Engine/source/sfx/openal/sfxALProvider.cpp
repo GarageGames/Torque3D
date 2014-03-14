@@ -44,7 +44,7 @@ protected:
 
    struct ALDeviceInfo : SFXDeviceInfo
    {
-      
+
    };
 
    void init();
@@ -58,14 +58,14 @@ MODULE_BEGIN( OpenAL )
 
    MODULE_INIT_BEFORE( SFX )
    MODULE_SHUTDOWN_AFTER( SFX )
-   
+
    SFXALProvider* mProvider;
-   
+
    MODULE_INIT
    {
       mProvider = new SFXALProvider;
    }
-   
+
    MODULE_SHUTDOWN
    {
       delete mProvider;
@@ -96,7 +96,7 @@ void SFXALProvider::init()
    for( int i = 0; i < mALDL->GetNumDevices(); i++ )
    {
       ALDeviceInfo* info = new ALDeviceInfo;
-      
+
       info->name = String( mALDL->GetDeviceName( i ) );
 
       int major, minor, eax = 0;

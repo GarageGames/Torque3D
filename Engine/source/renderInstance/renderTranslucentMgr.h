@@ -51,14 +51,14 @@ public:
    DECLARE_CONOBJECT(RenderTranslucentMgr);
 
 protected:
-   // This is a stateblock per potential blend type, we create 
+   // This is a stateblock per potential blend type, we create
    // these as needed.
    enum
    {
       MaxBlend = 256
    };
    GFXStateBlockRef mStateBlocks[MaxBlend];
-   
+
    GFXStateBlockRef _getStateBlock( U8 transFlag );
    RenderParticleMgr *mParticleRenderMgr;;
 };

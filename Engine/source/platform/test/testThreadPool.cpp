@@ -37,25 +37,25 @@ using namespace UnitTesting;
 CreateUnitTest( TestThreadPool, "Platform/ThreadPool/Simple" )
 {
    enum { DEFAULT_NUM_ITEMS = 4000 };
-   
+
    static Vector< U32 > results;
-   
+
    struct TestItem : public ThreadPool::WorkItem
    {
          typedef ThreadPool::WorkItem Parent;
-         
+
          U32 mIndex;
-         
+
          TestItem( U32 index )
             : mIndex( index ) {}
-      
+
       protected:
          virtual void execute()
          {
             results[ mIndex ] = mIndex;
          }
    };
-   
+
    void run()
    {
       U32 numItems = Con::getIntVariable( "$testThreadPool::numValues", DEFAULT_NUM_ITEMS );
@@ -64,18 +64,18 @@ CreateUnitTest( TestThreadPool, "Platform/ThreadPool/Simple" )
 
       for( U32 i = 0; i < numItems; ++ i )
          results[ i ] = U32( -1 );
-      
+
       for( U32 i = 0; i < numItems; ++ i )
       {
          ThreadSafeRef< TestItem > item( new TestItem( i ) );
          pool->queueWorkItem( item );
       }
-      
+
       pool->flushWorkItems();
-      
+
       for( U32 i = 0; i < numItems; ++ i )
          test( results[ i ] == i, "result mismatch" );
-         
+
       results.clear();
    }
 };

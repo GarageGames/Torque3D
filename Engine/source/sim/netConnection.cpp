@@ -527,7 +527,7 @@ DefineEngineMethod( NetConnection, transmitPaths, void, (),,
    "   %client.activateGhosting();\n"
    "}\n"
    "@endtsexample\n"
-   
+
    "@see clearPaths()\n"
    "@see Path\n")
 {
@@ -553,7 +553,7 @@ DefineEngineMethod( NetConnection, clearPaths, void, (),,
    "      %cl.clearPaths();\n"
    "   }\n"
    "@endtsexample\n"
-   
+
    "@see transmitPaths()\n"
    "@see Path\n")
 {
@@ -699,7 +699,7 @@ void NetConnection::handleNotify(bool recvd)
    if(note->maxRateChanged && !recvd)
       mMaxRate.changed = true;
 
-   if(recvd) 
+   if(recvd)
    {
       // Running average of roundTrip time
       U32 curTime = Platform::getVirtualMilliseconds();
@@ -1443,7 +1443,7 @@ DefineEngineMethod( NetConnection, connectLocal, const char*, (),,
       delete co;
       return "error";
    }
-      
+
    server->registerObject();
    server->setIsLocalClientConnection();
 
@@ -1455,13 +1455,13 @@ DefineEngineMethod( NetConnection, connectLocal, const char*, (),,
    //We need to reset the maxrate's here, because we
    // can't test if it is a local connection until RemoteConnectionObject
    // has been set
-   server->checkMaxRate();  
+   server->checkMaxRate();
    client->checkMaxRate();
 
    stream->setPosition(0);
    client->writeConnectRequest(stream);
    stream->setPosition(0);
-   
+
    const char* error;
    if( !server->readConnectRequest( stream, &error ) )
    {
@@ -1489,6 +1489,6 @@ DefineEngineMethod( NetConnection, connectLocal, const char*, (),,
    server->setConnectSequence(0);
    NetConnection::setLocalClientConnection(server);
    server->assignName("LocalClientConnection");
-   
+
    return "";
 }

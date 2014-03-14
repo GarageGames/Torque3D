@@ -29,21 +29,21 @@ IMPLEMENT_CONOBJECT( GuiDragAndDropControl );
 
 ConsoleDocClass( GuiDragAndDropControl,
    "@brief A container control that can be used to implement drag&drop behavior.\n\n"
-   
+
    "GuiDragAndDropControl is a special control that can be used to allow drag&drop behavior to be implemented where "
    "GuiControls may be dragged across the canvas and the dropped on other GuiControls.\n\n"
-   
+
    "To start a drag operation, construct a GuiDragAndDropControl and add the control that should be drag&dropped "
    "as a child to it.  Note that this must be a single child control.  To drag multiple controls, wrap them in a new "
    "GuiControl object as a temporary container.\n\n"
-   
+
    "Then, to initiate the drag, add the GuiDragAndDropControl to the canvas and call startDragging().  You can optionally "
    "supply an offset to better position the GuiDragAndDropControl on the mouse cursor.\n\n"
-   
+
    "As the GuiDragAndDropControl is then moved across the canvas, it will call the onControlDragEnter(), onControlDragExit(), "
    "onControlDragged(), and finally onControlDropped() callbacks on the visible topmost controls that it moves across.  "
    "onControlDropped() is called when the mouse button is released and the drag operation thus finished.\n\n"
-   
+
    "@tsexample\n"
       "// The following example implements drag&drop behavior for GuiSwatchButtonCtrl so that\n"
       "// one color swatch may be dragged over the other to quickly copy its color.\n"
@@ -143,12 +143,12 @@ ConsoleDocClass( GuiDragAndDropControl,
       "   }\n"
       "}\n"
    "@endtsexample\n\n"
-   
+
    "@see GuiControl::onControlDragEnter\n"
    "@see GuiControl::onControlDragExit\n"
    "@see GuiControl::onControlDragged\n"
    "@see GuiControl::onControlDropped\n\n"
-   
+
    "@ingroup GuiUtil"
 );
 
@@ -160,7 +160,7 @@ void GuiDragAndDropControl::initPersistFields()
    addField( "deleteOnMouseUp", TypeBool, Offset( mDeleteOnMouseUp, GuiDragAndDropControl ),
       "If true, the control deletes itself when the left mouse button is released.\n\n"
       "If at this point, the drag&drop control still contains its payload, it will be deleted along with the control." );
-   
+
    Parent::initPersistFields();
 }
 
@@ -176,7 +176,7 @@ void GuiDragAndDropControl::startDragging( Point2I offset )
          deleteObject();
       return;
    }
-   
+
    if( canvas->getMouseLockedControl() )
    {
       GuiEvent event;
@@ -201,7 +201,7 @@ void GuiDragAndDropControl::onMouseDown( const GuiEvent& event )
 void GuiDragAndDropControl::onMouseDragged( const GuiEvent& event )
 {
    setPosition( event.mousePoint - mOffset );
-   
+
    // Allow the control under the drag to react to a potential drop
    GuiControl* enterTarget = findDragTarget( event.mousePoint, "onControlDragEnter" );
    if( mLastTarget != enterTarget )
@@ -245,7 +245,7 @@ GuiControl* GuiDragAndDropControl::findDragTarget( Point2I mousePoint, const cha
       GuiControl* dropControl = parent->findHitControl(mousePoint);
       mVisible = true;
       while( dropControl )
-      {      
+      {
          if (dropControl->isMethod(method))
             return dropControl;
          else

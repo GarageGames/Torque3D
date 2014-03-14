@@ -87,7 +87,7 @@ ForestBrushTool::ForestBrushTool()
    mColor( ColorI::WHITE ),
    mMode( Paint ),
    mRandom( Platform::getRealMilliseconds() + 1 )
-{	
+{
 }
 
 ForestBrushTool::~ForestBrushTool()
@@ -103,18 +103,18 @@ ConsoleDocClass( ForestBrushTool,
 );
 
 void ForestBrushTool::initPersistFields()
-{  
+{
    addGroup( "ForestBrushTool" );
-      
+
       addField( "mode", TYPEID< BrushMode >(), Offset( mMode, ForestBrushTool) );
-      
-      addProtectedField( "size", TypeF32, Offset( mSize, ForestBrushTool ), 
+
+      addProtectedField( "size", TypeF32, Offset( mSize, ForestBrushTool ),
          &protectedSetSize, &defaultProtectedGetFn, "Brush Size" );
 
-      addProtectedField( "pressure", TypeF32, Offset( mPressure, ForestBrushTool ), 
+      addProtectedField( "pressure", TypeF32, Offset( mPressure, ForestBrushTool ),
          &protectedSetPressure, &defaultProtectedGetFn, "Brush Pressure" );
 
-      addProtectedField( "hardness", TypeF32, Offset( mHardness, ForestBrushTool ), 
+      addProtectedField( "hardness", TypeF32, Offset( mHardness, ForestBrushTool ),
          &protectedSetHardness, &defaultProtectedGetFn, "Brush Hardness" );
 
    endGroup( "ForestBrushTool" );
@@ -131,18 +131,18 @@ bool ForestBrushTool::onAdd()
 }
 
 void ForestBrushTool::onRemove()
-{	
+{
    Parent::onRemove();
 }
 
 void ForestBrushTool::on3DMouseDown( const Gui3DMouseEvent &evt )
-{   
+{
    Con::executef( this, "onMouseDown" );
 
    if ( !_updateBrushPoint( evt ) || !mForest )
       return;
 
-   mBrushDown = true;   
+   mBrushDown = true;
 
    mEditor->getRoot()->showCursor( false );
 
@@ -156,7 +156,7 @@ void ForestBrushTool::on3DMouseUp( const Gui3DMouseEvent &evt )
 {
    _updateBrushPoint( evt );
    Sim::cancelEvent( mStrokeEvent );
-   mBrushDown = false;  
+   mBrushDown = false;
 
    mEditor->getRoot()->showCursor( true );
 
@@ -171,15 +171,15 @@ void ForestBrushTool::on3DMouseUp( const Gui3DMouseEvent &evt )
 
 void ForestBrushTool::on3DMouseMove( const Gui3DMouseEvent &evt )
 {
-   _updateBrushPoint( evt );   
+   _updateBrushPoint( evt );
 }
 
 void ForestBrushTool::on3DMouseDragged( const Gui3DMouseEvent &evt )
 {
    _updateBrushPoint( evt );
 
-   if ( mBrushDown && !Sim::isEventPending( mStrokeEvent ) )         
-      mStrokeEvent = Sim::postEvent( this, new ForestBrushToolEvent(), Sim::getCurrentTime() + 250 );   
+   if ( mBrushDown && !Sim::isEventPending( mStrokeEvent ) )
+      mStrokeEvent = Sim::postEvent( this, new ForestBrushToolEvent(), Sim::getCurrentTime() + 250 );
 }
 
 bool ForestBrushTool::onMouseWheel( const GuiEvent &evt )
@@ -195,7 +195,7 @@ bool ForestBrushTool::onMouseWheel( const GuiEvent &evt )
 }
 
 void ForestBrushTool::onRender3D( )
-{      
+{
 }
 
 void ForestBrushTool::onRender2D()
@@ -204,8 +204,8 @@ void ForestBrushTool::onRender2D()
       return;
 
    if ( !mEditor->getRoot()->isCursorON() && !mBrushDown )
-      return;   
-   
+      return;
+
    RayInfo ri;
    Point3F start( 0, 0, mLastBrushPoint.z + mSize );
    Point3F end( 0, 0, mLastBrushPoint.z - mSize );
@@ -254,8 +254,8 @@ void ForestBrushTool::onRender2D()
          brushColor.set( 140, 140, 140 );
       }
    }
-   
-   mEditor->drawLineList( pointList, brushColor, 1.5f );   
+
+   mEditor->drawLineList( pointList, brushColor, 1.5f );
 }
 
 void ForestBrushTool::onActivated( const Gui3DMouseEvent &lastEvent )
@@ -284,9 +284,9 @@ bool ForestBrushTool::updateGuiInfo()
       text = "Forest Editor ( Paint Tool ) - This brush creates Items based on the Elements you have selected.";
    else if ( mMode == Erase )
       text = "Forest Editor ( Erase Tool ) - This brush erases Items of any Mesh type.";
-   else if ( mMode == EraseSelected )   
-      text = "Forest Editor ( Erase Selected ) - This brush erases Items based on the Elements you have selected.";      
-   
+   else if ( mMode == EraseSelected )
+      text = "Forest Editor ( Erase Selected ) - This brush erases Items based on the Elements you have selected.";
+
    if ( statusbar )
       statusbar->setText( text );
 
@@ -308,7 +308,7 @@ void ForestBrushTool::setSize( F32 val )
 }
 
 void ForestBrushTool::setPressure( F32 val )
-{   
+{
    mPressure = mClampF( val, 0.0f, 1.0f );
    Con::executef( this, "syncBrushToolbar" );
 }
@@ -337,7 +337,7 @@ void ForestBrushTool::_action( const Point3F &point )
 
 inline F32 mCircleArea( F32 radius )
 {
-   return radius * radius * M_PI_F;   
+   return radius * radius * M_PI_F;
 }
 
 void ForestBrushTool::_paint( const Point3F &point )
@@ -351,7 +351,7 @@ void ForestBrushTool::_paint( const Point3F &point )
    ForestBrushElement *pElement;
    ForestItemData *pData;
    F32 radius, area;
-   
+
    // How much area do we have to fill with trees ( within the brush ).
    F32 fillArea = mCircleArea( mSize );
 
@@ -361,7 +361,7 @@ void ForestBrushTool::_paint( const Point3F &point )
    // Create an MRandomSet we can get items we are painting out of with
    // the desired distribution.
    // Also grab the smallest and largest radius elements while we are looping.
-   
+
    ForestBrushElement *smallestElement, *largestElement;
    smallestElement = largestElement = mElements[0];
 
@@ -378,7 +378,7 @@ void ForestBrushTool::_paint( const Point3F &point )
 
       randElementSet.add( pElement, pElement->mProbability );
    }
-   
+
    // Pull elements from the random set until we would theoretically fill
    // the desired area.
 
@@ -407,7 +407,7 @@ void ForestBrushTool::_paint( const Point3F &point )
       //   break;
 
       // We have area left to fill...
-      
+
       const F32 rotRange = mDegToRad( pElement->mRotationRange );
 
       // Get a random sink value.
@@ -423,11 +423,11 @@ void ForestBrushTool::_paint( const Point3F &point )
       for ( ; i < MaxTries; i++ )
       {
          // Pick some randoms for placement.
-         worldCoords = MathUtils::randomPointInCircle( mSize ) + point.asPoint2F();                  
+         worldCoords = MathUtils::randomPointInCircle( mSize ) + point.asPoint2F();
 
          // Look for the ground at this position.
-         if ( !getGroundAt( Point3F( worldCoords.x, worldCoords.y , point.z ), 
-                                     &worldCoordZ, 
+         if ( !getGroundAt( Point3F( worldCoords.x, worldCoords.y , point.z ),
+                                     &worldCoordZ,
                                      &normalVector ) )
          {
             continue;
@@ -463,7 +463,7 @@ void ForestBrushTool::_paint( const Point3F &point )
             normalVector *= sink;
             temp = worldCoords + normalVector.asPoint2F();
             getGroundAt( Point3F( temp.x, temp.y, point.z ),
-                         &worldCoordZ, 
+                         &worldCoordZ,
                          NULL );
          }
 
@@ -486,7 +486,7 @@ void ForestBrushTool::_paint( const Point3F &point )
                           scaleFactor );
          break;
       }
-   }      
+   }
 }
 
 void ForestBrushTool::_erase( const Point3F &point )
@@ -504,7 +504,7 @@ void ForestBrushTool::_erase( const Point3F &point )
       {
          const ForestItem &tree = trees[i];
 
-         if ( !mDatablocks.contains( tree.getData() ) )    
+         if ( !mDatablocks.contains( tree.getData() ) )
          {
             trees.erase_fast( i );
             i--;
@@ -517,14 +517,14 @@ void ForestBrushTool::_erase( const Point3F &point )
 
    // Number of trees to erase depending on pressure.
    S32 eraseCount = getMax( (S32)mCeil( (F32)trees.size() * mPressure ), 0 );
-   
+
    // Initialize an MRandomDeck with trees under the brush.
    MRandomDeck<ForestItem> deck(&mRandom);
    deck.addToPile( trees );
    deck.shuffle();
 
    ForestItem currentTree;
-   
+
    // Draw eraseCount number of trees from MRandomDeck, adding them to our erase action.
    for ( U32 i = 0; i < eraseCount; i++ )
    {
@@ -538,7 +538,7 @@ void ForestBrushTool::_erase( const Point3F &point )
          mCurrAction = action;
       }
 
-      action->removeItem( currentTree );      
+      action->removeItem( currentTree );
    }
 }
 
@@ -569,7 +569,7 @@ bool ForestBrushTool::_updateBrushPoint( const Gui3DMouseEvent &event_ )
 }
 
 bool findSelectedElements( ForestBrushElement *obj )
-{   
+{
    if ( obj->isSelectedRecursive() )
       return true;
 
@@ -586,7 +586,7 @@ void ForestBrushTool::_collectElements()
    GuiTreeViewCtrl *brushTree;
    if ( !Sim::findObject( "ForestEditBrushTree", brushTree ) )
       return;
-      
+
    const char* objectIdList = Con::executef( brushTree, "getSelectedObjectList" );
 
    // Collect those objects in a vector and mark them as selected.
@@ -595,11 +595,11 @@ void ForestBrushTool::_collectElements()
    SimObject *simobj;
 
    S32 wordCount = StringUnit::getUnitCount( objectIdList, " " );
-   
+
    for ( S32 i = 0; i < wordCount; i++ )
    {
       const char* word = StringUnit::getUnit( objectIdList, i, " " );
-      
+
       if ( Sim::findObject( word, simobj ) )
       {
          objectList.push_back( simobj );
@@ -615,15 +615,15 @@ void ForestBrushTool::_collectElements()
    // We just needed to flag these objects as selected for the benefit of our
    // findSelectedElements callback, we can now mark them un-selected again.
 
-   for ( S32 i = 0; i < objectList.size(); i++ )   
-      objectList[i]->setSelected(false);   
+   for ( S32 i = 0; i < objectList.size(); i++ )
+      objectList[i]->setSelected(false);
 
    // If we are in Paint or EraseSelected mode we filter out elements with
-   // a non-positive probability. 
-   
+   // a non-positive probability.
+
    if ( mMode == Paint || mMode == EraseSelected )
    {
-      for ( S32 i = 0; i < mElements.size(); i++ )   
+      for ( S32 i = 0; i < mElements.size(); i++ )
       {
          if ( mElements[i]->mProbability <= 0.0f )
          {
@@ -637,7 +637,7 @@ void ForestBrushTool::_collectElements()
    // in a vector.
 
    mDatablocks.clear();
-   for ( S32 i = 0; i < mElements.size(); i++ )   
+   for ( S32 i = 0; i < mElements.size(); i++ )
    {
       if ( mElements[i]->mData == NULL )
       {
@@ -646,7 +646,7 @@ void ForestBrushTool::_collectElements()
          continue;
       }
 
-      mDatablocks.push_back_unique( mElements[i]->mData );   
+      mDatablocks.push_back_unique( mElements[i]->mData );
    }
 }
 
@@ -660,10 +660,10 @@ bool ForestBrushTool::getGroundAt( const Point3F &worldPt, float *zValueOut, Vec
    if ( mForest )
       mForest->disableCollision();
 
-   // Do a cast ray at this point from the top to 
+   // Do a cast ray at this point from the top to
    // the bottom of our brush radius.
 
-   RayInfo rinfo;   
+   RayInfo rinfo;
    bool hit = gServerContainer.castRay( start, end, mask, &rinfo );
 
    if ( mForest )

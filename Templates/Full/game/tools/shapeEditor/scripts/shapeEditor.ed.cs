@@ -63,7 +63,7 @@ function ShapeEditor::getObjectShapeFile( %this, %obj )
       %path = %obj.getDataBlock().shapeName;
    else if ( %obj.isMemberOfClass( "GameBase" ) )
       %path = %obj.getDataBlock().shapeFile;
-      
+
    return %path;
 }
 
@@ -132,7 +132,7 @@ function ShapeEditor::isCollisionMesh( %this, %name )
             startswith( %name, "ColConvex" ) );
 }
 
-// 
+//
 function ShapeEditor::getSequenceSource( %this, %seqName )
 {
    %source = %this.shape.getSequenceSource( %seqName );
@@ -513,7 +513,7 @@ function ShapeEdSelectWindow::createIcon( %this )
       sizeIconToButton = true;
       makeIconSquare = true;
       buttonType = "radioButton";
-      groupNum = "-1";   
+      groupNum = "-1";
    };
 
    return %ctrl;
@@ -528,10 +528,10 @@ function ShapeEdSelectWindow::addFolderIcon( %this, %text )
    %ctrl.text = %text;
    %ctrl.tooltip = %text;
    %ctrl.class = "CreatorFolderIconBtn";
-   
+
    %ctrl.buttonType = "radioButton";
    %ctrl.groupNum = "-1";
-   
+
    %this-->shapeLibrary.addGuiControl( %ctrl );
 }
 
@@ -552,7 +552,7 @@ function ShapeEdSelectWindow::addShapeIcon( %this, %fullPath )
    %ctrl.text = %file;
    %ctrl.class = "CreatorStaticIconBtn";
    %ctrl.tooltip = %tip;
-   
+
    %ctrl.buttonType = "radioButton";
    %ctrl.groupNum = "-1";
 
@@ -876,7 +876,7 @@ function ShapeEdPropWindow::update_onNodeSelectionChanged( %this, %id )
    else
    {
       // Disable delete button and edit boxes
-      if ( ShapeEdSeqNodeTabBook.activePage $= "Node" ) 
+      if ( ShapeEdSeqNodeTabBook.activePage $= "Node" )
          ShapeEdPropWindow-->deleteBtn.setActive( false );
       ShapeEdNodes-->nodeName.setActive( false );
       ShapeEdNodes-->nodePosition.setActive( false );
@@ -1258,7 +1258,7 @@ function ShapeEdPropWindow::update_onSeqSelectionChanged( %this )
    if ( %seqName !$= "" )
    {
       // Enable delete button and edit boxes
-      if ( ShapeEdSeqNodeTabBook.activePage $= "Seq" ) 
+      if ( ShapeEdSeqNodeTabBook.activePage $= "Seq" )
          ShapeEdPropWindow-->deleteBtn.setActive( true );
       ShapeEdSequences-->seqName.setActive( true );
       ShapeEdSequences-->blendFlag.setActive( true );
@@ -1302,7 +1302,7 @@ function ShapeEdPropWindow::update_onSeqSelectionChanged( %this )
    else
    {
       // Disable delete button and edit boxes
-      if ( ShapeEdSeqNodeTabBook.activePage $= "Seq" ) 
+      if ( ShapeEdSeqNodeTabBook.activePage $= "Seq" )
          ShapeEdPropWindow-->deleteBtn.setActive( false );
       ShapeEdSequences-->seqName.setActive( false );
       ShapeEdSequences-->blendFlag.setActive( false );
@@ -2324,17 +2324,17 @@ function ShapeEdMaterials::editSelectedMaterial( %this )
 
       ShapeEdSelectWindow.setVisible( false );
       ShapeEdPropWindow.setVisible( false );
-      
+
       EditorGui-->MatEdPropertiesWindow.setVisible( true );
       EditorGui-->MatEdPreviewWindow.setVisible( true );
-      
+
       MatEd_phoBreadcrumb.setVisible( true );
       MatEd_phoBreadcrumb.command = "ShapeEdMaterials.editSelectedMaterialEnd();";
-      
+
       advancedTextureMapsRollout.Expanded = false;
       materialAnimationPropertiesRollout.Expanded = false;
       materialAdvancedPropertiesRollout.Expanded = false;
-   
+
       MaterialEditorGui.open();
       MaterialEditorGui.setActiveMaterial( %this.selectedMaterial );
 
@@ -2345,10 +2345,10 @@ function ShapeEdMaterials::editSelectedMaterial( %this )
 }
 
 function ShapeEdMaterials::editSelectedMaterialEnd( %this, %closeEditor )
-{   
+{
    MatEd_phoBreadcrumb.setVisible( false );
    MatEd_phoBreadcrumb.command = "";
-   
+
    MaterialEditorGui.quit();
    EditorGui-->MatEdPropertiesWindow.setVisible( false );
    EditorGui-->MatEdPreviewWindow.setVisible( false );
@@ -2407,7 +2407,7 @@ function ShapeEdDetailTree::getDetailLevelFromItem( %this, %id )
 {
    if ( %this.isDetailItem( %id ) )
       %detSize = %this.getItemValue( %id );
-      
+
    else
       %detSize = %this.getItemValue( %this.getParent( %id ) );
    return ShapeEditor.shape.getDetailLevelIndex( %detSize );

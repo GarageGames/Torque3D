@@ -42,12 +42,12 @@ ConsoleDocClass( GuiInspectorField,
 //-----------------------------------------------------------------------------
 
 GuiInspectorField::GuiInspectorField( GuiInspector* inspector,
-                                      GuiInspectorGroup* parent, 
-                                      AbstractClassRep::Field* field ) 
+                                      GuiInspectorGroup* parent,
+                                      AbstractClassRep::Field* field )
  : mInspector( inspector ),
-   mParent( parent ), 
-   mField( field ), 
-   mFieldArrayIndex( NULL ), 
+   mParent( parent ),
+   mField( field ),
+   mFieldArrayIndex( NULL ),
    mEdit( NULL )
 {
    if( field != NULL )
@@ -57,18 +57,18 @@ GuiInspectorField::GuiInspectorField( GuiInspector* inspector,
 
    setCanSave( false );
    setBounds(0,0,100,18);
-   
+
    if( field )
       _setFieldDocs( field->pFieldDocs );
 }
 
 //-----------------------------------------------------------------------------
 
-GuiInspectorField::GuiInspectorField() 
+GuiInspectorField::GuiInspectorField()
  : mInspector( NULL ),
-   mParent( NULL ), 
+   mParent( NULL ),
    mEdit( NULL ),
-   mField( NULL ), 
+   mField( NULL ),
    mFieldArrayIndex( NULL ),
    mCaption( StringTable->EmptyString() ),
    mHighlighted( false )
@@ -85,7 +85,7 @@ GuiInspectorField::~GuiInspectorField()
 //-----------------------------------------------------------------------------
 
 void GuiInspectorField::init( GuiInspector *inspector, GuiInspectorGroup *group )
-{   
+{
    mInspector = inspector;
    mParent = group;
 }
@@ -93,14 +93,14 @@ void GuiInspectorField::init( GuiInspector *inspector, GuiInspectorGroup *group 
 //-----------------------------------------------------------------------------
 
 bool GuiInspectorField::onAdd()
-{   
-   setInspectorProfile();   
+{
+   setInspectorProfile();
 
    if ( !Parent::onAdd() )
       return false;
 
    if ( !mInspector )
-      return false;   
+      return false;
 
    mEdit = constructEditControl();
    if ( mEdit == NULL )
@@ -112,7 +112,7 @@ bool GuiInspectorField::onAdd()
    addObject( mEdit );
 
    // Calculate Caption and EditCtrl Rects
-   updateRects();   
+   updateRects();
 
    // Force our editField to set it's value
    updateValue();
@@ -135,14 +135,14 @@ bool GuiInspectorField::resize( const Point2I &newPosition, const Point2I &newEx
 void GuiInspectorField::onRender( Point2I offset, const RectI &updateRect )
 {
    RectI ctrlRect(offset, getExtent());
-   
+
    // Render fillcolor...
    if ( mProfile->mOpaque )
-      GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColor);   
+      GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColor);
 
    // Render caption...
    if ( mCaption && mCaption[0] )
-   {      
+   {
       // Backup current ClipRect
       RectI clipBackup = GFX->getClipRect();
 
@@ -166,13 +166,13 @@ void GuiInspectorField::onRender( Point2I offset, const RectI &updateRect )
          // Draw caption background...
          if( !isActive() )
             GFX->getDrawUtil()->drawRectFill( clipRect, mProfile->mFillColorNA );
-         else if ( mHighlighted )         
-            GFX->getDrawUtil()->drawRectFill( clipRect, mProfile->mFillColorHL );             
+         else if ( mHighlighted )
+            GFX->getDrawUtil()->drawRectFill( clipRect, mProfile->mFillColorHL );
 
          // Draw caption text...
 
          drawer->setBitmapModulation( !isActive() ? mProfile->mFontColorNA : mHighlighted ? mProfile->mFontColorHL : mProfile->mFontColor );
-         
+
          // Clip text with '...' if too long to fit
          String clippedText( mCaption );
          clipText( clippedText, clipRect.extent.x );
@@ -192,12 +192,12 @@ void GuiInspectorField::onRender( Point2I offset, const RectI &updateRect )
 
    // Render border...
    if ( mProfile->mBorder )
-      renderBorder(ctrlRect, mProfile);   
+      renderBorder(ctrlRect, mProfile);
 
    // Render divider...
    Point2I worldPnt = mEditCtrlRect.point + offset;
    GFX->getDrawUtil()->drawLine( worldPnt.x - 5,
-      worldPnt.y, 
+      worldPnt.y,
       worldPnt.x - 5,
       worldPnt.y + getHeight(),
       !isActive() ? mProfile->mBorderColorNA : mHighlighted ? mProfile->mBorderColorHL : mProfile->mBorderColor );
@@ -211,15 +211,15 @@ void GuiInspectorField::setFirstResponder( GuiControl *firstResponder )
 
    if ( firstResponder == this || firstResponder == mEdit )
    {
-      mInspector->setHighlightField( this );      
-   }   
+      mInspector->setHighlightField( this );
+   }
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiInspectorField::onMouseDown( const GuiEvent &event )
 {
-   if ( mCaptionRect.pointInRect( globalToLocalCoord( event.mousePoint ) ) )  
+   if ( mCaptionRect.pointInRect( globalToLocalCoord( event.mousePoint ) ) )
    {
       if ( mEdit )
          //mEdit->onMouseDown( event );
@@ -233,7 +233,7 @@ void GuiInspectorField::onMouseDown( const GuiEvent &event )
 
 void GuiInspectorField::onRightMouseUp( const GuiEvent &event )
 {
-   if ( mCaptionRect.pointInRect( globalToLocalCoord( event.mousePoint ) ) ) 
+   if ( mCaptionRect.pointInRect( globalToLocalCoord( event.mousePoint ) ) )
       Con::executef( mInspector, "onFieldRightClick", getIdString() );
    else
       Parent::onMouseDown( event );
@@ -250,18 +250,18 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
    {
       String strData = data;
       const U32 numTargets = mInspector->getNumInspectObjects();
-      
+
       if( callbacks && numTargets > 1 )
          Con::executef( mInspector, "onBeginCompoundEdit" );
-            
+
       for( U32 i = 0; i < numTargets; ++ i )
       {
          SimObject* target = mInspector->getInspectObject( i );
-         
+
          String oldValue = target->getDataField( mField->pFieldname, mFieldArrayIndex);
-         
+
          // For numeric fields, allow input expressions.
-         
+
          String newValue = strData;
          S32 type= mField->type;
          if( type == TypeS8 || type == TypeS32 || type == TypeF32 )
@@ -288,51 +288,51 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
             //TODO: we should actually take strings into account and not chop things up between quotes
 
             U32 numNewUnits = StringUnit::getUnitCount( newValue, " \t\n\r" );
-            
+
             StringBuilder strNew;
             bool isFirst = true;
             for( U32 n = 0; n < numNewUnits; ++ n )
             {
                char oldComponentVal[ 1024 ];
                StringUnit::getUnit( oldValue, n, " \t\n\r", oldComponentVal, sizeof( oldComponentVal ) );
-               
+
                char newComponentExpr[ 1024 ];
                StringUnit::getUnit( newValue, n, " \t\n\r", newComponentExpr, sizeof( newComponentExpr ) );
-               
+
                char buffer[ 2048 ];
                expandEscape( buffer, newComponentExpr );
 
                const char* newComponentVal = Con::evaluatef( "%%f = \"%s\"; %%v = \"%s\"; return ( %s );",
                   oldComponentVal, oldValue.c_str(), buffer );
-               
+
                if( !isFirst )
                   strNew.append( ' ' );
                strNew.append( newComponentVal );
-               
+
                isFirst = false;
             }
-            
+
             newValue = strNew.end();
          }
-            
+
          target->inspectPreApply();
-         
+
          // Fire callback single-object undo.
-         
+
          if( callbacks )
-            Con::executef( mInspector, "onInspectorFieldModified", 
-                                          target->getIdString(), 
-                                          mField->pFieldname, 
-                                          mFieldArrayIndex ? mFieldArrayIndex : "(null)", 
-                                          oldValue.c_str(), 
+            Con::executef( mInspector, "onInspectorFieldModified",
+                                          target->getIdString(),
+                                          mField->pFieldname,
+                                          mFieldArrayIndex ? mFieldArrayIndex : "(null)",
+                                          oldValue.c_str(),
                                           newValue.c_str() );
 
          target->setDataField( mField->pFieldname, mFieldArrayIndex, newValue );
-         
+
          // Give the target a chance to validate.
          target->inspectPostApply();
       }
-      
+
       if( callbacks && numTargets > 1 )
          Con::executef( mInspector, "onEndCompoundEdit" );
    }
@@ -357,9 +357,9 @@ void GuiInspectorField::resetData()
 {
    if( !mField )
       return;
-      
+
    SimObject* inspectObject = getInspector()->getInspectObject();
-   
+
    SimObject* tempObject = static_cast< SimObject* >( inspectObject->getClassRep()->create() );
    setData( tempObject->getDataField( mField->pFieldname, mFieldArrayIndex ) );
    delete tempObject;
@@ -367,18 +367,18 @@ void GuiInspectorField::resetData()
 
 //-----------------------------------------------------------------------------
 
-void GuiInspectorField::setInspectorField( AbstractClassRep::Field *field, StringTableEntry caption, const char*arrayIndex ) 
+void GuiInspectorField::setInspectorField( AbstractClassRep::Field *field, StringTableEntry caption, const char*arrayIndex )
 {
-   mField = field; 
+   mField = field;
 
-   if ( arrayIndex != NULL )   
+   if ( arrayIndex != NULL )
       mFieldArrayIndex = StringTable->insert( arrayIndex );
 
    if ( !caption || !caption[0] )
-      mCaption = getFieldName(); 
+      mCaption = getFieldName();
    else
       mCaption = caption;
-      
+
    _setFieldDocs( mField->pFieldDocs );
 }
 
@@ -388,14 +388,14 @@ StringTableEntry GuiInspectorField::getRawFieldName()
 {
    if( !mField )
       return StringTable->EmptyString();
-      
+
    return mField->pFieldname;
 }
 
 //-----------------------------------------------------------------------------
 
-StringTableEntry GuiInspectorField::getFieldName() 
-{ 
+StringTableEntry GuiInspectorField::getFieldName()
+{
    // Sanity
    if ( mField == NULL )
       return StringTable->EmptyString();
@@ -421,7 +421,7 @@ StringTableEntry GuiInspectorField::getFieldType()
 {
    if( !mField )
       return StringTable->EmptyString();
-      
+
    return ConsoleBaseType::getType( mField->type )->getTypeName();
 }
 
@@ -438,11 +438,11 @@ GuiControl* GuiInspectorField::constructEditControl()
 
    char szBuffer[512];
    dSprintf( szBuffer, 512, "%d.apply(%d.getText());",getId(), retCtrl->getId() );
-   
+
    // Suffices to hook on to "validate" as regardless of whether we lose
    // focus through the user pressing enter or clicking away on another
    // keyboard control, we will see a validate call.
-   
+
    retCtrl->setField("validate", szBuffer );
 
    return retCtrl;
@@ -452,8 +452,8 @@ GuiControl* GuiInspectorField::constructEditControl()
 
 void GuiInspectorField::setInspectorProfile()
 {
-   GuiControlProfile *profile = NULL;   
-   
+   GuiControlProfile *profile = NULL;
+
    if( mInspector->getNumInspectObjects() > 1 )
    {
       if( !hasSameValueInAllObjects() )
@@ -461,10 +461,10 @@ void GuiInspectorField::setInspectorProfile()
       else
          Sim::findObject( "GuiInspectorMultiFieldProfile", profile );
    }
-   
+
    if( !profile )
       Sim::findObject( "GuiInspectorFieldProfile", profile );
-   
+
    if( profile )
       setControlProfile( profile );
 }
@@ -483,7 +483,7 @@ void GuiInspectorField::setValue( StringTableEntry newValue )
 bool GuiInspectorField::updateRects()
 {
    S32 dividerPos, dividerMargin;
-   mInspector->getDivider( dividerPos, dividerMargin );   
+   mInspector->getDivider( dividerPos, dividerMargin );
 
    Point2I fieldExtent = getExtent();
    Point2I fieldPos = getPosition();
@@ -492,7 +492,7 @@ bool GuiInspectorField::updateRects()
 
    mEditCtrlRect.set( fieldExtent.x - dividerPos + dividerMargin, 1, editWidth, fieldExtent.y - 1 );
    mCaptionRect.set( 0, 0, fieldExtent.x - dividerPos - dividerMargin, fieldExtent.y );
-   
+
    if ( !mEdit )
       return false;
 
@@ -506,7 +506,7 @@ void GuiInspectorField::updateValue()
    if( mInspector->getNumInspectObjects() > 1 )
    {
       setInspectorProfile();
-         
+
       if( !hasSameValueInAllObjects() )
          setValue( StringTable->EmptyString() );
       else
@@ -543,9 +543,9 @@ void GuiInspectorField::setHLEnabled( bool enabled )
 bool GuiInspectorField::hasSameValueInAllObjects()
 {
    char value1[ 2048 ];
-   
+
    // Get field value from first object.
-   
+
    const char* data1 = getData( 0 );
    if( data1 )
    {
@@ -554,7 +554,7 @@ bool GuiInspectorField::hasSameValueInAllObjects()
    }
    else
       value1[ 0 ] = 0;
-   
+
    // Check if all other objects have the same value.
 
    const U32 numObjects = mInspector->getNumInspectObjects();
@@ -567,7 +567,7 @@ bool GuiInspectorField::hasSameValueInAllObjects()
       if( dStrcmp( value1, value2 ) != 0 )
          return false;
    }
-         
+
    return true;
 }
 
@@ -598,7 +598,7 @@ void GuiInspectorField::_setFieldDocs( StringTableEntry docs )
    if( docs && docs[ 0 ] )
    {
       // Only accept first line of docs for brevity.
-      
+
       const char* newline = dStrchr( docs, '\n' );
       if( newline )
          mFieldDocs = String( docs, newline - docs );
@@ -640,7 +640,7 @@ ConsoleMethod( GuiInspectorField, apply, void, 3, 4, "( string newValue, bool ca
    bool callbacks = true;
    if( argc > 3 )
       callbacks = dAtob( argv[ 3 ] );
-      
+
    object->setData( argv[ 2 ], callbacks );
 }
 

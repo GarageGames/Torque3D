@@ -135,7 +135,7 @@ bool Box3F::collideOrientedBox(const Point3F & bRadii, const MatrixF & toA) cons
    absZY = mFabs(f[6]);
 	if (aRadii.y + bRadii.x * absXY +	bRadii.y * absYY +	bRadii.z * absZY - mFabs(p.y)<0.0f)
 		return false;
-	
+
    absXZ = mFabs(f[8]);
    absYZ = mFabs(f[9]);
    absZZ = mFabs(f[10]);
@@ -146,56 +146,56 @@ bool Box3F::collideOrientedBox(const Point3F & bRadii, const MatrixF & toA) cons
 		return false;
 
 	if (aRadii.x*absYX + aRadii.y*absYY + aRadii.z*absYZ + bRadii.y - mFabs(p.x*f[1] + p.y*f[5] + p.z*f[9])<0.0f)
-		return false;		
-	
+		return false;
+
 	if (aRadii.x*absZX + aRadii.y*absZY + aRadii.z*absZZ + bRadii.z - mFabs(p.x*f[2] + p.y*f[6] + p.z*f[10])<0.0f)
-		return false;		
-	
+		return false;
+
 	if (mFabs(p.z*f[4] - p.y*f[8]) >
 				aRadii.y * absXZ + aRadii.z * absXY +
 				bRadii.y * absZX + bRadii.z * absYX)
 		return false;
-	
+
 	if (mFabs(p.z*f[5] - p.y*f[9]) >
 				aRadii.y * absYZ + aRadii.z * absYY +
 				bRadii.x * absZX + bRadii.z * absXX)
 		return false;
-	
+
 	if (mFabs(p.z*f[6] - p.y*f[10]) >
 				aRadii.y * absZZ + aRadii.z * absZY +
 				bRadii.x * absYX + bRadii.y * absXX)
 		return false;
-	
+
 	if (mFabs(p.x*f[8] - p.z*f[0]) >
 				aRadii.x * absXZ + aRadii.z * absXX +
 				bRadii.y * absZY + bRadii.z * absYY)
 		return false;
-	
+
 	if (mFabs(p.x*f[9] - p.z*f[1]) >
 				aRadii.x * absYZ + aRadii.z * absYX +
 				bRadii.x * absZY + bRadii.z * absXY)
 		return false;
-	
+
 	if (mFabs(p.x*f[10] - p.z*f[2]) >
 				aRadii.x * absZZ + aRadii.z * absZX +
 				bRadii.x * absYY + bRadii.y * absXY)
 		return false;
-	
+
 	if (mFabs(p.y*f[0] - p.x*f[4]) >
 				aRadii.x * absXY + aRadii.y * absXX +
 				bRadii.y * absZZ + bRadii.z * absYZ)
 		return false;
-	
+
 	if (mFabs(p.y*f[1] - p.x*f[5]) >
 				aRadii.x * absYY + aRadii.y * absYX +
 				bRadii.x * absZZ + bRadii.z * absXZ)
 		return false;
-	
+
 	if (mFabs(p.y*f[2] - p.x*f[6]) >
 				aRadii.x * absZY + aRadii.y * absZX +
 				bRadii.x * absYZ + bRadii.y * absXZ)
 		return false;
-	
+
 	return true;
 }
 
@@ -207,7 +207,7 @@ Box3F Box3F::aroundPoints( const Point3F* points, U32 numPoints )
    AssertFatal( numPoints >= 1, "Box3F::aroundPoints - Must have at least one point" );
 
    Box3F box;
-   
+
    Point3F minPoint = points[ 0 ];
    Point3F maxPoint = points[ 0 ];
 
@@ -226,7 +226,7 @@ Box3F Box3F::aroundPoints( const Point3F* points, U32 numPoints )
 Point3F Box3F::computeVertex( U32 corner ) const
 {
    AssertFatal( corner < NUM_POINTS, "Box3F::computeVertex - Index out of range" );
-   
+
    switch( corner )
    {
       case NearBottomLeft:    return Point3F( minExtents.x, minExtents.y, minExtents.z );

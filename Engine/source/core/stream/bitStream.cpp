@@ -35,11 +35,11 @@ static U8 gPacketBuffer[Net::MaxPacketDataSize];
 
 // bitstream utility functions
 
-void BitStream::clearStringBuffer() 
+void BitStream::clearStringBuffer()
 {
    static char stringBuf[256];
-   stringBuf[0] = 0; 
-//   setStringBuffer( stringBuf ); 
+   stringBuf[0] = 0;
+//   setStringBuffer( stringBuf );
 }
 
 void BitStream::setStringBuffer(char buffer[256])
@@ -202,7 +202,7 @@ void BitStream::writeClassId(U32 classId, U32 classType, U32 classGroup)
    AssertFatal(classType < NetClassTypesCount, "Out of range class type.");
    AssertFatal(classGroup < NetClassGroupsCount, "Out of range class group.");
    AssertFatal(classId < AbstractClassRep::NetClassCount[classGroup][classType], "Out of range class id.");
-   AssertFatal(AbstractClassRep::NetClassCount[classGroup][classType] < (1 << AbstractClassRep::NetClassBitSize[classGroup][classType]), 
+   AssertFatal(AbstractClassRep::NetClassCount[classGroup][classType] < (1 << AbstractClassRep::NetClassBitSize[classGroup][classType]),
       "NetClassBitSize too small!");
 
    writeInt(classId, AbstractClassRep::NetClassBitSize[classGroup][classType]);
@@ -212,7 +212,7 @@ S32 BitStream::readClassId(U32 classType, U32 classGroup)
 {
    AssertFatal(classType < NetClassTypesCount, "Out of range class type.");
    AssertFatal(classGroup < NetClassGroupsCount, "Out of range class group.");
-   AssertFatal(AbstractClassRep::NetClassCount[classGroup][classType] < (1 << AbstractClassRep::NetClassBitSize[classGroup][classType]), 
+   AssertFatal(AbstractClassRep::NetClassCount[classGroup][classType] < (1 << AbstractClassRep::NetClassBitSize[classGroup][classType]),
       "NetClassBitSize too small!");
 
    S32 ret = readInt(AbstractClassRep::NetClassBitSize[classGroup][classType]);
@@ -500,8 +500,8 @@ void BitStream::readQuat( QuatF *outQuat, U32 bitCount )
    outQuat->y = readSignedFloat( bitCount );
    outQuat->z = readSignedFloat( bitCount );
 
-   outQuat->w = mSqrt( 1.0 - getMin(   mSquared( outQuat->x ) + 
-                                       mSquared( outQuat->y ) + 
+   outQuat->w = mSqrt( 1.0 - getMin(   mSquared( outQuat->x ) +
+                                       mSquared( outQuat->y ) +
                                        mSquared( outQuat->z ),
                                        1.0f ) );
    if ( readFlag() )
@@ -510,7 +510,7 @@ void BitStream::readQuat( QuatF *outQuat, U32 bitCount )
 
 void BitStream::writeBits( const BitVector &bitvec )
 {
-   U32 size = bitvec.getSize();   
+   U32 size = bitvec.getSize();
    if ( writeFlag( size <= 127 ) )
       writeInt( size, 7 );
    else
@@ -521,7 +521,7 @@ void BitStream::writeBits( const BitVector &bitvec )
 
 void BitStream::readBits( BitVector *bitvec )
 {
-   U32 size;   
+   U32 size;
    if ( readFlag() ) // size <= 127
       size = readInt( 7 );
    else

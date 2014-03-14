@@ -99,7 +99,7 @@ public:
    void unpackUpdate( NetConnection *conn,           BitStream *stream );
 
    void prepRenderImage( SceneRenderState* state );
-  
+
    ///
    void setAzimuth( F32 azimuth );
    ///

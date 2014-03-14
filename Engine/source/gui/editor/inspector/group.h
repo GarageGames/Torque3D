@@ -35,7 +35,7 @@ class GuiInspectorField;
 
 /// The GuiInspectorGroup control is a helper control that the inspector
 /// makes use of which houses a collapsible pane type control for separating
-/// inspected objects fields into groups.  The content of the inspector is 
+/// inspected objects fields into groups.  The content of the inspector is
 /// made up of zero or more GuiInspectorGroup controls inside of a GuiStackControl
 ///
 class GuiInspectorGroup : public GuiRolloutCtrl
@@ -53,7 +53,7 @@ public:
    GuiInspectorGroup();
    GuiInspectorGroup( const String& groupName, SimObjectPtr<GuiInspector> parent );
    virtual ~GuiInspectorGroup();
-   
+
    DECLARE_CONOBJECT(GuiInspectorGroup);
    DECLARE_CATEGORY( "Gui Editor" );
 
@@ -73,13 +73,13 @@ public:
 
    virtual bool updateFieldValue( StringTableEntry fieldName, const char *arrayIdx );
    virtual void updateAllFields();
-   
+
    U32 getNumFields() const { return mChildren.size(); }
 
 protected:
    // overridable method that creates our inner controls.
    virtual bool createContent();
-   
+
    /// Determine the class that is a common ancestor to all inspected objects.
    AbstractClassRep* findCommonAncestorClass();
 };

@@ -25,7 +25,7 @@
 
 //------------------------------------------------------------------------------
 
-PlatformVideoInfo::PlatformVideoInfo() 
+PlatformVideoInfo::PlatformVideoInfo()
 {
    VECTOR_SET_ASSOCIATION( mAdapters );
 }
@@ -67,11 +67,11 @@ bool PlatformVideoInfo::profileAdapters()
    {
       PVIAdapter &adapter = *itr;
 
-      
+
       U32 querySuccessFlags = U32_MAX;
       AssertFatal( PVI_QueryCount < sizeof( querySuccessFlags ) * 8, "Not enough bits in query success mask." );
       querySuccessFlags -= ( ( 1 << PVI_QueryCount ) - 1 );
-      
+
       // Fill in adapter information
 #define _QUERY_MASK_HELPER( querytype, outstringaddr ) \
       querySuccessFlags |= ( _queryProperty( querytype, adapterNum, outstringaddr ) ? 1 << querytype : 0 )

@@ -60,7 +60,7 @@ struct ConsoleParser
 	struct ConsoleParser *next;       //!< Next object in list or NULL
 
 	char *ext;                        //!< Filename extension handled by this parser
-	
+
 	fnGetCurrentFile getCurrentFile;  //!< GetCurrentFile lexer function
 	fnGetCurrentLine getCurrentLine;  //!< GetCurrentLine lexer function
 	fnParse          parse;           //!< Parse lexer function
@@ -89,14 +89,14 @@ struct ConsoleParser
 
 //-----------------------------------------------------------------------------
 /// \brief Free the console parser list
-/// 
+///
 /// \sa AddConsoleParser()
 //-----------------------------------------------------------------------------
 void freeConsoleParserList(void);
 
 //-----------------------------------------------------------------------------
 /// \brief Add a console parser to the list
-/// 
+///
 /// \param ext Filename extension
 /// \param gcf GetCurrentFile function
 /// \param gcl GetCurrentLine function
@@ -111,7 +111,7 @@ bool addConsoleParser(char *ext, fnGetCurrentFile gcf, fnGetCurrentLine gcl, fnP
 
 //-----------------------------------------------------------------------------
 /// \brief Get the parser for a particular file based on its extension
-/// 
+///
 /// \param filename Filename of file to obtain parser for
 /// \sa ConsoleParser
 //-----------------------------------------------------------------------------

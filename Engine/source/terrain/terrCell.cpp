@@ -41,9 +41,9 @@ GFXImplementVertexFormat( TerrVertex )
 
 const U32 TerrCell::smMinCellSize   = 64;
 const U32 TerrCell::smVBStride      = TerrCell::smMinCellSize + 1;         // 129
-const U32 TerrCell::smVBSize        = ( TerrCell::smVBStride * TerrCell::smVBStride ) + 
+const U32 TerrCell::smVBSize        = ( TerrCell::smVBStride * TerrCell::smVBStride ) +
                                       ( TerrCell::smVBStride * 4 );        // 17,157
-const U32 TerrCell::smPBSize        = ( TerrCell::smMinCellSize * TerrCell::smMinCellSize * 6 ) + 
+const U32 TerrCell::smPBSize        = ( TerrCell::smMinCellSize * TerrCell::smMinCellSize * 6 ) +
                                       ( TerrCell::smMinCellSize * 4 * 6 ); // 101,376
 const U32 TerrCell::smTriCount      = TerrCell::smPBSize / 3;              // 33,792
 
@@ -71,7 +71,7 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
    PROFILE_SCOPE( TerrCell_AllocPrimBuffer );
 
    primBuffer->set( GFX, smPBSize, 1, GFXBufferTypeStatic, "TerrCell" );
-   
+
    // We don't use the primitive for normal clipmap
    // rendering, but it is used for the shadow pass.
    GFXPrimitive *prim = primBuffer->getPointer()->mPrimitiveArray;
@@ -109,7 +109,7 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
       for ( U32 x = 0; x < smMinCellSize; x++ )
       {
          U32 index = ( y * smVBStride ) + x;
-         
+
          const U32 xTess = x % 2;
 
          if ( ( xTess == 0 && yTess == 0 ) ||
@@ -135,8 +135,8 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
          }
 
          idxBuff += 6;
-         maxIndex = index + 1 + smVBStride;         
-         counter += 6;         
+         maxIndex = index + 1 + smVBStride;
+         counter += 6;
       }
    }
 
@@ -184,7 +184,7 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
    skirtStartIdx = startIndex + smVBStride * 2;
    // Step to go one vert to the right.
    step = 1;
-   
+
    for ( U32 i = 0; i < smMinCellSize; i++ )
    {
       t0 = startIndex + ( i * step );
@@ -270,7 +270,7 @@ TerrCell* TerrCell::init( TerrainBlock *terrain )
 {
    // Just create the root cell and call the inner init.
    TerrCell *root = new TerrCell;
-   root->_init(   terrain, 
+   root->_init(   terrain,
                   Point2I( 0, 0 ),
                   terrain->getBlockSize(),
                   0 );
@@ -282,7 +282,7 @@ TerrCell* TerrCell::init( TerrainBlock *terrain )
 }
 
 
-void TerrCell::_init( TerrainBlock *terrain,               
+void TerrCell::_init( TerrainBlock *terrain,
                       const Point2I &point,
                       U32 size,
                       U32 level )
@@ -300,24 +300,24 @@ void TerrCell::_init( TerrainBlock *terrain,
       _updateVertexBuffer();
       _updatePrimitiveBuffer();
    }
-      
+
    if ( mSize <= smMinCellSize )
    {
-      // Update our bounds and materials... the 
+      // Update our bounds and materials... the
       // parent will use it to update itself.
       _updateBounds();
       _updateMaterials();
       return;
    }
 
-   // Create our children and update our 
+   // Create our children and update our
    // bounds and materials from them.
 
    const U32 childSize = mSize / 2;
    const U32 childLevel = mLevel + 1;
 
    mChildren[0] = new TerrCell;
-   mChildren[0]->_init( mTerrain,               
+   mChildren[0]->_init( mTerrain,
                         Point2I( mPoint.x, mPoint.y ),
                         childSize,
                         childLevel );
@@ -325,7 +325,7 @@ void TerrCell::_init( TerrainBlock *terrain,
    mMaterials = mChildren[0]->getMaterials();
 
    mChildren[1] = new TerrCell;
-   mChildren[1]->_init( mTerrain,               
+   mChildren[1]->_init( mTerrain,
                         Point2I( mPoint.x + childSize, mPoint.y ),
                         childSize,
                         childLevel );
@@ -333,7 +333,7 @@ void TerrCell::_init( TerrainBlock *terrain,
    mMaterials |= mChildren[1]->getMaterials();
 
    mChildren[2] = new TerrCell;
-   mChildren[2]->_init( mTerrain,               
+   mChildren[2]->_init( mTerrain,
                         Point2I( mPoint.x, mPoint.y + childSize ),
                         childSize,
                         childLevel );
@@ -341,9 +341,9 @@ void TerrCell::_init( TerrainBlock *terrain,
    mMaterials |= mChildren[2]->getMaterials();
 
    mChildren[3] = new TerrCell;
-   mChildren[3]->_init( mTerrain,               
+   mChildren[3]->_init( mTerrain,
                         Point2I( mPoint.x + childSize, mPoint.y + childSize ),
-                        childSize, 
+                        childSize,
                         childLevel );
    mBounds.intersect( mChildren[3]->getBounds() );
    mMaterials |= mChildren[3]->getMaterials();
@@ -358,7 +358,7 @@ void TerrCell::updateGrid( const RectI &gridRect, bool opacityOnly )
    PROFILE_SCOPE( TerrCell_UpdateGrid );
 
    // If we have a VB... then update it.
-   if ( mVertexBuffer.isValid() && !opacityOnly )            
+   if ( mVertexBuffer.isValid() && !opacityOnly )
       _updateVertexBuffer();
 
    // Update our PB, if any
@@ -370,7 +370,7 @@ void TerrCell::updateGrid( const RectI &gridRect, bool opacityOnly )
    if ( !mChildren[0] )
    {
       if ( !opacityOnly )
-         _updateBounds(); 
+         _updateBounds();
 
       _updateMaterials();
       return;
@@ -389,10 +389,10 @@ void TerrCell::updateGrid( const RectI &gridRect, bool opacityOnly )
       // so grow it a bit when we create it.
       const RectI cellRect( cell->mPoint.x - 1,
                             cell->mPoint.y - 1,
-                            cell->mSize + 2, 
+                            cell->mSize + 2,
                             cell->mSize + 2 );
 
-      // We do an overlap and containment test as it 
+      // We do an overlap and containment test as it
       // properly handles zero sized rects.
       if (  cellRect.contains( gridRect ) ||
             cellRect.overlaps( gridRect ) )
@@ -438,8 +438,8 @@ void TerrCell::_updateVertexBuffer()
    Point2I gridPt;
    Point2F point;
    F32 height;
-   Point3F normal;   
-   
+   Point3F normal;
+
    const TerrainFile *file = mTerrain->getFile();
 
    for ( U32 y = 0; y < smVBStride; y++ )
@@ -481,15 +481,15 @@ void TerrCell::_updateVertexBuffer()
 
    // Add verts for 'skirts' around/beneath the edge verts of this cell.
    // This could probably be reduced to a loop...
-   
+
    const F32 skirtDepth = mSize / smMinCellSize * mTerrain->getSquareSize();
 
    // Top edge skirt
    for ( U32 i = 0; i < smVBStride; i++ )
-   {      
+   {
       gridPt.x = mClamp( mPoint.x + i * stepSize, 0, blockSize - 1 );
       gridPt.y = mClamp( mPoint.y, 0, blockSize - 1 );
-      
+
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
       height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
@@ -505,12 +505,12 @@ void TerrCell::_updateVertexBuffer()
       vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
 
       vbcounter++;
-      ++vert;      
+      ++vert;
    }
 
    // Bottom edge skirt
    for ( U32 i = 0; i < smVBStride; i++ )
-   {      
+   {
       gridPt.x = mClamp( mPoint.x + i * stepSize, 0, blockSize - 1 );
       gridPt.y = mClamp( mPoint.y + smMinCellSize * stepSize, 0, blockSize - 1 );
 
@@ -529,12 +529,12 @@ void TerrCell::_updateVertexBuffer()
       vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
 
       vbcounter++;
-      ++vert;      
+      ++vert;
    }
 
    // Left edge skirt
    for ( U32 i = 0; i < smVBStride; i++ )
-   {      
+   {
       gridPt.x = mClamp( mPoint.x, 0, blockSize - 1 );
       gridPt.y = mClamp( mPoint.y + i * stepSize, 0, blockSize - 1 );
 
@@ -553,12 +553,12 @@ void TerrCell::_updateVertexBuffer()
       vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
 
       vbcounter++;
-      ++vert;      
+      ++vert;
    }
 
    // Right edge skirt
    for ( U32 i = 0; i < smVBStride; i++ )
-   {      
+   {
       gridPt.x = mClamp( mPoint.x + smMinCellSize * stepSize, 0, blockSize - 1 );
       gridPt.y = mClamp( mPoint.y + i * stepSize, 0, blockSize - 1 );
 
@@ -577,7 +577,7 @@ void TerrCell::_updateVertexBuffer()
       vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
 
       vbcounter++;
-      ++vert;      
+      ++vert;
    }
 
    AssertFatal( vbcounter == smVBSize, "bad" );
@@ -627,7 +627,7 @@ void TerrCell::_updatePrimitiveBuffer()
       for ( U32 x = 0; x < smMinCellSize; x++ )
       {
          U32 index = ( y * smVBStride ) + x;
-         
+
          // Should this square be skipped?
          if ( _isVertIndexEmpty(index) )
             continue;
@@ -657,8 +657,8 @@ void TerrCell::_updatePrimitiveBuffer()
          }
 
          idxBuff += 6;
-         maxIndex = index + 1 + smVBStride;         
-         counter += 6;         
+         maxIndex = index + 1 + smVBStride;
+         counter += 6;
 
          mTriCount += 2;
       }
@@ -683,7 +683,7 @@ void TerrCell::_updatePrimitiveBuffer()
    for ( U32 i = 0; i < smMinCellSize; i++ )
    {
       t0 = startIndex + i * step;
-         
+
       // Should this square be skipped?
       if ( _isVertIndexEmpty(t0) )
          continue;
@@ -715,11 +715,11 @@ void TerrCell::_updatePrimitiveBuffer()
    skirtStartIdx = startIndex + smVBStride * 2;
    // Step to go one vert to the right.
    step = 1;
-   
+
    for ( U32 i = 0; i < smMinCellSize; i++ )
    {
       t0 = startIndex + ( i * step );
-         
+
       // Should this square be skipped?  We actually need to test
       // the vertex one row down as it defines the empty state
       // for this square.
@@ -757,7 +757,7 @@ void TerrCell::_updatePrimitiveBuffer()
    for ( U32 i = 0; i < smMinCellSize; i++ )
    {
       t0 = startIndex + ( i * step );
-         
+
       // Should this square be skipped?
       if ( _isVertIndexEmpty(t0) )
          continue;
@@ -793,7 +793,7 @@ void TerrCell::_updatePrimitiveBuffer()
    for ( U32 i = 0; i < smMinCellSize; i++ )
    {
       t0 = startIndex + ( i * step );
-         
+
       // Should this square be skipped?  We actually need to test
       // the vertex one column to the left as it defines the empty
       // state for this square.
@@ -841,9 +841,9 @@ void TerrCell::_updateMaterials()
    {
       for ( x = 0; x < smVBStride; x++ )
       {
-         index = file->getLayerIndex(  mPoint.x + x * stepSize, 
+         index = file->getLayerIndex(  mPoint.x + x * stepSize,
                                        mPoint.y + y * stepSize );
-         
+
          // Skip empty layers and anything that doesn't fit
          // the 64bit material flags.
          if ( index == U8_MAX || index > 63 )
@@ -869,7 +869,7 @@ void TerrCell::_updateBounds()
 
    // Prepare to expand the bounds.
    mBounds.minExtents.set( F32_MAX, F32_MAX, F32_MAX );
-   mBounds.maxExtents.set( -F32_MAX, -F32_MAX, -F32_MAX );   
+   mBounds.maxExtents.set( -F32_MAX, -F32_MAX, -F32_MAX );
 
    Point3F vert;
    Point2F texCoord;
@@ -955,9 +955,9 @@ void TerrCell::cullCells(  const SceneRenderState *state,
                            const Point3F &objLodPos,
                            Vector<TerrCell*> *outCells  )
 {
-   // If we have a VB and no children then just add 
+   // If we have a VB and no children then just add
    // ourselves to the results and return.
-   if ( mVertexBuffer.isValid() && !mChildren[0]  )               
+   if ( mVertexBuffer.isValid() && !mChildren[0]  )
    {
       outCells->push_back( this );
       return;
@@ -971,7 +971,7 @@ void TerrCell::cullCells(  const SceneRenderState *state,
       TerrCell *cell = mChildren[i];
 
       // Test cell visibility for interior zones.
-      
+
       const bool visibleInside = !cell->getZoneOverlap().empty() ? zoneState.testAny( cell->getZoneOverlap() ) : false;
 
       // Test cell visibility for outdoor zone, but only
@@ -979,7 +979,7 @@ void TerrCell::cullCells(  const SceneRenderState *state,
 
       bool visibleOutside = false;
       if( !mIsInteriorOnly && !visibleInside )
-      {         
+      {
          U32 outdoorZone = SceneZoneSpaceManager::RootZoneId;
          visibleOutside = !state->getCullingState().isCulled( cell->mOBB, &outdoorZone, 1 );
       }
@@ -998,9 +998,9 @@ void TerrCell::cullCells(  const SceneRenderState *state,
       if ( errorPixels < screenError )
       {
          if ( cell->mVertexBuffer.isValid() )
-            outCells->push_back( cell );       
+            outCells->push_back( cell );
       }
-      else      
+      else
          cell->cullCells( state, objLodPos, outCells );
    }
 }
@@ -1019,7 +1019,7 @@ void TerrCell::getRenderPrimitive(  GFXPrimitive *prim,
       useStaticPrimBuffer = false;
       *primBuff = mPrimBuffer;
    }
-      
+
 	prim->type = GFXTriangleList;
 	prim->startVertex = 0;
 	prim->minIndex = 0;
@@ -1046,7 +1046,7 @@ void TerrCell::renderBounds() const
    GFXStateBlockDesc desc;
    desc.setZReadWrite( true, false );
    desc.fillMode = GFXFillWireframe;
-   
+
    GFX->getDrawUtil()->drawCube( desc, mBounds, color );
 }
 
@@ -1060,13 +1060,13 @@ void TerrCell::preloadMaterials()
       TerrainCellMaterial *material = getMaterial();
       material->getReflectMat();
 
-      if (  GFX->getPixelShaderVersion() > 2.0f && 
+      if (  GFX->getPixelShaderVersion() > 2.0f &&
             dStrcmp( LIGHTMGR->getId(), "BLM" ) != 0)
          material->getPrePassMat();
    }
 
    for ( U32 i = 0; i < 4; i++ )
-      if ( mChildren[i] ) 
+      if ( mChildren[i] )
          mChildren[i]->preloadMaterials();
 }
 
@@ -1086,6 +1086,6 @@ void TerrCell::deleteMaterials()
    SAFE_DELETE( mMaterial );
 
    for ( U32 i = 0; i < 4; i++ )
-      if ( mChildren[i] ) 
+      if ( mChildren[i] )
          mChildren[i]->deleteMaterials();
 }

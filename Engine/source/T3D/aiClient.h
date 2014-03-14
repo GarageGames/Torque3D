@@ -61,13 +61,13 @@ class AIClient : public AIConnection {
 		bool mAimToDestination;
 		Point3F mAimLocation;
       bool mTargetInLOS;
-		
+
 		SimObjectPtr<ShapeBase> mTargetObject;
 
       // Utility Methods
       void throwCallback( const char *name );
 	public:
-		
+
 		DECLARE_CONOBJECT( AIClient );
 
 		enum {

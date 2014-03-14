@@ -62,7 +62,7 @@ void GFXGeneralFence::_init()
 void GFXGeneralFence::issue()
 {
    PROFILE_SCOPE(GFXGeneralFence_Issue);
-   
+
    // Resource creation will be done on first call to issue()
    if( !mInitialized )
       _init();
@@ -105,7 +105,7 @@ void GFXGeneralFence::block()
    if( !mInitialized )
       return;
 
-   // We have to deal with the case where the lock fails (usually due to 
+   // We have to deal with the case where the lock fails (usually due to
    // a device reset).
    if(mRTTexHandle.lock())
       mRTTexHandle.unlock();

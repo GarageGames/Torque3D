@@ -113,11 +113,11 @@ void StdMoveList::serverReadMovePacket(BitStream *bstream)
    // Skip forward (must be starting up), or over the moves
    // we already have.
    int skip = mLastMoveAck - start;
-   if (skip < 0) 
+   if (skip < 0)
    {
       mLastMoveAck = start;
    }
-   else 
+   else
    {
       if (skip > count)
          skip = count;

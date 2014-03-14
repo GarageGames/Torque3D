@@ -86,20 +86,20 @@ class WorldEditor : public EditTSCtrl
       void clearSelection();
       void selectObject(SimObject *obj);
       void selectObject(const char* obj);
-      void unselectObject(SimObject *obj);      
+      void unselectObject(SimObject *obj);
       void unselectObject(const char* obj);
-      
+
       S32 getSelectionSize();
-      S32 getSelectObject(S32 index);	
+      S32 getSelectObject(S32 index);
       const Point3F& getSelectionCentroid();
       const char* getSelectionCentroidText();
       const Box3F& getSelectionBounds();
       Point3F getSelectionExtent();
       F32 getSelectionRadius();
-      
+
       void dropCurrentSelection( bool skipUndo );
-      void copyCurrentSelection();	
-      void cutCurrentSelection();	
+      void copyCurrentSelection();
+      void cutCurrentSelection();
       bool canPasteSelection();
 
       bool alignByBounds(S32 boundsAxis);
@@ -167,7 +167,7 @@ class WorldEditor : public EditTSCtrl
 
       void terrainSnapSelection(Selection* sel, U8 modifier, Point3F gizmoPos, bool forceStick=false);
       void softSnapSelection(Selection* sel, U8 modifier, Point3F gizmoPos);
-      
+
       Selection* getActiveSelectionSet() const;
       void makeActiveSelectionSet( Selection* sel );
 
@@ -180,7 +180,7 @@ class WorldEditor : public EditTSCtrl
    public:
       bool objClassIgnored(const SimObject * obj);
       void renderObjectBox(SceneObject * obj, const ColorI & col);
-      
+
    private:
       SceneObject * getControlObject();
       bool collide(const Gui3DMouseEvent & event, SceneObject **hitObj );
@@ -234,21 +234,21 @@ class WorldEditor : public EditTSCtrl
       /// @{
 
       struct IconObject
-      {         
+      {
          SceneObject *object;
-         F32 dist;         
+         F32 dist;
          RectI rect;
          U32 alpha;
       };
-      
+
       Vector< IconObject > mIcons;
-      
+
       /// If true, icons fade out with distance to mouse cursor.
       bool mFadeIcons;
-      
+
       /// Distance at which to start fading out icons.
       F32 mFadeIconsDist;
-      
+
       /// @}
 
       SimObjectPtr<SceneObject>  mHitObject;
@@ -310,7 +310,7 @@ class WorldEditor : public EditTSCtrl
          AlignNegZ
       };
 
-      /// A large hard coded distance used to test 
+      /// A large hard coded distance used to test
       /// object and icon selection.
       static F32 smProjectDistance;
 
@@ -369,7 +369,7 @@ class WorldEditor : public EditTSCtrl
       Point3F           mSoftSnapDebugPoint;       ///< The point we're attempting to snap to
       Triangle          mSoftSnapDebugSnapTri;     ///< The triangle we are snapping to
       Vector<Triangle>  mSoftSnapDebugTriangles;   ///< The triangles that are considered for snapping
-      
+
    protected:
 
       S32 mCurrentCursor;

@@ -47,12 +47,12 @@ class GuiRiverEditorCtrl : public EditTSCtrl
    typedef EditTSCtrl Parent;
 
    public:
-   
+
       friend class GuiRiverEditorUndoAction;
 
       //static StringTableEntry smNormalMode;
       //static StringTableEntry smAddNodeMode;
-		
+
 		String mSelectRiverMode;
 		String mAddRiverMode;
 		String mAddNodeMode;
@@ -75,7 +75,7 @@ class GuiRiverEditorCtrl : public EditTSCtrl
       virtual void onSleep();
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
-      // EditTSCtrl      
+      // EditTSCtrl
 		bool onKeyDown(const GuiEvent& event);
       void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
       void on3DMouseDown(const Gui3DMouseEvent & event);
@@ -86,14 +86,14 @@ class GuiRiverEditorCtrl : public EditTSCtrl
       void on3DMouseLeave(const Gui3DMouseEvent & event);
       void on3DRightMouseDown(const Gui3DMouseEvent & event);
       void on3DRightMouseUp(const Gui3DMouseEvent & event);
-      void updateGuiInfo();      
+      void updateGuiInfo();
       void renderScene(const RectI & updateRect);
 
-      // GuiRiverEditorCtrl      
+      // GuiRiverEditorCtrl
       bool getStaticPos( const Gui3DMouseEvent & event, Point3F &tpos );
       void deleteSelectedNode();
       void deleteSelectedRiver( bool undoAble = true );
-      
+
       void setMode( String mode, bool sourceShortcut  );
       String getMode() { return mMode; }
 
@@ -135,7 +135,7 @@ class GuiRiverEditorCtrl : public EditTSCtrl
       S32 mSelNode;
       S32 mHoverNode;
       U32 mAddNodeIdx;
-      SimObjectPtr<River> mSelRiver;      
+      SimObjectPtr<River> mSelRiver;
       SimObjectPtr<River> mHoverRiver;
 
       String mMode;
@@ -183,7 +183,7 @@ class GuiRiverEditorUndoAction : public UndoAction
       {
       }
 
-      GuiRiverEditorCtrl *mRiverEditor;         
+      GuiRiverEditorCtrl *mRiverEditor;
 
       Vector<RiverNode> mNodes;
 

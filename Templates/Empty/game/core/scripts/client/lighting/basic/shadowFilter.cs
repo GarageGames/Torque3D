@@ -22,10 +22,10 @@
 
 
 singleton ShaderData( BL_ShadowFilterShaderV )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/lighting/basic/shadowFilterV.hlsl";
    DXPixelShaderFile 	= "shaders/common/lighting/basic/shadowFilterP.hlsl";
-   
+
    OGLVertexShaderFile 	= "shaders/common/lighting/basic/gl/shadowFilterV.glsl";
    OGLPixelShaderFile 	= "shaders/common/lighting/basic/gl/shadowFilterP.glsl";
 
@@ -33,7 +33,7 @@ singleton ShaderData( BL_ShadowFilterShaderV )
 
    defines = "BLUR_DIR=float2(1.0,0.0)";
 
-   pixVersion = 2.0;     
+   pixVersion = 2.0;
 };
 
 singleton ShaderData( BL_ShadowFilterShaderH : BL_ShadowFilterShaderV )
@@ -52,8 +52,8 @@ singleton GFXStateBlockData( BL_ShadowFilterSB : PFX_DefaultStateBlock )
    blendEnable = true;
 };
 
-// NOTE: This is ONLY used in Basic Lighting, and 
-// only directly by the ProjectedShadow.  It is not 
+// NOTE: This is ONLY used in Basic Lighting, and
+// only directly by the ProjectedShadow.  It is not
 // meant to be manually enabled like other PostEffects.
 singleton PostEffect( BL_ShadowFilterPostFx )
 {
@@ -63,7 +63,7 @@ singleton PostEffect( BL_ShadowFilterPostFx )
    targetClear = "PFXTargetClear_OnDraw";
    targetClearColor = "0 0 0 0";
    texture[0] = "$inTex";
-   target = "$outTex";   
+   target = "$outTex";
 
    // Blur horizontal
    new PostEffect()

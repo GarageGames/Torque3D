@@ -44,12 +44,12 @@ public:
 
    // SimObject
    virtual bool onAdd();
-   static void initPersistFields();  
+   static void initPersistFields();
 
    // GFXStateBlockData
    const GFXStateBlockDesc getState() const { return mState; }
-        
-   DECLARE_CONOBJECT(GFXStateBlockData);   
+
+   DECLARE_CONOBJECT(GFXStateBlockData);
 };
 
 /// Allows definition of sampler state via script, basically wraps a GFXSamplerStateDesc
@@ -59,7 +59,7 @@ class GFXSamplerStateData : public SimObject
    GFXSamplerStateDesc mState;
 public:
    // SimObject
-   static void initPersistFields();  
+   static void initPersistFields();
 
    /// Copies the data of this object into desc
    void setSamplerState(GFXSamplerStateDesc& desc);

@@ -59,11 +59,11 @@ struct DSoundFNTable
 
 
 /// Helper for asserting on dsound HRESULTS.
-inline void DSAssert( HRESULT hr, const char *info ) 
+inline void DSAssert( HRESULT hr, const char *info )
 {
    #ifdef TORQUE_DEBUG
 
-      if( FAILED( hr ) ) 
+      if( FAILED( hr ) )
       {
          char buf[256];
          dSprintf( buf, 256, "Error code: %x\n%s", hr, info );
@@ -77,12 +77,12 @@ inline void DSAssert( HRESULT hr, const char *info )
 /// The DirectSound device implementation exposes a couple
 /// of settings to script that you should be aware of:
 ///
-///   $DirectSound::dopplerFactor - This controls the scale of 
+///   $DirectSound::dopplerFactor - This controls the scale of
 ///   the doppler effect.  Valid factors are 0.0 to 10.0 and it
 ///   defaults to 0.75.
 ///
 ///   $DirectSound::distanceFactor - This sets the unit conversion
-///   for 
+///   for
 ///
 ///   $DirectSound::rolloffFactor - ;
 ///
@@ -90,7 +90,7 @@ inline void DSAssert( HRESULT hr, const char *info )
 class SFXDSDevice : public SFXDevice
 {
       typedef SFXDevice Parent;
-   
+
       friend class SFXDSVoice;
       friend class SFXDSProvider; // _init
 
@@ -98,11 +98,11 @@ class SFXDSDevice : public SFXDevice
 
       //explicit SFXDSDevice();
 
-      SFXDSDevice(   SFXProvider* provider, 
-                     DSoundFNTable *dsFnTbl, 
-                     GUID* guid, 
-                     String name, 
-                     bool useHardware, 
+      SFXDSDevice(   SFXProvider* provider,
+                     DSoundFNTable *dsFnTbl,
+                     GUID* guid,
+                     String name,
+                     bool useHardware,
                      S32 maxBuffers );
 
       virtual ~SFXDSDevice();

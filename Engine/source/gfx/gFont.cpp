@@ -37,11 +37,11 @@
 
 
 GFX_ImplementTextureProfile(GFXFontTextureProfile,
-                            GFXTextureProfile::DiffuseMap, 
+                            GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize |
                             GFXTextureProfile::Static |
                             GFXTextureProfile::KeepBitmap |
-                            GFXTextureProfile::NoMipmap, 
+                            GFXTextureProfile::NoMipmap,
                             GFXTextureProfile::None);
 
 template<> void *Resource<GFont>::create(const Torque::Path &path)
@@ -112,7 +112,7 @@ GFont* GFont::load( const Torque::Path& path )
          ret->setPlatformFont(platFont);
 #endif
    }
-   
+
    return ret;
 }
 
@@ -120,7 +120,7 @@ Resource<GFont> GFont::create(const String &faceName, U32 size, const char *cach
 {
    if( !cacheDirectory )
       cacheDirectory = Con::getVariable( "$GUI::fontCacheDirectory" );
-      
+
    const Torque::Path   path( String::ToString("%s/%s %d (%s).uft",
       cacheDirectory, faceName.c_str(), size, getCharSetName(charset)) );
 
@@ -140,7 +140,7 @@ Resource<GFont> GFont::create(const String &faceName, U32 size, const char *cach
 
    // Otherwise attempt to have the platform generate a new font
    PlatformFont *platFont = createPlatformFont(faceName, size, charset);
-   
+
    if (platFont == NULL)
    {
       String fontName;
@@ -209,7 +209,7 @@ GFont::GFont()
    mSize = 0;
    mCharSet = 0;
    mNeedSave = false;
-   
+
    mMutex = Mutex::createMutex();
 }
 
@@ -222,12 +222,12 @@ GFont::~GFont()
       FileStream stream;
       stream.open(mGFTFile, Torque::FS::File::Write);
 
-      if(stream.getStatus() == Stream::Ok) 
+      if(stream.getStatus() == Stream::Ok)
          write(stream);
 
       stream.close();
    }
-   
+
    S32 i;
 
    for(i = 0;i < mCharInfoList.size();i++)
@@ -239,7 +239,7 @@ GFont::~GFont()
       mTextureSheets[i] = NULL;
 
    SAFE_DELETE(mPlatformFont);
-   
+
    Mutex::destroyMutex(mMutex);
 }
 
@@ -287,9 +287,9 @@ bool GFont::loadCharInfo(const UTF16 ch)
 
         mCharInfoList.push_back(ci);
         mRemapTable[ch] = mCharInfoList.size() - 1;
-        
+
         mNeedSave = true;
-        
+
         Mutex::unlockMutex(mMutex);
         return true;
     }
@@ -385,7 +385,7 @@ const PlatformFont::CharInfo &GFont::getCharInfo(const UTF16 in_charIndex)
         loadCharInfo(in_charIndex);
 
     AssertFatal(mRemapTable[in_charIndex] != -1, "No remap info for this character");
-    
+
     return mCharInfoList[mRemapTable[in_charIndex]];
 }
 
@@ -431,13 +431,13 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
 {
    AssertFatal(str != NULL, "GFont::getStrNWidth: String is NULL");
 
-   if (str == NULL || str[0] == '\0' || n == 0)   
+   if (str == NULL || str[0] == '\0' || n == 0)
       return 0;
-      
+
    U32 totWidth = 0;
    UTF16 curChar;
    U32 charCount;
-   
+
    for(charCount = 0; charCount < n; charCount++)
    {
       curChar = str[charCount];
@@ -470,19 +470,19 @@ U32 GFont::getStrNWidthPrecise(const UTF16 *str, U32 n)
 {
    AssertFatal(str != NULL, "GFont::getStrNWidth: String is NULL");
 
-   if (str == NULL || str[0] == '\0' || n == 0)   
+   if (str == NULL || str[0] == '\0' || n == 0)
       return(0);
-      
+
    U32 totWidth = 0;
    UTF16 curChar;
    U32 charCount = 0;
-   
+
    for(charCount = 0; charCount < n; charCount++)
    {
       curChar = str[charCount];
       if(curChar == '\0')
          break;
-         
+
       if(isValidChar(curChar))
       {
          const PlatformFont::CharInfo& rChar = getCharInfo(curChar);
@@ -523,16 +523,16 @@ U32 GFont::getBreakPos(const UTF16 *str16, U32 slen, U32 width, bool breakOnWhit
       c = str16[charCount];
       if(c == '\0')
          break;
-         
+
       if(c == dT('\t'))
          c = dT(' ');
-      
+
       if(!isValidChar(c))
       {
          ret++;
          continue;
       }
-      
+
       if(c == dT(' '))
          lastws = ret+1;
 
@@ -545,7 +545,7 @@ U32 GFont::getBreakPos(const UTF16 *str16, U32 slen, U32 width, bool breakOnWhit
       }
 
       width -= rChar.xIncrement;
-      
+
       ret++;
    }
    return ret;
@@ -564,7 +564,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
 
    U32 len = dStrlen(txt);
 
-   U32 startLine; 
+   U32 startLine;
 
    for (U32 i = 0; i < len;)
    {
@@ -587,7 +587,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
             if( lineStrWidth > lineWidth )
             {
                needsNewLine = true;
-               break;      
+               break;
             }
          }
       }
@@ -599,20 +599,20 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
          return;
       }
 
-      S32 j; 
+      S32 j;
 
       // Did we hit a hardwrap (newline character) in the string.
       bool hardwrap = ( txt[i] == '\n' );
-      
+
       if ( hardwrap )
       {
          j = i;
       }
       // determine where to put the newline
-      // we need to backtrack until we find a space character 
+      // we need to backtrack until we find a space character
       // we don't do this for hardwrap(s)
       else
-      {        
+      {
          for (j = i - 1; j >= startLine; j--)
          {
             if ( dIsspace(txt[j]) || txt[i] == '\n' )
@@ -621,7 +621,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
 
          if (j < startLine)
          {
-            // the line consists of a single word!              
+            // the line consists of a single word!
             // So, just break up the word
 
             j = i - 1;
@@ -635,7 +635,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
       // beginning of the next line.
       // We don't skip spaces after a hardwrap because they were obviously intended.
       for (i++; i < len; i++)
-      {         
+      {
          if ( txt[i] == '\n' )
             continue;
 
@@ -689,7 +689,7 @@ bool GFont::read(Stream& io_rStream)
 
    U32 numSheets = 0;
    io_rStream.read(&numSheets);
-   
+
    for(i = 0; i < numSheets; i++)
    {
        GBitmap *bmp = new GBitmap;
@@ -702,7 +702,7 @@ bool GFont::read(Stream& io_rStream)
        //handle.setFilterNearest();
        mTextureSheets.push_back(handle);
    }
-   
+
    // Read last position info
    io_rStream.read(&mCurX);
    io_rStream.read(&mCurY);
@@ -733,7 +733,7 @@ bool GFont::read(Stream& io_rStream)
       for(i = minGlyph; i <= maxGlyph; i++)
          mRemapTable[i] = convertBEndianToHost(mRemapTable[i]);
    }
-   
+
    return (io_rStream.getStatus() == Stream::Ok);
 }
 
@@ -746,7 +746,7 @@ bool GFont::write(Stream& stream)
     stream.write(mFaceName);
     stream.write(mSize);
     stream.write(mCharSet);
-   
+
     stream.write(mHeight);
     stream.write(mBaseline);
     stream.write(mAscent);
@@ -814,7 +814,7 @@ bool GFont::write(Stream& stream)
       for(i = minGlyph; i <= maxGlyph; i++)
          mRemapTable[i] = convertBEndianToHost(mRemapTable[i]);
    }
-   
+
    return (stream.getStatus() == Stream::Ok);
 }
 
@@ -854,7 +854,7 @@ void GFont::exportStrip(const char *fileName, U32 padding, U32 kerning)
 
       RectI ri(mCharInfoList[i].xOffset, mCharInfoList[i].yOffset, mCharInfoList[i].width, mCharInfoList[i].height );
       Point2I outRi(curWidth, padding + getBaseline() - mCharInfoList[i].yOrigin);
-      gb.copyRect(mTextureSheets[bitmap].getBitmap(), ri, outRi); 
+      gb.copyRect(mTextureSheets[bitmap].getBitmap(), ri, outRi);
 
       // Advance.
       curWidth +=  mCharInfoList[i].width + kerning + 2*padding;
@@ -862,7 +862,7 @@ void GFont::exportStrip(const char *fileName, U32 padding, U32 kerning)
 
    // Write the image!
    FileStream fs;
-   
+
    fs.open( fileName, Torque::FS::File::Write );
 
    if(fs.getStatus() != Stream::Ok)
@@ -870,7 +870,7 @@ void GFont::exportStrip(const char *fileName, U32 padding, U32 kerning)
       Con::errorf("GFont::exportStrip - failed to open '%s' for writing.", fileName);
       return;
    }
- 
+
    // Done!
    gb.writeBitmap("png", fs);
 }
@@ -924,7 +924,7 @@ void GFont::importStrip(const char *fileName, U32 padding, U32 kerning)
       // Copy the rect.
       RectI ri(curWidth, getBaseline() - mCharInfoList[i].yOrigin, glyphList.last().bitmap->getWidth(), glyphList.last().bitmap->getHeight());
       Point2I outRi(0,0);
-      glyphList.last().bitmap->copyRect(strip, ri, outRi); 
+      glyphList.last().bitmap->copyRect(strip, ri, outRi);
 
       // Update glyph attributes.
       mCharInfoList[i].width = glyphList.last().bitmap->getWidth();
@@ -951,7 +951,7 @@ void GFont::importStrip(const char *fileName, U32 padding, U32 kerning)
    for(U32 i = 0; i < glyphList.size(); i++)
    {
       PlatformFont::CharInfo *ci = &mCharInfoList[glyphList[i].charId];
-      
+
       if(ci->height > maxHeight)
          maxHeight = ci->height;
 
@@ -972,7 +972,7 @@ void GFont::importStrip(const char *fileName, U32 padding, U32 kerning)
 
       if(ci->height > curLnHeight)
          curLnHeight = ci->height;
-      
+
       ci->bitmapIndex = sheetSizes.size();
       ci->xOffset = curX;
       ci->yOffset = curY;
@@ -1092,7 +1092,7 @@ DefineEngineFunction( dumpFontCacheStatus, void, (),,
    "@ingroup Font\n" )
 {
    Resource<GFont>   theFont = ResourceManager::get().startResourceList( Resource<GFont>::signature() );
- 
+
    Con::printf("--------------------------------------------------------------------------");
    Con::printf("   Font Cache Usage Report");
 
@@ -1104,7 +1104,7 @@ DefineEngineFunction( dumpFontCacheStatus, void, (),,
    }
 }
 
-DefineEngineFunction( writeFontCache, void, (),, 
+DefineEngineFunction( writeFontCache, void, (),,
    "Force all cached fonts to serialize themselves to the cache.\n"
    "@ingroup Font\n" )
 {
@@ -1120,7 +1120,7 @@ DefineEngineFunction( writeFontCache, void, (),,
       FileStream stream;
       stream.open(fileName, Torque::FS::File::Write);
 
-      if(stream.getStatus() == Stream::Ok) 
+      if(stream.getStatus() == Stream::Ok)
       {
          Con::printf("      o Writing '%s' to disk...", fileName.c_str());
          theFont->write(stream);
@@ -1201,7 +1201,7 @@ DefineEngineFunction( populateAllFontCacheRange, void, ( U32 rangeStart, U32 ran
    }
 }
 
-DefineEngineFunction( exportCachedFont, void, 
+DefineEngineFunction( exportCachedFont, void,
    ( const char *faceName, S32 fontSize, const char *fileName, S32 padding, S32 kerning ),,
    "Export specified font to the specified filename as a PNG. The "
    "image can then be processed in Photoshop or another tool and "
@@ -1210,8 +1210,8 @@ DefineEngineFunction( exportCachedFont, void,
    "@param faceName The name of the font face.\n"
    "@param fontSize The size of the font in pixels.\n"
    "@param fileName The file name and path for the output PNG.\n"
-   "@param padding The padding between characters.\n"   
-   "@param kerning The kerning between characters.\n"   
+   "@param padding The padding between characters.\n"
+   "@param kerning The kerning between characters.\n"
    "@ingroup Font\n" )
 {
    // Tell the font to export itself.
@@ -1233,8 +1233,8 @@ DefineEngineFunction( importCachedFont, void,
    "@param faceName The name of the font face.\n"
    "@param fontSize The size of the font in pixels.\n"
    "@param fileName The file name and path for the input PNG.\n"
-   "@param padding The padding between characters.\n"   
-   "@param kerning The kerning between characters.\n"   
+   "@param padding The padding between characters.\n"
+   "@param kerning The kerning between characters.\n"
    "@ingroup Font\n" )
 {
    // Tell the font to import itself.
@@ -1249,7 +1249,7 @@ DefineEngineFunction( importCachedFont, void,
    f->importStrip(fileName, padding, kerning);
 }
 
-DefineEngineFunction( duplicateCachedFont, void, 
+DefineEngineFunction( duplicateCachedFont, void,
    ( const char *oldFontName, S32 oldFontSize, const char *newFontName ),,
    "Copy the specified old font to a new name. The new copy will not have a "
    "platform font backing it, and so will never have characters added to it. "
@@ -1275,7 +1275,7 @@ DefineEngineFunction( duplicateCachedFont, void,
    // Ok, dump info!
    FileStream stream;
    stream.open( newFontFile, Torque::FS::File::Write );
-   if(stream.getStatus() == Stream::Ok) 
+   if(stream.getStatus() == Stream::Ok)
    {
       Con::printf( "      o Writing duplicate font '%s' to disk...", newFontFile.c_str() );
       font->write(stream);

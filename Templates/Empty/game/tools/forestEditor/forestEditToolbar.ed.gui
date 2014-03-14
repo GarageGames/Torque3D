@@ -354,7 +354,7 @@ new GuiMouseEventCtrl(ForestBrushSizeSliderCtrlContainer,EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -362,7 +362,7 @@ new GuiMouseEventCtrl(ForestBrushSizeSliderCtrlContainer,EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(ForestBrushSizeTextEditContainer.position) + firstWord(ForestEditToolbar.position)+11 SPC 
+      position = firstWord(ForestBrushSizeTextEditContainer.position) + firstWord(ForestEditToolbar.position)+11 SPC
          (getWord(ForestBrushSizeTextEditContainer, 1)) + 25;
       Extent = "112 20";
       MinExtent = "8 2";
@@ -384,7 +384,7 @@ new GuiMouseEventCtrl(ForestBrushPressureSliderCtrlContainer,EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -392,7 +392,7 @@ new GuiMouseEventCtrl(ForestBrushPressureSliderCtrlContainer,EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(ForestBrushPressureTextEditContainer.position) + firstWord(ForestEditToolbar.position) SPC 
+      position = firstWord(ForestBrushPressureTextEditContainer.position) + firstWord(ForestEditToolbar.position) SPC
          (getWord(ForestBrushPressureTextEditContainer, 1)) + 25;
       Extent = "112 20";
       MinExtent = "8 2";
@@ -404,7 +404,7 @@ new GuiMouseEventCtrl(ForestBrushPressureSliderCtrlContainer,EditorGuiGroup) {
       value = "0";
    };
 };
-         
+
 new GuiMouseEventCtrl(ForestBrushHardnessSliderCtrlContainer,EditorGuiGroup) {
    horizSizing = "right";
    vertSizing = "bottom";
@@ -414,7 +414,7 @@ new GuiMouseEventCtrl(ForestBrushHardnessSliderCtrlContainer,EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -422,7 +422,7 @@ new GuiMouseEventCtrl(ForestBrushHardnessSliderCtrlContainer,EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(ForestBrushHardnessTextEditContainer.position) + firstWord(ForestEditToolbar.position) SPC 
+      position = firstWord(ForestBrushHardnessTextEditContainer.position) + firstWord(ForestEditToolbar.position) SPC
          (getWord(TForestBrushHardnessTextEditContainer, 1)) + 25;
       Extent = "112 20";
       MinExtent = "8 2";

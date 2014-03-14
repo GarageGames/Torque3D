@@ -32,20 +32,20 @@
 class GuiInspectorDatablockField : public GuiInspectorTypeMenuBase
 {
    public:
-      
+
       typedef GuiInspectorTypeMenuBase Parent;
-      
+
    protected:
 
       AbstractClassRep *mDesiredClass;
 
       virtual SimSet* _getDatablockSet() const { return Sim::getDataBlockGroup(); }
       virtual void _populateMenu( GuiPopUpMenuCtrl* menu );
-      
+
    public:
-      
+
       DECLARE_CONOBJECT(GuiInspectorDatablockField);
-      
+
       GuiInspectorDatablockField( StringTableEntry className );
       GuiInspectorDatablockField() { mDesiredClass = NULL; };
 
@@ -58,15 +58,15 @@ class GuiInspectorDatablockField : public GuiInspectorTypeMenuBase
 class GuiInspectorTypeSFXDescriptionName : public GuiInspectorDatablockField
 {
    public:
-   
+
       typedef GuiInspectorDatablockField Parent;
-      
+
    protected:
-   
+
       virtual SimSet* _getDatablockSet() const { return Sim::getSFXDescriptionSet(); }
-   
+
    public:
-      
+
       DECLARE_CONOBJECT(GuiInspectorTypeSFXDescriptionName);
       static void consoleInit();
 };
@@ -78,13 +78,13 @@ class GuiInspectorTypeSFXDescriptionName : public GuiInspectorDatablockField
 class GuiInspectorTypeSFXTrackName : public GuiInspectorDatablockField
 {
    public:
-   
+
       typedef GuiInspectorDatablockField Parent;
-      
+
    protected:
-   
+
       virtual SimSet* _getDatablockSet() const { return Sim::getSFXTrackSet(); }
-      
+
    public:
 
       DECLARE_CONOBJECT(GuiInspectorTypeSFXTrackName);
@@ -98,13 +98,13 @@ class GuiInspectorTypeSFXTrackName : public GuiInspectorDatablockField
 class GuiInspectorTypeSFXEnvironmentName : public GuiInspectorDatablockField
 {
    public:
-   
+
       typedef GuiInspectorDatablockField Parent;
-      
+
    protected:
-   
+
       virtual SimSet* _getDatablockSet() const { return Sim::getSFXEnvironmentSet(); }
-   
+
    public:
       DECLARE_CONOBJECT(GuiInspectorTypeSFXEnvironmentName);
       static void consoleInit();
@@ -117,15 +117,15 @@ class GuiInspectorTypeSFXEnvironmentName : public GuiInspectorDatablockField
 class GuiInspectorTypeSFXAmbienceName : public GuiInspectorDatablockField
 {
    public:
-   
+
       typedef GuiInspectorDatablockField Parent;
-      
+
    protected:
-   
+
       virtual SimSet* _getDatablockSet() const { return Sim::getSFXAmbienceSet(); }
-   
+
    public:
-   
+
       DECLARE_CONOBJECT(GuiInspectorTypeSFXAmbienceName);
       static void consoleInit();
 };

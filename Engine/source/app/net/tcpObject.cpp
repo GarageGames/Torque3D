@@ -52,7 +52,7 @@ ConsoleDocClass( TCPObject,
 
    "If you want to work with HTTP you may wish to use HTTPObject instead as it handles all of the "
    "HTTP header setup and parsing.\n\n"
-   
+
    "@tsexample\n"
       "// In this example we'll retrieve the new forum threads RSS\n"
       "// feed from garagegames.com.  As we're using TCPObject, the\n"
@@ -115,8 +115,8 @@ ConsoleDocClass( TCPObject,
       "// Send the RSS feed request to the server.  Response will be\n"
       "// handled in onLine() callback above\n"
       "%rss.send(\"GET /feeds/rss/threads HTTP/1.1\\r\\nHost: www.garagegames.com\\r\\n\\r\\n\");\n"
-	"@endtsexample\n\n" 
-   
+	"@endtsexample\n\n"
+
    "@see HTTPObject\n"
 
    "@ingroup Networking\n"
@@ -400,7 +400,7 @@ void TCPObject::send(const U8 *buffer, U32 len)
    Net::sendtoSocket(mTag, buffer, S32(len));
 }
 
-DefineEngineMethod(TCPObject, send, void, (const char *data),, 
+DefineEngineMethod(TCPObject, send, void, (const char *data),,
    "@brief Transmits the data string to the connected computer.\n\n"
 
    "This method is used to send text data to the connected computer regardless if we initiated the "
@@ -421,7 +421,7 @@ DefineEngineMethod(TCPObject, send, void, (const char *data),,
    object->send( (const U8*)data, dStrlen(data) );
 }
 
-DefineEngineMethod(TCPObject, listen, void, (int port),, 
+DefineEngineMethod(TCPObject, listen, void, (int port),,
    "@brief Start listening on the specified port for connections.\n\n"
 
    "This method starts a listener which looks for incoming TCP connections to a port.  "
@@ -453,7 +453,7 @@ DefineEngineMethod(TCPObject, listen, void, (int port),,
    object->listen(U32(port));
 }
 
-DefineEngineMethod(TCPObject, connect, void, (const char* address),, 
+DefineEngineMethod(TCPObject, connect, void, (const char* address),,
    "@brief Connect to the given address.\n\n"
 
    "@param address Server address (including port) to connect to.\n"
@@ -469,7 +469,7 @@ DefineEngineMethod(TCPObject, connect, void, (const char* address),,
    object->connect(address);
 }
 
-DefineEngineMethod(TCPObject, disconnect, void, (),, 
+DefineEngineMethod(TCPObject, disconnect, void, (),,
    "@brief Disconnect from whatever this TCPObject is currently connected to, if anything.\n\n"
 
    "@tsexample\n"

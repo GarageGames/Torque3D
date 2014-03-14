@@ -71,7 +71,7 @@ class DbgFileView : public GuiArrayCtrl
 
    DbgFileView();
    ~DbgFileView();
-   
+
    DECLARE_CONOBJECT(DbgFileView);
    DECLARE_CATEGORY( "Gui Editor" );
 

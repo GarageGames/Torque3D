@@ -45,7 +45,7 @@ GFXDrawUtil::GFXDrawUtil( GFXDevice * d)
    mTextAnchorColor.set(0xFF, 0xFF, 0xFF, 0xFF);
    mFontRenderBatcher = new FontRenderBatcher();
 
-   _setupStateBlocks();   
+   _setupStateBlocks();
 }
 
 GFXDrawUtil::~GFXDrawUtil()
@@ -117,13 +117,13 @@ void GFXDrawUtil::setTextAnchorColor( const ColorI &ancColor )
 //-----------------------------------------------------------------------------
 // Draw Text
 //-----------------------------------------------------------------------------
-U32 GFXDrawUtil::drawText( GFont *font, const Point2I &ptDraw, const UTF16 *in_string, 
+U32 GFXDrawUtil::drawText( GFont *font, const Point2I &ptDraw, const UTF16 *in_string,
                           const ColorI *colorTable, const U32 maxColorIndex, F32 rot )
 {
    return drawTextN( font, ptDraw, in_string, dStrlen(in_string), colorTable, maxColorIndex, rot );
 }
 
-U32 GFXDrawUtil::drawText( GFont *font, const Point2I &ptDraw, const UTF8 *in_string, 
+U32 GFXDrawUtil::drawText( GFont *font, const Point2I &ptDraw, const UTF8 *in_string,
                           const ColorI *colorTable, const U32 maxColorIndex, F32 rot )
 {
    return drawTextN( font, ptDraw, in_string, dStrlen(in_string), colorTable, maxColorIndex, rot );
@@ -154,7 +154,7 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF8 *in_s
    return drawTextN( font, ptDraw, ubuf, n, colorTable, maxColorIndex, rot );
 }
 
-U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_string, 
+U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_string,
                            U32 n, const ColorI *colorTable, const U32 maxColorIndex, F32 rot )
 {
    // return on zero length strings
@@ -178,11 +178,11 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
 
    S32 ptX = 0;
 
-   // Queue everything for render.   
+   // Queue everything for render.
    mFontRenderBatcher->init(font, n);
 
    U32 i;
-   UTF16 c;   
+   UTF16 c;
    for(i = 0, c = in_string[i]; in_string[i] && i < n; i++, c = in_string[i])
    {
       switch(c)
@@ -193,25 +193,25 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
       case 14:
          {
             // Color code
-            if (colorTable) 
+            if (colorTable)
             {
-               static U8 remap[15] = 
-               { 
+               static U8 remap[15] =
+               {
                   0x0, // 0 special null terminator
                   0x0, // 1 ascii start-of-heading??
-                  0x1, 
-                  0x2, 
-                  0x3, 
-                  0x4, 
-                  0x5, 
-                  0x6, 
+                  0x1,
+                  0x2,
+                  0x3,
+                  0x4,
+                  0x5,
+                  0x6,
                   0x0, // 8 special backspace
                   0x0, // 9 special tab
                   0x0, // a special \n
-                  0x7, 
+                  0x7,
                   0x8,
                   0x0, // a special \r
-                  0x9 
+                  0x9
                };
 
                U8 remapped = remap[c];
@@ -256,7 +256,7 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
          }
 
          // Tab character
-      case dT('\t'): 
+      case dT('\t'):
          {
             if ( tabci == NULL )
                tabci = &(font->getCharInfo( dT(' ') ));
@@ -272,7 +272,7 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
          // Don't draw invalid characters.
       default:
          {
-            if( !font->isValidChar( c ) ) 
+            if( !font->isValidChar( c ) )
                continue;
          }
       }
@@ -317,7 +317,7 @@ void GFXDrawUtil::drawBitmapSR( GFXTextureObject* texture, const Point2I &in_rAt
    drawBitmapSR(texture,Point2F((F32)in_rAt.x,(F32)in_rAt.y),RectF((F32)srcRect.point.x,(F32)srcRect.point.y,(F32)srcRect.extent.x,(F32)srcRect.extent.y),in_flip,filter,in_wrap);
 }
 
-void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject *texture, const RectI &dstRect, const RectI &srcRect, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ ) 
+void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject *texture, const RectI &dstRect, const RectI &srcRect, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ )
 {
    RectF dstRectF = RectF((F32)dstRect.point.x,(F32)dstRect.point.y,(F32)dstRect.extent.x,(F32)dstRect.extent.y);
    RectF srcRectF = RectF((F32)srcRect.point.x,(F32)srcRect.point.y,(F32)srcRect.extent.x,(F32)srcRect.extent.y);
@@ -353,7 +353,7 @@ void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject* texture, const RectF &d
 {
    // Sanity if no texture is specified.
    if(!texture)
-      return;   
+      return;
 
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, 4, GFXBufferTypeVolatile );
    verts.lock();
@@ -368,13 +368,13 @@ void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject* texture, const RectF &d
    F32 screenTop    = dstRect.point.y;
    F32 screenBottom = (dstRect.point.y + dstRect.extent.y);
 
-   if( in_flip & GFXBitmapFlip_X ) 
+   if( in_flip & GFXBitmapFlip_X )
    {
       F32 temp = texLeft;
       texLeft = texRight;
       texRight = temp;
    }
-   if( in_flip & GFXBitmapFlip_Y ) 
+   if( in_flip & GFXBitmapFlip_Y )
    {
       F32 temp = texTop;
       texTop = texBottom;
@@ -410,7 +410,7 @@ void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject* texture, const RectF &d
       AssertFatal(false, "No GFXDrawUtil state block defined for this filter type!");
       mDevice->setStateBlock(mBitmapStretchSB);
       break;
-   }   
+   }
    mDevice->setTexture( 0, texture );
    mDevice->setupGenericShaders( GFXDevice::GSModColorTexture );
 
@@ -420,7 +420,7 @@ void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject* texture, const RectF &d
 //-----------------------------------------------------------------------------
 // Draw Rectangle
 //-----------------------------------------------------------------------------
-void GFXDrawUtil::drawRect( const Point2I &upperLeft, const Point2I &lowerRight, const ColorI &color ) 
+void GFXDrawUtil::drawRect( const Point2I &upperLeft, const Point2I &lowerRight, const ColorI &color )
 {
    drawRect( Point2F((F32)upperLeft.x,(F32)upperLeft.y),Point2F((F32)lowerRight.x,(F32)lowerRight.y),color);
 }
@@ -493,8 +493,8 @@ void GFXDrawUtil::drawRectFill( const RectF &rect, const ColorI &color )
    drawRectFill(rect.point, Point2F(rect.extent.x + rect.point.x - 1, rect.extent.y + rect.point.y - 1), color );
 }
 
-void GFXDrawUtil::drawRectFill( const Point2I &upperLeft, const Point2I &lowerRight, const ColorI &color ) 
-{   
+void GFXDrawUtil::drawRectFill( const Point2I &upperLeft, const Point2I &lowerRight, const ColorI &color )
+{
    drawRectFill(Point2F((F32)upperLeft.x, (F32)upperLeft.y), Point2F((F32)lowerRight.x, (F32)lowerRight.y), color);
 }
 
@@ -525,7 +525,7 @@ void GFXDrawUtil::drawRectFill( const Point2F &upperLeft, const Point2F &lowerRi
    verts.lock();
 
    F32 ulOffset = 0.5f - mDevice->getFillConventionOffset();
-   
+
    verts[0].point.set( upperLeft.x+nw.x+ulOffset, upperLeft.y+nw.y+ulOffset, 0.0f );
    verts[1].point.set( lowerRight.x+ne.x, upperLeft.y+ne.y+ulOffset, 0.0f );
    verts[2].point.set( upperLeft.x-ne.x+ulOffset, lowerRight.y-ne.y, 0.0f );
@@ -684,13 +684,13 @@ void GFXDrawUtil::drawSphere( const GFXStateBlockDesc &desc, F32 radius, const P
 
 //-----------------------------------------------------------------------------
 
-static const Point3F cubePoints[8] = 
+static const Point3F cubePoints[8] =
 {
    Point3F(-1, -1, -1), Point3F(-1, -1,  1), Point3F(-1,  1, -1), Point3F(-1,  1,  1),
    Point3F( 1, -1, -1), Point3F( 1, -1,  1), Point3F( 1,  1, -1), Point3F( 1,  1,  1)
 };
 
-static const U32 cubeFaces[6][4] = 
+static const U32 cubeFaces[6][4] =
 {
    { 0, 4, 6, 2 }, { 0, 2, 3, 1 }, { 0, 1, 5, 4 },
    { 3, 2, 6, 7 }, { 7, 6, 4, 5 }, { 3, 7, 5, 1 }
@@ -786,7 +786,7 @@ void GFXDrawUtil::drawPolygon( const GFXStateBlockDesc& desc, const Point3F* poi
       for( U32 i = 0; i < numPoints; ++ i )
          xfm->mulP( verts[ i ].point );
    }
-   
+
    if( isWireframe )
    {
       verts[ numVerts - 1 ].point = verts[ 0 ].point;
@@ -875,7 +875,7 @@ void GFXDrawUtil::_drawSolidCube( const GFXStateBlockDesc &desc, const Point3F &
    for(int i = 0; i < 6; i++)
    {
       idx = cubeFaces[i][0];
-      verts[vertexIndex].point = cubePoints[idx] * halfSize;      
+      verts[vertexIndex].point = cubePoints[idx] * halfSize;
       verts[vertexIndex].color = color;
       vertexIndex++;
 
@@ -947,7 +947,7 @@ void GFXDrawUtil::_drawWirePolyhedron( const GFXStateBlockDesc &desc, const AnyP
    GFXVertexBufferHandle< GFXVertexPC > verts( mDevice, numEdges * 2, GFXBufferTypeVolatile);
 
    // Fill it with the vertices for the edges.
-   
+
    verts.lock();
    for( U32 i = 0; i < numEdges; ++ i )
    {
@@ -992,7 +992,7 @@ void GFXDrawUtil::_drawSolidPolyhedron( const GFXStateBlockDesc &desc, const Any
    // put all the polyhedron's points in there.
 
    GFXVertexBufferHandle< GFXVertexPC > verts( mDevice, numPoints, GFXBufferTypeVolatile );
-   
+
    verts.lock();
    for( U32 i = 0; i < numPoints; ++ i )
    {
@@ -1085,16 +1085,16 @@ void GFXDrawUtil::drawObjectBox( const GFXStateBlockDesc &desc, const Point3F &s
    PrimBuild::color( color );
    PrimBuild::begin( GFXLineList, 48 );
 
-   static const Point3F cubePoints[8] = 
+   static const Point3F cubePoints[8] =
    {
       Point3F(-0.5, -0.5, -0.5), Point3F(-0.5, -0.5,  0.5), Point3F(-0.5,  0.5, -0.5), Point3F(-0.5,  0.5,  0.5),
       Point3F( 0.5, -0.5, -0.5), Point3F( 0.5, -0.5,  0.5), Point3F( 0.5,  0.5, -0.5), Point3F( 0.5,  0.5,  0.5)
    };
 
-   // 8 corner points of the box   
+   // 8 corner points of the box
    for ( U32 i = 0; i < 8; i++ )
    {
-      //const Point3F &start = cubePoints[i];  
+      //const Point3F &start = cubePoints[i];
 
       // 3 lines per corner point
       for ( U32 j = 0; j < 3; j++ )
@@ -1106,14 +1106,14 @@ void GFXDrawUtil::drawObjectBox( const GFXStateBlockDesc &desc, const Point3F &s
          scaledObjMat.mulP(start);
          PrimBuild::vertex3fv(start);
          scaledObjMat.mulP(end);
-         PrimBuild::vertex3fv(end);            
+         PrimBuild::vertex3fv(end);
       }
    }
 
    PrimBuild::end();
 }
 
-static const Point2F circlePoints[] = 
+static const Point2F circlePoints[] =
 {
    Point2F(0.707107f, 0.707107f),
    Point2F(0.923880f, 0.382683f),
@@ -1142,10 +1142,10 @@ void GFXDrawUtil::drawCapsule( const GFXStateBlockDesc &desc, const Point3F &cen
 }
 
 void GFXDrawUtil::_drawSolidCapsule( const GFXStateBlockDesc &desc, const Point3F &center, F32 radius, F32 height, const ColorI &color, const MatrixF *xfm )
-{	
+{
    MatrixF mat;
    if ( xfm )
-      mat = *xfm;      
+      mat = *xfm;
    else
       mat = MatrixF::Identity;
 
@@ -1155,7 +1155,7 @@ void GFXDrawUtil::_drawSolidCapsule( const GFXStateBlockDesc &desc, const Point3
 
    for (S32 i=0; i<numPoints + 1; i++)
    {
-      S32 imod = i % numPoints;      
+      S32 imod = i % numPoints;
       verts[2 * i].point = Point3F( circlePoints[imod].x * radius, circlePoints[imod].y * radius, height );
       verts[2 * i].color = color;
       verts[2 * i + 1].point = Point3F( circlePoints[imod].x * radius, circlePoints[imod].y * radius, -height );
@@ -1187,7 +1187,7 @@ void GFXDrawUtil::_drawSolidCapsule( const GFXStateBlockDesc &desc, const Point3
    if ( xfm )
       sphereMat = *xfm;
    else
-      sphereMat = MatrixF::Identity;   
+      sphereMat = MatrixF::Identity;
 
    sphereCenter.set( 0, 0, 0.5f * height );
    mat.mulV( sphereCenter );
@@ -1245,12 +1245,12 @@ void GFXDrawUtil::_drawWireCapsule( const GFXStateBlockDesc &desc, const Point3F
 }
 
 void GFXDrawUtil::drawCone( const GFXStateBlockDesc &desc, const Point3F &basePnt, const Point3F &tipPnt, F32 baseRadius, const ColorI &color )
-{   
+{
    VectorF uvec = tipPnt - basePnt;
    F32 height = uvec.len();
    uvec.normalize();
    MatrixF mat( true );
-   MathUtils::getMatrixFromUpVector( uvec, &mat );   
+   MathUtils::getMatrixFromUpVector( uvec, &mat );
    mat.setPosition(basePnt);
 
    Point3F scale( baseRadius, baseRadius, height );
@@ -1291,7 +1291,7 @@ void GFXDrawUtil::drawCylinder( const GFXStateBlockDesc &desc, const Point3F &ba
    F32 height = uvec.len();
    uvec.normalize();
    MatrixF mat( true );
-   MathUtils::getMatrixFromUpVector( uvec, &mat );   
+   MathUtils::getMatrixFromUpVector( uvec, &mat );
    mat.setPosition(basePnt);
 
    Point3F scale( radius, radius, height * 2 );
@@ -1332,14 +1332,14 @@ void GFXDrawUtil::drawCylinder( const GFXStateBlockDesc &desc, const Point3F &ba
 }
 
 void GFXDrawUtil::drawArrow( const GFXStateBlockDesc &desc, const Point3F &start, const Point3F &end, const ColorI &color )
-{   
+{
    GFXTransformSaver saver;
 
    // Direction and length of the arrow.
    VectorF dir = end - start;
    F32 len = dir.len();
-   dir.normalize();   
-   len *= 0.2f;      
+   dir.normalize();
+   len *= 0.2f;
 
    // Base of the cone will be a distance back from the end of the arrow
    // proportional to the total distance of the arrow... 0.3f looks about right.
@@ -1361,7 +1361,7 @@ void GFXDrawUtil::drawArrow( const GFXStateBlockDesc &desc, const Point3F &start
    Point3F coneDiff = end - coneBase;
 
    // Draw the cylinder.
-   F32 stickRadius = len * 0.025f;   
+   F32 stickRadius = len * 0.025f;
    drawCylinder( desc, start, end - coneDiff, stickRadius, color );
 }
 
@@ -1371,11 +1371,11 @@ void GFXDrawUtil::drawFrustum( const Frustum &f, const ColorI &color )
 
    // Draw near and far planes.
    for (U32 offset = 0; offset < 8; offset+=4)
-   {      
+   {
       drawLine(points[offset+0], points[offset+1], color);
       drawLine(points[offset+2], points[offset+3], color);
       drawLine(points[offset+0], points[offset+2], color);
-      drawLine(points[offset+1], points[offset+3], color);            
+      drawLine(points[offset+1], points[offset+3], color);
    }
 
    // connect the near and far planes
@@ -1420,13 +1420,13 @@ void GFXDrawUtil::drawPlaneGrid( const GFXStateBlockDesc &desc, const Point3F &p
    U32 vSteps = 0;
    if( step.y > 0 )
       vSteps = size.y / step.y + 0.5 + 1;
-      
+
    if( uSteps <= 1 || vSteps <= 1 )
       return;
-      
+
    const U32 numVertices = uSteps * 2 + vSteps * 2;
    const U32 numLines = uSteps + vSteps;
-   
+
    Point3F origin;
    switch( plane )
    {
@@ -1461,14 +1461,14 @@ void GFXDrawUtil::drawPlaneGrid( const GFXStateBlockDesc &desc, const Point3F &p
             verts[vertCount].point = Point3F( start + step.x * i, origin.y + size.y, origin.z );
          else
             verts[vertCount].point = Point3F( start + step.x * i, origin.y,  origin.z + size.y );
-            
+
          verts[vertCount].color = color;
          ++vertCount;
       }
    }
 
    if( plane == PlaneXY || plane == PlaneYZ )
-   {      
+   {
       U32 num;
       F32 stp;
       if( plane == PlaneXY )
@@ -1483,7 +1483,7 @@ void GFXDrawUtil::drawPlaneGrid( const GFXStateBlockDesc &desc, const Point3F &p
       }
 
       F32 start = mFloor( origin.y / stp + 0.5f ) * stp;
-         
+
       for ( U32 i = 0; i < num; i++ )
       {
          verts[vertCount].point = Point3F( origin.x, start + stp * i, origin.z );
@@ -1494,7 +1494,7 @@ void GFXDrawUtil::drawPlaneGrid( const GFXStateBlockDesc &desc, const Point3F &p
             verts[vertCount].point = Point3F( origin.x + size.x, start + stp * i, origin.z );
          else
             verts[vertCount].point = Point3F( origin.x, start + stp * i, origin.z + size.x );
-            
+
          verts[vertCount].color = color;
          ++vertCount;
       }
@@ -1513,7 +1513,7 @@ void GFXDrawUtil::drawPlaneGrid( const GFXStateBlockDesc &desc, const Point3F &p
             verts[vertCount].point = Point3F( origin.x + size.x, origin.y, start + step.y * i );
          else
             verts[vertCount].point = Point3F( origin.x, origin.y + size.x, start + step.y * i );
-            
+
          verts[vertCount].color = color;
          ++vertCount;
       }
@@ -1538,7 +1538,7 @@ void GFXDrawUtil::drawTransform( const GFXStateBlockDesc &desc, const MatrixF &m
    GFXVertexBufferHandle<GFXVertexPC> verts( mDevice, 6, GFXBufferTypeVolatile );
    verts.lock();
 
-   const static ColorI defColors[3] = 
+   const static ColorI defColors[3] =
    {
       ColorI::RED,
       ColorI::GREEN,
@@ -1564,7 +1564,7 @@ void GFXDrawUtil::drawTransform( const GFXStateBlockDesc &desc, const MatrixF &m
    {
       verts[1].point *= *scale;
       verts[3].point *= *scale;
-      verts[5].point *= *scale;      
+      verts[5].point *= *scale;
    }
 
    verts.unlock();

@@ -96,7 +96,7 @@ protected:
    /// the imposters.
    S32 mDl;
 
-   /// The bounding radius of the shape 
+   /// The bounding radius of the shape
    /// used to size the billboard.
    F32 mRadius;
 
@@ -104,7 +104,7 @@ protected:
    /// sphere used to render the imposter.
    Point3F mCenter;
 
-   /// The square dimensions of each 
+   /// The square dimensions of each
    /// captured imposter image.
    S32 mDim;
 
@@ -115,17 +115,17 @@ protected:
    /// The number of steps to go from equator to
    /// each polar region (0 means equator only) at
    /// which we capture an imposter.
-   U32 mNumPolarSteps;   
+   U32 mNumPolarSteps;
 
    /// The angle in radians of sub-polar regions.
    F32 mPolarAngle;
 
-   /// If true we captures polar images in the 
+   /// If true we captures polar images in the
    /// imposter texture.
    bool mIncludePoles;
 
    /// The combined imposter state and corner data vertex
-   /// format used for rendering with multiple streams. 
+   /// format used for rendering with multiple streams.
    GFXVertexFormat mImposterVertDecl;
 
    /// The material for this imposter.
@@ -155,13 +155,13 @@ protected:
 
 public:
 
-   TSLastDetail(  TSShape *shape, 
+   TSLastDetail(  TSShape *shape,
                   const String &cachePath,
-                  U32 numEquatorSteps, 
-                  U32 numPolarSteps, 
-                  F32 polarAngle, 
-                  bool includePoles, 
-                  S32 dl, 
+                  U32 numEquatorSteps,
+                  U32 numPolarSteps,
+                  F32 polarAngle,
+                  bool includePoles,
+                  S32 dl,
                   S32 dim );
 
    ~TSLastDetail();
@@ -185,14 +185,14 @@ public:
    void update( bool forceUpdate = false );
 
 
-   /// Internal function called from TSShapeInstance to 
+   /// Internal function called from TSShapeInstance to
    /// submit an imposter render instance.
    void render( const TSRenderState &rdata, F32 alpha );
 
    /// Returns the material instance used to render this imposter.
    BaseMatInstance* getMatInstance() const { return mMatInstance; }
 
-   /// Helper function which deletes the cached imposter 
+   /// Helper function which deletes the cached imposter
    /// texture files from disk.
    void deleteImposterCacheTextures();
 

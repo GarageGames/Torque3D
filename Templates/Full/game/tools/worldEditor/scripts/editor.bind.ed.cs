@@ -28,7 +28,7 @@ function mouseWheelScroll( %val )
 {
    //$Camera::speedCurveTime += $Camera::scrollStepSize * ( (%val>0.0) ? 1 : -1 );
    //$Camera::speedCurveTime = mClamp( $Camera::speedCurveTime, 0.0, 1.0 );
-   //calculateCameraSpeed();   
+   //calculateCameraSpeed();
    //EditorGui-->CameraSpeedSpinner.setText( $Camera::movementSpeed );
 
    %rollAdj = getMouseAdjustAmount(%val);

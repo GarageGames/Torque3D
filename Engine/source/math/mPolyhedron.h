@@ -152,7 +152,7 @@ struct PolyhedronVectorData : public PolyhedronData
       /// Return the number of points that this polyhedron has.
       U32 getNumPoints() const { return pointList.size(); }
 
-      /// 
+      ///
       Point3F* getPoints() const { return pointList.address(); }
 
       /// Return the number of edges that this polyhedron has.
@@ -214,7 +214,7 @@ struct PolyhedronUnmanagedVectorData : public PolyhedronData
       /// Return the number of points that this polyhedron has.
       U32 getNumPoints() const { return pointList.size(); }
 
-      /// 
+      ///
       const Point3F* getPoints() const { return pointList.address(); }
       Point3F* getPoints() { return pointList.address(); }
 
@@ -263,7 +263,7 @@ struct PolyhedronFixedVectorData : public PolyhedronData
       /// Return the number of points that this polyhedron has.
       U32 getNumPoints() const { return pointList.size(); }
 
-      /// 
+      ///
       Point3F* getPoints() const { return pointList.address(); }
 
       /// Return the number of edges that this polyhedron has.
@@ -435,7 +435,7 @@ struct PolyhedronImpl : public Base
 
       /// @name Extraction
       /// @{
-      
+
       /// Extract the polygon for the given plane.
       ///
       /// The resulting indices will be CW ordered if the plane normals on the polyhedron are facing

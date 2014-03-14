@@ -91,7 +91,7 @@ public:
    String& operator+=(const StringChar*);
    String& operator=(const String&);
    String& operator+=(const String&);
-   
+
    /**
       Compare this string with another.
       @param str  The string to compare against.
@@ -113,7 +113,7 @@ public:
    SizeType find(StringChar c, SizeType pos = 0, U32 mode = Case|Left) const;
    SizeType find(const StringChar *str, SizeType pos = 0, U32 mode = Case|Left) const;
    SizeType find(const String &str, SizeType pos = 0, U32 mode = Case|Left) const;
-   
+
    String   &insert(SizeType pos, const StringChar c) { return insert(pos,&c,1); }
    String   &insert(SizeType pos, const StringChar *str);
    String   &insert(SizeType pos, const String &str);
@@ -123,7 +123,7 @@ public:
 
    String   &replace(SizeType pos, SizeType len, const StringChar *str);
    String   &replace(SizeType pos, SizeType len, const String &str);
-   
+
    /// Replace all occurrences of character 'c1' with 'c2'
    String &replace( StringChar c1, StringChar c2 );
 
@@ -131,23 +131,23 @@ public:
    String &replace(const String &s1, const String &s2);
 
    String substr( SizeType pos, SizeType len = -1 ) const;
-   
+
    /// Remove leading and trailing whitespace.
    String trim() const;
-   
+
    /// Replace all characters that need to be escaped for the string to be a valid string literal with their
    /// respective escape sequences.
    String expandEscapes() const;
-   
+
    /// Replace all escape sequences in with their respective character codes.
    String collapseEscapes() const;
-   
+
    /// Split the string into its components separated by the given delimiter.
    void split( const char* delimiter, Vector< String >& outElements ) const;
-   
+
    /// Return true if the string starts with the given text.
    bool startsWith( const char* text ) const;
-   
+
    /// Return true if the string ends with the given text.
    bool endsWith( const char* text ) const;
 
@@ -207,14 +207,14 @@ public:
    /// reference counting that would otherwise be necessary.
    ///
    /// @{
-   
+
    /// Return the interned version of the string.
    /// @note Interning is case-sensitive.
    String intern() const;
-   
+
    /// Return true if this string is interned.
    bool isInterned() const;
-      
+
    /// @}
 
    /** An internal support class for ToString().
@@ -313,12 +313,12 @@ class StringBuilder
    public:
 
       StringBuilder() {}
-      
+
       U32 length() const
       {
          return mFormat.length();
       }
-      
+
       void copy( char* buffer ) const
       {
          mFormat.copy( buffer );

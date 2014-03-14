@@ -125,7 +125,7 @@ void GFXTextureManager::kill()
    GFXTextureObject *temp;
 
    // Actually delete all the textures we know about.
-   while( curr != NULL ) 
+   while( curr != NULL )
    {
       temp = curr->mNext;
       curr->kill();
@@ -152,7 +152,7 @@ void GFXTextureManager::zombify()
 
    // Free all the device copies of the textures.
    GFXTextureObject *temp = mListHead;
-   while( temp != NULL ) 
+   while( temp != NULL )
    {
       freeTexture( temp, true );
       temp = temp->mNext;
@@ -167,7 +167,7 @@ void GFXTextureManager::resurrect()
    // Reupload all the device copies of the textures.
    GFXTextureObject *temp = mListHead;
 
-   while( temp != NULL ) 
+   while( temp != NULL )
    {
       refreshTexture( temp );
       temp = temp->mNext;
@@ -175,7 +175,7 @@ void GFXTextureManager::resurrect()
 
    // Notify callback registries.
    smEventSignal.trigger( GFXResurrect );
-   
+
    // Update our state.
    mTextureManagerState = GFXTextureManager::Living;
 }
@@ -283,14 +283,14 @@ GFXTextureObject *GFXTextureManager::createTexture( GBitmap *bmp, const String &
    return _createTexture( bmp, resourceName, profile, deleteBmp, NULL );
 }
 
-GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp, 
-                                                      const String &resourceName, 
-                                                      GFXTextureProfile *profile, 
+GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
+                                                      const String &resourceName,
+                                                      GFXTextureProfile *profile,
                                                       bool deleteBmp,
                                                       GFXTextureObject *inObj )
 {
    PROFILE_SCOPE( GFXTextureManager_CreateTexture_Bitmap );
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[GFXTextureManager] _createTexture (GBitmap) '%s'",
       resourceName.c_str()
@@ -304,12 +304,12 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
    U32 realWidth = bmp->getWidth();
    U32 realHeight = bmp->getHeight();
 
-   if (  scalePower && 
-         isPow2(bmp->getWidth()) && 
-         isPow2(bmp->getHeight()) && 
+   if (  scalePower &&
+         isPow2(bmp->getWidth()) &&
+         isPow2(bmp->getHeight()) &&
          profile->canDownscale() )
    {
-      // We only work with power of 2 textures for now, so we 
+      // We only work with power of 2 textures for now, so we
       // don't have to worry about padding.
 
       // We downscale the bitmap on the CPU... this is the reason
@@ -323,7 +323,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
       realBmp = new GBitmap( realWidth, realHeight, false, bmp->getFormat() );
 
       // Copy to the new bitmap...
-      dMemcpy( realBmp->getWritableBits(), 
+      dMemcpy( realBmp->getWritableBits(),
                padBmp->getBits(scalePower),
                padBmp->getBytesPerPixel() * realWidth * realHeight );
 
@@ -341,7 +341,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
    GFXTextureObject *ret;
    if ( inObj )
    {
-      // If the texture has changed in dimensions 
+      // If the texture has changed in dimensions
       // then we need to recreate it.
       if (  inObj->getWidth() != realWidth ||
             inObj->getHeight() != realHeight ||
@@ -366,7 +366,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
    {
       // NOTE: This should really be done by extruding mips INTO a DDS file instead
       // of modifying the gbitmap
-      realBmp->extrudeMipLevels(false); 
+      realBmp->extrudeMipLevels(false);
    }
 
    // If _validateTexParams kicked back a different format, than there needs to be
@@ -386,7 +386,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
          bool convSuccess = false;
 
          if( bmpDDS != NULL )
-         {       
+         {
             // This shouldn't live here, I don't think
             switch( realFmt )
             {
@@ -415,7 +415,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
 
          if( !convSuccess )
          {
-            Con::errorf( "[GFXTextureManager]: Failed to change source format from %s to %s. Cannot create texture.", 
+            Con::errorf( "[GFXTextureManager]: Failed to change source format from %s to %s. Cannot create texture.",
                GFXStringTextureFormat[oldFmt], GFXStringTextureFormat[realFmt] );
             delete bmpDDS;
 
@@ -425,7 +425,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
 #ifdef TORQUE_DEBUG
       else
       {
-         //Con::warnf( "[GFXTextureManager]: Changed bitmap format from %s to %s.", 
+         //Con::warnf( "[GFXTextureManager]: Changed bitmap format from %s to %s.",
          //   GFXStringTextureFormat[oldFmt], GFXStringTextureFormat[realFmt] );
       }
 #endif
@@ -440,7 +440,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
    }
 
    // Do statistics and book-keeping...
-   
+
    //    - info for the texture...
    ret->mTextureLookupName = resourceName;
    ret->mBitmapSize.set(realWidth, realHeight,0);
@@ -546,20 +546,20 @@ GFXTextureObject *GFXTextureManager::_createTexture(  DDSFile *dds,
    GFXTextureObject *ret;
    if ( inObj )
    {
-      // If the texture has changed in dimensions 
-      // then we need to recreate it.   
+      // If the texture has changed in dimensions
+      // then we need to recreate it.
       if (  inObj->getWidth() != dds->getWidth() ||
             inObj->getHeight() != dds->getHeight() ||
             inObj->getFormat() != fmt ||
             inObj->getMipLevels() != numMips )
-         ret = _createTextureObject(   dds->getHeight(), dds->getWidth(), 0, 
-                                       fmt, profile, numMips, 
+         ret = _createTextureObject(   dds->getHeight(), dds->getWidth(), 0,
+                                       fmt, profile, numMips,
                                        true, 0, inObj );
       else
          ret = inObj;
    }
    else
-      ret =  _createTextureObject(  dds->getHeight(), dds->getWidth(), 0, 
+      ret =  _createTextureObject(  dds->getHeight(), dds->getWidth(), 0,
                                     fmt, profile, numMips, true );
 
 
@@ -619,14 +619,14 @@ GFXTextureObject *GFXTextureManager::_createTexture(  DDSFile *dds,
 GFXTextureObject *GFXTextureManager::createTexture( const Torque::Path &path, GFXTextureProfile *profile )
 {
    PROFILE_SCOPE( GFXTextureManager_createTexture );
-   
+
    // Resource handles used for loading.  Hold on to them
    // throughout this function so that change notifications
    // don't get added, then removed, and then re-added.
-   
+
    Resource< DDSFile > dds;
    Resource< GBitmap > bitmap;
-   
+
    // We need to handle path's that have had "incorrect"
    // extensions parsed out of the file name
    Torque::Path correctPath = path;
@@ -655,7 +655,7 @@ GFXTextureObject *GFXTextureManager::createTexture( const Torque::Path &path, GF
       const Vector<String>          &extensions = reg.extensions;
 
       for ( U32 j = 0; j < extensions.size(); ++j )
-      {    
+      {
          if ( extensions[j].equal( path.getExtension(), String::NoCase ) )
          {
             // Found a valid texture extension
@@ -706,13 +706,13 @@ GFXTextureObject *GFXTextureManager::createTexture( const Torque::Path &path, GF
             realPath = bitmap.getPath();
             retTexObj = createTexture( bitmap, pathNoExt, profile, false );
          }
-      }      
+      }
    }
    else
    {
       // NOTE -- We should probably remove the code from GBitmap that tries different
       // extensions for things GBitmap loads, and move it here. I think it should
-      // be a bit more involved than just a list of extensions. Some kind of 
+      // be a bit more involved than just a list of extensions. Some kind of
       // extension registration thing, maybe.
 
       // Check to see if there is a .DDS file with this name (if no extension is provided)
@@ -730,7 +730,7 @@ GFXTextureObject *GFXTextureManager::createTexture( const Torque::Path &path, GF
             retTexObj = createTexture( dds, profile, false );
          }
       }
-      
+
       // Otherwise, retTexObj stays NULL, and fall through to the generic GBitmap
       // load.
    }
@@ -793,7 +793,7 @@ GFXTextureObject *GFXTextureManager::createTexture( U32 width, U32 height, GFXFo
    // If this is a pooled profile then look there first.
    if ( profile->isPooled() )
    {
-      outTex = _findPooledTexure(   localWidth, localHeight, checkFmt, 
+      outTex = _findPooledTexure(   localWidth, localHeight, checkFmt,
                                     profile, numMips, antialiasLevel );
 
       // If we got a pooled texture then its
@@ -801,7 +801,7 @@ GFXTextureObject *GFXTextureManager::createTexture( U32 width, U32 height, GFXFo
       if ( outTex )
          return outTex;
    }
-   
+
    // Create the texture if we didn't get one from the pool.
    if ( !outTex )
    {
@@ -868,9 +868,9 @@ GFXTextureObject *GFXTextureManager::createTexture(   U32 width,
    return ret;
 }
 
-GFXTextureObject* GFXTextureManager::_findPooledTexure(  U32 width, 
-                                                         U32 height, 
-                                                         GFXFormat format, 
+GFXTextureObject* GFXTextureManager::_findPooledTexure(  U32 width,
+                                                         U32 height,
+                                                         GFXFormat format,
                                                          GFXTextureProfile *profile,
                                                          U32 numMipLevels,
                                                          S32 antialiasLevel )
@@ -897,7 +897,7 @@ GFXTextureObject* GFXTextureManager::_findPooledTexure(  U32 width,
       // to anyone else.
       if (  outTex->getFormat() == format &&
             outTex->getWidth() == width &&
-            outTex->getHeight() == height &&            
+            outTex->getHeight() == height &&
             outTex->getMipLevels() == numMipLevels &&
             outTex->mAntialiasLevel == antialiasLevel )
          return outTex;
@@ -910,7 +910,7 @@ void GFXTextureManager::hashInsert( GFXTextureObject *object )
 {
    if ( object->mTextureLookupName.isEmpty() )
       return;
-      
+
    U32 key = object->mTextureLookupName.getHashCaseInsensitive() % mHashCount;
    object->mHashNext = mHashTable[key];
    mHashTable[key] = object;
@@ -973,7 +973,7 @@ void GFXTextureManager::_linkTexture( GFXTextureObject *obj )
    if( mListHead == NULL )
       mListHead = obj;
 
-   if( mListTail != NULL ) 
+   if( mListTail != NULL )
       mListTail->mNext = obj;
 
    obj->mPrev = mListTail;
@@ -1009,8 +1009,8 @@ void GFXTextureManager::deleteTexture( GFXTextureObject *texture )
    freeTexture( texture );
 }
 
-void GFXTextureManager::_validateTexParams( const U32 width, const U32 height, 
-                                          const GFXTextureProfile *profile, 
+void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
+                                          const GFXTextureProfile *profile,
                                           U32 &inOutNumMips, GFXFormat &inOutFormat  )
 {
    // Validate mipmap parameter. If this profile requests no mips, set mips to 1.
@@ -1024,7 +1024,7 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
       // have only 1 mip level.
       inOutNumMips = 1;
    }
-   
+
    // Check format, and compatibility with texture profile requirements
    bool autoGenSupp = ( inOutNumMips == 0 );
 
@@ -1041,8 +1041,8 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
    }
 
    // inOutFormat is not modified by this method
-   bool chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp ); 
-   
+   bool chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp );
+
    if( !chekFmt )
    {
       // It tested for a compressed format, and didn't like it
@@ -1064,7 +1064,7 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
             testingFormat = GFXFormatR8G8B8A8;
             chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp );
             break;
-         
+
          default:
             chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp );
             break;
@@ -1088,13 +1088,13 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
          U32 currHeight = height;
 
          inOutNumMips = 1;
-         do 
+         do
          {
             currWidth  >>= 1;
             currHeight >>= 1;
             if( currWidth == 0 )
                currWidth  = 1;
-            if( currHeight == 0 ) 
+            if( currHeight == 0 )
                currHeight = 1;
 
             inOutNumMips++;
@@ -1190,7 +1190,7 @@ void GFXTextureManager::reloadTextures()
 {
    GFXTextureObject *tex = mListHead;
 
-   while ( tex != NULL ) 
+   while ( tex != NULL )
    {
       const Torque::Path path( tex->mPath );
       if ( !path.isEmpty() )

@@ -81,7 +81,7 @@ void SFXAsyncStream::_onArrival( SFXStreamPacket* const& packet )
 
    // Some buffer may be waiting for this data so trigger
    // an update.
-   
+
    if( !mIsStopped )
       TriggerUpdate();
 }
@@ -97,14 +97,14 @@ void SFXAsyncStream::_requestNext()
    if( !mNumRemainingSourceElements && mReadSilenceAtEnd )
    {
       // Push an artificial packet of silence.
-      
+
       SFXStreamPacket* packet = _newPacket( mPacketSize );
       packet->mIndex = mNextPacketIndex;
       mNextPacketIndex ++;
       mReadSilenceAtEnd = false;
       dMemset( packet->data, 0, packet->size );
       packet->mIsLast = true;
-      
+
       _onArrival( packet );
    }
    else
@@ -122,17 +122,17 @@ SFXWrapAroundBuffer::SFXWrapAroundBuffer( const ThreadSafeRef< SFXStream >& stre
      mWriteOffset( 0 )
 {
    // Determine the device buffer metrics.
-   
+
    const U32 maxQueuedPackets = isStreaming() ? SFXAsyncQueue::DEFAULT_STREAM_QUEUE_LENGTH : 1;
    const U32 packetSize = mAsyncState->mStream->getPacketSize();
 
    mBufferSize = maxQueuedPackets * packetSize;
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXWrapAroundBuffer] size=%i, packets=%i",
       mBufferSize, maxQueuedPackets );
    #endif
-   
+
    // For streaming buffers that are not looping, add a packet of silence to the
    // source stream.
 
@@ -149,7 +149,7 @@ void SFXWrapAroundBuffer::write( SFXStreamPacket* const* packets, U32 num )
    for( U32 i = 0; i < num; ++ i )
    {
       const SFXStreamPacket* packet = packets[ i ];
-      
+
       // Determine where in the buffer to copy the data to.  In case we are crossing over
       // the wrap-around point, we need to copy in two slices.
 
@@ -164,20 +164,20 @@ void SFXWrapAroundBuffer::write( SFXStreamPacket* const* packets, U32 num )
       if( offset1 + numBytes1 > mBufferSize )
       {
          // Crossing wrap-around point.
-         
+
          numBytes1   = mBufferSize - offset1;
          numBytes2   = packet->size - numBytes1;
       }
 
       offset2        = offset1 + numBytes1;
-      
+
       #ifdef DEBUG_SPEW
       Platform::outputDebugString( "[SFXWrapAroundBuffer] writing %i bytes from packet #%i at %i (stream offset: %i)",
          numBytes1, packet->mIndex, offset1, mWriteOffset );
       #endif
-      
+
       // Copy the packet data.
-      
+
       _copyData( offset1, packet->data, numBytes1 );
       if( numBytes2 > 0 )
       {
@@ -185,10 +185,10 @@ void SFXWrapAroundBuffer::write( SFXStreamPacket* const* packets, U32 num )
          Platform::outputDebugString( "[SFXWrapAroundBuffer] writing %i more bytes at %i",
             numBytes2, offset2 );
          #endif
-         
+
          _copyData( offset2, &packet->data[ numBytes1 ], numBytes2 );
       }
-   
+
       dFetchAndAdd( mWriteOffset, packet->size );
 
       // Free the packet.

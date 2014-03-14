@@ -69,7 +69,7 @@ class ForestSelectionTool : public ForestTool
       ForestItem mHoverItem;
 
       ForestItemSelection mSelection;
-      
+
       ForestItemSelection mDragSelection;
       bool mDragSelect;
       RectI mDragRect;
@@ -78,7 +78,7 @@ class ForestSelectionTool : public ForestTool
       bool mMouseDragged;
       ColorI mDragRectColor;
       bool mUsingGizmo;
-      
+
       Box3F mBounds;
 
       ForestUpdateAction *mCurrAction;
@@ -111,7 +111,7 @@ class ForestSelectionTool : public ForestTool
       void clearSelection();
       void cutSelection();
       void copySelection();
-      void pasteSelection();                
+      void pasteSelection();
 };
 
 

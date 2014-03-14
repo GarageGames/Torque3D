@@ -52,7 +52,7 @@ class GuiDecalEditorCtrl : public EditTSCtrl
 
       // SimObject
       bool onAdd();
-      static void initPersistFields();      
+      static void initPersistFields();
       static void consoleInit();
       void onEditorDisable();
 
@@ -61,7 +61,7 @@ class GuiDecalEditorCtrl : public EditTSCtrl
       virtual void onSleep();
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
-      // EditTSCtrl      
+      // EditTSCtrl
       void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
       void on3DMouseDown(const Gui3DMouseEvent & event);
       void on3DMouseUp(const Gui3DMouseEvent & event);
@@ -71,19 +71,19 @@ class GuiDecalEditorCtrl : public EditTSCtrl
       void on3DMouseLeave(const Gui3DMouseEvent & event);
       void on3DRightMouseDown(const Gui3DMouseEvent & event);
       void on3DRightMouseUp(const Gui3DMouseEvent & event);
-      void updateGuiInfo();      
+      void updateGuiInfo();
       void renderScene(const RectI & updateRect);
       void renderGui(Point2I offset, const RectI &updateRect);
 
       /// Find clicked point on "static collision" objects.
       bool getRayInfo( const Gui3DMouseEvent &event, RayInfo *rInfo );
-      
+
       void selectDecal( DecalInstance *inst );
       void deleteSelectedDecal();
 		void deleteDecalDatablock( String lookupName );
 		void retargetDecalDatablock( String dbFrom, String dbTo );
 		void setMode( String mode, bool sourceShortcut );
-		
+
 		void forceRedraw( DecalInstance * decalInstance );
 		void setGizmoFocus( DecalInstance * decalInstance );
 
@@ -96,7 +96,7 @@ class GuiDecalEditorCtrl : public EditTSCtrl
       static bool smRenderDecalPixelSize;
 
    protected:
-     
+
       bool mPerformedDragCopy;
 
       DecalData *mCurrentDecalData;
@@ -113,7 +113,7 @@ class DICreateUndoAction : public UndoAction
    typedef UndoAction Parent;
 
 public:
-	GuiDecalEditorCtrl *mEditor;	
+	GuiDecalEditorCtrl *mEditor;
 
 protected:
 
@@ -125,7 +125,7 @@ public:
 
    DECLARE_CONOBJECT( DICreateUndoAction );
    static void initPersistFields();
-   
+
    DICreateUndoAction( const UTF8* actionName = "Create Decal " );
    virtual ~DICreateUndoAction();
 
@@ -142,7 +142,7 @@ class DIDeleteUndoAction : public UndoAction
    typedef UndoAction Parent;
 
 public:
-	GuiDecalEditorCtrl *mEditor;	
+	GuiDecalEditorCtrl *mEditor;
 
 protected:
 
@@ -154,7 +154,7 @@ public:
 
    DECLARE_CONOBJECT( DIDeleteUndoAction );
    static void initPersistFields();
-   
+
    DIDeleteUndoAction( const UTF8* actionName = "Delete Decal" );
    virtual ~DIDeleteUndoAction();
 
@@ -172,19 +172,19 @@ class DBDeleteUndoAction : public UndoAction
    typedef UndoAction Parent;
 
 public:
-	GuiDecalEditorCtrl *mEditor;	
+	GuiDecalEditorCtrl *mEditor;
 	S32 mDatablockId;
 
 protected:
-	
+
 	// The captured decalInstance states
 	Vector<DecalInstance> mDecalInstanceVec;
-	
+
 public:
 
    DECLARE_CONOBJECT( DBDeleteUndoAction );
    static void initPersistFields();
-   
+
    DBDeleteUndoAction( const UTF8* actionName = "Delete Decal Datablock" );
    virtual ~DBDeleteUndoAction();
 
@@ -201,20 +201,20 @@ class DBRetargetUndoAction : public UndoAction
    typedef UndoAction Parent;
 
 public:
-	GuiDecalEditorCtrl *mEditor;	
+	GuiDecalEditorCtrl *mEditor;
 	S32 mDBFromId;
 	S32 mDBToId;
 
 protected:
-	
+
 	// The captured decalInstance states
 	Vector<DecalInstance*> mDecalInstanceVec;
-	
+
 public:
 
    DECLARE_CONOBJECT( DBRetargetUndoAction );
    static void initPersistFields();
-   
+
    DBRetargetUndoAction( const UTF8* actionName = "Retarget Decal Datablock" );
    virtual ~DBRetargetUndoAction();
 

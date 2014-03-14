@@ -115,7 +115,7 @@ void FileStreamObject::close()
 
 DefineEngineMethod( FileStreamObject, open, bool, (const char* filename, const char* openMode),,
    "@brief Open a file for reading, writing, reading and writing, or appending\n\n"
-   
+
    "Using \"Read\" for the open mode allows you to parse the contents of file, but not making modifications. \"Write\" will create a new "
    "file if it does not exist, or erase the contents of an existing file when opened. Write also allows you to modify the contents of the file.\n\n"
 
@@ -139,7 +139,7 @@ DefineEngineMethod( FileStreamObject, open, bool, (const char* filename, const c
    "@endtsexample\n\n"
 
    "@return True if the file was successfully opened, false if something went wrong"
-   
+
    "@see close()")
 {
 	for(S32 i = 0;gModeMap[i].strMode;++i)
@@ -159,7 +159,7 @@ DefineEngineMethod( FileStreamObject, open, bool, (const char* filename, const c
 
 DefineEngineMethod( FileStreamObject, close, void, (),,
    "@brief Close the file. You can no longer read or write to it unless you open it again.\n\n"
-   
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -168,7 +168,7 @@ DefineEngineMethod( FileStreamObject, close, void, (),,
    "// Always remember to close a file stream when finished\n"
    "%fsObject.close();\n"
    "@endtsexample\n\n"
-   
+
    "@see open()")
 {
 	object->close();

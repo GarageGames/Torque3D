@@ -65,7 +65,7 @@ void SceneLighting::sgNewEvent(U32 light, S32 object, U32 event)
 * Called once per scenelighting - entry point for event system
 */
 void SceneLighting::sgLightingStartEvent()
-{   
+{
    Con::printf("");
    Con::printf("Starting scene lighting...");
 
@@ -123,7 +123,7 @@ void SceneLighting::sgLightingCompleteEvent()
 	Con::printf("Scene lighting complete (%3.3f seconds)", (Platform::getRealMilliseconds()-sgTimeTemp2)/1000.f);
 	Con::printf("//-----------------------------------------------");
 	Con::printf("");
-	
+
 
    completed(true);
    deleteObject();
@@ -385,8 +385,8 @@ void SceneLighting::sgSGObjectCompleteEvent(S32 object)
 
    // only the last light does something
    mLitObjects[object]->postLight(true);
-   
-   
+
+
    /*ObjectProxy *obj = mLitObjects[object];
    for(U32 i=0; i<mLights.size(); i++)
    {
@@ -472,7 +472,7 @@ bool SceneLighting::light(BitSet32 flags)
    // Register static lights
    if (!LIGHTMGR)
       return false;     // This world doesn't need lighting.
-   
+
    LIGHTMGR->registerGlobalLights(NULL,true);
 
    // Notify each system factory that we are beginning to light
@@ -491,7 +491,7 @@ bool SceneLighting::light(BitSet32 flags)
       return(false);
 
    // get all the objects and create proxy's for them
-   SimpleQueryList objects;	
+   SimpleQueryList objects;
    gClientContainer.findObjects(mLightingInterfaces->mAvailableObjectTypes, &SimpleQueryList::insertionCallback, &objects);
 
    for(SceneObject ** itr = objects.mList.begin(); itr != objects.mList.end(); itr++)
@@ -501,8 +501,8 @@ bool SceneLighting::light(BitSet32 flags)
       if (!obj)
          continue;
 
-      // Create the right chunk for the system 
-      for(SceneLightingInterface** sitr = mLightingInterfaces->mAvailableSystemInterfaces.begin(); 
+      // Create the right chunk for the system
+      for(SceneLightingInterface** sitr = mLightingInterfaces->mAvailableSystemInterfaces.begin();
          sitr != mLightingInterfaces->mAvailableSystemInterfaces.end() && proxy == NULL; sitr++)
       {
          SceneLightingInterface* si = (*sitr);
@@ -614,7 +614,7 @@ void SceneLighting::completed(bool success)
 //------------------------------------------------------------------------------
 // Static access method: there can be only one SceneLighting object
 bool SceneLighting::lightScene(const char * callback, BitSet32 flags)
-{   
+{
    if(gLighting)
    {
       Con::errorf(ConsoleLogEntry::General, "Lighting is already in progress!");
@@ -644,7 +644,7 @@ bool SceneLighting::lightScene(const char * callback, BitSet32 flags)
    gTerminateLighting = false;
    gLightingProgress = 0.0f;
    if (gCompleteCallback)
-      dFree(gCompleteCallback);   
+      dFree(gCompleteCallback);
    gCompleteCallback = dStrdup(callback);
    gConnectionMissionCRC = con->getMissionCRC();
 
@@ -760,7 +760,7 @@ bool SceneLighting::loadPersistInfo(const char * fileName)
    if(!verifyMissionInfo(persistInfo.mChunks[0]))
       return(false);
 
-   // Create the right chunk for the system    
+   // Create the right chunk for the system
    for(SceneLightingInterface** sitr = mLightingInterfaces->mAvailableSystemInterfaces.begin(); sitr != mLightingInterfaces->mAvailableSystemInterfaces.end(); sitr++)
    {
       SceneLightingInterface* si = (*sitr);
@@ -821,7 +821,7 @@ bool SceneLighting::savePersistInfo(const char * fileName)
    for(U32 i = 0; i < mSceneObjects.size(); i++)
    {
       bChunkFound = false;
-      // Create the right chunk for the system 
+      // Create the right chunk for the system
       for(SceneLightingInterface** sitr = mLightingInterfaces->mAvailableSystemInterfaces.begin(); sitr != mLightingInterfaces->mAvailableSystemInterfaces.end() && !bChunkFound; sitr++)
       {
          SceneLightingInterface* si = (*sitr);

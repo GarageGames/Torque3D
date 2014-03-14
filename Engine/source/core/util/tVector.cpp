@@ -34,7 +34,7 @@ bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 el
 {
    PROFILE_SCOPE( VectorResize );
 
-   if (newCount > 0) 
+   if (newCount > 0)
    {
       U32 blocks = newCount / VectorBlockSize;
       if (newCount % VectorBlockSize)
@@ -56,7 +56,7 @@ bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 el
       return true;
    }
 
-   if (*arrayPtr) 
+   if (*arrayPtr)
    {
       dFree(*arrayPtr);
       *arrayPtr = 0;
@@ -87,7 +87,7 @@ bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 el
       return true;
    }
 
-   if (*arrayPtr) 
+   if (*arrayPtr)
    {
       dFree(*arrayPtr);
       *arrayPtr = 0;

@@ -43,10 +43,10 @@ class SFXDSVoice : public SFXVoice
 
       SFXDSVoice( SFXDSDevice *device,
                   SFXDSBuffer *buffer,
-                  IDirectSoundBuffer8 *dsBuffer, 
+                  IDirectSoundBuffer8 *dsBuffer,
                   IDirectSound3DBuffer8 *dsBuffer3d );
 
-      /// The device used to commit deferred settings. 
+      /// The device used to commit deferred settings.
       SFXDSDevice *mDevice;
 
       IDirectSoundBuffer8 *mDSBuffer;

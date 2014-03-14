@@ -60,17 +60,17 @@ class RenderInstType
    friend class RenderBinManager;
 
 protected:
-      
+
    String mName;
 
-public:  
+public:
 
-   RenderInstType( const RenderInstType &type = Invalid ) 
+   RenderInstType( const RenderInstType &type = Invalid )
       :  mName( type.mName )
    {
    }
 
-   RenderInstType( const String &name ) 
+   RenderInstType( const String &name )
       :  mName( name )
    {
    }
@@ -92,7 +92,7 @@ class RenderPassManager : public SimObject
 {
    typedef SimObject Parent;
 
-public:   
+public:
 
    // Default bin types.  Not necessarily the only bin types in the system.
    // RIT = "R"ender "I"nstance "T"ype
@@ -131,11 +131,11 @@ public:
    }
 
    /// Allocate a matrix, valid until ::clear called.
-   MatrixF* allocUniqueXform(const MatrixF& data) 
-   { 
-      MatrixF *r = mChunker.alloc<MatrixF>(); 
-      *r = data; 
-      return r; 
+   MatrixF* allocUniqueXform(const MatrixF& data)
+   {
+      MatrixF *r = mChunker.alloc<MatrixF>();
+      *r = data;
+      return r;
    }
 
    enum SharedTransformType
@@ -150,14 +150,14 @@ public:
 
    MatrixSet &getMatrixSet() { return *mMatrixSet; }
 
-   /// Allocate a GFXPrimitive object which will remain valid 
+   /// Allocate a GFXPrimitive object which will remain valid
    /// until the pass manager is cleared.
    GFXPrimitive* allocPrim() { return mChunker.alloc<GFXPrimitive>(); }
    /// @}
 
    /// Add a RenderInstance to the list
    virtual void addInst( RenderInst *inst );
-   
+
    /// Sorts the list of RenderInst's per bin. (Normally, one should just call renderPass)
    void sort();
 
@@ -186,7 +186,7 @@ public:
    ///        them.
    /// @param renderOrder Where to add the manager in the render list.
    void addManager(RenderBinManager* mgr);
-   
+
    /// Removes a manager from render and process add lists
    /// @param mgr Render bin manager to remove, the caller is now responsible for freeing the mgr.
    void removeManager(RenderBinManager* mgr);
@@ -212,11 +212,11 @@ public:
    ///
    /// @param bin    The render bin we're signaling.
    /// @param state  The current scene state.
-   /// @params preRender   If true it is before the bin is rendered, else its 
+   /// @params preRender   If true it is before the bin is rendered, else its
    ///                     after being rendered.
    ///
-   typedef Signal <void (  RenderBinManager *bin, 
-                           const SceneRenderState *state, 
+   typedef Signal <void (  RenderBinManager *bin,
+                           const SceneRenderState *state,
                            bool preRender )> RenderBinEventSignal;
 
    /// @see RenderBinEventSignal
@@ -227,7 +227,7 @@ public:
 
    AddInstSignal& getAddSignal( RenderInstTypeHash type )
    {
-      return mAddInstSignals.findOrInsert( type )->value; 
+      return mAddInstSignals.findOrInsert( type )->value;
    }
 
    // ConsoleObject interface
@@ -237,7 +237,7 @@ public:
 protected:
 
    MultiTypedChunker mChunker;
-      
+
    Vector< RenderBinManager* > mRenderBins;
 
 
@@ -261,10 +261,10 @@ struct RenderInst
    /// The type of render instance this is.
    RenderInstTypeHash type;
 
-   /// This should be true if the object needs to be sorted 
+   /// This should be true if the object needs to be sorted
    /// back to front with other translucent instances.
    /// @see sortDistSq
-   bool translucentSort;  
+   bool translucentSort;
 
    /// The reference squared distance from the camera used for
    /// back to front sorting of the instances.
@@ -303,8 +303,8 @@ struct ObjectRenderInst : public RenderInst
    /// @param overrideMat  An alternative material to use during rendering... usually
    ///                     used for special renders like shadows.  If the object doesn't
    ///                     support override materials it shouldn't render at all.
-   Delegate<void( ObjectRenderInst *ri, 
-                  SceneRenderState *state, 
+   Delegate<void( ObjectRenderInst *ri,
+                  SceneRenderState *state,
                   BaseMatInstance *overrideMat )> renderDelegate;
 
    // Clear this instance.
@@ -315,7 +315,7 @@ struct MeshRenderInst : public RenderInst
 {
    ////
    GFXVertexBufferHandleBase *vertBuff;
-   
+
    ////
    GFXPrimitiveBufferHandle *primBuff;
 
@@ -328,18 +328,18 @@ struct MeshRenderInst : public RenderInst
    /// indexed primitive from the primitive buffer.
    /// @see prim
    U32 primBuffIndex;
-   
+
    /// The material to setup when drawing this instance.
    BaseMatInstance *matInst;
 
    /// The object to world transform (world transform in most API's).
-   const MatrixF *objectToWorld;       
-   
+   const MatrixF *objectToWorld;
+
    /// The worldToCamera (view transform in most API's).
-   const MatrixF* worldToCamera;       
-   
+   const MatrixF* worldToCamera;
+
    /// The projection matrix.
-   const MatrixF* projection;         
+   const MatrixF* projection;
 
    // misc render states
    U8    transFlags;
@@ -347,11 +347,11 @@ struct MeshRenderInst : public RenderInst
    F32   visibility;
 
    /// A generic hint value passed from the game
-   /// code down to the material for use by shader 
+   /// code down to the material for use by shader
    /// features.
    void *materialHint;
 
-   /// The lights we pass to the material for this 
+   /// The lights we pass to the material for this
    /// mesh in order light importance.
    LightInfo* lights[8];
 
@@ -380,7 +380,7 @@ struct ParticleRenderInst : public RenderInst
 {
    /// The vertex buffer.
    GFXVertexBufferHandleBase *vertBuff;
-   
+
    /// The primitive buffer.
    GFXPrimitiveBufferHandle *primBuff;
 
@@ -388,9 +388,9 @@ struct ParticleRenderInst : public RenderInst
    S32 count;
 
    /// The combined model, camera, and projection transform.
-   const MatrixF *modelViewProj;       
-        
-   /// Blend style for the particle system 
+   const MatrixF *modelViewProj;
+
+   /// Blend style for the particle system
    enum BlendStyle {
       BlendUndefined = 0,
       BlendNormal,
@@ -425,12 +425,12 @@ class SceneObject;
 
 /// A special render instance for occlusion tests.
 struct OccluderRenderInst : public RenderInst
-{   
+{
    Point3F scale;
-   Point3F position;   
+   Point3F position;
    const MatrixF *orientation;
-   GFXOcclusionQuery *query; 
-   
+   GFXOcclusionQuery *query;
+
    // This optional query will have all pixels rendered.
    // Its purpose is to return to the user the full pixel count for comparison
    // with the other query.

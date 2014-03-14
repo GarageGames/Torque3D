@@ -67,7 +67,7 @@ IMPLEMENT_CALLBACK( GuiEditCtrl, onSelectionCloned, void, ( SimSet* selection ),
    "" );
 IMPLEMENT_CALLBACK( GuiEditCtrl, onTrashSelection, void, ( SimSet* selection ), ( selection ),
    "" );
-IMPLEMENT_CALLBACK( GuiEditCtrl, onAddNewCtrl, void, ( GuiControl* control ), ( control ),   
+IMPLEMENT_CALLBACK( GuiEditCtrl, onAddNewCtrl, void, ( GuiControl* control ), ( control ),
    "" );
 IMPLEMENT_CALLBACK( GuiEditCtrl, onAddNewCtrlSet, void, ( SimSet* set ), ( set ),
    "" );
@@ -107,16 +107,16 @@ GuiEditCtrl::GuiEditCtrl()
    VECTOR_SET_ASSOCIATION( mDragBeginPoints );
    VECTOR_SET_ASSOCIATION( mSnapHits[ 0 ] );
    VECTOR_SET_ASSOCIATION( mSnapHits[ 1 ] );
-      
+
    mActive = true;
    mDotSB = NULL;
-   
+
    mSnapped[ SnapVertical ] = false;
    mSnapped[ SnapHorizontal ] = false;
 
    mDragGuide[ GuideVertical ] = false;
    mDragGuide[ GuideHorizontal ] = false;
-   
+
    if( !smGuidesPropertyName[ GuideVertical ] )
       smGuidesPropertyName[ GuideVertical ] = StringTable->insert( "guidesVertical" );
    if( !smGuidesPropertyName[ GuideHorizontal ] )
@@ -141,12 +141,12 @@ void GuiEditCtrl::initPersistFields()
    addField( "snapSensitivity",     TypeS32,    Offset( mSnapSensitivity, GuiEditCtrl ),
       "Distance in pixels that edge and center snapping will work across." );
    endGroup( "Snapping" );
-   
+
    addGroup( "Selection" );
    addField( "fullBoxSelection",    TypeBool,   Offset( mFullBoxSelection, GuiEditCtrl ),
       "If true, rectangle selection will only select controls fully inside the drag rectangle." );
    endGroup( "Selection" );
-   
+
    addGroup( "Rendering" );
    addField( "drawBorderLines",  TypeBool,   Offset( mDrawBorderLines, GuiEditCtrl ),
       "If true, lines will be drawn extending along the edges of selected objects." );
@@ -168,10 +168,10 @@ bool GuiEditCtrl::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    mTrash = new SimGroup();
    mSelectedSet = new SimSet();
-      
+
    if( !mTrash->registerObject() )
       return false;
    if( !mSelectedSet->registerObject() )
@@ -185,12 +185,12 @@ bool GuiEditCtrl::onAdd()
 void GuiEditCtrl::onRemove()
 {
    Parent::onRemove();
-   
+
    mDotSB = NULL;
-   
+
    mTrash->deleteObject();
    mSelectedSet->deleteObject();
-   
+
    mTrash = NULL;
    mSelectedSet = NULL;
 }
@@ -264,7 +264,7 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
 
    // Check whether we've hit a guide.  If so, start a guide drag.
    // Don't do this if SHIFT is down.
-   
+
    if( !( event.modifier & SI_SHIFT ) )
    {
       for( U32 axis = 0; axis < 2; ++ axis )
@@ -273,33 +273,33 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
          if( guide != -1 )
          {
             setMouseMode( DragGuide );
-            
+
             mDragGuide[ axis ] = true;
             mDragGuideIndex[ axis ] = guide;
          }
       }
-            
+
       if( mMouseDownMode == DragGuide )
          return;
    }
-   
+
    // Check whether we have hit a sizing knob on any of the currently selected
    // controls.
-   
+
    for( U32 i = 0, num = mSelectedControls.size(); i < num; ++ i )
    {
       GuiControl* ctrl = mSelectedControls[ i ];
-      
+
       Point2I cext = ctrl->getExtent();
       Point2I ctOffset = globalToLocalCoord( ctrl->localToGlobalCoord( Point2I( 0, 0 ) ) );
-      
+
       RectI box( ctOffset.x, ctOffset.y, cext.x, cext.y );
 
       if( ( mSizingMode = ( GuiEditCtrl::sizingModes ) getSizingHitKnobs( mLastMousePos, box ) ) != 0 )
       {
          setMouseMode( SizingSelection );
          mLastDragPos = event.mousePoint;
-         
+
          // undo
          onPreEdit_callback( getSelectedSet() );
          return;
@@ -307,7 +307,7 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
    }
 
    // Find the control we have hit.
-   
+
    GuiControl* ctrl = mContentControl->findHitControl( mLastMousePos, getCurrentAddSet()->mLayer );
 
    // Give the control itself the opportunity to handle the event
@@ -324,7 +324,7 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
    {
       // Shift is down.  Start rectangle selection in add mode
       // no matter what we have hit.
-      
+
       startDragRectangle( event.mousePoint );
       mDragAddSelection = true;
    }
@@ -332,7 +332,7 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
    {
       // We hit a selected control.  If the multiselect key is pressed,
       // deselect the control.  Otherwise start a drag move.
-      
+
       if( event.modifier & SI_MULTISELECT )
       {
          removeSelection( ctrl );
@@ -343,7 +343,7 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
       else if( event.modifier & SI_PRIMARY_ALT )
       {
          // Alt is down.  Start a drag clone.
-         
+
          startDragClone( event.mousePoint );
       }
       else
@@ -354,21 +354,21 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
    else
    {
       // We clicked an unselected control.
-      
+
       if( ctrl == getContentControl() )
       {
          // Clicked in toplevel control.  Start a rectangle selection.
-         
+
          startDragRectangle( event.mousePoint );
          mDragAddSelection = false;
       }
       else if( event.modifier & SI_PRIMARY_ALT && ctrl != getContentControl() )
       {
          // Alt is down.  Start a drag clone.
-         
+
          clearSelection();
          addSelection( ctrl );
-         
+
          startDragClone( event.mousePoint );
       }
       else if( event.modifier & SI_MULTISELECT )
@@ -376,10 +376,10 @@ void GuiEditCtrl::onMouseDown(const GuiEvent &event)
       else
       {
          // Clicked on child control.  Start move.
-         
+
          clearSelection();
          addSelection( ctrl );
-         
+
          startDragMove( event.mousePoint );
       }
    }
@@ -418,7 +418,7 @@ void GuiEditCtrl::onMouseUp(const GuiEvent &event)
    {
       // Check to see if the mouse has moved off the canvas.  If so,
       // remove the guides being dragged.
-      
+
       for( U32 axis = 0; axis < 2; ++ axis )
          if( mDragGuide[ axis ] && !getContentControl()->getGlobalBounds().pointInRect( event.mousePoint ) )
             mGuides[ axis ].erase( mDragGuideIndex[ axis ] );
@@ -426,35 +426,35 @@ void GuiEditCtrl::onMouseUp(const GuiEvent &event)
    else if( mMouseDownMode == DragSelecting )
    {
       // If not multiselecting, clear the current selection.
-      
+
       if( !( event.modifier & SI_MULTISELECT ) && !mDragAddSelection )
          clearSelection();
-         
+
       RectI rect;
       getDragRect( rect );
-            
+
       // If the region is somewhere less than at least 2x2, count this as a
-      // normal, non-rectangular selection. 
-      
+      // normal, non-rectangular selection.
+
       if( rect.extent.x <= 2 && rect.extent.y <= 2 )
          addSelectControlAt( rect.point );
       else
       {
          // Use HIT_AddParentHits by default except if ALT is pressed.
          // Use HIT_ParentPreventsChildHit if ALT+CTRL is pressed.
-         
+
          U32 hitFlags = 0;
          if( !( event.modifier & SI_PRIMARY_ALT ) )
             hitFlags |= HIT_AddParentHits;
          if( event.modifier & SI_PRIMARY_ALT && event.modifier & SI_CTRL )
             hitFlags |= HIT_ParentPreventsChildHit;
-            
-         addSelectControlsInRegion( rect, hitFlags );      
+
+         addSelectControlsInRegion( rect, hitFlags );
       }
    }
    else if( ctrl == getContentControl() && mMouseDownMode == Selecting )
       setCurrentAddSet( NULL, true );
-   
+
    // deliver post edit event if we've been editing
    // note: paxorr: this may need to be moved earlier, if the selection has changed.
    // undo
@@ -465,17 +465,17 @@ void GuiEditCtrl::onMouseUp(const GuiEvent &event)
    setFirstResponder();
    setMouseMode( Selecting );
    mSizingMode = sizingNone;
-   
+
    // Clear snapping state.
-   
+
    mSnapped[ SnapVertical ] = false;
    mSnapped[ SnapHorizontal ] = false;
-   
+
    mSnapTargets[ SnapVertical ] = NULL;
    mSnapTargets[ SnapHorizontal ] = NULL;
-   
+
    // Clear guide drag state.
-   
+
    mDragGuide[ GuideVertical ] = false;
    mDragGuide[ GuideHorizontal ] = false;
 }
@@ -502,26 +502,26 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       // *NOT* act on it.  The dude abides.
       return;
    }
-   
+
    // If we're doing a drag clone, see if we have crossed the move threshold.  If so,
    // clone the selection and switch to move mode.
-   
+
    if( mMouseDownMode == DragClone )
    {
       // If we haven't yet crossed the mouse delta to actually start the
       // clone, check if we have now.
-      
+
       S32 delta = mAbs( ( mousePoint - mDragBeginPoint ).len() );
       if( delta >= 4 )
       {
          cloneSelection();
          mLastMousePos = mDragBeginPoint;
          mDragMoveUndo = false;
-         
+
          setMouseMode( MovingSelection );
       }
    }
-   
+
    if( mMouseDownMode == DragGuide )
    {
       for( U32 axis = 0; axis < 2; ++ axis )
@@ -529,11 +529,11 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
          {
             // Set the guide to the coordinate of the mouse cursor
             // on the guide's axis.
-            
+
             Point2I point = event.mousePoint;
             point -= localToGlobalCoord( Point2I( 0, 0 ) );
             point[ axis ] = mClamp( point[ axis ], 0, getExtent()[ axis ] - 1 );
-            
+
             mGuides[ axis ][ mDragGuideIndex[ axis ] ] = point[ axis ];
          }
    }
@@ -541,18 +541,18 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
    {
       // Snap the mouse cursor to grid if active.  Do this on the mouse cursor so that we handle
       // incremental drags correctly.
-      
+
       Point2I mousePoint = event.mousePoint;
       snapToGrid( mousePoint );
-                  
+
       Point2I delta = mousePoint - mLastDragPos;
-      
+
       // If CTRL is down, apply smart snapping.
-      
+
       if( event.modifier & SI_CTRL )
       {
          RectI selectionBounds = getSelectionBounds();
-         
+
          doSnapping( event, selectionBounds, delta );
       }
       else
@@ -560,7 +560,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
          mSnapped[ SnapVertical ] = false;
          mSnapped[ SnapHorizontal ] = false;
       }
-      
+
       // If ALT is down, do a move instead of a resize on the control
       // knob's axis.  Otherwise resize.
 
@@ -576,25 +576,25 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
             mSnapped[ SnapHorizontal ] = false;
             delta.y = 0;
          }
-            
+
          moveSelection( delta );
       }
       else
          resizeControlsInSelectionBy( delta, mSizingMode );
-         
+
       // Remember drag point.
-      
+
       mLastDragPos = mousePoint;
    }
    else if (mMouseDownMode == MovingSelection && mSelectedControls.size())
    {
       Point2I delta = mousePoint - mLastMousePos;
       RectI selectionBounds = getSelectionBounds();
-      
+
       // Apply snaps.
-      
+
       doSnapping( event, selectionBounds, delta );
-      
+
       //RDTODO: to me seems to be in need of revision
       // Do we want to align this drag to the X and Y axes within a certain threshold?
       if( event.modifier & SI_SHIFT && !( event.modifier & SI_PRIMARY_ALT ) )
@@ -639,7 +639,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       // that is flagged as a container.
       while( !inCtrl->mIsContainer )
          inCtrl = inCtrl->getParent();
-         
+
       // if the control under the mouse is not our parent, move the selected controls
       // into the new parent.
       if(mSelectedControls[0]->getParent() != inCtrl && inCtrl->mIsContainer)
@@ -671,7 +671,7 @@ void GuiEditCtrl::onRightMouseDown(const GuiEvent &event)
    {
       setCurrentAddSet( hitCtrl );
    }
-   // select the parent if we right-click on the current add set 
+   // select the parent if we right-click on the current add set
    else if( getCurrentAddSet() != mContentControl)
    {
       setCurrentAddSet( hitCtrl->getParent() );
@@ -700,7 +700,7 @@ void GuiEditCtrl::onPreRender()
 //-----------------------------------------------------------------------------
 
 void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
-{   
+{
    Point2I ctOffset;
    Point2I cext;
    bool keyFocused = isFirstResponder();
@@ -745,21 +745,21 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
 
    renderChildControls(offset, updateRect);
-   
+
    // Draw selection rectangle.
-   
+
    if( mActive && mMouseDownMode == DragSelecting )
    {
       RectI b;
       getDragRect(b);
       b.point += offset;
-      
+
       // Draw outline.
-      
+
       drawer->drawRect( b, ColorI( 100, 100, 100, 128 ) );
-      
+
       // Draw fill.
-      
+
       b.inset( 1, 1 );
       drawer->drawRectFill( b, ColorI( 150, 150, 150, 128 ) );
    }
@@ -772,7 +772,7 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       Point2I cext = getContentControl()->getExtent();
       Point2I coff = getContentControl()->localToGlobalCoord(Point2I(0,0));
-      
+
       // create point-dots
       const Point2I& snap = mGridSnap;
       U32 maxdot = (U32)(mCeil(cext.x / (F32)snap.x) - 1) * (U32)(mCeil(cext.y / (F32)snap.y) - 1);
@@ -784,7 +784,7 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
          U32 ndot = 0;
          mDots.lock();
          for(U32 ix = snap.x; ix < cext.x; ix += snap.x)
-         { 
+         {
             for(U32 iy = snap.y; ndot < maxdot && iy < cext.y; iy += snap.y)
             {
                mDots[ndot].color.set( 50, 50, 254, 100 );
@@ -815,11 +815,11 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
 
    // Draw snapping lines.
-   
+
    if( mActive && getContentControl() )
-   {      
+   {
       RectI bounds = getContentControl()->getGlobalBounds();
-            
+
       // Draw guide lines.
 
       if( mDrawGuides )
@@ -833,18 +833,18 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
       }
 
       // Draw smart snap lines.
-      
+
       for( U32 axis = 0; axis < 2; ++ axis )
       {
          if( mSnapped[ axis ] )
          {
             // Draw the snap line.
-            
+
             drawCrossSection( axis, mSnapOffset[ axis ],
                bounds, ColorI( 0, 0, 255, 100 ), drawer );
 
             // Draw a border around the snap target control.
-            
+
             if( mSnapTargets[ axis ] )
             {
                RectI bounds = mSnapTargets[ axis ]->getGlobalBounds();
@@ -870,7 +870,7 @@ void GuiEditCtrl::drawNuts(RectI &box, ColorI &outlineColor, ColorI &nutColor)
    {
       ColorF lineColor( 0.7f, 0.7f, 0.7f, 0.25f );
       ColorF lightLineColor( 0.5f, 0.5f, 0.5f, 0.1f );
-      
+
       if(lx > 0 && ty > 0)
       {
          drawer->drawLine(0, ty, lx, ty, lineColor);  // Left edge to top-left corner.
@@ -897,12 +897,12 @@ void GuiEditCtrl::drawNuts(RectI &box, ColorI &outlineColor, ColorI &nutColor)
    }
 
    // Adjust nuts, so they dont straddle the controls.
-   
+
    lx -= NUT_SIZE + 1;
    ty -= NUT_SIZE + 1;
    rx += 1;
    by += 1;
-   
+
    // Draw nuts.
 
    drawNut( Point2I( lx - NUT_SIZE, ty - NUT_SIZE ), outlineColor, nutColor ); // Top left
@@ -945,10 +945,10 @@ void GuiEditCtrl::setSelection(GuiControl *ctrl, bool inclusive)
    //sanity check
    if( !ctrl )
       return;
-      
+
    if( mSelectedControls.size() == 1 && mSelectedControls[ 0 ] == ctrl )
       return;
-      
+
    if( !inclusive )
       clearSelection();
 
@@ -973,20 +973,20 @@ void GuiEditCtrl::addSelection( GuiControl* ctrl )
 {
    // Only add if this isn't the content control and the
    // control isn't yet in the selection.
-   
+
    if( ctrl != getContentControl() && !selectionContains( ctrl ) )
    {
       mSelectedControls.push_back( ctrl );
-      
+
       if( mSelectedControls.size() == 1 )
       {
          // Update the add set.
-         
+
          if( ctrl->mIsContainer )
             setCurrentAddSet( ctrl, false );
          else
             setCurrentAddSet( ctrl->getParent(), false );
-            
+
          // Notify script.
 
          onSelect_callback( ctrl );
@@ -994,7 +994,7 @@ void GuiEditCtrl::addSelection( GuiControl* ctrl )
       else
       {
          // Notify script.
-         
+
          onAddSelected_callback( ctrl );
       }
    }
@@ -1042,22 +1042,22 @@ void GuiEditCtrl::moveSelectionToCtrl( GuiControl *newParent, bool callback )
           || ctrl->isLocked()
           || selectionContainsParentOf( ctrl ) )
          continue;
-   
+
       Point2I globalpos = ctrl->localToGlobalCoord(Point2I(0,0));
       newParent->addObject(ctrl);
       Point2I newpos = ctrl->globalToLocalCoord(globalpos) + ctrl->getPosition();
       ctrl->setPosition(newpos);
    }
-   
+
    onHierarchyChanged_callback();
-   
+
    //TODO: undo
 }
 
 //-----------------------------------------------------------------------------
 
 static Point2I snapPoint(Point2I point, Point2I delta, Point2I gridSnap)
-{ 
+{
    S32 snap;
    if(gridSnap.x && delta.x)
    {
@@ -1081,7 +1081,7 @@ void GuiEditCtrl::moveAndSnapSelection( const Point2I &delta, bool callback )
    // move / nudge gets a special callback so that multiple small moves can be
    // coalesced into one large undo action.
    // undo
-   
+
    if( callback )
       onPreSelectionNudged_callback( getSelectedSet() );
 
@@ -1240,35 +1240,35 @@ void GuiEditCtrl::justifySelection( Justification j )
 void GuiEditCtrl::cloneSelection()
 {
    Vector< GuiControl* > newSelection;
-   
+
    // Clone the controls in the current selection.
-   
+
    const U32 numOldControls = mSelectedControls.size();
    for( U32 i = 0; i < numOldControls; ++ i )
    {
       GuiControl* ctrl = mSelectedControls[ i ];
-      
+
       // If parent is in selection, too, skip to prevent multiple clones.
-      
+
       if( ctrl->getParent() && selectionContains( ctrl->getParent() ) )
          continue;
-         
+
       // Clone and add to set.
-      
+
       GuiControl* clone = dynamic_cast< GuiControl* >( ctrl->deepClone() );
       if( clone )
          newSelection.push_back( clone );
    }
-   
+
    // Exchange the selection set.
-   
+
    clearSelection();
    const U32 numNewControls = newSelection.size();
    for( U32 i = 0; i < numNewControls; ++ i )
       addSelection( newSelection[ i ] );
-      
+
    // Callback for undo.
-      
+
    onSelectionCloned_callback( getSelectedSet() );
 }
 
@@ -1277,9 +1277,9 @@ void GuiEditCtrl::cloneSelection()
 void GuiEditCtrl::deleteSelection()
 {
    // Notify script for undo.
-   
+
    onTrashSelection_callback( getSelectedSet() );
-   
+
    // Move all objects in selection to trash.
 
    Vector< GuiControl* >::iterator i;
@@ -1287,14 +1287,14 @@ void GuiEditCtrl::deleteSelection()
    {
       if( ( *i ) == getCurrentAddSet() )
          setCurrentAddSet( getContentControl(), false );
-         
+
       mTrash->addObject( *i );
    }
-      
+
    clearSelection();
-   
+
    // Notify script it needs to update its views.
-   
+
    onHierarchyChanged_callback();
 }
 
@@ -1303,17 +1303,17 @@ void GuiEditCtrl::deleteSelection()
 void GuiEditCtrl::loadSelection( const char* filename )
 {
    // Set redefine behavior to rename.
-   
+
    const char* oldRedefineBehavior = Con::getVariable( "$Con::redefineBehavior" );
    Con::setVariable( "$Con::redefineBehavior", "renameNew" );
-   
+
    // Exec the file or clipboard contents with the saved selection set.
 
    if( filename )
       Con::executef( "exec", filename );
    else
       Con::evaluate( Platform::getClipboard() );
-      
+
    SimSet* set;
    if( !Sim::findObject( "guiClipboard", set ) )
    {
@@ -1323,11 +1323,11 @@ void GuiEditCtrl::loadSelection( const char* filename )
          Con::errorf( "GuiEditCtrl::loadSelection() - could not find 'guiClipboard'" );
       return;
    }
-   
+
    // Restore redefine behavior.
-   
+
    Con::setVariable( "$Con::redefineBehavior", oldRedefineBehavior );
-   
+
    // Add the objects in the set.
 
    if( set->size() )
@@ -1344,7 +1344,7 @@ void GuiEditCtrl::loadSelection( const char* filename )
             ctrls.push_back( ctrl );
          }
       }
-      
+
       // Select all controls.  We need to perform this here rather than in the
       // loop above as addSelection() will modify the current add set.
       for( U32 i = 0; i < ctrls.size(); ++ i )
@@ -1352,7 +1352,7 @@ void GuiEditCtrl::loadSelection( const char* filename )
          addSelection( ctrls[i] );
       }
 
-      // Undo 
+      // Undo
       onAddNewCtrlSet_callback( getSelectedSet() );
 
       // Notify the script it needs to update its treeview.
@@ -1367,10 +1367,10 @@ void GuiEditCtrl::loadSelection( const char* filename )
 void GuiEditCtrl::saveSelection( const char* filename )
 {
    // If there are no selected objects, then don't save.
-   
+
    if( mSelectedControls.size() == 0 )
       return;
-      
+
    // Open the stream.
 
    Stream* stream;
@@ -1385,13 +1385,13 @@ void GuiEditCtrl::saveSelection( const char* filename )
    }
    else
       stream = new MemStream( 4096 );
-      
+
    // Create a temporary SimSet.
-      
+
    SimSet* clipboardSet = new SimSet;
    clipboardSet->registerObject();
    Sim::getRootGroup()->addObject( clipboardSet, "guiClipboard" );
-   
+
    // Add the selected controls to the set.
 
    for( Vector< GuiControl* >::iterator i = mSelectedControls.begin();
@@ -1401,17 +1401,17 @@ void GuiEditCtrl::saveSelection( const char* filename )
       if( !selectionContainsParentOf( ctrl ) )
          clipboardSet->addObject( ctrl );
    }
-   
+
    // Write the SimSet.  Use the IgnoreCanSave to ensure the controls
    // get actually written out (also disables the default parent inheritance
    // behavior for the flag).
 
    clipboardSet->write( *stream, 0, IgnoreCanSave );
    clipboardSet->deleteObject();
-   
+
    // If we were writing to a memory stream, copy to clipboard
    // now.
-   
+
    if( !filename )
    {
       MemStream* memStream = static_cast< MemStream* >( stream );
@@ -1427,7 +1427,7 @@ void GuiEditCtrl::saveSelection( const char* filename )
 void GuiEditCtrl::selectAll()
 {
    GuiControl::iterator i;
-   
+
    clearSelection();
    for(i = getCurrentAddSet()->begin(); i != getCurrentAddSet()->end(); i++)
    {
@@ -1463,29 +1463,29 @@ void GuiEditCtrl::pushToBack()
 RectI GuiEditCtrl::getSelectionBounds() const
 {
    Vector<GuiControl *>::const_iterator i = mSelectedControls.begin();
-   
+
    Point2I minPos = (*i)->localToGlobalCoord( Point2I( 0, 0 ) );
    Point2I maxPos = minPos;
-   
+
    for(; i != mSelectedControls.end(); i++)
    {
       Point2I iPos = (**i).localToGlobalCoord( Point2I( 0 , 0 ) );
-      
+
       minPos.x = getMin( iPos.x, minPos.x );
       minPos.y = getMin( iPos.y, minPos.y );
-         
+
       Point2I iExt = ( **i ).getExtent();
-      
+
       iPos.x += iExt.x;
       iPos.y += iExt.y;
 
       maxPos.x = getMax( iPos.x, maxPos.x );
       maxPos.y = getMax( iPos.y, maxPos.y );
    }
-   
+
    minPos = getContentControl()->globalToLocalCoord( minPos );
    maxPos = getContentControl()->globalToLocalCoord( maxPos );
-   
+
    return RectI( minPos.x, minPos.y, ( maxPos.x - minPos.x ), ( maxPos.y - minPos.y ) );
 }
 
@@ -1495,24 +1495,24 @@ RectI GuiEditCtrl::getSelectionGlobalBounds() const
 {
    Point2I minb( S32_MAX, S32_MAX );
    Point2I maxb( S32_MIN, S32_MIN );
-   
+
    for( U32 i = 0, num = mSelectedControls.size(); i < num; ++ i )
    {
       // Min.
 
       Point2I pos = mSelectedControls[ i ]->localToGlobalCoord( Point2I( 0, 0 ) );
-      
+
       minb.x = getMin( minb.x, pos.x );
       minb.y = getMin( minb.y, pos.y );
-      
+
       // Max.
-      
+
       const Point2I extent = mSelectedControls[ i ]->getExtent();
-      
+
       maxb.x = getMax( maxb.x, pos.x + extent.x );
       maxb.y = getMax( maxb.y, pos.y + extent.y );
    }
-   
+
    RectI bounds( minb.x, minb.y, maxb.x - minb.x, maxb.y - minb.y );
    return bounds;
 }
@@ -1536,10 +1536,10 @@ bool GuiEditCtrl::selectionContainsParentOf( GuiControl* ctrl )
    {
       if( selectionContains( parent ) )
          return true;
-         
+
       parent = parent->getParent();
    }
-   
+
    return false;
 }
 
@@ -1568,18 +1568,18 @@ void GuiEditCtrl::updateSelectedSet()
 void GuiEditCtrl::addSelectControlsInRegion( const RectI& rect, U32 flags )
 {
    // Do a hit test on the content control.
-   
+
    canHitSelectedControls( false );
    Vector< GuiControl* > hits;
-   
+
    if( mFullBoxSelection )
       flags |= GuiControl::HIT_FullBoxOnly;
-      
+
    getContentControl()->findHitControls( rect, hits, flags );
    canHitSelectedControls( true );
-   
+
    // Add all controls that got hit.
-   
+
    for( U32 i = 0, num = hits.size(); i < num; ++ i )
       addSelection( hits[ i ] );
 }
@@ -1589,13 +1589,13 @@ void GuiEditCtrl::addSelectControlsInRegion( const RectI& rect, U32 flags )
 void GuiEditCtrl::addSelectControlAt( const Point2I& pos )
 {
    // Run a hit test.
-   
+
    canHitSelectedControls( false );
    GuiControl* hit = getContentControl()->findHitControl( pos );
    canHitSelectedControls( true );
-   
+
    // Add to selection.
-   
+
    if( hit )
       addSelection( hit );
 }
@@ -1609,7 +1609,7 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
       GuiControl *ctrl = mSelectedControls[ i ];
       if( ctrl->isLocked() )
          continue;
-         
+
       Point2I minExtent    = ctrl->getMinExtent();
       Point2I newPosition  = ctrl->getPosition();
       Point2I newExtent    = ctrl->getExtent();
@@ -1618,7 +1618,7 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
       {
          newPosition.x     += delta.x;
          newExtent.x       -= delta.x;
-         
+
          if( newExtent.x < minExtent.x )
          {
             newPosition.x  -= minExtent.x - newExtent.x;
@@ -1637,7 +1637,7 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
       {
          newPosition.y     += delta.y;
          newExtent.y       -= delta.y;
-         
+
          if( newExtent.y < minExtent.y )
          {
             newPosition.y  -= minExtent.y - newExtent.y;
@@ -1647,14 +1647,14 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
       else if( mSizingMode & sizingBottom )
       {
          newExtent.y       += delta.y;
-         
+
          if( newExtent.y < minExtent.y )
             newExtent.y = minExtent.y;
       }
-      
+
       ctrl->resize( newPosition, newExtent );
    }
-   
+
    if( mSelectedControls.size() == 1 )
       onSelectionResized_callback( mSelectedControls[ 0 ] );
 }
@@ -1664,28 +1664,28 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
 void GuiEditCtrl::fitIntoParents( bool width, bool height )
 {
    // Record undo.
-   
+
    onFitIntoParent_callback( width, height );
-   
+
    // Fit.
-   
+
    for( U32 i = 0; i < mSelectedControls.size(); ++ i )
    {
       GuiControl* ctrl = mSelectedControls[ i ];
       GuiControl* parent = ctrl->getParent();
-      
+
       Point2I position = ctrl->getPosition();
       if( width )
          position.x = 0;
       if( height )
          position.y = 0;
-      
+
       Point2I extents = ctrl->getExtent();
       if( width )
          extents.x = parent->getWidth();
       if( height )
          extents.y = parent->getHeight();
-      
+
       ctrl->resize( position, extents );
    }
 }
@@ -1695,29 +1695,29 @@ void GuiEditCtrl::fitIntoParents( bool width, bool height )
 void GuiEditCtrl::selectParents( bool addToSelection )
 {
    Vector< GuiControl* > parents;
-   
+
    // Collect all parents.
-   
+
    for( U32 i = 0; i < mSelectedControls.size(); ++ i )
    {
       GuiControl* ctrl = mSelectedControls[ i ];
       if( ctrl != mContentControl && ctrl->getParent() != mContentControl )
          parents.push_back( mSelectedControls[ i ]->getParent() );
    }
-   
+
    // If there's no parents to select, don't
    // change the selection.
-   
+
    if( parents.empty() )
       return;
-   
+
    // Blast selection if need be.
-   
+
    if( !addToSelection )
       clearSelection();
-      
+
    // Add the parents.
-   
+
    for( U32 i = 0; i < parents.size(); ++ i )
       addSelection( parents[ i ] );
 }
@@ -1727,9 +1727,9 @@ void GuiEditCtrl::selectParents( bool addToSelection )
 void GuiEditCtrl::selectChildren( bool addToSelection )
 {
    Vector< GuiControl* > children;
-   
+
    // Collect all children.
-   
+
    for( U32 i = 0; i < mSelectedControls.size(); ++ i )
    {
       GuiControl* parent = mSelectedControls[ i ];
@@ -1740,20 +1740,20 @@ void GuiEditCtrl::selectChildren( bool addToSelection )
             children.push_back( child );
       }
    }
-   
+
    // If there's no children to select, don't
    // change the selection.
-   
+
    if( children.empty() )
       return;
 
    // Blast selection if need be.
-   
+
    if( !addToSelection )
       clearSelection();
-      
+
    // Add the children.
-   
+
    for( U32 i = 0; i < children.size(); ++ i )
       addSelection( children[ i ] );
 }
@@ -1769,7 +1769,7 @@ void GuiEditCtrl::readGuides( guideAxis axis, GuiControl* ctrl )
 {
    // Read the guide indices from the vector stored on the respective dynamic
    // property of the control.
-   
+
    const char* guideIndices = ctrl->getDataField( smGuidesPropertyName[ axis ], NULL );
    if( guideIndices && guideIndices[ 0 ] )
    {
@@ -1779,9 +1779,9 @@ void GuiEditCtrl::readGuides( guideAxis axis, GuiControl* ctrl )
          const char* posStr = StringUnit::getUnit( guideIndices, index, " \t" );
          if( !posStr[ 0 ] )
             break;
-            
+
          mGuides[ axis ].push_back( dAtoi( posStr ) );
-         
+
          index ++;
       }
    }
@@ -1793,22 +1793,22 @@ void GuiEditCtrl::writeGuides( guideAxis axis, GuiControl* ctrl )
 {
    // Store the guide indices of the given axis in a vector on the respective
    // dynamic property of the control.
-   
+
    StringBuilder str;
    bool isFirst = true;
    for( U32 i = 0, num = mGuides[ axis ].size(); i < num; ++ i )
    {
       if( !isFirst )
          str.append( ' ' );
-         
+
       char buffer[ 32 ];
       dSprintf( buffer, sizeof( buffer ), "%i", mGuides[ axis ][ i ] );
-      
+
       str.append( buffer );
-      
+
       isFirst = false;
    }
-   
+
    String value = str.end();
    ctrl->setDataField( smGuidesPropertyName[ axis ], NULL, value );
 }
@@ -1818,7 +1818,7 @@ void GuiEditCtrl::writeGuides( guideAxis axis, GuiControl* ctrl )
 S32 GuiEditCtrl::findGuide( guideAxis axis, const Point2I& point, U32 tolerance )
 {
    const S32 p = ( point - localToGlobalCoord( Point2I( 0, 0 ) ) )[ axis ];
-   
+
    for( U32 i = 0, num = mGuides[ axis ].size(); i < num; ++ i )
    {
       const S32 g = mGuides[ axis ][ i ];
@@ -1826,7 +1826,7 @@ S32 GuiEditCtrl::findGuide( guideAxis axis, const Point2I& point, U32 tolerance 
           p <= ( g + tolerance ) )
          return i;
    }
-         
+
    return -1;
 }
 
@@ -1840,7 +1840,7 @@ S32 GuiEditCtrl::findGuide( guideAxis axis, const Point2I& point, U32 tolerance 
 RectI GuiEditCtrl::getSnapRegion( snappingAxis axis, const Point2I& center ) const
 {
    RectI rootBounds = getContentControl()->getBounds();
-   
+
    RectI rect;
    if( axis == SnapHorizontal )
       rect = RectI( rootBounds.point.x,
@@ -1852,11 +1852,11 @@ RectI GuiEditCtrl::getSnapRegion( snappingAxis axis, const Point2I& center ) con
                     rootBounds.point.y,
                     mSnapSensitivity * 2,
                     rootBounds.extent.y );
-   
+
    // Clip against root bounds.
-   
+
    rect.intersect( rootBounds );
-      
+
    return rect;
 }
 
@@ -1868,25 +1868,25 @@ void GuiEditCtrl::registerSnap( snappingAxis axis, const Point2I& mousePoint, co
    const Point2I globalPoint = getContentControl()->localToGlobalCoord( point );
 
    // If we have no snap yet, just take this one.
-   
+
    if( !mSnapped[ axis ] )
       takeNewSnap = true;
-   
+
    // Otherwise see if this snap is the better one.
-   
+
    else
    {
       // Compare deltas to pointer.
-      
+
       S32 deltaCurrent = mAbs( mSnapOffset[ axis ] - mousePoint[ axis ] );
       S32 deltaNew = mAbs( globalPoint[ axis ] - mousePoint[ axis ] );
-                              
+
       if( deltaCurrent > deltaNew )
          takeNewSnap = true;
    }
 
    if( takeNewSnap )
-   {      
+   {
       mSnapped[ axis ]     = true;
       mSnapOffset[ axis ]  = globalPoint[ axis ];
       mSnapEdge[ axis ]    = edge;
@@ -1900,81 +1900,81 @@ void GuiEditCtrl::findSnaps( snappingAxis axis, const Point2I& mousePoint, const
 {
    // Find controls with edge in either minRegion, midRegion, or maxRegion
    // (depending on snap settings).
-   
+
    for( U32 i = 0, num = mSnapHits[ axis ].size(); i < num; ++ i )
    {
       GuiControl* ctrl = mSnapHits[ axis ][ i ];
       if( ctrl == getContentControl() && !mSnapToCanvas )
          continue;
-         
+
       RectI bounds = ctrl->getGlobalBounds();
       bounds.point = getContentControl()->globalToLocalCoord( bounds.point );
-      
+
       // Compute points on min, mid, and max lines of control.
-      
+
       Point2I min = bounds.point;
       Point2I max = min + bounds.extent - Point2I( 1, 1 );
 
       Point2I mid = min;
       mid.x += bounds.extent.x / 2;
       mid.y += bounds.extent.y / 2;
-            
+
       // Test edge snap cases.
-      
+
       if( mSnapToEdges )
       {
          // Min to min.
-         
+
          if( minRegion.pointInRect( min ) )
             registerSnap( axis, mousePoint, min, SnapEdgeMin, ctrl );
-      
+
          // Max to max.
-         
+
          if( maxRegion.pointInRect( max ) )
             registerSnap( axis, mousePoint, max, SnapEdgeMax, ctrl );
-         
+
          // Min to max.
-         
+
          if( minRegion.pointInRect( max ) )
             registerSnap( axis, mousePoint, max, SnapEdgeMin, ctrl );
-         
+
          // Max to min.
-         
+
          if( maxRegion.pointInRect( min ) )
             registerSnap( axis, mousePoint, min, SnapEdgeMax, ctrl );
       }
-      
+
       // Test center snap cases.
-      
+
       if( mSnapToCenters )
       {
          // Mid to mid.
-         
+
          if( midRegion.pointInRect( mid ) )
             registerSnap( axis, mousePoint, mid, SnapEdgeMid, ctrl );
       }
-      
+
       // Test combined center+edge snap cases.
-      
+
       if( mSnapToEdges && mSnapToCenters )
       {
          // Min to mid.
-         
+
          if( minRegion.pointInRect( mid ) )
             registerSnap( axis, mousePoint, mid, SnapEdgeMin, ctrl );
-         
+
          // Max to mid.
-         
+
          if( maxRegion.pointInRect( mid ) )
             registerSnap( axis, mousePoint, mid, SnapEdgeMax, ctrl );
-         
+
          // Mid to min.
-         
+
          if( midRegion.pointInRect( min ) )
             registerSnap( axis, mousePoint, min, SnapEdgeMid, ctrl );
-         
+
          // Mid to max.
-         
+
          if( midRegion.pointInRect( max ) )
             registerSnap( axis, mousePoint, max, SnapEdgeMid, ctrl );
       }
@@ -1987,54 +1987,54 @@ void GuiEditCtrl::doControlSnap( const GuiEvent& event, const RectI& selectionBo
 {
    if( !mSnapToControls || ( !mSnapToEdges && !mSnapToCenters ) )
       return;
-      
+
    // Allow restricting to just vertical (ALT+SHIFT) or just horizontal (ALT+CTRL)
    // snaps.
-   
+
    bool snapAxisEnabled[ 2 ];
-            
+
    if( event.modifier & SI_PRIMARY_ALT && event.modifier & SI_SHIFT )
       snapAxisEnabled[ SnapHorizontal ] = false;
    else
       snapAxisEnabled[ SnapHorizontal ] = true;
-      
+
    if( event.modifier & SI_PRIMARY_ALT && event.modifier & SI_CTRL )
       snapAxisEnabled[ SnapVertical ] = false;
    else
       snapAxisEnabled[ SnapVertical ] = true;
-   
+
    // Compute snap regions.  There is one region centered on and aligned with
    // each of the selection bounds edges plus two regions aligned on the selection
    // bounds center.  For the selection bounds origin, we use the point that the
    // selection would be at, if we had already done the mouse drag.
-   
+
    RectI snapRegions[ 2 ][ 3 ];
    Point2I projectedOrigin( selectionBounds.point + delta );
    dMemset( snapRegions, 0, sizeof( snapRegions ) );
-   
+
    for( U32 axis = 0; axis < 2; ++ axis )
    {
       if( !snapAxisEnabled[ axis ] )
          continue;
-         
+
       if( mSizingMode == sizingNone ||
           ( axis == 0 && mSizingMode & sizingLeft ) ||
           ( axis == 1 && mSizingMode & sizingTop ) )
          snapRegions[ axis ][ 0 ] = getSnapRegion( ( snappingAxis ) axis, projectedOrigin );
-         
+
       if( mSizingMode == sizingNone )
          snapRegions[ axis ][ 1 ] = getSnapRegion( ( snappingAxis ) axis, projectedOrigin + Point2I( selectionBounds.extent.x / 2, selectionBounds.extent.y / 2 ) );
-         
+
       if( mSizingMode == sizingNone ||
           ( axis == 0 && mSizingMode & sizingRight ) ||
           ( axis == 1 && mSizingMode & sizingBottom ) )
          snapRegions[ axis ][ 2 ] = getSnapRegion( ( snappingAxis ) axis, projectedOrigin + selectionBounds.extent - Point2I( 1, 1 ) );
    }
-   
+
    // Find hit controls.
-   
+
    canHitSelectedControls( false );
-   
+
    if( mSnapToEdges )
    {
       for( U32 axis = 0; axis < 2; ++ axis )
@@ -2050,20 +2050,20 @@ void GuiEditCtrl::doControlSnap( const GuiEvent& event, const RectI& selectionBo
          if( snapAxisEnabled[ axis ] )
             getContentControl()->findHitControls( snapRegions[ axis ][ 1 ], mSnapHits[ axis ], HIT_NoCanHitNoRecurse );
    }
-   
+
    canHitSelectedControls( true );
-   
+
    // Add the content control itself to the hit controls
    // so we can always get a snap on it.
-   
+
    if( mSnapToCanvas )
    {
       mSnapHits[ 0 ].push_back( mContentControl );
       mSnapHits[ 1 ].push_back( mContentControl );
    }
-            
+
    // Find snaps.
-   
+
    for( U32 i = 0; i < 2; ++ i )
       if( snapAxisEnabled[ i ] )
          findSnaps( ( snappingAxis ) i,
@@ -2071,9 +2071,9 @@ void GuiEditCtrl::doControlSnap( const GuiEvent& event, const RectI& selectionBo
                     snapRegions[ i ][ 0 ],
                     snapRegions[ i ][ 1 ],
                     snapRegions[ i ][ 2 ] );
-                                       
+
    // Clean up.
-   
+
    mSnapHits[ 0 ].clear();
    mSnapHits[ 1 ].clear();
 }
@@ -2083,7 +2083,7 @@ void GuiEditCtrl::doControlSnap( const GuiEvent& event, const RectI& selectionBo
 void GuiEditCtrl::doGridSnap( const GuiEvent& event, const RectI& selectionBounds, const RectI& selectionBoundsGlobal, Point2I& delta )
 {
    delta += selectionBounds.point;
-         
+
    if( mGridSnap.x )
       delta.x -= delta.x % mGridSnap.x;
    if( mGridSnap.y )
@@ -2098,18 +2098,18 @@ void GuiEditCtrl::doGuideSnap( const GuiEvent& event, const RectI& selectionBoun
 {
    if( !mSnapToGuides )
       return;
-      
+
    Point2I min = getContentControl()->localToGlobalCoord( selectionBounds.point + delta );
    Point2I mid = min + selectionBounds.extent / 2;
    Point2I max = min + selectionBounds.extent - Point2I( 1, 1 );
-   
+
    for( U32 axis = 0; axis < 2; ++ axis )
    {
       if( mSnapToEdges )
       {
          S32 guideMin = -1;
          S32 guideMax = -1;
-         
+
          if( mSizingMode == sizingNone ||
              ( axis == 0 && mSizingMode & sizingLeft ) ||
              ( axis == 1 && mSizingMode & sizingTop ) )
@@ -2118,22 +2118,22 @@ void GuiEditCtrl::doGuideSnap( const GuiEvent& event, const RectI& selectionBoun
              ( axis == 0 && mSizingMode & sizingRight ) ||
              ( axis == 1 && mSizingMode & sizingBottom ) )
             guideMax = findGuide( ( guideAxis ) axis, max, mSnapSensitivity );
-         
+
          Point2I pos( 0, 0 );
-         
+
          if( guideMin != -1 )
          {
             pos[ axis ] = mGuides[ axis ][ guideMin ];
             registerSnap( ( snappingAxis ) axis, event.mousePoint, pos, SnapEdgeMin );
          }
-         
+
          if( guideMax != -1 )
          {
             pos[ axis ] = mGuides[ axis ][ guideMax ];
             registerSnap( ( snappingAxis ) axis, event.mousePoint, pos, SnapEdgeMax );
          }
       }
-      
+
       if( mSnapToCenters && mSizingMode == sizingNone )
       {
          const S32 guideMid = findGuide( ( guideAxis ) axis, mid, mSnapSensitivity );
@@ -2152,17 +2152,17 @@ void GuiEditCtrl::doGuideSnap( const GuiEvent& event, const RectI& selectionBoun
 void GuiEditCtrl::doSnapping( const GuiEvent& event, const RectI& selectionBounds, Point2I& delta )
 {
    // Clear snapping.  If we have snapping on, we want to find a new best snap.
-   
+
    mSnapped[ SnapVertical ] = false;
    mSnapped[ SnapHorizontal ] = false;
-   
+
    // Compute global bounds.
-   
+
    RectI selectionBoundsGlobal = selectionBounds;
    selectionBoundsGlobal.point = getContentControl()->localToGlobalCoord( selectionBoundsGlobal.point );
 
    // Apply the snaps.
-   
+
    doGridSnap( event, selectionBounds, selectionBoundsGlobal, delta );
    doGuideSnap( event, selectionBounds, selectionBoundsGlobal, delta );
    doControlSnap( event, selectionBounds, selectionBoundsGlobal, delta );
@@ -2171,9 +2171,9 @@ void GuiEditCtrl::doSnapping( const GuiEvent& event, const RectI& selectionBound
 
    if( mSnapped[ SnapVertical ] )
       snapDelta( SnapVertical, mSnapEdge[ SnapVertical ], mSnapOffset[ SnapVertical ], selectionBoundsGlobal, delta );
-   
+
    // If we have a vertical snap, compute a delta.
-   
+
    if( mSnapped[ SnapHorizontal ] )
       snapDelta( SnapHorizontal, mSnapEdge[ SnapHorizontal ], mSnapOffset[ SnapHorizontal ], selectionBoundsGlobal, delta );
 }
@@ -2200,7 +2200,7 @@ void GuiEditCtrl::setContentControl(GuiControl *root)
    mContentControl = root;
    if( root != NULL )
       root->mIsContainer = true;
-      
+
    setCurrentAddSet( root );
 }
 
@@ -2246,7 +2246,7 @@ GuiControl* GuiEditCtrl::getCurrentAddSet()
 {
    if( !mCurrentAddSet )
       setCurrentAddSet( mContentControl, false );
-      
+
    return mCurrentAddSet;
 }
 
@@ -2269,7 +2269,7 @@ S32 GuiEditCtrl::getSizingHitKnobs(const Point2I &pt, const RectI &box)
    S32 cx = (lx + rx) >> 1;
    S32 ty = box.point.y, by = box.point.y + box.extent.y - 1;
    S32 cy = (ty + by) >> 1;
-   
+
    // adjust nuts, so they dont straddle the controls
    lx -= NUT_SIZE;
    ty -= NUT_SIZE;
@@ -2315,7 +2315,7 @@ void GuiEditCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent
 
    showCursor = false;
    cursor = NULL;
-   
+
    Point2I ctOffset;
    Point2I cext;
    GuiControl *ctrl;
@@ -2345,7 +2345,7 @@ void GuiEditCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent
             desiredCursor = PlatformCursorController::curResizeNWSE;
          else if (  ( mSizingMode == ( sizingBottom | sizingLeft ) ) || ( mSizingMode == ( sizingTop | sizingRight ) ) )
             desiredCursor = PlatformCursorController::curResizeNESW;
-         else if ( mSizingMode == sizingLeft || mSizingMode == sizingRight ) 
+         else if ( mSizingMode == sizingLeft || mSizingMode == sizingRight )
             desiredCursor = PlatformCursorController::curResizeVert;
          else if (mSizingMode == sizingTop || mSizingMode == sizingBottom )
             desiredCursor = PlatformCursorController::curResizeHorz;
@@ -2363,13 +2363,13 @@ void GuiEditCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent
             desiredCursor = PlatformCursorController::curResizeHorz;
       }
    }
-   
+
    if( mMouseDownMode == MovingSelection && cursor == NULL )
       desiredCursor = PlatformCursorController::curResizeAll;
 
    if( pRoot->mCursorChanged != desiredCursor )
    {
-      // We've already changed the cursor, 
+      // We've already changed the cursor,
       // so set it back before we change it again.
       if(pRoot->mCursorChanged != -1)
          pController->popCursor();
@@ -2410,7 +2410,7 @@ void GuiEditCtrl::controlInspectPostApply(GuiControl* object)
 void GuiEditCtrl::startDragMove( const Point2I& startPoint )
 {
    mDragMoveUndo = true;
-   
+
    // For calculating mouse delta
    mDragBeginPoint = globalToLocalCoord( startPoint );
 
@@ -2424,7 +2424,7 @@ void GuiEditCtrl::startDragMove( const Point2I& startPoint )
 
    // Set Mouse Mode
    setMouseMode( MovingSelection );
-   
+
    // undo
    onPreEdit_callback( getSelectedSet() );
 }
@@ -2442,7 +2442,7 @@ void GuiEditCtrl::startDragRectangle( const Point2I& startPoint )
 void GuiEditCtrl::startDragClone( const Point2I& startPoint )
 {
    mDragBeginPoint = globalToLocalCoord( startPoint );
-   
+
    setMouseMode( DragClone );
 }
 
@@ -2452,11 +2452,11 @@ void GuiEditCtrl::startMouseGuideDrag( guideAxis axis, U32 guideIndex, bool lock
 {
    mDragGuideIndex[ axis ] = guideIndex;
    mDragGuide[ axis ] = true;
-   
+
    setMouseMode( DragGuide );
-   
+
    // Grab the mouse.
-   
+
    if( lockMouse )
       mouseLock();
 }
@@ -2603,7 +2603,7 @@ ConsoleMethod( GuiEditCtrl, saveSelection, void, 2, 3, "( string fileName=null )
    const char* filename = NULL;
    if( argc > 2 )
       filename = argv[ 2 ];
-      
+
    object->saveSelection( filename );
 }
 
@@ -2646,10 +2646,10 @@ ConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, 2, 2, "() - R
 {
    RectI bounds = object->getSelectionGlobalBounds();
    String str = String::ToString( "%i %i %i %i", bounds.point.x, bounds.point.y, bounds.extent.x, bounds.extent.y );
-   
+
    char* buffer = Con::getReturnBuffer( str.length() );
    dStrcpy( buffer, str.c_str() );
-   
+
    return buffer;
 }
 
@@ -2660,7 +2660,7 @@ ConsoleMethod( GuiEditCtrl, selectParents, void, 2, 3, "( bool addToSelection=fa
    bool addToSelection = false;
    if( argc > 2 )
       addToSelection = dAtob( argv[ 2 ] );
-      
+
    object->selectParents( addToSelection );
 }
 
@@ -2671,7 +2671,7 @@ ConsoleMethod( GuiEditCtrl, selectChildren, void, 2, 3, "( bool addToSelection=f
    bool addToSelection = false;
    if( argc > 2 )
       addToSelection = dAtob( argv[ 2 ] );
-      
+
    object->selectChildren( addToSelection );
 }
 
@@ -2696,16 +2696,16 @@ ConsoleMethod(GuiEditCtrl, setSnapToGrid, void, 3, 3, "GuiEditCtrl.setSnapToGrid
 ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int axis ] ) - Read the guides from the given control." )
 {
    // Find the control.
-   
+
    GuiControl* ctrl;
    if( !Sim::findObject( argv[ 2 ], ctrl ) )
    {
       Con::errorf( "GuiEditCtrl::readGuides - no control '%s'", argv[ 2 ] );
       return;
    }
-   
+
    // Read the guides.
-   
+
    if( argc > 3 )
    {
       S32 axis = dAtoi( argv[ 3 ] );
@@ -2714,7 +2714,7 @@ ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int ax
          Con::errorf( "GuiEditCtrl::readGuides - invalid axis '%s'", argv[ 3 ] );
          return;
       }
-      
+
       object->readGuides( ( GuiEditCtrl::guideAxis ) axis, ctrl );
    }
    else
@@ -2729,16 +2729,16 @@ ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int ax
 ConsoleMethod( GuiEditCtrl, writeGuides, void, 3, 4, "( GuiControl ctrl [, int axis ] ) - Write the guides to the given control." )
 {
    // Find the control.
-   
+
    GuiControl* ctrl;
    if( !Sim::findObject( argv[ 2 ], ctrl ) )
    {
       Con::errorf( "GuiEditCtrl::writeGuides - no control '%i'", argv[ 2 ] );
       return;
    }
-   
+
    // Write the guides.
-   
+
    if( argc > 3 )
    {
       S32 axis = dAtoi( argv[ 3 ] );
@@ -2747,7 +2747,7 @@ ConsoleMethod( GuiEditCtrl, writeGuides, void, 3, 4, "( GuiControl ctrl [, int a
          Con::errorf( "GuiEditCtrl::writeGuides - invalid axis '%s'", argv[ 3 ] );
          return;
       }
-      
+
       object->writeGuides( ( GuiEditCtrl::guideAxis ) axis, ctrl );
    }
    else
@@ -2769,7 +2769,7 @@ ConsoleMethod( GuiEditCtrl, clearGuides, void, 2, 3, "( [ int axis ] ) - Clear a
          Con::errorf( "GuiEditCtrl::clearGuides - invalid axis '%i'", axis );
          return;
       }
-      
+
       object->clearGuides( ( GuiEditCtrl::guideAxis ) axis );
    }
    else
@@ -2785,12 +2785,12 @@ ConsoleMethod( GuiEditCtrl, fitIntoParents, void, 2, 4, "( bool width=true, bool
 {
    bool width = true;
    bool height = true;
-   
+
    if( argc > 2 )
       width = dAtob( argv[ 2 ] );
    if( argc > 3 )
       height = dAtob( argv[ 3 ] );
-      
+
    object->fitIntoParents( width, height );
 }
 
@@ -2802,22 +2802,22 @@ ConsoleMethod( GuiEditCtrl, getMouseMode, const char*, 2, 2, "() - Return the cu
    {
       case GuiEditCtrl::Selecting:
          return "Selecting";
-      
+
       case GuiEditCtrl::DragSelecting:
          return "DragSelecting";
 
       case GuiEditCtrl::MovingSelection:
          return "MovingSelection";
-      
+
       case GuiEditCtrl::SizingSelection:
          return "SizingSelection";
-            
+
       case GuiEditCtrl::DragGuide:
          return "DragGuide";
-         
+
       case GuiEditCtrl::DragClone:
          return "DragClone";
-         
+
       default:
          return "";
    }
@@ -2830,14 +2830,14 @@ ConsoleMethod( GuiEditCtrl, getMouseMode, const char*, 2, 2, "() - Return the cu
 class GuiEditorRuler : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
-      
+
    protected:
-   
+
       String mRefCtrlName;
       String mEditCtrlName;
-      
+
       GuiScrollCtrl* mRefCtrl;
       GuiEditCtrl* mEditCtrl;
 
@@ -2848,13 +2848,13 @@ class GuiEditorRuler : public GuiControl
          ORIENTATION_Horizontal,
          ORIENTATION_Vertical
       };
-      
+
       GuiEditorRuler()
          : mRefCtrl( 0 ),
            mEditCtrl( 0 )
       {
       }
-      
+
       EOrientation getOrientation() const
       {
          if( getWidth() > getHeight() )
@@ -2862,18 +2862,18 @@ class GuiEditorRuler : public GuiControl
          else
             return ORIENTATION_Vertical;
       }
-      
+
       bool onWake()
       {
          if( !Parent::onWake() )
             return false;
-            
+
          if( !mEditCtrlName.isEmpty() && !Sim::findObject( mEditCtrlName, mEditCtrl ) )
             Con::errorf( "GuiEditorRuler::onWake() - no GuiEditCtrl '%s'", mEditCtrlName.c_str() );
-         
+
          if( !mRefCtrlName.isEmpty() && !Sim::findObject( mRefCtrlName, mRefCtrl ) )
             Con::errorf( "GuiEditorRuler::onWake() - no GuiScrollCtrl '%s'", mRefCtrlName.c_str() );
-         
+
          return true;
       }
 
@@ -2881,30 +2881,30 @@ class GuiEditorRuler : public GuiControl
       {
          setUpdate();
       }
-      
+
       void onMouseDown( const GuiEvent& event )
-      {         
+      {
          if( !mEditCtrl )
             return;
-            
+
          // Determine the guide axis.
-         
+
          GuiEditCtrl::guideAxis axis;
          if( getOrientation() == ORIENTATION_Horizontal )
             axis = GuiEditCtrl::GuideHorizontal;
          else
             axis = GuiEditCtrl::GuideVertical;
-            
+
          // Start dragging a new guide out in the editor.
-         
+
          U32 guideIndex = mEditCtrl->addGuide( axis, 0 );
          mEditCtrl->startMouseGuideDrag( axis, guideIndex );
       }
-      
+
       void onRender(Point2I offset, const RectI &updateRect)
       {
          GFX->getDrawUtil()->drawRectFill(updateRect, ColorF(1,1,1,1));
-         
+
          Point2I choffset(0,0);
          if( mRefCtrl != NULL )
             choffset = mRefCtrl->getChildPos();
@@ -2950,10 +2950,10 @@ class GuiEditorRuler : public GuiControl
       {
          addField( "refCtrl", TypeRealString, Offset( mRefCtrlName, GuiEditorRuler ) );
          addField( "editCtrl", TypeRealString, Offset( mEditCtrlName, GuiEditorRuler ) );
-         
+
          Parent::initPersistFields();
       }
-      
+
       DECLARE_CONOBJECT(GuiEditorRuler);
       DECLARE_CATEGORY( "Gui Editor" );
 };

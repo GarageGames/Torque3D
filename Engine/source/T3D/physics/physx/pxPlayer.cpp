@@ -37,7 +37,7 @@ PxPlayer::PxPlayer()
       mWorld( NULL ),
       mObject( NULL ),
       mSkinWidth( 0.1f ),
-      mOriginOffset( 0.0f ) 
+      mOriginOffset( 0.0f )
 {
    PHYSICSMGR->getPhysicsResetSignal().notify( this, &PxPlayer::_onPhysicsReset );
 }
@@ -63,7 +63,7 @@ void PxPlayer::init( const char *type,
                      const Point3F &size,
                      F32 runSurfaceCos,
                      F32 stepHeight,
-                     SceneObject *obj, 
+                     SceneObject *obj,
                      PhysicsWorld *world )
 {
    AssertFatal( obj, "PxPlayer::init - Got a null scene object!" );
@@ -157,7 +157,7 @@ Point3F PxPlayer::move( const VectorF &disp, CollisionList &outCol )
    NxVec3 dispNx( disp.x, disp.y, disp.z );
    if (mIsZero(disp.z))
       dispNx.z = 0.0f;
-   
+
    NxU32 activeGroups = 0xFFFFFFFF;
    activeGroups &= ~( 1<<31 ); // Skip activeGroup for triggers ( 31 )
    activeGroups &= ~( 1<<30 ); // Skip activeGroup for debris / non interactive dynamics ( 30 )
@@ -185,14 +185,14 @@ NxControllerAction PxPlayer::onShapeHit( const NxControllerShapeHit& hit )
    if ( actor->readActorFlag( NX_AF_DISABLE_RESPONSE ) )
       return NX_ACTION_NONE;
 
-   // Fill out the Collision 
+   // Fill out the Collision
    // structure for use later.
    Collision &col = mCollisionList->increment();
    dMemset( &col, 0, sizeof( col ) );
 
    col.normal = pxCast<Point3F>( hit.worldNormal );
    col.point.set( hit.worldPos.x, hit.worldPos.y, hit.worldPos.z );
-   col.distance = hit.length;      
+   col.distance = hit.length;
    if ( userData )
       col.object = userData->getObject();
 
@@ -227,19 +227,19 @@ NxControllerAction PxPlayer::onShapeHit( const NxControllerShapeHit& hit )
    }
 
    /*
-   if ( userData && 
+   if ( userData &&
         userData->mCanPush &&
-        actor->isDynamic() && 
+        actor->isDynamic() &&
         !actor->readBodyFlag( NX_BF_KINEMATIC ) &&
         !mDummyMove )
    {
-      NxActor *ctrlActor = mController->getActor();   
+      NxActor *ctrlActor = mController->getActor();
 
       // So the object is neither
       // a static or a kinematic,
       // meaning we need to figure out
       // if we have enough force to push it.
-      
+
       // Get the hit object's force
       // and scale it by the amount
       // that it's acceleration is going
@@ -250,7 +250,7 @@ NxControllerAction PxPlayer::onShapeHit( const NxControllerShapeHit& hit )
 
       VectorF hitObjDeltaVel = hitObjLinVel * TickSec;
       VectorF hitObjAccel = hitObjDeltaVel / TickSec;
-      
+
       VectorF controllerLinVel = pxCast<Point3F>( controllerActor->getLinearVelocity() );
       VectorF controllerDeltaVel = controllerLinVel * TickSec;
       VectorF controllerAccel = controllerDeltaVel / TickSec;
@@ -270,7 +270,7 @@ NxControllerAction PxPlayer::onShapeHit( const NxControllerShapeHit& hit )
 
       playerForce = playerForce - hitObjForce;
 
-      if ( playerForce.x > 0.0f || playerForce.y > 0.0f || playerForce.z > 0.0f ) 
+      if ( playerForce.x > 0.0f || playerForce.y > 0.0f || playerForce.z > 0.0f )
          actor->addForceAtPos( NxVec3( playerForce.x, playerForce.y, playerForce.z ), actor->getCMassGlobalPosition() );
 
       //Con::printf( "onShapeHit: %f %f %f", playerForce.x, playerForce.y, playerForce.z );
@@ -301,8 +301,8 @@ NxControllerAction PxPlayer::onControllerHit( const NxControllersHit& hit )
    return NX_ACTION_NONE;
 }
 
-void PxPlayer::findContact(   SceneObject **contactObject, 
-                              VectorF *contactNormal, 
+void PxPlayer::findContact(   SceneObject **contactObject,
+                              VectorF *contactNormal,
                               Vector<SceneObject*> *outOverlapObjects ) const
 {
    AssertFatal( mController, "PxPlayer::findContact - The controller is null!" );
@@ -318,7 +318,7 @@ void PxPlayer::findContact(   SceneObject **contactObject,
 
    const F32 mSkinWidth = 0.1f;
 
-   F32 offsetDist = diff + mSkinWidth + 0.01f; 
+   F32 offsetDist = diff + mSkinWidth + 0.01f;
    NxVec3 motion(0,0,-offsetDist);
 
    /*
@@ -365,8 +365,8 @@ void PxPlayer::findContact(   SceneObject **contactObject,
    for ( S32 i = 0; i < hitCount; i++ )
    {
       PhysicsUserData *data = PhysicsUserData::cast( shapes[i]->getActor().userData );
-      if ( data )      
-         outOverlapObjects->push_back( data->getObject() );      
+      if ( data )
+         outOverlapObjects->push_back( data->getObject() );
    }
 }
 
@@ -375,7 +375,7 @@ void PxPlayer::enableCollision()
    AssertFatal( mController, "PxPlayer::enableCollision - The controller is null!" );
 
    mWorld->releaseWriteLock();
-   mController->setCollision( true );   
+   mController->setCollision( true );
 }
 
 void PxPlayer::disableCollision()
@@ -383,7 +383,7 @@ void PxPlayer::disableCollision()
    AssertFatal( mController, "PxPlayer::disableCollision - The controller is null!" );
 
    mWorld->releaseWriteLock();
-   mController->setCollision( false );   
+   mController->setCollision( false );
 }
 
 PhysicsWorld* PxPlayer::getWorld()
@@ -401,7 +401,7 @@ void PxPlayer::setTransform( const MatrixF &transform )
    newPos.z += mOriginOffset;
 
    const Point3F &curPos = pxCast<Point3F>(mController->getDebugPosition());
-   
+
    if ( !(newPos - curPos ).isZero() )
       mController->setPosition( pxCast<NxExtendedVec3>(newPos) );
 }

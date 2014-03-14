@@ -36,7 +36,7 @@ bool SphereF::intersectsRay( const Point3F &start, const Point3F &end ) const
    dir.normalize();
 
    Point3F tmpStart = start;
-   worldToObj.mulP( tmpStart ); 
+   worldToObj.mulP( tmpStart );
 
    //Compute A, B and C coefficients
    F32 a = mDot(dir, dir);
@@ -46,7 +46,7 @@ bool SphereF::intersectsRay( const Point3F &start, const Point3F &end ) const
    //Find discriminant
    F32 disc = b * b - 4 * a * c;
 
-   // if discriminant is negative there are no real roots, so return 
+   // if discriminant is negative there are no real roots, so return
    // false as ray misses sphere
    if ( disc < 0 )
       return false;
@@ -86,7 +86,7 @@ bool SphereF::intersectsRay( const Point3F &start, const Point3F &end ) const
       return false;
 
    // if t0 is less than zero, the intersection point is at t1
-   if ( t0 < 0 ) // t = t1;     
+   if ( t0 < 0 ) // t = t1;
       return true;
    else // else the intersection point is at t0
       return true; // t = t0;

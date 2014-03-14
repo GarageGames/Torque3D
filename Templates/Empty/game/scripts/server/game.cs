@@ -141,7 +141,7 @@ function onServerCreated()
 
    // Create the server physics world.
    physicsInitWorld( "server" );
-   
+
    // Load up any objects or datablocks saved to the editor managed scripts
    %datablockFiles = new ArrayObject();
    %datablockFiles.add( "art/particles/managedParticleData.cs" );
@@ -149,7 +149,7 @@ function onServerCreated()
    %datablockFiles.add( "art/decals/managedDecalData.cs" );
    %datablockFiles.add( "art/datablocks/managedDatablocks.cs" );
    %datablockFiles.add( "art/forest/managedItemData.cs" );
-   %datablockFiles.add( "art/datablocks/datablockExec.cs" );   
+   %datablockFiles.add( "art/datablocks/datablockExec.cs" );
    loadDatablockFiles( %datablockFiles, true );
 
    // Run the other gameplay scripts in this folder
@@ -165,7 +165,7 @@ function onServerCreated()
 function onServerDestroyed()
 {
    // Destroy the server physcis world
-   physicsDestroyWorld( "server" );   
+   physicsDestroyWorld( "server" );
 }
 
 //-----------------------------------------------------------------------------
@@ -187,7 +187,7 @@ function onMissionEnded()
 {
    // Stop the server physics simulation
    physicsStopSimulation( "server" );
-   
+
    // Normally the game should be ended first before the next
    // mission is loaded, this is here in case loadMission has been
    // called directly.  The mission will be ended if the server

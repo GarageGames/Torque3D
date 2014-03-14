@@ -25,10 +25,10 @@
 
 #ifndef _GFXTEXTUREOBJECT_H_
 #include "gfx/gfxTextureObject.h"
-#endif 
+#endif
 #ifndef _GBITMAP_H_
 #include "gfx/bitmap/gBitmap.h"
-#endif 
+#endif
 #ifndef _DDSFILE_H_
 #include "gfx/bitmap/ddsFile.h"
 #endif
@@ -51,8 +51,8 @@ namespace Torque
 class GFXCubemap;
 
 
-class GFXTextureManager 
-{   
+class GFXTextureManager
+{
 public:
    enum
    {
@@ -81,7 +81,7 @@ public:
    /// resolutions down by a specific factor (you can specify different scale factors
    /// for different types of textures).
    ///
-   /// @note The base GFXTextureManager class provides all the logic to do this scaling. 
+   /// @note The base GFXTextureManager class provides all the logic to do this scaling.
    ///       Subclasses need only implement getTotalVideoMemory().
    ///
    /// @param  type     Type of the requested texture. This is used to determine scaling factors.
@@ -133,7 +133,7 @@ public:
    void requestDeleteTexture( GFXTextureObject *texture );
 
    /// @name Texture Necromancy
-   /// 
+   ///
    /// Texture necromancy in three easy steps:
    /// - If you want to destroy the texture manager, call kill().
    /// - If you want to switch resolutions, or otherwise reset the device, call zombify().
@@ -145,7 +145,7 @@ public:
    void zombify();
    void resurrect();
 
-   /// This releases any pooled textures which are 
+   /// This releases any pooled textures which are
    /// currently unused freeing up video memory.
    void cleanupPool();
 
@@ -183,7 +183,7 @@ protected:
    /// Exposed to script via $pref::Video::textureReductionLevel.
    ///
    /// @see GFXTextureProfile::PreserveSize
-   /// 
+   ///
    static S32 smTextureReductionLevel;
 
    /// File path to the missing texture
@@ -234,9 +234,9 @@ protected:
    /// Returns a free texture of the requested attributes from
    /// from the shared texture pool.  It returns NULL if no match
    /// is found.
-   GFXTextureObject* _findPooledTexure(   U32 width, 
-                                          U32 height, 
-                                          GFXFormat format, 
+   GFXTextureObject* _findPooledTexure(   U32 width,
+                                          U32 height,
+                                          GFXFormat format,
                                           GFXTextureProfile *profile,
                                           U32 numMipLevels,
                                           S32 antialiasLevel );
@@ -289,14 +289,14 @@ protected:
    ///                        If NULL create the full mip chain
    /// @param  antialiasLevel, Use GFXTextureManager::AA_MATCH_BACKBUFFER to match the backbuffer settings (for render targets that want to share
    ///                         the backbuffer z buffer.  0 for no antialiasing, > 0 for levels that match the GFXVideoMode struct.
-   virtual GFXTextureObject *_createTextureObject( U32 height, 
-                                                   U32 width, 
-                                                   U32 depth, 
-                                                   GFXFormat format, 
-                                                   GFXTextureProfile *profile, 
-                                                   U32 numMipLevels, 
-                                                   bool forceMips = false, 
-                                                   S32 antialiasLevel = 0, 
+   virtual GFXTextureObject *_createTextureObject( U32 height,
+                                                   U32 width,
+                                                   U32 depth,
+                                                   GFXFormat format,
+                                                   GFXTextureProfile *profile,
+                                                   U32 numMipLevels,
+                                                   bool forceMips = false,
+                                                   S32 antialiasLevel = 0,
                                                    GFXTextureObject *inTex = NULL ) = 0;
 
    /// Load a texture from a proper DDSFile instance.
@@ -327,7 +327,7 @@ protected:
    void _linkTexture( GFXTextureObject *obj );
 
    /// Validate the parameters for creating a texture.
-   void _validateTexParams( const U32 width, const U32 height, const GFXTextureProfile *profile, 
+   void _validateTexParams( const U32 width, const U32 height, const GFXTextureProfile *profile,
       U32 &inOutNumMips, GFXFormat &inOutFormat );
 
    // New texture manager methods for the cleanup work:
@@ -345,14 +345,14 @@ protected:
 
 
 template <class T,class U>
-inline void GFXTextureManager::addEventDelegate( T obj, U func ) 
+inline void GFXTextureManager::addEventDelegate( T obj, U func )
 {
    EventSignal::DelegateSig d( obj, func );
-   
-   AssertFatal( !smEventSignal.contains( d ), 
+
+   AssertFatal( !smEventSignal.contains( d ),
       "GFXTextureManager::addEventDelegate() - This is already registered!" );
 
-   smEventSignal.notify( d ); 
+   smEventSignal.notify( d );
 }
 
 inline void GFXTextureManager::reloadTexture( GFXTextureObject *texture )

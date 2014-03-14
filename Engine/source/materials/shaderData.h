@@ -80,9 +80,9 @@ protected:
    /// them if the content has changed.
    const Vector<GFXShaderMacro>& _getMacros();
 
-   /// Helper for converting an array of macros 
+   /// Helper for converting an array of macros
    /// into a formatted string.
-   void _stringizeMacros(  const Vector<GFXShaderMacro> &macros, 
+   void _stringizeMacros(  const Vector<GFXShaderMacro> &macros,
                            String *outString );
 
    /// Creates a new shader returning NULL on error.
@@ -96,7 +96,7 @@ public:
 
    ShaderData();
 
-   /// Returns an initialized shader instance or NULL 
+   /// Returns an initialized shader instance or NULL
    /// if the shader failed to be created.
    GFXShader* getShader( const Vector<GFXShaderMacro> &macros = Vector<GFXShaderMacro>() );
 
@@ -109,7 +109,7 @@ public:
 
    /// Returns the required pixel shader version for this shader.
    F32 getPixVersion() const { return mPixVersion; }
-   
+
    // SimObject
    virtual bool onAdd();
    virtual void onRemove();

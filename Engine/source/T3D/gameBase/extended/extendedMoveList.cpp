@@ -130,7 +130,7 @@ U32 ExtendedMoveList::getExtMoves( ExtendedMove** movePtr, U32 *numMoves )
 
 void ExtendedMoveList::collectMove()
 {
-   ExtendedMove mv;   
+   ExtendedMove mv;
    if (mConnection)
    {
       if(!mConnection->isPlayingBack() && getNextExtMove(mv))
@@ -185,13 +185,13 @@ void ExtendedMoveList::clearMoves(U32 count)
          // drop right away if no connection
          ackMoves(count);
    }
-   else 
+   else
    {
       AssertFatal(count <= mExtMoveVec.size(),"GameConnection: Clearing too many moves");
       for (S32 i=0; i<count; i++)
          if (mExtMoveVec[i].checksum == Move::ChecksumMismatch)
             mControlMismatch = true;
-         else 
+         else
             mControlMismatch = false;
       if (count == mExtMoveVec.size())
          mExtMoveVec.clear();
@@ -259,11 +259,11 @@ void ExtendedMoveList::serverReadMovePacket(BitStream *bstream)
    // Skip forward (must be starting up), or over the moves
    // we already have.
    int skip = mLastMoveAck - start;
-   if (skip < 0) 
+   if (skip < 0)
    {
       mLastMoveAck = start;
    }
-   else 
+   else
    {
       if (skip > count)
          skip = count;
@@ -348,7 +348,7 @@ bool ExtendedMoveList::isBacklogged()
    if ( !mConnection->isConnectionToServer() )
       return false;
 
-   return mLastClientMove - mFirstMoveIndex == mExtMoveVec.size() && 
+   return mLastClientMove - mFirstMoveIndex == mExtMoveVec.size() &&
           mExtMoveVec.size() >= MaxMoveCount;
 }
 

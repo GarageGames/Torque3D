@@ -59,7 +59,7 @@ class RenderObjectExample : public SceneObject
    // the client version of the object to receive updates
    // from the server version (like if it has been moved
    // or edited)
-   enum MaskBits 
+   enum MaskBits
    {
       TransformMask = Parent::NextFreeMask << 0,
       NextFreeMask  = Parent::NextFreeMask << 1

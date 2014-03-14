@@ -160,7 +160,7 @@ class Vector
    void sort(compare_func f);
    void fill( const T& value );
 
-   /// Finds the first matching element and erases it.   
+   /// Finds the first matching element and erases it.
    /// @return Returns true if a match is found.
    bool remove( const T& );
 
@@ -303,7 +303,7 @@ template<class T> inline T* Vector<T>::address() const
 template<class T> inline U32 Vector<T>::setSize(U32 size)
 {
    const U32 oldSize = mElementCount;
-   
+
    if(size > mElementCount)
    {
       if (size > mArraySize)
@@ -378,7 +378,7 @@ template<class T> inline void Vector<T>::insert(U32 index)
    dMemmove(&mArray[index + 1],
                     &mArray[index],
                     (mElementCount - index - 1) * sizeof(value_type));
-   
+
    constructInPlace(&mArray[index]);
 }
 
@@ -519,16 +519,16 @@ template<class T> inline Vector<T>& Vector<T>::operator=(const Vector<T>& p)
    {
       destroy(p.mElementCount, mElementCount);
    }
-   
+
    U32 count = getMin( mElementCount, p.mElementCount );
    U32 i;
    for( i=0; i < count; i++ )
    {
       mArray[i] = p.mArray[i];
    }
-   
+
    resize( p.mElementCount );
-   
+
    if( i < p.mElementCount )
    {
       construct(i, p.mElementCount, p.mArray);

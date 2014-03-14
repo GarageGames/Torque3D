@@ -40,22 +40,22 @@ class StdClientProcessList : public ClientProcessList
    typedef ClientProcessList Parent;
 
 protected:
-   
+
    // ProcessList
    void onTickObject(ProcessObject *);
    void advanceObjects();
    void onAdvanceObjects();
-   
+
 public:
 
-   StdClientProcessList();  
+   StdClientProcessList();
 
    // ProcessList
    bool advanceTime( SimTime timeDelta );
-   
+
    // ClientProcessList
    void clientCatchup( GameConnection *conn );
-   
+
    static void init();
    static void shutdown();
 };
@@ -73,7 +73,7 @@ protected:
 
 public:
 
-   StdServerProcessList();  
+   StdServerProcessList();
 
    static void init();
    static void shutdown();

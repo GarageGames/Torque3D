@@ -47,13 +47,13 @@ class ConsoleBaseType
 
       /// Unique numeric type ID.
       S32 mTypeID;
-            
+
       /// Size of a single data value point.
       dsize_t mTypeSize;
-      
+
       /// Name of this console type (TypeXXX).
       StringTableEntry mTypeName;
-      
+
       /// Name of GuiInspectorField subclass to instantiate for field edit controls in
       /// inspectors.
       const char* mInspectorFieldType;
@@ -66,7 +66,7 @@ class ConsoleBaseType
       /// instance may be shared by multiple ConsoleBaseType instances.
       /// NULL if the console type is not mapped to an engine API type.
       const EngineTypeInfo* mTypeInfo;
-      
+
       /// Total number of defined console types.  This is used to generate unique IDs for each type.
       static S32 smConsoleTypeCount;
 
@@ -79,7 +79,7 @@ class ConsoleBaseType
 
       /// Destructor is private to avoid people mucking up the list.
       ~ConsoleBaseType() {}
- 
+
    public:
 
       /// @name cbt_list List Interface
@@ -106,52 +106,52 @@ class ConsoleBaseType
       /// Call to get a pointer to a type's info
       static ConsoleBaseType *getTypeByName( const char *typeName );
       static ConsoleBaseType *getTypeByClassName( const char *typeName );
-      
+
       /// Return the unique numeric ID of this type.
       S32 getTypeID() const { return mTypeID; }
-      
+
       /// Return the size of a single value in bytes.
       S32 getTypeSize() const { return mTypeSize; }
-      
+
       /// Return the console type name (TypeXXX).
       StringTableEntry getTypeName() const { return mTypeName; }
-      
+
       /// Return the type info for the engine type corresponding to this console type or NULL if
       /// there is no mapping for the console type.
       const EngineTypeInfo* getTypeInfo() const { return mTypeInfo; }
-            
+
       /// Return the documentation string for this type.
       const char* getDocString() const { return getTypeInfo() ? getTypeInfo()->getDocString() : ""; }
-      
+
       /// Return the EnumTable for this type (only for enumeration types).
       const EngineEnumTable* getEnumTable() const { return getTypeInfo() ? getTypeInfo()->getEnumTable() : NULL; }
-      
+
       /// Return the name of the GuiInspectorField subclass that fields of this
       /// type should use for editing.
       const char* getInspectorFieldType() { return mInspectorFieldType; }
-      
+
       /// Set the name of the GuiInspectorField subclass that fields of this type
       /// should use for editing.
       void setInspectorFieldType( const char* type ) { mInspectorFieldType = type; }
-      
+
       /// @name Value Handling Interface
       /// @{
 
       virtual void setData( void* dptr, S32 argc, const char** argv, const EnumTable* tbl, BitSet32 flag ) = 0;
       virtual const char* getData( void* dptr, const EnumTable* tbl, BitSet32 flag ) = 0;
       virtual const char* getTypeClassName() = 0;
-      
+
       /// Allocate a single value.
       virtual void* getNativeVariable() = 0;
-      
+
       /// Delete a single value allocated with getNativeVariable().
       virtual void deleteNativeVariable(void* var) = 0;
-      
+
       /// Return true if this is datablock object type.
       virtual const bool isDatablock() { return false; };
-      
+
       virtual const char* prepData( const char* data, char* buffer, U32 bufferLen ) { return data; };
-      
+
       /// @}
 };
 
@@ -159,14 +159,14 @@ class ConsoleBaseType
 class EnumConsoleBaseType : public ConsoleBaseType
 {
    public:
-   
+
       typedef ConsoleBaseType Parent;
-      
+
    protected:
-   
+
       EnumConsoleBaseType( S32 size, S32* idPtr, const char* typeName )
          : Parent( size, idPtr, typeName ) {}
-         
+
    public:
 
       virtual const char* getData(void *dptr, const EnumTable *tbl, BitSet32 flag)
@@ -199,14 +199,14 @@ class EnumConsoleBaseType : public ConsoleBaseType
 class BitfieldConsoleBaseType : public ConsoleBaseType
 {
    public:
-   
+
       typedef ConsoleBaseType Parent;
-      
+
    protected:
-   
+
       BitfieldConsoleBaseType( S32 size, S32* idPtr, const char* typeName )
          : Parent( size, idPtr, typeName ) {}
-         
+
    public:
 
       virtual const char* getData( void* dptr, const EnumTable*, BitSet32 )
@@ -253,7 +253,7 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
    extern const char* castConsoleTypeToString( _ConsoleConstType< nativeType >::ConstType &arg ); \
    extern bool castConsoleTypeFromString( nativeType &arg, const char *str ); \
    template<> S32 TYPEID< nativeType >();
-   
+
 #define DefineUnmappedConsoleType( type, nativeType ) \
    DefineConsoleType( type, nativeType ) \
    template<> inline const EngineTypeInfo* _MAPTYPE< nativeType >() { return NULL; }
@@ -311,8 +311,8 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
 
 #define ConsoleProcessData( type ) \
    const char *ConsoleType##type::prepData(const char *data, char *buffer, U32 bufferSz)
-   
-   
+
+
 #define DefineEnumType( type ) \
    DECLARE_ENUM( type ); \
    DefineConsoleType( Type ## type, type );
@@ -337,7 +337,7 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
 #define ImplementEnumType( type, doc ) \
    _ConsoleEnumType( type, Type ## type, type ) \
    IMPLEMENT_ENUM( type, type,, doc )
-   
+
 #define EndImplementEnumType \
    END_IMPLEMENT_ENUM
 
@@ -362,11 +362,11 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
       virtual void        deleteNativeVariable(void* var) { nativeType* nativeVar = reinterpret_cast< nativeType* >( var ); delete nativeVar; }\
    }; \
    BitfieldConsoleType ## type gConsoleType ## type ## Instance;
-      
+
 #define ImplementBitfieldType( type, doc ) \
    _ConsoleBitfieldType( type, Type ## type, type ) \
    IMPLEMENT_BITFIELD( type, type,, doc )
-   
+
 #define EndImplementBitfieldType \
    END_IMPLEMENT_BITFIELD
 

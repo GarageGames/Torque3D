@@ -285,7 +285,7 @@ bool LightningData::preload(bool server, String &errorStr)
       //
    }
 
-   if (server == false) 
+   if (server == false)
    {
       String errorStr;
       for (U32 i = 0; i < MaxThunders; i++) {
@@ -296,7 +296,7 @@ bool LightningData::preload(bool server, String &errorStr)
       if( !sfxResolve( &strikeSound, errorStr ) )
          Con::errorf(ConsoleLogEntry::General, "LightningData::preload: Invalid packet: %s", errorStr.c_str());
 
-      for (U32 i = 0; i < MaxTextures; i++) 
+      for (U32 i = 0; i < MaxTextures; i++)
       {
          if (strikeTextureNames[i][0])
             strikeTextures[i] = GFXTexHandle(strikeTextureNames[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - strikeTextures[%d] (line %d)", __FUNCTION__, i, __LINE__));
@@ -913,7 +913,7 @@ DefineEngineMethod(Lightning, warningFlashes, void, (),,
    "%lightning.warningFlashes();\n"
    "@endtsexample" )
 {
-   if (object->isServerObject()) 
+   if (object->isServerObject())
       object->warningFlashes();
 }
 
@@ -925,7 +925,7 @@ DefineEngineMethod(Lightning, strikeRandomPoint, void, (),,
    "%lightning.strikeRandomPoint();\n"
    "@endtsexample" )
 {
-   if (object->isServerObject()) 
+   if (object->isServerObject())
       object->strikeRandomPoint();
 }
 
@@ -1160,7 +1160,7 @@ void LightningBolt::createSplit( const Point3F &startPoint, const Point3F &endPo
 {
    if( depth == 0 )
       return;
-	  
+
    F32 chanceToEnd = gRandGen.randF();
    if( chanceToEnd > 0.70f )
       return;

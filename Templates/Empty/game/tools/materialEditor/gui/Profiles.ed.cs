@@ -36,7 +36,7 @@ singleton GuiControlProfile (GuiMatEdRightJustifyProfile)
    fontCharset = ANSI;
 
    fontColor = "0 0 0";
-   
+
    justify = "right";
    category = "Editor";
 };

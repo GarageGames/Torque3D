@@ -181,7 +181,7 @@ function setDefault( %name, %value )
 
 setDefault( "$pref::WorldEditor::visibleDistanceScale", "1" ); // DAW: Keep this around for now as is used by EditTSCtrl
 
-// JCF: Couldn't some or all of these be exposed 
+// JCF: Couldn't some or all of these be exposed
 // from WorldEditor::ConsoleInit via Con::AddVariable()
 // and do away with this file?
 
@@ -196,7 +196,7 @@ function EditorGui::readWorldEditorSettings(%this)
    EWorldEditor.renderOrthoGrid           = EditorSettings.value( "orthoShowGrid" );
    %this.currentEditor                    = EditorSettings.value( "currentEditor" );
    %this.torsionPath                      = EditorSettings.value( "torsionPath" );
-   
+
    EditorSettings.beginGroup( "ObjectIcons" );
    EWorldEditor.fadeIcons                 = EditorSettings.value( "fadeIcons" );
    EWorldEditor.fadeIconsStartDist        = EditorSettings.value( "fadeIconsStartDist" );
@@ -204,7 +204,7 @@ function EditorGui::readWorldEditorSettings(%this)
    EWorldEditor.fadeIconsStartAlpha       = EditorSettings.value( "fadeIconsStartAlpha" );
    EWorldEditor.fadeIconsEndAlpha         = EditorSettings.value( "fadeIconsEndAlpha" );
    EditorSettings.endGroup();
-   
+
    EditorSettings.beginGroup( "Grid" );
    EWorldEditor.gridSize                  = EditorSettings.value( "gridSize" );
    EWorldEditor.gridSnap                  = EditorSettings.value( "gridSnap" );
@@ -212,7 +212,7 @@ function EditorGui::readWorldEditorSettings(%this)
    EWorldEditor.gridOriginColor           = EditorSettings.value( "gridOriginColor" );
    EWorldEditor.gridMinorColor            = EditorSettings.value( "gridMinorColor" );
    EditorSettings.endGroup();
-   
+
    EditorSettings.beginGroup( "Tools" );
    EWorldEditor.stickToGround             = EditorSettings.value("snapGround");                 //$pref::WorldEditor::snapGround;
    EWorldEditor.setSoftSnap( EditorSettings.value("snapSoft") );                                //$pref::WorldEditor::snapSoft
@@ -227,8 +227,8 @@ function EditorGui::readWorldEditorSettings(%this)
    EWorldEditor.renderObjHandle           = EditorSettings.value("renderObjHandle");            //$pref::WorldEditor::renderObjHandle;
    EWorldEditor.renderObjText             = EditorSettings.value("renderObjText");              //$pref::WorldEditor::renderObjText;
    EWorldEditor.renderPopupBackground     = EditorSettings.value("renderPopupBackground");      //$pref::WorldEditor::renderPopupBackground;
-   EWorldEditor.renderSelectionBox        = EditorSettings.value("renderSelectionBox");         //$pref::WorldEditor::renderSelectionBox;   
-   EWorldEditor.showMousePopupInfo        = EditorSettings.value("showMousePopupInfo");         //$pref::WorldEditor::showMousePopupInfo;   
+   EWorldEditor.renderSelectionBox        = EditorSettings.value("renderSelectionBox");         //$pref::WorldEditor::renderSelectionBox;
+   EWorldEditor.showMousePopupInfo        = EditorSettings.value("showMousePopupInfo");         //$pref::WorldEditor::showMousePopupInfo;
    EditorSettings.endGroup();
 
    EditorSettings.beginGroup( "Color" );
@@ -238,7 +238,7 @@ function EditorGui::readWorldEditorSettings(%this)
    EWorldEditor.objMouseOverSelectColor   = EditorSettings.value("objMouseOverSelectColor");    //$pref::WorldEditor::objMouseOverSelectColor;
    EWorldEditor.objSelectColor            = EditorSettings.value("objSelectColor");             //$pref::WorldEditor::objSelectColor;
    EWorldEditor.popupBackgroundColor      = EditorSettings.value("popupBackgroundColor");       //$pref::WorldEditor::popupBackgroundColor;
-   EWorldEditor.popupTextColor            = EditorSettings.value("popupTextColor");             //$pref::WorldEditor::popupTextColor;   
+   EWorldEditor.popupTextColor            = EditorSettings.value("popupTextColor");             //$pref::WorldEditor::popupTextColor;
    EWorldEditor.selectionBoxColor         = EditorSettings.value("selectionBoxColor");          //$pref::WorldEditor::selectionBoxColor;
    EditorSettings.endGroup();
 
@@ -258,7 +258,7 @@ function EditorGui::readWorldEditorSettings(%this)
    //EWorldEditor.planarMovement            = $pref::WorldEditor::planarMovement;   //<-- What is this used for?
 
    EditorSettings.endGroup(); // WorldEditor
-   
+
    EditorSettings.beginGroup( "AxisGizmo", true );
    GlobalGizmoProfile.screenLength        = EditorSettings.value("axisGizmoMaxScreenLen");      //$pref::WorldEditor::axisGizmoMaxScreenLen;
    GlobalGizmoProfile.rotationSnap        = EditorSettings.value("rotationSnap");               //$pref::WorldEditor::rotationSnap;
@@ -273,7 +273,7 @@ function EditorGui::readWorldEditorSettings(%this)
    GlobalGizmoProfile.gridSize            = EditorSettings.value("gridSize");                   //$pref::WorldEditor::gridSize;
    GlobalGizmoProfile.snapToGrid          = EditorSettings.value("snapToGrid");                 //$pref::WorldEditor::snapToGrid;
    GlobalGizmoProfile.renderPlane         = EditorSettings.value("renderPlane");                //$pref::WorldEditor::renderPlane;
-   GlobalGizmoProfile.renderPlaneHashes   = EditorSettings.value("renderPlaneHashes");          //$pref::WorldEditor::renderPlaneHashes;   
+   GlobalGizmoProfile.renderPlaneHashes   = EditorSettings.value("renderPlaneHashes");          //$pref::WorldEditor::renderPlaneHashes;
    GlobalGizmoProfile.planeDim            = EditorSettings.value("planeDim");                   //$pref::WorldEditor::planeDim;
    EditorSettings.endGroup();
 
@@ -291,7 +291,7 @@ function EditorGui::writeWorldEditorSettings(%this)
    EditorSettings.setValue( "orthoShowGrid",          EWorldEditor.renderOrthoGrid );
    EditorSettings.setValue( "currentEditor",          %this.currentEditor );
    EditorSettings.setvalue( "torsionPath",            %this.torsionPath );
-   
+
    EditorSettings.beginGroup( "ObjectIcons" );
    EditorSettings.setValue( "fadeIcons",              EWorldEditor.fadeIcons );
    EditorSettings.setValue( "fadeIconsStartDist",     EWorldEditor.fadeIconsStartDist );
@@ -341,7 +341,7 @@ function EditorGui::writeWorldEditorSettings(%this)
    EditorSettings.setValue( "selectHandle",           EWorldEditor.selectHandle );           //$Pref::WorldEditor::selectHandle
    EditorSettings.setValue( "lockedHandle",           EWorldEditor.lockedHandle );           //$Pref::WorldEditor::lockedHandle
    EditorSettings.endGroup();
-   
+
    EditorSettings.beginGroup( "Docs" );
    EditorSettings.setValue(  "documentationLocal",    EWorldEditor.documentationLocal );
    EditorSettings.setValue(  "documentationReference",    EWorldEditor.documentationReference );
@@ -350,7 +350,7 @@ function EditorGui::writeWorldEditorSettings(%this)
    EditorSettings.endGroup();
 
    EditorSettings.endGroup(); // WorldEditor
-   
+
    EditorSettings.beginGroup( "AxisGizmo", true );
 
    EditorSettings.setValue( "axisGizmoMaxScreenLen",  GlobalGizmoProfile.screenLength );     //$Pref::WorldEditor::axisGizmoMaxScreenLen
@@ -406,7 +406,7 @@ function EditorGui::readTerrainEditorSettings(%this)
 function EditorGui::writeTerrainEditorSettings(%this)
 {
    EditorSettings.beginGroup( "TerrainEditor", true );
-   
+
    EditorSettings.setValue( "currentAction",          ETerrainEditor.savedAction );
 
    EditorSettings.beginGroup( "Brush" );

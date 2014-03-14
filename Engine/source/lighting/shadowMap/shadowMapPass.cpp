@@ -119,8 +119,8 @@ ShadowMapPass::~ShadowMapPass()
       mShadowRPM->deleteObject();
 }
 
-void ShadowMapPass::render(   SceneManager *sceneManager, 
-                              const SceneRenderState *diffuseState, 
+void ShadowMapPass::render(   SceneManager *sceneManager,
+                              const SceneRenderState *diffuseState,
                               U32 objectMask )
 {
    PROFILE_SCOPE( ShadowMapPass_Render );
@@ -140,7 +140,7 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
    mActiveLights = mLights.size();
 
    // Use the per-frame incremented time for
-   // priority updates and to track when the 
+   // priority updates and to track when the
    // shadow was last updated.
    const U32 currTime = Sim::getCurrentTime();
 
@@ -152,18 +152,18 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
    {
       ShadowMapParams *params = mLights[i]->getExtended<ShadowMapParams>();
 
-      // Before we do anything... skip lights without shadows.      
+      // Before we do anything... skip lights without shadows.
       if ( !mLights[i]->getCastShadows() || smDisableShadows )
          continue;
 
       LightShadowMap *lsm = params->getOrCreateShadowMap();
 
-      // First check the visiblity query... if it wasn't 
+      // First check the visiblity query... if it wasn't
       // visible skip it.
       if ( lsm->wasOccluded() )
          continue;
 
-      // Any shadow that is visible is counted as being 
+      // Any shadow that is visible is counted as being
       // active regardless if we update it or not.
       ++smActiveShadowMaps;
 
@@ -178,7 +178,7 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
 
    GFXDEBUGEVENT_SCOPE( ShadowMapPass_Render, ColorI::RED );
 
-   // Use a timer for tracking our shadow rendering 
+   // Use a timer for tracking our shadow rendering
    // budget to ensure a high precision results.
    mTimer->getElapsedMs();
    mTimer->reset();
@@ -204,7 +204,7 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
          continue;
       }
 
-      // See if we're over our frame budget for shadow 
+      // See if we're over our frame budget for shadow
       // updates... give up completely in that case.
       if ( mTimer->getElapsedMs() > smRenderBudgetMs )
          break;

@@ -45,13 +45,13 @@ function EUndoManager::updateUndoMenu( %this, %editMenu )
    // TODO: If we ever fix the TerrainEditor and WorldEditor
    // to have descriptive UndoAction names then we can change
    // the text as part of the menu update.
-      
+
    %undoName = %this.getNextUndoName();
    %redoName = %this.getNextRedoName();
-   
+
    %editMenu.setItemName( 0, "Undo " @ %undoName );
    %editMenu.setItemName( 1, "Redo " @ %redoName );
-   
+
    %editMenu.enableItem( 0, %undoName !$= "" );
    %editMenu.enableItem( 1, %redoName !$= "" );
 }
@@ -61,21 +61,21 @@ function EUndoManager::updateUndoMenu( %this, %editMenu )
 function MECreateUndoAction::submit( %undoObject )
 {
    // The instant group will try to add our
-   // UndoAction if we don't disable it.   
+   // UndoAction if we don't disable it.
    pushInstantGroup();
-   
-   // Create the undo action.     
+
+   // Create the undo action.
    %action = new MECreateUndoAction()
    {
       actionName = "Create " @ %undoObject.getClassName();
    };
-   
+
    // Restore the instant group.
    popInstantGroup();
-   
+
    // Set the object to undo.
    %action.addObject( %undoObject );
-   
+
    // Submit it.
    %action.addToManager( Editor.getUndoManager() );
 }
@@ -97,10 +97,10 @@ function MECreateUndoAction::onRedone( %this )
 function MEDeleteUndoAction::submit( %deleteObjects, %wordSeperated )
 {
    // The instant group will try to add our
-   // UndoAction if we don't disable it.   
+   // UndoAction if we don't disable it.
    pushInstantGroup();
-   
-   // Create the undo action.     
+
+   // Create the undo action.
    %action = new MEDeleteUndoAction()
    {
       actionName = "Delete";
@@ -108,11 +108,11 @@ function MEDeleteUndoAction::submit( %deleteObjects, %wordSeperated )
 
    // Restore the instant group.
    popInstantGroup();
-   
+
    // Add the deletion objects to the action which
    // will take care of properly deleting them.
-   %deleteObjects = trim( %deleteObjects );   
-   
+   %deleteObjects = trim( %deleteObjects );
+
    if ( %wordSeperated )
    {
       %count = getWordCount( %deleteObjects );
@@ -131,7 +131,7 @@ function MEDeleteUndoAction::submit( %deleteObjects, %wordSeperated )
          %action.deleteObject( %object );
       }
    }
-   
+
    // Submit it.
    %action.addToManager( Editor.getUndoManager() );
 }

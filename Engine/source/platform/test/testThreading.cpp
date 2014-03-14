@@ -36,7 +36,7 @@ class ThreadTestHarness
    void (*mThreadBody)(void*);
    S32 mThreadCount;
    Thread **mThreads;
-   
+
 public:
    ThreadTestHarness()
    {
@@ -50,12 +50,12 @@ public:
    {
       mThreadCount = threadCount;
       mThreadBody = threadBody;
-      
+
       // Start up threadCount threads...
       mThreads = new Thread*[threadCount];
-      
+
       mStartTime = Platform::getRealMilliseconds();
-      
+
       //Con::printf("   Running with %d threads...", threadCount);
       for(S32 i=0; i<mThreadCount; i++)
       {
@@ -69,7 +69,7 @@ public:
       // And wait for them to complete.
       bool someAlive = true;
       S32 liveCount = mThreadCount;
-      
+
       while(someAlive)
       {
          //Con::printf("      - Sleeping for %dms with %d live threads.", checkFrequencyMs, liveCount);
@@ -77,7 +77,7 @@ public:
 
          someAlive = false;
          liveCount = 0;
-         
+
          for(S32 i=0; i<mThreadCount; i++)
          {
             if(!mThreads[i]->isAlive())
@@ -88,19 +88,19 @@ public:
          }
 
       }
-      
+
       mEndTime = Platform::getRealMilliseconds();
 
       // Clean up memory at this point.
       for(S32 i=0; i<mThreadCount; i++)
          delete mThreads[i];
       delete[] mThreads;
-      
+
       // Make sure we didn't take a long time to complete.
       mCleanupTime = Platform::getRealMilliseconds();
 
       // And dump some stats.
-      Con::printf("   Took approximately %dms (+/- %dms) to run %d threads, and %dms to cleanup.", 
+      Con::printf("   Took approximately %dms (+/- %dms) to run %d threads, and %dms to cleanup.",
                   (mEndTime - mStartTime),
                   checkFrequencyMs,
                   mThreadCount,
@@ -113,7 +113,7 @@ CreateUnitTest( ThreadSanityCheck, "Platform/Threads/BasicSanity")
 {
    const static S32 amountOfWork = 100;
    const static S32 numberOfThreads = 8;
-   
+
    static void threadBody(void *)
    {
       S32 work = 0x381f4fd3;
@@ -122,16 +122,16 @@ CreateUnitTest( ThreadSanityCheck, "Platform/Threads/BasicSanity")
       {
          // Do a little computation...
          work ^= (i + work | amountOfWork);
-         
+
          // And sleep a slightly variable bit.
          Platform::sleep(10 + ((work+i) % 10));
       }
    }
-   
+
    void runNThreads(S32 threadCount)
    {
       ThreadTestHarness tth;
-      
+
       tth.startThreads(&threadBody, NULL, threadCount);
       tth.waitForThreadExit(32);
    }
@@ -147,9 +147,9 @@ CreateUnitTest( MutexStressTest, "Platform/Threads/MutexStress")
 {
    const static S32 numberOfLocks = 100;
    const static S32 numberOfThreads = 4;
-   
+
    void *mMutex;
-   
+
    static void threadBody(void *mutex)
    {
       // Acquire the mutex numberOfLocks times. Sleep for 1ms, acquire, sleep, release.
@@ -162,19 +162,19 @@ CreateUnitTest( MutexStressTest, "Platform/Threads/MutexStress")
          Mutex::unlockMutex(mutex);
       }
    }
-   
+
    void runNThreads(S32 threadCount)
    {
       ThreadTestHarness tth;
-      
+
       mMutex = Mutex::createMutex();
-      
+
       tth.startThreads(&threadBody, mMutex, threadCount);
-      
+
       // We fudge the wait period to be about the expected time assuming
       // perfect execution speed.
       tth.waitForThreadExit(32); //threadCount * 2 * numberOfLocks + 100);
-      
+
       Mutex::destroyMutex(mMutex);
    }
 
@@ -191,9 +191,9 @@ CreateUnitTest( MemoryStressTest, "Platform/Threads/MemoryStress")
    const static S32 minAllocSize = 13;
    const static S32 maxAllocSize = 1024 * 1024;
    const static S32 numberOfThreads = 4;
-   
+
    void *mMutex;
-   
+
    // Cheap little RNG so we can vary our allocations more uniquely per thread.
    static U32 threadRandom(U32 &seed, U32 min, U32 max)
    {
@@ -202,7 +202,7 @@ CreateUnitTest( MemoryStressTest, "Platform/Threads/MemoryStress")
       res %= (max - min);
       return res + min;
    }
-   
+
    static void threadBody(void *mutex)
    {
       // Acquire the mutex numberOfLocks times. Sleep for 1ms, acquire, sleep, release.
@@ -214,19 +214,19 @@ CreateUnitTest( MemoryStressTest, "Platform/Threads/MemoryStress")
          delete[] mem;
       }
    }
-   
+
    void runNThreads(S32 threadCount)
    {
       ThreadTestHarness tth;
-      
+
       mMutex = Mutex::createMutex();
-      
+
       tth.startThreads(&threadBody, mMutex, threadCount);
-      
+
       // We fudge the wait period to be about the expected time assuming
       // perfect execution speed.
       tth.waitForThreadExit(32);
-      
+
       Mutex::destroyMutex(mMutex);
    }
 
@@ -244,24 +244,24 @@ CreateUnitTest( ThreadGymnastics, "Platform/Threads/BasicSynchronization")
       // We test various scenarios wrt to locking and unlocking, in a single
       // thread, just to make sure our basic primitives are working in the
       // most basic case.
-      
+
       void *mutex1 = Mutex::createMutex();
       test(mutex1, "First Mutex::createMutex call failed - that's pretty bad!");
-      
+
       void *mutex2 = Mutex::createMutex();
       test(mutex2, "Second Mutex::createMutex call failed - that's pretty bad, too!");
-      
+
       test(Mutex::lockMutex(mutex1, false), "Nonblocking call to brand new mutex failed - should not be.");
       test(Mutex::lockMutex(mutex1, true), "Failed relocking a mutex from the same thread - should be able to do this.");
-      
+
       // Unlock & kill mutex 1
       Mutex::unlockMutex(mutex1);
       Mutex::unlockMutex(mutex1);
       Mutex::destroyMutex(mutex1);
-      
+
       // Kill mutex2, which was never touched.
       Mutex::destroyMutex(mutex2);
-      
+
       // Now we can test semaphores.
       Semaphore *sem1 = new Semaphore(1);
       Semaphore *sem2 = new Semaphore(1);
@@ -269,19 +269,19 @@ CreateUnitTest( ThreadGymnastics, "Platform/Threads/BasicSynchronization")
       // Test that we can do non-blocking acquires that succeed.
       test(sem1->acquire(false), "Should succeed at acquiring a new semaphore with count 1.");
       test(sem2->acquire(false), "This one should succeed too, see previous test.");
-      
+
       // Test that we can do non-blocking acquires that fail.
       test(sem1->acquire(false)==false, "Should failed, as we've already got the sem.");
       sem1->release();
       test(sem2->acquire(false)==false, "Should also fail.");
       sem2->release();
-      
+
       // Test that we can do blocking acquires that succeed.
       test(sem1->acquire(true)==true, "Should succeed as we just released.");
       test(sem2->acquire(true)==true, "Should succeed as we just released.");
-      
+
       // Can't test blocking acquires that never happen... :)
-      
+
       // Clean up.
       delete sem1;
       delete sem2;
@@ -296,12 +296,12 @@ CreateUnitTest( SemaphoreWaitTest, "Platform/Threads/SemaphoreWaitTest")
 
       // Wait for the semaphore to get released.
       me->mSemaphore->acquire();
-      
+
       // Increment the counter.
       Mutex::lockMutex(me->mMutex);
       me->mDoneCount++;
       Mutex::unlockMutex(me->mMutex);
-      
+
       // Signal back to the main thread we're done.
       me->mPostbackSemaphore->release();
    }
@@ -316,20 +316,20 @@ CreateUnitTest( SemaphoreWaitTest, "Platform/Threads/SemaphoreWaitTest")
    void run()
    {
       ThreadTestHarness tth;
-      
+
       mDoneCount = 0;
       mSemaphore = new Semaphore(0);
       mPostbackSemaphore = new Semaphore(0);
       mMutex = Mutex::createMutex();
-      
+
       tth.startThreads(&threadBody, this, csmThreadCount);
-      
+
       Platform::sleep(500);
 
       Mutex::lockMutex(mMutex);
       test(mDoneCount == 0, "no threads should have touched the counter yet.");
       Mutex::unlockMutex(mMutex);
-      
+
       // Let 500 come out.
       for(S32 i=0; i<csmThreadCount/2; i++)
          mSemaphore->release();
@@ -354,7 +354,7 @@ CreateUnitTest( SemaphoreWaitTest, "Platform/Threads/SemaphoreWaitTest")
       Mutex::lockMutex(mMutex);
       test(mDoneCount == csmThreadCount, "Didn't get expected number of done threads! (b)");
       Mutex::unlockMutex(mMutex);
-      
+
       // Wait for the threads to exit - shouldn't have to wait ever though.
       tth.waitForThreadExit(10);
 
@@ -382,12 +382,12 @@ CreateUnitTest( MutexWaitTest, "Platform/Threads/MutexWaitTest")
    U32 mDoneCount;
 
    const static int csmThreadCount = 10;
-   
+
    void run()
    {
-      mMutex = Mutex::createMutex();      
+      mMutex = Mutex::createMutex();
       mDoneCount = 0;
-      
+
       // We lock the mutex before we create any threads, so that all the threads
       // block on the mutex. Then we unlock it and let them all work their way
       // through the increment.
@@ -395,22 +395,22 @@ CreateUnitTest( MutexWaitTest, "Platform/Threads/MutexWaitTest")
 
       ThreadTestHarness tth;
       tth.startThreads(&threadBody, this, csmThreadCount);
-      
+
       Platform::sleep(5000);
 
       // Check count is still zero.
       test(mDoneCount == 0, "Uh oh - a thread somehow didn't get blocked by the locked mutex!");
-      
+
       // Open the flood gates...
       Mutex::unlockMutex(mMutex);
-      
+
       // Wait for the threads to all finish executing.
       tth.waitForThreadExit(10);
-      
+
       Mutex::lockMutex(mMutex);
       test(mDoneCount == csmThreadCount, "Hmm - all threads reported done, but we didn't get the expected count.");
       Mutex::unlockMutex(mMutex);
-      
+
       // Kill the mutex.
       Mutex::destroyMutex(mMutex);
    }

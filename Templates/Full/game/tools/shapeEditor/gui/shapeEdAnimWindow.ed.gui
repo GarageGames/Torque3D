@@ -103,7 +103,7 @@
             sinkAllKeyEvents = "0";
             passwordMask = "*";
          };
-         
+
          new GuiSliderCtrl(ShapeEdSeqSlider) {
             canSaveDynamicFields = "0";
             isContainer = "0";
@@ -122,7 +122,7 @@
             value = "0";
             Variable = "$ShapeEdCurrentFrame";
          };
-         
+
          new GuiTextEditCtrl() {
             internalName = "seqOut";
             canSaveDynamicFields = "0";
@@ -431,7 +431,7 @@
          bitmap = "tools/shapeEditor/images/seq_bar-out";
          ToolTip = "Set the Out Point to the Current Frame";
          Command = "ShapeEdSequences.onEditSeqInOut(\"out\", ShapeEdSeqSlider.getValue());";
-      };      
+      };
    };
 };
 

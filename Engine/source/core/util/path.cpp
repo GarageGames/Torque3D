@@ -321,7 +321,7 @@ const String& Path::setRoot(const String &s)
 const String& Path::setPath(const String &s)
 {
    String   clean = CleanSeparators(s);
-   
+
    if ( mPath != clean )
    {
       mIsDirtyPath = true;
@@ -352,7 +352,7 @@ const String& Path::setExtension(const String &s)
       mExt = s;
    }
 
-   return mExt; 
+   return mExt;
 }
 
 bool Path::isDirectory() const

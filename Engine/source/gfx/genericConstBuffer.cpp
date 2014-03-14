@@ -76,13 +76,13 @@ bool GenericConstBufferLayout::set(const ParamDesc& pd, const GFXShaderConstType
    // So long as the real paramater is a matrix of-some-type and the data
    // passed in is a MatrixF ( which is will be ), we DO NOT have a
    // mismatched const type.
-   AssertFatal( pd.constType == constType || 
-               ( 
-                 ( pd.constType == GFXSCT_Float2x2 || 
-                   pd.constType == GFXSCT_Float3x3 || 
-                   pd.constType == GFXSCT_Float4x4 ) && 
-                 ( constType == GFXSCT_Float2x2 || 
-                   constType == GFXSCT_Float3x3 || 
+   AssertFatal( pd.constType == constType ||
+               (
+                 ( pd.constType == GFXSCT_Float2x2 ||
+                   pd.constType == GFXSCT_Float3x3 ||
+                   pd.constType == GFXSCT_Float4x4 ) &&
+                 ( constType == GFXSCT_Float2x2 ||
+                   constType == GFXSCT_Float3x3 ||
                    constType == GFXSCT_Float4x4 )
                ), "Mismatched const type!" );
 
@@ -100,14 +100,14 @@ bool GenericConstBufferLayout::set(const ParamDesc& pd, const GFXShaderConstType
 
    AssertFatal(pd.size >= size, "Not enough room in the buffer for this data!");
 
-   // Ok, we only set data if it's different than the data we already have, this maybe more expensive than just setting the data, but 
+   // Ok, we only set data if it's different than the data we already have, this maybe more expensive than just setting the data, but
    // we'll have to do some timings to see.  For example, the lighting shader constants rarely change, but we can't assume that at the
    // renderInstMgr level, but we can check down here. -BTR
-   if (dMemcmp(basePointer+pd.offset, data, size) != 0)      
+   if (dMemcmp(basePointer+pd.offset, data, size) != 0)
    {
-      dMemcpy(basePointer+pd.offset, data, size);      
+      dMemcpy(basePointer+pd.offset, data, size);
       return true;
-   }   
+   }
    return false;
 }
 
@@ -123,11 +123,11 @@ bool GenericConstBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCon
    // 4x4 matrix regardless of the target case.
 
    if (dMemcmp(basePointer+pd.offset, data, size) != 0)
-   {      
-      dMemcpy(basePointer+pd.offset, data, size);         
+   {
+      dMemcpy(basePointer+pd.offset, data, size);
       return true;
    }
-      
+
    return false;
 }
 
@@ -140,7 +140,7 @@ bool GenericConstBufferLayout::getDesc(const String& name, ParamDesc& param) con
          param = mParams[i];
          return true;
       }
-   } 
+   }
    return false;
 }
 
@@ -166,7 +166,7 @@ bool GenericConstBufferLayout::write(Stream* s)
    for (U32 i = 0; i < mParams.size(); i++)
    {
       s->write(mParams[i].name);
-         
+
       if (!s->write(mParams[i].offset))
          return false;
       if (!s->write(mParams[i].size))
@@ -203,7 +203,7 @@ bool GenericConstBufferLayout::read(Stream* s)
    mCurrentIndex = 0;
    for (U32 i = 0; i < mParams.size(); i++)
    {
-      s->read(&mParams[i].name);         
+      s->read(&mParams[i].name);
       if (!s->read(&mParams[i].offset))
          return false;
       if (!s->read(&mParams[i].size))
@@ -227,7 +227,7 @@ bool GenericConstBufferLayout::read(Stream* s)
 
 void GenericConstBufferLayout::clear()
 {
-   mParams.clear();    
+   mParams.clear();
    mBufferSize = 0;
    mCurrentIndex = 0;
    mTimesCleared++;
@@ -242,14 +242,14 @@ GenericConstBuffer::GenericConstBuffer(GenericConstBufferLayout* layout)
 {
    if ( layout && layout->getBufferSize() > 0 )
    {
-      mBuffer = new U8[mLayout->getBufferSize()];   
+      mBuffer = new U8[mLayout->getBufferSize()];
 
       // Always set a default value, that way our isEqual checks
       // will work in release as well.
       dMemset( mBuffer, 0xFFFF, mLayout->getBufferSize() );
 
       #ifdef TORQUE_DEBUG
-      
+
          // Clear the debug assignment tracking.
          mWasAssigned.setSize( layout->getParameterCount() );
          dMemset( mWasAssigned.address(), 0, mWasAssigned.memSize() );
@@ -258,7 +258,7 @@ GenericConstBuffer::GenericConstBuffer(GenericConstBufferLayout* layout)
    }
 }
 
-GenericConstBuffer::~GenericConstBuffer() 
+GenericConstBuffer::~GenericConstBuffer()
 {
    delete [] mBuffer;
 }

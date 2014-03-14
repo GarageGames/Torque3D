@@ -121,7 +121,7 @@ function ObjectBuilderGui::init(%this)
 
    //
    %this.numControls       = 0;
-   
+
    %this.lastPath          = "";
 
    %this.reset();
@@ -169,7 +169,7 @@ function ObjectBuilderGui::createFileType(%this, %index)
    else
       %name = %this.field[%index, text];
 
-   // 
+   //
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
       profile = "ToolsGuiTextRightProfile";
       text = %name;
@@ -178,7 +178,7 @@ function ObjectBuilderGui::createFileType(%this, %index)
       modal = "1";
    };
 
-   // 
+   //
    %this.controls[%this.numControls] = new GuiButtonCtrl() {
       HorizSizing = "width";
       profile = "ToolsGuiButtonProfile";
@@ -202,7 +202,7 @@ function ObjectBuilderGui::getFileName(%this, %index)
       error("ObjectBuilderGui::getFileName: invalid field");
       return;
    }
-   
+
    %val = %this.field[%index, ext];
 
    //%path = filePath(%val);
@@ -215,14 +215,14 @@ function ObjectBuilderGui::getFileName(%this, %index)
 function ObjectBuilderGui::gotFileName(%this, %name)
 {
    %index = %this.currentControl;
-   
-   %name = makeRelativePath(%name,getWorkingDirectory()); 
-   
+
+   %name = makeRelativePath(%name,getWorkingDirectory());
+
    %this.field[%index, value] = %name;
    %this.controls[%this.currentControl].setText(fileBase(%name) @ fileExt(%name));
-   
+
    %this.lastPath = %name;
-   
+
    // This doesn't work for button controls as getValue returns their state!
    //%this.controls[%this.currentControl].setValue(%name);
 }
@@ -243,7 +243,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
    else
       %name = %this.field[%index, text];
 
-   // 
+   //
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
       profile = "ToolsGuiTextRightProfile";
       text = %name;
@@ -252,7 +252,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
       modal = "1";
    };
 
-   // 
+   //
    %this.controls[%this.numControls] = new GuiControl() {
       HorizSizing = "width";
       profile = "ToolsGuiDefaultProfile";
@@ -260,7 +260,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
       modal = "1";
    };
-   
+
    %text = new GuiTextEditCtrl() {
       class = ObjectBuilderGuiTextEditCtrl;
       internalName = "MatText";
@@ -272,7 +272,7 @@ function ObjectBuilderGui::createMaterialNameType(%this, %index)
       modal = "1";
    };
    %this.controls[%this.numControls].addGuiControl(%text);
-   
+
    %button = new GuiBitmapButtonCtrl() {
       internalName = "MatButton";
       HorizSizing = "left";
@@ -300,7 +300,7 @@ function ObjectBuilderGui::getMaterialName(%this, %index)
       error("ObjectBuilderGui::getMaterialName: invalid field");
       return;
    }
-   
+
    %this.currentControl = %index;
    materialSelector.showDialog(%this @ ".gotMaterialName", "name");
 }
@@ -308,7 +308,7 @@ function ObjectBuilderGui::getMaterialName(%this, %index)
 function ObjectBuilderGui::gotMaterialName(%this, %name)
 {
    %index = %this.currentControl;
-   
+
    %this.field[%index, value] = %name;
    %this.controls[%index]-->MatText.setText(%name);
 }
@@ -329,7 +329,7 @@ function ObjectBuilderGui::createDataBlockType(%this, %index)
    else
       %name = %this.field[%index, text];
 
-   // 
+   //
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
       profile = "ToolsGuiTextRightProfile";
       text = %name;
@@ -338,7 +338,7 @@ function ObjectBuilderGui::createDataBlockType(%this, %index)
       modal = "1";
    };
 
-   // 
+   //
    %this.controls[%this.numControls] = new GuiPopupMenuCtrl() {
       HorizSizing = "width";
       profile = "ToolsGuiPopUpMenuProfile";
@@ -360,7 +360,7 @@ function ObjectBuilderGui::createDataBlockType(%this, %index)
       if( isMemberOfClass( %obj.getClassName(), %classname ) || isMemberOfClass ( %obj.getClassName(), %classname_alt ) )
          %this.controls[%this.numControls].add(%obj.getName(), %i);
    }
-   
+
    %this.controls[%this.numControls].setValue(getWord(%this.field[%index, value], 1));
 
    %this.numControls++;
@@ -374,7 +374,7 @@ function ObjectBuilderGui::createBoolType(%this, %index)
       error("ObjectBuilderGui::createBoolType: invalid field");
       return;
    }
-   
+
    //
    if(%this.field[%index, value] $= "")
       %value = 0;
@@ -387,7 +387,7 @@ function ObjectBuilderGui::createBoolType(%this, %index)
    else
       %name = %this.field[%index, text];
 
-   // 
+   //
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
       profile = "ToolsGuiTextRightProfile";
       text = %name;
@@ -396,7 +396,7 @@ function ObjectBuilderGui::createBoolType(%this, %index)
       modal = "1";
    };
 
-   // 
+   //
    %this.controls[%this.numControls] = new GuiCheckBoxCtrl() {
       profile = "ToolsGuiCheckBoxProfile";
       extent = %this.checkBoxExtent;
@@ -405,7 +405,7 @@ function ObjectBuilderGui::createBoolType(%this, %index)
    };
 
    %this.controls[%this.numControls].setValue(%value);
-   
+
    %this.numControls++;
    %this.curYPos += %this.defaultFieldStep;
 }
@@ -422,14 +422,14 @@ function ObjectBuilderGui::createStringType(%this, %index)
       error("ObjectBuilderGui::createStringType: invalid field");
       return;
    }
-   
+
    //
    if(%this.field[%index, text] $= "")
       %name = %this.field[%index, name];
    else
       %name = %this.field[%index, text];
 
-   // 
+   //
    %this.textControls[%this.numControls] = new GuiTextCtrl() {
       profile = "ToolsGuiTextRightProfile";
       text = %name;
@@ -438,7 +438,7 @@ function ObjectBuilderGui::createStringType(%this, %index)
       modal = "1";
    };
 
-   // 
+   //
    %this.controls[%this.numControls] = new GuiTextEditCtrl() {
       class = ObjectBuilderGuiTextEditCtrl;
       HorizSizing = "width";
@@ -448,7 +448,7 @@ function ObjectBuilderGui::createStringType(%this, %index)
       position = %this.curXPos + %this.columnOffset @ " " @ %this.curYPos;
       modal = "1";
    };
-   
+
    %this.numControls++;
    %this.curYPos += %this.defaultFieldStep;
 }
@@ -497,8 +497,8 @@ function ObjectBuilderGui::process(%this)
             %this.createStringType(%i);
       }
    }
-   
-   // add the controls   
+
+   // add the controls
    for(%i = 0; %i < %this.numControls; %i++)
    {
       OBContentWindow.add(%this.textControls[%i]);
@@ -516,17 +516,17 @@ function ObjectBuilderGui::processNewObject(%this, %obj)
 {
    if ( %this.createCallback !$= "" )
       eval( %this.createCallback );
-   
-   // Skip out if nothing was created.   
+
+   // Skip out if nothing was created.
    if ( !isObject( %obj ) )
       return;
-      
+
    // Add the object to the group.
    if( %this.objectGroup !$= "" )
       %this.objectGroup.add( %obj );
    else
       EWCreatorWindow.objectGroup.add( %obj );
-      
+
    // If we were given a callback to call after the
    // object has been created, do so now.  Also clear
    // the callback to make sure it's valid only for
@@ -534,7 +534,7 @@ function ObjectBuilderGui::processNewObject(%this, %obj)
 
    %callback = %this.newObjectCallback;
    %this.newObjectCallback = "";
-   
+
    if( %callback !$= "" )
       eval( %callback @ "( " @ %obj @ " );" );
 }
@@ -554,8 +554,8 @@ function ObjectBuilderGui::onOK(%this)
       {
          if (strchr(%this.field[%i, value],"*") !$= "")
             %this.field[%i, value] = "";
-         
-         continue; 
+
+         continue;
       }
       if (%this.field[%i, type] $= "TypeMaterialName")
       {
@@ -564,19 +564,19 @@ function ObjectBuilderGui::onOK(%this)
       }
       %this.field[%i, value] = %this.controls[%i].getValue();
    }
-      
+
    // If we have a special creation function then
    // let it do the construction.
    if ( %this.createFunction !$= "" )
       eval( %this.createFunction );
-      
+
    else
    {
       // Else we use the memento.
       %memento = %this.buildMemento();
       eval( %memento );
    }
-   
+
    if(%this.newObject != 0)
       %this.processNewObject(%this.newObject);
 
@@ -604,11 +604,11 @@ function ObjectBuilderGui::addField(%this, %name, %type, %text, %value, %ext)
 function ObjectBuilderGui::buildMemento(%this)
 {
    // Build the object into a string.
-   %this.memento = %this @ ".newObject = new " @ %this.objectClassName @ "(" @ OBObjectName.getValue() @ ") { ";         
+   %this.memento = %this @ ".newObject = new " @ %this.objectClassName @ "(" @ OBObjectName.getValue() @ ") { ";
    for( %i = 0; %i < %this.numFields; %i++ )
       %this.memento = %this.memento @ %this.field[%i, name] @ " = \"" @ %this.field[%i, value] @ "\"; ";
    %this.memento = %this.memento @ "};";
-   
+
    return %this.memento;
 }
 
@@ -627,7 +627,7 @@ function ObjectBuilderGui::buildObject(%this, %className)
 //------------------------------------------------------------------------------
 
 function ObjectBuilderGui::buildScatterSky( %this, %dontWarnAboutSun )
-{   
+{
    if( !%dontWarnAboutSun )
    {
       // Check for sun object already in the level.  If there is one,
@@ -650,54 +650,54 @@ function ObjectBuilderGui::buildScatterSky( %this, %dontWarnAboutSun )
          }
       }
    }
-   
+
    %this.objectClassName = "ScatterSky";
 
    %this.addField("rayleighScattering", "TypeFloat", "Rayleigh Scattering",  "0.0035");
    %this.addField("mieScattering", "TypeFloat", "Mie Scattering", "0.0045");
-   %this.addField("skyBrightness", "TypeFloat", "Sky Brightness", "25");   
+   %this.addField("skyBrightness", "TypeFloat", "Sky Brightness", "25");
 
    %this.process();
-   
+
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
    %this.addField( "flareType", "TypeLightFlareDataPtr", "Flare", "ScatterSkyFlareExample" );
    %this.addField( "moonMat", "TypeMaterialName", "Moon Material", "Moon_Glow_Mat" );
    %this.addField( "nightCubemap", "TypeCubemapName", "Night Cubemap", "NightCubemap" );
    %this.addField( "useNightCubemap", "TypeBool", "Use Night Cubemap", "true" );
-   
+
 }
 
 function ObjectBuilderGui::buildCloudLayer(%this)
 {
-   OBObjectName.setValue( "" );      
+   OBObjectName.setValue( "" );
    %this.objectClassName = "CloudLayer";
-   %this.addField( "texture", "TypeImageFilename", "Texture", "art/skies/clouds/clouds_normal_displacement" );   
+   %this.addField( "texture", "TypeImageFilename", "Texture", "art/skies/clouds/clouds_normal_displacement" );
 	%this.process();
 }
 
 function ObjectBuilderGui::buildBasicClouds(%this)
 {
-   OBObjectName.setValue( "" );      
-   %this.objectClassName = "BasicClouds";      
+   OBObjectName.setValue( "" );
+   %this.objectClassName = "BasicClouds";
 	%this.process();
-	
+
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
-   %this.addField( "texture[0]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud1" );   
-   %this.addField( "texture[1]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud2" );   
-   %this.addField( "texture[2]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud3" );   	   
+   %this.addField( "texture[0]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud1" );
+   %this.addField( "texture[1]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud2" );
+   %this.addField( "texture[2]", "TypeImageFilename", "Texture", "art/skies/clouds/cloud3" );
 }
 
 function ObjectBuilderGui::checkExists( %this, %classname )
 {
    for ( %i = 0; %i < EWCreatorWindow.objectGroup.getCount(); %i++ )
-   {                                                   
+   {
       %obj = EWCreatorWindow.objectGroup.getObject( %i );
-      if ( %obj.getClassName() $= %classname ) 
+      if ( %obj.getClassName() $= %classname )
          return true;
-   } 
-   
+   }
+
    return false;
 }
 
@@ -735,7 +735,7 @@ function ObjectBuilderGui::buildSun( %this, %dontWarnAboutScatterSky )
          %object = containerSearchNext();
          if( !%object )
             break;
-            
+
          if( %object.isMemberOfClass( "ScatterSky" ) )
          {
             MessageBoxYesNo( "Warning",
@@ -751,10 +751,10 @@ function ObjectBuilderGui::buildSun( %this, %dontWarnAboutScatterSky )
 
    %this.addField("direction", "TypeVector", "Direction", "1 1 -1");
    %this.addField("color", "TypeColor", "Sun color", "0.8 0.8 0.8");
-   %this.addField("ambient", "TypeColor", "Ambient color", "0.2 0.2 0.2");   
+   %this.addField("ambient", "TypeColor", "Ambient color", "0.2 0.2 0.2");
 
    %this.process();
-   
+
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
    %this.addField( "coronaMaterial", "TypeMaterialName", "Corona Material", "Corona_Mat" );
@@ -785,7 +785,7 @@ function ObjectBuilderGui::addWaterObjectFields(%this)
    %this.addField("rippleMagnitude[1]", "TypeFloat", "Ripple Magnitude", "1.0");
    %this.addField("rippleMagnitude[2]", "TypeFloat", "Ripple Magnitude", "0.3");
    %this.addField("overallRippleMagnitude", "TypeFloat", "Overall Ripple Magnitude", "1.0");
-   
+
    %this.addField("waveDir[0]", "TypePoint2", "Wave Direction", "0.000000 1.000000");
    %this.addField("waveDir[1]", "TypePoint2", "Wave Direction", "0.707000 0.707000");
    %this.addField("waveDir[2]", "TypePoint2", "Wave Direction", "0.500000 0.860000");
@@ -796,7 +796,7 @@ function ObjectBuilderGui::addWaterObjectFields(%this)
    %this.addField("waveSpeed[1]", "TypeFloat", "Wave Speed", "1");
    %this.addField("waveSpeed[2]", "TypeFloat", "Wave Speed", "1");
    %this.addField("overallWaveMagnitude", "TypeFloat", "Overall Wave Magnitude", "1.0");
-   
+
    %this.addField("rippleTex", "TypeImageFilename", "Ripple Texture", "art/water/ripple" );
    %this.addField("depthGradientTex", "TypeImageFilename", "Depth Gradient Texture", "art/water/depthcolor_ramp" );
    %this.addField("foamTex", "TypeImageFilename", "Foam Texture", "art/water/foam" );
@@ -807,7 +807,7 @@ function ObjectBuilderGui::buildWaterBlock(%this)
    %this.objectClassName = "WaterBlock";
    %this.addField( "baseColor", "TypeColorI", "Base Color", "45 108 171 255" );
    %this.process();
-      
+
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
    %this.addWaterObjectFields();
@@ -818,10 +818,10 @@ function ObjectBuilderGui::buildWaterPlane(%this)
    %this.objectClassName = "WaterPlane";
    %this.addField( "baseColor", "TypeColorI", "Base Color", "45 108 171 255" );
    %this.process();
-   
+
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
-   %this.addWaterObjectFields();   
+   %this.addWaterObjectFields();
 }
 
 function ObjectBuilderGui::buildTerrainBlock(%this)
@@ -841,7 +841,7 @@ function ObjectBuilderGui::buildGroundCover( %this )
    %this.addField( "material", "TypeMaterialName", "Material Name", "" );
    %this.addField( "shapeFilename[0]", "TypeFile", "Shape File [Optional]", "", "*.*");
    %this.process();
-   
+
    // This is a trick... any fields added after process won't show
    // up as controls, but will be applied to the created object.
    %this.addField( "probability[0]", "TypeFloat", "Probability", "1" );
@@ -908,10 +908,10 @@ function ObjectBuilderGui::buildLevelInfo(%this)
       GenericPromptDialog-->GenericPromptText.text   = "There is already an existing LevelInfo in the scene.";
       Canvas.pushDialog( GenericPromptDialog );
       return;
-   } 
+   }
 
-   OBObjectName.setValue( "theLevelInfo" );   
-   %this.objectClassName = "LevelInfo";   
+   OBObjectName.setValue( "theLevelInfo" );
+   %this.objectClassName = "LevelInfo";
    %this.process();
 }
 
@@ -924,8 +924,8 @@ function ObjectBuilderGui::buildTimeOfDay(%this)
       Canvas.pushDialog( GenericPromptDialog );
       return;
    }
-   
-   %this.objectClassName = "TimeOfDay";   
+
+   %this.objectClassName = "TimeOfDay";
    %this.process();
 }
 
@@ -1101,12 +1101,12 @@ function PhysicsShapeData::create( %datablock )
    {
 		dataBlock = %datablock;
 		parentGroup = EWCreatorWindow.objectGroup;
-		
+
       invulnerable = false;
       damageRadius = 0;
       areaImpulse = 0;
       radiusDamage = 0;
-      minDamageAmount = 0;         
+      minDamageAmount = 0;
    };
 
    return %obj;

@@ -87,7 +87,7 @@ class TSStatic : public SceneObject
 
    static U32 smUniqueIdentifier;
 
-   enum MaskBits 
+   enum MaskBits
    {
       TransformMask              = Parent::NextFreeMask << 0,
       AdvancedStaticOptionsMask  = Parent::NextFreeMask << 1,
@@ -97,7 +97,7 @@ class TSStatic : public SceneObject
    };
 
 public:
-   
+
    /// The different types of mesh data types
    enum MeshType
    {
@@ -106,7 +106,7 @@ public:
       CollisionMesh = 2,   ///< Specifically designated collision meshes
       VisibleMesh = 3      ///< Rendered mesh polygons
    };
-   
+
 protected:
 
    bool onAdd();
@@ -118,9 +118,9 @@ protected:
    bool castRayRendered(const Point3F &start, const Point3F &end, RayInfo* info);
    bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF& sphere);
    void buildConvex(const Box3F& box, Convex* convex);
-   
+
    bool _createShape();
-   
+
    void _updatePhysics();
 
    void _renderNormals( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );
@@ -129,7 +129,7 @@ protected:
 
    // ProcessObject
    virtual void processTick( const Move *move );
-   virtual void interpolateTick( F32 delta );   
+   virtual void interpolateTick( F32 delta );
    virtual void advanceTime( F32 dt );
 
    /// Start or stop processing ticks depending on our state.
@@ -160,7 +160,7 @@ protected:
 
    bool mAllowPlayerStep;
 
-   /// If true each submesh within the TSShape is culled 
+   /// If true each submesh within the TSShape is culled
    /// against the object space frustum.
    bool mMeshCulling;
 
@@ -205,7 +205,7 @@ public:
 
    Resource<TSShape> getShape() const { return mShape; }
 	StringTableEntry getShapeFileName() { return mShapeName; }
-  
+
    TSShapeInstance* getShapeInstance() const { return mShapeInstance; }
 
    const Vector<S32>& getCollisionDetails() const { return mCollisionDetails; }

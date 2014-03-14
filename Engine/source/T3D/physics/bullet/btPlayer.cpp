@@ -54,11 +54,11 @@ void BtPlayer::_releaseController()
    SAFE_DELETE( mColShape );
 }
 
-void BtPlayer::init( const char *type, 
+void BtPlayer::init( const char *type,
                      const Point3F &size,
                      F32 runSurfaceCos,
                      F32 stepHeight,
-                     SceneObject *obj, 
+                     SceneObject *obj,
                      PhysicsWorld *world )
 {
    AssertFatal( obj, "BtPlayer::init - Got a null scene object!" );
@@ -91,9 +91,9 @@ void BtPlayer::init( const char *type,
    mGhostObject->setCollisionShape( mColShape );
    mGhostObject->setCollisionFlags( btCollisionObject::CF_CHARACTER_OBJECT );
    mWorld->getDynamicsWorld()->addCollisionObject( mGhostObject,
-                                                   btBroadphaseProxy::CharacterFilter, 
+                                                   btBroadphaseProxy::CharacterFilter,
                                                    btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter );
-   
+
    mUserData.setObject( obj );
    mGhostObject->setUserPointer( &mUserData );
 }
@@ -116,7 +116,7 @@ Point3F BtPlayer::move( const VectorF &disp, CollisionList &outCol )
    btTransform newTrans = mGhostObject->getWorldTransform();
    btVector3 newPos = newTrans.getOrigin();
 
-   // The move consists of 3 steps... the up step, the forward 
+   // The move consists of 3 steps... the up step, the forward
    // step, and the down step.
 
    btVector3 forwardSweep( disp.x, disp.y, 0.0f );
@@ -125,7 +125,7 @@ Point3F BtPlayer::move( const VectorF &disp, CollisionList &outCol )
    F32 downSweep = 0.0f;
 	if ( disp[2] < 0.0f )
       downSweep = disp[2];
-	else								
+	else
       upSweep = disp[2];
 
 	// Only do auto stepping if the character is moving forward.
@@ -148,7 +148,7 @@ Point3F BtPlayer::move( const VectorF &disp, CollisionList &outCol )
    // Now do the forward step.
    _stepForward( &newPos, forwardSweep, &outCol );
 
-   // Now remove what remains of our auto step 
+   // Now remove what remains of our auto step
    // from the down sweep.
 	if ( hasForwardSweep )
 		downSweep -= stepOffset;
@@ -172,8 +172,8 @@ bool BtPlayer::_recoverFromPenetration()
 
    btDynamicsWorld *collWorld = mWorld->getDynamicsWorld();
 
-	collWorld->getDispatcher()->dispatchAllCollisionPairs(   mGhostObject->getOverlappingPairCache(), 
-                                                            collWorld->getDispatchInfo(), 
+	collWorld->getDispatcher()->dispatchAllCollisionPairs(   mGhostObject->getOverlappingPairCache(),
+                                                            collWorld->getDispatchInfo(),
                                                             collWorld->getDispatcher() );
 
    btVector3 currPos = mGhostObject->getWorldTransform().getOrigin();
@@ -211,8 +211,8 @@ bool BtPlayer::_recoverFromPenetration()
 
 					currPos += pt.m_normalWorldOnB * directionSign * pt.getDistance(); // * 0.25f;
 					penetration = true;
-				} 
-            else 
+				}
+            else
             {
 					//printf("touching %f\n", pt.getDistance());
 				}
@@ -237,7 +237,7 @@ class BtPlayerSweepCallback : public btCollisionWorld::ClosestConvexResultCallba
 
 public:
 
-   BtPlayerSweepCallback( btCollisionObject *me, const btVector3 &moveVec  ) 
+   BtPlayerSweepCallback( btCollisionObject *me, const btVector3 &moveVec  )
       :  Parent( btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0) ),
          mMe( me ),
          mMoveVec( moveVec )
@@ -252,10 +252,10 @@ public:
       return Parent::needsCollision( proxy0 );
    }
 
-   virtual btScalar addSingleResult(   btCollisionWorld::LocalConvexResult &convexResult, 
+   virtual btScalar addSingleResult(   btCollisionWorld::LocalConvexResult &convexResult,
                                        bool normalInWorldSpace )
    {
-      // NOTE: I shouldn't have to do any of this, but Bullet 
+      // NOTE: I shouldn't have to do any of this, but Bullet
       // has some weird bugs.
       //
       // For one the plane type will return hits on a Z up surface
@@ -290,7 +290,7 @@ bool BtPlayer::_sweep( btVector3 *inOutCurrPos, const btVector3 &disp, Collision
    BtPlayerSweepCallback callback( mGhostObject, disp.normalized() );
 	callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 	callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
-	
+
 	mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
 
 	inOutCurrPos->setInterpolate3( start.getOrigin(), end.getOrigin(), callback.m_closestHitFraction );
@@ -356,10 +356,10 @@ void BtPlayer::_stepForward( btVector3 *inOutCurrPos, const btVector3 &displacem
          btTransform rayEnd( btTransform::getIdentity() );
          rayEnd.setOrigin( callback.m_hitPointWorld - callback.m_hitNormalWorld );
 
-         btCollisionWorld::ClosestRayResultCallback rayHit( rayStart.getOrigin(), rayEnd.getOrigin() ); 
-         mWorld->getDynamicsWorld()->rayTestSingle(   rayStart, 
-                                                      rayEnd, 
-                                                      callback.m_hitCollisionObject, 
+         btCollisionWorld::ClosestRayResultCallback rayHit( rayStart.getOrigin(), rayEnd.getOrigin() );
+         mWorld->getDynamicsWorld()->rayTestSingle(   rayStart,
+                                                      rayEnd,
+                                                      callback.m_hitCollisionObject,
                                                       callback.m_hitCollisionObject->getCollisionShape(),
                                                       callback.m_hitCollisionObject->getWorldTransform(),
                                                       rayHit );
@@ -407,8 +407,8 @@ void BtPlayer::_stepForward( btVector3 *inOutCurrPos, const btVector3 &displacem
 	}
 }
 
-void BtPlayer::findContact(   SceneObject **contactObject, 
-                              VectorF *contactNormal, 
+void BtPlayer::findContact(   SceneObject **contactObject,
+                              VectorF *contactNormal,
                               Vector<SceneObject*> *outOverlapObjects ) const
 {
    AssertFatal( mGhostObject, "BtPlayer::findContact - The controller is null!" );
@@ -425,7 +425,7 @@ void BtPlayer::findContact(   SceneObject **contactObject,
    for ( U32 i=0; i < numPairs; i++ )
    {
       const btBroadphasePair &pair = pairArray[i];
-      
+
       btBroadphasePair *collisionPair = pairCache->findPair( pair.m_pProxy0, pair.m_pProxy1 );
       if ( !collisionPair || !collisionPair->m_algorithm )
          continue;
@@ -445,7 +445,7 @@ void BtPlayer::findContact(   SceneObject **contactObject,
       collisionPair->m_algorithm->getAllContactManifolds( manifoldArray );
 
       for ( U32 j=0; j < manifoldArray.size(); j++ )
-      {                                 
+      {
          btPersistentManifold *manifold = manifoldArray[j];
       	btScalar directionSign = manifold->getBody0() == mGhostObject ? 1.0f : -1.0f;
 
@@ -462,7 +462,7 @@ void BtPlayer::findContact(   SceneObject **contactObject,
 
                btCollisionObject *colObject = (btCollisionObject*)collisionPair->m_pProxy0->m_clientObject;
                *contactObject = PhysicsUserData::getObject( colObject->getUserPointer() );
-               *contactNormal = normal; 
+               *contactNormal = normal;
             }
          }
       }
@@ -473,14 +473,14 @@ void BtPlayer::enableCollision()
 {
    AssertFatal( mGhostObject, "BtPlayer::enableCollision - The controller is null!" );
 
-   //mController->setCollision( true );   
+   //mController->setCollision( true );
 }
 
 void BtPlayer::disableCollision()
 {
    AssertFatal( mGhostObject, "BtPlayer::disableCollision - The controller is null!" );
 
-   //mController->setCollision( false );   
+   //mController->setCollision( false );
 }
 
 PhysicsWorld* BtPlayer::getWorld()

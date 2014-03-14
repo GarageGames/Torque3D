@@ -90,7 +90,7 @@ bool EditManager::onAdd()
 //------------------------------------------------------------------------------
 
 // NOTE: since EditManager is not actually used as a gui anymore, onWake/Sleep
-// were never called, which broke anyone hooking into onEditorEnable/onEditorDisable 
+// were never called, which broke anyone hooking into onEditorEnable/onEditorDisable
 // and gEditingMission. So, moved these to happen in response to console methods
 // which should be called at the appropriate time.
 //

@@ -320,11 +320,11 @@ ConsoleSetType( TypeWayPointTeam )
 
 void WayPoint::initPersistFields()
 {
-   addGroup("Misc");	
+   addGroup("Misc");
    addField("markerName", TypeCaseString, Offset(mName, WayPoint), "Unique name representing this waypoint");
    addField("team", TypeWayPointTeam, Offset(mTeam, WayPoint), "Unique numerical ID assigned to this waypoint, or set of waypoints");
    endGroup("Misc");
-   
+
    Parent::initPersistFields();
 }
 
@@ -646,7 +646,7 @@ void CameraBookmark::unpackUpdate(NetConnection * con, BitStream * stream)
 
 void CameraBookmark::initPersistFields()
 {
-   //addGroup("Misc");	
+   //addGroup("Misc");
    //addField("name", TypeCaseString, Offset(mName, CameraBookmark));
    //endGroup("Misc");
 

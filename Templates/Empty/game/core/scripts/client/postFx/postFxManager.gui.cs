@@ -33,7 +33,7 @@ function PostFXManager::onDialogPush( %this )
 {
    //Apply the settings to the controls
    postVerbose("% - PostFX Manager - Loading GUI.");
-   
+
    %this.settingsRefreshAll();
 }
 
@@ -45,14 +45,14 @@ function ppOptionsEnable::onAction(%this)
    if(ppOptionsEnable.getValue())
    {
       %toEnable = true;
-   }   
+   }
    else
    {
       %toEnable = false;
    }
-   
+
    PostFXManager.settingsSetEnabled(%toEnable);
-   
+
 }
 
 function PostFXManager::getEnableResultFromControl(%this, %control)
@@ -67,7 +67,7 @@ function PostFXManager::getEnableResultFromControl(%this, %control)
    {
       %toEnable = false;
    }
-   
+
    return %toEnable;
 }
 
@@ -90,14 +90,14 @@ function ppOptionsEnableLightRays::onAction(%this)
 }
 
 function ppOptionsEnableDOF::onAction(%this)
-{ 
+{
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
    PostFXManager.settingsEffectSetEnabled("DOF", %toEnable);
 }
- 
+
 function ppOptionsSavePreset::onClick(%this)
 {
-   //Stores the current settings into a preset file for loading and use later on 
+   //Stores the current settings into a preset file for loading and use later on
 }
 
 function ppOptionsLoadPreset::onClick(%this)
@@ -157,7 +157,7 @@ function ppOptionsSSAONearDepthMin::onMouseDragged(%this)
 function ppOptionsSSAONearDepthMax::onMouseDragged(%this)
 {
    $SSAOPostFx::sDepthMax = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;   
+   %this.ToolTip = "Value : " @ %this.value;
 }
 
 function ppOptionsSSAONearToleranceNormal::onMouseDragged(%this)
@@ -305,10 +305,10 @@ function ppOptionsLightRaysBrightScalar::onMouseDragged(%this)
 function ppOptionsUpdateDOFSettings()
 {
    DOFPostEffect.setFocusParams( $DOFPostFx::BlurMin, $DOFPostFx::BlurMax, $DOFPostFx::FocusRangeMin, $DOFPostFx::FocusRangeMax, -($DOFPostFx::BlurCurveNear), $DOFPostFx::BlurCurveFar );
-   
+
    DOFPostEffect.setAutoFocus( $DOFPostFx::EnableAutoFocus );
    DOFPostEffect.setFocalDist(0);
-   
+
    if($PostFXManager::PostFX::EnableDOF)
    {
       DOFPostEffect.enable();
@@ -350,13 +350,13 @@ function ppOptionsDOFFarBlurMaxSlider::onMouseDragged(%this)
 function ppOptionsDOFFocusRangeMinSlider::onMouseDragged(%this)
 {
    $DOFPostFx::FocusRangeMin = %this.value;
-   ppOptionsUpdateDOFSettings();   
+   ppOptionsUpdateDOFSettings();
 }
 
 function ppOptionsDOFFocusRangeMaxSlider::onMouseDragged(%this)
 {
    $DOFPostFx::FocusRangeMax = %this.value;
-   ppOptionsUpdateDOFSettings();   
+   ppOptionsUpdateDOFSettings();
 }
 
 function ppOptionsDOFBlurCurveNearSlider::onMouseDragged(%this)
@@ -368,7 +368,7 @@ function ppOptionsDOFBlurCurveNearSlider::onMouseDragged(%this)
 function ppOptionsDOFBlurCurveFarSlider::onMouseDragged(%this)
 {
    $DOFPostFx::BlurCurveFar = %this.value;
-   ppOptionsUpdateDOFSettings();   
+   ppOptionsUpdateDOFSettings();
 }
 
 function ppOptionsEnableHDRDebug::onAction(%this)
@@ -376,12 +376,12 @@ function ppOptionsEnableHDRDebug::onAction(%this)
    if ( %this.getValue() )
       LuminanceVisPostFX.enable();
    else
-      LuminanceVisPostFX.disable();   
+      LuminanceVisPostFX.disable();
 }
 
 function ppColorCorrection_selectFile()
 {
-   %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";   
+   %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";
    getLoadFilename( %filter, "ppColorCorrection_selectFileHandler");
 }
 
@@ -391,7 +391,7 @@ function ppColorCorrection_selectFileHandler( %filename )
       %filename = "core/scripts/client/postFx/null_color_ramp.png";
    else
       %filename = makeRelativePath( %filename, getMainDotCsDir() );
-            
+
    $HDRPostFX::colorCorrectionRamp = %filename;
-   PostFXManager-->ColorCorrectionFileName.Text = %filename; 
+   PostFXManager-->ColorCorrectionFileName.Text = %filename;
 }

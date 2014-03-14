@@ -46,7 +46,7 @@ void ShadowManager::activate()
 
 SceneManager* ShadowManager::getSceneManager()
 {
-   return mSceneManager;   
+   return mSceneManager;
 }
 
 //------------------------------------------------------------------------------
@@ -71,8 +71,8 @@ ConsoleFunction( setShadowManager, bool, 1, 3, "string sShadowSystemName" )
    }
 
    // Add to world and init.
-   world->addWorldManager(newSM);   
-   newSM->activate();      
+   world->addWorldManager(newSM);
+   newSM->activate();
    MaterialManager::get()->reInitInstances();
    */
    return true;

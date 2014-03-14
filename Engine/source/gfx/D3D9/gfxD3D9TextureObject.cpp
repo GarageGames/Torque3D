@@ -71,7 +71,7 @@ GFXLockedRect *GFXD3D9TextureObject::lock(U32 mipLevel /*= 0*/, RectI *inRect /*
 
    if( mProfile->isRenderTarget() )
    {
-      if( !mLockTex || 
+      if( !mLockTex ||
           mLockTex->getWidth() != getWidth() ||
           mLockTex->getHeight() != getHeight() )
       {
@@ -82,7 +82,7 @@ GFXLockedRect *GFXD3D9TextureObject::lock(U32 mipLevel /*= 0*/, RectI *inRect /*
 
       IDirect3DSurface9 *source;
       D3D9Assert( get2DTex()->GetSurfaceLevel( 0, &source ), "GFXD3D9TextureObject::lock - failed to get our own texture's surface." );
-      
+
       IDirect3DSurface9 *dest;
       GFXD3D9TextureObject *to = (GFXD3D9TextureObject *) &(*mLockTex);
       D3D9Assert( to->get2DTex()->GetSurfaceLevel( 0, &dest ), "GFXD3D9TextureObject::lock - failed to get dest texture's surface." );
@@ -123,16 +123,16 @@ GFXLockedRect *GFXD3D9TextureObject::lock(U32 mipLevel /*= 0*/, RectI *inRect /*
          r.right  = inRect->point.x + inRect->extent.x;
       }
 
-      D3D9Assert( get2DTex()->LockRect(mipLevel, &mLockRect, inRect ? &r : NULL, 0), 
+      D3D9Assert( get2DTex()->LockRect(mipLevel, &mLockRect, inRect ? &r : NULL, 0),
          "GFXD3D9TextureObject::lock - could not lock non-RT texture!" );
       mLocked = true;
 
    }
 
    // GFXLockedRect is set up to correspond to D3DLOCKED_RECT, so this is ok.
-   return (GFXLockedRect*)&mLockRect; 
+   return (GFXLockedRect*)&mLockRect;
 }
-   
+
 //-----------------------------------------------------------------------------
 // unLock
 //-----------------------------------------------------------------------------
@@ -155,7 +155,7 @@ void GFXD3D9TextureObject::unlock(U32 mipLevel)
    else
 #endif
    {
-      D3D9Assert( get2DTex()->UnlockRect(mipLevel), 
+      D3D9Assert( get2DTex()->UnlockRect(mipLevel),
          "GFXD3D9TextureObject::unlock - could not unlock non-RT texture." );
 
       mLocked = false;
@@ -248,7 +248,7 @@ bool GFXD3D9TextureObject::copyToBmp(GBitmap* bmp)
       {
          destPtr[0] = srcPtr[2]; // red
          destPtr[1] = srcPtr[1]; // green
-         destPtr[2] = srcPtr[0]; // blue 
+         destPtr[2] = srcPtr[0]; // blue
          if (destBytesPerPixel == 4)
             destPtr[3] = srcPtr[3]; // alpha
 

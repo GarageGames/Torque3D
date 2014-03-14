@@ -39,15 +39,15 @@ function MessageHud::open(%this)
       %text = "GLOBAL:";
 
    MessageHud_Text.setValue(%text);
-   
+
    %windowPos = "0 " @ ( getWord( outerChatHud.position, 1 ) + getWord( outerChatHud.extent, 1 ) + 1 );
    %windowExt = getWord( OuterChatHud.extent, 0 ) @ " " @ getWord( MessageHud_Frame.extent, 1 );
-   
+
    %textExtent = getWord(MessageHud_Text.extent, 0) + 14;
    %ctrlExtent = getWord(MessageHud_Frame.extent, 0);
 
    Canvas.pushDialog(%this);
-   
+
    messageHud_Frame.position = %windowPos;
    messageHud_Frame.extent = %windowExt;
    MessageHud_Edit.position = setWord(MessageHud_Edit.position, 0, %textExtent + %offset);
@@ -64,7 +64,7 @@ function MessageHud::close(%this)
 {
    if(!%this.isVisible())
       return;
-      
+
    Canvas.popDialog(%this);
    %this.setVisible(false);
    if ( $enableDirectInput )
@@ -107,7 +107,7 @@ function MessageHud_Edit::eval(%this)
    MessageHud.close();
 }
 
-   
+
 //----------------------------------------------------------------------------
 // MessageHud key handlers
 

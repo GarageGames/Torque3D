@@ -36,7 +36,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "collision/clippedPolyList.h"
 
-static const Point4F cubePoints[9] = 
+static const Point4F cubePoints[9] =
 {
    Point4F(-0.5, -0.5, -0.5, 1.0f), Point4F(-0.5, -0.5,  0.5, 1.0f), Point4F(-0.5,  0.5, -0.5, 1.0f), Point4F(-0.5,  0.5,  0.5, 1.0f),
    Point4F( 0.5, -0.5, -0.5, 1.0f), Point4F( 0.5, -0.5,  0.5, 1.0f), Point4F( 0.5,  0.5, -0.5, 1.0f), Point4F( 0.5,  0.5,  0.5, 1.0f)
@@ -50,7 +50,7 @@ GFXImplementVertexFormat( CompositeQuadVert )
 IMPLEMENT_CONOBJECT(RenderParticleMgr);
 
 
-ConsoleDocClass( RenderParticleMgr, 
+ConsoleDocClass( RenderParticleMgr,
    "@brief A render bin which renders particle geometry.\n\n"
    "This render bin gathers particle render instances, sorts, and renders them. "
    "It is currently used by ParticleEmitter and LightFlareData.\n\n"
@@ -64,11 +64,11 @@ const bool RenderToParticleTarget = true;
 const bool RenderToSingleTarget = true;
 
 RenderParticleMgr::RenderParticleMgr()
-:  Parent(  RenderParticleMgr::RIT_Particles, 
-            1.0f, 
-            1.0f, 
-            GFXFormatR8G8B8A8, 
-            Point2I( Parent::DefaultTargetSize, Parent::DefaultTargetSize), 
+:  Parent(  RenderParticleMgr::RIT_Particles,
+            1.0f,
+            1.0f,
+            GFXFormatR8G8B8A8,
+            Point2I( Parent::DefaultTargetSize, Parent::DefaultTargetSize),
             RenderToParticleTarget ? Parent::DefaultTargetChainLength : 0 ),
             mParticleShader( NULL )
 {
@@ -202,7 +202,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
 
       // Check the size of the system on screen. If it is small, it won't
       // be eating fillrate anyway, so just draw it high-resolution.
-      // The value it checks against is one I found from experimentation, 
+      // The value it checks against is one I found from experimentation,
       // not anything really meaningful.
       if( screenRect.extent.x < 0.35f || screenRect.extent.y < 0.35f )
       {
@@ -237,7 +237,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
    if(!RenderToSingleTarget)
    {
       // Construct crop matrix
-      Point3F scale( getMax(2.0f / systemEntry.screenRect.extent.x, 1.0f), 
+      Point3F scale( getMax(2.0f / systemEntry.screenRect.extent.x, 1.0f),
          getMax(2.0f / systemEntry.screenRect.extent.y, 1.0f),
          1.0f);
 
@@ -279,7 +279,7 @@ void RenderParticleMgr::render( SceneRenderState *state )
    PROFILE_SCOPE(RenderParticleMgr_render);
 
    // Early out if nothing to draw
-   if( !mElementList.size() || 
+   if( !mElementList.size() ||
       (!mParticleShader && !_initShader()) )
       return;
 
@@ -295,7 +295,7 @@ void RenderParticleMgr::render( SceneRenderState *state )
 
       // Setup target
       // NOTE: If you are using this on the Xbox360 with Basic Lighting,
-      // you are going to have to mess with either the render order, or 
+      // you are going to have to mess with either the render order, or
       // you are going to have to make this a 'preserve' draw
       if(!RenderToSingleTarget)
          mTargetChainIdx = systemEntry.targetChainIdx;
@@ -385,7 +385,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       {
          GFX->setStateBlock( _getOffscreenStateBlock(ri) );
          ri->systemState = PSS_AwaitingCompositeDraw;
-         mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mModelViewProjSC, 
+         mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mModelViewProjSC,
            *ri->modelViewProj * mOffscreenSystems[ri->targetIndex].clipMatrix );
       }
       else
@@ -423,7 +423,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaScaleSC, alphaScale );
 
       mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mFSModelViewProjSC, *ri->modelViewProj  );
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mOneOverFarSC, 1.0f / state->getFarPlane() );     
+      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mOneOverFarSC, 1.0f / state->getFarPlane() );
 
       if ( mParticleShaderConsts.mOneOverSoftnessSC->isValid() )
       {
@@ -604,7 +604,7 @@ void RenderParticleMgr::_onLMActivate( const char*, bool activate )
    mEdgeTarget = NamedTexTarget::find( "edge" );
 
    // Setup the shader
-   if ( activate ) 
+   if ( activate )
       _initShader();
 
    if ( mScreenQuadVertBuff.isNull() )
@@ -781,13 +781,13 @@ GFXStateBlockRef RenderParticleMgr::_getCompositeStateBlock(ParticleRenderInst *
    // draws to ONLY the edge areas.
    d.stencilDefined = true;
    d.stencilEnable = true;
-   d.stencilRef = RenderParticleMgr::HighResStencilRef; 
+   d.stencilRef = RenderParticleMgr::HighResStencilRef;
    d.stencilWriteMask = RenderParticleMgr::ParticleSystemStencilMask;
    d.stencilMask = RenderParticleMgr::ParticleSystemStencilMask;
    d.stencilPassOp = GFXStencilOpReplace;
    d.stencilFunc = GFXCmpGreater;
 
-   // Diffuse texture sampler and 
+   // Diffuse texture sampler and
    d.samplersDefined = true;
    d.samplers[0] = GFXSamplerStateDesc::getClampLinear();
    d.samplers[1] = GFXSamplerStateDesc::getClampLinear();

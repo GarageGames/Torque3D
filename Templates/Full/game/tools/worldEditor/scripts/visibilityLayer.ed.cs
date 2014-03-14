@@ -32,7 +32,7 @@ function EVisibility::onWake( %this )
    if ( !isObject( %this.classArray ) )
    {
       %this.classArray = new ArrayObject();
-      %this.addClassOptions();   
+      %this.addClassOptions();
    }
 
    %this.updateOptions();
@@ -42,8 +42,8 @@ function EVisibility::onWake( %this )
 function EVisibility::updateOptions( %this )
 {
    // First clear the stack control.
-   %this-->theVisOptionsList.clear();   
-    
+   %this-->theVisOptionsList.clear();
+
    // Go through all the
    // parameters in our array and
    // create a check box for each.
@@ -52,14 +52,14 @@ function EVisibility::updateOptions( %this )
       %text = "  " @ %this.array.getValue( %i );
       %val = %this.array.getKey( %i );
       %var = getWord( %val, 0 );
-      %toggleFunction = getWord( %val, 1 );         
-      
+      %toggleFunction = getWord( %val, 1 );
+
       %textLength = strlen( %text );
-      
+
       %cmd = "";
       if ( %toggleFunction !$= "" )
-         %cmd = %toggleFunction @ "( $thisControl.getValue() );";      
-      
+         %cmd = %toggleFunction @ "( $thisControl.getValue() );";
+
       %checkBox = new GuiCheckBoxCtrl()
       {
          canSaveDynamicFields = "0";
@@ -84,7 +84,7 @@ function EVisibility::updateOptions( %this )
       };
 
       %this-->theVisOptionsList.addGuiControl( %checkBox );
-   }   
+   }
 }
 
 function EVisibility::addOption( %this, %text, %varName, %toggleFunction )
@@ -92,11 +92,11 @@ function EVisibility::addOption( %this, %text, %varName, %toggleFunction )
    // Create the array if it
    // doesn't already exist.
    if ( !isObject( %this.array ) )
-      %this.array = new ArrayObject();   
-   
+      %this.array = new ArrayObject();
+
    %this.array.push_back( %varName @ " " @ %toggleFunction, %text );
-   %this.array.uniqueKey();  
-   %this.array.sortd(); 
+   %this.array.uniqueKey();
+   %this.array.sortd();
    %this.updateOptions();
 }
 
@@ -104,40 +104,40 @@ function EVisibility::addClassOptions( %this )
 {
    %visList = %this-->theClassVisList;
    %selList = %this-->theClassSelList;
-   
+
    // First clear the stack control.
-   
+
    %visList.clear();
    %selList.clear();
 
    %classList = enumerateConsoleClasses( "SceneObject" );
    %classCount = getFieldCount( %classList );
-   
+
    for ( %i = 0; %i < %classCount; %i++ )
    {
       %className = getField( %classList, %i );
       %this.classArray.push_back( %className );
    }
-   
+
    // Remove duplicates and sort by key.
    %this.classArray.uniqueKey();
    %this.classArray.sortkd();
-   
+
    // Go through all the
    // parameters in our array and
    // create a check box for each.
    for ( %i = 0; %i < %this.classArray.count(); %i++ )
    {
       %class = %this.classArray.getKey( %i );
-      
+
       %visVar = "$" @ %class @ "::isRenderable";
       %selVar = "$" @ %class @ "::isSelectable";
-      
+
       %textLength = strlen( %class );
       %text = "  " @ %class;
-      
+
       // Add visibility toggle.
-      
+
       %visCheckBox = new GuiCheckBoxCtrl()
       {
          canSaveDynamicFields = "0";
@@ -164,7 +164,7 @@ function EVisibility::addClassOptions( %this )
       %visList.addGuiControl( %visCheckBox );
 
       // Add selectability toggle.
-      
+
       %selCheckBox = new GuiCheckBoxCtrl()
       {
          canSaveDynamicFields = "0";

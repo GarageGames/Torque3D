@@ -95,7 +95,7 @@
                Margin = "4 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -111,7 +111,7 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
 
                   new GuiCheckBoxCtrl() {
@@ -222,7 +222,7 @@
                Margin = "0 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -238,7 +238,7 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
 
                   new GuiControl() {
@@ -903,7 +903,7 @@
                Margin = "0 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -920,9 +920,9 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
-                  
+
                   new GuiControl() {
                      isContainer = "1";
                      profile = "ToolsGuiDefaultProfile";
@@ -930,7 +930,7 @@
                      vertSizing = "bottom";
                      position = "0 0";
                      extent = "210 14";
-                     
+
                      new GuiCheckBoxCtrl() {
                         useInactiveState = "0";
                         text = "Force Load DAE";
@@ -988,7 +988,7 @@
                         canSave = "1";
                         canSaveDynamicFields = "0";
                      };
-                     
+
                      new GuiTextEditCtrl() {
                         historySize = "0";
                         password = "0";
@@ -1028,7 +1028,7 @@
                      vertSizing = "bottom";
                      position = "5 70";
                      extent = "210 18";
-                     
+
                      new GuiTextCtrl() {
                         text = "Screen Center Max:";
                         maxLength = "1024";

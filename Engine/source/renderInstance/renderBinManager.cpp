@@ -43,7 +43,7 @@ RenderBinManager::RenderBinManager( const RenderInstType& ritype, F32 renderOrde
 }
 
 
-ConsoleDocClass( RenderBinManager, 
+ConsoleDocClass( RenderBinManager,
    "@brief The abstract base for all render bins.\n\n"
    "The render bins are used by the engine as a high level method to order and batch rendering "
    "operations.\n"
@@ -65,7 +65,7 @@ void RenderBinManager::initPersistFields()
 
 void RenderBinManager::onRemove()
 {
-   // Tell the render pass to remove us when 
+   // Tell the render pass to remove us when
    // we're being unregistered.
    if ( mRenderPass )
       mRenderPass->removeManager( this );
@@ -97,7 +97,7 @@ void RenderBinManager::setRenderPass( RenderPassManager *rpm )
          mRenderPass->getAddSignal(mRenderInstType).remove( this, &RenderBinManager::addElement );
 
       for ( U32 i=0; i < mOtherTypes.size(); i++ )
-         mRenderPass->getAddSignal(mOtherTypes[i]).remove( this, &RenderBinManager::addElement );         
+         mRenderPass->getAddSignal(mOtherTypes[i]).remove( this, &RenderBinManager::addElement );
    }
 
    mRenderPass = rpm;
@@ -113,7 +113,7 @@ void RenderBinManager::setRenderPass( RenderPassManager *rpm )
 }
 
 void RenderBinManager::addElement( RenderInst *inst )
-{   
+{
    internalAddElement(inst);
 }
 
@@ -152,12 +152,12 @@ void RenderBinManager::setupSGData( MeshRenderInst *ri, SceneData &data )
 {
    PROFILE_SCOPE( RenderBinManager_setupSGData );
 
-   // NOTE: We do not reset or clear the scene state 
-   // here as the caller has initialized non-RI members 
+   // NOTE: We do not reset or clear the scene state
+   // here as the caller has initialized non-RI members
    // himself and we must preserve them.
    //
    // It also saves a bunch of CPU as this is called for
-   // every MeshRenderInst in every pass. 
+   // every MeshRenderInst in every pass.
 
    dMemcpy( data.lights, ri->lights, sizeof( data.lights ) );
    data.objTrans     = ri->objectToWorld;

@@ -54,13 +54,13 @@ public:
    ScriptMsgListener();
 
    DECLARE_CONOBJECT(ScriptMsgListener);
-   
+
    DECLARE_CALLBACK( void, onAdd, () );
    DECLARE_CALLBACK( void, onRemove, () );
 
    DECLARE_CALLBACK( bool, onMessageReceived, ( const char* queue, const char* event, const char* data ) );
    DECLARE_CALLBACK( bool, onMessageObjectReceived, ( const char* queue, Message *msg ) );
-   
+
    DECLARE_CALLBACK( void, onAddToQueue, ( const char* queue ) );
    DECLARE_CALLBACK( void, onRemoveFromQueue, ( const char* queue ) );
 

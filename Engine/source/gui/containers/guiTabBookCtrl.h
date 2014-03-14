@@ -59,9 +59,9 @@
 class GuiTabBookCtrl : public GuiContainer
 {
    public:
-   
+
       typedef GuiContainer Parent;
-      
+
       enum TabPosition
       {
          AlignTop,   ///< Align the tabs on the top of the tab book control
@@ -108,22 +108,22 @@ class GuiTabBookCtrl : public GuiContainer
          TabEnds,             ///< Index of end lines for horizontal tabs
          NumBitmaps           ///< Number of bitmaps in this array
       };
-      
+
       bool  mHasTexture;   ///< Indicates whether we have a texture to render the tabs with
       RectI *mBitmapBounds;///< Array of rectangles identifying textures for tab book
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onTabSelected, ( const String& text, U32 index ) );
       DECLARE_CALLBACK( void, onTabRightClick, ( const String& text, U32 index ) );
-      
+
       /// @}
-      
+
    public:
 
       GuiTabBookCtrl();
-      
+
       DECLARE_CONOBJECT(GuiTabBookCtrl);
       DECLARE_DESCRIPTION( "A control that allows to select from a set of tabbed pages." );
 
@@ -131,20 +131,20 @@ class GuiTabBookCtrl : public GuiContainer
 
       /// @name Control Events
       /// @{
-       
+
       bool onWake();
       void onRender( Point2I offset, const RectI &updateRect );
-      
+
       /// @}
 
       /// @name Child events
       /// @{
-      
+
       void onChildRemoved( GuiControl* child );
       void onChildAdded( GuiControl *child );
       bool reOrder(SimObject* obj, SimObject* target);
       bool acceptsAsChild( SimObject* object ) const;
-      
+
       /// @}
 
       /// @name Rendering methods
@@ -189,10 +189,10 @@ class GuiTabBookCtrl : public GuiContainer
 
       /// Select the Previous page in the tab book
       void selectPrevPage();
-      
+
       /// Make the page fill the entire page space.
       void fitPage( GuiTabPageCtrl* page );
-      
+
       /// Return the index for the given page.  -1 if not a page in this book.
       S32 getPageNum( GuiTabPageCtrl* page ) const;
 
@@ -256,7 +256,7 @@ class GuiTabBookCtrl : public GuiContainer
 
       /// @name Mouse Events
       /// @{
-      
+
       virtual void onMouseDown( const GuiEvent &event );
       virtual void onMouseUp( const GuiEvent &event );
       virtual void onMouseDragged( const GuiEvent &event );
@@ -264,7 +264,7 @@ class GuiTabBookCtrl : public GuiContainer
       virtual void onMouseLeave( const GuiEvent &event );
       virtual bool onMouseDownEditor( const GuiEvent &event, Point2I offset );
       virtual void onRightMouseUp( const GuiEvent& event );
-      
+
       /// @}
 };
 

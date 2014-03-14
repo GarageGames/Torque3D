@@ -51,7 +51,7 @@ TSForestItemData::~TSForestItemData()
 {
 }
 
-bool TSForestItemData::preload( bool server, String &errorBuffer )   
+bool TSForestItemData::preload( bool server, String &errorBuffer )
 {
    mIsClientObject = !server;
 
@@ -101,9 +101,9 @@ void TSForestItemData::_onResourceChanged( const Torque::Path &path )
 {
    if ( path != Path( mShapeFile ) )
       return;
-   
+
    SAFE_DELETE( mShapeInstance );
-   _loadShape();   
+   _loadShape();
 
    getReloadSignal().trigger();
 }
@@ -114,10 +114,10 @@ void TSForestItemData::_loadShape()
    if ( !(bool)mShape )
       return;
 
-   if ( mIsClientObject && 
-       !mShape->preloadMaterialList( mShapeFile ) )   
+   if ( mIsClientObject &&
+       !mShape->preloadMaterialList( mShapeFile ) )
       return;
-   
+
    // Lets add an autobillboard detail if don't have one.
    //_checkLastDetail();
 
@@ -131,12 +131,12 @@ TSShapeInstance* TSForestItemData::_getShapeInstance() const
    {
       // Create the instance.
       mShapeInstance = new TSShapeInstance( mShape, true );
-        
+
       // So we can make OpCode collision calls.
       mShapeInstance->prepCollision();
 
       // Get the material features adding the wind effect if
-      // we have a positive wind scale and have vertex color 
+      // we have a positive wind scale and have vertex color
       // data which is used for the weighting.
       FeatureSet features = MATMGR->getDefaultFeatures();
       if ( mWindScale > 0.0f && mShape->getVertexFormat()->hasColor() )
@@ -202,7 +202,7 @@ bool TSForestItemData::canBillboard( const SceneRenderState *state, const Forest
    TSShapeInstance *shapeInstance = _getShapeInstance();
    const S32 dl = shapeInstance->setDetailFromDistance( state, distToCamera / item.getScale() );
 
-   // This item has a null LOD... lets consider 
+   // This item has a null LOD... lets consider
    // that as being billboarded.
    if ( dl < 0 )
       return true;
@@ -236,7 +236,7 @@ bool TSForestItemData::render( TSRenderState *rdata, const ForestItem &item ) co
    if ( shapeInst->setDetailFromDistance( state, dist / scale ) < 0 )
       return false;
 
-   // TSShapeInstance::render() uses the 
+   // TSShapeInstance::render() uses the
    // world matrix for the RenderInst.
    MatrixF worldMat = item.getTransform();
    worldMat.scale( scale );

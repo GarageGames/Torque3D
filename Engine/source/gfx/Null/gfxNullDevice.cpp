@@ -33,7 +33,7 @@
 #include "core/util/safeDelete.h"
 
 
-GFXAdapter::CreateDeviceInstanceDelegate GFXNullDevice::mCreateDeviceInstance(GFXNullDevice::createInstance); 
+GFXAdapter::CreateDeviceInstanceDelegate GFXNullDevice::mCreateDeviceInstance(GFXNullDevice::createInstance);
 
 class GFXNullCardProfiler: public GFXCardProfiler
 {
@@ -50,7 +50,7 @@ protected:
 
    virtual bool _queryCardCap(const String &query, U32 &foundResult){ return false; }
    virtual bool _queryFormat(const GFXFormat fmt, const GFXTextureProfile *profile, bool &inOutAutogenMips) { inOutAutogenMips = false; return false; }
-   
+
 public:
    virtual void init()
    {
@@ -62,10 +62,10 @@ public:
    };
 };
 
-class GFXNullTextureObject : public GFXTextureObject 
+class GFXNullTextureObject : public GFXTextureObject
 {
 public:
-   GFXNullTextureObject(GFXDevice * aDevice, GFXTextureProfile *profile); 
+   GFXNullTextureObject(GFXDevice * aDevice, GFXTextureProfile *profile);
    ~GFXNullTextureObject() { kill(); };
 
    virtual void pureVirtualCrash() { };
@@ -79,7 +79,7 @@ public:
 };
 
 GFXNullTextureObject::GFXNullTextureObject(GFXDevice * aDevice, GFXTextureProfile *profile) :
-   GFXTextureObject(aDevice, profile) 
+   GFXTextureObject(aDevice, profile)
 {
    mProfile = profile;
    mTextureSize.set( 0, 0, 0 );
@@ -88,22 +88,22 @@ GFXNullTextureObject::GFXNullTextureObject(GFXDevice * aDevice, GFXTextureProfil
 class GFXNullTextureManager : public GFXTextureManager
 {
 protected:
-      virtual GFXTextureObject *_createTextureObject( U32 height, 
-                                                      U32 width, 
-                                                      U32 depth, 
-                                                      GFXFormat format, 
-                                                      GFXTextureProfile *profile, 
-                                                      U32 numMipLevels, 
-                                                      bool forceMips = false, 
-                                                      S32 antialiasLevel = 0, 
+      virtual GFXTextureObject *_createTextureObject( U32 height,
+                                                      U32 width,
+                                                      U32 depth,
+                                                      GFXFormat format,
+                                                      GFXTextureProfile *profile,
+                                                      U32 numMipLevels,
+                                                      bool forceMips = false,
+                                                      S32 antialiasLevel = 0,
                                                       GFXTextureObject *inTex = NULL )
-      { 
+      {
          GFXNullTextureObject *retTex;
          if ( inTex )
          {
             AssertFatal( dynamic_cast<GFXNullTextureObject*>( inTex ), "GFXNullTextureManager::_createTexture() - Bad inTex type!" );
             retTex = static_cast<GFXNullTextureObject*>( inTex );
-         }      
+         }
          else
          {
             retTex = new GFXNullTextureObject( GFX, profile );
@@ -161,14 +161,14 @@ public:
    virtual void resurrect() {}
 };
 
-class GFXNullVertexBuffer : public GFXVertexBuffer 
+class GFXNullVertexBuffer : public GFXVertexBuffer
 {
    unsigned char* tempBuf;
 public:
-   GFXNullVertexBuffer( GFXDevice *device, 
-                        U32 numVerts, 
-                        const GFXVertexFormat *vertexFormat, 
-                        U32 vertexSize, 
+   GFXNullVertexBuffer( GFXDevice *device,
+                        U32 numVerts,
+                        const GFXVertexFormat *vertexFormat,
+                        U32 vertexSize,
                         GFXBufferType bufferType ) :
       GFXVertexBuffer(device, numVerts, vertexFormat, vertexSize, bufferType) { };
    virtual void lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr);
@@ -179,7 +179,7 @@ public:
    virtual void resurrect() {}
 };
 
-void GFXNullVertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr) 
+void GFXNullVertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
 {
    tempBuf = new unsigned char[(vertexEnd - vertexStart) * mVertexSize];
    *vertexPtr = (void*) tempBuf;
@@ -187,13 +187,13 @@ void GFXNullVertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
    lockedVertexEnd   = vertexEnd;
 }
 
-void GFXNullVertexBuffer::unlock() 
+void GFXNullVertexBuffer::unlock()
 {
    delete[] tempBuf;
    tempBuf = NULL;
 }
 
-void GFXNullVertexBuffer::prepare() 
+void GFXNullVertexBuffer::prepare()
 {
 }
 
@@ -202,9 +202,9 @@ class GFXNullPrimitiveBuffer : public GFXPrimitiveBuffer
 private:
    U16* temp;
 public:
-   GFXNullPrimitiveBuffer( GFXDevice *device, 
-                           U32 indexCount, 
-                           U32 primitiveCount, 
+   GFXNullPrimitiveBuffer( GFXDevice *device,
+                           U32 indexCount,
+                           U32 primitiveCount,
                            GFXBufferType bufferType ) :
       GFXPrimitiveBuffer(device, indexCount, primitiveCount, bufferType), temp( NULL ) {};
 
@@ -222,7 +222,7 @@ void GFXNullPrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
    *indexPtr = temp;
 }
 
-void GFXNullPrimitiveBuffer::unlock() 
+void GFXNullPrimitiveBuffer::unlock()
 {
    delete[] temp;
    temp = NULL;
@@ -273,24 +273,24 @@ GFXNullDevice::~GFXNullDevice()
 {
 }
 
-GFXVertexBuffer *GFXNullDevice::allocVertexBuffer( U32 numVerts, 
+GFXVertexBuffer *GFXNullDevice::allocVertexBuffer( U32 numVerts,
                                                    const GFXVertexFormat *vertexFormat,
-                                                   U32 vertSize, 
-                                                   GFXBufferType bufferType ) 
+                                                   U32 vertSize,
+                                                   GFXBufferType bufferType )
 {
    return new GFXNullVertexBuffer(GFX, numVerts, vertexFormat, vertSize, bufferType);
 }
 
-GFXPrimitiveBuffer *GFXNullDevice::allocPrimitiveBuffer( U32 numIndices, 
-                                                         U32 numPrimitives, 
-                                                         GFXBufferType bufferType) 
+GFXPrimitiveBuffer *GFXNullDevice::allocPrimitiveBuffer( U32 numIndices,
+                                                         U32 numPrimitives,
+                                                         GFXBufferType bufferType)
 {
    return new GFXNullPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
 }
 
 GFXCubemap* GFXNullDevice::createCubemap()
-{ 
-   return new GFXNullCubemap(); 
+{
+   return new GFXNullCubemap();
 };
 
 void GFXNullDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )

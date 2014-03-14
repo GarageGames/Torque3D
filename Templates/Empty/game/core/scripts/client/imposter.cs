@@ -23,7 +23,7 @@
 
 function imposterMetricsCallback()
 {
-   return "  | IMPOSTER |" @ 
+   return "  | IMPOSTER |" @
           "   Rendered: " @ $ImposterStats::rendered @
           "   Batches: " @ $ImposterStats::batches @
           "   DrawCalls: " @ $ImposterStats::drawCalls @

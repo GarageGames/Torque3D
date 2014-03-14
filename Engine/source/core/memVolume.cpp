@@ -37,7 +37,7 @@ namespace Torque
       // Multiple MemFile's can reference the same path, so this is here to contain
       // the actual data at a Path.
       struct MemFileData
-      {      
+      {
          MemFileData(MemFileSystem* fs, const Path& path)
          {
             mPath = path;
@@ -46,7 +46,7 @@ namespace Torque
             mBuffer = dMalloc(mBufferSize);
             dMemset(mBuffer, 0, mBufferSize);
             mModified = Time::getCurrentTime();
-            mLastAccess = mModified;    
+            mLastAccess = mModified;
             mFileSystem = fs;
          }
 
@@ -76,7 +76,7 @@ namespace Torque
             return NULL;
          }
 
-         Path mPath;         
+         Path mPath;
          void* mBuffer;
          U32 mBufferSize;  // This is the size of the memory buffer >= mFileSize
          U32 mFileSize;    // This is the size of the "file" <= mBufferSize
@@ -142,8 +142,8 @@ namespace Torque
       //-----------------------------------------------------------------------------
       MemFileSystem::MemFileSystem(String volume)
       {
-         mVolume = volume;                  
-         mRootDir = new MemDirectoryData(this, volume);          
+         mVolume = volume;
+         mRootDir = new MemDirectoryData(this, volume);
       }
 
       MemFileSystem::~MemFileSystem()
@@ -156,7 +156,7 @@ namespace Torque
          return mRootDir->resolve(path);
       }
 
-      // 
+      //
       MemDirectory* MemFileSystem::getParentDir(const Path& path, FileNodeRef& parentRef)
       {
          parentRef = mRootDir->resolve(path.getRoot() + ":" + path.getPath());
@@ -200,7 +200,7 @@ namespace Torque
                   // anything else we ignore
                   break;
             }
-         }         
+         }
          return NULL;
       }
 
@@ -231,12 +231,12 @@ namespace Torque
       }
 
       bool MemFileSystem::rename(const Path& from,const Path& to)
-      {         
+      {
          // Source must exist
          FileNodeRef source = mRootDir->resolve(from);
          if (source.isNull())
             return false;
-          
+
          // Destination must not exist
          FileNodeRef dest = mRootDir->resolve(to);
          if (source.isValid())
@@ -262,7 +262,7 @@ namespace Torque
                   sourcedd = d->mDirectories[i];
                   d->mDirectories.erase_fast(i);
                   sourcedd->mPath = to;
-                  mDir->mDirectoryData->mDirectories.push_back(sourcedd);            
+                  mDir->mDirectoryData->mDirectories.push_back(sourcedd);
                   return true;
                }
             }
@@ -276,7 +276,7 @@ namespace Torque
                   sourceFile = d->mFiles[i];
                   d->mFiles.erase_fast(i);
                   sourceFile->mPath = to;
-                  mDir->mDirectoryData->mFiles.push_back(sourceFile);            
+                  mDir->mDirectoryData->mFiles.push_back(sourceFile);
                   return true;
                }
             }
@@ -310,7 +310,7 @@ namespace Torque
       MemFile::MemFile(MemFileSystem* fs, MemFileData* fileData)
       {
          mFileData = fileData;
-         mStatus = Closed;         
+         mStatus = Closed;
          mCurrentPos = U32_MAX;
          mFileSystem = fs;
       }
@@ -330,7 +330,7 @@ namespace Torque
       }
 
       bool MemFile::getAttributes(Attributes* attr)
-      {                 
+      {
          return mFileData->getAttributes(attr);
       }
 
@@ -340,7 +340,7 @@ namespace Torque
       }
 
       bool MemFile::open(AccessMode mode)
-      {         
+      {
          mStatus = Open;
          mCurrentPos = 0;
          switch (mode)
@@ -352,9 +352,9 @@ namespace Torque
             case Write :
                mCurrentPos = 0;
                mFileData->mFileSize = 0;
-               break;            
+               break;
             case WriteAppend :
-               mCurrentPos = mFileData->mFileSize; 
+               mCurrentPos = mFileData->mFileSize;
                break;
          }
          return true;
@@ -369,7 +369,7 @@ namespace Torque
       U32 MemFile::getPosition()
       {
          if (mStatus == Open || mStatus == EndOfFile)
-            return mCurrentPos;            
+            return mCurrentPos;
          return 0;
       }
 
@@ -377,18 +377,18 @@ namespace Torque
       {
          if (mStatus != Open && mStatus != EndOfFile)
             return 0;
-         
+
          switch (mode)
          {
-         case Begin:    
+         case Begin:
             mCurrentPos = delta;
-            break;            
-         case Current:  
+            break;
+         case Current:
             mCurrentPos += delta;
             break;
          case End:
             mCurrentPos = mFileData->mFileSize - delta;
-            break;         
+            break;
          }
 
          mStatus = Open;
@@ -432,7 +432,7 @@ namespace Torque
          mCurrentPos += size;
          mFileData->mFileSize = getMax(mFileData->mFileSize, mCurrentPos);
          mFileData->mLastAccess = Time::getCurrentTime();
-         mFileData->mModified = mFileData->mLastAccess;         
+         mFileData->mModified = mFileData->mLastAccess;
 
          return size;
       }
@@ -440,8 +440,8 @@ namespace Torque
       //-----------------------------------------------------------------------------
 
       MemDirectory::MemDirectory(MemFileSystem* fs, MemDirectoryData* dir)
-      {         
-         mStatus = Closed;         
+      {
+         mStatus = Closed;
          mDirectoryData = dir;
          mFileSystem = fs;
       }

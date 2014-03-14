@@ -29,17 +29,17 @@
 
 extern bool gEditingMission;
 
-ConsoleDocClass( BarrelDistortionPostEffect, 
+ConsoleDocClass( BarrelDistortionPostEffect,
    "@brief A fullscreen shader effect used with the Oculus Rift.\n\n"
 
-   "@section PFXTextureIdentifiers\n\n"   
+   "@section PFXTextureIdentifiers\n\n"
 
    "@ingroup Rendering\n"
 );
 
 IMPLEMENT_CONOBJECT(BarrelDistortionPostEffect);
 
-BarrelDistortionPostEffect::BarrelDistortionPostEffect() 
+BarrelDistortionPostEffect::BarrelDistortionPostEffect()
    :  PostEffect(),
       mHmdWarpParamSC(NULL),
       mHmdChromaAbSC(NULL),
@@ -59,13 +59,13 @@ BarrelDistortionPostEffect::~BarrelDistortionPostEffect()
 
 void BarrelDistortionPostEffect::initPersistFields()
 {
-   addField( "hmdIndex", TypeS32, Offset( mHMDIndex, BarrelDistortionPostEffect ), 
+   addField( "hmdIndex", TypeS32, Offset( mHMDIndex, BarrelDistortionPostEffect ),
       "Oculus VR HMD index to reference." );
 
-   addField( "sensorIndex", TypeS32, Offset( mSensorIndex, BarrelDistortionPostEffect ), 
+   addField( "sensorIndex", TypeS32, Offset( mSensorIndex, BarrelDistortionPostEffect ),
       "Oculus VR sensor index to reference." );
 
-   addField( "scaleOutput", TypeF32, Offset( mScaleOutput, BarrelDistortionPostEffect ), 
+   addField( "scaleOutput", TypeF32, Offset( mScaleOutput, BarrelDistortionPostEffect ),
       "Used to increase the size of the window into the world at the expense of apparent resolution." );
 
    Parent::initPersistFields();

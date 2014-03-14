@@ -57,12 +57,12 @@ public:
    /// The destructor.
    virtual ~PhysicsWorld() {};
 
-   /// 
+   ///
    Signal<void()>& getUpdateSignal() { return mUpdateSignal; }
 
    // Called when a static body in the scene has been removed.
    Signal<void()>& getStaticChangedSignal() { return mStaticChangedSignal; }
-   
+
    /// Overloaded to do debug drawing.
    ///
    /// It is assumed the GFX state is setup prior to this call for
@@ -86,11 +86,11 @@ public:
    /// Returns the active gravity force.
    const Point3F& getGravity() const { return mGravity; }
 
-   /// An abstract way to raycast into any type of PhysicsWorld, in a way 
-   /// that mirrors a Torque-style raycast.  
+   /// An abstract way to raycast into any type of PhysicsWorld, in a way
+   /// that mirrors a Torque-style raycast.
    //
-   /// This method is not fully developed or very sophisticated. For example, 
-   /// there is no system of collision groups or raycast masks, which could 
+   /// This method is not fully developed or very sophisticated. For example,
+   /// there is no system of collision groups or raycast masks, which could
    /// be very complex to write in a PhysicsPlugin-Abstract way...
    //
    // Optional forceAmt parameter will also apply a force to hit objects.

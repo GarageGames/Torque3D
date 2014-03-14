@@ -73,7 +73,7 @@ bool GuiConsoleEditCtrl::onKeyDown(const GuiEvent &event)
 {
    setUpdate();
 
-   if (event.keyCode == KEY_TAB) 
+   if (event.keyCode == KEY_TAB)
    {
       // Get a buffer that can hold the completed text...
       FrameTemp<UTF8> tmpBuff(GuiTextCtrl::MAX_STRING_LENGTH);
@@ -88,23 +88,23 @@ bool GuiConsoleEditCtrl::onKeyDown(const GuiEvent &event)
       mTextBuffer.set(tmpBuff);
       return true;
    }
-   else if ((event.keyCode == KEY_PAGE_UP) || (event.keyCode == KEY_PAGE_DOWN)) 
+   else if ((event.keyCode == KEY_PAGE_UP) || (event.keyCode == KEY_PAGE_DOWN))
    {
       // See if there's some other widget that can scroll the console history.
-      if (mUseSiblingScroller) 
+      if (mUseSiblingScroller)
       {
-         if (mSiblingScroller) 
+         if (mSiblingScroller)
          {
             return mSiblingScroller->onKeyDown(event);
          }
-         else 
+         else
          {
             // Let's see if we can find it...
             SimGroup* pGroup = getGroup();
-            if (pGroup) 
+            if (pGroup)
             {
                // Find the first scroll control in the same group as us.
-               for (SimSetIterator itr(pGroup); *itr; ++itr) 
+               for (SimSetIterator itr(pGroup); *itr; ++itr)
                {
                   mSiblingScroller = dynamic_cast<GuiScrollCtrl*>(*itr);
                   if (mSiblingScroller != NULL)
@@ -129,7 +129,7 @@ bool GuiConsoleEditCtrl::onKeyDown(const GuiEvent &event)
          char buf[GuiTextCtrl::MAX_STRING_LENGTH];
          getText( buf );
 
-         String text( buf );         
+         String text( buf );
          text.replace( ";", "" );
 
          text = String::ToString( "echo(%s);", text.c_str() );

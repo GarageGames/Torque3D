@@ -146,7 +146,7 @@ class SceneCullingState
 
       /// Return the viewing state that defines how the scene is being viewed.
       const SceneCameraState& getCameraState() const { return mCameraState; }
-      
+
       /// Return the root culling volume that corresponds to the camera frustum.
       /// @note This volume omits the near and far plane of the frustum's polyhedron
       ///   as these will be tested separately during culling.  Testing them repeatedly

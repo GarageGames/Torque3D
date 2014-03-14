@@ -104,7 +104,7 @@ namespace engineAPI
    // entirely but for now it is necessary for several behaviors that
    // differ between the interops to decide what to do.
    bool gUseConsoleInterop = true;
-   
+
    bool gIsInitialized = false;
 }
 
@@ -117,17 +117,17 @@ namespace engineAPI
 
    #ifdef TORQUE_COMPILER_VISUALC
    #  pragma data_seg( ".CRT$XTU" )
-   
+
       static void* sCheckMemBeforeTermination = &Memory::ensureAllFreed;
-      
+
    #  pragma data_seg()
    #elif defined( TORQUE_COMPILER_GCC )
-   
+
        __attribute__ ( ( destructor ) ) static void _ensureAllFreed()
       {
          Memory::ensureAllFreed();
       }
-      
+
    #endif
 
 #endif
@@ -139,21 +139,21 @@ void processTimeEvent(S32 elapsedTime)
 
    // If recording a video and not playinb back a journal, override the elapsedTime
    if (VIDCAP->isRecording() && !Journal::IsPlaying())
-      elapsedTime = VIDCAP->getMsPerFrame();   
-   
+      elapsedTime = VIDCAP->getMsPerFrame();
+
    // cap the elapsed time to one second
    // if it's more than that we're probably in a bad catch-up situation
    if(elapsedTime > 1024)
       elapsedTime = 1024;
-   
+
    U32 timeDelta;
    if(ATTS(gTimeAdvance))
       timeDelta = ATTS(gTimeAdvance);
    else
       timeDelta = (U32) (elapsedTime * ATTS(gTimeScale));
-   
+
    Platform::advanceTime(elapsedTime);
-   
+
    // Don't build up more time than a single tick... this makes the sim
    // frame rate dependent but is a useful hack for singleplayer.
    if ( ATTS(gFrameSkip) )
@@ -161,11 +161,11 @@ void processTimeEvent(S32 elapsedTime)
          timeDelta = TickMs;
 
    bool tickPass;
-   
+
    PROFILE_START(ServerProcess);
    tickPass = serverProcess(timeDelta);
    PROFILE_END();
-   
+
    PROFILE_START(ServerNetProcess);
    // only send packets if a tick happened
    if(tickPass)
@@ -174,24 +174,24 @@ void processTimeEvent(S32 elapsedTime)
    Con::setBoolVariable( "$pref::hasServerTicked", tickPass );
    PROFILE_END();
 
-   
+
    PROFILE_START(SimAdvanceTime);
    Sim::advanceTime(timeDelta);
    PROFILE_END();
-   
+
    PROFILE_START(ClientProcess);
    tickPass = clientProcess(timeDelta);
    // Used to indicate if client was just ticked.
    Con::setBoolVariable( "$pref::hasClientTicked", tickPass );
    PROFILE_END_NAMED(ClientProcess);
-   
+
    PROFILE_START(ClientNetProcess);
    if(tickPass)
       GNet->processClient();
    PROFILE_END();
-   
+
    GNet->checkTimeouts();
-   
+
    gFPS.update();
 
    // Give the texture manager a chance to cleanup any
@@ -200,7 +200,7 @@ void processTimeEvent(S32 elapsedTime)
       TEXMGR->cleanupCache( 5 );
 
    PROFILE_END();
-   
+
    // Update the console time
    Con::setFloatVariable("Sim::Time",F32(Platform::getVirtualMilliseconds()) / 1000);
 }
@@ -210,16 +210,16 @@ void StandardMainLoop::init()
    #ifdef TORQUE_DEBUG
    gStartupTimer = PlatformTimer::create();
    #endif
-   
+
    #ifdef TORQUE_DEBUG_GUARD
       Memory::flagCurrentAllocs( Memory::FLAG_Global );
    #endif
 
    Platform::setMathControlStateKnown();
-   
+
    // Asserts should be created FIRST
    PlatformAssert::create();
-   
+
    ManagedSingleton< ThreadManager >::createSingleton();
    FrameAllocator::init(TORQUE_FRAME_SIZE);      // See comments in torqueConfig.h
 
@@ -256,13 +256,13 @@ void StandardMainLoop::init()
    Platform::init();    // platform specific initialization
    RedBook::init();
    Platform::initConsole();
-   
+
    ThreadPool::GlobalThreadPool::createSingleton();
 
    // Initialize modules.
-   
+
    ModuleManager::initializeSystem();
-         
+
    // Initialise ITickable.
 #ifdef TORQUE_TGB_ONLY
    ITickable::init( 4 );
@@ -292,15 +292,15 @@ void StandardMainLoop::init()
 	Con::addVariable("MiniDump::Params", TypeString, &gMiniDumpParams);
 	Con::addVariable("MiniDump::ExecDir", TypeString, &gMiniDumpExecDir);
 #endif
-   
+
    ActionMap* globalMap = new ActionMap;
    globalMap->registerObject("GlobalActionMap");
    Sim::getActiveActionMapSet()->pushObject(globalMap);
-   
+
    // Do this before we init the process so that process notifiees can get the time manager
    tm = new TimeManager;
    tm->timeEvent.notify(&::processTimeEvent);
-   
+
    // Start up the Input Event Manager
    INPUTMGR->start();
 
@@ -325,11 +325,11 @@ void StandardMainLoop::shutdown()
 
    delete tm;
    preShutdown();
-   
+
    // Shut down modules.
-   
+
    ModuleManager::shutdownSystem();
-   
+
    ThreadPool::GlobalThreadPool::deleteSingleton();
 
 #ifdef TORQUE_ENABLE_VFS
@@ -339,7 +339,7 @@ void StandardMainLoop::shutdown()
    RedBook::destroy();
 
    Platform::shutdown();
-   
+
 #if defined( _XBOX ) || defined( TORQUE_OS_MAC )
    DebugOutputConsumer::destroy();
 #endif
@@ -351,7 +351,7 @@ void StandardMainLoop::shutdown()
    FrameAllocator::destroy();
    Net::shutdown();
    Sampler::destroy();
-   
+
    ManagedSingleton< ThreadManager >::deleteSingleton();
 
    // asserts should be destroyed LAST
@@ -429,7 +429,7 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
    Stream *mainCsStream = NULL;
 
    // The working filestream.
-   FileStream str; 
+   FileStream str;
 
    const char *defaultScriptName = "main.cs";
    bool useDefaultScript = true;
@@ -542,7 +542,7 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
    Platform::setMainDotCsDir(buffer);
    Platform::setCurrentDirectory(buffer);
 
-   Con::evaluate(script, false, useDefaultScript ? defaultScriptName : argv[1]); 
+   Con::evaluate(script, false, useDefaultScript ? defaultScriptName : argv[1]);
    delete[] script;
 
 #ifdef TORQUE_ENABLE_VFS
@@ -562,7 +562,7 @@ bool StandardMainLoop::doMainLoop()
       SAFE_DELETE( gStartupTimer );
    }
    #endif
-   
+
    bool keepRunning = true;
 //   while(keepRunning)
    {
@@ -584,12 +584,12 @@ bool StandardMainLoop::doMainLoop()
 #ifdef TORQUE_OS_MAC
             if (newFocus)
                WindowManager->getFirstWindow()->show();
-               
+
 #endif
             lastFocus = newFocus;
          }
-         
-#ifndef TORQUE_OS_MAC         
+
+#ifndef TORQUE_OS_MAC
          // under the web plugin do not sleep the process when the child window loses focus as this will cripple the browser perfomance
          if (!Platform::getWebDeployment())
             tm->setBackground(!newFocus);
@@ -603,7 +603,7 @@ bool StandardMainLoop::doMainLoop()
       {
          tm->setBackground(false);
       }
-      
+
       PROFILE_START(MainLoop);
       Sampler::beginFrame();
 
@@ -619,7 +619,7 @@ bool StandardMainLoop::doMainLoop()
 	  CheckBlocker();
 	  #endif
    }
-   
+
    return keepRunning;
 }
 

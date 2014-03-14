@@ -43,7 +43,7 @@ public:
    // MatInstanceHook
    virtual const MatInstanceHookType& getType() const { return Type; }
 
-   /// Returns the instancing material instance or the input material 
+   /// Returns the instancing material instance or the input material
    /// instance if one could not be created.
    static BaseMatInstance* getInstancingMat( BaseMatInstance *matInst );
 

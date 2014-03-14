@@ -32,7 +32,7 @@
 class GuiSliderCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
    protected:
@@ -65,22 +65,22 @@ class GuiSliderCtrl : public GuiControl
 
       F32 _getThumbValue( const GuiEvent& event );
       void _updateThumb( F32 value, bool snap = true, bool onWake = false, bool doCallback = true );
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onMouseDragged, () );
-      
+
       /// @}
-      
+
       static bool _setValue( void* object, const char* index, const char* data ) { static_cast< GuiSliderCtrl* >( object )->setValue( dAtof( data ) ); return false; }
 
    public:
-         
+
       GuiSliderCtrl();
-      
+
       bool isThumbBeingDragged() const { return mDepressed; }
-         
+
       const Point2F& getRange() const { return mRange; }
 
       // GuiControl.
@@ -93,7 +93,7 @@ class GuiSliderCtrl : public GuiControl
       void onMouseEnter(const GuiEvent &);
       bool onMouseWheelUp(const GuiEvent &event);
       bool onMouseWheelDown(const GuiEvent &event);
-      
+
       void setActive( bool value );
 
       F32 getValue() const { return mValue; }
@@ -101,7 +101,7 @@ class GuiSliderCtrl : public GuiControl
       void setValue(F32 val, bool doCallback=false);
 
       void onRender(Point2I offset, const RectI &updateRect);
-      
+
       virtual bool resize( const Point2I& newSize, const Point2I& newExtent );
       virtual void parentResized( const RectI& oldParentRect, const RectI& newParentRect );
 

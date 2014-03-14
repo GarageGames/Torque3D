@@ -57,7 +57,7 @@ public:
       None = 0,
       FirstPanel = 1,
       SecondPanel
-   };   
+   };
 
    GuiSplitContainer();
 
@@ -70,26 +70,26 @@ public:
    static void initPersistFields();
    virtual bool onAdd();
 
-   // GuiControl   
+   // GuiControl
    virtual bool onWake();
    virtual void parentResized(const RectI &oldParentRect, const RectI &newParentRect);
-   virtual bool resize( const Point2I &newPosition, const Point2I &newExtent );   
+   virtual bool resize( const Point2I &newPosition, const Point2I &newExtent );
    virtual void onRender(Point2I offset, const RectI &updateRect);
    virtual void onMouseDown(const GuiEvent &event);
    virtual void onMouseUp(const GuiEvent &event);
-   virtual void onMouseDragged(const GuiEvent &event); 
+   virtual void onMouseDragged(const GuiEvent &event);
 
    virtual bool layoutControls( RectI &clientRect );
    virtual void getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent);
    virtual inline Point2I getSplitPoint() { return mSplitPoint; };
    /// The Splitters entire Client Rectangle, this takes into account padding of this control
    virtual inline RectI getSplitRect() { return mSplitRect; };
-   virtual void solvePanelConstraints( Point2I newDragPos, GuiContainer * firstPanel, GuiContainer * secondPanel, RectI clientRect );   
-   virtual Point2I getMinExtent() const;   
+   virtual void solvePanelConstraints( Point2I newDragPos, GuiContainer * firstPanel, GuiContainer * secondPanel, RectI clientRect );
+   virtual Point2I getMinExtent() const;
 
 protected:
 
-   S32         mFixedPanel; 
+   S32         mFixedPanel;
    S32         mFixedPanelSize;
    S32         mOrientation;
    S32         mSplitterSize;

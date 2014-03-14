@@ -191,8 +191,8 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    // draw the identity line
    if ( mShowIdentity )
    {
-      GFX->getDrawUtil()->drawLine( pos.x, pos.y + ( ext.y * ( 1.0f - mIdentity.x ) ), 
-                                    pos.x + ext.x, pos.y + ( ext.y * ( 1.0f - mIdentity.y ) ), 
+      GFX->getDrawUtil()->drawLine( pos.x, pos.y + ( ext.y * ( 1.0f - mIdentity.x ) ),
+                                    pos.x + ext.x, pos.y + ( ext.y * ( 1.0f - mIdentity.y ) ),
                                     ColorF( 0.9f, 0.9f, 0.9f ) );
    }
 

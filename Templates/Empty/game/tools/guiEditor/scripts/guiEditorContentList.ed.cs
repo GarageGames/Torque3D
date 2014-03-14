@@ -59,7 +59,7 @@ function GuiEditorContentList::scanGroup( %this, %group )
          {
             %this.scanGroup( %obj );
          }
-         else 
+         else
          {
             if(%obj.getName() $= "")
                %name = "(unnamed) - " @ %obj;
@@ -67,14 +67,14 @@ function GuiEditorContentList::scanGroup( %this, %group )
                %name = %obj.getName() @ " - " @ %obj;
 
             %skip = false;
-            
+
             foreach$( %guiEntry in $GuiEditor::GuiFilterList )
                if( %obj.getName() $= %guiEntry )
                {
                   %skip = true;
                   break;
                }
-      
+
             if( !%skip )
                %this.add( %name, %obj );
          }
@@ -84,7 +84,7 @@ function GuiEditorContentList::scanGroup( %this, %group )
                      || GuiEditor.showEditorGuis ) )   // except if explicitly requested.
       {
          // Scan nested SimGroups for GuiControls.
-         
+
          %this.scanGroup( %obj );
       }
    }

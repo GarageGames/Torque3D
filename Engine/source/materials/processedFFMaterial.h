@@ -31,7 +31,7 @@ struct GFXShaderConstDesc;
 
 
 /// Fixed function rendering.  Does not load or use shaders.  Does not rely on GFXMaterialFeatureData.
-/// Tries very hard to not rely on anything possibly related to shaders. 
+/// Tries very hard to not rely on anything possibly related to shaders.
 ///
 /// @note Does not always succeed.
 class ProcessedFFMaterial : public ProcessedMaterial
@@ -48,17 +48,17 @@ public:
    /// Sets necessary textures and texture ops for rendering
    virtual void setTextureStages(SceneRenderState *, const SceneData &sgData, U32 pass );
 
-   virtual MaterialParameters* allocMaterialParameters();   
+   virtual MaterialParameters* allocMaterialParameters();
    virtual MaterialParameterHandle* getMaterialParameterHandle(const String& name);
-   virtual MaterialParameters* getDefaultMaterialParameters();      
-   
+   virtual MaterialParameters* getDefaultMaterialParameters();
+
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state, const U32 pass);
 
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData, U32 pass);
 
    /// @}
 
-   virtual bool init(   const FeatureSet &features, 
+   virtual bool init(   const FeatureSet &features,
                         const GFXVertexFormat *vertexFormat,
                         const MatFeaturesDelegate &featuresDelegate );
 
@@ -89,7 +89,7 @@ protected:
 
    bool mIsLightingMaterial;
 
-   Vector<GFXShaderConstDesc> mParamDesc;   
+   Vector<GFXShaderConstDesc> mParamDesc;
 
    /// @name Internal functions
    ///
@@ -105,8 +105,8 @@ protected:
    void _createPasses( U32 stageNum, const FeatureSet &features );
 
    /// Determine what features we need
-   void _determineFeatures(   U32 stageNum, 
-                              FixedFuncFeatureData &featData, 
+   void _determineFeatures(   U32 stageNum,
+                              FixedFuncFeatureData &featData,
                               const FeatureSet &features);
 
    /// Sets light info for the first light

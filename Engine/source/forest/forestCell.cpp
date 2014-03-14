@@ -78,7 +78,7 @@ void ForestCell::buildBatches()
    bool batched = false;
    for ( ; item != items.end(); item++ )
    {
-      // Loop thru the batches till someone 
+      // Loop thru the batches till someone
       // takes this guy off our hands.
       batched = false;
       for ( S32 i=0; i < mBatches.size(); i++ )
@@ -92,7 +92,7 @@ void ForestCell::buildBatches()
 
       if ( batched )
          continue;
-      
+
       // Gotta create a new batch.
       ForestCellBatch *batch = item->getData()->allocateBatch();
       if ( batch )
@@ -130,7 +130,7 @@ S32 ForestCell::render( TSRenderState *rdata, const Frustum *culler )
    PROFILE_SCOPE( ForestCell_render );
 
    AssertFatal( isLeaf(), "ForestCell::render() - This shouldn't be called on non-leaf cells!" );
-       
+
    U32 itemsRendered = 0;
 
    // TODO: Items are generated in order of type,
@@ -152,7 +152,7 @@ S32 ForestCell::render( TSRenderState *rdata, const Frustum *culler )
 }
 
 void ForestCell::_updateBounds()
-{   
+{
    mIsDirty = false;
    mBounds = Box3F::Invalid;
    mLargestItem = ForestItem::Invalid;
@@ -230,10 +230,10 @@ bool ForestCell::findIndexByKey( ForestItemKey key, U32 *outIndex ) const
    U32   i = 0,
          lo = 0,
          hi = mItems.size();
-   
+
    const ForestItem *items = mItems.address();
 
-   while ( lo < hi ) 
+   while ( lo < hi )
    {
       i = (lo + hi) / 2;
 
@@ -284,9 +284,9 @@ const ForestItem& ForestCell::insertItem( ForestItemKey key,
       {
          U32 index = _getSubCell( item->getPosition().x, item->getPosition().y );
 
-         mSubCells[index]->insertItem( item->getKey(), 
-                                       item->getData(), 
-                                       item->getTransform(), 
+         mSubCells[index]->insertItem( item->getKey(),
+                                       item->getData(),
+                                       item->getTransform(),
                                        item->getScale() );
       }
 
@@ -313,13 +313,13 @@ const ForestItem& ForestCell::insertItem( ForestItemKey key,
 
    // First see if we can find it.  This is nifty so
    // I'll explain it a bit more.
-   // 
+   //
    // The find function does a binary search thru the
    // sorted item list.
    //
    // If found the index is the position of the item.
-   // 
-   // If not found the index is the correct insertion 
+   //
+   // If not found the index is the correct insertion
    // position for adding the new item.
    //
    // So not only do we have a fast find which is worst
@@ -328,13 +328,13 @@ const ForestItem& ForestCell::insertItem( ForestItemKey key,
    //
    U32 index;
    bool found = findIndexByKey( key, &index );
-   
+
    // If we didn't find one then insert it.
    if ( !found )
       mItems.insert( index );
 
    // Update the item settings.
-   ForestItem &item = mItems[ index ];   
+   ForestItem &item = mItems[ index ];
    item.setData( data );
    item.setTransform( xfm, scale );
 
@@ -358,16 +358,16 @@ bool ForestCell::removeItem( ForestItemKey key, const Point3F &keyPos, bool dele
       if ( !mSubCells[index]->removeItem( key, keyPos, deleteIfEmpty ) )
       {
          // For debugging lets make sure we didn't pick the wrong subCell...
-         
+
          return false;
       }
 
-      // If requested by the caller delete our empty subcells.      
+      // If requested by the caller delete our empty subcells.
       // Note that by deleting SubCell[0] we have become a leaf with no items
       // and will return true to our parent's isEmpty test.
       if ( deleteIfEmpty &&
-           mSubCells[0]->isEmpty() && 
-           mSubCells[1]->isEmpty() && 
+           mSubCells[0]->isEmpty() &&
+           mSubCells[1]->isEmpty() &&
            mSubCells[2]->isEmpty() &&
            mSubCells[3]->isEmpty() )
       {
@@ -427,7 +427,7 @@ void ForestCell::getItems( Vector<ForestItem> *outItems ) const
 }
 
 void ForestCell::buildPhysicsRep( Forest *forest )
-{   
+{
    AssertFatal( isLeaf(), "ForestCell::buildPhysicsRep() - This shouldn't be called on non-leaf cells!" );
 
    bool isServer = forest->isServerObject();
@@ -435,23 +435,23 @@ void ForestCell::buildPhysicsRep( Forest *forest )
    // Already has a PhysicsBody, if it needed to be rebuilt it would
    // already be null.
    if ( mPhysicsRep[ isServer ] )
-      return;   
+      return;
 
    if ( !PHYSICSMGR )
       return;
 
    PhysicsCollision *colShape = NULL;
 
-   // If we can steal the collision shape from the server-side cell   
+   // If we can steal the collision shape from the server-side cell
    // then do so as it saves us alot of cpu time and memory.
    if ( mPhysicsRep[ 1 ] )
-   {      
+   {
       colShape = mPhysicsRep[ 1 ]->getColShape();
    }
    else
    {
       // We must pass a sphere to buildPolyList but it is not used.
-      const static SphereF dummySphere( Point3F::Zero, 0 );       
+      const static SphereF dummySphere( Point3F::Zero, 0 );
 
       // Step thru them and build collision data.
       ForestItemVector::iterator itemItr = mItems.begin();
@@ -460,7 +460,7 @@ void ForestCell::buildPhysicsRep( Forest *forest )
       {
          const ForestItem &item = *itemItr;
          const ForestItemData *itemData = item.getData();
-         
+
          // If not collidable don't need to build anything.
          if ( !itemData->mCollidable )
             continue;

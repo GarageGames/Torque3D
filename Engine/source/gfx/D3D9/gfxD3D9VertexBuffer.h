@@ -31,7 +31,7 @@
 #endif
 
 //*****************************************************************************
-// GFXD3D9VertexBuffer 
+// GFXD3D9VertexBuffer
 //*****************************************************************************
 class GFXD3D9VertexBuffer : public GFXVertexBuffer
 {
@@ -49,10 +49,10 @@ public:
    bool mClearAtFrameEnd;
 
    GFXD3D9VertexBuffer();
-   GFXD3D9VertexBuffer( GFXDevice *device, 
-                        U32 numVerts, 
+   GFXD3D9VertexBuffer( GFXDevice *device,
+                        U32 numVerts,
                         const GFXVertexFormat *vertexFormat,
-                        U32 vertexSize, 
+                        U32 vertexSize,
                         GFXBufferType bufferType );
    virtual ~GFXD3D9VertexBuffer();
 
@@ -61,7 +61,7 @@ public:
    void prepare() {}
 
 #ifdef TORQUE_DEBUG
-   char *name; 
+   char *name;
 
    /// In debug compile, the verts will be chained together and the device
    /// will examine the chain when it's destructor is called, this will
@@ -96,10 +96,10 @@ inline GFXD3D9VertexBuffer::GFXD3D9VertexBuffer()
 #endif
 }
 
-inline GFXD3D9VertexBuffer::GFXD3D9VertexBuffer(   GFXDevice *device, 
-                                                   U32 numVerts, 
-                                                   const GFXVertexFormat *vertexFormat, 
-                                                   U32 vertexSize, 
+inline GFXD3D9VertexBuffer::GFXD3D9VertexBuffer(   GFXDevice *device,
+                                                   U32 numVerts,
+                                                   const GFXVertexFormat *vertexFormat,
+                                                   U32 vertexSize,
                                                    GFXBufferType bufferType )
    : GFXVertexBuffer( device, numVerts, vertexFormat, vertexSize, bufferType )
 {
@@ -119,7 +119,7 @@ inline GFXD3D9VertexBuffer::GFXD3D9VertexBuffer(   GFXDevice *device,
 
 #ifdef TORQUE_DEBUG
 
-inline void GFXD3D9VertexBuffer::setName( const char *n ) 
+inline void GFXD3D9VertexBuffer::setName( const char *n )
 {
    SAFE_DELETE( name );
    name = new char[dStrlen( n )];

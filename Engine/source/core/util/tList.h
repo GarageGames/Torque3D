@@ -60,7 +60,7 @@ public:
 
       _Iterator();
       _Iterator(PersistentIter &iter) { _link = (Link *)iter; }
- 
+
       operator PersistentIter() const { return (PrivatePersist *)_link; }
 
       _Iterator& operator++();

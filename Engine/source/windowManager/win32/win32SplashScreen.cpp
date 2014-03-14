@@ -111,14 +111,14 @@ void CloseSplashWindow(HINSTANCE hinst)
 {
 	if (gSplashWndOwner)
 	{
-		//ShowWindow(gSplashWnd, 0);	
+		//ShowWindow(gSplashWnd, 0);
 		DestroyWindow(gSplashWndOwner);
 		UnregisterSplashWindowClass(hinst);
 	}
 
 	gSplashWndOwner = NULL;
 	gSplashWnd = NULL;
-	
+
 }
 
 bool Platform::displaySplashWindow( String path )
@@ -132,7 +132,7 @@ bool Platform::displaySplashWindow( String path )
    const UTF8  *lFileName = path.c_str();
 #endif
 
-	gSplashImage = (HBITMAP) ::LoadImage(0, lFileName, 
+	gSplashImage = (HBITMAP) ::LoadImage(0, lFileName,
 		IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
 	if (!gSplashImage)

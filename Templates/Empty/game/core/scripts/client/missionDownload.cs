@@ -32,7 +32,7 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-// Phase 1 
+// Phase 1
 //----------------------------------------------------------------------------
 
 function clientCmdMissionStartPhase1(%seq, %missionName, %musicTrack)
@@ -82,16 +82,16 @@ function clientCmdMissionStartPhase3(%seq,%missionName)
    onPhase2Complete();
    StartClientReplication();
    StartFoliageReplication();
-   
+
    // Load the static mission decals.
    decalManagerLoad( %missionName @ ".decals" );
-   
+
    echo ("*** Phase 3: Mission Lighting");
    $MSeq = %seq;
    $Client::MissionFile = %missionName;
 
    // Need to light the mission before we are ready.
-   // The sceneLightingComplete function will complete the handshake 
+   // The sceneLightingComplete function will complete the handshake
    // once the scene lighting is done.
    if (lightScene("sceneLightingComplete", ""))
    {
@@ -113,7 +113,7 @@ function sceneLightingComplete()
 {
    echo("Mission lighting done");
    onPhase3Complete();
-   
+
    // The is also the end of the mission load cycle.
    onMissionDownloadComplete();
    commandToServer('MissionStartPhase3Ack', $MSeq);

@@ -58,7 +58,7 @@ U32 RenderImposterMgr::smRTChanges = 0.0f;
 
 IMPLEMENT_CONOBJECT(RenderImposterMgr);
 
-ConsoleDocClass( RenderImposterMgr, 
+ConsoleDocClass( RenderImposterMgr,
    "@brief A render bin for batch rendering imposters.\n\n"
    "This render bin gathers imposter render instances and renders them in large "
    "batches.\n\n"
@@ -148,7 +148,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
 
    // Setup the large static index buffer for rendering the imposters.
    if ( !mIB.isValid() )
-   {     
+   {
       // Setup a static index buffer for rendering.
       mIB.set( GFX, smImposterBatchSize * 6, 0, GFXBufferTypeStatic );
       U16 *idxBuff;
@@ -156,7 +156,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
       for ( U32 i=0; i < smImposterBatchSize; i++ )
       {
          //
-         // The vertex pattern in the VB for each 
+         // The vertex pattern in the VB for each
          // imposter is as follows...
          //
          //     0----1
@@ -228,10 +228,10 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
    // Also consider making this store two element lists... one for
    // batches and one for individual imposters.
    //
-      
+
    for ( U32 i=0; i < binSize; )
    {
-      currMat = static_cast<ImposterBaseRenderInst*>( mElementList[i].inst )->mat;      
+      currMat = static_cast<ImposterBaseRenderInst*>( mElementList[i].inst )->mat;
       setupMat = prePassBin ? prePassBin->getPrePassMaterial( currMat ) : currMat;
 
       // TODO: Fix MatInstance to take a const SceneRenderState!
@@ -243,10 +243,10 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
          for ( ; i < binSize; )
          {
             ri = static_cast<ImposterBaseRenderInst*>( mElementList[i].inst );
-            
+
             // NOTE: Its safe to compare matinstances here instead of
-            // the state hint because imposters all share the same 
-            // material instances.... if this changes revise.            
+            // the state hint because imposters all share the same
+            // material instances.... if this changes revise.
             if ( ri->mat != currMat )
                break;
 
@@ -257,7 +257,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
 
                GFX->setVertexBuffer( batch->vertBuff->getPointer() );
                GFX->drawPrimitive( GFXTriangleList, 0, batch->vertBuff->getPointer()->mNumVerts / 3 );
-               
+
                i++;
                continue;
             }
@@ -286,7 +286,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
                if ( stateCount + 1 >= smImposterBatchSize )
                {
                   smBatches++;
-               
+
                   vb.set( GFX, stateCount*4, GFXBufferTypeVolatile );
                   ImposterState *buf = vb.lock();
                   if(buf)
@@ -294,7 +294,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
                      dMemcpy( buf, mBuffer, stateCount * 4 * sizeof( ImposterState ) );
                      vb.unlock();
                   }
-               
+
                   //GFX->setVertexBuffer( mCornerVB, 0, stateCount * 4 );
                   GFX->setVertexBuffer( vb );
                   ///GFX->setVertexFormat( &mImposterVertDecl );
@@ -337,7 +337,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
                   dMemcpy( buf, mBuffer, stateCount * 4 * sizeof( ImposterState ) );
                   vb.unlock();
                }
-               
+
                //GFX->setVertexBuffer( mCornerVB, 0, stateCount * 4 );
                GFX->setVertexBuffer( vb );
                ///GFX->setVertexFormat( &mImposterVertDecl );

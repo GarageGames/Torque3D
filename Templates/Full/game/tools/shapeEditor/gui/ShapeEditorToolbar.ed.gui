@@ -20,7 +20,7 @@
    resizeHeight = "0";
    EdgeSnap = "0";
    text ="";
-   
+
    new GuiContainer() {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -119,7 +119,7 @@
          groupNum = "-1";
          buttonType = "ToggleButton";
          useMouseEvents = "0";
-      }; 
+      };
       new GuiBitmapCtrl() {
          Profile = "ToolsGuiDefaultProfile";
          position = "202 3";

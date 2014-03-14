@@ -352,7 +352,7 @@ void TSShapeLoader::generateSubshapes()
       // Recurse through the node hierarchy, adding 3space nodes and
       // collecting geometry
       S32 firstNode = shape->nodes.size();
-      shape->subShapeFirstNode.push_back(firstNode);      
+      shape->subShapeFirstNode.push_back(firstNode);
 
       for (U32 iBranch = 0; iBranch < subshape->branches.size(); iBranch++)
          recurseSubshape(subshape->branches[iBranch], -1, true);
@@ -1268,5 +1268,5 @@ TSShapeLoader::~TSShapeLoader()
    // Delete AppSequences
    for (int iSeq = 0; iSeq < appSequences.size(); iSeq++)
       delete appSequences[iSeq];
-   appSequences.clear();   
+   appSequences.clear();
 }

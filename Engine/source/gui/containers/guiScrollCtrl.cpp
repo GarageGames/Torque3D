@@ -37,7 +37,7 @@ IMPLEMENT_CONOBJECT( GuiScrollCtrl );
 ConsoleDocClass( GuiScrollCtrl,
    "@brief A container that allows to view one or more possibly larger controls inside its area by "
       "providing horizontal and/or vertical scroll bars.\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -84,7 +84,7 @@ GuiScrollCtrl::GuiScrollCtrl()
 void GuiScrollCtrl::initPersistFields()
 {
    addGroup( "Scolling" );
-   
+
       addField( "willFirstRespond",     TypeBool,    Offset(mWillFirstRespond, GuiScrollCtrl));
       addField( "hScrollBar",           TYPEID< ScrollBarBehavior >(),    Offset(mForceHScrollBar, GuiScrollCtrl),
          "When to display the horizontal scrollbar.");
@@ -99,7 +99,7 @@ void GuiScrollCtrl::initPersistFields()
          "Padding region to put around child contents." );
       addField( "mouseWheelScrollSpeed", TypeS32,    Offset(mScrollAnimSpeed, GuiScrollCtrl),
          "Pixels/Tick - if not positive then mousewheel scrolling occurs instantly (like other scrolling).");
-      
+
    endGroup( "Scrolling" );
 
    Parent::initPersistFields();
@@ -145,12 +145,12 @@ bool GuiScrollCtrl::onWake()
       mScrollBarThickness      = mBitmapBounds[BmpStates * BmpVPage].extent.x;
       mScrollBarArrowBtnLength = mBitmapBounds[BmpStates * BmpUp].extent.y;
       computeSizes();
-   } 
+   }
    else
    {
       Con::warnf("No texture loaded for scroll control named %s with profile %s", getName(), mProfile->getName());
    }
-   
+
    return true;
 }
 
@@ -176,10 +176,10 @@ bool GuiScrollCtrl::calcChildExtents()
       return false;
 
    // Find size and relative position of the client rectangle.
-   
+
 	Point2I maxPos( TypeTraits< S32 >::MIN, TypeTraits< S32 >::MIN );
 	Point2I minPos( TypeTraits< S32 >::MAX, TypeTraits< S32 >::MAX );
-   
+
    bool haveVisibleChild = false;
    for( U32 i = 0; i < size(); i++ )
    {
@@ -187,21 +187,21 @@ bool GuiScrollCtrl::calcChildExtents()
       if( ctrl->isVisible() )
       {
          haveVisibleChild = true;
-         
+
          minPos.x = getMin( ctrl->getPosition().x, minPos.x );
          minPos.y = getMin( ctrl->getPosition().y, minPos.y );
 
          // This is +1 but the remaining code here all works with extents +1.
          Point2I ctrlMax = ctrl->getPosition() + ctrl->getExtent();
-                  
+
          maxPos.x = getMax( ctrlMax.x, maxPos.x );
          maxPos.y = getMax( ctrlMax.y, maxPos.y );
       }
    }
-   
+
    if( !haveVisibleChild )
       return false;
-   
+
    mChildPos = minPos;
    mChildExt = maxPos - minPos;
 
@@ -510,7 +510,7 @@ void GuiScrollCtrl::scrollDeltaAnimate(S32 x, S32 y)
 
    mScrollTargetPos.setMin( mChildExt - mContentExt );
    mScrollTargetPos.setMax( Point2I::Zero );
-   
+
    mAnimating = true;
 }
 
@@ -673,7 +673,7 @@ bool GuiScrollCtrl::onKeyDown(const GuiEvent &event)
          case KEY_PAGE_DOWN:
             scrollByRegion(DownPage);
             return true;
-            
+
          default:
             break;
       }
@@ -726,7 +726,7 @@ bool GuiScrollCtrl::onMouseDownEditor( const GuiEvent& event, Point2I offset )
 {
    // If ALT is pressed while clicking on a horizontal or vertical scrollbar,
    // do a scroll.
-   
+
    if( event.modifier & SI_PRIMARY_ALT )
    {
       Region hitRegion = findHitRegion( globalToLocalCoord( event.mousePoint ) );
@@ -736,7 +736,7 @@ bool GuiScrollCtrl::onMouseDownEditor( const GuiEvent& event, Point2I offset )
          return true;
       }
    }
-   
+
    return false;
 }
 
@@ -833,7 +833,7 @@ bool GuiScrollCtrl::onMouseWheelDown(const GuiEvent &event)
    if ( !mAwake || !mVisible )
       return false;
 
-   scrollByMouseWheel( event );   
+   scrollByMouseWheel( event );
 
    return true;
 }
@@ -841,7 +841,7 @@ bool GuiScrollCtrl::onMouseWheelDown(const GuiEvent &event)
 //-----------------------------------------------------------------------------
 
 void GuiScrollCtrl::updateChildMousePos()
-{      
+{
    // We pass a fake GuiEvent to child controls onMouseMove
    // since although the mouse has not moved 'they' have.
    //
@@ -874,7 +874,7 @@ void GuiScrollCtrl::onPreRender()
    // Update mouse-wheel scroll animation if we are currently doing one...
 
    if ( mAnimating )
-   {            
+   {
       //U32 frames = Con::getIntVariable( "$frames", 0 );
       //frames++;
       //Con::setIntVariable( "$frames", frames );
@@ -884,7 +884,7 @@ void GuiScrollCtrl::onPreRender()
       if ( mScrollAnimSpeed <= 0 )
       {
          scrollTo( mScrollTargetPos.x, mScrollTargetPos.y );
-      }      
+      }
       else
       {
          S32 maxPixels = deltaTicks * mScrollAnimSpeed;
@@ -899,7 +899,7 @@ void GuiScrollCtrl::onPreRender()
          scrollDelta( deltaX, deltaY );
       }
 
-      if ( mChildRelPos == mScrollTargetPos )   
+      if ( mChildRelPos == mScrollTargetPos )
       {
          //Con::printf( "Animated Frames : %d", frames );
          //Con::setIntVariable( "$frames", 0 );
@@ -914,7 +914,7 @@ void GuiScrollCtrl::onPreRender()
    // Short circuit if not depressed to save cycles
    if( mStateDepressed != true )
       return;
-   
+
    //default to one second, though it shouldn't be necessary
    U32 timeThreshold = 1000;
 
@@ -1037,10 +1037,10 @@ void GuiScrollCtrl::onRender(Point2I offset, const RectI &updateRect)
    // create a rect to intersect with the updateRect
    RectI contentRect(mContentPos.x + offset.x, mContentPos.y + offset.y, mContentExt.x, mContentExt.y);
    contentRect.intersect(updateRect);
-   
+
    // Always call parent
    Parent::onRender(offset, contentRect);
-   
+
    if( mTextureObject )
    {
       // Reset the ClipRect as the parent call can modify it when rendering

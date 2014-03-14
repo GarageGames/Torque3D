@@ -36,7 +36,7 @@ public:
    RenderObjectMgr();
    RenderObjectMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder);
 
-   virtual void setOverrideMaterial(BaseMatInstance* overrideMat); 
+   virtual void setOverrideMaterial(BaseMatInstance* overrideMat);
 
    // RenderBinMgr
    virtual void render(SceneRenderState * state);

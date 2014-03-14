@@ -80,7 +80,7 @@ SimDataBlockEvent::SimDataBlockEvent(SimDataBlock* obj, U32 index, U32 total, U3
       id = obj->getId();
       AssertFatal(id >= DataBlockObjectIdFirst && id <= DataBlockObjectIdLast,
                   "Out of range event data block id... check simBase.h");
-      
+
       #ifdef DEBUG_SPEW
       Con::printf("queuing data block: %d", mIndex);
       #endif
@@ -112,7 +112,7 @@ void SimDataBlockEvent::notifyDelivered(NetConnection *conn, bool )
    // we've already resorted and resent some blocks, so fall out.
    if(conn->isRemoved())
       return;
-   
+
    GameConnection *gc = (GameConnection *) conn;
    if(gc->getDataBlockSequence() != mMissionSequence)
       return;
@@ -167,12 +167,12 @@ void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
       S32 classId = bstream->readClassId(NetClassTypeDataBlock, cptr->getNetClassGroup());
       mIndex = bstream->readInt(DataBlockObjectIdBitSize);
       mTotal = bstream->readInt(DataBlockObjectIdBitSize + 1);
-      
+
       SimObject* ptr;
       if( Sim::findObject( id, ptr ) )
       {
          // An object with the given ID already exists.  Make sure it has the right class.
-         
+
          AbstractClassRep* classRep = AbstractClassRep::findClassRep( cptr->getNetClassGroup(), NetClassTypeDataBlock, classId );
          if( classRep && dStrcmp( classRep->getClassName(), ptr->getClassName() ) != 0 )
          {
@@ -183,17 +183,17 @@ void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
             ptr = NULL;
          }
       }
-      
+
       if( !ptr )
          ptr = ( SimObject* ) ConsoleObject::create( cptr->getNetClassGroup(), NetClassTypeDataBlock, classId );
-         
+
       mObj = dynamic_cast< SimDataBlock* >( ptr );
       if( mObj != NULL )
       {
          #ifdef DEBUG_SPEW
          Con::printf(" - SimDataBlockEvent: unpacking event of type: %s", mObj->getClassName());
          #endif
-         
+
          mObj->unpackData( bstream );
       }
       else
@@ -201,7 +201,7 @@ void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
          #ifdef DEBUG_SPEW
          Con::printf(" - SimDataBlockEvent: INVALID PACKET!  Could not create class with classID: %d", classId);
          #endif
-         
+
          delete ptr;
          cptr->setLastError("Invalid packet in SimDataBlockEvent::unpack()");
       }
@@ -237,10 +237,10 @@ void SimDataBlockEvent::process(NetConnection *cptr)
       Con::executef("onDataBlockObjectReceived", Con::getIntArg(mIndex), Con::getIntArg(mTotal));
 
       String &errorBuffer = NetConnection::getErrorBuffer();
-                     
+
       // Register the datablock object if this is a new DB
       // and not for a modified datablock event.
-         
+
       if( !mObj->isProperlyAdded() )
       {
          // This is a fresh datablock object.
@@ -250,7 +250,7 @@ void SimDataBlockEvent::process(NetConnection *cptr)
          GameConnection* conn = dynamic_cast< GameConnection* >( cptr );
          if( conn )
             conn->preloadDataBlock( mObj );
-         
+
          if( mObj->registerObject(id) )
          {
             cptr->addObject( mObj );
@@ -318,7 +318,7 @@ void Sim3DAudioEvent::pack(NetConnection *con, BitStream *bstream)
    // If the sound has cone parameters, the orientation is
    // transmitted as well.
    SFXDescription* ad = mProfile->getDescription();
-   if ( bstream->writeFlag( ad->mConeInsideAngle || ad->mConeOutsideAngle ) ) 
+   if ( bstream->writeFlag( ad->mConeInsideAngle || ad->mConeOutsideAngle ) )
    {
       QuatF q(mTransform);
       q.normalize();

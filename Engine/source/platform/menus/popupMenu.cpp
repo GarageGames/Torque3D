@@ -31,7 +31,7 @@ bool PopupMenu::smSelectionEventHandled = false;
 
 /// Event class used to remove popup menus from the event notification in a safe way
 class PopUpNotifyRemoveEvent : public SimEvent
-{   
+{
 public:
    void process(SimObject *object)
    {
@@ -125,8 +125,8 @@ void PopupMenu::onMenuSelect()
 //-----------------------------------------------------------------------------
 
 void PopupMenu::handleSelectEvent(U32 popID, U32 command)
-{	
-	if (popID == mPopupGUID && canHandleID(command))	
+{
+	if (popID == mPopupGUID && canHandleID(command))
 		if (handleSelect(command))
 			smSelectionEventHandled = true;
 }
@@ -139,7 +139,7 @@ void PopupMenu::onAttachToMenuBar(GuiCanvas *canvas, S32 pos, const char *title)
 
 	// Attached menus must be notified of menu events
 	smPopupMenuEvent.notify(this, &PopupMenu::handleSelectEvent);
-   
+
    // Pass on to sub menus
    for(SimSet::iterator i = mSubmenus->begin();i != mSubmenus->end();++i)
    {
@@ -161,7 +161,7 @@ void PopupMenu::onRemoveFromMenuBar(GuiCanvas *canvas)
 
 	// We are no longer interested in select events, remove ourselves from the notification list in a safe way
 	Sim::postCurrentEvent(this, new PopUpNotifyRemoveEvent());
-      
+
    // Pass on to sub menus
    for(SimSet::iterator i = mSubmenus->begin();i != mSubmenus->end();++i)
    {

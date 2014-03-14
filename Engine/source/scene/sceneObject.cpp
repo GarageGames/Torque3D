@@ -339,8 +339,8 @@ void SceneObject::removeFromScene()
 //-----------------------------------------------------------------------------
 
 void SceneObject::onDeleteNotify( SimObject *obj )
-{      
-   // We are comparing memory addresses so even if obj really is not a 
+{
+   // We are comparing memory addresses so even if obj really is not a
    // ProcessObject this cast shouldn't break anything.
    if ( obj == mAfterObject )
       mAfterObject = NULL;
@@ -348,7 +348,7 @@ void SceneObject::onDeleteNotify( SimObject *obj )
    if ( obj == mMount.object )
       unmount();
 
-   Parent::onDeleteNotify( obj );   
+   Parent::onDeleteNotify( obj );
 }
 
 //-----------------------------------------------------------------------------
@@ -364,7 +364,7 @@ void SceneObject::inspectPostApply()
 //-----------------------------------------------------------------------------
 
 void SceneObject::setGlobalBounds()
-{ 
+{
    mGlobalBounds = true;
    mObjBox.minExtents.set( -1e10, -1e10, -1e10 );
    mObjBox.maxExtents.set(  1e10,  1e10,  1e10 );
@@ -377,7 +377,7 @@ void SceneObject::setGlobalBounds()
 
 void SceneObject::setTransform( const MatrixF& mat )
 {
-   // This test is a bit expensive so turn it off in release.   
+   // This test is a bit expensive so turn it off in release.
 #ifdef TORQUE_DEBUG
    //AssertFatal( mat.isAffine(), "SceneObject::setTransform() - Bad transform (non affine)!" );
 #endif
@@ -439,8 +439,8 @@ void SceneObject::resetWorldBox()
    mWorldSphere.radius = (mWorldBox.maxExtents - mWorldSphere.center).len();
 
    // Update tracker links.
-   
-   for( SceneObjectLink* link = mSceneObjectLinks; link != NULL; 
+
+   for( SceneObjectLink* link = mSceneObjectLinks; link != NULL;
         link = link->getNextLink() )
       link->update();
 }
@@ -466,8 +466,8 @@ void SceneObject::resetObjectBox()
    mWorldSphere.radius = ( mWorldBox.maxExtents - mWorldSphere.center ).len();
 
    // Update scene managers.
-   
-   for( SceneObjectLink* link = mSceneObjectLinks; link != NULL; 
+
+   for( SceneObjectLink* link = mSceneObjectLinks; link != NULL;
         link = link->getNextLink() )
       link->update();
 }
@@ -629,27 +629,27 @@ bool SceneObject::writeField( StringTableEntry fieldName, const char* value )
 {
    if( !Parent::writeField( fieldName, value ) )
       return false;
-      
+
    static StringTableEntry sIsRenderEnabled = StringTable->insert( "isRenderEnabled" );
    static StringTableEntry sIsSelectionEnabled = StringTable->insert( "isSelectionEnabled" );
    static StringTableEntry sMountNode = StringTable->insert( "mountNode" );
    static StringTableEntry sMountPos = StringTable->insert( "mountPos" );
    static StringTableEntry sMountRot = StringTable->insert( "mountRot" );
-   
+
    // Don't write flag fields if they are at their default values.
-   
+
    if( fieldName == sIsRenderEnabled && dAtob( value ) )
       return false;
    else if( fieldName == sIsSelectionEnabled && dAtob( value ) )
       return false;
-   else if ( mMountPID == NULL && ( fieldName == sMountNode || 
-                                    fieldName == sMountPos || 
+   else if ( mMountPID == NULL && ( fieldName == sMountNode ||
+                                    fieldName == sMountPos ||
                                     fieldName == sMountRot ) )
    {
       return false;
    }
 
-      
+
    return true;
 }
 
@@ -699,7 +699,7 @@ void SceneObject::setRenderEnabled( bool value )
       mObjectFlags.set( RenderEnabledFlag );
    else
       mObjectFlags.clear( RenderEnabledFlag );
-      
+
    setMaskBits( FlagMask );
 }
 
@@ -739,7 +739,7 @@ void SceneObject::setSelectionEnabled( bool value )
       mObjectFlags.set( SelectionEnabledFlag );
    else
       mObjectFlags.clear( SelectionEnabledFlag );
-      
+
    // Not synchronized on network so don't set dirty bit.
 }
 
@@ -772,13 +772,13 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
    if ( stream->writeFlag( mask & FlagMask ) )
       stream->writeRangedU32( (U32)mObjectFlags, 0, getObjectFlagMax() );
 
-   if ( mask & MountedMask ) 
-   {                  
-      if ( mMount.object ) 
+   if ( mask & MountedMask )
+   {
+      if ( mMount.object )
       {
          S32 gIndex = conn->getGhostIndex( mMount.object );
 
-         if ( stream->writeFlag( gIndex != -1 ) ) 
+         if ( stream->writeFlag( gIndex != -1 ) )
          {
             stream->writeFlag( true );
             stream->writeInt( gIndex, NetConnection::GhostIdBitSize );
@@ -797,7 +797,7 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
    }
    else
       stream->writeFlag( false );
-   
+
    return retMask;
 }
 
@@ -806,15 +806,15 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
 void SceneObject::unpackUpdate( NetConnection* conn, BitStream* stream )
 {
    Parent::unpackUpdate( conn, stream );
-   
+
    // FlagMask
-   if ( stream->readFlag() )      
+   if ( stream->readFlag() )
       mObjectFlags = stream->readRangedU32( 0, getObjectFlagMax() );
 
    // MountedMask
-   if ( stream->readFlag() ) 
+   if ( stream->readFlag() )
    {
-      if ( stream->readFlag() ) 
+      if ( stream->readFlag() )
       {
          S32 gIndex = stream->readInt( NetConnection::GhostIdBitSize );
          SceneObject* obj = dynamic_cast<SceneObject*>( conn->resolveGhost( gIndex ) );
@@ -901,7 +901,7 @@ void SceneObject::setPosition(const Point3F &pos)
 
 F32 SceneObject::distanceTo(const Point3F &pnt) const
 {
-   return mWorldBox.getDistanceToPoint( pnt );   
+   return mWorldBox.getDistanceToPoint( pnt );
 }
 
 //-----------------------------------------------------------------------------
@@ -943,15 +943,15 @@ void SceneObject::setProcessTick( bool t )
 
       getProcessList()->addObject( this );
 
-      mProcessTick = true;  
-   }   
+      mProcessTick = true;
+   }
 }
 
 //-----------------------------------------------------------------------------
 
 ProcessList* SceneObject::getProcessList() const
 {
-   if ( isClientObject() )      
+   if ( isClientObject() )
       return ClientProcessList::get();
    else
       return ServerProcessList::get();
@@ -1086,7 +1086,7 @@ void SceneObject::mountObject( SceneObject *obj, S32 node, const MatrixF &xfm )
 
 void SceneObject::unmountObject( SceneObject *obj )
 {
-   if ( obj->mMount.object == this ) 
+   if ( obj->mMount.object == this )
    {
       // Find and unlink the object
       for ( SceneObject **ptr = &mMount.list; *ptr; ptr = &(*ptr)->mMount.link )
@@ -1122,12 +1122,12 @@ void SceneObject::unmount()
 //-----------------------------------------------------------------------------
 
 void SceneObject::onMount( SceneObject *obj, S32 node )
-{   
+{
    deleteNotify( obj );
 
-   if ( !isGhost() ) 
-   {      
-      setMaskBits( MountedMask );      
+   if ( !isGhost() )
+   {
+      setMaskBits( MountedMask );
       //onMount_callback( node );
    }
 }
@@ -1138,9 +1138,9 @@ void SceneObject::onUnmount( SceneObject *obj, S32 node )
 {
    clearNotify(obj);
 
-   if ( !isGhost() ) 
-   {           
-      setMaskBits( MountedMask );      
+   if ( !isGhost() )
+   {
+      setMaskBits( MountedMask );
       //onUnmount_callback( node );
    }
 }
@@ -1322,12 +1322,12 @@ DefineEngineMethod( SceneObject, getEulerRotation, Point3F, (),,
    "X, Y and Z axes in degrees.\n" )
 {
    Point3F euler = object->getTransform().toEuler();
-   
+
    // Convert to degrees.
    euler.x = mRadToDeg( euler.x );
    euler.y = mRadToDeg( euler.y );
    euler.z = mRadToDeg( euler.z );
-   
+
    return euler;
 }
 

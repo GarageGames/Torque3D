@@ -27,7 +27,7 @@
 #include "console/engineAPI.h"
 #include "core/volume.h"
 
-// NOTE: The script class docs are in 
+// NOTE: The script class docs are in
 // Documentation\scriptDocs\docs\classGFXCardProfiler.txt
 
 
@@ -37,7 +37,7 @@ void GFXCardProfiler::loadProfileScript(const char* aScriptName)
    String scriptName = !profilePath.isEmpty() ? profilePath.c_str() : "profile";
    scriptName += "/";
    scriptName += aScriptName;
-   
+
    void  *data = NULL;
    U32   dataSize = 0;
 
@@ -186,7 +186,7 @@ ConsoleDoc(
    "@ingroup GFX\n"
 );
 
-DefineEngineStaticMethod( GFXCardProfilerAPI, getVersion, String, (),, 
+DefineEngineStaticMethod( GFXCardProfilerAPI, getVersion, String, (),,
    "Returns the driver version string." )
 {
 	return GFX->getCardProfiler()->getVersionString();

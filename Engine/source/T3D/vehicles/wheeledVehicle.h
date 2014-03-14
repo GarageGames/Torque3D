@@ -37,7 +37,7 @@ class ParticleEmitterData;
 
 //----------------------------------------------------------------------------
 
-struct WheeledVehicleTire: public SimDataBlock 
+struct WheeledVehicleTire: public SimDataBlock
 {
    typedef SimDataBlock Parent;
 
@@ -77,7 +77,7 @@ struct WheeledVehicleTire: public SimDataBlock
 
 //----------------------------------------------------------------------------
 
-struct WheeledVehicleSpring: public SimDataBlock 
+struct WheeledVehicleSpring: public SimDataBlock
 {
    typedef SimDataBlock Parent;
 
@@ -97,17 +97,17 @@ struct WheeledVehicleSpring: public SimDataBlock
 
 //----------------------------------------------------------------------------
 
-struct WheeledVehicleData: public VehicleData 
+struct WheeledVehicleData: public VehicleData
 {
    typedef VehicleData Parent;
 
-   enum Constants 
+   enum Constants
    {
       MaxWheels = 8,
       MaxWheelBits = 3
    };
 
-   enum Sounds 
+   enum Sounds
    {
       JetSound,
       EngineSound,
@@ -125,7 +125,7 @@ struct WheeledVehicleData: public VehicleData
    F32 brakeTorque;              // Force used when brakeing
 
    // Initialized onAdd
-   struct Wheel 
+   struct Wheel
    {
       S32 opposite;              // Opposite wheel on Y axis (or -1 for none)
       Point3F pos;               // Root pos of spring
@@ -155,7 +155,7 @@ class WheeledVehicle: public Vehicle
 {
    typedef Vehicle Parent;
 
-   enum MaskBits 
+   enum MaskBits
    {
       WheelMask    = Parent::NextFreeMask << 0,
       NextFreeMask = Parent::NextFreeMask << 1
@@ -169,7 +169,7 @@ class WheeledVehicle: public Vehicle
    SFXSource* mEngineSound;
    SFXSource* mSquealSound;
 
-   struct Wheel 
+   struct Wheel
    {
       WheeledVehicleTire *tire;
       WheeledVehicleSpring *spring;
@@ -180,7 +180,7 @@ class WheeledVehicle: public Vehicle
       F32 apos;               // Anuglar position (client side only)
       F32 Dy,Dx;              // Current tire deformation
 
-      struct Surface 
+      struct Surface
       {
          bool contact;        // Wheel is touching a surface
          Point3F normal;      // Surface normal

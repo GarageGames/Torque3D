@@ -50,10 +50,10 @@ static void _onRegisterFeatures( GFXAdapterType type )
 MODULE_BEGIN( WindDeformationHLSL )
 
    MODULE_INIT_AFTER( ShaderGen )
-   
+
    MODULE_INIT
    {
-      SHADERGEN->getFeatureInitSignal().notify( _onRegisterFeatures );   
+      SHADERGEN->getFeatureInitSignal().notify( _onRegisterFeatures );
    }
 
 MODULE_END;
@@ -73,10 +73,10 @@ void WindDeformationHLSL::determineFeature(  Material *material,
                                              MaterialFeatureData *outFeatureData )
 {
    bool enabled = vertexFormat->hasColor() && features.hasFeature( MFT_WindEffect );
-   outFeatureData->features.setFeature( type, enabled );   
+   outFeatureData->features.setFeature( type, enabled );
 }
 
-void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList, 
+void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
@@ -98,7 +98,7 @@ void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
    // If we're instancing then we need to instance the wind direction
    // and speed as its unique for each tree instance.
    Var *windDirAndSpeed;
-   if ( fd.features[MFT_UseInstancing] ) 
+   if ( fd.features[MFT_UseInstancing] )
    {
       ShaderConnector *vertStruct = dynamic_cast<ShaderConnector *>( componentList[C_VERT_STRUCT] );
       windDirAndSpeed = vertStruct->getElement( RT_TEXCOORD );
@@ -120,7 +120,7 @@ void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
    {
       accumTime = new Var( "accumTime", "float" );
       accumTime->uniform = true;
-      accumTime->constSortPos = cspPass;  
+      accumTime->constSortPos = cspPass;
    }
 
    // Get the transform to world space.
@@ -132,7 +132,7 @@ void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
    if ( !inPosition )
       inPosition = (Var*)LangElement::find( "position" );
 
-   // Copy the input position to the output first as 
+   // Copy the input position to the output first as
    // the wind effects are conditional.
    Var *outPosition = (Var*)LangElement::find( "inPosition" );
    if ( !outPosition )
@@ -150,9 +150,9 @@ void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
    if ( GFX->getPixelShaderVersion() >= 3.0f )
       meta->addStatement( new GenOp("   [branch] if ( any( @ ) ) {\r\n", windDirAndSpeed ) );
 
-   // Do the branch and detail bending first so that 
+   // Do the branch and detail bending first so that
    // it can work in pure object space of the tree.
-   LangElement *effect = 
+   LangElement *effect =
       new GenOp(  "windBranchBending( "
 
                      "@, "                  // vPos
@@ -190,7 +190,7 @@ void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( "   @ = @;\r\n", outPosition, effect ) );
 
    // Now do the trunk bending.
-   meta->addStatement( new GenOp("   @ = windTrunkBending( @, @.xy, @.z * @.x );\r\n", 
+   meta->addStatement( new GenOp("   @ = windTrunkBending( @, @.xy, @.z * @.x );\r\n",
       outPosition, outPosition, windDirAndSpeed, outPosition, windParams ) );
 
    // End the dynamic branch.
@@ -201,7 +201,7 @@ void WindDeformationHLSL::processVert( Vector<ShaderComponent*> &componentList,
 ShaderFeatureConstHandles* WindDeformationHLSL::createConstHandles( GFXShader *shader, SimObject *userObject )
 {
    WindDeformationConstHandles *handles = new WindDeformationConstHandles();
-   handles->init( shader );      
+   handles->init( shader );
 
    return handles;
 }

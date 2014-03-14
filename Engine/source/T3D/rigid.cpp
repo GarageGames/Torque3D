@@ -35,7 +35,7 @@ Rigid::Rigid()
    linMomentum.set(0.0f,0.0f,0.0f);
    angVelocity.set(0.0f,0.0f,0.0f);
    angMomentum.set(0.0f,0.0f,0.0f);
-   
+
    angPosition.identity();
    invWorldInertia.identity();
 

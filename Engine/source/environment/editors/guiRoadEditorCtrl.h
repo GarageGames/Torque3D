@@ -42,9 +42,9 @@ class GuiRoadEditorCtrl : public EditTSCtrl
    typedef EditTSCtrl Parent;
 
    public:
-   
+
       friend class GuiRoadEditorUndoAction;
-		
+
 		String mSelectRoadMode;
 		String mAddRoadMode;
 		String mAddNodeMode;
@@ -66,7 +66,7 @@ class GuiRoadEditorCtrl : public EditTSCtrl
       virtual void onSleep();
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
-      // EditTSCtrl      
+      // EditTSCtrl
 		bool onKeyDown(const GuiEvent& event);
       void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
       void on3DMouseDown(const Gui3DMouseEvent & event);
@@ -77,14 +77,14 @@ class GuiRoadEditorCtrl : public EditTSCtrl
       void on3DMouseLeave(const Gui3DMouseEvent & event);
       void on3DRightMouseDown(const Gui3DMouseEvent & event);
       void on3DRightMouseUp(const Gui3DMouseEvent & event);
-      void updateGuiInfo();      
+      void updateGuiInfo();
       void renderScene(const RectI & updateRect);
       void renderGui(Point2I offset, const RectI &updateRect);
 
       bool getTerrainPos( const Gui3DMouseEvent & event, Point3F &tpos );
       void deleteSelectedNode();
       void deleteSelectedRoad( bool undoAble = true );
-      
+
       void setMode( String mode, bool sourceShortcut );
       String getMode() { return mMode; }
 
@@ -100,7 +100,7 @@ class GuiRoadEditorCtrl : public EditTSCtrl
 		void setNodePosition( Point3F pos );
 
       void setTextureFile( StringTableEntry file );
-	
+
 	public:
 
 		StringTableEntry mMaterialName;
@@ -118,7 +118,7 @@ class GuiRoadEditorCtrl : public EditTSCtrl
       S32 mSelNode;
       S32 mHoverNode;
       U32 mAddNodeIdx;
-      SimObjectPtr<DecalRoad> mSelRoad;      
+      SimObjectPtr<DecalRoad> mSelRoad;
       SimObjectPtr<DecalRoad> mHoverRoad;
 
       ColorI mHoverSplineColor;

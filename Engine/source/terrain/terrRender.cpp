@@ -59,8 +59,8 @@ bool TerrainBlock::smDebugRender = false;
 
 
 GFX_ImplementTextureProfile( TerrainLayerTexProfile,
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize | 
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize |
                             GFXTextureProfile::Dynamic,
                             GFXTextureProfile::None );
 
@@ -74,7 +74,7 @@ void TerrainBlock::_onFlushMaterials()
 }
 
 void TerrainBlock::_updateMaterials()
-{   
+{
    mBaseTextures.setSize( mFile->mMaterials.size() );
 
    mMaxDetailDistance = 0.0f;
@@ -84,8 +84,8 @@ void TerrainBlock::_updateMaterials()
       TerrainMaterial *mat = mFile->mMaterials[i];
 
       if( !mat->getDiffuseMap().isEmpty() )
-         mBaseTextures[i].set( mat->getDiffuseMap(),  
-            &GFXDefaultStaticDiffuseProfile, 
+         mBaseTextures[i].set( mat->getDiffuseMap(),
+            &GFXDefaultStaticDiffuseProfile,
             "TerrainBlock::_updateMaterials() - DiffuseMap" );
       else
          mBaseTextures[ i ] = GFXTexHandle();
@@ -123,7 +123,7 @@ void TerrainBlock::_updateLayerTexture()
    GFXLockedRect *lock = mLayerTex.lock();
 
    for ( U32 i=0; i < pixelCount; i++ )
-   {  
+   {
       lock->bits[0] = layerMap[i];
 
       if ( i + 1 >= pixelCount )
@@ -165,8 +165,8 @@ bool TerrainBlock::_initBaseShader()
 
    GFXStateBlockDesc desc;
    desc.samplersDefined = true;
-   desc.samplers[0] = GFXSamplerStateDesc::getClampPoint();   
-   desc.samplers[1] = GFXSamplerStateDesc::getWrapLinear();   
+   desc.samplers[0] = GFXSamplerStateDesc::getClampPoint();
+   desc.samplers[1] = GFXSamplerStateDesc::getWrapLinear();
    desc.zDefined = true;
    desc.zWriteEnable = false;
    desc.zEnable = false;
@@ -229,9 +229,9 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
 
    GFXTexHandle blendTex;
 
-   // If the base texture is already a valid render target then 
+   // If the base texture is already a valid render target then
    // use it to render to else we create one.
-   if (  mBaseTex.isValid() && 
+   if (  mBaseTex.isValid() &&
          mBaseTex->isRenderTarget() &&
          mBaseTex->getFormat() == GFXFormatR8G8B8A8 &&
          mBaseTex->getWidth() == destSize.x &&
@@ -240,7 +240,7 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
    else
       blendTex.set( destSize.x, destSize.y, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, "" );
 
-   GFX->pushActiveRenderTarget();   
+   GFX->pushActiveRenderTarget();
 
    // Set our shader stuff
    GFX->setShader( mBaseShader );
@@ -252,7 +252,7 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
    GFX->setActiveRenderTarget( mBaseTarget );
 
    GFX->setTexture( 0, mLayerTex );
-   mBaseShaderConsts->setSafe( mBaseLayerSizeConst, (F32)mLayerTex->getWidth() );      
+   mBaseShaderConsts->setSafe( mBaseLayerSizeConst, (F32)mLayerTex->getWidth() );
 
    for ( U32 i=0; i < mBaseTextures.size(); i++ )
    {
@@ -266,7 +266,7 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
       F32 scale = 1.0f;
       if ( !mIsZero( baseSize ) )
          scale = getWorldBlockSize() / baseSize;
-      
+
       // A mistake early in development means that texture
       // coords are not flipped correctly.  To compensate
       // we flip the y scale here.
@@ -277,7 +277,7 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
    }
 
    mBaseTarget->resolve();
-   
+
    GFX->setShader( NULL );
    //GFX->setStateBlock( NULL ); // WHY NOT?
    GFX->setShaderConstBuffer( NULL );
@@ -309,7 +309,7 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
          {
          blendBmp.writeBitmap( "png", fs );
          fs.close();
-         }         
+         }
          }
          */
 
@@ -320,7 +320,7 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
 
          // Write result to file stream
          blendDDS->write( fs );
-         
+
          delete blendDDS;
       }
       fs.close();
@@ -339,9 +339,9 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
    PROFILE_SCOPE( TerrainBlock_RenderBlock );
 
    // Prevent rendering shadows if feature is disabled
-   if ( !mCastShadows && state->isShadowPass() ) 
+   if ( !mCastShadows && state->isShadowPass() )
       return;
-	  
+
    MatrixF worldViewXfm = state->getWorldViewMatrix();
    worldViewXfm.mul( getRenderTransform() );
 
@@ -366,12 +366,12 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
 
    // Did the detail layers change?
    if ( mDetailsDirty )
-   {   
+   {
       _updateMaterials();
       mDetailsDirty = false;
    }
 
-   // If the layer texture has been cleared or is 
+   // If the layer texture has been cleared or is
    // dirty then update it.
    if ( mLayerTex.isNull() || mLayerTexDirty )
       _updateLayerTexture();
@@ -382,7 +382,7 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
    {
       _updateBaseTexture( false );
       mLayerTexDirty = false;
-   }   
+   }
 
    static Vector<TerrCell*> renderCells;
    renderCells.clear();
@@ -446,12 +446,12 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
       inst->objectToWorldXfm = riObjectToWorldXfm;
 
       // If we're not drawing to the shadow map then we need
-      // to include the normal rendering materials. 
+      // to include the normal rendering materials.
       if ( isColorDrawPass )
-      {         
-         const SphereF &bounds = cell->getSphereBounds();         
+      {
+         const SphereF &bounds = cell->getSphereBounds();
 
-         F32 sqDist = ( bounds.center - objCamPos ).lenSquared();         
+         F32 sqDist = ( bounds.center - objCamPos ).lenSquared();
 
          F32 radiusSq = mSquared( ( mMaxDetailDistance + bounds.radius ) * smDetailScale );
 
@@ -473,10 +473,10 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
    }
 
    // Trigger the debug rendering.
-   if (  state->isDiffusePass() && 
-         !renderCells.empty() && 
+   if (  state->isDiffusePass() &&
+         !renderCells.empty() &&
          smDebugRender )
-   {      
+   {
       // Store the render cells for later.
       mDebugCells = renderCells;
 
@@ -487,8 +487,8 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
    }
 }
 
-void TerrainBlock::_renderDebug( ObjectRenderInst *ri, 
-                                 SceneRenderState *state, 
+void TerrainBlock::_renderDebug( ObjectRenderInst *ri,
+                                 SceneRenderState *state,
                                  BaseMatInstance *overrideMat )
 {
    GFXTransformSaver saver;

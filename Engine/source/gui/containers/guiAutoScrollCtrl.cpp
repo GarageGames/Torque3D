@@ -29,9 +29,9 @@ IMPLEMENT_CONOBJECT( GuiAutoScrollCtrl );
 
 ConsoleDocClass( GuiAutoScrollCtrl,
    "@brief A container that scrolls its child control up over time.\n\n"
-   
+
    "This container can be used to scroll a single child control in either of the four directions.\n\n"
-   
+
    "@tsexample\n"
    "// Create a GuiAutoScrollCtrl that scrolls a long text of credits.\n"
    "new GuiAutoScrollCtrl( CreditsScroller )\n"
@@ -59,9 +59,9 @@ ConsoleDocClass( GuiAutoScrollCtrl,
    "// Start rolling credits.\n"
    "Canvas.setContent( CreditsScroller );\n"
    "@endtsexample\n\n"
-   
+
    "@note Only the first child will be scrolled.\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -106,7 +106,7 @@ GuiAutoScrollCtrl::GuiAutoScrollCtrl()
 void GuiAutoScrollCtrl::initPersistFields()
 {
    addGroup( "Scrolling" );
-   
+
       addField( "scrollDirection", TYPEID< Direction >(), Offset( mDirection, GuiAutoScrollCtrl ),
          "Direction in which the child control is moved." );
       addField( "startDelay", TypeF32, Offset( mStartDelay, GuiAutoScrollCtrl ),
@@ -123,7 +123,7 @@ void GuiAutoScrollCtrl::initPersistFields()
       addField( "scrollOutOfSight", TypeBool, Offset( mScrollOutOfSight, GuiAutoScrollCtrl ),
          "If true, the child control will be completely scrolled out of sight; otherwise it will only scroll "
          "until the other end becomes visible." );
-         
+
    endGroup( "Scrolling" );
 
    Parent::initPersistFields();
@@ -135,7 +135,7 @@ bool GuiAutoScrollCtrl::onWake()
 {
    if( !Parent::onWake() )
       return false;
-      
+
    setProcessTicks( true );
    return true;
 }
@@ -170,16 +170,16 @@ bool GuiAutoScrollCtrl::_isScrollComplete() const
 {
    if( empty() )
       return true;
-      
+
    GuiControl* control = static_cast< GuiControl* >( at( 0 ) );
    U32 axis = _getScrollAxis();
    F32 amount = _getScrollAmount();
-   
+
    if( mScrollOutOfSight )
    {
       // If scrolling out of sight, scrolling is complete when the control's rectangle
       // does not intersect our own rectangle anymore.
-      
+
       RectI thisRect( Point2I( 0, 0 ), getExtent() );
       return !( thisRect.overlaps( control->getBounds() ) );
    }
@@ -201,23 +201,23 @@ void GuiAutoScrollCtrl::_reset( GuiControl* control )
 
    Point2I newPosition( mChildBorder, mChildBorder );
    Point2I newExtent = control->getExtent();
-   
+
    // Fit control on axis that is not scrolled.
    newExtent[ counterAxis ] = getExtent()[ counterAxis ] - mChildBorder * 2;
-   
+
    // For the right and down scrolls, position the control away from the
    // right/bottom edge of our control.
-   
+
    if( mDirection == Right )
       newPosition.x = - ( newExtent.x - getExtent().x + mChildBorder );
    else if( mDirection == Down )
       newPosition.y = - ( newExtent.y - getExtent().y + mChildBorder );
-      
+
    // Set the child geometry.
-      
+
    control->setPosition( newPosition );
-   control->setExtent( newExtent );   
-   
+   control->setExtent( newExtent );
+
    // Reset counters.
 
    mCurrentTime = 0.0f;
@@ -271,17 +271,17 @@ void GuiAutoScrollCtrl::advanceTime( F32 timeDelta )
 {
    if( mCurrentPhase == PhaseComplete )
       return;
-      
+
    // Wait out initial delay.
-            
+
    if( ( mCurrentTime + timeDelta ) < mStartDelay)
    {
       mCurrentTime += timeDelta;
       return;
    }
-   
+
    // Start scrolling if we haven't already.
-   
+
    if( mCurrentPhase == PhaseInitial )
    {
       onStart_callback();
@@ -293,22 +293,22 @@ void GuiAutoScrollCtrl::advanceTime( F32 timeDelta )
       return;
 
    // If not yet complete, scroll some more.
-   
+
    if( !_isScrollComplete() )
    {
       U32 axis = _getScrollAxis();
       F32 amount = _getScrollAmount();
-      
+
       mCurrentPosition += amount * timeDelta;
       Point2I newPosition = control->getPosition();
       newPosition[ axis ] = mCurrentPosition;
-      
+
       control->setPosition( newPosition );
    }
    else
    {
       mCurrentTime += timeDelta;
-      
+
       if( mCurrentPhase != PhaseComplete && mCurrentPhase != PhaseWait )
       {
          if( mCurrentPhase != PhaseWait )
@@ -316,16 +316,16 @@ void GuiAutoScrollCtrl::advanceTime( F32 timeDelta )
             onComplete_callback();
             mCurrentPhase = PhaseComplete;
          }
-         
+
          mCompleteTime = mCurrentTime;
       }
-      
+
       // Reset, if looping.
-      
+
       if( mIsLooping )
       {
          // Wait out reset time and restart.
-         
+
          mCurrentPhase = PhaseWait;
          if( mCurrentTime > ( mCompleteTime + mResetDelay ) )
          {

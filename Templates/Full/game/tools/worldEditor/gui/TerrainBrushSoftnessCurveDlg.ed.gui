@@ -212,16 +212,16 @@
 
 function TerrainBrushSoftnessCurveDlg::onWake( %this )
 {
-   %curve = %this-->FilterCurveCtrl;  
+   %curve = %this-->FilterCurveCtrl;
    %curve.setValue( ETerrainEditor.softSelectFilter );
 }
 
 function TerrainBrushSoftnessCurveDlg::onOk( %this )
 {
-   %curve = %this-->FilterCurveCtrl;   
-   ETerrainEditor.softSelectFilter = %curve.getValue(); 
-   ETerrainEditor.resetSelWeights(true); 
-      
+   %curve = %this-->FilterCurveCtrl;
+   ETerrainEditor.softSelectFilter = %curve.getValue();
+   ETerrainEditor.resetSelWeights(true);
+
    Canvas.popDialog( %this );
 }
 

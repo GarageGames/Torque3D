@@ -176,7 +176,7 @@ void ZipArchive::insertEntry(ZipEntry *ze)
          }
 
          root = newEntry;
-         
+
          *slash = '/';
          ptr = slash + 1;
       }
@@ -228,7 +228,7 @@ void ZipArchive::removeEntry(ZipEntry *ze)
          break;
       }
    }
-   
+
    // Remove from the tree
    Vector<ZipEntry *>::iterator j;
    for(j = mEntries.begin();j != mEntries.end();++j)
@@ -339,7 +339,7 @@ Stream *ZipArchive::createNewFile(const char *filename, Compressor *method)
 void ZipArchive::updateFile(ZipTempStream *stream)
 {
    CentralDir *cd = stream->getCentralDir();
-   
+
    // [tom, 1/23/2007] Uncompressed size and CRC32 are updated by ZipStatFilter
    cd->mCompressedSize = stream->getStreamSize();
    cd->mInternalFlags |= CDFileDirty;
@@ -353,14 +353,14 @@ void ZipArchive::updateFile(ZipTempStream *stream)
    cd->mModTime = dosTime & 0x0000ffff;
    cd->mModDate = (dosTime & 0xffff0000) >> 16;
 
-   mTempFiles.push_back(stream);  
+   mTempFiles.push_back(stream);
 }
 
 //-----------------------------------------------------------------------------
 
 U32 ZipArchive::localTimeToDOSTime(const Torque::Time::DateTime &dt)
 {
-   // DOS time format 
+   // DOS time format
    // http://msdn.microsoft.com/en-us/library/ms724274(VS.85).aspx
    return TimeToDOSTime(Torque::Time(dt));
 }
@@ -460,7 +460,7 @@ bool ZipArchive::rebuildZip()
    // Write central directory
    mEOCD.mCDOffset = zipFile->getPosition();
    mEOCD.mNumEntriesInThisCD = 0;
-   
+
    for(S32 i = 0;i < mEntries.size();++i)
    {
       ZipEntry *entry = mEntries[i];
@@ -500,7 +500,7 @@ bool ZipArchive::rebuildZip()
 
       String oldRename;
       oldRename = String(mFilename) + ".old";
-      
+
       if(! Torque::FS::Rename(mFilename, oldRename))
          return false;
 
@@ -594,7 +594,7 @@ bool ZipArchive::openArchive(const char *filename, AccessMode mode /* = Read */)
       if(openArchive(mDiskStream, mode))
          return true;
    }
-   
+
    // Cleanup just in case openArchive() failed
    closeArchive();
 
@@ -685,7 +685,7 @@ Stream * ZipArchive::openFile(const char *filename, ZipEntry* ze, AccessMode mod
                Con::errorf("ZipArchive::openFile - File %s is already open", filename);
             return NULL;
          }
-         
+
          // Remove the old entry so we can create a new one
          removeEntry(ze);
          ze = NULL;
@@ -856,7 +856,7 @@ bool ZipArchive::extractFile(const char *pathInZip, const char *filename, bool *
    const CentralDir *realCD = findFileInfo(pathInZip);
    if(realCD == NULL)
       return false;
-   
+
    FileStream dest;
    if(! dest.open(filename, Torque::FS::File::Write))
       return false;
@@ -887,7 +887,7 @@ bool ZipArchive::extractFile(const char *pathInZip, const char *filename, bool *
          Con::errorf("ZipArchive::extractFile - CRC failure extracting file %s", pathInZip);
       ret = false;
    }
-   
+
    closeFile(source);
    dest.close();
 

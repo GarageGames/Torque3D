@@ -111,7 +111,7 @@ U32 MoveList::getMoves(Move** movePtr,U32* numMoves)
 
 void MoveList::collectMove()
 {
-   Move mv;   
+   Move mv;
    if (mConnection)
    {
       if(!mConnection->isPlayingBack() && getNextMove(mv))
@@ -142,13 +142,13 @@ void MoveList::clearMoves(U32 count)
          // drop right away if no connection
          ackMoves(count);
    }
-   else 
+   else
    {
       AssertFatal(count <= mMoveVec.size(),"GameConnection: Clearing too many moves");
       for (S32 i=0; i<count; i++)
          if (mMoveVec[i].checksum == Move::ChecksumMismatch)
             mControlMismatch = true;
-         else 
+         else
             mControlMismatch = false;
       if (count == mMoveVec.size())
          mMoveVec.clear();
@@ -170,7 +170,7 @@ bool MoveList::isBacklogged()
    if ( !mConnection->isConnectionToServer() )
       return false;
 
-   return mLastClientMove - mFirstMoveIndex == mMoveVec.size() && 
+   return mLastClientMove - mFirstMoveIndex == mMoveVec.size() &&
           mMoveVec.size() >= MaxMoveCount;
 }
 

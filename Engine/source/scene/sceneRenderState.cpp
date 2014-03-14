@@ -51,7 +51,7 @@ SceneRenderState::SceneRenderState( SceneManager* sceneManager,
    // Setup the default parameters for the screen metrics methods.
    mDiffuseCameraTransform = view.getViewWorldMatrix();
 
-   // The vector eye is the camera vector with its 
+   // The vector eye is the camera vector with its
    // length normalized to 1 / zFar.
    getCameraTransform().getColumn( 1, &mVectorEye );
    mVectorEye.normalize( 1.0f / getFarPlane() );

@@ -137,8 +137,8 @@ public:
 
    void writeRangedU32(U32 value, U32 rangeStart, U32 rangeEnd);
    U32  readRangedU32(U32 rangeStart, U32 rangeEnd);
-   
-   /// Writes a clamped signed integer to the stream using 
+
+   /// Writes a clamped signed integer to the stream using
    /// an optimal amount of bits for the range.
    void writeRangedS32( S32 value, S32 min, S32 max );
 
@@ -153,7 +153,7 @@ public:
    void writeFloat(F32 f, S32 bitCount);
    void writeSignedFloat(F32 f, S32 bitCount);
 
-   /// Writes a clamped floating point value to the 
+   /// Writes a clamped floating point value to the
    /// stream with the desired bits of precision.
    void writeRangedF32( F32 value, F32 min, F32 max, U32 numBits );
 
@@ -181,14 +181,14 @@ public:
    static Point3F dumbDownNormal(const Point3F& vec, S32 bitCount);
 
    /// Writes a compressed vector as separate magnitude and
-   /// normal components.  The final space used depends on the 
+   /// normal components.  The final space used depends on the
    /// content of the vector.
    ///
    ///  - 1 bit is used to skip over zero length vectors.
    ///  - 1 bit is used to mark if the magnitude exceeds max.
    ///  - The magnitude as:
    ///     a. magBits if less than maxMag.
-   ///     b. a full 32bit value if greater than maxMag.   
+   ///     b. a full 32bit value if greater than maxMag.
    ///  - The normal as a phi and theta sized normalBits+1 and normalBits.
    ///
    void writeVector( Point3F vec, F32 maxMag, S32 magBits, S32 normalBits );
@@ -222,7 +222,7 @@ public:
    virtual void writeBits(S32 bitCount, const void *bitPtr);
    virtual void readBits(S32 bitCount, void *bitPtr);
    virtual bool writeFlag(bool val);
-   
+
    inline bool writeFlag(U32 val)
    {
       return writeFlag(val != 0);

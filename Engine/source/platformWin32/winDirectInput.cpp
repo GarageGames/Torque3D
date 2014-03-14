@@ -53,7 +53,7 @@ DInputManager::DInputManager()
 //------------------------------------------------------------------------------
 void DInputManager::init()
 {
-   Con::addVariable( "pref::Input::JoystickEnabled",  TypeBool, &smJoystickEnabled, 
+   Con::addVariable( "pref::Input::JoystickEnabled",  TypeBool, &smJoystickEnabled,
       "@brief If true, the joystick is currently enabled.\n\n"
 	   "@ingroup Game");
 }
@@ -583,7 +583,7 @@ void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, In
 // The next three functions: fireXInputConnectEvent, fireXInputMoveEvent, and fireXInputButtonEvent
 // determine whether a "delta" has occurred between the last captured controller state and the
 // currently captured controller state and only if so, do we fire an event. The shortcutter
-// "mXInputStateReset" is the exception and is true whenever DirectInput gets reset (because 
+// "mXInputStateReset" is the exception and is true whenever DirectInput gets reset (because
 // the user ALT-TABBED away, for example). That means that after every context switch,
 // you will get a full set of updates on the "true" state of the controller.
 inline void DInputManager::fireXInputConnectEvent( int controllerID, bool condition, bool connected )
@@ -627,13 +627,13 @@ inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFi
 #ifdef LOG_INPUT
       char *objName;
       switch (objInst)
-      {      
+      {
       /*
       case XI_DPAD_UP:        objName = "DPAD_UP"; break;
       case XI_DPAD_DOWN:      objName = "DPAD_DOWN"; break;
       case XI_DPAD_LEFT:      objName = "DPAD_LEFT"; break;
       case XI_DPAD_RIGHT:     objName = "DPAD_RIGHT"; break;
-      */      
+      */
       case XI_START:          objName = "START"; break;
       case XI_BACK:           objName = "BACK"; break;
       case XI_LEFT_THUMB:     objName = "LEFT_THUMB"; break;
@@ -665,8 +665,8 @@ void DInputManager::processXInput( void )
    {
       for ( int i=0; i<4; i++ )
       {
-         // Calling XInputGetState on a disconnected controller takes a fair 
-         // amount of time (probably because it tries to locate it), so we 
+         // Calling XInputGetState on a disconnected controller takes a fair
+         // amount of time (probably because it tries to locate it), so we
          // add a delay - only check every 250ms or so.
          if(mLastDisconnectTime[i] != -1)
          {
@@ -703,16 +703,16 @@ void DInputManager::processXInput( void )
          // trim the controller's thumbsticks to zero if they are within the deadzone
          if( mXInputDeadZoneOn )
          {
-            // Zero value if thumbsticks are within the dead zone 
-            if( (mXInputStateNew[i].state.Gamepad.sThumbLX < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbLX > -XINPUT_DEADZONE) && 
-                (mXInputStateNew[i].state.Gamepad.sThumbLY < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbLY > -XINPUT_DEADZONE) ) 
+            // Zero value if thumbsticks are within the dead zone
+            if( (mXInputStateNew[i].state.Gamepad.sThumbLX < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbLX > -XINPUT_DEADZONE) &&
+                (mXInputStateNew[i].state.Gamepad.sThumbLY < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbLY > -XINPUT_DEADZONE) )
             {
                mXInputStateNew[i].state.Gamepad.sThumbLX = 0;
                mXInputStateNew[i].state.Gamepad.sThumbLY = 0;
             }
 
-            if( (mXInputStateNew[i].state.Gamepad.sThumbRX < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbRX > -XINPUT_DEADZONE) && 
-                (mXInputStateNew[i].state.Gamepad.sThumbRY < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbRY > -XINPUT_DEADZONE) ) 
+            if( (mXInputStateNew[i].state.Gamepad.sThumbRX < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbRX > -XINPUT_DEADZONE) &&
+                (mXInputStateNew[i].state.Gamepad.sThumbRY < XINPUT_DEADZONE && mXInputStateNew[i].state.Gamepad.sThumbRY > -XINPUT_DEADZONE) )
             {
                mXInputStateNew[i].state.Gamepad.sThumbRX = 0;
                mXInputStateNew[i].state.Gamepad.sThumbRY = 0;
@@ -764,7 +764,7 @@ void DInputManager::processXInput( void )
          fireXInputButtonEvent( i, bJustConnected, XINPUT_GAMEPAD_Y, XI_Y );
       }
 
-      if ( mXInputStateReset ) 
+      if ( mXInputStateReset )
          mXInputStateReset = false;
    }
 }
@@ -836,7 +836,7 @@ ConsoleFunction( resetXInput, void, 1, 1, "()"
 
    argc; argv;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
-   if ( mgr && mgr->isEnabled() ) 
+   if ( mgr && mgr->isEnabled() )
       mgr->resetXInput();
 }
 
@@ -877,7 +877,7 @@ ConsoleFunction( getXInputState, int, 3, 4, "( int controllerID, string property
    argc; argv;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
 
-   if ( !mgr || !mgr->isEnabled() ) 
+   if ( !mgr || !mgr->isEnabled() )
       return -1;
 
    // Use a little bit of macro magic to simplify this otherwise monolothic
@@ -885,7 +885,7 @@ ConsoleFunction( getXInputState, int, 3, 4, "( int controllerID, string property
 #define GET_XI_STATE(constName) \
    if (!dStricmp(argv[2], #constName)) \
       return mgr->getXInputState( dAtoi( argv[1] ), constName, ( dAtoi ( argv[3] ) == 1) );
-   
+
    GET_XI_STATE(XI_THUMBLX);
    GET_XI_STATE(XI_THUMBLY);
    GET_XI_STATE(XI_THUMBRX);

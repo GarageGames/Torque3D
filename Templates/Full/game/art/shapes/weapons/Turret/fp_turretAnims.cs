@@ -27,7 +27,7 @@
    %this.addSequence("art/shapes/weapons/Turret/FP_Turret.DAE fire", "Turret_fire");
    %this.addSequence("art/shapes/weapons/Turret/FP_Turret.DAE switch_out", "Turret_switch_out");
    %this.addSequence("art/shapes/weapons/Turret/FP_Turret.DAE switch_in", "Turret_switch_in");
-   
+
    %this.setSequenceCyclic("Turret_fire", "0");
    %this.setSequenceCyclic("Turret_switch_out", "0");
    %this.setSequenceCyclic("Turret_switch_in", "0");

@@ -1,19 +1,19 @@
 // Original code is:
-// Copyright (c) 2005 Intel Corporation 
+// Copyright (c) 2005 Intel Corporation
 // All Rights Reserved
 //
 // CPUCount.cpp : Detects three forms of hardware multi-threading support across IA-32 platform
-//					The three forms of HW multithreading are: Multi-processor, Multi-core, and 
+//					The three forms of HW multithreading are: Multi-processor, Multi-core, and
 //					HyperThreading Technology.
 //					This application enumerates all the logical processors enabled by OS and BIOS,
-//					determine the HW topology of these enabled logical processors in the system 
+//					determine the HW topology of these enabled logical processors in the system
 //					using information provided by CPUID instruction.
 //					A multi-processing system can support any combination of the three forms of HW
-//					multi-threading support. The relevant topology can be identified using a 
-//					three level decomposition of the "initial APIC ID" into 
-//					Package_id, core_id, and SMT_id. Such decomposition provides a three-level map of 
+//					multi-threading support. The relevant topology can be identified using a
+//					three level decomposition of the "initial APIC ID" into
+//					Package_id, core_id, and SMT_id. Such decomposition provides a three-level map of
 //					the topology of hardware resources and
-//					allow multi-threaded software to manage shared hardware resources in 
+//					allow multi-threaded software to manage shared hardware resources in
 //					the platform to reduce resource contention
 
 //					Multicore detection algorithm for processor and cache topology requires
@@ -26,7 +26,7 @@
 
 // Consoles don't need this
 #if defined(TORQUE_OS_XENON) || defined(TORQUE_OS_PS3)
-namespace CPUInfo 
+namespace CPUInfo
 {
 
 EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
@@ -42,10 +42,10 @@ EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
 #else
 
 #ifdef TORQUE_OS_LINUX
-// 	The Linux source code listing can be compiled using Linux kernel verison 2.6 
-//	or higher (e.g. RH 4AS-2.8 using GCC 3.4.4). 
-//	Due to syntax variances of Linux affinity APIs with earlier kernel versions 
-//	and dependence on glibc library versions, compilation on Linux environment 
+// 	The Linux source code listing can be compiled using Linux kernel verison 2.6
+//	or higher (e.g. RH 4AS-2.8 using GCC 3.4.4).
+//	Due to syntax variances of Linux affinity APIs with earlier kernel versions
+//	and dependence on glibc library versions, compilation on Linux environment
 //	with older kernels and compilers may require kernel patches or compiler upgrades.
 
 #include <stdlib.h>
@@ -68,19 +68,19 @@ namespace CPUInfo {
 
 #define HWD_MT_BIT         0x10000000     // EDX[28]  Bit 28 is set if HT or multi-core is supported
 #define NUM_LOGICAL_BITS   0x00FF0000     // EBX[23:16] Bit 16-23 in ebx contains the number of logical
-      // processors per physical processor when execute cpuid with 
+      // processors per physical processor when execute cpuid with
       // eax set to 1
 #define NUM_CORE_BITS      0xFC000000     // EAX[31:26] Bit 26-31 in eax contains the number of cores minus one
-      // per physical processor when execute cpuid with 
-      // eax set to 4. 
+      // per physical processor when execute cpuid with
+      // eax set to 4.
 
 
-#define INITIAL_APIC_ID_BITS  0xFF000000  // EBX[31:24] Bits 24-31 (8 bits) return the 8-bit unique 
+#define INITIAL_APIC_ID_BITS  0xFF000000  // EBX[31:24] Bits 24-31 (8 bits) return the 8-bit unique
       // initial APIC ID for the processor this code is running on.
 
 
       #ifndef TORQUE_OS_MAC
-      static unsigned int  CpuIDSupported(void);      
+      static unsigned int  CpuIDSupported(void);
       static unsigned int  find_maskwidth(unsigned int);
       static unsigned int  HWD_MTSupported(void);
       static unsigned int  MaxLogicalProcPerPhysicalProc(void);
@@ -94,7 +94,7 @@ namespace CPUInfo {
 #ifndef TORQUE_OS_MAC
 
       //
-      // CpuIDSupported will return 0 if CPUID instruction is unavailable. Otherwise, it will return 
+      // CpuIDSupported will return 0 if CPUID instruction is unavailable. Otherwise, it will return
       // the maximum supported standard function.
       //
       static unsigned int CpuIDSupported(void)
@@ -102,8 +102,8 @@ namespace CPUInfo {
          unsigned int MaxInputValue;
          // If CPUID instruction is supported
 #ifdef TORQUE_COMPILER_GCC
-         try    
-         {		
+         try
+         {
             MaxInputValue = 0;
             // call cpuid with eax = 0
             asm
@@ -113,9 +113,9 @@ namespace CPUInfo {
                "cpuid\n\t"
                "popl %%ebx\n\t"
                : "=a" (MaxInputValue)
-               : 
+               :
                : "%ecx", "%edx"
-               );		
+               );
          }
          catch (...)
          {
@@ -148,7 +148,7 @@ namespace CPUInfo {
 
 
       //
-      // Function returns the maximum cores per physical package. Note that the number of 
+      // Function returns the maximum cores per physical package. Note that the number of
       // AVAILABLE cores per physical to be used by an application might be less than this
       // maximum value.
       //
@@ -168,7 +168,7 @@ namespace CPUInfo {
                "cpuid\n\t"
                "cmpl $4, %eax\n\t"			// check if cpuid supports leaf 4
                "jl .single_core\n\t"		// Single core
-               "movl $4, %eax\n\t"		
+               "movl $4, %eax\n\t"
                "movl $0, %ecx\n\t"			// start with index = 0; Leaf 4 reports
                "popl %ebx\n\t"
                );								// at least one valid cache level
@@ -178,14 +178,14 @@ namespace CPUInfo {
                : "=a" (Regeax)
                :
                : "%ecx", "%edx"
-               );		
+               );
             asm
                (
                "jmp .multi_core\n"
                ".single_core:\n\t"
                "xor %eax, %eax\n"
                ".multi_core:"
-               );		
+               );
          }
 #elif defined( TORQUE_COMPILER_VISUALC )
          __asm
@@ -194,14 +194,14 @@ namespace CPUInfo {
                cpuid
                cmp eax, 4			// check if cpuid supports leaf 4
                jl single_core		// Single core
-               mov eax, 4			
+               mov eax, 4
                mov ecx, 0			// start with index = 0; Leaf 4 reports
                cpuid				// at least one valid cache level
                mov Regeax, eax
                jmp multi_core
 
 single_core:
-            xor eax, eax		
+            xor eax, eax
 
 multi_core:
 
@@ -228,7 +228,7 @@ multi_core:
          if ((CpuIDSupported() >= 1))
          {
 #ifdef TORQUE_COMPILER_GCC
-            asm 
+            asm
                (
                "pushl %%ebx\n\t"
                "movl $1,%%eax\n\t"
@@ -244,13 +244,13 @@ multi_core:
                mov eax, 1
                   cpuid
                   mov Regedx, edx
-            }		
+            }
 #else
 #  error Not implemented.
 #endif
          }
 
-         return (Regedx & HWD_MT_BIT);  
+         return (Regedx & HWD_MT_BIT);
 
 
       }
@@ -258,7 +258,7 @@ multi_core:
 
 
       //
-      // Function returns the maximum logical processors per physical package. Note that the number of 
+      // Function returns the maximum logical processors per physical package. Note that the number of
       // AVAILABLE logical processors per physical to be used by an application might be less than this
       // maximum value.
       //
@@ -269,7 +269,7 @@ multi_core:
 
          if (!HWD_MTSupported()) return (unsigned int) 1;
 #ifdef TORQUE_COMPILER_GCC
-         asm 
+         asm
             (
             "movl $1,%%eax\n\t"
             "cpuid"
@@ -299,11 +299,11 @@ multi_core:
 #ifdef TORQUE_COMPILER_GCC
          asm
             (
-            "movl $1, %%eax\n\t"	
+            "movl $1, %%eax\n\t"
             "cpuid"
-            : "=b" (Regebx) 
+            : "=b" (Regebx)
             :
-            : "%eax","%ecx","%edx" 
+            : "%eax","%ecx","%edx"
             );
 
 #elif defined( TORQUE_COMPILER_VISUALC )
@@ -315,14 +315,14 @@ multi_core:
          }
 #else
 #  error Not implemented.
-#endif                                
+#endif
 
          return (unsigned char) ((Regebx & INITIAL_APIC_ID_BITS) >> 24);
 
       }
 
       //
-      // Determine the width of the bit field that can represent the value count_item. 
+      // Determine the width of the bit field that can represent the value count_item.
       //
       unsigned int find_maskwidth(unsigned int CountItem)
       {
@@ -331,7 +331,7 @@ multi_core:
 #ifdef TORQUE_COMPILER_GCC
          asm
             (
-#ifdef __x86_64__		// define constant to compile  
+#ifdef __x86_64__		// define constant to compile
             "push %%rcx\n\t"		// under 64-bit Linux
             "push %%rax\n\t"
 #else
@@ -361,10 +361,10 @@ multi_core:
             "next:\n\t"
 #ifdef __x86_64__
             "pop %rax\n\t"
-            "pop %rcx"		
+            "pop %rcx"
 #else
             "popl %eax\n\t"
-            "popl %ecx"		
+            "popl %ecx"
 #endif
             );
 
@@ -400,7 +400,7 @@ next:
          unsigned char MaskBits;
 
          MaskWidth = find_maskwidth((unsigned int) MaxSubIDValue);
-         MaskBits  = (0xff << ShiftCount) ^ 
+         MaskBits  = (0xff << ShiftCount) ^
             ((unsigned char) (0xff << (ShiftCount + MaskWidth)));
 
          return (FullID & MaskBits);
@@ -419,7 +419,7 @@ next:
          g_s3Levels[0] = 0;
          TotAvailCore = 1;
          PhysicalNum  = 1;
-         
+
          unsigned int numLPEnabled = 0;
          int MaxLPPerCore = 1;
 
@@ -456,19 +456,19 @@ next:
          char	tmp[256];
 
 #ifdef TORQUE_OS_LINUX
-         //we need to make sure that this process is allowed to run on 
+         //we need to make sure that this process is allowed to run on
          //all of the logical processors that the OS itself can run on.
-         //A process could acquire/inherit affinity settings that restricts the 
+         //A process could acquire/inherit affinity settings that restricts the
          // current process to run on a subset of all logical processor visible to OS.
 
          // Linux doesn't easily allow us to look at the Affinity Bitmask directly,
-         // but it does provide an API to test affinity maskbits of the current process 
+         // but it does provide an API to test affinity maskbits of the current process
          // against each logical processor visible under OS.
-         int sysNumProcs = sysconf(_SC_NPROCESSORS_CONF); //This will tell us how many 
+         int sysNumProcs = sysconf(_SC_NPROCESSORS_CONF); //This will tell us how many
          //CPUs are currently enabled.
 
-         //this will tell us which processors this process can run on. 
-         cpu_set_t allowedCPUs;	 
+         //this will tell us which processors this process can run on.
+         cpu_set_t allowedCPUs;
          sched_getaffinity(0, sizeof(allowedCPUs), &allowedCPUs);
 
          for (int i = 0; i < sysNumProcs; i++ )
@@ -478,7 +478,7 @@ next:
          }
 #elif defined( TORQUE_OS_WIN32 )
          DWORD dwProcessAffinity, dwSystemAffinity;
-         GetProcessAffinityMask(GetCurrentProcess(), 
+         GetProcessAffinityMask(GetCurrentProcess(),
             &dwProcessAffinity,
             &dwSystemAffinity);
          if (dwProcessAffinity != dwSystemAffinity)  // not all CPUs are enabled
@@ -487,7 +487,7 @@ next:
 #  error Not implemented.
 #endif
 
-         // Assume that cores within a package have the SAME number of 
+         // Assume that cores within a package have the SAME number of
          // logical processors.  Also, values returned by
          // MaxLogicalProcPerPhysicalProc and MaxCorePerPhysicalProc do not have
          // to be power of 2.
@@ -529,7 +529,7 @@ next:
                // Extract package ID, assume single cluster.
                // Shift value is the mask width for max Logical per package
 
-               PackageIDMask = (unsigned char) (0xff << 
+               PackageIDMask = (unsigned char) (0xff <<
                   find_maskwidth(MaxLogicalProcPerPhysicalProc()));
 
                tblPkgID[j] = apicID & PackageIDMask;
@@ -541,7 +541,7 @@ next:
 
             } // if
 
-            j++;  
+            j++;
             dwAffinityMask = 1 << j;
          } // while
 
@@ -633,10 +633,10 @@ next:
 #endif
 
          //
-         // Check to see if the system is multi-core 
+         // Check to see if the system is multi-core
          // Check if the system is hyper-threading
          //
-         if (TotAvailCore > PhysicalNum) 
+         if (TotAvailCore > PhysicalNum)
          {
             // Multi-core
             if (MaxLPPerCore == 1)

@@ -86,7 +86,7 @@ inline MatrixF btCast( const btTransform &xfm )
    out.setRow( 0, btCast<Point3F>( xfm.getBasis()[0] ) );
    out.setRow( 1, btCast<Point3F>( xfm.getBasis()[1] ) );
    out.setRow( 2, btCast<Point3F>( xfm.getBasis()[2] ) );
-   
+
    // The position.
    out[3] = xfm.getOrigin().x();
    out[7] = xfm.getOrigin().y();

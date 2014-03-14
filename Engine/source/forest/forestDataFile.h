@@ -68,14 +68,14 @@ class ForestData
 
       /// Finds the best top level bucket for the ForestItem 'key' position
       /// or returns NULL.
-      ForestCell* _findBucket( const Point3F &pos ) const;      
+      ForestCell* _findBucket( const Point3F &pos ) const;
 
       /// Find the best top level bucket for the given position
       /// or returns a new one.
       ForestCell* _findOrCreateBucket( const Point3F &pos );
 
       void _onItemReload();
-      
+
 
    public:
 
@@ -84,7 +84,7 @@ class ForestData
 
       bool isDirty() const { return mIsDirty; }
 
-      /// Deletes all the data and resets the 
+      /// Deletes all the data and resets the
       /// file to an empty state.
       void clear();
 
@@ -112,7 +112,7 @@ class ForestData
                                     ForestItemData *newData,
                                     const MatrixF &newXfm,
                                     F32 newscale );
-     
+
       const ForestItem& updateItem( ForestItem &item );
 
       bool removeItem( ForestItemKey key, const Point3F &keyPosition );
@@ -120,7 +120,7 @@ class ForestData
       /// Performs a search using the position to limit tested cells.
       const ForestItem& findItem( ForestItemKey key, const Point3F &keyPosition ) const;
 
-      /// Does an exhaustive search thru all cells looking for 
+      /// Does an exhaustive search thru all cells looking for
       /// the item.  This method is slow and should be avoided.
       const ForestItem& findItem( ForestItemKey key ) const;
 
@@ -167,7 +167,7 @@ class ForestData
       /// on the first found item returning 1.
       ///
       /// @param point The center point of the search circle.
-      /// @param radius The radius of the search circle.      
+      /// @param radius The radius of the search circle.
       /// @param outItems The output vector of items or NULL.
       /// @return The count of items found.
       ///
@@ -186,7 +186,7 @@ class ForestData
 
       /// Returns all top level cells.
       void getCells( Vector<ForestCell*> *outCells ) const;
-      
+
       /// Gathers all the datablocks used and returns the count.
       U32 getDatablocks( Vector<ForestItemData*> *outVector ) const;
 
@@ -199,9 +199,9 @@ class ForestData
 };
 
 inline Point2I ForestData::_getBucketKey( const Point3F &pos )
-{   
-   return Point2I ( (S32)mFloor(pos.x / BUCKET_DIM) * BUCKET_DIM, 
-                    (S32)mFloor(pos.y / BUCKET_DIM) * BUCKET_DIM ); 
+{
+   return Point2I ( (S32)mFloor(pos.x / BUCKET_DIM) * BUCKET_DIM,
+                    (S32)mFloor(pos.y / BUCKET_DIM) * BUCKET_DIM );
 }
 
 inline ForestCell* ForestData::_findBucket( const Point3F &pos ) const

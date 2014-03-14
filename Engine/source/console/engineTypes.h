@@ -116,15 +116,15 @@ template< typename T >
 struct _EngineTypeTraits
 {
    // Default type traits corresponding to the semantics of class types.
-   
+
    typedef T Type;
    typedef T* ValueType;
    typedef typename Type::SuperType SuperType;
-   
+
    typedef T* ArgumentValueType;
    typedef T* ReturnValueType;
    typedef T* DefaultArgumentValueStoreType;
-   
+
    typedef ReturnValueType ReturnValue;
    static ValueType ArgumentToValue( ArgumentValueType val ) { return val; }
 
@@ -137,9 +137,9 @@ struct _EngineTypeTraits< void >
 {
    typedef void Type;
    typedef void ValueType;
-   typedef void ReturnValueType;   
+   typedef void ReturnValueType;
    typedef ReturnValueType ReturnValue;
-   
+
    static const EngineTypeInfo* const TYPEINFO;
 };
 
@@ -184,12 +184,12 @@ struct _EnginePrimitiveTypeTraits
    typedef T Type;
    typedef T ValueType;
    typedef void SuperType;
-   
+
    typedef ValueType ArgumentValueType;
    typedef ValueType ReturnValueType;
    typedef ValueType DefaultArgumentValueStoreType;
-   
-   typedef ReturnValueType ReturnValue;   
+
+   typedef ReturnValueType ReturnValue;
    static ValueType ArgumentToValue( ArgumentValueType val ) { return val; }
 
    static const EngineTypeInfo* const TYPEINFO;
@@ -206,7 +206,7 @@ struct _EngineEnumTypeTraits
    typedef ValueType ArgumentValueType;
    typedef ValueType ReturnValueType;
    typedef ValueType DefaultArgumentValueStoreType;
-   
+
    typedef ReturnValueType ReturnValue;
    static ValueType ArgumentToValue( ArgumentValueType val ) { return val; }
 
@@ -224,7 +224,7 @@ struct _EngineBitfieldTypeTraits
    typedef ValueType ArgumentValueType;
    typedef ValueType ReturnValueType;
    typedef ValueType DefaultArgumentValueStoreType;
-   
+
    typedef ReturnValueType ReturnValue;
    static ValueType ArgumentToValue( ArgumentValueType val ) { return val; }
 
@@ -238,7 +238,7 @@ struct _EngineStructTypeTraits
    typedef T Type;
    typedef const T& ValueType;
    typedef void SuperType;
-   
+
    // Structs get passed in as pointers and passed out as full copies.
    typedef T* ArgumentValueType;
    typedef T ReturnValueType;
@@ -263,12 +263,12 @@ struct _EngineFunctionTypeTraits
       typedef T* ArgumentValueType;
       typedef T* ReturnValueType;
       typedef T* DefaultArgumentValueStoreType;
-      
+
       static const bool IS_VARIADIC = _EngineArgumentTypeTable< T >::VARIADIC;
       static const U32 NUM_ARGUMENTS  = _EngineArgumentTypeTable< T >::NUM_ARGUMENTS;
 
       static const EngineTypeInfo* const TYPEINFO;
-   
+
    private:
       static const EngineFunctionTypeInfo< T > smTYPEINFO;
 };
@@ -355,7 +355,7 @@ namespace _Private {
          constructInPlace( p );
          return true;
       }
-   
+
       static void _destruct( void* ptr )
       {
          T* p = reinterpret_cast< T* >( ptr );
@@ -370,7 +370,7 @@ namespace _Private {
          AssertFatal( false, "EngineClassTypeInfo - constructInstance called on non-instantiable class" );
          return false;
       }
-   
+
       static void _destruct( void* ptr )
       {
          AssertFatal( false, "EngineClassTypeInfo - destructInstance called on non-instantiable class" );
@@ -390,7 +390,7 @@ namespace _Private {
          AssertFatal( false, "EngineClassTypeInfo - constructInstance called on abstract class" );
          return false;
       }
-   
+
       static void _destruct( void* ptr )
       {
          AssertFatal( false, "EngineClassTypeInfo - destructInstance called on abstract class" );
@@ -409,7 +409,7 @@ namespace _Private {
       static EngineExportScope __engineExportScopeInst;                                      \
       static EngineExportScope& __engineExportScope() { return __engineExportScopeInst; }    \
    };
-   
+
 ///
 #define IMPLEMENT_SCOPE( name, exportName, scope, doc )                                      \
    EngineExportScope name::__engineExportScopeInst( #exportName, &_SCOPE< scope >()(), doc );
@@ -432,12 +432,12 @@ namespace _Private {
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
    struct EngineTypeTraits< type > : public _EnginePrimitiveTypeTraits< type > {};
-   
+
 #define _DECLARE_ENUM( type )                                                                \
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
    struct _EngineTypeTraits< type > : public _EngineEnumTypeTraits< type > {};
-   
+
 #define _DECLARE_BITFIELD( type )                                                            \
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
@@ -462,7 +462,7 @@ namespace _Private {
       static EngineSimpleTypeInfo< type > gsTypeInfo( #exportName, &_SCOPE< scope >()(), EngineTypeKindPrimitive, doc );               \
    } }                                                                                                                                 \
    _IMPLEMENT_TYPE( type, exportName )
-   
+
 #define _IMPLEMENT_ENUM( type, exportName, scope, doc )                                                                                \
    namespace { namespace _ ## exportName {                                                                                             \
       typedef type EnumType;                                                                                                           \
@@ -474,7 +474,7 @@ namespace _Private {
       static const char* const _sDoc = doc;                                                                                            \
       static EngineExportScope& _sScope = _SCOPE< scope >()();                                                                         \
       static EngineEnumTable::Value _sEnums[] = {
-   
+
 #define _END_IMPLEMENT_ENUM                                                                                                            \
       };                                                                                                                               \
       static EngineEnumTable _sEnumTable( sizeof( _sEnums ) / sizeof( _sEnums[ 0 ] ), _sEnums );                                       \
@@ -492,13 +492,13 @@ namespace _Private {
       static const char* const _sDoc = doc;                                                                                            \
       static EngineExportScope& _sScope = _SCOPE< scope >()();                                                                         \
       static EngineEnumTable::Value _sEnums[] = {
-   
+
 #define _END_IMPLEMENT_BITFIELD                                                                                                        \
       };                                                                                                                               \
       static EngineEnumTable _sEnumTable( sizeof( _sEnums ) / sizeof( _sEnums[ 0 ] ), _sEnums );                                       \
       EngineSimpleTypeInfo< BitfieldType > gsTypeInfo( _sBitfieldName, &_sScope, EngineTypeKindBitfield, _sDoc, &_sEnumTable );        \
    } }
-   
+
 #define _IMPLEMENT_STRUCT( type, exportName, scope, doc )                                                                              \
    namespace { namespace _ ## exportName {                                                                                             \
       extern EngineStructTypeInfo< type > gsTypeInfo;                                                                                  \
@@ -531,7 +531,7 @@ namespace _Private {
 ///
 #define DECLARE_ENUM( type ) \
    _DECLARE_ENUM( type )
-   
+
 ///
 #define DECLARE_BITFIELD( type ) \
    _DECLARE_BITFIELD( type )
@@ -539,7 +539,7 @@ namespace _Private {
 ///
 #define IMPLEMENT_ENUM( type, exportName, scope, doc ) \
    _IMPLEMENT_ENUM( type, exportName, scope, doc )
-   
+
 ///
 #define IMPLEMENT_BITFIELD( type, exportName, scope, doc ) \
    _IMPLEMENT_BITFIELD( type, exportName, scope, doc )
@@ -547,7 +547,7 @@ namespace _Private {
 ///
 #define END_IMPLEMENT_ENUM \
    _END_IMPLEMENT_ENUM
-   
+
 ///
 #define END_IMPLEMENT_BITFIELD \
    _END_IMPLEMENT_BITFIELD
@@ -572,15 +572,15 @@ namespace _Private {
 ///
 #define FIELD_AS( type, fieldName, exportName, numElements, doc ) \
    { #exportName, doc, numElements, TYPE( *( ( type* ) &( ( ThisType* ) 16 )->fieldName ) ), FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
-   
+
 ///
 #define FIELDOFFSET( fieldName ) \
    U32( ( ( const char* ) &( ( ( ThisType* ) 16 )->fieldName ) ) - 16 ) // Artificial offset to avoid compiler warnings.
-   
+
 ///
 #define CLASSDOC( className, doc ) \
    template<> const char* EngineClassTypeInfo< className, className::_ClassBase >::smDocString = doc;
-   
+
 
 /// @}
 

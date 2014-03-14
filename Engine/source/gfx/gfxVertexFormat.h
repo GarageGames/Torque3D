@@ -50,7 +50,7 @@ namespace GFXSemantic
 
 /// This is a simple wrapper for the platform specific
 /// vertex declaration data which is held by the vertex
-/// format.  
+/// format.
 ///
 /// If your using it... you probably shouldn't be.
 ///
@@ -62,7 +62,7 @@ public:
 };
 
 
-/// The element structure helps define the data layout 
+/// The element structure helps define the data layout
 /// for GFXVertexFormat.
 ///
 /// @see GFXVertexFormat
@@ -78,11 +78,11 @@ protected:
    U32 mStreamIndex;
 
    /// A valid Torque shader symantic.
-   /// @see GFXSemantic   
+   /// @see GFXSemantic
    String mSemantic;
 
    /// The semantic index is used where there are
-   /// multiple semantics of the same type.  For 
+   /// multiple semantics of the same type.  For
    /// instance with texcoords.
    U32 mSemanticIndex;
 
@@ -94,7 +94,7 @@ public:
    /// Default constructor.
    GFXVertexElement()
       :  mStreamIndex( 0 ),
-         mSemanticIndex( 0 ),         
+         mSemanticIndex( 0 ),
          mType( GFXDeclType_Float4 )
    {
    }
@@ -103,7 +103,7 @@ public:
    GFXVertexElement( const GFXVertexElement &elem )
       :  mStreamIndex( elem.mStreamIndex ),
          mSemantic( elem.mSemantic ),
-         mSemanticIndex( elem.mSemanticIndex ),         
+         mSemanticIndex( elem.mSemanticIndex ),
          mType( elem.mType )
    {
    }
@@ -132,11 +132,11 @@ public:
 };
 
 
-/// The vertex format structure usually created via the declare and 
+/// The vertex format structure usually created via the declare and
 /// implement macros.
 ///
 /// You can use this class directly to create a vertex format, but
-/// note that it is expected to live as long as the VB that uses it 
+/// note that it is expected to live as long as the VB that uses it
 /// exists.
 ///
 /// @see GFXDeclareVertexFormat
@@ -172,7 +172,7 @@ public:
    /// @param index The semantic index which is typically only used for texcoords.
    ///
    void addElement( const String& semantic, GFXDeclType type, U32 index = 0, U32 stream = 0 );
-   
+
    /// Returns true if there is a NORMAL semantic in this vertex format.
    bool hasNormal() const;
 
@@ -182,7 +182,7 @@ public:
    /// Returns true if there is a COLOR semantic in this vertex format.
    bool hasColor() const;
 
-   /// Returns the texture coordinate count by 
+   /// Returns the texture coordinate count by
    /// counting the number of TEXCOORD semantics.
    U32 getTexCoordCount() const;
 
@@ -206,7 +206,7 @@ protected:
    /// We disable the copy operator.
    GFXVertexFormat& operator =( const GFXVertexFormat& ) { return *this; }
 
-   /// Recreates the description and state when 
+   /// Recreates the description and state when
    /// the format has been modified.
    void _updateDirty();
 
@@ -216,7 +216,7 @@ protected:
    /// Set when the element list is changed.
    bool mDirty;
 
-   /// Is set if there is a NORMAL semantic in this vertex format.   
+   /// Is set if there is a NORMAL semantic in this vertex format.
    bool mHasNormal;
 
    /// Is true if there is a TANGENT semantic in this vertex format.
@@ -225,7 +225,7 @@ protected:
    /// Is true if there is a COLOR semantic in this vertex format.
    bool mHasColor;
 
-   /// The texture coordinate count by counting the 
+   /// The texture coordinate count by counting the
    /// number of "TEXCOORD" semantics.
    U32 mTexCoordCount;
 
@@ -234,7 +234,7 @@ protected:
 
    /// An interned string which uniquely identifies the format.
    String mDescription;
-   
+
    /// The elements of the vertex format.
    Vector<GFXVertexElement> mElements;
 
@@ -243,16 +243,16 @@ protected:
 };
 
 
-inline bool GFXVertexFormat::isEqual( const GFXVertexFormat &format ) const 
+inline bool GFXVertexFormat::isEqual( const GFXVertexFormat &format ) const
 {
-   // Comparing the strings works because we know both 
+   // Comparing the strings works because we know both
    // these are interned strings.  This saves one comparison
    // over the string equality operator.
-   return getDescription().c_str() == format.getDescription().c_str(); 
+   return getDescription().c_str() == format.getDescription().c_str();
 }
 
 
-/// This template class is usused to initialize the format in 
+/// This template class is usused to initialize the format in
 /// the GFXImplement/DeclareVertexFormat macros.  You shouldn't
 /// need to use it directly in your code.
 ///
@@ -272,7 +272,7 @@ public:
 };
 
 
-/// Helper template function which returns the correct 
+/// Helper template function which returns the correct
 /// GFXVertexFormat object for a vertex structure.
 /// @see GFXVertexFormat
 template<class T> inline const GFXVertexFormat* getGFXVertexFormat();
@@ -288,13 +288,13 @@ template<class T> inline const GFXVertexFormat* getGFXVertexFormat();
 #endif
 
 
-/// The vertex format declaration which is usally placed in your header 
+/// The vertex format declaration which is usally placed in your header
 /// file.  It should be used in conjunction with the implementation macro.
-/// 
+///
 /// @param name The name for the vertex structure.
 ///
 /// @code
-///   
+///
 ///   // A simple vertex format declaration.
 ///   GFXDeclareVertexFormat( GFXVertexPCT )
 ///   {
@@ -314,13 +314,13 @@ template<class T> inline const GFXVertexFormat* getGFXVertexFormat();
    GFX_VERTEX_STRUCT name \
 
 
-/// The vertex format implementation which is usally placed in your source 
+/// The vertex format implementation which is usally placed in your source
 /// file.  It should be used in conjunction with the declaration macro.
-/// 
+///
 /// @param name The name of the vertex structure.
 ///
 /// @code
-///   
+///
 ///   // A simple vertex format implementation.
 ///   GFXImplementVertexFormat( GFXVertexPCT )
 ///   {

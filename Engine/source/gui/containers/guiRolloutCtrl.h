@@ -41,7 +41,7 @@
 class GuiRolloutCtrl : public GuiTickCtrl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
       // Theme Support
@@ -51,14 +51,14 @@ class GuiRolloutCtrl : public GuiTickCtrl
          CollapsedCenter,
          CollapsedRight,
          TopLeftHeader,
-         TopMidHeader,      
-         TopRightHeader,  
+         TopMidHeader,
+         TopRightHeader,
          MidPageLeft,
          MidPageCenter,
          MidPageRight,
-         BottomLeftHeader, 
-         BottomMidHeader,   
-         BottomRightHeader,   
+         BottomLeftHeader,
+         BottomMidHeader,
+         BottomRightHeader,
          NumBitmaps           ///< Number of bitmaps in this array
       };
 
@@ -66,7 +66,7 @@ class GuiRolloutCtrl : public GuiTickCtrl
 
       /// Label to display on rollout header.
       String mCaption;
-      
+
       RectI mHeader;
       RectI mExpanded;
       RectI mChildRect;
@@ -77,13 +77,13 @@ class GuiRolloutCtrl : public GuiTickCtrl
       S32 mAnimateDestHeight;
       S32 mAnimateStep;
       S32 mDefaultHeight;
-      
+
       /// Whether the rollout can be collapsed.
       bool mCanCollapse;
-      
+
       /// Whether to hide the rollout header.
       bool mHideHeader;
-      
+
       /// Whether to automatically collapse sibling rollouts when this one
       /// is expanded.
       bool mAutoCollapseSiblings;
@@ -93,23 +93,23 @@ class GuiRolloutCtrl : public GuiTickCtrl
 
       /// Indicates whether we have a texture to render the tabs with.
       bool mHasTexture;
-      
+
       /// Array of rectangles identifying textures for rollout.
       RectI *mBitmapBounds;
 
       // Property - "Expanded"
-      static bool setExpanded( void *object, const char *index, const char *data )  
-      { 
+      static bool setExpanded( void *object, const char *index, const char *data )
+      {
          bool expand = dAtob( data );
          if( expand )
-            static_cast<GuiRolloutCtrl*>(object)->instantExpand();         
+            static_cast<GuiRolloutCtrl*>(object)->instantExpand();
          else
-            static_cast<GuiRolloutCtrl*>(object)->instantCollapse();         
-         return false; 
+            static_cast<GuiRolloutCtrl*>(object)->instantCollapse();
+         return false;
       };
-      
+
       bool _onMouseUp( const GuiEvent& event, bool lockedMouse );
-      
+
       /// @name Callbacks
       /// @{
       DECLARE_CALLBACK( void, onHeaderRightClick, () );
@@ -120,7 +120,7 @@ class GuiRolloutCtrl : public GuiTickCtrl
       /// @}
 
    public:
-   
+
       GuiRolloutCtrl();
       ~GuiRolloutCtrl();
 
@@ -167,7 +167,7 @@ class GuiRolloutCtrl : public GuiTickCtrl
       void setCaption( const String& str ) { mCaption = str; }
       void setMargin( const RectI& rect ) { mMargin = rect; }
       void setMargin( S32 left, S32 top, S32 right, S32 bottom ) { setMargin( RectI( left, top, right, bottom ) ); }
-      
+
       void setHeaderHidden( bool value ) { mHideHeader = value; }
       void setCanCollapse( bool value ) { mCanCollapse = value; }
 

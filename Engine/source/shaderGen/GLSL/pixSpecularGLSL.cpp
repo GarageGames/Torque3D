@@ -35,11 +35,11 @@ PixelSpecularGLSL::PixelSpecularGLSL()
    addDependency( &mDep );
 }
 
-void PixelSpecularGLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void PixelSpecularGLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    /*
-   AssertFatal( fd.features[MFT_RTLighting], 
+   AssertFatal( fd.features[MFT_RTLighting],
       "PixelSpecularHLSL requires RTLighting to be enabled!" );
 
    MultiLine *meta = new MultiLine;
@@ -55,7 +55,7 @@ void PixelSpecularGLSL::processVert(   Vector<ShaderComponent*> &componentList,
       eyePos->constSortPos = cspPass;
    }
 
-   // Grab a register for passing the 
+   // Grab a register for passing the
    // world space view vector.
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
    Var *wsView = connectComp->getElement( RT_TEXCOORD );
@@ -67,7 +67,7 @@ void PixelSpecularGLSL::processVert(   Vector<ShaderComponent*> &componentList,
    Var *position = (Var*)LangElement::find( "inPosition" );
    if ( !position )
       position = (Var*)LangElement::find( "position" );
-   
+
    // Get the object to world transform.
    Var *objTrans = (Var*) LangElement::find( "objTrans" );
    if ( !objTrans )
@@ -76,21 +76,21 @@ void PixelSpecularGLSL::processVert(   Vector<ShaderComponent*> &componentList,
       objTrans->setType( "float4x4" );
       objTrans->setName( "objTrans" );
       objTrans->uniform = true;
-      objTrans->constSortPos = cspPrimitive;      
+      objTrans->constSortPos = cspPrimitive;
    }
 
-   meta->addStatement( new GenOp( "   @ = @ - mul( @, float4( @.xyz,1 ) ).xyz;\r\n", 
+   meta->addStatement( new GenOp( "   @ = @ - mul( @, float4( @.xyz,1 ) ).xyz;\r\n",
       wsView, eyePos, objTrans, position ) );
 
    output = meta;
    */
 }
 
-void PixelSpecularGLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void PixelSpecularGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
    /*
-   AssertFatal( fd.features[MFT_RTLighting], 
+   AssertFatal( fd.features[MFT_RTLighting],
       "PixelSpecularHLSL requires RTLighting to be enabled!" );
 
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -122,20 +122,20 @@ void PixelSpecularGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
    // Calcuate the specular factor.
    Var *specular = new Var( "specular", "float" );
-   meta->addStatement( new GenOp( "   @ = calcSpecular( -@, normalize( @ ), normalize( @ ), @ );\r\n", 
+   meta->addStatement( new GenOp( "   @ = calcSpecular( -@, normalize( @ ), normalize( @ ), @ );\r\n",
       new DecOp( specular ), inLightVec, wsNormal, wsView, specPow ) );
 
    LangElement *specMul = new GenOp( "float4(@.rgb,0) * @", specCol, specular );
    LangElement *final = specMul;
-   
+
    // mask out with lightmap if present
    if( fd.features[MFT_LightMap] )
    {
       LangElement *lmColor = NULL;
-      
+
       // find lightmap color
       lmColor = LangElement::find( "lmColor" );
-      
+
       if ( !lmColor )
       {
          LangElement * lightMap = LangElement::find( "lightMap" );
@@ -143,11 +143,11 @@ void PixelSpecularGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
          lmColor = new GenOp( "tex2D(@, @)", lightMap, lmCoord );
       }
-   
+
       final = new GenOp( "@ * float4(@.rgb,0)", specMul, lmColor );
    }
 
-   // We we have a normal map then mask the specular 
+   // We we have a normal map then mask the specular
    if ( !fd.features[MFT_SpecularMap] && fd.features[MFT_NormalMap] )
    {
       Var *bumpColor = (Var*)LangElement::find( "bumpNormal" );

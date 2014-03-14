@@ -42,7 +42,7 @@ struct KeyCode
    U32      mKeyCode;
    UniChar  mCharLower;
    UniChar  mCharUpper;
-   
+
    KeyCode( U32 keyCode )
       : mKeyCode( keyCode ) {}
 };
@@ -203,33 +203,33 @@ static bool KeyboardLayoutHasChanged()
 static UniChar OSKeyCodeToUnicode( UInt16 osKeyCode, bool shift = false )
 {
    // Translate the key code.
-   
+
    UniChar uniChar = 0;
    if( sKeyLayoutKind == kKLKCHRKind )
    {
       // KCHR mapping.
-      
+
       void* KCHRData;
       KLGetKeyboardLayoutProperty( sKeyLayout, kKLKCHRData, ( const void** ) & KCHRData );
-      
+
       UInt16 key = ( osKeyCode & 0x7f );
       if( shift )
          key |= NSShiftKeyMask;
-         
+
       UInt32 keyTranslateState = 0;
       UInt32 charCode = KeyTranslate( KCHRData, key, &keyTranslateState );
       charCode &= 0xff;
-      
+
       if( keyTranslateState == 0 && charCode )
          uniChar = charCode;
    }
    else
    {
       // UCHR mapping.
-      
+
       UCKeyboardLayout* uchrData;
       KLGetKeyboardLayoutProperty( sKeyLayout, kKLuchrData, ( const void** ) &uchrData );
-      
+
       UInt32 deadKeyState;
       UniCharCount actualStringLength;
       UniChar unicodeString[ 4 ];
@@ -243,11 +243,11 @@ static UniChar OSKeyCodeToUnicode( UInt16 osKeyCode, bool shift = false )
                       sizeof( unicodeString ) / sizeof( unicodeString[ 0 ] ),
                       &actualStringLength,
                       unicodeString );
-      
+
       if( actualStringLength )
          uniChar = unicodeString[ 0 ]; // Well, Unicode is something else, but...
    }
-   
+
    return uniChar;
 }
 
@@ -256,17 +256,17 @@ static void InitKeyCodeMapping()
    const U32 numOSKeyCodes = sizeof( sOSToKeyCode ) / sizeof( sOSToKeyCode[ 0 ] );
    GetKeyboardLayout();
    sLastKeyLayoutID = sKeyLayoutID;
-   
+
    U32 maxKeyCode = 0;
    for( U32 i = 0; i < numOSKeyCodes; ++ i )
    {
       sOSToKeyCode[ i ].mCharLower = OSKeyCodeToUnicode( i, false );
       sOSToKeyCode[ i ].mCharUpper = OSKeyCodeToUnicode( i, true );
-      
+
       if( sOSToKeyCode[ i ].mKeyCode > maxKeyCode )
          maxKeyCode = sOSToKeyCode[ i ].mKeyCode;
    }
-   
+
    if( !sKeyCodeToOS.size() )
    {
       sKeyCodeToOS.setSize( maxKeyCode + 1 );
@@ -281,7 +281,7 @@ U8 TranslateOSKeyCode(U8 macKeycode)
    AssertWarn(macKeycode < sizeof(sOSToKeyCode) / sizeof(sOSToKeyCode[0]), avar("TranslateOSKeyCode - could not translate code %i", macKeycode));
    if(macKeycode >= sizeof(sOSToKeyCode) / sizeof(sOSToKeyCode[0]))
       return KEY_NULL;
-      
+
    return sOSToKeyCode[ macKeycode ].mKeyCode;
 }
 
@@ -295,18 +295,18 @@ U8 TranslateKeyCodeToOS( U8 keycode )
 const char* Platform::getClipboard()
 {
    // mac clipboards can contain multiple items,
-   //  and each item can be in several differnt flavors, 
+   //  and each item can be in several differnt flavors,
    //  such as unicode or plaintext or pdf, etc.
    // scan through the clipboard, and return the 1st piece of actual text.
    ScrapRef    clip;
    char        *retBuf = "";
    OSStatus    err = noErr;
    char        *dataBuf = "";
-   
+
    // get a local ref to the system clipboard
-   GetScrapByName( kScrapClipboardScrap, kScrapGetNamedScrap, &clip ); 
-   
-   
+   GetScrapByName( kScrapClipboardScrap, kScrapGetNamedScrap, &clip );
+
+
    // First try to get unicode data, then try to get plain text data.
    Size dataSize = 0;
    bool plaintext = false;
@@ -324,24 +324,24 @@ const char* Platform::getClipboard()
       Con::errorf("no data, kicking out. size = %i",dataSize);
       return "";
    }
-   
+
    if( err == noErr && dataSize > 0 )
    {
       // ok, we've got something! allocate a buffer and copy it in.
       char buf[dataSize+1];
       dMemset(buf, 0, dataSize+1);
-      dataBuf = buf;      
+      dataBuf = buf;
       // plain text needs no conversion.
       // unicode data needs to be converted to normalized utf-8 format.
       if(plaintext)
-      { 
+      {
          GetScrapFlavorData(clip, kScrapFlavorTypeText, &dataSize, &buf);
          retBuf = Con::getReturnBuffer(dataSize + 1);
          dMemcpy(retBuf,buf,dataSize);
       }
       else
       {
-         GetScrapFlavorData(clip, kScrapFlavorTypeUnicode, &dataSize, &buf);         
+         GetScrapFlavorData(clip, kScrapFlavorTypeUnicode, &dataSize, &buf);
 
          // normalize
          CFStringRef cfBuf = CFStringCreateWithBytes(NULL, (const UInt8*)buf, dataSize, kCFStringEncodingUnicode, false);
@@ -359,7 +359,7 @@ const char* Platform::getClipboard()
       // manually null terminate, just in case.
       retBuf[dataSize] = 0;
    }
-         
+
     // return the data, or the empty string if we did not find any data.
          return retBuf;
 }
@@ -370,18 +370,18 @@ bool Platform::setClipboard(const char *text)
    ScrapRef       clip;
    U32            textSize;
    OSStatus       err = noErr;
-   
+
    // make sure we have something to copy
    textSize = dStrlen(text);
    if(textSize == 0)
       return false;
-   
+
    // get a local ref to the system clipboard
    GetScrapByName( kScrapClipboardScrap, kScrapClearNamedScrap, &clip );
 
    // put the data on the clipboard as text
    err = PutScrapFlavor( clip, kScrapFlavorTypeText, kScrapFlavorMaskNone, textSize, text);
-   
+
    // put the data on the clipboard as unicode
    const UTF16 *utf16Data = convertUTF8toUTF16(text);
    err |= PutScrapFlavor( clip, kScrapFlavorTypeUnicode, kScrapFlavorMaskNone,
@@ -399,7 +399,7 @@ void Input::init()
 {
    smManager = NULL;
    smActive = false;
-   
+
    InitKeyCodeMapping();
 }
 
@@ -407,12 +407,12 @@ U16 Input::getKeyCode( U16 asciiCode )
 {
    if( KeyboardLayoutHasChanged() )
       InitKeyCodeMapping();
-      
+
    for( U32 i = 0; i < ( sizeof( sOSToKeyCode ) / sizeof( sOSToKeyCode[ 0 ] ) ); ++ i )
       if( sOSToKeyCode[ i ].mCharLower == asciiCode
           || sOSToKeyCode[ i ].mCharUpper == asciiCode )
          return sOSToKeyCode[ i ].mKeyCode;
-         
+
    return 0;
 }
 

@@ -52,7 +52,7 @@ ConsoleDocClass( GuiDecalEditorCtrl,
 bool GuiDecalEditorCtrl::smRenderDecalPixelSize = false;
 
 GuiDecalEditorCtrl::GuiDecalEditorCtrl()
-{   
+{
    mSELDecal = NULL;
    mHLDecal = NULL;
    mCurrentDecalData = NULL;
@@ -82,7 +82,7 @@ void GuiDecalEditorCtrl::initPersistFields()
 
 void GuiDecalEditorCtrl::consoleInit()
 {
-   Con::addVariable( "$DecalEditor::renderPixelSize", TypeBool, &smRenderDecalPixelSize, 
+   Con::addVariable( "$DecalEditor::renderPixelSize", TypeBool, &smRenderDecalPixelSize,
       "Set true to render the pixel size as on overlay on the selected decal instance. "
       "This is the value used to fade distant decals and is intended to help the user adjust "
       "the values of DecalData::pixelSizeStartFade and pixelSizeEndFade.\n\n"
@@ -103,19 +103,19 @@ bool GuiDecalEditorCtrl::onWake()
 {
    if ( !Parent::onWake() )
       return false;
-	
-	
+
+
 
    return true;
 }
 
 void GuiDecalEditorCtrl::onSleep()
 {
-   Parent::onSleep();   
+   Parent::onSleep();
 }
 
-void GuiDecalEditorCtrl::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void GuiDecalEditorCtrl::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    cursor = NULL;
@@ -132,15 +132,15 @@ void GuiDecalEditorCtrl::get3DCursor( GuiCursor *&cursor,
 
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
-   
-   // We've already changed the cursor, 
+
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if( root->mCursorChanged != -1)
       controller->popCursor();
 
    // Now change the cursor shape
    controller->pushCursor(currCursor);
-   root->mCursorChanged = currCursor;   
+   root->mCursorChanged = currCursor;
 }
 
 void GuiDecalEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
@@ -149,10 +149,10 @@ void GuiDecalEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 
    if ( !isFirstResponder() )
       setFirstResponder();
-	
+
 	bool dblClick = ( event.mouseClickCount > 1 );
 
-	// Gather selected decal information 
+	// Gather selected decal information
    RayInfo ri;
    bool hit = getRayInfo( event, &ri );
 
@@ -160,19 +160,19 @@ void GuiDecalEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
    Point3F end = start + event.vec * 3000.0f; // use visible distance here??
 
    DecalInstance *pDecal = gDecalManager->raycast( start, end );
-	
+
 	if( mMode.compare("AddDecalMode") != 0 )
 	{
 		if ( mSELDecal )
 		{
-			// If our click hit the gizmo we are done.			
+			// If our click hit the gizmo we are done.
 			if ( mGizmo->getSelection() != Gizmo::None )
 			{
             mGizmo->on3DMouseDown( event );
 
 				char returnBuffer[256];
-				dSprintf(returnBuffer, sizeof(returnBuffer), "%f %f %f %f %f %f %f", 
-				mSELDecal->mPosition.x, mSELDecal->mPosition.y, mSELDecal->mPosition.z, 
+				dSprintf(returnBuffer, sizeof(returnBuffer), "%f %f %f %f %f %f %f",
+				mSELDecal->mPosition.x, mSELDecal->mPosition.y, mSELDecal->mPosition.z,
 				mSELDecal->mTangent.x, mSELDecal->mTangent.y, mSELDecal->mTangent.z,
 				mSELDecal->mSize);
 
@@ -184,8 +184,8 @@ void GuiDecalEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 
 		if ( mHLDecal && pDecal == mHLDecal )
 		{
-			mHLDecal = NULL;            
-			selectDecal( pDecal );   
+			mHLDecal = NULL;
+			selectDecal( pDecal );
 
 			if ( isMethod( "onSelectInstance" ) )
 			{
@@ -212,8 +212,8 @@ void GuiDecalEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 		{
 			if ( dblClick )
 			{
-				mHLDecal = NULL;            
-				selectDecal( pDecal );   
+				mHLDecal = NULL;
+				selectDecal( pDecal );
 
 				if ( isMethod( "onSelectInstance" ) )
 				{
@@ -223,37 +223,37 @@ void GuiDecalEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 				}
 				setMode( String("SelectDecalMode"), true );
 			}
-			return;	
+			return;
 		}
 
 		if ( hit && mCurrentDecalData ) // Create a new decal...
 		{
 			U8 flags = PermanentDecal | SaveDecal;
 
-			DecalInstance *decalInst = gDecalManager->addDecal( ri.point, ri.normal, 0.0f, mCurrentDecalData, 1.0f, -1, flags );      
-	      
-			if ( decalInst )  
+			DecalInstance *decalInst = gDecalManager->addDecal( ri.point, ri.normal, 0.0f, mCurrentDecalData, 1.0f, -1, flags );
+
+			if ( decalInst )
 			{
 				// Give the decal an id
 				decalInst->mId = gDecalManager->mDecalInstanceVec.size();
 				gDecalManager->mDecalInstanceVec.push_back(decalInst);
 
 				selectDecal( decalInst );
-				
+
 				// Grab the mission editor undo manager.
 				UndoManager *undoMan = NULL;
 				if ( !Sim::findObject( "EUndoManager", undoMan ) )
 				{
 					Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
-					return;           
+					return;
 				}
 
 				// Create the UndoAction.
 				DICreateUndoAction *action = new DICreateUndoAction("Create Decal");
 				action->addDecal( *decalInst );
-				
+
 				action->mEditor = this;
-				// Submit it.               
+				// Submit it.
 				undoMan->addAction( action );
 
 				if ( isMethod( "onCreateInstance" ) )
@@ -291,8 +291,8 @@ void GuiDecalEditorCtrl::on3DMouseUp(const Gui3DMouseEvent & event)
 		if ( mGizmo->isDirty() )
 		{
 			char returnBuffer[256];
-			dSprintf(returnBuffer, sizeof(returnBuffer), "%f %f %f %f %f %f %f", 
-			mSELDecal->mPosition.x, mSELDecal->mPosition.y, mSELDecal->mPosition.z, 
+			dSprintf(returnBuffer, sizeof(returnBuffer), "%f %f %f %f %f %f %f",
+			mSELDecal->mPosition.x, mSELDecal->mPosition.y, mSELDecal->mPosition.z,
 			mSELDecal->mTangent.x, mSELDecal->mTangent.y, mSELDecal->mTangent.z,
 			mSELDecal->mSize);
 
@@ -312,7 +312,7 @@ void GuiDecalEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
 
    RayInfo ri;
    if ( !getRayInfo( event, &ri ) )
-      return; 
+      return;
 
    Point3F start = event.pos;
    Point3F end = start + event.vec * 3000.0f; // use visible distance here??
@@ -320,13 +320,13 @@ void GuiDecalEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
    DecalInstance *pDecal = gDecalManager->raycast( start, end );
 
    if ( pDecal && pDecal != mSELDecal )
-      mHLDecal = pDecal;   
+      mHLDecal = pDecal;
    else if ( !pDecal )
       mHLDecal = NULL;
 }
 
 void GuiDecalEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
-{ 
+{
    if ( !mSELDecal )
       return;
 
@@ -335,12 +335,12 @@ void GuiDecalEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    {
       mPerformedDragCopy = true;
 
-		DecalInstance *newDecal = gDecalManager->addDecal(    mSELDecal->mPosition, 
-                                                            mSELDecal->mNormal, 
-                                                            0.0f, 
-                                                            mSELDecal->mDataBlock, 
-                                                            1.0f, 
-                                                            -1, 
+		DecalInstance *newDecal = gDecalManager->addDecal(    mSELDecal->mPosition,
+                                                            mSELDecal->mNormal,
+                                                            0.0f,
+                                                            mSELDecal->mDataBlock,
+                                                            1.0f,
+                                                            -1,
                                                             PermanentDecal | SaveDecal );
 
       newDecal->mTangent = mSELDecal->mTangent;
@@ -355,7 +355,7 @@ void GuiDecalEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 		gDecalManager->mDecalInstanceVec.push_back( newDecal );
 
 		selectDecal( newDecal );
-			
+
 		// Grab the mission editor undo manager.
 		UndoManager *undoMan = NULL;
 		if ( Sim::findObject( "EUndoManager", undoMan ) )
@@ -384,7 +384,7 @@ void GuiDecalEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       // and position.
       const MatrixF &gizmoMat = mGizmo->getTransform();
       const Point3F &gizmoPos = gizmoMat.getPosition();
-      
+
       // Get the new projection vector.
       VectorF upVec, rightVec;
       gizmoMat.getColumn( 0, &rightVec );
@@ -435,7 +435,7 @@ void GuiDecalEditorCtrl::updateGuiInfo()
 {
    // nothing to do
 }
-      
+
 void GuiDecalEditorCtrl::onRender( Point2I offset, const RectI &updateRect )
 {
    Parent::onRender( offset, updateRect );
@@ -451,7 +451,7 @@ void GuiDecalEditorCtrl::renderGui( Point2I offset, const RectI &updateRect )
    if ( smRenderDecalPixelSize && mSELDecal != NULL )
    {
       const F32 pixelSize = mSELDecal->calcPixelSize( mSaveViewport.extent.y, mLastCameraQuery.cameraMatrix.getPosition(), mSaveWorldToScreenScale.y );
-      
+
       // Find position onscreen to render the text.
       Point3F screenPos;
       bool onScreen = project( mSELDecal->mPosition, &screenPos );
@@ -476,7 +476,7 @@ void GuiDecalEditorCtrl::renderGui( Point2I offset, const RectI &updateRect )
          dSprintf( buf, 256, "%0.3f", pixelSize );
 
          const U32 width = font->getStrWidth((const UTF8 *)buf);;
-         const Point2I posi( (U32)screenPos.x, (U32)screenPos.y + 12 );   
+         const Point2I posi( (U32)screenPos.x, (U32)screenPos.y + 12 );
          const Point2I minPt(posi.x - width / 2 - 2, posi.y - 1);
          const Point2I maxPt(posi.x + width / 2 + 2, posi.y + font->getHeight() + 1);
 
@@ -484,7 +484,7 @@ void GuiDecalEditorCtrl::renderGui( Point2I offset, const RectI &updateRect )
          drawer->drawRectFill( minPt, maxPt, bgColor );
 	      GFX->getDrawUtil()->setBitmapModulation( textColor );
          GFX->getDrawUtil()->drawText( mProfile->mFont, Point2I( posi.x - width / 2, posi.y ), buf );
-      }      
+      }
    }
 }
 
@@ -495,19 +495,19 @@ void GuiDecalEditorCtrl::renderScene(const RectI & updateRect)
    GFXTransformSaver saver;
 
    RectI bounds = getBounds();
-   
+
    ColorI hlColor(0,255,0,255);
    ColorI regColor(255,0,0,255);
    ColorI selColor(0,0,255,255);
    ColorI color;
-   
-   GFXDrawUtil *drawUtil = GFX->getDrawUtil();   
+
+   GFXDrawUtil *drawUtil = GFX->getDrawUtil();
 
    GFXStateBlockDesc desc;
    desc.setBlend( true );
    desc.setZReadWrite( true, false );
 
-   // Draw 3D stuff here.   
+   // Draw 3D stuff here.
    if ( mSELDecal )
    {
       mGizmo->renderGizmo( mLastCameraQuery.cameraMatrix, mLastCameraQuery.fov );
@@ -520,7 +520,7 @@ void GuiDecalEditorCtrl::renderScene(const RectI & updateRect)
       Point3F boxSize( decalSize, decalSize, decalSize );
 
       MatrixF worldMat( true );
-      mSELDecal->getWorldMatrix( &worldMat, true );   
+      mSELDecal->getWorldMatrix( &worldMat, true );
 
       drawUtil->drawObjectBox( desc, boxSize, mSELDecal->mPosition, worldMat, ColorI( 255, 255, 255, 255 ) );
    }
@@ -535,14 +535,14 @@ void GuiDecalEditorCtrl::renderScene(const RectI & updateRect)
       Point3F boxSize( decalSize, decalSize, decalSize );
 
       MatrixF worldMat( true );
-      mHLDecal->getWorldMatrix( &worldMat, true );  
+      mHLDecal->getWorldMatrix( &worldMat, true );
 
       drawUtil->drawObjectBox( desc, boxSize, mHLDecal->mPosition, worldMat, ColorI( 255, 255, 255, 255 ) );
    }
-} 
+}
 
 void GuiDecalEditorCtrl::forceRedraw( DecalInstance * decalInstance )
-{ 
+{
    // This should be redundant because the decal is already reclipped
    // on each frame. Also it is not possible execute rendering code like
    // this in response to UI events from script.
@@ -550,7 +550,7 @@ void GuiDecalEditorCtrl::forceRedraw( DecalInstance * decalInstance )
 	if ( !decalInstance )
 		return;
 
-	GFXDrawUtil *drawUtil = GFX->getDrawUtil();  
+	GFXDrawUtil *drawUtil = GFX->getDrawUtil();
 	GFXStateBlockDesc desc;
    desc.setBlend( true );
    desc.setZReadWrite( true, false );
@@ -565,7 +565,7 @@ void GuiDecalEditorCtrl::forceRedraw( DecalInstance * decalInstance )
    Point3F boxSize( decalSize, decalSize, decalSize );
 
    MatrixF worldMat( true );
-   decalInstance->getWorldMatrix( &worldMat, true );   
+   decalInstance->getWorldMatrix( &worldMat, true );
 
    drawUtil->drawObjectBox( desc, boxSize, decalInstance->mPosition, worldMat, ColorI( 255, 255, 255, 255 ) );
    */
@@ -598,14 +598,14 @@ void GuiDecalEditorCtrl::_renderDecalEdge( const Vector<Point3F> &verts, const C
 }
 
 bool GuiDecalEditorCtrl::getRayInfo( const Gui3DMouseEvent & event, RayInfo *rInfo )
-{       
+{
    Point3F startPnt = event.pos;
    Point3F endPnt = event.pos + event.vec * 3000.0f;
 
-   bool hit;         
-         
-   hit = gServerContainer.castRayRendered( startPnt, endPnt, STATIC_COLLISION_TYPEMASK, rInfo );    
-   
+   bool hit;
+
+   hit = gServerContainer.castRayRendered( startPnt, endPnt, STATIC_COLLISION_TYPEMASK, rInfo );
+
    return hit;
 }
 
@@ -623,23 +623,23 @@ void GuiDecalEditorCtrl::deleteSelectedDecal()
 {
    if ( !mSELDecal )
       return;
-	
+
 	// Grab the mission editor undo manager.
 	UndoManager *undoMan = NULL;
 	if ( !Sim::findObject( "EUndoManager", undoMan ) )
 	{
 		Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
-		return;           
+		return;
 	}
 
 	// Create the UndoAction.
 	DIDeleteUndoAction *action = new DIDeleteUndoAction("Delete Decal");
 	action->deleteDecal( *mSELDecal );
-	
+
 	action->mEditor = this;
-	// Submit it.               
+	// Submit it.
 	undoMan->addAction( action );
-	
+
 	if ( isMethod( "onDeleteInstance" ) )
 	{
 		char buffer[512];
@@ -662,14 +662,14 @@ void GuiDecalEditorCtrl::deleteDecalDatablock( String lookupName )
 	if ( !Sim::findObject( "EUndoManager", undoMan ) )
 	{
 		Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
-		return;           
+		return;
 	}
 
 	// Create the UndoAction.
 	DBDeleteUndoAction *action = new DBDeleteUndoAction("Delete Decal Datablock");
 	action->mEditor = this;
 	action->mDatablockId = datablock->getId();
-	
+
 	Vector<DecalInstance*> mDecalQueue;
 	Vector<DecalInstance *>::iterator iter;
 	mDecalQueue.clear();
@@ -682,7 +682,7 @@ void GuiDecalEditorCtrl::deleteDecalDatablock( String lookupName )
 	}
 
 	for ( iter = mDecalQueue.begin();iter != mDecalQueue.end();iter++ )
-	{	
+	{
 		if( !(*iter) )
 			continue;
 
@@ -697,9 +697,9 @@ void GuiDecalEditorCtrl::deleteDecalDatablock( String lookupName )
 					dSprintf(buffer, 512, "%i", (*iter)->mId);
 					Con::executef( this, "onDeleteInstance", String(buffer).c_str(), (*iter)->mDataBlock->lookupName.c_str() );
 				}
-				
+
 				action->deleteDecal( *(*iter) );
-				
+
 				if( mSELDecal == (*iter) )
 					mSELDecal = NULL;
 
@@ -709,7 +709,7 @@ void GuiDecalEditorCtrl::deleteDecalDatablock( String lookupName )
 			gDecalManager->removeDecal( (*iter) );
 		}
 	}
-	
+
 	undoMan->addAction( action );
 
 	mCurrentDecalData = NULL;
@@ -719,16 +719,16 @@ void GuiDecalEditorCtrl::retargetDecalDatablock( String dbFrom, String dbTo )
 {
 	DecalData * ptrFrom = dynamic_cast<DecalData*> ( Sim::findObject(dbFrom.c_str()) );
 	DecalData * ptrTo = dynamic_cast<DecalData*> ( Sim::findObject(dbTo.c_str()) );
-	
+
 	if( !ptrFrom || !ptrTo )
 		return;
-	
+
 	// Grab the mission editor undo manager.
 	UndoManager *undoMan = NULL;
 	if ( !Sim::findObject( "EUndoManager", undoMan ) )
 	{
 		Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
-		return;           
+		return;
 	}
 
 	// Create the UndoAction.
@@ -748,7 +748,7 @@ void GuiDecalEditorCtrl::retargetDecalDatablock( String dbFrom, String dbTo )
 	}
 
 	for ( iter = mDecalQueue.begin();iter != mDecalQueue.end();iter++ )
-	{	
+	{
 		if( !(*iter) )
 			continue;
 
@@ -756,7 +756,7 @@ void GuiDecalEditorCtrl::retargetDecalDatablock( String dbFrom, String dbTo )
 		{
 			if( (*iter)->mId != -1 )
 			{
-				action->retargetDecal((*iter));	
+				action->retargetDecal((*iter));
 				(*iter)->mDataBlock = ptrTo;
 				forceRedraw((*iter));
 			}
@@ -778,7 +778,7 @@ void GuiDecalEditorCtrl::setMode( String mode, bool sourceShortcut = false )
 		mGizmo->getProfile()->mode = RotateMode;
 	else if( mode.compare("ScaleDecalMode") == 0)
 		mGizmo->getProfile()->mode = ScaleMode;
-	
+
 	mMode = mode;
 
 	if( sourceShortcut )
@@ -795,7 +795,7 @@ ConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, 3, 3, "deleteSele
 	String lookupName( argv[2] );
 	if( lookupName == String::EmptyString )
 		return;
-	
+
 	object->deleteDecalDatablock( lookupName );
 }
 
@@ -827,7 +827,7 @@ ConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, 3, 3, "getDec
    if ( decalInstance )
    {
 	   dSprintf(returnBuffer, 256, "%f %f %f %f %f %f %f",
-         decalInstance->mPosition.x, decalInstance->mPosition.y, decalInstance->mPosition.z, 
+         decalInstance->mPosition.x, decalInstance->mPosition.y, decalInstance->mPosition.z,
 		   decalInstance->mTangent.x, decalInstance->mTangent.y, decalInstance->mTangent.z,
 		   decalInstance->mSize);
    }
@@ -863,9 +863,9 @@ ConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, 4, 4, "editDecalDetai
 	Point3F tan;
 	F32 size;
 
-	S32 count = dSscanf( argv[3], "%f %f %f %f %f %f %f", 
+	S32 count = dSscanf( argv[3], "%f %f %f %f %f %f %f",
 		&pos.x, &pos.y, &pos.z, &tan.x, &tan.y, &tan.z, &size);
-	
+
 	if ( (count != 7) )
    {
 		Con::printf("Failed to parse decal information \"px py pz tx ty tz s\" from '%s'", argv[3]);
@@ -875,7 +875,7 @@ ConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, 4, 4, "editDecalDetai
    decalInstance->mPosition = pos;
 	decalInstance->mTangent = tan;
 	decalInstance->mSize = size;
-	
+
 	if ( decalInstance == object->mSELDecal )
 		object->setGizmoFocus( decalInstance );
 
@@ -941,7 +941,7 @@ void DICreateUndoAction::undo()
 	{
 		if( !(*iter) )
 			continue;
-		
+
 		if( (*iter)->mId != mDecalInstance.mId )
 			continue;
 
@@ -951,7 +951,7 @@ void DICreateUndoAction::undo()
 			dSprintf(buffer, 512, "%i", (*iter)->mId);
 			Con::executef( mEditor, "onDeleteInstance", String(buffer).c_str(), (*iter)->mDataBlock->lookupName.c_str() );
 		}
-		
+
 		// Decal manager handles clearing the vector if the decal contains a valid id
 		if( mEditor->mSELDecal == (*iter) )
 			mEditor->mSELDecal = NULL;
@@ -966,22 +966,22 @@ void DICreateUndoAction::undo()
 
 void DICreateUndoAction::redo()
 {
-	//Reinstate the valid datablock pointer	
+	//Reinstate the valid datablock pointer
 	mDecalInstance.mDataBlock = dynamic_cast<DecalData *>( Sim::findObject( mDatablockId ) );
 
-	DecalInstance * decal = gDecalManager->addDecal( mDecalInstance.mPosition, 
-		mDecalInstance.mNormal, 
-		mDecalInstance.mTangent, 
+	DecalInstance * decal = gDecalManager->addDecal( mDecalInstance.mPosition,
+		mDecalInstance.mNormal,
+		mDecalInstance.mTangent,
 		mDecalInstance.mDataBlock,
-		( mDecalInstance.mSize / mDecalInstance.mDataBlock->size ), 
-		mDecalInstance.mTextureRectIdx, 
+		( mDecalInstance.mSize / mDecalInstance.mDataBlock->size ),
+		mDecalInstance.mTextureRectIdx,
 		mDecalInstance.mFlags );
-	
+
 	decal->mId = mDecalInstance.mId;
 
 	// Override the rectIdx regardless of random decision in addDecal
 	decal->mTextureRectIdx = mDecalInstance.mTextureRectIdx;
-	
+
 	// We take care of filling in the vector space that was once there
 	gDecalManager->mDecalInstanceVec[decal->mId] = decal;
 
@@ -1024,22 +1024,22 @@ void DIDeleteUndoAction::deleteDecal( DecalInstance decal )
 
 void DIDeleteUndoAction::undo()
 {
-	//Reinstate the valid datablock pointer	
+	//Reinstate the valid datablock pointer
 	mDecalInstance.mDataBlock = dynamic_cast<DecalData *>( Sim::findObject( mDatablockId ) );
 
-	DecalInstance * decal = gDecalManager->addDecal( mDecalInstance.mPosition, 
-		mDecalInstance.mNormal, 
-		mDecalInstance.mTangent, 
+	DecalInstance * decal = gDecalManager->addDecal( mDecalInstance.mPosition,
+		mDecalInstance.mNormal,
+		mDecalInstance.mTangent,
 		mDecalInstance.mDataBlock,
-		( mDecalInstance.mSize / mDecalInstance.mDataBlock->size ), 
-		mDecalInstance.mTextureRectIdx, 
+		( mDecalInstance.mSize / mDecalInstance.mDataBlock->size ),
+		mDecalInstance.mTextureRectIdx,
 		mDecalInstance.mFlags );
-	
+
 	decal->mId = mDecalInstance.mId;
 
 	// Override the rectIdx regardless of random decision in addDecal
 	decal->mTextureRectIdx = mDecalInstance.mTextureRectIdx;
-	
+
 	// We take care of filling in the vector space that was once there
 	gDecalManager->mDecalInstanceVec[decal->mId] = decal;
 
@@ -1059,7 +1059,7 @@ void DIDeleteUndoAction::redo()
 	{
 		if( !(*iter) )
 			continue;
-		
+
 		if( (*iter)->mId != mDecalInstance.mId )
 			continue;
 
@@ -1069,7 +1069,7 @@ void DIDeleteUndoAction::redo()
 			dSprintf(buffer, 512, "%i", (*iter)->mId);
 			Con::executef( mEditor, "onDeleteInstance", String(buffer).c_str(), (*iter)->mDataBlock->lookupName.c_str() );
 		}
-		
+
 		// Decal manager handles clearing the vector if the decal contains a valid id
 		if( mEditor->mSELDecal == (*iter) )
 			mEditor->mSELDecal = NULL;
@@ -1121,22 +1121,22 @@ void DBDeleteUndoAction::undo()
    {
 		DecalInstance vecInstance = mDecalInstanceVec[i];
 
-		//Reinstate the valid datablock pointer		
+		//Reinstate the valid datablock pointer
 		vecInstance.mDataBlock = datablock;
 
-		DecalInstance * decalInstance = gDecalManager->addDecal( vecInstance.mPosition, 
-		vecInstance.mNormal, 
-		vecInstance.mTangent, 
+		DecalInstance * decalInstance = gDecalManager->addDecal( vecInstance.mPosition,
+		vecInstance.mNormal,
+		vecInstance.mTangent,
 		vecInstance.mDataBlock,
-		( vecInstance.mSize / vecInstance.mDataBlock->size ), 
-		vecInstance.mTextureRectIdx, 
+		( vecInstance.mSize / vecInstance.mDataBlock->size ),
+		vecInstance.mTextureRectIdx,
 		vecInstance.mFlags );
-	
+
 		decalInstance->mId = vecInstance.mId;
 
 		// Override the rectIdx regardless of random decision in addDecal
 		decalInstance->mTextureRectIdx = vecInstance.mTextureRectIdx;
-	
+
 		// We take care of filling in the vector space that was once there
 		gDecalManager->mDecalInstanceVec[decalInstance->mId] = decalInstance;
 
@@ -1147,7 +1147,7 @@ void DBDeleteUndoAction::undo()
 			Con::executef( mEditor, "onCreateInstance", buffer, decalInstance->mDataBlock->lookupName.c_str());
 		}
 	}
-	
+
 }
 
 void DBDeleteUndoAction::redo()
@@ -1162,7 +1162,7 @@ void DBDeleteUndoAction::redo()
 			DecalInstance * decalInstance = (*iter);
 			if( !decalInstance )
 				continue;
-			
+
 			if( decalInstance->mId != vecInstance.mId )
 				continue;
 
@@ -1172,7 +1172,7 @@ void DBDeleteUndoAction::redo()
 				dSprintf(buffer, 512, "%i", decalInstance->mId);
 				Con::executef( mEditor, "onDeleteInstance", String(buffer).c_str(), decalInstance->mDataBlock->lookupName.c_str() );
 			}
-			
+
 			// Decal manager handles clearing the vector if the decal contains a valid id
 			if( mEditor->mSELDecal == decalInstance )
 				mEditor->mSELDecal = NULL;
@@ -1184,7 +1184,7 @@ void DBDeleteUndoAction::redo()
 			break;
 		}
 	}
-	
+
 	DecalData * datablock = dynamic_cast<DecalData *>( Sim::findObject( mDatablockId ) );
 	if ( mEditor->isMethod( "redoDeleteDecalDatablock" ) )
 		Con::executef( mEditor, "redoDeleteDecalDatablock", datablock->lookupName.c_str());
@@ -1222,7 +1222,7 @@ void DBRetargetUndoAction::retargetDecal( DecalInstance* decal )
 void DBRetargetUndoAction::undo()
 {
 	DecalData * ptrFrom = dynamic_cast<DecalData*> ( Sim::findObject(mDBFromId) );
-	
+
 	if( !ptrFrom )
 		return;
 
@@ -1239,7 +1239,7 @@ void DBRetargetUndoAction::undo()
 void DBRetargetUndoAction::redo()
 {
 	DecalData * ptrTo = dynamic_cast<DecalData*> ( Sim::findObject(mDBToId) );
-	
+
 	if( !ptrTo )
 		return;
 
@@ -1249,7 +1249,7 @@ void DBRetargetUndoAction::redo()
 		(*iter)->mDataBlock = ptrTo;
 		mEditor->forceRedraw((*iter));
 	}
-	
+
 	if ( mEditor->isMethod( "rebuildInstanceTree" ) )
 		Con::executef( mEditor, "rebuildInstanceTree" );
 }

@@ -60,7 +60,7 @@ ConsoleDocClass( TimeOfDay,
    "@ingroup enviroMisc"
 );
 
-TimeOfDay::TimeOfDay() 
+TimeOfDay::TimeOfDay()
    :  mElevation( 0.0f ),
       mAzimuth( 0.0f ),
       mAxisTilt( 23.44f ),       // 35 degree tilt
@@ -173,7 +173,7 @@ bool TimeOfDay::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
-   
+
    // The server initializes to the specified starting values.
    // The client initializes itself to the server time from
    // unpackUpdate.
@@ -193,8 +193,8 @@ bool TimeOfDay::onAdd()
    if ( isClientObject() )
       NetConnection::smGhostAlwaysDone.notify( this, &TimeOfDay::_onGhostAlwaysDone );
 
-   if ( isServerObject() )   
-      Con::executef( this, "onAdd" );   
+   if ( isServerObject() )
+      Con::executef( this, "onAdd" );
 
    setProcessTick( true );
 
@@ -272,7 +272,7 @@ void TimeOfDay::processTick( const Move *move )
 {
    if ( mAnimate )
    {
-      F32 current = mTimeOfDay * 360.0f;      
+      F32 current = mTimeOfDay * 360.0f;
       F32 next = current + (mAnimateSpeed * TickSec);
 
       // Protect for wrap around.
@@ -307,7 +307,7 @@ void TimeOfDay::processTick( const Move *move )
 
       mTimeOfDay += dt / mDayLen;
 
-      // It could be possible for more than a full day to 
+      // It could be possible for more than a full day to
       // pass in a single advance time, so I put this inside a loop
       // but timeEvents will not actually be called for the
       // skipped day.
@@ -428,11 +428,11 @@ void TimeOfDay::_getSunColor( ColorF *outColor ) const
       if (ele >= one->elevation && ele <= two->elevation)
       {
 			      div = two->elevation - one->elevation;
-			
+
          //catch bad input divide by zero
          if ( mFabs( div ) < 0.01f )
             div = 0.01f;
-			
+
 			      phase = (ele - one->elevation) / div;
 			      outColor->interpolate( one->color, two->color, phase );
 
@@ -448,7 +448,7 @@ void TimeOfDay::_getSunColor( ColorF *outColor ) const
 
 void TimeOfDay::_initColors()
 {
-   // NOTE: The elevation targets represent distances 
+   // NOTE: The elevation targets represent distances
    // from PI/2 radians (strait up).
 
    ColorF c;
@@ -526,8 +526,8 @@ void TimeOfDay::_updateTimeEvents()
 
    // Find where in the event list we need to start...
    // The first timeEvent with elevation greater than our previous elevation.
-   
-   U32 start = 0;   
+
+   U32 start = 0;
    for ( ; start < evtCount; start++ )
    {
       if ( mTimeEvents[start].triggerElevation > prevElevation )
@@ -559,7 +559,7 @@ void TimeOfDay::_updateTimeEvents()
    while ( true )
    {
       TimeOfDayEvent &timeEvent = mTimeEvents[itr];
-      
+
       F32 elev = timeEvent.triggerElevation;
       if ( onNextDay )
          elev += 360.0f;
@@ -571,7 +571,7 @@ void TimeOfDay::_updateTimeEvents()
 
       // If its not greater than the nextElevation it must be less, and if
       // we are here we already know its greater than prevElevation.
-      
+
       AssertFatal( elev >= prevElevation && elev <= nextElevation, "TimeOfDay::_updateTimeEvents - Logical error in here!" );
       AssertFatal( !timeEvent.deleteMe, "TimeOfDay::_updateTimeEvents - tried to fire the same event twice!" );
 
@@ -591,10 +591,10 @@ void TimeOfDay::_updateTimeEvents()
             break;
          // Check events for the next day
          else
-         {            
+         {
             itr = 0;
             onNextDay = true;
-         }         
+         }
       }
    }
 
@@ -618,14 +618,14 @@ void TimeOfDay::addTimeEvent( F32 triggerElevation, const UTF8 *identifier )
    // may cause undefined behavior.
 
    TimeOfDayEvent *pEvent = NULL;
-   
+
    if ( mTimeEvents.empty() || mTimeEvents.last().triggerElevation <= triggerElevation )
    {
       mTimeEvents.increment();
       pEvent = &mTimeEvents.last();
    }
-   else 
-   {   
+   else
+   {
       for ( S32 i = 0; i < mTimeEvents.size(); i++ )
       {
          if ( mTimeEvents[i].triggerElevation > triggerElevation )
@@ -642,12 +642,12 @@ void TimeOfDay::addTimeEvent( F32 triggerElevation, const UTF8 *identifier )
    pEvent->triggerElevation = triggerElevation;
    pEvent->identifier = identifier;
    pEvent->oneShot = false;
-      
+
    pEvent->deleteMe = false;
 }
 
 void TimeOfDay::setTimeOfDay( F32 time )
-{ 
+{
    mTimeOfDay = time;
 
    while ( mTimeOfDay > 1.0f )
@@ -660,7 +660,7 @@ void TimeOfDay::setTimeOfDay( F32 time )
    //if ( isServerObject() )
    _updateTimeEvents();
 
-   setMaskBits( OrbitMask ); 
+   setMaskBits( OrbitMask );
 }
 
 void TimeOfDay::_onTimeEvent( const String &identifier )

@@ -94,7 +94,7 @@ protected:
    {
       S32 targetChainIdx;
       MatrixF clipMatrix;
-      RectF screenRect; 
+      RectF screenRect;
       bool drawnThisFrame;
       Vector<ParticleRenderInst *> pInstances;
    };
@@ -130,7 +130,7 @@ protected:
    GFXStateBlockRef mOffscreenBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mBackbufferBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mMixedResBlocks[ParticleRenderInst::BlendStyle_COUNT];
-   
+
    GFXStateBlockRef _getHighResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getMixedResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getOffscreenStateBlock(ParticleRenderInst *ri);

@@ -42,11 +42,11 @@ public:
    // GFXResource interface
    virtual void zombify();
    virtual void resurrect();
-   
+
 private:
 	/// Handle to our GL buffer object
 	GLuint mBuffer;
-   
+
    U8* mZombieCache;
 };
 

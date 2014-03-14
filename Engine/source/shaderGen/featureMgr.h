@@ -24,10 +24,10 @@
 
 #ifndef _TSINGLETON_H_
 #include "core/util/tSingleton.h"
-#endif 
+#endif
 #ifndef _TVECTOR_H_
 #include "core/util/tVector.h"
-#endif 
+#endif
 
 class FeatureType;
 class ShaderFeature;
@@ -54,7 +54,7 @@ protected:
    static S32 QSORT_CALLBACK _featureInfoCompare( const FeatureInfo *a, const FeatureInfo *b );
 
 public:
-   
+
    FeatureMgr();
    ~FeatureMgr();
 
@@ -64,12 +64,12 @@ public:
    /// Returns the feature info at the index.
    const FeatureInfo& getAt( U32 index );
 
-   /// 
+   ///
    ShaderFeature* getByType( const FeatureType &type );
 
-   // Allows other systems to add features.  index is 
+   // Allows other systems to add features.  index is
    // the enum in GFXMaterialFeatureData.
-   void registerFeature(   const FeatureType &type, 
+   void registerFeature(   const FeatureType &type,
                            ShaderFeature *feature );
 
    // Unregister a feature.
@@ -80,7 +80,7 @@ public:
    void unregisterAll();
 
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "FeatureMgr"; }   
+   static const char* getSingletonName() { return "FeatureMgr"; }
 };
 
 // Helper for accessing the feature manager singleton.

@@ -38,22 +38,22 @@ IMPLEMENT_CONOBJECT( SFXSound );
 
 ConsoleDocClass( SFXSound,
    "@brief A sound controller that directly plays a single sound file.\n\n"
-   
+
    "When playing individual audio files, SFXSounds are implicitly created by the sound system.\n\n"
-   
+
    "Each sound source has an associated play cursor that can be queried and explicitly positioned "
    "by the user.  The cursor is a floating-point value measured in seconds.\n\n"
-   
+
    "For streamed sources, playback may not be continuous in case the streaming queue is interrupted.\n\n"
-   
+
    "@note This class cannot be instantiated directly by the user but rather is implicitly created by the sound "
       "system when sfxCreateSource() or sfxPlayOnce() is called on a SFXProfile instance.\n\n"
-   
+
    "@section SFXSound_virtualization Sounds and Voices\n\n"
-   
+
    "To actually emit an audible signal, a sound must allocate a resource on the sound device through "
    "which the sound data is being played back.  This resource is called 'voice'.\n\n"
-   
+
    "As with other types of resources, the availability of these resources may be restricted, i.e. a given "
    "sound device will usually only support a fixed number of voices that are playing at the same time.  Since, "
    "however, there may be arbitrary many SFXSounds instantiated and playing at the same time, this needs to be "
@@ -70,7 +70,7 @@ ConsoleDocClass( SFXSound,
 SFXSound::SFXSound()
    : mVoice( NULL )
 {
-   // NOTE: This should never be used directly 
+   // NOTE: This should never be used directly
    // and is only here to satisfy satisfy the
    // construction needs of IMPLEMENT_CONOBJECT.
 }
@@ -97,10 +97,10 @@ SFXSound* SFXSound::_create( SFXDevice *device, SFXProfile *profile )
    }
 
    // Create the sound and register it.
-   
+
    SFXSound* sound = new SFXSound( profile, desc );
    sound->registerObject();
-   
+
    // Initialize the buffer.
 
    SFXBuffer* buffer = profile->getBuffer();
@@ -111,19 +111,19 @@ SFXSound* SFXSound::_create( SFXDevice *device, SFXProfile *profile )
       Con::errorf( "SFXSound::_create() - Could not create device buffer!" );
       return NULL;
    }
-   
+
    sound->_setBuffer( buffer );
-   
+
    // The sound is a console object... register it.
-   
-   
+
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXSound] new sound '%i' with profile '%i' (\"%s\")",
       sound->getId(), profile->getId(), profile->getName() );
    #endif
-   
+
    // Hook up reloading.
-   
+
    profile->getChangedSignal().notify( sound, &SFXSound::_onProfileChanged );
 
    return sound;
@@ -131,7 +131,7 @@ SFXSound* SFXSound::_create( SFXDevice *device, SFXProfile *profile )
 
 //-----------------------------------------------------------------------------
 
-SFXSound* SFXSound::_create(   SFXDevice* device, 
+SFXSound* SFXSound::_create(   SFXDevice* device,
                                const ThreadSafeRef< SFXStream >& stream,
                                SFXDescription* description )
 {
@@ -139,10 +139,10 @@ SFXSound* SFXSound::_create(   SFXDevice* device,
    AssertFatal( description, "SFXSound::_create() - Got a null description!" );
 
    // Create the source and register it.
-   
+
    SFXSound* source = new SFXSound( NULL, description );
    source->registerObject();
-   
+
    // Create the buffer.
 
    SFXBuffer* buffer = SFX->_createBuffer( stream, description );
@@ -153,7 +153,7 @@ SFXSound* SFXSound::_create(   SFXDevice* device,
       Con::errorf( "SFXSound::_create() - Could not create device buffer!" );
       return NULL;
    }
-   
+
    source->_setBuffer( buffer );
 
    #ifdef DEBUG_SPEW
@@ -176,9 +176,9 @@ void SFXSound::_reloadBuffer()
          Con::errorf( "SFXSound::_reloadBuffer() - Could not create device buffer!" );
          return;
       }
-      
+
       _setBuffer( buffer );
-      
+
       if( getLastStatus() == SFXStatusPlaying )
          SFX->_assignVoice( this );
    }
@@ -190,7 +190,7 @@ void SFXSound::_setBuffer( SFXBuffer* buffer )
 {
    mBuffer = buffer;
 
-   // There is no telling when the device will be 
+   // There is no telling when the device will be
    // destroyed and the buffers deleted.
    //
    // By caching the duration now we can allow sources
@@ -210,10 +210,10 @@ bool SFXSound::_allocVoice( SFXDevice* device )
    AssertFatal( getLastStatus() == SFXStatusPlaying,
       "SFXSound::_allocVoice() - Source is not playing!" );
 
-   // The buffer can be lost when the device is reset 
+   // The buffer can be lost when the device is reset
    // or changed, so initialize it if we have to.  If
    // that fails then we cannot create the voice.
-   
+
    if( mBuffer.isNull() )
    {
       SFXProfile* profile = getProfile();
@@ -232,26 +232,26 @@ bool SFXSound::_allocVoice( SFXDevice* device )
    mVoice = device->createVoice( is3d(), mBuffer );
    if( !mVoice )
       return false;
-            
+
    // Set initial properties.
-   
+
    mVoice->setVolume( mPreAttenuatedVolume );
    mVoice->setPitch( mEffectivePitch );
    mVoice->setPriority( mEffectivePriority );
    if( mDescription->mRolloffFactor != -1.f )
       mVoice->setRolloffFactor( mDescription->mRolloffFactor );
-      
+
    // Set 3D parameters.
-   
+
    if( is3d() )
    {
       // Scatter the position, if requested.  Do this only once so
       // we don't change position when resuming from virtualized
       // playback.
-      
+
       if( !mTransformScattered )
          _scatterTransform();
-      
+
       // Set the 3D attributes.
 
       setTransform( mTransform );
@@ -259,12 +259,12 @@ bool SFXSound::_allocVoice( SFXDevice* device )
       _setMinMaxDistance( mMinDistance, mMaxDistance );
       _setCone( mConeInsideAngle, mConeOutsideAngle, mConeOutsideVolume );
    }
-   
+
    // Set reverb, if enabled.
 
    if( mDescription->mUseReverb )
       mVoice->setReverb( mDescription->mReverb );
-   
+
    // Update the duration... it shouldn't have changed, but
    // its probably better that we're accurate if it did.
    mDuration = mBuffer->getDuration();
@@ -273,7 +273,7 @@ bool SFXSound::_allocVoice( SFXDevice* device )
    // voice and stop virtualization.
 
    const U32 playTime = mPlayTimer.getPosition();
-   
+
    if( playTime > 0 )
    {
       const U32 pos = mBuffer->getFormat().getSampleCount( playTime );
@@ -281,12 +281,12 @@ bool SFXSound::_allocVoice( SFXDevice* device )
    }
 
    mVoice->play( isLooping() );
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXSound] allocated voice for source '%i' (pos=%i, 3d=%i, vol=%f)",
       getId(), playTime, is3d(), mPreAttenuatedVolume );
    #endif
-   
+
    return true;
 }
 
@@ -298,18 +298,18 @@ void SFXSound::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent eve
 
    switch( event )
    {
-      case SFXParameterEvent_ValueChanged:            
+      case SFXParameterEvent_ValueChanged:
          switch( parameter->getChannel() )
          {
             case SFXChannelCursor:
                setPosition( parameter->getValue() * 1000.f );
                break;
-                              
+
             default:
                break;
          }
          break;
-         
+
       default:
          break;
    }
@@ -322,7 +322,7 @@ void SFXSound::onRemove()
    SFXProfile* profile = getProfile();
    if( profile != NULL )
       profile->getChangedSignal().remove( this, &SFXSound::_onProfileChanged );
-      
+
    Parent::onRemove();
 }
 
@@ -335,7 +335,7 @@ void SFXSound::onDeleteNotify( SimObject* object )
       deleteObject();
       return;
    }
-   
+
    Parent::onDeleteNotify( object );
 }
 
@@ -345,15 +345,15 @@ bool SFXSound::_releaseVoice()
 {
    if( !mVoice )
       return true;
-      
+
    // Refuse to release a voice for a streaming buffer that
    // is not coming from a profile.  For streaming buffers, we will
    // have to release the buffer, too, and without a profile we don't
    // know how to recreate the stream.
-   
+
    if( isStreaming() && !mTrack )
       return false;
-      
+
    // If we're currently playing, transfer our playback position
    // to the playtimer so we can virtualize playback while not
    // having a voice.
@@ -363,7 +363,7 @@ bool SFXSound::_releaseVoice()
    {
       // Sync up the play timer with the voice's current position to make
       // sure we handle any lag that's cropped up.
-      
+
       mPlayTimer.setPosition( mVoice->getPosition() );
 
       if( status == SFXStatusBlocked )
@@ -371,20 +371,20 @@ bool SFXSound::_releaseVoice()
    }
 
    mVoice = NULL;
-   
+
    // If this is a streaming source, release our buffer, too.
    // Otherwise the voice will stick around as it is uniquely assigned to
    // the buffer.  When we get reassigned a voice, we will have to do
    // a full stream seek anyway, so it's no real loss here.
-   
+
    if( isStreaming() )
       mBuffer = NULL;
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXSound] release voice for source '%i' (status: %s)",
       getId(), SFXStatusToString( status ) );
    #endif
-   
+
    return true;
 }
 
@@ -393,16 +393,16 @@ bool SFXSound::_releaseVoice()
 void SFXSound::_play()
 {
    Parent::_play();
-   
+
    if( mVoice )
       mVoice->play( isLooping() );
    else
    {
-      // To ensure the fastest possible reaction 
+      // To ensure the fastest possible reaction
       // to this playback let the system reassign
       // voices immediately.
       SFX->_assignVoice( this );
-      
+
       // If we did not get assigned a voice, we'll be
       // running virtualized.
 
@@ -418,7 +418,7 @@ void SFXSound::_play()
 void SFXSound::_stop()
 {
    Parent::_stop();
-   
+
    if( mVoice )
       mVoice->stop();
 }
@@ -428,7 +428,7 @@ void SFXSound::_stop()
 void SFXSound::_pause()
 {
    Parent::_pause();
-   
+
    if( mVoice )
       mVoice->pause();
 }
@@ -438,24 +438,24 @@ void SFXSound::_pause()
 void SFXSound::_updateStatus()
 {
    // If we have a voice, use its status.
-   
+
    if( mVoice )
    {
       SFXStatus voiceStatus = mVoice->getStatus();
-      
+
       // Filter out SFXStatusBlocked.
-      
+
       if( voiceStatus == SFXStatusBlocked )
          _setStatus( SFXStatusPlaying );
       else
          _setStatus( voiceStatus );
-      
+
       return;
    }
 
    // If we're not in a playing state or we're a looping
    // sound then we don't need to calculate the status.
-   
+
    if( isLooping() || mStatus != SFXStatusPlaying )
       return;
 
@@ -476,11 +476,11 @@ void SFXSound::_updateVolume( const MatrixF& listener )
 {
    F32 oldPreAttenuatedVolume = mPreAttenuatedVolume;
    Parent::_updateVolume( listener );
-   
+
    // If we have a voice and the pre-attenuated volume has
    // changed, pass it on to the voice.  Attenuation itself will
    // happen on the device.
-   
+
    if( mVoice != NULL && oldPreAttenuatedVolume != mPreAttenuatedVolume )
       mVoice->setVolume( mPreAttenuatedVolume );
 }
@@ -491,7 +491,7 @@ void SFXSound::_updatePitch()
 {
    F32 oldEffectivePitch = mEffectivePitch;
    Parent::_updatePitch();
-   
+
    if( mVoice != NULL && oldEffectivePitch != mEffectivePitch )
       mVoice->setPitch( mEffectivePitch );
 }
@@ -502,7 +502,7 @@ void SFXSound::_updatePriority()
 {
    F32 oldEffectivePriority = mEffectivePriority;
    Parent::_updatePriority();
-   
+
    if( mVoice != NULL && oldEffectivePriority != mEffectivePriority )
       mVoice->setPriority( mEffectivePriority );
 }
@@ -535,7 +535,7 @@ void SFXSound::setVelocity( const VectorF& velocity )
    Parent::setVelocity( velocity );
 
    if( mVoice && is3d() )
-      mVoice->setVelocity( velocity );      
+      mVoice->setVelocity( velocity );
 }
 
 //-----------------------------------------------------------------------------
@@ -545,7 +545,7 @@ void SFXSound::setTransform( const MatrixF& transform )
    Parent::setTransform( transform );
 
    if( mVoice && is3d() )
-      mVoice->setTransform( mTransform );      
+      mVoice->setTransform( mTransform );
 }
 
 //-----------------------------------------------------------------------------
@@ -586,7 +586,7 @@ bool SFXSound::isVirtualized() const
    return ( ( mVoice == NULL && isPlaying() ) ||
             ( mVoice != NULL && mVoice->isVirtual() ) );
 }
- 
+
 //-----------------------------------------------------------------------------
 
 SFXProfile* SFXSound::getProfile() const
@@ -619,37 +619,37 @@ S32 QSORT_CALLBACK SFXSound::qsortCompare( const void* item1, const void* item2 
    const SFXSound* source1 = *( ( SFXSound** ) item1 );
    const SFXSound* source2 = *( ( SFXSound** ) item2 );
 
-	// Sounds that are playing are always sorted 
+	// Sounds that are playing are always sorted
 	// closer than non-playing sounds.
-   
+
    const bool source1IsPlaying = source1->isPlaying();
    const bool source2IsPlaying = source2->isPlaying();
-   
+
    if( !source1IsPlaying && !source2IsPlaying )
       return 0;
 	else if( !source1IsPlaying && source1IsPlaying )
 		return 1;
 	else if( source1IsPlaying && !source2IsPlaying )
 		return -1;
-      
+
    // Louder attenuated volumes take precedence but adjust them
    // by priority so that less audible sounds with higher priority
    // become more important.
-   
+
 	F32 volume1 = source1->getAttenuatedVolume();
 	F32 volume2 = source2->getAttenuatedVolume();
-   
+
    volume1 += volume1 * source1->mEffectivePriority;
    volume2 += volume2 * source2->mEffectivePriority;
-   
+
    if( volume1 < volume2 )
       return 1;
    if( volume1 > volume2 )
       return -1;
 
-   // If we got this far then the source that was 
+   // If we got this far then the source that was
    // played last has the higher priority.
-   
+
    if( source1->mPlayStartTick > source2->mPlayStartTick )
       return -1;
    if( source1->mPlayStartTick < source2->mPlayStartTick )

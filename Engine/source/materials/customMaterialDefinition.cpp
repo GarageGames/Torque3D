@@ -64,12 +64,12 @@ ConsoleDocClass( CustomMaterial,
 // Constructor
 //----------------------------------------------------------------------------
 CustomMaterial::CustomMaterial()
-{  
+{
    mFallback = NULL;
    mMaxTex = 0;
    mVersion = 1.1f;
    mTranslucent = false;
-   dMemset( mFlags, 0, sizeof( mFlags ) );   
+   dMemset( mFlags, 0, sizeof( mFlags ) );
    mShaderData = NULL;
    mRefract = false;
    mStateBlockData = NULL;
@@ -81,23 +81,23 @@ CustomMaterial::CustomMaterial()
 //--------------------------------------------------------------------------
 void CustomMaterial::initPersistFields()
 {
-   addField("version",     TypeF32,             Offset(mVersion, CustomMaterial), 
+   addField("version",     TypeF32,             Offset(mVersion, CustomMaterial),
       "@brief Specifies pixel shader version for hardware.\n\n"
       "Valid pixel shader versions include 2.0, 3.0, etc. "
       "@note All features aren't compatible with all pixel shader versions.");
-   addField("fallback",    TYPEID< Material >(),    Offset(mFallback,  CustomMaterial), 
+   addField("fallback",    TYPEID< Material >(),    Offset(mFallback,  CustomMaterial),
       "@brief Alternate material for targeting lower end hardware.\n\n"
       "If the CustomMaterial requires a higher pixel shader version than the one "
       "it's using, it's fallback Material will be processed instead. "
       "If the fallback material wasn't defined, Torque 3D will assert and attempt to use a very "
       "basic material in it's place.\n\n");
-   addField("shader",      TypeRealString,      Offset(mShaderDataName, CustomMaterial), 
+   addField("shader",      TypeRealString,      Offset(mShaderDataName, CustomMaterial),
       "@brief Name of the ShaderData to use for this effect.\n\n");
-   addField("stateBlock",  TYPEID< GFXStateBlockData >(),    Offset(mStateBlockData,  CustomMaterial), 
+   addField("stateBlock",  TYPEID< GFXStateBlockData >(),    Offset(mStateBlockData,  CustomMaterial),
       "@brief Name of a GFXStateBlockData for this effect.\n\n");
-   addField("target",      TypeRealString,      Offset(mOutputTarget, CustomMaterial), 
+   addField("target",      TypeRealString,      Offset(mOutputTarget, CustomMaterial),
       "@brief String identifier of this material's target texture.");
-   addField("forwardLit",  TypeBool,      Offset(mForwardLit, CustomMaterial), 
+   addField("forwardLit",  TypeBool,      Offset(mForwardLit, CustomMaterial),
       "@brief Determines if the material should recieve lights in Basic Lighting. "
       "Has no effect in Advanced Lighting.\n\n");
 
@@ -118,7 +118,7 @@ bool CustomMaterial::onAdd()
       logError("Failed to find ShaderData %s", mShaderDataName.c_str());
       return false;
    }
-   
+
    const char* samplerDecl = "sampler";
    S32 i = 0;
    for (SimFieldDictionaryIterator itr(getFieldDictionary()); *itr; ++itr)
@@ -131,13 +131,13 @@ bool CustomMaterial::onAdd()
             logError("Too many sampler declarations, you may only have %i", MAX_TEX_PER_PASS);
             return false;
          }
-         
+
          if (dStrlen(entry->slotName) == dStrlen(samplerDecl))
          {
          	logError("sampler declarations must have a sampler name, e.g. sampler[\"diffuseMap\"]");
             return false;
          }
-         
+
       	mSamplerNames[i] = entry->slotName + dStrlen(samplerDecl);
          mSamplerNames[i].insert(0, '$');
          mTexFilename[i] = entry->value;

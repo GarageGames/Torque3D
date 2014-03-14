@@ -78,10 +78,10 @@ ExecuteThread::ExecuteThread(const char *executable, const char *args /* = NULL 
 
    shl.cbSize = sizeof(shl);
    shl.fMask = SEE_MASK_NOCLOSEPROCESS;
-   
+
    char exeBuf[1024];
    Platform::makeFullPathName(executable, exeBuf, sizeof(exeBuf));
-   
+
    TempAlloc< TCHAR > dirBuf( ( directory ? dStrlen( directory ) : 0 ) + 1 );
    dirBuf[ dirBuf.size - 1 ] = 0;
 
@@ -105,7 +105,7 @@ ExecuteThread::ExecuteThread(const char *executable, const char *args /* = NULL 
 
    backslash( exe );
    backslash( dirBuf );
-   
+
    shl.lpVerb = TEXT( "open" );
    shl.lpFile = exe;
    shl.lpParameters = argsBuf;

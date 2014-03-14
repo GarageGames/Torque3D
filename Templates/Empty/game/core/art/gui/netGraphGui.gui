@@ -2,29 +2,29 @@ function execNetGraphGuiGUI()
 {
    if ( isObject( NetGraphGui ) )
       NetGraphGui.delete();
- 
+
    if ( isObject( NetGraphProfile ) )
       NetGraphProfile.delete();
-           
+
    if ( isObject( NetGraphGhostsActiveProfile ) )
       NetGraphGhostsActiveProfile.delete();
-      
+
    if ( isObject( NetGraphGhostUpdatesProfile ) )
       NetGraphGhostUpdatesProfile.delete();
-   
+
    if ( isObject( NetGraphBitsSentProfile ) )
       NetGraphBitsSentProfile.delete();
-      
+
    if ( isObject( NetGraphBitsReceivedProfile ) )
       NetGraphBitsReceivedProfile.delete();
-      
+
    if ( isObject( NetGraphLatencyProfile ) )
       NetGraphLatencyProfile.delete();
-      
+
    if ( isObject( NetGraphPacketLossProfile ) )
       NetGraphPacketLossProfile.delete();
-      
-   exec( "./NetGraphGui.gui" );  
+
+   exec( "./NetGraphGui.gui" );
 }
 
 // Profiles
@@ -82,7 +82,7 @@ new GuiControl(NetGraphGui) {
    minExtent = "8 2";
    visible = "1";
    noCursor = "1";
-   
+
    new GuiGraphCtrl(NetGraph) {
       profile = "NetGraphKeyContainerProfile";
       horizSizing = "left";
@@ -92,7 +92,7 @@ new GuiControl(NetGraphGui) {
       minExtent = "8 2";
       visible = "1";
    };
-   
+
    new GuiControl() {
       profile = "NetGraphKeyContainerProfile";
       horizSizing = "left";

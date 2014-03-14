@@ -41,12 +41,12 @@ ConsoleDocClass( GuiInspectorVariableGroup,
    "@internal"
 );
 
-GuiInspectorVariableGroup::GuiInspectorVariableGroup() 
+GuiInspectorVariableGroup::GuiInspectorVariableGroup()
 {
 }
 
 GuiInspectorVariableGroup::~GuiInspectorVariableGroup()
-{  
+{
 }
 
 GuiInspectorField* GuiInspectorVariableGroup::constructField( S32 fieldType )
@@ -68,7 +68,7 @@ bool GuiInspectorVariableGroup::inspectGroup()
    bool bNewItems = false;
 
    for ( U32 i = 0; i < names.size(); i++ )
-   {      
+   {
       const String &varName = names[i];
 
       // If the field already exists, just update it
@@ -82,7 +82,7 @@ bool GuiInspectorVariableGroup::inspectGroup()
       bNewItems = true;
 
       field = new GuiInspectorVariableField();
-      field->init( mParent, this );            
+      field->init( mParent, this );
       field->setInspectorField( NULL, StringTable->insert( varName ) );
 
       if ( field->registerObject() )
@@ -91,9 +91,9 @@ bool GuiInspectorVariableGroup::inspectGroup()
          mStack->addObject( field );
       }
       else
-         delete field;         
+         delete field;
    }
-   
+
    mStack->freeze(false);
    mStack->updatePanes();
 

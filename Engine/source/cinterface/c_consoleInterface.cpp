@@ -151,7 +151,7 @@ extern "C" {
    {
       return Sim::findObject(param);
    }
-   
+
    SimObject *Sim_FindObjectById(S32 param)
    {
       return Sim::findObject(param);

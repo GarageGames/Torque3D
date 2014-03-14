@@ -58,7 +58,7 @@ void HifiMoveList::updateClientServerTickDiff(S32 & tickDiff)
       // doesn't change).
       S32 dropTicks = tickDiff;
       while (dropTicks)
-      {         
+      {
 #ifdef TORQUE_DEBUG_NET_MOVES
          Con::printf("dropping move%s",mLastClientMove>mFirstMoveIndex ? "" : " but none there");
 #endif
@@ -95,13 +95,13 @@ void HifiMoveList::updateClientServerTickDiff(S32 & tickDiff)
       }
    }
 
-   // drop moves that are not made yet (because we rolled them back) and not yet sent   
+   // drop moves that are not made yet (because we rolled them back) and not yet sent
    U32 len = getMax(mLastClientMove-mFirstMoveIndex,mLastSentMove-mFirstMoveIndex);
    mMoveVec.setSize(len);
 
 #ifdef TORQUE_DEBUG_NET_MOVES
    Con::printf("move list size: %i, last move: %i, last sent: %i",mMoveVec.size(),mLastClientMove-mFirstMoveIndex,mLastSentMove-mFirstMoveIndex);
-#endif      
+#endif
 }
 
 S32 HifiMoveList::getServerTicks(U32 serverTickNum)
@@ -146,7 +146,7 @@ void HifiMoveList::resetMoveList()
    mLastMoveAck = 0;
    mLastClientMove = 0;
    mFirstMoveIndex = 0;
-   mLastSentMove = 0;   
+   mLastSentMove = 0;
 }
 
 U32 HifiMoveList::getMoves(Move** movePtr,U32* numMoves)
@@ -170,7 +170,7 @@ U32 HifiMoveList::getMoves(Move** movePtr,U32* numMoves)
 }
 
 void HifiMoveList::advanceMove()
-{ 
+{
    S32 numMoves = mMoveVec.size();
    mAvgMoveQueueSize *= (1.0f-mSmoothMoveAvg);
    mAvgMoveQueueSize += mSmoothMoveAvg * F32(numMoves);
@@ -203,7 +203,7 @@ void HifiMoveList::advanceMove()
    }
 
    mSuppressMove = numMoves == 0;
-   
+
    // now clear move
    if (areMovesPending())
       clearMoves(1);
@@ -259,11 +259,11 @@ void HifiMoveList::serverReadMovePacket(BitStream *bstream)
    // Skip forward (must be starting up), or over the moves
    // we already have.
    int skip = mLastMoveAck - start;
-   if (skip < 0) 
+   if (skip < 0)
    {
       mLastMoveAck = start;
    }
-   else 
+   else
    {
       if (skip > count)
          skip = count;
@@ -382,7 +382,7 @@ void HifiMoveList::clientReadMovePacket(BitStream * bstream)
    // it took to get to that move.
    updateClientServerTickDiff(tickDiff);
 
-   // Apply the second (and final) client-side synchronization mechanism.  The tickDiff adjustments above 
+   // Apply the second (and final) client-side synchronization mechanism.  The tickDiff adjustments above
    // make sure time is preserved on client.  But that assumes that a future (or previous) update will adjust
    // time in the other direction, so that we don't get too far behind or ahead of the server.  The updateMoveSync
    // mechanism tracks us over time to make sure we eventually return to be in sync, and makes adjustments

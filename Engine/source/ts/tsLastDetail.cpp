@@ -90,7 +90,7 @@ TSLastDetail::TSLastDetail(   TSShape *shape,
    mMatInstance = NULL;
 
    // Store this in the static list.
-   smLastDetails.push_back( this );  
+   smLastDetails.push_back( this );
 }
 
 TSLastDetail::~TSLastDetail()
@@ -107,7 +107,7 @@ TSLastDetail::~TSLastDetail()
 void TSLastDetail::render( const TSRenderState &rdata, F32 alpha )
 {
    // Early out if we have nothing to render.
-   if (  alpha < 0.01f || 
+   if (  alpha < 0.01f ||
          !mMatInstance ||
          mMaterial->mImposterUVs.size() == 0 )
       return;
@@ -150,7 +150,7 @@ void TSLastDetail::render( const TSRenderState &rdata, F32 alpha )
    ri->defaultKey = 1;
    ri->defaultKey2 = ri->mat->getStateHint();
 
-   renderPass->addInst( ri );   
+   renderPass->addInst( ri );
 }
 
 void TSLastDetail::update( bool forceUpdate )
@@ -171,7 +171,7 @@ void TSLastDetail::update( bool forceUpdate )
    TEXMGR->cleanupCache();
 
    // Get the real path to the source shape for doing modified time
-   // comparisons... this might be different if the DAEs have been 
+   // comparisons... this might be different if the DAEs have been
    // deleted from the install.
    String shapeFile( mCachePath );
    if ( !Platform::isFile( shapeFile ) )
@@ -179,7 +179,7 @@ void TSLastDetail::update( bool forceUpdate )
       Torque::Path path(shapeFile);
       path.setExtension("cached.dts");
       shapeFile = path.getFullPath();
-      if ( !Platform::isFile( shapeFile ) )  
+      if ( !Platform::isFile( shapeFile ) )
       {
          Con::errorf( "TSLastDetail::update - '%s' could not be found!", mCachePath.c_str() );
          return;
@@ -188,7 +188,7 @@ void TSLastDetail::update( bool forceUpdate )
 
    // Do we need to update the imposter?
    const String diffuseMapPath = _getDiffuseMapPath();
-   if (  forceUpdate || 
+   if (  forceUpdate ||
          Platform::compareModifiedTimes( diffuseMapPath, shapeFile ) <= 0 )
       _update();
 
@@ -210,7 +210,7 @@ void TSLastDetail::update( bool forceUpdate )
    //
    //mImposterVertDecl.copy( *getGFXVertexFormat<ImposterCorner>() );
    //mImposterVertDecl.append( *getGFXVertexFormat<ImposterState>(), 1 );
-   //mImposterVertDecl.getDecl();   
+   //mImposterVertDecl.getDecl();
    mImposterVertDecl.clear();
    mImposterVertDecl.copy( *getGFXVertexFormat<ImposterState>() );
 
@@ -257,7 +257,7 @@ void TSLastDetail::update( bool forceUpdate )
          info.point.set( (F32)x / (F32)texSize.x, (F32)y / (F32)texSize.y );
          info.extent.set( (F32)downscaledDim / (F32)texSize.x, (F32)downscaledDim / (F32)texSize.y );
          imposterUVs.push_back( info );
-         
+
          x += downscaledDim;
       }
 
@@ -280,7 +280,7 @@ void TSLastDetail::_validateDim()
       if ( imposterCount <= maxImposters )
          break;
 
-      // There are too many imposters to fit a single 
+      // There are too many imposters to fit a single
       // texture, so we fail.  These imposters are for
       // rendering small distant objects.  If you need
       // a really high resolution imposter or many images
@@ -292,7 +292,7 @@ void TSLastDetail::_validateDim()
 
    if ( newDim != mDim )
    {
-      Con::printf( "TSLastDetail::_validateDim - '%s' detail dimensions too big! Reduced from %d to %d.", 
+      Con::printf( "TSLastDetail::_validateDim - '%s' detail dimensions too big! Reduced from %d to %d.",
          mCachePath.c_str(),
          mDim, newDim );
 
@@ -319,7 +319,7 @@ void TSLastDetail::_update()
    shape->animate( mDl );
 
    // So we don't have to change it everywhere.
-   const GFXFormat format = GFXFormatR8G8B8A8;  
+   const GFXFormat format = GFXFormatR8G8B8A8;
 
    S32 imposterCount = ( ((2*mNumPolarSteps) + 1 ) * mNumEquatorSteps ) + ( mIncludePoles ? 2 : 0 );
 
@@ -368,7 +368,7 @@ void TSLastDetail::_update()
    {
       if ( currDim < 1 )
          currDim = 1;
-      
+
       dMemset( destBmp.getWritableBits(mip), 0, destBmp.getWidth(mip) * destBmp.getHeight(mip) * GFXFormat_getByteSize( format ) );
       dMemset( destNormal.getWritableBits(mip), 0, destNormal.getWidth(mip) * destNormal.getHeight(mip) * GFXFormat_getByteSize( format ) );
 
@@ -389,7 +389,7 @@ void TSLastDetail::_update()
          F32 rotZ = -M_PI_F / 2.0f;
 
          for ( U32 k=0; k < mNumEquatorSteps; k++ )
-         {            
+         {
             angMat.mul( MatrixF( EulerF( rotX, 0, 0 ) ),
                         MatrixF( EulerF( 0, 0, rotZ ) ) );
 
@@ -414,7 +414,7 @@ void TSLastDetail::_update()
 
             bitmaps.push_back( imposter );
             normalmaps.push_back( normalmap );
-         }         
+         }
       }
 
       imposterCap->end();
@@ -459,9 +459,9 @@ void TSLastDetail::_update()
    PROFILE_END(); // TSLastDetail_snapshots
 
    delete imposterCap;
-   delete shape;   
-   
-   
+   delete shape;
+
+
    // Should we dump the images?
    if ( Con::getBoolVariable( "$TSLastDetail::dumpImposters", false ) )
    {

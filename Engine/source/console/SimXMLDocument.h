@@ -61,19 +61,19 @@ class SimXMLDocument: public SimObject
       bool onAdd();
       void onRemove();
       static void initPersistFields();
-      
+
       // Set this to default state at construction.
       void reset(void);
-      
+
       // Read / write / parse XML.
       bool loadFile(const char* rFileName);
       bool saveFile(const char* rFileName);
       S32 parse(const char* rText);
       bool saveToString(String& str);
-      
+
       // Clear XML document.
       void clear(void);
-      
+
       // Get error description if it exists.
       const char* getErrorDesc(void) const;
       // Clear previously set error.
@@ -87,7 +87,7 @@ class SimXMLDocument: public SimObject
       bool pushChildElement(S32 index);
 	  // Get element value
 	  const char* elementValue();
-      
+
       // Pop last element off of stack.
       void popElement(void);
 
@@ -109,10 +109,10 @@ class SimXMLDocument: public SimObject
       void setAttribute(const char* rAttribute, const char* rVal);
       // Set attributes of a simObject on top element of the stack.
       void setObjectAttributes(const char* objectID);
-      
+
       // Remove attribute with given name from top element on stack.
       void removeAttribute(const char* rAttribute);
-      
+
       // Create a new element and push it onto stack as a new level.
       void pushNewElement(const char* rName);
       // Create a new element and push it onto stack on current level.
@@ -133,7 +133,7 @@ class SimXMLDocument: public SimObject
       void addData(const char* text);
       // Retrieve data from the current level.
       const char* getData();
-      
+
    private:
       // Document.
       TiXmlDocument* m_qDocument;

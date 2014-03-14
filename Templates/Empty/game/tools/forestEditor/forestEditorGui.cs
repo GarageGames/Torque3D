@@ -27,7 +27,7 @@ function ForestEditorGui::setActiveTool( %this, %tool )
 {
    if ( %tool == ForestTools->BrushTool )
       ForestEditTabBook.selectPage(0);
-      
+
    Parent::setActiveTool( %this, %tool );
 }
 
@@ -40,11 +40,11 @@ function ForestEditorGui::onActiveForestUpdated( %this, %forest, %createNew )
    // Give the user a chance to add a forest.
    if ( !%gotForest && %createNew )
    {
-      MessageBoxYesNo(  "Forest", 
+      MessageBoxYesNo(  "Forest",
                         "There is not a Forest in this mission.  Do you want to add one?",
                         %this @ ".createForest();", "" );
-      return;                                                         
-   }  
+      return;
+   }
 }
 
 /// Called from a message box when a forest is not found.
@@ -55,73 +55,73 @@ function ForestEditorGui::createForest( %this )
       error( "Cannot create a second 'theForest' Forest!" );
       return;
    }
-   
+
    // Allocate the Forest and make it undoable.
    new Forest( theForest )
    {
       dataFile = "";
       parentGroup = "MissionGroup";
    };
-   
+
    MECreateUndoAction::submit( theForest );
-   
+
    ForestEditorInspector.inspect( theForest );
-   
+
    EWorldEditor.isDirty = true;
 }
 
 function ForestEditorGui::newBrush( %this )
-{   
+{
    %internalName = getUniqueInternalName( "Brush", ForestBrushGroup, true );
-         
+
    %brush = new ForestBrush()
    {
       internalName = %internalName;
-      parentGroup = ForestBrushGroup; 
-   };   
-   
+      parentGroup = ForestBrushGroup;
+   };
+
    MECreateUndoAction::submit( %brush );
-   
+
    ForestEditBrushTree.open( ForestBrushGroup );
    ForestEditBrushTree.buildVisibleTree(true);
    %item = ForestEditBrushTree.findItemByObjectId( %brush );
    ForestEditBrushTree.clearSelection();
    ForestEditBrushTree.addSelection( %item );
-   ForestEditBrushTree.scrollVisible( %item );   
-   
+   ForestEditBrushTree.scrollVisible( %item );
+
    ForestEditorPlugin.dirty = true;
 }
 
 function ForestEditorGui::newElement( %this )
 {
    %sel = ForestEditBrushTree.getSelectedObject();
-   
+
    if ( !isObject( %sel ) )
       %parentGroup = ForestBrushGroup;
    else
    {
-      if ( %sel.getClassName() $= "ForestBrushElement" )  
+      if ( %sel.getClassName() $= "ForestBrushElement" )
          %parentGroup = %sel.parentGroup;
       else
          %parentGroup = %sel;
    }
-      
-   %internalName = getUniqueInternalName( "Element", ForestBrushGroup, true );   
-   
+
+   %internalName = getUniqueInternalName( "Element", ForestBrushGroup, true );
+
    %element = new ForestBrushElement()
    {
       internalName = %internalName;
       parentGroup =  %parentGroup;
    };
-   
+
    MECreateUndoAction::submit( %element );
-   
-   ForestEditBrushTree.clearSelection();      
+
+   ForestEditBrushTree.clearSelection();
    ForestEditBrushTree.buildVisibleTree( true );
    %item = ForestEditBrushTree.findItemByObjectId( %element.getId() );
    ForestEditBrushTree.scrollVisible( %item );
-   ForestEditBrushTree.addSelection( %item );  
-   
+   ForestEditBrushTree.addSelection( %item );
+
    ForestEditorPlugin.dirty = true;
 }
 
@@ -134,7 +134,7 @@ function ForestEditorGui::deleteBrushOrElement( %this )
 function ForestEditorGui::newMesh( %this )
 {
    %spec = "All Mesh Files|*.dts;*.dae|DTS|*.dts|DAE|*.dae";
-   
+
    %dlg = new OpenFileDialog()
    {
       Filters        = %spec;
@@ -142,26 +142,26 @@ function ForestEditorGui::newMesh( %this )
       DefaultFile    = "";
       ChangePath     = true;
    };
-         
+
    %ret = %dlg.Execute();
-   
+
    if ( %ret )
    {
       $Pref::WorldEditor::LastPath = filePath( %dlg.FileName );
       %fullPath = makeRelativePath( %dlg.FileName, getMainDotCSDir() );
       %file = fileBase( %fullPath );
-   }   
-   
+   }
+
    %dlg.delete();
-   
+
    if ( !%ret )
       return;
-         
+
    %name = getUniqueName( %file );
-      
-   %str = "datablock TSForestItemData( " @ %name @ " ) { shapeFile = \"" @ %fullPath @ "\"; };";            
+
+   %str = "datablock TSForestItemData( " @ %name @ " ) { shapeFile = \"" @ %fullPath @ "\"; };";
    eval( %str );
-   
+
    if ( isObject( %name ) )
    {
       ForestEditMeshTree.clearSelection();
@@ -169,65 +169,65 @@ function ForestEditorGui::newMesh( %this )
       %item = ForestEditMeshTree.findItemByObjectId( %name.getId() );
       ForestEditMeshTree.scrollVisible( %item );
       ForestEditMeshTree.addSelection( %item );
-      
-      ForestDataManager.setDirty( %name, "art/forest/managedItemData.cs" );  
-      
+
+      ForestDataManager.setDirty( %name, "art/forest/managedItemData.cs" );
+
       %element = new ForestBrushElement()
       {
          internalName = %name;
-         forestItemData = %name;  
+         forestItemData = %name;
          parentGroup = ForestBrushGroup;
-      };                       
+      };
 
-      ForestEditBrushTree.clearSelection();      
+      ForestEditBrushTree.clearSelection();
       ForestEditBrushTree.buildVisibleTree( true );
       %item = ForestEditBrushTree.findItemByObjectId( %element.getId() );
       ForestEditBrushTree.scrollVisible( %item );
-      ForestEditBrushTree.addSelection( %item );    
-            
-      pushInstantGroup();      
+      ForestEditBrushTree.addSelection( %item );
+
+      pushInstantGroup();
       %action = new MECreateUndoAction()
       {
          actionName = "Create TSForestItemData";
-      };      
+      };
       popInstantGroup();
-            
+
       %action.addObject( %name );
-      %action.addObject( %element );            
-      %action.addToManager( Editor.getUndoManager() );   
-      
-      ForestEditorPlugin.dirty = true;   
-   }         
+      %action.addObject( %element );
+      %action.addToManager( Editor.getUndoManager() );
+
+      ForestEditorPlugin.dirty = true;
+   }
 }
 
 function ForestEditorGui::deleteMesh( %this )
 {
-   %obj = ForestEditMeshTree.getSelectedObject();   
-   
+   %obj = ForestEditMeshTree.getSelectedObject();
+
    // Can't delete itemData's that are in use without
    // crashing at the moment...
-      
+
    if ( isObject( %obj ) )
    {
-      MessageBoxOKCancel( "Warning", 
-                          "Deleting this mesh will also delete BrushesElements and ForestItems referencing it.", 
+      MessageBoxOKCancel( "Warning",
+                          "Deleting this mesh will also delete BrushesElements and ForestItems referencing it.",
                           "ForestEditorGui.okDeleteMesh(" @ %obj @ ");",
-                          "" );      
-   }   
+                          "" );
+   }
 }
 
 function ForestEditorGui::okDeleteMesh( %this, %mesh )
 {
    // Remove mesh from file
-   ForestDataManager.removeObjectFromFile( %mesh, "art/forest/managedItemData.cs" );  
+   ForestDataManager.removeObjectFromFile( %mesh, "art/forest/managedItemData.cs" );
 
    // Submitting undo actions is handled in code.
-   %this.deleteMeshSafe( %mesh );   
-   
+   %this.deleteMeshSafe( %mesh );
+
    // Update TreeViews.
    ForestEditBrushTree.buildVisibleTree( true );
    ForestEditMeshTree.buildVisibleTree( true );
-   
+
    ForestEditorPlugin.dirty = true;
 }
 
@@ -254,10 +254,10 @@ function ForestEditMeshTree::onSelect( %this, %obj )
 }
 
 function ForestEditBrushTree::onRemoveSelection( %this, %obj )
-{   
+{
    %this.buildVisibleTree( true );
    ForestTools->BrushTool.collectElements();
-   
+
    if ( %this.getSelectedItemsCount() == 1 )
       ForestEditorInspector.inspect( %obj );
    else
@@ -268,7 +268,7 @@ function ForestEditBrushTree::onAddSelection( %this, %obj )
 {
    %this.buildVisibleTree( true );
    ForestTools->BrushTool.collectElements();
-   
+
    if ( %this.getSelectedItemsCount() == 1 )
       ForestEditorInspector.inspect( %obj );
    else
@@ -279,32 +279,32 @@ function ForestEditTabBook::onTabSelected( %this, %text, %idx )
 {
    %bbg = ForestEditorPalleteWindow.findObjectByInternalName("BrushButtonGroup");
    %mbg = ForestEditorPalleteWindow.findObjectByInternalName("MeshButtonGroup");
-   
+
    %bbg.setVisible( false );
    %mbg.setVisible( false );
-      
+
    if ( %text $= "Brushes" )
-   {   
+   {
       %bbg.setVisible( true );
-      %obj = ForestEditBrushTree.getSelectedObject();      
+      %obj = ForestEditBrushTree.getSelectedObject();
       ForestEditorInspector.inspect( %obj );
    }
    else if ( %text $= "Meshes" )
    {
       %mbg.setVisible( true );
       %obj = ForestEditMeshTree.getSelectedObject();
-      ForestEditorInspector.inspect( %obj );      
+      ForestEditorInspector.inspect( %obj );
    }
 }
 
 function ForestEditBrushTree::onDeleteSelection( %this )
 {
-   %list = ForestEditBrushTree.getSelectedObjectList();               
-   
+   %list = ForestEditBrushTree.getSelectedObjectList();
+
    MEDeleteUndoAction::submit( %list, true );
-   
+
    ForestEditorPlugin.dirty = true;
-} 
+}
 
 function ForestEditBrushTree::onDragDropped( %this )
 {
@@ -324,50 +324,50 @@ function ForestEditMeshTree::onDeleteObject( %this, %obj )
 
 function ForestEditMeshTree::onDoubleClick( %this )
 {
-   %obj = %this.getSelectedObject();     
-   
+   %obj = %this.getSelectedObject();
+
    %name = getUniqueInternalName( %obj.getName(), ForestBrushGroup, true );
-   
+
    %element = new ForestBrushElement()
    {
       internalName = %name;
-      forestItemData = %obj.getName();  
+      forestItemData = %obj.getName();
       parentGroup = ForestBrushGroup;
-   };          
-   
-   //ForestDataManager.setDirty( %element, "art/forest/brushes.cs" );                 
+   };
 
-   ForestEditBrushTree.clearSelection();      
+   //ForestDataManager.setDirty( %element, "art/forest/brushes.cs" );
+
+   ForestEditBrushTree.clearSelection();
    ForestEditBrushTree.buildVisibleTree( true );
    %item = ForestEditBrushTree.findItemByObjectId( %element );
    ForestEditBrushTree.scrollVisible( %item );
-   ForestEditBrushTree.addSelection( %item );  
-   
+   ForestEditBrushTree.addSelection( %item );
+
    ForestEditorPlugin.dirty = true;
 }
 
 function ForestEditBrushTree::handleRenameObject( %this, %name, %obj )
-{   
+{
    if ( %name !$= "" )
-   {       
+   {
       %found = ForestBrushGroup.findObjectByInternalName( %name );
       if ( isObject( %found ) && %found.getId() != %obj.getId() )
       {
-         MessageBoxOK( "Error", "Brush or Element with that name already exists.", "" );   
-         
-         // true as in, we handled it, don't rename the object.      
-         return true;   
+         MessageBoxOK( "Error", "Brush or Element with that name already exists.", "" );
+
+         // true as in, we handled it, don't rename the object.
+         return true;
       }
-   }      
-   
+   }
+
    // Since we aren't showing any groups whens inspecting a ForestBrushGroup
    // we can't push this event off to the inspector to handle.
 
-   //return GuiTreeViewCtrl::handleRenameObject( %this, %name, %obj );      
-   
-   
+   //return GuiTreeViewCtrl::handleRenameObject( %this, %name, %obj );
+
+
    // The instant group will try to add our
-   // UndoAction if we don't disable it.   
+   // UndoAction if we don't disable it.
    pushInstantGroup();
 
    %nameOrClass = %obj.getName();
@@ -377,54 +377,54 @@ function ForestEditBrushTree::handleRenameObject( %this, %name, %obj )
    %action = new InspectorFieldUndoAction()
    {
       actionName = %nameOrClass @ "." @ "internalName" @ " Change";
-      
+
       objectId = %obj.getId();
       fieldName = "internalName";
       fieldValue = %obj.internalName;
       arrayIndex = 0;
-                  
+
       inspectorGui = "";
    };
-   
+
    // Restore the instant group.
    popInstantGroup();
-         
+
    %action.addToManager( Editor.getUndoManager() );
-   EWorldEditor.isDirty = true;   
-   
-   return false;   
+   EWorldEditor.isDirty = true;
+
+   return false;
 }
 
 function ForestEditorInspector::inspect( %this, %obj )
 {
    if ( isObject( %obj ) )
       %class = %obj.getClassName();
-   
+
    %this.showObjectName = false;
    %this.showCustomFields = false;
-   
+
    switch$ ( %class )
    {
-      case "ForestBrush":   
-         %this.groupFilters = "+NOTHING,-Ungrouped";      
+      case "ForestBrush":
+         %this.groupFilters = "+NOTHING,-Ungrouped";
 
       case "ForestBrushElement":
          %this.groupFilters = "+ForestBrushElement,-Ungrouped";
 
-      case "TSForestItemData":   
+      case "TSForestItemData":
          %this.groupFilters = "+Media,+Wind";
 
       default:
          %this.groupFilters = "";
    }
-   
-   Parent::inspect( %this, %obj );  
+
+   Parent::inspect( %this, %obj );
 }
 
 function ForestEditorInspector::onInspectorFieldModified( %this, %object, %fieldName, %oldValue, %newValue )
 {
    // The instant group will try to add our
-   // UndoAction if we don't disable it.   
+   // UndoAction if we don't disable it.
    %instantGroup = $InstantGroup;
    $InstantGroup = 0;
 
@@ -435,22 +435,22 @@ function ForestEditorInspector::onInspectorFieldModified( %this, %object, %field
    %action = new InspectorFieldUndoAction()
    {
       actionName = %nameOrClass @ "." @ %fieldName @ " Change";
-      
+
       objectId = %object.getId();
       fieldName = %fieldName;
       fieldValue = %oldValue;
-                  
+
       inspectorGui = %this;
    };
-   
+
    // Restore the instant group.
-   $InstantGroup = %instantGroup; 
-         
+   $InstantGroup = %instantGroup;
+
    %action.addToManager( Editor.getUndoManager() );
-   
+
    if ( %object.getClassName() $= "TSForestItemData" )
       ForestDataManager.setDirty( %object );
-      
+
    ForestEditorPlugin.dirty = true;
 }
 

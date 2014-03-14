@@ -29,10 +29,10 @@
 //----------------------------
 /// GuiColorPickerCtrl
 ///
-/// This control draws a box containing a color specified by mPickColor, 
+/// This control draws a box containing a color specified by mPickColor,
 /// in a way according to one of the PickMode enum's, stored as mDisplayMode.
-/// 
-/// The color the box represents is stored as mBaseColour (for pPallete, pBlendColorRange), 
+///
+/// The color the box represents is stored as mBaseColour (for pPallete, pBlendColorRange),
 /// whilst the color chosen by the box is stored as mPickColor.
 ///
 /// Whenever the control is clicked, it will do one of many things :
@@ -55,11 +55,11 @@
 class GuiColorPickerCtrl : public GuiControl
 {
    typedef GuiControl Parent;
-   
+
   public:
    enum PickMode
    {
-     pPallet = 0,		///< We just have a solid color; We just act like a pallet 
+     pPallet = 0,		///< We just have a solid color; We just act like a pallet
      pHorizColorRange,		///< We have a range of base colors going horizontally
      pVertColorRange,		///< We have a range of base colors going vertically
      pHorizColorBrightnessRange, ///< HorizColorRange with brightness
@@ -69,15 +69,15 @@ class GuiColorPickerCtrl : public GuiControl
      pVertAlphaRange,		///< We have a box which shows a range in alpha going vertically
      pDropperBackground		///< The control does not draw anything; Only does something when you click, or move the mouse (when active)
    };
-   
+
    enum SelectorMode
    {
      sHorizontal = 0,		///< Horizontal selector with small gap
      sVertical,			///< Vertical selector with small gap
    };
-  
+
   protected:
-   
+
    /// @name Core Rendering functions
    /// @{
    void renderColorBox(RectI &bounds);			///< Function that draws the actual color box
@@ -91,27 +91,27 @@ class GuiColorPickerCtrl : public GuiControl
    ColorF mPickColor;		///< Color that has been picked from control
    ColorF mBaseColor;		///< Colour we display (in case of pallet and blend mode)
    PickMode mDisplayMode;	///< Current color display mode of the selector
-   
+
    Point2I mSelectorPos;	///< Current position of the selector
    bool mPositionChanged;	///< Current position has changed since last render?
    bool mMouseOver;		///< Mouse is over?
    bool mMouseDown;		///< Mouse button down?
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
-	
-   
-   S32   mSelectorGap;		///< The half-way "gap" between the selector pos and where the selector is allowed to draw. 
+
+
+   S32   mSelectorGap;		///< The half-way "gap" between the selector pos and where the selector is allowed to draw.
 
    GFXStateBlockRef mStateBlock;
 
    static ColorI mColorRange[7]; ///< Color range for pHorizColorRange and pVertColorRange
    /// @}
 
-  public:   
-   
+  public:
+
    DECLARE_CONOBJECT(GuiColorPickerCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
-   
+
    GuiColorPickerCtrl();
 
    static void initPersistFields();
@@ -127,13 +127,13 @@ class GuiColorPickerCtrl : public GuiControl
    void setScriptValue(const char *value);
    void updateColor() {mPositionChanged = true;}
    /// @}
-   
+
    /// @name Selector Functions
    /// @{
    void setSelectorPos(const Point2I &pos); ///< Set new pos (in local coords)
    Point2I getSelectorPos() {return mSelectorPos;}
    /// @}
-   
+
    /// @name Input Events
    /// @{
    void onMouseDown(const GuiEvent &);

@@ -409,7 +409,7 @@ void PathCamera::onNode(S32 node)
 {
    if (!isGhost())
 		onNode_callback(Con::getIntArg(node));
-   
+
 }
 
 U32 PathCamera::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
@@ -456,7 +456,7 @@ void PathCamera::unpackUpdate(NetConnection *con, BitStream *stream)
       mState = stream->readInt(StateBits);
 
    // PositionMask
-   if (stream->readFlag()) 
+   if (stream->readFlag())
    {
       stream->read(&mPosition);
       delta.time = mPosition;
@@ -472,7 +472,7 @@ void PathCamera::unpackUpdate(NetConnection *con, BitStream *stream)
    }
 
    // WindowMask
-   if (stream->readFlag()) 
+   if (stream->readFlag())
    {
       mSpline.removeAll();
       stream->read(&mNodeBase);
@@ -566,9 +566,9 @@ DefineEngineMethod(PathCamera, reset, void, (F32 speed),(1.0f), "@brief Clear th
 
 static CameraSpline::Knot::Type resolveKnotType(const char *arg)
 {
-   if (dStricmp(arg, "Position Only") == 0) 
+   if (dStricmp(arg, "Position Only") == 0)
       return CameraSpline::Knot::POSITION_ONLY;
-   if (dStricmp(arg, "Kink") == 0) 
+   if (dStricmp(arg, "Kink") == 0)
       return CameraSpline::Knot::KINK;
    return CameraSpline::Knot::NORMAL;
 }
@@ -581,7 +581,7 @@ static CameraSpline::Knot::Path resolveKnotPath(const char *arg)
 }
 
 DefineEngineMethod(PathCamera, pushBack, void, (TransformF transform, F32 speed, const char* type, const char* path),
-											   (1.0, "Normal", "Linear"), 
+											   (1.0, "Normal", "Linear"),
 											      "@brief Adds a new knot to the back of a path camera's path.\n"
 													"@param transform Transform for the new knot.  In the form of \"x y z ax ay az aa\" such as returned by SceneObject::getTransform()\n"
 													"@param speed Speed setting for this knot.\n"
@@ -606,7 +606,7 @@ DefineEngineMethod(PathCamera, pushBack, void, (TransformF transform, F32 speed,
 }
 
 DefineEngineMethod(PathCamera, pushFront, void, (TransformF transform, F32 speed, const char* type, const char* path),
-											   (1.0, "Normal", "Linear"), 
+											   (1.0, "Normal", "Linear"),
 											      "@brief Adds a new knot to the front of a path camera's path.\n"
 													"@param transform Transform for the new knot. In the form of \"x y z ax ay az aa\" such as returned by SceneObject::getTransform()\n"
 													"@param speed Speed setting for this knot.\n"

@@ -71,7 +71,7 @@ struct Move;
 /// @see http://hosted.tribalwar.com/t2faq/datablocks.shtml for an excellent
 ///      explanation of the basics of datablocks from a scripting perspective.
 /// @nosubgrouping
-struct GameBaseData : public SimDataBlock 
+struct GameBaseData : public SimDataBlock
 {
 private:
 
@@ -89,7 +89,7 @@ public:
    // Triggers the reload signal.
    void inspectPostApply();
 
-   bool onAdd();   
+   bool onAdd();
 
    // The derived class should provide the following:
    DECLARE_CONOBJECT(GameBaseData);
@@ -180,7 +180,7 @@ class MoveList;
 ///
 /// @nosubgrouping
 class GameBase : public SceneObject
-{      
+{
    typedef SceneObject Parent;
 
    /// @name Datablock
@@ -191,35 +191,35 @@ class GameBase : public SceneObject
    /// @}
 
    TickCache mTickCache;
-   
+
    // Control interface
    GameConnection* mControllingClient;
 
 public:
 
    static bool gShowBoundingBox;    ///< Should we render bounding boxes?
-  
+
 protected:
 
    F32 mCameraFov;
 
    /// The WaterObject we are currently within.
    WaterObject *mCurrentWaterObject;
-   
+
    static bool setDataBlockProperty( void *object, const char *index, const char *data );
 
 #ifdef TORQUE_DEBUG_NET_MOVES
    U32 mLastMoveId;
    U32 mTicksSinceLastMove;
    bool mIsAiControlled;
-#endif   
+#endif
 
 public:
 
    GameBase();
    ~GameBase();
 
-   enum GameBaseMasks {      
+   enum GameBaseMasks {
       DataBlockMask     = Parent::NextFreeMask << 0,
       ExtendedInfoMask  = Parent::NextFreeMask << 1,
       NextFreeMask      = Parent::NextFreeMask << 2
@@ -267,7 +267,7 @@ public:
    /// @param  dptr     New datablock
    /// @param  reload   Is this a new datablock or are we reloading one
    ///                  we already had.
-   virtual bool onNewDataBlock( GameBaseData *dptr, bool reload );   
+   virtual bool onNewDataBlock( GameBaseData *dptr, bool reload );
    ///@}
 
    /// @name Script
@@ -290,11 +290,11 @@ public:
    /// @}
 
    // ProcessObject override
-   void processTick( const Move *move ); 
+   void processTick( const Move *move );
 
-   /// @name GameBase NetFlags & Hifi-Net Interface   
+   /// @name GameBase NetFlags & Hifi-Net Interface
    /// @{
-   
+
    /// Set or clear the GhostUpdated bit in our NetFlags.
    /// @see GhostUpdated
    void setGhostUpdated( bool b ) { if (b) mNetFlags.set(GhostUpdated); else mNetFlags.clear(GhostUpdated); }
@@ -330,7 +330,7 @@ public:
    /// Returns true if the NetOrdered bit in our NetFlags is set.
    /// @see NetOrdered
    bool isNetOrdered() const { return mNetFlags.test(NetOrdered); }
-   
+
    /// Called during client catchup under the hifi-net model.
    virtual void computeNetSmooth( F32 backDelta ) {}
 
@@ -378,8 +378,8 @@ public:
 
 public:
 
-   virtual void onMount( SceneObject *obj, S32 node );   
-   virtual void onUnmount( SceneObject *obj,S32 node ); 
+   virtual void onMount( SceneObject *obj, S32 node );
+   virtual void onUnmount( SceneObject *obj,S32 node );
 
    /// @}
 
@@ -411,14 +411,14 @@ public:
    virtual bool onlyFirstPerson() const { return false; }
    virtual F32 getDamageFlash() const { return 0.0f; }
    virtual F32 getWhiteOut() const { return 0.0f; }
-   
+
    // Not implemented here, but should return the Camera to world transformation matrix
    virtual void getCameraTransform (F32 *pos, MatrixF *mat ) { *mat = MatrixF::Identity; }
 
    /// Returns the water object we are colliding with, it is up to derived
    /// classes to actually set this object.
    virtual WaterObject* getCurrentWaterObject() { return mCurrentWaterObject; }
-   
+
    #ifdef TORQUE_DEBUG_NET_MOVES
    bool isAIControlled() const { return mIsAiControlled; }
    #endif
@@ -432,18 +432,18 @@ public:
 
 private:
 
-   /// This is called by the reload signal in our datablock when it is 
+   /// This is called by the reload signal in our datablock when it is
    /// modified in the editor.
    ///
    /// This method is private and is not virtual. To handle a datablock-modified
    /// even in a child-class specific way you should override onNewDatablock
-   /// and handle the reload( true ) case.   
+   /// and handle the reload( true ) case.
    ///
    /// Warning: For local-client, editor situations only.
    ///
    /// Warning: Do not attempt to call .remove or .notify on mDataBlock->mReloadSignal
    /// within this callback.
-   ///   
+   ///
    void _onDatablockModified();
 };
 

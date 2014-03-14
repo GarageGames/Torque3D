@@ -36,22 +36,22 @@
 class SimPersistSet : public SimSet
 {
    public:
-   
+
       typedef SimSet Parent;
-      
+
    protected:
-   
+
       /// List of unresolved persistent IDs.
       Vector< SimPersistID* > mUnresolvedPIDs;
-      
+
       /// If true, the set is currently resolving persistent IDs.
       bool mIsResolvingPIDs;
 
    public:
-   
+
       ///
       SimPersistSet();
-   
+
       /// Try to resolve all persistent IDs that as of yet are still unresolved.
       void resolvePIDs();
 
@@ -59,7 +59,7 @@ class SimPersistSet : public SimSet
       virtual void addObject( SimObject* );
       virtual void write( Stream &stream, U32 tabStop, U32 flags = 0 );
       virtual bool processArguments( S32 argc, const char** argv );
-      
+
       DECLARE_CONOBJECT( SimPersistSet );
       DECLARE_CATEGORY( "Console" );
       DECLARE_DESCRIPTION( "A SimSet that can be safely persisted." );

@@ -35,7 +35,7 @@
 ///
 /// @note This class has no meaningful constructor; the memory for all zone states is
 ///   cleared en bloc.
-class SceneZoneCullingState 
+class SceneZoneCullingState
 {
    public:
 

@@ -30,11 +30,11 @@
 //----------------------------------------------------------------------------
 
 ProcessObject::ProcessObject()
- : mProcessTag( 0 ),   
+ : mProcessTag( 0 ),
    mOrderGUID( 0 ),
    mProcessTick( false ),
    mIsGameBase( false )
-{ 
+{
    mProcessLink.next = mProcessLink.prev = this;
 }
 
@@ -162,13 +162,13 @@ void ProcessList::orderList()
    }
 
    // Reverse topological sort into the original head node
-   while (list.mProcessLink.next != &list) 
+   while (list.mProcessLink.next != &list)
    {
       ProcessObject * ptr = list.mProcessLink.next;
       ProcessObject * afterObject = ptr->getAfterObject();
       ptr->mProcessTag = mCurrentTag;
       ptr->plUnlink();
-      if (afterObject) 
+      if (afterObject)
       {
          // Build chain "stack" of dependent objects and patch
          // it to the end of the current list.
@@ -216,12 +216,12 @@ bool ProcessList::advanceTime(SimTime timeDelta)
    PROFILE_START(ProcessList_AdvanceTime);
 
    // some drivers change the FPU control state, which will break our control object simulation
-   // (leading to packet mismatch errors due to small FP differences).  So set it to the known 
+   // (leading to packet mismatch errors due to small FP differences).  So set it to the known
    // state before advancing.
    U32 mathState = Platform::getMathControlState();
    Platform::setMathControlStateKnown();
 
-   if (mDirty) 
+   if (mDirty)
       orderList();
 
    SimTime targetTime = mLastTime + timeDelta;
@@ -264,7 +264,7 @@ void ProcessList::advanceObjects()
    {
       pobj->plUnlink();
       pobj->plLinkBefore(&mHead);
-      
+
       onTickObject(pobj);
    }
 

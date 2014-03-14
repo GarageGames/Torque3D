@@ -444,7 +444,7 @@ function GameCore::cycleGame(%game)
    {
       // We're done with the whole game
       endMission();
-      
+
       // Destroy server to remove all connected clients after they've seen the
       // end game GUI.
       schedule($Game::EndGamePause * 1000, 0, "gameCoreDestroyServer", $Server::Session);
@@ -612,7 +612,7 @@ function GameCore::loadOut(%game, %player)
    //echo (%game @"\c4 -> "@ %game.class @" -> GameCore::loadOut");
 
    %player.clearWeaponCycle();
-   
+
    %player.setInventory(Ryder, 1);
    %player.setInventory(RyderClip, %player.maxInventory(RyderClip));
    %player.setInventory(RyderAmmo, %player.maxInventory(RyderAmmo));    // Start the gun loaded
@@ -632,7 +632,7 @@ function GameCore::loadOut(%game, %player)
 
    %player.setInventory(DeployableTurret, %player.maxInventory(DeployableTurret));
    %player.addToWeaponCycle(DeployableTurret);
-   
+
    if (%player.getDatablock().mainWeapon.image !$= "")
    {
       %player.mountImage(%player.getDatablock().mainWeapon.image, 0);
@@ -669,7 +669,7 @@ function sendMsgClientKilled_Default( %msgType, %client, %sourceClient, %damLoc 
 function GameCore::onDeath(%game, %client, %sourceObject, %sourceClient, %damageType, %damLoc)
 {
    //echo (%game @"\c4 -> "@ %game.class @" -> GameCore::onDeath");
-   
+
    // clear the weaponHUD
    %client.RefreshWeaponHud(0, "", "");
 
@@ -706,8 +706,8 @@ function GameCore::onDeath(%game, %client, %sourceObject, %sourceClient, %damage
       if ( $Game::EndGameScore > 0 && %sourceClient.kills >= $Game::EndGameScore )
          %game.cycleGame();
    }
-   
-   
+
+
 }
 
 // ----------------------------------------------------------------------------
@@ -717,7 +717,7 @@ function GameCore::onDeath(%game, %client, %sourceObject, %sourceClient, %damage
 function GameCore::incKills(%game, %client, %kill, %dontMessageAll)
 {
    %client.kills += %kill;
-   
+
    if( !%dontMessageAll )
       messageAll('MsgClientScoreChanged', "", %client.score, %client.kills, %client.deaths, %client);
 }
@@ -807,7 +807,7 @@ function GameCore::spawnPlayer(%game, %client, %spawnPoint, %noControl)
          // Pick a location within the spawn sphere.
          %spawnLocation = GameCore::pickPointInSpawnSphere(%player, %spawnPoint);
          %player.setTransform(%spawnLocation);
-         
+
       }
       else
       {
@@ -832,10 +832,10 @@ function GameCore::spawnPlayer(%game, %client, %spawnPoint, %noControl)
    }
    else
    {
-      
+
       // Create a default player
       %player = spawnObject($Game::DefaultPlayerClass, $Game::DefaultPlayerDataBlock);
-      
+
       if (!%player.isMemberOfClass("Player"))
          warn("Trying to spawn a class that does not derive from Player.");
 
@@ -869,7 +869,7 @@ function GameCore::spawnPlayer(%game, %client, %spawnPoint, %noControl)
    // Store the client object on the player object for
    // future reference
    %player.client = %client;
-   
+
    // If the player's client has some owned turrets, make sure we let them
    // know that we're a friend too.
    if (%client.ownedTurrets)
@@ -936,14 +936,14 @@ function GameCore::pickPointInSpawnSphere(%objectToSpawn, %spawnSphere)
    while(!%SpawnLocationFound && (%attemptsToSpawn < 5))
    {
       %sphereLocation = %spawnSphere.getTransform();
-      
+
       // Attempt to spawn the player within the bounds of the spawnsphere.
       %angleY = mDegToRad(getRandom(0, 100) * m2Pi());
       %angleXZ = mDegToRad(getRandom(0, 100) * m2Pi());
 
       %sphereLocation = setWord( %sphereLocation, 0, getWord(%sphereLocation, 0) + (mCos(%angleY) * mSin(%angleXZ) * getRandom(-%spawnSphere.radius, %spawnSphere.radius)));
       %sphereLocation = setWord( %sphereLocation, 1, getWord(%sphereLocation, 1) + (mCos(%angleXZ) * getRandom(-%spawnSphere.radius, %spawnSphere.radius)));
-      
+
       %SpawnLocationFound = true;
 
       // Now have to check that another object doesn't already exist at this spot.
@@ -952,11 +952,11 @@ function GameCore::pickPointInSpawnSphere(%objectToSpawn, %spawnSphere)
       %boundingBoxSize = %objectToSpawn.getDatablock().boundingBox;
       %searchRadius = getWord(%boundingBoxSize, 0);
       %boxSizeY = getWord(%boundingBoxSize, 1);
-      
+
       // Use the larger dimention as the radius to search
       if (%boxSizeY > %searchRadius)
          %searchRadius = %boxSizeY;
-         
+
       // Search a radius about the area we're about to spawn for players.
       initContainerRadiusSearch( %sphereLocation, %searchRadius, $TypeMasks::PlayerObjectType );
       while ( (%objectNearExit = containerSearchNext()) != 0 )
@@ -966,21 +966,21 @@ function GameCore::pickPointInSpawnSphere(%objectToSpawn, %spawnSphere)
          %SpawnLocationFound = false;
          break;
       }
-         
+
       // If the attempt at finding a clear spawn location failed
       // try no more than 5 times.
       %attemptsToSpawn++;
    }
-      
+
    // If we couldn't find a spawn location after 5 tries, spawn the object
    // At the center of the sphere and give a warning.
    if (!%SpawnLocationFound)
    {
       %sphereLocation = %spawnSphere.getTransform();
-      warn("WARNING: Could not spawn player after" SPC %attemptsToSpawn 
+      warn("WARNING: Could not spawn player after" SPC %attemptsToSpawn
       SPC "tries in spawnsphere" SPC %spawnSphere SPC "without overlapping another player. Attempting spawn in center of sphere.");
    }
-   
+
    return %sphereLocation;
 }
 

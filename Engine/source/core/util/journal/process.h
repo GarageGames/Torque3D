@@ -67,73 +67,73 @@ public:
    static void requestShutdown();
 
 
-   static void notifyInit(Delegate<bool()> del, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notifyInit(Delegate<bool()> del, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalInit.notify(del,order);
    }
 
    template <class T>
-   static void notifyInit(T func, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notifyInit(T func, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalInit.notify(func,order);
    }
 
 
-   static void notifyCommandLine(Delegate<void(S32, const char **)> del, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notifyCommandLine(Delegate<void(S32, const char **)> del, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalCommandLine.notify(del,order);
    }
 
    template <class T>
-   static void notifyCommandLine(T func, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notifyCommandLine(T func, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalCommandLine.notify(func,order);
    }
 
 
-   static void notify(Delegate<void()> del, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notify(Delegate<void()> del, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalProcess.notify(del,order);
    }
 
    template <class T>
-   static void notify(T func, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notify(T func, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalProcess.notify(func,order);
    }
 
    template <class T,class U>
-   static void notify(T obj,U func, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notify(T obj,U func, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalProcess.notify(obj,func,order);
    }
 
- 
-   static void remove(Delegate<void()> del) 
+
+   static void remove(Delegate<void()> del)
    {
       get()._signalProcess.remove(del);
    }
 
    template <class T>
-   static void remove(T func) 
+   static void remove(T func)
    {
       get()._signalProcess.remove(func);
    }
 
    template <class T,class U>
-   static void remove(T obj,U func) 
+   static void remove(T obj,U func)
    {
       get()._signalProcess.remove(obj,func);
    }
 
 
-   static void notifyShutdown(Delegate<bool(void)> del, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notifyShutdown(Delegate<bool(void)> del, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalShutdown.notify(del,order);
    }
 
    template <class T>
-   static void notifyShutdown(T func, F32 order = PROCESS_DEFAULT_ORDER) 
+   static void notifyShutdown(T func, F32 order = PROCESS_DEFAULT_ORDER)
    {
       get()._signalShutdown.notify(func,order);
    }

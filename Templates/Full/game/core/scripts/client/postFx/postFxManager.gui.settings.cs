@@ -25,17 +25,17 @@ $PostFXManager::defaultPreset  = "core/scripts/client/postFx/default.postfxprese
 function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
 {
    $PostFXManager::PostFX::Enabled = %bEnablePostFX;
-   
+
    //if to enable the postFX, apply the ones that are enabled
    if ( %bEnablePostFX )
    {
       //SSAO, HDR, LightRays, DOF
-      
-      if ( $PostFXManager::PostFX::EnableSSAO )      
-         SSAOPostFx.enable();      
+
+      if ( $PostFXManager::PostFX::EnableSSAO )
+         SSAOPostFx.enable();
       else
          SSAOPostFx.disable();
-      
+
       if ( $PostFXManager::PostFX::EnableHDR )
          HDRPostFX.enable();
       else
@@ -45,23 +45,23 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
          LightRayPostFX.enable();
       else
          LightRayPostFX.disable();
-      
+
       if ( $PostFXManager::PostFX::EnableDOF )
          DOFPostEffect.enable();
       else
          DOFPostEffect.disable();
-     
-      postVerbose("% - PostFX Manager - PostFX enabled");      
+
+      postVerbose("% - PostFX Manager - PostFX enabled");
    }
    else
    {
       //Disable all postFX
-      
+
       SSAOPostFx.disable();
       HDRPostFX.disable();
       LightRayPostFX.disable();
       DOFPostEffect.disable();
-      
+
       postVerbose("% - PostFX Manager - PostFX disabled");
    }
 }
@@ -69,7 +69,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
 function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
 {
    %postEffect = 0;
-   
+
    //Determine the postFX to enable, and apply the boolean
    if(%sName $= "SSAO")
    {
@@ -87,7 +87,7 @@ function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
    {
       %postEffect = LightRayPostFX;
       $PostFXManager::PostFX::EnableLightRays = %bEnable;
-      //$pref::PostFX::LightRays::Enabled = %bEnable;      
+      //$pref::PostFX::LightRays::Enabled = %bEnable;
    }
    else if(%sName $= "DOF")
    {
@@ -95,7 +95,7 @@ function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
       $PostFXManager::PostFX::EnableDOF = %bEnable;
       //$pref::PostFX::DOF::Enabled = %bEnable;
    }
-   
+
    // Apply the change
    if ( %bEnable == true )
    {
@@ -111,23 +111,23 @@ function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
 
 function PostFXManager::settingsRefreshSSAO(%this)
 {
-   //Apply the enabled flag 
-   ppOptionsEnableSSAO.setValue($PostFXManager::PostFX::EnableSSAO);   
-   
+   //Apply the enabled flag
+   ppOptionsEnableSSAO.setValue($PostFXManager::PostFX::EnableSSAO);
+
    //Add the items we need to display
    ppOptionsSSAOQuality.clear();
    ppOptionsSSAOQuality.add("Low", 0);
    ppOptionsSSAOQuality.add("Medium", 1);
    ppOptionsSSAOQuality.add("High", 2);
-   
+
    //Set the selected, after adding the items!
    ppOptionsSSAOQuality.setSelected($SSAOPostFx::quality);
-   
+
    //SSAO - Set the values of the sliders, General Tab
    ppOptionsSSAOOverallStrength.setValue($SSAOPostFx::overallStrength);
    ppOptionsSSAOBlurDepth.setValue($SSAOPostFx::blurDepthTol);
    ppOptionsSSAOBlurNormal.setValue($SSAOPostFx::blurNormalTol);
-      
+
    //SSAO - Set the values for the near tab
    ppOptionsSSAONearDepthMax.setValue($SSAOPostFx::sDepthMax);
    ppOptionsSSAONearDepthMin.setValue($SSAOPostFx::sDepthMin);
@@ -135,7 +135,7 @@ function PostFXManager::settingsRefreshSSAO(%this)
    ppOptionsSSAONearStrength.setValue($SSAOPostFx::sStrength);
    ppOptionsSSAONearToleranceNormal.setValue($SSAOPostFx::sNormalTol);
    ppOptionsSSAONearTolerancePower.setValue($SSAOPostFx::sNormalPow);
-   
+
    //SSAO - Set the values for the far tab
    ppOptionsSSAOFarDepthMax.setValue($SSAOPostFx::lDepthMax);
    ppOptionsSSAOFarDepthMin.setValue($SSAOPostFx::lDepthMin);
@@ -147,9 +147,9 @@ function PostFXManager::settingsRefreshSSAO(%this)
 
 function PostFXManager::settingsRefreshHDR(%this)
 {
-  //Apply the enabled flag 
-   ppOptionsEnableHDR.setValue($PostFXManager::PostFX::EnableHDR);   
-    
+  //Apply the enabled flag
+   ppOptionsEnableHDR.setValue($PostFXManager::PostFX::EnableHDR);
+
    ppOptionsHDRBloom.setValue($HDRPostFX::enableBloom);
    ppOptionsHDRBloomBlurBrightPassThreshold.setValue($HDRPostFX::brightPassThreshold);
    ppOptionsHDRBloomBlurMean.setValue($HDRPostFX::gaussMean);
@@ -164,54 +164,54 @@ function PostFXManager::settingsRefreshHDR(%this)
    ppOptionsHDRToneMapping.setValue($HDRPostFX::enableToneMapping);
    ppOptionsHDRToneMappingAmount.setValue($HDRPostFX::enableToneMapping);
    ppOptionsHDRWhiteCutoff.setValue($HDRPostFX::whiteCutoff);
-   
-   %this-->ColorCorrectionFileName.Text = $HDRPostFX::colorCorrectionRamp;    
+
+   %this-->ColorCorrectionFileName.Text = $HDRPostFX::colorCorrectionRamp;
 }
 
 function PostFXManager::settingsRefreshLightrays(%this)
 {
-  //Apply the enabled flag 
-   ppOptionsEnableLightRays.setValue($PostFXManager::PostFX::EnableLightRays);   
-    
+  //Apply the enabled flag
+   ppOptionsEnableLightRays.setValue($PostFXManager::PostFX::EnableLightRays);
+
    ppOptionsLightRaysBrightScalar.setValue($LightRayPostFX::brightScalar);
 }
 
 function PostFXManager::settingsRefreshDOF(%this)
 {
-  //Apply the enabled flag 
-   ppOptionsEnableDOF.setValue($PostFXManager::PostFX::EnableDOF);   
+  //Apply the enabled flag
+   ppOptionsEnableDOF.setValue($PostFXManager::PostFX::EnableDOF);
 
 
    //ppOptionsDOFEnableDOF.setValue($PostFXManager::PostFX::EnableDOF);
    ppOptionsDOFEnableAutoFocus.setValue($DOFPostFx::EnableAutoFocus);
-   
+
    ppOptionsDOFFarBlurMinSlider.setValue($DOFPostFx::BlurMin);
    ppOptionsDOFFarBlurMaxSlider.setValue($DOFPostFx::BlurMax);
-   
+
    ppOptionsDOFFocusRangeMinSlider.setValue($DOFPostFx::FocusRangeMin);
    ppOptionsDOFFocusRangeMaxSlider.setValue($DOFPostFx::FocusRangeMax);
-   
+
    ppOptionsDOFBlurCurveNearSlider.setValue($DOFPostFx::BlurCurveNear);
    ppOptionsDOFBlurCurveFarSlider.setValue($DOFPostFx::BlurCurveFar);
 
 }
 
 function PostFXManager::settingsRefreshAll(%this)
-{    
+{
    $PostFXManager::PostFX::Enabled           = $pref::enablePostEffects;
    $PostFXManager::PostFX::EnableSSAO        = SSAOPostFx.isEnabled();
    $PostFXManager::PostFX::EnableHDR         = HDRPostFX.isEnabled();
    $PostFXManager::PostFX::EnableLightRays   = LightRayPostFX.isEnabled();
    $PostFXManager::PostFX::EnableDOF         = DOFPostEffect.isEnabled();
-   
+
    //For all the postFX here, apply the active settings in the system
    //to the gui controls.
-   
+
    %this.settingsRefreshSSAO();
    %this.settingsRefreshHDR();
    %this.settingsRefreshLightrays();
    %this.settingsRefreshDOF();
-   
+
    ppOptionsEnable.setValue($PostFXManager::PostFX::Enabled);
 
    postVerbose("% - PostFX Manager - GUI values updated.");
@@ -240,11 +240,11 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $SSAOPostFx::sNormalTol             = $PostFXManager::Settings::SSAO::sNormalTol;
    $SSAOPostFx::sRadius                = $PostFXManager::Settings::SSAO::sRadius;
    $SSAOPostFx::sStrength              = $PostFXManager::Settings::SSAO::sStrength;
-   
+
    //HDR settings
    $HDRPostFX::adaptRate               = $PostFXManager::Settings::HDR::adaptRate;
    $HDRPostFX::blueShiftColor          = $PostFXManager::Settings::HDR::blueShiftColor;
-   $HDRPostFX::brightPassThreshold     = $PostFXManager::Settings::HDR::brightPassThreshold; 
+   $HDRPostFX::brightPassThreshold     = $PostFXManager::Settings::HDR::brightPassThreshold;
    $HDRPostFX::enableBloom             = $PostFXManager::Settings::HDR::enableBloom;
    $HDRPostFX::enableBlueShift         = $PostFXManager::Settings::HDR::enableBlueShift;
    $HDRPostFX::enableToneMapping       = $PostFXManager::Settings::HDR::enableToneMapping;
@@ -255,11 +255,11 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $HDRPostFX::minLuminace             = $PostFXManager::Settings::HDR::minLuminace;
    $HDRPostFX::whiteCutoff             = $PostFXManager::Settings::HDR::whiteCutoff;
    $HDRPostFX::colorCorrectionRamp     = $PostFXManager::Settings::ColorCorrectionRamp;
-   
+
    //Light rays settings
    $LightRayPostFX::brightScalar       = $PostFXManager::Settings::LightRays::brightScalar;
-   
-   //DOF settings   
+
+   //DOF settings
    $DOFPostFx::EnableAutoFocus         = $PostFXManager::Settings::DOF::EnableAutoFocus;
    $DOFPostFx::BlurMin                 = $PostFXManager::Settings::DOF::BlurMin;
    $DOFPostFx::BlurMax                 = $PostFXManager::Settings::DOF::BlurMax;
@@ -267,7 +267,7 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $DOFPostFx::FocusRangeMax           = $PostFXManager::Settings::DOF::FocusRangeMax;
    $DOFPostFx::BlurCurveNear           = $PostFXManager::Settings::DOF::BlurCurveNear;
    $DOFPostFx::BlurCurveFar            = $PostFXManager::Settings::DOF::BlurCurveFar;
-  
+
    if ( $PostFXManager::forceEnableFromPresets )
    {
       $PostFXManager::PostFX::Enabled           = $PostFXManager::Settings::EnablePostFX;
@@ -278,17 +278,17 @@ function PostFXManager::settingsApplyFromPreset(%this)
 
       %this.settingsSetEnabled( true );
    }
-   
+
    //make sure we apply the correct settings to the DOF
    ppOptionsUpdateDOFSettings();
-   
+
    // Update the actual GUI controls if its awake ( otherwise it will when opened ).
    if ( PostFXManager.isAwake() )
-      %this.settingsRefreshAll();      
+      %this.settingsRefreshAll();
 }
 
 function PostFXManager::settingsApplySSAO(%this)
-{   
+{
    $PostFXManager::Settings::SSAO::blurDepthTol             = $SSAOPostFx::blurDepthTol;
    $PostFXManager::Settings::SSAO::blurNormalTol            = $SSAOPostFx::blurNormalTol;
    $PostFXManager::Settings::SSAO::lDepthMax                = $SSAOPostFx::lDepthMax;
@@ -308,12 +308,12 @@ function PostFXManager::settingsApplySSAO(%this)
    $PostFXManager::Settings::SSAO::sRadius                  = $SSAOPostFx::sRadius;
    $PostFXManager::Settings::SSAO::sStrength                = $SSAOPostFx::sStrength;
 
-   postVerbose("% - PostFX Manager - Settings Saved - SSAO");    
-   
+   postVerbose("% - PostFX Manager - Settings Saved - SSAO");
+
 }
 
 function PostFXManager::settingsApplyHDR(%this)
-{   
+{
    $PostFXManager::Settings::HDR::adaptRate                 = $HDRPostFX::adaptRate;
    $PostFXManager::Settings::HDR::blueShiftColor            = $HDRPostFX::blueShiftColor;
    $PostFXManager::Settings::HDR::brightPassThreshold       = $HDRPostFX::brightPassThreshold;
@@ -327,42 +327,42 @@ function PostFXManager::settingsApplyHDR(%this)
    $PostFXManager::Settings::HDR::minLuminace               = $HDRPostFX::minLuminace;
    $PostFXManager::Settings::HDR::whiteCutoff               = $HDRPostFX::whiteCutoff;
    $PostFXManager::Settings::ColorCorrectionRamp            = $HDRPostFX::colorCorrectionRamp;
-   
-   postVerbose("% - PostFX Manager - Settings Saved - HDR");      
+
+   postVerbose("% - PostFX Manager - Settings Saved - HDR");
 }
 
 function PostFXManager::settingsApplyLightRays(%this)
-{   
+{
    $PostFXManager::Settings::LightRays::brightScalar        = $LightRayPostFX::brightScalar;
-   
-   postVerbose("% - PostFX Manager - Settings Saved - Light Rays");   
-   
+
+   postVerbose("% - PostFX Manager - Settings Saved - Light Rays");
+
 }
 
 function PostFXManager::settingsApplyDOF(%this)
 {
-   $PostFXManager::Settings::DOF::EnableAutoFocus           = $DOFPostFx::EnableAutoFocus;   
+   $PostFXManager::Settings::DOF::EnableAutoFocus           = $DOFPostFx::EnableAutoFocus;
    $PostFXManager::Settings::DOF::BlurMin                   = $DOFPostFx::BlurMin;
    $PostFXManager::Settings::DOF::BlurMax                   = $DOFPostFx::BlurMax;
    $PostFXManager::Settings::DOF::FocusRangeMin             = $DOFPostFx::FocusRangeMin;
    $PostFXManager::Settings::DOF::FocusRangeMax             = $DOFPostFx::FocusRangeMax;
    $PostFXManager::Settings::DOF::BlurCurveNear             = $DOFPostFx::BlurCurveNear;
    $PostFXManager::Settings::DOF::BlurCurveFar              = $DOFPostFx::BlurCurveFar;
-   
-   postVerbose("% - PostFX Manager - Settings Saved - DOF");   
-   
+
+   postVerbose("% - PostFX Manager - Settings Saved - DOF");
+
 }
 
 function PostFXManager::settingsApplyAll(%this, %sFrom)
 {
    // Apply settings which control if effects are on/off altogether.
-   $PostFXManager::Settings::EnablePostFX        = $PostFXManager::PostFX::Enabled;  
+   $PostFXManager::Settings::EnablePostFX        = $PostFXManager::PostFX::Enabled;
    $PostFXManager::Settings::EnableDOF           = $PostFXManager::PostFX::EnableDOF;
    $PostFXManager::Settings::EnableLightRays     = $PostFXManager::PostFX::EnableLightRays;
    $PostFXManager::Settings::EnableHDR           = $PostFXManager::PostFX::EnableHDR;
    $PostFXManager::Settings::EnabledSSAO         = $PostFXManager::PostFX::EnableSSAO;
-      
-   // Apply settings should save the values in the system to the 
+
+   // Apply settings should save the values in the system to the
    // the preset structure ($PostFXManager::Settings::*)
 
    // SSAO Settings
@@ -373,7 +373,7 @@ function PostFXManager::settingsApplyAll(%this, %sFrom)
    %this.settingsApplyLightRays();
    // DOF
    %this.settingsApplyDOF();
-   
+
    postVerbose("% - PostFX Manager - All Settings applied to $PostFXManager::Settings");
 }
 

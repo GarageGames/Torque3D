@@ -78,14 +78,14 @@ void PxContactReporter::onContactNotify( NxContactPair &pair, NxU32 events )
    hitPoint /= (F32)points;
 
    if ( userData0 )
-      userData0->getContactSignal().trigger( userData0, 
-                                             userData1, 
+      userData0->getContactSignal().trigger( userData0,
+                                             userData1,
                                              pxCast<Point3F>( hitPoint ),
                                              pxCast<Point3F>( pair.sumNormalForce ) );
 
    if ( userData1 )
-      userData1->getContactSignal().trigger( userData1, 
-                                             userData0, 
+      userData1->getContactSignal().trigger( userData1,
+                                             userData0,
                                              pxCast<Point3F>( hitPoint ),
                                              pxCast<Point3F>( -pair.sumNormalForce ) );
 }
@@ -94,7 +94,7 @@ bool PxUserNotify::onJointBreak( NxReal breakingForce, NxJoint &brokenJoint )
 {
    PROFILE_SCOPE( PxUserNotify_OnJointBreak );
 
-   PxUserData *userData = PxUserData::getData( brokenJoint );   
+   PxUserData *userData = PxUserData::getData( brokenJoint );
 
    if ( userData )
       userData->getOnJointBreakSignal().trigger( breakingForce, brokenJoint );

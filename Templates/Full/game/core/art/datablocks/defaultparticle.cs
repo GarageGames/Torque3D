@@ -38,17 +38,17 @@ datablock ParticleData(DefaultParticle)
    colors[1] = "1 0.834646 0 0.645669";
    colors[2] = "1 0.299213 0 0.330709";
    colors[3] = "0.732283 1 0 0";
-   
+
    sizes[0] = 0;
    sizes[1] = 0.497467;
    sizes[2] = 0.73857;
    sizes[3] = 0.997986;
-   
+
    times[0] = 0.0;
    times[1] = 0.247059;
    times[2] = 0.494118;
    times[3] = 1;
-   
+
    animTexName = "core/art/defaultParticle";
 };
 

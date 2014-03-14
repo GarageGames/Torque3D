@@ -29,7 +29,7 @@
 #include "core/util/safeCast.h"
 
 
-SFXDSBuffer* SFXDSBuffer::create(   IDirectSound8 *dsound, 
+SFXDSBuffer* SFXDSBuffer::create(   IDirectSound8 *dsound,
                                     const ThreadSafeRef< SFXStream >& stream,
                                     SFXDescription* description,
                                     bool useHardware )
@@ -79,21 +79,21 @@ bool SFXDSBuffer::_createBuffer( IDirectSoundBuffer8 **buffer8 )
 
    const SFXFormat& format = getFormat();
 
-   // Set up WAV format structure. 
+   // Set up WAV format structure.
    WAVEFORMATEX wfx;
-   dMemset( &wfx, 0, sizeof( WAVEFORMATEX ) ); 
-   wfx.wFormatTag = WAVE_FORMAT_PCM; 
+   dMemset( &wfx, 0, sizeof( WAVEFORMATEX ) );
+   wfx.wFormatTag = WAVE_FORMAT_PCM;
    wfx.nChannels = format.getChannels();
    wfx.nSamplesPerSec = format.getSamplesPerSecond();
    wfx.wBitsPerSample = format.getBitsPerChannel();
    wfx.nBlockAlign = wfx.nChannels * wfx.wBitsPerSample / 8;
-   wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign; 
+   wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
 
-   // Set up DSBUFFERDESC structure. 
-   DSBUFFERDESC dsbdesc; 
-   dMemset( &dsbdesc, 0, sizeof( DSBUFFERDESC ) ); 
-   dsbdesc.dwSize = sizeof( DSBUFFERDESC ); 
-   dsbdesc.dwFlags = 
+   // Set up DSBUFFERDESC structure.
+   DSBUFFERDESC dsbdesc;
+   dMemset( &dsbdesc, 0, sizeof( DSBUFFERDESC ) );
+   dsbdesc.dwSize = sizeof( DSBUFFERDESC );
+   dsbdesc.dwFlags =
       ( mIs3d ? DSBCAPS_CTRL3D | DSBCAPS_MUTE3DATMAXDISTANCE : DSBCAPS_CTRLPAN  ) |
       ( isStreaming() ? DSBCAPS_CTRLPOSITIONNOTIFY : 0 ) |
       DSBCAPS_CTRLFREQUENCY |
@@ -179,13 +179,13 @@ bool SFXDSBuffer::_createBuffer( IDirectSoundBuffer8 **buffer8 )
    return true;
 }
 
-bool SFXDSBuffer::_copyData(  U32 offset, 
+bool SFXDSBuffer::_copyData(  U32 offset,
                               const U8 *data,
                               U32 length )
 {
    AssertFatal( mBuffer, "SFXDSBuffer::_copyData() - no buffer" );
 
-   // Fill the buffer with the resource data.      
+   // Fill the buffer with the resource data.
    VOID* lpvWrite;
    DWORD  dwLength;
    VOID* lpvWrite2;
@@ -195,7 +195,7 @@ bool SFXDSBuffer::_copyData(  U32 offset,
          length,           // Size of lock.
          &lpvWrite,        // Gets address of first part of lock.
          &dwLength,        // Gets size of first part of lock.
-         &lpvWrite2,       // Address of wraparound not needed. 
+         &lpvWrite2,       // Address of wraparound not needed.
          &dwLength2,       // Size of wraparound not needed.
          0 );
    if ( FAILED( hr ) )

@@ -52,7 +52,7 @@ public:
    Path mapFrom(const Path& path) { return path; }
 
 public:
-   /// Private interface for use by unit test only. 
+   /// Private interface for use by unit test only.
    StrongRefPtr<ZipArchive> getArchive() { return mZipArchive; }
 
 private:

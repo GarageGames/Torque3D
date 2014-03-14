@@ -90,7 +90,7 @@ protected:
    GFXTexHandle mTextures[NumTextures];
 
    NamedTexTarget mNamedTarget;
-   NamedTexTarget mNamedTargetDepthStencil; 
+   NamedTexTarget mNamedTargetDepthStencil;
 
    GFXTextureObject *mActiveTextures[NumTextures];
 
@@ -107,7 +107,7 @@ protected:
    GFXShaderRef mShader;
 
    Vector<GFXShaderMacro> mShaderMacros;
-   
+
    GFXShaderConstBufferRef mShaderConsts;
 
    GFXShaderConstHandle *mRTSizeSC;
@@ -127,11 +127,11 @@ protected:
    GFXShaderConstHandle *mMatScreenToWorldSC;
    GFXShaderConstHandle *mMatPrevScreenToWorldSC;
    GFXShaderConstHandle *mNearFarSC;
-   GFXShaderConstHandle *mInvNearFarSC;   
+   GFXShaderConstHandle *mInvNearFarSC;
    GFXShaderConstHandle *mWorldToScreenScaleSC;
    GFXShaderConstHandle *mProjectionOffsetSC;
    GFXShaderConstHandle *mWaterColorSC;
-   GFXShaderConstHandle *mWaterFogDataSC;     
+   GFXShaderConstHandle *mWaterFogDataSC;
    GFXShaderConstHandle *mAmbientColorSC;
    GFXShaderConstHandle *mWaterFogPlaneSC;
    GFXShaderConstHandle *mWaterDepthGradMaxSC;
@@ -145,7 +145,7 @@ protected:
    bool mAllowReflectPass;
 
    /// If true update the shader.
-   bool mUpdateShader;   
+   bool mUpdateShader;
 
    GFXTextureTargetRef mTarget;
 
@@ -185,14 +185,14 @@ protected:
 
    /// True if the effect has been enabled by the manager.
    bool mEnabled;
-   
-   /// Skip processing of this PostEffect and its children even if its parent is enabled. 
+
+   /// Skip processing of this PostEffect and its children even if its parent is enabled.
    /// Parent and sibling PostEffects in the chain are still processed.
    /// This is intended for debugging purposes.
    bool mSkip;
 
    bool mOneFrameOnly;
-   bool mOnThisFrame;  
+   bool mOnThisFrame;
 
    U32 mShaderReloadKey;
 
@@ -201,7 +201,7 @@ protected:
    public:
 
       EffectConst( const String &name, const String &val )
-         : mName( name ), 
+         : mName( name ),
            mHandle( NULL ),
            mDirty( true )
       {
@@ -232,7 +232,7 @@ protected:
    ///
    virtual void _setupStateBlock( const SceneRenderState *state );
 
-   /// 
+   ///
    virtual void _setupConstants( const SceneRenderState *state );
 
    ///
@@ -251,8 +251,8 @@ protected:
    /// @see LightManager::addActivateCallback
    void _onLMActivate( const char*, bool activate )
    {
-      if ( activate ) 
-         mUpdateShader = true; 
+      if ( activate )
+         mUpdateShader = true;
    }
 
    /// We handle texture events to release named rendered targets.
@@ -269,7 +269,7 @@ protected:
    ///
    void _cleanTargets( bool recurse = false );
 
-   /// 
+   ///
    void _checkRequirements();
 
    ///
@@ -301,17 +301,17 @@ public:
 
    /// @}
 
-   virtual void process(   const SceneRenderState *state, 
+   virtual void process(   const SceneRenderState *state,
                            GFXTexHandle &inOutTex,
                            const RectI *inTexViewport = NULL );
 
-   /// 
+   ///
    void reload();
 
-   /// 
+   ///
    void enable();
 
-   /// 
+   ///
    void disable();
 
    /// Dump the shader disassembly to a temporary text file.
@@ -343,15 +343,15 @@ public:
    void clearShaderMacros();
 
    ///
-   void setShaderConst( const String &name, const String &val );   
+   void setShaderConst( const String &name, const String &val );
 
    void setOnThisFrame( bool enabled ) { mOnThisFrame = enabled; }
    bool isOnThisFrame() { return mOnThisFrame; }
    void setOneFrameOnly( bool enabled ) { mOneFrameOnly = enabled; }
-   bool isOneFrameOnly() { return mOneFrameOnly; }   
+   bool isOneFrameOnly() { return mOneFrameOnly; }
 
    F32 getAspectRatio() const;
-   
+
 
    enum PostEffectRequirements
    {

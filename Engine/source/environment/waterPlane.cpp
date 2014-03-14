@@ -62,19 +62,19 @@ ConsoleDocClass( WaterPlane,
    "@see WaterObject for inherited functionality.\n\n"
 
    "Limitations:\n\n"
-   
+
    "Because %WaterPlane cannot be projected exactly to the far-clip distance, "
    "other objects nearing this distance can have noticible artifacts as they "
    "clip through first the %WaterPlane and then the far plane.\n\n"
-   
+
    "To avoid this large objects should be positioned such that they will not line up with "
    "the far-clip from vantage points the player is expected to be. In particular, "
    "your TerrainBlock should be completely contained by the far-clip distance.\n\n"
-   
+
    "Viewing %WaterPlane from a high altitude with a tight far-clip distance "
    "will accentuate this limitation. %WaterPlane is primarily designed to "
    "be viewed from ground level.\n\n"
-      
+
    "@ingroup Water"
 );
 
@@ -88,7 +88,7 @@ WaterPlane::WaterPlane()
 
    mVertCount = 0;
    mIndxCount = 0;
-   mPrimCount = 0;   
+   mPrimCount = 0;
 }
 
 WaterPlane::~WaterPlane()
@@ -99,7 +99,7 @@ bool WaterPlane::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
-   
+
    setGlobalBounds();
    resetWorldBox();
    addToScene();
@@ -110,7 +110,7 @@ bool WaterPlane::onAdd()
 }
 
 void WaterPlane::onRemove()
-{   
+{
    removeFromScene();
 
    Parent::onRemove();
@@ -118,7 +118,7 @@ void WaterPlane::onRemove()
 
 void WaterPlane::initPersistFields()
 {
-   addGroup( "WaterPlane" );     
+   addGroup( "WaterPlane" );
 
       addProtectedField( "gridSize", TypeS32, Offset( mGridSize, WaterPlane ), &protectedSetGridSize, &defaultProtectedGetFn,
 		  "Spacing between vertices in the WaterBlock mesh" );
@@ -139,11 +139,11 @@ U32 WaterPlane::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
    stream->write( mGridSize );
-   stream->write( mGridElementSize );   
+   stream->write( mGridElementSize );
 
    if ( stream->writeFlag( mask & UpdateMask ) )
    {
-      stream->write( getPosition().z );        
+      stream->write( getPosition().z );
    }
 
    return retMask;
@@ -168,13 +168,13 @@ void WaterPlane::unpackUpdate(NetConnection* con, BitStream* stream)
       Point3F newPos = getPosition();
       newPos.z = posZ;
       setPosition( newPos );
-   }  
+   }
 }
 
 void WaterPlane::setupVBIB( SceneRenderState *state )
 {
    const Frustum &frustum = state->getCullingFrustum();
-   
+
    // Water base-color, assigned as color for all verts.
    const GFXVertexColor vertCol(mWaterFogData.color);
 
@@ -193,18 +193,18 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    const U32 gridStride = gridSize + 1;
 
    // Grid is filled in this order...
-   
+
    // Ex. Grid with gridSize of 2.
    //
    // Letters are cells.
-   // Numbers are verts, enumerated in their order within the vert buffer.       
+   // Numbers are verts, enumerated in their order within the vert buffer.
    //
-   // 6  7  8   
+   // 6  7  8
    // (c) (d)
    // 3  4  5
    // (a) (b)
    // 0  1  2
-   //   
+   //
    // Note...
    //   Camera would be positioned at vert 4 ( in this particular grid not a constant ).
    //   Positive Y points UP the diagram ( verts 0, 3, 6 ).
@@ -215,7 +215,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
 
    // Position of the first vertex in the grid.
    // Relative to the camera this is the "Back Left" corner vert.
-   const Point3F cornerPosition( -gridSideHalfLen, -gridSideHalfLen, 0.0f );   
+   const Point3F cornerPosition( -gridSideHalfLen, -gridSideHalfLen, 0.0f );
 
    // Number of verts in the grid centered on the camera.
    const U32 gridVertCount = gridStride * gridStride;
@@ -229,7 +229,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    // Total number of verts. Calculation explained above.
    mVertCount = gridVertCount + borderVertCount + horizonVertCount;
 
-   
+
    // Fill the vertex buffer...
 
    mVertBuff.set( GFX, mVertCount, GFXBufferTypeStatic );
@@ -264,8 +264,8 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    //
    // Letters in parenthesis are cells.
    // x's are grid-verts ( we have already filled ).
-   // Numbers are border verts, enumerated in their order within the vert buffer.       
-   // 
+   // Numbers are border verts, enumerated in their order within the vert buffer.
+   //
    // Lines connecting verts explained in the code below.
    //
    //      Front
@@ -275,11 +275,11 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    //  f       (c) (d)   |   g
    //  t   7   x  x  x   3   h
    //      |   (a) (b)       t
-   //      |   x  x  x       
+   //      |   x  x  x
    //      6      5------4
    //
    //      Back
-   //   
+   //
    // As in previous diagram...
    //   Camera would be positioned at vert 4 ( in this particular grid not a constant ).
    //   Positive Y points UP the diagram ( verts 6, 7, 0 ).
@@ -287,10 +287,10 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
 
 
    // Iterator i is looping through the 4 'sides' of the grid.
-   // Inner loop ( using iterator j ) will fill in a number of verts   
+   // Inner loop ( using iterator j ) will fill in a number of verts
    // where that count is 'gridSize'.
-   //    
-   // 
+   //
+   //
    // Ex. Given the grid with gridSize of 2 diagramed above,
    // Outer loop iterates through: Front, Right, Back, Left
    // Inner loop fills 2 verts per iteration of the outer loop: { 0, 1 }, { 2, 3 }, { 4, 5 }, { 6, 7 }
@@ -304,7 +304,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
       Point2F( -1,  0 ), // Back  ( 2 )
       Point2F(  0,  1 )  // Left  ( 3 )
    };
-   
+
 
    // Normalized positions indexed by 'side'
    // Defines the 'start' position of each side, eg. the position of the first vert.
@@ -318,10 +318,10 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
 
    // Diagram of Start vert position per Side.
    //
-   // Labeling convention for verts is 'As' where A is the first letter of 
-   // that side's descriptive name and lower-case s indicates 'start'. 
-   // 
-   // 
+   // Labeling convention for verts is 'As' where A is the first letter of
+   // that side's descriptive name and lower-case s indicates 'start'.
+   //
+   //
    //
    //          Front
    //          (-1,1)
@@ -330,9 +330,9 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    //          |             |      g
    //          o     (0,0)   o      h
    //          |             |      t
-   //          |             |     
+   //          |             |
    //  L(-1,-1)Ls------o-----Bs
-   //  e                     (1,-1)   
+   //  e                     (1,-1)
    //  f                     Back
    //  t
 
@@ -366,25 +366,25 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    //
    // Therefore...
    //
-   // The front border must be as close to the farclip plane as possible 
+   // The front border must be as close to the farclip plane as possible
    // so distant objects clip through the horizon and  farplane at the same time.
-   // 
+   //
    // The left and right borders must be pulled outward a distance such
    // that water extends horizontally across the entire viewable area while
    // looking straight forward +y or straight down -z.
    //
 
-   // 
+   //
    const F32 farDistScale = 0.99f;
 
-   // 
+   //
    F32 farDist = frustum.getFarDist() * farDistScale;
-   
+
    //
    F32 farWidth = (F32)state->getViewport().extent.x * farDist / state->getWorldToScreenScale().x;
 
    Point2F borderExtents( farWidth * 2.0f, farDist * 2.0f );
-   Point2F borderHalfExtents( farWidth, farDist );   
+   Point2F borderHalfExtents( farWidth, farDist );
 
    Point2F borderDir;
    Point2F borderStart;
@@ -405,7 +405,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
          vertPtr->undulateData.set( pos.x, pos.y );
          vertPtr->horizonFactor.set( 0, 0, 0, 0 );
          vertPtr->color = vertCol;
-         vertPtr->normal = worldUp;         
+         vertPtr->normal = worldUp;
          vertPtr++;
       }
    }
@@ -420,7 +420,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    for ( U32 i = 0; i < gridStride; i++ )
    {
       F32 frac = (F32)i / (F32)gridSize;
-      
+
       Point2F pos( sBorderStartPos[0] * borderHalfExtents );
       pos += sBorderTangentVec[0] * borderExtents * frac;
 
@@ -437,7 +437,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
 
    // Fill in the PrimitiveBuffer...
 
-   // 2 triangles per cell/quad   
+   // 2 triangles per cell/quad
    const U32 gridTriCount = gridSize * gridSize * 2;
 
    // 4 sides, mGridSize quads per side, 2 triangles per quad
@@ -446,15 +446,15 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    // 1 quad per gridSize, 2 triangles per quad
    // i.e. an extra row of 'cells' leading the front side of the grid
    const U32 horizonTriCount = gridSize * 2;
-   
+
    mPrimCount = gridTriCount + borderTriCount + horizonTriCount;
 
    // 3 indices per triangle.
-   mIndxCount = mPrimCount * 3; 
+   mIndxCount = mPrimCount * 3;
 
    mPrimBuff.set( GFX, mIndxCount, mPrimCount, GFXBufferTypeStatic );
    U16 *idxPtr;
-   mPrimBuff.lock(&idxPtr);        
+   mPrimBuff.lock(&idxPtr);
 
    // Temporaries to hold indices for the corner points of a quad.
    U32 p00, p01, p11, p10;
@@ -510,11 +510,11 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
 
    // Fill border indices...
 
-   // Given a grid size of 1, 
+   // Given a grid size of 1,
    // the grid / border verts are in the vertex buffer in this order.
    //
    //
-   // 4           5  
+   // 4           5
    //    2 --- 3
    //    |     |
    //    |     |
@@ -547,13 +547,13 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
    U32 startBorderVert = firstBorderVert;
    U32 startGridVert;
    U32 curStepSize;
-   
-   
+
+
    for ( U32 i = 0; i < 4; i++ )
    {
       startGridVert = sBorderStartVert[i];
       curStepSize = sBorderStepSize[i];
-      
+
       for ( U32 j = 0; j < gridSize; j++ )
       {
          // Each border cell is 1 quad, 2 triangles.
@@ -562,7 +562,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
          p10 = startGridVert + curStepSize;
          p01 = startBorderVert;
          p11 = startBorderVert + 1;
-         
+
          if ( p11 > lastBorderVert )
             p11 = firstBorderVert;
 
@@ -600,7 +600,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
       p10 = curBorderVert + 1;
       p01 = curHorizonVert;
       p11 = curHorizonVert + 1;
-      
+
       // Top Left Triangle
 
       *idxPtr = p00;
@@ -653,15 +653,15 @@ void WaterPlane::setShaderParams( SceneRenderState *state, BaseMatInstance* mat,
 
    mUndulateMaxDist = mGridElementSize * mGridSizeMinusOne * 0.5f;
 
-   Parent::setShaderParams( state, mat, paramHandles );   
+   Parent::setShaderParams( state, mat, paramHandles );
 
    // Now set the rest of the shader consts that are either unique to this
-   // class or that WaterObject leaves to us to handle...    
+   // class or that WaterObject leaves to us to handle...
 
    MaterialParameters* matParams = mat->getMaterialParameters();
 
    // set vertex shader constants
-   //-----------------------------------   
+   //-----------------------------------
    matParams->setSafe(paramHandles.mGridElementSizeSC, (F32)mGridElementSize);
    //matParams->setSafe( paramHandles.mReflectTexSizeSC, mReflectTexSize );
    if ( paramHandles.mModelMatSC->isValid() )
@@ -671,12 +671,12 @@ void WaterPlane::setShaderParams( SceneRenderState *state, BaseMatInstance* mat,
    //-----------------------------------
 
    ColorF c( mWaterFogData.color );
-   matParams->setSafe( paramHandles.mBaseColorSC, c );   
-   
+   matParams->setSafe( paramHandles.mBaseColorSC, c );
+
    // By default we need to show a true reflection is fullReflect is enabled and
    // we are above water.
    F32 reflect = mPlaneReflector.isEnabled() && !isUnderwater( state->getCameraPosition() );
-   
+
    // If we were occluded the last frame a query was fetched ( not necessarily last frame )
    // and we weren't updated last frame... we don't have a valid texture to show
    // so use the cubemap / fake reflection color this frame.
@@ -685,7 +685,7 @@ void WaterPlane::setShaderParams( SceneRenderState *state, BaseMatInstance* mat,
 
    //Point4F reflectParams( getRenderPosition().z, mReflectMinDist, mReflectMaxDist, reflect );
    Point4F reflectParams( getRenderPosition().z, 0.0f, 1000.0f, !reflect );
-   
+
    // TODO: This is a hack... why is this broken... check after
    // we merge advanced lighting with trunk!
    //
@@ -693,7 +693,7 @@ void WaterPlane::setShaderParams( SceneRenderState *state, BaseMatInstance* mat,
    matParams->setSafe( paramHandles.mReflectParamsSC, reflectParams );
 
    VectorF reflectNorm( 0, 0, 1 );
-   matParams->setSafe(paramHandles.mReflectNormalSC, reflectNorm ); 
+   matParams->setSafe(paramHandles.mReflectNormalSC, reflectNorm );
 }
 
 void WaterPlane::prepRenderImage( SceneRenderState *state )
@@ -707,13 +707,13 @@ void WaterPlane::prepRenderImage( SceneRenderState *state )
    mUnderwater = isUnderwater( state->getCameraPosition() );
 
    mMatrixSet->setSceneView(GFX->getWorldMatrix());
-   
+
    const Frustum &frustum = state->getCameraFrustum();
 
-   if ( mPrimBuff.isNull() || 
-        mGenerateVB ||         
+   if ( mPrimBuff.isNull() ||
+        mGenerateVB ||
         frustum != mFrustum )
-   {      
+   {
       mFrustum = frustum;
       setupVBIB( state );
       mGenerateVB = false;
@@ -752,10 +752,10 @@ void WaterPlane::innerRender( SceneRenderState *state )
    camMat.getColumn( 1, &fvec );
    uvec.set( 0, 0, 1 );
    rvec = mCross( fvec, uvec );
-   rvec.normalize();   
+   rvec.normalize();
    fvec = mCross( uvec, rvec );
    pos = camPosition;
-   pos.z = objMat.getPosition().z;      
+   pos.z = objMat.getPosition().z;
 
    renderMat.setColumn( 0, rvec );
    renderMat.setColumn( 1, fvec );
@@ -765,11 +765,11 @@ void WaterPlane::innerRender( SceneRenderState *state )
    setRenderTransform( renderMat );
 
    // Setup SceneData
-   SceneData sgData = setupSceneGraphInfo( state );   
+   SceneData sgData = setupSceneGraphInfo( state );
 
    // set the material
    S32 matIdx = getMaterialIndex( camPosition );
-   
+
    if ( !initMaterial( matIdx ) )
       return;
 
@@ -778,15 +778,15 @@ void WaterPlane::innerRender( SceneRenderState *state )
 
    // render the geometry
    if ( mat )
-   {      
+   {
       // setup proj/world transform
       mMatrixSet->restoreSceneViewProjection();
       mMatrixSet->setWorld(getRenderTransform());
 
-      setShaderParams( state, mat, matParams );     
+      setShaderParams( state, mat, matParams );
 
       while( mat->setupPass( state, sgData ) )
-      {    
+      {
          mat->setSceneInfo(state, sgData);
          mat->setTransforms(*mMatrixSet, state);
          setCustomTextures( matIdx, mat->getCurPass(), matParams );
@@ -828,9 +828,9 @@ void WaterPlane::setTransform( const MatrixF &mat )
    // We only accept the z value from the new transform.
 
    MatrixF newMat( true );
-   
+
    Point3F newPos = getPosition();
-   newPos.z = mat.getPosition().z;  
+   newPos.z = mat.getPosition().z;
    newMat.setPosition( newPos );
 
    Parent::setTransform( newMat );
@@ -844,7 +844,7 @@ void WaterPlane::setTransform( const MatrixF &mat )
    mObjBox.maxExtents.set( 1e10,  1e10,  1e10);
 
    // Keep mWaterPlane up to date.
-   mWaterFogData.plane.set( 0, 0, 1, -getPosition().z );   
+   mWaterFogData.plane.set( 0, 0, 1, -getPosition().z );
 }
 
 void WaterPlane::onStaticModified( const char* slotName, const char*newValue )
@@ -865,7 +865,7 @@ bool WaterPlane::castRay(const Point3F& start, const Point3F& end, RayInfo* info
    F32 hit = plane.intersect( start, end );
    if ( hit < 0.0f || hit > 1.0f )
       return false;
-   
+
    info->t = hit;
    info->object = this;
    info->point = start + ( ( end - start ) * hit );
@@ -878,10 +878,10 @@ bool WaterPlane::castRay(const Point3F& start, const Point3F& end, RayInfo* info
 F32 WaterPlane::getWaterCoverage( const Box3F &testBox ) const
 {
    F32 posZ = getPosition().z;
-   
+
    F32 coverage = 0.0f;
 
-   if ( posZ > testBox.minExtents.z ) 
+   if ( posZ > testBox.minExtents.z )
    {
       if ( posZ < testBox.maxExtents.z )
          coverage = (posZ - testBox.minExtents.z) / (testBox.maxExtents.z - testBox.minExtents.z);
@@ -894,7 +894,7 @@ F32 WaterPlane::getWaterCoverage( const Box3F &testBox ) const
 
 F32 WaterPlane::getSurfaceHeight( const Point2F &pos ) const
 {
-   return getPosition().z;   
+   return getPosition().z;
 }
 
 void WaterPlane::onReflectionInfoChanged()
@@ -968,6 +968,6 @@ bool WaterPlane::protectedSetGridElementSize( void *obj, const char *index, cons
 
 void WaterPlane::_getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &outPos )
 {
-   outPos = getPosition();   
-   outPlane.set( outPos, Point3F(0,0,1) );   
+   outPos = getPosition();
+   outPlane.set( outPos, Point3F(0,0,1) );
 }

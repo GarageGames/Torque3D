@@ -150,7 +150,7 @@ void SceneZoneSpace::_onZoneAddObject( SceneObject* object, const U32* zoneIDs, 
 
    // If this isn't the root zone and the object is zone space,
    // see if we should automatically connect the two.
-   
+
    if( !isRootZone() && object->getTypeMask() & ZoneObjectType )
    {
       SceneZoneSpace* zoneSpace = dynamic_cast< SceneZoneSpace* >( object );
@@ -196,7 +196,7 @@ bool SceneZoneSpace::_automaticallyConnectZoneSpace( SceneZoneSpace* zoneSpace )
    U32 zones[ SceneObject::MaxObjectZones ];
 
    zoneSpace->getOverlappingZones( getWorldBox(), zones, numZones );
-   
+
    return ( numZones > 0 );
 }
 
@@ -262,7 +262,7 @@ void SceneZoneSpace::_disconnectAllZoneSpaces()
          getZoneRangeStart(), getZoneRangeStart() + getZoneRange()
       );
    #endif
-   
+
    for( ZoneSpaceRef* ref = mConnectedZoneSpaces; ref != NULL; )
    {
       ZoneSpaceRef* next = ref->mNext;

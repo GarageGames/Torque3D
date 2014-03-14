@@ -84,10 +84,10 @@ void SimPersistSet::write( Stream& stream, U32 tabStop, U32 flags )
 {
    if( ( flags & SelectedOnly ) && !isSelected() )
       return;
-      
+
    // If the selection is transient, we cannot really save it.
    // Just invoke the default SimObject::write and return.
-      
+
    if( !getCanSave() )
    {
       Con::errorf( "SimPersistSet::write - transient set being saved: %d:%s (%s)",
@@ -95,48 +95,48 @@ void SimPersistSet::write( Stream& stream, U32 tabStop, U32 flags )
       Parent::write( stream, tabStop, flags );
       return;
    }
-   
+
    // If there are unresolved PIDs, give resolving them one last
    // chance before writing out the set.
-   
+
    if( !mUnresolvedPIDs.empty() )
       resolvePIDs();
-   
+
    // Write the set out.
 
    stream.writeTabs( tabStop );
-   
+
    StringBuilder buffer;
    buffer.format( "new %s(%s", getClassName(), getName() ? getName() : "" );
-   
+
    // Write the persistent IDs of all child objects into the set's
    // object constructor so we see them passed back to us through
    // processArguments when the object gets read in.
-   
+
    const U32 numChildren = size();
    for( U32 i = 0; i < numChildren; ++ i )
    {
       SimObject* child = at( i );
-      
+
       SimPersistID* pid = child->getPersistentId();
       AssertWarn( pid != NULL, "SimPersistSet::write - object without pid in persistent selection!" );
       if( !pid )
          continue;
-         
+
       buffer.append( ',' );
       buffer.append( '"' );
       buffer.append( pid->getUUID().toString() );
       buffer.append( '"' );
    }
-   
+
    buffer.append( ") {\r\n" );
 
    stream.write( buffer.length(), buffer.data() );
-   
+
    // Write our object fields.
-   
+
    writeFields( stream, tabStop + 1 );
-   
+
    // Close our object definition.
 
    stream.writeTabs( tabStop );
@@ -172,10 +172,10 @@ void SimPersistSet::addObject( SimObject* object )
 {
    // If this set isn't transient, make sure the object has a valid
    // persistent ID.
-   
+
    if( getCanSave() )
       object->getOrCreatePersistentId();
-      
+
    Parent::addObject( object );
 }
 

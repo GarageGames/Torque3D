@@ -54,7 +54,7 @@ function GuiFormManager::AddFormContent( %library, %contentName, %contentCreate,
       %contentRef.CreateFunction = %contentCreate;
       %contentRef.SaveFunction   = %contentSave;
       %contentRef.Margin         = %contentMargin;
-      
+
       // Return Success.
       return %contentRef;
    }
@@ -70,7 +70,7 @@ function GuiFormManager::AddFormContent( %library, %contentName, %contentCreate,
    {
       Name           = %contentName;
       CreateFunction = %contentCreate;
-      SaveFunction   = %contentSave; 
+      SaveFunction   = %contentSave;
       Margin         = %contentMargin;
       RefList        = %refList;
    };

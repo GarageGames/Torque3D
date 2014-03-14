@@ -307,7 +307,7 @@ void GuiMissionAreaCtrl::submitUndo( const UTF8 *name )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       Con::errorf( "GuiRiverEditorCtrl::submitUndo() - EUndoManager not found!" );
-      return;           
+      return;
    }
 
    // Setup the action.
@@ -317,7 +317,7 @@ void GuiMissionAreaCtrl::submitUndo( const UTF8 *name )
 
    action->mObjId = mMissionArea->getId();
    action->mArea = mMissionArea->getArea();
-      
+
    undoMan->addAction( action );
 }
 
@@ -378,11 +378,11 @@ GBitmap * GuiMissionAreaCtrl::createTerrainBitmap()
       {
          F32 height;
          height = mTerrainBlock->getHeight(Point2I(x, y));
- 
+
          U8 col = U8((height - min) * colRange);
          ColorI color(col, col, col);
          bitmap->setColor(x, y, color);
-    
+
       }
    }
 

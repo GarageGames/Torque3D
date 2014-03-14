@@ -40,7 +40,7 @@ $Pref::Server::ConnectionError =
    "the related art needed to play on this server, please contact "@
    "the server operator for more information.";
 
-// The network port is also defined by the client, this value 
+// The network port is also defined by the client, this value
 // overrides pref::net::port for dedicated servers
 $Pref::Server::Port = 28000;
 

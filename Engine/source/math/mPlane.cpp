@@ -39,7 +39,7 @@ bool PlaneF::intersect( const PlaneF& plane, Point3F& outLinePt, VectorF& outLin
    // If d is zero, the planes are parallel (and separated)
    // or coincident, so they're not considered intersecting
    F32 denom = mDot( outLineDir, outLineDir );
-   if ( denom < 0.00001f ) 
+   if ( denom < 0.00001f )
       return false;
 
    // Compute point on intersection line
@@ -62,7 +62,7 @@ bool PlaneF::isParallelTo( const PlaneF& plane, F32 epsilon ) const
 bool PlaneF::isPerpendicularTo( const PlaneF& plane, F32 epsilon ) const
 {
    F32 val = mDot( *this, plane );
-   return ( val > - epsilon) && ( val < epsilon );   
+   return ( val > - epsilon) && ( val < epsilon );
 }
 
 //-----------------------------------------------------------------------------

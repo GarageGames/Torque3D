@@ -30,8 +30,8 @@ using namespace UnitTesting;
 CreateUnitTest(TestPathMakeRelativePath, "Core/Util/Path/MakeRelativePath")
 {
    void run()
-   {      
-      TEST(Torque::Path::MakeRelativePath("art/interiors/burg/file.png", "art/interiors/") == "burg/file.png"); 
+   {
+      TEST(Torque::Path::MakeRelativePath("art/interiors/burg/file.png", "art/interiors/") == "burg/file.png");
       TEST(Torque::Path::MakeRelativePath("art/interiors/file.png", "art/interiors/burg/") == "../file.png");
       TEST(Torque::Path::MakeRelativePath("art/file.png", "art/interiors/burg/") == "../../file.png");
       TEST(Torque::Path::MakeRelativePath("file.png", "art/interiors/burg/") == "../../../file.png");

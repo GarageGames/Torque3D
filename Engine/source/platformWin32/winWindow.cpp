@@ -133,7 +133,7 @@ void Platform::restartInstance()
    TCHAR cen_buf[2048];
    GetModuleFileName( NULL, cen_buf, 2047);
 
-   // Start the child process. 
+   // Start the child process.
    if( CreateProcess( cen_buf,
       NULL,            // Command line
       NULL,           // Process handle not inheritable
@@ -141,7 +141,7 @@ void Platform::restartInstance()
       FALSE,          // Set handle inheritance to FALSE
       0,              // No creation flags
       NULL,           // Use parent's environment block
-      NULL,           // Use parent's starting directory 
+      NULL,           // Use parent's starting directory
       &si,            // Pointer to STARTUPINFO structure
       &pi )           // Pointer to PROCESS_INFORMATION structure
       != false )
@@ -152,15 +152,15 @@ void Platform::restartInstance()
    }
 }
 
-///just check if the app's global mutex exists, and if so, 
-///return true - otherwise, false. Should be called before ExcludeOther 
+///just check if the app's global mutex exists, and if so,
+///return true - otherwise, false. Should be called before ExcludeOther
 /// at very start of app execution.
 bool Platform::checkOtherInstances(const char *mutexName)
 {
 #ifdef TORQUE_MULTITHREAD
 
 	HANDLE pMutex	=	NULL;
-   
+
 #ifdef UNICODE
    UTF16 b[512];
    convertUTF8toUTF16((UTF8 *)mutexName, b, sizeof(b));
@@ -275,7 +275,7 @@ void Platform::shutdown()
       CloseHandle(gMutexHandle);
 
    Input::destroy();
-   
+
    GFXDevice::destroy();
 
    WinConsole::destroy();
@@ -342,13 +342,13 @@ S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
       // Eat white space
       for (; dIsspace(*ptr) && *ptr; ptr++)
          ;
-      
+
       // Pick out the next word
       for (word = ptr; !dIsspace(*ptr) && *ptr; ptr++)
          ;
-      
+
       // Add the word to the argument list.
-      if (*word) 
+      if (*word)
       {
          int len = ptr - word;
          char *arg = (char *) dMalloc(len + 1);
@@ -440,7 +440,7 @@ S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
       }
 
 		// Add the word to the argument list.
-		if (*word) 
+		if (*word)
 		{
 			int len = ptr - word;
 			char *arg = (char *) dMalloc(len + 1);
@@ -499,7 +499,7 @@ bool Platform::openWebBrowser( const char* webAddress )
          return( false );
       }
 
-      if ( RegQueryValueEx( regKey, dT(""), NULL, NULL, (unsigned char *)sWebKey, &size ) != ERROR_SUCCESS ) 
+      if ( RegQueryValueEx( regKey, dT(""), NULL, NULL, (unsigned char *)sWebKey, &size ) != ERROR_SUCCESS )
       {
          Con::errorf( ConsoleLogEntry::General, "Platform::openWebBrowser - Failed to query the open command registry key!!!" );
          return( false );
@@ -511,11 +511,11 @@ bool Platform::openWebBrowser( const char* webAddress )
       convertUTF16toUTF8(sWebKey,utf8WebKey,512);
 
 #ifdef UNICODE
-      char *p = dStrstr((const char *)utf8WebKey, "%1"); 
+      char *p = dStrstr((const char *)utf8WebKey, "%1");
 #else
-      char *p = strstr( (const char *) sWebKey  , "%1"); 
+      char *p = strstr( (const char *) sWebKey  , "%1");
 #endif
-      if (p) *p = 0; 
+      if (p) *p = 0;
 
    }
 
@@ -525,11 +525,11 @@ bool Platform::openWebBrowser( const char* webAddress )
 
    char buf[1024];
 #ifdef UNICODE
-   dSprintf( buf, sizeof( buf ), "%s %s", utf8WebKey, webAddress );   
+   dSprintf( buf, sizeof( buf ), "%s %s", utf8WebKey, webAddress );
    UTF16 b[1024];
    convertUTF8toUTF16((UTF8 *)buf, b, sizeof(b));
 #else
-   dSprintf( buf, sizeof( buf ), "%s %s", sWebKey, webAddress );   
+   dSprintf( buf, sizeof( buf ), "%s %s", sWebKey, webAddress );
 #endif
 
    //Con::errorf( ConsoleLogEntry::General, "** Web browser command = %s **", buf );
@@ -540,7 +540,7 @@ bool Platform::openWebBrowser( const char* webAddress )
 #ifdef UNICODE
       b,
 #else
-      buf, 
+      buf,
 #endif
       NULL,
       NULL,

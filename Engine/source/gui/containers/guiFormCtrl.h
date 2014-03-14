@@ -79,7 +79,7 @@ private:
 
    bool mMouseOver;
    bool mDepressed;
-   
+
    static bool _setHasMenu( void *object, const char *index, const char *data );
 
 protected:

@@ -51,20 +51,20 @@ class PxCloth : public GameBase
 {
    typedef GameBase Parent;
 
-   enum MaskBits 
+   enum MaskBits
    {
       TransformMask  = Parent::NextFreeMask << 0,
       ClothMask      = Parent::NextFreeMask << 1,
       MaterialMask   = Parent::NextFreeMask << 3,
       NextFreeMask   = Parent::NextFreeMask << 4
-   };  
+   };
 
 public:
 
    PxCloth();
    virtual ~PxCloth();
 
-   DECLARE_CONOBJECT( PxCloth );      
+   DECLARE_CONOBJECT( PxCloth );
 
    // SimObject
    virtual bool onAdd();
@@ -96,7 +96,7 @@ protected:
    /// Cooked cloth collision mesh.
    NxClothMesh *mClothMesh;
 
-   /// The cloth actor used 
+   /// The cloth actor used
    NxCloth *mCloth;
 
    NxMeshData mReceiveBuffers;
@@ -148,7 +148,7 @@ protected:
    GFXPrimitiveBufferHandle mPrimBuffer;
    GFXVertexBufferHandle<GFXVertexPNTT> mVB;
 
-   Point2I mPatchVerts; 
+   Point2I mPatchVerts;
    Point2F mPatchSize;
 
    MatrixF mResetXfm;

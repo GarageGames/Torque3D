@@ -118,13 +118,13 @@ class SimSet: public SimObject
 
       /// Signal that is triggered when objects are added or removed from the set.
       SetModificationSignal mSetModificationSignal;
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onObjectAdded, ( SimObject* object ) );
       DECLARE_CALLBACK( void, onObjectRemoved, ( SimObject* object ) );
-      
+
       /// @}
 
    public:
@@ -158,13 +158,13 @@ class SimSet: public SimObject
       /// Reorder the position of "obj" to either be the last object in the list or, if
       /// "target" is given, to come before "target" in the list of children.
       virtual bool reOrder( SimObject *obj, SimObject *target=0 );
-      
+
       /// Return the object at the given index.
       SimObject* at(S32 index) const { return objectList.at(index); }
 
       /// Remove all objects from this set.
       virtual void clear();
-      
+
       /// @}
 
       /// @name Set Management
@@ -173,7 +173,7 @@ class SimSet: public SimObject
       /// Add the given object to the set.
       /// @param object Object to add to the set.
       virtual void addObject( SimObject* object );
-      
+
       /// Remove the given object from the set.
       /// @param object Object to remove from the set.
       virtual void removeObject( SimObject* object );
@@ -181,11 +181,11 @@ class SimSet: public SimObject
       /// Add the given object to the end of the object list of this set.
       /// @param object Object to add to the set.
       virtual void pushObject( SimObject* object );
-      
+
       /// Return true if this set accepts the given object as a child.
       /// This method should be overridden for set classes that restrict membership.
       virtual bool acceptsAsChild( SimObject* object ) const { return true; }
-      
+
       /// Deletes all the objects in the set.
       void deleteAllObjects();
 
@@ -211,7 +211,7 @@ class SimSet: public SimObject
       /// the sort callback function as it can cause a deadlock.
       ///
       void scriptSort( const String &scriptCallbackFn );
-      
+
       /// @}
 
       void callOnChildren( const String &method, S32 argc, const char *argv[], bool executeOnChildGroups = true );
@@ -223,7 +223,7 @@ class SimSet: public SimObject
       U32 sizeRecursive();
 
       SimObject* findObjectByInternalName(StringTableEntry internalName, bool searchChildren = false);
-      SimObject* findObjectByLineNumber(const char* fileName, S32 declarationLine, bool searchChildren = false);   
+      SimObject* findObjectByLineNumber(const char* fileName, S32 declarationLine, bool searchChildren = false);
 
       /// Find the given object in this set.  Returns NULL if the object
       /// is not part of this set.
@@ -236,11 +236,11 @@ class SimSet: public SimObject
       void findObjectByType( Vector<T*> &foundObjects );
 
       /// Add all child objects ( including children of children ) to the foundObjects
-      /// Vector which are of type T and for which DecideAddObjectCallback return true;   
+      /// Vector which are of type T and for which DecideAddObjectCallback return true;
 
-      template< class T > 
-      void findObjectByCallback( bool ( *fn )( T* ), Vector<T*>& foundObjects );   
-      
+      template< class T >
+      void findObjectByCallback( bool ( *fn )( T* ), Vector<T*>& foundObjects );
+
       SimObject* getRandom();
 
       inline void lock()
@@ -295,7 +295,7 @@ void SimSet::findObjectByType( Vector<T*> &foundObjects )
 
    // Loop through our child objects.
 
-   SimObjectList::iterator itr = objectList.begin();   
+   SimObjectList::iterator itr = objectList.begin();
 
    for ( ; itr != objectList.end(); itr++ )
    {
@@ -304,22 +304,22 @@ void SimSet::findObjectByType( Vector<T*> &foundObjects )
 
       // If child object is a set, call recursively into it.
       if ( curSet )
-         curSet->findObjectByType( foundObjects ); 
+         curSet->findObjectByType( foundObjects );
 
       // Add this child object if appropriate.
       if ( curObj )
-         foundObjects.push_back( curObj );      
+         foundObjects.push_back( curObj );
    }
 
    // Add this object if appropriate.
    curObj = dynamic_cast<T*>(this);
-   if ( curObj )      
+   if ( curObj )
       foundObjects.push_back( curObj );
 
    unlock();
 }
 
-template< class T > 
+template< class T >
 void SimSet::findObjectByCallback(  bool ( *fn )( T* ), Vector<T*> &foundObjects )
 {
    T *curObj;
@@ -329,7 +329,7 @@ void SimSet::findObjectByCallback(  bool ( *fn )( T* ), Vector<T*> &foundObjects
 
    // Loop through our child objects.
 
-   SimObjectList::iterator itr = objectList.begin();   
+   SimObjectList::iterator itr = objectList.begin();
 
    for ( ; itr != objectList.end(); itr++ )
    {
@@ -338,16 +338,16 @@ void SimSet::findObjectByCallback(  bool ( *fn )( T* ), Vector<T*> &foundObjects
 
       // If child object is a set, call recursively into it.
       if ( curSet )
-         curSet->findObjectByCallback( fn, foundObjects ); 
+         curSet->findObjectByCallback( fn, foundObjects );
 
       // Add this child object if appropriate.
       if ( curObj && ( fn == NULL || fn( curObj ) ) )
-         foundObjects.push_back( curObj );      
+         foundObjects.push_back( curObj );
    }
 
    // Add this object if appropriate.
    curObj = dynamic_cast<T*>(this);
-   if ( curObj && ( fn == NULL || fn( curObj ) ) )      
+   if ( curObj && ( fn == NULL || fn( curObj ) ) )
       foundObjects.push_back( curObj );
 
    unlock();
@@ -401,7 +401,7 @@ public:
 class SimGroup: public SimSet
 {
    public:
-   
+
       typedef SimSet Parent;
 
       friend class SimManager;
@@ -427,7 +427,7 @@ class SimGroup: public SimSet
       virtual void pushObject( SimObject* object );
       virtual void popObject();
       virtual void clear();
-      
+
       virtual SimGroup* clone();
       virtual SimGroup* deepClone();
 

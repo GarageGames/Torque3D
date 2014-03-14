@@ -69,37 +69,37 @@ public:
                                  MultiLine *meta,
                                  const MaterialFeatureData &fd );
 
-   /// Returns the existing output "outWorldToTangent" transform or 
+   /// Returns the existing output "outWorldToTangent" transform or
    /// creates one if this is the first feature to need it.
    Var* getOutWorldToTangent( Vector<ShaderComponent*> &componentList,
                               MultiLine *meta,
                               const MaterialFeatureData &fd );
 
-   /// Returns the input "worldToTanget" space transform 
+   /// Returns the input "worldToTanget" space transform
    /// adding it to the input connector if it doesn't exist.
    static Var* getInWorldToTangent( Vector<ShaderComponent*> &componentList );
 
-   /// Returns the existing output "outViewToTangent" transform or 
+   /// Returns the existing output "outViewToTangent" transform or
    /// creates one if this is the first feature to need it.
    Var* getOutViewToTangent(  Vector<ShaderComponent*> &componentList,
                               MultiLine *meta,
                               const MaterialFeatureData &fd );
 
-   /// Returns the input "viewToTangent" space transform 
+   /// Returns the input "viewToTangent" space transform
    /// adding it to the input connector if it doesn't exist.
    static Var* getInViewToTangent( Vector<ShaderComponent*> &componentList );
 
-   /// Calculates the world space position in the vertex shader and 
-   /// assigns it to the passed language element.  It does not pass 
+   /// Calculates the world space position in the vertex shader and
+   /// assigns it to the passed language element.  It does not pass
    /// it across the connector to the pixel shader.
    /// @see addOutWsPosition
-   void getWsPosition(  Vector<ShaderComponent*> &componentList,                                       
+   void getWsPosition(  Vector<ShaderComponent*> &componentList,
                         bool useInstancing,
                         MultiLine *meta,
                         LangElement *wsPosition );
 
    /// Adds the "wsPosition" to the input connector if it doesn't exist.
-   Var* addOutWsPosition(  Vector<ShaderComponent*> &componentList,                                       
+   Var* addOutWsPosition(  Vector<ShaderComponent*> &componentList,
                            bool useInstancing,
                            MultiLine *meta );
 
@@ -113,27 +113,27 @@ public:
    static Var* getNormalMapTex();
 
    ///
-   Var* addOutDetailTexCoord( Vector<ShaderComponent*> &componentList, 
+   Var* addOutDetailTexCoord( Vector<ShaderComponent*> &componentList,
                               MultiLine *meta,
                               bool useTexAnim );
 
    ///
-   Var* getObjTrans( Vector<ShaderComponent*> &componentList,                                       
+   Var* getObjTrans( Vector<ShaderComponent*> &componentList,
                      bool useInstancing,
                      MultiLine *meta );
 
    ///
-   Var* getModelView(   Vector<ShaderComponent*> &componentList,                                       
+   Var* getModelView(   Vector<ShaderComponent*> &componentList,
                         bool useInstancing,
                         MultiLine *meta );
 
    ///
-   Var* getWorldView(   Vector<ShaderComponent*> &componentList,                                       
+   Var* getWorldView(   Vector<ShaderComponent*> &componentList,
                         bool useInstancing,
                         MultiLine *meta );
 
    ///
-   Var* getInvWorldView(   Vector<ShaderComponent*> &componentList,                                       
+   Var* getInvWorldView(   Vector<ShaderComponent*> &componentList,
                            bool useInstancing,
                            MultiLine *meta );
 
@@ -175,9 +175,9 @@ public:
 
    virtual String getName() { return mFeatureName; }
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
       const MaterialFeatureData &fd );
-   
+
    virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const { return mOutputTargetMask; }
 };
 
@@ -188,7 +188,7 @@ class VertPositionHLSL : public ShaderFeatureHLSL
 public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
-                             
+
    virtual String getName()
    {
       return "Vert Position";
@@ -204,7 +204,7 @@ public:
 };
 
 
-/// Vertex lighting based on the normal and the light 
+/// Vertex lighting based on the normal and the light
 /// direction passed through the vertex color.
 class RTLightingFeatHLSL : public ShaderFeatureHLSL
 {
@@ -219,11 +219,11 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
-   
+
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName()
@@ -240,7 +240,7 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
@@ -252,7 +252,7 @@ public:
                             const MaterialFeatureData &fd,
                             RenderPassData &passData,
                             U32 &texIndex );
-                            
+
    virtual String getName()
    {
       return "Base Texture";
@@ -267,7 +267,7 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
@@ -290,8 +290,8 @@ public:
 /// Diffuse color
 class DiffuseFeatureHLSL : public ShaderFeatureHLSL
 {
-public:   
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+public:
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
@@ -305,11 +305,11 @@ public:
 /// Diffuse vertex color
 class DiffuseVertColorFeatureHLSL : public ShaderFeatureHLSL
 {
-public:   
+public:
 
    virtual void processVert(  Vector< ShaderComponent* >& componentList,
                               const MaterialFeatureData& fd );
-   virtual void processPix(   Vector< ShaderComponent* >&componentList, 
+   virtual void processPix(   Vector< ShaderComponent* >&componentList,
                               const MaterialFeatureData& fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
@@ -327,7 +327,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
@@ -339,7 +339,7 @@ public:
                             const MaterialFeatureData &fd,
                             RenderPassData &passData,
                             U32 &texIndex );
-                            
+
    virtual String getName()
    {
       return "Lightmap";
@@ -356,7 +356,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
@@ -368,7 +368,7 @@ public:
                             const MaterialFeatureData &fd,
                             RenderPassData &passData,
                             U32 &texIndex );
-                            
+
    virtual String getName()
    {
       return "Tonemap";
@@ -385,11 +385,11 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
-   
+
    virtual String getName()
    {
       return "Vert Lit";
@@ -406,7 +406,7 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -433,7 +433,7 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -464,7 +464,7 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -505,7 +505,7 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -523,7 +523,7 @@ public:
 class AlphaTestHLSL : public ShaderFeatureHLSL
 {
 public:
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp() { return Material::None; }
@@ -541,7 +541,7 @@ public:
 class GlowMaskHLSL : public ShaderFeatureHLSL
 {
 public:
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp() { return Material::None; }
@@ -567,7 +567,7 @@ public:
 
    HDROutHLSL();
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp() { return Material::None; }
@@ -590,21 +590,21 @@ public:
                              const MaterialFeatureData &fd );
 
    virtual void processPix( Vector<ShaderComponent*> &componentList,
-                           const MaterialFeatureData &fd );   
+                           const MaterialFeatureData &fd );
 
    virtual String getName()
    {
       return "Foliage Feature";
    }
 
-   virtual void determineFeature( Material *material, 
+   virtual void determineFeature( Material *material,
                                   const GFXVertexFormat *vertexFormat,
                                   U32 stageNum,
                                   const FeatureType &type,
                                   const FeatureSet &features,
                                   MaterialFeatureData *outFeatureData );
 
-   virtual ShaderFeatureConstHandles* createConstHandles( GFXShader *shader, SimObject *userObject );   
+   virtual ShaderFeatureConstHandles* createConstHandles( GFXShader *shader, SimObject *userObject );
 };
 
 class ParticleNormalFeatureHLSL : public ShaderFeatureHLSL
@@ -642,7 +642,7 @@ public:
 
    virtual String getName() { return "Imposter Vert"; }
 
-   virtual void determineFeature( Material *material, 
+   virtual void determineFeature( Material *material,
                                   const GFXVertexFormat *vertexFormat,
                                   U32 stageNum,
                                   const FeatureType &type,

@@ -290,20 +290,20 @@ public:
 class GuiInspectorTypeEaseF : public GuiInspectorField
 {
    public:
-   
+
       typedef GuiInspectorField Parent;
-      
+
    protected:
-   
+
       SimObjectPtr<GuiButtonCtrl> mBrowseButton;
       RectI mBrowseRect;
-   
+
    public:
-   
+
       GuiInspectorTypeEaseF();
-      
+
       DECLARE_CONOBJECT( GuiInspectorTypeEaseF );
-      
+
       static void consoleInit();
 
       //-----------------------------------------------------------------------------
@@ -354,7 +354,7 @@ class GuiSwatchButtonCtrl;
 class GuiInspectorTypeColor : public GuiInspectorField
 {
    typedef GuiInspectorField Parent;
-   
+
 protected:
 
    /// Return the name of a function that will be used to convert the
@@ -386,7 +386,7 @@ public:
 class GuiInspectorTypeColorI : public GuiInspectorTypeColor
 {
    typedef GuiInspectorTypeColor Parent;
-   
+
 protected:
 
    virtual const char* _getColorConversionFunction() const { return "ColorFloatToInt"; }

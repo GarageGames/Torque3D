@@ -47,7 +47,7 @@ void GFXD3D9Device::initD3DXFnTable()
    if ( smD3DX.isLoaded )
       return;
 
-   // We only load the d3dx version that we compiled 
+   // We only load the d3dx version that we compiled
    // and linked against which should keep unexpected
    // problems from newer or older SDKs to a minimum.
    String d3dxVersion = String::ToString( "d3dx9_%d.dll", (S32)D3DX_SDK_VERSION );
@@ -75,7 +75,7 @@ void GFXD3D9Device::initD3DXFnTable()
    AssertISV( smD3DX.isLoaded, "D3DX Failed to load all functions." );
 
    // HACK: For some reason in the latest versions of
-   // the D3D SDK on the PC the shader compiler will load 
+   // the D3D SDK on the PC the shader compiler will load
    // and unload the compiler DLL over and over with each
    // shader compiled.
    //

@@ -33,20 +33,20 @@
 class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
 {
    public:
-      
+
       typedef GuiButtonBaseCtrl Parent;
 
    protected:
-      
+
       /// The color to display on the button.
       ColorF mSwatchColor;
-      
+
       /// Bitmap used for mGrid
       String mGridBitmap;
 
       /// Background texture that will show through with transparent colors.
       GFXTexHandle mGrid;
-      
+
    public:
 
       GuiSwatchButtonCtrl();

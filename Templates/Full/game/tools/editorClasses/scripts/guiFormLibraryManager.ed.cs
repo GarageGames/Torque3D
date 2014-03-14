@@ -109,7 +109,7 @@ function GuiFormManager::UnregisterLibrary( %libraryName )
 
    // Return Success.
    return true;
-   
+
 }
 
 
@@ -139,7 +139,7 @@ function GuiFormManager::FindLibrary( %libraryName )
 function GuiFormManager::Init()
 {
    // Create SimGroup.
-   new SimGroup( FormContentManager ){};  
+   new SimGroup( FormContentManager ){};
 }
 
 
@@ -151,11 +151,11 @@ function GuiFormManager::Destroy()
 
       if( isObject( %object ) )
          GuiFormManager::BroadcastContentMessage( %object, FormContentManager, "onLibraryDestroyed" );
-         
+
       FormContentManager.remove( %object );
    }
-   
+
    // Destroy SimGroup.
    if( isObject( FormContentManager ) )
-      FormContentManager.delete();   
+      FormContentManager.delete();
 }

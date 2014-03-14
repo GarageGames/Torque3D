@@ -10,7 +10,7 @@
    setFirstResponder = "False";
    modal = "True";
    helpTag = "0";
-   
+
    new GuiWindowCtrl() {
       profile = "ToolsGuiWindowProfile";
       horizSizing = "right";
@@ -31,7 +31,7 @@
       canMaximize = "False";
       minSize = "50 50";
          opaque = "true";
-   
+
       new GuiTextCtrl() {
          profile = "ToolsGuiTextProfile";
          horizSizing = "right";

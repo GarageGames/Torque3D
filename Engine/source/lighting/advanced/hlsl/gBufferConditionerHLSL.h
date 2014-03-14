@@ -50,7 +50,7 @@ public:
       WorldSpace,
       ViewSpace,
    };
-   
+
 protected:
 
    NormalStorage mNormalStorageType;

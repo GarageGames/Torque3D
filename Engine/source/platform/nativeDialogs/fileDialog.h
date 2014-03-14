@@ -28,13 +28,13 @@
 // - The interface is not in fact platform agnotsic, it is win32 oriented.
 // - Filter format is highly windows specific, and is a little fragile, both for
 //   win32 and for other platforms.
-// - Platform specific path strings are exposed to the console, because the 
+// - Platform specific path strings are exposed to the console, because the
 //   protected validators save them as such.
 // - Several of the FDS_XXX values are not options we want to give the user, such
 //   as NOT warning on file overwrite. The values FDS_OVERWRITEPROMPT,
 //   FDS_MUSTEXIST, and FDS_CHANGEPATH are not good things to give the user.
 // - The Execute method is virtual for good reason. It should be implemented for
-//   each subclass. If common behavior is needed for Execute(), it can be 
+//   each subclass. If common behavior is needed for Execute(), it can be
 //   factored out in hidden platform specific code.
 
 
@@ -42,10 +42,10 @@
 
 /// @ingroup SystemDialogs
 /// FileDialogOpaqueData is both defined and implemented on a platform specific
-///   basis. 
+///   basis.
 class FileDialogOpaqueData;
 
-/// @ingroup SystemDialogs 
+/// @ingroup SystemDialogs
 /// @internal
 /// Platform Agnostic Structure for holding information about a file dialog.
 struct FileDialogData
@@ -75,7 +75,7 @@ public:
    StringTableEntry mTitle;               ///< Title to display in file dialog
 
    FileDialogOpaqueData *mOpaqueData;     ///< Stores platform specific info about the dialog
-   
+
 };
 
 /// @ingroup SystemDialogs
@@ -92,7 +92,7 @@ public:
 ///
 /// @attention
 /// FileDialog is *NOT* intended to be used directly in script and is only exposed to script
-/// to expose generic file dialog attributes. 
+/// to expose generic file dialog attributes.
 /// @see OpenFileDialog for a practical example on opening a file
 /// @see SaveFileDialog for a practical example of saving a file
 ///
@@ -150,7 +150,7 @@ class OpenFileDialog : public FileDialog
    /// @}
 
 public:
-   
+
    OpenFileDialog();
    virtual ~OpenFileDialog();
 
@@ -193,7 +193,7 @@ public:
    SaveFileDialog();
    virtual ~SaveFileDialog();
    DECLARE_CONOBJECT(SaveFileDialog);
-   
+
    bool mOverwritePrompt;
 
    static void initPersistFields();

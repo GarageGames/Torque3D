@@ -50,7 +50,7 @@ function DeathMatchGame::initGameVars(%game)
    // the list of SpawnGroups till it finds a valid spawn object.
    // These override the values set in core/scripts/server/spawn.cs
    //-----------------------------------------------------------------------------
-   
+
    // Leave $Game::defaultPlayerClass and $Game::defaultPlayerDataBlock as empty strings ("")
    // to spawn a the $Game::defaultCameraClass as the control object.
    $Game::defaultPlayerClass = "Player";

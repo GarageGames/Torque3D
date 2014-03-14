@@ -35,13 +35,13 @@ class GuiInputCtrl : public GuiMouseEventCtrl
    public:
 
       typedef GuiMouseEventCtrl Parent;
-   
+
       // GuiControl.
       virtual bool onWake();
       virtual void onSleep();
 
       virtual bool onInputEvent( const InputEventInfo &event );
-      
+
       static void initPersistFields();
 
       DECLARE_CONOBJECT(GuiInputCtrl);

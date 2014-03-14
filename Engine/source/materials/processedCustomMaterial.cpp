@@ -54,17 +54,17 @@ ProcessedCustomMaterial::ProcessedCustomMaterial(Material &mat)
 }
 
 ProcessedCustomMaterial::~ProcessedCustomMaterial()
-{   
+{
 }
 
 void ProcessedCustomMaterial::_setStageData()
 {
    // Only do this once
-   if ( mHasSetStageData ) 
+   if ( mHasSetStageData )
       return;
-   mHasSetStageData = true;   
+   mHasSetStageData = true;
 
-   ShaderRenderPassData* rpd = _getRPD(0);   
+   ShaderRenderPassData* rpd = _getRPD(0);
    mConditionerMacros.clear();
 
    // Loop through all the possible textures, set the right flags, and load them if needed
@@ -143,7 +143,7 @@ void ProcessedCustomMaterial::_setStageData()
       if (filename.substr( 0, 1 ).equal("#"))
       {
          String texTargetBufferName = filename.substr(1, filename.length() - 1);
-         NamedTexTarget *texTarget = NamedTexTarget::find( texTargetBufferName ); 
+         NamedTexTarget *texTarget = NamedTexTarget::find( texTargetBufferName );
          rpd->mTexSlot[i].texTarget = texTarget;
 
          // Get the conditioner macros.
@@ -168,14 +168,14 @@ void ProcessedCustomMaterial::_setStageData()
    // We only get one cubemap
    if( mCustomMaterial->mCubemapData )
    {
-      mCustomMaterial->mCubemapData->createMap();      
+      mCustomMaterial->mCubemapData->createMap();
       rpd->mCubeMap = mMaterial->mCubemapData->mCubemap; // BTRTODO ?
       if ( !rpd->mCubeMap )
          mMaterial->logError("Failed to load cubemap");
    }
 
-   // If this has a output target defined, it may be writing 
-   // to a tex target bin with a conditioner, so search for 
+   // If this has a output target defined, it may be writing
+   // to a tex target bin with a conditioner, so search for
    // one and add its macros.
    if ( mCustomMaterial->mOutputTarget.isNotEmpty() )
    {
@@ -188,7 +188,7 @@ void ProcessedCustomMaterial::_setStageData()
    mHasGlow = mCustomMaterial->mGlow[0];
 }
 
-bool ProcessedCustomMaterial::init( const FeatureSet &features, 
+bool ProcessedCustomMaterial::init( const FeatureSet &features,
                                     const GFXVertexFormat *vertexFormat,
                                     const MatFeaturesDelegate &featuresDelegate )
 {
@@ -202,10 +202,10 @@ bool ProcessedCustomMaterial::init( const FeatureSet &features,
    mPasses.push_back( rpd );
 
    _setStageData();
-   _initPassStateBlocks();   
+   _initPassStateBlocks();
    mStateHint.clear();
 
-   // Note: We don't use the vertex format in a custom 
+   // Note: We don't use the vertex format in a custom
    // material at all right now.
    //
    // Maybe we can add some required semantics and
@@ -218,7 +218,7 @@ bool ProcessedCustomMaterial::init( const FeatureSet &features,
    macros.merge( mUserMacros );
 
    // Ask the shader data to give us a shader instance.
-   rpd->shader = mCustomMaterial->mShaderData->getShader( macros );      
+   rpd->shader = mCustomMaterial->mShaderData->getShader( macros );
    if ( !rpd->shader )
    {
       delete rpd;
@@ -226,12 +226,12 @@ bool ProcessedCustomMaterial::init( const FeatureSet &features,
       return false;
    }
 
-   rpd->shaderHandles.init( rpd->shader, mCustomMaterial );      
+   rpd->shaderHandles.init( rpd->shader, mCustomMaterial );
    _initMaterialParameters();
    mDefaultParameters = allocMaterialParameters();
    setMaterialParameters( mDefaultParameters, 0 );
    mStateHint.init( this );
-   
+
    return true;
 }
 
@@ -267,7 +267,7 @@ bool ProcessedCustomMaterial::setupPass( SceneRenderState *state, const SceneDat
 
    ShaderRenderPassData* rpd = _getRPD( pass );
    U32 currState = _getRenderStateIndex( state, sgData );
-   GFX->setStateBlock(rpd->mRenderStates[currState]);      
+   GFX->setStateBlock(rpd->mRenderStates[currState]);
 
    // activate shader
    if ( rpd->shader )
@@ -275,12 +275,12 @@ bool ProcessedCustomMaterial::setupPass( SceneRenderState *state, const SceneDat
    else
       GFX->disableShaders();
 
-   // Set our textures   
-   setTextureStages( state, sgData, pass );   
-   
+   // Set our textures
+   setTextureStages( state, sgData, pass );
+
    GFXShaderConstBuffer* shaderConsts = _getShaderConstBuffer(pass);
    GFX->setShaderConstBuffer(shaderConsts);
-   
+
    // Set our shader constants.
    _setTextureTransforms(pass);
    _setShaderConstants(state, sgData, pass);
@@ -289,23 +289,23 @@ bool ProcessedCustomMaterial::setupPass( SceneRenderState *state, const SceneDat
    if (lm)
       lm->setLightInfo(this, NULL, sgData, state, pass, shaderConsts);
 
-   shaderConsts->setSafe(rpd->shaderHandles.mAccumTimeSC, MATMGR->getTotalTime());   
+   shaderConsts->setSafe(rpd->shaderHandles.mAccumTimeSC, MATMGR->getTotalTime());
 
    return true;
 }
 
 void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const SceneData &sgData, U32 pass )
-{      
-   LightManager* lm = state ? LIGHTMGR : NULL;   
+{
+   LightManager* lm = state ? LIGHTMGR : NULL;
    ShaderRenderPassData* rpd = _getRPD(pass);
    ShaderConstHandles* handles = _getShaderConstHandles(pass);
    GFXShaderConstBuffer* shaderConsts = _getShaderConstBuffer(pass);
 
    const NamedTexTarget *texTarget;
-   GFXTextureObject *texObject; 
-   
+   GFXTextureObject *texObject;
+
    for( U32 i=0; i<mMaxTex; i++ )
-   {            
+   {
       U32 currTexFlag = rpd->mTexType[i];
       if ( !lm || !lm->setTextureStage(sgData, currTexFlag, i, shaderConsts, handles ) )
       {
@@ -314,7 +314,7 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
          	continue;
 
          S32 samplerRegister = handle->getSamplerRegister();
-         
+
          switch( currTexFlag )
          {
          case 0:
@@ -375,7 +375,7 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
                   GFX->setTexture( samplerRegister, NULL );
                   break;
                }
-               
+
                texObject = texTarget->getTexture();
 
                // If no texture is available then map the default 2x2
@@ -393,7 +393,7 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
                   ScreenSpace::RenderTargetParameters(targetSz, targetVp, rtParams);
                   shaderConsts->set(handles->mRTParamsSC[samplerRegister], rtParams);
                }
-              
+
                GFX->setTexture( samplerRegister, texObject );
                break;
             }
@@ -403,20 +403,20 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
 }
 
 template <typename T>
-void ProcessedCustomMaterial::setMaterialParameter(MaterialParameters* param, 
+void ProcessedCustomMaterial::setMaterialParameter(MaterialParameters* param,
                                                    MaterialParameterHandle* handle,
                                                    const String& value)
 {
    T typedValue;
    if (PropertyInfo::default_scan(value, typedValue))
-   {      
+   {
       param->set(handle, typedValue);
    } else {
       Con::errorf("Error setting %s, parse error: %s", handle->getName().c_str(), value.c_str());
    }
 }
 
-void ProcessedCustomMaterial::setMatrixParameter(MaterialParameters* param, 
+void ProcessedCustomMaterial::setMatrixParameter(MaterialParameters* param,
                                                  MaterialParameterHandle* handle,
                                                  const String& value, GFXShaderConstType matrixType)
 {
@@ -425,15 +425,15 @@ void ProcessedCustomMaterial::setMatrixParameter(MaterialParameters* param,
    switch (matrixType)
    {
    case GFXSCT_Float2x2 :
-      dSscanf(value.c_str(),"%g %g %g %g", 
-         m[result.idx(0,0)], m[result.idx(0,1)], 
+      dSscanf(value.c_str(),"%g %g %g %g",
+         m[result.idx(0,0)], m[result.idx(0,1)],
          m[result.idx(1,0)], m[result.idx(1,1)]);
       break;
    case GFXSCT_Float3x3 :
-      dSscanf(value.c_str(),"%g %g %g %g %g %g %g %g %g", 
-         m[result.idx(0,0)], m[result.idx(0,1)], m[result.idx(0,2)], 
-         m[result.idx(1,0)], m[result.idx(1,1)], m[result.idx(1,2)], 
-         m[result.idx(2,0)], m[result.idx(2,1)], m[result.idx(2,2)]);         
+      dSscanf(value.c_str(),"%g %g %g %g %g %g %g %g %g",
+         m[result.idx(0,0)], m[result.idx(0,1)], m[result.idx(0,2)],
+         m[result.idx(1,0)], m[result.idx(1,1)], m[result.idx(1,2)],
+         m[result.idx(2,0)], m[result.idx(2,1)], m[result.idx(2,2)]);
       break;
    default:
       AssertFatal(false, "Invalid type!");
@@ -455,9 +455,9 @@ MaterialParameters* ProcessedCustomMaterial::allocMaterialParameters()
    {
       // strip the dollar sign from the front.
       String stripped(consts[i].name);
-      stripped.erase(0, 1);      
+      stripped.erase(0, 1);
 
-      SimFieldDictionary::Entry* field = fields->findDynamicField(stripped);      
+      SimFieldDictionary::Entry* field = fields->findDynamicField(stripped);
       if (field)
       {
          MaterialParameterHandle* handle = getMaterialParameterHandle(consts[i].name);
@@ -466,32 +466,32 @@ MaterialParameters* ProcessedCustomMaterial::allocMaterialParameters()
          case GFXSCT_Float :
             setMaterialParameter<F32>(ret, handle, field->value);
             break;
-         case GFXSCT_Float2: 
+         case GFXSCT_Float2:
             setMaterialParameter<Point2F>(ret, handle, field->value);
-            break;            
-         case GFXSCT_Float3: 
+            break;
+         case GFXSCT_Float3:
             setMaterialParameter<Point3F>(ret, handle, field->value);
-            break;            
-         case GFXSCT_Float4: 
+            break;
+         case GFXSCT_Float4:
             setMaterialParameter<Point4F>(ret, handle, field->value);
-            break;            
-         case GFXSCT_Float2x2:                         
-         case GFXSCT_Float3x3: 
+            break;
+         case GFXSCT_Float2x2:
+         case GFXSCT_Float3x3:
             setMatrixParameter(ret, handle, field->value, consts[i].constType);
             break;
-         case GFXSCT_Float4x4: 
+         case GFXSCT_Float4x4:
             setMaterialParameter<MatrixF>(ret, handle, field->value);
-            break;            
-         case GFXSCT_Int: 
+            break;
+         case GFXSCT_Int:
             setMaterialParameter<S32>(ret, handle, field->value);
             break;
-         case GFXSCT_Int2: 
+         case GFXSCT_Int2:
             setMaterialParameter<Point2I>(ret, handle, field->value);
             break;
-         case GFXSCT_Int3: 
+         case GFXSCT_Int3:
             setMaterialParameter<Point3I>(ret, handle, field->value);
             break;
-         case GFXSCT_Int4: 
+         case GFXSCT_Int4:
             setMaterialParameter<Point4I>(ret, handle, field->value);
             break;
          // Do we want to ignore these?

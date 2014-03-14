@@ -38,7 +38,7 @@
 class TransformF
 {
    public:
-   
+
       Point3F mPosition;
       AngAxisF mOrientation;
       bool mHasRotation;
@@ -80,7 +80,7 @@ class TransformF
 
       /// Return the position vector of the transform.
       const Point3F& getPosition() const { return mPosition; }
-      
+
       /// REturn the orientation of the transform.
       const AngAxisF& getOrientation() const { return mOrientation; }
 

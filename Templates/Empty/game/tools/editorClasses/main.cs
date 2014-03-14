@@ -33,23 +33,23 @@ function initializeEditorClasses()
    //-----------------------------------------------------------------------------
    // Load Editor Profiles
    //-----------------------------------------------------------------------------
-   
-   exec("./scripts/fileLoader.ed.cs");   
-   
+
+   exec("./scripts/fileLoader.ed.cs");
+
    loadDirectory( expandFilename("./gui/panels") );
-   
+
 
    //-----------------------------------------------------------------------------
    // Setup Preferences Manager
    //-----------------------------------------------------------------------------
-   
+
    exec("./scripts/preferencesManager.ed.cs");
    initPreferencesManager();
-   
+
    //-----------------------------------------------------------------------------
    // Load Form Managers
    //-----------------------------------------------------------------------------
-   
+
    exec("./scripts/guiFormLibraryManager.ed.cs");
    exec("./scripts/guiFormContentManager.ed.cs");
    exec("./scripts/guiFormReferenceManager.ed.cs");
@@ -62,15 +62,15 @@ function initializeEditorClasses()
    // User Display
    exec("./scripts/contextPopup.ed.cs");
 
-   // Project Support   
+   // Project Support
    exec("./scripts/projects/projectEvents.ed.cs");
    exec("./scripts/projects/projectInternalInterface.ed.cs");
-   
+
    // Input
    exec("./scripts/input/inputEvents.ed.cs");
    exec("./scripts/input/dragDropEvents.ed.cs");
    exec("./scripts/input/applicationEvents.ed.cs");
-   
+
    // Form Class
    exec("./scripts/guiFormClass.ed.cs");
    exec("./scripts/guiClasses/guiThumbnailPopup.ed.cs");

@@ -70,71 +70,71 @@ const Move NullMove;
 
 void MoveManager::init()
 {
-   Con::addVariable("mvForwardAction", TypeF32, &mForwardAction, 
+   Con::addVariable("mvForwardAction", TypeF32, &mForwardAction,
       "Forwards movement speed for the active player.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvBackwardAction", TypeF32, &mBackwardAction, 
+   Con::addVariable("mvBackwardAction", TypeF32, &mBackwardAction,
       "Backwards movement speed for the active player.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvUpAction", TypeF32, &mUpAction, 
+   Con::addVariable("mvUpAction", TypeF32, &mUpAction,
       "Upwards movement speed for the active player.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvDownAction", TypeF32, &mDownAction, 
+   Con::addVariable("mvDownAction", TypeF32, &mDownAction,
       "Downwards movement speed for the active player.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvLeftAction", TypeF32, &mLeftAction, 
+   Con::addVariable("mvLeftAction", TypeF32, &mLeftAction,
       "Left movement speed for the active player.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvRightAction", TypeF32, &mRightAction, 
+   Con::addVariable("mvRightAction", TypeF32, &mRightAction,
       "Right movement speed for the active player.\n"
 	   "@ingroup Game");
 
-   Con::addVariable("mvFreeLook", TypeBool, &mFreeLook, 
+   Con::addVariable("mvFreeLook", TypeBool, &mFreeLook,
       "Boolean state for if freelook is active or not.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvDeviceIsKeyboardMouse", TypeBool, &mDeviceIsKeyboardMouse, 
+   Con::addVariable("mvDeviceIsKeyboardMouse", TypeBool, &mDeviceIsKeyboardMouse,
       "Boolean state for it the system is using a keyboard and mouse or not.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvPitch", TypeF32, &mPitch, 
+   Con::addVariable("mvPitch", TypeF32, &mPitch,
       "Current pitch value, typically applied through input devices, such as a mouse.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvYaw", TypeF32, &mYaw, 
+   Con::addVariable("mvYaw", TypeF32, &mYaw,
       "Current yaw value, typically applied through input devices, such as a mouse.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvRoll", TypeF32, &mRoll, 
+   Con::addVariable("mvRoll", TypeF32, &mRoll,
       "Current roll value, typically applied through input devices, such as a mouse.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvPitchUpSpeed", TypeF32, &mPitchUpSpeed, 
+   Con::addVariable("mvPitchUpSpeed", TypeF32, &mPitchUpSpeed,
       "Upwards pitch speed.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvPitchDownSpeed", TypeF32, &mPitchDownSpeed, 
+   Con::addVariable("mvPitchDownSpeed", TypeF32, &mPitchDownSpeed,
       "Downwards pitch speed.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvYawLeftSpeed", TypeF32, &mYawLeftSpeed, 
+   Con::addVariable("mvYawLeftSpeed", TypeF32, &mYawLeftSpeed,
       "Left Yaw speed.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvYawRightSpeed", TypeF32, &mYawRightSpeed, 
+   Con::addVariable("mvYawRightSpeed", TypeF32, &mYawRightSpeed,
       "Right Yaw speed.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvRollLeftSpeed", TypeF32, &mRollLeftSpeed, 
+   Con::addVariable("mvRollLeftSpeed", TypeF32, &mRollLeftSpeed,
       "Left roll speed.\n"
 	   "@ingroup Game");
-   Con::addVariable("mvRollRightSpeed", TypeF32, &mRollRightSpeed, 
+   Con::addVariable("mvRollRightSpeed", TypeF32, &mRollRightSpeed,
       "Right roll speed.\n"
 	   "@ingroup Game");
 
    // Dual-analog
-   Con::addVariable( "mvXAxis_L", TypeF32, &mXAxis_L, 
+   Con::addVariable( "mvXAxis_L", TypeF32, &mXAxis_L,
       "Left thumbstick X axis position on a dual-analog gamepad.\n"
 	   "@ingroup Game" );
-   Con::addVariable( "mvYAxis_L", TypeF32, &mYAxis_L, 
+   Con::addVariable( "mvYAxis_L", TypeF32, &mYAxis_L,
       "Left thumbstick Y axis position on a dual-analog gamepad.\n"
 	   "@ingroup Game" );
 
-   Con::addVariable( "mvXAxis_R", TypeF32, &mXAxis_R, 
+   Con::addVariable( "mvXAxis_R", TypeF32, &mXAxis_R,
       "Right thumbstick X axis position on a dual-analog gamepad.\n"
 	   "@ingroup Game" );
-   Con::addVariable( "mvYAxis_R", TypeF32, &mYAxis_R, 
+   Con::addVariable( "mvYAxis_R", TypeF32, &mYAxis_R,
       "Right thumbstick Y axis position on a dual-analog gamepad.\n"
 	   "@ingroup Game");
 
@@ -142,7 +142,7 @@ void MoveManager::init()
    {
       char varName[256];
       dSprintf(varName, sizeof(varName), "mvTriggerCount%d", i);
-      Con::addVariable(varName, TypeS32, &mTriggerCount[i], 
+      Con::addVariable(varName, TypeS32, &mTriggerCount[i],
          "Used to determine the trigger counts of buttons. Namely used for input actions such as jumping and weapons firing.\n"
 	      "@ingroup Game");
    }
@@ -179,13 +179,13 @@ static inline S32 clampRangeClamp(F32 val)
       return 0;
    if(val > 1)
       return 32;
-            
+
    // 0.5 / 16 = 0.03125 ... this forces a round up to
    // make the precision near zero equal in the negative
    // and positive directions.  See...
    //
    // http://www.garagegames.com/community/forums/viewthread/49714
-   
+
    return (S32)((val + 1.03125) * 16);
 }
 
@@ -217,10 +217,10 @@ static inline F32 clampAngleClamp( F32 angle )
 
 void Move::clamp()
 {
-   // If yaw/pitch/roll goes equal or greater than -PI/+PI it 
+   // If yaw/pitch/roll goes equal or greater than -PI/+PI it
    // flips the direction of the rotation... we protect against
    // that by clamping before the conversion.
-            
+
    yaw   = clampAngleClamp( yaw );
    pitch = clampAngleClamp( pitch );
    roll  = clampAngleClamp( roll );
@@ -261,7 +261,7 @@ bool Move::packMove(BitStream *stream, const Move* basemove, bool alwaysWriteAll
                              (deviceIsKeyboardMouse!=basemove->deviceIsKeyboardMouse) ||
                              (freeLook!=basemove->freeLook) ||
                              triggerDifferent;
-   
+
    if (alwaysWriteAll || stream->writeFlag(somethingDifferent))
    {
       if(stream->writeFlag(pyaw != basemove->pyaw))

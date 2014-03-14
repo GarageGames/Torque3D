@@ -32,7 +32,7 @@ class Frustum;
 /*!
    This class will eventually support various capabilities such as panoramics,
    high rez captures, and cubemap captures.
-   
+
    Right now it just captures standard screenshots, but it does support
    captures from multisample back buffers, so antialiased captures will work.
 */
@@ -40,7 +40,7 @@ class Frustum;
 
 class ScreenShot
 {
-   /// This is overloaded to copy the current GFX 
+   /// This is overloaded to copy the current GFX
    /// backbuffer to a new bitmap.
 	virtual GBitmap* _captureBackBuffer() { return NULL; }
 
@@ -53,7 +53,7 @@ class ScreenShot
    /// The full path to the screenshot file to write.
    char mFilename[256];
 
-   /// The number of times to tile the backbuffer to 
+   /// The number of times to tile the backbuffer to
    /// generate screenshots larger than normally possible.
    U32 mTiles;
 
@@ -69,9 +69,9 @@ class ScreenShot
    /// Helper for taking simple single tile screenshots and
    /// outputing it as a single file to disk.
    void _singleCapture( GuiCanvas *canvas );
-   
+
 public:
-  
+
    /// Constructor.
    ScreenShot();
 

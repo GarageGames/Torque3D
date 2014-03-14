@@ -70,7 +70,7 @@ GuiPanel::GuiPanel()
 {
    setMinExtent( Point2I( 16,16 ) );
    setDocking( Docking::dockNone );
-   
+
    mIsContainer = true;
 }
 

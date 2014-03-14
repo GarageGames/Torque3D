@@ -31,7 +31,7 @@
 
 VideoFrameGrabberD3D9::VideoFrameGrabberD3D9()
 {
-   GFXDevice::getDeviceEventSignal().notify( this, &VideoFrameGrabberD3D9::_handleGFXEvent );   
+   GFXDevice::getDeviceEventSignal().notify( this, &VideoFrameGrabberD3D9::_handleGFXEvent );
    mCurrentCapture = 0;
 }
 
@@ -40,7 +40,7 @@ VideoFrameGrabberD3D9::~VideoFrameGrabberD3D9()
    GFXDevice::getDeviceEventSignal().remove( this, &VideoFrameGrabberD3D9::_handleGFXEvent );
 }
 
- 
+
 void VideoFrameGrabberD3D9::captureBackBuffer()
 {
    AssertFatal( mCapture[mCurrentCapture].stage != eInSystemMemory, "Error! Trying to override a capture resource in \"SystemMemory\" stage!" );
@@ -57,7 +57,7 @@ void VideoFrameGrabberD3D9::captureBackBuffer()
    if (vidMemTex.isNull() || vidMemTex.getWidthHeight() != mResolution)
       vidMemTex.set(mResolution.x, mResolution.y,GFXFormatR8G8B8X8, &GFXDefaultRenderTargetProfile, avar("%s() - mVidMemTex (line %d)", __FUNCTION__, __LINE__) );
 
-   // set up the copy surface   
+   // set up the copy surface
    IDirect3DSurface9 *surface;
 
    // grab the top level surface of tex 0
@@ -78,7 +78,7 @@ void VideoFrameGrabberD3D9::captureBackBuffer()
 }
 
 void VideoFrameGrabberD3D9::makeBitmap()
-{    
+{
    // Advance the stages for all resources, except the one used for the last capture
    for (U32 i=0; i<eNumStages; i++)
    {
@@ -86,7 +86,7 @@ void VideoFrameGrabberD3D9::makeBitmap()
          continue;
 
       switch (mCapture[i].stage)
-      {         
+      {
       case eInVideoMemory:
          copyToSystemMemory(mCapture[i]);
          break;
@@ -109,7 +109,7 @@ void VideoFrameGrabberD3D9::releaseTextures()
       mCapture[i].sysMemTex.free();
       mCapture[i].vidMemTex.free();
       mCapture[i].stage = eReadyToCapture;
-   }   
+   }
 }
 
 void VideoFrameGrabberD3D9::copyToSystemMemory(CaptureResource &capture)
@@ -125,7 +125,7 @@ void VideoFrameGrabberD3D9::copyToSystemMemory(CaptureResource &capture)
    if (sysMemTex.isNull() || sysMemTex.getWidthHeight() != size)
       sysMemTex.set( size.x, size.y, GFXFormatR8G8B8X8, &GFXSystemMemProfile, avar("%s() - tex (line %d)", __FUNCTION__, __LINE__) );
 
-   // set up the 2 copy surfaces   
+   // set up the 2 copy surfaces
    IDirect3DSurface9 *surface[2];
 
    // grab the top level surface of tex 0
@@ -161,7 +161,7 @@ void VideoFrameGrabberD3D9::copyToBitmap(CaptureResource &capture)
 
    GFXD3D9TextureObject *to = (GFXD3D9TextureObject *) &(*sysMemTex);
    D3D9Assert( to->get2DTex()->GetSurfaceLevel( 0, &surface ), NULL );
-   
+
    // Lock the system memory surface
    D3DLOCKED_RECT r;
    D3DSURFACE_DESC d;
@@ -170,22 +170,22 @@ void VideoFrameGrabberD3D9::copyToBitmap(CaptureResource &capture)
 
    // Allocate a GBitmap and copy into it.
    GBitmap *gb = new GBitmap(size.x, size.y);
-   
+
    // We've got the X8 in there so we have to manually copy stuff.
    const U32* src = (const U32*)r.pBits;
    U8* dst = gb->getWritableBits();
    S32 pixels = size.x*size.y;
    for(S32 i=0; i<pixels; i++)
    {
-      U32 px = *src++;      
+      U32 px = *src++;
       *dst++ = px >> 16;
       *dst++ = px >> 8;
       *dst++ = px;
    }
    surface->UnlockRect();
-   
+
    // celease surfaces
-   surface->Release();   
+   surface->Release();
 
    // Push this new bitmap
    pushNewBitmap(gb);

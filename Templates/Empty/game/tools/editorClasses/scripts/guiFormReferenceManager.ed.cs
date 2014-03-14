@@ -82,7 +82,7 @@ function GuiFormManager::RemoveContentReference( %library, %contentName, %contro
 
    // Add Control Reference.
    %contentObj.RefList.remove( %control );
-   
+
    if( %control.isMethod("onFormRemove") )
       %control.onFormRemove();
 

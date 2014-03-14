@@ -29,16 +29,16 @@
 // quality and performance settings.
 
 singleton GFXStateBlockData( FXAA_StateBlock : PFX_DefaultStateBlock )
-{   
-   samplersDefined = true;   
+{
+   samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;
 };
 
 singleton ShaderData( FXAA_ShaderData )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/fxaa/fxaaV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/fxaa/fxaaP.hlsl";
-   
+
    samplerNames[0] = "$colorTex";
 
    pixVersion = 3.0;
@@ -47,11 +47,11 @@ singleton ShaderData( FXAA_ShaderData )
 singleton PostEffect( FXAA_PostEffect )
 {
    isEnabled = false;
-   
+
    allowReflectPass = false;
    renderTime = "PFXAfterDiffuse";
 
-   texture[0] = "$backBuffer";      
+   texture[0] = "$backBuffer";
 
    target = "$backBuffer";
 

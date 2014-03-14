@@ -44,14 +44,14 @@ function playMessageSound(%message, %voice, %pitch)
    }
 
    %wav = getSubStr(%message, %wavStart + 2, 1000);
-   
+
    if (%voice !$= "")
    {
       %wavFile = "art/sound/voice/" @ %voice @ "/" @ %wav;
    }
    else
       %wavFile = "art/sound/" @ %wav;
-   
+
    if (strstr(%wavFile, ".wav") != (strlen(%wavFile) - 4))
       %wavFile = %wavFile @ ".wav";
 
@@ -190,7 +190,7 @@ function ChatHud::addLine(%this,%text)
    %textHeight = %this.profile.fontSize + %this.lineSpacing;
    if (%textHeight <= 0)
       %textHeight = 12;
-      
+
    %scrollBox = %this.getGroup();
    %chatScrollHeight = getWord(%scrollBox.extent, 1) - 2 * %scrollBox.profile.borderThickness;
    %chatPosition = getWord(%this.extent, 1) - %chatScrollHeight + getWord(%this.position, 1) - %scrollBox.profile.borderThickness;

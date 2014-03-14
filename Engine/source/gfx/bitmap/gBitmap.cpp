@@ -149,7 +149,7 @@ const GBitmap::Registration   *GBitmap::sFindRegInfo( const String &extension )
       const Vector<String>          &extensions = reg.extensions;
 
       for ( U32 j = 0; j < extensions.size(); ++j )
-      {    
+      {
          if ( extensions[j].equal( extension, String::NoCase ) )
             return &reg;
       }
@@ -193,7 +193,7 @@ bool GBitmap::sFindFile( const Path &path, Path *outPath )
 bool GBitmap::sFindFiles( const Path &path, Vector<Path> *outFoundPaths )
 {
    PROFILE_SCOPE( GBitmap_sFindFiles );
-   
+
    Path  tryPath( path );
 
    for ( U32 i = 0; i < GBitmap::sRegistrations.size(); i++ )
@@ -228,7 +228,7 @@ String GBitmap::sGetExtensionList()
       for ( U32 j = 0; j < reg.extensions.size(); j++ )
       {
          list += reg.extensions[j];
-         list += " ";         
+         list += " ";
       }
    }
 
@@ -276,7 +276,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
 
    AssertFatal(in_width != 0 && in_height != 0, "GBitmap::allocateBitmap: width or height is 0");
 
-   if (in_extrudeMipLevels == true) 
+   if (in_extrudeMipLevels == true)
    {
       AssertFatal(isPow2(in_width) == true && isPow2(in_height) == true, "GBitmap::GBitmap: in order to extrude mip levels, bitmap w/h must be pow2");
    }
@@ -286,7 +286,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
    mHeight         = in_height;
 
    mBytesPerPixel = 1;
-   switch (mInternalFormat) 
+   switch (mInternalFormat)
    {
      case GFXFormatA8:
      case GFXFormatL8:           mBytesPerPixel = 1;
@@ -310,12 +310,12 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
    mMipLevelOffsets[0] = 0;
 
 
-   if (in_extrudeMipLevels == true) 
+   if (in_extrudeMipLevels == true)
    {
       U32 currWidth  = in_width;
       U32 currHeight = in_height;
 
-      do 
+      do
       {
          mMipLevelOffsets[mNumMipLevels] = mMipLevelOffsets[mNumMipLevels - 1] +
                                          (currWidth * currHeight * mBytesPerPixel);
@@ -372,7 +372,7 @@ void GBitmap::extrudeMipLevels(bool clearBorders)
             bitmapExtrudeRGBA(getBits(i - 1), getWritableBits(i), getHeight(i-1), getWidth(i-1));
          break;
       }
-      
+
       default:
          break;
    }
@@ -625,7 +625,7 @@ ColorF GBitmap::sampleTexel(F32 u, F32 v) const
 		//U16 *buffer = (U16 *)lockrect->pBits;
 	}
 	else if(mBytesPerPixel > 2)
-	{		
+	{
 		col.red = F32(buffer[lexelindex + 0]) / 255.0f;
       col.green = F32(buffer[lexelindex + 1]) / 255.0f;
 		col.blue = F32(buffer[lexelindex + 2]) / 255.0f;
@@ -704,7 +704,7 @@ bool GBitmap::setColor(const U32 x, const U32 y, const ColorI& rColor)
      case GFXFormatR8G8B8X8:
       dMemcpy( pLoc, &rColor, 4 * sizeof( U8 ) );
       break;
-      
+
      case GFXFormatR5G6B5:
       #ifdef TORQUE_OS_MAC
          *((U16*)pLoc) = (rColor.red << 11) | (rColor.green << 5) | (rColor.blue << 0) ;
@@ -787,7 +787,7 @@ bool GBitmap::combine( const GBitmap *bitmapA, const GBitmap *bitmapB, const GFX
       // Allocate new one
       allocateBitmap( resWidth, resHeight, false, resFmt );
    }
-   
+
    // Adjust format of result bitmap (if resFmt == getFormat() it will not perform the format convert)
    setFormat( resFmt );
 
@@ -806,12 +806,12 @@ bool GBitmap::combine( const GBitmap *bitmapA, const GBitmap *bitmapB, const GFX
             U8 pxB = 0;
 
             // Get contributions from A and B
-            if( y < bitmapA->getHeight() && 
+            if( y < bitmapA->getHeight() &&
                 x < bitmapA->getWidth() &&
                 _byte < bitmapA->mBytesPerPixel )
                pxA = *aBits++;
 
-            if( y < bitmapB->getHeight() && 
+            if( y < bitmapB->getHeight() &&
                x < bitmapB->getWidth() &&
                _byte < bitmapB->mBytesPerPixel )
                pxB = *bBits++;
@@ -839,12 +839,12 @@ bool GBitmap::combine( const GBitmap *bitmapA, const GBitmap *bitmapB, const GFX
 
 void GBitmap::fill( const ColorI &rColor )
 {
-   // Set the first pixel using the slow 
+   // Set the first pixel using the slow
    // but proper method.
    setColor( 0, 0, rColor );
    mHasTransparency = rColor.alpha < 255;
-      
-   // Now fill the first row of the bitmap by 
+
+   // Now fill the first row of the bitmap by
    // copying the first pixel across the row.
    const U32 stride = getWidth() * mBytesPerPixel;
    const U8 *src = getBits();
@@ -854,8 +854,8 @@ void GBitmap::fill( const ColorI &rColor )
       dMemcpy( dest, src, mBytesPerPixel );
 
    // Now copy the first row to all the others.
-   // 
-   // TODO: This could adaptively size the copy 
+   //
+   // TODO: This could adaptively size the copy
    // amount to copy more rows from the source
    // and reduce the total number of memcpy calls.
    //
@@ -887,7 +887,7 @@ GBitmap* GBitmap::createPaddedBitmap() const
 
    GBitmap* pReturn = new GBitmap(newWidth, newHeight, false, getFormat());
 
-   for (U32 i = 0; i < height; i++) 
+   for (U32 i = 0; i < height; i++)
    {
       U8*       pDest = (U8*)pReturn->getAddress(0, i);
       const U8* pSrc  = (const U8*)getAddress(0, i);
@@ -896,7 +896,7 @@ GBitmap* GBitmap::createPaddedBitmap() const
 
       pDest += width * mBytesPerPixel;
       // set the src pixel to the last pixel in the row
-      const U8 *pSrcPixel = pDest - mBytesPerPixel; 
+      const U8 *pSrcPixel = pDest - mBytesPerPixel;
 
       for(U32 j = width; j < newWidth; j++)
          for(U32 k = 0; k < mBytesPerPixel; k++)
@@ -947,7 +947,7 @@ GBitmap* GBitmap::createPow2Bitmap() const
       {
          pDest = (U8*) pReturn->getAddress(x, y);
          pSrc = (U8*) getAddress((S32)currX, (S32)currY);
-         for (U32 p = 0; p < pReturn->mBytesPerPixel; p++) 
+         for (U32 p = 0; p < pReturn->mBytesPerPixel; p++)
          {
             pDest[p] = pSrc[p];
          }
@@ -962,7 +962,7 @@ GBitmap* GBitmap::createPow2Bitmap() const
 void GBitmap::copyChannel( U32 index, GBitmap *outBitmap ) const
 {
    AssertFatal( index < mBytesPerPixel, "GBitmap::copyChannel() - Bad channel offset!" );
-   AssertFatal( outBitmap, "GBitmap::copyChannel() - Null output bitmap!" );   
+   AssertFatal( outBitmap, "GBitmap::copyChannel() - Null output bitmap!" );
    AssertFatal( outBitmap->getWidth() == getWidth(), "GBitmap::copyChannel() - Width mismatch!" );
    AssertFatal( outBitmap->getHeight() == getHeight(), "GBitmap::copyChannel() - Height mismatch!" );
 
@@ -1128,7 +1128,7 @@ Resource<GBitmap> GBitmap::_load(const Torque::Path &path)
 
    if ( Torque::FS::IsFile( path ) )
       return ResourceManager::get().load( path );
-  
+
    Path foundPath;
    if ( GBitmap::sFindFile( path, &foundPath ) )
    {
@@ -1179,7 +1179,7 @@ DefineEngineFunction( getBitmapInfo, String, ( const char *filename ),,
    if ( !image )
       return String::EmptyString;
 
-   return String::ToString( "%d\t%d\t%d", image->getWidth(), 
+   return String::ToString( "%d\t%d\t%d", image->getWidth(),
                                           image->getHeight(),
                                           image->getBytesPerPixel() );
 }

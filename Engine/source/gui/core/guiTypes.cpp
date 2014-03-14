@@ -60,15 +60,15 @@ ConsoleDocClass( GuiCursor,
 );
 
 GFX_ImplementTextureProfile(GFXGuiCursorProfile,
-                            GFXTextureProfile::DiffuseMap, 
+                            GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::Static, 
+                            GFXTextureProfile::Static,
                             GFXTextureProfile::None);
 GFX_ImplementTextureProfile(GFXDefaultGUIProfile,
-                            GFXTextureProfile::DiffuseMap, 
+                            GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize |
                             GFXTextureProfile::Static |
-                            GFXTextureProfile::NoPadding, 
+                            GFXTextureProfile::NoPadding,
                             GFXTextureProfile::None);
 
 
@@ -135,7 +135,7 @@ IMPLEMENT_CONOBJECT(GuiControlProfile);
 ConsoleDocClass( GuiControlProfile,
    "@brief A collection of properties that determine control behavior and rendering.\n"
    "@ingroup GuiCore\n"
-   
+
    ""
 );
 
@@ -186,12 +186,12 @@ void GuiControlProfile::setBitmapHandle(GFXTexHandle handle)
 bool GuiControlProfile::protectedSetBitmap( void *object, const char *index, const char *data )
 {
    GuiControlProfile *profile = static_cast<GuiControlProfile*>( object );
-   
+
    profile->mBitmapName = StringTable->insert(data);
 
    if ( !profile->isProperlyAdded() )
       return false;
-      
+
    if( profile->mLoadCount > 0 )
    {
       profile->mBitmapArrayRects.clear();
@@ -224,16 +224,16 @@ const char* GuiControlProfile::protectedGetSoundButtonDown( void* object, const 
 bool GuiControlProfile::protectedSetSoundButtonDown( void* object, const char* index, const char* data )
 {
    GuiControlProfile* profile = reinterpret_cast< GuiControlProfile* >( object );
-   
+
    SFXTrack* track = NULL;
    if( data && data[ 0] && !Sim::findObject( data, track ) )
    {
       Con::errorf( "GuiControlProfile::protectedSetSoundButtonDown - no SFXTrack '%s'", data );
       return false;
    }
-   
+
    profile->mSoundButtonDown = track;
-   
+
    return false;
 }
 
@@ -251,16 +251,16 @@ const char* GuiControlProfile::protectedGetSoundButtonOver( void* object, const 
 bool GuiControlProfile::protectedSetSoundButtonOver( void* object, const char* index, const char* data )
 {
    GuiControlProfile* profile = reinterpret_cast< GuiControlProfile* >( object );
-   
+
    SFXTrack* track = NULL;
    if( data && data[ 0] && !Sim::findObject( data, track ) )
    {
       Con::errorf( "GuiControlProfile::protectedSetSoundButtonOver - no SFXTrack '%s'", data );
       return false;
    }
-   
+
    profile->mSoundButtonOver = track;
-   
+
    return false;
 }
 
@@ -286,13 +286,13 @@ GuiControlProfile::GuiControlProfile(void) :
 {
    mLoadCount = 0;
    mUseCount = 0;
-   
+
    // event focus behavior
    mTabable = false;
    mCanKeyFocus = false;
    mModal = false;
 
-   // fill and border   
+   // fill and border
    mOpaque = false;
    mBorder = 1;
    mBorderThickness = 1;
@@ -313,7 +313,7 @@ GuiControlProfile::GuiControlProfile(void) :
    mReturnTab     = false;
    mNumbersOnly   = false;
    mMouseOverSelected = false;
-   
+
    // bitmap members
    mBitmapName = NULL;
    mUseBitmapArray = false;
@@ -351,7 +351,7 @@ GuiControlProfile::GuiControlProfile(void) :
 
       for(U32 i = 0; i < 10; i++)
          mFontColors[i] = def->mFontColors[i];
-		
+
       // default bitmap
       mBitmapName     = def->mBitmapName;
       mUseBitmapArray = def->mUseBitmapArray;
@@ -382,17 +382,17 @@ GuiControlProfile::~GuiControlProfile()
 void GuiControlProfile::initPersistFields()
 {
    addGroup( "Behavior" );
-   
+
       addField( "tab",           TypeBool,       Offset(mTabable, GuiControlProfile));
       addField("canKeyFocus",   TypeBool,       Offset(mCanKeyFocus, GuiControlProfile),
          "Whether the control can have the keyboard focus." );
       addField("mouseOverSelected", TypeBool,   Offset(mMouseOverSelected, GuiControlProfile));
       addField("modal",         TypeBool,       Offset(mModal, GuiControlProfile));
-   
+
    endGroup( "Behavior" );
-   
+
    addGroup( "Appearance" );
-   
+
       addField("opaque",        TypeBool,       Offset(mOpaque, GuiControlProfile));
       addField("fillColor",     TypeColorI,     Offset(mFillColor, GuiControlProfile));
       addField("fillColorHL",   TypeColorI,     Offset(mFillColorHL, GuiControlProfile));
@@ -409,9 +409,9 @@ void GuiControlProfile::initPersistFields()
 
       addField("bevelColorHL", TypeColorI,     Offset(mBevelColorHL, GuiControlProfile));
       addField("bevelColorLL", TypeColorI,     Offset(mBevelColorLL, GuiControlProfile));
-   
+
    endGroup( "Appearance" );
-   
+
    addGroup( "Text" );
 
       addField("fontType",             TypeString,     Offset(mFontType, GuiControlProfile),
@@ -433,7 +433,7 @@ void GuiControlProfile::initPersistFields()
          "Font color for links in text (same as fontColors[4])." );
       addField("fontColorLinkHL",      TypeColorI,     Offset(mFontColors[ColorUser1], GuiControlProfile),
          "Font color for highlighted links in text (same as fontColors[5])." );
-            
+
       addField( "justify",       TYPEID< GuiControlProfile::AlignmentType >(),       Offset(mAlignment, GuiControlProfile),
          "Horizontal alignment for text." );
       addField( "textOffset",    TypePoint2I,    Offset(mTextOffset, GuiControlProfile));
@@ -449,7 +449,7 @@ void GuiControlProfile::initPersistFields()
          "Color to use for the text cursor." );
 
    endGroup( "Text" );
-   
+
    addGroup( "Misc" );
 
       addProtectedField( "bitmap", TypeFilename,  Offset(mBitmapName, GuiControlProfile),
@@ -465,9 +465,9 @@ void GuiControlProfile::initPersistFields()
          &GuiControlProfile::protectedSetSoundButtonOver, &GuiControlProfile::protectedGetSoundButtonOver,
          "Sound to play when mouse is hovering over control." );
       addField("profileForChildren", TypeString,      Offset(mChildrenProfileName, GuiControlProfile));
-   
+
    endGroup( "Misc" );
-   
+
    addField( "category", TypeRealString, Offset( mCategory, GuiControlProfile ),
       "Category under which the profile will appear in the editor."
    );
@@ -481,7 +481,7 @@ bool GuiControlProfile::onAdd()
       return false;
 
    Sim::getGuiDataGroup()->addObject(this);
-   
+
    // Make sure we have an up-to-date children profile
    getChildrenProfile();
 
@@ -492,7 +492,7 @@ void GuiControlProfile::onStaticModified(const char* slotName, const char* newVa
 {
    if( mLoadCount > 0 )
    {
-      if ( !dStricmp(slotName, "fontType") || 
+      if ( !dStricmp(slotName, "fontType") ||
            !dStricmp(slotName, "fontCharset") ||
            !dStricmp(slotName, "fontSize" ) )
       {
@@ -548,7 +548,7 @@ RectI GuiControlProfile::getBitmapArrayRect(U32 i)
 {
    if(!mBitmapArrayRects.size())
       constructBitmapArray();
-   
+
    if( i >= mBitmapArrayRects.size())
       return RectI(0,0,0,0);
 
@@ -561,7 +561,7 @@ S32 GuiControlProfile::constructBitmapArray()
       return mBitmapArrayRects.size();
 
    if( mTextureObject.isNull() )
-   {   
+   {
       if ( !mBitmapName || !mBitmapName[0] || !mTextureObject.set( mBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
          return 0;
    }
@@ -640,11 +640,11 @@ void GuiControlProfile::incLoadCount()
       Platform::outputDebugString( "[GuiControlProfile] Loading profile %i:%s (%s:%s)",
          getId(), getClassName(), getName(), getInternalName() );
       #endif
-      
+
       sFontCacheDirectory = Con::getVariable( "$GUI::fontCacheDirectory" );
-         
+
       // Load font (if not already loaded).
-      
+
       if( mFont == NULL )
          loadFont();
 
@@ -656,7 +656,7 @@ void GuiControlProfile::incLoadCount()
 
       constructBitmapArray();
    }
-   
+
    mLoadCount ++;
 
    // Quick check to make sure our children profile is up-to-date
@@ -690,7 +690,7 @@ bool GuiControlProfile::loadFont()
       Con::errorf( "GuiControlProfile::loadFont - Failed to load/create profile font (%s/%d)", mFontType, mFontSize );
       return false;
    }
-      
+
    return true;
 }
 
@@ -705,12 +705,12 @@ ConsoleMethod( GuiControlProfile, getStringWidth, S32, 3, 3, "( pString )" )
 IMPLEMENT_STRUCT( RectSpacingI,
    RectSpacingI, GuiAPI,
    "" )
-   
+
       FIELD( left, leftPadding, 1, "" )
       FIELD( right, rightPadding, 1, "" )
       FIELD( top, topPadding, 1, "" )
       FIELD( bottom, bottomPadding, 1, "" )
-      
+
 END_IMPLEMENT_STRUCT;
 
 ConsoleType( RectSpacingI, TypeRectSpacingI, RectSpacingI )

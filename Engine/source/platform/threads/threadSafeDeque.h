@@ -195,7 +195,7 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getHead()
    while( 1 )
    {
       // Iterate through to leftmost node.
-      
+
       {
          NodeRef head = mHead;
          while( head != NULL )
@@ -205,19 +205,19 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getHead()
                mHead.trySetFromTo( head, prev, NodeRef::TAG_Unset );
             else
                break;
-               
+
             head = mHead;
          }
       }
-      
+
       // Clear out dead nodes at front of list.
-      
+
       {
          NodeRef head = mHead;
          if( head && head->mPrev.isTagged() )
          {
             NodeRef next = head->mNext;
-            
+
             mHead.trySetFromTo( head, next, NodeRef::TAG_Unset );
             mTail.trySetFromTo( head, next, NodeRef::TAG_Unset );
 
@@ -225,22 +225,22 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getHead()
                next->mPrev.trySetFromTo( head, NULL );
 
             head->mNext.trySetFromTo( next, NULL, NodeRef::TAG_Set );
-            
+
             continue; // Restart.
          }
       }
-      
+
       // Try head.
-      
+
       NodeRef head = mHead;
       if( head != NULL && !head->mPrev.isTagged() )
       {
          result = head;
          break;
       }
-         
+
       // Try tail.
-      
+
       if( !head )
       {
          head = mTail;
@@ -249,7 +249,7 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getHead()
       }
 
       // Update head.
-      
+
       NodeRef prev = head->mPrev;
       if( head->mPrev != NULL )
       {
@@ -273,7 +273,7 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getTail()
    while( 1 )
    {
       // Iterate through to rightmost node.
-      
+
       {
          NodeRef tail = mTail;
          while( tail != NULL )
@@ -283,19 +283,19 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getTail()
                mTail.trySetFromTo( tail, next, NodeRef::TAG_Unset );
             else
                break;
-               
+
             tail = mTail;
          }
       }
-      
+
       // Clear out dead nodes at tail of list.
-      
+
       {
          NodeRef tail = mTail;
          if( tail != NULL && tail->mNext.isTagged() )
          {
             NodeRef prev = tail->mPrev;
-            
+
             mHead.trySetFromTo( tail, prev, NodeRef::TAG_Unset );
             mTail.trySetFromTo( tail, prev, NodeRef::TAG_Unset );
 
@@ -303,22 +303,22 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getTail()
                prev->mNext.trySetFromTo( tail, NULL );
 
             tail->mPrev.trySetFromTo( prev, NULL, NodeRef::TAG_Set );
-            
+
             continue; // Restart.
          }
       }
-      
+
       // Try tail.
-      
+
       NodeRef tail = mTail;
       if( tail != NULL && !tail->mNext.isTagged() )
       {
          result = tail;
          break;
       }
-         
+
       // Try head.
-      
+
       if( !tail )
       {
          tail = mHead;
@@ -327,7 +327,7 @@ typename ThreadSafeDeque< T >::NodeRef ThreadSafeDeque< T >::getTail()
       }
 
       // Update tail.
-      
+
       NodeRef next = tail->mNext;
       if( next != NULL )
       {

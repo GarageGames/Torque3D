@@ -38,8 +38,8 @@ function PlayGui::onWake(%this)
    {
       Canvas.pushDialog( MainChatHud );
       chatHud.attach(HudMessageVector);
-   }      
-   
+   }
+
    // just update the action map here
    moveMap.push();
 
@@ -54,7 +54,7 @@ function PlayGui::onSleep(%this)
 {
    if ( isObject( MainChatHud ) )
       Canvas.popDialog( MainChatHud );
-   
+
    // pop the keymaps
    moveMap.pop();
 }

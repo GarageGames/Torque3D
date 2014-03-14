@@ -25,7 +25,7 @@ function loadDirectory(%path, %type, %dsoType)
    if( %type $= "" )
       %type = "ed.cs";
    if( %dsoType $= "" )
-      %dsoType = "edso"; 
+      %dsoType = "edso";
 
    %cspath = %path @ "/*." @ %type;
 

@@ -31,8 +31,8 @@
 #endif
 
 GFXD3D9OcclusionQuery::GFXD3D9OcclusionQuery( GFXDevice *device )
- : GFXOcclusionQuery( device ), 
-   mQuery( NULL )   
+ : GFXOcclusionQuery( device ),
+   mQuery( NULL )
 {
 #ifdef TORQUE_GATHER_METRICS
    mTimer = PlatformTimer::create();
@@ -88,7 +88,7 @@ void GFXD3D9OcclusionQuery::end()
    mQuery->Issue( D3DISSUE_END );
 
 #ifdef TORQUE_GATHER_METRICS
-   AssertFatal( mBeginFrame == GuiTSCtrl::getFrameCount(), "GFXD3D9OcclusionQuery::end - ended query on different frame than begin!" );   
+   AssertFatal( mBeginFrame == GuiTSCtrl::getFrameCount(), "GFXD3D9OcclusionQuery::end - ended query on different frame than begin!" );
    mTimer->getElapsedMs();
    mTimer->reset();
 #endif
@@ -96,7 +96,7 @@ void GFXD3D9OcclusionQuery::end()
 
 GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bool block, U32 *data )
 {
-   // If this ever shows up near the top of a profile then your system is 
+   // If this ever shows up near the top of a profile then your system is
    // GPU bound or you are calling getStatus too soon after submitting it.
    //
    // To test if you are GPU bound resize your window very small and see if
@@ -124,7 +124,7 @@ GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bo
    DWORD dwOccluded = 0;
 
    if ( block )
-   {      
+   {
       while( ( hRes = mQuery->GetData( &dwOccluded, sizeof(DWORD), D3DGETDATA_FLUSH ) ) == S_FALSE )
          ;
    }
@@ -133,18 +133,18 @@ GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bo
       hRes = mQuery->GetData( &dwOccluded, sizeof(DWORD), 0 );
    }
 
-   if ( hRes == S_OK )   
+   if ( hRes == S_OK )
    {
       if ( data != NULL )
          *data = dwOccluded;
 
-      return dwOccluded > 0 ? NotOccluded : Occluded;   
+      return dwOccluded > 0 ? NotOccluded : Occluded;
    }
 
    if ( hRes == S_FALSE )
       return Waiting;
 
-   return Error;   
+   return Error;
 }
 
 void GFXD3D9OcclusionQuery::zombify()

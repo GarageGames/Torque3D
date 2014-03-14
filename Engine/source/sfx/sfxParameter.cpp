@@ -35,28 +35,28 @@ IMPLEMENT_CONOBJECT( SFXParameter );
 
 ConsoleDocClass( SFXParameter,
    "@brief A sound channel value that can be bound to multiple sound sources.\n\n"
-   
+
    "Parameters are special objects that isolate a specific property that sound sources can have and allows to bind "
    "this isolated instance to multiple sound sources such that when the value of the parameter changes, all sources "
    "bound to the parameter will have their respective property changed.\n\n"
-   
+
    "Parameters are identified and referenced by their #internalName.  This means that the SFXDescription::parameters and "
    "SFXTrack::parameters fields should contain the #internalNames of the SFXParameter objects which should be attached to "
    "the SFXSources when they are created.  No two SFXParameters should have the same #internalName.\n\n"
-   
+
    "All SFXParameter instances are automatically made children of the SFXParameterGroup.\n\n"
-   
+
    "@note To simply control the volume and/or pitch levels of a group of sounds, it is easier and more efficient to use "
       "a sound source group rather than SFXParameters (see @ref SFXSource_hierarchies).  Simply create a SFXSource object representing the group, assign "
       "SFXDescription::sourceGroup of the sounds appropriately, and then set the volume and/or pitch level of the group to "
       "modulate the respective properties of all children.\n\n"
-      
+
    "@section SFXParameter_updates Parameter Updates\n"
-   
+
    "Parameters are periodically allowed to update their own values.  This makes it possible to attach custom logic to a parameter "
    "and have individual parameters synchronize their values autonomously.  Use the onUpdate() callback to attach "
    "script code to a parameter update.\n\n"
-   
+
    "@tsexample\n"
       "new SFXParameter( EngineRPMLevel )\n"
       "{\n"
@@ -87,7 +87,7 @@ ConsoleDocClass( SFXParameter,
       "EngineRPMLevel.value = 0.5;\n"
       "EngineRPMLevel.value = 1.5;\n"
    "@endtsexample\n\n"
-   
+
    "@ref SFX_interactive\n\n"
    "@ingroup SFX"
 );
@@ -119,7 +119,7 @@ SFXParameter::~SFXParameter()
 void SFXParameter::initPersistFields()
 {
    addGroup( "Sound" );
-   
+
       addProtectedField( "value",         TypeF32,       Offset( mValue, SFXParameter ),
          &SFXParameter::_setValue, &defaultProtectedGetFn,
          "Current value of the audio parameter.\n"
@@ -141,9 +141,9 @@ void SFXParameter::initPersistFields()
          "Textual description of the parameter.\n"
          "Primarily for use in the Audio Parameters dialog of the editor to allow for easier identification "
          "of parameters." );
-      
+
    endGroup( "Sound" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -187,29 +187,29 @@ bool SFXParameter::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    mValue = mDefaultValue;
-      
+
    // Make sure the parameter has a name.
-      
+
    if( !getInternalName() || !getInternalName()[ 0 ] )
    {
       Con::errorf( "SFXParameter::onAdd - %i (%s): parameter object does not have a name", getId(), getName() );
       return false;
    }
-      
+
    // Make sure the parameter has a unique name.
-      
+
    if( find( getInternalName() ) )
    {
       Con::errorf( "SFXParameter::onAdd - %i (%s): a parameter called '%s' already exists", getId(), getName(), getInternalName() );
       return false;
    }
-      
+
    // Add us to the SFXParameter group.
-   
+
    Sim::getSFXParameterGroup()->addObject( this );
-      
+
    return true;
 }
 
@@ -241,7 +241,7 @@ void SFXParameter::setValue( F32 value )
 {
    if( value == mValue )
       return;
-      
+
    mValue = mClampF( value, mRange.x, mRange.y );
    mEventSignal.trigger( this, SFXParameterEvent_ValueChanged );
 }
@@ -259,13 +259,13 @@ void SFXParameter::setRange( const Point2F& range )
 {
    if( range == mRange )
       return;
-      
+
    mRange = range;
-   
+
    F32 value = mClampF( mValue, mRange.x, mRange.y );
    if( value != mValue )
       setValue( value );
-      
+
    mDefaultValue = mClampF( mDefaultValue, mRange.x, mRange.y );
 }
 
@@ -275,9 +275,9 @@ void SFXParameter::setChannel( SFXChannel channel )
 {
    if( mChannel == channel )
       return;
-      
+
    mChannel = channel;
-   
+
    F32 value = mValue;
    switch( channel )
    {
@@ -285,34 +285,34 @@ void SFXParameter::setChannel( SFXChannel channel )
       case SFXChannelConeOutsideVolume:
          setRange( 0.f, 1.0f );
          break;
-         
+
       case SFXChannelConeInsideAngle:
       case SFXChannelConeOutsideAngle:
          setRange( 0.f, 360.f );
          break;
-         
+
       case SFXChannelPitch:
       case SFXChannelMinDistance:
       case SFXChannelMaxDistance:
       case SFXChannelCursor:
          setRange( 0.f, TypeTraits< F32 >::MAX );
          break;
-         
+
       case SFXChannelStatus:
          setRange( F32( SFXStatusPlaying ), F32( SFXStatusStopped ) );
          break;
-                     
+
       default:
          setRange( TypeTraits< F32 >::MIN, TypeTraits< F32 >::MAX );
          break;
    }
-   
+
    // If the range setting did not result in the value already
    // being changed, fire a value-change signal now so that sources
    // can catch on to the new semantics.  Unfortunately, we can't
    // do something about the old semantic's value having been
    // changed by us.
-   
+
    if( mValue == value )
       mEventSignal.trigger( this, SFXParameterEvent_ValueChanged );
 }

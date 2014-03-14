@@ -80,7 +80,7 @@ public:
    virtual void addCapsule(   F32 radius,
                               F32 height,
                               const MatrixF &localXfm );
-   virtual bool addConvex( const Point3F *points, 
+   virtual bool addConvex( const Point3F *points,
                            U32 count,
                            const MatrixF &localXfm );
    virtual bool addTriangleMesh( const Point3F *vert,

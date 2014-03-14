@@ -73,8 +73,8 @@ namespace {
 const U32 sIntergrationsPerTick = 1;
 const F32 sHoverVehicleGravity  = -20;
 
-const U32 sCollisionMoveMask = (TerrainObjectType     | PlayerObjectType  | 
-                                StaticShapeObjectType | VehicleObjectType | 
+const U32 sCollisionMoveMask = (TerrainObjectType     | PlayerObjectType  |
+                                StaticShapeObjectType | VehicleObjectType |
                                 VehicleBlockerObjectType);
 
 const U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
@@ -527,7 +527,7 @@ bool HoverVehicle::onNewDataBlock(GameBaseData* dptr, bool reload)
    if (!mDataBlock || !Parent::onNewDataBlock(dptr,reload))
       return false;
 
-   if (isGhost()) 
+   if (isGhost())
    {
       // Create the sounds ahead of time.  This reduces runtime
       // costs and makes the system easier to understand.
@@ -560,7 +560,7 @@ void HoverVehicle::advanceTime(F32 dt)
    Parent::advanceTime(dt);
 
    // Update jetsound...
-   if ( mJetSound ) 
+   if ( mJetSound )
    {
       if ( mJetting )
       {
@@ -569,7 +569,7 @@ void HoverVehicle::advanceTime(F32 dt)
 
          mJetSound->setTransform( getTransform() );
       }
-      else 
+      else
          mJetSound->stop();
    }
 
@@ -723,8 +723,8 @@ void HoverVehicle::updateForces(F32 /*dt*/)
 
    for (j = 0; j < 2; j++) {
       if (getContainer()->castRay(stabPoints[j].wsPoint, stabPoints[j].wsPoint + stabPoints[j].wsExtension * 2.0,
-                                  TerrainObjectType | 
-                                  WaterObjectType, &rinfo)) 
+                                  TerrainObjectType |
+                                  WaterObjectType, &rinfo))
       {
          reallyFloating = false;
 
@@ -737,7 +737,7 @@ void HoverVehicle::updateForces(F32 /*dt*/)
 
          normal[j] = rinfo.normal;
       }
-      
+
       if ( pointInWater( stabPoints[j].wsPoint ) )
          compression[j] = baseStabLen;
    }

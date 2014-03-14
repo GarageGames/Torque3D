@@ -51,7 +51,7 @@ U32 GFXTextureObject::dumpActiveTOs()
    Con::printf(" Addr   Dim. GFXTextureProfile  ProfilerPath DebugDescription");
 
    for(GFXTextureObject *walk = smHead; walk; walk=walk->mDebugNext)
-      Con::printf(" %x  (%4d, %4d)  %s    %s    %s", walk, walk->getWidth(), 
+      Con::printf(" %x  (%4d, %4d)  %s    %s    %s", walk, walk->getWidth(),
       walk->getHeight(), walk->mProfile->getName().c_str(), walk->mDebugCreationPath.c_str(), walk->mDebugDescription.c_str());
 
    Con::printf("----- dump complete -------------------------------------------");
@@ -71,7 +71,7 @@ DefineEngineFunction( dumpTextureObjects, void, (),,
 //-----------------------------------------------------------------------------
 // GFXTextureObject
 //-----------------------------------------------------------------------------
-GFXTextureObject::GFXTextureObject(GFXDevice *aDevice, GFXTextureProfile *aProfile) 
+GFXTextureObject::GFXTextureObject(GFXDevice *aDevice, GFXTextureProfile *aProfile)
 {
    mHashNext = mNext = mPrev = NULL;
 
@@ -90,7 +90,7 @@ GFXTextureObject::GFXTextureObject(GFXDevice *aDevice, GFXTextureProfile *aProfi
 
    mBitmap = NULL;
    mDDS    = NULL;
-   
+
    mFormat = GFXFormatR8G8B8;
 
    mHasTransparency = false;
@@ -99,7 +99,7 @@ GFXTextureObject::GFXTextureObject(GFXDevice *aDevice, GFXTextureProfile *aProfi
    // Active object tracking.
    smActiveTOCount++;
    mDebugDescription = "Anonymous Texture Object";
-#if defined(TORQUE_ENABLE_PROFILE_PATH)   
+#if defined(TORQUE_ENABLE_PROFILE_PATH)
    mDebugCreationPath = gProfiler->getProfilePath();
 #endif
    mDebugNext = smHead;
@@ -118,7 +118,7 @@ GFXTextureObject::GFXTextureObject(GFXDevice *aDevice, GFXTextureProfile *aProfi
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
-GFXTextureObject::~GFXTextureObject() 
+GFXTextureObject::~GFXTextureObject()
 {
    kill();
 
@@ -163,7 +163,7 @@ void GFXTextureObject::kill()
 #endif
 
    // If we're a dummy, don't do anything...
-   if( !mDevice || !mDevice->mTextureManager ) 
+   if( !mDevice || !mDevice->mTextureManager )
    {
       mDead = true;
       return;
@@ -187,10 +187,10 @@ void GFXTextureObject::kill()
 
 const String GFXTextureObject::describeSelf() const
 {
-   return String::ToString(" (width: %4d, height: %4d)  profile: %s   creation path: %s", getWidth(), 
-#if defined(TORQUE_DEBUG) && defined(TORQUE_ENABLE_PROFILER)  
+   return String::ToString(" (width: %4d, height: %4d)  profile: %s   creation path: %s", getWidth(),
+#if defined(TORQUE_DEBUG) && defined(TORQUE_ENABLE_PROFILER)
       getHeight(), mProfile->getName().c_str(), mDebugCreationPath.c_str());
-#else                  
+#else
       getHeight(), mProfile->getName().c_str(), "");
 #endif
 }
@@ -241,7 +241,7 @@ U32 GFXTextureObject::getEstimatedSizeInBytes() const
 }
 
 bool GFXTextureObject::dumpToDisk( const String &bmType, const String &path )
-{   
+{
    FileStream stream;
    if ( !stream.open( path, Torque::FS::File::Write ) )
       return false;

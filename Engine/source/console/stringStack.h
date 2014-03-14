@@ -255,7 +255,7 @@ struct StringStack
       return ret;
    }
 
-   
+
    void pushFrame()
    {
       mFrameOffsets[mNumFrames++] = mStartStackSize;

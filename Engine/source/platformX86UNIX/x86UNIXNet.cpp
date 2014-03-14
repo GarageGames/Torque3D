@@ -133,7 +133,7 @@ void Net::shutdown()
 {
    while (gPolledSockets.size() > 0)
       closeConnectTo(gPolledSockets[0]->fd);
-   
+
    closePort();
    NetAsync::stopAsync();
 }
@@ -243,7 +243,7 @@ NetSocket Net::openConnectTo(const char *addressString)
       addressString += 3;  // eat off the ip:
    char remoteAddr[256];
    dStrcpy(remoteAddr, addressString);
-      
+
    char *portString = dStrchr(remoteAddr, ':');
 
    U16 port;
@@ -269,7 +269,7 @@ NetSocket Net::openConnectTo(const char *addressString)
 
    sockaddr_in ipAddr;
    dMemset(&ipAddr, 0, sizeof(ipAddr));
-   
+
    if (inet_aton(remoteAddr, &ipAddr.sin_addr) != 0)
    {
       ipAddr.sin_port = port;
@@ -277,7 +277,7 @@ NetSocket Net::openConnectTo(const char *addressString)
       if(::connect(sock, (struct sockaddr *)&ipAddr, sizeof(ipAddr)) == -1 &&
          errno != EINPROGRESS)
       {
-         Con::errorf("Error connecting %s: %s", 
+         Con::errorf("Error connecting %s: %s",
 		     addressString, strerror(errno));
          ::close(sock);
          sock = InvalidSocket;
@@ -313,7 +313,7 @@ void Net::closeConnectTo(NetSocket sock)
          gPolledSockets.erase(i);
          break;
       }
-   
+
    closeSocket(sock);
 }
 
@@ -323,7 +323,7 @@ Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, int bufferSize)
    {
       U32 e;
       Game->journalRead(&e);
-      
+
       return (Net::Error) e;
    }
    Net::Error e = send(socket, buffer, bufferSize);
@@ -338,7 +338,7 @@ bool Net::openPort(S32 port)
       close(udpSocket);
    if(ipxSocket != InvalidSocket)
       close(ipxSocket);
-      
+
    udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
    ipxSocket = socket(AF_IPX, SOCK_DGRAM, 0);
 
@@ -364,7 +364,7 @@ bool Net::openPort(S32 port)
    if(ipxSocket != InvalidSocket)
    {
       Net::Error error = NoError;
-      sockaddr_ipx ipxAddress;   
+      sockaddr_ipx ipxAddress;
       memset((char *)&ipxAddress, 0, sizeof(ipxAddress));
       ipxAddress.sipx_family = AF_IPX;
       ipxAddress.sipx_port = htons(port);
@@ -441,17 +441,17 @@ void Net::process()
          addrLen = sizeof(sa);
          bytesRead = recvfrom(ipxSocket, (char *) receiveEvent.data, MaxPacketDataSize, 0, &sa, &addrLen);
       }
-      
+
       if(bytesRead == -1)
          break;
-      
+
       if(sa.sa_family == AF_INET)
          IPSocketToNetAddress((sockaddr_in *) &sa, &receiveEvent.sourceAddress);
       else if(sa.sa_family == AF_IPX)
          IPXSocketToNetAddress((sockaddr_ipx *) &sa, &receiveEvent.sourceAddress);
       else
          continue;
-         
+
       NetAddress &na = receiveEvent.sourceAddress;
       if(na.type == NetAddress::IPAddress &&
          na.netNum[0] == 127 &&
@@ -487,7 +487,7 @@ void Net::process()
    char out_h_addr[1024];
    int out_h_length = 0;
 
-   for (S32 i = 0; i < gPolledSockets.size(); 
+   for (S32 i = 0; i < gPolledSockets.size();
         /* no increment, this is done at end of loop body */)
    {
       removeSock = false;
@@ -500,7 +500,7 @@ void Net::process()
          case ConnectionPending:
             notifyEvent.tag = currentSock->fd;
             // see if it is now connected
-            if (getsockopt(currentSock->fd, SOL_SOCKET, SO_ERROR, 
+            if (getsockopt(currentSock->fd, SOL_SOCKET, SO_ERROR,
                            &optval, &optlen) == -1)
             {
                Con::errorf("Error getting socket options: %s", strerror(errno));
@@ -534,7 +534,7 @@ void Net::process()
          case Connected:
             bytesRead = 0;
             // try to get some data
-            err = Net::recv(currentSock->fd, cReceiveEvent.data, 
+            err = Net::recv(currentSock->fd, cReceiveEvent.data,
                             MaxPacketDataSize, &bytesRead);
             if(err == Net::NoError)
             {
@@ -542,16 +542,16 @@ void Net::process()
                {
                   // got some data, post it
                   cReceiveEvent.tag = currentSock->fd;
-                  cReceiveEvent.size = ConnectedReceiveEventHeaderSize + 
+                  cReceiveEvent.size = ConnectedReceiveEventHeaderSize +
                      bytesRead;
                   Game->postEvent(cReceiveEvent);
                }
-               else 
+               else
                {
                   // zero bytes read means EOF
                   if (bytesRead < 0)
                      // ack! this shouldn't happen
-                     Con::errorf("Unexpected error on socket: %s", 
+                     Con::errorf("Unexpected error on socket: %s",
                                  strerror(errno));
 
                   notifyEvent.tag = currentSock->fd;
@@ -572,10 +572,10 @@ void Net::process()
          case NameLookupRequired:
             // is the lookup complete?
             if (!gNetAsync.checkLookup(
-                   currentSock->fd, out_h_addr, &out_h_length, 
+                   currentSock->fd, out_h_addr, &out_h_length,
                    sizeof(out_h_addr)))
                break;
-            
+
             notifyEvent.tag = currentSock->fd;
             if (out_h_length == -1)
             {
@@ -589,7 +589,7 @@ void Net::process()
                dMemcpy(&(ipAddr.sin_addr.s_addr), out_h_addr, out_h_length);
                ipAddr.sin_port = currentSock->remotePort;
                ipAddr.sin_family = AF_INET;
-               if(::connect(currentSock->fd, (struct sockaddr *)&ipAddr, 
+               if(::connect(currentSock->fd, (struct sockaddr *)&ipAddr,
                             sizeof(ipAddr)) == -1)
                {
                   if (errno == EINPROGRESS)
@@ -599,7 +599,7 @@ void Net::process()
                   }
                   else
                   {
-                     Con::errorf("Error connecting to %s: %s", 
+                     Con::errorf("Error connecting to %s: %s",
                                  currentSock->remoteAddr, strerror(errno));
                      notifyEvent.state = ConnectedNotifyEvent::ConnectFailed;
                      removeSock = true;
@@ -611,10 +611,10 @@ void Net::process()
                   currentSock->state = Connected;
                }
             }
-            Game->postEvent(notifyEvent);			
+            Game->postEvent(notifyEvent);
             break;
     	 case Listening:
-            incoming = 
+            incoming =
                Net::accept(currentSock->fd, &acceptEvent.address);
             if(incoming != InvalidSocket)
             {
@@ -627,7 +627,7 @@ void Net::process()
             break;
       }
 
-      // only increment index if we're not removing the connection, since 
+      // only increment index if we're not removing the connection, since
       // the removal will shift the indices down by one
       if (removeSock)
          closeConnectTo(currentSock->fd);
@@ -635,7 +635,7 @@ void Net::process()
          i++;
    }
 }
-                 
+
 NetSocket Net::openSocket()
 {
    int retSocket;
@@ -682,7 +682,7 @@ NetSocket Net::accept(NetSocket acceptSocket, NetAddress *remoteAddress)
 {
    sockaddr_in socketAddress;
    U32 addrLen = sizeof(socketAddress);
-   
+
    int retVal = ::accept(acceptSocket, (sockaddr *) &socketAddress, &addrLen);
    if(retVal != InvalidSocket)
    {
@@ -695,7 +695,7 @@ NetSocket Net::accept(NetSocket acceptSocket, NetAddress *remoteAddress)
 Net::Error Net::bind(NetSocket socket, U16 port)
 {
    S32 error;
-   
+
    sockaddr_in socketAddress;
    dMemset((char *)&socketAddress, 0, sizeof(socketAddress));
    socketAddress.sin_family = AF_INET;
@@ -750,7 +750,7 @@ Net::Error Net::setBroadcast(NetSocket socket, bool broadcast)
    S32 error = setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (char*)&bc, sizeof(bc));
    if(!error)
       return NoError;
-   return getLastError();   
+   return getLastError();
 }
 
 Net::Error Net::setBlocking(NetSocket socket, bool blockingIO)
@@ -759,7 +759,7 @@ Net::Error Net::setBlocking(NetSocket socket, bool blockingIO)
    S32 error = ioctl(socket, FIONBIO, &notblock);
    if(!error)
       return NoError;
-   return getLastError();   
+   return getLastError();
 }
 
 Net::Error Net::send(NetSocket socket, const U8 *buffer, S32 bufferSize)
@@ -787,7 +787,7 @@ Net::Error Net::recv(NetSocket socket, U8 *buffer, S32 bufferSize, S32 *bytesRea
 
 bool Net::compareAddresses(const NetAddress *a1, const NetAddress *a2)
 {
-   if((a1->type != a2->type)  || 
+   if((a1->type != a2->type)  ||
       (*((U32 *)a1->netNum) != *((U32 *)a2->netNum)) ||
       (a1->port != a2->port))
       return false;
@@ -805,21 +805,21 @@ bool Net::stringToAddress(const char *addressString, NetAddress *address)
    if(dStrnicmp(addressString, "ipx:", 4))
    {
       // assume IP if it doesn't have ipx: at the front.
-      
+
       if(!dStrnicmp(addressString, "ip:", 3))
          addressString += 3;  // eat off the ip:
-      
+
       sockaddr_in ipAddr;
       char remoteAddr[256];
       if(strlen(addressString) > 255)
          return false;
-         
+
       dStrcpy(remoteAddr, addressString);
-         
+
       char *portString = dStrchr(remoteAddr, ':');
       if(portString)
          *portString++ = '\0';
-      
+
       struct hostent *hp;
       if(!dStricmp(remoteAddr, "broadcast"))
          ipAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
@@ -846,10 +846,10 @@ bool Net::stringToAddress(const char *addressString, NetAddress *address)
       S32 i;
       S32 port;
 
-      address->type = NetAddress::IPXAddress;      
+      address->type = NetAddress::IPXAddress;
       for(i = 0; i < 6; i++)
          address->nodeNum[i] = 0xFF;
-         
+
       // it's an IPX string
       addressString += 4;
       if(!dStricmp(addressString, "broadcast"))
@@ -868,9 +868,9 @@ bool Net::stringToAddress(const char *addressString, NetAddress *address)
          S32 netNum[4];
          S32 count = dSscanf(addressString, "%2x%2x%2x%2x:%2x%2x%2x%2x%2x%2x:%d",
                              &netNum[0], &netNum[1], &netNum[2], &netNum[3],
-                             &nodeNum[0], &nodeNum[1], &nodeNum[2], &nodeNum[3], &nodeNum[4], &nodeNum[5], 
+                             &nodeNum[0], &nodeNum[1], &nodeNum[2], &nodeNum[3], &nodeNum[4], &nodeNum[5],
                              &port);
-      
+
          if(count == 10)
          {
             port = defaultPort;
@@ -895,7 +895,7 @@ void Net::addressToString(const NetAddress *address, char addressString[256])
    {
       sockaddr_in ipAddr;
       netToIPSocketAddress(address, &ipAddr);
-      
+
       if(ipAddr.sin_addr.s_addr == htonl(INADDR_BROADCAST))
          dSprintf(addressString, 256, "IP:Broadcast:%d", ntohs(ipAddr.sin_port));
       else
@@ -908,8 +908,8 @@ void Net::addressToString(const NetAddress *address, char addressString[256])
    {
       return;
       dSprintf(addressString, 256, "IPX:%.2X%.2X%.2X%.2X:%.2X%.2X%.2X%.2X%.2X%.2X:%d",
-               address->netNum[0], address->netNum[1], address->netNum[2], address->netNum[3], 
-               address->nodeNum[0], address->nodeNum[1], address->nodeNum[2], address->nodeNum[3], address->nodeNum[4], address->nodeNum[5], 
+               address->netNum[0], address->netNum[1], address->netNum[2], address->netNum[3],
+               address->nodeNum[0], address->nodeNum[1], address->nodeNum[2], address->nodeNum[3], address->nodeNum[4], address->nodeNum[5],
                address->port);
    }
 }

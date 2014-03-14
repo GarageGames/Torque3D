@@ -37,13 +37,13 @@ MODULE_BEGIN( SFX3D )
 
    MODULE_INIT_AFTER( Scene )
    MODULE_SHUTDOWN_BEFORE( Scene )
-   
+
    MODULE_INIT
    {
       if( !Con::getBoolVariable( "$SFX::noSFXWorld", false ) )
          gSFX3DWorld = new SFX3DWorld;
    }
-   
+
    MODULE_SHUTDOWN
    {
       if( gSFX3DWorld )
@@ -77,7 +77,7 @@ SFX3DObject::SFX3DObject( SFX3DWorld* world, SceneObject* object )
 
 void SFX3DObject::getEarTransform( MatrixF& transform ) const
 {
-   // If it's not a ShapeBase, just use the object transform.   
+   // If it's not a ShapeBase, just use the object transform.
    ShapeBase* shape = dynamic_cast< ShapeBase* >( mObject );
    if ( !shape )
    {
@@ -97,9 +97,9 @@ void SFX3DObject::getEarTransform( MatrixF& transform ) const
 
    ShapeBaseData* datablock = dynamic_cast< ShapeBaseData* >( shape->getDataBlock() );
    AssertFatal( datablock, "SFX3DObject::getEarTransform() - shape without ShapeBaseData datablock!" );
-   
+
    // Get the transform for the ear node.
-       
+
    const S32 earNode = datablock->earNode;
 
    if ( earNode != -1 && earNode != datablock->eyeNode )
@@ -122,14 +122,14 @@ void SFX3DObject::getReferenceCenter( F32 position[ 3 ] ) const
    MatrixF transform;
    getEarTransform( transform );
    Point3F pos = transform.getPosition();
-   
+
    AssertFatal( TypeTraits< F32 >::MIN <= pos.x && pos.x <= TypeTraits< F32 >::MAX,
       "SFX3DObject::getReferenceCenter - invalid float in reference center X position" );
    AssertFatal( TypeTraits< F32 >::MIN <= pos.y && pos.y <= TypeTraits< F32 >::MAX,
       "SFX3DObject::getReferenceCenter - invalid float in reference center Y position" );
    AssertFatal( TypeTraits< F32 >::MIN <= pos.z && pos.z <= TypeTraits< F32 >::MAX,
       "SFX3DObject::getReferenceCenter - invalid float in reference center Z position" );
-   
+
    dMemcpy( position, &pos.x, sizeof( F32 ) * 3 );
 }
 
@@ -187,16 +187,16 @@ bool SFX3DWorld::_isTrackableObject( SceneObject* object ) const
 {
    if( !Parent::_isTrackableObject( object ) )
       return false;
-      
+
    // We are only interested in occluders, zones, and portals.
-      
+
    if( object->isOccludingSound() )
       return true;
    else if( object->getSoundAmbience() )
       return true;
    else if( dynamic_cast< Portal* >( object ) )
       return true;
-      
+
    return false;
 }
 
@@ -213,19 +213,19 @@ void SFX3DWorld::registerObject( SceneObject* object )
 {
    if( !_isTrackableObject( object ) )
       return;
-      
+
    // Construct a new scene object link.
-      
+
    SFX3DObject* sfxObject = mChunker.alloc();
    constructInPlace( sfxObject, this, object );
-   
+
    // Register it with the SFX world.
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFX3DWorld] Registering %i:%s as 0x%x",
       object->getId(), object->getClassName(), sfxObject );
    #endif
-   
+
    mSFXWorld.registerObject( sfxObject );
 }
 
@@ -236,21 +236,21 @@ void SFX3DWorld::unregisterObject( SceneObject* object )
    SFX3DObject* sfxObject = dynamic_cast< SFX3DObject* >( SFX3DObject::getLinkForTracker( this, object ) );
    if( !sfxObject )
       return;
-      
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFX3DWorld] Unregistering %i:%s (was 0x%x)",
       object->getId(), object->getClassName(), sfxObject );
    #endif
 
    // Remove the object from the SFX world.
-      
+
    if( sfxObject->isListener() )
       mSFXWorld.setReferenceObject( NULL );
    else
       mSFXWorld.unregisterObject( sfxObject );
-   
+
    // Destroy the scene object link.
-   
+
    destructInPlace( sfxObject );
    mChunker.free( sfxObject );
 }
@@ -261,18 +261,18 @@ void SFX3DWorld::updateObject( SceneObjectLink* object )
 {
    SFX3DObject* sfxObject = dynamic_cast< SFX3DObject* >( object );
    AssertFatal( sfxObject, "SFX3DWorld::updateObject - invalid object type" );
-   
+
    mSFXWorld.updateObject( sfxObject );
-   
+
    // If this is the listener object, update its
    // properties on the SFX system.
-   
+
    if( sfxObject->isListener() )
    {
       SFXListenerProperties listener;
       sfxObject->getEarTransform( listener.getTransform() );
       listener.getVelocity() = sfxObject->getObject()->getVelocity();
-      
+
       SFX->setListener( 0, listener );
    }
 }
@@ -284,7 +284,7 @@ SceneObject* SFX3DWorld::getListener() const
    SFX3DObject* object = mSFXWorld.getReferenceObject();
    if( !object )
       return NULL;
-      
+
    return object->getObject();
 }
 

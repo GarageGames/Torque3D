@@ -21,7 +21,7 @@
    resizeHeight = "0";
    EdgeSnap = "0";
    text ="";
-   
+
    new GuiTextCtrl() {
       profile = "ToolsGuiTextProfile";
       horizSizing = "right";
@@ -64,5 +64,5 @@
       groupNum = "-1";
       buttonType = "PushButton";
       useMouseEvents = "0";
-   };         
+   };
 };

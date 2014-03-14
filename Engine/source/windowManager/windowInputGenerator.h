@@ -38,7 +38,7 @@ class PlatformWindow;
 class WindowInputGenerator
 {
       bool mNotifyPosition;
-      
+
    protected:
 
       PlatformWindow *mWindow;
@@ -61,14 +61,14 @@ class WindowInputGenerator
       void handleInputEvent (U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier);
 
       void generateInputEvent( InputEventInfo &inputEvent );
-      
+
    public:
-   
+
       WindowInputGenerator( PlatformWindow *window );
       virtual ~WindowInputGenerator();
 
       void setInputController( IProcessInput *inputController ) { mInputController = inputController; };
-      
+
       /// Returns true if the given keypress event should be send as a raw keyboard
       /// event even if it maps to a character input event.
       bool wantAsKeyboardEvent( U32 modifiers, U32 key );

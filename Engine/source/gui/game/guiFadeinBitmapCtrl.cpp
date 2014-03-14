@@ -88,7 +88,7 @@ GuiFadeinBitmapCtrl::GuiFadeinBitmapCtrl()
 void GuiFadeinBitmapCtrl::initPersistFields()
 {
    addGroup( "Fading" );
-   
+
       addField( "fadeColor", TypeColorF, Offset( mFadeColor, GuiFadeinBitmapCtrl ),
          "Color to fade in from and fade out to." );
       addField( "fadeInTime", TypeS32, Offset( mFadeInTime, GuiFadeinBitmapCtrl ),
@@ -103,9 +103,9 @@ void GuiFadeinBitmapCtrl::initPersistFields()
          "Easing curve for fade-out." );
       addField( "done", TypeBool, Offset( mDone, GuiFadeinBitmapCtrl ),
          "Whether the fade cycle has finished running." );
-      
+
    endGroup( "Fading" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -138,10 +138,10 @@ bool GuiFadeinBitmapCtrl::onWake()
 {
    if( !Parent::onWake() )
       return false;
-      
+
    // Reset reference time.
    mStartTime = 0;
-   
+
    return true;
 }
 
@@ -150,17 +150,17 @@ bool GuiFadeinBitmapCtrl::onWake()
 void GuiFadeinBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    Parent::onRender(offset, updateRect);
-   
+
    // Set reference time if we haven't already.  This is done here when rendering
    // starts so that we begin counting from the time the control is actually
    // visible rather than from its onWake() (which may be a considerable time
    // before the control actually gets to render).
-   
+
    if( !mStartTime )
       mStartTime = Platform::getRealMilliseconds();
-      
+
    // Compute overlay alpha.
-   
+
    U32 elapsed = Platform::getRealMilliseconds() - mStartTime;
 
    U32 alpha;
@@ -185,17 +185,17 @@ void GuiFadeinBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
       // done state
       alpha = mFadeOutTime ? 255 : 0;
       mDone = true;
-      
+
       // Trigger onDone callback except when in Gui Editor.
 
       if( !smDesignTime )
 		  onDone_callback();
    }
-   
+
    // Render overlay on top of bitmap.
-   
+
    ColorI color = mFadeColor;
    color.alpha = alpha;
-   
+
    GFX->getDrawUtil()->drawRectFill( offset, getExtent() + offset, color );
 }

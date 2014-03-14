@@ -35,7 +35,7 @@ template<typename Signature> class JournaledSignal;
 
 /// A specialized signal object for journaling input.
 /// @see Journal
-template<> 
+template<>
 class JournaledSignal<void()> : public Signal<void()>
 {
    typedef Signal<void()> Parent;
@@ -60,7 +60,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A> 
+template<class A>
 class JournaledSignal<void(A)> : public Signal<void(A)>
 {
    typedef Signal<void(A)> Parent;
@@ -83,7 +83,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B> 
+template<class A, class B>
 class JournaledSignal<void(A,B)> : public Signal<void(A,B)>
 {
    typedef Signal<void(A,B)> Parent;
@@ -106,7 +106,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C> 
+template<class A, class B, class C>
 class JournaledSignal<void(A,B,C)> : public Signal<void(A,B,C)>
 {
    typedef Signal<void(A,B,C)> Parent;
@@ -129,7 +129,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D> 
+template<class A, class B, class C, class D>
 class JournaledSignal<void(A,B,C,D)> : public Signal<void(A,B,C,D)>
 {
    typedef Signal<void(A,B,C,D)> Parent;
@@ -152,7 +152,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E> 
+template<class A, class B, class C, class D, class E>
 class JournaledSignal<void(A,B,C,D,E)> : public Signal<void(A,B,C,D,E)>
 {
    typedef Signal<void(A,B,C,D,E)> Parent;
@@ -175,7 +175,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E, class F> 
+template<class A, class B, class C, class D, class E, class F>
 class JournaledSignal<void(A,B,C,D,E,F)> : public Signal<void(A,B,C,D,E,F)>
 {
    typedef Signal<void(A,B,C,D,E,F)> Parent;
@@ -198,7 +198,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E, class F, class G> 
+template<class A, class B, class C, class D, class E, class F, class G>
 class JournaledSignal<void(A,B,C,D,E,F,G)> : public Signal<void(A,B,C,D,E,F,G)>
 {
    typedef Signal<void(A,B,C,D,E,F,G)> Parent;
@@ -221,7 +221,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E, class F, class G, class H> 
+template<class A, class B, class C, class D, class E, class F, class G, class H>
 class JournaledSignal<void(A,B,C,D,E,F,G,H)> : public Signal<void(A,B,C,D,E,F,G,H)>
 {
    typedef Signal<void(A,B,C,D,E,F,G,H)> Parent;
@@ -244,7 +244,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K> 
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K>
 class JournaledSignal<void(A,B,C,D,E,F,G,H,I,J,K)> : public Signal<void(A,B,C,D,E,F,G,H,I,J,K)>
 {
    typedef Signal<void(A,B,C,D,E,F,G,H,I,J,K)> Parent;
@@ -267,7 +267,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L> 
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L>
 class JournaledSignal<void(A,B,C,D,E,F,G,H,I,J,K,L)> : public Signal<void(A,B,C,D,E,F,G,H,I,J,K,L)>
 {
    typedef Signal<void(A,B,C,D,E,F,G,H,I,J,K,L)> Parent;
@@ -290,7 +290,7 @@ public:
 };
 
 /// @copydoc JournaledSignal<void()>
-template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L, class M> 
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L, class M>
 class JournaledSignal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)> : public Signal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)>
 {
    typedef Signal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)> Parent;
@@ -344,7 +344,7 @@ enum ApplicationMessage {
    WindowOpen,          ///< Window opened
    WindowClose,         ///< Window closed.
    WindowShown,         ///< Window has been shown on screen
-   WindowHidden,        ///< Window has become hidden 
+   WindowHidden,        ///< Window has become hidden
    WindowDestroy,       ///< Window was destroyed.
    GainCapture,         ///< Window will capture all input
    LoseCapture,         ///< Window will no longer capture all input

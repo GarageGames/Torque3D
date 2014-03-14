@@ -59,7 +59,7 @@ RectClipper::clipLine(const Point2I& in_rStart,
    //  converted to FP math for greater precision on the back end...
    //
    bool flipped = false;
-   if (x1 > x2) 
+   if (x1 > x2)
    {
       swap(x1, x2);
       swap(y1, y2);
@@ -71,7 +71,7 @@ RectClipper::clipLine(const Point2I& in_rStart,
 
    // Clip x coord
    F32 t;
-   if (x1 < F32(m_clipRect.point.x)) 
+   if (x1 < F32(m_clipRect.point.x))
    {
       t   = (F32(m_clipRect.point.x) - x1) / F32(dx);
       x1  = F32(m_clipRect.point.x);
@@ -94,14 +94,14 @@ RectClipper::clipLine(const Point2I& in_rStart,
          (y1 < F32(m_clipRect.point.y) && y2 < F32(m_clipRect.point.y)))
       return false;
 
-   if (y1 > y2) 
+   if (y1 > y2)
    {
       swap(x1, x2);
       swap(y1, y2);
       flipped = !flipped;
    }
 
-   if (y1 < F32(m_clipRect.point.y)) 
+   if (y1 < F32(m_clipRect.point.y))
    {
       t   = (F32(m_clipRect.point.y) - y1) / F32(dy);
       y1  = F32(m_clipRect.point.y);
@@ -116,14 +116,14 @@ RectClipper::clipLine(const Point2I& in_rStart,
       x2  = x1 + (t * dx);
    }
 
-   if (flipped == true) 
+   if (flipped == true)
    {
       out_rEnd.x   = S32(x1 + 0.5f);
       out_rEnd.y   = S32(y1 + 0.5f);
       out_rStart.x = S32(x2 + 0.5f);
       out_rStart.y = S32(y2 + 0.5f);
-   } 
-   else 
+   }
+   else
    {
       out_rStart.x = S32(x1 + 0.5f);
       out_rStart.y = S32(y1 + 0.5f);

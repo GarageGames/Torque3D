@@ -195,7 +195,7 @@ new GuiControl(TerrainEditorValuesSettingsGui, EditorGuiGroup) {
             minExtent = "8 8";
             visible = "1";
             helpTag = "0";
-            text = "Soft Selection";   
+            text = "Soft Selection";
             tooltipprofile = "ToolsGuiToolTipProfile";
             tooltip = "This spline scale modifies the hardness of the brush.  Left is center, right is outer edge.";
             maxLength = "255";

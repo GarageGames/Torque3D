@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 // Notice:
-// Some of this code originates from an article in AI Game Programming Wisdom 
+// Some of this code originates from an article in AI Game Programming Wisdom
 // by Dave Mark.
 
 #ifndef _TRESPONSECURVE_H_
@@ -50,7 +50,7 @@ class Sigmoid
 public:
    Sigmoid( F32 s, F32 m) { _s = s; _m = m; }
    ~Sigmoid() {};
-   
+
    inline F32 get( F32 x )
    {
       F32 pow = -2.0f * ( ( x - _m ) / _s );
@@ -92,7 +92,7 @@ public:
    void addPoint( F32 f, const T &val );
    //void addPoints( U32 count, F32 f[], const T &val[] );
    T getVal( F32 f ) const;
-   S32 setPoint( S32 idx, F32 f, const T &val ); 
+   S32 setPoint( S32 idx, F32 f, const T &val );
    void removePoint( S32 idx );
    S32 getSampleCount() const { return mSamples.size(); }
 };
@@ -100,7 +100,7 @@ public:
 //-----------------------------------------------------------------------------
 // Adds a new value to the Response Curve, at the position f
 //-----------------------------------------------------------------------------
-template< class T > 
+template< class T >
 inline void ResponseCurve<T>::addPoint( F32 f, const T &val )
 {
    typename SampleList::iterator iter = mSamples.begin();
@@ -123,7 +123,7 @@ inline void ResponseCurve<T>::addPoint( F32 f, const T &val )
 // Finds the right value at position f, interpolating between the previous
 // and the following values
 //-----------------------------------------------------------------------------
-template< class T > 
+template< class T >
 inline T ResponseCurve<T>::getVal( F32 f ) const
 {
    T retVal;
@@ -162,11 +162,11 @@ inline T ResponseCurve<T>::getVal( F32 f ) const
    return retVal;
 }
 
-template< class T > 
+template< class T >
 inline S32 ResponseCurve< T >::setPoint( S32 idx, F32 f, const T &val )
-{   
+{
    mSamples.erase( idx );
-   
+
    typename SampleList::iterator iter = mSamples.begin();
    for ( ; iter != mSamples.end(); iter++ )
    {
@@ -189,7 +189,7 @@ inline S32 ResponseCurve< T >::setPoint( S32 idx, F32 f, const T &val )
 class FloatCurve : public ResponseCurve<F32>
 {
 public:
-   FloatCurve() {}   
+   FloatCurve() {}
 };
 
 

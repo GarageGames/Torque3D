@@ -31,7 +31,7 @@
 ForestWindAccumulator::ForestWindAccumulator( const TreePlacementInfo &info )
 :  mCurrentStrength( 0.0f )
 {
-   mCurrentDir.set( 0, 0 );   
+   mCurrentDir.set( 0, 0 );
    mPosition.set( info.pos );
    mScale = info.scale;
 
@@ -112,7 +112,7 @@ void ForestWindAccumulator::_updateParticle( VerletParticle *particle, const Poi
    // x* is the last position.
    // a is the acceleration for this frame.
    // dt is the delta time.
-  
+
    particle->position = ((particle->position * 2.0f) - particle->lastPosition) + accel * (timeDelta * timeDelta);
    particle->lastPosition = particle->position;
 }
@@ -127,6 +127,6 @@ void ForestWindAccumulator::applyImpulse( const VectorF &impulse )
    force += impulse / mass;
 
    // Set the new direction and force.
-   mCurrentDir.set( force.x, force.y );  
+   mCurrentDir.set( force.x, force.y );
    mCurrentStrength += impulse.len() * TickSec;
 }

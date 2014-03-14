@@ -46,17 +46,17 @@ class CentralDir : public FileHeader
    typedef FileHeader Parent;
 
    static const U32 mCentralDirSignature = 0x02014b50;
-   
+
    char *mFileComment;
 
 public:
    U16 mDiskNumStart;
-   
+
    U16 mInternalFileAttr;
    U32 mExternalFileAttr;
-   
+
    U32 mLocalHeadOffset;
-   
+
    U16 mVersionMadeBy;
 
    U32 mInternalFlags;
@@ -90,7 +90,7 @@ public:
    U32 mCDSize;
    U32 mCDOffset;
    U16 mCommentSize;
-   
+
    const char *mZipComment;
 
    EndOfCentralDir();

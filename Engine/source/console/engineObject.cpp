@@ -78,7 +78,7 @@ EngineObject::~EngineObject()
       mPrevEngineObject->mNextEngineObject = mNextEngineObject;
    else
       smFirstEngineObject = mNextEngineObject;
-      
+
    if( mNextEngineObject )
       mNextEngineObject->mPrevEngineObject = mPrevEngineObject;
 
@@ -98,10 +98,10 @@ void EngineObject::destroySelf()
    _destroySelf();
 
    // Destruct the object and release it in the pool.
-   
+
    IEngineObjectPool* pool = this->mEngineObjectPool;
    void* object = this;
-   
+
    destructInPlace( this );
    if( pool )
       pool->freeObject( object );
@@ -112,7 +112,7 @@ void EngineObject::destroySelf()
 String EngineObject::describeSelf() const
 {
    String desc = String::ToString( "class: %s", TYPEOF( this )->getFullyQualifiedExportName().c_str() );
-   
+
    return desc;
 }
 
@@ -129,10 +129,10 @@ void* EngineObject::operator new( size_t size )
       Platform::AlertOK( "Torque Memory Error", "Out of memory. Shutting down.\n");
       Platform::forceShutdown( -1 );
    }
-   
+
    EngineObject* object = reinterpret_cast< EngineObject* >( ptr );
    object->mEngineObjectPool = IEngineObjectPool::DEFAULT;
-   
+
    return ptr;
 }
 #endif
@@ -148,21 +148,21 @@ void* EngineObject::operator new( size_t size, IEngineObjectPool* pool )
    if( !ptr )
    {
       // Fall back to default pool.
-      
+
       pool = IEngineObjectPool::DEFAULT;
       AssertFatal( pool, "EngineObject::new - No default pool set!" );
       ptr = pool->allocateObject( size TORQUE_TMM_LOC );
-      
+
       if( !ptr )
       {
          Platform::AlertOK( "Torque Memory Error", "Out of memory. Shutting down.\n");
          Platform::forceShutdown( -1 );
       }
    }
-   
+
    EngineObject* object = reinterpret_cast< EngineObject* >( ptr );
    object->mEngineObjectPool = pool;
-   
+
    return ptr;
 }
 #endif
@@ -179,10 +179,10 @@ void* EngineObject::operator new( size_t size TORQUE_TMM_ARGS_DECL )
       Platform::AlertOK( "Torque Memory Error", "Out of memory. Shutting down.\n");
       Platform::forceShutdown( -1 );
    }
-   
+
    EngineObject* object = reinterpret_cast< EngineObject* >( ptr );
    object->mEngineObjectPool = IEngineObjectPool::DEFAULT;
-   
+
    return ptr;
 }
 
@@ -196,21 +196,21 @@ void* EngineObject::operator new( size_t size, IEngineObjectPool* pool TORQUE_TM
    if( !ptr )
    {
       // Fall back to default pool.
-      
+
       pool = IEngineObjectPool::DEFAULT;
       AssertFatal( pool, "EngineObject::new - No default pool set!" );
       ptr = pool->allocateObject( size TORQUE_TMM_ARGS );
-      
+
       if( !ptr )
       {
          Platform::AlertOK( "Torque Memory Error", "Out of memory. Shutting down.\n");
          Platform::forceShutdown( -1 );
       }
    }
-   
+
    EngineObject* object = reinterpret_cast< EngineObject* >( ptr );
    object->mEngineObjectPool = pool;
-   
+
    return ptr;
 }
 
@@ -222,7 +222,7 @@ void EngineObject::operator delete( void* ptr )
       return;
 
 //   AssertWarn( false, "EngineObject::delete - Directly deleting an EngineObject is disallowed!" );
-   
+
    EngineObject* object = reinterpret_cast< EngineObject* >( ptr );
    AssertFatal( !object->getRefCount(), "EngineObject::delete - object still referenced!" );
    if( object->mEngineObjectPool )
@@ -266,7 +266,7 @@ void EngineObject::debugEnumInstances( const char* className, DebugEnumInstances
             // Set breakpoint here to break for each instance.
             if( callback )
                callback( object );
-               
+
             break;
          }
    }
@@ -297,7 +297,7 @@ void EngineCRuntimeObjectPool::freeObject( void* ptr )
 StaticEngineObject::StaticEngineObject()
 {
    mEngineObjectPool = NULL;
-   
+
    // Add an artificial reference to the object.
    incRefCount();
 }

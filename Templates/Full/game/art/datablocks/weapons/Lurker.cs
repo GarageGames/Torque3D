@@ -236,7 +236,7 @@ datablock ProjectileData( BulletProjectile )
 function BulletProjectile::onCollision(%this,%obj,%col,%fade,%pos,%normal)
 {
    // Apply impact force from the projectile.
-   
+
    // Apply damage to the object all shape base objects
    if ( %col.getType() & $TypeMasks::GameBaseObjectType )
       %col.damage(%obj,%pos,%this.directDamage,"BulletProjectile");
@@ -351,7 +351,7 @@ datablock ShapeBaseImageData(LurkerWeaponImage)
    item = Lurker;
    ammo = LurkerAmmo;
    clip = LurkerClip;
-   
+
    projectile = BulletProjectile;
    projectileType = Projectile;
    projectileSpread = "0.005";
@@ -479,7 +479,7 @@ datablock ShapeBaseImageData(LurkerWeaponImage)
    stateScaleAnimation[7]           = false;
    stateScaleAnimationFP[7]         = false;
    stateTransitionOnTriggerDown[7]  = "DryFire";
-   
+
    stateName[8]                     = "NoAmmoMotion";
    stateTransitionGeneric0In[8]     = "SprintEnter";
    stateTransitionOnNoMotion[8]     = "NoAmmo";
@@ -538,7 +538,7 @@ datablock ShapeBaseImageData(LurkerWeaponImage)
    stateSequenceTransitionOut[12]   = true;
    stateAllowImageChange[12]        = false;
    stateSequence[12]                = "sprint";
-   
+
    // Stop Sprinting
    stateName[13]                    = "SprintExit";
    stateTransitionGeneric0In[13]    = "SprintEnter";
@@ -750,7 +750,7 @@ datablock ShapeBaseImageData(LurkerGrenadeLauncherImage)
    stateScaleAnimation[7]           = false;
    stateScaleAnimationFP[7]         = false;
    stateTransitionOnTriggerDown[7]  = "DryFire";
-   
+
    stateName[8]                     = "NoAmmoReadyMotion";
    stateTransitionGeneric0In[8]     = "SprintEnter";
    stateTransitionOnNoMotion[8]     = "NoAmmo";
@@ -805,7 +805,7 @@ datablock ShapeBaseImageData(LurkerGrenadeLauncherImage)
    stateSequenceTransitionOut[12]   = true;
    stateAllowImageChange[12]        = false;
    stateSequence[12]                = "sprint";
-   
+
    // Stop Sprinting
    stateName[13]                    = "SprintExit";
    stateTransitionGeneric0In[13]    = "SprintEnter";

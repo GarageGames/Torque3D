@@ -41,7 +41,7 @@ bool SimObject::writeObject(Stream *stream)
    AbstractClassRep *rep = getClassRep();
    AbstractClassRep::FieldList &fieldList = rep->mFieldList;
    AbstractClassRep::FieldList::iterator itr;
-   
+
    U32 savePos = stream->getPosition();
    U32 numFields = fieldList.size();
    stream->write(numFields);

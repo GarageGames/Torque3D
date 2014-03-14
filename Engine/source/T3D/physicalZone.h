@@ -40,7 +40,7 @@ class PhysicalZone : public SceneObject
 {
    typedef SceneObject Parent;
 
-   enum UpdateMasks {      
+   enum UpdateMasks {
       ActiveMask        = Parent::NextFreeMask << 0,
       NextFreeMask      = Parent::NextFreeMask << 1
    };

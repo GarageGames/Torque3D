@@ -74,7 +74,7 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_NormalMapAtlas, new NamedFeatureHLSL( "Normal Map Atlas" ) );
 
    FEATUREMGR->registerFeature( MFT_NormalsOut, new NormalsOutFeatHLSL );
-   
+
    FEATUREMGR->registerFeature( MFT_DepthOut, new DepthOutHLSL );
    FEATUREMGR->registerFeature( MFT_EyeSpaceDepthOut, new EyeSpaceDepthOutHLSL() );
 
@@ -99,12 +99,12 @@ MODULE_BEGIN( ShaderGenHLSL )
 
    MODULE_INIT_AFTER( ShaderGen )
    MODULE_INIT_AFTER( ShaderGenFeatureMgr )
-   
+
    MODULE_INIT
    {
       sInitDelegate.bind(_initShaderGenHLSL);
       SHADERGEN->registerInitDelegate(Direct3D9, sInitDelegate);
       SHADERGEN->registerInitDelegate(Direct3D9_360, sInitDelegate);
    }
-   
+
 MODULE_END;

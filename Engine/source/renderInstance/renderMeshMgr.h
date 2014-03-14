@@ -34,7 +34,7 @@ class RenderMeshMgr : public RenderBinManager
    typedef RenderBinManager Parent;
 public:
    RenderMeshMgr();
-   RenderMeshMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder);   
+   RenderMeshMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder);
 
    // RenderBinManager interface
    virtual void init();

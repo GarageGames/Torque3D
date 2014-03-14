@@ -75,7 +75,7 @@ bool PxFluid::onAdd()
 
    if ( isClientObject() )
       _createFluid();
-   
+
    Point3F halfScale = Point3F::One * 0.5f;
    mObjBox.minExtents = -halfScale;
    mObjBox.maxExtents = halfScale;
@@ -175,9 +175,9 @@ void PxFluid::setScale( const VectorF &scale )
 
    if ( lastScale != getScale() &&
         mEmitter )
-   {      
+   {
       _destroyFluid();
-      _createFluid();      
+      _createFluid();
    }
 }
 
@@ -228,7 +228,7 @@ void PxFluid::renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
 void PxFluid::_createFluid()
 {
    /*
-   // Set structure to pass particles, and receive them after every simulation step    
+   // Set structure to pass particles, and receive them after every simulation step
    NxParticleData particleData;
    particleData.numParticlesPtr		   = &mParticleCount;
    particleData.bufferPos				   = &mParticles[0].position.x;
@@ -236,30 +236,30 @@ void PxFluid::_createFluid()
    particleData.bufferVel				   = &mParticles[0].velocity.x;
    particleData.bufferVelByteStride	   = sizeof(FluidParticle);
    particleData.bufferLife				   = &mParticles[0].lifetime;
-   particleData.bufferLifeByteStride	= sizeof(FluidParticle);   
+   particleData.bufferLifeByteStride	= sizeof(FluidParticle);
 
    // Create a fluid descriptor
    NxFluidDesc fluidDesc;
-   fluidDesc.kernelRadiusMultiplier = 2.3f;    
-   fluidDesc.restParticlesPerMeter = 10.0f;    
-   fluidDesc.stiffness = 200.0f;    
-   fluidDesc.viscosity = 22.0f;    
-   fluidDesc.restDensity = 1000.0f;    
-   fluidDesc.damping = 0.0f;    
-   fluidDesc.simulationMethod = NX_F_SPH;    
-   fluidDesc.initialParticleData = particleData;    
+   fluidDesc.kernelRadiusMultiplier = 2.3f;
+   fluidDesc.restParticlesPerMeter = 10.0f;
+   fluidDesc.stiffness = 200.0f;
+   fluidDesc.viscosity = 22.0f;
+   fluidDesc.restDensity = 1000.0f;
+   fluidDesc.damping = 0.0f;
+   fluidDesc.simulationMethod = NX_F_SPH;
+   fluidDesc.initialParticleData = particleData;
    fluidDesc.particlesWriteData = particleData;
    */
 
-   NxFluidDesc fluidDesc;    
-   fluidDesc.setToDefault();  
-   fluidDesc.simulationMethod = NX_F_SPH;               
-   fluidDesc.maxParticles = MAX_PARTICLES;      
-   fluidDesc.restParticlesPerMeter = 50;       
-   fluidDesc.stiffness = 1;       
+   NxFluidDesc fluidDesc;
+   fluidDesc.setToDefault();
+   fluidDesc.simulationMethod = NX_F_SPH;
+   fluidDesc.maxParticles = MAX_PARTICLES;
+   fluidDesc.restParticlesPerMeter = 50;
+   fluidDesc.stiffness = 1;
    fluidDesc.viscosity = 6;
    fluidDesc.flags = NX_FF_VISUALIZATION|NX_FF_ENABLED;
-   
+
    mParticles = new FluidParticle[MAX_PARTICLES];
    dMemset( mParticles, 0, sizeof(FluidParticle) * MAX_PARTICLES );
 
@@ -271,11 +271,11 @@ void PxFluid::_createFluid()
    particleData.bufferVel				   = &mParticles[0].velocity.x;
    particleData.bufferVelByteStride	   = sizeof(FluidParticle);
    particleData.bufferLife				   = &mParticles[0].lifetime;
-   particleData.bufferLifeByteStride	= sizeof(FluidParticle);   
+   particleData.bufferLifeByteStride	= sizeof(FluidParticle);
 
    mFluid = mScene->createFluid( fluidDesc );
 
-   
+
    //Create Emitter.
    NxFluidEmitterDesc emitterDesc;
    emitterDesc.setToDefault();

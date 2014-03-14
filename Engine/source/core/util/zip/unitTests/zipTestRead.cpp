@@ -140,7 +140,7 @@ private:
       }
 
       U32 crc = CRC::INITIAL_CRC_VALUE;
-      
+
       bool ret = true;
       U8 buffer[1024];
       U32 numBytes = stream->getStreamSize() - stream->getPosition();
@@ -219,7 +219,7 @@ private:
       // Test writing a file and then reading it back before the zip is rebuilt
       test(writeFile(zip, "test.txt"), "Failed to write file to test zip");
       test(testReadFile(zip, "test.txt"), "Failed to read file back from test zip");
-      
+
       // Read from file that is already open for write (should fail)
       Stream *wrStream = zip->openFile("writeTest.txt", ZipArchive::Write);
       if(wrStream != NULL)

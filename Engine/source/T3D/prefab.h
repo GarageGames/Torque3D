@@ -43,13 +43,13 @@ class BaseMatInstance;
 class Prefab : public SceneObject
 {
    typedef SceneObject Parent;
-   
-   enum MaskBits 
+
+   enum MaskBits
    {
       TransformMask = Parent::NextFreeMask << 0,
       FileMask = Parent::NextFreeMask << 1,
       NextFreeMask  = Parent::NextFreeMask << 2
-   };   
+   };
 
 public:
 
@@ -57,7 +57,7 @@ public:
    virtual ~Prefab();
 
    DECLARE_CONOBJECT(Prefab);
-  
+
    static void initPersistFields();
 
    // SimObject
@@ -78,7 +78,7 @@ public:
    // Prefab
 
    /// If the passed object is a child of any Prefab return that Prefab.
-   /// Note that this call is only valid if the editor is open and when 
+   /// Note that this call is only valid if the editor is open and when
    /// passed server-side objects.
    static Prefab* getPrefabByChild( SimObject *child );
 
@@ -131,7 +131,7 @@ protected:
    };
    typedef Map<SimObjectId,Transform> ChildToMatMap;
 
-   /// Lookup from a child object's id to its transform in 
+   /// Lookup from a child object's id to its transform in
    /// this Prefab's object space.
    ChildToMatMap mChildMap;
 
@@ -149,7 +149,7 @@ class ExplodePrefabUndoAction : public UndoAction
 
 public:
 
-   ExplodePrefabUndoAction( Prefab *prefab );   
+   ExplodePrefabUndoAction( Prefab *prefab );
 
    // UndoAction
    virtual void undo();

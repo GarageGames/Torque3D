@@ -86,7 +86,7 @@ void ForestItemSelection::offsetObject( ForestItem &object, const Point3F &delta
    MatrixF newMat( object.getTransform() );
    newMat.displace( delta );
 
-   object = mData->updateItem( object.getKey(), object.getPosition(), object.getData(), newMat, object.getScale() );   
+   object = mData->updateItem( object.getKey(), object.getPosition(), object.getData(), newMat, object.getScale() );
 }
 
 void ForestItemSelection::rotateObject( ForestItem &object, const EulerF &delta, const Point3F &origin )
@@ -100,7 +100,7 @@ void ForestItemSelection::rotateObject( ForestItem &object, const EulerF &delta,
    mat.getColumn( 3, &pos );
 
    MatrixF wMat( mat );
-   wMat.inverse();   
+   wMat.inverse();
 
    // get offset in obj space
    Point3F offset = pos - origin;
@@ -232,7 +232,7 @@ void ForestSelectionTool::pasteSelection()
 void ForestSelectionTool::setActiveForest( Forest *forest )
 {
    mForest = forest;
-   
+
    if ( forest )
       mSelection.setForestData( forest->getData() );
    else
@@ -240,7 +240,7 @@ void ForestSelectionTool::setActiveForest( Forest *forest )
 }
 
 void ForestSelectionTool::on3DMouseDown( const Gui3DMouseEvent &evt )
-{   
+{
    mMouseDown = true;
    mMouseDragged = false;
 
@@ -248,10 +248,10 @@ void ForestSelectionTool::on3DMouseDown( const Gui3DMouseEvent &evt )
 
    if ( mUsingGizmo )
    {
-      mGizmo->on3DMouseDown( evt );   
+      mGizmo->on3DMouseDown( evt );
       return;
-   }   
-     
+   }
+
    mDragSelection.clear();
    mDragRect.set( Point2I(evt.mousePoint), Point2I(0,0) );
    mDragStart = evt.mousePoint;
@@ -262,9 +262,9 @@ void ForestSelectionTool::on3DMouseDown( const Gui3DMouseEvent &evt )
       clearSelection();
 
    if ( mHoverItem.isValid() )
-      _selectItem( mHoverItem );   
+      _selectItem( mHoverItem );
 
-   // This should never happen... it should have been 
+   // This should never happen... it should have been
    // submitted and nulled in on3DMouseUp()!
    //
    // Yeah, unless you had a breakpoint there and on3DMouseUp never fired,
@@ -279,7 +279,7 @@ void ForestSelectionTool::on3DMouseMove( const Gui3DMouseEvent &evt )
    mHoverItem.makeInvalid();
 
    if ( !mForest )
-      return;   
+      return;
 
    if ( !mSelection.empty() )
       mGizmo->on3DMouseMove( evt );
@@ -287,7 +287,7 @@ void ForestSelectionTool::on3DMouseMove( const Gui3DMouseEvent &evt )
    RayInfo ri;
    ri.userData = new ForestItem;
    Point3F startPnt = evt.pos;
-   Point3F endPnt = evt.pos + evt.vec * 1000.0f;   
+   Point3F endPnt = evt.pos + evt.vec * 1000.0f;
 
    if ( mForest->castRayRendered( startPnt, endPnt, &ri ) )
       mHoverItem = (*(ForestItem*)ri.userData);
@@ -327,7 +327,7 @@ void ForestSelectionTool::on3DMouseDragged( const Gui3DMouseEvent &evt )
          mSelection.offset( deltaPos ); break;
       case RotateMode:
          mSelection.rotate( deltaRot ); break;
-      case ScaleMode:         
+      case ScaleMode:
          mSelection.scale( mGizmo->getScale() ); break;
       default: ;
       }
@@ -348,7 +348,7 @@ void ForestSelectionTool::on3DMouseDragged( const Gui3DMouseEvent &evt )
       mDragRect.point.y = (evt.mousePoint.y < mDragStart.y) ? evt.mousePoint.y : mDragStart.y;
       mDragRect.extent.y = (evt.mousePoint.y > mDragStart.y) ? evt.mousePoint.y - mDragStart.y : mDragStart.y - evt.mousePoint.y;
       return;
-   }   
+   }
 }
 
 void ForestSelectionTool::on3DMouseUp( const Gui3DMouseEvent &evt )
@@ -373,11 +373,11 @@ void ForestSelectionTool::on3DMouseUp( const Gui3DMouseEvent &evt )
 
       clearSelection();
 
-      for ( S32 i = 0; i < mDragSelection.size(); i++ )      
+      for ( S32 i = 0; i < mDragSelection.size(); i++ )
          _selectItem( mDragSelection[i] );
-      
+
       mDragSelection.clear();
-      
+
       return;
    }
 }
@@ -393,13 +393,13 @@ void ForestSelectionTool::onRender3D()
    desc.setZReadWrite( true, false );
 
    if ( mHoverItem.isValid() )
-   {      
+   {
       treeMat = mHoverItem.getTransform();
       drawUtil->drawObjectBox( desc, mHoverItem.getSize(), mHoverItem.getWorldBox().getCenter(), treeMat, color );
    }
 
    if ( !mSelection.empty() )
-   {      
+   {
       for ( U32 i = 0; i < mSelection.size(); i++ )
       {
          const ForestItem &item = mSelection[i];
@@ -409,7 +409,7 @@ void ForestSelectionTool::onRender3D()
 
       mGizmo->set( mSelection.getOrientation(), mSelection.getOrigin(), mSelection.getScale() );
 
-      mGizmo->renderGizmo( mEditor->getLastCameraQuery().cameraMatrix, mEditor->getLastCameraQuery().fov );  
+      mGizmo->renderGizmo( mEditor->getLastCameraQuery().cameraMatrix, mEditor->getLastCameraQuery().fov );
    }
 }
 
@@ -455,7 +455,7 @@ void ForestSelectionTool::onRender2D()
       F32 bottom = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y + mDragRect.extent.y);
       gDragFrustum.set(lastCameraQuery.ortho, left, right, top, bottom, lastCameraQuery.nearPlane, lastCameraQuery.farPlane, lastCameraQuery.cameraMatrix );
 
-      mForest->getData()->getItems( gDragFrustum, &mDragSelection );      
+      mForest->getData()->getItems( gDragFrustum, &mDragSelection );
    }
 }
 
@@ -465,7 +465,7 @@ bool ForestSelectionTool::updateGuiInfo()
    if ( !Sim::findObject( "EditorGuiStatusBar", statusbar ) )
       return false;
 
-   String text( "Forest Editor." );      
+   String text( "Forest Editor." );
    GizmoMode mode = mGizmoProfile->mode;
 
    if ( mMouseDown && mGizmo->getSelection() != Gizmo::None )
@@ -473,15 +473,15 @@ bool ForestSelectionTool::updateGuiInfo()
       Point3F delta;
       String qualifier;
 
-      if ( mode == RotateMode )   
-         delta = mGizmo->getDeltaTotalRot();         
-      else if ( mode == MoveMode )         
-         delta = mGizmo->getTotalOffset();         
+      if ( mode == RotateMode )
+         delta = mGizmo->getDeltaTotalRot();
+      else if ( mode == MoveMode )
+         delta = mGizmo->getTotalOffset();
       else if ( mode == ScaleMode )
-         delta = mGizmo->getDeltaTotalScale();            
+         delta = mGizmo->getDeltaTotalScale();
 
       if ( mGizmo->getAlignment() == Object && mode != ScaleMode )
-      {       
+      {
          mSelection.getOrientation().mulV( delta );
       }
 
@@ -492,27 +492,27 @@ bool ForestSelectionTool::updateGuiInfo()
       if ( mIsZero( delta.z, 0.0001f ) )
          delta.z = 0.0f;
 
-      if ( mode == RotateMode )         
-      {         
+      if ( mode == RotateMode )
+      {
          delta.x = mRadToDeg( delta.x );
          delta.y = mRadToDeg( delta.y );
          delta.z = mRadToDeg( delta.z );
-         text = String::ToString( "Delta angle ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+         text = String::ToString( "Delta angle ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
       }
-      else if ( mode == MoveMode )     
-         text = String::ToString( "Delta position ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+      else if ( mode == MoveMode )
+         text = String::ToString( "Delta position ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
       else if ( mode == ScaleMode )
-         text = String::ToString( "Delta scale ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z ); 
+         text = String::ToString( "Delta scale ( x: %4.2f, y: %4.2f, z: %4.2f ).", delta.x, delta.y, delta.z );
    }
-   else 
-   {     
-      if ( mode == MoveMode )            
+   else
+   {
+      if ( mode == MoveMode )
          text = "Move selection.  SHIFT while dragging duplicates objects.";
-      else if ( mode == RotateMode )            
+      else if ( mode == RotateMode )
          text = "Rotate selection.";
-      else if ( mode == ScaleMode )            
-         text = "Scale selection.";        
-   }   
+      else if ( mode == ScaleMode )
+         text = "Scale selection.";
+   }
 
    Con::executef( statusbar, "setInfo", text.c_str() );
 
@@ -523,11 +523,11 @@ bool ForestSelectionTool::updateGuiInfo()
 
 void ForestSelectionTool::updateGizmo()
 {
-   mGizmoProfile->restoreDefaultState();     
+   mGizmoProfile->restoreDefaultState();
 
    const GizmoMode &mode = mGizmoProfile->mode;
 
-   if ( mode == ScaleMode )   
+   if ( mode == ScaleMode )
    {
       mGizmoProfile->flags &= ~GizmoProfile::PlanarHandlesOn;
       mGizmoProfile->allAxesScaleUniform = true;
@@ -548,13 +548,13 @@ void ForestSelectionTool::onUndoAction()
          mSelection.erase_fast( i );
          i--;
       }
-      else      
-         mSelection[i] = item;      
+      else
+         mSelection[i] = item;
    }
 
    // Recalculate our selection bounds.
    mBounds = Box3F::Invalid;
-   for ( S32 i = 0; i < mSelection.size(); i++ )   
+   for ( S32 i = 0; i < mSelection.size(); i++ )
       mBounds.intersect( mSelection[i].getWorldBox() );
 }
 

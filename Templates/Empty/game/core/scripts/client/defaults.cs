@@ -22,7 +22,7 @@
 
 // The master server is declared with the server defaults, which is
 // loaded on both clients & dedicated servers.  If the server mod
-// is not loaded on a client, then the master must be defined. 
+// is not loaded on a client, then the master must be defined.
 // $pref::Master[0] = "2:master.garagegames.com:28002";
 
 $pref::Player::Name = "Visitor";
@@ -107,8 +107,8 @@ $pref::camera::distanceScale = 1.0;
 $pref::SFX::autoDetect = true;
 
 /// The sound provider to select at startup.  Typically
-/// this is DirectSound, OpenAL, or XACT.  There is also 
-/// a special Null provider which acts normally, but 
+/// this is DirectSound, OpenAL, or XACT.  There is also
+/// a special Null provider which acts normally, but
 /// plays no sound.
 $pref::SFX::provider = "";
 
@@ -120,33 +120,33 @@ $pref::SFX::device = "OpenAL";
 /// and sound mixing.  If not it will use software.
 $pref::SFX::useHardware = false;
 
-/// If you have a software device you have a 
+/// If you have a software device you have a
 /// choice of how many software buffers to
 /// allow at any one time.  More buffers cost
 /// more CPU time to process and mix.
 $pref::SFX::maxSoftwareBuffers = 16;
 
-/// This is the playback frequency for the primary 
+/// This is the playback frequency for the primary
 /// sound buffer used for mixing.  Although most
-/// providers will reformat on the fly, for best 
+/// providers will reformat on the fly, for best
 /// quality and performance match your sound files
 /// to this setting.
 $pref::SFX::frequency = 44100;
 
-/// This is the playback bitrate for the primary 
+/// This is the playback bitrate for the primary
 /// sound buffer used for mixing.  Although most
-/// providers will reformat on the fly, for best 
+/// providers will reformat on the fly, for best
 /// quality and performance match your sound files
 /// to this setting.
 $pref::SFX::bitrate = 32;
 
-/// The overall system volume at startup.  Note that 
+/// The overall system volume at startup.  Note that
 /// you can only scale volume down, volume does not
 /// get louder than 1.
 $pref::SFX::masterVolume = 0.8;
 
-/// The startup sound channel volumes.  These are 
-/// used to control the overall volume of different 
+/// The startup sound channel volumes.  These are
+/// used to control the overall volume of different
 /// classes of sounds.
 $pref::SFX::channelVolume1 = 1;
 $pref::SFX::channelVolume2 = 1;
@@ -159,7 +159,7 @@ $pref::SFX::channelVolume8 = 1;
 
 $pref::PostEffect::PreferedHDRFormat = "GFXFormatR8G8B8A8";
 
-/// This is an scalar which can be used to reduce the 
+/// This is an scalar which can be used to reduce the
 /// reflection textures on all objects to save fillrate.
 $pref::Reflect::refractTexScale = 1.0;
 
@@ -185,9 +185,9 @@ $pref::Decals::enabled = true;
 $pref::Decals::lifeTimeScale = "1";
 
 /// The number of mipmap levels to drop on loaded textures
-/// to reduce video memory usage.  
+/// to reduce video memory usage.
 ///
-/// It will skip any textures that have been defined as not 
+/// It will skip any textures that have been defined as not
 /// allowing down scaling.
 ///
 $pref::Video::textureReductionLevel = 0;
@@ -204,7 +204,7 @@ $pref::Shadows::disable = false;
 ///
 /// SoftShadow - Does a simple soft shadow
 ///
-/// SoftShadowHighQuality 
+/// SoftShadowHighQuality
 ///
 $pref::Shadows::filterMode = "SoftShadow";
 
@@ -234,40 +234,40 @@ if ( isObject( LightingQualityGroup ) )
    LightingQualityGroup.delete();
 if ( isObject( ShaderQualityGroup ) )
    ShaderQualityGroup.delete();
- 
+
 new SimGroup( MeshQualityGroup )
-{ 
+{
    new ArrayObject( [Lowest] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::TS::detailAdjust"] = 0.5;
-      key["$pref::TS::skipRenderDLs"] = 1;      
+      key["$pref::TS::skipRenderDLs"] = 1;
       key["$pref::Terrain::lodScale"] = 2.0;
       key["$pref::decalMgr::enabled"] = false;
       key["$pref::GroundCover::densityScale"] = 0.5;
    };
-   
+
    new ArrayObject( [Low] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-            
+
       key["$pref::TS::detailAdjust"] = 0.75;
-      key["$pref::TS::skipRenderDLs"] = 0;      
+      key["$pref::TS::skipRenderDLs"] = 0;
       key["$pref::Terrain::lodScale"] = 1.5;
       key["$pref::decalMgr::enabled"] = true;
       key["$pref::GroundCover::densityScale"] = 0.75;
    };
-   
+
    new ArrayObject( [Normal] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
 
       key["$pref::TS::detailAdjust"] = 1.0;
-      key["$pref::TS::skipRenderDLs"] = 0;      
+      key["$pref::TS::skipRenderDLs"] = 0;
       key["$pref::Terrain::lodScale"] = 1.0;
       key["$pref::decalMgr::enabled"] = true;
       key["$pref::GroundCover::densityScale"] = 1.0;
@@ -279,11 +279,11 @@ new SimGroup( MeshQualityGroup )
       caseSensitive = true;
 
       key["$pref::TS::detailAdjust"] = 1.5;
-      key["$pref::TS::skipRenderDLs"] = 0;      
+      key["$pref::TS::skipRenderDLs"] = 0;
       key["$pref::Terrain::lodScale"] = 0.75;
       key["$pref::decalMgr::enabled"] = true;
       key["$pref::GroundCover::densityScale"] = 1.0;
-   };   
+   };
 };
 
 
@@ -293,22 +293,22 @@ new SimGroup( TextureQualityGroup )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::Video::textureReductionLevel"] = 2;
       key["$pref::Reflect::refractTexScale"] = 0.5;
-      key["$pref::Terrain::detailScale"] = 0.5;      
+      key["$pref::Terrain::detailScale"] = 0.5;
    };
-   
+
    new ArrayObject( [Low] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-            
+
       key["$pref::Video::textureReductionLevel"] = 1;
       key["$pref::Reflect::refractTexScale"] = 0.75;
-      key["$pref::Terrain::detailScale"] = 0.75;      
+      key["$pref::Terrain::detailScale"] = 0.75;
    };
-   
+
    new ArrayObject( [Normal] )
    {
       class = "GraphicsQualityLevel";
@@ -316,7 +316,7 @@ new SimGroup( TextureQualityGroup )
 
       key["$pref::Video::textureReductionLevel"] = 0;
       key["$pref::Reflect::refractTexScale"] = 1;
-      key["$pref::Terrain::detailScale"] = 1;      
+      key["$pref::Terrain::detailScale"] = 1;
    };
 
    new ArrayObject( [High] )
@@ -326,41 +326,41 @@ new SimGroup( TextureQualityGroup )
 
       key["$pref::Video::textureReductionLevel"] = 0;
       key["$pref::Reflect::refractTexScale"] = 1.25;
-      key["$pref::Terrain::detailScale"] = 1.5;      
-   };   
+      key["$pref::Terrain::detailScale"] = 1.5;
+   };
 };
 
 function TextureQualityGroup::onApply( %this, %level )
 {
-   // Note that this can be a slow operation.  
+   // Note that this can be a slow operation.
    reloadTextures();
 }
 
 
 new SimGroup( LightingQualityGroup )
-{ 
+{
    new ArrayObject( [Lowest] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::lightManager"] = "Basic Lighting";
       key["$pref::Shadows::disable"] = false;
       key["$pref::Shadows::textureScalar"] = 0.5;
-      key["$pref::Shadows::filterMode"] = "None";     
+      key["$pref::Shadows::filterMode"] = "None";
    };
-   
+
    new ArrayObject( [Low] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-                  
+
       key["$pref::lightManager"] = "Advanced Lighting";
       key["$pref::Shadows::disable"] = false;
       key["$pref::Shadows::textureScalar"] = 0.5;
-      key["$pref::Shadows::filterMode"] = "SoftShadow";     
+      key["$pref::Shadows::filterMode"] = "SoftShadow";
    };
-   
+
    new ArrayObject( [Normal] )
    {
       class = "GraphicsQualityLevel";
@@ -369,25 +369,25 @@ new SimGroup( LightingQualityGroup )
       key["$pref::lightManager"] = "Advanced Lighting";
       key["$pref::Shadows::disable"] = false;
       key["$pref::Shadows::textureScalar"] = 1.0;
-      key["$pref::Shadows::filterMode"] = "SoftShadowHighQuality";     
+      key["$pref::Shadows::filterMode"] = "SoftShadowHighQuality";
    };
 
    new ArrayObject( [High] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::lightManager"] = "Advanced Lighting";
       key["$pref::Shadows::disable"] = false;
       key["$pref::Shadows::textureScalar"] = 2.0;
-      key["$pref::Shadows::filterMode"] = "SoftShadowHighQuality";          
-   };   
+      key["$pref::Shadows::filterMode"] = "SoftShadowHighQuality";
+   };
 };
 
 function LightingQualityGroup::onApply( %this, %level )
 {
-   // Set the light manager.  This should do nothing 
-   // if its already set or if its not compatible.   
+   // Set the light manager.  This should do nothing
+   // if its already set or if its not compatible.
    setLightManager( $pref::lightManager );
 }
 
@@ -399,66 +399,66 @@ new SimGroup( ShaderQualityGroup )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::Video::disablePixSpecular"] = true;
       key["$pref::Video::disableNormalmapping"] = true;
       key["$pref::Video::disableParallaxMapping"] = true;
       key["$pref::Water::disableTrueReflections"] = true;
    };
-   
+
    new ArrayObject( [Low] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::Video::disablePixSpecular"] = false;
       key["$pref::Video::disableNormalmapping"] = false;
       key["$pref::Video::disableParallaxMapping"] = true;
       key["$pref::Water::disableTrueReflections"] = true;
    };
-   
+
    new ArrayObject( [Normal] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::Video::disablePixSpecular"] = false;
       key["$pref::Video::disableNormalmapping"] = false;
-      key["$pref::Video::disableParallaxMapping"] = false;   
-      key["$pref::Water::disableTrueReflections"] = false;   
+      key["$pref::Video::disableParallaxMapping"] = false;
+      key["$pref::Water::disableTrueReflections"] = false;
    };
-   
+
    new ArrayObject( [High] )
    {
       class = "GraphicsQualityLevel";
       caseSensitive = true;
-      
+
       key["$pref::Video::disablePixSpecular"] = false;
       key["$pref::Video::disableNormalmapping"] = false;
-      key["$pref::Video::disableParallaxMapping"] = false;     
-      key["$pref::Water::disableTrueReflections"] = false;          
-   };   
+      key["$pref::Video::disableParallaxMapping"] = false;
+      key["$pref::Water::disableTrueReflections"] = false;
+   };
 };
 
 
 function GraphicsQualityAutodetect()
 {
    $pref::Video::autoDetect = false;
-   
+
    %shaderVer = getPixelShaderVersion();
    %intel = ( strstr( strupr( getDisplayDeviceInformation() ), "INTEL" ) != -1 ) ? true : false;
    %videoMem = GFXCardProfilerAPI::getVideoMemoryMB();
-   
+
    return GraphicsQualityAutodetect_Apply( %shaderVer, %intel, %videoMem );
 }
 
 function GraphicsQualityAutodetect_Apply( %shaderVer, %intel, %videoMem )
 {
    if ( %shaderVer < 2.0 )
-   {      
+   {
       return "Your video card does not meet the minimum requirment of shader model 2.0.";
    }
-   
+
    if ( %shaderVer < 3.0 || %intel )
    {
       // Allow specular and normals for 2.0a and 2.0b
@@ -467,16 +467,16 @@ function GraphicsQualityAutodetect_Apply( %shaderVer, %intel, %videoMem )
          MeshQualityGroup-->Lowest.apply();
          TextureQualityGroup-->Lowest.apply();
          LightingQualityGroup-->Lowest.apply();
-         ShaderQualityGroup-->Low.apply();   
+         ShaderQualityGroup-->Low.apply();
       }
       else
       {
          MeshQualityGroup-->Lowest.apply();
          TextureQualityGroup-->Lowest.apply();
          LightingQualityGroup-->Lowest.apply();
-         ShaderQualityGroup-->Lowest.apply();   
+         ShaderQualityGroup-->Lowest.apply();
       }
-   }   
+   }
    else
    {
       if ( %videoMem > 1000 )
@@ -492,7 +492,7 @@ function GraphicsQualityAutodetect_Apply( %shaderVer, %intel, %videoMem )
          TextureQualityGroup-->Normal.apply();
          LightingQualityGroup-->Normal.apply();
          ShaderQualityGroup-->Normal.apply();
-         
+
          if ( %videoMem == 0 )
             return "Torque was unable to detect available video memory. Applying 'Normal' quality.";
       }
@@ -504,6 +504,6 @@ function GraphicsQualityAutodetect_Apply( %shaderVer, %intel, %videoMem )
          ShaderQualityGroup-->Low.apply();
       }
    }
-   
+
    return "Graphics quality settings have been auto detected.";
 }

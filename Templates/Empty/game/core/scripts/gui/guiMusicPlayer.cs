@@ -57,12 +57,12 @@ singleton SFXDescription( GuiMusicPlayerLoopingStream : AudioMusic2D )
 // Functions.
 
 function toggleMusicPlayer()
-{   
+{
    if( !GuiMusicPlayer.isAwake() )
    {
       GuiMusicPlayer.setExtent( Canvas.getExtent() );
       GuiMusicPlayer.setPosition( 0, 0 );
-      
+
       Canvas.pushDialog( GuiMusicPlayer );
    }
    else
@@ -97,7 +97,7 @@ function GuiMusicPlayerClass::play( %this )
             %desc = GuiMusicPlayerStream;
             if( GuiMusicPlayerLoopCheckBox.getValue() )
                %desc = GuiMusicPlayerLoopingStream;
-               
+
             if( GuiMusicPlayerFadeCheckBox.getValue() )
             {
                %desc.fadeInTime = $pref::GuiMusicPlayer::fadeTime;
@@ -108,7 +108,7 @@ function GuiMusicPlayerClass::play( %this )
                %desc.fadeInTime = 0;
                %desc.fadeOutTime = 0;
             }
-               
+
             %file = GuiMusicPlayerMusicList.getItemText( %sel );
             %this.sfxSource = sfxPlayOnce( %desc, %file );
             if( !%this.sfxSource )
@@ -117,13 +117,13 @@ function GuiMusicPlayerClass::play( %this )
             {
                %this.sfxSource.statusCallback = "GuiMusicPlayer_onSFXSourceStatusChange";
                GuiMusicPlayer.status = "Playing";
-               
+
                GuiMusicPlayerScrubber.setActive( true );
                GuiMusicPlayerScrubber.setup( %this.sfxSource.getDuration() );
             }
          }
       }
-      
+
       if( %isPlaying )
       {
          GuiMusicPlayerPlayButton.setText( "Pause" );
@@ -155,8 +155,8 @@ function GuiMusicPlayerClass::onStop( %this )
    GuiMusicPlayerPlayButton.setText( "Play" );
    GuiMusicPlayerPlayButton.Command = "GuiMusicPlayer.play();";
    %this.status = "Stopped";
-   
-   GuiMusicPlayerScrubber.setValue( 0 );   
+
+   GuiMusicPlayerScrubber.setValue( 0 );
 }
 
 function GuiMusicPlayerClass::pause( %this )
@@ -165,7 +165,7 @@ function GuiMusicPlayerClass::pause( %this )
    {
       if( isObject( %this.sfxSource ) )
          %this.sfxSource.pause( 0 );
-         
+
       GuiMusicPlayerPlayButton.setText( "Play" );
       GuiMusicPlayerPlayButton.command = "GuiMusicPlayer.play();";
       %this.status = "Paused";
@@ -188,19 +188,19 @@ function GuiMusicPlayer::onWake( %this )
 function GuiMusicPlayerMusicListClass::load( %this )
 {
    // Remove all the files currently in the list.
-   
+
    %this.clearItems();
-   
+
    // Find the file matching pattern we should use.
-   
+
    %filePattern = $pref::GuiMusicPlayer::filePattern;
    %sfxProvider = getWord( sfxGetDeviceInfo(), 0 );
    %filePatternVarName = "$pref::GuiMusicPlayer::filePattern" @ %sfxProvider;
    if( isDefined( %filePatternVarName ) )
       eval( "%filePattern = " @ %filePatternVarName @ ";" );
-      
+
    // Find all files matching the pattern.
-      
+
    for( %file = findFirstFileMultiExpr( %filePattern );
         %file !$= "";
         %file = findNextFileMultiExpr( %filePattern ) )
@@ -222,12 +222,12 @@ function GuiMusicPlayerScrubberClass::setup( %this, %totalPlaytime )
 {
    %this.range = "0 " @ %totalPlaytime;
    %this.ticks = %totalPlaytime / 5; // One tick per five seconds.
-   
+
    %this.update();
 }
 
 function GuiMusicPlayerScrubberClass::update( %this )
-{   
+{
    if( GuiMusicPlayer.status $= "Playing"
        && !%this.isBeingDragged )
       %this.setValue( GuiMusicPlayer.sfxSource.getPosition() );

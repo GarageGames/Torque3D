@@ -51,7 +51,7 @@ public:
    // ConsoleObject
    static void initPersistFields();
    void inspectPostApply();
-   
+
    DECLARE_CONOBJECT(GuiMaterialCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
 

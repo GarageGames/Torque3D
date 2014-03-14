@@ -31,22 +31,22 @@ void ExtendedMoveManager::init()
       char varName[256];
 
       dSprintf(varName, sizeof(varName), "mvPosX%d", i);
-      Con::addVariable(varName, TypeS32, &mPosX[i], 
+      Con::addVariable(varName, TypeS32, &mPosX[i],
          "X position of controller in millimeters.  Only 13 bits are networked.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvPosY%d", i);
-      Con::addVariable(varName, TypeS32, &mPosY[i], 
+      Con::addVariable(varName, TypeS32, &mPosY[i],
          "Y position of controller in millimeters.  Only 13 bits are networked.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvPosZ%d", i);
-      Con::addVariable(varName, TypeS32, &mPosZ[i], 
+      Con::addVariable(varName, TypeS32, &mPosZ[i],
          "Z position of controller in millimeters.  Only 13 bits are networked.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotIsEuler%d", i);
-      Con::addVariable(varName, TypeBool, &mRotIsEuler[i], 
+      Con::addVariable(varName, TypeBool, &mRotIsEuler[i],
          "@brief Indicates that the given rotation is Euler angles.\n\n"
          "When false (the default) the given rotation is a four component angled axis "
          "(a vector and angle).  When true, the given rotation is a three component "
@@ -55,22 +55,22 @@ void ExtendedMoveManager::init()
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotX%d", i);
-      Con::addVariable(varName, TypeF32, &mRotAX[i], 
+      Con::addVariable(varName, TypeF32, &mRotAX[i],
          "X rotation vector component of controller.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotY%d", i);
-      Con::addVariable(varName, TypeF32, &mRotAY[i], 
+      Con::addVariable(varName, TypeF32, &mRotAY[i],
          "Y rotation vector component of controller.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotZ%d", i);
-      Con::addVariable(varName, TypeF32, &mRotAZ[i], 
+      Con::addVariable(varName, TypeF32, &mRotAZ[i],
          "Z rotation vector component of controller.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotA%d", i);
-      Con::addVariable(varName, TypeF32, &mRotAA[i], 
+      Con::addVariable(varName, TypeF32, &mRotAA[i],
          "Angle rotation (in degrees) component of controller.\n"
 	      "@ingroup Game");
    }

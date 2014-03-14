@@ -188,7 +188,7 @@ function TextPad(%text, %callback, %root)
 
    if(!isObject(%root))
       %root = Canvas;
-      
+
    %root.pushDialog(ScriptEditorDlg);
 }
 

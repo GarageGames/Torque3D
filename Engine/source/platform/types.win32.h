@@ -27,14 +27,14 @@
 #define FN_CDECL __cdecl            ///< Calling convention
 
 // size_t is needed to overload new
-// size_t tends to be OS and compiler specific and may need to 
+// size_t tends to be OS and compiler specific and may need to
 // be if/def'ed in the future
-typedef unsigned int  dsize_t;      
+typedef unsigned int  dsize_t;
 
 
 /// Platform dependent file date-time structure.  The definition of this structure
 /// will likely be different for each OS platform.
-struct FileTime                     
+struct FileTime
 {
    U32 v1;
    U32 v2;

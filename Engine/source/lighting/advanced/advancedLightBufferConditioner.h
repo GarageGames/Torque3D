@@ -40,7 +40,7 @@ public:
 
 public:
 
-   AdvancedLightBufferConditioner(const GFXFormat bufferFormat, const ColorFormat colorFormat) 
+   AdvancedLightBufferConditioner(const GFXFormat bufferFormat, const ColorFormat colorFormat)
       : Parent(bufferFormat), mColorFormat(colorFormat)
    {
 

@@ -31,17 +31,17 @@ class GFXGLAppleFence : public GFXFence
 public:
    GFXGLAppleFence(GFXDevice* device);
    virtual ~GFXGLAppleFence();
-   
+
    // GFXFence interface
    virtual void issue();
    virtual FenceStatus getStatus() const;
    virtual void block();
-   
+
    // GFXResource interface
    virtual void zombify();
    virtual void resurrect();
    virtual const String describeSelf() const;
-   
+
 private:
    GLuint mHandle;
    bool mIssued;

@@ -86,7 +86,7 @@ public:
    /// Sets the video mode for the device
    virtual void setVideoMode( const GFXVideoMode &mode ) { };
 protected:
-   static GFXAdapter::CreateDeviceInstanceDelegate mCreateDeviceInstance; 
+   static GFXAdapter::CreateDeviceInstanceDelegate mCreateDeviceInstance;
 
    /// Called by GFXDevice to create a device specific stateblock
    virtual GFXStateBlockRef createStateBlockInternal(const GFXStateBlockDesc& desc);
@@ -112,12 +112,12 @@ protected:
 
    virtual void setMatrix( GFXMatrixType mtype, const MatrixF &mat ) { };
 
-   virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts, 
-                                                const GFXVertexFormat *vertexFormat, 
-                                                U32 vertSize, 
+   virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts,
+                                                const GFXVertexFormat *vertexFormat,
+                                                U32 vertSize,
                                                 GFXBufferType bufferType );
-   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
-                                                      U32 numPrimitives, 
+   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices,
+                                                      U32 numPrimitives,
                                                       GFXBufferType bufferType );
 
    virtual GFXVertexDecl* allocVertexDecl( const GFXVertexFormat *vertexFormat ) { return NULL; }
@@ -153,11 +153,11 @@ public:
    virtual void endSceneInternal() { };
 
    virtual void drawPrimitive( GFXPrimitiveType primType, U32 vertexStart, U32 primitiveCount ) { };
-   virtual void drawIndexedPrimitive(  GFXPrimitiveType primType, 
-                                       U32 startVertex, 
-                                       U32 minIndex, 
-                                       U32 numVerts, 
-                                       U32 startIndex, 
+   virtual void drawIndexedPrimitive(  GFXPrimitiveType primType,
+                                       U32 startVertex,
+                                       U32 minIndex,
+                                       U32 numVerts,
+                                       U32 startIndex,
                                        U32 primitiveCount ) { };
 
    virtual void setClipRect( const RectI &rect ) { };
@@ -168,15 +168,15 @@ public:
    virtual U32 getMaxDynamicVerts() { return 16384; };
    virtual U32 getMaxDynamicIndices() { return 16384; };
 
-   virtual GFXFormat selectSupportedFormat(  GFXTextureProfile *profile, 
-                                             const Vector<GFXFormat> &formats, 
-                                             bool texture, 
-                                             bool mustblend, 
+   virtual GFXFormat selectSupportedFormat(  GFXTextureProfile *profile,
+                                             const Vector<GFXFormat> &formats,
+                                             bool texture,
+                                             bool mustblend,
                                              bool mustfilter ) { return GFXFormatR8G8B8A8; };
 
    GFXFence *createFence() { return new GFXGeneralFence( this ); }
    GFXOcclusionQuery* createOcclusionQuery() { return NULL; }
-   
+
 private:
    typedef GFXDevice Parent;
    RectI clip;

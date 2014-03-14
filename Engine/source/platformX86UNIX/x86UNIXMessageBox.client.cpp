@@ -116,13 +116,13 @@ void XMessageBox::repaint()
    // line V margin
    y = y + MessageBox_LineVMargin * 2;
 
-   // line H margin 
+   // line H margin
    x = MessageBox_LineHMargin;
 
    XSetForeground(mDisplay, mGC, black);
    for (unsigned int i = 0; i < mMessageLines.size(); ++i)
    {
-      XDrawString(mDisplay, mWin, mGC, x, y, mMessageLines[i], 
+      XDrawString(mDisplay, mWin, mGC, x, y, mMessageLines[i],
          strlen(mMessageLines[i]));
       if (i < (mMessageLines.size() - 1))
          y = y + MessageBox_LineSpacer + mFontHeight;
@@ -143,7 +143,7 @@ void XMessageBox::repaint()
    for (iter = mButtons.begin(); iter != mButtons.end(); ++iter)
    {
       XCharStruct strInfo;
-      XTextExtents(mFS, iter->getLabel(), strlen(iter->getLabel()), 
+      XTextExtents(mFS, iter->getLabel(), strlen(iter->getLabel()),
          &fontDirection, &fontAscent, &fontDescent,
          &strInfo);
 //       if (maxButWidth < strInfo.width)
@@ -159,7 +159,7 @@ void XMessageBox::repaint()
    // button V margin
    y = y + MessageBox_ButtonVMargin;
 
-   // center the buttons 
+   // center the buttons
    x = MessageBox_ButtonHMargin + (mMBWidth - getButtonLineWidth()) / 2;
 
    for (iter = mButtons.begin(); iter != mButtons.end(); ++iter)
@@ -176,19 +176,19 @@ void XMessageBox::repaint()
       }
 
       XSetForeground(mDisplay, mGC, bgColor);
-      XFillRectangle(mDisplay, mWin, mGC, x, y, 
+      XFillRectangle(mDisplay, mWin, mGC, x, y,
          buttonBoxWidth, buttonBoxHeight);
       XSetForeground(mDisplay, mGC, fgColor);
-      XDrawRectangle(mDisplay, mWin, mGC, x, y, 
+      XDrawRectangle(mDisplay, mWin, mGC, x, y,
          buttonBoxWidth, buttonBoxHeight);
-      XDrawString(mDisplay, mWin, mGC, 
+      XDrawString(mDisplay, mWin, mGC,
          x + ((buttonBoxWidth - iter->getLabelWidth()) / 2),
          y + mFontAscent + ((buttonBoxHeight - mFontAscent) / 2),
          iter->getLabel(),
          strlen(iter->getLabel()));
       iter->setButtonRect(x, y, buttonBoxWidth, buttonBoxHeight);
       x = x + buttonBoxWidth + MessageBox_ButtonSpacer;
-   }   
+   }
 }
 
 template <class Type>
@@ -224,7 +224,7 @@ void XMessageBox::splitMessage()
       // JMQTODO: what to do with empty strings?
       return;
 
-   // need to break message up in to lines, and store lines in 
+   // need to break message up in to lines, and store lines in
    // mMessageLines
 
    int numChars = strlen(mMessage);
@@ -259,7 +259,7 @@ void XMessageBox::splitMessage()
 
       // compute length of substr
       int len = endChar - curChar;
-      XTextExtents(mFS, curChar, len, 
+      XTextExtents(mFS, curChar, len,
          &fontDirection, &fontAscent, &fontDescent,
          &strInfo);
       // if its too big, time to add a new line...
@@ -271,13 +271,13 @@ void XMessageBox::splitMessage()
          char* line = new char[len+1];
          strncpy(line, scratchBuf, len+1); // +1 gets the null char
          mMessageLines.push_back(line);
-         
+
          // reset curWrapped to the beginning of the scratch buffer
          curWrapped = scratchBuf;
          curWidth = 0;
       }
       // copy the current string into curWrapped if we have enough room
-      int bytesRemaining = 
+      int bytesRemaining =
          ScratchBufSize - (curWrapped - scratchBuf);
       if (bytesRemaining >= len)
          strncpy(curWrapped, curChar, len);
@@ -301,9 +301,9 @@ void XMessageBox::splitMessage()
 int XMessageBox::loadFont()
 {
   // load the font
-   mFS = XLoadQueryFont(mDisplay, 
+   mFS = XLoadQueryFont(mDisplay,
       "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*");
-   
+
    if (mFS == NULL)
       mFS = XLoadQueryFont(mDisplay, "fixed");
 
@@ -312,8 +312,8 @@ int XMessageBox::loadFont()
 
    // dummy call to XTextExtents to get the font specs
    XCharStruct strInfo;
-   
-   XTextExtents(mFS, "foo", 1, 
+
+   XTextExtents(mFS, "foo", 1,
       &mFontDirection, &mFontAscent, &mFontDescent,
       &strInfo);
 
@@ -336,15 +336,15 @@ void XMessageBox::setDimensions()
    // determine width of button line
    int buttonWidth = getButtonLineWidth();
 
-   // if there is only one line, the desired width is the greater of the 
-   // line width and the buttonWidth, otherwise the lineWidth is the 
+   // if there is only one line, the desired width is the greater of the
+   // line width and the buttonWidth, otherwise the lineWidth is the
    // max possible width which we already set.
    if (mMessageLines.size() == 1)
    {
       XCharStruct strInfo;
       int fontDirection, fontAscent, fontDescent;
 
-      XTextExtents(mFS, mMessageLines[0], strlen(mMessageLines[0]), 
+      XTextExtents(mFS, mMessageLines[0], strlen(mMessageLines[0]),
          &fontDirection, &fontAscent, &fontDescent,
          &strInfo);
 
@@ -354,7 +354,7 @@ void XMessageBox::setDimensions()
    }
 
    // determine the height of the button line
-   int buttonHeight = MessageBox_ButtonBoxHeight + 
+   int buttonHeight = MessageBox_ButtonBoxHeight +
       MessageBox_ButtonVMargin * 2;
 
    int lineHeight = mFontHeight * mMessageLines.size() +
@@ -391,7 +391,7 @@ int XMessageBox::show()
       DefaultRootWindow(mDisplay),
       (mScreenWidth - mMBWidth) / 2,  (mScreenHeight - mMBHeight) / 2,
       mMBWidth, mMBHeight,
-      1, 
+      1,
       BlackPixel(mDisplay, DefaultScreen(mDisplay)),
       WhitePixel(mDisplay, DefaultScreen(mDisplay)));
 
@@ -400,18 +400,18 @@ int XMessageBox::show()
    XSetFont(mDisplay, mGC, mFS->fid);
 
    // set input mask
-   XSelectInput(mDisplay, mWin, 
+   XSelectInput(mDisplay, mWin,
       ExposureMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
 
    // set wm protocols in case they hit X
-   Atom wm_delete_window = 
+   Atom wm_delete_window =
       XInternAtom(mDisplay, "WM_DELETE_WINDOW", False);
-   Atom wm_protocols = 
+   Atom wm_protocols =
       XInternAtom(mDisplay, "WM_PROTOCOLS", False);
    XSetWMProtocols (mDisplay, mWin, &wm_delete_window, 1);
    // set pop up dialog hint
    XSetTransientForHint(mDisplay, mWin, mWin);
-   
+
    // set title
    XTextProperty wtitle;
    wtitle.value = (unsigned char *)mTitle;
@@ -423,7 +423,7 @@ int XMessageBox::show()
    // show window
    XMapWindow(mDisplay, mWin);
    // move it in case some bozo window manager repositioned it
-   XMoveWindow(mDisplay, mWin, 
+   XMoveWindow(mDisplay, mWin,
       (mScreenWidth - mMBWidth) / 2,  (mScreenHeight - mMBHeight) / 2);
    // raise it to top
    XRaiseWindow(mDisplay, mWin);

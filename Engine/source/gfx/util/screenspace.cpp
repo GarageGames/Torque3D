@@ -36,7 +36,7 @@ void ScreenSpace::RenderTargetParameters(const Point3I &targetSize, const RectI 
    //                        ( (F32)targetSize.y - (F32)(targetViewport.point.y + targetViewport.extent.y ) ) / (F32)targetSize.y );
 
 
-   // Get the scale to convert from the 
+   // Get the scale to convert from the
    // screen space to the target size.
    Point2F targetScale( (F32)targetViewport.extent.x / (F32)targetSize.x,
                         (F32)targetViewport.extent.y / (F32)targetSize.y );

@@ -85,7 +85,7 @@ namespace engineAPI {
    /// Flag for enabling legacy console behavior in the interop system while
    /// we still have it around.  Will disappear along with console.
    extern bool gUseConsoleInterop;
-   
+
    /// Flag to allow engine functions to detect whether the engine had been
    /// initialized or shut down.
    extern bool gIsInitialized;
@@ -279,7 +279,7 @@ struct _EngineTrampoline< R( A ) >
    struct Args
    {
       char data[ sizeof( typename EngineTypeTraits< A >::ArgumentValueType ) ];
-      
+
       typename EngineTypeTraits< A >::ValueType a() const
       {
          return EngineTypeTraits< A >::ArgumentToValue(
@@ -1373,7 +1373,7 @@ struct _EngineConsoleThunkCountArgs
    {
       return 11;
    }
-   
+
    operator U32() const
    {
       return 0;
@@ -2103,8 +2103,8 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
          false, &_ ## name ## header                                                                                             \
       );                                                                                                                         \
    static inline returnType _fn ## name ## impl args
-   
-   
+
+
 // The next thing is a bit tricky.  DefineEngineMethod allows to make the 'object' (=this) argument to the function
 // implicit which presents quite an obstacle for the macro internals as the engine export system requires the
 // name of a DLL symbol that represents an extern "C" function with an explicit first object pointer argument.
@@ -2186,8 +2186,8 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
          false, &_ ## className ## name ## header                                                                                               \
       );                                                                                                                                        \
    returnType _ ## className ## name ## frame::_exec args const
-   
-   
+
+
 /// Define a call-in point for calling into the engine.  Unlike with DefineEngineFunction, the statically
 /// callable function will be confined to the namespace of the given class.
 ///
@@ -2442,7 +2442,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
    }
 
 
-/// Used to define global callbacks not associated with 
+/// Used to define global callbacks not associated with
 /// any particular class or namespace.
 #define IMPLEMENT_GLOBAL_CALLBACK( name, returnType, args, argNames, usageString )                                                           \
    DEFINE_CALLOUT( cb ## name, name,, returnType, args, 0, usageString );                                                                    \
@@ -2463,8 +2463,8 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
          #returnType, #args, "" );                                                                                                           \
       ConsoleConstructor _ ## name ## obj( NULL, #name, usageString, &_ ## name ## header );                                                 \
    }
-   
-   
+
+
 // Again, temporary macros to allow splicing the API while we still have the console interop around.
 
 #define IMPLEMENT_CONSOLE_CALLBACK( class, name, returnType, args, argNames, usageString )                                                   \
@@ -2483,7 +2483,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
          #returnType, #args, "" );                                                                                                           \
       ConsoleConstructor _ ## class ## name ## obj( #class, #name, usageString, &_ ## class ## name ## header );                             \
    }
-   
+
 #define IMPLEMENT_NEW_CALLBACK( class, name, returnType, args, argNames, usageString )                                                       \
    struct _ ## class ## name ## frame { typedef class ObjectType; };                                                                         \
    TORQUE_API _EngineMethodTrampoline< _ ## class ## name ## frame, returnType args >::FunctionType* cb ## class ## _ ## name;               \
@@ -2518,16 +2518,16 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
 struct _EngineCallbackHelper
 {
    protected:
-    
+
       EngineObject* mThis;
       const void* mFn;
-            
+
    public:
 
       _EngineCallbackHelper( EngineObject* pThis, const void* fn )
          : mThis( pThis ),
            mFn( fn ) {}
-      
+
       template< typename R >
       R call() const
       {
@@ -2613,14 +2613,14 @@ struct _EngineConsoleCallbackHelper
 {
 
    protected:
-   
+
       /// Matches up to storeArgs.
       static const U32 MAX_ARGUMENTS = 11;
 
       SimObject* mThis;
       S32 mArgc;
       const char* mArgv[ MAX_ARGUMENTS + 2 ];
-      
+
       const char* _exec()
       {
          if( mThis )
@@ -2631,7 +2631,7 @@ struct _EngineConsoleCallbackHelper
          else
             return Con::execute( mArgc, mArgv );
       }
-      
+
    public:
 
       _EngineConsoleCallbackHelper( StringTableEntry callbackName, SimObject* pThis )
@@ -2640,7 +2640,7 @@ struct _EngineConsoleCallbackHelper
       {
          mArgv[ 0 ] = callbackName;
       }
-      
+
       template< typename R >
       R call()
       {

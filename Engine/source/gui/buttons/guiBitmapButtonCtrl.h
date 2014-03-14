@@ -52,9 +52,9 @@
 class GuiBitmapButtonCtrl : public GuiButtonCtrl
 {
    public:
-   
+
       typedef GuiButtonCtrl Parent;
-      
+
       enum BitmapMode
       {
          BitmapStretched,
@@ -62,17 +62,17 @@ class GuiBitmapButtonCtrl : public GuiButtonCtrl
       };
 
    protected:
-   
+
       enum Modifier
       {
          ModifierNone,
          ModifierCtrl,
          ModifierAlt,
          ModifierShift,
-         
+
          NumModifiers
       };
-   
+
       enum State
       {
          NORMAL,
@@ -80,47 +80,47 @@ class GuiBitmapButtonCtrl : public GuiButtonCtrl
          DEPRESSED,
          INACTIVE
       };
-      
+
       struct Textures
       {
          /// Texture for normal state.
          GFXTexHandle mTextureNormal;
-         
+
          /// Texture for highlight state.
          GFXTexHandle mTextureHilight;
-         
+
          /// Texture for depressed state.
          GFXTexHandle mTextureDepressed;
-         
+
          /// Texture for inactive state.
          GFXTexHandle mTextureInactive;
       };
 
       /// Make control extents equal to bitmap size.
       bool mAutoFitExtents;
-      
+
       /// Allow switching out images according to modifier presses.
       bool mUseModifiers;
-      
+
       /// Allow switching images according to mouse states.  On by default.
       /// Switch off when not needed as it otherwise results in a lot of costly
       /// texture loads.
       bool mUseStates;
-      
+
       ///
       BitmapMode mBitmapMode;
 
       /// File name for bitmap.
       String mBitmapName;
-      
+
       ///
       Textures mTextures[ NumModifiers ];
-      
+
       virtual void renderButton( GFXTexHandle &texture, const Point2I& offset, const RectI& updateRect );
-      
+
       static bool _setAutoFitExtents( void *object, const char *index, const char *data );
       static bool _setBitmap( void *object, const char *index, const char *data );
-      
+
       State getState() const
       {
          if( mActive )
@@ -132,22 +132,22 @@ class GuiBitmapButtonCtrl : public GuiButtonCtrl
          else
             return INACTIVE;
       }
-      
+
       Modifier getCurrentModifier();
       GFXTexHandle& getTextureForCurrentState();
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onDefaultClick, () );
       DECLARE_CALLBACK( void, onCtrlClick, () );
       DECLARE_CALLBACK( void, onAltClick, () );
       DECLARE_CALLBACK( void, onShiftClick, () );
-      
+
       /// @}
 
    public:
-                           
+
       GuiBitmapButtonCtrl();
 
       void setAutoFitExtents( bool state );
@@ -176,11 +176,11 @@ DefineEnumType( GuiBitmapMode );
 class GuiBitmapButtonTextCtrl : public GuiBitmapButtonCtrl
 {
    public:
-   
+
       typedef GuiBitmapButtonCtrl Parent;
-      
+
    protected:
-   
+
       virtual void renderButton( GFXTexHandle &texture, const Point2I& offset, const RectI& updateRect );
 
    public:

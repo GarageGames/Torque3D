@@ -39,14 +39,14 @@ struct Move;
 class ClientProcessList : public ProcessList
 {
    typedef ProcessList Parent;
-   
+
 public:
 
    ClientProcessList();
-   
+
    // ProcessList
-   void addObject( ProcessObject *pobj );  
-   
+   void addObject( ProcessObject *pobj );
+
    /// Called after a correction packet is received from the server.
    /// If the control object was corrected it will now play back any moves
    /// which were rolled back.
@@ -54,8 +54,8 @@ public:
 
    static ClientProcessList* get() { return smClientProcessList; }
 
-protected:   
-   
+protected:
+
    // ProcessList
    void onPreTickObject( ProcessObject *pobj );
 
@@ -75,7 +75,7 @@ class ServerProcessList : public ProcessList
 public:
 
    ServerProcessList();
-   
+
    // ProcessList
    void addObject( ProcessObject *pobj );
 

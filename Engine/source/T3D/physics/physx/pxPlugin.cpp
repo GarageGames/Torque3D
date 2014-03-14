@@ -39,11 +39,11 @@ AFTER_MODULE_INIT( Sim )
 {
    NamedFactory<PhysicsPlugin>::add( "PhysX", &PxPlugin::create );
 
-   #if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)   
+   #if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
       NamedFactory<PhysicsPlugin>::add( "default", &PxPlugin::create );
-   #endif   
+   #endif
 
-   Con::addVariable( "$PhysXLogWarnings", TypeBool, &gPhysXLogWarnings, 
+   Con::addVariable( "$PhysXLogWarnings", TypeBool, &gPhysXLogWarnings,
       "@brief Output PhysX warnings to the console.\n\n"
 	   "@ingroup Physics\n");
 }
@@ -157,7 +157,7 @@ void PxPlugin::setTimeScale( const F32 timeScale )
 const F32 PxPlugin::getTimeScale() const
 {
    // Grab both the client and
-   // server worlds and call 
+   // server worlds and call
    // setEnabled( true ) on them.
    PxWorld *world = static_cast<PxWorld*>( getWorld( smClientWorldName ) );
    if ( !world )
@@ -166,7 +166,7 @@ const F32 PxPlugin::getTimeScale() const
       if ( !world )
          return 0.0f;
    }
-   
+
    return world->getEditorTimeScale();
 }
 
@@ -174,17 +174,17 @@ bool PxPlugin::createWorld( const String &worldName )
 {
    Map<StringNoCase, PhysicsWorld*>::Iterator iter = mPhysicsWorldLookup.find( worldName );
    PhysicsWorld *world = NULL;
-   
-   iter != mPhysicsWorldLookup.end() ? world = (*iter).value : world = NULL; 
 
-   if ( world ) 
+   iter != mPhysicsWorldLookup.end() ? world = (*iter).value : world = NULL;
+
+   if ( world )
    {
       Con::errorf( "PxPlugin::createWorld - %s world already exists!", worldName.c_str() );
       return false;
    }
 
    world = new PxWorld();
-   
+
    if ( worldName.equal( smClientWorldName, String::NoCase ) )
       world->initWorld( false, ClientProcessList::get() );
    else
@@ -204,7 +204,7 @@ void PxPlugin::destroyWorld( const String &worldName )
    PhysicsWorld *world = (*iter).value;
    world->destroyWorld();
    delete world;
-   
+
    mPhysicsWorldLookup.erase( iter );
 }
 
@@ -228,19 +228,19 @@ PhysicsWorld* PxPlugin::getWorld() const
 }
 
 U32 PxPlugin::getWorldCount() const
-{ 
-   return mPhysicsWorldLookup.size(); 
+{
+   return mPhysicsWorldLookup.size();
 }
 
 void PxPlugin::_onDebugDrawEnabled( bool enabled )
-{   
+{
    if ( !enabled )
       gPhysicsSDK->setParameter( NX_VISUALIZATION_SCALE, 0.0f );
 }
 
 ConsoleFunction( physXRemoteDebuggerConnect, bool, 1, 3, "" )
 {
-   if ( !gPhysicsSDK )  
+   if ( !gPhysicsSDK )
    {
       Con::errorf( "PhysX SDK not initialized!" );
       return false;
@@ -280,7 +280,7 @@ ConsoleFunction( physXRemoteDebuggerConnect, bool, 1, 3, "" )
 
 ConsoleFunction( physXRemoteDebuggerDisconnect, void, 1, 1, "" )
 {
-   if ( !gPhysicsSDK )  
+   if ( !gPhysicsSDK )
    {
       Con::errorf( "PhysX SDK not initialized!" );
       return;

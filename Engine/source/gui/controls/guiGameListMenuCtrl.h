@@ -331,8 +331,8 @@ public:
 
    /// Initializes fields accessible through the console.
    static void initPersistFields();
-   
-   enum 
+
+   enum
    {
       TEX_NORMAL      = 0,  ///< texture index for a normal, unselected row
       TEX_SELECTED    = 1,  ///< texture index for a selected row

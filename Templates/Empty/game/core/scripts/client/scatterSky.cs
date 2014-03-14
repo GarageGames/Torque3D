@@ -24,14 +24,14 @@ new GFXStateBlockData( ScatterSkySBData )
 {
    cullDefined = true;
    cullMode = "GFXCullNone";
-   
+
    zDefined = true;
    zEnable = true;
    zWriteEnable = false;
    zFunc = "GFXCmpLessEqual";
-   
+
    samplersDefined = true;
-   samplerStates[0] = SamplerClampLinear;   
+   samplerStates[0] = SamplerClampLinear;
    samplerStates[1] = SamplerClampLinear;
    vertexColorEnable = true;
 };
@@ -39,10 +39,10 @@ new GFXStateBlockData( ScatterSkySBData )
 singleton ShaderData( ScatterSkyShaderData )
 {
    DXVertexShaderFile     = "shaders/common/scatterSkyV.hlsl";
-   DXPixelShaderFile      = "shaders/common/scatterSkyP.hlsl";   
-   
+   DXPixelShaderFile      = "shaders/common/scatterSkyP.hlsl";
+
    OGLVertexShaderFile     = "shaders/common/gl/scatterSkyV.glsl";
-   OGLPixelShaderFile      = "shaders/common/gl/scatterSkyP.glsl";   
-   
+   OGLPixelShaderFile      = "shaders/common/gl/scatterSkyP.glsl";
+
    pixVersion = 2.0;
 };

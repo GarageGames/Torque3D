@@ -35,7 +35,7 @@ MODULE_BEGIN( TelnetConsole )
    {
       TelnetConsole::create();
    }
-   
+
    MODULE_SHUTDOWN
    {
       TelnetConsole::destroy();
@@ -176,7 +176,7 @@ void TelnetConsole::process()
 
          const char *prompt = Con::getVariable("Con::Prompt");
          char connectMessage[1024];
-         dSprintf(connectMessage, sizeof(connectMessage), 
+         dSprintf(connectMessage, sizeof(connectMessage),
             "Torque Telnet Remote Console\r\n\r\n%s",
             cl->state == FullAccessConnected ? prompt : "Enter Password:");
 

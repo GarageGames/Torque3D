@@ -224,7 +224,7 @@ ConsoleDocClass( GameBase,
 );
 
 GameBase::GameBase()
-: mDataBlock( NULL ),  
+: mDataBlock( NULL ),
   mControllingClient( NULL ),
   mCurrentWaterObject( NULL )
 {
@@ -232,9 +232,9 @@ GameBase::GameBase()
    mTypeMask |= GameBaseObjectType;
    mProcessTag = 0;
 
-   // From ProcessObject   
+   // From ProcessObject
    mIsGameBase = true;
-   
+
 #ifdef TORQUE_DEBUG_NET_MOVES
    mLastMoveId = 0;
    mTicksSinceLastMove = 0;
@@ -282,9 +282,9 @@ bool GameBase::onNewDataBlock( GameBaseData *dptr, bool reload )
       if ( mDataBlock )
          mDataBlock->mReloadSignal.remove( this, &GameBase::_onDatablockModified );
       if ( dptr )
-         dptr->mReloadSignal.notify( this, &GameBase::_onDatablockModified );   
+         dptr->mReloadSignal.notify( this, &GameBase::_onDatablockModified );
    }
-   
+
 
    mDataBlock = dptr;
 
@@ -296,7 +296,7 @@ bool GameBase::onNewDataBlock( GameBaseData *dptr, bool reload )
 }
 
 void GameBase::_onDatablockModified()
-{   
+{
    AssertFatal( mDataBlock, "GameBase::onDatablockModified - mDataBlock is NULL." );
    onNewDataBlock( mDataBlock, true );
 }
@@ -519,15 +519,15 @@ void GameBase::readPacketData(GameConnection*, BitStream*)
 U32 GameBase::packUpdate( NetConnection *connection, U32 mask, BitStream *stream )
 {
    U32 retMask = Parent::packUpdate( connection, mask, stream );
-       
-   if ( stream->writeFlag( mask & ScaleMask ) )  
+
+   if ( stream->writeFlag( mask & ScaleMask ) )
    {
       // Only write one bit if the scale is one.
       if ( stream->writeFlag( mObjScale != Point3F::One ) )
-         mathWrite( *stream, mObjScale );   
+         mathWrite( *stream, mObjScale );
    }
 
-   if ( stream->writeFlag( ( mask & DataBlockMask ) && mDataBlock != NULL ) ) 
+   if ( stream->writeFlag( ( mask & DataBlockMask ) && mDataBlock != NULL ) )
    {
       stream->writeRangedU32( mDataBlock->getId(),
                               DataBlockObjectIdFirst,
@@ -547,9 +547,9 @@ U32 GameBase::packUpdate( NetConnection *connection, U32 mask, BitStream *stream
 void GameBase::unpackUpdate(NetConnection *con, BitStream *stream)
 {
    Parent::unpackUpdate( con, stream );
-   
+
    // ScaleMask
-   if ( stream->readFlag() ) 
+   if ( stream->readFlag() )
    {
       if ( stream->readFlag() )
       {
@@ -582,7 +582,7 @@ void GameBase::unpackUpdate(NetConnection *con, BitStream *stream)
 }
 
 void GameBase::onMount( SceneObject *obj, S32 node )
-{      
+{
    deleteNotify( obj );
 
    // Are we mounting to a GameBase object?
@@ -619,19 +619,19 @@ bool GameBase::setDataBlockProperty( void *obj, const char *index, const char *d
       Con::errorf( "GameBase::setDataBlockProperty - Can't unset datablock on GameBase objects" );
       return false;
    }
-   
+
    GameBase* object = static_cast< GameBase* >( obj );
    GameBaseData* data;
    if( Sim::findObject( db, data ) )
       return object->setDataBlock( data );
-   
+
    Con::errorf( "GameBase::setDatablockProperty - Could not find data block \"%s\"", db );
    return false;
 }
 
 MoveList* GameBase::getMoveList()
-{ 
-   return mControllingClient ? mControllingClient->mMoveList : NULL; 
+{
+   return mControllingClient ? mControllingClient->mMoveList : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -660,7 +660,7 @@ void GameBase::initPersistFields()
    addGroup( "Game" );
 
       addProtectedField( "dataBlock", TYPEID< GameBaseData >(), Offset(mDataBlock, GameBase),
-         &setDataBlockProperty, &defaultProtectedGetFn, 
+         &setDataBlockProperty, &defaultProtectedGetFn,
          "Script datablock used for game objects." );
 
    endGroup( "Game" );
@@ -696,7 +696,7 @@ DefineEngineMethod( GameBase, applyRadialImpulse, void, ( Point3F origin, F32 ra
    "@param origin World point of origin of the radial impulse.\n"
    "@param radius The radius of the impulse area.\n"
    "@param magnitude The strength of the impulse.\n"
-   
+
    "@note Not all objects that derrive from GameBase have this defined.\n")
 {
    object->applyRadialImpulse( origin, radius, magnitude );

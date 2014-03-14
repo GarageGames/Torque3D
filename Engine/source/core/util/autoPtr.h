@@ -114,7 +114,7 @@ public:
         reset(ref._ptr);
         return *this;
    }
-   
+
    bool isNull() const { return _ptr == NULL; }
    bool isValid() const { return !isNull(); }
 

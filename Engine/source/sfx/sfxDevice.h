@@ -52,9 +52,9 @@ class SFXDescription;
 class SFXDevice
 {
    public:
-   
+
       typedef void Parent;
-      
+
       /// Device capability flags.
       enum ECaps
       {
@@ -65,12 +65,12 @@ class SFXDevice
          CAPS_MultiListener   = BIT( 4 ),    ///< Device supports multiple listeners.
          CAPS_FMODDesigner    = BIT( 5 ),    ///< FMOD Designer support.
       };
-      
+
    protected:
 
       typedef Vector< SFXBuffer* > BufferVector;
       typedef Vector< SFXVoice* > VoiceVector;
-      
+
       typedef BufferVector::iterator BufferIterator;
       typedef VoiceVector::iterator VoiceIterator;
 
@@ -105,7 +105,7 @@ class SFXDevice
 
       /// Current total memory size of sound buffers.  Reflected in $SFX::Device::numBufferBytes.
       U32 mStatNumBufferBytes;
-      
+
       /// Register a buffer with the device.
       /// This also triggers the buffer's stream packet request chain.
       void _addBuffer( SFXBuffer* buffer );
@@ -145,7 +145,7 @@ public:
       U32 getCaps() const { return mCaps; }
 
       /// Tries to create a new sound buffer.  If creation fails
-      /// freeing another buffer will usually allow a new one to 
+      /// freeing another buffer will usually allow a new one to
       /// be created.
       ///
       /// @param stream          The sound data stream.
@@ -169,19 +169,19 @@ public:
       ///
       /// @return Returns a new voice or NULL if one cannot be created.
       virtual SFXVoice* createVoice( bool is3D, SFXBuffer* buffer ) = 0;
-      
+
       /// Set the rolloff curve to be used by distance attenuation of 3D sounds.
       virtual void setDistanceModel( SFXDistanceModel model ) {}
-      
+
       /// Set the scale factor to use for doppler effects on 3D sounds.
       virtual void setDopplerFactor( F32 factor ) {}
-      
+
       /// Set the rolloff scale factor for distance attenuation of 3D sounds.
       virtual void setRolloffFactor( F32 factor ) {}
-      
+
       /// Set the global reverb environment.
       virtual void setReverb( const SFXReverbProperties& reverb ) {}
-      
+
       /// Reset the global reverb environment to its default.
       virtual void resetReverb() {}
 
@@ -190,13 +190,13 @@ public:
       /// @note On devices that do not support multiple listeners, any value
       ///   other than 1 will be ignored.
       virtual void setNumListeners( U32 num ) {}
-      
+
       /// Set the properties of the given listener.
       ///
       /// @note On devices that do not support multiple listeners, only setting
       ///   the properties on index=0 will have a effect.
       virtual void setListener( U32 index, const SFXListenerProperties& listener ) {}
-            
+
       /// Return the current total number of sound buffers.
       U32 getBufferCount() const { return mBuffers.size(); }
 

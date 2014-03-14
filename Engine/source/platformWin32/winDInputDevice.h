@@ -100,7 +100,7 @@ class DInputDevice : public InputDevice
       ~DInputDevice();
 
       static void init();
- 
+
       bool create();
       void destroy();
 

@@ -50,10 +50,10 @@ protected:
 
    bool mCaseSensitive;
    S32 mCurrentIndex;
-   
+
    /// The array of key/value pairs.
    Vector< Element > mArray;
-   
+
    /// @name Sorting
    /// @{
 
@@ -67,18 +67,18 @@ protected:
    static S32 QSORT_CALLBACK _keyNumCompare( const void *a, const void *b );
    static S32 QSORT_CALLBACK _keyFunctionCompare( const void* a, const void* b );
    static S32 QSORT_CALLBACK _valueFunctionCompare( const void* a, const void* b );
-   
+
    /// @}
 
    static bool _addKeyFromField( void *object, const char *index, const char *data );
 
 public:
-  
+
    ArrayObject();
 
-   /// @name Data Query 
+   /// @name Data Query
    /// @{
-   
+
    /// Returns true if string handling by the array is case-sensitive.
    bool isCaseSensitive() const { return mCaseSensitive; }
 
@@ -87,7 +87,7 @@ public:
       return valA.equal( valB, isCaseSensitive() ? String::Case : String::NoCase );
    }
 
-   /// Searches the array for the first matching value from the 
+   /// Searches the array for the first matching value from the
    /// current array position.  It will return -1 if no matching
    /// index is found.
    S32 getIndexFromValue( const String &value ) const;
@@ -95,7 +95,7 @@ public:
    /// Searches the array for the first matching key from the current
    /// array position.  It will return -1 if no matching index found.
    S32 getIndexFromKey( const String &key ) const;
-   
+
    /// Returns the key for a given index.
    /// Will return a null value for an invalid index
    const String& getKeyFromIndex( S32 index ) const;
@@ -103,7 +103,7 @@ public:
    /// Returns the value for a given index.
    /// Will return a null value for an invalid index
    const String&	getValueFromIndex( S32 index ) const;
-   
+
    ///
    S32 getIndexFromKeyValue( const String &key, const String &value ) const;
 
@@ -178,7 +178,7 @@ public:
    /// @param asc      Determines if sorting ascending or descending.
    /// @param numeric  Determines if sorting alpha or numeric search.
    void sort( bool valtest, bool asc, bool numeric );
-   
+
    /// This sorts the array using a script callback.
    /// @param valtest  Determines whether sorting by value or key.
    /// @param asc      Determines if sorting ascending or descending.
@@ -225,7 +225,7 @@ public:
    DECLARE_CONOBJECT( ArrayObject );
    DECLARE_CATEGORY( "Core" );
    DECLARE_DESCRIPTION( "An object storing an indexed sequence of key/value pairs." );
-   
+
    static void initPersistFields();
 };
 

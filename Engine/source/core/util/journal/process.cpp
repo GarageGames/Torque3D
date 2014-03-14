@@ -31,7 +31,7 @@ MODULE_BEGIN( Process )
    {
       Process::init();
    }
-   
+
    MODULE_SHUTDOWN
    {
       Process::shutdown();
@@ -92,7 +92,7 @@ bool  Process::processEvents()
    // playback to ensure that the OS event queues are serviced.
    Process::get()._signalProcess.trigger();
 
-   if (!Process::get()._RequestShutdown) 
+   if (!Process::get()._RequestShutdown)
    {
       if (Journal::IsPlaying())
          return Journal::PlayNext();

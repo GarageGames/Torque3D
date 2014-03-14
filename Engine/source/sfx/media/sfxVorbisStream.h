@@ -47,7 +47,7 @@ class SFXVorbisStream : public SFXFileStream,
 
       /// The current bitstream index.
       S32 mBitstream;
-      
+
       /// Total number of bytes read from the Vorbis stream so far.
       U32 mBytesRead;
 
@@ -87,8 +87,8 @@ class SFXVorbisStream : public SFXFileStream,
       U64 getPcmTotal( S32 link = -1 );
 
       ///
-      S32 read(   U8 *buffer, 
-                  U32 length, 
+      S32 read(   U8 *buffer,
+                  U32 length,
                   S32 *bitstream );
 
       // SFXStream

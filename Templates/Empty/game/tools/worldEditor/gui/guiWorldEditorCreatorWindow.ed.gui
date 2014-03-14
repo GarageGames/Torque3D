@@ -154,7 +154,7 @@
             hovertime = "1000";
             groupNum = "-1";
             buttonType = "PushButton";
-            
+
             Bitmap = "tools/gui/images/folderUp.png";
             autoSize = "0";
          };

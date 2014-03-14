@@ -32,11 +32,11 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXFMODEventGroup );
 
 ConsoleDocClass( SFXFMODEventGroup,
    "@brief A group of events in an imported FMOD Designer project.\n\n"
-   
+
    ""
-   
+
    "@note Instances of this class \n\n"
-   
+
    "@ingroup SFXFMOD\n"
    "@ingroup Datablocks"
 );
@@ -75,14 +75,14 @@ SFXFMODEventGroup::SFXFMODEventGroup( SFXFMODProject* project, FMOD_EVENTGROUP* 
 {
    AssertFatal( project != NULL, "SFXFMODEventGroup::SFXFMODEventGroup - got a NULL project!" );
    AssertFatal( handle != NULL, "SFXFMODEventGroup::SFXFMODEventGroup - got a NULL group handle!" );
-   
+
    // Fetch the name.
-   
+
    int index;
    char* name = NULL;
-   
+
    SFXFMODDevice::smFunc->FMOD_EventGroup_GetInfo( handle, &index, &name );
-   
+
    mName = name;
 }
 
@@ -103,7 +103,7 @@ void SFXFMODEventGroup::initPersistFields()
    addField( "fmodGroup", TYPEID< SFXFMODEventGroup >(), Offset( mParent, SFXFMODEventGroup ), "DO NOT MODIFY!!" );
    addField( "fmodName", TypeRealString, Offset( mName, SFXFMODEventGroup ), "DO NOT MODIFY!!" );
    endGroup( "DO NOT MODIFY!!" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -113,18 +113,18 @@ bool SFXFMODEventGroup::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    if( !mProject )
    {
       Con::errorf( "SFXFMODEventGroup - not part of a project" );
       return false;
    }
-      
+
    if( mParent )
       mParent->_addGroup( this );
-   
+
    mProject->_addGroup( this );
-      
+
    return true;
 }
 
@@ -133,20 +133,20 @@ bool SFXFMODEventGroup::onAdd()
 void SFXFMODEventGroup::onRemove()
 {
    Parent::onRemove();
-   
+
    if( !mProject )
       return;
-   
+
    release();
-   
+
    while( mEvents )
       mEvents->deleteObject();
    while( mChildren )
       mChildren->deleteObject();
-   
+
    if( mParent )
       mParent->_removeGroup( this );
-      
+
    mProject->_removeGroup( this );
 }
 
@@ -156,7 +156,7 @@ bool SFXFMODEventGroup::preload( bool server, String& errorStr )
 {
    if( !Parent::preload( server, errorStr ) )
       return false;
-   
+
    if( !server )
    {
       if( mParentId != 0 && !Sim::findObject( mParentId, mParent ) )
@@ -170,7 +170,7 @@ bool SFXFMODEventGroup::preload( bool server, String& errorStr )
          return false;
       }
    }
-      
+
    return true;
 }
 
@@ -179,7 +179,7 @@ bool SFXFMODEventGroup::preload( bool server, String& errorStr )
 void SFXFMODEventGroup::packData( BitStream* stream )
 {
    Parent::packData( stream );
-   
+
    stream->write( mName );
    stream->writeRangedS32( mProject->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast );
    if( stream->writeFlag( mParent ) )
@@ -191,9 +191,9 @@ void SFXFMODEventGroup::packData( BitStream* stream )
 void SFXFMODEventGroup::unpackData( BitStream* stream )
 {
    Parent::unpackData( stream );
-   
+
    stream->read( &mName );
-   
+
    mProjectId = stream->readRangedS32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
    if( stream->readFlag() )
       mParentId = stream->readRangedS32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
@@ -216,11 +216,11 @@ String SFXFMODEventGroup::getQualifiedName() const
 bool SFXFMODEventGroup::isDataLoaded() const
 {
    // Check whether we or any of our parents has triggered a load.
-   
+
    for( const SFXFMODEventGroup* group = this; group != NULL; group = group->mParent )
       if( group->mLoadCount > 0 )
          return true;
-         
+
    return false;
 }
 
@@ -230,7 +230,7 @@ bool SFXFMODEventGroup::loadData( bool samples, bool streams )
 {
    if( !mHandle )
       acquire();
-   
+
    if( !mLoadCount )
    {
       FMOD_EVENT_RESOURCE resource;
@@ -242,18 +242,18 @@ bool SFXFMODEventGroup::loadData( bool samples, bool streams )
          resource = FMOD_EVENT_RESOURCE_STREAMS;
       else
          return true;
-         
+
       FMOD_RESULT result = SFXFMODDevice::smFunc->FMOD_EventGroup_LoadEventData( mHandle, resource, FMOD_EVENT_DEFAULT );
       if( result != FMOD_OK )
       {
          Con::errorf( "SFXFMODEventGroup::loadData - could not load data: %s", FMODResultToString( result ).c_str() );
          return false;
       }
-      
+
       SFXFMODDevice::instance()->updateMemUsageStats();
       Con::printf( "SFXFMODProject - %s: Loaded data for group '%s'", mProject->getName(), getQualifiedName().c_str() );
    }
-   
+
    mLoadCount ++;
    return true;
 }
@@ -263,7 +263,7 @@ bool SFXFMODEventGroup::loadData( bool samples, bool streams )
 void SFXFMODEventGroup::freeData( bool force )
 {
    bool isLoaded = ( mLoadCount > 0 );
-   
+
    if( !isLoaded )
       isLoaded = ( mParent ? mParent->isDataLoaded() : false );
    else
@@ -273,13 +273,13 @@ void SFXFMODEventGroup::freeData( bool force )
       else
          -- mLoadCount;
    }
-      
+
    if( !mLoadCount && isLoaded )
    {
       FMOD_RESULT result = SFXFMODDevice::smFunc->FMOD_EventGroup_FreeEventData( mHandle, ( FMOD_EVENT* ) NULL, false );
       if( result != FMOD_OK )
          Con::errorf( "SFXFMODEventGroup - failed freeing event data: %s", FMODResultToString( result ).c_str() );
-         
+
       SFXFMODDevice::instance()->updateMemUsageStats();
       Con::printf( "SFXFMODProject - %s: Cleared data for group '%s'", mProject->getName(), getQualifiedName().c_str() );
    }
@@ -290,11 +290,11 @@ void SFXFMODEventGroup::freeData( bool force )
 void SFXFMODEventGroup::acquire( bool recursive )
 {
    // Make sure the project is acquired.
-   
+
    mProject->acquire();
-   
+
    // Acquire the group.
-   
+
    if( !mHandle )
    {
       if( mParent )
@@ -308,14 +308,14 @@ void SFXFMODEventGroup::acquire( bool recursive )
          SFXFMODDevice::smFunc->FMOD_EventProject_GetGroup( mProject->mHandle, mName, true, &mHandle );
       }
    }
-   
+
    // Acquite events and subgroups.
-   
+
    if( recursive )
    {
       for( SFXFMODEvent* event = mEvents; event != NULL; event = event->mSibling )
          event->acquire();
-         
+
       for( SFXFMODEventGroup* group = mChildren; group != NULL; group = group->mSibling )
          group->acquire( true );
    }
@@ -327,24 +327,24 @@ void SFXFMODEventGroup::release()
 {
    if( !mHandle )
       return;
-      
+
    // Free the event data if we still have it loaded.
-      
+
    if( isDataLoaded() )
       freeData( true );
-      
+
    // Release events.
-   
+
    for( SFXFMODEvent* event = mEvents; event != NULL; event = event->mSibling )
       event->release();
-   
+
    // Release children.
-   
+
    for( SFXFMODEventGroup* child = mChildren; child != NULL; child = child->mSibling )
       child->release();
-   
+
    // Release our handle.
-   
+
    freeData();
    mHandle = NULL;
 }
@@ -354,20 +354,20 @@ void SFXFMODEventGroup::release()
 void SFXFMODEventGroup::_load()
 {
    // Make sure we have the group open.
-   
+
    if( !mHandle )
       acquire();
-      
+
    // Fetch info.
-   
+
    int numEvents;
    int numGroups;
 
    SFXFMODDevice::smFunc->FMOD_EventGroup_GetNumEvents( mHandle, &numEvents );
    SFXFMODDevice::smFunc->FMOD_EventGroup_GetNumGroups( mHandle, &numGroups );
-   
+
    // Load events.
-   
+
    for( U32 i = 0; i < numEvents; ++ i )
    {
       FMOD_EVENT* handle;
@@ -376,15 +376,15 @@ void SFXFMODEventGroup::_load()
          SFXFMODEvent* event = new SFXFMODEvent( this, handle );
          if( !isClientOnly() )
             event->assignId();
-            
+
          event->registerObject( String::ToString( "%s_%s", getName(), FMODEventPathToTorqueName( event->getEventName() ).c_str() ) );
          if( isClientOnly() )
             Sim::getRootGroup()->addObject( event );
       }
    }
-   
+
    // Load subgroups.
-   
+
    for( U32 i = 0; i < numGroups; ++ i )
    {
       FMOD_EVENTGROUP* handle;
@@ -393,11 +393,11 @@ void SFXFMODEventGroup::_load()
          SFXFMODEventGroup* group = new SFXFMODEventGroup( mProject, handle, this );
          if( !isClientOnly() )
             group->assignId();
-            
+
          group->registerObject( String::ToString( "%s_%s", getName(), FMODEventPathToTorqueName( group->getGroupName() ).c_str() ) );
          if( isClientOnly() )
             Sim::getRootGroup()->addObject( group );
-         
+
          group->_load();
       }
    }
@@ -427,7 +427,7 @@ void SFXFMODEventGroup::_removeEvent( SFXFMODEvent* event )
       SFXFMODEvent* p = mEvents;
       while( p != NULL && p->mSibling != event )
          p = p->mSibling;
-      
+
       if( p )
       {
          p->mSibling = event->mSibling;
@@ -461,7 +461,7 @@ void SFXFMODEventGroup::_removeGroup( SFXFMODEventGroup* group )
       SFXFMODEventGroup* p = mChildren;
       while( p != NULL && p->mSibling != group )
          p = p->mSibling;
-      
+
       if( p )
       {
          p->mSibling = group->mSibling;

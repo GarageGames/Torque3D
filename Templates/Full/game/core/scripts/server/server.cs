@@ -56,19 +56,19 @@ function createAndConnectToLocalServer( %serverType, %level )
 {
    if( !createServer( %serverType, %level ) )
       return false;
-   
+
    %conn = new GameConnection( ServerConnection );
    RootGroup.add( ServerConnection );
 
    %conn.setConnectArgs( $pref::Player::Name );
    %conn.setJoinPassword( $Client::Password );
-   
+
    %result = %conn.connectLocal();
    if( %result !$= "" )
    {
       %conn.delete();
       destroyServer();
-      
+
       return false;
    }
 
@@ -82,13 +82,13 @@ function createServer(%serverType, %level)
    // Increase the server session number.  This is used to make sure we're
    // working with the server session we think we are.
    $Server::Session++;
-   
+
    if (%level $= "")
    {
       error("createServer(): level name unspecified");
       return false;
    }
-   
+
    // Make sure our level name is relative so that it can send
    // across the network correctly
    %level = makeRelativePath(%level, getWorkingDirectory());
@@ -100,13 +100,13 @@ function createServer(%serverType, %level)
    $Server::ServerType = %serverType;
    $Server::LoadFailMsg = "";
    $Physics::isSinglePlayer = true;
-   
+
    // Setup for multi-player, the network must have been
    // initialized before now.
    if (%serverType $= "MultiPlayer")
    {
       $Physics::isSinglePlayer = false;
-            
+
       echo("Starting multiplayer mode");
 
       // Make sure the network port is set to the correct pref.
@@ -128,7 +128,7 @@ function createServer(%serverType, %level)
    onServerCreated();
 
    loadMission(%level, true);
-   
+
    return true;
 }
 
@@ -139,7 +139,7 @@ function destroyServer()
    allowConnections(false);
    stopHeartbeat();
    $missionRunning = false;
-   
+
    // End any running levels
    endMission();
    onServerDestroyed();
@@ -159,7 +159,7 @@ function destroyServer()
 
    // Delete all the data blocks...
    deleteDataBlocks();
-   
+
    // Save any server settings
    echo( "Exporting server prefs..." );
    export( "$Pref::Server::*", "~/prefs.cs", false );
@@ -173,7 +173,7 @@ function destroyServer()
 function resetServerDefaults()
 {
    echo( "Resetting server defaults..." );
-   
+
    exec( "~/defaults.cs" );
    exec( "~/prefs.cs" );
 

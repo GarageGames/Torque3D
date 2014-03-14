@@ -65,14 +65,14 @@ function ActionUpdateActiveMaterial::redo(%this)
       eval("materialEd_previewMaterial." @ %this.field @ " = " @ %this.newValue @ ";");
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          eval("%this.material." @ %this.field @ " = " @ %this.newValue @ ";");
          MaterialEditorGui.currentMaterial.flush();
          MaterialEditorGui.currentMaterial.reload();
-      }      
-      
+      }
+
       MaterialEditorGui.preventUndo = true;
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
       MaterialEditorGui.setMaterialDirty();
@@ -99,11 +99,11 @@ function ActionUpdateActiveMaterial::undo(%this)
          MaterialEditorGui.setActiveMaterial(%this.material);
       }
       */
-      
+
       eval("materialEd_previewMaterial." @ %this.field @ " = " @ %this.oldValue @ ";");
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          eval("%this.material." @ %this.field @ " = " @ %this.oldValue @ ";");
@@ -119,7 +119,7 @@ function ActionUpdateActiveMaterial::undo(%this)
       %this.material.flush();
       %this.material.reload();
    }
-   
+
    MaterialEditorGui.preventUndo = false;
 }
 
@@ -137,11 +137,11 @@ function ActionUpdateActiveMaterialAnimationFlags::redo(%this)
          MaterialEditorGui.setActiveMaterial(%this.material);
       }
       */
-      
+
       eval("materialEd_previewMaterial.animFlags[" @ %this.layer @ "] = " @ %this.newValue @ ";");
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          eval("%this.material.animFlags[" @ %this.layer @ "] = " @ %this.newValue @ ";");
@@ -149,7 +149,7 @@ function ActionUpdateActiveMaterialAnimationFlags::redo(%this)
          MaterialEditorGui.currentMaterial.reload();
       }
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
-      MaterialEditorGui.setMaterialDirty();      
+      MaterialEditorGui.setMaterialDirty();
    }
    else
    {
@@ -162,11 +162,11 @@ function ActionUpdateActiveMaterialAnimationFlags::redo(%this)
 function ActionUpdateActiveMaterialAnimationFlags::undo(%this)
 {
    if( MaterialEditorPreviewWindow.isVisible() && MaterialEditorGui.currentMaterial == %this.material )
-   {      
+   {
       eval("materialEd_previewMaterial.animFlags[" @ %this.layer @ "] = " @ %this.oldValue @ ";");
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          eval("%this.material.animFlags[" @ %this.layer @ "] = " @ %this.oldValue @ ";");
@@ -174,7 +174,7 @@ function ActionUpdateActiveMaterialAnimationFlags::undo(%this)
          MaterialEditorGui.currentMaterial.reload();
       }
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
-      MaterialEditorGui.setMaterialDirty();      
+      MaterialEditorGui.setMaterialDirty();
    }
    else
    {
@@ -213,19 +213,19 @@ function ActionRefreshMaterial::redo(%this)
    if( MaterialEditorPreviewWindow.isVisible() && MaterialEditorGui.currentMaterial == %this.material )
    {
       %this.material.setName( %this.newName );
-     
+
       MaterialEditorGui.copyMaterials( %this.newMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          MaterialEditorGui.copyMaterials( %this.newMaterial , %this.material );
          %this.material.flush();
          %this.material.reload();
       }
-      
-      
+
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
       MaterialEditorGui.setMaterialNotDirty();
    }
@@ -242,18 +242,18 @@ function ActionRefreshMaterial::undo(%this)
    if( MaterialEditorPreviewWindow.isVisible() && MaterialEditorGui.currentMaterial == %this.material )
    {
       %this.material.setName( %this.oldName );
-      
+
       MaterialEditorGui.copyMaterials( %this.oldMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          MaterialEditorGui.copyMaterials( %this.oldMaterial, %this.material );
          %this.material.flush();
          %this.material.reload();
       }
-            
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
       MaterialEditorGui.setMaterialDirty();
    }
@@ -272,14 +272,14 @@ function ActionClearMaterial::redo(%this)
       MaterialEditorGui.copyMaterials( %this.newMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          MaterialEditorGui.copyMaterials( %this.newMaterial, %this.material );
          %this.material.flush();
          %this.material.reload();
       }
-      
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
       MaterialEditorGui.setMaterialDirty();
    }
@@ -298,14 +298,14 @@ function ActionClearMaterial::undo(%this)
       MaterialEditorGui.copyMaterials( %this.oldMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       if (MaterialEditorGui.livePreview == true)
       {
          MaterialEditorGui.copyMaterials( %this.oldMaterial, %this.material );
          %this.material.flush();
          %this.material.reload();
       }
-      
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
       MaterialEditorGui.setMaterialDirty();
    }
@@ -322,19 +322,19 @@ function ActionChangeMaterial::redo(%this)
    if( %this.mode $= "model" )
    {
       %this.object.changeMaterial( %this.materialTarget, %this.fromMaterial.getName(), %this.toMaterial.getName() );
-      
+
       MaterialEditorGui.currentObject = %this.object;
-   
-      if( %this.toMaterial.getFilename() !$= "tools/gui/materialSelector.ed.gui" || 
+
+      if( %this.toMaterial.getFilename() !$= "tools/gui/materialSelector.ed.gui" ||
             %this.toMaterial.getFilename() !$= "tools/materialEditor/scripts/materialEditor.ed.cs")
       {
          matEd_PersistMan.removeObjectFromFile(%this.toMaterial);
       }
-      
+
       matEd_PersistMan.setDirty(%this.fromMaterial);
       matEd_PersistMan.setDirty(%this.toMaterial, %this.toMaterialNewFname);
       matEd_PersistMan.saveDirty();
-      
+
       matEd_PersistMan.removeDirty(%this.fromMaterial);
       matEd_PersistMan.removeDirty(%this.toMaterial);
    }
@@ -343,7 +343,7 @@ function ActionChangeMaterial::redo(%this)
       eval("%this.object." @ %this.materialTarget @ " = " @ %this.toMaterial.getName() @ ";");
       MaterialEditorGui.currentObject.postApply();
    }
-   
+
    if( MaterialEditorPreviewWindow.isVisible() )
       MaterialEditorGui.setActiveMaterial( %this.toMaterial );
 }
@@ -353,20 +353,20 @@ function ActionChangeMaterial::undo(%this)
    if( %this.mode $= "model" )
    {
       %this.object.changeMaterial( %this.materialTarget, %this.toMaterial.getName(), %this.fromMaterial.getName() );
-      
-      MaterialEditorGui.currentObject = %this.object;    
-         
-      if( %this.toMaterial.getFilename() !$= "tools/gui/materialSelector.ed.gui" || 
+
+      MaterialEditorGui.currentObject = %this.object;
+
+      if( %this.toMaterial.getFilename() !$= "tools/gui/materialSelector.ed.gui" ||
             %this.toMaterial.getFilename() !$= "tools/materialEditor/scripts/materialEditor.ed.cs")
       {
          matEd_PersistMan.removeObjectFromFile(%this.toMaterial);
       }
-      
-      
+
+
       matEd_PersistMan.setDirty(%this.fromMaterial);
       matEd_PersistMan.setDirty(%this.toMaterial, %this.toMaterialOldFname);
       matEd_PersistMan.saveDirty();
-      
+
       matEd_PersistMan.removeDirty(%this.fromMaterial);
       matEd_PersistMan.removeDirty(%this.toMaterial);
    }
@@ -375,7 +375,7 @@ function ActionChangeMaterial::undo(%this)
       eval("%this.object." @ %this.materialTarget @ " = " @ %this.fromMaterial.getName() @ ";");
       MaterialEditorGui.currentObject.postApply();
    }
-   
+
    if( MaterialEditorPreviewWindow.isVisible() )
       MaterialEditorGui.setActiveMaterial( %this.fromMaterial );
 }
@@ -390,14 +390,14 @@ function ActionCreateNewMaterial::redo(%this)
          MaterialEditorGui.setMode();
          MaterialEditorGui.setActiveMaterial(%this.newMaterial);
       }
-      
+
       MaterialEditorGui.copyMaterials( %this.newMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
    }
-   
+
    %idx = UnlistedMaterials.getIndexFromValue( %this.newMaterial.getName() );
    UnlistedMaterials.erase( %idx );
 }
@@ -412,14 +412,14 @@ function ActionCreateNewMaterial::undo(%this)
          MaterialEditorGui.setMode();
          MaterialEditorGui.setActiveMaterial(%this.oldMaterial);
       }
-      
+
       MaterialEditorGui.copyMaterials( %this.oldMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
    }
-   
+
    UnlistedMaterials.add( "unlistedMaterials", %this.newMaterial.getName() );
 }
 
@@ -433,20 +433,20 @@ function ActionDeleteMaterial::redo(%this)
          MaterialEditorGui.setMode();
          MaterialEditorGui.setActiveMaterial(%this.newMaterial);
       }
-      
+
       MaterialEditorGui.copyMaterials( %this.newMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
    }
-   
-   if( %this.oldMaterial.getFilename() !$= "tools/gui/materialSelector.ed.gui" || 
+
+   if( %this.oldMaterial.getFilename() !$= "tools/gui/materialSelector.ed.gui" ||
          %this.oldMaterial.getFilename() !$= "tools/materialEditor/scripts/materialEditor.ed.cs")
    {
       matEd_PersistMan.removeObjectFromFile(%this.oldMaterial);
    }
-      
+
    UnlistedMaterials.add( "unlistedMaterials", %this.oldMaterial.getName() );
 }
 
@@ -460,18 +460,18 @@ function ActionDeleteMaterial::undo(%this)
          MaterialEditorGui.setMode();
          MaterialEditorGui.setActiveMaterial(%this.oldMaterial);
       }
-      
+
       MaterialEditorGui.copyMaterials( %this.oldMaterial, materialEd_previewMaterial );
       materialEd_previewMaterial.flush();
       materialEd_previewMaterial.reload();
-      
+
       MaterialEditorGui.guiSync( materialEd_previewMaterial );
    }
-   
+
    matEd_PersistMan.setDirty(%this.oldMaterial, %this.oldMaterialFname);
    matEd_PersistMan.saveDirty();
    matEd_PersistMan.removeDirty(%this.oldMaterial);
-   
+
    %idx = UnlistedMaterials.getIndexFromValue( %this.oldMaterial.getName() );
    UnlistedMaterials.erase( %idx );
 }

@@ -74,7 +74,7 @@ private:
       UpdateMask =   Parent::NextFreeMask,
       NextFreeMask = Parent::NextFreeMask << 1
    };
-   
+
    // vertex / index buffers
    Vector< GFXVertexBufferHandle<GFXWaterVertex>* > mVertBuffList;
    Vector<GFXPrimitiveBufferHandle*> mPrimBuffList;
@@ -85,7 +85,7 @@ private:
    F32            mGridElementSize;
    U32            mWidth;
    U32            mHeight;
-   F32            mElapsedTime;   
+   F32            mElapsedTime;
    GFXTexHandle   mBumpTex;
    bool           mGenerateVB;
 
@@ -97,7 +97,7 @@ private:
 
    // Stateblocks
    GFXStateBlockRef mUnderwaterSB;
-   
+
    void setupVertexBlock( U32 width, U32 height, U32 rowOffset );
    void setupPrimitiveBlock( U32 width, U32 height );
    void setMultiPassProjection();
@@ -120,7 +120,7 @@ public:
    WaterBlock();
    virtual ~WaterBlock();
 
-   DECLARE_CONOBJECT(WaterBlock);   
+   DECLARE_CONOBJECT(WaterBlock);
 
    static void initPersistFields();
    void onStaticModified( const char* slotName, const char*newValue = NULL );
@@ -133,9 +133,9 @@ public:
    virtual F32 getSurfaceHeight( const Point2F &pos ) const;
    virtual bool isUnderwater( const Point3F &pnt ) const;
 
-   // WaterBlock   
+   // WaterBlock
    bool isPointSubmerged ( const Point3F &pos, bool worldSpace = true ) const{ return true; }
-   
+
    // SceneObject.
    virtual F32 distanceTo( const Point3F& pos ) const;
 
@@ -143,7 +143,7 @@ protected:
 
    // WaterObject
    virtual void setShaderParams( SceneRenderState *state, BaseMatInstance *mat, const WaterMatParams &paramHandles );
-   virtual SceneData setupSceneGraphInfo( SceneRenderState *state );   
+   virtual SceneData setupSceneGraphInfo( SceneRenderState *state );
    virtual void setupVBIB();
    virtual void innerRender( SceneRenderState *state );
    virtual void _getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &outPos );

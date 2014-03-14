@@ -32,11 +32,11 @@ class WinFont : public PlatformFont
 private:
     HFONT mFont;
     TEXTMETRIC mTextMetric;
-    
+
 public:
     WinFont();
     virtual ~WinFont();
-    
+
     // PlatformFont virtual methods
     virtual bool isValidChar(const UTF16 ch) const;
     virtual bool isValidChar(const UTF8 *str) const;

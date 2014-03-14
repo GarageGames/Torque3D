@@ -30,7 +30,7 @@ singleton GuiControlProfile( MeshRoadEditorProfile )
 
 singleton GuiControlProfile (GuiDisabledTextEditProfile)
 {
-   opaque = false;   
+   opaque = false;
    border = 0;
    bitmap = "./textEdit";
    borderColor = "255 255 255 200";
@@ -41,13 +41,13 @@ singleton GuiControlProfile (GuiDisabledTextEditProfile)
    autoSizeWidth = false;
    autoSizeHeight = false;
    tab = false;
-   canKeyFocus = false;   
+   canKeyFocus = false;
    category = "Editor";
 };
 
 singleton GuiControlProfile (GuiSimpleBorderProfile)
 {
-   opaque = false;   
-   border = 1;   
+   opaque = false;
+   border = 1;
    category = "Editor";
 };

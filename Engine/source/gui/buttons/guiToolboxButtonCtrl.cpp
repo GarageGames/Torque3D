@@ -49,7 +49,7 @@ GuiToolboxButtonCtrl::GuiToolboxButtonCtrl()
    setExtent(48, 48);
    mButtonType = ButtonTypeRadio;
    mTipHoverTime = 100;
-   
+
 }
 
 
@@ -70,7 +70,7 @@ bool GuiToolboxButtonCtrl::onWake()
       return false;
 
    setActive( true );
-   
+
    setNormalBitmap( mNormalBitmapName );
    setLoweredBitmap( mLoweredBitmapName );
    setHoverBitmap( mHoverBitmapName );
@@ -124,7 +124,7 @@ void GuiToolboxButtonCtrl::inspectPostApply()
 void GuiToolboxButtonCtrl::setNormalBitmap( StringTableEntry bitmapName )
 {
    mNormalBitmapName = StringTable->insert( bitmapName );
-   
+
    if(!isAwake())
       return;
 
@@ -132,14 +132,14 @@ void GuiToolboxButtonCtrl::setNormalBitmap( StringTableEntry bitmapName )
       mTextureNormal = GFXTexHandle( mNormalBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__) );
    else
       mTextureNormal = NULL;
-   
+
    setUpdate();
-}   
+}
 
 void GuiToolboxButtonCtrl::setLoweredBitmap( StringTableEntry bitmapName )
 {
    mLoweredBitmapName = StringTable->insert( bitmapName );
-   
+
    if(!isAwake())
       return;
 
@@ -147,9 +147,9 @@ void GuiToolboxButtonCtrl::setLoweredBitmap( StringTableEntry bitmapName )
       mTextureLowered = GFXTexHandle( mLoweredBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureLowered (line %d)", __FUNCTION__, __LINE__) );
    else
       mTextureLowered = NULL;
-   
+
    setUpdate();
-}   
+}
 
 void GuiToolboxButtonCtrl::setHoverBitmap( StringTableEntry bitmapName )
 {
@@ -164,7 +164,7 @@ void GuiToolboxButtonCtrl::setHoverBitmap( StringTableEntry bitmapName )
       mTextureHover = NULL;
 
    setUpdate();
-}   
+}
 
 
 

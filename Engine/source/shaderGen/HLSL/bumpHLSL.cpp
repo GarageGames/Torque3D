@@ -31,7 +31,7 @@
 #include "shaderGen/shaderGenVars.h"
 
 
-void BumpFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
+void BumpFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
@@ -40,15 +40,15 @@ void BumpFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    const bool useTexAnim = fd.features[MFT_TexAnim];
 
    // Output the texture coord.
-   getOutTexCoord(   "texCoord", 
-                     "float2", 
-                     true, 
-                     useTexAnim, 
-                     meta, 
+   getOutTexCoord(   "texCoord",
+                     "float2",
+                     true,
+                     useTexAnim,
+                     meta,
                      componentList );
 
    if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
-      addOutDetailTexCoord( componentList, 
+      addOutDetailTexCoord( componentList,
                             meta,
                             useTexAnim );
 
@@ -57,7 +57,7 @@ void BumpFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    getOutWorldToTangent( componentList, meta, fd );
 }
 
-void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
+void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
@@ -121,7 +121,7 @@ void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
          meta->addStatement( new GenOp( "   @ = saturate(@);\r\n", atDecl, texCoord ) );
 
       // Finally scale/offset, and correct for filtering
-      meta->addStatement( new GenOp( "   @ = @ * ((mipSz_bump * @.xy - 1.0) / mipSz_bump) + 0.5 / mipSz_bump + @.xy * @.xy;\r\n", 
+      meta->addStatement( new GenOp( "   @ = @ * ((mipSz_bump * @.xy - 1.0) / mipSz_bump) + 0.5 / mipSz_bump + @.xy * @.xy;\r\n",
          atlasedTex, atlasedTex, atParams, atParams, tileParams ) );
 
       // Add a newline
@@ -172,7 +172,7 @@ void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       meta->addStatement( new GenOp( "   @.xy += @.xy * @;\r\n", bumpNorm, detailBump, detailBumpScale ) );
    }
 
-   // We transform it into world space by reversing the 
+   // We transform it into world space by reversing the
    // multiplication by the worldToTanget transform.
    Var *wsNormal = new Var( "wsNormal", "float3" );
    Var *worldToTanget = getInWorldToTangent( componentList );
@@ -181,7 +181,7 @@ void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
 ShaderFeature::Resources BumpFeatHLSL::getResources( const MaterialFeatureData &fd )
 {
-   Resources res; 
+   Resources res;
 
    // If we have no parallax then we bring on the normal tex.
    if ( !fd.features[MFT_Parallax] )
@@ -254,20 +254,20 @@ Var* ParallaxFeatHLSL::_getUniformVar( const char *name, const char *type, Const
    return theVar;
 }
 
-void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList, 
+void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
-   AssertFatal( GFX->getPixelShaderVersion() >= 2.0, 
+   AssertFatal( GFX->getPixelShaderVersion() >= 2.0,
       "ParallaxFeatHLSL::processVert - We don't support SM 1.x!" );
 
    MultiLine *meta = new MultiLine;
 
    // Add the texture coords.
-   getOutTexCoord(   "texCoord", 
-                     "float2", 
-                     true, 
-                     fd.features[MFT_TexAnim], 
-                     meta, 
+   getOutTexCoord(   "texCoord",
+                     "float2",
+                     true,
+                     fd.features[MFT_TexAnim],
+                     meta,
                      componentList );
 
    // Grab the input position.
@@ -275,7 +275,7 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    if ( !inPos )
       inPos = (Var*)LangElement::find( "position" );
 
-   // Get the object space eye position and the 
+   // Get the object space eye position and the
    // object to tangent space transform.
    Var *eyePos = _getUniformVar( "eyePos", "float3", cspPrimitive );
    Var *objToTangentSpace = getOutObjToTangentSpace( componentList, meta, fd );
@@ -286,7 +286,7 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    outNegViewTS->setName( "outNegViewTS" );
    outNegViewTS->setStructName( "OUT" );
    outNegViewTS->setType( "float3" );
-   meta->addStatement( new GenOp( "   @ = mul( @, float3( @.xyz - @ ) );\r\n", 
+   meta->addStatement( new GenOp( "   @ = mul( @, float3( @.xyz - @ ) );\r\n",
       outNegViewTS, objToTangentSpace, inPos, eyePos ) );
 
    // TODO: I'm at a loss at why i need to flip the binormal/y coord
@@ -295,7 +295,7 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    //
    // Someone figure this out!
    //
-   meta->addStatement( new GenOp( "   @.y = -@.y;\r\n", outNegViewTS, outNegViewTS ) );  
+   meta->addStatement( new GenOp( "   @.y = -@.y;\r\n", outNegViewTS, outNegViewTS ) );
 
    // If we have texture anim matrix the tangent
    // space view vector may need to be rotated.
@@ -309,10 +309,10 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    output = meta;
 }
 
-void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList, 
+void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
-   AssertFatal( GFX->getPixelShaderVersion() >= 2.0, 
+   AssertFatal( GFX->getPixelShaderVersion() >= 2.0,
       "ParallaxFeatHLSL::processPix - We don't support SM 1.x!" );
 
    MultiLine *meta = new MultiLine;
@@ -345,7 +345,7 @@ void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    Var *normalMap = getNormalMapTex();
 
    // Call the library function to do the rest.
-   meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @ );\r\n", 
+   meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @ );\r\n",
       texCoord, normalMap, texCoord, negViewTS, parallaxInfo ) );
 
    // TODO: Fix second UV maybe?
@@ -355,7 +355,7 @@ void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
 
 ShaderFeature::Resources ParallaxFeatHLSL::getResources( const MaterialFeatureData &fd )
 {
-   AssertFatal( GFX->getPixelShaderVersion() >= 2.0, 
+   AssertFatal( GFX->getPixelShaderVersion() >= 2.0,
       "ParallaxFeatHLSL::getResources - We don't support SM 1.x!" );
 
    Resources res;
@@ -376,7 +376,7 @@ void ParallaxFeatHLSL::setTexData(  Material::StageData &stageDat,
                                     RenderPassData &passData,
                                     U32 &texIndex )
 {
-   AssertFatal( GFX->getPixelShaderVersion() >= 2.0, 
+   AssertFatal( GFX->getPixelShaderVersion() >= 2.0,
       "ParallaxFeatHLSL::setTexData - We don't support SM 1.x!" );
 
    GFXTextureObject *tex = stageDat.getTex( MFT_NormalMap );
@@ -388,7 +388,7 @@ void ParallaxFeatHLSL::setTexData(  Material::StageData &stageDat,
 }
 
 
-void NormalsOutFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
+void NormalsOutFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // If we have normal maps then we can count
@@ -408,7 +408,7 @@ void NormalsOutFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    outNormal->mapsToSampler = false;
 
    // Find the incoming vertex normal.
-   Var *inNormal = (Var*)LangElement::find( "normal" );   
+   Var *inNormal = (Var*)LangElement::find( "normal" );
    if ( inNormal )
    {
       // Transform the normal to world space.
@@ -423,7 +423,7 @@ void NormalsOutFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    }
 }
 
-void NormalsOutFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
+void NormalsOutFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
@@ -446,7 +446,7 @@ void NormalsOutFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       // precision for normals and performs much better
       // on older Geforce cards.
       //
-      meta->addStatement( new GenOp( "   @ = normalize( half3( @ ) );\r\n", wsNormal, wsNormal ) );      
+      meta->addStatement( new GenOp( "   @ = normalize( half3( @ ) );\r\n", wsNormal, wsNormal ) );
    }
 
    LangElement *normalOut;
@@ -456,6 +456,6 @@ void NormalsOutFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    else
       normalOut = new GenOp( "float4( ( -@ + 1 ) * 0.5, 1 )", wsNormal );
 
-   meta->addStatement( new GenOp( "   @;\r\n", 
+   meta->addStatement( new GenOp( "   @;\r\n",
       assignColor( normalOut, Material::None ) ) );
 }

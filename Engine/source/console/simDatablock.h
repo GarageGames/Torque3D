@@ -107,7 +107,7 @@ public:
 
    SimDataBlock();
    DECLARE_CONOBJECT(SimDataBlock);
-   
+
    /// @name Datablock Internals
    /// @{
 
@@ -126,7 +126,7 @@ public:
    static S32 getNextModifiedKey() { return sNextModifiedKey; }
 
    /// Returns true if this is a client side only datablock (in
-   /// other words a datablock allocated with 'new' instead of 
+   /// other words a datablock allocated with 'new' instead of
    /// the 'datablock' keyword).
    bool isClientOnly() const { return getId() < DataBlockObjectIdFirst || getId() > DataBlockObjectIdLast; }
 

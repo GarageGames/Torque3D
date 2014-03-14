@@ -50,7 +50,7 @@ bool ScenePolyhedralZone::onAdd()
       // Also need to update OBB.
       _updateOrientedWorldBox();
    }
-      
+
    return true;
 }
 
@@ -88,7 +88,7 @@ bool ScenePolyhedralZone::getOverlappingZones( const Box3F& aabb, U32* outZones,
    // Otherwise, use the intersector.
 
    OverlapTestResult overlap = mIntersector.test( aabb );
-   
+
    if( overlap == GeometryOutside )
    {
       outNumZones = 0;

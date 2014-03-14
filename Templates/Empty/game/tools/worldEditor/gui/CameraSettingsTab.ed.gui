@@ -63,7 +63,7 @@
          tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          canSaveDynamicFields = "0";
-         
+
          new GuiStackControl() {
             internalName = "content";
             StackingType = "Vertical";
@@ -82,7 +82,7 @@
             Visible = "1";
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            
+
             new GuiRolloutCtrl() {
                Profile = "GuiRolloutProfile";
                HorizSizing = "right";
@@ -93,7 +93,7 @@
                Margin = "0 0 0 -3";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -110,8 +110,8 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
-            
+                  hovertime = "1000";
+
                   new GuiContainer(){
                      HorizSizing = "right";
                      VertSizing = "bottom";
@@ -177,26 +177,26 @@
 //--- OBJECT WRITE END ---
 
 function ECameraSettingsPage::init(%this)
-{   
+{
    %this.currentLevel = "";
    %this.currentRolloutCtrl = "";
-   
+
    %levelInfoPath = "LevelInformation/levels";
-   for( %fieldName = EditorSettings.findFirstValue(%levelInfoPath, true, true); 
-         %fieldName !$= ""; 
+   for( %fieldName = EditorSettings.findFirstValue(%levelInfoPath, true, true);
+         %fieldName !$= "";
          %fieldName = EditorSettings.findNextValue() )
-   {      
+   {
       %fieldSlashPos = 0;
       %levelSlashPos = 0;
       while( strpos( %fieldName, "/", %fieldSlashPos ) != -1 )
       {
-         %levelSlashPos = %fieldSlashPos;        
-         
+         %levelSlashPos = %fieldSlashPos;
+
          %temp = strpos( %fieldName, "/", %fieldSlashPos );
-         %fieldSlashPos = %temp + 1;         
+         %fieldSlashPos = %temp + 1;
       }
       %levelName = getSubStr( %fieldName , %levelSlashPos , ((%fieldSlashPos - %levelSlashPos) - 1));
-      
+
       for( %i = 0; %i < %this-->content.getCount(); %i++ )
       {
          %alreadyExist = false;
@@ -206,13 +206,13 @@ function ECameraSettingsPage::init(%this)
             break;
          }
       }
-      
+
       if( %this.currentLevel !$= %levelName && !%alreadyExist )
       {
          //Hold current level and reset gui params
          %this.currentLevel = %levelName;
          //%this.currentLevel = "\""@%levelName@"\"";
-         
+
          //Create and hold current rollout ctrl
          %this.currentRolloutCtrl = new GuiRolloutCtrl() {
             Profile = "GuiRolloutProfile";
@@ -224,7 +224,7 @@ function ECameraSettingsPage::init(%this)
             Margin = "0 0 0 -3";
             DragSizable = false;
             container = true;
-            
+
             new GuiStackControl() {
                StackingType = "Vertical";
                HorizStacking = "Left to Right";
@@ -242,21 +242,21 @@ function ECameraSettingsPage::init(%this)
                Visible = "1";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
-               
+
                new GuiContainer(){ //spacer
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "0 0";
                   Extent = "208 2";
                };
-      
+
                new GuiContainer(){
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "0 0";
                   Extent = "208 22";
                   Docking = "none";
-                  
+
                   new GuiTextCtrl() {
                      text = "Camera Speed Min:";
                      maxLength = "1024";
@@ -318,7 +318,7 @@ function ECameraSettingsPage::init(%this)
                   Position = "0 0";
                   Extent = "208 22";
                   Docking = "none";
-                  
+
                   new GuiTextCtrl() {
                      text = "Camera Speed Max:";
                      maxLength = "1024";
@@ -380,7 +380,7 @@ function ECameraSettingsPage::init(%this)
                   Position = "0 0";
                   Extent = "208 24";
                   Docking = "none";
-                  
+
                   new GuiButtonCtrl() {
                      canSaveDynamicFields = "0";
                      Enabled = "1";
@@ -416,14 +416,14 @@ function ECameraSettingsPage::deleteCameraSettingsGroup( %this, %levelName, %rol
       MessageBoxOK("Error", "You may not delete the settings group associated with the currently loaded level");
       return;
    }
-   
+
    %levelInfoPath = "LevelInformation/levels/" @ %levelName;
-   for( %fieldName = EditorSettings.findFirstValue(%levelInfoPath, true, true); 
-         %fieldName !$= ""; 
+   for( %fieldName = EditorSettings.findFirstValue(%levelInfoPath, true, true);
+         %fieldName !$= "";
          %fieldName = EditorSettings.findNextValue() )
    {
       EditorSettings.remove( %fieldName, true );
    }
-   
+
    %rolloutCtrl.delete();
 }

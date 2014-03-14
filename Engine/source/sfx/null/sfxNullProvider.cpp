@@ -48,14 +48,14 @@ MODULE_BEGIN( SFXNull )
 
    MODULE_INIT_BEFORE( SFX )
    MODULE_SHUTDOWN_AFTER( SFX )
-   
+
    SFXNullProvider* mProvider;
 
    MODULE_INIT
    {
       mProvider = new SFXNullProvider;
    }
-   
+
    MODULE_SHUTDOWN
    {
       delete mProvider;

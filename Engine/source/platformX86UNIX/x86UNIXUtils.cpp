@@ -35,7 +35,7 @@
 #include "platformX86UNIX/x86UNIXUtils.h"
 
 UnixUtils *UUtils = NULL;
-UnixUtils utils; 
+UnixUtils utils;
 
 UnixUtils::UnixUtils()
 {
@@ -64,7 +64,7 @@ const char* UnixUtils::getOSName()
    if (mUnameInfo == NULL)
       return "";
 
-   return mUnameInfo->sysname;  
+   return mUnameInfo->sysname;
 }
 
 bool UnixUtils::inBackground()
@@ -78,7 +78,7 @@ bool UnixUtils::inBackground()
 }
 
 //-----------------------------------------------------------------------------
-// UnixCommandExecutor 
+// UnixCommandExecutor
 void UnixCommandExecutor::clearFields()
 {
    mRet = -1;
@@ -103,15 +103,15 @@ UnixCommandExecutor::~UnixCommandExecutor()
    cleanup();
 }
 
-int UnixCommandExecutor::exec(char* args[], 
+int UnixCommandExecutor::exec(char* args[],
                               char* stdoutCapture, int stdoutCaptureSize)
 {
    // check for shitty parameters
-   if (args == NULL || stdoutCapture == NULL || 
+   if (args == NULL || stdoutCapture == NULL ||
        stdoutCaptureSize <= 0)
       return -666;
 
-   // we're going to be redirecting stdout, so save it so that we can 
+   // we're going to be redirecting stdout, so save it so that we can
    // restore it
    mRet = dup(1);
    if (mRet == -1)
@@ -171,7 +171,7 @@ int UnixCommandExecutor::exec(char* args[],
       cleanup();
       return mRet;
    }
-         
+
    if (mRet == 0)
    {
       // child process
@@ -186,7 +186,7 @@ int UnixCommandExecutor::exec(char* args[],
    // parent process
    mChildPID = mRet;
 
-   // need to suck in data from pipe while child is running, 
+   // need to suck in data from pipe while child is running,
    // otherwise child will eventually block on write and we'll
    // wait forever
    memset(stdoutCapture, 0, stdoutCaptureSize);
@@ -204,7 +204,7 @@ int UnixCommandExecutor::exec(char* args[],
    while (mRet == 0)
    {
       // not exited, read some data
-      mRet = read(mPipeFiledes[0], stdoutCapture + mBytesRead, 
+      mRet = read(mPipeFiledes[0], stdoutCapture + mBytesRead,
                   stdoutCaptureSize - mBytesRead);
       // any error that isn't EAGAIN means we should exit
       if (mRet == -1 && errno != EAGAIN)
@@ -218,7 +218,7 @@ int UnixCommandExecutor::exec(char* args[],
          mBytesRead += mRet;
 
       // check again for child exit
-      mRet = waitpid(mChildPID, NULL, WNOHANG);    
+      mRet = waitpid(mChildPID, NULL, WNOHANG);
    }
 
    // check for error from waitpid
@@ -232,7 +232,7 @@ int UnixCommandExecutor::exec(char* args[],
    mChildExited = true;
 
    // read final bit of data
-   mRet = read(mPipeFiledes[0], stdoutCapture + mBytesRead, 
+   mRet = read(mPipeFiledes[0], stdoutCapture + mBytesRead,
                stdoutCaptureSize - mBytesRead);
    if (mRet == -1 && errno != EAGAIN)
    {

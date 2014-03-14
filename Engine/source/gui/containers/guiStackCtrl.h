@@ -95,7 +95,7 @@ public:
    bool reOrder(SimObject* obj, SimObject* target = 0);
 
    static void initPersistFields();
-   
+
    DECLARE_CONOBJECT(GuiStackControl);
    DECLARE_CATEGORY( "Gui Containers" );
    DECLARE_DESCRIPTION( "A container that stacks its children horizontally or vertically." );

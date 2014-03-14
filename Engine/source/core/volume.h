@@ -201,7 +201,7 @@ public:
    // Functions
    virtual bool open() = 0;
    virtual bool close() = 0;
-   virtual bool read(Attributes*) = 0;   
+   virtual bool read(Attributes*) = 0;
 };
 
 typedef WeakRefPtr<Directory> DirectoryPtr;
@@ -238,7 +238,7 @@ public:
    void startNotifier();
    void stopNotifier();
 
-   /// Returns true if the notifier is enabled and file 
+   /// Returns true if the notifier is enabled and file
    /// change notifications will be sent.
    bool isNotifying() const { return mNotifying; }
 
@@ -383,10 +383,10 @@ protected:
       String path;               // File system path
       FileSystemRef fileSystem;
    };
-   
+
    virtual FileSystemRef _removeMountFromList(String root);
    virtual FileSystemRef _getFileSystemFromList(const Path& path) const ;
-   void _setFindByPatternOverrideFS(FileSystemRef fs) { mFindByPatternOverrideFS = fs; } 
+   void _setFindByPatternOverrideFS(FileSystemRef fs) { mFindByPatternOverrideFS = fs; }
 
    Path _normalize(const Path& path);
 
@@ -459,7 +459,7 @@ inline bool RemoveChangeNotification( const Path &path, T obj, U func )
 ///  Map a real file system path to a virtual one based on a root.
 ///  This is useful when we get a real path back from an OS file dialog for example.
 ///  e.g.  If we have a root "gumby" which points at "C:/foo/bar",
-///   MapFSPath("gumby", "C:/foo/bar/blat/picture.png", path ); 
+///   MapFSPath("gumby", "C:/foo/bar/blat/picture.png", path );
 ///   will map "C:/foo/bar/blat/picture.png" to "gumby:/blat/picture.png"
 ///@param inRoot     The root to check
 ///@param inPath     The real file system path
@@ -551,7 +551,7 @@ bool IsDirectory(const Path &path);
 bool IsFile(const Path &path);
 bool VerifyWriteAccess(const Path &path);
 
-/// This returns a unique file path from the components 
+/// This returns a unique file path from the components
 /// by appending numbers to the end of the file name if
 /// a file with the same name already exists.
 ///

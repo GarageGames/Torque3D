@@ -40,7 +40,7 @@ class PxFluid : public SceneObject
    typedef SceneObject Parent;
 
 protected:
-   
+
    enum NetMasks
    {
       UpdateMask     = Parent::NextFreeMask,
@@ -65,7 +65,7 @@ public:
    PxFluid();
    virtual ~PxFluid();
 
-   DECLARE_CONOBJECT( PxFluid );      
+   DECLARE_CONOBJECT( PxFluid );
 
    // SimObject
    virtual bool onAdd();

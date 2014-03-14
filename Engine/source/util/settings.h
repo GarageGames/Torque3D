@@ -46,7 +46,7 @@ public:
    DECLARE_CONOBJECT(Settings);
    static void initPersistFields();
 
-   /// These will set and get the values, with an option default value passed in to the get 
+   /// These will set and get the values, with an option default value passed in to the get
    void setDefaultValue(const UTF8 *settingName, const UTF8 *settingValue, const UTF8 *settingType="");
    void setValue(const UTF8 *settingName, const UTF8 *settingValue = "");
    const UTF8 *value(const UTF8 *settingName, const UTF8 *defaultValue = "");
@@ -59,7 +59,7 @@ public:
    void beginGroup(const UTF8 *groupName, bool fromStart = false);
    void endGroup();
    void clearGroups();
-   
+
    void buildGroupString(String &name, const UTF8 *settingName);
    const UTF8 *getCurrentGroups();
 

@@ -40,7 +40,7 @@ struct ContainerQueryInfo
 {
    ContainerQueryInfo()
       : waterCoverage(0.0f),
-        waterHeight(0.0f),                
+        waterHeight(0.0f),
         waterDensity(0.0f),
         waterViscosity(0.0f),
         gravityScale(1.0f),
@@ -48,7 +48,7 @@ struct ContainerQueryInfo
         box(-1,-1,-1,1,1,1),
         mass(1.0f),
         waterObject(NULL)
-   {        
+   {
    }
 
    //SceneObject *sceneObject;

@@ -46,14 +46,14 @@ private:
 
 protected:
    PlatformPopupMenuData *mData;
-   
+
    SimSet *mSubmenus;
    SimObjectPtr<GuiCanvas> mCanvas;
 
    StringTableEntry mBarTitle;
 
 	U32 mPopupGUID;
-   
+
    bool mIsPopup;
 
 public:
@@ -61,7 +61,7 @@ public:
    virtual ~PopupMenu();
    void createPlatformPopupMenuData();
    void deletePlatformPopupMenuData();
-   
+
    DECLARE_CONOBJECT(PopupMenu);
 
    static void initPersistFields();
@@ -71,23 +71,23 @@ public:
 
 	static PopupMenuEvent smPopupMenuEvent;
 	static bool smSelectionEventHandled; /// Set to true if any menu or submenu handles a selection event
-   
+
    /// Creates the platform specific menu object, a peer to this object.
    /// The platform menu *must* exist before calling any method that manipulates
    /// menu items or displays the menu.
    /// implementd on a per-platform basis.
    void createPlatformMenu();
 
-   void setBarTitle(const char * val) { mBarTitle = StringTable->insert(val, true); }	
+   void setBarTitle(const char * val) { mBarTitle = StringTable->insert(val, true); }
    StringTableEntry getBarTitle() const { return mBarTitle; }
-   
+
    /// pass NULL for @p title to insert a separator
    /// returns the menu item's ID, or -1 on failure.
    /// implementd on a per-platform basis.
    /// TODO: factor out common code
    S32 insertItem(S32 pos, const char *title, const char* accelerator);
 
-   /// Sets the name title and accelerator for 
+   /// Sets the name title and accelerator for
    /// an existing item.
    bool setItem(S32 pos, const char *title, const char* accelerator);
 
@@ -97,7 +97,7 @@ public:
    /// implemented on a per-platform basis.
    /// TODO: factor out common code
    S32 insertSubMenu(S32 pos, const char *title, PopupMenu *submenu);
-   
+
    /// remove the menu item at @p itemPos
    /// if the item has a submenu, it is removed from the mSubmenus list.
    /// implemented on a per-platform basis.
@@ -133,7 +133,7 @@ public:
    /// @param pos The relative position at which to place the menu.
    /// @param title The name of the menu
    void attachToMenuBar(GuiCanvas *owner, S32 pos, const char *title);
-   
+
    /// Removes this menu from the menu bar.
    void removeFromMenuBar();
 
@@ -141,7 +141,7 @@ public:
 
    /// Called when the menu has been attached to the menu bar
    void onAttachToMenuBar(GuiCanvas *canvas, S32 pos, const char *title);
-   
+
    /// Called when the menu has been removed from the menu bar
    void onRemoveFromMenuBar(GuiCanvas *canvas);
 

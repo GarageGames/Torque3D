@@ -33,17 +33,17 @@ IMPLEMENT_CONOBJECT( GuiTabBookCtrl );
 
 ConsoleDocClass( GuiTabBookCtrl,
    "@brief A container \n\n"
-   
+
    "@tsexample\n"
    "// Create \n"
    "@endtsexample\n\n"
-   
+
    "@note Only GuiTabPageCtrls must be added to GuiTabBookCtrls.  If an object of a different "
       "class is added to the control, it will be reassigned to either the active page or the "
       "tab book's parent.\n\n"
-      
+
    "@see GuiTabPageCtrl\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -69,7 +69,7 @@ IMPLEMENT_CALLBACK( GuiTabBookCtrl, onTabRightClick, void, ( const String& text,
 GuiTabBookCtrl::GuiTabBookCtrl()
 {
    VECTOR_SET_ASSOCIATION( mPages );
-   
+
    mTabHeight = 24;
    mTabPosition = AlignTop;
    mActivePage = NULL;
@@ -99,7 +99,7 @@ GuiTabBookCtrl::GuiTabBookCtrl()
 void GuiTabBookCtrl::initPersistFields()
 {
    addGroup( "TabBook" );
-   
+
       addField( "tabPosition",     TYPEID< TabPosition >(), Offset( mTabPosition,    GuiTabBookCtrl ),
          "Where to place the tab page headers." );
       addField( "tabMargin",       TypeS32,  Offset( mTabMargin,      GuiTabBookCtrl ),
@@ -272,7 +272,7 @@ bool GuiTabBookCtrl::onWake()
    }
 
    calculatePageTabs();
-   
+
    if( mIsFirstWake )
    {
       // Awaken all pages, visible or not.  We need to do this so
@@ -300,10 +300,10 @@ bool GuiTabBookCtrl::onWake()
 void GuiTabBookCtrl::addNewPage( const char* text )
 {
    GuiTabPageCtrl* page = new GuiTabPageCtrl();
-   
+
    if( text )
       page->setText( text );
-   
+
    page->registerObject();
    addObject( page );
 }
@@ -315,7 +315,7 @@ bool GuiTabBookCtrl::resize(const Point2I &newPosition, const Point2I &newExtent
    bool result = Parent::resize( newPosition, newExtent );
 
    calculatePageTabs();
-   
+
    return result;
 }
 
@@ -425,7 +425,7 @@ void GuiTabBookCtrl::onMouseMove(const GuiEvent &event)
 void GuiTabBookCtrl::onMouseLeave( const GuiEvent &event )
 {
    Parent::onMouseLeave( event );
-   
+
    mHoverTab = NULL;
 }
 
@@ -538,7 +538,7 @@ void GuiTabBookCtrl::renderTabs( const Point2I &offset, const RectI &tabRect )
          GFX->setClipRect( tabEndRect );
 
          // As it turns out the last tab can be outside the viewport in which
-         // case trying to render causes a DX assert. Could be better if 
+         // case trying to render causes a DX assert. Could be better if
          // setClipRect returned a bool.
          if ( GFX->getViewport().isValidRect() )
             renderFixedBitmapBordersFilled( tabEndRect, TabEnds + 1, mProfile );
@@ -563,7 +563,7 @@ void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
       {
       case AlignTop:
       case AlignBottom:
-         
+
          if ( mActivePage == tab )
             indexMultiplier += TabSelected;
          else if( mHoverTab == tab )
@@ -571,7 +571,7 @@ void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
          else
             indexMultiplier += TabNormal;
          break;
-      } 
+      }
 
       renderFixedBitmapBordersFilled( tabRect, indexMultiplier, mProfile );
    }
@@ -699,7 +699,7 @@ void GuiTabBookCtrl::calculatePageTabs()
          // Adjust Y Point based on alignment
          if( mTabPosition == AlignTop )
             info.TabRect.point.y  = ( info.TabRow * mTabHeight );
-         else 
+         else
             info.TabRect.point.y  = getHeight() - ( ( 1 + info.TabRow ) * mTabHeight );
 
          currX += tabWidth;
@@ -712,7 +712,7 @@ void GuiTabBookCtrl::calculatePageTabs()
 
    Point2I localPoint = getExtent();
 
-   // Calculate 
+   // Calculate
    switch( mTabPosition )
    {
    case AlignTop:
@@ -830,7 +830,7 @@ void GuiTabBookCtrl::selectPage( GuiTabPageCtrl *page )
    // Return if already selected.
    if( mSelectedPageNum >= 0 && mSelectedPageNum < mPages.size() && mPages[ mSelectedPageNum ].Page == page )
       return;
-      
+
    mSelectedPageNum = -1;
 
    Vector<TabHeaderInfo>::iterator i = mPages.begin();
@@ -843,7 +843,7 @@ void GuiTabBookCtrl::selectPage( GuiTabPageCtrl *page )
          tab->setVisible( true );
 
          mSelectedPageNum = index;
-         
+
          // Notify User
          onTabSelected_callback( tab->getText(), index );
       }
@@ -871,7 +871,7 @@ bool GuiTabBookCtrl::onKeyDown(const GuiEvent &event)
    {
       if( event.modifier & SI_PRIMARY_CTRL )
          selectPrevPage();
-      else 
+      else
          selectNextPage();
 
       return true;
@@ -898,7 +898,7 @@ void GuiTabBookCtrl::selectNextPage()
       {
          if( nI == ( mPages.size() - 1 ) )
             selectPage( 0 );
-         else if ( nI + 1 <= ( mPages.size() - 1 ) ) 
+         else if ( nI + 1 <= ( mPages.size() - 1 ) )
             selectPage( nI + 1 );
          else
             selectPage( 0 );
@@ -947,7 +947,7 @@ S32 GuiTabBookCtrl::getPageNum( GuiTabPageCtrl* page ) const
    for( U32 i = 0; i < numPages; ++ i )
       if( mPages[ i ].Page == page )
          return i;
-         
+
    return -1;
 }
 

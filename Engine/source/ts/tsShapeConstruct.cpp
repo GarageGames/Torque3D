@@ -288,15 +288,15 @@ void TSShapeConstructor::consoleInit()
 {
    Parent::consoleInit();
 
-   Con::addVariable( "$pref::TSShapeConstructor::CapsuleShapePath", TypeRealString, &TSShapeConstructor::smCapsuleShapePath, 
+   Con::addVariable( "$pref::TSShapeConstructor::CapsuleShapePath", TypeRealString, &TSShapeConstructor::smCapsuleShapePath,
       "The file path to the capsule shape used by tsMeshFit.\n\n"
 	   "@ingroup MeshFit\n" );
 
-   Con::addVariable( "$pref::TSShapeConstructor::CubeShapePath", TypeRealString, &TSShapeConstructor::smCubeShapePath, 
+   Con::addVariable( "$pref::TSShapeConstructor::CubeShapePath", TypeRealString, &TSShapeConstructor::smCubeShapePath,
       "The file path to the cube shape used by tsMeshFit.\n\n"
 	   "@ingroup MeshFit\n" );
 
-   Con::addVariable( "$pref::TSShapeConstructor::SphereShapePath", TypeRealString, &TSShapeConstructor::smSphereShapePath, 
+   Con::addVariable( "$pref::TSShapeConstructor::SphereShapePath", TypeRealString, &TSShapeConstructor::smSphereShapePath,
       "The file path to the sphere shape used by tsMeshFit.\n\n"
 	   "@ingroup MeshFit\n" );
 }
@@ -2026,7 +2026,7 @@ DefineTSShapeConstructorMethod( getTrigger, const char*, ( const char* name, S32
    "for ( %i = 0; %i < %count; %i++ )\n"
    "   echo( %i SPC %this.getTrigger( \"back\", %i ) );\n"
    "@endtsexample\n" )
-{  
+{
    // Find the sequence and return the indexed trigger (frame and state)
    GET_SEQUENCE( getTrigger, seq, name, "" );
 

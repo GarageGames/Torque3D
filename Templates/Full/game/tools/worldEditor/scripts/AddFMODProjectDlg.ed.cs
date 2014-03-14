@@ -42,7 +42,7 @@ function AddFMODProjectDlg::show( %this )
    }
 
    // Make sure we have FMOD running.
-   
+
    if( getField( sfxGetDeviceInfo(), $SFX::DEVICE_INFO_PROVIDER ) !$= "FMOD" )
    {
       MessageBoxOK( "Error",
@@ -55,12 +55,12 @@ function AddFMODProjectDlg::show( %this )
          "To select FMOD as your sound system, choose it as the sound provider in" SPC
          "the audio tab of the Game Options dialog."
       );
-      
+
       return;
    }
-   
+
    // Make sure we have the FMOD Event DLL loaded.
-   
+
    %deviceCaps = getField( sfxGetDeviceInfo(), $SFX::DEVICE_INFO_CAPS );
    if( !( %deviceCaps & $SFX::DEVICE_CAPS_FMODDESIGNER ) )
    {
@@ -71,9 +71,9 @@ function AddFMODProjectDlg::show( %this )
       );
       return;
    }
-   
+
    // Show it.
-      
+
    Canvas.pushDialog( %this, 0, true );
 }
 
@@ -105,13 +105,13 @@ function AddFMODProjectDlg::onOK( %this )
    %objName    = %this-->projectNameField.getText();
    %fileName   = %this-->fileNameField.getText();
    %mediaPath  = %this-->mediaPathField.getText();
-   
+
    // Make sure the object name is valid.
    if( !Editor::validateObjectName( %objName, true ))
       return;
 
    // Make sure the .fev file exists.
-   
+
    if( %fileName $= "" )
    {
       MessageBoxOK( "Error",
@@ -126,9 +126,9 @@ function AddFMODProjectDlg::onOK( %this )
       );
       return;
    }
-   
+
    // Make sure the media path exists.
-   
+
    if( !isDirectory( %mediaPath ) )
    {
       MessageBoxOK( "Error",
@@ -136,23 +136,23 @@ function AddFMODProjectDlg::onOK( %this )
       );
       return;
    }
-   
+
    // If an event script exists from a previous instantiation,
    // delete it first.
-   
+
    %eventFileName = %fileName @ ".cs";
    if( isFile( %eventFileName ) )
       fileDelete( %eventFileName );
-   
+
    // Create the FMOD project object.
-   
+
    pushInstantGroup();
    eval( "new SFXFMODProject( " @ %objName @ ") {" NL
       "fileName = \"" @ %fileName @ "\";" NL
       "mediaPath = \"" @ %mediaPath @ "\";" NL
    "};" );
    popInstantGroup();
-   
+
    if( !isObject( %objName ) )
    {
       MessageBoxOK( "Error",
@@ -168,11 +168,11 @@ function AddFMODProjectDlg::onOK( %this )
       %this.persistenceMgr.setDirty( %objName );
       %this.persistenceMgr.saveDirty();
    }
-      
+
    Canvas.popDialog( %this );
-   
+
    // Trigger a reinit on the datablock editor, just in case.
-   
+
    if( isObject( DatablockEditorPlugin ) )
       DatablockEditorPlugin.populateTrees();
 }
@@ -193,22 +193,22 @@ function AddFMODProjectDlg::onSelectFile( %this )
       MustExit    = true;
       ChangePath  = false;
    };
-   
+
    %ret = %dlg.execute();
    if( %ret )
    {
       %file = %dlg.fileName;
       $pref::WorldEditor::AddFMODProjectDlg::lastPath = filePath( %file );
    }
-   
+
    %dlg.delete();
-   
+
    if( !%ret )
       return;
-      
+
    %file = makeRelativePath( %file, getMainDotCsDir() );
    %this-->fileNameField.setText( %file );
-   
+
    if( %this-->projectNameField.getText() $= "" )
    {
       %projectName = "fmod" @ fileBase( %file );
@@ -238,16 +238,16 @@ function AddFMODProjectDlg::onSelectMediaPath( %this )
       MustExit    = true;
       ChangePath  = false;
    };
-   
+
    %ret = %dlg.execute();
    if( %ret )
       %file = %dlg.fileName;
-   
+
    %dlg.delete();
-   
+
    if( !%ret )
       return;
-      
+
    %file = makeRelativePath( %file, getMainDotCsDir() );
    %this-->mediaPathField.setText( %file );
 }

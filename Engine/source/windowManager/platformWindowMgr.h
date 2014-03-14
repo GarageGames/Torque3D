@@ -33,14 +33,14 @@
 
 /// Abstract representation of a manager for native OS windows.
 ///
-/// The PlatformWindowManager interface provides a variety of methods for querying 
+/// The PlatformWindowManager interface provides a variety of methods for querying
 /// the current desktop configuration, as well as allocating and retrieving
 /// existing windows. It may also manage application-level event handling.
 class PlatformWindowManager
 {
    // Generator for window IDs.
    S32 mIdSource;
-   
+
 protected:
    /// Get the next available window Id
    inline S32 getNextId() { return mIdSource++; }
@@ -48,10 +48,10 @@ public:
 
    /// Get Global Singleton
    static PlatformWindowManager *get();
-   
+
    PlatformWindowManager() : mIdSource(0) {};
 
-   virtual ~PlatformWindowManager() 
+   virtual ~PlatformWindowManager()
    {
    }
 

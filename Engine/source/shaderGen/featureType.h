@@ -55,7 +55,7 @@ protected:
    /// The group is used to orginize the types.
    U32 mGroup;
 
-   /// The sort order of this feature type 
+   /// The sort order of this feature type
    /// within its group.
    F32 mOrder;
 
@@ -73,8 +73,8 @@ public:
    /// You should not use this constructor directly.
    /// @see DeclareFeatureType
    /// @see ImplementFeatureType
-   FeatureType(   const char *type, 
-                  U32 group = -1, 
+   FeatureType(   const char *type,
+                  U32 group = -1,
                   F32 order = -1.0f,
                   bool isDefault = true );
 
@@ -95,7 +95,7 @@ public:
 };
 
 
-/// 
+///
 #define DeclareFeatureType( name ) \
    extern const FeatureType name
 

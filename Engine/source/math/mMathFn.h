@@ -104,14 +104,14 @@ extern F32 mRandF();               // random # from 0.0 to 1.0 inclusive
 inline void m_matF_x_point3F(const F32 *m, const F32 *p, F32 *presult)
 {
    AssertFatal(p != presult, "Error, aliasing matrix mul pointers not allowed here!");
-   
+
 #ifdef TORQUE_COMPILER_GCC
    const F32   p0 = p[0], p1 = p[1], p2 = p[2];
    const F32   m0 = m[0], m1 = m[1], m2 = m[2];
    const F32   m3 = m[3], m4 = m[4], m5 = m[5];
    const F32   m6 = m[6], m7 = m[7], m8 = m[8];
    const F32   m9 = m[9], m10 = m[10], m11 = m[11];
-   
+
    presult[0] = m0*p0 + m1*p1 + m2*p2  + m3;
    presult[1] = m4*p0 + m5*p1 + m6*p2  + m7;
    presult[2] = m8*p0 + m9*p1 + m10*p2 + m11;
@@ -133,7 +133,7 @@ inline void m_matF_x_vectorF(const F32 *m, const F32 *v, F32 *vresult)
    const F32   m0 = m[0], m1 = m[1], m2 = m[2];
    const F32   m4 = m[4], m5 = m[5], m6 = m[6];
    const F32   m8 = m[8], m9 = m[9], m10 = m[10];
-   
+
    vresult[0] = m0*v0 + m1*v1 + m2*v2;
    vresult[1] = m4*v0 + m5*v1 + m6*v2;
    vresult[2] = m8*v0 + m9*v1 + m10*v2;
@@ -151,7 +151,7 @@ inline void m_matF_x_vectorF(const F32 *m, const F32 *v, F32 *vresult)
 inline bool mIsEqual( F32 a, F32 b, const F32 epsilon = __EQUAL_CONST_F )
 {
    F32 diff = a - b;
-   return diff > -epsilon && diff < epsilon; 
+   return diff > -epsilon && diff < epsilon;
 }
 
 inline bool mIsZero(const F32 val, const F32 epsilon = __EQUAL_CONST_F )
@@ -433,7 +433,7 @@ inline F64 mRadToDeg(F64 r)
 
 inline bool mIsNaN_F( const F32 x )
 {
-   // If x is a floating point variable, then (x != x) will be TRUE if x has the value NaN. 
+   // If x is a floating point variable, then (x != x) will be TRUE if x has the value NaN.
    // This is only going to work if the compiler is IEEE 748 compliant.
    //
    // Tested and working on VC2k5

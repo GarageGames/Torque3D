@@ -39,11 +39,11 @@ class SFXStream;
 /// header to the actual sound data which is read through an SFXStream.
 ///
 /// The first step occurs at ResourceManager::load() time at which
-/// only the header information, the format, size frequency, and 
-/// looping flag, are loaded from the sound file.  This provides 
+/// only the header information, the format, size frequency, and
+/// looping flag, are loaded from the sound file.  This provides
 /// just the nessasary information to simulate sound playback for
 /// sounds playing just out of the users hearing range.
-/// 
+///
 /// The second step loads the actual sound data or begins filling
 /// the stream buffer.  This is triggered by a call to openStream().
 /// SFXProfile, for example, does this when mPreload is enabled.
@@ -51,12 +51,12 @@ class SFXStream;
 class SFXResource
 {
    public:
-   
+
       typedef void Parent;
-      
+
    protected:
 
-      /// The constructor is protected. 
+      /// The constructor is protected.
       /// @see SFXResource::load()
       SFXResource();
 
@@ -68,25 +68,25 @@ class SFXResource
 
       /// The length of the sample in milliseconds.
       U32 mDuration;
-      
+
       /// Construct a resource instance for the given file.  Format and duration
       /// are read from the given stream.
       SFXResource( String fileName, SFXStream* stream );
-      
+
    public:
 
       /// The destructor.
       virtual ~SFXResource() {}
 
       /// This is a helper function used by SFXProfile for load
-      /// a sound resource.  It takes care of trying different 
+      /// a sound resource.  It takes care of trying different
       /// types for extension-less filenames.
       ///
       /// @param filename The sound file path with or without extension.
       ///
       static Resource< SFXResource > load( String filename );
 
-      /// A helper function which returns true if the 
+      /// A helper function which returns true if the
       /// sound resource exists.
       ///
       /// @param filename The sound file path with or without extension.

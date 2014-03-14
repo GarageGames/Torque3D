@@ -31,7 +31,7 @@ class ConditionerMethodDependency;
 
 
 /// Lights the pixel by sampling from the light prepass buffer.  It will
-/// fall back to default vertex lighting functionality if  
+/// fall back to default vertex lighting functionality if
 class DeferredRTLightingFeatGLSL : public RTLightingFeatGLSL
 {
    typedef RTLightingFeatGLSL Parent;
@@ -40,10 +40,10 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros, 
+   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros,
                                     const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
@@ -71,7 +71,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp() { return Material::LerpAlpha; }
@@ -90,7 +90,7 @@ public:
 };
 
 
-/// Generates specular highlights in the forward pass 
+/// Generates specular highlights in the forward pass
 /// from the light prepass buffer.
 class DeferredPixelSpecularGLSL : public PixelSpecularGLSL
 {
@@ -100,7 +100,7 @@ public:
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -116,14 +116,14 @@ public:
 class DeferredMinnaertGLSL : public ShaderFeatureGLSL
 {
    typedef ShaderFeatureGLSL Parent;
-   
+
 public:
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
-   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros, 
+   virtual void processPixMacros(   Vector<GFXShaderMacro> &macros,
                                     const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -146,7 +146,7 @@ class DeferredSubSurfaceGLSL : public ShaderFeatureGLSL
    typedef ShaderFeatureGLSL Parent;
 
 public:
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
    virtual String getName()

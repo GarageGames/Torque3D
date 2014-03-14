@@ -79,7 +79,7 @@ void TerrainMaterial::initPersistFields()
    addField( "diffuseSize", TypeF32, Offset( mDiffuseSize, TerrainMaterial ), "Used to scale the diffuse map to the material square" );
 
    addField( "normalMap", TypeStringFilename, Offset( mNormalMap, TerrainMaterial ), "Bump map for the material" );
-   
+
    addField( "detailMap", TypeStringFilename, Offset( mDetailMap, TerrainMaterial ), "Detail map for the material" );
    addField( "detailSize", TypeF32, Offset( mDetailSize, TerrainMaterial ), "Used to scale the detail map to the material square" );
 
@@ -126,14 +126,14 @@ bool TerrainMaterial::onAdd()
 }
 
 TerrainMaterial* TerrainMaterial::getWarningMaterial()
-{ 
+{
    return findOrCreate( NULL );
 }
 
 TerrainMaterial* TerrainMaterial::findOrCreate( const char *nameOrPath )
 {
    SimSet *set = Sim::getTerrainMaterialSet();
-   
+
    if ( !nameOrPath || !nameOrPath[0] )
       nameOrPath = "warning_material";
 
@@ -170,7 +170,7 @@ TerrainMaterial* TerrainMaterial::findOrCreate( const char *nameOrPath )
 	  mat->mMacroMap = GFXTextureManager::getWarningTexturePath();
 	  mat->mMacroSize = 200;
       mat->registerObject();
-      
+
       Sim::getRootGroup()->addObject( mat );
    }
 

@@ -69,13 +69,13 @@ static U32 getColumnCount(const char *string, const char *set)
             count++;
             last = 0;
             break;
-         }   
+         }
       }
    }
    if(last)
       count++;
    return count;
-}   
+}
 
 // Function to return the 'index' column from 'string' given delimeters in 'set'
 static const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set)
@@ -88,7 +88,7 @@ static const char *getColumn(const char *string, char* returnbuff, U32 index, co
       sz = dStrcspn(string, set);
       if (string[sz] == 0)
          return "";
-      string += (sz + 1);    
+      string += (sz + 1);
    }
    sz = dStrcspn(string, set);
    if (sz == 0)
@@ -97,7 +97,7 @@ static const char *getColumn(const char *string, char* returnbuff, U32 index, co
    dStrncpy(ret, string, sz);
    ret[sz] = '\0';
    return ret;
-}   
+}
 
 GuiPopUpBackgroundCtrlEx::GuiPopUpBackgroundCtrlEx(GuiPopUpMenuCtrlEx *ctrl, GuiPopupTextListCtrlEx *textList)
 {
@@ -195,7 +195,7 @@ void GuiPopupTextListCtrlEx::onMouseUp(const GuiEvent &event)
    Point2I pt = globalToLocalCoord(event.mousePoint);
    pt.x -= mHeaderDim.x; pt.y -= mHeaderDim.y;
    Point2I cell(
-      (pt.x < 0 ? -1 : pt.x / mCellSize.x), 
+      (pt.x < 0 ? -1 : pt.x / mCellSize.x),
       (pt.y < 0 ? -1 : pt.y / mCellSize.y)
       );
 
@@ -222,7 +222,7 @@ void GuiPopupTextListCtrlEx::onMouseMove( const GuiEvent &event )
    if (cell.x >= 0 && cell.x < mSize.x && cell.y >= 0 && cell.y < mSize.y)
       // Hot Track notification
       Con::executef( mPopUpCtrl, "onHotTrackItem", Con::getIntArg(mList[cell.y].id) );
-   else 
+   else
       // Hot Track -1
       Con::executef( mPopUpCtrl, "onHotTrackItem", Con::getIntArg(-1) );
 
@@ -238,7 +238,7 @@ void GuiPopupTextListCtrlEx::onRenderCell(Point2I offset, Point2I cell, bool sel
 
    // Render a background color for the cell
    if ( mouseOver )
-   {      
+   {
       RectI cellR( offset.x, offset.y, size.x, size.y );
       GFX->getDrawUtil()->drawRectFill( cellR, mProfile->mFillColorHL );
    }
@@ -571,7 +571,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, getTextById, const char*, (S32 id),,
 }
 
 
-ConsoleMethod( GuiPopUpMenuCtrlEx, getColorById, const char*, 3, 3,  
+ConsoleMethod( GuiPopUpMenuCtrlEx, getColorById, const char*, 3, 3,
 			  "@brief Get color of an entry's box\n\n"
 			  "@param id ID number of entry to query\n\n"
 			  "@return ColorI in the format of \"Red Green Blue Alpha\", each of with is a value between 0 - 255")
@@ -614,9 +614,9 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, 4, 4,
       if(!dStricmp(classRep->mFieldList[i].pFieldname, argv[3]))
          break;
 
-   // found it?   
+   // found it?
    if(i == classRep->mFieldList.size())
-   {   
+   {
       Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", argv[3], argv[2]);
       return;
    }
@@ -634,7 +634,7 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, 4, 4,
    // fill it
    const EngineEnumTable& table = *( conType->getEnumTable() );
    const U32 numValues = table.getNumValues();
-   
+
    for(i = 0; i < numValues; i++)
       object->addEntry( table[i].getName(), table[i] );
 }
@@ -645,23 +645,23 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, 3, 3, "(string text)"
 			  "@param text String value used for the query\n\n"
 			  "@return Numerical ID of entry containing the text.")
 {
-   return( object->findText( argv[2] ) );   
+   return( object->findText( argv[2] ) );
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, 2, 2, 
+ConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, 2, 2,
 			  "@brief Get the size of the menu\n\n"
 			  "@return Number of entries in the menu\n")
 {
-   return( object->getNumEntries() ); 
+   return( object->getNumEntries() );
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrlEx, replaceText, void, 3, 3, 
+ConsoleMethod( GuiPopUpMenuCtrlEx, replaceText, void, 3, 3,
 			  "@brief Flag that causes each new text addition to replace the current entry\n\n"
 			  "@param True to turn on replacing, false to disable it")
 {
-   object->replaceText(dAtoi(argv[2]));  
+   object->replaceText(dAtoi(argv[2]));
 }
 
 //------------------------------------------------------------------------------
@@ -751,7 +751,7 @@ void GuiPopUpMenuCtrlEx::clearEntry( S32 entry )
 //------------------------------------------------------------------------------
 ConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, 3, 3, "(S32 entry)")
 {
-   object->clearEntry(dAtoi(argv[2]));  
+   object->clearEntry(dAtoi(argv[2]));
 }
 
 //------------------------------------------------------------------------------
@@ -760,7 +760,7 @@ static S32 QSORT_CALLBACK textCompare(const void *a,const void *b)
    GuiPopUpMenuCtrlEx::Entry *ea = (GuiPopUpMenuCtrlEx::Entry *) (a);
    GuiPopUpMenuCtrlEx::Entry *eb = (GuiPopUpMenuCtrlEx::Entry *) (b);
    return (dStrnatcasecmp(ea->buf, eb->buf));
-} 
+}
 
 //  Added to sort by entry ID
 //------------------------------------------------------------------------------
@@ -769,7 +769,7 @@ static S32 QSORT_CALLBACK idCompare(const void *a,const void *b)
    GuiPopUpMenuCtrlEx::Entry *ea = (GuiPopUpMenuCtrlEx::Entry *) (a);
    GuiPopUpMenuCtrlEx::Entry *eb = (GuiPopUpMenuCtrlEx::Entry *) (b);
    return ( (ea->id < eb->id) ? -1 : ((ea->id > eb->id) ? 1 : 0) );
-} 
+}
 
 //------------------------------------------------------------------------------
 //  Added
@@ -800,7 +800,7 @@ void GuiPopUpMenuCtrlEx::setBitmap(const char *name)
       mTextureDepressed = NULL;
    }
    setUpdate();
-}   
+}
 
 //------------------------------------------------------------------------------
 void GuiPopUpMenuCtrlEx::sort()
@@ -835,7 +835,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
       //Con::printf( "GuiPopupMenuCtrlEx::addEntry - Invalid buffer!" );
       return;
    }
-	
+
 	// Ensure that there are no other entries with exactly the same name
 	for ( U32 i = 0; i < mEntries.size(); i++ )
    {
@@ -846,7 +846,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
 	// If we don't give an id, create one from mIdMax
 	if( id == -1 )
 		id = mIdMax + 1;
-	
+
 	// Increase mIdMax when an id is greater than it
 	if( id > mIdMax )
 		mIdMax = id;
@@ -881,7 +881,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
 
       e.colorbox = ColorI(r,g,b);
 
-   } 
+   }
    else
    {
       e.usesColorBox = false;
@@ -938,7 +938,7 @@ S32 GuiPopUpMenuCtrlEx::findText( const char* text )
    for ( U32 i = 0; i < mEntries.size(); i++ )
    {
       if ( dStrcmp( text, mEntries[i].buf ) == 0 )
-         return( mEntries[i].id );        
+         return( mEntries[i].id );
    }
    return( -1 );
 }
@@ -1003,7 +1003,7 @@ void GuiPopUpMenuCtrlEx::setFirstSelected( bool bNotifyScript )
       dSprintf( idval, sizeof(idval), "%d", mEntries[mSelIndex].id );
       if ( isMethod( "onSelect" ) )
          Con::executef( this, "onSelect", idval, mEntries[mSelIndex].buf );
-      
+
 		// Execute the popup console command:
 		if ( bNotifyScript )
 			execConsoleCallback();
@@ -1012,7 +1012,7 @@ void GuiPopUpMenuCtrlEx::setFirstSelected( bool bNotifyScript )
 	{
 		if ( mReplaceText ) //  Only change the displayed text if appropriate.
 			setText("");
-		
+
 		mSelIndex = -1;
 
 		if ( bNotifyScript )
@@ -1058,7 +1058,7 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          // Render the fixed, filled in border
          renderFixedBitmapBordersFilled(r, 3, mProfile );
 
-      } 
+      }
       else
       {
          //renderSlightlyLoweredBox(r, mProfile);
@@ -1071,7 +1071,7 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          RectI rect(offset, mBitmapBounds);
          GFX->getDrawUtil()->clearBitmapModulation();
          GFX->getDrawUtil()->drawBitmapStretch( mTextureDepressed, rect );
-      } 
+      }
       else if ( mTextureNormal )
       {
          RectI rect(offset, mBitmapBounds);
@@ -1089,10 +1089,10 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       }
 
    }
-   else   
+   else
       // TODO: Implement
       // TODO: Add onMouseEnter() and onMouseLeave() and a definition of mMouseOver (see guiButtonBaseCtrl) for this to work.
-      if ( mMouseOver ) 
+      if ( mMouseOver )
       {
          S32 l = r.point.x, r2 = r.point.x + r.extent.x - 1;
          S32 t = r.point.y, b = r.point.y + r.extent.y - 1;
@@ -1103,7 +1103,7 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
             // Render the fixed, filled in border
             renderFixedBitmapBordersFilled( r, 2, mProfile );
 
-         } 
+         }
          else
          {
             GFX->getDrawUtil()->drawRectFill( r, mProfile->mFillColorHL );
@@ -1133,7 +1133,7 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // Render the fixed, filled in border
             renderFixedBitmapBordersFilled( r, 1, mProfile );
-         } 
+         }
          else
          {
             GFX->getDrawUtil()->drawRectFill( r, mProfile->mFillColorNA );
@@ -1169,10 +1169,10 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
             // right cap of the border.
             RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
             localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
-         } 
+         }
          else
          {
-            localStart.x = getWidth() - txt_w;  
+            localStart.x = getWidth() - txt_w;
          }
          break;
       case GuiControlProfile::CenterJustify:
@@ -1201,12 +1201,12 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
                // right cap of the border.
                RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
                localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
-            } 
+            }
             else
             {
                localStart.x = getWidth() - txt_w - 12;
             }
-         } 
+         }
          else
          {
             localStart.x = mProfile->mTextOffset.x; //  Use mProfile->mTextOffset as a controlable margin for the control's text.
@@ -1387,7 +1387,7 @@ void GuiPopUpMenuCtrlEx::onAction()
    Point2I windowExt = root->getExtent();
 
    mBackground->resize( Point2I(0,0), root->getExtent() );
-   
+
    S32 textWidth = 0, width = getWidth();
    //const S32 menuSpace = 5; //  Removed as no longer used.
    const S32 textSpace = 2;
@@ -1421,10 +1421,10 @@ void GuiPopUpMenuCtrlEx::onAction()
       mTl->setSelectedCell( Point2I( 0, mSelIndex ) );
 
    Point2I pointInGC = canCtrl->localToGlobalCoord( getPosition() );
-   Point2I scrollPoint( pointInGC.x, pointInGC.y + getHeight() ); 
+   Point2I scrollPoint( pointInGC.x, pointInGC.y + getHeight() );
 
-   //Calc max Y distance, so Scroll Ctrl will fit on window 
-   //S32 maxYdis = windowExt.y - pointInGC.y - getHeight() - menuSpace; 
+   //Calc max Y distance, so Scroll Ctrl will fit on window
+   //S32 maxYdis = windowExt.y - pointInGC.y - getHeight() - menuSpace;
    S32 sbBorder = mSc->getControlProfile()->mBorderThickness * 2 + mSc->getChildMargin().y * 2; //  Added to take into account the border thickness and the margin of the child controls of the scroll control when figuring out the size of the contained text list control
    S32 maxYdis = windowExt.y - pointInGC.y - getHeight() - sbBorder; // - menuSpace; //  Need to remove the border thickness from the contained control maximum extent and got rid of the 'menuspace' variable
 
@@ -1439,11 +1439,11 @@ void GuiPopUpMenuCtrlEx::onAction()
             reverseTextList();
 
          maxYdis = pointInGC.y; //  Was at the end: '- menuSpace;'
-         //Does the menu need a scroll bar 
+         //Does the menu need a scroll bar
          if ( maxYdis < mTl->getHeight() + sbBorder ) //  Instead of adding sbBorder, it was: 'textSpace'
          {
             //  Removed width recalculation for scroll bar as the scroll bar is already being taken into account.
-            //Calc for the width of the scroll bar 
+            //Calc for the width of the scroll bar
             //            if(textWidth >=  width)
             //               width += 20;
             //            mTl->setCellSize(Point2I(width,mFont->getHeight() + textSpace));
@@ -1461,14 +1461,14 @@ void GuiPopUpMenuCtrlEx::onAction()
 
          //  Added the next two lines
          scrollPoint.set(pointInGC.x, pointInGC.y - maxYdis); //  Used to have the following on the end: '-1);'
-      } 
+      }
       //Scroll bar needed but Don't pop above button
       else
       {
          //mRevNum = 0; //  Commented out as it has been added at the beginning of this function
 
          //  Removed width recalculation for scroll bar as the scroll bar is already being taken into account.
-         //Calc for the width of the scroll bar 
+         //Calc for the width of the scroll bar
          //         if(textWidth >=  width)
          //            width += 20;
          //         mTl->setCellSize(Point2I(width,mFont->getHeight() + textSpace));
@@ -1533,7 +1533,7 @@ void GuiPopUpMenuCtrlEx::addChildren()
    mTl = new GuiPopupTextListCtrlEx( this );
    AssertFatal( mTl, "Failed to create the GuiPopUpTextListCtrlEx for the PopUpMenu" );
    // Use the children's profile rather than the parent's profile, if it exists.
-   mTl->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile ); 
+   mTl->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
    mTl->setField("noDuplicates", "false");
 
    mSc = new GuiScrollCtrl;
@@ -1575,7 +1575,7 @@ void GuiPopUpMenuCtrlEx::reverseTextList()
 
    // Don't lose the selected cell:
    if ( mSelIndex >= 0 )
-      mTl->setSelectedCell( Point2I( 0, mEntries.size() - mSelIndex - 1 ) ); 
+      mTl->setSelectedCell( Point2I( 0, mEntries.size() - mSelIndex - 1 ) );
 
    mRevNum = mEntries.size() - 1;
 }
@@ -1676,12 +1676,12 @@ void GuiPopUpMenuCtrlEx::onMouseLeave(const GuiEvent &)
 void GuiPopUpMenuCtrlEx::setupAutoScroll(const GuiEvent &event)
 {
    GuiControl *parent = getParent();
-   if ( !parent ) 
+   if ( !parent )
       return;
 
    Point2I mousePt = mSc->globalToLocalCoord( event.mousePoint );
 
-   mEventSave = event;      
+   mEventSave = event;
 
    if ( mLastYvalue != mousePt.y )
    {
@@ -1691,7 +1691,7 @@ void GuiPopUpMenuCtrlEx::setupAutoScroll(const GuiEvent &event)
          S32 topOrBottom = ( mousePt.y > mSc->getHeight() ) ? 1 : 0;
          mSc->scrollTo( 0, topOrBottom );
          return;
-      }   
+      }
 
       F32 percent = (F32)mousePt.y / (F32)mSc->getHeight();
       if ( percent > 0.7f && mousePt.y > mLastYvalue )
@@ -1701,7 +1701,7 @@ void GuiPopUpMenuCtrlEx::setupAutoScroll(const GuiEvent &event)
       }
       else if ( percent < 0.3f && mousePt.y < mLastYvalue )
       {
-         mIncValue = 0.5f - percent;         
+         mIncValue = 0.5f - percent;
          mScrollDir = GuiScrollCtrl::UpArrow;
       }
       mLastYvalue = mousePt.y;

@@ -46,9 +46,9 @@ static HashTable<String,U32> smDocGroups;
 static void dumpDoc( Stream& stream, const char* text, bool checkUngrouped = true )
 {
    // Extract brief.
-   
+
    String brief;
-   
+
    if( text )
    {
       const char* briefTag = dStrstr( text, "@brief" );
@@ -69,14 +69,14 @@ static void dumpDoc( Stream& stream, const char* text, bool checkUngrouped = tru
    }
 
    // Write doc comment.
-   
+
    if( !brief.isEmpty() )
    {
       stream.writeText( "@brief " );
       stream.writeText( brief );
       stream.writeText( "\r\n\r\n" );
    }
-   
+
    if( text )
       stream.writeText( text );
 #ifdef USE_UNDOCUMENTED_GROUP
@@ -92,15 +92,15 @@ static void dumpFragment( Stream& stream, ConsoleDocFragment* fragment )
 {
    if( !fragment->mText || !fragment->mText[ 0 ] )
       return;
-      
+
    // Emit doc text in comment.
-      
+
    stream.writeText( "/*!\r\n" );
    stream.writeText( fragment->mText );
    stream.writeText( "*/\r\n\r\n" );
-   
+
    // Emit definition, if any.
-   
+
    if( fragment->mDefinition )
    {
       stream.writeText( fragment->mDefinition );
@@ -113,10 +113,10 @@ static void dumpVariable(  Stream& stream,
                            const char* inClass = NULL )
 {
    // Skip variables defined in script.
-   
+
    if( entry->type < 0 )
       return;
-         
+
    // Skip internals... don't export them.
    if (  entry->mUsage &&
          ( dStrstr( entry->mUsage, "@hide" ) || dStrstr( entry->mUsage, "@internal" ) ) )
@@ -128,25 +128,25 @@ static void dumpVariable(  Stream& stream,
    String( entry->name ).split( "::", nameComponents );
    if( !nameComponents.size() ) // Safety check.
       return;
-      
+
    // Match filter.
-   
+
    if( inClass )
    {
       // Make sure first qualifier in name components is a
       // namespace qualifier matching the given class name.
-      
+
       if( nameComponents.size() <= 1 || dStricmp( nameComponents.first().c_str() + 1, inClass ) != 0 ) // Skip '$'.
          return;
    }
    else
    {
       // Make sure, this is *not* in a class namespace.
-      
+
       if( nameComponents.size() > 1 && Con::lookupNamespace( nameComponents.first().c_str() + 1 )->mClassRep )
          return;
    }
-            
+
    // Skip variables for which we can't decipher their type.
 
    ConsoleBaseType* type = ConsoleBaseType::getType( entry->type );
@@ -157,9 +157,9 @@ static void dumpVariable(  Stream& stream,
    }
 
    // Write doc comment.
-   
+
    stream.writeText( "/*!\r\n" );
-   
+
    if( !inClass )
    {
       stream.writeText( "@var " );
@@ -168,13 +168,13 @@ static void dumpVariable(  Stream& stream,
       stream.writeText( entry->name );
       stream.writeText( ";\r\n" );
    }
-   
+
    dumpDoc( stream, entry->mUsage );
-   
+
    stream.writeText( "*/\r\n" );
-   
+
    // Write definition.
-   
+
    const U32 numNameComponents = nameComponents.size();
    if( !inClass && numNameComponents > 1 )
       for( U32 i = 0; i < ( numNameComponents - 1 ); ++ i )
@@ -183,22 +183,22 @@ static void dumpVariable(  Stream& stream,
          stream.writeText( nameComponents[ i ] );
          stream.writeText( " { " );
       }
-   
+
    if( inClass )
       stream.writeText( "static " );
-      
+
    if( entry->mIsConstant )
       stream.writeText( "const " );
-      
+
    stream.writeText( type->getTypeClassName() );
    stream.writeText( " " );
    stream.writeText( nameComponents.last() );
    stream.writeText( ";" );
-   
+
    if( !inClass && numNameComponents > 1 )
       for( U32 i = 0; i < ( numNameComponents - 1 ); ++ i )
          stream.writeText( " } " );
-         
+
    stream.writeText( "\r\n" );
 }
 
@@ -216,26 +216,26 @@ static void dumpFunction(  Stream &stream,
 {
    String doc = entry->getDocString().trim();
    String prototype = entry->getPrototypeString().trim();
-   
+
    // If the doc string contains @hide, skip this function.
-   
+
    if( dStrstr( doc.c_str(), "@hide" ) || dStrstr( doc.c_str(), "@internal" ) )
       return;
-   
+
    // Make sure we have a valid function prototype.
-   
+
    if( prototype.isEmpty() )
    {
       Con::errorf( "Function '%s::%s' has no prototype!", entry->mNamespace->mName, entry->mFunctionName );
       return;
    }
-   
+
    // See if it's a static method.
-   
+
    bool isStaticMethod = false;
    if( entry->mHeader )
       isStaticMethod = entry->mHeader->mIsStatic;
-      
+
    // Emit the doc comment.
 
    if( !doc.isEmpty() )
@@ -249,7 +249,7 @@ static void dumpFunction(  Stream &stream,
       if( !brief )
       {
          String brief = entry->getBriefDescription( &doc );
-         
+
          brief.trim();
          if( !brief.isEmpty() )
          {
@@ -260,7 +260,7 @@ static void dumpFunction(  Stream &stream,
       }
 
       stream.writeText( doc );
-      
+
       // Emit @ingroup if it's not a class method.
 
       if ( !isClassMethod && !isStaticMethod ) // Extra static method check for static classes (which will come out as non-class namespaces).
@@ -280,7 +280,7 @@ static void dumpFunction(  Stream &stream,
          }
 #endif
       }
-      
+
       stream.writeText( "*/\r\n" );
    }
 #ifdef USE_UNDOCUMENTED_GROUP
@@ -290,10 +290,10 @@ static void dumpFunction(  Stream &stream,
       stream.writeText( "/*! UNDOCUMENTED!\r\n@ingroup UNDOCUMENTED\r\n */\r\n" );
    }
 #endif
-      
+
    if( isStaticMethod )
       stream.writeText( "static " );
-      
+
    stream.writeText( prototype );
    stream.writeText( ";\r\n" );
 }
@@ -326,9 +326,9 @@ static void dumpNamespaceEntries( Stream &stream, Namespace *g, bool callbacks =
    }
 }
 
-static void dumpClassHeader(  Stream &stream, 
-                              const char *usage, 
-                              const char *className, 
+static void dumpClassHeader(  Stream &stream,
+                              const char *usage,
+                              const char *className,
                               const char *superClassName )
 {
    if ( usage )
@@ -350,20 +350,20 @@ static void dumpClassHeader(  Stream &stream,
          stream.writeText( "\r\n@ingroup UNDOCUMENTED\r\n" );
       }
 #endif
-      
+
       stream.writeText( "\r\n*/\r\n" );
    }
    else
    {
       // No documentation string.  Check whether ther is a separate
       // class doc fragement.
-      
+
       bool haveClassDocFragment = false;
       if( className )
       {
          char buffer[ 1024 ];
          dSprintf( buffer, sizeof( buffer ), "@class %s", className );
-         
+
          for(  ConsoleDocFragment* fragment = ConsoleDocFragment::smFirst;
                fragment != NULL; fragment = fragment->mNext )
             if( !fragment->mClass && dStrstr( fragment->mText, buffer ) != NULL )
@@ -398,7 +398,7 @@ static void dumpClassMember(  Stream &stream,
    if( field.pFieldDocs && field.pFieldDocs[ 0 ] )
    {
       stream.writeText( "@brief " );
-      
+
       String docs( field.pFieldDocs );
       S32 newline = docs.find( '\n' );
       if( newline == -1 )
@@ -407,12 +407,12 @@ static void dumpClassMember(  Stream &stream,
       {
          String brief = docs.substr( 0, newline );
          String body = docs.substr( newline + 1 );
-         
+
          stream.writeText( brief );
          stream.writeText( "\r\n\r\n" );
          stream.writeText( body );
       }
-      
+
       stream.writeText( "\r\n" );
    }
 
@@ -421,10 +421,10 @@ static void dumpClassMember(  Stream &stream,
       stream.writeText( "@deprecated This member is deprecated and its value is always undefined.\r\n" );
 
    stream.writeText( "*/\r\n" );
-  
+
    ConsoleBaseType* cbt = ConsoleBaseType::getType( field.type );
    const char* type = ( cbt ? cbt->getTypeClassName() : "" );
-   
+
    if( field.elementCount > 1 )
       stream.writeText( String::ToString( "%s %s[ %i ];\r\n", isDeprecated ? "deprecated" : type, field.pFieldname, field.elementCount ) );
    else
@@ -437,7 +437,7 @@ static void dumpClassFooter( Stream &stream )
 }
 
 static void dumpGroupStart(   Stream &stream,
-                              const char *aName, 
+                              const char *aName,
                               const char *aDocs = NULL )
 {
    stream.writeText( String::ToString( "\r\n/*! @name %s\r\n", aName ) );
@@ -506,11 +506,11 @@ static void dumpClasses( Stream &stream )
       const char *superClassName = vec[i]->mParent ? vec[i]->mParent->mName : NULL;
 
       // Skip the global namespace, that gets dealt with in dumpFunctions
-      if(!className) 
+      if(!className)
          continue;
 
       // We're just dumping engine functions, then we don't want to dump
-      // a class that only contains script functions. So, we iterate over 
+      // a class that only contains script functions. So, we iterate over
       // all the functions.
       bool found = false;
       for( Namespace::Entry *ewalk = vec[i]->mEntryList; ewalk; ewalk = ewalk->mNext )
@@ -526,13 +526,13 @@ static void dumpClasses( Stream &stream )
       // doesn't match the class name... then its a script class.
       if ( !found && !vec[i]->isClass() )
          continue;
-  
+
       // If we hit a class with no members and no classRep, do clever filtering.
       if(vec[i]->mEntryList == NULL && vec[i]->mClassRep == NULL)
       {
          // Print out a short stub so we get a proper class hierarchy.
-         if ( superClassName )  
-         { 
+         if ( superClassName )
+         {
             // Filter hack; we don't want non-inheriting classes...
             dumpClassHeader( stream, NULL, className, superClassName );
             dumpClassFooter( stream );
@@ -547,21 +547,21 @@ static void dumpClasses( Stream &stream )
 
       // Print the header for the class..
       dumpClassHeader( stream, vec[i]->mUsage, className, superClassName );
-      
+
       // Dump all fragments for this class.
-      
+
       for( ConsoleDocFragment* fragment = ConsoleDocFragment::smFirst; fragment != NULL; fragment = fragment->mNext )
          if( fragment->mClass && dStricmp( fragment->mClass, className ) == 0 )
             dumpFragment( stream, fragment );
 
       // Dump member functions.
       dumpNamespaceEntries( stream, vec[ i ], false );
-      
+
       // Dump callbacks.
       dumpGroupStart( stream, "Callbacks" );
       dumpNamespaceEntries( stream, vec[ i ], true );
       dumpGroupEnd( stream );
-      
+
       // Dump static member variables.
       dumpVariables( stream, className );
 
@@ -602,7 +602,7 @@ static void dumpClasses( Stream &stream )
                // our parent class.
                if ( parentRep && parentRep->findField( field.pFieldname ) )
                   continue;
-                     
+
                dumpClassMember( stream, field );
                break;
             }
@@ -618,38 +618,38 @@ static void dumpEnum( Stream& stream, const EngineTypeInfo* type )
 {
    if( !type->getEnumTable() ) // Sanity check.
       return;
-      
+
    // Skip internals... don't export them.
    if (  type->getDocString() &&
          ( dStrstr( type->getDocString(), "@hide" ) || dStrstr( type->getDocString(), "@internal" ) ) )
       return;
 
    // Write documentation.
-   
+
    stream.writeText( "/*!\r\n" );
    dumpDoc( stream, type->getDocString() );
    stream.writeText( "*/\r\n" );
-   
+
    // Write definition.
-   
+
    stream.writeText( "enum " );
    stream.writeText( type->getTypeName() );
    stream.writeText( " {\r\n" );
-   
+
    const EngineEnumTable& table = *( type->getEnumTable() );
    const U32 numValues = table.getNumValues();
-   
+
    for( U32 i = 0; i < numValues; ++ i )
    {
       const EngineEnumTable::Value& value = table[ i ];
-      
+
       stream.writeText( "/*!\r\n" );
       dumpDoc( stream, value.getDocString(), false );
       stream.writeText( "*/\r\n" );
       stream.writeText( value.getName() );
       stream.writeText( ",\r\n" );
    }
-   
+
    stream.writeText( "};\r\n" );
 }
 
@@ -672,26 +672,26 @@ static bool dumpEngineDocs( const char *outputFile )
    }
 
    // First dump all global ConsoleDoc fragments.
-   
+
    for( ConsoleDocFragment* fragment = ConsoleDocFragment::smFirst; fragment != NULL; fragment = fragment->mNext )
       if( !fragment->mClass )
          dumpFragment( stream, fragment );
-   
+
    // Clear the doc groups before continuing,
    smDocGroups.clear();
-   
+
    // Dump enumeration types.
    dumpEnums( stream );
-   
+
    // Dump all global variables.
    dumpVariables( stream );
 
    // Now dump the global functions.
    Namespace *g = Namespace::find( NULL );
-   while( g ) 
+   while( g )
    {
       dumpNamespaceEntries( stream, g );
-      
+
       // Dump callbacks.
       dumpGroupStart( stream, "Callbacks" );
       dumpNamespaceEntries( stream, g, true );

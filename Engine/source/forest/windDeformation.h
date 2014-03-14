@@ -41,7 +41,7 @@ public:
 
    // ShaderFeatureConstHandles
    virtual void init( GFXShader *shader );
-   virtual void setConsts( SceneRenderState *state, 
+   virtual void setConsts( SceneRenderState *state,
                            const SceneData &sgData,
                            GFXShaderConstBuffer *buffer );
 };

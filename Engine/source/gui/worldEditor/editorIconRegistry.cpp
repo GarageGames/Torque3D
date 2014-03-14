@@ -58,15 +58,15 @@ void EditorIconRegistry::loadFromPath( const String &path, bool overwrite )
    String defaultIconFile = path + "default";
 
    mDefaultIcon.set( defaultIconFile,
-                     &GFXDefaultPersistentProfile, 
-                     avar("%s() - mIcons[] (line %d)", 
+                     &GFXDefaultPersistentProfile,
+                     avar("%s() - mIcons[] (line %d)",
                      __FUNCTION__, __LINE__) );
 }
 
 void EditorIconRegistry::add( const String &className, const String &imageFile, bool overwrite )
 {
    // First see if we can load the image.
-   GFXTexHandle icon(   imageFile, &GFXDefaultPersistentProfile, 
+   GFXTexHandle icon(   imageFile, &GFXDefaultPersistentProfile,
                         avar("%s() - mIcons[] (line %d)", __FUNCTION__, __LINE__) );
    if ( icon.isNull() )
       return;
@@ -109,13 +109,13 @@ GFXTexHandle EditorIconRegistry::findIcon( const SimObject *object )
    AbstractClassRep *classRep = object->getClassRep();
 
    return findIcon( classRep );
-}   
+}
 
 GFXTexHandle EditorIconRegistry::findIcon( const char *className )
-{   
+{
    // On the chance we have this className already in the map,
    // check there first because its a lot faster...
-   
+
    StringNoCase key( className );
    IconMap::Iterator icon = mIcons.find( key );
 
@@ -130,7 +130,7 @@ GFXTexHandle EditorIconRegistry::findIcon( const char *className )
 
    bool found = false;
    AbstractClassRep* pClassRep = AbstractClassRep::getClassList();
-   
+
    while ( pClassRep )
    {
       if ( key.equal( pClassRep->getClassName(), String::NoCase ) )
@@ -146,7 +146,7 @@ GFXTexHandle EditorIconRegistry::findIcon( const char *className )
       Con::errorf( "EditorIconRegistry::findIcon, passed className %s was not an AbstractClassRep!", key.c_str() );
       return mDefaultIcon;
    }
-   
+
    // Now do a find by AbstractClassRep recursively up the class tree...
    return findIcon( pClassRep );
 }
@@ -154,7 +154,7 @@ GFXTexHandle EditorIconRegistry::findIcon( const char *className )
 bool EditorIconRegistry::hasIconNoRecurse( const SimObject *object )
 {
    AbstractClassRep *classRep = object->getClassRep();
-      
+
    StringNoCase key( classRep->getClassName() );
 
    IconMap::Iterator icon = mIcons.find( key );
@@ -188,14 +188,14 @@ ConsoleStaticMethod( EditorIconRegistry, loadFromPath, void, 2, 3, "( String ima
    gEditorIcons.loadFromPath( argv[1], overwrite );
 }
 
-ConsoleStaticMethod( EditorIconRegistry, clear, void, 1, 1, "" 
+ConsoleStaticMethod( EditorIconRegistry, clear, void, 1, 1, ""
 					"@internal")
 {
    gEditorIcons.clear();
 }
 
 ConsoleStaticMethod( EditorIconRegistry, findIconByClassName, const char*, 2, 2, "( String className )\n"
-   "Returns the file path to the icon file if found." 
+   "Returns the file path to the icon file if found."
    "@internal")
 {
    GFXTexHandle icon = gEditorIcons.findIcon( argv[1] );
@@ -206,7 +206,7 @@ ConsoleStaticMethod( EditorIconRegistry, findIconByClassName, const char*, 2, 2,
 }
 
 ConsoleStaticMethod( EditorIconRegistry, findIconBySimObject, const char*, 2, 2, "( SimObject )\n"
-   "Returns the file path to the icon file if found." 
+   "Returns the file path to the icon file if found."
    "@internal")
 {
    SimObject *obj = NULL;

@@ -229,7 +229,7 @@ class SimPersistID;
 class SimObject: public ConsoleObject
 {
    public:
-   
+
       typedef ConsoleObject Parent;
 
       friend class SimManager;
@@ -240,7 +240,7 @@ class SimObject: public ConsoleObject
 
       /// @name Notification
       /// @{
-      
+
       struct Notify
       {
          enum Type
@@ -250,14 +250,14 @@ class SimObject: public ConsoleObject
             ObjectRef,     ///< Cleverness to allow tracking of references.
             Invalid        ///< Mark this notification as unused (used in freeNotify).
          } type;
-         
+
          void *ptr;        ///< Data (typically referencing or interested object).
          Notify *next;     ///< Next notification in the linked list.
       };
 
       /// @}
 
-      /// Flags passed to SimObject::write 
+      /// Flags passed to SimObject::write
       enum WriteFlags
       {
          SelectedOnly         = BIT( 0 ), ///< Indicates that only objects marked as selected should be outputted. Used in SimSet.
@@ -284,7 +284,7 @@ class SimObject: public ConsoleObject
          Hidden            = BIT( 12 ),   ///< Object is hidden in editors.
          Locked            = BIT( 13 ),   ///< Object is locked in editors.
       };
-      
+
       // dictionary information stored on the object
       StringTableEntry objectName;
       StringTableEntry mOriginalName;
@@ -294,7 +294,7 @@ class SimObject: public ConsoleObject
 
       /// SimGroup we're contained in, if any.
       SimGroup*   mGroup;
-      
+
       /// Flags internal to the object management system.
       BitSet32    mFlags;
 
@@ -306,7 +306,7 @@ class SimObject: public ConsoleObject
 
       /// Buffer to store textual representation of this object's numeric ID in.
       char mIdString[ 11 ];
-      
+
       /// @name Serialization
       /// @{
 
@@ -315,12 +315,12 @@ class SimObject: public ConsoleObject
 
       /// The line number that the object was declared on if it was loaded from a file.
       S32 mDeclarationLine;
-      
+
       /// @}
 
       /// @name Notification
       /// @{
-      
+
       /// List of notifications added to this object.
       Notify* mNotifyList;
 
@@ -332,7 +332,7 @@ class SimObject: public ConsoleObject
 
       static bool _setCanSave( void* object, const char* index, const char* data );
       static const char* _getCanSave( void* object, const char* data );
-      
+
       static const char* _getHidden( void* object, const char* data )
          { if( static_cast< SimObject* >( object )->isHidden() ) return "1"; return "0"; }
       static const char* _getLocked( void* object, const char* data )
@@ -345,63 +345,63 @@ class SimObject: public ConsoleObject
       // Namespace protected set methods
       static bool setClass( void *object, const char *index, const char *data )
          { static_cast<SimObject*>(object)->setClassNamespace(data); return false; };
-      static bool setSuperClass(void *object, const char *index, const char *data)     
+      static bool setSuperClass(void *object, const char *index, const char *data)
          { static_cast<SimObject*>(object)->setSuperClassNamespace(data); return false; };
 
-      // Group hierarchy protected set method 
+      // Group hierarchy protected set method
       static bool setProtectedParent(void *object, const char *index, const char *data);
 
       // Object name protected set method
       static bool setProtectedName(void *object, const char *index, const char *data);
 
    protected:
-   
+
       /// Id number for this object.
       SimObjectId mId;
-      
+
       /// Internal name assigned to the object.  Not set by default.
       StringTableEntry mInternalName;
-      
+
       static bool          smForceId;   ///< Force a registered object to use the given Id.  Cleared upon use.
       static SimObjectId   smForcedId;  ///< The Id to force upon the object.  Poor object.
-      
+
       /// @name Serialization
       /// @{
-      
+
       /// Whether dynamic fields should be saved out in serialization.  Defaults to true.
       bool mCanSaveFieldDictionary;
-      
+
       /// @}
 
       /// @name Persistent IDs
       /// @{
-      
+
       /// Persistent ID assigned to this object.  Allows to unambiguously refer to this
       /// object in serializations regardless of stream object ordering.
       SimPersistID* mPersistentId;
-      
+
       static bool _setPersistentID( void* object, const char* index, const char* data );
-         
+
       /// @}
-      
+
       /// @name Namespace management
       /// @{
-      
+
       /// The namespace in which method lookup for this object begins.
       Namespace* mNameSpace;
 
       /// Name of namespace to use as class namespace.
       StringTableEntry mClassName;
-      
+
       /// Name of namespace to use as class super namespace.
       StringTableEntry mSuperClassName;
 
       /// Perform namespace linking on this object.
       void linkNamespaces();
-      
+
       /// Undo namespace linking on this object.
       void unlinkNamespaces();
-      
+
       /// @}
 
       /// Called when the object is selected in the editor.
@@ -409,10 +409,10 @@ class SimObject: public ConsoleObject
 
       /// Called when the object is unselected in the editor.
       virtual void _onUnselected() {}
-   
+
       /// We can provide more detail, like object name and id.
       virtual String _getLogMessage(const char* fmt, void* args) const;
-   
+
       DEFINE_CREATE_METHOD
       {
          T* object = new T;
@@ -421,21 +421,21 @@ class SimObject: public ConsoleObject
          return object;
       }
 
-      
+
       // EngineObject.
       virtual void _destroySelf();
 
    public:
-      
+
       /// @name Cloning
       /// @{
-      
+
       /// Return a shallow copy of this object.
       virtual SimObject* clone();
-      
+
       /// Return a deep copy of this object.
       virtual SimObject* deepClone();
-      
+
       /// @}
 
       /// @name Accessors
@@ -526,10 +526,10 @@ class SimObject: public ConsoleObject
 
       /// Check if a method exists in the objects current namespace.
       virtual bool isMethod( const char* methodName );
-      
+
       /// Return true if the field is defined on the object
       virtual bool isField( const char* fieldName, bool includeStatic = true, bool includeDynamic = true );
-      
+
       /// @}
 
       /// @name Initialization
@@ -537,7 +537,7 @@ class SimObject: public ConsoleObject
 
       ///
       SimObject();
-      
+
       virtual ~SimObject();
 
       virtual bool processArguments(S32 argc, const char **argv);  ///< Process constructor options. (ie, new SimObject(1,2,3))
@@ -546,22 +546,22 @@ class SimObject: public ConsoleObject
 
       /// @name Events
       /// @{
-      
+
       /// Called when the object is added to the sim.
       virtual bool onAdd();
-      
+
       /// Called when the object is removed from the sim.
       virtual void onRemove();
-      
+
       /// Called when the object is added to a SimGroup.
       virtual void onGroupAdd();
-      
+
       /// Called when the object is removed from a SimGroup.
       virtual void onGroupRemove();
-      
+
       /// Called when the object's name is changed.
       virtual void onNameChange(const char *name);
-      
+
       ///
       ///  Specifically, these are called by setDataField
       ///  when a static or dynamic field is modified, see
@@ -607,7 +607,7 @@ class SimObject: public ConsoleObject
 
       /// @name Notification
       /// @{
-      
+
       Notify *removeNotify(void *ptr, Notify::Type);   ///< Remove a notification from the list.
       void deleteNotify(SimObject* obj);               ///< Notify an object when we are deleted.
       void clearNotify(SimObject* obj);                ///< Notify an object when we are cleared.
@@ -701,13 +701,13 @@ class SimObject: public ConsoleObject
 
       /// @name Accessors
       /// @{
-      
+
       /// Return the unique numeric object ID.
       SimObjectId getId() const { return mId; }
-      
+
       /// Return the object ID as a string.
       const char* getIdString() const { return mIdString; }
-                  
+
       /// Return the name of this object.
       StringTableEntry getName() const { return objectName; }
 
@@ -724,7 +724,7 @@ class SimObject: public ConsoleObject
       bool isProperlyAdded() const { return mFlags.test(Added); }
       bool isDeleted() const { return mFlags.test(Deleted); }
       bool isRemoved() const { return mFlags.test(Deleted | Removed); }
-      
+
       virtual bool isLocked() const { return mFlags.test( Locked ); }
       virtual void setLocked( bool b );
       virtual bool isHidden() const { return mFlags.test( Hidden ); }
@@ -776,16 +776,16 @@ class SimObject: public ConsoleObject
 
       virtual bool writeObject(Stream *stream);
       virtual bool readObject(Stream *stream);
-      
+
       /// Set whether fields created at runtime should be saved. Default is true.
       void setCanSaveDynamicFields( bool bCanSave ) { mCanSaveFieldDictionary	=	bCanSave; }
-      
+
       /// Get whether fields created at runtime should be saved. Default is true.
       bool getCanSaveDynamicFields( bool bCanSave ) { return mCanSaveFieldDictionary;}
 
       /// Return the object that this object is copying fields from.
       SimObject* getCopySource() const { return mCopySource; }
-      
+
       /// Set the object that this object should be copying fields from.
       void setCopySource( SimObject* object );
 
@@ -822,7 +822,7 @@ class SimObject: public ConsoleObject
 
       /// @name Accessors
       /// @{
-      
+
       bool isSelected() const { return mFlags.test(Selected); }
       bool isExpanded() const { return mFlags.test(Expanded); }
       bool isEditorOnly() const { return mFlags.test( EditorOnly ); }
@@ -840,7 +840,7 @@ class SimObject: public ConsoleObject
 
       /// Returns boolean specifying if the object can be serialized.
       bool getCanSave() const { return !mFlags.test( CannotSave ); }
-      
+
       /// Set serialization flag.
       virtual void setCanSave( bool val ) { if( !val ) mFlags.set( CannotSave ); else mFlags.clear( CannotSave ); }
 
@@ -848,22 +848,22 @@ class SimObject: public ConsoleObject
       bool isSelectedRecursive() const;
 
       /// @}
-      
+
       /// @name Namespace management
       /// @{
-      
+
       /// Return name of class namespace set on this object.
       StringTableEntry getClassNamespace() const { return mClassName; };
-      
+
       /// Return name of superclass namespace set on this object.
       StringTableEntry getSuperClassNamespace() const { return mSuperClassName; };
-      
+
       ///
       void setClassNamespace( const char* classNamespace );
-      
+
       ///
       void setSuperClassNamespace( const char* superClassNamespace );
-            
+
       /// @}
 
       /// @name Persistent IDs
@@ -871,28 +871,28 @@ class SimObject: public ConsoleObject
 
       /// Return the persistent ID assigned to this object or NULL.
       SimPersistID* getPersistentId() const { return mPersistentId; }
-      
+
       /// Return the persistent ID assigned to this object or assign one to it if it has none.
       SimPersistID* getOrCreatePersistentId();
-      
+
       /// @}
-      
+
       /// @name Debugging
       /// @{
 
       /// Return a textual description of the object.
       virtual String describeSelf() const;
 
-      /// Dump the contents of this object to the console.  Use the Torque Script dump() and dumpF() functions to 
-      /// call this.  
+      /// Dump the contents of this object to the console.  Use the Torque Script dump() and dumpF() functions to
+      /// call this.
       void dumpToConsole( bool includeFunctions=true );
-      
-      ///added this so that you can print the entire class hierarchy, including script objects, 
+
+      ///added this so that you can print the entire class hierarchy, including script objects,
       //from the console or C++.
-      
+
       /// Print the AbstractClassRep hierarchy of this object to the console.
       virtual void dumpClassHierarchy();
-      
+
       /// Print the SimGroup hierarchy of this object to the console.
       virtual void dumpGroupHierarchy();
 
@@ -906,9 +906,9 @@ class SimObject: public ConsoleObject
       // Component Console Overrides
       virtual bool handlesConsoleMethod(const char * fname, S32 * routingId) { return false; }
       virtual void getConsoleMethodData(const char * fname, S32 routingId, S32 * type, S32 * minArgs, S32 * maxArgs, void ** callback, const char ** usage) {}
-      
+
       DECLARE_CONOBJECT( SimObject );
-      
+
       static SimObject* __findObject( const char* id ) { return Sim::findObject( id ); }
       static const char* __getObjectId( ConsoleObject* object )
       {
@@ -952,9 +952,9 @@ template< typename T >
 class SimObjectPtr : public WeakRefPtr< T >
 {
    public:
-   
+
       typedef WeakRefPtr< T > Parent;
-   
+
       SimObjectPtr() {}
       SimObjectPtr(T *ptr) { this->mReference = NULL; set(ptr); }
       SimObjectPtr( const SimObjectPtr& ref ) { this->mReference = NULL; set(ref.mReference); }

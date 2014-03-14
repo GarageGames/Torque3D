@@ -71,7 +71,7 @@ struct ObjectRenderInst;
 class Material;
 
 
-enum DecalFlags 
+enum DecalFlags
 {
    PermanentDecal = 1 << 0,
    SaveDecal      = 1 << 1,
@@ -85,14 +85,14 @@ enum DecalFlags
 class DecalManager : public SceneObject
 {
    public:
-      
+
       typedef SceneObject Parent;
 
       // [rene, 11-Mar-11] This vector is very poorly managed; the logic is spread all over the place
       Vector<DecalInstance *> mDecalInstanceVec;
 
    protected:
-      
+
       /// The clipper we keep around between decal updates
       /// to avoid excessive memory allocations.
       ClippedPolyList mClipper;
@@ -101,9 +101,9 @@ class DecalManager : public SceneObject
 
       StringTableEntry mDataFileName;
       Resource<DecalDataFile> mData;
-      
+
       Signal< void() > mClearDataSignal;
-      
+
       Vector< GFXVertexBufferHandle<DecalVertex>* > mVBs;
       Vector< GFXPrimitiveBufferHandle* > mPBs;
 
@@ -134,7 +134,7 @@ class DecalManager : public SceneObject
       static bool smDebugRender;
 
       static bool smDecalsOn;
-      static F32 smDecalLifeTimeScale;   
+      static F32 smDecalLifeTimeScale;
       static bool smPoolBuffers;
       static const U32 smMaxVerts;
       static const U32 smMaxIndices;
@@ -158,7 +158,7 @@ class DecalManager : public SceneObject
 
       // Rendering
       void prepRenderImage( SceneRenderState *state );
-      
+
       void _generateWindingOrder( const Point3F &cornerPoint, Vector<Point3F> *sortPoints );
 
       // Helpers for creating and deleting the vert and index arrays
@@ -263,7 +263,7 @@ class DecalManager : public SceneObject
       bool clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts = NULL, const Point2F *clipDepth = NULL );
 
       void notifyDecalModified( DecalInstance *inst );
-      
+
       Signal< void() >& getClearDataSignal() { return mClearDataSignal; }
 
 	   Resource<DecalDataFile> getDecalDataFile() { return mData; }

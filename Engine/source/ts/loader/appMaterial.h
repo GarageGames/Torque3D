@@ -31,7 +31,7 @@ struct AppMaterial
 
    AppMaterial() : flags(0), reflectance(1.0f) { }
    virtual ~AppMaterial() {}
-   
+
    virtual String getName() const { return "unnamed"; }
    virtual U32 getFlags() { return flags; }
    virtual F32 getReflectance() { return reflectance; }

@@ -33,7 +33,7 @@ class PostEffect;
 
 ///
 class RenderGlowMgr : public RenderTexTargetBinManager
-{  
+{
    typedef RenderTexTargetBinManager Parent;
 
 public:
@@ -75,10 +75,10 @@ protected:
 
       static void _overrideFeatures(   ProcessedMaterial *mat,
                                        U32 stageNum,
-                                       MaterialFeatureData &fd, 
+                                       MaterialFeatureData &fd,
                                        const FeatureSet &features );
 
-      BaseMatInstance *mGlowMatInst; 
+      BaseMatInstance *mGlowMatInst;
    };
 
    SimObjectPtr<PostEffect> mGlowEffect;

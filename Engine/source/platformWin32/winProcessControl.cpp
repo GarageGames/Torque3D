@@ -47,10 +47,10 @@ void Platform::outputDebugString( const char *string, ... )
    // Expand string.
 
    char buffer[ 2048 ];
-   
+
    va_list args;
    va_start( args, string );
-   
+
    dVsprintf( buffer, sizeof( buffer ), string, args );
    va_end( args );
 

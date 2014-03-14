@@ -54,7 +54,7 @@ enum GizmoMode
    MoveMode,    // 1
    RotateMode,  // 2
    ScaleMode,   // 3
-   ModeEnumCount 
+   ModeEnumCount
 };
 
 enum GizmoAlignment
@@ -97,7 +97,7 @@ public:
    F32 scaleScalar;
    U32 screenLen;
    ColorI axisColors[3];
-   ColorI activeColor;   
+   ColorI activeColor;
    ColorI inActiveColor;
    ColorI centroidColor;
    ColorI centroidHighlightColor;
@@ -116,7 +116,7 @@ public:
    bool renderPlane;
    bool renderPlaneHashes;
    ColorI gridColor;
-   F32 planeDim;   
+   F32 planeDim;
    bool renderSolid;
 
    /// Whether to render a transparent grid overlay when using the move gizmo.
@@ -135,8 +135,8 @@ public:
       CanScaleZ         = 1 << 9,
       CanScaleUniform   = 1 << 10,
       CanTranslate      = 1 << 11,
-      CanTranslateX     = 1 << 12, 
-      CanTranslateY     = 1 << 13, 
+      CanTranslateX     = 1 << 12,
+      CanTranslateY     = 1 << 13,
       CanTranslateZ     = 1 << 14,
       CanTranslateUniform = 1 << 15,
       PlanarHandlesOn   = 1 << 16
@@ -156,7 +156,7 @@ public:
 // The Gizmo has a MatrixF transform and Point3F scale on which it will
 // operate by passing it Gui3DMouseEvent(s).
 //
-// The idea is to set the Gizmo transform/scale to that of another 3D object 
+// The idea is to set the Gizmo transform/scale to that of another 3D object
 // which is being manipulated, pass mouse events into the Gizmo, read the
 // new transform/scale out, and set it to onto the object.
 // And of course the Gizmo can be rendered.
@@ -170,7 +170,7 @@ class Gizmo : public SimObject
 
    friend class WorldEditor;
 
-public:   
+public:
 
    enum Selection {
       None     = -1,
@@ -183,7 +183,7 @@ public:
       Centroid = 6,
       Custom1  = 7,  // screen-aligned rotation
       Custom2  = 8
-   };  
+   };
 
    Gizmo();
    ~Gizmo();
@@ -196,15 +196,15 @@ public:
    static void initPersistFields();
 
    // Mutators
-   void set( const MatrixF &objMat, const Point3F &worldPos, const Point3F &objScale ); 
-   void setProfile( GizmoProfile *profile ) 
-   { 
+   void set( const MatrixF &objMat, const Point3F &worldPos, const Point3F &objScale );
+   void setProfile( GizmoProfile *profile )
+   {
       AssertFatal( profile != NULL, "NULL passed to Gizmo::setProfile - Gizmo must always have a profile!" );
-      mProfile = profile; 
+      mProfile = profile;
    }
 
    // Accessors
-   
+
    GizmoProfile*  getProfile()               { return mProfile; }
 
    GizmoMode      getMode() const            { return mCurrentMode; }
@@ -213,22 +213,22 @@ public:
 
    /// Returns current object to world transform of the object being manipulated.
    const MatrixF& getTransform() const       { return mCurrentTransform; }
-   
-   Point3F        getPosition() const        { return mCurrentTransform.getPosition(); }   
-   
+
+   Point3F        getPosition() const        { return mCurrentTransform.getPosition(); }
+
    const Point3F& getScale() const           { return mScale; }
-   
-   
+
+
    // Returns change in position in last call to on3DMouseDragged.
    const Point3F& getOffset() const          { return mDeltaPos; }
-   
+
    // Returns change is position since on3DMouseDown.
    const Point3F& getTotalOffset() const     { return mDeltaTotalPos; }
-   
+
    const Point3F& getDeltaScale() const      { return mDeltaScale; }
-   
+
    const Point3F& getDeltaTotalScale() const { return mDeltaTotalScale; }
-   
+
    const Point3F& getDeltaRot() const        { return mDeltaRot; }
 
    const Point3F& getDeltaTotalRot() const   { return mDeltaTotalRot; }
@@ -256,10 +256,10 @@ public:
 
    // So Gizmo knows the current mouse button state.
    void on3DMouseUp( const Gui3DMouseEvent &event );
-   
+
    // Test Gizmo for collisions and set the Gizmo Selection (the part under the cursor)
    void on3DMouseMove( const Gui3DMouseEvent &event );
-   
+
    // Make changes to the Gizmo transform/scale (depending on mode)
    void on3DMouseDragged( const Gui3DMouseEvent &event );
 
@@ -278,13 +278,13 @@ public:
    void setSelection( Selection sel ) { mSelectionIdx = sel; }
 
    // Returns the object space vector corresponding to a Selection.
-   Point3F selectionToAxisVector( Selection axis ); 
+   Point3F selectionToAxisVector( Selection axis );
 
    // These provide the user an easy way to check if the Gizmo's transform
    // or scale have changed by calling markClean prior to calling
-   // on3DMouseDragged, and calling isDirty after.   
+   // on3DMouseDragged, and calling isDirty after.
    bool isDirty() { return mDirty; }
-   void markClean() { mDirty = false; } 
+   void markClean() { mDirty = false; }
 
    // Renders the 3D Gizmo in the scene, GFX must be setup for proper
    // 3D rendering before calling this!
@@ -298,7 +298,7 @@ public:
 
    // Returns true if the mouse event collides with any part of the Gizmo
    // and sets the Gizmo's current Selection.
-   // You can call this or on3DMouseMove, they are identical   
+   // You can call this or on3DMouseMove, they are identical
    bool collideAxisGizmo( const Gui3DMouseEvent & event );
 
 protected:
@@ -309,7 +309,7 @@ protected:
    void _renderAxisArrows();
    void _renderAxisBoxes();
    void _renderAxisCircles();
-   void _renderAxisText();   
+   void _renderAxisText();
    void _renderPlane();
    Point3F _snapPoint( const Point3F &pnt ) const;
    F32 _snapFloat( const F32 &val, const F32 &snap ) const;
@@ -337,7 +337,7 @@ protected:
    MatrixF mTransform;
    MatrixF mCurrentTransform;
    MatrixF mSavedTransform;
-   
+
    GizmoAlignment mCurrentAlignment;
    GizmoMode mCurrentMode;
 
@@ -350,7 +350,7 @@ protected:
    Point3F mDeltaTotalScale;
    Point3F mLastScale;
 	Point3F mScaleInfluence;
- 
+
    EulerF mRot;
    EulerF mSavedRot;
    EulerF mDeltaRot;
@@ -359,7 +359,7 @@ protected:
    F32 mLastAngle;
    Point2I mMouseDownPos;
    Point3F mMouseDownProjPnt;
-   Point3F mDeltaPos;   
+   Point3F mDeltaPos;
    Point3F mDeltaTotalPos;
    Point3F mProjPnt;
    Point3F mOrigin;
@@ -377,7 +377,7 @@ protected:
    bool mMouseDown;
 
    F32 mSign;
-   
+
    /// If false, don't render the grid plane even if it is enabled in the profile.
    bool mGridPlaneEnabled;
 
@@ -393,9 +393,9 @@ protected:
    bool mAxisEnabled[3];
    bool mUniformHandleEnabled;
    bool mScreenRotateHandleEnabled;
-      
+
    // Used to override rendering of handles.
-   bool mHighlightCentroidHandle;   
+   bool mHighlightCentroidHandle;
    bool mHighlightAll;
 
    // Initialized in renderGizmo and saved for later use when projecting
@@ -410,7 +410,7 @@ protected:
    Point3F mElipseCursorCollidePntSS;
    Point3F mElipseCursorCollideVecSS;
 
-   /// A large hard coded distance used to test 
+   /// A large hard coded distance used to test
    /// gizmo axis selection.
    static F32 smProjectDistance;
 };

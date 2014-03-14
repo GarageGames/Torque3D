@@ -83,7 +83,7 @@ SkyBox::~SkyBox()
    {
       mFogBandMat->deleteObject();
       mFogBandMat = NULL;
-   }   
+   }
 }
 
 bool SkyBox::onAdd()
@@ -113,9 +113,9 @@ void SkyBox::onRemove()
 
 void SkyBox::initPersistFields()
 {
-   addGroup( "Sky Box" );	
+   addGroup( "Sky Box" );
 
-   addField( "material", TypeMaterialName, Offset( mMatName, SkyBox ), 
+   addField( "material", TypeMaterialName, Offset( mMatName, SkyBox ),
       "The name of a cubemap material for the sky box." );
 
    addField( "drawBottom", TypeBool, Offset( mDrawBottom, SkyBox ),
@@ -138,7 +138,7 @@ void SkyBox::inspectPostApply()
 U32 SkyBox::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
 {
    U32 retMask = Parent::packUpdate( conn, mask, stream );
-   
+
    stream->write( mMatName );
    stream->writeFlag( mDrawBottom );
    stream->write( mFogBandHeight );
@@ -164,7 +164,7 @@ void SkyBox::unpackUpdate( NetConnection *conn, BitStream *stream )
 
    // If this flag has changed
    // we need to update the vertex buffer.
-   if (  drawBottom != mDrawBottom || 
+   if (  drawBottom != mDrawBottom ||
          bandHeight != mFogBandHeight )
    {
       mDrawBottom = drawBottom;
@@ -178,9 +178,9 @@ void SkyBox::prepRenderImage( SceneRenderState *state )
 {
    PROFILE_SCOPE( SkyBox_prepRenderImage );
 
-   if (  state->isShadowPass() || 
-         mVB.isNull() || 
-         mFogBandVB.isNull() || 
+   if (  state->isShadowPass() ||
+         mVB.isNull() ||
+         mFogBandVB.isNull() ||
          !mMatInstance )
       return;
 
@@ -199,8 +199,8 @@ void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
 {
    GFXDEBUGEVENT_SCOPE( SkyBox_RenderObject, ColorF::WHITE );
 
-   GFXTransformSaver saver;  
-   GFX->setVertexBuffer( mVB );         
+   GFXTransformSaver saver;
+   GFX->setVertexBuffer( mVB );
 
    MatrixF worldMat = MatrixF::Identity;
    worldMat.setPosition( state->getCameraPosition() );
@@ -215,11 +215,11 @@ void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
       mMatrixSet->setProjection( state->getSceneManager()->getNonClipProjection() );
 
    while ( mMatInstance->setupPass( state, sgData ) )
-   {         
+   {
       mMatInstance->setTransforms( *mMatrixSet, state );
       mMatInstance->setSceneInfo( state, sgData );
 
-      GFX->drawPrimitive( GFXTriangleList, 0, mPrimCount );     
+      GFX->drawPrimitive( GFXTriangleList, 0, mPrimCount );
    }
 
    // Draw render band.
@@ -243,7 +243,7 @@ void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
          mFogBandMatInst->setTransforms( *mMatrixSet, state );
          mFogBandMatInst->setSceneInfo( state, sgData );
 
-         GFX->setVertexBuffer( mFogBandVB );      
+         GFX->setVertexBuffer( mFogBandVB );
          GFX->drawPrimitive( GFXTriangleList, 0, 16 );
       }
    }
@@ -309,11 +309,11 @@ void SkyBox::_initRender()
    tmpVerts[14].texCoord.set( 1.0f, 1.0f );
 
    tmpVerts[15].point.set( -1, 1, 1 );
-   tmpVerts[16].point.set( -1, -1, -1 ); 
+   tmpVerts[16].point.set( -1, -1, -1 );
    tmpVerts[17].point.set( -1, 1, -1 );
 
    tmpVerts[15].texCoord.set( 0, 0 );
-   tmpVerts[16].texCoord.set( 1.0f, 1.0f ); 
+   tmpVerts[16].texCoord.set( 1.0f, 1.0f );
    tmpVerts[17].texCoord.set( 1.0f, 0 );
 
    tmpVerts[18].point.set( 1, 1, 1 );
@@ -353,19 +353,19 @@ void SkyBox::_initRender()
    // is set to render the bottom face.
    if ( mDrawBottom )
    {
-      tmpVerts[30].point.set( 1, 1, -1 ); 
+      tmpVerts[30].point.set( 1, 1, -1 );
       tmpVerts[31].point.set( -1, 1, -1 );
       tmpVerts[32].point.set( -1, -1, -1 );
 
-      tmpVerts[30].texCoord.set( 1.0f, 1.0f ); 
+      tmpVerts[30].texCoord.set( 1.0f, 1.0f );
       tmpVerts[31].texCoord.set( 1.0f, 0 );
       tmpVerts[32].texCoord.set( 0, 0 );
 
-      tmpVerts[33].point.set( 1, -1, -1 ); 
+      tmpVerts[33].point.set( 1, -1, -1 );
       tmpVerts[34].point.set( 1, 1, -1 );
       tmpVerts[35].point.set( -1, -1, -1 );
 
-      tmpVerts[33].texCoord.set( 0, 1.0f ); 
+      tmpVerts[33].texCoord.set( 0, 1.0f );
       tmpVerts[34].texCoord.set( 1.0f, 1.0f );
       tmpVerts[35].texCoord.set( 0, 0 );
    }
@@ -379,15 +379,15 @@ void SkyBox::_initRender()
       //tmpVerts[i].normal.set( tmp );
 
       // Note: SkyBox renders with a regular material, which uses the "Reflect Cube"
-      // feature. 
+      // feature.
       //
       // This feature is really designed a cubemap representing a reflection
-      // on an objects surface and therefore looks up into the cubemap with the 
-      // cubemap-space view vector reflected by the vert normal. 
+      // on an objects surface and therefore looks up into the cubemap with the
+      // cubemap-space view vector reflected by the vert normal.
       //
-      // Since we are actually viewing the skybox from "inside" not from 
-      // "outside" this reflection ends up making the cubemap appear upsidown. 
-      // Therefore we set the vert-normals to "zero" so that the reflection 
+      // Since we are actually viewing the skybox from "inside" not from
+      // "outside" this reflection ends up making the cubemap appear upsidown.
+      // Therefore we set the vert-normals to "zero" so that the reflection
       // operation returns the input, unreflected, vector.
 
       tmpVerts[i].normal.set( Point3F::Zero );
@@ -462,7 +462,7 @@ void SkyBox::_initRender()
       bandVertPtr[14].color.set( fogColor );
 
       bandVertPtr[15].point.set( -1, 1, mFogBandHeight );
-      bandVertPtr[16].point.set( -1, -1, 0 ); 
+      bandVertPtr[16].point.set( -1, -1, 0 );
       bandVertPtr[17].point.set( -1, 1, 0 );
 
       bandVertPtr[15].color.set( fogColorAlpha );
@@ -529,7 +529,7 @@ void SkyBox::_initRender()
       bandVertPtr[38].color.set( fogColor );
 
       bandVertPtr[39].point.set( -1, 1, 0 );
-      bandVertPtr[40].point.set( -1, -1, -1 ); 
+      bandVertPtr[40].point.set( -1, -1, -1 );
       bandVertPtr[41].point.set( -1, 1, -1 );
 
       bandVertPtr[39].color.set( fogColor );
@@ -564,8 +564,8 @@ void SkyBox::_initRender()
 
    // Setup the material for this imposter.
    mFogBandMat = MATMGR->allocateAndRegister( String::EmptyString );
-   mFogBandMat->mAutoGenerated = true;   
-   mFogBandMat->mTranslucent = true;   
+   mFogBandMat->mAutoGenerated = true;
+   mFogBandMat->mTranslucent = true;
    mFogBandMat->mVertColor[0] = true;
    mFogBandMat->mDoubleSided = true;
    mFogBandMat->mEmissive[0] = true;
@@ -618,7 +618,7 @@ void SkyBox::_updateMaterial()
    else if ( isProperlyAdded() )
    {
       mMaterial = pMat;
-      _initMaterial(); 
+      _initMaterial();
    }
 }
 

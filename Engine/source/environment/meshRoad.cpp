@@ -129,7 +129,7 @@ void MeshRoadNodeEvent::pack(NetConnection* conn, BitStream* stream)
       mathWrite( *stream, mPositions[i] );
       stream->write( mWidths[i] );
       stream->write( mDepths[i] );
-      mathWrite( *stream, mNormals[i] );         
+      mathWrite( *stream, mNormals[i] );
    }
 }
 
@@ -150,7 +150,7 @@ void MeshRoadNodeEvent::unpack(NetConnection* conn, BitStream* stream)
    for (U32 i=0; i<count; ++i)
    {
       mathRead( *stream, &pos );
-      stream->read( &width );   
+      stream->read( &width );
       stream->read( &depth );
       mathRead( *stream, &normal );
 
@@ -262,7 +262,7 @@ void MeshRoadNodeListNotify::sendNotification( NodeListManager::NodeList* list )
 
 const MatrixF& MeshRoadConvex::getTransform() const
 {
-   return MatrixF::Identity; //mObject->getTransform();    
+   return MatrixF::Identity; //mObject->getTransform();
 }
 
 Box3F MeshRoadConvex::getBoundingBox() const
@@ -466,11 +466,11 @@ MeshRoadSegment::MeshRoadSegment( MeshRoadSlice *rs0, MeshRoadSlice *rs1, const 
    // Will be used for intersection/buoyancy tests
 
    mPlaneCount = 6;
-   mPlanes[0].set( slice0->pb0, slice0->p0, slice1->p0 ); // left   
-   mPlanes[1].set( slice1->pb2, slice1->p2, slice0->p2 ); // right   
-   mPlanes[2].set( slice0->pb2, slice0->p2, slice0->p0 ); // near   
-   mPlanes[3].set( slice1->p0, slice1->p2, slice1->pb2 ); // far   
-   mPlanes[4].set( slice1->p2, slice1->p0, slice0->p0 ); // top   
+   mPlanes[0].set( slice0->pb0, slice0->p0, slice1->p0 ); // left
+   mPlanes[1].set( slice1->pb2, slice1->p2, slice0->p2 ); // right
+   mPlanes[2].set( slice0->pb2, slice0->p2, slice0->p0 ); // near
+   mPlanes[3].set( slice1->p0, slice1->p2, slice1->pb2 ); // far
+   mPlanes[4].set( slice1->p2, slice1->p0, slice0->p0 ); // top
    mPlanes[5].set( slice0->pb0, slice1->pb0, slice1->pb2 ); // bottom
 }
 
@@ -497,14 +497,14 @@ bool MeshRoadSegment::intersectBox( const Box3F &bounds ) const
    Point3F maxPoint;
    F32 maxDot;
 
-   // Note the planes are ordered left, right, near, 
+   // Note the planes are ordered left, right, near,
    // far, top, bottom for getting early rejections
    // from the typical horizontal scene.
    for ( S32 i = 0; i < mPlaneCount; i++ )
    {
       // This is pretty much as optimal as you can
       // get for a plane vs AABB test...
-      // 
+      //
       // 4 comparisons
       // 3 multiplies
       // 2 adds
@@ -543,7 +543,7 @@ bool MeshRoadSegment::containsPoint( const Point3F &pnt ) const
 
    F32 maxDot;
 
-   // Note the planes are ordered left, right, near, 
+   // Note the planes are ordered left, right, near,
    // far, top, bottom for getting early rejections
    // from the typical horizontal scene.
    for ( S32 i = 0; i < mPlaneCount; i++ )
@@ -552,7 +552,7 @@ bool MeshRoadSegment::containsPoint( const Point3F &pnt ) const
 
       // This is pretty much as optimal as you can
       // get for a plane vs point test...
-      // 
+      //
       // 1 comparison
       // 2 multiplies
       // 1 adds
@@ -580,10 +580,10 @@ F32 MeshRoadSegment::distanceToSurface(const Point3F &pnt) const
 ConsoleDocClass( MeshRoad,
    "@brief A strip of rectangular mesh segments defined by a 3D spline "
    "for prototyping road-shaped objects in your scene.\n\n"
-   
+
    "User may control width and depth per node, overall spline shape in three "
    "dimensions, and seperate Materials for rendering the top, bottom, and side surfaces.\n\n"
-   
+
    "MeshRoad is not capable of handling intersections, branches, curbs, or other "
    "desirable features in a final 'road' asset and is therefore intended for "
    "prototyping and experimentation.\n\n"
@@ -622,7 +622,7 @@ MeshRoad::MeshRoad()
 }
 
 MeshRoad::~MeshRoad()
-{   
+{
    delete mConvexList;
    mConvexList = NULL;
 }
@@ -640,20 +640,20 @@ void MeshRoad::initPersistFields()
       addField( "sideMaterial", TypeMaterialName, Offset( mMaterialName[Side], MeshRoad ),
          "Material for the left, right, front, and back surfaces of the road." );
 
-      addField( "textureLength", TypeF32, Offset( mTextureLength, MeshRoad ), 
-         "The length in meters of textures mapped to the MeshRoad." );      
+      addField( "textureLength", TypeF32, Offset( mTextureLength, MeshRoad ),
+         "The length in meters of textures mapped to the MeshRoad." );
 
-      addField( "breakAngle", TypeF32, Offset( mBreakAngle, MeshRoad ), 
-         "Angle in degrees - MeshRoad will subdivide the spline if its curve is greater than this threshold." ); 
+      addField( "breakAngle", TypeF32, Offset( mBreakAngle, MeshRoad ),
+         "Angle in degrees - MeshRoad will subdivide the spline if its curve is greater than this threshold." );
 
-      addField( "widthSubdivisions", TypeS32, Offset( mWidthSubdivisions, MeshRoad ), 
+      addField( "widthSubdivisions", TypeS32, Offset( mWidthSubdivisions, MeshRoad ),
          "Subdivide segments widthwise this many times when generating vertices." );
 
    endGroup( "MeshRoad" );
 
    addGroup( "Internal" );
 
-      addProtectedField( "Node", TypeString, NULL, &addNodeFromField, &emptyStringProtectedGetFn, 
+      addProtectedField( "Node", TypeString, NULL, &addNodeFromField, &emptyStringProtectedGetFn,
          "Do not modify, for internal use." );
 
    endGroup( "Internal" );
@@ -682,12 +682,12 @@ bool MeshRoad::addNodeFromField( void *object, const char *index, const char *da
    MeshRoad *pObj = static_cast<MeshRoad*>(object);
 
    //if ( !pObj->isProperlyAdded() )
-   //{      
+   //{
    F32 width, depth;
-   Point3F pos, normal;      
-   U32 result = dSscanf( data, "%g %g %g %g %g %g %g %g", &pos.x, &pos.y, &pos.z, &width, &depth, &normal.x, &normal.y, &normal.z );      
+   Point3F pos, normal;
+   U32 result = dSscanf( data, "%g %g %g %g %g %g %g %g", &pos.x, &pos.y, &pos.z, &width, &depth, &normal.x, &normal.y, &normal.z );
    if ( result == 8 )
-      pObj->_addNode( pos, width, depth, normal );      
+      pObj->_addNode( pos, width, depth, normal );
    //}
 
    return false;
@@ -695,7 +695,7 @@ bool MeshRoad::addNodeFromField( void *object, const char *index, const char *da
 
 bool MeshRoad::onAdd()
 {
-   if ( !Parent::onAdd() ) 
+   if ( !Parent::onAdd() )
       return false;
 
    // Reset the World Box.
@@ -708,7 +708,7 @@ bool MeshRoad::onAdd()
    // Add to ServerMeshRoadSet
    if ( isServerObject() )
    {
-      getServerSet()->addObject( this );      
+      getServerSet()->addObject( this );
    }
 
    if ( isClientObject() )
@@ -765,7 +765,7 @@ void MeshRoad::writeFields( Stream &stream, U32 tabStop )
 
    // Now write all nodes
 
-   stream.write(2, "\r\n");   
+   stream.write(2, "\r\n");
 
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
@@ -775,13 +775,13 @@ void MeshRoad::writeFields( Stream &stream, U32 tabStop )
 
       char buffer[1024];
       dMemset( buffer, 0, 1024 );
-      dSprintf( buffer, 1024, "Node = \"%g %g %g %g %g %g %g %g\";", node.point.x, node.point.y, node.point.z, node.width, node.depth, node.normal.x, node.normal.y, node.normal.z );      
+      dSprintf( buffer, 1024, "Node = \"%g %g %g %g %g %g %g %g\";", node.point.x, node.point.y, node.point.z, node.width, node.depth, node.normal.x, node.normal.y, node.normal.z );
       stream.writeLine( (const U8*)buffer );
    }
 }
 
 bool MeshRoad::writeField( StringTableEntry fieldname, const char *value )
-{   
+{
    if ( fieldname == StringTable->insert("Node") )
       return false;
 
@@ -814,7 +814,7 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
       return;
 
    RenderPassManager *renderPass = state->getRenderPass();
-	
+
    // Normal Road RenderInstance
    // Always rendered when the editor is not open
    // otherwise obey the smShowRoad flag
@@ -825,12 +825,12 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
       coreRI.objectToWorld = &MatrixF::Identity;
       coreRI.worldToCamera = renderPass->allocSharedXform(RenderPassManager::View);
       coreRI.projection = renderPass->allocSharedXform(RenderPassManager::Projection);
-      coreRI.type = RenderPassManager::RIT_Mesh;      
-		
+      coreRI.type = RenderPassManager::RIT_Mesh;
+
       BaseMatInstance *matInst;
       for ( U32 i = 0; i < SurfaceCount; i++ )
-      {             
-         matInst = state->getOverrideMaterial( mMatInst[i] );   
+      {
+         matInst = state->getOverrideMaterial( mMatInst[i] );
          if ( !matInst )
             continue;
 
@@ -865,7 +865,7 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
          ri->defaultKey = matInst->getStateHint();
          ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
 
-         renderPass->addInst( ri );  
+         renderPass->addInst( ri );
       }
    }
 
@@ -900,7 +900,7 @@ void MeshRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Base
 {
    //MeshRoadConvex convex;
    //buildConvex( Box3F(true), convex );
-   //convex.render();   
+   //convex.render();
    //GFXDrawUtil *drawer = GFX->getDrawUtil();
 
    //GFX->setStateBlock( smStateBlock );
@@ -924,10 +924,10 @@ void MeshRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Base
       //mObjToWorld.mulP(b);
       //mObjToWorld.mulP(c);
       //mObjToWorld.mulP(p);
-      
+
       PrimBuild::vertex3fv( c );
       PrimBuild::vertex3fv( b );
-      PrimBuild::vertex3fv( a );      
+      PrimBuild::vertex3fv( a );
 
       PrimBuild::vertex3fv( b );
       PrimBuild::vertex3fv( a );
@@ -952,20 +952,20 @@ void MeshRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Base
    GFX->enterDebugEvent( ColorI( 255, 0, 0 ), "DecalRoad_debugRender" );
    GFXTransformSaver saver;
 
-   GFX->setStateBlock( smStateBlock );      
+   GFX->setStateBlock( smStateBlock );
 
    Point3F size(1,1,1);
    ColorI color( 255, 0, 0, 255 );
 
-   if ( smShowBatches )  
+   if ( smShowBatches )
    {
-      for ( U32 i = 0; i < mBatches.size(); i++ )   
+      for ( U32 i = 0; i < mBatches.size(); i++ )
       {
          const Box3F &box = mBatches[i].bounds;
          Point3F center;
          box.getCenter( &center );
 
-         GFX->getDrawUtil()->drawWireCube( ( box.maxExtents - box.minExtents ) * 0.5f, center, ColorI(255,100,100,255) );         
+         GFX->getDrawUtil()->drawWireCube( ( box.maxExtents - box.minExtents ) * 0.5f, center, ColorI(255,100,100,255) );
       }
    }
 
@@ -974,7 +974,7 @@ void MeshRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Base
 }
 
 U32 MeshRoad::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
-{  
+{
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
    if ( stream->writeFlag( mask & MeshRoadMask ) )
@@ -982,12 +982,12 @@ U32 MeshRoad::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
       // Write Object Transform.
       stream->writeAffineTransform( mObjToWorld );
 
-      // Write Materials      
-      stream->write( mMaterialName[0] );      
+      // Write Materials
+      stream->write( mMaterialName[0] );
       stream->write( mMaterialName[1] );
       stream->write( mMaterialName[2] );
 
-      stream->write( mTextureLength );      
+      stream->write( mTextureLength );
       stream->write( mBreakAngle );
       stream->write( mWidthSubdivisions );
    }
@@ -1010,7 +1010,7 @@ U32 MeshRoad::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
             mathWrite( *stream, mNodes[i].point );
             stream->write( mNodes[i].width );
             stream->write( mNodes[i].depth );
-            mathWrite( *stream, mNodes[i].normal );         
+            mathWrite( *stream, mNodes[i].normal );
          }
       }
       else
@@ -1072,15 +1072,15 @@ void MeshRoad::unpackUpdate(NetConnection * con, BitStream * stream)
       for ( U32 i = 0; i < SurfaceCount; i++ )
       {
          stream->read( &mMaterialName[i] );
-        
+
          if ( !Sim::findObject( mMaterialName[i], pMat ) )
             Con::printf( "DecalRoad::unpackUpdate, failed to find Material of name &s!", mMaterialName[i].c_str() );
-         else         
-            mMaterial[i] = pMat;         
+         else
+            mMaterial[i] = pMat;
       }
 
       if ( isProperlyAdded() )
-         _initMaterial(); 
+         _initMaterial();
 
       stream->read( &mTextureLength );
 
@@ -1104,10 +1104,10 @@ void MeshRoad::unpackUpdate(NetConnection * con, BitStream * stream)
          for ( U32 i = 0; i < count; i++ )
          {
             mathRead( *stream, &pos );
-            stream->read( &width );   
+            stream->read( &width );
             stream->read( &depth );
             mathRead( *stream, &normal );
-            _addNode( pos, width, depth, normal );           
+            _addNode( pos, width, depth, normal );
          }
       }
       else
@@ -1136,7 +1136,7 @@ void MeshRoad::unpackUpdate(NetConnection * con, BitStream * stream)
       }
    }
 
-   if ( stream->readFlag() && isProperlyAdded() )   
+   if ( stream->readFlag() && isProperlyAdded() )
       _regenerate();
 }
 
@@ -1209,7 +1209,7 @@ void MeshRoad::buildConvex(const Box3F& box, Convex* convex)
             // See if this convex exists in the working set already...
             Convex* cc = 0;
             CollisionWorkingList& wl = convex->getWorkingList();
-            for ( CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext ) 
+            for ( CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext )
             {
                if ( itr->mConvex->getType() == MeshRoadConvexType )
                {
@@ -1218,7 +1218,7 @@ void MeshRoad::buildConvex(const Box3F& box, Convex* convex)
                   if ( pConvex->pRoad == this &&
                        pConvex->segmentId == i &&
                        pConvex->faceId == j &&
-                       pConvex->triangleId == k )           
+                       pConvex->triangleId == k )
                   {
                      cc = itr->mConvex;
                      break;
@@ -1236,11 +1236,11 @@ void MeshRoad::buildConvex(const Box3F& box, Convex* convex)
             Point3F a = segment[idx0];
             Point3F b = segment[idx1];
             Point3F c = segment[idx2];
-            
+
             // Transform the result into object space!
             //mWorldToObj.mulP( a );
             //mWorldToObj.mulP( b );
-            //mWorldToObj.mulP( c );            
+            //mWorldToObj.mulP( c );
 
             PlaneF p( c, b, a );
             Point3F peak = ((a + b + c) / 3.0f) + (p * 0.15f);
@@ -1335,7 +1335,7 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
 
 
    for ( U32 i = startSegIdx; i <= endSegIdx; i++ )
-   {		
+   {
       p00 = offset;
       p10 = offset + 1;
       pb00 = offset + 2;
@@ -1392,7 +1392,7 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
       polyList->vertex( p01 );
       polyList->vertex( p00 );
       polyList->plane( pb00, p01, p00 );
-      polyList->end();   
+      polyList->end();
 
       // Right Face
 
@@ -1408,7 +1408,7 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
       polyList->vertex( pb11 );
       polyList->vertex( pb10 );
       polyList->plane( p10, pb11, pb10 );
-      polyList->end();  
+      polyList->end();
 
       // Bottom Face
 
@@ -1424,7 +1424,7 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
       polyList->vertex( pb11 );
       polyList->vertex( pb01 );
       polyList->plane( pb00, pb11, pb01 );
-      polyList->end();  
+      polyList->end();
 
       // Front Face
 
@@ -1442,7 +1442,7 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
          polyList->vertex( pb10 );
          polyList->vertex( pb00 );
          polyList->plane( p00, pb10, pb00 );
-         polyList->end();  
+         polyList->end();
       }
 
       // Back Face
@@ -1460,7 +1460,7 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
          polyList->vertex( pb11 );
          polyList->vertex( p11 );
          polyList->plane( p01, pb11, p11 );
-         polyList->end();  
+         polyList->end();
       }
 
       offset += 4;
@@ -1478,7 +1478,7 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
 
    F32 out = 1.0f;   // The output fraction/percentage along the line defined by s and e
    VectorF norm(0.0f, 0.0f, 0.0f);     // The normal of the face intersected
-   
+
    Vector<MeshRoadHitSegment> hitSegments;
 
    for ( U32 i = 0; i < mSegments.size(); i++ )
@@ -1492,7 +1492,7 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
       {
          hitSegments.increment();
          hitSegments.last().t = t;
-         hitSegments.last().idx = i;         
+         hitSegments.last().idx = i;
       }
    }
 
@@ -1526,15 +1526,15 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
             const Point3F &v1 = segment[idx1];
             const Point3F &v2 = segment[idx2];
 
-            if ( !MathUtils::mLineTriangleCollide( start, end, 
+            if ( !MathUtils::mLineTriangleCollide( start, end,
                                                    v2, v1, v0,
                                                    NULL,
                                                    &t ) )
                continue;
-            
+
             if ( t >= 0.0f && t < 1.0f && t < out )
             {
-               out = t;               
+               out = t;
                norm = PlaneF( v0, v1, v2 );
             }
          }
@@ -1559,13 +1559,13 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
 }
 
 bool MeshRoad::collideBox(const Point3F &start, const Point3F &end, RayInfo* info)
-{   
+{
    Con::warnf( "MeshRoad::collideBox() - not yet implemented!" );
    return Parent::collideBox( start, end, info );
 }
 
 void MeshRoad::_regenerate()
-{               
+{
    if ( mNodes.size() == 0 )
       return;
 
@@ -1583,7 +1583,7 @@ void MeshRoad::_regenerate()
 }
 
 void MeshRoad::_generateSlices()
-{      
+{
    if ( mNodes.size() < 2 )
       return;
 
@@ -1609,8 +1609,8 @@ void MeshRoad::_generateSlices()
    delete [] splineNodes;
 
    mSlices.clear();
-      
-   VectorF lastBreakVector(0,0,0);      
+
+   VectorF lastBreakVector(0,0,0);
    MeshRoadSlice slice;
    MeshRoadSplineNode lastBreakNode;
    lastBreakNode = spline.evaluate(0.0f);
@@ -1619,12 +1619,12 @@ void MeshRoad::_generateSlices()
    {
       F32 t1 = spline.getTime(i);
       F32 t0 = spline.getTime(i-1);
-      
+
       F32 segLength = spline.arcLength( t0, t1 );
 
       U32 numSegments = mCeil( segLength / MIN_METERS_PER_SEGMENT );
       numSegments = getMax( numSegments, (U32)1 );
-      F32 tstep = ( t1 - t0 ) / numSegments; 
+      F32 tstep = ( t1 - t0 ) / numSegments;
 
       U32 startIdx = 0;
       U32 endIdx = ( i == nodeCount - 1 ) ? numSegments + 1 : numSegments;
@@ -1642,31 +1642,31 @@ void MeshRoad::_generateSlices()
 
          F32 angle = mRadToDeg( mAcos( mDot( toNodeVec, lastBreakVector ) ) );
 
-         if ( j == startIdx || 
+         if ( j == startIdx ||
             ( j == endIdx - 1 && i == mNodes.size() - 1 ) ||
               angle > mBreakAngle )
          {
             // Push back a spline node
-            slice.p1.set( splineNode.x, splineNode.y, splineNode.z );            
+            slice.p1.set( splineNode.x, splineNode.y, splineNode.z );
             slice.width = splineNode.width;
             slice.depth = splineNode.depth;
-            slice.normal = splineNode.normal;   
+            slice.normal = splineNode.normal;
             slice.normal.normalize();
             slice.parentNodeIdx = i-1;
             slice.t = t;
-            mSlices.push_back( slice );         
+            mSlices.push_back( slice );
 
             lastBreakVector = splineNode.getPosition() - lastBreakNode.getPosition();
             lastBreakVector.normalizeSafe();
 
             lastBreakNode = splineNode;
-         }          
+         }
       }
    }
 
    //
    // Calculate uvec, fvec, and rvec for all slices
-   //   
+   //
 
    MatrixF mat(true);
 
@@ -1676,11 +1676,11 @@ void MeshRoad::_generateSlices()
       mat.getColumn( 0, &mSlices[i].rvec );
       mat.getColumn( 1, &mSlices[i].fvec );
       mat.getColumn( 2, &mSlices[i].uvec );
-   } 
+   }
 
    //
    // Calculate p0/p2/pb0/pb2 for all slices
-   //      
+   //
    for ( U32 i = 0; i < mSlices.size(); i++ )
    {
       MeshRoadSlice *slice = &mSlices[i];
@@ -1705,7 +1705,7 @@ void MeshRoad::_generateSlices()
       }
       else
       {
-         box.extend( slice.p0 ); 
+         box.extend( slice.p0 );
          box.extend( slice.p2 );
          box.extend( slice.pb0 );
          box.extend( slice.pb2 );
@@ -1717,7 +1717,7 @@ void MeshRoad::_generateSlices()
    mWorldBox = box;
    resetObjectBox();
 
-   _generateSegments();   
+   _generateSegments();
 }
 
 void MeshRoad::_generateSegments()
@@ -1742,7 +1742,7 @@ void MeshRoad::_generateSegments()
 }
 
 void MeshRoad::_generateVerts()
-{           
+{
    const U32 widthDivisions = getMax( 0, mWidthSubdivisions );
    const F32 divisionStep = 1.0f / (F32)( widthDivisions + 1 );
    const U32 sliceCount = mSlices.size();
@@ -1756,7 +1756,7 @@ void MeshRoad::_generateVerts()
 
    mVertCount[Side] = sliceCount * 4;
    mTriangleCount[Side] = segmentCount * 4 + 4;
-   
+
    // Calculate TexCoords for Slices
 
    F32 texCoordV = 0.0f;
@@ -1764,12 +1764,12 @@ void MeshRoad::_generateVerts()
 
    for ( U32 i = 1; i < sliceCount; i++ )
    {
-      MeshRoadSlice &slice = mSlices[i]; 
+      MeshRoadSlice &slice = mSlices[i];
       MeshRoadSlice &prevSlice = mSlices[i-1];
-             
+
       // Increment the textCoordV for the next slice.
       F32 len = ( slice.p1 - prevSlice.p1 ).len();
-      texCoordV += len / mTextureLength;         
+      texCoordV += len / mTextureLength;
 
       slice.texCoordV = texCoordV;
    }
@@ -1780,18 +1780,18 @@ void MeshRoad::_generateVerts()
 
    // Top Buffers...
 
-   mVB[Top].set( GFX, mVertCount[Top], GFXBufferTypeStatic );   
-   pVert = mVB[Top].lock(); 
+   mVB[Top].set( GFX, mVertCount[Top], GFXBufferTypeStatic );
+   pVert = mVB[Top].lock();
    vertCounter = 0;
-   
+
    for ( U32 i = 0; i < sliceCount; i++ )
    {
-      MeshRoadSlice &slice = mSlices[i];      
-      
-      pVert->point = slice.p0;    
+      MeshRoadSlice &slice = mSlices[i];
+
+      pVert->point = slice.p0;
       pVert->normal = slice.uvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(1,slice.texCoordV);      
+      pVert->texCoord.set(1,slice.texCoordV);
       pVert++;
       vertCounter++;
 
@@ -1799,18 +1799,18 @@ void MeshRoad::_generateVerts()
       {
          const F32 t = divisionStep * (F32)( j + 1 );
 
-         pVert->point.interpolate( slice.p0, slice.p2, t );    
+         pVert->point.interpolate( slice.p0, slice.p2, t );
          pVert->normal = slice.uvec;
          pVert->tangent = slice.fvec;
-         pVert->texCoord.set( 1.0f - t, slice.texCoordV );      
+         pVert->texCoord.set( 1.0f - t, slice.texCoordV );
          pVert++;
          vertCounter++;
       }
 
-      pVert->point = slice.p2;    
+      pVert->point = slice.p2;
       pVert->normal = slice.uvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set( 0, slice.texCoordV );      
+      pVert->texCoord.set( 0, slice.texCoordV );
       pVert++;
       vertCounter++;
    }
@@ -1821,25 +1821,25 @@ void MeshRoad::_generateVerts()
 
    // Bottom Buffer...
 
-   mVB[Bottom].set( GFX, mVertCount[Bottom], GFXBufferTypeStatic );   
-   pVert = mVB[Bottom].lock(); 
+   mVB[Bottom].set( GFX, mVertCount[Bottom], GFXBufferTypeStatic );
+   pVert = mVB[Bottom].lock();
    vertCounter = 0;
 
    for ( U32 i = 0; i < sliceCount; i++ )
    {
-      MeshRoadSlice &slice = mSlices[i];      
+      MeshRoadSlice &slice = mSlices[i];
 
-      pVert->point = slice.pb2;    
+      pVert->point = slice.pb2;
       pVert->normal = -slice.uvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(0,slice.texCoordV);      
+      pVert->texCoord.set(0,slice.texCoordV);
       pVert++;
       vertCounter++;
 
-      pVert->point = slice.pb0;    
+      pVert->point = slice.pb0;
       pVert->normal = -slice.uvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(1,slice.texCoordV);      
+      pVert->texCoord.set(1,slice.texCoordV);
       pVert++;
       vertCounter++;
    }
@@ -1850,39 +1850,39 @@ void MeshRoad::_generateVerts()
 
    // Side Buffers...
 
-   mVB[Side].set( GFX, mVertCount[Side], GFXBufferTypeStatic );   
-   pVert = mVB[Side].lock(); 
+   mVB[Side].set( GFX, mVertCount[Side], GFXBufferTypeStatic );
+   pVert = mVB[Side].lock();
    vertCounter = 0;
 
    for ( U32 i = 0; i < sliceCount; i++ )
    {
-      MeshRoadSlice &slice = mSlices[i];      
+      MeshRoadSlice &slice = mSlices[i];
 
-      pVert->point = slice.p0;    
+      pVert->point = slice.p0;
       pVert->normal = -slice.rvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(1,slice.texCoordV);      
+      pVert->texCoord.set(1,slice.texCoordV);
       pVert++;
       vertCounter++;
 
-      pVert->point = slice.p2;    
+      pVert->point = slice.p2;
       pVert->normal = slice.rvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(1,slice.texCoordV);      
+      pVert->texCoord.set(1,slice.texCoordV);
       pVert++;
       vertCounter++;
 
-      pVert->point = slice.pb0;    
+      pVert->point = slice.pb0;
       pVert->normal = -slice.rvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(0,slice.texCoordV);      
+      pVert->texCoord.set(0,slice.texCoordV);
       pVert++;
       vertCounter++;
 
-      pVert->point = slice.pb2;    
+      pVert->point = slice.pb2;
       pVert->normal = slice.rvec;
       pVert->tangent = slice.fvec;
-      pVert->texCoord.set(0,slice.texCoordV);      
+      pVert->texCoord.set(0,slice.texCoordV);
       pVert++;
       vertCounter++;
    }
@@ -1891,25 +1891,25 @@ void MeshRoad::_generateVerts()
 
    mVB[Side].unlock();
 
-   // Make Primitive Buffers   
+   // Make Primitive Buffers
    U32 p00, p01, p11, p10;
    U32 pb00, pb01, pb11, pb10;
    U32 offset = 0;
-   U16 *pIdx = NULL;   
-   U32 curIdx = 0; 
+   U16 *pIdx = NULL;
+   U32 curIdx = 0;
 
    // Top Primitive Buffer
 
    mPB[Top].set( GFX, mTriangleCount[Top] * 3, mTriangleCount[Top], GFXBufferTypeStatic );
 
-   mPB[Top].lock(&pIdx);     
-   curIdx = 0; 
+   mPB[Top].lock(&pIdx);
+   curIdx = 0;
    offset = 0;
 
    const U32 rowStride = 2 + widthDivisions;
- 
+
    for ( U32 i = 0; i < mSegments.size(); i++ )
-   {		
+   {
       for ( U32 j = 0; j < widthDivisions + 1; j++ )
       {
          p00 = offset;
@@ -1929,7 +1929,7 @@ void MeshRoad::_generateVerts()
          pIdx[curIdx] = p11;
          curIdx++;
          pIdx[curIdx] = p10;
-         curIdx++;  
+         curIdx++;
 
          offset += 1;
       }
@@ -1946,12 +1946,12 @@ void MeshRoad::_generateVerts()
 
    mPB[Bottom].set( GFX, mTriangleCount[Bottom] * 3, mTriangleCount[Bottom], GFXBufferTypeStatic );
 
-   mPB[Bottom].lock(&pIdx);     
-   curIdx = 0; 
+   mPB[Bottom].lock(&pIdx);
+   curIdx = 0;
    offset = 0;
 
    for ( U32 i = 0; i < mSegments.size(); i++ )
-   {		
+   {
       p00 = offset;
       p10 = offset + 1;
       p01 = offset + 2;
@@ -1969,7 +1969,7 @@ void MeshRoad::_generateVerts()
       pIdx[curIdx] = p11;
       curIdx++;
       pIdx[curIdx] = p10;
-      curIdx++;      
+      curIdx++;
 
       offset += 2;
    }
@@ -1982,12 +1982,12 @@ void MeshRoad::_generateVerts()
 
    mPB[Side].set( GFX, mTriangleCount[Side] * 3, mTriangleCount[Side], GFXBufferTypeStatic );
 
-   mPB[Side].lock(&pIdx);     
-   curIdx = 0; 
+   mPB[Side].lock(&pIdx);
+   curIdx = 0;
    offset = 0;
 
    for ( U32 i = 0; i < mSegments.size(); i++ )
-   {		
+   {
       p00 = offset;
       p10 = offset + 1;
       pb00 = offset + 2;
@@ -2011,7 +2011,7 @@ void MeshRoad::_generateVerts()
       pIdx[curIdx] = p01;
       curIdx++;
       pIdx[curIdx] = p00;
-      curIdx++;      
+      curIdx++;
 
       // Right Side
 
@@ -2027,7 +2027,7 @@ void MeshRoad::_generateVerts()
       pIdx[curIdx] = pb11;
       curIdx++;
       pIdx[curIdx] = pb10;
-      curIdx++;      
+      curIdx++;
 
       offset += 4;
    }
@@ -2039,7 +2039,7 @@ void MeshRoad::_generateVerts()
    pIdx[curIdx++] = 0;
    pIdx[curIdx++] = 3;
    pIdx[curIdx++] = 2;
-   
+
    pIdx[curIdx++] = offset + 0;
    pIdx[curIdx++] = offset + 3;
    pIdx[curIdx++] = offset + 1;
@@ -2100,7 +2100,7 @@ void MeshRoad::setNodePosition( U32 idx, const Point3F &pos )
 
 U32 MeshRoad::addNode( const Point3F &pos, const F32 &width, const F32 &depth, const VectorF &normal )
 {
-   U32 idx = _addNode( pos, width, depth, normal );   
+   U32 idx = _addNode( pos, width, depth, normal );
 
    regenerate();
 
@@ -2193,8 +2193,8 @@ F32 MeshRoad::getNodeDepth( U32 idx )
 }
 
 MatrixF MeshRoad::getNodeTransform( U32 idx )
-{   
-   MatrixF mat(true);   
+{
+   MatrixF mat(true);
 
    if ( mNodes.size() - 1 < idx )
       return mat;
@@ -2202,13 +2202,13 @@ MatrixF MeshRoad::getNodeTransform( U32 idx )
    bool hasNext = idx + 1 < mNodes.size();
    bool hasPrev = (S32)idx - 1 > 0;
 
-   const MeshRoadNode &node = mNodes[idx];   
+   const MeshRoadNode &node = mNodes[idx];
 
    VectorF fvec( 0, 1, 0 );
 
    if ( hasNext )
    {
-      fvec = mNodes[idx+1].point - node.point;      
+      fvec = mNodes[idx+1].point - node.point;
       fvec.normalizeSafe();
    }
    else if ( hasPrev )
@@ -2241,24 +2241,24 @@ MatrixF MeshRoad::getNodeTransform( U32 idx )
 
    AssertFatal( m_matF_determinant( mat ) != 0.0f, "no inverse!");
 
-   return mat; 
+   return mat;
 }
 
 void MeshRoad::calcSliceTransform( U32 idx, MatrixF &mat )
-{   
+{
    if ( mSlices.size() - 1 < idx )
       return;
 
    bool hasNext = idx + 1 < mSlices.size();
    bool hasPrev = (S32)idx - 1 >= 0;
 
-   const MeshRoadSlice &slice = mSlices[idx];   
+   const MeshRoadSlice &slice = mSlices[idx];
 
    VectorF fvec( 0, 1, 0 );
 
    if ( hasNext )
    {
-      fvec = mSlices[idx+1].p1 - slice.p1;      
+      fvec = mSlices[idx+1].p1 - slice.p1;
       fvec.normalizeSafe();
    }
    else if ( hasPrev )
@@ -2309,7 +2309,7 @@ void MeshRoad::deleteNode( U32 idx )
    if ( mNodes.size() - 1 < idx )
       return;
 
-   mNodes.erase(idx);   
+   mNodes.erase(idx);
    _regenerate();
 
    setMaskBits( RegenMask | NodeMask );
@@ -2320,7 +2320,7 @@ U32 MeshRoad::_addNode( const Point3F &pos, const F32 &width, const F32 &depth, 
    mNodes.increment();
    MeshRoadNode &node = mNodes.last();
 
-   node.point = pos;   
+   node.point = pos;
    node.width = width;
    node.depth = depth;
    node.normal = normal;
@@ -2350,7 +2350,7 @@ U32 MeshRoad::_insertNode( const Point3F &pos, const F32 &width, const F32 &dept
 
    node->point = pos;
    node->depth = depth;
-   node->width = width;     
+   node->width = width;
    node->normal = normal;
 
    return ret;
@@ -2361,7 +2361,7 @@ bool MeshRoad::collideRay( const Point3F &origin, const Point3F &direction, U32 
    Point3F p0 = origin;
    Point3F p1 = origin + direction * 2000.0f;
 
-   // If the line segment does not collide with the MeshRoad's world box, 
+   // If the line segment does not collide with the MeshRoad's world box,
    // it definitely does not collide with any part of the river.
    if ( !getWorldBox().collideLine( p0, p1 ) )
       return false;
@@ -2395,7 +2395,7 @@ bool MeshRoad::collideRay( const Point3F &origin, const Point3F &direction, U32 
       if ( MathUtils::mRayQuadCollide( quad, ray, NULL, &t ) )
       {
          if ( nodeIdx )
-            *nodeIdx = slice0.parentNodeIdx;         
+            *nodeIdx = slice0.parentNodeIdx;
          if ( collisionPnt )
             *collisionPnt = ray.origin + ray.direction * t;
          return true;

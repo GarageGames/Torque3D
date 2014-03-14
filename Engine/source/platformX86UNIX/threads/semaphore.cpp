@@ -22,10 +22,10 @@
 
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platform/threads/semaphore.h"
-#include <unistd.h>     
-#include <sys/types.h>  
-#include <errno.h>      
-#include <semaphore.h> 
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <semaphore.h>
 #include <time.h>
 
 struct PlatformSemaphore
@@ -39,7 +39,7 @@ struct PlatformSemaphore
 	   if (sem_init(&semaphore, 0, initialCount) == -1) {
 		   initialized = false;
 			AssertFatal(0, "PlatformSemaphore constructor - Failed to create Semaphore.");
-	   } 
+	   }
    }
 
    ~PlatformSemaphore()
@@ -65,7 +65,7 @@ bool Semaphore::acquire(bool block, S32 timeoutMS)
    AssertFatal(mData && mData->initialized, "Semaphore::acquire - Invalid semaphore.");
    if (block)
    {
-      //SDL was removed so I do not now if this still holds true or not with OS calls but my guess is they are used underneath SDL anyway 
+      //SDL was removed so I do not now if this still holds true or not with OS calls but my guess is they are used underneath SDL anyway
       // Semaphore acquiring is different from the MacOS/Win realization because SDL_SemWaitTimeout() with "infinite" timeout can be too heavy on some platforms.
       // (see "man SDL_SemWaitTimeout(3)" for more info)
       // "man" states to avoid the use of SDL_SemWaitTimeout at all, but at current stage this looks like a valid and working solution, so keeping it this way.

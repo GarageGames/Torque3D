@@ -36,7 +36,7 @@ RadialImpulseEvent::RadialImpulseEvent()
  : mPosition( 0, 0, 0 ),
    mRadius( 0 ),
    mMagnitude( 0 )
-{            
+{
 }
 
 RadialImpulseEvent::RadialImpulseEvent( const Point3F &pos, F32 radius, F32 magnitude )
@@ -47,46 +47,46 @@ RadialImpulseEvent::RadialImpulseEvent( const Point3F &pos, F32 radius, F32 magn
 }
 
 RadialImpulseEvent::~RadialImpulseEvent()
-{ 
+{
 }
 
 void RadialImpulseEvent::pack( NetConnection* /*ps*/, BitStream *bstream )
-{       
+{
    mathWrite( *bstream, mPosition );
    bstream->write( mRadius );
    bstream->write( mMagnitude );
 }
 
 void RadialImpulseEvent::write( NetConnection*, BitStream *bstream )
-{ 
+{
    mathWrite( *bstream, mPosition );
    bstream->write( mRadius );
    bstream->write( mMagnitude );
 }
-   
+
 void RadialImpulseEvent::unpack( NetConnection *ps, BitStream *bstream )
-{      
+{
    mathRead( *bstream, &mPosition );
    bstream->read( &mRadius );
    bstream->read( &mMagnitude );
 }
-   
+
 void RadialImpulseEvent::process(NetConnection *con)
-{ 
-   impulse( &gClientContainer, mPosition, mRadius, mMagnitude );   
+{
+   impulse( &gClientContainer, mPosition, mRadius, mMagnitude );
 }
 
 void RadialImpulseEvent::_impulseCallback( SceneObject *obj, void *key )
 {
-   ImpulseInfo *info = (ImpulseInfo*)key; 
+   ImpulseInfo *info = (ImpulseInfo*)key;
    obj->applyRadialImpulse( info->pos, info->radius, info->magnitude );
 }
 
 void RadialImpulseEvent::impulse( SceneContainer *con, const Point3F &position, F32 radius, F32 magnitude )
 {
-   Point3F offset( radius, radius, radius );   
-   Box3F bounds( position - offset, position + offset );      
-   
+   Point3F offset( radius, radius, radius );
+   Box3F bounds( position - offset, position + offset );
+
    ImpulseInfo info;
    info.pos = position;
    info.radius = radius;
@@ -137,7 +137,7 @@ DefineEngineStaticMethod(RadialImpulseEvent, send, void, (const char* inPosition
       Con::errorf( "globalRadialImpulse() - Client group not found!" );
       return;
    }
-   
+
    SimGroup::iterator itr = pClientGroup->begin();
    for ( ; itr != pClientGroup->end(); itr++ )
    {

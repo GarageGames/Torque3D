@@ -88,7 +88,7 @@ inline RiverSplineNode& RiverSplineNode::operator=(const RiverSplineNode &_node)
    width = _node.width;
    depth = _node.depth;
    normal = _node.normal;
-   
+
    return *this;
 }
 
@@ -101,7 +101,7 @@ inline RiverSplineNode RiverSplineNode::operator+(const RiverSplineNode& _add) c
    result.width = width + _add.width;
    result.depth = depth + _add.depth;
    result.normal = normal + _add.normal;
-   
+
    return result;
 }
 
@@ -115,7 +115,7 @@ inline RiverSplineNode RiverSplineNode::operator-(const RiverSplineNode& _rSub) 
    result.width = width - _rSub.width;
    result.depth = depth - _rSub.depth;
    result.normal = normal - _rSub.normal;
-   
+
    return result;
 }
 
@@ -151,9 +151,9 @@ struct RiverRenderBatch
    U32 endIndex;
    U32 totalRows;
    U32 indexCount;
-   
+
    U32 vertCount;
-   U32 triangleCount; 
+   U32 triangleCount;
 };
 
 typedef Vector<RiverRenderBatch> RiverBatchVector;
@@ -176,7 +176,7 @@ typedef Vector<RiverNode> RiverNodeVector;
 
 struct RiverSlice
 {
-   RiverSlice() 
+   RiverSlice()
    {
       p0.zero();
       p1.zero();
@@ -210,7 +210,7 @@ struct RiverSlice
 
    VectorF normal;
 
-   F32 width;    
+   F32 width;
    F32 depth;
 
    F32 texCoordV;
@@ -230,14 +230,14 @@ class RiverSegment
 public:
 
    RiverSegment();
-   RiverSegment( RiverSlice *rs0, RiverSlice *rs1 );   
+   RiverSegment( RiverSlice *rs0, RiverSlice *rs1 );
 
    void set( RiverSlice *rs0, RiverSlice *rs1 );
 
    F32 TexCoordStart() { return slice0->texCoordV; }
    F32 TexCoordEnd() { return slice1->texCoordV; }
 
-   Point3F getP00() const { return slice0->p0; } 
+   Point3F getP00() const { return slice0->p0; }
    Point3F getP01() const { return slice1->p0; }
    Point3F getP11() const { return slice1->p2; }
    Point3F getP10() const { return slice0->p2; }
@@ -246,7 +246,7 @@ public:
    // For purposes of collision testing against a RiverSegment we represent
    // it as a set of 6 planes (one for each face) much like a frustum.
    // This is actually a flawed representation that will be more incorrect
-   // the more twist/bend exists between the two RiverSlices making up 
+   // the more twist/bend exists between the two RiverSlices making up
    // the segment. Basically we treat the four points that make up a "face"
    // as if they were coplanar.
 
@@ -263,7 +263,7 @@ public:
 	const Point3F& operator[](U32) const;
 	Point3F& operator[](S32 i)              { return operator[](U32(i)); }
 	const Point3F& operator[](S32 i ) const { return operator[](U32(i)); }
-   
+
    RiverSlice *slice0;
    RiverSlice *slice1;
 
@@ -276,7 +276,7 @@ public:
    U32 startVert;
    U32 endVert;
    U32 startIndex;
-   U32 endIndex;   
+   U32 endIndex;
 
    U32 numVerts;
    U32 numTriangles;
@@ -360,33 +360,33 @@ private:
    friend class GuiRiverEditorCtrl;
    friend class GuiRiverEditorUndoAction;
 
-   typedef WaterObject Parent;      
+   typedef WaterObject Parent;
 
 protected:
 
-   enum 
-   { 
+   enum
+   {
       RiverMask       = Parent::NextFreeMask,
-      NodeMask          = Parent::NextFreeMask << 1,      
+      NodeMask          = Parent::NextFreeMask << 1,
       RegenMask         = Parent::NextFreeMask << 2,
       InitialUpdateMask = Parent::NextFreeMask << 3,
       SelectedMask      = Parent::NextFreeMask << 4,
       MaterialMask      = Parent::NextFreeMask << 5,
       NextFreeMask      = Parent::NextFreeMask << 6,
-   };  
+   };
 
-public:   
+public:
 
    River();
    ~River();
 
    DECLARE_CONOBJECT(River);
-   
+
    // ConObject.
    static void initPersistFields();
    static void consoleInit();
 
-   // SimObject      
+   // SimObject
    bool onAdd();
    void onRemove();
    void inspectPostApply();
@@ -398,7 +398,7 @@ public:
    U32 packUpdate(NetConnection *, U32, BitStream *);
    void unpackUpdate(NetConnection *, BitStream *);
 
-   // SceneObject   
+   // SceneObject
    virtual void setTransform( const MatrixF &mat );
    virtual void setScale( const VectorF &scale );
 	virtual bool castRay(const Point3F &start, const Point3F &end, RayInfo* info);
@@ -406,12 +406,12 @@ public:
    virtual bool containsPoint( const Point3F& point ) const { return containsPoint( point, NULL ); }
 
    // WaterObject
-   virtual F32 getWaterCoverage( const Box3F &worldBox ) const;   
+   virtual F32 getWaterCoverage( const Box3F &worldBox ) const;
    virtual F32 getSurfaceHeight( const Point2F &pos ) const;
-   virtual VectorF getFlow( const Point3F &pos ) const;   
+   virtual VectorF getFlow( const Point3F &pos ) const;
    virtual void onReflectionInfoChanged();
    virtual void updateUnderwaterEffect( SceneRenderState *state );
-   
+
    virtual bool isUnderwater( const Point3F &pnt ) const;
    F32 distanceToSurface( const Point3F &pnt, U32 segmentIdx );
    bool containsPoint( const Point3F &worldPos, U32 *nodeIdx ) const;
@@ -427,7 +427,7 @@ public:
 	void setColumnCount( S32 count );
 
    U32 insertNode( const Point3F &pos, const F32 &width, const F32 &depth, const VectorF &normal, const U32 &idx );
-   U32 addNode( const Point3F &pos, const F32 &width, const F32 &depth, const VectorF &normal );   
+   U32 addNode( const Point3F &pos, const F32 &width, const F32 &depth, const VectorF &normal );
    void setNode( const Point3F &pos, const F32 &width, const F32 &depth, const VectorF &normal, const U32 &idx );
    void deleteNode( U32 idx );
 
@@ -441,7 +441,7 @@ public:
    MatrixF getNodeTransform( U32 idx ) const;
 
    F32 getNodeWidth( U32 idx ) const;
-   void setNodeWidth( U32 idx, F32 width );   
+   void setNodeWidth( U32 idx, F32 width );
 
    F32 getNodeDepth( U32 idx ) const;
    void setNodeDepth( U32 idx, F32 depth );
@@ -449,7 +449,7 @@ public:
    void setNodeHeight( U32 idx, F32 height );
 
 	void setNodeNormal( U32 idx, const VectorF &normal );
-   VectorF getNodeNormal( U32 idx ) const;   
+   VectorF getNodeNormal( U32 idx ) const;
 
    /// Protected 'Component' Field setter that will add a component to the list.
    static bool addNodeFromField( void *object, const char *index, const char *data );
@@ -483,10 +483,10 @@ protected:
    void _generateVerts();
 
    bool _getTerrainHeight( const Point2F &pos, F32 &height );
-   bool _getTerrainHeight( F32 x, F32 y, F32 &height ); 
+   bool _getTerrainHeight( F32 x, F32 y, F32 &height );
 
    // WaterObject
-   virtual void setShaderParams( SceneRenderState *state, BaseMatInstance *mat, const WaterMatParams &paramHandles );   
+   virtual void setShaderParams( SceneRenderState *state, BaseMatInstance *mat, const WaterMatParams &paramHandles );
    virtual void innerRender( SceneRenderState *state );
    virtual void _getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &outPos );
 
@@ -502,7 +502,7 @@ protected:
    GFXVertexBufferHandle<GFXWaterVertex> mVB_low;   // the low detail vertex buffer
 
    GFXPrimitiveBufferHandle mPB_high;	// the high detail prim buffer
-   GFXPrimitiveBufferHandle mPB_low;	// the low detail prim buffer  
+   GFXPrimitiveBufferHandle mPB_low;	// the low detail prim buffer
 
    RiverBatchVector mHighLODBatches;
    RiverBatchVector mLowLODBatches;
@@ -510,7 +510,7 @@ protected:
    U32 mLowVertCount;
    U32 mHighVertCount;
 
-   U32 mLowTriangleCount;   
+   U32 mLowTriangleCount;
    U32 mHighTriangleCount;
 
    // Fields.
@@ -525,7 +525,7 @@ protected:
    // while maintaining an equal division size.
    F32 mMaxDivisionSize;
    F32 mMinDivisionSize;
-   U32 mColumnCount;    
+   U32 mColumnCount;
 };
 
 #endif // _RIVER_H_

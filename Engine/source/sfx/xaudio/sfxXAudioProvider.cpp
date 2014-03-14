@@ -44,7 +44,7 @@ public:
 
 protected:
 
-   /// Extended SFXDeviceInfo to also store some 
+   /// Extended SFXDeviceInfo to also store some
    /// extra XAudio specific data.
    struct XADeviceInfo : SFXDeviceInfo
    {
@@ -70,14 +70,14 @@ MODULE_BEGIN( XAudio )
 
    MODULE_INIT_BEFORE( SFX )
    MODULE_SHUTDOWN_AFTER( SFX )
-   
+
    SFXXAudioProvider* mProvider;
-   
+
    MODULE_INIT
    {
       mProvider = new SFXXAudioProvider;
    }
-   
+
    MODULE_SHUTDOWN
    {
       delete mProvider;
@@ -138,7 +138,7 @@ void SFXXAudioProvider::init()
 
 bool SFXXAudioProvider::_createXAudio( IXAudio2 **xaudio )
 {
-   // In debug builds enable the debug version 
+   // In debug builds enable the debug version
    // of the XAudio engine.
    #ifdef TORQUE_DEBUG
       #define XAUDIO_FLAGS XAUDIO2_DEBUG_ENGINE
@@ -147,7 +147,7 @@ bool SFXXAudioProvider::_createXAudio( IXAudio2 **xaudio )
    #endif
 
 #ifndef TORQUE_OS_XENON
-   // This must be called first... it doesn't hurt to 
+   // This must be called first... it doesn't hurt to
    // call it more than once.
    CoInitialize( NULL );
 #endif
@@ -182,7 +182,7 @@ SFXDevice* SFXXAudioProvider::createDevice( const String& deviceName, bool useHa
 
       return new SFXXAudioDevice(   this,
                                     devName,
-                                    xAudio, 
+                                    xAudio,
                                     info->deviceIndex,
                                     info->format.dwChannelMask,
                                     maxBuffers );

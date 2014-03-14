@@ -91,27 +91,27 @@ DefineUnmappedConsoleType( TypePID, SimPersistID* );
 DefineConsoleType( TypeImageFilename, String )
 
 /// TypePrefabFilename is equivalent to TypeStringFilename in its usage,
-/// it exists for the benefit of GuiInspector, which will provide a 
+/// it exists for the benefit of GuiInspector, which will provide a
 /// custom InspectorField for this type.
 DefineConsoleType( TypePrefabFilename, String )
 
 /// TypeShapeFilename is equivalent to TypeStringFilename in its usage,
-/// it exists for the benefit of GuiInspector, which will provide a 
+/// it exists for the benefit of GuiInspector, which will provide a
 /// custom InspectorField for this type.
 DefineConsoleType( TypeShapeFilename, String )
 
 /// TypeMaterialName is equivalent to TypeRealString in its usage,
-/// it exists for the benefit of GuiInspector, which will provide a 
+/// it exists for the benefit of GuiInspector, which will provide a
 /// custom InspectorField for this type.
 DefineConsoleType( TypeMaterialName, String )
 
 /// TypeTerrainMaterialIndex is equivalent to TypeS32 in its usage,
-/// it exists for the benefit of GuiInspector, which will provide a 
+/// it exists for the benefit of GuiInspector, which will provide a
 /// custom InspectorField for this type.
 DefineConsoleType( TypeTerrainMaterialIndex, S32 )
 
 /// TypeTerrainMaterialName is equivalent to TypeString in its usage,
-/// it exists for the benefit of GuiInspector, which will provide a 
+/// it exists for the benefit of GuiInspector, which will provide a
 /// custom InspectorField for this type.
 DefineConsoleType( TypeTerrainMaterialName, const char * )
 
@@ -135,7 +135,7 @@ DefineConsoleType( TypeSimPersistId, SimPersistID* )
 DefineConsoleType( TypeName, const char* )
 
 /// TypeRectUV is equivalent to TypeRectF in its usage,
-/// it exists for the benefit of GuiInspector, which will provide a 
+/// it exists for the benefit of GuiInspector, which will provide a
 /// custom InspectorField for this type.
 DefineConsoleType( TypeRectUV, RectF )
 

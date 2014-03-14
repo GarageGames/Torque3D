@@ -45,9 +45,9 @@ GFXShader::~GFXShader()
    Torque::FS::RemoveChangeNotification( mPixelFile, this, &GFXShader::_onFileChanged );
 }
 
-bool GFXShader::init(   const Torque::Path &vertFile, 
-                        const Torque::Path &pixFile, 
-                        F32 pixVersion, 
+bool GFXShader::init(   const Torque::Path &vertFile,
+                        const Torque::Path &pixFile,
+                        F32 pixVersion,
                         const Vector<GFXShaderMacro> &macros )
 {
    // Store the inputs for use in reloading.
@@ -95,11 +95,11 @@ bool GFXShader::reload()
 
 void GFXShader::_updateDesc()
 {
-   mDescription = String::ToString( "Files: %s, %s Pix Version: %0.2f\nMacros: ", 
+   mDescription = String::ToString( "Files: %s, %s Pix Version: %0.2f\nMacros: ",
       mVertexFile.getFullPath().c_str(), mPixelFile.getFullPath().c_str(), mPixVersion );
 
    GFXShaderMacro::stringize( smGlobalMacros, &mDescription );
-   GFXShaderMacro::stringize( mMacros, &mDescription );   
+   GFXShaderMacro::stringize( mMacros, &mDescription );
 }
 
 void GFXShader::addGlobalMacro( const String &name, const String &value )
@@ -138,7 +138,7 @@ bool GFXShader::removeGlobalMacro( const String &name )
 }
 
 void GFXShader::_unlinkBuffer( GFXShaderConstBuffer *buf )
-{   
+{
    Vector<GFXShaderConstBuffer*>::iterator iter = mActiveBuffers.begin();
    for ( ; iter != mActiveBuffers.end(); iter++ )
    {
@@ -153,7 +153,7 @@ void GFXShader::_unlinkBuffer( GFXShaderConstBuffer *buf )
 }
 
 
-DefineEngineFunction( addGlobalShaderMacro, void, 
+DefineEngineFunction( addGlobalShaderMacro, void,
    ( const char *name, const char *value ), ( NULL ),
    "Adds a global shader macro which will be merged with the script defined "
    "macros on every shader.  The macro will replace the value of an existing "
@@ -165,7 +165,7 @@ DefineEngineFunction( addGlobalShaderMacro, void,
    GFXShader::addGlobalMacro( name, value );
 }
 
-DefineEngineFunction( removeGlobalShaderMacro, void, ( const char *name ),, 
+DefineEngineFunction( removeGlobalShaderMacro, void, ( const char *name ),,
    "Removes an existing global macro by name.\n"
    "@see addGlobalShaderMacro\n"
    "@ingroup Rendering\n" )

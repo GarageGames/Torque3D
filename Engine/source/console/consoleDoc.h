@@ -30,10 +30,10 @@
 /// There are on the order of three hundred functions exposed to the script language
 /// through the console. It is therefore extremely important that they be documented,
 /// but due to their number, it is difficult to maintain a seperate reference document.
-/// 
+///
 /// Therefore, a simple documentation system has been built into the scripting engine. It
 /// was initially added by Mark Frohnmayer, and later enhanced by Ben Garney. The
-/// scripting engine supports grouping functions and methods, to help organize the 
+/// scripting engine supports grouping functions and methods, to help organize the
 /// several hundred functions, as well as associating a "usage string" with functions and
 /// groups.
 ///
@@ -44,10 +44,10 @@
 ///       classes loaded into the scripting engine.
 ///
 /// The script documentation system is designed to output a dump of the current state
-/// of the scripting engine in a format understandable by Doxygen. It does this by 
+/// of the scripting engine in a format understandable by Doxygen. It does this by
 /// traversing the namespace/class hierarchy in memory at the time of the dump, and
 /// outputting psuedo-C++ code equivalent to this class hierarchy.
-/// 
+///
 /// @subsection script_autodoc_using_script For the Scripter...
 ///
 /// Currently, there is no way to associate usage strings or other documentation with script code
@@ -80,7 +80,7 @@
 /// object to output the documentation to a file, and look like this:
 ///
 /// @note You may want to add this code, or code like it, to your project if you have
-///       rewritten the script code in common. 
+///       rewritten the script code in common.
 ///
 /// @code
 /// // Writes out all script functions to a file
@@ -89,7 +89,7 @@
 ///    dumpConsoleFunctions();
 ///    logger.delete();
 /// }
-/// 
+///
 /// // Writes out all script classes to a file
 /// function writeOutClasses() {
 ///    new ConsoleLogger( logger, "scriptClasses.txt", false );
@@ -107,7 +107,7 @@
 ///       explaining things to them! So make everyone's lives easier - keep your usage strings
 ///       clear, concise, and up to date.
 ///
-/// There are four types of items which can be documented using the autodocumentation system: 
+/// There are four types of items which can be documented using the autodocumentation system:
 ///   - <b>Fields</b>, which are defined using the addField() calls. They are documented
 ///     by passing a string to the usage parameter.
 ///   - <b>Field groups</b>, which are defined using the beginGroup() and endGroup() calls.
@@ -119,7 +119,7 @@
 ///     the ConsoleMethod() macro, or the ConsoleFunction() macro. Methods and functions are
 ///     special in that the usage strings should be in a specific format, so
 ///     that parameter information can be extracted from them and placed into the Doxygen
-///     output. 
+///     output.
 ///
 /// You can use standard Doxygen commands in your comments, to make the documentation clearer.
 /// Of particular use are \@returns, \@param, \@note, and \@deprecated.
@@ -169,7 +169,7 @@
 /// slightly to reflect your individual setup.
 ///
 /// @section script_autodoc_internals Script Auto-Documentation Internals
-/// 
+///
 /// The consoleDoc system works by inserting "hidden" entries in Namespace and
 /// AbstractClassRep; these hidden entries are assigned special type IDs so that
 /// they aren't touched by the standard name resolution code. At documentation

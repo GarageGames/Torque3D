@@ -62,7 +62,7 @@ function PlayerData::onMount(%this, %obj, %vehicle, %node)
       %obj.unmountImage($WeaponSlot);
 
       %obj.setControlObject(%vehicle);
-      
+
       if(%obj.getClassName() $= "Player")
          commandToClient(%obj.client, 'toggleVehicleMap', true);
    }
@@ -172,13 +172,13 @@ function PlayerData::onCollision(%this, %obj, %col)
       {
          // Only mount drivers for now.
          ServerConnection.setFirstPerson(0);
-         
+
          // For this specific example, only one person can fit
          // into a vehicle
-         %mount = %col.getMountNodeObject(0);         
+         %mount = %col.getMountNodeObject(0);
          if(%mount)
             return;
-         
+
          // For this specific FPS Example, always mount the player
          // to node 0
          %node = 0;
@@ -252,7 +252,7 @@ function PlayerData::onDisabled(%this, %obj, %state)
    if (isObject(%item))
    {
       %amount = %obj.getInventory(%item.image.ammo);
-      
+
       if (!%item.image.clip)
          warn("No clip exists to throw for item ", %item);
       if(%amount)

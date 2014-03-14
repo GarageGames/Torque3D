@@ -35,8 +35,8 @@
 
 
 GFX_ImplementTextureProfile(ShadowMapTexProfile,
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize | GFXTextureProfile::Dynamic , 
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize | GFXTextureProfile::Dynamic ,
                             GFXTextureProfile::None);
 
 
@@ -46,7 +46,7 @@ MODULE_BEGIN( ShadowMapManager )
    {
       ManagedSingleton< ShadowMapManager >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< ShadowMapManager >::deleteSingleton();
@@ -57,7 +57,7 @@ MODULE_END;
 
 AFTER_MODULE_INIT( Sim )
 {
-   Con::addVariable( "$pref::Shadows::textureScalar",	
+   Con::addVariable( "$pref::Shadows::textureScalar",
       TypeF32, &LightShadowMap::smShadowTexScalar,
       "@brief Used to scale the shadow texture sizes.\n"
       "This can reduce the shadow quality and texture memory overhead or increase them.\n"
@@ -65,12 +65,12 @@ AFTER_MODULE_INIT( Sim )
    Con::NotifyDelegate callabck( &LightShadowMap::releaseAllTextures );
    Con::addVariableNotify( "$pref::Shadows::textureScalar", callabck );
 
-   Con::addVariable( "$pref::Shadows::disable", 
+   Con::addVariable( "$pref::Shadows::disable",
       TypeBool, &ShadowMapPass::smDisableShadowsPref,
       "Used to disable all shadow rendering.\n"
       "@ingroup AdvancedLighting\n" );
 
-   Con::addVariable( "$Shadows::disable", 
+   Con::addVariable( "$Shadows::disable",
       TypeBool, &ShadowMapPass::smDisableShadowsEditor,
       "Used by the editor to disable all shadow rendering.\n"
       "@ingroup AdvancedLighting\n" );
@@ -83,8 +83,8 @@ AFTER_MODULE_INIT( Sim )
 Signal<void(void)> ShadowMapManager::smShadowDeactivateSignal;
 
 
-ShadowMapManager::ShadowMapManager() 
-:  mShadowMapPass(NULL), 
+ShadowMapManager::ShadowMapManager()
+:  mShadowMapPass(NULL),
    mCurrentShadowMap(NULL),
    mIsActive(false)
 {
@@ -99,7 +99,7 @@ void ShadowMapManager::setLightShadowMapForLight( LightInfo *light )
    ShadowMapParams *params = light->getExtended<ShadowMapParams>();
    if ( params )
       mCurrentShadowMap = params->getShadowMap();
-   else 
+   else
       mCurrentShadowMap = NULL;
 }
 
@@ -155,14 +155,14 @@ GFXTextureObject* ShadowMapManager::getTapRotationTex()
    if ( mTapRotationTex.isValid() )
       return mTapRotationTex;
 
-   mTapRotationTex.set( 64, 64, GFXFormatR8G8B8A8, &ShadowMapTexProfile, 
+   mTapRotationTex.set( 64, 64, GFXFormatR8G8B8A8, &ShadowMapTexProfile,
                         "ShadowMapManager::getTapRotationTex" );
 
    GFXLockedRect *rect = mTapRotationTex.lock();
    U8 *f = rect->bits;
    F32 angle;
    for( U32 i = 0; i < 64*64; i++, f += 4 )
-   {         
+   {
       // We only pack the rotations into the red
       // and green channels... the rest are empty.
       angle = M_2PI_F * gRandGen.randF();

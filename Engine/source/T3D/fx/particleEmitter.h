@@ -56,7 +56,7 @@ class ParticleEmitterData : public GameBaseData
    static bool _setAlignDirection( void *object, const char *index, const char *data );
 
   public:
-  
+
    ParticleEmitterData();
    DECLARE_CONOBJECT(ParticleEmitterData);
    static void initPersistFields();
@@ -73,7 +73,7 @@ class ParticleEmitterData : public GameBaseData
    F32   ejectionVelocity;                   ///< Ejection velocity
    F32   velocityVariance;                   ///< Variance for velocity between 0 and n
    F32   ejectionOffset;                     ///< Z offset from emitter point to eject from
-   F32   ejectionOffsetVariance;             ///< Z offset Variance from emitter point to eject 
+   F32   ejectionOffsetVariance;             ///< Z offset Variance from emitter point to eject
    F32   thetaMin;                           ///< Minimum angle, from the horizontal plane, to eject from
    F32   thetaMax;                           ///< Maximum angle, from the horizontal plane, to eject from
 
@@ -83,7 +83,7 @@ class ParticleEmitterData : public GameBaseData
    F32   softnessDistance;                   ///< For soft particles, the distance (in meters) where particles will be faded
                                              ///< based on the difference in depth between the particle and the scene geometry.
 
-   /// A scalar value used to influence the effect 
+   /// A scalar value used to influence the effect
    /// of the ambient color on the particle.
    F32 ambientFactor;
 
@@ -100,7 +100,7 @@ class ParticleEmitterData : public GameBaseData
 
    StringTableEntry      particleString;     ///< Used to load particle data directly from a string
 
-   Vector<ParticleData*> particleDataBlocks; ///< Particle Datablocks 
+   Vector<ParticleData*> particleDataBlocks; ///< Particle Datablocks
    Vector<U32>           dataBlockIds;       ///< Datablock IDs (parellel array to particleDataBlocks)
 
    U32                   partListInitSize;   /// initial size of particle list calc'd from datablock info
@@ -140,7 +140,7 @@ class ParticleEmitter : public GameBase
 
    static Point3F mWindVelocity;
    static void setWindVelocity( const Point3F &vel ){ mWindVelocity = vel; }
-   
+
    ColorF getCollectiveColor();
 
    /// Sets sizes of particles based on sizelist provided
@@ -211,7 +211,7 @@ class ParticleEmitter : public GameBase
                               const ColorF &ambientColor,
                               ParticleVertexType *lVerts );
 
-   inline void setupAligned(  const Particle *part, 
+   inline void setupAligned(  const Particle *part,
                               const ColorF &ambientColor,
                               ParticleVertexType *lVerts );
 
@@ -236,11 +236,11 @@ class ParticleEmitter : public GameBase
 
    void update( U32 ms );
    inline void updateKeyData( Particle *part );
- 
+
 
   private:
 
-   /// Constant used to calculate particle 
+   /// Constant used to calculate particle
    /// rotation from spin and age.
    static const F32 AgedSpinToRadians;
 
@@ -269,7 +269,7 @@ class ParticleEmitter : public GameBase
    GFXVertexBufferHandle<ParticleVertexType> mVertBuff;
 #endif
 
-   //   These members are for implementing a link-list of the active emitter 
+   //   These members are for implementing a link-list of the active emitter
    //   particles. Member part_store contains blocks of particles that can be
    //   chained in a link-list. Usually the first part_store block is large
    //   enough to contain all the particles but it can be expanded in emergency

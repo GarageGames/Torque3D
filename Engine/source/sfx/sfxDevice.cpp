@@ -135,7 +135,7 @@ void SFXDevice::update()
 
    if( !UPDATE_THREAD() )
       UPDATE_LIST().process( MAIN_THREAD_PROCESS_TIMEOUT );
-      
+
    // Clean out buffers that have surfaced on the dead
    // buffer list.
 
@@ -147,13 +147,13 @@ void SFXDevice::update()
 void SFXDevice::_addBuffer( SFXBuffer* buffer )
 {
    AssertFatal( buffer, "SFXDevice::_addBuffer() - Got a null buffer!" );
-   
+
    // Register the buffer.
-   
+
    mBuffers.push_back( buffer );
    mStatNumBuffers ++;
    mStatNumBufferBytes += buffer->getMemoryUsed();
-   
+
    // Start loading the buffer.
 
    buffer->load();
@@ -172,7 +172,7 @@ void SFXDevice::_removeBuffer( SFXBuffer* buffer )
 
       mStatNumBufferBytes -= buffer->getMemoryUsed();
       mStatNumBuffers --;
-      
+
       mBuffers.erase( iter );
    }
 }
@@ -188,7 +188,7 @@ void SFXDevice::_addVoice( SFXVoice* voice )
    // to only bind voices that have been successfully constructed.
 
    voice->_attachToBuffer();
-   
+
    // Register the voice.
 
    mVoices.push_back( voice );

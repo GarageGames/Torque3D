@@ -113,7 +113,7 @@ void ByteBuffer::resize(U32 newBufferSize)
    U8    *newData = new U8[newBufferSize];
 
    U32   copyLen = getMin( newBufferSize, _data->dataSize );
-   
+
    dMemcpy( newData, _data->data, copyLen );
 
    delete [] _data->data;

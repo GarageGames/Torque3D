@@ -98,7 +98,7 @@ Thread::Thread(ThreadRunFunction func /* = 0 */, void *arg /* = 0 */, bool start
    : autoDelete( autodelete )
 {
    AssertFatal( !start_thread, "Thread::Thread() - auto-starting threads from ctor has been disallowed since the run() method is virtual" );
-   
+
    mData = new PlatformThreadData;
    mData->mRunFunc = func;
    mData->mRunArg = arg;
@@ -123,15 +123,15 @@ void Thread::start( void* arg )
    AssertFatal( !mData->mThreadHnd,
       "Thread::start() - thread already started" );
 
-   // cause start to block out other pthreads from using this Thread, 
+   // cause start to block out other pthreads from using this Thread,
    // at least until ThreadRunHandler exits.
    mData->mGateway.acquire();
-   
+
    // reset the shouldStop flag, so we'll know when someone asks us to stop.
    shouldStop = false;
-   
+
    mData->mDead = false;
-   
+
    if( !mData->mRunArg )
       mData->mRunArg = arg;
 

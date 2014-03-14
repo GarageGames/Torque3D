@@ -53,7 +53,7 @@ static const char* sExtensions[] =
    "wax",
    "wma",
    "xm",
-   
+
 #ifdef TORQUE_OS_XENON
    ".xma",
 #endif
@@ -78,7 +78,7 @@ SFXFMODBuffer* SFXFMODBuffer::create( const String& filename, SFXDescription* de
 {
    if( Con::getBoolVariable( "$pref::SFX::FMOD::noCustomFileLoading", false ) )
       return NULL;
-      
+
    SFXFMODBuffer *buffer = new SFXFMODBuffer( filename, description );
    if( !buffer->mSound )
       SAFE_DELETE( buffer );
@@ -100,12 +100,12 @@ SFXFMODBuffer::SFXFMODBuffer( const String& filename, SFXDescription* descriptio
       fMode |= FMOD_CREATESTREAM;
       mIsUnique = true;
    }
-   
+
    // Go through the extensions and try each with the given path.  The
    // first two are special.  First we try without touching the filename at all
    // so FMOD gets a chance to handle URLs and whatever, and then second we
    // try by expanding the path but without adding an extension.
-   
+
    Torque::Path path = filename;
    for( U32 i = 0; sExtensions[ i ]; ++ i )
    {
@@ -124,36 +124,36 @@ SFXFMODBuffer::SFXFMODBuffer( const String& filename, SFXDescription* descriptio
             Torque::Path realPath;
             if( !Torque::FS::GetFSPath( path, realPath ) )
                continue;
-            
+
             fullPath = realPath.getFullPath().c_str();
          }
-      
+
          mSound = NULL;
          FMOD_RESULT result = SFXFMODDevice::smFunc->FMOD_System_CreateSound(
-               SFXFMODDevice::smSystem, 
-               fullPath.c_str(), 
-               fMode, 
-               ( FMOD_CREATESOUNDEXINFO* ) NULL, 
+               SFXFMODDevice::smSystem,
+               fullPath.c_str(),
+               fMode,
+               ( FMOD_CREATESOUNDEXINFO* ) NULL,
                &mSound );
-               
+
          if( result == FMOD_OK )
          {
             SFXFMODDevice::smFunc->FMOD_Sound_GetMode( mSound, &mMode );
-            
+
             // Read out format.
-            
+
             int numChannels;
             int bitsPerSample;
             unsigned int length;
             float frequency;
-            
+
             SFXFMODDevice::smFunc->FMOD_Sound_GetFormat( mSound, ( FMOD_SOUND_TYPE* ) NULL, ( FMOD_SOUND_FORMAT* ) NULL, &numChannels, &bitsPerSample );
             SFXFMODDevice::smFunc->FMOD_Sound_GetLength( mSound, &length, FMOD_TIMEUNIT_MS );
             SFXFMODDevice::smFunc->FMOD_Sound_GetDefaults( mSound, &frequency, ( float* ) NULL, ( float* ) NULL, ( int* ) NULL );
 
             mDuration = length;
             mFormat = SFXFormat( numChannels, numChannels * bitsPerSample, frequency );
-            
+
             break;
          }
       }
@@ -217,12 +217,12 @@ SFXFMODBuffer::SFXFMODBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescr
    pCreatesoundexinfo = &createsoundexinfo;
 
    FMOD_RESULT result = SFXFMODDevice::smFunc->FMOD_System_CreateSound(
-         SFXFMODDevice::smSystem, 
-         ( const char* ) NULL, 
-         fMode, 
-         pCreatesoundexinfo, 
+         SFXFMODDevice::smSystem,
+         ( const char* ) NULL,
+         fMode,
+         pCreatesoundexinfo,
          &mSound );
-         
+
    if( result != FMOD_OK )
    {
       mSound = NULL;
@@ -237,7 +237,7 @@ SFXFMODBuffer::SFXFMODBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescr
 SFXFMODBuffer::~SFXFMODBuffer()
 {
    if( mSound )
-      FModAssert( SFXFMODDevice::smFunc->FMOD_Sound_Release( mSound ), 
+      FModAssert( SFXFMODDevice::smFunc->FMOD_Sound_Release( mSound ),
          "SFXFMODBuffer::~SFXFMODBuffer - Failed to release a sound!" );
 
    mSound = NULL;
@@ -261,7 +261,7 @@ bool SFXFMODBuffer::_copyData( U32 offset, const U8* data, U32 length )
 {
    AssertFatal( data != NULL && length > 0, "Must have data!" );
 
-   // Fill the buffer with the resource data.      
+   // Fill the buffer with the resource data.
    void* lpvWrite;
    U32  dwLength;
    void* lpvWrite2;
@@ -271,7 +271,7 @@ bool SFXFMODBuffer::_copyData( U32 offset, const U8* data, U32 length )
       offset,           // Offset at which to start lock.
       length,           // Size of lock.
       &lpvWrite,        // Gets address of first part of lock.
-      &lpvWrite2,       // Address of wraparound not needed. 
+      &lpvWrite2,       // Address of wraparound not needed.
       &dwLength,        // Gets size of first part of lock.
       &dwLength2       // Size of wraparound not needed.
       );
@@ -280,7 +280,7 @@ bool SFXFMODBuffer::_copyData( U32 offset, const U8* data, U32 length )
    {
       // You can remove this if it gets spammy. However since we can
       // safely fail in this case it doesn't seem right to assert...
-      // at the same time it can be very annoying not to know why 
+      // at the same time it can be very annoying not to know why
       // an upload fails!
       Con::errorf("SFXFMODBuffer::_copyData - failed to lock a sound buffer! (%d)", this);
       return false;
@@ -310,13 +310,13 @@ bool SFXFMODBuffer::_copyData( U32 offset, const U8* data, U32 length )
 U32 SFXFMODBuffer::getMemoryUsed() const
 {
    unsigned int memoryUsed;
-   
+
    SFXFMODDevice::smFunc->FMOD_Sound_GetMemoryInfo(
       mSound,
       FMOD_MEMBITS_ALL,
       FMOD_EVENT_MEMBITS_ALL,
       &memoryUsed,
       ( unsigned int* ) NULL );
-      
+
    return memoryUsed;
 }

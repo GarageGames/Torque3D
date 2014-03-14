@@ -68,22 +68,22 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_Fog, new FogFeatGLSL );
 
 	FEATUREMGR->registerFeature( MFT_NormalsOut, new NormalsOutFeatGLSL );
-	
+
    FEATUREMGR->registerFeature( MFT_DepthOut, new DepthOutGLSL );
    FEATUREMGR->registerFeature(MFT_EyeSpaceDepthOut, new EyeSpaceDepthOutGLSL());
 
 	FEATUREMGR->registerFeature( MFT_HDROut, new HDROutGLSL );
-	
+
    FEATUREMGR->registerFeature( MFT_ParaboloidVertTransform, new ParaboloidVertTransformGLSL );
    FEATUREMGR->registerFeature( MFT_IsSinglePassParaboloid, new NamedFeatureGLSL( "Single Pass Paraboloid" ) );
 	FEATUREMGR->registerFeature( MFT_RenderTarget1_Zero, new RenderTargetZeroGLSL
 										 ( ShaderFeature::RenderTarget1 ) );
-	
+
    FEATUREMGR->registerFeature( MFT_DiffuseMapAtlas, new NamedFeatureGLSL( "Diffuse Map Atlas" ) );
    FEATUREMGR->registerFeature( MFT_NormalMapAtlas, new NamedFeatureGLSL( "Normal Map Atlas" ) );
 
 	FEATUREMGR->registerFeature( MFT_Foliage, new FoliageFeatureGLSL );
-	
+
 	FEATUREMGR->registerFeature( MFT_ParticleNormal, new ParticleNormalFeatureGLSL );
    FEATUREMGR->registerFeature( MFT_ForwardShading, new NamedFeatureGLSL( "Forward Shaded Material" ) );
 
@@ -95,11 +95,11 @@ MODULE_BEGIN( ShaderGenGLSL )
 
    MODULE_INIT_AFTER( ShaderGen )
    MODULE_INIT_AFTER( ShaderGenFeatureMgr )
-   
+
    MODULE_INIT
    {
       sInitDelegate.bind( &_initShaderGenGLSL );
-      SHADERGEN->registerInitDelegate(OpenGL, sInitDelegate);   
+      SHADERGEN->registerInitDelegate(OpenGL, sInitDelegate);
    }
-   
+
 MODULE_END;

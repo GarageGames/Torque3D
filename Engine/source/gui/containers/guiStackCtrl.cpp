@@ -191,7 +191,7 @@ void GuiStackControl::onSleep()
 void GuiStackControl::updatePanes()
 {
    // Prevent recursion
-   if(mResizing) 
+   if(mResizing)
       return;
 
    // Set Resizing.

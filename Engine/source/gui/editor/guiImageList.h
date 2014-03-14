@@ -42,19 +42,19 @@ class GuiImageList : public SimObject
       GFXTexHandle Handle;
       U32 id;
    }TextureEntry,*PTextureEntry;
-   
+
    Vector<PTextureEntry> mTextures;
 
   protected:
 
 
     U32 mUniqueId;
-	
+
   public:
    GuiImageList();
-   
+
    DECLARE_CONOBJECT(GuiImageList);
-   
+
    static void initPersistFields();
 
    // Image managing functions

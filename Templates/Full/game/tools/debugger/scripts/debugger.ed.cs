@@ -29,7 +29,7 @@ function TCPDebugger::onLine(%this, %line)
    echo("Got line=>" @ %line);
    %cmd = firstWord(%line);
    %rest = restWords(%line);
-   
+
    if (%cmd $= "PASS") {
       %this.handlePass(%rest);
    }
@@ -60,7 +60,7 @@ function TCPDebugger::onLine(%this, %line)
 function TCPDebugger::handlePass(%this, %message)
 {
    if (%message $= "WrongPass") {
-      DebuggerConsoleView.print("Disconnected - wrong password.");   
+      DebuggerConsoleView.print("Disconnected - wrong password.");
       %this.disconnect();
    }
    else if(%message $= "Connected.") {
@@ -97,7 +97,7 @@ function TCPDebugger::handleBreakList(%this, %line)
    %pairs = getWord(%line, 1);
    %curLine = 1;
    DebuggerFileView.clearBreakPositions();
-   
+
    // Set the possible break positions.
    for (%i = 0; %i < %pairs; %i++) {
       %skip = getWord(%line, %i * 2 + 2);
@@ -124,7 +124,7 @@ function TCPDebugger::handleBreakList(%this, %line)
 function TCPDebugger::handleBreak(%this, %line)
 {
    DebuggerStatus.setValue("BREAK");
-   
+
    // Query all the watches.
    for (%i = 0; %i < DebuggerWatchView.rowCount(); %i++) {
       %id = DebuggerWatchView.getRowId(%i);
@@ -139,7 +139,7 @@ function TCPDebugger::handleBreak(%this, %line)
    %file = getWord(%line, 0);
    %lineNumber = getWord(%line, 1);
    %funcName = getWord(%line, 2);
-   
+
    DbgOpenFile(%file, %lineNumber, true);
 
    %nextWord = 3;
@@ -215,7 +215,7 @@ function DebuggerCallStack::onAction(%this)
    %text = %this.getRowTextById(%id);
    %file = getField(%text, 0);
    %line = getField(%text, 1);
-   
+
    DbgOpenFile(%file, %line, %id == 0);
 }
 
@@ -270,7 +270,7 @@ function DebuggerBreakPoints::onAction(%this)
    %text = %this.getRowTextById(%id);
    %line = getField(%text, 0);
    %file = getField(%text, 1);
-   
+
    DbgOpenFile(%file, %line, false);
 }
 
@@ -367,7 +367,7 @@ function DbgBreakConditionSet()
    if (%clear $= "") {
       %clear = "false";
    }
-   
+
    // Set the condition.
    %id = DebuggerBreakPoints.getSelectedId();
    if (%id != -1) {

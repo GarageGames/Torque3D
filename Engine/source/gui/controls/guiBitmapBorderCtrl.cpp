@@ -116,7 +116,7 @@ bool GuiBitmapBorderCtrl::onWake()
       mBitmapBounds = mProfile->mBitmapArrayRects.address();
    else
       Con::errorf( "GuiBitmapBorderCtrl: Could not construct bitmap array for profile '%s'", mProfile->getName() );
-      
+
    return true;
 }
 
@@ -124,14 +124,14 @@ void GuiBitmapBorderCtrl::onSleep()
 {
    mTextureObject = NULL;
    mBitmapBounds = NULL;
-   
+
    Parent::onSleep();
 }
 
 void GuiBitmapBorderCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    renderChildControls( offset, updateRect );
-   
+
    if( mBitmapBounds )
    {
       GFX->setClipRect(updateRect);

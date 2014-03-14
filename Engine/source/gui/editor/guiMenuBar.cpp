@@ -559,7 +559,7 @@ DefineEngineMethod(GuiMenuBar, removeMenuItem, void, (const char* menuTarget, co
 
 DefineEngineMethod(GuiMenuBar, clearMenuItems, void, (const char* menuTarget),,
    "@brief Removes all the menu items from the specified menu.\n\n"
-   "@param menuTarget Menu to remove all items from\n"  
+   "@param menuTarget Menu to remove all items from\n"
    "@tsexample\n"
    "// Define the menuTarget\n"
    "%menuTarget = \"New Menu\";  or %menuTarget = \"3\";\n\n"
@@ -579,7 +579,7 @@ DefineEngineMethod(GuiMenuBar, clearMenuItems, void, (const char* menuTarget),,
 
 DefineEngineMethod( GuiMenuBar, removeMenu, void, (const char* menuTarget),,
    "@brief Removes the specified menu from the menu bar.\n\n"
-   "@param menuTarget Menu to remove from the menu bar\n"  
+   "@param menuTarget Menu to remove from the menu bar\n"
    "@tsexample\n"
    "// Define the menuTarget\n"
    "%menuTarget = \"New Menu\";  or %menuTarget = \"3\";\n\n"
@@ -636,7 +636,7 @@ DefineEngineMethod(GuiMenuBar, setMenuItemSubmenuState, void, (const char* menuT
    menuitem->isSubmenu = isSubmenu;
 }
 
-DefineEngineMethod(GuiMenuBar, addSubmenuItem, void, (const char* menuTarget, const char* menuItem, const char* submenuItemText, 
+DefineEngineMethod(GuiMenuBar, addSubmenuItem, void, (const char* menuTarget, const char* menuItem, const char* submenuItemText,
 													  int submenuItemId, const char* accelerator, int checkGroup),,
    "@brief Adds a menu item to the specified menu.  The menu argument can be either the text of a menu or its id.\n\n"
    "@param menuTarget Menu to affect a submenu in\n"
@@ -792,7 +792,7 @@ void GuiMenuBar::addMenu(const char *menuText, U32 menuId)
    newMenu->bitmapIndex = -1;
    newMenu->drawBitmapOnly = false;
    newMenu->drawBorder = true;
-   
+
    // add it to the menu list
    menuBarDirty = true;
    Menu **walk;
@@ -1212,7 +1212,7 @@ void GuiMenuBar::onMouseLeave(const GuiEvent &event)
 void GuiMenuBar::onMouseDragged(const GuiEvent &event)
 {
    Menu *hit = findHitMenu(event.mousePoint);
-	
+
 	if(hit != mouseOverMenu)
 	{
 		//  If we need to, reset the mouse over menu counter and indicate
@@ -1266,7 +1266,7 @@ void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
       ColorI fontColor = mProfile->mFontColor;
       RectI bounds = walk->bounds;
       bounds.point += offset;
-      
+
       Point2I start;
 
       start.x = walk->bounds.point.x + mHorizontalMargin;
@@ -1335,7 +1335,7 @@ void GuiMenuBar::buildAcceleratorMap()
          }
          EventDescriptor accelEvent;
 			ActionMap::createEventDescriptor(item->accelerator, &accelEvent);
-   
+
          //now we have a modifier, and a key, add them to the canvas
          GuiCanvas *root = getRoot();
          if (root)
@@ -1361,7 +1361,7 @@ void GuiMenuBar::acceleratorKeyPress(U32 index)
          {
             // first, call the script callback for menu selection:
             onMenuSelect_callback(Con::getIntArg(menu->id), menu->text);
-			
+
             if(item->visible)
                menuItemSelected(menu, item);
             return;
@@ -1435,7 +1435,7 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
 
       GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, offset + off, rect);
-   } 
+   }
 
    //  Check if this is a submenu
    idx = mList[cell.y].text[1];
@@ -1466,7 +1466,7 @@ bool GuiMenuTextListCtrl::onKeyDown(const GuiEvent &event)
    //if the control is a dead end, don't process the input:
    if ( !mVisible || !mActive || !mAwake )
       return false;
-   
+
    //see if the key down is a <return> or not
    if ( event.modifier == 0 )
    {
@@ -1482,7 +1482,7 @@ bool GuiMenuTextListCtrl::onKeyDown(const GuiEvent &event)
          return true;
       }
    }
-   
+
    //otherwise, pass the event to it's parent
    return Parent::onKeyDown(event);
 }
@@ -1568,11 +1568,11 @@ void GuiMenuBar::closeMenu()
       getRoot()->popDialogControl(mBackground);
    else
       return;
-   
+
    // Kill the popup:
    mBackground->deleteObject();
    mBackground = NULL;
-   
+
    // Now perform the popup action:
    if ( selectionIndex != -1 )
    {
@@ -1716,10 +1716,10 @@ void GuiMenuBar::onAction()
 
    GuiControl *ctrl = new GuiControl;
    RectI ctrlBounds(  menuPoint, mTextList->getExtent() + Point2I(6, 6));
-   
+
    ctrl->setControlProfile(mProfile);
    mTextList->setPosition( mTextList->getPosition() + Point2I(3,3) );
-   
+
    //  Make sure the menu doesn't go beyond the Canvas' bottom edge.
    if((ctrlBounds.point.y + ctrlBounds.extent.y) > windowExt.y)
    {
@@ -1873,12 +1873,12 @@ void GuiMenuBar::closeSubmenu()
    // Pop the background:
    if( getRoot() )
       getRoot()->popDialogControl(mSubmenuBackground);
-   
+
    // Kill the popup:
    mSubmenuBackground->deleteObject();
    mSubmenuBackground = NULL;
    mSubmenuTextList = NULL;
-   
+
    // Now perform the popup action:
    if ( selectionIndex != -1 )
    {

@@ -74,7 +74,7 @@ template<>
 inline NxBounds3 pxCast( const Box3F &box )
 {
    NxBounds3 bounds;
-   bounds.set( box.minExtents.x, 
+   bounds.set( box.minExtents.x,
                box.minExtents.y,
                box.minExtents.z,
                box.maxExtents.x,
@@ -86,7 +86,7 @@ inline NxBounds3 pxCast( const Box3F &box )
 template<>
 inline Box3F pxCast( const NxBounds3 &bounds )
 {
-   return Box3F(  bounds.min.x, 
+   return Box3F(  bounds.min.x,
                   bounds.min.y,
                   bounds.min.z,
                   bounds.max.x,

@@ -67,7 +67,7 @@ F32 EaseF::getValue(F32 t, F32 b, F32 c, F32 d) const
 	F32 value = 0;
 
 	if (type == Ease::Linear)
-	{	   
+	{
 		value = mLinearTween(t,b, c, d);
 	}
 	else if (type == Ease::Quadratic)

@@ -76,7 +76,7 @@ namespace TriListOpt
 
    /// This method will look at the index buffer for a triangle list, and generate
    /// a new index buffer which is optimized using Tom Forsyth's paper:
-   /// "Linear-Speed Vertex Cache Optimization" 
+   /// "Linear-Speed Vertex Cache Optimization"
    /// http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
    /// @param   numVerts Number of vertices indexed by the 'indices'
    /// @param numIndices Number of elements in both 'indices' and 'outIndices'

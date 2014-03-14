@@ -38,7 +38,7 @@
 
 IMPLEMENT_CONOBJECT(RenderTranslucentMgr);
 
-ConsoleDocClass( RenderTranslucentMgr, 
+ConsoleDocClass( RenderTranslucentMgr,
    "@brief A render bin for rendering translucent meshes.\n\n"
    "This bin is used to render translucent render mesh instances and render object "
    "instances. It is generally ordered late in the RenderPassManager after all opaque "
@@ -63,7 +63,7 @@ void RenderTranslucentMgr::setupSGData(MeshRenderInst *ri, SceneData &data )
 
    // We do not support these in the translucent bin.
    data.backBuffTex = NULL;
-   data.cubemap = NULL;   
+   data.cubemap = NULL;
    data.lightmap = NULL;
 }
 
@@ -90,7 +90,7 @@ void RenderTranslucentMgr::addElement( RenderInst *inst )
    MainSortElem& elem = mElementList.last();
    elem.inst = inst;
 
-   // Override the instances default key to be the sort distance. All 
+   // Override the instances default key to be the sort distance. All
    // the pointer dereferencing is in there to prevent us from losing
    // information when converting to a U32.
    elem.key = *((U32*)&inst->sortDistSq);
@@ -112,10 +112,10 @@ GFXStateBlockRef RenderTranslucentMgr::_getStateBlock( U8 transFlag )
    d.cullMode = GFXCullNone;
    d.blendDefined = true;
    d.blendEnable = true;
-   d.blendSrc = (GFXBlend)((transFlag >> 4) & 0x0f); 
+   d.blendSrc = (GFXBlend)((transFlag >> 4) & 0x0f);
    d.blendDest = (GFXBlend)(transFlag & 0x0f);
    d.alphaDefined = true;
-   
+
    // See http://www.garagegames.com/mg/forums/result.thread.php?qt=81397
    d.alphaTestEnable = (d.blendSrc == GFXBlendSrcAlpha && (d.blendDest == GFXBlendInvSrcAlpha || d.blendDest == GFXBlendOne));
    d.alphaTestRef = 1;
@@ -134,7 +134,7 @@ GFXStateBlockRef RenderTranslucentMgr::_getStateBlock( U8 transFlag )
 
 void RenderTranslucentMgr::render( SceneRenderState *state )
 {
-   PROFILE_SCOPE(RenderTranslucentMgr_render);   
+   PROFILE_SCOPE(RenderTranslucentMgr_render);
 
    // Early out if nothing to draw.
    if(!mElementList.size())
@@ -157,7 +157,7 @@ void RenderTranslucentMgr::render( SceneRenderState *state )
       }
    }
 
-   GFXTransformSaver saver;   
+   GFXTransformSaver saver;
 
    SceneData sgData;
    sgData.init( state );
@@ -173,14 +173,14 @@ void RenderTranslucentMgr::render( SceneRenderState *state )
    for( U32 j=0; j<binSize; )
    {
       RenderInst *baseRI = mElementList[j].inst;
-      
+
       U32 matListEnd = j;
 
       // render these separately...
       if ( baseRI->type == RenderPassManager::RIT_ObjectTranslucent )
       {
          ObjectRenderInst* objRI = static_cast<ObjectRenderInst*>(baseRI);
-         objRI->renderDelegate( objRI, state, NULL );         
+         objRI->renderDelegate( objRI, state, NULL );
 
          lastVB = NULL;
          lastPB = NULL;
@@ -251,10 +251,10 @@ void RenderTranslucentMgr::render( SceneRenderState *state )
                mat->setBuffers( passRI->vertBuff, passRI->primBuff );
 
                // Render this sucker.
-               if ( passRI->prim )   
-                  GFX->drawPrimitive( *passRI->prim );   
-               else  
-                  GFX->drawPrimitive( passRI->primBuffIndex );              
+               if ( passRI->prim )
+                  GFX->drawPrimitive( *passRI->prim );
+               else
+                  GFX->drawPrimitive( passRI->primBuffIndex );
             }
 
             // Draw the instanced batch.

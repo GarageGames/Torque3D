@@ -44,33 +44,33 @@ class SFXMemoryStream : public SFXStream,
                         public IInputStreamFilter< U8, IInputStream< RawData* >* >
 {
    public:
-   
+
       typedef SFXStream Parent;
-      
+
    protected:
-   
+
       ///
       SFXFormat mFormat;
-   
+
       /// Total number of samples in the stream.  If this is U32_MAX, the stream
       /// is considered to be of indefinite size.
       U32 mNumSamplesTotal;
-      
+
       /// Number of samples left to be read from stream.  Locked to U32_MAX for
       /// stream of indefinite size.
       U32 mNumSamplesLeft;
-      
+
       /// The current sample data packet.
       RawData* mCurrentPacket;
-      
+
       /// Read offset in the current sample data packet.
       U32 mCurrentPacketOffset;
-         
+
    public:
-   
+
       ///
       SFXMemoryStream( const SFXFormat& format, SourceStreamType* stream, U32 numSamples = U32_MAX );
-      
+
       // SFXStream.
       const SFXFormat& getFormat() const { return mFormat; }
       U32 getSampleCount() const { return mNumSamplesTotal; }
@@ -78,7 +78,7 @@ class SFXMemoryStream : public SFXStream,
       U32 getDuration() const { return ( mNumSamplesTotal == U32_MAX ? U32_MAX : mFormat.getDuration( mNumSamplesTotal ) ); }
       bool isEOS() const { return ( mNumSamplesLeft != 0 ); }
       void reset();
-      U32 read( U8 *buffer, U32 length );      
+      U32 read( U8 *buffer, U32 length );
 };
 
 #endif // !_SFXMEMORYSTREAM_H_

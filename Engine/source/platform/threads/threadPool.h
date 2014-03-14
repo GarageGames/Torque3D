@@ -73,7 +73,7 @@
 class ThreadPool
 {
    public:
-   
+
       /// A ThreadPool context defines a logical context in which WorkItems are
       /// being executed.  Their primary use is for biasing priorities of
       /// WorkItems.
@@ -87,22 +87,22 @@ class ThreadPool
       class Context
       {
          protected:
-         
+
             /// Superordinate context; scales this context's priority bias.
             Context* mParent;
-            
+
             /// First child.
             Context* mChildren;
-            
+
             /// Next sibling in child chain.
             Context* mSibling;
-            
+
             /// Name of this context.  Should be unique in parent namespace.
             const char* mName;
-            
+
             /// Priority scale factor of this context.
             F32 mPriorityBias;
-            
+
             /// Accumulated scale factor.
             F32 mAccumulatedPriorityBias;
 
@@ -113,7 +113,7 @@ class ThreadPool
             void updateAccumulatedPriorityBiases();
 
          public:
-         
+
             Context( const char* name, Context* parent, F32 priorityBias );
             ~Context();
 
@@ -152,10 +152,10 @@ class ThreadPool
             {
                return &smRootContext;
             }
-            
+
             ///
             F32 getAccumulatedPriorityBias();
-            
+
             ///
             Context* getChild( const char* name );
 
@@ -175,7 +175,7 @@ class ThreadPool
             typedef ThreadSafeRefCount< WorkItem > Parent;
 
          protected:
-         
+
             /// The work context of this item.
             Context* mContext;
 
@@ -186,7 +186,7 @@ class ThreadPool
             /// whenever an item can be safely cancelled.  When it returns true,
             /// the work item should exit from its execute() method.
             bool cancellationPoint();
-            
+
             /// Called when the item has been cancelled.
             virtual void onCancelled() {}
 
@@ -195,7 +195,7 @@ class ThreadPool
             virtual void execute() = 0;
 
          public:
-         
+
             /// Construct a new work item.
             ///
             /// @param context The work context in which the item should be placed.
@@ -204,7 +204,7 @@ class ThreadPool
                : mContext( context ? context : Context::ROOT_CONTEXT() )
             {
             }
-            
+
             virtual ~WorkItem() {}
 
             /// Return the work context associated with the work item.
@@ -215,7 +215,7 @@ class ThreadPool
 
             /// Process the work item.
             void process();
-            
+
             /// Return true if the work item should be cancelled.
             ///
             /// This method can be overridden by subclasses.  It's value will be
@@ -225,7 +225,7 @@ class ThreadPool
             /// @return true, if item should be cancelled; default is false.
             /// @see ThreadPool::WorkItem::cancellationPoint
             virtual bool isCancellationRequested();
-            
+
             /// Return the item's base priority value.
             /// @return item priority; defaults to 1.0.
             virtual F32 getPriority();
@@ -233,9 +233,9 @@ class ThreadPool
 
       typedef ThreadSafeRef< WorkItem > WorkItemPtr;
       struct GlobalThreadPool;
-      
+
    protected:
-   
+
       struct WorkItemWrapper;
       struct WorkerThread;
 
@@ -245,22 +245,22 @@ class ThreadPool
 
       /// Name of this pool.  Mainly for debugging.  Used to name worker threads.
       String mName;
-      
+
       /// Number of worker threads spawned by the pool.
       U32 mNumThreads;
-      
+
       /// Number of worker threads in non-sleeping state.
       U32 mNumThreadsAwake;
-      
+
       /// Number of worker threads guaranteed to be non-blocking.
       U32 mNumThreadsReady;
-      
+
       /// Semaphore used to wake up threads, if necessary.
       Semaphore mSemaphore;
-      
+
       /// Threaded priority queue for concurrent access by worker threads.
       QueueType mWorkItemQueue;
-      
+
       /// List of worker threads.
       WorkerThread* mThreads;
 
@@ -269,10 +269,10 @@ class ThreadPool
       /// Primarily useful to find whether malfunctions are caused
       /// by parallel execution or not.
       static bool smForceAllMainThread;
-      
+
       ///
       static U32 smMainThreadTimeMS;
-            
+
       /// Work queue for main thread; can be used to ping back work items to
       /// main thread that need processing that can only happen on main thread.
       static QueueType smMainThreadQueue;
@@ -286,7 +286,7 @@ class ThreadPool
       ///
       /// @param numThreads Number of threads to create or zero for default.
       ThreadPool( const char* name, U32 numThreads = 0 );
-      
+
       ~ThreadPool();
 
       /// Manually shutdown threads outside of static destructors.
@@ -294,7 +294,7 @@ class ThreadPool
 
       ///
       void queueWorkItem( WorkItem* item );
-      
+
       ///
       /// <em>For the global pool, it is very important to only ever call
       /// this function on the main thread and to let work items only ever
@@ -320,7 +320,7 @@ class ThreadPool
       /// This method *may* (and is meant to) be called from threads
       /// other than the main thread.
       static void queueWorkItemOnMainThread( WorkItem* item );
-      
+
       /// Process work items waiting on the main thread's work queue.
       ///
       /// There is a soft limit imposed on the time this method is allowed
@@ -382,10 +382,10 @@ typedef ThreadPool::WorkItem ThreadWorkItem;
 struct ThreadPool::GlobalThreadPool : public ThreadPool, public ManagedSingleton< GlobalThreadPool >
 {
    typedef ThreadPool Parent;
-   
+
    GlobalThreadPool()
       : Parent( "GLOBAL" ) {}
-      
+
    // For ManagedSingleton.
    static const char* getSingletonName() { return "GlobalThreadPool"; }
 };

@@ -42,8 +42,8 @@ ConsoleDocClass( GuiInspectorGroup,
 
 //-----------------------------------------------------------------------------
 
-GuiInspectorGroup::GuiInspectorGroup() 
- : mParent( NULL ), 
+GuiInspectorGroup::GuiInspectorGroup()
+ : mParent( NULL ),
    mStack(NULL)
 {
    setBounds(0,0,200,20);
@@ -59,9 +59,9 @@ GuiInspectorGroup::GuiInspectorGroup()
 
 //-----------------------------------------------------------------------------
 
-GuiInspectorGroup::GuiInspectorGroup( const String& groupName, 
-                                      SimObjectPtr<GuiInspector> parent ) 
- : mParent( parent ), 
+GuiInspectorGroup::GuiInspectorGroup( const String& groupName,
+                                      SimObjectPtr<GuiInspector> parent )
+ : mParent( parent ),
    mStack(NULL)
 {
 
@@ -77,7 +77,7 @@ GuiInspectorGroup::GuiInspectorGroup( const String& groupName,
 //-----------------------------------------------------------------------------
 
 GuiInspectorGroup::~GuiInspectorGroup()
-{  
+{
 }
 
 //-----------------------------------------------------------------------------
@@ -241,11 +241,11 @@ bool GuiInspectorGroup::inspectGroup()
    // Un-grouped fields are all sorted into the 'general' group
    if ( dStricmp( mCaption, "General" ) == 0 )
       bNoGroup = true;
-      
+
    // Just delete all fields and recreate them (like the dynamicGroup)
    // because that makes creating controls for array fields a lot easier
    clearFields();
-   
+
    bool bNewItems = false;
    bool bMakingArray = false;
    GuiStackControl *pArrayStack = NULL;
@@ -276,9 +276,9 @@ bool GuiInspectorGroup::inspectGroup()
             bGrabItems = false;
          continue;
       }
-      
+
       // Skip field if it has the HideInInspectors flag set.
-      
+
       if( field->flag.test( AbstractClassRep::FIELD_HideInInspectors ) )
          continue;
 
@@ -293,55 +293,55 @@ bool GuiInspectorGroup::inspectGroup()
             Platform::outputDebugString( "[GuiInspectorGroup] Beginning array '%s'",
                field->pFieldname );
             #endif
-            
+
             // Starting an array...
             // Create a rollout for the Array, give it the array's name.
-            GuiRolloutCtrl *arrayRollout = new GuiRolloutCtrl();            
+            GuiRolloutCtrl *arrayRollout = new GuiRolloutCtrl();
             GuiControlProfile *arrayRolloutProfile = dynamic_cast<GuiControlProfile*>( Sim::findObject( "GuiInspectorRolloutProfile0" ) );
-            
+
             arrayRollout->setControlProfile(arrayRolloutProfile);
             //arrayRollout->mCaption = StringTable->insert( String::ToString( "%s (%i)", field->pGroupname, field->elementCount ) );
             arrayRollout->setCaption( field->pGroupname );
             //arrayRollout->setMargin( 14, 0, 0, 0 );
             arrayRollout->registerObject();
-            
+
             GuiStackControl *arrayStack = new GuiStackControl();
             arrayStack->registerObject();
             arrayStack->freeze(true);
             arrayRollout->addObject(arrayStack);
-            
+
             // Allocate a rollout for each element-count in the array
             // Give it the element count name.
             for ( U32 i = 0; i < field->elementCount; i++ )
             {
-               GuiRolloutCtrl *elementRollout = new GuiRolloutCtrl();            
+               GuiRolloutCtrl *elementRollout = new GuiRolloutCtrl();
                GuiControlProfile *elementRolloutProfile = dynamic_cast<GuiControlProfile*>( Sim::findObject( "GuiInspectorRolloutProfile0" ) );
-               
+
                char buf[256];
-               dSprintf( buf, 256, "  [%i]", i ); 
-               
+               dSprintf( buf, 256, "  [%i]", i );
+
                elementRollout->setControlProfile(elementRolloutProfile);
                elementRollout->setCaption(buf);
                //elementRollout->setMargin( 14, 0, 0, 0 );
                elementRollout->registerObject();
-               
+
                GuiStackControl *elementStack = new GuiStackControl();
-               elementStack->registerObject();            
+               elementStack->registerObject();
                elementRollout->addObject(elementStack);
                elementRollout->instantCollapse();
-               
+
                arrayStack->addObject( elementRollout );
             }
-            
+
             pArrayRollout = arrayRollout;
             pArrayStack = arrayStack;
             arrayStack->freeze(false);
             pArrayRollout->instantCollapse();
             mStack->addObject(arrayRollout);
-            
+
             bMakingArray = true;
             continue;
-         }      
+         }
          else if ( field->type == AbstractClassRep::EndArrayFieldType )
          {
             #ifdef DEBUG_SPEW
@@ -352,32 +352,32 @@ bool GuiInspectorGroup::inspectGroup()
             bMakingArray = false;
             continue;
          }
-         
+
          if ( bMakingArray )
          {
-            // Add a GuiInspectorField for this field, 
+            // Add a GuiInspectorField for this field,
             // for every element in the array...
             for ( U32 i = 0; i < pArrayStack->size(); i++ )
             {
                FrameTemp<char> intToStr( 64 );
                dSprintf( intToStr, 64, "%d", i );
-               
+
                // The array stack should have a rollout for each element
                // as children...
                GuiRolloutCtrl *pRollout = dynamic_cast<GuiRolloutCtrl*>(pArrayStack->at(i));
-               // And the each of those rollouts should have a stack for 
+               // And the each of those rollouts should have a stack for
                // fields...
                GuiStackControl *pStack = dynamic_cast<GuiStackControl*>(pRollout->at(0));
-               
-               // And we add a new GuiInspectorField to each of those stacks...            
+
+               // And we add a new GuiInspectorField to each of those stacks...
                GuiInspectorField *fieldGui = constructField( field->type );
-               if ( fieldGui == NULL )                
+               if ( fieldGui == NULL )
                   fieldGui = new GuiInspectorField();
-               
+
                fieldGui->init( mParent, this );
                StringTableEntry caption = field->pFieldname;
                fieldGui->setInspectorField( field, caption, intToStr );
-               
+
                if( fieldGui->registerObject() )
                {
                   #ifdef DEBUG_SPEW
@@ -391,10 +391,10 @@ bool GuiInspectorGroup::inspectGroup()
                else
                   delete fieldGui;
             }
-            
+
             continue;
          }
-         
+
          // This is weird, but it should work for now. - JDD
          // We are going to check to see if this item is an array
          // if so, we're going to construct a field for each array element
@@ -402,13 +402,13 @@ bool GuiInspectorGroup::inspectGroup()
          {
             // Make a rollout control for this array
             //
-            GuiRolloutCtrl *rollout = new GuiRolloutCtrl();  
-            rollout->setDataField( StringTable->insert("profile"), NULL, "GuiInspectorRolloutProfile0" );            
+            GuiRolloutCtrl *rollout = new GuiRolloutCtrl();
+            rollout->setDataField( StringTable->insert("profile"), NULL, "GuiInspectorRolloutProfile0" );
             rollout->setCaption(String::ToString( "%s (%i)", field->pFieldname, field->elementCount));
             rollout->setMargin( 14, 0, 0, 0 );
             rollout->registerObject();
             mArrayCtrls.push_back(rollout);
-            
+
             // Put a stack control within the rollout
             //
             GuiStackControl *stack = new GuiStackControl();
@@ -416,20 +416,20 @@ bool GuiInspectorGroup::inspectGroup()
             stack->registerObject();
             stack->freeze(true);
             rollout->addObject(stack);
-            
+
             mStack->addObject(rollout);
-            
+
             // Create each field and add it to the stack.
             //
             for (S32 nI = 0; nI < field->elementCount; nI++)
             {
                FrameTemp<char> intToStr( 64 );
                dSprintf( intToStr, 64, "%d", nI );
-               
+
                // Construct proper ValueName[nI] format which is "ValueName0" for index 0, etc.
-               
+
                String fieldName = String::ToString( "%s%d", field->pFieldname, nI );
-               
+
                // If the field already exists, just update it
                GuiInspectorField *fieldGui = findField( fieldName );
                if( fieldGui != NULL )
@@ -437,17 +437,17 @@ bool GuiInspectorGroup::inspectGroup()
                   fieldGui->updateValue();
                   continue;
                }
-               
+
                bNewItems = true;
-               
+
                fieldGui = constructField( field->type );
-               if ( fieldGui == NULL )               
+               if ( fieldGui == NULL )
                   fieldGui = new GuiInspectorField();
-               
-               fieldGui->init( mParent, this );               
+
+               fieldGui->init( mParent, this );
                StringTableEntry caption = StringTable->insert( String::ToString("   [%i]",nI) );
                fieldGui->setInspectorField( field, caption, intToStr );
-               
+
                if ( fieldGui->registerObject() )
                {
                   mChildren.push_back( fieldGui );
@@ -456,7 +456,7 @@ bool GuiInspectorGroup::inspectGroup()
                else
                   delete fieldGui;
             }
-            
+
             stack->freeze(false);
             stack->updatePanes();
             rollout->instantCollapse();
@@ -470,16 +470,16 @@ bool GuiInspectorGroup::inspectGroup()
                fieldGui->updateValue();
                continue;
             }
-            
+
             bNewItems = true;
-            
+
             fieldGui = constructField( field->type );
             if ( fieldGui == NULL )
                fieldGui = new GuiInspectorField();
-            
-            fieldGui->init( mParent, this );            
+
+            fieldGui->init( mParent, this );
             fieldGui->setInspectorField( field );
-                     
+
             if( fieldGui->registerObject() )
             {
                #ifdef DEBUG_SPEW
@@ -518,12 +518,12 @@ bool GuiInspectorGroup::updateFieldValue( StringTableEntry fieldName, StringTabl
    // Check if we contain a field of this name,
    // if so update its value and return true.
    Vector<GuiInspectorField*>::iterator iter = mChildren.begin();
-   
+
    if( arrayIdx == StringTable->EmptyString() )
       arrayIdx = NULL;
 
    for( ; iter != mChildren.end(); iter++ )
-   {   
+   {
       GuiInspectorField *field = (*iter);
       if ( field->mField &&
            field->mField->pFieldname == fieldName &&
@@ -540,7 +540,7 @@ bool GuiInspectorGroup::updateFieldValue( StringTableEntry fieldName, StringTabl
 //-----------------------------------------------------------------------------
 
 void GuiInspectorGroup::updateAllFields()
-{   
+{
    Vector<GuiInspectorField*>::iterator iter = mChildren.begin();
    for( ; iter != mChildren.end(); iter++ )
       (*iter)->updateValue();
@@ -552,7 +552,7 @@ AbstractClassRep* GuiInspectorGroup::findCommonAncestorClass()
 {
    AbstractClassRep* classRep = getInspector()->getInspectObject( 0 )->getClassRep();
    const U32 numInspectObjects = getInspector()->getNumInspectObjects();
-   
+
    for( U32 i = 1; i < numInspectObjects; ++ i )
    {
       SimObject* object = getInspector()->getInspectObject( i );
@@ -562,6 +562,6 @@ AbstractClassRep* GuiInspectorGroup::findCommonAncestorClass()
          AssertFatal( classRep, "GuiInspectorGroup::findcommonAncestorClass - Walked above ConsoleObject!" );
       }
    }
-      
+
    return classRep;
 }

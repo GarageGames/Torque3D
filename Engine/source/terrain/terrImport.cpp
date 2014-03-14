@@ -33,7 +33,7 @@
 
 using namespace Torque;
 
-ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5, 
+ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    "TerrainBlock.create( String terrainName, U32 resolution, String materialName, bool genNoise )\n"
    "" )
 {
@@ -66,7 +66,7 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
       Con::errorf( "TerrainBlock::createNew - error creating '%s'", terrFileName.c_str() );
       return 0;
    }
-   
+
    terrain->setPosition( Point3F( 0, 0, 0 ) );
 
    const U32 blockSize = terrain->getBlockSize();
@@ -80,7 +80,7 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
 
       Noise2D noise;
       noise.setSeed( 134208587 );
-      
+
       // Set up some defaults.
       F32 octaves = 3.0f;
       U32 freq = 4;
@@ -91,7 +91,7 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
 
       F32 omax, omin;
       noise.getMinMax( &floatHeights, &omin, &omax, blockSize );
-         
+
       F32 terrscale = 300.0f / (omax - omin);
       for ( S32 y = 0; y < blockSize; y++ )
       {
@@ -121,7 +121,7 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    return terrain->getId();
 }
 
-ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8, 
+ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
    "( String terrainName, String heightMap, F32 metersPerPixel, F32 heightScale, String materials, String opacityLayers[, bool flipYAxis=true] )\n"
    "" )
 {
@@ -155,18 +155,18 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
       return 0;
    }
 
-   U32 fileCount = StringUnit::getUnitCount( opacityFiles, "\n" ); 
+   U32 fileCount = StringUnit::getUnitCount( opacityFiles, "\n" );
    Vector<U8> layerMap;
    layerMap.setSize( terrSize * terrSize );
    {
       Vector<GBitmap*> bitmaps;
-  
+
       for ( U32 i = 0; i < fileCount; i++ )
       {
          String fileNameWithChannel = StringUnit::getUnit( opacityFiles, i, "\n" );
          String fileName = StringUnit::getUnit( fileNameWithChannel, 0, "\t" );
          String channel = StringUnit::getUnit( fileNameWithChannel, 1, "\t" );
-         
+
          if ( fileName.isEmpty() )
             continue;
 
@@ -181,10 +181,10 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
             }
 
             // Always going to be one channel.
-            GBitmap *opacityMapChannel = new GBitmap( terrSize, 
-                                                      terrSize, 
-                                                      false, 
-                                                      GFXFormatA8 );         
+            GBitmap *opacityMapChannel = new GBitmap( terrSize,
+                                                      terrSize,
+                                                      false,
+                                                      GFXFormatA8 );
 
             if ( opacityMap->getBytesPerPixel() > 1 )
             {
@@ -207,7 +207,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
          }
       }
 
-      // Ok... time to convert all this opacity layer 
+      // Ok... time to convert all this opacity layer
       // mess to the layer index map!
       U32 layerCount = bitmaps.size() - 1;
       U32 layer, lastValue;
@@ -226,7 +226,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
             }
          }
 
-         // Set the layer index.   
+         // Set the layer index.
          layerMap[i] = getMin( layer, layerCount );
       }
 
@@ -270,10 +270,10 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
    return terrain->getId();
 }
 
-bool TerrainBlock::import( const GBitmap &heightMap, 
-                           F32 heightScale, 
+bool TerrainBlock::import( const GBitmap &heightMap,
+                           F32 heightScale,
                            F32 metersPerPixel,
-                           const Vector<U8> &layerMap, 
+                           const Vector<U8> &layerMap,
                            const Vector<String> &materials,
                            bool flipYAxis)
 {

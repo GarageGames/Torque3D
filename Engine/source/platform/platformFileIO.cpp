@@ -217,7 +217,7 @@ char * Platform::makeFullPathName(const char *path, char *buffer, U32 size, cons
    char bspath[1024];
    dStrncpy(bspath, path, sizeof(bspath));
    bspath[sizeof(bspath)-1] = 0;
-   
+
    for(S32 i = 0;i < dStrlen(bspath);++i)
    {
       if(bspath[i] == '\\')
@@ -280,7 +280,7 @@ char * Platform::makeFullPathName(const char *path, char *buffer, U32 size, cons
             catPath(endptr, ptr, size - (endptr - buffer));
             endptr += dStrlen(endptr) - 1;
          }
-         
+
          ptr = slash + 1;
       }
       else if(endptr)
@@ -470,7 +470,7 @@ StringTableEntry Platform::stripBasePath(const char *path)
       return NULL;
 
    StringTableEntry str = tryStripBasePath(path, Platform::getMainDotCsDir());
-   
+
    if(str != NULL )
       return str;
 

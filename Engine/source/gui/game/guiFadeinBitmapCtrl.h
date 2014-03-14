@@ -35,29 +35,29 @@
 class GuiFadeinBitmapCtrl : public GuiBitmapCtrl
 {
    public:
-   
+
       typedef GuiBitmapCtrl Parent;
-      
+
    protected:
-   
+
       /// Color we fade in from and fade out to.
       ColorF mFadeColor;
-      
+
       /// Reference time on which to base all fade timings.
       U32 mStartTime;
-      
+
       /// Milliseconds for bitmap to fade in.
       U32 mFadeInTime;
-      
+
       /// Milliseconds to wait before fade-out.
       U32 mWaitTime;
-      
+
       /// Milliseconds for bitmap to fade out.
       U32 mFadeOutTime;
-      
+
       /// Easing curve for fade-in.
       EaseF mFadeInEase;
-      
+
       /// Easing curve for fade-out.
       EaseF mFadeOutEase;
 
@@ -74,7 +74,7 @@ class GuiFadeinBitmapCtrl : public GuiBitmapCtrl
       virtual bool onKeyDown(const GuiEvent &);
       virtual bool onWake();
       virtual void onRender(Point2I offset, const RectI &updateRect);
-      
+
       static void initPersistFields();
 
       DECLARE_CONOBJECT( GuiFadeinBitmapCtrl );

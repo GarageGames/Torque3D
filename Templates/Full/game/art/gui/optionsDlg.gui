@@ -179,47 +179,47 @@
             canSave = "1";
             canSaveDynamicFields = "0";
          };
-		 
-         new GuiSliderCtrl(OptMouseSensitivity) {  
-            range = "0.02 2";  
-            ticks = "10";  
-            value = "0.75";  
-            isContainer = "0";  
-            Profile = "GuiSliderProfile";  
-            HorizSizing = "right";  
-            VertSizing = "bottom";  
-            position = "105 182";  
-            Extent = "244 18";  
-            MinExtent = "8 2";  
-            canSave = "1";  
-            Visible = "1";  
-            Command = "OptMouseSetSensitivity(OptMouseSensitivity.value);";  
-            tooltipprofile = "GuiToolTipProfile";  
-            hovertime = "1000";  
-            canSaveDynamicFields = "0";  
-         };  
-         new GuiTextCtrl() {  
-            text = "Mouse Sensitivity:"; 
-            maxLength = "255";  
-            Margin = "0 0 0 0";  
-            Padding = "0 0 0 0";  
-            AnchorTop = "1";  
-            AnchorBottom = "0";  
-            AnchorLeft = "1";  
-            AnchorRight = "0";  
-            isContainer = "0";  
-            Profile = "GuiTextProfile";  
-            HorizSizing = "right";  
-            VertSizing = "bottom";  
-            position = "15 182";  
-            Extent = "85 18";  
-            MinExtent = "8 8";  
-            canSave = "1";  
-            Visible = "1";  
-            tooltipprofile = "GuiToolTipProfile";  
-            hovertime = "1000";  
-            canSaveDynamicFields = "0";  
-         };  
+
+         new GuiSliderCtrl(OptMouseSensitivity) {
+            range = "0.02 2";
+            ticks = "10";
+            value = "0.75";
+            isContainer = "0";
+            Profile = "GuiSliderProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "105 182";
+            Extent = "244 18";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            Command = "OptMouseSetSensitivity(OptMouseSensitivity.value);";
+            tooltipprofile = "GuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+         };
+         new GuiTextCtrl() {
+            text = "Mouse Sensitivity:";
+            maxLength = "255";
+            Margin = "0 0 0 0";
+            Padding = "0 0 0 0";
+            AnchorTop = "1";
+            AnchorBottom = "0";
+            AnchorLeft = "1";
+            AnchorRight = "0";
+            isContainer = "0";
+            Profile = "GuiTextProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "15 182";
+            Extent = "85 18";
+            MinExtent = "8 8";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "GuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+         };
       };
       new GuiBitmapBorderCtrl() {
          position = "9 55";

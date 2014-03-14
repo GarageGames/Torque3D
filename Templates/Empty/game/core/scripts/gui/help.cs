@@ -86,5 +86,5 @@ function GuiControl::getHelpPage(%this)
 function GuiMLTextCtrl::onURL(%this, %url)
 {
    gotoWebPage( %url );
-}   
+}
 

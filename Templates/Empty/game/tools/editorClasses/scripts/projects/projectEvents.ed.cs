@@ -27,7 +27,7 @@ function Projects::GetEventManager()
 {
    if( !isObject( $_Tools::ProjectEventManager ) )
       $_Tools::ProjectEventManager = new EventManager() { queue = "ProjectEventManager"; };
-      
+
    return $_Tools::ProjectEventManager;
 }
 
@@ -38,11 +38,11 @@ function Projects::DeclareProjectTarget( %projectTargetNamespace, %objectGlobalN
    // on SimObject that supported validating that another object
    // implemented all the methods provided by a given namespace.
    // .validateInterface("myNamespace") or some such.
-   %projectObject = new ScriptMsgListener( %objectGlobalName ) 
-   { 
-      class = %projectTargetNamespace; 
-      superclass = ProjectBase; 
-   };   
+   %projectObject = new ScriptMsgListener( %objectGlobalName )
+   {
+      class = %projectTargetNamespace;
+      superclass = ProjectBase;
+   };
 }
 
 ///
@@ -52,7 +52,7 @@ function Projects::DeclareProjectTarget( %projectTargetNamespace, %objectGlobalN
 /// ProjectOpened
 ///
 /// is fired when a project has been opened and all bootstrap
-/// processing has occured on the project object.  
+/// processing has occured on the project object.
 /// At this point it is safe for addons to do post-load processing
 /// such as creating new create entries and other specific modifications
 /// to the editor.
@@ -60,19 +60,19 @@ Projects::GetEventManager().registerEvent( "ProjectOpened" );
 
 /// ProjectClosed
 ///
-/// is fired when a project is about to be closed and it's 
+/// is fired when a project is about to be closed and it's
 /// resources destroyed by the base project class.  Addons
 /// should use this event to free any project specific resources
 /// they have allocated, as well as saving of data where applicable.
 Projects::GetEventManager().registerEvent( "ProjectClosed" );
 
-/// ProjectDeploy 
+/// ProjectDeploy
 ///
-/// is fired when a game is about to be run from the editor and on 
-/// this event addons and third party's should without scheduling or 
+/// is fired when a game is about to be run from the editor and on
+/// this event addons and third party's should without scheduling or
 /// other delaying calls, deploy any game data that the game will need
 /// to it's game path.
-/// 
+///
 /// Example, the core package zip code intercepts this message and
 /// builds and deploys a new core.zip if is necessary
 Projects::GetEventManager().registerEvent( "ProjectDeploy" );

@@ -125,16 +125,16 @@ class SFXBuffer :    public StrongRefBase,
       ///   in the constructor.  This is mainly useful for the null device which creates dummy buffers that
       ///   do not need the async state to be in place.  All other buffers do.
       SFXBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* description, bool createAsyncState = true );
-      
+
       /// Create a buffer with just a description.  This is used by devices who fully take over loading
       /// and streaming.
       SFXBuffer( SFXDescription* description );
-      
+
       virtual ~SFXBuffer();
 
       /// The buffer readiness status.
       Status mStatus;
-      
+
       /// The sound sample format used by the buffer.
       SFXFormat mFormat;
 
@@ -145,7 +145,7 @@ class SFXBuffer :    public StrongRefBase,
 
       /// If true, this is a continuously streaming buffer.
       bool mIsStreaming;
-      
+
       /// For streaming buffers, tells whether the source stream loops.
       bool mIsLooping;
 

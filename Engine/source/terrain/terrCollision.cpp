@@ -165,12 +165,12 @@ S32 sFaceList135[16][9] = {
 };
 
 
-TerrainConvex::TerrainConvex() 
+TerrainConvex::TerrainConvex()
 {
-   mType = TerrainConvexType; 
+   mType = TerrainConvexType;
 }
 
-TerrainConvex::TerrainConvex( const TerrainConvex &cv ) 
+TerrainConvex::TerrainConvex( const TerrainConvex &cv )
 {
    mType = TerrainConvexType;
 
@@ -341,13 +341,13 @@ void TerrainConvex::getPolyList(AbstractPolyList* list)
 void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
 {
    PROFILE_SCOPE( TerrainBlock_buildConvex );
-   
+
    sTerrainConvexList.collectGarbage();
 
-   // First check to see if the query misses the 
+   // First check to see if the query misses the
    // terrain elevation range.
    const Point3F &terrainPos = getPosition();
-   if (  box.maxExtents.z - terrainPos.z < -TerrainThickness || 
+   if (  box.maxExtents.z - terrainPos.z < -TerrainThickness ||
          box.minExtents.z - terrainPos.z > fixedToFloat( mFile->getMaxHeight() ) )
       return;
 
@@ -370,12 +370,12 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
 
    const U32 BlockMask = mFile->mSize - 1;
 
-   for ( S32 y = yStart; y < yEnd; y++ ) 
+   for ( S32 y = yStart; y < yEnd; y++ )
    {
       S32 yi = y & BlockMask;
 
       //
-      for ( S32 x = xStart; x < xEnd; x++ ) 
+      for ( S32 x = xStart; x < xEnd; x++ )
       {
          S32 xi = x & BlockMask;
 
@@ -386,7 +386,7 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
 
          // holes only in the primary terrain block
          if (  ( ( sq->flags & TerrainSquare::Empty ) && x == xi && y == yi ) ||
-               sq->minHeight > heightMax || 
+               sq->minHeight > heightMax ||
                sq->maxHeight < heightMin )
             continue;
 
@@ -484,14 +484,14 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
 {
 	PROFILE_SCOPE( TerrainBlock_buildPolyList );
 
-   // First check to see if the query misses the 
+   // First check to see if the query misses the
    // terrain elevation range.
    const Point3F &terrainPos = getPosition();
-   if (  box.maxExtents.z - terrainPos.z < -TerrainThickness || 
+   if (  box.maxExtents.z - terrainPos.z < -TerrainThickness ||
          box.minExtents.z - terrainPos.z > fixedToFloat( mFile->getMaxHeight() ) )
       return false;
 
-   // Transform the bounding sphere into the object's coord 
+   // Transform the bounding sphere into the object's coord
    // space.  Note that this is really optimal.
    Box3F osBox = box;
    mWorldToObj.mul(osBox);
@@ -524,7 +524,7 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
    const U32 BlockMask = mFile->mSize - 1;
 
    bool emitted = false;
-   for (S32 y = yStart; y < yEnd; y++) 
+   for (S32 y = yStart; y < yEnd; y++)
    {
       S32 yi = y & BlockMask;
 
@@ -538,7 +538,7 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
          continue;
 
       //
-      for (S32 x = xStart; x < xEnd; x++) 
+      for (S32 x = xStart; x < xEnd; x++)
       {
          S32 xi = x & BlockMask;
          const TerrainSquare *sq = mFile->findSquare( 0, xi, yi );
@@ -553,8 +553,8 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
             continue;
 
          // holes only in the primary terrain block
-         if (  ( ( sq->flags & TerrainSquare::Empty ) && x == xi && y == yi ) || 
-               sq->minHeight > heightMax || 
+         if (  ( ( sq->flags & TerrainSquare::Empty ) && x == xi && y == yi ) ||
+               sq->minHeight > heightMax ||
                sq->maxHeight < heightMin )
             continue;
 
@@ -562,12 +562,12 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
 
          // Add the missing points
          U32 vi[5];
-         for (int i = 0; i < 4 ; i++) 
+         for (int i = 0; i < 4 ; i++)
          {
             S32 dx = i >> 1;
             S32 dy = dx ^ (i & 1);
             U32* vp = &vb[dy][x - xStart + dx];
-            if (*vp == U32_MAX) 
+            if (*vp == U32_MAX)
             {
                Point3F pos;
                pos.x = (F32)((x + dx) * mSquareSize);
@@ -626,7 +626,7 @@ bool TerrainBlock::castRay(const Point3F &start, const Point3F &end, RayInfo *in
 
    if ( !castRayI(start, end, info, false) )
       return false;
-      
+
    // Set intersection point.
    info->setContactPoint( start, end );
    getTransform().mulP( info->point );    // transform to world coordinates for getGridPos
@@ -724,17 +724,17 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
       if(nextYInt < intersectT)
          intersectT = nextYInt;
 
-      if ( castRayBlock(   pStart, 
-                           pEnd, 
-                           Point2I( blockX * BlockSquareWidth, 
-                                    blockY * BlockSquareWidth ), 
-                           GridLevels, 
-                           invDeltaX, 
-                           invDeltaY, 
-                           startT, 
-                           intersectT, 
-                           info, 
-                           collideEmpty ) ) 
+      if ( castRayBlock(   pStart,
+                           pEnd,
+                           Point2I( blockX * BlockSquareWidth,
+                                    blockY * BlockSquareWidth ),
+                           GridLevels,
+                           invDeltaX,
+                           invDeltaY,
+                           startT,
+                           intersectT,
+                           info,
+                           collideEmpty ) )
       {
          info->normal.z *= BlockSquareWidth * mSquareSize;
          info->normal.normalize();
@@ -766,15 +766,15 @@ struct TerrLOSStackNode
    U32 level;
 };
 
-bool TerrainBlock::castRayBlock( const Point3F &pStart, 
-                                 const Point3F &pEnd, 
-                                 const Point2I &aBlockPos, 
-                                 U32 aLevel, 
-                                 F32 invDeltaX, 
-                                 F32 invDeltaY, 
-                                 F32 aStartT, 
-                                 F32 aEndT, 
-                                 RayInfo *info, 
+bool TerrainBlock::castRayBlock( const Point3F &pStart,
+                                 const Point3F &pEnd,
+                                 const Point2I &aBlockPos,
+                                 U32 aLevel,
+                                 F32 invDeltaX,
+                                 F32 invDeltaY,
+                                 F32 aStartT,
+                                 F32 aEndT,
+                                 RayInfo *info,
                                  bool collideEmpty )
 {
    const U32 BlockSquareWidth = mFile->mSize;
@@ -791,7 +791,7 @@ bool TerrainBlock::castRayBlock( const Point3F &pStart,
    stack[0].endT = aEndT;
    stack[0].blockPos = aBlockPos;
    stack[0].level = aLevel;
-   
+
    if( !aBlockPos.isZero() )
       return false;
 

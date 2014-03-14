@@ -29,16 +29,16 @@ function initializeCore()
    // Not Reentrant
    if( $coreInitialized == true )
       return;
-      
+
    // Core keybindings.
    GlobalActionMap.bind(keyboard, tilde, toggleConsole);
    GlobalActionMap.bind(keyboard, "ctrl p", doScreenShot);
    GlobalActionMap.bindcmd(keyboard, "alt enter", "Canvas.attemptFullscreenToggle();","");
    GlobalActionMap.bindcmd(keyboard, "alt k", "cls();",  "");
 //   GlobalActionMap.bindCmd(keyboard, "escape", "", "handleEscape();");
-   
-   
-   
+
+
+
    // Very basic functions used by everyone.
    exec("./audio.cs");
    exec("./canvas.cs");
@@ -48,7 +48,7 @@ function initializeCore()
    // Content.
    exec("~/art/gui/profiles.cs");
    exec("~/scripts/gui/cursors.cs");
-   
+
    exec( "./audioEnvironments.cs" );
    exec( "./audioDescriptions.cs" );
    exec( "./audioStates.cs" );
@@ -59,21 +59,21 @@ function initializeCore()
 
    // Seed the random number generator.
    setRandomSeed();
-   
+
    // Set up networking.
    setNetPort(0);
-  
+
    // Initialize the canvas.
    initializeCanvas();
 
-   // Start processing file change events.   
+   // Start processing file change events.
    startFileChangeNotifications();
-      
+
    // Core Guis.
    exec("~/art/gui/console.gui");
    exec("~/art/gui/consoleVarDlg.gui");
    exec("~/art/gui/netGraphGui.gui");
-   
+
    // Gui Helper Scripts.
    exec("~/scripts/gui/help.cs");
 
@@ -83,7 +83,7 @@ function initializeCore()
    //exec("~/scripts/client/keybindings.cs");
    exec("~/scripts/client/helperfuncs.cs");
    exec("~/scripts/client/commands.cs");
-   
+
    // Client scripts
    exec("~/scripts/client/devHelpers.cs");
    exec("~/scripts/client/metrics.cs");
@@ -101,22 +101,22 @@ function initializeCore()
    exec("~/scripts/client/imposter.cs");
    exec("~/scripts/client/scatterSky.cs");
    exec("~/scripts/client/clouds.cs");
-   
-   // Initialize all core post effects.   
+
+   // Initialize all core post effects.
    exec("~/scripts/client/postFx.cs");
    initPostEffects();
-   
+
    // Initialize the post effect manager.
    exec("~/scripts/client/postFx/postFXManager.gui");
    exec("~/scripts/client/postFx/postFXManager.gui.cs");
    exec("~/scripts/client/postFx/postFXManager.gui.settings.cs");
    exec("~/scripts/client/postFx/postFXManager.persistance.cs");
-   
-   PostFXManager.settingsApplyDefaultPreset();  // Get the default preset settings   
-   
+
+   PostFXManager.settingsApplyDefaultPreset();  // Get the default preset settings
+
    // Set a default cursor.
    Canvas.setCursor(DefaultCursor);
-   
+
    loadKeybindings();
 
    $coreInitialized = true;
@@ -127,10 +127,10 @@ function initializeCore()
 // Shuts down core game functionality.
 //---------------------------------------------------------------------------------------------
 function shutdownCore()
-{      
+{
    // Stop file change events.
    stopFileChangeNotifications();
-   
+
    sfxShutdown();
 }
 
@@ -178,12 +178,12 @@ function handleEscape()
       if (GuiEditor.isAwake())
       {
          GuiEditCanvas.quit();
-         return; 
+         return;
       }
    }
 
-   if (PlayGui.isAwake())	
-      escapeFromGame();	
+   if (PlayGui.isAwake())
+      escapeFromGame();
 }
 
 //-----------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 /// @brief Forward messages from one queue to another
-/// 
+///
 /// MessageForwarder is a script class that can be used to forward messages
 /// from one queue to another.
 ///

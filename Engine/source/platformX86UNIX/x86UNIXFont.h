@@ -42,7 +42,7 @@ class x86UNIXFont : public PlatformFont
 	public:
 		x86UNIXFont();
 		virtual ~x86UNIXFont();
-    
+
     	// PlatformFont virtual methods
 		virtual bool isValidChar(const UTF16 ch) const;
 		virtual bool isValidChar(const UTF8 *str) const;
@@ -51,7 +51,7 @@ class x86UNIXFont : public PlatformFont
 		{
 			return height;
 		}
-		
+
 		inline U32 getFontBaseLine() const
 		{
 			return baseline;

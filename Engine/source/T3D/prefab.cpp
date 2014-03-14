@@ -44,18 +44,18 @@ IMPLEMENT_CO_NETOBJECT_V1(Prefab);
 
 ConsoleDocClass( Prefab,
    "@brief A collection of arbitrary objects which can be allocated and manipulated as a group.\n\n"
-   
+
    "%Prefab always points to a (.prefab) file which defines its objects. In "
    "fact more than one %Prefab can reference this file and both will update "
    "if the file is modified.\n\n"
-   
+
    "%Prefab is a very simple object and only exists on the server. When it is "
    "created it allocates children objects by reading the (.prefab) file like "
    "a list of instructions.  It then sets their transform relative to the %Prefab "
    "and Torque networking handles the rest by ghosting the new objects to clients. "
    "%Prefab itself is not ghosted.\n\n"
-   
-   "@ingroup enviroMisc"   
+
+   "@ingroup enviroMisc"
 );
 
 IMPLEMENT_CALLBACK( Prefab, onLoad, void, ( SimGroup *children ), ( children ),
@@ -79,7 +79,7 @@ void Prefab::initPersistFields()
 {
    addGroup( "Prefab" );
 
-      addProtectedField( "filename", TypePrefabFilename, Offset( mFilename, Prefab ),         
+      addProtectedField( "filename", TypePrefabFilename, Offset( mFilename, Prefab ),
                          &protectedSetFile, &defaultProtectedGetFn,
                          "(.prefab) File describing objects within this prefab." );
 
@@ -99,7 +99,7 @@ bool Prefab::onAdd()
       Point3F(  0.5f,  0.5f,  0.5f ) );
 
    resetWorldBox();
-   
+
    // Not added to the scene unless we are editing.
    if ( gEditingMission )
       onEditorEnable();
@@ -130,7 +130,7 @@ void Prefab::onEditorEnable()
    if ( isClientObject() )
       return;
 
-   // Just in case we are already in the scene, lets not cause an assert.   
+   // Just in case we are already in the scene, lets not cause an assert.
    if ( mContainer != NULL )
       return;
 
@@ -143,11 +143,11 @@ void Prefab::onEditorEnable()
 }
 
 void Prefab::onEditorDisable()
-{   
+{
    if ( isClientObject() )
       return;
 
-   // Just in case we are not in the scene, lets not cause an assert.   
+   // Just in case we are not in the scene, lets not cause an assert.
    if ( mContainer == NULL )
       return;
 
@@ -166,7 +166,7 @@ void Prefab::inspectPostApply()
 
 void Prefab::setTransform(const MatrixF & mat)
 {
-   Parent::setTransform( mat ); 
+   Parent::setTransform( mat );
 
    if ( isServerObject() )
    {
@@ -177,7 +177,7 @@ void Prefab::setTransform(const MatrixF & mat)
 
 void Prefab::setScale(const VectorF & scale)
 {
-   Parent::setScale( scale ); 
+   Parent::setScale( scale );
 
    if ( isServerObject() )
    {
@@ -214,13 +214,13 @@ void Prefab::unpackUpdate(NetConnection *conn, BitStream *stream)
    resetWorldBox();
 
    // FileMask
-   if ( stream->readFlag() ) 
+   if ( stream->readFlag() )
    {
       stream->read( &mFilename );
    }
 
    // TransformMask
-   if ( stream->readFlag() )  
+   if ( stream->readFlag() )
    {
       mathRead(*stream, &mObjToWorld);
       mathRead(*stream, &mObjScale);
@@ -232,7 +232,7 @@ void Prefab::unpackUpdate(NetConnection *conn, BitStream *stream)
 bool Prefab::protectedSetFile( void *object, const char *index, const char *data )
 {
    Prefab *prefab = static_cast<Prefab*>(object);
-   
+
    String file = String( Platform::makeRelativePathName(data, Platform::getMainDotCsDir()) );
 
    prefab->setFile( file );
@@ -241,7 +241,7 @@ bool Prefab::protectedSetFile( void *object, const char *index, const char *data
 }
 
 void Prefab::setFile( String file )
-{  
+{
    AssertFatal( isServerObject(), "Prefab-bad" );
 
    if ( !isProperlyAdded() )
@@ -249,7 +249,7 @@ void Prefab::setFile( String file )
       mFilename = file;
       return;
    }
-   
+
    // Client-side Prefab(s) do not create/update/reference children, everything
    // is handled on the server-side. In normal usage this will never actually
    // be called for the client-side prefab but maybe the user did so accidentally.
@@ -294,7 +294,7 @@ SimGroup* Prefab::explode()
       _updateChildTransform( child );
       smChildToPrefabMap.erase( child->getId() );
    }
-   
+
    missionGroup->addObject(group);
    mChildGroup = NULL;
    mChildMap.clear();
@@ -345,7 +345,7 @@ void Prefab::_loadFile( bool addFileNotify )
 
    if ( sPrefabFileStack.contains(mFilename) )
    {
-      Con::errorf( 
+      Con::errorf(
          "Prefab::_loadFile - failed loading prefab file (%s). \n"
          "File was referenced recursively by both a Parent and Child prefab.", mFilename.c_str() );
       return;
@@ -409,7 +409,7 @@ void Prefab::_updateChildTransform( SceneObject* child )
    child->setScale( itr->value.scale * mObjScale );
 
    // Hack for PhysicsShape... need to store the "editor" position to return to
-   // when a physics reset event occurs. Normally this would be where it is 
+   // when a physics reset event occurs. Normally this would be where it is
    // during onAdd, but in this case it is not because the prefab stores its
    // child objects in object space...
 
@@ -493,14 +493,14 @@ bool Prefab::isValidChild( SimObject *simobj, bool logWarnings )
 
    if ( !sceneobj )
       return false;
-   
+
    if ( sceneobj->isGlobalBounds() )
    {
       if ( logWarnings )
          Con::warnf( "SceneObject's with global bounds are not valid within a Prefab." );
       return false;
    }
-   
+
    if ( sceneobj->getClassRep()->isClass( AbstractClassRep::findClassRep("TerrainBlock") ) )
    {
       if ( logWarnings )
@@ -537,14 +537,14 @@ ExplodePrefabUndoAction::ExplodePrefabUndoAction( Prefab *prefab )
 
 void ExplodePrefabUndoAction::undo()
 {
-   if ( !mGroup )   
+   if ( !mGroup )
    {
       Con::errorf( "ExplodePrefabUndoAction::undo - NULL Group" );
       return;
    }
 
    mGroup->deleteObject();
-   mGroup = NULL;   
+   mGroup = NULL;
 }
 
 void ExplodePrefabUndoAction::redo()
@@ -560,12 +560,12 @@ void ExplodePrefabUndoAction::redo()
 
    String name;
 
-   if ( prefab->getName() && prefab->getName()[0] != '\0' )   
-      name = prefab->getName();   
+   if ( prefab->getName() && prefab->getName()[0] != '\0' )
+      name = prefab->getName();
    else
       name = "prefab";
 
    name += "_exploded";
    name = Sim::getUniqueName( name );
-   mGroup->assignName( name );   
+   mGroup->assignName( name );
 }

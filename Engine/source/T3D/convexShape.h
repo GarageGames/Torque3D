@@ -55,7 +55,7 @@ public:
 	ConvexShapeCollisionConvex( const ConvexShapeCollisionConvex& cv ) {
 		mType      = ConvexShapeCollisionConvexType;
 		mObject    = cv.mObject;
-		pShape     = cv.pShape;		
+		pShape     = cv.pShape;
 	}
 
 	Point3F support(const VectorF& vec) const;
@@ -123,30 +123,30 @@ public:
       Vector< U32 > points;
       Vector< U32 > winding;
       Vector< Point2F > texcoords;
-      Vector< Triangle > triangles;			
+      Vector< Triangle > triangles;
       Point3F tangent;
       Point3F normal;
       Point3F centroid;
       F32 area;
       S32 id;
-   }; 
+   };
 
 	struct Geometry
-	{  
-		void generate( const Vector< PlaneF > &planes, const Vector< Point3F > &tangents );   
+	{
+		void generate( const Vector< PlaneF > &planes, const Vector< Point3F > &tangents );
 
-		Vector< Point3F > points;      
+		Vector< Point3F > points;
 		Vector< Face > faces;
 	};
 
-   static bool smRenderEdges;   
+   static bool smRenderEdges;
 
    // To prevent bitpack overflows.
    // This is only indirectly enforced by trucation when serializing.
    static const S32 smMaxSurfaces = 100;
 
 public:
-   
+
    ConvexShape();
    virtual ~ConvexShape();
 
@@ -155,7 +155,7 @@ public:
    // ConsoleObject
    static void initPersistFields();
 
-   // SimObject 
+   // SimObject
    virtual void inspectPostApply();
    virtual bool onAdd();
    virtual void onRemove();
@@ -168,7 +168,7 @@ public:
 
    // SceneObject
    virtual void onScaleChanged();
-   virtual void setTransform( const MatrixF &mat );   
+   virtual void setTransform( const MatrixF &mat );
    virtual void prepRenderImage( SceneRenderState *state );
    virtual void buildConvex( const Box3F &box, Convex *convex );
    virtual bool buildPolyList( PolyListContext context, AbstractPolyList *polyList, const Box3F &box, const SphereF &sphere );
@@ -181,7 +181,7 @@ public:
 
    /// Geometry access.
    /// @{
-         
+
       MatrixF getSurfaceWorldMat( S32 faceid, bool scaled = false ) const;
       void cullEmptyPlanes( Vector< U32 > *removedPlanes );
 		void exportToCollada();
@@ -212,9 +212,9 @@ protected:
    static S32 QSORT_CALLBACK _comparePlaneDist( const void *a, const void *b );
 
    static bool protectedSetSurface( void *object, const char *index, const char *data );
-  
+
 protected:
-   
+
    // The name of the Material we will use for rendering
    String            mMaterialName;
 
@@ -228,7 +228,7 @@ protected:
    U32 mVertCount;
    U32 mPrimCount;
 
-   Geometry mGeometry;  
+   Geometry mGeometry;
 
    Vector< PlaneF > mPlanes;
 
@@ -238,12 +238,12 @@ protected:
 
    Convex *mConvexList;
 
-   PhysicsBody *mPhysicsRep; 
+   PhysicsBody *mPhysicsRep;
 
    /// Geometry visualization
-   /// @{      
+   /// @{
 
-      F32 mNormalLength;   
+      F32 mNormalLength;
 
    /// @}
 

@@ -57,7 +57,7 @@ struct PhysicsState
 
    /// The position of the body.
    Point3F position;
-  
+
    /// The momentum in kilogram meters per second.
    Point3F momentum;
 
@@ -65,7 +65,7 @@ struct PhysicsState
    QuatF orientation;
 
    /// The angular momentum.
-   Point3F angularMomentum; 
+   Point3F angularMomentum;
 
    /// Is true if the shape is asleep.
    bool sleeping;
@@ -78,7 +78,7 @@ struct PhysicsState
    /// The linear velocity derived from the momentum.
    Point3F linVelocity;
 
-   /// 
+   ///
    Point3F angVelocity;
 
    /*
@@ -92,7 +92,7 @@ struct PhysicsState
    /// @}
 
 
-   /// Interpolates between two physics states leaving the 
+   /// Interpolates between two physics states leaving the
    /// result in this physics state.
 	inline PhysicsState& interpolate( const PhysicsState &a, const PhysicsState &b, F32 t )
 	{
@@ -103,7 +103,7 @@ struct PhysicsState
 		angularMomentum = a.angularMomentum*inverseT + b.angularMomentum*t;
 
       // Recalculate the velocities
-      //linVelocity = 
+      //linVelocity =
       //angVelocity
 
 		return *this;

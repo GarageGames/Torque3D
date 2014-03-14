@@ -30,16 +30,16 @@ IMPLEMENT_CONOBJECT( GuiRolloutCtrl );
 
 ConsoleDocClass( GuiRolloutCtrl,
    "@brief A container that shows a single child with an optional header bar that can be used to collapse and expand the rollout.\n\n"
-   
+
    "A rollout is a container that can be collapsed and expanded using smooth animation.  By default, rollouts will display a header "
    "with a caption along the top edge of the control which can be clicked by the user to toggle the collapse state of the rollout.\n\n"
-   
+
    "Rollouts will automatically size themselves to exactly fit around their child control.  They will also automatically position their child "
    "control in their upper left corner below the header (if present).\n\n"
-      
+
    "@note GuiRolloutCtrls will only work correctly with a single child control.  To put multiple controls in a rollout, put them "
       "in their own group using a new GuiControl which then can be put inside the rollout.\n\n"
-   
+
    "@ingroup GuiContainers"
 );
 
@@ -85,7 +85,7 @@ GuiRolloutCtrl::~GuiRolloutCtrl()
 void GuiRolloutCtrl::initPersistFields()
 {
    addGroup( "Rollout" );
-   
+
       addField( "caption", TypeRealString, Offset( mCaption, GuiRolloutCtrl ),
          "Text label to display on the rollout header." );
       addField( "margin", TypeRectI, Offset( mMargin, GuiRolloutCtrl ),
@@ -105,7 +105,7 @@ void GuiRolloutCtrl::initPersistFields()
          "is expanded.  If this is false, the auto-collapse behavior can be triggered by CTRL (CMD on MAC) "
          "clicking the rollout header.  CTRL/CMD clicking also works if this is false, in which case the "
          "auto-collapsing of sibling controls will be temporarily deactivated." );
-         
+
    endGroup( "Rollout" );
 
    Parent::initPersistFields();
@@ -183,7 +183,7 @@ bool GuiRolloutCtrl::_onMouseUp( const GuiEvent &event, bool lockedMouse )
    if( mCanCollapse && mHeader.pointInRect( localPoint ) && !mIsAnimating && ( !lockedMouse || isMouseLocked() ) )
    {
       // If Ctrl/Cmd-clicking a header, collapse all sibling GuiRolloutCtrls.
-      
+
       if(    ( mAutoCollapseSiblings && !mIsExpanded && !( event.modifier & SI_PRIMARY_CTRL )
           || ( !mAutoCollapseSiblings && event.modifier & SI_PRIMARY_CTRL ) ) )
       {
@@ -193,20 +193,20 @@ bool GuiRolloutCtrl::_onMouseUp( const GuiEvent &event, bool lockedMouse )
             if( ctrl && ctrl != this && ctrl->mCanCollapse )
                ctrl->instantCollapse();
          }
-         
+
          if( !mIsExpanded )
             expand();
       }
       else
       {
          // Toggle expansion.
-         
+
          toggleExpanded( false );
       }
-      
+
       return true;
    }
-   
+
    return false;
 }
 
@@ -224,7 +224,7 @@ void GuiRolloutCtrl::onMouseUp( const GuiEvent &event )
 void GuiRolloutCtrl::onRightMouseUp( const GuiEvent& event )
 {
    Parent::onRightMouseUp( event );
-   
+
    Point2I localMouse = globalToLocalCoord( event.mousePoint );
    if( mHeader.pointInRect( localMouse ) )
       onHeaderRightClick_callback();
@@ -260,7 +260,7 @@ void GuiRolloutCtrl::calculateHeights()
    {
       mHeader.set( 0, 0, getWidth(), barHeight );
    }
-   
+
    if ( mHideHeader )
    {
       barHeight = 0;
@@ -285,7 +285,7 @@ bool GuiRolloutCtrl::resize( const Point2I &newPosition, const Point2I &newExten
    calculateHeights();
 
    GuiControl *content = dynamic_cast<GuiControl*>( at(0) );
-   
+
    // Size Content Properly?!
    if ( mNotifyChildrenResized && content != NULL )
    {
@@ -295,9 +295,9 @@ bool GuiRolloutCtrl::resize( const Point2I &newPosition, const Point2I &newExten
          barHeight = mProfile->mBitmapArrayRects[ TopLeftHeader ].extent.y;
       }
 
-      mChildRect.set( mMargin.point.x, 
-                      mHeader.extent.y + mMargin.point.y, 
-                      getWidth() - ( mMargin.point.x + mMargin.extent.x ), 
+      mChildRect.set( mMargin.point.x,
+                      mHeader.extent.y + mMargin.point.y,
+                      getWidth() - ( mMargin.point.x + mMargin.extent.x ),
                       getHeight() - ( barHeight + ( mMargin.point.y + mMargin.extent.y ) ) );
 
       if ( content->resize( mChildRect.point, mChildRect.extent ) )
@@ -350,7 +350,7 @@ void GuiRolloutCtrl::instantCollapse()
 //-----------------------------------------------------------------------------
 
 void GuiRolloutCtrl::toggleExpanded( bool instant )
-{   
+{
    if ( mIsExpanded )
    {
       if ( instant )

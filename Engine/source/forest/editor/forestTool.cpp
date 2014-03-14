@@ -43,7 +43,7 @@ ConsoleDocClass( ForestTool,
 ForestTool::ForestTool()
    : mForest( NULL ),
      mEditor( NULL )
-{   
+{
 }
 
 ForestTool::~ForestTool()
@@ -59,7 +59,7 @@ void ForestTool::_submitUndo( UndoAction *action )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       Con::errorf( "ForestTool::_submitUndo() - EUndoManager not found!" );
-      return;     
+      return;
    }
 
    undoMan->addAction( action );

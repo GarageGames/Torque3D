@@ -100,7 +100,7 @@ class SceneZoneSpace : public SceneSpace
 
       ///
       BitSet32 mZoneFlags;
-      
+
       /// @name Occluders
       ///
       /// Zone spaces keep track of the occluders that get added to them so that during

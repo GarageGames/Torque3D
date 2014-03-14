@@ -47,7 +47,7 @@ class MessageQueue;
 
 //-----------------------------------------------------------------------------
 /// @brief Base class for messages
-/// 
+///
 /// Message is the base class for C++ defined messages, and may also be used
 /// in script for script defined messages if no C++ subclass is appropriate.
 ///
@@ -77,7 +77,7 @@ class MessageQueue;
 /// fields. Messages that need to be handled in C++ as well as script
 /// provide the relevant data through persistent fields in a subclass of
 /// Message to provide best performance on the C++ side. Script defined
-/// messages usually their through dynamic fields, and may be accessed in 
+/// messages usually their through dynamic fields, and may be accessed in
 /// C++ using the SimObject::getDataField() method.
 //-----------------------------------------------------------------------------
 class Message : public SimObject
@@ -104,7 +104,7 @@ public:
    /// If you store a message object in script and do not clear the variable
    /// containing the object ID after freeing the message, it is probable that
    /// the object ID will become valid again.
-   /// 
+   ///
    /// @return Next available SimObjectId
    //-----------------------------------------------------------------------------
    static SimObjectId getNextMessageID();
@@ -118,7 +118,7 @@ public:
    /// The message type is either the script class name or the C++ class name
    /// if it has not been overridden in script. This allows easy identification
    /// of message types with minimum effort.
-   /// 
+   ///
    /// @return Type of message
    //-----------------------------------------------------------------------------
    const char *getType();
@@ -127,14 +127,14 @@ public:
    /// @brief Add a reference to the reference count of this message
    ///
    /// Use freeReference() to free the reference when you are done with it.
-   /// 
+   ///
    /// @see freeReference()
    //-----------------------------------------------------------------------------
    void addReference() { incRefCount(); }
 
    //-----------------------------------------------------------------------------
    /// @brief Free a reference to this message
-   /// 
+   ///
    /// @see addReference()
    //-----------------------------------------------------------------------------
    void freeReference() { decRefCount(); }

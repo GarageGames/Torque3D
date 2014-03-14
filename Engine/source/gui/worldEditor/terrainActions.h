@@ -258,20 +258,20 @@ class SmoothHeightAction : public TerrainAction
       void process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type);
 };
 
-class SmoothSlopeAction : public TerrainAction  
-{  
-   public:  
-      SmoothSlopeAction(TerrainEditor * editor) : TerrainAction(editor){}  
-      StringTableEntry getName(){return("smoothSlope");}  
-  
-      void process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type);  
-};  
+class SmoothSlopeAction : public TerrainAction
+{
+   public:
+      SmoothSlopeAction(TerrainEditor * editor) : TerrainAction(editor){}
+      StringTableEntry getName(){return("smoothSlope");}
+
+      void process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type);
+};
 
 class PaintNoiseAction : public TerrainAction
 {
    public:
 
-      PaintNoiseAction( TerrainEditor *editor ) 
+      PaintNoiseAction( TerrainEditor *editor )
          :  TerrainAction( editor ),
             mNoiseSize( 256 )
       {
@@ -281,10 +281,10 @@ class PaintNoiseAction : public TerrainAction
          //Vector<F32> scratch = mNoiseData;
          //mNoise.rigidMultiFractal( &mNoiseData, &scratch, TerrainBlock::BlockSize, 12, 1.0f, 5.0f );
          mNoise.getMinMax( &mNoiseData, &mMinMaxNoise.x, &mMinMaxNoise.y, mNoiseSize );
-       
+
          mScale = 1.5f / ( mMinMaxNoise.x - mMinMaxNoise.y);
       }
-      
+
       StringTableEntry getName() { return "paintNoise"; }
 
       void process( Selection *sel, const Gui3DMouseEvent &event, bool selChanged, Type type );
@@ -306,14 +306,14 @@ class PaintNoiseAction : public TerrainAction
 class ThermalErosionAction : public TerrainAction
 {
    public:
-      ThermalErosionAction(TerrainEditor * editor) 
+      ThermalErosionAction(TerrainEditor * editor)
       : TerrainAction(editor)
       {
          mNoise.setSeed( 1 );//Sim::getCurrentTime() );
          mNoiseData.setSize( TerrainBlock::BlockSize * TerrainBlock::BlockSize );
          mTerrainHeights.setSize( TerrainBlock::BlockSize * TerrainBlock::BlockSize );
       }
-      
+
       StringTableEntry getName(){return("thermalErode");}
 
       void process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type);

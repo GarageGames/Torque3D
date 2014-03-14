@@ -142,7 +142,7 @@ DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMa
    "%TypeMasks = $TypeMasks::StaticObjectType | $TypeMasks::ItemObjectType\n\n"
    "// Acquire the damage value from 0.0f - 1.0f.\n"
    "%coverage = calcExplosionCoverage( %position, %sceneObject, %TypeMasks );\n\n"
-   "// Apply damage to object\n" 
+   "// Apply damage to object\n"
    "%sceneObject.applyDamage( %coverage * 20 );\n"
    "@endtsexample\n"
    "@ingroup FX")
@@ -733,7 +733,7 @@ bool ExplosionData::preload(bool server, String &errorStr)
 {
    if (Parent::preload(server, errorStr) == false)
       return false;
-      
+
    if( !server )
    {
       String errorStr;
@@ -802,7 +802,7 @@ Explosion::~Explosion()
       mExplosionInstance = NULL;
       mExplosionThread   = NULL;
    }
-   
+
    SAFE_DELETE(mLight);
 }
 
@@ -1087,7 +1087,7 @@ void Explosion::processTick(const Move*)
          deleteObject();
          return;
    }
-         
+
    if( (mCurrMS > mDelayMS) && !mActive )
       explode();
 }

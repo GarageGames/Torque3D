@@ -29,28 +29,28 @@
 function GuiEditorNewGuiDialog::init( %this, %guiName, %guiClass )
 {
    %this-->nameField.setValue( %guiName );
-   
+
    // Initialize the class dropdown if we haven't already.
-   
+
    %classDropdown = %this-->classDropdown;
    if( !%classDropdown.size() )
    {
       %classes = enumerateConsoleClassesByCategory( "Gui" );
       %count = getFieldCount( %classes );
-      
+
       for( %i = 0; %i < %count; %i ++ )
       {
          %className = getField( %classes, %i );
          if( GuiEditor.isFilteredClass( %className )
              || !isMemberOfClass( %className, "GuiControl" ) )
             continue;
-            
+
          %classDropdown.add( %className, 0 );
       }
-      
+
       %classDropdown.sort();
    }
-   
+
    %classDropdown.setText( "GuiControl" );
 }
 
@@ -91,10 +91,10 @@ function GuiEditorNewGuiDialog::onOK( %this )
    {
       %this.getRoot().popDialog( %this );
       %obj = eval("return new " @ %class @ "(" @ %name @ ");");
-      
+
       // Make sure we have no association with a filename.
       %obj.setFileName( "" );
-      
+
       GuiEditContent(%obj);
    }
 }

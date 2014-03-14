@@ -87,7 +87,7 @@ class AsyncPacketQueue
 
       ///
       typedef typename TypeTraits< TimeSource >::BaseType TimeSourceType;
-      
+
       /// Type for counting ticks.
       typedef Tick TickType;
 
@@ -138,7 +138,7 @@ class AsyncPacketQueue
 
       /// Total number of packets queued so far.
       U32 mTotalQueuedPackets;
-      
+
    public:
 
       /// Construct an AsyncPacketQueue of the given length.
@@ -196,7 +196,7 @@ class AsyncPacketQueue
 
       /// Return the total number of ticks that have been queued so far.
       TickType getTotalQueuedTicks() const { return mTotalQueuedTicks; }
-      
+
       /// Return the total number of packets that have been queued so far.
       U32 getTotalQueuedPackets() const { return mTotalQueuedPackets; }
 };
@@ -243,7 +243,7 @@ bool AsyncPacketQueue< Packet, TimeSource, Consumer, Tick >::needPacket()
          U32( currentTick ),
          mPacketQueue.size() );
       #endif
-      
+
       mPacketQueue.popFront();
    }
 
@@ -260,7 +260,7 @@ bool AsyncPacketQueue< Packet, TimeSource, Consumer, Tick >::submitPacket( Packe
 
    TickType packetStartPos;
    TickType packetEndPos;
-   
+
    if( packetPos != TypeTraits< TickType >::MAX )
    {
       packetStartPos = packetPos;
@@ -304,9 +304,9 @@ bool AsyncPacketQueue< Packet, TimeSource, Consumer, Tick >::submitPacket( Packe
    mTotalQueuedTicks = packetEndPos;
    if( isLast && !mTotalTicks )
       mTotalTicks = mTotalQueuedTicks;
-      
+
    mTotalQueuedPackets ++;
-   
+
    return !dropPacket;
 }
 

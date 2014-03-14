@@ -33,7 +33,7 @@ function clientCmdGameEnd(%seq)
 {
    // Stop local activity... the game will be destroyed on the server
    sfxStopAll();
-   
+
    if ((!EditorIsActive() && !GuiEditorIsActive()))
    {
       // Copy the current scores from the player list into the

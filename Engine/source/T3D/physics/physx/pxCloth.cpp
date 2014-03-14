@@ -42,8 +42,8 @@
 IMPLEMENT_CO_NETOBJECT_V1( PxCloth );
 
 ConsoleDocClass( PxCloth,
-   
-   "@brief Rectangular patch of cloth simulated by PhysX.\n\n"  
+
+   "@brief Rectangular patch of cloth simulated by PhysX.\n\n"
 
    "PxCloth is affected by other objects in the simulation but does not itself "
    "affect others, it is essentially a visual effect. Eg, shooting at cloth will "
@@ -55,7 +55,7 @@ ConsoleDocClass( PxCloth,
    "that add up to the same number of verts.\n\n"
 
    "Note that most field docs have been copied from their PhysX counterpart.\n\n"
-   
+
    "@ingroup Physics"
 );
 
@@ -85,12 +85,12 @@ PxCloth::PxCloth()
    mScene( NULL ),
    mMatInst( NULL )
 {
-   mVertexRenderBuffer = NULL; 
+   mVertexRenderBuffer = NULL;
    mIndexRenderBuffer = NULL;
 
    mMaxVertices = 0;
    mMaxIndices = 0;
-  
+
    mClothMesh = NULL;
    mCloth = NULL;
 
@@ -140,7 +140,7 @@ bool PxCloth::onAdd()
 
       mResetXfm = getTransform();
 
-      _createClothPatch();      
+      _createClothPatch();
 
       PhysicsPlugin::getPhysicsResetSignal().notify( this, &PxCloth::onPhysicsReset, 1053.0f );
    }
@@ -151,7 +151,7 @@ bool PxCloth::onAdd()
       _updateStaticCloth();
 
    addToScene();
-   
+
    // Also the server object never ticks.
    if ( isServerObject() )
       setProcessTick( false );
@@ -160,7 +160,7 @@ bool PxCloth::onAdd()
 }
 
 void PxCloth::onRemove()
-{   
+{
    SAFE_DELETE( mMatInst );
 
    if ( isClientObject() )
@@ -232,7 +232,7 @@ void PxCloth::initPersistFields()
 
    addField( "bendingStiffness", TypeF32, Offset( mBendingStiffness, PxCloth ),
       "@brief Bending stiffness of the cloth in the range 0 to 1.\n\n" );
-   
+
    addField( "dampingCoefficient", TypeF32, Offset( mDampingCoefficient, PxCloth ),
       "@brief Spring damping of the cloth in the range 0 to 1.\n\n" );
 
@@ -349,7 +349,7 @@ void PxCloth::unpackUpdate( NetConnection *conn, BitStream *stream )
          _releaseCloth();
       }
 
-      if (  isClientObject() && 
+      if (  isClientObject() &&
             isProperlyAdded() &&
             mWorld &&
             !mCloth )
@@ -393,7 +393,7 @@ void PxCloth::setScale( const VectorF &scale )
 }
 
 void PxCloth::prepRenderImage( SceneRenderState *state )
-{  
+{
    if ( mIsVBDirty )
       _updateVBIB();
 
@@ -401,7 +401,7 @@ void PxCloth::prepRenderImage( SceneRenderState *state )
    if ( !mMatInst )
       _initMaterial();
 
-   // If we don't have a material instance after the override then 
+   // If we don't have a material instance after the override then
    // we can skip rendering all together.
    BaseMatInstance *matInst = state->getOverrideMaterial( mMatInst );
    if ( !matInst )
@@ -420,7 +420,7 @@ void PxCloth::prepRenderImage( SceneRenderState *state )
    ri->projection = state->getRenderPass()->allocSharedXform(RenderPassManager::Projection);
    ri->objectToWorld = &MatrixF::Identity;
 
-   ri->worldToCamera = state->getRenderPass()->allocSharedXform(RenderPassManager::View);   
+   ri->worldToCamera = state->getRenderPass()->allocSharedXform(RenderPassManager::View);
    ri->type = RenderPassManager::RIT_Mesh;
 
    ri->primBuff = &mPrimBuffer;
@@ -478,67 +478,67 @@ void PxCloth::_initClothMesh()
    mPatchVerts.x = getMax( 2, mPatchVerts.x );
    mPatchVerts.y = getMax( 2, mPatchVerts.y );
 
-   // Generate a uniform cloth patch, 
-   // w and h are the width and height, 
-   // d is the distance between vertices.  
+   // Generate a uniform cloth patch,
+   // w and h are the width and height,
+   // d is the distance between vertices.
    mNumVertices = mPatchVerts.x * mPatchVerts.y;
    mNumIndices = (mPatchVerts.x-1) * (mPatchVerts.y-1) * 2;
 
    NxClothMeshDesc desc;
-   desc.numVertices = mNumVertices;    
-   desc.numTriangles = mNumIndices;   
-   desc.pointStrideBytes = sizeof(NxVec3);    
-   desc.triangleStrideBytes = 3*sizeof(NxU32);    
-   desc.points = (NxVec3*)dMalloc(sizeof(NxVec3)*desc.numVertices);    
-   desc.triangles = (NxU32*)dMalloc(sizeof(NxU32)*desc.numTriangles*3);    
-   desc.flags = 0;    
+   desc.numVertices = mNumVertices;
+   desc.numTriangles = mNumIndices;
+   desc.pointStrideBytes = sizeof(NxVec3);
+   desc.triangleStrideBytes = 3*sizeof(NxU32);
+   desc.points = (NxVec3*)dMalloc(sizeof(NxVec3)*desc.numVertices);
+   desc.triangles = (NxU32*)dMalloc(sizeof(NxU32)*desc.numTriangles*3);
+   desc.flags = 0;
 
-   U32 i,j;    
-   NxVec3 *p = (NxVec3*)desc.points;    
-   
+   U32 i,j;
+   NxVec3 *p = (NxVec3*)desc.points;
+
    F32 patchWidth = mPatchSize.x / (F32)( mPatchVerts.x - 1 );
    F32 patchHeight = mPatchSize.y / (F32)( mPatchVerts.y - 1 );
 
-   for (i = 0; i < mPatchVerts.y; i++) 
-   {        
-      for (j = 0; j < mPatchVerts.x; j++) 
-      {            
-         p->set( patchWidth * j, 0.0f, patchHeight * i );     
+   for (i = 0; i < mPatchVerts.y; i++)
+   {
+      for (j = 0; j < mPatchVerts.x; j++)
+      {
+         p->set( patchWidth * j, 0.0f, patchHeight * i );
          p++;
-      }    
+      }
    }
 
-   NxU32 *id = (NxU32*)desc.triangles;    
-   
-   for (i = 0; i < mPatchVerts.y-1; i++) 
-   {        
-      for (j = 0; j < mPatchVerts.x-1; j++) 
-      {            
-         NxU32 i0 = i * mPatchVerts.x + j;            
-         NxU32 i1 = i0 + 1;            
-         NxU32 i2 = i0 + mPatchVerts.x;            
-         NxU32 i3 = i2 + 1;            
-         if ( (j+i) % 2 ) 
-         {                
-            *id++ = i0; 
-            *id++ = i2; 
-            *id++ = i1;                
-            *id++ = i1; 
-            *id++ = i2; 
-            *id++ = i3;            
-         }            
-         else 
-         {                
-            *id++ = i0; 
-            *id++ = i2; 
-            *id++ = i3;                
-            *id++ = i0; 
-            *id++ = i3; 
-            *id++ = i1;            
-         }        
-      }    
-   }   
-   
+   NxU32 *id = (NxU32*)desc.triangles;
+
+   for (i = 0; i < mPatchVerts.y-1; i++)
+   {
+      for (j = 0; j < mPatchVerts.x-1; j++)
+      {
+         NxU32 i0 = i * mPatchVerts.x + j;
+         NxU32 i1 = i0 + 1;
+         NxU32 i2 = i0 + mPatchVerts.x;
+         NxU32 i3 = i2 + 1;
+         if ( (j+i) % 2 )
+         {
+            *id++ = i0;
+            *id++ = i2;
+            *id++ = i1;
+            *id++ = i1;
+            *id++ = i2;
+            *id++ = i3;
+         }
+         else
+         {
+            *id++ = i0;
+            *id++ = i2;
+            *id++ = i3;
+            *id++ = i0;
+            *id++ = i3;
+            *id++ = i1;
+         }
+      }
+   }
+
    NxCookingInterface *cooker = PxWorld::getCooking();
    cooker->NxInitCooking();
 
@@ -549,17 +549,17 @@ void PxCloth::_initClothMesh()
    params.hintCollisionSpeed = false;
 
    cooker->NxSetCookingParams( params );
-  
-   PxMemStream cooked;	
-  
+
+   PxMemStream cooked;
+
    if ( cooker->NxCookClothMesh( desc, cooked ) )
    {
       cooked.resetPosition();
       mClothMesh = gPhysicsSDK->createClothMesh( cooked );
    }
-   
+
    cooker->NxCloseCooking();
-   
+
    NxVec3 *ppoints = (NxVec3*)desc.points;
    NxU32 *triangs = (NxU32*)desc.triangles;
 
@@ -579,7 +579,7 @@ void PxCloth::_initReceiveBuffers()
 
    mMaxVertices = 3 * mNumVertices;
    mMaxIndices = 3 * mNumIndices;
-   
+
    // Allocate Render Buffer for Vertices if it hasn't been done before
    mVertexRenderBuffer = new GFXVertexPNTT[mMaxVertices];
    mIndexRenderBuffer = new U16[mMaxIndices];
@@ -603,9 +603,9 @@ void PxCloth::_initReceiveBuffers()
    F32 dy = 1.0f / (F32)(mPatchVerts.y-1);
 
    F32 *coord = (F32*)&mVertexRenderBuffer[0].texCoord;
-   for ( U32 i = 0; i < mPatchVerts.y; i++) 
+   for ( U32 i = 0; i < mPatchVerts.y; i++)
    {
-      for ( U32 j = 0; j < mPatchVerts.x; j++) 
+      for ( U32 j = 0; j < mPatchVerts.x; j++)
       {
          coord[0] = j*dx;
          coord[1] = i*-dy;
@@ -622,7 +622,7 @@ void PxCloth::_initReceiveBuffers()
    mMeshDirtyFlags = 0;
    mReceiveBuffers.dirtyBufferFlagsPtr = &mMeshDirtyFlags;
 
-   // init the buffers in case we want to draw the mesh 
+   // init the buffers in case we want to draw the mesh
    // before the SDK as filled in the correct values
 
    mReceiveBuffers.flags |= NX_MDF_16_BIT_INDICES;
@@ -647,12 +647,12 @@ bool PxCloth::_createClothPatch()
    desc.globalPose.setRowMajor44( getTransform() );
    desc.thickness = mThickness;
    desc.density = mDensity;
-   desc.bendingStiffness = mBendingStiffness;   
+   desc.bendingStiffness = mBendingStiffness;
    desc.dampingCoefficient = mDampingCoefficient;
    desc.friction = mFriction;
-   
+
    if ( mBendingEnabled )
-      desc.flags |= NX_CLF_BENDING;   
+      desc.flags |= NX_CLF_BENDING;
    if ( mDampingEnabled )
       desc.flags |= NX_CLF_DAMPING;
    if ( mTriangleCollisionEnabled )
@@ -660,7 +660,7 @@ bool PxCloth::_createClothPatch()
    if ( mSelfCollisionEnabled )
       desc.flags |= NX_CLF_SELFCOLLISION;
 
-   desc.clothMesh = mClothMesh;    
+   desc.clothMesh = mClothMesh;
    desc.meshData = mReceiveBuffers;
 
    if ( !desc.isValid() )
@@ -687,7 +687,7 @@ void PxCloth::_updateClothProperties()
 
    NxU32 flags = NX_CLF_GRAVITY; // TODO: Expose this?
    if ( mBendingEnabled )
-      flags |= NX_CLF_BENDING;   
+      flags |= NX_CLF_BENDING;
    if ( mDampingEnabled )
       flags |= NX_CLF_DAMPING;
    if ( mTriangleCollisionEnabled )
@@ -739,7 +739,7 @@ void PxCloth::_updateVBIB()
          vert->tangent = -(vert->point - secondVert->point);
       }
       else
-      {      
+      {
          secondVert = vert;
          secondVert++;
          vert->tangent = vert->point - secondVert->point;
@@ -765,7 +765,7 @@ void PxCloth::_updateVBIB()
 void PxCloth::_updateStaticCloth()
 {
    // Setup the unsimulated world bounds.
-   mObjBox.set(   0, mThickness * -0.5f, 0, 
+   mObjBox.set(   0, mThickness * -0.5f, 0,
                   mPatchSize.x, mThickness * 0.5f, mPatchSize.y );
    resetWorldBox();
 
@@ -784,10 +784,10 @@ void PxCloth::_updateStaticCloth()
 
    GFXVertexPNTT *vert = mVertexRenderBuffer;
 
-   for (U32 y = 0; y < mPatchVerts.y; y++) 
-   {        
-      for (U32 x = 0; x < mPatchVerts.x; x++) 
-      {            
+   for (U32 y = 0; y < mPatchVerts.y; y++)
+   {
+      for (U32 x = 0; x < mPatchVerts.x; x++)
+      {
          vert->point.set( patchWidth * x, 0.0f, patchHeight * y );
          getTransform().mulP( vert->point );
          vert->normal = normal;
@@ -799,10 +799,10 @@ void PxCloth::_updateStaticCloth()
    mNumIndices = (mPatchVerts.x-1) * (mPatchVerts.y-1) * 6;
    U16 yOffset = mPatchVerts.x;
 
-   for (U32 y = 0; y < mPatchVerts.y-1; y++) 
-   {   
-      for (U32 x = 0; x < mPatchVerts.x-1; x++) 
-      {       
+   for (U32 y = 0; y < mPatchVerts.y-1; y++)
+   {
+      for (U32 x = 0; x < mPatchVerts.x-1; x++)
+      {
          U16 base = x + ( yOffset * y );
 
          index[0] = base;
@@ -845,7 +845,7 @@ void PxCloth::processTick( const Move *move )
    if ( mWorld->getEnabled() )
    {
       NxBounds3 box;
-      mCloth->getWorldBounds( box ); 
+      mCloth->getWorldBounds( box );
 
       Point3F min = pxCast<Point3F>( box.min );
       Point3F max = pxCast<Point3F>( box.max );
@@ -857,7 +857,7 @@ void PxCloth::processTick( const Move *move )
    }
    else
    {
-      mObjBox.set(   0, mThickness * -0.5f, 0, 
+      mObjBox.set(   0, mThickness * -0.5f, 0,
                      mPatchSize.x, mThickness * 0.5f, mPatchSize.y );
    }
 
@@ -891,11 +891,11 @@ void PxCloth::_setupAttachments()
    if ( mAttachmentMask & BIT( 0 ) )
       mCloth->attachVertexToGlobalPosition( 0, mCloth->getPosition( 0 ) );
    if ( mAttachmentMask & BIT( 1 ) )
-      mCloth->attachVertexToGlobalPosition( mPatchVerts.x-1, mCloth->getPosition( mPatchVerts.x-1 ) );   
+      mCloth->attachVertexToGlobalPosition( mPatchVerts.x-1, mCloth->getPosition( mPatchVerts.x-1 ) );
    if ( mAttachmentMask & BIT( 2 ) )
       mCloth->attachVertexToGlobalPosition( mPatchVerts.x * mPatchVerts.y - mPatchVerts.x, mCloth->getPosition( mPatchVerts.x * mPatchVerts.y - mPatchVerts.x ) );
    if ( mAttachmentMask & BIT( 3 ) )
-      mCloth->attachVertexToGlobalPosition( mPatchVerts.x * mPatchVerts.y - 1, mCloth->getPosition( mPatchVerts.x * mPatchVerts.y - 1 ) );   
+      mCloth->attachVertexToGlobalPosition( mPatchVerts.x * mPatchVerts.y - 1, mCloth->getPosition( mPatchVerts.x * mPatchVerts.y - 1 ) );
    if ( mAttachmentMask & BIT( 4 ) )
       mCloth->attachVertexToGlobalPosition( mPatchVerts.x * mPatchVerts.y - (mPatchVerts.x/2), mCloth->getPosition( mPatchVerts.x * mPatchVerts.y - (mPatchVerts.x/2) ) );
    if ( mAttachmentMask & BIT( 5 ) )
@@ -904,11 +904,11 @@ void PxCloth::_setupAttachments()
       mCloth->attachVertexToGlobalPosition( mPatchVerts.x * (mPatchVerts.y/2), mCloth->getPosition( mPatchVerts.x * (mPatchVerts.y/2) ) );
    if ( mAttachmentMask & BIT( 7 ) )
       mCloth->attachVertexToGlobalPosition( mPatchVerts.x * (mPatchVerts.y/2) + (mPatchVerts.x-1), mCloth->getPosition( mPatchVerts.x * (mPatchVerts.y/2) + (mPatchVerts.x-1) ) );
-   
+
    if ( mAttachmentMask & BIT( 8 ) )
       for ( U32 i = mPatchVerts.x * mPatchVerts.y - mPatchVerts.x; i < mPatchVerts.x * mPatchVerts.y; i++ )
          mCloth->attachVertexToGlobalPosition( i, mCloth->getPosition( i ) );
-   
+
    if ( mAttachmentMask & BIT( 9 ) )
       for ( U32 i = 0; i < mPatchVerts.x; i++ )
          mCloth->attachVertexToGlobalPosition( i, mCloth->getPosition( i ) );

@@ -36,11 +36,11 @@ class ShaderDependency
 {
 public:
    virtual ~ShaderDependency() {}
-   
+
    /// Compare this dependency to another one.
-   virtual bool operator==( const ShaderDependency &cmpTo ) const 
-   { 
-      return this == &cmpTo; 
+   virtual bool operator==( const ShaderDependency &cmpTo ) const
+   {
+      return this == &cmpTo;
    }
 
    /// Print the dependency into the header of a shader.

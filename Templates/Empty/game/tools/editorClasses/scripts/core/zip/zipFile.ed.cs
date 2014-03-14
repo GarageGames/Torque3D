@@ -30,9 +30,9 @@ function ZipObject::addPath( %this, %path, %pathInZip )
    {
       %zipRel = makeRelativePath( %file, %beginPath );
       %finalZip = pathConcat(%pathInZip, %zipRel);
-      
+
       %this.addFile( %file, %finalZip );
 
       %file = findNextFile(%path);
-   }   
+   }
 }

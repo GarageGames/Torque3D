@@ -45,7 +45,7 @@ MODULE_BEGIN( LeapMotionDevice )
       // Register the device with the Input Event Manager
       INPUTMGR->registerDevice(LEAPMOTIONDEV);
    }
-   
+
    MODULE_SHUTDOWN
    {
       INPUTMGR->unregisterDevice(LEAPMOTIONDEV);
@@ -111,29 +111,29 @@ LeapMotionDevice::~LeapMotionDevice()
 
 void LeapMotionDevice::staticInit()
 {
-   Con::addVariable("pref::LeapMotion::EnableDevice", TypeBool, &smEnableDevice, 
+   Con::addVariable("pref::LeapMotion::EnableDevice", TypeBool, &smEnableDevice,
       "@brief If true, the Leap Motion device will be enabled, if present.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("LeapMotion::GenerateIndividualEvents", TypeBool, &smGenerateIndividualEvents, 
+   Con::addVariable("LeapMotion::GenerateIndividualEvents", TypeBool, &smGenerateIndividualEvents,
       "@brief Indicates that events for each hand and pointable will be created.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("LeapMotion::KeepHandIndexPersistent", TypeBool, &smKeepHandIndexPersistent, 
+   Con::addVariable("LeapMotion::KeepHandIndexPersistent", TypeBool, &smKeepHandIndexPersistent,
       "@brief Indicates that we track hand IDs and will ensure that the same hand will remain at the same index between frames.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("LeapMotion::KeepPointableIndexPersistent", TypeBool, &smKeepPointableIndexPersistent, 
+   Con::addVariable("LeapMotion::KeepPointableIndexPersistent", TypeBool, &smKeepPointableIndexPersistent,
       "@brief Indicates that we track pointable IDs and will ensure that the same pointable will remain at the same index between frames.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("LeapMotion::GenerateSingleHandRotationAsAxisEvents", TypeBool, &smGenerateSingleHandRotationAsAxisEvents, 
+   Con::addVariable("LeapMotion::GenerateSingleHandRotationAsAxisEvents", TypeBool, &smGenerateSingleHandRotationAsAxisEvents,
       "@brief If true, broadcast single hand rotation as axis events.\n\n"
 	   "@ingroup Game");
-   Con::addVariable("LeapMotion::MaximumHandAxisAngle", TypeF32, &smMaximumHandAxisAngle, 
+   Con::addVariable("LeapMotion::MaximumHandAxisAngle", TypeF32, &smMaximumHandAxisAngle,
       "@brief The maximum hand angle when used as an axis event as measured from a vector pointing straight up (in degrees).\n\n"
       "Shoud range from 0 to 90 degrees.\n\n"
 	   "@ingroup Game");
 
-   Con::addVariable("LeapMotion::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents, 
+   Con::addVariable("LeapMotion::GenerateWholeFrameEvents", TypeBool, &smGenerateWholeFrameEvents,
       "@brief Indicates that a whole frame event should be generated and frames should be buffered.\n\n"
 	   "@ingroup Game");
 }

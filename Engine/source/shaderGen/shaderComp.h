@@ -42,7 +42,7 @@ class ShaderComponent
 {
 public:
    virtual ~ShaderComponent() {}
-   
+
    virtual void print( Stream &stream ){};
 };
 
@@ -78,8 +78,8 @@ public:
    virtual ~ShaderConnector();
 
    ///
-   virtual Var* getElement(   RegisterType type, 
-                              U32 numElements = 1, 
+   virtual Var* getElement(   RegisterType type,
+                              U32 numElements = 1,
                               U32 numRegisters = -1 ) = 0;
 
    virtual void setName( char *newName ) = 0;

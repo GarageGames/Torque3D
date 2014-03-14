@@ -67,7 +67,7 @@ public:
 
    //-----------------------------------------------------------------------------
    /// @brief Callback for when messages are received
-   /// 
+   ///
    /// @param queue The name of the queue the message was dispatched to
    /// @param msg The type of message
    /// @param data The data for the message
@@ -78,7 +78,7 @@ public:
 
    //-----------------------------------------------------------------------------
    /// @brief Callback for when message objects are received
-   /// 
+   ///
    /// @param queue The name of the queue the message was dispatched to
    /// @param msg The message object
    /// @return false to prevent other listeners receiving this message, true otherwise
@@ -94,7 +94,7 @@ public:
    /// provide tracking of the queues this listener is added to through the
    /// #mQueues member. Overrides of onAddToQueue() or onRemoveFromQueue()
    /// should ensure they call the parent implementation in any overrides.
-   /// 
+   ///
    /// @param queue The name of the queue that the listener added to
    /// @see onRemoveFromQueue()
    //-----------------------------------------------------------------------------
@@ -102,12 +102,12 @@ public:
 
    //-----------------------------------------------------------------------------
    /// @brief Callback for when the listener is removed from a queue
-   /// 
+   ///
    /// The default implementation of onAddToQueue() and onRemoveFromQueue()
    /// provide tracking of the queues this listener is added to through the
    /// #mQueues member. Overrides of onAddToQueue() or onRemoveFromQueue()
    /// should ensure they call the parent implementation in any overrides.
-   /// 
+   ///
    /// @param queue The name of the queue the listener was removed from
    /// @see onAddToQueue()
    //-----------------------------------------------------------------------------
@@ -158,7 +158,7 @@ struct MessageQueue
 
 //-----------------------------------------------------------------------------
 /// @brief Check if a message queue is registered
-/// 
+///
 /// @param name The name of the message queue
 /// @return true if the queue is registered, false otherwise
 /// @see registerMessageQueue(), unregisterMessageQueue()
@@ -167,7 +167,7 @@ extern bool isQueueRegistered(const char *name);
 
 //-----------------------------------------------------------------------------
 /// @brief Register a message queue
-/// 
+///
 /// @param name The name of the message queue to register
 /// @see isQueueRegistered(), unregisterMessageQueue()
 //-----------------------------------------------------------------------------
@@ -175,7 +175,7 @@ extern void registerMessageQueue(const char *name);
 
 //-----------------------------------------------------------------------------
 /// @brief Register an anonymous message queue
-/// 
+///
 /// @return name of anonymous message queue for passing to other functions
 /// @see isQueueRegistered(), unregisterMessageQueue()
 //-----------------------------------------------------------------------------
@@ -183,7 +183,7 @@ extern const char *registerAnonMessageQueue();
 
 //-----------------------------------------------------------------------------
 /// @brief Unregister a message queue
-/// 
+///
 /// @param name The name of the message queue
 /// @see registerMessageQueue(), isQueueRegistered()
 //-----------------------------------------------------------------------------
@@ -191,7 +191,7 @@ extern void unregisterMessageQueue(const char *name);
 
 //-----------------------------------------------------------------------------
 /// @brief Register a listener with a queue to receive messages
-/// 
+///
 /// @param queue The name of the queue to register the listener with
 /// @param listener The listener interface that receives messages
 /// @return true for success, false otherwise
@@ -201,7 +201,7 @@ extern bool registerMessageListener(const char *queue, IMessageListener *listene
 
 //-----------------------------------------------------------------------------
 /// @brief Unregister a listener with a queue
-/// 
+///
 /// @param queue The name of the queue to unregister the listener
 /// @param listener The listener interface that was passed to registerMessageListener()
 /// @see registerMessageListener()
@@ -215,7 +215,7 @@ extern void unregisterMessageListener(const char *queue, IMessageListener *liste
 
 //-----------------------------------------------------------------------------
 /// @brief Dispatch a message to a queue
-/// 
+///
 /// @param queue Queue to dispatch the message to
 /// @param msg Message to dispatch
 /// @param data Data for message
@@ -226,7 +226,7 @@ extern bool dispatchMessage(const char *queue, const char *msg, const char *data
 
 //-----------------------------------------------------------------------------
 /// @brief Dispatch a message object to a queue
-/// 
+///
 /// @param queue Queue to dispatch the message to
 /// @param msg Message to dispatch
 /// @return true for success, false for failure
@@ -258,7 +258,7 @@ extern void unlockDispatcherMutex();
 
 //-----------------------------------------------------------------------------
 /// @brief Internal function: obtain message queue. Dispatcher mutex must be locked.
-/// 
+///
 /// @param name Name of the queue
 /// @return Message queue
 /// @see lockDispatcherMutex(), unlockDispatcherMutex()

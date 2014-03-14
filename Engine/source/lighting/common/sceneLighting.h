@@ -42,7 +42,7 @@ class SceneLighting : public SimObject
    typedef SimObject Parent;
 protected:
    AvailableSLInterfaces* mLightingInterfaces;
-   virtual void getMLName(const char* misName, const U32 missionCRC, const U32 buffSize, char* filenameBuffer);   
+   virtual void getMLName(const char* misName, const U32 missionCRC, const U32 buffSize, char* filenameBuffer);
 public:
    S32 sgTimeTemp;
    S32 sgTimeTemp2;
@@ -137,7 +137,7 @@ public:
       // Called to figure out if this object should be added to the shadow volume
       virtual bool supportsShadowVolume() { return false; }
       // Called to retrieve the clip planes of the object.  Currently used for terrain lighting, but could be used to speed up other
-      // lighting calculations.  
+      // lighting calculations.
       virtual void getClipPlanes(Vector<PlaneF>& planes) { }
       // Called to add the object to the shadow volume
       virtual void addToShadowVolume(ShadowVolumeBSP * shadowVolume, LightInfo * light, S32 level) { } ;

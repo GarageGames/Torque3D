@@ -80,7 +80,7 @@ struct Win32PlatState
    S32 desktopClientWidth;
    S32 desktopClientHeight;
    U32 currentTime;
-   
+
    // minimum time per frame
    U32 sleepTicks;
    // are we in the background?

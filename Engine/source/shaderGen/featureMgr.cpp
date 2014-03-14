@@ -38,7 +38,7 @@ MODULE_BEGIN( ShaderGenFeatureMgr )
    {
       ManagedSingleton< FeatureMgr >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< FeatureMgr >::deleteSingleton();
@@ -96,7 +96,7 @@ ShaderFeature* FeatureMgr::getByType( const FeatureType &type )
    return NULL;
 }
 
-void FeatureMgr::registerFeature(   const FeatureType &type, 
+void FeatureMgr::registerFeature(   const FeatureType &type,
                                     ShaderFeature *feature )
 {
    // Remove any existing feature first.

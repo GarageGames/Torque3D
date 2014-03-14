@@ -80,11 +80,11 @@ void vec_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result)
       loader[13] = matB[13];
       loader[14] = matB[14];
       loader[15] = matB[15];
-      
+
       vMultMatMat_4x4( A, B, C);
-      
+
       loader = (F32*) &C;
-      
+
       result[0] = loader[0];
       result[1] = loader[1];
       result[2] = loader[2];
@@ -112,9 +112,9 @@ void vec_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result)
       B[1][0] = vec_ld(16, matB);
       B[2][0] = vec_ld(32, matB);
       B[3][0] = vec_ld(48, matB);
-      
+
       vMultMatMat_4x4( A, B, C);
-      
+
       vec_st(C[0][0], 0,  result);
       vec_st(C[1][0], 16, result);
       vec_st(C[2][0], 32, result);

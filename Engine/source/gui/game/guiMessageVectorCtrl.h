@@ -145,11 +145,11 @@ class GuiMessageVectorCtrl : public GuiControl
    void callbackRouter(const MessageVector::MessageCode, const U32);
 
   public:
-   
+
    DECLARE_CONOBJECT(GuiMessageVectorCtrl);
    DECLARE_CATEGORY( "Gui Game" );
    DECLARE_DESCRIPTION( "A chat HUD control that displays messages from a MessageVector." );
-   
+
    static void initPersistFields();
 };
 

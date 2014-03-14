@@ -92,7 +92,7 @@
                Margin = "0 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -109,7 +109,7 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
 
                   new GuiControl() {
@@ -117,7 +117,7 @@
                      horizSizing = "right";
                      vertSizing = "bottom";
                      extent = "208 18";
-                     
+
                      new GuiTextCtrl() {
                         text = "Width:";
                         maxLength = "1024";
@@ -177,7 +177,7 @@
                      horizSizing = "right";
                      vertSizing = "bottom";
                      extent = "208 18";
-                     
+
                      new GuiTextCtrl() {
                         text = "Depth:";
                         maxLength = "1024";
@@ -237,7 +237,7 @@
                      horizSizing = "right";
                      vertSizing = "bottom";
                      extent = "208 18";
-                     
+
                      new GuiTextCtrl() {
                         text = "Normal:";
                         maxLength = "1024";
@@ -304,7 +304,7 @@
                Margin = "0 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -321,9 +321,9 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
-               
+
                   new GuiControl() {
                      isContainer = "1";
                      Profile = "ToolsGuiDefaultProfile";

@@ -54,7 +54,7 @@ struct StmtNode
 
    StmtNode();
    virtual ~StmtNode() {}
-   
+
    /// @name next Accessors
    /// @{
 
@@ -94,7 +94,7 @@ struct StmtNode
 #ifndef DEBUG_AST_NODES
 #  define DBG_STMT_TYPE(s) virtual String dbgStmtType() const { return String(#s); }
 #else
-#  define DBG_STMT_TYPE(s) 
+#  define DBG_STMT_TYPE(s)
 #endif
 
 struct BreakStmtNode : StmtNode
@@ -175,21 +175,21 @@ struct IterStmtNode : StmtNode
 {
    /// Local variable name to use for the container element.
    StringTableEntry varName;
-   
+
    /// Expression evaluating to a SimSet object.
    ExprNode* containerExpr;
-   
+
    /// The statement body.
    StmtNode* body;
-   
+
    /// If true, this is a 'foreach$'.
    bool isStringIter;
-   
+
    /// Bytecode size of body statement.  Set by precompileStmt.
    U32 bodySize;
-   
+
    static IterStmtNode* alloc( S32 lineNumber, StringTableEntry varName, ExprNode* containerExpr, StmtNode* body, bool isStringIter );
-   
+
    U32 precompileStmt( U32 loopCount );
    U32 compileStmt( U32* codeStream, U32 ip, U32 continuePoint, U32 breakPoint );
 };

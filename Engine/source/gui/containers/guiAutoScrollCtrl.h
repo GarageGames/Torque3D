@@ -35,9 +35,9 @@
 class GuiAutoScrollCtrl : public GuiTickCtrl
 {
    public:
-   
+
       typedef GuiTickCtrl Parent;
-      
+
       /// Scrolling direction.
       enum Direction
       {
@@ -48,7 +48,7 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
       };
 
    protected:
-   
+
       enum Phase
       {
          PhaseInitial,     ///< Waiting to begin scrolling.
@@ -56,25 +56,25 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
          PhaseComplete,    ///< Scrolling complete.
          PhaseWait         ///< Wait before starting a new loop.
       };
-      
+
       /// The direction in which to scroll.
       Direction mDirection;
-         
+
       /// If true, scrolling will start from the beginning once finished.
       bool mIsLooping;
-      
+
       /// Whether to scroll the child control completely out of sight.
       bool mScrollOutOfSight;
-      
+
       /// Current phase in the scrolling animation.
       Phase mCurrentPhase;
-      
+
       /// The current animation time.
       F32 mCurrentTime;
-      
+
       /// The time scrolling was completed.
       F32 mCompleteTime;
-      
+
       /// Current scrolling position.  This is kept separate from the control's
       /// current position value since we will receive time updates in increments
       /// less than a second and thus need to have this value in floating-point.
@@ -82,17 +82,17 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
 
       /// Seconds to wait before starting to scroll.
       F32 mStartDelay;
-      
+
       /// Seconds to wait after scrolling is complete before reseting the control
       /// to the initial state (only if #mIsLooping is true).
       F32 mResetDelay;
-      
+
       /// Border to put around scrolled child control.
       S32 mChildBorder;
-      
+
       /// Speed at which to scroll in pixels per second.
       F32 mScrollSpeed;
-            
+
       /// @name Callbacks
       /// @{
 
@@ -100,12 +100,12 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
       DECLARE_CALLBACK( void, onStart, () );
       DECLARE_CALLBACK( void, onComplete, () );
       DECLARE_CALLBACK( void, onReset, () );
-      
+
       /// @}
 
       void _reset( GuiControl* control );
       bool _isScrollComplete() const;
-      
+
       U32 _getScrollAxis() const
       {
          switch( mDirection )
@@ -117,7 +117,7 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
          }
          return 0;
       }
-      
+
       F32 _getScrollAmount() const
       {
          switch( mDirection )
@@ -131,11 +131,11 @@ class GuiAutoScrollCtrl : public GuiTickCtrl
       }
 
    public:
-   
+
       GuiAutoScrollCtrl();
-      
+
       void reset();
-            
+
       virtual bool onWake();
       virtual void onSleep();
 

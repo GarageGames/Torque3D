@@ -34,8 +34,8 @@ IMPLEMENT_CONOBJECT(GuiButtonCtrl);
 
 ConsoleDocClass( GuiButtonCtrl,
    "@brief The most widely used button class.\n\n"
-   
-   "GuiButtonCtrl renders seperately of, but utilizes all of the functionality of GuiBaseButtonCtrl.\n" 
+
+   "GuiButtonCtrl renders seperately of, but utilizes all of the functionality of GuiBaseButtonCtrl.\n"
    "This grants GuiButtonCtrl the versatility to be either of the 3 button types.\n\n"
 
    "@tsexample\n"
@@ -47,7 +47,7 @@ ConsoleDocClass( GuiButtonCtrl,
    "   command    = \"randomFunction();\";\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiButtons"
 );
 
@@ -101,7 +101,7 @@ void GuiButtonCtrl::onRender(Point2I      offset,
    else
    {
       S32 indexMultiplier = 1;
-      
+
       if( !mActive )
          indexMultiplier = 4;
       else if ( mDepressed || mStateOn )

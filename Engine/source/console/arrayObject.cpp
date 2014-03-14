@@ -102,12 +102,12 @@ S32 QSORT_CALLBACK ArrayObject::_keyFunctionCompare( const void* a, const void* 
 {
    ArrayObject::Element* ea = ( ArrayObject::Element* )( a );
    ArrayObject::Element* eb = ( ArrayObject::Element* )( b );
-   
+
    const char* argv[ 3 ];
    argv[ 0 ] = smCompareFunction;
    argv[ 1 ] = ea->key;
    argv[ 2 ] = eb->key;
-   
+
    S32 result = dAtoi( Con::execute( 3, argv ) );
    S32 res = result < 0 ? -1 : ( result > 0 ? 1 : 0 );
    return ( smDecreasing ? -res : res );
@@ -117,12 +117,12 @@ S32 QSORT_CALLBACK ArrayObject::_valueFunctionCompare( const void* a, const void
 {
    ArrayObject::Element* ea = ( ArrayObject::Element* )( a );
    ArrayObject::Element* eb = ( ArrayObject::Element* )( b );
-   
+
    const char* argv[ 3 ];
    argv[ 0 ] = smCompareFunction;
    argv[ 1 ] = ea->value;
    argv[ 2 ] = eb->value;
-   
+
    S32 result = dAtoi( Con::execute( 3, argv ) );
    S32 res = result < 0 ? -1 : ( result > 0 ? 1 : 0 );
    return ( smDecreasing ? -res : res );
@@ -141,11 +141,11 @@ ArrayObject::ArrayObject()
 
 void ArrayObject::initPersistFields()
 {
-   addField( "caseSensitive",    TypeBool,   Offset( mCaseSensitive, ArrayObject ), 
+   addField( "caseSensitive",    TypeBool,   Offset( mCaseSensitive, ArrayObject ),
       "Makes the keys and values case-sensitive.\n"
       "By default, comparison of key and value strings will be case-insensitive." );
 
-   addProtectedField( "key", TypeCaseString, NULL, &_addKeyFromField, &emptyStringProtectedGetFn, 
+   addProtectedField( "key", TypeCaseString, NULL, &_addKeyFromField, &emptyStringProtectedGetFn,
       "Helper field which allows you to add new key['keyname'] = value pairs." );
 
    Parent::initPersistFields();
@@ -282,7 +282,7 @@ S32 ArrayObject::countValue( const String &value ) const
 
 //-----------------------------------------------------------------------------
 
-S32 ArrayObject::countKey( const String &key) const 
+S32 ArrayObject::countKey( const String &key) const
 {
    S32 count = 0;
    for ( S32 i = 0; i < mArray.size(); i++ )
@@ -337,7 +337,7 @@ void ArrayObject::pop_front()
       return;
 
    mArray.pop_front();
-   
+
    if( mCurrentIndex >= mArray.size() )
       mCurrentIndex = mArray.size() - 1;
 }
@@ -466,7 +466,7 @@ void ArrayObject::setValue( const String &value, S32 index )
 {
    if ( index >= mArray.size() )
       return;
-   
+
    mArray[index].value = value;
 }
 
@@ -539,9 +539,9 @@ S32 ArrayObject::moveNext()
 {
    if ( mCurrentIndex >= mArray.size() - 1 )
       return -1;
-   
+
    mCurrentIndex++;
-   
+
    return mCurrentIndex;
 }
 
@@ -553,7 +553,7 @@ S32 ArrayObject::movePrev()
       return -1;
 
    mCurrentIndex--;
-   
+
    return mCurrentIndex;
 }
 
@@ -813,7 +813,7 @@ DefineEngineMethod( ArrayObject, sortn, void, ( bool ascending ), ( false ),
 }
 
 DefineEngineMethod( ArrayObject, sortna, void, (),,
-   "Numerically sorts the array by value in ascending order" ) 
+   "Numerically sorts the array by value in ascending order" )
 {
    object->sort( true, true, true );
 }

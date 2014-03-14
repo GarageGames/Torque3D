@@ -42,21 +42,21 @@ class SFXEnvironment : public SimDataBlock
       typedef SimDataBlock Parent;
 
    protected:
-   
+
       /// The reverb properties.
       SFXReverbProperties mReverb;
 
    public:
 
       SFXEnvironment();
-      
+
       ///
       void validate();
-      
+
       DECLARE_CONOBJECT( SFXEnvironment );
       DECLARE_CATEGORY( "SFX" );
       DECLARE_DESCRIPTION( "A reverb environment." );
-      
+
       static void initPersistFields();
 
       virtual bool onAdd();

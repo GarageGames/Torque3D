@@ -174,7 +174,7 @@ void Portal::consoleInit()
 String Portal::describeSelf() const
 {
    String str = Parent::describeSelf();
-   
+
    switch( getClassification() )
    {
       case InvalidPortal:     str += "|InvalidPortal"; break;
@@ -344,7 +344,7 @@ void Portal::_traverseConnectedZoneSpaces( SceneTraversalState* state )
       Parent::_traverseConnectedZoneSpaces( state );
       return;
    }
-   
+
    SceneCullingState* cullingState = state->getCullingState();
    const SceneCameraState& cameraState = cullingState->getCameraState();
 

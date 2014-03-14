@@ -51,24 +51,24 @@ void DualParaboloidLightShadowMap::_render(  RenderPassManager* renderPass,
 
    const U32 texSize = getBestTexSize( 2 );
 
-   if (  mShadowMapTex.isNull() || 
+   if (  mShadowMapTex.isNull() ||
          mTexSize != texSize )
    {
       mTexSize = texSize;
 
-      mShadowMapTex.set(   mTexSize * 2, mTexSize, 
-                           ShadowMapFormat, &ShadowMapProfile, 
+      mShadowMapTex.set(   mTexSize * 2, mTexSize,
+                           ShadowMapFormat, &ShadowMapProfile,
                            "DualParaboloidLightShadowMap" );
    }
 
    GFXFrustumSaver frustSaver;
-   GFXTransformSaver saver;   
+   GFXTransformSaver saver;
 
    // Set and Clear target
    GFX->pushActiveRenderTarget();
 
    mTarget->attachTexture(GFXTextureTarget::Color0, mShadowMapTex);
-   mTarget->attachTexture( GFXTextureTarget::DepthStencil, 
+   mTarget->attachTexture( GFXTextureTarget::DepthStencil,
       _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() ) );
    GFX->setActiveRenderTarget(mTarget);
    GFX->clear(GFXClearTarget | GFXClearStencil | GFXClearZBuffer, ColorI::WHITE, 1.0f, 0);
@@ -82,7 +82,7 @@ void DualParaboloidLightShadowMap::_render(  RenderPassManager* renderPass,
    const F32 &lightRadius = mLight->getRange().x;
    const F32 paraboloidNearPlane = 0.01f;
    const F32 renderPosOffset = 0.01f;
-   
+
    // Alter for creation of scene state if this is a single pass map
    if(bUseSinglePassDPM)
    {
@@ -107,7 +107,7 @@ void DualParaboloidLightShadowMap::_render(  RenderPassManager* renderPass,
    }
 
    SceneManager* sceneManager = diffuseState->getSceneManager();
-   
+
    // Front map render
    {
       SceneRenderState frontMapRenderState
@@ -137,8 +137,8 @@ void DualParaboloidLightShadowMap::_render(  RenderPassManager* renderPass,
       sceneManager->renderSceneNoLights( &frontMapRenderState, SHADOW_TYPEMASK );
       _debugRender( &frontMapRenderState );
    }
-   
-   // Back map render 
+
+   // Back map render
    if(!bUseSinglePassDPM)
    {
       GFXDEBUGEVENT_SCOPE( DualParaboloidLightShadowMap_Render_BackFacingParaboloid, ColorI::RED );
@@ -151,7 +151,7 @@ void DualParaboloidLightShadowMap::_render(  RenderPassManager* renderPass,
       MatrixF temp = mLight->getTransform();
       temp.getColumn( 1, &forward );
       temp.getColumn( 0, &right );
-      forward *= -1.0f;      
+      forward *= -1.0f;
       right *= -1.0f;
       temp.setColumn( 1, forward );
       temp.setColumn( 0, right );

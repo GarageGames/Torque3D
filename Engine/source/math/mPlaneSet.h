@@ -77,7 +77,7 @@ class PlaneSet
       /// Create an uninitialized set.
       /// @warn None of the members will be initialized.
       PlaneSet() {}
-      
+
       /// Use the given set of planes to initialize the set.
       ///
       /// @param planes The planes.  Memory must be valid for the entire
@@ -225,7 +225,7 @@ inline OverlapTestResult PlaneSet< T >::_testOverlap( const P& bounds ) const
 
    // First, find out whether there is any plane for which the bounds completely
    // lie on the negative side.  If so, the bounds are clearly outside of the volume.
-   
+
    const U32 numPlanes = getNumPlanes();
    for( U32 nplane = 0; nplane < numPlanes; ++ nplane )
    {
@@ -298,7 +298,7 @@ U32 PlaneSet< T >::testPlanes( const Box3F& bounds, U32 planeMask, F32 expand ) 
 {
    AssertFatal( mNumPlanes <= 32, "PlaneSet::testPlanes - Too many planes in set!" );
 
-   // This is based on the paper "A Faster Overlap Test for a Plane and a Bounding Box" 
+   // This is based on the paper "A Faster Overlap Test for a Plane and a Bounding Box"
    // by Kenny Hoff.  See http://www.cs.unc.edu/~hoff/research/vfculler/boxplane.html
 
    U32 retMask = 0;
@@ -366,7 +366,7 @@ U32 PlaneSet< T >::testPlanes( const Box3F& bounds, U32 planeMask, F32 expand ) 
 
 template< typename T >
 bool PlaneSet< T >::clipSegment( Point3F &pnt0, Point3F &pnt1 ) const
-{	
+{
    F32 tmin = F32_MAX;
    F32 tmax = -F32_MAX;
    U32 hitCount = 0;
@@ -394,7 +394,7 @@ bool PlaneSet< T >::clipSegment( Point3F &pnt0, Point3F &pnt1 ) const
 
    // If we had no intersections then either both points are inside or both are outside.
 
-   if( hitCount == 0 )	
+   if( hitCount == 0 )
       return isContained( pnt0 );
 
    // If we had one intersection then we have one point inside.
@@ -417,7 +417,7 @@ bool PlaneSet< T >::clipSegment( Point3F &pnt0, Point3F &pnt1 ) const
          pnt1.interpolate( prevPnt0, prevPnt1, tmax );
    }
 
-   return true;   
+   return true;
 }
 
 //-----------------------------------------------------------------------------

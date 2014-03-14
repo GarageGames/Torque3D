@@ -74,7 +74,7 @@
          hovertime = "1000";
          internalName = "Scroll";
          canSaveDynamicFields = "0";
-         
+
          new GuiVariableInspector(ConsoleVarInspector) {
             StackingType = "Vertical";
             HorizStacking = "Left to Right";
@@ -105,10 +105,10 @@ function InspectVars( %filter )
 {
    if ( %filter $= "" )
       %filter = "*";
-   
-   //if ( !ConsoleVarDlg.isAwake() )   
+
+   //if ( !ConsoleVarDlg.isAwake() )
       Canvas.pushDialog( ConsoleVarDlg, 100 );
-      
+
    ConsoleVarInspector.loadVars( %filter );
 }
 

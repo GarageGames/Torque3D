@@ -49,14 +49,14 @@ function onActivateAdvancedLM()
    // Don't allow the offscreen target on OSX.
    if ( $platform $= "macos" )
       return;
-                  
+
    // On the Xbox360 we know what will be enabled so don't do any trickery to
    // disable MSAA
    if ( $platform $= "xenon" )
       return;
-      
+
    // Enable the offscreen target so that AL will work
-   // with MSAA back buffers and for HDR rendering.   
+   // with MSAA back buffers and for HDR rendering.
    AL_FormatToken.enable();
 }
 
@@ -68,6 +68,6 @@ function onDeactivateAdvancedLM()
 
 function setAdvancedLighting()
 {
-   setLightManager( "Advanced Lighting" );   
+   setLightManager( "Advanced Lighting" );
 }
 

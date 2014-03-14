@@ -36,7 +36,7 @@
 /// A concrete, renderable PolyList
 ///
 /// This class is used to store geometry from a PolyList query.
-/// 
+///
 /// @see AbstractPolyList
 class OptimizedPolyList : public AbstractPolyList
 {

@@ -80,7 +80,7 @@ public:
    /// without knowing the concrete type.
    virtual ~LightInfoEx() { }
 
-   /// 
+   ///
    virtual const LightInfoExType& getType() const = 0;
 
    /// Copy the values from the other LightInfoEx.
@@ -94,14 +94,14 @@ public:
 };
 
 
-/// This is the base light information class that will be tracked by the 
+/// This is the base light information class that will be tracked by the
 /// engine.  Should basically contain a bounding volume and methods to interact
 /// with the rest of the system (for example, setting GFX fixed function lights).
 class LightInfo
 {
 public:
 
-   enum Type 
+   enum Type
    {
       Point    = 0,
       Spot     = 1,
@@ -153,7 +153,7 @@ public:
    // Copies data passed in from light
    void set( const LightInfo *light );
 
-   // Sets a fixed function GFXLight with our properties 
+   // Sets a fixed function GFXLight with our properties
    void setGFXLight( GFXLightInfo *light );
 
    // Accessors
@@ -208,7 +208,7 @@ public:
    /// Returns the extended light info for the selected type.
    LightInfoEx* getExtended( const LightInfoExType &type ) const;
 
-   /// Adds the extended info to the light deleting the 
+   /// Adds the extended info to the light deleting the
    /// existing extended info if it has one.
    void addExtended( LightInfoEx *lightInfoEx );
 
@@ -216,7 +216,7 @@ public:
    /// type.
    void deleteExtended( const LightInfoExType& type );
 
-   /// 
+   ///
    void deleteAllLightInfoEx();
 
    // Builds the world to light view projection used for
@@ -240,7 +240,7 @@ public:
 };
 
 
-/// When the scene is queried for lights, the light manager will get 
+/// When the scene is queried for lights, the light manager will get
 /// this interface to trigger a register light call.
 class ISceneLight
 {

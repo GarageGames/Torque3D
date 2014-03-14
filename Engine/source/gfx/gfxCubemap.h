@@ -59,7 +59,7 @@ public:
    virtual void initDynamic( U32 texSize, GFXFormat faceFormat = GFXFormatR8G8B8A8 ) = 0;
 
    void initNormalize(U32 size);
-      
+
    virtual ~GFXCubemap();
 
    /// Returns the size of the faces.

@@ -89,7 +89,7 @@ ProcessedMaterial::ProcessedMaterial()
 :  mMaterial( NULL ),
    mCurrentParams( NULL ),
    mHasSetStageData( false ),
-   mHasGlow( false ),   
+   mHasGlow( false ),
    mMaxStages( 0 ),
    mVertexFormat( NULL ),
    mUserObject( NULL )
@@ -177,27 +177,27 @@ void ProcessedMaterial::addStateBlockDesc(const GFXStateBlockDesc& sb)
 
 void ProcessedMaterial::_initStateBlockTemplates(GFXStateBlockDesc& stateTranslucent, GFXStateBlockDesc& stateGlow, GFXStateBlockDesc& stateReflect)
 {
-   // Translucency   
+   // Translucency
    stateTranslucent.blendDefined = true;
    stateTranslucent.blendEnable = mMaterial->mTranslucentBlendOp != Material::None;
    _setBlendState(mMaterial->mTranslucentBlendOp, stateTranslucent);
    stateTranslucent.zDefined = true;
-   stateTranslucent.zWriteEnable = mMaterial->mTranslucentZWrite;   
+   stateTranslucent.zWriteEnable = mMaterial->mTranslucentZWrite;
    stateTranslucent.alphaDefined = true;
    stateTranslucent.alphaTestEnable = mMaterial->mAlphaTest;
    stateTranslucent.alphaTestRef = mMaterial->mAlphaRef;
    stateTranslucent.alphaTestFunc = GFXCmpGreaterEqual;
    stateTranslucent.samplersDefined = true;
    stateTranslucent.samplers[0].textureColorOp = GFXTOPModulate;
-   stateTranslucent.samplers[0].alphaOp = GFXTOPModulate;   
+   stateTranslucent.samplers[0].alphaOp = GFXTOPModulate;
    stateTranslucent.samplers[0].alphaArg1 = GFXTATexture;
-   stateTranslucent.samplers[0].alphaArg2 = GFXTADiffuse;   
+   stateTranslucent.samplers[0].alphaArg2 = GFXTADiffuse;
 
-   // Glow   
+   // Glow
    stateGlow.zDefined = true;
    stateGlow.zWriteEnable = false;
 
-   // Reflect   
+   // Reflect
    stateReflect.cullDefined = true;
    stateReflect.cullMode = mMaterial->mDoubleSided ? GFXCullNone : GFXCullCW;
 }
@@ -220,7 +220,7 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
    if (mMaterial && mMaterial->isDoubleSided())
    {
       result.cullDefined = true;
-      result.cullMode = GFXCullNone;         
+      result.cullMode = GFXCullNone;
    }
 
    if(mMaterial && mMaterial->mAlphaTest)
@@ -239,7 +239,7 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
       maxAnisotropy = MATMGR->getDefaultAnisotropy();
 
    for( U32 i=0; i < rpd->mNumTex; i++ )
-   {      
+   {
       U32 currTexFlag = rpd->mTexType[i];
 
       switch( currTexFlag )
@@ -284,11 +284,11 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
       }
    }
 
-   // The prepass will take care of writing to the 
+   // The prepass will take care of writing to the
    // zbuffer, so we don't have to by default.
    // The prepass can't write to the backbuffer's zbuffer in OpenGL.
-   if (  MATMGR->getPrePassEnabled() && 
-         !GFX->getAdapterType() == OpenGL && 
+   if (  MATMGR->getPrePassEnabled() &&
+         !GFX->getAdapterType() == OpenGL &&
          !mFeatures.hasFeature(MFT_ForwardShading))
       result.setZReadWrite( result.zEnable, false );
 
@@ -326,17 +326,17 @@ void ProcessedMaterial::_initRenderStateStateBlocks( RenderPassData *rpd )
 
       GFXStateBlockRef sb = GFX->createStateBlock(stateFinal);
       rpd->mRenderStates[i] = sb;
-   }   
+   }
 }
 
-U32 ProcessedMaterial::_getRenderStateIndex( const SceneRenderState *sceneState, 
+U32 ProcessedMaterial::_getRenderStateIndex( const SceneRenderState *sceneState,
                                              const SceneData &sgData )
 {
    // Based on what the state of the world is, get our render state block
    U32 currState = 0;
 
    // NOTE: We should only use per-material or per-pass hints to
-   // change the render state.  This is importaint because we 
+   // change the render state.  This is importaint because we
    // only change the state blocks between material passes.
    //
    // For example sgData.visibility would be bad to use
@@ -358,24 +358,24 @@ U32 ProcessedMaterial::_getRenderStateIndex( const SceneRenderState *sceneState,
    return currState;
 }
 
-void ProcessedMaterial::_setRenderState(  const SceneRenderState *state, 
-                                          const SceneData& sgData, 
+void ProcessedMaterial::_setRenderState(  const SceneRenderState *state,
+                                          const SceneData& sgData,
                                           U32 pass )
-{   
+{
    // Make sure we have the pass
    if ( pass >= mPasses.size() )
       return;
 
    U32 currState = _getRenderStateIndex( state, sgData );
 
-   GFX->setStateBlock(mPasses[pass]->mRenderStates[currState]);   
+   GFX->setStateBlock(mPasses[pass]->mRenderStates[currState]);
 }
 
 
 void ProcessedMaterial::_setStageData()
 {
    // Only do this once
-   if ( mHasSetStageData ) 
+   if ( mHasSetStageData )
       return;
    mHasSetStageData = true;
 
@@ -391,8 +391,8 @@ void ProcessedMaterial::_setStageData()
          if (!mStages[i].getTex( MFT_DiffuseMap ))
          {
             mMaterial->logError("Failed to load diffuse map %s for stage %i", _getTexturePath(mMaterial->mDiffuseMapFilename[i]).c_str(), i);
-            
-            // Load a debug texture to make it clear to the user 
+
+            // Load a debug texture to make it clear to the user
             // that the texture for this stage was missing.
             mStages[i].setTex( MFT_DiffuseMap, _createTexture( GFXTextureManager::getMissingTexturePath().c_str(), &GFXDefaultStaticDiffuseProfile ) );
          }
@@ -445,7 +445,7 @@ void ProcessedMaterial::_setStageData()
          if(!mStages[i].getTex( MFT_DetailNormalMap ))
             mMaterial->logError("Failed to load normal map %s for stage %i", _getTexturePath(mMaterial->mDetailNormalMapFilename[i]).c_str(), i);
       }
-      
+
       // SpecularMap
       if( mMaterial->mSpecularMapFilename[i].isNotEmpty() )
       {
@@ -466,13 +466,13 @@ void ProcessedMaterial::_setStageData()
 	mMaterial->mCubemapData = dynamic_cast<CubemapData*>(Sim::findObject( mMaterial->mCubemapName ));
 	if( !mMaterial->mCubemapData )
 		mMaterial->mCubemapData = NULL;
-		
-		
+
+
    // If we have a cubemap put it on stage 0 (cubemaps only supported on stage 0)
    if( mMaterial->mCubemapData )
    {
       mMaterial->mCubemapData->createMap();
-      mStages[0].setCubemap( mMaterial->mCubemapData->mCubemap ); 
+      mStages[0].setCubemap( mMaterial->mCubemapData->mCubemap );
       if ( !mStages[0].getCubemap() )
          mMaterial->logError("Failed to load cubemap");
    }

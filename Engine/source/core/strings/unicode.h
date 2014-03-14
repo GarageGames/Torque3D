@@ -30,7 +30,7 @@
 
 /// Unicode conversion utility functions
 ///
-/// Some definitions first: 
+/// Some definitions first:
 /// - <b>Code Point</b>: a single character of Unicode text. Used to disabmiguate from C char type.
 /// - <b>UTF-32</b>: a Unicode encoding format where one code point is always 32 bits wide.
 ///   This format can in theory contain any Unicode code point that will ever be needed, now or in the future. 4billion+ code points should be enough, right?
@@ -52,7 +52,7 @@
 /// Any code points above 0xFFFF, the top of the BMP, are replaced with the
 ///  standard unicode replacement character: 0xFFFD.
 /// Any UTF16 surrogates are read correctly, but replaced.
-/// UTF-8 code points up to 6 code units wide will be read, but 5+ is illegal, 
+/// UTF-8 code points up to 6 code units wide will be read, but 5+ is illegal,
 ///  and 4+ is above the BMP, and will be replaced.
 ///  This means that UTF-8 output is clamped to 3 code units ( bytes ) per code point.
 
@@ -118,7 +118,7 @@ UTF16* dStrchr(UTF16* unistring, U32 c);
 const UTF16* dStrchr(const UTF16* unistring, U32 c);
 //-----------------------------------------------------------------------------
 /// Functions that scan for characters in a utf8 string.
-/// - this is useful for getting a character-wise offset into a UTF8 string, 
+/// - this is useful for getting a character-wise offset into a UTF8 string,
 ///   as opposed to a byte-wise offset into a UTF8 string: foo[i]
 const UTF8* getNthCodepoint(const UTF8 *unistring, const U32 n);
 

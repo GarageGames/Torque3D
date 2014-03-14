@@ -51,7 +51,7 @@ class GuiScrollCtrl : public GuiContainer
          HorizThumb,
          None
       };
-      
+
       enum ScrollBarBehavior
       {
          ScrollBarAlwaysOn = 0,
@@ -90,7 +90,7 @@ class GuiScrollCtrl : public GuiContainer
 
          BmpStates
       };
-      
+
       RectI *mBitmapBounds;  //bmp is [3*n], bmpHL is [3*n + 1], bmpNA is [3*n + 2]
       GFXTexHandle mTextureObject;
 
@@ -156,16 +156,16 @@ class GuiScrollCtrl : public GuiContainer
       bool mWillFirstRespond;     // for automatically handling arrow keys
 
       /// Used internally to prevent infinite recursion.
-      bool mIgnoreChildResized;   
+      bool mIgnoreChildResized;
 
       /// MouseWheel scroll animation
       /// @{
 
       /// Is currently performing a scroll animation.
-      bool mAnimating; 
+      bool mAnimating;
 
       /// Pixels moved per tick when performing a scroll animation.
-      S32 mScrollAnimSpeed; 
+      S32 mScrollAnimSpeed;
 
       /// The target position when performing a scroll animation.
       Point2I mScrollTargetPos;
@@ -174,12 +174,12 @@ class GuiScrollCtrl : public GuiContainer
       S32 mLastPreRender;
 
       /// @}
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onScroll, () );
-      
+
       /// @}
 
       Region findHitRegion(const Point2I &);
@@ -189,17 +189,17 @@ class GuiScrollCtrl : public GuiContainer
       void calcThumbs();
       void scrollByRegion(Region reg);
       void scrollByMouseWheel( const GuiEvent &event );
-      
+
       /// Tell the kids that the mouse moved (relatively)
       void updateChildMousePos();
-      
+
       ///
       void _onMouseDown( const GuiEvent& event, bool lockMouse );
 
    public:
-   
+
       GuiScrollCtrl();
-                                 
+
       void autoScroll(Region reg);
 
       void scrollDeltaAnimate(S32 x, S32 y);

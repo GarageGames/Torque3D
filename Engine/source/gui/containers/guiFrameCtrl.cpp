@@ -561,7 +561,7 @@ void GuiFrameSetCtrl::onRender(Point2I offset, const RectI &updateRect )
 {
 
    Parent::onRender( offset, updateRect );
- 
+
    drawDividers(offset);
 
 }

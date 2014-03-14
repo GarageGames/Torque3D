@@ -45,9 +45,9 @@ class GuiConvexEditorCtrl : public EditTSCtrl
 {
    typedef EditTSCtrl Parent;
 
-   friend class GuiConvexEditorUndoAction;   
+   friend class GuiConvexEditorUndoAction;
 
-public:   
+public:
 
    GuiConvexEditorCtrl();
    virtual ~GuiConvexEditorCtrl();
@@ -64,7 +64,7 @@ public:
    virtual void onSleep();
    virtual void setVisible(bool value);
 
-   // EditTSCtrl      
+   // EditTSCtrl
    bool onKeyDown( const GuiEvent &event );
    bool onKeyUp( const GuiEvent &event );
    void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
@@ -76,7 +76,7 @@ public:
    void on3DMouseLeave( const Gui3DMouseEvent &event );
    void on3DRightMouseDown( const Gui3DMouseEvent &event );
    void on3DRightMouseUp( const Gui3DMouseEvent &event );
-   void renderScene(const RectI & updateRect);   
+   void renderScene(const RectI & updateRect);
    void updateGizmo();
 
    void updateShape( ConvexShape *shape, S32 offsetFace = -1 );
@@ -107,7 +107,7 @@ public:
    bool getEdgesTouchingPoint( ConvexShape *shape, S32 faceId, S32 pId, Vector< U32 > &edgeIdxList, S32 excludeEdge = -1 );
 
    void hollowSelection();
-   void hollowShape( ConvexShape *shape, F32 thickness );   
+   void hollowShape( ConvexShape *shape, F32 thickness );
 
    void recenterSelection();
    void recenterShape( ConvexShape *shape );
@@ -115,7 +115,7 @@ public:
    void splitSelectedFace();
 
    /// Interface with Tools.
-   /// @{ 
+   /// @{
 
       MatrixF getCameraMat() const { return mLastCameraQuery.cameraMatrix; }
 
@@ -127,7 +127,7 @@ public:
          HollowShape
       };
 
-      void submitUndo( UndoType type, ConvexShape *shape );   
+      void submitUndo( UndoType type, ConvexShape *shape );
       void submitUndo( UndoType type, const Vector< ConvexShape* > &shape );
 
    /// @}
@@ -137,7 +137,7 @@ public:
    void setSelection( ConvexShape *shape, S32 faceId );
    void handleDeselect();
    bool handleEscape();
-   bool handleDelete();   
+   bool handleDelete();
    bool handleTab();
 public:
 
@@ -157,7 +157,7 @@ protected:
    U32 mSavedGizmoFlags;
 
    /// The selected ConvexShape.
-   SimObjectPtr<ConvexShape> mConvexSEL;      
+   SimObjectPtr<ConvexShape> mConvexSEL;
 
    /// The highlighted ConvexShape ( mouse over ).
    SimObjectPtr<ConvexShape> mConvexHL;
@@ -193,7 +193,7 @@ protected:
    UndoManager *mUndoManager;
 
    ConvexEditorTool *mActiveTool;
-   ConvexEditorCreateTool *mCreateTool;   
+   ConvexEditorCreateTool *mCreateTool;
 };
 
 class GuiConvexEditorUndoAction : public UndoAction
@@ -205,13 +205,13 @@ public:
    {
    }
 
-   GuiConvexEditorCtrl *mEditor;         
-   
+   GuiConvexEditorCtrl *mEditor;
+
    SimObjectId mObjId;
 
    Vector< MatrixF > mSavedSurfaces;
    MatrixF mSavedObjToWorld;
-   Point3F mSavedScale;   
+   Point3F mSavedScale;
 
    virtual void undo();
    virtual void redo() { undo(); }
@@ -229,7 +229,7 @@ public:
       Failed = 3
    };
 
-   ConvexEditorTool( GuiConvexEditorCtrl *editor ) 
+   ConvexEditorTool( GuiConvexEditorCtrl *editor )
       : mEditor( editor ), mDone( false ) {}
    virtual ~ConvexEditorTool() {}
 
@@ -245,9 +245,9 @@ public:
    virtual EventResult on3DMouseLeave( const Gui3DMouseEvent &event ) { return NotHandled; }
    virtual EventResult on3DRightMouseDown( const Gui3DMouseEvent &event ) { return NotHandled; }
    virtual EventResult on3DRightMouseUp( const Gui3DMouseEvent &event ) { return NotHandled; }
-   
+
    virtual void renderScene(const RectI & updateRect) {}
-   virtual void render2D() {} 
+   virtual void render2D() {}
 
    bool isDone() { return mDone; }
 
@@ -272,16 +272,16 @@ public:
    virtual EventResult on3DMouseMove( const Gui3DMouseEvent &event );
    virtual EventResult on3DMouseDragged( const Gui3DMouseEvent &event );
 
-   virtual void renderScene(const RectI & updateRect);   
+   virtual void renderScene(const RectI & updateRect);
 
    ConvexShape* extrudeShapeFromFace( ConvexShape *shape, S32 face );
 
 protected:
-	
-   S32 mStage;   
+
+   S32 mStage;
    ConvexShape *mNewConvex;
    PlaneF mCreatePlane;
-   
+
    MatrixF mTransform;
    Point3F mStart;
    Point3F mEnd;

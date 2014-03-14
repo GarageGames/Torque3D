@@ -61,7 +61,7 @@ public:
    virtual void onRemove();
    static void initPersistFields();
 
-   virtual void process(   const SceneRenderState *state, 
+   virtual void process(   const SceneRenderState *state,
                            GFXTexHandle &inOutTex,
                            const RectI *inTexViewport = NULL );
 };

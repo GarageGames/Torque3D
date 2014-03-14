@@ -34,33 +34,33 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXState );
 
 ConsoleDocClass( SFXState,
    "@brief A boolean switch used to modify playlist behavior.\n\n"
-   
+
    "Sound system states are used to allow playlist controllers to make decisions based on global state.  This is useful, for "
    "example, to couple audio playback to gameplay state.  Certain states may, for example, represent different locations that the "
    "listener can be in, like underwater, in open space, or indoors.  Other states could represent moods of the current gameplay "
    "situation, like, for example, an aggressive mood during combat.\n\n"
-   
+
    "By activating and deactivating sound states according to gameplay state, a set of concurrently running playlists may "
    "react and adapt to changes in the game.\n\n"
-   
+
    "@section SFXState_activation Activation and Deactivation\n"
-   
+
    "At any time, a given state can be either active or inactive.  Calling activate() on a state increases an internal "
    "counter and calling deactivate() decreases the counter.  Only when the count reaches zero will the state be "
    "deactivated.\n\n"
-   
+
    "In addition to the activation count, states also maintain a disabling count.  Calling disable() increases this count "
    "and calling enable() decreases it.  As long as this count is greater than zero, a given state will not be activated "
    "even if its activation count is non-zero.  Calling disable() on an active state will not only increase the disabling "
    "count but also deactivate the state.  Calling enable() on a state with a positive activation count will re-activate "
    "the state when the disabling count reaches zero.\n\n"
-   
+
    "@section SFXState_dependencies State Dependencies\n"
-   
+
    "By listing other states in in its #includedStates and #excludedStates fields, a state may automatically trigger the "
    "activation or disabling of other states in the sytem when it is activated.  This allows to form dependency chains "
    "between individual states.\n\n"
-   
+
    "@tsexample\n"
    "// State indicating that the listener is submerged.\n"
    "singleton SFXState( AudioLocationUnderwater )\n"
@@ -79,13 +79,13 @@ ConsoleDocClass( SFXState,
    "   className = \"AudioStateExclusive\";\n"
    "};\n"
    "@endtsexample\n\n"
-   
+
    "@see SFXPlayList\n"
    "@see SFXController\n"
    "@see SFXPlayList::state\n"
    "@see SFXPlayList::stateMode\n\n"
    "@ref SFX_interactive\n\n"
-   
+
    "@ingroup SFX\n"
    "@ingroup Datablocks"
 );
@@ -95,7 +95,7 @@ IMPLEMENT_CALLBACK( SFXState, onActivate, void, (), (),
    "Called when the state goes from inactive to active." );
 IMPLEMENT_CALLBACK( SFXState, onDeactivate, void, (), (),
    "called when the state goes from active to deactive." );
-   
+
 
 static Vector< SFXState* > sgActiveStates( __FILE__, __LINE__ );
 
@@ -115,7 +115,7 @@ SFXState::SFXState()
 void SFXState::initPersistFields()
 {
    addGroup( "State" );
-   
+
       addField( "includedStates", TypeSFXStateName, Offset( mIncludedStates, SFXState ),
          MaxIncludedStates,
          "States that will automatically be activated when this state is activated.\n\n"
@@ -124,9 +124,9 @@ void SFXState::initPersistFields()
          MaxExcludedStates,
          "States that will automatically be disabled when this state is activated.\n\n"
          "@ref SFXState_activation" );
-   
+
    endGroup( "State" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -136,7 +136,7 @@ void SFXState::activate()
 {
    mActiveCount ++;
    if( mActiveCount == 1 && !isDisabled() )
-      _onActivate();  
+      _onActivate();
 }
 
 //-----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ void SFXState::deactivate()
 {
    if( !mActiveCount )
       return;
-      
+
    mActiveCount --;
    if( !mActiveCount && !isDisabled() )
       _onDeactivate();
@@ -157,9 +157,9 @@ void SFXState::enable()
 {
    if( !mDisableCount )
       return;
-      
+
    mDisableCount --;
-   
+
    if( !mDisableCount && mActiveCount > 0 )
       _onActivate();
 }
@@ -169,7 +169,7 @@ void SFXState::enable()
 void SFXState::disable()
 {
    mDisableCount ++;
-   
+
    if( mDisableCount == 1 && mActiveCount > 0 )
       _onDeactivate();
 }
@@ -182,7 +182,7 @@ bool SFXState::onAdd()
       return false;
 
    Sim::getSFXStateSet()->addObject( this );
-      
+
    return true;
 }
 
@@ -198,12 +198,12 @@ bool SFXState::preload( bool server, String& errorStr )
       for( U32 i = 0; i < MaxIncludedStates; ++ i )
          if( !sfxResolve( &mIncludedStates[ i ], errorStr ) )
             return false;
-         
+
       for( U32 i = 0; i < MaxExcludedStates; ++ i )
          if( !sfxResolve( &mExcludedStates[ i ], errorStr ) )
             return false;
    }
-            
+
    return true;
 }
 
@@ -212,7 +212,7 @@ bool SFXState::preload( bool server, String& errorStr )
 void SFXState::packData( BitStream* stream )
 {
    Parent::packData( stream );
-      
+
    for( U32 i = 0; i < MaxIncludedStates; ++ i )
       sfxWrite( stream, mIncludedStates[ i ] );
    for( U32 i = 0; i < MaxExcludedStates; ++ i )
@@ -224,7 +224,7 @@ void SFXState::packData( BitStream* stream )
 void SFXState::unpackData( BitStream* stream )
 {
    Parent::unpackData( stream );
-   
+
    for( U32 i = 0; i < MaxIncludedStates; ++ i )
       sfxRead( stream, &mIncludedStates[ i ] );
    for( U32 i = 0; i < MaxExcludedStates; ++ i )
@@ -238,21 +238,21 @@ void SFXState::_onActivate()
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXState] Activating '%s'", getName() );
    #endif
-   
+
    onActivate_callback();
-      
+
    // Add the state to the list.
-      
+
    sgActiveStates.push_back( this );
 
    // Activate included states.
-      
+
    for( U32 i = 0; i < MaxIncludedStates; ++ i )
       if( mIncludedStates[ i ] )
          mIncludedStates[ i ]->activate();
-         
+
    // Disable excluded states.
-         
+
    for( U32 i = 0; i < MaxExcludedStates; ++ i )
       if( mExcludedStates[ i ] )
          mExcludedStates[ i ]->disable();
@@ -267,9 +267,9 @@ void SFXState::_onDeactivate()
    #endif
 
    onDeactivate_callback();
-      
+
    // Remove the state from the list.
-      
+
    for( U32 i = 0; i < sgActiveStates.size(); ++ i )
       if( sgActiveStates[ i ] == this )
       {
@@ -278,13 +278,13 @@ void SFXState::_onDeactivate()
       }
 
    // Deactivate included states.
-      
+
    for( U32 i = 0; i < MaxIncludedStates; ++ i )
       if( mIncludedStates[ i ] )
          mIncludedStates[ i ]->deactivate();
-         
+
    // Enable excluded states.
-         
+
    for( U32 i = 0; i < MaxExcludedStates; ++ i )
       if( mExcludedStates[ i ] )
          mExcludedStates[ i ]->enable();
@@ -382,16 +382,16 @@ DefineEngineFunction( sfxGetActiveStates, const char*, (),,
    "@ingroup SFX" )
 {
    StringBuilder str;
-   
+
    bool isFirst = true;
    for( U32 i = 0; i < sgActiveStates.size(); ++ i )
    {
       if( !isFirst )
          str.append( ' ' );
-         
+
       str.append( sgActiveStates[ i ]->getName() );
       isFirst = false;
    }
-   
+
    return Con::getReturnBuffer( str );
 }

@@ -29,7 +29,7 @@ void zero_vert_normal_bulk_SSE(const dsize_t count, U8 * __restrict const outPtr
 {
    // A U8 * version of the in/out pointer
    register char *outData = reinterpret_cast<char *>(outPtr);
-   
+
    register __m128 vPos;
    register __m128 vNrm;
    register __m128 vMask;
@@ -67,7 +67,7 @@ void zero_vert_normal_bulk_SSE(const dsize_t count, U8 * __restrict const outPtr
 
 //------------------------------------------------------------------------------
 
-void m_matF_x_BatchedVertWeightList_SSE(const MatrixF &mat, 
+void m_matF_x_BatchedVertWeightList_SSE(const MatrixF &mat,
                                     const dsize_t count,
                                     const TSSkinMesh::BatchData::BatchedVertWeight * __restrict batch,
                                     U8 * const __restrict outPtr,
@@ -117,7 +117,7 @@ void m_matF_x_BatchedVertWeightList_SSE(const MatrixF &mat,
       inPos = _mm_load_ps(inElem.vert);
       inNrm = _mm_load_ps(inElem.normal);
 
-      // prefetch input 
+      // prefetch input
 #define INPUT_PREFETCH_LOOKAHEAD 64
       const char *prefetchInput = reinterpret_cast<const char *>(batch) + inStride * (i + INPUT_PREFETCH_LOOKAHEAD);
       _mm_prefetch(prefetchInput, _MM_HINT_T0);

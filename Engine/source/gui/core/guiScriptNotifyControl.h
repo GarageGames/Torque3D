@@ -34,8 +34,8 @@ private:
 public:
 
     /// @name Event Callbacks
-    /// @{ 
-   bool mOnChildAdded;         ///< Script Notify : onAddObject(%object)  
+    /// @{
+   bool mOnChildAdded;         ///< Script Notify : onAddObject(%object)
    bool mOnChildRemoved;       ///< Script Notify : onRemoveObject(%object)
    bool mOnResize;             ///< Script Notify : onResize()
    bool mOnChildResized;       ///< Script Notify : onChildResized(%child)
@@ -51,7 +51,7 @@ public:
     DECLARE_CATEGORY( "Gui Other Script" );
     DECLARE_DESCRIPTION( "A control that implements various script callbacks for\n"
                          "certain GUI events." );
-    
+
     GuiScriptNotifyCtrl();
     virtual ~GuiScriptNotifyCtrl();
     static void initPersistFields();
@@ -69,10 +69,10 @@ public:
 	DECLARE_CALLBACK(void, onParentResized, (SimObjectId ID));
 	DECLARE_CALLBACK(void, onLoseFirstResponder, (SimObjectId ID));
 	DECLARE_CALLBACK(void, onGainFirstResponder, (SimObjectId ID));
-	
-	
-	
-	
+
+
+
+
     //virtual void onMouseUp(const GuiEvent &event);
     //virtual void onMouseDown(const GuiEvent &event);
     //virtual void onMouseMove(const GuiEvent &event);

@@ -49,7 +49,7 @@ SFXALBuffer* SFXALBuffer::create(   const OPENALFNTABLE &oalft,
    return buffer;
 }
 
-SFXALBuffer::SFXALBuffer(  const OPENALFNTABLE &oalft, 
+SFXALBuffer::SFXALBuffer(  const OPENALFNTABLE &oalft,
                            const ThreadSafeRef< SFXStream >& stream,
                            SFXDescription* description,
                            bool useHardware )
@@ -84,23 +84,23 @@ SFXALBuffer::~SFXALBuffer()
 void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
 {
    using namespace SFXInternal;
-   
+
    if( !num )
       return;
-   
+
    // If this is not a streaming buffer, just load the data into our single
    // static buffer.
-   
+
    if( !isStreaming() )
    {
       SFXStreamPacket* packet = packets[ num - 1 ];
-      
+
       ALenum alFormat = _sfxFormatToALFormat( getFormat() );
       AssertFatal( alFormat != 0, "SFXALBuffer::write() - format unsupported" );
-      
+
       mOpenAL.alBufferData( mALBuffer, alFormat,
          packet->data, packet->mSizeActual, getFormat().getSamplesPerSecond() );
-         
+
       destructSingle( packet );
       return;
    }
@@ -113,22 +113,22 @@ void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
    ALuint source = _getUniqueVoice()->mSourceName;
    ALint numProcessed;
    mOpenAL.alGetSourcei( source, AL_BUFFERS_PROCESSED, &numProcessed );
-   
+
    for( U32 i = 0; i < numProcessed; ++ i )
    {
       // Unqueue the buffer.
-      
+
       ALuint buffer;
       mOpenAL.alSourceUnqueueBuffers( source, 1, &buffer );
-      
+
       // Update the sample offset on the voice.
-      
+
       ALint size;
       mOpenAL.alGetBufferi( buffer, AL_SIZE, &size );
       _getUniqueVoice()->mSampleOffset += size / getFormat().getBytesPerSample();
-      
+
       // Push the buffer onto the freelist.
-      
+
       mFreeBuffers.push_back( buffer );
    }
 
@@ -137,9 +137,9 @@ void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
    for( U32 i = 0; i < num; ++ i )
    {
       SFXStreamPacket* packet = packets[ i ];
-      
+
       // Allocate a buffer.
-      
+
       ALuint buffer;
       if( mFreeBuffers.size() )
       {
@@ -148,20 +148,20 @@ void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
       }
       else
          mOpenAL.alGenBuffers( 1, &buffer );
-         
+
       // Upload the data.
-      
+
       ALenum alFormat = _sfxFormatToALFormat( getFormat() );
       AssertFatal( alFormat != 0, "SFXALBuffer::write() - format unsupported" );
       AssertFatal( mOpenAL.alIsBuffer( buffer ), "SFXALBuffer::write() - buffer invalid" );
-      
+
       mOpenAL.alBufferData( buffer, alFormat,
          packet->data, packet->mSizeActual, getFormat().getSamplesPerSecond() );
-      
+
       destructSingle( packet );
-      
+
       // Queue the buffer.
-      
+
       mOpenAL.alSourceQueueBuffers( source, 1, &buffer );
    }
 }
@@ -193,32 +193,32 @@ void SFXALBuffer::_flush()
    }
 
    _getUniqueVoice()->mSampleOffset = 0;
-   
+
    //RD: disabling hack for now; rewritten queueing should be able to cope
    #if 0 //def TORQUE_OS_MAC
-   
+
    //WORKAROUND: Ugly hack on Mac.  Apparently there's a bug in the OpenAL implementation
    // that will cause AL_BUFFERS_PROCESSED to not be reset as it should be causing write()
    // to fail.  Brute-force this and just re-create the source.  Let's pray that nobody
    // issues any concurrent state changes on the voice resulting in us losing state here.
-   
+
    ALuint newSource;
    mOpenAL.alGenSources( 1, &newSource );
-   
+
    #define COPY_F( name ) \
    { \
       F32 val; \
       mOpenAL.alGetSourcef( source, name, &val ); \
       mOpenAL.alSourcef( source, name, val ); \
    }
-   
+
    #define COPY_FV( name ) \
    { \
       VectorF val; \
       mOpenAL.alGetSourcefv( source, name, val ); \
       mOpenAL.alSourcefv( source, name, val ); \
    }
-   
+
    COPY_F( AL_REFERENCE_DISTANCE );
    COPY_F( AL_MAX_DISTANCE );
    COPY_F( AL_GAIN );
@@ -226,11 +226,11 @@ void SFXALBuffer::_flush()
    COPY_F( AL_CONE_INNER_ANGLE );
    COPY_F( AL_CONE_OUTER_ANGLE );
    COPY_F( AL_CONE_OUTER_GAIN );
-   
+
    COPY_FV( AL_VELOCITY );
    COPY_FV( AL_POSITION );
    COPY_FV( AL_DIRECTION );
-   
+
    _getUniqueVoice()->mSourceName = newSource;
    mOpenAL.alDeleteSources( 1, &source );
 

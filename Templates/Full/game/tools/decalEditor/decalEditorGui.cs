@@ -31,7 +31,7 @@ function DecalEditorGui::onSelectInstance( %this, %decalId, %lookupName )
    // Lets remember the new Id
    DecalEditorGui.selDecalInstanceId = %decalId;
    DecalEditorTreeView.clearSelection();
-   
+
    %name = %decalId SPC %lookupName;
    %item = DecalEditorTreeView.findItemByName( %name );
    DecalEditorTreeView.selectItem( %item );
@@ -42,11 +42,11 @@ function DecalEditorGui::onCreateInstance( %this, %decalId, %lookupName )
 {
    // Lets remember the new Id
    DecalEditorGui.selDecalInstanceId = %decalId;
-   
+
    // Add the new instance to the node tree
    DecalEditorTreeView.addNodeTree( %decalId, %lookupName );
    DecalEditorTreeView.clearSelection();
-   
+
    %name = %decalId SPC %lookupName;
    %item = DecalEditorTreeView.findItemByName( %name );
    DecalEditorTreeView.selectItem( %item );
@@ -57,7 +57,7 @@ function DecalEditorGui::onDeleteInstance( %this, %decalId, %lookupName )
 {
    if( %decalId == DecalEditorGui.selDecalInstanceId )
       DecalEditorGui.selDecalInstanceId = -1;
-   
+
    %id = DecalEditorTreeView.findItemByName( %decalId SPC %lookupName );
    DecalEditorTreeView.removeItem(%id);
 }
@@ -67,14 +67,14 @@ function DecalEditorGui::editNodeDetails( %this )
    %decalId = DecalEditorGui.selDecalInstanceId;
    if( %decalId == -1 )
       return;
-   
+
    %nodeDetails = DecalEditorDetailContainer-->nodePosition.getText();
    %nodeDetails = %nodeDetails @ " " @ DecalEditorDetailContainer-->nodeTangent.getText();
    %nodeDetails = %nodeDetails @ " " @ DecalEditorDetailContainer-->nodeSize.getText();
-   
+
    if( getWordCount(%nodeDetails) == 7 )
       DecalEditorGui.doEditNodeDetails( %decalId, %nodeDetails, false );
-   
+
 }
 
 // Stores the information when the gizmo is first used
@@ -98,10 +98,10 @@ function DecalEditorGui::syncNodeDetails( %this )
    %decalId = DecalEditorGui.selDecalInstanceId;
    if( %decalId == -1 )
       return;
-   
+
    %lookupName = DecalEditorGui.getDecalLookupName( %decalId );
-   DecalEditorGui.updateInstancePreview( %lookupName.material );   
-   
+   DecalEditorGui.updateInstancePreview( %lookupName.material );
+
    DecalEditorDetailContainer-->instanceId.setText(%decalId @ " " @ %lookupName);
    %transformData = DecalEditorGui.getDecalTransform(%decalId);
    DecalEditorDetailContainer-->nodePosition.setText(getWords(%transformData, 0, 2));
@@ -117,78 +117,78 @@ function DecalEditorGui::paletteSync( %this, %mode )
 
 function DecalDataList::onSelect( %this, %id, %text )
 {
-   %obj = %this.getItemObject( %id );   
+   %obj = %this.getItemObject( %id );
    DecalEditorGui.currentDecalData = %obj;
-   
+
    %itemNum = DecalDataList.getSelectedItem();
    if ( %itemNum == -1 )
       return;
-         
-   %data = DecalDataList.getItemObject( %itemNum );      
-   
+
+   %data = DecalDataList.getItemObject( %itemNum );
+
    // Update the materialEditorList
    $Tools::materialEditorList = %data.getId();
-   
+
    //Canvas.pushDialog( DecalEditDlg );
    DecalInspector.inspect( %data );
    DecalEditorGui.updateDecalPreview( %data.material );
 }
 
 function RetargetDecalButton::onClick( %this )
-{  
+{
    %id = DecalDataList.getSelectedItem();
    %datablock = DecalDataList.getItemText(%id );
-   
+
    if( !isObject(%datablock) )
    {
       MessageBoxOK("Error", "A valid Decal Template must be selected.");
       return;
    }
 
-   // This is the first place IODropdown is used. The # in the function passed replaced with the output 
+   // This is the first place IODropdown is used. The # in the function passed replaced with the output
    // of the preset menu.
-   
-   IODropdown("Retarget Decal Instances", 
+
+   IODropdown("Retarget Decal Instances",
                "Retarget DecalInstances from " @ %datablock.getName() @ " over to....",
-               "decalDataSet", 
-               "DecalEditorGui.retargetDecalDatablock(" @ %datablock.getName() @ ", #);", 
+               "decalDataSet",
+               "DecalEditorGui.retargetDecalDatablock(" @ %datablock.getName() @ ", #);",
                "");
    DecalEditorGui.rebuildInstanceTree();
 }
 
 function NewDecalButton::onClick( %this )
-{  
+{
    %name = getUniqueName( "NewDecalData" );
-   
-   %str = "datablock DecalData( " @ %name @ " ) { Material = \"WarningMaterial\"; };";            
+
+   %str = "datablock DecalData( " @ %name @ " ) { Material = \"WarningMaterial\"; };";
    eval( %str );
-   
+
    DecalPMan.setDirty( %name, $decalDataFile );
-   
+
    if ( strchr(LibraryTabControl.text, "*") $= ""  )
       LibraryTabControl.text = LibraryTabControl.text @ "*";
-   
+
    DecalDataList.doMirror();
    %id = DecalDataList.findItemText( %name );
    DecalDataList.setSelected( %id, true );
-      
+
    Canvas.pushDialog( DecalEditDlg );
    DecalInspector.inspect( %name );
 }
 
 function DeleteDecalButton::onClick( %this )
 {
-   
+
    if( DecalEditorTabBook.getSelectedPage() == 0 ) // library
    {
       %id = DecalDataList.getSelectedItem();
       %datablock = DecalDataList.getItemText(%id );
-   
-      MessageBoxYesNoCancel("Delete Decal Datablock?", 
-         "Are you sure you want to delete<br><br>" @ %datablock @ "<br><br> Datablock deletion won't take affect until the engine is quit.", 
-         "DecalEditorGui.deleteSelectedDecalDatablock();", 
-         "", 
-         "" ); 
+
+      MessageBoxYesNoCancel("Delete Decal Datablock?",
+         "Are you sure you want to delete<br><br>" @ %datablock @ "<br><br> Datablock deletion won't take affect until the engine is quit.",
+         "DecalEditorGui.deleteSelectedDecalDatablock();",
+         "",
+         "" );
    }
    else // instances
    {
@@ -202,15 +202,15 @@ function DecalEditorGui::deleteSelectedDecalDatablock()
 {
    %id = DecalDataList.getSelectedItem();
    %datablock = DecalDataList.getItemText(%id );
-   
+
    DecalEditorGui.deleteDecalDatablock( %datablock );
-   
+
    if( %datablock.getFilename() !$= "" )
    {
       DecalPMan.removeDirty( %datablock );
-      DecalPMan.removeObjectFromFile( %datablock );  
+      DecalPMan.removeObjectFromFile( %datablock );
    }
-   
+
    DecalDataList.addFilteredItem( %datablock );
 }
 
@@ -243,7 +243,7 @@ function DecalEditorTreeView::onDefineIcons()
    %icons = "tools/gui/images/treeview/default:" @
             "tools/classIcons/decal:" @
             "tools/classIcons/decalNode:";
-            
+
    DecalEditorTreeView.buildIconTable( %icons );
 }
 
@@ -251,20 +251,20 @@ function DecalEditorTreeView::onSelect(%this, %id)
 {
    %instanceTag = getWord( DecalEditorTreeView.getItemText(%id), 1 );
    if( !isObject( %instanceTag ) )
-      return;   
-   
+      return;
+
    if( %instanceTag.getClassName() !$= "DecalData" )
       return;
-   
+
    // Grab the id from the tree view
    %decalId = getWord( DecalEditorTreeView.getItemText(%id), 0 );
-   
+
    if( DecalEditorGui.selDecalInstanceId == %decalId )
       return;
-      
+
    // Set the curent decalinstances id
    DecalEditorGui.selDecalInstanceId = %decalId;
-   
+
    DecalEditorGui.selectDecal(%decalId);
    DecalEditorGui.syncNodeDetails(%id);
 }
@@ -278,7 +278,7 @@ function DecalEditorTreeView::addNodeTree(%this, %nodeName, %parentName)
       %rootId = %this.findItemByName("<root>");
       %this.insertItem( %rootId, %parentName, 0, "", 1, 1);
    }
-   
+
    %nodeName = %nodeName SPC %parentName;
    %parentId = %this.findItemByName(%parentName);
    %id = %this.insertItem(%parentId, %nodeName, 0, "", 2);
@@ -288,10 +288,10 @@ function DecalInspector::onInspectorFieldModified( %this, %object, %fieldName, %
 {
    if( %fieldName $= "Material" )
       DecalEditorGui.updateDecalPreview( %newValue );
-      
+
    // Same work to do as for the regular WorldEditor Inspector.
-   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );   
-   
+   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );
+
    if (%oldValue != %newValue || %oldValue !$= %newValue)
       %this.setDirty(%object);
 }
@@ -299,7 +299,7 @@ function DecalInspector::onInspectorFieldModified( %this, %object, %fieldName, %
 function DecalInspector::setDirty( %this, %object )
 {
    DecalPMan.setDirty( %object );
-   
+
    if ( strchr(LibraryTabControl.text, "*") $= ""  )
       LibraryTabControl.text = LibraryTabControl.text @ "*";
 }
@@ -321,9 +321,9 @@ function DecalEditorGui::updateDecalPreview( %this, %material )
 function DecalEditorGui::updateInstancePreview( %this, %material )
 {
    if( isObject( %material ) )
-      DecalPreviewWindow-->instancePreview.setBitmap( MaterialEditorGui.searchForTexture( %material.getId(), %material.diffuseMap[0]) );      
+      DecalPreviewWindow-->instancePreview.setBitmap( MaterialEditorGui.searchForTexture( %material.getId(), %material.diffuseMap[0]) );
    else
-      DecalPreviewWindow-->instancePreview.setBitmap("tools/materialeditor/gui/unknownImage");   
+      DecalPreviewWindow-->instancePreview.setBitmap("tools/materialeditor/gui/unknownImage");
 }
 
 function DecalEditorGui::rebuildInstanceTree( %this )
@@ -337,7 +337,7 @@ function DecalEditorGui::rebuildInstanceTree( %this )
       %name = DecalEditorGui.getDecalLookupName(%i);
       if( %name $= "invalid" )
          continue;
-         
+
       DecalEditorTreeView.addNodeTree(%i, %name);
    }
 }

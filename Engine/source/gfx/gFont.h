@@ -46,7 +46,7 @@ GFX_DeclareTextureProfile(GFXFontTextureProfile);
 class GFont
 {
 public:
-   enum Constants 
+   enum Constants
    {
       TabWidthInSpaces = 3,
       TextureSheetSize = 256,
@@ -55,7 +55,7 @@ public:
 public:
    GFont();
    virtual ~GFont();
-   
+
    static Resource<GFont> create(const String &faceName, U32 size, const char *cacheDirectory = 0, U32 charset = TGE_ANSI_CHARSET);
 
    GFXTexHandle getTextureHandle(S32 index) const { return mTextureSheets[index]; }
@@ -66,7 +66,7 @@ public:
    U32  getCharHeight(const UTF16 in_charIndex);
    U32  getCharWidth(const UTF16 in_charIndex);
    U32  getCharXIncrement(const UTF16 in_charIndex);
-   
+
    bool isValidChar(const UTF16 in_charIndex) const;
 
    const U32 getHeight() const   { return mHeight; }
@@ -79,7 +79,7 @@ public:
    /// These are the preferred width functions.
    U32 getStrNWidth(const UTF16*, U32 n);
    U32 getStrNWidthPrecise(const UTF16*, U32 n);
-   
+
    /// These UTF8 versions of the width functions will be deprecated, please avoid them.
    U32 getStrWidth(const UTF8*);   // Note: ignores c/r
    U32 getStrNWidth(const UTF8*, U32 n);
@@ -154,7 +154,7 @@ private:
    U32 mAscent;
    U32 mDescent;
 
-   /// List of character info structures, must be accessed through the 
+   /// List of character info structures, must be accessed through the
    /// getCharInfo(U32) function to account for remapping.
    Vector<PlatformFont::CharInfo>  mCharInfoList;
 

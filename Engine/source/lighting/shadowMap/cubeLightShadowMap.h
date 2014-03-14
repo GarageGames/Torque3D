@@ -47,7 +47,7 @@ public:
    virtual void releaseTextures();
    virtual bool setTextureStage( U32 currTexFlag, LightingShaderConstants* lsc );
 
-protected:   
+protected:
 
    /// The shadow cubemap.
    GFXCubemapHandle mCubemap;

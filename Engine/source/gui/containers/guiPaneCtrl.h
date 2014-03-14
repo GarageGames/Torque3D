@@ -51,51 +51,51 @@
 class GuiPaneControl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
    protected:
 
       /// If true, the pane can be collapsed and extended by clicking its header.
       bool mCollapsable;
-      
+
       /// Whether the pane is currently collapsed.
       bool mCollapsed;
-      
+
       /// Whether to display the bitmapped pane bar behind the header text, too.
       bool mBarBehindText;
-      
+
       ///
       Point2I mOriginalExtents;
-      
+
       /// Text to display as the pane caption.
       String mCaption;
-      
+
       /// String table text ID to use as caption string.
       StringTableEntry mCaptionID;
-      
+
       ///
       Point2I mThumbSize;
 
       ///
       bool mMouseOver;
-      
+
       ///
       bool mDepressed;
 
    public:
-   
+
       GuiPaneControl();
 
       /// Return whether the pane is currently collapsed.
       bool getCollapsed() { return mCollapsed; };
-      
+
       /// Collapse or expand the pane.
       void setCollapsed(bool isCollapsed);
 
       virtual void setCaptionID(S32 id);
       virtual void setCaptionID(const char *id);
-      
+
       // GuiControl.
       virtual bool onWake();
 
@@ -109,7 +109,7 @@ class GuiPaneControl : public GuiControl
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
       static void initPersistFields();
-      
+
       DECLARE_CONOBJECT(GuiPaneControl);
       DECLARE_CATEGORY( "Gui Containers" );
       DECLARE_DESCRIPTION( "A container that wraps a single child control displaying a header\n"

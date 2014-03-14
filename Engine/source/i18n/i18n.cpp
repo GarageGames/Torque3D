@@ -74,7 +74,7 @@ ConsoleFunction(setCoreLangTable, void, 2, 2, "(string LangTable)"
 				"@ingroup Localization")
 {
 	LangTable *lt;
-   
+
    if(Sim::findObject(argv[1], lt))
 		gCoreLangTable = lt;
    else

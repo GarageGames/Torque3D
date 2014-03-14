@@ -57,13 +57,13 @@ MODULE_BEGIN( DecalManager )
 
    MODULE_INIT_AFTER( Scene )
    MODULE_SHUTDOWN_BEFORE( Scene )
-   
+
    MODULE_INIT
    {
       gDecalManager = new DecalManager;
       gClientSceneGraph->addObjectToScene( gDecalManager );
    }
-   
+
    MODULE_SHUTDOWN
    {
       gClientSceneGraph->removeObjectFromScene( gDecalManager );
@@ -169,7 +169,7 @@ int QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
 }
 
 int QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
-{   
+{
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
 
@@ -186,7 +186,7 @@ int QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
 
       if ( (*pd2)->mFlags & SaveDecal )
       {
-         int id = ( (*pd1)->mDataBlock->getMaterial()->getId() - (*pd2)->mDataBlock->getMaterial()->getId() );      
+         int id = ( (*pd1)->mDataBlock->getMaterial()->getId() - (*pd2)->mDataBlock->getMaterial()->getId() );
          if ( id != 0 )
             return id;
 
@@ -206,7 +206,7 @@ enum
    SIZE_CLASS_0 = 256,
    SIZE_CLASS_1 = 512,
    SIZE_CLASS_2 = 1024,
-   
+
    NUM_SIZE_CLASSES = 3
 };
 
@@ -298,7 +298,7 @@ bool DecalManager::_handleGFXEvent(GFXDevice::GFXDeviceEventType event)
       }
 
       break;
-      
+
    default: ;
    }
 
@@ -313,7 +313,7 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
    _freeBuffers( decal );
 
    F32 halfSize = decal->mSize * 0.5f;
-   
+
    // Ugly hack for ProjectedShadow!
    F32 halfSizeZ = clipDepth ? clipDepth->x : halfSize;
    F32 negHalfSize = clipDepth ? clipDepth->y : halfSize;
@@ -328,7 +328,7 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
 
    VectorF newFwd, newRight;
    projMat.getColumn( 0, &newRight );
-   projMat.getColumn( 1, &newFwd );   
+   projMat.getColumn( 1, &newFwd );
 
    VectorF objRight( 1.0f, 0, 0 );
    VectorF objFwd( 0, 1.0f, 0 );
@@ -355,12 +355,12 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
    projMat.mul( box );
 
    PROFILE_START( DecalManager_clipDecal_buildPolyList );
-   getContainer()->buildPolyList( PLC_Decal, box, decalData->clippingMasks, &mClipper );   
+   getContainer()->buildPolyList( PLC_Decal, box, decalData->clippingMasks, &mClipper );
    PROFILE_END();
 
    mClipper.cullUnusedVerts();
    mClipper.triangulate();
-   
+
    const U32 numVerts = mClipper.mVertexList.size();
    const U32 numIndices = mClipper.mIndexList.size();
 
@@ -375,7 +375,7 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
 
    if ( !decalData->skipVertexNormals )
       mClipper.generateNormals();
-   
+
 #ifdef DECALMANAGER_DEBUG
    mDebugPlanes.clear();
    mDebugPlanes.merge( mClipper.mPlaneList );
@@ -383,13 +383,13 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
 
    decal->mVertCount = numVerts;
    decal->mIndxCount = numIndices;
-   
+
    Vector<Point3F> tmpPoints;
 
    tmpPoints.push_back(( objFwd * decalHalfSize ) + ( objRight * decalHalfSize ));
    tmpPoints.push_back(( objFwd * decalHalfSize ) + ( -objRight * decalHalfSize ));
    tmpPoints.push_back(( -objFwd * decalHalfSize ) + ( -objRight * decalHalfSize ));
-   
+
    Point3F lowerLeft(( -objFwd * decalHalfSize ) + ( objRight * decalHalfSize ));
 
    projMat.inverse();
@@ -397,20 +397,20 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
    _generateWindingOrder( lowerLeft, &tmpPoints );
 
    BiQuadToSqr quadToSquare( Point2F( lowerLeft.x, lowerLeft.y ),
-                             Point2F( tmpPoints[0].x, tmpPoints[0].y ), 
-                             Point2F( tmpPoints[1].x, tmpPoints[1].y ), 
-                             Point2F( tmpPoints[2].x, tmpPoints[2].y ) );  
+                             Point2F( tmpPoints[0].x, tmpPoints[0].y ),
+                             Point2F( tmpPoints[1].x, tmpPoints[1].y ),
+                             Point2F( tmpPoints[2].x, tmpPoints[2].y ) );
 
    Point2F uv( 0, 0 );
    Point3F vecX(0.0f, 0.0f, 0.0f);
 
    // Allocate memory for vert and index arrays
-   _allocBuffers( decal );  
+   _allocBuffers( decal );
 
    // Mark this so that the color will be assigned on these verts the next
    // time it renders, since we just threw away the previous verts.
    decal->mLastAlpha = -1;
-   
+
    Point3F vertPoint( 0, 0, 0 );
 
    for ( U32 i = 0; i < mClipper.mVertexList.size(); i++ )
@@ -433,26 +433,26 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
       const RectF &rect = decal->mDataBlock->texRect[decal->mTextureRectIdx];
 
       uv *= rect.extent;
-      uv += rect.point;      
+      uv += rect.point;
 
       // Set the world space vertex position.
       decal->mVerts[i].point = vert.point;
-      
+
       decal->mVerts[i].texCoord.set( uv.x, uv.y );
-      
+
       if ( mClipper.mNormalList.empty() )
          continue;
 
       decal->mVerts[i].normal = mClipper.mNormalList[i];
       decal->mVerts[i].normal.normalize();
 
-      if( mFabs( decal->mVerts[i].normal.z ) > 0.8f ) 
+      if( mFabs( decal->mVerts[i].normal.z ) > 0.8f )
          mCross( decal->mVerts[i].normal, Point3F( 1.0f, 0.0f, 0.0f ), &vecX );
       else if ( mFabs( decal->mVerts[i].normal.x ) > 0.8f )
          mCross( decal->mVerts[i].normal, Point3F( 0.0f, 1.0f, 0.0f ), &vecX );
       else if ( mFabs( decal->mVerts[i].normal.y ) > 0.8f )
          mCross( decal->mVerts[i].normal, Point3F( 0.0f, 0.0f, 1.0f ), &vecX );
-   
+
       decal->mVerts[i].tangent = mCross( decal->mVerts[i].normal, vecX );
    }
 
@@ -460,17 +460,17 @@ bool DecalManager::clipDecal( DecalInstance *decal, Vector<Point3F> *edgeVerts, 
    for ( U32 j = 0; j < mClipper.mPolyList.size(); j++ )
    {
       // Write indices for each Poly
-      ClippedPolyList::Poly *poly = &mClipper.mPolyList[j];                  
+      ClippedPolyList::Poly *poly = &mClipper.mPolyList[j];
 
       AssertFatal( poly->vertexCount == 3, "Got non-triangle poly!" );
 
-      decal->mIndices[curIdx] = mClipper.mIndexList[poly->vertexStart];         
+      decal->mIndices[curIdx] = mClipper.mIndexList[poly->vertexStart];
       curIdx++;
-      decal->mIndices[curIdx] = mClipper.mIndexList[poly->vertexStart + 1];            
+      decal->mIndices[curIdx] = mClipper.mIndexList[poly->vertexStart + 1];
       curIdx++;
-      decal->mIndices[curIdx] = mClipper.mIndexList[poly->vertexStart + 2];                
+      decal->mIndices[curIdx] = mClipper.mIndexList[poly->vertexStart + 2];
       curIdx++;
-   } 
+   }
 
    if ( !edgeVerts )
       return true;
@@ -504,7 +504,7 @@ DecalInstance* DecalManager::addDecal( const Point3F &pos,
                                        F32 decalScale,
                                        S32 decalTexIndex,
                                        U8 flags )
-{      
+{
    MatrixF mat( true );
    MathUtils::getMatrixFromUpVector( normal, &mat );
 
@@ -512,11 +512,11 @@ DecalInstance* DecalManager::addDecal( const Point3F &pos,
    MatrixF rotmat;
    rot.setMatrix( &rotmat );
    mat.mul( rotmat );
- 
+
    Point3F tangent;
    mat.getColumn( 1, &tangent );
 
-   return addDecal( pos, normal, tangent, decalData, decalScale, decalTexIndex, flags );   
+   return addDecal( pos, normal, tangent, decalData, decalScale, decalTexIndex, flags );
 }
 
 DecalInstance* DecalManager::addDecal( const Point3F& pos,
@@ -539,23 +539,23 @@ DecalInstance* DecalManager::addDecal( const Point3F& pos,
 
 void DecalManager::removeDecal( DecalInstance *inst )
 {
-   // If this is a decal we save then we need 
+   // If this is a decal we save then we need
    // to set the dirty flag.
    if ( inst->mFlags & SaveDecal )
       mDirty = true;
 
    // Remove the decal from the instance vector.
-   
+
 	if( inst->mId != -1 && inst->mId < mDecalInstanceVec.size() )
       mDecalInstanceVec[ inst->mId ] = NULL;
-   
+
    // Release its geometry (if it has any).
 
    _freeBuffers( inst );
-   
+
    // Remove it from the decal file.
 
-   if ( mData )      
+   if ( mData )
       mData->removeDecal( inst );
 }
 
@@ -569,7 +569,7 @@ DecalInstance* DecalManager::getDecal( S32 id )
 
 void DecalManager::notifyDecalModified( DecalInstance *inst )
 {
-   // If this is a decal we save then we need 
+   // If this is a decal we save then we need
    // to set the dirty flag.
    if ( inst->mFlags & SaveDecal )
       mDirty = true;
@@ -595,7 +595,7 @@ DecalInstance* DecalManager::getClosestDecal( const Point3F &pos )
    {
       DecalSphere *decalSphere = grid[i];
       const SphereF &worldSphere = decalSphere->mWorldSphere;
-      if (  !worldSphere.isIntersecting( worldPickSphere ) && 
+      if (  !worldSphere.isIntersecting( worldPickSphere ) &&
             !worldSphere.isContained( pos ) )
          continue;
 
@@ -632,9 +632,9 @@ DecalInstance* DecalManager::getClosestDecal( const Point3F &pos )
       }
    }
 
-   if (  !collectedInsts.empty() && 
-         collectedInsts[closestIndex] && 
-         closestDistance < 1.0f || 
+   if (  !collectedInsts.empty() &&
+         collectedInsts[closestIndex] &&
+         closestDistance < 1.0f ||
          worldInstSphere.isContained( pos ) )
       return collectedInsts[closestIndex];
    else
@@ -674,17 +674,17 @@ DecalInstance* DecalManager::raycast( const Point3F &start, const Point3F &end, 
 
          if ( !worldSphere.intersectsRay( start, end ) )
             continue;
-			
+
 			RayInfo ri;
 			bool containsPoint = false;
 			if ( gServerContainer.castRayRendered( start, end, STATIC_COLLISION_TYPEMASK, &ri ) )
-			{        
+			{
 				Point2F poly[4];
 				poly[0].set( inst->mPosition.x - (inst->mSize / 2), inst->mPosition.y + (inst->mSize / 2));
 				poly[1].set( inst->mPosition.x - (inst->mSize / 2), inst->mPosition.y - (inst->mSize / 2));
 				poly[2].set( inst->mPosition.x + (inst->mSize / 2), inst->mPosition.y - (inst->mSize / 2));
 				poly[3].set( inst->mPosition.x + (inst->mSize / 2), inst->mPosition.y + (inst->mSize / 2));
-				
+
 				if ( MathUtils::pointInPolygon( poly, 4, Point2F(ri.point.x, ri.point.y) ) )
 					containsPoint = true;
 			}
@@ -723,7 +723,7 @@ U32 DecalManager::_generateConvexHull( const Vector<Point3F> &points, Vector<Poi
    }
 
    // Sort our input points.
-   dQsort( points.address(), points.size(), sizeof( Point3F ), cmpPointsXY ); 
+   dQsort( points.address(), points.size(), sizeof( Point3F ), cmpPointsXY );
 
    U32 n = points.size();
 
@@ -739,12 +739,12 @@ U32 DecalManager::_generateConvexHull( const Vector<Point3F> &points, Vector<Poi
    S32 minmin = 0, minmax;
    F32 xmin = points[0].x;
    for ( i = 1; i < n; i++ )
-     if (points[i].x != xmin) 
+     if (points[i].x != xmin)
         break;
 
    minmax = i - 1;
-   if ( minmax == n - 1 ) 
-   {       
+   if ( minmax == n - 1 )
+   {
       // degenerate case: all x-coords == xmin
       toptmp = top + 1;
       if ( toptmp < n )
@@ -769,9 +769,9 @@ U32 DecalManager::_generateConvexHull( const Vector<Point3F> &points, Vector<Poi
    F32 xmax = points[n-1].x;
 
    for ( i = n - 2; i >= 0; i-- )
-     if ( points[i].x != xmax ) 
+     if ( points[i].x != xmax )
         break;
-   
+
    maxmin = i + 1;
 
    // Compute the lower hull on the stack H
@@ -817,7 +817,7 @@ U32 DecalManager::_generateConvexHull( const Vector<Point3F> &points, Vector<Poi
          continue;          // ignore P[i] below or on the upper line
 
       while ( top > bot )    // at least 2 points on the upper stack
-      { 
+      {
          // test if P[i] is left of the line at the stack top
          if ( isLeft( tmpPoints[top-1], tmpPoints[top], points[i] ) > 0 )
              break;         // P[i] is a new hull vertex
@@ -844,7 +844,7 @@ U32 DecalManager::_generateConvexHull( const Vector<Point3F> &points, Vector<Poi
 
 void DecalManager::_generateWindingOrder( const Point3F &cornerPoint, Vector<Point3F> *sortPoints )
 {
-   // This block of code is used to find 
+   // This block of code is used to find
    // the winding order for the points in our quad.
 
    // First, choose an arbitrary corner point.
@@ -855,7 +855,7 @@ void DecalManager::_generateWindingOrder( const Point3F &cornerPoint, Vector<Poi
    //F32 radius = 0;
 
    F32 theta = 0;
-   
+
    Vector<Point4F> tmpPoints;
 
    for ( U32 i = 0; i < (*sortPoints).size(); i++ )
@@ -864,7 +864,7 @@ void DecalManager::_generateWindingOrder( const Point3F &cornerPoint, Vector<Poi
       relPoint = cornerPoint - pnt;
 
       // Get the radius (r^2 = x^2 + y^2).
-      
+
       // This is commented because for a quad
       // you typically can't have the same values
       // for theta, which is the caveat which would
@@ -901,7 +901,7 @@ void DecalManager::_generateWindingOrder( const Point3F &cornerPoint, Vector<Poi
       tmpPoints.push_back( Point4F( pnt.x, pnt.y, pnt.z, theta ) );
    }
 
-   dQsort( tmpPoints.address(), tmpPoints.size(), sizeof( Point4F ), cmpQuadPointTheta ); 
+   dQsort( tmpPoints.address(), tmpPoints.size(), sizeof( Point4F ), cmpQuadPointTheta );
 
    for ( U32 i = 0; i < tmpPoints.size(); i++ )
    {
@@ -913,7 +913,7 @@ void DecalManager::_generateWindingOrder( const Point3F &cornerPoint, Vector<Poi
 void DecalManager::_allocBuffers( DecalInstance *inst )
 {
    const S32 sizeClass = _getSizeClass( inst );
-   
+
    void* data;
    if ( sizeClass == -1 )
       data = dMalloc( sizeof( DecalVertex ) * inst->mVertCount + sizeof( U16 ) * inst->mIndxCount );
@@ -930,20 +930,20 @@ void DecalManager::_freeBuffers( DecalInstance *inst )
    if ( inst->mVerts != NULL )
    {
       const S32 sizeClass = _getSizeClass( inst );
-      
+
       if ( sizeClass == -1 )
          dFree( inst->mVerts );
       else
       {
          // Use FreeListChunker
-         mChunkers[sizeClass]->free( inst->mVerts );      
+         mChunkers[sizeClass]->free( inst->mVerts );
       }
 
       inst->mVerts = NULL;
       inst->mVertCount = 0;
       inst->mIndices = NULL;
       inst->mIndxCount = 0;
-   }   
+   }
 }
 
 void DecalManager::_freePools()
@@ -992,12 +992,12 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 {
    PROFILE_SCOPE( DecalManager_RenderDecals );
 
-   if ( !smDecalsOn || !mData ) 
+   if ( !smDecalsOn || !mData )
       return;
 
    // Decals only render in the diffuse pass!
    // We technically could render them into reflections but prefer to save
-   // the performance. This would also break the DecalInstance::mLastAlpha 
+   // the performance. This would also break the DecalInstance::mLastAlpha
    // optimization.
    if ( !state->isDiffusePass() )
       return;
@@ -1014,7 +1014,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
    AssertFatal( zoneManager, "DecalManager::prepRenderImage - No zone manager!" );
    const Vector<DecalSphere*> &grid = mData->getSphereList();
    const bool haveOnlyOutdoorZone = ( zoneManager->getNumActiveZones() == 1 );
-   
+
    mDecalQueue.clear();
    for ( U32 i = 0; i < grid.size(); i++ )
    {
@@ -1041,7 +1041,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
          if( cullingState.isCulled( worldSphere, decalSphere->mZones.address(), decalSphere->mZones.size() ) )
             continue;
-      }  
+      }
 
       // TODO: If each sphere stored its largest decal instance we
       // could do an LOD step on it here and skip adding any of the
@@ -1054,7 +1054,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
    PROFILE_START( DecalManager_RenderDecals_Update );
 
-   const U32 &curSimTime = Sim::getCurrentTime();   
+   const U32 &curSimTime = Sim::getCurrentTime();
    F32 pixelSize;
    U32 delta, diff;
    DecalInstance *dinst;
@@ -1073,29 +1073,29 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
       pixelSize = dinst->calcPixelSize( state->getViewport().extent.y, state->getCameraPosition(), state->getWorldToScreenScale().y );
 
-      if ( pixelSize != F32_MAX && pixelSize < ddata->fadeEndPixelSize )      
+      if ( pixelSize != F32_MAX && pixelSize < ddata->fadeEndPixelSize )
       {
          mDecalQueue.erase_fast( i );
          i--;
          continue;
       }
 
-      // We will try to render this decal... so do any 
+      // We will try to render this decal... so do any
       // final adjustments to it before rendering.
 
       // Update fade and delete expired.
       if ( !( dinst->mFlags & PermanentDecal || dinst->mFlags & CustomDecal ) )
-      {         
+      {
          delta = ( curSimTime - dinst->mCreateTime );
-         if ( delta > dinst->mDataBlock->lifeSpan )         
-         {            
+         if ( delta > dinst->mDataBlock->lifeSpan )
+         {
             diff = delta - dinst->mDataBlock->lifeSpan;
             dinst->mVisibility = 1.0f - (F32)diff / (F32)dinst->mDataBlock->fadeTime;
 
             if ( dinst->mVisibility <= 0.0f )
             {
                mDecalQueue.erase_fast( i );
-               removeDecal( dinst );               
+               removeDecal( dinst );
                i--;
                continue;
             }
@@ -1104,7 +1104,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
       // Build clipped geometry for this decal if needed.
       if ( dinst->mFlags & ClipDecal && !( dinst->mFlags & CustomDecal ) )
-      {  
+      {
          // Turn off the flag so we don't continually try to clip
          // if it fails.
          dinst->mFlags = dinst->mFlags & ~ClipDecal;
@@ -1126,9 +1126,9 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
             // If this is a decal placed by the editor it will be
             // flagged to attempt clipping again the next time it is
-            // modified. For now we just skip rendering it.      
+            // modified. For now we just skip rendering it.
             continue;
-         }         
+         }
       }
 
       // If we get here and the decal still does not have any geometry
@@ -1140,8 +1140,8 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
          i--;
          continue;
       }
-            
-      // Calculate the alpha value for this decal and apply it to the verts.            
+
+      // Calculate the alpha value for this decal and apply it to the verts.
       {
          PROFILE_START( DecalManager_RenderDecals_Update_SetAlpha );
 
@@ -1158,7 +1158,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
             alpha *= dinst->mVisibility;
          }
-            
+
          // If the alpha value has not changed since last render avoid
          // looping through all the verts!
          if ( alpha != dinst->mLastAlpha )
@@ -1171,13 +1171,13 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
                dinst->mVerts[v].color = color;
 
             dinst->mLastAlpha = alpha;
-         }      
+         }
 
          PROFILE_END();
       }
    }
 
-   PROFILE_END();      
+   PROFILE_END();
 
    if ( mDecalQueue.empty() )
       return;
@@ -1201,7 +1201,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
    // Data shared by all instances we allocate below can be copied
    // from the base instance at the same time.
    MeshRenderInst baseRenderInst;
-   baseRenderInst.clear();   
+   baseRenderInst.clear();
 
    MatrixF *tempMat = renderPass->allocUniqueXform( MatrixF( true ) );
    MathUtils::getZBiasProjectionMatrix( gDecalBias, rootFrustum, tempMat );
@@ -1210,10 +1210,10 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
    baseRenderInst.objectToWorld = &MatrixF::Identity;
    baseRenderInst.worldToCamera = renderPass->allocSharedXform(RenderPassManager::View);
 
-   baseRenderInst.type = RenderPassManager::RIT_Decal;      
+   baseRenderInst.type = RenderPassManager::RIT_Decal;
 
-   // Make it the sort distance the max distance so that 
-   // it renders after all the other opaque geometry in 
+   // Make it the sort distance the max distance so that
+   // it renders after all the other opaque geometry in
    // the prepass bin.
    baseRenderInst.sortDistSq = F32_MAX;
 
@@ -1223,7 +1223,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
    // Loop through DecalQueue collecting them into render batches.
    for ( U32 i = 0; i < mDecalQueue.size(); i++ )
    {
-      DecalInstance *decal = mDecalQueue[i];      
+      DecalInstance *decal = mDecalQueue[i];
       DecalData *data = decal->mDataBlock;
       Material *mat = data->getMaterial();
 
@@ -1239,13 +1239,13 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
          currentBatch->vCount = decal->mVertCount;
          currentBatch->mat = mat;
          currentBatch->matInst = decal->mDataBlock->getMaterialInstance();
-         currentBatch->priority = decal->getRenderPriority();         
+         currentBatch->priority = decal->getRenderPriority();
          currentBatch->dynamic = !(decal->mFlags & SaveDecal);
 
          continue;
       }
 
-      if ( currentBatch->iCount + decal->mIndxCount >= smMaxIndices || 
+      if ( currentBatch->iCount + decal->mIndxCount >= smMaxIndices ||
            currentBatch->vCount + decal->mVertCount >= smMaxVerts ||
            currentBatch->mat != mat ||
            currentBatch->priority != decal->getRenderPriority() ||
@@ -1263,12 +1263,12 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
       currentBatch->iCount += decal->mIndxCount;
       currentBatch->vCount += decal->mVertCount;
    }
-   
+
    // Make sure our primitive and vertex buffer handle storage is
    // big enough to take all batches.  Doing this now avoids reallocation
    // later on which would invalidate all the pointers we already had
    // passed into render instances.
-   
+
    //mPBs.reserve( batches.size() );
    //mVBs.reserve( batches.size() );
 
@@ -1280,12 +1280,12 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
    // Loop through batches allocating buffers and submitting render instances.
    for ( U32 i = 0; i < batches.size(); i++ )
    {
-      DecalBatch &currentBatch = batches[i];      
+      DecalBatch &currentBatch = batches[i];
 
       // Copy data into the system memory arrays, from all decals in this batch...
 
       DecalVertex *vpPtr = vertData;
-      U16 *pbPtr = indexData;            
+      U16 *pbPtr = indexData;
 
       U32 lastDecal = currentBatch.startDecal + currentBatch.decalCount;
 
@@ -1301,7 +1301,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
          for ( U32 k = 0; k < dinst->mIndxCount; k++ )
          {
-            *( pbPtr + ioffset + k ) = dinst->mIndices[k] + voffset;            
+            *( pbPtr + ioffset + k ) = dinst->mIndices[k] + voffset;
          }
 
          ioffset += dinst->mIndxCount;
@@ -1316,18 +1316,18 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
       AssertFatal( ioffset == currentBatch.iCount, "bad" );
       AssertFatal( voffset == currentBatch.vCount, "bad" );
-        
+
       // Get handles to video memory buffers we will be filling...
 
       GFXVertexBufferHandle<DecalVertex> *vb = NULL;
-      
+
       if ( mVBPool.empty() )
       {
          // If the Pool is empty allocate a new one.
          vb = new GFXVertexBufferHandle<DecalVertex>;
-         vb->set( GFX, smMaxVerts, GFXBufferTypeDynamic );                  
-      }      
-      else 
+         vb->set( GFX, smMaxVerts, GFXBufferTypeDynamic );
+      }
+      else
       {
          // Otherwise grab from the pool.
          vb = mVBPool.last();
@@ -1336,16 +1336,16 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
       // Push into our vector of 'in use' buffers.
       mVBs.push_back( vb );
-      
+
       // Ready to start filling.
       vpPtr = vb->lock();
 
-      // Same deal as above...      
+      // Same deal as above...
       GFXPrimitiveBufferHandle *pb = NULL;
       if ( mPBPool.empty() )
       {
          pb = new GFXPrimitiveBufferHandle;
-         pb->set( GFX, smMaxIndices, 0, GFXBufferTypeDynamic );   
+         pb->set( GFX, smMaxIndices, 0, GFXBufferTypeDynamic );
       }
       else
       {
@@ -1353,7 +1353,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
          mPBPool.pop_back();
       }
       mPBs.push_back( pb );
-      
+
       pb->lock( &pbPtr );
 
       // Memcpy from system to video memory.
@@ -1469,7 +1469,7 @@ bool DecalManager::_createDataFile()
    char *dot = dStrstr((const char*)missionName, ".mis");
    if(dot)
       *dot = '\0';
-   
+
    dSprintf( fileName, sizeof(fileName), "%s.mis.decals", missionName );
 
    mDataFileName = StringTable->insert( fileName );
@@ -1530,9 +1530,9 @@ bool DecalManager::loadDecals( const UTF8 *fileName )
 void DecalManager::clearData()
 {
    mClearDataSignal.trigger();
-   
+
    // Free all geometry buffers.
-   
+
    if( mData )
    {
       const Vector< DecalSphere* > grid = mData->getSphereList();
@@ -1543,11 +1543,11 @@ void DecalManager::clearData()
             _freeBuffers( sphere->mItems[ n ] );
       }
    }
-   
+
    mData = NULL;
 	mDecalInstanceVec.clear();
 
-   _freePools();   
+   _freePools();
 }
 
 bool DecalManager::onSceneAdd()
@@ -1625,7 +1625,7 @@ DefineEngineFunction( decalManagerLoad, bool, ( const char* fileName ),,
    return gDecalManager->loadDecals( fileName );
 }
 
-DefineEngineFunction( decalManagerDirty, bool, (),, 
+DefineEngineFunction( decalManagerDirty, bool, (),,
    "Returns whether the decal manager has unsaved modifications.\n"
    "@return True if the decal manager has unsaved modifications, false if "
    "everything has been saved.\n"

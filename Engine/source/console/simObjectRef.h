@@ -39,7 +39,7 @@
 template< class T >
 class SimObjectRef
 {
-public:         
+public:
 
    static S32 _smTypeId;
 
@@ -49,12 +49,12 @@ public:
         mName( "" )
    {
    }
-   
-   T* operator-> () { return _get(); }   
+
+   T* operator-> () { return _get(); }
 
    operator T*() { return _get(); }
 
-   operator bool () { return _get() != NULL; }   
+   operator bool () { return _get() != NULL; }
 
    SimObjectRef<T>& operator= ( U32 id )
    {
@@ -71,8 +71,8 @@ public:
 protected:
 
    T* _get();
-   void _set( U32 id );      
-   void _set( const char *name );      
+   void _set( U32 id );
+   void _set( const char *name );
 
 protected:
 
@@ -101,18 +101,18 @@ void SimObjectRef<T>::_set( const char *name )
 template<class T>
 void SimObjectRef<T>::_set( U32 id )
 {
-   mId = id;   
+   mId = id;
    mObject = NULL;
    mName = "";
 }
 
-template<class T> 
+template<class T>
 T* SimObjectRef<T>::_get()
-{  
-   if ( mObject == NULL )   
+{
+   if ( mObject == NULL )
    {
       if ( mId != 0 )
-         Sim::findObject( mId, mObject );   
+         Sim::findObject( mId, mObject );
       else if ( mName != NULL && dStrlen( mName ) != 0 )
          Sim::findObject( mName, mObject );
    }
@@ -129,16 +129,16 @@ class SimObjectRefConsoleBaseType : public ConsoleBaseType
 public:
 
    typedef ConsoleBaseType Parent;
-   
+
    SimObjectRefConsoleBaseType( const char *typeName )
-      : Parent( sizeof(SimObjectRef<T>), &SimObjectRef<T>::_smTypeId, typeName ) 
+      : Parent( sizeof(SimObjectRef<T>), &SimObjectRef<T>::_smTypeId, typeName )
    {
    }
 
 public:
 
    virtual const char* getData( void *dptr, const EnumTable*, BitSet32 )
-   {      
+   {
       SimObjectRef<T> *objRef = static_cast< SimObjectRef<T>* >( dptr );
       T *obj = *objRef;
       return T::__getObjectId( obj );
@@ -148,33 +148,33 @@ public:
    {
       SimObjectRef<T> *objRef = static_cast< SimObjectRef<T>* >( dptr );
 
-      if ( argc != 1 ) 
+      if ( argc != 1 )
          return;
 
       *objRef = argv[0];
    }
 
-   virtual const bool isDatablock() 
-   { 
-      return T::__smIsDatablock; 
+   virtual const bool isDatablock()
+   {
+      return T::__smIsDatablock;
    };
 
    virtual const char* getTypeClassName()
    {
       return T::getStaticClassRep()->getClassName();
    }
-      
-   virtual void* getNativeVariable() 
-   { 
-      SimObjectRef<T> *var = new SimObjectRef<T>(); 
-      return (void*)var; 
+
+   virtual void* getNativeVariable()
+   {
+      SimObjectRef<T> *var = new SimObjectRef<T>();
+      return (void*)var;
    }
-   
-   virtual void deleteNativeVariable( void *var ) 
-   { 
-      SimObjectRef<T> *nativeVar = reinterpret_cast< SimObjectRef<T>* >( var ); 
-      delete nativeVar; 
-   }   
+
+   virtual void deleteNativeVariable( void *var )
+   {
+      SimObjectRef<T> *nativeVar = reinterpret_cast< SimObjectRef<T>* >( var );
+      delete nativeVar;
+   }
 };
 
 

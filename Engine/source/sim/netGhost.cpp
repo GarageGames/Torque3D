@@ -425,7 +425,7 @@ void NetConnection::ghostWritePacket(BitStream *bstream, PacketNotify *notify)
       GhostInfo *walk = mGhostArray[i];
 		if(walk->flags & (GhostInfo::KillingGhost | GhostInfo::Ghosting))
 		   continue;
-		
+
       bstream->writeFlag(true);
 
       bstream->writeInt(walk->index, sendSize);
@@ -566,7 +566,7 @@ void NetConnection::ghostReadPacket(BitStream *bstream)
             obj->mNetFlags &= ~(BIT(NetObject::MaxNetFlagBit+1)-1);
             // we're a ghost...
             obj->mNetFlags |= NetObject::IsGhost;
-            
+
             // object gets initial update before adding to the manager
 
             obj->mNetIndex = index;
@@ -598,11 +598,11 @@ void NetConnection::ghostReadPacket(BitStream *bstream)
                if ( obj->mServerObject )
                {
                   obj->mServerObject->mClientObject = obj;
-                  
+
                   // Sync selection flag as otherwise the editor will end up setting only
                   // server-side flags when selecting an object that hasn't been ghosted yet
                   // (usually the case when creating new objects).
-                  
+
                   if( obj->mServerObject->isSelected() )
                      obj->setSelected( true );
                }
@@ -614,7 +614,7 @@ void NetConnection::ghostReadPacket(BitStream *bstream)
                   setLastError("Invalid packet. (failed to register ghost)");
                return;
             }
-         
+
             addObject(obj);
             ghostReadExtra(mLocalGhosts[index],bstream,true);
          }
@@ -976,7 +976,7 @@ void NetConnection::activateGhosting()
                 mStream.setPosition(0);
                 mStream.clearCompressionPoint();
                 U32 retMask = mGhostArray[j]->obj->packUpdate(this, 0xFFFFFFFF, &mStream);
-                if ( retMask != 0 ) 
+                if ( retMask != 0 )
                    mGhostArray[j]->obj->setMaskBits( retMask );
 
                 // Create a new object instance for the client.
@@ -1072,7 +1072,7 @@ void NetConnection::setGhostAlwaysObject(NetObject *object, U32 index)
    object->mNetIndex = index;
 
    // while there's an object waiting...
-   if ( isLocalConnection() ) 
+   if ( isLocalConnection() )
    {
       object->mServerObject = mRemoteConnection->resolveObjectFromGhostIndex(index);
       if ( object->mServerObject )
@@ -1113,7 +1113,7 @@ void NetConnection::loadNextGhostAlwaysObject(bool hadNewFiles)
       // files were downloaded from the server.
 //       if(hadNewFiles)
 //          gResourceManager->setMissingFileLogging(true);
-// 
+//
 //       gResourceManager->clearMissingFileList();
       NetObject *object = mGhostAlwaysSaveList[0].ghost;
       U32 index = mGhostAlwaysSaveList[0].index;

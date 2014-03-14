@@ -133,7 +133,7 @@ class SceneRenderState
       /// Return the SceneManager that is being rendered in this SceneRenderState.
       SceneManager* getSceneManager() const { return mSceneManager; }
 
-      /// If true then bin based post effects are disabled 
+      /// If true then bin based post effects are disabled
       /// during rendering with this scene state.
       bool usePostEffects() const { return mUsePostEffects; }
       void usePostEffects( bool value ) { mUsePostEffects = value; }
@@ -282,7 +282,7 @@ class SceneRenderState
       void setWorldToScreenScale( const Point2F& scale ) { mWorldToScreenScale = scale; }
 
       /// Returns the pixel size of the radius projected to the screen at a desired distance.
-      /// 
+      ///
       /// Internally this uses the stored world to screen scale and viewport extents.  This
       /// allows the projection to be overloaded in special cases like when rendering shadows
       /// or reflections.
@@ -291,7 +291,7 @@ class SceneRenderState
       /// @see getViewportExtent
       F32 projectRadius( F32 dist, F32 radius ) const
       {
-         // We fixup any negative or zero distance 
+         // We fixup any negative or zero distance
          // so we don't get a divide by zero.
          dist = dist > 0.0f ? dist : 0.001f;
          return ( radius / dist ) * mWorldToScreenScale.y;
@@ -317,8 +317,8 @@ class SceneRenderState
       /// @{
 
       /// When performing a special render pass like shadows this
-      /// returns a specialized override material.  It can return 
-      /// NULL if the override wants to disable rendering.  If 
+      /// returns a specialized override material.  It can return
+      /// NULL if the override wants to disable rendering.  If
       /// there is no override in place then the input material is
       /// returned unaltered.
       BaseMatInstance* getOverrideMaterial( BaseMatInstance* matInst ) const

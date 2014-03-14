@@ -46,18 +46,18 @@ LightManager *LightManager::smActiveLM = NULL;
 LightManager::LightManager( const char *name, const char *id )
    :  mName( name ),
       mId( id ),
-      mIsActive( false ),      
+      mIsActive( false ),
       mSceneManager( NULL ),
       mDefaultLight( NULL ),
       mAvailableSLInterfaces( NULL ),
       mCullPos( Point3F::Zero )
-{ 
+{
    _getLightManagers().insert( mName, this );
 
    dMemset( &mSpecialLights, 0, sizeof( mSpecialLights ) );
 }
 
-LightManager::~LightManager() 
+LightManager::~LightManager()
 {
    _getLightManagers().erase( mName );
    SAFE_DELETE( mAvailableSLInterfaces );
@@ -187,9 +187,9 @@ void LightManager::setSpecialLight( LightManager::SpecialLightTypesEnum type, Li
    if ( light && type == slSunLightType )
    {
       // The sun must be specially positioned and ranged
-      // so that it can be processed like a point light 
+      // so that it can be processed like a point light
       // in the stock light shader used by Basic Lighting.
-      
+
       light->setPosition( mCullPos - ( light->getDirection() * 10000.0f ) );
       light->setRange( 2000000.0f );
    }
@@ -204,10 +204,10 @@ void LightManager::registerGlobalLights( const Frustum *frustum, bool staticLigh
 
    // TODO: We need to work this out...
    //
-   // 1. Why do we register and unregister lights on every 
+   // 1. Why do we register and unregister lights on every
    //    render when they don't often change... shouldn't we
    //    just register once and keep them?
-   // 
+   //
    // 2. If we do culling of lights should this happen as part
    //    of registration or somewhere else?
    //
@@ -215,7 +215,7 @@ void LightManager::registerGlobalLights( const Frustum *frustum, bool staticLigh
    // Grab the lights to process.
    Vector<SceneObject*> activeLights;
    const U32 lightMask = LightObjectType;
-   
+
    if ( staticLighting || !frustum )
    {
       // We're processing static lighting or want all the lights
@@ -231,7 +231,7 @@ void LightManager::registerGlobalLights( const Frustum *frustum, bool staticLigh
       // later... see setSpecialLight.
       mCullPos = frustum->getPosition();
 
-      // HACK: Make sure the control object always gets 
+      // HACK: Make sure the control object always gets
       // processed as lights mounted to it don't change
       // the shape bounds and can often get culled.
 
@@ -254,7 +254,7 @@ void LightManager::registerGlobalLights( const Frustum *frustum, bool staticLigh
 
 void LightManager::registerGlobalLight( LightInfo *light, SimObject *obj )
 {
-   AssertFatal( !mRegisteredLights.contains( light ), 
+   AssertFatal( !mRegisteredLights.contains( light ),
       "LightManager::registerGlobalLight - This light is already registered!" );
 
    mRegisteredLights.push_back( light );
@@ -303,7 +303,7 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
    PROFILE_SCOPE( LightManager_Update4LightConsts );
 
    // Skip over gathering lights if we don't have to!
-   if (  lightPositionSC->isValid() || 
+   if (  lightPositionSC->isValid() ||
          lightDiffuseSC->isValid() ||
          lightInvRadiusSqSC->isValid() ||
          lightSpotDirSC->isValid() ||
@@ -319,13 +319,13 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
       #else
          static AlignedArray<Point4F> lightPositions( 3, sizeof( Point4F ) );
          static AlignedArray<Point4F> lightSpotDirs( 3, sizeof( Point4F ) );
-      #endif               
+      #endif
       static AlignedArray<Point4F> lightColors( 4, sizeof( Point4F ) );
       static Point4F lightInvRadiusSq;
       static Point4F lightSpotAngle;
 	  static Point4F lightSpotFalloff;
       F32 range;
-      
+
       // Need to clear the buffers so that we don't leak
       // lights from previous passes or have NaNs.
       dMemset( lightPositions.getBuffer(), 0, lightPositions.getBufferSize() );
@@ -339,7 +339,7 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
       for ( U32 i=0; i < 4; i++ )
       {
          light = sgData.lights[i];
-         if ( !light )            
+         if ( !light )
             break;
 
          #if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
@@ -347,8 +347,8 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
             lightPositions[i] = light->getPosition();
 
          #else
-      
-            // The light positions and spot directions are 
+
+            // The light positions and spot directions are
             // in SoA order to make optimal use of the GPU.
             const Point3F &lightPos = light->getPosition();
             lightPositions[0][i] = lightPos.x;
@@ -359,16 +359,16 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
             lightSpotDirs[0][i] = lightDir.x;
             lightSpotDirs[1][i] = lightDir.y;
             lightSpotDirs[2][i] = lightDir.z;
-            
+
             if ( light->getType() == LightInfo::Spot )
 			{
-               lightSpotAngle[i] = mCos( mDegToRad( light->getOuterConeAngle() / 2.0f ) ); 
+               lightSpotAngle[i] = mCos( mDegToRad( light->getOuterConeAngle() / 2.0f ) );
 			   lightSpotFalloff[i] = 1.0f / getMax( F32_MIN, mCos( mDegToRad( light->getInnerConeAngle() / 2.0f ) ) - lightSpotAngle[i] );
 			}
 
-         #endif            
+         #endif
 
-         // Prescale the light color by the brightness to 
+         // Prescale the light color by the brightness to
          // avoid doing this in the shader.
          lightColors[i] = Point4F(light->getColor()) * light->getBrightness();
 
@@ -377,7 +377,7 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
          lightInvRadiusSq[i] = 1.0f / ( range * range );
       }
 
-      shaderConsts->setSafe( lightPositionSC, lightPositions );   
+      shaderConsts->setSafe( lightPositionSC, lightPositions );
       shaderConsts->setSafe( lightDiffuseSC, lightColors );
       shaderConsts->setSafe( lightInvRadiusSqSC, lightInvRadiusSq );
 
@@ -390,8 +390,8 @@ void LightManager::_update4LightConsts(   const SceneData &sgData,
       #endif
    }
 
-   // Setup the ambient lighting from the first 
-   // light which is the directional light if 
+   // Setup the ambient lighting from the first
+   // light which is the directional light if
    // one exists at all in the scene.
    if ( lightAmbientSC->isValid() )
       shaderConsts->set( lightAmbientSC, sgData.ambientLightColor );
@@ -419,8 +419,8 @@ bool LightManager::lightScene( const char* callback, const char* param )
          flags.set( SceneLighting::LoadOnly );
    }
 
-   // The SceneLighting object will delete itself 
-   // once the lighting process is complete.   
+   // The SceneLighting object will delete itself
+   // once the lighting process is complete.
    SceneLighting* sl = new SceneLighting( getSceneLightingInterface() );
    return sl->lightScene( callback, flags );
 }

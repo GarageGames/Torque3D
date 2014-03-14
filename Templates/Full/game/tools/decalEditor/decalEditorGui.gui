@@ -36,8 +36,8 @@
    GizmoProfile = "GlobalGizmoProfile";
    currentDecalID = "175";
    Docking = "None";
-   
-   new GuiWindowCollapseCtrl(DecalEditorWindow) {      
+
+   new GuiWindowCollapseCtrl(DecalEditorWindow) {
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
@@ -68,7 +68,7 @@
       closeCommand = "EditorGui.setEditor( WorldEditorInspectorPlugin );";
       EdgeSnap = "1";
       text = "Decal Editor";
-         
+
       new GuiTabBookCtrl(DecalEditorTabBook) {
          canSaveDynamicFields = "0";
          isContainer = "1";
@@ -91,7 +91,7 @@
          TabPosition = "Top";
          TabMargin = "0";
          MinTabWidth = "64";
-         
+
          new GuiTabPageCtrl(LibraryTabControl) {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -114,7 +114,7 @@
             AnchorRight = "0";
             text = "Library";
             maxLength = "1024";
-            
+
             new GuiContainer() {
                isContainer = "1";
                HorizSizing = "width";
@@ -125,7 +125,7 @@
                Docking = "client";
                MinExtent = "0 8";
                Profile = "GuiInspectorProfile";
-            
+
                new GuiBitmapBorderCtrl() {
                   isContainer = "1";
                   HorizSizing = "width";
@@ -135,7 +135,7 @@
                   MinExtent = "0 -500";
                   Profile = "ToolsGuiTabBorderProfile";
                };
-            };      
+            };
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -182,7 +182,7 @@
                   hovertime = "1000";
                   AllowMultipleSelections = "0";
                   fitParentWidth = "0";
-                  mirrorSet = "DecalDataSet";            
+                  mirrorSet = "DecalDataSet";
                };
             };
          };
@@ -209,7 +209,7 @@
             AnchorRight = "0";
             text = "Instances";
             maxLength = "1024";
-            
+
             new GuiContainer() {
                isContainer = "1";
                HorizSizing = "width";
@@ -220,7 +220,7 @@
                Docking = "client";
                MinExtent = "0 8";
                Profile = "GuiInspectorProfile";
-            
+
                new GuiBitmapBorderCtrl() {
                   isContainer = "1";
                   HorizSizing = "width";
@@ -230,7 +230,7 @@
                   MinExtent = "0 -500";
                   Profile = "ToolsGuiTabBorderProfile";
                };
-            }; 
+            };
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -312,7 +312,7 @@
          useMouseEvents = "0";
          bitmap = "tools/gui/images/save-icon";
       };
-         
+
       new GuiBitmapButtonCtrl(RetargetDecalButton) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -333,7 +333,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiBitmapButtonCtrl(NewDecalButton) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -354,7 +354,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiBitmapButtonCtrl(DeleteDecalButton) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -378,9 +378,9 @@
          useMouseEvents = "0";
          tabSelected = "0";
       };
-   }; 
+   };
 
-   
+
    new GuiWindowCollapseCtrl(DecalPreviewWindow) {
       canSaveDynamicFields = "0";
       internalName = "";
@@ -412,7 +412,7 @@
       closeCommand = "EPainter.parentGroup.setVisible(false);";
       EdgeSnap = "1";
       text = "Decal Properties";
-      
+
       new GuiScrollCtrl(DecalEditorTemplateProperties){
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -441,7 +441,7 @@
          lockVertScroll = "false";
          constantThumbHeight = "0";
          childMargin = "0 0";
-         
+
          new GuiStackControl() {
             StackingType = "Vertical";
             HorizStacking = "Left to Right";
@@ -459,7 +459,7 @@
             Visible = "1";
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            
+
             new GuiRolloutCtrl() {
                class = "BehaviorQuickEditRollout";
                superclass = LBQuickEditRollout;
@@ -473,8 +473,8 @@
                DragSizable = false;
                container = true;
                parentRollout = %this.rollout;
-               object = %behavior;  
-               
+               object = %behavior;
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -491,15 +491,15 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
-            
+                  hovertime = "1000";
+
                   new GuiContainer(){
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      Position = "-1 0";
                      Extent = "202 187";
                      Docking = "none";
-                     
+
                      new GuiBitmapCtrl() {
                         canSaveDynamicFields = "0";
                         internalName = "instancePreview";
@@ -554,7 +554,7 @@
                container = true;
                parentRollout = %this.rollout;
                object = %behavior;
-               
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -571,16 +571,16 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
-                  
+                  hovertime = "1000";
+
                   new GuiContainer(DecalEditorDetailContainer){
                      Position = "0 202";
                      Extent = "202 79";
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      isContainer = "1";
-                     
-                     new GuiTextCtrl(){ 
+
+                     new GuiTextCtrl(){
                         Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
@@ -597,7 +597,7 @@
                         Extent = "128 18";
                         text = "";
                      };
-                     new GuiTextCtrl(){ 
+                     new GuiTextCtrl(){
                         Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
@@ -615,7 +615,7 @@
                         Extent = "128 18";
                         text = "";
                      };
-                     new GuiTextCtrl(){ 
+                     new GuiTextCtrl(){
                         Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
@@ -633,7 +633,7 @@
                         Extent = "128 18";
                         text = "";
                      };
-                     new GuiTextCtrl(){ 
+                     new GuiTextCtrl(){
                         Profile = "ToolsGuiTextRightProfile";
                         HorizSizing = "right";
                         VertSizing = "bottom";
@@ -655,8 +655,8 @@
                };
             };
          };
-      }; 
-                                
+      };
+
       new GuiScrollCtrl(DecalEditorLibraryProperties) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -685,7 +685,7 @@
          lockVertScroll = "false";
          constantThumbHeight = "0";
          childMargin = "0 0";
-         
+
          new GuiStackControl() {
             StackingType = "Vertical";
             HorizStacking = "Left to Right";
@@ -703,7 +703,7 @@
             Visible = "1";
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
-            
+
             new GuiRolloutCtrl() {
                class = "BehaviorQuickEditRollout";
                superclass = LBQuickEditRollout;
@@ -717,8 +717,8 @@
                DragSizable = false;
                container = true;
                parentRollout = %this.rollout;
-               object = %behavior;  
-               
+               object = %behavior;
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -735,15 +735,15 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
-            
+                  hovertime = "1000";
+
                   new GuiContainer(){
                      HorizSizing = "width";
                      VertSizing = "bottom";
                      Position = "-1 0";
                      Extent = "202 187";
                      Docking = "none";
-                     
+
                      new GuiBitmapCtrl() {
                         canSaveDynamicFields = "0";
                         internalName = "decalPreview";
@@ -797,8 +797,8 @@
                DragSizable = false;
                container = true;
                parentRollout = %this.rollout;
-               object = %behavior; 
-               
+               object = %behavior;
+
                new GuiInspector(DecalInspector) {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";

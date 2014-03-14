@@ -39,7 +39,7 @@
 class ForestEditorCtrl : public EditTSCtrl
 {
    typedef EditTSCtrl Parent;
-   
+
    friend class ForestPaintEvent;
 
    protected:
@@ -63,10 +63,10 @@ class ForestEditorCtrl : public EditTSCtrl
 
       // GuiControl
       virtual bool onWake();
-      virtual void onSleep();      
+      virtual void onSleep();
       virtual void onMouseUp( const GuiEvent &event_ );
 
-      // EditTSCtrl      
+      // EditTSCtrl
       void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
       void on3DMouseDown( const Gui3DMouseEvent &event_ );
       void on3DMouseUp( const Gui3DMouseEvent &event_ );
@@ -78,7 +78,7 @@ class ForestEditorCtrl : public EditTSCtrl
       void on3DRightMouseUp( const Gui3DMouseEvent &event_ );
       bool onMouseWheelUp(const GuiEvent &event_);
       bool onMouseWheelDown(const GuiEvent &event_);
-      void updateGuiInfo();      
+      void updateGuiInfo();
       void updateGizmo();
       void renderScene( const RectI &updateRect );
       void renderGui( Point2I offset, const RectI &updateRect );
@@ -94,7 +94,7 @@ class ForestEditorCtrl : public EditTSCtrl
 
       void onUndoAction();
 
-      void deleteMeshSafe( ForestItemData *itemData );      
+      void deleteMeshSafe( ForestItemData *itemData );
 
       void updateCollision();
 

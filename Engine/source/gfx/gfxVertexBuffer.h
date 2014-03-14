@@ -59,16 +59,16 @@ public:
    void* lockedVertexPtr;
    U32   mVolatileStart;
 
-   GFXVertexBuffer(  GFXDevice *device, 
-                     U32 numVerts, 
-                     const GFXVertexFormat *vertexFormat, 
-                     U32 vertexSize, 
+   GFXVertexBuffer(  GFXDevice *device,
+                     U32 numVerts,
+                     const GFXVertexFormat *vertexFormat,
+                     U32 vertexSize,
                      GFXBufferType bufferType )
       :  mDevice( device ),
-         mVolatileStart( 0 ),         
+         mVolatileStart( 0 ),
          mNumVerts( numVerts ),
          mVertexSize( vertexSize ),
-         mBufferType( bufferType )      
+         mBufferType( bufferType )
    {
       if ( vertexFormat )
       {
@@ -76,7 +76,7 @@ public:
          mVertexFormat.copy( *vertexFormat );
       }
    }
-   
+
    virtual void lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr) = 0;
    virtual void unlock() = 0;
    virtual void prepare() = 0;
@@ -96,8 +96,8 @@ class GFXVertexBufferHandleBase : public StrongRefPtr<GFXVertexBuffer>
 protected:
 
    void set(   GFXDevice *theDevice,
-               U32 numVerts, 
-               const GFXVertexFormat *vertexFormat, 
+               U32 numVerts,
+               const GFXVertexFormat *vertexFormat,
                U32 vertexSize,
                GFXBufferType type );
 
@@ -119,12 +119,12 @@ protected:
 
 
 /// A handle object for allocating, filling, and reading a vertex buffer.
-template<class T> 
+template<class T>
 class GFXVertexBufferHandle : public GFXVertexBufferHandleBase
 {
    typedef GFXVertexBufferHandleBase Parent;
 
-   /// Sets this vertex buffer as the current 
+   /// Sets this vertex buffer as the current
    /// vertex buffer for the device it was allocated on
    void prepare() { getPointer()->prepare(); }
 
@@ -132,8 +132,8 @@ public:
 
    GFXVertexBufferHandle() {}
 
-   GFXVertexBufferHandle(  GFXDevice *theDevice, 
-                           U32 numVerts, 
+   GFXVertexBufferHandle(  GFXDevice *theDevice,
+                           U32 numVerts,
                            GFXBufferType type = GFXBufferTypeVolatile )
    {
       set( theDevice, numVerts, type );
@@ -141,7 +141,7 @@ public:
 
    ~GFXVertexBufferHandle() {}
 
-   void set(   GFXDevice *theDevice, 
+   void set(   GFXDevice *theDevice,
                U32 numVerts,
                GFXBufferType type = GFXBufferTypeVolatile )
    {
@@ -203,7 +203,7 @@ public:
 
 /// This is a non-typed vertex buffer handle which can be
 /// used when your vertex type is undefined until runtime.
-class GFXVertexBufferDataHandle : public GFXVertexBufferHandleBase         
+class GFXVertexBufferDataHandle : public GFXVertexBufferHandleBase
 {
    typedef GFXVertexBufferHandleBase Parent;
 
@@ -217,10 +217,10 @@ public:
    {
    }
 
-   void set(   GFXDevice *theDevice, 
-               U32 vertSize, 
-               const GFXVertexFormat *vertexFormat, 
-               U32 numVerts, 
+   void set(   GFXDevice *theDevice,
+               U32 vertSize,
+               const GFXVertexFormat *vertexFormat,
+               U32 numVerts,
                GFXBufferType type )
    {
       Parent::set( theDevice, numVerts, vertexFormat, vertSize, type );

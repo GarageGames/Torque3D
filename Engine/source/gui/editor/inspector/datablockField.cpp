@@ -35,7 +35,7 @@
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorDatablockField 
+// GuiInspectorDatablockField
 // Field construction for datablock types
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorDatablockField);
@@ -84,13 +84,13 @@ void GuiInspectorDatablockField::_populateMenu( GuiPopUpMenuCtrl* menu )
       if( datablock && ( !mDesiredClass || datablock->getClassRep()->isClass( mDesiredClass ) ) )
          menu->addEntry( datablock->getName(), id ++, datablock->isClientOnly() ? 1 : 0 );
    }
-   
+
    menu->sort();
 }
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXDescriptionName 
+// GuiInspectorTypeSFXDescriptionName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXDescriptionName);
 
@@ -109,7 +109,7 @@ void GuiInspectorTypeSFXDescriptionName::consoleInit()
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXTrackName 
+// GuiInspectorTypeSFXTrackName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXTrackName);
 
@@ -128,7 +128,7 @@ void GuiInspectorTypeSFXTrackName::consoleInit()
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXEnvironmentName 
+// GuiInspectorTypeSFXEnvironmentName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXEnvironmentName);
 
@@ -147,7 +147,7 @@ void GuiInspectorTypeSFXEnvironmentName::consoleInit()
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXAmbienceName 
+// GuiInspectorTypeSFXAmbienceName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXAmbienceName);
 

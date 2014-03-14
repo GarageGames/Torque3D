@@ -85,7 +85,7 @@ class Portal : public Zone
       };
 
    protected:
-      
+
       enum
       {
          PassableMask = Parent::NextFreeMask << 0,    ///< #mPassableSides has changed.
@@ -185,7 +185,7 @@ class Portal : public Zone
 
       // SimObject.
       DECLARE_CONOBJECT( Portal );
-      
+
       static void initPersistFields();
       static void consoleInit();
 

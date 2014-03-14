@@ -138,7 +138,7 @@ GuiTextEditCtrl::GuiTextEditCtrl()
 
 #if defined(__MACOSX__)
    UTF8	bullet[4] = { 0xE2, 0x80, 0xA2, 0 };
-   
+
    mPasswordMask = StringTable->insert( bullet );
 #else
    mPasswordMask = StringTable->insert( "*" );
@@ -161,7 +161,7 @@ GuiTextEditCtrl::~GuiTextEditCtrl()
 void GuiTextEditCtrl::initPersistFields()
 {
    addGroup( "Text Input" );
-   
+
       addField("validate",          TypeRealString,Offset(mValidateCommand,   GuiTextEditCtrl), "Script command to be called when the first validater is lost.\n");
       addField("escapeCommand",     TypeRealString,Offset(mEscapeCommand,     GuiTextEditCtrl), "Script command to be called when the Escape key is pressed.\n");
       addField("historySize",       TypeS32,       Offset(mHistorySize,       GuiTextEditCtrl), "How large of a history buffer to maintain.\n");
@@ -170,7 +170,7 @@ void GuiTextEditCtrl::initPersistFields()
       addField("sinkAllKeyEvents",  TypeBool,      Offset(mSinkAllKeyEvents,  GuiTextEditCtrl), "If true, every key event will act as if the Enter key was pressed.\n");
       addField("password",          TypeBool,      Offset(mPasswordText,      GuiTextEditCtrl), "If true, all characters entered will be stored in the control, however will display as the character stored in passwordMask.\n");
       addField("passwordMask",      TypeString,    Offset(mPasswordMask,      GuiTextEditCtrl), "If 'password' is true, this is the character that will be used to mask the characters in the control.\n");
-      
+
    endGroup( "Text Input" );
 
    Parent::initPersistFields();
@@ -222,7 +222,7 @@ void GuiTextEditCtrl::updateHistory( StringBuffer *inTxt, bool moveIndex )
       return;
 
    const UTF16* txt = inTxt->getPtr();
-   
+
    // Reject empty strings.
 
    if( !txt || !txt[ 0 ] )
@@ -261,7 +261,7 @@ void GuiTextEditCtrl::getRenderText(char *dest)
 {
     getText( dest );
 }
- 
+
 void GuiTextEditCtrl::setText( const UTF8 *txt )
 {
    if(txt && txt[0] != 0)
@@ -289,8 +289,8 @@ void GuiTextEditCtrl::setText( const UTF16* txt)
       Parent::setText("");
       mTextBuffer.set("");
    }
-   
-   mCursorPos = mTextBuffer.length();   
+
+   mCursorPos = mTextBuffer.length();
 }
 
 bool GuiTextEditCtrl::isAllTextSelected()
@@ -359,14 +359,14 @@ S32 GuiTextEditCtrl::calculateCursorPos( const Point2I &globalPos )
       UTF16 c = mTextBuffer.getChar(count);
       if(!mPasswordText && !mProfile->mFont->isValidChar(c))
          continue;
-         
+
       if(mPasswordText)
          charLength += mProfile->mFont->getCharXIncrement( mPasswordMask[0] );
       else
          charLength += mProfile->mFont->getCharXIncrement( c );
 
       if ( charLength > curX )
-         break;      
+         break;
    }
 
    return count;
@@ -489,7 +489,7 @@ void GuiTextEditCtrl::onCopy(bool andCut)
 }
 
 void GuiTextEditCtrl::onPaste()
-{           
+{
    //first, make sure there's something in the clipboard to copy...
    const UTF8 *clipboard = Platform::getClipboard();
    if(dStrlen(clipboard) <= 0)
@@ -573,7 +573,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
    // Ugly, but now I'm cool like MarkF.
    if(event.keyCode == KEY_BACKSPACE)
       goto dealWithBackspace;
-   
+
    if ( event.modifier & SI_SHIFT )
    {
 
@@ -585,7 +585,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
          {
             case KEY_LEFT:
             {
-               S32 newpos = findPrevWord();               
+               S32 newpos = findPrevWord();
 
                if ( mBlockStart == mBlockEnd )
                {
@@ -602,7 +602,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                   if ( mCursorPos == mBlockStart )
                   {
                      // We are at the start block and traveling left so
-                     // just extend the start block farther left.                     
+                     // just extend the start block farther left.
                      mBlockStart = newpos;
                   }
                   else
@@ -632,7 +632,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                      }
                   }
                }
-                              
+
                mCursorPos = newpos;
 
                return true;
@@ -640,7 +640,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
             case KEY_RIGHT:
             {
-               S32 newpos = findNextWord();               
+               S32 newpos = findNextWord();
 
                if ( mBlockStart == mBlockEnd )
                {
@@ -657,7 +657,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                   if ( mCursorPos == mBlockEnd )
                   {
                      // We are at the end block and traveling right so
-                     // just extend the end block farther right.                     
+                     // just extend the end block farther right.
                      mBlockEnd = newpos;
                   }
                   else
@@ -692,7 +692,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
                return true;
             }
-            
+
             default:
                break;
          }
@@ -777,7 +777,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
 				case KEY_RETURN:
 				case KEY_NUMPADENTER:
-           
+
 					return dealWithEnter(false);
 
             default:
@@ -793,7 +793,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-B - move one character back
          case KEY_B:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_LEFT;
@@ -802,7 +802,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-F - move one character forward
          case KEY_F:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_RIGHT;
@@ -811,7 +811,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-A - move to the beginning of the line
          case KEY_A:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_HOME;
@@ -820,7 +820,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-E - move to the end of the line
          case KEY_E:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_END;
@@ -829,7 +829,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-P - move backward in history
          case KEY_P:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_UP;
@@ -838,7 +838,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-N - move forward in history
          case KEY_N:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_DOWN;
@@ -847,7 +847,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Ctrl-D - delete under cursor
          case KEY_D:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = 0;
             new_event.keyCode = KEY_DELETE;
@@ -855,7 +855,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
          }
 
          case KEY_U:
-         { 
+         {
             GuiEvent new_event;
             new_event.modifier = SI_CTRL;
             new_event.keyCode = KEY_DELETE;
@@ -882,8 +882,8 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             mBlockStart = 0;
             mBlockEnd = 0;
             return true;
-         }         
-         
+         }
+
 #if !defined(TORQUE_OS_MAC)
          // Select all
          case KEY_A:
@@ -966,14 +966,14 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
             return true;
          }
-            
+
          case KEY_Z:
             if (! mDragHit)
             {
                onUndo();
                return true;
             }
-            
+
          default:
             break;
       }
@@ -993,7 +993,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          case KEY_RETURN:
          case KEY_NUMPADENTER:
-           
+
 				return dealWithEnter(true);
 
          case KEY_UP:
@@ -1007,13 +1007,13 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                }
 
                mHistoryIndex--;
-               
+
                if(mHistoryIndex >= 0 && mHistoryIndex <= mHistoryLast)
                   setText(mHistoryBuf[mHistoryIndex]);
                else if(mHistoryIndex < 0)
                   mHistoryIndex = 0;
             }
-               
+
             return true;
          }
 
@@ -1039,7 +1039,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
          }
 
          case KEY_LEFT:
-            
+
             // If we have a selection put the cursor to the left side of it.
             if ( mBlockStart != mBlockEnd )
             {
@@ -1049,14 +1049,14 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             else
             {
                mBlockStart = mBlockEnd = 0;
-               mCursorPos = getMax( mCursorPos - 1, 0 );               
+               mCursorPos = getMax( mCursorPos - 1, 0 );
             }
 
             return true;
 
          case KEY_RIGHT:
 
-            // If we have a selection put the cursor to the right side of it.            
+            // If we have a selection put the cursor to the right side of it.
             if ( mBlockStart != mBlockEnd )
             {
                mCursorPos = mBlockEnd;
@@ -1065,7 +1065,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             else
             {
                mBlockStart = mBlockEnd = 0;
-               mCursorPos = getMin( mCursorPos + 1, stringLen );               
+               mCursorPos = getMin( mCursorPos + 1, stringLen );
             }
 
             return true;
@@ -1139,7 +1139,7 @@ dealWithBackspace:
             mBlockEnd   = 0;
             mCursorPos  = stringLen;
             return true;
-      
+
          default:
             break;
 
@@ -1161,7 +1161,7 @@ dealWithBackspace:
       default:
          break;
    }
-         
+
    // Handle character input events.
 
    if( mProfile->mFont->isValidChar( event.ascii ) )
@@ -1204,7 +1204,7 @@ bool GuiTextEditCtrl::dealWithEnter( bool clearResponder )
          return true;
       }
    }
-	
+
 	if( clearResponder )
 		clearFirstResponder();
 
@@ -1219,7 +1219,7 @@ void GuiTextEditCtrl::setFirstResponder()
    if (root != NULL)
    {
 		root->enableKeyboardTranslation();
-  
+
 
 	   // If the native OS accelerator keys are not disabled
 		// then some key events like Delete, ctrl+V, etc may
@@ -1318,7 +1318,7 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, bool isFocused )
    }
 
    // Just a little sanity.
-   if(mCursorPos > textBuffer.length()) 
+   if(mCursorPos > textBuffer.length())
       mCursorPos = textBuffer.length();
 
    paddingLeftTop.set(( mProfile->mTextOffset.x != 0 ? mProfile->mTextOffset.x : 3 ), mProfile->mTextOffset.y);
@@ -1328,7 +1328,7 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, bool isFocused )
    drawPoint.y += ( ( drawRect.extent.y - paddingLeftTop.y - paddingRightBottom.y - S32( mProfile->mFont->getHeight() ) ) / 2 ) + paddingLeftTop.y;
 
    // Align horizontally:
-   
+
    S32 textWidth = mProfile->mFont->getStrNWidth(textBuffer.getPtr(), textBuffer.length());
 
    switch( mProfile->mAlignment )
@@ -1419,7 +1419,7 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, bool isFocused )
 #ifdef TORQUE_OS_MAC
       cursorStart.x += charWidth/2;
 #endif
-      
+
       cursorEnd.x = cursorStart.x;
 
       S32 cursorHeight = mProfile->mFont->getHeight();
@@ -1527,7 +1527,7 @@ void GuiTextEditCtrl::handleCharInput( U16 ascii )
             return;
          }
 
-         if ( mInsertOn && ( mTextBuffer.getChar(0) == '-' ) ) 
+         if ( mInsertOn && ( mTextBuffer.getChar(0) == '-' ) )
          {
             playDeniedSound();
             return;
@@ -1597,8 +1597,8 @@ void GuiTextEditCtrl::handleCharInput( U16 ascii )
 }
 
 S32 GuiTextEditCtrl::findPrevWord()
-{   
-   // First the first word to the left of the current cursor position 
+{
+   // First the first word to the left of the current cursor position
    // and return the positional index of its starting character.
 
    // We define the first character of a word as any non-whitespace
@@ -1607,7 +1607,7 @@ S32 GuiTextEditCtrl::findPrevWord()
    const UTF8* text = mTextBuffer.getPtr8();
 
    for ( S32 i = mCursorPos - 1; i > 0; i-- )
-   {  
+   {
       if ( !dIsspace( text[i] ) )
       {
          if ( !dIsalnum( text[i-1] ) )
@@ -1622,16 +1622,16 @@ S32 GuiTextEditCtrl::findPrevWord()
 
 S32 GuiTextEditCtrl::findNextWord()
 {
-   // First the first word to the right of the current cursor position 
+   // First the first word to the right of the current cursor position
    // and return the positional index of its starting character.
 
    // We define the first character of a word as any non-whitespace
    // character which has a non-alpha-numeric character to its immediate left.
-   
+
    const UTF8* text = mTextBuffer.getPtr8();
 
    for ( S32 i = mCursorPos + 1; i < mTextBuffer.length(); i++ )
-   {  
+   {
       if ( !dIsspace( text[i] ) )
       {
          if ( !dIsalnum( text[i-1] ) )

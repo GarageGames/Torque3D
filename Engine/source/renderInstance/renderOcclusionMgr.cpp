@@ -38,7 +38,7 @@
 
 IMPLEMENT_CONOBJECT(RenderOcclusionMgr);
 
-ConsoleDocClass( RenderOcclusionMgr, 
+ConsoleDocClass( RenderOcclusionMgr,
    "@brief A render bin which renders occlusion query requests.\n\n"
    "This render bin gathers occlusion query render instances and renders them. "
    "It is currently used by light flares and ShapeBase reflection cubemaps.\n\n"
@@ -58,17 +58,17 @@ RenderOcclusionMgr::RenderOcclusionMgr()
 
 RenderOcclusionMgr::RenderOcclusionMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder)
 : RenderBinManager(riType, renderOrder, processAddOrder)
-{  
+{
     delete mMatInstance;
 }
 
-static const Point3F cubePoints[8] = 
+static const Point3F cubePoints[8] =
 {
    Point3F(-0.5, -0.5, -0.5), Point3F(-0.5, -0.5,  0.5), Point3F(-0.5,  0.5, -0.5), Point3F(-0.5,  0.5,  0.5),
    Point3F( 0.5, -0.5, -0.5), Point3F( 0.5, -0.5,  0.5), Point3F( 0.5,  0.5, -0.5), Point3F( 0.5,  0.5,  0.5)
 };
 
-static const U32 cubeFaces[6][4] = 
+static const U32 cubeFaces[6][4] =
 {
    { 0, 4, 6, 2 }, { 0, 2, 3, 1 }, { 0, 1, 5, 4 },
    { 3, 2, 6, 7 }, { 7, 6, 4, 5 }, { 3, 7, 5, 1 }
@@ -91,12 +91,12 @@ void RenderOcclusionMgr::init()
    mMatInstance->init( features, getGFXVertexFormat<GFXVertexP>() );
 
    GFXStateBlockDesc d;
-   d.setBlend( false );   
+   d.setBlend( false );
    d.cullDefined = true;
    d.cullMode = GFXCullCCW;
-   d.setZReadWrite( true, false );   
+   d.setZReadWrite( true, false );
    d.setColorWrites( false, false, false, false );
-   mRenderSB = GFX->createStateBlock(d);      
+   mRenderSB = GFX->createStateBlock(d);
 
    d.setZReadWrite( false, false );
    mTestSB = GFX->createStateBlock(d);
@@ -143,7 +143,7 @@ void RenderOcclusionMgr::init()
    vertexIndex = 0;
 
    for ( S32 i = 0; i < mSpherePrimCount; i++ )
-   {      
+   {
       verts[vertexIndex].point = sphereMesh->poly[i].pnt[0];
       vertexIndex++;
 
@@ -179,7 +179,7 @@ void RenderOcclusionMgr::render( SceneRenderState *state )
    // Early out if nothing to draw.
    if ( !mElementList.size() )
       return;
-   
+
    GFXTransformSaver saver;
 
    GFXDEBUGEVENT_SCOPE(RenderOcclusionMgr_Render, ColorI::BLUE);
@@ -200,7 +200,7 @@ void RenderOcclusionMgr::render( SceneRenderState *state )
    U32 primCount;
    for( U32 i=0; i<mElementList.size(); i++ )
    {
-      OccluderRenderInst *ri = static_cast<OccluderRenderInst*>(mElementList[i].inst);      
+      OccluderRenderInst *ri = static_cast<OccluderRenderInst*>(mElementList[i].inst);
       AssertFatal( ri->query != NULL, "RenderOcclusionMgr::render, OcclusionRenderInst has NULL GFXOcclusionQuery" );
 
      if ( ri->isSphere )
@@ -215,16 +215,16 @@ void RenderOcclusionMgr::render( SceneRenderState *state )
      }
 
       MatrixF xfm( *ri->orientation );
-      xfm.setPosition( ri->position );      
+      xfm.setPosition( ri->position );
       xfm.scale( ri->scale );
 
       matrixSet.setWorld(xfm);
       mMatInstance->setTransforms(matrixSet, state);
 
       if ( !smDebugRender )
-         GFX->setStateBlock( mRenderSB );   
+         GFX->setStateBlock( mRenderSB );
 
-      ri->query->begin();      
+      ri->query->begin();
       GFX->drawPrimitive( GFXTriangleList, 0, primCount );
       ri->query->end();
 
@@ -236,7 +236,7 @@ void RenderOcclusionMgr::render( SceneRenderState *state )
          GFX->drawPrimitive( GFXTriangleList, 0, primCount );
          ri->query2->end();
       }
-   }   
+   }
 
    // Call setup one more time to end the pass.
    mMatInstance->setupPass( state, sgData );

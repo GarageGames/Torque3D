@@ -75,7 +75,7 @@ void TSShape::updateSmallestVisibleDL()
 
       for ( U32 d=0; d < details.size(); d++ )
       {
-         // Break when we get to hidden detail 
+         // Break when we get to hidden detail
          // levels like collision shapes.
          if ( details[d].size < 0 )
             break;
@@ -112,7 +112,7 @@ void TSShape::updateSmallestVisibleDL()
    //
    // See setDetailFromDistance().
    //
-   mUseDetailFromScreenError =   mSmallestVisibleDL >= 0 && 
+   mUseDetailFromScreenError =   mSmallestVisibleDL >= 0 &&
                                  details.first().maxError >= 0;
 }
 
@@ -215,7 +215,7 @@ S32 TSShape::addImposter(const String& cachePath, S32 size, S32 numEquatorSteps,
    //
    // Set the old autobillboard properties var to zero.
    detail.objectDetailNum = 0;
-   
+
    // We now use the new vars.
    detail.bbEquatorSteps = numEquatorSteps;
    detail.bbPolarSteps = numPolarSteps;
@@ -1332,7 +1332,7 @@ bool TSShape::removeDetail( S32 size )
          billboardDetails[dl]->deleteImposterCacheTextures();
          delete billboardDetails[dl];
      }
-     
+
       billboardDetails.erase( dl );
    }
 
@@ -1932,7 +1932,7 @@ bool TSShape::removeTrigger(const String& seqName, S32 keyframe, S32 state)
    for (S32 trigIndex = seq.firstTrigger; trigIndex < (seq.firstTrigger + seq.numTriggers); trigIndex++)
    {
       TSShape::Trigger& trig = triggers[trigIndex];
-      S32 cmpFrame = (S32)(trig.pos * (seq.numKeyframes-1) + 0.5f); 
+      S32 cmpFrame = (S32)(trig.pos * (seq.numKeyframes-1) + 0.5f);
       S32 cmpState = trig.state & (~TSShape::Trigger::InvertOnReverse);
 
       if ((cmpFrame == keyframe) && (cmpState == state))
@@ -1969,7 +1969,7 @@ void TSShape::getNodeKeyframe(S32 nodeIndex, const TSShape::Sequence& seq, S32 k
    {
       S32 index = seq.rotationMatters.count(nodeIndex) * seq.numKeyframes + keyframe;
       nodeRotations[seq.baseRotation + index].getQuatF(&rot);
-   }   
+   }
    else
       defaultRotations[nodeIndex].getQuatF(&rot);
 

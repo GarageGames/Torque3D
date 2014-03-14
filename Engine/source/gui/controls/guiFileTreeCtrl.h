@@ -41,20 +41,20 @@ protected:
    Vector< String >     mFilters;
 
    void _initFilters();
-   
+
    static bool _setFileFilterValue( void *object, const char *index, const char *data );
 
 public:
 
    typedef GuiTreeViewCtrl Parent;
-   
+
    enum
    {
       Icon_Folder = 1,
       Icon_FolderClosed = 2,
       Icon_Doc = 3
    };
-   
+
    GuiFileTreeCtrl();
 
    bool onWake();
@@ -62,7 +62,7 @@ public:
    void onItemSelected( Item *item );
    const String& getSelectedPath() { return mSelPath; }
    bool setSelectedPath( const char* path );
-      
+
    bool matchesFilters(const char* filename);
    void updateTree();
 

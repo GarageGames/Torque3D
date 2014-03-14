@@ -32,7 +32,7 @@ ConsoleDocClass( SimpleComponent,
 
 //////////////////////////////////////////////////////////////////////////
 // It may seem like some weak sauce to use a unit test for this, however
-// it is very, very easy to set breakpoints in a unit test, and trace 
+// it is very, very easy to set breakpoints in a unit test, and trace
 // execution in the debugger, so I will use a unit test.
 //
 // Note I am not using much actual 'test' functionality, just providing
@@ -51,10 +51,10 @@ CreateUnitTest(TestSimpleComponent, "Components/SimpleComponent")
    void run()
    {
       // When instantiating, and working with a SimObject in C++ code, such as
-      // a unit test, you *may not* allocate a SimObject off of the stack. 
+      // a unit test, you *may not* allocate a SimObject off of the stack.
       //
       // For example:
-      //    SimpleComponent sc; 
+      //    SimpleComponent sc;
       // is a stack allocation. This memory is allocated off of the program stack
       // when the function is called. SimObject deletion is done via SimObject::deleteObject()
       // and the last command of this method is 'delete this;' That command will
@@ -65,7 +65,7 @@ CreateUnitTest(TestSimpleComponent, "Components/SimpleComponent")
       SimpleComponent *sc = new SimpleComponent();
 
       // SimObject::registerObject must be called on a SimObject before it is
-      // fully 'hooked in' to the engine. 
+      // fully 'hooked in' to the engine.
       //
       // Tracing execution of this function will let you see onAdd get called on
       // the component, and you will see it cache the interface we exposed.
@@ -80,23 +80,23 @@ CreateUnitTest(TestSimpleComponent, "Components/SimpleComponent")
       // of 'sc' to the address of 'testOwner'
       testOwner->addComponent( sc );
 
-      // If you step-into this registerObject the same way as the previous one, 
+      // If you step-into this registerObject the same way as the previous one,
       // you will be able to see the recursive caching of the exposed interface.
       testOwner->registerObject();
 
-      // Now to prove that object composition is working properly, lets ask 
+      // Now to prove that object composition is working properly, lets ask
       // both of these components for their interface lists...
 
       // The ComponentInterfaceList is a typedef for type 'VectorPtr<ComponentInterface *>'
       // and it will be used by getInterfaces() to store the results of the interface
       // query. This is the "complete" way to obtain an interface, and it is too
-      // heavy-weight for most cases. A simplified query will be performed next, 
+      // heavy-weight for most cases. A simplified query will be performed next,
       // to demonstrate the usage of both.
       ComponentInterfaceList iLst;
 
       // This query requests all interfaces, on all components, regardless of name
       // or owner.
-      sc->getInterfaces( &iLst, 
+      sc->getInterfaces( &iLst,
          // This is the type field. I am passing NULL here to signify that the query
          // should match all values of 'type' in the list.
          NULL,
@@ -120,8 +120,8 @@ CreateUnitTest(TestSimpleComponent, "Components/SimpleComponent")
       AssertFatal( scQueriedInterface != NULL, "No valid SimpleComponentInterface was found in query" );
 
       // Lets do it again, only we will execute the query on the parent instead,
-      // in a simplified way. Remember the parent component doesn't expose any 
-      // interfaces at all, so the success of this behavior is entirely dependent 
+      // in a simplified way. Remember the parent component doesn't expose any
+      // interfaces at all, so the success of this behavior is entirely dependent
       // on the recursive registration that occurs in registerInterfaces()
       SimpleComponentInterface *ownerQueriedInterface = testOwner->getInterface<SimpleComponentInterface>();
 
@@ -146,6 +146,6 @@ CreateUnitTest(TestSimpleComponent, "Components/SimpleComponent")
       // Interfaces do not need to be freed. In Juggernaught, these will be ref-counted
       // for more robust behavior. Right now, however, the values of our two interface
       // pointers, scQueriedInterface and ownerQueriedInterface, reference invalid
-      // memory. 
+      // memory.
    }
 };

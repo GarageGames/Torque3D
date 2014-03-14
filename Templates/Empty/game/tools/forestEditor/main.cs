@@ -22,48 +22,48 @@
 
 function initializeForestEditor()
 {
-   echo(" % - Initializing Forest Editor");   
-  
+   echo(" % - Initializing Forest Editor");
+
    exec( "./forestEditor.cs" );
    exec( "./forestEditorGui.gui" );
    exec( "./forestEditToolbar.ed.gui" );
 
    exec( "./forestEditorGui.cs" );
    exec( "./tools.cs" );
-   
-   ForestEditorGui.setVisible( false );   
+
+   ForestEditorGui.setVisible( false );
    ForestEditorPalleteWindow.setVisible( false );
    ForestEditorPropertiesWindow.setVisible( false );
    ForestEditToolbar.setVisible( false );
-   
+
    EditorGui.add( ForestEditorGui );
    EditorGui.add( ForestEditorPalleteWindow );
    EditorGui.add( ForestEditorPropertiesWindow );
    EditorGui.add( ForestEditToolbar );
-            
+
    new ScriptObject( ForestEditorPlugin )
    {
       superClass = "EditorPlugin";
       editorGui = ForestEditorGui;
    };
-   
+
    new SimSet(ForestTools)
    {
       new ForestBrushTool()
       {
          internalName = "BrushTool";
          toolTip = "Paint Tool";
-         buttonImage = "tools/forest/images/brushTool";      
+         buttonImage = "tools/forest/images/brushTool";
       };
 
       new ForestSelectionTool()
       {
-         internalName = "SelectionTool";      
+         internalName = "SelectionTool";
          toolTip = "Selection Tool";
-         buttonImage = "tools/forest/images/selectionTool";      
+         buttonImage = "tools/forest/images/selectionTool";
       };
-   };      
-   
+   };
+
    %map = new ActionMap();
    %map.bindCmd( keyboard, "1", "ForestEditorSelectModeBtn.performClick();", "" ); // Select
    %map.bindCmd( keyboard, "2", "ForestEditorMoveModeBtn.performClick();", "" );   // Move
@@ -71,10 +71,10 @@ function initializeForestEditor()
    %map.bindCmd( keyboard, "4", "ForestEditorScaleModeBtn.performClick();", "" );  // Scale
    %map.bindCmd( keyboard, "5", "ForestEditorPaintModeBtn.performClick();", "" );  // Paint
    %map.bindCmd( keyboard, "6", "ForestEditorEraseModeBtn.performClick();", "" );  // Erase
-   %map.bindCmd( keyboard, "7", "ForestEditorEraseSelectedModeBtn.performClick();", "" );  // EraseSelected   
+   %map.bindCmd( keyboard, "7", "ForestEditorEraseSelectedModeBtn.performClick();", "" );  // EraseSelected
    //%map.bindCmd( keyboard, "backspace", "ForestEditorGui.onDeleteKey();", "" );
-   //%map.bindCmd( keyboard, "delete", "ForestEditorGui.onDeleteKey();", "" );   
-   ForestEditorPlugin.map = %map;   
+   //%map.bindCmd( keyboard, "delete", "ForestEditorGui.onDeleteKey();", "" );
+   ForestEditorPlugin.map = %map;
 }
 
 function destroyForestEditor()
@@ -85,49 +85,49 @@ function destroyForestEditor()
 function reinitForest()
 {
    exec( "./main.cs" );
-   exec( "./forestEditorGui.cs" );   
+   exec( "./forestEditorGui.cs" );
    exec( "./tools.cs" );
 }
 
 function ForestEditorPlugin::onWorldEditorStartup( %this )
-{       
+{
    new PersistenceManager( ForestDataManager );
-   
+
    %brushPath = "art/forest/brushes.cs";
-   if ( !isFile( %brushPath ) )   
-      createPath( %brushPath );      
-      
+   if ( !isFile( %brushPath ) )
+      createPath( %brushPath );
+
    // This creates the ForestBrushGroup, all brushes, and elements.
-   exec( %brushpath );         
-   
+   exec( %brushpath );
+
    if ( !isObject( ForestBrushGroup ) )
    {
       new SimGroup( ForestBrushGroup );
-      %this.showError = true;      
+      %this.showError = true;
    }
-      
-   ForestEditBrushTree.open( ForestBrushGroup );   
-            
+
+   ForestEditBrushTree.open( ForestBrushGroup );
+
    if ( !isObject( ForestItemDataSet ) )
       new SimSet( ForestItemDataSet );
-      
+
    ForestEditMeshTree.open( ForestItemDataSet );
 
    // Add ourselves to the window menu.
-   %accel = EditorGui.addToEditorsMenu( "Forest Editor", "", ForestEditorPlugin );    
-   
+   %accel = EditorGui.addToEditorsMenu( "Forest Editor", "", ForestEditorPlugin );
+
    // Add ourselves to the tools menu.
-   %tooltip = "Forest Editor (" @ %accel @ ")";  
-   EditorGui.addToToolsToolbar( "ForestEditorPlugin", "ForestEditorPalette", expandFilename("tools/forestEditor/images/forest-editor-btn"), %tooltip );   
-   
+   %tooltip = "Forest Editor (" @ %accel @ ")";
+   EditorGui.addToToolsToolbar( "ForestEditorPlugin", "ForestEditorPalette", expandFilename("tools/forestEditor/images/forest-editor-btn"), %tooltip );
+
    //connect editor windows
    GuiWindowCtrl::attach( ForestEditorPropertiesWindow, ForestEditorPalleteWindow );
-   ForestEditTabBook.selectPage(0);        
+   ForestEditTabBook.selectPage(0);
 }
 
 function ForestEditorPlugin::onWorldEditorShutdown( %this )
 {
-   if ( isObject( ForestBrushGroup ) )   
+   if ( isObject( ForestBrushGroup ) )
       ForestBrushGroup.delete();
    if ( isObject( ForestDataManager ) )
       ForestDataManager.delete();
@@ -141,30 +141,30 @@ function ForestEditorPlugin::onActivated( %this )
    ForestEditorPropertiesWindow.setVisible( true );
    ForestEditorGui.makeFirstResponder( true );
    //ForestEditToolbar.setVisible( true );
-   
+
    %this.map.push();
-   Parent::onActivated(%this);   
-   
-   ForestEditBrushTree.open( ForestBrushGroup );   
+   Parent::onActivated(%this);
+
+   ForestEditBrushTree.open( ForestBrushGroup );
    ForestEditMeshTree.open( ForestItemDataSet );
-   
+
    // Open the Brush tab.
    ForestEditTabBook.selectPage(0);
-   
+
    // Sync the pallete button state
-   
+
    // And toolbar.
-   %tool = ForestEditorGui.getActiveTool();      
+   %tool = ForestEditorGui.getActiveTool();
    if ( isObject( %tool ) )
       %tool.onActivated();
-   
+
    if ( !isObject( %tool ) )
    {
       ForestEditorPaintModeBtn.performClick();
-      
+
       if ( ForestEditBrushTree.getItemCount() > 0 )
       {
-         ForestEditBrushTree.selectItem( 0, true );  
+         ForestEditBrushTree.selectItem( 0, true );
       }
    }
    else if ( %tool == ForestTools->SelectionTool )
@@ -194,27 +194,27 @@ function ForestEditorPlugin::onActivated( %this )
          case "EraseSelected":
             ForestEditorEraseSelectedModeBtn.performClick();
       }
-   }   
-   
+   }
+
    if ( %this.showError )
       MessageBoxOK( "Error", "Your art/forest folder does not contain a valid brushes.cs. Brushes you create will not be saved!" );
 }
 
 function ForestEditorPlugin::onDeactivated( %this )
-{  
+{
    ForestEditorGui.setVisible( false );
    ForestEditorPalleteWindow.setVisible( false );
    ForestEditorPropertiesWindow.setVisible( false );
-   
+
    %tool = ForestEditorGui.getActiveTool();
    if ( isObject( %tool ) )
       %tool.onDeactivated();
-   
+
    // Also take this opportunity to save.
    ForestDataManager.saveDirty();
-   
+
    %this.map.pop();
-   
+
    Parent::onDeactivated(%this);
 }
 
@@ -225,17 +225,17 @@ function ForestEditorPlugin::isDirty( %this )
 }
 
 function ForestEditorPlugin::clearDirty( %this )
-{   
+{
    %this.dirty = false;
 }
 
 function ForestEditorPlugin::onSaveMission( %this, %missionFile )
 {
    ForestDataManager.saveDirty();
-   
-   if ( isObject( theForest ) )                     
+
+   if ( isObject( theForest ) )
       theForest.saveDataFile();
-      
+
    ForestBrushGroup.save( "art/forest/brushes.cs" );
 }
 
@@ -246,22 +246,22 @@ function ForestEditorPlugin::onEditorSleep( %this )
 function ForestEditorPlugin::onEditMenuSelect( %this, %editMenu )
 {
    %hasSelection = false;
-   
+
    %selTool = ForestTools->SelectionTool;
    if ( ForestEditorGui.getActiveTool() == %selTool )
-      if ( %selTool.getSelectionCount() > 0 )      
+      if ( %selTool.getSelectionCount() > 0 )
          %hasSelection = true;
-      
+
    %editMenu.enableItem( 3, %hasSelection ); // Cut
    %editMenu.enableItem( 4, %hasSelection ); // Copy
-   %editMenu.enableItem( 5, %hasSelection ); // Paste  
+   %editMenu.enableItem( 5, %hasSelection ); // Paste
    %editMenu.enableItem( 6, %hasSelection ); // Delete
-   %editMenu.enableItem( 8, %hasSelection ); // Deselect     
+   %editMenu.enableItem( 8, %hasSelection ); // Deselect
 }
 
 function ForestEditorPlugin::handleDelete( %this )
 {
-   ForestTools->SelectionTool.deleteSelection();   
+   ForestTools->SelectionTool.deleteSelection();
 }
 
 function ForestEditorPlugin::handleDeselect( %this )

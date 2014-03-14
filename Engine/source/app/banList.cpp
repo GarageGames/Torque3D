@@ -61,7 +61,7 @@ BanList::BanList()
 {
    AssertFatal( !smInstance, "BanList::BanList - already instantiated" );
    VECTOR_SET_ASSOCIATION( list );
-   
+
    smInstance = this;
 }
 
@@ -212,7 +212,7 @@ DefineEngineStaticMethod( BanList, addAbsolute, void, ( S32 uniqueId, const char
 			  "		messageAll( 'MsgAdminForce', '\\c2The Admin has kicked %1.', %client.playerName);\n\n"
 			  "		// If it is not an AI Player, execute the ban.\n"
 			  "		if (!%client.isAIControlled())\n"
-			  "			BanList::addAbsolute(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"				   
+			  "			BanList::addAbsolute(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"
 			  "		// Let the player know they messed up\n"
 			  "		%client.delete(\"You have been kicked from this server\");\n"
 			  "}\n"
@@ -237,7 +237,7 @@ DefineEngineStaticMethod( BanList, add, void, ( S32 uniqueId, const char* transp
 			  "		messageAll( 'MsgAdminForce', '\\c2The Admin has kicked %1.', %client.playerName);\n\n"
 			  "		// If it is not an AI Player, execute the ban.\n"
 			  "		if (!%client.isAIControlled())\n"
-			  "			BanList::add(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"				   
+			  "			BanList::add(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"
 			  "		// Let the player know they messed up\n"
 			  "		%client.delete(\"You have been kicked from this server\");\n"
 			  "}\n"
@@ -251,7 +251,7 @@ DefineEngineStaticMethod( BanList, add, void, ( S32 uniqueId, const char* transp
 DefineEngineStaticMethod( BanList, removeBan, void, ( S32 uniqueId, const char* transportAddress ),,
               "Unban someone.\n\n"
               "@param uniqueId Unique ID of the player.\n"
-              "@param transportAddress Address from which the player connected.\n" 
+              "@param transportAddress Address from which the player connected.\n"
 			  "@tsexample\n"
 			  "BanList::removeBan(%userID, %ipAddress);\n"
 			  "@endtsexample\n\n")

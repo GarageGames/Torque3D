@@ -491,7 +491,7 @@ function JoinServerDlg::onWake()
    // Double check the status. Tried setting this the control
    // inactive to start with, but that didn't seem to work.
    JS_joinServer.setActive(JS_serverList.rowCount() > 0);
-}   
+}
 
 //----------------------------------------
 function JoinServerDlg::query(%this)
@@ -581,7 +581,7 @@ function JoinServerDlg::refreshSelectedServer( %this )
 function JoinServerDlg::exit(%this)
 {
    cancelServerQuery();
-   
+
    Canvas.popDialog(JoinServerDlg);
 }
 
@@ -607,7 +607,7 @@ function JoinServerDlg::update(%this)
    JS_serverList.scrollVisible(0);
 
    JS_joinServer.setActive(JS_serverList.rowCount() > 0);
-} 
+}
 
 //----------------------------------------
 function onServerQueryStatus(%status, %msg, %value)

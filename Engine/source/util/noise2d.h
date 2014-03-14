@@ -70,18 +70,18 @@ public:
    ///
    /// Note that the output values of these functions
    /// are from -1.0 to 1.0.
-   /// 
+   ///
    /// fBm - Fractal Brownian Motion - A simple noise generation
    /// algorithm, it tends to generate either flowing rounded
    /// hills or rounded mountainous shapes.
    /// @{
    void fBm( Vector<F32> *dst, U32 size, U32 interval, F32 h, F32 octave=5.0f);
-   
+
    /// rigidMultiFractal
    /// Creates ridged mountains with a high frequency detail.
    void rigidMultiFractal( Vector<F32> *dst, Vector<F32> *signal, U32 size, U32 interval, F32 h, F32 octave=5.0f);
    /// @}
-   
+
    bool erodeHydraulic(Vector<F32> *src, Vector<F32> *dst, U32 iterations, U32 size );
    bool erodeThermal(Vector<F32> *src, Vector<F32> *dst, F32 slope, F32 materialLoss, U32 iterations, U32 size, U32 squareSize, F32 maxHeight );
 

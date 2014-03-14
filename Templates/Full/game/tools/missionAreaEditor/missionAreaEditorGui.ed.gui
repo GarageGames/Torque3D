@@ -67,7 +67,7 @@
       minSize = "50 50";
       EdgeSnap = "1";
       text = "Mission Area";
-      
+
       new GuiContainer(){
          profile = "ToolsGuiDefaultProfile";
          Position = "5 25";
@@ -77,7 +77,7 @@
          HorizSizing = "width";
          VertSizing = "height";
          isContainer = "1";
-         
+
          new GuiMissionAreaCtrl(MissionAreaEditorTerrainEditor) {
             canSaveDynamicFields = "0";
             isContainer = "0";
@@ -116,7 +116,7 @@
       Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
-      Position = getWord($pref::Video::mode, 0) - 209 
+      Position = getWord($pref::Video::mode, 0) - 209
          SPC getWord(EditorGuiToolbar.extent, 1) + getWord(MissionAreaEditorTerrainWindow.extent, 1) - 2;
       Extent = "210 466";
       MinExtent = "210 300";
@@ -139,7 +139,7 @@
       minSize = "50 50";
       EdgeSnap = "1";
       text = "Properties";
-      
+
       new GuiContainer(){ //Mission Area Properties
          isContainer = "1";
          Profile = "inspectorStyleRolloutDarkProfile";
@@ -149,7 +149,7 @@
          Extent = "202 31";
          Docking = "Top";
          Margin = "0 0 3 3";
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
@@ -220,7 +220,7 @@
          Extent = "202 42";
          Docking = "Bottom";
          Margin = "0 0 3 3";
-         
+
          new GuiMLTextCtrl(MissionAreaFieldInfoControl) {
             canSaveDynamicFields = "0";
             Enabled = "1";

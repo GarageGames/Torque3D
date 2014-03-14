@@ -53,7 +53,7 @@ static int _getModifierMask(const char* accel)
       ret |= kMenuOptionModifier;
    if(!(dStrstr(accel, "cmd") || dStrstr(accel, "command")))
       ret |= kMenuNoCommandModifier;
-   
+
    return ret;
 }
 
@@ -61,7 +61,7 @@ static void _assignCommandKeys(const char* accel, MenuRef menu, MenuItemIndex it
 {
    if(!(accel && *accel))
       return;
-   
+
    // get the modifier keys
    String _accel = String::ToLower( accel );
    int mods = _getModifierMask(_accel);
@@ -75,7 +75,7 @@ static void _assignCommandKeys(const char* accel, MenuRef menu, MenuItemIndex it
       key = _accel;
    else
       key++;
-      
+
    if(dStrlen(key) <= 1)
    {
       char k = dToupper( key[0] );
@@ -88,40 +88,40 @@ static void _assignCommandKeys(const char* accel, MenuRef menu, MenuItemIndex it
       //*** A lot of these mappings came from a listing at http://developer.apple.com/releasenotes/Carbon/HIToolboxOlderNotes.html
       if(!dStricmp(key, "DELETE"))
          glyph = kMenuDeleteRightGlyph;
-         
+
       else if(!dStricmp(key, "HOME"))
          glyph = kMenuNorthwestArrowGlyph;
-         
+
       else if(!dStricmp(key, "END"))
          glyph = kMenuSoutheastArrowGlyph;
-         
+
       else if(!dStricmp(key, "BACKSPACE"))
          glyph =  kMenuDeleteLeftGlyph;
-         
+
       else if(!dStricmp(key, "TAB"))
          glyph =  kMenuTabRightGlyph;
-         
+
       else if(!dStricmp(key, "RETURN"))
          glyph =  kMenuReturnGlyph;
-         
+
       else if(!dStricmp(key, "ENTER"))
          glyph =  kMenuEnterGlyph;
-         
+
       else if(!dStricmp(key, "PG UP"))
          glyph =  kMenuPageUpGlyph;
-         
+
       else if(!dStricmp(key, "PG DOWN"))
          glyph =  kMenuPageDownGlyph;
-         
+
       else if(!dStricmp(key, "ESC"))
          glyph =  kMenuEscapeGlyph;
-         
+
       else if(!dStricmp(key, "LEFT"))
          glyph =  kMenuLeftArrowGlyph;
-         
+
       else if(!dStricmp(key, "RIGHT"))
          glyph =  kMenuRightArrowGlyph;
-         
+
       else if(!dStricmp(key, "UP"))
          glyph =  kMenuUpArrowGlyph;
 
@@ -188,7 +188,7 @@ S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accel)
    MenuItemIndex item;
    CFStringRef cftitle;
    MenuItemAttributes attr = 0;
-   
+
    bool needRelease = false;
    if(title && *title)
    {
@@ -200,7 +200,7 @@ S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accel)
       cftitle = CFSTR("-");
       attr = kMenuItemAttrSeparator;
    }
-      
+
    InsertMenuItemTextWithCFString(mData->mMenu, cftitle, pos, attr, kHICommandTorque + 1);
    if( needRelease )
       CFRelease( cftitle );
@@ -209,17 +209,17 @@ S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accel)
    MenuRef outref;
    GetIndMenuItemWithCommandID(mData->mMenu, kHICommandTorque+1, 1, &outref, &item);
    SetMenuItemCommandID(mData->mMenu, item, kHICommandTorque);
-   
+
    // save a ref to the PopupMenu that owns this item.
    PopupMenu* thisMenu = this;
    SetMenuItemProperty(mData->mMenu, item, 'GG2d', 'ownr', sizeof(PopupMenu*), &thisMenu);
-   
+
    // construct the accelerator keys
    _assignCommandKeys(accel, mData->mMenu, item);
-   
+
    S32 tag = PlatformPopupMenuData::getTag();
    SetMenuItemRefCon(mData->mMenu, item, tag);
-   
+
    return tag;
 }
 
@@ -237,22 +237,22 @@ S32 PopupMenu::insertSubMenu(S32 pos, const char *title, PopupMenu *submenu)
    CFStringRef cftitle = CFStringCreateWithCString(NULL,title,kCFStringEncodingUTF8);
    InsertMenuItemTextWithCFString(mData->mMenu, cftitle, pos, 0, kHICommandTorque + 1);
    CFRelease( cftitle );
-   
+
    // ensure that we have the correct index for the new menu item
    MenuRef outref;
    MenuItemIndex item;
    GetIndMenuItemWithCommandID(mData->mMenu, kHICommandTorque+1, 1, &outref, &item);
    SetMenuItemCommandID(mData->mMenu, item, 0);
-   
+
    S32 tag = PlatformPopupMenuData::getTag();
    SetMenuItemRefCon( mData->mMenu, item, tag);
-   
+
    // store a pointer to the PopupMenu this item represents. See PopupMenu::removeItem()
    SetMenuItemProperty(mData->mMenu, item, 'GG2d', 'subm', sizeof(PopupMenu*), submenu);
-   
+
    SetMenuItemHierarchicalMenu( mData->mMenu, item, submenu->mData->mMenu);
    mSubmenus->addObject(submenu);
-   
+
    return tag;
 }
 
@@ -264,7 +264,7 @@ void PopupMenu::removeItem(S32 itemPos)
    OSStatus err = GetMenuItemProperty(mData->mMenu, itemPos, 'GG2d', 'subm', sizeof(PopupMenu*),NULL,&submenu);
    if(err == noErr)
       mSubmenus->removeObject(submenu);
-      
+
    // deleting the item decrements the ref count on the mac submenu.
    DeleteMenuItem(mData->mMenu, itemPos);
 }
@@ -291,7 +291,7 @@ void PopupMenu::checkRadioItem(S32 firstPos, S32 lastPos, S32 checkPos)
    // uncheck items
    for(int i = firstPos; i <= lastPos; i++)
       checkItem( i, false);
-   
+
    // check the selected item
    checkItem( checkPos, true);
 }
@@ -372,7 +372,7 @@ bool PopupMenu::handleSelect(U32 command, const char *text /* = NULL */)
       CFRelease( cfstr );
       text = textbuf;
    }
-   
+
    // [tom, 8/20/2006] Wasn't handled by a submenu, pass off to script
    return dAtob(Con::executef(this, "onSelectItem", Con::getIntArg(pos - 1), text ? text : ""));
 }
@@ -406,7 +406,7 @@ void PopupMenu::attachToMenuBar(GuiCanvas* canvas, S32 pos, const char *title)
 void PopupMenu::removeFromMenuBar()
 {
    DeleteMenu(mData->tag);
-   
+
    onRemoveFromMenuBar(mCanvas);
 }
 
@@ -418,15 +418,15 @@ U32 PopupMenu::getItemCount()
 bool PopupMenu::setItem(S32 pos, const char *title, const char *accelerator)
 {
    //TODO: update accelerator?
-   
+
    pos += 1; // Torque to mac index
-   
+
    CFStringRef cftitle = CFStringCreateWithCString( NULL, title, kCFStringEncodingUTF8 );
    SetMenuItemTextWithCFString( mData->mMenu, pos, cftitle );
    CFRelease( cftitle );
-   
+
    return true;
-} 
+}
 
 S32 PopupMenu::getPosOnMenuBar()
 {

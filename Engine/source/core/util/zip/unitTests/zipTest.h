@@ -93,7 +93,7 @@ namespace Zip
 inline StringTableEntry makeTestPath(const char *path)
 {
    char buffer[1024], dir[1024];
-  
+
    Platform::makeFullPathName(ZIPTEST_WORKING_DIR, dir, sizeof(dir), Platform::getMainDotCsDir());
    Platform::makeFullPathName(path, buffer, sizeof(buffer), dir);
 

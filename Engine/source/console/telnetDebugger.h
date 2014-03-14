@@ -47,8 +47,8 @@ class TelnetDebugger
    NetSocket mDebugSocket;
 
    enum {
-      
-      // We should only change this is we truely 
+
+      // We should only change this is we truely
       // break the protocol in a future version.
       Version = 2,
 

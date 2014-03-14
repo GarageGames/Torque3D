@@ -35,7 +35,7 @@ Iterator find(Iterator first, Iterator last, Value value)
 }
 
 /// Exchanges the values of the two elements.
-template <typename T> 
+template <typename T>
 inline void swap( T &left, T &right )
 {
    T temp = right;

@@ -28,12 +28,12 @@
 #include "gfx/gfxDevice.h"
 
 
-Var * AppVertConnectorGLSL::getElement(   RegisterType type, 
-                                          U32 numElements, 
+Var * AppVertConnectorGLSL::getElement(   RegisterType type,
+                                          U32 numElements,
                                           U32 numRegisters )
 {
    switch( type )
-   { 
+   {
       case RT_POSITION:
       {
          Var *newVar = new Var;
@@ -49,7 +49,7 @@ Var * AppVertConnectorGLSL::getElement(   RegisterType type,
          newVar->setConnectName( "gl_Normal" );
          return newVar;
       }
-      
+
 
       case RT_COLOR:
       {
@@ -65,7 +65,7 @@ Var * AppVertConnectorGLSL::getElement(   RegisterType type,
       {
          Var *newVar = new Var;
          mElementList.push_back( newVar );
-         
+
          char out[32];
          dSprintf( (char*)out, sizeof(out), "gl_MultiTexCoord%d", mCurTexElem );
          newVar->setConnectName( out );
@@ -83,7 +83,7 @@ Var * AppVertConnectorGLSL::getElement(   RegisterType type,
       default:
          break;
    }
-   
+
    return NULL;
 }
 
@@ -125,7 +125,7 @@ void AppVertConnectorGLSL::print( Stream &stream )
       else
          swizzle = "xyzw";
 
-      // This is ugly.  We use #defines to match user defined names with 
+      // This is ugly.  We use #defines to match user defined names with
       // built in vars.  There is no cleaner way to do this.
       dSprintf( (char*)output, sizeof(output), "#define %s %s.%s\r\n", var->name, var->connectName, swizzle );
 
@@ -133,8 +133,8 @@ void AppVertConnectorGLSL::print( Stream &stream )
    }
 }
 
-Var * VertPixelConnectorGLSL::getElement( RegisterType type, 
-                                          U32 numElements, 
+Var * VertPixelConnectorGLSL::getElement( RegisterType type,
+                                          U32 numElements,
                                           U32 numRegisters )
 {
    switch( type )
@@ -159,7 +159,7 @@ Var * VertPixelConnectorGLSL::getElement( RegisterType type,
             mCurTexElem += numRegisters;
          else
             mCurTexElem += numElements;
-         
+
          mElementList.push_back( newVar );
          return newVar;
       }

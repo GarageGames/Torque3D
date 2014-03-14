@@ -27,7 +27,7 @@
 #include "materials/materialFeatureData.h"
 
 
-void EyeSpaceDepthOutHLSL::processVert(   Vector<ShaderComponent*> &componentList, 
+void EyeSpaceDepthOutHLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                           const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
@@ -39,7 +39,7 @@ void EyeSpaceDepthOutHLSL::processVert(   Vector<ShaderComponent*> &componentLis
    outWSEyeVec->setName( "wsEyeVec" );
    outWSEyeVec->setStructName( "OUT" );
 
-   // grab incoming vert position   
+   // grab incoming vert position
    Var *wsPosition = new Var( "depthPos", "float3" );
    getWsPosition( componentList, fd.features[MFT_UseInstancing], meta, new DecOp( wsPosition ) );
 
@@ -56,9 +56,9 @@ void EyeSpaceDepthOutHLSL::processVert(   Vector<ShaderComponent*> &componentLis
    meta->addStatement( new GenOp( "   @ = float4( @.xyz - @, 1 );\r\n", outWSEyeVec, wsPosition, eyePos ) );
 }
 
-void EyeSpaceDepthOutHLSL::processPix( Vector<ShaderComponent*> &componentList, 
+void EyeSpaceDepthOutHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
-{      
+{
    MultiLine *meta = new MultiLine;
 
    // grab connector position
@@ -98,14 +98,14 @@ void EyeSpaceDepthOutHLSL::processPix( Vector<ShaderComponent*> &componentList,
       farDist->constSortPos = cspPass;
    }
 
-   meta->addStatement( new GenOp( "   @ = length( @.xyz / @.w ) * @.x;\r\n", depthOutDecl, wsEyeVec, wsEyeVec, farDist ) );      
+   meta->addStatement( new GenOp( "   @ = length( @.xyz / @.w ) * @.x;\r\n", depthOutDecl, wsEyeVec, wsEyeVec, farDist ) );
    meta->addStatement( new GenOp( "#endif\r\n" ) );
 
    // If there isn't an output conditioner for the pre-pass, than just write
    // out the depth to rgba and return.
    if( !fd.features[MFT_PrePassConditioner] )
       meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(@.rrr,1)", depthOut ), Material::None ) ) );
-   
+
    output = meta;
 }
 
@@ -115,13 +115,13 @@ ShaderFeature::Resources EyeSpaceDepthOutHLSL::getResources( const MaterialFeatu
 
    // Passing from VS->PS:
    // - world space position (wsPos)
-   temp.numTexReg = 1; 
+   temp.numTexReg = 1;
 
-   return temp; 
+   return temp;
 }
 
 
-void DepthOutHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
+void DepthOutHLSL::processVert(  Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -138,7 +138,7 @@ void DepthOutHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    output = new GenOp( "   @ = @.z / @.w;\r\n", outDepth, outPosition, outPosition );
 }
 
-void DepthOutHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
+void DepthOutHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -167,7 +167,7 @@ ShaderFeature::Resources DepthOutHLSL::getResources( const MaterialFeatureData &
 {
    // We pass the depth to the pixel shader.
    Resources temp;
-   temp.numTexReg = 1; 
+   temp.numTexReg = 1;
 
-   return temp; 
+   return temp;
 }

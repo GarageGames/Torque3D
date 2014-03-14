@@ -29,15 +29,15 @@
 #include "gfx/gl/ggl/ggl.h"
 
 class GFXGLTextureManager : public GFXTextureManager
-{   
+{
 public:
    GFXGLTextureManager();
    ~GFXGLTextureManager();
-   
+
 protected:
 
    // GFXTextureManager
-   GFXTextureObject *_createTextureObject(   U32 height, 
+   GFXTextureObject *_createTextureObject(   U32 height,
                                              U32 width,
                                              U32 depth,
                                              GFXFormat format,
@@ -54,7 +54,7 @@ protected:
 
 private:
    friend class GFXGLTextureObject;
-   
+
    /// Creates internal GL texture
    void innerCreateTexture(GFXGLTextureObject *obj, U32 height, U32 width, U32 depth, GFXFormat format, GFXTextureProfile *profile, U32 numMipLevels, bool forceMips = false);
 };

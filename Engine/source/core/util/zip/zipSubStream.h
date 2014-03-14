@@ -49,7 +49,7 @@ class ZipSubRStream : public FilterStream, public IStreamByteCount
 public:
    virtual U32 getLastBytesRead() { return m_lastBytesRead; }
    virtual U32 getLastBytesWritten() { return 0; }
-   
+
 
   public:
    ZipSubRStream();

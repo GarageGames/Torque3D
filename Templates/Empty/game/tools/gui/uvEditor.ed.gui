@@ -29,7 +29,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
       EdgeSnap = "0";
       canCollapse = "0";
       visible = "0";
-      
+
       new GuiTextCtrl() {
          text = "0.0";
          maxLength = "1024";
@@ -163,7 +163,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
-      
+
       new GuiControl(){
          HorizSizing = "right";
          VertSizing = "bottom";
@@ -171,7 +171,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
          position = "25 37";
          extent = "258 258";
       };
-      
+
       new GuiBitmapCtrl(){
          internalName = "bitmapPreview";
          HorizSizing = "right";
@@ -203,7 +203,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
 			setFirstResponder = "0";
 			modal = "1";
 			helpTag = "0";
-         
+
          new GuiTextCtrl() {
             text = "Handle Color:";
             maxLength = "1024";
@@ -237,7 +237,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
             reverseTextList = "0";
          };
       };
-      
+
 		new GuiBitmapBorderCtrl() {
 			profile = "ToolsGuiGroupBorderProfile";
 			horizSizing = "width";
@@ -249,7 +249,7 @@ new GuiControl(UVEditorOverlay, EditorGuiGroup) {
 			setFirstResponder = "0";
 			modal = "1";
 			helpTag = "0";
-         
+
          new GuiTextCtrl() {
             text = "U:";
             maxLength = "1024";
@@ -491,12 +491,12 @@ function UVEditor::showDialog( %this, %applyCallback, %obj, %uv)
 {
    // Set the select callback
    UVEditor.applyCallback = %applyCallback;
-   
+
    // Set the initial UV coordinates
    UVEditor.originalUV = %uv;
    UVEditor-->uvHandles.handleRect = %uv;
    UVEditor.setTextValues(%uv);
-   
+
    // Get the preview bitmap.  Code copied from Material Selector.
    %material = %obj.material;
    if( %material.toneMap[0] $= "" && %material.diffuseMap[0] $= "" && !isObject(%material.cubemap) )
@@ -511,7 +511,7 @@ function UVEditor::showDialog( %this, %applyCallback, %obj, %uv)
          %previewImage = %material.diffuseMap[0];
       else if( %material.cubemap.cubeFace[0] !$= "" )
          %previewImage = %material.cubemap.cubeFace[0];
-      
+
       %materialDiffuse =  %previewImage;
       %materialPath = %material.getFilename();
       if( strchr( %materialDiffuse, "/") $= "" )
@@ -522,16 +522,16 @@ function UVEditor::showDialog( %this, %applyCallback, %obj, %uv)
             %foo = strpos( %materialPath, "/", %k );
             %k = %foo + 1;
          }
-      
+
          %foobar = getSubStr( %materialPath , %k , 99 );
          %previewImage =  strreplace( %materialPath, %foobar, %previewImage );
       }
       else
          %previewImage =  strreplace( %materialPath, %materialPath, %previewImage );
    }
-      
+
    UVEditor-->bitmapPreview.setBitmap(%previewImage);
-   
+
    // Set up the color popup
    %popup = UVEditor-->colorPopup;
    %popup.clear();
@@ -549,7 +549,7 @@ function UVEditor::showDialog( %this, %applyCallback, %obj, %uv)
    %popup.setSelected(EditorSettings.value("WorldEditor/Color/uvEditorHandleColor"));
    UVEditor-->uvHandles.useCustomColor = true;
    UVEditor-->uvHandles.handleColor = %popup.getColorById(%popup.getSelected());
-   
+
    Canvas.pushDialog(UVEditorOverlay);
    UVEditor.setVisible(1);
 }
@@ -604,9 +604,9 @@ function UVEditorUVTextEdit::onValidate( %this )
    %v = UVEditor-->UVY.getValue();
    %w = UVEditor-->UVW.getValue();
    %h = UVEditor-->UVH.getValue();
-   
+
    // Check limits
-   
+
    if(%u < 0)
       %u = 0;
    if(%u > 1)
@@ -615,7 +615,7 @@ function UVEditorUVTextEdit::onValidate( %this )
       %v = 0;
    if(%v > 1)
       %v = 1;
-   
+
    if(%w < 0)
       %w = 0;
    if(%w > 1)
@@ -624,18 +624,18 @@ function UVEditorUVTextEdit::onValidate( %this )
       %h = 0;
    if(%h > 1)
       %h = 1;
-   
+
    if((%u+%w) > 1)
       %w = 1 - %u;
    if((%v+%h) > 1)
       %h = 1 - %v;
-   
+
    // Apply values
    UVEditor-->UVX.setText( %u );
    UVEditor-->UVY.setText( %v );
    UVEditor-->UVW.setText( %w );
    UVEditor-->UVH.setText( %h );
-   
+
    UVEditor-->uvHandles.handleRect = %u SPC %v SPC %w SPC %h;
 }
 

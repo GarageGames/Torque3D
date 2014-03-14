@@ -104,20 +104,20 @@ void GFXVertexFormat::append( const GFXVertexFormat &format, U32 streamIndex )
 }
 
 void GFXVertexFormat::clear()
-{ 
+{
    mDirty = true;
-   mElements.clear(); 
+   mElements.clear();
    mDecl = NULL;
 }
 
-void GFXVertexFormat::addElement( const String& semantic, GFXDeclType type, U32 index, U32 stream ) 
-{ 
+void GFXVertexFormat::addElement( const String& semantic, GFXDeclType type, U32 index, U32 stream )
+{
    mDirty = true;
    mElements.increment();
-   mElements.last().mStreamIndex = stream; 
+   mElements.last().mStreamIndex = stream;
    mElements.last().mSemantic = semantic.intern();
    mElements.last().mSemanticIndex = index;
-   mElements.last().mType = type;      
+   mElements.last().mType = type;
 }
 
 const String& GFXVertexFormat::getDescription() const
@@ -194,8 +194,8 @@ void GFXVertexFormat::_updateDirty()
       const GFXVertexElement &element = mElements[i];
 
       desc += String::ToString( "%d,%s,%d,%d\n",   element.mStreamIndex,
-                                                   element.mSemantic.c_str(), 
-                                                   element.mSemanticIndex, 
+                                                   element.mSemantic.c_str(),
+                                                   element.mSemanticIndex,
                                                    element.mType );
 
       if ( element.isSemantic( GFXSemantic::NORMAL ) )

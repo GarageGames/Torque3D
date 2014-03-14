@@ -88,7 +88,7 @@ namespace Sampler
    void sample( U32 key, S32 value );
    void sample( U32 key, F32 value );
    void sample( U32 key, const char* value );
-   
+
    inline void sample( U32 key, U32 value )
    {
       sample( key, S32( value ) );

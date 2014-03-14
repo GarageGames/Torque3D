@@ -76,7 +76,7 @@ struct SplashRing
 //--------------------------------------------------------------------------
 // Splash Data
 //--------------------------------------------------------------------------
-class SplashData : public GameBaseData 
+class SplashData : public GameBaseData
 {
   public:
    typedef GameBaseData Parent;

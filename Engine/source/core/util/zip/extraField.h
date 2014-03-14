@@ -60,9 +60,9 @@ public:
       mCreateFn = NULL;
    }
    ExtraField(U16 id, ExtraFieldCreateFn fnCreate);
-   
+
    virtual ~ExtraField() {}
-   
+
    inline U16 getID()                  { return mID; }
 
    virtual bool read(Stream *stream) = 0;

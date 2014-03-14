@@ -45,7 +45,7 @@
    %this.addSequence( "art/shapes/weapons/ProxMine/PlayerAnims/PlayerAnim_ProxMine_Swim_Root.dae Swim_Root", "ProxMine_Swim_Root", 0, -1);
    %this.addSequence( "art/shapes/weapons/ProxMine/PlayerAnims/PlayerAnim_ProxMine_Swim_Left.dae Swim_Left", "ProxMine_Swim_Left", 0, -1);
    %this.addSequence( "art/shapes/weapons/ProxMine/PlayerAnims/PlayerAnim_ProxMine_Swim_Right.dae Swim_Right", "ProxMine_Swim_Right", 0, -1);
-   
+
    %this.setSequenceCyclic( "ProxMine_Back", true);
    %this.setSequenceCyclic( "ProxMine_Crouch_Backward", true);
    %this.setSequenceCyclic( "ProxMine_Crouch_Forward", true);

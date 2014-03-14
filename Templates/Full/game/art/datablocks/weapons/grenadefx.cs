@@ -4,10 +4,10 @@
 //-----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
-// Placeholder projectile and explosion with required sounds, debris, and 
+// Placeholder projectile and explosion with required sounds, debris, and
 // particle datablocks. These datablocks existed in now removed scripts, but
 // were used within some that remain: see Lurker.cs, Ryder.cs, ProxMine.cs
-// 
+//
 // These effects should be made more generic or new fx created for unique usage.
 //
 // I've removed all effects that are not required for the current weapons.  On
@@ -263,12 +263,12 @@ datablock ParticleEmitterData(GrenadeSplashRingEmitter)
 
 datablock SplashData(GrenadeSplash)
 {
-   // SplashData doesn't have a render function in the source, 
+   // SplashData doesn't have a render function in the source,
    // so everything but the emitter array is useless here.
    emitter[0] = GrenadeSplashEmitter;
    emitter[1] = GrenadeSplashMistEmitter;
    emitter[2] = GrenadeSplashRingEmitter;
-   
+
     //numSegments = 15;
     //ejectionFreq = 15;
     //ejectionAngle = 40;

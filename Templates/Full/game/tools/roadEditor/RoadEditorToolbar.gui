@@ -12,7 +12,7 @@
    canSave = "1";
    Visible = "0";
    hovertime = "1000";
-   
+
    new GuiTextCtrl() {
       profile = "ToolsGuiTextProfile";
       horizSizing = "right";
@@ -34,7 +34,7 @@
       RowSize = "27";
       rowSpacing = "2";
       colspacing = "4";
-      
+
       new GuiBitmapButtonCtrl(RoadEditorShowSplineBtn) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -251,7 +251,7 @@ new GuiMouseEventCtrl(RoadDefaultWidthSliderCtrlContainer, EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -259,7 +259,7 @@ new GuiMouseEventCtrl(RoadDefaultWidthSliderCtrlContainer, EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(RoadDefaultWidthTextEditContainer.position) + firstWord(RoadEditorToolbar.position) + 10 SPC 
+      position = firstWord(RoadDefaultWidthTextEditContainer.position) + firstWord(RoadEditorToolbar.position) + 10 SPC
          (getWord(RoadDefaultWidthTextEditContainer, 1)) + 25;
       Extent = "112 20";
       MinExtent = "8 2";

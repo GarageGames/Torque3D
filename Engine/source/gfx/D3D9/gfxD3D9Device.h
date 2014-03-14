@@ -60,14 +60,14 @@
 
 #include "platform/tmm_on.h"
 
-inline void D3D9Assert( HRESULT hr, const char *info ) 
+inline void D3D9Assert( HRESULT hr, const char *info )
 {
 #if defined( TORQUE_DEBUG )
-   if( FAILED( hr ) ) 
+   if( FAILED( hr ) )
    {
       char buf[256];
       dSprintf( buf, 256, "%s\n%s\n%s", DXGetErrorStringA( hr ), DXGetErrorDescriptionA( hr ), info );
-      AssertFatal( false, buf ); 
+      AssertFatal( false, buf );
       //      DXTrace( __FILE__, __LINE__, hr, info, true );
    }
 #endif
@@ -93,7 +93,7 @@ struct D3DXFNTable
 #undef D3DX_FUNCTION
 };
 
-#define GFXD3DX static_cast<GFXD3D9Device *>(GFX)->smD3DX 
+#define GFXD3DX static_cast<GFXD3D9Device *>(GFX)->smD3DX
 
 class GFXResource;
 class GFXD3D9ShaderConstBuffer;
@@ -229,11 +229,11 @@ protected:
    // Index buffer management
    // {
    virtual void _setPrimitiveBuffer( GFXPrimitiveBuffer *buffer );
-   virtual void drawIndexedPrimitive(  GFXPrimitiveType primType, 
-                                       U32 startVertex, 
-                                       U32 minIndex, 
-                                       U32 numVerts, 
-                                       U32 startIndex, 
+   virtual void drawIndexedPrimitive(  GFXPrimitiveType primType,
+                                       U32 startVertex,
+                                       U32 minIndex,
+                                       U32 numVerts,
+                                       U32 startIndex,
                                        U32 primitiveCount );
    // }
 
@@ -241,7 +241,7 @@ protected:
 
    /// Device helper function
    virtual D3DPRESENT_PARAMETERS setupPresentParams( const GFXVideoMode &mode, const HWND &hwnd ) const = 0;
-   
+
 public:
    static D3DXFNTable smD3DX;
 
@@ -295,12 +295,12 @@ public:
 
    // Vertex/Index buffer management
    // {
-   virtual GFXVertexBuffer* allocVertexBuffer(  U32 numVerts, 
+   virtual GFXVertexBuffer* allocVertexBuffer(  U32 numVerts,
                                                 const GFXVertexFormat *vertexFormat,
                                                 U32 vertSize,
                                                 GFXBufferType bufferType );
-   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
-                                                      U32 numPrimitives, 
+   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices,
+                                                      U32 numPrimitives,
                                                       GFXBufferType bufferType );
    virtual void deallocVertexBuffer( GFXD3D9VertexBuffer *vertBuff );
    virtual GFXVertexDecl* allocVertexDecl( const GFXVertexFormat *vertexFormat );
@@ -330,18 +330,18 @@ public:
 
    // Function only really used on the, however a centralized function for
    // destroying resources is probably a good thing -patw
-   virtual void destroyD3DResource( IDirect3DResource9 *d3dResource ) { SAFE_RELEASE( d3dResource ); }; 
+   virtual void destroyD3DResource( IDirect3DResource9 *d3dResource ) { SAFE_RELEASE( d3dResource ); };
 
    inline virtual F32 getFillConventionOffset() const { return 0.5f; }
    virtual void doParanoidStateCheck();
 
    GFXFence *createFence();
 
-   GFXOcclusionQuery* createOcclusionQuery();   
+   GFXOcclusionQuery* createOcclusionQuery();
 
    // Default multisample parameters
    D3DMULTISAMPLE_TYPE getMultisampleType() const { return mMultisampleType; }
-   DWORD getMultisampleLevel() const { return mMultisampleLevel; } 
+   DWORD getMultisampleLevel() const { return mMultisampleLevel; }
 
    // Whether or not the Direct3D device was created with Direct3D9Ex support
 #if !defined(TORQUE_OS_XENON)

@@ -32,7 +32,7 @@
 #endif
 
 
-class CameraData: public ShapeBaseData 
+class CameraData: public ShapeBaseData
 {
    public:
 

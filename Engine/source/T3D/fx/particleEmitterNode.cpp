@@ -280,7 +280,7 @@ void ParticleEmitterNode::processTick(const Move* move)
 void ParticleEmitterNode::advanceTime(F32 dt)
 {
    Parent::advanceTime(dt);
-   
+
    if(!mActive || mEmitter.isNull() || !mDataBlock)
       return;
 
@@ -393,7 +393,7 @@ void ParticleEmitterNode::setEmitterDataBlock(ParticleEmitterData* data)
 
    mEmitterDatablock = data;
 }
- 
+
 DefineEngineMethod(ParticleEmitterNode, setEmitterDataBlock, void, (ParticleEmitterData* emitterDatablock), (0),
    "Assigns the datablock for this emitter node.\n"
    "@param emitterDatablock ParticleEmitterData datablock to assign\n"

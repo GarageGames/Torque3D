@@ -40,14 +40,14 @@ protected:
 public:
    GuiMissionAreaEditorCtrl();
    virtual ~GuiMissionAreaEditorCtrl();
-   
+
    DECLARE_CONOBJECT(GuiMissionAreaEditorCtrl);
 
    // SimObject
    bool onAdd();
    static void initPersistFields();
 
-   // EditTSCtrl      
+   // EditTSCtrl
    void get3DCursor( GuiCursor *&cursor, bool &visible, const Gui3DMouseEvent &event_ );
 
    void setSelectedMissionArea( MissionArea *missionArea );

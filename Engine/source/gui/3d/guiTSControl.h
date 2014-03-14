@@ -58,7 +58,7 @@ protected:
    F32            mCameraZRot;
    F32            mForceFOV;
 
-   /// A list of GuiTSCtrl which are awake and 
+   /// A list of GuiTSCtrl which are awake and
    /// most likely rendering.
    static Vector<GuiTSCtrl*> smAwakeTSCtrls;
 
@@ -76,17 +76,17 @@ protected:
    MatrixF     mSaveProjection;
    RectI       mSaveViewport;
 	Frustum		mSaveFrustum;
-   
+
    /// The saved world to screen space scale.
    /// @see getWorldToScreenScale
    Point2F mSaveWorldToScreenScale;
 
    /// The last camera query set in onRender.
    /// @see getLastCameraQuery
-   CameraQuery mLastCameraQuery;	
-   
+   CameraQuery mLastCameraQuery;
+
 public:
-   
+
    GuiTSCtrl();
 
    void onPreRender();
@@ -96,7 +96,7 @@ public:
    /// Subclasses can override this to perform 3D rendering.
    virtual void renderWorld(const RectI &updateRect);
 
-   /// Subclasses can override this to perform 2D rendering.   
+   /// Subclasses can override this to perform 2D rendering.
    virtual void renderGui(Point2I offset, const RectI &updateRect) {}
 
    static void initPersistFields();
@@ -117,17 +117,17 @@ public:
    /// Returns the last Frustum set in onRender.
    const Frustum&	getLastFrustum() const { return mSaveFrustum; }
 
-   /// Returns the scale for converting world space 
+   /// Returns the scale for converting world space
    /// units to screen space units... aka pixels.
    /// @see GFXDevice::getWorldToScreenScale
    const Point2F& getWorldToScreenScale() const { return mSaveWorldToScreenScale; }
 
    /// Returns the last camera query set in onRender.
-   const CameraQuery& getLastCameraQuery() const { return mLastCameraQuery; }   
-   
+   const CameraQuery& getLastCameraQuery() const { return mLastCameraQuery; }
+
    /// Returns the screen space X,Y and Z for world space point.
    /// The input z coord is depth, from 0 to 1.
-   bool project( const Point3F &pt, Point3F *dest ) const; 
+   bool project( const Point3F &pt, Point3F *dest ) const;
 
    /// Returns the world space point for X, Y and Z.  The ouput
    /// z coord is depth, from 0 to 1
@@ -145,7 +145,7 @@ public:
    /// width in pixels.
    ///
    /// This is a 2D drawing operation and should not be called from within
-   /// renderScene without preparing the GFX for 2D rendering first.   
+   /// renderScene without preparing the GFX for 2D rendering first.
    ///
    /// These methods are NOT optimized for performance in any way and are only
    /// intended for debug rendering, editor rendering, or infrequent rendering.

@@ -43,7 +43,7 @@ public:
       CartesianXY,
       Spherical,
    };
-   
+
 protected:
 
    NormalStorage mNormalStorageType;

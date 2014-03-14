@@ -46,9 +46,9 @@ extern bool gEditingMission;
 
 MODULE_BEGIN( Scene )
 
-   MODULE_INIT_AFTER( Sim )   
+   MODULE_INIT_AFTER( Sim )
    MODULE_SHUTDOWN_BEFORE( Sim )
-   
+
    MODULE_INIT
    {
       // Client scene.
@@ -85,7 +85,7 @@ MODULE_BEGIN( Scene )
          "TODO\n\n"
          "@ingroup Rendering" );
    }
-   
+
    MODULE_SHUTDOWN
    {
       SAFE_DELETE( gClientSceneGraph );
@@ -134,11 +134,11 @@ SceneManager::SceneManager( bool isClient )
 //-----------------------------------------------------------------------------
 
 SceneManager::~SceneManager()
-{   
+{
    SAFE_DELETE( mZoneManager );
 
    if( mLightManager )
-      mLightManager->deactivate();   
+      mLightManager->deactivate();
 }
 
 //-----------------------------------------------------------------------------
@@ -146,7 +146,7 @@ SceneManager::~SceneManager()
 void SceneManager::renderScene( ScenePassType passType, U32 objectMask )
 {
    SceneCameraState cameraState = SceneCameraState::fromGFX();
-   
+
    // Handle frustum locking.
 
    const bool lockedFrustum = ( smLockDiffuseFrustum && passType == SPT_Diffuse );
@@ -160,7 +160,7 @@ void SceneManager::renderScene( ScenePassType passType, U32 objectMask )
       if( passType == SPT_Diffuse )
          smLockedDiffuseCamera = cameraState;
    }
-   
+
    // Create the render state.
 
    SceneRenderState renderState( this, passType, cameraState );
@@ -345,7 +345,7 @@ void SceneManager::renderSceneNoLights( SceneRenderState* renderState, U32 objec
 
    if( gEditingMission && renderState->isDiffusePass() && smLockDiffuseFrustum )
       renderState->getCullingState().debugRenderCullingVolumes();
-   
+
    #endif
 
    mCurrentRenderState = NULL;
@@ -428,7 +428,7 @@ void SceneManager::_renderScene( SceneRenderState* state, U32 objectMask, SceneZ
    //    If it has, we should use the container query-based path.
    //    If it hasn't, we should fill the object list directly from the zone lists which will usually
    //       include way fewer objects.
-   
+
    // Gather all objects that intersect the scene render box.
 
    mBatchQueryList.clear();
@@ -556,7 +556,7 @@ void SceneManager::scopeScene( CameraScopeQuery* query, NetConnection* netConnec
    //
    // So, we perform a simple box query on the area covered by the camera query
    // and then scope in everything that is in range.
-   
+
    // Set up scoping info.
 
    ScopingInfo info;

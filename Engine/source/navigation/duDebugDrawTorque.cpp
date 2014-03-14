@@ -118,7 +118,7 @@ void duDebugDrawTorque::vertex(const float x, const float y, const float z, unsi
          mVertCount++;
       }
    }
-   else 
+   else
    {
       _vertex(x, -z, y, color);
    }

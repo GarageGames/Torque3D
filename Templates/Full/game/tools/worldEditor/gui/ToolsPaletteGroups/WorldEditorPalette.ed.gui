@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(EWorldEditorNoneModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorSelectArrow";
@@ -32,7 +32,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(EWorldEditorMoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorMove";
@@ -53,7 +53,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(EWorldEditorRotateModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorRotate";
@@ -74,7 +74,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(EWorldEditorScaleModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorScale";

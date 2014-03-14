@@ -89,9 +89,9 @@ S32 GuiConsole::getMaxWidth(S32 startIndex, S32 endIndex)
    S32 result = 0;
    for(S32 i = startIndex; i <= endIndex; i++)
       result = getMax(result, (S32)(mFont->getStrWidth((const UTF8 *)log[i].mString)));
-   
+
    Con::unlockLog();
-   
+
    return(result + 6);
 }
 
@@ -106,7 +106,7 @@ void GuiConsole::onPreRender()
 
    Con::getLockLog(log, size);
    Con::unlockLog(); // we unlock immediately because we only use size here, not log.
-   
+
    if(size != prevSize)
    {
       //first, find out if the console was scrolled up
@@ -151,7 +151,7 @@ void GuiConsole::onRenderCell(Point2I offset, Point2I cell, bool /*selected*/, b
       default: AssertFatal(false, "GuiConsole::onRenderCell - Unrecognized ConsoleLogEntry type, update this.");
    }
    GFX->getDrawUtil()->drawText(mFont, Point2I(offset.x + 3, offset.y), entry.mString, mProfile->mFontColors);
-   
+
    Con::unlockLog();
 }
 

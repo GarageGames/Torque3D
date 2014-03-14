@@ -37,7 +37,7 @@ bool SimObjectList::pushBack(SimObject* obj)
       push_back(obj);
       return true;
    }
-   
+
    return false;
 }
 
@@ -57,7 +57,7 @@ bool SimObjectList::pushBackForce(SimObject* obj)
       removeStable(pBack);
       push_back(pBack);
    }
-   
+
    return false;
 }
 
@@ -68,7 +68,7 @@ bool SimObjectList::pushFront(SimObject* obj)
       push_front(obj);
       return true;
    }
-   
+
    return false;
 }
 
@@ -80,7 +80,7 @@ bool SimObjectList::remove(SimObject* obj)
       erase(ptr);
       return true;
    }
-   
+
    return false;
 }
 
@@ -92,7 +92,7 @@ bool SimObjectList::removeStable(SimObject* obj)
       erase(ptr);
       return true;
    }
-   
+
    return false;
 }
 
@@ -110,7 +110,7 @@ void SimObjectList::sortId()
 S32 QSORT_CALLBACK SimObjectList::_callbackSort( const void *a, const void *b )
 {
    const SimObject *objA = *reinterpret_cast<const SimObject* const*>( a );
-   const SimObject *objB = *reinterpret_cast<const SimObject* const*>( b );   
+   const SimObject *objB = *reinterpret_cast<const SimObject* const*>( b );
 
    static char idA[64];
    dSprintf( idA, sizeof( idA ), "%d", objA->getId() );

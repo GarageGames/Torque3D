@@ -31,7 +31,7 @@ CreateUnitTest( TestTCPRequest, "Platform/Net/TCPRequest")
    NetSocket mSocket;
    S32 mDataRecved;
 
-   void handleNotify(NetSocket sock, U32 state) 
+   void handleNotify(NetSocket sock, U32 state)
    {
       // Only consider our own socket.
       if(mSocket != sock)
@@ -104,7 +104,7 @@ CreateUnitTest( TestTCPRequestJournal, "Platform/Net/JournalTCPRequest")
    NetSocket mSocket;
    S32 mDataRecved;
 
-   void handleNotify(NetSocket sock, U32 state) 
+   void handleNotify(NetSocket sock, U32 state)
    {
       // Only consider our own socket.
       if(mSocket != sock)

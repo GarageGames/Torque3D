@@ -47,7 +47,7 @@ public:
    void scale( const Point3F &delta );
 
 protected:
-   
+
    // Use explicit specialization to define these for your type.
    virtual void offsetObject( T &object, const Point3F &delta ) {}
    virtual void rotateObject( T &object, const EulerF &delta, const Point3F &origin ) {}
@@ -66,8 +66,8 @@ template<class T> inline void Selection<T>::offset( const Point3F &delta )
 {
    typename Selection<T>::iterator itr = this->begin();
 
-   for ( ; itr != this->end(); itr++ )   
-      offsetObject( *itr, delta );      
+   for ( ; itr != this->end(); itr++ )
+      offsetObject( *itr, delta );
 }
 
 template<class T> inline void Selection<T>::rotate( const EulerF &delta )
@@ -75,7 +75,7 @@ template<class T> inline void Selection<T>::rotate( const EulerF &delta )
    typename Selection<T>::iterator itr = this->begin();
    Point3F origin = getOrigin();
 
-   for ( ; itr != this->end(); itr++ )   
+   for ( ; itr != this->end(); itr++ )
       rotateObject( *itr, delta, origin );
 }
 
@@ -85,7 +85,7 @@ template<class T> inline void Selection<T>::scale( const Point3F &delta )
    if ( this->size() != 1 )
       return;
 
-   scaleObject( this->mArray[0], delta );   
+   scaleObject( this->mArray[0], delta );
 }
 
 #endif // _TSELECTION_H_

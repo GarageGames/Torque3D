@@ -95,7 +95,7 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
       AssertFatal( false, "Failed to register the window class for the GL test window." );
 
    // Now create a window
-   HWND hwnd = CreateWindow( L"GFX-OpenGL", L"", WS_POPUP, 0, 0, 640, 480, 
+   HWND hwnd = CreateWindow( L"GFX-OpenGL", L"", WS_POPUP, 0, 0, 640, 480,
                              NULL, NULL, winState.appInstance, NULL );
    AssertFatal( hwnd != NULL, "Failed to create the window for the GL test window." );
 
@@ -148,7 +148,7 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
       stillGoing = EnumDisplaySettings( NULL, modeNum++, &devMode );
 
       if (( devMode.dmPelsWidth >= 480) && (devMode.dmPelsHeight >= 360 )
-         && ( devMode.dmBitsPerPel == 16 || devMode.dmBitsPerPel == 32 )) 
+         && ( devMode.dmBitsPerPel == 16 || devMode.dmBitsPerPel == 32 ))
       {
          GFXVideoMode vmAdd;
 
@@ -187,7 +187,7 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
    UnregisterClass(L"GFX-OpenGL", winState.appInstance);
 }
 
-void GFXGLDevice::enumerateVideoModes() 
+void GFXGLDevice::enumerateVideoModes()
 {
    mVideoModes.clear();
 
@@ -203,7 +203,7 @@ void GFXGLDevice::enumerateVideoModes()
       stillGoing = EnumDisplaySettings( NULL, modeNum++, &devMode );
 
       if (( devMode.dmPelsWidth >= 480) && (devMode.dmPelsHeight >= 360 )
-           && ( devMode.dmBitsPerPel == 16 || devMode.dmBitsPerPel == 32 )) 
+           && ( devMode.dmBitsPerPel == 16 || devMode.dmBitsPerPel == 32 ))
            //( smCanSwitchBitDepth || devMode.dmBitsPerPel == winState.desktopBitsPixel ) )
       {
          GFXVideoMode toAdd;
@@ -267,7 +267,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    loadGLExtensions(hdcGL);
 
    wglSwapIntervalEXT(0);
-   
+
    // It is very important that extensions be loaded
    // before we call initGLState()
    initGLState();
@@ -278,7 +278,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    deviceInited();
 }
 
-bool GFXGLDevice::beginSceneInternal() 
+bool GFXGLDevice::beginSceneInternal()
 {
    glGetError();
    return true;
@@ -354,12 +354,12 @@ void GFXGLDevice::_updateRenderTargets()
       else
       {
          GFXGLWindowTarget *win = dynamic_cast<GFXGLWindowTarget*>( mCurrentRT.getPointer() );
-         AssertFatal( win != NULL, 
+         AssertFatal( win != NULL,
             "GFXGLDevice::_updateRenderTargets() - invalid target subclass passed!" );
 
          //DWORD w1 = GetLastError();
          HWND hwnd = GETHWND(win->getWindow());
-         HDC winDc = GetDC(hwnd);      
+         HDC winDc = GetDC(hwnd);
          bool res = wglMakeCurrent(winDc,(HGLRC)win->mContext);
          //DWORD w2 = GetLastError();
          AssertFatal(res==true,"GFXGLDevice::setActiveRenderTarget - failed");
@@ -370,7 +370,7 @@ void GFXGLDevice::_updateRenderTargets()
 
    if ( mViewportDirty )
    {
-      glViewport( mViewport.point.x, mViewport.point.y, mViewport.extent.x, mViewport.extent.y ); 
+      glViewport( mViewport.point.x, mViewport.point.y, mViewport.extent.x, mViewport.extent.y );
       mViewportDirty = false;
    }
 }

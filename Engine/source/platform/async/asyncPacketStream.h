@@ -133,7 +133,7 @@ class AsyncPacketBufferedInputStream : public AsyncBufferedInputStream< Packet*,
             {
                Parent::execute();
                mPacket->mSizeActual += this->mNumElementsRead;
-               
+
                #ifdef DEBUG_SPEW
                Platform::outputDebugString( "[AsyncPacketStream] read %i elements into packet #%i with size %i",
                   this->mNumElementsRead, mPacket->mIndex, mPacket->size );
@@ -144,7 +144,7 @@ class AsyncPacketBufferedInputStream : public AsyncBufferedInputStream< Packet*,
                if( this->cancellationPoint() ) return;
                U32 numExtraElements = mPacket->size - this->mNumElementsRead;
                if( numExtraElements )
-               {                  
+               {
                   if( mAsyncStream->mIsLooping
                       && dynamic_cast< IResettable* >( &Deref( this->getStream() ) ) )
                   {
@@ -155,14 +155,14 @@ class AsyncPacketBufferedInputStream : public AsyncBufferedInputStream< Packet*,
                      // Wrap around and start re-reading from beginning of stream.
 
                      dynamic_cast< IResettable* >( &Deref( this->getStream() ) )->reset();
-                     
+
                      this->mOffsetInBuffer += this->mNumElementsRead;
                      this->mOffsetInStream = 0;
                      this->mNumElements = numExtraElements;
 
                      this->_prep();
                      Parent::execute();
-                     
+
                      mPacket->mSizeActual += this->mNumElementsRead;
                   }
                   else
@@ -189,7 +189,7 @@ class AsyncPacketBufferedInputStream : public AsyncBufferedInputStream< Packet*,
 
       /// Running number of next stream packet.
       U32 mNextPacketIndex;
-            
+
       /// Total number of elements in the source stream.
       U32 mNumTotalSourceElements;
 
@@ -229,7 +229,7 @@ class AsyncPacketBufferedInputStream : public AsyncBufferedInputStream< Packet*,
                               bool isLooping = false,
                               ThreadPool* pool = &ThreadPool::GLOBAL(),
                               ThreadContext* context = ThreadContext::ROOT_CONTEXT() );
-      
+
       /// @return the size of stream packets returned by this stream in number of elements.
       U32 getPacketSize() const { return mPacketSize; }
 };
@@ -250,9 +250,9 @@ AsyncPacketBufferedInputStream< Stream, Packet >::AsyncPacketBufferedInputStream
 {
    AssertFatal( mPacketSize > 0,
       "AsyncPacketStream::AsyncPacketStream() - packet size cannot be zero" );
-      
+
    // Determine total number of elements in stream, if possible.
-      
+
    IPositionable< U32 >* positionable = dynamic_cast< IPositionable< U32 >* >( &Deref( stream ) );
    if( positionable )
       mNumTotalSourceElements += positionable->getPosition();
@@ -262,7 +262,7 @@ AsyncPacketBufferedInputStream< Stream, Packet >::AsyncPacketBufferedInputStream
       if( sizeable )
          mNumTotalSourceElements = sizeable->getSize();
    }
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[AsyncPacketStream] %i remaining, %i total (%i packets)",
       this->mNumRemainingSourceElements, mNumTotalSourceElements,
@@ -312,7 +312,7 @@ void AsyncPacketBufferedInputStream< Stream, Packet >::_requestNext()
    }
    else
       this->mNumRemainingSourceElements -= numElements;
-      
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[AsyncPacketStream] packet %i, %i remaining, %i total",
       packet->mIndex, this->mNumRemainingSourceElements, mNumTotalSourceElements );

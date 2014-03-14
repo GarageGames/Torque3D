@@ -162,7 +162,7 @@
          Profile = "ToolsGuiTextCenterProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
-         position = "393 53"; 
+         position = "393 53";
          Extent = "59 19";
          MinExtent = "8 2";
          canSave = "1";
@@ -181,7 +181,7 @@ function TimeAdjustSliderCtrl::onAction(%this)
    // we access and modify the server-side TimeOfDay object. This is acceptible
    // because this is a "tools" gui which is not intended for a real-game
    // or multiplayer situation.
-   
+
    if ( !isObject( %this.tod ) )
    {
       if ( isObject( MissionGroup ) )
@@ -189,20 +189,20 @@ function TimeAdjustSliderCtrl::onAction(%this)
          for ( %i = 0; %i < MissionGroup.getCount(); %i++ )
          {
             %obj = MissionGroup.getObject( %i );
-            
+
             if ( %obj.getClassName() $= "TimeOfDay" )
             {
                %this.tod = %obj;
                break;
-            }            
+            }
          }
       }
    }
-   
+
    if ( !isObject( %this.tod ) )
       return;
-      
-   %this.tod.time = %this.getValue();   
+
+   %this.tod.time = %this.getValue();
 }
 
 function toggleTimeAdjustGui()

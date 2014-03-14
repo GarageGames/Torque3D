@@ -219,56 +219,56 @@ bool DebrisData::preload(bool server, String &errorStr)
 void DebrisData::initPersistFields()
 {
    addGroup("Display");
-   addField("texture",              TypeString,                  Offset(textureName,         DebrisData), 
+   addField("texture",              TypeString,                  Offset(textureName,         DebrisData),
       "@brief Texture imagemap to use for this debris object.\n\nNot used any more.\n");
-   addField("shapeFile",            TypeShapeFilename,           Offset(shapeName,           DebrisData), 
+   addField("shapeFile",            TypeShapeFilename,           Offset(shapeName,           DebrisData),
       "@brief Object model to use for this debris object.\n\nThis shape is optional.  You could have Debris made up of only particles.\n");
    endGroup("Display");
 
    addGroup("Datablocks");
-   addField("emitters",             TYPEID< ParticleEmitterData >(),  Offset(emitterList,    DebrisData), DDC_NUM_EMITTERS, 
+   addField("emitters",             TYPEID< ParticleEmitterData >(),  Offset(emitterList,    DebrisData), DDC_NUM_EMITTERS,
       "@brief List of particle emitters to spawn along with this debris object.\n\nThese are optional.  You could have Debris made up of only a shape.\n");
-   addField("explosion",            TYPEID< ExplosionData >(),   Offset(explosion,           DebrisData), 
+   addField("explosion",            TYPEID< ExplosionData >(),   Offset(explosion,           DebrisData),
       "@brief ExplosionData to spawn along with this debris object.\n\nThis is optional as not all Debris explode.\n");
    endGroup("Datablocks");
 
    addGroup("Physical Properties");
-   addField("elasticity",           TypeF32,                     Offset(elasticity,          DebrisData), 
+   addField("elasticity",           TypeF32,                     Offset(elasticity,          DebrisData),
       "@brief A floating-point value specifying how 'bouncy' this object is.\n\nMust be in the range of -10 to 10.\n");
-   addField("friction",             TypeF32,                     Offset(friction,            DebrisData), 
+   addField("friction",             TypeF32,                     Offset(friction,            DebrisData),
       "@brief A floating-point value specifying how much velocity is lost to impact and sliding friction.\n\nMust be in the range of -10 to 10.\n");
-   addField("numBounces",           TypeS32,                     Offset(numBounces,          DebrisData), 
+   addField("numBounces",           TypeS32,                     Offset(numBounces,          DebrisData),
       "@brief How many times to allow this debris object to bounce until it either explodes, becomes static or snaps (defined in explodeOnMaxBounce, staticOnMaxBounce, snapOnMaxBounce).\n\n"
       "Must be within the range of 0 to 10000.\n"
       "@see bounceVariance\n");
-   addField("bounceVariance",       TypeS32,                     Offset(bounceVariance,      DebrisData), 
+   addField("bounceVariance",       TypeS32,                     Offset(bounceVariance,      DebrisData),
       "@brief Allowed variance in the value of numBounces.\n\nMust be less than numBounces.\n@see numBounces\n");
-   addField("minSpinSpeed",         TypeF32,                     Offset(minSpinSpeed,        DebrisData), 
+   addField("minSpinSpeed",         TypeF32,                     Offset(minSpinSpeed,        DebrisData),
       "@brief Minimum speed that this debris object will rotate.\n\nMust be in the range of -10000 to 1000, and must be less than maxSpinSpeed.\n@see maxSpinSpeed\n");
-   addField("maxSpinSpeed",         TypeF32,                     Offset(maxSpinSpeed,        DebrisData), 
+   addField("maxSpinSpeed",         TypeF32,                     Offset(maxSpinSpeed,        DebrisData),
       "@brief Maximum speed that this debris object will rotate.\n\nMust be in the range of -10000 to 10000.\n@see minSpinSpeed\n");
    addField("gravModifier",         TypeF32,                     Offset(gravModifier,        DebrisData), "How much gravity affects debris.");
    addField("terminalVelocity",     TypeF32,                     Offset(terminalVelocity,    DebrisData), "Max velocity magnitude.");
-   addField("velocity",             TypeF32,                     Offset(velocity,            DebrisData), 
+   addField("velocity",             TypeF32,                     Offset(velocity,            DebrisData),
       "@brief Speed at which this debris object will move.\n\n@see velocityVariance\n");
-   addField("velocityVariance",     TypeF32,                     Offset(velocityVariance,    DebrisData), 
+   addField("velocityVariance",     TypeF32,                     Offset(velocityVariance,    DebrisData),
       "@brief Allowed variance in the value of velocity\n\nMust be less than velocity.\n@see velocity\n");
-   addField("lifetime",             TypeF32,                     Offset(lifetime,            DebrisData), 
+   addField("lifetime",             TypeF32,                     Offset(lifetime,            DebrisData),
       "@brief Amount of time until this debris object is destroyed.\n\nMust be in the range of 0 to 1000.\n@see lifetimeVariance");
-   addField("lifetimeVariance",     TypeF32,                     Offset(lifetimeVariance,    DebrisData), 
+   addField("lifetimeVariance",     TypeF32,                     Offset(lifetimeVariance,    DebrisData),
       "@brief Allowed variance in the value of lifetime.\n\nMust be less than lifetime.\n@see lifetime\n");
-   addField("useRadiusMass",        TypeBool,                    Offset(useRadiusMass,       DebrisData), 
+   addField("useRadiusMass",        TypeBool,                    Offset(useRadiusMass,       DebrisData),
       "@brief Use mass calculations based on radius.\n\nAllows for the adjustment of elasticity and friction based on the Debris size.\n@see baseRadius\n");
-   addField("baseRadius",           TypeF32,                     Offset(baseRadius,          DebrisData), 
+   addField("baseRadius",           TypeF32,                     Offset(baseRadius,          DebrisData),
       "@brief Radius at which the standard elasticity and friction apply.\n\nOnly used when useRaduisMass is true.\n@see useRadiusMass.\n");
    endGroup("Physical Properties");
 
    addGroup("Behavior");
-   addField("explodeOnMaxBounce",   TypeBool,                    Offset(explodeOnMaxBounce,  DebrisData), 
+   addField("explodeOnMaxBounce",   TypeBool,                    Offset(explodeOnMaxBounce,  DebrisData),
       "@brief If true, this debris object will explode after it has bounced max times.\n\nBe sure to provide an ExplosionData datablock for this to take effect.\n@see explosion\n");
    addField("staticOnMaxBounce",    TypeBool,                    Offset(staticOnMaxBounce,   DebrisData), "If true, this debris object becomes static after it has bounced max times.");
    addField("snapOnMaxBounce",      TypeBool,                    Offset(snapOnMaxBounce,     DebrisData), "If true, this debris object will snap into a resting position on the last bounce.");
-   addField("fade",                 TypeBool,                    Offset(fade,                DebrisData), 
+   addField("fade",                 TypeBool,                    Offset(fade,                DebrisData),
       "@brief If true, this debris object will fade out when destroyed.\n\nThis fade occurs over the last second of the Debris' lifetime.\n");
    addField("ignoreWater",          TypeBool,                    Offset(ignoreWater,         DebrisData), "If true, this debris object will not collide with water, acting as if the water is not there.");
    endGroup("Behavior");
@@ -374,7 +374,7 @@ ConsoleDocClass( Debris,
    "Debris is typically made up of a shape and up to two particle emitters.  In most cases Debris objects are "
    "not created directly.  They are usually produced automatically by other means, such as through the Explosion "
    "class.  When an explosion goes off, its ExplosionData datablock determines what Debris to emit.\n"
-   
+
    "@tsexample\n"
    "datablock ExplosionData(GrenadeLauncherExplosion)\n"
    "{\n"
@@ -401,7 +401,7 @@ ConsoleDocClass( Debris,
 );
 
 DefineEngineMethod(Debris, init, bool, (const char* inputPosition, const char* inputVelocity),
-   ("1.0 1.0 1.0", "1.0 0.0 0.0"), 
+   ("1.0 1.0 1.0", "1.0 0.0 0.0"),
    "@brief Manually set this piece of debris at the given position with the given velocity.\n\n"
 
    "Usually you do not manually create Debris objects as they are generated through other means, "
@@ -474,16 +474,16 @@ Debris::~Debris()
 
 void Debris::initPersistFields()
 {
-   addGroup( "Debris" );	
-   
-      addField( "lifetime", TypeF32, Offset(mLifetime, Debris), 
+   addGroup( "Debris" );
+
+      addField( "lifetime", TypeF32, Offset(mLifetime, Debris),
          "@brief Length of time for this debris object to exist. When expired, the object will be deleted.\n\n"
          "The initial lifetime value comes from the DebrisData datablock.\n"
          "@see DebrisData::lifetime\n"
          "@see DebrisData::lifetimeVariance\n");
-      
+
    endGroup( "Debris" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -903,7 +903,7 @@ void Debris::prepBatchRender( SceneRenderState *state )
    Point3F cameraOffset;
    mObjToWorld.getColumn(3,&cameraOffset);
    cameraOffset -= state->getCameraPosition();
-      
+
    // Set up our TS render state.
    TSRenderState rdata;
    rdata.setSceneState( state );
@@ -928,7 +928,7 @@ void Debris::prepBatchRender( SceneRenderState *state )
       {
          MatrixF mat = getRenderTransform();
          GFX->setWorldMatrix( mat );
-           
+
          rdata.setFadeOverride( alpha );
          mPart->render( rdata );
       }

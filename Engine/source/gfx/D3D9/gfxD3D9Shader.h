@@ -60,7 +60,7 @@ protected:
 /// The D3D9 implementation of a shader constant handle.
 class GFXD3D9ShaderConstHandle : public GFXShaderConstHandle
 {
-public:   
+public:
 
    // GFXShaderConstHandle
    const String& getName() const;
@@ -73,7 +73,7 @@ public:
    GenericConstBufferLayout::ParamDesc mVertexHandle;
    bool mPixelConstant;
    GenericConstBufferLayout::ParamDesc mPixelHandle;
-   
+
    /// Is true if this constant is for hardware mesh instancing.
    ///
    /// Note: We currently store its settings in mPixelHandle.
@@ -84,7 +84,7 @@ public:
    S32 getSamplerRegister() const;
 
    // Returns true if this is a handle to a sampler register.
-   bool isSampler() const 
+   bool isSampler() const
    {
       return ( mPixelConstant && mPixelHandle.constType >= GFXSCT_Sampler ) ||
              ( mVertexConstant && mVertexHandle.constType >= GFXSCT_Sampler );
@@ -114,16 +114,16 @@ class GFXD3D9ShaderConstBuffer : public GFXShaderConstBuffer
 public:
 
    GFXD3D9ShaderConstBuffer( GFXD3D9Shader* shader,
-                             GFXD3D9ShaderBufferLayout* vertexLayoutF, 
+                             GFXD3D9ShaderBufferLayout* vertexLayoutF,
                              GFXD3D9ShaderBufferLayout* vertexLayoutI,
-                             GFXD3D9ShaderBufferLayout* pixelLayoutF, 
+                             GFXD3D9ShaderBufferLayout* pixelLayoutF,
                              GFXD3D9ShaderBufferLayout* pixelLayoutI );
-   virtual ~GFXD3D9ShaderConstBuffer();   
+   virtual ~GFXD3D9ShaderConstBuffer();
 
    /// Called by GFXD3D9Device to activate this buffer.
    /// @param mPrevShaderBuffer The previously active buffer
    void activate( GFXD3D9ShaderConstBuffer *prevShaderBuffer );
-   
+
    /// Used internally by GXD3D9ShaderConstBuffer to determine if it's dirty.
    bool isDirty();
 
@@ -138,7 +138,7 @@ public:
    virtual void set(GFXShaderConstHandle* handle, const Point3F& fv);
    virtual void set(GFXShaderConstHandle* handle, const Point4F& fv);
    virtual void set(GFXShaderConstHandle* handle, const PlaneF& fv);
-   virtual void set(GFXShaderConstHandle* handle, const ColorF& fv);   
+   virtual void set(GFXShaderConstHandle* handle, const ColorF& fv);
    virtual void set(GFXShaderConstHandle* handle, const S32 f);
    virtual void set(GFXShaderConstHandle* handle, const Point2I& fv);
    virtual void set(GFXShaderConstHandle* handle, const Point3I& fv);
@@ -146,14 +146,14 @@ public:
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<F32>& fv);
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point2F>& fv);
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point3F>& fv);
-   virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point4F>& fv);   
+   virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point4F>& fv);
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<S32>& fv);
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point2I>& fv);
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point3I>& fv);
    virtual void set(GFXShaderConstHandle* handle, const AlignedArray<Point4I>& fv);
    virtual void set(GFXShaderConstHandle* handle, const MatrixF& mat, const GFXShaderConstType matType = GFXSCT_Float4x4);
    virtual void set(GFXShaderConstHandle* handle, const MatrixF* mat, const U32 arraySize, const GFXShaderConstType matrixType = GFXSCT_Float4x4);
-   
+
    // GFXResource
    virtual const String describeSelf() const;
    virtual void zombify();
@@ -162,26 +162,26 @@ public:
 protected:
 
    template<class T>
-   inline void SET_CONSTANT(  GFXShaderConstHandle* handle, 
-                              const T& fv, 
-                              GenericConstBuffer *vBuffer, 
+   inline void SET_CONSTANT(  GFXShaderConstHandle* handle,
+                              const T& fv,
+                              GenericConstBuffer *vBuffer,
                               GenericConstBuffer *pBuffer );
 
    /// A cached direct pointer to the device.
    IDirect3DDevice9 *mDevice;
 
-   /// We keep a weak reference to the shader 
+   /// We keep a weak reference to the shader
    /// because it will often be deleted.
    WeakRefPtr<GFXD3D9Shader> mShader;
-   
+
    GFXD3D9ShaderBufferLayout* mVertexConstBufferLayoutF;
    GenericConstBuffer* mVertexConstBufferF;
    GFXD3D9ShaderBufferLayout* mPixelConstBufferLayoutF;
-   GenericConstBuffer* mPixelConstBufferF;   
+   GenericConstBuffer* mPixelConstBufferF;
    GFXD3D9ShaderBufferLayout* mVertexConstBufferLayoutI;
    GenericConstBuffer* mVertexConstBufferI;
    GFXD3D9ShaderBufferLayout* mPixelConstBufferLayoutI;
-   GenericConstBuffer* mPixelConstBufferI;   
+   GenericConstBuffer* mPixelConstBufferI;
 };
 
 
@@ -199,12 +199,12 @@ public:
    typedef Map<String, GFXD3D9ShaderConstHandle*> HandleMap;
 
    GFXD3D9Shader();
-   virtual ~GFXD3D9Shader();   
+   virtual ~GFXD3D9Shader();
 
    // GFXShader
    virtual GFXShaderConstBufferRef allocConstBuffer();
    virtual const Vector<GFXShaderConstDesc>& getShaderConstDesc() const;
-   virtual GFXShaderConstHandle* getShaderConstHandle(const String& name); 
+   virtual GFXShaderConstHandle* getShaderConstHandle(const String& name);
    virtual U32 getAlignmentValue(const GFXShaderConstType constType) const;
    virtual bool getDisassembly( String &outStr ) const;
 
@@ -214,7 +214,7 @@ public:
 
 protected:
 
-   virtual bool _init();   
+   virtual bool _init();
 
    static const U32 smCompiledShaderTag;
 
@@ -223,9 +223,9 @@ protected:
    IDirect3DVertexShader9 *mVertShader;
    IDirect3DPixelShader9 *mPixShader;
 
-   GFXD3D9ShaderBufferLayout* mVertexConstBufferLayoutF;   
+   GFXD3D9ShaderBufferLayout* mVertexConstBufferLayoutF;
    GFXD3D9ShaderBufferLayout* mPixelConstBufferLayoutF;
-   GFXD3D9ShaderBufferLayout* mVertexConstBufferLayoutI;   
+   GFXD3D9ShaderBufferLayout* mVertexConstBufferLayoutI;
    GFXD3D9ShaderBufferLayout* mPixelConstBufferLayoutI;
 
    static _gfxD3DXIncludeRef smD3DXInclude;
@@ -241,39 +241,39 @@ protected:
 
    /// Vector of descriptions (consolidated for the getShaderConstDesc call)
    Vector<GFXShaderConstDesc> mShaderConsts;
-   
+
    // These two functions are used when compiling shaders from hlsl
-   virtual bool _compileShader( const Torque::Path &filePath, 
-                                const String &target, 
-                                const _D3DXMACRO *defines, 
-                                GenericConstBufferLayout *bufferLayoutF, 
+   virtual bool _compileShader( const Torque::Path &filePath,
+                                const String &target,
+                                const _D3DXMACRO *defines,
+                                GenericConstBufferLayout *bufferLayoutF,
                                 GenericConstBufferLayout *bufferLayoutI,
                                 Vector<GFXShaderConstDesc> &samplerDescriptions );
 
-   void _getShaderConstants( ID3DXConstantTable* table, 
-                             GenericConstBufferLayout *bufferLayoutF, 
+   void _getShaderConstants( ID3DXConstantTable* table,
+                             GenericConstBufferLayout *bufferLayoutF,
                              GenericConstBufferLayout *bufferLayoutI,
                              Vector<GFXShaderConstDesc> &samplerDescriptions );
 
-   bool _saveCompiledOutput( const Torque::Path &filePath, 
-                             ID3DXBuffer *buffer, 
-                             GenericConstBufferLayout *bufferLayoutF, 
+   bool _saveCompiledOutput( const Torque::Path &filePath,
+                             ID3DXBuffer *buffer,
+                             GenericConstBufferLayout *bufferLayoutF,
                              GenericConstBufferLayout *bufferLayoutI,
                              Vector<GFXShaderConstDesc> &samplerDescriptions );
 
    // Loads precompiled shaders
-   bool _loadCompiledOutput( const Torque::Path &filePath, 
-                             const String &target, 
-                             GenericConstBufferLayout *bufferLayoutF, 
+   bool _loadCompiledOutput( const Torque::Path &filePath,
+                             const String &target,
+                             GenericConstBufferLayout *bufferLayoutF,
                              GenericConstBufferLayout *bufferLayoutI,
                              Vector<GFXShaderConstDesc> &samplerDescriptions );
 
    // This is used in both cases
    virtual void _buildShaderConstantHandles( GenericConstBufferLayout *layout, bool vertexConst );
-   
+
    virtual void _buildSamplerShaderConstantHandles( Vector<GFXShaderConstDesc> &samplerDescriptions );
 
-   /// Used to build the instancing shader constants from 
+   /// Used to build the instancing shader constants from
    /// the instancing vertex format.
    void _buildInstancingShaderConstantHandles();
 };

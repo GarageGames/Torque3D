@@ -39,50 +39,50 @@ IMPLEMENT_CONOBJECT( SFXSource );
 
 ConsoleDocClass( SFXSource,
    "@brief Playback controller for a sound source.\n\n"
-   
+
    "All sound playback is driven by SFXSources.  Each such source represents an independent playback controller "
    "that directly or indirectly affects sound output.\n\n"
-   
+
    "While this class itself is instantiable, such an instance will not by itself emit any sound.  This is the "
    "responsibility of its subclasses.  Note, however, that none of these subclasses must be instantiated directly "
    "but must instead be instantiated indirectly through the SFX interface.\n\n"
-   
+
    "@section SFXSource_playonce Play-Once Sources\n\n"
-   
+
    "Often, a sound source need only exist for the duration of the sound it is playing.  In this case "
    "so-called \"play-once\" sources simplify the bookkeeping involved by leaving the deletion of "
    "sources that have expired their playtime to the sound system.\n\n"
-   
+
    "Play-once sources can be created in either of two ways:\n"
-   
+
    "- sfxPlayOnce(): Directly create a play-once source from a SFXTrack or file.\n"
    "- sfxDeleteWhenStopped(): Retroactively turn any source into a play-once source that will automatically "
       "be deleted when moving into stopped state.\n\n"
-   
+
    "@see sfxPlayOnce\n"
    "@see sfxDeleteWhenStopped\n\n"
-   
+
    "@section SFXSource_hierarchies Source Hierarchies\n\n"
-   
+
    "Source are arranged into playback hierarchies where a parent source will scale some of the properties of its "
    "children and also hand on any play(), pause(), and stop() commands to them.  This allows to easily group sounds "
    "into logical units that can then be operated on as a whole.\n\n"
-   
+
    "An example of this is the segregation of sounds according to their use in the game.  Volume levels of background "
    "music, in-game sound effects, and character voices will usually be controlled independently and putting their sounds "
    "into different hierarchies allows to achieve that easily.\n\n"
-   
+
    "The source properties that are scaled by parent values are:\n"
-   
+
    "- volume,\n"
    "- pitch, and\n"
    "- priority\n\n"
-   
+
    "This means that if a parent has a volume of 0.5, the child will play at half the effective volume it would otherwise "
    "have.\n\n"
 
    "Additionally, parents affect the playback state of their children:\n\n"
-   
+
    "- A parent that is in stopped state will force all its direct and indirect children into stopped state.\n"
    "- A parent that is in paused state will force all its direct and indirect children that are playing into paused state.  However, "
       "children that are in stopped state will not be affected.\n"
@@ -91,25 +91,25 @@ ConsoleDocClass( SFXSource,
    "Each source maintains a state that is wants to be in which may differ from the state that is enforced on it by its "
    "parent.  If a parent changes its states in a way that allows a child to move into its desired state, the child will do "
    "so.\n\n"
-      
+
    "For logically grouping sources, instantiate the SFXSource class directly and make other sources children to it.  A "
    "source thus instantiated will not effect any real sound output on its own but will influence the sound output of its "
    "direct and indirect children.\n\n"
-   
+
    "@note Be aware that the property values used to scale child property values are the @b effective values.  For example, "
       "the value used to scale the volume of a child is the @b effective volume of the parent, i.e. the volume after fades, "
       "distance attenuation, etc. has been applied.\n\n"
-   
+
    "@see SFXDescription::sourceGroup\n"
-   
+
    "@section SFXSource_volume Volume Attenuation\n\n"
-   
+
    "During its lifetime, the volume of a source will be continually updated.  This update process always progresses "
    "in a fixed set of steps to compute the final effective volume of the source based on the base volume level "
    "that was either assigned from the SFXDescription associated with the source (SFXDescription::volume) or manually "
    "set by the user.  The process of finding a source's final effective volume is called \"volume attenuation\".  The "
    "steps involved in attenuating a source's volume are (in order):\n"
-   
+
    "<dl>\n"
       "<dt>Fading</dt>\n"
       "<dd>If the source currently has a fade-effect applied, the volume is interpolated along the currently active fade curve.</dd>\n"
@@ -119,54 +119,54 @@ ConsoleDocClass( SFXSource,
       "<dd>If the source is a 3D sound source, then the volume is interpolated according to the distance model in effect and "
          "current listener position and orientation (see @ref SFX_3d).</dd>\n"
    "</dl>\n\n"
-   
+
    "@see SFXDescription::volume\n"
    "@see SFXDescription::is3d\n"
-   
+
    "@section SFXSource_fades Volume Fades\n\n"
-   
+
    "To ease-in and ease-out playback of a sound, fade effects may be applied to sources.  A fade will either go from "
    "zero volume to full effective volume (fade-in) or from full effective volume to zero volume (fade-out).\n\n"
-   
+
    "Fading is coupled to the play(), pause(), and stop() methods as well as to loop iterations when SFXDescription::fadeLoops "
    "is true for the source.  play() and the start of a loop iteration will trigger a fade-in whereas pause(), stop() and the "
    "end of loop iterations will trigger fade-outs.\n\n"
-   
+
    "For looping sources, if SFXDescription::fadeLoops is false, only the initial play() will trigger a fade-in and no further "
    "fading will be applied to loop iterations.\n\n"
-   
+
    "By default, the fade durations will be governed by the SFXDescription::fadeInTime and SFXDescription::fadeOutTime properties "
    "of the SFXDescription attached to the source.  However, these may be overridden on a per-source basis by setting fade times "
    "explicitly with setFadeTimes().  Additionally, the set values may be overridden for individual play(), pause(), and stop() "
    "calls by supplying appropriate fadeInTime/fadeOutTime parameters.\n\n"
-   
+
    "By default, volume will interpolate linearly during fades.  However, custom interpolation curves can be assigned through the "
    "SFXDescription::fadeInEase and SFXDescription::fadeOutTime properties.\n\n"
-   
+
    "@see SFXDescription::fadeInTime\n"
    "@see SFXDescription::fadeOutTime\n"
    "@see SFXDescription::fadeInEase\n"
    "@see SFXDescription::fadeOutEase\n"
    "@see SFXDescription::fadeLoops\n"
-         
+
    "@section SFXSource_cones Sound Cones\n\n"
-   
+
    "@see SFXDescription::coneInsideAngle\n"
    "@see SFXDescription::coneOutsideAngle\n"
    "@see SFXDescription::coneOutsideVolume\n"
-   
+
    "@section SFXSource_doppler Doppler Effect\n\n"
-   
+
    "@see sfxGetDopplerFactor\n"
    "@see sfxSetDopplerFactor\n"
    "@see SFXAmbience::dopplerFactor\n"
-   
+
    "@section SFXSource_markers Playback Markers\n\n"
-   
+
    "Playback markers allow to attach notification triggers to specific playback positions.  Once the "
    "play cursor crosses a position for which a marker is defined, the #onMarkerPassed callback will "
    "be triggered on the SFXSource thus allowing to couple script logic to .\n\n"
-   
+
    "Be aware that the precision with which marker callbacks are triggered are bound by global source "
    "update frequency.  Thus there may be a delay between the play cursor actually passing a marker position "
    "and the callback being triggered.\n\n"
@@ -268,13 +268,13 @@ SFXSource::SFXSource( SFXTrack* track, SFXDescription* description )
      mDistToListener( 0.f )
 {
    VECTOR_SET_ASSOCIATION( mParameters );
-   
+
    if( !description && track )
       mDescription = track->getDescription();
-      
+
    // Make sure we get notified when our datablocks go away
    // so we can kill this source.
-      
+
    if( mTrack != NULL )
       deleteNotify( mTrack );
    deleteNotify( mDescription );
@@ -285,7 +285,7 @@ SFXSource::SFXSource( SFXTrack* track, SFXDescription* description )
 SFXSource::~SFXSource()
 {
    // Disconnect from any remaining parameters.
-   
+
    while( !mParameters.empty() )
    {
       mParameters.last()->getEventSignal().remove( this, &SFXSource::_onParameterEvent );
@@ -298,19 +298,19 @@ SFXSource::~SFXSource()
 void SFXSource::initPersistFields()
 {
    addGroup( "Sound" );
-   
+
       addProtectedField( "description", TypeSFXDescriptionName, Offset( mDescription, SFXSource ),
          &_setDescription, &_getDescription,
          "The playback configuration that determines the initial sound properties and setup.\n"
          "Any SFXSource must have an associated SFXDescription." );
-         
+
       addField( "statusCallback", TypeString, Offset( mStatusCallback, SFXSource ),
          "Name of function to call when the status of the source changes.\n\n"
          "The source that had its status changed is passed as the first argument to the function and the "
          "new status of the source is passed as the second argument." );
-         
+
    endGroup( "Sound" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -320,7 +320,7 @@ bool SFXSource::processArguments( S32 argc, const char **argv )
 {
    // Don't allow subclasses of this to be created via script.  Force
    // usage of the SFXSystem functions.
-   
+
    if( typeid( *this ) != typeid( SFXSource ) )
    {
       Con::errorf( ConsoleLogEntry::Script, "Use sfxCreateSource, sfxPlay, or sfxPlayOnce!" );
@@ -336,18 +336,18 @@ bool SFXSource::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    // Make sure we have a description.
-                  
+
    if( !mDescription )
    {
       Con::errorf( "SFXSource::onAdd() - no description set on source %i (%s)", getId(), getName() );
       return false;
    }
-         
+
    // Set our initial properties.
-        
-   _setVolume( mDescription->mVolume ); 
+
+   _setVolume( mDescription->mVolume );
    _setPitch( mDescription->mPitch );
    _setPriority( mDescription->mPriority );
    _setFadeTimes( mDescription->mFadeInTime, mDescription->mFadeOutTime );
@@ -358,7 +358,7 @@ bool SFXSource::onAdd()
              mDescription->mConeOutsideVolume );
 
    // Add the parameters from the description.
-   
+
    for( U32 i = 0; i < SFXDescription::MaxNumParameters; ++ i )
    {
       StringTableEntry name = mDescription->mParameters[ i ];
@@ -367,7 +367,7 @@ bool SFXSource::onAdd()
    }
 
    // Add the parameters from the track.
-   
+
    if( mTrack != NULL )
       for( U32 i = 0; i < SFXTrack::MaxNumParameters; ++ i )
       {
@@ -377,7 +377,7 @@ bool SFXSource::onAdd()
       }
 
    // Add us to the description's source group.
-   
+
    if( mDescription->mSourceGroup )
       mDescription->mSourceGroup->addObject( this );
 
@@ -385,11 +385,11 @@ bool SFXSource::onAdd()
 
    if( Sim::getSFXSourceSet() )
       Sim::getSFXSourceSet()->addObject( this );
-      
+
    // Register with SFX system.
-      
+
    SFX->_onAddSource( this );
-      
+
    return true;
 }
 
@@ -401,11 +401,11 @@ void SFXSource::onRemove()
 
    // Let the system know.
    SFX->_onRemoveSource( this );
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXSource] removed source '%i'", getId() );
    #endif
-   
+
    Parent::onRemove();
 }
 
@@ -434,7 +434,7 @@ bool SFXSource::acceptsAsChild( SimObject* object )
 void SFXSource::onGroupAdd()
 {
    Parent::onGroupAdd();
-   
+
    SFXSource* source = dynamic_cast< SFXSource* >( getGroup() );
    if( source )
    {
@@ -468,7 +468,7 @@ F32 SFXSource::getElapsedPlayTimeCurrentCycle() const
    // In this base class, we can't make assumptions about total playtimes
    // and thus cannot clamp the playtimer into range for the current cycle.
    // This needs to be done by subclasses.
-   
+
    return F32( mPlayTimer.getPosition() ) / 1000.f;
 }
 
@@ -484,25 +484,25 @@ F32 SFXSource::getTotalPlayTime() const
 void SFXSource::play( F32 fadeInTime )
 {
    SFXStatus status = getStatus();
-   
+
    // Return if the source is already playing.
-   
+
    if( status == SFXStatusPlaying )
    {
       // Revert fade-out if there is one.
-      
+
       if( mFadeSegmentType != FadeSegmentNone && mFadeSegmentType != FadeSegmentPlay )
       {
          // Let easing curve remain in place.  Otherwise we would have to
          // search the fade-in's easing curve for the point matching the
          // current fade volume in order to prevent volume pops.
-         
+
          mFadeSegmentType = FadeSegmentPlay;
       }
-   
+
       return;
    }
-   
+
    // First check the parent source.  If it is not playing,
    // only save our non-inherited state and return.
 
@@ -516,14 +516,14 @@ void SFXSource::play( F32 fadeInTime )
    }
 
    // Add fades, if required.
-   
+
    if( fadeInTime == -1.f )
       fadeInTime = mFadeInTime;
-      
+
    if( status == SFXStatusPaused && fadeInTime > 0.f )
    {
       // Source is paused.  Set up temporary fade-in segment.
-      
+
       mFadeSegmentEase = &mDescription->mFadeInEase;
       mFadeSegmentType = FadeSegmentPlay;
       mFadeSegmentStartPoint = getElapsedPlayTimeCurrentCycle();
@@ -532,10 +532,10 @@ void SFXSource::play( F32 fadeInTime )
    else if( fadeInTime > 0.f )
    {
       mFadeInPoint = fadeInTime;
-      
+
       // Add fade-out if play-time of the source is finite and
       // if it is either not looping or has fading enabled on loops.
-      
+
       F32 totalPlayTime = getTotalPlayTime();
       if( !mIsInf_F( totalPlayTime ) && mDescription->mFadeOutTime > 0.f && ( !mDescription->mIsLooping || mDescription->mFadeLoops ) )
       {
@@ -543,11 +543,11 @@ void SFXSource::play( F32 fadeInTime )
 
          // If there's an intersection between fade-in and fade-out, move them
          // to the midpoint.
-      
+
          if( mFadeOutPoint < mFadeInPoint )
          {
             F32 midPoint = mFadeOutPoint + ( mFadeInPoint - mFadeOutPoint / 2 );
-            
+
             mFadeInPoint = midPoint;
             mFadeOutPoint = midPoint;
          }
@@ -558,15 +558,15 @@ void SFXSource::play( F32 fadeInTime )
       mFadeInPoint = -1.f;
       mFadeOutPoint = -1.f;
    }
-   
+
    // Start playback.
-      
+
    if( status != SFXStatusPaused )
    {
       mPlayStartTick = Platform::getVirtualMilliseconds();
       mPlayTimer.reset();
    }
-      
+
    _setStatus( SFXStatusPlaying );
    _play();
 
@@ -582,19 +582,19 @@ void SFXSource::pause( F32 fadeOutTime )
    SFXStatus status = getStatus();
    if( status != SFXStatusPlaying )
       return;
-   
+
    // Pause playback.
-      
+
    if( fadeOutTime == -1.f )
       fadeOutTime = mFadeOutTime;
-      
+
    if( fadeOutTime > 0.f )
       _setupFadeOutSegment( FadeSegmentPause, fadeOutTime );
    else
    {
       _setStatus( SFXStatusPaused );
       _pause();
-      
+
       mFadeSegmentType = FadeSegmentNone;
       mPreFadeVolume = mVolume;
 
@@ -618,10 +618,10 @@ void SFXSource::stop( F32 fadeOutTime )
       _stop();
       return;
    }
-   
+
    if( fadeOutTime == -1.f )
       fadeOutTime = mFadeOutTime;
-      
+
    if( fadeOutTime > 0.f )
       _setupFadeOutSegment( FadeSegmentStop, fadeOutTime );
    else
@@ -644,11 +644,11 @@ void SFXSource::update()
 {
    if( !isPlaying() )
       return;
-      
-   _update();      
+
+   _update();
 
    // Update our modifiers, if any.
-   
+
    for( ModifierList::Iterator iter = mModifiers.begin();
         iter != mModifiers.end(); )
    {
@@ -673,7 +673,7 @@ void SFXSource::_play()
 
    // Resume playback of children that want to be in
    // playing state.
-   
+
    for( iterator iter = begin(); iter != end(); ++ iter )
    {
       SFXSource* source = dynamic_cast< SFXSource* >( *iter );
@@ -701,14 +701,14 @@ void SFXSource::_pause()
          source->mSavedFadeTime = 0.f;
       }
    }
-   
+
    mPlayTimer.pause();
 }
 
 //-----------------------------------------------------------------------------
 
 void SFXSource::_stop()
-{  
+{
    // Stop all child sources.
 
    for( iterator iter = begin(); iter != end(); ++ iter )
@@ -724,12 +724,12 @@ void SFXSource::_stop()
 //-----------------------------------------------------------------------------
 
 void SFXSource::_update()
-{      
+{
    /// Update our modulated properties.
-      
+
    _updateVolume( SFX->getListener().getTransform() );
    _updatePitch();
-   _updatePriority();         
+   _updatePriority();
 }
 
 //-----------------------------------------------------------------------------
@@ -746,7 +746,7 @@ bool SFXSource::_setDescription( void* obj, const char* index, const char* data 
    }
 
    source->notifyDescriptionChanged();
-   
+
    return false;
 }
 
@@ -756,7 +756,7 @@ const char* SFXSource::_getDescription( void* obj, const char* data )
 {
    SFXSource* source = reinterpret_cast< SFXSource* >( obj );
    SFXDescription* description = source->mDescription;
-   
+
    if( !description )
       return "";
 
@@ -792,22 +792,22 @@ void SFXSource::_setStatus( SFXStatus status )
 void SFXSource::_updateVolume( const MatrixF& listener )
 {
    // Handle fades (compute mFadedVolume).
-      
+
    mFadedVolume = mPreFadeVolume;
    if( mFadeSegmentType != FadeSegmentNone )
    {
       // We have a temporary fade segment.
-      
+
       F32 elapsed;
       if( mDescription->mIsLooping && !mDescription->mFadeLoops )
          elapsed = getElapsedPlayTime();
       else
          elapsed = getElapsedPlayTimeCurrentCycle();
-      
+
       if( elapsed < mFadeSegmentEndPoint )
       {
          const F32 duration = mFadeSegmentEndPoint - mFadeSegmentStartPoint;
-         
+
          if( mFadeSegmentType == FadeSegmentPlay )
          {
             const F32 time = elapsed - mFadeSegmentStartPoint;
@@ -819,7 +819,7 @@ void SFXSource::_updateVolume( const MatrixF& listener )
             // If the end-point to the ease functions is 0,
             // we'll always get out the start point.  Thus do the whole
             // thing backwards here.
-            
+
             const F32 time = mFadeSegmentEndPoint - elapsed;
             mFadedVolume = mFadeSegmentEase->getValue
                ( time, 0.f, mPreFadeVolume, duration );
@@ -828,22 +828,22 @@ void SFXSource::_updateVolume( const MatrixF& listener )
       else
       {
          // The fade segment has played.  Remove it.
-         
+
          switch( mFadeSegmentType )
          {
             case FadeSegmentStop:
                stop( 0.f );
                break;
-               
+
             case FadeSegmentPause:
                pause( 0.f );
                break;
-               
-            case FadeSegmentPlay: // Nothing to do.               
+
+            case FadeSegmentPlay: // Nothing to do.
             default:
                break;
          }
-         
+
          mFadeSegmentType = FadeSegmentNone;
          mPreFadeVolume = mVolume;
       }
@@ -855,9 +855,9 @@ void SFXSource::_updateVolume( const MatrixF& listener )
          elapsed = getElapsedPlayTime();
       else
          elapsed = getElapsedPlayTimeCurrentCycle();
-      
+
       // Check for fade-in.
-      
+
       if( mFadeInPoint != -1 )
       {
          if( elapsed < mFadeInPoint )
@@ -868,33 +868,33 @@ void SFXSource::_updateVolume( const MatrixF& listener )
             mFadeInPoint = -1;
          }
       }
-      
+
       // Check for fade-out.
-      
+
       if( mFadeOutPoint != -1 && elapsed > mFadeOutPoint )
       {
          const F32 totalPlayTime = getTotalPlayTime();
          const F32 duration = totalPlayTime - mFadeOutPoint;
          const F32 time = totalPlayTime - elapsed;
-         
+
          mFadedVolume = mDescription->mFadeOutEase.getValue( time, 0.f, mPreFadeVolume, duration );
       }
    }
 
    // Compute the pre-attenuated volume.
-   
+
    mPreAttenuatedVolume =
         mFadedVolume
       * mModulativeVolume;
-      
+
    SFXSource* group = getSourceGroup();
    if( group )
       mPreAttenuatedVolume *= group->getAttenuatedVolume();
 
-   if( !is3d() ) 
+   if( !is3d() )
    {
       mDistToListener = 0.0f;
-      mAttenuatedVolume = mPreAttenuatedVolume; 
+      mAttenuatedVolume = mPreAttenuatedVolume;
 	}
    else
    {
@@ -925,7 +925,7 @@ void SFXSource::_updatePitch()
 //-----------------------------------------------------------------------------
 
 void SFXSource::_updatePriority()
-{      
+{
    mEffectivePriority = mPriority * mModulativePriority;
 
    SFXSource* group = getSourceGroup();
@@ -952,7 +952,7 @@ void SFXSource::setVelocity( const VectorF& velocity )
 void SFXSource::setFadeTimes( F32 fadeInTime, F32 fadeOutTime )
 {
    _setFadeTimes( fadeInTime, fadeOutTime );
-   
+
    if( mFadeInTime >= 0.f || mFadeOutTime >= 0.f )
       mFlags.set( CustomFadeFlag );
 }
@@ -965,7 +965,7 @@ void SFXSource::_setFadeTimes( F32 fadeInTime, F32 fadeOutTime )
       mFadeInTime = getMax( 0.f, fadeInTime );
    else
       mFadeInTime = mDescription->mFadeInTime;
-      
+
    if( fadeOutTime >= 0.f )
       mFadeOutTime = getMax( 0.f, fadeOutTime );
    else
@@ -978,7 +978,7 @@ void SFXSource::_setupFadeOutSegment( FadeSegmentType type, F32 fadeOutTime )
 {
    // Get the current faded volume as the start volume so
    // that we correctly fade when starting in a fade.
-   
+
    _updateVolume( SFX->getListener().getTransform() );
    mPreFadeVolume = mFadedVolume;
 
@@ -1139,13 +1139,13 @@ void SFXSource::addParameter( SFXParameter* parameter )
    for( U32 i = 0; i < mParameters.size(); ++ i )
       if( mParameters[ i ] == parameter )
          return;
-         
+
    mParameters.push_back( parameter );
    parameter->getEventSignal().notify( this, &SFXSource::_onParameterEvent );
-   
+
    // Trigger an initial value-changed event so the
    // current parameter value becomes effective.
-   
+
    _onParameterEvent( parameter, SFXParameterEvent_ValueChanged );
 }
 
@@ -1169,13 +1169,13 @@ void SFXSource::_addParameter( StringTableEntry name )
    SFXParameter* parameter = dynamic_cast< SFXParameter* >(
       Sim::getSFXParameterGroup()->findObjectByInternalName( name )
    );
-   
+
    if( !parameter )
    {
       Con::errorf( "SFXSource::_addParameter - no parameter called '%s'", name );
       return;
    }
-   
+
    addParameter( parameter );
 }
 
@@ -1186,9 +1186,9 @@ void SFXSource::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent ev
    switch( event )
    {
       case SFXParameterEvent_ValueChanged:
-      
+
          onParameterValueChange_callback( parameter );
-            
+
          switch( parameter->getChannel() )
          {
             case SFXChannelStatus:
@@ -1202,34 +1202,34 @@ void SFXSource::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent ev
                      case SFXStatusPlaying:     play(); break;
                      case SFXStatusPaused:      pause(); break;
                      case SFXStatusStopped:     stop(); break;
-                     
+
                      default:
                         break;
                   }
                }
                break;
             }
-               
+
             case SFXChannelVolume:
                setVolume( parameter->getValue() );
                break;
-               
+
             case SFXChannelPitch:
                setPitch( parameter->getValue() );
                break;
-               
+
             case SFXChannelPriority:
                setPriority( parameter->getValue() );
                break;
-               
+
             case SFXChannelMinDistance:
                setMinMaxDistance( parameter->getValue(), mMaxDistance );
                break;
-               
+
             case SFXChannelMaxDistance:
                setMinMaxDistance( mMinDistance, parameter->getValue() );
                break;
-               
+
             case SFXChannelPositionX:
             {
                Point3F position = mTransform.getPosition();
@@ -1256,7 +1256,7 @@ void SFXSource::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent ev
                setTransform( mTransform );
                break;
             }
-            
+
             case SFXChannelRotationX:
             {
                EulerF angles = mTransform.toEuler();
@@ -1266,7 +1266,7 @@ void SFXSource::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent ev
                setTransform( transform );
                break;
             }
-            
+
             case SFXChannelRotationY:
             {
                EulerF angles = mTransform.toEuler();
@@ -1307,12 +1307,12 @@ void SFXSource::_onParameterEvent( SFXParameter* parameter, SFXParameterEvent ev
                setVelocity( mVelocity );
                break;
             }
-               
+
             default:
                break;
          }
          break;
-         
+
       case SFXParameterEvent_Deleted:
          removeParameter( parameter );
          break;
@@ -1334,7 +1334,7 @@ void SFXSource::_scatterTransform()
       }
       mTransform.setPosition( position );
    }
-   
+
    mTransformScattered = true;
 }
 
@@ -1579,14 +1579,14 @@ ConsoleMethod( SFXSource, setTransform, void, 3, 4,
    Point3F pos;
    dSscanf( argv[2], "%g %g %g", &pos.x, &pos.y, &pos.z );
    mat.setPosition( pos );
-   
+
    if( argc > 3 )
    {
       Point3F dir;
       dSscanf( argv[ 3 ], "%g %g %g", &dir.x, &dir.y, &dir.z );
       mat.setColumn( 1, dir );
    }
-   
+
    object->setTransform( mat );
 }
 
@@ -1600,7 +1600,7 @@ DefineEngineMethod( SFXSource, setCone, void, ( F32 innerAngle, F32 outerAngle, 
    "@note This method has no effect on the source if the source is not 3D.\n\n" )
 {
    bool isValid = true;
-   
+
    if( innerAngle < 0.0 || innerAngle > 360.0 )
    {
       Con::errorf( "SFXSource.setCone() - 'innerAngle' must be between 0 and 360" );
@@ -1616,10 +1616,10 @@ DefineEngineMethod( SFXSource, setCone, void, ( F32 innerAngle, F32 outerAngle, 
       Con::errorf( "SFXSource.setCone() - 'outsideVolume' must be between 0 and 1" );
       isValid = false;
    }
-   
+
    if( !isValid )
       return;
-      
+
    object->setCone( innerAngle, outerAngle, outsideVolume );
 }
 
@@ -1683,7 +1683,7 @@ DefineEngineMethod( SFXSource, getParameter, SFXParameter*, ( S32 index ),,
       Con::errorf( "SFXSource::getParameter - index out of range: %i", index );
       return 0;
    }
-   
+
    return object->getParameter( index );
 }
 

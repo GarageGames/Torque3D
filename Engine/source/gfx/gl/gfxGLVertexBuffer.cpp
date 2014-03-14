@@ -28,12 +28,12 @@
 #include "gfx/gl/gfxGLUtils.h"
 
 
-GFXGLVertexBuffer::GFXGLVertexBuffer(  GFXDevice *device, 
-                                       U32 numVerts, 
-                                       const GFXVertexFormat *vertexFormat, 
-                                       U32 vertexSize, 
+GFXGLVertexBuffer::GFXGLVertexBuffer(  GFXDevice *device,
+                                       U32 numVerts,
+                                       const GFXVertexFormat *vertexFormat,
+                                       U32 vertexSize,
                                        GFXBufferType bufferType )
-   :  GFXVertexBuffer( device, numVerts, vertexFormat, vertexSize, bufferType ), 
+   :  GFXVertexBuffer( device, numVerts, vertexFormat, vertexSize, bufferType ),
       mZombieCache(NULL)
 {
    PRESERVE_VERTEX_BUFFER();
@@ -48,7 +48,7 @@ GFXGLVertexBuffer::~GFXGLVertexBuffer()
 {
 	// While heavy handed, this does delete the buffer and frees the associated memory.
    glDeleteBuffers(1, &mBuffer);
-   
+
    if( mZombieCache )
       delete [] mZombieCache;
 }
@@ -88,7 +88,7 @@ void GFXGLVertexBuffer::prepare()
    for ( U32 i=0; i < mVertexFormat.getElementCount(); i++ )
    {
       const GFXVertexElement &element = mVertexFormat.getElement( i );
-      
+
       if ( element.isSemantic( GFXSemantic::POSITION ) )
       {
          glEnableClientState( GL_VERTEX_ARRAY );
@@ -115,14 +115,14 @@ void GFXGLVertexBuffer::prepare()
          buffer += element.getSizeInBytes();
          ++texCoordIndex;
       }
-      
+
    }
 }
 
 void GFXGLVertexBuffer::finish()
 {
    glBindBuffer(GL_ARRAY_BUFFER, 0);
-   
+
    U32 texCoordIndex = 0;
    for ( U32 i=0; i < mVertexFormat.getElementCount(); i++ )
    {
@@ -153,7 +153,7 @@ void GFXGLVertexBuffer::zombify()
 {
    if(mZombieCache || !mBuffer)
       return;
-      
+
    mZombieCache = new U8[mNumVerts * mVertexSize];
    glBindBuffer(GL_ARRAY_BUFFER, mBuffer);
    glGetBufferSubData(GL_ARRAY_BUFFER, 0, mNumVerts * mVertexSize, mZombieCache);
@@ -166,12 +166,12 @@ void GFXGLVertexBuffer::resurrect()
 {
    if(!mZombieCache)
       return;
-   
+
    glGenBuffers(1, &mBuffer);
    glBindBuffer(GL_ARRAY_BUFFER, mBuffer);
    glBufferData(GL_ARRAY_BUFFER, mNumVerts * mVertexSize, mZombieCache, GFXGLBufferType[mBufferType]);
    glBindBuffer(GL_ARRAY_BUFFER, 0);
-   
+
    delete[] mZombieCache;
    mZombieCache = NULL;
 }

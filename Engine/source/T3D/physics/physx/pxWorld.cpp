@@ -67,7 +67,7 @@ PxWorld::PxWorld() :
 	if ( !CCTAllocator::mAllocator )
 		CCTAllocator::mAllocator = new NxUserAllocatorDefault();
 	mControllerManager = new CharacterControllerManager( CCTAllocator::mAllocator );
-} 
+}
 
 PxWorld::~PxWorld()
 {
@@ -123,8 +123,8 @@ bool PxWorld::_init( bool isServer, ProcessList *processList )
    // Make note of what we've created.
    String simType = sceneDesc.simType == NX_SIMULATION_SW ? "software" : "hardware";
    String clientOrServer = this == isServer ? "server" : "client";
-   Con::printf( "PhysXWorld::init() - Created %s %s simulation!", 
-      clientOrServer.c_str(), 
+   Con::printf( "PhysXWorld::init() - Created %s %s simulation!",
+      clientOrServer.c_str(),
       simType.c_str() );
    */
 
@@ -147,7 +147,7 @@ bool PxWorld::_init( bool isServer, ProcessList *processList )
    /*
    NxCompartmentDesc compartmentDesc;
    compartmentDesc.type = NX_SCT_RIGIDBODY;
-   compartmentDesc.deviceCode = NX_DC_PPU_AUTO_ASSIGN; 
+   compartmentDesc.deviceCode = NX_DC_PPU_AUTO_ASSIGN;
    mRigidCompartment = mScene->createCompartment( compartmentDesc );
    if ( !mRigidCompartment )
    {
@@ -162,15 +162,15 @@ bool PxWorld::_init( bool isServer, ProcessList *processList )
    // interact with each other.
    //
    // In Torque you normally tick the server and then the client
-   // approximately every 32ms.  So before the game tick we call 
-   // getPhysicsResults() to get the new physics state and call 
+   // approximately every 32ms.  So before the game tick we call
+   // getPhysicsResults() to get the new physics state and call
    // tickPhysics() when the game tick is done to start processing
    // the next physics state.  This means PhysX is happily doing
    // physics in a separate thread while we're doing rendering,
    // sound, input, networking, etc.
-   // 
+   //
    // Because your frame rate is rarely perfectly even you can
-   // get cases where you may tick the server or the client 
+   // get cases where you may tick the server or the client
    // several times in a row.  This happens most often in debug
    // mode, but can also happen in release.
    //
@@ -198,15 +198,15 @@ bool PxWorld::_init( bool isServer, ProcessList *processList )
    NxMaterial *dmat = mScene->getMaterialFromIndex( 0 );
    dmat->setRestitution( 0.2f );
    dmat->setStaticFriction( 0.6f );
-   dmat->setDynamicFriction( 0.4f );      
+   dmat->setDynamicFriction( 0.4f );
 
    // Setup dominance groups.
 
    // Group 31 is for debris and other objects which can be pushed but cannot push back.
    // Group 0 is for everything else.
-   
+
 	NxConstraintDominance debrisDominance( 0.0f, 1.0f );
-	mScene->setDominanceGroupPair( 0, 31, debrisDominance );		
+	mScene->setDominanceGroupPair( 0, 31, debrisDominance );
 
    return true;
 }
@@ -221,7 +221,7 @@ void PxWorld::_destroy()
 
       U32 actorCount = mScene->getNbActors();
       U32 jointCount = mScene->getNbJoints();
-      
+
       if ( actorCount != 0 || jointCount != 0 )
       {
          // Dump the names of any actors or joints that
@@ -266,7 +266,7 @@ void PxWorld::_destroy()
       mScene->setUserContactReport( NULL );
       SAFE_DELETE( mConactReporter );
 
-      // First shut down threads... this makes it 
+      // First shut down threads... this makes it
       // safe to release the scene.
       mScene->shutdownWorkerThreads();
 
@@ -306,7 +306,7 @@ bool PxWorld::restartSDK( bool destroyOnly, PxWorld *clientWorld, PxWorld *serve
    sdkDesc.flags |= NX_SDKF_NO_HARDWARE; // [9/28/2009 Pat] Why is this disabled?
 
    NxSDKCreateError error;
-   gPhysicsSDK = NxCreatePhysicsSDK(   NX_PHYSICS_SDK_VERSION, 
+   gPhysicsSDK = NxCreatePhysicsSDK(   NX_PHYSICS_SDK_VERSION,
                                        NULL,
                                        smConsoleStream,
                                        sdkDesc,
@@ -320,7 +320,7 @@ bool PxWorld::restartSDK( bool destroyOnly, PxWorld *clientWorld, PxWorld *serve
                               "Error Code: %d", error),
                               MBOk, MIStop );
       Platform::forceShutdown( -1 );
-      
+
       // We shouldn't get here, but this shuts up
       // source diagnostic tools.
       return false;
@@ -340,7 +340,7 @@ void PxWorld::tickPhysics( U32 elapsedMs )
    // Did we forget to call getPhysicsResults somewhere?
    AssertFatal( !mIsSimulating, "PhysXWorld::tickPhysics() - Already simulating!" );
 
-   // The elapsed time should be non-zero and 
+   // The elapsed time should be non-zero and
    // a multiple of TickMs!
    AssertFatal(   elapsedMs != 0 &&
                   ( elapsedMs % TickMs ) == 0 , "PhysXWorld::tickPhysics() - Got bad elapsed time!" );
@@ -352,8 +352,8 @@ void PxWorld::tickPhysics( U32 elapsedMs )
 
    // For some reason this gets reset all the time
    // and it must be called before the simulate.
-   mScene->setFilterOps(   NX_FILTEROP_OR, 
-                           NX_FILTEROP_OR, 
+   mScene->setFilterOps(   NX_FILTEROP_OR,
+                           NX_FILTEROP_OR,
                            NX_FILTEROP_AND );
    mScene->setFilterBool( false );
    NxGroupsMask zeroMask;
@@ -383,7 +383,7 @@ void PxWorld::releaseWriteLocks()
 
 void PxWorld::releaseWriteLock()
 {
-   if ( !mScene || !mIsSimulating ) 
+   if ( !mScene || !mIsSimulating )
       return;
 
    PROFILE_SCOPE(PxWorld_ReleaseWriteLock);
@@ -398,7 +398,7 @@ void PxWorld::releaseWriteLock()
 
 void PxWorld::getPhysicsResults()
 {
-   if ( !mScene || !mIsSimulating ) 
+   if ( !mScene || !mIsSimulating )
       return;
 
    PROFILE_SCOPE(PxWorld_GetPhysicsResults);
@@ -446,7 +446,7 @@ void PxWorld::releaseActor( NxActor &actor )
    AssertFatal( &actor.getScene() == mScene, "PhysXWorld::releaseActor() - Bad scene!" );
 
    // Clear the userdata.
-   actor.userData = NULL;   
+   actor.userData = NULL;
 
    // If the scene is not simulating then we have the
    // write lock and can safely delete it now.
@@ -476,10 +476,10 @@ void PxWorld::releaseHeightField( NxHeightField &heightfield )
 {
    // Always delay releasing a heightfield, for whatever reason,
    // it causes lots of deadlock asserts if we do it here, even if
-   // the scene "says" its writable. 
+   // the scene "says" its writable.
    //
-   // Actually this is probably because a heightfield is owned by the "sdk" and 
-   // not an individual scene so if either the client "or" server scene are 
+   // Actually this is probably because a heightfield is owned by the "sdk" and
+   // not an individual scene so if either the client "or" server scene are
    // simulating it asserts, thats just my theory.
 
    mReleaseHeightFieldQueue.push_back( &heightfield );
@@ -489,7 +489,7 @@ void PxWorld::releaseJoint( NxJoint &joint )
 {
    AssertFatal( &joint.getScene() == mScene, "PhysXWorld::releaseJoint() - Bad scene!" );
 
-   AssertFatal( !mReleaseJointQueue.contains( &joint ), 
+   AssertFatal( !mReleaseJointQueue.contains( &joint ),
       "PhysXWorld::releaseJoint() - Joint already exists in the release queue!" );
 
    // Clear the userdata.
@@ -557,14 +557,14 @@ void PxWorld::_releaseQueues()
 {
    AssertFatal( mScene, "PhysXWorld::_releaseQueues() - The scene is null!" );
 
-   // We release joints still pending in the queue 
+   // We release joints still pending in the queue
    // first as they depend on the actors.
    for ( S32 i = 0; i < mReleaseJointQueue.size(); i++ )
    {
       NxJoint *currJoint = mReleaseJointQueue[i];
       mScene->releaseJoint( *currJoint );
    }
-   
+
    // All the joints should be released, clear the queue.
    mReleaseJointQueue.clear();
 
@@ -583,7 +583,7 @@ void PxWorld::_releaseQueues()
    // Now release any materials still pending in the queue.
    for ( S32 i = 0; i < mReleaseMaterialQueue.size(); i++ )
    {
-      NxMaterial *currMat = mReleaseMaterialQueue[i];     
+      NxMaterial *currMat = mReleaseMaterialQueue[i];
       mScene->releaseMaterial( *currMat );
    }
 
@@ -604,10 +604,10 @@ void PxWorld::_releaseQueues()
    for ( S32 i = 0; i < mReleaseHeightFieldQueue.size(); i++ )
    {
       NxHeightField *currHeightfield = mReleaseHeightFieldQueue[i];
-      
+
       if ( currHeightfield->getReferenceCount() == 0 )
       {
-         gPhysicsSDK->releaseHeightField( *currHeightfield );      
+         gPhysicsSDK->releaseHeightField( *currHeightfield );
          mReleaseHeightFieldQueue.erase_fast( i );
          i--;
       }
@@ -643,7 +643,7 @@ bool PxWorld::initWorld( bool isServer, ProcessList *processList )
       return false;
    }
    */
-   
+
    if ( !_init( isServer, processList ) )
       return false;
 
@@ -668,7 +668,7 @@ void PxWorld::destroyWorld()
 
 bool PxWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse )
 {
-   NxRay worldRay;    
+   NxRay worldRay;
    worldRay.orig = pxCast<NxVec3>( startPnt );
    worldRay.dir = pxCast<NxVec3>( endPnt - startPnt );
    NxF32 maxDist = worldRay.dir.magnitude();
@@ -692,7 +692,7 @@ bool PxWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *
    if ( ri )
    {
       ri->object = ( userData != NULL ) ? userData->getObject() : NULL;
-      
+
       // If we were passed a RayInfo, we can only return true signifying a collision
       // if we hit an object that actually has a torque object associated with it.
       //
@@ -713,8 +713,8 @@ bool PxWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *
         !actor.isDynamic() ||
         actor.readBodyFlag( NX_BF_KINEMATIC ) )
       return true;
-      
-   NxVec3 force = pxCast<NxVec3>( impulse );//worldRay.dir * forceAmt; 
+
+   NxVec3 force = pxCast<NxVec3>( impulse );//worldRay.dir * forceAmt;
    actor.addForceAtPos( force, hitInfo.worldImpact, NX_IMPULSE );
 
    return true;
@@ -770,14 +770,14 @@ void PxWorld::explosion( const Point3F &pos, F32 radius, F32 forceMagnitude )
    for ( NxU32 i = 0; i < numHits; i++ )
    {
       NxActor &actor = shapes[i]->getActor();
-      
+
       bool dynamic = actor.isDynamic();
-      
+
       if ( !dynamic )
          continue;
 
       bool kinematic = actor.readBodyFlag( NX_BF_KINEMATIC );
-      
+
       if ( kinematic )
          continue;
 
@@ -805,7 +805,7 @@ void PxWorld::onDebugDraw( const SceneRenderState *state )
    if ( !mScene )
       return;
 
-   // We need the write lock to be able to request 
+   // We need the write lock to be able to request
    // the NxDebugRenderable object.
    releaseWriteLock();
 
@@ -814,10 +814,10 @@ void PxWorld::onDebugDraw( const SceneRenderState *state )
 
    gPhysicsSDK->setParameter( NX_VISUALIZATION_SCALE, 1.0f );
    //gPhysicsSDK->setParameter( NX_VISUALIZE_BODY_MASS_AXES, 0.0f );
-   gPhysicsSDK->setParameter( NX_VISUALIZE_BODY_AXES, 1.0f );   
+   gPhysicsSDK->setParameter( NX_VISUALIZE_BODY_AXES, 1.0f );
    gPhysicsSDK->setParameter( NX_VISUALIZE_COLLISION_SHAPES, 1.0f );
 
-   const NxDebugRenderable *data = mScene->getDebugRenderable();  
+   const NxDebugRenderable *data = mScene->getDebugRenderable();
    if ( !data )
       return;
 
@@ -827,7 +827,7 @@ void PxWorld::onDebugDraw( const SceneRenderState *state )
       const NxDebugPoint *points = data->getPoints();
 
       PrimBuild::begin( GFXPointList, numPoints );
-      
+
       while ( numPoints-- )
       {
          PrimBuild::color( getDebugColor(points->color) );
@@ -862,7 +862,7 @@ void PxWorld::onDebugDraw( const SceneRenderState *state )
       const NxDebugTriangle *triangles = data->getTriangles();
 
       PrimBuild::begin( GFXTriangleList, numTris * 3 );
-      
+
       while ( numTris-- )
       {
          PrimBuild::color( getDebugColor( triangles->color ) );

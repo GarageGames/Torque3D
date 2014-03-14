@@ -102,7 +102,7 @@ static LRESULT PASCAL OKBtnFolderHackProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 static UINT_PTR CALLBACK FolderHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
    HWND hParent = GetParent(hdlg);
-   
+
    switch(uMsg)
    {
       case WM_INITDIALOG:
@@ -129,7 +129,7 @@ static UINT_PTR CALLBACK FolderHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPA
                      LPOFNOTIFY lpofn = (LPOFNOTIFY)lParam;
 
                      OpenFolderDialog *ofd = (OpenFolderDialog *)lpofn->lpOFN->lCustData;
-                     
+
 #ifdef UNICODE
                      UTF16 buf[MAX_PATH];
 #else
@@ -155,7 +155,7 @@ static UINT_PTR CALLBACK FolderHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPA
                         for(S32 i = count - 1;i >= 0;--i)
                         {
                            ListView_GetItemText(listView, i, 0, buf, sizeof(buf));
-                           
+
 #ifdef UNICODE
                            char buf2[MAX_PATH];
                            convertUTF16toUTF8(buf, buf2, sizeof(buf2));
@@ -202,12 +202,12 @@ ConsoleDocClass( FileDialog,
 
    "FileDialog is a platform agnostic dialog interface for querying the user for "
    "file locations. It is designed to be used through the exposed scripting interface.\n\n"
-   
+
    "FileDialog is the base class for Native File Dialog controls in Torque. It provides these basic areas of functionality:\n\n"
    "   - Inherits from SimObject and is exposed to the scripting interface\n"
    "   - Provides blocking interface to allow instant return to script execution\n"
    "   - Simple object configuration makes practical use easy and effective\n\n"
-   
+
    "FileDialog is *NOT* intended to be used directly in script and is only exposed to script to expose generic file dialog attributes.\n\n"
 
    "This base class is usable in TorqueScript, but is does not specify what functionality is intended (open or save?). "
@@ -261,27 +261,27 @@ FileDialog::~FileDialog()
 
 void FileDialog::initPersistFields()
 {
-   addProtectedField( "defaultPath", TypeString, Offset(mData.mDefaultPath, FileDialog), &setDefaultPath, &defaultProtectedGetFn, 
+   addProtectedField( "defaultPath", TypeString, Offset(mData.mDefaultPath, FileDialog), &setDefaultPath, &defaultProtectedGetFn,
       "The default directory path when the dialog is shown." );
-      
-   addProtectedField( "defaultFile", TypeString, Offset(mData.mDefaultFile, FileDialog), &setDefaultFile, &defaultProtectedGetFn, 
+
+   addProtectedField( "defaultFile", TypeString, Offset(mData.mDefaultFile, FileDialog), &setDefaultFile, &defaultProtectedGetFn,
       "The default file path when the dialog is shown." );
-            
-   addProtectedField( "fileName", TypeString, Offset(mData.mFile, FileDialog), &setFile, &defaultProtectedGetFn, 
+
+   addProtectedField( "fileName", TypeString, Offset(mData.mFile, FileDialog), &setFile, &defaultProtectedGetFn,
       "The default file name when the dialog is shown." );
-      
-   addProtectedField( "filters", TypeString, Offset(mData.mFilters, FileDialog), &setFilters, &defaultProtectedGetFn, 
+
+   addProtectedField( "filters", TypeString, Offset(mData.mFilters, FileDialog), &setFilters, &defaultProtectedGetFn,
       "The filter string for limiting the types of files visible in the dialog.  It makes use of the pipe symbol '|' "
       "as a delimiter.  For example:\n\n"
       "'All Files|*.*'\n\n"
       "'Image Files|*.png;*.jpg|Png Files|*.png|Jepg Files|*.jpg'" );
-      
-   addField( "title", TypeString, Offset(mData.mTitle, FileDialog), 
+
+   addField( "title", TypeString, Offset(mData.mTitle, FileDialog),
       "The title for the dialog." );
-   
+
    addProtectedField( "changePath", TypeBool, Offset(mChangePath, FileDialog), &setChangePath, &getChangePath,
       "True/False whether to set the working directory to the directory returned by the dialog." );
-   
+
    Parent::initPersistFields();
 }
 
@@ -337,7 +337,7 @@ bool FileDialog::Execute()
    dStrcpy( pszFilter, mData.mFilters );
    const char* pszInitialDir = mData.mDefaultPath;
    const char* pszTitle = mData.mTitle;
-   
+
 #endif
 
    pszFileTitle[0] = 0;
@@ -401,7 +401,7 @@ bool FileDialog::Execute()
       ofn.lpfnHook = FolderHookProc;
       ofn.Flags |= OFN_ENABLEHOOK;
    }
-   
+
    if( !(mData.mStyle & FileDialogData::FDS_CHANGEPATH) )
       ofn.Flags |= OFN_NOCHANGEDIR;
 
@@ -624,7 +624,7 @@ bool FileDialog::setDefaultPath( void *object, const char *index, const char *da
    if( szPathValidate[ validateLen - 1 ] == '\\' )
       szPathValidate[ validateLen - 1 ] = '\0';
 
-   // Now check 
+   // Now check
    if( Platform::isDirectory( szPathValidate ) )
    {
       // Finally, assign in proper format.
@@ -705,7 +705,7 @@ ConsoleDocClass( OpenFileDialog,
 
    "The core usage of this dialog is to locate a file in the OS and return the path and name. This does not handle "
    "the actual file parsing or data manipulation. That functionality is left up to the FileObject class.\n\n"
-   
+
    "@tsexample\n"
    " // Create a dialog dedicated to opening files\n"
    " %openFileDlg = new OpenFileDialog()\n"
@@ -762,7 +762,7 @@ void OpenFileDialog::initPersistFields()
 {
    addProtectedField("MustExist", TypeBool, Offset(mMustExist, OpenFileDialog), &setMustExist, &getMustExist, "True/False whether the file returned must exist or not" );
    addProtectedField("MultipleFiles", TypeBool, Offset(mMultipleFiles, OpenFileDialog), &setMultipleFiles, &getMultipleFiles, "True/False whether multiple files may be selected and returned or not" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -774,7 +774,7 @@ bool OpenFileDialog::setMustExist( void *object, const char *index, const char *
    bool bMustExist = dAtob( data );
 
    OpenFileDialog *pDlg = static_cast<OpenFileDialog*>( object );
-   
+
    if( bMustExist )
       pDlg->mData.mStyle |= FileDialogData::FDS_MUSTEXIST;
    else
@@ -826,7 +826,7 @@ ConsoleDocClass( SaveFileDialog,
 
    "The core usage of this dialog is to locate a file in the OS and return the path and name. This does not handle "
    "the actual file writing or data manipulation. That functionality is left up to the FileObject class.\n\n"
-   
+
    "@tsexample\n"
    " // Create a dialog dedicated to opening file\n"
    " %saveFileDlg = new SaveFileDialog()\n"
@@ -883,7 +883,7 @@ IMPLEMENT_CONOBJECT(SaveFileDialog);
 void SaveFileDialog::initPersistFields()
 {
    addProtectedField("OverwritePrompt", TypeBool, Offset(mOverwritePrompt, SaveFileDialog), &setOverwritePrompt, &getOverwritePrompt, "True/False whether the dialog should prompt before accepting an existing file name" );
-   
+
    Parent::initPersistFields();
 }
 

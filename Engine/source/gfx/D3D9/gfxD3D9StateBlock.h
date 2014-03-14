@@ -28,9 +28,9 @@
 
 struct IDirect3DDevice9;
 class GFXD3D9StateBlock : public GFXStateBlock
-{   
+{
 public:
-   // 
+   //
    // GFXD3D9StateBlock interface
    //
 
@@ -42,7 +42,7 @@ public:
    void activate(GFXD3D9StateBlock* oldState);
 
 
-   // 
+   //
    // GFXStateBlock interface
    //
 
@@ -63,7 +63,7 @@ private:
    U32 mCachedHashValue;
    IDirect3DDevice9 *mD3DDevice;  ///< Handle for D3DDevice
    // Cached D3D specific things, these are "calculated" from GFXStateBlock
-   U32 mColorMask; 
+   U32 mColorMask;
    U32 mZBias;
    U32 mZSlopeBias;
 };

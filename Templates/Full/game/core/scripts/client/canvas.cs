@@ -38,30 +38,30 @@ function configureCanvas()
    %bpp = getWord($pref::Video::mode,  $WORD::BITDEPTH);
    %rate = getWord($pref::Video::mode, $WORD::REFRESH);
    %fsaa = getWord($pref::Video::mode, $WORD::AA);
-   
+
    echo("--------------");
    echo("Attempting to set resolution to \"" @ $pref::Video::mode @ "\"");
-   
-   %deskRes    = getDesktopResolution();      
+
+   %deskRes    = getDesktopResolution();
    %deskResX   = getWord(%deskRes, $WORD::RES_X);
    %deskResY   = getWord(%deskRes, $WORD::RES_Y);
    %deskResBPP = getWord(%deskRes, 2);
-   
+
    // We shouldn't be getting this any more but just in case...
    if (%bpp $= "Default")
       %bpp = %deskResBPP;
-      
+
    // Make sure we are running at a valid resolution
    if (%fs $= "0" || %fs $= "false")
    {
       // Windowed mode has to use the same bit depth as the desktop
       %bpp = %deskResBPP;
-      
+
       // Windowed mode also has to run at a smaller resolution than the desktop
       if ((%resX >= %deskResX) || (%resY >= %deskResY))
       {
          warn("Warning: The requested windowed resolution is equal to or larger than the current desktop resolution. Attempting to find a better resolution");
-      
+
          %resCount = Canvas.getModeCount();
          for (%i = (%resCount - 1); %i >= 0; %i--)
          {
@@ -72,30 +72,30 @@ function configureCanvas()
 
             if (%testBPP != %bpp)
                continue;
-            
+
             if ((%testResX < %deskResX) && (%testResY < %deskResY))
             {
                // This will work as our new resolution
                %resX = %testResX;
                %resY = %testResY;
-               
+
                warn("Warning: Switching to \"" @ %resX SPC %resY SPC %bpp @ "\"");
-               
+
                break;
             }
          }
       }
    }
-      
+
    $pref::Video::mode = %resX SPC %resY SPC %fs SPC %bpp SPC %rate SPC %fsaa;
-   
+
    if (%fs == 1 || %fs $= "true")
       %fsLabel = "Yes";
    else
       %fsLabel = "No";
 
    echo("Accepted Mode: " NL
-      "--Resolution : " @  %resX SPC %resY NL 
+      "--Resolution : " @  %resX SPC %resY NL
       "--Full Screen : " @ %fsLabel NL
       "--Bits Per Pixel : " @ %bpp NL
       "--Refresh Rate : " @ %rate NL
@@ -104,11 +104,11 @@ function configureCanvas()
 
    // Actually set the new video mode
    Canvas.setVideoMode(%resX, %resY, %fs, %bpp, %rate, %fsaa);
-   
+
    // FXAA piggybacks on the FSAA setting in $pref::Video::mode.
    if ( isObject( FXAA_PostEffect ) )
       FXAA_PostEffect.isEnabled = ( %fsaa > 0 ) ? true : false;
-      
+
    //if ( $pref::Video::autoDetect )
    //   GraphicsQualityAutodetect();
 }

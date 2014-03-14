@@ -44,7 +44,7 @@ ClippedPolyList::ClippedPolyList()
    VECTOR_SET_ASSOCIATION(mPolyPlaneList);
    VECTOR_SET_ASSOCIATION(mPlaneList);
    VECTOR_SET_ASSOCIATION(mNormalList);
-   
+
    mIndexList.reserve(IndexListReserveSize);
 }
 
@@ -93,7 +93,7 @@ U32 ClippedPolyList::addPointAndNormal(const Point3F& p, const Point3F& normal)
     if ( !n.isZero() )
         mMatrix.mulV(n);
 
-    AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");    
+    AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");
 
    // Build the plane mask
    register U32      mask = 1;
@@ -178,8 +178,8 @@ void ClippedPolyList::end()
    PROFILE_SCOPE( ClippedPolyList_Clip );
 
    Poly& poly = mPolyList.last();
-   
-   // Reject polygons facing away from our normal.   
+
+   // Reject polygons facing away from our normal.
    if ( mDot( poly.plane, mNormal ) < mNormalTolCosineRadians )
    {
       mIndexList.setSize(poly.vertexStart);
@@ -193,7 +193,7 @@ void ClippedPolyList::end()
 
    U32 frontMask = 0,backMask = 0;
    U32 i;
-   for (i = indexStart; i < mIndexList.size(); i++) 
+   for (i = indexStart; i < mIndexList.size(); i++)
    {
       U32 mask = mVertexList[mIndexList[i]].mask;
       frontMask |= mask;
@@ -202,7 +202,7 @@ void ClippedPolyList::end()
 
    // Trivial accept if all the vertices are on the backsides of
    // all the planes.
-   if (!frontMask) 
+   if (!frontMask)
    {
       poly.vertexCount = vertexCount;
       return;
@@ -211,14 +211,14 @@ void ClippedPolyList::end()
    // Trivial reject if any plane not crossed has all it's points
    // on the front.
    U32 crossMask = frontMask & backMask;
-   if (~crossMask & frontMask) 
+   if (~crossMask & frontMask)
    {
       mIndexList.setSize(poly.vertexStart);
       mPolyList.decrement();
       return;
    }
 
-   // Potentially, this will add up to mPlaneList.size() * (indexStart - indexEnd) 
+   // Potentially, this will add up to mPlaneList.size() * (indexStart - indexEnd)
    // elements to mIndexList, so ensure that it has enough space to store that
    // so we can use push_back_noresize. If you find this code block getting hit
    // frequently, changing the value of 'IndexListReserveSize' or doing some selective
@@ -230,7 +230,7 @@ void ClippedPolyList::end()
    //   mIndexList.reserve(mIndexList.capacity() * 2);
 
    // Need to do some clipping
-   for (U32 p = 0; p < mPlaneList.size(); p++) 
+   for (U32 p = 0; p < mPlaneList.size(); p++)
    {
       U32 pmask = 1 << p;
 
@@ -243,10 +243,10 @@ void ClippedPolyList::end()
       U32 i1 = indexEnd - 1;
       U32 mask1 = mVertexList[mIndexList[i1]].mask;
 
-      for (U32 i2 = indexStart; i2 < indexEnd; i2++) 
+      for (U32 i2 = indexStart; i2 < indexEnd; i2++)
       {
          U32 mask2 = mVertexList[mIndexList[i2]].mask;
-         if ((mask1 ^ mask2) & pmask) 
+         if ((mask1 ^ mask2) & pmask)
          {
             //
             mVertexList.increment();
@@ -271,14 +271,14 @@ void ClippedPolyList::end()
 
             // Test against the remaining planes
             for (U32 i = p + 1; i < mPlaneList.size(); i++)
-               if (mPlaneList[i].distToPlane(iv.point) > 0) 
+               if (mPlaneList[i].distToPlane(iv.point) > 0)
                {
                   iv.mask = 1 << i;
                   break;
                }
          }
 
-         if (!(mask2 & pmask)) 
+         if (!(mask2 & pmask))
          {
             U32 index = mIndexList[i2];
             mIndexList.push_back/*_noresize*/(index);
@@ -290,7 +290,7 @@ void ClippedPolyList::end()
 
       // Check for degenerate
       indexStart = indexEnd;
-      if (mIndexList.size() - indexStart < 3) 
+      if (mIndexList.size() - indexStart < 3)
       {
          mIndexList.setSize(poly.vertexStart);
          mPolyList.decrement();
@@ -347,7 +347,7 @@ void ClippedPolyList::cullUnusedVerts()
       for ( nextVIter = vIter + 1; nextVIter != mVertexList.end(); nextVIter++, n++ )
       {
          iNextIter = find( mIndexList.begin(), mIndexList.end(), n );
-         
+
          // If we found a used vertex
          // grab its index for later use
          // and set our result bool.
@@ -368,7 +368,7 @@ void ClippedPolyList::cullUnusedVerts()
       }
 
       // Erase unused verts.
-      numDeleted = (k-1) - i + 1;       
+      numDeleted = (k-1) - i + 1;
       mVertexList.erase( i, numDeleted );
       mNormalList.erase( i, numDeleted );
 
@@ -406,13 +406,13 @@ void ClippedPolyList::triangulate()
       const Poly &poly = *polyIter;
 
       // How many triangles in this poly?
-      numTriangles = poly.vertexCount - 2;        
+      numTriangles = poly.vertexCount - 2;
 
       // Build out the triangles.
       for ( j = 0; j < numTriangles; j++ )
       {
          mPolyList.increment();
-         
+
          Poly &triangle = mPolyList.last();
          triangle = poly;
          triangle.vertexCount = 3;
@@ -429,7 +429,7 @@ void ClippedPolyList::generateNormals()
 {
    PROFILE_SCOPE( ClippedPolyList_GenerateNormals );
 
-   AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");    
+   AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");
 
    U32 i, polyCount;
    VectorF normal;
@@ -444,7 +444,7 @@ void ClippedPolyList::generateNormals()
        if ( !normalIter->isZero() )
            continue;
 
-      // Average all the face normals which 
+      // Average all the face normals which
       // share this vertex index.
       indexIter = mIndexList.begin();
       normal.zero();
@@ -465,14 +465,14 @@ void ClippedPolyList::generateNormals()
 
             ++polyCount;
             normal += poly.plane;
-         }        
+         }
       }
 
       // Average it.
       if ( polyCount > 0 )
          normal /= (F32)polyCount;
 
-      // Note: we use a temporary for the normal averaging 
+      // Note: we use a temporary for the normal averaging
       // then copy the result to limit the number of arrays
       // we're touching during the innermost loop.
       *normalIter = normal;

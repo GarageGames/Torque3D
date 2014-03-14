@@ -49,7 +49,7 @@ BtWorld::BtWorld() :
    mDynamicsWorld( NULL ),
    mThreadSupportCollision( NULL )
 {
-} 
+}
 
 BtWorld::~BtWorld()
 {
@@ -67,15 +67,15 @@ bool BtWorld::initWorld( bool isServer, ProcessList *processList )
    // Different initialization with threading enabled.
    if ( smMaxThreads > 1 )
    {
-	   
+
 	   // TODO: ifdef assumes smMaxThread is always one at this point. MACOSX support to be decided
 #ifdef WIN32
-      mThreadSupportCollision = new Win32ThreadSupport( 
+      mThreadSupportCollision = new Win32ThreadSupport(
          Win32ThreadSupport::Win32ThreadConstructionInfo(   isServer ? "bt_servercol" : "bt_clientcol",
 								                                    processCollisionTask,
 								                                    createCollisionLocalStoreMemory,
 								                                    smMaxThreads ) );
-      
+
       mDispatcher = new	SpuGatheringCollisionDispatcher( mThreadSupportCollision,
                                                          smMaxThreads,
                                                          mCollisionConfiguration );
@@ -86,7 +86,7 @@ bool BtWorld::initWorld( bool isServer, ProcessList *processList )
       mThreadSupportCollision = NULL;
       mDispatcher = new	btCollisionDispatcher( mCollisionConfiguration );
    }
-  
+
    btVector3 worldMin( -2000, -2000, -1000 );
    btVector3 worldMax( 2000, 2000, 1000 );
    btAxisSweep3 *sweepBP = new btAxisSweep3( worldMin, worldMax );
@@ -146,7 +146,7 @@ void BtWorld::tickPhysics( U32 elapsedMs )
    // Did we forget to call getPhysicsResults somewhere?
    AssertFatal( !mIsSimulating, "PhysXWorld::tickPhysics() - Already simulating!" );
 
-   // The elapsed time should be non-zero and 
+   // The elapsed time should be non-zero and
    // a multiple of TickMs!
    AssertFatal(   elapsedMs != 0 &&
                   ( elapsedMs % TickMs ) == 0 , "PhysXWorld::tickPhysics() - Got bad elapsed time!" );
@@ -166,7 +166,7 @@ void BtWorld::tickPhysics( U32 elapsedMs )
 
 void BtWorld::getPhysicsResults()
 {
-   if ( !mDynamicsWorld || !mIsSimulating ) 
+   if ( !mDynamicsWorld || !mIsSimulating )
       return;
 
    PROFILE_SCOPE(BtWorld_GetPhysicsResults);
@@ -201,7 +201,7 @@ bool BtWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *
    if ( ri )
    {
       ri->object = PhysicsUserData::getObject( result.m_collisionObject->getUserPointer() );
-      
+
       // If we were passed a RayInfo, we can only return true signifying a collision
       // if we hit an object that actually has a torque object associated with it.
       //
@@ -223,8 +223,8 @@ bool BtWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *
         !actor.isDynamic() ||
         actor.readBodyFlag( NX_BF_KINEMATIC ) )
       return true;
-      
-   NxVec3 force = pxCast<NxVec3>( impulse );//worldRay.dir * forceAmt; 
+
+   NxVec3 force = pxCast<NxVec3>( impulse );//worldRay.dir * forceAmt;
    actor.addForceAtPos( force, hitInfo.worldImpact, NX_IMPULSE );
    */
 
@@ -264,14 +264,14 @@ void BtWorld::explosion( const Point3F &pos, F32 radius, F32 forceMagnitude )
    for ( NxU32 i = 0; i < numHits; i++ )
    {
       NxActor &actor = shapes[i]->getActor();
-      
+
       bool dynamic = actor.isDynamic();
-      
+
       if ( !dynamic )
          continue;
 
       bool kinematic = actor.readBodyFlag( NX_BF_KINEMATIC );
-      
+
       if ( kinematic )
          continue;
 
@@ -347,7 +347,7 @@ ConsoleFunction( castForceRay, const char*, 4, 4, "( Point3F startPnt, Point3F e
    PhysicsWorld *world = PHYSICSPLUGIN->getWorld( "server" );
    if ( !world )
       return NULL;
-   
+
    char *returnBuffer = Con::getReturnBuffer(256);
 
    Point3F impulse;
@@ -375,7 +375,7 @@ ConsoleFunction( castForceRay, const char*, 4, 4, "( Point3F startPnt, Point3F e
             rinfo.point.x, rinfo.point.y, rinfo.point.z );
       return returnBuffer;
    }
-   else 
+   else
       return NULL;
 }
 */

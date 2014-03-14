@@ -40,14 +40,14 @@ void findRouter( SceneObject *obj, void *key )
 }
 
 void waterFind( SceneObject *obj, void *key )
-{     
+{
    PROFILE_SCOPE( waterFind );
 
    // This is called for each WaterObject the ShapeBase object is overlapping.
 
    ContainerQueryInfo *info = static_cast<ContainerQueryInfo*>(key);
-   WaterObject *water = dynamic_cast<WaterObject*>(obj);      
-   AssertFatal( water != NULL, "containerQuery - waterFind(), passed object was not of class WaterObject!");      
+   WaterObject *water = dynamic_cast<WaterObject*>(obj);
+   AssertFatal( water != NULL, "containerQuery - waterFind(), passed object was not of class WaterObject!");
 
    // Get point at the bottom/center of the box.
    Point3F testPnt = info->box.getCenter();
@@ -70,17 +70,17 @@ void waterFind( SceneObject *obj, void *key )
    // greatest water coverage for this ShapeBase object.
    if ( coverage < info->waterCoverage )
       return;
-   
+
    info->waterCoverage = coverage;
    info->liquidType = water->getLiquidType();
    info->waterViscosity = water->getViscosity();
    info->waterDensity = water->getDensity();
-   info->waterHeight = water->getSurfaceHeight( Point2F(testPnt.x,testPnt.y) );   
+   info->waterHeight = water->getSurfaceHeight( Point2F(testPnt.x,testPnt.y) );
    info->waterObject = water;
 }
 
 void physicalZoneFind(SceneObject* obj, void *key)
-{    
+{
    PROFILE_SCOPE( physicalZoneFind );
 
    ContainerQueryInfo *info = static_cast<ContainerQueryInfo*>(key);

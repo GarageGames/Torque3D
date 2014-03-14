@@ -42,23 +42,23 @@ class OggVorbisDecoder : public OggDecoder,
                          public IInputStream< RawData* >
 {
    public:
-   
+
       typedef OggDecoder Parent;
-      
+
    protected:
-      
+
       ///
       vorbis_info mVorbisInfo;
-      
+
       ///
       vorbis_comment mVorbisComment;
-      
+
       ///
       vorbis_dsp_state mVorbisDspState;
-      
+
       ///
       vorbis_block mVorbisBlock;
-      
+
       #ifdef TORQUE_DEBUG
       U32 mLock;
       #endif
@@ -67,23 +67,23 @@ class OggVorbisDecoder : public OggDecoder,
       virtual bool _detect( ogg_page* startPage );
       virtual bool _init();
       virtual bool _packetin( ogg_packet* packet );
-   
+
    public:
-   
+
       ///
       OggVorbisDecoder( const ThreadSafeRef< OggInputStream >& stream );
-      
+
       ~OggVorbisDecoder();
-      
+
       ///
       U32 getNumChannels() const { return mVorbisInfo.channels; }
-      
+
       ///
       U32 getSamplesPerSecond() const { return mVorbisInfo.rate; }
-      
+
       // OggDecoder.
       virtual const char* getName() const { return "Vorbis"; }
-      
+
       // IInputStream.
       virtual U32 read( RawData** buffer, U32 num );
 };

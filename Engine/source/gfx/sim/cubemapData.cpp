@@ -54,7 +54,7 @@ CubemapData::~CubemapData()
    mCubemap = NULL;
 }
 
-ConsoleDocClass( CubemapData, 
+ConsoleDocClass( CubemapData,
    "@brief Used to create static or dynamic cubemaps.\n\n"
    "This object is used with Material, WaterObject, and other objects for cubemap reflections.\n\n"
    "A simple declaration of a static cubemap:\n"
@@ -122,7 +122,7 @@ void CubemapData::createMap()
       {
          mCubemap = GFX->createCubemap();
          mCubemap->initDynamic( mDynamicSize );
-         mDepthBuff = GFXTexHandle( mDynamicSize, mDynamicSize, GFXFormatD24S8, 
+         mDepthBuff = GFXTexHandle( mDynamicSize, mDynamicSize, GFXFormatD24S8,
             &GFXDefaultZTargetProfile, avar("%s() - mDepthBuff (line %d)", __FUNCTION__, __LINE__));
          mRenderTarget = GFX->allocRenderToTextureTarget();
       }
@@ -177,13 +177,13 @@ void CubemapData::updateDynamic(SceneManager* sm, const Point3F& pos)
    }
    sm->setVisibleDistance(mDynamicFarDist);
 
-   // We don't use a special clipping projection, but still need to initialize 
+   // We don't use a special clipping projection, but still need to initialize
    // this for objects like SkyBox which will use it during a reflect pass.
    gClientSceneGraph->setNonClipProjection( (MatrixF&) GFX->getProjectionMatrix() );
 
    // Loop through the six faces of the cube map.
    for(U32 i=0; i<6; i++)
-   {      
+   {
       // Standard view that will be overridden below.
       VectorF vLookatPt(0.0f, 0.0f, 0.0f), vUpVec(0.0f, 0.0f, 0.0f), vRight(0.0f, 0.0f, 0.0f);
 

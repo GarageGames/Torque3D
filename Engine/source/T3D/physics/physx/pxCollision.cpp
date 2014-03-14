@@ -31,13 +31,13 @@
 #include "T3D/physics/physX/pxStream.h"
 
 
-PxCollision::PxCollision() 
+PxCollision::PxCollision()
 {
 }
 
 PxCollision::~PxCollision()
 {
-   // We may be deleteting SDK data... so make 
+   // We may be deleteting SDK data... so make
    // sure we have the the scene write lock.
    PxWorld::releaseWriteLocks();
 
@@ -66,7 +66,7 @@ void PxCollision::addPlane( const PlaneF &plane )
    desc->skinWidth = 0.01f;
    desc->dimensions.set( 10000.0f, 10000.0f, 100.0f );
    desc->localPose.t.z = -100.0f;
-   
+
    // TODO: Fix rotation to match plane normal!
    //boxDesc->localPose.M.setColumn( 0, NxVec3( plane.x, plane.y, plane.z ) );
    //boxDesc->localPose.M.setColumn( 1, NxVec3( plane.x, plane.y, plane.z ) );
@@ -107,11 +107,11 @@ void PxCollision::addCapsule( F32 radius,
    mColShapes.push_back( desc );
 }
 
-bool PxCollision::addConvex(  const Point3F *points, 
+bool PxCollision::addConvex(  const Point3F *points,
                               U32 count,
                               const MatrixF &localXfm )
 {
-   // Mesh cooking requires that both 
+   // Mesh cooking requires that both
    // scenes not be write locked!
    PxWorld::releaseWriteLocks();
 
@@ -126,7 +126,7 @@ bool PxCollision::addConvex(  const Point3F *points,
 
    // Cook it!
    NxCookingParams params;
-   #ifdef TORQUE_OS_XENON 
+   #ifdef TORQUE_OS_XENON
       params.targetPlatform = PLATFORM_XENON;
    #else
       params.targetPlatform = PLATFORM_PC;
@@ -135,7 +135,7 @@ bool PxCollision::addConvex(  const Point3F *points,
    params.hintCollisionSpeed = true;
    cooker->NxSetCookingParams( params );
 
-   PxMemStream stream;	
+   PxMemStream stream;
    bool cooked = cooker->NxCookConvexMesh( meshDesc, stream );
    cooker->NxCloseCooking();
 
@@ -162,7 +162,7 @@ bool PxCollision::addTriangleMesh(  const Point3F *vert,
                                     U32 triCount,
                                     const MatrixF &localXfm )
 {
-   // Mesh cooking requires that both 
+   // Mesh cooking requires that both
    // scenes not be write locked!
    PxWorld::releaseWriteLocks();
 
@@ -180,7 +180,7 @@ bool PxCollision::addTriangleMesh(  const Point3F *vert,
 
    // Cook it!
    NxCookingParams params;
-   #ifdef TORQUE_OS_XENON 
+   #ifdef TORQUE_OS_XENON
       params.targetPlatform = PLATFORM_XENON;
    #else
       params.targetPlatform = PLATFORM_PC;
@@ -188,8 +188,8 @@ bool PxCollision::addTriangleMesh(  const Point3F *vert,
    params.skinWidth = 0.01f;
    params.hintCollisionSpeed = true;
    cooker->NxSetCookingParams( params );
-   
-   PxMemStream stream;	
+
+   PxMemStream stream;
    bool cooked = cooker->NxCookTriangleMesh( meshDesc, stream );
    cooker->NxCloseCooking();
    if ( !cooked )
@@ -220,22 +220,22 @@ bool PxCollision::addHeightfield(   const U16 *heights,
    PxWorld::releaseWriteLocks();
 
    // Init the heightfield description.
-   NxHeightFieldDesc heightFieldDesc;    
-   heightFieldDesc.nbColumns           = blockSize;   
-   heightFieldDesc.nbRows              = blockSize; 
+   NxHeightFieldDesc heightFieldDesc;
+   heightFieldDesc.nbColumns           = blockSize;
+   heightFieldDesc.nbRows              = blockSize;
    heightFieldDesc.thickness           = -10.0f;
    heightFieldDesc.convexEdgeThreshold = 0;
 
    // Allocate the samples.
    heightFieldDesc.samples       = new NxU32[ blockSize * blockSize ];
-   heightFieldDesc.sampleStride  = sizeof(NxU32);   
+   heightFieldDesc.sampleStride  = sizeof(NxU32);
    NxU8 *currentByte = (NxU8*)heightFieldDesc.samples;
 
-   for ( U32 row = 0; row < blockSize; row++ )        
-   {  
+   for ( U32 row = 0; row < blockSize; row++ )
+   {
       const U32 tess = ( row + 1 ) % 2;
 
-      for ( U32 column = 0; column < blockSize; column++ )            
+      for ( U32 column = 0; column < blockSize; column++ )
       {
          NxHeightFieldSample *currentSample = (NxHeightFieldSample*)currentByte;
 
@@ -253,9 +253,9 @@ bool PxCollision::addHeightfield(   const U16 *heights,
             currentSample->materialIndex1 = 1; //materialIds[0];
          }
 
-         currentSample->tessFlag = ( column + tess ) % 2;    
+         currentSample->tessFlag = ( column + tess ) % 2;
 
-         currentByte += heightFieldDesc.sampleStride;     
+         currentByte += heightFieldDesc.sampleStride;
       }
    }
 
@@ -264,15 +264,15 @@ bool PxCollision::addHeightfield(   const U16 *heights,
    desc->heightField = gPhysicsSDK->createHeightField( heightFieldDesc );
 
    // Destroy the temp sample array.
-   delete [] heightFieldDesc.samples;   
+   delete [] heightFieldDesc.samples;
 
    // TerrainBlock uses a 11.5 fixed point height format
    // giving it a maximum height range of 0 to 2048.
    desc->heightScale = 0.03125f;
 
-   desc->rowScale = metersPerSample;  
-   desc->columnScale = metersPerSample;  
-   desc->materialIndexHighBits = 0;   
+   desc->rowScale = metersPerSample;
+   desc->columnScale = metersPerSample;
+   desc->materialIndexHighBits = 0;
    desc->skinWidth = 0.01f;
 
    // Use the local pose to align the heightfield
@@ -283,7 +283,7 @@ bool PxCollision::addHeightfield(   const U16 *heights,
    rotZ.rotZ( Float_Pi );
    NxMat34 rot;
    rot.M.multiply( rotZ, rotX );
-   rot.t.set( ( blockSize - 1 ) * metersPerSample, 0, 0 );   
+   rot.t.set( ( blockSize - 1 ) * metersPerSample, 0, 0 );
    desc->localPose = rot;
 
    mColShapes.push_back( desc );

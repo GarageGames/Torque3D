@@ -88,7 +88,7 @@ const bool Platform::checkKeyboardInputExclusion(const InputEventInfo *info)
 
       // CodeReview Looks like we don't even need to do #ifdefs here since
       // things like cmd-tab don't appear on windows, and alt-tab is an unlikely
-      // desired bind on other platforms - might be best to simply have a 
+      // desired bind on other platforms - might be best to simply have a
       // global exclusion list and keep it standard on all platforms.
       // This might not be so, but it's the current assumption. [bjg 5/4/07]
 

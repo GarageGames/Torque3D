@@ -50,10 +50,10 @@ static bool _hasChildren(const char* path)
 {
    if( Platform::hasSubDirectory(path))
       return true;
-      
+
    Vector<StringTableEntry> dummy;
    Platform::dumpDirectories( path, dummy, 0, true);
-   
+
    return dummy.size() > 0;
 }
 
@@ -77,7 +77,7 @@ void GuiFileTreeCtrl::initPersistFields()
    addProtectedField( "fileFilter", TypeRealString,   Offset( mFileFilter, GuiFileTreeCtrl ),
                       &_setFileFilterValue, &defaultProtectedGetFn, "Vector of file patterns.  If not empty, only files matching the pattern will be shown in the control." );
    endGroup( "File Tree" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -85,7 +85,7 @@ static void _dumpFiles(const char *path, Vector<StringTableEntry> &directoryVect
 {
    Vector<Platform::FileInfo> fileVec;
    Platform::dumpPath( path, fileVec, depth);
-   
+
    for(U32 i = 0; i < fileVec.size(); i++)
    {
       directoryVector.push_back( StringTable->insert(fileVec[i].pFileName) );
@@ -105,7 +105,7 @@ void GuiFileTreeCtrl::updateTree()
    // much as windows does.
 
    // Determine the root path.
-   
+
    String rootPath = Platform::getMainDotCsDir();
    if( !mRootPath.isEmpty() )
       rootPath = String::ToString( "%s/%s", rootPath.c_str(), mRootPath.c_str() );
@@ -126,7 +126,7 @@ void GuiFileTreeCtrl::updateTree()
          *lastPathComponent++ = '\0';
       else
          lastPathComponent = dirname;
-      
+
       // Iterate through the returned paths and add them to the tree
       Vector<StringTableEntry>::iterator j = pathVec.begin();
       for( ; j != pathVec.end(); j++ )
@@ -144,7 +144,7 @@ bool GuiFileTreeCtrl::onWake()
 {
    if( !Parent::onWake() )
       return false;
-      
+
    updateTree();
 
    return true;
@@ -232,24 +232,24 @@ void GuiFileTreeCtrl::onItemSelected( Item *item )
 bool GuiFileTreeCtrl::_setFileFilterValue( void *object, const char *index, const char *data )
 {
    GuiFileTreeCtrl* ctrl = ( GuiFileTreeCtrl* ) object;
-   
+
    ctrl->mFileFilter = data;
    ctrl->_initFilters();
-   
+
    return false;
 }
 
 void GuiFileTreeCtrl::_initFilters()
 {
    mFilters.clear();
-   
+
    U32 index = 0;
    while( true )
    {
       const char* pattern = StringUnit::getUnit( mFileFilter, index, " " );
       if( !pattern[ 0 ] )
          break;
-         
+
       mFilters.push_back( pattern );
       ++ index;
    }
@@ -259,7 +259,7 @@ bool GuiFileTreeCtrl::matchesFilters(const char* filename)
 {
    if( !mFilters.size() )
       return true;
-      
+
    for(int i = 0; i < mFilters.size(); i++)
    {
       if(FindMatch::isMatch( mFilters[i], filename))
@@ -294,11 +294,11 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
       dStrncpy( szValue, curPos, sizeof( szValue ) );
       szValue[ sizeof( szValue ) - 1 ] = 0;
    }
-   
+
    const U32 valueLen = dStrlen( szValue );
    char* value = new char[ valueLen + 1 ];
    dMemcpy( value, szValue, valueLen + 1 );
-   
+
    char *delim = dStrchr( curPos, '/' );
    if ( delim )
    {
@@ -372,7 +372,7 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
             item->setVirtualParent( true );
       }
    }
-   
+
    // Down the rabbit hole we go
    recurseInsert( getItem( itemIndex ), delim );
 

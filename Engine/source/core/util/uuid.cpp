@@ -89,7 +89,7 @@ typedef struct _uuid_t
 } xuuid_t;
 
 /* data type for UUID generator persistent state */
-	
+
 typedef struct {
     uuid_node_t node;     /* saved node ID */
     unsigned16 cs;        /* saved clock sequence */
@@ -133,17 +133,17 @@ static void get_random_info(unsigned char seed[16]);
 
 /* dav_create_opaquelocktoken - generates a UUID version 1 token.
  *   Clock_sequence and node_address set to pseudo-random
- *   numbers during init.  
+ *   numbers during init.
  *
  *   Should postpend pid to account for non-seralized creation?
  */
 static int create_token(uuid_state *st, xuuid_t *u)
 {
     uuid_time_t timestamp;
-    
+
     get_current_time(&timestamp);
     format_uuid_v1(u, st->cs, timestamp, st->node);
-    
+
     return 1;
 }
 
@@ -259,16 +259,16 @@ static void get_current_time(uuid_time_t * timestamp)
     static uuid_time_t  time_last;
     static unsigned16   uuids_this_tick;
     static int          inited = 0;
-    
+
     if (!inited) {
         get_system_time(&time_now);
         uuids_this_tick = UUIDS_PER_TICK;
         inited = 1;
     };
-	
+
     while (1) {
 	get_system_time(&time_now);
-        
+
 	/* if clock reading changed since last UUID generated... */
 	if (time_last != time_now) {
 	    /* reset count of uuids gen'd with this clock reading */
@@ -325,7 +325,7 @@ static void get_system_time(uuid_time_t *uuid_time)
        Jan 1, 1601.  UUIDs use time in 100ns ticks since Oct 15, 1582.
        The difference is 17 Days in Oct + 30 (Nov) + 31 (Dec)
        + 18 years and 5 leap days.    */
-	
+
     time.QuadPart +=
 	(unsigned __int64) (1000*1000*10)
 	* (unsigned __int64) (60 * 60 * 24)
@@ -353,7 +353,7 @@ static void get_random_info(unsigned char seed[16])
         TCHAR hostname[MAX_COMPUTERNAME_LENGTH + 1];
 
     } r;
-    
+
     MD5Init(&c);    /* memory usage stats */
     GlobalMemoryStatus(&r.m);    /* random system stats */
     GetSystemInfo(&r.s);    /* 100ns resolution (nominally) time of day */
@@ -382,7 +382,7 @@ static void get_system_time(uuid_time_t *uuid_time)
     *uuid_time = (tp.tv_sec * 10000000) + (tp.tv_usec * 10) +
         I64(0x01B21DD213814000);
 }
- 
+
 static void get_random_info(unsigned char seed[16])
 {
     MD5_CTX c;
@@ -416,7 +416,7 @@ namespace {
 namespace Torque
 {
    UUID UUID::smNull;
-   
+
    void UUID::generate()
    {
       if( !gUUIDStateInitialized )
@@ -424,17 +424,17 @@ namespace Torque
          create_uuid_state( &gUUIDState );
          gUUIDStateInitialized = true;
       }
-      
+
       create_token( &gUUIDState, ( xuuid_t* ) this );
    }
-   
+
    String UUID::toString() const
    {
       char buffer[ 1024 ];
       format_token( buffer, ( xuuid_t* ) this );
       return buffer;
    }
-   
+
    bool UUID::fromString( const char* str )
    {
       if( parse_token( str, ( xuuid_t* ) this ) != 0 )
@@ -442,10 +442,10 @@ namespace Torque
          dMemset( this, 0, sizeof( UUID ) );
          return false;
       }
-      
+
       return true;
    }
-   
+
    U32 UUID::getHash() const
    {
       return ( a + b + c + d + e + f[ 0 ] + f[ 1 ] + f[ 2 ] + f[ 3 ] + f[ 4 ] + f[ 5 ] );

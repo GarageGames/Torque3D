@@ -33,7 +33,7 @@ MODULE_BEGIN( BadWordFilter )
    {
       BadWordFilter::create();
    }
-   
+
    MODULE_SHUTDOWN
    {
       BadWordFilter::destroy();
@@ -62,7 +62,7 @@ BadWordFilter::~BadWordFilter()
 
 void BadWordFilter::create()
 {
-   Con::addVariable("pref::enableBadWordFilter", TypeBool, &filteringEnabled, 
+   Con::addVariable("pref::enableBadWordFilter", TypeBool, &filteringEnabled,
       "@brief If true, the bad word filter will be enabled.\n\n"
 	   "@ingroup Game");
    gBadWordFilter = new BadWordFilter;

@@ -39,11 +39,11 @@ function createCanvas(%windowTitle)
 
    // Create the Canvas
    %foo = new GuiCanvas(Canvas);
-   
+
    // Set the window title
    if (isObject(Canvas))
       Canvas.setWindowTitle(getEngineName() @ " - " @ $appName);
-   
+
    return true;
 }
 
@@ -60,7 +60,7 @@ function isScriptFile(%path)
 {
    if( isFile(%path @ ".dso") || isFile(%path) )
       return true;
-   
+
    return false;
 }
 
@@ -116,12 +116,12 @@ function parseArgs()
 }
 
 function compileFiles(%pattern)
-{  
+{
    %path = filePath(%pattern);
 
    %saveDSO    = $Scripts::OverrideDSOPath;
    %saveIgnore = $Scripts::ignoreDSOs;
-   
+
    $Scripts::OverrideDSOPath  = %path;
    $Scripts::ignoreDSOs       = false;
    %mainCsFile = makeFullPath("main.cs");
@@ -129,13 +129,13 @@ function compileFiles(%pattern)
    for (%file = findFirstFileMultiExpr(%pattern); %file !$= ""; %file = findNextFileMultiExpr(%pattern))
    {
       // we don't want to try and compile the primary main.cs
-      if(%mainCsFile !$= %file)      
+      if(%mainCsFile !$= %file)
          compile(%file, true);
    }
 
    $Scripts::OverrideDSOPath  = %saveDSO;
    $Scripts::ignoreDSOs       = %saveIgnore;
-   
+
 }
 
 if($compileAll)
@@ -143,7 +143,7 @@ if($compileAll)
    echo(" --- Compiling all files ---");
    compileFiles("*.cs");
    compileFiles("*.gui");
-   compileFiles("*.ts");  
+   compileFiles("*.ts");
    echo(" --- Exiting after compile ---");
    quit();
 }
@@ -153,7 +153,7 @@ if($compileTools)
    echo(" --- Compiling tools scritps ---");
    compileFiles("tools/*.cs");
    compileFiles("tools/*.gui");
-   compileFiles("tools/*.ts");  
+   compileFiles("tools/*.ts");
    echo(" --- Exiting after compile ---");
    quit();
 }
@@ -246,15 +246,15 @@ if ($displayHelp) {
 else {
    onStart();
    echo("Engine initialized...");
-   
+
    // Auto-load on the 360
    if( $platform $= "xenon" )
    {
       %mission = "levels/Empty Terrain.mis";
-      
+
       echo("Xbox360 Autoloading level: '" @ %mission @ "'");
-      
-      
+
+
       if ($pref::HostMultiPlayer)
          %serverType = "MultiPlayer";
       else

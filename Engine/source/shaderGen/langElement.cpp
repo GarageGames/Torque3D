@@ -53,7 +53,7 @@ LangElement * LangElement::find( const char *name )
          return elementList[i];
       }
    }
-   
+
    return NULL;
 }
 
@@ -66,7 +66,7 @@ void LangElement::deleteElements()
    {
       delete elementList[i];
    }
-   
+
    elementList.setSize( 0 );
 
 }
@@ -116,11 +116,11 @@ Var::Var( const char *inName, const char *inType )
 }
 
 void Var::setUniform(const String& constType, const String& constName, ConstantSortPosition sortPos)
-{ 
+{
    uniform = true;
    setType(constType.c_str());
-   setName(constName.c_str());   
-   constSortPos = cspPass;      
+   setName(constName.c_str());
+   constSortPos = cspPass;
 }
 
 //--------------------------------------------------------------------------
@@ -201,4 +201,4 @@ void MultiLine::print( Stream &stream )
    {
       mStatementList[i]->print( stream );
    }
-} 
+}

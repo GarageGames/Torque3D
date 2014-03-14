@@ -33,11 +33,11 @@ function mvReset()
 {
    for ( %i = 0; %i < 6; %i++ )
       setVariable( "mvTriggerCount" @ %i, 0 );
-      
+
    $mvUpAction = 0;
    $mvDownAction = 0;
    $mvLeftAction = 0;
    $mvRightAction = 0;
-   
+
    // There are others.
 }

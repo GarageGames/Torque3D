@@ -195,7 +195,7 @@ enum {
 
 
 bool netSocketWaitForWritable(NetSocket fd, S32 timeoutMs)
-{  
+{
    fd_set writefds;
    timeval timeout;
 
@@ -416,7 +416,7 @@ NetSocket Net::openConnectTo(const char *addressString)
             sock = InvalidSocket;
          }
       }
-      if(sock != InvalidSocket) 
+      if(sock != InvalidSocket)
       {
          // add this socket to our list of polled sockets
          addPolledSocket(sock, ConnectionPending);
@@ -635,7 +635,7 @@ void Net::process()
 #ifdef TORQUE_OS_XENON
          // WSASetLastError has no return value, however part of the SO_ERROR behavior
          // is to clear the last error, so this needs to be done here.
-         if( ( optval = _getLastErrorAndClear() ) == -1 ) 
+         if( ( optval = _getLastErrorAndClear() ) == -1 )
 #else
          if (getsockopt(currentSock->fd, SOL_SOCKET, SO_ERROR,
             (char*)&optval, &optlen) == -1)
@@ -990,7 +990,7 @@ bool Net::stringToAddress(const char *addressString, NetAddress  *address)
 
          // Wait for event (passing NULL as a handle to XNetDnsLookup will NOT
          // cause it to behave synchronously, so do not remove the handle/wait
-         while(pxndns->iStatus == WSAEINPROGRESS) 
+         while(pxndns->iStatus == WSAEINPROGRESS)
             WaitForSingleObject(hEvent, INFINITE);
 
          bool foundAddr = pxndns->iStatus == 0 && pxndns->cina > 0;

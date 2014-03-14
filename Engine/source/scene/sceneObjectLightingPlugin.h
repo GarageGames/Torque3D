@@ -27,7 +27,7 @@ class SceneObject;
 class NetConnection;
 class BitStream;
 
-class SceneObjectLightingPlugin 
+class SceneObjectLightingPlugin
 {
    public:
 
@@ -38,7 +38,7 @@ class SceneObjectLightingPlugin
 
       // Called by statics
       virtual U32  packUpdate( SceneObject* obj, U32 checkMask, NetConnection* conn, U32 mask, BitStream* stream ) = 0;
-      virtual void unpackUpdate( SceneObject* obj, NetConnection* conn, BitStream* stream ) = 0;     
+      virtual void unpackUpdate( SceneObject* obj, NetConnection* conn, BitStream* stream ) = 0;
 };
 
 #endif // !_SCENEOBJECTLIGHTINGPLUGIN_H_

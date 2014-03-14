@@ -382,23 +382,23 @@ public:
    /// someone playing on the same instance), we can do some short circuited code to enhance
    /// performance.
    ///
-   /// These variables are used to make it simpler; if we are running in short-circuited mode, 
+   /// These variables are used to make it simpler; if we are running in short-circuited mode,
    /// the ghosted client gets the server object while the server gets the client object.
    ///
    /// @note "Premature optimization is the root of all evil" - Donald Knuth. The current codebase
    ///       uses this feature in three small places, mostly for non-speed-related purposes.
    ///
    /// @{
-   
+
    /// Returns a pointer to the server object when on a local connection.
    NetObject* getServerObject() const { return mServerObject; }
 
    /// Returns a pointer to the client object when on a local connection.
    NetObject* getClientObject() const { return mClientObject; }
-   
+
    /// Template form for the callers convenience.
    template < class T >
-   static T* getServerObject( T *netObj ) { return static_cast<T*>( netObj->getServerObject() ); }   
+   static T* getServerObject( T *netObj ) { return static_cast<T*>( netObj->getServerObject() ); }
 
    /// Template form for the callers convenience.
    template < class T >

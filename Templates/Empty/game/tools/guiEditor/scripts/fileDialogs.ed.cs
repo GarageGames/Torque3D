@@ -28,7 +28,7 @@ $GUI::FileSpec = "Torque Gui Files (*.gui)|*.gui|All Files (*.*)|*.*|";
 function GuiBuilder::getSaveName( %defaultFileName )
 {
    %defaultPath = GuiEditor.LastPath;
-   
+
    if( %defaultFileName $= "" )
    {
       %prefix = "";
@@ -41,12 +41,12 @@ function GuiBuilder::getSaveName( %defaultFileName )
          else if( isScriptPathExpando( "^tools" ) )
             %prefix = "^tools/";
       }
-         
+
       %defaultFileName = expandFilename( %prefix @ "gui/untitled.gui" );
    }
    else
       %defaultPath = filePath( %defaultFileName );
-      
+
    %dlg = new SaveFileDialog()
    {
       Filters           = $GUI::FileSpec;
@@ -55,7 +55,7 @@ function GuiBuilder::getSaveName( %defaultFileName )
       ChangePath        = false;
       OverwritePrompt   = true;
    };
-         
+
    if( %dlg.Execute() )
    {
       GuiEditor.LastPath = filePath( %dlg.FileName );
@@ -65,9 +65,9 @@ function GuiBuilder::getSaveName( %defaultFileName )
    }
    else
       %filename = "";
-      
+
    %dlg.delete();
-      
+
    return %filename;
 }
 
@@ -75,7 +75,7 @@ function GuiBuilder::getOpenName( %defaultFileName )
 {
    if( %defaultFileName $= "" )
       %defaultFileName = expandFilename("^game/gui/untitled.gui");
-   
+
    %dlg = new OpenFileDialog()
    {
       Filters        = $GUI::FileSpec;
@@ -84,15 +84,15 @@ function GuiBuilder::getOpenName( %defaultFileName )
       ChangePath     = false;
       MustExist      = true;
    };
-         
+
    if(%dlg.Execute())
    {
       GuiEditor.LastPath = filePath( %dlg.FileName );
-      %filename = %dlg.FileName;      
+      %filename = %dlg.FileName;
       %dlg.delete();
       return %filename;
    }
-   
+
    %dlg.delete();
-   return "";   
+   return "";
 }

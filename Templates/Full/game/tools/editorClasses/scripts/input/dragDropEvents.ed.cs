@@ -39,7 +39,7 @@ function onDropFile( %filePath )
 }
 function onDropEnd( %fileCount )
 {
-   
+
    //error("% DragDrop - Completed file dropping");
    Input::GetEventManager().postEvent( "EndDropFiles" );
 }

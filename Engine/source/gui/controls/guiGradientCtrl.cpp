@@ -88,7 +88,7 @@ bool GuiGradientSwatchCtrl::onWake()
 {
 	if ( !Parent::onWake() )
       return false;
-	
+
 	char* altCommand = Con::getReturnBuffer(512);
 	dSprintf( altCommand, 512, "%s(%i.color, \"%i.setColor\");", mColorFunction, getId(), getId() );
 	setField( "altCommand", altCommand );
@@ -105,11 +105,11 @@ void GuiGradientSwatchCtrl::onRender( Point2I offset, const RectI &updateRect )
    RectI renderRect( offset, getExtent() );
 
 	if ( !highlight )
-      renderRect.inset( 1, 1 );      
+      renderRect.inset( 1, 1 );
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
    drawer->clearBitmapModulation();
-	
+
    // Draw background transparency grid texture...
    if ( mGrid.isValid() )
       drawer->drawBitmapStretch( mGrid, renderRect );
@@ -128,7 +128,7 @@ void GuiGradientSwatchCtrl::onMouseDown(const GuiEvent &event)
 
    if (mProfile->mCanKeyFocus)
       setFirstResponder();
-	
+
 	//capture current bounds and mouse down position
 	mOrigBounds = getBounds();
 	mMouseDownPosition = event.mousePoint;
@@ -158,15 +158,15 @@ void GuiGradientSwatchCtrl::onMouseDragged(const GuiEvent &event)
 	GuiGradientCtrl* parent = dynamic_cast<GuiGradientCtrl*>(getParent());
 	if( !parent )
 		return;
-	
+
 	//use bounds and delta to move the ctrl
 	Point2I newPosition = mMouseDownPosition;
 	Point2I deltaMousePosition = event.mousePoint - mMouseDownPosition;
-	
+
 	newPosition.x = mOrigBounds.point.x + deltaMousePosition.x;
 
 	// default position but it needs to be standard; currently using this cops out a static y value
-	newPosition.y = mOrigBounds.point.y; 
+	newPosition.y = mOrigBounds.point.y;
 
 	if( newPosition.x + parent->mSwatchFactor >= parent->mBlendRangeBox.point.x &&
 		newPosition.x + parent->mSwatchFactor <= parent->mBlendRangeBox.extent.x )
@@ -251,7 +251,7 @@ bool GuiGradientCtrl::onAdd()
 	S32 l = getBounds().point.x + mSwatchFactor, r = getBounds().point.x + getBounds().extent.x - mSwatchFactor;
    S32 t = getBounds().point.y, b = getBounds().point.y + getBounds().extent.y - mSwatchFactor;
 	mBlendRangeBox = RectI( Point2I(l, t), Point2I(r, b) );
-	
+
 	setupDefaultRange();
 	reInitSwatches( mDisplayMode );
 	return true;
@@ -283,25 +283,25 @@ void GuiGradientCtrl::onRender(Point2I offset, const RectI& updateRect)
       mStateBlock = GFX->createStateBlock( desc );
    }
 
-   RectI boundsRect(offset, getExtent()); 
+   RectI boundsRect(offset, getExtent());
    renderColorBox(boundsRect);
 
-   if (mPositionChanged) 
+   if (mPositionChanged)
    {
       mPositionChanged = false;
 
       // Now do onAction() if we are allowed
-      if (mActionOnMove) 
-			onAction();  
+      if (mActionOnMove)
+			onAction();
    }
-   
+
    //render the children
    renderChildControls( offset, updateRect);
 }
 
 /// Function to invoke calls to draw the picker box and swatch controls
 void GuiGradientCtrl::renderColorBox(RectI &bounds)
-{   
+{
    // Draw color box differently depending on mode
 	if( mDisplayMode == pHorizColorRange )
 	{
@@ -317,19 +317,19 @@ void GuiGradientCtrl::renderColorBox(RectI &bounds)
 void GuiGradientCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, Vector<ColorRange> colorRange)
 {
    GFX->setStateBlock(mStateBlock);
-   
+
 	// Create new global dimensions
    S32 l = bounds.point.x + mSwatchFactor, r = bounds.point.x + bounds.extent.x - mSwatchFactor;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y - mSwatchFactor;
-	
+
 	// Draw border using new global dimensions
 	if (mProfile->mBorder)
       GFX->getDrawUtil()->drawRect( RectI( Point2I(l,t),Point2I(r,b) ), mProfile->mBorderColor);
-	
+
 	// Update local dimensions
 	mBlendRangeBox.point = globalToLocalCoord(Point2I(l, t));
 	mBlendRangeBox.extent = globalToLocalCoord(Point2I(r, b));
-	
+
 	if(colorRange.size() == 1) // Only one color to draw
 	{
 		PrimBuild::begin( GFXTriangleFan, 4 );
@@ -358,7 +358,7 @@ void GuiGradientCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, Vector<Col
 
 		PrimBuild::end();
 
-		for( U16 i = 0;i < colorRange.size() - 1; i++ ) 
+		for( U16 i = 0;i < colorRange.size() - 1; i++ )
 		{
 			PrimBuild::begin( GFXTriangleFan, 4 );
 			if (!vertical)  // Horizontal (+x)
@@ -367,7 +367,7 @@ void GuiGradientCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, Vector<Col
 				PrimBuild::color( colorRange[i].swatch->getColor() );
 				PrimBuild::vertex2i( l + colorRange[i].swatch->getPosition().x, t );
 				PrimBuild::vertex2i( l + colorRange[i].swatch->getPosition().x, b );
-				
+
 				// First color
 				PrimBuild::color( colorRange[i+1].swatch->getColor() );
 				PrimBuild::vertex2i( l + colorRange[i+1].swatch->getPosition().x, b );
@@ -381,7 +381,7 @@ void GuiGradientCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, Vector<Col
 		PrimBuild::color( colorRange.last().swatch->getColor() );
 		PrimBuild::vertex2i( l + colorRange.last().swatch->getPosition().x, t );
 		PrimBuild::vertex2i( l + colorRange.last().swatch->getPosition().x, b );
-		
+
 		PrimBuild::color( colorRange.last().swatch->getColor() );
 		PrimBuild::vertex2i( r, b );
 		PrimBuild::vertex2i( r, t );
@@ -394,21 +394,21 @@ void GuiGradientCtrl::onMouseDown(const GuiEvent &event)
 {
    if (!mActive)
       return;
-   
+
    mouseLock(this);
-   
+
    if (mProfile->mCanKeyFocus)
       setFirstResponder();
-	
-	if (mActive) 
+
+	if (mActive)
       onAction();
 
 	Point2I extent = getRoot()->getExtent();
    Point2I resolution = getRoot()->getExtent();
-   GFXTexHandle bb( resolution.x, 
-                    resolution.y, 
+   GFXTexHandle bb( resolution.x,
+                    resolution.y,
                     GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
-   
+
    Point2I tmpPt( event.mousePoint.x, event.mousePoint.y );
    GFXTarget *targ = GFX->getActiveRenderTarget();
    targ->resolveTo( bb );
@@ -416,18 +416,18 @@ void GuiGradientCtrl::onMouseDown(const GuiEvent &event)
    bb.copyToBmp( &bmp );
    ColorI tmp;
    bmp.getColor( event.mousePoint.x, event.mousePoint.y, tmp );
-	
+
 	addColorRange( globalToLocalCoord(event.mousePoint), ColorF(tmp) );
-   
+
    mMouseDown = true;
 }
 
 void GuiGradientCtrl::onMouseUp(const GuiEvent &)
 {
    //if we released the mouse within this control, perform the action
-	if (mActive && mMouseDown ) 
+	if (mActive && mMouseDown )
       mMouseDown = false;
-   
+
    mouseUnlock();
 }
 
@@ -446,7 +446,7 @@ void GuiGradientCtrl::setupDefaultRange()
 {
 	S32 l = mBlendRangeBox.point.x - mSwatchFactor;
 	S32 r = mBlendRangeBox.extent.x - mSwatchFactor;
-	
+
 	//setup alpha range (white/black only)
 	ColorRange crW;
 	crW.pos = l;
@@ -471,7 +471,7 @@ void GuiGradientCtrl::setupDefaultRange()
 void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 {
 	//liable to crash in the guiEditor, needs fix
-	for( S32 i = 0;i < mColorRange.size(); i++ ) 
+	for( S32 i = 0;i < mColorRange.size(); i++ )
 	{
 		if(mColorRange[i].swatch != NULL)
 		{
@@ -481,8 +481,8 @@ void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 			mColorRange[i].swatch = NULL;
 		}
 	}
-	
-	for( S32 i = 0;i < mAlphaRange.size(); i++ ) 
+
+	for( S32 i = 0;i < mAlphaRange.size(); i++ )
 	{
 		if(mAlphaRange[i].swatch != NULL)
 		{
@@ -492,12 +492,12 @@ void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 			mAlphaRange[i].swatch = NULL;
 		}
 	}
-	
+
 	S32 b = mBlendRangeBox.extent.y - mSwatchFactor;
 
    if( mDisplayMode == pHorizColorRange )
 	{
-		for( S32 i = 0;i < mColorRange.size(); i++ ) 
+		for( S32 i = 0;i < mColorRange.size(); i++ )
 		{
 			mColorRange[i].swatch = new GuiGradientSwatchCtrl();
 			mColorRange[i].swatch->registerObject();
@@ -509,7 +509,7 @@ void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 
    else if( mDisplayMode == pHorizAlphaRange )
 	{
-		for( S32 i = 0;i < mAlphaRange.size(); i++ ) 
+		for( S32 i = 0;i < mAlphaRange.size(); i++ )
 		{
 			mAlphaRange[i].swatch = new GuiGradientSwatchCtrl();
 			mAlphaRange[i].swatch->registerObject();
@@ -531,7 +531,7 @@ void GuiGradientCtrl::addColorRange( Point2I pos, ColorF color )
 	ColorRange range;
    range.pos = pos.x - mSwatchFactor;
    range.color = color;
-	
+
 	S32 b = mBlendRangeBox.extent.y - mSwatchFactor;
 
 	range.swatch = new GuiGradientSwatchCtrl();
@@ -539,7 +539,7 @@ void GuiGradientCtrl::addColorRange( Point2I pos, ColorF color )
 	addObject( range.swatch );
 	range.swatch->setPosition( pos.x - mSwatchFactor, b );//swatch factor and default location is going to have to be placed
 	range.swatch->setColor( color );
-	
+
 	if( mDisplayMode == pHorizColorRange )
 	{
 		mColorRange.push_back( range );
@@ -563,7 +563,7 @@ void GuiGradientCtrl::removeColorRange( GuiGradientSwatchCtrl* swatch )
 		if( mColorRange.size() <= 1 )
 			return;
 
-		for( S32 i = 0;i < mColorRange.size(); i++ ) 
+		for( S32 i = 0;i < mColorRange.size(); i++ )
 		{
 			if( mColorRange[i].swatch == swatch )
 			{
@@ -578,13 +578,13 @@ void GuiGradientCtrl::removeColorRange( GuiGradientSwatchCtrl* swatch )
 		if( mAlphaRange.size() <= 1 )
 			return;
 
-		for( S32 i = 0;i < mAlphaRange.size(); i++ ) 
+		for( S32 i = 0;i < mAlphaRange.size(); i++ )
 		{
 			if( mAlphaRange[i].swatch == swatch )
 			{
 				mAlphaRange.erase( U32(i) );
 				swatch->safeDeleteObject();
-				break;	
+				break;
 			}
 		}
 	}
@@ -604,7 +604,7 @@ ConsoleMethod(GuiGradientCtrl, getColorCount, S32, 2, 2, "Get color count")
 		return object->mColorRange.size();
 	else if( object->getDisplayMode() == GuiGradientCtrl::pHorizColorRange )
 		return object->mColorRange.size();
-	
+
 	return 0;
 }
 

@@ -158,7 +158,7 @@ class GuiMLTextCtrl : public GuiControl
    DECLARE_CONOBJECT(GuiMLTextCtrl);
    DECLARE_CATEGORY( "Gui Text" );
    DECLARE_DESCRIPTION( "A control that displays multiple lines of text." );
-   
+
    static void initPersistFields();
 
    void setScriptValue(const char *value);

@@ -53,7 +53,7 @@ ConsoleDocClass( GuiMeshRoadEditorCtrl,
 );
 
 GuiMeshRoadEditorCtrl::GuiMeshRoadEditorCtrl()
- : 
+ :
 	// Each of the mode names directly correlates with the Mesh Road Editor's
 	// tool palette
 	mSelectMeshRoadMode("MeshRoadEditorSelectMode"),
@@ -81,7 +81,7 @@ GuiMeshRoadEditorCtrl::GuiMeshRoadEditorCtrl()
    mHoverSplineColor( 255,0,0,255 ),
    mSelectedSplineColor( 0,255,0,255 ),
    mHoverNodeColor( 255,255,255,255 )
-{   
+{
 	mMaterialName[Top] = StringTable->insert("DefaultRoadMaterialTop");
 	mMaterialName[Bottom] = StringTable->insert("DefaultRoadMaterialOther");
 	mMaterialName[Side] = StringTable->insert("DefaultRoadMaterialOther");
@@ -100,7 +100,7 @@ void GuiMeshRoadEditorUndoAction::undo()
 
    // Temporarily save the Roads current data.
    //F32 metersPerSeg = object->mMetersPerSegment;
-   Vector<MeshRoadNode> nodes;   
+   Vector<MeshRoadNode> nodes;
    nodes.merge( object->mNodes );
 
    // Restore the River properties saved in the UndoAction
@@ -110,7 +110,7 @@ void GuiMeshRoadEditorUndoAction::undo()
    object->mNodes.clear();
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
-      object->_addNode( mNodes[i].point, mNodes[i].width, mNodes[i].depth, mNodes[i].normal );      
+      object->_addNode( mNodes[i].point, mNodes[i].width, mNodes[i].depth, mNodes[i].normal );
    }
 
    // Regenerate the Road
@@ -132,12 +132,12 @@ bool GuiMeshRoadEditorCtrl::onAdd()
    if( !Parent::onAdd() )
       return false;
 
-   mRoadSet = MeshRoad::getServerSet();   
+   mRoadSet = MeshRoad::getServerSet();
 
    GFXStateBlockDesc desc;
-   desc.fillMode = GFXFillSolid;      
+   desc.fillMode = GFXFillSolid;
    desc.blendDefined = true;
-   desc.blendEnable = false;      
+   desc.blendEnable = false;
    desc.zDefined = true;
    desc.zEnable = false;
    desc.cullDefined = true;
@@ -178,19 +178,19 @@ void GuiMeshRoadEditorCtrl::onSleep()
 {
    Parent::onSleep();
 
-   mMode = mSelectMeshRoadMode;  
+   mMode = mSelectMeshRoadMode;
    mHoverNode = -1;
    mHoverRoad = NULL;
-   setSelectedNode(-1);   
+   setSelectedNode(-1);
 }
 
-void GuiMeshRoadEditorCtrl::get3DCursor( GuiCursor *&cursor, 
-                                       bool &visible, 
+void GuiMeshRoadEditorCtrl::get3DCursor( GuiCursor *&cursor,
+                                       bool &visible,
                                        const Gui3DMouseEvent &event_ )
 {
    //cursor = mAddNodeCursor;
    //visible = false;
-   
+
    cursor = NULL;
    visible = false;
 
@@ -205,15 +205,15 @@ void GuiMeshRoadEditorCtrl::get3DCursor( GuiCursor *&cursor,
 
    PlatformWindow *window = root->getPlatformWindow();
    PlatformCursorController *controller = window->getCursorController();
-   
-   // We've already changed the cursor, 
+
+   // We've already changed the cursor,
    // so set it back before we change it again.
    if( root->mCursorChanged != -1)
       controller->popCursor();
 
    // Now change the cursor shape
    controller->pushCursor(currCursor);
-   root->mCursorChanged = currCursor;   
+   root->mCursorChanged = currCursor;
 }
 
 void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
@@ -224,11 +224,11 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 
    if ( !isFirstResponder() )
       setFirstResponder();
-	
+
 	// Get the raycast collision position
    Point3F tPos;
    if ( !getStaticPos( event, tPos ) )
-		return;  
+		return;
 
    mouseLock();
 
@@ -237,7 +237,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
    // If that segment hits the terrain, truncate the ray to only be that length.
 
    // We will use a LineSegment/Sphere intersection test to determine if a MeshRoadNode
-   // was clicked.   
+   // was clicked.
 
    MeshRoad *pRoad = NULL;
    MeshRoad *pClickedRoad = NULL;
@@ -246,7 +246,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 
    Point3F startPnt = event.pos;
    Point3F endPnt = event.pos + event.vec * 2000.0f;
-   RayInfo ri;   
+   RayInfo ri;
 
    if ( gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri) )
       endPnt = ri.point;
@@ -313,7 +313,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
          // Do not select or edit a MeshRoad within a Prefab.
          if ( Prefab::getPrefabByChild(pRoad) )
             continue;
-         
+
          clickedNodeIdx = _getNodeAtScreenPos( pRoad, event.mousePoint );
 
          if ( clickedNodeIdx != -1 )
@@ -324,11 +324,11 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
          }
       }
    }
-	
+
 	// shortcuts
 	bool dblClick = ( event.mouseClickCount > 1 );
    if( dblClick )
-   { 
+   {
 		if( mMode == mSelectMeshRoadMode )
 		{
 			setMode( mAddMeshRoadMode, true );
@@ -342,7 +342,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 			return;
 		}
 	}
-	
+
 	//this check is here in order to bounce back from deleting a whole road with ctrl+z
 	//this check places the editor back into addrivermode
 	if ( mMode == mAddNodeMode )
@@ -358,7 +358,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
       {
          setSelectedRoad( NULL );
          setSelectedNode( -1 );
-         
+
          return;
       }
 
@@ -382,14 +382,14 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
    {
 		if ( nodeClicked )
       {
-			// A double-click on a node in Normal mode means set AddNode mode.  
+			// A double-click on a node in Normal mode means set AddNode mode.
          if ( clickedNodeIdx == 0 )
          {
 				setSelectedRoad( pClickedRoad  );
 				setSelectedNode( clickedNodeIdx );
 
 				mAddNodeIdx = clickedNodeIdx;
-            mMode = mAddNodeMode; 
+            mMode = mAddNodeMode;
 
             mSelNode = mSelRoad->insertNode( tPos, mDefaultWidth, mDefaultDepth, mDefaultNormal, mAddNodeIdx );
             mIsDirty = true;
@@ -409,20 +409,20 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 				setSelectedNode( mSelNode );
 
 				return;
-         } 
+         }
 		}
 
-		MeshRoad *newRoad = new MeshRoad;  
-		
+		MeshRoad *newRoad = new MeshRoad;
+
 		newRoad->mMaterialName[Top] = mMaterialName[Top];
 		newRoad->mMaterialName[Bottom] = mMaterialName[Bottom];
 		newRoad->mMaterialName[Side] = mMaterialName[Side];
-			
+
       newRoad->registerObject();
 
-      // Add to MissionGroup                              
+      // Add to MissionGroup
       SimGroup *missionGroup;
-      if ( !Sim::findObject( "MissionGroup", missionGroup ) )               
+      if ( !Sim::findObject( "MissionGroup", missionGroup ) )
          Con::errorf( "GuiMeshRoadEditorCtrl - could not find MissionGroup to add new MeshRoad" );
       else
          missionGroup->addObject( newRoad );
@@ -436,7 +436,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
       // Always add to the end of the road, the first node is the start.
       mAddNodeIdx = U32_MAX;
 
-      setSelectedRoad( newRoad );      
+      setSelectedRoad( newRoad );
       setSelectedNode( newNode );
 
       mMode = mAddNodeMode;
@@ -450,14 +450,14 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
       if ( !Sim::findObject( "EUndoManager", undoMan ) )
       {
          Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
-         return;           
+         return;
       }
 
       // Create the UndoAction.
       MECreateUndoAction *action = new MECreateUndoAction("Create MeshRoad");
       action->addObject( newRoad );
-      
-      // Submit it.               
+
+      // Submit it.
       undoMan->addAction( action );
 
 		return;
@@ -468,7 +468,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
       // Back to NormalMode.
       if ( mSelRoad )
       {
-			// A double-click on a node in Normal mode means set AddNode mode.  
+			// A double-click on a node in Normal mode means set AddNode mode.
          if ( clickedNodeIdx == 0 )
          {
 				submitUndo( "Add Node" );
@@ -564,7 +564,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 			setSelectedNode( clickedNodeIdx );
          return;
       }
-	}   
+	}
 }
 
 void GuiMeshRoadEditorCtrl::on3DRightMouseDown(const Gui3DMouseEvent & event)
@@ -593,7 +593,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
       Point3F pos;
 
 		mSelRoad->disableCollision();
-      if ( getStaticPos( event, pos ) )         
+      if ( getStaticPos( event, pos ) )
       {
          pos.z += mSelRoad->getNodeDepth( mSelNode ) * 0.5f;
          mSelRoad->setNodePosition( mSelNode, pos );
@@ -603,7 +603,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
 
       return;
    }
-   
+
    if ( mSelRoad != NULL && mSelNode != -1 )
    {
       mGizmo->on3DMouseMove( event );
@@ -619,14 +619,14 @@ void GuiMeshRoadEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
       Point3F startPnt = event.pos;
       Point3F endPnt = event.pos + event.vec * 1000.0f;
 
-      RayInfo ri;   
+      RayInfo ri;
 
       if ( gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri) )
-      {         
+      {
          MeshRoad *pRoad = NULL;
-         pRoad = dynamic_cast<MeshRoad*>(ri.object);         
+         pRoad = dynamic_cast<MeshRoad*>(ri.object);
 
-         // Do not select or edit a MeshRoad within a Prefab.         
+         // Do not select or edit a MeshRoad within a Prefab.
          if ( pRoad && !Prefab::getPrefabByChild(pRoad) )
             mHoverRoad = pRoad;
       }
@@ -655,7 +655,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseMove(const Gui3DMouseEvent & event)
 }
 
 void GuiMeshRoadEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
-{   
+{
    // Drags are only used to transform nodes
    if ( !mSelRoad || mSelNode == -1 ||
       ( mMode != mMovePointMode && mMode != mScalePointMode && mMode != mRotatePointMode ) )
@@ -675,11 +675,11 @@ void GuiMeshRoadEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    if ( event.modifier & SI_SHIFT && !mHasCopied && mSelRoad->isEndNode( mSelNode ) )
    {
       const MeshRoadNode &data = mSelRoad->getNode( mSelNode );
-      
-      U32 insertIdx = ( mSelNode == 0 ) ? 0 : U32_MAX;      
+
+      U32 insertIdx = ( mSelNode == 0 ) ? 0 : U32_MAX;
       U32 newNodeIdx = mSelRoad->insertNode( data.point, data.width, data.depth, data.normal, insertIdx );
       mIsDirty = true;
-         
+
       mSelNode = -1;
       setSelectedNode( newNodeIdx );
 
@@ -691,7 +691,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    if ( mGizmo->isDirty() )
    {
       Point3F pos = mGizmo->getPosition();
-      Point3F scale = mGizmo->getScale();      
+      Point3F scale = mGizmo->getScale();
       const MatrixF &mat = mGizmo->getTransform();
       VectorF normal;
       mat.getColumn( 2, &normal );
@@ -731,10 +731,10 @@ void GuiMeshRoadEditorCtrl::updateGuiInfo()
 {
    // nothing to do
 }
-      
+
 void GuiMeshRoadEditorCtrl::renderScene(const RectI & updateRect)
 {
-   //GFXDrawUtil *drawer = GFX->getDrawUtil();            
+   //GFXDrawUtil *drawer = GFX->getDrawUtil();
 
    GFX->setStateBlock( mZDisableSB );
 
@@ -758,7 +758,7 @@ void GuiMeshRoadEditorCtrl::renderScene(const RectI & updateRect)
 
    if ( mSelRoad )
    {
-      _drawSpline( mSelRoad, mSelectedSplineColor );            
+      _drawSpline( mSelRoad, mSelectedSplineColor );
 
       // Render Gizmo for selected node if were in either of the three transform modes
       if ( mSelNode != -1 && ( mMode == mMovePointMode || mMode == mScalePointMode || mMode == mRotatePointMode ) )
@@ -778,30 +778,30 @@ void GuiMeshRoadEditorCtrl::renderScene(const RectI & updateRect)
 
          const MeshRoadNode &node = mSelRoad->mNodes[mSelNode];
 
-         MatrixF objMat = mSelRoad->getNodeTransform(mSelNode);      
+         MatrixF objMat = mSelRoad->getNodeTransform(mSelNode);
          Point3F objScale( node.width, 1.0f, node.depth );
          Point3F worldPos = node.point;
 
          mGizmo->set( objMat, worldPos, objScale );
 
          mGizmo->renderGizmo( mLastCameraQuery.cameraMatrix, mLastCameraQuery.fov );
-			
+
 			// Render Gizmo text
-			mGizmo->renderText( mSaveViewport, mSaveModelview, mSaveProjection );     
-      }    
+			mGizmo->renderText( mSaveViewport, mSaveModelview, mSaveProjection );
+      }
    }
 
    DebugDrawer::get()->render();
 
    // Now draw all the 2d stuff!
-   GFX->setClipRect(updateRect); 
-   
+   GFX->setClipRect(updateRect);
+
    // Draw Control nodes for selecting and highlighted rivers
    if ( mHoverRoad )
       _drawControlNodes( mHoverRoad, mHoverSplineColor );
    if ( mSelRoad )
       _drawControlNodes( mSelRoad, mSelectedSplineColor );
-} 
+}
 
 S32 GuiMeshRoadEditorCtrl::_getNodeAtScreenPos( const MeshRoad *pRoad, const Point2I &posi )
 {
@@ -821,10 +821,10 @@ S32 GuiMeshRoadEditorCtrl::_getNodeAtScreenPos( const MeshRoad *pRoad, const Poi
 
       if ( nodeScreenRect.pointInRect(posi) )
       {
-         // we found a hit!         
-         return i;         
-      }           
-   }      
+         // we found a hit!
+         return i;
+      }
+   }
 
    return -1;
 }
@@ -838,44 +838,44 @@ void GuiMeshRoadEditorCtrl::_drawSpline( MeshRoad *river, const ColorI &color )
 	{
 		// Render the River center-line
 		PrimBuild::color( color );
-		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );            
+		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
-			PrimBuild::vertex3fv( river->mSlices[i].p1 );		      
+		{
+			PrimBuild::vertex3fv( river->mSlices[i].p1 );
 		}
 		PrimBuild::end();
 	}
-	
+
 	if ( MeshRoad::smWireframe )
 	{
 		// Left-side line
 		PrimBuild::color3i( 100, 100, 100 );
-		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );            
+		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
-			PrimBuild::vertex3fv( river->mSlices[i].p0 );		      
+		{
+			PrimBuild::vertex3fv( river->mSlices[i].p0 );
 		}
 		PrimBuild::end();
 
 		// Right-side line
-		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );            
+		PrimBuild::begin( GFXLineStrip, river->mSlices.size() );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
-			PrimBuild::vertex3fv( river->mSlices[i].p2 );		      
+		{
+			PrimBuild::vertex3fv( river->mSlices[i].p2 );
 		}
 		PrimBuild::end();
 
 		// Cross-sections
-		PrimBuild::begin( GFXLineList, river->mSlices.size() * 2 );            
+		PrimBuild::begin( GFXLineList, river->mSlices.size() * 2 );
 		for ( U32 i = 0; i < river->mSlices.size(); i++ )
-		{            		      
+		{
 			PrimBuild::vertex3fv( river->mSlices[i].p0 );
-			PrimBuild::vertex3fv( river->mSlices[i].p2 );		      
+			PrimBuild::vertex3fv( river->mSlices[i].p2 );
 		}
 		PrimBuild::end();
 	}
 
-   // Segment 
+   // Segment
 }
 
 void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &color )
@@ -889,7 +889,7 @@ void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &co
 
    bool isSelected = ( river == mSelRoad );
    bool isHighlighted = ( river == mHoverRoad );
-   
+
    for ( U32 i = 0; i < river->mNodes.size(); i++ )
    {
       if ( false && isSelected && mSelNode == i  )
@@ -898,7 +898,7 @@ void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &co
       const Point3F &wpos = river->mNodes[i].point;
 
       Point3F spos;
-      project( wpos, &spos );                  
+      project( wpos, &spos );
 
       if ( spos.z > 1.0f )
          continue;
@@ -912,7 +912,7 @@ void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &co
 
       ColorI theColor = color;
       Point2I nodeHalfSize = mNodeHalfSize;
-            
+
       if ( isHighlighted && mHoverNode == i )
       {
          //theColor = mHoverNodeColor;
@@ -920,7 +920,7 @@ void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &co
       }
 
       if ( isSelected )
-      {   
+      {
          if ( mSelNode == i )
          {
             theColor.set(0,0,255);
@@ -932,7 +932,7 @@ void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &co
          else if ( i == river->mNodes.size() - 1 )
          {
             theColor.set(255,0,0);
-         }         
+         }
       }
 
       drawer->drawRectFill( posi - nodeHalfSize, posi + nodeHalfSize, theColor );
@@ -940,30 +940,30 @@ void GuiMeshRoadEditorCtrl::_drawControlNodes( MeshRoad *river, const ColorI &co
 }
 
 bool GuiMeshRoadEditorCtrl::getStaticPos( const Gui3DMouseEvent & event, Point3F &tpos )
-{     
+{
    // Find clicked point on the terrain
 
    Point3F startPnt = event.pos;
    Point3F endPnt = event.pos + event.vec * 1000.0f;
 
    RayInfo ri;
-   bool hit;         
-         
-   hit = gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri);    
+   bool hit;
+
+   hit = gServerContainer.castRay(startPnt, endPnt, StaticShapeObjectType, &ri);
    tpos = ri.point;
-   
+
    return hit;
 }
 
 void GuiMeshRoadEditorCtrl::deleteSelectedNode()
-{    
+{
    if ( !mSelRoad || mSelNode == -1 )
       return;
 
    // If the Road has only two nodes remaining,
    // delete the whole Road.
    if ( mSelRoad->mNodes.size() <= 2 )
-   {      
+   {
       deleteSelectedRoad( mMode != mAddNodeMode );
    }
    else
@@ -988,7 +988,7 @@ void GuiMeshRoadEditorCtrl::deleteSelectedNode()
       }
    }
 
-   // If you were in addNodeMode, 
+   // If you were in addNodeMode,
    // deleting a node should ends it.
    //mMode = smNormalMode;
 }
@@ -1013,7 +1013,7 @@ void GuiMeshRoadEditorCtrl::deleteSelectedRoad( bool undoAble )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       // Couldn't find it? Well just delete the Road.
-      Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );    
+      Con::errorf( "GuiMeshRoadEditorCtrl::on3DMouseDown() - EUndoManager not found!" );
       return;
    }
    else
@@ -1023,14 +1023,14 @@ void GuiMeshRoadEditorCtrl::deleteSelectedRoad( bool undoAble )
       action->deleteObject( mSelRoad );
       mIsDirty = true;
 
-      // Submit it.               
+      // Submit it.
       undoMan->addAction( action );
    }
 
    // ScriptCallback with 'NULL' parameter for no Road currently selected.
    Con::executef( this, "onRoadSelected" );
 
-   // Clear the SelectedNode (it has been deleted along with the River).  
+   // Clear the SelectedNode (it has been deleted along with the River).
 	setSelectedNode( -1 );
    mSelNode = -1;
 }
@@ -1070,7 +1070,7 @@ F32 GuiMeshRoadEditorCtrl::getNodeWidth()
    if ( mSelRoad && mSelNode != -1 )
       return mSelRoad->getNodeWidth( mSelNode );
 
-   return 0.0f;   
+   return 0.0f;
 }
 
 void GuiMeshRoadEditorCtrl::setNodeDepth(F32 depth)
@@ -1104,7 +1104,7 @@ Point3F GuiMeshRoadEditorCtrl::getNodePosition()
    if ( mSelRoad && mSelNode != -1 )
       return mSelRoad->getNodePosition( mSelNode );
 
-   return Point3F( 0, 0, 0 );   
+   return Point3F( 0, 0, 0 );
 }
 
 void GuiMeshRoadEditorCtrl::setNodeNormal( const VectorF &normal )
@@ -1134,13 +1134,13 @@ void GuiMeshRoadEditorCtrl::setSelectedNode( S32 node )
    {
       const MeshRoadNode &node = mSelRoad->mNodes[mSelNode];
 
-      MatrixF objMat = mSelRoad->getNodeTransform(mSelNode);      
+      MatrixF objMat = mSelRoad->getNodeTransform(mSelNode);
       Point3F objScale( node.width, 1.0f, node.depth );
       Point3F worldPos = node.point;
-      
+
       mGizmo->set( objMat, worldPos, objScale );
    }
-   
+
    if ( mSelNode != -1 )
       Con::executef( this, "onNodeSelected", Con::getIntArg(mSelNode) );
    else
@@ -1154,7 +1154,7 @@ void GuiMeshRoadEditorCtrl::submitUndo( const UTF8 *name )
    if ( !Sim::findObject( "EUndoManager", undoMan ) )
    {
       Con::errorf( "GuiMeshRoadEditorCtrl::submitUndo() - EUndoManager not found!" );
-      return;           
+      return;
    }
 
    // Setup the action.
@@ -1166,9 +1166,9 @@ void GuiMeshRoadEditorCtrl::submitUndo( const UTF8 *name )
 
    for( U32 i = 0; i < mSelRoad->mNodes.size(); i++ )
    {
-      action->mNodes.push_back( mSelRoad->mNodes[i] );      
+      action->mNodes.push_back( mSelRoad->mNodes[i] );
    }
-      
+
    undoMan->addAction( action );
 }
 
@@ -1178,7 +1178,7 @@ void GuiMeshRoadEditorCtrl::matchTerrainToRoad()
       return;
 
    // Not implemented, but a potentially useful idea.
-   // Move manipulate the terrain so that the MeshRoad appears to be sitting 
+   // Move manipulate the terrain so that the MeshRoad appears to be sitting
    // on top of it.
 
    // The opposite could also be useful, manipulate the MeshRoad to line up
@@ -1235,9 +1235,9 @@ ConsoleMethod( GuiMeshRoadEditorCtrl, setNodePosition, void, 3, 3, "" )
 {
 	Point3F pos;
 
-	S32 count = dSscanf( argv[2], "%f %f %f", 
+	S32 count = dSscanf( argv[2], "%f %f %f",
 		&pos.x, &pos.y, &pos.z);
-	
+
 	if ( (count != 3) )
    {
 		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
@@ -1261,9 +1261,9 @@ ConsoleMethod( GuiMeshRoadEditorCtrl, setNodeNormal, void, 3, 3, "" )
 {
    VectorF normal;
 
-	S32 count = dSscanf( argv[2], "%f %f %f", 
+	S32 count = dSscanf( argv[2], "%f %f %f",
 		&normal.x, &normal.y, &normal.z);
-	
+
 	if ( (count != 3) )
    {
 		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);

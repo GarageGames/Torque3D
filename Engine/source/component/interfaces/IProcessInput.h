@@ -26,9 +26,9 @@
 #include "platform/input/event.h"
 
 
-// CodeReview : Input can come from a number of places to end up in 
-// torque, but in the torque world we don't want to expose this 
-// information to the user.  This interface bridges the gap between 
+// CodeReview : Input can come from a number of places to end up in
+// torque, but in the torque world we don't want to expose this
+// information to the user.  This interface bridges the gap between
 // other input devices working details and input as torque understands it.
 // Thoughts?  [7/6/2007 justind]
 class IProcessInput

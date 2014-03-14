@@ -61,7 +61,7 @@ LightBase::LightBase()
       mBrightness( 1.0f ),
       mCastShadows( false ),
       mPriority( 1.0f ),
-      mAnimationData( NULL ),      
+      mAnimationData( NULL ),
       mFlareData( NULL ),
       mFlareScale( 1.0f )
 {
@@ -85,10 +85,10 @@ void LightBase::initPersistFields()
    // are injected at runtime by the lighting system itself.
 
    addGroup( "Light" );
-      
+
       addField( "isEnabled", TypeBool, Offset( mIsEnabled, LightBase ), "Enables/Disables the object rendering and functionality in the scene." );
       addField( "color", TypeColorF, Offset( mColor, LightBase ), "Changes the base color hue of the light." );
-      addField( "brightness", TypeF32, Offset( mBrightness, LightBase ), "Adjusts the lights power, 0 being off completely." );      
+      addField( "brightness", TypeF32, Offset( mBrightness, LightBase ), "Adjusts the lights power, 0 being off completely." );
       addField( "castShadows", TypeBool, Offset( mCastShadows, LightBase ), "Enables/disabled shadow casts by this light." );
       addField( "priority", TypeF32, Offset( mPriority, LightBase ), "Used for sorting of lights by the light manager. "
 		  "Priority determines if a light has a stronger effect than, those with a lower value" );
@@ -100,7 +100,7 @@ void LightBase::initPersistFields()
       addField( "animate", TypeBool, Offset( mAnimState.active, LightBase ), "Toggles animation for the light on and off" );
       addField( "animationType", TYPEID< LightAnimData >(), Offset( mAnimationData, LightBase ), "Datablock containing light animation information (LightAnimData)" );
       addFieldV( "animationPeriod", TypeF32, Offset( mAnimState.animationPeriod, LightBase ), &CommonValidators::PositiveNonZeroFloat, "The length of time in seconds for a single playback of the light animation (must be > 0)" );
-      addField( "animationPhase", TypeF32, Offset( mAnimState.animationPhase, LightBase ), "The phase used to offset the animation start time to vary the animation of nearby lights." );      
+      addField( "animationPhase", TypeF32, Offset( mAnimState.animationPhase, LightBase ), "The phase used to offset the animation start time to vary the animation of nearby lights." );
 
    endGroup( "Light Animation" );
 
@@ -151,7 +151,7 @@ void LightBase::submitLights( LightManager *lm, bool staticLighting )
    if ( !mIsEnabled || staticLighting )
       return;
 
-   if (  mAnimState.active && 
+   if (  mAnimState.active &&
          mAnimState.animationPeriod > 0.0f &&
          mAnimationData )
    {
@@ -167,8 +167,8 @@ void LightBase::submitLights( LightManager *lm, bool staticLighting )
 
 void LightBase::inspectPostApply()
 {
-   // We do not call the parent here as it 
-   // will call setScale() and screw up the 
+   // We do not call the parent here as it
+   // will call setScale() and screw up the
    // real sizing fields on the light.
 
    // Ok fine... then we must set MountedMask ourself.
@@ -211,13 +211,13 @@ void LightBase::prepRenderImage( SceneRenderState *state )
    }
 }
 
-void LightBase::_onRenderViz( ObjectRenderInst *ri, 
-                              SceneRenderState *state, 
+void LightBase::_onRenderViz( ObjectRenderInst *ri,
+                              SceneRenderState *state,
                               BaseMatInstance *overrideMat )
 {
    if ( overrideMat )
       return;
-   
+
    _renderViz( state );
 }
 
@@ -278,9 +278,9 @@ U32 LightBase::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
 
       stream->writeFlag( mCastShadows );
 
-      stream->write( mPriority );      
+      stream->write( mPriority );
 
-      mLight->packExtended( stream ); 
+      mLight->packExtended( stream );
 
       stream->writeFlag( mAnimState.active );
       stream->write( mAnimState.animationPeriod );
@@ -293,14 +293,14 @@ U32 LightBase::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
       if ( stream->writeFlag( mAnimationData ) )
       {
          stream->writeRangedU32( mAnimationData->getId(),
-                                 DataBlockObjectIdFirst, 
+                                 DataBlockObjectIdFirst,
                                  DataBlockObjectIdLast );
       }
 
       if ( stream->writeFlag( mFlareData ) )
       {
          stream->writeRangedU32( mFlareData->getId(),
-                                 DataBlockObjectIdFirst, 
+                                 DataBlockObjectIdFirst,
                                  DataBlockObjectIdLast );
       }
    }
@@ -318,13 +318,13 @@ void LightBase::unpackUpdate( NetConnection *conn, BitStream *stream )
       stream->readAffineTransform( &mObjToWorld );
 
    if ( stream->readFlag() ) // UpdateMask
-   {   
+   {
       stream->read( &mColor );
-      stream->read( &mBrightness );      
+      stream->read( &mBrightness );
       mCastShadows = stream->readFlag();
 
-      stream->read( &mPriority );      
-      
+      stream->read( &mPriority );
+
       mLight->unpackExtended( stream );
 
       mAnimState.active = stream->readFlag();
@@ -337,9 +337,9 @@ void LightBase::unpackUpdate( NetConnection *conn, BitStream *stream )
    {
       if ( stream->readFlag() )
       {
-         SimObjectId id = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );  
+         SimObjectId id = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
          LightAnimData *datablock = NULL;
-         
+
          if ( Sim::findObject( id, datablock ) )
             mAnimationData = datablock;
          else
@@ -353,7 +353,7 @@ void LightBase::unpackUpdate( NetConnection *conn, BitStream *stream )
 
       if ( stream->readFlag() )
       {
-         SimObjectId id = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );  
+         SimObjectId id = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
          LightFlareData *datablock = NULL;
 
          if ( Sim::findObject( id, datablock ) )
@@ -367,7 +367,7 @@ void LightBase::unpackUpdate( NetConnection *conn, BitStream *stream )
       else
          mFlareData = NULL;
    }
-   
+
    if ( isProperlyAdded() )
       _conformLights();
 }
@@ -383,7 +383,7 @@ void LightBase::setLightEnabled( bool enabled )
 
 DefineEngineMethod( LightBase, setLightEnabled, void, ( bool state ),,
    "@brief Toggles the light on and off\n\n"
-   
+
    "@param state Turns the light on (true) or off (false)\n"
 
    "@tsexample\n"
@@ -391,7 +391,7 @@ DefineEngineMethod( LightBase, setLightEnabled, void, ( bool state ),,
    "CrystalLight.setLightEnabled(false);\n\n"
    "// Renable the light\n"
    "CrystalLight.setLightEnabled(true);\n"
-   
+
    "@endtsexample\n\n"
 )
 {
@@ -406,7 +406,7 @@ DefineEngineMethod( LightBase, setLightEnabled, void, ( bool state ),,
 
 static ConsoleDocFragment _lbplayAnimation1(
 	"@brief Plays the light animation assigned to this light with the existing LightAnimData datablock.\n\n"
-   
+
    "@tsexample\n"
    "// Play the animation assigned to this light\n"
    "CrystalLight.playAnimation();\n"

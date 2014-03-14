@@ -81,7 +81,7 @@ bool ScenePolyhedralObject< Base, P >::onAdd()
       // Compute object-space bounds from polyhedron.
       this->mObjBox = mPolyhedron.getBounds();
    }
-   
+
    if( !Parent::onAdd() )
       return false;
 
@@ -274,7 +274,7 @@ void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop 
    stream.write( 2, "\r\n" );
 
    // Write all planes.
-   
+
    const U32 numPlanes = mPolyhedron.getNumPlanes();
    for( U32 i = 0; i < numPlanes; ++ i )
    {

@@ -686,7 +686,7 @@ ConsoleGetType( TypeName )
 }
 
 ConsoleSetType( TypeName )
-{   
+{
    Con::warnf( "ConsoleSetType( TypeName ) should not be called. A ProtectedSetMethod does this work!" );
 }
 
@@ -852,7 +852,7 @@ ConsoleGetType( TypePID )
    SimPersistID* pid = *( ( SimPersistID** ) dptr );
    if( !pid )
       return "";
-      
+
    return Con::getReturnBuffer( pid->getUUID().toString() );
 }
 
@@ -861,7 +861,7 @@ ConsoleSetType( TypePID )
    if( argc == 1 )
    {
       SimPersistID** pid = ( SimPersistID** ) dptr;
-      
+
       if( !argv[ 0 ][ 0 ] )
          *pid = NULL;
       else
@@ -890,7 +890,7 @@ ConsoleGetType( TypeSimPersistId )
    SimPersistID* pid = *( ( SimPersistID** ) dptr );
    if( !pid )
       return "";
-      
+
    return Con::getReturnBuffer( pid->getUUID().toString() );
 }
 
@@ -899,7 +899,7 @@ ConsoleSetType( TypeSimPersistId )
    if( argc == 1 )
    {
       SimPersistID** pid = ( SimPersistID** ) dptr;
-      
+
       if( !argv[ 0 ][ 0 ] )
          *pid = NULL;
       else

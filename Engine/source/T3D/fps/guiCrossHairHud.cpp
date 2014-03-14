@@ -75,7 +75,7 @@ ConsoleDocClass( GuiCrossHairHud,
    "Uses the base bitmap control to render a bitmap, and decides whether to draw or not depending "
    "on the current control object and it's state. If there is ShapeBase object under the cross hair "
    "and it's named, then a small health bar is displayed.\n\n"
-     
+
    "@tsexample\n"
 		"\n new GuiCrossHairHud()"
 		"{\n"
@@ -85,7 +85,7 @@ ConsoleDocClass( GuiCrossHairHud,
 		"	damageOffset = \"0 -10\";\n"
 		"};\n"
    "@endtsexample\n"
-   
+
    "@ingroup GuiGame\n"
 );
 
@@ -99,7 +99,7 @@ GuiCrossHairHud::GuiCrossHairHud()
 
 void GuiCrossHairHud::initPersistFields()
 {
-   addGroup("Damage");		
+   addGroup("Damage");
    addField( "damageFillColor", TypeColorF, Offset( mDamageFillColor, GuiCrossHairHud ), "As the health bar depletes, this color will represent the health loss amount." );
    addField( "damageFrameColor", TypeColorF, Offset( mDamageFrameColor, GuiCrossHairHud ), "Color for the health bar's frame." );
    addField( "damageRect", TypePoint2I, Offset( mDamageRectSize, GuiCrossHairHud ), "Size for the health bar portion of the control." );

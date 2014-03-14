@@ -61,7 +61,7 @@ const Point4F Point4F::Zero(0.0f, 0.0f, 0.0f, 0.0f);
 
 
 Point3F mPerp( const Point3F &inVec )
-{   
+{
    AssertFatal( inVec.len() > 0.0f, "mPerp() - zero length vector has no perp!" );
    AssertFatal( inVec.isUnitLength(), "mPerp() - passed vector must be normalized!" );
 
@@ -75,6 +75,6 @@ Point3F mPerp( const Point3F &inVec )
 
    //AssertFatal( mIsZero( mDot( inVec, outVec ) ), "mPerp, failed to generate perpendicular" );
 
-   return outVec;   
+   return outVec;
 }
 

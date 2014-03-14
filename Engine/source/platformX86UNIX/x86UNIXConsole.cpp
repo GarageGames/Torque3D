@@ -87,18 +87,18 @@ void StdConsole::enable(bool enabled)
 
       // install signal handler for sigcont
       signal(SIGCONT, &signalHandler);
-      
+
       // save the terminal state
       if (originalTermState == NULL)
          originalTermState = new termios;
 
       tcgetattr(stdIn, originalTermState);
-      
+
       // put the terminal into our preferred mode
       resetTerminal();
-      
+
       printf("%s", Con::getVariable("Con::Prompt"));
-     
+
    }
    else if (!enabled && stdConsoleEnabled)
    {
@@ -142,7 +142,7 @@ StdConsole::StdConsole()
    lineOutput = false;
    inBackground = false;
    originalTermState = NULL;
-   
+
    Process::notify(this, &StdConsole::process, PROCESS_LAST_ORDER);
 }
 
@@ -211,7 +211,7 @@ void StdConsole::process()
          if (inBackground)
             resetTerminal();
          inBackground = false;
-      }   
+      }
 
       // see if stdIn has any input waiting
       // mojo for select call
@@ -229,8 +229,8 @@ void StdConsole::process()
          // no data available
          return;
 
-      numEvents = read(stdIn, typedData, 64);     
-      if (numEvents == -1) 
+      numEvents = read(stdIn, typedData, 64);
+      if (numEvents == -1)
          return;
 
       typedData[numEvents] = '\0';
@@ -297,10 +297,10 @@ void StdConsole::process()
                      RawData rd;
                      rd.size = inpos + 1;
                      rd.data = (S8*) inbuf;
-                     
+
                      Con::smConsoleInput.trigger(rd);
                   }
-                  
+
                   // If we've gone off the end of our array, wrap
                   // back to the beginning
                   if (iCmdIndex >= MAX_CMDS)

@@ -46,7 +46,7 @@ public:
    ForestBrushElement();
 
    DECLARE_CONOBJECT( ForestBrushElement );
-   
+
    static void initPersistFields();
 
 public:
@@ -54,13 +54,13 @@ public:
    /// The type of ForestItem this element holds placement parameters for.
    ForestItemData *mData;
 
-   /// The probability that this element will be 
+   /// The probability that this element will be
    /// created during an editor brush stroke.
    F32 mProbability;
 
    /// The max rotation in degrees that items will be placed.
    F32  mRotationRange;
-   
+
    /// The minimum random size for each item.
    F32 mScaleMin;
 
@@ -78,7 +78,7 @@ public:
    F32 mSinkMax;
 
    /// This is the radius used to calculate how much to
-   /// sink the trunk at its base and is used to sink 
+   /// sink the trunk at its base and is used to sink
    /// the tree into the ground when its on a slope.
    F32 mSinkRadius;
 
@@ -86,7 +86,7 @@ public:
    F32 mSlopeMin;
 
    /// The max surface slope in degrees this item will be placed on.
-   F32 mSlopeMax;   
+   F32 mSlopeMax;
 
    /// The min world space elevation this item will be placed.
    F32 mElevationMin;
@@ -115,7 +115,7 @@ public:
 
    static SimGroup* getGroup();
 
-   bool containsItemData( const ForestItemData *inData );	
+   bool containsItemData( const ForestItemData *inData );
 protected:
 
    static SimObjectPtr<SimGroup> smGroup;

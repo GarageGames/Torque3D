@@ -38,13 +38,13 @@ ConsoleDocClass( GuiGraphCtrl,
 
    "Up to 6 individual curves can be plotted in the graph.  Each plotted curve can have its own display style including its "
    "own charting style (#plotType) and color (#plotColor).\n\n"
-   
+
    "The data points on each curve can be added in one of two ways:\n\n"
-   
+
    "- Manually by calling addDatum().  This causes new data points to be added to the left end of the plotting curve.\n"
    "- Automatically by letting the graph plot the values of a variable over time.  This is achieved by calling addAutoPlot "
       "and specifying the variable and update frequency.\n\n"
-      
+
    "@tsexample\n"
       "// Create a graph that plots a red polyline graph of the FPS counter in a 1 second (1000 milliseconds) interval.\n"
       "new GuiGraphCtrl( FPSGraph )\n"
@@ -55,10 +55,10 @@ ConsoleDocClass( GuiGraphCtrl,
       "   plotInterval[ 0 ] = 1000;\n"
       "};\n"
    "@endtsexample\n\n"
-      
+
    "@note Each curve has a maximum number of 200 data points it can have at any one time.  Adding more data points to a curve "
       "will cause older data points to be removed.\n\n"
-   
+
    "@ingroup GuiValues"
 );
 
@@ -80,7 +80,7 @@ GuiGraphCtrl::GuiGraphCtrl()
    dMemset( mAutoPlot, 0, sizeof( mAutoPlot ) );
    dMemset( mAutoPlotDelay, 0, sizeof( mAutoPlotDelay ) );
    dMemset( mGraphMax, 0, sizeof( mGraphMax ) );
-   
+
    for( S32 i = 0; i < MaxPlots; ++ i )
    {
 	   mGraphType[ i ] = Polyline;
@@ -103,33 +103,33 @@ GuiGraphCtrl::GuiGraphCtrl()
 void GuiGraphCtrl::initPersistFields()
 {
    addGroup( "Graph" );
-   
+
       addField( "centerY", TypeF32, Offset( mCenterY, GuiGraphCtrl ),
          "Ratio of where to place the center coordinate of the graph on the Y axis. 0.5=middle height of control.\n\n"
          "This allows to account for graphs that have only positive or only negative data points, for example." );
-      
+
       addField( "plotColor", TypeColorF, Offset( mGraphColor, GuiGraphCtrl ), MaxPlots,
          "Color to use for the plotting curves in the graph." );
-      
+
       addField( "plotType", TYPEID< GuiGraphType >(), Offset( mGraphType, GuiGraphCtrl ), MaxPlots,
          "Charting type of the plotting curves." );
-                  
+
       addField( "plotVariable", TypeString, Offset( mAutoPlot, GuiGraphCtrl ), MaxPlots,
          "Name of the variable to automatically plot on the curves.  If empty, auto-plotting "
          "is disabled for the respective curve." );
-            
+
       addField( "plotInterval", TypeS32, Offset( mAutoPlotDelay, GuiGraphCtrl ), MaxPlots,
          "Interval between auto-plots of #plotVariable for the respective curve (in milliseconds)." );
-   
+
    endGroup( "Graph" );
-   
+
    Parent::initPersistFields();
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
-{   
+{
    if (mBlendSB.isNull())
    {
       GFXStateBlockDesc desc;
@@ -143,9 +143,9 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
 
    GFX->setStateBlock( mBlendSB );
-   
+
 	GFX->getDrawUtil()->drawRectFill( updateRect, mProfile->mFillColor );
-   
+
    GFX->setStateBlock( mSolidSB );
 
    const Point2I globalPos = getGlobalBounds().point;
@@ -166,7 +166,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 		// Adjust scale to max value + 5% so we can see high values
 		F32 Scale = F32( getExtent().y ) / F32( mGraphMax[ k ] * 1.05 );
-      
+
       const S32 numSamples = mGraphData[ k ].size();
 
       switch( mGraphType[ k ] )
@@ -176,7 +176,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
             F32 prevOffset = 0;
 
             for( S32 sample = 0; sample < numSamples; ++ sample )
-            {                  
+            {
                PrimBuild::begin( GFXTriangleFan, 4 );
                PrimBuild::color( mGraphColor[ k ] );
 
@@ -201,7 +201,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 
             break;
          }
-         
+
          case Filled:
          {
             PrimBuild::begin( GFXTriangleStrip, numSamples * 2 ); // Max size correct? -pw
@@ -251,7 +251,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		RectI rect( offset.x, offset.y, getWidth(), getHeight() );
 		GFX->getDrawUtil()->drawRect( rect, mProfile->mBorderColor );
 	}
-   
+
    renderChildControls( offset, updateRect );
 }
 
@@ -324,7 +324,7 @@ DefineEngineMethod( GuiGraphCtrl, addDatum, void, ( S32 plotId, F32 value ),,
 	   Con::errorf( "GuiGraphCtrl::addDatum - 'plotId' out of range: %i", plotId );
 	   return;
    }
-   
+
    object->addDatum( plotId, value );
 }
 
@@ -341,7 +341,7 @@ DefineEngineMethod( GuiGraphCtrl, getDatum, F32, ( S32 plotId, S32 index ),,
 	   Con::errorf( "GuiGraphCtrl::getDatum - 'plotId' out of range: %i", plotId );
 	   return -1.f;
    }
-   
+
    if( index > object->MaxDataPoints)
    {
 	   Con::errorf( "GuiGraphCtrl::getDatum - Data point index out of range: %i", index );
@@ -411,7 +411,7 @@ ConsoleMethod( GuiGraphCtrl, matchScale, void, 3, GuiGraphCtrl::MaxPlots + 2, "(
    "Set the scale of all specified plots to the maximum scale among them.\n\n"
    "@param plotID1 Index of plotting curve.\n"
    "@param plotID2 Index of plotting curve." )
-{   
+{
    F32 max = 0;
 	for( S32 i = 0; i < ( argc - 2 ); ++ i )
 	{
@@ -421,10 +421,10 @@ ConsoleMethod( GuiGraphCtrl, matchScale, void, 3, GuiGraphCtrl::MaxPlots + 2, "(
          Con::errorf( "GuiGraphCtrl::matchScale - Plot ID out of range: %i", plotID );
 			return;
 		}
-      
+
       max = getMax( object->getMax( plotID ), max );
 	}
-   
+
    for( S32 i = 0; i < ( argc - 2 ); ++ i )
 		object->setMax( dAtoi( argv[ 2 + i ] ), max );
 }

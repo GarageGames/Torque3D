@@ -113,7 +113,7 @@ void DecalRoadNodeEvent::unpack(NetConnection* conn, BitStream* stream)
    for (U32 i=0; i<count; ++i)
    {
       mathRead( *stream, &pos );
-      stream->read( &width );   
+      stream->read( &width );
 
       list->mPositions.push_back( pos );
       list->mWidths.push_back( width );
@@ -220,17 +220,17 @@ void DecalRoadUpdateEvent::process( SimObject *object )
 
    if ( !road->isProperlyAdded() )
       return;
-   
+
    // Perform the server side update.
    if ( mMask & DecalRoad::TerrainChangedMask )
-   {      
+   {
       road->_generateEdges();
    }
    if ( mMask & DecalRoad::GenEdgesMask )
    {
       // Server has already done this.
       //road->_generateEdges();
-   }   
+   }
    if ( mMask & DecalRoad::ReClipMask )
    {
       // Server does not need to capture verts.
@@ -281,14 +281,14 @@ DecalRoad::DecalRoad()
    mMatInst( NULL ),
    mUpdateEventId( -1 ),
    mTerrainUpdateRect( Box3F::Invalid )
-{   
+{
    // Setup NetObject.
    mTypeMask |= StaticObjectType | StaticShapeObjectType;
-   mNetFlags.set(Ghostable);      
+   mNetFlags.set(Ghostable);
 }
 
 DecalRoad::~DecalRoad()
-{   
+{
 }
 
 IMPLEMENT_CO_NETOBJECT_V1(DecalRoad);
@@ -300,22 +300,22 @@ void DecalRoad::initPersistFields()
 {
    addGroup( "DecalRoad" );
 
-      addField( "material", TypeMaterialName, Offset( mMaterialName, DecalRoad ), "Material used for rendering." ); 
+      addField( "material", TypeMaterialName, Offset( mMaterialName, DecalRoad ), "Material used for rendering." );
 
-      addProtectedField( "textureLength", TypeF32, Offset( mTextureLength, DecalRoad ), &DecalRoad::ptSetTextureLength, &defaultProtectedGetFn, 
-         "The length in meters of textures mapped to the DecalRoad" );      
+      addProtectedField( "textureLength", TypeF32, Offset( mTextureLength, DecalRoad ), &DecalRoad::ptSetTextureLength, &defaultProtectedGetFn,
+         "The length in meters of textures mapped to the DecalRoad" );
 
-      addProtectedField( "breakAngle", TypeF32, Offset( mBreakAngle, DecalRoad ), &DecalRoad::ptSetBreakAngle, &defaultProtectedGetFn, 
-         "Angle in degrees - DecalRoad will subdivided the spline if its curve is greater than this threshold." );      
+      addProtectedField( "breakAngle", TypeF32, Offset( mBreakAngle, DecalRoad ), &DecalRoad::ptSetBreakAngle, &defaultProtectedGetFn,
+         "Angle in degrees - DecalRoad will subdivided the spline if its curve is greater than this threshold." );
 
-      addField( "renderPriority", TypeS32, Offset( mRenderPriority, DecalRoad ), 
+      addField( "renderPriority", TypeS32, Offset( mRenderPriority, DecalRoad ),
          "DecalRoad(s) are rendered in descending renderPriority order." );
 
    endGroup( "DecalRoad" );
 
    addGroup( "Internal" );
 
-      addProtectedField( "node", TypeString, NULL, &addNodeFromField, &emptyStringProtectedGetFn, 
+      addProtectedField( "node", TypeString, NULL, &addNodeFromField, &emptyStringProtectedGetFn,
          "Do not modify, for internal use." );
 
    endGroup( "Internal" );
@@ -349,7 +349,7 @@ void DecalRoad::consoleInit()
 
 bool DecalRoad::onAdd()
 {
-   if ( !Parent::onAdd() ) 
+   if ( !Parent::onAdd() )
       return false;
 
    // DecalRoad is at position zero when created,
@@ -360,7 +360,7 @@ bool DecalRoad::onAdd()
    MatrixF mat(true);
    Parent::setTransform( mat );
 
-   // The client side calculates bounds based on clipped geometry.  It would 
+   // The client side calculates bounds based on clipped geometry.  It would
    // be wasteful for the server to do this so the server uses global bounds.
    if ( isServerObject() )
    {
@@ -374,13 +374,13 @@ bool DecalRoad::onAdd()
    // Add to Scene.
    addToScene();
 
-   if ( isServerObject() )   
-      getServerSet()->addObject( this );   
+   if ( isServerObject() )
+      getServerSet()->addObject( this );
 
-   //   
+   //
    TerrainBlock::smUpdateSignal.notify( this, &DecalRoad::_onTerrainChanged );
 
-   //   
+   //
    if ( isClientObject() )
       _initMaterial();
 
@@ -403,7 +403,7 @@ void DecalRoad::onRemove()
 
 void DecalRoad::inspectPostApply()
 {
-   Parent::inspectPostApply();      
+   Parent::inspectPostApply();
 
    setMaskBits( DecalRoadMask );
 }
@@ -416,7 +416,7 @@ void DecalRoad::onStaticModified( const char* slotName, const char*newValue )
    if ( isProperlyAdded() &&
         dStricmp( slotName, "material" ) == 0 )
    {
-      setMaskBits( DecalRoadMask );      
+      setMaskBits( DecalRoadMask );
    }
    */
 
@@ -444,7 +444,7 @@ void DecalRoad::writeFields( Stream &stream, U32 tabStop )
 
    // Now write all nodes
 
-   stream.write(2, "\r\n");   
+   stream.write(2, "\r\n");
 
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
@@ -454,13 +454,13 @@ void DecalRoad::writeFields( Stream &stream, U32 tabStop )
 
       char buffer[1024];
       dMemset( buffer, 0, 1024 );
-      dSprintf( buffer, 1024, "Node = \"%f %f %f %f\";", node.point.x, node.point.y, node.point.z, node.width );      
+      dSprintf( buffer, 1024, "Node = \"%f %f %f %f\";", node.point.x, node.point.y, node.point.z, node.width );
       stream.writeLine( (const U8*)buffer );
    }
 }
 
 bool DecalRoad::writeField( StringTableEntry fieldname, const char *value )
-{   
+{
    if ( fieldname == StringTable->insert("node") )
       return false;
 
@@ -479,7 +479,7 @@ void DecalRoad::onEditorDisable()
 // NetObject
 
 U32 DecalRoad::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
-{  
+{
    // Pack Parent.
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
@@ -488,7 +488,7 @@ U32 DecalRoad::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
       // Write Texture Name.
       stream->write( mMaterialName );
 
-      stream->write( mBreakAngle );      
+      stream->write( mBreakAngle );
 
       stream->write( mSegmentsPerBatch );
 
@@ -577,7 +577,7 @@ void DecalRoad::unpackUpdate( NetConnection *con, BitStream *stream )
    {
       String matName;
       stream->read( &matName );
-      
+
       if ( matName != mMaterialName )
       {
          mMaterialName = matName;
@@ -590,11 +590,11 @@ void DecalRoad::unpackUpdate( NetConnection *con, BitStream *stream )
          {
             mMaterial = pMat;
             if ( isProperlyAdded() )
-               _initMaterial(); 
+               _initMaterial();
          }
       }
 
-      stream->read( &mBreakAngle );    
+      stream->read( &mBreakAngle );
 
       stream->read( &mSegmentsPerBatch );
 
@@ -615,8 +615,8 @@ void DecalRoad::unpackUpdate( NetConnection *con, BitStream *stream )
       //for ( U32 i = 0; i < count; i++ )
       //{
       //   mathRead( *stream, &pos );
-      //   stream->read( &width );         
-      //   _addNode( pos, width );         
+      //   stream->read( &width );
+      //   _addNode( pos, width );
       //}
 
       if (stream->readFlag())
@@ -631,8 +631,8 @@ void DecalRoad::unpackUpdate( NetConnection *con, BitStream *stream )
          for ( U32 i = 0; i < count; i++ )
          {
             mathRead( *stream, &pos );
-            stream->read( &width );         
-            _addNode( pos, width );         
+            stream->read( &width );
+            _addNode( pos, width );
          }
       }
       else
@@ -671,7 +671,7 @@ void DecalRoad::unpackUpdate( NetConnection *con, BitStream *stream )
 
    // TerrainChangedMask
    if ( stream->readFlag() )
-   {      
+   {
       if ( isProperlyAdded() )
       {
          if ( mTerrainUpdateRect.isOverlapped( getWorldBox() ) )
@@ -682,8 +682,8 @@ void DecalRoad::unpackUpdate( NetConnection *con, BitStream *stream )
             // region and we now need to store future terrain changes
             // in it.
             mTerrainUpdateRect = Box3F::Invalid;
-         }         
-      }      
+         }
+      }
    }
 }
 
@@ -691,18 +691,18 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
 {
    PROFILE_SCOPE( DecalRoad_prepRenderImage );
 
-   if (  mNodes.size() <= 1 || 
+   if (  mNodes.size() <= 1 ||
          mBatches.size() == 0 ||
          !mMatInst ||
          state->isShadowPass() )
       return;
 
-   // If we don't have a material instance after the override then 
+   // If we don't have a material instance after the override then
    // we can skip rendering all together.
    BaseMatInstance *matInst = state->getOverrideMaterial( mMatInst );
    if ( !matInst )
       return;
-      
+
    RenderPassManager *renderPass = state->getRenderPass();
 
    // Debug RenderInstance
@@ -727,8 +727,8 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
    coreRI.clear();
    coreRI.objectToWorld = &MatrixF::Identity;
    coreRI.worldToCamera = renderPass->allocSharedXform(RenderPassManager::View);
-   
-   MatrixF *tempMat = renderPass->allocUniqueXform( MatrixF( true ) );   
+
+   MatrixF *tempMat = renderPass->allocUniqueXform( MatrixF( true ) );
    MathUtils::getZBiasProjectionMatrix( gDecalBias, frustum, tempMat );
    coreRI.projection = tempMat;
 
@@ -737,8 +737,8 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
    coreRI.primBuff = &mPB;
    coreRI.matInst = matInst;
 
-   // Make it the sort distance the max distance so that 
-   // it renders after all the other opaque geometry in 
+   // Make it the sort distance the max distance so that
+   // it renders after all the other opaque geometry in
    // the prepass bin.
    coreRI.sortDistSq = F32_MAX;
 
@@ -749,14 +749,14 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
       query.init( getWorldSphere() );
 		query.getLights( coreRI.lights, 8 );
    }
-   
+
    U32 startBatchIdx = -1;
    U32 endBatchIdx = 0;
 
-   for ( U32 i = 0; i < mBatches.size(); i++ )   
+   for ( U32 i = 0; i < mBatches.size(); i++ )
    {
       const RoadBatch &batch = mBatches[i];
-      const bool isVisible = !frustum.isCulled( batch.bounds );         
+      const bool isVisible = !frustum.isCulled( batch.bounds );
       if ( isVisible )
       {
          // If this is the start of a set of batches.
@@ -765,7 +765,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
 
          // Else we're extending the end batch index.
          else
-            ++endBatchIdx; 
+            ++endBatchIdx;
 
          // If this isn't the last batch then continue.
          if ( i < mBatches.size()-1 )
@@ -778,7 +778,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
 
       // Render this set of batches.
       const RoadBatch &startBatch = mBatches[startBatchIdx];
-      const RoadBatch &endBatch = mBatches[endBatchIdx]; 
+      const RoadBatch &endBatch = mBatches[endBatchIdx];
 
       U32 startVert = startBatch.startVert;
       U32 startIdx = startBatch.startIndex;
@@ -802,9 +802,9 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
       ri->prim->numVertices = endBatch.endVert + 1;
 
       // For sorting we first sort by render priority
-      // and then by objectId. 
+      // and then by objectId.
       //
-      // Since a road can submit more than one render instance, we want all 
+      // Since a road can submit more than one render instance, we want all
       // draw calls for a single road to occur consecutively, since they
       // could use the same vertex buffer.
       ri->defaultKey =  mRenderPriority << 0 | mId << 16;
@@ -814,7 +814,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
 
       // Reset the batching.
       startBatchIdx = -1;
-   }   
+   }
 }
 
 void DecalRoad::setTransform( const MatrixF &mat )
@@ -843,7 +843,7 @@ bool DecalRoad::getClosestNode( const Point3F &pos, U32 &idx )
       {
          closestDist = dist;
          idx = i;
-      }      
+      }
    }
 
    return closestDist != F32_MAX;
@@ -851,12 +851,12 @@ bool DecalRoad::getClosestNode( const Point3F &pos, U32 &idx )
 
 bool DecalRoad::containsPoint( const Point3F &worldPos, U32 *nodeIdx ) const
 {
-   // This is just for making selections in the editor, we use the 
+   // This is just for making selections in the editor, we use the
    // client-side road because it has the proper edge's.
    if ( isServerObject() && getClientObject() )
       return ((DecalRoad*)getClientObject())->containsPoint( worldPos, nodeIdx );
 
-   // If point isn't in the world box, 
+   // If point isn't in the world box,
    // it's definitely not in the road.
    //if ( !getWorldBox().isContained( worldPos ) )
    //   return false;
@@ -864,7 +864,7 @@ bool DecalRoad::containsPoint( const Point3F &worldPos, U32 *nodeIdx ) const
    if ( mEdges.size() < 2 )
       return false;
 
-   Point2F testPt(   worldPos.x, 
+   Point2F testPt(   worldPos.x,
                      worldPos.y );
    Point2F poly[4];
 
@@ -920,7 +920,7 @@ void DecalRoad::setNodePosition( U32 idx, const Point3F &pos )
 
 U32 DecalRoad::addNode( const Point3F &pos, F32 width )
 {
-   U32 idx = _addNode( pos, width );   
+   U32 idx = _addNode( pos, width );
 
    _generateEdges();
    scheduleUpdate( GenEdgesMask | ReClipMask | NodeMask );
@@ -944,7 +944,7 @@ void DecalRoad::setNodeWidth( U32 idx, F32 width )
       return;
 
    mNodes[idx].width = width;
-   
+
    _generateEdges();
    scheduleUpdate( GenEdgesMask | ReClipMask | NodeMask );
 }
@@ -962,7 +962,7 @@ void DecalRoad::deleteNode( U32 idx )
    if ( mNodes.size() - 1 < idx )
       return;
 
-   mNodes.erase(idx);   
+   mNodes.erase(idx);
 
    _generateEdges();
    scheduleUpdate( GenEdgesMask | ReClipMask | NodeMask );
@@ -982,8 +982,8 @@ void DecalRoad::buildNodesFromList( DecalRoadNodeList* list )
 }
 
 void DecalRoad::setTextureLength( F32 meters )
-{   
-   meters = getMax( meters, 0.1f );   
+{
+   meters = getMax( meters, 0.1f );
    if ( mTextureLength == meters )
       return;
 
@@ -1024,7 +1024,7 @@ void DecalRoad::scheduleUpdate( U32 updateMask, U32 delayMs, bool restartTimer  
          Sim::cancelEvent( mUpdateEventId );
       }
    }
-   
+
    mLastEvent = new DecalRoadUpdateEvent( updateMask, delayMs );
    mUpdateEventId = Sim::postEvent( this, mLastEvent, Sim::getCurrentTime() + delayMs );
 }
@@ -1032,16 +1032,16 @@ void DecalRoad::scheduleUpdate( U32 updateMask, U32 delayMs, bool restartTimer  
 void DecalRoad::regenerate()
 {
    _generateEdges();
-   _captureVerts();   
+   _captureVerts();
    setMaskBits( NodeMask | GenEdgesMask | ReClipMask );
 }
 
 bool DecalRoad::addNodeFromField( void *object, const char *index, const char *data )
 {
    DecalRoad *pObj = static_cast<DecalRoad*>(object);
-    
-   F32 x,y,z,width;      
-   U32 result = dSscanf( data, "%f %f %f %f", &x, &y, &z, &width );      
+
+   F32 x,y,z,width;
+   U32 result = dSscanf( data, "%f %f %f %f", &x, &y, &z, &width );
    if ( result == 4 )
       pObj->_addNode( Point3F(x,y,z), width );
 
@@ -1075,7 +1075,7 @@ void DecalRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Bas
    GFX->enterDebugEvent( ColorI( 255, 0, 0 ), "DecalRoad_debugRender" );
    GFXTransformSaver saver;
 
-   //GFX->setStateBlock( mStateBlock );      
+   //GFX->setStateBlock( mStateBlock );
 
    Point3F size(1,1,1);
    ColorI color( 255, 0, 0, 255 );
@@ -1085,12 +1085,12 @@ void DecalRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Bas
    desc.setBlend( true );
    desc.fillMode = GFXFillWireframe;
 
-   if ( smShowBatches )  
+   if ( smShowBatches )
    {
-      for ( U32 i = 0; i < mBatches.size(); i++ )   
+      for ( U32 i = 0; i < mBatches.size(); i++ )
       {
-         const Box3F &box = mBatches[i].bounds;         
-         GFX->getDrawUtil()->drawCube( desc, box, ColorI(255,100,100,255) );         
+         const Box3F &box = mBatches[i].bounds;
+         GFX->getDrawUtil()->drawCube( desc, box, ColorI(255,100,100,255) );
       }
    }
 
@@ -1098,7 +1098,7 @@ void DecalRoad::_debugRender( ObjectRenderInst *ri, SceneRenderState *state, Bas
 }
 
 void DecalRoad::_generateEdges()
-{      
+{
    PROFILE_SCOPE( DecalRoad_generateEdges );
 
    //Con::warnf( "%s - generateEdges", isServerObject() ? "server" : "client" );
@@ -1111,7 +1111,7 @@ void DecalRoad::_generateEdges()
       mat.setPosition( nodePt );
       Parent::setTransform( mat );
 
-      // The server object has global bounds, which Parent::setTransform 
+      // The server object has global bounds, which Parent::setTransform
       // messes up so we must reset it.
       if ( isServerObject() )
       {
@@ -1147,7 +1147,7 @@ void DecalRoad::_generateEdges()
 
    mEdges.clear();
 
-   Point3F lastBreakVector(0,0,0);      
+   Point3F lastBreakVector(0,0,0);
    RoadEdge slice;
    Point3F lastBreakNode;
    lastBreakNode = spline.evaluate(0.0f);
@@ -1161,7 +1161,7 @@ void DecalRoad::_generateEdges()
 
       U32 numSegments = mCeil( segLength / MIN_METERS_PER_SEGMENT );
       numSegments = getMax( numSegments, (U32)1 );
-      F32 tstep = ( t1 - t0 ) / numSegments; 
+      F32 tstep = ( t1 - t0 ) / numSegments;
 
       U32 startIdx = 0;
       U32 endIdx = ( i == nodeCount - 1 ) ? numSegments + 1 : numSegments;
@@ -1181,7 +1181,7 @@ void DecalRoad::_generateEdges()
 
          F32 angle = mRadToDeg( mAcos( mDot( toNodeVec, lastBreakVector ) ) );
 
-         if ( j == startIdx || 
+         if ( j == startIdx ||
             ( j == endIdx - 1 && i == mNodes.size() - 1 ) ||
             angle > mBreakAngle )
          {
@@ -1190,15 +1190,15 @@ void DecalRoad::_generateEdges()
             //_getTerrainHeight( slice.p1 );
             slice.p1 = splineNode;
             slice.uvec.set(0,0,1);
-            slice.width = width;            
+            slice.width = width;
             slice.parentNodeIdx = i-1;
-            mEdges.push_back( slice );         
+            mEdges.push_back( slice );
 
             lastBreakVector = splineNode - lastBreakNode;
             lastBreakVector.normalizeSafe();
 
             lastBreakNode = splineNode;
-         }          
+         }
       }
    }
 
@@ -1214,7 +1214,7 @@ void DecalRoad::_generateEdges()
       numSegments = getMax( numSegments, (U32)1 );
       F32 tstep = ( t1 - t0 ) / numSegments;
 
-      AssertFatal( numSegments > 0, "DecalRoad::_generateEdges, got zero segments!" );   
+      AssertFatal( numSegments > 0, "DecalRoad::_generateEdges, got zero segments!" );
 
       U32 startIdx = 0;
       U32 endIdx = ( i == nodeCount - 1 ) ? numSegments + 1 : numSegments;
@@ -1224,14 +1224,14 @@ void DecalRoad::_generateEdges()
          F32 t = t0 + tstep * j;
          Point3F val = spline.evaluate(t);
 
-         RoadEdge edge;         
-         edge.p1.set( val.x, val.y, 0.0f );    
-         _getTerrainHeight( val.x, val.y, edge.p1.z );    
+         RoadEdge edge;
+         edge.p1.set( val.x, val.y, 0.0f );
+         _getTerrainHeight( val.x, val.y, edge.p1.z );
          edge.uvec.set(0,0,1);
          edge.width = val.z;
          edge.parentNodeIdx = i-1;
          mEdges.push_back( edge );
-      }   
+      }
    }
    */
 
@@ -1262,7 +1262,7 @@ void DecalRoad::_generateEdges()
 
    //
    // Calculate p0/p2 for all edges
-   //      
+   //
    for ( U32 i = 0; i < mEdges.size(); i++ )
    {
       RoadEdge *edge = &mEdges[i];
@@ -1270,11 +1270,11 @@ void DecalRoad::_generateEdges()
       edge->p2 = edge->p1 + edge->rvec * edge->width * 0.5f;
       _getTerrainHeight( edge->p0 );
       _getTerrainHeight( edge->p2 );
-   }   
+   }
 }
 
 void DecalRoad::_captureVerts()
-{  
+{
    PROFILE_SCOPE( DecalRoad_captureVerts );
 
    //Con::warnf( "%s - captureVerts", isServerObject() ? "server" : "client" );
@@ -1303,7 +1303,7 @@ void DecalRoad::_captureVerts()
    Vector<ClippedPolyList> clipperList;
 
    for ( U32 i = 0; i < mEdges.size() - 1; i++ )
-   {      
+   {
       Box3F box;
       edge = &mEdges[i];
       nextEdge = &mEdges[i+1];
@@ -1329,8 +1329,8 @@ void DecalRoad::_captureVerts()
       // Construct Back Plane
       n = edge->p2 - edge->p0;
       n.normalize();
-      n = mCross( n, edge->uvec );      
-      plane0.set( edge->p0, n );   
+      n = mCross( n, edge->uvec );
+      plane0.set( edge->p0, n );
       clipper.mPlaneList.push_back( plane0 );
 
       // Construct Front Plane
@@ -1343,11 +1343,11 @@ void DecalRoad::_captureVerts()
       // Test if / where the planes intersect.
       bool discardLeft = false;
       bool discardRight = false;
-      Point3F iPos; 
+      Point3F iPos;
       VectorF iDir;
 
       if ( plane0.intersect( plane1, iPos, iDir ) )
-      {                  
+      {
          Point2F iPos2F( iPos.x, iPos.y );
          Point2F cPos2F( edge->p1.x, edge->p1.y );
          Point2F rVec2F( edge->rvec.x, edge->rvec.y );
@@ -1363,7 +1363,7 @@ void DecalRoad::_captureVerts()
             // The clipping planes intersected on the right side,
             // discard the right side clipping plane.
             if ( dot > 0.0f )
-               discardRight = true;         
+               discardRight = true;
             // The clipping planes intersected on the left side,
             // discard the left side clipping plane.
             else
@@ -1381,20 +1381,20 @@ void DecalRoad::_captureVerts()
       }
       else
       {
-         nextEdge->p0 = edge->p0;         
+         nextEdge->p0 = edge->p0;
       }
 
       // Right Plane
       if ( !discardRight )
       {
          n = ( nextEdge->p2 - edge->p2 );
-         n.normalize();            
+         n.normalize();
          n = -mCross( n, edge->uvec );
          clipper.mPlaneList.push_back( PlaneF(edge->p2, -n) );
       }
       else
       {
-         nextEdge->p2 = edge->p2;         
+         nextEdge->p2 = edge->p2;
       }
 
       n = nextEdge->p2 - nextEdge->p0;
@@ -1405,7 +1405,7 @@ void DecalRoad::_captureVerts()
 
       // We have constructed the clipping planes,
       // now grab/clip the terrain geometry
-      getContainer()->buildPolyList( PLC_Decal, box, TerrainObjectType, &clipper );         
+      getContainer()->buildPolyList( PLC_Decal, box, TerrainObjectType, &clipper );
       clipper.cullUnusedVerts();
       clipper.triangulate();
       clipper.generateNormals();
@@ -1413,8 +1413,8 @@ void DecalRoad::_captureVerts()
       // If we got something, add it to the ClippedPolyList Vector
       if ( !clipper.isEmpty() && !( smDiscardAll && ( discardRight || discardLeft ) ) )
       {
-         clipperList.push_back( clipper );       
-      
+         clipperList.push_back( clipper );
+
          mVertCount += clipper.mVertexList.size();
          mTriangleCount += clipper.mPolyList.size();
       }
@@ -1425,16 +1425,16 @@ void DecalRoad::_captureVerts()
    // This is not really necessary but makes the debug spline rendering better.
    //
    for ( U32 i = 0; i < mEdges.size() - 1; i++ )
-   {            
-      edge = &mEdges[i];      
-      
+   {
+      edge = &mEdges[i];
+
       _getTerrainHeight( edge->p0.x, edge->p0.y, edge->p0.z );
 
       _getTerrainHeight( edge->p2.x, edge->p2.y, edge->p2.z );
    }
 
    //
-   // Allocate the RoadBatch(s)   
+   // Allocate the RoadBatch(s)
    //
 
    // If we captured no verts, then we can return here without
@@ -1458,17 +1458,17 @@ void DecalRoad::_captureVerts()
 
    //
    // Fill the VertexBuffer and vertex data for the RoadBatches
-   // Loop through the ClippedPolyList Vector   
+   // Loop through the ClippedPolyList Vector
    //
    RoadBatch *batch = NULL;
    F32 texStart = 0.0f;
    F32 texEnd;
-   
+
    for ( U32 i = 0; i < clipperList.size(); i++ )
-   {   
+   {
       ClippedPolyList *clipper = &clipperList[i];
       RoadEdge &edge = mEdges[i];
-      RoadEdge &nextEdge = mEdges[i+1];      
+      RoadEdge &nextEdge = mEdges[i+1];
 
       VectorF segFvec = nextEdge.p1 - edge.p1;
       F32 segLen = segFvec.len();
@@ -1477,10 +1477,10 @@ void DecalRoad::_captureVerts()
       F32 texLen = segLen / mTextureLength;
       texEnd = texStart + texLen;
 
-      BiQuadToSqr quadToSquare(  Point2F( edge.p0.x, edge.p0.y ), 
-                                 Point2F( edge.p2.x, edge.p2.y ), 
-                                 Point2F( nextEdge.p2.x, nextEdge.p2.y ), 
-                                 Point2F( nextEdge.p0.x, nextEdge.p0.y ) );  
+      BiQuadToSqr quadToSquare(  Point2F( edge.p0.x, edge.p0.y ),
+                                 Point2F( edge.p2.x, edge.p2.y ),
+                                 Point2F( nextEdge.p2.x, nextEdge.p2.y ),
+                                 Point2F( nextEdge.p0.x, nextEdge.p0.y ) );
 
       //
       if ( i % mSegmentsPerBatch == 0 )
@@ -1493,70 +1493,70 @@ void DecalRoad::_captureVerts()
          batch->startVert = vertIdx;
       }
 
-      // Loop through each ClippedPolyList        
+      // Loop through each ClippedPolyList
       for ( U32 j = 0; j < clipper->mVertexList.size(); j++ )
       {
          // Add each vert to the VertexBuffer
          Point3F pos = clipper->mVertexList[j].point;
          vertPtr[vertIdx].point = pos;
-         vertPtr[vertIdx].normal = clipper->mNormalList[j];                     
-                  
+         vertPtr[vertIdx].normal = clipper->mNormalList[j];
+
          Point2F uv = quadToSquare.transform( Point2F(pos.x,pos.y) );
          vertPtr[vertIdx].texCoord.x = uv.x;
-         vertPtr[vertIdx].texCoord.y = -(( texEnd - texStart ) * uv.y + texStart);   
+         vertPtr[vertIdx].texCoord.y = -(( texEnd - texStart ) * uv.y + texStart);
 
          vertPtr[vertIdx].tangent = mCross( segFvec, clipper->mNormalList[j] );
          vertPtr[vertIdx].binormal = segFvec;
 
          vertIdx++;
 
-         // Expand the RoadBatch bounds to contain this vertex   
+         // Expand the RoadBatch bounds to contain this vertex
          batch->bounds.extend( pos );
-      }    
+      }
 
       batch->endVert = vertIdx - 1;
 
       texStart = texEnd;
-   }   
+   }
 
    // Unlock the VertexBuffer, we are done filling it.
    mVB.unlock();
 
    // Lock the PrimitiveBuffer
    U16 *idxBuff;
-   mPB.lock(&idxBuff);     
+   mPB.lock(&idxBuff);
    U32 curIdx = 0;
-   U16 vertOffset = 0;   
+   U16 vertOffset = 0;
    batch = NULL;
    S32 batchIdx = -1;
 
-   // Fill the PrimitiveBuffer   
+   // Fill the PrimitiveBuffer
    // Loop through each ClippedPolyList in the Vector
    for ( U32 i = 0; i < clipperList.size(); i++ )
-   {      
+   {
       ClippedPolyList *clipper = &clipperList[i];
 
       if ( i % mSegmentsPerBatch == 0 )
       {
          batchIdx++;
          batch = &mBatches[batchIdx];
-         batch->startIndex = curIdx;         
-      }        
+         batch->startIndex = curIdx;
+      }
 
       for ( U32 j = 0; j < clipper->mPolyList.size(); j++ )
       {
          // Write indices for each Poly
-         ClippedPolyList::Poly *poly = &clipper->mPolyList[j];                  
+         ClippedPolyList::Poly *poly = &clipper->mPolyList[j];
 
          AssertFatal( poly->vertexCount == 3, "Got non-triangle poly!" );
 
-         idxBuff[curIdx] = clipper->mIndexList[poly->vertexStart] + vertOffset;         
+         idxBuff[curIdx] = clipper->mIndexList[poly->vertexStart] + vertOffset;
          curIdx++;
-         idxBuff[curIdx] = clipper->mIndexList[poly->vertexStart + 1] + vertOffset;            
+         idxBuff[curIdx] = clipper->mIndexList[poly->vertexStart + 1] + vertOffset;
          curIdx++;
-         idxBuff[curIdx] = clipper->mIndexList[poly->vertexStart + 2] + vertOffset;                
+         idxBuff[curIdx] = clipper->mIndexList[poly->vertexStart + 2] + vertOffset;
          curIdx++;
-      } 
+      }
 
       batch->endIndex = curIdx - 1;
 
@@ -1574,10 +1574,10 @@ void DecalRoad::_captureVerts()
    {
       const RoadBatch &batch = mBatches[i];
 
-      if ( i == 0 )      
-         box = batch.bounds;               
-      else      
-         box.intersect( batch.bounds );               
+      if ( i == 0 )
+         box = batch.bounds;
+      else
+         box.intersect( batch.bounds );
    }
 
    Point3F pos = getPosition();
@@ -1621,8 +1621,8 @@ U32 DecalRoad::_insertNode( const Point3F &pos, const F32 &width, const U32 &idx
 
    node->point = pos;
    //node->t = -1.0f;
-   //node->rot.identity();   
-   node->width = width;     
+   //node->rot.identity();
+   node->width = width;
 
    return ret;
 }
@@ -1633,7 +1633,7 @@ bool DecalRoad::_getTerrainHeight( Point3F &pos )
 }
 
 bool DecalRoad::_getTerrainHeight( const Point2F &pos, F32 &height )
-{     
+{
    return _getTerrainHeight( pos.x, pos.y, height );
 }
 
@@ -1643,9 +1643,9 @@ bool DecalRoad::_getTerrainHeight( const F32 &x, const F32 &y, F32 &height )
    Point3F endPnt( x, y, -10000.0f );
 
    RayInfo ri;
-   bool hit;         
+   bool hit;
 
-   hit = getContainer()->castRay(startPnt, endPnt, TerrainObjectType, &ri);   
+   hit = getContainer()->castRay(startPnt, endPnt, TerrainObjectType, &ri);
 
    if ( hit )
       height = ri.point.z;

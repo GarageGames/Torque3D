@@ -69,14 +69,14 @@ function EManageSFXParameters::createNewParameter( %this, %name )
    {
       internalName = %name;
    };
-   
+
    if( !isObject( %parameter ) )
       return;
-   
+
    %parameter.setFilename( $SFX_PARAMETER_FILE );
    %this.persistenceMgr.setDirty( %parameter );
    %this.persistenceMgr.saveDirty();
-   
+
    %this.addParameter( %parameter );
 }
 
@@ -99,7 +99,7 @@ function EManageSFXParameters::deleteParameter( %this, %parameter )
    %this.removeParameter( %parameter );
    if( %parameter.getFilename() !$= "" )
       %this.persistenceMgr.removeObjectFromFile( %parameter );
-      
+
    %parameter.delete();
 }
 
@@ -111,7 +111,7 @@ function EManageSFXParameters::saveParameter( %this, %parameter )
    {
       if( !%this.persistenceMgr.isDirty( %parameter ) )
          %this.persistenceMgr.setDirty( %parameter );
-         
+
       %this.persistenceMgr.saveDirty();
    }
 }
@@ -122,10 +122,10 @@ function EManageSFXParameters::onWake( %this )
 {
    // If the parameter list is empty, add all SFXParameters in the
    // SFXParameterGroup to the list.
-   
+
    if( %this-->SFXParametersStack.getCount() == 0 )
       %this.initList();
-      
+
    if( !isObject( %this.persistenceMgr ) )
       %this.persistenceMgr = new PersistenceManager();
 }
@@ -138,7 +138,7 @@ function EManageSFXParameters::onVisible( %this, %value )
    {
       // Schedule an update.
 
-      %this.schedule( %SFX_PARAMETERS_UPDATE_INTERVAL, "update" );      
+      %this.schedule( %SFX_PARAMETERS_UPDATE_INTERVAL, "update" );
    }
 }
 
@@ -148,24 +148,24 @@ function EManageSFXParameters::onVisible( %this, %value )
 function EManageSFXParameters::initList( %this, %filter )
 {
    // Clear the current lists.
-   
+
    %this-->SFXParametersStack.clear();
-   
+
    // Add each SFXParameter in SFXParameterGroup.
-   
+
    foreach( %obj in SFXParameterGroup )
    {
       if( !isMemberOfClass( %obj.getClassName(), "SFXParameter" ) )
          continue;
-         
+
       // If we have a filter, search for it in the parameter's
       // categories.
-         
+
       %matchesFilter = true;
       if( %filter !$= "" )
       {
          %matchesFilter = false;
-         
+
          for( %idx = 0; %obj.categories[ %idx ] !$= ""; %idx ++  )
          {
             if( %obj.categories[ %idx ] $= %filter )
@@ -175,13 +175,13 @@ function EManageSFXParameters::initList( %this, %filter )
             }
          }
       }
-         
+
       if( %matchesFilter )
          %this.addParameter( %obj );
    }
-   
+
    // Init the filters.
-   
+
    %this.initFilterList( %filter );
 }
 
@@ -197,7 +197,7 @@ function EManageSFXParameters::initFilterList( %this, %selectFilter )
    {
       if( !isMemberOfClass( %obj.getClassName(), "SFXParameter" ) )
          continue;
-         
+
       for( %idx = 0; %obj.categories[ %idx ] !$= ""; %idx ++ )
       {
          %category = %obj.categories[ %idx ];
@@ -207,7 +207,7 @@ function EManageSFXParameters::initFilterList( %this, %selectFilter )
    }
 
    // Sort the filters.
-   
+
    %filterList.sort();
    %filterList.setSelected( %filterList.findText( %selectFilter ), false );
 }
@@ -223,7 +223,7 @@ function EManageSFXParameters::updateParameterCategories( %this, %parameter, %li
 
    %len = strlen( %list );
    %pos = 0;
-   
+
    %idx = 0;
    while( %pos < %len )
    {
@@ -231,7 +231,7 @@ function EManageSFXParameters::updateParameterCategories( %this, %parameter, %li
       %pos = strchrpos( %list, ",", %pos );
       if( %pos == -1 )
          %pos = %len;
-         
+
       if( %pos > %startPos )
       {
          %category = getSubStr( %list, %startPos, %pos - %startPos );
@@ -239,25 +239,25 @@ function EManageSFXParameters::updateParameterCategories( %this, %parameter, %li
          %parameter.categories[ %idx ] = %category;
          %idx ++;
       }
-      
+
       %pos ++;
    }
-   
+
    // Clear out excess categories existing from before.
-   
+
    while( %parameter.categories[ %idx ] !$= "" )
    {
       %parameter.categories[ %idx ] = "";
       %this.persistenceMgr.removeField( %parameter, "categories" @ %idx );
       %idx ++;
    }
-   
+
    // Save the parameter.
-   
+
    %this.saveParameter( %parameter );
-   
+
    // Re-initialize the filter list.
-   
+
    %this.initFilterList( %this-->SFXParameterFilter.getText() );
 }
 
@@ -759,50 +759,50 @@ function EManageSFXParameters::addParameter( %this, %parameter )
          };
       };
    };
-   
+
    %ctrl.sfxParameter = %parameter;
-   
+
    // Deactivate the per-source controls for now as these are not
    // yet implemented in SFX.
-   
+
    %ctrl-->localCheckbox.setActive( false );
    %ctrl-->sourceDropdown.setActive( false );
-   
+
    // Set the fields to reflect the parameter's current settings.
-   
+
    %ctrl-->valueField.setValue( %paramter.value );
    %ctrl-->rangeMinField.setText( %parameter.range.x );
    %ctrl-->rangeMaxField.setText( %parameter.range.y );
    %ctrl-->defaultField.setValue( %parameter.defaultValue );
    %ctrl-->descriptionField.setText( %parameter.description );
-   
+
    %ctrl-->valueSlider.range = %parameter.range;
    %ctrl-->valueSlider.setValue( %parameter.value );
-   
+
    // Set up the channels dropdown.
-   
+
    %list = %ctrl-->channelDropdown;
    for( %i = 0; %i < $SFX_PARAMETER_CHANNELS_COUNT; %i ++ )
       %list.add( $SFX_PARAMETER_CHANNELS[ %i ], %i );
    %list.sort();
    %list.setSelected( %list.findText( %parameter.channel ) );
-   
+
    %this-->SFXParametersStack.addGuiControl( %ctrl );
-   
+
    // Fill tagging field.
-   
+
    %tags = "";
    %isFirst = true;
    for( %i = 0; %parameter.categories[ %i ] !$= ""; %i ++ )
    {
       if( !%isFirst )
          %tags = %tags @ ", ";
-         
+
       %tags = %tags @ %parameter.categories[ %i ];
-      
+
       %isFirst = false;
    }
-   
+
    %ctrl-->tagsField.setText( %tags );
 }
 
@@ -823,25 +823,25 @@ function EManageSFXParameters::removeParameter( %this, %parameter )
 //-----------------------------------------------------------------------------
 
 function EManageSFXParameters::update( %this )
-{   
+{
    foreach( %ctrl in %this-->SFXParametersStack )
    {
       // If either the value field or the slider are currently being
       // edited, don't update the value in order to not interfere with
       // user editing.
-      
+
       if( %ctrl-->valueField.isFirstResponder() || %ctrl-->valueSlider.isThumbBeingDragged() )
          continue;
-      
+
       %parameter = %ctrl.sfxParameter;
-      
+
       %ctrl-->valueField.setValue( %parameter.value );
       %ctrl-->valueSlider.setValue( %parameter.value );
    }
-   
+
    // If the control is still awake, schedule another
    // update.
-   
+
    if( %this.isVisible() )
       %this.schedule( $SFX_PARAMETERS_UPDATE_INTERVAL, "update" );
 }

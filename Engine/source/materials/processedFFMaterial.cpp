@@ -64,7 +64,7 @@ ProcessedFFMaterial::ProcessedFFMaterial(Material &mat, const bool isLightingMat
 }
 
 void ProcessedFFMaterial::_construct()
-{   
+{
    mHasSetStageData = false;
    mHasGlow = false;
    mIsLightingMaterial = false;
@@ -87,17 +87,17 @@ void ProcessedFFMaterial::_createPasses( U32 stageNum, const FeatureSet &feature
    _addPass(0, featData);
 
    mFeatures.clear();
-   if ( featData.features[FixedFuncFeatureData::DiffuseMap] ) 
+   if ( featData.features[FixedFuncFeatureData::DiffuseMap] )
       mFeatures.addFeature( MFT_DiffuseMap );
-   if ( featData.features[FixedFuncFeatureData::LightMap] ) 
+   if ( featData.features[FixedFuncFeatureData::LightMap] )
       mFeatures.addFeature( MFT_LightMap );
-   if ( featData.features[FixedFuncFeatureData::ToneMap] ) 
+   if ( featData.features[FixedFuncFeatureData::ToneMap] )
       mFeatures.addFeature( MFT_ToneMap );
 
 }
 
-void ProcessedFFMaterial::_determineFeatures(   U32 stageNum, 
-                                                FixedFuncFeatureData& featData, 
+void ProcessedFFMaterial::_determineFeatures(   U32 stageNum,
+                                                FixedFuncFeatureData& featData,
                                                 const FeatureSet &features )
 {
    if ( mStages[stageNum].getTex( MFT_DiffuseMap ) )
@@ -105,7 +105,7 @@ void ProcessedFFMaterial::_determineFeatures(   U32 stageNum,
 
    if ( features.hasFeature( MFT_LightMap ) )
       featData.features[FixedFuncFeatureData::LightMap] = true;
-   if ( features.hasFeature( MFT_ToneMap )) 
+   if ( features.hasFeature( MFT_ToneMap ))
       featData.features[FixedFuncFeatureData::ToneMap] = true;
 }
 
@@ -131,7 +131,7 @@ U32 ProcessedFFMaterial::getNumStages()
          }
       }
 
-      // If we have a texture for the a feature the 
+      // If we have a texture for the a feature the
       // stage is active.
       if ( mStages[i].hasValidTex() )
          stageActive = true;
@@ -178,7 +178,7 @@ void ProcessedFFMaterial::setTextureStages(SceneRenderState * state, const Scene
 #endif
    RenderPassData *rpd = mPasses[pass];
    for( U32 i=0; i<rpd->mNumTex; i++ )
-   {      
+   {
       U32 currTexFlag = rpd->mTexType[i];
       if (!LIGHTMGR || !LIGHTMGR->setTextureStage(sgData, currTexFlag, i, NULL, NULL))
       {
@@ -217,7 +217,7 @@ void ProcessedFFMaterial::setTextureStages(SceneRenderState * state, const Scene
 }
 
 MaterialParameters* ProcessedFFMaterial::allocMaterialParameters()
-{   
+{
    return new MaterialParameters();
 }
 
@@ -241,7 +241,7 @@ void ProcessedFFMaterial::setTransforms(const MatrixSet &matrixSet, SceneRenderS
 void ProcessedFFMaterial::setSceneInfo(SceneRenderState * state, const SceneData& sgData, U32 pass)
 {
    _setPrimaryLightInfo(*sgData.objTrans, sgData.lights[0], pass);
-   _setSecondaryLightInfo(*sgData.objTrans, sgData.lights[1]);   
+   _setSecondaryLightInfo(*sgData.objTrans, sgData.lights[1]);
 }
 
 void ProcessedFFMaterial::_setPrimaryLightInfo(const MatrixF &_objTrans, LightInfo* light, U32 pass)
@@ -264,7 +264,7 @@ void ProcessedFFMaterial::_setPrimaryLightInfo(const MatrixF &_objTrans, LightIn
    lightMat.emissive = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
    lightMat.specular = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
    lightMat.shininess = 128.0f;
-   GFX->setLightMaterial(lightMat);   
+   GFX->setLightMaterial(lightMat);
 
    // set object transform
    MatrixF objTrans = _objTrans;
@@ -307,7 +307,7 @@ void ProcessedFFMaterial::_setSecondaryLightInfo(const MatrixF &_objTrans, Light
    GFX->setLight(1, &xlatedLight);
 }
 
-bool ProcessedFFMaterial::init(  const FeatureSet &features, 
+bool ProcessedFFMaterial::init(  const FeatureSet &features,
                                  const GFXVertexFormat *vertexFormat,
                                  const MatFeaturesDelegate &featuresDelegate )
 {

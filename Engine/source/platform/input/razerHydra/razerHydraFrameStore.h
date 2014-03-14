@@ -49,7 +49,7 @@ public:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "RazerHydraFrameStore"; }   
+   static const char* getSingletonName() { return "RazerHydraFrameStore"; }
 };
 
 /// Returns the LeapMotionFrameStore singleton.

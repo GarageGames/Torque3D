@@ -48,14 +48,14 @@ public:
    virtual ~PhysicsPlayer() {};
 
    ///
-   virtual void init(   const char *type, 
+   virtual void init(   const char *type,
                         const Point3F &size,
                         F32 runSurfaceCos,
                         F32 stepHeight,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world ) = 0;
 
-   virtual void findContact(  SceneObject **contactObject, 
+   virtual void findContact(  SceneObject **contactObject,
                               VectorF *contactNormal,
                               Vector<SceneObject*> *outOverlapObjects ) const = 0;
 

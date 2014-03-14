@@ -125,7 +125,7 @@ function ShapeEditorPlugin::onWorldEditorStartup(%this)
 
    GuiWindowCtrl::attach(ShapeEdPropWindow, ShapeEdSelectWindow);
    ShapeEdAnimWindow.resize( -1, 526, 593, 53 );
-   
+
    // Initialise gui
    ShapeEdSeqNodeTabBook.selectPage(0);
    ShapeEdAdvancedWindow-->tabBook.selectPage(0);
@@ -265,7 +265,7 @@ function ShapeEditorPlugin::onDeactivated(%this)
    ShapeEdPropWindow.setVisible(false);
    ShapeEdAnimWindow.setVisible(false);
    ShapeEdAdvancedWindow.setVisible(false);
-   
+
    if( EditorGui-->MatEdPropertiesWindow.visible )
    {
       ShapeEdMaterials.editSelectedMaterialEnd( true );
@@ -305,9 +305,9 @@ function ShapeEditorPlugin::onExitMission( %this )
 }
 
 function ShapeEditorPlugin::openShape( %this, %path, %discardChangesToCurrent )
-{   
+{
    EditorGui.setEditor( ShapeEditorPlugin );
-   
+
    if( ShapeEditor.isDirty() && !%discardChangesToCurrent )
    {
       MessageBoxYesNo( "Save Changes?",
@@ -316,7 +316,7 @@ function ShapeEditorPlugin::openShape( %this, %path, %discardChangesToCurrent )
          "ShapeEditorPlugin.openShape(\"" @ %path @ "\");" );
       return;
    }
-   
+
    ShapeEditor.selectShape( %path );
    ShapeEdShapeView.fitToShape();
 }

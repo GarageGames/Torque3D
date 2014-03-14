@@ -29,18 +29,18 @@ singleton ShaderData( PFX_FlashShader )
 
    pixVersion = 2.0;
 };
- 
+
 singleton PostEffect( FlashFx )
 {
-   isEnabled = false;    
-   allowReflectPass = false;  
+   isEnabled = false;
+   allowReflectPass = false;
 
-   renderTime = "PFXAfterDiffuse";  
+   renderTime = "PFXAfterDiffuse";
 
-   shader = PFX_FlashShader;   
-   texture[0] = "$backBuffer";  
+   shader = PFX_FlashShader;
+   texture[0] = "$backBuffer";
    renderPriority = 10;
-   stateBlock = PFX_DefaultStateBlock;  
+   stateBlock = PFX_DefaultStateBlock;
 };
 
 function FlashFx::setShaderConsts( %this )

@@ -66,15 +66,15 @@ GuiInspector::~GuiInspector()
 void GuiInspector::initPersistFields()
 {
    addGroup( "Inspector" );
-   
+
       addField( "dividerMargin", TypeS32, Offset( mDividerMargin, GuiInspector ) );
 
-      addField( "groupFilters", TypeRealString, Offset( mGroupFilters, GuiInspector ), 
+      addField( "groupFilters", TypeRealString, Offset( mGroupFilters, GuiInspector ),
          "Specify groups that should be shown or not. Specifying 'shown' implicitly does 'not show' all other groups. Example string: +name -otherName" );
 
       addField( "showCustomFields", TypeBool, Offset( mShowCustomFields, GuiInspector ),
          "If false the custom fields Name, Id, and Source Class will not be shown." );
-         
+
    endGroup( "Inspector" );
 
    Parent::initPersistFields();
@@ -93,7 +93,7 @@ void GuiInspector::onRemove()
 void GuiInspector::onDeleteNotify( SimObject *object )
 {
    Parent::onDeleteNotify( object );
-   
+
    if( isInspectingObject( object ) )
       removeInspectObject( object );
 }
@@ -186,14 +186,14 @@ void GuiInspector::onMouseDown(const GuiEvent &event)
 
 void GuiInspector::onMouseUp(const GuiEvent &event)
 {
-   mMovingDivider = false;   
+   mMovingDivider = false;
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiInspector::onMouseDragged(const GuiEvent &event)
 {
-   if ( !mMovingDivider )   
+   if ( !mMovingDivider )
       return;
 
    Point2I localPnt = globalToLocalCoord( event.mousePoint );
@@ -242,7 +242,7 @@ void GuiInspector::updateFieldValue( StringTableEntry fieldName, StringTableEntr
    Vector<GuiInspectorGroup*>::iterator groupIter = mGroups.begin();
 
    for( ; groupIter != mGroups.end(); groupIter++ )
-   {   
+   {
       if ( (*groupIter)->updateFieldValue( fieldName, arrayIdx ) )
          break;
    }
@@ -255,13 +255,13 @@ void GuiInspector::clearGroups()
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[GuiInspector] Clearing %i (%s)", getId(), getName() );
    #endif
-   
+
    // If we have no groups, there's nothing to clear!
    if( mGroups.empty() )
       return;
 
    mHLField = NULL;
-   
+
    if( isMethod( "onClear" ) )
       Con::executef( this, "onClear" );
 
@@ -274,7 +274,7 @@ void GuiInspector::clearGroups()
    {
       if((*i) && (*i)->isProperlyAdded())
          (*i)->deleteObject();
-   }   
+   }
 
    mGroups.clear();
 
@@ -290,17 +290,17 @@ bool GuiInspector::isInspectingObject( SimObject* object )
    for( U32 i = 0; i < numTargets; ++ i )
       if( mTargets[ i ] == object )
          return true;
-         
+
    return false;
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiInspector::inspectObject( SimObject *object )
-{  
+{
    if( mTargets.size() > 1 || !isInspectingObject( object ) )
       clearInspectObjects();
-         
+
    addInspectObject( object );
 }
 
@@ -311,7 +311,7 @@ void GuiInspector::clearInspectObjects()
    const U32 numTargets = mTargets.size();
    for( U32 i = 0; i < numTargets; ++ i )
       clearNotify( mTargets[ i ] );
-      
+
    clearGroups();
    mTargets.clear();
 }
@@ -319,9 +319,9 @@ void GuiInspector::clearInspectObjects()
 //-----------------------------------------------------------------------------
 
 void GuiInspector::addInspectObject( SimObject* object, bool autoSync )
-{   
+{
    // If we are already inspecting the object, just update the groups.
-   
+
    if( isInspectingObject( object ) )
    {
       #ifdef DEBUG_SPEW
@@ -348,7 +348,7 @@ void GuiInspector::addInspectObject( SimObject* object, bool autoSync )
    // Set Target
    mTargets.push_back( object );
    deleteNotify( object );
-   
+
 	if( autoSync )
 		refresh();
 }
@@ -360,13 +360,13 @@ void GuiInspector::removeInspectObject( SimObject* object )
    const U32 numTargets = mTargets.size();
    for( U32 i = 0; i < numTargets; ++ i )
       if( mTargets[ i ] == object )
-      {      
+      {
          // Delete all inspector data *before* removing the target so that apply calls
          // triggered by edit controls losing focus will not find the inspect object
          // gone.
 
          clearGroups();
-         
+
          #ifdef DEBUG_SPEW
          Platform::outputDebugString( "[GuiInspector] Removing %i:%s (%s) from inspect set",
             object->getId(), object->getClassName(), object->getName() );
@@ -374,14 +374,14 @@ void GuiInspector::removeInspectObject( SimObject* object )
 
          mTargets.erase( i );
          clearNotify( object );
-         
+
          // Refresh the inspector except if the system is going down.
 
          if( !Sim::isShuttingDown() )
             refresh();
-         
+
          return;
-      }   
+      }
 }
 
 //-----------------------------------------------------------------------------
@@ -400,8 +400,8 @@ void GuiInspector::setName( StringTableEntry newName )
 //-----------------------------------------------------------------------------
 
 bool GuiInspector::collideDivider( const Point2I &localPnt )
-{   
-   RectI divisorRect( getWidth() - getWidth() * mDividerPos - mDividerMargin, 0, mDividerMargin * 2, getHeight() ); 
+{
+   RectI divisorRect( getWidth() - getWidth() * mDividerPos - mDividerMargin, 0, mDividerMargin * 2, getHeight() );
 
    if ( divisorRect.pointInRect( localPnt ) )
       return true;
@@ -415,7 +415,7 @@ void GuiInspector::updateDivider()
 {
    for ( U32 i = 0; i < mGroups.size(); i++ )
       for ( U32 j = 0; j < mGroups[i]->mChildren.size(); j++ )
-         mGroups[i]->mChildren[j]->updateRects(); 
+         mGroups[i]->mChildren[j]->updateRects();
 
    //setUpdate();
 }
@@ -423,9 +423,9 @@ void GuiInspector::updateDivider()
 //-----------------------------------------------------------------------------
 
 void GuiInspector::getDivider( S32 &pos, S32 &margin )
-{   
+{
    pos = (F32)getWidth() * mDividerPos;
-   margin = mDividerMargin;   
+   margin = mDividerMargin;
 }
 
 //-----------------------------------------------------------------------------
@@ -450,7 +450,7 @@ void GuiInspector::setHighlightField( GuiInspectorField *field )
 
 bool GuiInspector::isGroupFiltered( const char *groupName ) const
 {
-   // Internal and Ungrouped always filtered, we never show them.   
+   // Internal and Ungrouped always filtered, we never show them.
    if ( dStricmp( groupName, "Internal" ) == 0 ||
         dStricmp( groupName, "Ungrouped" ) == 0 ||
 		  dStricmp( groupName, "AdvCoordManipulation" ) == 0)
@@ -462,16 +462,16 @@ bool GuiInspector::isGroupFiltered( const char *groupName ) const
    // Is this group explicitly show? Does it immediately follow a + char.
    searchStr = String::ToString( "+%s", groupName );
    if ( mGroupFilters.find( searchStr ) != String::NPos )
-      return false;   
+      return false;
 
-   // Were there any other + characters, if so, we are implicitly hidden.   
+   // Were there any other + characters, if so, we are implicitly hidden.
    if ( mGroupFilters.find( "+" ) != String::NPos )
       return true;
 
    // Is this group explicitly hidden? Does it immediately follow a - char.
    searchStr = String::ToString( "-%s", groupName );
    if ( mGroupFilters.find( searchStr ) != String::NPos )
-      return true;   
+      return true;
 
    return false;
 }
@@ -479,13 +479,13 @@ bool GuiInspector::isGroupFiltered( const char *groupName ) const
 //-----------------------------------------------------------------------------
 
 bool GuiInspector::isGroupExplicitlyFiltered( const char *groupName ) const
-{  
+{
    String searchStr;
 
    searchStr = String::ToString( "-%s", groupName );
 
    if ( mGroupFilters.find( searchStr ) != String::NPos )
-      return true;   
+      return true;
 
    return false;
 }
@@ -513,7 +513,7 @@ void GuiInspector::setObjectField( const char *fieldName, const char *data )
 static SimObject *sgKeyObj = NULL;
 
 bool findInspectors( GuiInspector *obj )
-{   
+{
    if ( obj->isAwake() && obj->isInspectingObject( sgKeyObj ) )
       return true;
 
@@ -540,23 +540,23 @@ GuiInspector* GuiInspector::findByObject( SimObject *obj )
 void GuiInspector::refresh()
 {
    clearGroups();
-   
+
    // Remove any inspect object that happened to have
    // already been killed.
-   
+
    for( U32 i = 0; i < mTargets.size(); ++ i )
       if( !mTargets[ i ] )
       {
          mTargets.erase( i );
          -- i;
       }
-      
+
    if( !mTargets.size() )
       return;
-   
+
    // Special group for fields which should appear at the top of the
    // list outside of a rollout control.
-   
+
    GuiInspectorGroup *ungroup = NULL;
    if( mTargets.size() == 1 )
    {
@@ -568,7 +568,7 @@ void GuiInspector::refresh()
          ungroup->registerObject();
          mGroups.push_back( ungroup );
          addObject( ungroup );
-      }   
+      }
    }
 
    // Put the 'transform' group first
@@ -580,7 +580,7 @@ void GuiInspector::refresh()
       addObject( transform );
    }
 
-   // Always create the 'general' group (for fields without a group)      
+   // Always create the 'general' group (for fields without a group)
    GuiInspectorGroup *general = new GuiInspectorGroup( "General", this );
    if( general != NULL )
    {
@@ -597,11 +597,11 @@ void GuiInspector::refresh()
 
       // Iterate through, identifying the groups and create necessary GuiInspectorGroups
       for( AbstractClassRep::FieldList::iterator itr = fieldList.begin(); itr != fieldList.end(); itr++ )
-      {      
+      {
          if ( itr->type == AbstractClassRep::StartGroupFieldType )
          {
             GuiInspectorGroup* group = findExistentGroup( itr->pGroupname );
-            
+
             if( !group && !isGroupFiltered( itr->pGroupname ) )
             {
                GuiInspectorGroup *group = new GuiInspectorGroup( itr->pGroupname, this );
@@ -614,7 +614,7 @@ void GuiInspector::refresh()
                      Platform::outputDebugString( "[GuiInspector] Removing empty group '%s'",
                         group->getCaption().c_str() );
                      #endif
-                     
+
                      // The group ended up having no fields.  Remove it.
                      group->deleteObject();
                   }
@@ -623,7 +623,7 @@ void GuiInspector::refresh()
                      mGroups.push_back( group );
                      addObject( group );
                   }
-               }            
+               }
             }
          }
       }
@@ -644,9 +644,9 @@ void GuiInspector::refresh()
    if( mShowCustomFields && mTargets.size() == 1 )
    {
       SimObject* object = mTargets.first();
-      
+
       // Add the SimObjectID field to the ungrouped group.
-      
+
       GuiInspectorCustomField* field = new GuiInspectorCustomField();
       field->init( this, ungroup );
 
@@ -654,9 +654,9 @@ void GuiInspector::refresh()
       {
          ungroup->mChildren.push_back( field );
          ungroup->mStack->addObject( field );
-         
+
          static StringTableEntry sId = StringTable->insert( "id" );
-         
+
          field->setCaption( sId );
          field->setData( object->getIdString() );
          field->setDoc( "SimObjectId of this object. [Read Only]" );
@@ -665,7 +665,7 @@ void GuiInspector::refresh()
          delete field;
 
       // Add the Source Class field to the ungrouped group.
-      
+
       field = new GuiInspectorCustomField();
       field->init( this, ungroup );
 
@@ -673,7 +673,7 @@ void GuiInspector::refresh()
       {
          ungroup->mChildren.push_back( field );
          ungroup->mStack->addObject( field );
-         
+
          StringTableEntry sSourceClass = StringTable->insert( "Source Class", true );
          field->setCaption( sSourceClass );
          field->setData( object->getClassName() );
@@ -720,7 +720,7 @@ void GuiInspector::refresh()
       }
    }
 
-   // If ungrouped is empty or explicitly filtered, remove it.   
+   // If ungrouped is empty or explicitly filtered, remove it.
    if( ungroup && ( isGroupExplicitlyFiltered( "Ungrouped" ) || ungroup->getNumFields() == 0 ) )
    {
       for(S32 i=0; i<mGroups.size(); i++)
@@ -735,9 +735,9 @@ void GuiInspector::refresh()
          }
       }
    }
-   
+
    // If the object cannot be renamed, deactivate the name field if we have it.
-   
+
    if( ungroup && getNumInspectObjects() == 1 && !getInspectObject()->isNameChangeAllowed() )
    {
       GuiInspectorField* nameField = ungroup->findField( "name" );
@@ -813,7 +813,7 @@ ConsoleMethod( GuiInspector, removeInspect, void, 3, 3, "( id object ) - Remove 
       Con::errorf( "%s::removeInspect(): invalid object: %s", argv[ 0 ], argv[ 2 ] );
       return;
    }
-   
+
    object->removeInspectObject( obj );
 }
 
@@ -836,13 +836,13 @@ ConsoleMethod( GuiInspector, getInspectObject, const char*, 2, 3, "getInspectObj
    U32 index = 0;
    if( argc > 2 )
       index = dAtoi( argv[ 2 ] );
-      
+
    if( index >= object->getNumInspectObjects() )
    {
       Con::errorf( "GuiInspector::getInspectObject() - index out of range: %i", index );
       return "";
    }
-   
+
    return object->getInspectObject( index )->getIdString();
 }
 
@@ -869,7 +869,7 @@ ConsoleMethod( GuiInspector, apply, void, 2, 2, "apply() - Force application of 
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, setObjectField, void, 4, 4, 
+ConsoleMethod( GuiInspector, setObjectField, void, 4, 4,
    "setObjectField( fieldname, data ) - Set a named fields value on the inspected object if it exists. This triggers all the usual callbacks that would occur if the field had been changed through the gui." )
 {
    object->setObjectField( argv[2], argv[3] );
@@ -877,17 +877,17 @@ ConsoleMethod( GuiInspector, setObjectField, void, 4, 4,
 
 //-----------------------------------------------------------------------------
 
-ConsoleStaticMethod( GuiInspector, findByObject, S32, 2, 2, 
+ConsoleStaticMethod( GuiInspector, findByObject, S32, 2, 2,
    "findByObject( SimObject ) - returns the id of an awake inspector that is inspecting the passed object if one exists." )
 {
    SimObject *obj;
-   if ( !Sim::findObject( argv[1], obj ) )   
+   if ( !Sim::findObject( argv[1], obj ) )
       return NULL;
-   
+
    obj = GuiInspector::findByObject( obj );
 
    if ( !obj )
       return NULL;
 
-   return obj->getId();      
+   return obj->getId();
 }

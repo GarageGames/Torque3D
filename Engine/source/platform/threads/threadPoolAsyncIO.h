@@ -68,7 +68,7 @@ class AsyncIOItem : public ThreadPool::WorkItem
 
       /// Buffer keeping/receiving the data elements.
       BufferType mBuffer;
-      
+
       /// The stream to read from/write to.
       StreamType* mStream;
 
@@ -87,11 +87,11 @@ class AsyncIOItem : public ThreadPool::WorkItem
       ///
       ValueType* getBufferPtr()
       {
-         return &getBuffer().data[ getOffsetInBuffer() ]; 
+         return &getBuffer().data[ getOffsetInBuffer() ];
       }
 
    public:
-   
+
       ///
       /// If the stream uses implicit positioning, then the supplied "offsetInStream"
       /// is meaningless and ignored.
@@ -224,7 +224,7 @@ class AsyncReadItem : public AsyncIOItem< T, Stream >
       U32 mNumElementsRead;
 
       virtual void execute();
-      
+
       void _allocBuffer()
       {
          if( !this->getBuffer().data )
@@ -261,7 +261,7 @@ template< typename T, class Stream >
 void AsyncReadItem< T, Stream >::execute()
 {
    _allocBuffer();
-   
+
    // Read the data.  Do a dynamic cast for any of the
    // interfaces we prefer.
 
@@ -316,7 +316,7 @@ class AsyncWriteItem : public AsyncIOItem< T, Stream >
 
       /// Handle of asynchronous write operation, if the stream implements IAsyncOutputStream.
       void* mAsyncHandle;
-      
+
       virtual void execute();
 
       void _prep( StreamType* stream )

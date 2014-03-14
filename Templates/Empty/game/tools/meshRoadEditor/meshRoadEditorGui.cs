@@ -25,11 +25,11 @@ $MeshRoad::showSpline = true;
 $MeshRoad::showReflectPlane = false;
 $MeshRoad::showRoad = true;
 $MeshRoad::breakAngle = 3.0;
-   
+
 function MeshRoadEditorGui::onWake( %this )
-{   
-   $MeshRoad::EditorOpen = true; 
-   
+{
+   $MeshRoad::EditorOpen = true;
+
    %count = EWorldEditor.getSelectionSize();
    for ( %i = 0; %i < %count; %i++ )
    {
@@ -38,23 +38,23 @@ function MeshRoadEditorGui::onWake( %this )
          EWorldEditor.unselectObject();
       else
          %this.setSelectedRoad( %obj );
-   }      
-   
+   }
+
    //%this-->TabBook.selectPage(0);
-     
+
    %this.onNodeSelected(-1);
 }
 
 function MeshRoadEditorGui::onSleep( %this )
 {
-   $MeshRoad::EditorOpen = false;    
+   $MeshRoad::EditorOpen = false;
 }
 
 function MeshRoadEditorGui::paletteSync( %this, %mode )
 {
    %evalShortcut = "ToolsPaletteArray-->" @ %mode @ ".setStateOn(1);";
    eval(%evalShortcut);
-}   
+}
 function MeshRoadEditorGui::onEscapePressed( %this )
 {
    if( %this.getMode() $= "MeshRoadEditorAddNodeMode" )
@@ -67,18 +67,18 @@ function MeshRoadEditorGui::onEscapePressed( %this )
 function MeshRoadEditorGui::onRoadSelected( %this, %road )
 {
    %this.road = %road;
-   
+
    // Update the materialEditorList
    if( isObject( %road ) )
       $Tools::materialEditorList = %road.getId();
-   
-   MeshRoadInspector.inspect( %road );  
+
+   MeshRoadInspector.inspect( %road );
    MeshRoadTreeView.buildVisibleTree(true);
    if( MeshRoadTreeView.getSelectedObject() != %road )
    {
       MeshRoadTreeView.clearSelection();
       %treeId = MeshRoadTreeView.findItemByObjectId( %road );
-      MeshRoadTreeView.selectItem( %treeId );  
+      MeshRoadTreeView.selectItem( %treeId );
    }
 }
 
@@ -87,45 +87,45 @@ function MeshRoadEditorGui::onNodeSelected( %this, %nodeIdx )
    if ( %nodeIdx == -1 )
    {
       MeshRoadEditorOptionsWindow-->position.setActive( false );
-      MeshRoadEditorOptionsWindow-->position.setValue( "" );    
-      
+      MeshRoadEditorOptionsWindow-->position.setValue( "" );
+
       MeshRoadEditorOptionsWindow-->rotation.setActive( false );
       MeshRoadEditorOptionsWindow-->rotation.setValue( "" );
-      
+
       MeshRoadEditorOptionsWindow-->width.setActive( false );
-      MeshRoadEditorOptionsWindow-->width.setValue( "" ); 
-      
+      MeshRoadEditorOptionsWindow-->width.setValue( "" );
+
       MeshRoadEditorOptionsWindow-->depth.setActive( false );
-      MeshRoadEditorOptionsWindow-->depth.setValue( "" );  
+      MeshRoadEditorOptionsWindow-->depth.setValue( "" );
    }
    else
    {
       MeshRoadEditorOptionsWindow-->position.setActive( true );
-      MeshRoadEditorOptionsWindow-->position.setValue( %this.getNodePosition() );    
-      
+      MeshRoadEditorOptionsWindow-->position.setValue( %this.getNodePosition() );
+
       MeshRoadEditorOptionsWindow-->rotation.setActive( true );
       MeshRoadEditorOptionsWindow-->rotation.setValue( %this.getNodeNormal() );
-      
+
       MeshRoadEditorOptionsWindow-->width.setActive( true );
-      MeshRoadEditorOptionsWindow-->width.setValue( %this.getNodeWidth() ); 
-      
+      MeshRoadEditorOptionsWindow-->width.setValue( %this.getNodeWidth() );
+
       MeshRoadEditorOptionsWindow-->depth.setActive( true );
-      MeshRoadEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );  
+      MeshRoadEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );
    }
 }
 
 
 function MeshRoadEditorGui::onNodeModified( %this, %nodeIdx )
 {
-   MeshRoadEditorOptionsWindow-->position.setValue( %this.getNodePosition() );    
+   MeshRoadEditorOptionsWindow-->position.setValue( %this.getNodePosition() );
    MeshRoadEditorOptionsWindow-->rotation.setValue( %this.getNodeNormal() );
-   MeshRoadEditorOptionsWindow-->width.setValue( %this.getNodeWidth() ); 
-   MeshRoadEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );   
+   MeshRoadEditorOptionsWindow-->width.setValue( %this.getNodeWidth() );
+   MeshRoadEditorOptionsWindow-->depth.setValue( %this.getNodeDepth() );
 }
 
 function MeshRoadEditorGui::editNodeDetails( %this )
 {
-   
+
    %this.setNodePosition( MeshRoadEditorOptionsWindow-->position.getText() );
    %this.setNodeNormal( MeshRoadEditorOptionsWindow-->rotation.getText() );
    %this.setNodeWidth( MeshRoadEditorOptionsWindow-->width.getText() );
@@ -144,7 +144,7 @@ function MeshRoadEditorGui::onBrowseClicked( %this )
       ChangePath     = false;
       MustExist      = true;
    };
-         
+
    %ret = %dlg.Execute();
    if(%ret)
    {
@@ -153,7 +153,7 @@ function MeshRoadEditorGui::onBrowseClicked( %this )
       MeshRoadEditorGui.setTextureFile( %filename );
       MeshRoadEditorTextureFileCtrl.setText( %filename );
    }
-   
+
    %dlg.delete();
 }
 
@@ -161,18 +161,18 @@ function MeshRoadInspector::inspect( %this, %obj )
 {
    %name = "";
    if ( isObject( %obj ) )
-      %name = %obj.getName();   
+      %name = %obj.getName();
    else
       MeshFieldInfoControl.setText( "" );
-   
+
    //RiverInspectorNameEdit.setValue( %name );
-   Parent::inspect( %this, %obj );  
+   Parent::inspect( %this, %obj );
 }
 
 function MeshRoadInspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // Same work to do as for the regular WorldEditor Inspector.
-   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );   
+   Inspector::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue );
 }
 
 function MeshRoadInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %fieldDoc )
@@ -182,12 +182,12 @@ function MeshRoadInspector::onFieldSelected( %this, %fieldName, %fieldTypeStr, %
 
 function MeshRoadTreeView::onInspect(%this, %obj)
 {
-   MeshRoadInspector.inspect(%obj);   
+   MeshRoadInspector.inspect(%obj);
 }
 
 function MeshRoadTreeView::onSelect(%this, %obj)
 {
-   MeshRoadEditorGui.road = %obj; 
+   MeshRoadEditorGui.road = %obj;
    MeshRoadInspector.inspect( %obj );
    if(%obj != MeshRoadEditorGui.getSelectedRoad())
    {
@@ -198,13 +198,13 @@ function MeshRoadTreeView::onSelect(%this, %obj)
 function MeshRoadEditorGui::prepSelectionMode( %this )
 {
    %mode = %this.getMode();
-   
+
    if ( %mode $= "MeshRoadEditorAddNodeMode"  )
    {
       if ( isObject( %this.getSelectedRoad() ) )
          %this.deleteNode();
    }
-   
+
    %this.setMode( "MeshRoadEditorSelectMode" );
    ToolsPaletteArray-->MeshRoadEditorSelectMode.setStateOn(1);
 }

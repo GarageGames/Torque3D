@@ -87,7 +87,7 @@ bool FileStream::setPosition(const U32 i_newPosition)
    {
       // set the position and return
       mBuffPos = i_newPosition;
-      
+
       // FIXME [tom, 9/5/2006] This needs to be checked. Basically, when seeking within
       // the buffer, if the stream has an EOS status before the seek then if you try to
       // read immediately after seeking, you'll incorrectly get an EOS.
@@ -95,7 +95,7 @@ bool FileStream::setPosition(const U32 i_newPosition)
       // I am not 100% sure if this fix is correct, but it seems to be working for the undo system.
       if(mBuffPos < mBuffTail)
          Stream::setStatus(Ok);
-      
+
       return(true);
    }
    // otherwise the new position lies in some block not in memory
@@ -109,7 +109,7 @@ bool FileStream::setPosition(const U32 i_newPosition)
       mFile->setPosition(i_newPosition, Torque::FS::File::Begin);
 
       setStatus();
-      
+
       if (mFile->getStatus() == Torque::FS::FileNode::EndOfFile)
          mEOF = true;
 
@@ -214,7 +214,7 @@ bool FileStream::flush()
    if (mDirty)
    {
       AssertFatal(hasCapability(StreamWrite), "FileStream::flush: a buffer without write-capability should never be dirty");
-      
+
       // align the file pointer to the buffer head
       if (mBuffHead != mFile->getPosition())
       {

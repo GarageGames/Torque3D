@@ -66,7 +66,7 @@ datablock ProximityMineData( ProxMine )
    triggerSound = MineTriggeredSound;
 
    explosionOffset = 0.1;
-   
+
    // dynamic fields
    pickUpName = "a proximity mine";
    description = "Proximity Mine";
@@ -216,7 +216,7 @@ datablock ShapeBaseImageData( ProxMineImage )
    stateSequenceTransitionOut[8]    = true;
    stateAllowImageChange[8]         = false;
    stateSequence[8]                 = "sprint";
-   
+
    // Stop Sprinting
    stateName[9]                     = "SprintExit";
    stateTransitionGeneric0In[9]     = "SprintEnter";

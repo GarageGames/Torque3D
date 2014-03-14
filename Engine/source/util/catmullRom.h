@@ -35,7 +35,7 @@ protected:
    virtual ~CatmullRomBase() {}
 
 public:
-   
+
    /// Clean out all the data.
    virtual void clear();
 
@@ -59,7 +59,7 @@ protected:
    static const F32 smX[];
    static const F32 smC[];
 
-   void _initialize( U32 count, const F32 *times = NULL );   
+   void _initialize( U32 count, const F32 *times = NULL );
 
    /// The time to arrive at each point.
    F32 *mTimes;
@@ -83,7 +83,7 @@ class CatmullRom : public CatmullRomBase
 public:
 
    CatmullRom();
-   virtual ~CatmullRom();   
+   virtual ~CatmullRom();
 
    /// Initialization.
    void initialize( U32 count, const TYPE *positions, const F32 *times = NULL );
@@ -107,7 +107,7 @@ public:
 protected:
 
    /// The sample points.
-   TYPE* mPositions; 
+   TYPE* mPositions;
 
 private:
 
@@ -121,7 +121,7 @@ template<typename TYPE>
 inline CatmullRom<TYPE>::CatmullRom()
    :  CatmullRomBase(),
       mPositions( NULL )
-{   
+{
 }
 
 template<typename TYPE>
@@ -182,7 +182,7 @@ inline TYPE CatmullRom<TYPE>::evaluate( F32 t )
    F32 t0 = mTimes[i];
    F32 t1 = mTimes[i+1];
    F32 u = (t - t0)/(t1 - t0);
-      
+
    S32 idx0, idx1, idx2, idx3;
    idx0 = i - 1;
    idx1 = i;
@@ -193,7 +193,7 @@ inline TYPE CatmullRom<TYPE>::evaluate( F32 t )
       idx0 = 0;
    if ( idx3 >= mCount )
       idx3 = mCount - 1;
-   
+
    TYPE A = 3.0f*mPositions[idx1]
             - mPositions[idx0]
             - 3.0f*mPositions[idx2]
@@ -298,7 +298,7 @@ inline TYPE CatmullRom<TYPE>::acceleration( F32 t )
             - mPositions[idx0]
             - 3.0f*mPositions[idx2]
             + mPositions[idx3];
-   
+
    TYPE B = 2.0f*mPositions[idx0]
             - 5.0f*mPositions[idx1]
             + 4.0f*mPositions[idx2]

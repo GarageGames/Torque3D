@@ -536,7 +536,7 @@
 
 
 function TerrainImportGui::onWake( %this )
-{   
+{
    if ( !isObject( %this.namesArray ) )
       %this.namesArray = new ArrayObject();
 
@@ -547,34 +547,34 @@ function TerrainImportGui::onWake( %this )
 function TerrainImportGui::import( %this )
 {
    // Gather all the import settings.
-   
+
    %heightMapPng = %this-->HeightfieldFilename.getText();
-     
+
    %metersPerPixel = %this-->MetersPerPixel.getText();
    %heightScale = %this-->HeightScale.getText();
-   
+
    %flipYAxis = %this-->FlipYAxis.isStateOn();
-   
+
    // Grab and validate terrain object name.
-   
+
    %terrainName = %this-->TerrainName.getText();
    if( !( isObject( %terrainName ) && %terrainName.isMemberOfClass( "TerrainBlock" ) ) &&
        !Editor::validateObjectName( %terrainName ) )
       return;
-   
+
    %opacityNames = "";
    %materialNames = "";
-   
+
    %opacityList = %this-->OpacityLayerTextList;
-   
+
    for( %i = 0; %i < %opacityList.rowCount(); %i++ )
    {
       %itemText = %opacityList.getRowTextById( %i );
       %opacityName = %this.namesArray.getValue( %i );
-     
+
       %channelInfo = %this.channelsArray.getValue( %i );
       %channel = getWord( %channelInfo, 0 );
-      
+
       %materialName = getField( %itemText, 2 );
 
       %opacityNames = %opacityNames @ %opacityName TAB %channel @ "\n";
@@ -585,11 +585,11 @@ function TerrainImportGui::import( %this )
 
    // This will update an existing terrain with the name %terrainName,
    // or create a new one if %terrainName isn't a TerrainBlock
-   %obj = TerrainBlock::import(   %terrainName, 
-                                  %heightMapPng, 
-                                  %metersPerPixel, 
-                                  %heightScale, 
-                                  %opacityNames, 
+   %obj = TerrainBlock::import(   %terrainName,
+                                  %heightMapPng,
+                                  %metersPerPixel,
+                                  %heightScale,
+                                  %opacityNames,
                                   %materialNames,
                                   %flipYAxis );
 
@@ -600,11 +600,11 @@ function TerrainImportGui::import( %this )
       if( %obj != %updated )
       {
          // created a new TerrainBlock
-         // Submit an undo action. 
+         // Submit an undo action.
          MECreateUndoAction::submit(%obj);
       }
 
-      assert( isObject( EWorldEditor ), 
+      assert( isObject( EWorldEditor ),
          "ObjectBuilderGui::processNewObject - EWorldEditor is missing!" );
 
       // Select it in the editor.
@@ -620,8 +620,8 @@ function TerrainImportGui::import( %this )
    }
    else
    {
-      MessageBox( "Import Terrain", 
-         "Terrain import failed! Check console for error messages.", 
+      MessageBox( "Import Terrain",
+         "Terrain import failed! Check console for error messages.",
          "Ok", "Error" );
    }
 }
@@ -636,16 +636,16 @@ function TerrainImportGui::doOpenDialog( %this, %filter, %callback )
       MustExist = true;
       MultipleFiles = false;
    };
-   
+
    if(filePath( %currentFile ) !$= "")
       %dlg.DefaultPath = filePath(%currentFile);
    else
       %dlg.DefaultPath = getMainDotCSDir();
-      
+
    if(%dlg.Execute())
       eval(%callback @ "(\"" @ %dlg.FileName @ "\");");
-   
-   
+
+
    %dlg.delete();
 }
 
@@ -668,16 +668,16 @@ function TerrainImportGuiAddOpacityMap( %name )
    // the file here and figure
    // out how many channels it has.
 
-   %txt = makeRelativePath( %name, getWorkingDirectory() );   
-   
+   %txt = makeRelativePath( %name, getWorkingDirectory() );
+
    // Will need to do this stuff
    // once per channel in the file
-   // currently it works with just grayscale.   
+   // currently it works with just grayscale.
    %channelsTxt = "R" TAB "G" TAB "B" TAB "A";
    %bitmapInfo = getBitmapinfo( %name );
-   
-   %channelCount = getWord( %bitmapInfo, 2 );   
-   
+
+   %channelCount = getWord( %bitmapInfo, 2 );
+
    %opacityList = TerrainImportGui-->OpacityLayerTextList;
 
    for ( %i = 0; %i < %channelCount; %i++ )
@@ -685,12 +685,12 @@ function TerrainImportGuiAddOpacityMap( %name )
       TerrainImportGui.namesArray.push_back( %txt, %name );
       TerrainImportGui.channelsArray.push_back( %txt, getWord( %channelsTxt, %i ) TAB %channelCount );
 
-      //TerrainImportGui.namesArray.echo();   
-   
+      //TerrainImportGui.namesArray.echo();
+
       %count = %opacityList.rowCount();
       %opacityList.addRow( %count, %txt TAB getWord( %channelsTxt, %i ) );
    }
-   
+
    //OpacityMapListBox.addItem( %name );
 }
 
@@ -700,57 +700,57 @@ function TerrainImportGui::browseForOpacityMap( %this )
 }
 
 function TerrainImportGui::removeOpacitymap( %this )
-{   
+{
    %opacityList = %this-->OpacityLayerTextList;
-   
-   //%itemIdx = OpacityMapListBox.getSelectedItem();   
+
+   //%itemIdx = OpacityMapListBox.getSelectedItem();
    %itemIdx = %opacityList.getSelectedId();
    if ( %itemIdx < 0 ) // -1 is no item selected
       return;
-  
-   %this.namesArray.erase( %itemIdx );  
+
+   %this.namesArray.erase( %itemIdx );
    %this.channelsArray.erase( %itemIdx );
-  
-   //%this.namesArray.echo();  
-  
+
+   //%this.namesArray.echo();
+
    %opacityList.removeRowById( %itemIdx );
-      
+
    //OpacityMapListBox.deleteItem( %itemIdx );
 }
 
 function TerrainImportGui::onOpacityListDblClick( %this )
 {
    %opacityList = %this-->OpacityLayerTextList;
-   
+
    //echo( "Double clicked the opacity list control!" );
    %itemIdx = %opacityList.getSelectedId();
    if ( %itemIdx < 0 )
       return;
 
    %this.activeIdx = %itemIdx;
-   
+
    %rowTxt = %opacityList.getRowTextById( %itemIdx );
    %matTxt = getField( %rowTxt, 2 );
    %matId = getField( %rowTxt, 3 );
-         
+
    TerrainMaterialDlg.showByObjectId( %matId, TerrainImportGui_TerrainMaterialApplyCallback );
 }
 
 function TerrainImportGui_TerrainMaterialApplyCallback( %mat, %matIndex )
-{           
+{
    // Skip over a bad selection.
-   if ( !isObject( %mat ) )   
+   if ( !isObject( %mat ) )
       return;
-                        
+
    %opacityList = TerrainImportGui-->OpacityLayerTextList;
-                           
+
    %itemIdx = TerrainImportGui.activeIdx;
-   
+
    if ( %itemIdx < 0 || %itemIdx $= "" )
       return;
 
    %rowTxt = %opacityList.getRowTextById( %itemIdx );
-   
+
    %columntTxtCount = getFieldCount( %rowTxt );
    if ( %columntTxtCount > 2 )
       %rowTxt = getFields( %rowTxt, 0, 1 );

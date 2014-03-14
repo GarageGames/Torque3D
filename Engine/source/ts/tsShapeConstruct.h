@@ -118,7 +118,7 @@ public:
          {
             addArgs( a );
             addArgs( b );
-         } 
+         }
          template< typename A, typename B, typename C >
             inline void addArgs( A a, B b, C c )
          {
@@ -226,13 +226,13 @@ protected:
    static String smSphereShapePath;
 
    static bool addSequenceFromField( void *obj, const char *index, const char *data );
-   
+
    static void       _onTSShapeLoaded( Resource< TSShape >& shape );
    static void       _onTSShapeUnloaded( const Torque::Path& path, TSShape* shape );
-   
+
    static ResourceRegisterPostLoadSignal< TSShape > _smAutoLoad;
    static ResourceRegisterUnloadSignal< TSShape > _smAutoUnload;
-   
+
    /// @name Callbacks
    ///@{
    DECLARE_CALLBACK( void, onLoad, () );

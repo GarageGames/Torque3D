@@ -55,13 +55,13 @@ IMPLEMENT_CO_NETOBJECT_V1( GroundPlane );
 
 ConsoleDocClass( GroundPlane,
    "@brief An infinite plane extending in all direction.\n\n"
-   
+
    "%GroundPlane is useful for setting up simple testing scenes, or it can be "
    "placed under an existing scene to keep objects from falling into 'nothing'.\n\n"
 
    "%GroundPlane may not be moved or rotated, it is always at the world origin.\n\n"
 
-   "@ingroup Terrain"   
+   "@ingroup Terrain"
 );
 
 GroundPlane::GroundPlane()
@@ -98,7 +98,7 @@ void GroundPlane::initPersistFields()
       addField( "material",      TypeMaterialName, Offset( mMaterialName, GroundPlane ), "Name of Material used to render %GroundPlane's surface." );
 
    endGroup( "Plane" );
-   
+
    Parent::initPersistFields();
 
    removeField( "scale" );
@@ -113,7 +113,7 @@ bool GroundPlane::onAdd()
 
    if( isClientObject() )
       _updateMaterial();
-      
+
    if( mSquareSize < sMIN_SQUARE_SIZE )
    {
       Con::errorf( "GroundPlane - squareSize below threshold; re-setting to %.02f", sMIN_SQUARE_SIZE );
@@ -130,7 +130,7 @@ bool GroundPlane::onAdd()
    if ( PHYSICSMGR )
    {
       PhysicsCollision *colShape = PHYSICSMGR->createCollision();
-      colShape->addPlane( PlaneF( Point3F::Zero, Point3F( 0, 0, 1 ) ) ); 
+      colShape->addPlane( PlaneF( Point3F::Zero, Point3F( 0, 0, 1 ) ) );
 
       PhysicsWorld *world = PHYSICSMGR->getWorld( isServerObject() ? "server" : "client" );
       mPhysicsRep = PHYSICSMGR->createBody();
@@ -193,7 +193,7 @@ void GroundPlane::unpackUpdate( NetConnection* connection, BitStream* stream )
    stream->read( &mScaleV );
    stream->read( &mMaterialName );
 
-   // If we're added then something possibly changed in 
+   // If we're added then something possibly changed in
    // the editor... do an update of the material and the
    // geometry.
    if ( isProperlyAdded() )
@@ -211,9 +211,9 @@ void GroundPlane::_updateMaterial()
       mMaterialName = "WarningMaterial";
    }
 
-   // If the material name matches then don't 
+   // If the material name matches then don't
    // bother updating it.
-   if (  mMaterial && 
+   if (  mMaterial &&
          mMaterialName.compare( mMaterial->getMaterial()->getName() ) == 0 )
       return;
 
@@ -336,14 +336,14 @@ bool GroundPlane::buildPolyList( PolyListContext context, AbstractPolyList* poly
 void GroundPlane::prepRenderImage( SceneRenderState* state )
 {
    PROFILE_SCOPE( GroundPlane_prepRenderImage );
-   
+
    // TODO: Should we skip rendering the ground plane into
    // the shadows?  Its not like you can ever get under it.
 
    if ( !mMaterial )
       return;
 
-   // If we don't have a material instance after the override then 
+   // If we don't have a material instance after the override then
    // we can skip rendering all together.
    BaseMatInstance *matInst = state->getOverrideMaterial( mMaterial );
    if ( !matInst )
@@ -392,20 +392,20 @@ void GroundPlane::prepRenderImage( SceneRenderState* state )
 void GroundPlane::createGeometry( const Frustum& frustum )
 {
    PROFILE_SCOPE( GroundPlane_createGeometry );
-   
+
    enum { MAX_WIDTH = 256, MAX_HEIGHT = 256 };
-   
+
    // Project the frustum onto the XY grid.
 
    Point2F min;
    Point2F max;
 
    projectFrustum( frustum, mSquareSize, min, max );
-   
+
    // Early out if the grid projection hasn't changed.
 
-   if(   mVertexBuffer.isValid() && 
-         min == mMin && 
+   if(   mVertexBuffer.isValid() &&
+         min == mMin &&
          max == mMax )
       return;
 
@@ -419,7 +419,7 @@ void GroundPlane::createGeometry( const Frustum& frustum )
    // long viewing distances.
    // This only affects the client object, of course, and thus
    // has no permanent effect.
-   
+
    U32 width = mCeil( ( max.x - min.x ) / mSquareSize );
    if( width > MAX_WIDTH )
    {
@@ -428,7 +428,7 @@ void GroundPlane::createGeometry( const Frustum& frustum )
    }
    else if( !width )
       width = 1;
-   
+
    U32 height = mCeil( ( max.y - min.y ) / mSquareSize );
    if( height > MAX_HEIGHT )
    {
@@ -543,12 +543,12 @@ void GroundPlane::generateGrid( U32 width, U32 height, F32 squareSize,
 
    U16* indices;
    outPrimitives.lock( &indices );
-   
+
    U16 corner1 = 0;
    U16 corner2 = 1;
    U16 corner3 = width + 1;
    U16 corner4 = width + 2;
-   
+
    for( U32 y = 0; y < height; ++ y )
    {
       for( U32 x = 0; x < width; ++ x )

@@ -26,7 +26,7 @@
 
 //------------------------------
 // basic build defines
-                                 
+
 // define our platform
 //#define TARG_WIN32              1
 //#define WIN32                   1

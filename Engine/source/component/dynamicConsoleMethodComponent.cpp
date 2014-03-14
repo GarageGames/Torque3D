@@ -161,7 +161,7 @@ const char *DynamicConsoleMethodComponent::_callMethod( U32 argc, const char *ar
       }
       unlockComponentList();
    }
-   
+
    // Set Owner Field
    const char* result = "";
    if(callThis)

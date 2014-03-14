@@ -44,9 +44,9 @@ public:
 
    /// Constructs the transform class from the quadrilateral
    /// points in counter clockwise order.
-   BiQuadToSqr(   const Point2F &p00, 
+   BiQuadToSqr(   const Point2F &p00,
                   const Point2F &p10,
-                  const Point2F &p11, 
+                  const Point2F &p11,
                   const Point2F &p01 );
 
    /// Transforms the point.
@@ -67,9 +67,9 @@ class BiSqrToQuad3D
 {
 public:
 
-   BiSqrToQuad3D( const Point3F &pnt00, 
+   BiSqrToQuad3D( const Point3F &pnt00,
                   const Point3F &pnt10,
-                  const Point3F &pnt11, 
+                  const Point3F &pnt11,
                   const Point3F &pnt01 );
 
    Point3F transform( const Point2F &pnt ) const;

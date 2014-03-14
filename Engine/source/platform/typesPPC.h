@@ -34,7 +34,7 @@
 //  will wind up including this file, we can affect compilation most effectively
 //  from this location.
 //
-#define PLATFORM_BIG_ENDIAN 
+#define PLATFORM_BIG_ENDIAN
 
 #define FN_CDECL
 
@@ -58,7 +58,7 @@ typedef float           	F32;
 typedef double          	F64;
 
 // size_t is needed to overload new
-// size_t tends to be OS and compiler specific and may need to 
+// size_t tends to be OS and compiler specific and may need to
 // be if/def'ed in the future
 typedef unsigned long   dsize_t;
 

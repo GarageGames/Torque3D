@@ -43,52 +43,52 @@ IMPLEMENT_CONOBJECT( GuiControl );
 
 ConsoleDocClass( GuiControl,
    "@brief Base class for all Gui control objects.\n\n"
-   
+
    "GuiControl is the basis for the Gui system.  It represents an individual control that can be placed on the canvas and with which "
    "the mouse and keyboard can potentially interact with.\n\n"
-   
+
    "@section GuiControl_Hierarchy Control Hierarchies\n"
-   
+
    "GuiControls are arranged in a hierarchy.  All children of a control are placed in their parent's coordinate space, i.e. their "
    "coordinates are relative to the upper left corner of their immediate parent.  When a control is moved, all its child controls "
    "are moved along with it.\n\n"
-   
+
    "Since GuiControl's are SimGroups, hierarchy also implies ownership.  This means that if a control is destroyed, all its children "
    "are destroyed along with it.  It also means that a given control can only be part of a single GuiControl hierarchy.  When adding a "
    "control to another control, it will automatically be reparented from another control it may have previously been parented to.\n\n"
-   
+
    "@section GuiControl_Layout Layout System\n"
-   
+
    "GuiControls have a two-dimensional position and are rectangular in shape.\n\n"
-   
+
    "@section GuiControl_Events Event System\n"
-   
+
    "@section GuiControl_Profiles Control Profiles\n"
-   
+
    "Common data accessed by GuiControls is stored in so-called \"Control Profiles.\"  This includes font, color, and texture information. "
    "By pooling this data in shared objects, the appearance of any number of controls can be changed quickly and easily by modifying "
    "only the shared profile object.\n\n"
-   
+
    "If not explicitly assigned a profile, a control will by default look for a profile object that matches its class name.  This means "
    "that the class GuiMyCtrl, for example, will look for a profile called 'GuiMyProfile'.  If this profile cannot be found, the control "
    "will fall back to GuiDefaultProfile which must be defined in any case for the Gui system to work.\n\n"
-   
+
    "In addition to its primary profile, a control may be assigned a second profile called 'tooltipProfile' that will be used to render "
    "tooltip popups for the control.\n\n"
-   
+
    "@section GuiControl_Actions Triggered Actions\n"
-   
+
    "@section GuiControl_FirstResponders First Responders\n"
-   
+
    "At any time, a single control can be what is called the \"first responder\" on the GuiCanvas is placed on.  This control "
    "will be the first control to receive keyboard events not bound in the global ActionMap.  If the first responder choses to "
    "handle a particular keyboard event, \n\n"
-   
+
    "@section GuiControl_Waking Waking and Sleeping\n"
-   
+
    "@section GuiControl_VisibleActive Visibility and Activeness\n"
    "By default, a GuiControl is active which means that it\n\n"
-   
+
    "@see GuiCanvas\n"
    "@see GuiControlProfile\n"
    "@ingroup GuiCore\n"
@@ -212,7 +212,7 @@ GuiControl::GuiControl() : mAddGroup( NULL ),
    mConsoleVariable     = StringTable->EmptyString();
    mAcceleratorKey      = StringTable->EmptyString();
    mLangTableName       = StringTable->EmptyString();
-   
+
    mTooltip = StringTable->EmptyString();
    mRenderTooltipDelegate.bind( this, &GuiControl::defaultTooltipRender );
 
@@ -241,7 +241,7 @@ void GuiControl::consoleInit()
 void GuiControl::initPersistFields()
 {
    addGroup( "Layout" );
-   
+
       addField("position",          TypePoint2I,      Offset(mBounds.point, GuiControl),
          "The position relative to the parent control." );
       addField("extent",            TypePoint2I,      Offset(mBounds.extent, GuiControl),
@@ -281,8 +281,8 @@ void GuiControl::initPersistFields()
       addField("accelerator",       TypeString,       Offset(mAcceleratorKey, GuiControl),
          "Key combination that triggers the control's primary action when the control is on the canvas." );
 
-   endGroup( "Control" );	
-   
+   endGroup( "Control" );
+
    addGroup( "ToolTip" );
       addProtectedField("tooltipProfile", TYPEID< GuiControlProfile >(), Offset(mTooltipProfile, GuiControl), &setTooltipProfileProt, &defaultProtectedGetFn,
          "Control profile to use when rendering tooltips for this control." );
@@ -309,10 +309,10 @@ void GuiControl::initPersistFields()
 
 bool GuiControl::processArguments(S32 argc, const char **argv)
 {
-   // argv[0] - The GuiGroup to add this control to when it's created.  
+   // argv[0] - The GuiGroup to add this control to when it's created.
    //           this is an optional parameter that may be specified at
-   //           object creation time to organize a gui control into a 
-   //           subgroup of GuiControls and is useful in helping the 
+   //           object creation time to organize a gui control into a
+   //           subgroup of GuiControls and is useful in helping the
    //           gui editor group and sort the existent gui's in the Sim.
 
    // Specified group?
@@ -344,7 +344,7 @@ bool GuiControl::processArguments(S32 argc, const char **argv)
 void GuiControl::awaken()
 {
    PROFILE_SCOPE( GuiControl_awaken );
-   
+
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[GuiControl] Waking up %i:%s (%s:%s) awake=%s",
       getId(), getClassName(), getName(), getInternalName(),
@@ -353,13 +353,13 @@ void GuiControl::awaken()
 
    if( mAwake )
       return;
-      
+
    // Wake up visible children.
-      
+
    for( GuiControl::iterator iter = begin(); iter != end(); ++ iter )
    {
       GuiControl* ctrl = static_cast< GuiControl* >( *iter );
-      
+
       if( ctrl->isVisible() && !ctrl->isAwake() )
          ctrl->awaken();
    }
@@ -448,16 +448,16 @@ void GuiControl::onRender(Point2I offset, const RectI &updateRect)
 bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &cursorPos, const char* tipText )
 {
    // Short Circuit.
-   if (!mAwake) 
+   if (!mAwake)
       return false;
-      
+
    if ( dStrlen( mTooltip ) == 0 && ( tipText == NULL || dStrlen( tipText ) == 0 ) )
       return false;
 
    String renderTip( mTooltip );
    if ( tipText != NULL )
       renderTip = tipText;
-   
+
    // Need to have root.
    GuiCanvas *root = getRoot();
    if ( !root )
@@ -482,19 +482,19 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
    }
 
    // The height is the number of lines times the height of the font.
-   U32 tipHeight = lineLengths.size() * font->getHeight(); 
+   U32 tipHeight = lineLengths.size() * font->getHeight();
 
    // Vars used:
    // Screensize (for position check)
    // Offset to get position of cursor
    // textBounds for text extent.
    Point2I screensize = getRoot()->getWindowSize();
-   Point2I offset = hoverPos; 
-   Point2I textBounds;   
+   Point2I offset = hoverPos;
+   Point2I textBounds;
 
    // Offset below cursor image
    offset.y += 20; // TODO: Attempt to fix?: root->getCursorExtent().y;
-   
+
    // Create text bounds...
 
    // Pixels above/below the text
@@ -513,7 +513,7 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
    // And ditto for the height
    if ( screensize.y < offset.y + textBounds.y + 5 )
       offset.y = hoverPos.y - textBounds.y - 5;
-   
+
    RectI oldClip = GFX->getClipRect();
 
    // Set rectangle for the box, and set the clip rectangle.
@@ -529,8 +529,8 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
    GFX->getDrawUtil()->setBitmapModulation( mTooltipProfile->mFontColor );
 
    for ( U32 i = 0; i < lineLengths.size(); i++ )
-   {      
-      Point2I start( hMargin, vMargin + i * font->getHeight() );       
+   {
+      Point2I start( hMargin, vMargin + i * font->getHeight() );
       const UTF8 *line = renderTip.c_str() + startLineOffsets[i];
       U32 lineLen = lineLengths[i];
 
@@ -546,7 +546,7 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
 
 void GuiControl::renderChildControls(Point2I offset, const RectI &updateRect)
 {
-   // Save the current clip rect 
+   // Save the current clip rect
    // so we can restore it at the end of this method.
    RectI savedClipRect = GFX->getClipRect();
 
@@ -608,7 +608,7 @@ void GuiControl::renderJustifiedText(Point2I offset, Point2I extent, const char 
    Point2I start( 0, 0 );
 
    // Align horizontal.
-   
+
    if( textWidth > extent.x )
    {
       // If the text is longer then the box size, (it'll get clipped) so
@@ -621,18 +621,18 @@ void GuiControl::renderJustifiedText(Point2I offset, Point2I extent, const char 
          case GuiControlProfile::RightJustify:
             start.x = extent.x - textWidth;
             break;
-            
+
          case GuiControlProfile::TopJustify:
          case GuiControlProfile::BottomJustify:
          case GuiControlProfile::CenterJustify:
             start.x = ( extent.x - textWidth) / 2;
             break;
-            
+
          case GuiControlProfile::LeftJustify:
             start.x = 0;
             break;
       }
-   
+
    // Align vertical.
 
    if( textHeight > extent.y )
@@ -645,11 +645,11 @@ void GuiControl::renderJustifiedText(Point2I offset, Point2I extent, const char 
          case GuiControlProfile::TopJustify:
             start.y = 0;
             break;
-            
+
          case GuiControlProfile::BottomJustify:
             start.y = extent.y - textHeight - 1;
             break;
-            
+
          default:
             // Center vertical.
             start.y = ( extent.y - font->getHeight() ) / 2;
@@ -687,21 +687,21 @@ bool GuiControl::onAdd()
    // If we don't have a profile we must assign one now.
    // Try assigning one based on the control's class name...
    if ( !mProfile )
-   {      
+   {
       String name = getClassName();
 
       if ( name.isNotEmpty() )
       {
          U32 pos = name.find( "Ctrl" );
-         
+
          if ( pos != -1 )
             name.replace( pos, 4, "Profile" );
          else
             name += "Profile";
-            
+
          GuiControlProfile *profile = NULL;
          if ( Sim::findObject( name, profile ) )
-            setControlProfile( profile ); 
+            setControlProfile( profile );
       }
    }
 
@@ -749,10 +749,10 @@ void GuiControl::onRemove()
 {
    // If control is still awake, put it to sleep first.  Otherwise, we'll see an
    // onSleep() call triggered when we are removed from our parent.
-   
+
    if( mAwake )
       sleep();
-      
+
    // Only invoke script callbacks if they can be received
    onRemove_callback();
 
@@ -764,7 +764,7 @@ void GuiControl::onRemove()
 
    if ( mTooltipProfile )
    {
-      mTooltipProfile->decUseCount();   
+      mTooltipProfile->decUseCount();
       mTooltipProfile = NULL;
    }
 
@@ -782,7 +782,7 @@ void GuiControl::onDeleteNotify(SimObject *object)
       GuiControlProfile* profile;
       Sim::findObject( "GuiDefaultProfile", profile );
 
-      if ( profile == mProfile )     
+      if ( profile == mProfile )
          mProfile = NULL;
       else
          setControlProfile( profile );
@@ -792,7 +792,7 @@ void GuiControl::onDeleteNotify(SimObject *object)
       GuiControlProfile* profile;
       Sim::findObject( "GuiDefaultProfile", profile );
 
-      if ( profile == mTooltipProfile )     
+      if ( profile == mTooltipProfile )
          mTooltipProfile = NULL;
       else
          setTooltipProfile( profile );
@@ -804,7 +804,7 @@ void GuiControl::onDeleteNotify(SimObject *object)
 bool GuiControl::onWake()
 {
    PROFILE_SCOPE( GuiControl_onWake );
-   
+
    AssertFatal( !mAwake, "GuiControl::onWake() - control is already awake" );
    if( mAwake )
       return true;
@@ -832,7 +832,7 @@ bool GuiControl::onWake()
    // Only invoke script callbacks if we have a namespace in which to do so
    // This will suppress warnings
    onWake_callback();
-   
+
    return true;
 }
 
@@ -879,7 +879,7 @@ void GuiControl::onGroupRemove()
 {
    // If we have a first responder in our hierarchy,
    // make sure to kill it off.
-   
+
    if( mFirstResponder )
       mFirstResponder->clearFirstResponder();
    else
@@ -892,9 +892,9 @@ void GuiControl::onGroupRemove()
             firstResponder->clearFirstResponder();
       }
    }
-   
+
    // If we are awake, put us to sleep.
-   
+
    if( isAwake() )
       sleep();
 }
@@ -951,7 +951,7 @@ void GuiControl::onMouseDown(const GuiEvent &event)
 {
 	if ( !mVisible || !mAwake )
       return;
-	
+
 	execConsoleCallback();
 }
 
@@ -1203,14 +1203,14 @@ void GuiControl::inspectPostApply()
    // to show.
    //
    // Don't do this with the canvas.
-   
+
    if( mAwake && !dynamic_cast< GuiCanvas* >( this ) )
    {
       bool isContainer = mIsContainer;
 
       onSleep();
       onWake();
-      
+
       mIsContainer = isContainer;
    }
 }
@@ -1238,11 +1238,11 @@ bool GuiControl::resize(const Point2I &newPosition, const Point2I &newExtent)
 
    // only do the child control resizing stuff if you really need to.
    const RectI bounds = getBounds();
-   
+
    // If we didn't size anything, return false to indicate such
    bool extentChanged = (actualNewExtent != bounds.extent);
    bool positionChanged = (newPosition != bounds.point);
-   if (!extentChanged && !positionChanged ) 
+   if (!extentChanged && !positionChanged )
       return false;
 
    // Update Position
@@ -1274,7 +1274,7 @@ bool GuiControl::resize(const Point2I &newPosition, const Point2I &newExtent)
          parent->childResized(this);
       setUpdate();
    }
-   
+
    // We sized something
    if( extentChanged )
       return true;
@@ -1468,7 +1468,7 @@ void GuiControl::setTooltipProfile( GuiControlProfile *prof )
 
    if ( mTooltipProfile == NULL )
       skipAwaken = true;
-      
+
    if( mTooltipProfile )
       mTooltipProfile->decUseCount();
 
@@ -1492,7 +1492,7 @@ void GuiControl::setTooltipProfile( GuiControlProfile *prof )
    if ( mAwake && !skipAwaken )
    {
       sleep();
-      
+
       if( !Sim::isShuttingDown() )
          awaken();
    }
@@ -1511,7 +1511,7 @@ void GuiControl::setControlProfile( GuiControlProfile *prof )
 
    if ( mProfile == NULL )
       skipAwaken = true;
-      
+
    if( mProfile )
       mProfile->decUseCount();
 
@@ -1535,7 +1535,7 @@ void GuiControl::setControlProfile( GuiControlProfile *prof )
    if ( mAwake && !skipAwaken )
    {
       sleep();
-      
+
       if( !Sim::isShuttingDown() )
          awaken();
    }
@@ -1545,11 +1545,11 @@ void GuiControl::setControlProfile( GuiControlProfile *prof )
 
 bool GuiControl::setProfileProt( void *object, const char *index, const char *data )
 {
-   GuiControl* ctrl = static_cast<GuiControl*>( object );   
+   GuiControl* ctrl = static_cast<GuiControl*>( object );
    GuiControlProfile *prof = dynamic_cast<GuiControlProfile*>( Sim::findObject( data ) );
    if ( prof == NULL )
-      return false;   
-               
+      return false;
+
    // filter through our setter, for consistency
    ctrl->setControlProfile( prof );
 
@@ -1561,10 +1561,10 @@ bool GuiControl::setProfileProt( void *object, const char *index, const char *da
 
 bool GuiControl::setTooltipProfileProt( void *object, const char *index, const char *data )
 {
-   GuiControl* ctrl = static_cast<GuiControl*>( object );   
+   GuiControl* ctrl = static_cast<GuiControl*>( object );
    GuiControlProfile *prof = dynamic_cast<GuiControlProfile*>( Sim::findObject( data ) );
    if ( prof == NULL )
-      return false;   
+      return false;
 
    // filter through our setter, for consistency
    ctrl->setTooltipProfile( prof );
@@ -1600,7 +1600,7 @@ void GuiControl::setConsoleVariable(const char *variable)
       mConsoleVariable = StringTable->EmptyString();
    }
 }
-  
+
 //-----------------------------------------------------------------------------
 
 void GuiControl::setConsoleCommand( const String& newCmd )
@@ -1684,15 +1684,15 @@ void GuiControl::setVisible(bool value)
 	if( parent )
    {
 	   parent->childResized( this );
-      
+
       // If parent is visible and awake and this control has just
       // become visible but was sleeping, wake it up now.
-      
+
       if(    parent->isVisible() && parent->isAwake()
           && this->isVisible() && !this->isAwake() )
          awaken();
    }
-   
+
    if( getNamespace() ) // May be called during construction.
       onVisible_callback( value );
 }
@@ -1703,7 +1703,7 @@ void GuiControl::setActive( bool value )
 {
    if( mActive == value )
       return;
-      
+
    mActive = value;
 
    if ( !mActive )
@@ -1711,12 +1711,12 @@ void GuiControl::setActive( bool value )
 
    if ( mVisible && mAwake )
       setUpdate();
-      
+
    if( getNamespace() ) // May be called during construction.
       onActive_callback( value );
-      
+
    // Pass activation on to children.
-      
+
    for( iterator iter = begin(); iter != end(); ++ iter )
    {
       GuiControl* child = dynamic_cast< GuiControl* >( *iter );
@@ -1901,38 +1901,38 @@ bool GuiControl::findHitControls( const RectI& rect, Vector< GuiControl* >& outR
       return false;
    else if( !mCanHit && flags & HIT_NoCanHitNoRecurse )
       return false;
-      
+
    // Check for hit.  If not full-box, always counts.
-      
+
    bool isHit = mVisible;
    if( flags & HIT_FullBoxOnly )
    {
       RectI rectInParentSpace = rect;
       rectInParentSpace.point += getPosition();
-      
+
       isHit &= rectInParentSpace.contains( getBounds() );
    }
    else
       isHit &= mCanHit;
-      
+
    // If we have a hit and should not recurse into children,
    // return us.
-   
+
    if( isHit && flags & HIT_ParentPreventsChildHit && depth > 0 )
    {
       outResult.push_back( this );
       return true;
    }
-   
+
    // Check child controls.
-   
+
    bool haveFoundChild = false;
    iterator i = end();
-   
+
    while( i != begin() )
    {
       i --;
-      
+
       GuiControl* ctrl = static_cast< GuiControl* >( *i );
       if( initialLayer >= 0 && ctrl->mLayer > initialLayer )
          continue;
@@ -1941,12 +1941,12 @@ bool GuiControl::findHitControls( const RectI& rect, Vector< GuiControl* >& outR
       {
          RectI transposedRect = rect;
          transposedRect.point -= ctrl->getPosition();
-         
+
          if( ctrl->findHitControls( transposedRect, outResult, flags, -1, depth + 1 ) )
             haveFoundChild = true;
       }
    }
-   
+
    if( ( !haveFoundChild || flags & HIT_AddParentHits ) && isHit )
    {
       outResult.push_back( this );
@@ -2118,12 +2118,12 @@ void GuiControl::setFirstResponder( GuiControl* firstResponder )
 {
    // If the control cannot have keyboard focus, refuse
    // to make it first responder.
-   
+
    if( firstResponder && !firstResponder->mProfile->mCanKeyFocus )
       return;
-      
+
    mFirstResponder = firstResponder;
-   
+
    if( getParent() )
       getParent()->setFirstResponder( firstResponder );
 }
@@ -2146,7 +2146,7 @@ void GuiControl::clearFirstResponder()
 {
    if( !getParent() )
       return;
-      
+
    if( isFirstResponder() )
       getParent()->setFirstResponder( NULL );
    else
@@ -2325,15 +2325,15 @@ U32 GuiControl::clipText( String &text, U32 clipWidth ) const
 
    U32 textWidth = mProfile->mFont->getStrWidthPrecise( text );
 
-   if ( textWidth <= clipWidth )         
-      return textWidth;   
+   if ( textWidth <= clipWidth )
+      return textWidth;
 
    // Start removing characters from the end of the string
    // until the string width plus the elipsesWidth is less
    // than clipWidth...
 
-   // Note this would be more efficient without calling 
-   // getStrWidthPrecise each loop iteration. eg. get the 
+   // Note this would be more efficient without calling
+   // getStrWidthPrecise each loop iteration. eg. get the
    // length of each char, store in a temporary U32 array,
    // and then remove the number we need from the end all at once.
 
@@ -2354,7 +2354,7 @@ U32 GuiControl::clipText( String &text, U32 clipWidth ) const
    }
 
    // Uh, not even the ellipses will fit in the passed width.
-   // Text should be an ellipses string now, 
+   // Text should be an ellipses string now,
    // which is the right thing to do in this case.
 
    return 0;
@@ -2375,7 +2375,7 @@ void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent 
 
    if(getRoot()->mCursorChanged != -1 && !isMouseLocked())
    {
-      // We've already changed the cursor, 
+      // We've already changed the cursor,
       // so set it back before we change it again.
 
       PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
@@ -2458,13 +2458,13 @@ DefineEngineMethod( GuiControl, findHitControls, const char*, ( S32 x, S32 y, S3
    "@see findHitControl" )
 {
    // Find hit controls.
-   
+
    RectI bounds( x, y, width, height );
    Vector< GuiControl* > controls;
-   
+
    if( !object->findHitControls( bounds, controls ) )
       return "";
-      
+
    // Create vector string.
 
    bool isFirst = true;
@@ -2473,20 +2473,20 @@ DefineEngineMethod( GuiControl, findHitControls, const char*, ( S32 x, S32 y, S3
    {
       if( !isFirst )
          str.append( ' ' );
-         
+
       str.append( controls[ i ]->getIdString() );
       isFirst = false;
    }
    String s = str.end();
-   
+
    // Return result.
 
    if ( s.compare( object->getIdString() ) == 0 )
       return "";
-   
+
    char* buffer = Con::getReturnBuffer( s.size() );
    dStrcpy( buffer, s.c_str() );
-   
+
    return buffer;
 }
 
@@ -2499,7 +2499,7 @@ DefineEngineMethod( GuiControl, controlIsChild, bool, ( GuiControl* control ),,
 {
    if( !control )
       return false;
-      
+
    return object->controlIsChild( control );
 }
 
@@ -2678,7 +2678,7 @@ DefineEngineMethod( GuiControl, setProfile, void, ( GuiControlProfile* profile )
 {
    if( !profile )
       return;
-      
+
    object->setControlProfile( profile );
 }
 
@@ -2715,7 +2715,7 @@ DefineEngineMethod( GuiControl, getCenter, Point2I, (),,
    const Point2I pos = object->getPosition();
    const Point2I ext = object->getExtent();
    Point2I center( pos.x + ext.x / 2, pos.y + ext.y / 2 );
-   
+
    return center;
 }
 
@@ -2741,7 +2741,7 @@ DefineEngineMethod( GuiControl, getGlobalCenter, Point2I, (),,
    Point2I pos = object->localToGlobalCoord( tl );
    const Point2I ext = object->getExtent();
    Point2I center( pos.x + ext.x / 2, pos.y + ext.y / 2 );
-   
+
    return center;
 }
 
@@ -2762,11 +2762,11 @@ DefineEngineMethod( GuiControl, setPositionGlobal, void, ( S32 x, S32 y ),,
    "@param x The new X coordinate of the control relative to the root's upper left corner.\n"
    "@param y The new Y coordinate of the control relative to the root's upper left corner." )
 {
-   //see if we can turn the x/y into ints directly, 
+   //see if we can turn the x/y into ints directly,
    Point2I lPosOffset	=	object->globalToLocalCoord( Point2I( x, y ) );
-   
+
    lPosOffset += object->getPosition();
-   
+
    object->setPosition( lPosOffset );
 }
 
@@ -2811,7 +2811,7 @@ ConsoleMethod( GuiControl, setExtent, void, 3, 4,
 {
    if ( argc == 3 )
    {
-      // We scan for floats because its possible that math 
+      // We scan for floats because its possible that math
       // done on the extent can result in fractional values.
       Point2F ext;
       if ( dSscanf( argv[2], "%g %g", &ext.x, &ext.y ) == 2 )

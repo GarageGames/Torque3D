@@ -49,20 +49,20 @@ class SFXFMODEvent;
 class SFXFMODEventSource : public SFXSource
 {
    public:
-   
+
       typedef SFXSource Parent;
-      
+
    protected:
-   
+
       /// The event instance handle for this source.
       FMOD_EVENT* mHandle;
-   
+
       ///
       SFXFMODEventSource( SFXFMODEvent* event );
-            
+
       /// Update 3D position, velocity, and orientation from current source transform.
       void _update3DAttributes();
-      
+
       // SFXSource.
       virtual void _updateStatus();
       virtual void _updateVolume( const MatrixF& listener );
@@ -72,27 +72,27 @@ class SFXFMODEventSource : public SFXSource
       virtual void _setMinMaxDistance( F32 min, F32 max );
       virtual void _setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume );
       virtual void _setFadeTimes( F32 fadeInTime, F32 fadeOutTime );
-   
+
    public:
-   
+
       ///
       SFXFMODEventSource();
-      
+
       virtual ~SFXFMODEventSource();
-   
+
       /// Return the FMOD event object that is being played back by this source.
       SFXFMODEvent* getEvent() const { return ( SFXFMODEvent* ) mTrack.getPointer(); }
 
       /// Create a new source for the given event.
       static SFXFMODEventSource* create( SFXFMODEvent* event );
-      
+
       // SFXSource.
       virtual void play( F32 fadeInTime = -1.f ); // fadeInTime ignored when resuming from paused
       virtual void stop( F32 fadeOutTime = -1.f ); // fadeOutTime!=0 ignored
       virtual void pause( F32 fadeOutTime = -1.f ); // fadeOutTime currently ignored
       virtual void setTransform( const MatrixF& transform );
       virtual void setVelocity( const VectorF& velocity );
-      
+
       DECLARE_CONOBJECT( SFXFMODEventSource );
       DECLARE_CATEGORY( "SFX FMOD" );
       DECLARE_DESCRIPTION( "An SFX source controlling the playback of an FMOD Designer event." );

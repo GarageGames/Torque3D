@@ -228,8 +228,8 @@ public:
    virtual Stream* clone() const;
 };
 
-// This interface is used to provide the amount of bytes actually written/read when using the stream as a 
-// file.  The Stream interface does not provide this information.  This is a lame workaround.  
+// This interface is used to provide the amount of bytes actually written/read when using the stream as a
+// file.  The Stream interface does not provide this information.  This is a lame workaround.
 class IStreamByteCount
 {
 public:

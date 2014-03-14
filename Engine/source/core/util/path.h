@@ -86,7 +86,7 @@ public:
 
    /// Take two paths and return the relative path between them.
    static Path MakeRelativePath( const Path &makeRelative, const Path &relativeTo, U32 mode = String::NoCase );
-   
+
    const String& getRoot() const { return mRoot; }
    const String& getPath() const { return mPath; }
    const String& getFileName() const { return mFile; }
@@ -94,7 +94,7 @@ public:
 
    const String& getFullFileName() const;
    const String& getFullPath() const;
-   
+
    /// Returns the full file path without the volume root.
    String getFullPathWithoutRoot() const;
 
@@ -105,14 +105,14 @@ public:
    const String& setPath(const String &s);
    const String& setFileName(const String &s);
    const String& setExtension(const String &s);
-   
+
    U32 getDirectoryCount() const;
    String getDirectory(U32) const;
-   
+
    bool isDirectory() const;
    bool isRelative() const;
    bool isAbsolute() const;
-   
+
    /// Appends the argument's path component to the object's
    /// path component. The object's root, filename and
    /// extension are unaffected.
@@ -123,13 +123,13 @@ private:
    String   mPath;
    String   mFile;
    String   mExt;
-   
+
    mutable String   mFullFileName;
    mutable String   mFullPath;
 
    mutable bool  mIsDirtyFileName;
    mutable bool  mIsDirtyPath;
-   
+
    void _split(String name);
    String _join() const;
 };

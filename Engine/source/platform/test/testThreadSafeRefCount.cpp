@@ -81,30 +81,30 @@ public:
       NUM_EXTRA_REFS_PER_THREAD = 1000,
       NUM_THREADS = 10
    };
-   
+
    class TestObject : public ThreadSafeRefCount< TestObject >
    {
       public:
    };
-   
+
    ThreadSafeRef< TestObject > mRef;
-   
+
    class TestThread : public Thread
    {
       public:
          TestType* mTest;
          Vector< ThreadSafeRef< TestObject > > mExtraRefs;
-         
+
          TestThread( TestType* test )
             : mTest( test ) {}
-         
+
          void run( void* arg )
          {
             if( !arg )
             {
                for( U32 i = 0; i < NUM_ADD_REFS_PER_THREAD; ++ i )
                   mTest->mRef->addRef();
-                  
+
                mExtraRefs.setSize( NUM_EXTRA_REFS_PER_THREAD );
                for( U32 i = 0; i < NUM_EXTRA_REFS_PER_THREAD; ++ i )
                   mExtraRefs[ i ] = mTest->mRef;
@@ -112,47 +112,47 @@ public:
             else
             {
                mExtraRefs.clear();
-               
+
                for( U32 i = 0; i < NUM_ADD_REFS_PER_THREAD; ++ i )
                   mTest->mRef->release();
             }
-         } 
+         }
    };
-   
+
    void run()
    {
       mRef = new TestObject;
       TEST( mRef->getRefCount() == 2 ); // increments of 2
-      
+
       Vector< TestThread* > threads;
       threads.setSize( NUM_THREADS );
-      
+
       // Create threads.
       for( U32 i = 0; i < NUM_THREADS; ++ i )
          threads[ i ] = new TestThread( this );
-         
+
       // Run phase 1: create references.
       for( U32 i = 0; i < NUM_THREADS; ++ i )
          threads[ i ]->start( NULL );
-               
+
       // Wait for completion.
       for( U32 i = 0; i < NUM_THREADS; ++ i )
          threads[ i ]->join();
-         
+
       Con::printf( "REF: %i", mRef->getRefCount() );
       TEST( mRef->getRefCount() == 2 + ( ( NUM_ADD_REFS_PER_THREAD + NUM_EXTRA_REFS_PER_THREAD ) * NUM_THREADS * 2 ) );
 
       // Run phase 2: release references.
       for( U32 i = 0; i < NUM_THREADS; ++ i )
          threads[ i ]->start( ( void* ) 1 );
-         
+
       // Wait for completion.
       for( U32 i = 0; i < NUM_THREADS; ++ i )
       {
          threads[ i ]->join();
          delete threads[ i ];
       }
-      
+
       TEST( mRef->getRefCount() == 2 ); // increments of two
 
       mRef = NULL;
@@ -172,7 +172,7 @@ CreateUnitTest( TestThreadSafeRefCountTagging, "Platform/ThreadSafeRefCount/Tagg
       TEST( !ref.isTagged() );
       TEST( !ref );
       TEST( !ref.ptr() );
-      
+
       TEST( ref.trySetFromTo( ref, NULL ) );
       TEST( !ref.isTagged() );
 

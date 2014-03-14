@@ -103,7 +103,7 @@ bool FileHeader::readExtraFields(Stream *stream, U16 efLen)
 
       stream->setPosition(pos + fieldSize);
    }
-   
+
    return ret;
 }
 
@@ -125,7 +125,7 @@ bool FileHeader::read(Stream *stream)
    stream->read(&mCRC32);
    stream->read(&mCompressedSize);
    stream->read(&mUncompressedSize);
-   
+
    U16 fnLen, efLen;
    stream->read(&fnLen);
    stream->read(&efLen);
@@ -135,7 +135,7 @@ bool FileHeader::read(Stream *stream)
    fn[fnLen] = 0;
    mFilename = fn;
    SAFE_DELETE_ARRAY(fn);
-   
+
 
    return readExtraFields(stream, efLen);
 }
@@ -145,7 +145,7 @@ bool FileHeader::write(Stream *stream)
    mHeaderSig = mFileHeaderSignature;
 
    stream->write(mHeaderSig);
-   
+
    stream->write(mExtractVer);
    stream->write(mFlags);
    stream->write(mCompressMethod);

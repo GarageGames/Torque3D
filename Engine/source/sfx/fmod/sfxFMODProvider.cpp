@@ -49,7 +49,7 @@ public:
          "Current number of bytes allocated by the %FMOD Designer event system.\n\n"
          "@note Only relevant if an %FMOD sound device is used and the FMOD event DLL is loaded.\n\n"
          "@ingroup SFXFMOD" );
-         
+
       Con::addVariable( "$pref::SFX::FMOD::disableSoftware", TypeBool, &SFXFMODDevice::smPrefDisableSoftware,
          "Whether to disable the %FMOD software mixer to conserve memory.\n"
          "All sounds not created with SFXDescription::useHardware or using DSP effects will fail to load.\n\n"
@@ -91,7 +91,7 @@ protected:
    };
 
    void init();
-   
+
    bool _createSystem();
 
 public:
@@ -104,19 +104,19 @@ MODULE_BEGIN( FMOD )
 
    MODULE_INIT_BEFORE( SFX )
    MODULE_SHUTDOWN_AFTER( SFX )
-   
+
    SFXFMODProvider* mProvider;
-      
+
    MODULE_INIT
    {
       mProvider = new SFXFMODProvider;
    }
-   
+
    MODULE_SHUTDOWN
    {
       delete mProvider;
    }
-   
+
 MODULE_END;
 
 
@@ -127,7 +127,7 @@ bool fmodBindFunction( DLibrary *dll, void *&fnAddress, const char* name )
 {
    if( !dll )
       return false;
-      
+
    fnAddress = dll->bind( name );
 
    if (!fnAddress)
@@ -143,11 +143,11 @@ void SFXFMODProvider::init()
 #ifdef TORQUE_FMOD_STATIC
 
    // FMOD statically linked.
-   
+
    mFMod.isLoaded = true;
    #define FMOD_FUNCTION(fn_name, fn_args) \
       (*(void**)&mFMod.fn_name.fn) = &fn_name;
-   
+
    #ifndef TORQUE_FMOD_NO_EVENTS
    mFMod.eventIsLoaded = true;
       #define FMOD_EVENT_FUNCTION(fn_name, fn_args) \
@@ -157,18 +157,18 @@ void SFXFMODProvider::init()
    #endif
 
    #include FMOD_FN_FILE
-   
+
    #undef FMOD_FUNCTION
    #undef FMOD_EVENT_FUNCTION
-   
+
 #else
 
    // FMOD dynamically linked.
-   
+
    const char* dllName;
    const char* pDllName; // plugin-based DLL
    const char* eventDllName;
-   
+
 #ifdef TORQUE_OS_WIN32
    dllName = "fmodex.dll";
    pDllName = "fmodexp.dll";
@@ -194,7 +194,7 @@ void SFXFMODProvider::init()
       Con::warnf( "SFXFMODProvider - Could not locate '%s' or '%s' - FMOD  not available.", dllName, pDllName );
       return;
    }
-   
+
    mFMod.eventDllRef = OsLoadLibrary( eventDllName );
    if(!mFMod.eventDllRef)
       Con::warnf( "SFXFMODProvider - Could not locate %s - FMOD Designer integration not available.", eventDllName );
@@ -206,9 +206,9 @@ void SFXFMODProvider::init()
       mFMod.isLoaded &= fmodBindFunction(mFMod.dllRef, *(void**)&mFMod.fn_name.fn, #fn_name);
    #define FMOD_EVENT_FUNCTION(fn_name, fn_args) \
       mFMod.eventIsLoaded &= fmodBindFunction(mFMod.eventDllRef, *(void**)&mFMod.fn_name.fn, #fn_name);
-            
+
    #include FMOD_FN_FILE
-   
+
    #undef FMOD_FUNCTION
    #undef FMOD_EVENT_FUNCTION
 
@@ -225,12 +225,12 @@ void SFXFMODProvider::init()
    FMOD_RESULT res;
 
    // Create the FMOD system object.
-      
+
    if( !_createSystem() )
       return;
-      
+
    // Check that the Ex API version is OK.
-   
+
    unsigned int version;
    res = mFMod.FMOD_System_GetVersion(SFXFMODDevice::smSystem, &version);
    FModAssert(res, "SFXFMODProvider - Failed to get FMOD version!");
@@ -246,14 +246,14 @@ void SFXFMODProvider::init()
       Con::warnf("SFXFMODProvider - FMOD Ex API version in DLL is too old - FMOD  not available.");
       return;
    }
-   
+
    // Check that the Designer API version is ok.
-   
+
    if( mFMod.eventIsLoaded )
    {
       res = mFMod.FMOD_EventSystem_GetVersion( SFXFMODDevice::smEventSystem, &version );
       FModAssert(res, "SFXFMODProvider - Failed to get FMOD version!");
-      
+
       Con::printf( "SFXFMODProvider - FMOD Designer API version: %x.%x.%x",
          ( version & 0xffff0000 ) >> 16,
          ( version & 0x0000ff00 ) >> 8,
@@ -283,7 +283,7 @@ void SFXFMODProvider::init()
          continue;
       }
       nameBuff[ 255 ] = '\0';
-      
+
       FMOD_CAPS caps;
       FMOD_SPEAKERMODE speakerMode;
       res = mFMod.FMOD_System_GetDriverCaps( SFXFMODDevice::smSystem, i, &caps, ( int* ) 0, &speakerMode );
@@ -335,7 +335,7 @@ SFXFMODProvider::~SFXFMODProvider()
    {
       mFMod.FMOD_System_Release( SFXFMODDevice::smSystem );
       SFXFMODDevice::smSystem = NULL;
-   }   
+   }
 }
 
 SFXDevice* SFXFMODProvider::createDevice( const String& deviceName, bool useHardware, S32 maxBuffers )
@@ -345,7 +345,7 @@ SFXDevice* SFXFMODProvider::createDevice( const String& deviceName, bool useHard
 
    if( !info )
       return NULL;
-      
+
    if( !SFXFMODDevice::smSystem && !_createSystem() )
       return false;
 
@@ -360,7 +360,7 @@ bool SFXFMODProvider::_createSystem()
 {
    AssertFatal( !SFXFMODDevice::smEventSystem, "SFXFMODProvider::_createSystem() - event system already created!" );
    AssertFatal( !SFXFMODDevice::smSystem, "SFXFMODProvider::_createSystem() - system already created!" );
-   
+
    if( mFMod.eventIsLoaded )
    {
       FMOD_RESULT res = mFMod.FMOD_EventSystem_Create( &SFXFMODDevice::smEventSystem );
@@ -369,7 +369,7 @@ bool SFXFMODProvider::_createSystem()
          Con::errorf( "SFXFMODProvider - could not create the FMOD event system." );
          return false;
       }
-      
+
       res = mFMod.FMOD_EventSystem_GetSystemObject( SFXFMODDevice::smEventSystem, &SFXFMODDevice::smSystem );
       if( res != FMOD_OK )
       {
@@ -380,7 +380,7 @@ bool SFXFMODProvider::_createSystem()
    else
    {
       // Allocate the FMod system.
-      
+
       FMOD_RESULT res = mFMod.FMOD_System_Create( &SFXFMODDevice::smSystem );
       if( res != FMOD_OK )
       {
@@ -389,6 +389,6 @@ bool SFXFMODProvider::_createSystem()
          return false;
       }
    }
-      
+
    return true;
 }

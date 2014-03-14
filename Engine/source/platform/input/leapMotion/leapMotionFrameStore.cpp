@@ -38,7 +38,7 @@ MODULE_BEGIN( LeapMotionFrameStore )
       LeapMotionFrameStore::staticInit();
       ManagedSingleton< LeapMotionFrameStore >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< LeapMotionFrameStore >::deleteSingleton();
@@ -70,7 +70,7 @@ LeapMotionFrameStore::~LeapMotionFrameStore()
 
 void LeapMotionFrameStore::staticInit()
 {
-   Con::addVariable("LeapMotion::MaximumFramesStored", TypeS32, &smMaximumFramesStored, 
+   Con::addVariable("LeapMotion::MaximumFramesStored", TypeS32, &smMaximumFramesStored,
       "@brief The maximum number of frames to keep when $LeapMotion::GenerateWholeFrameEvents is true.\n\n"
 	   "@ingroup Game");
 }

@@ -42,76 +42,76 @@
 class SFXState : public SimDataBlock
 {
    public:
-   
+
       typedef SimDataBlock Parent;
-      
+
       enum
       {
          MaxIncludedStates = 4,
          MaxExcludedStates = 4
       };
-      
+
    protected:
-   
+
       /// Reference count for activation.
       U32 mActiveCount;
-      
+
       /// Reference count for disabling.
       U32 mDisableCount;
-      
+
       /// States that will be activated when this state is activated.
       SFXState* mIncludedStates[ MaxIncludedStates ];
-   
+
       /// States that will be disabled when this state is activated.
       SFXState* mExcludedStates[ MaxExcludedStates ];
-                  
+
       /// Call when state has become active.
       void _onActivate();
-      
+
       /// Call when state has gone back to being deactive.
       void _onDeactivate();
-      
+
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onActivate, () );
       DECLARE_CALLBACK( void, onDeactivate, () );
-      
+
       /// @}
-      
+
    public:
-   
+
       ///
       SFXState();
-      
+
       /// Return true if the state is currently active (activated and not disabled).
       bool isActive() const { return ( !isDisabled() && mActiveCount > 0 ); }
-      
+
       /// Return true if the state is currently disabled.
       bool isDisabled() const { return ( mDisableCount > 0 ); }
-      
+
       /// Activate this state.  activate/deactivate calls balance each other.
       /// Activating a disabled state will not make it active.
       void activate();
-      
+
       ///
       void deactivate();
-      
+
       /// Re-enable this state.
       void enable();
-      
+
       /// Disable this state so that it cannot be activated.  This is used
       /// by state exclusion.
       void disable();
-      
+
       // SimDataBlock.
       virtual bool onAdd();
       virtual bool preload( bool server, String& errorStr );
       virtual void packData( BitStream* stream );
       virtual void unpackData( BitStream* stream );
-      
+
       static void initPersistFields();
-   
+
       DECLARE_CONOBJECT( SFXState );
       DECLARE_CATEGORY( "SFX" );
       DECLARE_DESCRIPTION( "A datablock describing a particular state for the SFX system." );

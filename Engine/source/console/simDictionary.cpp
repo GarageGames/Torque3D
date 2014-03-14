@@ -50,31 +50,31 @@ void SimNameDictionary::insert(SimObject* obj)
       Con::warnf("Warning! You have a duplicate datablock name of %s. This can cause problems. You should rename one of them.", obj->objectName);
 
    Mutex::lockMutex(mutex);
-   
+
    if(!hashTable)
    {
       hashTable = new SimObject *[DefaultTableSize];
       hashTableSize = DefaultTableSize;
       hashEntryCount = 0;
-      
+
       dMemset( hashTable, 0, sizeof( *hashTable ) * DefaultTableSize );
    }
-   
+
    S32 idx = HashPointer(obj->objectName) % hashTableSize;
    obj->nextNameObject = hashTable[idx];
    hashTable[idx] = obj;
    hashEntryCount++;
-   
+
    // Rehash if necessary.
 
    if( hashEntryCount > hashTableSize )
    {
       // Allocate new table.
-      
+
       U32 newHashTableSize = hashTableSize * 2 + 1;
       SimObject** newHashTable = new SimObject *[ newHashTableSize ];
       dMemset( newHashTable, 0, sizeof( newHashTable[ 0 ] ) * newHashTableSize );
-      
+
       // Move entries over.
 
       for( U32 i = 0; i < hashTableSize; ++ i )
@@ -85,17 +85,17 @@ void SimNameDictionary::insert(SimObject* obj)
             idx = HashPointer( object->objectName ) % newHashTableSize;
             object->nextNameObject = newHashTable[ idx ];
             newHashTable[ idx ] = object;
-            
+
             object = next;
          }
-         
+
       // Switch tables.
-      
+
       delete [] hashTable;
       hashTable = newHashTable;
       hashTableSize = newHashTableSize;
    }
-   
+
    Mutex::unlockMutex(mutex);
 }
 
@@ -104,7 +104,7 @@ SimObject* SimNameDictionary::find(StringTableEntry name)
    // NULL is a valid lookup - it will always return NULL
    if(!hashTable)
       return NULL;
-      
+
    Mutex::lockMutex(mutex);
 
    S32 idx = HashPointer(name) % hashTableSize;
@@ -146,7 +146,7 @@ void SimNameDictionary::remove(SimObject* obj)
    }
 
    Mutex::unlockMutex(mutex);
-}	
+}
 
 //----------------------------------------------------------------------------
 
@@ -155,7 +155,7 @@ SimManagerNameDictionary::SimManagerNameDictionary()
    hashTable = new SimObject *[DefaultTableSize];
    hashTableSize = DefaultTableSize;
    hashEntryCount = 0;
-   
+
    dMemset( hashTable, 0, sizeof( hashTable[ 0 ] ) * hashTableSize );
 
    mutex = Mutex::createMutex();
@@ -178,17 +178,17 @@ void SimManagerNameDictionary::insert(SimObject* obj)
    obj->nextManagerNameObject = hashTable[idx];
    hashTable[idx] = obj;
    hashEntryCount++;
-   
+
    // Rehash if necessary.
 
    if( hashEntryCount > hashTableSize )
    {
       // Allocate new table.
-      
+
       U32 newHashTableSize = hashTableSize * 2 + 1;
       SimObject** newHashTable = new SimObject *[ newHashTableSize ];
       dMemset( newHashTable, 0, sizeof( newHashTable[ 0 ] ) * newHashTableSize );
-      
+
       // Move entries over.
 
       for( U32 i = 0; i < hashTableSize; ++ i )
@@ -199,17 +199,17 @@ void SimManagerNameDictionary::insert(SimObject* obj)
             idx = HashPointer( object->objectName ) % newHashTableSize;
             object->nextManagerNameObject = newHashTable[ idx ];
             newHashTable[ idx ] = object;
-            
+
             object = next;
          }
-         
+
       // Switch tables.
-      
+
       delete [] hashTable;
       hashTable = newHashTable;
       hashTableSize = newHashTableSize;
    }
-   
+
    Mutex::unlockMutex(mutex);
 }
 
@@ -258,7 +258,7 @@ void SimManagerNameDictionary::remove(SimObject* obj)
    }
 
    Mutex::unlockMutex(mutex);
-}	
+}
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

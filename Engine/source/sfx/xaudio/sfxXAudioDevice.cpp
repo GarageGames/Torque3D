@@ -29,7 +29,7 @@
 #include "platform/profiler.h"
 
 
-SFXXAudioDevice::SFXXAudioDevice(   SFXProvider* provider, 
+SFXXAudioDevice::SFXXAudioDevice(   SFXProvider* provider,
                                     const String& name,
                                     IXAudio2 *xaudio,
                                     U32 deviceIndex,
@@ -49,11 +49,11 @@ SFXXAudioDevice::SFXXAudioDevice(   SFXProvider* provider,
       mMaxBuffers = 64;
 
    // Create the mastering voice.
-   HRESULT hr = mXAudio->CreateMasteringVoice(  &mMasterVoice, 
+   HRESULT hr = mXAudio->CreateMasteringVoice(  &mMasterVoice,
                                                 XAUDIO2_DEFAULT_CHANNELS,
-                                                XAUDIO2_DEFAULT_SAMPLERATE, 
-                                                0, 
-                                                deviceIndex, 
+                                                XAUDIO2_DEFAULT_SAMPLERATE,
+                                                0,
+                                                deviceIndex,
                                                 NULL );
    if ( FAILED( hr ) || !mMasterVoice )
    {
@@ -64,8 +64,8 @@ SFXXAudioDevice::SFXXAudioDevice(   SFXProvider* provider,
    mMasterVoice->GetVoiceDetails( &mMasterVoiceDetails );
 
    // Init X3DAudio.
-   X3DAudioInitialize(  speakerChannelMask, 
-                        X3DAUDIO_SPEED_OF_SOUND, 
+   X3DAudioInitialize(  speakerChannelMask,
+                        X3DAUDIO_SPEED_OF_SOUND,
                         mX3DAudio );
 
    // Start the update thread.
@@ -106,7 +106,7 @@ SFXBuffer* SFXXAudioDevice::createBuffer( const ThreadSafeRef< SFXStream >& stre
 
 SFXVoice* SFXXAudioDevice::createVoice( bool is3D, SFXBuffer *buffer )
 {
-   // Don't bother going any further if we've 
+   // Don't bother going any further if we've
    // exceeded the maximum voices.
    if ( mVoices.size() >= mMaxBuffers )
       return NULL;
@@ -137,20 +137,20 @@ void SFXXAudioDevice::_setOutputMatrix( SFXXAudioVoice *voice )
    dspSettings.SrcChannelCount = emitter.ChannelCount;
 
    // Calculate the output volumes and doppler.
-   X3DAudioCalculate(   mX3DAudio, 
-                        &mListener, 
-                        &emitter, 
-                        X3DAUDIO_CALCULATE_MATRIX | 
+   X3DAudioCalculate(   mX3DAudio,
+                        &mListener,
+                        &emitter,
+                        X3DAUDIO_CALCULATE_MATRIX |
                         X3DAUDIO_CALCULATE_DOPPLER,
                         &dspSettings );
 
-   voice->mXAudioVoice->SetOutputMatrix(   mMasterVoice, 
-                                           dspSettings.SrcChannelCount, 
-                                           dspSettings.DstChannelCount, 
+   voice->mXAudioVoice->SetOutputMatrix(   mMasterVoice,
+                                           dspSettings.SrcChannelCount,
+                                           dspSettings.DstChannelCount,
                                            dspSettings.pMatrixCoefficients,
                                            4321 );
 
-   voice->mXAudioVoice->SetFrequencyRatio(   dspSettings.DopplerFactor * voice->mPitch, 
+   voice->mXAudioVoice->SetFrequencyRatio(   dspSettings.DopplerFactor * voice->mPitch,
                                              4321 );
 
    // Commit the changes.
@@ -170,7 +170,7 @@ void SFXXAudioDevice::update()
 
    dspSettings.DopplerFactor = mDopplerFactor;
 
-   // Now update the volume and frequency of 
+   // Now update the volume and frequency of
    // all the active 3D voices.
    VoiceVector::iterator voice = mVoices.begin();
    for ( ; voice != mVoices.end(); voice++ )
@@ -186,20 +186,20 @@ void SFXXAudioDevice::update()
       dspSettings.SrcChannelCount = emitter.ChannelCount;
 
       // Calculate the output volumes and doppler.
-      X3DAudioCalculate(   mX3DAudio, 
-                           &mListener, 
-                           &emitter, 
-                           X3DAUDIO_CALCULATE_MATRIX | 
-                           X3DAUDIO_CALCULATE_DOPPLER, 
+      X3DAudioCalculate(   mX3DAudio,
+                           &mListener,
+                           &emitter,
+                           X3DAUDIO_CALCULATE_MATRIX |
+                           X3DAUDIO_CALCULATE_DOPPLER,
                            &dspSettings );
 
-      xaVoice->mXAudioVoice->SetOutputMatrix(   mMasterVoice, 
-                                                dspSettings.SrcChannelCount, 
-                                                dspSettings.DstChannelCount, 
+      xaVoice->mXAudioVoice->SetOutputMatrix(   mMasterVoice,
+                                                dspSettings.SrcChannelCount,
+                                                dspSettings.DstChannelCount,
                                                 dspSettings.pMatrixCoefficients,
                                                 4321 ) ;
 
-      xaVoice->mXAudioVoice->SetFrequencyRatio( dspSettings.DopplerFactor * xaVoice->mPitch, 
+      xaVoice->mXAudioVoice->SetFrequencyRatio( dspSettings.DopplerFactor * xaVoice->mPitch,
                                                 4321 );
    }
 

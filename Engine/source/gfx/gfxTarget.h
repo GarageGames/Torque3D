@@ -107,7 +107,7 @@ public:
    /// when activate() is next called.
    virtual void preserve() { }
 
-   /// Copy this surface to the passed GFXTextureObject.   
+   /// Copy this surface to the passed GFXTextureObject.
    /// @param tex The GFXTextureObject to copy to.
    virtual void resolveTo( GFXTextureObject *tex ) { }
 };
@@ -148,7 +148,7 @@ public:
 /// some cases it is necessary to allocate helper resources to enable RTT
 /// operations.
 ///
-/// @note A GFXTextureTarget will retain references to textures that are 
+/// @note A GFXTextureTarget will retain references to textures that are
 /// attached to it, so be sure to clear them out when you're done!
 ///
 /// @note Different APIs have different restrictions on what they can support
@@ -178,7 +178,7 @@ public:
    /// @param tex A texture and miplevel to bind for rendering, or else NULL/0
    ///            to clear a slot.
    /// @param mipLevel What level of this texture are we rendering to?
-   /// @param zOffset  If this is a depth texture, what z level are we 
+   /// @param zOffset  If this is a depth texture, what z level are we
    ///                 rendering to?
    virtual void attachTexture(RenderSlot slot, GFXTextureObject *tex, U32 mipLevel=0, U32 zOffset = 0) = 0;
 
@@ -193,9 +193,9 @@ public:
 
    /// Resolve the current render target data to the associated textures. This method
    /// will get called automatically when a rendertarget is changed, before new geometry
-   /// is drawn to a different rendertarget. This method can also be called to 
+   /// is drawn to a different rendertarget. This method can also be called to
    /// gather render target data without switching targets.
-   /// 
+   ///
    /// By default, this method will resolve all color targets.
    virtual void resolve()=0;
 };

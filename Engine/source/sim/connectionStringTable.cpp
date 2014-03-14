@@ -82,7 +82,7 @@ IMPLEMENT_CO_NETEVENT_V1(NetStringEvent);
 
 ConsoleDocClass( NetStringEvent,
    "@brief Internal event used for transmitting strings across the server.\n\n"
- 
+
    "For internal use only, not intended for TorqueScript or game development\n\n"
 
    "@internal\n"

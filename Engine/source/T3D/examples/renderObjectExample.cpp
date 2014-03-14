@@ -33,7 +33,7 @@
 
 IMPLEMENT_CO_NETOBJECT_V1(RenderObjectExample);
 
-ConsoleDocClass( RenderObjectExample, 
+ConsoleDocClass( RenderObjectExample,
    "@brief An example scene object which renders using a callback.\n\n"
    "This class implements a basic SceneObject that can exist in the world at a "
    "3D position and render itself. Note that RenderObjectExample handles its own "
@@ -141,7 +141,7 @@ void RenderObjectExample::unpackUpdate(NetConnection *conn, BitStream *stream)
 //-----------------------------------------------------------------------------
 void RenderObjectExample::createGeometry()
 {
-   static const Point3F cubePoints[8] = 
+   static const Point3F cubePoints[8] =
    {
       Point3F( 1.0f, -1.0f, -1.0f), Point3F( 1.0f, -1.0f,  1.0f),
       Point3F( 1.0f,  1.0f, -1.0f), Point3F( 1.0f,  1.0f,  1.0f),
@@ -149,21 +149,21 @@ void RenderObjectExample::createGeometry()
       Point3F(-1.0f, -1.0f,  1.0f), Point3F(-1.0f,  1.0f,  1.0f)
    };
 
-   static const Point3F cubeNormals[6] = 
+   static const Point3F cubeNormals[6] =
    {
       Point3F( 1.0f,  0.0f,  0.0f), Point3F(-1.0f,  0.0f,  0.0f),
       Point3F( 0.0f,  1.0f,  0.0f), Point3F( 0.0f, -1.0f,  0.0f),
       Point3F( 0.0f,  0.0f,  1.0f), Point3F( 0.0f,  0.0f, -1.0f)
    };
 
-   static const ColorI cubeColors[3] = 
+   static const ColorI cubeColors[3] =
    {
       ColorI( 255,   0,   0, 255 ),
       ColorI(   0, 255,   0, 255 ),
       ColorI(   0,   0, 255, 255 )
    };
 
-   static const U32 cubeFaces[36][3] = 
+   static const U32 cubeFaces[36][3] =
    {
       { 3, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 },
       { 2, 0, 0 }, { 0, 0, 0 }, { 3, 0, 0 },

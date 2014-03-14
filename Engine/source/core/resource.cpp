@@ -48,7 +48,7 @@ void ResourceBase::Header::destroySelf()
 {
    if (this == &smBlank)
       return;
-      
+
    if( mNotifyUnload )
       mNotifyUnload( getPath(), getResource() );
 

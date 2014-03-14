@@ -45,19 +45,19 @@
 class OggTheoraFrame : public RawData
 {
    public:
-   
+
       typedef RawData Parent;
-      
+
       OggTheoraFrame() {}
       OggTheoraFrame( S8* data, U32 size, bool ownMemory = false )
          : Parent( data, size, ownMemory ) {}
-         
+
       /// Serial number of this frame in the stream.
       U32 mFrameNumber;
-      
+
       /// Playtime in seconds at which to display this frame.
       F32 mFrameTime;
-      
+
       /// Seconds to display this frame.
       F32 mFrameDuration;
 };
@@ -72,9 +72,9 @@ class OggTheoraDecoder : public OggDecoder,
                          public IInputStream< OggTheoraFrame* >
 {
    public:
-   
+
       typedef OggDecoder Parent;
-      
+
       /// Y'CbCr pixel format of the source video stream.
       /// For informational purposes only.  Packet out is determined
       /// by PacketFormat.
@@ -85,7 +85,7 @@ class OggTheoraDecoder : public OggDecoder,
          PIXEL_FORMAT_420,    // Full Y, half-widht+height Cb, half-width+height Cr.
          PIXEL_FORMAT_Unknown
       };
-            
+
       /// Descriptor for surface format that this stream should
       /// decode into.  This saves an otherwise potentitally necessary
       /// swizzling step.
@@ -96,21 +96,21 @@ class OggTheoraDecoder : public OggDecoder,
       {
          /// Pixel format.
          GFXFormat mFormat;
-         
+
          /// Bytes per scanline.
          U32 mPitch;
-         
+
          /// Default descriptor sets up for RGB.
          PacketFormat()
             : mFormat( GFXFormatR8G8B8 ),
               mPitch( 0 ) {}
-         
+
          ///
          PacketFormat( GFXFormat format, U32 pitch )
             : mFormat( format ),
               mPitch( pitch ) {}
       };
-      
+
       ///
       enum ETranscoder
       {
@@ -118,64 +118,64 @@ class OggTheoraDecoder : public OggDecoder,
          TRANSCODER_Generic,        ///< Generic transcoder that handles all source and target formats; 32bit integer + lookup tables.
          TRANSCODER_SSE2420RGBA,    ///< SSE2 transcoder with fixed 4:2:0 to RGBA conversion; 32bit integer + lookup tables.
       };
-            
+
    protected:
-   
+
       typedef IPositionable< U32 >* TimeSourceRef;
-      
+
       /// @name libtheora Data
       /// @{
-            
+
       ///
       th_comment mTheoraComment;
-      
+
       ///
       th_info mTheoraInfo;
-      
+
       ///
       th_setup_info* mTheoraSetup;
-      
+
       ///
       th_dec_ctx* mTheoraDecoder;
-      
+
       /// @}
-      
+
       ///
       PacketFormat mPacketFormat;
-            
+
       ///
       F32 mFrameDuration;
 
       ///
       F32 mCurrentFrameTime;
-      
+
       ///
       U32 mCurrentFrameNumber;
-            
+
       /// If this is set, the decoder will drop frames that are
       /// already outdated with respect to the time source.
       ///
       /// @note Times are in milliseconds and in video time.
       TimeSourceRef mTimeSource;
-      
+
       /// Transcoder to use for color space conversion.  If the current
       /// setting is invalid, will fall back to generic.
       ETranscoder mTranscoder;
-      
+
       ///
       ThreadSafeDeque< OggTheoraFrame* > mFreePackets;
-      
+
       #ifdef TORQUE_DEBUG
       U32 mLock;
       #endif
-      
+
       /// Generic transcoder going from any of the Y'CbCr pixel formats to
       /// any RGB format (that is supported by GFXFormatUtils).
       void _transcode( th_ycbcr_buffer ycbcr, U8* buffer, U32 width, U32 height );
-      
+
       /// Transcoder with fixed 4:2:0 to RGBA conversion using SSE2 assembly.
       void _transcode420toRGBA_SSE2( th_ycbcr_buffer ycbcr, U8* buffer, U32 width, U32 height, U32 pitch );
-      
+
       // OggDecoder.
       virtual bool _detect( ogg_page* startPage );
       virtual bool _init();
@@ -189,11 +189,11 @@ class OggTheoraDecoder : public OggDecoder,
             case PIXEL_FORMAT_444:  break;
             case PIXEL_FORMAT_422:  if( plane != 0 ) x >>= 1; break;
             case PIXEL_FORMAT_420:  if( plane != 0 ) { x >>= 1; y >>= 1; } break;
-            
+
             default:
                AssertFatal( false, "OggTheoraDecoder::_getPixelOffset() - invalid pixel format" );
          }
-         
+
          return ( y * buffer[ plane ].stride + x );
       }
 
@@ -202,31 +202,31 @@ class OggTheoraDecoder : public OggDecoder,
       {
          return ( buffer[ plane ].data + offset + _getPixelOffset( buffer, plane, x, y ) );
       }
-      
+
       ///
       U32 _getPictureOffset( th_ycbcr_buffer buffer, U32 plane )
       {
          return _getPixelOffset( buffer, plane, mTheoraInfo.pic_x, mTheoraInfo.pic_y );
       }
-            
+
    public:
-   
+
       ///
       OggTheoraDecoder( const ThreadSafeRef< OggInputStream >& stream );
-      
+
       ~OggTheoraDecoder();
-      
+
       /// Return the width of video image frames in pixels.
       /// @note This returns the actual picture width rather than Theora's internal encoded frame width.
       U32 getFrameWidth() const { return mTheoraInfo.pic_width; }
-      
+
       /// Return the height of video image frames in pixels.
       /// @note This returns the actual picture height rather than Theora's internal encoded frame height.
       U32 getFrameHeight() const { return mTheoraInfo.pic_height; }
-      
+
       ///
       F32 getFramesPerSecond() const { return ( F32( mTheoraInfo.fps_numerator ) / F32( mTheoraInfo.fps_denominator ) ); }
-      
+
       ///
       EPixelFormat getDecoderPixelFormat() const
       {
@@ -238,28 +238,28 @@ class OggTheoraDecoder : public OggDecoder,
             default:          return PIXEL_FORMAT_Unknown;
          }
       }
-      
+
       ///
       const PacketFormat& getPacketFormat() const { return mPacketFormat; }
-      
+
       ///
       void setPacketFormat( const PacketFormat& format ) { mPacketFormat = format; }
-      
+
       /// Set the reference time source.  Frames will be dropped if the decoder
       /// falls behind the time of this source.
       ///
       /// @note The time source must have at least the same lifetime as the decoder.
       void setTimeSource( const TimeSourceRef& timeSource ) { mTimeSource = timeSource; }
-            
+
       /// Set the Y'CbCr->RGB transcoder to use.
       void setTranscoder( ETranscoder transcoder ) { mTranscoder = transcoder; }
-      
+
       ///
       void reusePacket( OggTheoraFrame* packet ) { mFreePackets.pushBack( packet ); }
-         
+
       // OggDecoder.
       virtual const char* getName() const { return "Theora"; }
-      
+
       // IInputStream.
       virtual U32 read( OggTheoraFrame** buffer, U32 num );
 };

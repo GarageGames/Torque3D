@@ -41,22 +41,22 @@ void Platform::getLocalTime(LocalTime &lt)
 
    time( &long_time );                // Get time as long integer.
    systime = localtime( &long_time ); // Convert to local time.
-   
-   lt.sec      = systime->tm_sec;      
-   lt.min      = systime->tm_min;      
-   lt.hour     = systime->tm_hour;     
-   lt.month    = systime->tm_mon;    
-   lt.monthday = systime->tm_mday; 
-   lt.weekday  = systime->tm_wday;  
-   lt.year     = systime->tm_year;     
-   lt.yearday  = systime->tm_yday;  
-   lt.isdst    = systime->tm_isdst;    
-}  
+
+   lt.sec      = systime->tm_sec;
+   lt.min      = systime->tm_min;
+   lt.hour     = systime->tm_hour;
+   lt.month    = systime->tm_mon;
+   lt.monthday = systime->tm_mday;
+   lt.weekday  = systime->tm_wday;
+   lt.year     = systime->tm_year;
+   lt.yearday  = systime->tm_yday;
+   lt.isdst    = systime->tm_isdst;
+}
 
 String Platform::localTimeToString( const LocalTime &lt )
 {
    tm systime;
-   
+
    systime.tm_sec    = lt.sec;
    systime.tm_min    = lt.min;
    systime.tm_hour   = lt.hour;
@@ -75,7 +75,7 @@ U32 Platform::getTime()
    time_t long_time;
    time( &long_time );
    return long_time;
-}   
+}
 
 U32 Platform::getRealMilliseconds()
 {
@@ -88,25 +88,25 @@ U32 Platform::getRealMilliseconds()
 U32 Platform::getVirtualMilliseconds()
 {
    return sgCurrentTime;
-}   
+}
 
 void Platform::advanceTime(U32 delta)
 {
    sgCurrentTime += delta;
-}   
+}
 
 void Platform::fileToLocalTime(const FileTime & ft, LocalTime * lt)
 {
    if(!lt)
       return;
-      
+
    time_t long_time = ft;
 
    struct tm systime;
 
    /// Convert to local time, thread safe.
    localtime_r( &long_time, &systime );
-   
+
    /// Fill the return struct
    lt->sec      = systime.tm_sec;
    lt->min      = systime.tm_min;
@@ -158,4 +158,4 @@ void Platform::sleep(U32 ms)
 	// note: this will overflow if you want to sleep for more than 49 days. just so ye know.
 	usleep( ms * 1000 );
 }
-	    
+

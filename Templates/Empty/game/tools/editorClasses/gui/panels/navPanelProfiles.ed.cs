@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
-singleton GuiControlProfile (NavPanelProfile) 
+singleton GuiControlProfile (NavPanelProfile)
 {
    opaque = false;
    border = -2;
@@ -29,72 +29,72 @@ singleton GuiControlProfile (NavPanelProfile)
 };
 
 
-singleton GuiControlProfile (NavPanel : NavPanelProfile) 
+singleton GuiControlProfile (NavPanel : NavPanelProfile)
 {
    bitmap = "./navPanel";
    category = "Editor";
 };
 
-singleton GuiControlProfile (NavPanelBlue : NavPanelProfile) 
+singleton GuiControlProfile (NavPanelBlue : NavPanelProfile)
 {
    bitmap = "./navPanel_blue";
    category = "Editor";
 };
 
-singleton GuiControlProfile (NavPanelGreen : NavPanelProfile) 
+singleton GuiControlProfile (NavPanelGreen : NavPanelProfile)
 {
    bitmap = "./navPanel_green";
    category = "Editor";
 };
 
-singleton GuiControlProfile (NavPanelRed : NavPanelProfile) 
+singleton GuiControlProfile (NavPanelRed : NavPanelProfile)
 {
    bitmap = "./navPanel_red";
    category = "Editor";
 };
 
-singleton GuiControlProfile (NavPanelWhite : NavPanelProfile) 
+singleton GuiControlProfile (NavPanelWhite : NavPanelProfile)
 {
    bitmap = "./navPanel_white";
    category = "Editor";
 };
 
-singleton GuiControlProfile (NavPanelYellow : NavPanelProfile) 
+singleton GuiControlProfile (NavPanelYellow : NavPanelProfile)
 {
    bitmap = "./navPanel_yellow";
    category = "Editor";
 };
-singleton GuiControlProfile (menubarProfile : NavPanelProfile) 
+singleton GuiControlProfile (menubarProfile : NavPanelProfile)
 {
    bitmap = "./menubar";
    category = "Editor";
 };
-singleton GuiControlProfile (editorMenubarProfile : NavPanelProfile) 
+singleton GuiControlProfile (editorMenubarProfile : NavPanelProfile)
 {
    bitmap = "./editor-menubar";
    category = "Editor";
 };
-singleton GuiControlProfile (editorMenu_wBorderProfile : NavPanelProfile) 
+singleton GuiControlProfile (editorMenu_wBorderProfile : NavPanelProfile)
 {
    bitmap = "./menu-fullborder";
    category = "Editor";
 };
-singleton GuiControlProfile (inspectorStyleRolloutProfile : NavPanelProfile) 
+singleton GuiControlProfile (inspectorStyleRolloutProfile : NavPanelProfile)
 {
    bitmap = "./inspector-style-rollout";
    category = "Editor";
 };
-singleton GuiControlProfile (inspectorStyleRolloutListProfile : NavPanelProfile) 
+singleton GuiControlProfile (inspectorStyleRolloutListProfile : NavPanelProfile)
 {
    bitmap = "./inspector-style-rollout-list";
    category = "Editor";
 };
-singleton GuiControlProfile (inspectorStyleRolloutDarkProfile : NavPanelProfile) 
+singleton GuiControlProfile (inspectorStyleRolloutDarkProfile : NavPanelProfile)
 {
    bitmap = "./inspector-style-rollout-dark";
    category = "Editor";
 };
-singleton GuiControlProfile (inspectorStyleRolloutInnerProfile : NavPanelProfile) 
+singleton GuiControlProfile (inspectorStyleRolloutInnerProfile : NavPanelProfile)
 {
    bitmap = "./inspector-style-rollout_inner";
    category = "Editor";
@@ -104,7 +104,7 @@ singleton GuiControlProfile (inspectorStyleRolloutNoHeaderProfile : NavPanelProf
    bitmap = "./inspector-style-rollout-noheader";
    category = "Editor";
 };
-singleton GuiControlProfile (IconDropdownProfile : NavPanelProfile) 
+singleton GuiControlProfile (IconDropdownProfile : NavPanelProfile)
 {
    bitmap = "./icon-dropdownbar";
    category = "Editor";

@@ -48,7 +48,7 @@ IMPLEMENT_CONOBJECT(Message);
 
 ConsoleDocClass( Message,
 	"@brief Base class for messages\n\n"
-	
+
 	"Message is the base class for C++ defined messages, and may also be used "
 	"in script for script defined messages if no C++ subclass is appropriate.\n\n"
 
@@ -78,7 +78,7 @@ ConsoleDocClass( Message,
 	"fields. Messages that need to be handled in C++ as well as script "
 	"provide the relevant data through persistent fields in a subclass of "
 	"Message to provide best performance on the C++ side. Script defined "
-	"messages usually their through dynamic fields, and may be accessed in " 
+	"messages usually their through dynamic fields, and may be accessed in "
 	"C++ using the SimObject::getDataField() method.\n\n"
 
    "@ingroup Messaging\n"
@@ -117,11 +117,11 @@ IMPLEMENT_CALLBACK(Message, onRemove, void, (),(),
 				   );
 
 void Message::onRemove()
-{   
+{
    onRemove_callback();
    //Con::executef(this, "onRemove");
    unlinkNamespaces();
-   
+
    Parent::onRemove();
 }
 

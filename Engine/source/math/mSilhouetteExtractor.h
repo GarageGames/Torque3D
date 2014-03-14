@@ -177,7 +177,7 @@ struct SilhouetteExtractorBaseOrtho : public SilhouetteExtractorBase< Polyhedron
          for( U32 i = 0; i < numPlanes; ++ i )
             mFaceDotProducts[ i ] = mDot( planes[ i ], viewDirOS );
       }
-      
+
       /// Finish extraction.
       void end() const
       {
@@ -377,7 +377,7 @@ struct SilhouetteExtractorPerspective
 
          mExtractor.end();
 
-         return result;         
+         return result;
       }
 };
 

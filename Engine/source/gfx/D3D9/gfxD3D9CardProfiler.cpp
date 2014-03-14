@@ -124,7 +124,7 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
       usage |= D3DUSAGE_DEPTHSTENCIL;
       rType = D3DRTYPE_SURFACE;
    }
-   
+
    if( inOutAutogenMips )
       usage |= D3DUSAGE_AUTOGENMIPMAP;
 #endif
@@ -133,7 +133,7 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
    if(texFormat == (_D3DFORMAT)GFX_UNSUPPORTED_VAL)
       return false;
 
-   HRESULT hr = pD3D->CheckDeviceFormat( mAdapterOrdinal, D3DDEVTYPE_HAL, 
+   HRESULT hr = pD3D->CheckDeviceFormat( mAdapterOrdinal, D3DDEVTYPE_HAL,
       adapterFormat, usage, rType, texFormat );
 
    bool retVal = SUCCEEDED( hr );
@@ -145,12 +145,12 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
    {
       usage ^= D3DUSAGE_AUTOGENMIPMAP;
 
-      hr = pD3D->CheckDeviceFormat( mAdapterOrdinal, D3DDEVTYPE_HAL, 
+      hr = pD3D->CheckDeviceFormat( mAdapterOrdinal, D3DDEVTYPE_HAL,
          adapterFormat, usage, D3DRTYPE_TEXTURE, GFXD3D9TextureFormat[fmt] );
 
       retVal = SUCCEEDED( hr );
 
-      // If this one passed, auto gen mips are not supported with this format, 
+      // If this one passed, auto gen mips are not supported with this format,
       // so set the variable properly
       if( retVal )
          inOutAutogenMips = false;

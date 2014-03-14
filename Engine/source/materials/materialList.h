@@ -77,10 +77,10 @@ public:
    void mapMaterials();
 
    /// Initialize material instances in material list.
-   void initMatInstances(  const FeatureSet &features, 
+   void initMatInstances(  const FeatureSet &features,
                            const GFXVertexFormat *vertexFormat );
 
-   /// Return the material instance or NULL if the 
+   /// Return the material instance or NULL if the
    /// index is out of bounds.
    inline BaseMatInstance* getMaterialInst( U32 index ) const
    {

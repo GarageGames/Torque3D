@@ -97,10 +97,10 @@ SceneContainer::SceneContainer()
    mStart.next = mStart.prev = &mEnd;
 
    mBinArray = new SceneObjectRef[csmNumBins * csmNumBins];
-   for (U32 i = 0; i < csmNumBins; i++) 
+   for (U32 i = 0; i < csmNumBins; i++)
    {
       U32 base = i * csmNumBins;
-      for (U32 j = 0; j < csmNumBins; j++) 
+      for (U32 j = 0; j < csmNumBins; j++)
       {
          mBinArray[base + j].object    = NULL;
          mBinArray[base + j].nextInBin = NULL;
@@ -417,7 +417,7 @@ void SceneContainer::findObjects(const Box3F& box, U32 mask, FindCallback callba
 
    // If we're searching for just water, just physical zones, or
    // just water and physical zones then use the optimized path.
-   if ( mask == WaterObjectType || 
+   if ( mask == WaterObjectType ||
         mask == PhysicalZoneObjectType ||
         mask == (WaterObjectType|PhysicalZoneObjectType) )
    {
@@ -495,7 +495,7 @@ void SceneContainer::findObjects( const Frustum &frustum, U32 mask, FindCallback
 
    Box3F searchBox = frustum.getBounds();
 
-   if (  mask == WaterObjectType || 
+   if (  mask == WaterObjectType ||
          mask == PhysicalZoneObjectType ||
          mask == (WaterObjectType|PhysicalZoneObjectType) )
    {
@@ -592,7 +592,7 @@ void SceneContainer::polyhedronFindObjects(const Polyhedron& polyhedron, U32 mas
       box.maxExtents.setMax(polyhedron.pointList[i]);
    }
 
-   if (  mask == WaterObjectType || 
+   if (  mask == WaterObjectType ||
          mask == PhysicalZoneObjectType ||
          mask == (WaterObjectType|PhysicalZoneObjectType) )
    {
@@ -790,7 +790,7 @@ void SceneContainer::_findSpecialObjects( const Vector< SceneObject* >& vector, 
    {
       if ( (*iter)->getTypeMask() & mask )
          callback( *iter, key );
-   }   
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -804,13 +804,13 @@ void SceneContainer::_findSpecialObjects( const Vector< SceneObject* >& vector, 
    for ( ; iter != vector.end(); iter++ )
    {
       SceneObject *pObj = *iter;
-      
+
       if ( pObj->getTypeMask() & mask &&
            ( pObj->isGlobalBounds() || pObj->getWorldBox().isOverlapped(box) ) )
       {
          callback( pObj, key );
       }
-   }  
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1379,7 +1379,7 @@ void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32
    if ((max - min) >= (SceneContainer::csmTotalBinSize - SceneContainer::csmBinSize))
    {
       F32 minCoord = mFmod(min, SceneContainer::csmTotalBinSize);
-      if (minCoord < 0.0f) 
+      if (minCoord < 0.0f)
       {
          minCoord += SceneContainer::csmTotalBinSize;
 
@@ -1397,12 +1397,12 @@ void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32
       maxBin = minBin + (SceneContainer::csmNumBins - 1);
       return;
    }
-   else 
+   else
    {
 
       F32 minCoord = mFmod(min, SceneContainer::csmTotalBinSize);
-      
-      if (minCoord < 0.0f) 
+
+      if (minCoord < 0.0f)
       {
          minCoord += SceneContainer::csmTotalBinSize;
 
@@ -1498,7 +1498,7 @@ DefineEngineFunction( initContainerRadiusSearch, void, ( Point3F pos, F32 radius
    "@param useClientContainer Optionally indicates the search should be within the "
    "client container.\n"
 
-   "@see containerSearchNext\n" 
+   "@see containerSearchNext\n"
    "@ingroup Game")
 {
    SceneContainer* pContainer = useClientContainer ? &gClientContainer : &gServerContainer;
@@ -1515,7 +1515,7 @@ DefineEngineFunction( initContainerTypeSearch, void, ( U32 mask, bool useClientC
    "@param useClientContainer Optionally indicates the search should be within the "
    "client container.\n"
 
-   "@see containerSearchNext\n" 
+   "@see containerSearchNext\n"
    "@ingroup Game")
 {
    SceneContainer* pContainer = useClientContainer ? &gClientContainer : &gServerContainer;
@@ -1584,7 +1584,7 @@ DefineEngineFunction( containerSearchCurrRadiusDist, F32, ( bool useClientContai
    "@return distance from the closest point of the current object to the "
    "center of the search\n"
 
-   "@see containerSearchNext\n" 
+   "@see containerSearchNext\n"
    "@ingroup Game")
 {
    SceneContainer* pContainer = useClientContainer ? &gClientContainer : &gServerContainer;
@@ -1613,7 +1613,7 @@ DefineEngineFunction( containerRayCast, const char*,
    "<ul><li>The ID of the object that was struck.</li>"
    "<li>The x, y, z position that it was struck.</li>"
    "<li>The x, y, z of the normal of the face that was struck.</li>"
-   "<li>The distance between the start point and the position we hit.</li></ul>" 
+   "<li>The distance between the start point and the position we hit.</li></ul>"
 
    "@ingroup Game")
 {

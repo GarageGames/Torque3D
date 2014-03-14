@@ -147,7 +147,7 @@ void LeapMotionFrame::copyFromFrameHands(const Leap::HandList& hands, const F32&
 
       mHandValid[i] = hand.isValid();
       mHandId[i] = hand.id();
-      
+
       // Position
       LeapMotionUtil::convertPosition(hand.palmPosition(), mHandRawPos[i]);
       mHandPos[i].x = (S32)mFloor(mHandRawPos[i].x);

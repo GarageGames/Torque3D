@@ -28,7 +28,7 @@
 #endif
 
 
-/// This simple class is used to store an SimObject and 
+/// This simple class is used to store an SimObject and
 /// its state so it can be recreated at a later time.
 ///
 /// The success of restoring the object completely depends

@@ -29,6 +29,6 @@ GFXFrustumSaver::GFXFrustumSaver()
 }
 
 GFXFrustumSaver::~GFXFrustumSaver()
-{   
-   GFX->setFrustum( mFrustum );   
+{
+   GFX->setFrustum( mFrustum );
 }

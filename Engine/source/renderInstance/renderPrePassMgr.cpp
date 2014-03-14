@@ -51,7 +51,7 @@ const RenderInstType RenderPrePassMgr::RIT_PrePass("PrePass");
 
 IMPLEMENT_CONOBJECT(RenderPrePassMgr);
 
-ConsoleDocClass( RenderPrePassMgr, 
+ConsoleDocClass( RenderPrePassMgr,
    "@brief The render bin which performs a z+normals prepass used in Advanced Lighting.\n\n"
    "This render bin is used in Advanced Lighting to gather all opaque mesh render instances "
    "and render them to the g-buffer for use in lighting the scene and doing effects.\n\n"
@@ -207,7 +207,7 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
       return;
 
    // If its a custom material and it refracts... skip it.
-   if (  matInst && 
+   if (  matInst &&
          matInst->isCustomMaterial() &&
          static_cast<CustomMaterial*>( matInst->getMaterial() )->mRefract )
       return;
@@ -301,8 +301,8 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
    // Signal start of pre-pass
    getRenderSignal().trigger( state, this, true );
-   
-   // First do a loop and render all the terrain... these are 
+
+   // First do a loop and render all the terrain... these are
    // usually the big blockers in a scene and will save us fillrate
    // on the smaller meshes and objects.
 
@@ -340,7 +340,7 @@ void RenderPrePassMgr::render( SceneRenderState *state )
       // Get the prepass material.
       BaseMatInstance *mat = getPrePassMaterial( ri->matInst );
 
-      // Set up SG data proper like and flag it 
+      // Set up SG data proper like and flag it
       // as a pre-pass render
       setupSGData( ri, sgData );
 
@@ -355,8 +355,8 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
             // Check to see if we need to break this batch.
             //
-            // NOTE: We're comparing the non-prepass materials 
-            // here so we don't incur the cost of looking up the 
+            // NOTE: We're comparing the non-prepass materials
+            // here so we don't incur the cost of looking up the
             // prepass hook on each inst.
             //
             if ( newPassNeeded( ri, passRI ) )

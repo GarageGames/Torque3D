@@ -43,7 +43,7 @@ MODULE_BEGIN( GFX )
          GFXDevice::initConsole();
       GFXTextureManager::init();
    }
-   
+
    MODULE_SHUTDOWN
    {
       GFXDevice::destroy();
@@ -98,7 +98,7 @@ inline static void _GFXInitGetInitialRes(GFXVideoMode &vm, const Point2I &initia
    // cache the desktop size of the main screen
    GFXVideoMode desktopVm = GFXInit::getDesktopResolution();
 
-   // load pref variables, properly choose windowed / fullscreen  
+   // load pref variables, properly choose windowed / fullscreen
    const String resString = Con::getVariable("$pref::Video::mode");
 
    // Set defaults into the video mode, then have it parse the user string.
@@ -127,7 +127,7 @@ void GFXInit::init()
    if(doneOnce)
       return;
    doneOnce = true;
-   
+
    Con::printf( "GFX Init:" );
 
    //find our adapters
@@ -201,20 +201,20 @@ GFXAdapter* GFXInit::getAdapterOfType( GFXAdapterType type, const char* outputDe
 GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevice)
 {
    GFXAdapter* adapter = GFXInit::getAdapterOfType(type, outputDevice);
-   
+
    if(!adapter && type != OpenGL)
    {
       Con::errorf("The requested renderer, %s, doesn't seem to be available."
                   " Trying the default, OpenGL.", getAdapterNameFromType(type));
       adapter = GFXInit::getAdapterOfType(OpenGL, outputDevice);
    }
-   
+
    if(!adapter)
    {
       Con::errorf("The OpenGL renderer doesn't seem to be available. Trying the GFXNulDevice.");
       adapter = GFXInit::getAdapterOfType(NullDevice, "");
    }
-   
+
    AssertFatal( adapter, "There is no rendering device available whatsoever.");
    return adapter;
 }
@@ -222,13 +222,13 @@ GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevic
 const char* GFXInit::getAdapterNameFromType(GFXAdapterType type)
 {
    static const char* _names[] = { "OpenGL", "D3D9", "D3D8", "NullDevice", "Xenon" };
-   
+
    if( type < 0 || type >= GFXAdapterType_Count )
    {
       Con::errorf( "GFXInit::getAdapterNameFromType - Invalid renderer type, defaulting to OpenGL" );
       return _names[OpenGL];
    }
-      
+
    return _names[type];
 }
 
@@ -240,13 +240,13 @@ GFXAdapterType GFXInit::getAdapterTypeFromName(const char* name)
       if( !dStricmp( getAdapterNameFromType((GFXAdapterType)i), name ) )
          ret = i;
    }
-   
+
    if( ret == -1 )
    {
       Con::errorf( "GFXInit::getAdapterTypeFromName - Invalid renderer name, defaulting to D3D9" );
       ret = Direct3D9;
    }
-   
+
    return (GFXAdapterType)ret;
 }
 
@@ -269,7 +269,7 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    // If D3D is unavailable, we're not on windows, so GL is de facto the
    // best choice!
    F32 highestSM9 = 0.f, highestSMGL = 0.f;
-   GFXAdapter  *foundAdapter8 = NULL, *foundAdapter9 = NULL, 
+   GFXAdapter  *foundAdapter8 = NULL, *foundAdapter9 = NULL,
                *foundAdapterGL = NULL;
 
    for(S32 i=0; i<smAdapters.size(); i++)
@@ -355,7 +355,7 @@ GFXVideoMode GFXInit::getDesktopResolution()
    return resVm;
 }
 
-void GFXInit::enumerateAdapters() 
+void GFXInit::enumerateAdapters()
 {
    // Call each device class and have it report any adapters it supports.
    if(smAdapters.size())
@@ -365,10 +365,10 @@ void GFXInit::enumerateAdapters()
       return;
    }
 
-   getRegisterDeviceSignal().trigger(GFXInit::smAdapters);     
+   getRegisterDeviceSignal().trigger(GFXInit::smAdapters);
 }
 
-GFXDevice *GFXInit::createDevice( GFXAdapter *adapter ) 
+GFXDevice *GFXInit::createDevice( GFXAdapter *adapter )
 {
    Con::printf("Attempting to create GFX device: %s [%s]", adapter->getName(), adapter->getOutputName());
 
@@ -471,7 +471,7 @@ DefineEngineStaticMethod( GFXInit, getDefaultAdapterIndex, S32, (),,
    Vector<GFXAdapter*> adapters( __FILE__, __LINE__ );
    GFXInit::getAdapters(&adapters);
    for(S32 i=0; i<adapters.size(); i++)
-      if (  adapters[i]->mIndex == a->mIndex && 
+      if (  adapters[i]->mIndex == a->mIndex &&
             adapters[i]->mType == a->mType )
          return i;
 
@@ -527,16 +527,16 @@ DefineEngineStaticMethod( GFXInit, createNullDevice, void, (),,
 {
    // Enumerate things for GFX before we have an active device.
    GFXInit::enumerateAdapters();
- 
+
    // Create a device.
    GFXAdapter *a = GFXInit::chooseAdapter(NullDevice, "");
- 
+
    GFXDevice *newDevice = GFX;
- 
+
    // Do we have a global device already? (This is the site if you want
    // to start rendering to multiple devices simultaneously)
    if(newDevice == NULL)
       newDevice = GFXInit::createDevice(a);
- 
+
    newDevice->setAllowRender( false );
 }

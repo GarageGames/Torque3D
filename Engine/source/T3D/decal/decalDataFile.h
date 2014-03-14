@@ -67,7 +67,7 @@ class DecalDataFile
       void _freeInstance( DecalInstance *decal ) { mChunker.free( decal ); }
 
       /// @}
-      
+
       /// @name Instance Management
       /// @{
 
@@ -87,7 +87,7 @@ class DecalDataFile
       bool _removeDecalFromSpheres( DecalInstance *inst );
 
       /// @}
-   
+
    public:
 
       DecalDataFile();
@@ -99,7 +99,7 @@ class DecalDataFile
       /// Return true if the decal data has been modified since the last save or load.
       bool isDirty() const { return mIsDirty; }
 
-      /// Deletes all the data and resets the 
+      /// Deletes all the data and resets the
       /// file to an empty state.
       void clear();
 

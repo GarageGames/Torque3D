@@ -55,7 +55,7 @@ String SceneRootZone::describeSelf() const
    String str = Parent::describeSelf();
 
    str += "|SceneRootZone";
-   
+
    return str;
 }
 

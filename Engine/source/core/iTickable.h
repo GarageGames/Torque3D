@@ -103,8 +103,8 @@ private:
    // This just makes life easy
    typedef Vector<ITickable *>::iterator ProcessListIterator;
    /// Returns a reference to the list of all ITickable objects.
-   static Vector<ITickable *>& getProcessList();   
-   
+   static Vector<ITickable *>& getProcessList();
+
    bool mProcessTick; ///< Set to true if this object wants tick processing
 protected:
    /// This method is called every frame and lets the control interpolate between

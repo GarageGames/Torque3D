@@ -37,7 +37,7 @@ CreateUnitTest(Check_advanceTime, "Platform/Time/advanceTime")
       U32 time = Platform::getVirtualMilliseconds();
       Platform::advanceTime(10);
       U32 newTime = Platform::getVirtualMilliseconds();
-      
+
       test(newTime - time == 10, "Platform::advanceTime is borked, we advanced 10ms but didn't get a 10ms delta!");
    }
 };
@@ -50,7 +50,7 @@ CreateUnitTest(Check_platformSleep, "Platform/Time/Sleep")
       U32 start = Platform::getRealMilliseconds();
       Platform::sleep(sleepTimeMs);
       U32 end = Platform::getRealMilliseconds();
-      
+
       test(end - start >= sleepTimeMs, "We didn't sleep at least as long as we requested!");
    }
 };
@@ -61,22 +61,22 @@ CreateUnitTest(Check_timeManager, "Platform/Time/Manager")
    {
       mElapsedTime += timeDelta;
       mNumberCalls++;
-      
+
       if(mElapsedTime >= 1000)
          Process::requestShutdown();
    }
-   
+
    S32 mElapsedTime;
    S32 mNumberCalls;
-   
+
    void run()
    {
       mElapsedTime = mNumberCalls = 0;
-      
+
       // Initialize the time manager...
       TimeManager time;
       time.timeEvent.notify(this, &Check_timeManager::handleTimeEvent);
-      
+
       // Event loop till at least one second has passed.
       const U32 start = Platform::getRealMilliseconds();
 
@@ -89,15 +89,15 @@ CreateUnitTest(Check_timeManager, "Platform/Time/Manager")
             Process::requestShutdown();
          }
       }
-      
+
       const U32 end = Platform::getRealMilliseconds();
-      
+
       // Now, confirm we have approximately similar elapsed times.
       S32 elapsedRealTime = end - start;
       test(mAbs(elapsedRealTime - mElapsedTime) < 50, "Failed to elapse time to within the desired tolerance.");
-      
+
       test(mNumberCalls > 0, "Somehow got no event callbacks from TimeManager?");
-      
+
       Con::printf("   Got %d time events, and elapsed %dms from TimeManager, "
                   "%dms according to Platform::getRealMilliseconds()",
                   mNumberCalls, mElapsedTime, elapsedRealTime);

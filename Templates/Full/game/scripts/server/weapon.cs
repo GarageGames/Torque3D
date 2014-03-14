@@ -52,32 +52,32 @@ function Weapon::onUse(%data, %obj)
          else
             messageClient(%obj.client, 'MsgWeaponUsed', '\c0Weapon selected');
       }
-      
+
       // If this is a Player class object then allow the weapon to modify allowed poses
       if (%obj.isInNamespaceHierarchy("Player"))
       {
          // Start by allowing everything
          %obj.allowAllPoses();
-         
+
          // Now see what isn't allowed by the weapon
-         
+
          %image = %data.image;
-         
+
          if (%image.jumpingDisallowed)
             %obj.allowJumping(false);
-         
+
          if (%image.jetJumpingDisallowed)
             %obj.allowJetJumping(false);
-         
+
          if (%image.sprintDisallowed)
             %obj.allowSprinting(false);
-         
+
          if (%image.crouchDisallowed)
             %obj.allowCrouching(false);
-         
+
          if (%image.proneDisallowed)
             %obj.allowProne(false);
-         
+
          if (%image.swimmingDisallowed)
             %obj.allowSwimming(false);
       }
@@ -127,7 +127,7 @@ function WeaponImage::onMount(%this, %obj, %slot)
          // Fill the weapon up from the first clip
          %obj.setInventory(%this.ammo, %this.ammo.maxInventory);
          %obj.setImageAmmo(%slot, true);
-         
+
          // Add any spare ammo that may be "in the player's pocket"
          %currentAmmo = %this.ammo.maxInventory;
          %amountInClips += %obj.getFieldValue( "remaining" @ %this.ammo.getName());
@@ -136,10 +136,10 @@ function WeaponImage::onMount(%this, %obj, %slot)
       {
          %currentAmmo = 0 + %obj.getFieldValue( "remaining" @ %this.ammo.getName());
       }
-      
+
       %amountInClips = %obj.getInventory(%this.clip);
       %amountInClips *= %this.ammo.maxInventory;
-      
+
       if (%obj.client !$= "" && !%obj.isAiControlled)
          %obj.client.RefreshWeaponHud(%currentAmmo, %this.item.previewImage, %this.item.reticle, %this.item.zoomReticle, %amountInClips);
    }
@@ -186,7 +186,7 @@ function WeaponImage::onFire(%this, %obj, %slot)
       error("WeaponImage::onFire() - Invalid projectile datablock");
       return;
    }
-   
+
    // Decrement inventory ammo. The image's ammo state is updated
    // automatically by the ammo inventory hooks.
    if ( !%this.infiniteAmmo )
@@ -194,11 +194,11 @@ function WeaponImage::onFire(%this, %obj, %slot)
 
    // Get the player's velocity, we'll then add it to that of the projectile
    %objectVelocity = %obj.getVelocity();
-   
+
    %numProjectiles = %this.projectileNum;
    if (%numProjectiles == 0)
       %numProjectiles = 1;
-      
+
    for (%i = 0; %i < %numProjectiles; %i++)
    {
       if (%this.projectileSpread)
@@ -260,11 +260,11 @@ function WeaponImage::onAltFire(%this, %obj, %slot)
 
    // Get the player's velocity, we'll then add it to that of the projectile
    %objectVelocity = %obj.getVelocity();
-   
+
    %numProjectiles = %this.altProjectileNum;
    if (%numProjectiles == 0)
       %numProjectiles = 1;
-      
+
    for (%i = 0; %i < %numProjectiles; %i++)
    {
       if (%this.altProjectileSpread)
@@ -325,11 +325,11 @@ function WeaponImage::onWetFire(%this, %obj, %slot)
 
    // Get the player's velocity, we'll then add it to that of the projectile
    %objectVelocity = %obj.getVelocity();
-   
+
    %numProjectiles = %this.projectileNum;
    if (%numProjectiles == 0)
       %numProjectiles = 1;
-      
+
    for (%i = 0; %i < %numProjectiles; %i++)
    {
       if (%this.wetProjectileSpread)
@@ -354,7 +354,7 @@ function WeaponImage::onWetFire(%this, %obj, %slot)
          // the straight ahead aiming point of the gun.
          %muzzleVector = %obj.getMuzzleVector(%slot);
       }
-      
+
       // Add player's velocity
       %muzzleVelocity = VectorAdd(
          VectorScale(%muzzleVector, %this.wetProjectile.muzzleVelocity),
@@ -413,14 +413,14 @@ function WeaponImage::reloadAmmoClip(%this, %obj, %slot)
             %obj.setImageAmmo( %slot, true );
          }
       }
-      
+
    }
 }
 
 function WeaponImage::clearAmmoClip( %this, %obj, %slot )
 {
    //echo("WeaponImage::clearAmmoClip: " SPC %this SPC %obj SPC %slot);
-   
+
    // if we're not empty put the remaining bullets from the current clip
    // in to the player's "pocket".
 
@@ -429,7 +429,7 @@ function WeaponImage::clearAmmoClip( %this, %obj, %slot )
       // Commenting out this line will use a "hard clip" system, where
       // A player will lose any ammo currently in the gun when reloading.
       %pocketAmount = %this.stashSpareAmmo( %obj );
-      
+
       if ( %obj.getInventory( %this.clip ) > 0 || %pocketAmount != 0 )
          %obj.setImageAmmo(%slot, false);
    }
@@ -442,14 +442,14 @@ function WeaponImage::stashSpareAmmo( %this, %player )
    if (%player.getInventory( %this.ammo ) < %this.ammo.maxInventory )
    {
       %nameOfAmmoField = "remaining" @ %this.ammo.getName();
-      
+
       %amountInPocket = %player.getFieldValue( %nameOfAmmoField );
-      
+
       %amountInGun = %player.getInventory( %this.ammo );
-      
+
       %combinedAmmo = %amountInGun + %amountInPocket;
-      
-      // Give the player another clip if the amount in our pocket + the 
+
+      // Give the player another clip if the amount in our pocket + the
       // Amount in our gun is over the size of a clip.
       if ( %combinedAmmo >= %this.ammo.maxInventory )
       {
@@ -458,11 +458,11 @@ function WeaponImage::stashSpareAmmo( %this, %player )
       }
       else if ( %player.getInventory(%this.clip) > 0 )// Only put it back in our pocket if we have clips.
          %player.setFieldValue( %nameOfAmmoField, %combinedAmmo );
-         
+
       return %player.getFieldValue( %nameOfAmmoField );
-      
+
    }
-   
+
    return 0;
 
 }
@@ -486,17 +486,17 @@ function AmmoClip::onPickup(%this, %obj, %shape, %amount)
       if (%image.isField("clip") && %image.clip.getId() == %this.getId())
       {
          %outOfAmmo = !%shape.getImageAmmo($WeaponSlot);
-         
+
          %currentAmmo = %shape.getInventory(%image.ammo);
 
          if ( isObject( %image.clip ) )
             %amountInClips = %shape.getInventory(%image.clip);
-            
+
          %amountInClips *= %image.ammo.maxInventory;
          %amountInClips += %obj.getFieldValue( "remaining" @ %this.ammo.getName() );
-         
+
          %shape.client.setAmmoAmountHud(%currentAmmo, %amountInClips );
-         
+
          if (%outOfAmmo)
          {
             %image.onClipEmpty(%shape, $WeaponSlot);
@@ -527,7 +527,7 @@ function Ammo::onInventory(%this, %obj, %amount)
          {
             %obj.setImageAmmo(%i, %amount != 0);
             %currentAmmo = %obj.getInventory(%this);
-            
+
             if (%obj.getClassname() $= "Player")
             {
                if ( isObject( %this.clip ) )
@@ -541,7 +541,7 @@ function Ammo::onInventory(%this, %obj, %amount)
                   %amountInClips = %currentAmmo;
                   %currentAmmo = 1;
                }
-               
+
                if (%obj.client !$= "" && !%obj.isAiControlled)
                   %obj.client.setAmmoAmountHud(%currentAmmo, %amountInClips);
             }
@@ -568,7 +568,7 @@ function ShapeBase::cycleWeapon(%this, %direction)
    // Can't cycle what we don't have
    if (%this.totalCycledWeapons == 0)
       return;
-      
+
    // Find out the index of the current weapon, if any (not all
    // available weapons may be part of the cycle)
    %currentIndex = -1;
@@ -610,7 +610,7 @@ function ShapeBase::cycleWeapon(%this, %direction)
          }
       }
    }
-   
+
    // We now need to check if the next index is a valid weapon.  If not,
    // then continue to cycle to the next weapon, in the appropriate direction,
    // until one is found.  If nothing is found, then do nothing.
@@ -624,7 +624,7 @@ function ShapeBase::cycleWeapon(%this, %direction)
          %found = true;
          break;
       }
-      
+
       %nextIndex = %nextIndex + %dir;
       if (%nextIndex < 0)
       {
@@ -635,7 +635,7 @@ function ShapeBase::cycleWeapon(%this, %direction)
          %nextIndex = 0;
       }
    }
-   
+
    if (%found)
    {
       %this.use(%this.cycleWeapon[%nextIndex]);

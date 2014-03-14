@@ -60,27 +60,27 @@ public:
 
    /// Returns the width and height as a point.
    Point2I getWidthHeight() const { return getPointer() ? Point2I( getPointer()->getWidth(), getPointer()->getHeight() ) : Point2I::Zero; }
-   
+
    U32 getWidth() const    { return getPointer() ? getPointer()->getWidth()  : 0; }
    U32 getHeight() const   { return getPointer() ? getPointer()->getHeight() : 0; }
    U32 getDepth() const    { return getPointer() ? getPointer()->getDepth()  : 0; }
    GFXFormat getFormat() const { return getPointer() ? getPointer()->getFormat() : GFXFormat_COUNT; }
-   
+
    /// Reloads the texture.
    /// @see GFXTextureManager::reloadTexture
    void refresh();
 
    /// Releases the texture handle.
    void free() { StrongObjectRef::set( NULL ); }
-   
+
    GFXLockedRect *lock( U32 mipLevel = 0, RectI *inRect = NULL )
    {
-      return getPointer()->lock(mipLevel, inRect); 
+      return getPointer()->lock(mipLevel, inRect);
    }
 
-   void unlock( U32 mipLevel = 0) 
+   void unlock( U32 mipLevel = 0)
    {
-      getPointer()->unlock(mipLevel); 
+      getPointer()->unlock(mipLevel);
    }
 
    // copy to bitmap.  see gfxTetureObject.h for description of what types of textures
@@ -95,7 +95,7 @@ public:
       StrongObjectRef::set(t.getPointer());
       return *this;
    }
-   
+
    GFXTexHandle& operator=( GFXTextureObject *to)
    {
       StrongObjectRef::set(to);
@@ -119,7 +119,7 @@ public:
    /// Helper 2x2 R8G8B8A8 texture filled with 255.
    static GFXTexHandle ONE;
 
-   /// Helper 2x2 R8G8B8A8 normal map texture filled 
+   /// Helper 2x2 R8G8B8A8 normal map texture filled
    /// with 128, 128, 255.
    static GFXTexHandle ZUP;
 

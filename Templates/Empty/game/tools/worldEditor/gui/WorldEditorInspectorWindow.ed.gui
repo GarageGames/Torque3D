@@ -19,7 +19,7 @@
       Enabled = "1";
       isContainer = "1";
       Profile = "ToolsGuiWindowProfile";
-      Position = getWord($pref::Video::mode, 0) - 209 SPC 
+      Position = getWord($pref::Video::mode, 0) - 209 SPC
          getWord(EditorGuiToolbar.extent, 1) + getWord(EWTreeWindow.extent, 1) - 2;
       Extent = "210 373";
       MinExtent = "210 140";

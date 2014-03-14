@@ -46,7 +46,7 @@ FontRenderBatcher::FontRenderBatcher() : mStorage(8096)
       f.samplers[0].alphaArg1 = GFXTATexture;
       f.samplers[0].alphaArg2 = GFXTADiffuse;
       // This is an add operation because in D3D, when a texture of format D3DFMT_A8
-      // is used, the RGB channels are all set to 0.  Therefore a modulate would 
+      // is used, the RGB channels are all set to 0.  Therefore a modulate would
       // result in the text always being black.  This may not be the case in OpenGL
       // so it may have to change.  -bramage
       f.samplers[0].textureColorOp = GFXTOPAdd;

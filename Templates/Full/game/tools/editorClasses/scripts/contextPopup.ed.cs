@@ -26,22 +26,22 @@
 ///
 /// ContextPopup is a support class that offers a simple way of displaying
 /// reusable context sensitive GuiControl popups.  These dialogs are created
-/// and shown to the user when the <b>show</b> method is used. 
+/// and shown to the user when the <b>show</b> method is used.
 ///
-/// Once a Popup is shown it will be dismissed if it meets one of a few 
+/// Once a Popup is shown it will be dismissed if it meets one of a few
 ///   criteria.
 ///
 ///  1. A user clicks anywhere outside the bounds of the GuiControl, specified by
 ///     the 'dialog' field on the object.
-///  2. Time Passes of (n)Milliseconds, specifed by the 'timeout' field on 
+///  2. Time Passes of (n)Milliseconds, specifed by the 'timeout' field on
 ///     the object.
 ///
-/// For example, if you wished to create a context dialog with a dialog you held in 
+/// For example, if you wished to create a context dialog with a dialog you held in
 /// a local variable named %myDialog you would create a new script object as such.
-/// 
-/// 
+///
+///
 /// @code
-/// %MyContextPopup = new ScriptObject() 
+/// %MyContextPopup = new ScriptObject()
 /// {
 ///    class     = ContextPopup;
 ///    superClass= MyCallbackNamespace; // Only Necessary when you want to perform logic pre/post showing
@@ -49,23 +49,23 @@
 ///    delay     = 500; // Pop the Popup after 500 Milliseconds
 /// };
 /// @endcode
-/// 
+///
 /// Now, if you wanted to show the dialog %%myDialog and have it dismissed when anything in the
 /// background is clicked, simply call the following.
-/// 
+///
 ///
 /// @code
 /// %MyContextPopup.show( %positionX, %positionY );
-/// @endcode 
-/// 
+/// @endcode
+///
 /// If you need to know more than show the dialog and hide it when clicked or time passes, ContextPopup
 /// Provides callback methods that you may override for doing intermediate processing on a dialog
 /// that is to be shown or is being hidden.  For example, in the above script we created a Context Dialog Container
 /// called @%myContextDialog with a superClass of <b>MyCallbackNamespace</b>.  If we wanted to hide the cursor when
 /// the dialog was shown, and show it when the dialog was hidden, we could implement the following functions.
-/// 
+///
 /// @code
-/// function MyCallbackNamespace::onContextActivate( %%this ) 
+/// function MyCallbackNamespace::onContextActivate( %%this )
 /// {
 ///     // Hide Cursor Here
 /// }
@@ -80,8 +80,8 @@
 function ContextDialogContainer::onAdd(%this)
 {
    // Add to our cleanup group.
-   $EditorClassesGroup.add( %this );  
-   
+   $EditorClassesGroup.add( %this );
+
    %this.base = new GuiButtonBaseCtrl()
    {
       profile = ToolsGuiTransparentProfile;
@@ -89,13 +89,13 @@ function ContextDialogContainer::onAdd(%this)
       parent = %this;
       modal = true;
    };
-   
+
    // Flag not active.
    %this.isPushed = false;
-   
+
    // Add to our cleanup group.
    $EditorClassesGroup.add( %this.base );
-   
+
    return true;
 
 }
@@ -103,8 +103,8 @@ function ContextDialogContainer::onAdd(%this)
 function ContextDialogContainer::onRemove(%this)
 {
    %this.Hide();
-   
-   if( isObject( %this.base ) ) 
+
+   if( isObject( %this.base ) )
       %this.base.delete();
 }
 
@@ -115,40 +115,40 @@ function ContextDialogContainer::onRemove(%this)
 /// Shows the GuiControl specified in the Dialog field at the coordinates passed
 /// to this function. If no coordinates are passed to this function, the Dialog control
 /// is shown using it's current position.
-/// 
+///
 /// @param this The ContextDialogContainer object
 /// @param positionX The X Position in Global Screen Coordinates to display the dialog
 /// @param positionY The Y Position in Global Screen Coordinates to display the dialog
 /// @param delay Optional delay before this popup is hidden that overrides that specified at construction time
 ///
-//-----------------------------------------------------------------------------   
+//-----------------------------------------------------------------------------
 function ContextDialogContainer::Show( %this, %positionX, %positionY, %delay )
 {
-   if( %this.isPushed == true ) 
+   if( %this.isPushed == true )
       return true;
-      
+
    if( !isObject( %this.Dialog ) )
       return false;
 
    // Store old parent.
    %this.oldParent = %this.dialog.getParent();
-         
+
    // Set new parent.
    %this.base.add( %this.Dialog );
-   
+
    if( %positionX !$= "" && %positionY !$= "" )
       %this.Dialog.setPositionGlobal( %positionX, %positionY );
-   
+
    Canvas.pushDialog( %this.base, 99 );
-   
-   // Setup Delay Schedule   
+
+   // Setup Delay Schedule
    if( isEventPending( %this.popSchedule ) )
       cancel( %this.popSchedule );
    if( %delay !$= "" )
       %this.popSchedule = %this.schedule( %delay, hide );
    else if( %this.Delay !$= "" )
       %this.popSchedule = %this.schedule( %this.Delay, hide );
-   
+
 }
 
 //-----------------------------------------------------------------------------
@@ -157,15 +157,15 @@ function ContextDialogContainer::Show( %this, %positionX, %positionY, %delay )
 /// is provided merely for more flexibility in when your dialog is shown.  If you
 /// do not call this function, it will be called when the dialog is dismissed by
 /// a background click.
-/// 
+///
 /// @param this The ContextDialogContainer object
 ///
-//-----------------------------------------------------------------------------   
+//-----------------------------------------------------------------------------
 function ContextDialogContainer::Hide( %this )
 {
    if( %this.isPushed == true )
       Canvas.popDialog( %this.base );
-      
+
    // Restore Old Parent;
    if( isObject( %this.Dialog ) && isObject( %this.oldParent ) )
       %this.oldParent.add( %this.Dialog );
@@ -201,9 +201,9 @@ function ContextDialogWatcher::onDialogPush( %this )
 {
    if( !isObject( %this.parent ) )
       return;
-   
+
    %this.parent.isPushed = true;
-   
+
    if( %this.parent.isMethod( "onContextActivate" ) )
       %this.parent.onContextActivate();
 

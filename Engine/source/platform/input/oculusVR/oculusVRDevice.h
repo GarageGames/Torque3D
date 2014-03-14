@@ -160,7 +160,7 @@ public:
 
 public:
    // For ManagedSingleton.
-   static const char* getSingletonName() { return "OculusVRDevice"; }   
+   static const char* getSingletonName() { return "OculusVRDevice"; }
 };
 
 /// Returns the OculusVRDevice singleton.

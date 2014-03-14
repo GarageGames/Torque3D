@@ -33,7 +33,7 @@ function GuiEditorTreeView::init(%this)
       {
          superClass = "MenuBuilder";
          isPopup = true;
-         
+
          item[ 0 ] = "Rename" TAB "" TAB "GuiEditorTreeView.showItemRenameCtrl( GuiEditorTreeView.findItemByObjectId( %this.object ) );";
          item[ 1 ] = "Delete" TAB "" TAB "GuiEditor.deleteControl( %this.object );";
          item[ 2 ] = "-";
@@ -43,16 +43,16 @@ function GuiEditorTreeView::init(%this)
          item[ 6 ] = "Add New Controls Here" TAB "" TAB "GuiEditor.setCurrentAddSet( %this.object );";
          item[ 7 ] = "Add Child Controls to Selection" TAB "" TAB "GuiEditor.selectAllControlsInSet( %this.object, false );";
          item[ 8 ] = "Remove Child Controls from Selection" TAB "" TAB "GuiEditor.selectAllControlsInSet( %this.object, true );";
-         
+
          object = -1;
       };
-      
+
    if( !isObject( %this.contextMenuMultiSel ) )
       %this.contextMenuMultiSel = new PopupMenu()
       {
          superClass = "MenuBuilder";
          isPopup = true;
-         
+
          item[ 0 ] = "Delete" TAB "" TAB "GuiEditor.deleteSelection();";
       };
 }
@@ -62,22 +62,22 @@ function GuiEditorTreeView::init(%this)
 function GuiEditorTreeView::update( %this )
 {
    %obj = GuiEditorContent.getObject( 0 );
-   
+
    if( !isObject( %obj ) )
       GuiEditorTreeView.clear();
    else
    {
       // Open inspector tree.
-      
+
       GuiEditorTreeView.open( %obj );
-      
+
       // Sync selection with GuiEditor.
-      
+
       GuiEditorTreeView.clearSelection();
-      
+
       %selection = GuiEditor.getSelection();
       %count = %selection.getCount();
-      
+
       for( %i = 0; %i < %count; %i ++ )
          GuiEditorTreeView.addSelection( %selection.getObject( %i ) );
    }
@@ -119,15 +119,15 @@ function GuiEditorTreeView::onRightMouseDown( %this, %item, %pts, %obj )
    else if( %obj )
    {
       %popup = %this.contextMenu;
-      
+
       %popup.checkItem( 3, %obj.locked );
       %popup.checkItem( 4, !%obj.isVisible() );
-      
+
       %popup.enableItem( 6, %obj.isContainer );
       %popup.enableItem( 7, %obj.getCount() > 0 );
       %popup.enableItem( 8, %obj.getCount() > 0 );
-      
-      %popup.object = %obj;      
+
+      %popup.object = %obj;
       %popup.showPopup( Canvas );
    }
 }
@@ -135,7 +135,7 @@ function GuiEditorTreeView::onRightMouseDown( %this, %item, %pts, %obj )
 //---------------------------------------------------------------------------------------------
 
 function GuiEditorTreeView::onAddSelection(%this,%ctrl)
-{   
+{
    GuiEditor.dontSyncTreeViewSelection = true;
    GuiEditor.addSelection( %ctrl );
    GuiEditor.dontSyncTreeViewSelection = false;
@@ -154,7 +154,7 @@ function GuiEditorTreeView::onRemoveSelection( %this, %ctrl )
 //---------------------------------------------------------------------------------------------
 
 function GuiEditorTreeView::onDeleteSelection(%this)
-{ 
+{
    GuiEditor.clearSelection();
 }
 
@@ -184,9 +184,9 @@ function GuiEditorTreeView::onBeginReparenting( %this )
 {
    if( isObject( %this.reparentUndoAction ) )
       %this.reparentUndoAction.delete();
-      
+
    %action = UndoActionReparentObjects::create( %this );
-   
+
    %this.reparentUndoAction = %action;
 }
 
@@ -210,7 +210,7 @@ function GuiEditorTreeView::onEndReparenting( %this )
          %action.actionName = "Reparent Control";
       else
          %action.actionName = "Reparent Controls";
-         
+
       %action.addToManager( GuiEditor.getUndoManager() );
 
       GuiEditor.updateUndoMenu();

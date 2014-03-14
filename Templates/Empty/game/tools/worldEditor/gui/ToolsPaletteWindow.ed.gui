@@ -43,7 +43,7 @@
       EdgeSnap = false;
       text = "";
       class = "EWToolsPaletteWindowClass";
-      
+
       new GuiDynamicCtrlArrayControl(ToolsPaletteArray) {
          canSaveDynamicFields = "0";
          Enabled = "1";

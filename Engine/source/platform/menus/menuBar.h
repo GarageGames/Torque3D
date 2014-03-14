@@ -40,10 +40,10 @@ protected:
 
    /// Update the native menu bar to ensure consistency with the set
    void updateMenuBar(PopupMenu *menu = NULL);
-   
+
    void createPlatformPopupMenuData();
    void deletePlatformPopupMenuData();
-   
+
 public:
    MenuBar();
    virtual ~MenuBar();

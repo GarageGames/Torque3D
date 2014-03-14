@@ -54,7 +54,7 @@ BlobShadow::BlobShadow(SceneObject* parentObject, LightInfo* light, TSShapeInsta
    mShapeInstance = shapeInstance;
    mRadius = 0.0f;
    mLastRenderTime = 0;
-   mDepthBias = -0.0002f;  
+   mDepthBias = -0.0002f;
 
    generateGenericShadowBitmap(smGenericShadowDim);
    setupStateBlocks();
@@ -68,8 +68,8 @@ void BlobShadow::setupStateBlocks()
    sh.zDefined = true;
    sh.zEnable = true;
    sh.zWriteEnable = false;
-   
-   sh.zBias = mDepthBias; 
+
+   sh.zBias = mDepthBias;
    sh.blendDefined = true;
    sh.blendEnable = true;
    sh.blendSrc = GFXBlendSrcAlpha;

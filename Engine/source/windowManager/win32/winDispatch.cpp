@@ -23,7 +23,7 @@
 #define NO_MINMAX
 #define WIN32_LEAN_AND_MEAN
 
-// This is a fix for mouse wheel support on 
+// This is a fix for mouse wheel support on
 // older versions of VC++.
 #if _MSC_VER < 1500
 #define _WIN32_WINNT 0x0400
@@ -73,7 +73,7 @@ static void _keyboardEvent(Win32Window* window,UINT message, WPARAM wParam, WPAR
 	bool previous   = lParam & (1 << 30);       // Previously down
 	bool make       = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
 
-	// Translate the OS virtual key code to a Torque KEY_XXXX.   
+	// Translate the OS virtual key code to a Torque KEY_XXXX.
 	S32 nVirtkey = TranslateOSKeyCode( wParam );
 
 	S32 keyCode;
@@ -103,7 +103,7 @@ static void _keyboardEvent(Win32Window* window,UINT message, WPARAM wParam, WPAR
 
 	// Track modifier keys
 	U32 modifier = 0;
-	switch (newVirtKey) 
+	switch (newVirtKey)
 	{
 	case KEY_LALT:     modifier = IM_LALT;   break;
 	case KEY_RALT:     modifier = IM_RALT;   break;
@@ -126,11 +126,11 @@ static void _keyboardEvent(Win32Window* window,UINT message, WPARAM wParam, WPAR
 
    U32 torqueMods = convertModifierBits( _ModifierKeys );
 	Input::setModifierKeys( torqueMods );
-	
+
 	// If character event translation is active and this isn't a key
 	// mapped in the global action map, try converting the event into
 	// a character event first.
-	
+
 	if(    make
        && window->getKeyboardTranslation()
 	    && !window->shouldNotTranslate( torqueMods, newVirtKey ) )
@@ -155,15 +155,15 @@ static void _keyboardEvent(Win32Window* window,UINT message, WPARAM wParam, WPAR
       			window->charEvent.trigger(window->getWindowId(),_ModifierKeys,chars[i]);
                handledCharEvent = true;
             }
-      		
+
          if( handledCharEvent )
             return;
       }
 	}
 
 	// Produce a key event.
-	
-	U32 action = make ? (previous ? IA_REPEAT : IA_MAKE ) : IA_BREAK;   
+
+	U32 action = make ? (previous ? IA_REPEAT : IA_MAKE ) : IA_BREAK;
 	window->keyEvent.trigger(window->getWindowId(),_ModifierKeys,action,newVirtKey);
 }
 
@@ -173,7 +173,7 @@ static void _keyboardEvent(Win32Window* window,UINT message, WPARAM wParam, WPAR
 static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 {
 	static bool button[3] = {false,false,false};
-	static S32 mouseNCState = -1; // -1 denotes unchanged, 
+	static S32 mouseNCState = -1; // -1 denotes unchanged,
 	// 0  denotes changed but was hidden
 	// 1  denotes changed but was visible
 	Win32Window* window = hWnd?(Win32Window*)GetWindowLong(hWnd, GWL_USERDATA): 0;
@@ -183,7 +183,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 	static bool cursorLocked = false;
 	static bool cursorVisible = true;
 
-	switch(message) 
+	switch(message)
 	{
 	case WM_MOUSEMOVE:
 		{
@@ -334,7 +334,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 		// NOTE: if wParam is NOT equal to our window handle then we are GAINING focus
 	case WM_SETFOCUS:
 
-		// clear any key states 
+		// clear any key states
 		_ModifierKeys = 0;
 		dMemset(keyboardState, 0, 256);
 		Input::setModifierKeys(0);
@@ -363,7 +363,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 		// NOTE: if wParam is NOT equal to our window handle then we are LOSING focus
 	case WM_KILLFOCUS:
 
-		// clear any key states 
+		// clear any key states
 		_ModifierKeys = 0;
 		dMemset(keyboardState, 0, 256);
 		Input::setModifierKeys(0);
@@ -378,7 +378,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 			if (hwnd)
 				GetClassName(hwnd, classBuf, sizeof(classBuf));
 
-			// We toggle the mouse lock when we become inactive 
+			// We toggle the mouse lock when we become inactive
 			// causing the subsequent lock call to defer itself
 			// until the window becomes active again.
 			if (window && window->isMouseLocked())
@@ -411,10 +411,10 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 			// Fire event.
 			window->appEvent.trigger(devId, LoseFocus);
 		}
-		break;      
+		break;
 
 	case WM_ACTIVATEAPP:
-		if (wParam) 
+		if (wParam)
 		{
 			// Could extract current modifier state from windows.
 			_ModifierKeys = 0;
@@ -454,7 +454,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 		break;
 				  }
 
-				  // CodeReview - This is not used now and will incur an overhead for rendering 
+				  // CodeReview - This is not used now and will incur an overhead for rendering
 				  //              since the renderThreadBlocked fix requires handling WM_PAINT and
 				  //              triggering the displayEvent.  May need to revisit this at a later
 				  //              time if we want event driven rendering.

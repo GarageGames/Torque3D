@@ -129,7 +129,7 @@ void VehicleBlocker::buildConvex(const Box3F& box, Convex* convex)
    // Just return a box convex for the entire shape...
    Convex* cc = 0;
    CollisionWorkingList& wl = convex->getWorkingList();
-   for (CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext) 
+   for (CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext)
    {
       if (itr->mConvex->getType() == BoxConvexType &&
           itr->mConvex->getObject() == this) {

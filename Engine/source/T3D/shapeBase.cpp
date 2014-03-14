@@ -191,7 +191,7 @@ ShapeBaseData::ShapeBaseData()
    inheritEnergyFromMount( false ),
    mCRC( 0 ),
    debrisDetail( -1 )
-{      
+{
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
 }
 
@@ -204,8 +204,8 @@ struct ShapeBaseDataProto
    F32 cameraMaxDist;
    F32 cameraMinDist;
    F32 cameraDefaultFov;
-   F32 cameraMinFov;    
-   F32 cameraMaxFov;    
+   F32 cameraMinFov;
+   F32 cameraMaxFov;
 
 
    ShapeBaseDataProto()
@@ -496,7 +496,7 @@ void ShapeBaseData::initPersistFields()
    endGroup( "Destruction" );
 
    addGroup( "Physics" );
-   
+
       addProtectedField("mass", TypeF32, Offset(mass, ShapeBaseData), &_setMass, &defaultProtectedGetFn, "Shape mass.\nUsed in simulation of moving objects.\n"  );
       addField( "drag", TypeF32, Offset(drag, ShapeBaseData),
          "Drag factor.\nReduces velocity of moving objects." );
@@ -573,7 +573,7 @@ void ShapeBaseData::initPersistFields()
 
    addGroup( "Reflection" );
 
-      addField( "cubeReflectorDesc", TypeRealString, Offset( cubeDescName, ShapeBaseData ), 
+      addField( "cubeReflectorDesc", TypeRealString, Offset( cubeDescName, ShapeBaseData ),
          "References a ReflectorDesc datablock that defines performance and quality properties for dynamic reflections.\n");
       //addField( "reflectMaxRateMs", TypeS32, Offset( reflectMaxRateMs, ShapeBaseData ), "reflection will not be updated more frequently than this" );
       //addField( "reflectMaxDist", TypeF32, Offset( reflectMaxDist, ShapeBaseData ), "distance at which reflection is never updated" );
@@ -723,7 +723,7 @@ void ShapeBaseData::packData(BitStream* stream)
    stream->writeFlag(inheritEnergyFromMount);
    stream->writeFlag(firstPersonOnly);
    stream->writeFlag(useEyePoint);
-   
+
    if( stream->writeFlag( reflectorDesc != NULL ) )
    {
       stream->writeRangedU32( reflectorDesc->getId(), DataBlockObjectIdFirst,  DataBlockObjectIdLast );
@@ -923,7 +923,7 @@ ShapeBase::ShapeBase()
    mMoveMotion( false ),
    mIsAiControlled( false )
 {
-   mTypeMask |= ShapeBaseObjectType | LightObjectType;   
+   mTypeMask |= ShapeBaseObjectType | LightObjectType;
 
    S32 i;
 
@@ -1027,7 +1027,7 @@ bool ShapeBase::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    if( !mDataBlock )
    {
       Con::errorf( "ShapeBase::onAdd - no datablock on shape %i:%s (%s)",
@@ -1045,12 +1045,12 @@ bool ShapeBase::onAdd()
       Thread& st = mScriptThread[i];
       if(st.thread)
          updateThread(st);
-   }   
+   }
 
 /*
       if(mDataBlock->cloakTexName != StringTable->insert(""))
         mCloakTexture = TextureHandle(mDataBlock->cloakTexName, MeshTexture, false);
-*/         
+*/
 
    return true;
 }
@@ -1066,9 +1066,9 @@ void ShapeBase::onRemove()
       for (S32 i = 0; i < MaxSoundThreads; i++)
          stopAudio(i);
 
-   if ( isClientObject() )   
+   if ( isClientObject() )
    {
-      mCubeReflector.unregisterReflector();      
+      mCubeReflector.unregisterReflector();
 
       if ( mWeaponCamShake )
       {
@@ -1134,12 +1134,12 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
             // initialized either by the constructor or from the server.
             bool reset = st.thread != 0;
             st.thread = 0;
-            
+
             // New datablock/shape may not actually HAVE this sequence.
             // In that case stop playing it.
-            
+
             AssertFatal( prevDB != NULL, "ShapeBase::onNewDataBlock - how did you have a sequence playing without a prior datablock?" );
-   
+
             const TSShape *prevShape = prevDB->mShape;
             const TSShape::Sequence &prevSeq = prevShape->sequences[st.sequence];
             const String &prevSeqName = prevShape->names[prevSeq.nameIndex];
@@ -1148,8 +1148,8 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
 
             if ( st.sequence != -1 )
             {
-               setThreadSequence( i, st.sequence, reset );                              
-            }            
+               setThreadSequence( i, st.sequence, reset );
+            }
          }
       }
 
@@ -1187,13 +1187,13 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
 
    if( !isInitialDataBlock && mLightPlugin )
       mLightPlugin->reset();
-   
+
    if ( isClientObject() )
-   {      
+   {
       mCubeReflector.unregisterReflector();
 
       if ( mDataBlock->reflectorDesc )
-         mCubeReflector.registerReflector( this, mDataBlock->reflectorDesc );      
+         mCubeReflector.registerReflector( this, mDataBlock->reflectorDesc );
    }
 
    return true;
@@ -1204,7 +1204,7 @@ void ShapeBase::onDeleteNotify( SimObject *obj )
    if ( obj == mCurrentWaterObject )
       mCurrentWaterObject = NULL;
 
-   Parent::onDeleteNotify( obj );      
+   Parent::onDeleteNotify( obj );
 }
 
 void ShapeBase::onImpact(SceneObject* obj, VectorF vec)
@@ -1313,11 +1313,11 @@ void ShapeBase::processTick(const Move* move)
    }
 
    // Call script on trigger state changes
-   if (move && mDataBlock && isServerObject()) 
+   if (move && mDataBlock && isServerObject())
    {
-      for (S32 i = 0; i < MaxTriggerKeys; i++) 
+      for (S32 i = 0; i < MaxTriggerKeys; i++)
       {
-         if (move->trigger[i] != mTrigger[i]) 
+         if (move->trigger[i] != mTrigger[i])
          {
             mTrigger[i] = move->trigger[i];
             mDataBlock->onTrigger_callback( this, i, move->trigger[i] );
@@ -1410,14 +1410,14 @@ void ShapeBase::setControllingClient( GameConnection* client )
       {
          // We are the current listener and are no longer a controller object on the
          // connection, so clear our listener status.
-         
+
          gSFX3DWorld->setListener( NULL );
       }
       else if( client && client->isConnectionToServer() && !getControllingObject() )
       {
          // We're on the local client and not controlled by another object, so make
          // us the current SFX listener.
-         
+
          gSFX3DWorld->setListener( this );
       }
    }
@@ -1525,7 +1525,7 @@ F32 ShapeBase::getEnergyLevel()
 {
    if ( mDataBlock->inheritEnergyFromMount && mShapeBaseMount )
       return mShapeBaseMount->getEnergyLevel();
-   return mEnergy; 
+   return mEnergy;
 }
 
 F32 ShapeBase::getEnergyValue()
@@ -1540,7 +1540,7 @@ F32 ShapeBase::getEnergyValue()
    {
       F32 maxEnergy = mDataBlock->maxEnergy;
       if ( maxEnergy > 0.f )
-         return (mEnergy / mDataBlock->maxEnergy);   
+         return (mEnergy / mDataBlock->maxEnergy);
    }
 
    return 0.0f;
@@ -1586,31 +1586,31 @@ void ShapeBase::updateContainer()
 
    // Set default values.
    mDrag = mDataBlock->drag;
-   mBuoyancy = 0.0f;      
+   mBuoyancy = 0.0f;
    mGravityMod = 1.0;
    mAppliedForce.set(0,0,0);
-   
+
    ContainerQueryInfo info;
    info.box = getWorldBox();
    info.mass = getMass();
 
    mContainer->findObjects(info.box, WaterObjectType|PhysicalZoneObjectType,findRouter,&info);
-      
+
    mWaterCoverage = info.waterCoverage;
    mLiquidType    = info.liquidType;
-   mLiquidHeight  = info.waterHeight;   
+   mLiquidHeight  = info.waterHeight;
    setCurrentWaterObject( info.waterObject );
-   
+
    // This value might be useful as a datablock value,
    // This is what allows the player to stand in shallow water (below this coverage)
    // without jiggling from buoyancy
-   if (mWaterCoverage >= 0.25f) 
-   {      
+   if (mWaterCoverage >= 0.25f)
+   {
       // water viscosity is used as drag for in water.
       // ShapeBaseData drag is used for drag outside of water.
-      // Combine these two components to calculate this ShapeBase object's 
+      // Combine these two components to calculate this ShapeBase object's
       // current drag.
-      mDrag = ( info.waterCoverage * info.waterViscosity ) + 
+      mDrag = ( info.waterCoverage * info.waterViscosity ) +
               ( 1.0f - info.waterCoverage ) * mDataBlock->drag;
       mBuoyancy = (info.waterDensity / mDataBlock->density) * info.waterCoverage;
    }
@@ -1661,7 +1661,7 @@ void ShapeBase::updateDamageLevel()
       } else {
          mShapeInstance->setPos(mDamageThread, mDamage / mDataBlock->destroyedLevel);
       }
-   }      
+   }
 }
 
 
@@ -1853,8 +1853,8 @@ void ShapeBase::blowUp()
 //----------------------------------------------------------------------------
 
 void ShapeBase::onMount( SceneObject *obj, S32 node )
-{   
-   mConvexList->nukeList();   
+{
+   mConvexList->nukeList();
 
    // Are we mounting to a ShapeBase object?
    mShapeBaseMount = dynamic_cast<ShapeBase*>( obj );
@@ -1934,7 +1934,7 @@ void ShapeBase::getCameraTransform(F32* pos,MatrixF* mat)
       vp.x = vp.z = 0;
       vp.y = -(max - min) * *pos;
       eye.mulV(vp,&vec);
-      
+
       VectorF minVec;
       vp.y = -min;
       eye.mulV( vp, &minVec );
@@ -2215,7 +2215,7 @@ void ShapeBase::playAudio(U32 slot,SFXTrack* profile)
 {
    AssertFatal( slot < MaxSoundThreads, "ShapeBase::playAudio() bad slot index" );
    Sound& st = mSoundThread[slot];
-   if( profile && ( !st.play || st.profile != profile ) ) 
+   if( profile && ( !st.play || st.profile != profile ) )
    {
       setMaskBits(SoundMaskN << slot);
       st.play = true;
@@ -2229,7 +2229,7 @@ void ShapeBase::stopAudio(U32 slot)
    AssertFatal( slot < MaxSoundThreads, "ShapeBase::stopAudio() bad slot index" );
 
    Sound& st = mSoundThread[slot];
-   if ( st.play ) 
+   if ( st.play )
    {
       st.play = false;
       setMaskBits(SoundMaskN << slot);
@@ -2253,9 +2253,9 @@ void ShapeBase::updateAudioState(Sound& st)
 {
    SFX_DELETE( st.sound );
 
-   if ( st.play && st.profile ) 
+   if ( st.play && st.profile )
    {
-      if ( isGhost() ) 
+      if ( isGhost() )
       {
          if ( Sim::findObject( SimObjectId( st.profile ), st.profile ) )
          {
@@ -2266,7 +2266,7 @@ void ShapeBase::updateAudioState(Sound& st)
          else
             st.play = false;
       }
-      else 
+      else
       {
          // Non-looping sounds timeout on the server
          st.timeout = 0;
@@ -2581,8 +2581,8 @@ void ShapeBase::prepRenderImage( SceneRenderState *state )
    _prepRenderImage( state, true, true );
 }
 
-void ShapeBase::_prepRenderImage(   SceneRenderState *state, 
-                                    bool renderSelf, 
+void ShapeBase::_prepRenderImage(   SceneRenderState *state,
+                                    bool renderSelf,
                                     bool renderMountedImages )
 {
    PROFILE_SCOPE( ShapeBase_PrepRenderImage );
@@ -2594,9 +2594,9 @@ void ShapeBase::_prepRenderImage(   SceneRenderState *state,
       return;
 
    // We don't need to render if all the meshes are forced hidden.
-   if ( mMeshHidden.getSize() > 0 && mMeshHidden.testAll() )   
+   if ( mMeshHidden.getSize() > 0 && mMeshHidden.testAll() )
       return;
-      
+
    // If we're rendering shadows don't render the mounted
    // images unless the shape is also rendered.
    if ( state->isShadowPass() && !renderSelf )
@@ -2632,16 +2632,16 @@ void ShapeBase::_prepRenderImage(   SceneRenderState *state,
 
    if (mShapeInstance)
    {
-      if ( forceHighestDetail )         
+      if ( forceHighestDetail )
          mShapeInstance->setCurrentDetail( 0 );
       else
          mShapeInstance->setDetailFromDistance( state, dist * invScale );
-                              
+
       mShapeInstance->animate();
    }
-   
+
    if (  ( mShapeInstance && mShapeInstance->getCurrentDetail() < 0 ) ||
-         ( !mShapeInstance && !gShowBoundingBox ) ) 
+         ( !mShapeInstance && !gShowBoundingBox ) )
    {
       // no, don't draw anything
       return;
@@ -2655,7 +2655,7 @@ void ShapeBase::_prepRenderImage(   SceneRenderState *state,
          U32 imageShapeIndex = getImageShapeIndex(image);
          if (image.dataBlock && image.shapeInstance[imageShapeIndex])
          {
-            // Select detail levels on mounted items but... always 
+            // Select detail levels on mounted items but... always
             // draw the control object's mounted images in high detail.
             if ( forceHighestDetail )
                image.shapeInstance[imageShapeIndex]->setCurrentDetail( 0 );
@@ -2702,10 +2702,10 @@ void ShapeBase::_prepRenderImage(   SceneRenderState *state,
 void ShapeBase::prepBatchRender(SceneRenderState* state, S32 mountedImageIndex )
 {
    // CHANGES IN HERE SHOULD BE DUPLICATED IN TSSTATIC!
-   
+
    GFXTransformSaver saver;
-   
-   // Set up our TS render state. 
+
+   // Set up our TS render state.
    TSRenderState rdata;
    rdata.setSceneState( state );
    if ( mCubeReflector.isEnabled() )
@@ -2737,13 +2737,13 @@ void ShapeBase::prepBatchRender(SceneRenderState* state, S32 mountedImageIndex )
       {
          RenderPassManager *pass = state->getRenderPass();
 
-         OccluderRenderInst *ri = pass->allocInst<OccluderRenderInst>();   
+         OccluderRenderInst *ri = pass->allocInst<OccluderRenderInst>();
 
          ri->type = RenderPassManager::RIT_Occluder;
-         ri->query = mCubeReflector.getOcclusionQuery();   
+         ri->query = mCubeReflector.getOcclusionQuery();
          mObjToWorld.mulP( mObjBox.getCenter(), &ri->position );
          ri->scale.set( mObjBox.getExtents() );
-         ri->orientation = pass->allocUniqueXform( mObjToWorld );        
+         ri->orientation = pass->allocUniqueXform( mObjToWorld );
          ri->isSphere = false;
          state->getRenderPass()->addInst( ri );
       }
@@ -2790,20 +2790,20 @@ void ShapeBase::_renderBoundingBox( ObjectRenderInst *ri, SceneRenderState *stat
       if ( image.shapeInstance )
       {
          MatrixF mat;
-         getRenderImageTransform( ri->objectIndex, &mat );         
+         getRenderImageTransform( ri->objectIndex, &mat );
 
          const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->bounds;
 
          drawer->drawCube( desc, objBox, ColorI( 255, 255, 255 ), &mat );
       }
    }
-   else   
+   else
       drawer->drawCube( desc, mObjBox, ColorI( 255, 255, 255 ), &mRenderObjToWorld );
 }
 
 bool ShapeBase::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 {
-   if (mShapeInstance) 
+   if (mShapeInstance)
    {
       RayInfo shortest;
       shortest.t = 1e8;
@@ -2820,7 +2820,7 @@ bool ShapeBase::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
          }
       }
 
-      if (info->object == this) 
+      if (info->object == this)
       {
          // Copy out the shortest time...
          *info = shortest;
@@ -2833,7 +2833,7 @@ bool ShapeBase::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
 bool ShapeBase::castRayRendered(const Point3F &start, const Point3F &end, RayInfo* info)
 {
-   if (mShapeInstance) 
+   if (mShapeInstance)
    {
       RayInfo localInfo;
       mShapeInstance->animate();
@@ -3036,7 +3036,7 @@ bool ShapeBase::pointInWater( Point3F &point )
    if ( mCurrentWaterObject == NULL )
       return false;
 
-   return mCurrentWaterObject->isUnderwater( point );   
+   return mCurrentWaterObject->isUnderwater( point );
 }
 
 //----------------------------------------------------------------------------
@@ -3163,7 +3163,7 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
                stream->writeFlag(image.genericTrigger[i]);
             }
 
-            stream->writeInt(image.fireCount,3);            
+            stream->writeInt(image.fireCount,3);
             stream->writeInt(image.altFireCount,3);
             stream->writeInt(image.reloadCount,3);
             stream->writeFlag(isImageFiring(i));
@@ -3174,7 +3174,7 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    // Group some of the uncommon stuff together.
    if (stream->writeFlag(mask & (NameMask | ShieldMask | CloakMask | InvincibleMask | SkinMask | MeshHiddenMask ))) {
-         
+
       if (stream->writeFlag(mask & CloakMask))
       {
          // cloaking
@@ -3249,15 +3249,15 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
       }
    }
 
-   if ( stream->readFlag() ) 
+   if ( stream->readFlag() )
    {
-      for ( S32 i = 0; i < MaxSoundThreads; i++ ) 
+      for ( S32 i = 0; i < MaxSoundThreads; i++ )
       {
-         if ( stream->readFlag() ) 
+         if ( stream->readFlag() )
          {
             Sound& st = mSoundThread[i];
             st.play = stream->readFlag();
-            if ( st.play ) 
+            if ( st.play )
             {
                st.profile = (SFXTrack*) stream->readRangedU32(  DataBlockObjectIdFirst,
                                                                 DataBlockObjectIdLast );
@@ -3318,13 +3318,13 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
                MountedImage& image = mMountedImageList[i];
                image.scriptAnimPrefix = scriptDesiredAnimPrefix;
 
-               setImage(   i, imageData, 
-                           skinDesiredNameHandle, image.loaded, 
+               setImage(   i, imageData,
+                           skinDesiredNameHandle, image.loaded,
                            image.ammo, image.triggerDown, image.altTriggerDown,
                            image.motion, image.genericTrigger[0], image.genericTrigger[1], image.genericTrigger[2], image.genericTrigger[3],
                            image.target);
             }
-            
+
             if (!datablockChange && image.scriptAnimPrefix != scriptDesiredAnimPrefix)
             {
                // We don't have a new image, but we do have a new script anim prefix to work with.
@@ -3361,9 +3361,9 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
 
                if (processFiring && imageData)
                {
-                  if ( imageData->lightType == ShapeBaseImageData::WeaponFireLight )                     
-                     image.lightStart = Sim::getCurrentTime();                     
-                  
+                  if ( imageData->lightType == ShapeBaseImageData::WeaponFireLight )
+                     image.lightStart = Sim::getCurrentTime();
+
                   // HACK: Only works properly if you are in control
                   // of the one and only shapeBase object in the scene
                   // which fires an image that uses camera shake.
@@ -3377,8 +3377,8 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
 
                      mWeaponCamShake->init();
                      mWeaponCamShake->setFrequency( imageData->camShakeFreq );
-                     mWeaponCamShake->setAmplitude( imageData->camShakeAmp );  
-                     
+                     mWeaponCamShake->setAmplitude( imageData->camShakeAmp );
+
                      if ( !mWeaponCamShake->isAdded )
                      {
                         gCamFXMgr.addFX( mWeaponCamShake );
@@ -3386,7 +3386,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
                      }
                   }
                }
-               
+
                updateImageState(i,0);
 
                if ( !image.triggerDown && !image.altTriggerDown )
@@ -3399,7 +3399,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
                }
             }
             else
-            {               
+            {
                if(imageData)
                {
                   // Initial state
@@ -3423,7 +3423,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
       if(stream->readFlag())     // CloakMask and control
       {
          // Read cloaking state.
-         
+
          setCloakedState(stream->readFlag());
          mIsControlled = stream->readFlag();
 
@@ -3448,13 +3448,13 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
          // Cloaking, Shield, and invul masking
          Point3F shieldNormal;
          stream->readNormalVector(&shieldNormal, ShieldNormalBits);
-         
+
          // CodeReview [bjg 4/6/07] This is our energy level - why aren't we storing it? Was in a
          // local variable called energyPercent.
          stream->readFloat(EnergyLevelBits);
       }
 
-      if (stream->readFlag()) 
+      if (stream->readFlag())
       {
          // InvincibleMask
          F32 time, speed;
@@ -3462,7 +3462,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
          stream->read(&speed);
          setupInvincibleEffect(time, speed);
       }
-      
+
       if ( stream->readFlag() ) // MeshHiddenMask
       {
          stream->readBits( &mMeshHidden );
@@ -3547,10 +3547,10 @@ void ShapeBaseConvex::findNodeTransform()
    // Find the first object that contains a mesh for this
    // detail level. There should only be one mesh per
    // collision detail level.
-   for (S32 i = start; i < end; i++) 
+   for (S32 i = start; i < end; i++)
    {
       const TSShape::Object* obj = &shape->objects[i];
-      if (obj->numMeshes && detail->objectDetailNum < obj->numMeshes) 
+      if (obj->numMeshes && detail->objectDetailNum < obj->numMeshes)
       {
          nodeTransform = &si->mNodeTransforms[obj->nodeIndex];
          return;
@@ -3748,7 +3748,7 @@ void ShapeBase::reSkin()
          String newSkin( skins[i] );
 
          // Check if the skin handle contains an explicit "old" base string. This
-         // allows all models to support skinning, even if they don't follow the 
+         // allows all models to support skinning, even if they don't follow the
          // "base_xxx" material naming convention.
          S32 split = newSkin.find( '=' );    // "old=new" format skin?
          if ( split != String::NPos )
@@ -3797,7 +3797,7 @@ DefineEngineMethod( ShapeBase, playAudio, bool, ( S32 slot, SFXTrack* track ),,
    "@param slot Audio slot index for the sound (valid range is 0 - 3)\n" // 3 = ShapeBase::MaxSoundThreads-1
    "@param track SFXTrack to play\n"
    "@return true if the sound was attached successfully, false if failed\n\n"
-   
+
    "@see stopAudio()\n")
 {
    if (track && slot >= 0 && slot < ShapeBase::MaxSoundThreads) {
@@ -3812,7 +3812,7 @@ DefineEngineMethod( ShapeBase, stopAudio, bool, ( S32 slot ),,
 
    "@param slot audio slot index (started with playAudio)\n"
    "@return true if the sound was stopped successfully, false if failed\n\n"
-   
+
    "@see playAudio()\n")
 {
    if (slot >= 0 && slot < ShapeBase::MaxSoundThreads) {
@@ -3840,7 +3840,7 @@ DefineEngineMethod( ShapeBase, playThread, bool, ( S32 slot, const char* name ),
    "%obj.playThread( 0 );                 // Resume playback\n"
    "%obj.playThread( 0, \"spin\" );         // Replace the sequence in slot 0\n"
    "@endtsexample\n"
-   
+
    "@see pauseThread()\n"
    "@see stopThread()\n"
    "@see setThreadDir()\n"
@@ -3868,7 +3868,7 @@ DefineEngineMethod( ShapeBase, setThreadDir, bool, ( S32 slot, bool fwd ),,
    "@param slot thread slot to modify\n"
    "@param fwd true to play the animation forwards, false to play backwards\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see playThread()\n" )
 {
    if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
@@ -3884,7 +3884,7 @@ DefineEngineMethod( ShapeBase, setThreadTimeScale, bool, ( S32 slot, F32 scale )
    "@param slot thread slot to modify\n"
    "@param scale new thread time scale (1=normal speed, 0.5=half speed etc)\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see playThread\n" )
 {
    if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
@@ -3900,7 +3900,7 @@ DefineEngineMethod( ShapeBase, setThreadPosition, bool, ( S32 slot, F32 pos ),,
    "@param slot thread slot to modify\n"
    "@param pos position within thread\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see playThread\n" )
 {
    if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
@@ -3917,7 +3917,7 @@ DefineEngineMethod( ShapeBase, stopThread, bool, ( S32 slot ),,
    "will start from the beginning again.\n"
    "@param slot thread slot to stop\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see playThread\n" )
 {
    if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
@@ -3932,7 +3932,7 @@ DefineEngineMethod( ShapeBase, destroyThread, bool, ( S32 slot ),,
 
    "@param slot thread slot to destroy\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see playThread\n" )
 {
    if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
@@ -3944,12 +3944,12 @@ DefineEngineMethod( ShapeBase, destroyThread, bool, ( S32 slot ),,
 
 DefineEngineMethod( ShapeBase, pauseThread, bool, ( S32 slot ),,
    "@brief Pause an animation thread.\n\n"
-   
+
    "If restarted using playThread, the animation "
    "will resume from the paused position.\n"
    "@param slot thread slot to stop\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see playThread\n" )
 {
    if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
@@ -3975,7 +3975,7 @@ DefineEngineMethod( ShapeBase, mountImage, bool,
    "%player.mountImage( CrossbowImage, 0, false );\n"
    "%player.mountImage( RocketLauncherImage, 0, true, 'blue' );\n"
    "@endtsexample\n"
-   
+
    "@see unmountImage()\n"
    "@see getMountedImage()\n"
    "@see getPendingImage()\n"
@@ -3997,7 +3997,7 @@ DefineEngineMethod( ShapeBase, unmountImage, bool, ( S32 slot ),,
 
    "@param slot Image slot to unmount\n"
    "@return true if successful, false if failed\n\n"
-   
+
    "@see mountImage()\n")
 {
    if (slot >= 0 && slot < ShapeBase::MaxMountedImages)
@@ -4029,7 +4029,7 @@ DefineEngineMethod( ShapeBase, getPendingImage, S32, ( S32 slot ),,
    "state completes. eg. if the user changes weapons, you may wish to ensure "
    "that the current weapon firing state plays to completion first.</li></ol>\n"
    "This command retrieves the ID of the pending Image (2nd case above).\n"
-   
+
    "@param slot Image slot to query\n"
    "@return ID of the pending ShapeBaseImageData datablock, or 0 if none.\n\n" )
 {
@@ -4446,32 +4446,32 @@ DefineEngineMethod( ShapeBase, getLookAtPoint, const char*, ( F32 distance, S32 
 {
    MatrixF mat;
    object->getEyeTransform( &mat );
-   
+
    // Get eye vector.
-   
+
    VectorF eyeVector;
    mat.getColumn( 1, &eyeVector );
-   
+
    // Get eye position.
-   
+
    VectorF eyePos;
    mat.getColumn( 3, &eyePos );
-   
+
    // Make sure the eye vector covers the distance.
-   
+
    eyeVector *= distance;
-   
+
    // Do a container search.
-   
+
    VectorF start = eyePos;
    VectorF end = eyePos + eyeVector;
-   
+
    RayInfo ri;
    if( !gServerContainer.castRay( start, end, typeMask, &ri ) || !ri.object )
       return ""; // No hit.
-   
+
    // Gather hit info.
-      
+
    enum { BUFFER_SIZE = 256 };
    char* buffer = Con::getReturnBuffer( BUFFER_SIZE );
    if( ri.material )
@@ -4495,7 +4495,7 @@ DefineEngineMethod( ShapeBase, setEnergyLevel, void, ( F32 level ),,
    "@brief Set this object's current energy level.\n\n"
 
    "@param level new energy level\n"
-   
+
    "@see getEnergyLevel()\n"
    "@see getEnergyPercent()\n")
 {
@@ -4506,7 +4506,7 @@ DefineEngineMethod( ShapeBase, getEnergyLevel, F32, (),,
    "@brief Get the object's current energy level.\n\n"
 
    "@return energy level\n"
-   
+
    "@see setEnergyLevel()\n")
 {
    return object->getEnergyLevel();
@@ -4525,7 +4525,7 @@ DefineEngineMethod( ShapeBase, setDamageLevel, void, ( F32 level ),,
    "@brief Set the object's current damage level.\n\n"
 
    "@param level new damage level\n"
-   
+
    "@see getDamageLevel()\n"
    "@see getDamagePercent()\n")
 {
@@ -4536,7 +4536,7 @@ DefineEngineMethod( ShapeBase, getDamageLevel, F32, (),,
    "@brief Get the object's current damage level.\n\n"
 
    "@return damage level\n"
-   
+
    "@see setDamageLevel()\n")
 {
    return object->getDamageLevel();
@@ -4546,25 +4546,25 @@ DefineEngineMethod( ShapeBase, getDamagePercent, F32, (),,
    "@brief Get the object's current damage level as a percentage of maxDamage.\n\n"
 
    "@return damageLevel / datablock.maxDamage\n"
-   
+
    "@see setDamageLevel()\n")
 {
    return object->getDamageValue();
 }
-  
-DefineEngineMethod(ShapeBase, getMaxDamage, F32, (),,   
-   "Get the object's maxDamage level.\n"  
-   "@return datablock.maxDamage\n")    
-{    
-   return object->getMaxDamage();    
-}  
+
+DefineEngineMethod(ShapeBase, getMaxDamage, F32, (),,
+   "Get the object's maxDamage level.\n"
+   "@return datablock.maxDamage\n")
+{
+   return object->getMaxDamage();
+}
 
 DefineEngineMethod( ShapeBase, setDamageState, bool, ( const char* state ),,
    "@brief Set the object's damage state.\n\n"
 
    "@param state should be one of \"Enabled\", \"Disabled\", \"Destroyed\"\n"
    "@return true if successful, false if failed\n"
-   
+
    "@see getDamageState()\n")
 {
    return object->setDamageState( state );
@@ -4574,7 +4574,7 @@ DefineEngineMethod( ShapeBase, getDamageState, const char*, (),,
    "@brief Get the object's damage state.\n\n"
 
    "@return the damage state; one of \"Enabled\", \"Disabled\", \"Destroyed\"\n"
-   
+
    "@see setDamageState()\n")
 {
    return object->getDamageStateName();
@@ -4583,8 +4583,8 @@ DefineEngineMethod( ShapeBase, getDamageState, const char*, (),,
 DefineEngineMethod( ShapeBase, isDestroyed, bool, (),,
    "@brief Check if the object is in the Destroyed damage state.\n\n"
 
-   "@return true if damage state is \"Destroyed\", false if not\n" 
-   
+   "@return true if damage state is \"Destroyed\", false if not\n"
+
    "@see isDisabled()\n"
    "@see isEnabled()\n")
 {
@@ -4595,7 +4595,7 @@ DefineEngineMethod( ShapeBase, isDisabled, bool, (),,
    "@brief Check if the object is in the Disabled or Destroyed damage state.\n\n"
 
    "@return true if damage state is not \"Enabled\", false if it is\n"
-   
+
    "@see isDestroyed()\n"
    "@see isEnabled()\n")
 {
@@ -4606,7 +4606,7 @@ DefineEngineMethod( ShapeBase, isEnabled, bool, (),,
    "@brief Check if the object is in the Enabled damage state.\n\n"
 
    "@return true if damage state is \"Enabled\", false if not\n"
-   
+
    "@see isDestroyed()\n"
    "@see isDisabled()\n")
 {
@@ -4644,9 +4644,9 @@ DefineEngineMethod( ShapeBase, setRepairRate, void, ( F32 rate ),,
    "This value will be subtracted from the damage level each tick, whereas the "
    "ShapeBaseData field limits how much of the applyRepair value is subtracted "
    "each tick. Both repair types can be active at the same time.\n"
-   
+
    "@param rate value to subtract from damage level each tick (must be > 0)\n"
-   
+
    "@see getRepairRate()\n")
 {
    if(rate < 0)
@@ -4669,9 +4669,9 @@ DefineEngineMethod( ShapeBase, setRechargeRate, void, ( F32 rate ),,
 
    "The recharge rate is added to the object's current energy level each tick, "
    "up to the maxEnergy level set in the ShapeBaseData datablock.\n"
-   
+
    "@param rate the recharge rate (per tick)\n"
-   
+
    "@see getRechargeRate()\n")
 {
    object->setRechargeRate( rate );
@@ -4681,7 +4681,7 @@ DefineEngineMethod( ShapeBase, getRechargeRate, F32, (),,
    "@brief Get the current recharge rate.\n\n"
 
    "@return the recharge rate (per tick)\n"
-   
+
    "@see setRechargeRate()\n")
 {
    return object->getRechargeRate();
@@ -4694,7 +4694,7 @@ DefineEngineMethod( ShapeBase, getControllingClient, S32, (),,
 
    "@return the ID of the controlling GameConnection, or 0 if this object is not "
    "controlled by any client.\n"
-   
+
    "@see GameConnection\n")
 {
    if (GameConnection* con = object->getControllingClient())
@@ -4716,7 +4716,7 @@ DefineEngineMethod( ShapeBase, getControllingObject, S32, (),,
 DefineEngineMethod( ShapeBase, canCloak, bool, (),,
    "@brief Check if this object can cloak.\n\n"
    "@return true\n"
-   
+
    "@note Not implemented as it always returns true.")
 {
    return true;
@@ -4728,7 +4728,7 @@ DefineEngineMethod( ShapeBase, setCloaked, void, ( bool cloak ),,
    "When an object is cloaked it is not rendered.\n"
 
    "@param cloak true to cloak the object, false to uncloak\n"
-   
+
    "@see isCloaked()\n")
 {
    if (object->isServerObject())
@@ -4738,8 +4738,8 @@ DefineEngineMethod( ShapeBase, setCloaked, void, ( bool cloak ),,
 DefineEngineMethod( ShapeBase, isCloaked, bool, (),,
    "@brief Check if this object is cloaked.\n\n"
 
-   "@return true if cloaked, false if not\n" 
-   
+   "@return true if cloaked, false if not\n"
+
    "@see setCloaked()\n")
 {
    return object->getCloakedState();
@@ -4754,7 +4754,7 @@ DefineEngineMethod( ShapeBase, setDamageFlash, void, ( F32 level ),,
    "@note Relies on the flash postFx.\n"
 
    "@param level flash level (0-1)\n"
-   
+
    "@see getDamageFlash()\n")
 {
    if (object->isServerObject())
@@ -4780,7 +4780,7 @@ DefineEngineMethod( ShapeBase, setWhiteOut, void, ( F32 level ),,
    "@note Relies on the flash postFx.\n"
 
    "@param level flash level (0-1)\n"
-   
+
    "@see getWhiteOut()\n")
 {
    if (object->isServerObject())
@@ -4844,7 +4844,7 @@ DefineEngineMethod( ShapeBase, startFade, void, ( S32 time, S32 delay, bool fade
    "A faded out object is still in the scene and can still be collided with, "
    "so if you want to disable collisions for this shape after it fades out "
    "use setHidden to temporarily remove this shape from the scene.\n"
-  
+
    "@note Items have the ability to light their surroundings. When an Item with "
    "an active light is fading out, the light it emits is correspondingly "
    "reduced until it goes out. Likewise, when the item fades in, the light is "
@@ -4880,7 +4880,7 @@ DefineEngineMethod( ShapeBase, setShapeName, void, ( const char* name ),,
    "not the DTS or DAE model filename.\n"
 
    "@param name new name for the shape\n\n"
-   
+
    "@see getShapeName()\n")
 {
    object->setShapeName( name );
@@ -4892,8 +4892,8 @@ DefineEngineMethod( ShapeBase, getShapeName, const char*, (),,
    "@note This is the name of the shape object that is sent to the client, "
    "not the DTS or DAE model filename.\n"
 
-   "@return the name of the shape\n\n" 
-   
+   "@return the name of the shape\n\n"
+
    "@see setShapeName()\n")
 {
    return object->getShapeName();
@@ -4916,7 +4916,7 @@ DefineEngineMethod( ShapeBase, setSkinName, void, ( const char* name ),,
 DefineEngineMethod( ShapeBase, getSkinName, const char*, (),,
    "@brief Get the name of the skin applied to this shape.\n\n"
 
-   "@return the name of the skin\n\n" 
+   "@return the name of the skin\n\n"
 
    "@see skin\n"
    "@see setSkinName()\n")
@@ -4937,14 +4937,14 @@ void ShapeBase::consoleInit()
       "@see ShapeBase::getWhiteOut"
       "@note Relies on the flash postFx.\n"
 	   "@ingroup gameObjects\n");
-   Con::addVariable("SB::FullCorrectionDistance", TypeF32, &sFullCorrectionDistance, 
+   Con::addVariable("SB::FullCorrectionDistance", TypeF32, &sFullCorrectionDistance,
       "@brief Distance at which a weapon's muzzle vector is fully corrected to match where the player is looking.\n\n"
       "When a weapon image has correctMuzzleVector set and the Player is in 1st person, the muzzle vector from the "
       "weapon is modified to match where the player is looking.  Beyond the FullCorrectionDistance the muzzle vector "
       "is always corrected.  Between FullCorrectionDistance and the player, the weapon's muzzle vector is adjusted so that "
       "the closer the aim point is to the player, the closer the muzzle vector is to the true (non-corrected) one.\n"
 	   "@ingroup gameObjects\n");
-   Con::addVariable("SB::CloakSpeed", TypeF32, &sCloakSpeed, 
+   Con::addVariable("SB::CloakSpeed", TypeF32, &sCloakSpeed,
       "@brief Time to cloak, in seconds.\n\n"
 	   "@ingroup gameObjects\n");
 }
@@ -4974,9 +4974,9 @@ void ShapeBase::setMeshHidden( S32 meshIndex, bool forceHidden )
       return;
 
    if ( forceHidden )
-      mMeshHidden.set( meshIndex );   
+      mMeshHidden.set( meshIndex );
    else
-      mMeshHidden.clear( meshIndex );   
+      mMeshHidden.clear( meshIndex );
 
    if ( mShapeInstance )
       mShapeInstance->setMeshForceHidden( meshIndex, forceHidden );
@@ -5036,7 +5036,7 @@ void ShapeBase::dumpMeshVisibility()
 
       const String &meshName = mDataBlock->mShape->getMeshName( i );
 
-      Con::printf( "%d - %s - forceHidden = %s, visibility = %f", 
+      Con::printf( "%d - %s - forceHidden = %s, visibility = %f",
          i,
          meshName.c_str(),
          mesh.forceHidden ? "true" : "false",
@@ -5064,7 +5064,7 @@ DefineEngineMethod( ShapeBase, getTargetName, const char*, ( S32 index ),,
 
    "@param index index of the material to get (valid range is 0 - getTargetCount()-1).\n"
    "@return the name of the indexed material.\n\n"
-   
+
    "@see getTargetCount()\n")
 {
 	ShapeBase *obj = dynamic_cast< ShapeBase* > ( object );
@@ -5083,8 +5083,8 @@ DefineEngineMethod( ShapeBase, getTargetName, const char*, ( S32 index ),,
 DefineEngineMethod( ShapeBase, getTargetCount, S32, (),,
    "@brief Get the number of materials in the shape.\n\n"
 
-   "@return the number of materials in the shape.\n\n" 
-   
+   "@return the number of materials in the shape.\n\n"
+
    "@see getTargetName()\n")
 {
 	ShapeBase *obj = dynamic_cast< ShapeBase* > ( object );

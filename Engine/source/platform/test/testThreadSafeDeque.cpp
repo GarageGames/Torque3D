@@ -116,12 +116,12 @@ CreateUnitTest( TestThreadSafeDequeSerial, "Platform/ThreadSafeDeque/Serial" )
       char ch;
 
       TEST( deque.isEmpty() );
-      
+
       deque.pushFront( 'a' );
       TEST( !deque.isEmpty() );
       TEST( deque.tryPopFront( ch ) );
       TEST( ch == 'a' );
-      
+
       deque.pushBack( 'a' );
       TEST( !deque.isEmpty() );
       TEST( deque.tryPopFront( ch ) );
@@ -212,7 +212,7 @@ public:
       {
          _setName( "ProducerThread" );
          Platform::outputDebugString( "Starting ProducerThread" );
-         
+
          TestType* test = ( TestType* ) arg;
 
          for( U32 i = 0; i < test->mValues.size(); ++ i )
@@ -256,10 +256,10 @@ public:
 
       ProducerThread pThread( this );
       ConsumerThread cThread( this );
-      
+
       pThread.start();
       cThread.start();
-      
+
       pThread.join();
       cThread.join();
 
@@ -312,7 +312,7 @@ public:
             U32 index = test->mProducerIndex;
             if( index == test->mValues.size() )
                break;
-               
+
             if( dCompareAndSwap( test->mProducerIndex, index, index + 1 ) )
             {
                U32 tick = Platform::getRealMilliseconds();
@@ -346,7 +346,7 @@ public:
                t->mValues[ value->mIndex ] = 0;
             }
          }
-         
+
          Platform::outputDebugString( "Stopping ConsumerThread" );
       }
    };

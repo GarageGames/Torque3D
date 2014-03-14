@@ -81,7 +81,7 @@ void SFXNullVoice::play( bool looping )
 U32 SFXNullVoice::_tell() const
 {
    U32 ms = _getPlayTime();
-   
+
    const SFXFormat& format = mBuffer->getFormat();
    return ( format.getDataLength( ms ) / format.getBytesPerSample() );
 }
@@ -113,7 +113,7 @@ void SFXNullVoice::setVolume( F32 volume )
 }
 
 void SFXNullVoice::setPitch( F32 pitch )
-{ 
+{
 }
 
 void SFXNullVoice::setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )

@@ -54,12 +54,12 @@ END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( ColorI,
    ColorI,,
    "RGBA color quadruple in 8bit integer precision per channel." )
-   
+
    FIELD( red, red, 1, "Red channel value." )
    FIELD( green, green, 1, "Green channel value." )
    FIELD( blue, blue, 1, "Blue channel value." )
    FIELD( alpha, alpha, 1, "Alpha channel value." )
-   
+
 END_IMPLEMENT_STRUCT;
 
 

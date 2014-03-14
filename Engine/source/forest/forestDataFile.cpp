@@ -74,7 +74,7 @@ ForestData::~ForestData()
 void ForestData::clear()
 {
    // We only have to delete the top level cells and ForestCell will
-   // clean up its sub-cells in its destructor.   
+   // clean up its sub-cells in its destructor.
 
    BucketTable::Iterator iter = mBuckets.begin();
    for ( ; iter != mBuckets.end(); iter++ ) delete iter->value;
@@ -85,7 +85,7 @@ void ForestData::clear()
 
 bool ForestData::read( Stream &stream )
 {
-   // Read our identifier... so we know we're 
+   // Read our identifier... so we know we're
    // not reading in pure garbage.
    char id[4] = { 0 };
    stream.read( 4, id );
@@ -117,7 +117,7 @@ bool ForestData::read( Stream &stream )
    {
       StringTableEntry name = stream.readSTString();
       ForestItemData* data = ForestItemData::find( name );
-      
+
       // TODO: Change this to instead create a dummy forest data
       // for each so that the user can swap it with the right one.
       if ( data == NULL )
@@ -125,7 +125,7 @@ bool ForestData::read( Stream &stream )
          Con::warnf( "ForestData::read - ForestItemData named %s was not found.", name );
          Con::warnf( "Note this can occur if you have deleted or renamed datablocks prior to loading this forest and is not an 'error' in this scenario." );
       }
-      
+
       allDatablocks[ i ] = data;
    }
 
@@ -219,7 +219,7 @@ bool ForestData::write( const char *path )
 
       mathWrite( stream, iter->getPosition() );
 
-      QuatF quat;       
+      QuatF quat;
       quat.set( iter->getTransform() );
       mathWrite( stream, quat );
 
@@ -270,7 +270,7 @@ ForestCell* ForestData::_findOrCreateBucket( const Point3F &pos )
    else
    {
       bucket = new ForestCell( RectF( key.x, key.y, BUCKET_DIM, BUCKET_DIM ) );
-      mBuckets.insertUnique( key, bucket );     
+      mBuckets.insertUnique( key, bucket );
       mIsDirty = true;
    }
 
@@ -312,7 +312,7 @@ const ForestItem& ForestData::addItem( ForestItemData *data,
 
    return addItem(   smNextItemId++,
                      data,
-                     xfm, 
+                     xfm,
                      scale );
 }
 
@@ -322,7 +322,7 @@ const ForestItem& ForestData::addItem( ForestItemKey key,
                                        F32 scale )
 {
    ForestCell *bucket = _findOrCreateBucket( xfm.getPosition() );
-   
+
    mIsDirty = true;
 
    return bucket->insertItem( key, data, xfm, scale );
@@ -352,11 +352,11 @@ const ForestItem& ForestData::updateItem( ForestItemKey key,
 
 const ForestItem& ForestData::updateItem( ForestItem &item )
 {
-   return updateItem( item.getKey(), 
-                      item.getPosition(), 
-                      item.getData(), 
-                      item.getTransform(), 
-                      item.getScale() );   
+   return updateItem( item.getKey(),
+                      item.getPosition(),
+                      item.getData(),
+                      item.getTransform(),
+                      item.getScale() );
 }
 
 bool ForestData::removeItem( ForestItemKey key, const Point3F &keyPosition )
@@ -372,7 +372,7 @@ bool ForestData::removeItem( ForestItemKey key, const Point3F &keyPosition )
    {
       delete bucket;
       mBuckets.erase( bucketkey );
-   }      
+   }
 
    mIsDirty = true;
 
@@ -531,7 +531,7 @@ U32 ForestData::getItems( const Box3F &box, Vector<ForestItem> *outItems ) const
       stack.pop_back();
 
       // If the cell is empty or doesn't overlap the box... skip it.
-      if (  cell->isEmpty() || 
+      if (  cell->isEmpty() ||
             !cell->getBounds().isOverlapped( box ) )
          continue;
 
@@ -588,7 +588,7 @@ U32 ForestData::getItems( const Point3F &point, F32 radius, Vector<ForestItem> *
       // without any further testing of it or its children.
 
       // If the cell is empty or doesn't overlap the sphere... skip it.
-      if (  cell->isEmpty() || 
+      if (  cell->isEmpty() ||
             cell->getBounds().getSqDistanceToPoint( point ) > radiusSq )
          continue;
 
@@ -642,7 +642,7 @@ U32 ForestData::getItems( const Point2F &point, F32 radius, Vector<ForestItem> *
       stack.pop_back();
 
       // If the cell is empty or doesn't overlap the sphere... skip it.
-      if (  cell->isEmpty() || 
+      if (  cell->isEmpty() ||
             cell->getRect().getSqDistanceToPoint( point ) > radiusSq )
          continue;
 
@@ -736,7 +736,7 @@ void ForestData::getCells( Vector<ForestCell*> *outCells ) const
    PROFILE_SCOPE( ForestData_getCells_nofrustum );
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )         
+   for ( ; iter != mBuckets.end(); iter++ )
       outCells->push_back( iter->value );
 }
 
@@ -803,7 +803,7 @@ void ForestData::clearPhysicsRep( Forest *forest )
          continue;
       }
 
-      cell->clearPhysicsRep( forest );      
+      cell->clearPhysicsRep( forest );
    }
 }
 
@@ -829,6 +829,6 @@ void ForestData::buildPhysicsRep( Forest *forest )
          continue;
       }
 
-      cell->buildPhysicsRep( forest );      
-   }   
+      cell->buildPhysicsRep( forest );
+   }
 }

@@ -62,7 +62,7 @@ void PolyhedronImpl< Base >::transform( const MatrixF& matrix, const Point3F& sc
 
    const U32 numPlanes = this->getNumPlanes();
    typename Base::PlaneType* planes = this->getPlanes();
-   
+
    PlaneTransformer transformer;
    transformer.set( matrix, scale );
 
@@ -148,7 +148,7 @@ U32 PolyhedronImpl< Base >::constructIntersection( const PlaneF& plane, Point3F*
    U32 currentEdge = firstEdge;
    U32 currentFace = firstFace;
 
-   do 
+   do
    {
       // Handle the current edge.
 
@@ -382,7 +382,7 @@ U32 PolyhedronImpl< Base >::extractFace( U32 plane, IndexType* outIndices, U32 m
    // so it should be sufficiently fast to just loop over the original
    // set.
 
-   do 
+   do
    {
       // Add the vertex for the current edge.
 

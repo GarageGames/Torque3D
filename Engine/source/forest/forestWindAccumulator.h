@@ -32,7 +32,7 @@ struct TreePlacementInfo;
 class ForestItemData;
 
 
-/// This simple class holds the state of the accumulated 
+/// This simple class holds the state of the accumulated
 /// wind effect for a single tree.
 class ForestWindAccumulator
 {

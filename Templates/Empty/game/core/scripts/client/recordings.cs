@@ -22,7 +22,7 @@
 
 //-----------------------------------------------------------------------------
 // RecordingsGui is the main TSControl through which the a demo game recording
-// is viewed. 
+// is viewed.
 //-----------------------------------------------------------------------------
 
 function recordingsDlg::onWake()
@@ -31,7 +31,7 @@ function recordingsDlg::onWake()
    %i = 0;
    %filespec = $currentMod @ "/recordings/*.rec";
    echo(%filespec);
-   for(%file = findFirstFile(%filespec); %file !$= ""; %file = findNextFile(%filespec)) 
+   for(%file = findFirstFile(%filespec); %file !$= ""; %file = findNextFile(%filespec))
       RecordingsDlgList.addRow(%i++, fileBase(%file));
    RecordingsDlgList.sort(0);
    RecordingsDlgList.setSelectedRow(0);
@@ -60,7 +60,7 @@ function StartSelectedDemo()
       Canvas.popDialog(RecordingsDlg);
       ServerConnection.prepDemoPlayback();
    }
-   else 
+   else
    {
       MessageBoxOK("Playback Failed", "Demo playback failed for file '" @ %file @ "'.");
       if (isObject(ServerConnection)) {
@@ -73,11 +73,11 @@ function startDemoRecord()
 {
    // make sure that current recording stream is stopped
    ServerConnection.stopRecording();
-   
+
    // make sure we aren't playing a demo
    if(ServerConnection.isDemoPlaying())
       return;
-   
+
    for(%i = 0; %i < 1000; %i++)
    {
       %num = %i;
@@ -124,8 +124,8 @@ function demoPlaybackComplete()
    disconnect();
 
    // Clean up important client-side stuff, such as the group
-   // for particle emitters and the decal manager.  This doesn't get 
-   // launched during a demo as we short circuit the whole mission 
+   // for particle emitters and the decal manager.  This doesn't get
+   // launched during a demo as we short circuit the whole mission
    // handling functionality.
    clientEndMission();
 

@@ -53,10 +53,10 @@ public:
    ///
    F32 mass;
 
-   /// 
+   ///
    F32 dynamicFriction;
 
-   /// 
+   ///
    F32 staticFriction;
 
    ///
@@ -68,7 +68,7 @@ public:
    ///
    F32 angularDamping;
 
-   /// 
+   ///
    F32 linearSleepThreshold;
 
    ///
@@ -111,10 +111,10 @@ class PhysicsDebris : public GameBase
 
 public:
 
-   /// Helper method which creates debris based on the 
+   /// Helper method which creates debris based on the
    /// datablock and initial state.
    ///
-   /// It can return NULL if the system quality settings 
+   /// It can return NULL if the system quality settings
    /// are set to disable the debris.
    ///
    static PhysicsDebris* create( PhysicsDebrisData *datablock,
@@ -128,7 +128,7 @@ public:
    static void initPersistFields();
 
    bool onAdd();
-   void onRemove(); 
+   void onRemove();
 
    void applyImpulse( const Point3F &pos, const VectorF &vec );
    void applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude );
@@ -154,7 +154,7 @@ protected:
    void _findNodes( U32 objId, Vector<U32> &nodeIds );
 
    void _onPhysicsReset( PhysicsResetEvent reset );
-   
+
 protected:
 
    F32 mLifetime;
@@ -163,8 +163,8 @@ protected:
 
    PhysicsDebrisData *mDataBlock;
 
-   TSShapeInstance *mShapeInstance;      
-   
+   TSShapeInstance *mShapeInstance;
+
    PhysicsWorld *mWorld;
 
    struct Fragment

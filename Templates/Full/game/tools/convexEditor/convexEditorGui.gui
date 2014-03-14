@@ -71,7 +71,7 @@
       closeCommand = "EditorGui.setEditor( WorldEditorInspectorPlugin );";
       EdgeSnap = "1";
       text = "ConvexShapes";
-      
+
       new GuiContainer(){
          profile = "ToolsGuiDefaultProfile";
          Position = "5 25";
@@ -81,7 +81,7 @@
          HorizSizing = "width";
          VertSizing = "height";
          isContainer = "1";
-         
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -183,7 +183,7 @@
          Extent = "202 85";
          Docking = "Top";
          Margin = "3 3 3 3";
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
@@ -192,7 +192,7 @@
             Extent = "86 18";
             text = "Node Properties";
          };
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiTextRightProfile";
             HorizSizing = "right";
@@ -275,7 +275,7 @@
          Extent = "202 31";
          Docking = "Top";
          Margin = "0 0 3 3";
-         
+
          new GuiTextCtrl(){
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
@@ -335,7 +335,7 @@
             hovertime = "1000";
             dividerMargin = "5";
          };
-      };   
+      };
       new GuiMLTextCtrl(ConvexFieldInfoControl) {
          canSaveDynamicFields = "0";
          Enabled = "1";

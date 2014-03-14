@@ -172,10 +172,10 @@ void TSStatic::initPersistFields()
 
       addField( "playAmbient",   TypeBool,   Offset( mPlayAmbient, TSStatic ),
          "Enables automatic playing of the animation sequence named \"ambient\" (if it exists) when the TSStatic is loaded.");
-      addField( "meshCulling",   TypeBool,   Offset( mMeshCulling, TSStatic ), 
+      addField( "meshCulling",   TypeBool,   Offset( mMeshCulling, TSStatic ),
          "Enables detailed culling of meshes within the TSStatic. Should only be used "
          "with large complex shapes like buildings which contain many submeshes." );
-      addField( "originSort",    TypeBool,   Offset( mUseOriginSort, TSStatic ), 
+      addField( "originSort",    TypeBool,   Offset( mUseOriginSort, TSStatic ),
          "Enables translucent sorting of the TSStatic by its origin instead of the bounds." );
 
    endGroup("Rendering");
@@ -186,10 +186,10 @@ void TSStatic::initPersistFields()
          "The type of mesh data to use for collision queries." );
       addField( "decalType",        TypeTSMeshType,   Offset( mDecalType,   TSStatic ),
          "The type of mesh data used to clip decal polygons against." );
-      addField( "allowPlayerStep",  TypeBool,         Offset( mAllowPlayerStep, TSStatic ), 
+      addField( "allowPlayerStep",  TypeBool,         Offset( mAllowPlayerStep, TSStatic ),
          "@brief Allow a Player to walk up sloping polygons in the TSStatic (based on the collisionType).\n\n"
          "When set to false, the slightest bump will stop the player from walking on top of the object.\n");
-   
+
    endGroup("Collision");
 
    addGroup("Debug");
@@ -223,7 +223,7 @@ void TSStatic::inspectPostApply()
    // Apply any transformations set in the editor
    Parent::inspectPostApply();
 
-   if(isServerObject()) 
+   if(isServerObject())
    {
       setMaskBits(AdvancedStaticOptionsMask);
       prepCollision();
@@ -294,7 +294,7 @@ bool TSStatic::_createShape()
    mAmbientThread = NULL;
    mShape = NULL;
 
-   if (!mShapeName || mShapeName[0] == '\0') 
+   if (!mShapeName || mShapeName[0] == '\0')
    {
       Con::errorf( "TSStatic::_createShape() - No shape name!" );
       return false;
@@ -309,8 +309,8 @@ bool TSStatic::_createShape()
       return false;
    }
 
-   if (  isClientObject() && 
-         !mShape->preloadMaterialList(mShape.getPath()) && 
+   if (  isClientObject() &&
+         !mShape->preloadMaterialList(mShape.getPath()) &&
          NetConnection::filesWereDownloaded() )
       return false;
 
@@ -373,7 +373,7 @@ void TSStatic::_updatePhysics()
       MatrixF offset( true );
       offset.setPosition( mShape->center );
       colShape = PHYSICSMGR->createCollision();
-      colShape->addBox( getObjBox().getExtents() * 0.5f * mObjScale, offset );         
+      colShape->addBox( getObjBox().getExtents() * 0.5f * mObjScale, offset );
    }
    else
       colShape = mShape->buildColShape( mCollisionType == VisibleMesh, getScale() );
@@ -410,7 +410,7 @@ void TSStatic::_onResourceChanged( const Torque::Path &path )
 {
    if ( path != Path( mShapeName ) )
       return;
-   
+
    _createShape();
    _updateShouldTick();
 }
@@ -448,7 +448,7 @@ void TSStatic::reSkin()
          String newSkin( skins[i] );
 
          // Check if the skin handle contains an explicit "old" base string. This
-         // allows all models to support skinning, even if they don't follow the 
+         // allows all models to support skinning, even if they don't follow the
          // "base_xxx" material naming convention.
          S32 split = newSkin.find( '=' );    // "old=new" format skin?
          if ( split != String::NPos )
@@ -478,7 +478,7 @@ void TSStatic::interpolateTick( F32 delta )
 void TSStatic::advanceTime( F32 dt )
 {
    AssertFatal( mPlayAmbient && mAmbientThread, "TSSTatic::advanceTime called with nothing to play." );
-   
+
    mShapeInstance->advanceTime( dt, mAmbientThread );
 }
 
@@ -502,7 +502,7 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    if (dist < 0.01f)
       dist = 0.01f;
 
-   F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
+   F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));
 
    if ( mForceDetail == -1 )
       mShapeInstance->setDetailFromDistance( state, dist * invScale );
@@ -513,7 +513,7 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
       return;
 
    GFXTransformSaver saver;
-   
+
    // Set up our TS render state.
    TSRenderState rdata;
    rdata.setSceneState( state );
@@ -673,7 +673,7 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    stream->read( (U32*)&mDecalType );
 
    mAllowPlayerStep = stream->readFlag();
-   mMeshCulling = stream->readFlag();   
+   mMeshCulling = stream->readFlag();
    mUseOriginSort = stream->readFlag();
 
    stream->read( &mRenderNormalScalar );
@@ -710,7 +710,7 @@ bool TSStatic::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
       for ( U32 i = 0; i < 3; i++ )
       {
-         if (*si < *ei) 
+         if (*si < *ei)
          {
             if ( *si > *bmax || *ei < *bmin )
                return false;
@@ -718,7 +718,7 @@ bool TSStatic::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
             st = ( *si < *bmin ) ? ( *bmin - *si ) / di : 0.0f;
             et = ( *ei > *bmax ) ? ( *bmax - *si ) / di : 1.0f;
          }
-         else 
+         else
          {
             if ( *ei > *bmax || *si < *bmin )
                return false;
@@ -799,7 +799,7 @@ bool TSStatic::buildPolyList(PolyListContext context, AbstractPolyList* polyList
    if ( !mShapeInstance )
       return false;
 
-   // This is safe to set even if we're not outputing 
+   // This is safe to set even if we're not outputing
    polyList->setTransform( &mObjToWorld, mObjScale );
    polyList->setObject( this );
 

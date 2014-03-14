@@ -53,7 +53,7 @@ public:
    RenderTexTargetBinManager( const RenderInstType &ritype = RenderPassManager::RIT_Mesh,
                               F32 renderOrder = 1.0f,
                               F32 processAddOrder = 1.0f,
-                              const GFXFormat targetFormat = DefaultTargetFormat, 
+                              const GFXFormat targetFormat = DefaultTargetFormat,
                               const Point2I &targetSize = Point2I(DefaultTargetSize, DefaultTargetSize),
                               const U32 targetChainLength = DefaultTargetChainLength);
 
@@ -86,7 +86,7 @@ protected:
    GFXFormat mTargetFormat;
    Point2I mTargetSize;
    Point2F mTargetScale;
-   
+
    //RectI mTargetViewport;
    TargetSizeType mTargetSizeType;
 
@@ -108,14 +108,14 @@ protected:
    /// target is then cleared using 'mTargetClearColor', viewport is set properly,
    /// and true is returned, and '_onPostRender' must be called after rendering
    /// is complete. If the return value is false, than '_onPostRender'
-   /// should not be called. 
+   /// should not be called.
    ///
-   /// @param preserve  If set to true, the contents of the current render target 
+   /// @param preserve  If set to true, the contents of the current render target
    //                   will be the same when _onPostRender is called. Otherwise
    //                   the contents are undefined on console platforms.
    virtual bool _onPreRender(SceneRenderState * state, bool preserve = false);
 
-   /// Resolves the active render target, pops the render target from _onPreRender, and sets debug info. 
+   /// Resolves the active render target, pops the render target from _onPreRender, and sets debug info.
    virtual void _onPostRender();
 
    virtual bool _updateTargets();

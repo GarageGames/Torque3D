@@ -45,9 +45,9 @@ class SFXNullDevice : public SFXDevice
 
    public:
 
-      SFXNullDevice( SFXProvider* provider, 
-                     String name, 
-                     bool useHardware, 
+      SFXNullDevice( SFXProvider* provider,
+                     String name,
+                     bool useHardware,
                      S32 maxBuffers );
 
       virtual ~SFXNullDevice();

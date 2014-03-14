@@ -39,7 +39,7 @@ class GuiMenuBackgroundCtrl : public GuiControl
 
 protected:
    GuiMenuBar *mMenuBarCtrl;
-   GuiMenuTextListCtrl *mTextList; 
+   GuiMenuTextListCtrl *mTextList;
 public:
    GuiMenuBackgroundCtrl(GuiMenuBar *ctrl, GuiMenuTextListCtrl* textList);
    void onMouseDown(const GuiEvent &event);
@@ -100,7 +100,7 @@ public:
 		bool enabled;        // true if the menu item is selectable
       bool visible;        // true if the menu item is visible
       S32 bitmapIndex;     // index of the bitmap in the bitmap array
-      S32 checkGroup;      // the group index of the item visa vi check marks - 
+      S32 checkGroup;      // the group index of the item visa vi check marks -
                            // only one item in the group can be checked.
 		MenuItem *nextMenuItem; // next menu item in the linked list
 
@@ -124,10 +124,10 @@ public:
 		Menu *nextMenu;
 		MenuItem *firstMenuItem;
 	};
-	
+
 	GuiMenuBackgroundCtrl *mBackground;
 	GuiMenuTextListCtrl *mTextList;
-	
+
 	GuiSubmenuBackgroundCtrl *mSubmenuBackground; //  Background for a submenu
 	GuiMenuTextListCtrl *mSubmenuTextList;     //  Text list for a submenu
 
@@ -154,7 +154,7 @@ public:
    S32 mMouseOverCounter;
    bool mCountMouseOver;
    S32 mMouseHoverAmount;
-	
+
 	GuiMenuBar();
    bool onWake();
    void onSleep();
@@ -199,7 +199,7 @@ public:
    void onMouseDown(const GuiEvent &event);
    void onMouseDragged(const GuiEvent &event);
    void onMouseUp(const GuiEvent &event);
-   
+
    void onAction();
    void closeMenu();
    void buildAcceleratorMap();

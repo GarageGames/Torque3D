@@ -31,11 +31,11 @@
 #include "component/componentInterface.h"
 #endif
 
-/// This is a very simple interface. Interfaces provide ways for components to 
+/// This is a very simple interface. Interfaces provide ways for components to
 /// interact with each-other, and query each-other for functionality. It makes it
 /// possible for two components to be interdependent on one another, as well. An
-/// interface should make accessor calls to it's owner for functionality, and 
-/// generally be as thin of a layer as possible. 
+/// interface should make accessor calls to it's owner for functionality, and
+/// generally be as thin of a layer as possible.
 class SimpleComponentInterface : public ComponentInterface
 {
 public:
@@ -43,7 +43,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
-/// The purpose of this component is to provide a minimalistic component that 
+/// The purpose of this component is to provide a minimalistic component that
 /// exposes a simple, cached interface
 class SimpleComponent : public SimComponent
 {
@@ -58,7 +58,7 @@ public:
    DECLARE_CONOBJECT(SimpleComponent);
 
    //////////////////////////////////////////////////////////////////////////
-   // SimComponent overloads. 
+   // SimComponent overloads.
 
    // This method is called on each component as it's parent is getting onAdd
    // called. The purpose of overloading this method is to expose cached interfaces
@@ -74,19 +74,19 @@ public:
 
       // Now we should go ahead and register our cached interface. What we are doing
       // is telling the component which contains this component (if it exists)
-      // all of the interfaces that we expose. When this call is made, it will 
-      // recurse up the owner list. 
+      // all of the interfaces that we expose. When this call is made, it will
+      // recurse up the owner list.
       //
-      // For example, there exists components A, B, and C. 
+      // For example, there exists components A, B, and C.
       // A owns B, and B owns C.
-      // 
-      // If C exposes a cached interface, it will expose it via registerCachedInterface
-      // when registerInterfaces is recursively called. It will add it's interface to 
-      // it's cache list, and then pass the register call up to it's parent. The parent
-      // will also cache the interface, and continue to pass the cache call up the 
-      // child->parent chain until there exists no parent. 
       //
-      // The result is that, if C exposes an interface 'foo', and A owns B, and 
+      // If C exposes a cached interface, it will expose it via registerCachedInterface
+      // when registerInterfaces is recursively called. It will add it's interface to
+      // it's cache list, and then pass the register call up to it's parent. The parent
+      // will also cache the interface, and continue to pass the cache call up the
+      // child->parent chain until there exists no parent.
+      //
+      // The result is that, if C exposes an interface 'foo', and A owns B, and
       // B owns C, an interface request for 'foo' given to component A will result
       // in 'foo' being returned, even though A does not expose 'foo'. This makes
       // it possible for a component to query it's owner for an interface, and
@@ -94,26 +94,26 @@ public:
       // to work with any SimComponent and query that component for any interface
       // it wants without knowing or caring exactly where it is coming from.
       //
-      // registerCachedInterface returns a boolean value if it was successful. 
+      // registerCachedInterface returns a boolean value if it was successful.
       // Success results in the caching of this interface throughout the full
-      // child->parent chain. An interface will be added to a cache list 
+      // child->parent chain. An interface will be added to a cache list
       // successfully iff there exists no entry in that list that has matching
-      // values for 'type', 'name' and 'owner'. 
-      owner->registerCachedInterface( 
+      // values for 'type', 'name' and 'owner'.
+      owner->registerCachedInterface(
          // The first parameter is the 'type' of the interface, this is not to be
          // confused with any kind of existing console, or c++ type. It is simply
          // a string which is can be set to any value
-         "example", 
+         "example",
 
          // The next parameter is the 'name' of the interface. This is also a string
          // which can be set to any value
-         "isfortytwo", 
-         
+         "isfortytwo",
+
          // The owner of the interface. Note that the value being assigned here
          // is this instance of SimpleComponent, and not the 'owner' argument
          // of the function registerInterfaces that we are calling from.
-         this, 
-         
+         this,
+
          // And finally the interface; a pointer to an object with type ComponentInterface
          &mSCInterface );
    }
@@ -134,7 +134,7 @@ public:
 //
 // Since interfaces themselves implement very little functionality, it is a good
 // idea to inline them if at all possible. Interdependent components will be using
-// these interfaces constantly, and so putting as thin of a layer between the 
+// these interfaces constantly, and so putting as thin of a layer between the
 // functionality they expose, and the functionality the component implements is
 // a good design practice.
 inline bool SimpleComponentInterface::isFortyTwo( const U32 test )

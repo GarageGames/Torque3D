@@ -127,7 +127,7 @@ bool expandToolScriptFilename(char *filename, U32 size, const char *src)
                *insertPtr = 0;
 
                PathExpando *exp = sgPathExpandos.retreive(varBuf);
-               
+
                if(exp == NULL)
                {
                   Con::errorf("expandScriptFilename - Ignoring invalid path expando \"%s\"", varBuf);
@@ -182,7 +182,7 @@ bool expandToolScriptFilename(char *filename, U32 size, const char *src)
             case '/': ptr += 2; break;
             default: ptr++;
          }
-         
+
          break;
 
       case '.':
@@ -194,7 +194,7 @@ bool expandToolScriptFilename(char *filename, U32 size, const char *src)
             if(slash) *slash = 0;
 
             catPath = varBuf;
-            
+
             // swallow dot and optional slash, but dont swallow .. relative path token
             switch(ptr[1])
             {
@@ -316,7 +316,7 @@ bool collapseScriptFilename(char *filename, U32 size, const char *src)
          continue;
 
       StringTableEntry rel = Platform::makeRelativePathName(src, test[i].path);
-      
+
       *filename = 0;
       if(*test[i].replace)
          dSprintf(filename, size, "%s/", test[i].replace);

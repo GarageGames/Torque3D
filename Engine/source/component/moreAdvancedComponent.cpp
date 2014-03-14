@@ -41,7 +41,7 @@ bool MoreAdvancedComponent::onComponentRegister( SimComponent *owner )
       return false;
 
    // This will return the first interface of type SimpleComponent that is cached
-   // on the parent object. 
+   // on the parent object.
    mSCInterface = owner->getInterface<SimpleComponentInterface>();
 
    // If we can't find this interface, our component can't function, so false
@@ -92,7 +92,7 @@ CreateUnitTest(MoreAdvancedComponentTest, "Component/MoreAdvancedComponent")
       test( parentComponent->isProperlyAdded(), "Parent component not properly added!" );
 
       // Now lets test the interface. You can step through this, as well.
-      test( moreAdvComponent->testDependentInterface(), "Dependent interface test failed." ); 
+      test( moreAdvComponent->testDependentInterface(), "Dependent interface test failed." );
 
       // CodeReview is there a reason we can't just delete the parentComponent here? [3/3/2007 justind]
       //

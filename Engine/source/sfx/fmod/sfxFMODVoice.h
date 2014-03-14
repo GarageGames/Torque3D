@@ -50,7 +50,7 @@ class SFXFMODVoice : public SFXVoice
       SFXFMODDevice *mDevice;
 
       mutable FMOD_CHANNEL *mChannel;
-      
+
       enum ESettings
       {
          SET_MinMaxDistance   = BIT( 0 ),
@@ -62,9 +62,9 @@ class SFXFMODVoice : public SFXVoice
          SET_Priority         = BIT( 6 ),
          SET_Reverb           = BIT( 7 ),
       };
-      
+
       BitSet32 mSetFlags;
-      
+
       FMOD_MODE mMode;
       F32 mMinDistance;
       F32 mMaxDistance;
@@ -80,7 +80,7 @@ class SFXFMODVoice : public SFXVoice
       FMOD_REVERB_CHANNELPROPERTIES mReverb;
 
       ///
-	   SFXFMODVoice(  SFXFMODDevice *device, 
+	   SFXFMODVoice(  SFXFMODDevice *device,
                      SFXFMODBuffer *buffer );
 
       // prep for playback
@@ -99,7 +99,7 @@ class SFXFMODVoice : public SFXVoice
    public:
 
       ///
-      static SFXFMODVoice* create(  SFXFMODDevice *device, 
+      static SFXFMODVoice* create(  SFXFMODDevice *device,
                                     SFXFMODBuffer *buffer );
 
       ///

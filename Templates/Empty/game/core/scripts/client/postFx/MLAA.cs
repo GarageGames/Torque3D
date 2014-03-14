@@ -20,17 +20,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// An implementation of "Practical Morphological Anti-Aliasing" from 
-// GPU Pro 2 by Jorge Jimenez, Belen Masia, Jose I. Echevarria, 
+// An implementation of "Practical Morphological Anti-Aliasing" from
+// GPU Pro 2 by Jorge Jimenez, Belen Masia, Jose I. Echevarria,
 // Fernando Navarro, and Diego Gutierrez.
 //
 // http://www.iryoku.com/mlaa/
 
-// NOTE: This is currently disabled in favor of FXAA.  See 
+// NOTE: This is currently disabled in favor of FXAA.  See
 // core\scripts\client\canvas.cs if you want to re-enable it.
 
 singleton GFXStateBlockData( MLAA_EdgeDetectStateBlock : PFX_DefaultStateBlock )
-{   
+{
    // Mark the edge pixels in stencil.
    stencilDefined = true;
    stencilEnable = true;
@@ -38,12 +38,12 @@ singleton GFXStateBlockData( MLAA_EdgeDetectStateBlock : PFX_DefaultStateBlock )
    stencilFunc = GFXCmpAlways;
    stencilRef = 1;
 
-   samplersDefined = true;   
+   samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;
 };
 
 singleton ShaderData( MLAA_EdgeDetectionShader )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/edgeDetectionP.hlsl";
 
@@ -53,7 +53,7 @@ singleton ShaderData( MLAA_EdgeDetectionShader )
 };
 
 singleton GFXStateBlockData( MLAA_BlendWeightCalculationStateBlock : PFX_DefaultStateBlock )
-{   
+{
    // Here we want to process only marked pixels.
    stencilDefined = true;
    stencilEnable = true;
@@ -61,14 +61,14 @@ singleton GFXStateBlockData( MLAA_BlendWeightCalculationStateBlock : PFX_Default
    stencilFunc = GFXCmpEqual;
    stencilRef = 1;
 
-   samplersDefined = true;   
+   samplersDefined = true;
    samplerStates[0] = SamplerClampPoint;
    samplerStates[1] = SamplerClampLinear;
    samplerStates[2] = SamplerClampPoint;
 };
 
 singleton ShaderData( MLAA_BlendWeightCalculationShader )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/passthruV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/blendWeightCalculationP.hlsl";
 
@@ -80,7 +80,7 @@ singleton ShaderData( MLAA_BlendWeightCalculationShader )
 };
 
 singleton GFXStateBlockData( MLAA_NeighborhoodBlendingStateBlock : PFX_DefaultStateBlock )
-{   
+{
    // Here we want to process only marked pixels too.
    stencilDefined = true;
    stencilEnable = true;
@@ -88,14 +88,14 @@ singleton GFXStateBlockData( MLAA_NeighborhoodBlendingStateBlock : PFX_DefaultSt
    stencilFunc = GFXCmpEqual;
    stencilRef = 1;
 
-   samplersDefined = true;   
+   samplersDefined = true;
    samplerStates[0] = SamplerClampPoint;
    samplerStates[1] = SamplerClampLinear;
    samplerStates[2] = SamplerClampPoint;
 };
 
 singleton ShaderData( MLAA_NeighborhoodBlendingShader )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/neighborhoodBlendingP.hlsl";
 
@@ -110,11 +110,11 @@ singleton ShaderData( MLAA_NeighborhoodBlendingShader )
 singleton PostEffect( MLAAFx )
 {
    isEnabled = false;
-   
+
    allowReflectPass = false;
    renderTime = "PFXAfterDiffuse";
 
-   texture[0] = "$backBuffer"; //colorMapG      
+   texture[0] = "$backBuffer"; //colorMapG
    texture[1] = "#prepass"; // Used for depth detection
 
    target = "$outTex";
@@ -127,7 +127,7 @@ singleton PostEffect( MLAAFx )
    // The luma calculation weights which can be user adjustable
    // per-scene if nessasary.  The default value of...
    //
-   //    0.2126 0.7152 0.0722 
+   //    0.2126 0.7152 0.0722
    //
    // ... is the HDTV ITU-R Recommendation BT. 709.
    lumaCoefficients = "0.2126 0.7152 0.0722";
@@ -150,8 +150,8 @@ singleton PostEffect( MLAAFx )
       shader = MLAA_BlendWeightCalculationShader;
       stateBlock = MLAA_BlendWeightCalculationStateBlock;
 
-      texture[0] = "$inTex"; // Edges mask    
-      texture[1] = "$inTex"; // Edges mask 
+      texture[0] = "$inTex"; // Edges mask
+      texture[1] = "$inTex"; // Edges mask
       texture[2] = "AreaMap33.dds";
    };
 
@@ -163,8 +163,8 @@ singleton PostEffect( MLAAFx )
       stateBlock = MLAA_NeighborhoodBlendingStateBlock;
 
       texture[0] = "$inTex"; // Blend weights
-      texture[1] = "$backBuffer";      
-      texture[2] = "$backBuffer";      
+      texture[1] = "$backBuffer";
+      texture[2] = "$backBuffer";
    };
 };
 

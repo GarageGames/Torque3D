@@ -39,8 +39,8 @@
 IMPLEMENT_CO_NETOBJECT_V1(LevelInfo);
 
 ConsoleDocClass( LevelInfo,
-   "@brief Stores and controls the rendering and status information for a game level.\n\n"   
-   
+   "@brief Stores and controls the rendering and status information for a game level.\n\n"
+
    "@tsexample\n"
    "new LevelInfo(theLevelInfo)\n"
    "{\n"
@@ -154,14 +154,14 @@ void LevelInfo::initPersistFields()
          "Enable expanded support for mixing static and dynamic lighting (more costly)" );
 
    endGroup( "Lighting" );
-   
+
    addGroup( "Sound" );
-   
+
       addField( "soundAmbience", TypeSFXAmbienceName, Offset( mSoundAmbience, LevelInfo ), "The global ambient sound environment." );
       addField( "soundDistanceModel", TypeSFXDistanceModel, Offset( mSoundDistanceModel, LevelInfo ), "The distance attenuation model to use." );
-   
+
    endGroup( "Sound" );
-   
+
    Parent::initPersistFields();
 }
 
@@ -171,7 +171,7 @@ void LevelInfo::inspectPostApply()
 {
    _updateSceneGraph();
    setMaskBits( 0xFFFFFFFF );
-   
+
    Parent::inspectPostApply();
 }
 
@@ -199,7 +199,7 @@ U32 LevelInfo::packUpdate(NetConnection *conn, U32 mask, BitStream *stream)
 
    sfxWrite( stream, mSoundAmbience );
    stream->writeInt( mSoundDistanceModel, 1 );
-      
+
    return retMask;
 }
 
@@ -229,11 +229,11 @@ void LevelInfo::unpackUpdate(NetConnection *conn, BitStream *stream)
    if( !sfxReadAndResolve( stream, &mSoundAmbience, errorStr ) )
       Con::errorf( "%s", errorStr.c_str() );
    mSoundDistanceModel = ( SFXDistanceModel ) stream->readInt( 1 );
-   
+
    if( isProperlyAdded() )
    {
       _updateSceneGraph();
-      
+
       if( mSoundscape )
       {
          if( mSoundAmbience )
@@ -252,21 +252,21 @@ bool LevelInfo::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
-      
+
    // If no sound ambience has been set, default to
    // 'AudioAmbienceDefault'.
-      
+
    if( !mSoundAmbience )
       Sim::findObject( "AudioAmbienceDefault", mSoundAmbience );
-      
+
    // Set up sound on client.
-   
+
    if( isClientObject() )
    {
       SFX->setDistanceModel( mSoundDistanceModel );
-      
+
       // Set up the global ambient soundscape.
-      
+
       mSoundscape = SFX->getSoundscapeManager()->getGlobalSoundscape();
       if( mSoundAmbience )
          mSoundscape->setAmbience( mSoundAmbience );
@@ -297,7 +297,7 @@ void LevelInfo::_updateSceneGraph()
       mNearClip = 0.001f;
 
    SceneManager* scene = isClientObject() ? gClientSceneGraph : gServerSceneGraph;
-   
+
    scene->setNearClip( mNearClip );
    scene->setVisibleDistance( mVisibleDistance );
 

@@ -273,7 +273,7 @@ void bitmapConvertA8_to_RGBA_c( U8 **src, U32 pixels )
    dMemset( newBits, 0, pixels * 4 );
 
    // Copy Alpha values
-   for( U32 i = 0; i < pixels; i++ )      
+   for( U32 i = 0; i < pixels; i++ )
       newBits[i * 4 + 3] = oldBits[i];
 
    // Now hose the old bits

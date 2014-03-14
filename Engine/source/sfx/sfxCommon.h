@@ -57,7 +57,7 @@ class SFXPlayList;
 
 
 /// The sound playback state.
-enum SFXStatus 
+enum SFXStatus
 {
    /// Initial state; no operation yet performed on sound.
    SFXStatusNull,
@@ -95,11 +95,11 @@ inline const char* SFXStatusToString( SFXStatus status )
       case SFXStatusPaused:      return "paused";
       case SFXStatusBlocked:     return "blocked";
       case SFXStatusTransition:  return "transition";
-      
+
       case SFXStatusNull:
       default: ;
    }
-   
+
    return "null";
 }
 
@@ -135,7 +135,7 @@ enum SFXChannel
    SFXChannelUser1,
    SFXChannelUser2,
    SFXChannelUser3,
-   
+
    /// Total number of animatable channels.
    SFX_NUM_CHANNELS
 };
@@ -169,27 +169,27 @@ DefineEnumType( SFXDistanceModel );
 inline F32 SFXDistanceAttenuation( SFXDistanceModel model, F32 minDistance, F32 maxDistance, F32 distance, F32 volume, F32 rolloffFactor )
 {
    F32 gain = 1.0f;
-      
+
    switch( model )
    {
       case SFXDistanceModelLinear:
-      
+
          distance = getMax( distance, minDistance );
          distance = getMin( distance, maxDistance );
-         
+
          gain = ( 1 - ( distance - minDistance ) / ( maxDistance - minDistance ) );
          break;
-                  
+
       case SFXDistanceModelLogarithmic:
-      
+
          distance = getMax( distance, minDistance );
          distance = getMin( distance, maxDistance );
-         
+
          gain = minDistance / ( minDistance + rolloffFactor * ( distance - minDistance ) );
          break;
-         
+
    }
-   
+
    return ( volume * gain );
 }
 
@@ -220,11 +220,11 @@ class SFXFormat
 
    public:
 
-      SFXFormat(  U8 channels = 0,                  
+      SFXFormat(  U8 channels = 0,
                   U8 bitsPerSample = 0,
                   U32 samplesPerSecond = 0 )
          :  mChannels( channels ),
-            mSamplesPerSecond( samplesPerSecond ), 
+            mSamplesPerSecond( samplesPerSecond ),
             mBitsPerSample( bitsPerSample )
       {}
 
@@ -238,7 +238,7 @@ class SFXFormat
    public:
 
       /// Sets the format.
-      void set(   U8 channels,                  
+      void set(   U8 channels,
                   U8 bitsPerSample,
                   U32 samplesPerSecond )
       {
@@ -248,9 +248,9 @@ class SFXFormat
       }
 
       /// Comparision between formats.
-      bool operator == ( const SFXFormat& format ) const 
-      { 
-         return   mChannels == format.mChannels && 
+      bool operator == ( const SFXFormat& format ) const
+      {
+         return   mChannels == format.mChannels &&
                   mBitsPerSample == format.mBitsPerSample &&
                   mSamplesPerSecond == format.mSamplesPerSecond;
       }
@@ -267,7 +267,7 @@ class SFXFormat
       /// Is true if there are more than two sound channels.
       bool isMultiChannel() const { return mChannels > 2; }
 
-      /// 
+      ///
       U32 getSamplesPerSecond() const { return mSamplesPerSecond; }
 
       /// The bits of data per channel.
@@ -286,7 +286,7 @@ class SFXFormat
       /// Returns the duration from the sample count.
       U32 getDuration( U32 samples ) const
       {
-         // Use 64bit types to avoid overflow during division. 
+         // Use 64bit types to avoid overflow during division.
          return ( (U64)samples * (U64)1000 ) / (U64)mSamplesPerSecond;
       }
 
@@ -316,9 +316,9 @@ class SFXFormat
 class SFXReverbProperties
 {
    public:
-   
+
       typedef void Parent;
-         
+
       F32   mEnvSize;
       F32   mEnvDiffusion;
       S32   mRoom;
@@ -344,7 +344,7 @@ class SFXReverbProperties
       F32   mDiffusion;
       F32   mDensity;
       S32   mFlags;
-      
+
       SFXReverbProperties()
          : mEnvSize( 7.5f ),
            mEnvDiffusion( 1.0f ),
@@ -373,12 +373,12 @@ class SFXReverbProperties
          mReflectionsPan[ 0 ] = 0.0f;
          mReflectionsPan[ 1 ] = 0.0f;
          mReflectionsPan[ 2 ] = 0.0f;
-         
+
          mReverbPan[ 0 ] = 0.0f;
          mReverbPan[ 1 ] = 0.0f;
          mReverbPan[ 2 ] = 0.0f;
       }
-      
+
       void validate()
       {
          mEnvSize                = mClampF( mEnvSize,                1.0f,     100.0f );
@@ -418,9 +418,9 @@ class SFXReverbProperties
 class SFXSoundReverbProperties
 {
    public:
-   
+
       typedef void Parent;
-   
+
       S32   mDirect;
       S32   mDirectHF;
       S32   mRoom;
@@ -439,7 +439,7 @@ class SFXSoundReverbProperties
       F32   mRoomRolloffFactor;
       F32   mAirAbsorptionFactor;
       S32   mFlags;
-      
+
       SFXSoundReverbProperties()
          : mDirect( 0 ),
            mDirectHF( 0 ),
@@ -461,7 +461,7 @@ class SFXSoundReverbProperties
            mFlags( 0 )
       {
       }
-      
+
       void validate()
       {
          mDirect              = mClamp( mDirect,                -10000,  1000 );
@@ -494,27 +494,27 @@ class SFXSoundReverbProperties
 class SFXListenerProperties
 {
    public:
-   
+
       typedef void Parent;
-      
+
       /// Position and orientation of the listener.
       MatrixF mTransform;
-      
+
       ///
       Point3F mVelocity;
 
       SFXListenerProperties()
          : mTransform( true ),
            mVelocity( 0.0f, 0.0f, 0.0f ) {}
-           
+
       SFXListenerProperties( const MatrixF& transform, const Point3F& velocity )
          : mTransform( transform ),
            mVelocity( velocity ) {}
-           
+
       ///
       const MatrixF& getTransform() const { return mTransform; }
       MatrixF& getTransform() { return mTransform; }
-      
+
       ///
       const Point3F& getVelocity() const { return mVelocity; }
       Point3F& getVelocity() { return mVelocity; }
@@ -530,23 +530,23 @@ class SFXListenerProperties
 class SFXMaterialProperties
 {
    public:
-   
+
       typedef void Parent;
-   
+
       ///
       bool mDoubleSided;
-   
+
       ///
       F32 mDirectOcclusion;
-      
+
       ///
       F32 mReverbOcclusion;
-      
+
       SFXMaterialProperties()
          : mDoubleSided( false ),
            mDirectOcclusion( 0.5f ),
            mReverbOcclusion( 0.5f ) {}
-      
+
       void validate()
       {
          mDirectOcclusion = mClampF( mDirectOcclusion, 0.0f, 1.0f );
@@ -566,23 +566,23 @@ struct SFXVariantFloat
 {
    /// Base value.
    F32 mValue[ NUM_VALUES ];
-      
+
    /// Variance of value.  Final value will be
    ///
    ///   mClampF( randF( mValue + mVariance[ 0 ], mValue + mVariance[ 1 ] ), min, max )
    ///
    /// with min and max being dependent on the context of the value.
    F32 mVariance[ NUM_VALUES ][ 2 ];
-            
+
    F32 getValue( U32 index = 0, F32 min = TypeTraits< F32 >::MIN, F32 max = TypeTraits< F32 >::MAX ) const
    {
       AssertFatal( index < NUM_VALUES, "SFXVariantFloat::getValue() - index out of range!" );
-      
+
       return mClampF( gRandGen.randF( mValue[ index ] + mVariance[ index ][ 0 ],
                                       mValue[ index ] + mVariance[ index ][ 1 ] ),
                       min, max );
    }
-   
+
    void validate()
    {
       for( U32 i = 0; i < NUM_VALUES; ++ i )

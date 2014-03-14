@@ -53,9 +53,9 @@ struct LangElement
    static Vector<LangElement*> elementList;
    static LangElement * find( const char *name );
    static void deleteElements();
-      
+
    U8    name[32];
-   
+
    LangElement();
    virtual ~LangElement() {};
    virtual void print( Stream &stream ){};
@@ -66,7 +66,7 @@ struct LangElement
 enum ConstantSortPosition
 {
    /// Default / unset
-   cspUninit = 0,      
+   cspUninit = 0,
    /// Updated before every draw primitive call.
    cspPrimitive,
    /// Potentially updated every draw primitive call, but not necessarily (lights for example)
@@ -80,16 +80,16 @@ enum ConstantSortPosition
 //----------------------------------------------------------------------------
 /*!
    Var - Variable - used to specify a variable to be used in a shader.
-   Var stores information such  that when it is printed out, its context 
+   Var stores information such  that when it is printed out, its context
    can be identified and the proper information will automatically be printed.
-   For instance, if a variable is created with 'uniform' set to true, when the 
-   shader function definition is printed, it will automatically add that 
+   For instance, if a variable is created with 'uniform' set to true, when the
+   shader function definition is printed, it will automatically add that
    variable to the incoming parameters of the shader.  There are several
    similar cases such as when a new variable is declared within a shader.
-   
+
    example:
-   
-   @code   
+
+   @code
 
    Var *modelview = new Var;
    modelview->setType( "float4x4" );
@@ -98,9 +98,9 @@ enum ConstantSortPosition
    modelview->constSortPos = cspPass;
 
    @endcode
-   
+
    it prints out in the shader declaration as:
-   
+
    @code
       ConnectData main( VertData IN,
                         uniform float4x4 modelview : register(C0) )
@@ -113,7 +113,7 @@ struct Var : public LangElement
    U8    type[32];
    U8    structName[32];
    char  connectName[32];
-   ConstantSortPosition constSortPos; // used to calculate constant number 
+   ConstantSortPosition constSortPos; // used to calculate constant number
    U32   constNum;
    U32   texCoordNum;
    bool  uniform;       // argument passed in through constant registers
@@ -128,13 +128,13 @@ struct Var : public LangElement
    static void reset();
 
    // Default
-   Var();   
-   Var( const char *name, const char *type );   
-   
+   Var();
+   Var( const char *name, const char *type );
+
    void setStructName(const char *newName );
    void setConnectName(const char *newName );
    void setType(const char *newType );
-  
+
    virtual void print( Stream &stream );
 
    // Construct a uniform / shader const var
@@ -144,19 +144,19 @@ struct Var : public LangElement
 //----------------------------------------------------------------------------
 /*!
    MultiLine - Multi Line Statement - This class simply ties multiple
-   
+
    example:
-   
-   @code   
+
+   @code
 
    MultiLine *meta = new MultiLine;
    meta->addStatement( new GenOp( "foo = true;\r\n" ) );
    meta->addStatement( new GenOp( "bar = false;\r\n ) );
 
    @endcode
-   
+
    it prints out in the shader declaration as:
-   
+
    @code
       foo = true;
       bar = false;

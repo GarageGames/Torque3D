@@ -64,23 +64,23 @@ void LightFlareState::clear()
 }
 
 Point3F LightFlareData::sBasePoints[] =
-{ 
-   Point3F( -0.5, 0.5, 0.0 ), 
-   Point3F( -0.5, -0.5, 0.0 ),   
-   Point3F( 0.5, -0.5, 0.0 ),  
-   Point3F( 0.5, 0.5, 0.0 ) 
+{
+   Point3F( -0.5, 0.5, 0.0 ),
+   Point3F( -0.5, -0.5, 0.0 ),
+   Point3F( 0.5, -0.5, 0.0 ),
+   Point3F( 0.5, 0.5, 0.0 )
 };
 
 
 IMPLEMENT_CO_DATABLOCK_V1( LightFlareData );
 
 ConsoleDocClass( LightFlareData,
-   "@brief Defines a light flare effect usable by scene lights.\n\n"      
-   
+   "@brief Defines a light flare effect usable by scene lights.\n\n"
+
    "%LightFlareData is a datablock which defines a type of flare effect. "
    "This may then be referenced by other classes which support the rendering "
    "of a flare: Sun, ScatterSky, LightBase.\n\n"
-   
+
    "A flare contains one or more elements defined in the element* named fields "
    "of %LightFlareData, with a maximum of ten elements. Each element is rendered "
    "as a 2D sprite in screenspace.\n\n"
@@ -110,12 +110,12 @@ ConsoleDocClass( LightFlareData,
    "   elementUseLightColor[1] = false;\n"
    "};\n"
    "@endtsexample\n"
-   "The elementDist field defines where along the flare's beam the element appears. "   
+   "The elementDist field defines where along the flare's beam the element appears. "
    "A distance of 0.0 is directly over the light source, a distance of 1.0 "
    "is at the screen center, and a distance of 2.0 is at the position of the "
    "light source mirrored across the screen center.\n"
    "@image html images/lightFlareData_diagram.png\n"
-   "@ingroup Lighting"   
+   "@ingroup Lighting"
 );
 
 LightFlareData::LightFlareData()
@@ -125,14 +125,14 @@ LightFlareData::LightFlareData()
    mOcclusionRadius( 0.0f ),
    mRenderReflectPass( true )
 {
-   dMemset( mElementRect, 0, sizeof( RectF ) * MAX_ELEMENTS );   
+   dMemset( mElementRect, 0, sizeof( RectF ) * MAX_ELEMENTS );
    dMemset( mElementScale, 0, sizeof( F32 ) * MAX_ELEMENTS );
    dMemset( mElementTint, 0, sizeof( ColorF ) * MAX_ELEMENTS );
    dMemset( mElementRotate, 0, sizeof( bool ) * MAX_ELEMENTS );
-   dMemset( mElementUseLightColor, 0, sizeof( bool ) * MAX_ELEMENTS );   
+   dMemset( mElementUseLightColor, 0, sizeof( bool ) * MAX_ELEMENTS );
 
-   for ( U32 i = 0; i < MAX_ELEMENTS; i++ )   
-      mElementDist[i] = -1.0f;   
+   for ( U32 i = 0; i < MAX_ELEMENTS; i++ )
+      mElementDist[i] = -1.0f;
 }
 
 LightFlareData::~LightFlareData()
@@ -146,10 +146,10 @@ void LightFlareData::initPersistFields()
       addField( "overallScale", TypeF32, Offset( mScale, LightFlareData ),
          "Size scale applied to all elements of the flare." );
 
-      addField( "occlusionRadius", TypeF32, Offset( mOcclusionRadius, LightFlareData ), 
+      addField( "occlusionRadius", TypeF32, Offset( mOcclusionRadius, LightFlareData ),
          "If positive an occlusion query is used to test flare visibility, else it uses simple raycasts." );
 
-      addField( "renderReflectPass", TypeBool, Offset( mRenderReflectPass, LightFlareData ), 
+      addField( "renderReflectPass", TypeBool, Offset( mRenderReflectPass, LightFlareData ),
          "If false the flare does not render in reflections, else only non-zero distance elements are rendered." );
 
    endGroup( "LightFlareData" );
@@ -200,7 +200,7 @@ void LightFlareData::inspectPostApply()
 
    // Hack to allow changing properties in game.
    // Do the same work as preload.
-   
+
    String str;
    _preload( false, str );
 }
@@ -218,7 +218,7 @@ void LightFlareData::packData( BitStream *stream )
    Parent::packData( stream );
 
    stream->writeFlag( mFlareEnabled );
-   stream->write( mFlareTextureName );   
+   stream->write( mFlareTextureName );
    stream->write( mScale );
    stream->write( mOcclusionRadius );
    stream->writeFlag( mRenderReflectPass );
@@ -241,7 +241,7 @@ void LightFlareData::unpackData( BitStream *stream )
    Parent::unpackData( stream );
 
    mFlareEnabled = stream->readFlag();
-   stream->read( &mFlareTextureName );   
+   stream->read( &mFlareTextureName );
    stream->read( &mScale );
    stream->read( &mOcclusionRadius );
    mRenderReflectPass = stream->readFlag();
@@ -273,10 +273,10 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
    // Initialize it to something first.
    *outOcclusionFade = 0;
 
-   // First check to see if the flare point 
+   // First check to see if the flare point
    // is on scren at all... if not then return
    // the last result.
-   const Point3F &lightPos = flareState->lightMat.getPosition();  
+   const Point3F &lightPos = flareState->lightMat.getPosition();
    const RectI &viewport = GFX->getViewport();
    MatrixF projMatrix;
    state->getCameraFrustum().getProjectionMatrix(&projMatrix);
@@ -323,18 +323,18 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
 
       // Setup the new queries.
       RenderPassManager *rpm = state->getRenderPass();
-      OccluderRenderInst *ri = rpm->allocInst<OccluderRenderInst>();   
+      OccluderRenderInst *ri = rpm->allocInst<OccluderRenderInst>();
       ri->type = RenderPassManager::RIT_Occluder;
-      ri->query = flareState->occlusionQuery;   
+      ri->query = flareState->occlusionQuery;
       ri->query2 = flareState->fullPixelQuery;
       ri->isSphere = true;
       ri->position = lightPos;
-      if ( isVectorLight && flareState->worldRadius > 0.0f )         
+      if ( isVectorLight && flareState->worldRadius > 0.0f )
          ri->scale.set( flareState->worldRadius );
       else
          ri->scale.set( mOcclusionRadius );
-      ri->orientation = rpm->allocUniqueXform( lightInfo->getTransform() );         
-      
+      ri->orientation = rpm->allocUniqueXform( lightInfo->getTransform() );
+
       // Submit the queries.
       state->getRenderPass()->addInst( ri );
    }
@@ -363,10 +363,10 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
    }
 
    // The raycast and hardware occlusion query only calculate if
-   // the flare is on screen... if does not account for being 
+   // the flare is on screen... if does not account for being
    // partially offscreen.
    //
-   // The code here clips a box against the viewport to 
+   // The code here clips a box against the viewport to
    // get an approximate percentage of onscreen area.
    //
    F32 worldRadius = flareState->worldRadius > 0 ? flareState->worldRadius : mOcclusionRadius;
@@ -375,8 +375,8 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
       F32 dist = ( camPos - lightPos ).len();
       F32 pixelRadius = state->projectRadius(dist, worldRadius);
 
-      RectI visRect( outLightPosSS->x - pixelRadius, outLightPosSS->y - pixelRadius, 
-                     pixelRadius * 2.0f, pixelRadius * 2.0f ); 
+      RectI visRect( outLightPosSS->x - pixelRadius, outLightPosSS->y - pixelRadius,
+                     pixelRadius * 2.0f, pixelRadius * 2.0f );
       F32 fullArea = visRect.area();
 
       if ( visRect.intersect( viewport ) )
@@ -388,7 +388,7 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
       else
          *outOcclusionFade = 0.0f;
    }
-   
+
    const bool lightVisible = onScreen && *outOcclusionFade > 0.0f;
 
    // To perform a fade in/out when we gain or lose visibility
@@ -429,7 +429,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
       if ( !mRenderReflectPass )
          return;
 
-      // Find the zero distance elements which make 
+      // Find the zero distance elements which make
       // up the corona of the light flare.
       elementCount = 0.0f;
       for ( U32 i=0; i < mElementCount; i++ )
@@ -440,13 +440,13 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    // Better have something to render.
    if ( elementCount == 0 )
       return;
-  
+
    U32 visDelta = U32_MAX;
    F32 occlusionFade = 1.0f;
    Point3F lightPosSS;
    bool lightVisible = _testVisibility( state, flareState, &visDelta, &occlusionFade, &lightPosSS );
-   
-   // We can only skip rendering if the light is not 
+
+   // We can only skip rendering if the light is not
    // visible, and it has elapsed the fade out time.
    if (  mIsZero( occlusionFade ) ||
          !lightVisible && visDelta > FadeOutTime )
@@ -480,14 +480,14 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    rot *= flareVec.y > 0.0f ? -1.0f : 1.0f;
    MathUtils::vectorRotateZAxis( rot, rotatedBasePoints, 4 );
 
-   // Here we calculate a the light source's influence on 
+   // Here we calculate a the light source's influence on
    // the effect's size and brightness.
 
    // Scale based on the current light brightness compared to its normal output.
    F32 lightSourceBrightnessScale = lightInfo->getBrightness() / flareState->fullBrightness;
 
    const Point3F &camPos = state->getCameraPosition();
-   const Point3F &lightPos = flareState->lightMat.getPosition();   
+   const Point3F &lightPos = flareState->lightMat.getPosition();
    const bool isVectorLight = lightInfo->getType() == LightInfo::Vector;
 
    // Scale based on world space distance from camera to light source.
@@ -498,21 +498,21 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    F32 lightSourceSSDistanceScale = getMax( ( 1.5f - flareLength ) / 1.5f, 0.0f );
 
    // Scale based on recent visibility changes, fading in or out.
-   F32 fadeInOutScale = 1.0f;   
+   F32 fadeInOutScale = 1.0f;
    if (  lightVisible &&
-         visDelta < FadeInTime && 
+         visDelta < FadeInTime &&
          flareState->occlusion > 0.0f )
       fadeInOutScale = (F32)visDelta / (F32)FadeInTime;
-   else if (   !lightVisible && 
+   else if (   !lightVisible &&
                visDelta < FadeOutTime )
       fadeInOutScale = 1.0f - (F32)visDelta / (F32)FadeOutTime;
 
    // This combined scale influences the size of all elements this effect renders.
    // Note we also add in a scale that is user specified in the Light.
-   F32 lightSourceIntensityScale = lightSourceBrightnessScale * 
-                                   lightSourceWSDistanceScale * 
-                                   lightSourceSSDistanceScale * 
-                                   fadeInOutScale * 
+   F32 lightSourceIntensityScale = lightSourceBrightnessScale *
+                                   lightSourceWSDistanceScale *
+                                   lightSourceSSDistanceScale *
+                                   fadeInOutScale *
                                    flareState->scale *
                                    occlusionFade;
 
@@ -527,7 +527,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
 
    // Setup the vertex buffer for the maximum flare elements.
    const U32 vertCount = 4 * mElementCount;
-   if (  flareState->vertBuffer.isNull() || 
+   if (  flareState->vertBuffer.isNull() ||
          flareState->vertBuffer->mNumVerts != vertCount )
          flareState->vertBuffer.set( GFX, vertCount, GFXBufferTypeDynamic );
 
@@ -536,7 +536,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    const Point2F oneOverTexSize( 1.0f / (F32)mFlareTexture.getWidth(), 1.0f / (F32)mFlareTexture.getHeight() );
 
    for ( U32 i = 0; i < mElementCount; i++ )
-   {      
+   {
       // Skip non-zero elements for reflections.
       if ( isReflectPass && mElementDist[i] > 0.0f )
          continue;
@@ -564,14 +564,14 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
 
       Point2F texCoordMin, texCoordMax;
       texCoordMin = rect.point * oneOverTexSize;
-      texCoordMax = ( rect.point + rect.extent ) * oneOverTexSize;          
+      texCoordMax = ( rect.point + rect.extent ) * oneOverTexSize;
 
       size.x = getMax( size.x, 1.0f );
       size.y = getMax( size.y, 1.0f );
       size *= oneOverViewportExtent;
 
       vert->color = color;
-      vert->point = ( basePos[0] * size ) + pos;      
+      vert->point = ( basePos[0] * size ) + pos;
       vert->texCoord.set( texCoordMin.x, texCoordMax.y );
       vert++;
 
@@ -589,13 +589,13 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
       vert->point = ( basePos[3] * size ) + pos;
       vert->texCoord.set( texCoordMin.x, texCoordMin.y );
       vert++;
-   }   
+   }
 
-   flareState->vertBuffer.unlock();   
+   flareState->vertBuffer.unlock();
 
    RenderPassManager *rpm = state->getRenderPass();
 
-   // Create and submit the render instance.   
+   // Create and submit the render instance.
    ParticleRenderInst *ri = rpm->allocInst<ParticleRenderInst>();
    ri->type = RenderPassManager::RIT_Particle;
    ri->vertBuff = &flareState->vertBuffer;
@@ -607,7 +607,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    ri->count = elementCount;
    ri->blendStyle = ParticleRenderInst::BlendGreyscale;
    ri->diffuseTex = mFlareTexture;
-   ri->softnessDistance = 1.0f; 
+   ri->softnessDistance = 1.0f;
    ri->defaultKey = ri->diffuseTex ? (U32)ri->diffuseTex : (U32)ri->vertBuff; // Sort by texture too.
 
    // NOTE: Offscreen partical code is currently disabled.
@@ -624,15 +624,15 @@ bool LightFlareData::_preload( bool server, String &errorStr )
       if ( mElementDist[i] == -1 )
          break;
       mElementCount = i + 1;
-   }   
+   }
 
    if ( mElementCount > 0 )
       _makePrimBuffer( &mFlarePrimBuffer, mElementCount );
 
    if ( !server )
    {
-      if ( mFlareTextureName.isNotEmpty() )      
-         mFlareTexture.set( mFlareTextureName, &GFXDefaultStaticDiffuseProfile, "FlareTexture" );  
+      if ( mFlareTextureName.isNotEmpty() )
+         mFlareTexture.set( mFlareTextureName, &GFXDefaultStaticDiffuseProfile, "FlareTexture" );
    }
 
    return true;
@@ -654,7 +654,7 @@ void LightFlareData::_makePrimBuffer( GFXPrimitiveBufferHandle *pb, U32 count )
       idx[2] = 3 + offset;
       idx[3] = 1 + offset;
       idx[4] = 3 + offset;
-      idx[5] = 2 + offset; 
+      idx[5] = 2 + offset;
    }
 
    U16 *ibIndices;

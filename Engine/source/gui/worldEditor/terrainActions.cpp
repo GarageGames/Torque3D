@@ -86,7 +86,7 @@ void SoftSelectAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
    TerrainBlock *terrBlock = mTerrainEditor->getActiveTerrain();
    if ( !terrBlock )
       return;
-      
+
    // allow process of current selection
    Selection tmpSel;
    if(sel == mTerrainEditor->getCurrentSel())
@@ -223,7 +223,7 @@ void PaintMaterialAction::process(Selection * sel, const Gui3DMouseEvent &, bool
 
          if (  norm.z > minSlope ||
                norm.z < maxSlope )
-            continue;  
+            continue;
       }
 
       // If grid is already set to our material, or it is an
@@ -259,7 +259,7 @@ void ClearMaterialsAction::process(Selection * sel, const Gui3DMouseEvent &, boo
          inf.mMaterialChanged = true;
 
          // Reset to the first texture layer.
-         inf.mMaterial = 0; 
+         inf.mMaterial = 0;
          mTerrainEditor->setGridInfo(inf);
       }
       mTerrainEditor->scheduleMaterialUpdate();
@@ -277,7 +277,7 @@ void RaiseHeightAction::process( Selection *sel, const Gui3DMouseEvent &evt, boo
    if ( !brush )
       return;
 
-   if ( type == End )   
+   if ( type == End )
       return;
 
    Point2I brushPos = brush->getPosition();
@@ -306,9 +306,9 @@ void RaiseHeightAction::process( Selection *sel, const Gui3DMouseEvent &evt, boo
             (*sel)[i].mHeight = maxHeight;
       }
       mTerrainEditor->setGridInfo((*sel)[i]);
-   }   
+   }
 
-   mTerrainEditor->scheduleGridUpdate();  
+   mTerrainEditor->scheduleGridUpdate();
 }
 
 //------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ void LowerHeightAction::process(Selection * sel, const Gui3DMouseEvent &, bool s
    if(!brush)
       return;
 
-   if ( type == End )   
+   if ( type == End )
       return;
 
    Point2I brushPos = brush->getPosition();
@@ -355,7 +355,7 @@ void LowerHeightAction::process(Selection * sel, const Gui3DMouseEvent &, bool s
       mTerrainEditor->setGridInfo((*sel)[i]);
    }
 
-   mTerrainEditor->scheduleGridUpdate();   
+   mTerrainEditor->scheduleGridUpdate();
 }
 
 //------------------------------------------------------------------------------
@@ -631,51 +631,51 @@ void SmoothHeightAction::process(Selection * sel, const Gui3DMouseEvent &, bool 
    }
 }
 
-void SmoothSlopeAction::process(Selection * sel, const Gui3DMouseEvent &, bool selChanged, Type)  
-{  
-   if(!sel->size())  
-      return;  
-  
-   if(selChanged)  
-   {  
-      // Perform simple 2d linear regression on x&z and y&z:  
-      // b = (Avg(xz) - Avg(x)Avg(z))/(Avg(x^2) - Avg(x)^2)  
-      Point2F prod(0.f, 0.f);   // mean of product for covar  
-      Point2F avgSqr(0.f, 0.f); // mean sqr of x, y for var  
-      Point2F avgPos(0.f, 0.f);  
-      F32 avgHeight = 0.f;  
-      F32 z;  
-      Point2F pos;  
-      for(U32 k = 0; k < sel->size(); k++)  
-      {  
-         mTerrainEditor->getUndoSel()->add((*sel)[k]);  
-         pos = Point2F((*sel)[k].mGridPoint.gridPos.x, (*sel)[k].mGridPoint.gridPos.y);  
-         z = (*sel)[k].mHeight;  
-  
-         prod += pos * z;  
-         avgSqr += pos * pos;  
-         avgPos += pos;  
-         avgHeight += z;  
-      }  
-  
-      prod /= sel->size();  
-      avgSqr /= sel->size();  
-      avgPos /= sel->size();  
-      avgHeight /= sel->size();  
-  
-      Point2F avgSlope = (prod - avgPos*avgHeight)/(avgSqr - avgPos*avgPos);  
-  
-      F32 goalHeight;  
-      for(U32 i = 0; i < sel->size(); i++)  
-      {  
-         goalHeight = avgHeight + ((*sel)[i].mGridPoint.gridPos.x - avgPos.x)*avgSlope.x +  
-            ((*sel)[i].mGridPoint.gridPos.y - avgPos.y)*avgSlope.y;  
-         (*sel)[i].mHeight += (goalHeight - (*sel)[i].mHeight) * (*sel)[i].mWeight;  
-         mTerrainEditor->setGridInfo((*sel)[i]);  
-      }  
-      mTerrainEditor->scheduleGridUpdate();  
-   }  
-}  
+void SmoothSlopeAction::process(Selection * sel, const Gui3DMouseEvent &, bool selChanged, Type)
+{
+   if(!sel->size())
+      return;
+
+   if(selChanged)
+   {
+      // Perform simple 2d linear regression on x&z and y&z:
+      // b = (Avg(xz) - Avg(x)Avg(z))/(Avg(x^2) - Avg(x)^2)
+      Point2F prod(0.f, 0.f);   // mean of product for covar
+      Point2F avgSqr(0.f, 0.f); // mean sqr of x, y for var
+      Point2F avgPos(0.f, 0.f);
+      F32 avgHeight = 0.f;
+      F32 z;
+      Point2F pos;
+      for(U32 k = 0; k < sel->size(); k++)
+      {
+         mTerrainEditor->getUndoSel()->add((*sel)[k]);
+         pos = Point2F((*sel)[k].mGridPoint.gridPos.x, (*sel)[k].mGridPoint.gridPos.y);
+         z = (*sel)[k].mHeight;
+
+         prod += pos * z;
+         avgSqr += pos * pos;
+         avgPos += pos;
+         avgHeight += z;
+      }
+
+      prod /= sel->size();
+      avgSqr /= sel->size();
+      avgPos /= sel->size();
+      avgHeight /= sel->size();
+
+      Point2F avgSlope = (prod - avgPos*avgHeight)/(avgSqr - avgPos*avgPos);
+
+      F32 goalHeight;
+      for(U32 i = 0; i < sel->size(); i++)
+      {
+         goalHeight = avgHeight + ((*sel)[i].mGridPoint.gridPos.x - avgPos.x)*avgSlope.x +
+            ((*sel)[i].mGridPoint.gridPos.y - avgPos.y)*avgSlope.y;
+         (*sel)[i].mHeight += (goalHeight - (*sel)[i].mHeight) * (*sel)[i].mWeight;
+         mTerrainEditor->setGridInfo((*sel)[i]);
+      }
+      mTerrainEditor->scheduleGridUpdate();
+   }
+}
 
 void PaintNoiseAction::process(Selection * sel, const Gui3DMouseEvent &, bool selChanged, Type type)
 {
@@ -687,7 +687,7 @@ void PaintNoiseAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
       mNoise.setSeed( Sim::getCurrentTime() );
       mNoise.fBm( &mNoiseData, mNoiseSize, 12, 1.0f, 5.0f );
       mNoise.getMinMax( &mNoiseData, &mMinMaxNoise.x, &mMinMaxNoise.y, mNoiseSize );
-    
+
       mScale = 1.5f / ( mMinMaxNoise.x - mMinMaxNoise.y);
    }
 
@@ -699,7 +699,7 @@ void PaintNoiseAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
 
          const Point2I &gridPos = (*sel)[i].mGridPoint.gridPos;
 
-         const F32 noiseVal = mNoiseData[ ( gridPos.x % mNoiseSize ) + 
+         const F32 noiseVal = mNoiseData[ ( gridPos.x % mNoiseSize ) +
                                           ( ( gridPos.y % mNoiseSize ) * mNoiseSize ) ];
 
          (*sel)[i].mHeight += (noiseVal - mMinMaxNoise.y * mScale) * (*sel)[i].mWeight * mTerrainEditor->mNoiseFactor;
@@ -718,7 +718,7 @@ void ThermalErosionAction::process(Selection * sel, const Gui3DMouseEvent &, boo
       TerrainBlock *tblock = mTerrainEditor->getActiveTerrain();
       if ( !tblock )
          return;
-      
+
       F32 height = 0;
       F32 maxHeight = 0;
       U32 shift = getBinLog2( TerrainBlock::BlockSize );
@@ -736,7 +736,7 @@ void ThermalErosionAction::process(Selection * sel, const Gui3DMouseEvent &, boo
       }
 
       //mNoise.erodeThermal( &mTerrainHeights, &mNoiseData, 30.0f, 5.0f, 5, TerrainBlock::BlockSize, tblock->getSquareSize(), maxHeight );
-         
+
       mNoise.erodeHydraulic( &mTerrainHeights, &mNoiseData, 1, TerrainBlock::BlockSize );
 
       F32 heightDiff = 0;
@@ -746,7 +746,7 @@ void ThermalErosionAction::process(Selection * sel, const Gui3DMouseEvent &, boo
          mTerrainEditor->getUndoSel()->add((*sel)[i]);
 
          const Point2I &gridPos = (*sel)[i].mGridPoint.gridPos;
-         
+
          // Need to get the height difference
          // between the current height and the
          // erosion height to properly apply the

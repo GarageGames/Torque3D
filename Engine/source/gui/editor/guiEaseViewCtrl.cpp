@@ -85,12 +85,12 @@ void GuiEaseViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    const F32 plotH = H;
    const F32 zeroX = offset.x + 1.f;
    const F32 zeroY = offset.y;
-   
+
    // Draw axis.
 
 	GFX->getDrawUtil()->drawLine( zeroX,  zeroY + 0.0f,  zeroX,          zeroY + plotH,  mAxisColor );
 	GFX->getDrawUtil()->drawLine( zeroX,  zeroY + plotH, zeroX + plotW,  zeroY + plotH,  mAxisColor );
-   
+
 	F32 numPoints = W;
 	F32 lastX = zeroX;
 	F32 lastY = zeroY + plotH;
@@ -104,7 +104,7 @@ void GuiEaseViewCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 		x = zeroX + x * plotW;
       y = zeroY + plotH - y * plotH;
-      
+
 		GFX->getDrawUtil()->drawLine( lastX, lastY, x, y, mEaseColor );
 
 		lastX = x;

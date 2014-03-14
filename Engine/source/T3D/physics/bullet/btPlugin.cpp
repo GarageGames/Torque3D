@@ -38,7 +38,7 @@ AFTER_MODULE_INIT( Sim )
 
    #if defined(TORQUE_OS_MAC)
       NamedFactory<PhysicsPlugin>::add( "default", &BtPlugin::create );
-   #endif   
+   #endif
 }
 
 
@@ -142,7 +142,7 @@ void BtPlugin::setTimeScale( const F32 timeScale )
 const F32 BtPlugin::getTimeScale() const
 {
    // Grab both the client and
-   // server worlds and call 
+   // server worlds and call
    // setEnabled( true ) on them.
    BtWorld *world = static_cast<BtWorld*>( getWorld( smClientWorldName ) );
    if ( !world )
@@ -151,7 +151,7 @@ const F32 BtPlugin::getTimeScale() const
       if ( !world )
          return 0.0f;
    }
-   
+
    return world->getEditorTimeScale();
 }
 
@@ -159,17 +159,17 @@ bool BtPlugin::createWorld( const String &worldName )
 {
    Map<StringNoCase, PhysicsWorld*>::Iterator iter = mPhysicsWorldLookup.find( worldName );
    PhysicsWorld *world = NULL;
-   
-   iter != mPhysicsWorldLookup.end() ? world = (*iter).value : world = NULL; 
 
-   if ( world ) 
+   iter != mPhysicsWorldLookup.end() ? world = (*iter).value : world = NULL;
+
+   if ( world )
    {
       Con::errorf( "BtPlugin::createWorld - %s world already exists!", worldName.c_str() );
       return false;
    }
 
    world = new BtWorld();
-   
+
    if ( worldName.equal( smClientWorldName, String::NoCase ) )
       world->initWorld( false, ClientProcessList::get() );
    else
@@ -189,7 +189,7 @@ void BtPlugin::destroyWorld( const String &worldName )
    PhysicsWorld *world = (*iter).value;
    world->destroyWorld();
    delete world;
-   
+
    mPhysicsWorldLookup.erase( iter );
 }
 
@@ -213,6 +213,6 @@ PhysicsWorld* BtPlugin::getWorld() const
 }
 
 U32 BtPlugin::getWorldCount() const
-{ 
-   return mPhysicsWorldLookup.size(); 
+{
+   return mPhysicsWorldLookup.size();
 }

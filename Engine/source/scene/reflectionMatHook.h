@@ -62,10 +62,10 @@ protected:
 
    static void _overrideFeatures(   ProcessedMaterial *mat,
                                     U32 stageNum,
-                                    MaterialFeatureData &fd, 
+                                    MaterialFeatureData &fd,
                                     const FeatureSet &features );
 
-   /// 
+   ///
    BaseMatInstance* mReflectMat;
 
 

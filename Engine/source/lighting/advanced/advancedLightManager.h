@@ -25,10 +25,10 @@
 
 #ifndef _SIMOBJECT_H_
 #include "console/simObject.h"
-#endif 
+#endif
 #ifndef _LIGHTMANAGER_H_
 #include "lighting/lightManager.h"
-#endif 
+#endif
 #ifndef _LIGHTINFO_H_
 #include "lighting/lightInfo.h"
 #endif
@@ -78,16 +78,16 @@ public:
    virtual void deactivate();
    virtual void registerGlobalLight(LightInfo *light, SimObject *obj);
    virtual void unregisterAllLights();
-   virtual void setLightInfo( ProcessedMaterial *pmat, 
-                              const Material *mat, 
-                              const SceneData &sgData, 
+   virtual void setLightInfo( ProcessedMaterial *pmat,
+                              const Material *mat,
+                              const SceneData &sgData,
                               const SceneRenderState *state,
-                              U32 pass, 
+                              U32 pass,
                               GFXShaderConstBuffer *shaderConsts );
-   virtual bool setTextureStage( const SceneData &sgData, 
-                                 const U32 currTexFlag, 
-                                 const U32 textureSlot, 
-                                 GFXShaderConstBuffer *shaderConsts, 
+   virtual bool setTextureStage( const SceneData &sgData,
+                                 const U32 currTexFlag,
+                                 const U32 textureSlot,
+                                 GFXShaderConstBuffer *shaderConsts,
                                  ShaderConstHandles *handles );
 
    typedef GFXVertexPC LightVertex;
@@ -97,7 +97,7 @@ public:
 
    LightShadowMap* findShadowMapForObject( SimObject *object );
 
-protected:   
+protected:
 
    // LightManager
    virtual void _addLightInfoEx( LightInfo *lightInfo );
@@ -137,7 +137,7 @@ protected:
    U32 mConePrimitiveCount;
 
    LightingShaderConstants* getLightingShaderConstants(GFXShaderConstBuffer* shader);
-   
+
 };
 
 #endif // _ADVANCEDLIGHTMANAGER_H_

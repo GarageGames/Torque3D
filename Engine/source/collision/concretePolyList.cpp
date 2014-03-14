@@ -105,7 +105,7 @@ void ConcretePolyList::plane(U32 v1,U32 v2,U32 v3)
 
 void ConcretePolyList::plane(const PlaneF& p)
 {
-   mPlaneTransformer.transform(p, mPolyList.last().plane); 
+   mPlaneTransformer.transform(p, mPolyList.last().plane);
 }
 
 void ConcretePolyList::plane(const U32 index)
@@ -157,7 +157,7 @@ void ConcretePolyList::render()
 
    for ( p = mPolyList.begin(); p < mPolyList.end(); p++ )
    {
-      PrimBuild::begin( GFXLineStrip, p->vertexCount + 1 );      
+      PrimBuild::begin( GFXLineStrip, p->vertexCount + 1 );
 
       for ( U32 i = 0; i < p->vertexCount; i++ )
       {
@@ -169,7 +169,7 @@ void ConcretePolyList::render()
       PrimBuild::vertex3fv( pnt );
 
       PrimBuild::end();
-   }   
+   }
 }
 
 void ConcretePolyList::triangulate()
@@ -182,15 +182,15 @@ void ConcretePolyList::triangulate()
    // here as we're not reserving enough space for
    // new generated triangles.
    //
-   // We need to either over estimate and shrink or 
-   // better yet fix vector to internally grow in 
+   // We need to either over estimate and shrink or
+   // better yet fix vector to internally grow in
    // large chunks.
    //
    PolyList polyList;
    polyList.reserve( mPolyList.size() );
    IndexList indexList;
    indexList.reserve( mIndexList.size() );
-   
+
    U32 j, numTriangles;
 
    //
@@ -200,13 +200,13 @@ void ConcretePolyList::triangulate()
       const Poly &poly = *polyIter;
 
       // How many triangles in this poly?
-      numTriangles = poly.vertexCount - 2;        
+      numTriangles = poly.vertexCount - 2;
 
       // Build out the triangles.
       for ( j = 0; j < numTriangles; j++ )
       {
          polyList.increment();
-         
+
          Poly &triangle = polyList.last();
          triangle = poly;
          triangle.vertexCount = 3;
@@ -216,7 +216,7 @@ void ConcretePolyList::triangulate()
          indexList.push_back( mIndexList[ poly.vertexStart + 1 + j ] );
          indexList.push_back( mIndexList[ poly.vertexStart + 2 + j ] );
       }
-   } 
+   }
 
    mPolyList = polyList;
    mIndexList = indexList;

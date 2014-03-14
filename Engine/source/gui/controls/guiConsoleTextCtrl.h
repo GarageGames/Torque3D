@@ -56,7 +56,7 @@ public:
    //creation methods
    DECLARE_CONOBJECT(GuiConsoleTextCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
-   
+
    GuiConsoleTextCtrl();
    virtual ~GuiConsoleTextCtrl();
    static void initPersistFields();

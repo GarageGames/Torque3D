@@ -38,7 +38,7 @@ void Platform::debugBreak()
 void Platform::forceShutdown(S32 returnValue)
 {
    exit(returnValue);
-}   
+}
 
 void Platform::restartInstance()
 {
@@ -54,12 +54,12 @@ void Platform::restartInstance()
    CFMutableStringRef mut = CFStringCreateMutableCopy(NULL, 0, execString);
    CFStringInsert(mut, 0, CFSTR("\""));
    CFStringAppend(mut, CFSTR("\" & "));
-   
+
    U32 len = CFStringGetMaximumSizeForEncoding(CFStringGetLength(mut), kCFStringEncodingUTF8);
    char *execCString = new char[len+1];
    CFStringGetCString(mut, execCString, len, kCFStringEncodingUTF8);
    execCString[len] = '\0';
-   
+
    Con::printf("---- %s -----",execCString);
    system(execCString);
 }

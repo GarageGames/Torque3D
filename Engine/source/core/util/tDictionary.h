@@ -379,7 +379,7 @@ void HashTable<Key,Value>::_destroy()
          ptr = ptr->mNext;
          destructInPlace( tmp );
       }
-      
+
    mNodeAllocator.freeBlocks();
    delete[] mTable;
    mTable = NULL;
@@ -514,7 +514,7 @@ void HashTable<Key,Value>::erase(Iterator node)
    Node** prev = &mTable[_index(node->key)];
    for (Node* itr = *prev; itr; prev = &itr->mNext, itr = itr->mNext)
    {
-      if (itr == node.mLink) 
+      if (itr == node.mLink)
       {
          *prev = itr->mNext;
          mNodeAllocator.free(itr);
@@ -663,7 +663,7 @@ void HashTable<Key,Value>::operator=(const HashTable& p)
       if (Node* itr = p.mTable[i])
       {
          Node** head = &mTable[i];
-         do 
+         do
          {
             *head = new Node(itr->mPair,0);
             head = &(*head)->mNext;
@@ -723,7 +723,7 @@ public:
    }
    /// Try to get the value of the specified key.  Returns true and fills in the value
    /// if the key exists.  Returns false otherwise.
-   /// Unlike operator [], this function does not create the key/value if the key 
+   /// Unlike operator [], this function does not create the key/value if the key
    /// is not found.
    bool tryGetValue(const Key& key, Value& val) const
    {
@@ -744,9 +744,9 @@ public:
 
    // operators
    /// Index using the given key. If the key is not currently in the map it is added.
-   /// If you just want to try to get the value without the side effect of creating the 
+   /// If you just want to try to get the value without the side effect of creating the
    /// key, use tryGetValue() instead.
-   Value& operator[](const Key&);      
+   Value& operator[](const Key&);
 
 private:
    Sequence mMap;
@@ -768,7 +768,7 @@ inline U32 Map<Key,Value,Sequence>::size() const
 }
 
 template<typename Key, typename Value, class Sequence>
-inline void Map<Key,Value,Sequence>::resize(U32 size) 
+inline void Map<Key,Value,Sequence>::resize(U32 size)
 {
    return mMap.resize(size);
 }

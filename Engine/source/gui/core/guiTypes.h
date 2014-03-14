@@ -55,7 +55,7 @@ struct GuiEvent
    U8                   mouseClickCount;  ///< to determine double clicks, etc...
    U8                   mouseAxis;        ///< mousewheel axis (0 == X, 1 == Y)
    F32                  fval;             ///< used for mousewheel events
-   
+
    GuiEvent()
       : ascii( 0 ),
         modifier( 0 ),
@@ -73,7 +73,7 @@ struct Gui3DMouseEvent : public GuiEvent
 {
    Point3F     vec;
    Point3F     pos;
-   
+
    Gui3DMouseEvent()
       : vec( 0.f, 0.f, 0.f ),
         pos( 0.f, 0.f, 0.f ) {}
@@ -172,7 +172,7 @@ struct Edge
       normal = inNormal;
       margin = 2.f;
 
-      if( normal.x == 1.f || normal.x == -1.f )  
+      if( normal.x == 1.f || normal.x == -1.f )
       {
          // Vertical Edge
          position.x = inPoint.x;
@@ -201,12 +201,12 @@ struct Edge
       position = inEdge.position;
       extent   = inEdge.extent;
       margin   = inEdge.margin;
-   }     
+   }
 
    // RectI cast operator overload
    operator const RectI() const
    {
-      if( normal.x == 1.f || normal.x == -1.f )  
+      if( normal.x == 1.f || normal.x == -1.f )
       {
          // Vertical Edge
          RectI retRect = RectI( position.x, position.y, 1, position.y + extent.y );
@@ -251,7 +251,7 @@ struct EdgeRectI
 
    EdgeRectI( const RectI &inRect, F32 inMargin )
    {
-      // Left Edge 
+      // Left Edge
       left.normal    = Point2F( -1.f, 0.f );
       left.position.x= inRect.point.x;
       left.position.y= 0;
@@ -311,7 +311,7 @@ struct ControlSizing
 
    RectSpacingI mPadding; ///< Padding for each side of the control to have as spacing between other controls
    ///  For example 1,1,1,1 would mean one pixel at least of spacing between this control and the
-   ///  one next to it.  
+   ///  one next to it.
    RectSpacingI mInternalPadding; ///< Interior Spacing of the control
 
 
@@ -325,7 +325,7 @@ struct ControlSizing
    /// will be locked to a certain edge of a parent, when the parent resizes.  Anchors are specified
    /// as a Mask and therefore you may lock any number of edges to a parent container and when the parent
    /// is resized, any locked edges on a control will remain the same distance from the parent edge it
-   /// is locked to, after the resize happens.  
+   /// is locked to, after the resize happens.
    ///
    bool mAnchorTop;     ///< Anchor to the Top edge of the parent when created
    bool mAnchorBottom;  ///< Anchor to the Bottom edge of the parent when created
@@ -436,7 +436,7 @@ public:
    bool mNumbersOnly;                              ///< For text controls, true if this should only accept numerical data
    bool mMouseOverSelected;                        ///< True if this object should be "selected" while the mouse is over it
    ColorI mCursorColor;                            ///< Color for the blinking cursor in text fields (for example)
-	   
+
 	Point2I mTextOffset;                            ///< Text offset for the control
 
    // bitmap members
@@ -453,7 +453,7 @@ public:
 
    /// Returns our children profile (and finds the profile if it hasn't been set yet)
    GuiControlProfile* getChildrenProfile();
-   
+
    /// Category name for editing in the Gui Editor.
    String mCategory;
 
@@ -476,7 +476,7 @@ public:
    GuiControlProfile();
    ~GuiControlProfile();
    static void initPersistFields();
-   
+
    bool onAdd();
 
    void onStaticModified(const char* slotName, const char* newValue = NULL );
@@ -490,25 +490,25 @@ public:
    /// UI textures. It returns the number of bitmaps in the array it created
    /// It also stores the sizes in the mBitmapArrayRects vector.
    S32 constructBitmapArray();
-   
+
    /// This method returns the ith bitmap array rect, first ensuring that i is a
    /// valid index into mBitmapArrayRects. If the vector is empty, we call
-   /// constructBitmapArray() automatically. If it is still empty, we return a 
+   /// constructBitmapArray() automatically. If it is still empty, we return a
    /// zeroed RectI.
    RectI getBitmapArrayRect(U32 i);
 
    ///
    bool isInUse() const { return ( mUseCount != 0 ); }
-   
+
    void incUseCount() { mUseCount ++; }
    void decUseCount() { if( mUseCount > 0 ) mUseCount --; }
 
    void incLoadCount();
    void decLoadCount();
-   
+
    bool loadFont();
 
-   void setBitmapHandle(GFXTexHandle handle); 
+   void setBitmapHandle(GFXTexHandle handle);
 };
 
 typedef GuiControlProfile::AlignmentType GuiAlignmentType;

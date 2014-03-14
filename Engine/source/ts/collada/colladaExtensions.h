@@ -64,7 +64,7 @@ protected:
                if (dStrEqual(element->getExtra_array()[iExt]->getTechnique_array()[iTech]->getProfile(), name))
                   return element->getExtra_array()[iExt]->getTechnique_array()[iTech];
             }
-         }         
+         }
       }
       return NULL;
    }

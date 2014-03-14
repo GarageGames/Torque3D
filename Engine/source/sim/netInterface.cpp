@@ -28,7 +28,7 @@
 #include "core/util/journal/journal.h"
 
 #ifdef GGC_PLUGIN
-#include "GGCNatTunnel.h" 
+#include "GGCNatTunnel.h"
 extern void HandleGGCPacket(NetAddress* addr, unsigned char* data, U32 dataSize);
 #endif
 

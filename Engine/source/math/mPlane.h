@@ -469,7 +469,7 @@ inline void PlaneF::set( const Point3F& k, const Point3F& j, const Point3F& l )
    x = ay*bz - az*by;
    y = az*bx - ax*bz;
    z = ax*by - ay*bx;
-      
+
    m_point3F_normalize( (F32 *)(&x) );
    d = -(j.x * x + j.y * y + j.z * z);
 }
@@ -610,19 +610,19 @@ inline void PlaneD::setXZ( F64 yy )
 
 inline void PlaneD::setXY(const Point3D& point, F64 dir)       // Normal = (0, 0, -1|1)
 {
-   x = y = 0; 
+   x = y = 0;
    d = -((z = dir) * point.z);
 }
 
 inline void PlaneD::setYZ(const Point3D& point, F64 dir)       // Normal = (-1|1, 0, 0)
 {
-   z = y = 0; 
+   z = y = 0;
    d = -((x = dir) * point.x);
 }
 
 inline void PlaneD::setXZ(const Point3D& point, F64 dir)       // Normal = (0, -1|1, 0)
 {
-   x = z = 0; 
+   x = z = 0;
    d = -((y = dir) * point.y);
 }
 
@@ -676,11 +676,11 @@ inline PlaneD::Side PlaneD::whichSide(const Point3D& cp) const
 
 inline void PlaneD::set(const F64 _x, const F64 _y, const F64 _z)
 {
-    Point3D::set(_x,_y,_z); 
+    Point3D::set(_x,_y,_z);
 }
 
 //---------------------------------------------------------------------------
-// Calculate the coefficients of the plane passing through 
+// Calculate the coefficients of the plane passing through
 // a point with the given normal.
 
 ////inline void PlaneD::set( const Point3D& p, const Point3D& n )
@@ -700,7 +700,7 @@ inline void PlaneD::set( const Point3D& p, const Point3D& n )
 }
 
 //---------------------------------------------------------------------------
-// Calculate the coefficients of the plane passing through 
+// Calculate the coefficients of the plane passing through
 // three points.  Basically it calculates the normal to the three
 // points then calculates a plane through the middle point with that
 // normal.
@@ -731,7 +731,7 @@ inline void PlaneD::set( const Point3D& k, const Point3D& j, const Point3D& l )
    AssertFatal(squared != 0.0, "Error, no plane possible!");
 
    // In non-debug mode
-   if (squared != 0) 
+   if (squared != 0)
    {
       F64 invSqrt = 1.0 / (F64)mSqrt(x*x + y*y + z*z);
       x *= invSqrt;
@@ -739,7 +739,7 @@ inline void PlaneD::set( const Point3D& k, const Point3D& j, const Point3D& l )
       z *= invSqrt;
       d = -(j.x * x + j.y * y + j.z * z);
    }
-   else 
+   else
    {
       x = 0;
       y = 0;

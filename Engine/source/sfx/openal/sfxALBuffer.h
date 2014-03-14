@@ -47,15 +47,15 @@ class SFXALBuffer : public SFXBuffer
       friend class SFXALVoice;
 
    protected:
-      
+
       /// AL buffer in case this is a static, non-streaming buffer.
       ALuint mALBuffer;
-      
+
       /// Free buffers for use in queuing in case this is a streaming buffer.
       Vector< ALuint > mFreeBuffers;
 
       ///
-      SFXALBuffer(   const OPENALFNTABLE &oalft, 
+      SFXALBuffer(   const OPENALFNTABLE &oalft,
                      const ThreadSafeRef< SFXStream >& stream,
                      SFXDescription* description,
                      bool useHardware );
@@ -108,7 +108,7 @@ class SFXALBuffer : public SFXBuffer
 
    public:
 
-      static SFXALBuffer* create(   const OPENALFNTABLE &oalft, 
+      static SFXALBuffer* create(   const OPENALFNTABLE &oalft,
                                     const ThreadSafeRef< SFXStream >& stream,
                                     SFXDescription* description,
                                     bool useHardware );

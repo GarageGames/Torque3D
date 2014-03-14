@@ -23,7 +23,7 @@
 #ifndef _ALIGNEDARRAY_H_
 #define _ALIGNEDARRAY_H_
 
-/// This is a fixed size class that will align its elements on configurable boundaries.    
+/// This is a fixed size class that will align its elements on configurable boundaries.
 template<typename T>
 class AlignedArray
 {
@@ -45,14 +45,14 @@ public:
    void setCapacity(const U32 arraySize, const U32 elementSize, U8* buffer, bool takeOwn);
 
    /// Size of the array
-   U32 size() const;      
+   U32 size() const;
 
    /// Set a new array size (up to initial size created returned by capacity)
    void setSize(U32 newsize);
 
    /// Capacity of the array (you can setCapacity the size this high)
    U32 capacity() const;
-   
+
    /// Returns the size of an element (useful for asserting, etc)
    U32 getElementSize() const;
 
@@ -73,7 +73,7 @@ protected:
    U32 mElementCount;
    // How many elements can we have
    U32 mCapacity;
-   // Storage, we use placement new and reinterpret casts to deal with 
+   // Storage, we use placement new and reinterpret casts to deal with
    // alignment
    U8* mBuffer;
    // Do we own this buffer? Or are we just wrapping it?

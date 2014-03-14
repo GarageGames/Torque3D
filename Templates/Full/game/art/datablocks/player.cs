@@ -503,7 +503,7 @@ datablock PlayerData(DefaultPlayerData)
 
    debrisShapeName = "art/shapes/actors/common/debris_player.dts";
    debris = playerDebris;
-   
+
    throwForce = 30;
 
    minLookAngle = "-1.4";

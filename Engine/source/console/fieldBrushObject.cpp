@@ -384,14 +384,14 @@ ConsoleMethod(FieldBrushObject, copyFields, void, 3, 4, "(simObject, [fieldList]
 
     // Fetch field list.
     const char* pFieldList = (argc > 3 ) ? argv[3] : NULL;
-    
+
     // Copy Fields.
     object->copyFields( pSimObject, pFieldList );
 }
 // Copy Fields.
 void FieldBrushObject::copyFields( SimObject* pSimObject, const char* fieldList )
 {
-    // FieldBrushObject class?   
+    // FieldBrushObject class?
     if ( dStrcmp(pSimObject->getClassName(), getClassName()) == 0 )
     {
         // Yes, so warn.
@@ -522,7 +522,7 @@ ConsoleMethod(FieldBrushObject, pasteFields, void, 3, 3, "(simObject) Paste copi
 // Paste Fields.
 void FieldBrushObject::pasteFields( SimObject* pSimObject )
 {
-    // FieldBrushObject class?   
+    // FieldBrushObject class?
     if ( dStrcmp(pSimObject->getClassName(), getClassName()) == 0 )
     {
         // Yes, so warn.

@@ -34,7 +34,7 @@
       Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
-      Position = getWord($pref::Video::mode, 0) - 209 
+      Position = getWord($pref::Video::mode, 0) - 209
          SPC getWord(EditorGuiToolbar.extent, 1) + getWord(DatablockEditorTreeWindow.extent, 1) - 2;
       Extent = "210 373";
       MinExtent = "210 140";

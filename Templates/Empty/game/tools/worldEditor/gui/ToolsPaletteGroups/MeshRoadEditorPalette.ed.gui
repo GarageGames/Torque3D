@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(EMeshRoadEditorSelectModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "MeshRoadEditorSelectMode";
@@ -32,8 +32,8 @@
       bitmap = "tools/gui/images/menubar/arrow";
       buttonType = "RadioButton";
       useMouseEvents = "0";
-   }; 
-      
+   };
+
    new GuiBitmapButtonCtrl(EMeshRoadEditorMoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "MeshRoadEditorMoveMode";

@@ -89,10 +89,10 @@ public:
    virtual bool isSimulationEnabled() { return mIsEnabled; }
 
    // PhysicsBody
-   virtual bool init(   PhysicsCollision *shape, 
+   virtual bool init(   PhysicsCollision *shape,
                         F32 mass,
                         U32 bodyFlags,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world );
    virtual bool isDynamic() const { return mIsDynamic; }
    virtual PhysicsCollision* getColShape();
@@ -107,7 +107,7 @@ public:
    virtual Point3F getAngVelocity() const;
    virtual void setSleeping( bool sleeping );
    virtual void setMaterial(  F32 restitution,
-                              F32 friction, 
+                              F32 friction,
                               F32 staticFriction );
    virtual void applyCorrection( const MatrixF &xfm );
    virtual void applyImpulse( const Point3F &origin, const Point3F &force );

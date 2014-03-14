@@ -58,11 +58,11 @@ enum {
    AL_MIN_DISTANCE,
    AL_MAX_DISTANCE,
    AL_CONE_OUTER_GAIN,
-   
+
    // relative with pos(0,0,0) won't work for ambient sounds with miles
    AL_SOURCE_AMBIENT,
    AL_PAN,
-   
+
    // other extensions
    AL_BUFFER_KEEP_RESIDENT,
    AL_FORMAT_WAVE_EXT,
@@ -145,12 +145,12 @@ void libraryShutdown();
 inline bool doesSupportIASIG()
 {
    return gDoesSupport_AL_EXT_IASIG;
-}   
+}
 
 inline bool doesSupportDynamix()
 {
    return gDoesSupport_AL_EXT_DYNAMIX;
-}  
+}
 
 // helpers
 F32 DBToLinear(F32 value);

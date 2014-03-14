@@ -47,7 +47,7 @@ class Sun : public SceneObject, public ISceneLight
 protected:
 
    F32 mSunAzimuth;
-   
+
    F32 mSunElevation;
 
    ColorF mLightColor;
@@ -75,7 +75,7 @@ protected:
    bool mCoronaEnabled;
    String mCoronaMatName;
    BaseMatInstance *mCoronaMatInst;
-   MatrixSet *mMatrixSet;   
+   MatrixSet *mMatrixSet;
    F32 mCoronaScale;
    ColorF mCoronaTint;
    bool mCoronaUseLightColor;
@@ -94,7 +94,7 @@ protected:
    virtual void _onSelected();
    virtual void _onUnselected();
 
-   enum NetMaskBits 
+   enum NetMaskBits
    {
       UpdateMask = BIT(0)
    };
@@ -109,19 +109,19 @@ public:
    virtual void onRemove();
 
    // ConsoleObject
-   DECLARE_CONOBJECT(Sun);   
+   DECLARE_CONOBJECT(Sun);
    static void initPersistFields();
    void inspectPostApply();
 
    // NetObject
    U32 packUpdate( NetConnection *conn, U32 mask, BitStream *stream );
-   void unpackUpdate( NetConnection *conn, BitStream *stream ); 
+   void unpackUpdate( NetConnection *conn, BitStream *stream );
 
    // ISceneLight
    virtual void submitLights( LightManager *lm, bool staticLighting );
-   virtual LightInfo* getLight() { return mLight; }   
+   virtual LightInfo* getLight() { return mLight; }
 
-   // SceneObject   
+   // SceneObject
    virtual void prepRenderImage( SceneRenderState* state );
 
    // ProcessObject

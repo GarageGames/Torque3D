@@ -209,11 +209,11 @@ CreateUnitTest( TestString, "Util/String" )
    {
       // String.insert( Pos, Char )
       TEST( String( "aa" ).insert( 1, 'c' ) == String( "aca" ) );
-      
+
       // String.insert( Pos, String )
       TEST( String( "aa" ).insert( 1, "cc" ) == String( "acca" ) );
       TEST( String( "aa" ).insert( 1, String( "cc" ) ) == String( "acca" ) );
-      
+
       // String.insert( Pos, String, Len )
       TEST( String( "aa" ).insert( 1, "ccdddd", 2 ) == String( "acca" ) );
    }
@@ -287,7 +287,7 @@ CreateUnitTest( TestString, "Util/String" )
       TEST( String( "foo" ).getHashCaseSensitive() != String( "bar" ).getHashCaseSensitive() );
       TEST( String( "foo" ).getHashCaseInsensitive() == String( "FOO" ).getHashCaseInsensitive() );
    }
-   
+
    void testIntern()
    {
       TEST( String( "foo" ).intern().isSame( String( "foo" ).intern() ) );

@@ -170,7 +170,7 @@ bool HifiClientProcessList::advanceTime( SimTime timeDelta )
    {
       AssertFatal( mLastDelta >= 0.0f && mLastDelta <= 1.0f, "mLastDelta must always be zero to one." );
       for ( ProcessObject *pobj = mHead.mProcessLink.next; pobj != &mHead; pobj = pobj->mProcessLink.next )
-      {                
+      {
          if ( pobj->isTicking() )
             pobj->interpolateTick( mLastDelta );
       }
@@ -179,7 +179,7 @@ bool HifiClientProcessList::advanceTime( SimTime timeDelta )
       // client side animations.
       F32 dt = F32( timeDelta ) / 1000;
       for ( ProcessObject *pobj = mHead.mProcessLink.next; pobj != &mHead; pobj = pobj->mProcessLink.next)
-      {                  
+      {
          pobj->advanceTime( dt );
       }
    }
@@ -228,7 +228,7 @@ void HifiClientProcessList::onAdvanceObjects()
 void HifiClientProcessList::onTickObject(ProcessObject * pobj)
 {
    // Each object is advanced a single tick
-   // If it's controlled by a client, tick using a move.   
+   // If it's controlled by a client, tick using a move.
 
    Move *movePtr;
    U32 numMoves;
@@ -259,7 +259,7 @@ void HifiClientProcessList::onTickObject(ProcessObject * pobj)
    }
    else if ( pobj->isTicking() )
       pobj->processTick( 0 );
-   
+
    if ( obj && ( obj->getTypeMask() & GameBaseHiFiObjectType ) )
    {
       GameConnection * serverConnection = GameConnection::getConnectionToServer();
@@ -283,7 +283,7 @@ void HifiClientProcessList::advanceObjects()
    gMaxHiFiVelSq = 0;
    Parent::advanceObjects();
 
-   // We need to consume a move on the connections whether 
+   // We need to consume a move on the connections whether
    // there is a control object to consume the move or not,
    // otherwise client and server can get out of sync move-wise
    // during startup.  If there is a control object, we cleared
@@ -561,7 +561,7 @@ void HifiServerProcessList::onTickObject(ProcessObject * pobj)
 {
    // Each object is advanced a single tick
    // If it's controlled by a client, tick using a move.
-               
+
    Move *movePtr;
    U32 numMoves;
    GameConnection *con = pobj->getControllingClient();

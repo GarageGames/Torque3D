@@ -46,7 +46,7 @@ static struct { U32 id; LPTSTR resourceID; } sgCursorShapeMap[]=
    { 0,                             0 },
 };
 
-//static const EnumTable::Enums curManagerShapesEnums[] = 
+//static const EnumTable::Enums curManagerShapesEnums[] =
 //{
 //   { Win32CursorController::curArrow, "Arrow" },
 //   { Win32CursorController::curWait, "Wait" },
@@ -59,7 +59,7 @@ static struct { U32 id; LPTSTR resourceID; } sgCursorShapeMap[]=
 //   { Win32CursorController::curResizeNWSE, "ResizeNWSE" },
 //};
 //
-//static const EnumTable gCurManagerShapesTable(8, &curManagerShapesEnums[0]); 
+//static const EnumTable gCurManagerShapesTable(8, &curManagerShapesEnums[0]);
 
 // CodeReview I've duplicated this 'cache' trick for system settings
 // because they're unlikely to change and calling into the OS for values
@@ -96,7 +96,7 @@ void Win32CursorController::getCursorPosition( Point2I &point )
    POINT rPoint;
    ::GetCursorPos( &rPoint );
 
-   // Return 
+   // Return
    point.x = rPoint.x;
    point.y = rPoint.y;
 }
@@ -157,7 +157,7 @@ void Win32CursorController::setCursorShape( const UTF8 *fileName, bool reload )
 
    if ( !gCursorShape || reload )
       gCursorShape = LoadCursorFromFile( lFileName );
-   
+
    if ( gCursorShape )
       SetCursor( gCursorShape );
 }

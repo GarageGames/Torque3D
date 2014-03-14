@@ -69,7 +69,7 @@ public:
       eHotLava          = 5,
       eCrustyLava       = 6,
       eQuicksand        = 7,
-   }; 
+   };
 
 private:
 
@@ -77,7 +77,7 @@ private:
       UpdateMask =   Parent::NextFreeMask,
       NextFreeMask = Parent::NextFreeMask << 1
    };
-   
+
    // vertex / index buffers
    GFXVertexBufferHandle<GFXWaterVertex> mVertBuff;
    GFXPrimitiveBufferHandle mPrimBuff;
@@ -88,9 +88,9 @@ private:
    F32            mGridElementSize;
    U32            mVertCount;
    U32            mIndxCount;
-   U32            mPrimCount;   
+   U32            mPrimCount;
    Frustum        mFrustum;
-   
+
    SceneData setupSceneGraphInfo( SceneRenderState *state );
    void setShaderParams( SceneRenderState *state, BaseMatInstance* mat, const WaterMatParams& paramHandles );
    void setupVBIB( SceneRenderState *state );
@@ -104,7 +104,7 @@ protected:
    // Standard engine functions
    //-------------------------------------------------------
    bool onAdd();
-   void onRemove();   
+   void onRemove();
    U32  packUpdate  (NetConnection *conn, U32 mask, BitStream *stream);
    void unpackUpdate(NetConnection *conn,           BitStream *stream);
    bool castRay(const Point3F &start, const Point3F &end, RayInfo* info);
@@ -113,7 +113,7 @@ public:
    WaterPlane();
    virtual ~WaterPlane();
 
-   DECLARE_CONOBJECT(WaterPlane);   
+   DECLARE_CONOBJECT(WaterPlane);
 
    static void initPersistFields();
    void onStaticModified( const char* slotName, const char*newValue = NULL );
@@ -127,13 +127,13 @@ public:
    virtual void onReflectionInfoChanged();
    virtual bool isUnderwater( const Point3F &pnt ) const;
 
-   // WaterBlock   
+   // WaterBlock
    bool isPointSubmerged ( const Point3F &pos, bool worldSpace = true ) const{ return true; }
 
    // WaterPlane
    void setGridSize( U32 inSize );
    void setGridElementSize( F32 inSize );
-   
+
    // Protected Set'ers
    static bool protectedSetGridSize( void *object, const char *index, const char *data );
    static bool protectedSetGridElementSize( void *object, const char *index, const char *data );

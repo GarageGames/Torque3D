@@ -29,7 +29,7 @@
 #include "T3D/physics/bullet/btCasts.h"
 
 
-BtCollision::BtCollision() 
+BtCollision::BtCollision()
    :  mCompound( NULL ),
       mLocalXfm( true )
 {
@@ -46,11 +46,11 @@ BtCollision::~BtCollision()
       delete mMeshInterfaces[i];
 }
 
-btCollisionShape* BtCollision::getShape() 
-{   
+btCollisionShape* BtCollision::getShape()
+{
    if ( mCompound )
       return mCompound;
-   
+
    if ( mShapes.empty() )
       return NULL;
 
@@ -121,7 +121,7 @@ void BtCollision::addCapsule( F32 radius,
    _addShape( shape, localXfm );
 }
 
-bool BtCollision::addConvex(  const Point3F *points, 
+bool BtCollision::addConvex(  const Point3F *points,
                               U32 count,
                               const MatrixF &localXfm )
 {
@@ -153,7 +153,7 @@ bool BtCollision::addTriangleMesh(  const Point3F *vert,
    btBvhTriangleMeshShape *shape = new btBvhTriangleMeshShape( meshInterface, true, true );
    shape->setMargin( 0.01f );
    _addShape( shape, localXfm );
-   
+
    return true;
 }
 
@@ -174,8 +174,8 @@ bool BtCollision::addHeightfield(   const U16 *heights,
                                                                      (void*)heights,
                                                                      heightScale,
                                                                      minHeight, maxHeight,
-                                                                     2, // Z up! 
-                                                                     PHY_SHORT, 
+                                                                     2, // Z up!
+                                                                     PHY_SHORT,
                                                                      false );
    shape->setMargin( 0.01f );
    shape->setLocalScaling( btVector3( metersPerSample, metersPerSample, 1.0f ) );
@@ -186,7 +186,7 @@ bool BtCollision::addHeightfield(   const U16 *heights,
    //
    // ( blockSize * samplesPerMeter, blockSize * samplesPerMeter, maxHeight ) / 2.0f
    //
-   // So we create a local transform to move it to the min point 
+   // So we create a local transform to move it to the min point
    // of the bounds so it matched Torque terrain.
    Point3F offset(   (F32)blockSize * metersPerSample / 2.0f,
                      (F32)blockSize * metersPerSample / 2.0f,

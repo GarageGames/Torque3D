@@ -27,13 +27,13 @@
 #include "platform/platformAssert.h"
 #endif
 
-/// This is a simple thread safe singleton class based on the 
+/// This is a simple thread safe singleton class based on the
 /// design of boost::singleton_default (see http://www.boost.org/).
 ///
 /// This singleton is guaranteed to be constructed before main() is called
 /// and destroyed after main() exits.  It will also be created on demand
 /// if Singleton<T>::instance() is called before main() begins.
-/// 
+///
 /// This thread safety only works within the execution context of main().
 /// Access to the singleton from multiple threads outside of main() is
 /// is not guaranteed to be thread safe.
@@ -56,16 +56,16 @@ private:
    // singleton is created before main() begins.
    struct SingletonCreator
    {
-      SingletonCreator() { Singleton<T>::instance(); } 
+      SingletonCreator() { Singleton<T>::instance(); }
 
-      // This dummy function is used below to force 
+      // This dummy function is used below to force
       // singleton creation at startup.
       inline void forceSafeCreate() const {}
    };
 
    // The creator object instance.
    static SingletonCreator smSingletonCreator;
-   
+
    /// This is private on purpose.
    Singleton();
 
@@ -86,7 +86,7 @@ public:
 
 };
 
-template <typename T> 
+template <typename T>
 typename Singleton<T>::SingletonCreator Singleton<T>::smSingletonCreator;
 
 
@@ -112,10 +112,10 @@ public:
 
    /// Create the singleton instance.
    /// @note Asserts when the singleton instance has already been constructed.
-   static void createSingleton() 
+   static void createSingleton()
    {
       AssertFatal( smSingleton == NULL, String::ToString( "%s::createSingleton() - The singleton is already created!", T::getSingletonName() ) );
-      smSingleton = new T(); 
+      smSingleton = new T();
    }
 
    /// Destroy the singleton instance.
@@ -129,10 +129,10 @@ public:
 
    /// Return the singleton instance.
    /// @note Asserts when called before createSingleton().
-   static T* instance() 
-   { 
+   static T* instance()
+   {
       AssertFatal( smSingleton, String::ToString( "%s::instance() - The singleton has not been created!", T::getSingletonName() ) );
-      return smSingleton; 
+      return smSingleton;
    }
 
    /// Return the singleton instance or NULL if it has been deleted or not yet constructed.
@@ -143,7 +143,7 @@ public:
 };
 
 ///
-template <typename T> 
+template <typename T>
 T* ManagedSingleton<T>::smSingleton = NULL;
 
 

@@ -44,7 +44,7 @@ GFXDeclareVertexFormat( GFXCloudVertex )
    Point3F point;
    Point3F normal;
    Point3F binormal;
-   Point3F tangent; 
+   Point3F tangent;
    Point2F texCoord;
 };
 
@@ -52,11 +52,11 @@ class CloudLayer : public SceneObject
 {
    typedef SceneObject Parent;
 
-   enum 
-   { 
-      CloudLayerMask    = Parent::NextFreeMask,      
+   enum
+   {
+      CloudLayerMask    = Parent::NextFreeMask,
       NextFreeMask      = Parent::NextFreeMask << 1,
-   };  
+   };
 
    #define TEX_COUNT 3
 
@@ -71,7 +71,7 @@ public:
    virtual bool onAdd();
    virtual void onRemove();
    static void initPersistFields();
-   virtual void inspectPostApply();   
+   virtual void inspectPostApply();
 
    // NetObject
    virtual U32 packUpdate( NetConnection *conn, U32 mask, BitStream *stream );
@@ -100,15 +100,15 @@ protected:
    GFXStateBlockRef mStateblock;
 
    GFXShaderConstBufferRef mShaderConsts;
-   GFXShaderConstHandle *mModelViewProjSC; 
+   GFXShaderConstHandle *mModelViewProjSC;
    GFXShaderConstHandle *mAmbientColorSC;
    GFXShaderConstHandle *mSunColorSC;
    GFXShaderConstHandle *mSunVecSC;
    GFXShaderConstHandle *mTexOffsetSC[3];
    GFXShaderConstHandle *mTexScaleSC;
-   GFXShaderConstHandle *mBaseColorSC;    
-   GFXShaderConstHandle *mCoverageSC;  
-   GFXShaderConstHandle *mExposureSC;  
+   GFXShaderConstHandle *mBaseColorSC;
+   GFXShaderConstHandle *mCoverageSC;
+   GFXShaderConstHandle *mExposureSC;
    GFXShaderConstHandle *mEyePosWorldSC;
 
    GFXVertexBufferHandle<GFXCloudVertex> mVB;
@@ -122,12 +122,12 @@ protected:
    String mTextureName;
    F32 mTexScale[TEX_COUNT];
    Point2F mTexDirection[TEX_COUNT];
-   F32 mTexSpeed[TEX_COUNT];   
-   
+   F32 mTexSpeed[TEX_COUNT];
+
    ColorF mBaseColor;
    F32 mExposure;
    F32 mCoverage;
-   F32 mWindSpeed;   
+   F32 mWindSpeed;
    F32 mHeight;
 };
 

@@ -180,7 +180,7 @@ void LightAnimData::AnimValue<COUNT>::updateKey()
    {
       timeScale[i] = 0.0f;
       keyLen[i] = 0.0f;
-      
+
       if ( keys[i] && keys[i][0] && period[i] > 0.0f )
       {
          keyLen[i] = dStrlen( keys[i] );
@@ -195,7 +195,7 @@ bool LightAnimData::AnimValue<COUNT>::animate( F32 time, F32 *output )
    F32 scaledTime, lerpFactor, valueRange, keyFrameLerp;
    U32 posFrom, posTo;
    S32 keyFrameFrom, keyFrameTo;
-   
+
    bool wasAnimated = false;
 
    for ( U32 i=0; i < COUNT; i++ )
@@ -273,12 +273,12 @@ void LightAnimData::unpackData( BitStream *stream )
 }
 
 void LightAnimData::animate( LightInfo *lightInfo, LightAnimState *state )
-{   
+{
    PROFILE_SCOPE( LightAnimData_animate );
 
    // Calculate the input time for animation.
-   F32 time =  state->animationPhase + 
-               ( (F32)Sim::getCurrentTime() * 0.001f ) / 
+   F32 time =  state->animationPhase +
+               ( (F32)Sim::getCurrentTime() * 0.001f ) /
                state->animationPeriod;
 
    MatrixF transform( state->transform );

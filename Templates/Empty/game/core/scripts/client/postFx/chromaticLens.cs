@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-/// 
+///
 $CAPostFx::enabled = false;
 
 /// The lens distortion coefficient.
@@ -38,15 +38,15 @@ singleton GFXStateBlockData( PFX_DefaultChromaticLensStateBlock )
 {
    zDefined = true;
    zEnable = false;
-   zWriteEnable = false;   
+   zWriteEnable = false;
    samplersDefined = true;
    samplerStates[0] = SamplerClampPoint;
 };
 
 singleton ShaderData( PFX_ChromaticLensShader )
-{   
+{
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
-   DXPixelShaderFile 	= "shaders/common/postFx/chromaticLens.hlsl"; 
+   DXPixelShaderFile 	= "shaders/common/postFx/chromaticLens.hlsl";
    pixVersion = 3.0;
 };
 
@@ -65,7 +65,7 @@ singleton PostEffect( ChromaticLensPostFX )
 
 function ChromaticLensPostFX::setShaderConsts( %this )
 {
-   %this.setShaderConst( "$distCoeff", $CAPostFx::distCoeffecient );   
-   %this.setShaderConst( "$cubeDistort", $CAPostFx::cubeDistortionFactor );    
-   %this.setShaderConst( "$colorDistort", $CAPostFx::colorDistortionFactor );   
+   %this.setShaderConst( "$distCoeff", $CAPostFx::distCoeffecient );
+   %this.setShaderConst( "$cubeDistort", $CAPostFx::cubeDistortionFactor );
+   %this.setShaderConst( "$colorDistort", $CAPostFx::colorDistortionFactor );
 }

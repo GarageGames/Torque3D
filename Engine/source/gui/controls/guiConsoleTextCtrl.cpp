@@ -46,7 +46,7 @@ GuiConsoleTextCtrl::~GuiConsoleTextCtrl()
 
 void GuiConsoleTextCtrl::initPersistFields()
 {
-   addGroup("GuiConsoleTextCtrl");		
+   addGroup("GuiConsoleTextCtrl");
    addField("expression",  TypeRealString,  Offset(mConsoleExpression, GuiConsoleTextCtrl));
    endGroup("GuiConsoleTextCtrl");
    Parent::initPersistFields();
@@ -103,24 +103,24 @@ void GuiConsoleTextCtrl::calcResize()
    }
 
    // The height is the number of lines times the height of the font.
-   U32 ctrlHeight = mLineLen.size() * mFont->getHeight();   
+   U32 ctrlHeight = mLineLen.size() * mFont->getHeight();
 
    setExtent( Point2I( ctrlWidth, ctrlHeight ) + mProfile->mTextOffset * 2 );
 }
 
 
 void GuiConsoleTextCtrl::onPreRender()
-{   
+{
    if ( mConsoleExpression.isNotEmpty() )
    {
       mResult = Con::evaluatef( "$guiConsoleTextCtrlTemp = %s;", mConsoleExpression.c_str() );
-      
+
       // Of the resulting string we will be printing,
-      // Find the number of lines and length of each.      
+      // Find the number of lines and length of each.
       mProfile->mFont->wrapString( mResult, U32_MAX, mStartLineOffset, mLineLen );
    }
    else
-      mResult = String::EmptyString;         
+      mResult = String::EmptyString;
 
    calcResize();
 }
@@ -140,16 +140,16 @@ void GuiConsoleTextCtrl::onRender( Point2I offset, const RectI &updateRect )
    // If we have text to render.
    if ( mResult.isNotEmpty() )
    {
-      GFont *font = mProfile->mFont;      
-      
+      GFont *font = mProfile->mFont;
+
       GFX->getDrawUtil()->setBitmapModulation( mProfile->mFontColor );
 
       for ( U32 i = 0; i < mLineLen.size(); i++ )
-      {      
-         Point2I tempOffset = offset; 
+      {
+         Point2I tempOffset = offset;
          tempOffset += mProfile->mTextOffset;
          tempOffset.y += i * font->getHeight();
-         
+
          const UTF8 *line = mResult.c_str() + mStartLineOffset[i];
          U32 lineLen = mLineLen[i];
          GFX->getDrawUtil()->drawTextN( font, tempOffset, line, lineLen, mProfile->mFontColors );

@@ -45,7 +45,7 @@ SFXBuffer::SFXBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* 
      mIsUnique( description->mIsStreaming )
 {
    using namespace SFXInternal;
-   
+
    if( createAsyncState )
    {
       U32 packetLength = description->mStreamPacketSize;
@@ -132,7 +132,7 @@ bool SFXBuffer::update()
          // Write packet data into buffer.
          write( &packet, 1 );
          packet = NULL;
-         
+
          if( isLast )
          {
             // Release async state.
@@ -171,7 +171,7 @@ bool SFXBuffer::update()
          // Make sure we have no data currently submitted to the device.
          // This will stop and discard an outdated feed if we've been
          // switching streams.
-         
+
          _setStatus( STATUS_Loading );
          _flush();
 
@@ -179,7 +179,7 @@ bool SFXBuffer::update()
 
          state->mQueue = new SFXAsyncQueue( mUniqueVoice, this, mIsLooping );
       }
-      
+
       // Check the queue.
 
       if( state->mQueue != NULL )

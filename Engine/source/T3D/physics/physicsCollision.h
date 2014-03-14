@@ -32,7 +32,7 @@ class MatrixF;
 class PlaneF;
 
 
-/// The shared collision representation for a instance of a 
+/// The shared collision representation for a instance of a
 /// static or dynamic physics body.
 ///
 /// Note that making very big convex primitives can cause bad
@@ -65,7 +65,7 @@ public:
                               const MatrixF &localXfm ) = 0;
 
    /// Add a point cloud convex hull to the collision shape.
-   virtual bool addConvex( const Point3F *points, 
+   virtual bool addConvex( const Point3F *points,
                            U32 count,
                            const MatrixF &localXfm ) = 0;
 

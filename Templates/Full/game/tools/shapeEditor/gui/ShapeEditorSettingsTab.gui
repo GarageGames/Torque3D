@@ -92,7 +92,7 @@
                Margin = "0 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -109,7 +109,7 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
 
                   new GuiControl() {
@@ -400,7 +400,7 @@
                Margin = "0 3 0 0";
                DragSizable = false;
                container = true;
-                
+
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -417,7 +417,7 @@
                   isDecoy = "0";
                   Visible = "1";
                   tooltipprofile = "ToolsGuiToolTipProfile";
-                  hovertime = "1000"; 
+                  hovertime = "1000";
                   padding = "3";
 
                   new GuiControl() {

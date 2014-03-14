@@ -95,12 +95,12 @@ function GuiFormManager::BroadcastContentMessage( %libraryName, %sender, %messag
 
    // Iterate over all contents ref lists and message everyone
    for( %refGroupIter = 0; %refGroupIter < %contentRefGroup.getCount(); %refGroupIter++ )
-   {      
+   {
 
       // Fetch the Object Reference List Set
       %refListSet = %contentRefGroup.getObject( %refGroupIter );
 
-    
+
       // Look for the content by name in our library.
       for( %i = 0; %i < %refListSet.getCount(); %i++ )
       {

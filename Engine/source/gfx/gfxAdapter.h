@@ -35,10 +35,10 @@
 #include "core/util/delegate.h"
 #endif
 
-struct GFXAdapter 
+struct GFXAdapter
 {
 public:
-   typedef Delegate<GFXDevice* (U32 adapterIndex)> CreateDeviceInstanceDelegate;     
+   typedef Delegate<GFXDevice* (U32 adapterIndex)> CreateDeviceInstanceDelegate;
 
    enum
    {

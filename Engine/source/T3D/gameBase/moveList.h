@@ -43,7 +43,7 @@ public:
 
    MoveList();
    virtual ~MoveList() {}
-   
+
    virtual void init() {}
 
    void setConnection( GameConnection *connection) { mConnection = connection; }
@@ -83,7 +83,7 @@ public:
    virtual void markControlDirty() { mLastClientMove = mLastMoveAck; }
    bool isMismatch() { return mControlMismatch; }
    void clearMismatch() { mControlMismatch = false; }
-   
+
    /// Clear out all moves in the list and reset to initial state.
    virtual void reset();
 
@@ -101,7 +101,7 @@ protected:
 
 protected:
 
-   enum 
+   enum
    {
       MoveCountBits = 5,
       /// MaxMoveCount should not exceed the MoveManager's

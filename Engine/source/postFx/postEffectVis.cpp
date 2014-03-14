@@ -47,7 +47,7 @@ MODULE_BEGIN( PostEffectVis )
    {
       ManagedSingleton< PostEffectVis >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< PostEffectVis >::deleteSingleton();
@@ -67,7 +67,7 @@ PostEffectVis::~PostEffectVis()
 
 void PostEffectVis::open( PostEffect *pfx )
 {
-   GuiControl *content = _getContentControl();   
+   GuiControl *content = _getContentControl();
 
    // If we already have this PostEffect added
    // remove it first so we can recreate its controls.
@@ -81,7 +81,7 @@ void PostEffectVis::open( PostEffect *pfx )
             // Deleting the GuiWindowCtrl will automatically also delete
             // any child controls we have allocated.
             if ( itr->window[i] )
-               itr->window[i]->deleteObject();            
+               itr->window[i]->deleteObject();
          }
 
          mWindows.erase_fast( itr );
@@ -95,7 +95,7 @@ void PostEffectVis::open( PostEffect *pfx )
    window.pfx = pfx;
 
    for ( U32 i = 0; i < TexCount; i++ )
-   {      
+   {
       // Only allocate window/bitmaps for input textures that are actually used.
       if ( i > Target )
       {
@@ -115,7 +115,7 @@ void PostEffectVis::open( PostEffect *pfx )
       winCtrl->setMobility( true, true, true, true, false, false );
       winCtrl->setCanResize( true, true );
       winCtrl->setDataField( StringTable->insert( "closeCommand" ), NULL, "PfxVis::onWindowClosed( $ThisControl );" );
-      winCtrl->registerObject();      
+      winCtrl->registerObject();
 
       window.window[i] = winCtrl;
 
@@ -128,7 +128,7 @@ void PostEffectVis::open( PostEffect *pfx )
       bmpCtrl->setExtent( 341, 181 );
       bmpCtrl->setDataField( StringTable->insert( "wrap" ), NULL, "1" );
       bmpCtrl->setBitmap( "tools/gui/images/transp_grid" );
-      bmpCtrl->registerObject();      
+      bmpCtrl->registerObject();
       winCtrl->addObject( bmpCtrl );
 
       // Allocate GuiBitmapCtrl
@@ -139,9 +139,9 @@ void PostEffectVis::open( PostEffect *pfx )
       bmpCtrl->registerObject();
       winCtrl->addObject( bmpCtrl );
 
-      window.bmp[i] = bmpCtrl;      
+      window.bmp[i] = bmpCtrl;
 
-      content->addObject( winCtrl );      
+      content->addObject( winCtrl );
    }
 
    // Make sure we visible.
@@ -157,20 +157,20 @@ void PostEffectVis::setVisible( bool visible )
       return;
    }
 
-   GuiControl *content = _getContentControl();   
-   
+   GuiControl *content = _getContentControl();
+
    if ( visible && !content->isAwake() )
-      canvas->pushDialogControl( content, 100 );   
-   
+      canvas->pushDialogControl( content, 100 );
+
    if ( !visible && content->isAwake() )
       canvas->popDialogControl( content );
 }
 
 void PostEffectVis::clear()
 {
-   GuiControl *content = _getContentControl(); 
+   GuiControl *content = _getContentControl();
 
-   content->clear();   
+   content->clear();
    mWindows.clear();
 }
 
@@ -218,20 +218,20 @@ void PostEffectVis::onPFXProcessed( PostEffect *pfx )
          GuiWindowCtrl *pWinCtrl = NULL;
 
          if ( itr->bmp[Target] != NULL )
-         {            
+         {
             pBmpCtrl = itr->bmp[Target];
             pWinCtrl = itr->window[Target];
 
             GFXTextureObject *tex;
 
             if ( pfx->mTargetTex )
-               tex = pfx->mTargetTex;         
+               tex = pfx->mTargetTex;
             else
                tex = PFXMGR->getBackBufferTex();
 
             pBmpCtrl->setBitmapHandle( tex );
 
-            char caption[256];           
+            char caption[256];
             char name[256];
 
             if ( pfx->getName() == NULL || dStrlen( pfx->getName() ) == 0 )
@@ -241,7 +241,7 @@ void PostEffectVis::onPFXProcessed( PostEffect *pfx )
 
 
             if ( tex )
-               dSprintf( caption, 256, "%s[%i] target - %s [ %ix%i ]", name, pfx->getId(), pfx->mTargetName.c_str(), tex->getWidth(), tex->getHeight() );               
+               dSprintf( caption, 256, "%s[%i] target - %s [ %ix%i ]", name, pfx->getId(), pfx->mTargetName.c_str(), tex->getWidth(), tex->getHeight() );
             else
                dSprintf( caption, 256, "%s[%i] target", name, pfx->getId() );
 
@@ -255,13 +255,13 @@ void PostEffectVis::onPFXProcessed( PostEffect *pfx )
                continue;
 
             pBmpCtrl = itr->bmp[i];
-            pWinCtrl = itr->window[i];            
+            pWinCtrl = itr->window[i];
 
             GFXTextureObject *tex = pfx->mActiveTextures[i-1];
 
             pBmpCtrl->setBitmapHandle( tex );
 
-            char caption[256];            
+            char caption[256];
             char name[256];
 
             if ( pfx->getName() == NULL || dStrlen( pfx->getName() ) == 0 )
@@ -271,7 +271,7 @@ void PostEffectVis::onPFXProcessed( PostEffect *pfx )
 
 
             if ( tex )
-               dSprintf( caption, 256, "%s[%i] input%i - %s [ %ix%i ]", name, pfx->getId(), i-1, pfx->mTexFilename[i-1].c_str(), tex->getWidth(), tex->getHeight() );               
+               dSprintf( caption, 256, "%s[%i] input%i - %s [ %ix%i ]", name, pfx->getId(), i-1, pfx->mTexFilename[i-1].c_str(), tex->getWidth(), tex->getHeight() );
             else
                dSprintf( caption, 256, "%s[%i] input%i - %s", name, pfx->getId(), i-1, pfx->mTexFilename[i-1].c_str() );
 
@@ -304,13 +304,13 @@ void PostEffectVis::onWindowClosed( GuiWindowCtrl *ctrl )
       }
    }
 
-   Con::errorf( "PostEffectVis::onWindowClosed, passed window (%s) [%i] was found.", StringTable->insert( ctrl->getName() ), ctrl->getId() );   
+   Con::errorf( "PostEffectVis::onWindowClosed, passed window (%s) [%i] was found.", StringTable->insert( ctrl->getName() ), ctrl->getId() );
 }
 
 GuiControl* PostEffectVis::_getContentControl()
 {
    if ( mContent == NULL )
-   {      
+   {
       GuiCanvas *canvas = NULL;
       if ( !Sim::findObject( "Canvas", canvas ) )
       {
@@ -322,7 +322,7 @@ GuiControl* PostEffectVis::_getContentControl()
       mContent->setPosition( 0, 0 );
       mContent->setExtent( 1024, 768 );
       mContent->setDataField( StringTable->insert( "noCursor" ), NULL, "1" );
-      mContent->setDataField( StringTable->insert( "profile" ), NULL, "GuiModelessDialogProfile" );   
+      mContent->setDataField( StringTable->insert( "profile" ), NULL, "GuiModelessDialogProfile" );
       mContent->registerObject( "PfxVisContent" );
 
       canvas->pushDialogControl( mContent, 100 );
@@ -335,10 +335,10 @@ void PostEffectVis::_setDefaultCaption( VisWindow &vis, U32 texIndex )
 {
    PostEffect *pfx = vis.pfx;
    GuiWindowCtrl *winCtrl = vis.window[texIndex];
-   
+
    if ( texIndex == Target )
    {
-      char caption[256];           
+      char caption[256];
       char name[256];
 
       if ( pfx->getName() == NULL || dStrlen( pfx->getName() ) == 0 )
@@ -352,7 +352,7 @@ void PostEffectVis::_setDefaultCaption( VisWindow &vis, U32 texIndex )
    }
    else
    {
-      char caption[256];            
+      char caption[256];
       char name[256];
 
       if ( pfx->getName() == NULL || dStrlen( pfx->getName() ) == 0 )
@@ -396,7 +396,7 @@ ConsoleStaticMethod( PfxVis, open, void, 2, 3, "( PostEffect, [bool clear = fals
 {
    if ( argc == 3 && dAtob( argv[2] ) )
       PFXVIS->clear();
-   
+
    PostEffect *pfx;
    if ( !Sim::findObject( argv[1], pfx ) )
    {

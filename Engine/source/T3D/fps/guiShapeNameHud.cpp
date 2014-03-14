@@ -89,7 +89,7 @@ ConsoleDocClass( GuiShapeNameHud,
    "The name and damage of objects within the control's display area are overlayed above the object.\n\n"
    "This GUI control must be a child of a TSControl, and a server connection and control object must be present. "
    "This is a stand-alone control and relies only on the standard base GuiControl.\n\n"
-   
+
    "@tsexample\n"
 		"\n new GuiShapeNameHud()"
 		"{\n"
@@ -106,7 +106,7 @@ ConsoleDocClass( GuiShapeNameHud,
 		"	distanceFade = \"15.0\";\n"
 		"};\n"
    "@endtsexample\n\n"
-   
+
    "@ingroup GuiGame\n"
 );
 
@@ -126,15 +126,15 @@ GuiShapeNameHud::GuiShapeNameHud()
 
 void GuiShapeNameHud::initPersistFields()
 {
-   addGroup("Colors");     
+   addGroup("Colors");
    addField( "fillColor",  TypeColorF, Offset( mFillColor, GuiShapeNameHud ), "Standard color for the background of the control." );
    addField( "frameColor", TypeColorF, Offset( mFrameColor, GuiShapeNameHud ), "Color for the control's frame."  );
    addField( "textColor",  TypeColorF, Offset( mTextColor, GuiShapeNameHud ), "Color for the text on this control." );
    addField( "labelFillColor",  TypeColorF, Offset( mLabelFillColor, GuiShapeNameHud ), "Color for the background of each shape name label." );
    addField( "labelFrameColor", TypeColorF, Offset( mLabelFrameColor, GuiShapeNameHud ), "Color for the frames around each shape name label."  );
-   endGroup("Colors");     
+   endGroup("Colors");
 
-   addGroup("Misc");       
+   addGroup("Misc");
    addField( "showFill",   TypeBool, Offset( mShowFill, GuiShapeNameHud ), "If true, we draw the background color of the control." );
    addField( "showFrame",  TypeBool, Offset( mShowFrame, GuiShapeNameHud ), "If true, we draw the frame of the control."  );
    addField( "showLabelFill",  TypeBool, Offset( mShowLabelFill, GuiShapeNameHud ), "If true, we draw a background for each shape name label." );
@@ -202,21 +202,21 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
    for (SimSetIterator itr(conn); *itr; ++itr) {
       ShapeBase* shape = dynamic_cast< ShapeBase* >(*itr);
       if ( shape ) {
-         if (shape != control && shape->getShapeName()) 
+         if (shape != control && shape->getShapeName())
          {
 
             // Target pos to test, if it's a player run the LOS to his eye
             // point, otherwise we'll grab the generic box center.
             Point3F shapePos;
-            if (shape->getTypeMask() & PlayerObjectType) 
+            if (shape->getTypeMask() & PlayerObjectType)
             {
                MatrixF eye;
 
                // Use the render eye transform, otherwise we'll see jittering
                shape->getRenderEyeTransform(&eye);
                eye.getColumn(3, &shapePos);
-            } 
-            else 
+            }
+            else
             {
                 // Use the render transform instead of the box center
                 // otherwise it'll jitter.

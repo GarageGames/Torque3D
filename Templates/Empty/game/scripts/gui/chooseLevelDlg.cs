@@ -58,7 +58,7 @@ function ChooseLevelDlg::onWake( %this )
 {
    CL_levelList.clear();
    ChooseLevelWindow->SmallPreviews.clear();
-   
+
    %i = 0;
    for(%file = findFirstFile($Server::MissionFileSpec); %file !$= ""; %file = findNextFile($Server::MissionFileSpec))
    {
@@ -67,14 +67,14 @@ function ChooseLevelDlg::onWake( %this )
       if ( !%this.launchInEditor )
       {
          if (strstr(%file, "newMission.mis") > -1)
-            continue;      
+            continue;
          if (strstr(%file, "newLevel.mis") > -1)
             continue;
       }
-      
+
       %this.addMissionFile( %file );
    }
-   
+
    // Also add the new level mission as defined in the world editor settings
    // if we are choosing a level to launch in the editor.
    if ( %this.launchInEditor )
@@ -189,7 +189,7 @@ function ChooseLevelDlg::onWake( %this )
       ChooseLevelWindow->SmallPreviews.setVisible(true);
 
       %extentX = getWord(ChooseLevelWindow.getExtent(), 0);
-      
+
       %extentY = getWord(ChooseLevelWindow->SmallPreviews.getPosition(), 1);
       %extentY = %extentY + getWord(ChooseLevelWindow->SmallPreviews.getExtent(), 1);
       %extentY = %extentY + 9;
@@ -214,7 +214,7 @@ function ChooseLevelDlg::addMissionFile( %this, %file )
 
       if (%LevelInfoObject.desc0 !$= "")
          %levelDesc = %LevelInfoObject.desc0;
-         
+
       %LevelInfoObject.delete();
    }
 
@@ -306,33 +306,33 @@ function ChooseLevelWindow::nextPreviews(%this)
 }
 
 //----------------------------------------
-function getLevelInfo( %missionFile ) 
+function getLevelInfo( %missionFile )
 {
    %file = new FileObject();
-   
+
    %LevelInfoObject = "";
-   
+
    if ( %file.openForRead( %missionFile ) ) {
 		%inInfoBlock = false;
-		
+
 		while ( !%file.isEOF() ) {
 			%line = %file.readLine();
 			%line = trim( %line );
-			
+
 			if( %line $= "new ScriptObject(LevelInfo) {" )
 				%inInfoBlock = true;
          else if( %line $= "new LevelInfo(theLevelInfo) {" )
 				%inInfoBlock = true;
 			else if( %inInfoBlock && %line $= "};" ) {
 				%inInfoBlock = false;
-				%LevelInfoObject = %LevelInfoObject @ %line; 
+				%LevelInfoObject = %LevelInfoObject @ %line;
 				break;
 			}
-			
+
 			if( %inInfoBlock )
-			   %LevelInfoObject = %LevelInfoObject @ %line @ " "; 	
+			   %LevelInfoObject = %LevelInfoObject @ %line @ " ";
 		}
-		
+
 		%file.close();
 	}
    %file.delete();
@@ -344,7 +344,7 @@ function getLevelInfo( %missionFile )
 
       return %LevelInfoObject;
 	}
-	
+
 	// Didn't find our LevelInfo
-   return 0; 
+   return 0;
 }

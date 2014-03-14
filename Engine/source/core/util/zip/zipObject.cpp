@@ -83,7 +83,7 @@ StreamObject *ZipObject::createStreamObject(Stream *stream)
          mStreamPool[i] = so;
          return so;
       }
-      
+
       if(so->getStream() == NULL)
       {
          // Existing unused stream, update it and return it
@@ -126,7 +126,7 @@ void ZipObject::closeArchive()
       StreamObject *so = mStreamPool[i];
       if(so && so->getStream() != NULL)
          closeFile(so);
-      
+
       SAFE_DELETE_OBJECT(mStreamPool[i]);
    }
    mStreamPool.clear();
@@ -254,7 +254,7 @@ DefineEngineMethod(ZipObject, openArchive, bool, ( const char* filename, const c
    "@param accessMode One of read, write or readwrite\n"
 
    "@return True is the archive was successfully opened.\n"
-   
+
    "@note If you wish to make any changes to the archive, be sure to open it "
    "with a write or readwrite access mode.\n"
 
@@ -305,7 +305,7 @@ DefineEngineMethod(ZipObject, openFileForRead, SimObject*, ( const char* filenam
 
 DefineEngineMethod(ZipObject, openFileForWrite, SimObject*, ( const char* filename ),,
    "@brief Open a file within the zip archive for writing to.\n\n"
-   
+
    "Be sure to close the file when you are done with it.\n"
 
    "@param filename The path and name of the file to open within the zip archive.\n"
@@ -340,7 +340,7 @@ DefineEngineMethod(ZipObject, closeFile, void, ( SimObject* stream ),,
 
 DefineEngineMethod(ZipObject, addFile, bool, ( const char* filename, const char* pathInZip, bool replace ), ( true ),
    "@brief Add a file to the zip archive\n\n"
-   
+
    "@param filename The path and name of the file to add to the zip archive.\n"
    "@param pathInZip The path and name to be given to the file within the zip archive.\n"
    "@param replace If a file already exists within the zip archive at the same location as this "

@@ -60,7 +60,7 @@ ConsoleDocClass( GuiInputCtrl,
 
 void GuiInputCtrl::initPersistFields()
 {
-   
+
 
    Parent::initPersistFields();
 }
@@ -83,7 +83,7 @@ bool GuiInputCtrl::onWake()
 
    if( !smDesignTime )
       mouseLock();
-      
+
    setFirstResponder();
 
    return( true );

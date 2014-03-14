@@ -116,7 +116,7 @@ public:
 
    DECLARE_CONOBJECT(GuiGameListOptionsCtrl);
    DECLARE_DESCRIPTION( "A control for showing pages of options that are gamepad friendly." );
-   
+
    virtual bool onAdd();
 
    /// Initializes fields accessible through the console.

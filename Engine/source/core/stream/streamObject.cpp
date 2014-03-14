@@ -144,7 +144,7 @@ const char *StreamObject::readLongString(U32 maxStringLen)
 
 DefineEngineMethod( StreamObject, getStatus, const char*, (),,
    "@brief Gets a printable string form of the stream's status\n\n"
-   
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -178,7 +178,7 @@ DefineEngineMethod( StreamObject, getStatus, const char*, (),,
 
 DefineEngineMethod( StreamObject, isEOS, bool, (),,
    "@brief Tests if the stream has reached the end of the file\n\n"
-   
+
    "This is an alternative name for isEOF. Both functions are interchangeable. This simply exists "
    "for those familiar with some C++ file I/O standards.\n\n"
 
@@ -208,10 +208,10 @@ DefineEngineMethod( StreamObject, isEOS, bool, (),,
 
 DefineEngineMethod( StreamObject, isEOF, bool, (),,
    "@brief Tests if the stream has reached the end of the file\n\n"
-   
+
    "This is an alternative name for isEOS. Both functions are interchangeable. This simply exists "
    "for those familiar with some C++ file I/O standards.\n\n"
-   
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -230,7 +230,7 @@ DefineEngineMethod( StreamObject, isEOF, bool, (),,
    "@endtsexample\n\n"
 
    "@return True if the parser has reached the end of the file, false otherwise\n"
-   
+
    "@see isEOS()")
 {
 	return object->isEOS();
@@ -240,12 +240,12 @@ DefineEngineMethod( StreamObject, isEOF, bool, (),,
 
 DefineEngineMethod( StreamObject, getPosition, S32, (),,
    "@brief Gets the position in the stream\n\n"
-   
+
    "The easiest way to visualize this is to think of a cursor in a text file. If you have moved the cursor by "
    "five characters, the current position is 5. If you move ahead 10 more characters, the position is now 15. "
    "For StreamObject, when you read in the line the position is increased by the number of characters parsed, "
    "the null terminator, and a newline.\n\n"
-   
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -266,7 +266,7 @@ DefineEngineMethod( StreamObject, getPosition, S32, (),,
    "@endtsexample\n\n"
 
    "@return Number of bytes which stream has parsed so far, null terminators and newlines are included\n"
-   
+
    "@see setPosition()")
 {
 	return object->getPosition();
@@ -274,12 +274,12 @@ DefineEngineMethod( StreamObject, getPosition, S32, (),,
 
 DefineEngineMethod( StreamObject, setPosition, bool, (S32 newPosition),,
    "@brief Gets the position in the stream\n\n"
-   
+
    "The easiest way to visualize this is to think of a cursor in a text file. If you have moved the cursor by "
    "five characters, the current position is 5. If you move ahead 10 more characters, the position is now 15. "
    "For StreamObject, when you read in the line the position is increased by the number of characters parsed, "
    "the null terminator, and a newline. Using setPosition allows you to skip to specific points of the file.\n\n"
-   
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -299,7 +299,7 @@ DefineEngineMethod( StreamObject, setPosition, bool, (S32 newPosition),,
    "@endtsexample\n\n"
 
    "@return Number of bytes which stream has parsed so far, null terminators and newlines are included\n"
-   
+
    "@see getPosition()")
 {
 	return object->setPosition(newPosition);
@@ -307,10 +307,10 @@ DefineEngineMethod( StreamObject, setPosition, bool, (S32 newPosition),,
 
 DefineEngineMethod( StreamObject, getStreamSize, S32, (),,
    "@brief Gets the size of the stream\n\n"
-   
+
    "The size is dependent on the type of stream being used. If it is a file stream, returned value will "
    "be the size of the file. If it is a memory stream, it will be the size of the allocated buffer.\n\n"
-      
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -336,10 +336,10 @@ DefineEngineMethod( StreamObject, getStreamSize, S32, (),,
 //-----------------------------------------------------------------------------
 DefineEngineMethod( StreamObject, readLine, const char*, (),,
    "@brief Read a line from the stream.\n\n"
-   
+
    "Emphasis on *line*, as in you cannot parse individual characters or chunks of data. "
    "There is no limitation as to what kind of data you can read.\n\n"
-   
+
    "@tsexample\n"
    "// Create a file stream object for reading\n"
    "// This file contains the following two lines:\n"
@@ -356,7 +356,7 @@ DefineEngineMethod( StreamObject, readLine, const char*, (),,
    "@endtsexample\n\n"
 
    "@return String containing the line of data that was just read\n"
-   
+
    "@see writeLine()")
 {
 	const char *str = object->readLine();
@@ -365,12 +365,12 @@ DefineEngineMethod( StreamObject, readLine, const char*, (),,
 
 DefineEngineMethod( StreamObject, writeLine, void, ( const char* line ),,
    "@brief Write a line to the stream, if it was opened for writing.\n\n"
-   
+
    "There is no limit as to what kind of data you can write. Any format and data is allowable, not just text. "
    "Be careful of what you write, as whitespace, current values, and literals will be preserved.\n\n"
 
    "@param line The data we are writing out to file."
-   
+
    "@tsexample\n"
    "// Create a file stream\n"
    "%fsObject = new FileStreamObject();\n\n"
@@ -384,7 +384,7 @@ DefineEngineMethod( StreamObject, writeLine, void, ( const char* line ),,
    "// Always remember to close a file stream when finished\n"
    "%fsObject.close();\n"
    "@endtsexample\n\n"
-   
+
    "@see readLine()")
 {
 	object->writeLine((U8 *)line);
@@ -398,7 +398,7 @@ DefineEngineMethod(StreamObject, readSTString, String, ( bool caseSensitive ), (
    "to match the read in string with what is already in the string table.\n"
    "@return The string that was read from the stream.\n"
    "@see writeString()"
-   
+
    "@note When working with these particular string reading and writing methods, the stream "
    "begins with the length of the string followed by the string itself, and does not include "
    "a NULL terminator.")
@@ -411,7 +411,7 @@ DefineEngineMethod(StreamObject, readString, String, (),,
    "@brief Read a string up to a maximum of 256 characters"
    "@return The string that was read from the stream.\n"
    "@see writeString()"
-   
+
    "@note When working with these particular string reading and writing methods, the stream "
    "begins with the length of the string followed by the string itself, and does not include "
    "a NULL terminator.")
@@ -425,7 +425,7 @@ DefineEngineMethod(StreamObject, readLongString, String, ( S32 maxLength ),,
    "@param maxLength The maximum number of characters to read in.\n"
    "@return The string that was read from the stream.\n"
    "@see writeLongString()"
-   
+
    "@note When working with these particular string reading and writing methods, the stream "
    "begins with the length of the string followed by the string itself, and does not include "
    "a NULL terminator.")
@@ -439,7 +439,7 @@ DefineEngineMethod(StreamObject, writeLongString, void, ( S32 maxLength, const c
    "@param maxLength The maximum number of characters that will be written.\n"
    "@param string The string to write out to the stream.\n"
    "@see readLongString()"
-   
+
    "@note When working with these particular string reading and writing methods, the stream "
    "begins with the length of the string followed by the string itself, and does not include "
    "a NULL terminator.")
@@ -453,7 +453,7 @@ DefineEngineMethod(StreamObject, writeString, void, ( const char* string, S32 ma
    "@param maxLength The maximum string length to write out with a default of 256 characters.  This "
    "value should not be larger than 256 as it is written to the stream as a single byte.\n"
    "@see readString()"
-   
+
    "@note When working with these particular string reading and writing methods, the stream "
    "begins with the length of the string followed by the string itself, and does not include "
    "a NULL terminator.")

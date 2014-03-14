@@ -23,15 +23,15 @@
 function initializeGuiEditor()
 {
    echo( " % - Initializing Gui Editor" );
-   
+
    // GUIs.
-   
+
    exec( "./gui/guiEditor.ed.gui" );
    exec( "./gui/guiEditorNewGuiDialog.ed.gui" );
    exec( "./gui/guiEditorPrefsDlg.ed.gui" );
    exec( "./gui/guiEditorSelectDlg.ed.gui" );
    exec( "./gui/EditorChooseGUI.ed.gui" );
-   
+
    // Scripts.
 
    exec( "./scripts/guiEditor.ed.cs" );
@@ -45,7 +45,7 @@ function initializeGuiEditor()
    exec( "./scripts/guiEditorStatusBar.ed.cs" );
    exec( "./scripts/guiEditorToolbox.ed.cs" );
    exec( "./scripts/guiEditorSelectDlg.ed.cs" );
-   
+
    exec( "./scripts/guiEditorNewGuiDialog.ed.cs" );
    exec( "./scripts/fileDialogs.ed.cs" );
    exec( "./scripts/guiEditorPrefsDlg.ed.cs" );

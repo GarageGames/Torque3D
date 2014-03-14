@@ -167,7 +167,7 @@ public:
    TurretShape();
    virtual ~TurretShape();
 
-   static void initPersistFields();   
+   static void initPersistFields();
 
    bool onAdd();
    void onRemove();

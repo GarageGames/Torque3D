@@ -37,7 +37,7 @@ class ProcessedMaterial;
 //-----------------------------------------------------------------------------
 // MaterialFeatureData, this is basically a series of flags which a material can
 // ask for.  Shader processed materials will use the shadergen system to accomplish this,
-// FF processed materials will do the best they can.  
+// FF processed materials will do the best they can.
 //-----------------------------------------------------------------------------
 struct MaterialFeatureData
 {
@@ -69,7 +69,7 @@ public:
 ///
 typedef Delegate< void( ProcessedMaterial *mat,
                         U32 stageNum,
-                        MaterialFeatureData &fd, 
+                        MaterialFeatureData &fd,
                         const FeatureSet &features) > MatFeaturesDelegate;
 
 #endif // _MATERIALFEATUREDATA_H_

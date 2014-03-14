@@ -248,10 +248,10 @@ bool GuiGameListMenuCtrl::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    // If we have a non-GuiGameListMenuProfile profile, try to
    // substitute it for DefaultListMenuProfile.
-      
+
    if( !hasValidProfile() )
    {
       GuiGameListMenuProfile* profile;
@@ -263,7 +263,7 @@ bool GuiGameListMenuCtrl::onAdd()
       }
       else
          Con::warnf( "GuiGameListMenuCtrl: substituted non-GuiGameListMenuProfile in %s for DefaultListMenuProfile", getName() );
-         
+
       setControlProfile( profile );
    }
 
@@ -274,10 +274,10 @@ bool GuiGameListMenuCtrl::onWake()
 {
    if( !Parent::onWake() )
       return false;
-      
+
    if( !hasValidProfile() )
       return false;
-      
+
    if( mRows.empty() )
    {
       Con::errorf( "GuiGameListMenuCtrl: %s can't be woken up without any rows. Please use \"addRow\" to add at least one row to the control before pushing it to the canvas.",
@@ -735,19 +735,19 @@ bool GuiGameListMenuProfile::onAdd()
 
    // We can't call enforceConstraints() here because incRefCount initializes
    // some of the things to enforce. Do a basic sanity check here instead.
-   
+
    if( !dStrlen(mBitmapName) )
    {
       Con::errorf( "GuiGameListMenuProfile: %s can't be created without a bitmap. Please add a 'Bitmap' property to the object definition.", getName() );
       return false;
    }
-   
+
    if( mRowSize.x < 0 )
    {
       Con::errorf( "GuiGameListMenuProfile: %s can't have a negative row width. Please change the row width to be non-negative.", getName() );
       return false;
    }
-   
+
    if( mRowSize.y < 0 )
    {
       Con::errorf( "GuiGameListMenuProfile: %s can't have a negative row height. Please change the row height to be non-negative.", getName() );

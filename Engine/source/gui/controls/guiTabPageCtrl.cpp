@@ -214,7 +214,7 @@ void GuiTabPageCtrl::onRender(Point2I offset,const RectI &updateRect)
 void GuiTabPageCtrl::inspectPostApply()
 {
    Parent::inspectPostApply();
-   
+
    if( mFitBook )
    {
       GuiTabBookCtrl* book = dynamic_cast< GuiTabBookCtrl* >( getParent() );

@@ -41,7 +41,7 @@ MODULE_BEGIN( ForestWindMgr )
       ManagedSingleton< ForestWindMgr >::createSingleton();
       ForestWindMgr::initConsole();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< ForestWindMgr >::deleteSingleton();
@@ -50,7 +50,7 @@ MODULE_BEGIN( ForestWindMgr )
 MODULE_END;
 
 
-ForestWindMgr::WindAdvanceSignal ForestWindMgr::smAdvanceSignal;  
+ForestWindMgr::WindAdvanceSignal ForestWindMgr::smAdvanceSignal;
 
 F32 ForestWindMgr::smWindEffectRadius = 25.0f;
 
@@ -65,7 +65,7 @@ ForestWindMgr::ForestWindMgr()
 ForestWindMgr::~ForestWindMgr()
 {
    IdToWindMap::Iterator sourceIter = mSources->begin();
-   for( ; sourceIter != mSources->end(); sourceIter++ )      
+   for( ; sourceIter != mSources->end(); sourceIter++ )
       delete (*sourceIter).value;
 
    delete mSources;
@@ -85,11 +85,11 @@ void ForestWindMgr::addEmitter( ForestWindEmitter *emitter )
 
 void ForestWindMgr::removeEmitter( ForestWindEmitter *emitter )
 {
-   ForestWindEmitterList::iterator iter = find( mEmitters.begin(), 
-                                                mEmitters.end(), 
+   ForestWindEmitterList::iterator iter = find( mEmitters.begin(),
+                                                mEmitters.end(),
                                                 emitter );
 
-   AssertFatal( iter != mEmitters.end(), 
+   AssertFatal( iter != mEmitters.end(),
       "SpeedTreeWindMgr::removeEmitter() - Bad emitter!" );
 
    mEmitters.erase( iter );
@@ -121,12 +121,12 @@ void ForestWindMgr::processTick()
                wind->processTick();
          }
       }
-   }   
+   }
 
    // Assign the new global wind value used by the particle system.
    {
       ForestWindEmitter *pWindEmitter = getGlobalWind();
-      if ( pWindEmitter == NULL )      
+      if ( pWindEmitter == NULL )
          ParticleEmitter::setWindVelocity( Point3F::Zero );
       else
       {
@@ -143,16 +143,16 @@ void ForestWindMgr::processTick()
 
    GameBase *cam = conn->getCameraObject();
    if ( !cam )
-      return;   
+      return;
 
    const Point3F &camPos = cam->getPosition();
 
-      
+
 
    // Gather TreePlacementInfo for trees near the camera.
    {
       PROFILE_SCOPE( ForestWindMgr_AdvanceTime_GatherTreePlacementInfo );
-      
+
       smAdvanceSignal.trigger( camPos, smWindEffectRadius, &mPlacementInfo );
    }
 
@@ -160,8 +160,8 @@ void ForestWindMgr::processTick()
    {
       PROFILE_SCOPE( ForestWindMgr_AdvanceTime_SwapSources );
       AssertFatal( mPrevSources->isEmpty(), "prev sources not empty!" );
-      
-      swap( mSources, mPrevSources );      
+
+      swap( mSources, mPrevSources );
 
       AssertFatal( mSources->isEmpty(), "swap failed!" );
    }
@@ -172,8 +172,8 @@ void ForestWindMgr::processTick()
 
       for( S32 i = 0; i < mPlacementInfo.size(); i++ )
       {
-         const TreePlacementInfo &info = mPlacementInfo[i];      
-         updateWind( camPos, info, timeDelta );    
+         const TreePlacementInfo &info = mPlacementInfo[i];
+         updateWind( camPos, info, timeDelta );
       }
 
       mPlacementInfo.clear();
@@ -238,8 +238,8 @@ ForestWindEmitter* ForestWindMgr::getGlobalWind()
    return NULL;
 }
 
-void ForestWindMgr::updateWind(  const Point3F &camPos, 
-                                 const TreePlacementInfo &info, 
+void ForestWindMgr::updateWind(  const Point3F &camPos,
+                                 const TreePlacementInfo &info,
                                  F32 timeDelta )
 {
    PROFILE_SCOPE(ForestWindMgr_updateWind);
@@ -279,7 +279,7 @@ void ForestWindMgr::updateWind(  const Point3F &camPos,
       ForestWind *wind = emitter->getWind();
 
       F32 strength = wind->getStrength();
-      
+
       if ( emitter->isRadialEmitter() )
       {
          Point3F closest = MathUtils::mClosestPointOnSegment( info.pos, top, emitter->getPosition() );

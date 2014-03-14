@@ -46,7 +46,7 @@ public:
 
    virtual GFXFormat selectSupportedFormat(GFXTextureProfile *profile,
 	   const Vector<GFXFormat> &formats, bool texture, bool mustblend, bool mustfilter);
-   
+
    static void enumerateAdapters( Vector<GFXAdapter*> &adapterList );
 
    virtual void enumerateVideoModes();
@@ -74,7 +74,7 @@ protected:
    static void createDirect3D9(LPDIRECT3D9 &d3d9, LPDIRECT3D9EX &d3d9ex);
    HRESULT createDevice(U32 adapter, D3DDEVTYPE deviceType, HWND hFocusWindow, DWORD behaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters);
 
-   virtual void _setTextureStageState( U32 stage, U32 state, U32 value );      
+   virtual void _setTextureStageState( U32 stage, U32 state, U32 value );
    void _validateMultisampleParams(D3DFORMAT format, D3DMULTISAMPLE_TYPE & aatype, DWORD & aalevel) const;
 };
 

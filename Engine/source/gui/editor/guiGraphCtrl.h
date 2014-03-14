@@ -30,7 +30,7 @@
 class GuiGraphCtrl : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
 
       enum Constants
@@ -47,7 +47,7 @@ class GuiGraphCtrl : public GuiControl
       };
 
    protected:
-   
+
       F32 mCenterY;
       StringTableEntry mAutoPlot[ MaxPlots ];
       U32 mAutoPlotDelay[ MaxPlots ];
@@ -59,9 +59,9 @@ class GuiGraphCtrl : public GuiControl
 
       GFXStateBlockRef  mSolidSB;
       GFXStateBlockRef  mBlendSB;
-      
+
    public:
-      
+
       GuiGraphCtrl();
 
       void addDatum( S32 plotID, F32 v );
@@ -78,7 +78,7 @@ class GuiGraphCtrl : public GuiControl
       DECLARE_CONOBJECT(GuiGraphCtrl);
       DECLARE_CATEGORY( "Gui Other" );
       DECLARE_DESCRIPTION( "A control that allows to plot curve graphs." );
-      
+
       static void initPersistFields();
 };
 

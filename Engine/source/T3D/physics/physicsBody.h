@@ -47,7 +47,7 @@ public:
       /// to get collision events and not get collision response.
       BF_TRIGGER = BIT( 0 ),
 
-      /// The body is kinematic and assumed to be moved by 
+      /// The body is kinematic and assumed to be moved by
       /// the game code via transforms.
       BF_KINEMATIC = BIT( 1 ),
 
@@ -55,15 +55,15 @@ public:
       BF_DEBRIS = BIT( 2 )
    };
 
-   /// Initialize the body with a collision shape 
+   /// Initialize the body with a collision shape
    /// and basic physics properties.
-   virtual bool init(   PhysicsCollision *shape, 
+   virtual bool init(   PhysicsCollision *shape,
                         F32 mass,
                         U32 bodyFlags,
-                        SceneObject *obj, 
+                        SceneObject *obj,
                         PhysicsWorld *world ) = 0;
 
-   /// Returns true if the object is a dynamic rigid body 
+   /// Returns true if the object is a dynamic rigid body
    /// animated by the physics simulation.
    ///
    /// Kinematics are not considered to be dynamic.
@@ -105,7 +105,7 @@ public:
 
    ///
    virtual void setMaterial(  F32 restitution,
-                              F32 friction, 
+                              F32 friction,
                               F32 staticFriction ) = 0;
 
    ///

@@ -29,7 +29,7 @@
 
 class GuiInspectorDynamicField : public GuiInspectorField
 {
-   typedef GuiInspectorField Parent;   
+   typedef GuiInspectorField Parent;
 
 public:
 
@@ -50,7 +50,7 @@ public:
    GuiControl* constructRenameControl();
 
    virtual bool updateRects();
-   virtual void setInspectorField( AbstractClassRep::Field *field, 
+   virtual void setInspectorField( AbstractClassRep::Field *field,
                                    StringTableEntry caption = NULL,
                                    const char *arrayIndex = NULL );
 
@@ -62,7 +62,7 @@ protected:
 
    /// Dynamic field dictionary entry for first target object only.
    SimFieldDictionary::Entry* mDynField;
-   
+
    SimObjectPtr<GuiTextEditCtrl> mRenameCtrl;
    GuiBitmapButtonCtrl*          mDeleteButton;
    RectI                         mDeleteRect;

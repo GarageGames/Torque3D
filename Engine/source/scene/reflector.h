@@ -70,10 +70,10 @@ public:
    static void initPersistFields();
 
    virtual void packData( BitStream *stream );
-   virtual void unpackData( BitStream* stream );   
+   virtual void unpackData( BitStream* stream );
    virtual bool preload( bool server, String &errorStr );
 
-   U32 texSize;   
+   U32 texSize;
    F32 nearDist;
    F32 farDist;
    U32 objectTypeMask;
@@ -103,7 +103,7 @@ public:
    bool isOccluded() const { return mOccluded; }
 
    /// Returns true if this reflector is in the process of rendering.
-   bool isRendering() const { return mIsRendering; }   
+   bool isRendering() const { return mIsRendering; }
 
    /// Signifies that the query has not finished yet and a new query
    /// does not need to be submitted.
@@ -117,7 +117,7 @@ protected:
 
    GFXOcclusionQuery *mOcclusionQuery;
 
-   bool mOccluded;   
+   bool mOccluded;
 
    SceneObject *mObject;
 
@@ -130,7 +130,7 @@ public:
 
    F32 score;
    U32 lastUpdateMs;
-   
+
 
 };
 
@@ -150,7 +150,7 @@ public:
                            ReflectorDesc *inDesc );
 
    virtual void unregisterReflector();
-   virtual void updateReflection( const ReflectParams &params );   
+   virtual void updateReflection( const ReflectParams &params );
 
    GFXCubemap* getCubemap() const { return cubemap; }
 
@@ -160,7 +160,7 @@ public:
 protected:
 
    GFXTexHandle depthBuff;
-   GFXTextureTargetRef renderTarget;   
+   GFXTextureTargetRef renderTarget;
    GFXCubemapHandle  cubemap;
    U32 mLastTexSize;
 
@@ -173,7 +173,7 @@ protected:
       U32 faceIdx;
       CubeReflector *cube;
 
-      virtual void updateReflection( const ReflectParams &params ) { cube->updateFace( params, faceIdx ); } 
+      virtual void updateReflection( const ReflectParams &params ) { cube->updateFace( params, faceIdx ); }
       virtual F32 calcScore( const ReflectParams &params );
    };
 
@@ -187,7 +187,7 @@ class PlaneReflector : public ReflectorBase
 
 public:
 
-   PlaneReflector() 
+   PlaneReflector()
    {
       refplane.set( Point3F(0,0,0), Point3F(0,0,1) );
       objectSpace = false;
@@ -200,7 +200,7 @@ public:
                            ReflectorDesc *inDesc );
 
    virtual F32 calcScore( const ReflectParams &params );
-   virtual void updateReflection( const ReflectParams &params ); 
+   virtual void updateReflection( const ReflectParams &params );
 
    /// Set up the GFX matrices
    void setGFXMatrices( const MatrixF &camTrans );
@@ -224,7 +224,7 @@ protected:
 public:
 
    GFXTextureTargetRef reflectTarget;
-   GFXTexHandle reflectTex;   
+   GFXTexHandle reflectTex;
    PlaneF refplane;
    bool objectSpace;
 };

@@ -149,7 +149,7 @@ ParticleEmitterData::ParticleEmitterData()
    textureName = 0;
    textureHandle = 0;
    highResOnly = true;
-   
+
    alignParticles = false;
    alignDirection = Point3F(0.0f, 1.0f, 0.0f);
 }
@@ -200,7 +200,7 @@ void ParticleEmitterData::initPersistFields()
 
       addFieldV( "ejectionOffset", TYPEID< F32 >(), Offset(ejectionOffset, ParticleEmitterData), &ejectionFValidator,
          "Distance along ejection Z axis from which to eject particles." );
-		 
+
       addFieldV( "ejectionOffsetVariance", TYPEID< F32 >(), Offset(ejectionOffsetVariance, ParticleEmitterData), &ejectionFValidator,
          "Distance Padding along ejection Z axis from which to eject particles." );
 
@@ -256,7 +256,7 @@ void ParticleEmitterData::initPersistFields()
          "@brief If true, use emitter specified colors instead of datablock colors.\n\n"
          "Useful for ShapeBase dust and WheeledVehicle wheel particle emitters that use "
          "the current material to control particle color." );
- 
+
       /// These fields added for support of user defined blend factors and optional particle sorting.
       //@{
       addField( "blendStyle", TYPEID< ParticleRenderInst::BlendStyle >(), Offset(blendStyle, ParticleEmitterData),
@@ -493,17 +493,17 @@ bool ParticleEmitterData::onAdd()
       softnessDistance = 0.0f;
    }
 
-   if (particleString == NULL && dataBlockIds.size() == 0) 
+   if (particleString == NULL && dataBlockIds.size() == 0)
    {
       Con::warnf(ConsoleLogEntry::General, "ParticleEmitterData(%s) no particleString, invalid datablock", getName());
       return false;
    }
-   if (particleString && particleString[0] == '\0') 
+   if (particleString && particleString[0] == '\0')
    {
       Con::warnf(ConsoleLogEntry::General, "ParticleEmitterData(%s) no particleString, invalid datablock", getName());
       return false;
    }
-   if (particleString && dStrlen(particleString) > 255) 
+   if (particleString && dStrlen(particleString) > 255)
    {
       Con::errorf(ConsoleLogEntry::General, "ParticleEmitterData(%s) particle string too long [> 255 chars]", getName());
       return false;
@@ -528,36 +528,36 @@ bool ParticleEmitterData::onAdd()
       //   particleString is once again a list of particle datablocks so it
       //   must be parsed to extract the particle references.
 
-      // First we parse particleString into a list of particle name tokens 
+      // First we parse particleString into a list of particle name tokens
       Vector<char*> dataBlocks(__FILE__, __LINE__);
       char* tokCopy = new char[dStrlen(particleString) + 1];
       dStrcpy(tokCopy, particleString);
 
       char* currTok = dStrtok(tokCopy, " \t");
-      while (currTok != NULL) 
+      while (currTok != NULL)
       {
          dataBlocks.push_back(currTok);
          currTok = dStrtok(NULL, " \t");
       }
-      if (dataBlocks.size() == 0) 
+      if (dataBlocks.size() == 0)
       {
          Con::warnf(ConsoleLogEntry::General, "ParticleEmitterData(%s) invalid particles string.  No datablocks found", getName());
          delete [] tokCopy;
          return false;
-      }    
+      }
 
-      // Now we convert the particle name tokens into particle datablocks and IDs 
+      // Now we convert the particle name tokens into particle datablocks and IDs
       particleDataBlocks.clear();
       dataBlockIds.clear();
 
-      for (U32 i = 0; i < dataBlocks.size(); i++) 
+      for (U32 i = 0; i < dataBlocks.size(); i++)
       {
          ParticleData* pData = NULL;
-         if (Sim::findObject(dataBlocks[i], pData) == false) 
+         if (Sim::findObject(dataBlocks[i], pData) == false)
          {
             Con::warnf(ConsoleLogEntry::General, "ParticleEmitterData(%s) unable to find particle datablock: %s", getName(), dataBlocks[i]);
          }
-         else 
+         else
          {
             particleDataBlocks.push_back(pData);
             dataBlockIds.push_back(pData->getId());
@@ -568,7 +568,7 @@ bool ParticleEmitterData::onAdd()
       delete [] tokCopy;
 
       // check that we actually found some particle datablocks
-      if (particleDataBlocks.size() == 0) 
+      if (particleDataBlocks.size() == 0)
       {
          Con::warnf(ConsoleLogEntry::General, "ParticleEmitterData(%s) unable to find any particle datablocks", getName());
          return false;
@@ -587,7 +587,7 @@ bool ParticleEmitterData::preload(bool server, String &errorStr)
       return false;
 
    particleDataBlocks.clear();
-   for (U32 i = 0; i < dataBlockIds.size(); i++) 
+   for (U32 i = 0; i < dataBlockIds.size(); i++)
    {
       ParticleData* pData = NULL;
       if (Sim::findObject(dataBlockIds[i], pData) == false)
@@ -639,7 +639,7 @@ bool ParticleEmitterData::preload(bool server, String &errorStr)
      }
      blendStyle = (useInvAlpha) ? ParticleRenderInst::BlendNormal : ParticleRenderInst::BlendAdditive;
    }
-   
+
    if( !server )
    {
       allocPrimBuffer();
@@ -805,7 +805,7 @@ bool ParticleEmitter::onNewDataBlock( GameBaseData *dptr, bool reload )
 
    //   Allocate particle structures and init the freelist. Member part_store
    //   is a Vector so that we can allocate more particles if partListInitSize
-   //   turns out to be too small. 
+   //   turns out to be too small.
    //
    if (mDataBlock->partListInitSize > 0)
    {
@@ -874,7 +874,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    PROFILE_SCOPE(ParticleEmitter_prepRenderImage);
 
    if (  mDead ||
-         n_parts == 0 || 
+         n_parts == 0 ||
          part_list_head.next == NULL )
       return;
 
@@ -896,8 +896,8 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    // Draw the system offscreen unless the highResOnly flag is set on the datablock
    ri->systemState = ( getDataBlock()->highResOnly ? PSS_AwaitingHighResDraw : PSS_AwaitingOffscreenDraw );
 
-   ri->modelViewProj = renderManager->allocUniqueXform(  GFX->getProjectionMatrix() * 
-                                                         GFX->getViewMatrix() * 
+   ri->modelViewProj = renderManager->allocUniqueXform(  GFX->getProjectionMatrix() *
+                                                         GFX->getViewMatrix() *
                                                          GFX->getWorldMatrix() );
 
    // Update position on the matrix before multiplying it
@@ -915,7 +915,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    else
      ri->diffuseTex = &*(part_list_head.next->dataBlock->textureHandle);
 
-   ri->softnessDistance = mDataBlock->softnessDistance; 
+   ri->softnessDistance = mDataBlock->softnessDistance;
 
    // Sort by texture too.
    ri->defaultKey = ri->diffuseTex ? (U32)ri->diffuseTex : (U32)ri->vertBuff;
@@ -1015,7 +1015,7 @@ void ParticleEmitter::emitParticles(const Point3F& start,
                                     const U32      numMilliseconds)
 {
    if( mDead ) return;
-   
+
    if( mDataBlock->particleDataBlocks.empty() )
       return;
 
@@ -1095,23 +1095,23 @@ void ParticleEmitter::emitParticles(const Point3F& start,
 
       //   This override-advance code is restored in order to correctly adjust
       //   animated parameters of particles allocated within the same frame
-      //   update. Note that ordering is important and this code correctly 
+      //   update. Note that ordering is important and this code correctly
       //   adds particles in the same newest-to-oldest ordering of the link-list.
       //
       // NOTE: We are assuming that the just added particle is at the head of our
       //  list.  If that changes, so must this...
       U32 advanceMS = numMilliseconds - currTime;
-      if (mDataBlock->overrideAdvance == false && advanceMS != 0) 
+      if (mDataBlock->overrideAdvance == false && advanceMS != 0)
       {
          Particle* last_part = part_list_head.next;
-         if (advanceMS > last_part->totalLifetime) 
+         if (advanceMS > last_part->totalLifetime)
          {
            part_list_head.next = last_part->next;
            n_parts--;
            last_part->next = part_freelist;
            part_freelist = last_part;
-         } 
-         else 
+         }
+         else
          {
             if (advanceMS != 0)
             {
@@ -1229,7 +1229,7 @@ void ParticleEmitter::updateBBox()
       minPt.setMin( part->pos - particleSize );
       maxPt.setMax( part->pos + particleSize );
    }
-   
+
    mObjBox = Box3F(minPt, maxPt);
    MatrixF temp = getTransform();
    setTransform(temp);
@@ -1263,7 +1263,7 @@ void ParticleEmitter::addParticle(const Point3F& pos,
         store_block[i].next = part_freelist;
         part_freelist = &store_block[i];
       }
-      mDataBlock->allocPrimBuffer(n_part_capacity); // allocate larger primitive buffer or will crash 
+      mDataBlock->allocPrimBuffer(n_part_capacity); // allocate larger primitive buffer or will crash
    }
    Particle* pNew = part_freelist;
    part_freelist = pNew->next;
@@ -1512,7 +1512,7 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
    tempBuff.reserve( n_parts*4 + 64); // make sure tempBuff is big enough
    ParticleVertexType *buffPtr = tempBuff.address(); // use direct pointer (faster)
 #endif
-   
+
    if (mDataBlock->orientParticles)
    {
       PROFILE_START(ParticleEmitter_copyToVB_Orient);
@@ -1695,7 +1695,7 @@ void ParticleEmitter::setupBillboard( Particle *part,
 
    // Here we deal with UVs for animated particle (billboard)
    if (part->dataBlock->animateTexture)
-   { 
+   {
      S32 fm = (S32)(part->currentAge*(1.0/1000.0)*part->dataBlock->framesPerSec);
      U8 fm_tile = part->dataBlock->animTexFrames[fm % part->dataBlock->numFrames];
      S32 uv[4];
@@ -1788,7 +1788,7 @@ void ParticleEmitter::setupOriented( Particle *part,
 
    // Here we deal with UVs for animated particle (oriented)
    if (part->dataBlock->animateTexture)
-   { 
+   {
       // Let particle compute the UV indices for current frame
       S32 fm = (S32)(part->currentAge*(1.0f/1000.0f)*part->dataBlock->framesPerSec);
       U8 fm_tile = part->dataBlock->animTexFrames[fm % part->dataBlock->numFrames];
@@ -1844,7 +1844,7 @@ void ParticleEmitter::setupOriented( Particle *part,
    ++lVerts;
 }
 
-void ParticleEmitter::setupAligned( const Particle *part, 
+void ParticleEmitter::setupAligned( const Particle *part,
                                     const ColorF &ambientColor,
                                     ParticleVertexType *lVerts )
 {
@@ -1899,7 +1899,7 @@ void ParticleEmitter::setupAligned( const Particle *part,
 
    // Here we deal with UVs for animated particle
    if (part->dataBlock->animateTexture)
-   { 
+   {
       // Let particle compute the UV indices for current frame
       S32 fm = (S32)(part->currentAge*(1.0f/1000.0f)*part->dataBlock->framesPerSec);
       U8 fm_tile = part->dataBlock->animTexFrames[fm % part->dataBlock->numFrames];
@@ -1957,12 +1957,12 @@ void ParticleEmitter::setupAligned( const Particle *part,
 bool ParticleEmitterData::reload()
 {
    // Clear out current particle data.
-   
+
    dataBlockIds.clear();
    particleDataBlocks.clear();
 
    // Parse out particle string.
-   
+
    U32 numUnits = 0;
    if( particleString )
       numUnits = StringUnit::getUnitCount( particleString, " \t" );
@@ -1987,9 +1987,9 @@ bool ParticleEmitterData::reload()
       particleDataBlocks.push_back( data );
       dataBlockIds.push_back( data->getId() );
    }
-   
+
    // Check that we actually found some particle datablocks.
-   
+
    if( particleDataBlocks.empty() )
    {
       Con::errorf( ConsoleLogEntry::General, "ParticleEmitterData(%s) unable to find any particle datablocks", getName() );
@@ -1998,9 +1998,9 @@ bool ParticleEmitterData::reload()
    }
 
    // Trigger reload.
-      
+
    mReloadSignal.trigger();
-   
+
    return true;
 }
 

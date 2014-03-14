@@ -18,22 +18,22 @@ class ExtendedClientProcessList : public ClientProcessList
    typedef ClientProcessList Parent;
 
 protected:
-   
+
    // ProcessList
    void onTickObject(ProcessObject *);
    void advanceObjects();
    void onAdvanceObjects();
-   
+
 public:
 
-   ExtendedClientProcessList();  
+   ExtendedClientProcessList();
 
    // ProcessList
    bool advanceTime( SimTime timeDelta );
-   
+
    // ClientProcessList
    void clientCatchup( GameConnection *conn );
-   
+
    static void init();
    static void shutdown();
 };
@@ -51,7 +51,7 @@ protected:
 
 public:
 
-   ExtendedServerProcessList();  
+   ExtendedServerProcessList();
 
    static void init();
    static void shutdown();

@@ -900,7 +900,7 @@ DefineTSShapeConstructorMethod( addCollisionDetail, bool, ( S32 size, const char
          setNodeTransform( colNodeName, TransformF::Identity );
    }
 
-   // Add the meshes to the shape => 
+   // Add the meshes to the shape =>
    for ( S32 i = 0; i < fit.getMeshCount(); i++ )
    {
       MeshFit::Mesh* mesh = fit.getMesh( i );

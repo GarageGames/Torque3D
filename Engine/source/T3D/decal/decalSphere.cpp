@@ -81,7 +81,7 @@ void DecalSphere::updateWorldSphere()
       aabb.intersect( mItems[ i ]->getWorldBox() );
 
    mWorldSphere = aabb.getBoundingSphere();
-      
+
    // Clear the zoning data so that it gets recomputed.
    mZones.clear();
 }

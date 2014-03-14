@@ -70,7 +70,7 @@ static int gifReadDataFn(GifFileType *gifinfo, GifByteType *data, int length)
 
 
 //--------------------------------------
-#if 0 
+#if 0
 // CodeReview - until we can write these, get rid of warning by disabling method.
 static int gifWriteDataFn(GifFileType *gifinfo, GifByteType *data, int length)
 {

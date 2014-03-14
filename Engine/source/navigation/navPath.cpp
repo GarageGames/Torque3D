@@ -501,7 +501,7 @@ void NavPath::prepRenderImage(SceneRenderState *state)
 {
    ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
    ri->renderDelegate.bind(this, &NavPath::renderSimple);
-   ri->type = RenderPassManager::RIT_Editor;      
+   ri->type = RenderPassManager::RIT_Editor;
    ri->translucentSort = true;
    ri->defaultKey = 1;
    state->getRenderPass()->addInst(ri);

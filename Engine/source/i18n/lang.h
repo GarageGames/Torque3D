@@ -57,7 +57,7 @@ public:
 
 	const UTF8 * getString(U32 id);
 	U32 addString(const UTF8 *str);
-	
+
 	// [tom, 4/22/2005] setString() added to help the language compiler a bit
 	void setString(U32 id, const UTF8 *str);
 
@@ -70,7 +70,7 @@ public:
 	void deactivateLanguage(void);
 
 	bool isLoaded(void)						{ return mStringTable.size() > 0; }
-	
+
 	S32 getNumStrings(void)					{ return mStringTable.size(); }
 };
 
@@ -80,7 +80,7 @@ public:
 class LangTable : public SimObject
 {
 	typedef SimObject Parent;
-	
+
 protected:
 	Vector<LangFile *> mLangTable;
 	S32 mDefaultLang;
@@ -98,8 +98,8 @@ public:
 	void setDefaultLanguage(S32 langid);
 	void setCurrentLanguage(S32 langid);
 	S32 getCurrentLanguage(void)			{ return mCurrentLang; }
-	
-	const UTF8 * getLangName(const S32 langid) const 
+
+	const UTF8 * getLangName(const S32 langid) const
 	{
 		if(langid < 0 || langid >= mLangTable.size())
 			return NULL;

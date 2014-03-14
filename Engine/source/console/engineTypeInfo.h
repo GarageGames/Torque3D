@@ -62,7 +62,7 @@ enum EngineTypeFlags
 class EngineEnumTable
 {
    public:
-   
+
       /// A value in an enumeration.
       ///
       /// The order of the fields in this structure is important as it is meant to be
@@ -75,43 +75,43 @@ class EngineEnumTable
 
          /// Name of the value.
          const char* mName;
-         
+
          /// Documentation string.
          const char* mDocString;
-         
+
          /// Return the name of this enum value.
          const char* getName() const { return mName; }
-         
+
          /// Return the documentation string of this enum value.
          const char* getDocString() const { return mDocString; }
-         
+
          /// Return the integer value of this enum value.
          S32 getInt() const { return mInt; }
-                  
+
          operator S32() const
          {
             return getInt();
          }
       };
-      
+
    protected:
-   
+
       /// Number of values in this enumeration.
       U32 mNumValues;
-      
+
       /// Records for all the enum values.
       const Value* mValues;
-      
+
    public:
-   
+
       ///
       EngineEnumTable( U32 numValues, const Value* values )
          :  mNumValues( numValues ),
             mValues( values ) {}
-      
+
       /// Return the number of Values in this enumeration/bitfield.
       U32 getNumValues() const { return mNumValues; }
-      
+
       /// Get the enum value at the given index.
       const Value& operator []( U32 index ) const
       {
@@ -125,7 +125,7 @@ class EngineEnumTable
 class EngineFieldTable
 {
    public:
-   
+
       /// A field descriptor in a field table.
       struct Field
       {
@@ -140,36 +140,36 @@ class EngineFieldTable
 
          /// Type of the field.
          const EngineTypeInfo* mType;
-         
+
          /// Offset of the field in instances.
          U32 mOffset;
 
          ///
          const char* getName() const { return mName; }
-         
+
          ///
          const char* getDocString() const { return mDocString; }
-         
+
          ///
          U32 getNumElements() const { return mNumElements; }
-         
+
          ///
          const EngineTypeInfo* getType() const { return mType; }
-         
+
          ///
          U32 getOffset() const { return mOffset; }
-      };   
-      
+      };
+
    protected:
-   
+
       /// Number of fields in this table.
       U32 mNumFields;
-      
+
       ///
       const Field* mFields;
 
    public:
-   
+
       /// Construct a field table from a NULL-terminated array of Field
       /// records.
       EngineFieldTable( const Field* fields )
@@ -179,15 +179,15 @@ class EngineFieldTable
          while( fields[ mNumFields ].getName() )
             mNumFields ++;
       }
-   
+
       ///
       EngineFieldTable( U32 numFields, const Field* fields )
          :  mNumFields( numFields ),
             mFields( fields ) {}
-      
+
       ///
       U32 getNumFields() const { return mNumFields; }
-      
+
       ///
       const Field& operator []( U32 index ) const
       {
@@ -212,69 +212,69 @@ enum EnginePropertyFlags
 ///
 /// - Read-only properties only have a getXXX and no setXXX method.
 /// - Static properties (value shared by all instances) don't take a 'this' parameter.
-/// - 
+/// -
 class EnginePropertyTable
 {
    public:
-   
+
       struct Property
       {
          /// Name of the property.
          const char* mName;
-         
+
          /// Doc string using Javadoc markup.
          const char* mDocString;
-         
+
          /// Indexed size of the property.  If 0, the property array is variable-sized.  If 1, the property
          /// is not indexed.  If >1, the property is a fixed-size array.
          U32 mNumElements;
 
          /// Combination of EnginePropertyFlags.
          U32 mFlags;
-         
+
          /// Return the name of the property.
          const char* getName() const { return mName; }
-         
+
          /// Return the number of indexed elements of the property.
          U32 getNumElements() const { return mNumElements; }
-         
+
          /// Return the documentation string for this property.
          const char* getDocString() const { return mDocString; }
-                           
+
          /// Test whether the property has a constant value.
          bool isConstant() const { return ( mFlags & EnginePropertyConstant ); }
-         
+
          /// Test whether the property value is transient, i.e. should not be serialized.
          bool isTransient() const { return ( mFlags & EnginePropertyTransient ); }
-         
+
          /// Test whether this property begins a group of properties.
          bool isGroupBegin() const { return ( mFlags & EnginePropertyGroupBegin ); }
-         
+
          /// Test whether this property ends a group of properties.
          bool isGroupEnd() const { return ( mFlags & EnginePropertyGroupEnd ); }
-         
+
          ///
          bool hideInInspectors() const { return ( mFlags & EnginePropertyHideInInspectors ); }
       };
-      
+
    protected:
-   
+
       /// Number of properties in this table.
       U32 mNumProperties;
-      
+
       /// Array of property definitions.
       const Property* mProperties;
-      
+
    public:
-   
+
       ///
       EnginePropertyTable( U32 numProperties, const Property* properties )
          :  mNumProperties( numProperties ),
             mProperties( properties ) {}
-      
+
       ///
       U32 getNumProperties() const { return mNumProperties; }
-      
+
       ///
       const Property& operator []( U32 index ) const
       {
@@ -288,18 +288,18 @@ class EnginePropertyTable
 class EngineArgumentTypeTable
 {
    protected:
-   
+
       /// Return type of the function type.
       const EngineTypeInfo* mReturnType;
-      
+
       /// Number of argument types of the function type.
       U32 mNumArguments;
-      
+
       /// Array of argument types of the function type.
       const EngineTypeInfo* const* mArgumentTypes;
-      
+
    public:
-      
+
       ///
       EngineArgumentTypeTable( const EngineTypeInfo* returnType,
                                U32 numArguments,
@@ -307,13 +307,13 @@ class EngineArgumentTypeTable
          :  mReturnType( returnType ),
             mNumArguments( numArguments ),
             mArgumentTypes( argumentTypes ) {}
-            
+
       /// Return the return type of the function type.
       const EngineTypeInfo* getReturnType() const { return mReturnType; }
-      
+
       /// Return the number of argument types of the function type.
       U32 getNumArguments() const { return mNumArguments; }
-      
+
       /// Get the argument type at the given index.
       const EngineTypeInfo* operator []( U32 index ) const
       {
@@ -325,7 +325,7 @@ class EngineArgumentTypeTable
 
 /// Networking related information for an engine API type.
 struct EngineTypeNetInfo
-{   
+{
    S32 mNetGroupMask;
    S32 mNetType;
    S32 mNetEventDir;
@@ -335,7 +335,7 @@ struct EngineTypeNetInfo
    {
    };
    #endif
-   
+
    EngineTypeNetInfo()
       : mNetGroupMask( 0 ),
         mNetType( 0 ),
@@ -355,50 +355,50 @@ struct EngineTypeNetInfo
 class EngineTypeInfo : public EngineExportScope
 {
    public:
-   
+
       DECLARE_CLASS( EngineTypeInfo, EngineExportScope );
-      
+
       // While we still have the old ConsoleObject system around, allow
       // them to retroactively install property tables.  Will be removed
       // when the console interop is removed and all classes are migrated
       // to the new system.
       template< typename T > friend class ConcreteClassRep;
-      
+
    protected:
-      
+
       /// Kind of type.
       EngineTypeKind mTypeKind;
 
       /// Size of an instance of this type.
       U32 mInstanceSize;
-      
+
       /// Combination of EngineTypeFlags.
       BitSet32 mTypeFlags;
-                              
+
       /// If this is an enumeration or bitfield type, this is the pointer to the enum table.
       const EngineEnumTable* mEnumTable;
-      
+
       /// If this is a struct type, this is the pointer to the field table.
       const EngineFieldTable* mFieldTable;
-      
+
       /// If this is a class type, this is the pointer to the property table.
       const EnginePropertyTable* mPropertyTable;
-      
+
       /// If this is a function type, this is the pointer to the argument type table.
       const EngineArgumentTypeTable* mArgumentTypeTable;
-      
+
       /// Pointer to type info object for engine type that this type subtypes from.  NULL if none.
       const EngineTypeInfo* mSuperType;
-      
+
       /// Networking related information for this type.
       mutable EngineTypeNetInfo mNetInfo;
-      
+
       /// Next type in the global link chain.
       const EngineTypeInfo* mNext;
-      
+
       /// Total number of defined types.
       static U32 smNumTypes;
-      
+
       /// First type in the global link chain of type info instances.
       static const EngineTypeInfo* smFirst;
 
@@ -426,14 +426,14 @@ class EngineTypeInfo : public EngineExportScope
       /// @param typeName Name of a registered engine type.
       /// @return Type info instance for @a typeName or NULL if no such type exists.
       static const EngineTypeInfo* getTypeInfoByName( const char* typeName );
-            
+
       /// Return the name of the type.
       /// @return The name of the type or an empty string if this is an anonymous type.
       const char* getTypeName() const { return getExportName(); }
 
       /// Return the kind this type.
       EngineTypeKind getTypeKind() const { return mTypeKind; }
-      
+
       /// Return the type info object of the engine type that this type subtypes from.
       const EngineTypeInfo* getSuperType() const { return mSuperType; }
 
@@ -442,73 +442,73 @@ class EngineTypeInfo : public EngineExportScope
       /// reference or pointer value semantics, this is thus the size of a pointer or reference and
       /// not the size of the actual instance.
       U32 getValueSize() const;
-      
+
       /// Return the
       U32 getInstanceSize() const { return mInstanceSize; }
-      
+
       /// Return true if the type is abstract.
       /// @note Only class and function types can be abstract.
       bool isAbstract() const { return mTypeFlags.test( EngineTypeAbstract ); }
-      
+
       /// Return true if the type can be instantiated from outside the engine.
       bool isInstantiable() const { return mTypeFlags.test( EngineTypeInstantiable ); }
-      
+
       /// Return true if the objects of this type can be disposed by the engine.
       bool isDisposable() const { return mTypeFlags.test( EngineTypeDisposable ); }
-      
+
       /// Return true if the type can have only a single instance.
       bool isSingleton() const { return mTypeFlags.test( EngineTypeSingleton ); }
-      
+
       /// Return true if the type is a variadic function type.
       bool isVariadic() const { return mTypeFlags.test( EngineTypeVariadic ); }
-                                    
+
       /// Test whether this type is a primitive type.
       bool isPrimitive() const { return ( getTypeKind() == EngineTypeKindPrimitive ); }
-      
+
       /// Test whether this type is an enumeration type.
       bool isEnum() const { return ( getTypeKind() == EngineTypeKindEnum ); }
-      
+
       /// Test whether this type is a bitfield type.
       bool isBitfield() const { return ( getTypeKind() == EngineTypeKindBitfield ); }
-      
+
       /// Test whether this type is a function type.
       bool isFunction() const { return ( getTypeKind() == EngineTypeKindFunction ); }
-      
+
       /// Test whether this type is a struct type.
       bool isStruct() const { return ( getTypeKind() == EngineTypeKindStruct ); }
 
       /// Test whether this is a class type.
       bool isClass() const { return ( getTypeKind() == EngineTypeKindClass ); }
-            
+
       /// Return the EngineEnumTable for this type (only for enumeration and bitfield types).
       const EngineEnumTable* getEnumTable() const { return mEnumTable; }
-      
+
       /// Return the EngineFieldTable for this type (only for struct types).
       const EngineFieldTable* getFieldTable() const { return mFieldTable; }
-      
+
       /// Return the EnginePropertyTable for this type (only for class types).
       const EnginePropertyTable* getPropertyTable() const { return mPropertyTable; }
-      
+
       ///
       const EngineArgumentTypeTable* getArgumentTypeTable() const { return mArgumentTypeTable; }
-      
+
       /// Return true if this type is a subtype of the given type.
       bool isSubtypeOf( const EngineTypeInfo* type ) const;
-      
+
       ///
       EngineTypeNetInfo& getNetInfo() const { return mNetInfo; }
-      
+
       /// @name Instancing
       /// @{
-      
+
       /// Create a new instance at the given address.
       /// @pre Must not be called for abstract types.
       virtual bool constructInstance( void* ptr ) const;
-      
+
       /// Destroy the instance at the given address.
       /// @pre Must not be called for abstract types.
       virtual void destructInstance( void* ptr ) const;
-      
+
       /// @}
 };
 
@@ -522,23 +522,23 @@ template< typename T >
 class EngineSimpleTypeInfo : public EngineTypeInfo
 {
    public:
-   
+
       typedef EngineTypeInfo Parent;
-      
+
       EngineSimpleTypeInfo( const char* name, EngineExportScope* scope, EngineTypeKind kind, const char* docString, EngineEnumTable* enumTable = NULL )
          : Parent( name, scope, kind, sizeof( T ), docString )
       {
          mEnumTable = enumTable;
          mTypeFlags.set( EngineTypeInstantiable );
       }
-      
+
       virtual bool constructInstance( void* ptr ) const
       {
          T* p = reinterpret_cast< T* >( ptr );
          *p = T();
          return true;
       }
-      
+
       virtual void destructInstance( void* ptr ) const
       {
          // Nothing to do.
@@ -551,23 +551,23 @@ template< typename T >
 class EngineStructTypeInfo : public EngineTypeInfo
 {
    public:
-   
+
       typedef EngineTypeInfo Parent;
-      
+
       EngineStructTypeInfo( const char* name, EngineExportScope* scope, const char* docString, EngineFieldTable* fieldTable )
          : Parent( name, scope, EngineTypeKindStruct, sizeof( T ), docString )
       {
          mFieldTable = fieldTable;
          mTypeFlags.set( EngineTypeInstantiable );
       }
-      
+
       virtual bool constructInstance( void* ptr ) const
       {
          T* p = reinterpret_cast< T* >( ptr );
          *p = T();
          return true;
       }
-   
+
       virtual void destructInstance( void* ptr ) const
       {
          T* p = reinterpret_cast< T* >( ptr );
@@ -581,9 +581,9 @@ template< typename T, typename Base >
 class EngineClassTypeInfo : public EngineTypeInfo
 {
    public:
-   
+
       typedef EngineTypeInfo Parent;
-      
+
       /// The documentation string set by CLASSDOC (if any).
       static const char* smDocString;
 
@@ -596,18 +596,18 @@ class EngineClassTypeInfo : public EngineTypeInfo
             mTypeFlags.set( EngineTypeAbstract );
          else if( IsTrueType< typename T::__IsInstantiableType >() )
             mTypeFlags.set( EngineTypeInstantiable );
-            
+
          if( IsTrueType< typename T::__IsDisposableType >() )
             mTypeFlags.set( EngineTypeDisposable );
          if( IsTrueType< typename T::__IsSingletonType >() )
             mTypeFlags.set( EngineTypeSingleton );
       }
-      
+
       virtual bool constructInstance( void* ptr ) const
       {
          return Base::_construct( ptr );
       }
-   
+
       virtual void destructInstance( void* ptr ) const
       {
          return Base::_destruct( ptr );
@@ -622,22 +622,22 @@ template< typename T >
 class EngineFunctionTypeInfo : public EngineTypeInfo
 {
    public:
-   
+
       typedef EngineTypeInfo Parent;
-      
+
       static _EngineArgumentTypeTable< T > ARGTYPES;
-      
+
       EngineFunctionTypeInfo()
          : Parent( "", &_SCOPE<>()(), EngineTypeKindFunction, sizeof( T* ), "" )
       {
          mArgumentTypeTable = &ARGTYPES;
-         
+
          if( ARGTYPES.VARIADIC )
             mTypeFlags.set( EngineTypeVariadic );
-         
+
          // Function types cannot be instantiated.
          mTypeFlags.set( EngineTypeAbstract );
-      }      
+      }
 };
 
 template< typename T > _EngineArgumentTypeTable< T > EngineFunctionTypeInfo< T >::ARGTYPES;

@@ -39,7 +39,7 @@ function UndoActionReparentObjects::create( %treeView )
       treeView = %treeView;
    };
    popInstantGroup();
-   
+
    return %action;
 }
 
@@ -48,11 +48,11 @@ function UndoActionReparentObjects::create( %treeView )
 function UndoActionReparentObjects::add( %this, %object, %oldParent, %newParent )
 {
    %index = %this.numObjects;
-   
+
    %this.objects[ %index ] = %object;
    %this.oldParents[ %index ] = %oldParent;
    %this.newParents[ %index ] = %newParent;
-   
+
    %this.numObjects = %this.numObjects + 1;
 }
 
@@ -65,11 +65,11 @@ function UndoActionReparentObjects::undo( %this )
    {
       %obj = %this.objects[ %i ];
       %group = %this.oldParents[ %i ];
-      
+
       if( isObject( %obj ) && isObject( %group ) )
          %obj.parentGroup = %group;
    }
-   
+
    if( isObject( %this.treeView ) )
       %this.treeView.update();
 }
@@ -83,7 +83,7 @@ function UndoActionReparentObjects::redo( %this )
    {
       %obj = %this.objects[ %i ];
       %group = %this.newParents[ %i ];
-      
+
       if( isObject( %obj ) && isObject( %group ) )
          %obj.parentGroup = %group;
    }

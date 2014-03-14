@@ -73,7 +73,7 @@ public:
    ///
    static void initLightFields();
 
-   /// 
+   ///
    static LightInfo* createLightInfo(LightInfo* light = NULL);
 
    ///
@@ -89,12 +89,12 @@ public:
    static inline LightManager* getActiveLM() { return smActiveLM; }
 
    /// Return an id string used to load different versions of light manager
-   /// specific assets.  It shoud be short, contain no spaces, and be safe 
+   /// specific assets.  It shoud be short, contain no spaces, and be safe
    /// for filename use.
    const char* getName() const { return mName.c_str(); }
 
    /// Return an id string used to load different versions of light manager
-   /// specific assets.  It shoud be short, contain no spaces, and be safe 
+   /// specific assets.  It shoud be short, contain no spaces, and be safe
    /// for filename use.
    const char* getId() const { return mId.c_str(); }
 
@@ -111,16 +111,16 @@ public:
    // Called when we don't want the light manager active (should clean up)
    virtual void deactivate();
 
-   // Returns the active scene lighting interface for this light manager.  
+   // Returns the active scene lighting interface for this light manager.
    virtual AvailableSLInterfaces* getSceneLightingInterface();
 
-   // Returns a "default" light info that callers should not free.  Used for instances where we don't actually care about 
+   // Returns a "default" light info that callers should not free.  Used for instances where we don't actually care about
    // the light (for example, setting default data for SceneData)
    virtual LightInfo* getDefaultLight();
 
    /// Returns the special light or the default light if useDefault is true.
    /// @see getDefaultLight
-   virtual LightInfo* getSpecialLight( SpecialLightTypesEnum type, 
+   virtual LightInfo* getSpecialLight( SpecialLightTypesEnum type,
                                        bool useDefault = true );
 
    /// Set a special light type.
@@ -141,18 +141,18 @@ public:
    void getAllUnsortedLights( Vector<LightInfo*> *list ) const;
 
    /// Sets shader constants / textures for light infos
-   virtual void setLightInfo( ProcessedMaterial *pmat, 
-                              const Material *mat, 
-                              const SceneData &sgData, 
+   virtual void setLightInfo( ProcessedMaterial *pmat,
+                              const Material *mat,
+                              const SceneData &sgData,
                               const SceneRenderState *state,
-                              U32 pass, 
+                              U32 pass,
                               GFXShaderConstBuffer *shaderConsts ) = 0;
 
    /// Allows us to set textures during the Material::setTextureStage call, return true if we've done work.
-   virtual bool setTextureStage( const SceneData &sgData, 
-                                 const U32 currTexFlag, 
-                                 const U32 textureSlot, 
-                                 GFXShaderConstBuffer *shaderConsts, 
+   virtual bool setTextureStage( const SceneData &sgData,
+                                 const U32 currTexFlag,
+                                 const U32 textureSlot,
+                                 GFXShaderConstBuffer *shaderConsts,
                                  ShaderConstHandles *handles ) = 0;
 
    /// Called when the static scene lighting (aka lightmaps) should be computed.
@@ -184,7 +184,7 @@ protected:
    /// A dummy default light used when no lights
    /// happen to be registered with the manager.
    LightInfo *mDefaultLight;
-  
+
    /// The list of global registered lights which is
    /// initialized before the scene is rendered.
    LightInfoList mRegisteredLights;
@@ -197,11 +197,11 @@ protected:
    /// @see setSpecialLight
    Point3F mCullPos;
 
-   /// The scene lighting interfaces for 
+   /// The scene lighting interfaces for
    /// lightmap generation.
    AvailableSLInterfaces *mAvailableSLInterfaces;
 
-   /// Attaches any LightInfoEx data for this manager 
+   /// Attaches any LightInfoEx data for this manager
    /// to the light info object.
    virtual void _addLightInfoEx( LightInfo *lightInfo ) = 0;
 
@@ -210,7 +210,7 @@ protected:
 
    /// Returns the static light manager map.
    static LightManagerMap& _getLightManagers();
-  
+
    /// The constant light manager name initialized
    /// in the constructor.
    const String mName;

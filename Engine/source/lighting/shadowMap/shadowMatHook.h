@@ -30,7 +30,7 @@
 #include "materials/matInstance.h"
 #endif
 
-// TODO: Move ShadowType enum to somewhere 
+// TODO: Move ShadowType enum to somewhere
 // with less dependancies.
 #ifndef _SHADOWMAPPASS_H_
 #include "lighting/shadowMap/shadowMapPass.h"
@@ -69,10 +69,10 @@ protected:
 
    static void _overrideFeatures(   ProcessedMaterial *mat,
                                     U32 stageNum,
-                                    MaterialFeatureData &fd, 
+                                    MaterialFeatureData &fd,
                                     const FeatureSet &features );
 
-   /// 
+   ///
    BaseMatInstance* mShadowMat[ShadowType_Count];
 
 

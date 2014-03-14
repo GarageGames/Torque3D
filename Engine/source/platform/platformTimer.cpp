@@ -51,7 +51,7 @@ TimeManager::TimeManager()
    mBackground = false;
    mTimer = PlatformTimer::create();
    Process::notify(this, &TimeManager::_updateTime, PROCESS_TIME_ORDER);
-   
+
    mForegroundThreshold = 5;
    mBackgroundThreshold = 10;
 }
@@ -137,9 +137,9 @@ ScriptTimerMan::~ScriptTimerMan()
 {
    TimerMap::Iterator itr = mTimers.begin();
 
-   for ( ; itr != mTimers.end(); itr++ )   
+   for ( ; itr != mTimers.end(); itr++ )
       delete itr->value;
-   
+
    mTimers.clear();
 }
 

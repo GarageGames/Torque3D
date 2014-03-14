@@ -41,7 +41,7 @@ public:
    DeferredPNGWriter();
    ~DeferredPNGWriter();
 
-   bool begin( GFXFormat format, S32 width, S32 height, Stream &stream, U32 compressionLevel );      
+   bool begin( GFXFormat format, S32 width, S32 height, Stream &stream, U32 compressionLevel );
    void append( GBitmap* bitmap, U32 rows );
    void end();
 };

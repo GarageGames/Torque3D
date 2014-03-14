@@ -42,7 +42,7 @@ package BootEditor {
 function GameConnection::initialControlSet( %this )
 {
    Parent::initialControlSet( %this );
-   
+
    toggleEditor( true );
    deactivatePackage( "BootEditor" );
 }
@@ -51,8 +51,8 @@ function GameConnection::initialControlSet( %this )
 
 //////////////////////////////////////////////////////////////////////////
 
-/// Checks the various dirty flags and returns true if the 
-/// mission or other related resources need to be saved.  
+/// Checks the various dirty flags and returns true if the
+/// mission or other related resources need to be saved.
 function EditorIsDirty()
 {
    // We kept a hard coded test here, but we could break these
@@ -60,14 +60,14 @@ function EditorIsDirty()
    %isDirty =  ( isObject( "ETerrainEditor" ) && ( ETerrainEditor.isMissionDirty || ETerrainEditor.isDirty ) )
                || ( isObject( "EWorldEditor" ) && EWorldEditor.isDirty )
                || ( isObject( "ETerrainPersistMan" ) && ETerrainPersistMan.hasDirty() );
-   
+
    // Give the editor plugins a chance to set the dirty flag.
    for ( %i = 0; %i < EditorPluginSet.getCount(); %i++ )
    {
       %obj = EditorPluginSet.getObject(%i);
-      %isDirty |= %obj.isDirty(); 
+      %isDirty |= %obj.isDirty();
    }
-   
+
    return %isDirty;
 }
 
@@ -78,11 +78,11 @@ function EditorClearDirty()
    ETerrainEditor.isDirty = false;
    ETerrainEditor.isMissionDirty = false;
    ETerrainPersistMan.clearAll();
-   
+
    for ( %i = 0; %i < EditorPluginSet.getCount(); %i++ )
    {
       %obj = EditorPluginSet.getObject(%i);
-      %obj.clearDirty();      
+      %obj.clearDirty();
    }
 }
 
@@ -97,7 +97,7 @@ function EditorQuitGame()
 }
 
 function EditorExitMission()
-{  
+{
    if( EditorIsDirty() && !isWebDemo() )
    {
       MessageBoxYesNoCancel("Level Modified", "Would you like to save your changes before exiting?", "EditorDoExitMission(true);", "EditorDoExitMission(false);", "");
@@ -126,7 +126,7 @@ function EditorDoExitMission(%saveFirst)
 function EditorOpenTorsionProject( %projectFile )
 {
    // Make sure we have a valid path to the Torsion installation.
-   
+
    %torsionPath = EditorSettings.value( "WorldEditor/torsionPath" );
    if( !isFile( %torsionPath ) )
    {
@@ -136,9 +136,9 @@ function EditorOpenTorsionProject( %projectFile )
       );
       return;
    }
-   
+
    // Determine the path to the .torsion file.
-   
+
    if( %projectFile $= "" )
    {
       %projectName = fileBase( getExecutableName() );
@@ -156,16 +156,16 @@ function EditorOpenTorsionProject( %projectFile )
          }
       }
    }
-   
+
    // Open the project in Torsion.
-   
+
    shellExecute( %torsionPath, "\"" @ %projectFile @ "\"" );
 }
 
 function EditorOpenFileInTorsion( %file, %line )
 {
    // Make sure we have a valid path to the Torsion installation.
-   
+
    %torsionPath = EditorSettings.value( "WorldEditor/torsionPath" );
    if( !isFile( %torsionPath ) )
    {
@@ -175,19 +175,19 @@ function EditorOpenFileInTorsion( %file, %line )
       );
       return;
    }
-   
+
    // If no file was specified, take the current mission file.
-   
+
    if( %file $= "" )
       %file = makeFullPath( $Server::MissionFile );
-  
+
    // Open the file in Torsion.
-   
+
    %args = "\"" @ %file;
    if( %line !$= "" )
       %args = %args @ ":" @ %line;
    %args = %args @ "\"";
-   
+
    shellExecute( %torsionPath, %args );
 }
 
@@ -196,7 +196,7 @@ function EditorOpenDeclarationInTorsion( %object )
    %fileName = %object.getFileName();
    if( %fileName $= "" )
       return;
-      
+
    EditorOpenFileInTorsion( makeFullPath( %fileName ), %object.getDeclarationLine() );
 }
 
@@ -204,7 +204,7 @@ function EditorNewLevel( %file )
 {
    if(isWebDemo())
       return;
-      
+
    %saveFirst = false;
    if ( EditorIsDirty() )
    {
@@ -212,7 +212,7 @@ function EditorNewLevel( %file )
       %saveFirst = MessageBox("Mission Modified", "Would you like to save changes to the current mission \"" @
          $Server::MissionFile @ "\" before creating a new mission?", "SaveDontSave", "Question") == $MROk;
    }
-      
+
    if(%saveFirst)
       EditorSaveMission();
 
@@ -262,7 +262,7 @@ function EditorSaveMission()
       MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "Canvas.showPurchaseScreen(\"objectlimit\");" );
       return;
    }
-   
+
    // first check for dirty and read-only files:
    if((EWorldEditor.isDirty || ETerrainEditor.isMissionDirty) && !isWriteableFileName($Server::MissionFile))
    {
@@ -285,7 +285,7 @@ function EditorSaveMission()
          }
       }
    }
-  
+
    // now write the terrain and mission files out:
 
    if(EWorldEditor.isDirty || ETerrainEditor.isMissionDirty)
@@ -300,27 +300,27 @@ function EditorSaveMission()
    }
 
    ETerrainPersistMan.saveDirty();
-      
+
    // Give EditorPlugins a chance to save.
    for ( %i = 0; %i < EditorPluginSet.getCount(); %i++ )
    {
       %obj = EditorPluginSet.getObject(%i);
       if ( %obj.isDirty() )
-         %obj.onSaveMission( $Server::MissionFile );      
-   } 
-   
+         %obj.onSaveMission( $Server::MissionFile );
+   }
+
    EditorClearDirty();
-   
+
    EditorGui.saveAs = false;
-   
+
    return true;
 }
 
 function EditorSaveMissionMenuDisableSave()
 {
    GenericPromptDialog-->GenericPromptWindow.text = "Warning";
-   GenericPromptDialog-->GenericPromptText.setText("Saving disabled in demo mode."); 
-   Canvas.pushDialog( GenericPromptDialog ); 
+   GenericPromptDialog-->GenericPromptText.setText("Saving disabled in demo mode.");
+   Canvas.pushDialog( GenericPromptDialog );
 }
 
 function EditorSaveMissionAs( %missionName )
@@ -330,7 +330,7 @@ function EditorSaveMissionAs( %missionName )
       MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "Canvas.showPurchaseScreen(\"objectlimit\");" );
       return;
    }
-   
+
    if(!$Pref::disableSaving && !isWebDemo())
    {
       // If we didn't get passed a new mission name then
@@ -350,16 +350,16 @@ function EditorSaveMissionAs( %missionName )
          {
             // Immediately override/set the levelsDirectory
             EditorSettings.setValue( "LevelInformation/levelsDirectory", collapseFilename(filePath( %dlg.FileName )) );
-            
+
             %missionName = %dlg.FileName;
          }
-         
+
          %dlg.delete();
-         
+
          if(! %ret)
             return;
       }
-                  
+
       if( fileExt( %missionName ) !$= ".mis" )
          %missionName = %missionName @ ".mis";
 
@@ -374,7 +374,7 @@ function EditorSaveMissionAs( %missionName )
       // reset them if saving fails.
       %newMissionName = fileBase(%missionName);
       %oldMissionName = fileBase(%saveMissionFile);
-      
+
       initContainerTypeSearch( $TypeMasks::TerrainObjectType );
       %savedTerrNames = new ScriptObject();
       for( %i = 0;; %i ++ )
@@ -384,16 +384,16 @@ function EditorSaveMissionAs( %missionName )
             break;
 
          %savedTerrNames.array[ %i ] = %terrainObject.terrainFile;
-         
+
          %terrainFilePath = makeRelativePath( filePath( %terrainObject.terrainFile ), getMainDotCsDir() );
          %terrainFileName = fileName( %terrainObject.terrainFile );
-                  
+
          // Workaround to have terrains created in an unsaved "New Level..." mission
          // moved to the correct place.
-         
+
          if( EditorGui.saveAs && %terrainFilePath $= "tools/art/terrains" )
             %terrainFilePath = "art/terrains";
-         
+
          // Try and follow the existing naming convention.
          // If we can't, use systematic terrain file names.
          if( strstr( %terrainFileName, %oldMissionName ) >= 0 )
@@ -413,24 +413,24 @@ function EditorSaveMissionAs( %missionName )
                break;
             }
          }
-         
+
          if( !%terrainObject.save( %newTerrainFile ) )
          {
             error( "Failed to save '" @ %newTerrainFile @ "'" );
             %copyTerrainsFailed = true;
             break;
          }
-         
+
          %terrainObject.terrainFile = %newTerrainFile;
       }
 
       ETerrainEditor.isDirty = false;
-      
+
       // Save the mission.
       if(%copyTerrainsFailed || !EditorSaveMission())
       {
          // It failed, so restore the mission and terrain filenames.
-         
+
          $Server::MissionFile = %saveMissionFile;
 
          initContainerTypeSearch( $TypeMasks::TerrainObjectType );
@@ -439,18 +439,18 @@ function EditorSaveMissionAs( %missionName )
             %terrainObject = containerSearchNext();
             if( !%terrainObject )
                break;
-               
+
             %terrainObject.terrainFile = %savedTerrNames.array[ %i ];
          }
       }
-      
+
       %savedTerrNames.delete();
    }
    else
    {
       EditorSaveMissionMenuDisableSave();
    }
-   
+
 }
 
 function EditorOpenMission(%filename)
@@ -475,7 +475,7 @@ function EditorOpenMission(%filename)
          ChangePath     = false;
          MustExist      = true;
       };
-            
+
       %ret = %dlg.Execute();
       if(%ret)
       {
@@ -483,13 +483,13 @@ function EditorOpenMission(%filename)
          EditorSettings.setValue( "LevelInformation/levelsDirectory", collapseFilename(filePath( %dlg.FileName )) );
          %filename = %dlg.FileName;
       }
-      
+
       %dlg.delete();
-      
+
       if(! %ret)
          return;
    }
-      
+
    // close the current editor, it will get cleaned up by MissionCleanup
    if( isObject( "Editor" ) )
       Editor.close( LoadingGui );
@@ -507,7 +507,7 @@ function EditorOpenMission(%filename)
    else
    {
       loadMission( %filename, true ) ;
-   
+
       pushInstantGroup();
 
       // recreate and open the editor
@@ -516,7 +516,7 @@ function EditorOpenMission(%filename)
       MissionCleanup.add( Editor.getUndoManager() );
       EditorGui.loadingMission = true;
       Editor.open();
-   
+
       popInstantGroup();
    }
 }
@@ -569,31 +569,31 @@ function EditorMakePrefab()
          ChangePath     = false;
          OverwritePrompt   = true;
       };
-            
+
       %ret = %dlg.Execute();
       if ( %ret )
       {
          $Pref::WorldEditor::LastPath = filePath( %dlg.FileName );
          %saveFile = %dlg.FileName;
       }
-      
+
       if( fileExt( %saveFile ) !$= ".prefab" )
          %saveFile = %saveFile @ ".prefab";
-      
+
       %dlg.delete();
-      
+
       if ( !%ret )
          return;
-      
-      EWorldEditor.makeSelectionPrefab( %saveFile );    
-      
-      EditorTree.buildVisibleTree( true );  
+
+      EWorldEditor.makeSelectionPrefab( %saveFile );
+
+      EditorTree.buildVisibleTree( true );
    }
 }
 
 function EditorExplodePrefab()
 {
-   //echo( "EditorExplodePrefab()" );  
+   //echo( "EditorExplodePrefab()" );
    EWorldEditor.explodeSelectedPrefab();
    EditorTree.buildVisibleTree( true );
 }
@@ -601,14 +601,14 @@ function EditorExplodePrefab()
 function EditorMount()
 {
    echo( "EditorMount" );
-   
+
    %size = EWorldEditor.getSelectionSize();
    if ( %size != 2 )
       return;
-      
+
    %a = EWorldEditor.getSelectedObject(0);
    %b = EWorldEditor.getSelectedObject(1);
-   
+
    //%a.mountObject( %b, 0 );
    EWorldEditor.mountRelative( %a, %b );
 }
@@ -616,9 +616,9 @@ function EditorMount()
 function EditorUnmount()
 {
    echo( "EditorUnmount" );
-   
+
    %obj = EWorldEditor.getSelectedObject(0);
-   %obj.unmount();   
+   %obj.unmount();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -635,19 +635,19 @@ function EditorViewMenu::onMenuSelect( %this )
 //////////////////////////////////////////////////////////////////////////
 
 function EditorEditMenu::onMenuSelect( %this )
-{      
+{
    // UndoManager is in charge of enabling or disabling the undo/redo items.
    Editor.getUndoManager().updateUndoMenu( %this );
-   
-   // SICKHEAD: It a perfect world we would abstract 
-   // cut/copy/paste with a generic selection object 
-   // which would know how to process itself.         
-   
+
+   // SICKHEAD: It a perfect world we would abstract
+   // cut/copy/paste with a generic selection object
+   // which would know how to process itself.
+
    // Give the active editor a chance at fixing up
    // the state of the edit menu.
    // Do we really need this check here?
    if ( isObject( EditorGui.currentEditor ) )
-      EditorGui.currentEditor.onEditMenuSelect( %this );   
+      EditorGui.currentEditor.onEditMenuSelect( %this );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -655,31 +655,31 @@ function EditorEditMenu::onMenuSelect( %this )
 function EditorMenuEditDelete()
 {
    if ( isObject( EditorGui.currentEditor ) )
-      EditorGui.currentEditor.handleDelete();      
+      EditorGui.currentEditor.handleDelete();
 }
 
 function EditorMenuEditDeselect()
 {
    if ( isObject( EditorGui.currentEditor ) )
-      EditorGui.currentEditor.handleDeselect();  
+      EditorGui.currentEditor.handleDeselect();
 }
 
 function EditorMenuEditCut()
 {
    if ( isObject( EditorGui.currentEditor ) )
-      EditorGui.currentEditor.handleCut();  
+      EditorGui.currentEditor.handleCut();
 }
 
 function EditorMenuEditCopy()
 {
    if ( isObject( EditorGui.currentEditor ) )
-      EditorGui.currentEditor.handleCopy();  
+      EditorGui.currentEditor.handleCopy();
 }
 
 function EditorMenuEditPaste()
 {
    if ( isObject( EditorGui.currentEditor ) )
-      EditorGui.currentEditor.handlePaste();  
+      EditorGui.currentEditor.handlePaste();
 }
 
 
@@ -690,10 +690,10 @@ function EditorMenuEditPaste()
 
 function EditorToolsMenu::onSelectItem(%this, %id)
 {
-   %toolName = getField( %this.item[%id], 2 );  
+   %toolName = getField( %this.item[%id], 2 );
 
    EditorGui.setEditor(%toolName, %paletteName  );
-   
+
    %this.checkRadioItem(0, %this.getItemCount(), %id);
    return true;
 }
@@ -741,27 +741,27 @@ function EditorFreeCameraTypeMenu::setupDefaultState(%this)
 }
 
 function EditorCameraSpeedMenu::onSelectItem(%this, %id, %text)
-{   
+{
    // Grab and set speed
-   %speed = getField( %this.item[%id], 2 ); 
+   %speed = getField( %this.item[%id], 2 );
    $Camera::movementSpeed = %speed;
-   
+
    // Update Editor
    %this.checkRadioItem(0, 6, %id);
-   
+
    // Update Toolbar TextEdit
    EWorldEditorCameraSpeed.setText( $Camera::movementSpeed );
-   
+
    // Update Toolbar Slider
    CameraSpeedDropdownCtrlContainer-->Slider.setValue( $Camera::movementSpeed );
-   
+
    return true;
 }
 function EditorCameraSpeedMenu::setupDefaultState(%this)
 {
    // Setup camera speed gui's. Both menu and editorgui
    %this.setupGuiControls();
-   
+
    //Grab and set speed
    %defaultSpeed = EditorSettings.value("LevelInformation/levels/" @ EditorGui.levelName @ "/cameraSpeed");
    if( %defaultSpeed $= "" )
@@ -770,13 +770,13 @@ function EditorCameraSpeedMenu::setupDefaultState(%this)
       %defaultSpeed = 25;
    }
    $Camera::movementSpeed = %defaultSpeed;
-   
+
    // Update Toolbar TextEdit
    EWorldEditorCameraSpeed.setText( %defaultSpeed );
-   
+
    // Update Toolbar Slider
    CameraSpeedDropdownCtrlContainer-->Slider.setValue( %defaultSpeed );
-   
+
    Parent::setupDefaultState(%this);
 }
 
@@ -785,11 +785,11 @@ function EditorCameraSpeedMenu::setupGuiControls(%this)
    // Default levelInfo params
    %minSpeed = 5;
    %maxSpeed = 200;
-   
+
    %speedA = EditorSettings.value("LevelInformation/levels/" @ EditorGui.levelName @ "/cameraSpeedMin");
    %speedB = EditorSettings.value("LevelInformation/levels/" @ EditorGui.levelName @ "/cameraSpeedMax");
    if( %speedA < %speedB )
-   {         
+   {
       if( %speedA == 0 )
       {
          if( %speedB > 1 )
@@ -804,12 +804,12 @@ function EditorCameraSpeedMenu::setupGuiControls(%this)
 
       %maxSpeed = %speedB;
    }
-   
+
    // Set up the camera speed items
    %inc = ( (%maxSpeed - %minSpeed) / (%this.getItemCount() - 1) );
    for( %i = 0; %i < %this.getItemCount(); %i++)
       %this.item[%i] = setField( %this.item[%i], 2, (%minSpeed + (%inc * %i)));
-   
+
    // Set up min/max camera slider range
    eval("CameraSpeedDropdownCtrlContainer-->Slider.range = \"" @ %minSpeed @ " " @ %maxSpeed @ "\";");
 }
@@ -822,7 +822,7 @@ function EditorWorldMenu::onMenuSelect(%this)
    %selSize = EWorldEditor.getSelectionSize();
    %lockCount = EWorldEditor.getSelectionLockCount();
    %hideCount = EWorldEditor.getSelectionHiddenCount();
-   
+
    %this.enableItem(0, %lockCount < %selSize);  // Lock Selection
    %this.enableItem(1, %lockCount > 0);  // Unlock Selection
    %this.enableItem(3, %hideCount < %selSize);  // Hide Selection
@@ -834,10 +834,10 @@ function EditorWorldMenu::onMenuSelect(%this)
    %this.enableItem(11, %selSize > 0 && %lockCount == 0);  // Reset Selected Scale
    %this.enableItem(12, %selSize > 0 && %lockCount == 0);  // Transform Selection
    %this.enableItem(14, %selSize > 0 && %lockCount == 0);  // Drop Selection
-   
+
    %this.enableItem(17, %selSize > 0); // Make Prefab
-   %this.enableItem(18, %selSize > 0); // Explode Prefab   
-   
+   %this.enableItem(18, %selSize > 0); // Explode Prefab
+
    %this.enableItem(20, %selSize > 1); // Mount
    %this.enableItem(21, %selSize > 0); // Unmount
 }
@@ -849,29 +849,29 @@ function EditorDropTypeMenu::onSelectItem(%this, %id, %text)
    // This sets up which drop script function to use when
    // a drop type is selected in the menu.
    EWorldEditor.dropType = getField(%this.item[%id], 2);
-   
+
    %this.checkRadioItem(0, (%this.getItemCount() - 1), %id);
-   
+
    return true;
 }
 
 function EditorDropTypeMenu::setupDefaultState(%this)
 {
    // Check the radio item for the currently set drop type.
-   
+
    %numItems = %this.getItemCount();
-   
+
    %dropTypeIndex = 0;
    for( ; %dropTypeIndex < %numItems; %dropTypeIndex ++ )
       if( getField( %this.item[ %dropTypeIndex ], 2 ) $= EWorldEditor.dropType )
          break;
- 
-   // Default to screenCenter if we didn't match anything.        
+
+   // Default to screenCenter if we didn't match anything.
    if( %dropTypeIndex > (%numItems - 1) )
       %dropTypeIndex = 4;
-   
+
    %this.checkRadioItem( 0, (%numItems - 1), %dropTypeIndex );
-      
+
    Parent::setupDefaultState(%this);
 }
 
@@ -881,7 +881,7 @@ function EditorAlignBoundsMenu::onSelectItem(%this, %id, %text)
 {
    // Have the editor align all selected objects by the selected bounds.
    EWorldEditor.alignByBounds(getField(%this.item[%id], 2));
-   
+
    return true;
 }
 
@@ -897,7 +897,7 @@ function EditorAlignCenterMenu::onSelectItem(%this, %id, %text)
 {
    // Have the editor align all selected objects by the selected axis.
    EWorldEditor.alignByAxis(getField(%this.item[%id], 2));
-   
+
    return true;
 }
 

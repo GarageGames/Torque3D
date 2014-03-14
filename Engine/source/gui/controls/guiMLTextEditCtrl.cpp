@@ -186,7 +186,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
 				}
 				return true;
 			}
-         
+
          default:
             break;
 		}
@@ -252,7 +252,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
             }
             insertChars( "\n", 1, mCursorPosition );
             return true;
-            
+
          default:
             break;
       }
@@ -456,7 +456,7 @@ void GuiMLTextEditCtrl::onRender(Point2I offset, const RectI& updateRect)
    Parent::onRender(offset, updateRect);
 
    // We are the first responder, draw our cursor in the appropriate position...
-   if (isFirstResponder()) 
+   if (isFirstResponder())
    {
       Point2I top, bottom;
       ColorI color;

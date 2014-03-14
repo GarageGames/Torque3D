@@ -53,7 +53,7 @@ public:
    void setDeleteOnClose(bool del)        { mDeleteOnClose = del; }
 
    virtual bool open(String filename, Torque::FS::File::AccessMode mode);
-   
+
    /// Open a temporary file in ReadWrite mode. The file will be deleted when the stream is closed.
    virtual bool open()
    {
@@ -66,10 +66,10 @@ public:
 
       if(mDeleteOnClose)
          Torque::FS::Remove(mFilename);
-      
+
    }
 
-   /// Disallow setPosition() 
+   /// Disallow setPosition()
    virtual bool setPosition(const U32 i_newPosition)        { return false; }
 
    /// Seek back to the start of the file.

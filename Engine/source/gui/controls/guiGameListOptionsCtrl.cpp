@@ -42,7 +42,7 @@ bool GuiGameListOptionsCtrl::onAdd()
 {
    if( !Parent::onAdd() )
       return false;
-      
+
    if( !hasValidProfile() )
    {
       GuiGameListOptionsProfile* profile;
@@ -54,10 +54,10 @@ bool GuiGameListOptionsCtrl::onAdd()
       }
       else
          Con::warnf( "GuiGameListOptionsCtrl: substituted non-GuiGameListOptionsProfile in %s for DefaultOptionsMenuProfile", getName() );
-         
+
       setControlProfile( profile );
    }
-      
+
    return true;
 }
 
@@ -310,7 +310,7 @@ bool GuiGameListOptionsCtrl::onKeyDown(const GuiEvent &event)
       case KEY_RIGHT:
          changeOption(1);
          return true;
-      
+
       default:
          break;
    }
@@ -497,7 +497,7 @@ GuiGameListOptionsProfile::GuiGameListOptionsProfile()
 void GuiGameListOptionsProfile::enforceConstraints()
 {
    Parent::enforceConstraints();
-   
+
    if( mHitAreaUpperLeft.x > mColumnSplit || mColumnSplit > mHitAreaLowerRight.x )
       Con::errorf( "GuiGameListOptionsProfile: You can't create %s with a ColumnSplit outside the hit area. You set the split to %d. Please change the ColumnSplit to be in the range [%d, %d].",
          getName(), mColumnSplit, mHitAreaUpperLeft.x, mHitAreaLowerRight.x);

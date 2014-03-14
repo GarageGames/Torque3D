@@ -47,11 +47,11 @@ GFXGLTextureManager::~GFXGLTextureManager()
 //-----------------------------------------------------------------------------
 // createTexture
 //-----------------------------------------------------------------------------
-GFXTextureObject *GFXGLTextureManager::_createTextureObject(   U32 height, 
+GFXTextureObject *GFXGLTextureManager::_createTextureObject(   U32 height,
                                                                U32 width,
                                                                U32 depth,
-                                                               GFXFormat format, 
-                                                               GFXTextureProfile *profile, 
+                                                               GFXFormat format,
+                                                               GFXTextureProfile *profile,
                                                                U32 numMipLevels,
                                                                bool forceMips,
                                                                S32 antialiasLevel,
@@ -65,7 +65,7 @@ GFXTextureObject *GFXGLTextureManager::_createTextureObject(   U32 height,
       AssertFatal( dynamic_cast<GFXGLTextureObject*>( inTex ), "GFXGLTextureManager::_createTexture() - Bad inTex type!" );
       retTex = static_cast<GFXGLTextureObject*>( inTex );
       retTex->release();
-   }      
+   }
    else
    {
       retTex = new GFXGLTextureObject( GFX, profile );
@@ -81,34 +81,34 @@ GFXTextureObject *GFXGLTextureManager::_createTextureObject(   U32 height,
 // innerCreateTexture
 //-----------------------------------------------------------------------------
 // This just creates the texture, no info is actually loaded to it.  We do that later.
-void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex, 
-                                               U32 height, 
-                                               U32 width, 
+void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
+                                               U32 height,
+                                               U32 width,
                                                U32 depth,
-                                               GFXFormat format, 
-                                               GFXTextureProfile *profile, 
+                                               GFXFormat format,
+                                               GFXTextureProfile *profile,
                                                U32 numMipLevels,
                                                bool forceMips)
 {
    // No 24 bit formats.  They trigger various oddities because hardware (and Apple's drivers apparently...) don't natively support them.
    if(format == GFXFormatR8G8B8)
       format = GFXFormatR8G8B8A8;
-      
+
    retTex->mFormat = format;
    retTex->mIsZombie = false;
    retTex->mIsNPoT2 = false;
-   
+
    GLenum binding = (depth == 0) ? GL_TEXTURE_2D : GL_TEXTURE_3D;
    if((profile->testFlag(GFXTextureProfile::RenderTarget) || profile->testFlag(GFXTextureProfile::ZTarget)) && (!isPow2(width) || !isPow2(height)) && !depth)
       retTex->mIsNPoT2 = true;
    retTex->mBinding = binding;
-   
+
    // Bind it
    glActiveTexture(GL_TEXTURE0);
    PRESERVE_2D_TEXTURE();
    PRESERVE_3D_TEXTURE();
    glBindTexture(binding, retTex->getHandle());
-   
+
    // Create it
    // TODO: Reenable mipmaps on render targets when Apple fixes their drivers
    if(forceMips && !retTex->mIsNPoT2)
@@ -135,16 +135,16 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
       if(depth && !isPow2(depth))
          depth = getNextPow2(depth);
    }
-   
+
    AssertFatal(GFXGLTextureInternalFormat[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid internal format");
    AssertFatal(GFXGLTextureFormat[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid format");
    AssertFatal(GFXGLTextureType[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid type");
-   
+
    if(binding != GL_TEXTURE_3D)
       glTexImage2D(binding, 0, GFXGLTextureInternalFormat[format], width, height, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
    else
       glTexImage3D(GL_TEXTURE_3D, 0, GFXGLTextureInternalFormat[format], width, height, depth, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
-   
+
    // Complete the texture
    glTexParameteri(binding, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(binding, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -152,15 +152,15 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
    glTexParameteri(binding, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
    if(binding == GL_TEXTURE_3D)
       glTexParameteri(binding, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-   
+
    // Get the size from GL (you never know...)
    GLint texHeight, texWidth, texDepth = 0;
-   
+
    glGetTexLevelParameteriv(binding, 0, GL_TEXTURE_WIDTH, &texWidth);
    glGetTexLevelParameteriv(binding, 0, GL_TEXTURE_HEIGHT, &texHeight);
    if(binding == GL_TEXTURE_3D)
       glGetTexLevelParameteriv(binding, 0, GL_TEXTURE_DEPTH, &texDepth);
-   
+
    retTex->mTextureSize.set(texWidth, texHeight, texDepth);
 }
 
@@ -174,16 +174,16 @@ static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
    U32 bufSize = pDL->getWidth(0) * pDL->getHeight(0) * pDL->getBytesPerPixel();
    glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, bufSize, NULL, GL_STREAM_DRAW);
    U8* pboMemory = (U8*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
-   
+
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
       GFX->getDeviceSwizzle32()->ToBuffer(pboMemory, pDL->getBits(0), bufSize);
    else
       dMemcpy(pboMemory, pDL->getBits(0), bufSize);
-   
+
    glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
-   
+
    glTexSubImage2D(texture->getBinding(), 0, 0, 0, pDL->getWidth(0), pDL->getHeight(0), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], NULL);
-   
+
    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 }
 
@@ -195,13 +195,13 @@ static void _slowTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *pDL)
 {
    GFXGLTextureObject *texture = static_cast<GFXGLTextureObject*>(aTexture);
-   
-   AssertFatal(texture->getBinding() == GL_TEXTURE_2D, 
+
+   AssertFatal(texture->getBinding() == GL_TEXTURE_2D,
       "GFXGLTextureManager::_loadTexture(GBitmap) - This method can only be used with 2D textures");
-      
+
    if(texture->getBinding() != GL_TEXTURE_2D)
       return false;
-         
+
    // No 24bit formats.
    if(pDL->getFormat() == GFXFormatR8G8B8)
       pDL->setFormat(GFXFormatR8G8B8A8);
@@ -209,14 +209,14 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *pDL)
    glActiveTexture(GL_TEXTURE0);
    PRESERVE_2D_TEXTURE();
    glBindTexture(texture->getBinding(), texture->getHandle());
-   
+
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
       _fastTextureLoad(texture, pDL);
    else
       _slowTextureLoad(texture, pDL);
-   
+
    glBindTexture(texture->getBinding(), 0);
-   
+
    return true;
 }
 
@@ -224,13 +224,13 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
 {
    AssertFatal(!(dds->mFormat == GFXFormatDXT2 || dds->mFormat == GFXFormatDXT4), "GFXGLTextureManager::_loadTexture - OpenGL does not support DXT2 or DXT4 compressed textures");
    GFXGLTextureObject* texture = static_cast<GFXGLTextureObject*>(aTexture);
-   
-   AssertFatal(texture->getBinding() == GL_TEXTURE_2D, 
+
+   AssertFatal(texture->getBinding() == GL_TEXTURE_2D,
       "GFXGLTextureManager::_loadTexture(DDSFile) - This method can only be used with 2D textures");
-      
+
    if(texture->getBinding() != GL_TEXTURE_2D)
       return false;
-   
+
    glActiveTexture(GL_TEXTURE0);
    PRESERVE_2D_TEXTURE();
    glBindTexture(texture->getBinding(), texture->getHandle());
@@ -267,7 +267,7 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
          glTexSubImage2D(texture->getBinding(), i, 0, 0, dds->getWidth(i), dds->getHeight(i), GFXGLTextureFormat[dds->mFormat], GFXGLTextureType[dds->mFormat], dds->mSurfaces[0]->mMips[i]);
    }
    glBindTexture(texture->getBinding(), 0);
-   
+
    return true;
 }
 
@@ -275,15 +275,15 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, void *raw)
 {
    if(aTexture->getDepth() < 1)
       return false;
-   
+
    GFXGLTextureObject* texture = static_cast<GFXGLTextureObject*>(aTexture);
-   
+
    glActiveTexture(GL_TEXTURE0);
    PRESERVE_3D_TEXTURE();
    glBindTexture(GL_TEXTURE_3D, texture->getHandle());
    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, texture->getWidth(), texture->getHeight(), texture->getDepth(), GFXGLTextureFormat[texture->mFormat], GFXGLTextureType[texture->mFormat], raw);
    glBindTexture(GL_TEXTURE_3D, 0);
-   
+
    return true;
 }
 
@@ -293,7 +293,7 @@ bool GFXGLTextureManager::_freeTexture(GFXTextureObject *texture, bool zombify /
       static_cast<GFXGLTextureObject*>(texture)->zombify();
    else
       static_cast<GFXGLTextureObject*>(texture)->release();
-      
+
    return true;
 }
 
@@ -301,7 +301,7 @@ bool GFXGLTextureManager::_refreshTexture(GFXTextureObject *texture)
 {
    U32 usedStrategies = 0;
    GFXGLTextureObject* realTex = static_cast<GFXGLTextureObject*>(texture);
-      
+
    if(texture->mProfile->doStoreBitmap())
    {
       if(realTex->isZombie())
@@ -311,13 +311,13 @@ bool GFXGLTextureManager::_refreshTexture(GFXTextureObject *texture)
       }
       if(texture->mBitmap)
          _loadTexture(texture, texture->mBitmap);
-      
+
       if(texture->mDDS)
          return false;
-      
+
       usedStrategies++;
    }
-   
+
    if(texture->mProfile->isRenderTarget() || texture->mProfile->isDynamic() || texture->mProfile->isZTarget() || !usedStrategies)
    {
       realTex->release();
@@ -326,8 +326,8 @@ bool GFXGLTextureManager::_refreshTexture(GFXTextureObject *texture)
       realTex->reloadFromCache();
       usedStrategies++;
    }
-   
+
    AssertFatal(usedStrategies < 2, "GFXGLTextureManager::_refreshTexture - Inconsistent profile flags (store bitmap and dynamic/target");
-   
+
    return true;
 }

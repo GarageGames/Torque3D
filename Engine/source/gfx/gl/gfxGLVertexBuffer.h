@@ -31,13 +31,13 @@
 #endif
 
 /// This is a vertex buffer which uses GL_ARB_vertex_buffer_object.
-class GFXGLVertexBuffer : public GFXVertexBuffer 
+class GFXGLVertexBuffer : public GFXVertexBuffer
 {
 public:
-	GFXGLVertexBuffer(   GFXDevice *device, 
-                        U32 numVerts, 
-                        const GFXVertexFormat *vertexFormat, 
-                        U32 vertexSize, 
+	GFXGLVertexBuffer(   GFXDevice *device,
+                        U32 numVerts,
+                        const GFXVertexFormat *vertexFormat,
+                        U32 vertexSize,
                         GFXBufferType bufferType );
 
 	~GFXGLVertexBuffer();
@@ -52,12 +52,12 @@ public:
    // GFXResource interface
    virtual void zombify();
    virtual void resurrect();
-   
+
 private:
    friend class GFXGLDevice;
 	/// GL buffer handle
 	GLuint mBuffer;
-   
+
    U8* mZombieCache;
 };
 

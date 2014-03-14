@@ -51,20 +51,20 @@ void dFree_aligned(void* p)
 void* dMemcpy(void *dst, const void *src, dsize_t size)
 {
    return memcpy(dst,src,size);
-}   
+}
 
 
 //--------------------------------------
 void* dMemmove(void *dst, const void *src, dsize_t size)
 {
    return memmove(dst,src,size);
-}  
- 
+}
+
 //--------------------------------------
 void* dMemset(void *dst, int c, dsize_t size)
 {
-   return memset(dst,c,size);   
-}   
+   return memset(dst,c,size);
+}
 
 //--------------------------------------
 int dMemcmp(const void *ptr1, const void *ptr2, dsize_t len)

@@ -23,44 +23,44 @@
 function initializeMeshRoadEditor()
 {
    echo(" % - Initializing Mesh Road Editor");
-     
+
    exec( "./meshRoadEditor.cs" );
    exec( "./meshRoadEditorGui.gui" );
    exec( "./meshRoadEditorToolbar.gui");
    exec( "./meshRoadEditorGui.cs" );
-   
-   MeshRoadEditorGui.setVisible( false );  
-   MeshRoadEditorOptionsWindow.setVisible( false );  
-   MeshRoadEditorToolbar.setVisible( false ); 
-   MeshRoadEditorTreeWindow.setVisible( false ); 
-   
+
+   MeshRoadEditorGui.setVisible( false );
+   MeshRoadEditorOptionsWindow.setVisible( false );
+   MeshRoadEditorToolbar.setVisible( false );
+   MeshRoadEditorTreeWindow.setVisible( false );
+
    EditorGui.add( MeshRoadEditorGui );
    EditorGui.add( MeshRoadEditorOptionsWindow );
    EditorGui.add( MeshRoadEditorToolbar );
    EditorGui.add( MeshRoadEditorTreeWindow );
-      
+
    new ScriptObject( MeshRoadEditorPlugin )
    {
       superClass = "EditorPlugin";
       editorGui = MeshRoadEditorGui;
    };
-   
+
    %map = new ActionMap();
    %map.bindCmd( keyboard, "backspace", "MeshRoadEditorGui.deleteNode();", "" );
-   %map.bindCmd( keyboard, "1", "MeshRoadEditorGui.prepSelectionMode();", "" );  
-   %map.bindCmd( keyboard, "2", "ToolsPaletteArray->MeshRoadEditorMoveMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "3", "ToolsPaletteArray->MeshRoadEditorRotateMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "4", "ToolsPaletteArray->MeshRoadEditorScaleMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "5", "ToolsPaletteArray->MeshRoadEditorAddRoadMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "=", "ToolsPaletteArray->MeshRoadEditorInsertPointMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "numpadadd", "ToolsPaletteArray->MeshRoadEditorInsertPointMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "-", "ToolsPaletteArray->MeshRoadEditorRemovePointMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "numpadminus", "ToolsPaletteArray->MeshRoadEditorRemovePointMode.performClick();", "" );  
-   %map.bindCmd( keyboard, "z", "MeshRoadEditorShowSplineBtn.performClick();", "" );  
-   %map.bindCmd( keyboard, "x", "MeshRoadEditorWireframeBtn.performClick();", "" );  
-   %map.bindCmd( keyboard, "v", "MeshRoadEditorShowRoadBtn.performClick();", "" );  
+   %map.bindCmd( keyboard, "1", "MeshRoadEditorGui.prepSelectionMode();", "" );
+   %map.bindCmd( keyboard, "2", "ToolsPaletteArray->MeshRoadEditorMoveMode.performClick();", "" );
+   %map.bindCmd( keyboard, "3", "ToolsPaletteArray->MeshRoadEditorRotateMode.performClick();", "" );
+   %map.bindCmd( keyboard, "4", "ToolsPaletteArray->MeshRoadEditorScaleMode.performClick();", "" );
+   %map.bindCmd( keyboard, "5", "ToolsPaletteArray->MeshRoadEditorAddRoadMode.performClick();", "" );
+   %map.bindCmd( keyboard, "=", "ToolsPaletteArray->MeshRoadEditorInsertPointMode.performClick();", "" );
+   %map.bindCmd( keyboard, "numpadadd", "ToolsPaletteArray->MeshRoadEditorInsertPointMode.performClick();", "" );
+   %map.bindCmd( keyboard, "-", "ToolsPaletteArray->MeshRoadEditorRemovePointMode.performClick();", "" );
+   %map.bindCmd( keyboard, "numpadminus", "ToolsPaletteArray->MeshRoadEditorRemovePointMode.performClick();", "" );
+   %map.bindCmd( keyboard, "z", "MeshRoadEditorShowSplineBtn.performClick();", "" );
+   %map.bindCmd( keyboard, "x", "MeshRoadEditorWireframeBtn.performClick();", "" );
+   %map.bindCmd( keyboard, "v", "MeshRoadEditorShowRoadBtn.performClick();", "" );
    MeshRoadEditorPlugin.map = %map;
-   
+
    MeshRoadEditorPlugin.initSettings();
 }
 
@@ -69,17 +69,17 @@ function destroyMeshRoadEditor()
 }
 
 function MeshRoadEditorPlugin::onWorldEditorStartup( %this )
-{     
+{
    // Add ourselves to the window menu.
    %accel = EditorGui.addToEditorsMenu( "Mesh Road Editor", "", MeshRoadEditorPlugin );
-   
+
    // Add ourselves to the ToolsToolbar
-   %tooltip = "Mesh Road Editor (" @ %accel @ ")";   
+   %tooltip = "Mesh Road Editor (" @ %accel @ ")";
    EditorGui.addToToolsToolbar( "MeshRoadEditorPlugin", "MeshRoadEditorPalette", expandFilename("tools/worldEditor/images/toolbar/mesh-road-editor"), %tooltip );
 
    //connect editor windows
    GuiWindowCtrl::attach( MeshRoadEditorOptionsWindow, MeshRoadEditorTreeWindow);
-   
+
    // Add ourselves to the Editor Settings window
    exec( "./meshRoadEditorSettingsTab.gui" );
    ESettingsWindow.addTabPage( EMeshRoadEditorSettingsPage );
@@ -88,61 +88,61 @@ function MeshRoadEditorPlugin::onWorldEditorStartup( %this )
 function MeshRoadEditorPlugin::onActivated( %this )
 {
    %this.readSettings();
-   
+
    ToolsPaletteArray->MeshRoadEditorAddRoadMode.performClick();
    EditorGui.bringToFront( MeshRoadEditorGui );
    MeshRoadEditorGui.setVisible( true );
    MeshRoadEditorGui.makeFirstResponder( true );
    MeshRoadEditorOptionsWindow.setVisible( true );
-   MeshRoadEditorToolbar.setVisible( true );  
+   MeshRoadEditorToolbar.setVisible( true );
    MeshRoadEditorTreeWindow.setVisible( true );
    MeshRoadTreeView.open(ServerMeshRoadSet,true);
    %this.map.push();
-   
+
    // Store this on a dynamic field
    // in order to restore whatever setting
    // the user had before.
    %this.prevGizmoAlignment = GlobalGizmoProfile.alignment;
-   
+
    // The DecalEditor always uses Object alignment.
    GlobalGizmoProfile.alignment = "Object";
-   
+
    // Set the status bar here until all tool have been hooked up
    EditorGuiStatusBar.setInfo("Mesh road editor.");
    EditorGuiStatusBar.setSelection("");
-   
+
    Parent::onActivated(%this);
 }
 
 function MeshRoadEditorPlugin::onDeactivated( %this )
-{   
+{
    %this.writeSettings();
-   
+
    MeshRoadEditorGui.setVisible( false );
    MeshRoadEditorOptionsWindow.setVisible( false );
-   MeshRoadEditorToolbar.setVisible( false );  
+   MeshRoadEditorToolbar.setVisible( false );
    MeshRoadEditorTreeWindow.setVisible( false );
    %this.map.pop();
-   
+
    // Restore the previous Gizmo
    // alignment settings.
-   GlobalGizmoProfile.alignment = %this.prevGizmoAlignment; 
-   
-   Parent::onDeactivated(%this);  
+   GlobalGizmoProfile.alignment = %this.prevGizmoAlignment;
+
+   Parent::onDeactivated(%this);
 }
 
 function MeshRoadEditorPlugin::onEditMenuSelect( %this, %editMenu )
 {
    %hasSelection = false;
-   
+
    if( isObject( MeshRoadEditorGui.road ) )
       %hasSelection = true;
-      
+
    %editMenu.enableItem( 3, false ); // Cut
    %editMenu.enableItem( 4, false ); // Copy
-   %editMenu.enableItem( 5, false ); // Paste  
+   %editMenu.enableItem( 5, false ); // Paste
    %editMenu.enableItem( 6, %hasSelection ); // Delete
-   %editMenu.enableItem( 8, false ); // Deselect   
+   %editMenu.enableItem( 8, false ); // Deselect
 }
 
 function MeshRoadEditorPlugin::handleDelete( %this )
@@ -152,7 +152,7 @@ function MeshRoadEditorPlugin::handleDelete( %this )
 
 function MeshRoadEditorPlugin::handleEscape( %this )
 {
-   return MeshRoadEditorGui.onEscapePressed();  
+   return MeshRoadEditorGui.onEscapePressed();
 }
 
 function MeshRoadEditorPlugin::isDirty( %this )
@@ -176,7 +176,7 @@ function MeshRoadEditorPlugin::onSaveMission( %this, %missionFile )
 function MeshRoadEditorPlugin::initSettings( %this )
 {
    EditorSettings.beginGroup( "MeshRoadEditor", true );
-   
+
    EditorSettings.setDefaultValue(  "DefaultWidth",         "10" );
    EditorSettings.setDefaultValue(  "DefaultDepth",         "5" );
    EditorSettings.setDefaultValue(  "DefaultNormal",        "0 0 1" );
@@ -186,14 +186,14 @@ function MeshRoadEditorPlugin::initSettings( %this )
    EditorSettings.setDefaultValue(  "TopMaterialName",      "DefaultRoadMaterialTop" );
    EditorSettings.setDefaultValue(  "BottomMaterialName",   "DefaultRoadMaterialOther" );
    EditorSettings.setDefaultValue(  "SideMaterialName",     "DefaultRoadMaterialOther" );
-   
+
    EditorSettings.endGroup();
 }
 
 function MeshRoadEditorPlugin::readSettings( %this )
 {
    EditorSettings.beginGroup( "MeshRoadEditor", true );
-   
+
    MeshRoadEditorGui.DefaultWidth         = EditorSettings.value("DefaultWidth");
    MeshRoadEditorGui.DefaultDepth         = EditorSettings.value("DefaultDepth");
    MeshRoadEditorGui.DefaultNormal        = EditorSettings.value("DefaultNormal");
@@ -203,14 +203,14 @@ function MeshRoadEditorPlugin::readSettings( %this )
    MeshRoadEditorGui.topMaterialName      = EditorSettings.value("TopMaterialName");
    MeshRoadEditorGui.bottomMaterialName   = EditorSettings.value("BottomMaterialName");
    MeshRoadEditorGui.sideMaterialName     = EditorSettings.value("SideMaterialName");
-   
-   EditorSettings.endGroup();  
+
+   EditorSettings.endGroup();
 }
 
 function MeshRoadEditorPlugin::writeSettings( %this )
 {
    EditorSettings.beginGroup( "MeshRoadEditor", true );
-   
+
    EditorSettings.setValue( "DefaultWidth",           MeshRoadEditorGui.DefaultWidth );
    EditorSettings.setValue( "DefaultDepth",           MeshRoadEditorGui.DefaultDepth );
    EditorSettings.setValue( "DefaultNormal",          MeshRoadEditorGui.DefaultNormal );
@@ -220,6 +220,6 @@ function MeshRoadEditorPlugin::writeSettings( %this )
    EditorSettings.setValue( "TopMaterialName",        MeshRoadEditorGui.topMaterialName );
    EditorSettings.setValue( "BottomMaterialName",     MeshRoadEditorGui.bottomMaterialName );
    EditorSettings.setValue( "SideMaterialName",       MeshRoadEditorGui.sideMaterialName );
-   
+
    EditorSettings.endGroup();
 }

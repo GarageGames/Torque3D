@@ -37,10 +37,10 @@
 class  GuiContainer : public GuiControl
 {
    public:
-   
+
       typedef GuiControl Parent;
-   
-      enum 
+
+      enum
       {
          updateSelf = BIT(1),
          updateParent = BIT(2),
@@ -52,9 +52,9 @@ class  GuiContainer : public GuiControl
       S32 mUpdateLayout; ///< Layout Update Mask
       ControlSizing mSizingOptions; ///< Control Sizing Options
       S32 mValidDockingMask;
-      
+
    public:
-   
+
       DECLARE_CONOBJECT(GuiContainer);
       DECLARE_CATEGORY( "Gui Containers" );
 
@@ -93,7 +93,7 @@ class  GuiContainer : public GuiControl
       ControlSizing getSizingOptions() const { return mSizingOptions; }
       void setSizingOptions(ControlSizing val) { mSizingOptions = val; }
 
-      /// @}   
+      /// @}
 
       /// @name Sizing Constraints
       /// @{
@@ -120,19 +120,19 @@ class  GuiContainer : public GuiControl
       /// @{
 
       /// Dock a Control with the given docking mode inside the given client rect.
-      /// @attention The clientRect passed in will be modified by the docking of 
+      /// @attention The clientRect passed in will be modified by the docking of
       ///    the control.  It will return the rect that remains after the docking operation.
       virtual bool dockControl( GuiContainer *control, S32 dockingMode, RectI &clientRect );
-      
+
       /// Update a Controls Anchor based on a delta sizing of it's parents extent
       /// This function should return true if the control was changed in size or position at all
       virtual bool anchorControl( GuiControl *control, const Point2I &deltaParentExtent );
-      
+
       /// @}
 
       /// @name GuiControl Inherited
       /// @{
-      
+
       virtual void onChildAdded(GuiControl* control);
       virtual void onChildRemoved(GuiControl* control);
       virtual bool resize( const Point2I &newPosition, const Point2I &newExtent );
@@ -141,14 +141,14 @@ class  GuiContainer : public GuiControl
       virtual void removeObject(SimObject *obj);
       virtual bool reOrder(SimObject* obj, SimObject* target);
       virtual void onPreRender();
-      
+
       /// GuiContainer deals with parentResized calls differently than GuiControl.  It will
       /// update the layout for all of it's non-docked child controls.  parentResized calls
       /// on the child controls will be handled by their default functions, but for our
       /// purposes we want at least our immediate children to use the anchors that they have
       /// set on themselves. - JDD [9/20/2006]
       virtual void parentResized(const RectI &oldParentRect, const RectI &newParentRect);
-      
+
       /// @}
 };
 /// @}

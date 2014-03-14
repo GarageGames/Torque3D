@@ -12,7 +12,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   
+
    new GuiStackControl() {
       StackingType = "Horizontal";
       HorizStacking = "Left to Right";
@@ -34,7 +34,7 @@
       hovertime = "1000";
       changeChildSizeToFit = false;
       padding = "2";
-                  
+
       new GuiBitmapButtonCtrl(FitToSelectionBtn) {
          canSaveDynamicFields = "0";
          internalName = "";
@@ -58,7 +58,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -67,7 +67,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-      
+
       new GuiTextCtrl() {
          profile = "ToolsGuiTextProfile";
          horizSizing = "right";
@@ -80,14 +80,14 @@
          maxLength = "255";
          helpTag = "0";
       };
-      
+
       new GuiControl(SnapToBar){
          isContainer = "1";
          profile = "ToolsGuiDefaultProfile";
          Position = "116 3";
          Extent = "123 27";
          Padding = "4";
-         
+
          new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "snappingSettingsBtn";
@@ -110,7 +110,7 @@
          useMouseEvents = "0";
          buttonMargin = "0 0";
          bitmap = "tools/gui/images/menubar/snapping-settings";
-         
+
          new GuiBitmapCtrl(){
             HorizSizing = "left";
             VertSizing = "top";
@@ -119,8 +119,8 @@
             MinExtent = "4 4";
             bitmap = "tools/gui/images/dropdown-button-arrow";
          };
-      }; 
-         
+      };
+
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "objectGridSnapBtn";
@@ -260,7 +260,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-         
+
       new GuiBitmapButtonCtrl() {
          canSaveDynamicFields = "0";
          internalName = "boundingBoxColBtn";
@@ -284,7 +284,7 @@
          buttonType = "ToggleButton";
          useMouseEvents = "0";
       };
-         
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -293,13 +293,13 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-      
+
       new GuiControl(ToggleButtonBar){
          isContainer = "1";
          profile = "ToolsGuiDefaultProfile";
          Position = "313 3";
          Extent = "65 27";
-         
+
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "centerObject";
@@ -322,7 +322,7 @@
             groupNum = "-1";
             buttonType = "ToggleButton";
             useMouseEvents = "0";
-            
+
             new GuiBitmapCtrl(){
                HorizSizing = "left";
                VertSizing = "top";
@@ -353,8 +353,8 @@
             bitmap = "tools/gui/images/menubar/world-transform";
             groupNum = "-1";
             buttonType = "ToggleButton";
-            text = "";  
-            
+            text = "";
+
             new GuiBitmapCtrl(){
                HorizSizing = "left";
                VertSizing = "top";
@@ -362,10 +362,10 @@
                Extent = "4 4";
                MinExtent = "4 4";
                bitmap = "tools/gui/images/dropdown-button-arrow";
-            };  
+            };
          };
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -374,13 +374,13 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-            
+
       new GuiControl(ToggleNodeBar){
          isContainer = "1";
          profile = "ToolsGuiDefaultProfile";
          Position = "386 3";
          Extent = "63 27";
-         
+
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "renderHandleBtn";
@@ -429,7 +429,7 @@
             useMouseEvents = "0";
          };
       };
-      
+
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -438,14 +438,14 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-            
+
       new GuiControl(PrefabBar){
          isContainer = "1";
          profile = "ToolsGuiDefaultProfile";
          Position = "386 3";
          Extent = "63 27";
          visible = true;
-         
+
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "makePrefabBtn";
@@ -500,8 +500,8 @@
          Position = getWord(EWorldEditorToolbar.position, 0)+getWord(ToggleButtonBar.Position, 0)+getWord(EWorldEditorToolbar-->centerObject.position, 0)-5 SPC getWord(EditorGuiToolbar.extent, 1)-1;
          Extent = "132 62";
          isContainer = "1";
-         visible = "0"; 
-         
+         visible = "0";
+
          new GuiIconButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "objectBoxBtn";
@@ -552,7 +552,7 @@
             buttonType = "RadioButton";
             useMouseEvents = "0";
          };
-         
+
          new GuiDecoyCtrl(objectCenterDropdownDecoy) {
             profile = "ToolsGuiDefaultProfile";
             horizSizing = "right";
@@ -573,7 +573,7 @@
          Extent = "147 62";
          isContainer = "1";
          visible ="0";
-         
+
          new GuiIconButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "worldTransformBtn";
@@ -599,7 +599,7 @@
             buttonType = "RadioButton";
             useMouseEvents = "0";
          };
-         
+
          new GuiIconButtonCtrl() {
             canSaveDynamicFields = "0";
             internalName = "objectTransformBtn";
@@ -625,7 +625,7 @@
             buttonType = "RadioButton";
             useMouseEvents = "0";
          };
-         
+
          new GuiDecoyCtrl(objectTransformDropdownDecoy) {
             profile = "ToolsGuiDefaultProfile";
             horizSizing = "right";
@@ -651,7 +651,7 @@ new GuiMouseEventCtrl(softSnapSizeSliderCtrlContainer, EditorGuiGroup) {
    visible = "1";
    helpTag = "0";
    class = "EditorDropdownSliderContainer";
-   
+
    new GuiSliderCtrl() {
       canSaveDynamicFields = "0";
       internalName = "slider";
@@ -659,7 +659,7 @@ new GuiMouseEventCtrl(softSnapSizeSliderCtrlContainer, EditorGuiGroup) {
       Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = firstWord(EWorldEditorToolbar-->softSnapSizeTextEdit.getGlobalPosition()) - 12 SPC 
+      position = firstWord(EWorldEditorToolbar-->softSnapSizeTextEdit.getGlobalPosition()) - 12 SPC
          (getWord(EWorldEditorToolbar-->softSnapSizeTextEdit.getGlobalPosition(), 1)) + 18;
       Extent = "112 20";
       MinExtent = "8 2";

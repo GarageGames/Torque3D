@@ -57,7 +57,7 @@ ConsoleDocClass( ReflectorDesc,
    "It is a dummy class for holding and exposing to the user a set of "
    "reflection related properties. Objects which support dynamic reflections "
    "may then reference a ReflectorDesc.\n\n"
-   
+
    "@tsexample\n"
    "datablock ReflectorDesc( ExampleReflectorDesc )\n"
    "{\n"
@@ -72,11 +72,11 @@ ConsoleDocClass( ReflectorDesc,
    "};\n"
    "@endtsexample\n"
 
-   "@see ShapeBaseData::cubeReflectorDesc\n"   
+   "@see ShapeBaseData::cubeReflectorDesc\n"
    "@ingroup enviroMisc"
 );
 
-ReflectorDesc::ReflectorDesc() 
+ReflectorDesc::ReflectorDesc()
 {
    texSize = 256;
    nearDist = 0.1f;
@@ -96,7 +96,7 @@ void ReflectorDesc::initPersistFields()
 {
    addGroup( "ReflectorDesc" );
 
-      addField( "texSize", TypeS32, Offset( texSize, ReflectorDesc ), 
+      addField( "texSize", TypeS32, Offset( texSize, ReflectorDesc ),
          "Size in pixels of the (square) reflection texture. For a cubemap "
          "this value is interpreted as size of each face." );
 
@@ -120,7 +120,7 @@ void ReflectorDesc::initPersistFields()
       addField( "maxRateMs", TypeS32, Offset( maxRateMs, ReflectorDesc ),
          "If less than maxRateMs has elapsed since this relfection was last "
          "updated, then do not update it again. This 'skip' can be disabled by "
-         "setting maxRateMs to zero." );         
+         "setting maxRateMs to zero." );
 
       addField( "useOcclusionQuery", TypeBool, Offset( useOcclusionQuery, ReflectorDesc ),
          "If available on the device use HOQs to determine if the reflective object "
@@ -200,11 +200,11 @@ F32 ReflectorBase::calcScore( const ReflectParams &params )
    PROFILE_SCOPE( ReflectorBase_calcScore );
 
    // First check the occlusion query to see if we're hidden.
-   if (  mDesc->useOcclusionQuery && 
+   if (  mDesc->useOcclusionQuery &&
          mOcclusionQuery )
    {
       GFXOcclusionQuery::OcclusionQueryStatus status = mOcclusionQuery->getStatus( false );
-      
+
       if ( status == GFXOcclusionQuery::Waiting )
       {
          mQueryPending = true;
@@ -224,8 +224,8 @@ F32 ReflectorBase::calcScore( const ReflectParams &params )
 
    // If we're disabled for any reason then there
    // is nothing more left to do.
-   if (  !mEnabled || 
-         mOccluded || 
+   if (  !mEnabled ||
+         mOccluded ||
          params.culler.isCulled( mObject->getWorldBox() ) )
    {
       score = 0;
@@ -235,10 +235,10 @@ F32 ReflectorBase::calcScore( const ReflectParams &params )
    // This mess is calculating a score based on LOD.
 
    /*
-   F32 sizeWS = getMax( object->getWorldBox().len_z(), 0.001f );      
-   Point3F cameraOffset = params.culler.getPosition() - object->getPosition(); 
-   F32 dist = getMax( cameraOffset.len(), 0.01f );      
-   F32 worldToScreenScaleY = ( params.culler.getNearDist() * params.viewportExtent.y ) / 
+   F32 sizeWS = getMax( object->getWorldBox().len_z(), 0.001f );
+   Point3F cameraOffset = params.culler.getPosition() - object->getPosition();
+   F32 dist = getMax( cameraOffset.len(), 0.01f );
+   F32 worldToScreenScaleY = ( params.culler.getNearDist() * params.viewportExtent.y ) /
                              ( params.culler.getNearTop() - params.culler.getNearBottom() );
    F32 sizeSS = sizeWS / dist * worldToScreenScaleY;
    */
@@ -252,7 +252,7 @@ F32 ReflectorBase::calcScore( const ReflectParams &params )
    F32 lodFactor = 1.0f; //sizeSS;
 
    F32 maxRate = getMax( (F32)mDesc->maxRateMs, 1.0f );
-   U32 delta = params.startOfUpdateMs - lastUpdateMs;      
+   U32 delta = params.startOfUpdateMs - lastUpdateMs;
    F32 timeFactor = getMax( (F32)delta / maxRate - 1.0f, 0.0f );
 
    score = mDesc->priority * timeFactor * lodFactor;
@@ -270,7 +270,7 @@ CubeReflector::CubeReflector()
 {
 }
 
-void CubeReflector::registerReflector( SceneObject *object, 
+void CubeReflector::registerReflector( SceneObject *object,
                                        ReflectorDesc *desc )
 {
    if ( mEnabled )
@@ -307,34 +307,34 @@ void CubeReflector::updateReflection( const ReflectParams &params )
    texDim = getMin( texDim, params.viewportExtent.x );
    texDim = getMin( texDim, params.viewportExtent.y );
 
-   bool texResize = ( texDim != mLastTexSize );  
+   bool texResize = ( texDim != mLastTexSize );
 
    const GFXFormat reflectFormat = REFLECTMGR->getReflectFormat();
 
-   if (  texResize || 
+   if (  texResize ||
          cubemap.isNull() ||
          cubemap->getFormat() != reflectFormat )
    {
       cubemap = GFX->createCubemap();
       cubemap->initDynamic( texDim, reflectFormat );
    }
-   
+
    GFXTexHandle depthBuff = LightShadowMap::_getDepthTarget( texDim, texDim );
 
    if ( renderTarget.isNull() )
-      renderTarget = GFX->allocRenderToTextureTarget();   
+      renderTarget = GFX->allocRenderToTextureTarget();
 
    GFX->pushActiveRenderTarget();
    renderTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
 
-  
+
    F32 oldVisibleDist = gClientSceneGraph->getVisibleDistance();
-   gClientSceneGraph->setVisibleDistance( mDesc->farDist );   
+   gClientSceneGraph->setVisibleDistance( mDesc->farDist );
 
 
    for ( U32 i = 0; i < 6; i++ )
       updateFace( params, i );
-   
+
 
    GFX->popActiveRenderTarget();
 
@@ -349,14 +349,14 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    GFXDEBUGEVENT_SCOPE( CubeReflector_UpdateFace, ColorI::WHITE );
 
    // store current matrices
-   GFXTransformSaver saver;   
+   GFXTransformSaver saver;
 
    // set projection to 90 degrees vertical and horizontal
    F32 left, right, top, bottom;
    MathUtils::makeFrustum( &left, &right, &top, &bottom, M_HALFPI_F, 1.0f, mDesc->nearDist );
    GFX->setFrustum( left, right, bottom, top, mDesc->nearDist, mDesc->farDist );
 
-   // We don't use a special clipping projection, but still need to initialize 
+   // We don't use a special clipping projection, but still need to initialize
    // this for objects like SkyBox which will use it during a reflect pass.
    gClientSceneGraph->setNonClipProjection( GFX->getProjectionMatrix() );
 
@@ -425,35 +425,35 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    LIGHTMGR->unregisterAllLights();
 
    // Clean up.
-   renderTarget->resolve();   
+   renderTarget->resolve();
 }
 
 F32 CubeReflector::calcFaceScore( const ReflectParams &params, U32 faceidx )
 {
    if ( Parent::calcScore( params ) <= 0.0f )
       return score;
-   
+
    VectorF vLookatPt(0.0f, 0.0f, 0.0f);
 
    switch( faceidx )
    {
    case 0 : // D3DCUBEMAP_FACE_POSITIVE_X:
-      vLookatPt = VectorF( 1.0f, 0.0f, 0.0f );      
+      vLookatPt = VectorF( 1.0f, 0.0f, 0.0f );
       break;
    case 1 : // D3DCUBEMAP_FACE_NEGATIVE_X:
-      vLookatPt = VectorF( -1.0f, 0.0f, 0.0f );      
+      vLookatPt = VectorF( -1.0f, 0.0f, 0.0f );
       break;
    case 2 : // D3DCUBEMAP_FACE_POSITIVE_Y:
-      vLookatPt = VectorF( 0.0f, 1.0f, 0.0f );      
+      vLookatPt = VectorF( 0.0f, 1.0f, 0.0f );
       break;
    case 3 : // D3DCUBEMAP_FACE_NEGATIVE_Y:
-      vLookatPt = VectorF( 0.0f, -1.0f, 0.0f );      
+      vLookatPt = VectorF( 0.0f, -1.0f, 0.0f );
       break;
    case 4 : // D3DCUBEMAP_FACE_POSITIVE_Z:
-      vLookatPt = VectorF( 0.0f, 0.0f, 1.0f );      
+      vLookatPt = VectorF( 0.0f, 0.0f, 1.0f );
       break;
    case 5: // D3DCUBEMAP_FACE_NEGATIVE_Z:
-      vLookatPt = VectorF( 0.0f, 0.0f, -1.0f );      
+      vLookatPt = VectorF( 0.0f, 0.0f, -1.0f );
       break;
    }
 
@@ -511,14 +511,14 @@ F32 PlaneReflector::calcScore( const ReflectParams &params )
    score += dot * mDesc->priority;
 
    // Also account for the camera movement.
-   score += ( camPos - mLastPos ).lenSquared() * mDesc->priority;   
+   score += ( camPos - mLastPos ).lenSquared() * mDesc->priority;
 
    return score;
 }
 
 void PlaneReflector::updateReflection( const ReflectParams &params )
 {
-   PROFILE_SCOPE(PlaneReflector_updateReflection);   
+   PROFILE_SCOPE(PlaneReflector_updateReflection);
    GFXDEBUGEVENT_SCOPE( PlaneReflector_updateReflection, ColorI::WHITE );
 
    mIsRendering = true;
@@ -531,12 +531,12 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    texDim = getMin( texDim, params.viewportExtent.x );
    texDim = getMin( texDim, params.viewportExtent.y );
 
-   bool texResize = ( texDim != mLastTexSize );  
+   bool texResize = ( texDim != mLastTexSize );
    mLastTexSize = texDim;
 
    const Point2I texSize( texDim, texDim );
 
-   if (  texResize || 
+   if (  texResize ||
          reflectTex.isNull() ||
          reflectTex->getFormat() != REFLECTMGR->getReflectFormat() )
       reflectTex = REFLECTMGR->allocRenderTarget( texSize );
@@ -545,7 +545,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
 
    // store current matrices
    GFXTransformSaver saver;
-   
+
    Point2I viewport(params.viewportExtent);
    if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
    {
@@ -562,7 +562,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       gScreenShot->tileFrustum( frustum );
 
    GFX->setFrustum( frustum );
-      
+
    // Store the last view info for scoring.
    mLastDir = params.query->cameraMatrix.getForwardVector();
    mLastPos = params.query->cameraMatrix.getPosition();
@@ -579,7 +579,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    reflectTarget->attachTexture( GFXTextureTarget::Color0, reflectTex );
    reflectTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
    GFX->pushActiveRenderTarget();
-   GFX->setActiveRenderTarget( reflectTarget );   
+   GFX->setActiveRenderTarget( reflectTarget );
 
    U32 objTypeFlag = -1;
    SceneCameraState reflectCameraState = SceneCameraState::fromGFX();
@@ -714,7 +714,7 @@ void PlaneReflector::setGFXMatrices( const MatrixF &camTrans )
       gClientSceneGraph->setNonClipProjection( (MatrixF&) GFX->getProjectionMatrix() );
       MatrixF clipProj = getFrustumClipProj( camTrans );
       GFX->setProjectionMatrix( clipProj );
-   }    
+   }
    else
    {
       // set world mat from new camera view
@@ -726,7 +726,7 @@ void PlaneReflector::setGFXMatrices( const MatrixF &camTrans )
       gClientSceneGraph->setNonClipProjection( (MatrixF&) GFX->getProjectionMatrix() );
       MatrixF clipProj = getFrustumClipProj( camReflectTrans );
       GFX->setProjectionMatrix( clipProj );
-   }   
+   }
 }
 
 MatrixF PlaneReflector::getCameraReflection( const MatrixF &camTrans )

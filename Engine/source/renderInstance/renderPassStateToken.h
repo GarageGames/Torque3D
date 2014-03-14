@@ -55,7 +55,7 @@ class RenderPassStateBin : public RenderBinManager
 
 protected:
    SimObjectPtr< RenderPassStateToken > mStateToken;
-   
+
    static bool _setStateToken( void* object, const char* index, const char* data )
    {
       RenderPassStateToken* stateToken;
@@ -71,7 +71,7 @@ protected:
       else
          return "0";
    }
-   
+
 public:
    DECLARE_CONOBJECT(RenderPassStateBin);
    static void initPersistFields();

@@ -42,7 +42,7 @@
 
 /// Look up table. Shift a byte >> 1, then look up how many bytes to expect after it.
 /// Contains -1's for illegal values.
-static const U8 sgFirstByteLUT[128] = 
+static const U8 sgFirstByteLUT[128] =
 {
    1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1, // 0x0F // single byte ascii
    1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1, // 0x1F // single byte ascii
@@ -57,12 +57,12 @@ static const U8 sgFirstByteLUT[128] =
 
 /// Look up table. Shift a 16-bit word >> 10, then look up whether it is a surrogate,
 ///  and which part. 0 means non-surrogate, 1 means 1st in pair, 2 means 2nd in pair.
-static const U8 sgSurrogateLUT[64] = 
+static const U8 sgSurrogateLUT[64] =
 {
-   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, // 0x0F 
-   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, // 0x1F 
-   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, // 0x2F 
-   0, 0, 0, 0,  0, 0, 1, 2,  0, 0, 0, 0,  0, 0, 0, 0, // 0x3F 
+   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, // 0x0F
+   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, // 0x1F
+   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, // 0x2F
+   0, 0, 0, 0,  0, 0, 1, 2,  0, 0, 0, 0,  0, 0, 0, 0, // 0x3F
 };
 
 /// Look up table. Feed value from firstByteLUT in, gives you
@@ -88,7 +88,7 @@ struct UTF16Cache
       mString = NULL;
       mLength = 0;
    }
-   
+
    UTF16Cache(UTF16 *str, U32 len)
    {
       mLength = len;
@@ -122,7 +122,7 @@ struct UTF16Cache
       U32 copy = getMin(mLength, lenToCopy);
       if(mString && copy > 0)
          dMemcpy(outBuffer, mString, copy * sizeof(UTF16));
-      
+
       if(nullTerminate)
          outBuffer[copy] = 0;
    }
@@ -166,7 +166,7 @@ U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
 
    U32 walked, nCodepoints;
    UTF32 middleman;
-   
+
    nCodepoints=0;
    while(*unistring != '\0' && nCodepoints < len)
    {
@@ -186,8 +186,8 @@ U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
    UTF16Cache cache(outbuffer, nCodepoints);
    sgUTF16Cache.insertUnique(hashKey, cache);
 #endif
-   
-   return nCodepoints; 
+
+   return nCodepoints;
 }
 
 //-----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
    PROFILE_START(convertUTF16toUTF8);
    U32 walked, nCodeunits, codeunitLen;
    UTF32 middleman;
-   
+
    nCodeunits=0;
    while( *unistring != '\0' && nCodeunits + 3 < len )
    {
@@ -210,7 +210,7 @@ U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
 
    nCodeunits = getMin(nCodeunits,len - 1);
    outbuffer[nCodeunits] = '\0';
-   
+
    PROFILE_END();
    return nCodeunits;
 }
@@ -246,21 +246,21 @@ U32 convertUTF16toUTF8DoubleNULL( const UTF16 *unistring, UTF8  *outbuffer, U32 
 UTF16* convertUTF8toUTF16( const UTF8* unistring)
 {
    PROFILE_SCOPE(convertUTF8toUTF16_create);
-   
+
    // allocate plenty of memory.
    U32 nCodepoints, len = dStrlen(unistring) + 1;
    FrameTemp<UTF16> buf(len);
-   
+
    // perform conversion
    nCodepoints = convertUTF8toUTF16( unistring, buf, len);
-   
+
    // add 1 for the NULL terminator the converter promises it included.
    nCodepoints++;
-   
+
    // allocate the return buffer, copy over, and return it.
    UTF16 *ret = new UTF16[nCodepoints];
    dMemcpy(ret, buf, nCodepoints * sizeof(UTF16));
-   
+
    return ret;
 }
 
@@ -272,13 +272,13 @@ UTF8*  convertUTF16toUTF8( const UTF16* unistring)
    // allocate plenty of memory.
    U32 nCodeunits, len = dStrlen(unistring) * 3 + 1;
    FrameTemp<UTF8> buf(len);
-      
+
    // perform conversion
    nCodeunits = convertUTF16toUTF8( unistring, buf, len);
-   
+
    // add 1 for the NULL terminator the converter promises it included.
    nCodeunits++;
-   
+
    // allocate the return buffer, copy over, and return it.
    UTF8 *ret = new UTF8[nCodeunits];
    dMemcpy(ret, buf, nCodeunits * sizeof(UTF8));
@@ -294,10 +294,10 @@ UTF8*  convertUTF16toUTF8( const UTF16* unistring)
 UTF32 oneUTF8toUTF32( const UTF8* codepoint, U32 *unitsWalked)
 {
    PROFILE_SCOPE(oneUTF8toUTF32);
-   
+
    // codepoints 6 codeunits long are read, but do not convert correctly,
    // and are filtered out anyway.
-   
+
    // early out for ascii
    if(!(*codepoint & 0x0080))
    {
@@ -305,11 +305,11 @@ UTF32 oneUTF8toUTF32( const UTF8* codepoint, U32 *unitsWalked)
          *unitsWalked = 1;
       return (UTF32)*codepoint;
    }
-   
+
    U32 expectedByteCount;
    UTF32  ret = 0;
    U8 codeunit;
-   
+
    // check the first byte ( a.k.a. codeunit ) .
    unsigned char c = codepoint[0];
    c = c >> 1;
@@ -318,7 +318,7 @@ UTF32 oneUTF8toUTF32( const UTF8* codepoint, U32 *unitsWalked)
    {
       // process 1st codeunit
       ret |= sgByteMask8LUT[expectedByteCount] & codepoint[0]; // bug?
-      
+
       // process trailing codeunits
       for(U32 i=1;i<expectedByteCount; i++)
       {
@@ -332,29 +332,29 @@ UTF32 oneUTF8toUTF32( const UTF8* codepoint, U32 *unitsWalked)
          {
             // found a bad codepoint - did not get a medial where we wanted one.
             // Dump the replacement, and claim to have parsed only 1 char,
-            // so that we'll dump a slew of replacements, instead of eating the next char.            
+            // so that we'll dump a slew of replacements, instead of eating the next char.
             ret = kReplacementChar;
             expectedByteCount = 1;
             break;
          }
       }
    }
-   else 
+   else
    {
-      // found a bad codepoint - got a medial or an illegal codeunit. 
+      // found a bad codepoint - got a medial or an illegal codeunit.
       // Dump the replacement, and claim to have parsed only 1 char,
       // so that we'll dump a slew of replacements, instead of eating the next char.
       ret = kReplacementChar;
       expectedByteCount = 1;
    }
-   
+
    if(unitsWalked != NULL)
       *unitsWalked = expectedByteCount;
-   
+
    // codepoints in the surrogate range are illegal, and should be replaced.
    if(isSurrogateRange(ret))
       ret = kReplacementChar;
-   
+
    // codepoints outside the Basic Multilingual Plane add complexity to our UTF16 string classes,
    // we've read them correctly so they won't foul the byte stream,
    // but we kill them here to make sure they wont foul anything else
@@ -372,7 +372,7 @@ UTF32  oneUTF16toUTF32(const UTF16* codepoint, U32 *unitsWalked)
    U32   unitCount;
    UTF32 ret = 0;
    UTF16 codeunit1,codeunit2;
-   
+
    codeunit1 = codepoint[0];
    expectedType = sgSurrogateLUT[codeunit1 >> 10];
    switch(expectedType)
@@ -430,7 +430,7 @@ UTF16 oneUTF32toUTF16(const UTF32 codepoint)
    // or, found an illegal codepoint!
    if(codepoint >= 0x10FFFF || isSurrogateRange(codepoint))
       return kReplacementChar;
-   
+
    // these are legal, we just don't want to deal with them.
    if(isAboveBMP(codepoint))
       return kReplacementChar;
@@ -450,7 +450,7 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
    //-----------------
    if(isSurrogateRange(working))  // found an illegal codepoint!
       working = kReplacementChar;
-   
+
    if(isAboveBMP(working))        // these are legal, we just dont want to deal with them.
       working = kReplacementChar;
 
@@ -467,11 +467,11 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
    //-----------------
    U8  mask = sgByteMask8LUT[0];            // 0011 1111
    U8  marker = ( ~mask << 1);            // 1000 0000
-   
+
    // Process the low order bytes, shifting the codepoint down 6 each pass.
    for( int i = bytecount-1; i > 0; i--)
    {
-      threeByteCodeunitBuf[i] = marker | (working & mask); 
+      threeByteCodeunitBuf[i] = marker | (working & mask);
       working >>= 6;
    }
 
@@ -479,7 +479,7 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
    mask = sgByteMask8LUT[bytecount];
    marker = ( ~mask << 1 );
    threeByteCodeunitBuf[0] = marker | working & mask;
-   
+
    PROFILE_END();
    return bytecount;
 }
@@ -493,7 +493,7 @@ U32 dStrlen(const UTF16 *unistring)
    U32 i = 0;
    while(unistring[i] != '\0')
       i++;
-      
+
 //   AssertFatal( wcslen(unistring) == i, "Incorrect length" );
 
    return i;
@@ -505,7 +505,7 @@ U32 dStrlen(const UTF32 *unistring)
    U32 i = 0;
    while(unistring[i] != '\0')
       i++;
-      
+
    return i;
 }
 
@@ -532,7 +532,7 @@ const UTF16* dStrrchr(const UTF16* unistring, U32 c)
 
    const UTF16* tmp = unistring + dStrlen(unistring);
    while( tmp >= unistring)
-   { 
+   {
       if(*tmp == c)
          return tmp;
       tmp--;
@@ -550,7 +550,7 @@ const UTF16* dStrchr(const UTF16* unistring, U32 c)
 {
    if(!unistring) return NULL;
    const UTF16* tmp = unistring;
-   
+
    while ( *tmp  && *tmp != c)
       tmp++;
 
@@ -574,22 +574,22 @@ const UTF8* getNthCodepoint(const UTF8 *unistring, const U32 n)
       if((*ret & 0xC0) != 0x80)
          charsseen++;
    }
-   
+
    return ret;
 }
 
-/* alternate utf-8 decode impl for speed, no error checking, 
+/* alternate utf-8 decode impl for speed, no error checking,
    left here for your amusement:
-   
+
    U32 codeunit = codepoint + expectedByteCount - 1;
    U32 i = 0;
    switch(expectedByteCount)
    {
-      case 6: ret |= ( *(codeunit--) & 0x3f ); i++;            
-      case 5: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);    
-      case 4: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);    
-      case 3: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);    
-      case 2: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);    
+      case 6: ret |= ( *(codeunit--) & 0x3f ); i++;
+      case 5: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);
+      case 4: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);
+      case 3: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);
+      case 2: ret |= ( *(codeunit--) & 0x3f ) << (6 * i++);
       case 1: ret |= *(codeunit) & byteMask8LUT[expectedByteCount] << (6 * i);
    }
 */

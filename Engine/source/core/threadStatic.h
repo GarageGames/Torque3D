@@ -44,7 +44,7 @@ protected:
 public:
    _TorqueThreadStatic()
 #ifdef TORQUE_ENABLE_THREAD_STATIC_METRICS
-    :  mHitCount( 0 ) 
+    :  mHitCount( 0 )
 #endif
    { };
 
@@ -74,7 +74,7 @@ class _TorqueThreadStaticReg
    // This is a vector of vectors which will store instances of thread static
    // variables. mThreadStaticInsances[0] will be the list of the initial values
    // of the statics, and then indexing for instanced versions will start at 1
-   // 
+   //
    // Note that the list of instances in mThreadStaticInstances[0] does not, and
    // must not get 'delete' called on it, because all members of the list are
    // pointers to statically allocated memory. All other lists will be contain
@@ -110,11 +110,11 @@ public:
    virtual ~_TorqueThreadStaticReg();
 
    // Accessors
-   static const TorqueThreadStaticList &getStaticList( const U32 idx = 0 ) 
-   { 
-      AssertFatal( getThreadStaticListVector().size() > idx, "Out of range static list" ); 
-      
-      return getThreadStaticListVector()[idx]; 
+   static const TorqueThreadStaticList &getStaticList( const U32 idx = 0 )
+   {
+      AssertFatal( getThreadStaticListVector().size() > idx, "Out of range static list" );
+
+      return getThreadStaticListVector()[idx];
    }
 
    static void destroyInstances();

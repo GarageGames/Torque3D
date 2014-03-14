@@ -96,7 +96,7 @@ GuiClockHud::GuiClockHud()
 
 void GuiClockHud::initPersistFields()
 {
-   addGroup("Misc");		
+   addGroup("Misc");
    addField( "showFill", TypeBool, Offset( mShowFill, GuiClockHud ), "If true, draws a background color behind the control.");
    addField( "showFrame", TypeBool, Offset( mShowFrame, GuiClockHud ), "If true, draws a frame around the control." );
    addField( "fillColor", TypeColorF, Offset( mFillColor, GuiClockHud ), "Standard color for the background of the control." );
@@ -140,11 +140,11 @@ void GuiClockHud::onRender(Point2I offset, const RectI &updateRect)
 
 //-----------------------------------------------------------------------------
 
-void GuiClockHud::setReverseTime(F32 time)  
-{  
-   // Set the current time in seconds.  
-   mTimeReversed = true;  
-   mTimeOffset = S32(time * 1000) + Platform::getVirtualMilliseconds();  
+void GuiClockHud::setReverseTime(F32 time)
+{
+   // Set the current time in seconds.
+   mTimeReversed = true;
+   mTimeOffset = S32(time * 1000) + Platform::getVirtualMilliseconds();
 }
 
 void GuiClockHud::setTime(F32 time)
@@ -158,7 +158,7 @@ F32 GuiClockHud::getTime()
 {
    // Return elapsed time in seconds.
    if(mTimeReversed)
-      return F32(mTimeOffset - Platform::getVirtualMilliseconds()) / 1000;  
+      return F32(mTimeOffset - Platform::getVirtualMilliseconds()) / 1000;
    else
       return F32(mTimeOffset + Platform::getVirtualMilliseconds()) / 1000;
 }

@@ -66,7 +66,7 @@ ConsoleDocClass( StaticShapeData,
 
 	"@tsexample\n"
 	   "// Create a StaticShape using a datablock\n"
-	   "datablock StaticShapeData(BasicShapeData)\n" 
+	   "datablock StaticShapeData(BasicShapeData)\n"
 	   "{\n"
 	   "	shapeFile = \"art/shapes/items/kit/healthkit.dts\";\n"
 	   "	testVar = \"Simple string, not a stock variable\";\n"
@@ -99,7 +99,7 @@ StaticShapeData::StaticShapeData()
 void StaticShapeData::initPersistFields()
 {
    addField("noIndividualDamage",   TypeBool, Offset(noIndividualDamage,   StaticShapeData), "Deprecated\n\n @internal");
-   addField("dynamicType",          TypeS32,  Offset(dynamicTypeField,     StaticShapeData), 
+   addField("dynamicType",          TypeS32,  Offset(dynamicTypeField,     StaticShapeData),
       "@brief An integer value which, if speficied, is added to the value retured by getType().\n\n"
       "This allows you to extend the type mask for a StaticShape that uses this datablock.  Type masks "
       "are used for container queries, etc.");
@@ -149,7 +149,7 @@ ConsoleDocClass( StaticShape,
 
 	"@tsexample\n"
 	   "// Create a StaticShape using a datablock\n"
-	   "datablock StaticShapeData(BasicShapeData)\n" 
+	   "datablock StaticShapeData(BasicShapeData)\n"
 	   "{\n"
 	   "	shapeFile = \"art/shapes/items/kit/healthkit.dts\";\n"
 	   "	testVar = \"Simple string, not a stock variable\";\n"
@@ -280,7 +280,7 @@ U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstr
    // powered?
    bstream->writeFlag(mPowered);
 
-   if (mLightPlugin) 
+   if (mLightPlugin)
    {
       retMask |= mLightPlugin->packUpdate(this, ExtendedInfoMask, connection, mask, bstream);
    }

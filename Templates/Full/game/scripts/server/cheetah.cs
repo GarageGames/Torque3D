@@ -41,7 +41,7 @@ function CheetahCar::onAdd(%this, %obj)
    %obj.setWheelSteering(1, 1);
 
    // Add tail lights
-   %obj.rightBrakeLight = new PointLight() 
+   %obj.rightBrakeLight = new PointLight()
    {
       radius = "1";
       isEnabled = "0";
@@ -71,7 +71,7 @@ function CheetahCar::onAdd(%this, %obj)
       canSaveDynamicFields = "1";
          splitFadeDistances = "10 20 30 40";
    };
-   %obj.leftBrakeLight = new PointLight() 
+   %obj.leftBrakeLight = new PointLight()
    {
       radius = "1";
       isEnabled = "0";

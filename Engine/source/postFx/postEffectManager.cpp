@@ -40,7 +40,7 @@ MODULE_BEGIN( PostEffectManager )
    {
       ManagedSingleton< PostEffectManager >::createSingleton();
    }
-   
+
    MODULE_SHUTDOWN
    {
       ManagedSingleton< PostEffectManager >::deleteSingleton();
@@ -51,7 +51,7 @@ MODULE_END;
 
 bool PostEffectManager::smRenderEffects = true;
 
-PostEffectManager::PostEffectManager() : 
+PostEffectManager::PostEffectManager() :
       mFrameStateSwitch( false ),
       mLastBackBufferTarget( NULL )
 {
@@ -59,7 +59,7 @@ PostEffectManager::PostEffectManager() :
    RenderPassManager::getRenderBinSignal().notify( this, &PostEffectManager::_handleBinEvent );
    SceneManager::getPostRenderSignal().notify( this, &PostEffectManager::_onPostRenderPass );
 
-   Con::addVariable("pref::enablePostEffects", TypeBool, &smRenderEffects, 
+   Con::addVariable("pref::enablePostEffects", TypeBool, &smRenderEffects,
       "@brief If true, post effects will be eanbled.\n\n"
 	   "@ingroup Game");
 }
@@ -77,7 +77,7 @@ bool PostEffectManager::_handleDeviceEvent( GFXDevice::GFXDeviceEventType evt )
    {
       case GFXDevice::deStartOfFrame:
          PFXVIS->onStartOfFrame();
-         
+
          // Fall through
 
       case GFXDevice::deDestroy:
@@ -96,7 +96,7 @@ bool PostEffectManager::_handleDeviceEvent( GFXDevice::GFXDeviceEventType evt )
          mFrameStateSwitch = !mFrameStateSwitch;
 
          break;
-   
+
       default:
          break;
    }
@@ -108,7 +108,7 @@ void PostEffectManager::_handleBinEvent( RenderBinManager *bin,
                                                 const SceneRenderState* sceneState,
                                                 bool isBinStart )
 {
-   if (  sceneState->isShadowPass() || 
+   if (  sceneState->isShadowPass() ||
          sceneState->isOtherPass() )
       return;
 
@@ -139,8 +139,8 @@ GFXTextureObject* PostEffectManager::getBackBufferTex()
       const Point2I &targetSize = target->getSize();
       GFXFormat targetFormat = target->getFormat();
 
-      mBackBufferCopyTex.set( targetSize.x, targetSize.y, 
-                              targetFormat, 
+      mBackBufferCopyTex.set( targetSize.x, targetSize.y,
+                              targetFormat,
                               &PostFxTargetProfile, "mBackBufferCopyTex" );
 
       target->resolveTo( mBackBufferCopyTex );
@@ -163,7 +163,7 @@ bool PostEffectManager::_addEffect( PostEffect *effect )
    const String &binName = effect->getRenderBin();
 
    switch( effect->getRenderTime() )
-   { 
+   {
    case PFXAfterDiffuse:
       effects = &mAfterDiffuseList;
       break;
@@ -179,7 +179,7 @@ bool PostEffectManager::_addEffect( PostEffect *effect )
    case PFXAfterBin:
       effects = &mAfterBinMap[binName];
       break;
-   
+
    case PFXTexGenOnDemand:
    	break;
    }
@@ -242,18 +242,18 @@ bool PostEffectManager::_removeEffect( PostEffect *effect )
 }
 
 void PostEffectManager::renderEffects( const SceneRenderState *state,
-                                       const PFXRenderTime effectTiming, 
+                                       const PFXRenderTime effectTiming,
                                        const String &binName )
 {
-   // MACHAX - The proper fix is to ensure that PostFX do not get rendered if 
+   // MACHAX - The proper fix is to ensure that PostFX do not get rendered if
    // their shader failed to load.
 #ifdef TORQUE_OS_MAC
    return;
 #endif
 
-   // Check the global render effect state as 
-   // well as the 
-   if (  !smRenderEffects || 
+   // Check the global render effect state as
+   // well as the
+   if (  !smRenderEffects ||
          ( state && !state->usePostEffects() ))
       return;
 
@@ -276,7 +276,7 @@ void PostEffectManager::renderEffects( const SceneRenderState *state,
       case PFXEndOfFrame:
          effects = &mEndOfFrameList;
          break;
-      
+
       case PFXTexGenOnDemand:
       	break;
    }

@@ -42,11 +42,11 @@ public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
                             const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );
-   
+
    virtual String getName()
    {
       return "Pixel Specular";
@@ -59,7 +59,7 @@ class SpecularMapGLSL : public ShaderFeatureGLSL
 {
 
 public:
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
       const MaterialFeatureData &fd );
 
    virtual Resources getResources( const MaterialFeatureData &fd );

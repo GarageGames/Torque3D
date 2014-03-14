@@ -34,7 +34,7 @@
 #endif
 
 
-/// GFXCardProfiler provides a device independent wrapper around both the 
+/// GFXCardProfiler provides a device independent wrapper around both the
 /// capabilities reported by the card/drivers and the exceptions recorded
 /// in various scripts.
 ///
@@ -55,7 +55,7 @@ class GFXCardProfiler
    ///      - getRendererString() indicating the name of the renderer ("DX9", "GL1.2").
    ///        Each card profiler subclass must return a unique constant so we can keep
    ///        data separate. Bear in mind that punctuation is stripped from filenames.
-   ///        
+   ///
    /// The profiler also needs to implement setupCardCapabilities(), which is responsible
    /// for querying the active device and setting defaults based on the reported capabilities,
    /// and _queryCardCap, which is responsible for recognizing and responding to
@@ -82,7 +82,7 @@ protected:
 
    virtual void setupCardCapabilities()=0;
 
-   /// Implementation specific query code. 
+   /// Implementation specific query code.
    ///
    /// This function is meant to be overridden by the specific implementation class.
    ///
@@ -104,23 +104,23 @@ protected:
 
    /// Load a specified script file from the profiles directory, if it exists.
    void loadProfileScript(const char* scriptName);
-   
+
    /// Load the script files in order for the specified card profile tuple.
    void loadProfileScripts(const String& render, const String& vendor, const String& card, const String& version);
 
    String strippedString(const char*string);
 
    /// @}
-   
+
    /// Capability dictionary.
    Map<String, U32> mCapDictionary;
 
 public:
-   
+
    /// @name ecpi External Card Profile Interface
    ///
    /// @{
-   
+
    /// Called for a profile for a given device.
    GFXCardProfiler();
    virtual ~GFXCardProfiler();
@@ -128,7 +128,7 @@ public:
    /// Set load script files and generally initialize things.
    virtual void init()=0;
 
-   /// Called to query a capability. Given a query string it returns a 
+   /// Called to query a capability. Given a query string it returns a
    /// bool indicating whether or not the capability holds. If you call
    /// this and cap isn't recognized then it returns false and prints
    /// a console error.

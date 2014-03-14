@@ -142,7 +142,7 @@ ConsoleDocFragment _getTerrainUnderWorldPoint2(
 );
 
 ConsoleFunction(getTerrainUnderWorldPoint, S32, 2, 4, "(Point3F x/y/z) Gets the terrain block that is located under the given world point.\n"
-                                                      "@param x/y/z The world coordinates (floating point values) you wish to query at. " 
+                                                      "@param x/y/z The world coordinates (floating point values) you wish to query at. "
                                                       "These can be formatted as either a string (\"x y z\") or separately as (x, y, z)\n"
                                                       "@return Returns the ID of the requested terrain block (0 if not found).\n\n"
 													  "@hide")
@@ -177,7 +177,7 @@ ConsoleFunction(getTerrainUnderWorldPoint, S32, 2, 4, "(Point3F x/y/z) Gets the 
 TerrainBlock::TerrainBlock()
  : mSquareSize( 1.0f ),
    mCastShadows( true ),
-   mScreenError( 16 ),   
+   mScreenError( 16 ),
    mDetailsDirty( false ),
    mLayerTexDirty( false ),
    mLightMap( NULL ),
@@ -250,7 +250,7 @@ bool TerrainBlock::_setBaseTexSize( void *obj, const char *index, const char *da
 {
    TerrainBlock *terrain = static_cast<TerrainBlock*>( obj );
 
-   // NOTE: We're limiting the base texture size to 
+   // NOTE: We're limiting the base texture size to
    // 2048 as anything greater in size becomes too
    // large to generate for many cards.
    //
@@ -299,10 +299,10 @@ bool TerrainBlock::setFile( const FileName &terrFileName )
    Resource<TerrainFile> file = ResourceManager::get().load( terrFileName );
    if( !file )
       return false;
-      
+
    setFile( file );
    setMaskBits( FileMask | HeightMapChangeMask );
-   
+
    return true;
 }
 
@@ -334,7 +334,7 @@ void TerrainBlock::_updateBounds()
    getMinMaxHeight( &mBounds.minExtents.z, &mBounds.maxExtents.z );
 
    // Set our mObjBox to be equal to mBounds
-   if (  mObjBox.maxExtents != mBounds.maxExtents || 
+   if (  mObjBox.maxExtents != mBounds.maxExtents ||
 	      mObjBox.minExtents != mBounds.minExtents )
    {
       mObjBox = mBounds;
@@ -421,7 +421,7 @@ void TerrainBlock::updateGrid( const Point2I &minPt, const Point2I &maxPt, bool 
       // Rebuild the physics representation.
       if ( mPhysicsRep )
       {
-         // Delay the update by a few milliseconds so 
+         // Delay the update by a few milliseconds so
          // that we're not rebuilding during an active
          // editing operation.
          mPhysicsRep->queueCallback( 500, Delegate<void()>( this, &TerrainBlock::_updatePhysics ) );
@@ -430,7 +430,7 @@ void TerrainBlock::updateGrid( const Point2I &minPt, const Point2I &maxPt, bool 
       return;
    }
 
-   // Now on the server we rebuild the 
+   // Now on the server we rebuild the
    // affected area of the grid map.
    mFile->updateGrid( minPt, maxPt );
 
@@ -440,7 +440,7 @@ void TerrainBlock::updateGrid( const Point2I &minPt, const Point2I &maxPt, bool 
    // Rebuild the physics representation.
    if ( mPhysicsRep )
    {
-      // Delay the update by a few milliseconds so 
+      // Delay the update by a few milliseconds so
       // that we're not rebuilding during an active
       // editing operation.
       mPhysicsRep->queueCallback( 500, Delegate<void()>( this, &TerrainBlock::_updatePhysics ) );
@@ -472,10 +472,10 @@ bool TerrainBlock::getHeight( const Point2F &pos, F32 *height ) const
 
    if ( x & ~blockMask || y & ~blockMask )
       return false;
-   
+
    x &= blockMask;
    y &= blockMask;
-   
+
    const TerrainSquare *sq = mFile->findSquare( 0, x, y );
    if ( sq->flags & TerrainSquare::Empty )
       return false;
@@ -518,15 +518,15 @@ bool TerrainBlock::getNormal( const Point2F &pos, Point3F *normal, bool normaliz
    S32 y = S32(yp);
    xp -= (F32)x;
    yp -= (F32)y;
-   
+
    const U32 blockMask = mFile->mSize - 1;
 
    if ( x & ~blockMask || y & ~blockMask )
       return false;
-   
+
    x &= blockMask;
    y &= blockMask;
-   
+
    const TerrainSquare *sq = mFile->findSquare( 0, x, y );
    if ( skipEmpty && sq->flags & TerrainSquare::Empty )
       return false;
@@ -561,8 +561,8 @@ bool TerrainBlock::getNormal( const Point2F &pos, Point3F *normal, bool normaliz
    return true;
 }
 
-bool TerrainBlock::getSmoothNormal( const Point2F &pos, 
-                                    Point3F *normal, 
+bool TerrainBlock::getSmoothNormal( const Point2F &pos,
+                                    Point3F *normal,
                                     bool normalize,
                                     bool skipEmpty ) const
 {
@@ -573,15 +573,15 @@ bool TerrainBlock::getSmoothNormal( const Point2F &pos,
    F32 yp = pos.y * invSquareSize;
    S32 x = S32(xp);
    S32 y = S32(yp);
-   
+
    const U32 blockMask = mFile->mSize - 1;
 
    if ( x & ~blockMask || y & ~blockMask )
       return false;
-   
+
    x &= blockMask;
    y &= blockMask;
-   
+
    const TerrainSquare *sq = mFile->findSquare( 0, x, y );
    if ( skipEmpty && sq->flags & TerrainSquare::Empty )
       return false;
@@ -615,10 +615,10 @@ bool TerrainBlock::getNormalAndHeight( const Point2F &pos, Point3F *normal, F32 
 
    if ( x & ~blockMask || y & ~blockMask )
       return false;
-   
+
    x &= blockMask;
    y &= blockMask;
-   
+
    const TerrainSquare *sq = mFile->findSquare( 0, x, y );
    if ( sq->flags & TerrainSquare::Empty )
       return false;
@@ -666,9 +666,9 @@ bool TerrainBlock::getNormalAndHeight( const Point2F &pos, Point3F *normal, F32 
 }
 
 
-bool TerrainBlock::getNormalHeightMaterial(  const Point2F &pos, 
-                                             Point3F *normal, 
-                                             F32 *height, 
+bool TerrainBlock::getNormalHeightMaterial(  const Point2F &pos,
+                                             Point3F *normal,
+                                             F32 *height,
                                              StringTableEntry &matName ) const
 {
 	PROFILE_SCOPE( TerrainBlock_getNormalHeightMaterial );
@@ -678,8 +678,8 @@ bool TerrainBlock::getNormalHeightMaterial(  const Point2F &pos,
    F32 yp = pos.y * invSquareSize;
    S32 x = S32(xp);
    S32 y = S32(yp);
-   S32 xm = S32(mFloor( xp + 0.5f ));   
-   S32 ym = S32(mFloor( yp + 0.5f ));   
+   S32 xm = S32(mFloor( xp + 0.5f ));
+   S32 ym = S32(mFloor( yp + 0.5f ));
    xp -= (F32)x;
    yp -= (F32)y;
 
@@ -687,10 +687,10 @@ bool TerrainBlock::getNormalHeightMaterial(  const Point2F &pos,
 
    if ( x & ~blockMask || y & ~blockMask )
       return false;
-   
+
    x &= blockMask;
    y &= blockMask;
-   
+
    const TerrainSquare *sq = mFile->findSquare( 0, x, y );
    if ( sq->flags & TerrainSquare::Empty )
       return false;
@@ -755,7 +755,7 @@ void TerrainBlock::addMaterial( const String &name, U32 insertAt )
    else
    {
 
-      // TODO: Insert and reindex!        
+      // TODO: Insert and reindex!
 
    }
 
@@ -782,7 +782,7 @@ void TerrainBlock::removeMaterial( U32 index )
    }
 
    mDetailsDirty = true;
-   mLayerTexDirty = true;     
+   mLayerTexDirty = true;
 }
 
 void TerrainBlock::updateMaterial( U32 index, const String &name )
@@ -839,9 +839,9 @@ GFXTextureObject* TerrainBlock::getLightMapTex()
 {
    if ( mLightMapTex.isNull() && mLightMap )
    {
-      mLightMapTex.set( mLightMap, 
-                        &GFXDefaultStaticDiffuseProfile, 
-                        false, 
+      mLightMapTex.set( mLightMap,
+                        &GFXDefaultStaticDiffuseProfile,
+                        false,
                         "TerrainBlock::getLightMapTex()" );
    }
 
@@ -908,7 +908,7 @@ bool TerrainBlock::onAdd()
    }
 
    _updateBounds();
-   
+
    resetWorldBox();
    setRenderTransform(mObjToWorld);
 
@@ -1042,8 +1042,8 @@ void TerrainBlock::onRemove()
 void TerrainBlock::prepRenderImage( SceneRenderState* state )
 {
    PROFILE_SCOPE(TerrainBlock_prepRenderImage);
-   
-   // If we need to update our cached 
+
+   // If we need to update our cached
    // zone state then do it now.
    if ( mZoningDirty )
    {
@@ -1078,14 +1078,14 @@ void TerrainBlock::setTransform(const MatrixF & mat)
 void TerrainBlock::setScale( const VectorF &scale )
 {
    // We disable scaling... we never scale!
-   Parent::setScale( VectorF::One );   
+   Parent::setScale( VectorF::One );
 }
 
 void TerrainBlock::initPersistFields()
 {
    addGroup( "Media" );
-      
-      addProtectedField( "terrainFile", TypeStringFilename, Offset( mTerrFileName, TerrainBlock ), 
+
+      addProtectedField( "terrainFile", TypeStringFilename, Offset( mTerrFileName, TerrainBlock ),
          &TerrainBlock::_setTerrainFile, &defaultProtectedGetFn,
          "The source terrain data file." );
 
@@ -1093,9 +1093,9 @@ void TerrainBlock::initPersistFields()
 
    addGroup( "Misc" );
 
-      addField( "castShadows", TypeBool, Offset( mCastShadows, TerrainBlock ),   
-         "Allows the terrain to cast shadows onto itself and other objects."); 
-   
+      addField( "castShadows", TypeBool, Offset( mCastShadows, TerrainBlock ),
+         "Allows the terrain to cast shadows onto itself and other objects.");
+
       addProtectedField( "squareSize", TypeF32, Offset( mSquareSize, TerrainBlock ),
          &TerrainBlock::_setSquareSize, &defaultProtectedGetFn,
          "Indicates the spacing between points on the XY plane on the terrain." );
@@ -1118,11 +1118,11 @@ void TerrainBlock::initPersistFields()
 
    Con::addVariable( "$TerrainBlock::debugRender", TypeBool, &smDebugRender, "Triggers debug rendering of terrain cells\n\n"
 	   "@ingroup Terrain");
-   
+
    Con::addVariable( "$pref::Terrain::lodScale", TypeF32, &smLODScale, "A global LOD scale used to tweak the default terrain screen error value.\n\n"
 		"@ingroup Terrain");
 
-   Con::addVariable( "$pref::Terrain::detailScale", TypeF32, &smDetailScale, "A global detail scale used to tweak the material detail distances.\n\n" 
+   Con::addVariable( "$pref::Terrain::detailScale", TypeF32, &smDetailScale, "A global detail scale used to tweak the material detail distances.\n\n"
 	   "@ingroup Terrain");
 }
 
@@ -1135,7 +1135,7 @@ void TerrainBlock::inspectPostApply()
 U32 TerrainBlock::packUpdate(NetConnection* con, U32 mask, BitStream *stream)
 {
    U32 retMask = Parent::packUpdate( con, mask, stream );
-   
+
    if ( stream->writeFlag( mask & TransformMask ) )
       mathWrite( *stream, getTransform() );
 
@@ -1149,7 +1149,7 @@ U32 TerrainBlock::packUpdate(NetConnection* con, U32 mask, BitStream *stream)
       stream->write( mSquareSize );
 
    stream->writeFlag( mCastShadows );
-   
+
    if ( stream->writeFlag( mask & MaterialMask ) )
    {
       stream->write( mBaseTexSize );
@@ -1167,7 +1167,7 @@ U32 TerrainBlock::packUpdate(NetConnection* con, U32 mask, BitStream *stream)
 void TerrainBlock::unpackUpdate(NetConnection* con, BitStream *stream)
 {
    Parent::unpackUpdate( con, stream );
-   
+
    if ( stream->readFlag() ) // TransformMask
    {
       MatrixF mat;
@@ -1229,7 +1229,7 @@ void TerrainBlock::unpackUpdate(NetConnection* con, BitStream *stream)
       stream->read( &mScreenError );
 }
 
-void TerrainBlock::getMinMaxHeight( F32 *minHeight, F32 *maxHeight ) const 
+void TerrainBlock::getMinMaxHeight( F32 *minHeight, F32 *maxHeight ) const
 {
    // We can get the bound height from the last grid level.
    const TerrainSquare *sq = mFile->findSquare( mFile->mGridLevels, 0, 0 );
@@ -1355,7 +1355,7 @@ ConsoleFunction(getTerrainHeightBelowPosition, F32, 2, 4, "(Point3F pos) - gets 
    }
 
 	TerrainBlock * terrain = getTerrainUnderWorldPoint(pos);
-	
+
 	Point2F nohghtPos(pos.x, pos.y);
 
 	if(terrain)
@@ -1368,6 +1368,6 @@ ConsoleFunction(getTerrainHeightBelowPosition, F32, 2, 4, "(Point3F pos) - gets 
 			terrain->getHeight(nohghtPos, &height);
 		}
 	}
-	
+
 	return height;
 }

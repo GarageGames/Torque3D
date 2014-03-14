@@ -53,10 +53,10 @@ class SFXALDevice : public SFXDevice
       typedef SFXDevice Parent;
       friend class SFXALVoice; // mDistanceFactor, mRolloffFactor
 
-      SFXALDevice(   SFXProvider *provider, 
-                     const OPENALFNTABLE &openal, 
-                     String name, 
-                     bool useHardware, 
+      SFXALDevice(   SFXProvider *provider,
+                     const OPENALFNTABLE &openal,
+                     String name,
+                     bool useHardware,
                      S32 maxBuffers );
 
       virtual ~SFXALDevice();
@@ -68,12 +68,12 @@ class SFXALDevice : public SFXDevice
       ALCcontext *mContext;
 
       ALCdevice *mDevice;
-      
+
       SFXDistanceModel mDistanceModel;
       F32 mDistanceFactor;
       F32 mRolloffFactor;
       F32 mUserRolloffFactor;
-      
+
       void _setRolloffFactor( F32 factor );
 
    public:

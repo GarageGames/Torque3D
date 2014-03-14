@@ -252,7 +252,7 @@ namespace PropertyInfo
       }
       else
          dSscanf(data.c_str(),"%d %d %d %d",&result.x,&result.y,&result.z,&result.w);
-      return true;      
+      return true;
    }
 
    bool default_print(String & result, const Point4I & data)
@@ -355,11 +355,11 @@ namespace PropertyInfo
          return false;
 
       F32* m = result;
-      dSscanf(data.c_str(),"%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g", 
-         &m[result.idx(0,0)], &m[result.idx(0,1)], &m[result.idx(0,2)], &m[result.idx(0,3)], 
-         &m[result.idx(1,0)], &m[result.idx(1,1)], &m[result.idx(1,2)], &m[result.idx(1,3)], 
-         &m[result.idx(2,0)], &m[result.idx(2,1)], &m[result.idx(2,2)], &m[result.idx(2,3)], 
-         &m[result.idx(3,0)], &m[result.idx(3,1)], &m[result.idx(3,2)], &m[result.idx(3,3)]);         
+      dSscanf(data.c_str(),"%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g",
+         &m[result.idx(0,0)], &m[result.idx(0,1)], &m[result.idx(0,2)], &m[result.idx(0,3)],
+         &m[result.idx(1,0)], &m[result.idx(1,1)], &m[result.idx(1,2)], &m[result.idx(1,3)],
+         &m[result.idx(2,0)], &m[result.idx(2,1)], &m[result.idx(2,2)], &m[result.idx(2,3)],
+         &m[result.idx(3,0)], &m[result.idx(3,1)], &m[result.idx(3,2)], &m[result.idx(3,3)]);
       return true;
    }
 
@@ -367,9 +367,9 @@ namespace PropertyInfo
    {
       const F32* m = data;
       result = String::ToString("%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g",
-         m[data.idx(0,0)], m[data.idx(0,1)], m[data.idx(0,2)], m[data.idx(0,3)], 
-         m[data.idx(1,0)], m[data.idx(1,1)], m[data.idx(1,2)], m[data.idx(1,3)], 
-         m[data.idx(2,0)], m[data.idx(2,1)], m[data.idx(2,2)], m[data.idx(2,3)], 
+         m[data.idx(0,0)], m[data.idx(0,1)], m[data.idx(0,2)], m[data.idx(0,3)],
+         m[data.idx(1,0)], m[data.idx(1,1)], m[data.idx(1,2)], m[data.idx(1,3)],
+         m[data.idx(2,0)], m[data.idx(2,1)], m[data.idx(2,2)], m[data.idx(2,3)],
          m[data.idx(3,0)], m[data.idx(3,1)], m[data.idx(3,2)], m[data.idx(3,3)]);
       return true;
    }

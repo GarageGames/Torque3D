@@ -98,7 +98,7 @@ void GuiInspectorTypeMenuBase::_populateMenu( GuiPopUpMenuCtrl *menu )
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeEnum 
+// GuiInspectorTypeEnum
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeEnum);
 
@@ -119,10 +119,10 @@ void GuiInspectorTypeEnum::_populateMenu( GuiPopUpMenuCtrl *menu )
       else
          return;
    }
-      
+
    const EngineEnumTable& t = *table;
    const U32 numEntries = t.getNumValues();
-   
+
    for( U32 i = 0; i < numEntries; ++ i )
       menu->addEntry( t[ i ].getName(), t[ i ] );
 
@@ -134,14 +134,14 @@ void GuiInspectorTypeEnum::consoleInit()
    Parent::consoleInit();
 
    // Set this to be the inspector type for all enumeration console types.
-   
+
    for( ConsoleBaseType* type = ConsoleBaseType::getListHead(); type != NULL; type = type->getListNext() )
       if( type->getTypeInfo() && type->getTypeInfo()->isEnum() )
          type->setInspectorFieldType( "GuiInspectorTypeEnum" );
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeCubemapName 
+// GuiInspectorTypeCubemapName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeCubemapName);
 
@@ -160,7 +160,7 @@ void GuiInspectorTypeCubemapName::_populateMenu( GuiPopUpMenuCtrl *menu )
    // to keep an eye on it.
 
    SimGroup *root = Sim::getRootGroup();
-   
+
    SimGroupIterator iter( root );
    for ( ; *iter; ++iter )
    {
@@ -179,7 +179,7 @@ void GuiInspectorTypeCubemapName::consoleInit()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeMaterialName 
+// GuiInspectorTypeMaterialName
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(GuiInspectorTypeMaterialName);
@@ -242,7 +242,7 @@ GuiControl* GuiInspectorTypeMaterialName::construct(const char* command)
 }
 
 GuiControl* GuiInspectorTypeMaterialName::constructEditControl()
-{	
+{
    return construct("materialSelector.showDialog(\"%d.apply\", \"name\");");
 }
 
@@ -262,7 +262,7 @@ bool GuiInspectorTypeMaterialName::updateRects()
    bool browseResize = false;
 
    if ( mBrowseButton != NULL )
-   {         
+   {
       browseResize = mBrowseButton->resize( mBrowseRect.point, mBrowseRect.extent );
    }
 
@@ -270,7 +270,7 @@ bool GuiInspectorTypeMaterialName::updateRects()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeTerrainMaterialIndex 
+// GuiInspectorTypeTerrainMaterialIndex
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(GuiInspectorTypeTerrainMaterialIndex);
@@ -289,12 +289,12 @@ void GuiInspectorTypeTerrainMaterialIndex::consoleInit()
 }
 
 GuiControl* GuiInspectorTypeTerrainMaterialIndex::constructEditControl()
-{	
+{
    return construct("materialSelector.showTerrainDialog(\"%d.apply\", \"index\");");
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeTerrainMaterialName 
+// GuiInspectorTypeTerrainMaterialName
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(GuiInspectorTypeTerrainMaterialName);
@@ -352,12 +352,12 @@ GuiControl* GuiInspectorTypeTerrainMaterialName::construct(const char* command)
 }
 
 GuiControl* GuiInspectorTypeTerrainMaterialName::constructEditControl()
-{	
+{
    return construct("materialSelector.showTerrainDialog(\"%d.apply\", \"name\");");
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeGuiProfile 
+// GuiInspectorTypeGuiProfile
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeGuiProfile);
 
@@ -370,11 +370,11 @@ ConsoleDocClass( GuiInspectorTypeGuiProfile,
 void GuiInspectorTypeGuiProfile::_populateMenu( GuiPopUpMenuCtrl *menu )
 {
    // Check whether we should show profiles from the editor category.
-   
+
    const bool showEditorProfiles = Con::getBoolVariable( "$pref::GuiEditor::showEditorProfiles", false );
-   
+
    // Add the control profiles to the menu.
-   
+
    SimGroup *grp = Sim::getGuiDataGroup();
    SimSetIterator iter( grp );
    for ( ; *iter; ++iter )
@@ -382,13 +382,13 @@ void GuiInspectorTypeGuiProfile::_populateMenu( GuiPopUpMenuCtrl *menu )
       GuiControlProfile *profile = dynamic_cast<GuiControlProfile*>(*iter);
       if( !profile )
          continue;
-      
+
       if( !showEditorProfiles && profile->mCategory.compare( "Editor", 0, String::NoCase ) == 0 )
          continue;
-         
+
       menu->addEntry( profile->getName(), profile->getId() );
    }
-   
+
    menu->sort();
 }
 
@@ -400,7 +400,7 @@ void GuiInspectorTypeGuiProfile::consoleInit()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeCheckBox 
+// GuiInspectorTypeCheckBox
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeCheckBox);
 
@@ -463,7 +463,7 @@ const char* GuiInspectorTypeCheckBox::getValue()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeFileName 
+// GuiInspectorTypeFileName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeFileName);
 
@@ -536,7 +536,7 @@ bool GuiInspectorTypeFileName::resize( const Point2I &newPosition, const Point2I
 }
 
 bool GuiInspectorTypeFileName::updateRects()
-{   
+{
    S32 dividerPos, dividerMargin;
    mInspector->getDivider( dividerPos, dividerMargin );
    Point2I fieldExtent = getExtent();
@@ -574,13 +574,13 @@ ConsoleMethod( GuiInspectorTypeFileName, apply, void, 3,3, "apply(newValue);" )
    String path( argv[2] );
    if ( path.isNotEmpty() )
       path = Platform::makeRelativePathName( path, Platform::getMainDotCsDir() );
-      
+
    object->setData( path.c_str() );
 }
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeImageFileName 
+// GuiInspectorTypeImageFileName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeImageFileName);
 
@@ -600,10 +600,10 @@ void GuiInspectorTypeImageFileName::consoleInit()
 GuiControl* GuiInspectorTypeImageFileName::constructEditControl()
 {
    GuiControl *retCtrl = Parent::constructEditControl();
-   
+
    if ( retCtrl == NULL )
       return retCtrl;
-   
+
    retCtrl->getRenderTooltipDelegate().bind( this, &GuiInspectorTypeImageFileName::renderTooltip );
    char szBuffer[512];
 
@@ -613,7 +613,7 @@ GuiControl* GuiInspectorTypeImageFileName::constructEditControl()
 
    String fileSpec;
 
-   // building the fileSpec string 
+   // building the fileSpec string
 
    fileSpec += "All Image Files|";
 
@@ -647,7 +647,7 @@ GuiControl* GuiInspectorTypeImageFileName::constructEditControl()
 
 bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, const Point2I &cursorPos, const char *tipText )
 {
-   if ( !mAwake ) 
+   if ( !mAwake )
       return false;
 
    GuiCanvas *root = getRoot();
@@ -662,10 +662,10 @@ bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, cons
    if ( texture.isNull() )
       return false;
 
-   // Render image at a reasonable screen size while 
+   // Render image at a reasonable screen size while
    // keeping its aspect ratio...
    Point2I screensize = getRoot()->getWindowSize();
-   Point2I offset = hoverPos; 
+   Point2I offset = hoverPos;
    Point2I tipBounds;
 
    U32 texWidth = texture.getWidth();
@@ -702,7 +702,7 @@ bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, cons
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypePrefabFilename 
+// GuiInspectorTypePrefabFilename
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypePrefabFilename);
 
@@ -725,7 +725,7 @@ GuiControl* GuiInspectorTypePrefabFilename::constructEditControl()
 
    if ( retCtrl == NULL )
       return retCtrl;
-   
+
    const char *fileSpec = "Prefab Files (*.prefab)|*.prefab|All Files (*.*)|*.*|";
 
    char szBuffer[512];
@@ -737,7 +737,7 @@ GuiControl* GuiInspectorTypePrefabFilename::constructEditControl()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeShapeFileName 
+// GuiInspectorTypeShapeFileName
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(GuiInspectorTypeShapeFilename);
@@ -966,7 +966,7 @@ bool GuiInspectorTypeRectUV::updateRects()
    bool browseResize = false;
 
    if ( mBrowseButton != NULL )
-   {         
+   {
       browseResize = mBrowseButton->resize( mBrowseRect.point, mBrowseRect.extent );
    }
 
@@ -1044,7 +1044,7 @@ bool GuiInspectorTypeEaseF::resize( const Point2I &newPosition, const Point2I &n
 }
 
 bool GuiInspectorTypeEaseF::updateRects()
-{   
+{
    S32 dividerPos, dividerMargin;
    mInspector->getDivider( dividerPos, dividerMargin );
    Point2I fieldExtent = getExtent();
@@ -1066,7 +1066,7 @@ bool GuiInspectorTypeEaseF::updateRects()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeColor (Base for ColorI/ColorF) 
+// GuiInspectorTypeColor (Base for ColorI/ColorF)
 //-----------------------------------------------------------------------------
 GuiInspectorTypeColor::GuiInspectorTypeColor()
  : mBrowseButton( NULL )
@@ -1108,13 +1108,13 @@ GuiControl* GuiInspectorTypeColor::constructEditControl()
       mBrowseButton->setDataField( StringTable->insert("Profile"), NULL, "GuiInspectorSwatchButtonProfile" );
       mBrowseButton->registerObject();
       addObject( mBrowseButton );
-		
+
 		char szColor[512];
       if( _getColorConversionFunction() )
          dSprintf( szColor, 512, "%s( %d.color )", _getColorConversionFunction(), mBrowseButton->getId() );
       else
          dSprintf( szColor, 512, "%d.color", mBrowseButton->getId() );
-         
+
       // If the inspector supports the alternate undo recording path,
       // use this here.
 
@@ -1135,7 +1135,7 @@ GuiControl* GuiInspectorTypeColor::constructEditControl()
          dSprintf( szBuffer, sizeof( szBuffer ),
             "%s(%s, \"%d.apply\", %d.getRoot());",
             mColorFunction, szColor, getId(), getId() );
-		
+
 		mBrowseButton->setConsoleCommand( szBuffer );
       mBrowseButton->setUseMouseEvents( true ); // Allow drag&drop.
 
@@ -1169,7 +1169,7 @@ bool GuiInspectorTypeColor::updateRects()
    bool browseResize = false;
 
    if ( mBrowseButton != NULL )
-   {         
+   {
       browseResize = mBrowseButton->resize( mBrowseRect.point, mBrowseRect.extent );
    }
 
@@ -1207,7 +1207,7 @@ void GuiInspectorTypeColorI::setValue( StringTableEntry newValue )
 
    // Now we also set our color swatch button to the new color value.
    if ( mBrowseButton )
-   {      
+   {
       ColorI color(255,0,255,255);
       S32 r,g,b,a;
       dSscanf( newValue, "%d %d %d %d", &r, &g, &b, &a );
@@ -1249,7 +1249,7 @@ void GuiInspectorTypeColorF::setValue( StringTableEntry newValue )
 
    // Now we also set our color swatch button to the new color value.
    if ( mBrowseButton )
-   {      
+   {
       ColorF color(1,0,1,1);
       dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
       mBrowseButton->setColor( color );
@@ -1345,7 +1345,7 @@ bool GuiInspectorTypeBitMask32::onAdd()
    }
 
    static StringTableEntry sProfile = StringTable->insert( "profile" );
-   setDataField( sProfile, NULL, "GuiInspectorFieldProfile" );   
+   setDataField( sProfile, NULL, "GuiInspectorFieldProfile" );
    setBounds(0,0,100,18);
 
    // Allocate our children controls...
@@ -1355,7 +1355,7 @@ bool GuiInspectorTypeBitMask32::onAdd()
    mRollout->setCanCollapse( false );
    mRollout->registerObject();
    addObject( mRollout );
-   
+
    mArrayCtrl = new GuiDynamicCtrlArrayControl();
    mArrayCtrl->setDataField( sProfile, NULL, "GuiInspectorBitMaskArrayProfile" );
    mArrayCtrl->setField( "autoCellSize", "true" );
@@ -1365,19 +1365,19 @@ bool GuiInspectorTypeBitMask32::onAdd()
    mArrayCtrl->setField( "colSpacing", "1" );
    mArrayCtrl->setField( "frozen", "true" );
    mArrayCtrl->registerObject();
-   
+
    mRollout->addObject( mArrayCtrl );
 
    GuiCheckBoxCtrl *pCheckBox = NULL;
-   
+
    const EngineEnumTable& t = *table;
    const U32 numValues = t.getNumValues();
 
    for ( S32 i = 0; i < numValues; i++ )
-   {   
+   {
       pCheckBox = new GuiCheckBoxCtrl();
       pCheckBox->setText( t[ i ].getName() );
-      pCheckBox->registerObject();      
+      pCheckBox->registerObject();
       mArrayCtrl->addObject( pCheckBox );
 
       pCheckBox->autoSize();
@@ -1385,11 +1385,11 @@ bool GuiInspectorTypeBitMask32::onAdd()
       // Override the normal script callbacks for GuiInspectorTypeCheckBox
       char szBuffer[512];
       dSprintf( szBuffer, 512, "%d.applyBit();", getId() );
-      pCheckBox->setField( "Command", szBuffer );   
-   }      
+      pCheckBox->setField( "Command", szBuffer );
+   }
 
    mArrayCtrl->setField( "frozen", "false" );
-   mArrayCtrl->refresh(); 
+   mArrayCtrl->refresh();
 
    mHelper = new GuiInspectorTypeBitMask32Helper();
    mHelper->init( mInspector, mParent );
@@ -1402,7 +1402,7 @@ bool GuiInspectorTypeBitMask32::onAdd()
    mRollout->addObject( mHelper );
 
    mRollout->sizeToContents();
-   mRollout->instantCollapse();  
+   mRollout->instantCollapse();
 
    updateValue();
 
@@ -1414,7 +1414,7 @@ void GuiInspectorTypeBitMask32::consoleInit()
    Parent::consoleInit();
 
    // Set this to be the inspector type for all bitfield console types.
-   
+
    for( ConsoleBaseType* type = ConsoleBaseType::getListHead(); type != NULL; type = type->getListNext() )
       if( type->getTypeInfo() && type->getTypeInfo()->isBitfield() )
          type->setInspectorFieldType( "GuiInspectorTypeBitMask32" );
@@ -1429,7 +1429,7 @@ bool GuiInspectorTypeBitMask32::resize(const Point2I &newPosition, const Point2I
 {
    if ( !Parent::resize( newPosition, newExtent ) )
       return false;
-   
+
    // Hack... height of 18 is hardcoded
    return mHelper->resize( Point2I(0,0), Point2I( newExtent.x, 18 ) );
 }
@@ -1439,8 +1439,8 @@ bool GuiInspectorTypeBitMask32::updateRects()
    if ( !mRollout )
       return false;
 
-   bool result = mRollout->setExtent( getExtent() );   
-   
+   bool result = mRollout->setExtent( getExtent() );
+
    for ( U32 i = 0; i < mArrayCtrl->size(); i++ )
    {
       GuiInspectorField *pField = dynamic_cast<GuiInspectorField*>( mArrayCtrl->at(i) );
@@ -1452,7 +1452,7 @@ bool GuiInspectorTypeBitMask32::updateRects()
    if ( mHelper && mHelper->updateRects() )
       result = true;
 
-   return result;   
+   return result;
 }
 
 StringTableEntry GuiInspectorTypeBitMask32::getValue()
@@ -1491,7 +1491,7 @@ void GuiInspectorTypeBitMask32::setValue( StringTableEntry value )
 void GuiInspectorTypeBitMask32::updateData()
 {
    StringTableEntry data = getValue();
-   setData( data );   
+   setData( data );
 }
 
 ConsoleMethod( GuiInspectorTypeBitMask32, applyBit, void, 2,2, "apply();" )
@@ -1592,7 +1592,7 @@ void GuiInspectorTypeBitMask32Helper::setValue( StringTableEntry newValue )
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeName 
+// GuiInspectorTypeName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeName);
 
@@ -1610,13 +1610,13 @@ void GuiInspectorTypeName::consoleInit()
 }
 
 bool GuiInspectorTypeName::verifyData( StringTableEntry data )
-{   
-   return validateObjectName( data, mInspector->getInspectObject() );   
+{
+   return validateObjectName( data, mInspector->getInspectObject() );
 }
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXParameterName 
+// GuiInspectorTypeSFXParameterName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXParameterName);
 
@@ -1635,7 +1635,7 @@ void GuiInspectorTypeSFXParameterName::_populateMenu( GuiPopUpMenuCtrl *menu )
       if( parameter )
          menu->addEntry( parameter->getInternalName(), parameter->getId() );
    }
-   
+
    menu->sort();
 }
 
@@ -1648,7 +1648,7 @@ void GuiInspectorTypeSFXParameterName::consoleInit()
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXStateName 
+// GuiInspectorTypeSFXStateName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXStateName);
 
@@ -1669,7 +1669,7 @@ void GuiInspectorTypeSFXStateName::_populateMenu( GuiPopUpMenuCtrl *menu )
       if( state )
          menu->addEntry( state->getName(), state->getId() );
    }
-   
+
    menu->sort();
 }
 
@@ -1682,7 +1682,7 @@ void GuiInspectorTypeSFXStateName::consoleInit()
 
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeSFXSourceName 
+// GuiInspectorTypeSFXSourceName
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(GuiInspectorTypeSFXSourceName);
 
@@ -1703,7 +1703,7 @@ void GuiInspectorTypeSFXSourceName::_populateMenu( GuiPopUpMenuCtrl *menu )
       if( source && source->getName() )
          menu->addEntry( source->getName(), source->getId() );
    }
-   
+
    menu->sort();
 }
 

@@ -25,7 +25,7 @@
 //#include <comdef.h>
 #include <wbemidl.h>
 //#include <atlconv.h>
-#pragma comment(lib, "comsuppw.lib") 
+#pragma comment(lib, "comsuppw.lib")
 #pragma comment(lib, "wbemuuid.lib")
 
 #include "platformWin32/videoInfo/wmiVideoInfo.h"
@@ -69,7 +69,7 @@ struct DXGI_ADAPTER_DESC;
 
 struct IDXGIObject : public IUnknown
 {
-   virtual HRESULT STDMETHODCALLTYPE SetPrivateData( REFGUID, UINT, const void* ) = 0; 
+   virtual HRESULT STDMETHODCALLTYPE SetPrivateData( REFGUID, UINT, const void* ) = 0;
    virtual HRESULT STDMETHODCALLTYPE SetPrivateDataInterface( REFGUID, const IUnknown* ) = 0;
    virtual HRESULT STDMETHODCALLTYPE GetPrivateData( REFGUID, UINT*, void* ) = 0;
    virtual HRESULT STDMETHODCALLTYPE GetParent( REFIID, void** ) = 0;
@@ -83,7 +83,7 @@ struct IDXGIFactory : public IDXGIObject
    virtual HRESULT STDMETHODCALLTYPE CreateSwapChain( IUnknown*, DXGI_SWAP_CHAIN_DESC* ) = 0;
    virtual HRESULT STDMETHODCALLTYPE CreateSoftwareAdapter( HMODULE, IDXGIAdapter** ) = 0;
 };
-                 
+
 struct IDXGIAdapter : public IDXGIObject
 {
    virtual HRESULT STDMETHODCALLTYPE EnumOutputs( UINT, IDXGIOutput** ) = 0;
@@ -204,16 +204,16 @@ bool WMIVideoInfo::_initialize()
 
 bool WMIVideoInfo::_initializeWMI()
 {
-   //// Set security levels 
+   //// Set security levels
    //hr = CoInitializeSecurity(
-   //   NULL, 
+   //   NULL,
    //   -1,                          // COM authentication
    //   NULL,                        // Authentication services
    //   NULL,                        // Reserved
-   //   RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-   //   RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+   //   RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+   //   RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
    //   NULL,                        // Authentication info
-   //   EOAC_NONE,                   // Additional capabilities 
+   //   EOAC_NONE,                   // Additional capabilities
    //   NULL                         // Reserved
    //   );
 
@@ -223,12 +223,12 @@ bool WMIVideoInfo::_initializeWMI()
    //   return false;
    //}
 
-   // Obtain the locator to WMI 
+   // Obtain the locator to WMI
    HRESULT hr = CoCreateInstance(
-      CLSID_WbemLocator,             
-      0, 
-      CLSCTX_INPROC_SERVER, 
-      IID_IWbemLocator, 
+      CLSID_WbemLocator,
+      0,
+      CLSCTX_INPROC_SERVER,
+      IID_IWbemLocator,
       (void**)&mLocator
       );
 
@@ -248,7 +248,7 @@ bool WMIVideoInfo::_initializeWMI()
       0,                       // Locale. NULL indicates current
       NULL,                    // Security flags.
       0,                       // Authority (e.g. Kerberos)
-      0,                       // Context object 
+      0,                       // Context object
       &mServices               // pointer to IWbemServices proxy
       );
 
@@ -259,16 +259,16 @@ bool WMIVideoInfo::_initializeWMI()
    }
 
 
-   // Set security levels on the proxy 
+   // Set security levels on the proxy
    hr = CoSetProxyBlanket(
       mServices,                   // Indicates the proxy to set
       RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
       RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-      NULL,                        // Server principal name 
-      RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+      NULL,                        // Server principal name
+      RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
       RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
       NULL,                        // client identity
-      EOAC_NONE                    // proxy capabilities 
+      EOAC_NONE                    // proxy capabilities
       );
 
    if( FAILED( hr ) )
@@ -299,7 +299,7 @@ bool WMIVideoInfo::_initializeDXGI()
          mDXGIModule = 0;
       }
    }
-#endif 
+#endif
    return false;
 }
 
@@ -333,11 +333,11 @@ bool WMIVideoInfo::_initializeDxDiag()
 
 //------------------------------------------------------------------------------
 // http://msdn2.microsoft.com/en-us/library/aa394512.aspx
-// 
-// The Win32_VideoController WMI class represents the capabilities and management capacity of the 
+//
+// The Win32_VideoController WMI class represents the capabilities and management capacity of the
 // video controller on a computer system running Windows.
 //
-// Starting with Windows Vista, hardware that is not compatible with Windows Display Driver Model (WDDM) 
+// Starting with Windows Vista, hardware that is not compatible with Windows Display Driver Model (WDDM)
 // returns inaccurate property values for instances of this class.
 //
 // Windows Server 2003, Windows XP, Windows 2000, and Windows NT 4.0:  This class is supported.
@@ -531,14 +531,14 @@ bool WMIVideoInfo::_queryPropertyWMI( const PVIQueryType queryType, const U32 ad
    BSTR bstrWQL  = SysAllocString(L"WQL");
    BSTR bstrPath = SysAllocString(L"select * from Win32_VideoController");
    IEnumWbemClassObject* enumerator;
-   
+
    // Use the IWbemServices pointer to make requests of WMI
    HRESULT hr = mServices->ExecQuery(bstrWQL, bstrPath, WBEM_FLAG_FORWARD_ONLY, NULL, &enumerator);
 
    if( FAILED( hr ) )
       return false;
 
-   IWbemClassObject *adapter = NULL;   
+   IWbemClassObject *adapter = NULL;
    ULONG uReturned;
 
    // Get the appropriate adapter.
@@ -549,7 +549,7 @@ bool WMIVideoInfo::_queryPropertyWMI( const PVIQueryType queryType, const U32 ad
       if ( FAILED( hr ) || uReturned == 0 )
       {
          enumerator->Release();
-         return false;         
+         return false;
       }
    }
 
@@ -595,17 +595,17 @@ bool WMIVideoInfo::_queryPropertyWMI( const PVIQueryType queryType, const U32 ad
          {
             *outValue = String( v.bstrVal );
             break;
-         }            
+         }
       case VT_LPSTR:
       case VT_LPWSTR:
          break;
       }
 
 
-   }                  
+   }
 
-   // Cleanup      
-   adapter->Release();   
+   // Cleanup
+   adapter->Release();
    enumerator->Release();
 
    return result;

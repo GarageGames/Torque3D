@@ -31,7 +31,7 @@
 ///
 enum MaterialFeatureGroup
 {
-   /// One or more pre-transform features are 
+   /// One or more pre-transform features are
    /// allowed at any one time and are executed
    /// in order to each other.
    MFG_PreTransform,
@@ -40,7 +40,7 @@ enum MaterialFeatureGroup
    /// any one time.
    MFG_Transform,
 
-   /// 
+   ///
    MFG_PostTransform,
 
    /// The features that need to occur before texturing
@@ -52,19 +52,19 @@ enum MaterialFeatureGroup
    /// textures and colors.
    MFG_Texture,
 
-   /// 
+   ///
    MFG_PreLighting,
 
-   /// 
+   ///
    MFG_Lighting,
 
-   /// 
+   ///
    MFG_PostLighting,
 
    /// Final features like fogging.
    MFG_PostProcess,
 
-   /// Miscellaneous features that require no specialized 
+   /// Miscellaneous features that require no specialized
    /// ShaderFeature object and are just queried as flags.
    MFG_Misc = -1,
 };
@@ -75,11 +75,11 @@ DeclareFeatureType( MFT_UseInstancing );
 /// The standard vertex transform.
 DeclareFeatureType( MFT_VertTransform );
 
-/// A special transform with paraboloid warp used 
+/// A special transform with paraboloid warp used
 /// in shadow and reflection rendering.
 DeclareFeatureType( MFT_ParaboloidVertTransform );
 
-/// This feature is queried from the MFT_ParaboloidVertTransform 
+/// This feature is queried from the MFT_ParaboloidVertTransform
 /// feature to detect if it needs to generate a single pass.
 DeclareFeatureType( MFT_IsSinglePassParaboloid );
 
@@ -120,7 +120,7 @@ DeclareFeatureType( MFT_SpecularMap );
 DeclareFeatureType( MFT_GlossMap );
 
 /// This feature is only used to detect alpha transparency
-/// and does not have any code associtated with it. 
+/// and does not have any code associtated with it.
 DeclareFeatureType( MFT_IsTranslucent );
 
 ///

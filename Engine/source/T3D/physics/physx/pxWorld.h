@@ -72,7 +72,7 @@ protected:
    NxScene *mScene;
 
 	CharacterControllerManager *mControllerManager;
-	
+
    bool  mErrorReport;
 
    bool	mIsEnabled;
@@ -105,7 +105,7 @@ public:
    virtual void destroyWorld();
    virtual bool castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse );
    virtual PhysicsBody* castRay( const Point3F &start, const Point3F &end, U32 bodyTypes = BT_All );
-   virtual void explosion( const Point3F &pos, F32 radius, F32 forceMagnitude );   
+   virtual void explosion( const Point3F &pos, F32 radius, F32 forceMagnitude );
    virtual void onDebugDraw( const SceneRenderState *state );
    virtual void reset() {}
    virtual bool isEnabled() const { return mIsEnabled; }
@@ -149,11 +149,11 @@ public:
 
    ///
    /// @see releaseController
-   NxController* createController( NxControllerDesc &desc ); 
+   NxController* createController( NxControllerDesc &desc );
 
    //U16 setMaterial(NxMaterialDesc &material, U16 id);
 
-   // NOTE: This is all a mess, but its a side effect of how 
+   // NOTE: This is all a mess, but its a side effect of how
    // PhysX works.  Many objects cannot be deleted without write
    // access to the scene.  Worse some objects cannot be deleted
    // until their owner objects are deleted first.
@@ -170,9 +170,9 @@ public:
    void releaseMaterial( NxMaterial &mat );
 
    void releaseJoint( NxJoint &joint );
-   
+
    void releaseCloth( NxCloth &cloth );
-   
+
    void releaseClothMesh( NxClothMesh &clothMesh );
 
    void releaseController( NxController &controller );

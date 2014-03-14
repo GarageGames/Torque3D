@@ -89,8 +89,8 @@ GFXDevice::DeviceEventSignal& GFXDevice::getDeviceEventSignal()
    return theSignal;
 }
 
-GFXDevice::GFXDevice() 
-{    
+GFXDevice::GFXDevice()
+{
    VECTOR_SET_ASSOCIATION( mVideoModes );
    VECTOR_SET_ASSOCIATION( mRTStack );
 
@@ -102,13 +102,13 @@ GFXDevice::GFXDevice()
 
    mViewMatrix.identity();
    mProjectionMatrix.identity();
-   
+
    for( int i = 0; i < WORLD_STACK_MAX; i++ )
       mWorldMatrix[i].identity();
-   
+
    AssertFatal(smGFXDevice == NULL, "Already a GFXDevice created! Bad!");
    smGFXDevice = this;
-      
+
    // Vertex buffer cache
    mCurrVertexDecl = NULL;
    mVertexDeclDirty = false;
@@ -122,7 +122,7 @@ GFXDevice::GFXDevice()
    // Primitive buffer cache
    mPrimitiveBufferDirty = false;
    mTexturesDirty = false;
-   
+
    // Use of TEXTURE_STAGE_COUNT in initialization is okay [7/2/2007 Pat]
    for(U32 i = 0; i < TEXTURE_STAGE_COUNT; i++)
    {
@@ -150,7 +150,7 @@ GFXDevice::GFXDevice()
    mLightMaterialDirty = false;
    dMemset(&mCurrentLightMaterial, NULL, sizeof(GFXLightMaterial));
 
-   // State block 
+   // State block
    mStateBlockDirty = false;
    mCurrentStateBlock = NULL;
    mNewStateBlock = NULL;
@@ -164,7 +164,7 @@ GFXDevice::GFXDevice()
    mStereoEyeOffset = Point3F::Zero;
    mCanCurrentlyRender = false;
    mInitialized = false;
-   
+
    mRTDirty = false;
    mViewport = RectI::Zero;
    mViewportDirty = false;
@@ -176,7 +176,7 @@ GFXDevice::GFXDevice()
 
    mResourceListHead = NULL;
 
-   mCardProfiler = NULL;   
+   mCardProfiler = NULL;
 
    // Initialize our drawing utility.
    mDrawer = NULL;
@@ -189,13 +189,13 @@ GFXDevice::GFXDevice()
    #elif defined TORQUE_OS_MAC
       GFXShader::addGlobalMacro( "TORQUE_OS_MAC" );
    #elif defined TORQUE_OS_LINUX
-      GFXShader::addGlobalMacro( "TORQUE_OS_LINUX" );      
+      GFXShader::addGlobalMacro( "TORQUE_OS_LINUX" );
    #elif defined TORQUE_OS_XENON
       GFXShader::addGlobalMacro( "TORQUE_OS_XENON" );
    #elif defined TORQUE_OS_XBOX
-      GFXShader::addGlobalMacro( "TORQUE_OS_XBOX" );      
+      GFXShader::addGlobalMacro( "TORQUE_OS_XBOX" );
    #elif defined TORQUE_OS_PS3
-      GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );            
+      GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );
    #endif
 }
 
@@ -216,11 +216,11 @@ void GFXDevice::deviceInited()
    // Initialize the static helper textures.
    GBitmap temp( 2, 2, false, GFXFormatR8G8B8A8 );
    temp.fill( ColorI::ONE );
-   GFXTexHandle::ONE.set( &temp, &GFXDefaultStaticDiffuseProfile, false, "GFXTexHandle::ONE" ); 
+   GFXTexHandle::ONE.set( &temp, &GFXDefaultStaticDiffuseProfile, false, "GFXTexHandle::ONE" );
    temp.fill( ColorI::ZERO );
-   GFXTexHandle::ZERO.set( &temp, &GFXDefaultStaticDiffuseProfile, false, "GFXTexHandle::ZERO" ); 
+   GFXTexHandle::ZERO.set( &temp, &GFXDefaultStaticDiffuseProfile, false, "GFXTexHandle::ZERO" );
    temp.fill( ColorI( 128, 128, 255 ) );
-   GFXTexHandle::ZUP.set( &temp, &GFXDefaultStaticNormalMapProfile, false, "GFXTexHandle::ZUP" ); 
+   GFXTexHandle::ZUP.set( &temp, &GFXDefaultStaticNormalMapProfile, false, "GFXTexHandle::ZUP" );
 }
 
 bool GFXDevice::destroy()
@@ -250,7 +250,7 @@ void GFXDevice::preDestroy()
 }
 
 GFXDevice::~GFXDevice()
-{ 
+{
    smGFXDevice = NULL;
 
    // Clean up our current buffers.
@@ -294,7 +294,7 @@ GFXDevice::~GFXDevice()
    {
       GFXResource * head = mResourceListHead;
       mResourceListHead = head->mNextResource;
-      
+
       head->mPrevResource = NULL;
       head->mNextResource = NULL;
       head->mOwningDevice = NULL;
@@ -310,7 +310,7 @@ GFXStateBlockRef GFXDevice::createStateBlock(const GFXStateBlockDesc& desc)
       return mCurrentStateBlocks[hashValue];
 
    GFXStateBlockRef result = createStateBlockInternal(desc);
-   result->registerResourceWithDevice(this);   
+   result->registerResourceWithDevice(this);
    mCurrentStateBlocks[hashValue] = result;
    return result;
 }
@@ -387,7 +387,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
                {
                   mCurrentTexture[i] = mNewTexture[i];
                   setTextureInternal(i, mCurrentTexture[i]);
-               }  
+               }
                break;
             case GFXTDT_Cube :
                {
@@ -433,14 +433,14 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
       setMatrix( GFXMatrixProjection, mProjectionMatrix );
       mProjectionMatrixDirty = false;
    }
-   
+
    // Update World Matrix
    if( mWorldMatrixDirty )
    {
       setMatrix( GFXMatrixWorld, mWorldMatrix[mWorldStackSize] );
       mWorldMatrixDirty = false;
    }
-   
+
    // Update View Matrix
    if( mViewMatrixDirty )
    {
@@ -524,7 +524,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
             {
                mCurrentTexture[i] = mNewTexture[i];
                setTextureInternal(i, mCurrentTexture[i]);
-            }  
+            }
             break;
          case GFXTDT_Cube :
             {
@@ -541,7 +541,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
          }
       }
    }
-   
+
    // Set light material
    if(mLightMaterialDirty)
    {
@@ -574,7 +574,7 @@ void GFXDevice::setPrimitiveBuffer( GFXPrimitiveBuffer *buffer )
 {
    if( buffer == mCurrentPrimitiveBuffer )
       return;
-   
+
    mCurrentPrimitiveBuffer = buffer;
    mPrimitiveBufferDirty = true;
    mStateDirty = true;
@@ -590,11 +590,11 @@ void GFXDevice::drawPrimitive( U32 primitiveIndex )
 void GFXDevice::drawPrimitive( const GFXPrimitive &prim )
 {
    // Do NOT add index buffer offset to this call, it will be added by drawIndexedPrimitive
-   drawIndexedPrimitive(   prim.type, 
+   drawIndexedPrimitive(   prim.type,
                            prim.startVertex,
-                           prim.minIndex, 
-                           prim.numVertices, 
-                           prim.startIndex, 
+                           prim.minIndex,
+                           prim.numVertices,
+                           prim.startIndex,
                            prim.numPrimitives );
 }
 
@@ -603,16 +603,16 @@ void GFXDevice::drawPrimitives()
    AssertFatal( mCurrentPrimitiveBuffer.isValid(), "Trying to call drawPrimitive with no current primitive buffer, call setPrimitiveBuffer()" );
 
    GFXPrimitive *info = NULL;
-   
+
    for( U32 i = 0; i < mCurrentPrimitiveBuffer->mPrimitiveCount; i++ ) {
       info = &mCurrentPrimitiveBuffer->mPrimitiveArray[i];
 
       // Do NOT add index buffer offset to this call, it will be added by drawIndexedPrimitive
-      drawIndexedPrimitive(   info->type, 
+      drawIndexedPrimitive(   info->type,
                               info->startVertex,
-                              info->minIndex, 
-                              info->numVertices, 
-                              info->startIndex, 
+                              info->minIndex,
+                              info->numVertices,
+                              info->startIndex,
                               info->numPrimitives );
    }
 }
@@ -635,17 +635,17 @@ DefineEngineFunction( getDisplayDeviceList, String, (),,
    return str.end();
 }
 
-void GFXDevice::setFrustum(   F32 left, 
-                              F32 right, 
-                              F32 bottom, 
-                              F32 top, 
-                              F32 nearPlane, 
+void GFXDevice::setFrustum(   F32 left,
+                              F32 right,
+                              F32 bottom,
+                              F32 top,
+                              F32 nearPlane,
                               F32 farPlane,
                               bool bRotate )
 {
    // store values
    mFrustum.set(false, left, right, top, bottom, nearPlane, farPlane);
-   
+
    // compute matrix
    MatrixF projection;
    mFrustum.getProjectionMatrix(&projection, bRotate);
@@ -656,7 +656,7 @@ void GFXDevice::setFrustum( const Frustum& frust, bool bRotate )
 {
    // store values
    mFrustum = frust;
-   
+
    // compute matrix
    MatrixF projection;
    mFrustum.getProjectionMatrix(&projection, bRotate);
@@ -665,7 +665,7 @@ void GFXDevice::setFrustum( const Frustum& frust, bool bRotate )
 
 
 void GFXDevice::getFrustum( F32 *left, F32 *right, F32 *bottom, F32 *top, F32 *nearPlane, F32 *farPlane, bool *isOrtho ) const
-{   
+{
    if ( left )       *left       = mFrustum.getNearLeft();
    if ( right )      *right      = mFrustum.getNearRight();
    if ( bottom )     *bottom     = mFrustum.getNearBottom();
@@ -675,11 +675,11 @@ void GFXDevice::getFrustum( F32 *left, F32 *right, F32 *bottom, F32 *top, F32 *n
    if ( isOrtho )    *isOrtho    = mFrustum.isOrtho();
 }
 
-void GFXDevice::setOrtho(  F32 left, 
-                           F32 right, 
-                           F32 bottom, 
-                           F32 top, 
-                           F32 nearPlane, 
+void GFXDevice::setOrtho(  F32 left,
+                           F32 right,
+                           F32 bottom,
+                           F32 top,
+                           F32 nearPlane,
                            F32 farPlane,
                            bool doRotate )
 {
@@ -688,7 +688,7 @@ void GFXDevice::setOrtho(  F32 left,
 
    // compute matrix
    MatrixF projection;
-   mFrustum.getProjectionMatrix(&projection, doRotate);  
+   mFrustum.getProjectionMatrix(&projection, doRotate);
 
    setProjectionMatrix( projection );
 }
@@ -811,7 +811,7 @@ inline bool GFXDevice::beginScene()
 inline void GFXDevice::endScene()
 {
    AssertFatal( mCanCurrentlyRender == true, "GFXDevice::endScene() - The scene has already ended!" );
-   
+
    // End frame signal
    getDeviceEventSignal().trigger( GFXDevice::deEndOfFrame );
 
@@ -835,7 +835,7 @@ inline void GFXDevice::endField()
    getDeviceEventSignal().trigger( GFXDevice::deEndOfField );
 }
 
-void GFXDevice::setViewport( const RectI &inRect ) 
+void GFXDevice::setViewport( const RectI &inRect )
 {
    // Clip the rect against the renderable size.
    Point2I size = mCurrentRT->getSize();
@@ -847,7 +847,7 @@ void GFXDevice::setViewport( const RectI &inRect )
    {
       mViewport = rect;
       mViewportDirty = true;
-   }   
+   }
 }
 
 void GFXDevice::pushActiveRenderTarget()
@@ -867,13 +867,13 @@ void GFXDevice::popActiveRenderTarget()
 
 void GFXDevice::setActiveRenderTarget( GFXTarget *target, bool updateViewport )
 {
-   AssertFatal( target, 
+   AssertFatal( target,
       "GFXDevice::setActiveRenderTarget - must specify a render target!" );
 
    if ( target == mCurrentRT )
       return;
-   
-   // If we're not dirty then store the 
+
+   // If we're not dirty then store the
    // current RT for deactivation later.
    if ( !mRTDirty )
    {
@@ -893,7 +893,7 @@ void GFXDevice::setActiveRenderTarget( GFXTarget *target, bool updateViewport )
    //
    // We should consider removing this and making it the
    // responsibility of the caller to set a proper viewport
-   // when the target is changed.   
+   // when the target is changed.
    if ( updateViewport )
    {
       setViewport( RectI( Point2I::Zero, mCurrentRT->getSize() ) );
@@ -1017,11 +1017,11 @@ void GFXDevice::listResources(bool unflaggedOnly)
 }
 
 void GFXDevice::fillResourceVectors(const char* resNames, bool unflaggedOnly, Vector<GFXResource*> &textureObjects,
-                                 Vector<GFXResource*> &textureTargets, Vector<GFXResource*> &windowTargets, Vector<GFXResource*> &vertexBuffers, 
-                                 Vector<GFXResource*> &primitiveBuffers, Vector<GFXResource*> &fences, Vector<GFXResource*> &cubemaps, 
+                                 Vector<GFXResource*> &textureTargets, Vector<GFXResource*> &windowTargets, Vector<GFXResource*> &vertexBuffers,
+                                 Vector<GFXResource*> &primitiveBuffers, Vector<GFXResource*> &fences, Vector<GFXResource*> &cubemaps,
                                  Vector<GFXResource*> &shaders, Vector<GFXResource*> &stateblocks)
 {
-   bool describeTexture = true, describeTextureTarget = true, describeWindowTarget = true, describeVertexBuffer = true, 
+   bool describeTexture = true, describeTextureTarget = true, describeWindowTarget = true, describeVertexBuffer = true,
       describePrimitiveBuffer = true, describeFence = true, describeCubemap = true, describeShader = true,
       describeStateBlock = true;
 
@@ -1052,7 +1052,7 @@ void GFXDevice::fillResourceVectors(const char* resNames, bool unflaggedOnly, Ve
       }
 
       // All of the following checks go through the same logic.
-      // if(describingThisResource) 
+      // if(describingThisResource)
       // {
       //    ResourceType* type = dynamic_cast<ResourceType*>(walk)
       //    if(type)
@@ -1164,10 +1164,10 @@ void GFXDevice::describeResources(const char* resNames, const char* filePath, bo
 {
    const U32 numResourceTypes = 9;
    Vector<GFXResource*> resVectors[numResourceTypes];
-   const char* reslabels[numResourceTypes] = { "texture", "texture target", "window target", "vertex buffers", "primitive buffers", "fences", "cubemaps", "shaders", "stateblocks" };   
+   const char* reslabels[numResourceTypes] = { "texture", "texture target", "window target", "vertex buffers", "primitive buffers", "fences", "cubemaps", "shaders", "stateblocks" };
 
    // Fill the vectors with the right resources
-   fillResourceVectors(resNames, unflaggedOnly, resVectors[0], resVectors[1], resVectors[2], resVectors[3], 
+   fillResourceVectors(resNames, unflaggedOnly, resVectors[0], resVectors[1], resVectors[2], resVectors[3],
       resVectors[4], resVectors[5], resVectors[6], resVectors[7], resVectors[8]);
 
    // Helper object
@@ -1265,11 +1265,11 @@ DefineEngineFunction( describeGFXResources, void, ( const char *resourceTypes, c
 }
 
 DefineEngineFunction( describeGFXStateBlocks, void, ( const char *filePath ),,
-   "Dumps a description of all state blocks.\n"     
+   "Dumps a description of all state blocks.\n"
    "@param filePath A file to dump the state blocks to or an empty string to write to the console.\n"
    "@ingroup GFX\n" )
 {
-   GFX->dumpStates( filePath );   
+   GFX->dumpStates( filePath );
 }
 
 DefineEngineFunction( getPixelShaderVersion, F32, (),,
@@ -1277,7 +1277,7 @@ DefineEngineFunction( getPixelShaderVersion, F32, (),,
    "@ingroup GFX\n" )
 {
    return GFX->getPixelShaderVersion();
-}   
+}
 
 DefineEngineFunction( setPixelShaderVersion, void, ( float version ),,
    "@brief Sets the pixel shader version for the active device.\n"
@@ -1315,9 +1315,9 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
    Vector<GFXFormat> formats;
    formats.push_back( GFXFormatR10G10B10A2 );
    formats.push_back( GFXFormatR16G16B16A16F );
-   formats.push_back( GFXFormatR16G16B16A16 );    
+   formats.push_back( GFXFormatR16G16B16A16 );
    GFXFormat format = GFX->selectSupportedFormat(  &GFXDefaultRenderTargetProfile,
-                                                   formats, 
+                                                   formats,
                                                    true,
                                                    true,
                                                    true );

@@ -97,7 +97,7 @@ typedef unsigned long long  U64;
 // This could be reconfigured for static builds, though minimal impact
 //#     define TORQUE_SUPPORTS_NASM
 #  endif
-#else 
+#else
 #  error "GCC: Unsupported Operating System"
 #endif
 

@@ -39,7 +39,7 @@ ConsoleDocClass( RenderFormatToken,
 
    "RenderFormatToken is an implementation which changes the format of the "
    "back buffer and/or the depth buffer.\n\n"
-   
+
    "The RenderPassStateBin manager changes the rendering state associated with "
    "this token. In stock Torque 3D, a single example exists in the "
    "way of AL_FormatToken (found in renderManager.cs). In that script file, all the "
@@ -77,10 +77,10 @@ ConsoleDocClass( RenderFormatToken,
    "@ingroup GFX\n"
 );
 
-RenderFormatToken::RenderFormatToken() 
-   :  Parent(), 
-      mFCState(FTSDisabled), 
-      mColorFormat(GFXFormat_COUNT), 
+RenderFormatToken::RenderFormatToken()
+   :  Parent(),
+      mFCState(FTSDisabled),
+      mColorFormat(GFXFormat_COUNT),
       mDepthFormat(GFXFormat_COUNT),
       mTargetUpdatePending(true),
       mTargetChainIdx(0),
@@ -115,7 +115,7 @@ void RenderFormatToken::process(SceneRenderState *state, RenderPassStateBin *cal
          // Update targets
          _updateTargets();
 
-         // If we have a copy PostEffect then get the active backbuffer copy 
+         // If we have a copy PostEffect then get the active backbuffer copy
          // now before we swap the render targets.
          GFXTexHandle curBackBuffer;
          if(mCopyPostEffect.isValid())
@@ -157,8 +157,8 @@ void RenderFormatToken::process(SceneRenderState *state, RenderPassStateBin *cal
          AssertFatal(GFX->getActiveRenderTarget() == mTargetChain[mTargetChainIdx], "Render target stack went wrong somewhere");
          mTargetChain[mTargetChainIdx]->resolve();
          GFX->popActiveRenderTarget();
-         mTarget.setTexture( mTargetColorTexture[mTargetChainIdx] ); 
-         
+         mTarget.setTexture( mTargetColorTexture[mTargetChainIdx] );
+
          // This is the GFX viewport when we were first processed.
          GFX->setViewport( mTarget.getViewport() );
 
@@ -201,13 +201,13 @@ void RenderFormatToken::_updateTargets()
 
    const Point2I &rtSize = GFX->getActiveRenderTarget()->getSize();
 
-   if ( rtSize.x <= mTargetSize.x && 
-        rtSize.y <= mTargetSize.y && 
+   if ( rtSize.x <= mTargetSize.x &&
+        rtSize.y <= mTargetSize.y &&
         !mTargetUpdatePending )
-      return;   
+      return;
 
    mTargetSize = rtSize;
-   mTargetUpdatePending = false;   
+   mTargetUpdatePending = false;
    mTargetChainIdx = 0;
 
    for( U32 i = 0; i < TargetChainLength; i++ )
@@ -218,19 +218,19 @@ void RenderFormatToken::_updateTargets()
       // Update color target
       if(mColorFormat != GFXFormat_COUNT)
       {
-         mTargetColorTexture[i].set( rtSize.x, rtSize.y, mColorFormat, 
+         mTargetColorTexture[i].set( rtSize.x, rtSize.y, mColorFormat,
             &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, mTargetAALevel );
          mTargetChain[i]->attachTexture( GFXTextureTarget::Color0, mTargetColorTexture[i] );
       }
 
       mTargetChain[i]->attachTexture( GFXTextureTarget::Color0, mTargetColorTexture[i] );
-      
+
 
       // Update depth target
       if(mDepthFormat != GFXFormat_COUNT)
       {
-         mTargetDepthStencilTexture[i].set( rtSize.x, rtSize.y, mDepthFormat, 
+         mTargetDepthStencilTexture[i].set( rtSize.x, rtSize.y, mDepthFormat,
             &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, mTargetAALevel );
       }
@@ -311,10 +311,10 @@ bool RenderFormatToken::isEnabled() const
 
 void RenderFormatToken::initPersistFields()
 {
-   addProtectedField("format", TypeGFXFormat, Offset(mColorFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn, 
+   addProtectedField("format", TypeGFXFormat, Offset(mColorFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn,
       "Sets the color buffer format for this token.");
 
-   addProtectedField("depthFormat", TypeGFXFormat, Offset(mDepthFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn, 
+   addProtectedField("depthFormat", TypeGFXFormat, Offset(mDepthFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn,
       "Sets the depth/stencil buffer format for this token.");
 
    addProtectedField("copyEffect", TYPEID<PostEffect>(), Offset(mCopyPostEffect, RenderFormatToken),
@@ -327,7 +327,7 @@ void RenderFormatToken::initPersistFields()
       "This PostEffect will be run when the render target is changed back to the format "
       "active prior to this token. It is used to copy/format data from the token rendertarget to the backbuffer.");
 
-   addField("aaLevel", TypeS32, Offset(mTargetAALevel, RenderFormatToken), 
+   addField("aaLevel", TypeS32, Offset(mTargetAALevel, RenderFormatToken),
       "Anti-ailiasing level for the this token. 0 disables, -1 uses adapter default.");
 
    Parent::initPersistFields();

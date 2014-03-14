@@ -536,7 +536,7 @@ inline U32 Point3F::getLeastComponentIndex() const
    else
    {
       if ( mFabs( y ) < mFabs( z ) )
-         idx = 1;  
+         idx = 1;
       else
          idx = 2;
    }
@@ -558,7 +558,7 @@ inline U32 Point3F::getGreatestComponentIndex() const
    else
    {
       if ( mFabs( y ) > mFabs( z ) )
-         idx = 1;  
+         idx = 1;
       else
          idx = 2;
    }

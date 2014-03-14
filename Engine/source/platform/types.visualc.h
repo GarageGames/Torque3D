@@ -49,7 +49,7 @@ typedef unsigned _int64 U64;
 
 //--------------------------------------
 // Identify the Operating System
-#if _XBOX_VER >= 200 
+#if _XBOX_VER >= 200
 #  define TORQUE_OS_STRING "Xenon"
 #  ifndef TORQUE_OS_XENON
 #     define TORQUE_OS_XENON
@@ -63,7 +63,7 @@ typedef unsigned _int64 U64;
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN32
 #  include "platform/types.win32.h"
-#else 
+#else
 #  error "VC: Unsupported Operating System"
 #endif
 
@@ -94,7 +94,7 @@ typedef unsigned _int64 U64;
 
 // disable warning caused by memory layer
 // see msdn.microsoft.com "Compiler Warning (level 1) C4291" for more details
-#pragma warning(disable: 4291) 
+#pragma warning(disable: 4291)
 
 
 #endif // INCLUDED_TYPES_VISUALC_H

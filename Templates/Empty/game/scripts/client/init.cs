@@ -63,8 +63,8 @@ function initClient()
    // These should be game specific GuiProfiles.  Custom profiles are saved out
    // from the Gui Editor.  Either of these may override any that already exist.
    exec("art/gui/gameProfiles.cs");
-   exec("art/gui/customProfiles.cs"); 
-   
+   exec("art/gui/customProfiles.cs");
+
    // The common module provides basic client functionality
    initBaseClient();
 
@@ -81,7 +81,7 @@ function initClient()
    exec("art/gui/loadingGui.gui");
    exec("art/gui/optionsDlg.gui");
    exec("art/gui/remapDlg.gui");
-   
+
    // Gui scripts
    exec("scripts/gui/playGui.cs");
    exec("scripts/gui/startupGui.cs");
@@ -133,7 +133,7 @@ function initClient()
       // Otherwise go to the splash screen.
       Canvas.setCursor("DefaultCursor");
       loadStartup();
-   }   
+   }
 }
 
 
@@ -144,7 +144,7 @@ function loadMainMenu()
    // Startup the client with the Main menu...
    if (isObject( MainMenuGui ))
       Canvas.setContent( MainMenuGui );
-   
+
    Canvas.setCursor("DefaultCursor");
 
    // first check if we have a level file to load
@@ -160,7 +160,7 @@ function loadMainMenu()
       // Clear out the $levelToLoad so we don't attempt to load the level again
       // later on.
       $levelToLoad = "";
-      
+
       // let's make sure the file exists
       %file = findFirstFile(%levelFile);
 

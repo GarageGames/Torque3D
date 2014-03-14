@@ -26,10 +26,10 @@
 
 void BitVector::_resize( U32 sizeInBits, bool copyBits )
 {
-   if ( sizeInBits != 0 ) 
+   if ( sizeInBits != 0 )
    {
       U32 newSize = calcByteSize( sizeInBits );
-      if ( mByteSize < newSize ) 
+      if ( mByteSize < newSize )
       {
          U8 *newBits = new U8[newSize];
          if( copyBits )
@@ -39,8 +39,8 @@ void BitVector::_resize( U32 sizeInBits, bool copyBits )
          mBits = newBits;
          mByteSize = newSize;
       }
-   } 
-   else 
+   }
+   else
    {
       delete [] mBits;
       mBits     = NULL;
@@ -96,7 +96,7 @@ bool BitVector::testAll() const
       return true;
 
    const U8 mask = (U8)0xFF >> ( 8 - remaider );
-   return ( mBits[testBytes] & mask ) == mask; 
+   return ( mBits[testBytes] & mask ) == mask;
 }
 
 bool BitVector::testAllClear() const

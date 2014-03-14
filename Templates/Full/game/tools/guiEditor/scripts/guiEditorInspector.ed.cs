@@ -40,30 +40,30 @@ function GuiEditorInspectFields::update( %this, %inspectTarget )
 function GuiEditorInspectFields::onInspectorFieldModified( %this, %object, %fieldName, %arrayIndex, %oldValue, %newValue )
 {
    // The instant group will try to add our
-   // UndoAction if we don't disable it.   
+   // UndoAction if we don't disable it.
    pushInstantGroup();
 
    %nameOrClass = %object.getName();
    if ( %nameOrClass $= "" )
       %nameOrClass = %object.getClassname();
-      
+
    %action = new InspectorFieldUndoAction()
    {
       actionName = %nameOrClass @ "." @ %fieldName @ " Change";
-      
+
       objectId = %object.getId();
       fieldName = %fieldName;
       fieldValue = %oldValue;
       arrayIndex = %arrayIndex;
-                  
+
       inspectorGui = %this;
    };
-   
+
    // Restore the instant group.
    popInstantGroup();
-         
+
    %action.addToManager( GuiEditor.getUndoManager() );
-   
+
    GuiEditor.updateUndoMenu();
 }
 
@@ -73,15 +73,15 @@ function GuiEditorInspectFields::onInspectorPreFieldModification( %this, %fieldN
 {
    pushInstantGroup();
    %undoManager = GuiEditor.getUndoManager();
-   
+
    %numObjects = %this.getNumInspectObjects();
    if( %numObjects > 1 )
       %action = %undoManager.pushCompound( "Multiple Field Edit" );
-      
+
    for( %i = 0; %i < %numObjects; %i ++ )
    {
       %object = %this.getInspectObject( %i );
-      
+
       %nameOrClass = %object.getName();
       if( %nameOrClass $= "" )
          %nameOrClass = %object.getClassname();
@@ -97,7 +97,7 @@ function GuiEditorInspectFields::onInspectorPreFieldModification( %this, %fieldN
 
          inspectorGui = %this;
       };
-      
+
       if( %numObjects > 1 )
          %undo.addToManager( %undoManager );
       else
@@ -106,7 +106,7 @@ function GuiEditorInspectFields::onInspectorPreFieldModification( %this, %fieldN
          break;
       }
    }
-      
+
    %this.currentFieldEditAction = %action;
    popInstantGroup();
 }
@@ -125,7 +125,7 @@ function GuiEditorInspectFields::onInspectorPostFieldModification( %this )
       // Queue single field undo.
       %this.currentFieldEditAction.addToManager( GuiEditor.getUndoManager() );
    }
-   
+
    %this.currentFieldEditAction = "";
    GuiEditor.updateUndoMenu();
 }
@@ -135,7 +135,7 @@ function GuiEditorInspectFields::onInspectorPostFieldModification( %this )
 function GuiEditorInspectFields::onInspectorDiscardFieldModification( %this )
 {
    %this.currentFieldEditAction.undo();
-   
+
    if( %this.currentFieldEditAction.isMemberOfClass( "CompoundUndoAction" ) )
    {
       // Multiple field editor.  Pop and discard.
@@ -146,7 +146,7 @@ function GuiEditorInspectFields::onInspectorDiscardFieldModification( %this )
       // Single field edit.  Just kill undo action.
       %this.currentFieldEditAction.delete();
    }
-   
+
    %this.currentFieldEditAction = "";
 }
 

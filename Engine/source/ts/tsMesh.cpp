@@ -112,7 +112,7 @@ void tsForceFaceCamera( MatrixF *mat, const Point3F *objScale )
 void TSMesh::render( TSVertexBufferHandle &instanceVB, GFXPrimitiveBufferHandle &instancePB )
 {
    // A TSMesh never uses the instanceVB.
-   TORQUE_UNUSED( instanceVB ); 
+   TORQUE_UNUSED( instanceVB );
    TORQUE_UNUSED( instancePB );
 
    innerRender( mVB, mPB );
@@ -125,21 +125,21 @@ void TSMesh::innerRender( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
 
    GFX->setVertexBuffer( vb );
    GFX->setPrimitiveBuffer( pb );
-   
+
    for( U32 p = 0; p < primitives.size(); p++ )
       GFX->drawPrimitive( p );
 }
 
 
-void TSMesh::render( TSMaterialList *materials, 
-                     const TSRenderState &rdata, 
+void TSMesh::render( TSMaterialList *materials,
+                     const TSRenderState &rdata,
                      bool isSkinDirty,
-                     const Vector<MatrixF> &transforms, 
+                     const Vector<MatrixF> &transforms,
                      TSVertexBufferHandle &vertexBuffer,
                      GFXPrimitiveBufferHandle &primitiveBuffer )
 {
    // These are only used by TSSkinMesh.
-   TORQUE_UNUSED( isSkinDirty );   
+   TORQUE_UNUSED( isSkinDirty );
    TORQUE_UNUSED( transforms );
    TORQUE_UNUSED( vertexBuffer );
    TORQUE_UNUSED( primitiveBuffer );
@@ -152,7 +152,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 {
    PROFILE_SCOPE( TSMesh_InnerRender );
 
-   if( vertsPerFrame <= 0 ) 
+   if( vertsPerFrame <= 0 )
       return;
 
    F32 meshVisibility = rdata.getFadeOverride() * mVisibility;
@@ -174,7 +174,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
    {
       Box3F rBox = mBounds;
       objToWorld.mul( rBox );
-      coreRI->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );      
+      coreRI->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );
    }
 
    if (getFlags(Billboard))
@@ -207,7 +207,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 
    coreRI->materialHint = rdata.getMaterialHint();
 
-   coreRI->visibility = meshVisibility;  
+   coreRI->visibility = meshVisibility;
    coreRI->cubemap = rdata.getCubemap();
 
    // NOTICE: SFXBB is removed and refraction is disabled!
@@ -222,7 +222,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
          continue;
 
 #ifdef TORQUE_DEBUG
-      // for inspection if you happen to be running in a debugger and can't do bit 
+      // for inspection if you happen to be running in a debugger and can't do bit
       // operations in your head.
       S32 triangles = draw.matIndex & TSDrawPrimitive::Triangles;
       S32 strip = draw.matIndex & TSDrawPrimitive::Strip;
@@ -420,7 +420,7 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
    S32 i;
    S32 base = cf->mVertexList.size();
 
-   for ( i = 0; i < vertsPerFrame; i++ ) 
+   for ( i = 0; i < vertsPerFrame; i++ )
    {
       cf->mVertexList.increment();
       mat.mulP( mVertexData[firstVert + i].vert(), &cf->mVertexList.last() );
@@ -450,7 +450,7 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
             cf->mFaceList.last().vertex[1] = base + indices[start + j + 1];
             cf->mFaceList.last().vertex[2] = base + indices[start + j + 2];
 
-            for ( U32 l = 0; l < 3; l++ ) 
+            for ( U32 l = 0; l < 3; l++ )
             {
                U32 newEdge0, newEdge1;
                U32 zero = base + indices[start + j + l];
@@ -458,17 +458,17 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
                newEdge0 = getMin( zero, one );
                newEdge1 = getMax( zero, one );
                bool found = false;
-               for ( S32 k = 0; k < cf->mEdgeList.size(); k++ ) 
+               for ( S32 k = 0; k < cf->mEdgeList.size(); k++ )
                {
                   if ( cf->mEdgeList[k].vertex[0] == newEdge0 &&
-                       cf->mEdgeList[k].vertex[1] == newEdge1) 
+                       cf->mEdgeList[k].vertex[1] == newEdge1)
                   {
                      found = true;
                      break;
                   }
                }
 
-               if ( !found ) 
+               if ( !found )
                {
                   cf->mEdgeList.increment();
                   cf->mEdgeList.last().vertex[0] = newEdge0;
@@ -509,17 +509,17 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
             newEdge1 = getMax( idx0, idx1 );
             bool found = false;
             S32 k;
-            for ( k = 0; k < cf->mEdgeList.size(); k++ ) 
+            for ( k = 0; k < cf->mEdgeList.size(); k++ )
             {
                if ( cf->mEdgeList[k].vertex[0] == newEdge0 &&
-                    cf->mEdgeList[k].vertex[1] == newEdge1) 
+                    cf->mEdgeList[k].vertex[1] == newEdge1)
                {
                   found = true;
                   break;
                }
             }
 
-            if ( !found ) 
+            if ( !found )
             {
                cf->mEdgeList.increment();
                cf->mEdgeList.last().vertex[0] = newEdge0;
@@ -529,17 +529,17 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
             newEdge0 = getMin( idx1, idx2 );
             newEdge1 = getMax( idx1, idx2 );
             found = false;
-            for ( k = 0; k < cf->mEdgeList.size(); k++ ) 
+            for ( k = 0; k < cf->mEdgeList.size(); k++ )
             {
                if ( cf->mEdgeList[k].vertex[0] == newEdge0 &&
-                    cf->mEdgeList[k].vertex[1] == newEdge1 ) 
+                    cf->mEdgeList[k].vertex[1] == newEdge1 )
                {
                   found = true;
                   break;
                }
             }
 
-            if ( !found ) 
+            if ( !found )
             {
                cf->mEdgeList.increment();
                cf->mEdgeList.last().vertex[0] = newEdge0;
@@ -549,17 +549,17 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
             newEdge0 = getMin(idx0, idx2);
             newEdge1 = getMax(idx0, idx2);
             found = false;
-            for ( k = 0; k < cf->mEdgeList.size(); k++ ) 
+            for ( k = 0; k < cf->mEdgeList.size(); k++ )
             {
                if ( cf->mEdgeList[k].vertex[0] == newEdge0 &&
-                    cf->mEdgeList[k].vertex[1] == newEdge1 ) 
+                    cf->mEdgeList[k].vertex[1] == newEdge1 )
                {
                   found = true;
                   break;
                }
             }
 
-            if ( !found ) 
+            if ( !found )
             {
                cf->mEdgeList.increment();
                cf->mEdgeList.last().vertex[0] = newEdge0;
@@ -655,7 +655,7 @@ bool TSMesh::castRay( S32 frame, const Point3F & start, const Point3F & end, Ray
          // same side of the plane...which side -- dot==0 considered inside
          if ( dot1 > 0.0f )
             return false; // start and end outside of this plane, no collision
-         
+
          // start and end inside plane, continue
          continue;
       }
@@ -755,7 +755,7 @@ bool TSMesh::castRay( S32 frame, const Point3F & start, const Point3F & end, Ray
 
 bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & end, RayInfo * rayInfo, TSMaterialList* materials )
 {
-   if( vertsPerFrame <= 0 ) 
+   if( vertsPerFrame <= 0 )
       return false;
 
    if( mNumVerts == 0 )
@@ -827,7 +827,7 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
 			   F32 cur_t = 0;
 			   Point2F b;
 
-			   if(castRayTriangle(start, dir, mVertexData[firstVert + idx0].vert(), 
+			   if(castRayTriangle(start, dir, mVertexData[firstVert + idx0].vert(),
                mVertexData[firstVert + idx1].vert(), mVertexData[firstVert + idx2].vert(), cur_t, b))
 			   {
 				   if(cur_t < best_t)
@@ -878,7 +878,7 @@ bool TSMesh::addToHull( U32 idx0, U32 idx1, U32 idx2 )
 {
    // calculate the normal of this triangle... remember, we lose precision
    // when we subtract two large numbers that are very close to each other,
-   // so depending on how we calculate the normal, we could get a 
+   // so depending on how we calculate the normal, we could get a
    // different result. so, we will calculate the normal three different
    // ways and take the one that gives us the largest vector before we
    // normalize.
@@ -905,7 +905,7 @@ bool TSMesh::addToHull( U32 idx0, U32 idx1, U32 idx2 )
 
    normal.normalize();
    F32 k = mDot( normal, mVertexData[idx0].vert() );
-   for ( S32 i = 0; i < planeNormals.size(); i++ ) 
+   for ( S32 i = 0; i < planeNormals.size(); i++ )
    {
       if ( mDot( planeNormals[i], normal ) > 0.99f && mFabs( k-planeConstants[i] ) < 0.01f )
          return false;          // this is a repeat...
@@ -942,8 +942,8 @@ bool TSMesh::buildConvexHull()
          if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
          {
             for ( j = 0;  j < draw.numElements; j += 3 )
-               if ( addToHull(   indices[start + j + 0] + firstVert, 
-                                 indices[start + j + 1] + firstVert, 
+               if ( addToHull(   indices[start + j + 0] + firstVert,
+                                 indices[start + j + 1] + firstVert,
                                  indices[start + j + 2] + firstVert ) && frame == 0 )
                   planeMaterials.push_back( draw.matIndex & TSDrawPrimitive::MaterialMask );
          }
@@ -1225,7 +1225,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
       register Point3F skinnedVert;
       register Point3F skinnedNorm;
 
-      for( Vector<BatchData::BatchedVertex>::const_iterator itr = batchData.vertexBatchOperations.begin(); 
+      for( Vector<BatchData::BatchedVertex>::const_iterator itr = batchData.vertexBatchOperations.begin();
          itr != batchData.vertexBatchOperations.end(); itr++ )
       {
          const BatchData::BatchedVertex &curVert = *itr;
@@ -1234,7 +1234,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
          skinnedNorm.zero();
 
          for( int tOp = 0; tOp < curVert.transformCount; tOp++ )
-         {      
+         {
             const BatchData::TransformOp &transformOp = curVert.transform[tOp];
 
             const MatrixF& deltaTransform = matrices[transformOp.transformIndex];
@@ -1246,7 +1246,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
             skinnedNorm += srcNrm * transformOp.weight;
          }
 
-         // Assign results 
+         // Assign results
          __TSMeshVertexBase &dest = mVertexData[curVert.vertexIndex];
          dest.vert(skinnedVert);
          dest.normal(skinnedNorm);
@@ -1258,7 +1258,7 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
       dsize_t outStride = mVertexData.vertSize();
 
 #if defined(USE_MEM_VERTEX_BUFFERS)
-      // Initialize it if NULL. 
+      // Initialize it if NULL.
       // Skinning includes readbacks from memory (argh) so don't allocate with PAGE_WRITECOMBINE
       if( instanceVB.isNull() )
          instanceVB.set( GFX, outStride, mVertexFormat, mNumVerts, GFXBufferTypeDynamic );
@@ -1410,11 +1410,11 @@ void TSSkinMesh::createBatchData()
    // Copy data to member, and be done
    batchData.vertexBatchOperations.set(batchOperations.address(), batchOperations.size());
 
-   // Convert to batch-by-transform, which is better for CPU skinning, 
+   // Convert to batch-by-transform, which is better for CPU skinning,
    // where-as GPU skinning would data for batch-by-vertex operation
 #else
    // Iterate the batch-by-vertex, and populate the batch-by-transform structs
-   for( Vector<BatchData::BatchedVertex>::const_iterator itr = batchOperations.begin(); 
+   for( Vector<BatchData::BatchedVertex>::const_iterator itr = batchOperations.begin();
       itr != batchOperations.end(); itr++ )
    {
       const BatchData::BatchedVertex &curTransform = *itr;
@@ -1475,10 +1475,10 @@ void TSSkinMesh::render( TSVertexBufferHandle &instanceVB, GFXPrimitiveBufferHan
    innerRender( instanceVB, instancePB );
 }
 
-void TSSkinMesh::render(   TSMaterialList *materials, 
+void TSSkinMesh::render(   TSMaterialList *materials,
                            const TSRenderState &rdata,
                            bool isSkinDirty,
-                           const Vector<MatrixF> &transforms, 
+                           const Vector<MatrixF> &transforms,
                            TSVertexBufferHandle &vertexBuffer,
                            GFXPrimitiveBufferHandle &primitiveBuffer )
 {
@@ -1503,23 +1503,23 @@ void TSSkinMesh::render(   TSMaterialList *materials,
    {
       // Perform skinning
       updateSkin( transforms, vertexBuffer, primitiveBuffer );
-      
+
       // Update GFX vertex buffer
       _createVBIB( vertexBuffer, primitiveBuffer );
    }
 
    // render...
-   innerRender( materials, rdata, vertexBuffer, primitiveBuffer );   
+   innerRender( materials, rdata, vertexBuffer, primitiveBuffer );
 }
 
 bool TSSkinMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceKey, TSMaterialList *materials )
 {
-   // UpdateSkin() here may not be needed... 
-   // we don't capture skinned 
+   // UpdateSkin() here may not be needed...
+   // we don't capture skinned
    // verts in the polylist.
-   
+
    // update verts and normals...
-   //if( !smGlowPass && !smRefractPass ) 
+   //if( !smGlowPass && !smRefractPass )
    // updateSkin();
 
    // render...
@@ -1944,9 +1944,9 @@ TSMesh* TSMesh::assembleMesh( U32 meshType, bool skip )
 void TSMesh::convertToTris(	const TSDrawPrimitive *primitivesIn,
 							         const S32 *indicesIn,
                            	S32 numPrimIn,
-         							S32 &numPrimOut, 
+         							S32 &numPrimOut,
          							S32 &numIndicesOut,
-                           	TSDrawPrimitive *primitivesOut, 
+                           	TSDrawPrimitive *primitivesOut,
 							         S32 *indicesOut ) const
 {
    S32 prevMaterial = -99999;
@@ -2044,10 +2044,10 @@ void unwindStrip( const S32 * indices, S32 numElements, Vector<S32> &triIndices 
    }
 }
 
-void TSMesh::convertToSingleStrip(	const TSDrawPrimitive *primitivesIn, 
+void TSMesh::convertToSingleStrip(	const TSDrawPrimitive *primitivesIn,
 									         const S32 *indicesIn,
-                                  	S32 numPrimIn, 
-         									S32 &numPrimOut, 
+                                  	S32 numPrimIn,
+         									S32 &numPrimOut,
          									S32 &numIndicesOut,
          									TSDrawPrimitive *primitivesOut,
          									S32 *indicesOut ) const
@@ -2115,7 +2115,7 @@ void TSMesh::convertToSingleStrip(	const TSDrawPrimitive *primitivesIn,
 
             if ( newDraw )
                newDraw->numElements += 3;
-            
+
             numIndicesOut += 3;
          }
       }
@@ -2166,7 +2166,7 @@ void TSMesh::convertToSingleStrip(	const TSDrawPrimitive *primitivesIn,
             added += curDrawOut ? (curDrawOut&1 ? 3 : 2) : 0;
             if ( newDraw )
                newDraw->numElements += added;
-            
+
             numIndicesOut += added;
             curDrawOut += added;
          }
@@ -2191,12 +2191,12 @@ void TSMesh::convertToSingleStrip(	const TSDrawPrimitive *primitivesIn,
 
 // this method does none of the converting that the above methods do, except that small strips are converted
 // to triangle lists...
-void TSMesh::leaveAsMultipleStrips(	const TSDrawPrimitive *primitivesIn, 
+void TSMesh::leaveAsMultipleStrips(	const TSDrawPrimitive *primitivesIn,
 									         const S32 *indicesIn,
-                                   	S32 numPrimIn, 
-         									S32 &numPrimOut, 
+                                   	S32 numPrimIn,
+         									S32 &numPrimOut,
          									S32 &numIndicesOut,
-                                   	TSDrawPrimitive *primitivesOut, 
+                                   	TSDrawPrimitive *primitivesOut,
 									         S32 *indicesOut ) const
 {
    S32 prevMaterial = -99999;
@@ -2266,7 +2266,7 @@ void TSMesh::leaveAsMultipleStrips(	const TSDrawPrimitive *primitivesIn,
             }
             if ( newDraw )
                newDraw->numElements += 3;
-            
+
             numIndicesOut += 3;
          }
       }
@@ -2284,7 +2284,7 @@ void TSMesh::leaveAsMultipleStrips(	const TSDrawPrimitive *primitivesIn,
                dMemcpy(indicesOut+numIndicesOut,indicesIn+start,numElements*sizeof(U32));
             if ( newDraw )
                newDraw->numElements = numElements;
-            
+
             numIndicesOut += numElements;
          }
       }
@@ -2333,7 +2333,7 @@ S32 * TSMesh::getSharedData32( S32 parentMesh, S32 size, S32 **source, bool skip
          ptr = tsalloc.allocShape32( size );
          if ( ptr && tmp )
             dMemcpy(ptr, tmp, size * sizeof(S32) );
-      } 
+      }
    }
    return ptr;
 }
@@ -2383,7 +2383,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
 #endif
       // Create the vertex buffer
       if( vertsChanged || vb == NULL )
-         vb.set( GFX, mVertSize, mVertexFormat, mNumVerts, mDynamic ? 
+         vb.set( GFX, mVertSize, mVertexFormat, mNumVerts, mDynamic ?
 #if defined(TORQUE_OS_XENON)
          // Skinned meshes still will occasionally re-skin more than once per frame.
          // This cannot happen on the Xbox360. Until this issue is resolved, use
@@ -2611,7 +2611,7 @@ void TSMesh::assemble( bool skip )
    U32 flags = (U32)tsalloc.get32();
    if ( encodedNorms.size() )
       flags |= UseEncodedNormals;
-   
+
    setFlags( flags );
 
    tsalloc.checkGuard();
@@ -2711,7 +2711,7 @@ void TSMesh::disassemble()
          {
             TriListOpt::OptimizeTriangleOrdering(verts.size(), prim.numElements,
                indices.address() + prim.start, tmpIdxs.address());
-            dCopyArray(indices.address() + prim.start, tmpIdxs.address(), 
+            dCopyArray(indices.address() + prim.start, tmpIdxs.address(),
                prim.numElements);
          }
       }
@@ -2795,7 +2795,7 @@ void TSSkinMesh::assemble( bool skip )
 
       if ( parentMesh < 0 )
          tsalloc.getPointer8( numVerts ); // advance past encoded normls, don't use
-      
+
       encodedNorms.set( NULL, 0 );
    }
    else
@@ -2887,10 +2887,10 @@ TSSkinMesh::TSSkinMesh()
 //-----------------------------------------------------------------------------
 // find tangent vector
 //-----------------------------------------------------------------------------
-inline void TSMesh::findTangent( U32 index1, 
-                                 U32 index2, 
-                                 U32 index3, 
-                                 Point3F *tan0, 
+inline void TSMesh::findTangent( U32 index1,
+                                 U32 index2,
+                                 U32 index3,
+                                 Point3F *tan0,
                                  Point3F *tan1,
                                  const Vector<Point3F> &_verts)
 {
@@ -2921,12 +2921,12 @@ inline void TSMesh::findTangent( U32 index1,
 
    F32 r = 1.0f / denom;
 
-   Point3F sdir(  (t2 * x1 - t1 * x2) * r, 
-                  (t2 * y1 - t1 * y2) * r, 
+   Point3F sdir(  (t2 * x1 - t1 * x2) * r,
+                  (t2 * y1 - t1 * y2) * r,
                   (t2 * z1 - t1 * z2) * r );
 
-   Point3F tdir(  (s1 * x2 - s2 * x1) * r, 
-                  (s1 * y2 - s2 * y1) * r, 
+   Point3F tdir(  (s1 * x2 - s2 * x1) * r,
+                  (s1 * y2 - s2 * y1) * r,
                   (s1 * z2 - s2 * z1) * r );
 
 
@@ -2954,7 +2954,7 @@ void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F>
 
    Point3F *tan1 = tan0.address() + numVerts;
    dMemset( tan0.address(), 0, sizeof(Point3F) * 2 * numVerts );
-   
+
    U32   numPrimatives = primitives.size();
 
    for (S32 i = 0; i < numPrimatives; i++ )
@@ -3022,7 +3022,7 @@ void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F>
 
       Point3F cp;
       mCross( n, t, &cp );
-      
+
       tangents[i].w = (mDot( cp, b ) < 0.0f) ? -1.0f : 1.0f;
    }
 }
@@ -3068,7 +3068,7 @@ void TSMesh::_convertToAlignedMeshData( TSMeshVertexArray &vertexData, const Vec
 
    AssertFatal(!vertexData.isReady(), "Mesh already converted to aligned data! Re-check code!");
    AssertFatal(_verts.size() == _norms.size() &&
-               _verts.size() == tangents.size(), 
+               _verts.size() == tangents.size(),
                "Vectors: verts, norms, tangents must all be the same size");
    mNumVerts = _verts.size();
 

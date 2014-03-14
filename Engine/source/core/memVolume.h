@@ -28,7 +28,7 @@
 
 #ifndef _TDICTIONARY_H_
 #include "core/util/tDictionary.h"
-#endif 
+#endif
 
 namespace Torque
 {
@@ -120,10 +120,10 @@ namespace Torque
          MemFileSystem* mFileSystem;
          MemDirectoryData* mDirectoryData;
 
-         U32 calculateChecksum();         
-         
+         U32 calculateChecksum();
+
          Status   mStatus;
-         U32 mSearchIndex;         
+         U32 mSearchIndex;
       };
 
    } // Namespace

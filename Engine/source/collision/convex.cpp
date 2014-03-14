@@ -110,7 +110,7 @@ bool ConvexFeature::collide(ConvexFeature& cf,CollisionList* cList, F32 tol)
 
       // Fix up last reference.  material and object are copied from this rather
       //  than the object we're colliding against.
-      if (storeCount != cList->getCount()) 
+      if (storeCount != cList->getCount())
       {
          Collision &col = (*cList)[cList->getCount() - 1];
          col.material = cf.material;
@@ -561,7 +561,7 @@ CollisionState* Convex::findClosestState(const MatrixF& mat, const Point3F& scal
    temp.affineInverse();
    axforminv.mul(temp);
 
-   for (CollisionStateList* itr = mList.mNext; itr != &mList; itr = itr->mNext) 
+   for (CollisionStateList* itr = mList.mNext; itr != &mList; itr = itr->mNext)
    {
       CollisionState* state = itr->mState;
       if (state->mLista != itr)
@@ -579,7 +579,7 @@ CollisionState* Convex::findClosestState(const MatrixF& mat, const Point3F& scal
 
       //
       F32 dd = state->distance(axform, bxform, dontCareDist, &axforminv, &bxforminv);
-      if (dd < dist) 
+      if (dd < dist)
       {
          dist = dd;
          st = state;
@@ -603,9 +603,9 @@ bool Convex::getCollisionInfo(const MatrixF& mat, const Point3F& scale, Collisio
    static ConvexFeature fa;
    static ConvexFeature fb;
 
-   for ( CollisionStateList* itr = mList.mNext; 
-         itr != &mList; 
-         itr = itr->mNext) 
+   for ( CollisionStateList* itr = mList.mNext;
+         itr != &mList;
+         itr = itr->mNext)
    {
 
       CollisionState* state = itr->mState;
@@ -613,7 +613,7 @@ bool Convex::getCollisionInfo(const MatrixF& mat, const Point3F& scale, Collisio
       if (state->mLista != itr)
          state->swap();
 
-      if (state->dist <= tol) 
+      if (state->dist <= tol)
       {
          fa.reset();
          fb.reset();

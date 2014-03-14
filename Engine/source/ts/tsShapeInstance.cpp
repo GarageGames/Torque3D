@@ -406,7 +406,7 @@ void TSShapeInstance::listMeshes( const String &state ) const
       for ( U32 i = 0; i < mMeshObjects.size(); i++ )
       {
          const MeshObjectInstance &mesh = mMeshObjects[i];
-         Con::warnf( "meshidx %3d, %8s, %s", i, ( mesh.forceHidden ) ? "Hidden" : "Visible", mShape->getMeshName(i).c_str() );         
+         Con::warnf( "meshidx %3d, %8s, %s", i, ( mesh.forceHidden ) ? "Hidden" : "Visible", mShape->getMeshName(i).c_str() );
       }
    }
    else if ( state.equal( "Hidden", String::NoCase ) )
@@ -415,7 +415,7 @@ void TSShapeInstance::listMeshes( const String &state ) const
       {
          const MeshObjectInstance &mesh = mMeshObjects[i];
          if ( mesh.forceHidden )
-            Con::warnf( "meshidx %3d, %8s, %s", i, "Visible", mShape->getMeshName(i).c_str() );         
+            Con::warnf( "meshidx %3d, %8s, %s", i, "Visible", mShape->getMeshName(i).c_str() );
       }
    }
    else if ( state.equal( "Visible", String::NoCase ) )
@@ -424,7 +424,7 @@ void TSShapeInstance::listMeshes( const String &state ) const
       {
          const MeshObjectInstance &mesh = mMeshObjects[i];
          if ( !mesh.forceHidden )
-            Con::warnf( "meshidx %3d, %8s, %s", i, "Hidden", mShape->getMeshName(i).c_str() );         
+            Con::warnf( "meshidx %3d, %8s, %s", i, "Hidden", mShape->getMeshName(i).c_str() );
       }
    }
    else
@@ -503,7 +503,7 @@ void TSShapeInstance::setMeshForceHidden( S32 meshIndex, bool hidden )
 {
    AssertFatal( meshIndex > -1 && meshIndex < mMeshObjects.size(),
       "TSShapeInstance::setMeshForceHidden - Invalid index!" );
-                  
+
    mMeshObjects[meshIndex].forceHidden = hidden;
 }
 
@@ -521,14 +521,14 @@ void TSShapeInstance::render( const TSRenderState &rdata, S32 dl, F32 intraDL )
    if ( ss < 0 )
    {
       PROFILE_SCOPE( TSShapeInstance_RenderBillboards );
-      
+
       if ( !rdata.isNoRenderTranslucent() && ( TSLastDetail::smCanShadow || !rdata.getSceneState()->isShadowPass() ) )
          mShape->billboardDetails[ dl ]->render( rdata, mAlphaAlways ? mAlphaAlwaysValue : 1.0f );
 
       return;
    }
 
-   // run through the meshes   
+   // run through the meshes
    S32 start = rdata.isNoRenderNonTranslucent() ? mShape->subShapeFirstTranslucentObject[ss] : mShape->subShapeFirstObject[ss];
    S32 end   = rdata.isNoRenderTranslucent() ? mShape->subShapeFirstTranslucentObject[ss] : mShape->subShapeFirstObject[ss] + mShape->subShapeNumObjects[ss];
    for (i=start; i<end; i++)
@@ -559,7 +559,7 @@ void TSShapeInstance::setCurrentDetail( S32 dl, F32 intraDL )
 }
 
 S32 TSShapeInstance::setDetailFromPosAndScale(  const SceneRenderState *state,
-                                                const Point3F &pos, 
+                                                const Point3F &pos,
                                                 const Point3F &scale )
 {
    VectorF camVector = pos - state->getDiffuseCameraPosition();
@@ -600,7 +600,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
    // meshes.  The original crossbow weapon uses this.
    //
    // If we have more than one detail level and the maxError
-   // is non-negative then we do some sort of screen error 
+   // is non-negative then we do some sort of screen error
    // metric for detail selection.
    //
    if ( mShape->mUseDetailFromScreenError )
@@ -611,12 +611,12 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
       return setDetailFromScreenError( smScreenError / pixelRadius );
    }
 
-   // We're inlining SceneRenderState::projectRadius here to 
+   // We're inlining SceneRenderState::projectRadius here to
    // skip the unnessasary divide by zero protection.
    F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
 
-   if (  pixelSize > smSmallestVisiblePixelSize && 
+   if (  pixelSize > smSmallestVisiblePixelSize &&
          pixelSize <= mShape->mSmallestVisibleSize )
       pixelSize = mShape->mSmallestVisibleSize + 0.01f;
 
@@ -712,9 +712,9 @@ void TSShapeInstance::ObjectInstance::render( S32, TSMaterialList *, const TSRen
    AssertFatal(0,"TSShapeInstance::ObjectInstance::render:  no default render method.");
 }
 
-void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail, 
-                                                   TSMaterialList *materials, 
-                                                   const TSRenderState &rdata, 
+void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
+                                                   TSMaterialList *materials,
+                                                   const TSRenderState &rdata,
                                                    F32 alpha )
 {
    PROFILE_SCOPE( TSShapeInstance_MeshObjectInstance_render );
@@ -747,10 +747,10 @@ void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
    const U32 currTime = Sim::getCurrentTime();
    bool isSkinDirty = currTime != mLastTime;
 
-   mesh->render(  materials, 
-                  rdata, 
+   mesh->render(  materials,
+                  rdata,
                   isSkinDirty,
-                  *mTransforms, 
+                  *mTransforms,
                   mVertexBuffer,
                   mPrimitiveBuffer );
 
@@ -760,7 +760,7 @@ void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
    GFX->popWorldMatrix();
 }
 
-TSShapeInstance::MeshObjectInstance::MeshObjectInstance() 
+TSShapeInstance::MeshObjectInstance::MeshObjectInstance()
    : meshList(0), object(0), frame(0), matFrame(0),
      visible(1.0f), forceHidden(false), mLastTime( 0 )
 {

@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl() {
       canSaveDynamicFields = "0";
       internalName = "brushAdjustHeight";
@@ -100,28 +100,28 @@
       useMouseEvents = "0";
       bitmap = "tools/worldEditor/images/smoothHeight";
    };
-   new GuiBitmapButtonCtrl() {  
-      canSaveDynamicFields = "0";  
-      internalName = "smoothSlope";  
-      Enabled = "1";  
-      isContainer = "0";  
-      Profile = "GuiButtonProfile";  
-      HorizSizing = "right";  
-      VertSizing = "bottom";  
-      position = "144 0";  
-      Extent = "25 19";  
-      MinExtent = "8 2";  
-      canSave = "1";  
-      Visible = "1";  
-      Command = "ETerrainEditor.switchAction( smoothSlope );";  
-      tooltipprofile = "GuiToolTipProfile";  
-      ToolTip = "Smooth Slope (5)";  
-      hovertime = "750";  
-      text = "Button";  
-      buttonType = "RadioButton";  
-      useMouseEvents = "0";  
-      bitmap = "tools/worldEditor/images/softCurve";  
-   };  
+   new GuiBitmapButtonCtrl() {
+      canSaveDynamicFields = "0";
+      internalName = "smoothSlope";
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiButtonProfile";
+      HorizSizing = "right";
+      VertSizing = "bottom";
+      position = "144 0";
+      Extent = "25 19";
+      MinExtent = "8 2";
+      canSave = "1";
+      Visible = "1";
+      Command = "ETerrainEditor.switchAction( smoothSlope );";
+      tooltipprofile = "GuiToolTipProfile";
+      ToolTip = "Smooth Slope (5)";
+      hovertime = "750";
+      text = "Button";
+      buttonType = "RadioButton";
+      useMouseEvents = "0";
+      bitmap = "tools/worldEditor/images/softCurve";
+   };
    new GuiBitmapButtonCtrl() {
       canSaveDynamicFields = "0";
       internalName = "paintNoise";
@@ -143,7 +143,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
       bitmap = "tools/worldEditor/images/brushPaintNoise";
-   };   
+   };
    new GuiBitmapButtonCtrl() {
       canSaveDynamicFields = "0";
       internalName = "flattenHeight";

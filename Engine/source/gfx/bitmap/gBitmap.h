@@ -56,7 +56,7 @@ public:
    {
       /// The maximum mipmap levels we support.  The current
       /// value lets us support up to 4096 x 4096 images.
-      c_maxMipLevels = 13 
+      c_maxMipLevels = 13
    };
 
    struct Registration
@@ -67,12 +67,12 @@ public:
       /// The write function prototype.  Compression levels are image-specific - see their registration declaration for details.
       typedef bool(*WriteFunc)(GBitmap *bitmap, Stream &stream, U32 compressionLevel);
 
-      /// Used to sort the registrations so that 
+      /// Used to sort the registrations so that
       /// lookups occur in a fixed order.
       U32 priority;
 
       Vector<String>   extensions;     ///< the list of file extensions for this bitmap type [these should be lower case]
-      
+
       ReadFunc    readFunc;            ///< the read function to call for this bitmap type
       WriteFunc   writeFunc;           ///< the write function to call for this bitmap type
       U32         defaultCompression;  ///< the default compression level [levels are image-specific - see their registration declaration for details]
@@ -130,9 +130,9 @@ public:
 
 
    static void sRegisterFormat( const Registration &reg );
-   static const Registration* sFindRegInfo( const String &extension );   
-   
-   /// Find the first file matching the registered extensions 
+   static const Registration* sFindRegInfo( const String &extension );
+
+   /// Find the first file matching the registered extensions
    /// skipping the original.
    static bool sFindFile( const Torque::Path &path, Torque::Path *outPath );
 
@@ -156,11 +156,11 @@ public:
    GBitmap *createPaddedBitmap() const;
    GBitmap *createPow2Bitmap() const;
 
-   /// Copies a color channel by index into the first channel 
+   /// Copies a color channel by index into the first channel
    /// of the output bitmap.  The output bitmap must be the same
    /// dimensions as the source.
    void copyChannel( U32 index, GBitmap *outBitmap ) const;
-   
+
    void copyRect(const GBitmap *in, const RectI &srcRect, const Point2I &dstPoint, const U32 srcMipLevel = 0, const U32 dstMipLevel = 0);
 
    GFXFormat   getFormat() const { return mInternalFormat; }
@@ -184,7 +184,7 @@ public:
    /// an alpha value less than 255 (used by the auto-Material mapper)
    bool        getHasTransparency() const { return mHasTransparency; }
    void        setHasTransparency(bool hasTransparency) { mHasTransparency = hasTransparency; }
-   
+
    /// In general you will want to use this function if there is not a
    /// good spot in the bitmap loader(s) to check the alpha value of
    /// the pixels. This function uses the texture format to loop over

@@ -213,7 +213,7 @@ struct MeshRoadRenderBatch
    U32 indexCount;
 
    U32 vertCount;
-   U32 triangleCount; 
+   U32 triangleCount;
 };
 
 typedef Vector<MeshRoadRenderBatch> MeshRoadBatchVector;
@@ -229,14 +229,14 @@ struct MeshRoadNode
    // The depth of the River at this node (meters)
    F32 depth;
 
-   VectorF normal;   
+   VectorF normal;
 };
 
 typedef Vector<MeshRoadNode> MeshRoadNodeVector;
 
 struct MeshRoadSlice
 {
-   MeshRoadSlice() 
+   MeshRoadSlice()
    {
       p0.zero();
       p1.zero();
@@ -247,7 +247,7 @@ struct MeshRoadSlice
       uvec.zero();
       fvec.zero();
       rvec.zero();
-      
+
       width = 0.0f;
       depth = 0.0f;
       normal.set(0,0,1);
@@ -267,7 +267,7 @@ struct MeshRoadSlice
    VectorF fvec;
    VectorF rvec;
 
-   F32 width;    
+   F32 width;
    F32 depth;
    Point3F normal;
 
@@ -289,14 +289,14 @@ class MeshRoadSegment
 public:
 
    MeshRoadSegment();
-   MeshRoadSegment( MeshRoadSlice *rs0, MeshRoadSlice *rs1, const MatrixF &roadMat );   
+   MeshRoadSegment( MeshRoadSlice *rs0, MeshRoadSlice *rs1, const MatrixF &roadMat );
 
    void set( MeshRoadSlice *rs0, MeshRoadSlice *rs1 );
 
    F32 TexCoordStart() const { return slice0->texCoordV; }
    F32 TexCoordEnd() const { return slice1->texCoordV; }
 
-   const Point3F& getP00() const { return slice0->p0; } 
+   const Point3F& getP00() const { return slice0->p0; }
    const Point3F& getP01() const { return slice1->p0; }
    const Point3F& getP11() const { return slice1->p2; }
    const Point3F& getP10() const { return slice0->p2; }
@@ -331,7 +331,7 @@ protected:
    U32 startVert;
    U32 endVert;
    U32 startIndex;
-   U32 endIndex;   
+   U32 endIndex;
 
    U32 numVerts;
    U32 numTriangles;
@@ -417,16 +417,16 @@ private:
 
    typedef SceneObject		Parent;
 
-   enum 
-   { 
+   enum
+   {
       MeshRoadMask      = Parent::NextFreeMask,
-      NodeMask          = Parent::NextFreeMask << 1,      
+      NodeMask          = Parent::NextFreeMask << 1,
       RegenMask         = Parent::NextFreeMask << 2,
       InitialUpdateMask = Parent::NextFreeMask << 3,
       SelectedMask      = Parent::NextFreeMask << 4,
       MaterialMask      = Parent::NextFreeMask << 5,
       NextFreeMask      = Parent::NextFreeMask << 6,
-   };   
+   };
 
 public:
 
@@ -439,7 +439,7 @@ public:
    static void initPersistFields();
    static void consoleInit();
 
-   // SimObject      
+   // SimObject
    bool onAdd();
    void onRemove();
    void onEditorEnable();
@@ -465,7 +465,7 @@ public:
    virtual bool collideBox(const Point3F &start, const Point3F &end, RayInfo* info);
 
    // MeshRoad
-   void regenerate();   
+   void regenerate();
    void setBatchSize( U32 level );
    void setTextureFile( StringTableEntry file );
    void setTextureRepeat( F32 meters );
@@ -476,7 +476,7 @@ public:
    void buildNodesFromList( MeshRoadNodeList* list );
 
    U32 insertNode( const Point3F &pos, const F32 &width, const F32 &depth, const Point3F &normal, const U32 &idx );
-   U32 addNode( const Point3F &pos, const F32 &width, const F32 &depth, const Point3F &normal );   
+   U32 addNode( const Point3F &pos, const F32 &width, const F32 &depth, const Point3F &normal );
    void deleteNode( U32 idx );
 
    void setNode( const Point3F &pos, const F32 &width, const F32 &depth, const Point3F &normal, const U32 &idx );
@@ -487,7 +487,7 @@ public:
    Point3F getNodePosition( U32 idx );
    void setNodePosition( U32 idx, const Point3F &pos );
    F32 getNodeWidth( U32 idx );
-   void setNodeWidth( U32 idx, F32 width );   
+   void setNodeWidth( U32 idx, F32 width );
    F32 getNodeDepth( U32 idx );
    void setNodeDepth( U32 idx, F32 depth );
    MatrixF getNodeTransform( U32 idx );
@@ -509,7 +509,7 @@ public:
    static bool smShowBatches;
    static bool smShowSpline;
    static bool smShowRoad;
-   static SimObjectPtr<SimSet> smServerMeshRoadSet;   
+   static SimObjectPtr<SimSet> smServerMeshRoadSet;
 
 protected:
 
@@ -523,7 +523,7 @@ protected:
    void _regenerate();
    void _generateSlices();
    void _generateSegments();
-   void _generateVerts();   
+   void _generateVerts();
 
 protected:
 
@@ -531,31 +531,31 @@ protected:
    MeshRoadNodeVector mNodes;
    MeshRoadSegmentVector mSegments;
    MeshRoadBatchVector mBatches;
-   
+
    static GFXStateBlockRef smWireframeSB;
 
-   enum { 
-      Top = 0, 
-      Bottom = 1, 
+   enum {
+      Top = 0,
+      Bottom = 1,
       Side = 2,
       SurfaceCount = 3
    };
 
-   GFXVertexBufferHandle<GFXVertexPNTT> mVB[SurfaceCount];   
-   GFXPrimitiveBufferHandle mPB[SurfaceCount];      
+   GFXVertexBufferHandle<GFXVertexPNTT> mVB[SurfaceCount];
+   GFXPrimitiveBufferHandle mPB[SurfaceCount];
 
-   String mMaterialName[SurfaceCount];   
+   String mMaterialName[SurfaceCount];
    SimObjectPtr<Material> mMaterial[SurfaceCount];
    BaseMatInstance *mMatInst[SurfaceCount];
 
    U32 mVertCount[SurfaceCount];
-   U32 mTriangleCount[SurfaceCount];   
-      
+   U32 mTriangleCount[SurfaceCount];
+
    // Fields.
    F32 mTextureLength;
    F32 mBreakAngle;
    S32 mWidthSubdivisions;
-   
+
    // Collision and Physics.
    Convex* mConvexList;
    Vector<MeshRoadConvex*> mDebugConvex;

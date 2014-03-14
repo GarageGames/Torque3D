@@ -71,7 +71,7 @@ protected:
    bool mSizeToChildren;
    bool mAutoCellSize;
    bool mFrozen;
-   bool mDynamicSize;   
+   bool mDynamicSize;
    bool mFillRowFirst;
 
    RectSpacingI mPadding;

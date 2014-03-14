@@ -44,13 +44,13 @@ class SFXSoundscape;
 class LevelInfo : public NetObject
 {
       typedef NetObject Parent;
-      
+
    private:
 
       F32 mWorldSize;
 
       FogData mFogData;
-      
+
       F32 mNearClip;
 
       F32 mVisibleDistance;
@@ -73,21 +73,21 @@ class LevelInfo : public NetObject
       EaseF mAmbientLightBlendCurve;
 
       /// @}
-      
+
       /// @name Sound Properties
       /// @{
-      
+
       /// Global ambient sound space properties.
       SFXAmbience* mSoundAmbience;
-      
+
       /// Distance attenuation model to use.
       SFXDistanceModel mSoundDistanceModel;
-      
+
       ///
       SFXSoundscape* mSoundscape;
-         
+
       /// @}
-      
+
       /// Responsible for passing on
       /// the LevelInfo settings to the
       /// client SceneGraph, from which
@@ -105,11 +105,11 @@ class LevelInfo : public NetObject
 
       /// @name SceneObject Inheritance
       /// @{
-      
+
       virtual SFXAmbience* getSoundAmbience() const { return mSoundAmbience; }
 
       /// @}
-      
+
       /// @name SimObject Inheritance
       /// @{
 
@@ -123,8 +123,8 @@ class LevelInfo : public NetObject
 
       /// @name NetObject Inheritance
       /// @{
-      
-      enum NetMaskBits 
+
+      enum NetMaskBits
       {
          UpdateMask = BIT(0)
       };

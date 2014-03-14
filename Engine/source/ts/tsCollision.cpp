@@ -881,7 +881,7 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
       // Extract the detail number from the name.
       S32 number = 0;
       String::GetTrailingNumber( name, number );
-      
+
       // Look for a matching LOS collision detail.
       //
       // TODO: Fix the old 9 detail offset which is there
@@ -891,7 +891,7 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
       const S32 LOSOverrideOffset = 9;
       String buff = String::ToString( "LOS-%d", mAbs( number ) + LOSOverrideOffset );
       S32 los = findDetail( buff );
-      
+
       // If we didn't find the lod detail then use the
       // normal collision detail for LOS tests.
       if ( los == -1 )
@@ -904,7 +904,7 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
    if ( !outLOSDetails )
       return;
 
-   // Snag any "unmatched" LOS details and put 
+   // Snag any "unmatched" LOS details and put
    // them at the end of the list.
    for ( U32 i = 0; i < details.size(); i++ )
    {
@@ -954,7 +954,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
       // visible detail levels.
 
       // A negative subshape on the detail means we don't have geometry.
-      const TSShape::Detail &detail = details[0];     
+      const TSShape::Detail &detail = details[0];
       if ( detail.subShapeNum < 0 )
          return NULL;
 
@@ -1026,7 +1026,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
       S32 start = subShapeFirstObject[ detail.subShapeNum ];
       S32 end = start + subShapeNumObjects[ detail.subShapeNum ];
       if ( start >= end )
-         continue;         
+         continue;
 
       for ( S32 o=start; o < end; o++ )
       {
@@ -1055,7 +1055,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
             // The bounds define the box extents directly.
             Point3F halfWidth = mesh->getBounds().getExtents() * 0.5f;
 
-            // Add the offset to the center of the bounds 
+            // Add the offset to the center of the bounds
             // into the local space transform.
             MatrixF centerXfm( true );
             centerXfm.setPosition( mesh->getBounds().getCenter() );
@@ -1068,7 +1068,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
             // Get a sphere inscribed to the bounds.
             F32 radius = mesh->getBounds().len_min() * 0.5f;
 
-            // Add the offset to the center of the bounds 
+            // Add the offset to the center of the bounds
             // into the local space transform.
             MatrixF primXfm( true );
             primXfm.setPosition( mesh->getBounds().getCenter() );
@@ -1122,7 +1122,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
             ConcretePolyList polyList;
             polyList.setTransform( &MatrixF::Identity, scale );
             mesh->buildPolyList( 0, &polyList, surfaceKey, NULL );
-            colShape->addTriangleMesh( polyList.mVertexList.address(), 
+            colShape->addTriangleMesh( polyList.mVertexList.address(),
                                        polyList.mVertexList.size(),
                                        polyList.mIndexList.address(),
                                        polyList.mIndexList.size() / 3,
@@ -1132,7 +1132,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
          {
             // Any other mesh name we assume as a generic convex hull.
             //
-            // Collect the verts using the vertex polylist which will 
+            // Collect the verts using the vertex polylist which will
             // filter out duplicates.  This is importaint as the convex
             // generators can sometimes fail with duplicate verts.
             //
@@ -1141,11 +1141,11 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
 
             Point3F t = meshMat.getPosition();
             t.convolve( scale );
-            meshMat.setPosition( t );            
+            meshMat.setPosition( t );
 
             polyList.setTransform( &MatrixF::Identity, scale );
             mesh->buildPolyList( 0, &polyList, surfaceKey, NULL );
-            colShape->addConvex( polyList.getVertexList().address(), 
+            colShape->addConvex( polyList.getVertexList().address(),
                                  polyList.getVertexList().size(),
                                  meshMat );
          }
@@ -1153,10 +1153,10 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
          if ( perMesh )
          {
             list->increment();
-            
+
             S32 detailNum;
-            String::GetTrailingNumber( name, detailNum );            
-            
+            String::GetTrailingNumber( name, detailNum );
+
             String str = String::ToString( "%s%i", meshName.c_str(), detailNum );
             S32 found = findNode( str );
 
@@ -1166,7 +1166,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
                found = findNode( str );
             }
 
-            list->last().colNode = found;            
+            list->last().colNode = found;
             list->last().colShape = colShape;
 
             colShape = NULL;
@@ -1187,8 +1187,8 @@ bool TSMesh::buildPolyListOpcode( const S32 od, AbstractPolyList *polyList, cons
    Opcode::AABBCollider opCollider;
    opCollider.SetPrimitiveTests( true );
 
-   // This isn't really needed within the AABBCollider as 
-   // we don't use temporal coherance... use a static to 
+   // This isn't really needed within the AABBCollider as
+   // we don't use temporal coherance... use a static to
    // remove the allocation overhead.
    static Opcode::AABBCache opCache;
 
@@ -1244,8 +1244,8 @@ bool TSMesh::buildConvexOpcode( const MatrixF &meshToObjectMat, const Box3F &nod
    Opcode::AABBCollider opCollider;
    opCollider.SetPrimitiveTests( true );
 
-   // This isn't really needed within the AABBCollider as 
-   // we don't use temporal coherance... use a static to 
+   // This isn't really needed within the AABBCollider as
+   // we don't use temporal coherance... use a static to
    // remove the allocation overhead.
    static Opcode::AABBCache opCache;
 
@@ -1279,7 +1279,7 @@ bool TSMesh::buildConvexOpcode( const MatrixF &meshToObjectMat, const Box3F &nod
 
          if( chunkc->getObject() != TSStaticPolysoupConvex::smCurObject )
             continue;
-               
+
          if( chunkc->mesh != this )
             continue;
 
@@ -1552,9 +1552,9 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
 
       info->normal.set( n.x, n.y, n.z );
 
-      // generate UV coordinate across mesh based on 
-      // matching normals, this isn't done by default and is 
-      // primarily of interest in matching a collision point to 
+      // generate UV coordinate across mesh based on
+      // matching normals, this isn't done by default and is
+      // primarily of interest in matching a collision point to
       // either a GUI control coordinate or finding a hit pixel in texture space
       if (info->generateTexCoord)
       {
@@ -1562,7 +1562,7 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
          a = *vp.Vertex[1];
          b = *vp.Vertex[2];
 
-         Point3F facePoint = (1.0f - face.mU - face.mV) * Point3F(baseVert.x, baseVert.y, baseVert.z)  
+         Point3F facePoint = (1.0f - face.mU - face.mV) * Point3F(baseVert.x, baseVert.y, baseVert.z)
             + face.mU * Point3F(a.x, a.y, a.z) + face.mV * Point3F(b.x, b.y, b.z);
 
          U32 faces[1024];

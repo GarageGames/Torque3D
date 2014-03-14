@@ -97,7 +97,7 @@ DDSFile::DDSFile( const DDSFile &dds )
 {
    VECTOR_SET_ASSOCIATION( mSurfaces );
    smActiveCopies++;
-   
+
    for ( U32 i=0; i < dds.mSurfaces.size(); i++ )
    {
       SurfaceData *surface = NULL;
@@ -112,7 +112,7 @@ DDSFile::DDSFile( const DDSFile &dds )
       for ( U32 m=0; m < dds.mSurfaces[i]->mMips.size(); m++ )
       {
          U32 size = dds.getSurfaceSize( m );
-         surface->mMips.push_back(new U8[size]);         
+         surface->mMips.push_back(new U8[size]);
          dMemcpy( surface->mMips.last(), dds.mSurfaces[i]->mMips[m], size );
       }
    }
@@ -157,7 +157,7 @@ U32 DDSFile::getSurfacePitch( U32 mipLevel ) const
       return getWidth(mipLevel) * mBytesPerPixel;
 }
 
-U32 DDSFile::getSurfaceSize( U32 height, U32 width, U32 mipLevel ) const 
+U32 DDSFile::getSurfaceSize( U32 height, U32 width, U32 mipLevel ) const
 {
    // Bump by the mip level.
    height = getMax(U32(1), height >> mipLevel);
@@ -208,7 +208,7 @@ U32 DDSFile::getSizeInBytes() const
 
 U32 DDSFile::getSizeInBytes( GFXFormat format, U32 height, U32 width, U32 mipLevels )
 {
-   AssertFatal( format >= GFXFormatDXT1 && format <= GFXFormatDXT5, 
+   AssertFatal( format >= GFXFormatDXT1 && format <= GFXFormatDXT5,
       "DDSFile::getSizeInBytes - Must be a DXT format!" );
 
    // From the directX docs:
@@ -220,14 +220,14 @@ U32 DDSFile::getSizeInBytes( GFXFormat format, U32 height, U32 width, U32 mipLev
    else
       sizeMultiple = 16;
 
-   U32 mipHeight, mipWidth; 
+   U32 mipHeight, mipWidth;
    U32 bytes = 0;
    for ( U32 m=0; m < mipLevels; m++ )
    {
       mipHeight = getMax( U32(1), height >> m );
       mipWidth  = getMax( U32(1), width >> m );
 
-      bytes += getMax( U32(1), mipWidth / 4 ) * 
+      bytes += getMax( U32(1), mipWidth / 4 ) *
                getMax( U32(1), mipHeight / 4 ) * sizeMultiple;
    }
 
@@ -364,7 +364,7 @@ bool DDSFile::readHeader(Stream &s)
    {
       mFlags.set(RGBData);
 
-      mBytesPerPixel = pfBitCount / 8;      
+      mBytesPerPixel = pfBitCount / 8;
 
       bool hasAlpha = ddpfFlags & DDPFAlphaPixels;
 
@@ -609,7 +609,7 @@ bool DDSFile::read(Stream &s, U32 dropMipCount)
       else
          mPitchOrLinearSize = mPitchOrLinearSize; // Do nothing?
 
-      // Now fix up the rest of the 
+      // Now fix up the rest of the
       mMipMapCount = getMax( (U32)1, mMipMapCount - dropMipCount );
       mHeight = getHeight( dropMipCount );
       mWidth = getWidth( dropMipCount );
@@ -630,7 +630,7 @@ bool DDSFile::writeHeader( Stream &s )
 
    // Read some flags...
    U32 ddsdFlags = DDSDCaps | DDSDPixelFormat | DDSDWidth | DDSDHeight;
-   
+
    if ( mFlags.test( CompressedData ) )
       ddsdFlags |= DDSDLinearSize;
    else
@@ -696,7 +696,7 @@ bool DDSFile::writeHeader( Stream &s )
    s.write( 0xFF000000 );
 
    // Deal with final caps bits... Is this really necessary?
- 
+
    U32 caps1 = DDSCAPSTexture;
    if ( mMipMapCount > 0 )
       caps1 |= DDSCAPSComplex | DDSCAPSMipMap;
@@ -754,7 +754,7 @@ void DDSFile::SurfaceData::dumpImage(DDSFile *dds, U32 mip, const char *file)
 
    // Copy our data in.
    dMemcpy(foo->getWritableBits(), mMips[mip], dds->getSurfaceSize(dds->mHeight, dds->mWidth, mip) );
-   
+
    FileStream  stream;
 
    stream.open( file, Torque::FS::File::Write );
@@ -832,8 +832,8 @@ template<> ResourceBase::Signature  Resource<DDSFile>::signature()
 Resource<DDSFile> DDSFile::load( const Torque::Path &path, U32 dropMipCount )
 {
    PROFILE_SCOPE( DDSFile_load );
-   
-   // HACK:  It sucks that we cannot pass parameters into 
+
+   // HACK:  It sucks that we cannot pass parameters into
    // the resource manager loading system.
    DDSFile::smDropMipCount = dropMipCount;
    Resource<DDSFile> ret = ResourceManager::get().load( path );
@@ -889,7 +889,7 @@ DDSFile *DDSFile::createDDSFileFromGBitmap( const GBitmap *gbmp )
       ret->mSurfaces.last()->mMips.push_back( new U8[mipSz] );
 
       U8 *mipMem = ret->mSurfaces.last()->mMips.last();
-      
+
       // If this is a straight copy, just do it, otherwise (ugh)
       if( ret->mFormat == gbmp->getFormat() )
          dMemcpy( mipMem, gbmp->getBits(i), mipSz );
@@ -904,7 +904,7 @@ DDSFile *DDSFile::createDDSFileFromGBitmap( const GBitmap *gbmp )
             const U8 *src = &gbmp->getBits(i)[pxl * gbmp->getBytesPerPixel()];
             dMemcpy( dst, src, gbmp->getBytesPerPixel() * sizeof(U8) );
             dst[ret->mBytesPerPixel - 1] = 255;
-         } 
+         }
       }
 
       // Uncomment to debug-dump each mip level

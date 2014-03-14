@@ -115,7 +115,7 @@ EnumTable* StaticNamedSingleton< T >::staticCreateEnumTable()
    U32 numSingletons = staticGetNumSingletons();
 
    // Create the enums.
-   
+
    EnumTable::Enums* enums = new EnumTable::Enums[ numSingletons ];
    This* ptr = smSingletons;
    for( U32 i = 0; i < numSingletons; ++ i )

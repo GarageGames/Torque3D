@@ -63,7 +63,7 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
 {
    String nameStr = name;
    nameStr = nameStr.trim();
-   
+
    // create and cache the style and layout.
    // based on apple sample code at http://developer.apple.com/qa/qa2001/qa1027.html
 
@@ -77,10 +77,10 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
    ATSURGBAlphaColor black;
    ATSFontMetrics    fontMetrics;
    U32               scaledSize;
-   
+
    bool              isBold = false;
    bool              isItalic = false;
-   
+
    bool haveModifier;
    do
    {
@@ -99,12 +99,12 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
       }
    }
    while( haveModifier );
-      
+
    // Look up the font. We need it in 2 differnt formats, for differnt Apple APIs.
    cfsName = CFStringCreateWithCString( kCFAllocatorDefault, nameStr.c_str(), kCFStringEncodingUTF8);
    if(!cfsName)
       Con::errorf("Error: could not make a cfstring out of \"%s\" ",nameStr.c_str());
-      
+
    atsFontRef =  ATSFontFindFromName( cfsName, kATSOptionFlagsDefault);
    atsuFontID = FMGetFontFromATSFontRef( atsFontRef);
 
@@ -119,7 +119,7 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
    // Interestingly enough, 0.75 is not what makes things the right size.
    scaledSize = size - 2 - (int)((float)size * 0.1);
    mSize = scaledSize;
-   
+
    // Set up the size and color. We send these to ATSUSetAttributes().
    atsuSize = IntToFixed(scaledSize);
    black.red = black.green = black.blue = black.alpha = 1.0;
@@ -128,11 +128,11 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
    ATSUAttributeTag theTags[] = { kATSUFontTag, kATSUSizeTag, kATSURGBAlphaColorTag};
    ByteCount theSizes[] = { sizeof(ATSUFontID), sizeof(Fixed), sizeof(ATSURGBAlphaColor) };
    ATSUAttributeValuePtr theValues[] = { &atsuFontID, &atsuSize, &black };
-   
+
    // create and configure the style object.
    ATSUCreateStyle(&mStyle);
    ATSUSetAttributes( mStyle, 3, theTags, theSizes, theValues );
-   
+
    if( isBold )
    {
       ATSUAttributeTag tag = kATSUQDBoldfaceTag;
@@ -141,7 +141,7 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
       ATSUAttributeValuePtr valuePtr = &value;
       ATSUSetAttributes( mStyle, 1, &tag, &size, &valuePtr );
    }
-   
+
    if( isItalic )
    {
       ATSUAttributeTag tag = kATSUQDItalicTag;
@@ -150,33 +150,33 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
       ATSUAttributeValuePtr valuePtr = &value;
       ATSUSetAttributes( mStyle, 1, &tag, &size, &valuePtr );
    }
-   
-   // create the layout object, 
-   ATSUCreateTextLayout(&mLayout);  
+
+   // create the layout object,
+   ATSUCreateTextLayout(&mLayout);
    // we'll bind the layout to a bitmap context when we actually draw.
    // ATSUSetTextPointerLocation()  - will set the text buffer
    // ATSUSetLayoutControls()       - will set the cg context.
-   
+
    // get font metrics, save our baseline and height
    ATSFontGetHorizontalMetrics(atsFontRef, kATSOptionFlagsDefault, &fontMetrics);
    mBaseline = scaledSize * fontMetrics.ascent;
    mHeight   = scaledSize * ( fontMetrics.ascent - fontMetrics.descent + fontMetrics.leading ) + 1;
-   
+
    // cache our grey color space, so we dont have to re create it every time.
    mColorSpace = CGColorSpaceCreateDeviceGray();
-   
+
    // and finally cache the font's name. We use this to cheat some antialiasing options below.
    mName = StringTable->insert(name);
-   
+
    return true;
-}    
+}
 
 //------------------------------------------------------------------------------
 bool MacCarbFont::isValidChar(const UTF8 *str) const
 {
    // since only low order characters are invalid, and since those characters
    // are single codeunits in UTF8, we can safely cast here.
-   return isValidChar((UTF16)*str);  
+   return isValidChar((UTF16)*str);
 }
 
 bool MacCarbFont::isValidChar( const UTF16 ch) const
@@ -205,7 +205,7 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    OSStatus             err;
 
    // 16 bit character buffer for the ATUSI calls.
-   // -- hey... could we cache this at the class level, set style and loc *once*, 
+   // -- hey... could we cache this at the class level, set style and loc *once*,
    //    then just write to this buffer and clear the layout cache, to speed up drawing?
    static UniChar chUniChar[1];
    chUniChar[0] = ch;
@@ -213,7 +213,7 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    // Declare and clear out the CharInfo that will be returned.
    static PlatformFont::CharInfo c;
    dMemset(&c, 0, sizeof(c));
-   
+
    // prep values for GFont::addBitmap()
    c.bitmapIndex = 0;
    c.xOffset = 0;
@@ -224,11 +224,11 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    // note: ATSUSetTextPointerLocation() also clears the previous cached layout information.
    ATSUSetTextPointerLocation( mLayout, chUniChar, 0, 1, 1);
    ATSUSetRunStyle( mLayout, mStyle, 0,1);
-   
+
    // get the typographic bounds. this tells us how characters are placed relative to other characters.
    ATSUGetUnjustifiedBounds( mLayout, 0, 1, &tbefore, &tafter, &tascent, &tdescent);
    c.xIncrement =  FixedToInt(tafter);
-   
+
    // find out how big of a bitmap we'll need.
    // as a bonus, we also get the origin where we should draw, encoded in the Rect.
    ATSUMeasureTextImage( mLayout, 0, 1, 0, 0, &imageRect);
@@ -238,16 +238,16 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    c.height = imageRect.bottom - imageRect.top + yFudge;
    c.xOrigin = imageRect.left; // dist x0 -> center line
    c.yOrigin = -imageRect.top; // dist y0 -> base line
-   
+
    // kick out early if the character is undrawable
    if( c.width == xFudge || c.height == yFudge)
       return c;
-   
+
    // allocate a greyscale bitmap and clear it.
    bitmapDataSize = c.width * c.height;
    c.bitmapData = new U8[bitmapDataSize];
    dMemset(c.bitmapData,0x00,bitmapDataSize);
-   
+
    // get a graphics context on the bitmap
    imageCtx = CGBitmapContextCreate( c.bitmapData, c.width, c.height, 8, c.width, mColorSpace, kCGImageAlphaNone);
    if(!imageCtx) {
@@ -268,16 +268,16 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    CGContextSetInterpolationQuality( imageCtx, kCGInterpolationNone);
    CGContextSetGrayFillColor( imageCtx, 1.0, 1.0);
    CGContextSetTextDrawingMode( imageCtx,  kCGTextFill);
-   
-   // tell ATSUI to substitute fonts as needed for missing glyphs
-   ATSUSetTransientFontMatching(mLayout, true); 
 
-   // set up three parrallel arrays for setting up attributes. 
+   // tell ATSUI to substitute fonts as needed for missing glyphs
+   ATSUSetTransientFontMatching(mLayout, true);
+
+   // set up three parrallel arrays for setting up attributes.
    // this is how most options in ATSUI are set, by passing arrays of options.
    ATSUAttributeTag theTags[] = { kATSUCGContextTag };
    ByteCount theSizes[] = { sizeof(CGContextRef) };
    ATSUAttributeValuePtr theValues[] = { &imageCtx };
-   
+
    // bind the layout to the context.
    ATSUSetLayoutControls( mLayout, 1, theTags, theSizes, theValues );
 
@@ -286,7 +286,7 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    int xoff = 1;
    err = ATSUDrawText( mLayout, 0, 1, IntToFixed(-imageRect.left + xoff), IntToFixed(imageRect.bottom + yoff ) );
    CGContextRelease(imageCtx);
-   
+
    if(err != noErr) {
       Con::errorf("Error: could not draw the character! Drawing a blank box.");
       dMemset(c.bitmapData,0x0F,bitmapDataSize);
@@ -297,7 +297,7 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
 //   Con::printf("Font Metrics: Rect = %2i %2i %2i %2i  Char= %C, 0x%x  Size= %i, Baseline= %i, Height= %i",imageRect.top, imageRect.bottom, imageRect.left, imageRect.right,ch,ch, mSize,mBaseline, mHeight);
 //   Con::printf("Font Bounds:  left= %2i right= %2i  Char= %C, 0x%x  Size= %i",FixedToInt(tbefore), FixedToInt(tafter), ch,ch, mSize);
 #endif
-      
+
    return c;
 }
 
@@ -306,7 +306,7 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
    if( fontFamily )
    {
       // Determine the font ID from the family name.
-      
+
       ATSUFontID fontID;
       if( ATSUFindFontFromName(
             fontFamily,
@@ -317,15 +317,15 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
             kFontNoLanguageCode, &fontID ) != kATSUInvalidFontErr )
       {
          // Get the number of fonts in the family.
-         
+
          ItemCount numFonts;
          ATSUCountFontNames( fontID, &numFonts );
-         
+
          // Read out font names.
-         
+
          U32 bufferSize = 512;
          char* buffer = ( char* ) dMalloc( bufferSize );
-         
+
          for( U32 i = 0; i < numFonts; ++ i )
          {
             for( U32 n = 0; n < 2; ++ n )
@@ -335,7 +335,7 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
                FontPlatformCode fontPlatformCode;
                FontScriptCode fontScriptCode;
                FontLanguageCode fontLanguageCode;
-               
+
                if( ATSUGetIndFontName(
                      fontID,
                      i,
@@ -353,41 +353,41 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
                   delete [] utf8;
                   break;
                }
-               
+
                // Allocate larger buffer.
-               
+
                bufferSize = actualNameLength + 2;
                buffer = ( char* ) dRealloc( buffer, bufferSize );
             }
          }
-         
+
          dFree( buffer );
       }
    }
    else
    {
       // Get the number of installed fonts.
-      
+
       ItemCount numFonts;
       ATSUFontCount( &numFonts );
-      
+
       // Get all the font IDs.
-      
+
       ATSUFontID* fontIDs = new ATSUFontID[ numFonts ];
       if( ATSUGetFontIDs( fontIDs, numFonts, &numFonts ) == noErr )
       {
          U32 bufferSize = 512;
          char* buffer = ( char* ) dMalloc( bufferSize );
-         
+
          // Read all family names.
-         
+
          for( U32 i = 0; i < numFonts; ++ i )
          {
             for( U32 n = 0; n < 2; ++ n )
             {
                ByteCount actualNameLength;
                ItemCount fontIndex;
-               
+
                OSStatus result = ATSUFindFontName(
                      fontIDs[ i ],
                      kFontFamilyName,
@@ -398,7 +398,7 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
                      buffer,
                      &actualNameLength,
                      &fontIndex );
-               
+
                if( result == kATSUNoFontNameErr )
                   break;
                else if( result == noErr )
@@ -407,9 +407,9 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
                   char* utf8 = convertUTF16toUTF8( ( UTF16* ) buffer );
                   StringTableEntry name = StringTable->insert( utf8 );
                   delete [] utf8;
-                  
+
                   // Avoid duplicates.
-                  
+
                   bool duplicate = false;
                   for( U32 i = 0, num = fonts.size(); i < num; ++ i )
                      if( fonts[ i ] == name )
@@ -417,29 +417,29 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
                         duplicate = true;
                         break;
                      }
-                     
+
                   if( !duplicate )
                      fonts.push_back( name );
-                     
+
                   break;
                }
-               
+
                // Allocate larger buffer.
-               
+
                bufferSize = actualNameLength + 2;
                buffer = ( char* ) dRealloc( buffer, bufferSize );
             }
          }
-         
+
          dFree( buffer );
       }
-      
+
       delete [] fontIDs;
    }
 }
 
 //-----------------------------------------------------------------------------
-// The following code snippet demonstrates how to get the elusive GlyphIDs, 
+// The following code snippet demonstrates how to get the elusive GlyphIDs,
 // which are needed when you want to do various complex and arcane things
 // with ATSUI and CoreGraphics.
 //

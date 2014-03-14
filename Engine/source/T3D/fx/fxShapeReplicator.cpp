@@ -609,7 +609,7 @@ void fxShapeReplicator::renderArc(const F32 fRadiusX, const F32 fRadiusY)
 
       PrimBuild::vertex3f(XPos, YPos, -(F32)mFieldData.mPlacementBandHeight/2.0f);
       PrimBuild::vertex3f(XPos, YPos, +(F32)mFieldData.mPlacementBandHeight/2.0f);
-   }			
+   }
    PrimBuild::end();
 }
 
@@ -662,7 +662,7 @@ void fxShapeReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *sta
    // Calculate Elapsed Time and take new Timestamp.
    S32 Time = Platform::getVirtualMilliseconds();
    F32 ElapsedTime = (Time - mLastRenderTime) * 0.001f;
-   mLastRenderTime = Time;	
+   mLastRenderTime = Time;
 
    renderPlacementArea(ElapsedTime);
 }

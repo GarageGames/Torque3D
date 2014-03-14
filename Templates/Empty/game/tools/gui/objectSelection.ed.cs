@@ -32,19 +32,19 @@
 function EObjectSelection::init( %this )
 {
    // Initialize the class list.
-   
+
    %classList = %this-->classList;
    if( isObject( %classList ) )
       %this.initClassList();
-      
+
    // Initialize the filter list.
-   
+
    %filterList = %this-->filterList;
    if( isObject( %filterList ) )
       %this.initFilterList();
-      
+
    // Initialize the group list.
-   
+
    %groupList = %this-->groupList;
    if( isObject( %groupList ) )
       %this.initGroupList();
@@ -53,21 +53,21 @@ function EObjectSelection::init( %this )
 //---------------------------------------------------------------------------------------------
 
 function EObjectSelection::cleanup( %this )
-{      
+{
    // Clear the class list.
-      
+
    %classList = %this-->classList;
    if( isObject( %classList ) )
       %classList.clear();
-      
+
    // Clear the filter list.
-      
+
    %filterList = %this-->filterList;
    if( isObject( %filterList ) )
       %filterList.clear();
-      
+
    // Clear the group list.
-   
+
    %groupList = %this-->groupList;
    if( isObject( %groupList ) )
       %groupList.clear();
@@ -123,35 +123,35 @@ function EObjectSelection::selectObject( %this, %object, %val )
 function EObjectSelection::onSelectObjects( %this, %val )
 {
    // Get the root group to search in.
-   
+
    %groupList = %this-->groupList;
    if( !isObject( %groupList ) )
       %root = %this.getRootGroup();
    else
       %root = %groupList.getSelected();
-      
+
    if( !isObject( %root ) )
       return;
-      
+
    // Fetch the object name pattern.
-   
+
    %namePatternField = %this-->namePattern;
    if( isObject( %namePatternField ) )
       %this.namePattern = %namePatternField.getText();
    else
       %this.namePattern = "";
-      
+
    // Clear current selection first, if need be.
-   
+
    if( %val )
    {
       %retainSelectionBox = %this-->retainSelection;
       if( isObject( %retainSelectionBox ) && !%retainSelectionBox.isStateOn() )
          %this.clearSelection();
    }
-      
+
    // (De)Select all matching objects in it.
-      
+
    %this.selectObjectsIn( %root, %val, true );
 }
 
@@ -164,12 +164,12 @@ function EObjectSelection::onSelectObjects( %this, %val )
 function EObjectSelection::selectObjectsIn( %this, %group, %val, %excludeGroup )
 {
    // Match to the group itself.
-   
+
    if( !%excludeGroup && %this.objectMatchesCriteria( %group ) )
       %this.selectObject( %group, %val );
-      
+
    // Recursively match all children.
-      
+
    foreach( %obj in %group )
    {
       if( %obj.isMemberOfClass( "SimSet" ) )
@@ -184,15 +184,15 @@ function EObjectSelection::selectObjectsIn( %this, %group, %val, %excludeGroup )
 function EObjectSelection::objectMatchesCriteria( %this, %object )
 {
    // Check name.
-   
+
    if( %this.namePattern !$= "" && !strIsMatchExpr( %this.namePattern, %object.getName() ) )
       return false;
-      
+
    // Check class.
-   
+
    if( !%this.isClassEnabled( %object.getClassName() ) )
       return false;
-      
+
    return true;
 }
 
@@ -209,19 +209,19 @@ function EObjectSelection::initGroupList( %this )
    %selected = 0;
    if( %groupList.size() > 0 )
       %selected = %groupList.getSelected();
-      
+
    %groupList.clear();
-   
+
    %root = %this.getRootGroup();
    if( !isObject( %root ) )
       return;
-      
+
    // Add all non-empty groups.
-      
+
    %this.scanGroup( %root, %groupList, 0 );
-   
+
    // Select initial group.
-   
+
    if( %selected != 0 && isObject( %selected ) )
       %groupList.setSelected( %selected );
    else
@@ -233,32 +233,32 @@ function EObjectSelection::initGroupList( %this )
 function EObjectSelection::scanGroup( %this, %group, %list, %indentLevel )
 {
    // Create a display name for the group.
-   
+
    %text = %group.getName();
    if( %text $= "" )
-      %text = %group.getClassName(); 
-      
+      %text = %group.getClassName();
+
    %internalName = %group.getInternalName();
    if( %internalName !$= "" )
       %text = %text @ " [" @ %internalName @ "]";
-   
+
    // Indent the name according to the depth in the hierarchy.
-   
+
    if( %indentLevel > 0 )
       %text = strrepeat( "  ", %indentLevel ) @ %text;
-      
+
    // Add it to the list.
-      
+
    %list.add( %text, %group.getId() );
-   
+
    // Recurse into SimSets with at least one child.
-   
+
    foreach ( %obj in %group )
    {
       if(    !%obj.isMemberOfClass( "SimSet" )
           || %obj.getCount() == 0 )
          continue;
-         
+
       %this.scanGroup( %obj, %list, %indentLevel + 1 );
    }
 }
@@ -282,12 +282,12 @@ function EObjectSelection::initFilterList( %this )
 
 /// Initialize the list of class toggles.
 function EObjectSelection::initClassList( %this )
-{   
+{
    %classArray = new ArrayObject();
    %this.classArray = %classArray;
-      
+
    // Add all classes to the array.
-   
+
    %classes = enumerateConsoleClasses();
    foreach$( %className in %classes )
    {
@@ -296,13 +296,13 @@ function EObjectSelection::initClassList( %this )
 
       %classArray.push_back( %className, true );
    }
-   
+
    // Sort the class list.
-   
+
    %classArray.sortk( true );
-   
+
    // Add checkboxes for all classes to the list.
-   
+
    %classList = %this-->classList;
    %count = %classArray.count();
    for( %i = 0; %i < %count; %i ++ )
@@ -344,7 +344,7 @@ function EObjectSelection::initClassList( %this )
 function EObjectSelection::selectAllInClassList( %this, %state )
 {
    %classList = %this-->classList;
-   
+
    foreach( %ctrl in %classList )
    {
       if( %ctrl.getValue() == %state )
@@ -357,12 +357,12 @@ function EObjectSelection::selectAllInClassList( %this, %state )
 function EObjectSelection::isClassEnabled( %this, %className )
 {
    // Look up the class entry in the array.
-   
+
    %index = %this.classArray.getIndexFromKey( %className );
    if( %index == -1 )
       return false;
-      
+
    // Return the flag.
-      
+
    return %this.classArray.getValue( %index );
 }

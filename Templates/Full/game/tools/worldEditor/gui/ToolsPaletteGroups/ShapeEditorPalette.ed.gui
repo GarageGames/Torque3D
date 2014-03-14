@@ -11,7 +11,7 @@
    canSave = "1";
    Visible = "1";
    hovertime = "1000";
-   
+
    new GuiBitmapButtonCtrl(ShapeEditorNoneModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorSelectArrow";
@@ -33,7 +33,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(ShapeEditorMoveModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorMove";
@@ -55,7 +55,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(ShapeEditorRotateModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "WorldEditorRotate";
@@ -77,7 +77,7 @@
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
-   
+
    new GuiBitmapButtonCtrl(ShapeEditorSunModeBtn) {
       canSaveDynamicFields = "0";
       internalName = "";
