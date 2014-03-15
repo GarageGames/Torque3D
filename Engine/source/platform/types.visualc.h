@@ -58,11 +58,11 @@ typedef unsigned _int64 U64;
 #elif defined( _XBOX_VER )
 #  define TORQUE_OS_STRING "Xbox"
 #  define TORQUE_OS_XBOX
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
 #elif defined( _WIN32 )
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN32
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
 #elif defined( _WIN64 )
 #  define TORQUE_OS_STRING "Win64"
 #  define TORQUE_OS_WIN64

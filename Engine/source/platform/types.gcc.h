@@ -58,13 +58,13 @@ typedef unsigned long long  U64;
 #if defined(_WIN64)
 #  define TORQUE_OS_STRING "Win64"
 #  define TORQUE_OS_WIN64
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
 #if defined(__WIN32__) || defined(_WIN32)
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN32
 #  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
 
 #elif defined(SN_TARGET_PS3)
 #  define TORQUE_OS_STRING "PS3"
