@@ -527,7 +527,7 @@ bool PxMultiActorData::preload( bool server, String &errorBuffer )
       return false;
    }
 
-   if (!shapeName || shapeName == '\0')
+   if (!shapeName || shapeName[0] == '\0')
    {
       errorBuffer = "PxMultiActorDatas::preload: no shape name!";
       return false;
