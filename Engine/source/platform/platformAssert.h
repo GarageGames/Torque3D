@@ -96,8 +96,8 @@ public:
             { if ( ::PlatformAssert::processAssert(::PlatformAssert::Fatal, __FILE__, __LINE__,  y) ) { ::Platform::debugBreak(); } } }
 
 #else
-   #define AssertFatal(x, y)   { (void)sizeof(x); (void)sizeof(y); }
-   #define AssertWarn(x, y)    { (void)sizeof(x); (void)sizeof(y); }
+   #define AssertFatal(x, y)   { TORQUE_UNUSED(x); TORQUE_UNUSED(y); }
+   #define AssertWarn(x, y)    { TORQUE_UNUSED(x); TORQUE_UNUSED(y); }
 #endif
 
 /*!

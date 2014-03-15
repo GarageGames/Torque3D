@@ -407,7 +407,6 @@ public:
    {
       AssertFatal(IsPlaying(), "Journal::Read - not playing right now.");
       bool r = mFile->read(v);
-      TORQUE_UNUSED(r);
       AssertFatal(r, "Journal::Read - failed to read!");
    }
 
@@ -430,7 +429,6 @@ public:
    {
       AssertFatal(IsRecording(), "Journal::Write - not recording right now.");
       bool r = mFile->write(v);
-      TORQUE_UNUSED(r);
       AssertFatal(r, "Journal::Write - failed to write!");
    }
 

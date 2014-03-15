@@ -350,8 +350,6 @@ bool GuiSplitContainer::resize( const Point2I &newPosition, const Point2I &newEx
    GuiContainer *panelTwo = dynamic_cast<GuiContainer*>( at(1) );
 	
    // 
-   TORQUE_UNUSED(panelOne);
-   TORQUE_UNUSED(panelTwo);
    AssertFatal( panelOne && panelTwo, "GuiSplitContainer::resize - Missing/Invalid Subordinate Controls! Split contained controls must derive from GuiContainer!" );
 
    // We only need to update the split point if our second panel is fixed.  

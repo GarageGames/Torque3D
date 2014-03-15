@@ -163,7 +163,6 @@ void TSThread::setSequence(S32 seq, F32 toPos)
 {
    const TSShape * shape = mShapeInstance->mShape;
 
-   TORQUE_UNUSED(shape);
    AssertFatal(shape && shape->sequences.size()>seq && toPos>=0.0f && toPos<=1.0f,
       "TSThread::setSequence: invalid shape handle, sequence number, or position.");
 

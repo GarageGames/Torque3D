@@ -475,8 +475,6 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    Var *d_specular = (Var*)LangElement::find( "d_specular" );
    Var *d_NL_Att = (Var*)LangElement::find( "d_NL_Att" );
 
-   TORQUE_UNUSED(lightInfoSamp);
-   TORQUE_UNUSED(d_NL_Att);
    AssertFatal( lightInfoSamp && d_specular && d_NL_Att,
       "DeferredPixelSpecularHLSL::processPix - Something hosed the deferred features!" );
 

@@ -514,7 +514,6 @@ ConsoleSetType( TypeBox3F )
       U32 args = dSscanf(argv[0], "%g %g %g %g %g %g",
                          &pDst->minExtents.x, &pDst->minExtents.y, &pDst->minExtents.z,
                          &pDst->maxExtents.x, &pDst->maxExtents.y, &pDst->maxExtents.z);
-      TORQUE_UNUSED(args);
       AssertWarn(args == 6, "Warning, box probably not read properly");
    } 
    else 

@@ -390,7 +390,6 @@ void TSShape::getObjectDetails(S32 objIndex, Vector<S32>& objDetails)
 void TSShape::init()
 {
    S32 numSubShapes = subShapeFirstNode.size();
-   TORQUE_UNUSED(numSubShapes);
    AssertFatal(numSubShapes==subShapeFirstObject.size(),"TSShape::init");
 
    S32 i,j;
