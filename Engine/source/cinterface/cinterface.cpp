@@ -29,7 +29,7 @@
 #include "windowManager/platformWindow.h"
 #include "windowManager/platformWindowMgr.h"
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/winDispatch.h"
 extern void createFontInit(void);
@@ -415,7 +415,7 @@ extern "C" {
 			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
 	}
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
    // retrieve the hwnd of our render window
    void* torque_gethwnd()
    {

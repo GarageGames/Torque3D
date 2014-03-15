@@ -22,7 +22,7 @@
 
 #include "platform/platform.h"
 
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
 #include <sys/utime.h>
 #else
 #include <sys/time.h>
@@ -84,7 +84,7 @@ bool MountZips(const String &root)
 
 bool  Touch( const Path &path )
 {
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    return( utime( path.getFullPath(), 0 ) != -1 );
 #else
    return( utimes( path.getFullPath(), NULL) == 0 ); // utimes returns 0 on success.

@@ -290,7 +290,7 @@ inline double getMax(double a, double b)
 
 #define BIT(x) (1 << (x))                       ///< Returns value with bit x set (2^x)
 
-#if defined(TORQUE_OS_WIN32)
+#if defined(TORQUE_OS_WIN)
 #define STDCALL __stdcall
 #else
 #define STDCALL

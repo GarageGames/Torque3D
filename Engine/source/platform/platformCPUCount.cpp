@@ -53,7 +53,7 @@ EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
 #include <string.h>
 #include <sched.h>
 #define DWORD unsigned long
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
 #include <windows.h>
 #elif defined( TORQUE_OS_MAC )
 #  include <sys/types.h>
@@ -476,7 +476,7 @@ next:
             if ( CPU_ISSET(i, &allowedCPUs) == 0 )
                return CONFIG_UserConfigIssue;
          }
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
          DWORD dwProcessAffinity, dwSystemAffinity;
          GetProcessAffinityMask(GetCurrentProcess(), 
             &dwProcessAffinity,
@@ -504,7 +504,7 @@ next:
             if ( sched_setaffinity (0, sizeof(currentCPU), &currentCPU) == 0 )
             {
                sleep(0);  // Ensure system to switch to the right CPU
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
          while (dwAffinityMask && dwAffinityMask <= dwSystemAffinity)
          {
             if (SetThreadAffinityMask(GetCurrentThread(), dwAffinityMask))
@@ -549,7 +549,7 @@ next:
 #ifdef TORQUE_OS_LINUX
          sched_setaffinity (0, sizeof(allowedCPUs), &allowedCPUs);
          sleep(0);
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
          SetThreadAffinityMask(GetCurrentThread(), dwProcessAffinity);
          Sleep(0);
 #else
