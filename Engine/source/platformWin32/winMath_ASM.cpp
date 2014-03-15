@@ -92,8 +92,27 @@ void Platform::setMathControlStateKnown()
    }
 }
 
+#else
+
+U32 Platform::getMathControlState( )
+{
+   // @todo See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+   return 0;
+}
+
+void Platform::setMathControlState( U32 state )
+{
+   // @todo See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+}
+
+void Platform::setMathControlStateKnown( )
+{
+   // @todo See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+}
 
 #endif
+
+
 
 //------------------------------------------------------------------------------
 void mInstallLibrary_ASM()

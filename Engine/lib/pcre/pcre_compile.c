@@ -50,6 +50,7 @@ supporting internal functions that are not used by other modules. */
 #define PSSTART start_pattern  /* Field containing processed string start */
 #define PSEND   end_pattern    /* Field containing processed string end */
 
+#include <assert.h>
 #include "pcre_internal.h"
 
 
@@ -6038,7 +6039,8 @@ regex compiled on a system with 4-byte pointers is run on another with 8-byte
 pointers. */
 
 re->magic_number = MAGIC_NUMBER;
-re->size = size;
+assert( (size <= UINT_MAX) && "Huge data." );
+re->size = (unsigned int)size;
 re->options = cd->external_options;
 re->flags = cd->external_flags;
 re->dummy1 = 0;

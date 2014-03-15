@@ -39,6 +39,7 @@ struct FileTime
 #define TORQUE_LITTLE_ENDIAN
 #define TORQUE_SUPPORTS_NASM
 #define TORQUE_SUPPORTS_VC_INLINE_X86_ASM
+// @todo Where could fit in (here?) the TORQUE_OS_WIN64?
 #define TORQUE_OS_WIN32
 #define TORQUE_COMPILER_VISUALC 1500
 

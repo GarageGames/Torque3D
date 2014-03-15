@@ -233,7 +233,7 @@ void oc_idct8x8_c(ogg_int16_t _y[64],const ogg_int16_t _x[64]){
   /*Transform rows of w into columns of y.*/
   for(in=w,out=_y,end=out+8;out<end;in+=8,out++)idct8(out,in);
   /*Adjust for scale factor.*/
-  for(out=_y,end=out+64;out<end;out++)*out=(ogg_int16_t)(*out+8>>4);
+  for(out=_y,end=out+64;out<end;out++)*out=(ogg_int16_t)((*out+8)>>4);
 }
 
 /*Performs an inverse 8x8 Type-II DCT transform.
@@ -264,5 +264,5 @@ void oc_idct8x8_10_c(ogg_int16_t _y[64],const ogg_int16_t _x[64]){
   /*Transform rows of w into columns of y.*/
   for(in=w,out=_y,end=out+8;out<end;in+=8,out++)idct8_4(out,in);
   /*Adjust for scale factor.*/
-  for(out=_y,end=out+64;out<end;out++)*out=(ogg_int16_t)(*out+8>>4);
+  for(out=_y,end=out+64;out<end;out++)*out=(ogg_int16_t)((*out+8)>>4);
 }

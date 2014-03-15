@@ -359,7 +359,7 @@ static void yy_fatal_error (yyconst char msg[]  );
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	CMDleng = (size_t) (yy_cp - yy_bp); \
+	CMDleng = yy_cp - yy_bp; \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
@@ -1910,9 +1910,13 @@ extern int isatty (int );
         b->yy_bs_column = 0;
     }
 
-        b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
-    
-	errno = oerrno;
+#ifdef _MSC_VER
+    b->yy_is_interactive = file ? (isatty( _fileno( file ) ) > 0) : 0;
+#else
+    b->yy_is_interactive = file ? (isatty(  fileno( file ) ) > 0) : 0;
+#endif
+
+    errno = oerrno; 
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
@@ -2024,7 +2028,8 @@ static void CMDensure_buffer_stack (void)
 		/* Increase the buffer to prepare for a possible push. */
 		int grow_size = 8 /* arbitrary grow size */;
 
-		num_to_alloc = (yy_buffer_stack_max) + grow_size;
+      AssertFatal( (yy_buffer_stack_max + grow_size) <= INT_MAX, "Huge data." );
+		num_to_alloc = (int)(yy_buffer_stack_max) + grow_size;
 		(yy_buffer_stack) = (struct yy_buffer_state**)CMDrealloc
 								((yy_buffer_stack),
 								num_to_alloc * sizeof(struct yy_buffer_state*)
@@ -2081,8 +2086,8 @@ YY_BUFFER_STATE CMD_scan_buffer  (char * base, yy_size_t  size )
  */
 YY_BUFFER_STATE CMD_scan_string (yyconst char * yystr )
 {
-    
-	return CMD_scan_bytes(yystr,strlen(yystr) );
+   AssertFatal( strlen( yystr ) <= INT_MAX, "Huge data." );
+	return CMD_scan_bytes( yystr, (int)strlen( yystr ) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to CMDlex() will
@@ -2355,7 +2360,7 @@ void CMDerror(char *format, ...)
    char tempBuf[BUFMAX];
    va_list args;
    va_start( args, format );
-#ifdef TORQUE_OS_WIN32
+#if defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
    _vsnprintf( tempBuf, BUFMAX, format, args );
 #else
    vsnprintf( tempBuf, BUFMAX, format, args );

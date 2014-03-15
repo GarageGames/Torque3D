@@ -245,9 +245,9 @@ void TestRun::test(TestRegistry* reg)
 
 bool TestRun::test(const char* module, bool skipInteractive)
 {
-   StringTableEntry cwdSave = Platform::getCurrentDirectory();
+   const StringTableEntry cwdSave = Platform::getCurrentDirectory();
 
-   int len = strlen(module);
+   const size_t len = strlen(module);
 
    const char *skipMsg = skipInteractive ? "(skipping interactive tests)" : "";
 

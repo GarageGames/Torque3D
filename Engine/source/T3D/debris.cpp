@@ -506,10 +506,11 @@ bool Debris::onNewDataBlock( GameBaseData *dptr, bool reload )
 
 bool Debris::onAdd()
 {
-   if( !Parent::onAdd() )
-   {
+   if ( !Parent::onAdd() )
       return false;
-   }
+
+   if ( !mDataBlock )
+      return false;
 
    // create emitters
    for( int i=0; i<DebrisData::DDC_NUM_EMITTERS; i++ )
@@ -653,8 +654,11 @@ void Debris::onRemove()
       }
    }
 
-   getSceneManager()->removeObjectFromScene(this);
-   getContainer()->removeObject(this);
+   if ( getSceneManager( ) )
+      getSceneManager()->removeObjectFromScene(this);
+
+   if ( getContainer( ) )
+      getContainer()->removeObject(this);
 
    Parent::onRemove();
 }

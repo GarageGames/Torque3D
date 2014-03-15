@@ -58,9 +58,9 @@ void Platform::outputDebugString( const char *string, ... )
    // twice as in a multi-threaded environment, some other thread may output some
    // stuff in between the two calls.
 
-   U32 length = strlen( buffer );
+   size_t length = strlen( buffer );
    if( length == ( sizeof( buffer ) - 1 ) )
-      length --;
+      length--;
 
    buffer[ length ]     = '\n';
    buffer[ length + 1 ] = '\0';

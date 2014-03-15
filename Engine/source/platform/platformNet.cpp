@@ -23,7 +23,7 @@
 #include "platform/platformNet.h"
 #include "core/strings/stringFunctions.h"
 
-#if defined (TORQUE_OS_WIN32)
+#if defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
 #define TORQUE_USE_WINSOCK
 #include <errno.h>
 #include <winsock.h>

@@ -42,25 +42,29 @@ EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
 #else
 
 #ifdef TORQUE_OS_LINUX
-// 	The Linux source code listing can be compiled using Linux kernel verison 2.6 
+// The Linux source code listing can be compiled using Linux kernel verison 2.6 
 //	or higher (e.g. RH 4AS-2.8 using GCC 3.4.4). 
 //	Due to syntax variances of Linux affinity APIs with earlier kernel versions 
 //	and dependence on glibc library versions, compilation on Linux environment 
 //	with older kernels and compilers may require kernel patches or compiler upgrades.
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sched.h>
 #define DWORD unsigned long
-#elif defined( TORQUE_OS_WIN32 )
+
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
 #include <windows.h>
+#include <intrin.h>
+
 #elif defined( TORQUE_OS_MAC )
 #  include <sys/types.h>
 #  include <sys/sysctl.h>
+
 #else
 #error Not implemented on platform.
 #endif
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -99,12 +103,11 @@ namespace CPUInfo {
       //
       static unsigned int CpuIDSupported(void)
       {
-         unsigned int MaxInputValue;
+         unsigned int MaxInputValue = 0;
          // If CPUID instruction is supported
 #ifdef TORQUE_COMPILER_GCC
          try    
          {		
-            MaxInputValue = 0;
             // call cpuid with eax = 0
             asm
                (
@@ -122,27 +125,15 @@ namespace CPUInfo {
             return(0);                   // cpuid instruction is unavailable
          }
 #elif defined( TORQUE_COMPILER_VISUALC )
-         try
-         {
-            MaxInputValue = 0;
-            // call cpuid with eax = 0
-            __asm
-            {
-               xor eax, eax
-                  cpuid
-                  mov MaxInputValue, eax
-            }
-         }
-         catch (...)
-         {
-            return(0);                   // cpuid instruction is unavailable
-         }
+         // @source http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
+         int CPUInfo[ 4 ] = { -1 };
+         __cpuid( CPUInfo, 0 );
+         MaxInputValue = CPUInfo[ 0 ];
 #else
 #  error Not implemented.
 #endif
 
          return MaxInputValue;
-
       }
 
 
@@ -188,29 +179,15 @@ namespace CPUInfo {
                );		
          }
 #elif defined( TORQUE_COMPILER_VISUALC )
-         __asm
-         {
-            xor eax, eax
-               cpuid
-               cmp eax, 4			// check if cpuid supports leaf 4
-               jl single_core		// Single core
-               mov eax, 4			
-               mov ecx, 0			// start with index = 0; Leaf 4 reports
-               cpuid				// at least one valid cache level
-               mov Regeax, eax
-               jmp multi_core
-
-single_core:
-            xor eax, eax		
-
-multi_core:
-
-         }
+         // @source http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
+         int CPUInfo[ 4 ] = { -1 };
+         __cpuid( CPUInfo, 0 );
+         const int i = CPUInfo[ 0 ];
+         if ( i == 1 ) { Regeax = CPUInfo[ 1 ]; }
 #else
 #  error Not implemented.
 #endif
          return (unsigned int)((Regeax & NUM_CORE_BITS) >> 26)+1;
-
       }
 
 
@@ -239,20 +216,16 @@ multi_core:
                : "%eax","%ecx"
                );
 #elif defined( TORQUE_COMPILER_VISUALC )
-            __asm
-            {
-               mov eax, 1
-                  cpuid
-                  mov Regedx, edx
-            }		
+            // @source http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
+            int CPUInfo[ 4 ] = { -1 };
+            __cpuid( CPUInfo, 0 );
+            Regedx = CPUInfo[ 3 ];
 #else
 #  error Not implemented.
 #endif
          }
 
          return (Regedx & HWD_MT_BIT);  
-
-
       }
 
 
@@ -278,17 +251,14 @@ multi_core:
             : "%eax","%ecx","%edx"
             );
 #elif defined( TORQUE_COMPILER_VISUALC )
-         __asm
-         {
-            mov eax, 1
-               cpuid
-               mov Regebx, ebx
-         }
+         // @source http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
+         int CPUInfo[ 4 ] = { -1 };
+         __cpuid( CPUInfo, 0 );
+         Regebx = CPUInfo[ 1 ];
 #else
 #  error Not implemented.
 #endif
          return (unsigned int) ((Regebx & NUM_LOGICAL_BITS) >> 16);
-
       }
 
 
@@ -307,12 +277,10 @@ multi_core:
             );
 
 #elif defined( TORQUE_COMPILER_VISUALC )
-         __asm
-         {
-            mov eax, 1
-               cpuid
-               mov Regebx, ebx
-         }
+         // @source http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
+         int CPUInfo[ 4 ] = { -1 };
+         __cpuid( CPUInfo, 0 );
+         Regebx = CPUInfo[ 1 ];
 #else
 #  error Not implemented.
 #endif                                
@@ -326,9 +294,10 @@ multi_core:
       //
       unsigned int find_maskwidth(unsigned int CountItem)
       {
-         unsigned int MaskWidth,
-            count = CountItem;
+         unsigned int MaskWidth = 0;
+
 #ifdef TORQUE_COMPILER_GCC
+         const unsigned int count = CountItem;
          asm
             (
 #ifdef __x86_64__		// define constant to compile  
@@ -368,7 +337,8 @@ multi_core:
 #endif
             );
 
-#elif defined( TORQUE_COMPILER_VISUALC )
+#elif defined( TORQUE_COMPILER_VISUALC ) && !defined( _WIN64 )
+         const unsigned int count = CountItem;
          __asm
          {
             mov eax, count
@@ -382,6 +352,9 @@ multi_core:
 next:
 
          }
+#elif defined( _WIN64 )
+         // @todo Release it!
+         // ...
 #else
 #  error Not implemented.
 #endif
@@ -416,9 +389,10 @@ next:
       {
          EConfig StatusFlag = CONFIG_UserConfigIssue;
 
-         g_s3Levels[0] = 0;
-         TotAvailCore = 1;
-         PhysicalNum  = 1;
+         g_s3Levels[0]   = 0;
+         TotAvailLogical = 1;
+         TotAvailCore    = 1;
+         PhysicalNum     = 1;
          
          unsigned int numLPEnabled = 0;
          int MaxLPPerCore = 1;
@@ -483,10 +457,17 @@ next:
             &dwSystemAffinity);
          if (dwProcessAffinity != dwSystemAffinity)  // not all CPUs are enabled
             return CONFIG_UserConfigIssue;
+
+#elif defined( TORQUE_OS_WIN64 )
+         // @todo Not implemented.
+         return CONFIG_UserConfigIssue;
 #else
 #  error Not implemented.
 #endif
 
+
+// @todo Not implemented.
+#ifndef TORQUE_OS_WIN64
          // Assume that cores within a package have the SAME number of 
          // logical processors.  Also, values returned by
          // MaxLogicalProcPerPhysicalProc and MaxCorePerPhysicalProc do not have
@@ -504,7 +485,7 @@ next:
             if ( sched_setaffinity (0, sizeof(currentCPU), &currentCPU) == 0 )
             {
                sleep(0);  // Ensure system to switch to the right CPU
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
          while (dwAffinityMask && dwAffinityMask <= dwSystemAffinity)
          {
             if (SetThreadAffinityMask(GetCurrentThread(), dwAffinityMask))
@@ -549,7 +530,7 @@ next:
 #ifdef TORQUE_OS_LINUX
          sched_setaffinity (0, sizeof(allowedCPUs), &allowedCPUs);
          sleep(0);
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
          SetThreadAffinityMask(GetCurrentThread(), dwProcessAffinity);
          Sleep(0);
 #else
@@ -630,8 +611,13 @@ next:
             }
 
          }  // for ProcessorNum
-#endif
 
+#endif // #ifndef TORQUE_OS_WIN64
+
+#endif // #fdef TORQUE_OS_MAC #else
+
+// @todo Not implemented.
+#ifndef TORQUE_OS_WIN64
          //
          // Check to see if the system is multi-core 
          // Check if the system is hyper-threading
@@ -658,9 +644,9 @@ next:
 
          }
 
-
-
          return StatusFlag;
+
+#endif // #ifndef TORQUE_OS_WIN64
       }
 
 } // namespace CPUInfo

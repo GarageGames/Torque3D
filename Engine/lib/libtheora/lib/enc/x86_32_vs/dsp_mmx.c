@@ -15,12 +15,13 @@
 
  ********************************************************************/
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include "../codec_internal.h"
 #include "../dsp.h"
 
-#if 0
+#ifdef _WIN64
 //These are to let me selectively enable the C versions, these are needed
 #define DSP_OP_AVG(a,b) ((((int)(a)) + ((int)(b)))/2)
 #define DSP_OP_DIFF(a,b) (((int)(a)) - ((int)(b)))
@@ -34,9 +35,7 @@ static void sub8x8__mmx (unsigned char *FiltPtr, unsigned char *ReconPtr,
                   ogg_int16_t *DctInputPtr, ogg_uint32_t PixelsPerLine,
                   ogg_uint32_t ReconPixelsPerLine)
 {
-
-    //Make non-zero to use the C-version
-#if 0
+#ifdef _WIN64
   int i;
 
   /* For each block row */
@@ -55,6 +54,7 @@ static void sub8x8__mmx (unsigned char *FiltPtr, unsigned char *ReconPtr,
     ReconPtr += ReconPixelsPerLine;
     DctInputPtr += 8;
   }
+
 #else
     __asm {
         align 16
@@ -246,8 +246,7 @@ static void sub8x8__mmx (unsigned char *FiltPtr, unsigned char *ReconPtr,
 static void sub8x8_128__mmx (unsigned char *FiltPtr, ogg_int16_t *DctInputPtr,
                       ogg_uint32_t PixelsPerLine)
 {
-
-#if 0
+#ifdef _WIN64
   int i;
   /* For each block row */
   for (i=8; i; i--) {
@@ -420,8 +419,7 @@ static void sub8x8avg2__mmx (unsigned char *FiltPtr, unsigned char *ReconPtr1,
                      ogg_uint32_t PixelsPerLine,
                      ogg_uint32_t ReconPixelsPerLine)
 {
-
-#if 0
+#ifdef _WIN64
   int i;
 
   /* For each block row */
@@ -441,8 +439,8 @@ static void sub8x8avg2__mmx (unsigned char *FiltPtr, unsigned char *ReconPtr1,
     ReconPtr2 += ReconPixelsPerLine;
     DctInputPtr += 8;
   }
-#else
 
+#else
     __asm {
         align 16
 
@@ -703,8 +701,7 @@ static void sub8x8avg2__mmx (unsigned char *FiltPtr, unsigned char *ReconPtr1,
 
 static ogg_uint32_t row_sad8__mmx (unsigned char *Src1, unsigned char *Src2)
 {
-
-#if 0
+#ifdef _WIN64
   ogg_uint32_t SadValue;
   ogg_uint32_t SadValue1;
 
@@ -782,8 +779,7 @@ static ogg_uint32_t row_sad8__mmx (unsigned char *Src1, unsigned char *Src2)
 static ogg_uint32_t col_sad8x8__mmx (unsigned char *Src1, unsigned char *Src2,
                         ogg_uint32_t stride)
 {
-
-#if 0
+#ifdef _WIN64
   ogg_uint32_t SadValue[8] = {0,0,0,0,0,0,0,0};
   ogg_uint32_t SadValue2[8] = {0,0,0,0,0,0,0,0};
   ogg_uint32_t MaxSad = 0;
@@ -825,6 +821,7 @@ static ogg_uint32_t col_sad8x8__mmx (unsigned char *Src1, unsigned char *Src2,
   }
 
   return MaxSad;
+
 #else
   ogg_uint32_t MaxSad;
 
@@ -910,8 +907,7 @@ static ogg_uint32_t col_sad8x8__mmx (unsigned char *Src1, unsigned char *Src2,
 static ogg_uint32_t sad8x8__mmx (unsigned char *ptr1, ogg_uint32_t stride1,
                 unsigned char *ptr2, ogg_uint32_t stride2)
 {
-
-#if 0
+#ifdef _WIN64
   ogg_uint32_t  i;
   ogg_uint32_t  sad = 0;
 
@@ -931,6 +927,7 @@ static ogg_uint32_t sad8x8__mmx (unsigned char *ptr1, ogg_uint32_t stride1,
   }
 
   return sad;
+
 #else
   ogg_uint32_t  DiffVal;
 
@@ -1112,7 +1109,7 @@ static ogg_uint32_t sad8x8_thres__mmx (unsigned char *ptr1, ogg_uint32_t stride1
                 unsigned char *ptr2, ogg_uint32_t stride2,
             ogg_uint32_t thres)
 {
-#if 0
+#ifdef _WIN64
   ogg_uint32_t  i;
   ogg_uint32_t  sad = 0;
 
@@ -1146,7 +1143,7 @@ static ogg_uint32_t sad8x8_xy2_thres__mmx (unsigned char *SrcData, ogg_uint32_t 
                     unsigned char *RefDataPtr2, ogg_uint32_t RefStride,
                     ogg_uint32_t thres)
 {
-#if 0
+#ifdef _WIN64
   ogg_uint32_t  i;
   ogg_uint32_t  sad = 0;
 
@@ -1170,6 +1167,7 @@ static ogg_uint32_t sad8x8_xy2_thres__mmx (unsigned char *SrcData, ogg_uint32_t 
   }
 
   return sad;
+
 #else
   ogg_uint32_t  DiffVal;
 
@@ -1238,7 +1236,7 @@ static ogg_uint32_t sad8x8_xy2_thres__mmx (unsigned char *SrcData, ogg_uint32_t 
 
 static ogg_uint32_t intra8x8_err__mmx (unsigned char *DataPtr, ogg_uint32_t Stride)
 {
-#if 0
+#ifdef _WIN64
   ogg_uint32_t  i;
   ogg_uint32_t  XSum=0;
   ogg_uint32_t  XXSum=0;
@@ -1268,6 +1266,7 @@ static ogg_uint32_t intra8x8_err__mmx (unsigned char *DataPtr, ogg_uint32_t Stri
 
    /* Compute population variance as mis-match metric. */
    return (( (XXSum<<6) - XSum*XSum ) );
+
 #else
   ogg_uint32_t  XSum;
   ogg_uint32_t  XXSum;
@@ -1332,8 +1331,7 @@ static ogg_uint32_t intra8x8_err__mmx (unsigned char *DataPtr, ogg_uint32_t Stri
 static ogg_uint32_t inter8x8_err__mmx (unsigned char *SrcData, ogg_uint32_t SrcStride,
                      unsigned char *RefDataPtr, ogg_uint32_t RefStride)
 {
-
-#if 0
+#ifdef _WIN64
   ogg_uint32_t  i;
   ogg_uint32_t  XSum=0;
   ogg_uint32_t  XXSum=0;
@@ -1379,6 +1377,7 @@ static ogg_uint32_t inter8x8_err__mmx (unsigned char *SrcData, ogg_uint32_t SrcS
 
   /* Compute and return population variance as mis-match metric. */
   return (( (XXSum<<6) - XSum*XSum ));
+
 #else
   ogg_uint32_t  XSum;
   ogg_uint32_t  XXSum;
@@ -1454,7 +1453,7 @@ static ogg_uint32_t inter8x8_err_xy2__mmx (unsigned char *SrcData, ogg_uint32_t 
                          unsigned char *RefDataPtr1,
              unsigned char *RefDataPtr2, ogg_uint32_t RefStride)
 {
-#if 0
+#ifdef _WIN64
   ogg_uint32_t  i;
   ogg_uint32_t  XSum=0;
   ogg_uint32_t  XXSum=0;
@@ -1501,6 +1500,7 @@ static ogg_uint32_t inter8x8_err_xy2__mmx (unsigned char *SrcData, ogg_uint32_t 
 
   /* Compute and return population variance as mis-match metric. */
   return (( (XXSum<<6) - XSum*XSum ));
+
 #else
   ogg_uint32_t XSum;
   ogg_uint32_t XXSum;
@@ -1580,11 +1580,14 @@ static ogg_uint32_t inter8x8_err_xy2__mmx (unsigned char *SrcData, ogg_uint32_t 
 
 static void restore_fpu (void)
 {
-
+#ifndef _WIN64
     __asm {
         emms
     }
-
+#else
+    assert( 0
+        && "Not released." );
+#endif
 }
 
 void dsp_mmx_init(DspFunctions *funcs)
@@ -1602,4 +1605,3 @@ void dsp_mmx_init(DspFunctions *funcs)
   funcs->inter8x8_err = inter8x8_err__mmx;
   funcs->inter8x8_err_xy2 = inter8x8_err_xy2__mmx;
 }
-

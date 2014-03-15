@@ -31,10 +31,13 @@
 #include "platform/types.h"
 #endif
 
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
+#endif
+
+#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
 #define strtof       (float)strtod
 #endif
 
@@ -220,8 +223,8 @@ char* dStripPath(const char* filename);
 
 extern void   dPrintf(const char *format, ...);
 extern int    dVprintf(const char *format, void *arglist);
-extern int    dSprintf(char *buffer, U32 bufferSize, const char *format, ...);
-extern int    dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist);
+extern int    dSprintf(char *buffer, size_t bufferSize, const char *format, ...);
+extern int    dVsprintf(char *buffer, size_t bufferSize, const char *format, void *arglist);
 extern int    dSscanf(const char *buffer, const char *format, ...);
 
 #endif

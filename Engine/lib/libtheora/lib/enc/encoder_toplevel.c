@@ -19,6 +19,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "toplevel_lookup.h"
@@ -1221,7 +1222,7 @@ int theora_encode_header(theora_state *t, ogg_packet *op){
 int theora_encode_comment(theora_comment *tc, ogg_packet *op)
 {
   const char *vendor = theora_version_string();
-  const int vendor_length = strlen(vendor);
+  const size_t vendor_length = strlen(vendor);
   oggpack_buffer *opb;
 
   opb = _ogg_malloc(sizeof(oggpack_buffer));
@@ -1229,8 +1230,9 @@ int theora_encode_comment(theora_comment *tc, ogg_packet *op)
   oggpackB_write(opb, 0x81, 8);
   _tp_writebuffer(opb, "theora", 6);
 
-  _tp_writelsbint(opb, vendor_length);
-  _tp_writebuffer(opb, vendor, vendor_length);
+  assert( (vendor_length <= LONG_MAX) && "Huge data." );
+  _tp_writelsbint(opb, (long)vendor_length);
+  _tp_writebuffer(opb, vendor, (long)vendor_length);
 
   _tp_writelsbint(opb, tc->comments);
   if(tc->comments){

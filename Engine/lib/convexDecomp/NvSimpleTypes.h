@@ -73,7 +73,7 @@ NvSimpleTypes.h : Defines basic data types for integers and floats.
 
 #endif
 
-#ifdef WIN32
+#if defined( WIN64 ) || defined( WIN32 )
 	typedef __int64				NxI64;
 	typedef signed int			NxI32;
 	typedef signed short		NxI16;

@@ -139,7 +139,7 @@ WinFont::~WinFont()
     }
 }
 
-bool WinFont::create(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+bool WinFont::create(const char *name, dsize_t size, U32 charset /* = TGE_ANSI_CHARSET */)
 {
    if(name == NULL || size < 1)
       return false;

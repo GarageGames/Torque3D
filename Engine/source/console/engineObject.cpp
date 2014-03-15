@@ -276,7 +276,7 @@ void EngineObject::debugEnumInstances( const char* className, DebugEnumInstances
 
 //-----------------------------------------------------------------------------
 
-void* EngineCRuntimeObjectPool::allocateObject( U32 size TORQUE_TMM_ARGS_DECL )
+void* EngineCRuntimeObjectPool::allocateObject( size_t size TORQUE_TMM_ARGS_DECL )
 {
    #ifdef TORQUE_DISABLE_MEMORY_MANAGER
       return dMalloc( size );

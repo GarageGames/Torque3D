@@ -27,7 +27,7 @@
 #include "platform/platform.h"
 
 
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
 // This standard function is not defined when compiling with VC7...
 #define vsnprintf	_vsnprintf
 #endif
@@ -108,7 +108,7 @@ compare_right(const nat_char* a, const nat_char* b)
    remember it in BIAS. */
    for (;; a++, b++) {
       if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
-         return bias;
+         break;
       else if (!nat_isdigit(*a))
          return -1;
       else if (!nat_isdigit(*b))
@@ -123,7 +123,7 @@ compare_right(const nat_char* a, const nat_char* b)
          return bias;
    }
 
-   return 0;
+   return bias;
 }
 
 
@@ -134,7 +134,7 @@ compare_left(const nat_char* a, const nat_char* b)
    different value wins. */
    for (;; a++, b++) {
       if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
-         return 0;
+         break;
       else if (!nat_isdigit(*a))
          return -1;
       else if (!nat_isdigit(*b))
@@ -330,7 +330,7 @@ char* dStrcpyl(char *dst, dsize_t dstSize, ...)
 
 int dStrcmp( const UTF16 *str1, const UTF16 *str2)
 {
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    return wcscmp( reinterpret_cast<const wchar_t *>( str1 ), reinterpret_cast<const wchar_t *>( str2 ) );
 #else
    int ret;
@@ -347,7 +347,7 @@ int dStrcmp( const UTF16 *str1, const UTF16 *str2)
 
 char* dStrupr(char *str)
 {
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    return _strupr(str);
 #else
    if (str == NULL)
@@ -365,7 +365,7 @@ char* dStrupr(char *str)
 
 char* dStrlwr(char *str)
 {
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    return _strlwr(str);
 #else
    if (str == NULL)
@@ -396,7 +396,7 @@ S32 dVprintf(const char *format, void *arglist)
    return vprintf(format, (char*)arglist);
 }
 
-S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
+S32 dSprintf(char *buffer, size_t bufferSize, const char *format, ...)
 {
    va_list args;
    va_start(args, format);
@@ -409,7 +409,7 @@ S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
 }
 
 
-S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist)
+S32 dVsprintf(char *buffer, size_t bufferSize, const char *format, void *arglist)
 {
    S32 len = vsnprintf(buffer, bufferSize, format, (char*)arglist);
    
@@ -421,7 +421,7 @@ S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist)
 
 S32 dSscanf(const char *buffer, const char *format, ...)
 {
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN64) || defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    va_list args;
    va_start(args, format);
 
@@ -516,13 +516,12 @@ char* dStristr( char* str1, const char* str2 )
 
    // Slow but at least we have it.
 
-   U32 str2len = strlen( str2 );
+   const size_t str2len = strlen( str2 );
    while( *str1 )
    {
-      if( strncasecmp( str1, str2, str2len ) == 0 )
+      if ( strncasecmp( str1, str2, str2len ) == 0 )
          return str1;
-
-      ++ str1;
+      ++str1;
    }
 
    return NULL;

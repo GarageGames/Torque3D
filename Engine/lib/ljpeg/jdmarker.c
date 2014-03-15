@@ -119,7 +119,7 @@ typedef my_marker_reader * my_marker_ptr;
 #define INPUT_VARS(cinfo)  \
 	struct jpeg_source_mgr * datasrc = (cinfo)->src;  \
 	const JOCTET * next_input_byte = datasrc->next_input_byte;  \
-	size_t bytes_in_buffer = datasrc->bytes_in_buffer
+   jpeg_size_t bytes_in_buffer = datasrc->bytes_in_buffer
 
 /* Unload the local copies --- do this only at a restart boundary */
 #define INPUT_SYNC(cinfo)  \

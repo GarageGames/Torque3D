@@ -312,9 +312,10 @@ PhysicsDebris* PhysicsDebris::create(  PhysicsDebrisData *datablock,
 
 PhysicsDebris::PhysicsDebris()
    :  mLifetime( 0.0f ),
+      mInitialLinVel( Point3F::Zero ),
+      mDataBlock( NULL ),
       mShapeInstance( NULL ),
-      mWorld( NULL ),
-      mInitialLinVel( Point3F::Zero )
+      mWorld( NULL )
 {
    mTypeMask |= DebrisObjectType | DynamicShapeObjectType;
 
@@ -339,8 +340,13 @@ bool PhysicsDebris::onAdd()
 {
    AssertFatal( isClientObject(), "PhysicsDebris::onAdd - This shouldn't be added on the server!" );
 
-   if ( !Parent::onAdd() )  
-      return false;  
+   if ( !Parent::onAdd() ) {
+      return false;
+   }
+
+   if ( !mDataBlock ) {
+      return false;
+   }
 
    // If it has a fixed lifetime then calculate it.
    if ( mDataBlock->lifetime > 0.0f )

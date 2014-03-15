@@ -31,7 +31,7 @@ typedef struct {
    * next_output_byte/free_in_buffer are local copies of cinfo->dest fields.
    */
   JOCTET * next_output_byte;	/* => next byte to write in buffer */
-  size_t free_in_buffer;	/* # of byte spaces remaining in buffer */
+  jpeg_size_t free_in_buffer;	/* # of byte spaces remaining in buffer */
   INT32 put_buffer;		/* current bit-accumulation buffer */
   int put_bits;			/* # of bits now in it */
   j_compress_ptr cinfo;		/* link to cinfo (needed for dump_buffer) */

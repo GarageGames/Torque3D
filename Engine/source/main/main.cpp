@@ -22,7 +22,7 @@
 
 #ifdef TORQUE_SHARED
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( WIN64 )
 
 #include <windows.h>
 #include <stdio.h>
@@ -68,7 +68,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
    return ret;
 
 }
-#endif // WIN32
+#endif // defined( WIN32 ) || defined( WIN64 )
 
 
 #ifdef __MACOSX__

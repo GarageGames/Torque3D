@@ -18,6 +18,8 @@
 #include "../codec_internal.h"
 
 
+#ifndef _WIN64
+
 static const unsigned __int64 V128 = 0x8080808080808080;
 
 static void copy8x8__mmx (unsigned char *src,
@@ -195,3 +197,4 @@ void dsp_mmx_recon_init(DspFunctions *funcs)
   funcs->recon_inter8x8_half = recon_inter8x8_half__mmx;
 }
 
+#endif // #ifndef _WIN64

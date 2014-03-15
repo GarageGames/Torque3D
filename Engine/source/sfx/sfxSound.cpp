@@ -456,7 +456,7 @@ void SFXSound::_updateStatus()
    // If we're not in a playing state or we're a looping
    // sound then we don't need to calculate the status.
    
-   if( isLooping() || mStatus != SFXStatusPlaying )
+   if ( (mStatus != SFXStatusPlaying) || isLooping() )
       return;
 
    // If we're playing and don't have a voice we

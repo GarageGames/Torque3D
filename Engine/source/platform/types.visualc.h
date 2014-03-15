@@ -26,6 +26,12 @@
 
 // For more information on VisualC++ predefined macros
 // http://support.microsoft.com/default.aspx?scid=kb;EN-US;q65472
+// @copy _WIN32  Defined for WIN32 applications.Always defined. Microsoft specific.
+/* @todo ? Undef _WIN32 for catch all dirt places in the code.
+#if defined( _WIN64 )
+#  undef _WIN32
+#endif
+*/
 
 //--------------------------------------
 // Types
@@ -58,30 +64,38 @@ typedef unsigned _int64 U64;
 #elif defined( _XBOX_VER )
 #  define TORQUE_OS_STRING "Xbox"
 #  define TORQUE_OS_XBOX
-#  include "platform/types.win32.h"
-#elif defined(_WIN32)
+#  include "platform/types.win.h"
+#elif defined( _WIN64 )
+#  define TORQUE_OS_STRING "Win64"
+#  define TORQUE_OS_WIN64
+#  include "platform/types.win.h"
+#elif defined( _WIN32 )
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN32
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
 #else 
-#  error "VC: Unsupported Operating System"
+#  error "VC: Unsupported operating system"
 #endif
 
 
 //--------------------------------------
 // Identify the CPU
-#if defined(_M_IX86)
+#if defined( _M_X64 )
+#  define TORQUE_CPU_STRING "x64"
+#  define TORQUE_CPU_X64
+#  define TORQUE_LITTLE_ENDIAN
+#elif defined( _M_IX86 )
 #  define TORQUE_CPU_STRING "x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
 #  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_VC_INLINE_X86_ASM
-#elif defined(TORQUE_OS_XENON)
+#elif defined( TORQUE_OS_XENON )
 #  define TORQUE_CPU_STRING "ppc"
 #  define TORQUE_CPU_PPC
 #  define TORQUE_BIG_ENDIAN
 #else
-#  error "VC: Unsupported Target CPU"
+#  error "VC: Unsupported target CPU"
 #endif
 
 #ifndef FN_CDECL

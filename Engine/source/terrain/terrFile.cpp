@@ -114,7 +114,7 @@ void TerrainFile::_buildGridMap()
    for ( S32 i = mGridLevels; i >= 0; i-- )
    {
       mGridMap[i] = sq;
-      sq += 1 << ( 2 * ( mGridLevels - i ) );
+      sq += (size_t)(1 << ( 2 * ( mGridLevels - i ) ));
    }
 
    for( S32 i = mGridLevels; i >= 0; i-- )

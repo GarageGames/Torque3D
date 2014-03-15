@@ -80,13 +80,15 @@ size_t SFXVorbisStream::_read_func( void *ptr, size_t size, size_t nmemb, void *
 
    // Stream::read() returns true if any data was
    // read, so we must track the read bytes ourselves.
-   U32 startByte = stream->getPosition();
-   stream->read( size * nmemb, ptr );
-   U32 endByte = stream->getPosition();
+   const size_t rs = size * nmemb;
+   AssertFatal( rs <= U32_MAX, "Huge data." );
+   stream->read( (U32)rs, ptr );
+   const U32 endByte = stream->getPosition();
 
    // How many did we actually read?
-   U32 readBytes = ( endByte - startByte );
-   U32 readItems = readBytes / size;
+   const U32 startByte = stream->getPosition( );
+   const U32 readBytes = (endByte - startByte);
+   const U32 readItems = readBytes / (U32)size;
 
    return readItems;
 }

@@ -3577,7 +3577,7 @@ void GuiTreeViewCtrl::onMiddleMouseDown(const GuiEvent & event)
          if (mSelectedItems[i]->isInspectorData()) {
             Con::printf("%d",mSelectedItems[i]->getObject()->getId());
          } else
-            Con::printf("wtf %d", mSelectedItems[i]);
+            Con::printf("wtf %p", mSelectedItems[i]);
       }
       Con::printf("contents of mSelected");
       for (S32 j = 0; j < mSelected.size(); j++) {
