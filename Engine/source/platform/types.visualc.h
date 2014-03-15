@@ -59,9 +59,13 @@ typedef unsigned _int64 U64;
 #  define TORQUE_OS_STRING "Xbox"
 #  define TORQUE_OS_XBOX
 #  include "platform/types.win32.h"
-#elif defined(_WIN32)
+#elif defined( _WIN32 )
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN32
+#  include "platform/types.win32.h"
+#elif defined( _WIN64 )
+#  define TORQUE_OS_STRING "Win64"
+#  define TORQUE_OS_WIN64
 #  include "platform/types.win32.h"
 #else 
 #  error "VC: Unsupported Operating System"
@@ -70,17 +74,17 @@ typedef unsigned _int64 U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(_M_X64)
+#if defined( _M_X64 )
 #  define TORQUE_CPU_STRING "x64"
 #  define TORQUE_CPU_X64
 #  define TORQUE_LITTLE_ENDIAN
-#elif defined(_M_IX86)
+#elif defined( _M_IX86 )
 #  define TORQUE_CPU_STRING "x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
 #  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_VC_INLINE_X86_ASM
-#elif defined(TORQUE_OS_XENON)
+#elif defined( TORQUE_OS_XENON )
 #  define TORQUE_CPU_STRING "ppc"
 #  define TORQUE_CPU_PPC
 #  define TORQUE_BIG_ENDIAN
