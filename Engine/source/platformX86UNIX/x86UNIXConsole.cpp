@@ -217,7 +217,7 @@ void StdConsole::process()
       // mojo for select call
       fd_set rfds;
       struct timeval tv;
-      int retval;
+
       FD_ZERO(&rfds);
       FD_SET(stdIn, &rfds);
       // don't wait at all in select

@@ -401,10 +401,9 @@ void NavMesh::buildNextTile()
          nm->removeTile(nm->getTileRefAt(tile.x, tile.y, 0), 0, 0);
          // Add new data (navmesh owns and deletes the data).
          dtStatus status = nm->addTile(data, dataSize, DT_TILE_FREE_DATA, 0, 0);
-         int success = 1;
+
          if(dtStatusFailed(status))
          {
-            success = 0;
             dtFree(data);
          }
       }
