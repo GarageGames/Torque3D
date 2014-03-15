@@ -599,10 +599,10 @@ DefineEngineFunction(fileExt, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(fileBase, String, ( const char* fileName ),,
-   "@brief Get the base of a file name (removes extension)\n\n"
+   "@brief Get the base of a file name (removes extension and path)\n\n"
 
    "@param fileName Name and path of file to check\n"
-   "@return String containing the file name, minus extension\n"
+   "@return String containing the file name, minus extension and path\n"
    "@ingroup FileSystem")
 {
 
@@ -626,10 +626,10 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(fileName, String, ( const char* fileName ),,
-	"@brief Get the file name of a file (removes extension and path)\n\n"
+	"@brief Get only the file name of a path and file name string (removes path)\n\n"
 
 	"@param fileName Name and path of file to check\n"
-	"@return String containing the file name, minus extension and path\n"
+	"@return String containing the file name, minus the path\n"
 	"@ingroup FileSystem")
 {
    S32 pathLen = dStrlen( fileName );
