@@ -1446,6 +1446,7 @@ void SimObject::linkNamespaces()
          // No increasing parent reference counts is needed in this case.
 
          bool ok = superClassNamespacePackageRoot->classLinkTo( cppNamespace );
+         TORQUE_UNUSED(ok);
          AssertFatal( ok, "SimObject::linkNamespaces - failed to link new namespace to c++ class name" );
          parentNamespace = superClassNamespace;
       }

@@ -303,6 +303,7 @@ void SFXWorld< NUM_DIMENSIONS, Object >::update()
       else
       {
          SFXAmbience* ambience = Deref( scope.mObject ).getAmbience();
+         TORQUE_UNUSED(ambience);
          AssertFatal( ambience != NULL, "SFXWorld::update() - object on stack that does not have an ambient space!" );
 
          // Listener is neither inside object nor in its

@@ -436,6 +436,7 @@ bool ZipSubWStream::_write(const U32 numBytes, const void *pBuffer)
       }
 
       S32 retVal = deflate(m_pZipStream, Z_NO_FLUSH);
+      TORQUE_UNUSED(retVal);
       AssertFatal(retVal !=  Z_BUF_ERROR, "ZipSubWStream::_write: invalid buffer");
    }
 

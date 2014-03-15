@@ -623,6 +623,7 @@ void Profiler::dump()
    {
       FileStream fws;
       bool success = fws.open(mDumpFileName, Torque::FS::File::Write);
+      TORQUE_UNUSED(success);
       AssertFatal(success, "Cannot write profile dump to specified file!");
          char buffer[1024];
 

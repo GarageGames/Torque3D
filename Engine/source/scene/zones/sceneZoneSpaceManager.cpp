@@ -901,6 +901,7 @@ void SceneZoneSpaceManager::verifyState()
             continue;
 
          SceneZoneSpace* otherSpace = mZoneSpaces[ n ];
+         TORQUE_UNUSED(otherSpace);
          AssertFatal( otherSpace->getZoneRangeStart() >= zoneRangeStart + numZones ||
                       otherSpace->getZoneRangeStart() + otherSpace->getZoneRange() <= zoneRangeStart,
             "SceneZoneSpaceManager::verifyState - Overlap between zone ID ranges of zone spaces!" );

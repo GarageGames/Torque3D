@@ -198,6 +198,7 @@ bool ForestData::write( const char *path )
    for ( U32 i=0; i < count; i++ )
    {
       StringTableEntry localName = allDatablocks[i]->getInternalName();
+      TORQUE_UNUSED(localName);
       AssertFatal( localName != NULL && localName[0] != '\0', "ForestData::write - ForestItemData had no internal name set!" );
       stream.writeString( allDatablocks[i]->getInternalName() );
    }

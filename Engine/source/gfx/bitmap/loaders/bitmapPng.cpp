@@ -76,6 +76,7 @@ static void pngReadDataFn(png_structp png_ptr,
 
    Stream *strm = (Stream*)png_get_io_ptr(png_ptr);
    bool success = strm->read(length, data);
+   TORQUE_UNUSED(success);
    AssertFatal(success, "pngReadDataFn - failed to read from stream!");
 }
 
@@ -89,6 +90,7 @@ static void pngWriteDataFn(png_structp png_ptr,
 
    Stream *strm = (Stream*)png_get_io_ptr(png_ptr);
    bool success = strm->write(length, data);
+   TORQUE_UNUSED(success);
    AssertFatal(success, "pngWriteDataFn - failed to write to stream!");
 }
 

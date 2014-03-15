@@ -786,6 +786,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
       U32 idxCount = ( endBatch.endIndex - startIdx ) + 1;
       U32 triangleCount = idxCount / 3;
 
+      TORQUE_UNUSED(vertCount);
       AssertFatal( startVert + vertCount <= mVertCount, "DecalRoad, bad draw call!" );
       AssertFatal( startIdx + triangleCount < mTriangleCount * 3, "DecalRoad, bad draw call!" );
 

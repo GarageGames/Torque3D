@@ -1512,6 +1512,7 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
 
    // Do collision.
    bool safety = ray.Collide( vec, *mOptTree );
+   TORQUE_UNUSED(safety);
    AssertFatal( safety, "TSMesh::castRayOpcode - no good ray collide!" );
 
    // If no hit, just skip out.

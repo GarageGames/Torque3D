@@ -506,6 +506,7 @@ void* String::StringData::operator new( size_t size, U32 len )
 void String::StringData::operator delete(void *ptr)
 {
    StringData* sub = static_cast<StringData *>(ptr);
+   TORQUE_UNUSED(sub);
    AssertFatal( sub->mRefCount == 0, "StringData::delete() - invalid refcount" );
 
 #ifdef TORQUE_DEBUG
