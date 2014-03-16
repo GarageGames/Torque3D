@@ -191,9 +191,9 @@ INT CreateMiniDump( LPEXCEPTION_POINTERS ExceptionInfo)
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //  MiniDumpDialogProc - Used By DisplayMiniDumpDialog
 //-----------------------------------------------------------------------------------------------------------------------------------------
-const int ID_TEXT=200;
-const int ID_USERTEXT=300;
-const int ID_DONE=400;
+const S32 ID_TEXT=200;
+const S32 ID_USERTEXT=300;
+const S32 ID_DONE=400;
 BOOL CALLBACK MiniDumpDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
 { 
    char text[128]= "";
@@ -259,7 +259,7 @@ LRESULT DisplayMiniDumpDialog(HINSTANCE hinst, HWND hwndOwner)
    *lpw++ = 0;             // Predefined dialog box class (by default)
 
    LPWSTR lpwsz = (LPWSTR)lpw;
-   int nchar = 1 + MultiByteToWideChar(CP_ACP, 0, "MiniDump Crash Report", -1, lpwsz, 50);
+   S32 nchar = 1 + MultiByteToWideChar(CP_ACP, 0, "MiniDump Crash Report", -1, lpwsz, 50);
    lpw += nchar;
 
    //-----------------------------------------------------------------

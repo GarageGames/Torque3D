@@ -280,7 +280,7 @@ bool Polytope::intersect(const PlaneF& plane,const Point3F& sp,const Point3F& ep
 
 //----------------------------------------------------------------------------
 
-void Polytope::extrudeFace(int faceIdx,const VectorF& vec,Polytope* out)
+void Polytope::extrudeFace(S32 faceIdx,const VectorF& vec,Polytope* out)
 {
    // Assumes the face belongs to the first volume.
    out->mVertexList.clear();
@@ -373,7 +373,7 @@ bool Polytope::findCollision(const VectorF& vec,Polytope::Collision *best)
       return false;
    if (!best->object)
       best->distance = 1.0E30f;
-   int bestVertex = -1;
+   S32 bestVertex = -1;
    Polytope::Volume* bestVolume = NULL;
    sideCount++;
 

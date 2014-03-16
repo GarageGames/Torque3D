@@ -474,7 +474,7 @@ void GFXDrawUtil::drawRect( const Point2F &upperLeft, const Point2F &lowerRight,
    verts[8].point.set( upperLeft.x + ulOffset + nw.x, upperLeft.y + ulOffset + nw.y, 0.0f ); // same as 0
    verts[9].point.set( upperLeft.x + ulOffset - nw.x, upperLeft.y + ulOffset - nw.y, 0.0f ); // same as 1
 
-   for (int i=0; i<10; i++)
+   for (S32 i=0; i<10; i++)
       verts[i].color = color;
 
    verts.unlock();
@@ -531,7 +531,7 @@ void GFXDrawUtil::drawRectFill( const Point2F &upperLeft, const Point2F &lowerRi
    verts[2].point.set( upperLeft.x-ne.x+ulOffset, lowerRight.y-ne.y, 0.0f );
    verts[3].point.set( lowerRight.x-nw.x, lowerRight.y-nw.y, 0.0f );
 
-   for (int i=0; i<4; i++)
+   for (S32 i=0; i<4; i++)
       verts[i].color = color;
 
    verts.unlock();
@@ -828,11 +828,11 @@ void GFXDrawUtil::_drawWireCube( const GFXStateBlockDesc &desc, const Point3F &s
 
    // setup 6 line loops
    U32 vertexIndex = 0;
-   for(int i = 0; i < 6; i++)
+   for(S32 i = 0; i < 6; i++)
    {
-      for(int j = 0; j < 5; j++)
+      for(S32 j = 0; j < 5; j++)
       {
-         int idx = cubeFaces[i][j%4];
+         S32 idx = cubeFaces[i][j%4];
 
          verts[vertexIndex].point = cubePoints[idx] * halfSize;
          verts[vertexIndex].color = color;
@@ -872,7 +872,7 @@ void GFXDrawUtil::_drawSolidCube( const GFXStateBlockDesc &desc, const Point3F &
    // setup 6 line loops
    U32 vertexIndex = 0;
    U32 idx;
-   for(int i = 0; i < 6; i++)
+   for(S32 i = 0; i < 6; i++)
    {
       idx = cubeFaces[i][0];
       verts[vertexIndex].point = cubePoints[idx] * halfSize;      

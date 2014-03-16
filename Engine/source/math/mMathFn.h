@@ -442,7 +442,7 @@ inline bool mIsNaN_F( const F32 x )
 
 inline bool mIsInf_F( const F32 x )
 {
-   return ( x == std::numeric_limits< float >::infinity() );
+   return ( x == std::numeric_limits< F32 >::infinity() );
 }
 
 inline F32 mSign( const F32 n )

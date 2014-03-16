@@ -58,8 +58,8 @@ struct GjkCollisionState: public CollisionState
 
    ///
    void compute_det();
-   bool valid(int s);
-   void compute_vector(int bits, VectorF& v);
+   bool valid(S32 s);
+   void compute_vector(S32 bits, VectorF& v);
    bool closest(VectorF& v);
    bool degenerate(const VectorF& w);
    void nextBit();

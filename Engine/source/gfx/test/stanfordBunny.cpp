@@ -13606,8 +13606,8 @@ void setupBunny(GFXVertexPCN* v)
    {
       for(j=0;j<3;j++)
       {
-         int vi=face_indicies[i][j];
-         int ni=face_indicies[i][j+3];//Normal index
+         S32 vi=face_indicies[i][j];
+         S32 ni=face_indicies[i][j+3];//Normal index
          Point3F point = Point3F(vertices[vi][0], vertices[vi][1], vertices[vi][2]);
          v[vert].normal = Point3F(normals[ni][0], normals[ni][1], normals[ni][2]);
          v[vert].point = point;

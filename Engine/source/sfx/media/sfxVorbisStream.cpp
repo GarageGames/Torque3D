@@ -91,7 +91,7 @@ size_t SFXVorbisStream::_read_func( void *ptr, size_t size, size_t nmemb, void *
    return readItems;
 }
 
-int SFXVorbisStream::_seek_func( void *datasource, ogg_int64_t offset, int whence )
+S32 SFXVorbisStream::_seek_func( void *datasource, ogg_int64_t offset, S32 whence )
 {
    Stream *stream = reinterpret_cast<Stream*>( datasource );
 
@@ -133,7 +133,7 @@ bool SFXVorbisStream::_openVorbis()
    cb.tell_func = canSeek ? _tell_func : NULL;
 
    // Open it.
-   int ovResult = ov_open_callbacks( mStream, mVF, NULL, 0, cb );
+   S32 ovResult = ov_open_callbacks( mStream, mVF, NULL, 0, cb );
    if( ovResult != 0 )
       return false;
 
@@ -196,9 +196,9 @@ S32 SFXVorbisStream::read( U8 *buffer,
    mBitstream = *bitstream;
 
    #ifdef TORQUE_BIG_ENDIAN
-      static const int isBigEndian = 1;
+      static const S32 isBigEndian = 1;
    #else
-      static const int isBigEndian = 0;
+      static const S32 isBigEndian = 0;
    #endif
 
    // Vorbis doesn't seem to like reading 

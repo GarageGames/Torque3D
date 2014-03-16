@@ -157,7 +157,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
       pri->bbModelViewProj->mul(tempPt);
       tempPt = tempPt / tempPt.w;
 
-      for(int i = 0; i < 1; i++)
+      for(S32 i = 0; i < 1; i++)
       {
          screenClipper.mPlaneList.push_back(planes[i]);
          screenClipper.mPlaneList.last() += tempPt.asPoint3F();
@@ -167,7 +167,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
       screenSpaceBoundingBox.minExtents = Point3F::Zero;
       screenSpaceBoundingBox.maxExtents = Point3F::Zero;
 
-      for(int i = 0; i < 8; i++)
+      for(S32 i = 0; i < 8; i++)
       {
          tempPt = cubePoints[i];
          pri->bbModelViewProj->mul(tempPt);

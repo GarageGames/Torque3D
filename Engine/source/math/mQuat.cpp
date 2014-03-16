@@ -262,12 +262,12 @@ QuatF & QuatF::interpolate( const QuatF & q1, const QuatF & q2, F32 t )
    //-----------------------------------
    // calculate interpolating coeffs:
 
-   double scale1, scale2;
+   F64 scale1, scale2;
    if ( (1.0 - cosOmega) > 0.00001 )
    {
       // standard case
-      double omega = mAcos(cosOmega);
-      double sinOmega = mSin(omega);
+      F64 omega = mAcos(cosOmega);
+      F64 sinOmega = mSin(omega);
       scale1 = mSin((1.0 - t) * omega) / sinOmega;
       scale2 = sign2 * mSin(t * omega) / sinOmega;
    }

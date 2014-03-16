@@ -63,7 +63,7 @@ struct GFXLockedRect
 {
    /// Pitch of the lock. This is the spacing in bytes of the start
    /// of each row of the locked region.
-   int pitch;
+   S32 pitch;
 
    /// Pointer to the start of locked rectangle.
    U8* bits;

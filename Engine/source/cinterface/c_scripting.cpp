@@ -164,7 +164,7 @@ extern "C" {
       return false;
    }
 
-   void script_simobject_setfield_int(U32 objectId, const char* fieldName, int v)
+   void script_simobject_setfield_int(U32 objectId, const char* fieldName, S32 v)
    {
       SimObject *object = Sim::findObject( objectId );
       if( object )
@@ -291,12 +291,12 @@ extern "C" {
       entry->cb.mVoidCallbackFunc(o, argc, argv);      
    }
 
-   int script_simobject_get_id(SimObject* so)
+   S32 script_simobject_get_id(SimObject* so)
    {
       return so->getId();
    }
 
-   int script_simobject_find(const char* classname, const char* name)
+   S32 script_simobject_find(const char* classname, const char* name)
    {
       SimObject *object;
       if( Sim::findObject( name, object ) )
@@ -385,7 +385,7 @@ extern "C" {
 
 #ifdef TORQUE_OS_WIN32
 
-   void script_input_event(int type, int value1, int value2)
+   void script_input_event(S32 type, S32 value1, S32 value2)
    {
       if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
       {

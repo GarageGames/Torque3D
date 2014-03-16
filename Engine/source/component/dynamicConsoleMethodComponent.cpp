@@ -139,7 +139,7 @@ const char *DynamicConsoleMethodComponent::_callMethod( U32 argc, const char *ar
    if( getComponentCount() > 0 )
    {
       lockComponentList();
-      for( int i = getComponentCount() - 1; i >= 0; i-- )
+      for( S32 i = getComponentCount() - 1; i >= 0; i-- )
       //for( SimComponentIterator nItr = componentList.end();  nItr != componentList.begin(); nItr-- )
       {
          argv[0] = cbName;

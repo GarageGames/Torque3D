@@ -307,7 +307,7 @@ static void dumpNamespaceEntries( Stream &stream, Namespace *g, bool callbacks =
    // Go through all the entries in the namespace.
    for ( Namespace::Entry *ewalk = g->mEntryList; ewalk; ewalk = ewalk->mNext )
    {
-      int eType = ewalk->mType;
+      S32 eType = ewalk->mType;
 
       // We do not dump script defined functions... only engine exports.
       if(    eType == Namespace::Entry::ConsoleFunctionType

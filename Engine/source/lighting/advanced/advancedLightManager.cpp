@@ -606,7 +606,7 @@ GFXVertexBufferHandle<AdvancedLightManager::LightVertex> AdvancedLightManager::g
       mConeIndices.lock( &idx );
       // Build the cone
       U32 idxIdx = 0;
-      for( int i = 1; i < numPoints + 1; i++ )
+      for( U32 i = 1; i < numPoints + 1; i++ )
       {
          idx[idxIdx++] = 0; // Triangles on cone start at top point
          idx[idxIdx++] = i;
@@ -614,7 +614,7 @@ GFXVertexBufferHandle<AdvancedLightManager::LightVertex> AdvancedLightManager::g
       }
 
       // Build the bottom of the cone (reverse winding order)
-      for( int i = 1; i < numPoints - 1; i++ )
+      for( U32 i = 1; i < numPoints - 1; i++ )
       {
          idx[idxIdx++] = 1;
          idx[idxIdx++] = i + 2;
