@@ -108,7 +108,7 @@ compare_right(const nat_char* a, const nat_char* b)
    remember it in BIAS. */
    for (;; a++, b++) {
       if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
-         return bias;
+         break;
       else if (!nat_isdigit(*a))
          return -1;
       else if (!nat_isdigit(*b))
@@ -123,7 +123,7 @@ compare_right(const nat_char* a, const nat_char* b)
          return bias;
    }
 
-   return 0;
+   return bias;
 }
 
 
@@ -134,7 +134,7 @@ compare_left(const nat_char* a, const nat_char* b)
    different value wins. */
    for (;; a++, b++) {
       if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
-         return 0;
+         break;
       else if (!nat_isdigit(*a))
          return -1;
       else if (!nat_isdigit(*b))
@@ -516,13 +516,12 @@ char* dStristr( char* str1, const char* str2 )
 
    // Slow but at least we have it.
 
-   U32 str2len = strlen( str2 );
+   const U32 str2len = strlen( str2 );
    while( *str1 )
    {
-      if( strncasecmp( str1, str2, str2len ) == 0 )
+      if ( strncasecmp( str1, str2, str2len ) == 0 )
          return str1;
-
-      ++ str1;
+      ++str1;
    }
 
    return NULL;

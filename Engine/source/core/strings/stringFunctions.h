@@ -35,6 +35,9 @@
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
+#endif
+
+#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
 #define strtof       (float)strtod
 #endif
 
