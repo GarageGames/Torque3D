@@ -14,6 +14,8 @@
 #include "../dsp.h"
 
 
+#ifndef _WIN64
+
 static const  ogg_int64_t xC1S7 = 0x0fb15fb15fb15fb15;
 static const  ogg_int64_t xC2S6 = 0x0ec83ec83ec83ec83;
 static const  ogg_int64_t xC3S5 = 0x0d4dbd4dbd4dbd4db;
@@ -331,3 +333,5 @@ void dsp_mmx_fdct_init(DspFunctions *funcs)
 {
   funcs->fdct_short = fdct_short__mmx;
 }
+
+#endif // #ifndef _WIN64

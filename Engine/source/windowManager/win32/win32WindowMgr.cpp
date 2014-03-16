@@ -293,7 +293,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
 
 void Win32WindowManager::setParentWindow(void* newParent)
 {
-   Con::printf( "Setting parent HWND: %d", newParent );
+   Con::printf( "Setting parent HWND: %p", newParent );
    mParentWindow = (HWND)newParent;
    if( mWindowListHead && mWindowListHead->mWindowHandle )
       ::SetParent( mWindowListHead->mWindowHandle, mParentWindow);
@@ -356,7 +356,8 @@ void Win32WindowManager::_process()
 
          // [tom, 4/30/2007] I think this should work, but leaving the above commented
          // out just in case this is actually fubared with multiple windows.
-         Win32Window* window = (Win32Window*)(GetWindowLong(msg.hwnd, GWL_USERDATA));
+         Win32Window* window =
+            (Win32Window*)(GetWindowLong(msg.hwnd, GWLP_USERDATA));
          if(window)
             translated = window->translateMessage(msg);
          

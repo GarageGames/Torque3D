@@ -296,7 +296,7 @@ jpeg_fill_bit_buffer (bitread_working_state * state,
 {
   /* Copy heavily used state fields into locals (hopefully registers) */
   register const JOCTET * next_input_byte = state->next_input_byte;
-  register size_t bytes_in_buffer = state->bytes_in_buffer;
+  register jpeg_size_t bytes_in_buffer = state->bytes_in_buffer;
   j_decompress_ptr cinfo = state->cinfo;
 
   /* Attempt to load at least MIN_GET_BITS bits into get_buffer. */

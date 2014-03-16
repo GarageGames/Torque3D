@@ -15,6 +15,7 @@
 
  ********************************************************************/
 
+#include <assert.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -55,13 +56,13 @@ void th_comment_init(th_comment *_tc){
 }
 
 void th_comment_add(th_comment *_tc,char *_comment){
-  int comment_len;
   _tc->user_comments=_ogg_realloc(_tc->user_comments,
    (_tc->comments+2)*sizeof(*_tc->user_comments));
   _tc->comment_lengths=_ogg_realloc(_tc->comment_lengths,
    (_tc->comments+2)*sizeof(*_tc->comment_lengths));
-  comment_len=strlen(_comment);
-  _tc->comment_lengths[_tc->comments]=comment_len;
+  const size_t comment_len=strlen(_comment);
+  assert( (comment_len <= INT_MAX) && "Huge data." );
+  _tc->comment_lengths[_tc->comments]=(int)comment_len;
   _tc->user_comments[_tc->comments]=_ogg_malloc(comment_len+1);
   memcpy(_tc->user_comments[_tc->comments],_comment,comment_len+1);
   _tc->comments++;
@@ -69,13 +70,10 @@ void th_comment_add(th_comment *_tc,char *_comment){
 }
 
 void th_comment_add_tag(th_comment *_tc,char *_tag,char *_val){
-  char *comment;
-  int   tag_len;
-  int   val_len;
-  tag_len=strlen(_tag);
-  val_len=strlen(_val);
+  const size_t tag_len=strlen(_tag);
+  const size_t val_len=strlen(_val);
   /*+2 for '=' and '\0'.*/
-  comment=_ogg_malloc(tag_len+val_len+2);
+  char* comment=_ogg_malloc(tag_len+val_len+2);
   memcpy(comment,_tag,tag_len);
   comment[tag_len]='=';
   memcpy(comment+tag_len+1,_val,val_len+1);
@@ -84,15 +82,13 @@ void th_comment_add_tag(th_comment *_tc,char *_tag,char *_val){
 }
 
 char *th_comment_query(th_comment *_tc,char *_tag,int _count){
-  long i;
-  int  found;
-  int  tag_len;
-  tag_len=strlen(_tag);
-  found=0;
-  for(i=0;i<_tc->comments;i++){
-    if(!oc_tagcompare(_tc->user_comments[i],_tag,tag_len)){
+  const size_t tag_len=strlen(_tag);
+  assert( (tag_len <= INT_MAX) && "Huge data." );
+  int found=0;
+  for(long i=0;i<_tc->comments;i++){
+    if(!oc_tagcompare(_tc->user_comments[i],_tag,(int)tag_len)){
       /*We return a pointer to the data, not a copy.*/
-      if(_count==found++)return _tc->user_comments[i]+tag_len+1;
+      if(_count==found++)return _tc->user_comments[i]+(int)tag_len+1;
     }
   }
   /*Didn't find anything.*/
@@ -100,13 +96,11 @@ char *th_comment_query(th_comment *_tc,char *_tag,int _count){
 }
 
 int th_comment_query_count(th_comment *_tc,char *_tag){
-  long i;
-  int  tag_len;
-  int  count;
-  tag_len=strlen(_tag);
-  count=0;
-  for(i=0;i<_tc->comments;i++){
-    if(!oc_tagcompare(_tc->user_comments[i],_tag,tag_len))count++;
+  const size_t tag_len=strlen(_tag);
+  assert( (tag_len <= INT_MAX) && "Huge data." );
+  int count=0;
+  for(long i=0;i<_tc->comments;i++){
+    if(!oc_tagcompare(_tc->user_comments[i],_tag,(int)tag_len))count++;
   }
   return count;
 }

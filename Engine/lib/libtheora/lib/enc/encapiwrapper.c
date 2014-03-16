@@ -1016,7 +1016,7 @@ static unsigned char *th_encode_copy_pad_plane(th_img_plane *_dst,
       }
     }
     /*Right side.*/
-    for(x=_pic_x+_pic_width;x<_dst->width;x++){
+    for(x=_pic_x+_pic_width;x<(ogg_uint32_t)_dst->width;x++){
       dst=_dst->data+_pic_y*dstride+x-1;
       for(y=0;y<_pic_height;y++){
         dst[1]=(dst[0]<<1)+(dst-(dstride&-(y>0)))[0]+
@@ -1027,17 +1027,17 @@ static unsigned char *th_encode_copy_pad_plane(th_img_plane *_dst,
     /*Top.*/
     dst=_dst->data+_pic_y*dstride;
     for(y=_pic_y;y-->0;){
-      for(x=0;x<_dst->width;x++){
-        (dst-dstride)[x]=(dst[x]<<1)+dst[x-(x>0)]+dst[x+(x+1<_dst->width)]+2>>2;
+      for(x=0;x<(ogg_uint32_t)_dst->width;x++){
+        (dst-dstride)[x]=(dst[x]<<1)+dst[x-(x>0)]+dst[x+(x+1<(ogg_uint32_t)_dst->width)]+2>>2;
       }
       dst-=dstride;
     }
     /*Bottom.*/
     dst=_dst->data+(_pic_y+_pic_height)*dstride;
-    for(y=_pic_y+_pic_height;y<_dst->height;y++){
-      for(x=0;x<_dst->width;x++){
+    for(y=_pic_y+_pic_height;y<(ogg_uint32_t)_dst->height;y++){
+      for(x=0;x<(ogg_uint32_t)_dst->width;x++){
         dst[x]=((dst-dstride)[x]<<1)+(dst-dstride)[x-(x>0)]+
-         (dst-dstride)[x+(x+1<_dst->width)]+2>>2;
+         (dst-dstride)[x+(x+1<(ogg_uint32_t)_dst->width)]+2>>2;
       }
       dst+=dstride;
     }
@@ -1091,7 +1091,7 @@ int th_encode_ycbcr_in(th_enc_ctx *_enc,th_ycbcr_buffer _ycbcr){
     int            pli;
     pic_x=cpi->pb.info.offset_x;
     pic_y=cpi->pb.info.offset_y;
-    if(_ycbcr[0].width>pic_width||_ycbcr[0].height>pic_height){
+    if((ogg_uint32_t)_ycbcr[0].width>pic_width||(ogg_uint32_t)_ycbcr[0].height>pic_height){
       buf=th_encode_copy_pad_plane(ycbcr+0,_enc->buf,_ycbcr+0,
        pic_x,pic_y,pic_width,pic_height);
     }

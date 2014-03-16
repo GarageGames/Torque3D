@@ -1093,7 +1093,8 @@ void GFXPCD3D9Device::reset( D3DPRESENT_PARAMETERS &d3dpp )
    // Deal with the depth/stencil buffer.
    if(mDeviceDepthStencil)
    {
-      Con::printf("GFXPCD3D9Device::reset - depthstencil %x has %d ref's", mDeviceDepthStencil, mDeviceDepthStencil->AddRef()-1);
+      Con::printf("GFXPCD3D9Device::reset - depthstencil %p has %d ref's",
+         mDeviceDepthStencil, mDeviceDepthStencil->AddRef()-1);
       mDeviceDepthStencil->Release();
    }
 

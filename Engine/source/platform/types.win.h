@@ -23,13 +23,16 @@
 #ifndef _TYPESWIN32_H_
 #define _TYPESWIN32_H_
 
-
 #define FN_CDECL __cdecl            ///< Calling convention
 
 // size_t is needed to overload new
 // size_t tends to be OS and compiler specific and may need to 
 // be if/def'ed in the future
-typedef unsigned int  dsize_t;      
+#ifdef _WIN64
+typedef unsigned long long  dsize_t;
+#else
+typedef unsigned int  dsize_t;
+#endif
 
 
 /// Platform dependent file date-time structure.  The definition of this structure

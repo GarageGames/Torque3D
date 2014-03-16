@@ -51,8 +51,10 @@ U32 GFXTextureObject::dumpActiveTOs()
    Con::printf(" Addr   Dim. GFXTextureProfile  ProfilerPath DebugDescription");
 
    for(GFXTextureObject *walk = smHead; walk; walk=walk->mDebugNext)
-      Con::printf(" %x  (%4d, %4d)  %s    %s    %s", walk, walk->getWidth(), 
-      walk->getHeight(), walk->mProfile->getName().c_str(), walk->mDebugCreationPath.c_str(), walk->mDebugDescription.c_str());
+      Con::printf(" %p  (%4d, %4d)  %s    %s    %s",
+      walk, walk->getWidth(),
+      walk->getHeight(), walk->mProfile->getName().c_str(),
+      walk->mDebugCreationPath.c_str(), walk->mDebugDescription.c_str());
 
    Con::printf("----- dump complete -------------------------------------------");
    return smActiveTOCount;

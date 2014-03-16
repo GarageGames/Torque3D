@@ -109,7 +109,7 @@ static const F32 F32_MAX = F32(3.402823466e+38F);                 ///< Constant 
 #endif
 
 /// Integral type matching the host's memory address width.
-#ifdef TORQUE_64BITS
+#ifdef TORQUE_OS_WIN64
    typedef U64 MEM_ADDRESS;
 #else
    typedef U32 MEM_ADDRESS;
@@ -290,7 +290,7 @@ inline double getMax(double a, double b)
 
 #define BIT(x) (1 << (x))                       ///< Returns value with bit x set (2^x)
 
-#if defined(TORQUE_OS_WIN32)
+#if defined( TORQUE_OS_WIN64 ) || defined( TORQUE_OS_WIN32 )
 #define STDCALL __stdcall
 #else
 #define STDCALL

@@ -1196,7 +1196,7 @@ start_pass_2_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
       ERREXIT1(cinfo, JERR_QUANT_MANY_COLORS, MAXNUMCOLORS);
 
     if (cinfo->dither_mode == JDITHER_FS) {
-      size_t arraysize = (size_t) ((cinfo->output_width + 2) *
+       jpeg_size_t arraysize = (jpeg_size_t)((cinfo->output_width + 2) *
 				   (3 * SIZEOF(FSERROR)));
       /* Allocate Floyd-Steinberg workspace if we didn't already. */
       if (cquantize->fserrors == NULL)

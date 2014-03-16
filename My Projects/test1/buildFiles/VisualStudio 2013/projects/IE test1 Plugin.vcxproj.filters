@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ea533d9d-b022-4550-ac78-d22ca8963840}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;cc</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\web\source\activex\IEWebGamePlugin.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\web\source\activex\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\web\source\activex\IEWebGameCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\web\source\activex\IEWebGamePlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\web\source\activex\IEWebGameWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\web\source\common\webCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\web\source\activex\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\web\source\activex\IEWebGamePlugin_i.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\web\source\activex\dllmain.h" />
+    <ClInclude Include="..\..\..\web\source\activex\IEWebGameCtrl.h" />
+    <ClInclude Include="..\..\..\web\source\activex\IEWebGameWindow.h" />
+    <ClInclude Include="..\..\..\web\source\activex\Resource.h" />
+    <ClInclude Include="..\..\..\web\source\activex\stdafx.h" />
+    <ClInclude Include="..\..\..\web\source\activex\targetver.h" />
+    <ClInclude Include="..\..\..\web\source\common\webConfig.h" />
+    <ClInclude Include="..\..\..\web\source\common\webCommon.h" />
+    <ClInclude Include="..\..\..\web\source\activex\IEWebGamePlugin_i.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="..\..\..\web\source\activex\IEWebGamePlugin.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\web\source\activex\IEWebGamePlugin.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\..\web\source\activex\IEWebGameCtrl.bmp" />
+    <None Include="..\..\..\web\source\activex\IEWebGameCtrl.rgs" />
+    <None Include="..\..\..\web\source\activex\IEWebGamePlugin.rgs" />
+  </ItemGroup>
+</Project>

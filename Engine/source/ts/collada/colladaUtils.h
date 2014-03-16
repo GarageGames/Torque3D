@@ -468,7 +468,7 @@ public:
    virtual const char* getMaterial() = 0;
    virtual const domInputLocalOffset_Array& getInputs() = 0;
 
-   virtual S32 getStride() const = 0;
+   virtual size_t getStride() const = 0;
    virtual const domListOfUInts *getTriangleData() = 0;
 };
 
@@ -477,7 +477,7 @@ template<class T> class ColladaPrimitive : public BasePrimitive
 {
    T* primitive;
    domListOfUInts *pTriangleData;
-   S32 stride;
+   size_t stride;
 public:
    ColladaPrimitive(const daeElement* e) : pTriangleData(0)
    {
@@ -500,7 +500,7 @@ public:
    const char* getElementName() { return primitive->getElementName(); }
    const char* getMaterial() { return primitive->getMaterial(); }
    const domInputLocalOffset_Array& getInputs() { return primitive->getInput_array(); }
-   S32 getStride() const { return stride; }
+   size_t getStride() const { return stride; }
 
    /// Each supported primitive needs to implement this method (and convert
    /// to triangles if required)
@@ -533,7 +533,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTrian
             continue;
 
          domUint* pSrcData = &(P->getValue()[0]);
-         S32 numTriangles = (P->getValue().getCount() / stride) - 2;
+         const size_t numTriangles = (P->getValue().getCount() / stride) - 2;
 
          // Convert the strip back to a triangle list
          domUint* v0 = pSrcData;
@@ -574,7 +574,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangl
             continue;
 
          domUint* pSrcData = &(P->getValue()[0]);
-         S32 numTriangles = (P->getValue().getCount() / stride) - 2;
+         const size_t numTriangles = (P->getValue().getCount() / stride) - 2;
 
          // Convert the fan back to a triangle list
          domUint* v0 = pSrcData + stride;
@@ -606,7 +606,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriang
             continue;
 
          domUint* pSrcData = &(P->getValue()[0]);
-         S32 numPoints = P->getValue().getCount() / stride;
+         const size_t numPoints = P->getValue().getCount() / stride;
 
          // Use a simple tri-fan (centered at the first point) method of
          // converting the polygon to triangles.
@@ -635,7 +635,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
       // has been seen with certain models exported using COLLADAMax)
       const domListOfUInts& vcount = primitive->getVcount()->getValue();
 
-      U32 expectedCount = 0;
+      size_t expectedCount = 0;
       for (int iPoly = 0; iPoly < vcount.getCount(); iPoly++)
          expectedCount += vcount[iPoly];
       expectedCount *= stride;

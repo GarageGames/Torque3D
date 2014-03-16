@@ -15,6 +15,7 @@
 
  ********************************************************************/
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -69,10 +70,11 @@ static long _get_data(OggVorbis_File *vf){
   if(!(vf->callbacks.read_func))return(-1);
   if(vf->datasource){
     char *buffer=ogg_sync_buffer(&vf->oy,READSIZE);
-    long bytes=(vf->callbacks.read_func)(buffer,1,READSIZE,vf->datasource);
-    if(bytes>0)ogg_sync_wrote(&vf->oy,bytes);
+    const size_t bytes=(vf->callbacks.read_func)(buffer,1,READSIZE,vf->datasource);
+    assert( (bytes <= LONG_MAX) && "Huge data." );
+    if(bytes>0)ogg_sync_wrote(&vf->oy,(long)bytes);
     if(bytes==0 && errno)return(-1);
-    return(bytes);
+    return((long)bytes);
   }else
     return(0);
 }
