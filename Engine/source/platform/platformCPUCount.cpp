@@ -99,12 +99,11 @@ namespace CPUInfo {
       //
       static unsigned int CpuIDSupported(void)
       {
-         unsigned int MaxInputValue;
+         unsigned int MaxInputValue = 0;
          // If CPUID instruction is supported
 #ifdef TORQUE_COMPILER_GCC
          try    
          {		
-            MaxInputValue = 0;
             // call cpuid with eax = 0
             asm
                (
@@ -124,7 +123,6 @@ namespace CPUInfo {
 #elif defined( TORQUE_COMPILER_VISUALC )
          try
          {
-            MaxInputValue = 0;
             // call cpuid with eax = 0
             __asm
             {
@@ -135,14 +133,14 @@ namespace CPUInfo {
          }
          catch (...)
          {
-            return(0);                   // cpuid instruction is unavailable
+            // cpuid instruction is unavailable
+            // 'MaxInputValue' is 0 already, see declaration
          }
 #else
 #  error Not implemented.
 #endif
 
          return MaxInputValue;
-
       }
 
 
