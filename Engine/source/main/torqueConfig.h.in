@@ -75,6 +75,7 @@
 /// sanity checks, as well as making AssertFatal and AssertWarn do something.
 /// This is usually defined by the build target.
 #cmakedefine TORQUE_DEBUG
+#cmakedefine DEBUG_SPEW
 
 /// Define me if this is a shipping build; if defined I will instruct Torque
 /// to batten down some hatches and generally be more "final game" oriented.

@@ -94,7 +94,7 @@ option(TORQUE_DEBUG "T3D Debug mode" OFF)
 option(TORQUE_SHIPPING "T3D Shipping build?" OFF)
 option(TORQUE_DEBUG_NET "debug network" OFF)
 option(TORQUE_DEBUG_NET_MOVES "debug network moves" OFF)
-
+#option(DEBUG_SPEW "more debug" OFF)
 
 set(TORQUE_APP_NAME "Default" CACHE STRING "the app name")
 set(TORQUE_APP_VERSION "1000" CACHE STRING "the app version: major * 1000 + minor * 100 + revision * 10.")
@@ -248,7 +248,7 @@ addLibPath(t "/core/util/zip/unitTests" GLOB)
 addLibPath(t "/core/util/zip/compressors" GLOB)
 addLibPath(t "/i18n" GLOB)
 addLibPath(t "/sim" GLOB)
-addLibPath(t "/unit/tests" GLOB)
+#addLibPath(t "/unit/tests" GLOB)
 addLibPath(t "/unit" GLOB)
 addLibPath(t "/util" GLOB)
 addLibPath(t "/windowManager" GLOB)
@@ -442,10 +442,6 @@ else()
     addLibPath(t "/T3D/gameBase/std" GLOB)
 endif()
 
-addLibraryFinal("${t}" "libtorque3d")
-set(t3dLibs "${t3dLibs};libtorque3d")
-link_directories(${t3dLibDirs})
-
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
     set(t3dLibs "${t3dLibs};COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib")
@@ -455,8 +451,14 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/main/torqueConfig.h.in ${CMAKE_CURREN
 
 # internal libs
 set(t3dLibs "${t3dLibs};mng;png;ungif;jpeg;zlib;tinyxml;opcode;squish;collada;pcre;convexDecomp")
+#set(t3dLibs "${t3dLibs};libtorque3d")
+link_directories(${t3dLibDirs})
 
-add_executable(torque3d main/main.cpp main/Torque.rc)
+#addLibraryFinal("${t}" "libtorque3d")
+addExecutableFinal("${t};${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp;${CMAKE_CURRENT_SOURCE_DIR}/main/Torque.rc" "torque3d")
+#add_executable(torque3d WIN32 main/main.cpp main/Torque.rc)
 
 target_link_libraries(torque3d ${t3dLibs})
 
+INSTALL_TARGETS(/ torque3d)
+INSTALL_FILES(/ FILES ${CMAKE_SOURCE_DIR}/Templates/Empty/game/)
