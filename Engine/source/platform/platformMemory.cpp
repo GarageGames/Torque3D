@@ -798,19 +798,17 @@ void checkPtr( void* ptr )
       AllocatedHeader* header = ( AllocatedHeader* ) *iter;
       if( header->getUserPtr() == ptr )
       {
-         char buffer[ 1024 ];
-
 #ifdef TORQUE_DEBUG_GUARD
+         char buffer[ 1024 ];
          if( !checkGuard( *iter, true ) )
          {
             dSprintf( buffer, sizeof( buffer ), "0x%x is a valid heap pointer but has its guards corrupted", ptr );
             Platform::outputDebugString( buffer );
             return;
          }
-#endif
-
          //dSprintf( buffer, sizeof( buffer ), "0x%x is a valid heap pointer", ptr );
          //Platform::outputDebugString( buffer );
+#endif
          return;
       }
    }

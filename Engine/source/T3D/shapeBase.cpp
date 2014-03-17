@@ -3158,9 +3158,9 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
             stream->writeFlag(image.triggerDown);
             stream->writeFlag(image.altTriggerDown);
 
-            for (U32 i=0; i<ShapeBaseImageData::MaxGenericTriggers; ++i)
+            for (U32 j=0; j<ShapeBaseImageData::MaxGenericTriggers; ++j)
             {
-               stream->writeFlag(image.genericTrigger[i]);
+               stream->writeFlag(image.genericTrigger[j]);
             }
 
             stream->writeInt(image.fireCount,3);            
