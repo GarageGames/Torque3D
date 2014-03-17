@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-
 project(mng)
 
 add_definitions(-DMNG_OPTIMIZE_OBJCLEANUP)

@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-
 project(vorbis)
 
 add_definitions(-DTORQUE_OGGVORBIS)

@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-
 project(theora)
 
 add_definitions(-DTORQUE_OGGTHEORA -DTORQUE_OGGVORIBS)

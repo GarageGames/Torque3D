@@ -36,51 +36,51 @@
 /// What version of the application specific source code is this?
 ///
 /// Version number is major * 1000 + minor * 100 + revision * 10.
-#define TORQUE_APP_VERSION         1000
+#define TORQUE_APP_VERSION         @TORQUE_APP_VERSION@
 
 /// Human readable application version string.
-#define TORQUE_APP_VERSION_STRING  "1.0"
+#define TORQUE_APP_VERSION_STRING  "@TORQUE_APP_VERSION_STRING@"
 
 /// Define me if you want to enable multithreading support.
-#define TORQUE_MULTITHREAD
+#cmakedefine TORQUE_MULTITHREAD
 
 /// Define me if you want to disable Torque memory manager.
-/* #undef TORQUE_DISABLE_MEMORY_MANAGER */
+#cmakedefine TORQUE_DISABLE_MEMORY_MANAGER
 
 /// Define me if you want to disable the virtual mount system.
-/* #undef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM */
+#cmakedefine TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM
 
 /// Define me if you want to disable looking for the root of a given path
 /// within a zip file.  This means that the zip file name itself must be
 /// the root of the path.  Requires the virtual mount system to be active.
-/* #undef TORQUE_DISABLE_FIND_ROOT_WITHIN_ZIP */
+#cmakedefine TORQUE_DISABLE_FIND_ROOT_WITHIN_ZIP
 
 //Uncomment this define if you want to use the alternative zip support where you can 
 //define your directories and files inside the zip just like you would on disk
 //instead of the default zip support that treats the zip as an extra directory.
-/* #undef TORQUE_ZIP_DISK_LAYOUT */
+#cmakedefine TORQUE_ZIP_DISK_LAYOUT
 
 /// Define me if you don't want Torque to compile dso's
-#define TORQUE_NO_DSO_GENERATION
+#cmakedefine TORQUE_NO_DSO_GENERATION
 
 // Define me if this build is a tools build
-/* #undef TORQUE_PLAYER */
-#define TORQUE_TOOLS
+#cmakedefine TORQUE_PLAYER
+#cmakedefine TORQUE_TOOLS
 
 /// Define me if you want to enable the profiler.
 ///    See also the TORQUE_SHIPPING block below
-/* #undef TORQUE_ENABLE_PROFILER */
+#cmakedefine TORQUE_ENABLE_PROFILER
 
 /// Define me to enable debug mode; enables a great number of additional
 /// sanity checks, as well as making AssertFatal and AssertWarn do something.
 /// This is usually defined by the build target.
-/* #undef TORQUE_DEBUG */
+#cmakedefine TORQUE_DEBUG
 
 /// Define me if this is a shipping build; if defined I will instruct Torque
 /// to batten down some hatches and generally be more "final game" oriented.
 /// Notably this disables a liberal resource manager file searching, and
 /// console help strings.
-/* #undef TORQUE_SHIPPING */
+#cmakedefine TORQUE_SHIPPING
 
 /// Define me to enable a variety of network debugging aids.
 ///
@@ -88,10 +88,10 @@
 ///  - DebugChecksum guards to detect mismatched pack/unpacks.
 ///  - Detection of invalid destination ghosts.
 ///
-/* #undef TORQUE_DEBUG_NET */
+#cmakedefine TORQUE_DEBUG_NET
 
 /// Define me to enable detailed console logging of net moves.
-/* #undef TORQUE_DEBUG_NET_MOVES */
+#cmakedefine TORQUE_DEBUG_NET_MOVES
 
 /// Enable this define to change the default Net::MaxPacketDataSize
 /// Do this at your own risk since it has the potential to cause packets

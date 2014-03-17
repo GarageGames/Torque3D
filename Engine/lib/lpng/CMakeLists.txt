@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-
 project(png)
 
 #add_definitions(-DPNG_NO_ASSEMBLER_CODE)
