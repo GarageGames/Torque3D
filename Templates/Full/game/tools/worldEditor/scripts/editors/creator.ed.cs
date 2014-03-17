@@ -335,28 +335,23 @@ function EWCreatorWindow::navigate( %this, %address )
          }
 
          %fullPath = makeRelativePath( %fullPath, getMainDotCSDir() );                                  
-         %splitPath = strreplace( %fullPath, "/", " " );     
-         if( getWord(%splitPath, 0) $= "tools" )
+         %path = filePath( %fullPath );
+         if ( strpos( %path, "tools", 0 ) == 0 )
          {
             %fullPath = findNextFileMultiExpr( "*.dts" TAB "*.dae" TAB "*.kmz"  TAB "*.dif" );
             continue;
          }
                       
-         %dirCount = getWordCount( %splitPath ) - 1;
-         
-         %pathFolders = getWords( %splitPath, 0, %dirCount - 1 );         
-         
          // Add this file's path (parent folders) to the
          // popup menu if it isn't there yet.
-         %temp = strreplace( %pathFolders, " ", "/" );         
-         %r = CreatorPopupMenu.findText( %temp );
+         %r = CreatorPopupMenu.findText( %path );
          if ( %r == -1 )
          {
-            CreatorPopupMenu.add( %temp );
+            CreatorPopupMenu.add( %path );
          }
          
          // Is this file in the current folder?        
-         if ( stricmp( %pathFolders, %address ) == 0 )
+         if ( stricmp( %path, %address ) == 0 )
          {
             %this.addStaticIcon( %fullPath );
          }
@@ -364,35 +359,22 @@ function EWCreatorWindow::navigate( %this, %address )
          // a folder icon for?
          else
          {
-            %wordIdx = 0;
-            %add = false;
+            %add = "";
             
             if ( %address $= "" )
             {
-               %add = true;
-               %wordIdx = 0;
+               nextToken( %path, "add", "/" );
             }
-            else
+            else if ( strpos( %path, %address, 0 ) == 0 )
             {
-               for ( ; %wordIdx < %dirCount; %wordIdx++ )
-               {
-                  %temp = getWords( %splitPath, 0, %wordIdx );
-                  if ( stricmp( %temp, %address ) == 0 )
-                  {                  
-                     %add = true;
-                     %wordIdx++;
-                     break;  
-                  }
-               }
+               nextToken( strreplace( %path, %address, "" ), "add", "/" );
             }
             
-            if ( %add == true )
+            if ( %add !$= "" )
             {               
-               %folder = getWord( %splitPath, %wordIdx );
-               
-               %ctrl = %this.findIconCtrl( %folder );
+               %ctrl = %this.findIconCtrl( %add  );
                if ( %ctrl == -1 )
-                  %this.addFolderIcon( %folder );
+                  %this.addFolderIcon( %add  );
             }
          }         
 
@@ -447,28 +429,23 @@ function EWCreatorWindow::navigate( %this, %address )
       while ( %fullPath !$= "" )
       {         
          %fullPath = makeRelativePath( %fullPath, getMainDotCSDir() );                                  
-         %splitPath = strreplace( %fullPath, "/", " " );     
-         if( getWord(%splitPath, 0) $= "tools" )
+         %path = filePath( %fullPath );
+         if ( strpos( %path, "tools", 0 ) == 0 )
          {
             %fullPath = findNextFile( %expr );
             continue;
          }
                       
-         %dirCount = getWordCount( %splitPath ) - 1;
-         
-         %pathFolders = getWords( %splitPath, 0, %dirCount - 1 );         
-         
          // Add this file's path (parent folders) to the
          // popup menu if it isn't there yet.
-         %temp = strreplace( %pathFolders, " ", "/" );         
-         %r = CreatorPopupMenu.findText( %temp );
+         %r = CreatorPopupMenu.findText( %path );
          if ( %r == -1 )
          {
-            CreatorPopupMenu.add( %temp );
+            CreatorPopupMenu.add( %path );
          }
          
          // Is this file in the current folder?        
-         if ( stricmp( %pathFolders, %address ) == 0 )
+         if ( stricmp( %path, %address ) == 0 )
          {
             %this.addPrefabIcon( %fullPath );            
          }
@@ -476,35 +453,22 @@ function EWCreatorWindow::navigate( %this, %address )
          // a folder icon for?
          else
          {
-            %wordIdx = 0;
-            %add = false;
+            %add = "";
             
             if ( %address $= "" )
             {
-               %add = true;
-               %wordIdx = 0;
+               nextToken( %path, "add", "/" );
             }
-            else
+            else if ( strpos( %path, %address, 0 ) == 0 )
             {
-               for ( ; %wordIdx < %dirCount; %wordIdx++ )
-               {
-                  %temp = getWords( %splitPath, 0, %wordIdx );
-                  if ( stricmp( %temp, %address ) == 0 )
-                  {                  
-                     %add = true;
-                     %wordIdx++;
-                     break;  
-                  }
-               }
+               nextToken( strreplace( %path, %address, "" ), "add", "/" );
             }
             
-            if ( %add == true )
+            if ( %add !$= "" )
             {               
-               %folder = getWord( %splitPath, %wordIdx );
-               
-               %ctrl = %this.findIconCtrl( %folder );
+               %ctrl = %this.findIconCtrl( %add );
                if ( %ctrl == -1 )
-                  %this.addFolderIcon( %folder );
+                  %this.addFolderIcon( %add );
             }
          }         
 
@@ -529,13 +493,12 @@ function EWCreatorWindow::navigate( %this, %address )
 
    CreatorPopupMenu.sort();
 
-   %str = strreplace( %address, " ", "/" );
-   %r = CreatorPopupMenu.findText( %str );
+   %r = CreatorPopupMenu.findText( %address  );
    if ( %r != -1 )
       CreatorPopupMenu.setSelected( %r, false );
    else
-      CreatorPopupMenu.setText( %str );
-   CreatorPopupMenu.tooltip = %str;
+      CreatorPopupMenu.setText( %address );
+   CreatorPopupMenu.tooltip = %address;
 }
 
 function EWCreatorWindow::navigateDown( %this, %folder )
@@ -543,7 +506,7 @@ function EWCreatorWindow::navigateDown( %this, %folder )
    if ( %this.address $= "" )
       %address = %folder;
    else   
-      %address = %this.address SPC %folder;
+      %address = %this.address @ "/" @ %folder;
 
    // Because this is called from an IconButton::onClick command
    // we have to wait a tick before actually calling navigate, else
@@ -553,7 +516,8 @@ function EWCreatorWindow::navigateDown( %this, %folder )
 
 function EWCreatorWindow::navigateUp( %this )
 {
-   %count = getWordCount( %this.address );
+   %str=strreplace( %this.address, "/", "\t" );
+   %count = getFieldCount( %str );
    
    if ( %count == 0 )
       return;
@@ -561,7 +525,7 @@ function EWCreatorWindow::navigateUp( %this )
    if ( %count == 1 )
       %address = "";
    else      
-      %address = getWords( %this.address, 0, %count - 2 );
+      %address = strreplace( getFields( %str, 0, %count - 2 ), "\t", "/" );
       
    %this.navigate( %address );
 }
@@ -752,8 +716,7 @@ function EWCreatorWindow::addPrefabIcon( %this, %fullPath )
 
 function CreatorPopupMenu::onSelect( %this, %id, %text )
 {   
-   %split = strreplace( %text, "/", " " );
-   EWCreatorWindow.navigate( %split );  
+   EWCreatorWindow.navigate( %text );
 }
 
 function alphaIconCompare( %a, %b )
