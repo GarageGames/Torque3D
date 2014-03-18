@@ -1,7 +1,8 @@
 project(pcre)
 
-addLibrary("${libDir}/pcre" pcre GLOB)
+addStaticLib("${libDir}/pcre")
 
-set_property(TARGET pcre PROPERTY COMPILE_DEFINITIONS PCRE_STATIC HAVE_CONFIG_H)
+addDef(PCRE_STATIC)
+addDef(HAVE_CONFIG_H)
+
 set_property(TARGET pcre PROPERTY COMPILE_FLAGS       /TP) #/TP = compile as C++
-set_property(TARGET pcre PROPERTY INCLUDE_DIRECTORIES ${libDir}/pcre)

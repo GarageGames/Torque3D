@@ -1,5 +1,5 @@
 project(lungif)
 
-addLibrary("${libDir}/lungif" lungif GLOB)
+addStaticLib("${libDir}/${PROJECT_NAME}")
 
-set_property(TARGET lungif PROPERTY COMPILE_DEFINITIONS _GBA_NO_FILEIO)
+addDef(_GBA_NO_FILEIO)

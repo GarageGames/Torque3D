@@ -1,3 +1,3 @@
 project(tinyxml)
 
-addLibrary("${libDir}/tinyxml" tinyxml GLOB)
+addStaticLib("${libDir}/${PROJECT_NAME}")

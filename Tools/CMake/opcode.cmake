@@ -1,5 +1,9 @@
 project(opcode)
 
-addLibrary("${libDir}/opcode;${libDir}/opcode/Ice" opcode GLOB)
+addPath("${libDir}/${PROJECT_NAME}")
+addPath("${libDir}/${PROJECT_NAME}/Ice")
 
-set_property(TARGET opcode PROPERTY COMPILE_DEFINITIONS TORQUE_OPCODE ICE_NO_DLL)
+addStaticLib()
+
+addDef(TORQUE_OPCODE)
+addDef(ICE_NO_DLL)

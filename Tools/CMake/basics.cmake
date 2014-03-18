@@ -15,62 +15,123 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${projectOutDir}/bin)
 
 SET(CMAKE_INSTALL_PREFIX "${projectOutDir}" CACHE INTERNAL "Prefix prepended to install directories" FORCE)
 
-
-function(addLibPath varname dir mode)
+# finds and adds sources files in a folder
+macro(addPath dir)
     set(tmpa "")
-    file(${mode} tmpa
+    file(GLOB tmpa
              ${dir}/*.cpp
              ${dir}/*.c
              ${dir}/*.cc
              ${dir}/*.h)
-    set("${varname}" "${${varname}};${tmpa}" PARENT_SCOPE)
-endfunction()
+    LIST(APPEND ${PROJECT_NAME}_files "${tmpa}")
+    LIST(APPEND ${PROJECT_NAME}_paths "${dir}")
+    #set(t "${${t}};${tmpa}")
+endmacro()
 
-function(addLibraryFinal paths libName relDir)
-    foreach(f ${paths})
+# adds a file to the sources
+macro(addFile filename)
+    LIST(APPEND ${PROJECT_NAME}_files "${filename}")
+endmacro()
+
+# finds and adds sources files in a folder recursively
+macro(addPathRec dir)
+    set(tmpa "")
+    file(GLOB_RECURSE tmpa
+             ${dir}/*.cpp
+             ${dir}/*.c
+             ${dir}/*.cc
+             ${dir}/*.h)
+    LIST(APPEND ${PROJECT_NAME}_files "${tmpa}")
+    LIST(APPEND ${PROJECT_NAME}_paths "${dir}")
+endmacro()
+
+# adds a definition
+macro(addDef def)
+    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS "${def}")
+endmacro()
+
+# adds an include path
+macro(addInclude incPath)
+    #message(STATUS "${PROJECT_NAME} : add include path : ${incPath}")
+    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY INCLUDE_DIRECTORIES "${incPath}")
+endmacro()
+
+# adds a library to link against
+macro(addLib lib)
+    #message(STATUS "${PROJECT_NAME} : add lib : ${lib}")
+    target_link_libraries(${PROJECT_NAME} "${lib}")
+endmacro()
+
+# adds a path to search for libs
+macro(addLibPath dir)
+    link_directories(${dir})
+endmacro()
+
+# creates a proper filter for VS
+macro(generateFilters relDir)
+    foreach(f ${${PROJECT_NAME}_files})
         # Get the path of the file relative to ${DIRECTORY},
         # then alter it (not compulsory)
         file(RELATIVE_PATH SRCGR ${relDir} ${f})
-        set(SRCGR "${libName}/${SRCGR}")            
+        set(SRCGR "${PROJECT_NAME}/${SRCGR}")            
         # Extract the folder, ie remove the filename part
         string(REGEX REPLACE "(.*)(/[^/]*)$" "\\1" SRCGR ${SRCGR})
+        # do not have any ../ dirs
+        string(REPLACE "../" "" SRCGR ${SRCGR})
         # Source_group expects \\ (double antislash), not / (slash)
         string(REPLACE / \\ SRCGR ${SRCGR})
+        #STRING(REPLACE "//" "/" SRCGR ${SRCGR})
+        #message(STATUS "FILE: ${f} -> ${SRCGR}")
         source_group("${SRCGR}" FILES ${f})
     endforeach()
-    add_library("${libName}" STATIC ${paths})
-endfunction()
+endmacro()
 
-function(addExecutableFinal paths exeName relDir)
-    foreach(f ${paths})
-        # Get the path of the file relative to ${DIRECTORY},
-        # then alter it (not compulsory)
-        file(RELATIVE_PATH SRCGR ${relDir} ${f})
-        set(SRCGR "${exeName}/${SRCGR}")            
-        # Extract the folder, ie remove the filename part
-        string(REGEX REPLACE "(.*)(/[^/]*)$" "\\1" SRCGR ${SRCGR})
-        # Source_group expects \\ (double antislash), not / (slash)
-        string(REPLACE / \\ SRCGR ${SRCGR})
-        source_group("${SRCGR}" FILES ${f})
-    endforeach()
-    add_executable("${exeName}" WIN32 ${paths})
-endfunction()
-
-function(addLibrary dirs libName mode)
-    set(tmp "")
+# macro to add a static library
+macro(addStaticLib)
+    # more paths?
+    if(${ARGC} GREATER 0)
+        foreach(dir ${ARGV0})
+            addPath("${dir}")
+        endforeach()
+    endif()
+    # now inspect the paths we got
     set(firstDir "")
-    #message(STATUS "${libName}")
-    foreach(dir ${dirs})
+    foreach(dir ${${PROJECT_NAME}_paths})
         if("${firstDir}" STREQUAL "")
             set(firstDir "${dir}")
         endif()
-        addLibPath(tmp "${dir}" ${mode})
     endforeach()
-    addLibraryFinal("${tmp}" "${libName}" "${firstDir}")
-    foreach(dir ${dirs})
-        set_property(TARGET "${libName}" PROPERTY INCLUDE_DIRECTORIES "${dir}")
+    generateFilters("${firstDir}")
+    add_library("${PROJECT_NAME}" STATIC ${${PROJECT_NAME}_files})
+    # omg - only use the first folder ... otehrwise we get lots of header name collisions
+    #foreach(dir ${${PROJECT_NAME}_paths})
+    addInclude("${firstDir}")
+    #endforeach()
+endmacro()
+
+# macro to add an executable
+macro(addExecutable)
+    # more paths?
+    if(${ARGC} GREATER 0)
+        foreach(dir ${ARGV0})
+            addPath("${dir}")
+        endforeach()
+    endif()
+    # now inspect the paths we got
+    set(firstDir "")
+    foreach(dir ${${PROJECT_NAME}_paths})
+        if("${firstDir}" STREQUAL "")
+            set(firstDir "${dir}")
+        endif()
     endforeach()
-endfunction()
+    generateFilters("${firstDir}")
+    add_executable("${PROJECT_NAME}" WIN32 ${${PROJECT_NAME}_files})
+    # omg - only use the first folder ... otehrwise we get lots of header name collisions
+    #foreach(dir ${${PROJECT_NAME}_paths})
+    addInclude("${firstDir}")
+    #endforeach()
+endmacro()
+
 
 if(WIN32)
     # default disabled warnings: 4018;4100;4121;4127;4130;4244;4245;4389;4511;4512;4800;

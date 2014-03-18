@@ -1,3 +1,3 @@
 project(squish)
 
-addLibrary("${libDir}/squish" squish GLOB)
+addStaticLib("${libDir}/${PROJECT_NAME}")

@@ -1,6 +1,7 @@
 project(lpng)
 
-addLibrary("${libDir}/lpng" lpng GLOB)
+addStaticLib("${libDir}/${PROJECT_NAME}")
 
-#set_property(TARGET lpng PROPERTY COMPILE_DEFINITIONS PNG_NO_ASSEMBLER_CODE)
-set_property(TARGET lpng PROPERTY INCLUDE_DIRECTORIES ${libDir}/zlib)
+# addDef(PNG_NO_ASSEMBLER_CODE)
+
+addInclude(${libDir}/zlib)

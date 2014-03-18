@@ -1,3 +1,3 @@
 project(zlib)
 
-addLibrary("${libDir}/zlib" zlib GLOB)
+addStaticLib("${libDir}/${PROJECT_NAME}")

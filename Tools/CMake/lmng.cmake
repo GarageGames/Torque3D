@@ -1,6 +1,9 @@
 project(lmng)
 
-addLibrary("${libDir}/lmng" lmng GLOB)
+addStaticLib("${libDir}/${PROJECT_NAME}")
 
-set_property(TARGET lmng PROPERTY COMPILE_DEFINITIONS MNG_OPTIMIZE_OBJCLEANUP)
-set_property(TARGET lmng PROPERTY INCLUDE_DIRECTORIES ${libDir}/lpng ${libDir}/zlib ${libDir}/ljpeg)
+addDef(MNG_OPTIMIZE_OBJCLEANUP)
+
+addInclude(${libDir}/lpng)
+addInclude(${libDir}/zlib)
+addInclude(${libDir}/ljpeg)
