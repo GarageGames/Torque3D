@@ -533,7 +533,8 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    AssertFatal( lightInfoSamp, "Something hosed the deferred features! Can't find lightInfoSample" );
 
    // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow(d_specular, ceil(@ / @)) * @;\r\n", specDecl, specPow, constSpecPow, specStrength ) );
+   meta->addStatement( new GenOp( "   @ = pow( abs(@), max((@ / AL_ConstantSpecularPower),1.0f)) * @;\r\n", 
+      specDecl, d_specular, specPow, specStrength ) );
 
    LangElement *specMul = new GenOp( "@ * @", specCol, specular );
    LangElement *final = specMul;
