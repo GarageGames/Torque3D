@@ -23,11 +23,15 @@
 #include "platform/platformNet.h"
 #include "core/strings/stringFunctions.h"
 
-#if defined (TORQUE_OS_WIN32)
+#if defined (TORQUE_OS_WIN)
 #define TORQUE_USE_WINSOCK
 #include <errno.h>
 #include <winsock.h>
+
+#ifndef EINPROGRESS
 #define EINPROGRESS             WSAEINPROGRESS
+#endif // EINPROGRESS
+
 #define ioctl ioctlsocket
 
 typedef int socklen_t;

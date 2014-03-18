@@ -156,9 +156,7 @@ void SceneManager::renderScene( ScenePassType passType, U32 objectMask )
    {
       // Store the camera state so if we lock, this will become the
       // locked state.
-
-      if( passType == SPT_Diffuse )
-         smLockedDiffuseCamera = cameraState;
+      smLockedDiffuseCamera = cameraState;
    }
    
    // Create the render state.

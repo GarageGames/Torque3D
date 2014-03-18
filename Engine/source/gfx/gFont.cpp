@@ -265,7 +265,7 @@ void GFont::dumpInfo() const
    if(mapCount)
       Con::printf("      - Codepoints range from 0x%x to 0x%x.", mapBegin, mapEnd);
    else
-      Con::printf("      - No mapped codepoints.", mapBegin, mapEnd);
+      Con::printf("      - No mapped codepoints.");
    Con::printf("      - Platform font is %s.", (mPlatformFont ? "present" : "not present") );
 }
 

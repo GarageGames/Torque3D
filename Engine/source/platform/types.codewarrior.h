@@ -51,10 +51,16 @@ typedef unsigned long long U64;     ///< Compiler independent Unsigned 64-bit in
 
 //--------------------------------------
 // Identify the Operating System
+#if defined(_WIN64)
+#  define TORQUE_OS_STRING "Win64"
+#  define TORQUE_OS_WIN
+#  define TORQUE_OS_WIN64
+#  include "platform/types.win.h"
 #if defined(_WIN32)
 #  define TORQUE_OS_STRING "Win32"
+#  define TORQUE_OS_WIN
 #  define TORQUE_OS_WIN32
-#  include "platform/types.win32.h"
+#  include "platform/types.win.h"
 
 #elif defined(macintosh) || defined(__APPLE__)
 #  define TORQUE_OS_STRING "Mac"

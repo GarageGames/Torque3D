@@ -29,7 +29,7 @@
 
 // External scripting cinterface, suitable for import into any scripting system which support "C" interfaces (C#, Python, Lua, Java, etc)
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/winDispatch.h"
 #endif
@@ -383,7 +383,7 @@ extern "C" {
    }
 
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 
    void script_input_event(int type, int value1, int value2)
    {

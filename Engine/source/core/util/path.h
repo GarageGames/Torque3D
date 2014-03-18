@@ -40,7 +40,7 @@ class Path
 public:
    enum Separator
    {
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XENON)
       OsSeparator = '\\'
 #else
       OsSeparator = '/'
