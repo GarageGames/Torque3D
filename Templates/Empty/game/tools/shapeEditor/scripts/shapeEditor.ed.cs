@@ -380,25 +380,21 @@ function ShapeEdSelectWindow::navigate( %this, %address )
 
       // Ignore assets in the tools folder
       %fullPath = makeRelativePath( %fullPath, getMainDotCSDir() );
-      %splitPath = strreplace( %fullPath, "/", " " );
-      if ( getWord( %splitPath, 0 ) $= "tools" )
+      %path = filePath ( %fullPath );
+      if ( strpos( %path, "tools", 0 ) == 0 )
       {
          %fullPath = findNextFileMultiExpr( %filePatterns );
          continue;
       }
 
-      %dirCount = getWordCount( %splitPath ) - 1;
-      %pathFolders = getWords( %splitPath, 0, %dirCount - 1 );
-
       // Add this file's path ( parent folders ) to the
       // popup menu if it isn't there yet.
-      %temp = strreplace( %pathFolders, " ", "/" );
-      %r = ShapeEdSelectMenu.findText( %temp );
+      %r = ShapeEdSelectMenu.findText( %path );
       if ( %r == -1 )
-         ShapeEdSelectMenu.add( %temp );
+         ShapeEdSelectMenu.add( %path );
 
       // Is this file in the current folder?
-      if ( stricmp( %pathFolders, %address ) == 0 )
+      if ( stricmp( %path, %address ) == 0 )
       {
          %this.addShapeIcon( %fullPath );
       }
@@ -406,36 +402,22 @@ function ShapeEdSelectWindow::navigate( %this, %address )
       // a folder icon for?
       else
       {
-         %wordIdx = 0;
-         %add = false;
-
+         %add = "";
          if ( %address $= "" )
          {
-            %add = true;
-            %wordIdx = 0;
+            nextToken( %path, "add", "/");
          }
-         else
+         else if ( strpos( %path, %address, 0 ) == 0)
          {
-            for ( ; %wordIdx < %dirCount; %wordIdx++ )
-            {
-               %temp = getWords( %splitPath, 0, %wordIdx );
-               if ( stricmp( %temp, %address ) == 0 )
-               {
-                  %add = true;
-                  %wordIdx++;
-                  break;
-               }
-            }
+            nextToken( strreplace( %path, %address, "" ), "add", "/" );
          }
 
-         if ( %add == true )
+         if ( %add !$= "" )
          {
-            %folder = getWord( %splitPath, %wordIdx );
-
             // Add folder icon if not already present
-            %ctrl = %this.findIconCtrl( %folder );
+            %ctrl = %this.findIconCtrl( %add );
             if ( %ctrl == -1 )
-               %this.addFolderIcon( %folder );
+               %this.addFolderIcon( %add );
          }
       }
 
@@ -452,12 +434,11 @@ function ShapeEdSelectWindow::navigate( %this, %address )
 
    ShapeEdSelectMenu.sort();
 
-   %str = strreplace( %address, " ", "/" );
-   %r = ShapeEdSelectMenu.findText( %str );
+   %r = ShapeEdSelectMenu.findText( %address );
    if ( %r != -1 )
       ShapeEdSelectMenu.setSelected( %r, false );
    else
-      ShapeEdSelectMenu.setText( %str );
+      ShapeEdSelectMenu.setText( %address );
 }
 
 function ShapeEdSelectWindow::navigateDown( %this, %folder )
@@ -465,7 +446,7 @@ function ShapeEdSelectWindow::navigateDown( %this, %folder )
    if ( %this.address $= "" )
       %address = %folder;
    else
-      %address = %this.address SPC %folder;
+      %address = %this.address @ "/" @ %folder;
 
    // Because this is called from an IconButton::onClick command
    // we have to wait a tick before actually calling navigate, else
@@ -475,15 +456,15 @@ function ShapeEdSelectWindow::navigateDown( %this, %folder )
 
 function ShapeEdSelectWindow::navigateUp( %this )
 {
-   %count = getWordCount( %this.address );
-
+   %str=strreplace( %this.address, "/", "\t" );
+   %count = getFieldCount( %str );
    if ( %count == 0 )
       return;
 
    if ( %count == 1 )
       %address = "";
    else
-      %address = getWords( %this.address, 0, %count - 2 );
+      %address = strreplace( getFields( %str, 0, %count - 2 ), "\t", "/" );
 
    %this.navigate( %address );
 }
@@ -574,8 +555,7 @@ function ShapeEdSelectWindow::addShapeIcon( %this, %fullPath )
 
 function ShapeEdSelectMenu::onSelect( %this, %id, %text )
 {
-   %split = strreplace( %text, "/", " " );
-   ShapeEdSelectWindow.navigate( %split );
+   ShapeEdSelectWindow.navigate( %text );
 }
 
 // Update the GUI in response to the shape selection changing
