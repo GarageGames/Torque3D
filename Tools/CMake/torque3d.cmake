@@ -281,16 +281,16 @@ addExecutable()
 ###############################################################################
 
 # configure file relevant files only once
-if(NOT EXISTS ${projectSrcDir}/torqueConfig.h)
+if(NOT EXISTS "${projectSrcDir}/torqueConfig.h")
     message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
-    CONFIGURE_FILE(${cmakeDir}/torqueConfig.h.in ${projectSrcDir}/torqueConfig.h)
+    CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
 endif()
-if(NOT EXISTS ${projectSrcDir}/torque.ico)
-    CONFIGURE_FILE(${cmakeDir}/torque.ico ${projectSrcDir}/torque.ico COPYONLY)
+if(NOT EXISTS "${projectSrcDir}/torque.ico")
+    CONFIGURE_FILE("${cmakeDir}/torque.ico" "${projectSrcDir}/torque.ico" COPYONLY)
 endif()
 if(WIN32)
-	if(NOT EXISTS ${projectSrcDir}/torque.rc)
-		CONFIGURE_FILE(${cmakeDir}/torque-win.rc.in ${projectSrcDir}/torque.rc)
+	if(NOT EXISTS "${projectSrcDir}/torque.rc")
+		CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
 	endif()
 endif()
 
