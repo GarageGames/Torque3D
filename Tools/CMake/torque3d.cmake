@@ -6,28 +6,60 @@ project(torque3d)
 # modules
 ###############################################################################
 option(TORQUE_SFX_VORBIS "Vorbis Sound" ON)
+mark_as_advanced(TORQUE_SFX_VORBIS)
 option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
+mark_as_advanced(TORQUE_ADVANCED_LIGHTING)
 option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
+mark_as_advanced(TORQUE_BASIC_LIGHTING)
 option(TORQUE_THEORA "Theora Video Support" ON)
+mark_as_advanced(TORQUE_THEORA)
 option(TORQUE_SFX_DirectX "DirectX Sound" ON)
+mark_as_advanced(TORQUE_SFX_DirectX)
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
+mark_as_advanced(TORQUE_SFX_OPENAL)
 option(TORQUE_HIFI "HIFI? support" OFF)
+mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
+mark_as_advanced(TORQUE_EXTENDED_MOVE)
 
 ###############################################################################
 # options
 ###############################################################################
 option(TORQUE_MULTITHREAD "Multi Threading" ON)
+mark_as_advanced(TORQUE_MULTITHREAD)
+
 option(TORQUE_DISABLE_MEMORY_MANAGER "Disable memory manager" OFF)
+mark_as_advanced(TORQUE_DISABLE_MEMORY_MANAGER)
+
 option(TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM "Disable virtual mount system" OFF)
+mark_as_advanced(TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM)
+
 option(TORQUE_PLAYER "Playback only?" OFF)
+mark_as_advanced(TORQUE_PLAYER)
+
 option(TORQUE_TOOLS "Enable or disable the tools" ON)
+mark_as_advanced(TORQUE_TOOLS)
+
 option(TORQUE_ENABLE_PROFILER "Enable or disable the profiler" OFF)
+mark_as_advanced(TORQUE_ENABLE_PROFILER)
+
 option(TORQUE_DEBUG "T3D Debug mode" OFF)
+mark_as_advanced(TORQUE_DEBUG)
+
 option(TORQUE_SHIPPING "T3D Shipping build?" OFF)
+mark_as_advanced(TORQUE_SHIPPING)
+
 option(TORQUE_DEBUG_NET "debug network" OFF)
+mark_as_advanced(TORQUE_DEBUG_NET)
+
 option(TORQUE_DEBUG_NET_MOVES "debug network moves" OFF)
+mark_as_advanced(TORQUE_DEBUG_NET_MOVES)
+
 option(TORQUE_ENABLE_ASSERTS "enables or disable asserts" OFF)
+mark_as_advanced(TORQUE_ENABLE_ASSERTS)
+
+option(TORQUE_DEBUG_GFX_MODE "triggers graphics debug mode" OFF)
+mark_as_advanced(TORQUE_DEBUG_GFX_MODE)
 
 #option(DEBUG_SPEW "more debug" OFF)
 set(TORQUE_APP_NAME "Default" CACHE STRING "the app name")
@@ -311,7 +343,9 @@ addLib(convexDecomp)
 
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
-    addLib("COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib")
+	set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
+	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
+    addLib("${TORQUE_EXTERNAL_LIBS}")
 endif()
 
 ###############################################################################
@@ -323,7 +357,7 @@ addDef(NTORQUE_SHARED)
 addDef(UNICODE)
 addDef(_UNICODE) # for VS
 addDef(TORQUE_UNICODE)
-#addDef(TORQUE_SHARED)
+#addDef(TORQUE_SHARED) # not used anymore as the game is the executable directly
 addDef(LTC_NO_PROTOTYPES) # for libTomCrypt
 addDef(BAN_OPCODE_AUTOLINK)
 addDef(ICE_NO_DLL)

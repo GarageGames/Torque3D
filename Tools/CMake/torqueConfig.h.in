@@ -76,6 +76,7 @@
 /// This is usually defined by the build target.
 #cmakedefine TORQUE_DEBUG
 #cmakedefine DEBUG_SPEW
+#cmakedefine TORQUE_DEBUG_GFX_MODE
 
 /// Define me if this is a shipping build; if defined I will instruct Torque
 /// to batten down some hatches and generally be more "final game" oriented.

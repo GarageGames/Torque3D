@@ -103,7 +103,11 @@ macro(addStaticLib)
         endif()
     endforeach()
     generateFilters("${firstDir}")
-    add_library("${PROJECT_NAME}" STATIC ${${PROJECT_NAME}_files})
+	if(TORQUE_STATIC)
+		add_library("${PROJECT_NAME}" STATIC ${${PROJECT_NAME}_files})
+	else()
+		add_library("${PROJECT_NAME}" SHARED ${${PROJECT_NAME}_files})
+	endif()
     # omg - only use the first folder ... otehrwise we get lots of header name collisions
     #foreach(dir ${${PROJECT_NAME}_paths})
     addInclude("${firstDir}")
@@ -134,26 +138,34 @@ macro(addExecutable)
 endmacro()
 
 
+# always static for now
+set(TORQUE_STATIC ON)
+#option(TORQUE_STATIC "enables or disable static" OFF)
+
 if(WIN32)
     # default disabled warnings: 4018;4100;4121;4127;4130;4244;4245;4389;4511;4512;4800;
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /O2 /Ob2 /Oi /Ot /Oy /GT /Zi /W2 /nologo /GF /EHsc /GS- /Gy- /Qpar- /arch:SSE2 /fp:fast /fp:except- /GR /Zc:wchar_t-")
+	set(TORQUE_CXX_FLAGS "/MP /O2 /Ob2 /Oi /Ot /Oy /GT /Zi /W2 /nologo /GF /EHsc /GS- /Gy- /Qpar- /arch:SSE2 /fp:fast /fp:except- /GR /Zc:wchar_t-" CACHE TYPE STRING)
+	mark_as_advanced(TORQUE_CXX_FLAGS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORQUE_CXX_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
     #set(CMAKE_EXE_LINKER_FLAGS "/OPT:NOREF")
     #set(STATIC_LIBRARY_FLAGS "/OPT:NOREF")
     
     # Force static runtime libraries
-    FOREACH(flag
-        CMAKE_C_FLAGS_RELEASE
-        CMAKE_C_FLAGS_RELWITHDEBINFO
-        CMAKE_C_FLAGS_DEBUG
-        CMAKE_C_FLAGS_DEBUG_INIT
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_RELWITHDEBINFO
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_DEBUG_INIT)
-        STRING(REPLACE "/MD"  "/MT" "${flag}" "${${flag}}")
-        SET("${flag}" "${${flag}} /EHsc")
-    ENDFOREACH()    
+	if(TORQUE_STATIC)
+		FOREACH(flag
+			CMAKE_C_FLAGS_RELEASE
+			CMAKE_C_FLAGS_RELWITHDEBINFO
+			CMAKE_C_FLAGS_DEBUG
+			CMAKE_C_FLAGS_DEBUG_INIT
+			CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_RELWITHDEBINFO
+			CMAKE_CXX_FLAGS_DEBUG
+			CMAKE_CXX_FLAGS_DEBUG_INIT)
+			STRING(REPLACE "/MD"  "/MT" "${flag}" "${${flag}}")
+			SET("${flag}" "${${flag}} /EHsc")
+		ENDFOREACH()
+	endif()
 endif()
 
 
@@ -162,7 +174,7 @@ if(MSVC)
 	FOREACH(CONF ${CMAKE_CONFIGURATION_TYPES})
 		# Go uppercase (DEBUG, RELEASE...)
 		STRING(TOUPPER "${CONF}" CONF)
-		#SET("CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONF}" "${projectOutDir}")
+		SET("CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONF}" "${projectOutDir}")
 		SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONF}" "${projectOutDir}")
 	ENDFOREACH()
 endif()
