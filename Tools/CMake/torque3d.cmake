@@ -312,7 +312,7 @@ addExecutable()
 ###############################################################################
 ###############################################################################
 
-# configure file relevant files only once
+# configure the relevant files only once
 if(NOT EXISTS "${projectSrcDir}/torqueConfig.h")
     message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
     CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
