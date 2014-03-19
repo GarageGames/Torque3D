@@ -2,17 +2,18 @@ project("Torque3DEngine")
 
 set(TORQUE_TEMPLATE "Empty" CACHE STRING "the template to use")
 
-set(projectOutDir "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_TEMPLATE}")
-set(projectSrcDir "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_TEMPLATE}/source")
-set(libDir "${CMAKE_SOURCE_DIR}/Engine/lib")
-set(srcDir "${CMAKE_SOURCE_DIR}/Engine/source")
-set(cmakeDir "${CMAKE_SOURCE_DIR}/Tools/CMake")
+set(projectOutDir "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_APP_NAME}")
+set(projectSrcDir "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_APP_NAME}/source")
+set(libDir        "${CMAKE_SOURCE_DIR}/Engine/lib")
+set(srcDir        "${CMAKE_SOURCE_DIR}/Engine/source")
+set(cmakeDir      "${CMAKE_SOURCE_DIR}/Tools/CMake")
 
 # output folders
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${projectOutDir}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${projectOutDir}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${projectOutDir}/bin)
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${projectOutDir}/bin)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${projectOutDir}/bin)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${projectOutDir}/bin)
 
+# change the default installation path to My Projects/app name
 SET(CMAKE_INSTALL_PREFIX "${projectOutDir}" CACHE INTERNAL "Prefix prepended to install directories" FORCE)
 
 # finds and adds sources files in a folder
@@ -156,4 +157,12 @@ if(WIN32)
 endif()
 
 
-
+# fix the debug/release subfolders on windows
+if(MSVC)
+	FOREACH(CONF ${CMAKE_CONFIGURATION_TYPES})
+		# Go uppercase (DEBUG, RELEASE...)
+		STRING(TOUPPER "${CONF}" CONF)
+		#SET("CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONF}" "${projectOutDir}")
+		SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONF}" "${projectOutDir}")
+	ENDFOREACH()
+endif()

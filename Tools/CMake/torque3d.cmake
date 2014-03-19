@@ -139,6 +139,7 @@ addPath("${srcDir}/T3D/turret")
 addPath("${srcDir}/main/")
 addPathRec("${srcDir}/ts/collada")
 addPathRec("${srcDir}/ts/loader")
+addFile("${projectSrcDir}")
 
 ###############################################################################
 # modular paths
@@ -213,7 +214,7 @@ if(WIN32)
     addPath("${srcDir}/terrain/hlsl")
     addPath("${srcDir}/forest/hlsl")
     # add windows rc file for the icon
-    addFile("${projectSrcDir}/torque-win.rc")
+    addFile("${projectSrcDir}/torque.rc")
 endif()
 
 if(APPLE)
@@ -279,18 +280,34 @@ addExecutable()
 ###############################################################################
 ###############################################################################
 
-# configure only once
+# configure file relevant files only once
 if(NOT EXISTS ${projectSrcDir}/torqueConfig.h)
     message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
     CONFIGURE_FILE(${cmakeDir}/torqueConfig.h.in ${projectSrcDir}/torqueConfig.h)
-    CONFIGURE_FILE(${cmakeDir}/torque-win.rc.in ${projectSrcDir}/torque-win.rc)
+endif()
+if(NOT EXISTS ${projectSrcDir}/torque.ico)
     CONFIGURE_FILE(${cmakeDir}/torque.ico ${projectSrcDir}/torque.ico COPYONLY)
+endif()
+if(WIN32)
+	if(NOT EXISTS ${projectSrcDir}/torque.rc)
+		CONFIGURE_FILE(${cmakeDir}/torque-win.rc.in ${projectSrcDir}/torque.rc)
+	endif()
 endif()
 
 ###############################################################################
 # Common Libraries
 ###############################################################################
-addLib("lmng;lpng;lungif;ljpeg;zlib;tinyxml;opcode;squish;collada;pcre;convexDecomp")
+addLib(lmng)
+addLib(lpng)
+addLib(lungif)
+addLib(ljpeg)
+addLib(zlib)
+addLib(tinyxml)
+addLib(opcode)
+addLib(squish)
+addLib(collada)
+addLib(pcre)
+addLib(convexDecomp)
 
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
@@ -384,5 +401,5 @@ endif()
 ###############################################################################
 # Installation
 ###############################################################################
-INSTALL_TARGETS(/ torque3d)
+#INSTALL_TARGETS(/ torque3d) # not needed anymore as we should directly build in there
 INSTALL_FILES(/ FILES ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/)
