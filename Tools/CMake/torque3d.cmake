@@ -1,4 +1,4 @@
-project(torque3d)
+project(${TORQUE_APP_NAME})
 
 # TODO: fmod support
 
@@ -317,12 +317,18 @@ endif()
 if(NOT EXISTS "${projectSrcDir}/torque.ico")
     CONFIGURE_FILE("${cmakeDir}/torque.ico" "${projectSrcDir}/torque.ico" COPYONLY)
 endif()
+if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}.torsion")
+    CONFIGURE_FILE("${cmakeDir}/template.torsion.in" "${projectOutDir}/${PROJECT_NAME}.torsion")
+endif()
+if(EXISTS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" AND NOT EXISTS "${projectOutDir}/main.cs")
+    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" "${projectOutDir}/main.cs")
+endif()
 if(WIN32)
 	if(NOT EXISTS "${projectSrcDir}/torque.rc")
 		CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
 	endif()
-	if(NOT EXISTS "${projectDir}/cleanup.bat")
-		CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectDir}/cleanup.bat")
+	if(NOT EXISTS "${projectOutDir}/cleanup.bat")
+		CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
 	endif()
 endif()
 
@@ -435,12 +441,12 @@ endif()
 ###############################################################################
 # Installation
 ###############################################################################
-INSTALL_FILES(/ FILES ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game)
+INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game"                 DESTINATION "${projectDir}")
 if(WIN32)
-	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat")
-	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat")
-	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat")
-	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat")
+	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat"     DESTINATION "${projectDir}")
+	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat" DESTINATION "${projectDir}")
+	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat"       DESTINATION "${projectDir}")
+	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat"      DESTINATION "${projectDir}")
 endif()
 
 INCLUDE(CPack)

@@ -1,6 +1,6 @@
 project("Torque3DEngine")
 
-set(TORQUE_TEMPLATE "Empty" CACHE STRING "the template to use")
+set(TORQUE_TEMPLATE "Full" CACHE STRING "the template to use")
 
 set(projectDir    "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_APP_NAME}")
 set(projectOutDir "${projectDir}/game")
@@ -13,9 +13,6 @@ set(cmakeDir      "${CMAKE_SOURCE_DIR}/Tools/CMake")
 #set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${projectOutDir}/game)
 #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${projectOutDir}/game)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${projectOutDir}/game)
-
-# change the default installation path to My Projects/app name
-SET(CMAKE_INSTALL_PREFIX "${projectDir}" CACHE INTERNAL "Prefix prepended to install directories" FORCE)
 
 # finds and adds sources files in a folder
 macro(addPath dir)
@@ -117,12 +114,6 @@ endmacro()
 
 # macro to add an executable
 macro(addExecutable)
-    # more paths?
-    if(${ARGC} GREATER 0)
-        foreach(dir ${ARGV0})
-            addPath("${dir}")
-        endforeach()
-    endif()
     # now inspect the paths we got
     set(firstDir "")
     foreach(dir ${${PROJECT_NAME}_paths})
@@ -133,9 +124,7 @@ macro(addExecutable)
     generateFilters("${firstDir}")
     add_executable("${PROJECT_NAME}" WIN32 ${${PROJECT_NAME}_files})
     # omg - only use the first folder ... otehrwise we get lots of header name collisions
-    #foreach(dir ${${PROJECT_NAME}_paths})
     addInclude("${firstDir}")
-    #endforeach()
 endmacro()
 
 
