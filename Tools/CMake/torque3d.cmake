@@ -62,9 +62,6 @@ option(TORQUE_DEBUG_GFX_MODE "triggers graphics debug mode" OFF)
 mark_as_advanced(TORQUE_DEBUG_GFX_MODE)
 
 #option(DEBUG_SPEW "more debug" OFF)
-set(TORQUE_APP_NAME "Default" CACHE STRING "the app name")
-set(TORQUE_APP_VERSION "1000" CACHE STRING "the app version: major * 1000 + minor * 100 + revision * 10.")
-set(TORQUE_APP_VERSION_STRING "1.0" CACHE STRING "the app version string")
 set(TORQUE_NO_DSO_GENERATION ON)
 
 # warning C4800: 'XXX' : forcing value to bool 'true' or 'false' (performance warning)
@@ -324,6 +321,9 @@ if(WIN32)
 	if(NOT EXISTS "${projectSrcDir}/torque.rc")
 		CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
 	endif()
+	if(NOT EXISTS "${projectDir}/cleanup.bat")
+		CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectDir}/cleanup.bat")
+	endif()
 endif()
 
 ###############################################################################
@@ -435,5 +435,12 @@ endif()
 ###############################################################################
 # Installation
 ###############################################################################
-#INSTALL_TARGETS(/ torque3d) # not needed anymore as we should directly build in there
-INSTALL_FILES(/ FILES ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/)
+INSTALL_FILES(/ FILES ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game)
+if(WIN32)
+	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat")
+	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat")
+	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat")
+	INSTALL_FILES(/ FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat")
+endif()
+
+INCLUDE(CPack)
