@@ -1,5 +1,7 @@
 include(basics.cmake)
 
+setupVersionNumbers()
+
 #the libs
 include(lmng.cmake)
 include(lpng.cmake)
@@ -22,3 +24,5 @@ endif()
 
 # the main engine, should come last
 include(torque3d.cmake)
+
+#setupPackaging()

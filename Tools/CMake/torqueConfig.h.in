@@ -74,7 +74,10 @@
 /// Define me to enable debug mode; enables a great number of additional
 /// sanity checks, as well as making AssertFatal and AssertWarn do something.
 /// This is usually defined by the build target.
-#cmakedefine TORQUE_DEBUG
+
+// TORQUE_DEBUG is now set dynamically and not here anymore
+// #cmakedefine TORQUE_DEBUG
+
 #cmakedefine DEBUG_SPEW
 #cmakedefine TORQUE_DEBUG_GFX_MODE
 
@@ -156,7 +159,9 @@
    #endif
 
    // Enables the C++ assert macros AssertFatal, AssertWarn, etc.
+   #ifndef TORQUE_ENABLE_ASSERTS
    #define TORQUE_ENABLE_ASSERTS
+   #endif
 
 #endif
 

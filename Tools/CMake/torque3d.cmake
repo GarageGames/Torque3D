@@ -168,7 +168,7 @@ addPath("${srcDir}/T3D/turret")
 addPath("${srcDir}/main/")
 addPathRec("${srcDir}/ts/collada")
 addPathRec("${srcDir}/ts/loader")
-addFile("${projectSrcDir}")
+addPathRec("${projectSrcDir}")
 
 ###############################################################################
 # modular paths
@@ -327,6 +327,9 @@ if(WIN32)
 	if(NOT EXISTS "${projectSrcDir}/torque.rc")
 		CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
 	endif()
+	if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+		CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+	endif()
 	if(NOT EXISTS "${projectOutDir}/cleanup.bat")
 		CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
 	endif()
@@ -357,6 +360,10 @@ endif()
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
+addDebugDef(TORQUE_DEBUG)
+addDebugDef(TORQUE_ENABLE_ASSERTS)
+addDebugDef(TORQUE_DEBUG_GFX_MODE)
+
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
 addDef(NTORQUE_SHARED)
@@ -448,5 +455,3 @@ if(WIN32)
 	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat"       DESTINATION "${projectDir}")
 	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat"      DESTINATION "${projectDir}")
 endif()
-
-INCLUDE(CPack)
