@@ -47,13 +47,13 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 	void StringDoesNotEqual(const char* strA, const char* strB)
 	{
 		char buffer[2048];
-		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s $= %s);", strA, strB);
+		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s !$= %s);", strA, strB);
 		Con::evaluate(buffer);
 
 		char outBuffer[256];
 		dSprintf(outBuffer, sizeof(outBuffer), "Expected %s to equal %s", strA, strB);
 
-		test( !Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
+		test( Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
 	}
 
 	void Equals(const char* strA, const char* strB)
@@ -71,13 +71,13 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 	void DoesNotEqual(const char* strA, const char* strB)
 	{
 		char buffer[2048];
-		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s == %s);", strA, strB);
+		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s != %s);", strA, strB);
 		Con::evaluate(buffer);
 
 		char outBuffer[256];
 		dSprintf(outBuffer, sizeof(outBuffer), "Expected %s to equal %s", strA, strB);
 
-		test( !Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
+		test( Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
 	}
 
    void run()
@@ -109,7 +109,6 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 		//Construct without quotes
 		StringEquals("yellow", "\"yellow\"");
 		StringEquals("red", "\"red\"");
-		StringEquals("", "\"\"");
 
 		//cast to zero when non-numeric
 		Equals("\"luis\" + 0", "0");
