@@ -38,7 +38,7 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s $= %s);", strA, strB);
 		Con::evaluate(buffer);
 
-		char outBuffer[256];
+		char outBuffer[1024];
 		dSprintf(outBuffer, sizeof(outBuffer), "Expected %s to equal %s", strA, strB);
 
 		test( Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
@@ -50,7 +50,7 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s !$= %s);", strA, strB);
 		Con::evaluate(buffer);
 
-		char outBuffer[256];
+		char outBuffer[1024];
 		dSprintf(outBuffer, sizeof(outBuffer), "Expected %s to equal %s", strA, strB);
 
 		test( Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
@@ -62,7 +62,7 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s == %s);", strA, strB);
 		Con::evaluate(buffer);
 
-		char outBuffer[256];
+		char outBuffer[1024];
 		dSprintf(outBuffer, sizeof(outBuffer), "Expected %s to equal %s", strA, strB);
 
 		test( Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
@@ -74,7 +74,7 @@ CreateUnitTest(TestTorqueScriptStandard, "TorqueScript/StandardOperations")
 		dSprintf(buffer, sizeof(buffer), "TSTestObject.testValue = (%s != %s);", strA, strB);
 		Con::evaluate(buffer);
 
-		char outBuffer[256];
+		char outBuffer[1024];
 		dSprintf(outBuffer, sizeof(outBuffer), "Expected %s to equal %s", strA, strB);
 
 		test( Con::getBoolVariable("TSTestObject.testValue"), outBuffer );
