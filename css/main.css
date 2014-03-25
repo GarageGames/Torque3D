@@ -2,6 +2,10 @@
  * Bootstrap overrides
  */
 
+.container {
+  max-width: 760px;
+}
+
 .site .navbar-default {
   background-color: white;
 }
@@ -26,13 +30,17 @@
   bottom: -40px;
 }
 
+.carousel-inner a {
+  color: white;
+}
+
 .site .carousel-indicators li {
   border-radius: 3px;
 }
 
 .site .carousel-inner .item {
   width: 80%;
-  margin: 0 auto;
+  margin-left: 10%;
 }
 
 .site h1 { font-size: 24px; }

@@ -178,7 +178,7 @@ root: ..
     </div>
 
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/rendering-feature.jpg" />
+        <img class="pull-left feature" src="{{page.root}}/img/editors-feature.jpg" />
         <div class="media-body">
             <h4 class="media-heading">Editors</h4>
             <p>
@@ -240,7 +240,7 @@ root: ..
     </div>
 
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/rendering-feature.jpg" />
+        <img class="pull-left feature" src="{{page.root}}/img/scripting-feature.jpg" />
         <div class="media-body">
             <h4 class="media-heading">Scripts and source code</h4>
             <p>
@@ -252,8 +252,15 @@ root: ..
             <p>
             If you're not the recompiling type, Torque provides a scripting engine
             using a custom C-like language called TorqueScript. You can create
-            whole games without touching a line of C++.
+            whole games without touching a line of C++. Check this out:
             </p>
+            <pre><code>$minion = new AIPlayer();
+$minion.name = "Fubar";
+$minion.setMoveDestination("50 0 0");
+
+function Fubar::onReachDestination(%self) {
+   echo("I made it! Says" SPC %self.name);
+}</code></pre>
         </div>
     </div>
 </div>
@@ -263,12 +270,13 @@ root: ..
 </div></div>
 
 <div class="container">
-    <p>
-    Please note that the roadmap is currently being debated by the Steering Committee.
-    This version represents our rough ideas and intentions and may change when we
-    settle on an actual plan! When that happens we will document future engine
-    versions here with their planned outcomes.
+    <p class="alert alert-warning">
+        Please note that the roadmap is currently being debated by the Steering Committee.
+        This version represents our rough ideas and intentions and may change when we
+        settle on an actual plan! When that happens we will document future engine
+        versions here with their planned outcomes.
     </p>
+
     <h2>Short-term</h2>
     <p>
     The theme of our immediate efforts will be cleaning up the state of the repository,
@@ -280,12 +288,14 @@ root: ..
         <li>Set up automated testing to increase confidence in pull requests.</li>
         <li>Merge (possibly into unstable branches) or reject all outstanding pull-requests.</li>
     </ul>
+
     <h2>Middle-term</h2>
     <ul>
         <li>Linux and OSX support via OpenGL rendering layer.</li>
         <li>Clean up engine source code (e.g. use of non-STL container replacements, signed/unsigned mismatches).</li>
         <li>New modular script templates and content distribution.</li>
     </ul>
+
     <h2>Long-term</h2>
     <ul>
         <li>Modularise scripting engine, paving the way for other scripting languages.</li>
@@ -315,7 +325,7 @@ root: ..
     <p>
     GarageGames sold TGE for around $100USD throughout the product's lifetime,
     increasing this to $150 with the release of TGE 1.5. Its selling point against
-    other engines was its strong networking (that had powered 128-player games
+    other engines was its strong networking (which had powered 128-player games
     of Tribes 2), its terrain rendering, and the fact that a license bought you
     the entire engine source code. During this time, GarageGames spun off numerous
     other products - TorqueX focused on delivering the same strengths to the XNA

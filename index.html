@@ -5,12 +5,13 @@ root: .
 ---
 
 <div class="jumbotron banner">
-    <div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+    <div id="home-carousel" class="carousel slide" data-ride="carousel">
         <!-- Indicators -->
         <ol class="carousel-indicators">
             <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
             <li data-target="#home-carousel" data-slide-to="1"></li>
             <li data-target="#home-carousel" data-slide-to="2"></li>
+            <li data-target="#home-carousel" data-slide-to="3"></li>
         </ol>
 
         <!-- Wrapper for slides -->
@@ -23,7 +24,7 @@ root: .
                             <img src="{{page.root}}/img/torque.png"></img>
                         </div>
                         <div class="col-sm-8">
-                            <h1 class="title">{{site.name}}</h1>
+                            <h1 class="title">Torque 3D</h1>
                             <p>The open-source game engine of the future.</p>
                         </div>
                     </div>
@@ -37,8 +38,11 @@ root: .
                             <img src="{{page.root}}/img/torque.png"></img>
                         </div>
                         <div class="col-sm-8">
-                            <h1 class="title">{{site.name}}</h1>
-                            <p>The open-source game engine of the future.</p>
+                            <h1 class="title">Gratis et libre</h1>
+                            <p>Torque 3D is free as in speech <i>and</i> free as
+                            in beer. Under the permissive MIT license, you can
+                            do what you want with the source code!</p>
+                            <a href="{{page.root}}/start" class="pull-right">Download it now <i class="fa fa-angle-double-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -51,8 +55,26 @@ root: .
                             <img src="{{page.root}}/img/torque.png"></img>
                         </div>
                         <div class="col-sm-8">
-                            <h1 class="title">{{site.name}}</h1>
-                            <p>The open-source game engine of the future.</p>
+                            <h1 class="title">Feature rich</h1>
+                            <p>Packed with features and easy-to-use editors, T3D
+                            has you covered even if you have no programming experience.</p>
+                            <a href="{{page.root}}/engine" class="pull-right">Read the feature list <i class="fa fa-angle-double-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <img src="{{page.root}}/img/torque.png"></img>
+                        </div>
+                        <div class="col-sm-8">
+                            <h1 class="title">Always evolving</h1>
+                            <p>Torque 3D is being actively developed by an
+                            enthusiastic community. Can you help out?</p>
+                            <a href="{{page.root}}/contribute" class="pull-right">Get involved <i class="fa fa-angle-double-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -72,25 +94,12 @@ root: .
 <div class="container">
     <div class="row">
         <div class="col-sm-4">
-            <h2>Gratis et libre</h2>
-            <p>Torque 3D is free as in speech <i>and</i> free as in beer. Under
-            the permissive MIT license, you can do what you want with the source
-            code!</p>
-            <a href="{{page.root}}/start" class="pull-right">Download it now <i class="fa fa-angle-double-right"></i></a>
         </div>
 
         <div class="col-sm-4">
-            <h2>Feature rich</h2>
-            <p>Packed with features and easy-to-use editors, T3D has you covered
-            even if you have no programming experience.</p>
-            <a href="{{page.root}}/engine" class="pull-right">Read the feature list <i class="fa fa-angle-double-right"></i></a>
         </div>
 
         <div class="col-sm-4">
-            <h2>Always evolving</h2>
-            <p>Torque 3D is being actively developed by an enthusiastic community.
-            Can you help out?</p>
-            <a href="{{page.root}}/contribute" class="pull-right">Get involved <i class="fa fa-angle-double-right"></i></a>
         </div>
     </div>
 
