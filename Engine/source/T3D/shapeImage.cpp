@@ -462,7 +462,10 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
             Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(shape[i].getPath());
 
             if (!fileRef)
+            {
+               errorStr = String::ToString("ShapeBaseImageData: Couldn't load shape \"%s\"",name);
                return false;
+            }
 
             if(server)
             {

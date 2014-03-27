@@ -306,7 +306,10 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
          Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(mShape.getPath());
 
          if (!fileRef)
+         {
+            errorStr = String::ToString("ShapeBaseData: Couldn't load shape \"%s\"",shapeName);
             return false;
+         }
 
          if(server)
             mCRC = fileRef->getChecksum();
