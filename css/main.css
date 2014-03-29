@@ -144,6 +144,12 @@ img.history {
   margin: 1em;
 }
 
+table.history tr td:nth-child(1) {
+  font-weight: bold;
+  width: 4em;
+  display: inline-block;
+}
+
 /*-----------------------------------------------------------------------------
  * Posts
  */
