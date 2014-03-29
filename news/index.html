@@ -1,0 +1,19 @@
+---
+layout: page
+title: News | Torque 3D
+root: ..
+---
+
+<div class="banner"><div class="container">
+    <h2>News Archive</h2>
+</div></div>
+
+<div class="container">
+    <p></p>
+    <ul class="list-unstyled">
+    {% for post in site.posts %}
+        <li><span class="date">{{post.date | date_to_string}}</span>
+        <a class="post-title" href="{{page.root}}{{post.url}}">{{post.title}}</a></li>
+    {% endfor %}
+    </ul>
+</div>

@@ -5,7 +5,7 @@ root: .
 ---
 
 <div class="jumbotron banner">
-    <div id="home-carousel" class="carousel slide" data-ride="carousel">
+    <div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
         <!-- Indicators -->
         <ol class="carousel-indicators">
             <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
@@ -25,7 +25,7 @@ root: .
                         </div>
                         <div class="col-sm-8">
                             <h1 class="title">Torque 3D</h1>
-                            <p>The open-source game engine of the future.</p>
+                            <p>The premier open-source game engine.</p>
                         </div>
                     </div>
                 </div>
@@ -93,20 +93,29 @@ root: .
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-4">
-        </div>
+        <h2>Recent news</h2>
 
-        <div class="col-sm-4">
-        </div>
+        {% for post in site.posts limit:3 %}
+            <span class="date">{{post.date | date_to_string}}</span>
+            <a href="{{page.root}}{{post.url}}"><span class="post-title">{{post.title}}</span></a>
+            <p>{{ post.content | strip_html | truncatewords: 40 }}</p>
+        {% endfor %}
 
-        <div class="col-sm-4">
-        </div>
+        <a class="pull-right" href="{{page.root}}/news">See all</a>
     </div>
 
     <div class="row">
-        <h2>Recent news</h2>
-        <p>
-I am by birth a Genevese, and my family is one of the most distinguished of that republic. My ancestors had been for many years counsellors and syndics,[1] and my father had filled several public situations with honour and reputation. He was respected by all who knew him for his integrity and indefatigable attention to public business.
-        </p>
+        <h2>From GarageGames</h2>
+        <div class="col-sm-4">
+            <h3>Blogs</h3>
+        </div>
+
+        <div class="col-sm-4">
+            <h3>Forums</h3>
+        </div>
+
+        <div class="col-sm-4">
+            <h3>Resources</h3>
+        </div>
     </div>
 </div>

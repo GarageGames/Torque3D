@@ -5,7 +5,7 @@ root: ..
 ---
 
 <div class="banner"><div class="container">
-    <h1 id="made-with-torque">Made with Torque</h1>
+    <h2 id="made-with-torque">Made with Torque</h2>
 </div></div>
 
 <div class="container">
@@ -146,12 +146,14 @@ root: ..
 </div>
 
 <div class="banner"><div class="container">
-    <h1 id="features">Features</h1>
+    <h2 id="features">Features</h2>
 </div></div>
 
 <div class="container">
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/rendering-feature.jpg" />
+        <img class="pull-left feature"
+        src="{{page.root}}/img/rendering-feature.jpg"
+        title="By Felix Westin"/>
         <div class="media-body">
             <h4 class="media-heading">Rendering</h4>
             <p>
@@ -178,7 +180,9 @@ root: ..
     </div>
 
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/editors-feature.jpg" />
+        <img class="pull-left feature"
+            src="{{page.root}}/img/editors-feature.jpg"
+            title="Metal Drift by Black Jacket Studios" />
         <div class="media-body">
             <h4 class="media-heading">Editors</h4>
             <p>
@@ -209,26 +213,35 @@ root: ..
     </div>
 
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/rendering-feature.jpg" />
+        <img class="pull-left feature"
+            src="{{page.root}}/img/networking-feature.jpg"
+            title="Frozen Endzone by Mode 7" />
         <div class="media-body">
             <h4 class="media-heading">Networking</h4>
             <p>
             Since its inception as the engine behind the online shooter Tribes 2,
             Torque has consistently provided high performance, reliable networking
             for fast-paced online games. The engine has networking built into 
-            its core, including interpolation and prediction to smooth over
-            high-latency environments and provide instant feedback to clients.
+            its core, allowing you to quickly get up and running with networked
+            games.
             </p>
             <p>
             Time-invarying data is transferred via datablocks at client join time,
             reducing the amount of data that needs to be networked during
             gameplay.
             </p>
+            <p>
+            Torque uses a <em>server authoritative</em> networking model that
+            helps you to reduce cheating and exploitation. At the same time,
+            the game state is predicted and interpolated locally so each client
+            experiences a smooth view of the action.
         </div>
     </div>
 
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/physics-feature.jpg" />
+        <img class="pull-left feature"
+            src="{{page.root}}/img/physics-feature.jpg"
+            title="Pacific Demo by GarageGames" />
         <div class="media-body">
             <h4 class="media-heading">Physics</h4>
             <p>
@@ -240,7 +253,9 @@ root: ..
     </div>
 
     <div class="media">
-        <img class="pull-left feature" src="{{page.root}}/img/scripting-feature.jpg" />
+        <img class="pull-left feature"
+            src="{{page.root}}/img/scripting-feature.jpg"
+            title="Life is Feudal" />
         <div class="media-body">
             <h4 class="media-heading">Scripts and source code</h4>
             <p>
@@ -266,7 +281,7 @@ function Fubar::onReachDestination(%self) {
 </div>
 
 <div class="banner"><div class="container">
-    <h1 id="roadmap">Roadmap</h1>
+    <h2 id="roadmap">Roadmap</h2>
 </div></div>
 
 <div class="container">
@@ -277,7 +292,7 @@ function Fubar::onReachDestination(%self) {
         versions here with their planned outcomes.
     </p>
 
-    <h2>Short-term</h2>
+    <h3>Short-term</h3>
     <p>
     The theme of our immediate efforts will be cleaning up the state of the repository,
     forging new links with the community, and putting in place procedures that will
@@ -285,31 +300,39 @@ function Fubar::onReachDestination(%self) {
     </p>
     <ul>
         <li>Complete and launch this website!</li>
-        <li>Set up automated testing to increase confidence in pull requests.</li>
-        <li>Merge (possibly into unstable branches) or reject all outstanding pull-requests.</li>
+        <li>Set up automated testing to increase ease of maintenance.</li>
+        <li>Merge (possibly into unstable branches) or reject all outstanding pull-requests.
+        In particular:
+        <ul>
+            <li>A usable CMake alternative to the current Project Generator</li>
+            <li>64-bit-ready changes</li>
+            <li>VS2013 compatibility</li>
+        </ul></li>
     </ul>
 
-    <h2>Middle-term</h2>
+    <h3>Middle-term</h3>
     <ul>
         <li>Linux and OSX support via OpenGL rendering layer.</li>
-        <li>Clean up engine source code (e.g. use of non-STL container replacements, signed/unsigned mismatches).</li>
+        <li>DirectX 11 and PhysX 3.3 support.
         <li>New modular script templates and content distribution.</li>
+        <li>More difficult existing pull-requests, particularly improvements to the TorqueScript language.</li>
     </ul>
 
-    <h2>Long-term</h2>
+    <h3>Long-term</h3>
     <ul>
+        <li>Clean up engine source code (e.g. use of non-STL container replacements, signed/unsigned mismatches).</li>
         <li>Modularise scripting engine, paving the way for other scripting languages.</li>
-        <li>Replace project generator with CMake or other appropriate solution.</li>
         <li>Entity/component system replacing hardcoded gameplay classes.</li>
-        <li>64-bit support.</li>
+        <li>Overhaul editor suite</li>
     </ul>
 </div>
 
 <div class="banner"><div class="container">
-    <h1 id="history">History</h1>
+    <h2 id="history">History</h2>
 </div></div>
 
 <div class="container">
+
     <img class="pull-left history" src="{{page.root}}/img/frozen-endzone-icon.jpg" />
     <p>
     Torque began as the game engine behind Starsiege: Tribes, one of the venerable

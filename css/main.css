@@ -1,3 +1,7 @@
+body {
+  overflow-y: scroll;
+}
+
 /*-----------------------------------------------------------------------------
  * Bootstrap overrides
  */
@@ -43,12 +47,18 @@
   margin-left: 10%;
 }
 
-.site h1 { font-size: 24px; }
-.site h2 { font-size: 20px; }
-
 /*-----------------------------------------------------------------------------
  * Site
  */
+
+span.post-title {
+  font-weight: bold;
+}
+
+span.date {
+  color: gray;
+  margin-right: 1em;
+}
 
 h4 a,
 h4 a:hover {
@@ -108,7 +118,7 @@ h4 a:hover {
  * Static pages
  */
 
-.page h2 {
+.page h3 {
   color: #555;
 }
 
@@ -116,10 +126,11 @@ h4 a:hover {
   margin-top: 1em;
 }
 
-.page .banner h1 {
+.banner h2 {
   /* Fixes scrolling to anchors with the fixed navbar. */
   margin-top: -60px;
   padding-top: 70px;
+  display: inline-block;
 }
 
 img.history,
@@ -131,4 +142,12 @@ img.made-with-torque {
 
 img.history {
   margin: 1em;
+}
+
+/*-----------------------------------------------------------------------------
+ * Posts
+ */
+
+.meta {
+  margin-top: 10px;
 }
