@@ -5,107 +5,71 @@ root: .
 ---
 
 <div class="jumbotron banner">
-    <div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
-        <!-- Indicators -->
-        <ol class="carousel-indicators">
-            <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
-            <li data-target="#home-carousel" data-slide-to="1"></li>
-            <li data-target="#home-carousel" data-slide-to="2"></li>
-            <li data-target="#home-carousel" data-slide-to="3"></li>
-        </ol>
-
-        <!-- Wrapper for slides -->
-        <div class="carousel-inner">
-            <!-- Slides -->
-            <div class="item active">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{page.root}}/img/torque.png"></img>
-                        </div>
-                        <div class="col-sm-8">
-                            <h1 class="title">Torque 3D</h1>
-                            <p>The premier open-source game engine.</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <img src="{{page.root}}/img/torque.png"></img>
             </div>
-
-            <div class="item">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{page.root}}/img/torque.png"></img>
-                        </div>
-                        <div class="col-sm-8">
-                            <h1 class="title">Gratis et libre</h1>
-                            <p>Torque 3D is free as in speech <i>and</i> free as
-                            in beer. Under the permissive MIT license, you can
-                            do what you want with the source code!</p>
-                            <a href="{{page.root}}/start" class="pull-right">Download it now <i class="fa fa-angle-double-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{page.root}}/img/torque.png"></img>
-                        </div>
-                        <div class="col-sm-8">
-                            <h1 class="title">Feature rich</h1>
-                            <p>Packed with features and easy-to-use editors, T3D
-                            has you covered even if you have no programming experience.</p>
-                            <a href="{{page.root}}/engine" class="pull-right">Read the feature list <i class="fa fa-angle-double-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{page.root}}/img/torque.png"></img>
-                        </div>
-                        <div class="col-sm-8">
-                            <h1 class="title">Always evolving</h1>
-                            <p>Torque 3D is being actively developed by an
-                            enthusiastic community. Can you help out?</p>
-                            <a href="{{page.root}}/contribute" class="pull-right">Get involved <i class="fa fa-angle-double-right"></i></a>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-sm-8">
+                <h1 class="title">Torque 3D</h1>
+                <p>The premier open-source game engine.</p>
             </div>
         </div>
-
-        <!-- Controls -->
-        <a class="left carousel-control" href="#home-carousel" data-slide="prev">
-            <i class="fa fa-arrow-left"></i>
-        </a>
-        <a class="right carousel-control" href="#home-carousel" data-slide="next">
-            <i class="fa fa-arrow-right"></i>
-        </a>
     </div>
 </div>
 
 <div class="container">
     <div class="row">
-        <h2>Recent news</h2>
+        <div class="col-sm-4">
+            <h3>Gratis et libre</h3>
+            <p>
+            When you get Torque, you get everything. Under the permissive MIT
+            open-source license, you can do what you want with the source code.
+            </p>
+            <a href="{{page.root}}/start">Download it now</a>
+        </div>
 
-        {% for post in site.posts limit:3 %}
-            <span class="date">{{post.date | date_to_string}}</span>
-            <a href="{{page.root}}{{post.url}}"><span class="post-title">{{post.title}}</span></a>
-            <p>{{ post.content | strip_html | truncatewords: 40 }}</p>
-        {% endfor %}
+        <div class="col-sm-4">
+            <h3>Proven</h3>
+            <p>
+            Torque has been around for a while, and it's been used for everything
+            from interactive coral reefs to MMOs to driving simulators.
+            </p>
+            <a href="{{page.root}}/engine">Games made with Torque</a>
+        </div>
 
-        <a class="pull-right" href="{{page.root}}/news">See all</a>
+        <div class="col-sm-4">
+            <h3>Always evolving</h3>
+            <p>
+            Torque is being constantly developed by an enthusiastic community.
+            Its future is in <em>your</em> hands, not those of a company with a
+            bottom line to meet.
+            </p>
+            <a href="{{page.root}}/contribute">Get involved</a>
+        </div>
     </div>
 
     <div class="row">
-        <h2>From GarageGames</h2>
+        <div class="col-sm-12">
+            <h2>Recent news</h2>
+
+            {% for post in site.posts limit:3 %}
+                <span class="date">{{post.date | date_to_string}}</span>
+                <a href="{{page.root}}{{post.url}}"><span class="post-title">{{post.title}}</span></a>
+                <p>{{ post.content | strip_html | truncatewords: 40 }}</p>
+            {% endfor %}
+
+            <a class="pull-right" href="{{page.root}}/news">See all</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>From GarageGames</h2>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-sm-4">
             <h3>Blogs</h3>
         </div>
