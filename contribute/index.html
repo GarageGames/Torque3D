@@ -10,7 +10,23 @@ root: ..
 
 <div class="container">
     <p>
-    Link to repository, short explanation of the branches that exist.
+    Torque 3D's source code lives at <a href="https://github.com/GarageGames/Torque3D">GarageGames/Torque3D</a>.
+    </p>
+
+    <p>
+    To clone a copy of the source code, you will need a <a href="http://git-scm.com/">git</a>
+    client. We recommend the <a href="http://git-scm.com/downloads">official client</a>. Once you
+    have installed Git, you should follow
+    <a href="https://help.github.com/articles/fork-a-repo">GitHub's forking tutorial</a>
+    to make your own repository to which you can commit your code.
+    </p>
+
+    <p>
+    The repository has two main branches: <code>master</code> and <code>development</code>. We
+    recommend that you do <em>not</em> commit any of your own code into these branches, but
+    simply pull down changes from GarageGames' repository into them. You can maintain
+    your own branch (perhaps named after your GitHub username, or the game you're working on)
+    and merge changes into it as you see fit.
     </p>
 </div>
 
@@ -20,8 +36,22 @@ root: ..
 
 <div class="container">
     <p>
-    Link to GitHub issues. Reporting guidelines.
+    If you find a bug in the engine that you're sure you didn't cause (don't
+    worry, we cause bugs all the time ourselves!), please use the
+    <a href="https://github.com/GarageGames/Torque3D/issues">GitHub issue tracker</a>
+    to let us know. Please have a bit of a look at recent issues before you
+    do, in case someone has already noticed the same problem. And remember to
+    provide the following information:
     </p>
+
+    <ul>
+        <li>Your platform and compiler version</li>
+
+        <li>A description of what currently happens, and what <em>should</em> or
+        should not happen.</li>
+
+        <li><b>Steps to reproduce the bug.</b></li>
+    </ul>
 </div>
 
 <div class="banner"><div class="container">
@@ -66,19 +96,13 @@ root: ..
 
         <li>Pull-requests against the master branch cannot be accepted. All requests
         must go to development, or an appropriate topic or maintenance branch.</li>
-
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
     </ul>
 
     <p>
     In many cases, if any of these rules are breached, we will first ask the contributor
     to resubmit their pull request, or add commits to it that resolve our issues.
-    In exceptional cases, a committee member may perform that work themselves.
-    Sometimes, we may also ask contributors to rebase large numbers of commits
-    into a single commit before the request is pulled.
+    In exceptional cases (i.e., re really really like your work), a committee
+    member may perform that work themselves.
     </p>
 
     <h2>Pull request guidelines</h2>
@@ -104,13 +128,38 @@ root: ..
         so we can verify that exists and that your patch actually does fix it.
         We'd also appreciate platform and compiler information.</li>
 
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
+        <li>We like each pull request to have a reasonable revision history - not
+        too many small commits with typo fixes, for example. Sometimes, we may ask
+        contributors to rebase large numbers of commits into a single commit
+        before the request is pulled.</li>
     </ul>
 
     <h2>The pull request process</h2>
+    <ol>
+        <li>You make a pull-request to the GarageGames/Torque3D repository.</li>
+
+        <li>We tag the request appropriately according to its status as a new feature,
+        a bug/fix or a defect/enhancement. The difference between the latter two is
+        that a bug (which you may be submitting a fix for) is advertised functionality
+        that does not work correctly, or a situation that causes a crash. A defect
+        (or an ehnahcement to an existing feature) is simply something that <em>could</em>
+        be better (for example, a performance improvement).</li>
+
+        <li>One or more members of the Committee or the general community review your
+        request, adding comments if they see any problems. This code-review process
+        may take some time as we need to consider a variety of factors when considering
+        whether a pull request is appropriate. We (and others) may point out technical
+        flaws or suggest ways we would prefer the issue to be solved. We will also
+        pull down your code and test it locally to verify that it does as advertised!</li>
+
+        <li>If all goes well, the 'Final Review' label will be applied to your request.
+        This is a formality stage that collects pull requests we feel are nearly ready
+        to be merged, and allows reviews to focus their attention better on imminent
+        new code. At this stage, if only one member of the Committee has been involved
+        in reviewing the code, another must become involved.</li>
+
+        <li>If it passes final review, your pull-request is merged! Congratulations.</li>
+    </ol>
 </div>
 
 <div class="banner"><div class="container">
@@ -119,7 +168,38 @@ root: ..
 
 <div class="container">
     <p>
-    Explain versions.
+    We maintain an <b>X.Y.z</b> version scheme similar to that of
+    <a href="http://semver.org/">Semantic Versioning</a>. However, since our API is
+    less well-defined, we define the three components as follows:
+    </p>
+
+    <table class="table">
+        <tr>
+            <td><b>X</b><br/>Major version number</td>
+            <td>The major version number denotes a single version of our <em>client-facing</em>
+            API, which refers to the script and editor capabilities exposed to binary-only
+            users of the engine, as well as major parts of the internal C++ API, such
+            as the class hierarchy.</td>
+        </tr>
+
+        <tr>
+            <td><b>Y</b><br/>Minor version number</td>
+            <td>The minor version number refers to the set of features in a given API. Across
+            a minor version number change, we may refactor code, fix bugs, or introduce
+            <em>new</em> features, but we will not make breaking changes to existing ones.</td>
+        </tr>
+
+        <tr>
+            <td><b>z</b><br/>Patch number</td>
+            <td>Patches denote minor updates to stability or correctness that do not change
+            the engine API in a significant way.</td>
+        </tr>
+    </table>
+
+    <p class="alert alert-warning">
+    Note that this new versioning policy is different to the one adopted by the first
+    two Steering Committees, and applies only to engine versions 3.6 and above, or
+    3.5.2 and above.
     </p>
 </div>
 
@@ -129,6 +209,8 @@ root: ..
 
 <div class="container">
     <p>
-    Link to Uservoice.
+    We use a <a href="http://garagegames.uservoice.com/">UserVoice</a> forum to monitor
+    feature requests from users. Before making a forum post or starting a new request,
+    check to see if your feature has already been requested.
     </p>
 </div>
