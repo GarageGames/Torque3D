@@ -6,6 +6,15 @@ body {
  * Bootstrap overrides
  */
 
+.borderless th,
+.borderless td {
+    border: none !important;
+}
+
+tr.hrule {
+    border-bottom: 1px solid #ddd;
+}
+
 .container {
   max-width: 760px!important;
 }
