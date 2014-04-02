@@ -22,3 +22,6 @@
 
 // Load up all scripts.  This function is called when
 // a server is constructed.
+
+// Load useful utils
+exec("./utils.cs");
