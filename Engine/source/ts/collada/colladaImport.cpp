@@ -50,7 +50,7 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    S32 nodeID = tree->insertItem(parentID, _GetNameOrId(node), "node", "", 0, 0);
 
    // Update mesh and poly counts
-   for (int i = 0; i < node->getContents().getCount(); i++)
+   for (S32 i = 0; i < node->getContents().getCount(); i++)
    {
       domGeometry* geom = 0;
       const char* elemName = "";
@@ -178,13 +178,13 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
    SceneStats stats;
 
    // Query DOM for shape summary details
-   for (int i = 0; i < root->getLibrary_visual_scenes_array().getCount(); i++)
+   for (S32 i = 0; i < root->getLibrary_visual_scenes_array().getCount(); i++)
    {
       const domLibrary_visual_scenes* libScenes = root->getLibrary_visual_scenes_array()[i];
-      for (int j = 0; j < libScenes->getVisual_scene_array().getCount(); j++)
+      for (S32 j = 0; j < libScenes->getVisual_scene_array().getCount(); j++)
       {
          const domVisual_scene* visualScene = libScenes->getVisual_scene_array()[j];
-         for (int k = 0; k < visualScene->getNode_array().getCount(); k++)
+         for (S32 k = 0; k < visualScene->getNode_array().getCount(); k++)
             processNode(tree, visualScene->getNode_array()[k], nodesID, stats);
       }
    }

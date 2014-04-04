@@ -100,9 +100,9 @@ ConsoleDocClass( ParticleEmitterData,
    "@see ParticleEmitterNode\n"
 );
 
-static const float sgDefaultEjectionOffset = 0.f;
-static const float sgDefaultPhiReferenceVel = 0.f;
-static const float sgDefaultPhiVariance = 360.f;
+static const F32 sgDefaultEjectionOffset = 0.f;
+static const F32 sgDefaultPhiReferenceVel = 0.f;
+static const F32 sgDefaultPhiVariance = 360.f;
 
 //-----------------------------------------------------------------------------
 // ParticleEmitterData
@@ -929,7 +929,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
 //-----------------------------------------------------------------------------
 void ParticleEmitter::setSizes( F32 *sizeList )
 {
-   for( int i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
+   for( S32 i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
    {
       sizes[i] = sizeList[i];
    }
@@ -940,7 +940,7 @@ void ParticleEmitter::setSizes( F32 *sizeList )
 //-----------------------------------------------------------------------------
 void ParticleEmitter::setColors( ColorF *colorList )
 {
-   for( int i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
+   for( S32 i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
    {
       colors[i] = colorList[i];
    }
@@ -1455,7 +1455,7 @@ struct SortParticle
 };
 
 // qsort callback function for particle sorting
-int QSORT_CALLBACK cmpSortParticles(const void* p1, const void* p2)
+S32 QSORT_CALLBACK cmpSortParticles(const void* p1, const void* p2)
 {
    const SortParticle* sp1 = (const SortParticle*)p1;
    const SortParticle* sp2 = (const SortParticle*)p2;

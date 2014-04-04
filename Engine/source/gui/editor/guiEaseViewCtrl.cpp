@@ -97,7 +97,7 @@ void GuiEaseViewCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // Draw curve.
 
-	for( int i = 1; i <= numPoints; ++ i )
+	for( S32 i = 1; i <= numPoints; ++ i )
 	{
 		F32 x = ( F32 ) i / ( F32 ) numPoints;
       F32 y = mEase.getValue( x, 0, 1, 1 );

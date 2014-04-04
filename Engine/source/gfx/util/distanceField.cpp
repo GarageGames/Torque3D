@@ -32,7 +32,7 @@ struct DistanceFieldSearchSpaceStruct
    F32 distance;
 };
 
-int QSORT_CALLBACK cmpSortDistanceFieldSearchSpaceStruct(const void* p1, const void* p2)
+S32 QSORT_CALLBACK cmpSortDistanceFieldSearchSpaceStruct(const void* p1, const void* p2)
 {
    const DistanceFieldSearchSpaceStruct* sp1 = (const DistanceFieldSearchSpaceStruct*)p1;
    const DistanceFieldSearchSpaceStruct* sp2 = (const DistanceFieldSearchSpaceStruct*)p2;

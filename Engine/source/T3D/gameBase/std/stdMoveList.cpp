@@ -92,7 +92,7 @@ void StdMoveList::clientWriteMovePacket(BitStream *bstream)
    bstream->writeInt(start,32);
    bstream->writeInt(count,MoveCountBits);
    Move * prevMove = NULL;
-   for (int i = 0; i < count; i++)
+   for (S32 i = 0; i < count; i++)
    {
       move[offset + i].sendCount++;
       move[offset + i].pack(bstream,prevMove);
@@ -112,7 +112,7 @@ void StdMoveList::serverReadMovePacket(BitStream *bstream)
 
    // Skip forward (must be starting up), or over the moves
    // we already have.
-   int skip = mLastMoveAck - start;
+   S32 skip = mLastMoveAck - start;
    if (skip < 0) 
    {
       mLastMoveAck = start;
@@ -121,7 +121,7 @@ void StdMoveList::serverReadMovePacket(BitStream *bstream)
    {
       if (skip > count)
          skip = count;
-      for (int i = 0; i < skip; i++)
+      for (S32 i = 0; i < skip; i++)
       {
          prevMoveHolder.unpack(bstream,prevMove);
          prevMoveHolder.checksum = bstream->readInt(Move::ChecksumBits);
@@ -141,7 +141,7 @@ void StdMoveList::serverReadMovePacket(BitStream *bstream)
    }
 
    // Put the rest on the move list.
-   int index = mMoveVec.size();
+   S32 index = mMoveVec.size();
    mMoveVec.increment(count);
    while (index < mMoveVec.size())
    {

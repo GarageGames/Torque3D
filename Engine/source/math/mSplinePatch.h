@@ -110,7 +110,7 @@ public:
    const Point3F *      getControlPoint( U32 index ){ return mControlPoints.getPoint( index ); }
 
    // virtuals
-   virtual void         setControlPoint( Point3F &point, int index );
+   virtual void         setControlPoint( Point3F &point, S32 index );
    /// If you have a preconstructed "SplCtrlPts" class, submit it with this function.
    /// @see SplCtrlPts
    virtual void         submitControlPoints( SplCtrlPts &points ){ mControlPoints = points; }

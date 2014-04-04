@@ -250,8 +250,8 @@ struct StreqExprNode : BinaryExprNode
 
 struct StrcatExprNode : BinaryExprNode
 {
-   int appendChar;
-   static StrcatExprNode *alloc( S32 lineNumber, ExprNode *left, ExprNode *right, int appendChar );
+   S32 appendChar;
+   static StrcatExprNode *alloc( S32 lineNumber, ExprNode *left, ExprNode *right, S32 appendChar );
    U32 precompile(TypeReq type);
    U32 compile(U32 *codeStream, U32 ip, TypeReq type);
    TypeReq getPreferredType();

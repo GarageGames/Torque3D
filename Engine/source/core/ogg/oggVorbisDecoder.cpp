@@ -89,7 +89,7 @@ bool OggVorbisDecoder::_init()
          break;
       }
           
-      int result = vorbis_synthesis_headerin( &mVorbisInfo, &mVorbisComment, &nextPacket );
+      S32 result = vorbis_synthesis_headerin( &mVorbisInfo, &mVorbisComment, &nextPacket );
       if( result != 0 )
       {
          haveVorbisHeader = false;

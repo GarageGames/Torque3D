@@ -46,7 +46,7 @@ void FPSTracker::reset()
 
 void FPSTracker::update()
 {
-   const float alpha  = 0.07f;
+   const F32 alpha  = 0.07f;
    F32 realSeconds    = (F32)Platform::getRealMilliseconds()/1000.0f;
    F32 virtualSeconds = (F32)Platform::getVirtualMilliseconds()/1000.0f;
 

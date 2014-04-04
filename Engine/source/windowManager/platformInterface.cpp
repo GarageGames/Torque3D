@@ -70,7 +70,7 @@ static struct ModifierBitMap {
    { IM_LOPT,   SI_MAC_LOPT },
    { IM_ROPT,   SI_MAC_ROPT },
 };
-static int _ModifierBitMapCount = sizeof(_ModifierBitMap) / sizeof(ModifierBitMap);
+static S32 _ModifierBitMapCount = sizeof(_ModifierBitMap) / sizeof(ModifierBitMap);
 
 InputModifiers convertModifierBits(const U32 in)
 {

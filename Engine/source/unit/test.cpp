@@ -40,10 +40,10 @@ TestRegistry *TestRegistry::_list = 0;
 
 //-----------------------------------------------------------------------------
 
-static const int MaxMarginCount = 32;
-static const int MaxMarginValue = 128;
-static int _Margin[MaxMarginCount] = { 3 };
-static int* _MarginPtr = _Margin;
+static const S32 MaxMarginCount = 32;
+static const S32 MaxMarginValue = 128;
+static S32 _Margin[MaxMarginCount] = { 3 };
+static S32* _MarginPtr = _Margin;
 static char _MarginString[MaxMarginValue];
 
 static void _printMargin()
@@ -52,7 +52,7 @@ static void _printMargin()
       ::fwrite(_MarginString,1,*_MarginPtr,stdout);
 }
 
-void UnitMargin::Push(int margin)
+void UnitMargin::Push(S32 margin)
 {
    if (_MarginPtr < _Margin + MaxMarginCount) {
       *++_MarginPtr = (margin < MaxMarginValue)? margin: MaxMarginValue;
@@ -68,7 +68,7 @@ void UnitMargin::Pop()
    }
 }
 
-int UnitMargin::Current()
+S32 UnitMargin::Current()
 {
    return *_MarginPtr;
 }
@@ -247,7 +247,7 @@ bool TestRun::test(const char* module, bool skipInteractive)
 {
    StringTableEntry cwdSave = Platform::getCurrentDirectory();
 
-   int len = strlen(module);
+   S32 len = strlen(module);
 
    const char *skipMsg = skipInteractive ? "(skipping interactive tests)" : "";
 

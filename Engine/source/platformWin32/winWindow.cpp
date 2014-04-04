@@ -350,7 +350,7 @@ S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
       // Add the word to the argument list.
       if (*word) 
       {
-         int len = ptr - word;
+         S32 len = ptr - word;
          char *arg = (char *) dMalloc(len + 1);
          dStrncpy(arg, word, len);
          arg[len] = 0;
@@ -373,12 +373,12 @@ S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 
 extern "C"
 {
-	bool torque_engineinit(int argc, const char **argv);
-	int  torque_enginetick();
+	bool torque_engineinit(S32 argc, const char **argv);
+	S32  torque_enginetick();
 	bool torque_engineshutdown();
 };
 
-int TorqueMain(int argc, const char **argv)
+S32 TorqueMain(int argc, const char **argv)
 {
 	if (!torque_engineinit(argc, argv))
 		return 1;
@@ -442,7 +442,7 @@ S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 		// Add the word to the argument list.
 		if (*word) 
 		{
-			int len = ptr - word;
+			S32 len = ptr - word;
 			char *arg = (char *) dMalloc(len + 1);
 			dStrncpy(arg, word, len);
 			arg[len] = 0;
@@ -499,7 +499,7 @@ bool Platform::openWebBrowser( const char* webAddress )
          return( false );
       }
 
-      if ( RegQueryValueEx( regKey, dT(""), NULL, NULL, (unsigned char *)sWebKey, &size ) != ERROR_SUCCESS ) 
+      if ( RegQueryValueEx( regKey, dT(""), NULL, NULL, (U8 *)sWebKey, &size ) != ERROR_SUCCESS ) 
       {
          Con::errorf( ConsoleLogEntry::General, "Platform::openWebBrowser - Failed to query the open command registry key!!!" );
          return( false );

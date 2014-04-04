@@ -76,7 +76,7 @@ private:
    DWORD m_dwProcessId;
    bool m_modulesLoaded;
    LPSTR m_szSymPath;
-   int m_options;
+   S32 m_options;
    char * m_pOutputBuffer;
 
    static BOOL __stdcall myReadProcMem(HANDLE hProcess, DWORD64 qwBaseAddress, PVOID lpBuffer, DWORD nSize, LPDWORD lpNumberOfBytesRead);

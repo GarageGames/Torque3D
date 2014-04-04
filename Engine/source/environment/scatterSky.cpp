@@ -1057,7 +1057,7 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
    const MatrixF &camView = state->getCameraTransform();
 
    // Finalize points
-   for(int i = 0; i < 4; i++)
+   for(S32 i = 0; i < 4; i++)
    {
       // align with camera
       camView.mulV(points[i]);
@@ -1114,13 +1114,13 @@ void ScatterSky::_generateSkyPoints()
    F32 deltaSegAngle = ( 2.0f * M_PI_F / (F32)segments );
 
    // Generate the group of rings for the sphere.
-   for( int ring = 0; ring < 2; ring++ )
+   for( S32 ring = 0; ring < 2; ring++ )
    {
       F32 r0 = mSin( ring * deltaRingAngle );
       F32 y0 = mCos( ring * deltaRingAngle );
 
       // Generate the group of segments for the current ring.
-      for( int seg = 0; seg < segments + 1 ; seg++ )
+      for( S32 seg = 0; seg < segments + 1 ; seg++ )
       {
          F32 x0 = r0 * sinf( seg * deltaSegAngle );
          F32 z0 = r0 * cosf( seg * deltaSegAngle );

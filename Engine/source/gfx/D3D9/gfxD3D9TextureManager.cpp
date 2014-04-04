@@ -259,7 +259,7 @@ void GFXD3D9TextureManager::_innerCreateTexture( GFXD3D9TextureObject *retTex,
 
       retTex->mTextureSize.set(probeDesc.Width, probeDesc.Height, 0);
       
-      int fmt = probeDesc.Format;
+      S32 fmt = probeDesc.Format;
 
 #if !defined(TORQUE_OS_XENON)
       GFXREVERSE_LOOKUP( GFXD3D9TextureFormat, GFXFormat, fmt );
@@ -568,7 +568,7 @@ bool GFXD3D9TextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dd
    GFXD3D9TextureObject *texture = static_cast<GFXD3D9TextureObject*>(aTexture);
 
    // Fill the texture...
-   for( int i = 0; i < aTexture->mMipLevels; i++ )
+   for( S32 i = 0; i < aTexture->mMipLevels; i++ )
    {
       PROFILE_SCOPE(GFXD3DTexMan_loadSurface);
 

@@ -1688,7 +1688,7 @@ DefineEngineMethod( GuiTextEditCtrl, getCursorPos, S32, (),,
    return( object->getCursorPos() );
 }
 
-DefineEngineMethod( GuiTextEditCtrl, setCursorPos, void, (int position),,
+DefineEngineMethod( GuiTextEditCtrl, setCursorPos, void, (S32 position),,
    "@brief Sets the text cursor at the defined position within the control.\n\n"
    "@param position Text position to set the text cursor.\n"
    "@tsexample\n"

@@ -25,7 +25,7 @@
 
 
 /// A vector with a compile-time constant size.
-template< typename T, int SIZE >
+template< typename T, S32 SIZE >
 class FixedSizeVector
 {
    protected:

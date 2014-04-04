@@ -40,7 +40,7 @@ ConsoleDocClass( GuiParticleGraphCtrl,
 GuiParticleGraphCtrl::GuiParticleGraphCtrl()
 {
 
-   for(int i = 0; i < MaxPlots; i++)
+   for(S32 i = 0; i < MaxPlots; i++)
    {
 	   mPlots[i].mGraphColor = ColorF(1.0, 1.0, 1.0);
 	   VECTOR_SET_ASSOCIATION(mPlots[i].mGraphData);
@@ -140,7 +140,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 	ColorF color(1.0f, 1.0f, 1.0f, 0.5f);
 	pDrawUtil->drawRectFill(updateRect, color);
 
-	for (int k = 0; k < MaxPlots; k++)
+	for (S32 k = 0; k < MaxPlots; k++)
 	{
 		// Nothing to graph
 		if ((mPlots[k].mGraphData.size() == 0) || (mPlots[k].mHidden == true))

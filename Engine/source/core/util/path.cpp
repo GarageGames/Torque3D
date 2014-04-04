@@ -56,7 +56,7 @@ void Path::_split(String name)
    idx = name.find('/', 0, String::Right);
    if (idx >= pos)
    {
-      int len = idx - pos;
+      S32 len = idx - pos;
       mPath = name.substr(pos,len? len: 1);
       mPath = Path::CleanSeparators(mPath);
       pos = idx + 1;

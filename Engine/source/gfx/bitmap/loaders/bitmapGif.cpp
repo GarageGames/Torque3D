@@ -54,7 +54,7 @@ static struct _privateRegisterGIF
 //-------------------------------------- Replacement I/O for standard LIBjpeg
 //                                        functions.  we don't wanna use
 //                                        FILE*'s...
-static int gifReadDataFn(GifFileType *gifinfo, GifByteType *data, int length)
+static S32 gifReadDataFn(GifFileType *gifinfo, GifByteType *data, S32 length)
 {
    Stream *stream = (Stream*)gifinfo->UserData;
    AssertFatal(stream != NULL, "gifReadDataFn::No stream.");
@@ -72,7 +72,7 @@ static int gifReadDataFn(GifFileType *gifinfo, GifByteType *data, int length)
 //--------------------------------------
 #if 0 
 // CodeReview - until we can write these, get rid of warning by disabling method.
-static int gifWriteDataFn(GifFileType *gifinfo, GifByteType *data, int length)
+static S32 gifWriteDataFn(GifFileType *gifinfo, GifByteType *data, S32 length)
 {
    Stream *stream = (Stream*)gifinfo->UserData;
    AssertFatal(stream != NULL, "gifWriteDataFn::No stream.");
