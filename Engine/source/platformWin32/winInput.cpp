@@ -496,10 +496,10 @@ InputManager* Input::getManager()
 //------------------------------------------------------------------------------
 void Input::attemptSwitchToKeyboardLayout( U32 layout )
 {
-   const auto lang = MAKELANGID( layout, SUBLANG_DEFAULT );
+   const LANGID lang = MAKELANGID( layout, SUBLANG_DEFAULT );
    std::wstringstream ss;
    ss << std::hex << lang;
-   const auto hexLang = ss.str().c_str();
+   const wchar_t* hexLang = ss.str().c_str();
    ActivateKeyboardLayout( LoadKeyboardLayout(
        hexLang,  KLF_ACTIVATE | KLF_REPLACELANG
    ), KLF_REORDER );
