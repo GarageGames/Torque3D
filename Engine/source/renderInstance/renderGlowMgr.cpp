@@ -54,7 +54,7 @@ RenderGlowMgr::GlowMaterialHook::GlowMaterialHook( BaseMatInstance *matInst )
 {
    mGlowMatInst = (MatInstance*)matInst->getMaterial()->createMatInstance();
    mGlowMatInst->getFeaturesDelegate().bind( &GlowMaterialHook::_overrideFeatures );
-	mGlowMatInst->setUserObject(matInst->getUserObject());
+   mGlowMatInst->setUserObject(matInst->getUserObject());
    mGlowMatInst->init(  matInst->getRequestedFeatures(), 
                         matInst->getVertexFormat() );
 }
