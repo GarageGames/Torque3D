@@ -91,7 +91,7 @@ GFX_ImplementTextureProfile(GFXMLTextureProfile,
                             GFXTextureProfile::DiffuseMap, 
                             GFXTextureProfile::PreserveSize |
                             GFXTextureProfile::Static, 
-                            GFXTextureProfile::None);
+                            GFXTextureProfile::NONE);
 
 const U32 GuiMLTextCtrl::csmTextBufferGrowthSize = 1024;
 
