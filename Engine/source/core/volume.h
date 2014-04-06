@@ -79,7 +79,7 @@ public:
 class FileNode : public FileBase
 {
 public:
-   enum Status
+   enum NodeStatus
    {
       Open,                   ///< In an open state
       Closed,                 ///< In a closed state
@@ -122,7 +122,7 @@ public:
 
    // Properties
    virtual Path   getName() const = 0;
-   virtual Status getStatus() const = 0;
+   virtual NodeStatus getStatus() const = 0;
 
    virtual bool   getAttributes(Attributes*) = 0;
 
