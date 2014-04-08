@@ -1634,7 +1634,7 @@ void ShapeBase::applyRepair(F32 amount)
 
 void ShapeBase::applyDamage(F32 amount)
 {
-   if (amount > 0)
+   if (amount != 0)
       setDamageLevel(mDamage + amount);
 }
 
