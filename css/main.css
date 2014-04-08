@@ -6,13 +6,29 @@ body {
  * Bootstrap overrides
  */
 
-.borderless th,
-.borderless td {
-    border: none !important;
+.table.borderless tr td {
+  padding-top: 1em;
 }
 
-tr.hrule {
-    border-bottom: 1px solid #ddd;
+.table.borderless tr,
+.table.borderless tr td {
+  border: none;
+  border-bottom: 1px solid #ddd;
+}
+
+.table.borderless tr:last-child,
+.table.borderless tr:last-child td {
+  border: none;
+}
+
+.contact td:first-child {
+  padding-right: 1em;
+  text-align: right;
+}
+
+td.wide {
+  min-width: 10em;
+  font-weight: bold;
 }
 
 .container {

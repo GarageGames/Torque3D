@@ -10,38 +10,74 @@ root: ..
 
 <div class="container">
     <p>
-    If you don't want to bother compiling the engine yourself, but just want to
-    get started working on your game, a binary distribution is just the thing for
-    you. Below are links to the engine itself, and the Project Manager, a small
+    Below are links to the engine itself, and the Project Manager, a small
     utility that helps you set up new Torque projects. You should download both
-    of them if you want to work with the engine.
+    of them if you want to work with the engine. You'll also need some utilities
+    that vary depending on your platform.
+    </p>
+
+    <p>
+    Torque is currently fully supported on Windows only. It is possible to
+    compile a dedicated server (DS) under Linux. Users have successfully ported
+    the engine to Linux and OSX, and these efforts will soon make their way into
+    the official version.
     </p>
 
     <ul class="nav nav-tabs">
         <li class="active"><a href="#windows-tab" data-toggle="tab">Windows</a></li>
+        <li><a href="#linux-tab" data-toggle="tab">Linux (DS only)</a></li>
     </ul>
 
     <div class="tab-content">
         <div class="tab-pane active" id="windows-tab">
             <table class="borderless table">
                 <tr>
-                    <td>Current version</td>
-                    <td><a href="http://mit.garagegames.com/Torque3D-3-5-1.zip">Torque 3D 3.5.1</a></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><a href="http://mit.garagegames.com/T3DProjectManager-2-1.zip">Project Manager 2.1</a></td>
+                    <td class="wide">Current version</td>
+                    <td><a href="http://mit.garagegames.com/Torque3D-3-5-1.zip">Torque 3D 3.5.1</a>
+                    <br />
+                    <a href="http://mit.garagegames.com/T3DProjectManager-2-1.zip">Project Manager 2.1</a></td>
                 </tr>
 
-                <tr class="hrule"><td></td><td></td></tr>
+                <tr>
+                    <td class="wide">Previous version</td>
+                    <td><a href="http://mit.garagegames.com/Torque3D-3-5.zip">Torque 3D 3.5</a>
+                    <br />
+                    <a href="http://mit.garagegames.com/T3DProjectManager-2-0.zip">Project Manager 2.0</a></td>
+                </tr>
 
                 <tr>
-                    <td>Previous version</td>
-                    <td><a href="http://mit.garagegames.com/Torque3D-3-5.zip">Torque 3D 3.5</a></td>
+                    <td class="wide">Tools</td>
+                    <td>
+                    Torque is currently compatible with Microsoft Visual Studio
+                    <a href="http://www.microsoft.com/en-us/download/details.aspx?id=7873">2008</a>,
+                    <a href="http://www.visualstudio.com/en-us/downloads#d-2010-express">2010</a>, and
+                    <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34673">2012</a>.
+                    You'll also need the DirectX SDK version from
+                    <a href="http://www.microsoft.com/en-us/download/details.aspx?id=6812">June 2010</a>.
+                    </td>
                 </tr>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="linux-tab">
+            <table class="borderless table">
                 <tr>
-                    <td></td>
-                    <td><a href="http://mit.garagegames.com/T3DProjectManager-2-0.zip">Project Manager 2.0</a></td>
+                    <td class="wide">Current version</td>
+                    <td><a href="http://mit.garagegames.com/Torque3D-3-5-1.zip">Torque 3D 3.5.1</a>
+                </tr>
+
+                <tr>
+                    <td class="wide">Previous version</td>
+                    <td><a href="http://mit.garagegames.com/Torque3D-3-5.zip">Torque 3D 3.5</a>
+                </tr>
+
+                <tr>
+                    <td class="wide">Tools</td>
+                    <td>
+                    The requirements vary depending on your distribution. Under
+                    Ubuntu, the following packages must be installed:
+                    <code>build-essential nasm git php5-cli libsdl-dev libogg-dev</code>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -60,4 +96,30 @@ root: ..
     Below are some tutorials that we highly recommend to beginners, but for more
     comprehensive or specific tutorials we recommend you check the above link.
     </p>
+
+    <ul>
+        <li><a href="http://docs.garagegames.com/torque-3d/official/index.html?content/documentation/Setup/Overview.html">Setting up the engine</a>
+        A detailed look at how to start working with Torque. If you have trouble
+        getting started, here's the first place you should look!</li>
+
+        <li><a href="https://github.com/GarageGames/Torque3D/wiki/Project-Manager">Using the Project Manager</a>
+        A quick look at how to use the Project Manager to create and manage
+        your Torque projects.</li>
+
+        <li><a href="http://www.garagegames.com/community/resources/view/20937">Scripting damage and destruction</a>
+        Creating damageable objects with animations, different damage levels,
+        and destruction effects. A great introduction to the full process of working
+        with art and scripts together.</li>
+
+        <li><a href="http://www.garagegames.com/community/resources/view/21604">Deathmatch FPS with AI</a>
+        A tutorial series on creating a deathmatch shooter with AI enemies.</li>
+
+        <li><a href="http://www.garagegames.com/community/blogs/view/22447">Action/tactics hybrid game</a>
+        A lengthy series that shows you how to turn Torque into a Valkyria Chronicles-
+        style turn-based action tactics game. Written by Steve Acaster, developer
+        of <a href="http://www.desura.com/games/airship-dragoon">Airship Dragoon</a>.</li>
+
+        <li><a href="http://www.garagegames.com/products/torque-3d/guides">RTS prototype</a>
+        Build a basic real-time strategy game from default assets.</li>
+    </ul>
 </div>
