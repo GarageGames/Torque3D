@@ -516,7 +516,7 @@ public:
    enum Constants {
       MaxCollisionShapes = 8,
       AIRepairNode		= 31,
-	  Max_Hitboxes      = 20    // Max number of hitboxes allowed per player
+      Max_Hitboxes      = 20    // Max number of hitboxes allowed per player
    };
 
    // TODO: These are only really used in Basic Lighting

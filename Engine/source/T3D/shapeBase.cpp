@@ -383,21 +383,20 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             if (!found)
                LOSDetails.push_back(i);
          }
-
-	  if (mUseHitboxes)
-	  {
-		  //find the HitBox mesh
-		  //The hit box mesh is a convex mesh named HB$DDD where DDD is the detail level, the same used for the model and $ is a letter from a to z
-		  bool HBfound=false;
-		  for (i=0; i< Max_Hitboxes; i++)
-		  {
-			  char buff[8];
-			  dSprintf(buff,sizeof(buff),"HB%d",i+1);
-			  HBIndex[i] = mShape->findObject(buff);
-			  if (HBIndex[i] != -1) HBfound = true;
-		  }
-		  if (!HBfound) Con::errorf("No hitboxes found!");
-	  }
+         if (mUseHitboxes)
+         {
+            //find the HitBox mesh
+            //The hit box mesh is a convex mesh named HB$DDD where DDD is the detail level, the same used for the model and $ is a letter from a to z
+            bool HBfound=false;
+            for (i=0; i< Max_Hitboxes; i++)
+            {
+               char buff[8];
+               dSprintf(buff,sizeof(buff),"HB%d",i+1);
+               HBIndex[i] = mShape->findObject(buff);
+               if (HBIndex[i] != -1) HBfound = true;
+            }
+            if (!HBfound) Con::errorf("No hitboxes found!");
+         }
       }
 
       debrisDetail = mShape->findDetail("Debris-17");

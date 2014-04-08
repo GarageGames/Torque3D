@@ -251,58 +251,58 @@ bool TSShapeInstance::castRay(const Point3F & a, const Point3F & b, RayInfo * ra
 
 bool TSShapeInstance::castRayEA(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl, S32 HBIndex)
 {
-	// if dl==-1, nothing to do
-	if (dl==-1)
-		return false;
+   // if dl==-1, nothing to do
+   if (dl == -1)
+      return false;
 
-	if (HBIndex == -1)				//No hit box to test
-		return false;
+   if (HBIndex == -1)				//No hit box to test
+      return false;
 
-	AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::castRay");
+   AssertFatal(dl >= 0 && dl<mShape->details.size(), "TSShapeInstance::castRay");
 
-	// get subshape and object detail
-	const TSDetail * detail = &mShape->details[dl];
-	S32 ss = detail->subShapeNum;
-	S32 od = detail->objectDetailNum;
+   // get subshape and object detail
+   const TSDetail * detail = &mShape->details[dl];
+   S32 ss = detail->subShapeNum;
+   S32 od = detail->objectDetailNum;
 
-	S32 start = mShape->subShapeFirstObject[ss];
-	S32 end   = mShape->subShapeNumObjects[ss] + start;
- 
-	bool found = false;
-	MatrixF mat;
-	if (start<end)
-	{
-		Point3F ta, tb;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end = mShape->subShapeNumObjects[ss] + start;
 
-		// set up for first object's node
-		MeshObjectInstance * mesh = &mMeshObjects[HBIndex];
-		mat = mesh->getTransform();
-		mat.inverse();
-		mat.mulP(a,&ta);
-		mat.mulP(b,&tb);
+   bool found = false;
+   MatrixF mat;
+   if (start<end)
+   {
+      Point3F ta, tb;
 
-		// collide...
-		if (mesh->castRayEA(od,ta,tb,rayInfo, mMaterialList))
-		{
-			if (!rayInfo)
-				return true;
+      // set up for first object's node
+      MeshObjectInstance * mesh = &mMeshObjects[HBIndex];
+      mat = mesh->getTransform();
+      mat.inverse();
+      mat.mulP(a, &ta);
+      mat.mulP(b, &tb);
 
-			found = true;
-		}
-	}
+      // collide...
+      if (mesh->castRayEA(od, ta, tb, rayInfo, mMaterialList))
+      {
+         if (!rayInfo)
+            return true;
 
-	// collide with any skins for this detail level...
-	// TODO: if ever...
+         found = true;
+      }
+   }
 
-	// finalize the deal...
-	if (found)
-	{
-		mat.mulV(rayInfo->normal);
-		rayInfo->point  = b-a;
-		rayInfo->point *= rayInfo->t;
-		rayInfo->point += a;
-	}
-	return found;
+   // collide with any skins for this detail level...
+   // TODO: if ever...
+
+   // finalize the deal...
+   if (found)
+   {
+      mat.mulV(rayInfo->normal);
+      rayInfo->point = b - a;
+      rayInfo->point *= rayInfo->t;
+      rayInfo->point += a;
+   }
+   return found;
 }
 
 bool TSShapeInstance::castRayRendered(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl)
@@ -577,7 +577,7 @@ bool TSShapeInstance::MeshObjectInstance::castRayEA(S32 objectDetail, const Poin
    TSMesh * mesh = getMesh(objectDetail);
 
    if (mesh)    //You have to remove the && visible>0.01f because the hitBoxes are hidden
-      return mesh->castRay(frame,start,end,rayInfo,materials);
+      return mesh->castRay(frame, start, end, rayInfo, materials);
    return false;
 }
 

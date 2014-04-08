@@ -114,18 +114,18 @@ IMPLEMENT_CALLBACK( ProjectileData, onExplode, void, ( Projectile* proj, Point3F
 				   "@see Projectile\n"
 				  );
 
-IMPLEMENT_CALLBACK( ProjectileData, onCollision, void, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal, S32 hitBoxNum ),
-                   ( proj, col, fade, pos, normal, hitBoxNum ),
-				   "@brief Called when a projectile collides with another object.\n\n"
-                   "This function is only called on server objects."
-				   "@param proj The projectile colliding with SceneObject col.\n"
-				   "@param col The SceneObject hit by the projectile.\n"
-				   "@param fade The current fadeValue of the projectile, affects its visibility.\n"
-				   "@param pos The position of the collision.\n"
-               "@param normal The normal of the collision.\n"
-               "@param the struck hitbox suffix.\n"
-				   "@see Projectile\n"
-				  );
+IMPLEMENT_CALLBACK(ProjectileData, onCollision, void, (Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal, S32 hitBoxNum),
+                  (proj, col, fade, pos, normal, hitBoxNum),
+                  "@brief Called when a projectile collides with another object.\n\n"
+                  "This function is only called on server objects."
+                  "@param proj The projectile colliding with SceneObject col.\n"
+                  "@param col The SceneObject hit by the projectile.\n"
+                  "@param fade The current fadeValue of the projectile, affects its visibility.\n"
+                  "@param pos The position of the collision.\n"
+                  "@param normal The normal of the collision.\n"
+                  "@param the struck hitbox suffix.\n"
+                  "@see Projectile\n"
+   );
 
 const U32 Projectile::csmStaticCollisionMask =  TerrainObjectType | StaticShapeObjectType;
 
