@@ -49,6 +49,7 @@ root: .
         </div>
     </div>
 
+    {% if site.posts | size %}
     <div class="row">
         <div class="col-sm-12">
             <h2>Recent news</h2>
@@ -62,24 +63,5 @@ root: .
             <a class="pull-right" href="{{page.root}}/news">See all <i class="fa fa-angle-right"></i></a>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-sm-12">
-            <h2>From GarageGames</h2>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-4">
-            <h3>Blogs</h3>
-        </div>
-
-        <div class="col-sm-4">
-            <h3>Forums</h3>
-        </div>
-
-        <div class="col-sm-4">
-            <h3>Resources</h3>
-        </div>
-    </div>
+    {% endif %}
 </div>
