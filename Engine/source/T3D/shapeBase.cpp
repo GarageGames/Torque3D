@@ -190,9 +190,12 @@ ShapeBaseData::ShapeBaseData()
    computeCRC( false ),
    inheritEnergyFromMount( false ),
    mCRC( 0 ),
-   debrisDetail( -1 )
+   debrisDetail( -1 ),
+   mUseHitboxes(false)
 {      
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
+
+   for (int i=0; i< Max_Hitboxes; i++) HBIndex[i] = -1;
 }
 
 struct ShapeBaseDataProto
@@ -380,6 +383,20 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             if (!found)
                LOSDetails.push_back(i);
          }
+         if (mUseHitboxes)
+         {
+            //find the HitBox mesh
+            //The hit box mesh is a convex mesh named HB$DDD where DDD is the detail level, the same used for the model and $ is a letter from a to z
+            bool HBfound=false;
+            for (i=0; i< Max_Hitboxes; i++)
+            {
+               char buff[8];
+               dSprintf(buff,sizeof(buff),"HB%d",i+1);
+               HBIndex[i] = mShape->findObject(buff);
+               if (HBIndex[i] != -1) HBfound = true;
+            }
+            if (!HBfound) Con::errorf("No hitboxes found!");
+         }
       }
 
       debrisDetail = mShape->findDetail("Debris-17");
@@ -502,6 +519,9 @@ void ShapeBaseData::initPersistFields()
          "Drag factor.\nReduces velocity of moving objects." );
       addField( "density", TypeF32, Offset(density, ShapeBaseData),
          "Shape density.\nUsed when computing buoyancy when in water.\n" );
+
+      addField( "UseHitboxes", TypeBool, Offset(mUseHitboxes, ShapeBaseData),
+         "Do we use Collision models, or default to a collision box?" );
 
    endGroup( "Physics" );
 

@@ -156,13 +156,13 @@ typedef Chunker<BSPNode> BSPTree;
 /// @see Collision
 struct RayInfo : public Collision 
 {
-   RayInfo() : userData( NULL ) {}
+   RayInfo() : userData( NULL ), HitBoxNum(-1) {}           //DA added HitBoxNum
 
    // The collision struct has object, point, normal & material.
 
    /// Distance along ray to contact point.
    F32 t; 
-
+   S32  HitBoxNum;                              //DA
    /// Set the point of intersection according to t and the given ray.
    ///
    /// Several pieces of code will not use ray information but rather rely
