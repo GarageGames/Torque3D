@@ -180,6 +180,7 @@ class TSShapeInstance
       bool getFeatures( S32 objectDetail, const MatrixF &mat, const Point3F &n, ConvexFeature *feature, U32 &surfaceKey );
       void support( S32 od, const Point3F &v, F32 *currMaxDP, Point3F *currSupport );
       bool castRay( S32 objectDetail, const Point3F &start, const Point3F &end, RayInfo *info, TSMaterialList *materials );
+	  bool castRayEA(S32 objectDetail, const Point3F & start, const Point3F & end, RayInfo *, TSMaterialList* materials);
       bool castRayRendered( S32 objectDetail, const Point3F &start, const Point3F &end, RayInfo *info, TSMaterialList *materials );
 
       bool buildPolyListOpcode( S32 objectDetail, AbstractPolyList *polyList, const Box3F &box, TSMaterialList* materials );
@@ -575,6 +576,7 @@ protected:
    bool buildPolyList(AbstractPolyList *, S32 dl);
    bool getFeatures(const MatrixF& mat, const Point3F& n, ConvexFeature*, S32 dl);
    bool castRay(const Point3F & start, const Point3F & end, RayInfo *,S32 dl);
+   bool castRayEA(const Point3F & start, const Point3F & end, RayInfo *,S32 dl,S32 HBIndex);
    bool castRayRendered(const Point3F & start, const Point3F & end, RayInfo *,S32 dl);
    bool quickLOS(const Point3F & start, const Point3F & end, S32 dl) { return castRay(start,end,NULL,dl); }
    Point3F support(const Point3F & v, S32 dl);

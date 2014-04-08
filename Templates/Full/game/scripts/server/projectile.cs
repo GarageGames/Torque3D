@@ -24,9 +24,9 @@
 // override these support functions with an equivalent namespace method if your
 // weapon needs a unique solution for applying damage.
 
-function ProjectileData::onCollision(%data, %proj, %col, %fade, %pos, %normal)
+function ProjectileData::onCollision(%this,%obj,%col,%fade,%pos,%normal,%hitbox)
 {
-   //echo("ProjectileData::onCollision("@%data.getName()@", "@%proj@", "@%col.getClassName()@", "@%fade@", "@%pos@", "@%normal@")");
+   //echo("ProjectileData::onCollision("@%data.getName()@", "@%proj@", "@%col.getClassName()@", "@%fade@", "@%pos@", "@%normal@", "@%hitbox@")");
 
    // Apply damage to the object all shape base objects
    if (%data.directDamage > 0)

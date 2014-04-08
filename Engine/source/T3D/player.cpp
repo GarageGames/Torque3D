@@ -5853,6 +5853,47 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    info->object = this;
    info->point.interpolate(start,end,fst);
    info->material = 0;
+   info->t = fst;
+   info->object = this;
+   info->point.interpolate(start,end,fst);
+   info->material = 0;
+   
+   if (!mDataBlock->mUseHitboxes) return true;
+   //if we are here means that the ray has hit the bounding box, now check if an hit box was hit
+   //if it hit a collision box the HitBoxNum
+   //in the info struct is filled with the number of the box otherwise it remains -1
+   if (mShapeInstance)
+   {
+	   RayInfo shortest;
+	   shortest.t = 1e8;
+	   if (isServerObject()) 
+	   {
+		   mShapeInstance->animate(0);	//Animate the model on the server
+	   }
+	   
+	   for (U32 i = 0; i < ShapeBaseData::Max_Hitboxes; i++) 
+	   {
+		   if (mDataBlock->HBIndex[i] != -1) 
+		   {
+			   if (mShapeInstance->castRayEA(start, end, info,0,mDataBlock->HBIndex[i]))
+			   {
+				   info->object = this;
+				   if (info->t < shortest.t) 
+				   {
+					   shortest = *info;
+					   shortest.HitBoxNum = i+1;		//  +1 because the meshes HB## begin from 1
+				   }
+			   }
+		   }
+	   }
+	   if (info->object == this) 
+	   {
+		   // Copy out the shortest time...
+		   *info = shortest;
+	   }
+	   if (info->HitBoxNum == -1) return false;
+	   info->point.interpolate(start,end,info->t);
+   }
    return true;
 }
 
