@@ -26,11 +26,6 @@ body {
   text-align: right;
 }
 
-td.wide {
-  min-width: 10em;
-  font-weight: bold;
-}
-
 .container {
   max-width: 760px!important;
 }
@@ -169,10 +164,19 @@ img.history {
   margin: 1em;
 }
 
-table.history tr td:nth-child(1) {
+table.history tr td:first-child {
   font-weight: bold;
   width: 4em;
   display: inline-block;
+}
+
+table.download tr td:first-child {
+  min-width: 10em;
+  font-weight: bold;
+}
+
+table.versioning tr td:first-child {
+  min-width: 8em;
 }
 
 /*-----------------------------------------------------------------------------
