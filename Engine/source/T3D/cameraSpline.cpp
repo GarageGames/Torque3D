@@ -214,7 +214,7 @@ void CameraSpline::renderTimeMap()
 
    // Render the buffer
    GFX->pushWorldMatrix();
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    GFX->setVertexBuffer(vb);
    GFX->drawPrimitive(GFXLineStrip,0,index);
    GFX->popWorldMatrix();

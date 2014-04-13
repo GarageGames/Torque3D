@@ -688,7 +688,7 @@ bool ProcessedShaderMaterial::setupPass( SceneRenderState *state, const SceneDat
    }
    else
    {
-      GFX->disableShaders();
+      GFX->setupGenericShaders();
       GFX->setShaderConstBuffer(NULL);
    } 
 

@@ -1668,7 +1668,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
    }
    else
    {
-      GFX->disableShaders();
+      GFX->setupGenericShaders(GFXDevice::GSTexture);
 
       // We don't support distance fade or lighting without shaders.
       GFX->setStateBlock(mDistantSB);
@@ -1801,7 +1801,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       GFX->setShaderConstBuffer(mSplashShaderConsts);
    }
    else
-      GFX->disableShaders();
+      GFX->setupGenericShaders(GFXDevice::GSTexture);
 
    while (curr)
    {
