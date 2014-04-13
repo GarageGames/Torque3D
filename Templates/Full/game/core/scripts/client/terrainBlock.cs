@@ -29,5 +29,8 @@ singleton ShaderData( TerrainBlendShader )
    OGLVertexShaderFile = "shaders/common/terrain/gl/blendV.glsl";
    OGLPixelShaderFile = "shaders/common/terrain/gl/blendP.glsl";
    
+   samplerNames[0] = "layerTex";
+   samplerNames[1] = "textureMap";
+   
    pixVersion = 2.0;
 };

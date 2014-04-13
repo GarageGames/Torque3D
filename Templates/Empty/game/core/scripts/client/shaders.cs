@@ -33,6 +33,10 @@ singleton ShaderData( ParticlesShaderData )
    OGLVertexShaderFile     = "shaders/common/gl/particlesV.glsl";
    OGLPixelShaderFile      = "shaders/common/gl/particlesP.glsl";
    
+   samplerNames[0] = "$diffuseMap";
+   samplerNames[1] = "$prepassTex";
+   samplerNames[2] = "$paraboloidLightMap";
+   
    pixVersion = 2.0;
 };
 
@@ -43,6 +47,9 @@ singleton ShaderData( OffscreenParticleCompositeShaderData )
    
    OGLVertexShaderFile     = "shaders/common/gl/particleCompositeV.glsl";
    OGLPixelShaderFile      = "shaders/common/gl/particleCompositeP.glsl";
+   
+   samplerNames[0] = "$colorSource";
+   samplerNames[1] = "$edgeSource";
    
    pixVersion = 2.0;
 };
@@ -55,8 +62,8 @@ new ShaderData( ReflectBump )
    DXVertexShaderFile 	= "shaders/common/planarReflectBumpV.hlsl";
    DXPixelShaderFile 	= "shaders/common/planarReflectBumpP.hlsl";
    
-   OGLVertexShaderFile 	= "shaders/common/gl/planarReflectBumpV.glsl";
-   OGLPixelShaderFile 	= "shaders/common/gl/planarReflectBumpP.glsl";
+   OGLVertexShaderFile  = "shaders/common/gl/planarReflectBumpV.glsl";
+   OGLPixelShaderFile   = "shaders/common/gl/planarReflectBumpP.glsl";
               
    samplerNames[0] = "$diffuseMap";
    samplerNames[1] = "$refractMap";
@@ -70,8 +77,8 @@ new ShaderData( Reflect )
    DXVertexShaderFile 	= "shaders/common/planarReflectV.hlsl";
    DXPixelShaderFile 	= "shaders/common/planarReflectP.hlsl";
    
-   OGLVertexShaderFile 	= "shaders/common/gl/planarReflectV.glsl";
-   OGLPixelShaderFile 	= "shaders/common/gl/planarReflectP.glsl";
+   OGLVertexShaderFile  = "shaders/common/gl/planarReflectV.glsl";
+   OGLPixelShaderFile   = "shaders/common/gl/planarReflectP.glsl";
    
    samplerNames[0] = "$diffuseMap";
    samplerNames[1] = "$refractMap";
