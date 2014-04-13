@@ -194,7 +194,7 @@ ShapeBaseData::ShapeBaseData()
 {      
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
 
-   for (int i=0; i< Max_Hitboxes; i++) HBIndex[i] = -1;
+   for (int i=0; i< MaxHitboxes; i++) HBIndex[i] = -1;
 }
 
 struct ShapeBaseDataProto
@@ -386,7 +386,7 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
 	  
 	  //find the HitBox mesh
 	  //The hit box mesh is a convex mesh named Hitbox$DDD where DDD is the detail level, the same used for the model and $ is a number from 1 to 20
-	  for (i=0; i< Max_Hitboxes; i++)
+	  for (i=0; i< MaxHitboxes; i++)
 	  {
 		  char buff[16];
 		  dSprintf(buff,sizeof(buff),"Hitbox%d",i+1);

@@ -251,11 +251,8 @@ bool TSShapeInstance::castRay(const Point3F & a, const Point3F & b, RayInfo * ra
 
 bool TSShapeInstance::castRayEA(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl, S32 HBIndex)
 {
-   // if dl==-1, nothing to do
-   if (dl == -1)
-      return false;
-
-   if (HBIndex == -1)				//No hit box to test
+   // if dl==-1, or there is no hitbox list, nothing to do
+   if ((dl == -1)||(HBIndex == -1))
       return false;
 
    AssertFatal(dl >= 0 && dl<mShape->details.size(), "TSShapeInstance::castRay");
@@ -576,7 +573,7 @@ bool TSShapeInstance::MeshObjectInstance::castRayEA(S32 objectDetail, const Poin
 {
    TSMesh * mesh = getMesh(objectDetail);
 
-   if (mesh)    //You have to remove the && visible>0.01f because the hitBoxes are hidden
+   if (mesh)
       return mesh->castRay(frame, start, end, rayInfo, materials);
    return false;
 }

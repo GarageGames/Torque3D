@@ -5867,7 +5867,7 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
          mShapeInstance->animate(0);	//Animate the model on the server
       }
 
-      for (U32 i = 0; i < ShapeBaseData::Max_Hitboxes; i++)
+      for (U32 i = 0; i < ShapeBaseData::MaxHitboxes; i++)
       {
          if (mDataBlock->HBIndex[i] != -1)
          {

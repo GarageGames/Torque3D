@@ -123,7 +123,7 @@ IMPLEMENT_CALLBACK(ProjectileData, onCollision, void, (Projectile* proj, SceneOb
                   "@param fade The current fadeValue of the projectile, affects its visibility.\n"
                   "@param pos The position of the collision.\n"
                   "@param normal The normal of the collision.\n"
-                  "@param the struck hitbox suffix.\n"
+                  "@param hitBoxNum the struck hitbox suffix.\n"
                   "@see Projectile\n"
    );
 

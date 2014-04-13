@@ -516,7 +516,7 @@ public:
    enum Constants {
       MaxCollisionShapes = 8,
       AIRepairNode		= 31,
-      Max_Hitboxes      = 20    // Max number of hitboxes allowed per player
+      MaxHitboxes      = 20    // Max number of hitboxes allowed per player
    };
 
    // TODO: These are only really used in Basic Lighting
@@ -527,7 +527,7 @@ public:
    F32 shadowProjectionDistance;
    F32 shadowSphereAdjust;
 
-   S32 HBIndex[Max_Hitboxes];
+   S32 HBIndex[MaxHitboxes];
    StringTableEntry  shapeName;
    StringTableEntry  cloakTexName;
 
