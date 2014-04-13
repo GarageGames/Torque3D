@@ -382,15 +382,16 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             if (!found)
                LOSDetails.push_back(i);
          }
-         //find the HitBox mesh
-         //The hit box mesh is a convex mesh named Hitbox$DDD where DDD is the detail level, the same used for the model and $ is a number from 1 to 20
-         for (i=0; i< Max_Hitboxes; i++)
-         {
-            char buff[8];
-            dSprintf(buff,sizeof(buff),"Hitbox%d",i+1);
-            HBIndex[i] = mShape->findObject(buff);
-         }
       }
+	  
+	  //find the HitBox mesh
+	  //The hit box mesh is a convex mesh named Hitbox$DDD where DDD is the detail level, the same used for the model and $ is a number from 1 to 20
+	  for (i=0; i< Max_Hitboxes; i++)
+	  {
+		  char buff[16];
+		  dSprintf(buff,sizeof(buff),"Hitbox%d",i+1);
+		  HBIndex[i] = mShape->findObject(buff);
+	  }
 
       debrisDetail = mShape->findDetail("Debris-17");
       eyeNode = mShape->findNode("eye");
