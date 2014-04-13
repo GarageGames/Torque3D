@@ -23,10 +23,13 @@
 //-----------------------------------------------------------------------------
 // Data
 //-----------------------------------------------------------------------------
+in vec4 vPosition;
+in vec2 vTexCoord0;
+
 uniform mat4 modelview;
 
-varying vec2 TEX0;
-varying vec4 TEX1;
+out vec2 TEX0;
+out vec4 TEX1;
 
 //-----------------------------------------------------------------------------
 // Main                                                                        
@@ -38,9 +41,9 @@ void main()
                            0.0, 0.0, 1.0, 0.0,
                            0.5, 0.5, 0.0, 1.0);
                           
-   gl_Position = modelview * gl_Vertex;
+   gl_Position = modelview * vPosition;
    
-   TEX0 = gl_MultiTexCoord0.st;
+   TEX0 = vTexCoord0;
    
    TEX1 = texGenTest * gl_Position;
    TEX1.y = -TEX1.y;

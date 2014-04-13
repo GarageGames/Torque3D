@@ -46,7 +46,19 @@ uniform vec3 gc_gustInfo;
 uniform vec2 gc_turbInfo;
 
 
-//static float sMovableCorner[4] = { 0.0, 0.0, 1.0, 1.0 };
+const float sCornerRight[4] = float[]( -0.5, 0.5, 0.5, -0.5 );
+
+const float sCornerUp[4] = float[]( 0, 0, 1, 1 );
+
+const float sMovableCorner[4] = float[]( 0, 0, 1, 1 );
+
+const vec2 sUVCornerExtent[4] = vec2[]
+(
+   vec2( 0, 1 ),
+   vec2( 1, 1 ), 
+   vec2( 1, 0 ), 
+   vec2( 0, 0 )
+);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,34 +118,13 @@ vec2 windEffect(   float bbPhase,
    
 void foliageProcessVert( inout vec3 position, 
                          inout vec4 diffuse, 
-                         in vec4 texCoord, 
-                         out vec2 outTexCoord, 
+                         inout vec4 texCoord, 
                          inout vec3 normal, 
                          inout vec3 T,
                          in vec3 eyePos )
 {  
-
-   float sCornerRight[4];
-   sCornerRight[0] = -0.5;
-   sCornerRight[1] = 0.5;
-   sCornerRight[2] = 0.5;
-   sCornerRight[3] = -0.5;
-
-   float sCornerUp[4];
-   sCornerUp[0] = 0.0;
-   sCornerUp[1] = 0.0;
-   sCornerUp[2] = 1.0;
-   sCornerUp[3] = 1.0;
-
-   vec2 sUVCornerExtent[4];
-   sUVCornerExtent[0] = vec2( 0.0, 1.0 );
-   sUVCornerExtent[1] = vec2( 1.0, 1.0 ); 
-   sUVCornerExtent[2] = vec2( 1.0, 0.0 ); 
-   sUVCornerExtent[3] = vec2( 0.0, 0.0 );
-
-
    // Assign the normal and tagent values.
-   //normal = cross( gc_camUp, gc_camRight );
+   //normal = vec3( 0, 0, 1 );//cross( gc_camUp, gc_camRight );
    T = gc_camRight;
    
    // Pull out local vars we need for work.
@@ -172,8 +163,8 @@ void foliageProcessVert( inout vec3 position,
 
    // Grab the uv set and setup the texture coord.
    vec4 uvSet = gc_typeRects[type]; 
-   outTexCoord.x = uvSet.x + ( uvSet.z * sUVCornerExtent[corner].x );
-   outTexCoord.y = uvSet.y + ( uvSet.w * sUVCornerExtent[corner].y );
+   texCoord.x = uvSet.x + ( uvSet.z * sUVCornerExtent[corner].x );
+   texCoord.y = uvSet.y + ( uvSet.w * sUVCornerExtent[corner].y );
 
    // Animate the normal to get lighting changes
    // across the the wind swept foliage.
@@ -183,7 +174,6 @@ void foliageProcessVert( inout vec3 position,
    //
    normal.xy += wind.xy * ( 10.0 * texCoord.w );
    normal = normalize( normal );
-
 
    // Get the alpha fade value.
    

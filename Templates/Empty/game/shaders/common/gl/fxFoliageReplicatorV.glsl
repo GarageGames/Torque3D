@@ -23,13 +23,20 @@
 //-----------------------------------------------------------------------------
 // Data
 //-----------------------------------------------------------------------------
+in vec4 vPosition;
+in vec3 vNormal;
+in vec4 vColor;
+in vec2 vTexCoord0;
+in vec2 vTexCoord1;
+in vec2 vTexCoord2;
+
 uniform mat4 projection, world;
 uniform vec3 CameraPos;
 uniform float GlobalSwayPhase, SwayMagnitudeSide, SwayMagnitudeFront,
               GlobalLightPhase, LuminanceMagnitude, LuminanceMidpoint, DistanceRange;
               
-varying vec4 color, groundAlphaCoeff;
-varying vec2 outTexCoord, alphaLookup;
+out vec4 color, groundAlphaCoeff;
+out vec2 outTexCoord, alphaLookup;
 
 //-----------------------------------------------------------------------------
 // Main                                                                        
@@ -42,9 +49,9 @@ void main()
 	trans[1][1] = 1.0;
 	trans[2][2] = 1.0;
 	trans[3][3] = 1.0;
-	trans[3][0] = gl_Vertex.x;
-	trans[3][1] = gl_Vertex.y;
-	trans[3][2] = gl_Vertex.z;
+	trans[3][0] = vPosition.x;
+	trans[3][1] = vPosition.y;
+	trans[3][2] = vPosition.z;
 	
 	// Billboard transform * world matrix
 	mat4 o = world;
@@ -64,28 +71,29 @@ void main()
 	// Handle sway. Sway is stored in a texture coord. The x coordinate is the sway phase multiplier, 
 	// the y coordinate determines if this vertex actually sways or not.
 	float xSway, ySway;
-	float wavePhase = GlobalSwayPhase * gl_MultiTexCoord1.x;
+	float wavePhase = GlobalSwayPhase * vTexCoord1.x;
 	ySway = sin(wavePhase);
 	xSway = cos(wavePhase);
-	xSway = xSway * gl_MultiTexCoord1.y * SwayMagnitudeSide;
-	ySway = ySway * gl_MultiTexCoord1.y * SwayMagnitudeFront;
+	xSway = xSway * vTexCoord1.y * SwayMagnitudeSide;
+	ySway = ySway * vTexCoord1.y * SwayMagnitudeFront;
 	vec4 p;
-	p = o * vec4(gl_Normal.x + xSway, ySway, gl_Normal.z, 1.0);
+	p = o * vec4(vNormal.x + xSway, ySway, vNormal.z, 1.0);
 		
 	// Project the point	
 	gl_Position = projection * p;
 	
 	// Lighting 
-	float Luminance = LuminanceMidpoint + LuminanceMagnitude * cos(GlobalLightPhase + gl_Normal.y);
+	float Luminance = LuminanceMidpoint + LuminanceMagnitude * cos(GlobalLightPhase + vNormal.y);
 
 	// Alpha
-	vec3 worldPos = vec3(gl_Vertex.x, gl_Vertex.y, gl_Vertex.z);
+	vec3 worldPos = vec3(vPosition.x, vPosition.y, vPosition.z);
 	float alpha = abs(distance(worldPos, CameraPos)) / DistanceRange;			
 	alpha = clamp(alpha, 0.0, 1.0); //pass it through	
 
 	alphaLookup = vec2(alpha, 0.0);
-	bool alphaCoeff = bool(gl_Normal.z);
+	bool alphaCoeff = bool(vNormal.z);
    groundAlphaCoeff = vec4(float(alphaCoeff));
-	outTexCoord = gl_MultiTexCoord0.st;	
+	outTexCoord = vTexCoord0.st;	
 	color = vec4(Luminance, Luminance, Luminance, 1.0);
+   gl_Position.y *= -1;
 }
