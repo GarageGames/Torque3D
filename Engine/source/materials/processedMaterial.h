@@ -68,6 +68,7 @@ public:
    } mTexSlot[Material::MAX_TEX_PER_PASS];
 
    U32 mTexType[Material::MAX_TEX_PER_PASS];
+   String mSamplerNames[Material::MAX_TEX_PER_PASS];
 
    /// The cubemap to use when the texture type is
    /// set to Material::Cube.
