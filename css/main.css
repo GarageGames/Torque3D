@@ -95,6 +95,13 @@ h4 a:hover {
   color: rgb(51, 51, 51);
 }
 
+a.media-subheading,
+a.media-subheading:hover {
+  color: #666;
+  font-style: italic;
+  font-size: 90%;
+}
+
 .dropdown-toggle i {
   margin-left: 0.3em;
 }
