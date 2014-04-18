@@ -178,11 +178,17 @@ a.media-subheading:hover {
   display: inline-block;
 }
 
-img.history,
 img.feature,
 img.made-with-torque {
   width: 128px;
   border-radius: 3px;
+}
+
+@media (max-width: 360px) {
+  img.feature,
+  img.made-with-torque {
+    width: 96px;
+  }
 }
 
 img.history {
