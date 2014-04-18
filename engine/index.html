@@ -276,15 +276,12 @@ root: ..
             games.
             </p>
             <p>
-            Time-invarying data is transferred via datablocks at client join time,
-            reducing the amount of data that needs to be networked during
-            gameplay.
-            </p>
-            <p>
             Torque uses a <em>server authoritative</em> networking model that
             helps you to reduce cheating and exploitation. At the same time,
             the game state is predicted and interpolated locally so each client
-            experiences a smooth view of the action.
+            experiences a smooth view of the action. Time-invarying data is
+            transferred via datablocks at client join time, reducing the amount
+            of data that needs to be networked during gameplay.
         </div>
     </div>
 
@@ -296,9 +293,16 @@ root: ..
             <h3 class="media-heading">Physics</h3>
             <p>
             Torque 3D provides a plugin system for physics. There is a simple
-            implementation built in which can be easily swapped out for PhysX or
-            Bullet libraries.
+            built-in implementation which can be easily swapped out for PhysX or
+            Bullet libraries. They enable features like:
             </p>
+            <ul>
+                <li>Cloth dynamics</li>
+                <li>Rigid body dynamics</li>
+                <li>Destructible objects</li>
+                <li>Destroyable joints</li>
+                <li>Fluid buoyancy</li>
+            </ul>
         </div>
     </div>
 
