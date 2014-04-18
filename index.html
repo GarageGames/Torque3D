@@ -8,7 +8,7 @@ root: .
     <div class="container">
         <div class="row">
             <div class="col-sm-4">
-                <img src="{{page.root}}/img/torque.png"></img>
+                <img id="torque-logo" src="{{page.root}}/img/torque.png"></img>
             </div>
             <div class="col-sm-8">
                 <h1 class="title">Torque 3D</h1>
@@ -18,10 +18,12 @@ root: .
     </div>
 </div>
 
+<div class="break row"></div>
+
 <div class="container">
     <div class="row">
         <div class="col-sm-4">
-            <h3>Proven</h3>
+            <h2>Proven</h2>
             <p>
             Torque has been around for a while, and it's been used for everything
             from interactive coral reefs to MMOs to driving simulators.
@@ -30,7 +32,7 @@ root: .
         </div>
 
         <div class="col-sm-4">
-            <h3>Gratis et libre</h3>
+            <h2>Gratis et libre</h2>
             <p>
             When you get Torque, you get everything. Under the permissive MIT
             open-source license, you can do what you want with the source code.
@@ -39,7 +41,7 @@ root: .
         </div>
 
         <div class="col-sm-4">
-            <h3>Always evolving</h3>
+            <h2>Always evolving</h2>
             <p>
             Torque is being constantly developed by an enthusiastic community.
             Its future is in <em>your</em> hands, not those of a company with a
@@ -48,8 +50,55 @@ root: .
             <a href="{{page.root}}/contribute">Get involved <i class="fa fa-angle-right"></i></a>
         </div>
     </div>
+</div>
 
-    {% if site.posts != empty %}
+<div class="break row"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+            <h2 class="status">Status</h2>
+            <table class="borderless history table">
+                <tr>
+                    <td>Current version</td>
+                    <td>Torque 3D 3.5.1 <br />
+                        Project Manager 2.1 <br />
+                </tr>
+
+                <tr>
+                    <td>Build</td>
+                    <td>
+                        <table>
+                            <tr><td>Nightly:</td><td>&nbsp;<img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td></tr>
+                            <tr><td>Release:</td><td>&nbsp;<img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td></tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-sm-6">
+            <h2>Issues</h2>
+            <ul>
+                <li><a href="https://github.com/GarageGames/Torque3D/issues/new">Report an issue</a></li>
+                <li><a href="https://github.com/GarageGames/Torque3D/issues?milestone=2">Issues for next milestone</a></li>
+                <li><a href="https://github.com/GarageGames/Torque3D/issues?labels=Final+review">Changes for final review</a></li>
+                <li><a href="http://garagegames.uservoice.com/forums/178972-torque-3d-mit">Feature requests</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if site.posts != empty %}
+<div class="break row"></div>
+
+<div class="container">
+    <div class="imgbanner row">
+        <div class="col-sm-12">
+            <img src="{{page.root}}/img/banner1.jpg"></img>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-12">
             <h2>Recent news</h2>
@@ -63,5 +112,37 @@ root: .
             <a class="pull-right" href="{{page.root}}/news">See all <i class="fa fa-angle-right"></i></a>
         </div>
     </div>
-    {% endif %}
 </div>
+{% endif %}
+
+<script type="text/javascript">
+(function() {
+  var images = {
+    1: 'Deadly Matter by Studio Dim Sum',
+    2: 'Airship Dragoon by YorkshireRifes',
+    3: 'Deadly Matter by Studio Dim Sum',
+    4: 'Life is Feudal',
+    5: 'Frozen Endzone by Mode 7',
+    6: 'The Reef by QUT',
+    7: 'By Felix Westin',
+    8: 'By Felix Westin',
+    9: 'BeamNG.drive by BeamNG',
+  };
+
+  function addImages() {
+    var ids = shuffle(Object.keys(images));
+    var breaks = $('div.break.row');
+    breaks.each(function(i) {
+      $(this).attr('title', images[ids[i]]);
+      $(this).css('background-image', 'url({{page.root}}/img/banner'+ids[i]+'.jpg)');
+    });
+  }
+
+  addImages();
+
+  function shuffle(o) {
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+  }
+})();
+</script>

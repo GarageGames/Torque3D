@@ -6,18 +6,18 @@ body {
  * Bootstrap overrides
  */
 
-.table.borderless tr td {
+.table.borderless > tbody > tr > td {
   padding-top: 1em;
 }
 
-.table.borderless tr,
-.table.borderless tr td {
+.table.borderless > tbody > tr,
+.table.borderless > tbody > tr > td {
   border: none;
   border-bottom: 1px solid #ddd;
 }
 
-.table.borderless tr:last-child,
-.table.borderless tr:last-child td {
+.table.borderless > tbody > tr:last-child,
+.table.borderless > tbody > tr:last-child > td {
   border: none;
 }
 
@@ -71,6 +71,16 @@ body {
  * Site
  */
 
+#torque-logo {
+  width: 140px;
+}
+
+@media (max-width: 768px) {
+  .jumbotron.banner .row {
+    text-align: center;
+  }
+}
+
 span.post-title {
   font-weight: bold;
 }
@@ -97,6 +107,14 @@ h4 a:hover {
 .site .banner {
   background-color: #a00;
   color: white;
+}
+
+.break.row {
+  display: block;
+  height: 114px;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 2em;
 }
 
 .site .banner .col-sm-4 {
@@ -164,18 +182,18 @@ img.history {
   margin: 1em;
 }
 
-table.history tr td:first-child {
+table.history > tbody > tr > td:first-child {
   font-weight: bold;
   width: 4em;
   display: inline-block;
 }
 
-table.download tr td:first-child {
+table.download > tbody > tr > td:first-child {
   min-width: 10em;
   font-weight: bold;
 }
 
-table.versioning tr td:first-child {
+table.versioning > tbody > tr > td:first-child {
   min-width: 8em;
 }
 
