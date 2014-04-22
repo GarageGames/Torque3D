@@ -118,7 +118,7 @@ a.media-subheading:hover {
   color: white;
 }
 
-.break.row {
+.break {
   display: block;
   height: 114px;
   background-repeat: no-repeat;

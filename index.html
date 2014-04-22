@@ -18,7 +18,7 @@ root: .
     </div>
 </div>
 
-<div class="break row"></div>
+<div class="break"></div>
 
 <div class="container">
     <div class="row">
@@ -52,7 +52,7 @@ root: .
     </div>
 </div>
 
-<div class="break row"></div>
+<div class="break"></div>
 
 <div class="container">
     <div class="row">
@@ -90,7 +90,7 @@ root: .
 </div>
 
 {% if site.posts != empty %}
-<div class="break row"></div>
+<div class="break"></div>
 
 <div class="container">
     <div class="imgbanner row">
@@ -136,7 +136,7 @@ root: .
 
   function addImages() {
     var ids = shuffle(Object.keys(images));
-    var breaks = $('div.break.row');
+    var breaks = $('div.break');
     breaks.each(function(i) {
       $(this).attr('title', images[ids[i]]);
       $(this).css('background-image', 'url({{page.root}}/img/banner'+ids[i]+'.jpg)');
