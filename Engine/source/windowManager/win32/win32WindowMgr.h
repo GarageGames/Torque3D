@@ -85,6 +85,8 @@ class Win32WindowManager : public PlatformWindowManager
    /// If a curtain window is present, then its HWND will be stored here.
    HWND mCurtainWindow;
 
+   SignalSlot<void()> mOnProcessSignalSlot;
+
 public:
    Win32WindowManager();
    ~Win32WindowManager();
