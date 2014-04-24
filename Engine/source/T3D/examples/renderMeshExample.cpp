@@ -107,6 +107,8 @@ bool RenderMeshExample::onAdd()
 
    // Add this object to the scene
    addToScene();
+   // Refresh the applied material
+   updateMaterial();
 
    return true;
 }
