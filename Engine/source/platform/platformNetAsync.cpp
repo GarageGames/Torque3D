@@ -25,7 +25,7 @@
 #include "platform/threads/threadPool.h"
 #include "console/console.h"
 
-#if defined(TORQUE_OS_WIN32)
+#if defined(TORQUE_OS_WIN)
 #  include <winsock.h>
 #elif defined(TORQUE_OS_XENON)
 #  include <Xtl.h>

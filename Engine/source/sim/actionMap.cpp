@@ -458,8 +458,12 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
    }
 
    // Now we need to map the key string to the proper KEY code from event.h
-   //
-   AssertFatal(dStrlen(pObjectString) != 0, "Error, no key was specified!");
+   AssertFatal(
+       dStrlen( pObjectString ) > 0,
+       "Error, no key was specified!\n"
+       "Review file 'scripts/client/config.cs' and remove symbols"
+       " which is not latin. Or delete this file."
+   );
 
    if (dStrlen(pObjectString) == 1)
    {

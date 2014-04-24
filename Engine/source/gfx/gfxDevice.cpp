@@ -184,8 +184,8 @@ GFXDevice::GFXDevice()
    // Add a few system wide shader macros.
    GFXShader::addGlobalMacro( "TORQUE", "1" );
    GFXShader::addGlobalMacro( "TORQUE_VERSION", String::ToString(getVersionNumber()) );
-   #if defined TORQUE_OS_WIN32
-      GFXShader::addGlobalMacro( "TORQUE_OS_WIN32" );
+   #if defined TORQUE_OS_WIN
+      GFXShader::addGlobalMacro( "TORQUE_OS_WIN" );
    #elif defined TORQUE_OS_MAC
       GFXShader::addGlobalMacro( "TORQUE_OS_MAC" );
    #elif defined TORQUE_OS_LINUX

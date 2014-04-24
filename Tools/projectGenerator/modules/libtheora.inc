@@ -27,7 +27,7 @@ addLibSrcDir( 'libtheora/include/theora' );
 addLibSrcDir( 'libtheora/lib' );
 addLibSrcDir( 'libtheora/lib/dec' );
 
-switch( Generator::$platform )
+switch( T3D_Generator::$platform )
 {
    case "win32":
       addLibSrcDir( 'libtheora/lib/dec/x86_vc' );
@@ -41,7 +41,7 @@ switch( Generator::$platform )
 // As we don't use the encoder, disable this for now.
 addLibSrcDir( 'libtheora/lib/enc' );
 
-switch( Generator::$platform )
+switch( T3D_Generator::$platform )
 {
    case "win32":
       addLibSrcDir( 'libtheora/lib/enc/x86_32_vs' );

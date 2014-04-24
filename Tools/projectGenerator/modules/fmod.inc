@@ -25,7 +25,7 @@ beginModule( 'fmod' );
   $allgood = true;
 
 	// Additional includes
-	switch( Generator::$platform )
+	switch( T3D_Generator::$platform )
    {
       case "win32":
       case "mac":

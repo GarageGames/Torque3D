@@ -781,7 +781,7 @@ class SimObject: public ConsoleObject
       void setCanSaveDynamicFields( bool bCanSave ) { mCanSaveFieldDictionary	=	bCanSave; }
       
       /// Get whether fields created at runtime should be saved. Default is true.
-      bool getCanSaveDynamicFields( bool bCanSave ) { return mCanSaveFieldDictionary;}
+      bool getCanSaveDynamicFields( ) { return mCanSaveFieldDictionary;}
 
       /// Return the object that this object is copying fields from.
       SimObject* getCopySource() const { return mCopySource; }

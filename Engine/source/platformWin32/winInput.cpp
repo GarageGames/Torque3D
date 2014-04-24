@@ -33,6 +33,8 @@
 #include <stdarg.h>
 #endif
 
+#include <sstream>
+
 // Static class variables:
 InputManager*  Input::smManager;
 bool           Input::smActive;
@@ -78,6 +80,10 @@ void Input::init()
    Con::printf( "Input Init:" );
 
    destroy();
+
+#ifdef TORQUE_DEFAULT_KEYBOARD_LAYOUT
+   attemptSwitchToKeyboardLayout( TORQUE_DEFAULT_KEYBOARD_LAYOUT );
+#endif
 
 #ifdef LOG_INPUT
    struct tm* newTime;
@@ -485,6 +491,18 @@ void Input::process()
 InputManager* Input::getManager()
 {
    return( smManager );
+}
+
+//------------------------------------------------------------------------------
+void Input::attemptSwitchToKeyboardLayout( U32 layout )
+{
+   const LANGID lang = MAKELANGID( layout, SUBLANG_DEFAULT );
+   std::wstringstream ss;
+   ss << std::hex << lang;
+   const wchar_t* hexLang = ss.str().c_str();
+   ActivateKeyboardLayout( LoadKeyboardLayout(
+       hexLang,  KLF_ACTIVATE | KLF_REPLACELANG
+   ), KLF_REORDER );
 }
 
 #ifdef LOG_INPUT

@@ -121,7 +121,7 @@ void Platform::closeWindow()
 
 
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 // Hack so we can get the HWND of the global window more easily - replacement
 // for the HWND that was in the platstate.
 #include "windowManager/win32/win32Window.h"

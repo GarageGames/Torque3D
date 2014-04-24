@@ -25,7 +25,7 @@
 #include "gfx/primBuilder.h"
 #include "gfx/D3D9/gfxD3D9CardProfiler.h"
 #include "gfx/D3D9/gfxD3D9EnumTranslate.h"
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 #include "platformWin32/videoInfo/wmiVideoInfo.h"
 #endif
 

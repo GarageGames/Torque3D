@@ -616,6 +616,11 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
    F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
 
+   if ( pixelSize < smSmallestVisiblePixelSize ) {
+      mCurrentDetailLevel = -1;
+      return mCurrentDetailLevel;
+   }
+
    if (  pixelSize > smSmallestVisiblePixelSize && 
          pixelSize <= mShape->mSmallestVisibleSize )
       pixelSize = mShape->mSmallestVisibleSize + 0.01f;

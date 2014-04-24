@@ -28,7 +28,7 @@ beginModule( 'advancedLighting' );
 	addEngineSrcDir( 'lighting/advanced' );
 	addEngineSrcDir( 'lighting/shadowMap' );
 
-   switch( Generator::$platform )
+   switch( T3D_Generator::$platform )
    {
       case "win32":
          addEngineSrcDir( 'lighting/advanced/hlsl' );

@@ -53,7 +53,7 @@ EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
 #include <string.h>
 #include <sched.h>
 #define DWORD unsigned long
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
 #include <windows.h>
 #elif defined( TORQUE_OS_MAC )
 #  include <sys/types.h>
@@ -99,12 +99,11 @@ namespace CPUInfo {
       //
       static unsigned int CpuIDSupported(void)
       {
-         unsigned int MaxInputValue;
+         unsigned int maxInputValue = 0;
          // If CPUID instruction is supported
 #ifdef TORQUE_COMPILER_GCC
          try    
          {		
-            MaxInputValue = 0;
             // call cpuid with eax = 0
             asm
                (
@@ -112,7 +111,7 @@ namespace CPUInfo {
                "xorl %%eax,%%eax\n\t"
                "cpuid\n\t"
                "popl %%ebx\n\t"
-               : "=a" (MaxInputValue)
+               : "=a" (maxInputValue)
                : 
                : "%ecx", "%edx"
                );		
@@ -124,25 +123,23 @@ namespace CPUInfo {
 #elif defined( TORQUE_COMPILER_VISUALC )
          try
          {
-            MaxInputValue = 0;
             // call cpuid with eax = 0
             __asm
             {
                xor eax, eax
                   cpuid
-                  mov MaxInputValue, eax
+                  mov maxInputValue, eax
             }
          }
          catch (...)
          {
-            return(0);                   // cpuid instruction is unavailable
+            // cpuid instruction is unavailable
          }
 #else
 #  error Not implemented.
 #endif
 
-         return MaxInputValue;
-
+         return maxInputValue;
       }
 
 
@@ -476,7 +473,7 @@ next:
             if ( CPU_ISSET(i, &allowedCPUs) == 0 )
                return CONFIG_UserConfigIssue;
          }
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
          DWORD dwProcessAffinity, dwSystemAffinity;
          GetProcessAffinityMask(GetCurrentProcess(), 
             &dwProcessAffinity,
@@ -504,7 +501,7 @@ next:
             if ( sched_setaffinity (0, sizeof(currentCPU), &currentCPU) == 0 )
             {
                sleep(0);  // Ensure system to switch to the right CPU
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
          while (dwAffinityMask && dwAffinityMask <= dwSystemAffinity)
          {
             if (SetThreadAffinityMask(GetCurrentThread(), dwAffinityMask))
@@ -549,7 +546,7 @@ next:
 #ifdef TORQUE_OS_LINUX
          sched_setaffinity (0, sizeof(allowedCPUs), &allowedCPUs);
          sleep(0);
-#elif defined( TORQUE_OS_WIN32 )
+#elif defined( TORQUE_OS_WIN )
          SetThreadAffinityMask(GetCurrentThread(), dwProcessAffinity);
          Sleep(0);
 #else

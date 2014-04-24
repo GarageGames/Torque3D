@@ -381,7 +381,7 @@ CodeMapping gVirtualMap[] =
    { "lpov2",         SI_POV,    SI_LPOV2       },
    { "rpov2",         SI_POV,    SI_RPOV2       },
 
-#if defined( TORQUE_OS_WIN32 ) || defined( TORQUE_OS_XENON )
+#if defined( TORQUE_OS_WIN ) || defined( TORQUE_OS_XENON )
    //-------------------------------------- XINPUT EVENTS
    // Controller connect / disconnect:
    { "connect",       SI_BUTTON, XI_CONNECT     },
