@@ -127,6 +127,10 @@ a.media-subheading:hover {
   margin-top: 2em;
 }
 
+.break img {
+  border-radius: 3px;
+}
+
 .site .banner .col-sm-4 {
   text-align: center;
 }
