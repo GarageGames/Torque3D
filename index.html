@@ -115,8 +115,9 @@ root: .
 </div>
 {% endif %}
 
+<script type="text/javascript" src="{{page.root}}/js/jquery.cycle.all.js"></script>
 <script type="text/javascript">
-(function() {
+$(document).ready(function() {
   var images = {
     1:  'Deadly Matter by Studio Dim Sum',
     2:  'Airship Dragoon by YorkshireRifes',
@@ -134,20 +135,27 @@ root: .
     14: 'Villagers and Heroes by Mad Otter Games',
   };
 
-  function addImages() {
-    var ids = shuffle(Object.keys(images));
-    var breaks = $('div.break');
-    breaks.each(function(i) {
-      $(this).attr('title', images[ids[i]]);
-      $(this).css('background-image', 'url({{page.root}}/img/banner'+ids[i]+'.jpg)');
-    });
-  }
-
-  addImages();
-
   function shuffle(o) {
     for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
     return o;
   }
-})();
+
+  function createBreaks() {
+    var breaks = $('div.break');
+    var delay = 0;
+    breaks.each(function(i) {
+      // Shuffle the list of pictures that will appear in each break.
+      var ids = shuffle(Object.keys(images));
+      for(var i = 0; i < ids.length; i++) {
+        $(this).append($('<img>')
+          .attr('src', '{{page.root}}/img/banner'+ids[i]+'.jpg')
+          .attr('title', images[ids[i]]));
+      }
+      $(this).cycle({fx: 'fade', delay: delay});
+      delay += 5000 / breaks.length;
+    });
+  };
+
+  createBreaks();
+});
 </script>

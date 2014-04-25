@@ -119,10 +119,11 @@ a.media-subheading:hover {
 }
 
 .break {
-  display: block;
-  height: 114px;
-  background-repeat: no-repeat;
-  background-position: center;
+  height: 144px;
+  width: 760px;
+  left: 50%;
+  margin-left: -380px;
+  text-align: center;
   margin-top: 2em;
 }
 
