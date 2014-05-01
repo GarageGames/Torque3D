@@ -222,7 +222,7 @@ extern "C" {
    {
       // maxArgs improper on a number of console function/methods
       if (argc < entry->mMinArgs)// || argc > entry->mMaxArgs)
-         return "";
+         return false;
 
       SimObject* o = NULL;
 
@@ -230,7 +230,7 @@ extern "C" {
       {
          o = Sim::findObject(dAtoi(argv[1]));
          if (!o)
-            return "";
+            return false;
       }
 
       return entry->cb.mBoolCallbackFunc(o, argc, argv);      

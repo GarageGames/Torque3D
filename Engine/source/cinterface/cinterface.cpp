@@ -303,7 +303,7 @@ extern "C" {
 		Namespace::Entry* entry = GetEntry(nameSpace, name);
 
 		if (!entry)
-			return "";
+			return false;
 
 		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);      
 	}
