@@ -48,6 +48,8 @@ class ShaderFeatureConstHandles
 {
 public:
 
+   virtual ~ShaderFeatureConstHandles() { }
+
    virtual void init( GFXShader *shader ) = 0;
 
    virtual void setConsts( SceneRenderState *state, 
