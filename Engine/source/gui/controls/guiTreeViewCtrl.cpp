@@ -3583,7 +3583,7 @@ void GuiTreeViewCtrl::onMiddleMouseDown(const GuiEvent & event)
       for (S32 j = 0; j < mSelected.size(); j++) {
          Con::printf("%d", mSelected[j]);
       }
-      S32 mCurrentDragCell = mMouseOverCell.y;
+      mCurrentDragCell = mMouseOverCell.y;
       S32 midpCell = (mCurrentDragCell) * mItemHeight + (mItemHeight/2);
       S32 currentY = pt.y;
       S32 yDiff = currentY-midpCell;
@@ -3648,7 +3648,7 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
                break;
             }
          }
-         S32 mCurrentDragCell = mMouseOverCell.y;
+         mCurrentDragCell = mMouseOverCell.y;
          if (mVisibleItems[firstSelectedIndex] != firstItem )
          {
             /*
