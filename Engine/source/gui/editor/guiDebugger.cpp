@@ -79,7 +79,7 @@ ConsoleMethod(DbgFileView, getCurrentLine, const char *, 2, 2, "()"
 	S32 lineNum;
    const char *file = object->getCurrentLine(lineNum);
    char* ret = Con::getReturnBuffer(256);
-	dSprintf(ret, sizeof(ret), "%s\t%d", file, lineNum);
+	dSprintf(ret, 256, "%s\t%d", file, lineNum);
 	return ret;
 }
 
