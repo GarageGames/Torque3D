@@ -20,7 +20,7 @@
       HorizSizing = "right";  
       VertSizing = "bottom";  
       Position = "285 83";  
-      Extent = "175 209";  
+      Extent = "175 233";  
       MinExtent = "8 2";  
       canSave = "1";  
       Visible = "1";  
@@ -52,7 +52,7 @@
          Profile = "ToolsGuiButtonProfile";  
          HorizSizing = "right";  
          VertSizing = "bottom";  
-         Position = "19 164";  
+         Position = "19 193";  
          Extent = "140 30";  
          MinExtent = "8 2";  
          canSave = "1";  
@@ -305,6 +305,83 @@
          sinkAllKeyEvents = "0";  
          passwordMask = "*";  
       };  
+
+
+      new GuiTextCtrl() {
+         text = "COVERAGE";
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "10 165";
+         extent = "55 13";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiTextProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextEditCtrl() {
+         historySize = "0";
+         tabComplete = "0";
+         sinkAllKeyEvents = "0";
+         password = "0";
+         passwordMask = "*";
+         text = "1";
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "97 162";
+         extent = "66 18";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiTextEditProfile";
+         visible = "1";
+         active = "1";
+         variable = "$TPPCoverage";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         text = "%";
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "77 164";
+         extent = "11 14";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiTextProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
    };  
 };  
 //--- OBJECT WRITE END ---  
@@ -313,6 +390,7 @@ $TPPHeightMin = -10000;
 $TPPHeightMax = 10000;  
 $TPPSlopeMin = 0;  
 $TPPSlopeMax = 90;  
+$TPPCoverage = 100;  
   
 function autoLayers() 
 {  
@@ -322,5 +400,6 @@ function autoLayers()
 function generateProceduralTerrainMask() 
 {  
    Canvas.popDialog(ProceduralTerrainPainterGui);  
-   ETerrainEditor.autoMaterialLayer($TPPHeightMin, $TPPHeightMax, $TPPSlopeMin, $TPPSlopeMax);  
+   ETerrainEditor.autoMaterialLayer($TPPHeightMin, $TPPHeightMax, $TPPSlopeMin, $TPPSlopeMax, $TPPCoverage);  
 }  
+
