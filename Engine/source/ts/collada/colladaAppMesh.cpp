@@ -623,7 +623,7 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
       delete meshPrims[iPrim];
 }
 
-void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const MatrixF& objectOffset,
+void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const MatrixF& objOffset,
                                    Vector<Point3F>& v_points, 
                                    Vector<Point3F>& v_norms, 
                                    Vector<ColorI>& v_colors,
@@ -693,7 +693,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          if (appNode->invertMeshes)
             points_array[iVert].z = -points_array[iVert].z;
 
-         objectOffset.mulP(points_array[iVert]);
+         objOffset.mulP(points_array[iVert]);
       }
 
       if (appendValues || ((tuple.uv >= 0) && (tuple.uv < streams.uvs.size()))) {
@@ -755,7 +755,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
       delete meshPrims[iPrim];
 }
 
-void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const MatrixF& objectOffset,
+void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const MatrixF& objOffset,
                                         Vector<Point3F>& v_points, 
                                         Vector<Point3F>& v_norms, 
                                         Vector<ColorI>& v_colors, 
@@ -807,7 +807,7 @@ void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const M
       return;
 
    getPrimitives(baseGeometry);
-   getVertexData(baseGeometry, time, objectOffset, v_points, v_norms, v_colors, v_uvs, v_uv2s, true);
+   getVertexData(baseGeometry, time, objOffset, v_points, v_norms, v_colors, v_uvs, v_uv2s, true);
 
    // Get pointers to the arrays of base geometry data
    Point3F* points_array = &v_points[v_points.size() - vertTuples.size()];
@@ -863,7 +863,7 @@ void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const M
       if (uv2s_array)
          targetUv2s.set(uv2s_array, vertTuples.size());
 
-      getVertexData(targetGeoms[iTarget], time, objectOffset, targetPoints, targetNorms, targetColors, targetUvs, targetUv2s, false);
+      getVertexData(targetGeoms[iTarget], time, objOffset, targetPoints, targetNorms, targetColors, targetUvs, targetUv2s, false);
 
       // Combine with base geometry
       for (int iVert = 0; iVert < vertTuples.size(); iVert++) {
@@ -883,7 +883,7 @@ void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const M
    }
 }
 
-void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objectOffset)
+void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objOffset)
 {
    // Find the geometry element for this mesh. Could be one of 3 things:
    // 1) a simple static mesh (Collada <geometry> element)
@@ -923,10 +923,10 @@ void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objectOffset)
    // Now get the vertex data at the specified time
    if (geometry->getElementType() == COLLADA_TYPE::GEOMETRY) {
       getPrimitives(daeSafeCast<domGeometry>(geometry));
-      getVertexData(daeSafeCast<domGeometry>(geometry), t, objectOffset, points, normals, colors, uvs, uv2s, true);
+      getVertexData(daeSafeCast<domGeometry>(geometry), t, objOffset, points, normals, colors, uvs, uv2s, true);
    }
    else if (geometry->getElementType() == COLLADA_TYPE::MORPH) {
-      getMorphVertexData(daeSafeCast<domMorph>(geometry), t, objectOffset, points, normals, colors, uvs, uv2s);
+      getMorphVertexData(daeSafeCast<domMorph>(geometry), t, objOffset, points, normals, colors, uvs, uv2s);
    }
    else {
       daeErrorHandler::get()->handleWarning(avar("Unsupported geometry type "
