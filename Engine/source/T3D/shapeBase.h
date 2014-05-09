@@ -689,7 +689,6 @@ public:
       MaxMountedImages = 4,            ///< Should be a power of 2
       MaxImageEmitters = 3,
       NumImageBits = 3,
-      ShieldNormalBits = 8,
       CollisionTimeoutValue = 250      ///< Timeout in ms.
    };
 
@@ -741,17 +740,6 @@ protected:
    };
    Thread mScriptThread[MaxScriptThreads];
 
-   /// @}
-
-   /// @name Invincibility
-   /// @{
-   F32 mInvincibleCount;
-   F32 mInvincibleTime;
-   F32 mInvincibleSpeed;
-   F32 mInvincibleDelta;
-   F32 mInvincibleEffect;
-   F32 mInvincibleFade;
-   bool mInvincibleOn;
    /// @}
 
    /// @name Motion
@@ -917,9 +905,6 @@ protected:
    F32 mWhiteOut;
 
    bool mFlipFadeVal;
-
-   /// Last shield direction (cur. unused)
-   Point3F mShieldNormal;
 
    /// Camera shake caused by weapon fire.
    CameraShake *mWeaponCamShake;
@@ -1156,11 +1141,9 @@ public:
       DamageMask      = Parent::NextFreeMask << 1,
       NoWarpMask      = Parent::NextFreeMask << 2,
       CloakMask       = Parent::NextFreeMask << 3,
-      ShieldMask      = Parent::NextFreeMask << 4,
-      InvincibleMask  = Parent::NextFreeMask << 5,
-      SkinMask        = Parent::NextFreeMask << 6,
-      MeshHiddenMask  = Parent::NextFreeMask << 7,
-      SoundMaskN      = Parent::NextFreeMask << 8,       ///< Extends + MaxSoundThreads bits
+      SkinMask        = Parent::NextFreeMask << 4,
+      MeshHiddenMask  = Parent::NextFreeMask << 5,
+      SoundMaskN      = Parent::NextFreeMask << 6,       ///< Extends + MaxSoundThreads bits
       ThreadMaskN     = SoundMaskN  << MaxSoundThreads,  ///< Extends + MaxScriptThreads bits
       ImageMaskN      = ThreadMaskN << MaxScriptThreads, ///< Extends + MaxMountedImage bits
       NextFreeMask    = ImageMaskN  << MaxMountedImages
@@ -1700,26 +1683,6 @@ public:
 
    /// Set the level of flash blindness
    virtual void setWhiteOut(const F32);
-   /// @}
-
-   /// @name Invincibility effect
-   /// This is the screen effect when invincible in the HUD
-   /// @see GameRenderFilters()
-   /// @{
-
-   /// Returns the level of invincibility effect
-   virtual F32 getInvincibleEffect() const;
-
-   /// Initializes invincibility effect and interpolation parameters
-   ///
-   /// @param   time   Time it takes to become invincible
-   /// @param   speed  Speed at which invincibility effects progress
-   virtual void setupInvincibleEffect(F32 time, F32 speed);
-
-   /// Advance invincibility effect animation
-   /// @param   dt   Time since last call of this function
-   virtual void updateInvincibleEffect(F32 dt);
-
    /// @}
 
    /// @name Movement & velocity
