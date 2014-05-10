@@ -929,7 +929,7 @@ bool Explosion::onAdd()
 
 void Explosion::onRemove()
 {
-   for( int i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
+   for( S32 i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
    {
       if( mEmitterList[i] )
       {
@@ -1114,7 +1114,7 @@ void Explosion::updateEmitters( F32 dt )
 {
    Point3F pos = getPosition();
 
-   for( int i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
+   for( S32 i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
    {
       if( mEmitterList[i] )
       {
@@ -1134,7 +1134,7 @@ void Explosion::launchDebris( Point3F &axis )
       return;
 
    bool hasDebris = false;
-   for( int j=0; j<ExplosionData::EC_NUM_DEBRIS_TYPES; j++ )
+   for( S32 j=0; j<ExplosionData::EC_NUM_DEBRIS_TYPES; j++ )
    {
       if( mDataBlock->debrisList[j] )
       {
@@ -1160,7 +1160,7 @@ void Explosion::launchDebris( Point3F &axis )
 
    U32 numDebris = mDataBlock->debrisNum + sgRandom.randI( -mDataBlock->debrisNumVariance, mDataBlock->debrisNumVariance );
 
-   for( int i=0; i<numDebris; i++ )
+   for( S32 i=0; i<numDebris; i++ )
    {
 
       Point3F launchDir = MathUtils::randomDir( axis, mDataBlock->debrisThetaMin, mDataBlock->debrisThetaMax,
@@ -1249,7 +1249,7 @@ bool Explosion::explode()
          Point3F::Zero, U32(mDataBlock->particleDensity * mFade));
    }
 
-   for( int i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
+   for( S32 i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
    {
       if( mDataBlock->emitterList[i] != NULL )
       {

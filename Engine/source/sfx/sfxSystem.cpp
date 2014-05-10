@@ -854,7 +854,7 @@ void SFXSystem::_updateSources()
       if(   source->getLastStatus() == SFXStatusStopped &&
             source->getSavedStatus() != SFXStatusPlaying )
       {
-         int index = iter - mPlayOnceSources.begin();
+         S32 index = iter - mPlayOnceSources.begin();
 
          // Erase it from the vector first, so that onRemoveSource
          // doesn't do it during cleanup and screw up our loop here!

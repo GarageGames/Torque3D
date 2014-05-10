@@ -367,7 +367,7 @@ static U32 validateTreeRecurse(TreeNode *tree)
    if(tree == NIL)
       return 1;
    // check my left tree
-   int lcount, rcount, nc = 0;
+   S32 lcount, rcount, nc = 0;
 
    if(tree->color == Red)
    {
@@ -1586,7 +1586,7 @@ dsize_t getMemoryUsed()
 }
 
 #ifdef TORQUE_DEBUG_GUARD
-DefineEngineFunction( dumpAlloc, void, ( int allocNum ),,
+DefineEngineFunction( dumpAlloc, void, ( S32 allocNum ),,
 				"@brief Dumps information about the given allocated memory block.\n\n"
 				"@param allocNum Memory block to dump information about."
 				"@note Available in debug builds only. "

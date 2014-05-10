@@ -213,7 +213,7 @@ void GuiGameListOptionsCtrl::addRow(const char* label, const char* optionsList, 
    Row * row = new Row();
    Vector<StringTableEntry> options( __FILE__, __LINE__ );
    S32 count = StringUnit::getUnitCount(optionsList, DELIM);
-   for (int i = 0; i < count; ++i)
+   for (S32 i = 0; i < count; ++i)
    {
       const char * option = StringUnit::getUnit(optionsList, i, DELIM);
       options.push_back(StringTable->insert(option, true));
@@ -238,7 +238,7 @@ void GuiGameListOptionsCtrl::setOptions(S32 rowIndex, const char * optionsList)
 
    S32 count = StringUnit::getUnitCount(optionsList, DELIM);
    row->mOptions.setSize(count);
-   for (int i = 0; i < count; ++i)
+   for (S32 i = 0; i < count; ++i)
    {
       const char * option = StringUnit::getUnit(optionsList, i, DELIM);
       row->mOptions[i] = StringTable->insert(option, true);

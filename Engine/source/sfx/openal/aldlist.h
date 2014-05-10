@@ -32,10 +32,10 @@
 typedef struct
 {
 	char           strDeviceName[256];
-	int				iMajorVersion;
-	int				iMinorVersion;
-	unsigned int	uiSourceCount;
-	int iCapsFlags;
+	S32				iMajorVersion;
+	S32				iMinorVersion;
+   U32	uiSourceCount;
+	S32 iCapsFlags;
 	bool			bSelected;
 } ALDEVICEINFO, *LPALDEVICEINFO;
 
@@ -44,27 +44,27 @@ class ALDeviceList
 private:
 	OPENALFNTABLE	ALFunction;
 	Vector<ALDEVICEINFO> vDeviceInfo;
-	int defaultDeviceIndex;
-	int filterIndex;
+	S32 defaultDeviceIndex;
+	S32 filterIndex;
 
 public:
 	ALDeviceList ( const OPENALFNTABLE &oalft );
 	~ALDeviceList ();
-	int GetNumDevices();
-	const char *GetDeviceName(int index);
-	void GetDeviceVersion(int index, int *major, int *minor);
-	unsigned int GetMaxNumSources(int index);
-	bool IsExtensionSupported(int index, SFXALCaps caps);
-	int GetDefaultDevice();
-	void FilterDevicesMinVer(int major, int minor);
-	void FilterDevicesMaxVer(int major, int minor);
+	S32 GetNumDevices();
+	const char *GetDeviceName(S32 index);
+	void GetDeviceVersion(S32 index, S32 *major, S32 *minor);
+   U32 GetMaxNumSources(S32 index);
+	bool IsExtensionSupported(S32 index, SFXALCaps caps);
+	S32 GetDefaultDevice();
+	void FilterDevicesMinVer(S32 major, S32 minor);
+	void FilterDevicesMaxVer(S32 major, S32 minor);
 	void FilterDevicesExtension(SFXALCaps caps);
 	void ResetFilters();
-	int GetFirstFilteredDevice();
-	int GetNextFilteredDevice();
+	S32 GetFirstFilteredDevice();
+	S32 GetNextFilteredDevice();
 
 private:
-	unsigned int GetMaxNumSources();
+	U32 GetMaxNumSources();
 };
 
 #endif // ALDEVICELIST_H

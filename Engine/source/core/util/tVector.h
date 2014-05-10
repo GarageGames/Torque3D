@@ -508,7 +508,7 @@ template<class T> inline void Vector<T>::compact()
    resize(mElementCount);
 }
 
-typedef int (QSORT_CALLBACK *qsort_compare_func)(const void *, const void *);
+typedef S32 (QSORT_CALLBACK *qsort_compare_func)(const void *, const void *);
 
 template<class T> inline void Vector<T>::sort(compare_func f)
 {
@@ -800,7 +800,7 @@ class VectorPtr : public Vector<void *>
    const_iterator end() const;
 
    void insert(iterator,const T&);
-   void insert(int idx) { Parent::insert(idx); }
+   void insert(S32 idx) { Parent::insert(idx); }
    void erase(iterator);
 
    T&       front();

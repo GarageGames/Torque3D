@@ -55,7 +55,7 @@ bool OggDecoder::_readNextPacket( ogg_packet* packet )
       
    while( 1 )
    {
-      int result = ogg_stream_packetout( &mOggStreamState, packet );
+      S32 result = ogg_stream_packetout( &mOggStreamState, packet );
       if( result == 0 )
       {
          if( !mOggStream->_requestData() )

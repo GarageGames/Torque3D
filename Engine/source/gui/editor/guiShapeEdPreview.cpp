@@ -42,7 +42,7 @@
 
 static const F32 sMoveScaler = 50.0f;
 static const F32 sZoomScaler = 200.0f;
-static const int sNodeRectSize = 16;
+static const S32 sNodeRectSize = 16;
 
 IMPLEMENT_CONOBJECT( GuiShapeEdPreview );
 

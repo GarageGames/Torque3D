@@ -1140,7 +1140,7 @@ void Platform::getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bO
 
    out_rNameVector.clear();
 		
-	for(int i = 0; i < 32; i++ )
+	for(S32 i = 0; i < 32; i++ )
 	{
 		dMemset(driveLetter,0,12);
 		if( dwDrives & dwMask )

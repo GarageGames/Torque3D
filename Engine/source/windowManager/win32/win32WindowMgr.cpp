@@ -452,7 +452,7 @@ void Win32WindowManager::_processCmdLineArgs( const S32 argc, const char **argv 
 {
    if (argc > 1)
    {
-      for (int i = 1; i < argc; i++)
+      for (S32 i = 1; i < argc; i++)
       {
          if ( dStrnicmp( argv[i], "-window", 7 ) == 0 )
          {

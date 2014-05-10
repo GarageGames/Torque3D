@@ -451,7 +451,7 @@ void ProximityMine::processTick( const Move* move )
             SimpleQueryList sql;
             getContainer()->findObjects( triggerBox, sTriggerCollisionMask,
                SimpleQueryList::insertionCallback, &sql );
-            for ( int i = 0; i < sql.mList.size(); i++ )
+            for ( S32 i = 0; i < sql.mList.size(); i++ )
             {
                // Detect movement in the trigger area
                if ( ( sql.mList[i] == mOwner && !mDataBlock->triggerOnOwner ) ||

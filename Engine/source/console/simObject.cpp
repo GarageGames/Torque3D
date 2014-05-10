@@ -2663,7 +2663,7 @@ DefineConsoleMethod( SimObject, getDynamicFieldCount, S32, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimObject, getDynamicField, const char*, ( int index ),,
+DefineConsoleMethod( SimObject, getDynamicField, const char*, ( S32 index ),,
    "Get a value of a dynamic field by index.\n"
    "@param index The index of the dynamic field.\n"
    "@return The value of the dynamic field at the given index or \"\"." )
@@ -2702,7 +2702,7 @@ DefineConsoleMethod( SimObject, getFieldCount, S32, (),,
    const AbstractClassRep::Field* f;
    U32 numDummyEntries = 0;
 
-   for(int i = 0; i < list.size(); i++)
+   for(S32 i = 0; i < list.size(); i++)
    {
       f = &list[i];
 
@@ -2716,7 +2716,7 @@ DefineConsoleMethod( SimObject, getFieldCount, S32, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimObject, getField, const char*, ( int index ),,
+DefineConsoleMethod( SimObject, getField, const char*, ( S32 index ),,
    "Retrieve the value of a static field by index.\n"
    "@param index The index of the static field.\n"
    "@return The value of the static field with the given index or \"\"." )
