@@ -42,7 +42,7 @@ GFX_ImplementTextureProfile(GFXFontTextureProfile,
                             GFXTextureProfile::Static |
                             GFXTextureProfile::KeepBitmap |
                             GFXTextureProfile::NoMipmap, 
-                            GFXTextureProfile::None);
+                            GFXTextureProfile::NONE);
 
 template<> void *Resource<GFont>::create(const Torque::Path &path)
 {

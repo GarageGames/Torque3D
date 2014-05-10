@@ -59,14 +59,14 @@ MODULE_END;
 GFX_ImplementTextureProfile( ReflectRenderTargetProfile, 
                              GFXTextureProfile::DiffuseMap, 
                              GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget | GFXTextureProfile::Pooled, 
-                             GFXTextureProfile::None );
+                             GFXTextureProfile::NONE );
 
 GFX_ImplementTextureProfile( RefractTextureProfile,
                              GFXTextureProfile::DiffuseMap,
                              GFXTextureProfile::PreserveSize | 
                              GFXTextureProfile::RenderTarget |
                              GFXTextureProfile::Pooled,
-                             GFXTextureProfile::None );
+                             GFXTextureProfile::NONE );
 
 static S32 QSORT_CALLBACK compareReflectors( const void *a, const void *b )
 {
