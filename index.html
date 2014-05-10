@@ -56,28 +56,26 @@ root: .
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-6">
-            <h2 class="status">Status</h2>
-            <table class="borderless history table">
-                <tr>
-                    <td>Current version</td>
-                    <td>Torque 3D 3.5.1 <br />
-                        Project Manager 2.1 <br />
-                </tr>
+        <div class="col-sm-4">
+            <h2 class="status">Activity</h2>
+            <p id="activity-loading">Loading activity...</p>
+        </div>
 
+        <div class="col-sm-4">
+            <h2 class="status">Status</h2>
+            <table class="borderless table">
                 <tr>
-                    <td>Build</td>
-                    <td>
-                        <table>
-                            <tr><td>Nightly:</td><td>&nbsp;<img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td></tr>
-                            <tr><td>Release:</td><td>&nbsp;<img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td></tr>
-                        </table>
-                    </td>
+                    <td>Continuous</td>
+                    <td><img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td>
+                </tr>
+                <tr>
+                    <td>Release</td>
+                    <td><img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td>
                 </tr>
             </table>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <h2>Issues</h2>
             <ul>
                 <li><a href="https://github.com/GarageGames/Torque3D/issues/new">Report an issue</a></li>
@@ -116,6 +114,7 @@ root: .
 {% endif %}
 
 <script type="text/javascript" src="{{page.root}}/js/jquery.cycle.all.js"></script>
+<script type="text/javascript" src="{{page.root}}/js/jquery.timeago.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
   var images = {
@@ -152,6 +151,7 @@ $(document).ready(function() {
     return o;
   }
 
+  // TODO: ensure no duplicate images occur.
   function createBreaks() {
     var breaks = $('div.break');
     var delay = 0;
@@ -169,5 +169,44 @@ $(document).ready(function() {
   };
 
   createBreaks();
+
+  var numResults = 2;
+  var feed = 'https://github.com/GarageGames/Torque3D/commits/development.atom';
+  var googleAPI = document.location.protocol +
+    '//ajax.googleapis.com/ajax/services/feed/load?' +
+    'v=1.0' +
+    '&num=' + numResults +
+    '&callback=?&q=';
+  var url = googleAPI + encodeURIComponent(feed);
+  $.ajax({
+    url: url,
+    dataType: 'json',
+    success: function (data) {
+      if(data.responseData.feed && data.responseData.feed.entries) {
+        var list = $('<ul/>').addClass('list-unstyled');
+        $.each(data.responseData.feed.entries, function (i, e) {
+          var li = $('<li/>').appendTo(list);
+          var hash = e.link.split('/').pop().substr(0, 6);
+          var hashel = $('<pre/>').addClass('inline').appendTo(li);
+          hashel.append($('<a/>')
+            .text(hash)
+            .attr('href', e.link)
+            .attr('target', '_blank'));
+
+          var content = e.contentSnippet.split('\n').pop();
+          li.append($('<span/>')
+            .addClass('commit')
+            .text(content));
+
+          var d = new Date(e.publishedDate);
+          var stamp = $('<p/>').addClass('timeago').text('by ' + e.author + ' ').appendTo(li);
+          stamp.append($('<span/>')
+            .attr('title', d.toISOString())
+            .timeago());
+        });
+        $('#activity-loading').replaceWith(list);
+      }
+    }
+  });
 });
 </script>
