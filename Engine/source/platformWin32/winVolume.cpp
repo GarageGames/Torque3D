@@ -333,7 +333,7 @@ Path Win32File::getName() const
    return mPath;
 }
 
-FileNode::Status Win32File::getStatus() const
+FileNode::NodeStatus Win32File::getStatus() const
 {
    return mStatus;
 }
@@ -620,7 +620,7 @@ bool Win32Directory::getAttributes(Attributes* attr)
    return true;
 }
 
-FileNode::Status Win32Directory::getStatus() const
+FileNode::NodeStatus Win32Directory::getStatus() const
 {
    return mStatus;
 }
