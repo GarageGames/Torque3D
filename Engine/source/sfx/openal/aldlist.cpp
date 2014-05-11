@@ -161,9 +161,9 @@ const char *ALDeviceList::GetDeviceName(int index)
 void ALDeviceList::GetDeviceVersion(int index, int *major, int *minor)
 {
 	if (index < GetNumDevices()) {
-		if (*major)
+		if (major)
 			*major = vDeviceInfo[index].iMajorVersion;
-		if (*minor)
+		if (minor)
 			*minor = vDeviceInfo[index].iMinorVersion;
 	}
 	return;
