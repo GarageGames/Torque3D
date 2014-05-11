@@ -760,7 +760,7 @@ String& String::operator=(const String &src)
 
 String& String::operator+=(const StringChar *src)
 {
-   if( src == NULL && !*src )
+   if( src == NULL || !*src )
       return *this;
 
    // Append the given string into a new string
