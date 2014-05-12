@@ -475,14 +475,14 @@ public:
 /// Template child class for supported Collada primitive elements
 template<class T> class ColladaPrimitive : public BasePrimitive
 {
-   T* primitive;
-   domListOfUInts *pTriangleData;
+   T* mPrimitive;
+   domListOfUInts *mTriangleData;
    S32 stride;
 public:
-   ColladaPrimitive(const daeElement* e) : pTriangleData(0)
+   ColladaPrimitive(const daeElement* e) : mTriangleData(0)
    {
       // Cast to geometric primitive element
-      primitive = daeSafeCast<T>(const_cast<daeElement*>(e));
+      mPrimitive = daeSafeCast<T>(const_cast<daeElement*>(e));
 
       // Determine stride
       stride = 0;
@@ -493,13 +493,13 @@ public:
    }
    ~ColladaPrimitive()
    {
-      delete pTriangleData;
+      delete mTriangleData;
    }
 
    /// Most primitives can use these common implementations
-   const char* getElementName() { return primitive->getElementName(); }
-   const char* getMaterial() { return primitive->getMaterial(); }
-   const domInputLocalOffset_Array& getInputs() { return primitive->getInput_array(); }
+   const char* getElementName() { return mPrimitive->getElementName(); }
+   const char* getMaterial() { return mPrimitive->getMaterial(); }
+   const domInputLocalOffset_Array& getInputs() { return mPrimitive->getInput_array(); }
    S32 getStride() const { return stride; }
 
    /// Each supported primitive needs to implement this method (and convert
@@ -512,21 +512,21 @@ public:
 template<> inline const domListOfUInts *ColladaPrimitive<domTriangles>::getTriangleData()
 {
    // Return the <p> integer list directly
-   return (primitive->getP() ? &(primitive->getP()->getValue()) : NULL);
+   return (mPrimitive->getP() ? &(mPrimitive->getP()->getValue()) : NULL);
 }
 
 //-----------------------------------------------------------------------------
 // <tristrips>
 template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTriangleData()
 {
-   if (!pTriangleData)
+   if (!mTriangleData)
    {
       // Convert strips to triangles
-      pTriangleData = new domListOfUInts();
+      mTriangleData = new domListOfUInts();
 
-      for (S32 iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
+      for (S32 iStrip = 0; iStrip < mPrimitive->getCount(); iStrip++) {
 
-         domP* P = primitive->getP_array()[iStrip];
+         domP* P = mPrimitive->getP_array()[iStrip];
 
          // Ignore invalid P arrays
          if (!P || !P->getValue().getCount())
@@ -541,33 +541,33 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTrian
             if (iTri & 0x1)
             {
                // CW triangle
-               pTriangleData->appendArray(stride, v0);
-               pTriangleData->appendArray(stride, v0 + 2*stride);
-               pTriangleData->appendArray(stride, v0 + stride);
+               mTriangleData->appendArray(stride, v0);
+               mTriangleData->appendArray(stride, v0 + 2*stride);
+               mTriangleData->appendArray(stride, v0 + stride);
             }
             else
             {
                // CCW triangle
-               pTriangleData->appendArray(stride*3, v0);
+               mTriangleData->appendArray(stride*3, v0);
             }
          }
       }
    }
-   return pTriangleData;
+   return mTriangleData;
 }
 
 //-----------------------------------------------------------------------------
 // <trifans>
 template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangleData()
 {
-   if (!pTriangleData)
+   if (!mTriangleData)
    {
       // Convert strips to triangles
-      pTriangleData = new domListOfUInts();
+      mTriangleData = new domListOfUInts();
 
-      for (S32 iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
+      for (S32 iStrip = 0; iStrip < mPrimitive->getCount(); iStrip++) {
 
-         domP* P = primitive->getP_array()[iStrip];
+         domP* P = mPrimitive->getP_array()[iStrip];
 
          // Ignore invalid P arrays
          if (!P || !P->getValue().getCount())
@@ -579,27 +579,27 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangl
          // Convert the fan back to a triangle list
          domUint* v0 = pSrcData + stride;
          for (S32 iTri = 0; iTri < numTriangles; iTri++, v0 += stride) {
-            pTriangleData->appendArray(stride, pSrcData);   // shared vertex
-            pTriangleData->appendArray(stride, v0);         // previous vertex
-            pTriangleData->appendArray(stride, v0+stride);  // current vertex
+            mTriangleData->appendArray(stride, pSrcData);   // shared vertex
+            mTriangleData->appendArray(stride, v0);         // previous vertex
+            mTriangleData->appendArray(stride, v0+stride);  // current vertex
          }
       }
    }
-   return pTriangleData;
+   return mTriangleData;
 }
 
 //-----------------------------------------------------------------------------
 // <polygons>
 template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriangleData()
 {
-   if (!pTriangleData)
+   if (!mTriangleData)
    {
       // Convert polygons to triangles
-      pTriangleData = new domListOfUInts();
+      mTriangleData = new domListOfUInts();
 
-      for (S32 iPoly = 0; iPoly < primitive->getCount(); iPoly++) {
+      for (S32 iPoly = 0; iPoly < mPrimitive->getCount(); iPoly++) {
 
-         domP* P = primitive->getP_array()[iPoly];
+         domP* P = mPrimitive->getP_array()[iPoly];
 
          // Ignore invalid P arrays
          if (!P || !P->getValue().getCount())
@@ -613,41 +613,41 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriang
          domUint* v0 = pSrcData;
          pSrcData += stride;
          for (S32 iTri = 0; iTri < numPoints-2; iTri++) {
-            pTriangleData->appendArray(stride, v0);
-            pTriangleData->appendArray(stride*2, pSrcData);
+            mTriangleData->appendArray(stride, v0);
+            mTriangleData->appendArray(stride*2, pSrcData);
             pSrcData += stride;
          }
       }
    }
-   return pTriangleData;
+   return mTriangleData;
 }
 
 //-----------------------------------------------------------------------------
 // <polylist>
 template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriangleData()
 {
-   if (!pTriangleData)
+   if (!mTriangleData)
    {
       // Convert polygons to triangles
-      pTriangleData = new domListOfUInts();
+      mTriangleData = new domListOfUInts();
 
       // Check that the P element has the right number of values (this
       // has been seen with certain models exported using COLLADAMax)
-      const domListOfUInts& vcount = primitive->getVcount()->getValue();
+      const domListOfUInts& vcount = mPrimitive->getVcount()->getValue();
 
       U32 expectedCount = 0;
       for (S32 iPoly = 0; iPoly < vcount.getCount(); iPoly++)
          expectedCount += vcount[iPoly];
       expectedCount *= stride;
 
-      if (!primitive->getP() || !primitive->getP()->getValue().getCount() ||
-         (primitive->getP()->getValue().getCount() != expectedCount) )
+      if (!mPrimitive->getP() || !mPrimitive->getP()->getValue().getCount() ||
+         (mPrimitive->getP()->getValue().getCount() != expectedCount) )
       {
          Con::warnf("<polylist> element found with invalid <p> array. This primitive will be ignored.");
-         return pTriangleData;
+         return mTriangleData;
       }
 
-      domUint* pSrcData = &(primitive->getP()->getValue()[0]);
+      domUint* pSrcData = &(mPrimitive->getP()->getValue()[0]);
       for (S32 iPoly = 0; iPoly < vcount.getCount(); iPoly++) {
 
          // Use a simple tri-fan (centered at the first point) method of
@@ -655,14 +655,14 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
          domUint* v0 = pSrcData;
          pSrcData += stride;
          for (S32 iTri = 0; iTri < vcount[iPoly]-2; iTri++) {
-            pTriangleData->appendArray(stride, v0);
-            pTriangleData->appendArray(stride*2, pSrcData);
+            mTriangleData->appendArray(stride, v0);
+            mTriangleData->appendArray(stride*2, pSrcData);
             pSrcData += stride;
          }
          pSrcData += stride;
       }
    }
-   return pTriangleData;
+   return mTriangleData;
 }
 
 //-----------------------------------------------------------------------------
