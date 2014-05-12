@@ -88,7 +88,7 @@ void ColladaAppSequence::setAnimationActive(const domAnimation* anim, bool activ
       domChannel* channel = anim->getChannel_array()[iChannel];
       AnimData* animData = reinterpret_cast<AnimData*>(channel->getUserData());
       if (animData)
-         animData->enabled = active;
+         animData->mEnabled = active;
    }
 
    // Recurse into child animations

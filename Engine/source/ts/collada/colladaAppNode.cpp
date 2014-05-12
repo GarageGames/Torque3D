@@ -99,7 +99,7 @@ ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
          case COLLADA_TYPE::MATRIX:
          case COLLADA_TYPE::LOOKAT:
             nodeTransforms.increment();
-            nodeTransforms.last().element = node->getContents()[iChild];
+            nodeTransforms.last().mElement = node->getContents()[iChild];
             break;
       }
    }
@@ -232,7 +232,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
       MatrixF mat(true);
 
       // Convert the transform element to a MatrixF
-      switch (nodeTransforms[iTxfm].element->getElementType()) {
+      switch (nodeTransforms[iTxfm].mElement->getElementType()) {
          case COLLADA_TYPE::TRANSLATE: mat = vecToMatrixF<domTranslate>(nodeTransforms[iTxfm].getValue(time));  break;
          case COLLADA_TYPE::SCALE:     mat = vecToMatrixF<domScale>(nodeTransforms[iTxfm].getValue(time));      break;
          case COLLADA_TYPE::ROTATE:    mat = vecToMatrixF<domRotate>(nodeTransforms[iTxfm].getValue(time));     break;

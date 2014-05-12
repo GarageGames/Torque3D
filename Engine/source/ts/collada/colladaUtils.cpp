@@ -248,27 +248,27 @@ BasePrimitive* BasePrimitive::get(const daeElement* element)
 void AnimData::parseTargetString(const char* target, S32 fullCount, const char* elements[])
 {
    // Assume targeting all elements at offset 0
-   targetValueCount = fullCount;
-   targetValueOffset = 0;
+   mTargetValueCount = fullCount;
+   mTargetValueOffset = 0;
 
    // Check for array syntax: (n) or (n)(m)
    if (const char* p = dStrchr(target, '(')) {
       S32 indN, indM;
       if (dSscanf(p, "(%d)(%d)", &indN, &indM) == 2) {
-         targetValueOffset = (indN * 4) + indM;   // @todo: 4x4 matrix only
-         targetValueCount = 1;
+         mTargetValueOffset = (indN * 4) + indM;   // @todo: 4x4 matrix only
+         mTargetValueCount = 1;
       }
       else if (dSscanf(p, "(%d)", &indN) == 1) {
-         targetValueOffset = indN;
-         targetValueCount = 1;
+         mTargetValueOffset = indN;
+         mTargetValueCount = 1;
       }
    }
    else if (const char* p = dStrrchr(target, '.')) {
       // Check for named elements
       for (S32 iElem = 0; elements[iElem][0] != 0; iElem++) {
          if (!dStrcmp(p, elements[iElem])) {
-            targetValueOffset = iElem;
-            targetValueCount = 1;
+            mTargetValueOffset = iElem;
+            mTargetValueCount = 1;
             break;
          }
       }
@@ -327,47 +327,47 @@ F32 AnimData::invertParamCubic(F32 param, F32 x0, F32 x1, F32 x2, F32 x3) const
 void AnimData::interpValue(F32 t, U32 offset, double* value) const
 {
    // handle degenerate animation data
-   if (input.size() == 0)
+   if (mInput.size() == 0)
    {
       *value = 0.0f;
       return;
    }
-   else if (input.size() == 1)
+   else if (mInput.size() == 1)
    {
-      *value = output.getStringArrayData(0)[offset];
+      *value = mOutput.getStringArrayData(0)[offset];
       return;
    }
 
    // clamp time to valid range
-   F32 curveStart = input.getFloatValue(0);
-   F32 curveEnd = input.getFloatValue(input.size()-1);
+   F32 curveStart = mInput.getFloatValue(0);
+   F32 curveEnd = mInput.getFloatValue(mInput.size()-1);
    t = mClampF(t, curveStart, curveEnd);
 
    // find the index of the input keyframe BEFORE 't'
    S32 index;
-   for (index = 0; index < input.size()-2; index++) {
-      if (input.getFloatValue(index + 1) > t)
+   for (index = 0; index < mInput.size()-2; index++) {
+      if (mInput.getFloatValue(index + 1) > t)
          break;
    }
 
    // get the data for the two control points either side of 't'
    Point2F v0;
-   v0.x = input.getFloatValue(index);
-   v0.y = output.getStringArrayData(index)[offset];
+   v0.x = mInput.getFloatValue(index);
+   v0.y = mOutput.getStringArrayData(index)[offset];
 
    Point2F v3;
-   v3.x = input.getFloatValue(index + 1);
-   v3.y = output.getStringArrayData(index + 1)[offset];
+   v3.x = mInput.getFloatValue(index + 1);
+   v3.y = mOutput.getStringArrayData(index + 1)[offset];
 
    // If spline interpolation is specified but the tangents are not available,
    // default to LINEAR.
-   const char* interp_method = interpolation.getStringValue(index);
+   const char* interp_method = mInterpolation.getStringValue(index);
    if (dStrEqual(interp_method, "BEZIER") ||
        dStrEqual(interp_method, "HERMITE") ||
        dStrEqual(interp_method, "CARDINAL")) {
 
-      const double* inArray = inTangent.getStringArrayData(index + 1);
-      const double* outArray = outTangent.getStringArrayData(index);
+      const double* inArray = mInTangent.getStringArrayData(index + 1);
+      const double* outArray = mOutTangent.getStringArrayData(index);
       if (!inArray || !outArray)
          interp_method = "LINEAR";
    }
@@ -398,17 +398,17 @@ void AnimData::interpValue(F32 t, U32 offset, double* value) const
          v2 = v3;
 
          if (index > 0) {
-            v0.x = input.getFloatValue(index-1);
-            v0.y = output.getStringArrayData(index-1)[offset];
+            v0.x = mInput.getFloatValue(index-1);
+            v0.y = mOutput.getStringArrayData(index-1)[offset];
          }
          else {
             // mirror P1 through P0
             v0 = v1 + (v1 - v2);
          }
 
-         if (index < (input.size()-2)) {
-            v3.x = input.getFloatValue(index+2);
-            v3.y = output.getStringArrayData(index+2)[offset];
+         if (index < (mInput.size()-2)) {
+            v3.x = mInput.getFloatValue(index+2);
+            v3.y = mOutput.getStringArrayData(index+2)[offset];
          }
          else {
             // mirror P0 through P1
@@ -416,10 +416,10 @@ void AnimData::interpValue(F32 t, U32 offset, double* value) const
          }
       }
       else {
-         const double* inArray = inTangent.getStringArrayData(index + 1);
-         const double* outArray = outTangent.getStringArrayData(index);
+         const double* inArray = mInTangent.getStringArrayData(index + 1);
+         const double* outArray = mOutTangent.getStringArrayData(index);
 
-         if (output.stride() == inTangent.stride()) {
+         if (mOutput.stride() == mInTangent.stride()) {
             // This degenerate form (1D control points) does 2 things wrong:
             // 1) it does not specify the key (time) value
             // 2) the control point is specified as a tangent for both bezier and hermite
@@ -458,27 +458,27 @@ void AnimData::interpValue(F32 t, U32 offset, double* value) const
 
 void AnimData::interpValue(F32 t, U32 offset, const char** value) const
 {
-   if (input.size() == 0)
+   if (mInput.size() == 0)
       *value = "";
-   else if (input.size() == 1)
-      *value = output.getStringValue(0);
+   else if (mInput.size() == 1)
+      *value = mOutput.getStringValue(0);
    else
    {
       // clamp time to valid range
-      F32 curveStart = input.getFloatValue(0);
-      F32 curveEnd = input.getFloatValue(input.size()-1);
+      F32 curveStart = mInput.getFloatValue(0);
+      F32 curveEnd = mInput.getFloatValue(mInput.size()-1);
       t = mClampF(t, curveStart, curveEnd);
 
       // find the index of the input keyframe BEFORE 't'
       S32 index;
-      for (index = 0; index < input.size()-2; index++) {
-         if (input.getFloatValue(index + 1) > t)
+      for (index = 0; index < mInput.size()-2; index++) {
+         if (mInput.getFloatValue(index + 1) > t)
             break;
       }
 
       // String values only support STEP interpolation, so just get the
       // value at the input keyframe
-      *value = output.getStringValue(index);
+      *value = mOutput.getStringValue(index);
    }
 }
 

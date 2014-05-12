@@ -160,14 +160,14 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
          // @todo:don't care about the input param names for now. Could
          // validate against the target type....
          if (dStrEqual(input->getSemantic(), "INPUT")) {
-            data.input.initFromSource(source);
+            data.mInput.initFromSource(source);
             // Adjust the maximum sequence end time
-            maxEndTime = getMax(maxEndTime, data.input.getFloatValue((S32)data.input.size()-1));
+            maxEndTime = getMax(maxEndTime, data.mInput.getFloatValue((S32)data.mInput.size()-1));
 
             // Detect the frame rate (minimum time between keyframes)
-            for (S32 iFrame = 1; iFrame < data.input.size(); iFrame++)
+            for (S32 iFrame = 1; iFrame < data.mInput.size(); iFrame++)
             {
-               F32 delta = data.input.getFloatValue( iFrame ) - data.input.getFloatValue( iFrame-1 );
+               F32 delta = data.mInput.getFloatValue( iFrame ) - data.mInput.getFloatValue( iFrame-1 );
                if ( delta < 0 )
                {
                   daeErrorHandler::get()->handleError(avar("<animation> INPUT '%s' "
@@ -178,13 +178,13 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
             }
          }
          else if (dStrEqual(input->getSemantic(), "OUTPUT"))
-            data.output.initFromSource(source);
+            data.mOutput.initFromSource(source);
          else if (dStrEqual(input->getSemantic(), "IN_TANGENT"))
-            data.inTangent.initFromSource(source);
+            data.mInTangent.initFromSource(source);
          else if (dStrEqual(input->getSemantic(), "OUT_TANGENT"))
-            data.outTangent.initFromSource(source);
+            data.mOutTangent.initFromSource(source);
          else if (dStrEqual(input->getSemantic(), "INTERPOLATION"))
-            data.interpolation.initFromSource(source);
+            data.mInterpolation.initFromSource(source);
       }
 
       // Set initial value for visibility targets that were added automatically (in colladaUtils.cpp
@@ -192,11 +192,11 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
       {
          domAny* visTarget = daeSafeCast<domAny>(target);
          if (visTarget && dStrEqual(visTarget->getValue(), ""))
-            visTarget->setValue(avar("%g", data.output.getFloatValue(0)));
+            visTarget->setValue(avar("%g", data.mOutput.getFloatValue(0)));
       }
 
       // Ignore empty animations
-      if (data.input.size() == 0) {
+      if (data.mInput.size() == 0) {
          channel->setUserData(0);
          delete targetChannels->last();
          targetChannels->pop_back();

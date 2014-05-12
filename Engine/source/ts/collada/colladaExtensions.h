@@ -108,9 +108,9 @@ protected:
    /// Get the value of the named animated parameter (use defaultVal if parameter not found)
    template<typename T> void get(const char* name, AnimatedElement<T>& value, T defaultVal)
    {
-      value.defaultVal = defaultVal;
+      value.mDefaultVal = defaultVal;
       if (const domAny* param = findParam(name))
-         value.element = param;
+         value.mElement = param;
    }
 
 public:

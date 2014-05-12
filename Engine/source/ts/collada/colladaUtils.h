@@ -678,32 +678,32 @@ template<> inline F32 convert(const char* value) { return convert<double>(value)
 /// Collada animation data
 struct AnimChannels : public Vector<struct AnimData*>
 {
-   daeElement  *element;
-   AnimChannels(daeElement* el) : element(el)
+   daeElement  *mElement;
+   AnimChannels(daeElement* el) : mElement(el)
    {
-      element->setUserData(this);
+      mElement->setUserData(this);
    }
    ~AnimChannels()
    {
-      if (element)
-         element->setUserData(0);
+      if (mElement)
+         mElement->setUserData(0);
    }
 };
 
 struct AnimData
 {
-   bool           enabled;       ///!< Used to select animation channels for the current clip
+   bool           mEnabled;      ///!< Used to select animation channels for the current clip
 
-   _SourceReader  input;
-   _SourceReader  output;
+   _SourceReader  mInput;
+   _SourceReader  mOutput;
 
-   _SourceReader  inTangent;
-   _SourceReader  outTangent;
+   _SourceReader  mInTangent;
+   _SourceReader  mOutTangent;
 
-   _SourceReader  interpolation;
+   _SourceReader  mInterpolation;
 
-   U32 targetValueOffset;        ///< Offset into the target element (for arrays of values)
-   U32 targetValueCount;         ///< Number of values animated (from OUTPUT source array)
+   U32 mTargetValueOffset;       ///< Offset into the target element (for arrays of values)
+   U32 mTargetValueCount;        ///< Number of values animated (from OUTPUT source array)
 
    /// Get the animation channels for the Collada element (if any)
    static AnimChannels* getAnimChannels(const daeElement* element)
@@ -711,7 +711,7 @@ struct AnimData
       return element ? (AnimChannels*)const_cast<daeElement*>(element)->getUserData() : 0;
    }
 
-   AnimData() : enabled(false) { }
+   AnimData() : mEnabled(false) { }
 
    void parseTargetString(const char* target, S32 fullCount, const char* elements[]);
 
@@ -735,13 +735,13 @@ struct AnimData
 template<class T>
 struct AnimatedElement
 {
-   const daeElement* element;    ///< The Collada element (can be NULL)
-   T defaultVal;                 ///< Default value (used when element is NULL)
+   const daeElement* mElement;   ///< The Collada element (can be NULL)
+   T mDefaultVal;                ///< Default value (used when element is NULL)
 
-   AnimatedElement(const daeElement* e=0) : element(e) { }
+   AnimatedElement(const daeElement* e=0) : mElement(e) { }
 
    /// Check if the element has any animations channels
-   bool isAnimated() { return (AnimData::getAnimChannels(element) != 0); }
+   bool isAnimated() { return (AnimData::getAnimChannels(mElement) != 0); }
    bool isAnimated(F32 start, F32 end) { return isAnimated(); }
 
    /// Get the value of the element at the specified time
@@ -749,17 +749,17 @@ struct AnimatedElement
    {
       // If the element is NULL, just use the default (handy for <extra> profiles which
       // may or may not be present in the document)
-      T value(defaultVal);
-      if (const domAny* param = daeSafeCast<domAny>(const_cast<daeElement*>(element))) {
+      T value(mDefaultVal);
+      if (const domAny* param = daeSafeCast<domAny>(const_cast<daeElement*>(mElement))) {
          // If the element is not animated, just use its current value
          value = convert<T>(param->getValue());
 
          // Animate the value
-         const AnimChannels* channels = AnimData::getAnimChannels(element);
+         const AnimChannels* channels = AnimData::getAnimChannels(mElement);
          if (channels && (time >= 0)) {
             for (S32 iChannel = 0; iChannel < channels->size(); iChannel++) {
                const AnimData* animData = (*channels)[iChannel];
-               if (animData->enabled)
+               if (animData->mEnabled)
                   animData->interpValue(time, 0, &value);
             }
          }
@@ -779,19 +779,19 @@ template<class T> struct AnimatedElementList : public AnimatedElement<T>
    // Get the value of the element list at the specified time
    T getValue(F32 time)
    {
-      T vec(this->defaultVal);
-      if (this->element) {
+      T vec(this->mDefaultVal);
+      if (this->mElement) {
          // Get a copy of the vector
-         vec = *(T*)const_cast<daeElement*>(this->element)->getValuePointer();
+         vec = *(T*)const_cast<daeElement*>(this->mElement)->getValuePointer();
 
          // Animate the vector
-         const AnimChannels* channels = AnimData::getAnimChannels(this->element);
+         const AnimChannels* channels = AnimData::getAnimChannels(this->mElement);
          if (channels && (time >= 0)) {
             for (S32 iChannel = 0; iChannel < channels->size(); iChannel++) {
                const AnimData* animData = (*channels)[iChannel];
-               if (animData->enabled) {
-                  for (S32 iValue = 0; iValue < animData->targetValueCount; iValue++)
-                     animData->interpValue(time, iValue, &vec[animData->targetValueOffset + iValue]);
+               if (animData->mEnabled) {
+                  for (S32 iValue = 0; iValue < animData->mTargetValueCount; iValue++)
+                     animData->interpValue(time, iValue, &vec[animData->mTargetValueOffset + iValue]);
                }
             }
          }
