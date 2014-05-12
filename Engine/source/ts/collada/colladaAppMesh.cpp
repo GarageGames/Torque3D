@@ -197,27 +197,27 @@ private:
 
 public:
 
-   _SourceReader     points;
-   _SourceReader     normals;
-   _SourceReader     colors;
-   _SourceReader     uvs;
-   _SourceReader     uv2s;
+   _SourceReader     mPoints;
+   _SourceReader     mNormals;
+   _SourceReader     mColors;
+   _SourceReader     mUVs;
+   _SourceReader     mUV2s;
 
-   _SourceReader     joints;
-   _SourceReader     weights;
-   _SourceReader     invBindMatrices;
+   _SourceReader     mJoints;
+   _SourceReader     mWeights;
+   _SourceReader     mInvBindMatrices;
 
    /// Clear the mesh streams
    void reset()
    {
-      points.reset();
-      normals.reset();
-      colors.reset();
-      uvs.reset();
-      uv2s.reset();
-      joints.reset();
-      weights.reset();
-      invBindMatrices.reset();
+      mPoints.reset();
+      mNormals.reset();
+      mColors.reset();
+      mUVs.reset();
+      mUV2s.reset();
+      mJoints.reset();
+      mWeights.reset();
+      mInvBindMatrices.reset();
    }
 
    /// Classify a set of inputs by type and set number (needs to be a template
@@ -283,32 +283,32 @@ public:
 
       // Attempt to initialise the SourceReaders
       const char* vertex_params[] = { "X", "Y", "Z", "" };
-      initSourceReader(sortedInputs[Points], Points, points, vertex_params);
+      initSourceReader(sortedInputs[Points], Points, mPoints, vertex_params);
 
       const char* normal_params[] = { "X", "Y", "Z", "" };
-      initSourceReader(sortedInputs[Normals], Normals, normals, normal_params);
+      initSourceReader(sortedInputs[Normals], Normals, mNormals, normal_params);
 
       const char* color_params[] = { "R", "G", "B", "A", "" };
-      initSourceReader(sortedInputs[Colors], Colors, colors, color_params);
+      initSourceReader(sortedInputs[Colors], Colors, mColors, color_params);
 
       const char* uv_params[] = { "S", "T", "" };
       const char* uv_params2[] = { "U", "V", "" }; // some files use the nonstandard U,V or X,Y param names
       const char* uv_params3[] = { "X", "Y", "" };
-      if (!initSourceReader(sortedInputs[UVs], UVs, uvs, uv_params))
-         if (!initSourceReader(sortedInputs[UVs], UVs, uvs, uv_params2))
-            initSourceReader(sortedInputs[UVs], UVs, uvs, uv_params3);
-      if (!initSourceReader(sortedInputs[UV2s], UV2s, uv2s, uv_params))
-         if (!initSourceReader(sortedInputs[UV2s], UV2s, uv2s, uv_params2))
-            initSourceReader(sortedInputs[UV2s], UV2s, uv2s, uv_params3);
+      if (!initSourceReader(sortedInputs[UVs], UVs, mUVs, uv_params))
+         if (!initSourceReader(sortedInputs[UVs], UVs, mUVs, uv_params2))
+            initSourceReader(sortedInputs[UVs], UVs, mUVs, uv_params3);
+      if (!initSourceReader(sortedInputs[UV2s], UV2s, mUV2s, uv_params))
+         if (!initSourceReader(sortedInputs[UV2s], UV2s, mUV2s, uv_params2))
+            initSourceReader(sortedInputs[UV2s], UV2s, mUV2s, uv_params3);
 
       const char* joint_params[] = { "JOINT", "" };
-      initSourceReader(sortedInputs[Joints], Joints, joints, joint_params);
+      initSourceReader(sortedInputs[Joints], Joints, mJoints, joint_params);
 
       const char* weight_params[] = { "WEIGHT", "" };
-      initSourceReader(sortedInputs[Weights], Weights, weights, weight_params);
+      initSourceReader(sortedInputs[Weights], Weights, mWeights, weight_params);
 
       const char* matrix_params[] = { "TRANSFORM", "" };
-      initSourceReader(sortedInputs[InvBindMatrices], InvBindMatrices, invBindMatrices, matrix_params);
+      initSourceReader(sortedInputs[InvBindMatrices], InvBindMatrices, mInvBindMatrices, matrix_params);
 
       return true;
    }
@@ -593,11 +593,11 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
             tuple.mUV     = offsets[MeshStreams::UVs]     >= 0 ? pSrcData[offsets[MeshStreams::UVs]] : -1;
             tuple.mUV2    = offsets[MeshStreams::UV2s]    >= 0 ? pSrcData[offsets[MeshStreams::UV2s]] : -1;
 
-            tuple.mDataVertex = tuple.mVertex > -1 ? streams.points.getPoint3FValue(tuple.mVertex) : Point3F::Max;
-            tuple.mDataNormal = tuple.mNormal > -1 ? streams.normals.getPoint3FValue(tuple.mNormal) : Point3F::Max;
-            tuple.mDataColor  = tuple.mColor > -1  ? streams.colors.getColorIValue(tuple.mColor) : ColorI(0,0,0);
-            tuple.mDataUV     = tuple.mUV > -1     ? streams.uvs.getPoint2FValue(tuple.mUV) : Point2F::Max;
-            tuple.mDataUV2    = tuple.mUV2 > -1    ? streams.uv2s.getPoint2FValue(tuple.mUV2) : Point2F::Max;
+            tuple.mDataVertex = tuple.mVertex > -1 ? streams.mPoints.getPoint3FValue(tuple.mVertex) : Point3F::Max;
+            tuple.mDataNormal = tuple.mNormal > -1 ? streams.mNormals.getPoint3FValue(tuple.mNormal) : Point3F::Max;
+            tuple.mDataColor  = tuple.mColor > -1  ? streams.mColors.getColorIValue(tuple.mColor) : ColorI(0,0,0);
+            tuple.mDataUV     = tuple.mUV > -1     ? streams.mUVs.getPoint2FValue(tuple.mUV) : Point2F::Max;
+            tuple.mDataUV2    = tuple.mUV2 > -1    ? streams.mUV2s.getPoint2FValue(tuple.mUV2) : Point2F::Max;
 
             VertTupleMap::Iterator itr = tupleMap.find(tuple);
             if (itr == tupleMap.end())
@@ -686,8 +686,8 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
       // If we are NOT appending values, only set the value if it actually exists
       // in the mesh data stream.
 
-      if (appendValues || ((tuple.mVertex >= 0) && (tuple.mVertex < streams.points.size()))) {
-         points_array[iVert] = streams.points.getPoint3FValue(tuple.mVertex);
+      if (appendValues || ((tuple.mVertex >= 0) && (tuple.mVertex < streams.mPoints.size()))) {
+         points_array[iVert] = streams.mPoints.getPoint3FValue(tuple.mVertex);
 
          // Flip verts for inverted meshes
          if (mAppNode->invertMeshes)
@@ -696,8 +696,8 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          objectOffset.mulP(points_array[iVert]);
       }
 
-      if (appendValues || ((tuple.mUV >= 0) && (tuple.mUV < streams.uvs.size()))) {
-         uvs_array[iVert] = streams.uvs.getPoint2FValue(tuple.mUV);
+      if (appendValues || ((tuple.mUV >= 0) && (tuple.mUV < streams.mUVs.size()))) {
+         uvs_array[iVert] = streams.mUVs.getPoint2FValue(tuple.mUV);
          if (appMat && appMat->effectExt)
             appMat->effectExt->applyTextureTransform(uvs_array[iVert], time);
          uvs_array[iVert].y = 1.0f - uvs_array[iVert].y;   // Collada texcoords are upside down compared to TGE
@@ -705,7 +705,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 
       // The rest is non-required data... if it doesn't exist then don't append it.
 
-      if ( (tuple.mNormal >= 0) && (tuple.mNormal < streams.normals.size()) ) {
+      if ( (tuple.mNormal >= 0) && (tuple.mNormal < streams.mNormals.size()) ) {
          if ( !norms_array && iVert == 0 )
          {
             v_norms.setSize(v_norms.size() + mVertTuples.size());
@@ -713,7 +713,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
 
          if ( norms_array ) {
-            norms_array[iVert] = streams.normals.getPoint3FValue(tuple.mNormal);
+            norms_array[iVert] = streams.mNormals.getPoint3FValue(tuple.mNormal);
 
             // Flip normals for inverted meshes
             if (mAppNode->invertMeshes)
@@ -721,7 +721,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
       }
 
-      if ( (tuple.mColor >= 0) && (tuple.mColor < streams.colors.size())) 
+      if ( (tuple.mColor >= 0) && (tuple.mColor < streams.mColors.size())) 
       {
          if ( !colors_array && iVert == 0 )
          {
@@ -730,10 +730,10 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
 
          if ( colors_array )
-            colors_array[iVert] = streams.colors.getColorIValue(tuple.mColor);
+            colors_array[iVert] = streams.mColors.getColorIValue(tuple.mColor);
       }
 
-      if ( (tuple.mUV2 >= 0) && (tuple.mUV2 < streams.uv2s.size()) ) 
+      if ( (tuple.mUV2 >= 0) && (tuple.mUV2 < streams.mUV2s.size()) ) 
       {
          if ( !uv2s_array && iVert == 0 )
          {
@@ -743,7 +743,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 
          if ( uv2s_array )
          {
-            uv2s_array[iVert] = streams.uv2s.getPoint2FValue(tuple.mUV2);
+            uv2s_array[iVert] = streams.mUV2s.getPoint2FValue(tuple.mUV2);
             if (appMat && appMat->effectExt)
                appMat->effectExt->applyTextureTransform(uv2s_array[iVert], time);
             uv2s_array[iVert].y = 1.0f - uv2s_array[iVert].y;   // Collada texcoords are upside down compared to TGE
@@ -981,7 +981,7 @@ void ColladaAppMesh::lookupSkinData()
       for (S32 iWeight = 0; iWeight < vcount[mVertTuples[iVert].mVertex]; iWeight++) {
 
          S32 bIndex = vindices[iWeight*2];
-         F32 bWeight = streams.weights.getFloatValue( vindices[iWeight*2 + 1] );
+         F32 bWeight = streams.mWeights.getFloatValue( vindices[iWeight*2 + 1] );
 
          // Ignore empty weights
          if ( bIndex < 0 || bWeight == 0 )
@@ -1046,11 +1046,11 @@ void ColladaAppMesh::lookupSkinData()
    }
 
    // Add dummy AppNodes to allow Collada joints to be mapped to 3space nodes
-   mBones.setSize(streams.joints.size());
-   mInitialTransforms.setSize(streams.joints.size());
-   for (S32 iJoint = 0; iJoint < streams.joints.size(); iJoint++)
+   mBones.setSize(streams.mJoints.size());
+   mInitialTransforms.setSize(streams.mJoints.size());
+   for (S32 iJoint = 0; iJoint < streams.mJoints.size(); iJoint++)
    {
-      const char* jointName = streams.joints.getStringValue(iJoint);
+      const char* jointName = streams.mJoints.getStringValue(iJoint);
 
       // Lookup the joint element
       const domNode* joint = 0;
@@ -1082,7 +1082,7 @@ void ColladaAppMesh::lookupSkinData()
       // Bone scaling is generally ignored during import, since 3space only
       // stores default node transform and rotation. Compensate for this by
       // removing the scaling from the inverse bind transform as well
-      MatrixF invBind = streams.invBindMatrices.getMatrixFValue(iJoint);
+      MatrixF invBind = streams.mInvBindMatrices.getMatrixFValue(iJoint);
       if (!ColladaUtils::getOptions().ignoreNodeScale)
       {
          Point3F invScale = invBind.getScale();
