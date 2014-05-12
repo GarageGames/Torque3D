@@ -40,8 +40,8 @@ namespace DictHash
 
 using namespace ColladaUtils;
 
-bool ColladaAppMesh::fixedSizeEnabled = false;
-S32 ColladaAppMesh::fixedSize = 2;
+bool ColladaAppMesh::mFixedSizeEnabled = false;
+S32 ColladaAppMesh::mFixedSize = 2;
 
 //-----------------------------------------------------------------------------
 // Define a VertTuple dictionary to allow fast tuple lookups
@@ -317,7 +317,7 @@ public:
 //------------------------------------------------------------------------------
 
 ColladaAppMesh::ColladaAppMesh(const domInstance_geometry* instance, ColladaAppNode* node)
-   : instanceGeom(instance), instanceCtrl(0), appNode(node), geomExt(0)
+   : mInstanceGeom(instance), mInstanceCtrl(0), mAppNode(node), mGeomExt(0)
 {
    mFlags = 0;
    mNumFrames = 0;
@@ -325,7 +325,7 @@ ColladaAppMesh::ColladaAppMesh(const domInstance_geometry* instance, ColladaAppN
 }
 
 ColladaAppMesh::ColladaAppMesh(const domInstance_controller* instance, ColladaAppNode* node)
-   : instanceGeom(0), instanceCtrl(instance), appNode(node), geomExt(0)
+   : mInstanceGeom(0), mInstanceCtrl(instance), mAppNode(node), mGeomExt(0)
 {
    mFlags = 0;
    mNumFrames = 0;
@@ -337,18 +337,18 @@ const char* ColladaAppMesh::getName(bool allowFixed)
    // Some exporters add a 'PIVOT' or unnamed node between the mesh and the
    // actual object node. Detect this and return the object node name instead
    // of the pivot node.
-   const char* nodeName = appNode->getName();
+   const char* nodeName = mAppNode->getName();
    if ( dStrEqual(nodeName, "null") || dStrEndsWith(nodeName, "PIVOT") )
-      nodeName = appNode->getParentName();
+      nodeName = mAppNode->getParentName();
 
    // If all geometry is being fixed to the same size, append the size
    // to the name
-   return allowFixed && fixedSizeEnabled ? avar("%s %d", nodeName, fixedSize) : nodeName;
+   return allowFixed && mFixedSizeEnabled ? avar("%s %d", nodeName, mFixedSize) : nodeName;
 }
 
 MatrixF ColladaAppMesh::getMeshTransform(F32 time)
 {
-   return appNode->getNodeTransform(time);
+   return mAppNode->getNodeTransform(time);
 }
 
 bool ColladaAppMesh::animatesVis(const AppSequence* appSeq)
@@ -357,7 +357,7 @@ bool ColladaAppMesh::animatesVis(const AppSequence* appSeq)
       (dynamic_cast<const ColladaAppNode*>(node)->nodeExt->visibility.isAnimated(appSeq->getStart(), appSeq->getEnd()))
 
    // Check if the node visibility is animated within the sequence interval
-   return IS_VIS_ANIMATED(appNode) || (appNode->appParent ? IS_VIS_ANIMATED(appNode->appParent) : false);
+   return IS_VIS_ANIMATED(mAppNode) || (mAppNode->appParent ? IS_VIS_ANIMATED(mAppNode->appParent) : false);
 }
 
 bool ColladaAppMesh::animatesMatFrame(const AppSequence* appSeq)
@@ -421,7 +421,7 @@ F32 ColladaAppMesh::getVisValue(F32 t)
       (dynamic_cast<const ColladaAppNode*>(node)->nodeExt->visibility.getValue(t))
 
    // Get the visibility of the mesh's node at time, 't'
-   return GET_VIS(appNode) * (appNode->appParent ? GET_VIS(appNode->appParent) : 1.0f);
+   return GET_VIS(mAppNode) * (mAppNode->appParent ? GET_VIS(mAppNode->appParent) : 1.0f);
 }
 
 S32 ColladaAppMesh::addMaterial(const char* symbol)
@@ -431,14 +431,14 @@ S32 ColladaAppMesh::addMaterial(const char* symbol)
 
    // Lookup the symbol in the materials already bound to this geometry/controller
    // instance
-   Map<StringTableEntry,U32>::Iterator itr = boundMaterials.find(symbol);
-   if (itr != boundMaterials.end())
+   Map<StringTableEntry,U32>::Iterator itr = mBoundMaterials.find(symbol);
+   if (itr != mBoundMaterials.end())
       return itr->value;
 
    // Find the Collada material that this symbol maps to
    U32 matIndex = TSDrawPrimitive::NoMaterial;
-   const domBind_material* binds = instanceGeom ? instanceGeom->getBind_material() :
-                                                  instanceCtrl->getBind_material();
+   const domBind_material* binds = mInstanceGeom ? mInstanceGeom->getBind_material() :
+                                                  mInstanceCtrl->getBind_material();
    if (binds) {
       const domInstance_material_Array& matArray = binds->getTechnique_common()->getInstance_material_array();
       for (S32 iBind = 0; iBind < matArray.getCount(); iBind++) {
@@ -470,7 +470,7 @@ S32 ColladaAppMesh::addMaterial(const char* symbol)
    }
 
    // Add this symbol to the bound list for the mesh
-   boundMaterials.insert(StringTable->insert(symbol), matIndex);
+   mBoundMaterials.insert(StringTable->insert(symbol), matIndex);
    return matIndex;
 }
 
@@ -481,8 +481,8 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
       return;
 
    // Read the <geometry> extension
-   if (!geomExt)
-      geomExt = new ColladaExtension_geometry(geometry);
+   if (!mGeomExt)
+      mGeomExt = new ColladaExtension_geometry(geometry);
 
    // Get the supported primitive elements for this geometry, and warn
    // about unsupported elements
@@ -529,7 +529,7 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
          appMat = static_cast<ColladaAppMaterial*>(mAppMaterials[primitive.matIndex & TSDrawPrimitive::MaterialMask]);
 
       // Force the material to be double-sided if this geometry is double-sided.
-      if (geomExt->double_sided && appMat && appMat->effectExt)
+      if (mGeomExt->double_sided && appMat && appMat->effectExt)
          appMat->effectExt->double_sided = true;
 
       // Pre-allocate triangle indices
@@ -555,12 +555,12 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
          // If the next triangle could cause us to index across a 16-bit
          // boundary, split this primitive and clear the tuple map to
          // ensure primitives only index verts within a 16-bit range.
-         if (vertTuples.size() &&
-            (((vertTuples.size()-1) ^ (vertTuples.size()+2)) & 0x10000))
+         if (mVertTuples.size() &&
+            (((mVertTuples.size()-1) ^ (mVertTuples.size()+2)) & 0x10000))
          {
             // Pad vertTuples up to the next 16-bit boundary
-            while (vertTuples.size() & 0xFFFF)
-               vertTuples.push_back(VertTuple(vertTuples.last()));
+            while (mVertTuples.size() & 0xFFFF)
+               mVertTuples.push_back(VertTuple(mVertTuples.last()));
 
             // Split the primitive at the current triangle
             S32 indicesRemaining = (numTriangles - iTri) * 3;
@@ -602,13 +602,13 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
             VertTupleMap::Iterator itr = tupleMap.find(tuple);
             if (itr == tupleMap.end())
             {
-               itr = tupleMap.insert(tuple, vertTuples.size());
-               vertTuples.push_back(tuple);
+               itr = tupleMap.insert(tuple, mVertTuples.size());
+               mVertTuples.push_back(tuple);
             }
 
             // Collada uses CCW for front face and Torque uses the opposite, so
             // for normal (non-inverted) meshes, the indices are flipped.
-            if (appNode->invertMeshes)
+            if (mAppNode->invertMeshes)
                dstIndex[v] = itr->value;
             else
                dstIndex[2 - v] = itr->value;
@@ -648,20 +648,20 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 
    // If appending values, pre-allocate the arrays
    if (appendValues) {
-      v_points.setSize(v_points.size() + vertTuples.size());
-      v_uvs.setSize(v_uvs.size() + vertTuples.size());
+      v_points.setSize(v_points.size() + mVertTuples.size());
+      v_uvs.setSize(v_uvs.size() + mVertTuples.size());
    }
 
    // Get pointers to arrays
-   Point3F* points_array = &v_points[v_points.size() - vertTuples.size()];
-   Point2F* uvs_array = &v_uvs[v_uvs.size() - vertTuples.size()];
+   Point3F* points_array = &v_points[v_points.size() - mVertTuples.size()];
+   Point2F* uvs_array = &v_uvs[v_uvs.size() - mVertTuples.size()];
    Point3F* norms_array = NULL;
    ColorI*  colors_array = NULL;
    Point2F* uv2s_array = NULL;
 
-   for (S32 iVert = 0; iVert < vertTuples.size(); iVert++) {
+   for (S32 iVert = 0; iVert < mVertTuples.size(); iVert++) {
 
-      const VertTuple& tuple = vertTuples[iVert];
+      const VertTuple& tuple = mVertTuples[iVert];
 
       // Change primitives?
       if (tuple.mPrim != lastPrimitive) {
@@ -690,7 +690,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          points_array[iVert] = streams.points.getPoint3FValue(tuple.mVertex);
 
          // Flip verts for inverted meshes
-         if (appNode->invertMeshes)
+         if (mAppNode->invertMeshes)
             points_array[iVert].z = -points_array[iVert].z;
 
          objectOffset.mulP(points_array[iVert]);
@@ -708,15 +708,15 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
       if ( (tuple.mNormal >= 0) && (tuple.mNormal < streams.normals.size()) ) {
          if ( !norms_array && iVert == 0 )
          {
-            v_norms.setSize(v_norms.size() + vertTuples.size());
-            norms_array = &v_norms[v_norms.size() - vertTuples.size()];
+            v_norms.setSize(v_norms.size() + mVertTuples.size());
+            norms_array = &v_norms[v_norms.size() - mVertTuples.size()];
          }
 
          if ( norms_array ) {
             norms_array[iVert] = streams.normals.getPoint3FValue(tuple.mNormal);
 
             // Flip normals for inverted meshes
-            if (appNode->invertMeshes)
+            if (mAppNode->invertMeshes)
                norms_array[iVert].z = -norms_array[iVert].z;
          }
       }
@@ -725,8 +725,8 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
       {
          if ( !colors_array && iVert == 0 )
          {
-            v_colors.setSize(v_colors.size() + vertTuples.size());
-            colors_array = &v_colors[v_colors.size() - vertTuples.size()];
+            v_colors.setSize(v_colors.size() + mVertTuples.size());
+            colors_array = &v_colors[v_colors.size() - mVertTuples.size()];
          }
 
          if ( colors_array )
@@ -737,8 +737,8 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
       {
          if ( !uv2s_array && iVert == 0 )
          {
-            v_uv2s.setSize(v_uv2s.size() + vertTuples.size());
-            uv2s_array = &v_uv2s[v_uv2s.size() - vertTuples.size()];
+            v_uv2s.setSize(v_uv2s.size() + mVertTuples.size());
+            uv2s_array = &v_uv2s[v_uv2s.size() - mVertTuples.size()];
          }
 
          if ( uv2s_array )
@@ -810,11 +810,11 @@ void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const M
    getVertexData(baseGeometry, time, objectOffset, v_points, v_norms, v_colors, v_uvs, v_uv2s, true);
 
    // Get pointers to the arrays of base geometry data
-   Point3F* points_array = &v_points[v_points.size() - vertTuples.size()];
-   Point3F* norms_array = &v_norms[v_norms.size() - vertTuples.size()];
-   Point2F* uvs_array = &v_uvs[v_uvs.size() - vertTuples.size()];
-   ColorI* colors_array = v_colors.size() ? &v_colors[v_colors.size() - vertTuples.size()] : 0;
-   Point2F* uv2s_array = v_uv2s.size() ? &v_uv2s[v_uv2s.size() - vertTuples.size()] : 0;
+   Point3F* points_array = &v_points[v_points.size() - mVertTuples.size()];
+   Point3F* norms_array = &v_norms[v_norms.size() - mVertTuples.size()];
+   Point2F* uvs_array = &v_uvs[v_uvs.size() - mVertTuples.size()];
+   ColorI* colors_array = v_colors.size() ? &v_colors[v_colors.size() - mVertTuples.size()] : 0;
+   Point2F* uv2s_array = v_uv2s.size() ? &v_uv2s[v_uv2s.size() - mVertTuples.size()] : 0;
 
    // Normalize base vertex data?
    if (morph->getMethod() == MORPHMETHODTYPE_NORMALIZED) {
@@ -827,14 +827,14 @@ void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const M
       // Result = Base*(1.0-w1-w2 ... -wN) + w1*Target1 + w2*Target2 ... + wN*TargetN
       weightSum = mClampF(1.0f - weightSum, 0.0f, 1.0f);
 
-      for (S32 iVert = 0; iVert < vertTuples.size(); iVert++) {
+      for (S32 iVert = 0; iVert < mVertTuples.size(); iVert++) {
          points_array[iVert] *= weightSum;
          norms_array[iVert] *= weightSum;
          uvs_array[iVert] *= weightSum;
       }
 
       if (uv2s_array) {
-         for (S32 iVert = 0; iVert < vertTuples.size(); iVert++)
+         for (S32 iVert = 0; iVert < mVertTuples.size(); iVert++)
             uv2s_array[iVert] *= weightSum;
       }
    }
@@ -855,29 +855,29 @@ void ColladaAppMesh::getMorphVertexData(const domMorph* morph, F32 time, const M
 
       // Copy base geometry into target geometry (will be used if target does
       // not define normals or uvs)
-      targetPoints.set(points_array, vertTuples.size());
-      targetNorms.set(norms_array, vertTuples.size());
-      targetUvs.set(uvs_array, vertTuples.size());
+      targetPoints.set(points_array, mVertTuples.size());
+      targetNorms.set(norms_array, mVertTuples.size());
+      targetUvs.set(uvs_array, mVertTuples.size());
       if (colors_array)
-         targetColors.set(colors_array, vertTuples.size());
+         targetColors.set(colors_array, mVertTuples.size());
       if (uv2s_array)
-         targetUv2s.set(uv2s_array, vertTuples.size());
+         targetUv2s.set(uv2s_array, mVertTuples.size());
 
       getVertexData(targetGeoms[iTarget], time, objectOffset, targetPoints, targetNorms, targetColors, targetUvs, targetUv2s, false);
 
       // Combine with base geometry
-      for (S32 iVert = 0; iVert < vertTuples.size(); iVert++) {
+      for (S32 iVert = 0; iVert < mVertTuples.size(); iVert++) {
          points_array[iVert] += targetPoints[iVert] * targetWeights[iTarget];
          norms_array[iVert] += targetNorms[iVert] * targetWeights[iTarget];
          uvs_array[iVert] += targetUvs[iVert] * targetWeights[iTarget];
       }
 
       if (uv2s_array) {
-         for (S32 iVert = 0; iVert < vertTuples.size(); iVert++)
+         for (S32 iVert = 0; iVert < mVertTuples.size(); iVert++)
             uv2s_array[iVert] += targetUv2s[iVert] * targetWeights[iTarget];
       }
       if (colors_array) {
-         for (S32 iVert = 0; iVert < vertTuples.size(); iVert++)
+         for (S32 iVert = 0; iVert < mVertTuples.size(); iVert++)
             colors_array[iVert] += targetColors[iVert] * (F32)targetWeights[iTarget];
       }
    }
@@ -891,12 +891,12 @@ void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objectOffset)
    // 3) a skin (skin geometry could also be a morph!)
    daeElement* geometry = 0;
 
-   if (instanceGeom) {
+   if (mInstanceGeom) {
       // Simple, static mesh
-      geometry = instanceGeom->getUrl().getElement();
+      geometry = mInstanceGeom->getUrl().getElement();
    }
-   else if (instanceCtrl) {
-      const domController* ctrl = daeSafeCast<domController>(instanceCtrl->getUrl().getElement());
+   else if (mInstanceCtrl) {
+      const domController* ctrl = daeSafeCast<domController>(mInstanceCtrl->getUrl().getElement());
       if (!ctrl) {
          daeErrorHandler::get()->handleWarning(avar("Failed to find <controller> "
             "element for %s", getName()));
@@ -941,7 +941,7 @@ void ColladaAppMesh::lookupSkinData()
       return;
 
    // Get the skin and vertex weight data
-   const domSkin* skin = daeSafeCast<domController>(instanceCtrl->getUrl().getElement())->getSkin();
+   const domSkin* skin = daeSafeCast<domController>(mInstanceCtrl->getUrl().getElement())->getSkin();
    const domSkin::domVertex_weights& weightIndices = *(skin->getVertex_weights());
    const domListOfInts& weights_v = weightIndices.getV()->getValue();
    const domListOfUInts& weights_vcount = weightIndices.getVcount()->getValue();
@@ -974,11 +974,11 @@ void ColladaAppMesh::lookupSkinData()
    for (S32 iVert = 0; iVert < mVertsPerFrame; iVert++) {
       const domUint* vcount = (domUint*)weights_vcount.getRaw(0);
       const domInt* vindices = (domInt*)weights_v.getRaw(0);
-      vindices += vindicesOffset[vertTuples[iVert].mVertex];
+      vindices += vindicesOffset[mVertTuples[iVert].mVertex];
 
       S32 nonZeroWeightCount = 0;
 
-      for (S32 iWeight = 0; iWeight < vcount[vertTuples[iVert].mVertex]; iWeight++) {
+      for (S32 iWeight = 0; iWeight < vcount[mVertTuples[iVert].mVertex]; iWeight++) {
 
          S32 bIndex = vindices[iWeight*2];
          F32 bWeight = streams.weights.getFloatValue( vindices[iWeight*2 + 1] );
@@ -990,7 +990,7 @@ void ColladaAppMesh::lookupSkinData()
          // Limit the number of weights per bone (keep the N largest influences)
          if ( nonZeroWeightCount >= TSSkinMesh::BatchData::maxBonePerVert )
          {
-            if (vcount[vertTuples[iVert].mVertex] > TSSkinMesh::BatchData::maxBonePerVert)
+            if (vcount[mVertTuples[iVert].mVertex] > TSSkinMesh::BatchData::maxBonePerVert)
             {
                if (!tooManyWeightsWarning)
                {
@@ -1054,10 +1054,10 @@ void ColladaAppMesh::lookupSkinData()
 
       // Lookup the joint element
       const domNode* joint = 0;
-      if (instanceCtrl->getSkeleton_array().getCount()) {
+      if (mInstanceCtrl->getSkeleton_array().getCount()) {
          // Search for the node using the <skeleton> as the base element
-         for (S32 iSkel = 0; iSkel < instanceCtrl->getSkeleton_array().getCount(); iSkel++) {
-            xsAnyURI skeleton = instanceCtrl->getSkeleton_array()[iSkel]->getValue();
+         for (S32 iSkel = 0; iSkel < mInstanceCtrl->getSkeleton_array().getCount(); iSkel++) {
+            xsAnyURI skeleton = mInstanceCtrl->getSkeleton_array()[iSkel]->getValue();
             daeSIDResolver resolver(skeleton.getElement(), jointName);
             joint = daeSafeCast<domNode>(resolver.getElement());
             if (joint)
@@ -1072,8 +1072,8 @@ void ColladaAppMesh::lookupSkinData()
 
       if (!joint) {
          daeErrorHandler::get()->handleWarning(avar("Failed to find bone '%s', "
-            "defaulting to instance_controller parent node '%s'", jointName, appNode->getName()));
-         joint = appNode->getDomNode();
+            "defaulting to instance_controller parent node '%s'", jointName, mAppNode->getName()));
+         joint = mAppNode->getDomNode();
       }
       mBones[iJoint] = new ColladaAppNode(joint);
 
