@@ -76,20 +76,20 @@ namespace ColladaUtils
          NumLodTypes
       };
 
-      domUpAxisType  upAxis;           // Override for the collada <up_axis> element
-      F32            unit;             // Override for the collada <unit> element
-      eLodType       lodType;          // LOD type option
-      S32            singleDetailSize; // Detail size for all meshes in the model
-      String         matNamePrefix;    // Prefix to apply to collada material names
-      String         alwaysImport;     // List of node names (with wildcards) to import, even if in the neverImport list
-      String         neverImport;      // List of node names (with wildcards) to ignore on loading
-      String         alwaysImportMesh; // List of mesh names (with wildcards) to import, even if in the neverImportMesh list
-      String         neverImportMesh;  // List of mesh names (with wildcards) to ignore on loading
-      bool           ignoreNodeScale;  // Ignore <scale> elements in <node>s
-      bool           adjustCenter;     // Translate model so origin is at the center
-      bool           adjustFloor;      // Translate model so origin is at the bottom
-      bool           forceUpdateMaterials;   // Force update of materials.cs
-      bool           useDiffuseNames;  // Use diffuse texture as the material name
+      domUpAxisType  mUpAxis;             // Override for the collada <up_axis> element
+      F32            mUnit;               // Override for the collada <unit> element
+      eLodType       mLodType;            // LOD type option
+      S32            mSingleDetailSize;   // Detail size for all meshes in the model
+      String         mMatNamePrefix;      // Prefix to apply to collada material names
+      String         mAlwaysImport;       // List of node names (with wildcards) to import, even if in the neverImport list
+      String         mNeverImport;        // List of node names (with wildcards) to ignore on loading
+      String         mAlwaysImportMesh;   // List of mesh names (with wildcards) to import, even if in the neverImportMesh list
+      String         mNeverImportMesh;    // List of mesh names (with wildcards) to ignore on loading
+      bool           mIgnoreNodeScale;    // Ignore <scale> elements in <node>s
+      bool           mAdjustCenter;       // Translate model so origin is at the center
+      bool           mAdjustFloor;        // Translate model so origin is at the bottom
+      bool           mForceUpdateMaterials;  // Force update of materials.cs
+      bool           mUseDiffuseNames;    // Use diffuse texture as the material name
 
       ImportOptions()
       {
@@ -98,20 +98,20 @@ namespace ColladaUtils
 
       void reset()
       {
-         upAxis = UPAXISTYPE_COUNT;
-         unit = -1.0f;
-         lodType = DetectDTS;
-         singleDetailSize = 2;
-         matNamePrefix = "";
-         alwaysImport = "";
-         neverImport = "";
-         alwaysImportMesh = "";
-         neverImportMesh = "";
-         ignoreNodeScale = false;
-         adjustCenter = false;
-         adjustFloor = false;
-         forceUpdateMaterials = false;
-         useDiffuseNames = false;
+         mUpAxis = UPAXISTYPE_COUNT;
+         mUnit = -1.0f;
+         mLodType = DetectDTS;
+         mSingleDetailSize = 2;
+         mMatNamePrefix = "";
+         mAlwaysImport = "";
+         mNeverImport = "";
+         mAlwaysImportMesh = "";
+         mNeverImportMesh = "";
+         mIgnoreNodeScale = false;
+         mAdjustCenter = false;
+         mAdjustFloor = false;
+         mForceUpdateMaterials = false;
+         mUseDiffuseNames = false;
       }
    };
 

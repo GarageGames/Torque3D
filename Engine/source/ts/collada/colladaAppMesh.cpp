@@ -1083,7 +1083,7 @@ void ColladaAppMesh::lookupSkinData()
       // stores default node transform and rotation. Compensate for this by
       // removing the scaling from the inverse bind transform as well
       MatrixF invBind = streams.mInvBindMatrices.getMatrixFValue(iJoint);
-      if (!ColladaUtils::getOptions().ignoreNodeScale)
+      if (!ColladaUtils::getOptions().mIgnoreNodeScale)
       {
          Point3F invScale = invBind.getScale();
          invScale.x = invScale.x ? (1.0f / invScale.x) : 0;

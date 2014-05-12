@@ -86,11 +86,11 @@ ColladaShapeLoader::ColladaShapeLoader(domCOLLADA* _root)
    }
 
    // Set import options (if they are not set to override)
-   if (ColladaUtils::getOptions().unit <= 0.0f)
-      ColladaUtils::getOptions().unit = unit;
+   if (ColladaUtils::getOptions().mUnit <= 0.0f)
+      ColladaUtils::getOptions().mUnit = unit;
 
-   if (ColladaUtils::getOptions().upAxis == UPAXISTYPE_COUNT)
-      ColladaUtils::getOptions().upAxis = upAxis;
+   if (ColladaUtils::getOptions().mUpAxis == UPAXISTYPE_COUNT)
+      ColladaUtils::getOptions().mUpAxis = upAxis;
 }
 
 ColladaShapeLoader::~ColladaShapeLoader()
@@ -267,7 +267,7 @@ void ColladaShapeLoader::enumerateScene()
 
    // Set LOD option
    bool singleDetail = true;
-   switch (ColladaUtils::getOptions().lodType)
+   switch (ColladaUtils::getOptions().mLodType)
    {
       case ColladaUtils::ImportOptions::DetectDTS:
          // Check for a baseXX->startXX hierarchy at the top-level, if we find
@@ -298,7 +298,7 @@ void ColladaShapeLoader::enumerateScene()
          break;
    }
 
-   ColladaAppMesh::fixDetailSize( singleDetail, ColladaUtils::getOptions().singleDetailSize );
+   ColladaAppMesh::fixDetailSize( singleDetail, ColladaUtils::getOptions().mSingleDetailSize );
 
    // Process the top level nodes
    for (S32 iNode = 0; iNode < sceneNodes.size(); iNode++) {
@@ -321,18 +321,18 @@ void ColladaShapeLoader::enumerateScene()
 
 bool ColladaShapeLoader::ignoreNode(const String& name)
 {
-   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().alwaysImport, name, false))
+   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mAlwaysImport, name, false))
       return false;
    else
-      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().neverImport, name, false);
+      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mNeverImport, name, false);
 }
 
 bool ColladaShapeLoader::ignoreMesh(const String& name)
 {
-   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().alwaysImportMesh, name, false))
+   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mAlwaysImportMesh, name, false))
       return false;
    else
-      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().neverImportMesh, name, false);
+      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mNeverImportMesh, name, false);
 }
 
 void ColladaShapeLoader::computeBounds(Box3F& bounds)
@@ -341,17 +341,17 @@ void ColladaShapeLoader::computeBounds(Box3F& bounds)
 
    // Check if the model origin needs adjusting
    if ( bounds.isValidBox() &&
-       (ColladaUtils::getOptions().adjustCenter ||
-        ColladaUtils::getOptions().adjustFloor) )
+       (ColladaUtils::getOptions().mAdjustCenter ||
+        ColladaUtils::getOptions().mAdjustFloor) )
    {
       // Compute shape offset
       Point3F shapeOffset = Point3F::Zero;
-      if ( ColladaUtils::getOptions().adjustCenter )
+      if ( ColladaUtils::getOptions().mAdjustCenter )
       {
          bounds.getCenter( &shapeOffset );
          shapeOffset = -shapeOffset;
       }
-      if ( ColladaUtils::getOptions().adjustFloor )
+      if ( ColladaUtils::getOptions().mAdjustFloor )
          shapeOffset.z = -bounds.minExtents.z;
 
       // Adjust bounds
@@ -448,7 +448,7 @@ void copySketchupTexture(const Torque::Path &path, String &textureFilename)
 void updateMaterialsScript(const Torque::Path &path, bool copyTextures = false)
 {
 #ifdef DAE2DTS_TOOL
-   if (!ColladaUtils::getOptions().forceUpdateMaterials)
+   if (!ColladaUtils::getOptions().mForceUpdateMaterials)
       return;
 #endif
 
@@ -467,7 +467,7 @@ void updateMaterialsScript(const Torque::Path &path, bool copyTextures = false)
          if ( Sim::findObject( MATMGR->getMapEntry( mat->getName() ), mappedMat ) )
          {
             // Only update existing materials if forced to
-            if ( ColladaUtils::getOptions().forceUpdateMaterials )
+            if ( ColladaUtils::getOptions().mForceUpdateMaterials )
                persistMgr.setDirty( mappedMat );
          }
          else
@@ -677,8 +677,8 @@ TSShape* loadColladaShape(const Torque::Path &path)
 
 #ifdef DAE2DTS_TOOL
       // Command line overrides certain options
-      ColladaUtils::getOptions().forceUpdateMaterials = cmdLineOptions.forceUpdateMaterials;
-      ColladaUtils::getOptions().useDiffuseNames = cmdLineOptions.useDiffuseNames;
+      ColladaUtils::getOptions().mForceUpdateMaterials = cmdLineOptions.mForceUpdateMaterials;
+      ColladaUtils::getOptions().mUseDiffuseNames = cmdLineOptions.mUseDiffuseNames;
 #endif
    }
 

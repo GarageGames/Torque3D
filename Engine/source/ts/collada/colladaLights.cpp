@@ -210,8 +210,8 @@ ConsoleFunction( loadColladaLights, bool, 2, 4,
          upAxis = root->getAsset()->getUp_axis()->getValue();
    }
 
-   ColladaUtils::getOptions().unit = unit;
-   ColladaUtils::getOptions().upAxis = upAxis;
+   ColladaUtils::getOptions().mUnit = unit;
+   ColladaUtils::getOptions().mUpAxis = upAxis;
 
    // First grab all of the top-level nodes
    Vector<ColladaAppNode*> sceneNodes;

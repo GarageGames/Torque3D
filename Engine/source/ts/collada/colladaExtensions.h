@@ -247,7 +247,7 @@ public:
 
       // OpenCOLLADA profile
       pTechnique = findExtraTechnique(node, "OpenCOLLADA");
-      if (!visibility.element)
+      if (!visibility.mElement)
          GET_EXTRA_PARAM(visibility, 1.0);
       GET_EXTRA_PARAM(user_properties, user_properties);
    }

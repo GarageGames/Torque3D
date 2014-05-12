@@ -159,7 +159,7 @@ void TSShapeConstructor::initPersistFields()
    endGroup( "Media" );
 
    addGroup( "Collada" );
-   addField( "upAxis", TYPEID< domUpAxisType >(), Offset(mOptions.upAxis, TSShapeConstructor),
+   addField( "upAxis", TYPEID< domUpAxisType >(), Offset(mOptions.mUpAxis, TSShapeConstructor),
       "Override the <up_axis> element in the COLLADA (.dae) file. No effect for DTS files.\n"
       "Set to one of the following values:\n"
       "<dl><dt>X_AXIS</dt><dd>Positive X points up. Model will be rotated into Torque's coordinate system (Z up).</dd>"
@@ -167,7 +167,7 @@ void TSShapeConstructor::initPersistFields()
       "<dt>Z_AXIS</dt><dd>Positive Z points up. No rotation will be applied to the model.</dd>"
       "<dt>DEFAULT</dt><dd>The default value. Use the value in the .dae file (defaults to Z_AXIS if the <up_axis> element is not present).</dd></dl>" );
 
-   addField( "unit", TypeF32, Offset(mOptions.unit, TSShapeConstructor),
+   addField( "unit", TypeF32, Offset(mOptions.mUnit, TSShapeConstructor),
       "Override the <unit> element in the COLLADA (.dae) file. No effect for DTS files.\n"
       "COLLADA (.dae) files usually contain a <unit> element that indicates the "
       "'real world' units that the model is described in. It means you can work "
@@ -182,7 +182,7 @@ void TSShapeConstructor::initPersistFields()
       "Omit the field or set to -1 to use the value in the .dae file (1.0 if the "
       "<unit> element is not present)" );
 
-   addField( "lodType", TYPEID< ColladaUtils::ImportOptions::eLodType >(), Offset(mOptions.lodType, TSShapeConstructor),
+   addField( "lodType", TYPEID< ColladaUtils::ImportOptions::eLodType >(), Offset(mOptions.mLodType, TSShapeConstructor),
       "Control how the COLLADA (.dae) importer interprets LOD in the model. No effect for DTS files.\n"
       "Set to one of the following values:\n"
       "<dl><dt>DetectDTS</dt><dd>The default value. Instructs the importer to search for a 'baseXXX->startXXX' node hierarchy at the root level. If found, the importer acts as if ''TrailingNumber'' was set. Otherwise, all geometry is imported at a single detail size.</dd>"
@@ -190,16 +190,16 @@ void TSShapeConstructor::initPersistFields()
       "<dt>TrailingNumber</dt><dd>Numbers at the end of geometry node's name are interpreted as the detail size (similar to DTS exporting). Geometry instances with the same base name but different trailing number are grouped into the same object.</dd>"
       "<dt>DEFAULT</dt><dd>The default value. Use the value in the .dae file (defaults to Z_AXIS if the <up_axis> element is not present).</dd></dl>" );
 
-   addField( "singleDetailSize", TypeS32, Offset(mOptions.singleDetailSize, TSShapeConstructor),
+   addField( "singleDetailSize", TypeS32, Offset(mOptions.mSingleDetailSize, TSShapeConstructor),
       "Sets the detail size when lodType is set to SingleSize. No effect otherwise, and no effect for DTS files.\n"
       "@see lodType" );
 
-   addField( "matNamePrefix", TypeRealString, Offset(mOptions.matNamePrefix, TSShapeConstructor),
+   addField( "matNamePrefix", TypeRealString, Offset(mOptions.mMatNamePrefix, TSShapeConstructor),
       "Prefix to apply to all material map names in the COLLADA (.dae) file. No effect for DTS files.\n"
       "This field is useful to avoid material name clashes for exporters that generate generic material "
       "names like \"texture0\" or \"material1\"." );
 
-   addField( "alwaysImport", TypeRealString, Offset(mOptions.alwaysImport, TSShapeConstructor),
+   addField( "alwaysImport", TypeRealString, Offset(mOptions.mAlwaysImport, TSShapeConstructor),
       "TAB separated patterns of nodes to import even if in neverImport list. No effect for DTS files.\n"
       "Torque allows unwanted nodes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -215,7 +215,7 @@ void TSShapeConstructor::initPersistFields()
       "}\n"
       "@endtsexample" );
 
-   addField( "neverImport", TypeRealString, Offset(mOptions.neverImport, TSShapeConstructor),
+   addField( "neverImport", TypeRealString, Offset(mOptions.mNeverImport, TSShapeConstructor),
       "TAB separated patterns of nodes to ignore on loading. No effect for DTS files.\n"
       "Torque allows unwanted nodes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -223,7 +223,7 @@ void TSShapeConstructor::initPersistFields()
       "not be imported (unless it matches the alwaysImport list.\n"
       "@see alwaysImport" );
 
-   addField( "alwaysImportMesh", TypeRealString, Offset(mOptions.alwaysImportMesh, TSShapeConstructor),
+   addField( "alwaysImportMesh", TypeRealString, Offset(mOptions.mAlwaysImportMesh, TSShapeConstructor),
       "TAB separated patterns of meshes to import even if in neverImportMesh list. No effect for DTS files.\n"
       "Torque allows unwanted meshes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -239,7 +239,7 @@ void TSShapeConstructor::initPersistFields()
       "}\n"
       "@endtsexample" );
 
-   addField( "neverImportMesh", TypeRealString, Offset(mOptions.neverImportMesh, TSShapeConstructor),
+   addField( "neverImportMesh", TypeRealString, Offset(mOptions.mNeverImportMesh, TSShapeConstructor),
       "TAB separated patterns of meshes to ignore on loading. No effect for DTS files.\n"
       "Torque allows unwanted meshes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -247,21 +247,21 @@ void TSShapeConstructor::initPersistFields()
       "not be imported (unless it matches the alwaysImportMesh list.\n"
       "@see alwaysImportMesh" );
 
-   addField( "ignoreNodeScale", TypeBool, Offset(mOptions.ignoreNodeScale, TSShapeConstructor),
+   addField( "ignoreNodeScale", TypeBool, Offset(mOptions.mIgnoreNodeScale, TSShapeConstructor),
       "Ignore <scale> elements inside COLLADA <node>s. No effect for DTS files.\n"
       "This field is a workaround for certain exporters that generate bad node "
       "scaling, and is not usually required." );
 
-   addField( "adjustCenter", TypeBool, Offset(mOptions.adjustCenter, TSShapeConstructor),
+   addField( "adjustCenter", TypeBool, Offset(mOptions.mAdjustCenter, TSShapeConstructor),
       "Translate COLLADA model on import so the origin is at the center. No effect for DTS files." );
 
-   addField( "adjustFloor", TypeBool, Offset(mOptions.adjustFloor, TSShapeConstructor),
+   addField( "adjustFloor", TypeBool, Offset(mOptions.mAdjustFloor, TSShapeConstructor),
       "Translate COLLADA model on import so origin is at the (Z axis) bottom of the model. No effect for DTS files.\n"
       "This can be used along with adjustCenter to have the origin at the "
       "center of the bottom of the model.\n"
       "@see adjustCenter" );
 
-   addField( "forceUpdateMaterials", TypeBool, Offset(mOptions.forceUpdateMaterials, TSShapeConstructor),
+   addField( "forceUpdateMaterials", TypeBool, Offset(mOptions.mForceUpdateMaterials, TSShapeConstructor),
       "Forces update of the materials.cs file in the same folder as the COLLADA "
       "(.dae) file, even if Materials already exist. No effect for DTS files.\n"
       "Normally only Materials that are not already defined are written to materials.cs." );

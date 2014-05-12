@@ -221,7 +221,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
    else {
       // no parent (ie. root level) => scale by global shape <unit>
       lastTransform.identity();
-      lastTransform.scale(ColladaUtils::getOptions().unit);
+      lastTransform.scale(ColladaUtils::getOptions().mUnit);
       if (!isBounds())
          ColladaUtils::convertTransform(lastTransform);     // don't convert bounds node transform (or upAxis won't work!)
    }
@@ -242,7 +242,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
       }
 
       // Remove node scaling (but keep reflections) if desired
-      if (ColladaUtils::getOptions().ignoreNodeScale)
+      if (ColladaUtils::getOptions().mIgnoreNodeScale)
       {
          Point3F invScale = mat.getScale();
          invScale.x = invScale.x ? (1.0f / invScale.x) : 0;

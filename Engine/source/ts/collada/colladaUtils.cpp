@@ -49,7 +49,7 @@ void ColladaUtils::convertTransform(MatrixF& mat)
 {
    MatrixF rot(true);
 
-   switch (ColladaUtils::getOptions().upAxis)
+   switch (ColladaUtils::getOptions().mUpAxis)
    {
       case UPAXISTYPE_X_UP:
          // rotate 90 around Y-axis, then 90 around Z-axis

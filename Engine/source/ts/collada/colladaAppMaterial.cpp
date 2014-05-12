@@ -155,8 +155,8 @@ ColladaAppMaterial::ColladaAppMaterial(const domMaterial *pMat)
    normalMap = getSamplerImagePath(effect, effectExt->bumpSampler);
 
    // Set the material name
-   name = ColladaUtils::getOptions().matNamePrefix;
-   if ( ColladaUtils::getOptions().useDiffuseNames )
+   name = ColladaUtils::getOptions().mMatNamePrefix;
+   if ( ColladaUtils::getOptions().mUseDiffuseNames )
    {
       Torque::Path diffusePath( diffuseMap );
       name += diffusePath.getFileName();
