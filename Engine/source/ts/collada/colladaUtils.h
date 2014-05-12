@@ -291,27 +291,27 @@ template<> inline const char* _GetNameOrId(const domInstance_controller* element
 // is done until we actually try to extract values from the source.
 class _SourceReader
 {
-   const domSource* source;      // the wrapped Collada source
-   const domAccessor* accessor;  // shortcut to the source accessor
-   Vector<U32> offsets;          // offset of each of the desired values to pull from the source array
+   const domSource* mSource;     // the wrapped Collada source
+   const domAccessor* mAccessor; // shortcut to the source accessor
+   Vector<U32> mOffsets;         // offset of each of the desired values to pull from the source array
 
 public:
-   _SourceReader() : source(0), accessor(0) {}
+   _SourceReader() : mSource(0), mAccessor(0) {}
 
    void reset()
    {
-      source = 0;
-      accessor = 0;
-      offsets.clear();
+      mSource = 0;
+      mAccessor = 0;
+      mOffsets.clear();
    }
 
    //------------------------------------------------------
    // Initialize the _SourceReader object
    bool initFromSource(const domSource* src, const char* paramNames[] = 0)
    {
-      source = src;
-      accessor = source->getTechnique_common()->getAccessor();
-      offsets.clear();
+      mSource = src;
+      mAccessor = mSource->getTechnique_common()->getAccessor();
+      mOffsets.clear();
 
       // The source array has groups of values in a 1D stream => need to map the
       // input param names to source params to determine the offset within the
@@ -319,11 +319,11 @@ public:
       U32 paramCount = 0;
       while (paramNames && paramNames[paramCount][0]) {
          // lookup the index of the source param that matches the input param
-         offsets.push_back(paramCount);
-         for (U32 iParam = 0; iParam < accessor->getParam_array().getCount(); iParam++) {
-            if (accessor->getParam_array()[iParam]->getName() &&
-               dStrEqual(accessor->getParam_array()[iParam]->getName(), paramNames[paramCount])) {
-               offsets.last() = iParam;
+         mOffsets.push_back(paramCount);
+         for (U32 iParam = 0; iParam < mAccessor->getParam_array().getCount(); iParam++) {
+            if (mAccessor->getParam_array()[iParam]->getName() &&
+               dStrEqual(mAccessor->getParam_array()[iParam]->getName(), paramNames[paramCount])) {
+               mOffsets.last() = iParam;
                break;
             }
          }
@@ -331,9 +331,9 @@ public:
       }
 
       // If no input params were specified, just map the source params directly
-      if (!offsets.size()) {
-         for (S32 iParam = 0; iParam < accessor->getParam_array().getCount(); iParam++)
-            offsets.push_back(iParam);
+      if (!mOffsets.size()) {
+         for (S32 iParam = 0; iParam < mAccessor->getParam_array().getCount(); iParam++)
+            mOffsets.push_back(iParam);
       }
 
       return true;
@@ -341,10 +341,10 @@ public:
 
    //------------------------------------------------------
    // Shortcut to the size of the array (should be the number of destination objects)
-   S32 size() const { return accessor ? accessor->getCount() : 0; }
+   S32 size() const { return mAccessor ? mAccessor->getCount() : 0; }
 
    // Get the number of elements per group in the source
-   S32 stride() const { return accessor ? accessor->getStride() : 0; }
+   S32 stride() const { return mAccessor ? mAccessor->getStride() : 0; }
 
    //------------------------------------------------------
    // Get a pointer to the start of a group of values (index advances by stride)
@@ -353,8 +353,8 @@ public:
    const double* getStringArrayData(S32 index) const
    {
       if ((index >= 0) && (index < size())) {
-         if (source->getFloat_array())
-            return &source->getFloat_array()->getValue()[index*stride()];
+         if (mSource->getFloat_array())
+            return &mSource->getFloat_array()->getValue()[index*stride()];
       }
       return 0;
    }
@@ -367,10 +367,10 @@ public:
    {
       if ((index >= 0) && (index < size())) {
          // could be plain strings or IDREFs
-         if (source->getName_array())
-            return source->getName_array()->getValue()[index*stride()];
-         else if (source->getIDREF_array())
-            return source->getIDREF_array()->getValue()[index*stride()].getID();
+         if (mSource->getName_array())
+            return mSource->getName_array()->getValue()[index*stride()];
+         else if (mSource->getIDREF_array())
+            return mSource->getIDREF_array()->getValue()[index*stride()].getID();
       }
       return "";
    }
@@ -379,7 +379,7 @@ public:
    {
       F32 value(0);
       if (const double* data = getStringArrayData(index))
-         return data[offsets[0]];
+         return data[mOffsets[0]];
       return value;
    }
 
@@ -387,7 +387,7 @@ public:
    {
       Point2F value(0, 0);
       if (const double* data = getStringArrayData(index))
-         value.set(data[offsets[0]], data[offsets[1]]);
+         value.set(data[mOffsets[0]], data[mOffsets[1]]);
       return value;
    }
 
@@ -395,7 +395,7 @@ public:
    {
       Point3F value(1, 0, 0);
       if (const double* data = getStringArrayData(index))
-         value.set(data[offsets[0]], data[offsets[1]], data[offsets[2]]);
+         value.set(data[mOffsets[0]], data[mOffsets[1]], data[mOffsets[2]]);
       return value;
    }
 
@@ -404,11 +404,11 @@ public:
       ColorI value(255, 255, 255, 255);
       if (const double* data = getStringArrayData(index))
       {
-         value.red = data[offsets[0]] * 255.0;
-         value.green = data[offsets[1]] * 255.0;
-         value.blue = data[offsets[2]] * 255.0;
+         value.red = data[mOffsets[0]] * 255.0;
+         value.green = data[mOffsets[1]] * 255.0;
+         value.blue = data[mOffsets[2]] * 255.0;
          if ( stride() == 4 )
-            value.alpha = data[offsets[3]] * 255.0;
+            value.alpha = data[mOffsets[3]] * 255.0;
       }
       return value;
    }
