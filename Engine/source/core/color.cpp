@@ -66,6 +66,24 @@ static typeColorIToNameHash    mColorIToName;
 
 #define DEFAULT_UNKNOWN_STOCK_COLOR_NAME    "White"
 
+MODULE_BEGIN( StockColors )
+
+   MODULE_INIT_AFTER( GFX )
+
+   MODULE_INIT
+   {
+      // Create the stock colors.
+      StockColor::create();
+   }
+
+   MODULE_SHUTDOWN
+   {
+      // Destroy the stock colors.
+      StockColor::destroy();
+   }
+
+MODULE_END;
+
 //-----------------------------------------------------------------------------
 
 StockColorItem StockColorTable[] =
