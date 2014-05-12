@@ -49,7 +49,7 @@ namespace DictHash
 {
    inline U32 hash(const VertTuple& data)
    {
-      return (U32)data.vertex;
+      return (U32)data.mVertex;
    }
 }
 
@@ -586,18 +586,18 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
             // Collect vert tuples into a single array so we can easily grab
             // vertex data later.
             VertTuple tuple;
-            tuple.prim = iPrim;
-            tuple.vertex = offsets[MeshStreams::Points]  >= 0 ? pSrcData[offsets[MeshStreams::Points]] : -1;
-            tuple.normal = offsets[MeshStreams::Normals] >= 0 ? pSrcData[offsets[MeshStreams::Normals]] : -1;
-            tuple.color  = offsets[MeshStreams::Colors]  >= 0 ? pSrcData[offsets[MeshStreams::Colors]] : -1;
-            tuple.uv     = offsets[MeshStreams::UVs]     >= 0 ? pSrcData[offsets[MeshStreams::UVs]] : -1;
-            tuple.uv2    = offsets[MeshStreams::UV2s]    >= 0 ? pSrcData[offsets[MeshStreams::UV2s]] : -1;
+            tuple.mPrim = iPrim;
+            tuple.mVertex = offsets[MeshStreams::Points]  >= 0 ? pSrcData[offsets[MeshStreams::Points]] : -1;
+            tuple.mNormal = offsets[MeshStreams::Normals] >= 0 ? pSrcData[offsets[MeshStreams::Normals]] : -1;
+            tuple.mColor  = offsets[MeshStreams::Colors]  >= 0 ? pSrcData[offsets[MeshStreams::Colors]] : -1;
+            tuple.mUV     = offsets[MeshStreams::UVs]     >= 0 ? pSrcData[offsets[MeshStreams::UVs]] : -1;
+            tuple.mUV2    = offsets[MeshStreams::UV2s]    >= 0 ? pSrcData[offsets[MeshStreams::UV2s]] : -1;
 
-            tuple.dataVertex = tuple.vertex > -1 ? streams.points.getPoint3FValue(tuple.vertex) : Point3F::Max;
-            tuple.dataNormal = tuple.normal > -1 ? streams.normals.getPoint3FValue(tuple.normal) : Point3F::Max;
-            tuple.dataColor  = tuple.color > -1  ? streams.colors.getColorIValue(tuple.color) : ColorI(0,0,0);
-            tuple.dataUV     = tuple.uv > -1     ? streams.uvs.getPoint2FValue(tuple.uv) : Point2F::Max;
-            tuple.dataUV2    = tuple.uv2 > -1    ? streams.uv2s.getPoint2FValue(tuple.uv2) : Point2F::Max;
+            tuple.mDataVertex = tuple.mVertex > -1 ? streams.points.getPoint3FValue(tuple.mVertex) : Point3F::Max;
+            tuple.mDataNormal = tuple.mNormal > -1 ? streams.normals.getPoint3FValue(tuple.mNormal) : Point3F::Max;
+            tuple.mDataColor  = tuple.mColor > -1  ? streams.colors.getColorIValue(tuple.mColor) : ColorI(0,0,0);
+            tuple.mDataUV     = tuple.mUV > -1     ? streams.uvs.getPoint2FValue(tuple.mUV) : Point2F::Max;
+            tuple.mDataUV2    = tuple.mUV2 > -1    ? streams.uv2s.getPoint2FValue(tuple.mUV2) : Point2F::Max;
 
             VertTupleMap::Iterator itr = tupleMap.find(tuple);
             if (itr == tupleMap.end())
@@ -664,8 +664,8 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
       const VertTuple& tuple = vertTuples[iVert];
 
       // Change primitives?
-      if (tuple.prim != lastPrimitive) {
-         if (meshPrims.size() <= tuple.prim) {
+      if (tuple.mPrim != lastPrimitive) {
+         if (meshPrims.size() <= tuple.mPrim) {
             daeErrorHandler::get()->handleError(avar("Failed to get vertex data "
                "for %s. Primitives do not match base geometry.", geometry->getID()));
             break;
@@ -673,21 +673,21 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 
          // Update vertex/normal/UV streams and get the new material index
          streams.reset();
-         streams.readInputs(meshPrims[tuple.prim]->getInputs());
-         S32 matIndex = addMaterial(meshPrims[tuple.prim]->getMaterial());
+         streams.readInputs(meshPrims[tuple.mPrim]->getInputs());
+         S32 matIndex = addMaterial(meshPrims[tuple.mPrim]->getMaterial());
          if (matIndex != TSDrawPrimitive::NoMaterial)
             appMat = static_cast<ColladaAppMaterial*>(mAppMaterials[matIndex]);
          else
             appMat = 0;
 
-         lastPrimitive = tuple.prim;
+         lastPrimitive = tuple.mPrim;
       }
 
       // If we are NOT appending values, only set the value if it actually exists
       // in the mesh data stream.
 
-      if (appendValues || ((tuple.vertex >= 0) && (tuple.vertex < streams.points.size()))) {
-         points_array[iVert] = streams.points.getPoint3FValue(tuple.vertex);
+      if (appendValues || ((tuple.mVertex >= 0) && (tuple.mVertex < streams.points.size()))) {
+         points_array[iVert] = streams.points.getPoint3FValue(tuple.mVertex);
 
          // Flip verts for inverted meshes
          if (appNode->invertMeshes)
@@ -696,8 +696,8 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          objectOffset.mulP(points_array[iVert]);
       }
 
-      if (appendValues || ((tuple.uv >= 0) && (tuple.uv < streams.uvs.size()))) {
-         uvs_array[iVert] = streams.uvs.getPoint2FValue(tuple.uv);
+      if (appendValues || ((tuple.mUV >= 0) && (tuple.mUV < streams.uvs.size()))) {
+         uvs_array[iVert] = streams.uvs.getPoint2FValue(tuple.mUV);
          if (appMat && appMat->effectExt)
             appMat->effectExt->applyTextureTransform(uvs_array[iVert], time);
          uvs_array[iVert].y = 1.0f - uvs_array[iVert].y;   // Collada texcoords are upside down compared to TGE
@@ -705,7 +705,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 
       // The rest is non-required data... if it doesn't exist then don't append it.
 
-      if ( (tuple.normal >= 0) && (tuple.normal < streams.normals.size()) ) {
+      if ( (tuple.mNormal >= 0) && (tuple.mNormal < streams.normals.size()) ) {
          if ( !norms_array && iVert == 0 )
          {
             v_norms.setSize(v_norms.size() + vertTuples.size());
@@ -713,7 +713,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
 
          if ( norms_array ) {
-            norms_array[iVert] = streams.normals.getPoint3FValue(tuple.normal);
+            norms_array[iVert] = streams.normals.getPoint3FValue(tuple.mNormal);
 
             // Flip normals for inverted meshes
             if (appNode->invertMeshes)
@@ -721,7 +721,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
       }
 
-      if ( (tuple.color >= 0) && (tuple.color < streams.colors.size())) 
+      if ( (tuple.mColor >= 0) && (tuple.mColor < streams.colors.size())) 
       {
          if ( !colors_array && iVert == 0 )
          {
@@ -730,10 +730,10 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          }
 
          if ( colors_array )
-            colors_array[iVert] = streams.colors.getColorIValue(tuple.color);
+            colors_array[iVert] = streams.colors.getColorIValue(tuple.mColor);
       }
 
-      if ( (tuple.uv2 >= 0) && (tuple.uv2 < streams.uv2s.size()) ) 
+      if ( (tuple.mUV2 >= 0) && (tuple.mUV2 < streams.uv2s.size()) ) 
       {
          if ( !uv2s_array && iVert == 0 )
          {
@@ -743,7 +743,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
 
          if ( uv2s_array )
          {
-            uv2s_array[iVert] = streams.uv2s.getPoint2FValue(tuple.uv2);
+            uv2s_array[iVert] = streams.uv2s.getPoint2FValue(tuple.mUV2);
             if (appMat && appMat->effectExt)
                appMat->effectExt->applyTextureTransform(uv2s_array[iVert], time);
             uv2s_array[iVert].y = 1.0f - uv2s_array[iVert].y;   // Collada texcoords are upside down compared to TGE
@@ -974,11 +974,11 @@ void ColladaAppMesh::lookupSkinData()
    for (S32 iVert = 0; iVert < mVertsPerFrame; iVert++) {
       const domUint* vcount = (domUint*)weights_vcount.getRaw(0);
       const domInt* vindices = (domInt*)weights_v.getRaw(0);
-      vindices += vindicesOffset[vertTuples[iVert].vertex];
+      vindices += vindicesOffset[vertTuples[iVert].mVertex];
 
       S32 nonZeroWeightCount = 0;
 
-      for (S32 iWeight = 0; iWeight < vcount[vertTuples[iVert].vertex]; iWeight++) {
+      for (S32 iWeight = 0; iWeight < vcount[vertTuples[iVert].mVertex]; iWeight++) {
 
          S32 bIndex = vindices[iWeight*2];
          F32 bWeight = streams.weights.getFloatValue( vindices[iWeight*2 + 1] );
@@ -990,7 +990,7 @@ void ColladaAppMesh::lookupSkinData()
          // Limit the number of weights per bone (keep the N largest influences)
          if ( nonZeroWeightCount >= TSSkinMesh::BatchData::maxBonePerVert )
          {
-            if (vcount[vertTuples[iVert].vertex] > TSSkinMesh::BatchData::maxBonePerVert)
+            if (vcount[vertTuples[iVert].mVertex] > TSSkinMesh::BatchData::maxBonePerVert)
             {
                if (!tooManyWeightsWarning)
                {

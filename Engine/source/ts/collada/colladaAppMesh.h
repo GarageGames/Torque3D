@@ -57,20 +57,20 @@
 // AND all of the target geometries because they MUST have the same topology.
 struct VertTuple
 {
-   S32 prim, vertex, normal, color, uv, uv2;
+   S32 mPrim, mVertex, mNormal, mColor, mUV, mUV2;
 
-   Point3F dataVertex, dataNormal;
-   ColorI  dataColor;
-   Point2F dataUV, dataUV2;
+   Point3F mDataVertex, mDataNormal;
+   ColorI  mDataColor;
+   Point2F mDataUV, mDataUV2;
 
-   VertTuple(): prim(-1), vertex(-1), normal(-1), color(-1), uv(-1), uv2(-1) {}
+   VertTuple(): mPrim(-1), mVertex(-1), mNormal(-1), mColor(-1), mUV(-1), mUV2(-1) {}
    bool operator==(const VertTuple& p) const 
    {
-      return   dataVertex == p.dataVertex &&
-               dataColor == p.dataColor &&  
-               dataNormal == p.dataNormal &&   
-               dataUV == p.dataUV &&  
-               dataUV2 == p.dataUV2;
+      return   mDataVertex == p.mDataVertex &&
+               mDataColor == p.mDataColor &&  
+               mDataNormal == p.mDataNormal &&   
+               mDataUV == p.mDataUV &&  
+               mDataUV2 == p.mDataUV2;
    }
 };
 
