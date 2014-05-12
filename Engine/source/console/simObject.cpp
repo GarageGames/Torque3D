@@ -2158,8 +2158,8 @@ DefineConsoleMethod( SimObject, dumpMethods, ArrayObject*, (),,
       str.append( e->getPrototypeString() );
 
       str.append( '\n' );
-      if( e->mCode && e->mCode->fullPath )
-         str.append( e->mCode->fullPath );
+      if( e->mCode && e->mCode->mFullPath )
+         str.append( e->mCode->mFullPath );
       str.append( '\n' );
       if( e->mCode )
          str.append( String::ToString( e->mFunctionLineNumber ) );

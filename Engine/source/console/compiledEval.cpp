@@ -422,8 +422,8 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
    if(argv)
    {
       // assume this points into a function decl:
-      U32 fnArgc = code[ip + 5];
-      thisFunctionName = U32toSTE(code[ip]);
+      U32 fnArgc = mCode[ip + 5];
+      thisFunctionName = U32toSTE(mCode[ip]);
       argc = getMin(argc-1, fnArgc); // argv[0] is func name
       if(gEvalState.traceOn)
       {
@@ -458,20 +458,20 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
       popFrame = true;
       for(i = 0; i < argc; i++)
       {
-         StringTableEntry var = U32toSTE(code[ip + i + 6]);
+         StringTableEntry var = U32toSTE(mCode[ip + i + 6]);
          gEvalState.setCurVarNameCreate(var);
          gEvalState.setStringVariable(argv[i+1]);
       }
       ip = ip + fnArgc + 6;
-      curFloatTable = functionFloats;
-      curStringTable = functionStrings;
-      curStringTableLen = functionStringsMaxLen;
+      curFloatTable = mFunctionFloats;
+      curStringTable = mFunctionStrings;
+      curStringTableLen = mFunctionStringsMaxLen;
    }
    else
    {
-      curFloatTable = globalFloats;
-      curStringTable = globalStrings;
-      curStringTableLen = globalStringsMaxLen;
+      curFloatTable = mGlobalFloats;
+      curStringTable = mGlobalStrings;
+      curStringTableLen = mGlobalStringsMaxLen;
 
       // If requested stack frame isn't available, request a new one
       // (this prevents assert failures when creating local
@@ -537,10 +537,10 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
 
    CodeBlock *saveCodeBlock = smCurrentCodeBlock;
    smCurrentCodeBlock = this;
-   if(this->name)
+   if(this->mName)
    {
-      Con::gCurrentFile = this->name;
-      Con::gCurrentRoot = this->modPath;
+      Con::gCurrentFile = this->mName;
+      Con::gCurrentRoot = this->mModPath;
    }
    const char * val;
 
@@ -551,7 +551,7 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
 
    for(;;)
    {
-      U32 instruction = code[ip++];
+      U32 instruction = mCode[ip++];
       nsEntry = NULL;
 breakContinue:
       switch(instruction)
@@ -559,11 +559,11 @@ breakContinue:
          case OP_FUNC_DECL:
             if(!noCalls)
             {
-               fnName       = U32toSTE(code[ip]);
-               fnNamespace  = U32toSTE(code[ip+1]);
-               fnPackage    = U32toSTE(code[ip+2]);
-               bool hasBody = ( code[ ip + 3 ] & 0x01 ) != 0;
-               U32 lineNumber = code[ ip + 3 ] >> 1;
+               fnName       = U32toSTE(mCode[ip]);
+               fnNamespace  = U32toSTE(mCode[ip+1]);
+               fnPackage    = U32toSTE(mCode[ip+2]);
+               bool hasBody = ( mCode[ ip + 3 ] & 0x01 ) != 0;
+               U32 lineNumber = mCode[ ip + 3 ] >> 1;
                
                Namespace::unlinkPackages();
                ns = Namespace::find(fnNamespace, fnPackage);
@@ -586,18 +586,18 @@ breakContinue:
 
                //Con::printf("Adding function %s::%s (%d)", fnNamespace, fnName, ip);
             }
-            ip = code[ip + 4];
+            ip = mCode[ip + 4];
             break;
 
          case OP_CREATE_OBJECT:
          {
             // Read some useful info.
-            objParent        = U32toSTE(code[ip    ]);
-            bool isDataBlock =          code[ip + 1];
-            bool isInternal  =          code[ip + 2];
-            bool isSingleton =          code[ip + 3];
-            U32  lineNumber  =          code[ip + 4];
-            failJump         =          code[ip + 5];
+            objParent        = U32toSTE(mCode[ip    ]);
+            bool isDataBlock =          mCode[ip + 1];
+            bool isInternal  =          mCode[ip + 2];
+            bool isSingleton =          mCode[ip + 3];
+            U32  lineNumber  =          mCode[ip + 4];
+            failJump         =          mCode[ip + 5];
                         
             // If we don't allow calls, we certainly don't allow creating objects!
             // Moved this to after failJump is set. Engine was crashing when
@@ -790,7 +790,7 @@ breakContinue:
                currentNewObject->setDeclarationLine(lineNumber);
 
                // Set the file that this object was created in
-               currentNewObject->setFilename(name);
+               currentNewObject->setFilename(mName);
 
                // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
                if(*objParent)
@@ -859,7 +859,7 @@ breakContinue:
             curNSDocBlock = NULL;
             
             // Do we place this object at the root?
-            bool placeAtRoot = code[ip++];
+            bool placeAtRoot = mCode[ip++];
 
             // Con::printf("Adding object %s", currentNewObject->getName());
 
@@ -962,7 +962,7 @@ breakContinue:
          {
             // If we're not to be placed at the root, make sure we clean up
             // our group reference.
-            bool placeAtRoot = code[ip++];
+            bool placeAtRoot = mCode[ip++];
             if(!placeAtRoot)
                _UINT--;
             break;
@@ -983,7 +983,7 @@ breakContinue:
                ip++;
                break;
             }
-            ip = code[ip];
+            ip = mCode[ip];
             break;
          case OP_JMPIFNOT:
             if(intStack[_UINT--])
@@ -991,7 +991,7 @@ breakContinue:
                ip++;
                break;
             }
-            ip = code[ip];
+            ip = mCode[ip];
             break;
          case OP_JMPIFF:
             if(!floatStack[_FLT--])
@@ -999,7 +999,7 @@ breakContinue:
                ip++;
                break;
             }
-            ip = code[ip];
+            ip = mCode[ip];
             break;
          case OP_JMPIF:
             if(!intStack[_UINT--])
@@ -1007,7 +1007,7 @@ breakContinue:
                ip ++;
                break;
             }
-            ip = code[ip];
+            ip = mCode[ip];
             break;
          case OP_JMPIFNOT_NP:
             if(intStack[_UINT])
@@ -1016,7 +1016,7 @@ breakContinue:
                ip++;
                break;
             }
-            ip = code[ip];
+            ip = mCode[ip];
             break;
          case OP_JMPIF_NP:
             if(!intStack[_UINT])
@@ -1025,10 +1025,10 @@ breakContinue:
                ip++;
                break;
             }
-            ip = code[ip];
+            ip = mCode[ip];
             break;
          case OP_JMP:
-            ip = code[ip];
+            ip = mCode[ip];
             break;
             
          // This fixes a bug when not explicitly returning a value.
@@ -1170,7 +1170,7 @@ breakContinue:
             break;
 
          case OP_SETCURVAR:
-            var = U32toSTE(code[ip]);
+            var = U32toSTE(mCode[ip]);
             ip++;
 
             // If a variable is set, then these must be NULL. It is necessary
@@ -1190,7 +1190,7 @@ breakContinue:
             break;
 
          case OP_SETCURVAR_CREATE:
-            var = U32toSTE(code[ip]);
+            var = U32toSTE(mCode[ip]);
             ip++;
 
 			// See OP_SETCURVAR
@@ -1289,7 +1289,7 @@ breakContinue:
                if(set)
                {
                   StringTableEntry intName = StringTable->insert(STR.getStringValue());
-                  bool recurse = code[ip-1];
+                  bool recurse = mCode[ip-1];
                   SimObject *obj = set->findObjectByInternalName(intName, recurse);
                   intStack[_UINT+1] = obj ? obj->getId() : 0;
                   _UINT++;
@@ -1310,7 +1310,7 @@ breakContinue:
             // Save the previous field for parsing vector fields.
             prevField = curField;
             dStrcpy( prevFieldArray, curFieldArray );
-            curField = U32toSTE(code[ip]);
+            curField = U32toSTE(mCode[ip]);
             curFieldArray[0] = 0;
             ip++;
             break;
@@ -1321,7 +1321,7 @@ breakContinue:
 
          case OP_SETCURFIELD_TYPE:
             if(curObject)
-               curObject->setDataFieldType(code[ip], curField, curFieldArray);
+               curObject->setDataFieldType(mCode[ip], curField, curFieldArray);
             ip++;
             break;
 
@@ -1449,34 +1449,34 @@ breakContinue:
             break;
 
          case OP_LOADIMMED_UINT:
-            intStack[_UINT+1] = code[ip++];
+            intStack[_UINT+1] = mCode[ip++];
             _UINT++;
             break;
 
          case OP_LOADIMMED_FLT:
-            floatStack[_FLT+1] = curFloatTable[code[ip]];
+            floatStack[_FLT+1] = curFloatTable[mCode[ip]];
             ip++;
             _FLT++;
             break;
             
          case OP_TAG_TO_STR:
-            code[ip-1] = OP_LOADIMMED_STR;
+            mCode[ip-1] = OP_LOADIMMED_STR;
             // it's possible the string has already been converted
-            if(U8(curStringTable[code[ip]]) != StringTagPrefixByte)
+            if(U8(curStringTable[mCode[ip]]) != StringTagPrefixByte)
             {
-               U32 id = GameAddTaggedString(curStringTable + code[ip]);
-               dSprintf(curStringTable + code[ip] + 1, 7, "%d", id);
-               *(curStringTable + code[ip]) = StringTagPrefixByte;
+               U32 id = GameAddTaggedString(curStringTable + mCode[ip]);
+               dSprintf(curStringTable + mCode[ip] + 1, 7, "%d", id);
+               *(curStringTable + mCode[ip]) = StringTagPrefixByte;
             }
          case OP_LOADIMMED_STR:
-            STR.setStringValue(curStringTable + code[ip++]);
+            STR.setStringValue(curStringTable + mCode[ip++]);
             break;
 
          case OP_DOCBLOCK_STR:
             {
                // If the first word of the doc is '\class' or '@class', then this
                // is a namespace doc block, otherwise it is a function doc block.
-               const char* docblock = curStringTable + code[ip++];
+               const char* docblock = curStringTable + mCode[ip++];
 
                const char* sansClass = dStrstr( docblock, "@class" );
                if( !sansClass )
@@ -1504,13 +1504,13 @@ breakContinue:
             break;
 
          case OP_LOADIMMED_IDENT:
-            STR.setStringValue(U32toSTE(code[ip++]));
+            STR.setStringValue(U32toSTE(mCode[ip++]));
             break;
 
          case OP_CALLFUNC_RESOLVE:
             // This deals with a function that is potentially living in a namespace.
-            fnNamespace = U32toSTE(code[ip+1]);
-            fnName      = U32toSTE(code[ip]);
+            fnNamespace = U32toSTE(mCode[ip+1]);
+            fnName      = U32toSTE(mCode[ip]);
 
             // Try to look it up.
             ns = Namespace::find(fnNamespace);
@@ -1535,7 +1535,7 @@ breakContinue:
             // or just on the object.
             S32 routingId = 0;
 
-            fnName = U32toSTE(code[ip]);
+            fnName = U32toSTE(mCode[ip]);
 
             //if this is called from inside a function, append the ip and codeptr
             if( gEvalState.getStackDepth() > 0 )
@@ -1544,7 +1544,7 @@ breakContinue:
                gEvalState.getCurrentFrame().ip = ip - 1;
             }
 
-            U32 callType = code[ip+2];
+            U32 callType = mCode[ip+2];
 
             ip += 3;
             STR.getArgcArgv(fnName, &callArgc, &callArgv);
@@ -1682,19 +1682,19 @@ breakContinue:
                      {
                         S32 result = nsEntry->cb.mIntCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
-                        if(code[ip] == OP_STR_TO_UINT)
+                        if(mCode[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
                            intStack[++_UINT] = result;
                            break;
                         }
-                        else if(code[ip] == OP_STR_TO_FLT)
+                        else if(mCode[ip] == OP_STR_TO_FLT)
                         {
                            ip++;
                            floatStack[++_FLT] = result;
                            break;
                         }
-                        else if(code[ip] == OP_STR_TO_NONE)
+                        else if(mCode[ip] == OP_STR_TO_NONE)
                            ip++;
                         else
                            STR.setIntValue(result);
@@ -1704,19 +1704,19 @@ breakContinue:
                      {
                         F64 result = nsEntry->cb.mFloatCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
-                        if(code[ip] == OP_STR_TO_UINT)
+                        if(mCode[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
                            intStack[++_UINT] = (S64)result;
                            break;
                         }
-                        else if(code[ip] == OP_STR_TO_FLT)
+                        else if(mCode[ip] == OP_STR_TO_FLT)
                         {
                            ip++;
                            floatStack[++_FLT] = result;
                            break;
                         }
-                        else if(code[ip] == OP_STR_TO_NONE)
+                        else if(mCode[ip] == OP_STR_TO_NONE)
                            ip++;
                         else
                            STR.setFloatValue(result);
@@ -1724,7 +1724,7 @@ breakContinue:
                      }
                      case Namespace::Entry::VoidCallbackType:
                         nsEntry->cb.mVoidCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
-                        if( code[ ip ] != OP_STR_TO_NONE && Con::getBoolVariable( "$Con::warnVoidAssignment", true ) )
+                        if( mCode[ ip ] != OP_STR_TO_NONE && Con::getBoolVariable( "$Con::warnVoidAssignment", true ) )
                            Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip-4), fnName, functionName);
                         
                         STR.popFrame();
@@ -1734,19 +1734,19 @@ breakContinue:
                      {
                         bool result = nsEntry->cb.mBoolCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
-                        if(code[ip] == OP_STR_TO_UINT)
+                        if(mCode[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
                            intStack[++_UINT] = result;
                            break;
                         }
-                        else if(code[ip] == OP_STR_TO_FLT)
+                        else if(mCode[ip] == OP_STR_TO_FLT)
                         {
                            ip++;
                            floatStack[++_FLT] = result;
                            break;
                         }
-                        else if(code[ip] == OP_STR_TO_NONE)
+                        else if(mCode[ip] == OP_STR_TO_NONE)
                            ip++;
                         else
                            STR.setIntValue(result);
@@ -1764,7 +1764,7 @@ breakContinue:
             STR.advance();
             break;
          case OP_ADVANCE_STR_APPENDCHAR:
-            STR.advanceChar(code[ip++]);
+            STR.advanceChar(mCode[ip++]);
             break;
 
          case OP_ADVANCE_STR_COMMA:
@@ -1798,13 +1798,13 @@ breakContinue:
          {
             if( !intStack[_UINT--] )
             {
-               const char *message = curStringTable + code[ip];
+               const char *message = curStringTable + mCode[ip];
 
                U32 breakLine, inst;
                findBreakLine( ip - 1, breakLine, inst );
 
                if ( PlatformAssert::processAssert( PlatformAssert::Fatal, 
-                                                   name ? name : "eval", 
+                                                   mName ? mName : "eval", 
                                                    breakLine,  
                                                    message ) )
                {
@@ -1844,8 +1844,8 @@ breakContinue:
          
          case OP_ITER_BEGIN:
          {
-            StringTableEntry varName = U32toSTE( code[ ip ] );
-            U32 failIp = code[ ip + 1 ];
+            StringTableEntry varName = U32toSTE( mCode[ ip ] );
+            U32 failIp = mCode[ ip + 1 ];
             
             IterStackRecord& iter = iterStack[ _ITER ];
             
@@ -1886,7 +1886,7 @@ breakContinue:
          
          case OP_ITER:
          {
-            U32 breakIp = code[ ip ];
+            U32 breakIp = mCode[ ip ];
             IterStackRecord& iter = iterStack[ _ITER - 1 ];
             
             if( iter.mIsStringIter )
@@ -2001,18 +2001,18 @@ execFinished:
    }
    else
    {
-      delete[] globalStrings;
-      globalStringsMaxLen = 0;
+      delete[] mGlobalStrings;
+      mGlobalStringsMaxLen = 0;
 
-      delete[] globalFloats;
-      globalStrings = NULL;
-      globalFloats = NULL;
+      delete[] mGlobalFloats;
+      mGlobalStrings = NULL;
+      mGlobalFloats = NULL;
    }
    smCurrentCodeBlock = saveCodeBlock;
-   if(saveCodeBlock && saveCodeBlock->name)
+   if(saveCodeBlock && saveCodeBlock->mName)
    {
-      Con::gCurrentFile = saveCodeBlock->name;
-      Con::gCurrentRoot = saveCodeBlock->modPath;
+      Con::gCurrentFile = saveCodeBlock->mName;
+      Con::gCurrentRoot = saveCodeBlock->mModPath;
    }
 
    decRefCount();

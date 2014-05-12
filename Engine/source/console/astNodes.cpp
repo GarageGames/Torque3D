@@ -82,10 +82,10 @@ void StmtNode::addBreakLine(U32 ip)
    U32 line = CodeBlock::smBreakLineCount * 2;
    CodeBlock::smBreakLineCount++;
 
-   if(getBreakCodeBlock()->lineBreakPairs)
+   if(getBreakCodeBlock()->mLineBreakPairs)
    {
-      getBreakCodeBlock()->lineBreakPairs[line] = dbgLineNumber;
-      getBreakCodeBlock()->lineBreakPairs[line+1] = ip;
+      getBreakCodeBlock()->mLineBreakPairs[line] = dbgLineNumber;
+      getBreakCodeBlock()->mLineBreakPairs[line+1] = ip;
    }
 }
 
