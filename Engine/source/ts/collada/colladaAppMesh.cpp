@@ -319,17 +319,17 @@ public:
 ColladaAppMesh::ColladaAppMesh(const domInstance_geometry* instance, ColladaAppNode* node)
    : instanceGeom(instance), instanceCtrl(0), appNode(node), geomExt(0)
 {
-   flags = 0;
-   numFrames = 0;
-   numMatFrames = 0;
+   mFlags = 0;
+   mNumFrames = 0;
+   mNumMatFrames = 0;
 }
 
 ColladaAppMesh::ColladaAppMesh(const domInstance_controller* instance, ColladaAppNode* node)
    : instanceGeom(0), instanceCtrl(instance), appNode(node), geomExt(0)
 {
-   flags = 0;
-   numFrames = 0;
-   numMatFrames = 0;
+   mFlags = 0;
+   mNumFrames = 0;
+   mNumMatFrames = 0;
 }
 
 const char* ColladaAppMesh::getName(bool allowFixed)
@@ -367,8 +367,8 @@ bool ColladaAppMesh::animatesMatFrame(const AppSequence* appSeq)
    // - by animating the morph weights for morph targets with different UVs
 
    // Check if the MAYA profile texture transform is animated
-   for (S32 iMat = 0; iMat < appMaterials.size(); iMat++) {
-      ColladaAppMaterial* appMat = static_cast<ColladaAppMaterial*>(appMaterials[iMat]);
+   for (S32 iMat = 0; iMat < mAppMaterials.size(); iMat++) {
+      ColladaAppMaterial* appMat = static_cast<ColladaAppMaterial*>(mAppMaterials[iMat]);
       if (appMat->effectExt &&
           appMat->effectExt->animatesTextureTransform(appSeq->getStart(), appSeq->getEnd()))
          return true;
@@ -446,17 +446,17 @@ S32 ColladaAppMesh::addMaterial(const char* symbol)
 
             // Find the index of the bound material in the shape global list
             const domMaterial* mat = daeSafeCast<domMaterial>(matArray[iBind]->getTarget().getElement());
-            for (matIndex = 0; matIndex < appMaterials.size(); matIndex++) {
-               if (static_cast<ColladaAppMaterial*>(appMaterials[matIndex])->mat == mat)
+            for (matIndex = 0; matIndex < mAppMaterials.size(); matIndex++) {
+               if (static_cast<ColladaAppMaterial*>(mAppMaterials[matIndex])->mat == mat)
                   break;
             }
 
             // Check if this material needs to be added to the shape global list
-            if (matIndex == appMaterials.size()) {
+            if (matIndex == mAppMaterials.size()) {
                if (mat)
-                  appMaterials.push_back(new ColladaAppMaterial(mat));
+                  mAppMaterials.push_back(new ColladaAppMaterial(mat));
                else
-                  appMaterials.push_back(new ColladaAppMaterial(symbol));
+                  mAppMaterials.push_back(new ColladaAppMaterial(symbol));
             }
 
             break;
@@ -466,7 +466,7 @@ S32 ColladaAppMesh::addMaterial(const char* symbol)
    else
    {
       // No Collada material is present for this symbol, so just create an empty one
-      appMaterials.push_back(new ColladaAppMaterial(symbol));
+      mAppMaterials.push_back(new ColladaAppMaterial(symbol));
    }
 
    // Add this symbol to the bound list for the mesh
@@ -477,7 +477,7 @@ S32 ColladaAppMesh::addMaterial(const char* symbol)
 void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
 {
    // Only do this once
-   if (primitives.size())
+   if (mPrimitives.size())
       return;
 
    // Read the <geometry> extension
@@ -517,16 +517,16 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
          continue;
 
       // Create TSMesh primitive
-      primitives.increment();
-      TSDrawPrimitive& primitive = primitives.last();
-      primitive.start = indices.size();
+      mPrimitives.increment();
+      TSDrawPrimitive& primitive = mPrimitives.last();
+      primitive.start = mIndices.size();
       primitive.matIndex = (TSDrawPrimitive::Triangles | TSDrawPrimitive::Indexed) |
                            addMaterial(meshPrims[iPrim]->getMaterial());
 
       // Get the AppMaterial associated with this primitive
       ColladaAppMaterial* appMat = 0;
       if (!(primitive.matIndex & TSDrawPrimitive::NoMaterial))
-         appMat = static_cast<ColladaAppMaterial*>(appMaterials[primitive.matIndex & TSDrawPrimitive::MaterialMask]);
+         appMat = static_cast<ColladaAppMaterial*>(mAppMaterials[primitive.matIndex & TSDrawPrimitive::MaterialMask]);
 
       // Force the material to be double-sided if this geometry is double-sided.
       if (geomExt->double_sided && appMat && appMat->effectExt)
@@ -534,8 +534,8 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
 
       // Pre-allocate triangle indices
       primitive.numElements = numTriangles * 3;
-      indices.setSize(indices.size() + primitive.numElements);
-      U32* dstIndex = indices.end() - primitive.numElements;
+      mIndices.setSize(mIndices.size() + primitive.numElements);
+      U32* dstIndex = mIndices.end() - primitive.numElements;
 
       // Determine the offset for each element type in the stream, and also the
       // maximum input offset, which will be the number of indices per vertex we
@@ -569,12 +569,12 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
                daeErrorHandler::get()->handleWarning(avar("Splitting primitive "
                   "in %s: too many verts for 16-bit indices.", _GetNameOrId(geometry)));
 
-               primitives.last().numElements -= indicesRemaining;
-               primitives.push_back(TSDrawPrimitive(primitives.last()));
+               mPrimitives.last().numElements -= indicesRemaining;
+               mPrimitives.push_back(TSDrawPrimitive(mPrimitives.last()));
             }
 
-            primitives.last().numElements = indicesRemaining;
-            primitives.last().start = indices.size() - indicesRemaining;
+            mPrimitives.last().numElements = indicesRemaining;
+            mPrimitives.last().start = mIndices.size() - indicesRemaining;
 
             tupleMap.clear();
          }
@@ -631,7 +631,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
                                    Vector<Point2F>& v_uv2s,
                                    bool appendValues)
 {
-   if (!primitives.size())
+   if (!mPrimitives.size())
       return;
 
    MeshStreams streams;
@@ -676,7 +676,7 @@ void ColladaAppMesh::getVertexData(const domGeometry* geometry, F32 time, const 
          streams.readInputs(meshPrims[tuple.prim]->getInputs());
          S32 matIndex = addMaterial(meshPrims[tuple.prim]->getMaterial());
          if (matIndex != TSDrawPrimitive::NoMaterial)
-            appMat = static_cast<ColladaAppMaterial*>(appMaterials[matIndex]);
+            appMat = static_cast<ColladaAppMaterial*>(mAppMaterials[matIndex]);
          else
             appMat = 0;
 
@@ -923,10 +923,10 @@ void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objectOffset)
    // Now get the vertex data at the specified time
    if (geometry->getElementType() == COLLADA_TYPE::GEOMETRY) {
       getPrimitives(daeSafeCast<domGeometry>(geometry));
-      getVertexData(daeSafeCast<domGeometry>(geometry), t, objectOffset, points, normals, colors, uvs, uv2s, true);
+      getVertexData(daeSafeCast<domGeometry>(geometry), t, objectOffset, mPoints, mNormals, mColors, mUVs, mUV2s, true);
    }
    else if (geometry->getElementType() == COLLADA_TYPE::MORPH) {
-      getMorphVertexData(daeSafeCast<domMorph>(geometry), t, objectOffset, points, normals, colors, uvs, uv2s);
+      getMorphVertexData(daeSafeCast<domMorph>(geometry), t, objectOffset, mPoints, mNormals, mColors, mUVs, mUV2s);
    }
    else {
       daeErrorHandler::get()->handleWarning(avar("Unsupported geometry type "
@@ -937,7 +937,7 @@ void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objectOffset)
 void ColladaAppMesh::lookupSkinData()
 {
    // Only lookup skin data once
-   if (!isSkin() || weight.size())
+   if (!isSkin() || mWeight.size())
       return;
 
    // Get the skin and vertex weight data
@@ -950,7 +950,7 @@ void ColladaAppMesh::lookupSkinData()
    streams.readInputs(skin->getJoints()->getInput_array());
    streams.readInputs(weightIndices.getInput_array());
 
-   MatrixF invObjOffset(objectOffset);
+   MatrixF invObjOffset(mObjectOffset);
    invObjOffset.inverse();
 
    // Get the bind shape matrix
@@ -971,7 +971,7 @@ void ColladaAppMesh::lookupSkinData()
 
    // Set vertex weights
    bool tooManyWeightsWarning = false;
-   for (S32 iVert = 0; iVert < vertsPerFrame; iVert++) {
+   for (S32 iVert = 0; iVert < mVertsPerFrame; iVert++) {
       const domUint* vcount = (domUint*)weights_vcount.getRaw(0);
       const domInt* vindices = (domInt*)weights_v.getRaw(0);
       vindices += vindicesOffset[vertTuples[iVert].vertex];
@@ -1002,25 +1002,25 @@ void ColladaAppMesh::lookupSkinData()
             }
 
             // Too many weights => find and replace the smallest one
-            S32 minIndex = weight.size() - TSSkinMesh::BatchData::maxBonePerVert;
-            F32 minWeight = weight[minIndex];
-            for (S32 i = minIndex + 1; i < weight.size(); i++)
+            S32 minIndex = mWeight.size() - TSSkinMesh::BatchData::maxBonePerVert;
+            F32 minWeight = mWeight[minIndex];
+            for (S32 i = minIndex + 1; i < mWeight.size(); i++)
             {
-               if (weight[i] < minWeight)
+               if (mWeight[i] < minWeight)
                {
-                  minWeight = weight[i];
+                  minWeight = mWeight[i];
                   minIndex = i;
                }
             }
 
-            boneIndex[minIndex] = bIndex;
-            weight[minIndex] = bWeight;
+            mBoneIndex[minIndex] = bIndex;
+            mWeight[minIndex] = bWeight;
          }
          else
          {
-            vertexIndex.push_back( iVert );
-            boneIndex.push_back( bIndex );
-            weight.push_back( bWeight );
+            mVertexIndex.push_back( iVert );
+            mBoneIndex.push_back( bIndex );
+            mWeight.push_back( bWeight );
             nonZeroWeightCount++;
          }
       }
@@ -1028,26 +1028,26 @@ void ColladaAppMesh::lookupSkinData()
 
    // Normalize vertex weights (force weights for each vert to sum to 1)
    S32 iWeight = 0;
-   while (iWeight < weight.size()) {
+   while (iWeight < mWeight.size()) {
       // Find the last weight with the same vertex number, and sum all weights for
       // that vertex
       F32 invTotalWeight = 0;
       S32 iLast;
-      for (iLast = iWeight; iLast < weight.size(); iLast++) {
-         if (vertexIndex[iLast] != vertexIndex[iWeight])
+      for (iLast = iWeight; iLast < mWeight.size(); iLast++) {
+         if (mVertexIndex[iLast] != mVertexIndex[iWeight])
             break;
-         invTotalWeight += weight[iLast];
+         invTotalWeight += mWeight[iLast];
       }
 
       // Then normalize the vertex weights
       invTotalWeight = 1.0f / invTotalWeight;
       for (; iWeight < iLast; iWeight++)
-         weight[iWeight] *= invTotalWeight;
+         mWeight[iWeight] *= invTotalWeight;
    }
 
    // Add dummy AppNodes to allow Collada joints to be mapped to 3space nodes
-   bones.setSize(streams.joints.size());
-   initialTransforms.setSize(streams.joints.size());
+   mBones.setSize(streams.joints.size());
+   mInitialTransforms.setSize(streams.joints.size());
    for (S32 iJoint = 0; iJoint < streams.joints.size(); iJoint++)
    {
       const char* jointName = streams.joints.getStringValue(iJoint);
@@ -1075,9 +1075,9 @@ void ColladaAppMesh::lookupSkinData()
             "defaulting to instance_controller parent node '%s'", jointName, appNode->getName()));
          joint = appNode->getDomNode();
       }
-      bones[iJoint] = new ColladaAppNode(joint);
+      mBones[iJoint] = new ColladaAppNode(joint);
 
-      initialTransforms[iJoint] = objectOffset;
+      mInitialTransforms[iJoint] = mObjectOffset;
 
       // Bone scaling is generally ignored during import, since 3space only
       // stores default node transform and rotation. Compensate for this by
@@ -1089,16 +1089,16 @@ void ColladaAppMesh::lookupSkinData()
          invScale.x = invScale.x ? (1.0f / invScale.x) : 0;
          invScale.y = invScale.y ? (1.0f / invScale.y) : 0;
          invScale.z = invScale.z ? (1.0f / invScale.z) : 0;
-         initialTransforms[iJoint].scale(invScale);
+         mInitialTransforms[iJoint].scale(invScale);
       }
 
       // Inverted node coordinate spaces (negative scale factor) are corrected
       // in ColladaAppNode::getNodeTransform, so need to apply the same operation
       // here to match
       if (m_matF_determinant(invBind) < 0.0f)
-         initialTransforms[iJoint].scale(Point3F(1, 1, -1));
+         mInitialTransforms[iJoint].scale(Point3F(1, 1, -1));
 
-      initialTransforms[iJoint].mul(invBind);
-      initialTransforms[iJoint].mul(bindShapeMatrix);
+      mInitialTransforms[iJoint].mul(invBind);
+      mInitialTransforms[iJoint].mul(bindShapeMatrix);
    }
 }

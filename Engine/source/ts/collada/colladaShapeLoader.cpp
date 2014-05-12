@@ -458,9 +458,9 @@ void updateMaterialsScript(const Torque::Path &path, bool copyTextures = false)
 
    // First see what materials we need to update
    PersistenceManager persistMgr;
-   for ( U32 iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++ )
+   for ( U32 iMat = 0; iMat < AppMesh::mAppMaterials.size(); iMat++ )
    {
-      ColladaAppMaterial *mat = dynamic_cast<ColladaAppMaterial*>( AppMesh::appMaterials[iMat] );
+      ColladaAppMaterial *mat = dynamic_cast<ColladaAppMaterial*>( AppMesh::mAppMaterials[iMat] );
       if ( mat )
       {
          Material *mappedMat;

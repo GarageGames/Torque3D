@@ -42,33 +42,33 @@ class AppMesh
 {
 public:
    // Mesh and skin elements
-   Vector<Point3F> points;
-   Vector<Point3F> normals;
-   Vector<Point2F> uvs;
-   Vector<Point2F> uv2s;
-   Vector<ColorI> colors;
-   Vector<TSDrawPrimitive> primitives;
-   Vector<U32> indices;
+   Vector<Point3F> mPoints;
+   Vector<Point3F> mNormals;
+   Vector<Point2F> mUVs;
+   Vector<Point2F> mUV2s;
+   Vector<ColorI> mColors;
+   Vector<TSDrawPrimitive> mPrimitives;
+   Vector<U32> mIndices;
 
    // Skin elements
-   Vector<F32> weight;
-   Vector<S32> boneIndex;
-   Vector<S32> vertexIndex;
-   Vector<S32> nodeIndex;
-   Vector<MatrixF> initialTransforms;
-   Vector<Point3F> initialVerts;
-   Vector<Point3F> initialNorms;
+   Vector<F32> mWeight;
+   Vector<S32> mBoneIndex;
+   Vector<S32> mVertexIndex;
+   Vector<S32> mNodeIndex;
+   Vector<MatrixF> mInitialTransforms;
+   Vector<Point3F> mInitialVerts;
+   Vector<Point3F> mInitialNorms;
 
-   U32 flags;
-   U32 vertsPerFrame;
-   S32 numFrames;
-   S32 numMatFrames;
+   U32 mFlags;
+   U32 mVertsPerFrame;
+   S32 mNumFrames;
+   S32 mNumMatFrames;
 
    // Loader elements (can be discarded after loading)
-   S32                           detailSize;
-   MatrixF                       objectOffset;
-   Vector<AppNode*>              bones;
-   static Vector<AppMaterial*>   appMaterials;
+   S32                           mDetailSize;
+   MatrixF                       mObjectOffset;
+   Vector<AppNode*>              mBones;
+   static Vector<AppMaterial*>   mAppMaterials;
 
 public:
    AppMesh();

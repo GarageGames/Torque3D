@@ -377,7 +377,7 @@ bool cmpMeshNameAndSize(const String& key, const Vector<String>& names, void* ar
    {
       if (names[i].compare(key, 0, String::NoCase) == 0)
       {
-         if (meshes[i]->detailSize == meshSize)
+         if (meshes[i]->mDetailSize == meshSize)
             return false;
       }
    }
@@ -396,17 +396,17 @@ void TSShapeLoader::generateObjects()
       for (S32 iMesh = 0; iMesh < subshape->objMeshes.size(); iMesh++)
       {
          AppMesh* mesh = subshape->objMeshes[iMesh];
-         mesh->detailSize = 2;
-         String name = String::GetTrailingNumber( mesh->getName(), mesh->detailSize );
-         name = getUniqueName( name, cmpMeshNameAndSize, meshNames, &(subshape->objMeshes), (void*)mesh->detailSize );
+         mesh->mDetailSize = 2;
+         String name = String::GetTrailingNumber( mesh->getName(), mesh->mDetailSize );
+         name = getUniqueName( name, cmpMeshNameAndSize, meshNames, &(subshape->objMeshes), (void*)mesh->mDetailSize );
          meshNames.push_back( name );
 
          // Fix up any collision details that don't have a negative detail level.
          if (  dStrStartsWith(meshNames[iMesh], "Collision") ||
                dStrStartsWith(meshNames[iMesh], "LOSCol") )
          {
-            if (mesh->detailSize > 0)
-               mesh->detailSize = -mesh->detailSize;
+            if (mesh->mDetailSize > 0)
+               mesh->mDetailSize = -mesh->mDetailSize;
          }
       }
 
@@ -421,7 +421,7 @@ void TSShapeLoader::generateObjects()
          {
             if ((meshNames[i].compare(meshNames[j]) < 0) ||
                ((meshNames[i].compare(meshNames[j]) == 0) &&
-               (subshape->objMeshes[i]->detailSize < subshape->objMeshes[j]->detailSize)))
+               (subshape->objMeshes[i]->mDetailSize < subshape->objMeshes[j]->mDetailSize)))
             {
                {
                   AppMesh* tmp = subshape->objMeshes[i];
@@ -463,17 +463,17 @@ void TSShapeLoader::generateObjects()
          shape->objects.last().numMeshes++;
 
          // Set mesh flags
-         mesh->flags = 0;
+         mesh->mFlags = 0;
          if (mesh->isBillboard())
          {
-            mesh->flags |= TSMesh::Billboard;
+            mesh->mFlags |= TSMesh::Billboard;
             if (mesh->isBillboardZAxis())
-               mesh->flags |= TSMesh::BillboardZAxis;
+               mesh->mFlags |= TSMesh::BillboardZAxis;
          }
 
          // Set the detail name... do fixups for collision details.
          const char* detailName = "detail";
-         if ( mesh->detailSize < 0 )
+         if ( mesh->mDetailSize < 0 )
          {
             if (  dStrStartsWith(meshNames[iMesh], "Collision") ||
                   dStrStartsWith(meshNames[iMesh], "Col") )
@@ -484,11 +484,11 @@ void TSShapeLoader::generateObjects()
 
          // Attempt to add the detail (will fail if it already exists)
          S32 oldNumDetails = shape->details.size();
-         shape->addDetail(detailName, mesh->detailSize, iSub);
+         shape->addDetail(detailName, mesh->mDetailSize, iSub);
          if (shape->details.size() > oldNumDetails)
          {
             Con::warnf("Object mesh \"%s\" has no matching detail (\"%s%d\" has"
-               " been added automatically)", mesh->getName(false), detailName, mesh->detailSize);
+               " been added automatically)", mesh->getName(false), detailName, mesh->mDetailSize);
          }
       }
 
@@ -519,30 +519,30 @@ void TSShapeLoader::generateSkins()
       skin->lookupSkinData();
 
       // Just copy initial verts and norms for now
-      skin->initialVerts.set(skin->points.address(), skin->vertsPerFrame);
-      skin->initialNorms.set(skin->normals.address(), skin->vertsPerFrame);
+      skin->mInitialVerts.set(skin->mPoints.address(), skin->mVertsPerFrame);
+      skin->mInitialNorms.set(skin->mNormals.address(), skin->mVertsPerFrame);
 
       // Map bones to nodes
-      skin->nodeIndex.setSize(skin->bones.size());
-      for (S32 iBone = 0; iBone < skin->bones.size(); iBone++)
+      skin->mNodeIndex.setSize(skin->mBones.size());
+      for (S32 iBone = 0; iBone < skin->mBones.size(); iBone++)
       {
          // Find the node that matches this bone
-         skin->nodeIndex[iBone] = -1;
+         skin->mNodeIndex[iBone] = -1;
          for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
          {
-            if (appNodes[iNode]->isEqual(skin->bones[iBone]))
+            if (appNodes[iNode]->isEqual(skin->mBones[iBone]))
             {
-               delete skin->bones[iBone];
-               skin->bones[iBone] = appNodes[iNode];
-               skin->nodeIndex[iBone] = iNode;
+               delete skin->mBones[iBone];
+               skin->mBones[iBone] = appNodes[iNode];
+               skin->mNodeIndex[iBone] = iNode;
                break;
             }
          }
 
-         if (skin->nodeIndex[iBone] == -1)
+         if (skin->mNodeIndex[iBone] == -1)
          {
             Con::warnf("Could not find bone %d. Defaulting to first node", iBone);
-            skin->nodeIndex[iBone] = 0;
+            skin->mNodeIndex[iBone] = 0;
          }
       }
    }
@@ -569,7 +569,7 @@ void TSShapeLoader::generateDefaultStates()
 
          zapScale(nodeMat);
 
-         appMesh->objectOffset = nodeMat.inverse() * meshMat;
+         appMesh->mObjectOffset = nodeMat.inverse() * meshMat;
       }
 
       generateObjectState(shape->objects[iObject], DefaultTime, true, true);
@@ -603,8 +603,8 @@ void TSShapeLoader::generateObjectState(TSShape::Object& obj, F32 t, bool addFra
       generateFrame(obj, t, addFrame, addMatFrame);
 
       // set the frame number for the object state
-      state.frameIndex = appMeshes[obj.startMeshIndex]->numFrames - 1;
-      state.matFrameIndex = appMeshes[obj.startMeshIndex]->numMatFrames - 1;
+      state.frameIndex = appMeshes[obj.startMeshIndex]->mNumFrames - 1;
+      state.matFrameIndex = appMeshes[obj.startMeshIndex]->mNumMatFrames - 1;
    }
 }
 
@@ -614,45 +614,45 @@ void TSShapeLoader::generateFrame(TSShape::Object& obj, F32 t, bool addFrame, bo
    {
       AppMesh* appMesh = appMeshes[obj.startMeshIndex + iMesh];
 
-      U32 oldNumPoints = appMesh->points.size();
-      U32 oldNumUvs = appMesh->uvs.size();
+      U32 oldNumPoints = appMesh->mPoints.size();
+      U32 oldNumUvs = appMesh->mUVs.size();
 
       // Get the mesh geometry at time, 't'
       // Geometry verts, normals and tverts can be animated (different set for
       // each frame), but the TSDrawPrimitives stay the same, so the way lockMesh
       // works is that it will only generate the primitives once, then after that
       // will just append verts, normals and tverts each time it is called.
-      appMesh->lockMesh(t, appMesh->objectOffset);
+      appMesh->lockMesh(t, appMesh->mObjectOffset);
 
       // Calculate vertex normals if required
-      if (appMesh->normals.size() != appMesh->points.size())
+      if (appMesh->mNormals.size() != appMesh->mPoints.size())
          appMesh->computeNormals();
 
       // If this is the first call, set the number of points per frame
-      if (appMesh->numFrames == 0)
+      if (appMesh->mNumFrames == 0)
       {
-         appMesh->vertsPerFrame = appMesh->points.size();
+         appMesh->mVertsPerFrame = appMesh->mPoints.size();
       }
       else
       {
          // Check frame topology => ie. that the right number of points, normals
          // and tverts was added
-         if ((appMesh->points.size() - oldNumPoints) != appMesh->vertsPerFrame)
+         if ((appMesh->mPoints.size() - oldNumPoints) != appMesh->mVertsPerFrame)
          {
             Con::warnf("Wrong number of points (%d) added at time=%f (expected %d)",
-               appMesh->points.size() - oldNumPoints, t, appMesh->vertsPerFrame);
+               appMesh->mPoints.size() - oldNumPoints, t, appMesh->mVertsPerFrame);
             addFrame = false;
          }
-         if ((appMesh->normals.size() - oldNumPoints) != appMesh->vertsPerFrame)
+         if ((appMesh->mNormals.size() - oldNumPoints) != appMesh->mVertsPerFrame)
          {
             Con::warnf("Wrong number of normals (%d) added at time=%f (expected %d)",
-               appMesh->normals.size() - oldNumPoints, t, appMesh->vertsPerFrame);
+               appMesh->mNormals.size() - oldNumPoints, t, appMesh->mVertsPerFrame);
             addFrame = false;
          }
-         if ((appMesh->uvs.size() - oldNumUvs) != appMesh->vertsPerFrame)
+         if ((appMesh->mUVs.size() - oldNumUvs) != appMesh->mVertsPerFrame)
          {
             Con::warnf("Wrong number of tverts (%d) added at time=%f (expected %d)",
-               appMesh->uvs.size() - oldNumUvs, t, appMesh->vertsPerFrame);
+               appMesh->mUVs.size() - oldNumUvs, t, appMesh->mVertsPerFrame);
             addMatFrame = false;
          }
       }
@@ -663,21 +663,21 @@ void TSShapeLoader::generateFrame(TSShape::Object& obj, F32 t, bool addFrame, bo
       // points/normals/tverts are already in place!
       if (addFrame)
       {
-         appMesh->numFrames++;
+         appMesh->mNumFrames++;
       }
       else
       {
-         appMesh->points.setSize(oldNumPoints);
-         appMesh->normals.setSize(oldNumPoints);
+         appMesh->mPoints.setSize(oldNumPoints);
+         appMesh->mNormals.setSize(oldNumPoints);
       }
 
       if (addMatFrame)
       {
-         appMesh->numMatFrames++;
+         appMesh->mNumMatFrames++;
       }
       else
       {
-         appMesh->uvs.setSize(oldNumPoints);
+         appMesh->mUVs.setSize(oldNumPoints);
       }
    }
 }
@@ -690,11 +690,11 @@ void TSShapeLoader::generateMaterialList()
 {
    // Install the materials into the material list
    shape->materialList = new TSMaterialList;
-   for (S32 iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++)
+   for (S32 iMat = 0; iMat < AppMesh::mAppMaterials.size(); iMat++)
    {
-      updateProgress(Load_GenerateMaterials, "Generating materials...", AppMesh::appMaterials.size(), iMat);
+      updateProgress(Load_GenerateMaterials, "Generating materials...", AppMesh::mAppMaterials.size(), iMat);
 
-      AppMaterial* appMat = AppMesh::appMaterials[iMat];
+      AppMaterial* appMat = AppMesh::mAppMaterials[iMat];
       shape->materialList->push_back(appMat->getName(), appMat->getFlags(), U32(-1), U32(-1), U32(-1), 1.0f, appMat->getReflectance());
    }
 }
@@ -1119,7 +1119,7 @@ void TSShapeLoader::sortDetails()
             // object does not already have a mesh with an equal or higher detail)
             S32 meshIndex = (iDet < object.numMeshes) ? iDet : object.numMeshes-1;
 
-            if (appMeshes[object.startMeshIndex + meshIndex]->detailSize < shape->details[iDet].size)
+            if (appMeshes[object.startMeshIndex + meshIndex]->mDetailSize < shape->details[iDet].size)
             {
                // Add a NULL mesh
                appMeshes.insert(object.startMeshIndex + iDet, NULL);
@@ -1256,9 +1256,9 @@ TSShapeLoader::~TSShapeLoader()
    clearNodeTransformCache();
 
    // Clear shared AppMaterial list
-   for (S32 iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++)
-      delete AppMesh::appMaterials[iMat];
-   AppMesh::appMaterials.clear();
+   for (S32 iMat = 0; iMat < AppMesh::mAppMaterials.size(); iMat++)
+      delete AppMesh::mAppMaterials[iMat];
+   AppMesh::mAppMaterials.clear();
 
    // Delete Subshapes
    delete boundsNode;
