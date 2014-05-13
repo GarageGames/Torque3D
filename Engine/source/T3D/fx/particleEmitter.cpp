@@ -1381,8 +1381,6 @@ void ParticleEmitter::processTick(const Move*)
 //-----------------------------------------------------------------------------
 void ParticleEmitter::advanceTime(F32 dt)
 {
-   U32 removeTime;
-
    if( dt < 0.00001 ) return;
 
    Parent::advanceTime(dt);
@@ -1403,11 +1401,8 @@ void ParticleEmitter::advanceTime(F32 dt)
    for (Particle* part = part_list_head.next; part != NULL; part = part->next)
    {
      part->currentAge += numMSToUpdate;
-	 if (mDataBlock->ribbonParticles)
-		 removeTime = part->totalLifetime + mDataBlock->particleDataBlocks[0]->lifetimeMS;
-	 else
-		 removeTime = part->totalLifetime;
-	 if ( part->currentAge > removeTime)
+     
+     if (part->currentAge > part->totalLifetime)
      {
        n_parts--;
        last_part->next = part->next;
