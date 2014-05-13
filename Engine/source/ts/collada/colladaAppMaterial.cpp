@@ -82,9 +82,9 @@ ColladaAppMaterial::ColladaAppMaterial(const domMaterial *pMat)
    const domCommon_color_or_texture_type_complexType* domSpecular = findEffectSpecular(effect);
 
    // Wrap flags
-   if (effectExt->wrapU)
+   if (effectExt->mWrapU)
       flags |= TSMaterialList::S_Wrap;
-   if (effectExt->wrapV)
+   if (effectExt->mWrapV)
       flags |= TSMaterialList::T_Wrap;
 
    // Set material attributes
@@ -146,13 +146,13 @@ ColladaAppMaterial::ColladaAppMaterial(const domMaterial *pMat)
    }
 
    // Double-sided flag
-   doubleSided = effectExt->double_sided;
+   doubleSided = effectExt->mDoubleSided;
 
    // Get the paths for the various textures => Collada indirection at its finest!
    // <texture>.<newparam>.<sampler2D>.<source>.<newparam>.<surface>.<init_from>.<image>.<init_from>
    diffuseMap = getSamplerImagePath(effect, getTextureSampler(effect, domDiffuse));
    specularMap = getSamplerImagePath(effect, getTextureSampler(effect, domSpecular));
-   normalMap = getSamplerImagePath(effect, effectExt->bumpSampler);
+   normalMap = getSamplerImagePath(effect, effectExt->mBumpSampler);
 
    // Set the material name
    name = ColladaUtils::getOptions().mMatNamePrefix;

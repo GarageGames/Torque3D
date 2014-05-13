@@ -66,7 +66,7 @@ ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
 
    // Extract user properties from the <node> extension as whitespace separated
    // "name=value" pairs
-   char* properties = dStrdup(nodeExt->user_properties);
+   char* properties = dStrdup(nodeExt->mUserProperties);
    char* pos = properties;
    char* end = properties + dStrlen( properties );
    while ( pos < end )

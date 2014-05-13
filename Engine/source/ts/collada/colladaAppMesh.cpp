@@ -354,7 +354,7 @@ MatrixF ColladaAppMesh::getMeshTransform(F32 time)
 bool ColladaAppMesh::animatesVis(const AppSequence* appSeq)
 {
    #define IS_VIS_ANIMATED(node)    \
-      (dynamic_cast<const ColladaAppNode*>(node)->nodeExt->visibility.isAnimated(appSeq->getStart(), appSeq->getEnd()))
+      (dynamic_cast<const ColladaAppNode*>(node)->nodeExt->mVisibility.isAnimated(appSeq->getStart(), appSeq->getEnd()))
 
    // Check if the node visibility is animated within the sequence interval
    return IS_VIS_ANIMATED(mAppNode) || (mAppNode->appParent ? IS_VIS_ANIMATED(mAppNode->appParent) : false);
@@ -418,7 +418,7 @@ bool ColladaAppMesh::animatesFrame(const AppSequence* appSeq)
 F32 ColladaAppMesh::getVisValue(F32 t)
 {
    #define GET_VIS(node)   \
-      (dynamic_cast<const ColladaAppNode*>(node)->nodeExt->visibility.getValue(t))
+      (dynamic_cast<const ColladaAppNode*>(node)->nodeExt->mVisibility.getValue(t))
 
    // Get the visibility of the mesh's node at time, 't'
    return GET_VIS(mAppNode) * (mAppNode->appParent ? GET_VIS(mAppNode->appParent) : 1.0f);
@@ -529,8 +529,8 @@ void ColladaAppMesh::getPrimitives(const domGeometry* geometry)
          appMat = static_cast<ColladaAppMaterial*>(mAppMaterials[primitive.matIndex & TSDrawPrimitive::MaterialMask]);
 
       // Force the material to be double-sided if this geometry is double-sided.
-      if (mGeomExt->double_sided && appMat && appMat->effectExt)
-         appMat->effectExt->double_sided = true;
+      if (mGeomExt->mDoubleSided && appMat && appMat->effectExt)
+         appMat->effectExt->mDoubleSided = true;
 
       // Pre-allocate triangle indices
       primitive.numElements = numTriangles * 3;
