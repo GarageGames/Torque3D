@@ -1280,10 +1280,10 @@ bool TSMesh::buildConvexOpcode( const MatrixF &meshToObjectMat, const Box3F &nod
          if( chunkc->getObject() != TSStaticPolysoupConvex::smCurObject )
             continue;
                
-         if( chunkc->mesh != this )
+         if( chunkc->mMesh != this )
             continue;
 
-         if( chunkc->idx != curIdx )
+         if( chunkc->mIdx != curIdx )
             continue;
 
          // A match! Don't need to add it.
@@ -1315,18 +1315,18 @@ bool TSMesh::buildConvexOpcode( const MatrixF &meshToObjectMat, const Box3F &nod
       list->registerObject( cp );
       convex->addToWorkingList( cp );
 
-      cp->mesh    = this;
-      cp->idx     = curIdx;
+      cp->mMesh    = this;
+      cp->mIdx     = curIdx;
       cp->mObject = TSStaticPolysoupConvex::smCurObject;
 
-      cp->normal = p;
-      cp->verts[0] = a;
-      cp->verts[1] = b;
-      cp->verts[2] = c;
-      cp->verts[3] = peak;
+      cp->mNormal = p;
+      cp->mVerts[0] = a;
+      cp->mVerts[1] = b;
+      cp->mVerts[2] = c;
+      cp->mVerts[3] = peak;
 
       // Update the bounding box.
-      Box3F &bounds = cp->box;
+      Box3F &bounds = cp->mBox;
       bounds.minExtents.set( F32_MAX,  F32_MAX,  F32_MAX );
       bounds.maxExtents.set( -F32_MAX, -F32_MAX, -F32_MAX );
 
