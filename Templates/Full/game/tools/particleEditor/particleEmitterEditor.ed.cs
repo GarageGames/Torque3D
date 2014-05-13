@@ -71,12 +71,16 @@ function PE_EmitterEditor::guiSync( %this )
    PE_EmitterEditor-->PEE_orientParticles.setValue( %data.orientParticles );
    PE_EmitterEditor-->PEE_alignParticles.setValue( %data.alignParticles );
    PE_EmitterEditor-->PEE_alignDirection.setText( %data.alignDirection );
+   PE_EmitterEditor-->PEE_ribbonParticles.setValue( %data.ribbonParticles );
    
    PE_EmitterEditor-->PEE_thetaMin_slider.setValue( %data.thetaMin );
    PE_EmitterEditor-->PEE_thetaMin_textEdit.setText( %data.thetaMin );
    
    PE_EmitterEditor-->PEE_thetaMax_slider.setValue( %data.thetaMax );
    PE_EmitterEditor-->PEE_thetaMax_textEdit.setText( %data.thetaMax );
+   
+   PE_EmitterEditor-->PEE_thetaVar_slider.setValue( %data.thetaVariance );
+   PE_EmitterEditor-->PEE_thetaVar_textEdit.setText( %data.thetaVariance );
    
    PE_EmitterEditor-->PEE_phiVariance_slider.setValue( %data.phiVariance );
    PE_EmitterEditor-->PEE_phiVariance_textEdit.setText( %data.phiVariance );

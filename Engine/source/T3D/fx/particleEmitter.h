@@ -76,6 +76,7 @@ class ParticleEmitterData : public GameBaseData
    F32   ejectionOffsetVariance;             ///< Z offset Variance from emitter point to eject 
    F32   thetaMin;                           ///< Minimum angle, from the horizontal plane, to eject from
    F32   thetaMax;                           ///< Maximum angle, from the horizontal plane, to eject from
+   F32   thetaVariance;                      ///< Angle, from the previous particle, to eject from
 
    F32   phiReferenceVel;                    ///< Reference angle, from the verticle plane, to eject from
    F32   phiVariance;                        ///< Varience from the reference angle, from 0 to n
@@ -93,6 +94,7 @@ class ParticleEmitterData : public GameBaseData
    bool  overrideAdvance;                    ///<
    bool  orientParticles;                    ///< Particles always face the screen
    bool  orientOnVelocity;                   ///< Particles face the screen at the start
+   bool  ribbonParticles;                    ///< Particles are rendered as a continous ribbon
    bool  useEmitterSizes;                    ///< Use emitter specified sizes instead of datablock sizes
    bool  useEmitterColors;                   ///< Use emitter specified colors instead of datablock colors
    bool  alignParticles;                     ///< Particles always face along a particular axis
@@ -215,6 +217,13 @@ class ParticleEmitter : public GameBase
                               const ColorF &ambientColor,
                               ParticleVertexType *lVerts );
 
+   inline void setupRibbon( Particle *part,
+							  Particle *next,
+							  Particle *prev,
+                              const Point3F &camPos,
+                              const ColorF &ambientColor,
+                              ParticleVertexType *lVerts);
+
    /// Updates the bounding box for the particle system
    void updateBBox();
 
@@ -250,12 +259,15 @@ class ParticleEmitter : public GameBase
 
    U32       mNextParticleTime;
 
+   F32       mThetaOld;
+   F32       mPhiOld;
+
    Point3F   mLastPosition;
    bool      mHasLastPosition;
    MatrixF   mBBObjToWorld;
 
    bool      mDeleteWhenEmpty;
-   bool      mDeleteOnTick;
+   bool      mDeleteOnTick; 
 
    S32       mLifetimeMS;
    S32       mElapsedTimeMS;
