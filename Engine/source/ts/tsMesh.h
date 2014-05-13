@@ -501,13 +501,13 @@ public:
    typedef TSMesh Parent;
 
    /// Structure containing data needed to batch skinning
-   BatchData batchData;
-   bool batchDataInitialized;
+   BatchData mBatchData;
+   bool mBatchDataInitialized;
    
    /// vectors that define the vertex, weight, bone tuples
-   Vector<F32> weight;
-   Vector<S32> boneIndex;
-   Vector<S32> vertexIndex;
+   Vector<F32> mWeight;
+   Vector<S32> mBoneIndex;
+   Vector<S32> mVertexIndex;
 
    /// set verts and normals...
    void updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHandle &instanceVB, GFXPrimitiveBufferHandle &instancePB );

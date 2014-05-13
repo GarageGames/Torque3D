@@ -485,10 +485,10 @@ bool TSShape::addNode(const String& name, const String& parentName, const Point3
       if (meshes[i] && (meshes[i]->getMeshType() == TSMesh::SkinMeshType))
       {
          TSSkinMesh* skin = dynamic_cast<TSSkinMesh*>(meshes[i]);
-         for (S32 j = 0; j < skin->batchData.nodeIndex.size(); j++)
+         for (S32 j = 0; j < skin->mBatchData.nodeIndex.size(); j++)
          {
-            if (skin->batchData.nodeIndex[j] >= nodeIndex)
-               skin->batchData.nodeIndex[j]++;
+            if (skin->mBatchData.nodeIndex[j] >= nodeIndex)
+               skin->mBatchData.nodeIndex[j]++;
          }
       }
    }
@@ -613,12 +613,12 @@ bool TSShape::removeNode(const String& name)
       if (meshes[i] && (meshes[i]->getMeshType() == TSMesh::SkinMeshType))
       {
          TSSkinMesh* skin = dynamic_cast<TSSkinMesh*>(meshes[i]);
-         for (S32 j = 0; j < skin->batchData.nodeIndex.size(); j++)
+         for (S32 j = 0; j < skin->mBatchData.nodeIndex.size(); j++)
          {
-            if (skin->batchData.nodeIndex[j] == nodeIndex)
-               skin->batchData.nodeIndex[j] = nodeParentIndex;
-            if (skin->batchData.nodeIndex[j] > nodeIndex)
-               skin->batchData.nodeIndex[j]--;
+            if (skin->mBatchData.nodeIndex[j] == nodeIndex)
+               skin->mBatchData.nodeIndex[j] = nodeParentIndex;
+            if (skin->mBatchData.nodeIndex[j] > nodeIndex)
+               skin->mBatchData.nodeIndex[j]--;
          }
       }
    }
@@ -876,14 +876,14 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
 
       // Copy skin elements
       const TSSkinMesh *srcSkin = dynamic_cast<const TSSkinMesh*>(srcMesh);
-      skin->weight = srcSkin->weight;
-      skin->vertexIndex = srcSkin->vertexIndex;
-      skin->boneIndex = srcSkin->boneIndex;
+      skin->mWeight = srcSkin->mWeight;
+      skin->mVertexIndex = srcSkin->mVertexIndex;
+      skin->mBoneIndex = srcSkin->mBoneIndex;
 
-      skin->batchData.nodeIndex = srcSkin->batchData.nodeIndex;
-      skin->batchData.initialTransforms = srcSkin->batchData.initialTransforms;
-      skin->batchData.initialVerts = srcSkin->batchData.initialVerts;
-      skin->batchData.initialNorms = srcSkin->batchData.initialNorms;
+      skin->mBatchData.nodeIndex = srcSkin->mBatchData.nodeIndex;
+      skin->mBatchData.initialTransforms = srcSkin->mBatchData.initialTransforms;
+      skin->mBatchData.initialVerts = srcSkin->mBatchData.initialVerts;
+      skin->mBatchData.initialNorms = srcSkin->mBatchData.initialNorms;
 
       mesh = static_cast<TSMesh*>(skin);
    }
@@ -1073,9 +1073,9 @@ bool TSShape::addMesh(TSShape* srcShape, const String& srcMeshName, const String
       for (S32 i = 0; i < srcShape->nodes.size(); i++)
          nodeMap.push_back( findNode( srcShape->getName(srcShape->nodes[i].nameIndex) ) );
 
-      for (S32 i = 0; i < srcSkin->boneIndex.size(); i++)
+      for (S32 i = 0; i < srcSkin->mBoneIndex.size(); i++)
       {
-         S32 srcNode = srcSkin->boneIndex[i];
+         S32 srcNode = srcSkin->mBoneIndex[i];
          if (nodeMap[srcNode] == -1)
          {
             const char* name = srcShape->getName(srcShape->nodes[srcNode].nameIndex).c_str();
@@ -1088,9 +1088,9 @@ bool TSShape::addMesh(TSShape* srcShape, const String& srcMeshName, const String
       TSSkinMesh *skin = dynamic_cast<TSSkinMesh*>(mesh);
 
       // Remap node indices
-      skin->batchData.nodeIndex = srcSkin->batchData.nodeIndex;
-      for (S32 i = 0; i < skin->batchData.nodeIndex.size(); i++)
-         skin->batchData.nodeIndex[i] = nodeMap[skin->batchData.nodeIndex[i]];
+      skin->mBatchData.nodeIndex = srcSkin->mBatchData.nodeIndex;
+      for (S32 i = 0; i < skin->mBatchData.nodeIndex.size(); i++)
+         skin->mBatchData.nodeIndex[i] = nodeMap[skin->mBatchData.nodeIndex[i]];
    }
 
    // Add the copied mesh to the shape

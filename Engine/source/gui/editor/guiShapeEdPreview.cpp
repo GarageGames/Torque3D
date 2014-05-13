@@ -1236,8 +1236,8 @@ void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
          if ( mesh->getMeshType() == TSMesh::SkinMeshType )
          {
             const TSSkinMesh* skin = dynamic_cast<const TSSkinMesh*>(mesh);
-            mNumBones += skin->batchData.initialTransforms.size();
-            mNumWeights += skin->weight.size();
+            mNumBones += skin->mBatchData.initialTransforms.size();
+            mNumWeights += skin->mWeight.size();
          }
       }
 

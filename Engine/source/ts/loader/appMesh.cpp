@@ -133,13 +133,13 @@ TSMesh* AppMesh::constructTSMesh()
       tsmesh = tsskin;
 
       // Copy skin elements
-      tsskin->weight = mWeight;
-      tsskin->boneIndex = mBoneIndex;
-      tsskin->vertexIndex = mVertexIndex;
-      tsskin->batchData.nodeIndex = mNodeIndex;
-      tsskin->batchData.initialTransforms = mInitialTransforms;
-      tsskin->batchData.initialVerts = mInitialVerts;
-      tsskin->batchData.initialNorms = mInitialNorms;
+      tsskin->mWeight = mWeight;
+      tsskin->mBoneIndex = mBoneIndex;
+      tsskin->mVertexIndex = mVertexIndex;
+      tsskin->mBatchData.nodeIndex = mNodeIndex;
+      tsskin->mBatchData.initialTransforms = mInitialTransforms;
+      tsskin->mBatchData.initialVerts = mInitialVerts;
+      tsskin->mBatchData.initialNorms = mInitialNorms;
    }
    else
    {

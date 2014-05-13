@@ -1188,13 +1188,13 @@ void TSShape::assembleShape()
          if (meshType==TSMesh::SkinMeshType)
          {
             TSSkinMesh * skin = (TSSkinMesh*)mesh;
-            TSMesh::smVertsList[i]  = skin->batchData.initialVerts.address();
-            TSMesh::smNormsList[i]  = skin->batchData.initialNorms.address();
-            TSSkinMesh::smInitTransformList[i] = skin->batchData.initialTransforms.address();
-            TSSkinMesh::smVertexIndexList[i] = skin->vertexIndex.address();
-            TSSkinMesh::smBoneIndexList[i] = skin->boneIndex.address();
-            TSSkinMesh::smWeightList[i] = skin->weight.address();
-            TSSkinMesh::smNodeIndexList[i] = skin->batchData.nodeIndex.address();
+            TSMesh::smVertsList[i]  = skin->mBatchData.initialVerts.address();
+            TSMesh::smNormsList[i]  = skin->mBatchData.initialNorms.address();
+            TSSkinMesh::smInitTransformList[i] = skin->mBatchData.initialTransforms.address();
+            TSSkinMesh::smVertexIndexList[i] = skin->mVertexIndex.address();
+            TSSkinMesh::smBoneIndexList[i] = skin->mBoneIndex.address();
+            TSSkinMesh::smWeightList[i] = skin->mWeight.address();
+            TSSkinMesh::smNodeIndexList[i] = skin->mBatchData.nodeIndex.address();
          }
       }
    }
@@ -1270,16 +1270,16 @@ void TSShape::assembleShape()
          // fill in location of verts, tverts, and normals for shared detail levels
          if (skin)
          {
-            TSMesh::smVertsList[i]  = skin->batchData.initialVerts.address();
+            TSMesh::smVertsList[i]  = skin->mBatchData.initialVerts.address();
             TSMesh::smTVertsList[i] = skin->mTVerts.address();
-            TSMesh::smNormsList[i]  = skin->batchData.initialNorms.address();
+            TSMesh::smNormsList[i]  = skin->mBatchData.initialNorms.address();
             TSMesh::smEncodedNormsList[i]  = skin->mEncodedNorms.address();
             TSMesh::smDataCopied[i] = !skip; // as long as we didn't skip this mesh, the data should be in shape now
-            TSSkinMesh::smInitTransformList[i] = skin->batchData.initialTransforms.address();
-            TSSkinMesh::smVertexIndexList[i] = skin->vertexIndex.address();
-            TSSkinMesh::smBoneIndexList[i] = skin->boneIndex.address();
-            TSSkinMesh::smWeightList[i] = skin->weight.address();
-            TSSkinMesh::smNodeIndexList[i] = skin->batchData.nodeIndex.address();
+            TSSkinMesh::smInitTransformList[i] = skin->mBatchData.initialTransforms.address();
+            TSSkinMesh::smVertexIndexList[i] = skin->mVertexIndex.address();
+            TSSkinMesh::smBoneIndexList[i] = skin->mBoneIndex.address();
+            TSSkinMesh::smWeightList[i] = skin->mWeight.address();
+            TSSkinMesh::smNodeIndexList[i] = skin->mBatchData.nodeIndex.address();
          }
       }
 

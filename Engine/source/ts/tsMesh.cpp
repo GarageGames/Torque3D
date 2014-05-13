@@ -1180,53 +1180,53 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
 {
    PROFILE_SCOPE( TSSkinMesh_UpdateSkin );
 
-   AssertFatal(batchDataInitialized, "Batch data not initialized. Call createBatchData() before any skin update is called.");
+   AssertFatal(mBatchDataInitialized, "Batch data not initialized. Call createBatchData() before any skin update is called.");
 
    // set arrays
 #if defined(TORQUE_MAX_LIB)
-   mVerts.setSize(batchData.initialVerts.size());
-   mNorms.setSize(batchData.initialNorms.size());
+   mVerts.setSize(mBatchData.initialVerts.size());
+   mNorms.setSize(mBatchData.initialNorms.size());
 #else
-   if ( !batchDataInitialized && mEncodedNorms.size() )
+   if ( !mBatchDataInitialized && mEncodedNorms.size() )
    {
       // we co-opt responsibility for updating encoded normals from mesh
       gNormalStore.setSize( mVertsPerFrame );
       for ( S32 i = 0; i < mVertsPerFrame; i++ )
          gNormalStore[i] = decodeNormal( mEncodedNorms[i] );
 
-      batchData.initialNorms.set( gNormalStore.address(), mVertsPerFrame );
+      mBatchData.initialNorms.set( gNormalStore.address(), mVertsPerFrame );
    }
 #endif
 
    static Vector<MatrixF> sBoneTransforms;
-   sBoneTransforms.setSize( batchData.nodeIndex.size() );
+   sBoneTransforms.setSize( mBatchData.nodeIndex.size() );
 
    // set up bone transforms
    PROFILE_START(TSSkinMesh_UpdateTransforms);
-   for( S32 i=0; i<batchData.nodeIndex.size(); i++ )
+   for( S32 i=0; i<mBatchData.nodeIndex.size(); i++ )
    {
-      S32 node = batchData.nodeIndex[i];
-      sBoneTransforms[i].mul( transforms[node], batchData.initialTransforms[i] );
+      S32 node = mBatchData.nodeIndex[i];
+      sBoneTransforms[i].mul( transforms[node], mBatchData.initialTransforms[i] );
    }
    const MatrixF * matrices = &sBoneTransforms[0];
    PROFILE_END();
 
    // Perform skinning
-   const bool bBatchByVert = !batchData.vertexBatchOperations.empty();
+   const bool bBatchByVert = !mBatchData.vertexBatchOperations.empty();
    if(bBatchByVert)
    {
-      const Point3F *inVerts = &batchData.initialVerts[0];
-      const Point3F *inNorms = &batchData.initialNorms[0];
+      const Point3F *inVerts = &mBatchData.initialVerts[0];
+      const Point3F *inNorms = &mBatchData.initialNorms[0];
 
       Point3F srcVtx, srcNrm;
 
-      AssertFatal( batchData.vertexBatchOperations.size() == batchData.initialVerts.size(), "Assumption failed!" );
+      AssertFatal( mBatchData.vertexBatchOperations.size() == mBatchData.initialVerts.size(), "Assumption failed!" );
 
       register Point3F skinnedVert;
       register Point3F skinnedNorm;
 
-      for( Vector<BatchData::BatchedVertex>::const_iterator itr = batchData.vertexBatchOperations.begin(); 
-         itr != batchData.vertexBatchOperations.end(); itr++ )
+      for( Vector<BatchData::BatchedVertex>::const_iterator itr = mBatchData.vertexBatchOperations.begin(); 
+         itr != mBatchData.vertexBatchOperations.end(); itr++ )
       {
          const BatchData::BatchedVertex &curVert = *itr;
 
@@ -1275,11 +1275,11 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
       zero_vert_normal_bulk(mNumVerts, outPtr, outStride);
 
       // Iterate over transforms, and perform batch transform x skin_vert
-      for(Vector<S32>::const_iterator itr = batchData.transformKeys.begin();
-          itr != batchData.transformKeys.end(); itr++)
+      for(Vector<S32>::const_iterator itr = mBatchData.transformKeys.begin();
+          itr != mBatchData.transformKeys.end(); itr++)
       {
          const S32 boneXfmIdx = *itr;
-         const BatchData::BatchedTransform &curTransform = *batchData.transformBatchOperations.retreive(boneXfmIdx);
+         const BatchData::BatchedTransform &curTransform = *mBatchData.transformBatchOperations.retreive(boneXfmIdx);
          const MatrixF &curBoneMat = matrices[boneXfmIdx];
          const S32 numVerts = curTransform.numElements;
 
@@ -1307,14 +1307,14 @@ S32 QSORT_CALLBACK _sort_BatchedVertWeight( const void *a, const void *b )
 
 void TSSkinMesh::createBatchData()
 {
-   if(batchDataInitialized)
+   if(mBatchDataInitialized)
       return;
 
-   batchDataInitialized = true;
-   S32 * curVtx = vertexIndex.begin();
-   S32 * curBone = boneIndex.begin();
-   F32 * curWeight = weight.begin();
-   const S32 * endVtx = vertexIndex.end();
+   mBatchDataInitialized = true;
+   S32 * curVtx = mVertexIndex.begin();
+   S32 * curBone = mBoneIndex.begin();
+   F32 * curWeight = mWeight.begin();
+   const S32 * endVtx = mVertexIndex.end();
 
    // Temp vector to build batch operations
    Vector<BatchData::BatchedVertex> batchOperations;
@@ -1408,7 +1408,7 @@ void TSSkinMesh::createBatchData()
 
 #ifdef _BATCH_BY_VERTEX
    // Copy data to member, and be done
-   batchData.vertexBatchOperations.set(batchOperations.address(), batchOperations.size());
+   mBatchData.vertexBatchOperations.set(batchOperations.address(), batchOperations.size());
 
    // Convert to batch-by-transform, which is better for CPU skinning, 
    // where-as GPU skinning would data for batch-by-vertex operation
@@ -1424,18 +1424,18 @@ void TSSkinMesh::createBatchData()
 
          // Find the proper batched transform, and add this vertex/weight to the
          // list of verts affected by the transform
-         BatchData::BatchedTransform *bt = batchData.transformBatchOperations.retreive(transformOp.transformIndex);
+         BatchData::BatchedTransform *bt = mBatchData.transformBatchOperations.retreive(transformOp.transformIndex);
          if(!bt)
          {
             bt = new BatchData::BatchedTransform;
-            batchData.transformBatchOperations.insert(bt, transformOp.transformIndex);
+            mBatchData.transformBatchOperations.insert(bt, transformOp.transformIndex);
             bt->_tmpVec = new Vector<BatchData::BatchedVertWeight>;
-            batchData.transformKeys.push_back(transformOp.transformIndex);
+            mBatchData.transformKeys.push_back(transformOp.transformIndex);
          }
 
          bt->_tmpVec->increment();
-         bt->_tmpVec->last().vert = batchData.initialVerts[curTransform.vertexIndex];
-         bt->_tmpVec->last().normal = batchData.initialNorms[curTransform.vertexIndex];
+         bt->_tmpVec->last().vert = mBatchData.initialVerts[curTransform.vertexIndex];
+         bt->_tmpVec->last().normal = mBatchData.initialNorms[curTransform.vertexIndex];
          bt->_tmpVec->last().weight = transformOp.weight;
          bt->_tmpVec->last().vidx = curTransform.vertexIndex;
       }
@@ -1443,10 +1443,10 @@ void TSSkinMesh::createBatchData()
 
    // Now iterate the resulting operations and convert the vectors to aligned
    // memory locations
-   const S32 numBatchOps = batchData.transformKeys.size();
+   const S32 numBatchOps = mBatchData.transformKeys.size();
    for(S32 i = 0; i < numBatchOps; i++)
    {
-      BatchData::BatchedTransform &curTransform = *batchData.transformBatchOperations.retreive(batchData.transformKeys[i]);
+      BatchData::BatchedTransform &curTransform = *mBatchData.transformBatchOperations.retreive(mBatchData.transformKeys[i]);
       const S32 numVerts = curTransform._tmpVec->size();
 
       // Allocate a chunk of aligned memory and copy in values
@@ -1464,7 +1464,7 @@ void TSSkinMesh::createBatchData()
    // Now sort the batch data so that the skin function writes close to linear output
    for(S32 i = 0; i < numBatchOps; i++)
    {
-      BatchData::BatchedTransform &curTransform = *batchData.transformBatchOperations.retreive(batchData.transformKeys[i]);
+      BatchData::BatchedTransform &curTransform = *mBatchData.transformBatchOperations.retreive(mBatchData.transformKeys[i]);
       dQsort(curTransform.alignedMem, curTransform.numElements, sizeof(BatchData::BatchedVertWeight), _sort_BatchedVertWeight);
    }
 #endif
@@ -1489,11 +1489,11 @@ void TSSkinMesh::render(   TSMaterialList *materials,
 
    // Initialize the vertex data if it needs it
    if(!mVertexData.isReady() )
-      _convertToAlignedMeshData(mVertexData, batchData.initialVerts, batchData.initialNorms);
+      _convertToAlignedMeshData(mVertexData, mBatchData.initialVerts, mBatchData.initialNorms);
    AssertFatal(mVertexData.size() == mNumVerts, "Vert # mismatch");
 
    // Initialize the skin batch if that isn't ready
-   if(!batchDataInitialized)
+   if(!mBatchDataInitialized)
       createBatchData();
 
    const bool vertsChanged = vertexBuffer.isNull() || vertexBuffer->mNumVerts != mNumVerts;
@@ -1550,7 +1550,7 @@ void TSSkinMesh::computeBounds( const MatrixF &transform, Box3F &bounds, S32 fra
    if (frame < 0)
    {
       // Use unskinned verts
-      TSMesh::computeBounds( batchData.initialVerts.address(), batchData.initialVerts.size(), sizeof(Point3F), transform, bounds, center, radius );
+      TSMesh::computeBounds( mBatchData.initialVerts.address(), mBatchData.initialVerts.size(), sizeof(Point3F), transform, bounds, center, radius );
    }
    else
    {
@@ -2765,14 +2765,14 @@ void TSMesh::disassemble()
 void TSSkinMesh::assemble( bool skip )
 {
    // avoid a crash on computeBounds...
-   batchData.initialVerts.set( NULL, 0 );
+   mBatchData.initialVerts.set( NULL, 0 );
 
    TSMesh::assemble( skip );
 
    S32 sz = tsalloc.get32();
    S32 numVerts = sz;
    S32 * ptr32 = getSharedData32( mParentMesh, 3 * numVerts, (S32**)smVertsList.address(), skip );
-   batchData.initialVerts.set( (Point3F*)ptr32, sz );
+   mBatchData.initialVerts.set( (Point3F*)ptr32, sz );
 
    S8 * ptr8;
    if ( TSShape::smReadVersion>21 && TSMesh::smUseEncodedNormals )
@@ -2780,7 +2780,7 @@ void TSSkinMesh::assemble( bool skip )
       // we have encoded normals and we want to use them...
       if ( mParentMesh < 0 )
          tsalloc.getPointer32( numVerts * 3 ); // advance past norms, don't use
-      batchData.initialNorms.set( NULL, 0 );
+      mBatchData.initialNorms.set( NULL, 0 );
 
       ptr8 = getSharedData8( mParentMesh, numVerts, (S8**)smEncodedNormsList.address(), skip );
       mEncodedNorms.set( ptr8, numVerts );
@@ -2791,7 +2791,7 @@ void TSSkinMesh::assemble( bool skip )
    {
       // we have encoded normals but we don't want to use them...
       ptr32 = getSharedData32( mParentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip );
-      batchData.initialNorms.set( (Point3F*)ptr32, numVerts );
+      mBatchData.initialNorms.set( (Point3F*)ptr32, numVerts );
 
       if ( mParentMesh < 0 )
          tsalloc.getPointer8( numVerts ); // advance past encoded normls, don't use
@@ -2802,34 +2802,34 @@ void TSSkinMesh::assemble( bool skip )
    {
       // no encoded normals...
       ptr32 = getSharedData32( mParentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip );
-      batchData.initialNorms.set( (Point3F*)ptr32, numVerts );
+      mBatchData.initialNorms.set( (Point3F*)ptr32, numVerts );
       mEncodedNorms.set( NULL, 0 );
    }
 
    sz = tsalloc.get32();
    ptr32 = getSharedData32( mParentMesh, 16 * sz, (S32**)smInitTransformList.address(), skip );
-   batchData.initialTransforms.set( ptr32, sz );
+   mBatchData.initialTransforms.set( ptr32, sz );
 
    sz = tsalloc.get32();
    ptr32 = getSharedData32( mParentMesh, sz, (S32**)smVertexIndexList.address(), skip );
-   vertexIndex.set( ptr32, sz );
+   mVertexIndex.set( ptr32, sz );
 
    ptr32 = getSharedData32( mParentMesh, sz, (S32**)smBoneIndexList.address(), skip );
-   boneIndex.set( ptr32, sz );
+   mBoneIndex.set( ptr32, sz );
 
    ptr32 = getSharedData32( mParentMesh, sz, (S32**)smWeightList.address(), skip );
-   weight.set( (F32*)ptr32, sz );
+   mWeight.set( (F32*)ptr32, sz );
 
    sz = tsalloc.get32();
    ptr32 = getSharedData32( mParentMesh, sz, (S32**)smNodeIndexList.address(), skip );
-   batchData.nodeIndex.set( ptr32, sz );
+   mBatchData.nodeIndex.set( ptr32, sz );
 
    tsalloc.checkGuard();
 
    if ( tsalloc.allocShape32( 0 ) && TSShape::smReadVersion < 19 )
       TSMesh::computeBounds(); // only do this if we copied the data...
 
-   createTangents(batchData.initialVerts, batchData.initialNorms);
+   createTangents(mBatchData.initialVerts, mBatchData.initialNorms);
 }
 
 //-----------------------------------------------------------------------------
@@ -2839,40 +2839,40 @@ void TSSkinMesh::disassemble()
 {
    TSMesh::disassemble();
 
-   tsalloc.set32( batchData.initialVerts.size() );
+   tsalloc.set32( mBatchData.initialVerts.size() );
    // if we have no parent mesh, then save off our verts & norms
    if ( mParentMesh < 0 )
    {
-      tsalloc.copyToBuffer32( (S32*)batchData.initialVerts.address(), 3 * batchData.initialVerts.size() );
+      tsalloc.copyToBuffer32( (S32*)mBatchData.initialVerts.address(), 3 * mBatchData.initialVerts.size() );
 
       // no longer do this here...let tsmesh handle this
-      tsalloc.copyToBuffer32( (S32*)batchData.initialNorms.address(), 3 * batchData.initialNorms.size() );
+      tsalloc.copyToBuffer32( (S32*)mBatchData.initialNorms.address(), 3 * mBatchData.initialNorms.size() );
 
       // if no parent mesh, compute encoded normals and copy over
-      for ( S32 i = 0; i < batchData.initialNorms.size(); i++ )
+      for ( S32 i = 0; i < mBatchData.initialNorms.size(); i++ )
       {
-         U8 normIdx = mEncodedNorms.size() ? mEncodedNorms[i] : encodeNormal( batchData.initialNorms[i] );
+         U8 normIdx = mEncodedNorms.size() ? mEncodedNorms[i] : encodeNormal( mBatchData.initialNorms[i] );
          tsalloc.copyToBuffer8( (S8*)&normIdx, 1 );
       }
    }
 
-   tsalloc.set32( batchData.initialTransforms.size() );
+   tsalloc.set32( mBatchData.initialTransforms.size() );
    if ( mParentMesh < 0 )
-      tsalloc.copyToBuffer32( (S32*)batchData.initialTransforms.address(), batchData.initialTransforms.size() * 16 );
+      tsalloc.copyToBuffer32( (S32*)mBatchData.initialTransforms.address(), mBatchData.initialTransforms.size() * 16 );
 
-   tsalloc.set32( vertexIndex.size() );
+   tsalloc.set32( mVertexIndex.size() );
    if ( mParentMesh < 0 )
    {
-      tsalloc.copyToBuffer32( (S32*)vertexIndex.address(), vertexIndex.size() );
+      tsalloc.copyToBuffer32( (S32*)mVertexIndex.address(), mVertexIndex.size() );
 
-      tsalloc.copyToBuffer32( (S32*)boneIndex.address(), boneIndex.size() );
+      tsalloc.copyToBuffer32( (S32*)mBoneIndex.address(), mBoneIndex.size() );
 
-      tsalloc.copyToBuffer32( (S32*)weight.address(), weight.size() );
+      tsalloc.copyToBuffer32( (S32*)mWeight.address(), mWeight.size() );
    }
 
-   tsalloc.set32( batchData.nodeIndex.size() );
+   tsalloc.set32( mBatchData.nodeIndex.size() );
    if ( mParentMesh < 0 )
-      tsalloc.copyToBuffer32( (S32*)batchData.nodeIndex.address(), batchData.nodeIndex.size() );
+      tsalloc.copyToBuffer32( (S32*)mBatchData.nodeIndex.address(), mBatchData.nodeIndex.size() );
 
    tsalloc.setGuard();
 }
@@ -2881,7 +2881,7 @@ TSSkinMesh::TSSkinMesh()
 {
    mMeshType = SkinMeshType;
    mDynamic = true;
-   batchDataInitialized = false;
+   mBatchDataInitialized = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -3040,7 +3040,7 @@ void TSMesh::convertToAlignedMeshData()
 void TSSkinMesh::convertToAlignedMeshData()
 {
    if(!mVertexData.isReady())
-      _convertToAlignedMeshData(mVertexData, batchData.initialVerts, batchData.initialNorms);
+      _convertToAlignedMeshData(mVertexData, mBatchData.initialVerts, mBatchData.initialNorms);
 }
 
 void TSMesh::_convertToAlignedMeshData( TSMeshVertexArray &vertexData, const Vector<Point3F> &_verts, const Vector<Point3F> &_norms )
