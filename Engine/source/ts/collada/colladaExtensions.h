@@ -157,7 +157,7 @@ public:
 
 public:
    ColladaExtension_effect(const domEffect* effect)
-      : mLastAnimTime(TSShapeLoader::DefaultTime-1), mTextureTransform(true), mBumpSampler(0)
+      : mLastAnimTime(TSShapeLoader::smDefaultTime-1), mTextureTransform(true), mBumpSampler(0)
    {
       //----------------------------------
       // <effect>

@@ -116,7 +116,7 @@ static void processNodeLights(AppNode* appNode, const MatrixF& offset, SimGroup*
       Con::printf("Adding <%s> light \"%s\" as a %s", lightType, lightName.c_str(), pLight->getClassName());
 
       MatrixF mat(offset);
-      mat.mul(appNode->getNodeTransform(TSShapeLoader::DefaultTime));
+      mat.mul(appNode->getNodeTransform(TSShapeLoader::smDefaultTime));
 
       pLight->setDataField(StringTable->insert("color"), 0,
          avar("%f %f %f %f", color.red, color.green, color.blue, color.alpha));

@@ -81,31 +81,31 @@ protected:
    };
 
 public:
-   static const F32 DefaultTime;
-   static const F64 MinFrameRate;
-   static const F64 MaxFrameRate;
-   static const F64 AppGroundFrameRate;
+   static const F32 smDefaultTime;
+   static const F64 smMinFrameRate;
+   static const F64 smMaxFrameRate;
+   static const F64 smAppGroundFrameRate;
 
 protected:
    // Variables used during loading that must be held until the shape is deleted
-   TSShape*                      shape;
-   Vector<AppMesh*>              appMeshes;
+   TSShape*                      mShape;
+   Vector<AppMesh*>              mAppMeshes;
 
    // Variables used during loading, but that can be discarded afterwards
-   static Torque::Path           shapePath;
+   static Torque::Path           smShapePath;
 
-   AppNode*                      boundsNode;
-   Vector<AppNode*>              appNodes;            ///< Nodes in the loaded shape
-   Vector<AppSequence*>          appSequences;
+   AppNode*                      mBoundsNode;
+   Vector<AppNode*>              mAppNodes;            ///< Nodes in the loaded shape
+   Vector<AppSequence*>          mAppSequences;
 
-   Vector<Subshape*>             subshapes;
+   Vector<Subshape*>             mSubShapes;
 
-   Vector<QuatF*>                nodeRotCache;
-   Vector<Point3F*>              nodeTransCache;
-   Vector<QuatF*>                nodeScaleRotCache;
-   Vector<Point3F*>              nodeScaleCache;
+   Vector<QuatF*>                mNodeRotCache;
+   Vector<Point3F*>              mNodeTransCache;
+   Vector<QuatF*>                mNodeScaleRotCache;
+   Vector<Point3F*>              mNodeScaleCache;
 
-   Point3F                       shapeOffset;         ///< Offset used to translate the shape origin
+   Point3F                       mShapeOffset;         ///< Offset used to translate the shape origin
 
    //--------------------------------------------------------------------------
 
@@ -170,10 +170,10 @@ protected:
    void install();
 
 public:
-   TSShapeLoader() : boundsNode(0) { }
+   TSShapeLoader() : mBoundsNode(0) { }
    virtual ~TSShapeLoader();
 
-   static const Torque::Path& getShapePath() { return shapePath; }
+   static const Torque::Path& getShapePath() { return smShapePath; }
 
    static void zapScale(MatrixF& mat);
 

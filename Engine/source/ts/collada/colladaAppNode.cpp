@@ -58,7 +58,7 @@ static char* TrimFirstWord(char* str)
 
 ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
       : p_domNode(node), appParent(parent), nodeExt(new ColladaExtension_node(node)),
-      lastTransformTime(TSShapeLoader::DefaultTime-1), defaultTransformValid(false),
+      lastTransformTime(TSShapeLoader::smDefaultTime-1), defaultTransformValid(false),
       invertMeshes(false)
 {
    mName = dStrdup(_GetNameOrId(node));
@@ -178,7 +178,7 @@ bool ColladaAppNode::animatesTransform(const AppSequence* appSeq)
 MatrixF ColladaAppNode::getNodeTransform(F32 time)
 {
    // Avoid re-computing the default transform if possible
-   if (defaultTransformValid && time == TSShapeLoader::DefaultTime)
+   if (defaultTransformValid && time == TSShapeLoader::smDefaultTime)
    {
       return defaultNodeTransform;
    }
@@ -198,7 +198,7 @@ MatrixF ColladaAppNode::getNodeTransform(F32 time)
       }
 
       // Cache the default transform
-      if (time == TSShapeLoader::DefaultTime)
+      if (time == TSShapeLoader::smDefaultTime)
       {
          defaultTransformValid = true;
          defaultNodeTransform = nodeTransform;

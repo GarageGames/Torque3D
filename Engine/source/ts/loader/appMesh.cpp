@@ -47,7 +47,7 @@ void AppMesh::computeBounds(Box3F& bounds)
       boneTransforms.setSize( mNodeIndex.size() );
       for (S32 iBone = 0; iBone < boneTransforms.size(); iBone++)
       {
-         MatrixF nodeMat = mBones[iBone]->getNodeTransform( TSShapeLoader::DefaultTime );
+         MatrixF nodeMat = mBones[iBone]->getNodeTransform( TSShapeLoader::smDefaultTime );
          TSShapeLoader::zapScale(nodeMat);
          boneTransforms[iBone].mul( nodeMat, mInitialTransforms[iBone] );
       }
@@ -74,7 +74,7 @@ void AppMesh::computeBounds(Box3F& bounds)
    }
    else
    {
-      MatrixF transform = getMeshTransform(TSShapeLoader::DefaultTime);
+      MatrixF transform = getMeshTransform(TSShapeLoader::smDefaultTime);
       TSShapeLoader::zapScale(transform);
 
       for (S32 iVert = 0; iVert < mPoints.size(); iVert++)
