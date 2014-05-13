@@ -168,19 +168,19 @@ void TSThread::setSequence(S32 seq, F32 toPos)
 
    mShapeInstance->clearTransition(this);
 
-   sequence = seq;
-   priority = getSequence()->priority;
-   pos = toPos;
-   makePath = getSequence()->makePath();
-   path.start = path.end = 0;
-   path.loop = 0;
+   mSequence = seq;
+   mPriority = getSequence()->priority;
+   mPos = toPos;
+   mMakePath = getSequence()->makePath();
+   mPath.start = mPath.end = 0;
+   mPath.loop = 0;
 
    // 1.0f doesn't exist on cyclic sequences
-   if (pos>0.9999f && getSequence()->isCyclic())
-      pos = 0.9999f;
+   if (mPos>0.9999f && getSequence()->isCyclic())
+      mPos = 0.9999f;
 
    // select keyframes
-   selectKeyframes(pos,getSequence(),&keyNum1,&keyNum2,&keyPos);
+   selectKeyframes(mPos,getSequence(),&mKeyNum1,&mKeyNum2,&mKeyPos);
 }
 
 void TSThread::transitionToSequence(S32 seq, F32 toPos, F32 duration, bool continuePlay)
@@ -192,49 +192,49 @@ void TSThread::transitionToSequence(S32 seq, F32 toPos, F32 duration, bool conti
    // of the transition is interpolated.  If we start to transtion from A to B,
    // but before reaching B we transtion to C, we interpolate all nodes controlled
    // by A, B, or C to their new position.
-   if (transitionData.inTransition)
+   if (mTransitionData.inTransition)
    {
-      transitionData.oldRotationNodes.overlap(getSequence()->rotationMatters);
-      transitionData.oldTranslationNodes.overlap(getSequence()->translationMatters);
-      transitionData.oldScaleNodes.overlap(getSequence()->scaleMatters);
+      mTransitionData.oldRotationNodes.overlap(getSequence()->rotationMatters);
+      mTransitionData.oldTranslationNodes.overlap(getSequence()->translationMatters);
+      mTransitionData.oldScaleNodes.overlap(getSequence()->scaleMatters);
    }
    else
    {
-      transitionData.oldRotationNodes = getSequence()->rotationMatters;
-      transitionData.oldTranslationNodes = getSequence()->translationMatters;
-      transitionData.oldScaleNodes = getSequence()->scaleMatters;
+      mTransitionData.oldRotationNodes = getSequence()->rotationMatters;
+      mTransitionData.oldTranslationNodes = getSequence()->translationMatters;
+      mTransitionData.oldScaleNodes = getSequence()->scaleMatters;
    }
 
    // set time characteristics of transition
-   transitionData.oldSequence = sequence;
-   transitionData.oldPos = pos;
-   transitionData.duration = duration;
-   transitionData.pos = 0.0f;
-   transitionData.direction = timeScale>0.0f ? 1.0f : -1.0f;
-   transitionData.targetScale = continuePlay ? 1.0f : 0.0f;
+   mTransitionData.oldSequence = mSequence;
+   mTransitionData.oldPos = mPos;
+   mTransitionData.duration = duration;
+   mTransitionData.pos = 0.0f;
+   mTransitionData.direction = mTimeScale>0.0f ? 1.0f : -1.0f;
+   mTransitionData.targetScale = continuePlay ? 1.0f : 0.0f;
 
    // in transition...
-   transitionData.inTransition = true;
+   mTransitionData.inTransition = true;
 
    // set target sequence data
-   sequence = seq;
-   priority = getSequence()->priority;
-   pos = toPos;
-   makePath = getSequence()->makePath();
-   path.start = path.end = 0;
-   path.loop = 0;
+   mSequence = seq;
+   mPriority = getSequence()->priority;
+   mPos = toPos;
+   mMakePath = getSequence()->makePath();
+   mPath.start = mPath.end = 0;
+   mPath.loop = 0;
 
    // 1.0f doesn't exist on cyclic sequences
-   if (pos>0.9999f && getSequence()->isCyclic())
-      pos = 0.9999f;
+   if (mPos>0.9999f && getSequence()->isCyclic())
+      mPos = 0.9999f;
 
    // select keyframes
-   selectKeyframes(pos,getSequence(),&keyNum1,&keyNum2,&keyPos);
+   selectKeyframes(mPos,getSequence(),&mKeyNum1,&mKeyNum2,&mKeyPos);
 }
 
 bool TSThread::isInTransition()
 {
-   return transitionData.inTransition;
+   return mTransitionData.inTransition;
 }
 
 void TSThread::animateTriggers()
@@ -242,30 +242,30 @@ void TSThread::animateTriggers()
    if (!getSequence()->numTriggers)
       return;
 
-   switch (path.loop)
+   switch (mPath.loop)
    {
       case -1 :
-         activateTriggers(path.start,0);
-         activateTriggers(1,path.end);
+         activateTriggers(mPath.start,0);
+         activateTriggers(1,mPath.end);
          break;
       case  0 :
-         activateTriggers(path.start,path.end);
+         activateTriggers(mPath.start,mPath.end);
          break;
       case  1 :
-         activateTriggers(path.start,1);
-         activateTriggers(0,path.end);
+         activateTriggers(mPath.start,1);
+         activateTriggers(0,mPath.end);
          break;
       default:
       {
-         if (path.loop>0)
+         if (mPath.loop>0)
          {
-            activateTriggers(path.end,1);
-            activateTriggers(0,path.end);
+            activateTriggers(mPath.end,1);
+            activateTriggers(0,mPath.end);
          }
          else
          {
-            activateTriggers(path.end,0);
-            activateTriggers(1,path.end);
+            activateTriggers(mPath.end,0);
+            activateTriggers(1,mPath.end);
          }
       }
    }
@@ -320,32 +320,32 @@ void TSThread::activateTriggers(F32 a, F32 b)
 
 F32 TSThread::getPos()
 {
-   return transitionData.inTransition ? transitionData.pos : pos;
+   return mTransitionData.inTransition ? mTransitionData.pos : mPos;
 }
 
 F32 TSThread::getTime()
 {
-   return transitionData.inTransition ? transitionData.pos * transitionData.duration : pos * getSequence()->duration;
+   return mTransitionData.inTransition ? mTransitionData.pos * mTransitionData.duration : mPos * getSequence()->duration;
 }
 
 F32 TSThread::getDuration()
 {
-   return transitionData.inTransition ? transitionData.duration : getSequence()->duration;
+   return mTransitionData.inTransition ? mTransitionData.duration : getSequence()->duration;
 }
 
 F32 TSThread::getScaledDuration()
 {
-   return getDuration() / mFabs(timeScale);
+   return getDuration() / mFabs(mTimeScale);
 }
 
 F32 TSThread::getTimeScale()
 {
-   return timeScale;
+   return mTimeScale;
 }
 
 void TSThread::setTimeScale(F32 ts)
 {
-   timeScale = ts;
+   mTimeScale = ts;
 }
 
 void TSThread::advancePos(F32 delta)
@@ -353,76 +353,76 @@ void TSThread::advancePos(F32 delta)
    if (mFabs(delta)>0.00001f)
    {
       // make dirty what this thread changes
-      U32 dirtyFlags = getSequence()->dirtyFlags | (transitionData.inTransition ? TSShapeInstance::TransformDirty : 0);
+      U32 dirtyFlags = getSequence()->dirtyFlags | (mTransitionData.inTransition ? TSShapeInstance::TransformDirty : 0);
       for (S32 i=0; i<mShapeInstance->getShape()->mSubShapeFirstNode.size(); i++)
          mShapeInstance->mDirtyFlags[i] |= dirtyFlags;
    }
 
-   if (transitionData.inTransition)
+   if (mTransitionData.inTransition)
    {
-      transitionData.pos += transitionData.direction * delta;
-      if (transitionData.pos<0 || transitionData.pos>=1.0f)
+      mTransitionData.pos += mTransitionData.direction * delta;
+      if (mTransitionData.pos<0 || mTransitionData.pos>=1.0f)
       {
          mShapeInstance->clearTransition(this);
-         if (transitionData.pos<0.0f)
+         if (mTransitionData.pos<0.0f)
             // return to old sequence
-            mShapeInstance->setSequence(this,transitionData.oldSequence,transitionData.oldPos);
+            mShapeInstance->setSequence(this,mTransitionData.oldSequence,mTransitionData.oldPos);
       }
       // re-adjust delta to be correct time-wise
-      delta *= transitionData.targetScale * transitionData.duration / getSequence()->duration;
+      delta *= mTransitionData.targetScale * mTransitionData.duration / getSequence()->duration;
    }
 
    // even if we are in a transition, keep playing the sequence
 
-   if (makePath)
+   if (mMakePath)
    {
-      path.start = pos;
-      pos += delta;
+      mPath.start = mPos;
+      mPos += delta;
       if (!getSequence()->isCyclic())
       {
-         pos = mClampF(pos , 0.0f, 1.0f);
-         path.loop = 0;
+         mPos = mClampF(mPos , 0.0f, 1.0f);
+         mPath.loop = 0;
       }
       else
       {
-         path.loop = (S32)pos;
-         if (pos < 0.0f)
-            path.loop--;
-         pos -= path.loop;
+         mPath.loop = (S32)mPos;
+         if (mPos < 0.0f)
+            mPath.loop--;
+         mPos -= mPath.loop;
          // following necessary because of floating point roundoff errors
-         if (pos < 0.0f) pos += 1.0f;
-         if (pos >= 1.0f) pos -= 1.0f;
+         if (mPos < 0.0f) mPos += 1.0f;
+         if (mPos >= 1.0f) mPos -= 1.0f;
       }
-      path.end = pos;
+      mPath.end = mPos;
 
       animateTriggers(); // do this automatically...no need for user to call it
 
-      AssertFatal(pos>=0.0f && pos<=1.0f,"TSThread::advancePos (1)");
-      AssertFatal(!getSequence()->isCyclic() || pos<1.0f,"TSThread::advancePos (2)");
+      AssertFatal(mPos>=0.0f && mPos<=1.0f,"TSThread::advancePos (1)");
+      AssertFatal(!getSequence()->isCyclic() || mPos<1.0f,"TSThread::advancePos (2)");
    }
    else
    {
-      pos += delta;
+      mPos += delta;
       if (!getSequence()->isCyclic())
-         pos = mClampF(pos, 0.0f, 1.0f);
+         mPos = mClampF(mPos, 0.0f, 1.0f);
       else
       {
-         pos -= S32(pos);
+         mPos -= S32(mPos);
          // following necessary because of floating point roundoff errors
-         if (pos < 0.0f) pos += 1.0f;
-         if (pos >= 1.0f) pos -= 1.0f;
+         if (mPos < 0.0f) mPos += 1.0f;
+         if (mPos >= 1.0f) mPos -= 1.0f;
       }
-      AssertFatal(pos>=0.0f && pos<=1.0f,"TSThread::advancePos (3)");
-      AssertFatal(!getSequence()->isCyclic() || pos<1.0f,"TSThread::advancePos (4)");
+      AssertFatal(mPos>=0.0f && mPos<=1.0f,"TSThread::advancePos (3)");
+      AssertFatal(!getSequence()->isCyclic() || mPos<1.0f,"TSThread::advancePos (4)");
    }
 
    // select keyframes
-   selectKeyframes(pos,getSequence(),&keyNum1,&keyNum2,&keyPos);
+   selectKeyframes(mPos,getSequence(),&mKeyNum1,&mKeyNum2,&mKeyPos);
 }
 
 void TSThread::advanceTime(F32 delta)
 {
-   advancePos(timeScale * delta / getDuration());
+   advancePos(mTimeScale * delta / getDuration());
 }
 
 void TSThread::setPos(F32 pos)
@@ -432,40 +432,40 @@ void TSThread::setPos(F32 pos)
 
 void TSThread::setTime(F32 time)
 {
-   setPos(timeScale * time/getDuration());
+   setPos(mTimeScale * time/getDuration());
 }
 
 S32 TSThread::getKeyframeCount()
 {
-   AssertFatal(!transitionData.inTransition,"TSThread::getKeyframeCount: not while in transition");
+   AssertFatal(!mTransitionData.inTransition,"TSThread::getKeyframeCount: not while in transition");
 
    return getSequence()->numKeyframes + 1;
 }
 
 S32 TSThread::getKeyframeNumber()
 {
-   AssertFatal(!transitionData.inTransition,"TSThread::getKeyframeNumber: not while in transition");
+   AssertFatal(!mTransitionData.inTransition,"TSThread::getKeyframeNumber: not while in transition");
 
-   return keyNum1;
+   return mKeyNum1;
 }
 
 void TSThread::setKeyframeNumber(S32 kf)
 {
    AssertFatal(kf>=0 && kf<= getSequence()->numKeyframes,
       "TSThread::setKeyframeNumber: invalid frame specified.");
-   AssertFatal(!transitionData.inTransition,"TSThread::setKeyframeNumber: not while in transition");
+   AssertFatal(!mTransitionData.inTransition,"TSThread::setKeyframeNumber: not while in transition");
 
-   keyNum1 = keyNum2 = kf;
-   keyPos = 0;
-   pos = 0;
+   mKeyNum1 = mKeyNum2 = kf;
+   mKeyPos = 0;
+   mPos = 0;
 }
 
 TSThread::TSThread(TSShapeInstance * _shapeInst)
 {
-   timeScale = 1.0f;
+   mTimeScale = 1.0f;
    mShapeInstance = _shapeInst;
-   transitionData.inTransition = false;
-   blendDisabled = false;
+   mTransitionData.inTransition = false;
+   mBlendDisabled = false;
    setSequence(0,0.0f);
 }
 
@@ -475,9 +475,9 @@ S32 TSThread::operator<(const TSThread & th2) const
    {
       // both blend or neither blend, sort based on priority only -- higher priority first
       S32 ret = 0; // do it this way to (hopefully) take advantage of 'conditional move' assembly instruction
-      if (priority > th2.priority)
+      if (mPriority > th2.mPriority)
          ret = -1;
-      if (th2.priority > priority)
+      if (th2.mPriority > mPriority)
          ret = 1;
       return ret;
    }
@@ -542,7 +542,7 @@ U32 TSShapeInstance::threadCount()
 
 void TSShapeInstance::setSequence(TSThread * thread, S32 seq, F32 pos)
 {
-   if ( (thread->transitionData.inTransition && mTransitionThreads.size()>1) || mTransitionThreads.size()>0)
+   if ( (thread->mTransitionData.inTransition && mTransitionThreads.size()>1) || mTransitionThreads.size()>0)
    {
       // if we have transitions, make sure transforms are up to date...
       sortThreads();
@@ -565,7 +565,7 @@ U32 TSShapeInstance::getSequence(TSThread * thread)
 {
    //AssertFatal( thread->sequence >= 0, "TSShapeInstance::getSequence: range error A");
    //AssertFatal( thread->sequence < mShape->sequences.size(), "TSShapeInstance::getSequence: range error B");
-   return (U32)thread->sequence;
+   return (U32)thread->mSequence;
 }
 
 void TSShapeInstance::transitionToSequence(TSThread * thread, S32 seq, F32 pos, F32 duration, bool continuePlay)
@@ -583,13 +583,13 @@ void TSShapeInstance::transitionToSequence(TSThread * thread, S32 seq, F32 pos, 
    else if (!mScaleCurrentlyAnimated && thread->getSequence()->animatesScale())
       mScaleCurrentlyAnimated=true;
 
-   mTransitionRotationNodes.overlap(thread->transitionData.oldRotationNodes);
+   mTransitionRotationNodes.overlap(thread->mTransitionData.oldRotationNodes);
    mTransitionRotationNodes.overlap(thread->getSequence()->rotationMatters);
 
-   mTransitionTranslationNodes.overlap(thread->transitionData.oldTranslationNodes);
+   mTransitionTranslationNodes.overlap(thread->mTransitionData.oldTranslationNodes);
    mTransitionTranslationNodes.overlap(thread->getSequence()->translationMatters);
 
-   mTransitionScaleNodes.overlap(thread->transitionData.oldScaleNodes);
+   mTransitionScaleNodes.overlap(thread->mTransitionData.oldScaleNodes);
    mTransitionScaleNodes.overlap(thread->getSequence()->scaleMatters);
 
    // if we aren't already in the list of transition threads, add us now
@@ -605,7 +605,7 @@ void TSShapeInstance::transitionToSequence(TSThread * thread, S32 seq, F32 pos, 
 
 void TSShapeInstance::clearTransition(TSThread * thread)
 {
-   if (!thread->transitionData.inTransition)
+   if (!thread->mTransitionData.inTransition)
       return;
 
    // if other transitions are still playing,
@@ -614,7 +614,7 @@ void TSShapeInstance::clearTransition(TSThread * thread)
       animateNodeSubtrees();
 
    // turn off transition...
-   thread->transitionData.inTransition = false;
+   thread->mTransitionData.inTransition = false;
 
    // remove us from transition list
    S32 i;
@@ -632,13 +632,13 @@ void TSShapeInstance::clearTransition(TSThread * thread)
    mTransitionScaleNodes.clearAll();
    for (i=0; i<mTransitionThreads.size(); i++)
    {
-      mTransitionRotationNodes.overlap(mTransitionThreads[i]->transitionData.oldRotationNodes);
+      mTransitionRotationNodes.overlap(mTransitionThreads[i]->mTransitionData.oldRotationNodes);
       mTransitionRotationNodes.overlap(mTransitionThreads[i]->getSequence()->rotationMatters);
 
-      mTransitionTranslationNodes.overlap(mTransitionThreads[i]->transitionData.oldTranslationNodes);
+      mTransitionTranslationNodes.overlap(mTransitionThreads[i]->mTransitionData.oldTranslationNodes);
       mTransitionTranslationNodes.overlap(mTransitionThreads[i]->getSequence()->translationMatters);
 
-      mTransitionScaleNodes.overlap(mTransitionThreads[i]->transitionData.oldScaleNodes);
+      mTransitionScaleNodes.overlap(mTransitionThreads[i]->mTransitionData.oldScaleNodes);
       mTransitionScaleNodes.overlap(mTransitionThreads[i]->getSequence()->scaleMatters);
    }
 
@@ -709,10 +709,10 @@ void TSShapeInstance::updateTransitions()
    for (i=0; i<mTransitionThreads.size(); i++)
    {
       TSThread * th = mTransitionThreads[i];
-      if (th->transitionData.inTransition)
+      if (th->mTransitionData.inTransition)
       {
-         th->transitionData.duration *= 1.0f - th->transitionData.pos;
-         th->transitionData.pos = 0.0f;
+         th->mTransitionData.duration *= 1.0f - th->mTransitionData.pos;
+         th->mTransitionData.pos = 0.0f;
       }
    }
 }
@@ -728,22 +728,22 @@ void TSShapeInstance::checkScaleCurrentlyAnimated()
 
 void TSShapeInstance::setBlendEnabled(TSThread * thread, bool blendOn)
 {
-   thread->blendDisabled = !blendOn;
+   thread->mBlendDisabled = !blendOn;
 }
 
 bool TSShapeInstance::getBlendEnabled(TSThread * thread)
 {
-   return !thread->blendDisabled;
+   return !thread->mBlendDisabled;
 }
 
 void TSShapeInstance::setPriority(TSThread * thread, F32 priority)
 {
-   thread->priority = priority;
+   thread->mPriority = priority;
 }
 
 F32 TSShapeInstance::getPriority(TSThread * thread)
 {
-   return thread->priority;
+   return thread->mPriority;
 }
 
 F32 TSShapeInstance::getTime(TSThread * thread)

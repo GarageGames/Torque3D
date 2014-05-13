@@ -696,20 +696,20 @@ class TSThread
 {
    friend class TSShapeInstance;
 
-   S32 priority;
+   S32 mPriority;
 
    TSShapeInstance * mShapeInstance;  ///< Instance of the shape that this thread animates
 
-   S32 sequence;                      ///< Sequence this thread will perform
-   F32 pos;
+   S32 mSequence;                      ///< Sequence this thread will perform
+   F32 mPos;
 
-   F32 timeScale;                     ///< How fast to play through the sequence
+   F32 mTimeScale;                     ///< How fast to play through the sequence
 
-   S32 keyNum1;                       ///< Keyframe at or before current position
-   S32 keyNum2;                       ///< Keyframe at or after current position
-   F32 keyPos;
+   S32 mKeyNum1;                       ///< Keyframe at or before current position
+   S32 mKeyNum2;                       ///< Keyframe at or after current position
+   F32 mKeyPos;
 
-   bool blendDisabled;                ///< Blend with other sequences?
+   bool mBlendDisabled;                ///< Blend with other sequences?
 
    /// if in transition...
    struct TransitionData
@@ -726,15 +726,15 @@ class TSThread
       TSIntegerSet oldScaleNodes;       ///< nodes controlled by this thread pre-transition
       U32 oldSequence; ///< sequence that was set before transition began
       F32 oldPos;      ///< position of sequence before transition began
-   } transitionData;
+   } mTransitionData;
 
    struct
    {
       F32 start;
       F32 end;
       S32 loop;
-   } path;
-   bool makePath;
+   } mPath;
+   bool mMakePath;
 
    /// given a position on the thread, choose correct keyframes
    /// slight difference between one-shot and cyclic sequences -- see comments below for details
@@ -783,10 +783,10 @@ class TSThread
 public:
 
    TSShapeInstance * getShapeInstance() { return mShapeInstance; }
-   bool hasSequence() const { return sequence >= 0; }
-   U32 getSeqIndex() const { return sequence; }
-   const TSSequence* getSequence() const { return &(mShapeInstance->mShape->mSequences[sequence]); }
-   const String& getSequenceName() const { return mShapeInstance->mShape->getSequenceName(sequence); }
+   bool hasSequence() const { return mSequence >= 0; }
+   U32 getSeqIndex() const { return mSequence; }
+   const TSSequence* getSequence() const { return &(mShapeInstance->mShape->mSequences[mSequence]); }
+   const String& getSequenceName() const { return mShapeInstance->mShape->getSequenceName(mSequence); }
    S32 operator<(const TSThread &) const;
 };
 
