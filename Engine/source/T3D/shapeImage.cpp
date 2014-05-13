@@ -490,9 +490,9 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
             do {
                MatrixF nmat;
                QuatF q;
-               TSTransform::setMatrix(shape[i]->defaultRotations[node].getQuatF(&q),shape[i]->defaultTranslations[node],&nmat);
+               TSTransform::setMatrix(shape[i]->mDefaultRotations[node].getQuatF(&q),shape[i]->mDefaultTranslations[node],&nmat);
                total.mul(nmat);
-               node = shape[i]->nodes[node].parentIndex;
+               node = shape[i]->mNodes[node].parentIndex;
             }
             while(node != -1);
             total.inverse();

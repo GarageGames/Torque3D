@@ -492,12 +492,12 @@ bool PlayerData::preload(bool server, String &errorStr)
          if (dStricmp(sp->name, "jet") != 0)
             AssertWarn(dp->sequence != -1, avar("PlayerData::preload - Unable to find named animation sequence '%s'!", sp->name));
       }
-      for (S32 b = 0; b < mShape->sequences.size(); b++)
+      for (S32 b = 0; b < mShape->mSequences.size(); b++)
       {
          if (!isTableSequence(b))
          {
             dp->sequence      = b;
-            dp->name          = mShape->getName(mShape->sequences[b].nameIndex);
+            dp->name          = mShape->getName(mShape->mSequences[b].nameIndex);
             dp->velocityScale = false;
             getGroundInfo(si,thread,dp++);
          }
@@ -614,7 +614,7 @@ void PlayerData::getGroundInfo(TSShapeInstance* si, TSThread* thread,ActionAnima
       dp->dir.set(0.0f, 0.0f, 0.0f);
 
       // Death animations MUST define ground transforms, so add dummy ones if required
-      if (si->getShape()->sequences[dp->sequence].numGroundFrames == 0)
+      if (si->getShape()->mSequences[dp->sequence].numGroundFrames == 0)
          si->getShape()->setSequenceGroundSpeed(dp->name, Point3F(0, 0, 0), Point3F(0, 0, 0));
    }
    else

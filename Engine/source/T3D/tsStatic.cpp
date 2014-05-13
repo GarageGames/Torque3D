@@ -314,7 +314,7 @@ bool TSStatic::_createShape()
          NetConnection::filesWereDownloaded() )
       return false;
 
-   mObjBox = mShape->bounds;
+   mObjBox = mShape->mBounds;
    resetWorldBox();
 
    mShapeInstance = new TSShapeInstance( mShape, isClientObject() );
@@ -371,7 +371,7 @@ void TSStatic::_updatePhysics()
    if ( mCollisionType == Bounds )
    {
       MatrixF offset( true );
-      offset.setPosition( mShape->center );
+      offset.setPosition( mShape->mCenter );
       colShape = PHYSICSMGR->createCollision();
       colShape->addBox( getObjBox().getExtents() * 0.5f * mObjScale, offset );         
    }
@@ -1109,7 +1109,7 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
    }
 
    // Check the mapTo name exists for this shape
-   S32 matIndex = object->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = object->getShape()->mMaterialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("TSShape::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -1127,13 +1127,13 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
-   delete object->getShape()->materialList->mMatInstList[matIndex];
-   object->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete object->getShape()->mMaterialList->mMatInstList[matIndex];
+   object->getShape()->mMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
-   object->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
+   object->getShape()->mMaterialList->getMaterialInst(matIndex)->init( features, flags );
 }
 
 DefineEngineMethod( TSStatic, getModelFile, const char *, (),,

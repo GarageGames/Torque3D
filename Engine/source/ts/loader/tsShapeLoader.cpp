@@ -252,7 +252,7 @@ void TSShapeLoader::recurseSubshape(AppNode* appNode, S32 parentIndex, bool recu
    if (appNode->isBounds())
       return;
 
-   S32 subShapeNum = mShape->subShapeFirstNode.size()-1;
+   S32 subShapeNum = mShape->mSubShapeFirstNode.size()-1;
    Subshape* subshape = mSubShapes[subShapeNum];
 
    // Check if we should collapse this node
@@ -264,19 +264,19 @@ void TSShapeLoader::recurseSubshape(AppNode* appNode, S32 parentIndex, bool recu
    else
    {
       // Check that adding this node will not exceed the maximum node count
-      if (mShape->nodes.size() >= MAX_TS_SET_SIZE)
+      if (mShape->mNodes.size() >= MAX_TS_SET_SIZE)
          return;
 
-      myIndex = mShape->nodes.size();
-      String nodeName = getUniqueName(appNode->getName(), cmpShapeName, mShape->names);
+      myIndex = mShape->mNodes.size();
+      String nodeName = getUniqueName(appNode->getName(), cmpShapeName, mShape->mNames);
 
       // Create the 3space node
-      mShape->nodes.increment();
-      mShape->nodes.last().nameIndex = mShape->addName(nodeName);
-      mShape->nodes.last().parentIndex = parentIndex;
-      mShape->nodes.last().firstObject = -1;
-      mShape->nodes.last().firstChild = -1;
-      mShape->nodes.last().nextSibling = -1;
+      mShape->mNodes.increment();
+      mShape->mNodes.last().nameIndex = mShape->addName(nodeName);
+      mShape->mNodes.last().parentIndex = parentIndex;
+      mShape->mNodes.last().firstObject = -1;
+      mShape->mNodes.last().firstChild = -1;
+      mShape->mNodes.last().nextSibling = -1;
 
       // Add the AppNode to a matching list (so AppNodes can be accessed using 3space
       // node indices)
@@ -312,12 +312,12 @@ void TSShapeLoader::recurseSubshape(AppNode* appNode, S32 parentIndex, bool recu
             appNode->getBool("BB::INCLUDE_POLES", includePoles);
 
             S32 detIndex = mShape->addDetail( "bbDetail", size, -1 );
-            mShape->details[detIndex].bbEquatorSteps = numEquatorSteps;
-            mShape->details[detIndex].bbPolarSteps = numPolarSteps;
-            mShape->details[detIndex].bbDetailLevel = dl;
-            mShape->details[detIndex].bbDimension = dim;
-            mShape->details[detIndex].bbIncludePoles = includePoles;
-            mShape->details[detIndex].bbPolarAngle = polarAngle;
+            mShape->mDetails[detIndex].bbEquatorSteps = numEquatorSteps;
+            mShape->mDetails[detIndex].bbPolarSteps = numPolarSteps;
+            mShape->mDetails[detIndex].bbDetailLevel = dl;
+            mShape->mDetails[detIndex].bbDimension = dim;
+            mShape->mDetails[detIndex].bbIncludePoles = includePoles;
+            mShape->mDetails[detIndex].bbPolarAngle = polarAngle;
          }
       }
    }
@@ -351,15 +351,15 @@ void TSShapeLoader::generateSubshapes()
 
       // Recurse through the node hierarchy, adding 3space nodes and
       // collecting geometry
-      S32 firstNode = mShape->nodes.size();
-      mShape->subShapeFirstNode.push_back(firstNode);      
+      S32 firstNode = mShape->mNodes.size();
+      mShape->mSubShapeFirstNode.push_back(firstNode);      
 
       for (U32 iBranch = 0; iBranch < subshape->branches.size(); iBranch++)
          recurseSubshape(subshape->branches[iBranch], -1, true);
 
-      mShape->subShapeNumNodes.push_back(mShape->nodes.size() - firstNode);
+      mShape->mSubShapeNumNodes.push_back(mShape->mNodes.size() - firstNode);
 
-      if (mShape->nodes.size() >= MAX_TS_SET_SIZE)
+      if (mShape->mNodes.size() >= MAX_TS_SET_SIZE)
       {
          Con::warnf("Shape exceeds the maximum node count (%d). Ignoring additional nodes.",
             MAX_TS_SET_SIZE);
@@ -389,7 +389,7 @@ void TSShapeLoader::generateObjects()
    for (S32 iSub = 0; iSub < mSubShapes.size(); iSub++)
    {
       Subshape* subshape = mSubShapes[iSub];
-      mShape->subShapeFirstObject.push_back(mShape->objects.size());
+      mShape->mSubShapeFirstObject.push_back(mShape->mObjects.size());
 
       // Get the names and sizes of the meshes for this subshape
       Vector<String> meshNames;
@@ -450,17 +450,17 @@ void TSShapeLoader::generateObjects()
 
          if (!lastName || (meshNames[iMesh] != *lastName))
          {
-            mShape->objects.increment();
-            mShape->objects.last().nameIndex = mShape->addName(meshNames[iMesh]);
-            mShape->objects.last().nodeIndex = subshape->objNodes[iMesh];
-            mShape->objects.last().startMeshIndex = mAppMeshes.size();
-            mShape->objects.last().numMeshes = 0;
+            mShape->mObjects.increment();
+            mShape->mObjects.last().nameIndex = mShape->addName(meshNames[iMesh]);
+            mShape->mObjects.last().nodeIndex = subshape->objNodes[iMesh];
+            mShape->mObjects.last().startMeshIndex = mAppMeshes.size();
+            mShape->mObjects.last().numMeshes = 0;
             lastName = &meshNames[iMesh];
          }
 
          // Add this mesh to the object
          mAppMeshes.push_back(mesh);
-         mShape->objects.last().numMeshes++;
+         mShape->mObjects.last().numMeshes++;
 
          // Set mesh flags
          mesh->mFlags = 0;
@@ -483,9 +483,9 @@ void TSShapeLoader::generateObjects()
          }
 
          // Attempt to add the detail (will fail if it already exists)
-         S32 oldNumDetails = mShape->details.size();
+         S32 oldNumDetails = mShape->mDetails.size();
          mShape->addDetail(detailName, mesh->mDetailSize, iSub);
-         if (mShape->details.size() > oldNumDetails)
+         if (mShape->mDetails.size() > oldNumDetails)
          {
             Con::warnf("Object mesh \"%s\" has no matching detail (\"%s%d\" has"
                " been added automatically)", mesh->getName(false), detailName, mesh->mDetailSize);
@@ -493,18 +493,18 @@ void TSShapeLoader::generateObjects()
       }
 
       // Get object count for this subshape
-      mShape->subShapeNumObjects.push_back(mShape->objects.size() - mShape->subShapeFirstObject.last());
+      mShape->mSubShapeNumObjects.push_back(mShape->mObjects.size() - mShape->mSubShapeFirstObject.last());
    }
 }
 
 void TSShapeLoader::generateSkins()
 {
    Vector<AppMesh*> skins;
-   for (S32 iObject = 0; iObject < mShape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < mShape->mObjects.size(); iObject++)
    {
-      for (S32 iMesh = 0; iMesh < mShape->objects[iObject].numMeshes; iMesh++)
+      for (S32 iMesh = 0; iMesh < mShape->mObjects[iObject].numMeshes; iMesh++)
       {
-         AppMesh* mesh = mAppMeshes[mShape->objects[iObject].startMeshIndex + iMesh];
+         AppMesh* mesh = mAppMeshes[mShape->mObjects[iObject].startMeshIndex + iMesh];
          if (mesh->isSkin())
             skins.push_back(mesh);
       }
@@ -551,12 +551,12 @@ void TSShapeLoader::generateSkins()
 void TSShapeLoader::generateDefaultStates()
 {
    // Generate default object states (includes initial geometry)
-   for (S32 iObject = 0; iObject < mShape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < mShape->mObjects.size(); iObject++)
    {
       updateProgress(Load_GenerateDefaultStates, "Generating initial mesh and node states...",
-         mShape->objects.size(), iObject);
+         mShape->mObjects.size(), iObject);
 
-      TSShape::Object& obj = mShape->objects[iObject];
+      TSShape::Object& obj = mShape->mObjects[iObject];
 
       // Calculate the objectOffset for each mesh at T=0
       for (S32 iMesh = 0; iMesh < obj.numMeshes; iMesh++)
@@ -572,7 +572,7 @@ void TSShapeLoader::generateDefaultStates()
          appMesh->mObjectOffset = nodeMat.inverse() * meshMat;
       }
 
-      generateObjectState(mShape->objects[iObject], smDefaultTime, true, true);
+      generateObjectState(mShape->mObjects[iObject], smDefaultTime, true, true);
    }
 
    // Generate default node transforms
@@ -591,8 +591,8 @@ void TSShapeLoader::generateDefaultStates()
 
 void TSShapeLoader::generateObjectState(TSShape::Object& obj, F32 t, bool addFrame, bool addMatFrame)
 {
-   mShape->objectStates.increment();
-   TSShape::ObjectState& state = mShape->objectStates.last();
+   mShape->mObjectStates.increment();
+   TSShape::ObjectState& state = mShape->mObjectStates.last();
 
    state.frameIndex = 0;
    state.matFrameIndex = 0;
@@ -689,13 +689,13 @@ void TSShapeLoader::generateFrame(TSShape::Object& obj, F32 t, bool addFrame, bo
 void TSShapeLoader::generateMaterialList()
 {
    // Install the materials into the material list
-   mShape->materialList = new TSMaterialList;
+   mShape->mMaterialList = new TSMaterialList;
    for (S32 iMat = 0; iMat < AppMesh::mAppMaterials.size(); iMat++)
    {
       updateProgress(Load_GenerateMaterials, "Generating materials...", AppMesh::mAppMaterials.size(), iMat);
 
       AppMaterial* appMat = AppMesh::mAppMaterials[iMat];
-      mShape->materialList->push_back(appMat->getName(), appMat->getFlags(), U32(-1), U32(-1), U32(-1), 1.0f, appMat->getReflectance());
+      mShape->mMaterialList->push_back(appMat->getName(), appMat->getFlags(), U32(-1), U32(-1), U32(-1), 1.0f, appMat->getReflectance());
    }
 }
 
@@ -712,8 +712,8 @@ void TSShapeLoader::generateSequences()
       // Initialize the sequence
       mAppSequences[iSeq]->setActive(true);
 
-      mShape->sequences.increment();
-      TSShape::Sequence& seq = mShape->sequences.last();
+      mShape->mSequences.increment();
+      TSShape::Sequence& seq = mShape->mSequences.last();
 
       seq.nameIndex = mShape->addName(mAppSequences[iSeq]->getName());
       seq.toolBegin = mAppSequences[iSeq]->getStart();
@@ -788,7 +788,7 @@ void TSShapeLoader::setRotationMembership(TSShape::Sequence& seq)
       // Check if any of the node rotations are different to
       // the default rotation
       QuatF defaultRot;
-      mShape->defaultRotations[iNode].getQuatF(&defaultRot);
+      mShape->mDefaultRotations[iNode].getQuatF(&defaultRot);
 
       for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
       {
@@ -807,7 +807,7 @@ void TSShapeLoader::setTranslationMembership(TSShape::Sequence& seq)
    {
       // Check if any of the node translations are different to
       // the default translation
-      Point3F& defaultTrans = mShape->defaultTranslations[iNode];
+      Point3F& defaultTrans = mShape->mDefaultTranslations[iNode];
 
       for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
       {
@@ -865,12 +865,12 @@ void TSShapeLoader::setObjectMembership(TSShape::Sequence& seq, const AppSequenc
    seq.frameMatters.clearAll();        // vert animation (morph) (size = objects.size())
    seq.matFrameMatters.clearAll();     // UV animation (size = objects.size())
 
-   for (S32 iObject = 0; iObject < mShape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < mShape->mObjects.size(); iObject++)
    {
-      if (!mAppMeshes[mShape->objects[iObject].startMeshIndex])
+      if (!mAppMeshes[mShape->mObjects[iObject].startMeshIndex])
          continue;
 
-      if (mAppMeshes[mShape->objects[iObject].startMeshIndex]->animatesVis(appSeq))
+      if (mAppMeshes[mShape->mObjects[iObject].startMeshIndex]->animatesVis(appSeq))
          seq.visMatters.set(iObject);
       // Morph and UV animation has been deprecated
       //if (appMeshes[shape->objects[iObject].startMeshIndex]->animatesFrame(appSeq))
@@ -934,44 +934,44 @@ void TSShapeLoader::addNodeRotation(QuatF& rot, bool defaultVal)
    rot16.set(rot);
 
    if (!defaultVal)
-      mShape->nodeRotations.push_back(rot16);
+      mShape->mNodeRotations.push_back(rot16);
    else
-      mShape->defaultRotations.push_back(rot16);
+      mShape->mDefaultRotations.push_back(rot16);
 }
 
 void TSShapeLoader::addNodeTranslation(Point3F& trans, bool defaultVal)
 {
    if (!defaultVal)
-      mShape->nodeTranslations.push_back(trans);
+      mShape->mNodeTranslations.push_back(trans);
    else
-      mShape->defaultTranslations.push_back(trans);
+      mShape->mDefaultTranslations.push_back(trans);
 }
 
 void TSShapeLoader::addNodeUniformScale(F32 scale)
 {
-   mShape->nodeUniformScales.push_back(scale);
+   mShape->mNodeUniformScales.push_back(scale);
 }
 
 void TSShapeLoader::addNodeAlignedScale(Point3F& scale)
 {
-   mShape->nodeAlignedScales.push_back(scale);
+   mShape->mNodeAlignedScales.push_back(scale);
 }
 
 void TSShapeLoader::addNodeArbitraryScale(QuatF& qrot, Point3F& scale)
 {
    Quat16 rot16;
    rot16.set(qrot);
-   mShape->nodeArbitraryScaleRots.push_back(rot16);
-   mShape->nodeArbitraryScaleFactors.push_back(scale);
+   mShape->mNodeArbitraryScaleRots.push_back(rot16);
+   mShape->mNodeArbitraryScaleFactors.push_back(scale);
 }
 
 void TSShapeLoader::generateNodeAnimation(TSShape::Sequence& seq)
 {
-   seq.baseRotation = mShape->nodeRotations.size();
-   seq.baseTranslation = mShape->nodeTranslations.size();
-   seq.baseScale = (seq.flags & TSShape::ArbitraryScale) ? mShape->nodeArbitraryScaleRots.size() :
-                   (seq.flags & TSShape::AlignedScale) ? mShape->nodeAlignedScales.size() :
-                   mShape->nodeUniformScales.size();
+   seq.baseRotation = mShape->mNodeRotations.size();
+   seq.baseTranslation = mShape->mNodeTranslations.size();
+   seq.baseScale = (seq.flags & TSShape::ArbitraryScale) ? mShape->mNodeArbitraryScaleRots.size() :
+                   (seq.flags & TSShape::AlignedScale) ? mShape->mNodeAlignedScales.size() :
+                   mShape->mNodeUniformScales.size();
 
    for (S32 iNode = 0; iNode < mAppNodes.size(); iNode++)
    {
@@ -999,9 +999,9 @@ void TSShapeLoader::generateNodeAnimation(TSShape::Sequence& seq)
 
 void TSShapeLoader::generateObjectAnimation(TSShape::Sequence& seq, const AppSequence* appSeq)
 {
-   seq.baseObjectState = mShape->objectStates.size();
+   seq.baseObjectState = mShape->mObjectStates.size();
 
-   for (S32 iObject = 0; iObject < mShape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < mShape->mObjects.size(); iObject++)
    {
       bool visMatters = seq.visMatters.test(iObject);
       bool frameMatters = seq.frameMatters.test(iObject);
@@ -1012,7 +1012,7 @@ void TSShapeLoader::generateObjectAnimation(TSShape::Sequence& seq, const AppSeq
          for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
          {
             F32 time = appSeq->getStart() + seq.duration * iFrame / getMax(1, seq.numKeyframes - 1);
-            generateObjectState(mShape->objects[iObject], time, frameMatters, matFrameMatters);
+            generateObjectState(mShape->mObjects[iObject], time, frameMatters, matFrameMatters);
          }
       }
    }
@@ -1020,7 +1020,7 @@ void TSShapeLoader::generateObjectAnimation(TSShape::Sequence& seq, const AppSeq
 
 void TSShapeLoader::generateGroundAnimation(TSShape::Sequence& seq, const AppSequence* appSeq)
 {
-   seq.firstGroundFrame = mShape->groundTranslations.size();
+   seq.firstGroundFrame = mShape->mGroundTranslations.size();
    seq.numGroundFrames = 0;
 
    if (!mBoundsNode)
@@ -1048,15 +1048,15 @@ void TSShapeLoader::generateGroundAnimation(TSShape::Sequence& seq, const AppSeq
       // Add ground transform
       Quat16 rotation;
       rotation.set(QuatF(mat));
-      mShape->groundTranslations.push_back(mat.getPosition());
-      mShape->groundRotations.push_back(rotation);
+      mShape->mGroundTranslations.push_back(mat.getPosition());
+      mShape->mGroundRotations.push_back(rotation);
    }
 }
 
 void TSShapeLoader::generateFrameTriggers(TSShape::Sequence& seq, const AppSequence* appSeq)
 {
    // Initialize triggers
-   seq.firstTrigger = mShape->triggers.size();
+   seq.firstTrigger = mShape->mTriggers.size();
    seq.numTriggers  = appSeq->getNumTriggers();
    if (!seq.numTriggers)
       return;
@@ -1066,8 +1066,8 @@ void TSShapeLoader::generateFrameTriggers(TSShape::Sequence& seq, const AppSeque
    // Add triggers
    for (S32 iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
    {
-      mShape->triggers.increment();
-      appSeq->getTrigger(iTrigger, mShape->triggers.last());
+      mShape->mTriggers.increment();
+      appSeq->getTrigger(iTrigger, mShape->mTriggers.last());
    }
 
    // Track the triggers that get turned off by this shape...normally, triggers
@@ -1077,7 +1077,7 @@ void TSShapeLoader::generateFrameTriggers(TSShape::Sequence& seq, const AppSeque
    U32 offTriggers = 0;
    for (S32 iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
    {
-      U32 state = mShape->triggers[seq.firstTrigger+iTrigger].state;
+      U32 state = mShape->mTriggers[seq.firstTrigger+iTrigger].state;
       if ((state & TSShape::Trigger::StateOn) == 0)
          offTriggers |= (state & TSShape::Trigger::StateMask);
    }
@@ -1085,8 +1085,8 @@ void TSShapeLoader::generateFrameTriggers(TSShape::Sequence& seq, const AppSeque
    // We now know which states are turned off, set invert on all those (including when turned on)
    for (int iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
    {
-      if (mShape->triggers[seq.firstTrigger + iTrigger].state & offTriggers)
-         mShape->triggers[seq.firstTrigger + iTrigger].state |= TSShape::Trigger::InvertOnReverse;
+      if (mShape->mTriggers[seq.firstTrigger + iTrigger].state & offTriggers)
+         mShape->mTriggers[seq.firstTrigger + iTrigger].state |= TSShape::Trigger::InvertOnReverse;
    }
 }
 
@@ -1105,29 +1105,29 @@ void TSShapeLoader::sortDetails()
 
       for (S32 iDet = 0; iDet < validDetails.size(); iDet++)
       {
-         TSShape::Detail &detail = mShape->details[validDetails[iDet]];
+         TSShape::Detail &detail = mShape->mDetails[validDetails[iDet]];
          if (detail.subShapeNum >= 0)
             detail.objectDetailNum = iDet;
 
-         for (S32 iObj = mShape->subShapeFirstObject[iSub];
-            iObj < (mShape->subShapeFirstObject[iSub] + mShape->subShapeNumObjects[iSub]);
+         for (S32 iObj = mShape->mSubShapeFirstObject[iSub];
+            iObj < (mShape->mSubShapeFirstObject[iSub] + mShape->mSubShapeNumObjects[iSub]);
             iObj++)
          {
-            TSShape::Object &object = mShape->objects[iObj];
+            TSShape::Object &object = mShape->mObjects[iObj];
 
             // Insert a NULL mesh for this detail level if required (ie. if the
             // object does not already have a mesh with an equal or higher detail)
             S32 meshIndex = (iDet < object.numMeshes) ? iDet : object.numMeshes-1;
 
-            if (mAppMeshes[object.startMeshIndex + meshIndex]->mDetailSize < mShape->details[iDet].size)
+            if (mAppMeshes[object.startMeshIndex + meshIndex]->mDetailSize < mShape->mDetails[iDet].size)
             {
                // Add a NULL mesh
                mAppMeshes.insert(object.startMeshIndex + iDet, NULL);
                object.numMeshes++;
 
                // Fixup the start index for the other objects
-               for (S32 k = iObj+1; k < mShape->objects.size(); k++)
-                  mShape->objects[k].startMeshIndex++;
+               for (S32 k = iObj+1; k < mShape->mObjects.size(); k++)
+                  mShape->mObjects[k].startMeshIndex++;
             }
          }
       }
@@ -1142,20 +1142,20 @@ void TSShapeLoader::install()
 {
    // Arrays that are filled in by ts shape init, but need
    // to be allocated beforehand.
-   mShape->subShapeFirstTranslucentObject.setSize(mShape->subShapeFirstObject.size());
+   mShape->mSubShapeFirstTranslucentObject.setSize(mShape->mSubShapeFirstObject.size());
 
    // Construct TS sub-meshes
-   mShape->meshes.setSize(mAppMeshes.size());
+   mShape->mMeshes.setSize(mAppMeshes.size());
    for (U32 m = 0; m < mAppMeshes.size(); m++)
-      mShape->meshes[m] = mAppMeshes[m] ? mAppMeshes[m]->constructTSMesh() : NULL;
+      mShape->mMeshes[m] = mAppMeshes[m] ? mAppMeshes[m]->constructTSMesh() : NULL;
 
    // Remove empty meshes and objects
-   for (S32 iObj = mShape->objects.size()-1; iObj >= 0; iObj--)
+   for (S32 iObj = mShape->mObjects.size()-1; iObj >= 0; iObj--)
    {
-      TSShape::Object& obj = mShape->objects[iObj];
+      TSShape::Object& obj = mShape->mObjects[iObj];
       for (S32 iMesh = obj.numMeshes-1; iMesh >= 0; iMesh--)
       {
-         TSMesh *mesh = mShape->meshes[obj.startMeshIndex + iMesh];
+         TSMesh *mesh = mShape->mMeshes[obj.startMeshIndex + iMesh];
 
          if (mesh && !mesh->mPrimitives.size())
          {
@@ -1171,45 +1171,45 @@ void TSShapeLoader::install()
    }
 
    // Add a dummy object if needed so the shape loads and renders ok
-   if (!mShape->details.size())
+   if (!mShape->mDetails.size())
    {
       mShape->addDetail("detail", 2, 0);
-      mShape->subShapeNumObjects.last() = 1;
+      mShape->mSubShapeNumObjects.last() = 1;
 
-      mShape->meshes.push_back(NULL);
+      mShape->mMeshes.push_back(NULL);
 
-      mShape->objects.increment();
-      mShape->objects.last().nameIndex = mShape->addName("dummy");
-      mShape->objects.last().nodeIndex = 0;
-      mShape->objects.last().startMeshIndex = 0;
-      mShape->objects.last().numMeshes = 1;
+      mShape->mObjects.increment();
+      mShape->mObjects.last().nameIndex = mShape->addName("dummy");
+      mShape->mObjects.last().nodeIndex = 0;
+      mShape->mObjects.last().startMeshIndex = 0;
+      mShape->mObjects.last().numMeshes = 1;
 
-      mShape->objectStates.increment();
-      mShape->objectStates.last().frameIndex = 0;
-      mShape->objectStates.last().matFrameIndex = 0;
-      mShape->objectStates.last().vis = 1.0f;
+      mShape->mObjectStates.increment();
+      mShape->mObjectStates.last().frameIndex = 0;
+      mShape->mObjectStates.last().matFrameIndex = 0;
+      mShape->mObjectStates.last().vis = 1.0f;
    }
 
    // Update smallest visible detail
    mShape->mSmallestVisibleDL = -1;
    mShape->mSmallestVisibleSize = 999999;
-   for (S32 i = 0; i < mShape->details.size(); i++)
+   for (S32 i = 0; i < mShape->mDetails.size(); i++)
    {
-      if ((mShape->details[i].size >= 0) &&
-         (mShape->details[i].size < mShape->mSmallestVisibleSize))
+      if ((mShape->mDetails[i].size >= 0) &&
+         (mShape->mDetails[i].size < mShape->mSmallestVisibleSize))
       {
          mShape->mSmallestVisibleDL = i;
-         mShape->mSmallestVisibleSize = mShape->details[i].size;
+         mShape->mSmallestVisibleSize = mShape->mDetails[i].size;
       }
    }
 
-   computeBounds(mShape->bounds);
-   if (!mShape->bounds.isValidBox())
-      mShape->bounds = Box3F(1.0f);
+   computeBounds(mShape->mBounds);
+   if (!mShape->mBounds.isValidBox())
+      mShape->mBounds = Box3F(1.0f);
 
-   mShape->bounds.getCenter(&mShape->center);
-   mShape->radius = (mShape->bounds.maxExtents - mShape->center).len();
-   mShape->tubeRadius = mShape->radius;
+   mShape->mBounds.getCenter(&mShape->mCenter);
+   mShape->mRadius = (mShape->mBounds.maxExtents - mShape->mCenter).len();
+   mShape->mTubeRadius = mShape->mRadius;
 
    mShape->init();
 }

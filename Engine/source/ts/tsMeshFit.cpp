@@ -204,18 +204,18 @@ void MeshFit::initSourceGeometry( const String& target )
    {
       // Add all geometry in the highest detail level
       S32 dl = 0;
-      S32 ss = mShape->details[dl].subShapeNum;
+      S32 ss = mShape->mDetails[dl].subShapeNum;
       if ( ss < 0 )
          return;
 
-      S32 od = mShape->details[dl].objectDetailNum;
-      S32 start = mShape->subShapeFirstObject[ss];
-      S32 end   = start + mShape->subShapeNumObjects[ss];
+      S32 od = mShape->mDetails[dl].objectDetailNum;
+      S32 start = mShape->mSubShapeFirstObject[ss];
+      S32 end   = start + mShape->mSubShapeNumObjects[ss];
 
       for ( S32 i = start; i < end; i++ )
       {
-         const TSShape::Object &obj = mShape->objects[i];
-         const TSMesh* mesh = ( od < obj.numMeshes ) ? mShape->meshes[obj.startMeshIndex + od] : NULL;
+         const TSShape::Object &obj = mShape->mObjects[i];
+         const TSMesh* mesh = ( od < obj.numMeshes ) ? mShape->mMeshes[obj.startMeshIndex + od] : NULL;
          if ( mesh )
             addSourceMesh( obj, mesh );
       }
@@ -227,10 +227,10 @@ void MeshFit::initSourceGeometry( const String& target )
       if ( objIndex == -1 )
          return;
 
-      const TSShape::Object &obj = mShape->objects[objIndex];
+      const TSShape::Object &obj = mShape->mObjects[objIndex];
       for ( S32 i = 0; i < obj.numMeshes; i++ )
       {
-         const TSMesh* mesh = mShape->meshes[obj.startMeshIndex + i];
+         const TSMesh* mesh = mShape->mMeshes[obj.startMeshIndex + i];
          if ( mesh )
          {
             addSourceMesh( obj, mesh );
@@ -310,13 +310,13 @@ TSMesh* MeshFit::initMeshFromFile( const String& filename ) const
 {
    // Open the source shape file and make a copy of the mesh
    Resource<TSShape> hShape = ResourceManager::get().load(filename);
-   if (!bool(hShape) || !((TSShape*)hShape)->meshes.size())
+   if (!bool(hShape) || !((TSShape*)hShape)->mMeshes.size())
    {
       Con::errorf("TSShape::createMesh: Could not load source mesh from %s", filename.c_str());
       return NULL;
    }
 
-   TSMesh* srcMesh = ((TSShape*)hShape)->meshes[0];
+   TSMesh* srcMesh = ((TSShape*)hShape)->mMeshes[0];
    return mShape->copyMesh( srcMesh );
 }
 

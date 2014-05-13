@@ -482,7 +482,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          return ret;                                                 \
       }                                                              \
    }                                                                 \
-   TSShape::Node* var = var##Index < 0 ? NULL : &(mShape->nodes[var##Index]); \
+   TSShape::Node* var = var##Index < 0 ? NULL : &(mShape->mNodes[var##Index]); \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var)
 
@@ -495,7 +495,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          "node '%s'", name);                                         \
       return ret;                                                    \
    }                                                                 \
-   TSShape::Node* var = &(mShape->nodes[var##Index]);                \
+   TSShape::Node* var = &(mShape->mNodes[var##Index]);                \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var)
 
@@ -508,7 +508,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          "object '%s'", name);                                       \
       return ret;                                                    \
    }                                                                 \
-   TSShape::Object* var = &(mShape->objects[var##Index]);            \
+   TSShape::Object* var = &(mShape->mObjects[var##Index]);            \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var)
 
@@ -531,7 +531,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          "sequence named '%s'", name);                               \
       return ret;                                                    \
    }                                                                 \
-   TSShape::Sequence* var = &(mShape->sequences[var##Index]);        \
+   TSShape::Sequence* var = &(mShape->mSequences[var##Index]);        \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var);
 
@@ -695,7 +695,7 @@ DefineTSShapeConstructorMethod( getNodeCount, S32, (),,
    "%count = %this.getNodeCount();\n"
    "@endtsexample\n" )
 {
-   return mShape->nodes.size();
+   return mShape->mNodes.size();
 }}
 
 DefineTSShapeConstructorMethod( getNodeIndex, S32, ( const char* name ),,
@@ -723,8 +723,8 @@ DefineTSShapeConstructorMethod( getNodeName, const char*, ( S32 index ),,
    "   echo(%i SPC %this.getNodeName(%i));\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getNodeName, index, mShape->nodes.size(), "" );
-   return mShape->getName( mShape->nodes[index].nameIndex );
+   CHECK_INDEX_IN_RANGE( getNodeName, index, mShape->mNodes.size(), "" );
+   return mShape->getName( mShape->mNodes[index].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getNodeParentName, const char*, ( const char* name ),,
@@ -742,7 +742,7 @@ DefineTSShapeConstructorMethod( getNodeParentName, const char*, ( const char* na
    if ( node->parentIndex < 0 )
       return "";
    else
-      return mShape->getName( mShape->nodes[node->parentIndex].nameIndex );
+      return mShape->getName( mShape->mNodes[node->parentIndex].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( setNodeParent, bool, ( const char* name, const char* parentName ),,
@@ -814,7 +814,7 @@ DefineTSShapeConstructorMethod( getNodeChildName, const char*, ( const char* nam
    mShape->getNodeChildren( nodeIndex, nodeChildren );
    CHECK_INDEX_IN_RANGE( getNodeChildName, index, nodeChildren.size(), "" );
 
-   return mShape->getName( mShape->nodes[nodeChildren[index]].nameIndex );
+   return mShape->getName( mShape->mNodes[nodeChildren[index]].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getNodeObjectCount, S32, ( const char* name ),,
@@ -852,7 +852,7 @@ DefineTSShapeConstructorMethod( getNodeObjectName, const char*, ( const char* na
    mShape->getNodeObjects( nodeIndex, nodeObjects );
    CHECK_INDEX_IN_RANGE( getNodeObjectName, index, nodeObjects.size(), "" );
 
-   return mShape->getName( mShape->objects[nodeObjects[index]].nameIndex );
+   return mShape->getName( mShape->mObjects[nodeObjects[index]].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getNodeTransform, TransformF, ( const char* name, bool isWorld ), ( false ),
@@ -884,8 +884,8 @@ DefineTSShapeConstructorMethod( getNodeTransform, TransformF, ( const char* name
    else
    {
       // Local transform
-      pos = mShape->defaultTranslations[nodeIndex];
-      const Quat16& q16 = mShape->defaultRotations[nodeIndex];
+      pos = mShape->mDefaultTranslations[nodeIndex];
+      const Quat16& q16 = mShape->mDefaultRotations[nodeIndex];
       aa.set( q16.getQuatF() );
    }
 
@@ -1067,7 +1067,7 @@ DefineTSShapeConstructorMethod( getObjectCount, S32, (),, (), 0,
    "%count = %this.getObjectCount();\n"
    "@endtsexample\n" )
 {
-   return mShape->objects.size();
+   return mShape->mObjects.size();
 }}
 
 DefineTSShapeConstructorMethod( getObjectName, const char*, ( S32 index ),,
@@ -1082,9 +1082,9 @@ DefineTSShapeConstructorMethod( getObjectName, const char*, ( S32 index ),,
    "   echo( %i SPC %this.getObjectName( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getObjectName, index, mShape->objects.size(), "" );
+   CHECK_INDEX_IN_RANGE( getObjectName, index, mShape->mObjects.size(), "" );
 
-   return mShape->getName( mShape->objects[index].nameIndex );
+   return mShape->getName( mShape->mObjects[index].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getObjectIndex, S32, ( const char* name ),,
@@ -1113,7 +1113,7 @@ DefineTSShapeConstructorMethod( getObjectNode, const char*, ( const char* name )
    if ( obj->nodeIndex < 0 )
       return "";
    else
-      return mShape->getName( mShape->nodes[obj->nodeIndex].nameIndex );
+      return mShape->getName( mShape->mNodes[obj->nodeIndex].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( setObjectNode, bool, ( const char* objName, const char* nodeName ),,
@@ -1217,7 +1217,7 @@ DefineTSShapeConstructorMethod( getMeshName, const char*, ( const char* name, S3
    CHECK_INDEX_IN_RANGE( getMeshName, index, objectDetails.size(), "" );
 
    char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%s %d", name, (S32)mShape->details[objectDetails[index]].size);
+   dSprintf(returnBuffer, 256, "%s %d", name, (S32)mShape->mDetails[objectDetails[index]].size);
    return returnBuffer;
 }}
 
@@ -1242,7 +1242,7 @@ DefineTSShapeConstructorMethod( getMeshSize, S32, ( const char* name, S32 index 
 
    CHECK_INDEX_IN_RANGE( getMeshName, index, objectDetails.size(), -1 );
 
-   return (S32)mShape->details[objectDetails[index]].size;
+   return (S32)mShape->mDetails[objectDetails[index]].size;
 }}
 
 DefineTSShapeConstructorMethod( setMeshSize, bool, ( const char* name, S32 size ),,
@@ -1327,8 +1327,8 @@ DefineTSShapeConstructorMethod( getMeshMaterial, const char*, ( const char* name
 
    // Return the name of the first material attached to this mesh
    S32 matIndex = mesh->mPrimitives[0].matIndex & TSDrawPrimitive::MaterialMask;
-   if ((matIndex >= 0) && (matIndex < mShape->materialList->size()))
-      return mShape->materialList->getMaterialName( matIndex );
+   if ((matIndex >= 0) && (matIndex < mShape->mMaterialList->size()))
+      return mShape->mMaterialList->getMaterialName( matIndex );
    else
       return "";
 }}
@@ -1350,16 +1350,16 @@ DefineTSShapeConstructorMethod( setMeshMaterial, bool, ( const char* meshName, c
 
    // Check if this material is already in the shape
    S32 matIndex;
-   for ( matIndex = 0; matIndex < mShape->materialList->size(); matIndex++ )
+   for ( matIndex = 0; matIndex < mShape->mMaterialList->size(); matIndex++ )
    {
-      if ( dStrEqual( matName, mShape->materialList->getMaterialName( matIndex ) ) )
+      if ( dStrEqual( matName, mShape->mMaterialList->getMaterialName( matIndex ) ) )
          break;
    }
-   if ( matIndex == mShape->materialList->size() )
+   if ( matIndex == mShape->mMaterialList->size() )
    {
       // Add a new material to the shape
       U32 flags = TSMaterialList::S_Wrap | TSMaterialList::T_Wrap;
-      mShape->materialList->push_back( matName, flags );
+      mShape->mMaterialList->push_back( matName, flags );
    }
 
    // Set this material for all primitives in the mesh
@@ -1431,7 +1431,7 @@ DefineTSShapeConstructorMethod( getBounds, Box3F, (),,
    "Get the bounding box for the shape.\n"
    "@return Bounding box \"minX minY minZ maxX maxY maxZ\"" )
 {
-   return mShape->bounds;
+   return mShape->mBounds;
 }}
 
 DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
@@ -1443,10 +1443,10 @@ DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
    // Set shape bounds
    TSShape* shape = mShape;
 
-   shape->bounds = bbox;
-   shape->bounds.getCenter( &shape->center );
-   shape->radius = ( shape->bounds.maxExtents - shape->center ).len();
-   shape->tubeRadius = shape->radius;
+   shape->mBounds = bbox;
+   shape->mBounds.getCenter( &shape->mCenter );
+   shape->mRadius = ( shape->mBounds.maxExtents - shape->mCenter ).len();
+   shape->mTubeRadius = shape->mRadius;
 
    ADD_TO_CHANGE_SET();
    return true;
@@ -1458,7 +1458,7 @@ DefineTSShapeConstructorMethod( getDetailLevelCount, S32, (),, (), 0,
    "Get the total number of detail levels in the shape.\n"
    "@return the number of detail levels in the shape\n" )
 {
-   return mShape->details.size();
+   return mShape->mDetails.size();
 }}
 
 DefineTSShapeConstructorMethod( getDetailLevelName, const char*, ( S32 index ),,
@@ -1473,9 +1473,9 @@ DefineTSShapeConstructorMethod( getDetailLevelName, const char*, ( S32 index ),,
    "   echo( %i SPC %this.getDetailLevelName( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getDetailLevelName, index, mShape->details.size(), "" );
+   CHECK_INDEX_IN_RANGE( getDetailLevelName, index, mShape->mDetails.size(), "" );
 
-   return mShape->getName(mShape->details[index].nameIndex);
+   return mShape->getName(mShape->mDetails[index].nameIndex);
 }}
 
 DefineTSShapeConstructorMethod( getDetailLevelSize, S32, ( S32 index),,
@@ -1490,9 +1490,9 @@ DefineTSShapeConstructorMethod( getDetailLevelSize, S32, ( S32 index),,
    "   echo( \"Detail\" @ %i @ \" has size \" @ %this.getDetailLevelSize( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getDetailLevelSize, index, mShape->details.size(), 0 );
+   CHECK_INDEX_IN_RANGE( getDetailLevelSize, index, mShape->mDetails.size(), 0 );
 
-   return (S32)mShape->details[index].size;
+   return (S32)mShape->mDetails[index].size;
 }}
 
 DefineTSShapeConstructorMethod( getDetailLevelIndex, S32, ( S32 size ),,
@@ -1567,9 +1567,9 @@ DefineTSShapeConstructorMethod( getImposterDetailLevel, S32, (),, (), -1,
    "@return imposter detail level index, or -1 if the shape does not use "
    "imposters.\n\n" )
 {
-   for ( S32 i = 0; i < mShape->details.size(); i++ )
+   for ( S32 i = 0; i < mShape->mDetails.size(); i++ )
    {
-      if ( mShape->details[i].subShapeNum < 0 )
+      if ( mShape->mDetails[i].subShapeNum < 0 )
          return i;
    }
    return -1;
@@ -1597,10 +1597,10 @@ DefineTSShapeConstructorMethod( getImposterSettings, const char*, ( S32 index ),
    "   echo( \"Imposter settings: \" @ %this.getImposterSettings( %index ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getImposterSettings, index, mShape->details.size(), "" );
+   CHECK_INDEX_IN_RANGE( getImposterSettings, index, mShape->mDetails.size(), "" );
 
    // Return information about the detail level
-   const TSShape::Detail& det = mShape->details[index];
+   const TSShape::Detail& det = mShape->mDetails[index];
 
    char* returnBuffer = Con::getReturnBuffer(512);
    dSprintf(returnBuffer, 512, "%d\t%d\t%d\t%d\t%d\t%d\t%g",
@@ -1670,7 +1670,7 @@ DefineTSShapeConstructorMethod( getSequenceCount, S32, (),, (), 0,
    "Get the total number of sequences in the shape.\n"
    "@return the number of sequences in the shape\n\n" )
 {
-   return mShape->sequences.size();
+   return mShape->mSequences.size();
 }}
 
 DefineTSShapeConstructorMethod( getSequenceIndex, S32, ( const char* name),,
@@ -1699,9 +1699,9 @@ DefineTSShapeConstructorMethod( getSequenceName, const char*, ( S32 index ),,
    "   echo( %i SPC %this.getSequenceName( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getSequenceName, index, mShape->sequences.size(), "" );
+   CHECK_INDEX_IN_RANGE( getSequenceName, index, mShape->mSequences.size(), "" );
 
-   return mShape->getName( mShape->sequences[index].nameIndex );
+   return mShape->getName( mShape->mSequences[index].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getSequenceSource, const char*, ( const char* name ),,
@@ -1789,12 +1789,12 @@ DefineTSShapeConstructorMethod( getSequenceGroundSpeed, const char*, ( const cha
    Point3F trans(0,0,0), rot(0,0,0);
    if ( seq->numGroundFrames > 0 )
    {
-      const Point3F& p1 = mShape->groundTranslations[seq->firstGroundFrame];
-      const Point3F& p2 = mShape->groundTranslations[seq->firstGroundFrame + 1];
+      const Point3F& p1 = mShape->mGroundTranslations[seq->firstGroundFrame];
+      const Point3F& p2 = mShape->mGroundTranslations[seq->firstGroundFrame + 1];
       trans = p2 - p1;
 
-      QuatF r1 = mShape->groundRotations[seq->firstGroundFrame].getQuatF();
-      QuatF r2 = mShape->groundRotations[seq->firstGroundFrame + 1].getQuatF();
+      QuatF r1 = mShape->mGroundRotations[seq->firstGroundFrame].getQuatF();
+      QuatF r2 = mShape->mGroundRotations[seq->firstGroundFrame + 1].getQuatF();
       r2 -= r1;
 
       MatrixF mat;
@@ -2032,7 +2032,7 @@ DefineTSShapeConstructorMethod( getTrigger, const char*, ( const char* name, S32
 
    CHECK_INDEX_IN_RANGE( getTrigger, index, seq->numTriggers, "" );
 
-   const TSShape::Trigger& trig = mShape->triggers[seq->firstTrigger + index];
+   const TSShape::Trigger& trig = mShape->mTriggers[seq->firstTrigger + index];
    S32 frame = trig.pos * seq->numKeyframes;
    S32 state = getBinLog2(trig.state & TSShape::Trigger::StateMask) + 1;
    if (!(trig.state & TSShape::Trigger::StateOn))
@@ -2138,9 +2138,9 @@ void TSShapeConstructor::ChangeSet::write(TSShape* shape, Stream& stream, const 
    // Remove all __backup__ sequences (used during Shape Editing)
    if (shape)
    {
-      for (S32 i = 0; i < shape->sequences.size(); i++)
+      for (S32 i = 0; i < shape->mSequences.size(); i++)
       {
-         const char* seqName = shape->getName( shape->sequences[i].nameIndex );
+         const char* seqName = shape->getName( shape->mSequences[i].nameIndex );
          if ( dStrStartsWith( seqName, "__backup__" ) )
          {
             Command cmd( "removeSequence" );

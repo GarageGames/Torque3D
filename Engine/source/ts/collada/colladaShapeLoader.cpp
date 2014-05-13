@@ -359,24 +359,24 @@ void ColladaShapeLoader::computeBounds(Box3F& bounds)
       bounds.maxExtents += shapeOffset;
 
       // Now adjust all positions for root level nodes (nodes with no parent)
-      for (S32 iNode = 0; iNode < mShape->nodes.size(); iNode++)
+      for (S32 iNode = 0; iNode < mShape->mNodes.size(); iNode++)
       {
          if ( !mAppNodes[iNode]->isParentRoot() )
             continue;
 
          // Adjust default translation
-         mShape->defaultTranslations[iNode] += shapeOffset;
+         mShape->mDefaultTranslations[iNode] += shapeOffset;
 
          // Adjust animated translations
-         for (S32 iSeq = 0; iSeq < mShape->sequences.size(); iSeq++)
+         for (S32 iSeq = 0; iSeq < mShape->mSequences.size(); iSeq++)
          {
-            const TSShape::Sequence& seq = mShape->sequences[iSeq];
+            const TSShape::Sequence& seq = mShape->mSequences[iSeq];
             if ( seq.translationMatters.test(iNode) )
             {
                for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
                {
                   S32 index = seq.baseTranslation + seq.translationMatters.count(iNode)*seq.numKeyframes + iFrame;
-                  mShape->nodeTranslations[index] += shapeOffset;
+                  mShape->mNodeTranslations[index] += shapeOffset;
                }
             }
          }

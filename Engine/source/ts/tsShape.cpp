@@ -62,7 +62,7 @@ bool TSShape::smInitOnRead = true;
 
 TSShape::TSShape()
 {
-   materialList = NULL;
+   mMaterialList = NULL;
    mReadVersion = -1; // -1 means constructed from scratch (e.g., in exporter or no read yet)
    mHasSkinMesh = false;
    mSequencesConstructed = false;
@@ -74,70 +74,70 @@ TSShape::TSShape()
    mDetailLevelLookup.setSize( 1 );
    mDetailLevelLookup[0].set( -1, 0 );
 
-   VECTOR_SET_ASSOCIATION(sequences);
-   VECTOR_SET_ASSOCIATION(nodeRotations);
-   VECTOR_SET_ASSOCIATION(nodeTranslations);
-   VECTOR_SET_ASSOCIATION(nodeUniformScales);
-   VECTOR_SET_ASSOCIATION(nodeAlignedScales);
-   VECTOR_SET_ASSOCIATION(nodeArbitraryScaleRots);
-   VECTOR_SET_ASSOCIATION(nodeArbitraryScaleFactors);
-   VECTOR_SET_ASSOCIATION(groundRotations);
-   VECTOR_SET_ASSOCIATION(groundTranslations);
-   VECTOR_SET_ASSOCIATION(triggers);
-   VECTOR_SET_ASSOCIATION(billboardDetails);
-   VECTOR_SET_ASSOCIATION(detailCollisionAccelerators);
-   VECTOR_SET_ASSOCIATION(names);
+   VECTOR_SET_ASSOCIATION(mSequences);
+   VECTOR_SET_ASSOCIATION(mNodeRotations);
+   VECTOR_SET_ASSOCIATION(mNodeTranslations);
+   VECTOR_SET_ASSOCIATION(mNodeUniformScales);
+   VECTOR_SET_ASSOCIATION(mNodeAlignedScales);
+   VECTOR_SET_ASSOCIATION(mNodeArbitraryScaleRots);
+   VECTOR_SET_ASSOCIATION(mNodeArbitraryScaleFactors);
+   VECTOR_SET_ASSOCIATION(mGroundRotations);
+   VECTOR_SET_ASSOCIATION(mGroundTranslations);
+   VECTOR_SET_ASSOCIATION(mTriggers);
+   VECTOR_SET_ASSOCIATION(mBillboardDetails);
+   VECTOR_SET_ASSOCIATION(mDetailCollisionAccelerators);
+   VECTOR_SET_ASSOCIATION(mNames);
 
-   VECTOR_SET_ASSOCIATION( nodes );
-   VECTOR_SET_ASSOCIATION( objects );
-   VECTOR_SET_ASSOCIATION( objectStates );
-   VECTOR_SET_ASSOCIATION( subShapeFirstNode );
-   VECTOR_SET_ASSOCIATION( subShapeFirstObject );
-   VECTOR_SET_ASSOCIATION( detailFirstSkin );
-   VECTOR_SET_ASSOCIATION( subShapeNumNodes );
-   VECTOR_SET_ASSOCIATION( subShapeNumObjects );
-   VECTOR_SET_ASSOCIATION( details );
-   VECTOR_SET_ASSOCIATION( defaultRotations );
-   VECTOR_SET_ASSOCIATION( defaultTranslations );
+   VECTOR_SET_ASSOCIATION( mNodes );
+   VECTOR_SET_ASSOCIATION( mObjects );
+   VECTOR_SET_ASSOCIATION( mObjectStates );
+   VECTOR_SET_ASSOCIATION( mSubShapeFirstNode );
+   VECTOR_SET_ASSOCIATION( mSubShapeFirstObject );
+   VECTOR_SET_ASSOCIATION( mDetailFirstSkin );
+   VECTOR_SET_ASSOCIATION( mSubShapeNumNodes );
+   VECTOR_SET_ASSOCIATION( mSubShapeNumObjects );
+   VECTOR_SET_ASSOCIATION( mDetails );
+   VECTOR_SET_ASSOCIATION( mDefaultRotations );
+   VECTOR_SET_ASSOCIATION( mDefaultTranslations );
 
-   VECTOR_SET_ASSOCIATION( subShapeFirstTranslucentObject );
-   VECTOR_SET_ASSOCIATION( meshes );
+   VECTOR_SET_ASSOCIATION( mSubShapeFirstTranslucentObject );
+   VECTOR_SET_ASSOCIATION( mMeshes );
 
-   VECTOR_SET_ASSOCIATION( alphaIn );
-   VECTOR_SET_ASSOCIATION( alphaOut );
+   VECTOR_SET_ASSOCIATION( mAlphaIn );
+   VECTOR_SET_ASSOCIATION( mAlphaOut );
 }
 
 TSShape::~TSShape()
 {
-   delete materialList;
+   delete mMaterialList;
 
    S32 i;
 
    // everything left over here is a legit mesh
-   for (i=0; i<meshes.size(); i++)
+   for (i=0; i<mMeshes.size(); i++)
    {
-      if (!meshes[i])
+      if (!mMeshes[i])
          continue;
 
       // Handle meshes that were either assembled with the shape or added later
-      if (((S8*)meshes[i] >= mShapeData) && ((S8*)meshes[i] < (mShapeData + mShapeDataSize)))
-         destructInPlace(meshes[i]);
+      if (((S8*)mMeshes[i] >= mShapeData) && ((S8*)mMeshes[i] < (mShapeData + mShapeDataSize)))
+         destructInPlace(mMeshes[i]);
       else
-         delete meshes[i];
+         delete mMeshes[i];
    }
 
-   for (i=0; i<billboardDetails.size(); i++)
+   for (i=0; i<mBillboardDetails.size(); i++)
    {
-      delete billboardDetails[i];
-      billboardDetails[i] = NULL;
+      delete mBillboardDetails[i];
+      mBillboardDetails[i] = NULL;
    }
-   billboardDetails.clear();
+   mBillboardDetails.clear();
 
    // Delete any generated accelerators
    S32 dca;
-   for (dca = 0; dca < detailCollisionAccelerators.size(); dca++)
+   for (dca = 0; dca < mDetailCollisionAccelerators.size(); dca++)
    {
-      ConvexHullAccelerator* accel = detailCollisionAccelerators[dca];
+      ConvexHullAccelerator* accel = mDetailCollisionAccelerators[dca];
       if (accel != NULL) {
          delete [] accel->vertexList;
          delete [] accel->normalList;
@@ -147,8 +147,8 @@ TSShape::~TSShape()
          delete accel;
       }
    }
-   for (dca = 0; dca < detailCollisionAccelerators.size(); dca++)
-      detailCollisionAccelerators[dca] = NULL;
+   for (dca = 0; dca < mDetailCollisionAccelerators.size(); dca++)
+      mDetailCollisionAccelerators[dca] = NULL;
 
    if( mShapeData )
       delete[] mShapeData;
@@ -156,44 +156,44 @@ TSShape::~TSShape()
 
 const String& TSShape::getName( S32 nameIndex ) const
 {
-   AssertFatal(nameIndex>=0 && nameIndex<names.size(),"TSShape::getName");
-   return names[nameIndex];
+   AssertFatal(nameIndex>=0 && nameIndex<mNames.size(),"TSShape::getName");
+   return mNames[nameIndex];
 }
 
 const String& TSShape::getMeshName( S32 meshIndex ) const
 {
-   S32 nameIndex = objects[meshIndex].nameIndex;
+   S32 nameIndex = mObjects[meshIndex].nameIndex;
    if ( nameIndex < 0 )
       return String::EmptyString;
 
-   return names[nameIndex];
+   return mNames[nameIndex];
 }
 
 const String& TSShape::getNodeName( S32 nodeIndex ) const
 {   
-   S32 nameIdx = nodes[nodeIndex].nameIndex;
+   S32 nameIdx = mNodes[nodeIndex].nameIndex;
    if ( nameIdx < 0 )
       return String::EmptyString;
 
-   return names[nameIdx];
+   return mNames[nameIdx];
 }
 
 const String& TSShape::getSequenceName( S32 seqIndex ) const
 {
-   AssertFatal(seqIndex >= 0 && seqIndex<sequences.size(),"TSShape::getSequenceName index beyond range");
+   AssertFatal(seqIndex >= 0 && seqIndex<mSequences.size(),"TSShape::getSequenceName index beyond range");
 
-   S32 nameIdx = sequences[seqIndex].nameIndex;
+   S32 nameIdx = mSequences[seqIndex].nameIndex;
    if ( nameIdx < 0 )
       return String::EmptyString;
 
-   return names[nameIdx];
+   return mNames[nameIdx];
 }
 
 S32 TSShape::findName(const String &name) const
 {
-   for (S32 i=0; i<names.size(); i++)
+   for (S32 i=0; i<mNames.size(); i++)
    {
-      if (names[i].equal( name, String::NoCase ))
+      if (mNames[i].equal( name, String::NoCase ))
          return i;
    }
   
@@ -202,12 +202,12 @@ S32 TSShape::findName(const String &name) const
 
 const String& TSShape::getTargetName( S32 mapToNameIndex ) const
 {
-	S32 targetCount = materialList->getMaterialNameList().size();
+	S32 targetCount = mMaterialList->getMaterialNameList().size();
 
 	if(mapToNameIndex < 0 || mapToNameIndex >= targetCount)
 		return String::EmptyString;
 
-	return materialList->getMaterialNameList()[mapToNameIndex];
+	return mMaterialList->getMaterialNameList()[mapToNameIndex];
 }
 
 S32 TSShape::getTargetCount() const
@@ -215,46 +215,46 @@ S32 TSShape::getTargetCount() const
 	if(!this)
 		return -1;
 
-	return materialList->getMaterialNameList().size();
+	return mMaterialList->getMaterialNameList().size();
 
 }
 
 S32 TSShape::findNode(S32 nameIndex) const
 {
-   for (S32 i=0; i<nodes.size(); i++)
-      if (nodes[i].nameIndex==nameIndex)
+   for (S32 i=0; i<mNodes.size(); i++)
+      if (mNodes[i].nameIndex==nameIndex)
          return i;
    return -1;
 }
 
 S32 TSShape::findObject(S32 nameIndex) const
 {
-   for (S32 i=0; i<objects.size(); i++)
-      if (objects[i].nameIndex==nameIndex)
+   for (S32 i=0; i<mObjects.size(); i++)
+      if (mObjects[i].nameIndex==nameIndex)
          return i;
    return -1;
 }
 
 S32 TSShape::findDetail(S32 nameIndex) const
 {
-   for (S32 i=0; i<details.size(); i++)
-      if (details[i].nameIndex==nameIndex)
+   for (S32 i=0; i<mDetails.size(); i++)
+      if (mDetails[i].nameIndex==nameIndex)
          return i;
    return -1;
 }
 
 S32 TSShape::findDetailBySize(S32 size) const
 {
-   for (S32 i=0; i<details.size(); i++)
-      if (details[i].size==size)
+   for (S32 i=0; i<mDetails.size(); i++)
+      if (mDetails[i].size==size)
          return i;
    return -1;
 }
 
 S32 TSShape::findSequence(S32 nameIndex) const
 {
-   for (S32 i=0; i<sequences.size(); i++)
-      if (sequences[i].nameIndex==nameIndex)
+   for (S32 i=0; i<mSequences.size(); i++)
+      if (mSequences[i].nameIndex==nameIndex)
          return i;
    return -1;
 }
@@ -269,7 +269,7 @@ bool TSShape::findMeshIndex(const String& meshName, S32& objIndex, S32& meshInde
 
    // Determine the subshape this object belongs to
    S32 subShapeIndex = getSubShapeForObject(objIndex);
-   AssertFatal(subShapeIndex < subShapeFirstObject.size(), "Could not find subshape for object!");
+   AssertFatal(subShapeIndex < mSubShapeFirstObject.size(), "Could not find subshape for object!");
 
    // Get the detail levels for the subshape
    Vector<S32> validDetails;
@@ -278,7 +278,7 @@ bool TSShape::findMeshIndex(const String& meshName, S32& objIndex, S32& meshInde
    // Find the detail with the correct size
    for (meshIndex = 0; meshIndex < validDetails.size(); meshIndex++)
    {
-      const TSShape::Detail& det = details[validDetails[meshIndex]];
+      const TSShape::Detail& det = mDetails[validDetails[meshIndex]];
       if (detailSize == det.size)
          return true;
    }
@@ -291,15 +291,15 @@ TSMesh* TSShape::findMesh(const String& meshName)
    S32 objIndex, meshIndex;
    if (!findMeshIndex(meshName, objIndex, meshIndex))
       return 0;
-   return meshes[objects[objIndex].startMeshIndex + meshIndex];
+   return mMeshes[mObjects[objIndex].startMeshIndex + meshIndex];
 }
 
 S32 TSShape::getSubShapeForNode(S32 nodeIndex)
 {
-   for (S32 i = 0; i < subShapeFirstNode.size(); i++)
+   for (S32 i = 0; i < mSubShapeFirstNode.size(); i++)
    {
-      S32 start = subShapeFirstNode[i];
-      S32 end = start + subShapeNumNodes[i];
+      S32 start = mSubShapeFirstNode[i];
+      S32 end = start + mSubShapeNumNodes[i];
       if ((nodeIndex >= start) && (nodeIndex < end))
          return i;;
    }
@@ -308,10 +308,10 @@ S32 TSShape::getSubShapeForNode(S32 nodeIndex)
 
 S32 TSShape::getSubShapeForObject(S32 objIndex)
 {
-   for (S32 i = 0; i < subShapeFirstObject.size(); i++)
+   for (S32 i = 0; i < mSubShapeFirstObject.size(); i++)
    {
-      S32 start = subShapeFirstObject[i];
-      S32 end = start + subShapeNumObjects[i];
+      S32 start = mSubShapeFirstObject[i];
+      S32 end = start + mSubShapeNumObjects[i];
       if ((objIndex >= start) && (objIndex < end))
          return i;
    }
@@ -321,10 +321,10 @@ S32 TSShape::getSubShapeForObject(S32 objIndex)
 void TSShape::getSubShapeDetails(S32 subShapeIndex, Vector<S32>& validDetails)
 {
    validDetails.clear();
-   for (S32 i = 0; i < details.size(); i++)
+   for (S32 i = 0; i < mDetails.size(); i++)
    {
-      if ((details[i].subShapeNum == subShapeIndex) ||
-          (details[i].subShapeNum < 0))
+      if ((mDetails[i].subShapeNum == subShapeIndex) ||
+          (mDetails[i].subShapeNum < 0))
           validDetails.push_back(i);
    }
 }
@@ -338,36 +338,36 @@ void TSShape::getNodeWorldTransform(S32 nodeIndex, MatrixF* mat) const
    else
    {
       // Calculate the world transform of the given node
-      defaultRotations[nodeIndex].getQuatF().setMatrix(mat);
-      mat->setPosition(defaultTranslations[nodeIndex]);
+      mDefaultRotations[nodeIndex].getQuatF().setMatrix(mat);
+      mat->setPosition(mDefaultTranslations[nodeIndex]);
 
-      S32 parentIndex = nodes[nodeIndex].parentIndex;
+      S32 parentIndex = mNodes[nodeIndex].parentIndex;
       while (parentIndex != -1)
       {
          MatrixF mat2(*mat);
-         defaultRotations[parentIndex].getQuatF().setMatrix(mat);
-         mat->setPosition(defaultTranslations[parentIndex]);
+         mDefaultRotations[parentIndex].getQuatF().setMatrix(mat);
+         mat->setPosition(mDefaultTranslations[parentIndex]);
          mat->mul(mat2);
 
-         parentIndex = nodes[parentIndex].parentIndex;
+         parentIndex = mNodes[parentIndex].parentIndex;
       }
    }
 }
 
 void TSShape::getNodeObjects(S32 nodeIndex, Vector<S32>& nodeObjects)
 {
-   for (S32 i = 0; i < objects.size(); i++)
+   for (S32 i = 0; i < mObjects.size(); i++)
    {
-      if ((nodeIndex == -1) || (objects[i].nodeIndex == nodeIndex))
+      if ((nodeIndex == -1) || (mObjects[i].nodeIndex == nodeIndex))
          nodeObjects.push_back(i);
    }
 }
 
 void TSShape::getNodeChildren(S32 nodeIndex, Vector<S32>& nodeChildren)
 {
-   for (S32 i = 0; i < nodes.size(); i++)
+   for (S32 i = 0; i < mNodes.size(); i++)
    {
-      if (nodes[i].parentIndex == nodeIndex)
+      if (mNodes[i].parentIndex == nodeIndex)
          nodeChildren.push_back(i);
    }
 }
@@ -379,101 +379,101 @@ void TSShape::getObjectDetails(S32 objIndex, Vector<S32>& objDetails)
    getSubShapeDetails(getSubShapeForObject(objIndex), validDetails);
 
    // Get the non-null details for this object
-   const TSShape::Object& obj = objects[objIndex];
+   const TSShape::Object& obj = mObjects[objIndex];
    for (S32 i = 0; i < obj.numMeshes; i++)
    {
-      if (meshes[obj.startMeshIndex + i])
+      if (mMeshes[obj.startMeshIndex + i])
          objDetails.push_back(validDetails[i]);
    }
 }
 
 void TSShape::init()
 {
-   S32 numSubShapes = subShapeFirstNode.size();
-   AssertFatal(numSubShapes==subShapeFirstObject.size(),"TSShape::init");
+   S32 numSubShapes = mSubShapeFirstNode.size();
+   AssertFatal(numSubShapes==mSubShapeFirstObject.size(),"TSShape::init");
 
    S32 i,j;
 
    // set up parent/child relationships on nodes and objects
-   for (i=0; i<nodes.size(); i++)
-      nodes[i].firstObject = nodes[i].firstChild = nodes[i].nextSibling = -1;
-   for (i=0; i<nodes.size(); i++)
+   for (i=0; i<mNodes.size(); i++)
+      mNodes[i].firstObject = mNodes[i].firstChild = mNodes[i].nextSibling = -1;
+   for (i=0; i<mNodes.size(); i++)
    {
-      S32 parentIndex = nodes[i].parentIndex;
+      S32 parentIndex = mNodes[i].parentIndex;
       if (parentIndex>=0)
       {
-         if (nodes[parentIndex].firstChild<0)
-            nodes[parentIndex].firstChild=i;
+         if (mNodes[parentIndex].firstChild<0)
+            mNodes[parentIndex].firstChild=i;
          else
          {
-            S32 child = nodes[parentIndex].firstChild;
-            while (nodes[child].nextSibling>=0)
-               child = nodes[child].nextSibling;
-            nodes[child].nextSibling = i;
+            S32 child = mNodes[parentIndex].firstChild;
+            while (mNodes[child].nextSibling>=0)
+               child = mNodes[child].nextSibling;
+            mNodes[child].nextSibling = i;
          }
       }
    }
-   for (i=0; i<objects.size(); i++)
+   for (i=0; i<mObjects.size(); i++)
    {
-      objects[i].nextSibling = -1;
+      mObjects[i].nextSibling = -1;
 
-      S32 nodeIndex = objects[i].nodeIndex;
+      S32 nodeIndex = mObjects[i].nodeIndex;
       if (nodeIndex>=0)
       {
-         if (nodes[nodeIndex].firstObject<0)
-            nodes[nodeIndex].firstObject = i;
+         if (mNodes[nodeIndex].firstObject<0)
+            mNodes[nodeIndex].firstObject = i;
          else
          {
-            S32 objectIndex = nodes[nodeIndex].firstObject;
-            while (objects[objectIndex].nextSibling>=0)
-               objectIndex = objects[objectIndex].nextSibling;
-            objects[objectIndex].nextSibling = i;
+            S32 objectIndex = mNodes[nodeIndex].firstObject;
+            while (mObjects[objectIndex].nextSibling>=0)
+               objectIndex = mObjects[objectIndex].nextSibling;
+            mObjects[objectIndex].nextSibling = i;
          }
       }
    }
 
    mFlags = 0;
-   for (i=0; i<sequences.size(); i++)
+   for (i=0; i<mSequences.size(); i++)
    {
-      if (!sequences[i].animatesScale())
+      if (!mSequences[i].animatesScale())
          continue;
 
       U32 curVal = mFlags & AnyScale;
-      U32 newVal = sequences[i].flags & AnyScale;
+      U32 newVal = mSequences[i].flags & AnyScale;
       mFlags &= ~(AnyScale);
       mFlags |= getMax(curVal,newVal); // take the larger value (can only convert upwards)
    }
 
    // set up alphaIn and alphaOut vectors...
-   alphaIn.setSize(details.size());
-   alphaOut.setSize(details.size());
+   mAlphaIn.setSize(mDetails.size());
+   mAlphaOut.setSize(mDetails.size());
 
-   for (i=0; i<details.size(); i++)
+   for (i=0; i<mDetails.size(); i++)
    {
-      if (details[i].size<0)
+      if (mDetails[i].size<0)
       {
          // we don't care...
-         alphaIn[i]  = 0.0f;
-         alphaOut[i] = 0.0f;
+         mAlphaIn[i]  = 0.0f;
+         mAlphaOut[i] = 0.0f;
       }
-      else if (i+1==details.size() || details[i+1].size<0)
+      else if (i+1==mDetails.size() || mDetails[i+1].size<0)
       {
-         alphaIn[i]  = 0.0f;
-         alphaOut[i] = smAlphaOutLastDetail;
+         mAlphaIn[i]  = 0.0f;
+         mAlphaOut[i] = smAlphaOutLastDetail;
       }
       else
       {
-         if (details[i+1].subShapeNum<0)
+         if (mDetails[i+1].subShapeNum<0)
          {
             // following detail is a billboard detail...treat special...
-            alphaIn[i]  = smAlphaInBillboard;
-            alphaOut[i] = smAlphaOutBillboard;
+            mAlphaIn[i]  = smAlphaInBillboard;
+            mAlphaOut[i] = smAlphaOutBillboard;
          }
          else
          {
             // next detail is normal detail
-            alphaIn[i] = smAlphaInDefault;
-            alphaOut[i] = smAlphaOutDefault;
+            mAlphaIn[i] = smAlphaInDefault;
+            mAlphaOut[i] = smAlphaOutDefault;
          }
       }
    }
@@ -486,50 +486,50 @@ void TSShape::init()
          // is larger than our cap...zap all the meshes and decals
          // associated with it and use the next detail level
          // instead...
-         S32 ss    = details[i].subShapeNum;
-         S32 od    = details[i].objectDetailNum;
+         S32 ss    = mDetails[i].subShapeNum;
+         S32 od    = mDetails[i].objectDetailNum;
 
-         if (ss==details[i+1].subShapeNum && od==details[i+1].objectDetailNum)
+         if (ss==mDetails[i+1].subShapeNum && od==mDetails[i+1].objectDetailNum)
             // doh! already done this one (init can be called multiple times on same shape due
             // to sequence importing).
             continue;
-         details[i].subShapeNum = details[i+1].subShapeNum;
-         details[i].objectDetailNum = details[i+1].objectDetailNum;
+         mDetails[i].subShapeNum = mDetails[i+1].subShapeNum;
+         mDetails[i].objectDetailNum = mDetails[i+1].objectDetailNum;
       }
    }
 
-   for (i=0; i<details.size(); i++)
+   for (i=0; i<mDetails.size(); i++)
    {
       S32 count = 0;
-      S32 ss = details[i].subShapeNum;
-      S32 od = details[i].objectDetailNum;
+      S32 ss = mDetails[i].subShapeNum;
+      S32 od = mDetails[i].objectDetailNum;
       if (ss<0)
       {
          // billboard detail...
-         details[i].polyCount = 2;
+         mDetails[i].polyCount = 2;
          continue;
       }
-      S32 start = subShapeFirstObject[ss];
-      S32 end   = start + subShapeNumObjects[ss];
+      S32 start = mSubShapeFirstObject[ss];
+      S32 end   = start + mSubShapeNumObjects[ss];
       for (j=start; j<end; j++)
       {
-         Object & obj = objects[j];
+         Object & obj = mObjects[j];
          if (od<obj.numMeshes)
          {
-            TSMesh * mesh = meshes[obj.startMeshIndex+od];
+            TSMesh * mesh = mMeshes[obj.startMeshIndex+od];
             count += mesh ? mesh->getNumPolys() : 0;
          }
       }
-      details[i].polyCount = count;
+      mDetails[i].polyCount = count;
    }
 
    // Init the collision accelerator array.  Note that we don't compute the
    //  accelerators until the app requests them
    {
       S32 dca;
-      for (dca = 0; dca < detailCollisionAccelerators.size(); dca++)
+      for (dca = 0; dca < mDetailCollisionAccelerators.size(); dca++)
       {
-         ConvexHullAccelerator* accel = detailCollisionAccelerators[dca];
+         ConvexHullAccelerator* accel = mDetailCollisionAccelerators[dca];
          if (accel != NULL) {
             delete [] accel->vertexList;
             delete [] accel->normalList;
@@ -540,9 +540,9 @@ void TSShape::init()
          }
       }
 
-      detailCollisionAccelerators.setSize(details.size());
-      for (dca = 0; dca < detailCollisionAccelerators.size(); dca++)
-         detailCollisionAccelerators[dca] = NULL;
+      mDetailCollisionAccelerators.setSize(mDetails.size());
+      for (dca = 0; dca < mDetailCollisionAccelerators.size(); dca++)
+         mDetailCollisionAccelerators[dca] = NULL;
    }
 
    initVertexFeatures();
@@ -554,8 +554,8 @@ void TSShape::initVertexFeatures()
    bool hasColors = false;
    bool hasTexcoord2 = false;
 
-   Vector<TSMesh*>::iterator iter = meshes.begin();
-   for ( ; iter != meshes.end(); iter++ )
+   Vector<TSMesh*>::iterator iter = mMeshes.begin();
+   for ( ; iter != mMeshes.end(); iter++ )
    {
       TSMesh *mesh = *iter;
       if (  mesh &&
@@ -594,8 +594,8 @@ void TSShape::initVertexFeatures()
 
    // Go fix up meshes to include defaults for optional features
    // and initialize them if they're not a skin mesh.
-   iter = meshes.begin();
-   for ( ; iter != meshes.end(); iter++ )
+   iter = mMeshes.begin();
+   for ( ; iter != mMeshes.end(); iter++ )
    {
       TSMesh *mesh = *iter;
       if (  !mesh ||
@@ -621,20 +621,20 @@ void TSShape::setupBillboardDetails( const String &cachePath )
    // set up billboard details -- only do this once, meaning that
    // if we add a sequence to the shape we don't redo the billboard
    // details...
-   if ( !billboardDetails.empty() )
+   if ( !mBillboardDetails.empty() )
       return;
 
-   for ( U32 i=0; i < details.size(); i++ )
+   for ( U32 i=0; i < mDetails.size(); i++ )
    {
-      const Detail &det = details[i];
+      const Detail &det = mDetails[i];
 
       if ( det.subShapeNum >= 0 )
          continue; // not a billboard detail
 
-      while (billboardDetails.size() <= i )
-         billboardDetails.push_back(NULL);
+      while (mBillboardDetails.size() <= i )
+         mBillboardDetails.push_back(NULL);
 
-      billboardDetails[i] = new TSLastDetail(   this,
+      mBillboardDetails[i] = new TSLastDetail(   this,
                                                 cachePath,
                                                 det.bbEquatorSteps,
                                                 det.bbPolarSteps,
@@ -643,15 +643,15 @@ void TSShape::setupBillboardDetails( const String &cachePath )
                                                 det.bbDetailLevel,
                                                 det.bbDimension );
 
-      billboardDetails[i]->update();
+      mBillboardDetails[i]->update();
    }
 }
 
 void TSShape::initMaterialList()
 {
-   S32 numSubShapes = subShapeFirstObject.size();
+   S32 numSubShapes = mSubShapeFirstObject.size();
    #if defined(TORQUE_MAX_LIB)
-   subShapeFirstTranslucentObject.setSize(numSubShapes);
+   mSubShapeFirstTranslucentObject.setSize(numSubShapes);
    #endif
 
    mHasSkinMesh = false;
@@ -661,16 +661,16 @@ void TSShape::initMaterialList()
    // also, while we're at it, set mHasTranslucency
    for (S32 ss = 0; ss<numSubShapes; ss++)
    {
-      S32 start = subShapeFirstObject[ss];
-      S32 end = subShapeNumObjects[ss];
-      subShapeFirstTranslucentObject[ss] = end;
+      S32 start = mSubShapeFirstObject[ss];
+      S32 end = mSubShapeNumObjects[ss];
+      mSubShapeFirstTranslucentObject[ss] = end;
       for (i=start; i<end; i++)
       {
          // check to see if this object has translucency
-         Object & obj = objects[i];
+         Object & obj = mObjects[i];
          for (j=0; j<obj.numMeshes; j++)
          {
-            TSMesh * mesh = meshes[obj.startMeshIndex+j];
+            TSMesh * mesh = mMeshes[obj.startMeshIndex+j];
             if (!mesh)
                continue;
 
@@ -680,13 +680,13 @@ void TSShape::initMaterialList()
             {
                if (mesh->mPrimitives[k].matIndex & TSDrawPrimitive::NoMaterial)
                   continue;
-               S32 flags = materialList->getFlags(mesh->mPrimitives[k].matIndex & TSDrawPrimitive::MaterialMask);
+               S32 flags = mMaterialList->getFlags(mesh->mPrimitives[k].matIndex & TSDrawPrimitive::MaterialMask);
                if (flags & TSMaterialList::AuxiliaryMap)
                   continue;
                if (flags & TSMaterialList::Translucent)
                {
                   mFlags |= HasTranslucency;
-                  subShapeFirstTranslucentObject[ss] = i;
+                  mSubShapeFirstTranslucentObject[ss] = i;
                   break;
                }
             }
@@ -704,26 +704,26 @@ void TSShape::initMaterialList()
 
 bool TSShape::preloadMaterialList(const Torque::Path &path)
 {
-   if (materialList)
-      materialList->setTextureLookupPath(path.getPath());
+   if (mMaterialList)
+      mMaterialList->setTextureLookupPath(path.getPath());
    return true;
 }
 
 bool TSShape::buildConvexHull(S32 dl) const
 {
-   AssertFatal(dl>=0 && dl<details.size(),"TSShape::buildConvexHull: detail out of range");
+   AssertFatal(dl>=0 && dl<mDetails.size(),"TSShape::buildConvexHull: detail out of range");
 
    bool ok = true;
 
-   const Detail & detail = details[dl];
+   const Detail & detail = mDetails[dl];
    S32 ss = detail.subShapeNum;
    S32 od = detail.objectDetailNum;
 
-   S32 start = subShapeFirstObject[ss];
-   S32 end   = subShapeNumObjects[ss];
+   S32 start = mSubShapeFirstObject[ss];
+   S32 end   = mSubShapeNumObjects[ss];
    for (S32 i=start; i<end; i++)
    {
-      TSMesh * mesh = meshes[objects[i].startMeshIndex+od];
+      TSMesh * mesh = mMeshes[mObjects[i].startMeshIndex+od];
       if (!mesh)
          continue;
       ok &= mesh->buildConvexHull();
@@ -739,10 +739,10 @@ void TSShape::computeBounds(S32 dl, Box3F & bounds) const
    if (dl==-1)
       return;
 
-   AssertFatal(dl>=0 && dl<details.size(),"TSShapeInstance::computeBounds");
+   AssertFatal(dl>=0 && dl<mDetails.size(),"TSShapeInstance::computeBounds");
 
    // get subshape and object detail
-   const TSDetail * detail = &details[dl];
+   const TSDetail * detail = &mDetails[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
@@ -753,16 +753,16 @@ void TSShape::computeBounds(S32 dl, Box3F & bounds) const
 
    // set up temporary storage for non-local transforms...
    S32 i;
-   S32 start = subShapeFirstNode[ss];
-   S32 end   = subShapeNumNodes[ss] + start;
+   S32 start = mSubShapeFirstNode[ss];
+   S32 end   = mSubShapeNumNodes[ss] + start;
    gTempNodeTransforms.setSize(end-start);
    for (i=start; i<end; i++)
    {
       MatrixF mat;
       QuatF q;
-      TSTransform::setMatrix(defaultRotations[i].getQuatF(&q),defaultTranslations[i],&mat);
-      if (nodes[i].parentIndex>=0)
-         gTempNodeTransforms[i-start].mul(gTempNodeTransforms[nodes[i].parentIndex-start],mat);
+      TSTransform::setMatrix(mDefaultRotations[i].getQuatF(&q),mDefaultTranslations[i],&mat);
+      if (mNodes[i].parentIndex>=0)
+         gTempNodeTransforms[i-start].mul(gTempNodeTransforms[mNodes[i].parentIndex-start],mat);
       else
          gTempNodeTransforms[i-start] = mat;
    }
@@ -771,12 +771,12 @@ void TSShape::computeBounds(S32 dl, Box3F & bounds) const
    bounds.minExtents.set( 10E30f, 10E30f, 10E30f);
    bounds.maxExtents.set(-10E30f,-10E30f,-10E30f);
    Box3F box;
-   start = subShapeFirstObject[ss];
-   end   = subShapeNumObjects[ss] + start;
+   start = mSubShapeFirstObject[ss];
+   end   = mSubShapeNumObjects[ss] + start;
    for (i=start; i<end; i++)
    {
-      const Object * object = &objects[i];
-      TSMesh * mesh = od<object->numMeshes ? meshes[object->startMeshIndex+od] : NULL;
+      const Object * object = &mObjects[i];
+      TSMesh * mesh = od<object->numMeshes ? mMeshes[object->startMeshIndex+od] : NULL;
       if (mesh)
       {
          static MatrixF idMat(true);
@@ -805,23 +805,23 @@ bool TSShape::checkSkip(S32 meshNum, S32 & curObject, S32 skipDL)
       return false;
 
    // skip detail level exists on this subShape
-   S32 skipSS = details[skipDL].subShapeNum;
+   S32 skipSS = mDetails[skipDL].subShapeNum;
 
-   if (curObject<objects.size())
+   if (curObject<mObjects.size())
    {
-      S32 start = objects[curObject].startMeshIndex;
+      S32 start = mObjects[curObject].startMeshIndex;
       if (meshNum>=start)
       {
          // we are either from this object, the next object, or a decal
-         if (meshNum < start + objects[curObject].numMeshes)
+         if (meshNum < start + mObjects[curObject].numMeshes)
          {
             // this object...
-            if (subShapeFirstObject[skipSS]>curObject)
+            if (mSubShapeFirstObject[skipSS]>curObject)
                // haven't reached this subshape yet
                return true;
-            if (skipSS+1==subShapeFirstObject.size() || curObject<subShapeFirstObject[skipSS+1])
+            if (skipSS+1==mSubShapeFirstObject.size() || curObject<mSubShapeFirstObject[skipSS+1])
                // curObject is on subshape of skip detail...make sure it's after skipDL
-               return (meshNum-start<details[skipDL].objectDetailNum);
+               return (meshNum-start<mDetails[skipDL].objectDetailNum);
             // if we get here, then curObject occurs on subShape after skip detail (so keep it)
             return false;
          }
@@ -884,16 +884,16 @@ void TSShape::assembleShape()
    tsalloc.checkGuard();
 
    // get bounds...
-   tsalloc.get32((S32*)&radius,1);
-   tsalloc.get32((S32*)&tubeRadius,1);
-   tsalloc.get32((S32*)&center,3);
-   tsalloc.get32((S32*)&bounds,6);
+   tsalloc.get32((S32*)&mRadius,1);
+   tsalloc.get32((S32*)&mTubeRadius,1);
+   tsalloc.get32((S32*)&mCenter,3);
+   tsalloc.get32((S32*)&mBounds,6);
 
    tsalloc.checkGuard();
 
    // copy various vectors...
    S32 * ptr32 = tsalloc.copyToShape32(numNodes*5);
-   nodes.set(ptr32,numNodes);
+   mNodes.set(ptr32,numNodes);
 
    tsalloc.checkGuard();
 
@@ -902,7 +902,7 @@ void TSShape::assembleShape()
       ptr32 = tsalloc.allocShape32(numSkins*6); // pre v23 shapes store skins and meshes separately...no longer
    else
       tsalloc.allocShape32(numSkins*6);
-   objects.set(ptr32,numObjects);
+   mObjects.set(ptr32,numObjects);
 
    tsalloc.checkGuard();
 
@@ -917,31 +917,31 @@ void TSShape::assembleShape()
    tsalloc.checkGuard();
 
    ptr32 = tsalloc.copyToShape32(numSubShapes,true);
-   subShapeFirstNode.set(ptr32,numSubShapes);
+   mSubShapeFirstNode.set(ptr32,numSubShapes);
    ptr32 = tsalloc.copyToShape32(numSubShapes,true);
-   subShapeFirstObject.set(ptr32,numSubShapes);
+   mSubShapeFirstObject.set(ptr32,numSubShapes);
    // DEPRECATED subShapeFirstDecal
    ptr32 = tsalloc.getPointer32(numSubShapes);
 
    tsalloc.checkGuard();
 
    ptr32 = tsalloc.copyToShape32(numSubShapes);
-   subShapeNumNodes.set(ptr32,numSubShapes);
+   mSubShapeNumNodes.set(ptr32,numSubShapes);
    ptr32 = tsalloc.copyToShape32(numSubShapes);
-   subShapeNumObjects.set(ptr32,numSubShapes);
+   mSubShapeNumObjects.set(ptr32,numSubShapes);
    // DEPRECATED subShapeNumDecals
    ptr32 = tsalloc.getPointer32(numSubShapes);
 
    tsalloc.checkGuard();
 
    ptr32 = tsalloc.allocShape32(numSubShapes);
-   subShapeFirstTranslucentObject.set(ptr32,numSubShapes);
+   mSubShapeFirstTranslucentObject.set(ptr32,numSubShapes);
 
    // get default translation and rotation
    S16 * ptr16 = tsalloc.allocShape16(0);
    for (i=0;i<numNodes;i++)
       tsalloc.copyToShape16(4);
-   defaultRotations.set(ptr16,numNodes);
+   mDefaultRotations.set(ptr16,numNodes);
    tsalloc.align32();
    ptr32 = tsalloc.allocShape32(0);
    for (i=0;i<numNodes;i++)
@@ -949,15 +949,15 @@ void TSShape::assembleShape()
       tsalloc.copyToShape32(3);
       tsalloc.copyToShape32(sizeof(Point3F)-12); // handle alignment issues w/ point3f
    }
-   defaultTranslations.set(ptr32,numNodes);
+   mDefaultTranslations.set(ptr32,numNodes);
 
    // get any node sequence data stored in shape
-   nodeTranslations.setSize(numNodeTrans);
+   mNodeTranslations.setSize(numNodeTrans);
    for (i=0;i<numNodeTrans;i++)
-      tsalloc.get32((S32*)&nodeTranslations[i],3);
-   nodeRotations.setSize(numNodeRots);
+      tsalloc.get32((S32*)&mNodeTranslations[i],3);
+   mNodeRotations.setSize(numNodeRots);
    for (i=0;i<numNodeRots;i++)
-      tsalloc.get16((S16*)&nodeRotations[i],4);
+      tsalloc.get16((S16*)&mNodeRotations[i],4);
    tsalloc.align32();
 
    tsalloc.checkGuard();
@@ -965,18 +965,18 @@ void TSShape::assembleShape()
    if (smReadVersion>21)
    {
       // more node sequence data...scale
-      nodeUniformScales.setSize(numNodeUniformScales);
+      mNodeUniformScales.setSize(numNodeUniformScales);
       for (i=0;i<numNodeUniformScales;i++)
-         tsalloc.get32((S32*)&nodeUniformScales[i],1);
-      nodeAlignedScales.setSize(numNodeAlignedScales);
+         tsalloc.get32((S32*)&mNodeUniformScales[i],1);
+      mNodeAlignedScales.setSize(numNodeAlignedScales);
       for (i=0;i<numNodeAlignedScales;i++)
-         tsalloc.get32((S32*)&nodeAlignedScales[i],3);
-      nodeArbitraryScaleFactors.setSize(numNodeArbitraryScales);
+         tsalloc.get32((S32*)&mNodeAlignedScales[i],3);
+      mNodeArbitraryScaleFactors.setSize(numNodeArbitraryScales);
       for (i=0;i<numNodeArbitraryScales;i++)
-         tsalloc.get32((S32*)&nodeArbitraryScaleFactors[i],3);
-      nodeArbitraryScaleRots.setSize(numNodeArbitraryScales);
+         tsalloc.get32((S32*)&mNodeArbitraryScaleFactors[i],3);
+      mNodeArbitraryScaleRots.setSize(numNodeArbitraryScales);
       for (i=0;i<numNodeArbitraryScales;i++)
-         tsalloc.get16((S16*)&nodeArbitraryScaleRots[i],4);
+         tsalloc.get16((S16*)&mNodeArbitraryScaleRots[i],4);
       tsalloc.align32();
 
       tsalloc.checkGuard();
@@ -985,17 +985,17 @@ void TSShape::assembleShape()
    // old shapes need ground transforms moved to ground arrays...but only do it once
    if (smReadVersion<22 && tsalloc.allocShape32(0))
    {
-      for (i=0; i<sequences.size(); i++)
+      for (i=0; i<mSequences.size(); i++)
       {
          // move ground transform data to ground vectors
-         Sequence & seq = sequences[i];
-         S32 oldSz = groundTranslations.size();
-         groundTranslations.setSize(oldSz+seq.numGroundFrames);
-         groundRotations.setSize(oldSz+seq.numGroundFrames);
+         Sequence & seq = mSequences[i];
+         S32 oldSz = mGroundTranslations.size();
+         mGroundTranslations.setSize(oldSz+seq.numGroundFrames);
+         mGroundRotations.setSize(oldSz+seq.numGroundFrames);
          for (S32 j=0;j<seq.numGroundFrames;j++)
          {
-            groundTranslations[j+oldSz] = nodeTranslations[seq.firstGroundFrame+j-numNodes];
-            groundRotations[j+oldSz] = nodeRotations[seq.firstGroundFrame+j-numNodes];
+            mGroundTranslations[j+oldSz] = mNodeTranslations[seq.firstGroundFrame+j-numNodes];
+            mGroundRotations[j+oldSz] = mNodeRotations[seq.firstGroundFrame+j-numNodes];
          }
          seq.firstGroundFrame = oldSz;
          seq.baseTranslation -= numNodes;
@@ -1008,12 +1008,12 @@ void TSShape::assembleShape()
    // earlier shapes is handled just above, so...
    if (smReadVersion>23)
    {
-      groundTranslations.setSize(numGroundFrames);
+      mGroundTranslations.setSize(numGroundFrames);
       for (i=0;i<numGroundFrames;i++)
-         tsalloc.get32((S32*)&groundTranslations[i],3);
-      groundRotations.setSize(numGroundFrames);
+         tsalloc.get32((S32*)&mGroundTranslations[i],3);
+      mGroundRotations.setSize(numGroundFrames);
       for (i=0;i<numGroundFrames;i++)
-         tsalloc.get16((S16*)&groundRotations[i],4);
+         tsalloc.get16((S16*)&mGroundRotations[i],4);
       tsalloc.align32();
 
       tsalloc.checkGuard();
@@ -1021,7 +1021,7 @@ void TSShape::assembleShape()
 
    // object states
    ptr32 = tsalloc.copyToShape32(numObjectStates*3);
-   objectStates.set(ptr32,numObjectStates);
+   mObjectStates.set(ptr32,numObjectStates);
    tsalloc.allocShape32(numSkins*3); // provide buffer after objectStates for older shapes
 
    tsalloc.checkGuard();
@@ -1033,8 +1033,8 @@ void TSShape::assembleShape()
 
    // frame triggers
    ptr32 = tsalloc.getPointer32(numTriggers*2);
-   triggers.setSize(numTriggers);
-   dMemcpy(triggers.address(),ptr32,sizeof(S32)*numTriggers*2);
+   mTriggers.setSize(numTriggers);
+   dMemcpy(mTriggers.address(),ptr32,sizeof(S32)*numTriggers*2);
 
    tsalloc.checkGuard();
 
@@ -1043,7 +1043,7 @@ void TSShape::assembleShape()
    {
       U32 alignedSize32 = sizeof( Detail ) / 4;
       ptr32 = tsalloc.copyToShape32( numDetails * alignedSize32, true );
-      details.set( ptr32, numDetails );
+      mDetails.set( ptr32, numDetails );
    }
    else
    {
@@ -1066,10 +1066,10 @@ void TSShape::assembleShape()
 
       ptr32 = tsalloc.copyToShape32( numDetails * 7, true );
 
-      details.setSize( numDetails );
-      for ( U32 i = 0; i < details.size(); i++, ptr32 += 7 )
+      mDetails.setSize( numDetails );
+      for ( U32 i = 0; i < mDetails.size(); i++, ptr32 += 7 )
       {
-         Detail *det = &(details[i]);
+         Detail *det = &(mDetails[i]);
 
          // Clear the struct... we don't want to leave 
          // garbage in the parts that are unfilled.
@@ -1097,12 +1097,12 @@ void TSShape::assembleShape()
    // Some DTS exporters (MAX - I'm looking at you!) write garbage into the
    // averageError and maxError values which stops LOD from working correctly.
    // Try to detect and fix it
-   for ( U32 i = 0; i < details.size(); i++ )
+   for ( U32 i = 0; i < mDetails.size(); i++ )
    {
-      if ( ( details[i].averageError == 0 ) || ( details[i].averageError > 10000 ) ||
-           ( details[i].maxError == 0 ) || ( details[i].maxError > 10000 ) )
+      if ( ( mDetails[i].averageError == 0 ) || ( mDetails[i].averageError > 10000 ) ||
+           ( mDetails[i].maxError == 0 ) || ( mDetails[i].maxError > 10000 ) )
       {
-         details[i].averageError = details[i].maxError = -1.0f;
+         mDetails[i].averageError = mDetails[i].maxError = -1.0f;
       }
    }
 
@@ -1198,7 +1198,7 @@ void TSShape::assembleShape()
          }
       }
    }
-   meshes.set(ptr32,numMeshes);
+   mMeshes.set(ptr32,numMeshes);
 
    tsalloc.checkGuard();
 
@@ -1206,13 +1206,13 @@ void TSShape::assembleShape()
    char * nameBufferStart = (char*)tsalloc.getPointer8(0);
    char * name = nameBufferStart;
    S32 nameBufferSize = 0;
-   names.setSize(numNames);
+   mNames.setSize(numNames);
    for (i=0; i<numNames; i++)
    {
       for (j=0; name[j]; j++)
          ;
 
-      names[i] = name;
+      mNames[i] = name;
       nameBufferSize += j + 1;
       name += j + 1;
    }
@@ -1259,12 +1259,12 @@ void TSShape::assembleShape()
       {
          bool skip = i<detailFirstSkin[skipDL];
          TSSkinMesh * skin = (TSSkinMesh*)TSMesh::assembleMesh(TSMesh::SkinMeshType,skip);
-         if (meshes.address())
+         if (mMeshes.address())
          {
             // add pointer to skin in shapes list of meshes
             // we reserved room for this above...
-            meshes.set(meshes.address(),meshes.size()+1);
-            meshes[meshes.size()-1] = skip ? NULL : skin;
+            mMeshes.set(mMeshes.address(),mMeshes.size()+1);
+            mMeshes[mMeshes.size()-1] = skip ? NULL : skin;
          }
 
          // fill in location of verts, tverts, and normals for shared detail levels
@@ -1291,9 +1291,9 @@ void TSShape::assembleShape()
 
    // allocate storage space for some arrays (filled in during Shape::init)...
    ptr32 = tsalloc.allocShape32(numDetails);
-   alphaIn.set(ptr32,numDetails);
+   mAlphaIn.set(ptr32,numDetails);
    ptr32 = tsalloc.allocShape32(numDetails);
-   alphaOut.set(ptr32,numDetails);
+   mAlphaOut.set(ptr32,numDetails);
 }
 
 void TSShape::disassembleShape()
@@ -1301,79 +1301,79 @@ void TSShape::disassembleShape()
    S32 i;
 
    // set counts...
-   S32 numNodes = tsalloc.set32(nodes.size());
-   S32 numObjects = tsalloc.set32(objects.size());
+   S32 numNodes = tsalloc.set32(mNodes.size());
+   S32 numObjects = tsalloc.set32(mObjects.size());
    tsalloc.set32(0); // DEPRECATED decals
-   S32 numSubShapes = tsalloc.set32(subShapeFirstNode.size());
+   S32 numSubShapes = tsalloc.set32(mSubShapeFirstNode.size());
    tsalloc.set32(0); // DEPRECATED ifl materials
-   S32 numNodeRotations = tsalloc.set32(nodeRotations.size());
-   S32 numNodeTranslations = tsalloc.set32(nodeTranslations.size());
-   S32 numNodeUniformScales = tsalloc.set32(nodeUniformScales.size());
-   S32 numNodeAlignedScales = tsalloc.set32(nodeAlignedScales.size());
-   S32 numNodeArbitraryScales = tsalloc.set32(nodeArbitraryScaleFactors.size());
-   S32 numGroundFrames = tsalloc.set32(groundTranslations.size());
-   S32 numObjectStates = tsalloc.set32(objectStates.size());
+   S32 numNodeRotations = tsalloc.set32(mNodeRotations.size());
+   S32 numNodeTranslations = tsalloc.set32(mNodeTranslations.size());
+   S32 numNodeUniformScales = tsalloc.set32(mNodeUniformScales.size());
+   S32 numNodeAlignedScales = tsalloc.set32(mNodeAlignedScales.size());
+   S32 numNodeArbitraryScales = tsalloc.set32(mNodeArbitraryScaleFactors.size());
+   S32 numGroundFrames = tsalloc.set32(mGroundTranslations.size());
+   S32 numObjectStates = tsalloc.set32(mObjectStates.size());
    tsalloc.set32(0); // DEPRECATED decals
-   S32 numTriggers = tsalloc.set32(triggers.size());
-   S32 numDetails = tsalloc.set32(details.size());
-   S32 numMeshes = tsalloc.set32(meshes.size());
-   S32 numNames = tsalloc.set32(names.size());
+   S32 numTriggers = tsalloc.set32(mTriggers.size());
+   S32 numDetails = tsalloc.set32(mDetails.size());
+   S32 numMeshes = tsalloc.set32(mMeshes.size());
+   S32 numNames = tsalloc.set32(mNames.size());
    tsalloc.set32((S32)mSmallestVisibleSize);
    tsalloc.set32(mSmallestVisibleDL);
 
    tsalloc.setGuard();
 
    // get bounds...
-   tsalloc.copyToBuffer32((S32*)&radius,1);
-   tsalloc.copyToBuffer32((S32*)&tubeRadius,1);
-   tsalloc.copyToBuffer32((S32*)&center,3);
-   tsalloc.copyToBuffer32((S32*)&bounds,6);
+   tsalloc.copyToBuffer32((S32*)&mRadius,1);
+   tsalloc.copyToBuffer32((S32*)&mTubeRadius,1);
+   tsalloc.copyToBuffer32((S32*)&mCenter,3);
+   tsalloc.copyToBuffer32((S32*)&mBounds,6);
 
    tsalloc.setGuard();
 
    // copy various vectors...
-   tsalloc.copyToBuffer32((S32*)nodes.address(),numNodes*5);
+   tsalloc.copyToBuffer32((S32*)mNodes.address(),numNodes*5);
    tsalloc.setGuard();
-   tsalloc.copyToBuffer32((S32*)objects.address(),numObjects*6);
+   tsalloc.copyToBuffer32((S32*)mObjects.address(),numObjects*6);
    tsalloc.setGuard();
    // DEPRECATED: no copy decals
    tsalloc.setGuard();
    tsalloc.copyToBuffer32(0,0); // DEPRECATED: ifl materials!
    tsalloc.setGuard();
-   tsalloc.copyToBuffer32((S32*)subShapeFirstNode.address(),numSubShapes);
-   tsalloc.copyToBuffer32((S32*)subShapeFirstObject.address(),numSubShapes);
+   tsalloc.copyToBuffer32((S32*)mSubShapeFirstNode.address(),numSubShapes);
+   tsalloc.copyToBuffer32((S32*)mSubShapeFirstObject.address(),numSubShapes);
    tsalloc.copyToBuffer32(0, numSubShapes); // DEPRECATED: no copy subShapeFirstDecal
    tsalloc.setGuard();
-   tsalloc.copyToBuffer32((S32*)subShapeNumNodes.address(),numSubShapes);
-   tsalloc.copyToBuffer32((S32*)subShapeNumObjects.address(),numSubShapes);
+   tsalloc.copyToBuffer32((S32*)mSubShapeNumNodes.address(),numSubShapes);
+   tsalloc.copyToBuffer32((S32*)mSubShapeNumObjects.address(),numSubShapes);
    tsalloc.copyToBuffer32(0, numSubShapes); // DEPRECATED: no copy subShapeNumDecals
    tsalloc.setGuard();
 
    // default transforms...
-   tsalloc.copyToBuffer16((S16*)defaultRotations.address(),numNodes*4);
-   tsalloc.copyToBuffer32((S32*)defaultTranslations.address(),numNodes*3);
+   tsalloc.copyToBuffer16((S16*)mDefaultRotations.address(),numNodes*4);
+   tsalloc.copyToBuffer32((S32*)mDefaultTranslations.address(),numNodes*3);
 
    // animated transforms...
-   tsalloc.copyToBuffer16((S16*)nodeRotations.address(),numNodeRotations*4);
-   tsalloc.copyToBuffer32((S32*)nodeTranslations.address(),numNodeTranslations*3);
+   tsalloc.copyToBuffer16((S16*)mNodeRotations.address(),numNodeRotations*4);
+   tsalloc.copyToBuffer32((S32*)mNodeTranslations.address(),numNodeTranslations*3);
 
    tsalloc.setGuard();
 
    // ...with scale
-   tsalloc.copyToBuffer32((S32*)nodeUniformScales.address(),numNodeUniformScales);
-   tsalloc.copyToBuffer32((S32*)nodeAlignedScales.address(),numNodeAlignedScales*3);
-   tsalloc.copyToBuffer32((S32*)nodeArbitraryScaleFactors.address(),numNodeArbitraryScales*3);
-   tsalloc.copyToBuffer16((S16*)nodeArbitraryScaleRots.address(),numNodeArbitraryScales*4);
+   tsalloc.copyToBuffer32((S32*)mNodeUniformScales.address(),numNodeUniformScales);
+   tsalloc.copyToBuffer32((S32*)mNodeAlignedScales.address(),numNodeAlignedScales*3);
+   tsalloc.copyToBuffer32((S32*)mNodeArbitraryScaleFactors.address(),numNodeArbitraryScales*3);
+   tsalloc.copyToBuffer16((S16*)mNodeArbitraryScaleRots.address(),numNodeArbitraryScales*4);
 
    tsalloc.setGuard();
 
-   tsalloc.copyToBuffer32((S32*)groundTranslations.address(),3*numGroundFrames);
-   tsalloc.copyToBuffer16((S16*)groundRotations.address(),4*numGroundFrames);
+   tsalloc.copyToBuffer32((S32*)mGroundTranslations.address(),3*numGroundFrames);
+   tsalloc.copyToBuffer16((S16*)mGroundRotations.address(),4*numGroundFrames);
 
    tsalloc.setGuard();
 
    // object states..
-   tsalloc.copyToBuffer32((S32*)objectStates.address(),numObjectStates*3);
+   tsalloc.copyToBuffer32((S32*)mObjectStates.address(),numObjectStates*3);
    tsalloc.setGuard();
 
    // decal states...
@@ -1381,21 +1381,21 @@ void TSShape::disassembleShape()
    tsalloc.setGuard();
 
    // frame triggers
-   tsalloc.copyToBuffer32((S32*)triggers.address(),numTriggers*2);
+   tsalloc.copyToBuffer32((S32*)mTriggers.address(),numTriggers*2);
    tsalloc.setGuard();
 
    // details
    if (TSShape::smVersion > 25)
    {
       U32 alignedSize32 = sizeof( Detail ) / 4;
-      tsalloc.copyToBuffer32((S32*)details.address(),numDetails * alignedSize32 );
+      tsalloc.copyToBuffer32((S32*)mDetails.address(),numDetails * alignedSize32 );
    }
    else
    {
       // Legacy details => no explicit autobillboard parameters
       U32 legacyDetailSize32 = 7;   // only store the first 7 4-byte values of each detail
-      for ( S32 i = 0; i < details.size(); i++ )
-         tsalloc.copyToBuffer32( (S32*)&details[i], legacyDetailSize32 );
+      for ( S32 i = 0; i < mDetails.size(); i++ )
+         tsalloc.copyToBuffer32( (S32*)&mDetails[i], legacyDetailSize32 );
    }
    tsalloc.setGuard();
 
@@ -1403,18 +1403,18 @@ void TSShape::disassembleShape()
    bool * isMesh = new bool[numMeshes]; // funny business because decals are pretend meshes (legacy issue)
    for (i=0;i<numMeshes;i++)
       isMesh[i]=false;
-   for (i=0; i<objects.size(); i++)
+   for (i=0; i<mObjects.size(); i++)
    {
-      for (S32 j=0; j<objects[i].numMeshes; j++)
+      for (S32 j=0; j<mObjects[i].numMeshes; j++)
          // even if an empty mesh, it's a mesh...
-         isMesh[objects[i].startMeshIndex+j]=true;
+         isMesh[mObjects[i].startMeshIndex+j]=true;
    }
    for (i=0; i<numMeshes; i++)
    {
       TSMesh * mesh = NULL;
       // decal mesh deprecated
       if (isMesh[i])
-         mesh = meshes[i];
+         mesh = mMeshes[i];
       tsalloc.set32( (mesh && mesh->getMeshType() != TSMesh::DecalMeshType) ? mesh->getMeshType() : TSMesh::NullMeshType);
       if (mesh)
          mesh->disassemble();
@@ -1424,7 +1424,7 @@ void TSShape::disassembleShape()
 
    // names
    for (i=0; i<numNames; i++)
-      tsalloc.copyToBuffer8((S8 *)(names[i].c_str()),names[i].length()+1);
+      tsalloc.copyToBuffer8((S8 *)(mNames[i].c_str()),mNames[i].length()+1);
 
    tsalloc.setGuard();
 }
@@ -1436,27 +1436,27 @@ void TSShape::disassembleShape()
 bool TSShape::canWriteOldFormat() const
 {
    // Cannot use old format if using autobillboard details
-   for (S32 i = 0; i < details.size(); i++)
+   for (S32 i = 0; i < mDetails.size(); i++)
    {
-      if (details[i].subShapeNum < 0)
+      if (mDetails[i].subShapeNum < 0)
          return false;
    }
 
-   for (S32 i = 0; i < meshes.size(); i++)
+   for (S32 i = 0; i < mMeshes.size(); i++)
    {
-      if (!meshes[i])
+      if (!mMeshes[i])
          continue;
 
       // Cannot use old format if using the new functionality (COLORs, 2nd UV set)
-      if (meshes[i]->mTVerts2.size() || meshes[i]->mColors.size())
+      if (mMeshes[i]->mTVerts2.size() || mMeshes[i]->mColors.size())
          return false;
 
       // Cannot use old format if any primitive has too many triangles
       // (ie. cannot fit in a S16)
-      for (S32 j = 0; j < meshes[i]->mPrimitives.size(); j++)
+      for (S32 j = 0; j < mMeshes[i]->mPrimitives.size(); j++)
       {
-         if ((meshes[i]->mPrimitives[j].start +
-               meshes[i]->mPrimitives[j].numElements) >= (1 << 15))
+         if ((mMeshes[i]->mPrimitives[j].start +
+               mMeshes[i]->mPrimitives[j].numElements) >= (1 << 15))
          {
             return false;
          }
@@ -1513,12 +1513,12 @@ void TSShape::write(Stream * s, bool saveOldFormat)
    s->write(size8 *4,buffer8);
 
    // write sequences - write will properly endian-flip.
-   s->write(sequences.size());
-   for (S32 i=0; i<sequences.size(); i++)
-      sequences[i].write(s);
+   s->write(mSequences.size());
+   for (S32 i=0; i<mSequences.size(); i++)
+      mSequences[i].write(s);
 
    // write material list - write will properly endian-flip.
-   materialList->write(*s);
+   mMaterialList->write(*s);
 
    delete [] buffer32;
    delete [] buffer16;
@@ -1585,20 +1585,20 @@ bool TSShape::read(Stream * s)
       // read sequences
       S32 numSequences;
       s->read(&numSequences);
-      sequences.setSize(numSequences);
+      mSequences.setSize(numSequences);
       for (i=0; i<numSequences; i++)
       {
-         sequences[i].read(s);
+         mSequences[i].read(s);
 
          // Store initial (empty) source data
-         sequences[i].sourceData.total = sequences[i].numKeyframes;
-         sequences[i].sourceData.end = sequences[i].sourceData.total - 1;
+         mSequences[i].sourceData.total = mSequences[i].numKeyframes;
+         mSequences[i].sourceData.end = mSequences[i].sourceData.total - 1;
       }
 
       // read material list
-      delete materialList; // just in case...
-      materialList = new TSMaterialList;
-      materialList->read(*s);
+      delete mMaterialList; // just in case...
+      mMaterialList = new TSMaterialList;
+      mMaterialList->read(*s);
    }
 
 	// since we read in the buffers, we need to endian-flip their entire contents...
@@ -1842,89 +1842,89 @@ bool TSShape::read(Stream * s)
 
 void TSShape::createEmptyShape()
 {
-   nodes.set(dMalloc(1 * sizeof(Node)), 1);
-      nodes[0].nameIndex = 1;
-      nodes[0].parentIndex = -1;
-      nodes[0].firstObject = 0;
-      nodes[0].firstChild = -1;
-      nodes[0].nextSibling = -1;
+   mNodes.set(dMalloc(1 * sizeof(Node)), 1);
+      mNodes[0].nameIndex = 1;
+      mNodes[0].parentIndex = -1;
+      mNodes[0].firstObject = 0;
+      mNodes[0].firstChild = -1;
+      mNodes[0].nextSibling = -1;
 
-   objects.set(dMalloc(1 * sizeof(Object)), 1);
-      objects[0].nameIndex = 2;
-      objects[0].numMeshes = 1;
-      objects[0].startMeshIndex = 0;
-      objects[0].nodeIndex = 0;
-      objects[0].nextSibling = -1;
-      objects[0].firstDecal = -1;
+   mObjects.set(dMalloc(1 * sizeof(Object)), 1);
+      mObjects[0].nameIndex = 2;
+      mObjects[0].numMeshes = 1;
+      mObjects[0].startMeshIndex = 0;
+      mObjects[0].nodeIndex = 0;
+      mObjects[0].nextSibling = -1;
+      mObjects[0].firstDecal = -1;
 
-   objectStates.set(dMalloc(1 * sizeof(ObjectState)), 1);
-      objectStates[0].vis = 1;
-      objectStates[0].frameIndex = 0;
-      objectStates[0].matFrameIndex = 0;
+   mObjectStates.set(dMalloc(1 * sizeof(ObjectState)), 1);
+      mObjectStates[0].vis = 1;
+      mObjectStates[0].frameIndex = 0;
+      mObjectStates[0].matFrameIndex = 0;
 
-   subShapeFirstNode.set(dMalloc(1 * sizeof(S32)), 1);
-      subShapeFirstNode[0] = 0;
+   mSubShapeFirstNode.set(dMalloc(1 * sizeof(S32)), 1);
+      mSubShapeFirstNode[0] = 0;
 
-   subShapeFirstObject.set(dMalloc(1 * sizeof(S32)), 1);
-      subShapeFirstObject[0] = 0;
+   mSubShapeFirstObject.set(dMalloc(1 * sizeof(S32)), 1);
+      mSubShapeFirstObject[0] = 0;
 
-   detailFirstSkin.set(NULL, 0);
+   mDetailFirstSkin.set(NULL, 0);
 
-   subShapeNumNodes.set(dMalloc(1 * sizeof(S32)), 1);
-      subShapeNumNodes[0] = 1;
+   mSubShapeNumNodes.set(dMalloc(1 * sizeof(S32)), 1);
+      mSubShapeNumNodes[0] = 1;
 
-   subShapeNumObjects.set(dMalloc(1 * sizeof(S32)), 1);
-      subShapeNumObjects[0] = 1;
+   mSubShapeNumObjects.set(dMalloc(1 * sizeof(S32)), 1);
+      mSubShapeNumObjects[0] = 1;
 
-   details.set(dMalloc(1 * sizeof(Detail)), 1);
-      details[0].nameIndex = 0;
-      details[0].subShapeNum = 0;
-      details[0].objectDetailNum = 0;
-      details[0].size = 2.0f;
-      details[0].averageError = -1.0f;
-      details[0].maxError = -1.0f;
-      details[0].polyCount = 0;
+   mDetails.set(dMalloc(1 * sizeof(Detail)), 1);
+      mDetails[0].nameIndex = 0;
+      mDetails[0].subShapeNum = 0;
+      mDetails[0].objectDetailNum = 0;
+      mDetails[0].size = 2.0f;
+      mDetails[0].averageError = -1.0f;
+      mDetails[0].maxError = -1.0f;
+      mDetails[0].polyCount = 0;
 
-   defaultRotations.set(dMalloc(1 * sizeof(Quat16)), 1);
-      defaultRotations[0].x = 0.0f;
-      defaultRotations[0].y = 0.0f;
-      defaultRotations[0].z = 0.0f;
-      defaultRotations[0].w = 0.0f;
+   mDefaultRotations.set(dMalloc(1 * sizeof(Quat16)), 1);
+      mDefaultRotations[0].x = 0.0f;
+      mDefaultRotations[0].y = 0.0f;
+      mDefaultRotations[0].z = 0.0f;
+      mDefaultRotations[0].w = 0.0f;
 
-   defaultTranslations.set(dMalloc(1 * sizeof(Point3F)), 1);
-      defaultTranslations[0].set(0.0f, 0.0f, 0.0f);
+   mDefaultTranslations.set(dMalloc(1 * sizeof(Point3F)), 1);
+      mDefaultTranslations[0].set(0.0f, 0.0f, 0.0f);
 
-   subShapeFirstTranslucentObject.set(dMalloc(1 * sizeof(S32)), 1);
-      subShapeFirstTranslucentObject[0] = 1;
+   mSubShapeFirstTranslucentObject.set(dMalloc(1 * sizeof(S32)), 1);
+      mSubShapeFirstTranslucentObject[0] = 1;
 
-   alphaIn.set(dMalloc(1 * sizeof(F32)), 1);
-      alphaIn[0] = 0;
+   mAlphaIn.set(dMalloc(1 * sizeof(F32)), 1);
+      mAlphaIn[0] = 0;
 
-   alphaOut.set(dMalloc(1 * sizeof(F32)), 1);
-      alphaOut[0] = -1;
+   mAlphaOut.set(dMalloc(1 * sizeof(F32)), 1);
+      mAlphaOut[0] = -1;
 
-   sequences.set(NULL, 0);
-   nodeRotations.set(NULL, 0);
-   nodeTranslations.set(NULL, 0);
-   nodeUniformScales.set(NULL, 0);
-   nodeAlignedScales.set(NULL, 0);
-   nodeArbitraryScaleRots.set(NULL, 0);
-   nodeArbitraryScaleFactors.set(NULL, 0);
-   groundRotations.set(NULL, 0);
-   groundTranslations.set(NULL, 0);
-   triggers.set(NULL, 0);
-   billboardDetails.set(NULL, 0);
+   mSequences.set(NULL, 0);
+   mNodeRotations.set(NULL, 0);
+   mNodeTranslations.set(NULL, 0);
+   mNodeUniformScales.set(NULL, 0);
+   mNodeAlignedScales.set(NULL, 0);
+   mNodeArbitraryScaleRots.set(NULL, 0);
+   mNodeArbitraryScaleFactors.set(NULL, 0);
+   mGroundRotations.set(NULL, 0);
+   mGroundTranslations.set(NULL, 0);
+   mTriggers.set(NULL, 0);
+   mBillboardDetails.set(NULL, 0);
 
-   names.setSize(3);
-      names[0] = StringTable->insert("Detail2");
-      names[1] = StringTable->insert("Mesh2");
-      names[2] = StringTable->insert("Mesh");
+   mNames.setSize(3);
+      mNames[0] = StringTable->insert("Detail2");
+      mNames[1] = StringTable->insert("Mesh2");
+      mNames[2] = StringTable->insert("Mesh");
 
-   radius = 0.866025f;
-   tubeRadius = 0.707107f;
-   center.set(0.0f, 0.5f, 0.0f);
-   bounds.minExtents.set(-0.5f, 0.0f, -0.5f);
-   bounds.maxExtents.set(0.5f, 1.0f, 0.5f);
+   mRadius = 0.866025f;
+   mTubeRadius = 0.707107f;
+   mCenter.set(0.0f, 0.5f, 0.0f);
+   mBounds.minExtents.set(-0.5f, 0.0f, -0.5f);
+   mBounds.maxExtents.set(0.5f, 1.0f, 0.5f);
 
    mExporterVersion = 124;
    mSmallestVisibleSize = 2;
@@ -1940,9 +1940,9 @@ void TSShape::createEmptyShape()
 
    // Init the collision accelerator array.  Note that we don't compute the
    //  accelerators until the app requests them
-   detailCollisionAccelerators.setSize(details.size());
-   for (U32 i = 0; i < detailCollisionAccelerators.size(); i++)
-      detailCollisionAccelerators[i] = NULL;
+   mDetailCollisionAccelerators.setSize(mDetails.size());
+   for (U32 i = 0; i < mDetailCollisionAccelerators.size(); i++)
+      mDetailCollisionAccelerators[i] = NULL;
 }
 
 void TSShape::fixEndian(S32 * buff32, S16 * buff16, S8 *, S32 count32, S32 count16, S32)
@@ -2045,27 +2045,27 @@ template<> ResourceBase::Signature  Resource<TSShape>::signature()
 
 TSShape::ConvexHullAccelerator* TSShape::getAccelerator(S32 dl)
 {
-   AssertFatal(dl < details.size(), "Error, bad detail level!");
+   AssertFatal(dl < mDetails.size(), "Error, bad detail level!");
    if (dl == -1)
       return NULL;
 
-   AssertFatal( detailCollisionAccelerators.size() == details.size(), 
+   AssertFatal( mDetailCollisionAccelerators.size() == mDetails.size(), 
       "TSShape::getAccelerator() - mismatched array sizes!" );
 
-   if (detailCollisionAccelerators[dl] == NULL)
+   if (mDetailCollisionAccelerators[dl] == NULL)
       computeAccelerator(dl);
 
-   AssertFatal(detailCollisionAccelerators[dl] != NULL, "This should be non-null after computing it!");
-   return detailCollisionAccelerators[dl];
+   AssertFatal(mDetailCollisionAccelerators[dl] != NULL, "This should be non-null after computing it!");
+   return mDetailCollisionAccelerators[dl];
 }
 
 
 void TSShape::computeAccelerator(S32 dl)
 {
-   AssertFatal(dl < details.size(), "Error, bad detail level!");
+   AssertFatal(dl < mDetails.size(), "Error, bad detail level!");
 
    // Have we already computed this?
-   if (detailCollisionAccelerators[dl] != NULL)
+   if (mDetailCollisionAccelerators[dl] != NULL)
       return;
 
    // Create a bogus features list...
@@ -2073,12 +2073,12 @@ void TSShape::computeAccelerator(S32 dl)
    MatrixF mat(true);
    Point3F n(0, 0, 1);
 
-   const TSDetail* detail = &details[dl];
+   const TSDetail* detail = &mDetails[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
-   S32 start = subShapeFirstObject[ss];
-   S32 end   = subShapeNumObjects[ss] + start;
+   S32 start = mSubShapeFirstObject[ss];
+   S32 end   = mSubShapeNumObjects[ss] + start;
    if (start < end)
    {
       // run through objects and collide
@@ -2087,10 +2087,10 @@ void TSShape::computeAccelerator(S32 dl)
       U32 surfaceKey = 0;
       for (S32 i = start; i < end; i++)
       {
-         const TSObject* obj = &objects[i];
+         const TSObject* obj = &mObjects[i];
 
          if (obj->numMeshes && od < obj->numMeshes) {
-            TSMesh* mesh = meshes[obj->startMeshIndex + od];
+            TSMesh* mesh = mMeshes[obj->startMeshIndex + od];
             if (mesh)
                mesh->getFeatures(0, mat, n, &cf, surfaceKey);
          }
@@ -2145,7 +2145,7 @@ void TSShape::computeAccelerator(S32 dl)
 
    // Ok, so now we have a vertex list.  Lets copy that out...
    ConvexHullAccelerator* accel = new ConvexHullAccelerator;
-   detailCollisionAccelerators[dl] = accel;
+   mDetailCollisionAccelerators[dl] = accel;
    accel->numVerts    = cf.mVertexList.size();
    accel->vertexList  = new Point3F[accel->numVerts];
    dMemcpy(accel->vertexList, cf.mVertexList.address(), sizeof(Point3F) * accel->numVerts);

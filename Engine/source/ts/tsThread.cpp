@@ -139,8 +139,8 @@ void TSThread::getGround(F32 t, MatrixF * pMat)
    // assumed to be ident. and not found in the list.
    if (frame)
    {
-      p1 = &mShapeInstance->mShape->groundTranslations[getSequence()->firstGroundFrame + frame - 1];
-      q1 = &mShapeInstance->mShape->groundRotations[getSequence()->firstGroundFrame + frame - 1].getQuatF(&rot1);
+      p1 = &mShapeInstance->mShape->mGroundTranslations[getSequence()->firstGroundFrame + frame - 1];
+      q1 = &mShapeInstance->mShape->mGroundRotations[getSequence()->firstGroundFrame + frame - 1].getQuatF(&rot1);
    }
    else
    {
@@ -149,8 +149,8 @@ void TSThread::getGround(F32 t, MatrixF * pMat)
    }
 
    // similar to above, ground keyframe number 'frame+1' is actually offset by 'frame'
-   p2 = &mShapeInstance->mShape->groundTranslations[getSequence()->firstGroundFrame + frame];
-   q2 = &mShapeInstance->mShape->groundRotations[getSequence()->firstGroundFrame + frame].getQuatF(&rot2);
+   p2 = &mShapeInstance->mShape->mGroundTranslations[getSequence()->firstGroundFrame + frame];
+   q2 = &mShapeInstance->mShape->mGroundRotations[getSequence()->firstGroundFrame + frame].getQuatF(&rot2);
 
    QuatF q;
    Point3F p;
@@ -163,7 +163,7 @@ void TSThread::setSequence(S32 seq, F32 toPos)
 {
    const TSShape * shape = mShapeInstance->mShape;
 
-   AssertFatal(shape && shape->sequences.size()>seq && toPos>=0.0f && toPos<=1.0f,
+   AssertFatal(shape && shape->mSequences.size()>seq && toPos>=0.0f && toPos<=1.0f,
       "TSThread::setSequence: invalid shape handle, sequence number, or position.");
 
    mShapeInstance->clearTransition(this);
@@ -287,12 +287,12 @@ void TSThread::activateTriggers(F32 a, F32 b)
    for (i=firstTrigger; i<numTriggers+firstTrigger; i++)
    {
       // is a between this trigger and previous one...
-      if (a>lastPos && a<=shape->triggers[i].pos)
+      if (a>lastPos && a<=shape->mTriggers[i].pos)
          aIndex = i;
       // is b between this trigger and previous one...
-      if (b>lastPos && b<=shape->triggers[i].pos)
+      if (b>lastPos && b<=shape->mTriggers[i].pos)
          bIndex = i;
-      lastPos = shape->triggers[i].pos;
+      lastPos = shape->mTriggers[i].pos;
    }
 
    // activate triggers between aIndex and bIndex (depends on direction)
@@ -300,7 +300,7 @@ void TSThread::activateTriggers(F32 a, F32 b)
    {
       for (i=aIndex; i<bIndex; i++)
       {
-         U32 state = shape->triggers[i].state;
+         U32 state = shape->mTriggers[i].state;
          bool on = (state & TSShape::Trigger::StateOn)!=0;
          mShapeInstance->setTriggerStateBit(state & TSShape::Trigger::StateMask, on);
       }
@@ -309,7 +309,7 @@ void TSThread::activateTriggers(F32 a, F32 b)
    {
       for (i=aIndex-1; i>=bIndex; i--)
       {
-         U32 state = shape->triggers[i].state;
+         U32 state = shape->mTriggers[i].state;
          bool on = (state & TSShape::Trigger::StateOn)!=0;
          if (state & TSShape::Trigger::InvertOnReverse)
             on = !on;
@@ -354,7 +354,7 @@ void TSThread::advancePos(F32 delta)
    {
       // make dirty what this thread changes
       U32 dirtyFlags = getSequence()->dirtyFlags | (transitionData.inTransition ? TSShapeInstance::TransformDirty : 0);
-      for (S32 i=0; i<mShapeInstance->getShape()->subShapeFirstNode.size(); i++)
+      for (S32 i=0; i<mShapeInstance->getShape()->mSubShapeFirstNode.size(); i++)
          mShapeInstance->mDirtyFlags[i] |= dirtyFlags;
    }
 
@@ -500,7 +500,7 @@ S32 TSThread::operator<(const TSThread & th2) const
 
 TSThread * TSShapeInstance::addThread()
 {
-   if (mShape->sequences.empty())
+   if (mShape->mSequences.empty())
       return NULL;
 
    mThreadList.increment();
@@ -656,9 +656,9 @@ void TSShapeInstance::updateTransitions()
    updateTransitionNodeTransforms(transitionNodes);
 
    S32 i;
-   mNodeReferenceRotations.setSize(mShape->nodes.size());
-   mNodeReferenceTranslations.setSize(mShape->nodes.size());
-   for (i=0; i<mShape->nodes.size(); i++)
+   mNodeReferenceRotations.setSize(mShape->mNodes.size());
+   mNodeReferenceTranslations.setSize(mShape->mNodes.size());
+   for (i=0; i<mShape->mNodes.size(); i++)
    {
       if (mTransitionRotationNodes.test(i))
          mNodeReferenceRotations[i].set(smNodeCurrentRotations[i]);
@@ -674,8 +674,8 @@ void TSShapeInstance::updateTransitions()
 
       if (animatesUniformScale())
       {
-         mNodeReferenceUniformScales.setSize(mShape->nodes.size());
-         for (i=0; i<mShape->nodes.size(); i++)
+         mNodeReferenceUniformScales.setSize(mShape->mNodes.size());
+         for (i=0; i<mShape->mNodes.size(); i++)
          {
             if (mTransitionScaleNodes.test(i))
                mNodeReferenceUniformScales[i] = smNodeCurrentUniformScales[i];
@@ -683,8 +683,8 @@ void TSShapeInstance::updateTransitions()
       }
       else if (animatesAlignedScale())
       {
-         mNodeReferenceScaleFactors.setSize(mShape->nodes.size());
-         for (i=0; i<mShape->nodes.size(); i++)
+         mNodeReferenceScaleFactors.setSize(mShape->mNodes.size());
+         for (i=0; i<mShape->mNodes.size(); i++)
          {
             if (mTransitionScaleNodes.test(i))
                mNodeReferenceScaleFactors[i] = smNodeCurrentAlignedScales[i];
@@ -692,9 +692,9 @@ void TSShapeInstance::updateTransitions()
       }
       else
       {
-         mNodeReferenceScaleFactors.setSize(mShape->nodes.size());
-         mNodeReferenceArbitraryScaleRots.setSize(mShape->nodes.size());
-         for (i=0; i<mShape->nodes.size(); i++)
+         mNodeReferenceScaleFactors.setSize(mShape->mNodes.size());
+         mNodeReferenceArbitraryScaleRots.setSize(mShape->mNodes.size());
+         for (i=0; i<mShape->mNodes.size(); i++)
          {
             if (mTransitionScaleNodes.test(i))
             {

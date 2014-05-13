@@ -531,7 +531,7 @@ protected:
    void deltaGround1(TSThread *, F32 start, F32 end, MatrixF& mat);
    /// @}
 
-   U32 getNumDetails() const { return mShape ? mShape->details.size() : 0; }
+   U32 getNumDetails() const { return mShape ? mShape->mDetails.size() : 0; }
 
    S32 getCurrentDetail() const { return mCurrentDetailLevel; }
 
@@ -785,7 +785,7 @@ public:
    TSShapeInstance * getShapeInstance() { return mShapeInstance; }
    bool hasSequence() const { return sequence >= 0; }
    U32 getSeqIndex() const { return sequence; }
-   const TSSequence* getSequence() const { return &(mShapeInstance->mShape->sequences[sequence]); }
+   const TSSequence* getSequence() const { return &(mShapeInstance->mShape->mSequences[sequence]); }
    const String& getSequenceName() const { return mShapeInstance->mShape->getSequenceName(sequence); }
    S32 operator<(const TSThread &) const;
 };

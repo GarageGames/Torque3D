@@ -43,14 +43,14 @@ void TSShapeInstance::sortThreads()
 void TSShapeInstance::setDirty(U32 dirty)
 {
    AssertFatal((dirty & AllDirtyMask) == dirty,"TSShapeInstance::setDirty: illegal dirty flags");
-   for (S32 i=0; i<mShape->subShapeFirstNode.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeFirstNode.size(); i++)
       mDirtyFlags[i] |= dirty;
 }
 
 void TSShapeInstance::clearDirty(U32 dirty)
 {
    AssertFatal((dirty & AllDirtyMask) == dirty,"TSShapeInstance::clearDirty: illegal dirty flags");
-   for (S32 i=0; i<mShape->subShapeFirstNode.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeFirstNode.size(); i++)
       mDirtyFlags[i] &= ~dirty;
 }
 
@@ -62,25 +62,25 @@ void TSShapeInstance::animateNodes(S32 ss)
 {
    PROFILE_SCOPE( TSShapeInstance_animateNodes );
 
-   if (!mShape->nodes.size())
+   if (!mShape->mNodes.size())
       return;
 
    // @todo: When a node is added, we need to make sure to resize the nodeTransforms array as well
-   mNodeTransforms.setSize(mShape->nodes.size());
+   mNodeTransforms.setSize(mShape->mNodes.size());
 
    // temporary storage for node transforms
-   smNodeCurrentRotations.setSize(mShape->nodes.size());
-   smNodeCurrentTranslations.setSize(mShape->nodes.size());
-   smNodeLocalTransforms.setSize(mShape->nodes.size());
-   smRotationThreads.setSize(mShape->nodes.size());
-   smTranslationThreads.setSize(mShape->nodes.size());
+   smNodeCurrentRotations.setSize(mShape->mNodes.size());
+   smNodeCurrentTranslations.setSize(mShape->mNodes.size());
+   smNodeLocalTransforms.setSize(mShape->mNodes.size());
+   smRotationThreads.setSize(mShape->mNodes.size());
+   smTranslationThreads.setSize(mShape->mNodes.size());
 
    TSIntegerSet rotBeenSet;
    TSIntegerSet tranBeenSet;
    TSIntegerSet scaleBeenSet;
-   rotBeenSet.setAll(mShape->nodes.size());
-   tranBeenSet.setAll(mShape->nodes.size());
-   scaleBeenSet.setAll(mShape->nodes.size());
+   rotBeenSet.setAll(mShape->mNodes.size());
+   tranBeenSet.setAll(mShape->mNodes.size());
+   scaleBeenSet.setAll(mShape->mNodes.size());
    smNodeLocalTransformDirty.clearAll();
 
    S32 i,j,nodeIndex,a,b,start,end,firstBlend = mThreadList.size();
@@ -114,18 +114,18 @@ void TSShapeInstance::animateNodes(S32 ss)
    // we'll set default regardless of mask status
 
    // all the nodes marked above need to have the default transform
-   a = mShape->subShapeFirstNode[ss];
-   b = a + mShape->subShapeNumNodes[ss];
+   a = mShape->mSubShapeFirstNode[ss];
+   b = a + mShape->mSubShapeNumNodes[ss];
    for (i=a; i<b; i++)
    {
       if (rotBeenSet.test(i))
       {
-         mShape->defaultRotations[i].getQuatF(&smNodeCurrentRotations[i]);
+         mShape->mDefaultRotations[i].getQuatF(&smNodeCurrentRotations[i]);
          smRotationThreads[i] = NULL;
       }
       if (tranBeenSet.test(i))
       {
-         smNodeCurrentTranslations[i] = mShape->defaultTranslations[i];
+         smNodeCurrentTranslations[i] = mShape->mDefaultTranslations[i];
          smTranslationThreads[i] = NULL;
       }
    }
@@ -235,7 +235,7 @@ void TSShapeInstance::animateNodes(S32 ss)
    // multiply transforms...
    for (i=a; i<b; i++)
    {
-      S32 parentIdx = mShape->nodes[i].parentIndex;
+      S32 parentIdx = mShape->mNodes[i].parentIndex;
       if (parentIdx < 0)
          mNodeTransforms[i] = smNodeLocalTransforms[i];
       else
@@ -248,12 +248,12 @@ void TSShapeInstance::handleDefaultScale(S32 a, S32 b, TSIntegerSet & scaleBeenS
    // set default scale values (i.e., identity) and do any initialization
    // relating to animated scale (since scale normally not animated)
 
-   smScaleThreads.setSize(mShape->nodes.size());
+   smScaleThreads.setSize(mShape->mNodes.size());
    scaleBeenSet.takeAway(mCallbackNodes);
    scaleBeenSet.takeAway(mHandsOffNodes);
    if (animatesUniformScale())
    {
-      smNodeCurrentUniformScales.setSize(mShape->nodes.size());
+      smNodeCurrentUniformScales.setSize(mShape->mNodes.size());
       for (S32 i=a; i<b; i++)
          if (scaleBeenSet.test(i))
          {
@@ -263,7 +263,7 @@ void TSShapeInstance::handleDefaultScale(S32 a, S32 b, TSIntegerSet & scaleBeenS
    }
    else if (animatesAlignedScale())
    {
-      smNodeCurrentAlignedScales.setSize(mShape->nodes.size());
+      smNodeCurrentAlignedScales.setSize(mShape->mNodes.size());
       for (S32 i=a; i<b; i++)
          if (scaleBeenSet.test(i))
          {
@@ -273,7 +273,7 @@ void TSShapeInstance::handleDefaultScale(S32 a, S32 b, TSIntegerSet & scaleBeenS
    }
    else
    {
-      smNodeCurrentArbitraryScales.setSize(mShape->nodes.size());
+      smNodeCurrentArbitraryScales.setSize(mShape->mNodes.size());
       for (S32 i=a; i<b; i++)
          if (scaleBeenSet.test(i))
          {
@@ -672,12 +672,12 @@ void TSShapeInstance::animateVisibility(S32 ss)
       beenSet.takeAway(mThreadList[i]->getSequence()->visMatters);
 
    // set defaults
-   S32 a = mShape->subShapeFirstObject[ss];
-   S32 b = a + mShape->subShapeNumObjects[ss];
+   S32 a = mShape->mSubShapeFirstObject[ss];
+   S32 b = a + mShape->mSubShapeNumObjects[ss];
    for (i=a; i<b; i++)
    {
       if (beenSet.test(i))
-         mMeshObjects[i].visible = mShape->objectStates[i].vis;
+         mMeshObjects[i].visible = mShape->mObjectStates[i].vis;
    }
 
    // go through each thread and set visibility on those objects that
@@ -735,11 +735,11 @@ void TSShapeInstance::animateFrame(S32 ss)
       beenSet.takeAway(mThreadList[i]->getSequence()->frameMatters);
 
    // set defaults
-   S32 a = mShape->subShapeFirstObject[ss];
-   S32 b = a + mShape->subShapeNumObjects[ss];
+   S32 a = mShape->mSubShapeFirstObject[ss];
+   S32 b = a + mShape->mSubShapeNumObjects[ss];
    for (i=a; i<b; i++)
       if (beenSet.test(i))
-         mMeshObjects[i].frame = mShape->objectStates[i].frameIndex;
+         mMeshObjects[i].frame = mShape->mObjectStates[i].frameIndex;
 
    // go through each thread and set frame on those objects that
    // are not set yet and are controlled by that thread
@@ -790,11 +790,11 @@ void TSShapeInstance::animateMatFrame(S32 ss)
       beenSet.takeAway(mThreadList[i]->getSequence()->matFrameMatters);
 
    // set defaults
-   S32 a = mShape->subShapeFirstObject[ss];
-   S32 b = a + mShape->subShapeNumObjects[ss];
+   S32 a = mShape->mSubShapeFirstObject[ss];
+   S32 b = a + mShape->mSubShapeNumObjects[ss];
    for (i=a; i<b; i++)
       if (beenSet.test(i))
-         mMeshObjects[i].matFrame = mShape->objectStates[i].matFrameIndex;
+         mMeshObjects[i].matFrame = mShape->mObjectStates[i].matFrameIndex;
 
    // go through each thread and set matFrame on those objects that
    // are not set yet and are controlled by that thread
@@ -842,7 +842,7 @@ void TSShapeInstance::animate(S32 dl)
       // nothing to do
       return;
 
-   S32 ss = mShape->details[dl].subShapeNum;
+   S32 ss = mShape->mDetails[dl].subShapeNum;
 
    // this is a billboard detail...
    if (ss<0)
@@ -878,7 +878,7 @@ void TSShapeInstance::animateNodeSubtrees(bool forceFull)
       // force transforms to animate
       setDirty(TransformDirty);
 
-   for (S32 i=0; i<mShape->subShapeNumNodes.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeNumNodes.size(); i++)
    {
       if (mDirtyFlags[i] & TransformDirty)
       {
@@ -896,7 +896,7 @@ void TSShapeInstance::animateSubtrees(bool forceFull)
       // force full animate
       setDirty(AllDirtyMask);
 
-   for (S32 i=0; i<mShape->subShapeNumNodes.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeNumNodes.size(); i++)
    {
       if (mDirtyFlags[i] & TransformDirty)
       {

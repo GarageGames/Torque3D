@@ -33,12 +33,12 @@ void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * d
 {
 #if !defined(TORQUE_MAX_LIB)
    // this method not necessary in exporter, and a couple lines won't compile for exporter
-   if (!objects.address() || !meshes.address() || !numSkins)
+   if (!mObjects.address() || !mMeshes.address() || !numSkins)
       // not ready for this yet, will catch it on the next pass
       return;
-   S32 numObjects = objects.size();
-   TSObject * newObjects = objects.address() + objects.size();
-   TSSkinMesh ** skins = (TSSkinMesh**)&meshes[numMeshes];
+   S32 numObjects = mObjects.size();
+   TSObject * newObjects = mObjects.address() + mObjects.size();
+   TSSkinMesh ** skins = (TSSkinMesh**)&mMeshes[numMeshes];
    Vector<TSSkinMesh*> skinsCopy;
    // Note: newObjects has as much free space as we need, so we just need to keep track of the
    //       number of objects we use and then update objects.size
@@ -52,7 +52,7 @@ void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * d
    while (skinsUsed<numSkins-emptySkins)
    {
       TSObject & object = newObjects[numSkinObjects++];
-      objects.increment();
+      mObjects.increment();
       object.nameIndex = 0; // no name
       object.numMeshes = 0;
       object.startMeshIndex = numMeshes + skinsCopy.size();
@@ -92,29 +92,29 @@ void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * d
       // if no meshes, don't need object
       if (!object.numMeshes)
       {
-         objects.decrement();
+         mObjects.decrement();
          numSkinObjects--;
       }
    }
    dMemcpy(skins,skinsCopy.address(),skinsCopy.size()*sizeof(TSSkinMesh*));
 
-   if (subShapeFirstObject.size()==1)
+   if (mSubShapeFirstObject.size()==1)
       // as long as only one subshape, we'll now be rendered
-      subShapeNumObjects[0] += numSkinObjects;
+      mSubShapeNumObjects[0] += numSkinObjects;
 
    // now for something ugly -- we've added somoe objects to hold the skins...
    // now we have to add default states for those objects
    // we also have to increment base states on all the sequences that are loaded
-   dMemmove(objectStates.address()+numObjects+numSkinObjects,objectStates.address()+numObjects,(objectStates.size()-numObjects)*sizeof(ObjectState));
+   dMemmove(mObjectStates.address()+numObjects+numSkinObjects,mObjectStates.address()+numObjects,(mObjectStates.size()-numObjects)*sizeof(ObjectState));
    for (i=numObjects; i<numObjects+numSkinObjects; i++)
    {
-      objectStates[i].vis=1.0f;
-      objectStates[i].frameIndex=0;
-      objectStates[i].matFrameIndex=0;
+      mObjectStates[i].vis=1.0f;
+      mObjectStates[i].frameIndex=0;
+      mObjectStates[i].matFrameIndex=0;
    }
-   for (i=0;i<sequences.size();i++)
+   for (i=0;i<mSequences.size();i++)
    {
-      sequences[i].baseObjectState += numSkinObjects;
+      mSequences[i].baseObjectState += numSkinObjects;
    }
 #endif
 }
@@ -197,10 +197,10 @@ void TSShape::exportSequences(Stream * s)
 
    // write node names
    // -- this is how we will map imported sequence nodes to shape nodes
-   sz = nodes.size();
+   sz = mNodes.size();
    s->write(sz);
-   for (i=0;i<nodes.size();i++)
-      writeName(s,nodes[i].nameIndex);
+   for (i=0;i<mNodes.size();i++)
+      writeName(s,mNodes[i].nameIndex);
 
    // legacy write -- write zero objects, don't pretend to support object export anymore
    s->write(0);
@@ -208,71 +208,71 @@ void TSShape::exportSequences(Stream * s)
    // on import, we will need to adjust keyframe data based on number of
    // nodes/objects in this shape...number of nodes can be inferred from
    // above, but number of objects cannot be.  Write that quantity here:
-   s->write(objects.size());
+   s->write(mObjects.size());
 
    // write node states -- skip default node states
-   s->write(nodeRotations.size());
-   for (i=0;i<nodeRotations.size();i++)
+   s->write(mNodeRotations.size());
+   for (i=0;i<mNodeRotations.size();i++)
    {
-      s->write(nodeRotations[i].x);
-      s->write(nodeRotations[i].y);
-      s->write(nodeRotations[i].z);
-      s->write(nodeRotations[i].w);
+      s->write(mNodeRotations[i].x);
+      s->write(mNodeRotations[i].y);
+      s->write(mNodeRotations[i].z);
+      s->write(mNodeRotations[i].w);
    }
-   s->write(nodeTranslations.size());
-   for (i=0;i<nodeTranslations.size(); i++)
+   s->write(mNodeTranslations.size());
+   for (i=0;i<mNodeTranslations.size(); i++)
    {
-      s->write(nodeTranslations[i].x);
-      s->write(nodeTranslations[i].y);
-      s->write(nodeTranslations[i].z);
+      s->write(mNodeTranslations[i].x);
+      s->write(mNodeTranslations[i].y);
+      s->write(mNodeTranslations[i].z);
    }
-   s->write(nodeUniformScales.size());
-   for (i=0;i<nodeUniformScales.size();i++)
-      s->write(nodeUniformScales[i]);
-   s->write(nodeAlignedScales.size());
-   for (i=0;i<nodeAlignedScales.size();i++)
+   s->write(mNodeUniformScales.size());
+   for (i=0;i<mNodeUniformScales.size();i++)
+      s->write(mNodeUniformScales[i]);
+   s->write(mNodeAlignedScales.size());
+   for (i=0;i<mNodeAlignedScales.size();i++)
    {
-      s->write(nodeAlignedScales[i].x);
-      s->write(nodeAlignedScales[i].y);
-      s->write(nodeAlignedScales[i].z);
+      s->write(mNodeAlignedScales[i].x);
+      s->write(mNodeAlignedScales[i].y);
+      s->write(mNodeAlignedScales[i].z);
    }
-   s->write(nodeArbitraryScaleRots.size());
-   for (i=0;i<nodeArbitraryScaleRots.size();i++)
+   s->write(mNodeArbitraryScaleRots.size());
+   for (i=0;i<mNodeArbitraryScaleRots.size();i++)
    {
-      s->write(nodeArbitraryScaleRots[i].x);
-      s->write(nodeArbitraryScaleRots[i].y);
-      s->write(nodeArbitraryScaleRots[i].z);
-      s->write(nodeArbitraryScaleRots[i].w);
+      s->write(mNodeArbitraryScaleRots[i].x);
+      s->write(mNodeArbitraryScaleRots[i].y);
+      s->write(mNodeArbitraryScaleRots[i].z);
+      s->write(mNodeArbitraryScaleRots[i].w);
    }
-   for (i=0;i<nodeArbitraryScaleFactors.size();i++)
+   for (i=0;i<mNodeArbitraryScaleFactors.size();i++)
    {
-      s->write(nodeArbitraryScaleFactors[i].x);
-      s->write(nodeArbitraryScaleFactors[i].y);
-      s->write(nodeArbitraryScaleFactors[i].z);
+      s->write(mNodeArbitraryScaleFactors[i].x);
+      s->write(mNodeArbitraryScaleFactors[i].y);
+      s->write(mNodeArbitraryScaleFactors[i].z);
    }
-   s->write(groundTranslations.size());
-   for (i=0;i<groundTranslations.size();i++)
+   s->write(mGroundTranslations.size());
+   for (i=0;i<mGroundTranslations.size();i++)
    {
-      s->write(groundTranslations[i].x);
-      s->write(groundTranslations[i].y);
-      s->write(groundTranslations[i].z);
+      s->write(mGroundTranslations[i].x);
+      s->write(mGroundTranslations[i].y);
+      s->write(mGroundTranslations[i].z);
    }
-   for (i=0;i<groundRotations.size();i++)
+   for (i=0;i<mGroundRotations.size();i++)
    {
-      s->write(groundRotations[i].x);
-      s->write(groundRotations[i].y);
-      s->write(groundRotations[i].z);
-      s->write(groundRotations[i].w);
+      s->write(mGroundRotations[i].x);
+      s->write(mGroundRotations[i].y);
+      s->write(mGroundRotations[i].z);
+      s->write(mGroundRotations[i].w);
    }
 
    // write object states -- legacy..no object states
    s->write((S32)0);
 
    // write sequences
-   s->write(sequences.size());
-   for (i=0;i<sequences.size();i++)
+   s->write(mSequences.size());
+   for (i=0;i<mSequences.size();i++)
    {
-      Sequence & seq = sequences[i];
+      Sequence & seq = mSequences[i];
 
       // first write sequence name
       writeName(s,seq.nameIndex);
@@ -282,11 +282,11 @@ void TSShape::exportSequences(Stream * s)
    }
 
    // write out all the triggers...
-   s->write(triggers.size());
-   for (i=0; i<triggers.size(); i++)
+   s->write(mTriggers.size());
+   for (i=0; i<mTriggers.size(); i++)
    {
-      s->write(triggers[i].state);
-      s->write(triggers[i].pos);
+      s->write(mTriggers[i].state);
+      s->write(mTriggers[i].pos);
    }
 }
 
@@ -303,9 +303,9 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
    s->write(smVersion);
 
    // write node names
-   s->write( nodes.size() );
-   for ( S32 i = 0; i < nodes.size(); i++ )
-      writeName( s, nodes[i].nameIndex );
+   s->write( mNodes.size() );
+   for ( S32 i = 0; i < mNodes.size(); i++ )
+      writeName( s, mNodes[i].nameIndex );
 
    // legacy write -- write zero objects, don't pretend to support object export anymore
    s->write( (S32)0 );
@@ -313,26 +313,26 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
    // on import, we will need to adjust keyframe data based on number of
    // nodes/objects in this shape...number of nodes can be inferred from
    // above, but number of objects cannot be.  Write that quantity here:
-   s->write( objects.size() );
+   s->write( mObjects.size() );
 
    // write node states -- skip default node states
    S32 count = seq.rotationMatters.count() * seq.numKeyframes;
    s->write( count );
    for ( S32 i = seq.baseRotation; i < seq.baseRotation + count; i++ )
    {
-      s->write( nodeRotations[i].x );
-      s->write( nodeRotations[i].y );
-      s->write( nodeRotations[i].z );
-      s->write( nodeRotations[i].w );
+      s->write( mNodeRotations[i].x );
+      s->write( mNodeRotations[i].y );
+      s->write( mNodeRotations[i].z );
+      s->write( mNodeRotations[i].w );
    }
 
    count = seq.translationMatters.count() * seq.numKeyframes;
    s->write( count );
    for ( S32 i = seq.baseTranslation; i < seq.baseTranslation + count; i++ )
    {
-      s->write( nodeTranslations[i].x );
-      s->write( nodeTranslations[i].y );
-      s->write( nodeTranslations[i].z );
+      s->write( mNodeTranslations[i].x );
+      s->write( mNodeTranslations[i].y );
+      s->write( mNodeTranslations[i].z );
    }
 
    count = seq.scaleMatters.count() * seq.numKeyframes;
@@ -340,7 +340,7 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
    {
       s->write( count );
       for ( S32 i = seq.baseScale; i < seq.baseScale + count; i++ )
-         s->write( nodeUniformScales[i] );
+         s->write( mNodeUniformScales[i] );
    }
    else
       s->write( (S32)0 );
@@ -350,9 +350,9 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
       s->write( count );
       for ( S32 i = seq.baseScale; i < seq.baseScale + count; i++ )
       {
-         s->write( nodeAlignedScales[i].x );
-         s->write( nodeAlignedScales[i].y );
-         s->write( nodeAlignedScales[i].z );
+         s->write( mNodeAlignedScales[i].x );
+         s->write( mNodeAlignedScales[i].y );
+         s->write( mNodeAlignedScales[i].z );
       }
    }
    else
@@ -363,16 +363,16 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
       s->write( count );
       for ( S32 i = seq.baseScale; i < seq.baseScale + count; i++ )
       {
-         s->write( nodeArbitraryScaleRots[i].x );
-         s->write( nodeArbitraryScaleRots[i].y );
-         s->write( nodeArbitraryScaleRots[i].z );
-         s->write( nodeArbitraryScaleRots[i].w );
+         s->write( mNodeArbitraryScaleRots[i].x );
+         s->write( mNodeArbitraryScaleRots[i].y );
+         s->write( mNodeArbitraryScaleRots[i].z );
+         s->write( mNodeArbitraryScaleRots[i].w );
       }
       for ( S32 i = seq.baseScale; i < seq.baseScale + count; i++ )
       {
-         s->write( nodeArbitraryScaleFactors[i].x );
-         s->write( nodeArbitraryScaleFactors[i].y );
-         s->write( nodeArbitraryScaleFactors[i].z );
+         s->write( mNodeArbitraryScaleFactors[i].x );
+         s->write( mNodeArbitraryScaleFactors[i].y );
+         s->write( mNodeArbitraryScaleFactors[i].z );
       }
    }
    else
@@ -381,16 +381,16 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
    s->write( seq.numGroundFrames );
    for ( S32 i = seq.firstGroundFrame; i < seq.firstGroundFrame + seq.numGroundFrames; i++ )
    {
-      s->write( groundTranslations[i].x );
-      s->write( groundTranslations[i].y );
-      s->write( groundTranslations[i].z );
+      s->write( mGroundTranslations[i].x );
+      s->write( mGroundTranslations[i].y );
+      s->write( mGroundTranslations[i].z );
    }
    for ( S32 i = seq.firstGroundFrame; i < seq.firstGroundFrame + seq.numGroundFrames; i++ )
    {
-      s->write( groundRotations[i].x );
-      s->write( groundRotations[i].y );
-      s->write( groundRotations[i].z );
-      s->write( groundRotations[i].w );
+      s->write( mGroundRotations[i].x );
+      s->write( mGroundRotations[i].y );
+      s->write( mGroundRotations[i].z );
+      s->write( mGroundRotations[i].w );
    }
 
    // write object states -- legacy..no object states
@@ -417,8 +417,8 @@ void TSShape::exportSequence(Stream * s, const TSShape::Sequence& seq, bool save
    s->write( seq.numTriggers );
    for ( S32 i = seq.firstTrigger; i < seq.firstTrigger + seq.numTriggers; i++ )
    {
-      s->write( triggers[i].state );
-      s->write( triggers[i].pos );
+      s->write( mTriggers[i].state );
+      s->write( mTriggers[i].pos );
    }
 
    smVersion = currentVersion;
@@ -460,7 +460,7 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
 
    for (i=0;i<sz;i++)
    {
-      U32 startSize = names.size();
+      U32 startSize = mNames.size();
       S32 nameIndex = readName(s,true);
       
       nodeMap[i] = findNode(nameIndex);
@@ -468,12 +468,12 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
       if (nodeMap[i] < 0)
       {
          // node found in sequence but not shape => remove the added node name
-         if (names.size() != startSize)
+         if (mNames.size() != startSize)
          {
-            names.decrement();
+            mNames.decrement();
 
-            if (names.size() != startSize)
-               Con::errorf(ConsoleLogEntry::General, "TSShape::importSequence: failed to remove unused node correctly for dsq %s.", names[nameIndex].c_str(), sequencePath.c_str());
+            if (mNames.size() != startSize)
+               Con::errorf(ConsoleLogEntry::General, "TSShape::importSequence: failed to remove unused node correctly for dsq %s.", mNames[nameIndex].c_str(), sequencePath.c_str());
          }
       }
    }
@@ -487,9 +487,9 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
    s->read(&oldShapeNumObjects);
 
    // adjust all the new keyframes
-   S32 adjNodeRots = smReadVersion<22 ? nodeRotations.size() - nodeMap.size() : nodeRotations.size();
-   S32 adjNodeTrans = smReadVersion<22 ? nodeTranslations.size() - nodeMap.size() : nodeTranslations.size();
-   S32 adjGroundStates = smReadVersion<22 ? 0 : groundTranslations.size(); // groundTrans==groundRot
+   S32 adjNodeRots = smReadVersion<22 ? mNodeRotations.size() - nodeMap.size() : mNodeRotations.size();
+   S32 adjNodeTrans = smReadVersion<22 ? mNodeTranslations.size() - nodeMap.size() : mNodeTranslations.size();
+   S32 adjGroundStates = smReadVersion<22 ? 0 : mGroundTranslations.size(); // groundTrans==groundRot
 
    // Read the node states into temporary vectors, then use the
    // nodeMap to discard unused transforms and map others to our nodes
@@ -551,21 +551,21 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
       // ground transforms can be read directly into the shape (none will be
       // discarded)
       s->read(&sz);
-      S32 oldSz = groundTranslations.size();
-      groundTranslations.setSize(sz+oldSz);
+      S32 oldSz = mGroundTranslations.size();
+      mGroundTranslations.setSize(sz+oldSz);
       for (i=oldSz;i<sz+oldSz;i++)
       {
-         s->read(&groundTranslations[i].x);
-         s->read(&groundTranslations[i].y);
-         s->read(&groundTranslations[i].z);
+         s->read(&mGroundTranslations[i].x);
+         s->read(&mGroundTranslations[i].y);
+         s->read(&mGroundTranslations[i].z);
       }
-      groundRotations.setSize(sz+oldSz);
+      mGroundRotations.setSize(sz+oldSz);
       for (i=oldSz;i<sz+oldSz;i++)
       {
-         s->read(&groundRotations[i].x);
-         s->read(&groundRotations[i].y);
-         s->read(&groundRotations[i].z);
-         s->read(&groundRotations[i].w);
+         s->read(&mGroundRotations[i].x);
+         s->read(&mGroundRotations[i].y);
+         s->read(&mGroundRotations[i].z);
+         s->read(&mGroundRotations[i].w);
       }
    }
    else
@@ -590,28 +590,28 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
 
    // read sequences
    s->read(&sz);
-   S32 startSeqNum = sequences.size();
+   S32 startSeqNum = mSequences.size();
    for (i=0;i<sz;i++)
    {
-      sequences.increment();
-      Sequence & seq = sequences.last();
+      mSequences.increment();
+      Sequence & seq = mSequences.last();
 
       // read name
       seq.nameIndex = readName(s,true);
 
       // read the rest of the sequence
       seq.read(s,false);
-      seq.baseRotation = nodeRotations.size();
-      seq.baseTranslation = nodeTranslations.size();
+      seq.baseRotation = mNodeRotations.size();
+      seq.baseTranslation = mNodeTranslations.size();
 
       if (smReadVersion > 21)
       {
          if (seq.animatesUniformScale())
-            seq.baseScale = nodeUniformScales.size();
+            seq.baseScale = mNodeUniformScales.size();
          else if (seq.animatesAlignedScale())
-            seq.baseScale = nodeAlignedScales.size();
+            seq.baseScale = mNodeAlignedScales.size();
          else if (seq.animatesArbitraryScale())
-            seq.baseScale = nodeArbitraryScaleFactors.size();
+            seq.baseScale = mNodeArbitraryScaleFactors.size();
       }
 
       // remap the node matters arrays
@@ -633,18 +633,18 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
       }
 
       // resize node transform arrays
-      nodeTranslations.increment(newTransMembership.count() * seq.numKeyframes);
-      nodeRotations.increment(newRotMembership.count() * seq.numKeyframes);
+      mNodeTranslations.increment(newTransMembership.count() * seq.numKeyframes);
+      mNodeRotations.increment(newRotMembership.count() * seq.numKeyframes);
       if (seq.flags & TSShape::ArbitraryScale)
       {
          S32 scaleCount = newScaleMembership.count() * seq.numKeyframes;
-         nodeArbitraryScaleRots.increment(scaleCount);
-         nodeArbitraryScaleFactors.increment(scaleCount);
+         mNodeArbitraryScaleRots.increment(scaleCount);
+         mNodeArbitraryScaleFactors.increment(scaleCount);
       }
       else if (seq.flags & TSShape::AlignedScale)
-         nodeAlignedScales.increment(newScaleMembership.count() * seq.numKeyframes);
+         mNodeAlignedScales.increment(newScaleMembership.count() * seq.numKeyframes);
       else
-         nodeUniformScales.increment(newScaleMembership.count() * seq.numKeyframes);
+         mNodeUniformScales.increment(newScaleMembership.count() * seq.numKeyframes);
 
       // remap node transforms from temporary arrays
       for (S32 j = 0; j < nodeMap.size(); j++)
@@ -656,13 +656,13 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
          {
             S32 src = seq.numKeyframes * seq.translationMatters.count(j);
             S32 dest = seq.baseTranslation + seq.numKeyframes * newTransMembership.count(nodeMap[j]);
-            dCopyArray(&nodeTranslations[dest], &seqTranslations[src], seq.numKeyframes);
+            dCopyArray(&mNodeTranslations[dest], &seqTranslations[src], seq.numKeyframes);
          }
          if (newRotMembership.test(nodeMap[j]))
          {
             S32 src = seq.numKeyframes * seq.rotationMatters.count(j);
             S32 dest = seq.baseRotation + seq.numKeyframes * newRotMembership.count(nodeMap[j]);
-            dCopyArray(&nodeRotations[dest], &seqRotations[src], seq.numKeyframes);
+            dCopyArray(&mNodeRotations[dest], &seqRotations[src], seq.numKeyframes);
          }
          if (newScaleMembership.test(nodeMap[j]))
          {
@@ -670,13 +670,13 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
             S32 dest = seq.baseScale + seq.numKeyframes * newScaleMembership.count(nodeMap[j]);
             if (seq.flags & TSShape::ArbitraryScale)
             {
-               dCopyArray(&nodeArbitraryScaleRots[dest], &seqArbitraryScaleRots[src], seq.numKeyframes);
-               dCopyArray(&nodeArbitraryScaleFactors[dest], &seqArbitraryScaleFactors[src], seq.numKeyframes);
+               dCopyArray(&mNodeArbitraryScaleRots[dest], &seqArbitraryScaleRots[src], seq.numKeyframes);
+               dCopyArray(&mNodeArbitraryScaleFactors[dest], &seqArbitraryScaleFactors[src], seq.numKeyframes);
             }
             else if (seq.flags & TSShape::AlignedScale)
-               dCopyArray(&nodeAlignedScales[dest], &seqAlignedScales[src], seq.numKeyframes);
+               dCopyArray(&mNodeAlignedScales[dest], &seqAlignedScales[src], seq.numKeyframes);
             else
-               dCopyArray(&nodeUniformScales[dest], &seqUniformScales[src], seq.numKeyframes);
+               dCopyArray(&mNodeUniformScales[dest], &seqUniformScales[src], seq.numKeyframes);
          }
       }
 
@@ -685,7 +685,7 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
       seq.scaleMatters = newScaleMembership;
 
       // adjust trigger numbers...we'll read triggers after sequences...
-      seq.firstTrigger += triggers.size();
+      seq.firstTrigger += mTriggers.size();
 
       // finally, adjust ground transform's nodes states
       seq.firstGroundFrame += adjGroundStates;
@@ -693,30 +693,30 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
 
    if (smReadVersion<22)
    {
-      for (i=startSeqNum; i<sequences.size(); i++)
+      for (i=startSeqNum; i<mSequences.size(); i++)
       {
          // move ground transform data to ground vectors
-         Sequence & seq = sequences[i];
-         S32 oldSz = groundTranslations.size();
-         groundTranslations.setSize(oldSz+seq.numGroundFrames);
-         groundRotations.setSize(oldSz+seq.numGroundFrames);
+         Sequence & seq = mSequences[i];
+         S32 oldSz = mGroundTranslations.size();
+         mGroundTranslations.setSize(oldSz+seq.numGroundFrames);
+         mGroundRotations.setSize(oldSz+seq.numGroundFrames);
          for (S32 j=0;j<seq.numGroundFrames;j++)
          {
-            groundTranslations[j+oldSz] = nodeTranslations[seq.firstGroundFrame+adjNodeTrans+j];
-            groundRotations[j+oldSz] = nodeRotations[seq.firstGroundFrame+adjNodeRots+j];
+            mGroundTranslations[j+oldSz] = mNodeTranslations[seq.firstGroundFrame+adjNodeTrans+j];
+            mGroundRotations[j+oldSz] = mNodeRotations[seq.firstGroundFrame+adjNodeRots+j];
          }
          seq.firstGroundFrame = oldSz;
       }
    }
 
    // add the new triggers
-   S32 oldSz = triggers.size();
+   S32 oldSz = mTriggers.size();
    s->read(&sz);
-   triggers.setSize(oldSz+sz);
+   mTriggers.setSize(oldSz+sz);
    for (S32 i=0; i<sz;i++)
    {
-      s->read(&triggers[i+oldSz].state);
-      s->read(&triggers[i+oldSz].pos);
+      s->read(&mTriggers[i+oldSz].state);
+      s->read(&mTriggers[i+oldSz].pos);
    }
 
    if (smInitOnRead)
@@ -846,7 +846,7 @@ void TSShape::writeName(Stream * s, S32 nameIndex)
 {
    const char * name = "";
    if (nameIndex>=0)
-      name = names[nameIndex];
+      name = mNames[nameIndex];
    S32 sz = (S32)dStrlen(name);
    s->write(sz);
    if (sz)
@@ -876,9 +876,9 @@ S32 TSShape::readName(Stream * s, bool addName)
 
       if (nameIndex<0 && addName)
       {
-         nameIndex = names.size();
-         names.increment();
-         names.last() = buffer;
+         nameIndex = mNames.size();
+         mNames.increment();
+         mNames.last() = buffer;
       }
    }
 
