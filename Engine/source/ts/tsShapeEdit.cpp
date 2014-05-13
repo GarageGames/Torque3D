@@ -900,11 +900,11 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
       return mesh;      // return an empty mesh
 
    // Copy mesh elements
-   mesh->indices = srcMesh->indices;
-   mesh->primitives = srcMesh->primitives;
-   mesh->numFrames = srcMesh->numFrames;
-   mesh->numMatFrames = srcMesh->numMatFrames;
-   mesh->vertsPerFrame = srcMesh->vertsPerFrame;
+   mesh->mIndices = srcMesh->mIndices;
+   mesh->mPrimitives = srcMesh->mPrimitives;
+   mesh->mNumFrames = srcMesh->mNumFrames;
+   mesh->mNumMatFrames = srcMesh->mNumMatFrames;
+   mesh->mVertsPerFrame = srcMesh->mVertsPerFrame;
    mesh->setFlags(srcMesh->getFlags());
    mesh->mHasColor = srcMesh->mHasColor;
    mesh->mHasTVert2 = srcMesh->mHasTVert2;
@@ -936,14 +936,14 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
    }
    else
    {
-      mesh->verts = srcMesh->verts;
-      mesh->tverts = srcMesh->tverts;
-      mesh->tverts2 = srcMesh->tverts2;
-      mesh->colors = srcMesh->colors;
-      mesh->norms = srcMesh->norms;
+      mesh->mVerts = srcMesh->mVerts;
+      mesh->mTVerts = srcMesh->mTVerts;
+      mesh->mTVerts2 = srcMesh->mTVerts2;
+      mesh->mColors = srcMesh->mColors;
+      mesh->mNorms = srcMesh->mNorms;
 
-      mesh->createTangents(mesh->verts, mesh->norms);
-      mesh->encodedNorms.set(NULL,0);
+      mesh->createTangents(mesh->mVerts, mesh->mNorms);
+      mesh->mEncodedNorms.set(NULL,0);
 
       mesh->convertToAlignedMeshData();
    }
@@ -1103,12 +1103,12 @@ bool TSShape::addMesh(TSShape* srcShape, const String& srcMeshName, const String
    // Copy materials used by the source mesh (only if from a different shape)
    if (srcShape != this)
    {
-      for (S32 i = 0; i < mesh->primitives.size(); i++)
+      for (S32 i = 0; i < mesh->mPrimitives.size(); i++)
       {
-         if (!(mesh->primitives[i].matIndex & TSDrawPrimitive::NoMaterial))
+         if (!(mesh->mPrimitives[i].matIndex & TSDrawPrimitive::NoMaterial))
          {
-            S32 drawType = (mesh->primitives[i].matIndex & (~TSDrawPrimitive::MaterialMask));
-            S32 srcMatIndex = mesh->primitives[i].matIndex & TSDrawPrimitive::MaterialMask;
+            S32 drawType = (mesh->mPrimitives[i].matIndex & (~TSDrawPrimitive::MaterialMask));
+            S32 srcMatIndex = mesh->mPrimitives[i].matIndex & TSDrawPrimitive::MaterialMask;
             const String& matName = srcShape->materialList->getMaterialName(srcMatIndex);
 
             // Add the material if it does not already exist
@@ -1119,7 +1119,7 @@ bool TSShape::addMesh(TSShape* srcShape, const String& srcMeshName, const String
                materialList->push_back(matName, srcShape->materialList->getFlags(srcMatIndex));
             }
 
-            mesh->primitives[i].matIndex = drawType | destMatIndex;
+            mesh->mPrimitives[i].matIndex = drawType | destMatIndex;
          }
       }
    }

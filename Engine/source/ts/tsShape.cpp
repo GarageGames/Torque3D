@@ -569,8 +569,8 @@ void TSShape::initVertexFeatures()
          }
          else
          {
-            hasColors |= !mesh->colors.empty();
-            hasTexcoord2 |= !mesh->tverts2.empty();
+            hasColors |= !mesh->mColors.empty();
+            hasTexcoord2 |= !mesh->mTVerts2.empty();
          }
       }
    }
@@ -676,11 +676,11 @@ void TSShape::initMaterialList()
 
             mHasSkinMesh |= mesh->getMeshType() == TSMesh::SkinMeshType;
 
-            for (k=0; k<mesh->primitives.size(); k++)
+            for (k=0; k<mesh->mPrimitives.size(); k++)
             {
-               if (mesh->primitives[k].matIndex & TSDrawPrimitive::NoMaterial)
+               if (mesh->mPrimitives[k].matIndex & TSDrawPrimitive::NoMaterial)
                   continue;
-               S32 flags = materialList->getFlags(mesh->primitives[k].matIndex & TSDrawPrimitive::MaterialMask);
+               S32 flags = materialList->getFlags(mesh->mPrimitives[k].matIndex & TSDrawPrimitive::MaterialMask);
                if (flags & TSMaterialList::AuxiliaryMap)
                   continue;
                if (flags & TSMaterialList::Translucent)
@@ -690,7 +690,7 @@ void TSShape::initMaterialList()
                   break;
                }
             }
-            if (k!=mesh->primitives.size())
+            if (k!=mesh->mPrimitives.size())
                break;
          }
          if (j!=obj.numMeshes)
@@ -1175,15 +1175,15 @@ void TSShape::assembleShape()
       // fill in location of verts, tverts, and normals for detail levels
       if (mesh && meshType!=TSMesh::DecalMeshType)
       {
-         TSMesh::smVertsList[i]  = mesh->verts.address();
-         TSMesh::smTVertsList[i] = mesh->tverts.address();
+         TSMesh::smVertsList[i]  = mesh->mVerts.address();
+         TSMesh::smTVertsList[i] = mesh->mTVerts.address();
          if (smReadVersion >= 26)
          {
-            TSMesh::smTVerts2List[i] = mesh->tverts2.address();
-            TSMesh::smColorsList[i] = mesh->colors.address();
+            TSMesh::smTVerts2List[i] = mesh->mTVerts2.address();
+            TSMesh::smColorsList[i] = mesh->mColors.address();
          }
-         TSMesh::smNormsList[i]  = mesh->norms.address();
-         TSMesh::smEncodedNormsList[i] = mesh->encodedNorms.address();
+         TSMesh::smNormsList[i]  = mesh->mNorms.address();
+         TSMesh::smEncodedNormsList[i] = mesh->mEncodedNorms.address();
          TSMesh::smDataCopied[i] = !skip; // as long as we didn't skip this mesh, the data should be in shape now
          if (meshType==TSMesh::SkinMeshType)
          {
@@ -1271,9 +1271,9 @@ void TSShape::assembleShape()
          if (skin)
          {
             TSMesh::smVertsList[i]  = skin->batchData.initialVerts.address();
-            TSMesh::smTVertsList[i] = skin->tverts.address();
+            TSMesh::smTVertsList[i] = skin->mTVerts.address();
             TSMesh::smNormsList[i]  = skin->batchData.initialNorms.address();
-            TSMesh::smEncodedNormsList[i]  = skin->encodedNorms.address();
+            TSMesh::smEncodedNormsList[i]  = skin->mEncodedNorms.address();
             TSMesh::smDataCopied[i] = !skip; // as long as we didn't skip this mesh, the data should be in shape now
             TSSkinMesh::smInitTransformList[i] = skin->batchData.initialTransforms.address();
             TSSkinMesh::smVertexIndexList[i] = skin->vertexIndex.address();
@@ -1448,15 +1448,15 @@ bool TSShape::canWriteOldFormat() const
          continue;
 
       // Cannot use old format if using the new functionality (COLORs, 2nd UV set)
-      if (meshes[i]->tverts2.size() || meshes[i]->colors.size())
+      if (meshes[i]->mTVerts2.size() || meshes[i]->mColors.size())
          return false;
 
       // Cannot use old format if any primitive has too many triangles
       // (ie. cannot fit in a S16)
-      for (S32 j = 0; j < meshes[i]->primitives.size(); j++)
+      for (S32 j = 0; j < meshes[i]->mPrimitives.size(); j++)
       {
-         if ((meshes[i]->primitives[j].start +
-               meshes[i]->primitives[j].numElements) >= (1 << 15))
+         if ((meshes[i]->mPrimitives[j].start +
+               meshes[i]->mPrimitives[j].numElements) >= (1 << 15))
          {
             return false;
          }
