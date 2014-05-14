@@ -1578,44 +1578,44 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
 
       if (mDataBlock->reverseOrder)
       {
-        buffPtr += 4*(n_parts-1);
-        // do sorted-oriented particles
-        if (mDataBlock->sortParticles)
-        {
-          SortParticle* partPtr = orderedVector.address();
-          for (U32 i = 0; i < n_parts - 1; i++, partPtr++, buffPtr-=4 )
-             setupRibbon(partPtr->p, partPtr++->p, partPtr--->p,camPos, ambientColor, buffPtr);
-        }
-        // do unsorted-oriented particles
-        else
-        {
-		   Particle* oldPtr = NULL;
-		   for (Particle* partPtr = part_list_head.next; partPtr != NULL; partPtr = partPtr->next, buffPtr-=4) {
-             setupRibbon(partPtr, partPtr->next, oldPtr, camPos, ambientColor, buffPtr);
-			 oldPtr = partPtr;
-		   }
-        }
+         buffPtr += 4 * (n_parts - 1);
+         // do sorted-oriented particles
+         if (mDataBlock->sortParticles)
+         {
+            SortParticle* partPtr = orderedVector.address();
+            for (U32 i = 0; i < n_parts - 1; i++, partPtr++, buffPtr -= 4)
+               setupRibbon(partPtr->p, partPtr++->p, partPtr--->p, camPos, ambientColor, buffPtr);
+         }
+         // do unsorted-oriented particles
+         else
+         {
+            Particle* oldPtr = NULL;
+            for (Particle* partPtr = part_list_head.next; partPtr != NULL; partPtr = partPtr->next, buffPtr -= 4) {
+               setupRibbon(partPtr, partPtr->next, oldPtr, camPos, ambientColor, buffPtr);
+               oldPtr = partPtr;
+            }
+         }
       }
       else
       {
-        // do sorted-oriented particles
-        if (mDataBlock->sortParticles)
-        {
-          SortParticle* partPtr = orderedVector.address();
-         for (U32 i = 0; i < n_parts - 1; i++, partPtr++, buffPtr+=4 )
-            setupRibbon(partPtr->p,  partPtr++->p, partPtr--->p, camPos, ambientColor, buffPtr);
-        }
-        // do unsorted-oriented particles
-        else
-        {
-			Particle* oldPtr = NULL;
-			for (Particle* partPtr = part_list_head.next; partPtr != NULL; partPtr = partPtr->next, buffPtr+=4) {
-             setupRibbon(partPtr, partPtr->next, oldPtr, camPos, ambientColor, buffPtr);
-			 oldPtr = partPtr;
-			}
-        }
+         // do sorted-oriented particles
+         if (mDataBlock->sortParticles)
+         {
+            SortParticle* partPtr = orderedVector.address();
+            for (U32 i = 0; i < n_parts - 1; i++, partPtr++, buffPtr += 4)
+               setupRibbon(partPtr->p, partPtr++->p, partPtr--->p, camPos, ambientColor, buffPtr);
+         }
+         // do unsorted-oriented particles
+         else
+         {
+            Particle* oldPtr = NULL;
+            for (Particle* partPtr = part_list_head.next; partPtr != NULL; partPtr = partPtr->next, buffPtr += 4) {
+               setupRibbon(partPtr, partPtr->next, oldPtr, camPos, ambientColor, buffPtr);
+               oldPtr = partPtr;
+            }
+         }
       }
-	  PROFILE_END();
+      PROFILE_END();
    }
    else if (mDataBlock->orientParticles)
    {
@@ -2062,12 +2062,12 @@ void ParticleEmitter::setupAligned( const Particle *part,
 //-----------------------------------------------------------------------------
 // Set up Ribbon particle
 //-----------------------------------------------------------------------------
-void ParticleEmitter::setupRibbon( Particle *part,
-									 Particle *next,
-									 Particle *prev,
-                                     const Point3F &camPos,
-                                     const ColorF &ambientColor,
-                                     ParticleVertexType *lVerts)
+void ParticleEmitter::setupRibbon(Particle *part,
+   Particle *next,
+   Particle *prev,
+   const Point3F &camPos,
+   const ColorF &ambientColor,
+   ParticleVertexType *lVerts)
 {
    Point3F dir, dirFromCam;
    Point3F crossDir, crossDirNext;
@@ -2077,92 +2077,92 @@ void ParticleEmitter::setupRibbon( Particle *part,
    static int position;
    static F32 alphaMod, alphaModEnd;
 
-   const F32 ambientLerp = mClampF( mDataBlock->ambientFactor, 0.0f, 1.0f );
-   ColorF partCol = mLerp( part->color, ( part->color * ambientColor ), ambientLerp );
+   const F32 ambientLerp = mClampF(mDataBlock->ambientFactor, 0.0f, 1.0f);
+   ColorF partCol = mLerp(part->color, (part->color * ambientColor), ambientLerp);
    if (part->currentAge > part->totalLifetime)
    {
-	   F32 alphaDeath = (part->currentAge - part->totalLifetime) / 200.0f;
-	   if (alphaDeath > 1.0f)
-		   alphaDeath = 1.0f;
-	   alphaDeath = 1.0f - alphaDeath;
-	   partCol.alpha *= alphaDeath;
+      F32 alphaDeath = (part->currentAge - part->totalLifetime) / 200.0f;
+      if (alphaDeath > 1.0f)
+         alphaDeath = 1.0f;
+      alphaDeath = 1.0f - alphaDeath;
+      partCol.alpha *= alphaDeath;
    }
 
    start = part->pos;
    position++;
 
-   if ( next == NULL && prev == NULL) {
-	   // a ribbon of just one particle
+   if (next == NULL && prev == NULL) {
+      // a ribbon of just one particle
       position = 0;
 
-	  if( part->vel.magnitudeSafe() == 0.0 )
+      if (part->vel.magnitudeSafe() == 0.0)
          dir = part->orientDir;
       else
-   	     dir = part->vel;
+         dir = part->vel;
 
-	  dir.normalize();
-	  dirFromCam = part->pos - camPos;
-	  mCross( dirFromCam, dir, &crossDir );
-	  crossDir.normalize();
- 	  crossDir = crossDir * part->size * 0.5;
-	  crossDirPrev = crossDir;
+      dir.normalize();
+      dirFromCam = part->pos - camPos;
+      mCross(dirFromCam, dir, &crossDir);
+      crossDir.normalize();
+      crossDir = crossDir * part->size * 0.5;
+      crossDirPrev = crossDir;
 
-	  partCol.alpha = 0.0f;
-	  prevCol = partCol;
+      partCol.alpha = 0.0f;
+      prevCol = partCol;
    }
    else if (next == NULL && prev != NULL)
    {
       // last link in the chain, also the oldest
-	  dir = part->pos - prev->pos;
-	  dir.normalize();
-	  dirFromCam = part->pos - camPos;
-	  mCross( dirFromCam, dir, &crossDir );
-	  crossDir.normalize();
- 	  crossDir = crossDir * part->size * 0.5;
+      dir = part->pos - prev->pos;
+      dir.normalize();
+      dirFromCam = part->pos - camPos;
+      mCross(dirFromCam, dir, &crossDir);
+      crossDir.normalize();
+      crossDir = crossDir * part->size * 0.5;
 
-	  end = prev->pos;
-	  partCol.alpha = 0.0f;
-      prevCol = mLerp( prev->color, ( prev->color * ambientColor ), ambientLerp );
+      end = prev->pos;
+      partCol.alpha = 0.0f;
+      prevCol = mLerp(prev->color, (prev->color * ambientColor), ambientLerp);
       prevCol.alpha *= alphaModEnd;
-   } 
+   }
    else if (next != NULL && prev == NULL)
    {
       // first link in chain, newest particle
-	  // since we draw from current to previous, this one isn't drawn
-	  position = 0;
+      // since we draw from current to previous, this one isn't drawn
+      position = 0;
 
-	  dir = next->pos - part->pos;
-	  dir.normalize();
+      dir = next->pos - part->pos;
+      dir.normalize();
 
-	  dirFromCam = part->pos - camPos;
-	  mCross( dirFromCam, dir, &crossDir );
-	  crossDir.normalize();
-	  crossDir = crossDir * part->size * 0.5f;
+      dirFromCam = part->pos - camPos;
+      mCross(dirFromCam, dir, &crossDir);
+      crossDir.normalize();
+      crossDir = crossDir * part->size * 0.5f;
       crossDirPrev = crossDir;
 
-	  partCol.alpha = 0.0f;
+      partCol.alpha = 0.0f;
       prevCol = partCol;
-	  alphaModEnd = 0.0f;
+      alphaModEnd = 0.0f;
 
-	  end = part->pos;
-   } 
+      end = part->pos;
+   }
    else
    {
       // middle of chain
-	  dir = next->pos - prev->pos;
-	  dir.normalize();
-	  dirFromCam = part->pos - camPos;
-	  mCross( dirFromCam, dir, &crossDir );
-	  crossDir.normalize();
+      dir = next->pos - prev->pos;
+      dir.normalize();
+      dirFromCam = part->pos - camPos;
+      mCross(dirFromCam, dir, &crossDir);
+      crossDir.normalize();
 
- 	  crossDir = crossDir * part->size * 0.5;
+      crossDir = crossDir * part->size * 0.5;
 
-      prevCol = mLerp( prev->color, ( prev->color * ambientColor ), ambientLerp );
+      prevCol = mLerp(prev->color, (prev->color * ambientColor), ambientLerp);
 
-	  if (position == 1)
-	  {
-	     // the second particle has a few tweaks for alpha, to smoothly match the first particle
-	     // we only want to do this once when the particle first fades in, and avoid a strobing effect
+      if (position == 1)
+      {
+         // the second particle has a few tweaks for alpha, to smoothly match the first particle
+         // we only want to do this once when the particle first fades in, and avoid a strobing effect
          alphaMod = (float(part->currentAge) / float(part->currentAge - prev->currentAge)) - 1.0f;
          if (alphaMod > 1.0f)
             alphaMod = 1.0f;
@@ -2171,61 +2171,61 @@ void ParticleEmitter::setupRibbon( Particle *part,
          if (next->next == NULL)
             alphaModEnd = alphaMod;
          //Con::printf("alphaMod: %f", alphaMod );
-	  }
-	  else if (position == 2 )
-	  {
+      }
+      else if (position == 2)
+      {
          prevCol.alpha *= alphaMod;
-		 alphaMod = 0.0f;
-	  }
+         alphaMod = 0.0f;
+      }
 
-	  if ( next->next == NULL && position > 1)
-	  {
+      if (next->next == NULL && position > 1)
+      {
          // next to last particle, start the fade out
-		 alphaModEnd =  ( float(next->totalLifetime - next->currentAge)) / (float(part->totalLifetime - part->currentAge));
-		 alphaModEnd *= 2.0f;
+         alphaModEnd = (float(next->totalLifetime - next->currentAge)) / (float(part->totalLifetime - part->currentAge));
+         alphaModEnd *= 2.0f;
          if (alphaModEnd > 1.0f)
             alphaModEnd = 1.0f;
          partCol.alpha *= alphaModEnd;
-		 //Con::printf("alphaMod: %f  Lifetime: %d  Age: %d", alphaMod, part->totalLifetime, part->currentAge );
-	  }
-	  end = prev->pos;
+         //Con::printf("alphaMod: %f  Lifetime: %d  Age: %d", alphaMod, part->totalLifetime, part->currentAge );
+      }
+      end = prev->pos;
    }
 
    // Here we deal with UVs for animated particle (oriented)
    if (part->dataBlock->animateTexture)
-   { 
+   {
       // Let particle compute the UV indices for current frame
-      S32 fm = (S32)(part->currentAge*(1.0f/1000.0f)*part->dataBlock->framesPerSec);
+      S32 fm = (S32)(part->currentAge*(1.0f / 1000.0f)*part->dataBlock->framesPerSec);
       U8 fm_tile = part->dataBlock->animTexFrames[fm % part->dataBlock->numFrames];
       S32 uv[4];
-      uv[0] = fm_tile + fm_tile/part->dataBlock->animTexTiling.x;
+      uv[0] = fm_tile + fm_tile / part->dataBlock->animTexTiling.x;
       uv[1] = uv[0] + (part->dataBlock->animTexTiling.x + 1);
       uv[2] = uv[1] + 1;
       uv[3] = uv[0] + 1;
 
-     lVerts->point = start + crossDir;
-     lVerts->color = partCol;
-     // Here and below, we copy UVs from particle datablock's current frame's UVs (oriented)
-     lVerts->texCoord = part->dataBlock->animTexUVs[uv[0]];
-     ++lVerts;
+      lVerts->point = start + crossDir;
+      lVerts->color = partCol;
+      // Here and below, we copy UVs from particle datablock's current frame's UVs (oriented)
+      lVerts->texCoord = part->dataBlock->animTexUVs[uv[0]];
+      ++lVerts;
 
-     lVerts->point = start - crossDir;
-     lVerts->color = partCol;
-     lVerts->texCoord = part->dataBlock->animTexUVs[uv[1]];
-     ++lVerts;
+      lVerts->point = start - crossDir;
+      lVerts->color = partCol;
+      lVerts->texCoord = part->dataBlock->animTexUVs[uv[1]];
+      ++lVerts;
 
-     lVerts->point = end - crossDirPrev;
-     lVerts->color = prevCol;
-     lVerts->texCoord = part->dataBlock->animTexUVs[uv[2]];
-     ++lVerts;
+      lVerts->point = end - crossDirPrev;
+      lVerts->color = prevCol;
+      lVerts->texCoord = part->dataBlock->animTexUVs[uv[2]];
+      ++lVerts;
 
-     lVerts->point = end + crossDirPrev;
-     lVerts->color = prevCol;
-     lVerts->texCoord = part->dataBlock->animTexUVs[uv[3]];
-     ++lVerts;
+      lVerts->point = end + crossDirPrev;
+      lVerts->color = prevCol;
+      lVerts->texCoord = part->dataBlock->animTexUVs[uv[3]];
+      ++lVerts;
 
-     crossDirPrev = crossDir;
-     return;
+      crossDirPrev = crossDir;
+      return;
    }
 
    lVerts->point = start + crossDir;
