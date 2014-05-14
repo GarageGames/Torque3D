@@ -28,7 +28,7 @@
 #include "T3D/gameBase/moveManager.h"
 #include "console/engineAPI.h"
 
-static U32 AIPLAYER_LOSMASK = TerrainObjectType | WaterObjectType | 
+static U32 sAIPlayerLoSMask = TerrainObjectType | WaterObjectType |
                               ShapeBaseObjectType | StaticShapeObjectType | 
                               PlayerObjectType | ItemObjectType;
 
@@ -628,7 +628,7 @@ bool AIPlayer::checkInLos(GameBase* target, bool _checkEnabled = false)
    }
    Point3F muzzlePoint;
    getMuzzlePointAI(0, &muzzlePoint);
-   bool hit = gServerContainer.castRay(muzzlePoint, target->getBoxCenter(), AIPLAYER_LOSMASK, &ri);
+   bool hit = gServerContainer.castRay(muzzlePoint, target->getBoxCenter(), sAIPlayerLoSMask, &ri);
    enableCollision();
 
    for (S32 i = 0; i < mountCount; i++)
@@ -654,7 +654,7 @@ bool AIPlayer::checkLosClear(Point3F _pos)
 
    Point3F muzzlePoint;
    getMuzzlePointAI(0, &muzzlePoint);
-   gServerContainer.castRay(muzzlePoint, _pos, AIPLAYER_LOSMASK, &ri);
+   gServerContainer.castRay(muzzlePoint, _pos, sAIPlayerLoSMask, &ri);
    bool emptySpace = bool(ri.object == NULL);
    enableCollision();
    return emptySpace;
