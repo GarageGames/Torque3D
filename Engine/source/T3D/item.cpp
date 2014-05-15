@@ -1241,9 +1241,10 @@ DefineEngineMethod( Item, getLastStickyPos, const char*, (),,
    "@note Server side only.\n"
    )
 {
-   char* ret = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* ret = Con::getReturnBuffer(bufSize);
    if (object->isServerObject())
-      dSprintf(ret, 255, "%g %g %g",
+      dSprintf(ret, bufSize, "%g %g %g",
                object->mStickyCollisionPos.x,
                object->mStickyCollisionPos.y,
                object->mStickyCollisionPos.z);
@@ -1263,9 +1264,10 @@ DefineEngineMethod( Item, getLastStickyNormal, const char *, (),,
    "@note Server side only.\n"
    )
 {
-   char* ret = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* ret = Con::getReturnBuffer(bufSize);
    if (object->isServerObject())
-      dSprintf(ret, 255, "%g %g %g",
+      dSprintf(ret, bufSize, "%g %g %g",
                object->mStickyCollisionNormal.x,
                object->mStickyCollisionNormal.y,
                object->mStickyCollisionNormal.z);

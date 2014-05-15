@@ -123,8 +123,9 @@ ImplementConsoleTypeCasters( TypePoint2I, Point2I )
 ConsoleGetType( TypePoint2I )
 {
    Point2I *pt = (Point2I *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d", pt->x, pt->y);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d", pt->x, pt->y);
    return returnBuffer;
 }
 
@@ -147,8 +148,9 @@ ImplementConsoleTypeCasters( TypePoint2F, Point2F )
 ConsoleGetType( TypePoint2F )
 {
    Point2F *pt = (Point2F *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g", pt->x, pt->y);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g", pt->x, pt->y);
    return returnBuffer;
 }
 
@@ -171,8 +173,9 @@ ImplementConsoleTypeCasters(TypePoint3I, Point3I)
 ConsoleGetType( TypePoint3I )
 {
    Point3I *pt = (Point3I *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d %d", pt->x, pt->y, pt->z);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %d", pt->x, pt->y, pt->z);
    return returnBuffer;
 }
 
@@ -195,8 +198,9 @@ ImplementConsoleTypeCasters(TypePoint3F, Point3F)
 ConsoleGetType( TypePoint3F )
 {
    Point3F *pt = (Point3F *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g", pt->x, pt->y, pt->z);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g %g", pt->x, pt->y, pt->z);
    return returnBuffer;
 }
 
@@ -219,8 +223,9 @@ ImplementConsoleTypeCasters( TypePoint4F, Point4F )
 ConsoleGetType( TypePoint4F )
 {
    Point4F *pt = (Point4F *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g %g", pt->x, pt->y, pt->z, pt->w);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g %g %g", pt->x, pt->y, pt->z, pt->w);
    return returnBuffer;
 }
 
@@ -243,8 +248,9 @@ ImplementConsoleTypeCasters( TypeRectI, RectI )
 ConsoleGetType( TypeRectI )
 {
    RectI *rect = (RectI *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d %d %d", rect->point.x, rect->point.y,
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %d %d", rect->point.x, rect->point.y,
             rect->extent.x, rect->extent.y);
    return returnBuffer;
 }
@@ -269,8 +275,9 @@ ImplementConsoleTypeCasters( TypeRectF, RectF )
 ConsoleGetType( TypeRectF )
 {
    RectF *rect = (RectF *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g %g", rect->point.x, rect->point.y,
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g %g %g", rect->point.x, rect->point.y,
             rect->extent.x, rect->extent.y);
    return returnBuffer;
 }
@@ -303,8 +310,9 @@ ConsoleGetType( TypeMatrixF )
    mat->getColumn(0, &col0);
    mat->getColumn(1, &col1);
    mat->getColumn(2, &col2);
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g %g %g %g %g %g %g",
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer,bufSize,"%g %g %g %g %g %g %g %g %g",
             col0.x, col0.y, col0.z, col1.x, col1.y, col1.z, col2.x, col2.y, col2.z);
    return returnBuffer;
 }
@@ -336,11 +344,12 @@ ConsoleType( MatrixPosition, TypeMatrixPosition, MatrixF )
 ConsoleGetType( TypeMatrixPosition )
 {
    F32 *col = (F32 *) dptr + 3;
-   char* returnBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
    if(col[12] == 1.f)
-      dSprintf(returnBuffer, 256, "%g %g %g", col[0], col[4], col[8]);
+      dSprintf(returnBuffer, bufSize, "%g %g %g", col[0], col[4], col[8]);
    else
-      dSprintf(returnBuffer, 256, "%g %g %g %g", col[0], col[4], col[8], col[12]);
+      dSprintf(returnBuffer, bufSize, "%g %g %g %g", col[0], col[4], col[8], col[12]);
    return returnBuffer;
 }
 
@@ -371,8 +380,9 @@ ConsoleGetType( TypeMatrixRotation )
 {
    AngAxisF aa(*(MatrixF *) dptr);
    aa.axis.normalize();
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g %g",aa.axis.x,aa.axis.y,aa.axis.z,mRadToDeg(aa.angle));
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer,bufSize,"%g %g %g %g",aa.axis.x,aa.axis.y,aa.axis.z,mRadToDeg(aa.angle));
    return returnBuffer;
 }
 
@@ -415,8 +425,9 @@ ImplementConsoleTypeCasters( TypeAngAxisF, AngAxisF )
 ConsoleGetType( TypeAngAxisF )
 {
    AngAxisF* aa = ( AngAxisF* ) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g %g",aa->axis.x,aa->axis.y,aa->axis.z,mRadToDeg(aa->angle));
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer,bufSize,"%g %g %g %g",aa->axis.x,aa->axis.y,aa->axis.z,mRadToDeg(aa->angle));
    return returnBuffer;
 }
 
@@ -453,8 +464,9 @@ ImplementConsoleTypeCasters( TypeTransformF, TransformF )
 ConsoleGetType( TypeTransformF )
 {
    TransformF* aa = ( TransformF* ) dptr;
-   char* returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%g %g %g %g %g %g %g",
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%g %g %g %g %g %g %g",
              aa->mPosition.x, aa->mPosition.y, aa->mPosition.z,
              aa->mOrientation.axis.x, aa->mOrientation.axis.y, aa->mOrientation.axis.z, aa->mOrientation.angle );
    return returnBuffer;
@@ -497,8 +509,9 @@ ConsoleGetType( TypeBox3F )
 {
    const Box3F* pBox = (const Box3F*)dptr;
 
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g %g %g %g",
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g %g %g %g %g",
             pBox->minExtents.x, pBox->minExtents.y, pBox->minExtents.z,
             pBox->maxExtents.x, pBox->maxExtents.y, pBox->maxExtents.z);
 
@@ -533,8 +546,9 @@ ConsoleGetType( TypeEaseF )
 {
    const EaseF* pEase = (const EaseF*)dptr;
 
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d %g %g",
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %g %g",
             pEase->dir, pEase->type, pEase->param[0], pEase->param[1]);
 
    return returnBuffer;

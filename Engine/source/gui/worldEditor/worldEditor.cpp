@@ -2882,8 +2882,9 @@ const Point3F& WorldEditor::getSelectionCentroid()
 const char* WorldEditor::getSelectionCentroidText()
 {
    const Point3F & centroid = getSelectionCentroid();
-   char * ret = Con::getReturnBuffer(100);
-   dSprintf(ret, 100, "%g %g %g", centroid.x, centroid.y, centroid.z);
+   static const U32 bufSize = 100;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%g %g %g", centroid.x, centroid.y, centroid.z);
    return ret;	
 }
 
@@ -3263,8 +3264,9 @@ ConsoleMethod( WorldEditor, getSelectionCentroid, const char *, 2, 2, "")
 ConsoleMethod( WorldEditor, getSelectionExtent, const char *, 2, 2, "")
 {
    Point3F bounds = object->getSelectionExtent();
-   char * ret = Con::getReturnBuffer(100);
-   dSprintf(ret, 100, "%g %g %g", bounds.x, bounds.y, bounds.z);
+   static const U32 bufSize = 100;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%g %g %g", bounds.x, bounds.y, bounds.z);
    return ret;	
 }
 

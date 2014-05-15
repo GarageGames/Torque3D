@@ -695,8 +695,9 @@ DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd )
 	"@return String containing non-relative directory of path\n"
 	"@ingroup FileSystem")
 {
-   char *buf = Con::getReturnBuffer(512);
-   Platform::makeFullPathName(path, buf, 512, dStrlen(cwd) > 1 ? cwd : NULL);
+   static const U32 bufSize = 512;
+   char *buf = Con::getReturnBuffer(buf);
+   Platform::makeFullPathName(path, buf, bufSize, dStrlen(cwd) > 1 ? cwd : NULL);
    return buf;
 }
 
@@ -721,8 +722,9 @@ DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
 	"@return String containing concatenated file name and path\n"
 	"@ingroup FileSystem")
 {
-   char *buf = Con::getReturnBuffer(1024);
-   Platform::makeFullPathName(file, buf, 1024, path);
+   static const U32 bufSize = 1024;
+   char *buf = Con::getReturnBuffer(buf);
+   Platform::makeFullPathName(file, buf, bufSize, path);
    return buf;
 }
 

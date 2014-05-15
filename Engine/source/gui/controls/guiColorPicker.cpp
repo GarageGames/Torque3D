@@ -528,10 +528,11 @@ void GuiColorPickerCtrl::setScriptValue(const char *value)
 
 ConsoleMethod(GuiColorPickerCtrl, getSelectorPos, const char*, 2, 2, "Gets the current position of the selector")
 {
-   char *temp = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char *temp = Con::getReturnBuffer(bufSize);
    Point2I pos;
    pos = object->getSelectorPos();
-   dSprintf(temp,256,"%d %d",pos.x, pos.y); 
+   dSprintf(temp,bufSize,"%d %d",pos.x, pos.y); 
    return temp;
 }
 

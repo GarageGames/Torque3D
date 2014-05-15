@@ -113,8 +113,9 @@ const char * StreamObject::readLine()
    if(mStream == NULL)
       return NULL;
 
-   char *buffer = Con::getReturnBuffer(256);
-   mStream->readLine((U8 *)buffer, 256);
+   static const U32 bufSize = 256;
+   char *buffer = Con::getReturnBuffer(bufSize);
+   mStream->readLine((U8 *)buffer, bufSize);
    return buffer;
 }
 

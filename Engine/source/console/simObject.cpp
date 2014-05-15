@@ -2680,11 +2680,12 @@ DefineConsoleMethod( SimObject, getDynamicField, const char*, ( S32 index ),,
       ++itr;
    }
 
-   char* buffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* buffer = Con::getReturnBuffer(bufSize);
    if (*itr)
    {
       SimFieldDictionary::Entry* entry = *itr;
-      dSprintf(buffer, 256, "%s\t%s", entry->slotName, entry->value);
+      dSprintf(buffer, bufSize, "%s\t%s", entry->slotName, entry->value);
       return buffer;
    }
 

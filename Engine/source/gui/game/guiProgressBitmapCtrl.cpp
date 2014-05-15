@@ -158,8 +158,9 @@ void GuiProgressBitmapCtrl::setBitmap( const char* name )
 
 const char* GuiProgressBitmapCtrl::getScriptValue()
 {
-   char * ret = Con::getReturnBuffer(64);
-   dSprintf(ret, 64, "%g", mProgress);
+   static const U32 bufSize = 64;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%g", mProgress);
    return ret;
 }
 

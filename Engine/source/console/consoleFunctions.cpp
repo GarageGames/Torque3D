@@ -75,7 +75,8 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
    "@ingroup Strings\n"
    "@see http://en.wikipedia.org/wiki/Printf" )
 {
-   char* pBuffer = Con::getReturnBuffer(64);
+   static const U32 bufSize = 64;
+   char* pBuffer = Con::getReturnBuffer(bufSize);
    const char *pch = format;
 
    pBuffer[0] = '\0';
@@ -99,7 +100,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       case 'u':
       case 'x':
       case 'X':
-         dSprintf( pBuffer, 64, format, dAtoi( value ) );
+         dSprintf( pBuffer, bufSize, format, dAtoi( value ) );
          break;
 
       case 'e':
@@ -107,7 +108,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       case 'f':
       case 'g':
       case 'G':
-         dSprintf( pBuffer, 64, format, dAtof( value ) );
+         dSprintf( pBuffer, bufSize, format, dAtof( value ) );
          break;
 
       default:

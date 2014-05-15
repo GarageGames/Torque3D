@@ -343,8 +343,9 @@ DefineEngineMethod( FileObject, peekLine, const char*, (),,
 
    "@return String containing the line of data that was just peeked\n")
 {
-	char *line = Con::getReturnBuffer( 512 );
-	object->peekLine( (U8*)line, 512 );
+	static const U32 bufSize = 512;
+	char *line = Con::getReturnBuffer( bufSize );
+	object->peekLine( (U8*)line, bufSize );
 	return line;
 }
 
