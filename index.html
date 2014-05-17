@@ -70,7 +70,7 @@ root: .
                 </tr>
                 <tr>
                     <td>Release</td>
-                    <td><img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td>
+                    <td><img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt78)/statusIcon"></img></td>
                 </tr>
             </table>
         </div>
@@ -160,6 +160,8 @@ $(document).ready(function() {
       var ids = shuffle(Object.keys(images));
       for(var i = 0; i < ids.length; i++) {
         $(this).append($('<img>')
+          .attr('width', '760px')
+          .attr('height', '144px')
           .attr('src', '{{page.root}}/img/banner'+ids[i]+'.jpg')
           .attr('title', images[ids[i]]));
       }
@@ -172,9 +174,11 @@ $(document).ready(function() {
 
   var numResults = 2;
   var feed = 'https://github.com/GarageGames/Torque3D/commits/development.atom';
+  var now = new Date();
   var googleAPI = document.location.protocol +
     '//ajax.googleapis.com/ajax/services/feed/load?' +
     'v=1.0' +
+    '&dailycache=' + [now.getUTCDate(), now.getUTCMonth(), now.getUTCFullYear()].join('-') +
     '&num=' + numResults +
     '&callback=?&q=';
   var url = googleAPI + encodeURIComponent(feed);
