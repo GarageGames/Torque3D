@@ -2,6 +2,7 @@
 
 addRequiredDefinition( "TORQUE_NAVIGATION_ENABLED" )
 addRequiredLibrary( "libraries/library_recast.cmake" )
+addRequiredLink( "recast" )
 
 # files
 addPathRec( "${srcDir}/navigation" )
