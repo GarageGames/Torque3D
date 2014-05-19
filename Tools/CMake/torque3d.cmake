@@ -21,6 +21,8 @@ option(TORQUE_HIFI "HIFI? support" OFF)
 mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
+option(TORQUE_NAVIGATION "Enable Navigation module" OFF)
+#mark_as_advanced(TORQUE_NAVIGATION)
 
 ###############################################################################
 # options
@@ -222,6 +224,10 @@ if(TORQUE_EXTENDED_MOVE)
     addPath("${srcDir}/T3D/gameBase/extended")
 else()
     addPath("${srcDir}/T3D/gameBase/std")
+endif()
+
+if(TORQUE_NAVIGATION)
+   include( "modules/module_navigation.cmake" )
 endif()
 
 ###############################################################################
