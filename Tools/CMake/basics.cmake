@@ -61,6 +61,32 @@ macro(addDebugDef def)
     set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS_DEBUG "${def}")
 endmacro()
 
+# adds a required definition. Are processed on addExecutable or addStaticLib
+macro(addRequiredDefinition def)
+    #message(STATUS "${PROJECT_NAME} : add def : ${def}")
+    LIST( APPEND ${PROJECT_NAME}_required_definition ${def} )    
+endmacro()
+# adds a required debug definition. Are processed on addExecutable or addStaticLib
+macro(addRequiredDebugDefinition def)
+    #message(STATUS "${PROJECT_NAME} : add def : ${def}")
+    LIST( APPEND ${PROJECT_NAME}_required_debug_definition ${def} )    
+endmacro()
+
+# add definitions to project
+macro( _processProjectDefinition )
+   foreach( def ${${PROJECT_NAME}_required_definition} )
+       addDef( ${def} )
+   endforeach()   
+   
+   foreach( def ${${PROJECT_NAME}_required_debug_definition} )
+       addDef( ${def} )
+   endforeach()
+   
+   #clear required defs
+   set( ${PROJECT_NAME}_required_definition )
+   set( ${PROJECT_NAME}_required_debug_definition )
+endmacro()
+
 # adds an include path
 macro(addInclude incPath)
     #message(STATUS "${PROJECT_NAME} : add include path : ${incPath}")
@@ -196,6 +222,7 @@ macro(addStaticLib)
     
     _processProjectLinks()
     _processProjectLibrary()
+    _processProjectDefinition()
 endmacro()
 
 # macro to add an executable
@@ -214,6 +241,7 @@ macro(addExecutable)
     
     _processProjectLinks()
     _processProjectLibrary()
+    _processProjectDefinition()
 endmacro()
 
 macro(setupVersionNumbers)
