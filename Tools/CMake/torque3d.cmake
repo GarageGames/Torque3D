@@ -33,6 +33,15 @@ else() # hide variable
     set(TORQUE_OCULUSVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
 endif()
 
+#Hydra
+option(TORQUE_HYDRA "Enable HYDRA module" OFF)
+mark_as_advanced(TORQUE_HYDRA)
+if(TORQUE_HYDRA)
+    set(TORQUE_HYDRA_SDK_PATH "" CACHE PATH "HYDRA library path" FORCE)
+else() # hide variable
+    set(TORQUE_HYDRA_SDK_PATH "" CACHE INTERNAL "" FORCE) 
+endif()
+
 ###############################################################################
 # options
 ###############################################################################
@@ -241,6 +250,10 @@ endif()
 
 if(TORQUE_OCULUSVR)
     include( "modules/module_oculusVR.cmake" )
+endif()
+
+if(TORQUE_HYDRA)
+    include( "modules/module_hydra.cmake" )
 endif()
 
 ###############################################################################
