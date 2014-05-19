@@ -24,6 +24,15 @@ mark_as_advanced(TORQUE_EXTENDED_MOVE)
 option(TORQUE_NAVIGATION "Enable Navigation module" OFF)
 #mark_as_advanced(TORQUE_NAVIGATION)
 
+#Oculus VR
+option(TORQUE_OCULUSVR "Enable OCULUSVR module" OFF)
+mark_as_advanced(TORQUE_OCULUSVR)
+if(TORQUE_OCULUSVR)
+    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE PATH "OCULUSVR library path" FORCE)
+else() # hide variable
+    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
+endif()
+
 ###############################################################################
 # options
 ###############################################################################
@@ -228,6 +237,10 @@ endif()
 
 if(TORQUE_NAVIGATION)
    include( "modules/module_navigation.cmake" )
+endif()
+
+if(TORQUE_OCULUSVR)
+    include( "modules/module_oculusVR.cmake" )
 endif()
 
 ###############################################################################
