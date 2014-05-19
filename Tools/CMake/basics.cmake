@@ -73,6 +73,53 @@ macro(addLib lib)
     target_link_libraries(${PROJECT_NAME} "${lib}")
 endmacro()
 
+# adds a library dependency. Are processed on addExecutable or addStaticLib
+macro(addRequiredLibrary lib)
+    #message(STATUS "${PROJECT_NAME} : add lib : ${lib}")
+    LIST( APPEND ${PROJECT_NAME}_required_library ${lib} )    
+endmacro()
+
+# adds a link dependency. Are processed on addExecutable or addStaticLib
+macro(addRequiredLink lib)
+    #message(STATUS "${PROJECT_NAME} : add lib : ${lib}")
+    LIST( APPEND ${PROJECT_NAME}_required_link ${lib} )    
+endmacro()
+
+macro( _processProjectLibrary )
+   # Append currect project to PROJECT_STACK
+   LIST( APPEND PROJECT_STACK "${PROJECT_NAME}" )
+   
+   foreach( lib ${${PROJECT_NAME}_required_library} )
+       #message( "adding library dependency: ${lib}" )
+       include( ${lib} )
+   endforeach()
+   
+   #clear required libraries
+   set( ${PROJECT_NAME}_required_library )
+   
+   # pop currect project form PROJECT_STACK
+   LIST(REMOVE_AT PROJECT_STACK -1)
+   
+   # get currect project form stack
+   if( PROJECT_STACK )      
+      LIST(GET PROJECT_STACK -1 TEMP_PROJECT)
+      project( ${TEMP_PROJECT} )
+   endif()
+   
+   
+endmacro()
+
+macro( _processProjectLinks )
+   #message( "_processProjectLinks: ${PROJECT_NAME}" )
+   foreach( lib ${${PROJECT_NAME}_required_link} )
+       addLib( ${lib} )
+   endforeach()
+   
+   #clear required libraries
+   set( ${PROJECT_NAME}_required_link )
+endmacro()
+
+
 # adds a path to search for libs
 macro(addLibPath dir)
     link_directories(${dir})
@@ -146,6 +193,9 @@ macro(addStaticLib)
     #foreach(dir ${${PROJECT_NAME}_paths})
     addInclude("${firstDir}")
     #endforeach()
+    
+    _processProjectLinks()
+    _processProjectLibrary()
 endmacro()
 
 # macro to add an executable
@@ -161,6 +211,9 @@ macro(addExecutable)
     add_executable("${PROJECT_NAME}" WIN32 ${${PROJECT_NAME}_files})
     # omg - only use the first folder ... otehrwise we get lots of header name collisions
     addInclude("${firstDir}")
+    
+    _processProjectLinks()
+    _processProjectLibrary()
 endmacro()
 
 macro(setupVersionNumbers)
