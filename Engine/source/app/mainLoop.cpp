@@ -22,6 +22,7 @@
 
 #include "app/mainLoop.h"
 #include "app/game.h"
+#include "app/net/tcpObject.h"
 
 #include "platform/platformTimer.h"
 #include "platform/platformRedBook.h"
@@ -191,6 +192,8 @@ void processTimeEvent(S32 elapsedTime)
    PROFILE_END();
    
    GNet->checkTimeouts();
+
+   TCPObject::updateSends();
    
    gFPS.update();
 
