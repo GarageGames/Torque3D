@@ -79,7 +79,7 @@ macro( _processProjectDefinition )
    endforeach()   
    
    foreach( def ${${PROJECT_NAME}_required_debug_definition} )
-       addDef( ${def} )
+       addDebugDef( ${def} )
    endforeach()
    
    #clear required defs
