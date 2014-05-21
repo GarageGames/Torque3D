@@ -45,6 +45,19 @@
 class TSShapeLoader
 {
 
+// Supported Format List
+protected:
+   struct ShapeFormat
+   {
+      String mName;
+      String mExtension;
+   };
+   static Vector<ShapeFormat> smFormats;
+public:
+   static void addFormat(String name, String extension);
+   static String getFormatExtensions();
+   static String getFormatFilters();
+
 public:
    enum eLoadPhases
    {
