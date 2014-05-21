@@ -1831,7 +1831,10 @@ U32 FunctionDeclStmtNode::precompileStmt(U32)
 
    argc = 0;
    for(VarNode *walk = args; walk; walk = (VarNode *)((StmtNode*)walk)->getNext())
+   {
+      precompileIdent(walk->varName);
       argc++;
+   }
    
    CodeBlock::smInFunction = true;
    
