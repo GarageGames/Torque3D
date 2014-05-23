@@ -40,7 +40,9 @@ public:
    virtual void reset();
    virtual void sortVars();
 
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVerterShader );
+   void printStructDefines( Stream &stream, bool in );
+   virtual void printOnMain( Stream &stream, bool isVerterShader );
 };
 
 class AppVertConnectorGLSL : public ShaderConnector
@@ -53,21 +55,22 @@ public:
    virtual void reset();
    virtual void sortVars();
    
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVerterShader );   
+   virtual void printOnMain( Stream &stream, bool isVerterShader );
 };
 
 
 class VertexParamsDefGLSL : public ParamsDef
 {
 public:
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVerterShader );   
 };
 
 
 class PixelParamsDefGLSL : public ParamsDef
 {
 public:
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVerterShader );
 };
 
 #endif // _SHADERCOMP_GLSL_H_
