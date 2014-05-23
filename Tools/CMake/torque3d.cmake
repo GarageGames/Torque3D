@@ -21,6 +21,26 @@ option(TORQUE_HIFI "HIFI? support" OFF)
 mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
+option(TORQUE_NAVIGATION "Enable Navigation module" OFF)
+#mark_as_advanced(TORQUE_NAVIGATION)
+
+#Oculus VR
+option(TORQUE_OCULUSVR "Enable OCULUSVR module" OFF)
+mark_as_advanced(TORQUE_OCULUSVR)
+if(TORQUE_OCULUSVR)
+    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE PATH "OCULUSVR library path" FORCE)
+else() # hide variable
+    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
+endif()
+
+#Hydra
+option(TORQUE_HYDRA "Enable HYDRA module" OFF)
+mark_as_advanced(TORQUE_HYDRA)
+if(TORQUE_HYDRA)
+    set(TORQUE_HYDRA_SDK_PATH "" CACHE PATH "HYDRA library path" FORCE)
+else() # hide variable
+    set(TORQUE_HYDRA_SDK_PATH "" CACHE INTERNAL "" FORCE) 
+endif()
 
 ###############################################################################
 # options
@@ -222,6 +242,18 @@ if(TORQUE_EXTENDED_MOVE)
     addPath("${srcDir}/T3D/gameBase/extended")
 else()
     addPath("${srcDir}/T3D/gameBase/std")
+endif()
+
+if(TORQUE_NAVIGATION)
+   include( "modules/module_navigation.cmake" )
+endif()
+
+if(TORQUE_OCULUSVR)
+    include( "modules/module_oculusVR.cmake" )
+endif()
+
+if(TORQUE_HYDRA)
+    include( "modules/module_hydra.cmake" )
 endif()
 
 ###############################################################################
@@ -448,10 +480,14 @@ endif()
 ###############################################################################
 # Installation
 ###############################################################################
-INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game"                 DESTINATION "${projectDir}")
-if(WIN32)
-	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat"     DESTINATION "${projectDir}")
-	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat" DESTINATION "${projectDir}")
-	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat"       DESTINATION "${projectDir}")
-	INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat"      DESTINATION "${projectDir}")
+
+if(TORQUE_TEMPLATE)
+    message("Prepare Template(${TORQUE_TEMPLATE}) install...")
+    INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game"                 DESTINATION "${projectDir}")
+    if(WIN32)
+        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat"     DESTINATION "${projectDir}")
+        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat" DESTINATION "${projectDir}")
+        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat"       DESTINATION "${projectDir}")
+        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat"      DESTINATION "${projectDir}")
+    endif()
 endif()
