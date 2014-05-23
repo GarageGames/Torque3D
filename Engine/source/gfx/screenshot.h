@@ -74,6 +74,7 @@ public:
   
    /// Constructor.
    ScreenShot();
+   virtual ~ScreenShot() { }
 
    /// Used to start the screenshot capture.
    void setPending( const char *filename, bool writeJPG, S32 tiles, F32 overlap );

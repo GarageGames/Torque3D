@@ -136,11 +136,11 @@ bool ProximityMineData::preload( bool server, String& errorStr )
    if ( !server )
    {
       // Resolve sounds
-      String errorStr;
-      if( !sfxResolve( &armingSound, errorStr ) )
-         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", errorStr.c_str() );
-      if( !sfxResolve( &triggerSound, errorStr ) )
-         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", errorStr.c_str() );
+      String sfxErrorStr;
+      if( !sfxResolve( &armingSound, sfxErrorStr ) )
+         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", sfxErrorStr.c_str() );
+      if( !sfxResolve( &triggerSound, sfxErrorStr ) )
+         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", sfxErrorStr.c_str() );
    }
 
    if ( mShape )

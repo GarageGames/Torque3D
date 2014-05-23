@@ -427,9 +427,9 @@ bool PlayerData::preload(bool server, String &errorStr)
    {
       for( U32 i = 0; i < MaxSounds; ++ i )
       {
-         String errorStr;
-         if( !sfxResolve( &sound[ i ], errorStr ) )
-            Con::errorf( "PlayerData::preload: %s", errorStr.c_str() );
+         String sfxErrorStr;
+         if( !sfxResolve( &sound[ i ], sfxErrorStr ) )
+            Con::errorf( "PlayerData::preload: %s", sfxErrorStr.c_str() );
       }
    }
 
@@ -586,7 +586,10 @@ bool PlayerData::preload(bool server, String &errorStr)
             Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(mShapeFP[i].getPath());
 
             if (!fileRef)
+            {
+               errorStr = String::ToString("PlayerData: Mounted image %d loading failed, shape \"%s\" is not found.",i,mShapeFP[i].getPath().getFullPath().c_str());
                return false;
+            }
 
             if(server)
                mCRCFP[i] = fileRef->getChecksum();

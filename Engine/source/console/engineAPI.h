@@ -76,6 +76,7 @@
 
 
 // Disable some VC warnings that are irrelevant to us.
+#pragma warning( push )
 #pragma warning( disable : 4510 ) // default constructor could not be generated; all the Args structures are never constructed by us
 #pragma warning( disable : 4610 ) // can never be instantiated; again Args is never constructed by us
 
@@ -2788,7 +2789,6 @@ struct _EngineConsoleCallbackHelper
 
 
 // Re-enable some VC warnings we disabled for this file.
-#pragma warning( default : 4510 )
-#pragma warning( default : 4610 )
+#pragma warning( pop ) // 4510 and 4610
 
 #endif // !_ENGINEAPI_H_

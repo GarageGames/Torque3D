@@ -179,7 +179,7 @@ DefineEngineMethod( MissionArea, getArea, const char *, (),,
    char* returnBuffer = Con::getReturnBuffer(48);
 
    RectI area = object->getArea();
-   dSprintf(returnBuffer, sizeof(returnBuffer), "%d %d %d %d", area.point.x, area.point.y, area.extent.x, area.extent.y);
+   dSprintf(returnBuffer, 48, "%d %d %d %d", area.point.x, area.point.y, area.extent.x, area.extent.y);
    return(returnBuffer);
 }
 

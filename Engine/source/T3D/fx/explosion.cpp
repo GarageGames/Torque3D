@@ -749,9 +749,9 @@ bool ExplosionData::preload(bool server, String &errorStr)
       
    if( !server )
    {
-      String errorStr;
-      if( !sfxResolve( &soundProfile, errorStr ) )
-         Con::errorf(ConsoleLogEntry::General, "Error, unable to load sound profile for explosion datablock: %s", errorStr.c_str());
+      String sfxErrorStr;
+      if( !sfxResolve( &soundProfile, sfxErrorStr ) )
+         Con::errorf(ConsoleLogEntry::General, "Error, unable to load sound profile for explosion datablock: %s", sfxErrorStr.c_str());
       if (!particleEmitter && particleEmitterId != 0)
          if (Sim::findObject(particleEmitterId, particleEmitter) == false)
             Con::errorf(ConsoleLogEntry::General, "Error, unable to load particle emitter for explosion datablock");
