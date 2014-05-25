@@ -52,5 +52,7 @@ CreateUnitTest(TestingProcess, "Journal/Process")
       for(S32 i=0; i<30; i++)
          test(Process::processEvents(), "Should quit after 30 ProcessEvents() calls - not before!");
       test(!Process::processEvents(), "Should quit after the 30th ProcessEvent() call!");
+
+      Process::remove(this, &TestingProcess::process);
    }
 };

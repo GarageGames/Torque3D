@@ -48,6 +48,12 @@ CreateUnitTest(TestsJournalRecordAndPlayback, "Journal/Basic")
       // Initialize journal recording and fire off some events...
       Journal::Record("test.jrn");
 
+      if( !Journal::IsRecording() )
+      {
+         test(false, "Fail");
+         return;
+      }
+
       testEvent.trigger(16);
       testEvent.trigger(17);
       testEvent.trigger(18);
@@ -131,6 +137,12 @@ CreateUnitTest(TestsJournalDynamicSignals, "Journal/DynamicSignals")
 
       // Initialize journal recording and fire off some events...
       Journal::Record("test.jrn");
+
+      if( !Journal::IsRecording() )
+      {
+         test(false, "Fail");
+         return;
+      }
 
       testEvent.trigger(1);
       dynamicA->trigger(8, 100);

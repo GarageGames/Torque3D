@@ -686,7 +686,8 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
    if( dynamic_cast< SFXSound* >( source ) )
    {
       SFXSoundVector::iterator iter = find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
-      mSounds.erase_fast( iter );
+      if( iter != mSounds.end() )
+         mSounds.erase_fast( iter );
          
       mStatNumSounds = mSounds.size();
    }
