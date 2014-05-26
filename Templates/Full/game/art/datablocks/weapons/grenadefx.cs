@@ -893,7 +893,7 @@ datablock ProjectileData(GrenadeLauncherProjectile)
    explosion = GrenadeLauncherExplosion;
    waterExplosion = GrenadeLauncherWaterExplosion;
 
-   decal = ExpBlastDecal;
+   decal = ScorchRXDecal;
    splash = GrenadeSplash;
 
    particleEmitter = GrenadeProjSmokeTrailEmitter;
