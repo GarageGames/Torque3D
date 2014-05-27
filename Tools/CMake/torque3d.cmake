@@ -392,7 +392,7 @@ add_dependencies(${TORQUE_APP_NAME} opcode)
 add_dependencies(${TORQUE_APP_NAME} squish)
 add_dependencies(${TORQUE_APP_NAME} collada)
 add_dependencies(${TORQUE_APP_NAME} pcre)
-add_dependencies(${TORQUE_APP_NAME} convexDecomp)
+add_dependencies(${TORQUE_APP_NAME} convexDecomp) 
 
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
