@@ -287,7 +287,6 @@ set(TORQUE_STATIC ON)
 #option(TORQUE_STATIC "enables or disable static" OFF)
 
 if(WIN32)
-    set(TORQUE_DISABLED_WARNINGS " ")
     set(TORQUE_CXX_FLAGS "/MP /O2 /Ob2 /Oi /Ot /Oy /GT /Zi /W4 /nologo /GF /EHsc /GS- /Gy- /Qpar- /arch:SSE2 /fp:fast /fp:except- /GR /Zc:wchar_t- /wd4018 /wd4100 /wd4121 /wd4127 /wd4130 /wd4244 /wd4245 /wd4389 /wd4511 /wd4512 /wd4800 /wd4995 /D_CRT_SECURE_NO_WARNINGS " CACHE TYPE STRING)
     mark_as_advanced(TORQUE_CXX_FLAGS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORQUE_CXX_FLAGS}")
