@@ -40,7 +40,7 @@ typedef double             F64;     ///< Compiler independent 64-bit float
 
 struct EmptyType {};             ///< "Null" type used by templates
 
-#define TORQUE_UNUSED(var) (void)(var)
+#define TORQUE_UNUSED(var) (void)sizeof(var)
 
 //------------------------------------------------------------------------------
 //------------------------------------- String Types
