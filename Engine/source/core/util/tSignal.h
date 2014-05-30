@@ -149,7 +149,7 @@ public:
    }
 
 protected:
-   friend class SignalSig;
+   friend class SignalBaseT< Signature >;
 
    void _setSignal(SignalSig *sig)
    {      

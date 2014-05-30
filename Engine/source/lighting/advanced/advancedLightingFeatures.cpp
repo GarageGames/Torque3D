@@ -55,7 +55,7 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
    if(GFX->getAdapterType() == OpenGL)
    {
 #if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
-      cond = new GBufferConditionerGLSL( prepassTargetFormat );
+      cond = new GBufferConditionerGLSL( prepassTargetFormat, GBufferConditionerGLSL::ViewSpace );
       FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatGLSL());
       FEATUREMGR->registerFeature(MFT_NormalMap, new DeferredBumpFeatGLSL());
