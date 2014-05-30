@@ -41,6 +41,7 @@ enum RegisterType
    RT_NORMAL,
    RT_BINORMAL,
    RT_TANGENT,
+   RT_TANGENTW,
    RT_COLOR,
    RT_TEXCOORD,
    RT_VPOS,

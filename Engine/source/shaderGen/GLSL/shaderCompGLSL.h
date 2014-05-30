@@ -40,6 +40,7 @@ public:
    virtual void reset();
    virtual void sortVars();
 
+   virtual void print( Stream &stream) {} // TODO OPENGL temporal fix for dedicated build on Linux
    virtual void print( Stream &stream, bool isVerterShader );
    void printStructDefines( Stream &stream, bool in );
    virtual void printOnMain( Stream &stream, bool isVerterShader );
@@ -55,6 +56,7 @@ public:
    virtual void reset();
    virtual void sortVars();
    
+   virtual void print( Stream &stream) {} // TODO OPENGL temporal fix for dedicated build on Linux
    virtual void print( Stream &stream, bool isVerterShader );   
    virtual void printOnMain( Stream &stream, bool isVerterShader );
 };
