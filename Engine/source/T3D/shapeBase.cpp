@@ -114,11 +114,12 @@ IMPLEMENT_CALLBACK( ShapeBaseData, onTrigger, void, ( ShapeBase* obj, S32 index,
    "@param index Index of the trigger that changed\n"
    "@param state New state of the trigger\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseData, onEndSequence, void, ( ShapeBase* obj, S32 slot ), ( obj, slot ),
+IMPLEMENT_CALLBACK(ShapeBaseData, onEndSequence, void, (ShapeBase* obj, S32 slot, const String &name), (obj, slot, name),
    "@brief Called when a thread playing a non-cyclic sequence reaches the end of the "
    "sequence.\n\n"
    "@param obj The ShapeBase object\n"
-   "@param slot Thread slot that finished playing\n" );
+   "@param slot Thread slot that finished playing\n"
+   "@param name Thread name that finished playing\n");
 
 IMPLEMENT_CALLBACK( ShapeBaseData, onForceUncloak, void, ( ShapeBase* obj, const char* reason ), ( obj, reason ),
    "@brief Called when the object is forced to uncloak.\n\n"
@@ -2352,7 +2353,7 @@ void ShapeBase::advanceThreads(F32 dt)
             st.atEnd = true;
             updateThread(st);
             if (!isGhost()) {
-               mDataBlock->onEndSequence_callback( this, i );
+               mDataBlock->onEndSequence_callback(this, i, this->getThreadSequenceName(i));
             }
          }
 
