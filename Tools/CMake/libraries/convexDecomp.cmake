@@ -1,3 +1,3 @@
 project(convexDecomp)
 
-addStaticLib("${libDir}/convexDecomp")
+finishLibrary("${libDir}/convexDecomp")

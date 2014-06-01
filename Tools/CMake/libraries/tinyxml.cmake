@@ -1,3 +1,3 @@
 project(tinyxml)
 
-addStaticLib("${libDir}/${PROJECT_NAME}")
+finishLibrary("${libDir}/${PROJECT_NAME}")

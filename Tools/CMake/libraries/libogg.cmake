@@ -1,7 +1,7 @@
 project(libogg)
 
-addPathRec("${libDir}/libogg")
-
-addStaticLib()
+addPath("${libDir}/libogg" REC)
 
 addInclude(${libDir}/libogg/include)
+
+finishLibrary()

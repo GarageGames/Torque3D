@@ -1,16 +1,15 @@
 # Navigation module
 
-addRequiredDefinition( "TORQUE_NAVIGATION_ENABLED" )
-addRequiredLibrary( "libraries/library_recast.cmake" )
-addRequiredLink( "recast" )
+addDef( "TORQUE_NAVIGATION_ENABLED" )
+addLib( "recast" )
 
 # files
 addPathRec( "${srcDir}/navigation" )
 
 # include paths
-include_directories( "${libDir}/recast/DebugUtils/Include" )
-include_directories( "${libDir}/recast/Recast/Include" )
-include_directories( "${libDir}/recast/Detour/Include" )
-include_directories( "${libDir}/recast/DetourTileCache/Include" )
-include_directories( "${libDir}/recast/DetourCrowd/Include" )
+addInclude( "${libDir}/recast/DebugUtils/Include" )
+addInclude( "${libDir}/recast/Recast/Include" )
+addInclude( "${libDir}/recast/Detour/Include" )
+addInclude( "${libDir}/recast/DetourTileCache/Include" )
+addInclude( "${libDir}/recast/DetourCrowd/Include" )
 

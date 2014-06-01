@@ -1,3 +1,3 @@
 project(ljpeg)
 
-addStaticLib("${libDir}/ljpeg")
+finishLibrary("${libDir}/ljpeg")

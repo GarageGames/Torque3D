@@ -1,8 +1,10 @@
 project(pcre)
 
-addStaticLib("${libDir}/pcre")
-
 addDef(PCRE_STATIC)
 addDef(HAVE_CONFIG_H)
 
-set_property(TARGET pcre PROPERTY COMPILE_FLAGS       /TP) #/TP = compile as C++
+finishLibrary("${libDir}/pcre")
+
+if(WIN32)
+    set_property(TARGET pcre PROPERTY COMPILE_FLAGS /TP) #/TP = compile as C++
+endif()

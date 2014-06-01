@@ -9,10 +9,10 @@ addPathRec( "${libDir}/recast/DetourCrowd/Source" )
 addPathRec( "${libDir}/recast/DetourTileCache/Source" )
 
 # Additional includes
-include_directories( "${libDir}/recast/DebugUtils/Include" )
-include_directories( "${libDir}/recast/Recast/Include" )
-include_directories( "${libDir}/recast/Detour/Include" )
-include_directories( "${libDir}/recast/DetourTileCache/Include" )
-include_directories( "${libDir}/recast/DetourCrowd/Include" )
+addInclude( "${libDir}/recast/DebugUtils/Include" )
+addInclude( "${libDir}/recast/Recast/Include" )
+addInclude( "${libDir}/recast/Detour/Include" )
+addInclude( "${libDir}/recast/DetourTileCache/Include" )
+addInclude( "${libDir}/recast/DetourCrowd/Include" )
 
-addStaticLib()
+finishLibrary()

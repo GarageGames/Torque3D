@@ -7,12 +7,12 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 option(TORQUE_SFX_VORBIS "Vorbis Sound" ON)
 mark_as_advanced(TORQUE_SFX_VORBIS)
+option(TORQUE_THEORA "Theora Video Support" ON)
+mark_as_advanced(TORQUE_THEORA)
 option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
 mark_as_advanced(TORQUE_ADVANCED_LIGHTING)
 option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
 mark_as_advanced(TORQUE_BASIC_LIGHTING)
-option(TORQUE_THEORA "Theora Video Support" ON)
-mark_as_advanced(TORQUE_THEORA)
 option(TORQUE_SFX_DirectX "DirectX Sound" ON)
 mark_as_advanced(TORQUE_SFX_DirectX)
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
@@ -199,14 +199,17 @@ if(TORQUE_ADVANCED_LIGHTING)
     addPathRec("${srcDir}/lighting/shadowMap")
     addPathRec("${srcDir}/lighting/advanced/hlsl")
     #addPathRec("${srcDir}/lighting/advanced/glsl")
+    addDef(TORQUE_ADVANCED_LIGHTING)
 endif()
 if(TORQUE_BASIC_LIGHTING)
     addPathRec("${srcDir}/lighting/basic")
     addPathRec("${srcDir}/lighting/shadowMap")
+    addDef(TORQUE_BASIC_LIGHTING)
 endif()
 
 # DirectX Sound
 if(TORQUE_SFX_DirectX)
+    addLib(x3daudio.lib)
     addPathRec("${srcDir}/sfx/dsound")
     addPathRec("${srcDir}/sfx/xaudio")
 endif()
@@ -216,6 +219,15 @@ if(TORQUE_SFX_OPENAL)
     addPath("${srcDir}/sfx/openal")
     #addPath("${srcDir}/sfx/openal/mac")
     addPath("${srcDir}/sfx/openal/win32")
+    addInclude("${libDir}/openal/win32")
+endif()
+
+# Vorbis
+if(TORQUE_SFX_VORBIS)
+    addInclude(${libDir}/libvorbis/include)
+    addDef(TORQUE_OGGVORBIS)
+    addLib(libvorbis)
+    addLib(libogg)
 endif()
 
 # Theora
@@ -223,6 +235,11 @@ if(TORQUE_THEORA)
     addPath("${srcDir}/core/ogg")
     addPath("${srcDir}/gfx/video")
     addPath("${srcDir}/gui/theora")
+    
+    addDef(TORQUE_OGGTHEORA)
+    addDef(TORQUE_OGGVORIBS)
+    addInclude(${libDir}/libtheora/include)
+    addLib(libtheora)
 endif()
 
 # Include tools for non-tool builds (or define player if a tool build)
@@ -236,10 +253,12 @@ endif()
 
 if(TORQUE_HIFI)
     addPath("${srcDir}/T3D/gameBase/hifi")
+    addDef(TORQUE_HIFI_NET)
 endif()
     
 if(TORQUE_EXTENDED_MOVE)
     addPath("${srcDir}/T3D/gameBase/extended")
+    addDef(TORQUE_EXTENDED_MOVE)
 else()
     addPath("${srcDir}/T3D/gameBase/std")
 endif()
@@ -337,7 +356,7 @@ endif()
 
 ###############################################################################
 ###############################################################################
-addExecutable()
+finishExecutable()
 ###############################################################################
 ###############################################################################
 
@@ -356,15 +375,15 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" AND
     CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" "${projectOutDir}/main.cs")
 endif()
 if(WIN32)
-	if(NOT EXISTS "${projectSrcDir}/torque.rc")
-		CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
-	endif()
-	if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-		CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-	endif()
-	if(NOT EXISTS "${projectOutDir}/cleanup.bat")
-		CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
-	endif()
+    if(NOT EXISTS "${projectSrcDir}/torque.rc")
+        CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
+    endif()
+    if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+        CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+    endif()
+    if(NOT EXISTS "${projectOutDir}/cleanup.bat")
+        CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
+    endif()
 endif()
 
 ###############################################################################
@@ -384,18 +403,17 @@ addLib(convexDecomp)
 
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
-	set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
-	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
+    set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
+    mark_as_advanced(TORQUE_EXTERNAL_LIBS)
     addLib("${TORQUE_EXTERNAL_LIBS}")
 endif()
 
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
-addDebugDef(TORQUE_DEBUG)
-addDebugDef(TORQUE_ENABLE_ASSERTS)
-addDebugDef(TORQUE_DEBUG_GFX_MODE)
-
+addDef(TORQUE_DEBUG DEBUG)
+addDef(TORQUE_ENABLE_ASSERTS "DEBUG;RelWithDebInfo")
+addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
 addDef(NTORQUE_SHARED)
@@ -412,46 +430,6 @@ addDef(DOM_INCLUDE_TINYXML)
 addDef(PCRE_STATIC)
 addDef(_CRT_SECURE_NO_WARNINGS)
 addDef(_CRT_SECURE_NO_DEPRECATE)
-
-
-###############################################################################
-# Modules
-###############################################################################
-if(TORQUE_SFX_DirectX)
-    addLib(x3daudio.lib)
-endif()
-
-if(TORQUE_ADVANCED_LIGHTING)
-    addDef(TORQUE_ADVANCED_LIGHTING)
-endif()
-if(TORQUE_BASIC_LIGHTING)
-    addDef(TORQUE_BASIC_LIGHTING)
-endif()
-
-if(TORQUE_SFX_OPENAL)
-    addInclude("${libDir}/openal/win32")
-endif()
-
-if(TORQUE_SFX_VORBIS)
-    addInclude(${libDir}/libvorbis/include)
-    addDef(TORQUE_OGGVORBIS)
-    addLib(libvorbis)
-    addLib(libogg)
-endif()
-
-if(TORQUE_THEORA)
-    addDef(TORQUE_OGGTHEORA)
-    addDef(TORQUE_OGGVORIBS)
-    addInclude(${libDir}/libtheora/include)
-    addLib(libtheora)
-endif()
-
-if(TORQUE_HIFI)
-    addDef(TORQUE_HIFI_NET)
-endif()
-if(TORQUE_EXTENDED_MOVE)
-    addDef(TORQUE_EXTENDED_MOVE)
-endif()
 
 ###############################################################################
 # Include Paths
