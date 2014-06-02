@@ -39,7 +39,8 @@ macro(addPath dir)
              ${dir}/*.cpp
              ${dir}/*.c
              ${dir}/*.cc
-             ${dir}/*.h)
+             ${dir}/*.h
+             ${dir}/*.asm)
     LIST(APPEND ${PROJECT_NAME}_files "${tmp_files}")
     LIST(APPEND ${PROJECT_NAME}_paths "${dir}")
     #message(STATUS "addPath ${PROJECT_NAME} : ${tmp_files}")
@@ -351,6 +352,12 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 endif()
 
+if(UNIX)
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${projectOutDir}")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${projectOutDir}")
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${projectOutDir}")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${projectOutDir}")
+endif()
 
 # fix the debug/release subfolders on windows
 if(MSVC)
