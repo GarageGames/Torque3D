@@ -1,4 +1,4 @@
-Torque 3D v3.5.1 ![Build status](http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon)
+Torque 3D v3.5.1
 ================
 
 MIT Licensed Open Source version of [Torque 3D](http://www.garagegames.com/products/torque-3d) from [GarageGames](http://www.garagegames.com)
