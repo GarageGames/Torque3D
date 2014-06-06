@@ -46,7 +46,7 @@
    #define __APPLE__
 #elif defined(TORQUE_OS_LINUX) && !defined(LINUX)
    #define LINUX
-#elif defined(TORQUE_OS_WIN32) && !defined(WIN32)
+#elif defined(TORQUE_OS_WIN) && !defined(WIN32)
    #define WIN32
 #endif
 

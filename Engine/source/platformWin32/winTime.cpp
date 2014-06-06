@@ -66,7 +66,7 @@ String Platform::localTimeToString( const LocalTime &lt )
    
    TCHAR buffer[1024] = {0};
 
-   int result = 0;
+   S32 result = 0;
 
    String outStr;
 

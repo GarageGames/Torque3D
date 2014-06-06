@@ -101,4 +101,4 @@ public:
 };
 
 
-#endif // _PXPLAYER_H
+#endif // _PX3PLAYER_H_

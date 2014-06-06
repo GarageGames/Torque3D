@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PHYSX3_WORLD_H_
-#define _PHYSX3_WORLD_H_
+#ifndef _PX3WORLD_H_
+#define _PX3WORLD_H_
 
 #ifndef _T3D_PHYSICS_PHYSICSWORLD_H_
 #include "T3D/physics/physicsWorld.h"
@@ -53,7 +53,6 @@ class Px3World : public PhysicsWorld
 protected:
 
 	physx::PxScene* mScene;
-
 	bool mIsEnabled;
 	bool mIsSimulating;
 	bool mIsServer;
@@ -71,7 +70,6 @@ protected:
 	static physx::PxVisualDebuggerConnection* smPvdConnection;
    static F32 smPhysicsStepTime;
    static U32 smPhysicsMaxIterations;
-
 	F32 mAccumulator;
 	bool _simulate(const F32 dt);
 
@@ -105,6 +103,4 @@ public:
    static void setTiming(F32 stepTime,U32 maxIterations);
 };
 
-
-
-#endif
+#endif // _PX3WORLD_H_

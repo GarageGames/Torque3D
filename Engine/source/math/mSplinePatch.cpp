@@ -68,7 +68,7 @@ void SplCtrlPts::submitPoints( Point3F *pts, U32 num )
 {
    mPoints.clear();
 
-   for( int i=0; i<num; i++ )
+   for( S32 i=0; i<num; i++ )
    {
       mPoints.push_back( pts[i] );
    }
@@ -89,7 +89,7 @@ SplinePatch::SplinePatch()
 // to re-calc any pre-calculated data it may be using from the submitted control
 // points.
 //------------------------------------------------------------------------------
-void SplinePatch::setControlPoint( Point3F &point, int index )
+void SplinePatch::setControlPoint( Point3F &point, S32 index )
 {
    mControlPoints.setPoint( point, index );
 }

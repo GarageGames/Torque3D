@@ -230,7 +230,7 @@ void GuiIconButtonCtrl::renderButton( Point2I &offset, const RectI& updateRect )
    bool highlight = mMouseOver;
    bool depressed = mDepressed;
    
-   ColorI fontColor   = mActive ? (highlight ? mProfile->mFontColor : mProfile->mFontColor) : mProfile->mFontColorNA;
+   ColorI fontColor   = mActive ? (highlight ? mProfile->mFontColorHL : mProfile->mFontColor) : mProfile->mFontColorNA;
    
    RectI boundsRect(offset, getExtent());
 

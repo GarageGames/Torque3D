@@ -24,7 +24,7 @@
 #include "T3D/physics/physx3/px3Body.h"
 
 #include "T3D/physics/physx3/px3.h"
-#include "T3D/physics/physx3/px3Cast.h"
+#include "T3D/physics/physx3/px3Casts.h"
 #include "T3D/physics/physx3/px3World.h"
 #include "T3D/physics/physx3/px3Collision.h"
 
@@ -123,24 +123,23 @@ bool Px3Body::init(   PhysicsCollision *shape,
 				Con::errorf("PhysX3 Dynamic Triangle Mesh is not supported.");
 			}
 	   }
-	   physx::PxShape * pShape = mActor->createShape(*desc->pGeometry,*mMaterial,desc->pose);
+	   physx::PxShape * pShape = mActor->createShape(*desc->pGeometry,*mMaterial);
 	   physx::PxFilterData colData;
 	   if(isDebris)
 			colData.word0 = PX3_DEBRIS;
 	   else if(isTrigger)
-      {
-         //We don't want trigger shapes taking part in shape pair intersection tests
-         pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
-		   colData.word0 = PX3_TRIGGER;
-      }
+        colData.word0 = PX3_TRIGGER;
 	   else
 		   colData.word0 = PX3_DEFAULT;
 
+      //set local pose - actor->createShape with a local pose is deprecated in physx 3.3
+      pShape->setLocalPose(desc->pose);
       //set the skin width
       pShape->setContactOffset(0.01f);
+      pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
       pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE,true);
-		pShape->setSimulationFilterData(colData);
-		pShape->setQueryFilterData(colData);
+      pShape->setSimulationFilterData(colData);
+      pShape->setQueryFilterData(colData);
    }
 
    //mass & intertia has to be set after creating the shape
@@ -148,6 +147,10 @@ bool Px3Body::init(   PhysicsCollision *shape,
    {
 		physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
 		physx::PxRigidBodyExt::setMassAndUpdateInertia(*actor,mass);
+      if(mBodyFlags & BF_CCD)
+         actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true);
+      else
+         actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eENABLE_CCD, false);
    }
 
     // This sucks, but it has to happen if we want
@@ -364,6 +367,23 @@ void Px3Body::setSimulationEnabled( bool enabled )
    }
 
    delete [] shapes;
+}
+
+void Px3Body::moveKinematicTo( const MatrixF &transform )
+{
+   AssertFatal( mActor, "Px3Body::moveKinematicTo - The actor is null!" );
+
+   const bool isKinematic = mBodyFlags & BF_KINEMATIC;
+   if (!isKinematic )
+   {
+      Con::errorf("Px3Body::moveKinematicTo is only for kinematic bodies.");
+      return;
+   }   
+
+   mWorld->releaseWriteLock();
+
+   physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+   actor->setKinematicTarget(px3Cast<physx::PxTransform>(transform));
 }
 
 void Px3Body::setTransform( const MatrixF &transform )

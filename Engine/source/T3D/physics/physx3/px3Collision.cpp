@@ -26,7 +26,7 @@
 #include "math/mPoint3.h"
 #include "math/mMatrix.h"
 #include "T3D/physics/physx3/px3.h"
-#include "T3D/physics/physx3/px3Cast.h"
+#include "T3D/physics/physx3/px3Casts.h"
 #include "T3D/physics/physx3/px3World.h"
 #include "T3D/physics/physx3/px3Stream.h"
 
@@ -105,7 +105,10 @@ bool Px3Collision::addConvex(  const Point3F *points,
 	convexMesh = gPhysics3SDK->createConvexMesh(in);
 
 	Px3CollisionDesc *desc = new Px3CollisionDesc;
-	desc->pGeometry = new physx::PxConvexMeshGeometry(convexMesh);
+   physx::PxVec3 scale = px3Cast<physx::PxVec3>(localXfm.getScale());
+   physx::PxQuat rotation = px3Cast<physx::PxQuat>(QuatF(localXfm));
+   physx::PxMeshScale meshScale(scale,rotation);
+	desc->pGeometry = new physx::PxConvexMeshGeometry(convexMesh,meshScale);
 	desc->pose = px3Cast<physx::PxTransform>(localXfm);
 	mColShapes.push_back(desc);
 	return true;
@@ -177,13 +180,13 @@ bool Px3Collision::addHeightfield(   const U16 *heights,
 
          if ( holes && holes[ getMax( (S32)index - 1, 0 ) ] )     // row index for holes adjusted so PhysX collision shape better matches rendered terrain
          {
-            currentSample->materialIndex0 = 0;
-            currentSample->materialIndex1 = 0;
+            currentSample->materialIndex0 = physx::PxHeightFieldMaterial::eHOLE;
+            currentSample->materialIndex1 = physx::PxHeightFieldMaterial::eHOLE;
          }
          else
          {
-            currentSample->materialIndex0 = 1;
-            currentSample->materialIndex1 = 1;
+            currentSample->materialIndex0 = 0;
+            currentSample->materialIndex1 = 0;
          }
 
 		int flag = ( column + tess ) % 2;

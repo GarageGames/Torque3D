@@ -259,7 +259,7 @@ DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, int offset ), ( 0 ),
+DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
    "Find the start of @a needle in @a haystack searching from left to right beginning at the given offset.\n"
    "@param haystack The string to search.\n"
    "@param needle The string to search for.\n"
@@ -479,7 +479,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
       if(!scan)
       {
          dStrcpy(ret + dstp, source + scanp);
-         return ret;
+         break;
       }
       U32 len = scan - (source + scanp);
       dStrncpy(ret + dstp, source + scanp, len);

@@ -29,25 +29,25 @@
    #define __APPLE__
 #elif defined(TORQUE_OS_LINUX) && !defined(LINUX)
    #define LINUX
-#elif defined(TORQUE_OS_WIN32) && !defined(WIN32)
+#elif defined(TORQUE_OS_WIN) && !defined(WIN32)
    #define WIN32
 #endif
 
 //-------------------------------------------------------------------------
 
 #include <PxPhysicsAPI.h>
-#include <extensions/PxExtensionsAPI.h>
-#include <extensions/PxDefaultErrorCallback.h>
-#include <extensions/PxDefaultAllocator.h>
-#include <extensions/PxDefaultSimulationFilterShader.h>
-#include <extensions/PxDefaultCpuDispatcher.h>
-#include <extensions/PxShapeExt.h>
-#include <extensions/PxSimpleFactory.h>
-#include <foundation/PxFoundation.h>
-#include <characterkinematic/PxController.h>
-#include <common/PxIO.h> 
+#include <PxExtensionsAPI.h>
+#include <PxDefaultErrorCallback.h>
+#include <PxDefaultAllocator.h>
+#include <PxDefaultSimulationFilterShader.h>
+#include <PxDefaultCpuDispatcher.h>
+#include <PxShapeExt.h>
+#include <PxSimpleFactory.h>
+#include <PxFoundation.h>
+#include <PxController.h>
+#include <PxIO.h> 
 
 
 extern physx::PxPhysics* gPhysics3SDK;
 
-#endif
+#endif // _PHYSX3_

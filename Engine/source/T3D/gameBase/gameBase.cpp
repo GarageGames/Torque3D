@@ -614,7 +614,7 @@ void GameBase::onUnmount( SceneObject *obj, S32 node )
 
 bool GameBase::setDataBlockProperty( void *obj, const char *index, const char *db)
 {
-   if( db == NULL || !db || !db[ 0 ] )
+   if( db == NULL || !db[ 0 ] )
    {
       Con::errorf( "GameBase::setDataBlockProperty - Can't unset datablock on GameBase objects" );
       return false;

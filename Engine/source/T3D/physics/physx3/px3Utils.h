@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PHYSX3_UTILS_H_
-#define _PHYSX3_UTILS_H_
+#ifndef _PX3UTILS_H_
+#define _PX3UTILS_H_
 
 namespace physx
 {
@@ -31,5 +31,4 @@ namespace physx
 
 extern physx::PxShape* px3GetFirstShape(physx::PxRigidActor *actor);
 
-
-#endif
+#endif // _PX3UTILS_H_

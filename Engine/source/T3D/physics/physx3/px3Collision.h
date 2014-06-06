@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _T3D_PHYSICS_PX3COLLISION_H_
-#define _T3D_PHYSICS_PX3COLLISION_H_
+#ifndef _PX3COLLISION_H_
+#define _PX3COLLISION_H_
 
 #ifndef _T3D_PHYSICS_PHYSICSCOLLISION_H_
 #include "T3D/physics/physicsCollision.h"
@@ -32,7 +32,7 @@
 #ifndef _MMATRIX_H_
 #include "math/mMatrix.h"
 #endif
-//nasty hate doing this!
+
 #include <foundation/PxTransform.h>
 
 //forward declare
@@ -84,4 +84,4 @@ public:
                                  const MatrixF &localXfm );
 };
 
-#endif 
+#endif // _PX3COLLISION_H_

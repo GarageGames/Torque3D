@@ -216,7 +216,7 @@ String ZipObject::getFileEntry(S32 idx)
 
    const Zip::CentralDir &dir = (*mZipArchive)[idx];
    char buffer[1024];
-   int chars = dSprintf(buffer, sizeof(buffer), "%s\t%d\t%d\t%d\t%08x",
+   S32 chars = dSprintf(buffer, sizeof(buffer), "%s\t%d\t%d\t%d\t%08x",
             dir.mFilename.c_str(), dir.mUncompressedSize, dir.mCompressedSize,
             dir.mCompressMethod, dir.mCRC32);
    if (chars < sizeof(buffer))

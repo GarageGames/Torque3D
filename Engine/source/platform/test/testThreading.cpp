@@ -311,7 +311,7 @@ CreateUnitTest( SemaphoreWaitTest, "Platform/Threads/SemaphoreWaitTest")
    void        *mMutex;
    U32         mDoneCount;
 
-   const static int csmThreadCount = 10;
+   const static S32 csmThreadCount = 10;
 
    void run()
    {
@@ -381,7 +381,7 @@ CreateUnitTest( MutexWaitTest, "Platform/Threads/MutexWaitTest")
    void *mMutex;
    U32 mDoneCount;
 
-   const static int csmThreadCount = 10;
+   const static S32 csmThreadCount = 10;
    
    void run()
    {

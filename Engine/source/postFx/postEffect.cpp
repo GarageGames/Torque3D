@@ -134,7 +134,7 @@ GFX_ImplementTextureProfile(  PostFxTargetProfile,
                               GFXTextureProfile::PreserveSize |
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 IMPLEMENT_CONOBJECT(PostEffect);
 
@@ -142,7 +142,7 @@ IMPLEMENT_CONOBJECT(PostEffect);
 GFX_ImplementTextureProfile( PostFxTextureProfile,
                             GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::Static | GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap,
-                            GFXTextureProfile::None );
+                            GFXTextureProfile::NONE );
 
 
 void PostEffect::EffectConst::set( const String &newVal )
@@ -374,7 +374,7 @@ bool PostEffect::onAdd()
    scriptPath.setExtension( String::EmptyString );
 
    // Find additional textures
-   for( int i = 0; i < NumTextures; i++ )
+   for( S32 i = 0; i < NumTextures; i++ )
    {
       String texFilename = mTexFilename[i];
 

@@ -283,7 +283,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN: {
-		int index = (message - WM_LBUTTONDOWN) / 3;
+		S32 index = (message - WM_LBUTTONDOWN) / 3;
 		button[index] = true;
 
 		// Capture the mouse on button down to allow dragging outside
@@ -299,7 +299,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP: {
-		int index = (message - WM_LBUTTONUP) / 3;
+		S32 index = (message - WM_LBUTTONUP) / 3;
 		button[index] = false;
 
 		// Release mouse capture from button down.

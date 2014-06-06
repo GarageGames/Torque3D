@@ -25,7 +25,7 @@
 
 #include "T3D/physics/physx3/px3.h"
 #include "T3D/physics/physx3/px3Plugin.h"
-#include "T3D/physics/physx3/px3Cast.h"
+#include "T3D/physics/physx3/px3Casts.h"
 #include "T3D/physics/physx3/px3Stream.h"
 #include "T3D/physics/physicsUserData.h"
 
@@ -53,6 +53,23 @@ physx::PxDefaultAllocator Px3World::smMemoryAlloc;
 //Physics timing
 F32 Px3World::smPhysicsStepTime = 1.0f/(F32)TickMs;
 U32 Px3World::smPhysicsMaxIterations = 4;
+
+//filter shader with support for CCD pairs
+static physx::PxFilterFlags sCcdFilterShader(
+        physx::PxFilterObjectAttributes attributes0,
+        physx::PxFilterData filterData0,
+        physx::PxFilterObjectAttributes attributes1,
+        physx::PxFilterData filterData1,
+        physx::PxPairFlags& pairFlags,
+        const void* constantBlock,
+        physx::PxU32 constantBlockSize)
+{
+        pairFlags = physx::PxPairFlag::eRESOLVE_CONTACTS;
+        pairFlags |= physx::PxPairFlag::eCCD_LINEAR;
+        return physx::PxFilterFlags();
+}
+
+
 
 Px3World::Px3World(): mScene( NULL ),
    mProcessList( NULL ),
@@ -198,7 +215,6 @@ void Px3World::destroyWorld()
 		mScene->release();
 		mScene = NULL;
 	}
-
 }
 
 bool Px3World::initWorld( bool isServer, ProcessList *processList )
@@ -221,10 +237,12 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
 		sceneDesc.cpuDispatcher = smCpuDispatcher;
 		Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
 	}
-   	
+
+ 	
+   sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
 
-   sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+   sceneDesc.filterShader  = sCcdFilterShader;
 
 	mScene = gPhysics3SDK->createScene(sceneDesc);
 
@@ -559,7 +577,6 @@ void Px3World::onDebugDraw( const SceneRenderState *state )
    }
 
 }
-
 //set simulation timing via script
 DefineEngineFunction( physx3SetSimulationTiming, void, ( F32 stepTime, U32 maxSteps ),, "Set simulation timing of the PhysX 3 plugin" )
 {

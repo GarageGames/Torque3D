@@ -245,7 +245,7 @@ void CMDerror(char *format, ...)
    char tempBuf[BUFMAX];
    va_list args;
    va_start( args, format );
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
    _vsnprintf( tempBuf, BUFMAX, format, args );
 #else
    vsnprintf( tempBuf, BUFMAX, format, args );

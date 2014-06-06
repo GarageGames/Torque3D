@@ -40,7 +40,7 @@ typedef double             F64;     ///< Compiler independent 64-bit float
 
 struct EmptyType {};             ///< "Null" type used by templates
 
-#define TORQUE_UNUSED(var) (void)var
+#define TORQUE_UNUSED(var) (void)sizeof(var)
 
 //------------------------------------------------------------------------------
 //------------------------------------- String Types
@@ -218,13 +218,13 @@ inline S8 getMin(S8 a, S8 b)
 }
 
 /// Returns the lesser of the two parameters: a & b.
-inline float getMin(float a, float b)
+inline F32 getMin(F32 a, F32 b)
 {
    return a>b ? b : a;
 }
 
 /// Returns the lesser of the two parameters: a & b.
-inline double getMin(double a, double b)
+inline F64 getMin(F64 a, F64 b)
 {
    return a>b ? b : a;
 }
@@ -266,13 +266,13 @@ inline S8 getMax(S8 a, S8 b)
 }
 
 /// Returns the greater of the two parameters: a & b.
-inline float getMax(float a, float b)
+inline F32 getMax(F32 a, F32 b)
 {
    return a>b ? a : b;
 }
 
 /// Returns the greater of the two parameters: a & b.
-inline double getMax(double a, double b)
+inline F64 getMax(F64 a, F64 b)
 {
    return a>b ? a : b;
 }
@@ -290,7 +290,7 @@ inline double getMax(double a, double b)
 
 #define BIT(x) (1 << (x))                       ///< Returns value with bit x set (2^x)
 
-#if defined(TORQUE_OS_WIN32)
+#if defined(TORQUE_OS_WIN)
 #define STDCALL __stdcall
 #else
 #define STDCALL

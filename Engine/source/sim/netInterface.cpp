@@ -531,7 +531,7 @@ void NetInterface::checkTimeouts()
 #define F3(x, y, z) (x ^ y ^ z)
 #define F4(x, y, z) (y ^ (x | ~z))
 
-inline U32 rotlFixed(U32 x, unsigned int y)
+inline U32 rotlFixed(U32 x, U32 y)
 {
    return (x >> y) | (x << (32 - y));
 }

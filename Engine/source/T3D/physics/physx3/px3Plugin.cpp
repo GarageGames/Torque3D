@@ -37,7 +37,7 @@ AFTER_MODULE_INIT( Sim )
 {
    NamedFactory<PhysicsPlugin>::add( "PhysX3", &Px3Plugin::create );
 
-   #if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)   
+   #if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)   
       NamedFactory<PhysicsPlugin>::add( "default", &Px3Plugin::create );
    #endif   
 }
@@ -224,4 +224,3 @@ U32 Px3Plugin::getWorldCount() const
 { 
    return mPhysicsWorldLookup.size(); 
 }
-

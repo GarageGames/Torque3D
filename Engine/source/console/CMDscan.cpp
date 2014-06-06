@@ -1910,8 +1910,7 @@ extern int isatty (int );
         b->yy_bs_column = 0;
     }
 
-        b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
-    
+    b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
 	errno = oerrno;
 }
 
@@ -2355,7 +2354,7 @@ void CMDerror(char *format, ...)
    char tempBuf[BUFMAX];
    va_list args;
    va_start( args, format );
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
    _vsnprintf( tempBuf, BUFMAX, format, args );
 #else
    vsnprintf( tempBuf, BUFMAX, format, args );

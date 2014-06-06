@@ -403,14 +403,14 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       for(U32 i = 0; i < size; i++)
          st.read(&functionFloats[i]);
    }
-   U32 codeSize;
-   st.read(&codeSize);
+   U32 codeLength;
+   st.read(&codeLength);
    st.read(&lineBreakPairCount);
 
-   U32 totSize = codeSize + lineBreakPairCount * 2;
+   U32 totSize = codeLength + lineBreakPairCount * 2;
    code = new U32[totSize];
 
-   for(i = 0; i < codeSize; i++)
+   for(i = 0; i < codeLength; i++)
    {
       U8 b;
       st.read(&b);
@@ -420,10 +420,10 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
          code[i] = b;
    }
 
-   for(i = codeSize; i < totSize; i++)
+   for(i = codeLength; i < totSize; i++)
       st.read(&code[i]);
 
-   lineBreakPairs = code + codeSize;
+   lineBreakPairs = code + codeLength;
 
    // StringTable-ize our identifiers.
    U32 identCount;
@@ -559,7 +559,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
 
 }
 
-const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, int setFrame)
+const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
 {
    // Check for a UTF8 script file
    char *string;

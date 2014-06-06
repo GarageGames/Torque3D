@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <wchar.h>
 #include <string.h>
+#include <algorithm>
 
 #include <dae/daeError.h>
 

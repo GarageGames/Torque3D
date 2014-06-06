@@ -287,14 +287,14 @@ bool LightningData::preload(bool server, String &errorStr)
 
    if (server == false) 
    {
-      String errorStr;
+      String sfxErrorStr;
       for (U32 i = 0; i < MaxThunders; i++) {
-         if( !sfxResolve( &thunderSounds[ i ], errorStr ) )
-            Con::errorf(ConsoleLogEntry::General, "LightningData::preload: Invalid packet: %s", errorStr.c_str());
+         if( !sfxResolve( &thunderSounds[ i ], sfxErrorStr ) )
+            Con::errorf(ConsoleLogEntry::General, "LightningData::preload: Invalid packet: %s", sfxErrorStr.c_str());
       }
 
-      if( !sfxResolve( &strikeSound, errorStr ) )
-         Con::errorf(ConsoleLogEntry::General, "LightningData::preload: Invalid packet: %s", errorStr.c_str());
+      if( !sfxResolve( &strikeSound, sfxErrorStr ) )
+         Con::errorf(ConsoleLogEntry::General, "LightningData::preload: Invalid packet: %s", sfxErrorStr.c_str());
 
       for (U32 i = 0; i < MaxTextures; i++) 
       {
@@ -1139,7 +1139,7 @@ void LightningBolt::generateMinorNodes()
 {
    mMinorNodes.clear();
 
-   for( int i=0; i<mMajorNodes.numNodes - 1; i++ )
+   for( S32 i=0; i<mMajorNodes.numNodes - 1; i++ )
    {
       NodeManager segment;
       segment.startPoint = mMajorNodes.nodeList[i].point;

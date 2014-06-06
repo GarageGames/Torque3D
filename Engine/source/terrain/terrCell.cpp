@@ -849,7 +849,7 @@ void TerrCell::_updateMaterials()
          if ( index == U8_MAX || index > 63 )
             continue;
 
-         mMaterials |= (U64)(1<<index);
+         mMaterials |= (U64)((U64)1<<index);
       }
    }
 

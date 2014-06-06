@@ -118,6 +118,9 @@ public:
 
    static U8 getModifierKeys() {return smModifierKeys;}
    static void setModifierKeys(U8 mod) {smModifierKeys = mod;}
+
+   static void attemptSwitchToKeyboardLayout( U32 layout );
+
 #ifdef LOG_INPUT
    static void log( const char* format, ... );
 #endif

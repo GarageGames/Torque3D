@@ -61,7 +61,7 @@ bool Box3F::collideLine(const Point3F& start, const Point3F& end, F32* t, Point3
    static const Point3F na[3] = { Point3F(1.0f, 0.0f, 0.0f), Point3F(0.0f, 1.0f, 0.0f), Point3F(0.0f, 0.0f, 1.0f) };
    Point3F finalNormal(0.0f, 0.0f, 0.0f);
 
-   for (int i = 0; i < 3; i++) {
+   for (S32 i = 0; i < 3; i++) {
 	  bool	n_neg = false;
       if (si[i] < ei[i]) {
          if (si[i] > bmax[i] || ei[i] < bmin[i])

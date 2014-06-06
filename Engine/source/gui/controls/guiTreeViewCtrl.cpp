@@ -3583,7 +3583,7 @@ void GuiTreeViewCtrl::onMiddleMouseDown(const GuiEvent & event)
       for (S32 j = 0; j < mSelected.size(); j++) {
          Con::printf("%d", mSelected[j]);
       }
-      S32 mCurrentDragCell = mMouseOverCell.y;
+      mCurrentDragCell = mMouseOverCell.y;
       S32 midpCell = (mCurrentDragCell) * mItemHeight + (mItemHeight/2);
       S32 currentY = pt.y;
       S32 yDiff = currentY-midpCell;
@@ -3648,7 +3648,7 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
                break;
             }
          }
-         S32 mCurrentDragCell = mMouseOverCell.y;
+         mCurrentDragCell = mMouseOverCell.y;
          if (mVisibleItems[firstSelectedIndex] != firstItem )
          {
             /*
@@ -4920,7 +4920,7 @@ ConsoleMethod( GuiTreeViewCtrl, open, void, 3, 4, "(SimSet obj, bool okToEdit=tr
 
 ConsoleMethod( GuiTreeViewCtrl, setItemTooltip, void, 4, 4, "( int id, string text ) - Set the tooltip to show for the given item." )
 {
-   int id = dAtoi( argv[ 2 ] );
+   S32 id = dAtoi( argv[ 2 ] );
    
    GuiTreeViewCtrl::Item* item = object->getItem( id );
    if( !item )
@@ -4934,7 +4934,7 @@ ConsoleMethod( GuiTreeViewCtrl, setItemTooltip, void, 4, 4, "( int id, string te
 
 ConsoleMethod( GuiTreeViewCtrl, setItemImages, void, 5, 5, "( int id, int normalImage, int expandedImage ) - Sets the normal and expanded images to show for the given item." )
 {
-   int id = dAtoi( argv[ 2 ] );
+   S32 id = dAtoi( argv[ 2 ] );
 
    GuiTreeViewCtrl::Item* item = object->getItem( id );
    if( !item )
@@ -4949,7 +4949,7 @@ ConsoleMethod( GuiTreeViewCtrl, setItemImages, void, 5, 5, "( int id, int normal
 
 ConsoleMethod( GuiTreeViewCtrl, isParentItem, bool, 3, 3, "( int id ) - Returns true if the given item contains child items." )
 {
-   int id = dAtoi( argv[ 2 ] );
+   S32 id = dAtoi( argv[ 2 ] );
    if( !id && object->getItemCount() )
       return true;
    
@@ -5065,7 +5065,7 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedObjectList, const char*, 2, 2,
    dSprintf(buff,1024,"");
 
    const Vector< GuiTreeViewCtrl::Item* > selectedItems = object->getSelectedItems();
-   for(int i = 0; i < selectedItems.size(); i++)
+   for(S32 i = 0; i < selectedItems.size(); i++)
    {
       GuiTreeViewCtrl::Item *item = selectedItems[i];
 
@@ -5130,7 +5130,7 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedItemList,const char*, 2,2,"returns a s
 	dSprintf(buff,1024,"");
 
    const Vector< S32 >& selected = object->getSelected();
-	for(int i = 0; i < selected.size(); i++)
+	for(S32 i = 0; i < selected.size(); i++)
 	{
 		S32 id  = selected[i];
 		//get the current length of the buffer

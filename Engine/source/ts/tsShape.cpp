@@ -1225,7 +1225,7 @@ void TSShape::assembleShape()
    if (smReadVersion<23)
    {
       // get detail information about skins...
-      S32 * detailFirstSkin = tsalloc.getPointer32(numDetails);
+      S32 * detFirstSkin = tsalloc.getPointer32(numDetails);
       S32 * detailNumSkins = tsalloc.getPointer32(numDetails);
 
       tsalloc.checkGuard();
@@ -1257,7 +1257,7 @@ void TSShape::assembleShape()
       ptr32 = tsalloc.allocShape32(numSkins);
       for (i=0; i<numSkins; i++)
       {
-         bool skip = i<detailFirstSkin[skipDL];
+         bool skip = i<detFirstSkin[skipDL];
          TSSkinMesh * skin = (TSSkinMesh*)TSMesh::assembleMesh(TSMesh::SkinMeshType,skip);
          if (meshes.address())
          {
@@ -1286,7 +1286,7 @@ void TSShape::assembleShape()
       tsalloc.checkGuard();
 
       // we now have skins in mesh list...add skin objects to object list and patch things up
-      fixupOldSkins(numMeshes,numSkins,numDetails,detailFirstSkin,detailNumSkins);
+      fixupOldSkins(numMeshes,numSkins,numDetails,detFirstSkin,detailNumSkins);
    }
 
    // allocate storage space for some arrays (filled in during Shape::init)...

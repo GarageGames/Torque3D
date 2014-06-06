@@ -38,9 +38,9 @@
 /// because we get a much better speed gain if we can assume the data is aligned.
 void vec_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result)
 {
-   vector float A[4][1];
-   vector float B[4][1];
-   vector float C[4][1];
+   vector F32 A[4][1];
+   vector F32 B[4][1];
+   vector F32 C[4][1];
 
    /// If the incoming pointers are not 16-byte aligned, we have to load & store the slow way.
    if((int)matA & 0xF || (int)matB & 0xF || (int)result & 0xF)

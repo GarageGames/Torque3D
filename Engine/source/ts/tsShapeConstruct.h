@@ -213,7 +213,7 @@ public:
       void write(TSShape* shape, Stream& stream, const String& savePath);
    };
 
-   static const int MaxLegacySequences = 127;
+   static const S32 MaxLegacySequences = 127;
 
 protected:
    FileName          mShapePath;

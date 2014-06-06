@@ -56,7 +56,7 @@ CreateUnitTest( TestThreadStatic, "Core/ThreadStatic" )
       if( lastTestPassed() ) 
       {
          // Traverse the list and compare it to the initial value copy (index 0)
-         for( int i = 0; i < _TorqueThreadStaticReg::getStaticList().size(); i++ )
+         for( S32 i = 0; i < _TorqueThreadStaticReg::getStaticList().size(); i++ )
          {
             _TorqueThreadStatic *master = _TorqueThreadStaticReg::getStaticList()[i];
             _TorqueThreadStatic *cpy = (*testInstance)[i];

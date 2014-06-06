@@ -429,7 +429,7 @@ U32 PathCamera::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if (stream->writeFlag(mask & WindowMask)) {
       stream->write(mNodeBase);
       stream->write(mNodeCount);
-      for (int i = 0; i < mNodeCount; i++) {
+      for (S32 i = 0; i < mNodeCount; i++) {
          CameraSpline::Knot *knot = mSpline.getKnot(i);
          mathWrite(*stream, knot->mPosition);
          mathWrite(*stream, knot->mRotation);
@@ -477,7 +477,7 @@ void PathCamera::unpackUpdate(NetConnection *con, BitStream *stream)
       mSpline.removeAll();
       stream->read(&mNodeBase);
       stream->read(&mNodeCount);
-      for (int i = 0; i < mNodeCount; i++)
+      for (S32 i = 0; i < mNodeCount; i++)
       {
          CameraSpline::Knot *knot = new CameraSpline::Knot();
          mathRead(*stream, &knot->mPosition);

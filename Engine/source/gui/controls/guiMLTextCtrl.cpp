@@ -91,7 +91,7 @@ GFX_ImplementTextureProfile(GFXMLTextureProfile,
                             GFXTextureProfile::DiffuseMap, 
                             GFXTextureProfile::PreserveSize |
                             GFXTextureProfile::Static, 
-                            GFXTextureProfile::None);
+                            GFXTextureProfile::NONE);
 
 const U32 GuiMLTextCtrl::csmTextBufferGrowthSize = 1024;
 
@@ -138,7 +138,7 @@ DefineEngineMethod( GuiMLTextCtrl, addText, void, ( const char* text, bool refor
    object->addText(text, dStrlen(text), reformat);
 }
 
-DefineEngineMethod( GuiMLTextCtrl, setCursorPosition, bool, (int newPos),,
+DefineEngineMethod( GuiMLTextCtrl, setCursorPosition, bool, (S32 newPos),,
    "@brief Change the text cursor's position to a new defined offset within the text in the control.\n\n"
    "@param newPos Offset to place cursor.\n"
    "@tsexample\n"
@@ -153,7 +153,7 @@ DefineEngineMethod( GuiMLTextCtrl, setCursorPosition, bool, (int newPos),,
    return object->setCursorPosition(newPos);
 }
 
-DefineEngineMethod( GuiMLTextCtrl, scrollToTag, void, (int tagID),,
+DefineEngineMethod( GuiMLTextCtrl, scrollToTag, void, (S32 tagID),,
    "@brief Scroll down to a specified tag.\n\n"
    "Detailed description\n\n"
    "@param tagID TagID to scroll the control to\n"

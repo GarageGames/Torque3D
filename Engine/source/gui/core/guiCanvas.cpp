@@ -1561,7 +1561,7 @@ void GuiCanvas::setupFences()
       mFences = new GFXFence*[mNumFences];
 
       // Allocate the new fences
-      for( int i = 0; i < mNumFences; i++ )
+      for( S32 i = 0; i < mNumFences; i++ )
          mFences[i] = GFX->createFence();
    }
 

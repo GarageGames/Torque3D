@@ -41,7 +41,8 @@ PlatformWindowManager * CreatePlatformWindowManager()
 Win32WindowManager::Win32WindowManager()
 {
    // Register in the process list.
-   Process::notify(this, &Win32WindowManager::_process, PROCESS_INPUT_ORDER);
+   mOnProcessSignalSlot.setDelegate( this, &Win32WindowManager::_process );
+   Process::notify( mOnProcessSignalSlot, PROCESS_INPUT_ORDER );
 
    // Init our list of allocated windows.
    mWindowListHead = NULL;
@@ -58,9 +59,6 @@ Win32WindowManager::Win32WindowManager()
 
 Win32WindowManager::~Win32WindowManager()
 {
-   // Get ourselves off the process list.
-   Process::remove(this, &Win32WindowManager::_process);
-
    // Kill all our windows first.
    while(mWindowListHead)
       // The destructors update the list, so this works just fine.
@@ -452,7 +450,7 @@ void Win32WindowManager::_processCmdLineArgs( const S32 argc, const char **argv 
 {
    if (argc > 1)
    {
-      for (int i = 1; i < argc; i++)
+      for (S32 i = 1; i < argc; i++)
       {
          if ( dStrnicmp( argv[i], "-window", 7 ) == 0 )
          {

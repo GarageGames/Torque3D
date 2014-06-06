@@ -175,7 +175,7 @@ bool ConsoleLogger::detach()
    mStream.close();
 
    // Remove this object from the list of active loggers
-   for( int i = 0; i < mActiveLoggers.size(); i++ ) 
+   for( S32 i = 0; i < mActiveLoggers.size(); i++ ) 
    {
       if( mActiveLoggers[i] == this ) 
       {

@@ -29,7 +29,7 @@ function initializeWorldEditor()
    exec("./scripts/cursors.ed.cs");
 
    exec("./gui/guiCreateNewTerrainGui.gui" );
-   exec("./gui/genericPromptDialog.ed.gui" );
+   exec("./gui/GenericPromptDialog.ed.gui" );
    exec("./gui/guiTerrainImportGui.gui" );
    exec("./gui/guiTerrainExportGui.gui" );
    exec("./gui/EditorGui.ed.gui");

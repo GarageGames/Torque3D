@@ -56,7 +56,7 @@ class SFXVorbisStream : public SFXFileStream,
 
       // The ov_callbacks.
       static size_t _read_func( void *ptr, size_t size, size_t nmemb, void *datasource );
-      static int _seek_func( void *datasource, ogg_int64_t offset, int whence );
+      static S32 _seek_func( void *datasource, ogg_int64_t offset, S32 whence );
       static long _tell_func( void *datasource );
 
       // SFXStream

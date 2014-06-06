@@ -320,9 +320,9 @@ bool ProjectileData::preload(bool server, String &errorStr)
          if (Sim::findObject(decalId, decal) == false)
             Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet, bad datablockId(decal): %d", decalId);
 
-      String errorStr;
-      if( !sfxResolve( &sound, errorStr ) )
-         Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet: %s", errorStr.c_str());
+      String sfxErrorStr;
+      if( !sfxResolve( &sound, sfxErrorStr ) )
+         Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet: %s", sfxErrorStr.c_str());
 
       if (!lightDesc && lightDescId != 0)
          if (Sim::findObject(lightDescId, lightDesc) == false)
@@ -1011,7 +1011,7 @@ void Projectile::explode( const Point3F &p, const Point3F &n, const U32 collideT
 
       // Client (impact) decal.
       if ( mDataBlock->decal )     
-         gDecalManager->addDecal( p, n, 0.0f, mDataBlock->decal );
+         gDecalManager->addDecal(p, n, mRandF(0.0f, M_2PI_F), mDataBlock->decal);
 
       // Client object
       updateSound();

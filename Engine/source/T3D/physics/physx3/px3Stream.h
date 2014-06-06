@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _T3D_PHYSICS_PX3STREAM_H_
-#define _T3D_PHYSICS_PX3STREAM_H_
+#ifndef _PX3STREAM_H_
+#define _PX3STREAM_H_
 
 #ifndef _PHYSX3_H_
 #include "T3D/physics/physx3/px3.h"
@@ -74,4 +74,4 @@ public:
    virtual ~Px3ConsoleStream();
 };
 
-#endif
+#endif // _PX3STREAM_H_

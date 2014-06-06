@@ -25,48 +25,57 @@
 #ifdef WIN32
 
 #include <windows.h>
-#include <stdio.h>
+#include <string>
 
 extern "C"
 {
    int (*torque_winmain)( HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow) = NULL;
 };
 
+bool getDllName(std::wstring& dllName)
+{
+   wchar_t filenameBuf[MAX_PATH];
+   DWORD length = GetModuleFileNameW( NULL, filenameBuf, MAX_PATH );
+   if(length == 0) return false;
+   dllName = std::wstring(filenameBuf);
+   size_t dotPos = dllName.find_last_of(L".");
+   if(dotPos == std::wstring::npos) return false;
+   dllName.erase(dotPos);
+   dllName += L".dll";
+   return true;
+}
+
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
 {
-   char filename[4096];
-   char gameLib[4096];
+   std::wstring dllName = std::wstring();
+   if(!getDllName(dllName))
+   {
+      MessageBoxW(NULL, L"Unable to find game dll", L"Error",  MB_OK|MB_ICONWARNING);
+      return -1;
+   }
 
-   GetModuleFileNameA(NULL, filename, 4096);
-   filename[strlen(filename)-4] = 0;
-   sprintf(gameLib, "%s.dll", filename);
-
-   HMODULE hGame = LoadLibraryA(gameLib);
-
-   if (hGame)
-      torque_winmain = (int (*)(HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow))GetProcAddress(hGame, "torque_winmain");
-
-   char error[4096];
+   HMODULE hGame = LoadLibraryW(dllName.c_str());
    if (!hGame)
    {
-      sprintf(error, "Unable to load game library: %s.  Please make sure it exists and the latest DirectX is installed.", gameLib);
-      MessageBoxA(NULL, error, "Error",  MB_OK|MB_ICONWARNING);
+      wchar_t error[4096];
+      _swprintf_l(error, sizeof(error), L"Unable to load game library: %s.  Please make sure it exists and the latest DirectX is installed.", _get_current_locale(), dllName.c_str());
+      MessageBoxW(NULL, error, L"Error",  MB_OK|MB_ICONWARNING);
       return -1;
    }
 
+   torque_winmain = (int (*)(HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow))GetProcAddress(hGame, "torque_winmain");
    if (!torque_winmain)
    {
-      sprintf(error, "Missing torque_winmain export in game library: %s.  Please make sure that it exists and the latest DirectX is installed.", gameLib);
-      MessageBoxA(NULL, error, "Error",  MB_OK|MB_ICONWARNING);
+      wchar_t error[4096];
+      _swprintf_l(error, sizeof(error), L"Missing torque_winmain export in game library: %s.  Please make sure that it exists and the latest DirectX is installed.", _get_current_locale(), dllName.c_str());
+      MessageBoxW(NULL, error, L"Error",  MB_OK|MB_ICONWARNING);
       return -1;
    }
 
-   int ret = torque_winmain(hInstance, hPrevInstance, lpszCmdLine, nCommandShow );
+   int ret = torque_winmain(hInstance, hPrevInstance, lpszCmdLine, nCommandShow);
 
    FreeLibrary(hGame);
-
    return ret;
-
 }
 #endif // WIN32
 

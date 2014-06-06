@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _T3D_PHYSICS_PX3BODY_H_
-#define _T3D_PHYSICS_PX3BODY_H_
+#ifndef _PX3BODY_H_
+#define _PX3BODY_H_
 
 #ifndef _T3D_PHYSICS_PHYSICSBODY_H_
 #include "T3D/physics/physicsBody.h"
@@ -88,6 +88,7 @@ public:
    // PhysicsObject
    virtual PhysicsWorld* getWorld();
    virtual void setTransform( const MatrixF &xfm );
+   virtual void moveKinematicTo( const MatrixF &xfm );
    virtual MatrixF& getTransform( MatrixF *outMatrix );
    virtual Box3F getWorldBounds();
    virtual void setSimulationEnabled( bool enabled );
@@ -118,4 +119,4 @@ public:
    virtual void applyImpulse( const Point3F &origin, const Point3F &force );
 };
 
-#endif 
+#endif // _PX3BODY_H_

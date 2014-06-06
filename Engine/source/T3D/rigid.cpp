@@ -265,8 +265,8 @@ void Rigid::translateCenterOfMass(const Point3F &oldPos,const Point3F &newPos)
    MatrixF oldx,newx;
    oldx.setCrossProduct(oldPos);
    newx.setCrossProduct(newPos);
-   for (int row = 0; row < 3; row++)
-      for (int col = 0; col < 3; col++) {
+   for (S32 row = 0; row < 3; row++)
+      for (S32 col = 0; col < 3; col++) {
          F32 n = newx(row,col), o = oldx(row,col);
          objectInertia(row,col) += mass * ((o * o) - (n * n));
       }

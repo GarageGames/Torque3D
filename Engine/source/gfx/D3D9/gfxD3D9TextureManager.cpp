@@ -236,7 +236,7 @@ void GFXD3D9TextureManager::_innerCreateTexture( GFXD3D9TextureObject *retTex,
          // If this is a render target, and it wants AA or wants to match the backbuffer (for example, to share the z)
          // Check the caps though, if we can't stretchrect between textures, use the old RT method.  (Which hopefully means
          // that they can't force AA on us as well.)
-         if (retTex->mProfile->isRenderTarget() && mslevel != 0 && (mDeviceCaps.Caps2 && D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES))
+         if (retTex->mProfile->isRenderTarget() && mslevel != 0 && (mDeviceCaps.Caps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES))
          {
             D3D9Assert(mD3DDevice->CreateRenderTarget(width, height, d3dTextureFormat, 
                mstype, mslevel, false, retTex->getSurfacePtr(), NULL),
@@ -259,7 +259,7 @@ void GFXD3D9TextureManager::_innerCreateTexture( GFXD3D9TextureObject *retTex,
 
       retTex->mTextureSize.set(probeDesc.Width, probeDesc.Height, 0);
       
-      int fmt = probeDesc.Format;
+      S32 fmt = probeDesc.Format;
 
 #if !defined(TORQUE_OS_XENON)
       GFXREVERSE_LOOKUP( GFXD3D9TextureFormat, GFXFormat, fmt );
@@ -568,7 +568,7 @@ bool GFXD3D9TextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dd
    GFXD3D9TextureObject *texture = static_cast<GFXD3D9TextureObject*>(aTexture);
 
    // Fill the texture...
-   for( int i = 0; i < aTexture->mMipLevels; i++ )
+   for( S32 i = 0; i < aTexture->mMipLevels; i++ )
    {
       PROFILE_SCOPE(GFXD3DTexMan_loadSurface);
 

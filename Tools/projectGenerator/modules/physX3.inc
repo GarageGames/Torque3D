@@ -75,10 +75,16 @@ beginModule( 'physX3' );
 
    // Source
    addEngineSrcDir( "T3D/physics/physx3" );
+   addEngineSrcDir( "T3D/physics/physx3/Cloth" );
+   addEngineSrcDir( "T3D/physics/physx3/Particles" );
 
    // Includes
    addIncludePath( $PHYSX3_SDK_PATH . "/Include" );
-
+   addIncludePath( $PHYSX3_SDK_PATH . "/Include/extensions" );
+   addIncludePath( $PHYSX3_SDK_PATH . "/Include/foundation" );
+   addIncludePath( $PHYSX3_SDK_PATH . "/Include/characterkinematic" );
+   addIncludePath( $PHYSX3_SDK_PATH . "/Include/common" );
+      
    // Libs
    addProjectLibDir( $PHYSX3_SDK_PATH . "/Lib/win32" );
    addProjectLibInput( "PhysX3_x86.lib","PhysX3CHECKED_x86.lib" );

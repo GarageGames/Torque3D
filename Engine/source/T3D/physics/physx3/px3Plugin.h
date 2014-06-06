@@ -20,12 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _T3D_PHYSICS_PX3PLUGIN_H_
-#define _T3D_PHYSICS_PX3PLUGIN_H_
+#ifndef _PX3PLUGIN_H_
+#define _PX3PLUGIN_H_
 
 #ifndef _T3D_PHYSICS_PHYSICSPLUGIN_H_
 #include "T3D/physics/physicsPlugin.h"
 #endif
+
+class Px3ClothShape;
 
 class Px3Plugin : public PhysicsPlugin
 {
@@ -52,7 +54,6 @@ public:
    virtual PhysicsWorld* getWorld( const String &worldName ) const;
    virtual PhysicsWorld* getWorld() const;
    virtual U32 getWorldCount() const;
-
 };
 
-#endif 
+#endif  // _PX3PLUGIN_H_

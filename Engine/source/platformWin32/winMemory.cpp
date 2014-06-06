@@ -63,7 +63,7 @@ void dRealFree(void* p)
    free(p);
 }
 
-void *dMalloc_aligned(dsize_t in_size, int alignment)
+void *dMalloc_aligned(dsize_t in_size, S32 alignment)
 {
    return _mm_malloc(in_size, alignment);
 }

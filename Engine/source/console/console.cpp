@@ -248,7 +248,7 @@ static bool active = false;
 static bool newLogFile;
 static const char *logFileName;
 
-static const int MaxCompletionBufferSize = 4096;
+static const S32 MaxCompletionBufferSize = 4096;
 static char completionBuffer[MaxCompletionBufferSize];
 static char tabBuffer[MaxCompletionBufferSize] = {0};
 static SimObjectPtr<SimObject> tabObject;

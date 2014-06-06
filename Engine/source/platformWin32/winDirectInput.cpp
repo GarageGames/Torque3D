@@ -437,14 +437,14 @@ bool DInputManager::isXInputEnabled()
 }
 
 //------------------------------------------------------------------------------
-bool DInputManager::isXInputConnected(int controllerID)
+bool DInputManager::isXInputConnected(S32 controllerID)
 {
    return( mXInputStateNew[controllerID].bConnected );
 }
 
-int DInputManager::getXInputState(int controllerID, int property, bool current)
+int DInputManager::getXInputState(S32 controllerID, S32 property, bool current)
 {
-   int retVal;
+   S32 retVal;
 
    switch(property)
    {
@@ -511,7 +511,7 @@ void DInputManager::deactivateXInput()
 }
 
 //------------------------------------------------------------------------------
-bool DInputManager::rumble( const char *pDeviceName, float x, float y )
+bool DInputManager::rumble( const char *pDeviceName, F32 x, F32 y )
 {
    // Determine the device
    U32 deviceType;
@@ -566,7 +566,7 @@ bool DInputManager::rumble( const char *pDeviceName, float x, float y )
    }
 }
 
-void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue )
+void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, F32 fValue )
 {
    InputEventInfo newEvent;
 
@@ -586,7 +586,7 @@ void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, In
 // "mXInputStateReset" is the exception and is true whenever DirectInput gets reset (because 
 // the user ALT-TABBED away, for example). That means that after every context switch,
 // you will get a full set of updates on the "true" state of the controller.
-inline void DInputManager::fireXInputConnectEvent( int controllerID, bool condition, bool connected )
+inline void DInputManager::fireXInputConnectEvent( S32 controllerID, bool condition, bool connected )
 {
    if ( mXInputStateReset || condition )
    {
@@ -597,7 +597,7 @@ inline void DInputManager::fireXInputConnectEvent( int controllerID, bool condit
    }
 }
 
-inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, float fValue )
+inline void DInputManager::fireXInputMoveEvent( S32 controllerID, bool condition, InputObjectInstances objInst, F32 fValue )
 {
    if ( mXInputStateReset || condition )
    {
@@ -620,7 +620,7 @@ inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition
    }
 }
 
-inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFire, int button, InputObjectInstances objInst )
+inline void DInputManager::fireXInputButtonEvent( S32 controllerID, bool forceFire, S32 button, InputObjectInstances objInst )
 {
    if ( mXInputStateReset || forceFire || ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != (mXInputStateOld[controllerID].state.Gamepad.wButtons & button)) )
    {
@@ -663,7 +663,7 @@ void DInputManager::processXInput( void )
 
    if ( mfnXInputGetState )
    {
-      for ( int i=0; i<4; i++ )
+      for ( S32 i=0; i<4; i++ )
       {
          // Calling XInputGetState on a disconnected controller takes a fair 
          // amount of time (probably because it tries to locate it), so we 
@@ -855,7 +855,7 @@ ConsoleFunction( isXInputConnected, bool, 2, 2, "( int controllerID )"
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( getXInputState, int, 3, 4, "( int controllerID, string property, bool current )"
+ConsoleFunction( getXInputState, S32, 3, 4, "( int controllerID, string property, bool current )"
 				"@brief Queries the current state of a connected Xbox 360 controller.\n\n"
             "XInput Properties:\n\n"
             " - XI_THUMBLX, XI_THUMBLY - X and Y axes of the left thumbstick. \n"

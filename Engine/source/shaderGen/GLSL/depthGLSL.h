@@ -54,7 +54,7 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
    virtual String getName() { return "Depth (Out)"; }
    virtual Material::BlendOp getBlendOp() { return Material::None; }
-   virtual const char* getOutputVarName() const { return "outDepth"; }
+   virtual const char* getOutputVarName() const { return "IN_depth"; }
 };
 
 #endif // _DEPTH_GLSL_H_
