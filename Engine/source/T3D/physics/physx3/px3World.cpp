@@ -54,23 +54,6 @@ physx::PxDefaultAllocator Px3World::smMemoryAlloc;
 F32 Px3World::smPhysicsStepTime = 1.0f/(F32)TickMs;
 U32 Px3World::smPhysicsMaxIterations = 4;
 
-//filter shader with support for CCD pairs
-static physx::PxFilterFlags sCcdFilterShader(
-        physx::PxFilterObjectAttributes attributes0,
-        physx::PxFilterData filterData0,
-        physx::PxFilterObjectAttributes attributes1,
-        physx::PxFilterData filterData1,
-        physx::PxPairFlags& pairFlags,
-        const void* constantBlock,
-        physx::PxU32 constantBlockSize)
-{
-        pairFlags = physx::PxPairFlag::eRESOLVE_CONTACTS;
-        pairFlags |= physx::PxPairFlag::eCCD_LINEAR;
-        return physx::PxFilterFlags();
-}
-
-
-
 Px3World::Px3World(): mScene( NULL ),
    mProcessList( NULL ),
    mIsSimulating( false ),
@@ -180,7 +163,6 @@ bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *se
 		return false;
 	}
 
-   //just for testing-must remove, should really be enabled via console like physx 2 plugin
 #ifdef TORQUE_DEBUG
 	physx::PxVisualDebuggerConnectionFlags connectionFlags(physx::PxVisualDebuggerExt::getAllConnectionFlags());
 	smPvdConnection = physx::PxVisualDebuggerExt::createConnection(gPhysics3SDK->getPvdConnectionManager(), 
@@ -241,8 +223,7 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
  	
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
-
-   sceneDesc.filterShader  = sCcdFilterShader;
+   sceneDesc.filterShader  = physx::PxDefaultSimulationFilterShader;
 
 	mScene = gPhysics3SDK->createScene(sceneDesc);
 

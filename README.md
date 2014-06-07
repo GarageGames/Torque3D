@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 Torque 3D v3.5 - PhysX 3.3 Basic Plugin
 ==========================
+=======
+Torque 3D v3.5.1
+================
+>>>>>>> GarageGames/development
 
 This is a basic PhysX 3.3 plugin that does not contain any added features like cloth,particles and CCD. This plugin provides no more features than the bullet plugin and can therefore be used as a drop in alternative. It does not modify any files outside of the physx3 folder. A far more advanced physx3 plugin with CCD, cloth and particles can be found on this repository under the physx3 branch.
 
@@ -25,6 +30,7 @@ Setting up PhysX 3.3 manually
 
 The following libraries will also be needed:
  
+<<<<<<< HEAD
 Release , Debug
 
  - PhysX3_x86.lib,PhysX3CHECKED_x86.lib
@@ -39,6 +45,14 @@ Release , Debug
 With debug build feel free to change CHECKED to DEBUG if you prefer but it will still require the CHECKED dll's though.
  
 Running a project
+=======
+* [Complete Torque 3D 3.5.1 zip package](http://mit.garagegames.com/Torque3D-3-5-1.zip) with updated TorqueScript documentation, the *Project Manager*, and compiled versions of the templates.
+* [Torque 3D Project Manager v2.1](http://mit.garagegames.com/T3DProjectManager-2-1.zip) on its own for use in your T3D forks.
+
+If you're looking for an older release see the [Torque 3D Archive](https://github.com/GarageGames/Torque3D/wiki/Torque-3D-Archive)
+
+Creating a New Project Based on a Template
+>>>>>>> GarageGames/development
 ------------------------------------------
 
  - To run a release project you will need the following from the SDK bin folder:

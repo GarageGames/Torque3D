@@ -88,7 +88,6 @@ public:
    // PhysicsObject
    virtual PhysicsWorld* getWorld();
    virtual void setTransform( const MatrixF &xfm );
-   virtual void moveKinematicTo( const MatrixF &xfm );
    virtual MatrixF& getTransform( MatrixF *outMatrix );
    virtual Box3F getWorldBounds();
    virtual void setSimulationEnabled( bool enabled );
@@ -100,6 +99,7 @@ public:
                         U32 bodyFlags,
                         SceneObject *obj, 
                         PhysicsWorld *world );
+
    virtual bool isDynamic() const;
    virtual PhysicsCollision* getColShape();
    virtual void setSleepThreshold( F32 linear, F32 angular );

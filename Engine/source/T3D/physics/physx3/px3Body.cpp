@@ -147,10 +147,6 @@ bool Px3Body::init(   PhysicsCollision *shape,
    {
 		physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
 		physx::PxRigidBodyExt::setMassAndUpdateInertia(*actor,mass);
-      if(mBodyFlags & BF_CCD)
-         actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true);
-      else
-         actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eENABLE_CCD, false);
    }
 
     // This sucks, but it has to happen if we want
@@ -223,7 +219,7 @@ void Px3Body::getState( PhysicsState *outState )
    outState->linVelocity = px3Cast<Point3F>( actor->getLinearVelocity() ); 
    outState->angVelocity = px3Cast<Point3F>( actor->getAngularVelocity() );
    outState->sleeping = actor->isSleeping();
-   outState->momentum = px3Cast<Point3F>( (1.0f/actor->getMass()) * actor->getLinearVelocity() );//??
+   outState->momentum = px3Cast<Point3F>( (1.0f/actor->getMass()) * actor->getLinearVelocity() );
 
 }
 
@@ -368,24 +364,6 @@ void Px3Body::setSimulationEnabled( bool enabled )
 
    delete [] shapes;
 }
-
-void Px3Body::moveKinematicTo( const MatrixF &transform )
-{
-   AssertFatal( mActor, "Px3Body::moveKinematicTo - The actor is null!" );
-
-   const bool isKinematic = mBodyFlags & BF_KINEMATIC;
-   if (!isKinematic )
-   {
-      Con::errorf("Px3Body::moveKinematicTo is only for kinematic bodies.");
-      return;
-   }   
-
-   mWorld->releaseWriteLock();
-
-   physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
-   actor->setKinematicTarget(px3Cast<physx::PxTransform>(transform));
-}
-
 void Px3Body::setTransform( const MatrixF &transform )
 {
    AssertFatal( mActor, "Px3Body::setTransform - The actor is null!" );
