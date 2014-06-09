@@ -34,7 +34,6 @@
 #include "gui/core/guiCanvas.h"
 #include "gui/worldEditor/terrainActions.h"
 #include "terrain/terrMaterial.h"
-#include <ctime>
 
 
 
@@ -2877,12 +2876,7 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
    S32 mat = getPaintMaterialIndex();  
    if (mat == -1)  
       return;  
-
-   //setup for randomized coverage
-   mCoverage*=100;
-   srand((unsigned)time(0));
-   int randomNumber;
-
+  
    mUndoSel = new Selection;  
           
    U32 terrBlocks = mActiveTerrain->getBlockSize();  
@@ -2901,8 +2895,7 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
          if (gi.mMaterial == mat)  
             continue;  
 
-         randomNumber = (rand() % 10000);
-         if (randomNumber > mCoverage)
+         if (mRandI(0, 100) > mCoverage)
             continue;
   
          Point3F wp;  
