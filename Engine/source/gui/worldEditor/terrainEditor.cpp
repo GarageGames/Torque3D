@@ -2111,8 +2111,9 @@ const char* TerrainEditor::getBrushPos()
    AssertFatal(mMouseBrush!=NULL, "TerrainEditor::getBrushPos: no mouse brush!");
 
    Point2I pos = mMouseBrush->getPosition();
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", pos.x, pos.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", pos.x, pos.y);
    return(ret);
 }
 
@@ -2521,8 +2522,9 @@ ConsoleMethod( TerrainEditor, getBrushSize, const char*, 2, 2, "()")
 {
    Point2I size = object->getBrushSize();
 
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", size.x, size.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", size.x, size.y);
    return ret;
 }
 

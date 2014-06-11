@@ -89,8 +89,9 @@ bool GuiGradientSwatchCtrl::onWake()
 	if ( !Parent::onWake() )
       return false;
 	
-	char* altCommand = Con::getReturnBuffer(512);
-	dSprintf( altCommand, 512, "%s(%i.color, \"%i.setColor\");", mColorFunction, getId(), getId() );
+	static const U32 bufSize = 512;
+	char* altCommand = Con::getReturnBuffer(bufSize);
+	dSprintf( altCommand, bufSize, "%s(%i.color, \"%i.setColor\");", mColorFunction, getId(), getId() );
 	setField( "altCommand", altCommand );
 
 	return true;
@@ -616,10 +617,11 @@ ConsoleMethod(GuiGradientCtrl, getColor, const char*, 3, 3, "Get color value")
 	{
 		if ( idx >= 0 && idx < object->mColorRange.size() )
 		{
-			char* rColor = Con::getReturnBuffer(256);
+			static const U32 bufSize = 256;
+			char* rColor = Con::getReturnBuffer(bufSize);
 			rColor[0] = 0;
 
-			dSprintf(rColor, 256, "%f %f %f %f",
+			dSprintf(rColor, bufSize, "%f %f %f %f",
 				object->mColorRange[idx].swatch->getColor().red,
 				object->mColorRange[idx].swatch->getColor().green,
 				object->mColorRange[idx].swatch->getColor().blue,
@@ -632,10 +634,11 @@ ConsoleMethod(GuiGradientCtrl, getColor, const char*, 3, 3, "Get color value")
 	{
 		if ( idx >= 0 && idx < object->mAlphaRange.size() )
 		{
-			char* rColor = Con::getReturnBuffer(256);
+			static const U32 bufSize = 256;
+			char* rColor = Con::getReturnBuffer(bufSize);
 			rColor[0] = 0;
 
-			dSprintf(rColor, 256, "%f %f %f %f",
+			dSprintf(rColor, bufSize, "%f %f %f %f",
 				object->mAlphaRange[idx].swatch->getColor().red,
 				object->mAlphaRange[idx].swatch->getColor().green,
 				object->mAlphaRange[idx].swatch->getColor().blue,

@@ -468,9 +468,10 @@ ConsoleFunction(testJavaScriptBridge, const char *, 4, 4, "testBridge(arg1, arg2
 	if (dStrcmp(jret,"42"))
 		failed = 3;
 
-	char *ret = Con::getReturnBuffer(256);
+	static const U32 bufSize = 256;
+	char *ret = Con::getReturnBuffer(bufSize);
 
-	dSprintf(ret, 256, "%i", failed);
+	dSprintf(ret, bufSize, "%i", failed);
 
 	return ret;
 }

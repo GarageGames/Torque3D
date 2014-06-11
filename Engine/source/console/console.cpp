@@ -1313,8 +1313,9 @@ const char *getFormattedData(S32 type, const char *data, const EnumTable *tbl, B
       Con::setData(type, variable, 0, 1, &data, tbl, flag);
       const char* formattedVal = Con::getData(type, variable, 0, tbl, flag);
 
-      char* returnBuffer = Con::getReturnBuffer(2048);
-      dSprintf(returnBuffer, 2048, "%s\0", formattedVal );
+      static const U32 bufSize = 2048;
+      char* returnBuffer = Con::getReturnBuffer(bufSize);
+      dSprintf(returnBuffer, bufSize, "%s\0", formattedVal );
 
       cbt->deleteNativeVariable(variable);
 
