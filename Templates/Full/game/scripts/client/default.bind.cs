@@ -615,7 +615,11 @@ GlobalActionMap.bind(keyboard, "ctrl o", bringUpOptions);
 //------------------------------------------------------------------------------
 // Debugging Functions
 //------------------------------------------------------------------------------
-
+function showmetrics(%val)
+{
+      metrics("FPS GFX SHADOW SFX TERRAIN GROUNDCOVER FOREST NET");
+}
+GlobalActionMap.bind(keyboard, "ctrl F2", showmetrics);
 
 //------------------------------------------------------------------------------
 //
