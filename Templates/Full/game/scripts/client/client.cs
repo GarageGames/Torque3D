@@ -145,6 +145,9 @@ function clientCmdtoggleVehicleMap(%toggle)
    if(%toggle)
    {
       moveMap.pop();
+	  // clear movement
+	  $mvForwardAction = 0;
+	  $mvBackwardAction = 0;
       vehicleMap.push();
    }
    else
