@@ -2870,7 +2870,7 @@ ConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, 3, 3, 0)
 }
 
 //------------------------------------------------------------------------------  
-void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope )  
+void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage )  
 {  
    if (!mActiveTerrain)  
       return;  
@@ -2896,6 +2896,9 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
   
          if (gi.mMaterial == mat)  
             continue;  
+
+         if (mRandI(0, 100) > mCoverage)
+            continue;
   
          Point3F wp;  
          gridToWorld(gp, wp);  
@@ -2935,7 +2938,7 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
    scheduleMaterialUpdate();     
 }  
   
-ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 6, 6, "(float minHeight, float maxHeight, float minSlope, float maxSlope)")  
+ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 7, 7, "(float minHeight, float maxHeight, float minSlope, float maxSlope, float coverage)")   
 {  
-   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]) );  
+   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]), dAtof(argv[6]));  
 }  
