@@ -1,5 +1,16 @@
 project(${TORQUE_APP_NAME})
 
+if(UNIX)
+    # default compiler flags
+    # force compile 32 bit
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+
+	# for asm files
+	SET (CMAKE_ASM_NASM_OBJECT_FORMAT "elf")
+	ENABLE_LANGUAGE (ASM_NASM)
+endif()
+
 # TODO: fmod support
 
 ###############################################################################
@@ -7,14 +18,18 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 option(TORQUE_SFX_VORBIS "Vorbis Sound" ON)
 mark_as_advanced(TORQUE_SFX_VORBIS)
+option(TORQUE_THEORA "Theora Video Support" ON)
+mark_as_advanced(TORQUE_THEORA)
 option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
 mark_as_advanced(TORQUE_ADVANCED_LIGHTING)
 option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
 mark_as_advanced(TORQUE_BASIC_LIGHTING)
-option(TORQUE_THEORA "Theora Video Support" ON)
-mark_as_advanced(TORQUE_THEORA)
-option(TORQUE_SFX_DirectX "DirectX Sound" ON)
-mark_as_advanced(TORQUE_SFX_DirectX)
+if(WIN32)
+	option(TORQUE_SFX_DirectX "DirectX Sound" ON)
+	mark_as_advanced(TORQUE_SFX_DirectX)
+else()
+	set(TORQUE_SFX_DirectX OFF)
+endif()
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
 mark_as_advanced(TORQUE_SFX_OPENAL)
 option(TORQUE_HIFI "HIFI? support" OFF)
@@ -23,6 +38,13 @@ option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
 option(TORQUE_NAVIGATION "Enable Navigation module" OFF)
 #mark_as_advanced(TORQUE_NAVIGATION)
+if(WIN32)
+	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
+	#mark_as_advanced(TORQUE_OPENGL)
+else()
+	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
+	option(TORQUE_DEDICATED "Torque dedicated" OFF)
+endif()
 
 #Oculus VR
 option(TORQUE_OCULUSVR "Enable OCULUSVR module" OFF)
@@ -45,10 +67,18 @@ endif()
 ###############################################################################
 # options
 ###############################################################################
+if(NOT MSVC) # handle single-configuration generator
+    set(TORQUE_BUILD_TYPE "Debug" CACHE STRING "Select one of Debug, Release and RelWithDebInfo")
+    set_property(CACHE TORQUE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo")
+    
+    set(TORQUE_ADDITIONAL_LINKER_FLAGS "" CACHE STRING "Additional linker flags")
+    mark_as_advanced(TORQUE_ADDITIONAL_LINKER_FLAGS)
+endif()
+
 option(TORQUE_MULTITHREAD "Multi Threading" ON)
 mark_as_advanced(TORQUE_MULTITHREAD)
 
-option(TORQUE_DISABLE_MEMORY_MANAGER "Disable memory manager" OFF)
+option(TORQUE_DISABLE_MEMORY_MANAGER "Disable memory manager" ON)
 mark_as_advanced(TORQUE_DISABLE_MEMORY_MANAGER)
 
 option(TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM "Disable virtual mount system" OFF)
@@ -130,7 +160,9 @@ addPath("${srcDir}/math/test")
 addPath("${srcDir}/platform")
 addPath("${srcDir}/cinterface")
 addPath("${srcDir}/platform/nativeDialogs")
-addPath("${srcDir}/platform/menus")
+if( NOT TORQUE_DEDICATED )
+    addPath("${srcDir}/platform/menus")
+endif()
 addPath("${srcDir}/platform/test")
 addPath("${srcDir}/platform/threads")
 addPath("${srcDir}/platform/async")
@@ -197,25 +229,47 @@ addPathRec("${projectSrcDir}")
 if(TORQUE_ADVANCED_LIGHTING)
     addPath("${srcDir}/lighting/advanced")
     addPathRec("${srcDir}/lighting/shadowMap")
-    addPathRec("${srcDir}/lighting/advanced/hlsl")
-    #addPathRec("${srcDir}/lighting/advanced/glsl")
+    if(WIN32)
+		addPathRec("${srcDir}/lighting/advanced/hlsl")
+	endif()
+	if(TORQUE_OPENGL)
+		addPathRec("${srcDir}/lighting/advanced/glsl")
+	endif()
+    addDef(TORQUE_ADVANCED_LIGHTING)
 endif()
 if(TORQUE_BASIC_LIGHTING)
     addPathRec("${srcDir}/lighting/basic")
     addPathRec("${srcDir}/lighting/shadowMap")
+    addDef(TORQUE_BASIC_LIGHTING)
 endif()
 
 # DirectX Sound
 if(TORQUE_SFX_DirectX)
+    addLib(x3daudio.lib)
     addPathRec("${srcDir}/sfx/dsound")
     addPathRec("${srcDir}/sfx/xaudio")
 endif()
 
 # OpenAL
-if(TORQUE_SFX_OPENAL)
+if(TORQUE_SFX_OPENAL AND NOT TORQUE_DEDICATED)
     addPath("${srcDir}/sfx/openal")
     #addPath("${srcDir}/sfx/openal/mac")
-    addPath("${srcDir}/sfx/openal/win32")
+    if(WIN32)
+		addPath("${srcDir}/sfx/openal/win32")
+		addInclude("${libDir}/openal/win32")
+    endif()
+	if(UNIX)
+		addPath("${srcDir}/sfx/openal/linux")
+	endif()
+    
+endif()
+
+# Vorbis
+if(TORQUE_SFX_VORBIS)
+    addInclude(${libDir}/libvorbis/include)
+    addDef(TORQUE_OGGVORBIS)
+    addLib(libvorbis)
+    addLib(libogg)
 endif()
 
 # Theora
@@ -223,6 +277,11 @@ if(TORQUE_THEORA)
     addPath("${srcDir}/core/ogg")
     addPath("${srcDir}/gfx/video")
     addPath("${srcDir}/gui/theora")
+    
+    addDef(TORQUE_OGGTHEORA)
+    addDef(TORQUE_OGGVORIBS)
+    addInclude(${libDir}/libtheora/include)
+    addLib(libtheora)
 endif()
 
 # Include tools for non-tool builds (or define player if a tool build)
@@ -236,10 +295,12 @@ endif()
 
 if(TORQUE_HIFI)
     addPath("${srcDir}/T3D/gameBase/hifi")
+    addDef(TORQUE_HIFI_NET)
 endif()
     
 if(TORQUE_EXTENDED_MOVE)
     addPath("${srcDir}/T3D/gameBase/extended")
+    addDef(TORQUE_EXTENDED_MOVE)
 else()
     addPath("${srcDir}/T3D/gameBase/std")
 endif()
@@ -255,6 +316,15 @@ endif()
 if(TORQUE_HYDRA)
     include( "modules/module_hydra.cmake" )
 endif()
+
+if(TORQUE_DISABLE_MEMORY_MANAGER)
+    addDef(TORQUE_DISABLE_MEMORY_MANAGER)
+endif()
+
+if(TORQUE_DEDICATED)
+    addDef(TORQUE_DEDICATED)
+endif()
+
 
 ###############################################################################
 # platform specific things
@@ -320,24 +390,45 @@ if(PS3)
 endif()
 
 if(UNIX)
-    # linux_dedicated
-    addPath("${srcDir}/windowManager/dedicated")
-    # linux
-    addPath("${srcDir}/platformX86UNIX")
+    if(TORQUE_DEDICATED)
+		addPath("${srcDir}/windowManager/dedicated")
+		# ${srcDir}/platformX86UNIX/*.client.* files are not needed	
+		# @todo: move to separate file
+		file( GLOB tmp_files
+             ${srcDir}/platformX86UNIX/*.cpp
+             ${srcDir}/platformX86UNIX/*.c
+             ${srcDir}/platformX86UNIX/*.cc
+             ${srcDir}/platformX86UNIX/*.h )
+        file( GLOB tmp_remove_files ${srcDir}/platformX86UNIX/*client.* )
+        LIST( REMOVE_ITEM tmp_files ${tmp_remove_files} )
+        foreach( f ${tmp_files} )
+            addFile( ${f} )
+        endforeach()
+    else()
+        addPath("${srcDir}/platformX86UNIX")
+    endif()    
+    
     addPath("${srcDir}/platformX86UNIX/threads")
     addPath("${srcDir}/platformPOSIX")
-    addPath("${srcDir}/gfx/gl")
-    addPath("${srcDir}/gfx/gl/ggl")
-    addPath("${srcDir}/gfx/gl/ggl/x11") # This one is not yet implemented!
-    addPath("${srcDir}/gfx/gl/ggl/generated")
+endif()
+
+if( TORQUE_OPENGL )
     addPath("${srcDir}/shaderGen/GLSL")
-    addPath("${srcDir}/terrain/glsl")
-    addPath("${srcDir}/forest/glsl")    
+    if( TORQUE_OPENGL AND NOT TORQUE_DEDICATED )
+        addPath("${srcDir}/gfx/gl")
+        addPath("${srcDir}/gfx/gl/tGL")        
+        addPath("${srcDir}/terrain/glsl")
+        addPath("${srcDir}/forest/glsl")    
+    endif()
+    
+    if(WIN32 AND NOT TORQUE_SDL)
+      addPath("${srcDir}/gfx/gl/win32")
+    endif()
 endif()
 
 ###############################################################################
 ###############################################################################
-addExecutable()
+finishExecutable()
 ###############################################################################
 ###############################################################################
 
@@ -356,15 +447,15 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" AND
     CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" "${projectOutDir}/main.cs")
 endif()
 if(WIN32)
-	if(NOT EXISTS "${projectSrcDir}/torque.rc")
-		CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
-	endif()
-	if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-		CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-	endif()
-	if(NOT EXISTS "${projectOutDir}/cleanup.bat")
-		CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
-	endif()
+    if(NOT EXISTS "${projectSrcDir}/torque.rc")
+        CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
+    endif()
+    if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+        CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+    endif()
+    if(NOT EXISTS "${projectOutDir}/cleanup.bat")
+        CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
+    endif()
 endif()
 
 ###############################################################################
@@ -384,18 +475,26 @@ addLib(convexDecomp)
 
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
-	set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
-	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
+    set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
+    mark_as_advanced(TORQUE_EXTERNAL_LIBS)
     addLib("${TORQUE_EXTERNAL_LIBS}")
+endif()
+
+if(UNIX)
+    # copy pasted from T3D build system, some might not be needed
+	set(TORQUE_EXTERNAL_LIBS "dl Xxf86vm Xext X11 Xft stdc++ pthread GL" CACHE STRING "external libs to link against")
+	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
+    
+    string(REPLACE " " ";" TORQUE_EXTERNAL_LIBS_LIST ${TORQUE_EXTERNAL_LIBS})
+    addLib( "${TORQUE_EXTERNAL_LIBS_LIST}" )
 endif()
 
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
-addDebugDef(TORQUE_DEBUG)
-addDebugDef(TORQUE_ENABLE_ASSERTS)
-addDebugDef(TORQUE_DEBUG_GFX_MODE)
-
+addDef(TORQUE_DEBUG DEBUG)
+addDef(TORQUE_ENABLE_ASSERTS "DEBUG;RelWithDebInfo")
+addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
 addDef(NTORQUE_SHARED)
@@ -413,44 +512,8 @@ addDef(PCRE_STATIC)
 addDef(_CRT_SECURE_NO_WARNINGS)
 addDef(_CRT_SECURE_NO_DEPRECATE)
 
-
-###############################################################################
-# Modules
-###############################################################################
-if(TORQUE_SFX_DirectX)
-    addLib(x3daudio.lib)
-endif()
-
-if(TORQUE_ADVANCED_LIGHTING)
-    addDef(TORQUE_ADVANCED_LIGHTING)
-endif()
-if(TORQUE_BASIC_LIGHTING)
-    addDef(TORQUE_BASIC_LIGHTING)
-endif()
-
-if(TORQUE_SFX_OPENAL)
-    addInclude("${libDir}/openal/win32")
-endif()
-
-if(TORQUE_SFX_VORBIS)
-    addInclude(${libDir}/libvorbis/include)
-    addDef(TORQUE_OGGVORBIS)
-    addLib(libvorbis)
-    addLib(libogg)
-endif()
-
-if(TORQUE_THEORA)
-    addDef(TORQUE_OGGTHEORA)
-    addDef(TORQUE_OGGVORIBS)
-    addInclude(${libDir}/libtheora/include)
-    addLib(libtheora)
-endif()
-
-if(TORQUE_HIFI)
-    addDef(TORQUE_HIFI_NET)
-endif()
-if(TORQUE_EXTENDED_MOVE)
-    addDef(TORQUE_EXTENDED_MOVE)
+if(UNIX)
+	addDef(LINUX)	
 endif()
 
 ###############################################################################
@@ -475,6 +538,11 @@ addInclude("${libDir}/collada/include/1.4")
 # external things
 if(WIN32)
     set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY INCLUDE_DIRECTORIES $ENV{DXSDK_DIR}/Include)
+endif()
+
+if(UNIX)
+	addInclude("/usr/include/freetype2/freetype")
+	addInclude("/usr/include/freetype2")
 endif()
 
 ###############################################################################

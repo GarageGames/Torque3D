@@ -311,6 +311,8 @@ public:
       // NOTE: This is protected to ensure no one outside
       // of this structure is messing with it.
 
+      friend class Dictionary;
+
       #pragma warning( push )
       #pragma warning( disable : 4201 ) // warning C4201: nonstandard extension used : nameless struct/union
 

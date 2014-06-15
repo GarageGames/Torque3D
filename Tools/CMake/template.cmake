@@ -4,13 +4,10 @@
 # 1st thing: the project name
 project(pcre)
 
-# 2nd: add the paths where the source code is
+# add the paths where the source code is
 
 addPath("${libDir}/pcre")
 addPathRec("${libDir}/pcre")
-
-# 3rd: add addStaticLib()
-addStaticLib()
 
 # then add definitions
 addDef(PCRE_STATIC)
@@ -19,3 +16,6 @@ addDef(HAVE_CONFIG_H)
 # and maybe more include paths
 addInclude(${libDir}/libvorbis/include)
 addInclude(${libDir}/libogg/include)
+
+# finally: add finishLibrary()
+finishLibrary()

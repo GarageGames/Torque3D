@@ -4,7 +4,7 @@
 addPathRec( "${srcDir}/platform/input/razerHydra" )
 
 # Includes
-include_directories( "${TORQUE_RAZERHYDRA_SDK_PATH}/include" )
+addInclude( "${TORQUE_RAZERHYDRA_SDK_PATH}/include" )
  
 # Install
 if( WIN32 ) 
