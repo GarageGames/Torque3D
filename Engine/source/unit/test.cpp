@@ -29,6 +29,8 @@
 
 #include "unit/test.h"
 
+#include "core/util/journal/process.h"
+
 
 namespace UnitTesting
 {
@@ -274,6 +276,9 @@ bool TestRun::test(const char* module, bool skipInteractive)
    printStats();
 
    Platform::setCurrentDirectory(cwdSave);
+
+   // sanity check for avoid Process::requestShutdown() called on some tests
+   Process::processEvents();
 
    // And indicate our failure situation in the return value.
    return !_failureCount;

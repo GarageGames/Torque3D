@@ -98,6 +98,9 @@ static S32 QSORT_CALLBACK compareEntries(const void* a,const void* b)
 //-----------------------------------------------------------------------------
 bool GuiInspectorDynamicGroup::inspectGroup()
 {
+   if( !mParent )
+      return false;
+
    // clear the first responder if it's set
    mStack->clearFirstResponder();
 

@@ -784,6 +784,7 @@ bool ExplosionData::preload(bool server, String &errorStr)
 //--------------------------------------
 //
 Explosion::Explosion()
+   : mDataBlock( NULL )
 {
    mTypeMask |= ExplosionObjectType | LightObjectType;
 
@@ -843,6 +844,12 @@ bool Explosion::onAdd()
    GameConnection *conn = GameConnection::getConnectionToServer();
    if ( !conn || !Parent::onAdd() )
       return false;
+
+   if( !mDataBlock )
+   {
+      Con::errorf("Explosion::onAdd - Fail - No datablok");
+      return false;
+   }
 
    mDelayMS = mDataBlock->delayMS + sgRandom.randI( -mDataBlock->delayVariance, mDataBlock->delayVariance );
    mEndingMS = mDataBlock->lifetimeMS + sgRandom.randI( -mDataBlock->lifetimeVariance, mDataBlock->lifetimeVariance );
