@@ -5316,10 +5316,10 @@ void Player::setPosition(const Point3F& pos,const Point3F& rot)
    MatrixF mat;
    if (isMounted()) {
       // Use transform from mounted object
-      MatrixF nmat,zrot;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &nmat );
-      zrot.set(EulerF(0.0f, 0.0f, rot.z));
-      mat.mul(nmat,zrot);
+      //MatrixF nmat,zrot;
+      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
+      //zrot.set(EulerF(0.0f, 0.0f, rot.z));
+      //mat.mul(nmat,zrot);
    }
    else {
       mat.set(EulerF(0.0f, 0.0f, rot.z));
@@ -5338,10 +5338,10 @@ void Player::setRenderPosition(const Point3F& pos, const Point3F& rot, F32 dt)
    MatrixF mat;
    if (isMounted()) {
       // Use transform from mounted object
-      MatrixF nmat,zrot;
-      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &nmat );
-      zrot.set(EulerF(0.0f, 0.0f, rot.z));
-      mat.mul(nmat,zrot);
+      //MatrixF nmat,zrot;
+      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &mat );
+      //zrot.set(EulerF(0.0f, 0.0f, rot.z));
+      //mat.mul(nmat,zrot);
    }
    else {
       EulerF   orient(0.0f, 0.0f, rot.z);
