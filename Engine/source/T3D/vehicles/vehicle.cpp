@@ -859,6 +859,8 @@ void Vehicle::processTick(const Move* move)
    PROFILE_SCOPE( Vehicle_ProcessTick );
 
    Parent::processTick(move);
+   if ( isMounted() )
+      return;
 
    // Warp to catch up to server
    if (mDelta.warpCount < mDelta.warpTicks)
@@ -929,6 +931,8 @@ void Vehicle::interpolateTick(F32 dt)
    PROFILE_SCOPE( Vehicle_InterpolateTick );
 
    Parent::interpolateTick(dt);
+   if ( isMounted() )
+      return;
 
    if(dt == 0.0f)
       setRenderPosition(mDelta.pos, mDelta.rot[1]);
