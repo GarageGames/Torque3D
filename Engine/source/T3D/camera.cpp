@@ -495,13 +495,6 @@ void Camera::processTick(const Move* move)
 
    if ( isMounted() )
    {
-      // Fetch Mount Transform.
-      MatrixF mat;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-
-      // Apply.
-      setTransform( mat );
-
       // Update SceneContainer.
       updateContainer();
       return;
@@ -868,16 +861,7 @@ void Camera::interpolateTick(F32 dt)
    Parent::interpolateTick(dt);
 
    if ( isMounted() )
-   {
-      // Fetch Mount Transform.
-      MatrixF mat;
-      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &mat );
-
-      // Apply.
-      setRenderTransform( mat );
-
       return;
-   }
 
    Point3F rot = mDelta.rot + mDelta.rotVec * dt;
 
