@@ -218,6 +218,8 @@ public:
    void onScaleChanged();
    void prepRenderImage( SceneRenderState *state );
    void inspectPostApply();
+   virtual void onMount( SceneObject *obj, S32 node );
+   virtual void onUnmount( SceneObject *obj, S32 node );
 
    /// The type of mesh data use for collision queries.
    MeshType getCollisionType() const { return mCollisionType; }
