@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2014 GarageGames, LLC
+// Copyright (c) 2013 Stephan Brenner https://github.com/ymx/gtest_mem
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -30,8 +30,6 @@
 
 namespace testing
 {
-   // Original author: Stephan Brenner
-   // https://github.com/ymx/gtest_mem
    class MemoryLeakDetector : public EmptyTestEventListener
    {
    public:
