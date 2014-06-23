@@ -25,6 +25,7 @@
 #include "console/engineAPI.h"
 #include "console/consoleInternal.h"
 #include "unitTesting.h"
+#include "memoryTester.h"
 
 #include <gtest/gtest-all.cc>
 
@@ -86,6 +87,9 @@ DefineConsoleFunction( runAllUnitTests, int, (),,
 
    // Release the default listener.
    delete listeners.Release( listeners.default_result_printer() );
+
+   // Add the memory leak tester.
+   listeners.Append( new testing::MemoryLeakDetector );
 
    // Add the Torque unit test listener.
    listeners.Append( new TorqueUnitTestListener );
