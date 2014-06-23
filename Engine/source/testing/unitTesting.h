@@ -27,6 +27,17 @@
 
 #include <gtest/gtest.h>
 
+/// Allow test fixtures named with a Fixture suffix, so that we can name tests
+/// after a class name rather than having to call them XXTest.
+#define TEST_FIX(test_fixture, test_name)\
+   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
+   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+
+/// Convenience to define a test fixture with a Fixture suffix for use with
+/// TEST_FIX.
+#define FIXTURE(test_fixture)\
+   class test_fixture##Fixture : public ::testing::Test
+
 #endif // TORQUE_TESTS_ENABLED
 
 #endif // _UNIT_TESTING_H_
