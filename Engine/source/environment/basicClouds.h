@@ -116,6 +116,7 @@ protected:
    F32 mTexSpeed[TEX_COUNT];   
    Point2F mTexOffset[TEX_COUNT];
    F32 mHeight[TEX_COUNT];
+   bool mBehindSkybox;
 };
 
 
