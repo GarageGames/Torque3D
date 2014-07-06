@@ -5,7 +5,7 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-2003                *
+ * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-2009                *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
@@ -49,26 +49,20 @@ extern "C" {
  *                     <tt>NULL</tt> and \a _buf_sz is not zero, or \a _buf is
  *                     non-<tt>NULL</tt> and \a _buf_sz is not
  *                     <tt>sizeof(#th_huff_code)*#TH_NHUFFMAN_TABLES*#TH_NDCT_TOKENS</tt>.
- * \retval TH_IMPL   Not supported by this implementation.*/
+ * \retval TH_EIMPL   Not supported by this implementation.*/
 #define TH_ENCCTL_SET_HUFFMAN_CODES (0)
 /**Sets the quantization parameters to use.
  * The parameters are copied, not stored by reference, so they can be freed
  *  after this call.
  * <tt>NULL</tt> may be specified to revert to the default parameters.
- * For the current encoder, <tt>scale[ci!=0][qi]</tt> must be no greater than
- *  <tt>scale[ci!=0][qi-1]</tt> and <tt>base[qti][pli][qi][ci]</tt> must be no
- *  greater than <tt>base[qti][pli][qi-1][ci]</tt>.
- * These two conditions ensure that the actual quantizer for a given \a qti,
- *  \a pli, and \a ci does not increase as \a qi increases.
  *
  * \param[in] _buf #th_quant_info
  * \retval TH_EFAULT \a _enc_ctx is <tt>NULL</tt>.
- * \retval TH_EINVAL Encoding has already begun, the quantization parameters
- *                    do not meet one of the above stated conditions, \a _buf
- *                    is <tt>NULL</tt> and \a _buf_sz is not zero, or \a _buf
- *                    is non-<tt>NULL</tt> and \a _buf_sz is not
- *                    <tt>sizeof(#th_quant_info)</tt>.
- * \retval TH_IMPL   Not supported by this implementation.*/
+ * \retval TH_EINVAL Encoding has already begun, \a _buf is 
+ *                    <tt>NULL</tt> and \a _buf_sz is not zero,
+ *                    or \a _buf is non-<tt>NULL</tt> and
+ *                    \a _buf_sz is not <tt>sizeof(#th_quant_info)</tt>.
+ * \retval TH_EIMPL   Not supported by this implementation.*/
 #define TH_ENCCTL_SET_QUANT_PARAMS (2)
 /**Sets the maximum distance between key frames.
  * This can be changed during an encode, but will be bounded by
@@ -81,12 +75,12 @@ extern "C" {
  * \param[out] _buf <tt>ogg_uint32_t</tt>: The actual maximum distance set.
  * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
  * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(ogg_uint32_t)</tt>.
- * \retval TH_IMPL   Not supported by this implementation.*/
+ * \retval TH_EIMPL   Not supported by this implementation.*/
 #define TH_ENCCTL_SET_KEYFRAME_FREQUENCY_FORCE (4)
 /**Disables any encoder features that would prevent lossless transcoding back
  *  to VP3.
- * This primarily means disabling block-level QI values and not using 4MV mode
- *  when any of the luma blocks in a macro block are not coded.
+ * This primarily means disabling block-adaptive quantization and always coding
+ *  all four luma blocks in a macro block when 4MV is used.
  * It also includes using the VP3 quantization tables and Huffman codes; if you
  *  set them explicitly after calling this function, the resulting stream will
  *  not be VP3-compatible.
@@ -109,7 +103,7 @@ extern "C" {
  *                   tables and codebooks from being set.
  * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
  * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt>.
- * \retval TH_IMPL   Not supported by this implementation.*/
+ * \retval TH_EIMPL   Not supported by this implementation.*/
 #define TH_ENCCTL_SET_VP3_COMPATIBLE (10)
 /**Gets the maximum speed level.
  * Higher speed levels favor quicker encoding over better quality per bit.
@@ -117,28 +111,254 @@ extern "C" {
  *  may actually improve, but in this case bitrate will also likely increase.
  * In any case, overall rate/distortion performance will probably decrease.
  * The maximum value, and the meaning of each value, may change depending on
- *  the current encoding mode (VBR vs. CQI, etc.).
+ *  the current encoding mode (VBR vs. constant quality, etc.).
  *
- * \param[out] _buf int: The maximum encoding speed level.
+ * \param[out] _buf <tt>int</tt>: The maximum encoding speed level.
  * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
  * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt>.
- * \retval TH_IMPL   Not supported by this implementation in the current
+ * \retval TH_EIMPL   Not supported by this implementation in the current
  *                    encoding mode.*/
 #define TH_ENCCTL_GET_SPLEVEL_MAX (12)
 /**Sets the speed level.
- * By default, the slowest speed (0) is used.
+ * The current speed level may be retrieved using #TH_ENCCTL_GET_SPLEVEL.
  *
- * \param[in] _buf int: The new encoding speed level.
- *                      0 is slowest, larger values use less CPU.
+ * \param[in] _buf <tt>int</tt>: The new encoding speed level.
+ *                 0 is slowest, larger values use less CPU.
  * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
  * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt>, or the
  *                    encoding speed level is out of bounds.
  *                   The maximum encoding speed level may be
  *                    implementation- and encoding mode-specific, and can be
  *                    obtained via #TH_ENCCTL_GET_SPLEVEL_MAX.
- * \retval TH_IMPL   Not supported by this implementation in the current
+ * \retval TH_EIMPL   Not supported by this implementation in the current
  *                    encoding mode.*/
 #define TH_ENCCTL_SET_SPLEVEL (14)
+/**Gets the current speed level.
+ * The default speed level may vary according to encoder implementation, but if
+ *  this control code is not supported (it returns #TH_EIMPL), the default may
+ *  be assumed to be the slowest available speed (0).
+ * The maximum encoding speed level may be implementation- and encoding
+ *  mode-specific, and can be obtained via #TH_ENCCTL_GET_SPLEVEL_MAX.
+ *
+ * \param[out] _buf <tt>int</tt>: The current encoding speed level.
+ *                  0 is slowest, larger values use less CPU.
+ * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt>.
+ * \retval TH_EIMPL   Not supported by this implementation in the current
+ *                    encoding mode.*/
+#define TH_ENCCTL_GET_SPLEVEL (16)
+/**Sets the number of duplicates of the next frame to produce.
+ * Although libtheora can encode duplicate frames very cheaply, it costs some
+ *  amount of CPU to detect them, and a run of duplicates cannot span a
+ *  keyframe boundary.
+ * This control code tells the encoder to produce the specified number of extra
+ *  duplicates of the next frame.
+ * This allows the encoder to make smarter keyframe placement decisions and
+ *  rate control decisions, and reduces CPU usage as well, when compared to
+ *  just submitting the same frame for encoding multiple times.
+ * This setting only applies to the next frame submitted for encoding.
+ * You MUST call th_encode_packetout() repeatedly until it returns 0, or the
+ *  extra duplicate frames will be lost.
+ *
+ * \param[in] _buf <tt>int</tt>: The number of duplicates to produce.
+ *                 If this is negative or zero, no duplicates will be produced.
+ * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt>, or the
+ *                    number of duplicates is greater than or equal to the
+ *                    maximum keyframe interval.
+ *                   In the latter case, NO duplicate frames will be produced.
+ *                   You must ensure that the maximum keyframe interval is set
+ *                    larger than the maximum number of duplicates you will
+ *                    ever wish to insert prior to encoding.
+ * \retval TH_EIMPL   Not supported by this implementation in the current
+ *                    encoding mode.*/
+#define TH_ENCCTL_SET_DUP_COUNT (18)
+/**Modifies the default bitrate management behavior.
+ * Use to allow or disallow frame dropping, and to enable or disable capping
+ *  bit reservoir overflows and underflows.
+ * See \ref encctlcodes "the list of available flags".
+ * The flags are set by default to
+ *  <tt>#TH_RATECTL_DROP_FRAMES|#TH_RATECTL_CAP_OVERFLOW</tt>.
+ *
+ * \param[in] _buf <tt>int</tt>: Any combination of
+ *                  \ref ratectlflags "the available flags":
+ *                 - #TH_RATECTL_DROP_FRAMES: Enable frame dropping.
+ *                 - #TH_RATECTL_CAP_OVERFLOW: Don't bank excess bits for later
+ *                    use.
+ *                 - #TH_RATECTL_CAP_UNDERFLOW: Don't try to make up shortfalls
+ *                    later.
+ * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt> or rate control
+ *                    is not enabled.
+ * \retval TH_EIMPL   Not supported by this implementation in the current
+ *                    encoding mode.*/
+#define TH_ENCCTL_SET_RATE_FLAGS (20)
+/**Sets the size of the bitrate management bit reservoir as a function
+ *  of number of frames.
+ * The reservoir size affects how quickly bitrate management reacts to
+ *  instantaneous changes in the video complexity.
+ * Larger reservoirs react more slowly, and provide better overall quality, but
+ *  require more buffering by a client, adding more latency to live streams.
+ * By default, libtheora sets the reservoir to the maximum distance between
+ *  keyframes, subject to a minimum and maximum limit.
+ * This call may be used to increase or decrease the reservoir, increasing or
+ *  decreasing the allowed temporary variance in bitrate.
+ * An implementation may impose some limits on the size of a reservoir it can
+ *  handle, in which case the actual reservoir size may not be exactly what was
+ *  requested.
+ * The actual value set will be returned.
+ *
+ * \param[in]  _buf <tt>int</tt>: Requested size of the reservoir measured in
+ *                   frames.
+ * \param[out] _buf <tt>int</tt>: The actual size of the reservoir set.
+ * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(int)</tt>, or rate control
+ *                    is not enabled.  The buffer has an implementation
+ *                    defined minimum and maximum size and the value in _buf
+ *                    will be adjusted to match the actual value set.
+ * \retval TH_EIMPL   Not supported by this implementation in the current
+ *                    encoding mode.*/
+#define TH_ENCCTL_SET_RATE_BUFFER (22)
+/**Enable pass 1 of two-pass encoding mode and retrieve the first pass metrics.
+ * Pass 1 mode must be enabled before the first frame is encoded, and a target
+ *  bitrate must have already been specified to the encoder.
+ * Although this does not have to be the exact rate that will be used in the
+ *  second pass, closer values may produce better results.
+ * The first call returns the size of the two-pass header data, along with some
+ *  placeholder content, and sets the encoder into pass 1 mode implicitly.
+ * This call sets the encoder to pass 1 mode implicitly.
+ * Then, a subsequent call must be made after each call to
+ *  th_encode_ycbcr_in() to retrieve the metrics for that frame.
+ * An additional, final call must be made to retrieve the summary data,
+ *  containing such information as the total number of frames, etc.
+ * This must be stored in place of the placeholder data that was returned
+ *  in the first call, before the frame metrics data.
+ * All of this data must be presented back to the encoder during pass 2 using
+ *  #TH_ENCCTL_2PASS_IN.
+ *
+ * \param[out] <tt>char *</tt>_buf: Returns a pointer to internal storage
+ *              containing the two pass metrics data.
+ *             This storage is only valid until the next call, or until the
+ *              encoder context is freed, and must be copied by the
+ *              application.
+ * \retval >=0       The number of bytes of metric data available in the
+ *                    returned buffer.
+ * \retval TH_EFAULT \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL \a _buf_sz is not <tt>sizeof(char *)</tt>, no target
+ *                    bitrate has been set, or the first call was made after
+ *                    the first frame was submitted for encoding.
+ * \retval TH_EIMPL   Not supported by this implementation.*/
+#define TH_ENCCTL_2PASS_OUT (24)
+/**Submits two-pass encoding metric data collected the first encoding pass to
+ *  the second pass.
+ * The first call must be made before the first frame is encoded, and a target
+ *  bitrate must have already been specified to the encoder.
+ * It sets the encoder to pass 2 mode implicitly; this cannot be disabled.
+ * The encoder may require reading data from some or all of the frames in
+ *  advance, depending on, e.g., the reservoir size used in the second pass.
+ * You must call this function repeatedly before each frame to provide data
+ *  until either a) it fails to consume all of the data presented or b) all of
+ *  the pass 1 data has been consumed.
+ * In the first case, you must save the remaining data to be presented after
+ *  the next frame.
+ * You can call this function with a NULL argument to get an upper bound on
+ *  the number of bytes that will be required before the next frame.
+ *
+ * When pass 2 is first enabled, the default bit reservoir is set to the entire
+ *  file; this gives maximum flexibility but can lead to very high peak rates.
+ * You can subsequently set it to another value with #TH_ENCCTL_SET_RATE_BUFFER
+ *  (e.g., to set it to the keyframe interval for non-live streaming), however,
+ *  you may then need to provide more data before the next frame.
+ *
+ * \param[in] _buf <tt>char[]</tt>: A buffer containing the data returned by
+ *                  #TH_ENCCTL_2PASS_OUT in pass 1.
+ *                 You may pass <tt>NULL</tt> for \a _buf to return an upper
+ *                  bound on the number of additional bytes needed before the
+ *                  next frame.
+ *                 The summary data returned at the end of pass 1 must be at
+ *                  the head of the buffer on the first call with a
+ *                  non-<tt>NULL</tt> \a _buf, and the placeholder data
+ *                  returned at the start of pass 1 should be omitted.
+ *                 After each call you should advance this buffer by the number
+ *                  of bytes consumed.
+ * \retval >0            The number of bytes of metric data required/consumed.
+ * \retval 0             No more data is required before the next frame.
+ * \retval TH_EFAULT     \a _enc_ctx is <tt>NULL</tt>.
+ * \retval TH_EINVAL     No target bitrate has been set, or the first call was
+ *                        made after the first frame was submitted for
+ *                        encoding.
+ * \retval TH_ENOTFORMAT The data did not appear to be pass 1 from a compatible
+ *                        implementation of this library.
+ * \retval TH_EBADHEADER The data was invalid; this may be returned when
+ *                        attempting to read an aborted pass 1 file that still
+ *                        has the placeholder data in place of the summary
+ *                        data.
+ * \retval TH_EIMPL       Not supported by this implementation.*/
+#define TH_ENCCTL_2PASS_IN (26)
+/**Sets the current encoding quality.
+ * This is only valid so long as no bitrate has been specified, either through
+ *  the #th_info struct used to initialize the encoder or through
+ *  #TH_ENCCTL_SET_BITRATE (this restriction may be relaxed in a future
+ *  version).
+ * If it is set before the headers are emitted, the target quality encoded in
+ *  them will be updated.
+ *
+ * \param[in] _buf <tt>int</tt>: The new target quality, in the range 0...63,
+ *                  inclusive.
+ * \retval 0             Success.
+ * \retval TH_EFAULT     \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL     A target bitrate has already been specified, or the
+ *                        quality index was not in the range 0...63.
+ * \retval TH_EIMPL       Not supported by this implementation.*/
+#define TH_ENCCTL_SET_QUALITY (28)
+/**Sets the current encoding bitrate.
+ * Once a bitrate is set, the encoder must use a rate-controlled mode for all
+ *  future frames (this restriction may be relaxed in a future version).
+ * If it is set before the headers are emitted, the target bitrate encoded in
+ *  them will be updated.
+ * Due to the buffer delay, the exact bitrate of each section of the encode is
+ *  not guaranteed.
+ * The encoder may have already used more bits than allowed for the frames it
+ *  has encoded, expecting to make them up in future frames, or it may have
+ *  used fewer, holding the excess in reserve.
+ * The exact transition between the two bitrates is not well-defined by this
+ *  API, but may be affected by flags set with #TH_ENCCTL_SET_RATE_FLAGS.
+ * After a number of frames equal to the buffer delay, one may expect further
+ *  output to average at the target bitrate.
+ *
+ * \param[in] _buf <tt>long</tt>: The new target bitrate, in bits per second.
+ * \retval 0             Success.
+ * \retval TH_EFAULT     \a _enc_ctx or \a _buf is <tt>NULL</tt>.
+ * \retval TH_EINVAL     The target bitrate was not positive.
+ * \retval TH_EIMPL       Not supported by this implementation.*/
+#define TH_ENCCTL_SET_BITRATE (30)
+
+/*@}*/
+
+
+/**\name TH_ENCCTL_SET_RATE_FLAGS flags
+ * \anchor ratectlflags
+ * These are the flags available for use with #TH_ENCCTL_SET_RATE_FLAGS.*/
+/*@{*/
+/**Drop frames to keep within bitrate buffer constraints.
+ * This can have a severe impact on quality, but is the only way to ensure that
+ *  bitrate targets are met at low rates during sudden bursts of activity.*/
+#define TH_RATECTL_DROP_FRAMES   (0x1)
+/**Ignore bitrate buffer overflows.
+ * If the encoder uses so few bits that the reservoir of available bits
+ *  overflows, ignore the excess.
+ * The encoder will not try to use these extra bits in future frames.
+ * At high rates this may cause the result to be undersized, but allows a
+ *  client to play the stream using a finite buffer; it should normally be
+ *  enabled.*/
+#define TH_RATECTL_CAP_OVERFLOW  (0x2)
+/**Ignore bitrate buffer underflows.
+ * If the encoder uses so many bits that the reservoir of available bits
+ *  underflows, ignore the deficit.
+ * The encoder will not try to make up these extra bits in future frames.
+ * At low rates this may cause the result to be oversized; it should normally
+ *  be disabled.*/
+#define TH_RATECTL_CAP_UNDERFLOW (0x4)
 /*@}*/
 
 
