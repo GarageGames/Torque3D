@@ -45,7 +45,7 @@
 	//! Fast square root for floating-point values.
 	inline_ float FastSqrt(float square)
 	{
-#if defined( PLATFORM_WINDOWS )
+#if defined( PLATFORM_WINDOWS ) && !defined ( _WIN64 )
 			float retval;
 
 			__asm {
@@ -188,7 +188,7 @@
 		return x*x < epsilon;
 	}
 
-#ifdef PLATFORM_WINDOWS
+#if defined( PLATFORM_WINDOWS ) && !defined ( _WIN64 )
 	#define FCOMI_ST0	_asm	_emit	0xdb	_asm	_emit	0xf0
 	#define FCOMIP_ST0	_asm	_emit	0xdf	_asm	_emit	0xf0
 	#define FCMOVB_ST0	_asm	_emit	0xda	_asm	_emit	0xc0
