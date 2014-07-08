@@ -88,8 +88,10 @@ DefineConsoleFunction( runAllUnitTests, int, (),,
    // Release the default listener.
    delete listeners.Release( listeners.default_result_printer() );
 
-   // Add the memory leak tester.
-   listeners.Append( new testing::MemoryLeakDetector );
+   if ( Con::getBoolVariable( "$testing::checkMemoryLeaks", false ) ) {
+      // Add the memory leak tester.
+      listeners.Append( new testing::MemoryLeakDetector );
+   }
 
    // Add the Torque unit test listener.
    listeners.Append( new TorqueUnitTestListener );
