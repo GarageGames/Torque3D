@@ -736,7 +736,7 @@ bool GuiGameListMenuProfile::onAdd()
    // We can't call enforceConstraints() here because incRefCount initializes
    // some of the things to enforce. Do a basic sanity check here instead.
    
-   if( !dStrlen(mBitmapName) )
+   if( !mBitmapName || !dStrlen(mBitmapName) )
    {
       Con::errorf( "GuiGameListMenuProfile: %s can't be created without a bitmap. Please add a 'Bitmap' property to the object definition.", getName() );
       return false;
