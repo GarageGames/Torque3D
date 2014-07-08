@@ -44,7 +44,8 @@ NavPath::NavPath() :
    mFrom(0.0f, 0.0f, 0.0f),
    mTo(0.0f, 0.0f, 0.0f)
 {
-   mTypeMask |= MarkerObjectType;
+   mTypeMask |= StaticShapeObjectType | MarkerObjectType;
+   mNetFlags.clear(Ghostable);
 
    mMesh = NULL;
    mWaypoints = NULL;
@@ -162,6 +163,25 @@ const char *NavPath::getProtectedTo(void *obj, const char *data)
       return "";
 }
 
+bool NavPath::setProtectedAlwaysRender(void *obj, const char *index, const char *data)
+{
+   NavPath *path = static_cast<NavPath*>(obj);
+   bool always = dAtob(data);
+   if(always)
+   {
+      if(!gEditingMission)
+         path->mNetFlags.set(Ghostable);
+   }
+   else
+   {
+      if(!gEditingMission)
+         path->mNetFlags.clear(Ghostable);
+   }
+   path->mAlwaysRender = always;
+   path->setMaskBits(PathMask);
+   return true;
+}
+
 static IRangeValidator NaturalNumber(1, S32_MAX);
 
 void NavPath::initPersistFields()
@@ -188,9 +208,10 @@ void NavPath::initPersistFields()
    endGroup("NavPath");
 
    addGroup("NavPath Render");
-
-   addField("alwaysRender", TypeBool, Offset(mAlwaysRender, NavPath),
-      "Render this NavPath even when not selected.");
+   
+   addProtectedField("alwaysRender", TypeBool, Offset(mAlwaysRender, NavMesh),
+      &setProtectedAlwaysRender, &defaultProtectedGetFn,
+      "Display this NavPath even outside the editor.");
    addField("xray", TypeBool, Offset(mXray, NavPath),
       "Render this NavPath through other objects.");
 
@@ -204,8 +225,10 @@ bool NavPath::onAdd()
    if(!Parent::onAdd())
       return false;
 
+   addToScene();
+
    // Ghost immediately if the editor's already open.
-   if(gEditingMission)
+   if(gEditingMission || mAlwaysRender)
       mNetFlags.set(Ghostable);
 
    // Automatically find a path if we can.
@@ -215,18 +238,15 @@ bool NavPath::onAdd()
    // Set initial world bounds and stuff.
    resize();
 
-   // Finally, add us to the simulation.
-   addToScene();
-
    return true;
 }
 
 void NavPath::onRemove()
 {
-   Parent::onRemove();
-
    // Remove from simulation.
    removeFromScene();
+
+   Parent::onRemove();
 }
 
 bool NavPath::init()
@@ -324,7 +344,9 @@ bool NavPath::plan()
    if(!init())
       return false;
 
-   visitNext();
+   if(!visitNext())
+      return false;
+
    while(update());
 
    if(!finalise())
@@ -476,11 +498,18 @@ S32 NavPath::getCount()
 void NavPath::onEditorEnable()
 {
    mNetFlags.set(Ghostable);
+   if(isClientObject() && !mAlwaysRender)
+      addToScene();
 }
 
 void NavPath::onEditorDisable()
 {
-   mNetFlags.clear(Ghostable);
+   if(!mAlwaysRender)
+   {
+      mNetFlags.clear(Ghostable);
+      if(isClientObject())
+         removeFromScene();
+   }
 }
 
 void NavPath::inspectPostApply()
@@ -501,7 +530,7 @@ void NavPath::prepRenderImage(SceneRenderState *state)
 {
    ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
    ri->renderDelegate.bind(this, &NavPath::renderSimple);
-   ri->type = RenderPassManager::RIT_Editor;      
+   ri->type = RenderPassManager::RIT_Object;
    ri->translucentSort = true;
    ri->defaultKey = 1;
    state->getRenderPass()->addInst(ri);
