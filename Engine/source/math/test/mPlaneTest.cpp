@@ -28,10 +28,10 @@
 // test case. This allows a large number of tests without introducing non-
 // deterministic test behavior.
 
-static const Point3F positions[] = {Point3F(0, 0, 0), Point3F(1, -2, 3), Point3F(1e5, 2e5, -3e6)};
+static const Point3F positions[] = {Point3F(0, 0, 0), Point3F(1, -2, 3), Point3F(1e-2, -2e-2, 1)};
 static const U32 numPositions = sizeof(positions) / sizeof(Point3F);
 
-static const Point3F normals[] = {Point3F(1, 0, 0), Point3F(-4, -2, 6), Point3F(1e8, 2e7, 5e-2)};
+static const Point3F normals[] = {Point3F(1, 0, 0), Point3F(-4, -2, 6)};
 static const U32 numNormals = sizeof(normals) / sizeof(Point3F);
 
 /// Tests that points in the direction of the normal are in 'Front' of the
@@ -40,7 +40,7 @@ static const U32 numNormals = sizeof(normals) / sizeof(Point3F);
 TEST(Plane, WhichSide)
 {
    for(U32 i = 0; i < numPositions; i++) {
-      for(U32 j = 0; i < numNormals; j++) {
+      for(U32 j = 0; j < numNormals; j++) {
          Point3F position = positions[i];
          Point3F normal = normals[j];
 
@@ -58,7 +58,7 @@ TEST(Plane, WhichSide)
 TEST(Plane, DistToPlane)
 {
    for(U32 i = 0; i < numPositions; i++) {
-      for(U32 j = 0; i < numNormals; j++) {
+      for(U32 j = 0; j < numNormals; j++) {
          Point3F position = positions[i];
          Point3F normal = normals[j];
 
