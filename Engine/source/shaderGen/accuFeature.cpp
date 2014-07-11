@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "sahara/accuFeature.h"
+#include "shaderGen/accuFeature.h"
 #include "shaderGen/shaderFeature.h"
 #include "shaderGen/shaderOp.h"
 #include "shaderGen/featureMgr.h"
