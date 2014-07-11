@@ -28,8 +28,7 @@
 #include "T3D/gameBase/moveManager.h"
 #include "console/engineAPI.h"
 
-static U32 sAIPlayerLoSMask = TerrainObjectType | WaterObjectType |
-                              ShapeBaseObjectType | StaticShapeObjectType;
+static U32 sAIPlayerLoSMask = TerrainObjectType | StaticShapeObjectType | StaticObjectType;
 
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);
 
@@ -643,19 +642,13 @@ bool AIPlayer::checkInLos(GameBase* target, bool _useMuzzle, bool _checkEnabled)
       eyeMat.getColumn(3, &checkPoint );
    }
 
-   bool hit = gServerContainer.castRay(checkPoint , target->getBoxCenter(), sAIPlayerLoSMask, &ri);
+   bool hit = !gServerContainer.castRay(checkPoint, target->getBoxCenter(), sAIPlayerLoSMask, &ri);
    enableCollision();
 
    for (S32 i = 0; i < mountCount; i++)
    {
       target->getMountedObject(i)->enableCollision();
    }
-
-   if (hit)
-   {
-      if (target != dynamic_cast<GameBase*>(ri.object)) hit = false;
-   }
-
    return hit;
 }
 
