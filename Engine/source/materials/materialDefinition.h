@@ -19,6 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+
 #ifndef _MATERIALDEFINITION_H_
 #define _MATERIALDEFINITION_H_
 
@@ -198,6 +199,12 @@ public:
    // Data
    //-----------------------------------------------------------------------
    FileName mDiffuseMapFilename[MAX_STAGES];
+   String   mAccuMapFilename[MAX_STAGES];
+   F32      mAccuScale[MAX_STAGES];
+   F32      mAccuDirection[MAX_STAGES];
+   F32      mAccuStrength[MAX_STAGES];
+   F32      mAccuCoverage[MAX_STAGES];
+   F32      mAccuSpecular[MAX_STAGES];
    FileName mOverlayMapFilename[MAX_STAGES];
    FileName mLightMapFilename[MAX_STAGES];
    FileName mToneMapFilename[MAX_STAGES];

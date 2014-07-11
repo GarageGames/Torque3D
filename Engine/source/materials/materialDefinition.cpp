@@ -119,6 +119,12 @@ Material::Material()
       mSpecularStrength[i] = 1.0f;
       mPixelSpecular[i] = false;
 
+      mAccuScale[i]     = 1.0f;
+      mAccuDirection[i] = 1.0f;
+      mAccuStrength[i]  = 0.6f;
+      mAccuCoverage[i]  = 0.9f;
+      mAccuSpecular[i]  = 16.0f;
+	  
       mParallaxScale[i] = 0.0f;
 
       mVertLit[i] = false;
@@ -249,6 +255,24 @@ void Material::initPersistFields()
          "This enables per-pixel specular highlights controlled by the alpha channel of the "
          "normal map texture.  Note that if pixel specular is enabled the DXTnm format will not "
          "work with your normal map, unless you are also using a specular map." );
+		 
+      addField("accuMap",        TypeImageFilename,   Offset(mAccuMapFilename, Material), MAX_STAGES,
+         "The accu map texture. It should be used much like a diffuse texture - except it is only placed in carefully chosen spots on the model.");
+		 
+      addField("accuScale",      TypeF32, Offset(mAccuScale, Material), MAX_STAGES,
+         "The scale that is applied to the accu map texture. You can use this to fit the texture to smaller or larger objects.");
+		 
+      addField("accuDirection",  TypeF32, Offset(mAccuDirection, Material), MAX_STAGES,
+         "The direction of the accumulation. Chose whether you want the accu map to go from top to bottom (ie. snow) or upwards (ie. mold).");
+		 
+      addField("accuStrength",   TypeF32, Offset(mAccuStrength, Material), MAX_STAGES,
+         "The strength of the accu map. This changes the transparency of the accu map texture. Make it subtle or add more contrast.");
+		 
+      addField("accuCoverage",   TypeF32, Offset(mAccuCoverage, Material), MAX_STAGES,
+         "The coverage ratio of the accu map texture. Use this to make the entire shape pick up some of the accu map texture or none at all.");
+		 
+      addField("accuSpecular",   TypeF32, Offset(mAccuSpecular, Material), MAX_STAGES,
+         "Changes specularity to this value where the accumulated material is present.");
 
       addField( "specularMap", TypeImageFilename, Offset(mSpecularMapFilename, Material), MAX_STAGES,
          "The specular map texture. The RGB channels of this texture provide a per-pixel replacement for the 'specular' parameter on the material. "
