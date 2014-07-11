@@ -29,8 +29,7 @@
 #include "console/engineAPI.h"
 
 static U32 sAIPlayerLoSMask = TerrainObjectType | WaterObjectType |
-                              ShapeBaseObjectType | StaticShapeObjectType | 
-                              PlayerObjectType | ItemObjectType;
+                              ShapeBaseObjectType | StaticShapeObjectType;
 
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);
 
@@ -423,13 +422,15 @@ bool AIPlayer::getAIMove(Move *movePtr)
    // which is not very accurate.
    if (mAimObject)
    {
-      mTargetInLOS = checkInLos(mAimObject.getPointer(), false);
-      if (mTargetInLOS)
+      if (checkInLos(mAimObject.getPointer()))
       {
-         throwCallback("onTargetEnterLOS");
-         mTargetInLOS = true;
+         if (!mTargetInLOS)
+         {
+            throwCallback("onTargetEnterLOS");
+            mTargetInLOS = true;
+         }
       }
-      else
+      else if (mTargetInLOS)
       {
          throwCallback("onTargetExitLOS");
          mTargetInLOS = false;
@@ -605,11 +606,16 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
 	GameBase* obj = object->getAimObject();
    return obj? obj->getId(): -1;
 }
- 
-bool AIPlayer::checkInLos(GameBase* target, bool _checkEnabled = false)
+
+bool AIPlayer::checkInLos(GameBase* target, bool _useMuzzle, bool _checkEnabled)
 {
    if (!isServerObject()) return false;
-   if (!(bool(target))) return false;
+   if (!(bool(target)))
+   {
+      target = mAimObject.getPointer();
+      if (!(bool(target)))
+         return false;
+   }
    if (_checkEnabled)
    {
       ShapeBase *shapeBaseCheck = dynamic_cast<ShapeBase *>(target);
@@ -626,9 +632,18 @@ bool AIPlayer::checkInLos(GameBase* target, bool _checkEnabled = false)
    {
       target->getMountedObject(i)->disableCollision();
    }
-   Point3F muzzlePoint;
-   getMuzzlePointAI(0, &muzzlePoint);
-   bool hit = gServerContainer.castRay(muzzlePoint, target->getBoxCenter(), sAIPlayerLoSMask, &ri);
+
+   Point3F checkPoint ;
+   if (_useMuzzle)
+      getMuzzlePointAI(0, &checkPoint );
+   else
+   {
+      MatrixF eyeMat;
+      getEyeTransform(&eyeMat);
+      eyeMat.getColumn(3, &checkPoint );
+   }
+
+   bool hit = gServerContainer.castRay(checkPoint , target->getBoxCenter(), sAIPlayerLoSMask, &ri);
    enableCollision();
 
    for (S32 i = 0; i < mountCount; i++)
@@ -643,6 +658,7 @@ bool AIPlayer::checkInLos(GameBase* target, bool _checkEnabled = false)
 
    return hit;
 }
+
 
 bool AIPlayer::checkLosClear(Point3F _pos)
 {
@@ -660,13 +676,17 @@ bool AIPlayer::checkLosClear(Point3F _pos)
    return emptySpace;
 }
 
-DefineEngineMethod(AIPlayer, checkInLos, bool, (ShapeBase* obj, bool checkEnabled), (0, false),
-   "@brief Check for an object in line of sight.\n")
+DefineEngineMethod(AIPlayer, checkInLos, bool, (ShapeBase* obj,  bool useMuzzle, bool checkEnabled),(NULL, false, false),
+   "@brief Check for an object in line of sight.\n"
+   "@obj Object to check. if blank it will check the current target.\n"
+   "@useMuzzle Use muzzle position (otherwise use eye position).\n"
+   "@checkEnabled check if the object is not disabled.\n")
 {
-   return object->checkInLos(obj, checkEnabled);
+   return object->checkInLos(obj, useMuzzle, checkEnabled);
 }
 
-bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled = false)
+
+bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
 {
    if (!isServerObject()) return false;
    if (!(bool(target))) return false;
@@ -700,8 +720,11 @@ bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled = fal
    return (dot > camFov);
 }
 
-DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (0, 45, false),
-   "@brief Check for an object within a specified veiw cone.\n")
+DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (NULL, 45.0f, false),
+   "@brief Check for an object within a specified veiw cone.\n"
+   "@obj Object to check. if blank it will check the current target.\n"
+   "@fov view angle (in degrees)\n"
+   "@checkEnabled check if the object is not disabled.\n")
 {
    return object->checkInFoV(obj, fov, checkEnabled);
 }

@@ -80,9 +80,9 @@ public:
    void setAimLocation( const Point3F &location );
    Point3F getAimLocation() const { return mAimLocation; }
    void clearAim();
-   bool checkInLos(GameBase* target, bool _checkEnabled);
+   bool checkInLos(GameBase* target = NULL, bool _useMuzzle = false, bool _checkEnabled = false);
    bool checkLosClear(Point3F _pos);
-   bool checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled);
+   bool checkInFoV(GameBase* target = NULL, F32 camFov = 45.0f, bool _checkEnabled = false);
 
    // Movement sets/gets
    void setMoveSpeed( const F32 speed );
