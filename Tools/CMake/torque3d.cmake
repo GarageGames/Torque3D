@@ -325,6 +325,8 @@ if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
 endif()
 
+include( "modules/module_testing.cmake" )
+
 
 ###############################################################################
 # platform specific things
