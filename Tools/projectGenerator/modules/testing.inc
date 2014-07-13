@@ -27,7 +27,6 @@ beginModule( 'testing' );
    addProjectDefine( '_VARIADIC_MAX', 10 );
    addSrcDir(getEngineSrcDir() . 'testing', true);
 
-   includeLib( 'libgtest' );
    addLibIncludePath( 'gtest/fused-src/' );
 
 endModule();

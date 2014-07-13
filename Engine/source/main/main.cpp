@@ -32,29 +32,49 @@ extern "C"
    int (*torque_winmain)( HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow) = NULL;
 };
 
-bool getDllName(std::wstring& dllName)
+bool getDllName(std::wstring& dllName, const std::wstring suffix)
 {
    wchar_t filenameBuf[MAX_PATH];
    DWORD length = GetModuleFileNameW( NULL, filenameBuf, MAX_PATH );
    if(length == 0) return false;
    dllName = std::wstring(filenameBuf);
    size_t dotPos = dllName.find_last_of(L".");
-   if(dotPos == std::wstring::npos) return false;
+   if(dotPos == std::wstring::npos)
+   {
+      dllName.clear();
+      return false;
+   }
    dllName.erase(dotPos);
-   dllName += L".dll";
+   dllName += suffix + L".dll";
    return true;
 }
 
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
 {
+   // Try to find the game DLL, which may have one of several file names.
+   HMODULE hGame = NULL;
    std::wstring dllName = std::wstring();
-   if(!getDllName(dllName))
+   // The file name is the same as this executable's name, plus a suffix.
+   const std::wstring dllSuffices[] = {L"", L" DLL"};
+   const unsigned int numSuffices = sizeof(dllSuffices) / sizeof(std::wstring);
+
+   for (unsigned int i = 0; i < numSuffices; i++)
+   {
+      // Attempt to glue the suffix onto the current filename.
+      if(!getDllName(dllName, dllSuffices[i]))
+         continue;
+      // Load the DLL at that address.
+      hGame = LoadLibraryW(dllName.c_str());
+      if (hGame)
+         break;
+   }
+
+   if(!dllName.length())
    {
       MessageBoxW(NULL, L"Unable to find game dll", L"Error",  MB_OK|MB_ICONWARNING);
       return -1;
    }
 
-   HMODULE hGame = LoadLibraryW(dllName.c_str());
    if (!hGame)
    {
       wchar_t error[4096];

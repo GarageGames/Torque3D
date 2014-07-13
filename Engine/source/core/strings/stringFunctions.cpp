@@ -532,3 +532,32 @@ const char* dStristr( const char* str1, const char* str2 )
 {
    return dStristr( const_cast< char* >( str1 ), str2 );
 }
+
+int dStrrev(char* str)
+{
+   int l=dStrlen(str)-1; //get the string length
+   for(int x=0;x < l;x++,l--)
+   {
+      str[x]^=str[l];  //triple XOR Trick
+      str[l]^=str[x];  //for not using a temp
+      str[x]^=str[l];
+   }
+   return l;
+}
+
+int dItoa(int n, char s[])
+{
+   int i, sign;
+
+   if ((sign = n) < 0)  /* record sign */
+      n = -n;          /* make n positive */
+   i = 0;
+   do {       /* generate digits in reverse order */
+      s[i++] = n % 10 + '0';   /* get next digit */
+   } while ((n /= 10) > 0);     /* delete it */
+   if (sign < 0)
+      s[i++] = '-';
+   s[i] = '\0';
+   dStrrev(s);
+   return dStrlen(s);
+}

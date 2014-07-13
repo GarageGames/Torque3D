@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
+#include "console/engineAPI.h"
 #include "ts/loader/tsShapeLoader.h"
 
 #include "core/volume.h"
@@ -30,12 +31,22 @@
 #include "ts/tsShapeInstance.h"
 #include "ts/tsMaterialList.h"
 
+MODULE_BEGIN( ShapeLoader )
+   MODULE_INIT_AFTER( GFX )
+   MODULE_INIT
+   {
+      TSShapeLoader::addFormat("Torque DTS", "dts");
+      TSShapeLoader::addFormat("Torque DSQ", "dsq");
+   }
+MODULE_END;
 
 const F32 TSShapeLoader::DefaultTime = -1.0f;
 const F64 TSShapeLoader::MinFrameRate = 15.0f;
 const F64 TSShapeLoader::MaxFrameRate = 60.0f;
 const F64 TSShapeLoader::AppGroundFrameRate = 10.0f;
 Torque::Path TSShapeLoader::shapePath;
+
+Vector<TSShapeLoader::ShapeFormat> TSShapeLoader::smFormats;
 
 //------------------------------------------------------------------------------
 // Utility functions
@@ -1269,4 +1280,54 @@ TSShapeLoader::~TSShapeLoader()
    for (S32 iSeq = 0; iSeq < appSequences.size(); iSeq++)
       delete appSequences[iSeq];
    appSequences.clear();   
+}
+
+// Static functions to handle supported formats for shape loader.
+void TSShapeLoader::addFormat(String name, String extension)
+{
+   ShapeFormat newFormat;
+   newFormat.mName = name;
+   newFormat.mExtension = extension;
+   smFormats.push_back(newFormat);
+}
+
+String TSShapeLoader::getFormatExtensions()
+{
+   // "*.dsq TAB *.dae TAB
+   StringBuilder output;
+   for(U32 n = 0; n < smFormats.size(); ++n)
+   {
+      output.append("*.");
+      output.append(smFormats[n].mExtension);
+      output.append("\t");
+   }
+   return output.end();
+}
+
+String TSShapeLoader::getFormatFilters()
+{
+   // "DSQ Files|*.dsq|COLLADA Files|*.dae|"
+   StringBuilder output;
+   for(U32 n = 0; n < smFormats.size(); ++n)
+   {
+      output.append(smFormats[n].mName);
+      output.append("|*.");
+      output.append(smFormats[n].mExtension);
+      output.append("|");
+   }
+   return output.end();
+}
+
+DefineConsoleFunction( getFormatExtensions, const char*, ( ),, 
+  "Returns a list of supported shape format extensions separated by tabs."
+  "Example output: *.dsq TAB *.dae TAB")
+{
+   return Con::getReturnBuffer(TSShapeLoader::getFormatExtensions());
+}
+
+DefineConsoleFunction( getFormatFilters, const char*, ( ),, 
+  "Returns a list of supported shape formats in filter form.\n"
+  "Example output: DSQ Files|*.dsq|COLLADA Files|*.dae|")
+{
+   return Con::getReturnBuffer(TSShapeLoader::getFormatFilters());
 }

@@ -1,4 +1,3 @@
-<?php
 //-----------------------------------------------------------------------------
 // Copyright (c) 2014 GarageGames, LLC
 //
@@ -21,14 +20,44 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-beginLibConfig( 'libgtest', '{F2C0209B-1B90-4F73-816A-A0920FF8B107}' );
+#ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "math/mQuat.h"
+#include "math/mAngAxis.h"
+#include "math/mMatrix.h"
 
-   // Source
-   addSrcDir( T3D_Generator::getLibSrcDir() . 'gtest/fused-src/gtest', true );
+/// For testing things that should be close to 0, but accounting for floating-
+/// point inaccuracy.
+static const F32 epsilon = 1e-3f;
 
-   // Additional includes
-   addLibIncludePath( 'gtest/fused-src/' );
+/// Test quaternions for equality by expecting the angle between them to be
+/// close to 0.
+#define EXPECT_QUAT_EQ(q1, q2) EXPECT_LT(q1.angleBetween(q2), epsilon)
 
-endLibConfig();
+TEST(QuatF, AngleBetween)
+{
+   QuatF p(QuatF::Identity), q(QuatF::Identity);
+   EXPECT_LT(p.angleBetween(q), epsilon)
+      << "Angle between identity quaternions should be ~0.";
 
-?>
+   p.set(EulerF(0.1, 0.15, -0.2));
+   q = p;
+   EXPECT_LT(p.angleBetween(q), epsilon)
+      << "Angle between identical quaternions should be ~0.";
+}
+
+/// Test conversion from EulerF.
+TEST(QuatF, Construction)
+{
+   EulerF eId(0, 0, 0);
+   EXPECT_QUAT_EQ(QuatF(eId), QuatF::Identity)
+      << "Quaternions constructed from identity EulerF and QuatF::Identity not equal.";
+
+   EulerF eRot(0.0f, -0.0f, 1.5707963267948966f);
+   MatrixF mat(eRot);
+   AngAxisF aaRot(mat);
+   EXPECT_QUAT_EQ(QuatF(eRot), QuatF(aaRot))
+      << "Quaternions constructed from EulerF and AngAxisF not equal.";
+}
+
+#endif
