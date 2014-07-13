@@ -609,17 +609,22 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
 bool AIPlayer::checkInLos(GameBase* target, bool _useMuzzle, bool _checkEnabled)
 {
    if (!isServerObject()) return false;
-   if (!(bool(target)))
+   if (!target)
    {
       target = mAimObject.getPointer();
-      if (!(bool(target)))
+      if (!target)
          return false;
    }
    if (_checkEnabled)
    {
-      ShapeBase *shapeBaseCheck = dynamic_cast<ShapeBase *>(target);
-      if (shapeBaseCheck)
-         if (shapeBaseCheck->getDamageState() != Enabled) return false;
+       if (target->getTypeMask() & ShapeBaseObjectType)
+       {
+           ShapeBase *shapeBaseCheck = static_cast<ShapeBase *>(target);
+           if (shapeBaseCheck)
+               if (shapeBaseCheck->getDamageState() != Enabled) return false;
+       }
+       else
+           return false;
    }
 
    RayInfo ri;
@@ -652,42 +657,34 @@ bool AIPlayer::checkInLos(GameBase* target, bool _useMuzzle, bool _checkEnabled)
    return hit;
 }
 
-
-bool AIPlayer::checkLosClear(Point3F _pos)
-{
-   if (!isServerObject()) return false;
-
-   RayInfo ri;
-
-   disableCollision();
-
-   Point3F muzzlePoint;
-   getMuzzlePointAI(0, &muzzlePoint);
-   gServerContainer.castRay(muzzlePoint, _pos, sAIPlayerLoSMask, &ri);
-   bool emptySpace = bool(ri.object == NULL);
-   enableCollision();
-   return emptySpace;
-}
-
 DefineEngineMethod(AIPlayer, checkInLos, bool, (ShapeBase* obj,  bool useMuzzle, bool checkEnabled),(NULL, false, false),
-   "@brief Check for an object in line of sight.\n"
-   "@obj Object to check. if blank it will check the current target.\n"
-   "@useMuzzle Use muzzle position (otherwise use eye position).\n"
-   "@checkEnabled check if the object is not disabled.\n")
+   "@brief Check whether an object is in line of sight.\n"
+   "@obj Object to check. (If blank, it will check the current target).\n"
+   "@useMuzzle Use muzzle position. Otherwise use eye position. (defaults to false).\n"
+   "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
 {
    return object->checkInLos(obj, useMuzzle, checkEnabled);
 }
 
-
 bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
 {
    if (!isServerObject()) return false;
-   if (!(bool(target))) return false;
+   if (!target)
+   {
+      target = mAimObject.getPointer();
+      if (!target)
+         return false;
+   }
    if (_checkEnabled)
    {
-      ShapeBase *shapeBaseCheck = dynamic_cast<ShapeBase *>(target);
-      if (shapeBaseCheck)
-         if (shapeBaseCheck->getDamageState() != Enabled) return false;
+       if (target->getTypeMask() & ShapeBaseObjectType)
+       {
+           ShapeBase *shapeBaseCheck = static_cast<ShapeBase *>(target);
+           if (shapeBaseCheck)
+               if (shapeBaseCheck->getDamageState() != Enabled) return false;
+       }
+       else
+           return false;
    }
 
    MatrixF cam = getTransform();
@@ -699,11 +696,7 @@ bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
 
    camFov = mDegToRad(camFov) / 2;
 
-   Point3F shapePos;
-   // Use the render transform instead of the box center
-   // otherwise it'll jitter.
-   MatrixF srtMat = target->getTransform();
-   srtMat.getColumn(3, &shapePos);
+   Point3F shapePos = target->getBoxCenter();
    VectorF shapeDir = shapePos - camPos;
    // Test to see if it's within our viewcone, this test doesn't
    // actually match the viewport very well, should consider
@@ -714,10 +707,10 @@ bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
 }
 
 DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (NULL, 45.0f, false),
-   "@brief Check for an object within a specified veiw cone.\n"
-   "@obj Object to check. if blank it will check the current target.\n"
-   "@fov view angle (in degrees)\n"
-   "@checkEnabled check if the object is not disabled.\n")
+   "@brief Check whether an object is within a specified veiw cone.\n"
+   "@obj Object to check. (If blank, it will check the current target).\n"
+   "@fov view angle in degrees.(Defaults to 45)\n"
+   "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
 {
    return object->checkInFoV(obj, fov, checkEnabled);
 }
