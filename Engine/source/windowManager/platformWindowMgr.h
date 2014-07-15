@@ -133,7 +133,7 @@ public:
    /// This method removes the curtain window.
    virtual void raiseCurtain()=0;
 
-	/// This method indicates to created windows to show as normal.
+   /// This method indicates to created windows to show as normal.
    virtual void setDisplayWindow(bool set)=0;
 
 private:

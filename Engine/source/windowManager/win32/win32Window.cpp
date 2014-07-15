@@ -155,7 +155,7 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 		SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 		
       if(mDisplayWindow)
-		   ShowWindow(getHWND(), SW_SHOWNORMAL);
+         ShowWindow(getHWND(), SW_SHOWNORMAL);
 
       // Clear the menu bar from the window for full screen
       HMENU menu = GetMenu(getHWND());
@@ -220,7 +220,7 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
          if(mDisplayWindow)
-		      ShowWindow( getHWND(), SW_SHOWNORMAL);
+            ShowWindow( getHWND(), SW_SHOWNORMAL);
       }
 
       mFullscreen = false;
