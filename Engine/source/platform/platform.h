@@ -338,6 +338,9 @@ namespace Platform
    // display Splash Window
    bool displaySplashWindow( String path );
 
+   // close Splash Window
+   bool closeSplashWindow();
+
    void openFolder( const char* path );
 
    // Open file at the OS level, according to registered file-types.

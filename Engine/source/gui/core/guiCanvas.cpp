@@ -2683,3 +2683,21 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
    // Store the new mode into a pref.
    Con::setVariable( "$pref::Video::mode", vm.toString() );
 }
+
+ConsoleMethod( GuiCanvas, showWindow, void, 2, 2, "" )
+{
+   if (!object->getPlatformWindow())
+      return;
+
+   object->getPlatformWindow()->show();
+   WindowManager->setDisplayWindow(true);
+   object->getPlatformWindow()->setDisplayWindow(true);
+}
+
+ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
+{
+   if (!object->getPlatformWindow())
+      return;
+
+   object->getPlatformWindow()->hide();
+}
