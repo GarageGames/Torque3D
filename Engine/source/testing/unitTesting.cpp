@@ -88,7 +88,7 @@ DefineConsoleFunction( runAllUnitTests, int, (),,
    // Release the default listener.
    delete listeners.Release( listeners.default_result_printer() );
 
-   if ( Con::getBoolVariable( "$testing::checkMemoryLeaks", false ) ) {
+   if ( Con::getBoolVariable( "$Testing::CheckMemoryLeaks", false ) ) {
       // Add the memory leak tester.
       listeners.Append( new testing::MemoryLeakDetector );
    }
