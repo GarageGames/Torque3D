@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,13 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "unit/test.h"
-#include "unit/memoryTester.h"
+#ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
 #include "component/simComponent.h"
-
-using namespace UnitTesting;
-
-//////////////////////////////////////////////////////////////////////////
 
 class CachedInterfaceExampleComponent : public SimComponent
 {
@@ -89,18 +85,16 @@ public:
 
    // CodeReview [patw, 2, 17, 2007] I'm going to make another lightweight interface
    // for this functionality later
-   void unit_test( UnitTest *test )
+   void unit_test()
    {
-      AssertFatal(test, "CachedInterfaceExampleComponent::unit_test - NULL UnitTest");
-
-      if( !test )
-         return;
-
-      test->test( mpU32 != NULL, "Pointer to dependent interface is NULL" );
+      EXPECT_TRUE( mpU32 != NULL )
+         << "Pointer to dependent interface is NULL";
       if( mpU32 )
       {
-         test->test( *(*mpU32) & ( 1 << 24 ), "Pointer to interface data is bogus." );
-         test->test( *(*mpU32) != *mMyId, "Two of me have the same ID, bad!" );
+         EXPECT_TRUE( *(*mpU32) & ( 1 << 24 ))
+            << "Pointer to interface data is bogus.";
+         EXPECT_TRUE( *(*mpU32) != *mMyId)
+            << "Two of me have the same ID, bad!";
       }
    }
 };
@@ -113,42 +107,47 @@ ConsoleDocClass( CachedInterfaceExampleComponent,
 				"Not intended for game development, for editors or internal use only.\n\n "
 				"@internal");
 
-//////////////////////////////////////////////////////////////////////////
-
-CreateUnitTest(TestComponentInterfacing, "Components/Composition")
+TEST(SimComponent, Composition)
 {
-   void run()
+   SimComponent *testComponent = new SimComponent();
+   CachedInterfaceExampleComponent *componentA = new CachedInterfaceExampleComponent();
+   CachedInterfaceExampleComponent *componentB = new CachedInterfaceExampleComponent();
+
+   // Register sub-components
+   EXPECT_TRUE( componentA->registerObject())
+      << "Failed to register componentA";
+   EXPECT_TRUE( componentB->registerObject())
+      << "Failed to register componentB";
+
+   // Add the components
+   EXPECT_TRUE( testComponent->addComponent( componentA ))
+      << "Failed to add component a to testComponent";
+   EXPECT_TRUE( testComponent->addComponent( componentB ))
+      << "Failed to add component b to testComponent";
+
+   EXPECT_EQ( componentA->getOwner(), testComponent)
+      << "testComponent did not properly set the mOwner field of componentA to NULL.";
+   EXPECT_EQ( componentB->getOwner(), testComponent)
+      << "testComponent did not properly set the mOwner field of componentB to NULL.";
+
+   // Register the object with the simulation, kicking off the interface registration
+   const bool registered = testComponent->registerObject();
+   EXPECT_TRUE( registered )
+      << "Failed to register testComponent";
+
+   // Interface tests
+   if( registered )
    {
-      MemoryTester m;
-      m.mark();
-
-      SimComponent *testComponent = new SimComponent();
-      CachedInterfaceExampleComponent *componentA = new CachedInterfaceExampleComponent();
-      CachedInterfaceExampleComponent *componentB = new CachedInterfaceExampleComponent();
-
-      // Register sub-components
-      test( componentA->registerObject(), "Failed to register componentA" );
-      test( componentB->registerObject(), "Failed to register componentB" );
-
-      // Add the components
-      test( testComponent->addComponent( componentA ), "Failed to add component a to testComponent" );
-      test( testComponent->addComponent( componentB ), "Failed to add component b to testComponent" );
-
-      test( componentA->getOwner() == testComponent, "testComponent did not properly set the mOwner field of componentA to NULL." );
-      test( componentB->getOwner() == testComponent, "testComponent did not properly set the mOwner field of componentB to NULL." );
-
-      // Register the object with the simulation, kicking off the interface registration
-      const bool registered = testComponent->registerObject();
-      test( registered, "Failed to register testComponent" );
-
-      // Interface tests
-      if( registered )
       {
-         componentA->unit_test( this );
-         componentB->unit_test( this );
-         testComponent->deleteObject();
-      } 
-
-      test( m.check(), "Component composition test leaked memory." );
+         SCOPED_TRACE("componentA");
+         componentA->unit_test();
+      }
+      {
+         SCOPED_TRACE("componentB");
+         componentB->unit_test();
+      }
+      testComponent->deleteObject();
    }
 };
+
+#endif
