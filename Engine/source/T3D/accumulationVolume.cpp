@@ -295,7 +295,7 @@ void AccumulationVolume::refreshVolumes()
    {
       SimObjectPtr<SceneObject> object = smAccuObjects[n];
       if ( object.isValid() )
-         object->mAccuTex = NULL;
+         object->mAccuTex = GFXTexHandle::ZERO;
    }
 
    // 
@@ -334,7 +334,9 @@ void AccumulationVolume::updateObject(SceneObject* object)
    // has been moved. Tests to see if it's in any of the
    // accumulation volumes.
 
-   object->mAccuTex = NULL;
+   // We use ZERO instead of NULL so the accumulation
+   // texture will be updated in renderMeshMgr.
+   object->mAccuTex = GFXTexHandle::ZERO;
 
    for (S32 i = 0; i < smAccuVolumes.size(); ++i)
    {

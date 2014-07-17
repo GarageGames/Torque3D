@@ -228,7 +228,7 @@ void RenderMeshMgr::render(SceneRenderState * state)
 
             // Update accumulation texture if it changed.
             // Note: accumulation texture can be NULL, and must be updated.
-            if ( passRI->accuTex != lastAccuTex || !lastAccuTex )
+            if ( passRI->accuTex != lastAccuTex )
             {
                sgData.accuTex = passRI->accuTex;
                lastAccuTex = lastAccuTex;
