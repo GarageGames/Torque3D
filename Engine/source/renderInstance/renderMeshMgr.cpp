@@ -115,6 +115,7 @@ void RenderMeshMgr::render(SceneRenderState * state)
    GFXCubemap *lastCubemap = NULL;
    GFXTextureObject *lastReflectTex = NULL;
    GFXTextureObject *lastMiscTex = NULL;
+   GFXTextureObject *lastAccuTex = NULL;
 
    SceneData sgData;
    sgData.init( state );
@@ -222,6 +223,15 @@ void RenderMeshMgr::render(SceneRenderState * state)
             {
                sgData.reflectTex = passRI->reflectTex;
                lastReflectTex = passRI->reflectTex;
+               dirty = true;
+            }
+
+            // Update accumulation texture if it changed.
+            // Note: accumulation texture can be NULL, and must be updated.
+            if ( passRI->accuTex != lastAccuTex || !lastAccuTex )
+            {
+               sgData.accuTex = passRI->accuTex;
+               lastAccuTex = lastAccuTex;
                dirty = true;
             }
 

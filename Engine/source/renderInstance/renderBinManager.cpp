@@ -165,6 +165,7 @@ void RenderBinManager::setupSGData( MeshRenderInst *ri, SceneData &data )
    data.cubemap      = ri->cubemap;
    data.miscTex      = ri->miscTex;
    data.reflectTex   = ri->reflectTex;
+   data.accuTex      = ri->accuTex;
    data.lightmap     = ri->lightmap;
    data.visibility   = ri->visibility;
    data.materialHint = ri->materialHint;

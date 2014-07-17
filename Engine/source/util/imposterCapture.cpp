@@ -121,6 +121,7 @@ void ImposterCaptureMaterialHook::init( BaseMatInstance *inMat )
    features.addFeature( MFT_IsDXTnm );
    features.addFeature( MFT_NormalMap );
    features.addFeature( MFT_NormalsOut );
+   features.addFeature( MFT_AccuMap );
    mNormalsMatInst = MATMGR->createMatInstance( matName );
    mNormalsMatInst->getFeaturesDelegate().bind( &ImposterCaptureMaterialHook::_overrideFeatures );
    mNormalsMatInst->init( features, inMat->getVertexFormat() );

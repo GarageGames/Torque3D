@@ -39,7 +39,6 @@
 #include "gfx/gfxDrawUtil.h"
 #include "core/module.h"
 
-
 MODULE_BEGIN( TSShapeInstance )
 
    MODULE_INIT
@@ -781,5 +780,18 @@ void TSShapeInstance::prepCollision()
       if(mShape->meshes[i])
          mShape->meshes[i]->prepOpcodeCollision();
    }
+}
+
+// Returns true is the shape contains any materials with accumulation enabled.
+bool TSShapeInstance::hasAccumulation()
+{
+   bool result = false;
+   for ( U32 i = 0; i < mMaterialList->size(); ++i )
+   {
+      BaseMatInstance* mat = mMaterialList->getMaterialInst(i);
+      if ( mat->hasAccumulation() )
+         result = true;
+   }
+   return result;
 }
 
