@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,35 +20,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "unit/test.h"
+#ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
 #include "core/util/tFixedSizeDeque.h"
 
-
-using namespace UnitTesting;
-
-#define TEST( x ) test( ( x ), "FAIL: " #x )
-
-CreateUnitTest( TestFixedSizeDeque, "Util/FixedSizeDeque" )
+TEST(FixedSizeDeque, FixedSizeDeque)
 {
-   void run()
-   {
-      enum { DEQUE_SIZE = 3 };
-      FixedSizeDeque< U32 > deque( DEQUE_SIZE );
+   enum { DEQUE_SIZE = 3 };
+   FixedSizeDeque< U32 > deque( DEQUE_SIZE );
 
-      TEST( deque.capacity() == DEQUE_SIZE );
-      TEST( deque.size() == 0 );
+   EXPECT_EQ( deque.capacity(), DEQUE_SIZE );
+   EXPECT_EQ( deque.size(), 0 );
 
-      deque.pushFront( 1 );
-      TEST( deque.capacity() == ( DEQUE_SIZE - 1 ) );
-      TEST( deque.size() == 1 );
-      TEST( !deque.isEmpty() );
+   deque.pushFront( 1 );
+   EXPECT_EQ( deque.capacity(), ( DEQUE_SIZE - 1 ) );
+   EXPECT_EQ( deque.size(), 1 );
+   EXPECT_FALSE( deque.isEmpty() );
 
-      deque.pushBack( 2 );
-      TEST( deque.capacity() == ( DEQUE_SIZE - 2 ) );
-      TEST( deque.size() == 2 );
+   deque.pushBack( 2 );
+   EXPECT_EQ( deque.capacity(), ( DEQUE_SIZE - 2 ) );
+   EXPECT_EQ( deque.size(), 2 );
 
-      TEST( deque.popFront() == 1 );
-      TEST( deque.popFront() == 2 );
-      TEST( deque.isEmpty() );
-   }
+   EXPECT_EQ( deque.popFront(), 1 );
+   EXPECT_EQ( deque.popFront(), 2 );
+   EXPECT_TRUE( deque.isEmpty() );
 };
+
+#endif
