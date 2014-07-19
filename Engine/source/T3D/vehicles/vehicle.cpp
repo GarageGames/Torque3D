@@ -690,6 +690,18 @@ U32 Vehicle::getCollisionMask()
    return 0;
 }
 
+void Vehicle::_updateConvexCollision()
+{
+    AssertFatal(mDataBlock->collisionDetails.size() && mDataBlock->collisionDetails[0] != -1, "Error, a vehicle must have a collision-1 detail!");
+    mConvex.mObject = this;
+    mConvex.pShapeBase = this;
+    mConvex.hullId = 0;
+    mConvex.box = mObjBox;
+    mConvex.box.minExtents.convolve(mObjScale);
+    mConvex.box.maxExtents.convolve(mObjScale);
+    mConvex.findNodeTransform();
+}
+
 Point3F Vehicle::getVelocity() const
 {
    return mRigid.linVelocity;
@@ -767,14 +779,7 @@ bool Vehicle::onAdd()
    }
 
    // Create a new convex.
-   AssertFatal(mDataBlock->collisionDetails[0] != -1, "Error, a vehicle must have a collision-1 detail!");
-   mConvex.mObject    = this;
-   mConvex.pShapeBase = this;
-   mConvex.hullId     = 0;
-   mConvex.box        = mObjBox;
-   mConvex.box.minExtents.convolve(mObjScale);
-   mConvex.box.maxExtents.convolve(mObjScale);
-   mConvex.findNodeTransform();
+   _updateConvexCollision();
 
    return true;
 }
@@ -947,6 +952,9 @@ bool Vehicle::onNewDataBlock(GameBaseData* dptr,bool reload)
       if ( mDataBlock->waterSound[VehicleData::Wake] )
          mWakeSound = SFX->createSource( mDataBlock->waterSound[VehicleData::Wake], &getTransform() );
    }
+
+   //update convex
+   _updateConvexCollision();
 
    return true;
 }

@@ -237,6 +237,7 @@ class Vehicle: public ShapeBase
 
    void updateWorkingCollisionSet(const U32 mask);
    virtual U32 getCollisionMask();
+   void _updateConvexCollision();
 
    void updateFroth( F32 dt );
    bool collidingWithWater( Point3F &waterHeight );

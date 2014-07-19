@@ -20,10 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function CheetahCar::onAdd(%this, %obj)
+function CheetahCar::_updateShape(%this, %obj)
 {
-   Parent::onAdd(%this, %obj);
-
    %obj.setWheelTire(0,CheetahCarTire);
    %obj.setWheelTire(1,CheetahCarTire);
    %obj.setWheelTire(2,CheetahCarTireRear);
@@ -108,6 +106,20 @@ function CheetahCar::onAdd(%this, %obj)
    // Mount the brake lights
    %obj.mountObject(%obj.rightBrakeLight, %this.rightBrakeSlot);
    %obj.mountObject(%obj.leftBrakeLight, %this.leftBrakeSlot);
+}
+
+function CheetahCar::onAdd(%this, %obj)
+{
+   Parent::onAdd(%this, %obj);
+
+   %this._updateShape(%obj);
+}
+
+function CheetahCar::onNewDataBlock(%this, %obj)
+{
+   Parent::onNewDataBlock(%this, %obj);
+
+   %this._updateShape(%obj);
 }
 
 function CheetahCar::onRemove(%this, %obj)
