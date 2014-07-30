@@ -99,6 +99,15 @@ GFXImplementVertexFormat( GFXVertexPNTT )
    addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
 }
 
+GFXImplementVertexFormat( GFXVertexPCNTT )
+{
+   addElement( "POSITION", GFXDeclType_Float3 );
+   addElement( "COLOR", GFXDeclType_Color );
+   addElement( "NORMAL", GFXDeclType_Float3 );
+   addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
+   addElement( "TEXCOORD", GFXDeclType_Float2, 1 );
+}
+
 GFXImplementVertexFormat( GFXVertexPNTBT )
 {
    addElement( "POSITION", GFXDeclType_Float3 );

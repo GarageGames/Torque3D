@@ -112,6 +112,14 @@ GFXDeclareVertexFormat( GFXVertexPNTT )
    Point2F texCoord;
 };
 
+GFXDeclareVertexFormat( GFXVertexPCNTT )
+{
+   Point3F point;
+   GFXVertexColor color;
+   Point3F normal;
+   Point2F texCoord[2];
+};
+
 GFXDeclareVertexFormat( GFXVertexPNTBT )
 {
    Point3F point;
