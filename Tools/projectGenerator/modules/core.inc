@@ -29,6 +29,7 @@ addEngineSrcDir('sfx');
 // Components
 addEngineSrcDir('component');
 addEngineSrcDir('component/interfaces');
+addEngineSrcDir('component/test');
 
 // Core
 if (T3D_Generator::isApp())
