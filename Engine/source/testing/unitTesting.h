@@ -27,16 +27,26 @@
 
 #include <gtest/gtest.h>
 
+/// Convenience to define a test fixture with a Fixture suffix for use with
+/// TEST_FIX.
+#define FIXTURE(test_fixture)\
+   class test_fixture##Fixture : public ::testing::Test
+
 /// Allow test fixtures named with a Fixture suffix, so that we can name tests
 /// after a class name rather than having to call them XXTest.
 #define TEST_FIX(test_fixture, test_name)\
    GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
    ::testing::internal::GetTypeId<test_fixture##Fixture>())
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+/// Define a stress test. The test name is suffixed with Stress, so it will be
+/// excluded from normal unit test runs.
+#define TEST_STRESS(test_case_name, test_name)\
+   TEST(test_case_name##Stress, test_name)
+
+/// Define a stress test with a fixture.
+#define TEST_STRESS_FIX(test_fixture, test_name)\
+   GTEST_TEST_(test_fixture##Stress, test_name, test_fixture##Fixture, \
+   ::testing::internal::GetTypeId<test_fixture##Fixture>())
 
 #endif // TORQUE_TESTS_ENABLED
 

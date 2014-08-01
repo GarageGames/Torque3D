@@ -69,12 +69,24 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    }
 };
 
-DefineConsoleFunction( runAllUnitTests, int, (),,
-                      "" )
+DefineConsoleFunction( runAllUnitTests, int, (bool includeStressTests), (false),
+   "Runs all engine unit tests. Some tests are marked as 'stress' tests which do "
+   "not necessarily check correctness, just performance or possible nondeterministic "
+   "glitches. These tests can take some time, so they are not included unless "
+   "specified.\n\n"
+   "@param includeStressTests Run stress tests as well as unit tests. Default is false." )
 {
-   // Set-up some empty arguments.
    S32 testArgc = 0;
    char** testArgv = NULL;
+   if ( includeStressTests )
+   {
+      // Yes, I never free this memory, because it seems to be mangled by gtest.
+      // Also it's a negligible space leak that will only occur once.
+      testArgv = new char*[2];
+      testArgv[0] = new char( '\0' );
+      testArgv[1] = new char[26];
+      dStrcpy( testArgv[1], "--gtest_filter=-*Stress.*" );
+   }
 
    // Initialize Google Test.
    testing::InitGoogleTest( &testArgc, testArgv );
