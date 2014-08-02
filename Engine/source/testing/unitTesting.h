@@ -38,16 +38,6 @@
    GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
    ::testing::internal::GetTypeId<test_fixture##Fixture>())
 
-/// Define a stress test. The test name is suffixed with Stress, so it will be
-/// excluded from normal unit test runs.
-#define TEST_STRESS(test_case_name, test_name)\
-   TEST(test_case_name##Stress, test_name)
-
-/// Define a stress test with a fixture.
-#define TEST_STRESS_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture##Stress, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
-
 #endif // TORQUE_TESTS_ENABLED
 
 #endif // _UNIT_TESTING_H_

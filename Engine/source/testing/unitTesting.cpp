@@ -69,23 +69,30 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    }
 };
 
-DefineConsoleFunction( runAllUnitTests, int, (bool includeStressTests), (false),
-   "Runs all engine unit tests. Some tests are marked as 'stress' tests which do "
-   "not necessarily check correctness, just performance or possible nondeterministic "
-   "glitches. These tests can take some time, so they are not included unless "
-   "specified.\n\n"
-   "@param includeStressTests Run stress tests as well as unit tests. Default is false." )
+DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
+   "Runs engine unit tests. Some tests are marked as 'stress' tests which do not "
+   "necessarily check correctness, just performance or possible nondeterministic "
+   "glitches. There may also be interactive or networking tests which may be "
+   "excluded by using the testSpecs argument.\n"
+   "This function should only be called once per executable run, because of "
+   "googletest's design.\n\n"
+
+   "@param testSpecs A space-sepatated list of filters for test cases. "
+   "See https://code.google.com/p/googletest/wiki/AdvancedGuide#Running_a_Subset_of_the_Tests "
+   "for a description of the flag format.")
 {
    S32 testArgc = 0;
    char** testArgv = NULL;
-   if ( includeStressTests )
+   if ( dStrlen( testSpecs ) > 0 )
    {
-      // Yes, I never free this memory, because it seems to be mangled by gtest.
-      // Also it's a negligible space leak that will only occur once.
+      String specs(testSpecs);
+      specs.replace(' ', ':');
+      specs.insert(0, "--gtest_filter=");
+      testArgc = 2;
       testArgv = new char*[2];
-      testArgv[0] = new char( '\0' );
-      testArgv[1] = new char[26];
-      dStrcpy( testArgv[1], "--gtest_filter=-*Stress.*" );
+      testArgv[0] = NULL; // Program name is unused by googletest.
+      testArgv[1] = new char[specs.length()+1];
+      dStrcpy(testArgv[1], specs);
    }
 
    // Initialize Google Test.
@@ -108,11 +115,10 @@ DefineConsoleFunction( runAllUnitTests, int, (bool includeStressTests), (false),
    // Add the Torque unit test listener.
    listeners.Append( new TorqueUnitTestListener );
 
+   // Perform googletest run.
    Con::printf( "\nUnit Tests Starting...\n" );
-
    const S32 result = RUN_ALL_TESTS();
-
-   Con::printf( "\n... Unit Tests Ended.\n" );
+   Con::printf( "... Unit Tests Ended.\n" );
 
    return result;
 }
