@@ -732,6 +732,11 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
    bool doQuery = ( !mPlaneReflector.mQueryPending && query && mReflectorDesc.useOcclusionQuery );
 
+   // We need to call this for avoid a DX9 or Nvidia bug.
+   // At some resollutions read from render target,
+   // break current occlusion query.
+   REFLECTMGR->getRefractTex();
+
    if ( doQuery )
       query->begin();
 
