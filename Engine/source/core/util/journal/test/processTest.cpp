@@ -20,39 +20,41 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "unit/test.h"
+#ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
 #include "core/util/journal/process.h"
-#include "core/util/safeDelete.h"
 
-using namespace UnitTesting;
-
-CreateUnitTest(TestingProcess, "Journal/Process")
+FIXTURE(Process)
 {
-   // How many ticks remaining?
-   U32 _remainingTicks;
-
-   // Callback for process list.
-   void process()
+public:
+   U32 remainingTicks;
+   void notification()
    {
-      if(_remainingTicks==0)
+      if(remainingTicks == 0)
          Process::requestShutdown();
-
-      _remainingTicks--;
-   }
-
-   void run()
-   {
-      // We'll run 30 ticks, then quit.
-      _remainingTicks = 30;
-
-      // Register with the process list.
-      Process::notify(this, &TestingProcess::process);
-
-      // And do 30 notifies, making sure we end on the 30th.
-      for(S32 i=0; i<30; i++)
-         test(Process::processEvents(), "Should quit after 30 ProcessEvents() calls - not before!");
-      test(!Process::processEvents(), "Should quit after the 30th ProcessEvent() call!");
-
-      Process::remove(this, &TestingProcess::process);
+      remainingTicks--;
    }
 };
+
+TEST_FIX(Process, BasicAPI)
+{
+   // We'll run 30 ticks, then quit.
+   remainingTicks = 30;
+
+   // Register with the process list.
+   Process::notify(this, &ProcessFixture::notification);
+
+   // And do 30 notifies, making sure we end on the 30th.
+   for(S32 i = 0; i < 30; i++)
+   {
+      EXPECT_TRUE(Process::processEvents())
+         << "Should quit after 30 ProcessEvents() calls - not before!";
+   }
+
+   EXPECT_FALSE(Process::processEvents())
+      << "Should quit after the 30th ProcessEvent() call!";
+
+   Process::remove(this, &ProcessFixture::notification);
+};
+
+#endif
