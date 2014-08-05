@@ -121,7 +121,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mMiddleMouseLast(false),
                         mRightMouseLast(false),
                         mPlatformWindow(NULL),
-                        mLastRenderMs(0)
+                        mLastRenderMs(0),
+                        mDisplayWindow(true)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -176,6 +177,8 @@ void GuiCanvas::initPersistFields()
 
    addGroup("Canvas Rendering");
    addProtectedField( "numFences", TypeS32, Offset( mNumFences, GuiCanvas ), &setProtectedNumFences, &defaultProtectedGetFn, "The number of GFX fences to use." );
+
+   addField("displayWindow", TypeBool, Offset(mDisplayWindow, GuiCanvas), "Controls if the canvas window is rendered or not." );
    endGroup("Canvas Rendering");
 
    Parent::initPersistFields();
@@ -251,6 +254,19 @@ bool GuiCanvas::onAdd()
 
    // Make sure we're able to render.
    newDevice->setAllowRender( true );
+
+   if(mDisplayWindow)
+   {
+      getPlatformWindow()->show();
+      WindowManager->setDisplayWindow(true);
+      getPlatformWindow()->setDisplayWindow(true);
+   }
+   else
+   {
+      getPlatformWindow()->hide();
+      WindowManager->setDisplayWindow(false);
+      getPlatformWindow()->setDisplayWindow(false);
+   }
 
    // Propagate add to parents.
    // CodeReview - if GuiCanvas fails to add for whatever reason, what happens to
@@ -2700,4 +2716,6 @@ ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
       return;
 
    object->getPlatformWindow()->hide();
+	WindowManager->setDisplayWindow(false);
+   object->getPlatformWindow()->setDisplayWindow(false);
 }

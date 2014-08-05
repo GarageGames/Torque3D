@@ -268,7 +268,10 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
    w32w->setDisplayWindow(mDisplayWindow);
 
    if (!mOffscreenRender && mDisplayWindow)
+   {
       ShowWindow( w32w->mWindowHandle, SW_SHOWDEFAULT );
+      CloseSplashWindow(winState.appInstance);
+   }
 
    // Bind the window to the specified device.
    if(device)
