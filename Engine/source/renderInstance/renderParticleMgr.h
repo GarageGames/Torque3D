@@ -77,7 +77,9 @@ protected:
    // Not only a helper method, but a method for the RenderTranslucentMgr to
    // request a particle system draw
    void renderInstance(ParticleRenderInst *ri, SceneRenderState *state);
-
+public:
+   void renderParticle(ParticleRenderInst *ri, SceneRenderState *state);
+protected:
    bool mOffscreenRenderEnabled;
 
    /// The prepass render target used for the
