@@ -193,6 +193,8 @@ void RenderGlowMgr::render( SceneRenderState *state )
          {
             MeshRenderInst *passRI = static_cast<MeshRenderInst*>(mElementList[a].inst);
 
+            if (passRI->type == RenderPassManager::RIT_Particle)
+                break;
             if ( newPassNeeded( ri, passRI ) )
                break;
 

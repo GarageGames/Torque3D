@@ -39,6 +39,8 @@
 #include "ts/tsShape.h"
 #endif
 
+#include "T3D/fx/ParticleSystem/Utility/psMeshParsing.h"
+
 class TSShapeInstance;
 class TSThread;
 class TSStatic;
@@ -81,7 +83,7 @@ public:
 
 
 /// A simple mesh shape with optional ambient animation.
-class TSStatic : public SceneObject
+class TSStatic : public SceneObject, public psMeshInterface
 {
    typedef SceneObject Parent;
 
@@ -206,12 +208,16 @@ public:
    Resource<TSShape> getShape() const { return mShape; }
 	StringTableEntry getShapeFileName() { return mShapeName; }
   
-   TSShapeInstance* getShapeInstance() const { return mShapeInstance; }
+   virtual TSShapeInstance* getShapeInstance() const { return mShapeInstance; }
 
    const Vector<S32>& getCollisionDetails() const { return mCollisionDetails; }
 
    const Vector<S32>& getLOSDetails() const { return mLOSDetails; }
 
+   virtual Point3F getShapeScale() const { return getScale(); }
+   virtual Point3F getShapePosition() const { return getPosition(); }
+    
+   virtual void transformVertex(Point3F &p);
 };
 
 typedef TSStatic::MeshType TSMeshType;
