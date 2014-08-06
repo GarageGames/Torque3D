@@ -35,7 +35,8 @@
 #include "core/dnet.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "ts/tsShapeInstance.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
+#include "T3D/fx/ParticleSystem/particleSystemInterfaces.h"
 #include "sfx/sfxSystem.h"
 #include "sfx/sfxTrack.h"
 #include "sfx/sfxSource.h"
@@ -449,7 +450,7 @@ void WheeledVehicleData::initPersistFields()
    addField("WheelImpactSound", TYPEID< SFXTrack >(), Offset(sound[WheelImpactSound], WheeledVehicleData),
       "Sound played when the wheels impact the ground.\nCurrently unused." );
 
-   addField("tireEmitter",TYPEID< ParticleEmitterData >(), Offset(tireEmitter, WheeledVehicleData),
+   addField("tireEmitter",TYPEID< IParticleSystemData >(), Offset(tireEmitter, WheeledVehicleData),
       "ParticleEmitterData datablock used to generate particles from each wheel "
       "when the vehicle is moving and the wheel is in contact with the ground.");
    addField("maxWheelSpeed", TypeF32, Offset(maxWheelSpeed, WheeledVehicleData),
@@ -494,7 +495,7 @@ void WheeledVehicleData::unpackData(BitStream* stream)
    Parent::unpackData(stream);
 
    tireEmitter = stream->readFlag()?
-      (ParticleEmitterData*) stream->readRangedU32(DataBlockObjectIdFirst,
+      (IParticleSystemData*) stream->readRangedU32(DataBlockObjectIdFirst,
          DataBlockObjectIdLast): 0;
 
    for (S32 i = 0; i < MaxSounds; i++)
@@ -652,7 +653,7 @@ bool WheeledVehicle::onNewDataBlock(GameBaseData* dptr, bool reload)
       // Each wheel get's it's own particle emitter
       if( mDataBlock->tireEmitter && isGhost() )
       {
-         wheel->emitter = new ParticleEmitter;
+         wheel->emitter = mDataBlock->tireEmitter->createParticleSystem();
          wheel->emitter->onNewDataBlock( mDataBlock->tireEmitter, false );
          wheel->emitter->registerObject();
       }
@@ -1232,14 +1233,19 @@ void WheeledVehicle::updateWheelParticles(F32 dt)
 
             if( material)//&& material->mShowDust )
             {
-               ColorF colorList[ ParticleData::PDC_NUM_KEYS ];
+               IColoredParticleRenderer* coloredRenderer = dynamic_cast<IColoredParticleRenderer*>(wheel->emitter->getRenderer());
 
-               for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleData::PDC_NUM_KEYS ); ++ x )
-                  colorList[ x ] = material->mEffectColor[ x ];
-               for( U32 x = Material::NUM_EFFECT_COLOR_STAGES; x < ParticleData::PDC_NUM_KEYS; ++ x )
-                  colorList[ x ].set( 1.0, 1.0, 1.0, 0.0 );
+               if(coloredRenderer)
+               {
+                  ColorF colorList[ ParticleSystem::PDC_NUM_KEYS ];
 
-               wheel->emitter->setColors( colorList );
+                  for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleSystem::PDC_NUM_KEYS ); ++ x )
+                     colorList[ x ] = material->mEffectColor[ x ];
+                  for( U32 x = Material::NUM_EFFECT_COLOR_STAGES; x < ParticleSystem::PDC_NUM_KEYS; ++ x )
+                     colorList[ x ].set( 1.0, 1.0, 1.0, 0.0 );
+
+                  coloredRenderer->setColors( colorList );
+               }
 
                // Emit the dust, the density (time) is scaled by the
                // the vehicles velocity.

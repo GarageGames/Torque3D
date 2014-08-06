@@ -27,8 +27,8 @@
 #include "T3D/vehicles/vehicle.h"
 #endif
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 
 // -------------------------------------------------------------------------
 class HoverVehicleData : public VehicleData
@@ -55,7 +55,7 @@ class HoverVehicleData : public VehicleData
       DownwardJetEmitter,     // Thrust down
       MaxJetEmitters,
    };
-   ParticleEmitterData* jetEmitter[MaxJetEmitters];
+   IParticleSystemData* jetEmitter[MaxJetEmitters];
 
    enum JetNodes {
       // These enums index into a static name list.
@@ -101,7 +101,7 @@ class HoverVehicleData : public VehicleData
    F32 brakingForce;
    F32 brakingActivationSpeed;
 
-   ParticleEmitterData * dustTrailEmitter;
+   IParticleSystemData * dustTrailEmitter;
    S32                   dustTrailID;
    Point3F               dustTrailOffset;
    F32                   triggerTrailHeight;
@@ -131,7 +131,7 @@ class HoverVehicle : public Vehicle
 
   private:
    HoverVehicleData* mDataBlock;
-   SimObjectPtr<ParticleEmitter> mDustTrailEmitter;
+   SimObjectPtr<IParticleSystem> mDustTrailEmitter;
 
   protected:
    bool onAdd();
@@ -189,11 +189,11 @@ class HoverVehicle : public Vehicle
       S32 emitter;
    };
    static JetActivation sJetActivation[NumThrustDirections];
-   SimObjectPtr<ParticleEmitter> mJetEmitter[HoverVehicleData::MaxJetNodes];
+   SimObjectPtr<IParticleSystem> mJetEmitter[HoverVehicleData::MaxJetNodes];
 
    U32 getCollisionMask();
    void updateJet(F32 dt);
-   void updateEmitter(bool active,F32 dt,ParticleEmitterData *emitter,S32 idx,S32 count);
+   void updateEmitter(bool active,F32 dt,IParticleSystemData *emitter,S32 idx,S32 count);
   public:
    HoverVehicle();
    ~HoverVehicle();

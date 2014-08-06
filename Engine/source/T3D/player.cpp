@@ -47,7 +47,8 @@
 #include "T3D/physicalZone.h"
 #include "T3D/item.h"
 #include "T3D/missionArea.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
+#include "T3D/fx/ParticleSystem/particleSystemInterfaces.h"
 #include "T3D/fx/cameraFXMgr.h"
 #include "T3D/fx/splash.h"
 #include "T3D/tsStatic.h"
@@ -975,7 +976,7 @@ void PlayerData::initPersistFields()
    
    addGroup( "Interaction: Footsteps" );
 
-      addField( "footPuffEmitter", TYPEID< ParticleEmitterData >(), Offset(footPuffEmitter, PlayerData),
+      addField( "footPuffEmitter", TYPEID< IParticleSystemData >(), Offset(footPuffEmitter, PlayerData),
          "@brief Particle emitter used to generate footpuffs (particles created as the player "
          "walks along the ground).\n\n"
          "@note The generation of foot puffs requires the appropriate triggeres to be defined in the "
@@ -990,7 +991,7 @@ void PlayerData::initPersistFields()
          "This is applied to each foot puff particle, even if footPuffNumParts is set to one.  So "
          "set this value to zero if you want a single foot puff placed at exactly the same location "
          "under the player each time.\n");
-      addField( "dustEmitter", TYPEID< ParticleEmitterData >(), Offset(dustEmitter, PlayerData),
+      addField( "dustEmitter", TYPEID< IParticleSystemData >(), Offset(dustEmitter, PlayerData),
          "@brief Emitter used to generate dust particles.\n\n"
          "@note Currently unused." );
 
@@ -1082,7 +1083,7 @@ void PlayerData::initPersistFields()
          "@brief Minimum speed to generate splash particles.\n\n" );
       addField( "bubbleEmitTime", TypeF32, Offset(bubbleEmitTime, PlayerData),
          "@brief Time in seconds to generate bubble particles after entering the water.\n\n" );
-      addField( "splashEmitter", TYPEID< ParticleEmitterData >(), Offset(splashEmitterList, PlayerData), NUM_SPLASH_EMITTERS,
+      addField( "splashEmitter", TYPEID< IParticleSystemData >(), Offset(splashEmitterList, PlayerData), NUM_SPLASH_EMITTERS,
          "@brief Particle emitters used to generate splash particles.\n\n" );
 
       addField( "footstepSplashHeight", TypeF32, Offset(footSplashHeight, PlayerData),
@@ -1720,7 +1721,7 @@ bool Player::onAdd()
       {
          if ( mDataBlock->splashEmitterList[i] ) 
          {
-            mSplashEmitter[i] = new ParticleEmitter;
+            mSplashEmitter[i] = mDataBlock->splashEmitterList[i]->createParticleSystem();
             mSplashEmitter[i]->onNewDataBlock( mDataBlock->splashEmitterList[i], false );
             if( !mSplashEmitter[i]->registerObject() )
             {
@@ -3826,20 +3827,25 @@ void Player::updateActionThread()
                 && material && material->mShowDust )
             {
                // New emitter every time for visibility reasons
-               ParticleEmitter * emitter = new ParticleEmitter;
+               IParticleSystem * emitter = new ParticleSystem;
                emitter->onNewDataBlock( mDataBlock->footPuffEmitter, false );
 
-               ColorF colorList[ ParticleData::PDC_NUM_KEYS];
+               IColoredParticleRenderer* coloredRenderer = dynamic_cast<IColoredParticleRenderer*>(emitter->getRenderer());
 
-               for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleData::PDC_NUM_KEYS ); ++ x )
-                  colorList[ x ].set( material->mEffectColor[ x ].red,
-                                      material->mEffectColor[ x ].green,
-                                      material->mEffectColor[ x ].blue,
-                                      material->mEffectColor[ x ].alpha );
-               for( U32 x = Material::NUM_EFFECT_COLOR_STAGES; x < ParticleData::PDC_NUM_KEYS; ++ x )
-                  colorList[ x ].set( 1.0, 1.0, 1.0, 0.0 );
+               if(coloredRenderer)
+               {
+                  ColorF colorList[ ParticleSystem::PDC_NUM_KEYS];
 
-               emitter->setColors( colorList );
+                  for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleSystem::PDC_NUM_KEYS ); ++ x )
+                     colorList[ x ].set( material->mEffectColor[ x ].red,
+                                         material->mEffectColor[ x ].green,
+                                         material->mEffectColor[ x ].blue,
+                                         material->mEffectColor[ x ].alpha );
+                  for( U32 x = Material::NUM_EFFECT_COLOR_STAGES; x < ParticleSystem::PDC_NUM_KEYS; ++ x )
+                     colorList[ x ].set( 1.0, 1.0, 1.0, 0.0 );
+
+                  coloredRenderer->setColors( colorList );
+               }
                if( !emitter->registerObject() )
                {
                   Con::warnf( ConsoleLogEntry::General, "Could not register emitter for particle of class: %s", mDataBlock->getName() );

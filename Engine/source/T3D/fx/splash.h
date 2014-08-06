@@ -33,8 +33,8 @@
 
 #include "gfx/gfxTextureHandle.h"
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 class AudioProfile;
 class ExplosionData;
 
@@ -92,7 +92,7 @@ public:
    AudioProfile*           soundProfile;
    S32                     soundProfileId;
 
-   ParticleEmitterData*    emitterList[NUM_EMITTERS];
+   IParticleSystemData*    emitterList[NUM_EMITTERS];
    S32                     emitterIDList[NUM_EMITTERS];
 
    S32               delayMS;
@@ -141,7 +141,7 @@ class Splash : public GameBase
 private:
    SplashData*    mDataBlock;
 
-   SimObjectPtr<ParticleEmitter> mEmitterList[ SplashData::NUM_EMITTERS ];
+   SimObjectPtr<IParticleSystem> mEmitterList[ SplashData::NUM_EMITTERS ];
 
    typedef Torque::List<SplashRing> SplashRingList;
    SplashRingList ringList;

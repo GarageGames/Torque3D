@@ -31,7 +31,7 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "forest/forest.h"
 #include "forest/forestWindAccumulator.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 
 
 MODULE_BEGIN( ForestWindMgr )
@@ -127,11 +127,11 @@ void ForestWindMgr::processTick()
    {
       ForestWindEmitter *pWindEmitter = getGlobalWind();
       if ( pWindEmitter == NULL )      
-         ParticleEmitter::setWindVelocity( Point3F::Zero );
+         ParticleSystem::setWindVelocity( Point3F::Zero );
       else
       {
          ForestWind *pWind = pWindEmitter->getWind();
-         ParticleEmitter::setWindVelocity( pWind->getDirection() * pWind->getStrength() );
+         ParticleSystem::setWindVelocity( pWind->getDirection() * pWind->getStrength() );
       }
    }
 

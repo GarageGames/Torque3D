@@ -33,8 +33,8 @@
 #include "T3D/gameBase/gameProcess.h"
 
 class Material;
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 class DecalData;
 class SplashData;
 class PhysicsPlayer;
@@ -303,7 +303,7 @@ struct PlayerData: public ShapeBaseData {
    /// All of the data relating to environmental effects
    /// @{
 
-   ParticleEmitterData * footPuffEmitter;
+   IParticleSystemData * footPuffEmitter;
    S32 footPuffID;
    S32 footPuffNumParts;
    F32 footPuffRadius;
@@ -311,7 +311,7 @@ struct PlayerData: public ShapeBaseData {
    DecalData* decalData;
    S32 decalID;
 
-   ParticleEmitterData * dustEmitter;
+   IParticleSystemData * dustEmitter;
    S32 dustID;
 
    SplashData* splash;
@@ -336,7 +336,7 @@ struct PlayerData: public ShapeBaseData {
    // For use if/when mPhysicsPlayer is created
    StringTableEntry physicsPlayerType;
 
-   ParticleEmitterData* splashEmitterList[NUM_SPLASH_EMITTERS];
+   IParticleSystemData* splashEmitterList[NUM_SPLASH_EMITTERS];
    S32 splashEmitterIDList[NUM_SPLASH_EMITTERS];
    /// @}
 
@@ -398,7 +398,7 @@ protected:
       NextFreeMask = Parent::NextFreeMask << 3
    };
 
-   SimObjectPtr<ParticleEmitter> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
+   SimObjectPtr<IParticleSystem> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
    F32 mBubbleEmitterTime;
 
    /// Client interpolation/warp data

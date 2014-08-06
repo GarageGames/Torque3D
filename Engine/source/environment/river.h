@@ -349,8 +349,8 @@ inline const Point3F& RiverSegment::operator[](U32 index) const
 // River Class
 //------------------------------------------------------------------------------
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleEmitter;
+class IParticleSystemData;
 struct RiverNodeList;
 
 class River : public WaterObject

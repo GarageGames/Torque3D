@@ -35,7 +35,7 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/fx/cameraFXMgr.h"
 #include "ts/tsShapeInstance.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "sfx/sfxSystem.h"
 #include "sfx/sfxProfile.h"
 #include "sfx/sfxSource.h"
@@ -541,7 +541,7 @@ void VehicleData::initPersistFields()
    addField("cameraOffset", TypeF32, Offset(cameraOffset, VehicleData),
       "Vertical (Z axis) height of the camera above the vehicle." );
 
-   addField( "dustEmitter", TYPEID< ParticleEmitterData >(), Offset(dustEmitter, VehicleData),
+   addField( "dustEmitter", TYPEID< IParticleSystemData >(), Offset(dustEmitter, VehicleData),
       "Dust particle emitter.\n\n@see triggerDustHeight\n\n@see dustHeight");
    addField( "triggerDustHeight", TypeF32, Offset(triggerDustHeight, VehicleData),
       "@brief Maximum height above surface to emit dust particles.\n\n"
@@ -551,7 +551,7 @@ void VehicleData::initPersistFields()
    addField( "dustHeight", TypeF32, Offset(dustHeight, VehicleData),
       "Height above ground at which to emit particles from the dustEmitter." );
 
-   addField( "damageEmitter", TYPEID< ParticleEmitterData >(), Offset(damageEmitterList, VehicleData), VC_NUM_DAMAGE_EMITTERS,
+   addField( "damageEmitter", TYPEID< IParticleSystemData >(), Offset(damageEmitterList, VehicleData), VC_NUM_DAMAGE_EMITTERS,
       "@brief Array of particle emitters used to generate damage (dust, smoke etc) "
       "effects.\n\n"
       "Currently, the first two emitters (indices 0 and 1) are used when the damage "
@@ -579,7 +579,7 @@ void VehicleData::initPersistFields()
       "Number of damageEmitterOffset values to use for each damageEmitter.\n\n"
       "@see damageEmitterOffset" );
 
-   addField( "splashEmitter", TYPEID< ParticleEmitterData >(), Offset(splashEmitterList, VehicleData), VC_NUM_SPLASH_EMITTERS,
+   addField( "splashEmitter", TYPEID< IParticleSystemData >(), Offset(splashEmitterList, VehicleData), VC_NUM_SPLASH_EMITTERS,
       "Array of particle emitters used to generate splash effects." );
    addField( "splashFreqMod",  TypeF32, Offset(splashFreqMod, VehicleData),
       "@brief Number of splash particles to generate based on vehicle speed.\n\n"
@@ -721,7 +721,7 @@ bool Vehicle::onAdd()
       {
          for( S32 i=0; i<VehicleData::VC_NUM_DUST_EMITTERS; i++ )
          {
-            mDustEmitterList[i] = new ParticleEmitter;
+            mDustEmitterList[i] = mDataBlock->dustEmitter->createParticleSystem();
             mDustEmitterList[i]->onNewDataBlock( mDataBlock->dustEmitter, false );
             if( !mDustEmitterList[i]->registerObject() )
             {
@@ -737,7 +737,7 @@ bool Vehicle::onAdd()
       {
          if( mDataBlock->damageEmitterList[j] )
          {
-            mDamageEmitterList[j] = new ParticleEmitter;
+            mDamageEmitterList[j] = mDataBlock->damageEmitterList[j]->createParticleSystem();
             mDamageEmitterList[j]->onNewDataBlock( mDataBlock->damageEmitterList[j], false );
             if( !mDamageEmitterList[j]->registerObject() )
             {
@@ -753,7 +753,7 @@ bool Vehicle::onAdd()
       {
          if( mDataBlock->splashEmitterList[j] )
          {
-            mSplashEmitterList[j] = new ParticleEmitter;
+            mSplashEmitterList[j] = mDataBlock->splashEmitterList[j]->createParticleSystem();
             mSplashEmitterList[j]->onNewDataBlock( mDataBlock->splashEmitterList[j], false );
             if( !mSplashEmitterList[j]->registerObject() )
             {

@@ -31,7 +31,7 @@
 #include "console/engineAPI.h"
 #include "lighting/lightInfo.h"
 #include "lighting/lightManager.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "T3D/projectile.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "math/mathIO.h"
@@ -930,7 +930,7 @@ void ShapeBaseImageData::initPersistFields()
          "callback function takes the same arguments as the onMount callback.\n"
          "@see onMount() for the same arguments as this callback.");
 
-      addField( "stateEmitter", TYPEID< ParticleEmitterData >(), Offset(stateEmitter, ShapeBaseImageData), MaxStates,
+      addField( "stateEmitter", TYPEID< IParticleSystemData >(), Offset(stateEmitter, ShapeBaseImageData), MaxStates,
          "@brief Emitter to generate particles in this state (from muzzle point or "
          "specified node).\n\n"
          "@see stateEmitterNode" );
@@ -1323,7 +1323,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
 
          if (stream->readFlag())
          {
-            s.emitter = (ParticleEmitterData*) stream->readRangedU32(DataBlockObjectIdFirst,
+            s.emitter = (IParticleSystemData*) stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
             stream->read(&s.emitterTime);
 
@@ -3220,7 +3220,7 @@ void ShapeBase::startImageEmitter(MountedImage& image,ShapeBaseImageData::StateD
 
    bem->time = state.emitterTime;
    bem->node = state.emitterNode[imageShapeIndex];
-   bem->emitter = new ParticleEmitter;
+   bem->emitter = state.emitter->createParticleSystem();
    bem->emitter->onNewDataBlock(state.emitter,false);
    if( !bem->emitter->registerObject() )
    {

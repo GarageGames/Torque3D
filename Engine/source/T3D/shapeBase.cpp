@@ -40,7 +40,8 @@
 #include "scene/sceneRenderState.h"
 #include "scene/sceneObjectLightingPlugin.h"
 #include "T3D/fx/explosion.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
+#include "T3D/fx/ParticleSystem/particleSystemInterfaces.h"
 #include "T3D/fx/cameraFXMgr.h"
 #include "environment/waterBlock.h"
 #include "T3D/debris.h"
@@ -2372,7 +2373,7 @@ void ShapeBase::advanceThreads(F32 dt)
 /// material that has 'showDust' set to true.  The particles will have a lifetime of 'numMilliseconds'
 /// and be emitted at the given offset from the contact point having a direction of 'axis'.
 
-void ShapeBase::emitDust( ParticleEmitter* emitter, F32 triggerHeight, const Point3F& offset, U32 numMilliseconds, const Point3F& axis )
+void ShapeBase::emitDust( IParticleSystem* emitter, F32 triggerHeight, const Point3F& offset, U32 numMilliseconds, const Point3F& axis )
 {
    if( !emitter )
       return;
@@ -2386,14 +2387,19 @@ void ShapeBase::emitDust( ParticleEmitter* emitter, F32 triggerHeight, const Poi
       Material* material = ( rayInfo.material ? dynamic_cast< Material* >( rayInfo.material->getMaterial() ) : 0 );
       if( material && material->mShowDust )
       {
-         ColorF colorList[ ParticleData::PDC_NUM_KEYS ];
+         IColoredParticleRenderer* coloredRenderer = dynamic_cast<IColoredParticleRenderer*>(emitter->getRenderer());
 
-         for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleData::PDC_NUM_KEYS ); ++ x )
-            colorList[ x ] = material->mEffectColor[ x ];
-         for( U32 x = Material::NUM_EFFECT_COLOR_STAGES; x < ParticleData::PDC_NUM_KEYS; ++ x )
-            colorList[ x ].set( 1.0, 1.0, 1.0, 0.0 );
+         if(coloredRenderer)
+         {
+            ColorF colorList[ ParticleSystem::PDC_NUM_KEYS ];
 
-         emitter->setColors( colorList );
+            for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleSystem::PDC_NUM_KEYS ); ++ x )
+               colorList[ x ] = material->mEffectColor[ x ];
+            for( U32 x = Material::NUM_EFFECT_COLOR_STAGES; x < ParticleSystem::PDC_NUM_KEYS; ++ x )
+               colorList[ x ].set( 1.0, 1.0, 1.0, 0.0 );
+
+            coloredRenderer->setColors( colorList );
+         }
 
          Point3F contactPoint = rayInfo.point + offset;
          emitter->emitParticles( contactPoint, true, ( axis == Point3F::Zero ? rayInfo.normal : axis ),

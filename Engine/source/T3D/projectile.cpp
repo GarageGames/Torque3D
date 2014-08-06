@@ -41,7 +41,7 @@
 #include "math/mathUtils.h"
 #include "math/mathIO.h"
 #include "sim/netConnection.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "T3D/fx/splash.h"
 #include "T3D/physics/physicsPlugin.h"
 #include "T3D/physics/physicsWorld.h"
@@ -52,6 +52,7 @@
 #include "T3D/lightDescription.h"
 #include "console/engineAPI.h"
 
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 
 IMPLEMENT_CO_DATABLOCK_V1(ProjectileData);
 
@@ -194,12 +195,12 @@ ProjectileData::ProjectileData()
 
 void ProjectileData::initPersistFields()
 {
-   addField("particleEmitter", TYPEID< ParticleEmitterData >(), Offset(particleEmitter, ProjectileData),
+   addField("particleEmitter", TYPEID< IParticleSystemData >(), Offset(particleEmitter, ProjectileData),
       "@brief Particle emitter datablock used to generate particles while the projectile is outside of water.\n\n"
       "@note If datablocks are defined for both particleEmitter and particleWaterEmitter, both effects will play "
       "as the projectile enters or leaves water.\n\n"
       "@see particleWaterEmitter\n");
-   addField("particleWaterEmitter", TYPEID< ParticleEmitterData >(), Offset(particleWaterEmitter, ProjectileData),
+   addField("particleWaterEmitter", TYPEID< IParticleSystemData >(), Offset(particleWaterEmitter, ProjectileData),
       "@brief Particle emitter datablock used to generate particles while the projectile is submerged in water.\n\n"
       "@note If datablocks are defined for both particleWaterEmitter and particleEmitter , both effects will play "
       "as the projectile enters or leaves water.\n\n"
@@ -556,8 +557,8 @@ Projectile::Projectile()
    mSourceObjectId( -1 ),
    mSourceObjectSlot( -1 ),
    mCurrTick( 0 ),
-   mParticleEmitter( NULL ),
-   mParticleWaterEmitter( NULL ),
+   mParticleSystem( NULL ),
+   mParticleWaterSystem( NULL ),
    mSound( NULL ),
    mProjectileShape( NULL ),
    mActivateThread( NULL ),
@@ -742,7 +743,7 @@ bool Projectile::onAdd()
       }
       if (mDataBlock->particleEmitter != NULL)
       {
-         ParticleEmitter* pEmitter = new ParticleEmitter;
+         IParticleSystem* pEmitter = new ParticleSystem;
          pEmitter->onNewDataBlock(mDataBlock->particleEmitter,false);
          if (pEmitter->registerObject() == false)
          {
@@ -750,12 +751,12 @@ bool Projectile::onAdd()
             delete pEmitter;
             pEmitter = NULL;
          }
-         mParticleEmitter = pEmitter;
+         mParticleSystem = pEmitter;
       }
 
       if (mDataBlock->particleWaterEmitter != NULL)
       {
-         ParticleEmitter* pEmitter = new ParticleEmitter;
+         IParticleSystem* pEmitter = new ParticleSystem;
          pEmitter->onNewDataBlock(mDataBlock->particleWaterEmitter,false);
          if (pEmitter->registerObject() == false)
          {
@@ -763,7 +764,7 @@ bool Projectile::onAdd()
             delete pEmitter;
             pEmitter = NULL;
          }
-         mParticleWaterEmitter = pEmitter;
+         mParticleWaterSystem = pEmitter;
       }
    }
    if (mSourceObject.isValid())
@@ -790,16 +791,16 @@ bool Projectile::onAdd()
 
 void Projectile::onRemove()
 {
-   if( !mParticleEmitter.isNull() )
+   if( !mParticleSystem.isNull() )
    {
-      mParticleEmitter->deleteWhenEmpty();
-      mParticleEmitter = NULL;
+      mParticleSystem->deleteWhenEmpty();
+      mParticleSystem = NULL;
    }
 
-   if( !mParticleWaterEmitter.isNull() )
+   if( !mParticleWaterSystem.isNull() )
    {
-      mParticleWaterEmitter->deleteWhenEmpty();
-      mParticleWaterEmitter = NULL;
+      mParticleWaterSystem->deleteWhenEmpty();
+      mParticleWaterSystem = NULL;
    }
 
    SFX_DELETE( mSound );
@@ -896,10 +897,10 @@ void Projectile::emitParticles(const Point3F& from, const Point3F& to, const Poi
    bool fromWater = pointInWater(from);
    bool toWater   = pointInWater(to);
 
-   if (!fromWater && !toWater && bool(mParticleEmitter))                                        // not in water
-      mParticleEmitter->emitParticles(from, to, axis, vel, ms);
-   else if (fromWater && toWater && bool(mParticleWaterEmitter))                                // in water
-      mParticleWaterEmitter->emitParticles(from, to, axis, vel, ms);
+   if (!fromWater && !toWater && bool(mParticleSystem))                                        // not in water
+      mParticleSystem->emitParticles(from, to, axis, vel, ms);
+   else if (fromWater && toWater && bool(mParticleWaterSystem))                                // in water
+      mParticleWaterSystem->emitParticles(from, to, axis, vel, ms);
    else if (!fromWater && toWater && mDataBlock->splash)     // entering water
    {
       // cast the ray to get the surface point of the water
@@ -920,11 +921,11 @@ void Projectile::emitParticles(const Point3F& from, const Point3F& to, const Poi
          }
 
          // create an emitter for the particles out of water and the particles in water
-         if (mParticleEmitter)
-            mParticleEmitter->emitParticles(from, rInfo.point, axis, vel, ms);
+         if (mParticleSystem)
+            mParticleSystem->emitParticles(from, rInfo.point, axis, vel, ms);
 
-         if (mParticleWaterEmitter)
-            mParticleWaterEmitter->emitParticles(rInfo.point, to, axis, vel, ms);
+         if (mParticleWaterSystem)
+            mParticleWaterSystem->emitParticles(rInfo.point, to, axis, vel, ms);
       }
    }
    else if (fromWater && !toWater && mDataBlock->splash)     // leaving water
@@ -948,11 +949,11 @@ void Projectile::emitParticles(const Point3F& from, const Point3F& to, const Poi
          }
 
          // create an emitter for the particles out of water and the particles in water
-         if (mParticleEmitter)
-            mParticleEmitter->emitParticles(rInfo.point, to, axis, vel, ms);
+         if (mParticleSystem)
+            mParticleSystem->emitParticles(rInfo.point, to, axis, vel, ms);
 
-         if (mParticleWaterEmitter)
-            mParticleWaterEmitter->emitParticles(from, rInfo.point, axis, vel, ms);
+         if (mParticleWaterSystem)
+            mParticleWaterSystem->emitParticles(from, rInfo.point, axis, vel, ms);
       }
    }
 }

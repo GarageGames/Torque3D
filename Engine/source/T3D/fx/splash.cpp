@@ -32,9 +32,7 @@
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
 #include "T3D/fx/explosion.h"
-#include "T3D/fx/particle.h"
-#include "T3D/fx/particleEmitter.h"
-#include "T3D/fx/particleEmitterNode.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "T3D/gameBase/gameProcess.h"
 #include "sim/netConnection.h"
 #include "renderInstance/renderPassManager.h"
@@ -113,7 +111,7 @@ SplashData::SplashData()
 {
    addField("soundProfile",      TYPEID< SFXProfile >(),       Offset(soundProfile,       SplashData), "SFXProfile effect to play.\n");
    addField("scale",             TypePoint3F,                  Offset(scale,              SplashData), "The scale of this splashing effect, defined as the F32 points X, Y, Z.\n");
-   addField("emitter",           TYPEID< ParticleEmitterData >(),   Offset(emitterList,        SplashData), NUM_EMITTERS, "List of particle emitters to create at the point of this Splash effect.\n");
+   addField("emitter",           TYPEID< IParticleSystemData >(),   Offset(emitterList,        SplashData), NUM_EMITTERS, "List of particle emitters to create at the point of this Splash effect.\n");
    addField("delayMS",           TypeS32,                      Offset(delayMS,            SplashData), "Time to delay, in milliseconds, before actually starting this effect.\n");
    addField("delayVariance",     TypeS32,                      Offset(delayVariance,      SplashData), "Time variance for delayMS.\n");
    addField("lifetimeMS",        TypeS32,                      Offset(lifetimeMS,         SplashData), "Lifetime for this effect, in milliseconds.\n");
@@ -371,7 +369,7 @@ bool Splash::onAdd()
    {
       if( mDataBlock->emitterList[i] != NULL )
       {
-         ParticleEmitter * pEmitter = new ParticleEmitter;
+         IParticleSystem * pEmitter = new ParticleSystem;
          pEmitter->onNewDataBlock( mDataBlock->emitterList[i], false );
          if( !pEmitter->registerObject() )
          {

@@ -50,8 +50,8 @@ class DecalData;
 class LightDescription;
 class SFXTrack;
 class SFXSource;
-class ParticleEmitterData;
-class ParticleEmitter;
+class IParticleSystemData;
+class IParticleSystem;
 class Projectile;
 
 //--------------------------------------------------------------------------
@@ -120,10 +120,10 @@ public:
    S32 activateSeq;
    S32 maintainSeq;
 
-   ParticleEmitterData* particleEmitter;
+   IParticleSystemData* particleEmitter;
    S32 particleEmitterId;
 
-   ParticleEmitterData* particleWaterEmitter;
+   IParticleSystemData* particleWaterEmitter;
    S32 particleWaterEmitterId;
 
    ProjectileData();
@@ -233,8 +233,8 @@ protected:
 
    ProjectileData* mDataBlock;
 
-   SimObjectPtr< ParticleEmitter > mParticleEmitter;
-   SimObjectPtr< ParticleEmitter > mParticleWaterEmitter;
+   SimObjectPtr< IParticleSystem > mParticleSystem;
+   SimObjectPtr< IParticleSystem > mParticleWaterSystem;
 
    SFXSource* mSound;
 

@@ -59,7 +59,7 @@ class GFXShader;
 class GFXCubemap;
 class CustomMaterial;
 class ProjectileData;
-class ParticleEmitterData;
+class IParticleSystemData;
 class SimPersistID;
 
 
