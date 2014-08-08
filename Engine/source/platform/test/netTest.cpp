@@ -48,13 +48,15 @@ TEST(Net, TCPRequest)
 
             Net::Error e = Net::sendtoSocket(mSocket, reqBuffer, sizeof(reqBuffer));
 
-            EXPECT_EQ(e, Net::NoError)
+            ASSERT_EQ(Net::NoError, e)
                << "Got an error sending our HTTP request!";
          }
-         else if(state == Net::Disconnected)
+         else
          {
             Process::requestShutdown();
             mSocket = NULL;
+            ASSERT_EQ(Net::Disconnected, state)
+               << "Ended with a network error!";
          }
       }
 
@@ -63,10 +65,6 @@ TEST(Net, TCPRequest)
          // Only consider our own socket.
          if(mSocket != sock)
             return;
-
-         char buff[4096];
-         dMemcpy(buff, incomingData.data, incomingData.size);
-         buff[incomingData.size] = 0;
 
          mDataReceived += incomingData.size;
       }
@@ -115,13 +113,15 @@ TEST(Net, JournalTCPRequest)
 
             Net::Error e = Net::sendtoSocket(mSocket, reqBuffer, sizeof(reqBuffer));
 
-            EXPECT_EQ(e, Net::NoError)
+            ASSERT_EQ(Net::NoError, e)
                << "Got an error sending our HTTP request!";
          }
-         else if(state == Net::Disconnected)
+         else
          {
             Process::requestShutdown();
             mSocket = NULL;
+            ASSERT_EQ(Net::Disconnected, state)
+               << "Ended with a network error!";
          }
       }
 
@@ -130,11 +130,6 @@ TEST(Net, JournalTCPRequest)
          // Only consider our own socket.
          if(mSocket != sock)
             return;
-
-         char buff[4096];
-         dMemcpy(buff, incomingData.data, incomingData.size);
-         buff[incomingData.size] = 0;
-
          mDataReceived += incomingData.size;
       }
 
@@ -142,9 +137,6 @@ TEST(Net, JournalTCPRequest)
       {
          mSocket = InvalidSocket;
          mDataReceived = 0;
-
-         // Initialize networking - done by initLibraries currently
-         //test(Net::init(), "Failed to initialize networking!");
 
          // Hook into the signals.
          Net::smConnectionNotify. notify(this, &handle::notify);
