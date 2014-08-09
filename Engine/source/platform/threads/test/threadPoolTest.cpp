@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,66 +20,52 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "unit/test.h"
+#ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
 #include "platform/threads/threadPool.h"
 #include "console/console.h"
 #include "core/util/tVector.h"
 
-#ifndef TORQUE_SHIPPING
-
-using namespace UnitTesting;
-
-#define TEST( x ) test( ( x ), "FAIL: " #x )
-
-// Simple test that creates and verifies an array of numbers using
-// thread pool work items.
-
-CreateUnitTest( TestThreadPool, "Platform/ThreadPool/Simple" )
+TEST(ThreadPool, BasicAPI)
 {
-   enum { DEFAULT_NUM_ITEMS = 4000 };
-   
-   static Vector< U32 > results;
-   
+   // Represents a single unit of work. In this test we just set an element in
+   // a result vector.
    struct TestItem : public ThreadPool::WorkItem
    {
-         typedef ThreadPool::WorkItem Parent;
-         
-         U32 mIndex;
-         
-         TestItem( U32 index )
-            : mIndex( index ) {}
-      
-      protected:
-         virtual void execute()
-         {
-            results[ mIndex ] = mIndex;
-         }
-   };
-   
-   void run()
-   {
-      U32 numItems = Con::getIntVariable( "$testThreadPool::numValues", DEFAULT_NUM_ITEMS );
-      ThreadPool* pool = &ThreadPool::GLOBAL();
-      results.setSize( numItems );
+      U32 mIndex;
+      Vector<U32>& mResults;
+      TestItem(U32 index, Vector<U32>& results)
+         : mIndex(index), mResults(results) {}
 
-      for( U32 i = 0; i < numItems; ++ i )
-         results[ i ] = U32( -1 );
-      
-      for( U32 i = 0; i < numItems; ++ i )
+   protected:
+      virtual void execute()
       {
-         ThreadSafeRef< TestItem > item( new TestItem( i ) );
-         pool->queueWorkItem( item );
+         mResults[mIndex] = mIndex;
       }
-      
-      pool->flushWorkItems();
-      
-      for( U32 i = 0; i < numItems; ++ i )
-         test( results[ i ] == i, "result mismatch" );
-         
-      results.clear();
+   };
+
+   // Construct the vector of results from the work items.
+   const U32 numItems = 100;
+   Vector<U32> results(__FILE__, __LINE__);
+   results.setSize(numItems);
+   for (U32 i = 0; i < numItems; i++)
+      results[i] = U32(-1);
+
+   // Launch the work items.
+   ThreadPool* pool = &ThreadPool::GLOBAL();
+   for (U32 i = 0; i < numItems; i++)
+   {
+      ThreadSafeRef<TestItem> item(new TestItem(i, results));
+      pool->queueWorkItem(item);
    }
-};
 
-Vector< U32 > TestThreadPool::results( __FILE__, __LINE__ );
+   // Wait for all items to complete.
+   pool->flushWorkItems();
 
-#endif // !TORQUE_SHIPPING
+   // Verify.
+   for (U32 i = 0; i < numItems; i++)
+      EXPECT_EQ(results[i], i) << "result mismatch";
+   results.clear();
+}
+
+#endif
