@@ -1237,7 +1237,7 @@ void GuiTreeViewCtrl::buildVisibleTree(bool bForceFullUpdate)
       bForceFullUpdate = true;
 
    // Update the flags.
-   mFlags.clear(RebuildVisible);
+   mFlags.set(RebuildVisible);
 
    // build the root items
    Item *traverse = mRoot;
