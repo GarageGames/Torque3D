@@ -1237,7 +1237,7 @@ void GuiTreeViewCtrl::buildVisibleTree(bool bForceFullUpdate)
       bForceFullUpdate = true;
 
    // Update the flags.
-   mFlags.set(RebuildVisible);
+   mFlags.clear(RebuildVisible);
 
    // build the root items
    Item *traverse = mRoot;
@@ -1785,6 +1785,8 @@ bool GuiTreeViewCtrl::onWake()
       // make sure it's big enough for both bitmap AND font...
       mItemHeight = getMax((S32)mFont->getHeight(), (S32)mProfile->mBitmapArrayRects[0].extent.y);
    }
+   
+   mFlags.set(RebuildVisible);
 
    return true;
 }
