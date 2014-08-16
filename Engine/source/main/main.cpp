@@ -55,7 +55,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
    HMODULE hGame = NULL;
    std::wstring dllName = std::wstring();
    // The file name is the same as this executable's name, plus a suffix.
-   const std::wstring dllSuffices[] = {L"", L" DLL"};
+   const std::wstring dllSuffices[] = {L" DLL", L""};
    const unsigned int numSuffices = sizeof(dllSuffices) / sizeof(std::wstring);
 
    for (unsigned int i = 0; i < numSuffices; i++)
