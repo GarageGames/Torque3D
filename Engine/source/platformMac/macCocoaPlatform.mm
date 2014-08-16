@@ -70,6 +70,11 @@ bool Platform::displaySplashWindow()
     return false;
 }
 
+bool Platform::closeSplashWindow()
+{
+    return false;
+}
+
 #pragma mark ---- File IO ----
 //-----------------------------------------------------------------------------
 bool dPathCopy(const char* source, const char* dest, bool nooverwrite)

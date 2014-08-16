@@ -29,12 +29,6 @@ function loadStartup()
    // The index of the current splash screen
    $StartupIdx = 0;
 
-   // As we know at this point that the initial load is complete, 
-   // we can hide any splash screen we have, and show the canvas.
-   // This keeps things looking nice, instead of having a blank window
-   closeSplashWindow();
-   Canvas.showWindow();
-
    // A list of the splash screens and logos
    // to cycle through. Note that they have to
    // be in consecutive numerical order

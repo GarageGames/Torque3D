@@ -2716,6 +2716,6 @@ ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
       return;
 
    object->getPlatformWindow()->hide();
-	WindowManager->setDisplayWindow(false);
+   WindowManager->setDisplayWindow(false);
    object->getPlatformWindow()->setDisplayWindow(false);
 }
