@@ -38,7 +38,10 @@ function createCanvas(%windowTitle)
    }
 
    // Create the Canvas
-   %foo = new GuiCanvas(Canvas);
+   %foo = new GuiCanvas(Canvas)
+   {
+      displayWindow = false;
+   };
    
    // Set the window title
    if (isObject(Canvas))
