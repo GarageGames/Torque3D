@@ -153,7 +153,9 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 	{
 		SetWindowLong( getHWND(), GWL_STYLE, WS_POPUP);
 		SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-		ShowWindow(getHWND(), SW_SHOWNORMAL);
+		
+      if(mDisplayWindow)
+         ShowWindow(getHWND(), SW_SHOWNORMAL);
 
       // Clear the menu bar from the window for full screen
       HMENU menu = GetMenu(getHWND());
@@ -216,7 +218,9 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 		   // We have to force Win32 to update the window frame and make the window
 		   // visible and no longer topmost - this code might be possible to simplify.
 		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-		   ShowWindow( getHWND(), SW_SHOWNORMAL);
+
+         if(mDisplayWindow)
+            ShowWindow( getHWND(), SW_SHOWNORMAL);
       }
 
       mFullscreen = false;
