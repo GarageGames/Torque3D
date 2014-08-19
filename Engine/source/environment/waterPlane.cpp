@@ -894,7 +894,27 @@ F32 WaterPlane::getWaterCoverage( const Box3F &testBox ) const
 
 F32 WaterPlane::getSurfaceHeight( const Point2F &pos ) const
 {
-   return getPosition().z;   
+   MatrixF modelMatrix( getRenderTransform() );
+   Point4F undulate( pos.x, pos.y, 0, 1 );
+   modelMatrix.mul( undulate );
+   F32 time = Sim::getCurrentTime() / 1000.0f;
+   F32 height = getPosition().z;
+   height += mWaveMagnitude[0] * mOverallWaveMagnitude *
+      mSin( time * mWaveSpeed[0] +
+      undulate.x * -mWaveDir[0].x +
+      undulate.y * -mWaveDir[0].y );
+
+   height += mWaveMagnitude[1] * mOverallWaveMagnitude *
+      mSin( time * mWaveSpeed[1] +
+      undulate.x * -mWaveDir[1].x +
+      undulate.y * -mWaveDir[1].y );
+
+   height += mWaveMagnitude[2] * mOverallWaveMagnitude *
+      mSin( time * mWaveSpeed[2] +
+      undulate.x * -mWaveDir[2].x +
+      undulate.y * -mWaveDir[2].y );
+
+   return height;
 }
 
 void WaterPlane::onReflectionInfoChanged()
