@@ -87,5 +87,53 @@ TEST(ThreadStatic, BasicAPI)
    _TorqueThreadStaticReg::destroyInstance(testInstance);
 }
 
+#ifdef TORQUE_ENABLE_PROFILER
+#include "math/mRandom.h"
+#include "platform/profiler.h"
+
+// Declare a test thread static
+DITTS(U32, gInstancedStaticFoo, 42);
+static U32 gTrueStaticFoo = 42;
+
+TEST(ThreadStatic, StressThreadStatic)
+{
+   ASSERT_FALSE(gProfiler->isEnabled())
+      << "Profiler is currently enabled, test cannot continue";
+
+   // Spawn an instance
+   TorqueThreadStaticListHandle testInstance = _TorqueThreadStaticReg::spawnThreadStaticsInstance();
+
+   static const dsize_t TEST_SIZE = 100000;
+
+   // What we are going to do in this test is to test some U32 static
+   // performance. The test will be run TEST_SIZE times, and so first create
+   // an array of values to standardize the tests on.
+   U32 testValue[TEST_SIZE];
+
+   for(S32 i = 0; i < TEST_SIZE; i++)
+      testValue[i] = gRandGen.randI();
+
+   // Reset the profiler, tell it to dump to console when done
+   gProfiler->dumpToConsole();
+   gProfiler->enable(true);
+
+   // Value array is initialized, so lets put the foo's through the paces
+   PROFILE_START(ThreadStaticPerf_TrueStaticAssign);
+   for(int i = 0; i < TEST_SIZE; i++)
+      gTrueStaticFoo = testValue[i];
+   PROFILE_END();
+
+   PROFILE_START(ThreadStaticPerf_InstanceStaticAssign);
+   for(S32 i = 0; i < TEST_SIZE; i++)
+      ATTS_(gInstancedStaticFoo, 1) = testValue[i];
+   PROFILE_END();
+
+   gProfiler->enable(false);
+
+   // Clean up instance
+   _TorqueThreadStaticReg::destroyInstance(testInstance);
+}
+#endif
+
 #endif
 #endif
