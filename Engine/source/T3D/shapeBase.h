@@ -873,7 +873,8 @@ protected:
 
    /// @name Physical Properties
    /// @{
-
+   
+   F32 mAiPose;
    F32 mEnergy;                     ///< Current enery level.
    F32 mRechargeRate;               ///< Energy recharge rate (in units/tick).
 
