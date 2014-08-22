@@ -69,7 +69,7 @@ static float2 sNonUniformTaps[NUM_PRE_TAPS] =
 
 /// The texture used to do per-pixel pseudorandom
 /// rotations of the filter taps.
-uniform sampler2D gTapRotationTex : register(S3);
+uniform sampler2D gTapRotationTex : register(S4);
 
 
 float softShadow_sampleTaps(  sampler2D shadowMap,

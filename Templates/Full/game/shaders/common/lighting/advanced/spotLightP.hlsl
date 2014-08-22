@@ -27,13 +27,14 @@
 #include "../../lighting.hlsl"
 #include "../shadowMap/shadowMapIO_HLSL.h"
 #include "softShadow.hlsl"
-
+#include "../../torque.hlsl"
 
 struct ConvexConnectP
 {
    float4 wsEyeDir : TEXCOORD0;
    float4 ssPos : TEXCOORD1;
    float4 vsEyeDir : TEXCOORD2;
+   float4 color : COLOR0;
 };
 
 #ifdef USE_COOKIE_TEX
@@ -48,6 +49,10 @@ float4 main(   ConvexConnectP IN,
 
                uniform sampler2D prePassBuffer : register(S0),
                uniform sampler2D shadowMap : register(S1),
+
+               uniform sampler2D lightBuffer : register(S5),
+               uniform sampler2D colorBuffer : register(S6),
+               uniform sampler2D matInfoBuffer : register(S7),
 
                uniform float4 rtParams0,
 
@@ -70,6 +75,14 @@ float4 main(   ConvexConnectP IN,
    float3 ssPos = IN.ssPos.xyz / IN.ssPos.w;
    float2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
    
+   // Emissive.
+   float4 matInfo = tex2D( matInfoBuffer, uvScene );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       return float4(0.0, 0.0, 0.0, 0.0);
+   }
+
    // Sample/unpack the normal/z data
    float4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
    float3 normal = prepassSample.rgb;
@@ -163,5 +176,6 @@ float4 main(   ConvexConnectP IN,
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   return lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   float4 colorSample = tex2D( colorBuffer, uvScene );
+   return AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, colorSample.a, Sat_NL_Att);
 }

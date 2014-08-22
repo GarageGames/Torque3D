@@ -20,19 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( DesertSkyCubemap )
-{
-   cubeFace[0] = "./cubemap/skybox_1";
-   cubeFace[1] = "./cubemap/skybox_2";
-   cubeFace[2] = "./cubemap/skybox_3";
-   cubeFace[3] = "./cubemap/skybox_4";
-   cubeFace[4] = "./cubemap/skybox_5";
-   cubeFace[5] = "./cubemap/skybox_6";
-};
+#include "shadergen:/autogenConditioners.h"
+#include "../../postfx/postFx.hlsl"
 
-singleton Material( DesertSkyMat )
-{
-   cubemap = DesertSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+
+float4 main( PFXVertToPix IN, 
+             uniform sampler2D colorBufferTex : register(S0) ) : COLOR0
+{     
+   float specular = tex2D( colorBufferTex, IN.uv0 ).a;  
+   return float4( specular, specular, specular, 1.0 );   
+}

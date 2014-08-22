@@ -875,6 +875,17 @@ function MaterialEditorGui::guiSync( %this, %material )
       MaterialEditorPropertiesWindow-->toneMapDisplayBitmap.setBitmap( (%material).toneMap[%layer] );
    }
    
+   if((%material).translucencyMap[%layer] $= "") 
+   {
+      MaterialEditorPropertiesWindow-->translucencyMapNameText.setText( "None" );
+      MaterialEditorPropertiesWindow-->translucencyMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+   }
+   else
+   {
+      MaterialEditorPropertiesWindow-->translucencyMapNameText.setText( (%material).translucencyMap[%layer] );
+      MaterialEditorPropertiesWindow-->translucencyMapDisplayBitmap.setBitmap( (%material).translucencyMap[%layer] );
+   }
+   
    if((%material).specularMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->specMapNameText.setText( "None" );
@@ -901,6 +912,9 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->emissiveCheckbox.setValue((%material).emissive[%layer]);
    MaterialEditorPropertiesWindow-->parallaxTextEdit.setText((%material).parallaxScale[%layer]);
    MaterialEditorPropertiesWindow-->parallaxSlider.setValue((%material).parallaxScale[%layer]);
+
+   // Deferred Shading: Metalness
+   MaterialEditorPropertiesWindow-->useMetalCheckbox.setValue((%material).useMetalness[%layer]);
 
    MaterialEditorPropertiesWindow-->useAnisoCheckbox.setValue((%material).useAnisotropic[%layer]);
    MaterialEditorPropertiesWindow-->vertLitCheckbox.setValue((%material).vertLit[%layer]);

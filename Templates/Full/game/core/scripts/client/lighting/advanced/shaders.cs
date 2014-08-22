@@ -72,6 +72,9 @@ new CustomMaterial( AL_VectorLightMaterial )
    sampler["prePassBuffer"] = "#prepass";
    sampler["ShadowMap"] = "$dynamiclight";
    sampler["ssaoMask"] = "#ssaoMask";
+   sampler["lightBuffer"] = "#lightinfo";
+   sampler["colorBuffer"] = "#color";
+   sampler["matInfoBuffer"] = "#matinfo";
    
    target = "lightinfo";
    
@@ -132,6 +135,9 @@ new CustomMaterial( AL_PointLightMaterial )
    sampler["prePassBuffer"] = "#prepass";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["cookieTex"] = "$dynamiclightmask";
+   sampler["lightBuffer"] = "#lightinfo";
+   sampler["colorBuffer"] = "#color";
+   sampler["matInfoBuffer"] = "#matinfo";
    
    target = "lightinfo";
    
@@ -158,6 +164,9 @@ new CustomMaterial( AL_SpotLightMaterial )
    sampler["prePassBuffer"] = "#prepass";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["cookieTex"] = "$dynamiclightmask";
+   sampler["lightBuffer"] = "#lightinfo";
+   sampler["colorBuffer"] = "#color";
+   sampler["matInfoBuffer"] = "#matinfo";
    
    target = "lightinfo";
    

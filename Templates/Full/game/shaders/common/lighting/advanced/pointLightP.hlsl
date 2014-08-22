@@ -27,13 +27,14 @@
 #include "../../lighting.hlsl"
 #include "../shadowMap/shadowMapIO_HLSL.h"
 #include "softShadow.hlsl"
-
+#include "../../torque.hlsl"
 
 struct ConvexConnectP
 {
    float4 wsEyeDir : TEXCOORD0;
    float4 ssPos : TEXCOORD1;
    float4 vsEyeDir : TEXCOORD2;
+   float4 color : COLOR0;
 };
 
 
@@ -116,6 +117,10 @@ float4 main(   ConvexConnectP IN,
                   uniform sampler2D shadowMap : register(S1),
                #endif
 
+               uniform sampler2D lightBuffer : register(S5),
+               uniform sampler2D colorBuffer : register(S6),
+               uniform sampler2D matInfoBuffer : register(S7),
+
                uniform float4 rtParams0,
 
                uniform float3 lightPosition,
@@ -134,6 +139,14 @@ float4 main(   ConvexConnectP IN,
    // Compute scene UV
    float3 ssPos = IN.ssPos.xyz / IN.ssPos.w;
    float2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
+   
+   // Emissive.
+   float4 matInfo = tex2D( matInfoBuffer, uvScene );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       return float4(0.0, 0.0, 0.0, 0.0);
+   }
    
    // Sample/unpack the normal/z data
    float4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
@@ -235,5 +248,22 @@ float4 main(   ConvexConnectP IN,
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   return lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   bool translucent = getFlag( matInfo.r, 2 );
+   if ( translucent && matInfo.g > 0.1 )
+   {
+      float fLTDistortion = 0.0;
+      int iLTPower = 10;
+      float fLTAmbient = 0.0;
+      float fLTThickness = matInfo.g;
+      float fLTScale = 1.0;
+
+      float3 vLTLight = lightVec + normal * fLTDistortion;
+      float fLTDot = pow(saturate(dot(-IN.vsEyeDir.xyz, -vLTLight)), iLTPower) * fLTScale;
+      float3 fLT = atten * (fLTDot + fLTAmbient) * fLTThickness;
+
+      addToResult = lightColor * float4( fLT, 0.0);
+   }
+
+   float4 colorSample = tex2D( colorBuffer, uvScene );
+   return AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, colorSample.a, Sat_NL_Att);
 }
