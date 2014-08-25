@@ -59,7 +59,7 @@ function GammaPostFX::preProcess( %this )
  
 function GammaPostFX::setShaderConsts( %this )
 {
-   %clampedGamma  = mClamp( $pref::Video::Gamma, 0.001, 2.2);
+   %clampedGamma  = mClamp( $pref::Video::Gamma, 2.0, 2.5);
    %this.setShaderConst( "$OneOverGamma", 1 / %clampedGamma );
    %this.setShaderConst( "$Brightness", $pref::Video::Brightness );
    %this.setShaderConst( "$Contrast", $pref::Video::Contrast );
