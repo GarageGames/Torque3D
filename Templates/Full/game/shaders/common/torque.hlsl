@@ -285,4 +285,17 @@ bool getFlag(float flags, int num)
    return (fmod(process, pow(2, squareNum)) >= squareNum); 
 }
 
+// Sample in linear space. Decodes gamma.
+float4 tex2DLinear(sampler2D tex, float2 texCoord)
+{
+   float4 sample = tex2D(tex, texCoord);
+   return float4(pow(sample.rgb, 2.2), sample.a);
+}
+
+// Sample in linear space. Decodes gamma.
+float4 tex2DLodLinear(sampler2D tex, float4 texCoord)
+{
+   float4 sample = tex2Dlod(tex, texCoord);
+   return float4(pow(sample.rgb, 2.2), sample.a);
+}
 #endif // _TORQUE_HLSL_

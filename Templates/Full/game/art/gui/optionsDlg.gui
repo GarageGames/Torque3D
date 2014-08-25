@@ -1269,10 +1269,10 @@
             canSaveDynamicFields = "0";
 
             new GuiSliderCtrl() {
-               range = "0.001 2.2";
+               range = "2.0 2.5";
                ticks = "0";
                snap = "0";
-               value = "1";
+               value = "2.25";
                position = "76 -1";
                extent = "268 15";
                minExtent = "8 2";

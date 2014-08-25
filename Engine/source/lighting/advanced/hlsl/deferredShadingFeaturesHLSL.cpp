@@ -60,7 +60,7 @@ void DeferredDiffuseMapHLSL::processPix( Vector<ShaderComponent*> &componentList
       diffColor->setName( "diffuseColor" );
       LangElement *colorDecl = new DecOp( diffColor );
    
-      meta->addStatement(  new GenOp( "   @ = tex2D(@, @);\r\n", 
+      meta->addStatement(  new GenOp( "   @ = tex2DLinear(@, @);\r\n", 
                            colorDecl, 
                            diffuseMap, 
                            inTex ) );
@@ -152,7 +152,7 @@ void DeferredDiffuseMapHLSL::processPix( Vector<ShaderComponent*> &componentList
       }
       else
       {
-         meta->addStatement(new GenOp( "   @ = tex2D(@, @);\r\n", 
+         meta->addStatement(new GenOp( "   @ = tex2DLinear(@, @);\r\n", 
             new DecOp(diffColor), diffuseMap, inTex));
       }
 
@@ -160,7 +160,7 @@ void DeferredDiffuseMapHLSL::processPix( Vector<ShaderComponent*> &componentList
    }
    else
    {
-       LangElement *statement = new GenOp( "tex2D(@, @)", diffuseMap, inTex );
+       LangElement *statement = new GenOp( "tex2DLinear(@, @)", diffuseMap, inTex );
        output = new GenOp( "   @;\r\n", assignColor( statement, Material::None, NULL, ShaderFeature::RenderTarget1 ) );
    }
 }
@@ -241,7 +241,7 @@ void DeferredSpecMapHLSL::processPix( Vector<ShaderComponent*> &componentList, c
    specularMap->uniform = true;
    specularMap->sampler = true;
    specularMap->constNum = Var::getTexUnitNum();
-   LangElement *texOp = new GenOp( "tex2D(@, @)", specularMap, texCoord );
+   LangElement *texOp = new GenOp( "tex2DLinear(@, @)", specularMap, texCoord );
 
    output = new GenOp( "   @.a = dot(tex2D(@, @).rgb, float3(0.3, 0.59, 0.11));\r\n", color, specularMap, texCoord );
 }

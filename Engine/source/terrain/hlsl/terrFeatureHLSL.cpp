@@ -268,7 +268,7 @@ ShaderFeature::Resources TerrainBaseMapFeatHLSL::getResources( const MaterialFea
 {
    Resources res; 
    res.numTexReg = 1;
-      res.numTex = 1;
+   res.numTex = 1;
 
    return res;
 }
@@ -375,13 +375,6 @@ void TerrainDetailMapFeatHLSL::processVert(  Vector<ShaderComponent*> &component
 void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
-   // Count the amount of detail textures which are handled in this
-   //  shader.
-   int detailCount = 0;
-   for (int i = 0; i < fd.features.getCount(); i++)
-      if ((fd.features.getAt(i) == MFT_TerrainDetailMap)||(fd.features.getAt(i) == MFT_DeferredTerrainDetailMap))
-         detailCount++;
-
    const U32 detailIndex = getProcessIndex();
    Var *inTex = getVertTexCoord( "texCoord" );
    
@@ -444,61 +437,14 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
    // Get the detail id.
    Var *detailInfo = _getDetailIdStrengthParallax();
 
-   // Create the detail blend var if it doesn't already exist.
-   Var *detailBlend = (Var*)LangElement::find(String::ToString("detailBlend%d", detailIndex));
-   if (!detailBlend)
-   {
-       if (detailCount == 0)
-       {
-         detailBlend = new Var;
+   // Create the detail blend var.
+   Var *detailBlend = new Var;
    detailBlend->setType( "float" );
    detailBlend->setName( String::ToString( "detailBlend%d", detailIndex ) );
-         meta->addStatement( new GenOp( "   @ = 1.0;\r\n", new DecOp( detailBlend )));
-       }
-      // TODO: Extract this to a method
-      for(int i = detailCount-1; i >= 0; i--)
-      {
-         // Create the blend var
-         detailBlend = new Var;
-         detailBlend->setType( "float" );
-         detailBlend->setName( String::ToString( "detailBlend%d", i ) );
-         
-         // Get the detailInfo for the current texture.
-         Var *curDetailInfo;
-         String name(String::ToString("detailIdStrengthParallax%d", i));
-
-         // If it doesn't exist, create it.
-         curDetailInfo = (Var*)LangElement::find(name);
-         if (!curDetailInfo)
-         {
-            curDetailInfo = new Var;
-            curDetailInfo->setType("float3");
-            curDetailInfo->setName(name);
-            curDetailInfo->uniform = true;
-            curDetailInfo->constSortPos = cspPotentialPrimitive;
-         }
 
    // Calculate the blend for this detail texture.
    meta->addStatement( new GenOp( "   @ = calcBlend( @.x, @.xy, @, @ );\r\n", 
-                                          new DecOp( detailBlend ), curDetailInfo, inTex, layerSize, layerSample ) );
-
-         // Textures only blend with the layers below it, so e.g. layer
-         // 0 will just be a solid texture. This works fine for 2 textures,
-         // but for 3 or more there will be artifacts. Therefore we calculate
-         // the blending of the current layer based on the blending of the 
-         // previous layers. We saturate to handle cases where blend < 0.
-         if(i < detailCount-1)
-         {
-            String out = String::ToString("   detailBlend%d = detailBlend%d", i, i);
-            for(int j = detailCount-1; j > i; j--)
-            {
-               out += String::ToString("- saturate(detailBlend%d)", j);
-            }
-            out += ";\r\n";
-            meta->addStatement(new GenOp(out));
-         }
-      }
-   }
+                                    new DecOp( detailBlend ), detailInfo, inTex, layerSize, layerSample ) );
 
    // Get a var and accumulate the blend amount.
    Var *blendTotal = (Var*)LangElement::find( "blendTotal" );
@@ -524,10 +470,10 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
       if(fd.features.hasFeature( MFT_IsDXTnm, detailIndex ) )
       {
          meta->addStatement( new GenOp( "   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @.z * @ );\r\n", 
-         inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend ) );
-   }
+            inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend ) );
+      }
       else
-   {
+      {
          meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @.z * @ );\r\n", 
             inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend ) );
       }
@@ -627,7 +573,7 @@ ShaderFeature::Resources TerrainDetailMapFeatHLSL::getResources( const MaterialF
    }
 
    // sample from the detail texture for diffuse coloring.
-      res.numTex += 1;
+   res.numTex += 1;
 
    // If we have parallax for this layer then we'll also
    // be sampling the normal map for the parallax heightmap.
@@ -880,7 +826,7 @@ ShaderFeature::Resources TerrainMacroMapFeatHLSL::getResources( const MaterialFe
       res.numTex += 1;
    }
 
-      res.numTex += 1;
+   res.numTex += 1;
 
    // Finally we always send the detail texture 
    // coord to the pixel shader.
