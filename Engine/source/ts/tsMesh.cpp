@@ -2949,7 +2949,11 @@ inline void TSMesh::findTangent( U32 index1,
 void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F> &_norms)
 {
    U32 numVerts = _verts.size();
-   if ( numVerts == 0 )
+   U32 numNorms = _norms.size();
+   if ( numVerts <= 0 || numNorms <= 0 )
+      return;
+
+   if( numVerts != numNorms)
       return;
 
    Vector<Point3F> tan0;
