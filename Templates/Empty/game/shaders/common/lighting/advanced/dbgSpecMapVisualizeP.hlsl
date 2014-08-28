@@ -20,53 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( BlackSkyCubemap )
-{
-   cubeFace[0] = "./solidsky_black";
-   cubeFace[1] = "./solidsky_black";
-   cubeFace[2] = "./solidsky_black";
-   cubeFace[3] = "./solidsky_black";
-   cubeFace[4] = "./solidsky_black";
-   cubeFace[5] = "./solidsky_black";
-};
+#include "shadergen:/autogenConditioners.h"
+#include "../../postfx/postFx.hlsl"
 
-singleton Material( BlackSkyMat )
-{
-   cubemap = BlackSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
 
-singleton CubemapData( BlueSkyCubemap )
-{
-   cubeFace[0] = "./solidsky_blue";
-   cubeFace[1] = "./solidsky_blue";
-   cubeFace[2] = "./solidsky_blue";
-   cubeFace[3] = "./solidsky_blue";
-   cubeFace[4] = "./solidsky_blue";
-   cubeFace[5] = "./solidsky_blue";
-};
-
-singleton Material( BlueSkyMat )
-{
-   cubemap = BlueSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
-
-singleton CubemapData( GreySkyCubemap )
-{
-   cubeFace[0] = "./solidsky_grey";
-   cubeFace[1] = "./solidsky_grey";
-   cubeFace[2] = "./solidsky_grey";
-   cubeFace[3] = "./solidsky_grey";
-   cubeFace[4] = "./solidsky_grey";
-   cubeFace[5] = "./solidsky_grey";
-};
-
-singleton Material( GreySkyMat )
-{
-   cubemap = GreySkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+float4 main( PFXVertToPix IN, 
+             uniform sampler2D colorBufferTex : register(S0) ) : COLOR0
+{     
+   float specular = tex2D( colorBufferTex, IN.uv0 ).a;  
+   return float4( specular, specular, specular, 1.0 );   
+}

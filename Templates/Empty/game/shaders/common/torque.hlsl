@@ -151,6 +151,21 @@ float2 parallaxOffset( sampler2D texMap, float2 texCoord, float3 negViewTS, floa
    return offset;
 }
 
+/// Same as above but for dxt5nm where the deoth is stored in the red channel instead of the alpha
+float2 parallaxOffsetDxtnm(sampler2D texMap, float2 texCoord, float3 negViewTS, float depthScale)
+{
+   float depth = tex2D(texMap, texCoord).r;
+   float2 offset = negViewTS.xy * (depth * depthScale);
+
+   for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
+   {
+      depth = (depth + tex2D(texMap, texCoord + offset).r) * 0.5;
+      offset = negViewTS.xy * (depth * depthScale);
+   }
+
+   return offset;
+}
+
 
 /// The maximum value for 16bit per component integer HDR encoding.
 static const float HDR_RGB16_MAX = 100.0;
@@ -262,5 +277,25 @@ void fizzle(float2 vpos, float visibility)
    clip( visibility - frac( determinant( m ) ) );
 }
 
+// Deferred Shading: Material Info Flag Check
+bool getFlag(float flags, int num)
+{
+   int process = round(flags * 255);
+   int squareNum = pow(2, num);
+   return (fmod(process, pow(2, squareNum)) >= squareNum); 
+}
 
+// Sample in linear space. Decodes gamma.
+float4 tex2DLinear(sampler2D tex, float2 texCoord)
+{
+   float4 sample = tex2D(tex, texCoord);
+   return float4(pow(sample.rgb, 2.2), sample.a);
+}
+
+// Sample in linear space. Decodes gamma.
+float4 tex2DLodLinear(sampler2D tex, float4 texCoord)
+{
+   float4 sample = tex2Dlod(tex, texCoord);
+   return float4(pow(sample.rgb, 2.2), sample.a);
+}
 #endif // _TORQUE_HLSL_

@@ -20,53 +20,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( BlackSkyCubemap )
-{
-   cubeFace[0] = "./solidsky_black";
-   cubeFace[1] = "./solidsky_black";
-   cubeFace[2] = "./solidsky_black";
-   cubeFace[3] = "./solidsky_black";
-   cubeFace[4] = "./solidsky_black";
-   cubeFace[5] = "./solidsky_black";
-};
+#include "shadergen:/autogenConditioners.h"
+#include "../../postfx/postFx.hlsl"
+#include "shaders/common/torque.hlsl"
 
-singleton Material( BlackSkyMat )
-{
-   cubemap = BlackSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
 
-singleton CubemapData( BlueSkyCubemap )
-{
-   cubeFace[0] = "./solidsky_blue";
-   cubeFace[1] = "./solidsky_blue";
-   cubeFace[2] = "./solidsky_blue";
-   cubeFace[3] = "./solidsky_blue";
-   cubeFace[4] = "./solidsky_blue";
-   cubeFace[5] = "./solidsky_blue";
-};
+float4 main( PFXVertToPix IN, 
+             uniform sampler2D colorBufferTex : register(S0),
+             uniform sampler2D lightPrePassTex : register(S1),
+             uniform sampler2D matInfoTex : register(S2)) : COLOR0
+{        
+   float4 lightBuffer = tex2D( lightPrePassTex, IN.uv0 );
+   float4 colorBuffer = tex2D( colorBufferTex, IN.uv0 );
+   float4 matInfo = tex2D( matInfoTex, IN.uv0 );
+   float specular = lightBuffer.a;
 
-singleton Material( BlueSkyMat )
-{
-   cubemap = BlueSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+   // Diffuse Color Altered by Metalness
+   bool metalness = getFlag(matInfo.r, 3);
+   if ( metalness )
+   {
+	colorBuffer *= (1.0 - colorBuffer.a);
+   }
 
-singleton CubemapData( GreySkyCubemap )
-{
-   cubeFace[0] = "./solidsky_grey";
-   cubeFace[1] = "./solidsky_grey";
-   cubeFace[2] = "./solidsky_grey";
-   cubeFace[3] = "./solidsky_grey";
-   cubeFace[4] = "./solidsky_grey";
-   cubeFace[5] = "./solidsky_grey";
-};
+   colorBuffer *= float4(lightBuffer.rgb, 1.0);
+   colorBuffer += float4(specular, specular, specular, 1.0);
 
-singleton Material( GreySkyMat )
-{
-   cubemap = GreySkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+   return hdrEncode( colorBuffer );   
+}

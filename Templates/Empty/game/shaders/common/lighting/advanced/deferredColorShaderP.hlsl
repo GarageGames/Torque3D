@@ -20,53 +20,25 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( BlackSkyCubemap )
+struct Fragout
 {
-   cubeFace[0] = "./solidsky_black";
-   cubeFace[1] = "./solidsky_black";
-   cubeFace[2] = "./solidsky_black";
-   cubeFace[3] = "./solidsky_black";
-   cubeFace[4] = "./solidsky_black";
-   cubeFace[5] = "./solidsky_black";
+   float4 col : COLOR0;
+   float4 col1 : COLOR1;
+   float4 col2 : COLOR2;
 };
 
-singleton Material( BlackSkyMat )
+//-----------------------------------------------------------------------------
+// Main                                                                        
+//-----------------------------------------------------------------------------
+Fragout main( )
 {
-   cubemap = BlackSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+   Fragout OUT;
+   
+   OUT.col =  float4(0.0, 0.0, 0.0, 0.0);
+   OUT.col1 = float4(1.0, 1.0, 1.0, 1.0);
 
-singleton CubemapData( BlueSkyCubemap )
-{
-   cubeFace[0] = "./solidsky_blue";
-   cubeFace[1] = "./solidsky_blue";
-   cubeFace[2] = "./solidsky_blue";
-   cubeFace[3] = "./solidsky_blue";
-   cubeFace[4] = "./solidsky_blue";
-   cubeFace[5] = "./solidsky_blue";
-};
+   // Draw on color buffer.
+   OUT.col2 = float4(1.0, 0.0, 0.0, 1.0);
 
-singleton Material( BlueSkyMat )
-{
-   cubemap = BlueSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
-
-singleton CubemapData( GreySkyCubemap )
-{
-   cubeFace[0] = "./solidsky_grey";
-   cubeFace[1] = "./solidsky_grey";
-   cubeFace[2] = "./solidsky_grey";
-   cubeFace[3] = "./solidsky_grey";
-   cubeFace[4] = "./solidsky_grey";
-   cubeFace[5] = "./solidsky_grey";
-};
-
-singleton Material( GreySkyMat )
-{
-   cubemap = GreySkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+   return OUT;
+}
