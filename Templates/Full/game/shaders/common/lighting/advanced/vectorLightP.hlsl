@@ -42,12 +42,17 @@ float4 main( FarFrustumQuadConnectP IN,
 
              uniform sampler2D prePassBuffer : register(S0),
              
+             uniform sampler2D lightBuffer : register(S5),
+             uniform sampler2D colorBuffer : register(S6),
+             uniform sampler2D matInfoBuffer : register(S7),
+             
              uniform float3 lightDirection,
              uniform float4 lightColor,
              uniform float  lightBrightness,
              uniform float4 lightAmbient,
              
              uniform float3 eyePosWorld,
+             uniform float4x4 eyeMat, 
              
              uniform float4x4 worldToLightProj,
 
@@ -66,6 +71,14 @@ float4 main( FarFrustumQuadConnectP IN,
              uniform float4 overDarkPSSM,
              uniform float shadowSoftness ) : COLOR0
 {
+   // Emissive.
+   float4 matInfo = tex2D( matInfoBuffer, IN.uv0 );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       return float4(1.0, 1.0, 1.0, 0.0);
+   }
+
    // Sample/unpack the normal/z data
    float4 prepassSample = prepassUncondition( prePassBuffer, IN.uv0 );
    float3 normal = prepassSample.rgb;
@@ -202,7 +215,16 @@ float4 main( FarFrustumQuadConnectP IN,
                                     
    float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
    float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
-   float4 addToResult = lightAmbient;
+
+   // Felix' Normal Mapped Ambient.
+   float ambientBrightness = (float)lightAmbient;
+   float3 worldNormal = normalize(mul(eyeMat, float4(normal,1.0))).xyz;
+   float ambientContrast = 0.5;  
+   float4 upAmbient = lerp( 1 - lightAmbient * 0.65, lightAmbient, 1-ambientBrightness*ambientContrast );
+   float4 lightAmbientTwoTone = lerp( lightAmbient * 0.8 , upAmbient , worldNormal.b ); 
+   float4 addToResult = lightAmbientTwoTone + dotNL * lightColor * ambientBrightness * 0.25; 
+
+   //float4 addToResult = lightAmbient;
 
    // TODO: This needs to be removed when lightmapping is disabled
    // as its extra work per-pixel on dynamic lit scenes.
@@ -229,5 +251,22 @@ float4 main( FarFrustumQuadConnectP IN,
       lightColorOut = debugColor;
    #endif
 
-   return lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
+   bool translucent = getFlag( matInfo.r, 2 );
+   if ( translucent && matInfo.g > 0.1 )
+   {
+      float fLTDistortion = 0.1;
+      int iLTPower = 10;
+      float fLTAmbient = 0.0;
+      float fLTThickness = matInfo.g;
+      float fLTScale = 0.5;
+
+      float3 vLTLight = lightDirection + normal * fLTDistortion;
+      float fLTDot = pow(saturate(dot(normalize(IN.vsEyeRay), -vLTLight)), iLTPower) * fLTScale;
+      float3 fLT = 1.0 * (fLTDot + fLTAmbient) * fLTThickness;
+
+      addToResult = lightColor * float4( fLT, 0.0);
+   }
+
+   float4 colorSample = tex2D( colorBuffer, IN.uv0 );
+   return AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, colorSample.a, Sat_NL_Att);
 }

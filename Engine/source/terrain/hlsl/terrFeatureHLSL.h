@@ -64,6 +64,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Base Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -87,6 +89,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Detail Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -110,6 +114,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Macro Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 

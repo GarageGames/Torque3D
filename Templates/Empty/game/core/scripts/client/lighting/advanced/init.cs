@@ -43,6 +43,7 @@ exec( "./shaders.cs" );
 exec( "./lightViz.cs" );
 exec( "./shadowViz.cs" );
 exec( "./shadowViz.gui" );
+exec( "./deferredShading.cs" );
 
 function onActivateAdvancedLM()
 {
@@ -58,12 +59,18 @@ function onActivateAdvancedLM()
    // Enable the offscreen target so that AL will work
    // with MSAA back buffers and for HDR rendering.   
    AL_FormatToken.enable();
+   
+   // Activate Deferred Shading
+   AL_DeferredShading.enable();
 }
 
 function onDeactivateAdvancedLM()
 {
    // Disable the offscreen render target.
    AL_FormatToken.disable();
+   
+   // Deactivate Deferred Shading
+   AL_DeferredShading.disable();
 }
 
 function setAdvancedLighting()

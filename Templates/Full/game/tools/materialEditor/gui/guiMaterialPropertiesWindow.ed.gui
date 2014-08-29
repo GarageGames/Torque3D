@@ -577,7 +577,7 @@
                            AnchorBottom = "0";
                            AnchorLeft = "1";
                            AnchorRight = "0";
-                           text = "Spec Map";
+                           text = "Spec/Metalness Map";
                            maxLength = "1024";
                         };
                         new GuiBitmapButtonCtrl() {
@@ -624,6 +624,32 @@
                            text = "None";
                            maxLength = "1024";
                         };
+                        
+                        // Deferred Shading: Metalness
+                        new GuiCheckBoxCtrl() {
+                           canSaveDynamicFields = "0";
+                           internalName = "useMetalCheckbox";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiCheckBoxProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "56 34";
+                           Extent = "80 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "MaterialEditorGui.updateActiveMaterial(\"useMetalness[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                           tooltipprofile = "ToolsGuiDefaultProfile";
+                           ToolTip = "Uses specular map as metalness map.";
+                           hovertime = "1000";
+                           text = "Metalness";
+                           groupNum = "-1";
+                           buttonType = "ToggleButton";
+                           useMouseEvents = "0";
+                           useInactiveState = "0";
+                        };                             
+                        
                         new GuiButtonCtrl(){
                            profile="ToolsGuiButtonProfile";
                            text ="Edit";
@@ -1361,7 +1387,7 @@
                         HorizSizing = "width";
                         bitmap ="tools/gui/images/separator-v"; 
                      };
-                     new GuiContainer(){ // Environment Map
+                     new GuiContainer(){ // Translucency Map
                         profile="ToolsGuiDefaultProfile";
                         isContainer = "1";
                         position = "6 359";
@@ -1370,7 +1396,7 @@
                         
                         new GuiBitmapCtrl() {
                            canSaveDynamicFields = "0";
-                           internalName = "envMapDisplayBitmap";
+                           internalName = "translucencyMapDisplayBitmap";
                            Enabled = "1";
                            isContainer = "0";
                            Profile = "ToolsGuiDefaultProfile";
@@ -1404,7 +1430,7 @@
                            AnchorBottom = "0";
                            AnchorLeft = "1";
                            AnchorRight = "0";
-                           text = "Env Map";
+                           text = "Translucency Map";
                            maxLength = "1024";
                         };
                         new GuiBitmapButtonCtrl() {
@@ -1419,9 +1445,9 @@
                            MinExtent = "8 2";
                            canSave = "1";
                            Visible = "1";
-                           Command = "MaterialEditorGui.updateTextureMap(\"env\", 1);";
+                           Command = "MaterialEditorGui.updateTextureMap(\"translucency\", 1);";
                            tooltipprofile = "ToolsGuiDefaultProfile";
-                           ToolTip = "Change the active Environment Map for this layer.";
+                           ToolTip = "Change the active Translucency Map for this layer.";
                            hovertime = "1000";
                            groupNum = "-1";
                            buttonType = "PushButton";
@@ -1430,7 +1456,7 @@
                         };
                         new GuiTextCtrl() {
                            canSaveDynamicFields = "0";
-                           internalName = "envMapNameText";
+                           internalName = "translucencyMapNameText";
                            Enabled = "1";
                            isContainer = "0";
                            Profile = "ToolsGuiTextProfile";
@@ -1459,7 +1485,7 @@
                            position = "134 34";
                            Extent = "40 16";
                            buttonType = "PushButton";
-                           command="MaterialEditorGui.updateTextureMap(\"env\", 1);";
+                           command="MaterialEditorGui.updateTextureMap(\"translucency\", 1);";
                         };
                         new GuiBitmapButtonCtrl() {
                            canSaveDynamicFields = "0";
@@ -1473,7 +1499,7 @@
                            MinExtent = "8 2";
                            canSave = "1";
                            Visible = "1";
-                           Command = "MaterialEditorGui.updateTextureMap(\"env\", 0);";
+                           Command = "MaterialEditorGui.updateTextureMap(\"translucency\", 0);";
                            hovertime = "1000";
                            groupNum = "-1";
                            buttonType = "PushButton";

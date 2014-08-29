@@ -153,6 +153,9 @@ Material::Material()
 
       mSeqFramePerSec[i] = 0.0f;
       mSeqSegSize[i] = 0.0f;
+
+      // Deferred Shading
+      mMatInfoFlags[i] = 0.0f;
    }
 
    dMemset(mCellIndex, 0, sizeof(mCellIndex));
@@ -160,6 +163,9 @@ Material::Material()
    dMemset(mCellSize, 0, sizeof(mCellSize));
    dMemset(mNormalMapAtlas, 0, sizeof(mNormalMapAtlas));
    dMemset(mUseAnisotropic, 0, sizeof(mUseAnisotropic));
+
+   // Deferred Shading : Metalness
+   dMemset(mUseMetalness, 0, sizeof(mUseMetalness));
 
    mImposterLimits = Point4F::Zero;
 
@@ -194,6 +200,9 @@ Material::Material()
    
    mDirectSoundOcclusion = 1.f;
    mReverbSoundOcclusion = 1.0;
+
+   // Deferred Shading
+   mIsSky = false;
 }
 
 void Material::initPersistFields()
@@ -262,8 +271,12 @@ void Material::initPersistFields()
       addField( "useAnisotropic", TypeBool, Offset(mUseAnisotropic, Material), MAX_STAGES,
          "Use anisotropic filtering for the textures of this stage." );
 
-      addField("envMap", TypeImageFilename, Offset(mEnvMapFilename, Material), MAX_STAGES,
-         "The name of an environment map cube map to apply to this material." );
+      // Deferred Shading: Metalness
+      addField( "useMetalness", TypeBool, Offset(mUseMetalness, Material), MAX_STAGES,
+         "Treat specular map as metalness map." );
+
+      addField("translucencyMap", TypeImageFilename, Offset(mTranslucencyMapFilename, Material), MAX_STAGES,
+         "The name of a translucency map to apply to this material." );
 
       addField("vertLit", TypeBool, Offset(mVertLit, Material), MAX_STAGES,
          "If true the vertex color is used for lighting." );
@@ -351,7 +364,7 @@ void Material::initPersistFields()
       addProtectedField("bumpTex",        TypeImageFilename,   Offset(mNormalMapFilename, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
          "For backwards compatibility.\n@see normalMap\n"); 
-      addProtectedField("envTex",         TypeImageFilename,   Offset(mEnvMapFilename, Material),
+      addProtectedField("translucencyTex",         TypeImageFilename,   Offset(mTranslucencyMapFilename, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
          "For backwards compatibility.\n@see envMap\n"); 
       addProtectedField("colorMultiply",  TypeColorF,          Offset(mDiffuse, Material),
@@ -385,6 +398,9 @@ void Material::initPersistFields()
 
    addField("dynamicCubemap", TypeBool, Offset(mDynamicCubemap, Material),
       "Enables the material to use the dynamic cubemap from the ShapeBase object its applied to." );
+
+   addField("isSky", TypeBool, Offset(mIsSky, Material),
+       "Sky support. Alters draw dimensions." );
 
    addGroup( "Behavioral" );
 
