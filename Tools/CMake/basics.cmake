@@ -1,15 +1,38 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2014 GarageGames, LLC
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+# -----------------------------------------------------------------------------
+
 project("Torque3DEngine")
 
-set(TORQUE_TEMPLATE "Full" CACHE STRING "the template to use")
-
-if(NOT projectDir)
-    set(projectDir    "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_APP_NAME}")
+if(NOT TORQUE_TEMPLATE)
+    set(TORQUE_TEMPLATE "Full" CACHE STRING "the template to use")
+endif()
+if(NOT TORQUE_APP_DIR)
+    set(TORQUE_APP_DIR "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_APP_NAME}")
 endif()
 if(NOT projectOutDir)
-    set(projectOutDir "${projectDir}/game")
+    set(projectOutDir "${TORQUE_APP_DIR}/game")
 endif()
 if(NOT projectSrcDir)
-    set(projectSrcDir "${projectDir}/source")
+    set(projectSrcDir "${TORQUE_APP_DIR}/source")
 endif()
 set(libDir        "${CMAKE_SOURCE_DIR}/Engine/lib")
 set(srcDir        "${CMAKE_SOURCE_DIR}/Engine/source")
@@ -295,7 +318,7 @@ macro(setupPackaging)
     SET(CPACK_PACKAGE_VENDOR "${PROJECT_NAME}")
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
     SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 1)
-    SET(CPACK_OUTPUT_FILE_PREFIX "${projectDir}/packages/${PROJECT_NAME}")
+    SET(CPACK_OUTPUT_FILE_PREFIX "${TORQUE_APP_DIR}/packages/${PROJECT_NAME}")
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY "")
     #SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
     #SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")

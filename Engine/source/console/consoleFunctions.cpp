@@ -1589,6 +1589,13 @@ DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/s
    return Platform::displaySplashWindow(path);
 }
 
+DefineEngineFunction( closeSplashWindow, void, (),,
+   "Close our startup splash window.\n\n"
+   "@note This is currently only implemented on Windows.\n\n"
+   "@ingroup Platform" )
+{
+   Platform::closeSplashWindow();
+}
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( getWebDeployment, bool, (),,
