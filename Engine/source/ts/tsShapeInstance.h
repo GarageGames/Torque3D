@@ -576,7 +576,7 @@ protected:
    bool buildPolyList(AbstractPolyList *, S32 dl);
    bool getFeatures(const MatrixF& mat, const Point3F& n, ConvexFeature*, S32 dl);
    bool castRay(const Point3F & start, const Point3F & end, RayInfo *,S32 dl);
-   bool castRayEA(const Point3F & start, const Point3F & end, RayInfo *,S32 dl,S32 HBIndex);
+   bool castRayEA(const Point3F & start, const Point3F & end, RayInfo *,S32 dl,S32 _hitMeshID);
    bool castRayRendered(const Point3F & start, const Point3F & end, RayInfo *,S32 dl);
    bool quickLOS(const Point3F & start, const Point3F & end, S32 dl) { return castRay(start,end,NULL,dl); }
    Point3F support(const Point3F & v, S32 dl);

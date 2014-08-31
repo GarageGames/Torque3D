@@ -194,7 +194,7 @@ ShapeBaseData::ShapeBaseData()
 {      
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
 
-   for (int i=0; i< MaxHitboxes; i++) HBIndex[i] = -1;
+   for (int i=0; i< MaxHitboxes; i++) mHitMeshID[i] = -1;
 }
 
 struct ShapeBaseDataProto
@@ -390,7 +390,7 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
 	  {
 		  char buff[16];
 		  dSprintf(buff,sizeof(buff),"Hitbox%d",i+1);
-		  HBIndex[i] = mShape->findObject(buff);
+		  mHitMeshID[i] = mShape->findObject(buff);
 	  }
 
       debrisDetail = mShape->findDetail("Debris-17");

@@ -5854,9 +5854,9 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    info->point.interpolate(start, end, fst);
    info->material = 0;
 
-   if (mDataBlock->HBIndex[0] == -1) return true;
+   if (mDataBlock->mHitMeshID[0] == -1) return true;
    //if we are here means that the ray has hit the bounding box, now check if an hit box was hit
-   //if it hit a collision box the HitBoxNum
+   //if it hit a collision box the hitArea
    //in the info struct is filled with the number of the box otherwise it remains -1
    if (mShapeInstance)
    {
@@ -5869,17 +5869,17 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
       for (U32 i = 0; i < ShapeBaseData::MaxHitboxes; i++)
       {
-         if (mDataBlock->HBIndex[i] != -1)
+         if (mDataBlock->mHitMeshID[i] != -1)
          {
             for (U32 j = 0; j < mDataBlock->mShape->details.size(); j++)
             {
-                if (mShapeInstance->castRayEA(start, end, info, j, mDataBlock->HBIndex[i]))
+                if (mShapeInstance->castRayEA(start, end, info, j, mDataBlock->mHitMeshID[i]))
                 {
                     info->object = this;
                     if (info->t < shortest.t)
                     {
                         shortest = *info;
-                        shortest.HitBoxNum = i + 1;		//  +1 because the meshes HB## begin from 1
+                        shortest.hitArea = i + 1;		//  +1 because the meshes HB## begin from 1
                     }
                 }
             }
@@ -5890,7 +5890,7 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
          // Copy out the shortest time...
          *info = shortest;
       }
-      if (info->HitBoxNum == -1) return false;
+      if (info->hitArea == -1) return false;
       info->point.interpolate(start, end, info->t);
    }
    return true;

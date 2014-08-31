@@ -527,7 +527,7 @@ public:
    F32 shadowProjectionDistance;
    F32 shadowSphereAdjust;
 
-   S32 HBIndex[MaxHitboxes];
+   S32 mHitMeshID[MaxHitboxes];   /// Hit Mesh ID
    StringTableEntry  shapeName;
    StringTableEntry  cloakTexName;
 

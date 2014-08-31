@@ -249,10 +249,10 @@ bool TSShapeInstance::castRay(const Point3F & a, const Point3F & b, RayInfo * ra
    return found;
 }
 
-bool TSShapeInstance::castRayEA(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl, S32 HBIndex)
+bool TSShapeInstance::castRayEA(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl, S32 _hitMeshID)
 {
    // if dl==-1, or there is no hitbox list, nothing to do
-   if ((dl == -1)||(HBIndex == -1))
+   if ((dl == -1)||(_hitMeshID == -1))
       return false;
 
    AssertFatal(dl >= 0 && dl<mShape->details.size(), "TSShapeInstance::castRay");
@@ -272,7 +272,7 @@ bool TSShapeInstance::castRayEA(const Point3F & a, const Point3F & b, RayInfo * 
       Point3F ta, tb;
 
       // set up for first object's node
-      MeshObjectInstance * mesh = &mMeshObjects[HBIndex];
+      MeshObjectInstance * mesh = &mMeshObjects[_hitMeshID];
       mat = mesh->getTransform();
       mat.inverse();
       mat.mulP(a, &ta);
