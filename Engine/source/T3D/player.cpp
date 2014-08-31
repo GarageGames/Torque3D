@@ -5871,14 +5871,17 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
       {
          if (mDataBlock->HBIndex[i] != -1)
          {
-            if (mShapeInstance->castRayEA(start, end, info, 0, mDataBlock->HBIndex[i]))
+            for (U32 j = 0; j < mDataBlock->mShape->details.size(); j++)
             {
-               info->object = this;
-               if (info->t < shortest.t)
-               {
-                  shortest = *info;
-                  shortest.HitBoxNum = i + 1;		//  +1 because the meshes HB## begin from 1
-               }
+                if (mShapeInstance->castRayEA(start, end, info, j, mDataBlock->HBIndex[i]))
+                {
+                    info->object = this;
+                    if (info->t < shortest.t)
+                    {
+                        shortest = *info;
+                        shortest.HitBoxNum = i + 1;		//  +1 because the meshes HB## begin from 1
+                    }
+                }
             }
          }
       }
