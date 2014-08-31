@@ -24,7 +24,7 @@
 #include "testing/unitTesting.h"
 #include "platform/threads/thread.h"
 
-TEST(Thread, BasicAPI)
+TEST(Thread, CallbackAPI)
 {
 #define VALUE_TO_SET 10
 
@@ -51,6 +51,37 @@ TEST(Thread, BasicAPI)
       << "Thread did not set expected value!";
 
 #undef VALUE_TO_SET
-};
+}
+
+TEST(Thread, InheritanceAPI)
+{
+#define VALUE_TO_SET 10
+
+   // This struct exists just so we can define run as a local function.
+   struct thread : public Thread
+   {
+      U32* mPtr;
+      thread(U32* ptr): mPtr(ptr) {}
+
+      // Do some work we can observe.
+      virtual void run(void*)
+      {
+         *mPtr = VALUE_TO_SET;
+      }
+   };
+
+   // Test most basic Thread API functions.
+   U32 value = ~VALUE_TO_SET;
+   thread thread(&value);
+   thread.start();
+   EXPECT_TRUE(thread.isAlive());
+   thread.join();
+   EXPECT_FALSE(thread.isAlive());
+
+   EXPECT_EQ(value, VALUE_TO_SET)
+      << "Thread did not set expected value!";
+
+#undef VALUE_TO_SET
+}
 
 #endif
