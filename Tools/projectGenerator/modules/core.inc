@@ -126,7 +126,6 @@ switch( T3D_Generator::$platform )
 
 // GFX
 addEngineSrcDir( 'gfx/Null' );
-addEngineSrcDir( 'gfx/test' );
 addEngineSrcDir( 'gfx/bitmap' );
 addEngineSrcDir( 'gfx/bitmap/loaders' );
 addEngineSrcDir( 'gfx/util' );
