@@ -82,31 +82,31 @@ ConsoleDocClass( GuiTreeViewCtrl,
 
 	"@ingroup GuiContainers\n");
 
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onDeleteObject, bool, ( SimObject* object ), ( object ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, isValidDragTarget, bool, ( S32 id, const char* value ), ( id, value ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onDefineIcons, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onAddGroupSelected, void, ( SimGroup* group ), ( group ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onAddSelection, void, ( S32 itemOrObjectId, bool isLastSelection ), ( itemOrObjectId, isLastSelection ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onSelect, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onInspect, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onRemoveSelection, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onUnselect, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onDeleteSelection, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onObjectDeleteCompleted, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onKeyDown, void, ( S32 modifier, S32 keyCode ), ( modifier, keyCode ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onMouseUp, void, ( S32 hitItemId, S32 mouseClickCount ), ( hitItemId, mouseClickCount ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onMouseDragged, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onRightMouseDown, void, ( S32 itemId, const Point2I& mousePos, SimObject* object ), ( itemId, mousePos, object ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onRightMouseUp, void, ( S32 itemId, const Point2I& mousePos, SimObject* object ), ( itemId, mousePos, object ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onBeginReparenting, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onEndReparenting, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onReparent, void, ( S32 itemOrObjectId, S32 oldParentItemOrObjectId, S32 newParentItemOrObjectId ), ( itemOrObjectId, oldParentItemOrObjectId, newParentItemOrObjectId ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onDragDropped, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onAddMultipleSelectionBegin, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onAddMultipleSelectionEnd, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, canRenameObject, bool, ( SimObject* object ), ( object ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, handleRenameObject, bool, ( const char* newName, SimObject* object ), ( newName, object ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onClearSelection, void, (), (), "" );
+IMPLEMENT_SIMDELEGATE( GuiTreeViewCtrl, onDeleteObject, bool, ( SimObject* object ), ( object ), "" );
+IMPLEMENT_SIMDELEGATE( GuiTreeViewCtrl, isValidDragTarget, bool, ( S32 id, const char* value ), ( id, value ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onDefineIcons, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onAddGroupSelected, ( SimGroup* group ), ( group ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onAddSelection, ( S32 itemOrObjectId, bool isLastSelection ), ( itemOrObjectId, isLastSelection ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onSelect, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onInspect, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onRemoveSelection, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onUnselect, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onDeleteSelection, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onObjectDeleteCompleted, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onKeyDown, ( S32 modifier, S32 keyCode ), ( modifier, keyCode ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onMouseUp, ( S32 hitItemId, S32 mouseClickCount ), ( hitItemId, mouseClickCount ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onMouseDragged, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onRightMouseDown, ( S32 itemId, const Point2I& mousePos, SimObject* object ), ( itemId, mousePos, object ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onRightMouseUp, ( S32 itemId, const Point2I& mousePos, SimObject* object ), ( itemId, mousePos, object ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onBeginReparenting, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onEndReparenting, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onReparent, ( S32 itemOrObjectId, S32 oldParentItemOrObjectId, S32 newParentItemOrObjectId ), ( itemOrObjectId, oldParentItemOrObjectId, newParentItemOrObjectId ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onDragDropped, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onAddMultipleSelectionBegin, (), (), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onAddMultipleSelectionEnd, (), (), "" );
+IMPLEMENT_SIMDELEGATE( GuiTreeViewCtrl, canRenameObject, bool, ( SimObject* object ), ( object ), "" );
+IMPLEMENT_SIMDELEGATE( GuiTreeViewCtrl, handleRenameObject, bool, ( const char* newName, SimObject* object ), ( newName, object ), "" );
+IMPLEMENT_SIMSIGNAL( GuiTreeViewCtrl, onClearSelection, (), (), "" );
 
 
 static S32 QSORT_CALLBACK itemCompareCaseSensitive( const void *a, const void *b )

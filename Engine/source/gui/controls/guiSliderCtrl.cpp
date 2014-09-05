@@ -80,7 +80,7 @@ ConsoleDocClass( GuiSliderCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiSliderCtrl, onMouseDragged, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiSliderCtrl, onMouseDragged, (), (),
    "Called when the left mouse button is dragged across the slider." );
 
 

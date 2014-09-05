@@ -52,7 +52,7 @@ ConsoleDocClass( GuiTextListCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const char* text),( cellid , text ),
+IMPLEMENT_SIMSIGNAL( GuiTextListCtrl, onSelect, (const char* cellid, const char* text),( cellid , text ),
    "@brief Called whenever an item in the list is selected.\n\n"
    "@param cellid The ID of the cell that was selected\n"
    "@param text The text in the selected cel\n\n"
@@ -66,7 +66,7 @@ IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const 
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( const char* id ),( id ),
+IMPLEMENT_SIMSIGNAL( GuiTextListCtrl, onDeleteKey, ( const char* id ),( id ),
    "@brief Called when the delete key has been pressed.\n\n"
    "@param id Id of the selected item in the list\n"
    "@tsexample\n"

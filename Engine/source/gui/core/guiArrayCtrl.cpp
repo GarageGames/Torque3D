@@ -50,11 +50,11 @@ ConsoleDocClass( GuiArrayCtrl,
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiArrayCtrl, onCellSelected, void, ( const Point2I& cell ), ( cell ),
+IMPLEMENT_SIMSIGNAL( GuiArrayCtrl, onCellSelected, ( const Point2I& cell ), ( cell ),
    "Call when a cell in the array is selected (clicked).\n\n"
    "@param @cell Coordinates of the cell"
 );
-IMPLEMENT_CALLBACK( GuiArrayCtrl, onCellHighlighted, void, ( const Point2I& cell ), ( cell ),
+IMPLEMENT_SIMSIGNAL( GuiArrayCtrl, onCellHighlighted, ( const Point2I& cell ), ( cell ),
    "Call when a cell in the array is highlighted (moused over).\n\n"
    "@param @cell Coordinates of the cell"
 );

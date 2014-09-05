@@ -43,6 +43,7 @@ class Vehicle;
 
 struct VehicleData: public ShapeBaseData
 {
+   typedef VehicleData privateThisClassType;
    typedef ShapeBaseData Parent;
 
    struct Body {
@@ -136,8 +137,8 @@ struct VehicleData: public ShapeBaseData
 
    DECLARE_CONOBJECT(VehicleData);
 
-   DECLARE_CALLBACK( void, onEnterLiquid, ( Vehicle* obj, F32 coverage, const char* type ) );
-   DECLARE_CALLBACK( void, onLeaveLiquid, ( Vehicle* obj, const char* type ) );
+   DECLARE_SIMSIGNAL( public, onEnterLiquid, ( Vehicle* obj, F32 coverage, const char* type ) );
+   DECLARE_SIMSIGNAL( public, onLeaveLiquid, ( Vehicle* obj, const char* type ) );
 };
 
 

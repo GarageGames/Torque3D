@@ -52,6 +52,7 @@ class GuiMenuBar;
 class GuiFormCtrl : public GuiPanel
 {
 private:
+   typedef GuiFormCtrl privateThisClassType;
    typedef GuiPanel Parent;
 
    Resource<GFont>  mFont;
@@ -85,7 +86,7 @@ private:
 protected:
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onResize, () );
+   DECLARE_SIMSIGNAL( protected, onResize, () );
    /// @}
 
 public:

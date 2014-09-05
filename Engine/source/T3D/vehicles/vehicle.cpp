@@ -123,13 +123,13 @@ ConsoleDocClass( VehicleData,
    "@ingroup Vehicles\n"
 );
 
-IMPLEMENT_CALLBACK( VehicleData, onEnterLiquid, void, ( Vehicle* obj, F32 coverage, const char* type ), ( obj, coverage, type ),
+IMPLEMENT_SIMSIGNAL( VehicleData, onEnterLiquid, ( Vehicle* obj, F32 coverage, const char* type ), ( obj, coverage, type ),
    "Called when the vehicle enters liquid.\n"
    "@param obj the Vehicle object\n"
    "@param coverage percentage of the vehicle's bounding box covered by the liquid\n"
    "@param type type of liquid the vehicle has entered\n" );
 
-IMPLEMENT_CALLBACK( VehicleData, onLeaveLiquid, void, ( Vehicle* obj, const char* type ), ( obj, type ),
+IMPLEMENT_SIMSIGNAL( VehicleData, onLeaveLiquid, ( Vehicle* obj, const char* type ), ( obj, type ),
    "Called when the vehicle leaves liquid.\n"
    "@param obj the Vehicle object\n"
    "@param type type of liquid the vehicle has left\n" );

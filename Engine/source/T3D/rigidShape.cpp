@@ -153,7 +153,7 @@ ConsoleDocClass( RigidShape,
 );
 
 
-IMPLEMENT_CALLBACK( RigidShape, onEnterLiquid, void, ( const char* objId, const char* waterCoverage, const char* liquidType ),
+IMPLEMENT_SIMSIGNAL( RigidShape, onEnterLiquid, ( const char* objId, const char* waterCoverage, const char* liquidType ),
 													 ( objId, waterCoverage, liquidType ),
    "@brief Called whenever this RigidShape object enters liquid.\n\n"
    "@param objId The ID of the rigidShape object.\n"
@@ -169,7 +169,7 @@ IMPLEMENT_CALLBACK( RigidShape, onEnterLiquid, void, ( const char* objId, const 
    "@see ShapeBase\n\n"
 );
 
-IMPLEMENT_CALLBACK( RigidShape, onLeaveLiquid, void, ( const char* objId, const char* liquidType ),( objId, liquidType ),
+IMPLEMENT_SIMSIGNAL( RigidShape, onLeaveLiquid, ( const char* objId, const char* liquidType ),( objId, liquidType ),
    "@brief Called whenever the RigidShape object exits liquid.\n\n"
    "@param objId The ID of the RigidShape object.\n"
    "@param liquidType Type if liquid that was exited.\n\n"

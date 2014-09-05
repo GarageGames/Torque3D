@@ -62,6 +62,7 @@ public:
 class GuiMenuTextListCtrl : public GuiTextListCtrl
 {
    private:
+      typedef GuiMenuTextListCtrl privateThisClassType;
       typedef GuiTextListCtrl Parent;
 
    protected:
@@ -86,6 +87,7 @@ class GuiMenuTextListCtrl : public GuiTextListCtrl
 
 class GuiMenuBar : public GuiTickCtrl //  Was: GuiControl
 {
+   typedef GuiMenuBar privateThisClassType;
    typedef GuiTickCtrl Parent; //  Was: GuiControl Parent;
 public:
 
@@ -213,10 +215,10 @@ public:
    static void initPersistFields();
 
    DECLARE_CONOBJECT(GuiMenuBar);
-   DECLARE_CALLBACK( void, onMouseInMenu, (bool hasLeftMenu));
-   DECLARE_CALLBACK( void, onMenuSelect, (const char* menuId, const char* menuText));
-   DECLARE_CALLBACK( void, onMenuItemSelect, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText  ));
-   DECLARE_CALLBACK( void, onSubmenuSelect, ( const char* submenuId, const char* submenuText));
+   DECLARE_SIMSIGNAL( public, onMouseInMenu, (bool hasLeftMenu));
+   DECLARE_SIMSIGNAL( public, onMenuSelect, (const char* menuId, const char* menuText));
+   DECLARE_SIMSIGNAL( public, onMenuItemSelect, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText  ));
+   DECLARE_SIMSIGNAL( public, onSubmenuSelect, ( const char* submenuId, const char* submenuText));
 };
 
 #endif

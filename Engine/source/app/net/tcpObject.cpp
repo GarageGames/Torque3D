@@ -123,7 +123,7 @@ ConsoleDocClass( TCPObject,
 );
 
 
-IMPLEMENT_CALLBACK(TCPObject, onConnectionRequest, void, (const char* address, const char* ID), (address, ID),
+IMPLEMENT_SIMSIGNAL(TCPObject, onConnectionRequest, (const char* address, const char* ID), (address, ID),
    "@brief Called whenever a connection request is made.\n\n"
    "This callback is used when the TCPObject is listening to a port and a client is attempting to connect.\n"
    "@param address Server address connecting from.\n"
@@ -131,30 +131,30 @@ IMPLEMENT_CALLBACK(TCPObject, onConnectionRequest, void, (const char* address, c
    "@see listen()\n"
    );
 
-IMPLEMENT_CALLBACK(TCPObject, onLine, void, (const char* line), (line),
+IMPLEMENT_SIMSIGNAL(TCPObject, onLine, (const char* line), (line),
    "@brief Called whenever a line of data is sent to this TCPObject.\n\n"
    "This callback is called when the received data contains a newline @\\n character, or "
    "the connection has been disconnected and the TCPObject's buffer is flushed.\n"
    "@param line Data sent from the server.\n"
    );
 
-IMPLEMENT_CALLBACK(TCPObject, onDNSResolved, void, (),(),
+IMPLEMENT_SIMSIGNAL(TCPObject, onDNSResolved, (),(),
    "Called whenever the DNS has been resolved.\n"
    );
 
-IMPLEMENT_CALLBACK(TCPObject, onDNSFailed, void, (),(),
+IMPLEMENT_SIMSIGNAL(TCPObject, onDNSFailed, (),(),
    "Called whenever the DNS has failed to resolve.\n"
    );
 
-IMPLEMENT_CALLBACK(TCPObject, onConnected, void, (),(),
+IMPLEMENT_SIMSIGNAL(TCPObject, onConnected, (),(),
    "Called whenever a connection is established with a server.\n"
    );
 
-IMPLEMENT_CALLBACK(TCPObject, onConnectFailed, void, (),(),
+IMPLEMENT_SIMSIGNAL(TCPObject, onConnectFailed, (),(),
    "Called whenever a connection has failed to be established with a server.\n"
    );
 
-IMPLEMENT_CALLBACK(TCPObject, onDisconnect, void, (),(),
+IMPLEMENT_SIMSIGNAL(TCPObject, onDisconnect, (),(),
    "Called whenever the TCPObject disconnects from whatever it is currently connected to.\n"
    );
 

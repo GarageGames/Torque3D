@@ -45,7 +45,7 @@ ConsoleDocClass( GuiGradientSwatchCtrl,
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiGradientSwatchCtrl, onMouseDown, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiGradientSwatchCtrl, onMouseDown, (),(),
    "@brief Called whenever the left mouse button has entered the down state while in this control.\n\n"
    "@tsexample\n"
    "// The left mouse button is down on the control, causing the callback to occur.\n"
@@ -59,7 +59,7 @@ IMPLEMENT_CALLBACK( GuiGradientSwatchCtrl, onMouseDown, void, (),(),
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiGradientSwatchCtrl, onDoubleClick, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiGradientSwatchCtrl, onDoubleClick, (),(),
    "@brief Called whenever the left mouse button performs a double click while in this control.\n\n"
    "@tsexample\n"
    "// The left mouse button has performed a double click on the control, causing the callback to occur.\n"

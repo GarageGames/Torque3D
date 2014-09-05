@@ -33,6 +33,7 @@
 ///
 class GuiScrollCtrl : public GuiContainer
 {
+   typedef GuiScrollCtrl privateThisClassType;
    public:
 
       typedef GuiContainer Parent;
@@ -178,7 +179,7 @@ class GuiScrollCtrl : public GuiContainer
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onScroll, () );
+      DECLARE_SIMSIGNAL( protected, onScroll, () );
       
       /// @}
 

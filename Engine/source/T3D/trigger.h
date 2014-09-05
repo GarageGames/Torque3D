@@ -43,7 +43,9 @@ class Trigger;
 DefineConsoleType( TypeTriggerPolyhedron, Polyhedron )
 
 
-struct TriggerData: public GameBaseData {
+struct TriggerData: public GameBaseData 
+{
+   typedef TriggerData privateThisClassType;
    typedef GameBaseData Parent;
 
   public:
@@ -54,9 +56,9 @@ struct TriggerData: public GameBaseData {
    
    DECLARE_CONOBJECT(TriggerData);
 
-   DECLARE_CALLBACK( void, onEnterTrigger, ( Trigger* trigger, GameBase* obj ) );
-   DECLARE_CALLBACK( void, onTickTrigger, ( Trigger* trigger ) );
-   DECLARE_CALLBACK( void, onLeaveTrigger, ( Trigger* trigger, GameBase* obj ) );
+   DECLARE_SIMSIGNAL( public, onEnterTrigger, ( Trigger* trigger, GameBase* obj ) );
+   DECLARE_SIMSIGNAL( public, onTickTrigger, ( Trigger* trigger ) );
+   DECLARE_SIMSIGNAL( public, onLeaveTrigger, ( Trigger* trigger, GameBase* obj ) );
 
    bool onAdd();
    static void initPersistFields();
@@ -66,6 +68,7 @@ struct TriggerData: public GameBaseData {
 
 class Trigger : public GameBase
 {
+   typedef Trigger privateThisClassType;
    typedef GameBase Parent;
 
    /// Trigger polyhedron with *outward* facing normals and CCW ordered
@@ -118,8 +121,8 @@ class Trigger : public GameBase
    // SimObject
    DECLARE_CONOBJECT(Trigger);
 
-   DECLARE_CALLBACK( void, onAdd, ( U32 objectId ) );
-   DECLARE_CALLBACK( void, onRemove, ( U32 objectId ) );
+   DECLARE_SIMSIGNAL( public, onAdd, ( U32 objectId ) );
+   DECLARE_SIMSIGNAL( public, onRemove, ( U32 objectId ) );
 
    static void consoleInit();
    static void initPersistFields();

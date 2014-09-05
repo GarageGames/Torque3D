@@ -2402,7 +2402,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
 /// @warn With the new interop system, method-style callbacks <em>must not</em> be triggered on object
 ///   that are being created!  This is because the control layer will likely not yet have a fully valid wrapper
 ///   object in place for the EngineObject under construction.
-#define IMPLEMENT_CALLBACK( class, name, returnType, args, argNames, usageString )                                                           \
+#define _IMPLEMENT_CALLBACK_HEADER(  class, name, returnType, args, argNames, usageString )                                                  \
    struct _ ## class ## name ## frame { typedef class ObjectType; };                                                                         \
    TORQUE_API _EngineMethodTrampoline< _ ## class ## name ## frame, returnType args >::FunctionType* cb ## class ## _ ## name;               \
    TORQUE_API void set_cb ## class ## _ ## name(                                                                                             \
@@ -2422,6 +2422,8 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
          EngineFunctionCallout                                                                                                               \
       );                                                                                                                                     \
    }                                                                                                                                         \
+
+#define _IMPLEMENT_CALLBACK_CALLER(  class, name, returnType, args, argNames, usageString )                                                  \
    returnType class::name ## _callback args                                                                                                  \
    {                                                                                                                                         \
       if( cb ## class ## _ ## name ) {                                                                                                       \
@@ -2436,11 +2438,75 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
       }                                                                                                                                      \
       return returnType();                                                                                                                   \
    }                                                                                                                                         \
+
+
+#define _IMPLEMENT_CALLBACK_END(  class, name, returnType, args, argNames, usageString )                                                     \
    namespace {                                                                                                                               \
       ConsoleFunctionHeader _ ## class ## name ## header(                                                                                    \
          #returnType, #args, "" );                                                                                                           \
       ConsoleConstructor _ ## class ## name ## obj( #class, #name, usageString, &_ ## class ## name ## header );                             \
    }
+
+#define IMPLEMENT_CALLBACK( class, name, returnType, args, argNames, usageString )                                                           \
+   _IMPLEMENT_CALLBACK_HEADER(class, name, void, args, argNames, usageString)                                                                \
+   _IMPLEMENT_CALLBACK_CALLER(  class, name, returnType, args, argNames, usageString )                                                       \
+   _IMPLEMENT_CALLBACK_END(  class, name, returnType, args, argNames, usageString )                                                          \
+
+
+#define _IMPLEMENT_SIMSIGNAL_CALLER( class, name, returnType, args, argNames, usageString )                                                  \
+   void class::name ## _callback args                                                                                                        \
+   {                                                                                                                                         \
+      typedef EngineAppendOwner< class, void args >::FunctionType SIGNATURE;                                                                 \
+      Delegate<SIGNATURE> dlg(&mSignal_##name, &Signal<SIGNATURE>::trigger);                                                                 \
+      _EngineDlgCallbackHelper<class> cb(this, &dlg);                                                                                        \
+      cb.call<void> argNames;                                                                                                                \
+      if( cb ## class ## _ ## name ) {                                                                                                       \
+         _EngineCallbackHelper cbh( this, reinterpret_cast< const void* >( cb ## class ## _ ## name ) );                                     \
+         return void( cbh.call< void > argNames );                                                                                           \
+      }                                                                                                                                      \
+      if( engineAPI::gUseConsoleInterop )                                                                                                    \
+      {                                                                                                                                      \
+         static StringTableEntry sName = StringTable->insert( #name );                                                                       \
+         _EngineConsoleCallbackHelper cbh( sName, this );                                                                                    \
+         return void( cbh.call< void > argNames );                                                                                           \
+      }                                                                                                                                      \
+      return void();                                                                                                                         \
+   }                                                                                                                                         \
+
+#define _IMPLEMENT_SIMDELEGATE_CALLER(  class, name, returnType, args, argNames, usageString )                                               \
+   returnType class::name ## _callback args                                                                                                  \
+   {                                                                                                                                         \
+      if( mDelegate_##name ) {                                                                                                               \
+         typedef EngineAppendOwner< class, returnType args >::FunctionType SIGNATURE;                                                        \
+         _EngineDlgCallbackHelper<class> cb(this, &mDelegate_##name);                                                                        \
+         return returnType( cb.call<returnType> argNames );                                                                                  \
+      }                                                                                                                                      \
+      if( ::cb ## class ## _ ## name ) {                                                                                                     \
+         _EngineCallbackHelper cbh( this, reinterpret_cast< const void* >( ::cb ## class ## _ ## name ) );                                   \
+         return returnType( cbh.call< returnType > argNames );                                                                               \
+      }                                                                                                                                      \
+      if( engineAPI::gUseConsoleInterop )                                                                                                    \
+      {                                                                                                                                      \
+         static StringTableEntry sName = StringTable->insert( #name );                                                                       \
+         _EngineConsoleCallbackHelper cbh( sName, this );                                                                                    \
+         return returnType( cbh.call< returnType > argNames );                                                                               \
+      }                                                                                                                                      \
+      return returnType();                                                                                                                   \
+   }                                                                                                                                         \
+
+/// Similar to IMPLEMENT_CALLBACK but c++ Signal and ScriptCallback
+/// c++ signal are triggered first, then torque-script callback.
+#define IMPLEMENT_SIMSIGNAL( class, name, args, argNames, usageString )                                                                      \
+   _IMPLEMENT_CALLBACK_HEADER(class, name, void, args, argNames, usageString)                                                                \
+   _IMPLEMENT_SIMSIGNAL_CALLER(class, name, void, args, argNames, usageString)                                                               \
+   _IMPLEMENT_CALLBACK_END(class, name, void, args, argNames, usageString)
+
+/// Similar to IMPLEMENT_CALLBACK but c++ Delegate and ScriptCallback
+/// If a c++ delegate is set, torque-script callback are not executed.
+#define IMPLEMENT_SIMDELEGATE( class, name, returnType, args, argNames, usageString )                                                        \
+   _IMPLEMENT_CALLBACK_HEADER(class, name, returnType, args, argNames, usageString)                                                          \
+   _IMPLEMENT_SIMDELEGATE_CALLER(class, name, returnType, args, argNames, usageString)                                                       \
+   _IMPLEMENT_CALLBACK_END(class, name, returnType, args, argNames, usageString)
 
 
 /// Used to define global callbacks not associated with 
@@ -2464,7 +2530,58 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
          #returnType, #args, "" );                                                                                                           \
       ConsoleConstructor _ ## name ## obj( NULL, #name, usageString, &_ ## name ## header );                                                 \
    }
-   
+
+//! Similar to IMPLEMENT_GLOBAL_CALLBACK but c++ Signal and ScriptCallback
+#define IMPLEMENT_GLOBAL_SIMSIGNAL( name, args, argNames, usageString )                                                                      \
+   DEFINE_CALLOUT( cb ## name, name,, void, args, 0, usageString );                                                                          \
+   Signal< void args > global_signal_##name;                                                                                                 \
+   Torque::ISignal< void args > getGlobal_ISignal_##name() { return global_signal_##name; }                                                  \
+   void name ## _callback args                                                                                                               \
+   {                                                                                                                                         \
+      global_signal_##name.trigger argNames;                                                                                                 \
+      if( cb ## name )                                                                                                                       \
+         return void( cb ## name argNames );                                                                                                 \
+      if( engineAPI::gUseConsoleInterop )                                                                                                    \
+      {                                                                                                                                      \
+         static StringTableEntry sName = StringTable->insert( #name );                                                                       \
+         _EngineConsoleCallbackHelper cbh( sName, NULL );                                                                                    \
+         return void( cbh.call< void > argNames );                                                                                           \
+      }                                                                                                                                      \
+      return void();                                                                                                                         \
+   }                                                                                                                                         \
+   namespace {                                                                                                                               \
+      ConsoleFunctionHeader _ ## name ## header(                                                                                             \
+         "void", #args, "" );                                                                                                                \
+      ConsoleConstructor _ ## name ## obj( NULL, #name, usageString, &_ ## name ## header );                                                 \
+   }
+
+
+//! Similar to IMPLEMENT_GLOBAL_CALLBACK but c++ delegate or ScriptCallback
+#define IMPLEMENT_GLOBAL_SIMDELEGATE( name, returnType, args, argNames, usageString )                                                        \
+   DEFINE_CALLOUT( cb ## name, name,, returnType, args, 0, usageString );                                                                    \
+   Delegate< returnType args > global_delegate_##name;                                                                                       \
+   void setDelegate_##NAME(const Delegate< returnType args > &dlg) { global_delegate_##name = dlg; }                                         \
+   Delegate< returnType args > detDelegateCopy_##NAME() { return global_delegate_##name; }                                                   \
+   returnType name ## _callback args                                                                                                         \
+   {                                                                                                                                         \
+      if( global_delegate_##name )                                                                                                           \
+         return global_delegate_##name argNames;                                                                                             \
+      if( cb ## name )                                                                                                                       \
+         return returnType( cb ## name argNames );                                                                                           \
+      if( engineAPI::gUseConsoleInterop )                                                                                                    \
+      {                                                                                                                                      \
+         static StringTableEntry sName = StringTable->insert( #name );                                                                       \
+         _EngineConsoleCallbackHelper cbh( sName, NULL );                                                                                    \
+         return returnType( cbh.call< returnType > argNames );                                                                               \
+      }                                                                                                                                      \
+      return returnType();                                                                                                                   \
+   }                                                                                                                                         \
+   namespace {                                                                                                                               \
+      ConsoleFunctionHeader _ ## name ## header(                                                                                             \
+      #returnType, #args, "" );                                                                                                              \
+      ConsoleConstructor _ ## name ## obj( NULL, #name, usageString, &_ ## name ## header );                                                 \
+   }
+
    
 // Again, temporary macros to allow splicing the API while we still have the console interop around.
 
@@ -2608,6 +2725,102 @@ struct _EngineCallbackHelper
          return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g, h, i, j, k, l ) );
       }
 };
+
+//Similar to _EngineCallbackHelper but support Delegate
+template<typename CLASS>
+struct _EngineDlgCallbackHelper
+{
+   protected:
+    
+      CLASS* mThis;
+      const void* mDlg;
+            
+   public:
+
+      _EngineDlgCallbackHelper( CLASS* pThis, void* fn )
+         : mThis( pThis ),
+           mDlg( fn ) {}
+      
+      template< typename R >
+      R call() const
+      {
+         typedef const Delegate<R( CLASS*)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis ) );
+      }
+      template< typename R, typename A >
+      R call( A a ) const
+      {
+         typedef const Delegate<R( CLASS*, A)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a ) );
+      }
+      template< typename R, typename A, typename B >
+      R call( A a, B b ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b) );
+      }
+      template< typename R, typename A, typename B, typename C >
+      R call( A a, B b, C c ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D >
+      R call( A a, B b, C c, D d ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E >
+      R call( A a, B b, C c, D d, E e ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
+      R call( A a, B b, C c, D d, E e, F f ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
+      R call( A a, B b, C c, D d, E e, F f, G g ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F, G)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f, g) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
+      R call( A a, B b, C c, D d, E e, F f, G g, H h ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F, G, H)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f, g, h) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
+      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F, G, H, I)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f, g, h, i) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
+      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F, G, H, I, J)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f, g, h, i, j) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
+      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F, G, H, I, J, K)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f, g, h, i, j, k) );
+      }
+      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
+      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l ) const
+      {
+         typedef const Delegate<R( CLASS*, A, B, C, D, E, F, G, H, I, J, K, L)>* DlgTypePtr;
+         return R( (*reinterpret_cast< DlgTypePtr >( mDlg ))( mThis, a, b, c, d, e, f, g, h, i, j, k, l ) );
+      }
+};
+
 
 // Internal helper for callback support in legacy console system.
 struct _EngineConsoleCallbackHelper

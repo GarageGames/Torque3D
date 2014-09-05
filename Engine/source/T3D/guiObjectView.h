@@ -37,12 +37,13 @@ class LightInfo;
 /// A control that displays a TSShape in its view.
 class GuiObjectView : public GuiTSCtrl
 {
+   typedef GuiObjectView privateThisClassType;
    public:
    
       typedef GuiTSCtrl Parent;
 
-	  DECLARE_CALLBACK( void, onMouseEnter, ());
-	  DECLARE_CALLBACK( void, onMouseLeave, ());
+	  DECLARE_SIMSIGNAL( public, onMouseEnter, ());
+	  DECLARE_SIMSIGNAL( public, onMouseLeave, ());
 
    protected:
    

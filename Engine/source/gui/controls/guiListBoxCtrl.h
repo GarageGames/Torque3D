@@ -46,6 +46,7 @@
 class GuiListBoxCtrl : public GuiControl
 {
 private:
+   typedef GuiListBoxCtrl privateThisClassType;
    typedef GuiControl Parent;
 public:
 
@@ -55,14 +56,15 @@ public:
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "Linear list of text items." );
 
-   DECLARE_CALLBACK( void, onMouseDragged, ());
-   DECLARE_CALLBACK( void, onClearSelection, ());
-   DECLARE_CALLBACK( void, onUnSelect, ( const char* index, const char* itemText));
-   DECLARE_CALLBACK( void, onSelect, ( const char* index , const char* itemText ));
-   DECLARE_CALLBACK( void, onDoubleClick, ());
-   DECLARE_CALLBACK( void, onMouseUp, (const char* itemHit, const char* mouseClickCount));
-   DECLARE_CALLBACK( void, onDeleteKey, ());
-   DECLARE_CALLBACK( bool, isObjectMirrored, ( const char* indexIdString ));
+   DECLARE_SIMSIGNAL( public, onMouseDragged, ());
+   DECLARE_SIMSIGNAL( public, onClearSelection, ());
+   DECLARE_SIMSIGNAL( public, onUnSelect, ( const char* index, const char* itemText));
+   DECLARE_SIMSIGNAL( public, onSelect, ( const char* index , const char* itemText ));
+   DECLARE_SIMSIGNAL( public, onDoubleClick, ());
+   DECLARE_SIMSIGNAL( public, onMouseUp, (const char* itemHit, const char* mouseClickCount));
+   DECLARE_SIMSIGNAL( public, onDeleteKey, ());
+   DECLARE_SIMDELEGATE( public,  bool, isObjectMirrored, ( const char* indexIdString ));
+
 
    struct LBItem
    {

@@ -74,7 +74,7 @@ struct Move;
 struct GameBaseData : public SimDataBlock 
 {
 private:
-
+   typedef GameBaseData privateThisClassType;
    typedef SimDataBlock Parent;
 
 public:
@@ -100,11 +100,11 @@ public:
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onAdd, ( GameBase* obj ) );
-   DECLARE_CALLBACK( void, onRemove, ( GameBase* obj ) );
-   DECLARE_CALLBACK( void, onNewDataBlock, ( GameBase* obj ) );
-   DECLARE_CALLBACK( void, onMount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
-   DECLARE_CALLBACK( void, onUnmount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
+   DECLARE_SIMSIGNAL( public, onAdd, ( GameBase* obj ) );
+   DECLARE_SIMSIGNAL( public, onRemove, ( GameBase* obj ) );
+   DECLARE_SIMSIGNAL( public, onNewDataBlock, ( GameBase* obj ) );
+   DECLARE_SIMSIGNAL( public, onMount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
+   DECLARE_SIMSIGNAL( public, onUnmount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
    /// @}
 };
 
@@ -180,7 +180,8 @@ class MoveList;
 ///
 /// @nosubgrouping
 class GameBase : public SceneObject
-{      
+{
+   typedef GameBase privateThisClassType;
    typedef SceneObject Parent;
 
    /// @name Datablock
@@ -427,7 +428,7 @@ public:
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, setControl, ( bool controlled ) );
+   DECLARE_SIMSIGNAL( public, setControl, ( bool controlled ) );
    /// @}
 
 private:

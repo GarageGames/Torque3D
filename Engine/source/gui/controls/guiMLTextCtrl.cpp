@@ -60,7 +60,7 @@ ConsoleDocClass( GuiMLTextCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiMLTextCtrl, onURL, void, ( const char* url ),( url ),
+IMPLEMENT_SIMSIGNAL( GuiMLTextCtrl, onURL, ( const char* url ),( url ),
    "@brief Called whenever a URL was clicked on within the control.\n\n"
    "@param url The URL address that was clicked on.\n"
    "@tsexample\n"
@@ -73,7 +73,7 @@ IMPLEMENT_CALLBACK( GuiMLTextCtrl, onURL, void, ( const char* url ),( url ),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( const char* width, const char* maxY ),( width, maxY ),
+IMPLEMENT_SIMSIGNAL( GuiMLTextCtrl, onResize, ( const char* width, const char* maxY ),( width, maxY ),
    "@brief Called whenever the control size changes.\n\n"
    "@param width The new width value for the control\n"
    "@param maxY The current maximum allowed Y value for the control\n\n"

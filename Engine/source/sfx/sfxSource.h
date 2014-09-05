@@ -60,7 +60,7 @@ class EaseF;
 class SFXSource : public SimGroup
 {
    public:
-
+      typedef SFXSource privateThisClassType;
       typedef SimGroup Parent;
          
       friend class SFXSystem; // _init
@@ -369,8 +369,8 @@ class SFXSource : public SimGroup
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onStatusChange, ( SFXStatus newStatus ) );
-      DECLARE_CALLBACK( void, onParameterValueChange, ( SFXParameter* parameter ) );
+      DECLARE_SIMSIGNAL( protected, onStatusChange, ( SFXStatus newStatus ) );
+      DECLARE_SIMSIGNAL( protected, onParameterValueChange, ( SFXParameter* parameter ) );
       
       /// @}
                         

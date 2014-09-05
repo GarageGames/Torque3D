@@ -66,7 +66,7 @@ ConsoleDocClass( Lightning,
    "@ingroup Atmosphere\n"
 );
 
-IMPLEMENT_CALLBACK( Lightning, applyDamage, void, ( const Point3F& hitPosition, const Point3F& hitNormal, SceneObject* hitObject ),
+IMPLEMENT_SIMSIGNAL( Lightning, applyDamage, ( const Point3F& hitPosition, const Point3F& hitNormal, SceneObject* hitObject ),
    ( hitPosition, hitNormal, hitObject ),
    "Informs an object that it was hit by a lightning bolt and needs to take damage.\n"
    "@param hitPosition World position hit by the lightning bolt.\n"

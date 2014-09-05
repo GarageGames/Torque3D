@@ -52,12 +52,12 @@ ConsoleDocClass( ScriptObject,
    "@ingroup Scripting"
 );
 
-IMPLEMENT_CALLBACK( ScriptObject, onAdd, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( ScriptObject, onAdd, ( SimObjectId ID ), ( ID ),
 	"Called when this ScriptObject is added to the system.\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
 
-IMPLEMENT_CALLBACK( ScriptObject, onRemove, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( ScriptObject, onRemove, ( SimObjectId ID ), ( ID ),
 	"Called when this ScriptObject is removed from the system.\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
@@ -104,16 +104,16 @@ ConsoleDocClass( ScriptTickObject,
    "@ingroup Scripting"
 );
 
-IMPLEMENT_CALLBACK( ScriptTickObject, onInterpolateTick, void, ( F32 delta ), ( delta ),
+IMPLEMENT_SIMSIGNAL( ScriptTickObject, onInterpolateTick, ( F32 delta ), ( delta ),
 	"This is called every frame, but only if the object is set to process ticks.\n"
 	"@param delta The time delta for this frame.\n"
 );
 
-IMPLEMENT_CALLBACK( ScriptTickObject, onProcessTick, void, (), (),
+IMPLEMENT_SIMSIGNAL( ScriptTickObject, onProcessTick, (), (),
 	"Called once every 32ms if this object is set to process ticks.\n"
 );
 
-IMPLEMENT_CALLBACK( ScriptTickObject, onAdvanceTime, void, ( F32 timeDelta ), ( timeDelta ),
+IMPLEMENT_SIMSIGNAL( ScriptTickObject, onAdvanceTime, ( F32 timeDelta ), ( timeDelta ),
 	"This is called every frame regardless if the object is set to process ticks, but only "
    "if the callOnAdvanceTime property is set to true.\n"
 	"@param timeDelta The time delta for this frame.\n"
@@ -225,12 +225,12 @@ ScriptGroup::ScriptGroup()
 {
 }
 
-IMPLEMENT_CALLBACK( ScriptGroup, onAdd, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( ScriptGroup, onAdd, ( SimObjectId ID ), ( ID ),
 	"Called when this ScriptGroup is added to the system.\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n" 
 );
 
-IMPLEMENT_CALLBACK( ScriptGroup, onRemove, void, ( SimObjectId ID ), ( ID ),
+IMPLEMENT_SIMSIGNAL( ScriptGroup, onRemove, ( SimObjectId ID ), ( ID ),
 	"Called when this ScriptObject is removed from the system.\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n" 
 );

@@ -38,13 +38,14 @@ class SFXTrack;
 class GuiTextEditCtrl : public GuiTextCtrl
 {
 private:
+   typedef GuiTextEditCtrl privateThisClassType;
    typedef GuiTextCtrl Parent;
 
 protected:
 
-   DECLARE_CALLBACK( void, onTabComplete, (const char* val));
-   DECLARE_CALLBACK( void, onReturn, ());
-   DECLARE_CALLBACK( void, onValidate, ());
+   DECLARE_SIMSIGNAL( protected, onTabComplete, (const char* val));
+   DECLARE_SIMSIGNAL( protected, onReturn, ());
+   DECLARE_SIMSIGNAL( protected, onValidate, ());
 
    StringBuffer mTextBuffer;
 

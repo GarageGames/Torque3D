@@ -69,6 +69,7 @@ struct ItemData: public ShapeBaseData {
 
 class Item: public ShapeBase
 {
+   typedef Item privateThisClassType;
   protected:
    typedef ShapeBase Parent;
 
@@ -113,9 +114,9 @@ class Item: public ShapeBase
    bool mSubclassItemHandlesScene;  ///< A subclass of Item will handle all of the adding to the scene
 
   protected:
-	DECLARE_CALLBACK( void, onStickyCollision, ( const char* objID ));
-	DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objID, const char* waterCoverage, const char* liquidType ));
-	DECLARE_CALLBACK( void, onLeaveLiquid, ( const char* objID, const char* liquidType ));
+	DECLARE_SIMSIGNAL( protected, onStickyCollision, ( const char* objID ));
+	DECLARE_SIMSIGNAL( protected, onEnterLiquid, ( const char* objID, const char* waterCoverage, const char* liquidType ));
+	DECLARE_SIMSIGNAL( protected, onLeaveLiquid, ( const char* objID, const char* liquidType ));
 
   public:
 

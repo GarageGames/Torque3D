@@ -56,15 +56,15 @@ ConsoleDocClass( GuiWindowCtrl,
    "@ingroup GuiContainers"
 );
 
-IMPLEMENT_CALLBACK( GuiWindowCtrl, onClose, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiWindowCtrl, onClose, (), (),
    "Called when the close button has been pressed." );
-IMPLEMENT_CALLBACK( GuiWindowCtrl, onMinimize, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiWindowCtrl, onMinimize, (), (),
    "Called when the window has been minimized." );
-IMPLEMENT_CALLBACK( GuiWindowCtrl, onMaximize, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiWindowCtrl, onMaximize, (), (),
    "Called when the window has been maximized." );
-IMPLEMENT_CALLBACK( GuiWindowCtrl, onCollapse, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiWindowCtrl, onCollapse, (), (),
    "Called when the window is collapsed by clicking its title bar." );
-IMPLEMENT_CALLBACK( GuiWindowCtrl, onRestore, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiWindowCtrl, onRestore, (), (),
    "Called when the window is restored from minimized, maximized, or collapsed state." );
 
 //-----------------------------------------------------------------------------

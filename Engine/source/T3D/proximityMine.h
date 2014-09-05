@@ -35,10 +35,13 @@ class ProximityMine;
 
 struct ProximityMineData: public ItemData
 {
+private:
+   typedef ProximityMineData privateThisClassType;
+public:
    typedef ItemData Parent;
 
-   DECLARE_CALLBACK( void, onTriggered, ( ProximityMine* obj, SceneObject* target ) );
-   DECLARE_CALLBACK( void, onExplode, ( ProximityMine* obj, Point3F pos ) );
+   DECLARE_SIMSIGNAL( public, onTriggered, ( ProximityMine* obj, SceneObject* target ) );
+   DECLARE_SIMSIGNAL( public, onExplode, ( ProximityMine* obj, Point3F pos ) );
 
 public:
    F32               armingDelay;

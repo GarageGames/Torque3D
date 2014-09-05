@@ -93,7 +93,7 @@ ConsoleDocClass( SFXParameter,
 );
 
 
-IMPLEMENT_CALLBACK( SFXParameter, onUpdate, void, (), (),
+IMPLEMENT_SIMSIGNAL( SFXParameter, onUpdate, (), (),
    "Called when the sound system triggers an update on the parameter.\n"
    "This occurs periodically during system operation." );
 

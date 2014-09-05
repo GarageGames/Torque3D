@@ -284,7 +284,7 @@ ConsoleDocClass( Item,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( Item, onStickyCollision, void, ( const char* objID ),( objID ),
+IMPLEMENT_SIMSIGNAL( Item, onStickyCollision, ( const char* objID ),( objID ),
    "@brief Informs the Item object that it is now sticking to another object.\n\n"
    "This callback is only called if the ItemData::sticky property for this Item is true.\n"
    "@param objID Object ID this Item object.\n"
@@ -292,7 +292,7 @@ IMPLEMENT_CALLBACK( Item, onStickyCollision, void, ( const char* objID ),( objID
    "@see Item, ItemData\n"
 );
 
-IMPLEMENT_CALLBACK( Item, onEnterLiquid, void, ( const char* objID, const char* waterCoverage, const char* liquidType ),( objID, waterCoverage, liquidType ),
+IMPLEMENT_SIMSIGNAL( Item, onEnterLiquid, ( const char* objID, const char* waterCoverage, const char* liquidType ),( objID, waterCoverage, liquidType ),
    "Informs an Item object that it has entered liquid, along with information about the liquid type.\n"
    "@param objID Object ID for this Item object.\n"
    "@param waterCoverage How much coverage of water this Item object has.\n"
@@ -301,7 +301,7 @@ IMPLEMENT_CALLBACK( Item, onEnterLiquid, void, ( const char* objID, const char* 
    "@see Item, ItemData, WaterObject\n"
 );
 
-IMPLEMENT_CALLBACK( Item, onLeaveLiquid, void, ( const char* objID, const char* liquidType ),( objID, liquidType ),
+IMPLEMENT_SIMSIGNAL( Item, onLeaveLiquid, ( const char* objID, const char* liquidType ),( objID, liquidType ),
    "Informs an Item object that it has left a liquid, along with information about the liquid type.\n"
    "@param objID Object ID for this Item object.\n"
    "@param liquidType The type of liquid that this Item object has left.\n"

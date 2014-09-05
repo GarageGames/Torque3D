@@ -91,9 +91,9 @@ ConsoleDocClass( SFXState,
 );
 
 
-IMPLEMENT_CALLBACK( SFXState, onActivate, void, (), (),
+IMPLEMENT_SIMSIGNAL( SFXState, onActivate, (), (),
    "Called when the state goes from inactive to active." );
-IMPLEMENT_CALLBACK( SFXState, onDeactivate, void, (), (),
+IMPLEMENT_SIMSIGNAL( SFXState, onDeactivate, (), (),
    "called when the state goes from active to deactive." );
    
 

@@ -102,16 +102,16 @@ ConsoleDocClass( GuiBitmapButtonCtrl,
    "@ingroup GuiButtons"
 );
 
-IMPLEMENT_CALLBACK( GuiBitmapButtonCtrl, onDefaultClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiBitmapButtonCtrl, onDefaultClick, (), (),
    "Called when per-modifier functionality is enabled and the user clicks on the button without any modifier pressed.\n"
    "@ref guibitmapbutton_modifiers" );
-IMPLEMENT_CALLBACK( GuiBitmapButtonCtrl, onCtrlClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiBitmapButtonCtrl, onCtrlClick, (), (),
    "Called when per-modifier functionality is enabled and the user clicks on the button with the CTRL key pressed.\n"
    "@ref guibitmapbutton_modifiers" );
-IMPLEMENT_CALLBACK( GuiBitmapButtonCtrl, onAltClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiBitmapButtonCtrl, onAltClick, (), (),
    "Called when per-modifier functionality is enabled and the user clicks on the button with the ALT key pressed.\n"
    "@ref guibitmapbutton_modifiers" );
-IMPLEMENT_CALLBACK( GuiBitmapButtonCtrl, onShiftClick, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiBitmapButtonCtrl, onShiftClick, (), (),
    "Called when per-modifier functionality is enabled and the user clicks on the button with the SHIFT key pressed.\n"
    "@ref guibitmapbutton_modifiers" );
 

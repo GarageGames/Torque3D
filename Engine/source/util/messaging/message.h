@@ -82,13 +82,14 @@ class MessageQueue;
 //-----------------------------------------------------------------------------
 class Message : public SimObject
 {
+   typedef Message privateThisClassType;
    typedef SimObject Parent;
 
 public:
    Message();
    DECLARE_CONOBJECT(Message);
-   DECLARE_CALLBACK( void, onAdd, () );
-   DECLARE_CALLBACK( void, onRemove, () );
+   DECLARE_SIMSIGNAL( public, onAdd, () );
+   DECLARE_SIMSIGNAL( public, onRemove, () );
 
    //-----------------------------------------------------------------------------
    /// @brief Obtain next available #SimObjectId for messages

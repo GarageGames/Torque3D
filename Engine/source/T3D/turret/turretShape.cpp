@@ -69,7 +69,7 @@ ConsoleDocClass( TurretShapeData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
+IMPLEMENT_SIMSIGNAL( TurretShapeData, onMountObject, ( TurretShape* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
    "@brief Informs the TurretShapeData object that a player is mounting it.\n\n"
    "@param turret The TurretShape object.\n"
    "@param obj The player that is mounting.\n"
@@ -77,14 +77,14 @@ IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret,
    "@note Server side only.\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onUnmountObject, void, ( TurretShape* turret, SceneObject* obj ),( turret, obj ),
+IMPLEMENT_SIMSIGNAL( TurretShapeData, onUnmountObject, ( TurretShape* turret, SceneObject* obj ),( turret, obj ),
    "@brief Informs the TurretShapeData object that a player is unmounting it.\n\n"
    "@param turret The TurretShape object.\n"
    "@param obj The player that is unmounting.\n"
    "@note Server side only.\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onStickyCollision, void, ( TurretShape* obj ),( obj ),
+IMPLEMENT_SIMSIGNAL( TurretShapeData, onStickyCollision, ( TurretShape* obj ),( obj ),
    "@brief Informs the TurretData object that it is now sticking to another object.\n\n"
    "This callback is only called if the TurretData::sticky property for this Turret is true.\n"
    "@param obj The Turret object that is colliding.\n"

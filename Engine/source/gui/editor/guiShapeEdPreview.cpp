@@ -54,7 +54,7 @@ ConsoleDocClass( GuiShapeEdPreview,
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiShapeEdPreview, onThreadPosChanged, void, ( F32 pos, bool inTransition ), ( pos, inTransition),
+IMPLEMENT_SIMSIGNAL( GuiShapeEdPreview, onThreadPosChanged, ( F32 pos, bool inTransition ), ( pos, inTransition),
    "Called when the position of the active thread has changed, such as during "
    "playback." );
 

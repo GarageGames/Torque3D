@@ -30,6 +30,7 @@
 class GuiTextListCtrl : public GuiArrayCtrl
 {
   private:
+     typedef GuiTextListCtrl privateThisClassType;
    typedef GuiArrayCtrl Parent;
 
   public:
@@ -67,8 +68,8 @@ class GuiTextListCtrl : public GuiArrayCtrl
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that displays text in tabular form." );
    
-   DECLARE_CALLBACK( void, onSelect, (const char* cellid, const char* text));
-   DECLARE_CALLBACK( void, onDeleteKey, ( const char* id ));
+   DECLARE_SIMSIGNAL( public, onSelect, (const char* cellid, const char* text));
+   DECLARE_SIMSIGNAL( public, onDeleteKey, ( const char* id ));
 
    static void initPersistFields();
 

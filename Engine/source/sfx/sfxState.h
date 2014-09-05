@@ -41,6 +41,7 @@
 ///
 class SFXState : public SimDataBlock
 {
+   typedef SFXState privateThisClassType;
    public:
    
       typedef SimDataBlock Parent;
@@ -74,8 +75,8 @@ class SFXState : public SimDataBlock
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onActivate, () );
-      DECLARE_CALLBACK( void, onDeactivate, () );
+      DECLARE_SIMSIGNAL( protected, onActivate, () );
+      DECLARE_SIMSIGNAL( protected, onDeactivate, () );
       
       /// @}
       

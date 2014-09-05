@@ -44,13 +44,13 @@ ConsoleDocClass( TSShapeConstructor,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( TSShapeConstructor, onLoad, void, (), (),
+IMPLEMENT_SIMSIGNAL( TSShapeConstructor, onLoad, (), (),
    "Called immediately after the DTS or DAE file has been loaded; before the "
    "shape data is available to any other object (StaticShape, Player etc). This "
    "is where you should put any post-load commands to modify the shape in-memory "
    "such as addNode, renameSequence etc." )
 
-IMPLEMENT_CALLBACK( TSShapeConstructor, onUnload, void, (), (),
+IMPLEMENT_SIMSIGNAL( TSShapeConstructor, onUnload, (), (),
    "Called when the DTS or DAE resource is flushed from memory. Not normally "
    "required, but may be useful to perform cleanup." )
 

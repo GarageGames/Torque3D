@@ -42,7 +42,9 @@ class Player;
 
 //----------------------------------------------------------------------------
 
-struct PlayerData: public ShapeBaseData {
+struct PlayerData: public ShapeBaseData 
+{
+   typedef PlayerData privateThisClassType;
    typedef ShapeBaseData Parent;
    enum Constants {
       RecoverDelayBits = 7,
@@ -354,17 +356,17 @@ struct PlayerData: public ShapeBaseData {
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onPoseChange, ( Player* obj, const char* oldPose, const char* newPose ) );
-   DECLARE_CALLBACK( void, onStartSwim, ( Player* obj ) );
-   DECLARE_CALLBACK( void, onStopSwim, ( Player* obj ) );
-   DECLARE_CALLBACK( void, onStartSprintMotion, ( Player* obj ) );
-   DECLARE_CALLBACK( void, onStopSprintMotion, ( Player* obj ) );
-   DECLARE_CALLBACK( void, doDismount, ( Player* obj ) );
-   DECLARE_CALLBACK( void, onEnterLiquid, ( Player* obj, F32 coverage, const char* type ) );
-   DECLARE_CALLBACK( void, onLeaveLiquid, ( Player* obj, const char* type ) );
-   DECLARE_CALLBACK( void, animationDone, ( Player* obj ) );
-   DECLARE_CALLBACK( void, onEnterMissionArea, ( Player* obj ) );
-   DECLARE_CALLBACK( void, onLeaveMissionArea, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onPoseChange, ( Player* obj, const char* oldPose, const char* newPose ) );
+   DECLARE_SIMSIGNAL( public, onStartSwim, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onStopSwim, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onStartSprintMotion, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onStopSprintMotion, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, doDismount, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onEnterLiquid, ( Player* obj, F32 coverage, const char* type ) );
+   DECLARE_SIMSIGNAL( public, onLeaveLiquid, ( Player* obj, const char* type ) );
+   DECLARE_SIMSIGNAL( public, animationDone, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onEnterMissionArea, ( Player* obj ) );
+   DECLARE_SIMSIGNAL( public, onLeaveMissionArea, ( Player* obj ) );
    /// @}
 };
 

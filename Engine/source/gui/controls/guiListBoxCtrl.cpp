@@ -47,7 +47,7 @@ ConsoleDocClass( GuiListBoxCtrl,
    "@ingroup GuiCore\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseDragged, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onMouseDragged,  (),(),
    "@brief Called whenever the mouse is dragged across the control.\n\n"
    "@tsexample\n"
    "// Mouse is dragged across the control, causing the callback to occur.\n"
@@ -59,7 +59,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseDragged, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onClearSelection, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onClearSelection,  (),(),
    "@brief Called whenever a selected item in the list is cleared.\n\n"
    "@tsexample\n"
    "// A selected item is cleared, causing the callback to occur.\n"
@@ -71,7 +71,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onClearSelection, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( const char* index, const char* itemText),( index, itemText ),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onUnSelect, ( const char* index, const char* itemText),( index, itemText ),
    "@brief Called whenever a selected item in the list has been unselected.\n\n"
    "@param index Index id of the item that was unselected\n"
    "@param itemText Text for the list entry at the index id that was unselected\n\n"
@@ -85,7 +85,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( const char* index, const
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onSelect, void, ( const char* index , const char* itemText ),( index, itemText ),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onSelect, ( const char* index , const char* itemText ),( index, itemText ),
    "@brief Called whenever an item in the list is selected.\n\n"
    "@param index Index id for the item in the list that was selected.\n"
    "@param itemText Text for the list item at the index that was selected.\n\n"
@@ -99,7 +99,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onSelect, void, ( const char* index , const 
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDoubleClick, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onDoubleClick, (),(),
    "@brief Called whenever an item in the list has been double clicked.\n\n"
    "@tsexample\n"
    "// An item in the list is double clicked, causing the callback to occur.\n"
@@ -111,7 +111,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDoubleClick, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, (const char* itemHit, const char* mouseClickCount),( itemHit,mouseClickCount),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onMouseUp, (const char* itemHit, const char* mouseClickCount),( itemHit,mouseClickCount),
    "@brief Called whenever the mouse has previously been clicked down (onMouseDown) and has now been raised on the control.\n"
    "If an item in the list was hit during the click cycle, then the index id of the clicked object along with how many clicks occured are passed\n"
    "into the callback.\n\n"
@@ -128,7 +128,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, (const char* itemHit, const
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDeleteKey, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiListBoxCtrl, onDeleteKey, (),(),
    "@brief Called whenever the Delete key on the keyboard has been pressed while in this control.\n\n"
    "@tsexample\n"
    "// The delete key on the keyboard has been pressed while this control is in focus, causing the callback to occur.\n"
@@ -140,7 +140,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDeleteKey, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, isObjectMirrored, bool, ( const char* indexIdString ),( indexIdString ),
+IMPLEMENT_SIMDELEGATE( GuiListBoxCtrl, isObjectMirrored, bool, ( const char* indexIdString ),( indexIdString ),
    "@brief Checks if a list item at a defined index id is mirrored, and returns the result.\n\n"
    "@param indexIdString Index id of the list to check.\n"
    "@tsexample\n"

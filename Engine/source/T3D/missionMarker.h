@@ -146,6 +146,7 @@ class WayPoint : public MissionMarker
 class SpawnSphere : public MissionMarker
 {
    private:
+      typedef SpawnSphere privateThisClassType;
       typedef MissionMarker         Parent;
 
    public:
@@ -189,7 +190,7 @@ class SpawnSphere : public MissionMarker
       static void initPersistFields();
 
       DECLARE_CONOBJECT(SpawnSphere);
-	  DECLARE_CALLBACK( void, onAdd, ( U32 objectId ) );
+	   DECLARE_SIMSIGNAL( public, onAdd, ( U32 objectId ) );
 };
 
 
@@ -227,11 +228,11 @@ class CameraBookmark : public MissionMarker
       static void initPersistFields();
 
       DECLARE_CONOBJECT(CameraBookmark);
-	  /*DECLARE_CALLBACK( void, onAdd, () );
-	  DECLARE_CALLBACK( void, onRemove, () );
-	  DECLARE_CALLBACK( void, onGroupAdd, () );
-	  DECLARE_CALLBACK( void, onGroupRemove, () );
-	  DECLARE_CALLBACK( void, onInspectPostApply, () );*/
+	  /*DECLARE_SIMSIGNAL( protected, onAdd, () );
+	  DECLARE_SIMSIGNAL( protected, onRemove, () );
+	  DECLARE_SIMSIGNAL( protected, onGroupAdd, () );
+	  DECLARE_SIMSIGNAL( protected, onGroupRemove, () );
+	  DECLARE_SIMSIGNAL( protected, onInspectPostApply, () );*/
 };
 
 #endif // _MISSIONMARKER_H_

@@ -391,7 +391,7 @@ SpawnSphere::SpawnSphere()
    mOutdoorWeight = 100.f;
 }
 
-IMPLEMENT_CALLBACK( SpawnSphere, onAdd, void, ( U32 objectId ), ( objectId ),
+IMPLEMENT_SIMSIGNAL( SpawnSphere, onAdd, ( U32 objectId ), ( objectId ),
    "Called when the SpawnSphere is being created.\n"
    "@param objectId The unique SimObjectId generated when SpawnSphere is created (%%this in script)\n" );
 

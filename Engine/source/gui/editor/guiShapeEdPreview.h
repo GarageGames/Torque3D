@@ -30,6 +30,7 @@ class LightInfo;
 
 class GuiShapeEdPreview : public EditTSCtrl
 {
+   typedef GuiShapeEdPreview privateThisClassType;
    struct Thread
    {
       TSThread*   key;              //!< TSThread key
@@ -210,7 +211,7 @@ public:
    const char* getThreadSequence() const;
    void refreshThreadSequences();
 
-   DECLARE_CALLBACK( void, onThreadPosChanged, ( F32 pos, bool inTransition ) );
+   DECLARE_SIMSIGNAL( public, onThreadPosChanged, ( F32 pos, bool inTransition ) );
    ///@}
 
    /// @name Mounting

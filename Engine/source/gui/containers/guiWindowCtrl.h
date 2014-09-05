@@ -34,6 +34,7 @@
 /// @{
 class GuiWindowCtrl : public GuiContainer
 {
+   typedef GuiWindowCtrl privateThisClassType;
 	public:
    
 		typedef GuiContainer Parent;
@@ -196,11 +197,11 @@ class GuiWindowCtrl : public GuiContainer
       /// @name Callbacks
       /// @{
       
-      DECLARE_CALLBACK( void, onClose, () );
-      DECLARE_CALLBACK( void, onMinimize, () );
-      DECLARE_CALLBACK( void, onMaximize, () );
-      DECLARE_CALLBACK( void, onCollapse, () );
-      DECLARE_CALLBACK( void, onRestore, () );
+      DECLARE_SIMSIGNAL( protected, onClose, () );
+      DECLARE_SIMSIGNAL( protected, onMinimize, () );
+      DECLARE_SIMSIGNAL( protected, onMaximize, () );
+      DECLARE_SIMSIGNAL( protected, onCollapse, () );
+      DECLARE_SIMSIGNAL( protected, onRestore, () );
       
       /// @}
 

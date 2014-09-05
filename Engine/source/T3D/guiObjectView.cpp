@@ -62,7 +62,7 @@ ConsoleDocClass( GuiObjectView,
    "@ingroup Gui3D\n"
 );
 
-IMPLEMENT_CALLBACK( GuiObjectView, onMouseEnter, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiObjectView, onMouseEnter, (),(),
    "@brief Called whenever the mouse enters the control.\n\n"
    "@tsexample\n"
    "// The mouse has entered the control, causing the callback to occur\n"
@@ -74,7 +74,7 @@ IMPLEMENT_CALLBACK( GuiObjectView, onMouseEnter, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiObjectView, onMouseLeave, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiObjectView, onMouseLeave, (),(),
    "@brief Called whenever the mouse leaves the control.\n\n"
    "@tsexample\n"
    "// The mouse has left the control, causing the callback to occur\n"

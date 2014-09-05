@@ -37,6 +37,7 @@ class GuiTextEditCtrl;
 class GuiTreeViewCtrl : public GuiArrayCtrl
 {
    private:
+      typedef GuiTreeViewCtrl privateThisClassType;
       typedef GuiArrayCtrl Parent;
 
    public:
@@ -285,31 +286,32 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       /// @name Callbacks
       /// @{
 
-      DECLARE_CALLBACK( bool, onDeleteObject, ( SimObject* object ) );
-      DECLARE_CALLBACK( bool, isValidDragTarget, ( S32 id, const char* value ) );
-      DECLARE_CALLBACK( void, onDefineIcons, () );
-      DECLARE_CALLBACK( void, onAddGroupSelected, ( SimGroup* group ) );
-      DECLARE_CALLBACK( void, onAddSelection, ( S32 itemOrObjectId, bool isLastSelection ) );
-      DECLARE_CALLBACK( void, onSelect, ( S32 itemOrObjectId ) );
-      DECLARE_CALLBACK( void, onInspect, ( S32 itemOrObjectId ) );
-      DECLARE_CALLBACK( void, onRemoveSelection, ( S32 itemOrObjectId ) );
-      DECLARE_CALLBACK( void, onUnselect, ( S32 itemOrObjectId ) );
-      DECLARE_CALLBACK( void, onDeleteSelection, () );
-      DECLARE_CALLBACK( void, onObjectDeleteCompleted, () );
-      DECLARE_CALLBACK( void, onKeyDown, ( S32 modifier, S32 keyCode ) );
-      DECLARE_CALLBACK( void, onMouseUp, ( S32 hitItemId, S32 mouseClickCount ) );
-      DECLARE_CALLBACK( void, onMouseDragged, () );
-      DECLARE_CALLBACK( void, onRightMouseDown, ( S32 itemId, const Point2I& mousePos, SimObject* object = NULL ) );
-      DECLARE_CALLBACK( void, onRightMouseUp, ( S32 itemId, const Point2I& mousePos, SimObject* object = NULL ) );
-      DECLARE_CALLBACK( void, onBeginReparenting, () );
-      DECLARE_CALLBACK( void, onEndReparenting, () );
-      DECLARE_CALLBACK( void, onReparent, ( S32 itemOrObjectId, S32 oldParentItemOrObjectId, S32 newParentItemOrObjectId ) );
-      DECLARE_CALLBACK( void, onDragDropped, () );
-      DECLARE_CALLBACK( void, onAddMultipleSelectionBegin, () );
-      DECLARE_CALLBACK( void, onAddMultipleSelectionEnd, () );
-      DECLARE_CALLBACK( bool, canRenameObject, ( SimObject* object ) );
-      DECLARE_CALLBACK( bool, handleRenameObject, ( const char* newName, SimObject* object ) );
-      DECLARE_CALLBACK( void, onClearSelection, () );
+      DECLARE_SIMDELEGATE( protected,  bool, onDeleteObject, ( SimObject* object ) );
+      DECLARE_SIMDELEGATE( protected,  bool, isValidDragTarget, ( S32 id, const char* value ) );
+      DECLARE_SIMSIGNAL( protected, onDefineIcons, () );
+      DECLARE_SIMSIGNAL( protected, onAddGroupSelected, ( SimGroup* group ) );
+      DECLARE_SIMSIGNAL( protected, onAddSelection, ( S32 itemOrObjectId, bool isLastSelection ) );
+      DECLARE_SIMSIGNAL( protected, onSelect, ( S32 itemOrObjectId ) );
+      DECLARE_SIMSIGNAL( protected, onInspect, ( S32 itemOrObjectId ) );
+      DECLARE_SIMSIGNAL( protected, onRemoveSelection, ( S32 itemOrObjectId ) );
+      DECLARE_SIMSIGNAL( protected, onUnselect, ( S32 itemOrObjectId ) );
+      DECLARE_SIMSIGNAL( protected, onDeleteSelection, () );
+      DECLARE_SIMSIGNAL( protected, onObjectDeleteCompleted, () );
+      DECLARE_SIMSIGNAL( protected, onKeyDown, ( S32 modifier, S32 keyCode ) );
+      DECLARE_SIMSIGNAL( protected, onMouseUp, ( S32 hitItemId, S32 mouseClickCount ) );
+      DECLARE_SIMSIGNAL( protected, onMouseDragged, () );
+      DECLARE_SIMSIGNAL( protected, onRightMouseDown, ( S32 itemId, const Point2I& mousePos, SimObject* object = NULL ) );
+      DECLARE_SIMSIGNAL( protected, onRightMouseUp, ( S32 itemId, const Point2I& mousePos, SimObject* object = NULL ) );
+      DECLARE_SIMSIGNAL( protected, onBeginReparenting, () );
+      DECLARE_SIMSIGNAL( protected, onEndReparenting, () );
+      DECLARE_SIMSIGNAL( protected, onReparent, ( S32 itemOrObjectId, S32 oldParentItemOrObjectId, S32 newParentItemOrObjectId ) );
+      DECLARE_SIMSIGNAL( protected, onDragDropped, () );
+      DECLARE_SIMSIGNAL( protected, onAddMultipleSelectionBegin, () );
+      DECLARE_SIMSIGNAL( protected, onAddMultipleSelectionEnd, () );
+      DECLARE_SIMDELEGATE( protected,  bool, canRenameObject, ( SimObject* object ) );
+      DECLARE_SIMDELEGATE( protected,  bool, handleRenameObject, ( const char* newName, SimObject* object ) );
+
+      DECLARE_SIMSIGNAL( protected, onClearSelection, () );
 
       /// @}
 

@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiControl.h"
 
 #include "console/consoleTypes.h"
@@ -94,65 +95,65 @@ ConsoleDocClass( GuiControl,
    "@ingroup GuiCore\n"
 );
 
-IMPLEMENT_CALLBACK( GuiControl, onAdd, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onAdd, (), (),
    "Called when the control object is registered with the system after the control has been created." );
-IMPLEMENT_CALLBACK( GuiControl, onRemove, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onRemove, (), (),
    "Called when the control object is removed from the system before it is deleted." );
-IMPLEMENT_CALLBACK( GuiControl, onWake, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onWake, (), (),
    "Called when the control is woken up.\n"
    "@ref GuiControl_Waking" );
-IMPLEMENT_CALLBACK( GuiControl, onSleep, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onSleep, (), (),
    "Called when the control is put to sleep.\n"
    "@ref GuiControl_Waking" );
-IMPLEMENT_CALLBACK( GuiControl, onGainFirstResponder, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onGainFirstResponder, (), (),
    "Called when the control gains first responder status on the GuiCanvas.\n"
    "@see setFirstResponder\n"
    "@see makeFirstResponder\n"
    "@see isFirstResponder\n"
    "@ref GuiControl_FirstResponders" );
-IMPLEMENT_CALLBACK( GuiControl, onLoseFirstResponder, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onLoseFirstResponder, (), (),
    "Called when the control loses first responder status on the GuiCanvas.\n"
    "@see setFirstResponder\n"
    "@see makeFirstResponder\n"
    "@see isFirstResponder\n"
    "@ref GuiControl_FirstResponders" );
-IMPLEMENT_CALLBACK( GuiControl, onAction, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onAction, (), (),
    "Called when the control's associated action is triggered and no 'command' is defined for the control.\n"
    "@ref GuiControl_Actions" );
-IMPLEMENT_CALLBACK( GuiControl, onVisible, void, ( bool state ), ( state ),
+IMPLEMENT_SIMSIGNAL( GuiControl, onVisible, ( bool state ), ( state ),
    "Called when the control changes its visibility state, i.e. when going from visible to invisible or vice versa.\n"
    "@param state The new visibility state.\n"
    "@see isVisible\n"
    "@see setVisible\n"
    "@ref GuiControl_VisibleActive" );
-IMPLEMENT_CALLBACK( GuiControl, onActive, void, ( bool state ), ( state ),
+IMPLEMENT_SIMSIGNAL( GuiControl, onActive, ( bool state ), ( state ),
    "Called when the control changes its activeness state, i.e. when going from active to inactive or vice versa.\n"
    "@param stat The new activeness state.\n"
    "@see isActive\n"
    "@see setActive\n"
    "@ref GuiControl_VisibleActive" );
-IMPLEMENT_CALLBACK( GuiControl, onDialogPush, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onDialogPush, (), (),
    "Called when the control is pushed as a dialog onto the canvas.\n"
    "@see GuiCanvas::pushDialog" );
-IMPLEMENT_CALLBACK( GuiControl, onDialogPop, void, (), (),
+IMPLEMENT_SIMSIGNAL( GuiControl, onDialogPop, (), (),
    "Called when the control is removed as a dialog from the canvas.\n"
    "@see GuiCanvas::popDialog" );
-IMPLEMENT_CALLBACK( GuiControl, onControlDragEnter, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+IMPLEMENT_SIMSIGNAL( GuiControl, onControlDragEnter, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
    "Called when a drag&drop operation through GuiDragAndDropControl has entered the control.  This is only called for "
    "topmost visible controls as the GuiDragAndDropControl moves over them.\n\n"
    "@param control The payload of the drag operation.\n"
    "@param dropPoint The point at which the payload would be dropped if it were released now.  Relative to the canvas." );
-IMPLEMENT_CALLBACK( GuiControl, onControlDragExit, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+IMPLEMENT_SIMSIGNAL( GuiControl, onControlDragExit, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
    "Called when a drag&drop operation through GuiDragAndDropControl has exited the control and moved over a different control.  This is only called for "
    "topmost visible controls as the GuiDragAndDropControl moves off of them.\n\n"
    "@param control The payload of the drag operation.\n"
    "@param dropPoint The point at which the payload would be dropped if it were released now.  Relative to the canvas." );
-IMPLEMENT_CALLBACK( GuiControl, onControlDragged, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+IMPLEMENT_SIMSIGNAL( GuiControl, onControlDragged, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
    "Called when a drag&drop operation through GuiDragAndDropControl is moving across the control after it has entered it.  This is only called for "
    "topmost visible controls as the GuiDragAndDropControl moves across them.\n\n"
    "@param control The payload of the drag operation.\n"
    "@param dropPoint The point at which the payload would be dropped if it were released now.  Relative to the canvas." );
-IMPLEMENT_CALLBACK( GuiControl, onControlDropped, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+IMPLEMENT_SIMSIGNAL( GuiControl, onControlDropped, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
    "Called when a drag&drop operation through GuiDragAndDropControl has completed and is dropping its payload onto the control.  "
    "This is only called for topmost visible controls as the GuiDragAndDropControl drops its payload on them.\n\n"
    "@param control The control that is being dropped onto this control.\n"

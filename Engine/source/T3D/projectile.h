@@ -58,6 +58,7 @@ class Projectile;
 /// Datablock for projectiles.  This class is the base class for all other projectiles.
 class ProjectileData : public GameBaseData
 {
+   typedef ProjectileData privateThisClassType;
    typedef GameBaseData Parent;
 
 protected:
@@ -142,8 +143,8 @@ public:
    DECLARE_CONOBJECT(ProjectileData);
 
    
-   DECLARE_CALLBACK( void, onExplode, ( Projectile* proj, Point3F pos, F32 fade ) );
-   DECLARE_CALLBACK( void, onCollision, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ) );
+   DECLARE_SIMSIGNAL( public, onExplode, ( Projectile* proj, Point3F pos, F32 fade ) );
+   DECLARE_SIMSIGNAL( public, onCollision, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ) );
 };
 
 

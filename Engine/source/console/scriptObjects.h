@@ -38,7 +38,7 @@
 class ScriptObject : public SimObject
 {
    typedef SimObject Parent;
-
+   typedef ScriptObject privateThisClassType;
 public:
    ScriptObject();
    bool onAdd();
@@ -46,8 +46,8 @@ public:
 
    DECLARE_CONOBJECT(ScriptObject);
 
-   DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
-   DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
+   DECLARE_SIMSIGNAL( public, onAdd, (SimObjectId ID) );
+   DECLARE_SIMSIGNAL( public, onRemove, (SimObjectId ID));
 };
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ public:
 class ScriptTickObject : public ScriptObject, public virtual ITickable
 {
    typedef ScriptObject Parent;
-
+   typedef ScriptTickObject privateThisClassType;
 protected:
    bool mCallOnAdvanceTime;
 
@@ -73,9 +73,9 @@ public:
 
    DECLARE_CONOBJECT(ScriptTickObject);
 
-   DECLARE_CALLBACK(void, onInterpolateTick, (F32 delta) );
-   DECLARE_CALLBACK(void, onProcessTick, () );
-   DECLARE_CALLBACK(void, onAdvanceTime, (F32 timeDelta) );
+   DECLARE_SIMSIGNAL( public, onInterpolateTick, (F32 delta) );
+   DECLARE_SIMSIGNAL( public, onProcessTick, () );
+   DECLARE_SIMSIGNAL( public, onAdvanceTime, (F32 timeDelta) );
 };
 
 //-----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ public:
 class ScriptGroup : public SimGroup
 {
    typedef SimGroup Parent;
-   
+   typedef ScriptGroup privateThisClassType;
 public:
    ScriptGroup();
    bool onAdd();
@@ -93,8 +93,8 @@ public:
 
    DECLARE_CONOBJECT(ScriptGroup);
 
-   DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
-   DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
+   DECLARE_SIMSIGNAL( public, onAdd, (SimObjectId ID) );
+   DECLARE_SIMSIGNAL( public, onRemove, (SimObjectId ID));
 };
 
 #endif

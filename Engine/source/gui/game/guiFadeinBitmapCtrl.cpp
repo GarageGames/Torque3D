@@ -49,7 +49,8 @@ ConsoleDocClass( GuiFadeinBitmapCtrl,
    "@ingroup GuiCore\n"
 );
 
-IMPLEMENT_CALLBACK( GuiFadeinBitmapCtrl, click, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiFadeinBitmapCtrl, click, (),(),
+
    "@brief Informs the script level that this object received a Click event from the cursor or keyboard.\n\n"
    "@tsexample\n"
    "GuiFadeInBitmapCtrl::click(%this)\n"
@@ -60,7 +61,8 @@ IMPLEMENT_CALLBACK( GuiFadeinBitmapCtrl, click, void, (),(),
    "@see GuiCore\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiFadeinBitmapCtrl, onDone, void, (),(),
+IMPLEMENT_SIMSIGNAL( GuiFadeinBitmapCtrl, onDone, (),(),
+
    "@brief Informs the script level that this object has completed is fade cycle.\n\n"
    "@tsexample\n"
    "GuiFadeInBitmapCtrl::onDone(%this)\n"

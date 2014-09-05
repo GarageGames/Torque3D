@@ -42,6 +42,7 @@ class BaseMatInstance;
 
 class Prefab : public SceneObject
 {
+   typedef Prefab privateThisClassType;
    typedef SceneObject Parent;
    
    enum MaskBits 
@@ -109,7 +110,7 @@ protected:
    /// @name Callbacks
    /// @{
 
-   DECLARE_CALLBACK( void, onLoad, ( SimGroup *children ) );
+   DECLARE_SIMSIGNAL( protected, onLoad, ( SimGroup *children ) );
 
    /// @}
 
