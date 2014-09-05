@@ -733,8 +733,7 @@ protected:
                         ///
                         ///  @see Thread::State
       S32 sequence;     ///< The animation sequence which is running in this thread.
-	  F32 timescale;    ///< Timescale
-      U32 sound;        ///< Handle to sound.
+      F32 timescale;    ///< Timescale
       bool atEnd;       ///< Are we at the end of this thread?
       F32 position;
    };
@@ -1353,14 +1352,6 @@ public:
    /// @param   slot   Mount slot ID
    /// @param   timescale   Timescale
    bool setThreadTimeScale( U32 slot, F32 timeScale );
-
-   /// Start the sound associated with an animation thread
-   /// @param   thread   Thread
-   void startSequenceSound(Thread& thread);
-
-   /// Stop the sound associated with an animation thread
-   /// @param   thread   Thread
-   void stopThreadSound(Thread& thread);
 
    /// Advance all animation threads attached to this shapebase
    /// @param   dt   Change in time from last call to this function
