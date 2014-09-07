@@ -328,7 +328,10 @@ public:
       reset();
       
       if (mCode)
+      {
+         dFree(mCode->data);
          delete mCode;
+      }
    }
    
    U8 *allocCode(U32 sz);
