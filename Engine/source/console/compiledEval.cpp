@@ -45,6 +45,9 @@
 #include "materials/materialManager.h"
 #endif
 
+// Uncomment to optimize function calls at the expense of potential invalid package lookups
+//#define COMPILER_OPTIMIZE_FUNCTION_CALLS
+
 using namespace Compiler;
 
 enum EvalConstants {
@@ -1527,6 +1530,7 @@ breakContinue:
                break;
             }
             
+#ifdef COMPILER_OPTIMIZE_FUNCTION_CALLS
             // Now fall through to OP_CALLFUNC...
             // Now, rewrite our code a bit (ie, avoid future lookups) and fall
             // through to OP_CALLFUNC
@@ -1536,6 +1540,7 @@ breakContinue:
             code[ip+2] = ((U32)nsEntry);
 #endif
             code[ip-1] = OP_CALLFUNC;
+#endif
 
          case OP_CALLFUNC:
          {
@@ -1565,10 +1570,14 @@ breakContinue:
             {
                if( !nsEntry )
                {
+#ifdef COMPILER_OPTIMIZE_FUNCTION_CALLS
 #ifdef TORQUE_64
                   nsEntry = ((Namespace::Entry *) *((U64*)(code+ip-3)));
 #else
                   nsEntry = ((Namespace::Entry *) *(code+ip-3));
+#endif
+#else
+                  nsEntry = Namespace::global()->lookup( fnName );
 #endif
                   ns = NULL;
                }
