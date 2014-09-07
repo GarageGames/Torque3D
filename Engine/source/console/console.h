@@ -182,7 +182,8 @@ namespace Con
       /// 09/12/07 - CAF - 43->44 remove newmsg operator
       /// 09/27/07 - RDB - 44->45 Patch from Andreas Kirsch: Added opcode to support correct void return
       /// 01/13/09 - TMS - 45->46 Added script assert
-      DSOVersion = 46,
+      /// 09/07/14 - jamesu - 47->47 64bit support
+      DSOVersion = 47,
 
       MaxLineLength = 512,  ///< Maximum length of a line of console input.
       MaxDataTypes = 256    ///< Maximum number of registered data types.
