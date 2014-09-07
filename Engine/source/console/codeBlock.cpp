@@ -636,8 +636,7 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
    codeStream.emit(OP_RETURN);
    codeStream.emitCodeStream(&codeSize, &code, &lineBreakPairs);
    
-   
-   dumpInstructions(0, false);
+   //dumpInstructions(0, false);
    
    consoleAllocReset();
 
