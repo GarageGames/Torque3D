@@ -37,6 +37,9 @@ class DataChunker;
 #include "console/ast.h"
 #include "console/codeBlock.h"
 
+#ifndef _TVECTOR_H_
+#include "core/util/tVector.h"
+#endif
 
 namespace Compiler
 {
