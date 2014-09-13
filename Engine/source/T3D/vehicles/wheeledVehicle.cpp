@@ -311,6 +311,24 @@ WheeledVehicleData::WheeledVehicleData()
 
 
 //----------------------------------------------------------------------------
+bool WheeledVehicleData::preload(bool server, String &errorStr)
+{
+   if (!Parent::preload(server, errorStr))
+      return false;
+
+   // Resolve objects transmitted from server
+   if (!server) {
+      for (S32 i = 0; i < MaxSounds; i++)
+         if( !sfxResolve( &sound[ i ], errorStr ) )
+            return false;
+
+      if (tireEmitter)
+         Sim::findObject(SimObjectId(tireEmitter),tireEmitter);
+   }
+
+   return true;
+}
+
 /** Load the vehicle shape
    Loads and extracts information from the vehicle shape.
 
@@ -327,24 +345,14 @@ WheeledVehicleData::WheeledVehicleData()
 
    The steering and animation sequences are optional.
 */
-bool WheeledVehicleData::preload(bool server, String &errorStr)
+bool WheeledVehicleData::_loadShape(bool server, String &errorStr)
 {
-   if (!Parent::preload(server, errorStr))
+   if (!Parent::_loadShape(server, errorStr))
       return false;
 
    // A temporary shape instance is created so that we can
    // animate the shape and extract wheel information.
    TSShapeInstance* si = new TSShapeInstance(mShape, false);
-
-   // Resolve objects transmitted from server
-   if (!server) {
-      for (S32 i = 0; i < MaxSounds; i++)
-         if( !sfxResolve( &sound[ i ], errorStr ) )
-            return false;
-
-      if (tireEmitter)
-         Sim::findObject(SimObjectId(tireEmitter),tireEmitter);
-   }
 
    // Extract wheel information from the shape
    TSThread* thread = si->addThread();
@@ -408,9 +416,9 @@ bool WheeledVehicleData::preload(bool server, String &errorStr)
    }
 
    delete si;
+
    return true;
 }
-
 
 //----------------------------------------------------------------------------
 /** Find a matching lateral wheel

@@ -328,6 +328,16 @@ bool HoverVehicleData::preload(bool server, String &errorStr)
          Con::errorf( ConsoleLogEntry::General, "HoverVehicleData::preload Invalid packet, bad datablockId(dustTrailEmitter): 0x%x", dustTrailID );
       }
    }
+
+   return true;
+}
+
+
+bool HoverVehicleData::_loadShape(bool server, String &errorStr)
+{
+   if (Parent::_loadShape(server, errorStr) == false)
+      return false;
+
    // Resolve jet nodes
    for (S32 j = 0; j < MaxJetNodes; j++)
       jetNode[j] = mShape->findNode(sJetNode[j]);

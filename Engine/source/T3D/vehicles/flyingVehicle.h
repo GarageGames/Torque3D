@@ -108,6 +108,7 @@ struct FlyingVehicleData: public VehicleData {
    DECLARE_CONOBJECT(FlyingVehicleData);
    static void initPersistFields();
    bool preload(bool server, String &errorStr);
+   bool _loadShape(bool server, String &errorStr);
    void packData(BitStream* stream);
    void unpackData(BitStream* stream);
 };

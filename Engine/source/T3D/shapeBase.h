@@ -628,6 +628,12 @@ public:
    void computeAccelerator(U32 i);
    S32  findMountPoint(U32 n);
 
+   /// Initialise data related to our shapefile, such as finding named nodes
+   /// and collision meshes.
+   virtual bool _loadShape(bool server, String &errorStr);
+   /// Called when the shapeName field is changed from scripts.
+   static bool _setShapeName(void*, const char*, const char*);
+
    /// @name Infrastructure
    /// The derived class should provide the following:
    /// @{

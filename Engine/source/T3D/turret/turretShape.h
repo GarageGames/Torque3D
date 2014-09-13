@@ -91,7 +91,7 @@ public:
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
 
-   virtual bool preload(bool server, String &errorStr);
+   virtual bool _loadShape(bool server, String &errorStr);
 
    DECLARE_CALLBACK( void, onMountObject, ( TurretShape* turret, SceneObject* obj, S32 node ) );
    DECLARE_CALLBACK( void, onUnmountObject, ( TurretShape* turret, SceneObject* obj ) );

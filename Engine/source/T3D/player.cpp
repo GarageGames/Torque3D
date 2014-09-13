@@ -456,77 +456,6 @@ bool PlayerData::preload(bool server, String &errorStr)
       Con::printf("PlayerData:: Jump delay exceeds range (0-%d)",jumpDelay);
    }
 
-   // If we don't have a shape don't crash out trying to
-   // setup animations and sequences.
-   if ( mShape )
-   {
-      // Go ahead a pre-load the player shape
-      TSShapeInstance* si = new TSShapeInstance(mShape, false);
-      TSThread* thread = si->addThread();
-
-      // Extract ground transform velocity from animations
-      // Get the named ones first so they can be indexed directly.
-      ActionAnimation *dp = &actionList[0];
-      for (S32 i = 0; i < NumTableActionAnims; i++,dp++)
-      {
-         ActionAnimationDef *sp = &ActionAnimationList[i];
-         dp->name          = sp->name;
-         dp->dir.set(sp->dir.x,sp->dir.y,sp->dir.z);
-         dp->sequence      = mShape->findSequence(sp->name);
-
-         // If this is a sprint action and is missing a sequence, attempt to use
-         // the standard run ones.
-         if(dp->sequence == -1 && i >= SprintRootAnim && i <= SprintRightAnim)
-         {
-            S32 offset = i-SprintRootAnim;
-            ActionAnimationDef *standDef = &ActionAnimationList[RootAnim+offset];
-            dp->sequence = mShape->findSequence(standDef->name);
-         }
-
-         dp->velocityScale = true;
-         dp->death         = false;
-         if (dp->sequence != -1)
-            getGroundInfo(si,thread,dp);
-
-         // No real reason to spam the console about a missing jet animation
-         if (dStricmp(sp->name, "jet") != 0)
-            AssertWarn(dp->sequence != -1, avar("PlayerData::preload - Unable to find named animation sequence '%s'!", sp->name));
-      }
-      for (S32 b = 0; b < mShape->sequences.size(); b++)
-      {
-         if (!isTableSequence(b))
-         {
-            dp->sequence      = b;
-            dp->name          = mShape->getName(mShape->sequences[b].nameIndex);
-            dp->velocityScale = false;
-            getGroundInfo(si,thread,dp++);
-         }
-      }
-      actionCount = dp - actionList;
-      AssertFatal(actionCount <= NumActionAnims, "Too many action animations!");
-      delete si;
-
-      // Resolve lookAction index
-      dp = &actionList[0];
-      String lookName("look");
-      for (S32 c = 0; c < actionCount; c++,dp++)
-         if( dStricmp( dp->name, lookName ) == 0 )
-            lookAction = c;
-
-      // Resolve spine
-      spineNode[0] = mShape->findNode("Bip01 Pelvis");
-      spineNode[1] = mShape->findNode("Bip01 Spine");
-      spineNode[2] = mShape->findNode("Bip01 Spine1");
-      spineNode[3] = mShape->findNode("Bip01 Spine2");
-      spineNode[4] = mShape->findNode("Bip01 Neck");
-      spineNode[5] = mShape->findNode("Bip01 Head");
-
-      // Recoil animations
-      recoilSequence[0] = mShape->findSequence("light_recoil");
-      recoilSequence[1] = mShape->findSequence("medium_recoil");
-      recoilSequence[2] = mShape->findSequence("heavy_recoil");
-   }
-
    // Convert pickupRadius to a delta of boundingBox
    //
    // NOTE: it is not really correct to precalculate a pickupRadius based 
@@ -604,6 +533,84 @@ bool PlayerData::preload(bool server, String &errorStr)
       }
    }
 
+   return true;
+}
+
+bool PlayerData::_loadShape(bool server, String &errorStr)
+{
+   if(!Parent::_loadShape(server, errorStr))
+      return false;
+
+   // If we don't have a shape don't crash out trying to
+   // setup animations and sequences.
+   if ( mShape )
+   {
+      // Go ahead a pre-load the player shape
+      TSShapeInstance* si = new TSShapeInstance(mShape, false);
+      TSThread* thread = si->addThread();
+
+      // Extract ground transform velocity from animations
+      // Get the named ones first so they can be indexed directly.
+      ActionAnimation *dp = &actionList[0];
+      for (S32 i = 0; i < NumTableActionAnims; i++,dp++)
+      {
+         ActionAnimationDef *sp = &ActionAnimationList[i];
+         dp->name          = sp->name;
+         dp->dir.set(sp->dir.x,sp->dir.y,sp->dir.z);
+         dp->sequence      = mShape->findSequence(sp->name);
+
+         // If this is a sprint action and is missing a sequence, attempt to use
+         // the standard run ones.
+         if(dp->sequence == -1 && i >= SprintRootAnim && i <= SprintRightAnim)
+         {
+            S32 offset = i-SprintRootAnim;
+            ActionAnimationDef *standDef = &ActionAnimationList[RootAnim+offset];
+            dp->sequence = mShape->findSequence(standDef->name);
+         }
+
+         dp->velocityScale = true;
+         dp->death         = false;
+         if (dp->sequence != -1)
+            getGroundInfo(si,thread,dp);
+
+         // No real reason to spam the console about a missing jet animation
+         if (dStricmp(sp->name, "jet") != 0)
+            AssertWarn(dp->sequence != -1, avar("PlayerData::_loadShape - Unable to find named animation sequence '%s'!", sp->name));
+      }
+      for (S32 b = 0; b < mShape->sequences.size(); b++)
+      {
+         if (!isTableSequence(b))
+         {
+            dp->sequence      = b;
+            dp->name          = mShape->getName(mShape->sequences[b].nameIndex);
+            dp->velocityScale = false;
+            getGroundInfo(si,thread,dp++);
+         }
+      }
+      actionCount = dp - actionList;
+      AssertFatal(actionCount <= NumActionAnims, "Too many action animations!");
+      delete si;
+
+      // Resolve lookAction index
+      dp = &actionList[0];
+      String lookName("look");
+      for (S32 c = 0; c < actionCount; c++,dp++)
+         if( dStricmp( dp->name, lookName ) == 0 )
+            lookAction = c;
+
+      // Resolve spine
+      spineNode[0] = mShape->findNode("Bip01 Pelvis");
+      spineNode[1] = mShape->findNode("Bip01 Spine");
+      spineNode[2] = mShape->findNode("Bip01 Spine1");
+      spineNode[3] = mShape->findNode("Bip01 Spine2");
+      spineNode[4] = mShape->findNode("Bip01 Neck");
+      spineNode[5] = mShape->findNode("Bip01 Head");
+
+      // Recoil animations
+      recoilSequence[0] = mShape->findSequence("light_recoil");
+      recoilSequence[1] = mShape->findSequence("medium_recoil");
+      recoilSequence[2] = mShape->findSequence("heavy_recoil");
+   }
    return true;
 }
 

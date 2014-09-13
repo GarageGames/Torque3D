@@ -285,29 +285,89 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       }
    }
 
-   //
+   if(!_loadShape(server, errorStr))
+      return false;
+
+   if(!server)
+   {
+/*
+      // grab all the hud images
+      for(U32 i = 0; i < NumHudRenderImages; i++)
+      {
+         if(hudImageNameFriendly[i] && hudImageNameFriendly[i][0])
+            hudImageFriendly[i] = TextureHandle(hudImageNameFriendly[i], BitmapTexture);
+
+         if(hudImageNameEnemy[i] && hudImageNameEnemy[i][0])
+            hudImageEnemy[i] = TextureHandle(hudImageNameEnemy[i], BitmapTexture);
+      }
+*/
+   }
+
+   // Resolve CubeReflectorDesc.
+   if ( cubeDescName.isNotEmpty() )
+   {
+      Sim::findObject( cubeDescName, reflectorDesc );
+   }
+   else if( cubeDescId > 0 )
+   {
+      Sim::findObject( cubeDescId, reflectorDesc );
+   }
+
+   return !shapeError;
+}
+
+bool ShapeBaseData::_setShapeName(void *obj, const char *index, const char *data)
+{
+   ShapeBaseData *sbd = static_cast<ShapeBaseData*>(obj);
+
+   // We early-out here because _loadShape will be called inside preload() so
+   // we don't want to call it before then. However, we _do_ want the logic
+   // below to happen _after_ the datablock has been properly added - i.e.
+   // when changing the field in the editor.
+   if(!sbd->isProperlyAdded())
+      return true;
+
+   // Store the old shapename in case the new one doesn't work out.
+   const char *oldShapeName = sbd->shapeName;
+   sbd->shapeName = StringTable->insert(data);
+   String errorStr;
+   if(!sbd->_loadShape(true, errorStr))
+   {
+      Con::errorf(ConsoleLogEntry::General, "_loadShape failed for %s: %s.",
+                  sbd->getName(), errorStr.c_str());
+      sbd->shapeName = oldShapeName;
+   }
+
+   // For some reason, returning true here results in shapeName being set to
+   // "" after this call returns. Returning false prevents that from happening
+   // and leaves the field set.
+   return false;
+}
+
+bool ShapeBaseData::_loadShape(bool server, String &errorStr)
+{
    if (shapeName && shapeName[0]) {
       S32 i;
 
       // Resolve shapename
-      mShape = ResourceManager::get().load(shapeName);
-      if (bool(mShape) == false)
+      Resource<TSShape> shape = ResourceManager::get().load(shapeName);
+      if (bool(shape) == false)
       {
-         errorStr = String::ToString("ShapeBaseData: Couldn't load shape \"%s\"",shapeName);
+         errorStr = String::ToString("ShapeBaseData: Couldn't load shape \"%s\"", shapeName);
          return false;
       }
-      if(!server && !mShape->preloadMaterialList(mShape.getPath()) && NetConnection::filesWereDownloaded())
-         shapeError = true;
+      if(!server && !shape->preloadMaterialList(shape.getPath()) && NetConnection::filesWereDownloaded())
+         return false;
 
       if(computeCRC)
       {
          Con::printf("Validation required for shape: %s", shapeName);
 
-         Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(mShape.getPath());
+         Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode(shape.getPath());
 
          if (!fileRef)
          {
-            errorStr = String::ToString("ShapeBaseData: Couldn't load shape \"%s\"",shapeName);
+            errorStr = String::ToString("ShapeBaseData: Couldn't load shape \"%s\"", shapeName);
             return false;
          }
 
@@ -315,12 +375,19 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             mCRC = fileRef->getChecksum();
          else if(mCRC != fileRef->getChecksum())
          {
-            errorStr = String::ToString("Shape \"%s\" does not match version on server.",shapeName);
+            errorStr = String::ToString("Shape \"%s\" does not match version on server.", shapeName);
             return false;
          }
       }
+
+      mShape = shape;
+
       // Resolve details and camera node indexes.
       static const String sCollisionStr( "collision-" );
+
+      collisionDetails.clear();
+      collisionBounds.clear();
+      LOSDetails.clear();
 
       for (i = 0; i < mShape->details.size(); i++)
       {
@@ -413,33 +480,12 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       if (cameraMaxDist < w)
          cameraMaxDist = w;
    }
-
-   if(!server)
+   else
    {
-/*
-      // grab all the hud images
-      for(U32 i = 0; i < NumHudRenderImages; i++)
-      {
-         if(hudImageNameFriendly[i] && hudImageNameFriendly[i][0])
-            hudImageFriendly[i] = TextureHandle(hudImageNameFriendly[i], BitmapTexture);
-
-         if(hudImageNameEnemy[i] && hudImageNameEnemy[i][0])
-            hudImageEnemy[i] = TextureHandle(hudImageNameEnemy[i], BitmapTexture);
-      }
-*/
+      mShape = NULL;
    }
 
-   // Resolve CubeReflectorDesc.
-   if ( cubeDescName.isNotEmpty() )
-   {
-      Sim::findObject( cubeDescName, reflectorDesc );
-   }
-   else if( cubeDescId > 0 )
-   {
-      Sim::findObject( cubeDescId, reflectorDesc );
-   }
-
-   return !shapeError;
+   return true;
 }
 
 bool ShapeBaseData::_setMass( void* object, const char* index, const char* data )
@@ -478,7 +524,8 @@ void ShapeBaseData::initPersistFields()
 
    addGroup( "Render" );
 
-      addField( "shapeFile", TypeShapeFilename, Offset(shapeName, ShapeBaseData),
+      addProtectedField("shapeFile", TypeShapeFilename, Offset(shapeName, ShapeBaseData),
+         &_setShapeName, &defaultProtectedGetFn,
          "The DTS or DAE model to use for this object." );
 
    endGroup( "Render" );

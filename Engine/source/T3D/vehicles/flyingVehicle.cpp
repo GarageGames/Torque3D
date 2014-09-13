@@ -128,8 +128,6 @@ bool FlyingVehicleData::preload(bool server, String &errorStr)
    if (!Parent::preload(server, errorStr))
       return false;
 
-   TSShapeInstance* si = new TSShapeInstance(mShape, false);
-
    // Resolve objects transmitted from server
    if (!server) {
       for (S32 i = 0; i < MaxSounds; i++)
@@ -140,6 +138,19 @@ bool FlyingVehicleData::preload(bool server, String &errorStr)
          if (jetEmitter[j])
             Sim::findObject(SimObjectId(jetEmitter[j]),jetEmitter[j]);
    }
+
+   //
+   maxSpeed = maneuveringForce / minDrag;
+
+   return true;
+}
+
+bool FlyingVehicleData::_loadShape(bool server, String &errorStr)
+{
+   if (!Parent::_loadShape(server, errorStr))
+      return false;
+
+   TSShapeInstance* si = new TSShapeInstance(mShape, false);
 
    // Extract collision planes from shape collision detail level
    if (collisionDetails[0] != -1)
@@ -152,14 +163,12 @@ bool FlyingVehicleData::preload(bool server, String &errorStr)
       si->buildPolyList(&polyList,collisionDetails[0]);
    }
 
+   delete si;
+
    // Resolve jet nodes
    for (S32 j = 0; j < MaxJetNodes; j++)
       jetNode[j] = mShape->findNode(sJetNode[j]);
 
-   //
-   maxSpeed = maneuveringForce / minDrag;
-
-   delete si;
    return true;
 }
 

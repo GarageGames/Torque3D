@@ -344,6 +344,7 @@ struct PlayerData: public ShapeBaseData {
    DECLARE_CONOBJECT(PlayerData);
    PlayerData();
    bool preload(bool server, String &errorStr);
+   bool _loadShape(bool server, String &errorStr);
    void getGroundInfo(TSShapeInstance*,TSThread*,ActionAnimation*);
    bool isTableSequence(S32 seq);
    bool isJumpAction(U32 action);

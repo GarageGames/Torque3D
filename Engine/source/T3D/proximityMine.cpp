@@ -143,6 +143,15 @@ bool ProximityMineData::preload( bool server, String& errorStr )
          Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", sfxErrorStr.c_str() );
    }
 
+   return true;
+}
+
+
+bool ProximityMineData::_loadShape( bool server, String& errorStr )
+{
+   if ( Parent::_loadShape( server, errorStr ) == false )
+      return false;
+
    if ( mShape )
    {
       // Lookup animation sequences
@@ -152,6 +161,7 @@ bool ProximityMineData::preload( bool server, String& errorStr )
 
    return true;
 }
+
 
 void ProximityMineData::packData( BitStream* stream )
 {

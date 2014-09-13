@@ -59,6 +59,7 @@ public:
    DECLARE_CONOBJECT( ProximityMineData );
    static void initPersistFields();
    bool preload( bool server, String& errorStr );
+   bool _loadShape( bool server, String& errorStr );
    virtual void packData( BitStream* stream );
    virtual void unpackData( BitStream* stream );
 };
