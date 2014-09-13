@@ -931,7 +931,6 @@ ShapeBase::ShapeBase()
    for (i = 0; i < MaxScriptThreads; i++) {
       mScriptThread[i].sequence = -1;
       mScriptThread[i].thread = 0;
-      mScriptThread[i].sound = 0;
       mScriptThread[i].state = Thread::Stop;
       mScriptThread[i].atEnd = false;
 	   mScriptThread[i].timescale = 1.f;
@@ -2162,7 +2161,6 @@ bool ShapeBase::setThreadSequence(U32 slot, S32 seq, bool reset)
          if (!st.thread)
             st.thread = mShapeInstance->addThread();
          mShapeInstance->setSequence(st.thread,seq,0);
-         stopThreadSound(st);
          updateThread(st);
       }
       return true;
@@ -2189,7 +2187,6 @@ void ShapeBase::updateThread(Thread& st)
 				}
 
 				mShapeInstance->setTimeScale( st.thread, 0.f );
-				stopThreadSound( st );
 			} break;
 
 		case Thread::Play:
@@ -2199,7 +2196,6 @@ void ShapeBase::updateThread(Thread& st)
 					mShapeInstance->setTimeScale(st.thread,1);
 					mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
 					mShapeInstance->setTimeScale(st.thread,0);
-					stopThreadSound(st);
                st.state = Thread::Stop;
 				}
 				else
@@ -2211,16 +2207,11 @@ void ShapeBase::updateThread(Thread& st)
 					}
 
 					mShapeInstance->setTimeScale(st.thread, st.timescale );
-					if (!st.sound)
-					{
-						startSequenceSound(st);
-					}
 				}
 			} break;
 
       case Thread::Destroy:
          {
-				stopThreadSound(st);
             st.atEnd = true;
             st.sequence = -1;
             if(st.thread)
@@ -2326,19 +2317,6 @@ bool ShapeBase::setThreadTimeScale( U32 slot, F32 timeScale )
 		return true;
 	}
 	return false;
-}
-
-void ShapeBase::stopThreadSound(Thread& thread)
-{
-   if (thread.sound) {
-   }
-}
-
-void ShapeBase::startSequenceSound(Thread& thread)
-{
-   if (!isGhost() || !thread.thread)
-      return;
-   stopThreadSound(thread);
 }
 
 void ShapeBase::advanceThreads(F32 dt)
