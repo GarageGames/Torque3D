@@ -70,10 +70,41 @@ namespace Compiler
 
    //------------------------------------------------------------
 
+#ifdef TORQUE_CPU_X64
+     // Fixed unsafe conversion from pointer to U32. @todo x64 revise
+     U32 u32toSTEId = 0;
+     typedef Map< U32, StringTableEntry > U32toSteMap;
+     U32toSteMap u32toSTEMap;
+
+     StringTableEntry U32toSTE( U32 u )
+     {
+         // @todo x64 Added thread-safe convertion.
+         const U32toSteMap::Iterator result = u32toSTEMap.find( u );
+         AssertFatal( result != u32toSTEMap.end( ),
+         "Don't converted U32 to STE. See evalSTEtoU32()." );
+         return result->value;
+     }
+
+     U32 evalSTEtoU32( StringTableEntry ste, U32 )
+     {
+         // @todo x64 Added thread-safe convertion.
+         u32toSTEMap.insert( u32toSTEId++, ste );
+         return (u32toSTEId - 1); // pointer to inserted
+     }
+
+#else
+
+    StringTableEntry U32toSTE(U32 u)
+    {
+        return *((StringTableEntry *) &u);
+    }
+
    U32 evalSTEtoU32(StringTableEntry ste, U32)
    {
       return *((U32 *) &ste);
    }
+
+#endif
 
    U32 compileSTEtoU32(StringTableEntry ste, U32 ip)
    {
