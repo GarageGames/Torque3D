@@ -144,7 +144,11 @@ if(WIN32)
     # warning C4244: 'initializing' : conversion from 'XXX' to 'XXX', possible loss of data
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4244")
 
-    link_directories($ENV{DXSDK_DIR}/Lib/x86)
+    if( TORQUE_CPU_X64 )
+        link_directories($ENV{DXSDK_DIR}/Lib/x64)
+    else()
+        link_directories($ENV{DXSDK_DIR}/Lib/x86)
+    endif()
 endif()
 
 ###############################################################################
