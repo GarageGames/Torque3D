@@ -92,6 +92,23 @@ void Platform::setMathControlStateKnown()
    }
 }
 
+#else
+
+U32 Platform::getMathControlState( )
+{
+   // @todo x64 See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+   return 0;
+}
+
+void Platform::setMathControlState( U32 state )
+{
+   // @todo x64 See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+}
+
+void Platform::setMathControlStateKnown( )
+{
+   // @todo x64 See http://msdn.microsoft.com/en-us/library/c9676k6h.aspx
+}
 
 #endif
 

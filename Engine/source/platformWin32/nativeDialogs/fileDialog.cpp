@@ -113,7 +113,7 @@ static UINT_PTR CALLBACK FolderHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPA
             SendMessage(hParent, CDM_HIDECONTROL, cmb1, 0);
             SendMessage(hParent, CDM_HIDECONTROL, stc2, 0);
 
-            LONG oldProc = SetWindowLong(hParent, GWL_WNDPROC, (LONG)OKBtnFolderHackProc);
+            LONG oldProc = SetWindowLong(hParent, GWLP_WNDPROC, (LONG)OKBtnFolderHackProc);
             SetProp(hParent, dT("OldWndProc"), (HANDLE)oldProc);
             SetProp(hParent, dT("OFN"), (HANDLE)lpofn);
          }
