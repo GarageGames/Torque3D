@@ -729,9 +729,7 @@ protected:
          Play, Stop, Pause, Destroy
       };
       TSThread* thread; ///< Pointer to 3space data.
-      U32 state;        ///< State of the thread
-                        ///
-                        ///  @see Thread::State
+      State state;      ///< State of the thread
       S32 sequence;     ///< The animation sequence which is running in this thread.
       F32 timescale;    ///< Timescale
       bool atEnd;       ///< Are we at the end of this thread?
