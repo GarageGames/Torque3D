@@ -566,7 +566,7 @@ void SceneManager::scopeScene( CameraScopeQuery* query, NetConnection* netConnec
 
    // Scope all objects in the query area.
 
-   Box3F area( query->visibleDistance );
+   Box3F area( 2 * query->visibleDistance );
    area.setCenter( query->pos );
 
    getContainer()->findObjects( area, 0xFFFFFFFF, _scopeCallback, &info );
