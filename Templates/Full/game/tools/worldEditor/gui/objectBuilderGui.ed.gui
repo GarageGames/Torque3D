@@ -862,6 +862,14 @@ function ObjectBuilderGui::buildParticleEmitterNode(%this)
    %this.process();
 }
 
+function ObjectBuilderGui::buildRibbonNode(%this)
+{
+   %this.objectClassName = "RibbonNode";
+   %this.addField("dataBlock", "TypeDataBlock", "datablock", "RibbonNodeData");
+   %this.addField("ribbon",   "TypeDataBlock", "Ribbon data", "RibbonData");
+   %this.process();
+}
+
 function ObjectBuilderGui::buildParticleSimulation(%this)
 {
    %this.objectClassName = "ParticleSimulation";
