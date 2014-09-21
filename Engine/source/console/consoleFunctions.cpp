@@ -1517,11 +1517,12 @@ ConsoleFunction( realQuit, void, 1, 1, "" )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
+DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message, S32 status ), (0),
    "Display an error message box showing the given @a message and then shut down the engine and exit its process.\n"
    "This function cleanly uninitialized the engine and then exits back to the system with a process "
    "exit status indicating an error.\n\n"
-   "@param message The message to log to the console and show in an error message box.\n\n"
+   "@param message The message to log to the console and show in an error message box.\n"
+   "@param status  The status code to return to the OS.\n\n"
    "@see quit\n\n"
    "@ingroup Platform" )
 {
@@ -1532,7 +1533,20 @@ DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
    //    as the script code should not be allowed to pretty much hard-crash the engine
    //    and prevent proper shutdown.  Changed this to use postQuitMessage.
    
-   Platform::postQuitMessage( -1 );
+   Platform::postQuitMessage( status );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( quitWithStatus, void, ( S32 status ), (0),
+   "Shut down the engine and exit its process.\n"
+   "This function cleanly uninitializes the engine and then exits back to the system with a given "
+   "return status code.\n\n"
+   "@param status The status code to return to the OS.\n\n"
+   "@see quitWithErrorMessage\n\n"
+   "@ingroup Platform" )
+{
+   Platform::postQuitMessage(status);
 }
 
 //-----------------------------------------------------------------------------

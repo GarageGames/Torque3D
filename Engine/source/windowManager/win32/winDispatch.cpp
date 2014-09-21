@@ -450,7 +450,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 		// Quit indicates that we're not going to receive anymore Win32 messages.
 		// Therefore, it's appropriate to flag our event loop for exit as well,
 		// since we won't be getting any more messages.
-		Process::requestShutdown();
+		Process::requestShutdown((S32)wParam);
 		break;
 				  }
 
