@@ -285,7 +285,7 @@ Net::Error getLastError()
       return Net::UnknownError;
    }
 #else
-   if (errno == EAGAIN)
+   if (errno == EAGAIN || errno == EINPROGRESS)
       return Net::WouldBlock;
    if (errno == 0)
       return Net::NoError;
@@ -458,7 +458,7 @@ void Net::closeConnectTo(NetSocket sock)
    closeSocket(sock);
 }
 
-Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, S32  bufferSize)
+Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, S32  bufferSize, S32 *outBytesWritten)
 {
    if(Journal::IsPlaying())
    {
@@ -468,7 +468,7 @@ Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, S32  bufferSize
       return (Net::Error) e;
    }
 
-   Net::Error e = send(socket, buffer, bufferSize);
+   Net::Error e = send(socket, buffer, bufferSize, outBytesWritten);
 
    if(Journal::IsRecording())
       Journal::Write(U32(e));
@@ -914,17 +914,12 @@ Net::Error Net::setBlocking(NetSocket socket, bool blockingIO)
    return getLastError();
 }
 
-Net::Error Net::send(NetSocket socket, const U8 *buffer, S32 bufferSize)
+Net::Error Net::send(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *outBytesWritten)
 {
    errno = 0;
    S32 bytesWritten = ::send(socket, (const char*)buffer, bufferSize, 0);
-   if(bytesWritten == -1)
-#if defined(TORQUE_USE_WINSOCK)
-      Con::errorf("Could not write to socket. Error: %s",strerror_wsa( WSAGetLastError() ));
-#else
-      Con::errorf("Could not write to socket. Error: %s",strerror(errno));
-#endif
-
+   if (outBytesWritten)
+      *outBytesWritten = bytesWritten;
    return getLastError();
 }
 

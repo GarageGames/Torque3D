@@ -27,6 +27,10 @@
 #include "console/simBase.h"
 #endif
 
+#ifndef _SIMPLEDATAQUEUE_H_
+#include "core/util/simpleDataQueue.h"
+#endif
+
 #include "platform/platformNet.h"
 
 class TCPObject : public SimObject
@@ -54,6 +58,8 @@ protected:
    U8 *mBuffer;
    U32 mBufferSize;
    U16 mPort;
+   
+   SimpleDataQueue mSendQueue;
 
 public:
    TCPObject();
@@ -81,12 +87,16 @@ public:
 
    bool processArguments(S32 argc, const char **argv);
    void send(const U8 *buffer, U32 bufferLen);
+   void processSendBuffer();
    void addToTable(NetSocket newTag);
    void removeFromTable();
 
    void setPort(U16 port) { mPort = port; }
 
    bool onAdd();
+
+
+   static void updateSends(); ///< Updates send buffers for all active TCPObjects
 
    DECLARE_CONOBJECT(TCPObject);
 

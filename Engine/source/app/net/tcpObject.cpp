@@ -186,13 +186,25 @@ void TCPObject::removeFromTable()
    }
 }
 
+void TCPObject::updateSends()
+{
+   SimSet *tcpSet = Sim::getTCPGroup();
+   SimSet::iterator i;
+   for (i = tcpSet->begin(); i != tcpSet->end(); i++)
+   {
+      TCPObject *tcp = (TCPObject*)(*i);
+      tcp->processSendBuffer();
+   }
+}
+
 void processConnectedReceiveEvent(NetSocket sock, RawData incomingData);
 void processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress);
 void processConnectedNotifyEvent( NetSocket sock, U32 state );
 
 S32 gTCPCount = 0;
 
-TCPObject::TCPObject()
+TCPObject::TCPObject() :
+mSendQueue(8192)
 {
    mBuffer = NULL;
    mBufferSize = 0;
@@ -370,6 +382,7 @@ void TCPObject::finishLastLine()
 void TCPObject::onDisconnect()
 {
    finishLastLine();
+   mSendQueue.clear();
    mState = Disconnected;
    onDisconnect_callback();
 }
@@ -385,6 +398,7 @@ void TCPObject::connect(const char *address)
 {
    NetSocket newTag = Net::openConnectTo(address);
    addToTable(newTag);
+   mSendQueue.clear();
 }
 
 void TCPObject::disconnect()
@@ -397,7 +411,40 @@ void TCPObject::disconnect()
 
 void TCPObject::send(const U8 *buffer, U32 len)
 {
-   Net::sendtoSocket(mTag, buffer, S32(len));
+   // Add to send buffer
+   mSendQueue.write(len, buffer);
+   processSendBuffer();
+}
+
+void TCPObject::processSendBuffer()
+{
+   // Send more bytes from line buffer
+   U8 buffer[4096];
+   U32 bytesToCopy = mSendQueue.size();
+
+   while (bytesToCopy != 0)
+   {
+      U32 bytesToWrite = mSendQueue.copyToBuffer(buffer, sizeof(buffer));
+      S32 bytesWritten = 0;
+
+      // No bytes? No problem.
+      if (bytesToWrite == 0)
+         return;
+
+      Net::Error e = Net::send(mTag, buffer, bytesToWrite, &bytesWritten);
+      if (e == Net::NoError) // usually means the queue is full
+      {
+         mSendQueue.expendBuffer(bytesWritten);
+         bytesToCopy -= bytesWritten;
+      }
+      else
+      {
+         break;
+      }
+
+      if (bytesWritten == 0)
+         break;
+   }
 }
 
 DefineEngineMethod(TCPObject, send, void, (const char *data),, 
