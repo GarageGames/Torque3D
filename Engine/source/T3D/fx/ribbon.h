@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -38,8 +38,6 @@
 #include "materials/materialParameters.h"
 #include "math/util/matrixSet.h"
 
-#define RIBBON_NUM_FIELDS 4
-
 //--------------------------------------------------------------------------
 class RibbonData : public GameBaseData
 {
@@ -50,18 +48,25 @@ protected:
 
 public:
 
-   U32 mRibbonLength; ///< The amount of segments that will make up the ribbon.
-   F32 mSizes[RIBBON_NUM_FIELDS]; ///< The radius for each keyframe.
-   ColorF mColours[RIBBON_NUM_FIELDS]; ///< The colour of the ribbon for each keyframe.
-   F32 mTimes[RIBBON_NUM_FIELDS]; ///< The relative time for each keyframe.
-   StringTableEntry mMatName; ///< The material for the ribbon.
-   bool mUseFadeOut; ///< If true, the ribbon will fade away after deletion.
-   F32 mFadeAwayStep; ///< How quickly the ribbons is faded away after deletion.
-   S32 segmentsPerUpdate; ///< Amount of segments to add each update.
-   F32 mTileScale; ///< A scalar to scale the texcoord.
-   bool mFixedTexcoords; ///< If true, texcoords will stay the same over the lifetime for each segment.
-   bool mTexcoordsRelativeToDistance; ///< If true, texcoords will not be stretched if the distance between 2 segments are long.
+   enum Constants
+   {
+      NumFields = 4
+   };
+
+   F32 mSizes[NumFields];      ///< The radius for each keyframe.
+   ColorF mColours[NumFields]; ///< The colour of the ribbon for each keyframe.
+   F32 mTimes[NumFields];      ///< The relative time for each keyframe.
+
+   U32 mRibbonLength;      ///< The amount of segments that will make up the ribbon.
+   S32 segmentsPerUpdate;  ///< Amount of segments to add each update.
    S32 mSegmentSkipAmount; ///< The amount of segments to skip each time segments are added.
+
+   bool mUseFadeOut;          ///< If true, the ribbon will fade away after deletion.
+   F32 mFadeAwayStep;         ///< How quickly the ribbons is faded away after deletion.
+   StringTableEntry mMatName; ///< The material for the ribbon.
+   F32 mTileScale;            ///< A scalar to scale the texcoord.
+   bool mFixedTexcoords;      ///< If true, texcoords will stay the same over the lifetime for each segment.
+   bool mTexcoordsRelativeToDistance; ///< If true, texcoords will not be stretched if the distance between 2 segments are long.
 
    RibbonData();
 
@@ -77,21 +82,25 @@ public:
 class Ribbon : public GameBase
 {
    typedef GameBase Parent;
+
    RibbonData* mDataBlock;
+
+   bool mDeleteOnEnd;   ///< If true, the ribbon should delete itself as soon as the last segment is deleted
+   bool mUseFadeOut;    ///< If true, the ribbon will fade away upon deletion
+   F32 mFadeAwayStep;   ///< How quickly the ribbons is faded away after deletion.
+   F32 mFadeOut;
+   F32 mTravelledDistance; ///< How far the ribbon has travelled in it's lifetime.
+
    Vector<Point3F> mSegmentPoints; ///< The points in space where the ribbon has spawned segments.
+   U32 mSegmentOffset;
+   U32 mSegmentIdx;
+
+   bool mUpdateBuffers; ///< If true, the vertex buffers need to be updated.
    BaseMatInstance *mRibbonMat;
    MaterialParameterHandle* mRadiusSC;
    MaterialParameterHandle* mRibbonProjSC;
    GFXPrimitiveBufferHandle primBuffer;
    GFXVertexBufferHandle<GFXVertexPCNTT> verts;
-   bool mUpdateBuffers; ///< If true, the vertex buffers need to be updated.
-   bool mDeleteOnEnd; ///< If true, the ribbon should delete itself as soon as the last segment is deleted
-   bool mUseFadeOut; ///< If true, the ribbon will fade away upon deletion
-   F32 mFadeAwayStep; ///< How quickly the ribbons is faded away after deletion.
-   F32 mFadeOut;
-   U32 mSegmentOffset;
-   U32 mSegmentIdx;
-   F32 mTravelledDistance; ///< How far the ribbon has travelled in it's lifetime.
 
 protected:
 
@@ -102,10 +111,11 @@ protected:
 
    // Rendering
    void prepRenderImage(SceneRenderState *state);
+   void setShaderParams();
 
    ///Checks to see if ribbon is too long
    U32 checkRibbonDistance(S32 segments);
-   void setShaderParams();
+
    /// Construct the vertex and primitive buffers
    void createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVertexPCNTT> &verts, GFXPrimitiveBufferHandle &pb, U32 segments);
 
@@ -116,11 +126,16 @@ public:
    DECLARE_CONOBJECT(Ribbon);
    static void initPersistFields();
    bool onNewDataBlock(GameBaseData*,bool);
-   void addSegmentPoint(Point3F &point, MatrixF &mat);  ///< Used to add another segment to the ribbon.
-   void clearSegments() { mSegmentPoints.clear(); } ///< Delete all segments.
-   void deleteOnEnd(); ///< Delete the ribbon when all segments have been deleted.
    void onRemove();
 
+   /// Used to add another segment to the ribbon.
+   void addSegmentPoint(Point3F &point, MatrixF &mat);
+
+   /// Delete all segments.
+   void clearSegments() { mSegmentPoints.clear(); }
+
+   /// Delete the ribbon when all segments have been deleted.
+   void deleteOnEnd();
 };
 
 #endif // _H_RIBBON

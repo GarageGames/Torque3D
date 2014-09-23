@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -47,7 +47,7 @@ IMPLEMENT_CO_NETOBJECT_V1(Ribbon);
 //
 RibbonData::RibbonData()
 {
-   for (U8 i = 0; i < RIBBON_NUM_FIELDS; i++) {
+   for (U8 i = 0; i < NumFields; i++) {
       mSizes[i] = 0.0f;
       mColours[i].set(0.0f, 0.0f, 0.0f, 1.0f);
       mTimes[i] = -1.0f;
@@ -70,32 +70,38 @@ void RibbonData::initPersistFields()
 {
    Parent::initPersistFields();
 
-   addField("size", TypeF32, Offset(mSizes, RibbonData), RIBBON_NUM_FIELDS, 
+   addGroup("Ribbon");
+
+   addField("size", TypeF32, Offset(mSizes, RibbonData), NumFields,
       "The size of the ribbon at the specified keyframe.");
-   addField("color", TypeColorF, Offset(mColours, RibbonData), RIBBON_NUM_FIELDS,
+   addField("color", TypeColorF, Offset(mColours, RibbonData), NumFields,
       "The colour of the ribbon at the specified keyframe.");
-   addField("position", TypeF32, Offset(mTimes, RibbonData), RIBBON_NUM_FIELDS,
+   addField("position", TypeF32, Offset(mTimes, RibbonData), NumFields,
       "The position of the keyframe along the lifetime of the ribbon.");
-   addField("RibbonLength", TypeS32, Offset(mRibbonLength, RibbonData),
+
+   addField("ribbonLength", TypeS32, Offset(mRibbonLength, RibbonData),
       "The amount of segments the Ribbon can maximally have in length.");
-   addField("UseFadeOut", TypeBool, Offset(mUseFadeOut, RibbonData),
-      "If true, the ribbon will fade away after deletion.");
-   addField("RibbonMaterial", TypeString, Offset(mMatName, RibbonData),
-      "The material the ribbon uses for rendering.");
-   addField("fadeAwayStep", TypeF32, Offset(mFadeAwayStep, RibbonData),
-      "How much to fade the ribbon with each update, after deletion.");
    addField("segmentsPerUpdate", TypeS32, Offset(segmentsPerUpdate, RibbonData),
       "How many segments to add each update.");
-   addField("tileScale", TypeF32, Offset(mTileScale, RibbonData), 
+   addField("skipAmount", TypeS32, Offset(mSegmentSkipAmount, RibbonData),
+      "The amount of segments to skip each update.");
+
+   addField("useFadeOut", TypeBool, Offset(mUseFadeOut, RibbonData),
+      "If true, the ribbon will fade away after deletion.");
+   addField("fadeAwayStep", TypeF32, Offset(mFadeAwayStep, RibbonData),
+      "How much to fade the ribbon with each update, after deletion.");
+   addField("ribbonMaterial", TypeString, Offset(mMatName, RibbonData),
+      "The material the ribbon uses for rendering.");
+   addField("tileScale", TypeF32, Offset(mTileScale, RibbonData),
       "How much to scale each 'tile' with, where 1 means the material is stretched"
       "across the whole ribbon. (If TexcoordsRelativeToDistance is true, this is in meters.)");
    addField("fixedTexcoords", TypeBool, Offset(mFixedTexcoords, RibbonData),
       "If true, this prevents 'floating' texture coordinates.");
-   addField("skipAmount", TypeS32, Offset(mSegmentSkipAmount, RibbonData),
-      "The amount of segments to skip each update.");
-   addField("TexcoordsRelativeToDistance", TypeBool, Offset(mTexcoordsRelativeToDistance, RibbonData),
+   addField("texcoordsRelativeToDistance", TypeBool, Offset(mTexcoordsRelativeToDistance, RibbonData),
       "If true, texture coordinates are scaled relative to distance, this prevents"
       "'stretched' textures.");
+
+   endGroup("Ribbon");
 }
 
 
@@ -122,7 +128,7 @@ void RibbonData::packData(BitStream* stream)
 {
    Parent::packData(stream);
 
-   for (U8 i = 0; i < RIBBON_NUM_FIELDS; i++) {
+   for (U8 i = 0; i < NumFields; i++) {
       stream->write(mSizes[i]);
       stream->write(mColours[i]);
       stream->write(mTimes[i]);
@@ -142,7 +148,7 @@ void RibbonData::unpackData(BitStream* stream)
 {
    Parent::unpackData(stream);
 
-   for (U8 i = 0; i < RIBBON_NUM_FIELDS; i++) {
+   for (U8 i = 0; i < NumFields; i++) {
       stream->read(&mSizes[i]);
       stream->read(&mColours[i]);
       stream->read(&mTimes[i]);
@@ -558,7 +564,7 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
       F32 tRadius = mDataBlock->mSizes[0];
       ColorF tColor = mDataBlock->mColours[0];
 
-      for (U8 j = 0; j < RIBBON_NUM_FIELDS-1; j++) {
+      for (U8 j = 0; j < RibbonData::NumFields-1; j++) {
 
          F32 curPosition = mDataBlock->mTimes[j];
          F32 curRadius = mDataBlock->mSizes[j];

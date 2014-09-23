@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -37,11 +37,8 @@ class RibbonNodeData : public GameBaseData
 {
    typedef GameBaseData Parent;
 
-   //-------------------------------------- Console set variables
 public:
    F32 timeMultiple;
-
-   //-------------------------------------- load set variables
 
 public:
    RibbonNodeData();
