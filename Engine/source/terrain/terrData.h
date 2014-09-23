@@ -74,6 +74,8 @@ protected:
       NextFreeMask = Parent::NextFreeMask << 6,
    };
 
+public:
+
    enum BaseTexFormat
    {
       NONE, DDS, PNG, JPG
@@ -93,6 +95,8 @@ protected:
          return "";
       }
    };
+
+protected:
 
    Box3F mBounds;
 
@@ -235,7 +239,8 @@ protected:
    // Protected fields
    static bool _setTerrainFile( void *obj, const char *index, const char *data );
    static bool _setSquareSize( void *obj, const char *index, const char *data );
-   static bool _setBaseTexSize( void *obj, const char *index, const char *data );
+   static bool _setBaseTexSize(void *obj, const char *index, const char *data);
+   static bool _setBaseTexFormat(void *obj, const char *index, const char *data);
    static bool _setLightMapSize( void *obj, const char *index, const char *data );
 
 public:

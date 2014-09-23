@@ -174,6 +174,18 @@ ConsoleFunction(getTerrainUnderWorldPoint, S32, 2, 4, "(Point3F x/y/z) Gets the 
 }
 
 
+typedef TerrainBlock::BaseTexFormat baseTexFormat;
+DefineEnumType(baseTexFormat);
+
+ImplementEnumType(baseTexFormat,
+   "Description\n"
+   "@ingroup ?\n\n")
+{ TerrainBlock::NONE, "NONE", "No cached terrain.\n" },
+{ TerrainBlock::DDS, "DDS", "Cache the terrain in a DDS format.\n" },
+{ TerrainBlock::PNG, "PNG", "Cache the terrain in a PNG format.\n" },
+{ TerrainBlock::JPG, "JPG", "Cache the terrain in a JPG format.\n" },
+EndImplementEnumType;
+
 TerrainBlock::TerrainBlock()
  : mSquareSize( 1.0f ),
    mCastShadows( true ),
@@ -265,6 +277,27 @@ bool TerrainBlock::_setBaseTexSize( void *obj, const char *index, const char *da
    {
       terrain->mBaseTexSize = texSize;
       terrain->setMaskBits( MaterialMask );
+   }
+
+   return false;
+}
+
+bool TerrainBlock::_setBaseTexFormat(void *obj, const char *index, const char *data)
+{
+   TerrainBlock *terrain = static_cast<TerrainBlock*>(obj);
+
+   EngineEnumTable eTable = _baseTexFormat::_sEnumTable;
+
+   for (U8 i = 0; i < eTable.getNumValues(); i++)
+   {
+      if (strcasecmp(eTable[i].mName, data) == 0)
+      {
+         terrain->mBaseTexFormat = (BaseTexFormat)eTable[i].mInt;
+         terrain->_updateMaterials();
+         terrain->_updateLayerTexture();
+         terrain->_updateBaseTexture(true);
+         break;
+      }
    }
 
    return false;
@@ -1104,6 +1137,10 @@ void TerrainBlock::initPersistFields()
       addProtectedField( "baseTexSize", TypeS32, Offset( mBaseTexSize, TerrainBlock ),
          &TerrainBlock::_setBaseTexSize, &defaultProtectedGetFn,
          "Size of base texture size per meter." );
+
+      addProtectedField("baseTexFormat", TYPEID<baseTexFormat>(), Offset(mBaseTexFormat, TerrainBlock),
+         &TerrainBlock::_setBaseTexFormat, &defaultProtectedGetFn,
+         "");
 
       addProtectedField( "lightMapSize", TypeS32, Offset( mLightMapSize, TerrainBlock ),
          &TerrainBlock::_setLightMapSize, &defaultProtectedGetFn,
