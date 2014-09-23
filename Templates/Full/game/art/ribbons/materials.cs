@@ -24,7 +24,7 @@
 
 //Basic ribbon shader/////////////////////////////////////////////
  
-new ShaderData( basicRibbonShader )
+new ShaderData( BasicRibbonShader )
 {
    DXVertexShaderFile   = "shaders/common/ribbons/basicRibbonShaderV.hlsl";
    DXPixelShaderFile    = "shaders/common/ribbons/basicRibbonShaderP.hlsl";
@@ -32,9 +32,9 @@ new ShaderData( basicRibbonShader )
    pixVersion = 2.0;
 };
  
-singleton CustomMaterial( basicRibbonMat )
+singleton CustomMaterial( BasicRibbonMat )
 {
-   shader = basicRibbonShader;
+   shader = BasicRibbonShader;
    version = 2.0;
    
    emissive[0] = true;
@@ -51,17 +51,17 @@ singleton CustomMaterial( basicRibbonMat )
 
 //Texture ribbon shader/////////////////////////////////////////////
  
-new ShaderData( texRibbonShader )
+new ShaderData( TexturedRibbonShader )
 {
-   DXVertexShaderFile   = "shaders/common/ribbons/texRibbonShaderV.hlsl";
-   DXPixelShaderFile    = "shaders/common/ribbons/texRibbonShaderP.hlsl";
+   DXVertexShaderFile   = "shaders/common/ribbons/TexturedRibbonShaderV.hlsl";
+   DXPixelShaderFile    = "shaders/common/ribbons/TexturedRibbonShaderP.hlsl";
  
    pixVersion = 2.0;
 };
  
-singleton CustomMaterial( texRibbonMat )
+singleton CustomMaterial( TexturedRibbonMat )
 {
-   shader = texRibbonShader;
+   shader = TexturedRibbonShader;
    version = 2.0;
    
    emissive[0] = true;

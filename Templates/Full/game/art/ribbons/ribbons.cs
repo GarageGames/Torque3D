@@ -27,7 +27,7 @@ datablock RibbonNodeData(DefaultRibbonNodeData)
 
 //ribbon data////////////////////////////////////////
 
-datablock RibbonData(basicRibbon)
+datablock RibbonData(BasicRibbon)
 {
    size[0] = 0.5;
    color[0] = "1.0 0.0 0.0 1.0";
@@ -40,12 +40,12 @@ datablock RibbonData(basicRibbon)
    RibbonLength = 40;
    fadeAwayStep = 0.1;
    UseFadeOut = true;
-   RibbonMaterial = basicRibbonMat;
+   RibbonMaterial = BasicRibbonMat;
 };
 
-datablock RibbonData(texRibbon)
+datablock RibbonData(TexturedRibbon)
 {
-   RibbonMaterial = texRibbonMat;
+   RibbonMaterial = TexturedRibbonMat;
    size[0] = 0.5;
    color[0] = "1.0 1.0 1.0 1.0";
    position[0] = 0.0;
