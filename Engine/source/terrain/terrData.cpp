@@ -186,6 +186,7 @@ TerrainBlock::TerrainBlock()
    mCell( NULL ),
    mCRC( 0 ),
    mBaseTexSize( 1024 ),
+   mBaseTexFormat( TerrainBlock::JPG ),
    mBaseMaterial( NULL ),
    mDefaultMatInst( NULL ),
    mBaseTexScaleConst( NULL ),
@@ -961,7 +962,7 @@ String TerrainBlock::_getBaseTexCacheFileName() const
 {
    Torque::Path basePath( mTerrFileName );
    basePath.setFileName( basePath.getFileName() + "_basetex" );
-   basePath.setExtension( "dds" );
+   basePath.setExtension( formatToExtension(mBaseTexFormat) );
    return basePath.getFullPath();
 }
 
@@ -1200,7 +1201,7 @@ void TerrainBlock::unpackUpdate(NetConnection* con, BitStream *stream)
       {
          mBaseTexSize = baseTexSize;
          if ( isProperlyAdded() )
-            _updateBaseTexture( false );
+            _updateBaseTexture( NONE );
       }
 
       U32 lightMapSize;

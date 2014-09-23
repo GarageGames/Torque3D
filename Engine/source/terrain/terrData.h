@@ -74,6 +74,26 @@ protected:
       NextFreeMask = Parent::NextFreeMask << 6,
    };
 
+   enum BaseTexFormat
+   {
+      NONE, DDS, PNG, JPG
+   };
+
+   static const char* formatToExtension(BaseTexFormat format)
+   {
+      switch (format)
+      {
+      case DDS:
+         return "dds";
+      case PNG:
+         return "png";
+      case JPG:
+         return "jpg";
+      default:
+         return "";
+      }
+   };
+
    Box3F mBounds;
 
    ///
@@ -131,6 +151,8 @@ protected:
 
    /// The desired size for the base texture.
    U32 mBaseTexSize;
+
+   BaseTexFormat mBaseTexFormat;
 
    ///
    TerrCell *mCell;
