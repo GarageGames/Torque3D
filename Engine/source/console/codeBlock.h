@@ -38,7 +38,6 @@ private:
    static CodeBlock* smCurrentCodeBlock;
    
 public:
-   static U32                       smBreakLineCount;
    static bool                      smInFunction;
    static Compiler::ConsoleParser * smCurrentParser;
 
