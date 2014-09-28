@@ -36,8 +36,9 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    // Called before a test starts.
    virtual void OnTestStart( const ::testing::TestInfo& testInfo )
    {
-      Con::printf("> Starting Test '%s.%s'",
-         testInfo.test_case_name(), testInfo.name());
+      if( mVerbose )
+         Con::printf("> Starting Test '%s.%s'",
+            testInfo.test_case_name(), testInfo.name());
    }
 
    // Called after a failed assertion or a SUCCEED() invocation.
@@ -45,13 +46,13 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    {
       if ( testPartResult.failed() )
       {
-         Con::warnf(">> Failed with '%s' in '%s' at (line:%d)",
+         Con::warnf(">> Failed with '%s' in '%s' at (line:%d)\n",
             testPartResult.summary(),
             testPartResult.file_name(),
             testPartResult.line_number()
             );
       }
-      else
+      else if( mVerbose )
       {
          Con::printf(">> Passed with '%s' in '%s' at (line:%d)",
             testPartResult.summary(),
@@ -64,9 +65,15 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    // Called after a test ends.
    virtual void OnTestEnd( const ::testing::TestInfo& testInfo )
    {
-      Con::printf("> Ending Test '%s.%s'\n",
-         testInfo.test_case_name(), testInfo.name());
+      if( mVerbose )
+         Con::printf("> Ending Test '%s.%s'\n",
+            testInfo.test_case_name(), testInfo.name());
    }
+
+   bool mVerbose;
+
+public:
+   TorqueUnitTestListener( bool verbose ) : mVerbose( verbose ) {}
 };
 
 DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
@@ -113,7 +120,7 @@ DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
    }
 
    // Add the Torque unit test listener.
-   listeners.Append( new TorqueUnitTestListener );
+   listeners.Append( new TorqueUnitTestListener(false) );
 
    // Perform googletest run.
    Con::printf( "\nUnit Tests Starting...\n" );
