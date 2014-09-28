@@ -72,6 +72,7 @@ switch( T3D_Generator::$platform )
 addEngineSrcDir('platform/threads');
 addEngineSrcDir('platform/threads/test');
 addEngineSrcDir('platform/async');
+addEngineSrcDir('platform/async/test');
 addEngineSrcDir('platform/input');
 addEngineSrcDir('platform/output');
 addEngineSrcDir('app');
