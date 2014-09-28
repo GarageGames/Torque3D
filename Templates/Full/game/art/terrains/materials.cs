@@ -49,9 +49,34 @@ new TerrainMaterial()
    diffuseSize = "200";
 };
 
+singleton Material(TerrainFX_grass2)  
+{  
+   mapTo = "grass2";  
+   footstepSoundId = 0;  
+   terrainMaterials = "1";  
+   ShowDust = "1";  
+   showFootprints = "1"; 
+   materialTag0 = "Terrain"; 
+   effectColor[0] = "0.42 0.42 0 1";
+   effectColor[1] = "0.42 0.42 0 1";
+   impactSoundId = "0";
+};  
+
+new TerrainMaterial()
+{
+   internalName = "grass2";
+   diffuseMap = "art/terrains/Example/grass2";
+   detailMap = "art/terrains/Example/grass2_d";
+   detailSize = "10";
+   isManaged = "1";
+   detailBrightness = "1";
+   Enabled = "1";
+   diffuseSize = "200";
+};
+
 singleton Material(TerrainFX_grass1dry)  
 {  
-   mapTo = "grass1-dry";  
+   mapTo = "grass1_dry";
    footstepSoundId = 0;  
    terrainMaterials = "1";  
    ShowDust = "1";  
@@ -62,9 +87,9 @@ singleton Material(TerrainFX_grass1dry)
 
 new TerrainMaterial()
 {
-   internalName = "grass1-dry";
-   diffuseMap = "art/terrains/Example/grass1-dry";
-   detailMap = "art/terrains/Example/grass1-dry_d";
+   internalName = "grass1_dry";
+   diffuseMap = "art/terrains/Example/grass1_dry";
+   detailMap = "art/terrains/Example/grass1_dry_d";
    detailSize = "10";
    detailDistance = "100";
    isManaged = "1";
@@ -76,14 +101,13 @@ new TerrainMaterial()
 
 singleton Material(TerrainFX_dirt_grass)  
 {  
-   mapTo = "dirt_grass";  
+   mapTo = "dirt_grass";
    footstepSoundId = 0;  
    terrainMaterials = "1";  
    ShowDust = "1";  
    showFootprints = "1";
    materialTag0 = "Terrain";  
    effectColor[0] = "0.63 0.55 0 1";
-   effectColor[1] = "0.63 0.55 0 0";
 };  
 
 new TerrainMaterial()
@@ -129,6 +153,36 @@ new TerrainMaterial()
    diffuseSize = "400";
 };
 
+// ----------------------------------------------------------------------------
+// Sample rock
+// ----------------------------------------------------------------------------
+
+singleton Material(TerrainFX_stone)  
+{  
+   mapTo = "stone";  
+   footstepSoundId = "1";  
+   terrainMaterials = "1";  
+   ShowDust = "1";  
+   showFootprints = "1"; 
+   materialTag0 = "Terrain"; 
+   impactSoundId = "1";
+   effectColor[0] = "0.25 0.25 0.25 1";
+   effectColor[1] = "0.25 0.25 0.25 0";
+};  
+
+new TerrainMaterial()
+{
+   internalName = "stone";
+   diffuseMap = "art/terrains/Example/stone";
+   detailMap = "art/terrains/Example/stone_d";
+   detailSize = "10";
+   detailDistance = "100";
+   isManaged = "1";
+   detailBrightness = "1";
+   Enabled = "1";
+   diffuseSize = "400";
+   useSideProjection = "0";
+};
 // ----------------------------------------------------------------------------
 // Sample sand
 // ----------------------------------------------------------------------------
