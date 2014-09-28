@@ -339,10 +339,6 @@ if(TORQUE_HYDRA)
     include( "modules/module_hydra.cmake" )
 endif()
 
-if(TORQUE_DISABLE_MEMORY_MANAGER)
-    addDef(TORQUE_DISABLE_MEMORY_MANAGER)
-endif()
-
 if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
 endif()
@@ -456,11 +452,10 @@ finishExecutable()
 ###############################################################################
 ###############################################################################
 
+message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
+CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
+
 # configure the relevant files only once
-if(NOT EXISTS "${projectSrcDir}/torqueConfig.h")
-    message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
-    CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
-endif()
 if(NOT EXISTS "${projectSrcDir}/torque.ico")
     CONFIGURE_FILE("${cmakeDir}/torque.ico" "${projectSrcDir}/torque.ico" COPYONLY)
 endif()
