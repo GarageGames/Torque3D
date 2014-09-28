@@ -44,7 +44,7 @@ addEngineSrcDir('core/util/test');
 addEngineSrcDir('core/util/journal');
 addEngineSrcDir('core/util/journal/test');
 addEngineSrcDir('core/util/zip');
-addEngineSrcDir('core/util/zip/unitTests');
+addEngineSrcDir('core/util/zip/test');
 addEngineSrcDir('core/util/zip/compressors');
 addEngineSrcDir('i18n');
 addEngineSrcDir('sim');

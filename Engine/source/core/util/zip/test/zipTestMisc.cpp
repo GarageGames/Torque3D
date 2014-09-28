@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
+/*
 #include "core/crc.h"
 #include "core/strings/stringFunctions.h"
 #include "core/util/zip/zipArchive.h"
@@ -194,3 +194,4 @@ private:
       return ret;
    }
 };
+*/

@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
+/*
 #include "core/strings/stringFunctions.h"
 #include "core/util/zip/zipArchive.h"
 #include "core/util/zip/unitTests/zipTest.h"
@@ -242,3 +242,4 @@ bail:
       return ret;
    }
 };
+*/

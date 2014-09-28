@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
+/*
 #include "platform/platform.h"
 
 #include "unit/test.h"
@@ -250,3 +250,4 @@ private:
       return ret;
    }
 };
+*/
