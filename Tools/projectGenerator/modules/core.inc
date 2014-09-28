@@ -48,8 +48,6 @@ addEngineSrcDir('core/util/zip/test');
 addEngineSrcDir('core/util/zip/compressors');
 addEngineSrcDir('i18n');
 addEngineSrcDir('sim');
-addEngineSrcDir('unit/tests');
-addEngineSrcDir('unit');
 addEngineSrcDir('util');
 addEngineSrcDir('windowManager');
 addEngineSrcDir('windowManager/torque');
