@@ -91,9 +91,9 @@ public:
          << "Pointer to dependent interface is NULL";
       if( mpU32 )
       {
-         EXPECT_TRUE( *(*mpU32) & ( 1 << 24 ))
+         EXPECT_TRUE( *(*mpU32) & ( 1 << 24 ) )
             << "Pointer to interface data is bogus.";
-         EXPECT_TRUE( *(*mpU32) != *mMyId)
+         EXPECT_TRUE( *(*mpU32) != *mMyId )
             << "Two of me have the same ID, bad!";
       }
    }
@@ -114,20 +114,20 @@ TEST(SimComponent, Composition)
    CachedInterfaceExampleComponent *componentB = new CachedInterfaceExampleComponent();
 
    // Register sub-components
-   EXPECT_TRUE( componentA->registerObject())
+   EXPECT_TRUE( componentA->registerObject() )
       << "Failed to register componentA";
-   EXPECT_TRUE( componentB->registerObject())
+   EXPECT_TRUE( componentB->registerObject() )
       << "Failed to register componentB";
 
    // Add the components
-   EXPECT_TRUE( testComponent->addComponent( componentA ))
+   EXPECT_TRUE( testComponent->addComponent( componentA ) )
       << "Failed to add component a to testComponent";
-   EXPECT_TRUE( testComponent->addComponent( componentB ))
+   EXPECT_TRUE( testComponent->addComponent( componentB ) )
       << "Failed to add component b to testComponent";
 
-   EXPECT_EQ( componentA->getOwner(), testComponent)
+   EXPECT_EQ( componentA->getOwner(), testComponent )
       << "testComponent did not properly set the mOwner field of componentA to NULL.";
-   EXPECT_EQ( componentB->getOwner(), testComponent)
+   EXPECT_EQ( componentB->getOwner(), testComponent )
       << "testComponent did not properly set the mOwner field of componentB to NULL.";
 
    // Register the object with the simulation, kicking off the interface registration
