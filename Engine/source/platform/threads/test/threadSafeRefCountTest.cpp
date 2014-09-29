@@ -105,7 +105,7 @@ TEST(ThreadSafeRefCount, Concurrent)
    };
 
    mRef = new TestObject;
-   EXPECT_EQ(mRef->getRefCount(), 2); // increments of 2
+   EXPECT_EQ(2, mRef->getRefCount()); // increments of 2
 
    Vector<TestThread*> threads;
    threads.setSize(NUM_THREADS);
@@ -122,8 +122,8 @@ TEST(ThreadSafeRefCount, Concurrent)
    for (U32 i = 0; i < NUM_THREADS; i++)
       threads[i]->join();
 
-   Con::printf("REF: %i", mRef->getRefCount());
-   EXPECT_EQ(mRef->getRefCount(), 2 + ((NUM_ADD_REFS_PER_THREAD + NUM_EXTRA_REFS_PER_THREAD) * NUM_THREADS * 2));
+   EXPECT_EQ(2 + ((1 + NUM_ADD_REFS_PER_THREAD + NUM_EXTRA_REFS_PER_THREAD) * NUM_THREADS * 2),
+             mRef->getRefCount());
 
    // Run phase 2: release references.
    for (U32 i = 0; i < NUM_THREADS; i++)
@@ -136,7 +136,7 @@ TEST(ThreadSafeRefCount, Concurrent)
       delete threads[i];
    }
 
-   EXPECT_EQ(mRef->getRefCount(), 2); // increments of two
+   EXPECT_EQ(2, mRef->getRefCount()); // increments of two
 
    mRef = NULL;
 }
@@ -148,7 +148,7 @@ TEST(ThreadSafeRefCount, Tagging)
 
    TestObjectRef ref;
    EXPECT_FALSE(ref.isTagged());
-   EXPECT_TRUE(bool(ref));
+   EXPECT_FALSE(bool(ref));
    EXPECT_FALSE(bool(ref.ptr()));
 
    EXPECT_TRUE(ref.trySetFromTo(ref, NULL));

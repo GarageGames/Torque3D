@@ -47,10 +47,10 @@ public:
 public:
    //////////////////////////////////////////////////////////////////////////
 
-   virtual void registerInterfaces( const SimComponent *owner )
+   virtual void registerInterfaces( SimComponent *owner )
    {
       // Register a cached interface for this 
-      registerCachedInterface( NULL, "aU32", this, &mMyId );
+      owner->registerCachedInterface( NULL, "aU32", this, &mMyId );
    }
 
    //////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ public:
       ComponentInterfaceList list;
 
       // Enumerate the interfaces on the owner, only ignore interfaces that this object owns
-      if( !_getOwner()->getInterfaces( &list, NULL, "aU32", this, true ) )
+      if( !owner->getInterfaces( &list, NULL, "aU32", this, true ) )
          return false;
 
       // Sanity check before just assigning all willy-nilly
@@ -131,23 +131,19 @@ TEST(SimComponent, Composition)
       << "testComponent did not properly set the mOwner field of componentB to NULL.";
 
    // Register the object with the simulation, kicking off the interface registration
-   const bool registered = testComponent->registerObject();
-   EXPECT_TRUE( registered )
+   ASSERT_TRUE( testComponent->registerObject() )
       << "Failed to register testComponent";
 
-   // Interface tests
-   if( registered )
    {
-      {
-         SCOPED_TRACE("componentA");
-         componentA->unit_test();
-      }
-      {
-         SCOPED_TRACE("componentB");
-         componentB->unit_test();
-      }
-      testComponent->deleteObject();
+      SCOPED_TRACE("componentA");
+      componentA->unit_test();
    }
+   {
+      SCOPED_TRACE("componentB");
+      componentB->unit_test();
+   }
+
+   testComponent->deleteObject();
 };
 
 #endif

@@ -86,6 +86,7 @@ DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
 
    "@param testSpecs A space-sepatated list of filters for test cases. "
    "See https://code.google.com/p/googletest/wiki/AdvancedGuide#Running_a_Subset_of_the_Tests "
+   "and http://stackoverflow.com/a/14021997/945863 "
    "for a description of the flag format.")
 {
    S32 testArgc = 0;

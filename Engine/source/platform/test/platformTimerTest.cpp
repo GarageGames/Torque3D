@@ -40,7 +40,7 @@ TEST(Platform, Sleep)
    U32 start = Platform::getRealMilliseconds();
    Platform::sleep(500);
    U32 end = Platform::getRealMilliseconds();
-   EXPECT_GE(end - start, 500)
+   EXPECT_GE(end - start, 500-10) // account for clock resolution
       << "We didn't sleep at least as long as we requested!";
 };
 
