@@ -27,42 +27,23 @@
 #include "core/util/tVector.h"
 #include "console/console.h"
 
-TEST(ThreadSafeRefCount, Serial)
+FIXTURE(ThreadSafeRefCount)
 {
-   struct TestObject : public ThreadSafeRefCount<TestObject>
+public:
+   struct TestObjectDtor : public ThreadSafeRefCount<TestObjectDtor>
    {
       bool &flag;
-      TestObject(bool &f) : flag(f)
+      TestObjectDtor(bool &f) : flag(f)
       {
          flag = false;
       }
-      ~TestObject()
+      ~TestObjectDtor()
       {
          flag = true;
       }
    };
-   typedef ThreadSafeRef<TestObject> TestObjectRef;
+   typedef ThreadSafeRef<TestObjectDtor> TestObjectDtorRef;
 
-   bool deleted = false;
-   TestObjectRef ref1 = new TestObject(deleted);
-   ASSERT_FALSE(deleted);
-   EXPECT_FALSE(ref1->isShared());
-   EXPECT_TRUE(ref1 != NULL);
-
-   TestObjectRef ref2 = ref1;
-   EXPECT_TRUE(ref1->isShared());
-   EXPECT_TRUE(ref2->isShared());
-   EXPECT_EQ(ref1, ref2);
-
-   ref1 = NULL;
-   EXPECT_FALSE(ref2->isShared());
-
-   ref2 = NULL;
-   ASSERT_TRUE(deleted);
-}
-
-TEST(ThreadSafeRefCount, Concurrent)
-{
    enum
    {
       NUM_ADD_REFS_PER_THREAD = 10,
@@ -72,7 +53,6 @@ TEST(ThreadSafeRefCount, Concurrent)
    
    class TestObject : public ThreadSafeRefCount<TestObject> {};
    typedef ThreadSafeRef<TestObject> TestObjectRef;
-   TestObjectRef mRef;
    
    class TestThread : public Thread
    {
@@ -104,7 +84,31 @@ TEST(ThreadSafeRefCount, Concurrent)
       } 
    };
 
-   mRef = new TestObject;
+};
+
+TEST_FIX(ThreadSafeRefCount, Serial)
+{
+   bool deleted = false;
+   TestObjectDtorRef ref1 = new TestObjectDtor(deleted);
+   ASSERT_FALSE(deleted);
+   EXPECT_FALSE(ref1->isShared());
+   EXPECT_TRUE(ref1 != NULL);
+
+   TestObjectDtorRef ref2 = ref1;
+   EXPECT_TRUE(ref1->isShared());
+   EXPECT_TRUE(ref2->isShared());
+   EXPECT_EQ(ref1, ref2);
+
+   ref1 = NULL;
+   EXPECT_FALSE(ref2->isShared());
+
+   ref2 = NULL;
+   ASSERT_TRUE(deleted);
+}
+
+TEST_FIX(ThreadSafeRefCount, Concurrent)
+{
+   TestObjectRef mRef = new TestObject;
    EXPECT_EQ(2, mRef->getRefCount()); // increments of 2
 
    Vector<TestThread*> threads;
@@ -141,11 +145,8 @@ TEST(ThreadSafeRefCount, Concurrent)
    mRef = NULL;
 }
 
-TEST(ThreadSafeRefCount, Tagging)
+TEST_FIX(ThreadSafeRefCount, Tagging)
 {
-   struct TestObject : public ThreadSafeRefCount<TestObject> {};
-   typedef ThreadSafeRef<TestObject> TestObjectRef;
-
    TestObjectRef ref;
    EXPECT_FALSE(ref.isTagged());
    EXPECT_FALSE(bool(ref));

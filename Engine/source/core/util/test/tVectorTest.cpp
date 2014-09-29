@@ -25,22 +25,40 @@
 #include "core/util/tVector.h"
 
 // Define some test data used below.
-static const S32 ints[] = {0, 10, 2, 3, 14, 4, 12, 6, 16, 7, 8, 1, 11, 5, 13, 9, 15};
-static const U32 length = sizeof(ints) / sizeof(S32);
-static S32 QSORT_CALLBACK sortInts(const S32* a, const S32* b)
+FIXTURE(Vector)
 {
-   S32 av = *a;
-   S32 bv = *b;
-      
-   if (av < bv)
-      return -1;
-   else if (av > bv)
-      return 1;
-   else
-      return 0;
-}
+public:
+   struct Dtor
+   {
+      bool* ptr;
+      Dtor() {} // Needed for vector increment.
+      Dtor(bool* ptr): ptr(ptr) {}
+      ~Dtor()
+      {
+         *ptr = true;
+      }
+   };
 
-TEST(Vector, Allocation)
+   static const S32 ints[];
+   static const U32 length;
+   static S32 QSORT_CALLBACK sortInts(const S32* a, const S32* b)
+   {
+      S32 av = *a;
+      S32 bv = *b;
+
+      if (av < bv)
+         return -1;
+      else if (av > bv)
+         return 1;
+      else
+         return 0;
+   }
+};
+
+const S32 VectorFixture::ints[] = {0, 10, 2, 3, 14, 4, 12, 6, 16, 7, 8, 1, 11, 5, 13, 9, 15};
+const U32 VectorFixture::length = sizeof(VectorFixture::ints) / sizeof(S32);
+
+TEST_FIX(Vector, Allocation)
 {
    Vector<S32> *vector = new Vector<S32>;
    for (S32 i = 0; i < 1000; i++)
@@ -57,19 +75,8 @@ TEST(Vector, Allocation)
    delete vector;
 }
 
-TEST(Vector, Deallocation)
+TEST_FIX(Vector, Deallocation)
 {
-   struct Dtor
-   {
-      bool* ptr;
-      Dtor() {} // Needed for vector increment.
-      Dtor(bool* ptr): ptr(ptr) {}
-      ~Dtor()
-      {
-         *ptr = true;
-      }
-   };
-
    bool dtorVals[10];
    Vector<Dtor> v;
 
@@ -101,7 +108,7 @@ TEST(Vector, Deallocation)
          << "Element " << i << "'s destructor was not called";
 }
 
-TEST(Vector, Sorting)
+TEST_FIX(Vector, Sorting)
 {
    Vector<S32> v;
 

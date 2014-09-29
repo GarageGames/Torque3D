@@ -26,8 +26,9 @@
 #include "console/console.h"
 #include "core/util/tVector.h"
 
-TEST(ThreadPool, BasicAPI)
+FIXTURE(ThreadPool)
 {
+public:
    // Represents a single unit of work. In this test we just set an element in
    // a result vector.
    struct TestItem : public ThreadPool::WorkItem
@@ -43,7 +44,10 @@ TEST(ThreadPool, BasicAPI)
          mResults[mIndex] = mIndex;
       }
    };
+};
 
+TEST_FIX(ThreadPool, BasicAPI)
+{
    // Construct the vector of results from the work items.
    const U32 numItems = 100;
    Vector<U32> results(__FILE__, __LINE__);

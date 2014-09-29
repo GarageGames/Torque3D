@@ -28,57 +28,10 @@
 #include "core/util/tVector.h"
 #include "console/console.h"
 
-// Test deque without concurrency.
-TEST(ThreadSafeDeque, PopFront)
+FIXTURE(ThreadSafeDeque)
 {
-   ThreadSafeDeque<char> deque;
-   String str = "teststring";
-
-   for(U32 i = 0; i < str.length(); i++)
-      deque.pushBack(str[i]);
-
-   EXPECT_FALSE(deque.isEmpty());
-   
-   char ch;
-   for(U32 i = 0; i < str.length(); i++)
-   {
-      EXPECT_TRUE(deque.tryPopFront(ch));
-      EXPECT_EQ(str[i], ch);
-   }
-
-   ASSERT_TRUE(deque.isEmpty());
-}
-
-TEST(ThreadSafeDeque, PopBack)
-{
-   ThreadSafeDeque<char> deque;
-   String str = "teststring";
-
-   const char* p1 = str.c_str() + 4;
-   const char* p2 = p1 + 1;
-   while(*p2)
-   {
-      deque.pushFront(*p1);
-      deque.pushBack(*p2);
-      --p1;
-      ++p2;
-   }
-
-   char ch;
-   for(S32 i = str.length()-1; i >= 0; i--)
-   {
-      EXPECT_TRUE(deque.tryPopBack(ch));
-      EXPECT_EQ(str[i], ch);
-   }
-
-   ASSERT_TRUE(deque.isEmpty());
-}
-
-// Test deque in a concurrent setting.
-TEST(ThreadSafeDeque, Concurrent1)
-{
-   const U32 NumValues = 100;
-
+public:
+   // Used by the concurrent test.
    struct Value : public ThreadSafeRefCount<Value>
    {
       U32 mIndex;
@@ -121,9 +74,6 @@ TEST(ThreadSafeDeque, Concurrent1)
       }
    };
 
-   Deque mDeque;
-   Vector<U32> mValues;
-
    struct ProducerThread : public Thread
    {
       Vector<U32>& mValues;
@@ -163,6 +113,61 @@ TEST(ThreadSafeDeque, Concurrent1)
          }
       }
    };
+};
+
+// Test deque without concurrency.
+TEST_FIX(ThreadSafeDeque, PopFront)
+{
+   ThreadSafeDeque<char> deque;
+   String str = "teststring";
+
+   for(U32 i = 0; i < str.length(); i++)
+      deque.pushBack(str[i]);
+
+   EXPECT_FALSE(deque.isEmpty());
+
+   char ch;
+   for(U32 i = 0; i < str.length(); i++)
+   {
+      EXPECT_TRUE(deque.tryPopFront(ch));
+      EXPECT_EQ(str[i], ch);
+   }
+
+   ASSERT_TRUE(deque.isEmpty());
+}
+
+TEST_FIX(ThreadSafeDeque, PopBack)
+{
+   ThreadSafeDeque<char> deque;
+   String str = "teststring";
+
+   const char* p1 = str.c_str() + 4;
+   const char* p2 = p1 + 1;
+   while(*p2)
+   {
+      deque.pushFront(*p1);
+      deque.pushBack(*p2);
+      --p1;
+      ++p2;
+   }
+
+   char ch;
+   for(S32 i = str.length()-1; i >= 0; i--)
+   {
+      EXPECT_TRUE(deque.tryPopBack(ch));
+      EXPECT_EQ(str[i], ch);
+   }
+
+   ASSERT_TRUE(deque.isEmpty());
+}
+
+// Test deque in a concurrent setting.
+TEST_FIX(ThreadSafeDeque, Concurrent1)
+{
+   const U32 NumValues = 100;
+
+   Deque mDeque;
+   Vector<U32> mValues;
 
    mValues.setSize(NumValues);
 

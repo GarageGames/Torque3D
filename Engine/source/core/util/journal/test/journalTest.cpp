@@ -25,22 +25,78 @@
 #include "core/util/journal/journaledSignal.h"
 #include "core/util/safeDelete.h"
 
-TEST(Journal, BasicAPI)
+FIXTURE(Journal)
 {
+public:
+   // Used for basic API test.
    struct receiver
    {
-      U32 lastTriggerValue;
-      void triggerReceiver(U16 msg)
+      U16 lastTriggerValue;
+      void trigger(U16 msg)
       {
          lastTriggerValue = msg;
       }
-   } rec;
+   };
 
+   // Used for non-basic test.
+   typedef JournaledSignal<void(U32, U16)> EventA;
+   typedef JournaledSignal<void(U8, S8)> EventB;
+   typedef JournaledSignal<void(U32, S32)> EventC;
+
+   // Root, non-dynamic signal receiver.
+   struct multiReceiver {
+      U32 recvA, recvB, recvC;
+
+      EventA *dynamicA;
+      EventB *dynamicB;
+      EventC *dynamicC;
+
+      void receiverRoot(U8 msg)
+      {
+         if(msg==1)
+         {
+            dynamicA = new EventA();
+            dynamicA->notify(this, &multiReceiver::receiverA);
+         }
+
+         if(msg==2)
+         {
+            dynamicB = new EventB();
+            dynamicB->notify(this, &multiReceiver::receiverB);
+         }
+
+         if(msg==3)
+         {
+            dynamicC = new EventC();
+            dynamicC->notify(this, &multiReceiver::receiverC);
+         }
+      }
+
+      void receiverA(U32, U16 d)
+      {
+         recvA += d;
+      }
+
+      void receiverB(U8, S8 d)
+      {
+         recvB += d;
+      }
+
+      void receiverC(U32, S32 d)
+      {
+         recvC += d;
+      }
+   };
+};
+
+TEST_FIX(Journal, BasicAPI)
+{
+   receiver rec;
    rec.lastTriggerValue = 0;
 
    // Set up a journaled signal to test with.
    JournaledSignal<void(U16)> testEvent;
-   testEvent.notify(&rec, &receiver::triggerReceiver);
+   testEvent.notify(&rec, &receiver::trigger);
 
    // Initialize journal recording and fire off some events...
    Journal::Record("test.jrn");
@@ -71,63 +127,16 @@ TEST(Journal, BasicAPI)
       << "Should encounter last journaled value (18).";
 }
 
-TEST(Journal, DynamicSignals)
+TEST_FIX(Journal, DynamicSignals)
 {
-   typedef JournaledSignal<void(U32, U16)> EventA;
-   typedef JournaledSignal<void(U8, S8)> EventB;
-   typedef JournaledSignal<void(U32, S32)> EventC;
-
-   // Root, non-dynamic signal receiver.
-   struct receiver {
-      U32 recvA, recvB, recvC;
-
-      EventA *dynamicA;
-      EventB *dynamicB;
-      EventC *dynamicC;
-
-      void receiverRoot(U8 msg)
-      {
-         if(msg==1)
-         {
-            dynamicA = new EventA();
-            dynamicA->notify(this, &receiver::receiverA);
-         }
-
-         if(msg==2)
-         {
-            dynamicB = new EventB();
-            dynamicB->notify(this, &receiver::receiverB);
-         }
-
-         if(msg==3)
-         {
-            dynamicC = new EventC();
-            dynamicC->notify(this, &receiver::receiverC);
-         }
-      }
-
-      void receiverA(U32, U16 d)
-      {
-         recvA += d;
-      }
-
-      void receiverB(U8, S8 d)
-      {
-         recvB += d;
-      }
-
-      void receiverC(U32, S32 d)
-      {
-         recvC += d;
-      }
-   } rec;
+   multiReceiver rec;
 
    // Reset our state values.
    rec.recvA = rec.recvB = rec.recvC = 0;
 
    // Set up a signal to start with.
    JournaledSignal<void(U8)> testEvent;
-   testEvent.notify(&rec, &receiver::receiverRoot);
+   testEvent.notify(&rec, &multiReceiver::receiverRoot);
 
    // Initialize journal recording and fire off some events...
    Journal::Record("test.jrn");
