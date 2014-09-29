@@ -130,6 +130,7 @@ struct VehicleData: public ShapeBaseData
    //
    VehicleData();
    bool preload(bool server, String &errorStr);
+   bool _loadShape(bool server, String &errorStr);
    static void initPersistFields();
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
@@ -237,6 +238,7 @@ class Vehicle: public ShapeBase
 
    void updateWorkingCollisionSet(const U32 mask);
    virtual U32 getCollisionMask();
+   void _updateConvexCollision();
 
    void updateFroth( F32 dt );
    bool collidingWithWater( Point3F &waterHeight );

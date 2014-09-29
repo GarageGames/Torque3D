@@ -212,9 +212,9 @@ void TurretShapeData::unpackData(BitStream* stream)
    stream->read(&pitchRate);
 }
 
-bool TurretShapeData::preload(bool server, String &errorStr)
+bool TurretShapeData::_loadShape(bool server, String &errorStr)
 {
-   if (!Parent::preload(server, errorStr))
+   if (!Parent::_loadShape(server, errorStr))
       return false;
 
    // We have mShape at this point.  Resolve nodes.
@@ -250,7 +250,6 @@ bool TurretShapeData::preload(bool server, String &errorStr)
 
    return true;
 }
-
 
 //----------------------------------------------------------------------------
 

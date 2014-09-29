@@ -141,7 +141,7 @@ public:
    static void initPersistFields();
 
    virtual bool onAdd();
-   virtual bool preload(bool server, String &errorStr);
+   virtual bool _loadShape(bool server, String &errorStr);
 
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);

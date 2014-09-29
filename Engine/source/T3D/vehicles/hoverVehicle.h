@@ -118,6 +118,7 @@ class HoverVehicleData : public VehicleData
    void packData(BitStream*);
    void unpackData(BitStream*);
    bool preload(bool server, String &errorStr);
+   bool _loadShape(bool server, String &errorStr);
 
    DECLARE_CONOBJECT(HoverVehicleData);
    static void initPersistFields();

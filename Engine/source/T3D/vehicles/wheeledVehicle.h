@@ -143,6 +143,7 @@ struct WheeledVehicleData: public VehicleData
    DECLARE_CONOBJECT(WheeledVehicleData);
    static void initPersistFields();
    bool preload(bool, String &errorStr);
+   bool _loadShape(bool, String &errorStr);
    bool mirrorWheel(Wheel* we);
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);

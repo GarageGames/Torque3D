@@ -241,9 +241,9 @@ bool AITurretShapeData::onAdd()
    return true;
 }
 
-bool AITurretShapeData::preload(bool server, String &errorStr)
+bool AITurretShapeData::_loadShape(bool server, String &errorStr)
 {
-   if (!Parent::preload(server, errorStr))
+   if (!Parent::_loadShape(server, errorStr))
       return false;
 
    // We have mShape at this point.  Resolve nodes.

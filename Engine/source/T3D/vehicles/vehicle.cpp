@@ -214,14 +214,6 @@ bool VehicleData::preload(bool server, String &errorStr)
    if (!Parent::preload(server, errorStr))
       return false;
 
-   // Vehicle objects must define a collision detail
-   if (!collisionDetails.size() || collisionDetails[0] == -1)
-   {
-      Con::errorf("VehicleData::preload failed: Vehicle models must define a collision-1 detail");
-      errorStr = String::ToString("VehicleData: Couldn't load shape \"%s\"",shapeName);
-      return false;
-   }
-
    // Resolve objects transmitted from server
    if (!server) {
       for (S32 i = 0; i < Body::MaxSounds; i++)
@@ -258,6 +250,23 @@ bool VehicleData::preload(bool server, String &errorStr)
             Con::errorf( ConsoleLogEntry::General, "VehicleData::preload Invalid packet, bad datablockId(splashEmitter): 0x%x", splashEmitterIDList[i] );
          }
       }
+   }
+
+   return true;
+}
+
+
+bool VehicleData::_loadShape(bool server, String &errorStr)
+{
+   if (!Parent::_loadShape(server, errorStr))
+      return false;
+
+   // Vehicle objects must define a collision detail
+   if (!collisionDetails.size() || collisionDetails[0] == -1)
+   {
+      Con::errorf("VehicleData::_loadShape failed: Vehicle models must define a collision-1 detail");
+      errorStr = String::ToString("VehicleData: Couldn't load shape \"%s\"",shapeName);
+      return false;
    }
 
    return true;
@@ -690,6 +699,18 @@ U32 Vehicle::getCollisionMask()
    return 0;
 }
 
+void Vehicle::_updateConvexCollision()
+{
+    AssertFatal(mDataBlock->collisionDetails.size() && mDataBlock->collisionDetails[0] != -1, "Error, a vehicle must have a collision-1 detail!");
+    mConvex.mObject = this;
+    mConvex.pShapeBase = this;
+    mConvex.hullId = 0;
+    mConvex.box = mObjBox;
+    mConvex.box.minExtents.convolve(mObjScale);
+    mConvex.box.maxExtents.convolve(mObjScale);
+    mConvex.findNodeTransform();
+}
+
 Point3F Vehicle::getVelocity() const
 {
    return mRigid.linVelocity;
@@ -766,15 +787,7 @@ bool Vehicle::onAdd()
       }
    }
 
-   // Create a new convex.
-   AssertFatal(mDataBlock->collisionDetails[0] != -1, "Error, a vehicle must have a collision-1 detail!");
-   mConvex.mObject    = this;
-   mConvex.pShapeBase = this;
-   mConvex.hullId     = 0;
-   mConvex.box        = mObjBox;
-   mConvex.box.minExtents.convolve(mObjScale);
-   mConvex.box.maxExtents.convolve(mObjScale);
-   mConvex.findNodeTransform();
+   _updateConvexCollision();
 
    return true;
 }
@@ -947,6 +960,9 @@ bool Vehicle::onNewDataBlock(GameBaseData* dptr,bool reload)
       if ( mDataBlock->waterSound[VehicleData::Wake] )
          mWakeSound = SFX->createSource( mDataBlock->waterSound[VehicleData::Wake], &getTransform() );
    }
+
+   _updateConvexCollision();
+
 
    return true;
 }

@@ -298,14 +298,6 @@ bool RigidShapeData::preload(bool server, String &errorStr)
    if (!Parent::preload(server, errorStr))
       return false;
 
-   // RigidShape objects must define a collision detail
-   if (!collisionDetails.size() || collisionDetails[0] == -1)
-   {
-      Con::errorf("RigidShapeData::preload failed: Rigid shapes must define a collision-1 detail");
-      errorStr = String::ToString("RigidShapeData: Couldn't load shape \"%s\"",shapeName);
-      return false;
-   }
-
    // Resolve objects transmitted from server
    if (!server) {
       for (S32 i = 0; i < Body::MaxSounds; i++)
@@ -354,6 +346,23 @@ bool RigidShapeData::preload(bool server, String &errorStr)
 
    return true;
 }   
+
+
+bool RigidShapeData::_loadShape(bool server, String &errorStr)
+{
+   if (!Parent::_loadShape(server, errorStr))
+      return false;
+
+   // RigidShape objects must define a collision detail
+   if (!collisionDetails.size() || collisionDetails[0] == -1)
+   {
+      Con::errorf("RigidShapeData::_loadShape failed: Rigid shapes must define a collision-1 detail");
+      errorStr = String::ToString("RigidShapeData: Couldn't load shape \"%s\"",shapeName);
+      return false;
+   }
+
+   return true;
+}
 
 
 //----------------------------------------------------------------------------
