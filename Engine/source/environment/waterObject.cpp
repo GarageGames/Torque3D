@@ -91,6 +91,7 @@ void WaterMatParams::clear()
    mSpecularParamsSC = NULL;
    mDepthGradMaxSC = NULL;
    mReflectivitySC = NULL;
+   mDepthGradSamplerSC = NULL;
 }
 
 void WaterMatParams::init( BaseMatInstance* matInst )
@@ -132,6 +133,7 @@ void WaterMatParams::init( BaseMatInstance* matInst )
    mSpecularParamsSC = matInst->getMaterialParameterHandle( "$specularParams" );   
    mDepthGradMaxSC = matInst->getMaterialParameterHandle( "$depthGradMax" );
    mReflectivitySC = matInst->getMaterialParameterHandle( "$reflectivity" );
+   mDepthGradSamplerSC = matInst->getMaterialParameterHandle( "$depthGradMap" );
 }
 
 
@@ -752,22 +754,20 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
 void WaterObject::setCustomTextures( S32 matIdx, U32 pass, const WaterMatParams &paramHandles )
 {
-   // TODO: Retrieve sampler numbers from parameter handles, see r22631.
-   
    // Always use the ripple texture.
-   GFX->setTexture( 0, mRippleTex );
+   GFX->setTexture( paramHandles.mRippleSamplerSC->getSamplerRegister(pass), mRippleTex );
 
    // Only above-water in advanced-lighting uses the foam texture.
    if ( matIdx == WaterMat )
    {
-      GFX->setTexture( 5, mFoamTex );
-      GFX->setTexture( 6, mDepthGradientTex );
+      GFX->setTexture( paramHandles.mFoamSamplerSC->getSamplerRegister(pass), mFoamTex );
+      GFX->setTexture( paramHandles.mDepthGradSamplerSC->getSamplerRegister(pass), mDepthGradientTex );
    }
 
    if ( ( matIdx == WaterMat || matIdx == BasicWaterMat ) && mCubemap )   
-      GFX->setCubeTexture( 4, mCubemap->mCubemap );
-   else
-      GFX->setCubeTexture( 4, NULL );
+      GFX->setCubeTexture( paramHandles.mCubemapSamplerSC->getSamplerRegister(pass), mCubemap->mCubemap );
+   else if(paramHandles.mCubemapSamplerSC->getSamplerRegister(pass) != -1 )
+      GFX->setCubeTexture( paramHandles.mCubemapSamplerSC->getSamplerRegister(pass), NULL );
 }
 
 void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
