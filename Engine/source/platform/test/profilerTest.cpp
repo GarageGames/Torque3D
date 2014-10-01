@@ -20,24 +20,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "platform/platform.h" // Allows us to see TORQUE_ENABLE_PROFILER
 
-#include <gtest/gtest.h>
+#ifdef TORQUE_ENABLE_PROFILER
+#include "testing/unitTesting.h"
+#include "platform/profiler.h"
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+TEST(Profiler, ProfileStartEnd)
+{
+   PROFILE_START(ProfileStartEndTest);
+   // Do work.
+   if(true)
+   {
+      PROFILE_END(ProfileStartEndTest);
+      return;
+   }
+   PROFILE_END(ProfileStartEndTest);
+}
 
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+TEST(Profiler, ProfileScope)
+{
+   PROFILE_SCOPE(ScopedProfilerTest);
+   // Do work and return whenever you want.
+}
 
-#endif // TORQUE_TESTS_ENABLED
-
-#endif // _UNIT_TESTING_H_
+#endif
+#endif

@@ -20,24 +20,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "core/util/tFixedSizeDeque.h"
 
-#include <gtest/gtest.h>
+TEST(FixedSizeDeque, FixedSizeDeque)
+{
+   enum { DEQUE_SIZE = 3 };
+   FixedSizeDeque< U32 > deque( DEQUE_SIZE );
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+   EXPECT_EQ( deque.capacity(), DEQUE_SIZE );
+   EXPECT_EQ( deque.size(), 0 );
 
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+   deque.pushFront( 1 );
+   EXPECT_EQ( deque.capacity(), ( DEQUE_SIZE - 1 ) );
+   EXPECT_EQ( deque.size(), 1 );
+   EXPECT_FALSE( deque.isEmpty() );
 
-#endif // TORQUE_TESTS_ENABLED
+   deque.pushBack( 2 );
+   EXPECT_EQ( deque.capacity(), ( DEQUE_SIZE - 2 ) );
+   EXPECT_EQ( deque.size(), 2 );
 
-#endif // _UNIT_TESTING_H_
+   EXPECT_EQ( deque.popFront(), 1 );
+   EXPECT_EQ( deque.popFront(), 2 );
+   EXPECT_TRUE( deque.isEmpty() );
+};
+
+#endif

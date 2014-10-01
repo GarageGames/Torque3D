@@ -20,24 +20,56 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "platform/threads/threadPool.h"
+#include "console/console.h"
+#include "core/util/tVector.h"
 
-#include <gtest/gtest.h>
+FIXTURE(ThreadPool)
+{
+public:
+   // Represents a single unit of work. In this test we just set an element in
+   // a result vector.
+   struct TestItem : public ThreadPool::WorkItem
+   {
+      U32 mIndex;
+      Vector<U32>& mResults;
+      TestItem(U32 index, Vector<U32>& results)
+         : mIndex(index), mResults(results) {}
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+   protected:
+      virtual void execute()
+      {
+         mResults[mIndex] = mIndex;
+      }
+   };
+};
 
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+TEST_FIX(ThreadPool, BasicAPI)
+{
+   // Construct the vector of results from the work items.
+   const U32 numItems = 100;
+   Vector<U32> results(__FILE__, __LINE__);
+   results.setSize(numItems);
+   for (U32 i = 0; i < numItems; i++)
+      results[i] = U32(-1);
 
-#endif // TORQUE_TESTS_ENABLED
+   // Launch the work items.
+   ThreadPool* pool = &ThreadPool::GLOBAL();
+   for (U32 i = 0; i < numItems; i++)
+   {
+      ThreadSafeRef<TestItem> item(new TestItem(i, results));
+      pool->queueWorkItem(item);
+   }
 
-#endif // _UNIT_TESTING_H_
+   // Wait for all items to complete.
+   pool->flushWorkItems();
+
+   // Verify.
+   for (U32 i = 0; i < numItems; i++)
+      EXPECT_EQ(results[i], i) << "result mismatch";
+   results.clear();
+}
+
+#endif

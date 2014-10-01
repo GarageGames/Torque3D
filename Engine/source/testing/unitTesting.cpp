@@ -36,8 +36,9 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    // Called before a test starts.
    virtual void OnTestStart( const ::testing::TestInfo& testInfo )
    {
-      Con::printf("> Starting Test '%s.%s'",
-         testInfo.test_case_name(), testInfo.name());
+      if( mVerbose )
+         Con::printf("> Starting Test '%s.%s'",
+            testInfo.test_case_name(), testInfo.name());
    }
 
    // Called after a failed assertion or a SUCCEED() invocation.
@@ -45,13 +46,13 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    {
       if ( testPartResult.failed() )
       {
-         Con::warnf(">> Failed with '%s' in '%s' at (line:%d)",
+         Con::warnf(">> Failed with '%s' in '%s' at (line:%d)\n",
             testPartResult.summary(),
             testPartResult.file_name(),
             testPartResult.line_number()
             );
       }
-      else
+      else if( mVerbose )
       {
          Con::printf(">> Passed with '%s' in '%s' at (line:%d)",
             testPartResult.summary(),
@@ -64,17 +65,43 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
    // Called after a test ends.
    virtual void OnTestEnd( const ::testing::TestInfo& testInfo )
    {
-      Con::printf("> Ending Test '%s.%s'\n",
-         testInfo.test_case_name(), testInfo.name());
+      if( mVerbose )
+         Con::printf("> Ending Test '%s.%s'\n",
+            testInfo.test_case_name(), testInfo.name());
    }
+
+   bool mVerbose;
+
+public:
+   TorqueUnitTestListener( bool verbose ) : mVerbose( verbose ) {}
 };
 
-DefineConsoleFunction( runAllUnitTests, int, (),,
-                      "" )
+DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
+   "Runs engine unit tests. Some tests are marked as 'stress' tests which do not "
+   "necessarily check correctness, just performance or possible nondeterministic "
+   "glitches. There may also be interactive or networking tests which may be "
+   "excluded by using the testSpecs argument.\n"
+   "This function should only be called once per executable run, because of "
+   "googletest's design.\n\n"
+
+   "@param testSpecs A space-sepatated list of filters for test cases. "
+   "See https://code.google.com/p/googletest/wiki/AdvancedGuide#Running_a_Subset_of_the_Tests "
+   "and http://stackoverflow.com/a/14021997/945863 "
+   "for a description of the flag format.")
 {
-   // Set-up some empty arguments.
    S32 testArgc = 0;
    char** testArgv = NULL;
+   if ( dStrlen( testSpecs ) > 0 )
+   {
+      String specs(testSpecs);
+      specs.replace(' ', ':');
+      specs.insert(0, "--gtest_filter=");
+      testArgc = 2;
+      testArgv = new char*[2];
+      testArgv[0] = NULL; // Program name is unused by googletest.
+      testArgv[1] = new char[specs.length()+1];
+      dStrcpy(testArgv[1], specs);
+   }
 
    // Initialize Google Test.
    testing::InitGoogleTest( &testArgc, testArgv );
@@ -88,19 +115,18 @@ DefineConsoleFunction( runAllUnitTests, int, (),,
    // Release the default listener.
    delete listeners.Release( listeners.default_result_printer() );
 
-   if ( Con::getBoolVariable( "$testing::checkMemoryLeaks", false ) ) {
+   if ( Con::getBoolVariable( "$Testing::CheckMemoryLeaks", false ) ) {
       // Add the memory leak tester.
       listeners.Append( new testing::MemoryLeakDetector );
    }
 
    // Add the Torque unit test listener.
-   listeners.Append( new TorqueUnitTestListener );
+   listeners.Append( new TorqueUnitTestListener(false) );
 
+   // Perform googletest run.
    Con::printf( "\nUnit Tests Starting...\n" );
-
    const S32 result = RUN_ALL_TESTS();
-
-   Con::printf( "\n... Unit Tests Ended.\n" );
+   Con::printf( "... Unit Tests Ended.\n" );
 
    return result;
 }

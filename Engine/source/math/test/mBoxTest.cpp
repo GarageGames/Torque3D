@@ -20,24 +20,23 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "math/mBox.h"
 
-#include <gtest/gtest.h>
+TEST(Box3F, GetOverlap)
+{
+   Box3F b1(Point3F(-1, -1, -1), Point3F(1, 1, 1));
+   EXPECT_EQ(b1.getOverlap(b1), b1)
+      << "A box's overlap with itself should be itself.";
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+   Box3F b2(Point3F(0, 0, 0), Point3F(1, 1, 1));
+   EXPECT_EQ(b1.getOverlap(b2), b2)
+      << "Box's overlap should be the intersection of two boxes.";
 
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+   Box3F b3(Point3F(10, 10, 10), Point3F(11, 11, 11));
+   EXPECT_TRUE(b1.getOverlap(b3).isEmpty())
+      << "Overlap of boxes that do not overlap should be empty.";
+}
 
-#endif // TORQUE_TESTS_ENABLED
-
-#endif // _UNIT_TESTING_H_
+#endif

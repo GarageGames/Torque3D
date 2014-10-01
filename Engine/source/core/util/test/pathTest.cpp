@@ -20,24 +20,21 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "core/util/path.h"
 
-#include <gtest/gtest.h>
+TEST(MakeRelativePath, MakeRelativePath)
+{
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/interiors/burg/file.png", "art/interiors/"), "burg/file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/interiors/file.png", "art/interiors/burg/"), "../file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/file.png", "art/interiors/burg/"), "../../file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("file.png", "art/interiors/burg/"), "../../../file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/interiors/burg/file.png", "art/interiors/burg/"), "file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/interiors/camp/file.png", "art/interiors/burg/"), "../camp/file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/interiors/burg/file.png", "art/shapes/"), "../interiors/burg/file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("levels/den/file.png", "art/interiors/burg/"), "../../../levels/den/file.png");
+   EXPECT_EQ(Torque::Path::MakeRelativePath("art/interiors/burg/file.png", "art/dts/burg/"), "../../interiors/burg/file.png");
+};
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
-
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
-
-#endif // TORQUE_TESTS_ENABLED
-
-#endif // _UNIT_TESTING_H_
+#endif

@@ -20,24 +20,39 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "windowManager/platformWindowMgr.h"
 
-#include <gtest/gtest.h>
+// Mysteriously, TEST(WindowManager, BasicAPI) gives an error. Huh.
+TEST(WinMgr, BasicAPI)
+{
+   PlatformWindowManager *pwm = CreatePlatformWindowManager();
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+   // Check out the primary desktop area...
+   RectI primary = pwm->getPrimaryDesktopArea();
 
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+   EXPECT_TRUE(primary.isValidRect())
+      << "Got some sort of invalid rect from the window manager!";
 
-#endif // TORQUE_TESTS_ENABLED
+   // Now try to get info about all the monitors.
+   Vector<RectI> monitorRects;
+   pwm->getMonitorRegions(monitorRects);
 
-#endif // _UNIT_TESTING_H_
+   EXPECT_GT(monitorRects.size(), 0)
+      << "Should get at least one monitor rect back from getMonitorRegions!";
+
+   // This test is here just to detect overflow/runaway situations. -- BJG
+   EXPECT_LT(monitorRects.size(), 64)
+      << "Either something's wrong, or you have a lot of monitors...";
+
+   for(S32 i=0; i<monitorRects.size(); i++)
+   {
+      EXPECT_TRUE(monitorRects[i].isValidRect())
+         << "Got an invalid rect for this monitor - no good.";
+   }
+
+   // No way to destroy the window manager.
+};
+
+#endif

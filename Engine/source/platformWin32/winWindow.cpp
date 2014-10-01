@@ -311,18 +311,10 @@ S32 main(S32 argc, const char **argv)
 
 //--------------------------------------
 
-#include "unit/test.h"
 #include "app/mainLoop.h"
 
 S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 {
-#if 0
-   // Run a unit test.
-   StandardMainLoop::initCore();
-   UnitTesting::TestRun tr;
-   tr.test("Platform", true);
-#else
-
    Vector<char *> argv( __FILE__, __LINE__ );
 
    char moduleName[256];
@@ -366,7 +358,6 @@ S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
       dFree(argv[j]);
 
    return retVal;
-#endif
 }
 
 #else //TORQUE_SHARED

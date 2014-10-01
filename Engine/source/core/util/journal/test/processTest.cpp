@@ -20,24 +20,41 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _UNIT_TESTING_H_
-#define _UNIT_TESTING_H_
-
 #ifdef TORQUE_TESTS_ENABLED
+#include "testing/unitTesting.h"
+#include "core/util/journal/process.h"
 
-#include <gtest/gtest.h>
+FIXTURE(Process)
+{
+public:
+   U32 remainingTicks;
+   void notification()
+   {
+      if(remainingTicks == 0)
+         Process::requestShutdown();
+      remainingTicks--;
+   }
+};
 
-/// Convenience to define a test fixture with a Fixture suffix for use with
-/// TEST_FIX.
-#define FIXTURE(test_fixture)\
-   class test_fixture##Fixture : public ::testing::Test
+TEST_FIX(Process, BasicAPI)
+{
+   // We'll run 30 ticks, then quit.
+   remainingTicks = 30;
 
-/// Allow test fixtures named with a Fixture suffix, so that we can name tests
-/// after a class name rather than having to call them XXTest.
-#define TEST_FIX(test_fixture, test_name)\
-   GTEST_TEST_(test_fixture, test_name, test_fixture##Fixture, \
-   ::testing::internal::GetTypeId<test_fixture##Fixture>())
+   // Register with the process list.
+   Process::notify(this, &ProcessFixture::notification);
 
-#endif // TORQUE_TESTS_ENABLED
+   // And do 30 notifies, making sure we end on the 30th.
+   for(S32 i = 0; i < 30; i++)
+   {
+      EXPECT_TRUE(Process::processEvents())
+         << "Should quit after 30 ProcessEvents() calls - not before!";
+   }
 
-#endif // _UNIT_TESTING_H_
+   EXPECT_FALSE(Process::processEvents())
+      << "Should quit after the 30th ProcessEvent() call!";
+
+   Process::remove(this, &ProcessFixture::notification);
+};
+
+#endif

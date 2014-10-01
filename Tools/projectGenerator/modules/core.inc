@@ -29,6 +29,7 @@ addEngineSrcDir('sfx');
 // Components
 addEngineSrcDir('component');
 addEngineSrcDir('component/interfaces');
+addEngineSrcDir('component/test');
 
 // Core
 if (T3D_Generator::isApp())
@@ -43,12 +44,10 @@ addEngineSrcDir('core/util/test');
 addEngineSrcDir('core/util/journal');
 addEngineSrcDir('core/util/journal/test');
 addEngineSrcDir('core/util/zip');
-addEngineSrcDir('core/util/zip/unitTests');
+addEngineSrcDir('core/util/zip/test');
 addEngineSrcDir('core/util/zip/compressors');
 addEngineSrcDir('i18n');
 addEngineSrcDir('sim');
-addEngineSrcDir('unit/tests');
-addEngineSrcDir('unit');
 addEngineSrcDir('util');
 addEngineSrcDir('windowManager');
 addEngineSrcDir('windowManager/torque');
@@ -71,7 +70,9 @@ switch( T3D_Generator::$platform )
 }
 
 addEngineSrcDir('platform/threads');
+addEngineSrcDir('platform/threads/test');
 addEngineSrcDir('platform/async');
+addEngineSrcDir('platform/async/test');
 addEngineSrcDir('platform/input');
 addEngineSrcDir('platform/output');
 addEngineSrcDir('app');
@@ -124,7 +125,6 @@ switch( T3D_Generator::$platform )
 
 // GFX
 addEngineSrcDir( 'gfx/Null' );
-addEngineSrcDir( 'gfx/test' );
 addEngineSrcDir( 'gfx/bitmap' );
 addEngineSrcDir( 'gfx/bitmap/loaders' );
 addEngineSrcDir( 'gfx/util' );
