@@ -116,7 +116,7 @@ void PlatformFont::enumeratePlatformFonts( Vector<StringTableEntry>& fonts, UTF1
    EnumFontFamilies( fontHDC, fontFamily, (FONTENUMPROC)EnumFamCallBack, (LPARAM)&fonts );
 }
 
-PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+PlatformFont *createPlatformFont(const char *name, dsize_t size, U32 charset /* = TGE_ANSI_CHARSET */)
 {
     PlatformFont *retFont = new WinFont;
 
@@ -139,7 +139,7 @@ WinFont::~WinFont()
     }
 }
 
-bool WinFont::create(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+bool WinFont::create(const char *name, dsize_t size, U32 charset /* = TGE_ANSI_CHARSET */)
 {
    if(name == NULL || size < 1)
       return false;

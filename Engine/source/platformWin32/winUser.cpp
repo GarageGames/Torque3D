@@ -25,7 +25,10 @@
 #include "core/stringTable.h"
 #include "core/strings/unicode.h"
 
+#ifndef TORQUE_OS_WIN64
 typedef long SHANDLE_PTR;
+#endif
+
 #include <shlobj.h>
 #include <windows.h>
 #include <lmcons.h>

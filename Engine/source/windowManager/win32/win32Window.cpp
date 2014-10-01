@@ -661,7 +661,7 @@ void Win32Window::_unregisterWindowClass()
 LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	// CodeReview [tom, 4/30/2007] The two casts here seem somewhat silly and redundant ?
-	Win32Window* window = (Win32Window*)((PlatformWindow*)GetWindowLong(hWnd, GWL_USERDATA));
+	Win32Window* window = (Win32Window*)((PlatformWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	const WindowId devId = window ? window->getWindowId() : 0;
 
    if (window && window->getOffscreenRender())
@@ -712,8 +712,8 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 	case WM_CREATE:
 		// CodeReview [tom, 4/30/2007] Why don't we just cast this to a LONG 
 		//            instead of having a ton of essentially pointless casts ?
-		SetWindowLong(hWnd, GWL_USERDATA,
-			(LONG)((PlatformWindow*)((CREATESTRUCT*)lParam)->lpCreateParams));
+		SetWindowLongPtr(hWnd, GWLP_USERDATA,
+			(LONG_PTR)((PlatformWindow*)((CREATESTRUCT*)lParam)->lpCreateParams));
 		break;
 
 	case WM_SETFOCUS:

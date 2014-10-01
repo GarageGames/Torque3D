@@ -136,7 +136,7 @@ void Win32WindowManager::buildMonitorsList()
    mMonitors.clear();
 
    // Enumerate all monitors
-   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (U32)(void*)&mMonitors);
+   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (size_t)(void*)&mMonitors);
 }
 
 S32 Win32WindowManager::findFirstMatchingMonitor(const char* name)
@@ -252,7 +252,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
    w32w->setVideoMode(mode);
 
    // Associate our window struct with the HWND.
-   SetWindowLongPtrW(w32w->mWindowHandle, GWLP_USERDATA, (LONG)w32w);
+   SetWindowLongPtr(w32w->mWindowHandle, GWLP_USERDATA, (LONG_PTR)w32w);
 
    // Do some error checking.
    AssertFatal(w32w->mWindowHandle != NULL, "Win32WindowManager::createWindow - Could not create window!");
@@ -358,7 +358,7 @@ void Win32WindowManager::_process()
 
          // [tom, 4/30/2007] I think this should work, but leaving the above commented
          // out just in case this is actually fubared with multiple windows.
-         Win32Window* window = (Win32Window*)(GetWindowLong(msg.hwnd, GWL_USERDATA));
+         Win32Window* window = (Win32Window*)(GetWindowLongPtr(msg.hwnd, GWLP_USERDATA));
          if(window)
             translated = window->translateMessage(msg);
          
