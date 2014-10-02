@@ -72,3 +72,11 @@ singleton Material(defaultTree_fronds_material)
    alphaRef = "114";
    translucent = "1";
 };
+
+singleton Material(defaulttree_ColorEffectR27G177B88_material)
+{
+   mapTo = "ColorEffectR27G177B88-material";
+   diffuseColor[0] = "0.105882 0.694118 0.345098 1";
+   specularPower[0] = "10";
+   translucentBlendOp = "None";
+};
