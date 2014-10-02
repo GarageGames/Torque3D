@@ -45,7 +45,7 @@ float4 main( PFXVertToPix IN ) : COLOR0
         col = tex2D( backBuffer, IN.uv0 );
 
         //col = 1 - exp(-120000 * col);
-        col += dot( col, LUMINANCE_VECTOR ) + 0.0001f;
+        col += dot( col.rgb, LUMINANCE_VECTOR ) + 0.0001f;
         col *= brightScalar;
     }
     
