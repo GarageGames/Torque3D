@@ -212,7 +212,7 @@ namespace Platform
    void debugBreak();
    
    // Random
-   float getRandom();
+   F32 getRandom();
    
    // Window state
    void setWindowLocked(bool locked);
@@ -338,6 +338,9 @@ namespace Platform
    // display Splash Window
    bool displaySplashWindow( String path );
 
+   // close Splash Window
+   bool closeSplashWindow();
+
    void openFolder( const char* path );
 
    // Open file at the OS level, according to registered file-types.
@@ -412,7 +415,7 @@ namespace Platform
 //------------------------------------------------------------------------------
 // Misc StdLib functions
 #define QSORT_CALLBACK FN_CDECL
-inline void dQsort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void *, const void *))
+inline void dQsort(void *base, U32 nelem, U32 width, S32 (QSORT_CALLBACK *fcmp)(const void *, const void *))
 {
    qsort(base, nelem, width, fcmp);
 }
@@ -507,7 +510,7 @@ extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const ds
 extern void* dRealMalloc(dsize_t);
 extern void  dRealFree(void*);
 
-extern void *dMalloc_aligned(dsize_t in_size, int alignment);
+extern void *dMalloc_aligned(dsize_t in_size, S32 alignment);
 extern void dFree_aligned(void *);
 
 
@@ -525,8 +528,8 @@ template<class T,class S> void dCopyArray(T *dst, const S *src, dsize_t size)
 
 extern void* dMemcpy(void *dst, const void *src, dsize_t size);
 extern void* dMemmove(void *dst, const void *src, dsize_t size);
-extern void* dMemset(void *dst, int c, dsize_t size);
-extern int   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
+extern void* dMemset(void *dst, S32 c, dsize_t size);
+extern S32   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
 
 // Special case of the above function when the arrays are the same type (use memcpy)
 template<class T> void dCopyArray(T *dst, const T *src, dsize_t size)
@@ -565,8 +568,8 @@ enum DFILE_STATUS
 
 extern FILE_HANDLE dOpenFileRead(const char *name, DFILE_STATUS &error);
 extern FILE_HANDLE dOpenFileReadWrite(const char *name, bool append, DFILE_STATUS &error);
-extern int dFileRead(FILE_HANDLE handle, U32 bytes, char *dst, DFILE_STATUS &error);
-extern int dFileWrite(FILE_HANDLE handle, U32 bytes, const char *dst, DFILE_STATUS &error);
+extern S32 dFileRead(FILE_HANDLE handle, U32 bytes, char *dst, DFILE_STATUS &error);
+extern S32 dFileWrite(FILE_HANDLE handle, U32 bytes, const char *dst, DFILE_STATUS &error);
 extern void dFileClose(FILE_HANDLE handle);
 
 extern StringTableEntry osGetTemporaryDirectory();

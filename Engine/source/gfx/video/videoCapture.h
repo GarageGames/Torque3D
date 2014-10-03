@@ -221,6 +221,8 @@ protected:
    // List with bitmaps which are done encoding
    ThreadSafeDeque< GBitmap* > mProcessedBitmaps;
 public:
+   virtual ~VideoEncoder() { }
+
    // Stores an encoded bitmap to be dealt with later
    void pushProcessedBitmap( GBitmap* bitmap );
       

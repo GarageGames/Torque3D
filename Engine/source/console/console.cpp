@@ -248,7 +248,7 @@ static bool active = false;
 static bool newLogFile;
 static const char *logFileName;
 
-static const int MaxCompletionBufferSize = 4096;
+static const S32 MaxCompletionBufferSize = 4096;
 static char completionBuffer[MaxCompletionBufferSize];
 static char tabBuffer[MaxCompletionBufferSize] = {0};
 static SimObjectPtr<SimObject> tabObject;
@@ -1313,8 +1313,9 @@ const char *getFormattedData(S32 type, const char *data, const EnumTable *tbl, B
       Con::setData(type, variable, 0, 1, &data, tbl, flag);
       const char* formattedVal = Con::getData(type, variable, 0, tbl, flag);
 
-      char* returnBuffer = Con::getReturnBuffer(2048);
-      dSprintf(returnBuffer, 2048, "%s\0", formattedVal );
+      static const U32 bufSize = 2048;
+      char* returnBuffer = Con::getReturnBuffer(bufSize);
+      dSprintf(returnBuffer, bufSize, "%s\0", formattedVal );
 
       cbt->deleteNativeVariable(variable);
 

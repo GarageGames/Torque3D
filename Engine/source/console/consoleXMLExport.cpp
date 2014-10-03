@@ -255,7 +255,7 @@ namespace Con {
       mXML->pushNewElement("EnumTables");
 
       // write out the used EnumTables
-      for (int i = 0; i < enumTables.size(); i++)
+      for (S32 i = 0; i < enumTables.size(); i++)
       {
          mXML->pushNewElement("EnumTable");
 
@@ -267,7 +267,7 @@ namespace Con {
 
          mXML->pushNewElement("Enums");
 
-         for (int j = 0; j < table->size; j++)
+         for (S32 j = 0; j < table->size; j++)
          {
             mXML->pushNewElement("Enum");
 

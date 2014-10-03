@@ -30,7 +30,7 @@ addLibSrcDir( 'ljpeg' );
 addLibIncludePath( 'ljpeg' );
 
 // Defines
-	if ( Generator::$platform == "360" )
+	if ( T3D_Generator::$platform == "360" )
       addProjectDefines( 'NO_GETENV;' );
 
 endModule();

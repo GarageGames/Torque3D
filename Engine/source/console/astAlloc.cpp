@@ -149,7 +149,7 @@ StreqExprNode *StreqExprNode::alloc( S32 lineNumber, ExprNode *left, ExprNode *r
    return ret;
 }
 
-StrcatExprNode *StrcatExprNode::alloc( S32 lineNumber, ExprNode *left, ExprNode *right, int appendChar )
+StrcatExprNode *StrcatExprNode::alloc( S32 lineNumber, ExprNode *left, ExprNode *right, S32 appendChar )
 {
    StrcatExprNode *ret = (StrcatExprNode *) consoleAlloc(sizeof(StrcatExprNode));
    constructInPlace(ret);

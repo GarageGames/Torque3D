@@ -262,9 +262,9 @@ void Dictionary::deleteVariables(const char *varString)
    }
 }
 
-S32 HashPointer(StringTableEntry ptr)
+U32 HashPointer(StringTableEntry ptr)
 {
-   return (S32)(((dsize_t)ptr) >> 2);
+   return (U32)(((dsize_t)ptr) >> 2);
 }
 
 Dictionary::Entry *Dictionary::lookup(StringTableEntry name)

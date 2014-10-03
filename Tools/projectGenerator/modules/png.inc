@@ -30,7 +30,7 @@ beginModule( 'lpng' );
 	addLibIncludePath( 'lpng' );
 	
 	// Defines
-	if ( Generator::$platform == "360" )
+	if ( T3D_Generator::$platform == "360" )
       addProjectDefines( 'PNG_NO_ASSEMBLER_CODE' );
 	
 endModule();

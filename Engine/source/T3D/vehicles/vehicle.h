@@ -202,7 +202,7 @@ class Vehicle: public ShapeBase
    CollisionList mContacts;
    Rigid mRigid;
    ShapeBaseConvex mConvex;
-   int restCount;
+   S32 restCount;
 
    SimObjectPtr<ParticleEmitter> mDustEmitterList[VehicleData::VC_NUM_DUST_EMITTERS];
    SimObjectPtr<ParticleEmitter> mDamageEmitterList[VehicleData::VC_NUM_DAMAGE_EMITTERS];

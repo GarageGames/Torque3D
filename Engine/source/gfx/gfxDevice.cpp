@@ -103,7 +103,7 @@ GFXDevice::GFXDevice()
    mViewMatrix.identity();
    mProjectionMatrix.identity();
    
-   for( int i = 0; i < WORLD_STACK_MAX; i++ )
+   for( S32 i = 0; i < WORLD_STACK_MAX; i++ )
       mWorldMatrix[i].identity();
    
    AssertFatal(smGFXDevice == NULL, "Already a GFXDevice created! Bad!");
@@ -180,12 +180,12 @@ GFXDevice::GFXDevice()
 
    // Initialize our drawing utility.
    mDrawer = NULL;
-
+   mFrameTime = PlatformTimer::create();
    // Add a few system wide shader macros.
    GFXShader::addGlobalMacro( "TORQUE", "1" );
    GFXShader::addGlobalMacro( "TORQUE_VERSION", String::ToString(getVersionNumber()) );
-   #if defined TORQUE_OS_WIN32
-      GFXShader::addGlobalMacro( "TORQUE_OS_WIN32" );
+   #if defined TORQUE_OS_WIN
+      GFXShader::addGlobalMacro( "TORQUE_OS_WIN" );
    #elif defined TORQUE_OS_MAC
       GFXShader::addGlobalMacro( "TORQUE_OS_MAC" );
    #elif defined TORQUE_OS_LINUX
@@ -451,7 +451,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
 
    if( mTextureMatrixCheckDirty )
    {
-      for( int i = 0; i < getNumSamplers(); i++ )
+      for( S32 i = 0; i < getNumSamplers(); i++ )
       {
          if( mTextureMatrixDirty[i] )
          {
@@ -804,7 +804,7 @@ inline bool GFXDevice::beginScene()
 
    // Send the start of frame signal.
    getDeviceEventSignal().trigger( GFXDevice::deStartOfFrame );
-
+   mFrameTime->reset();
    return beginSceneInternal();
 }
 
@@ -1279,7 +1279,7 @@ DefineEngineFunction( getPixelShaderVersion, F32, (),,
    return GFX->getPixelShaderVersion();
 }   
 
-DefineEngineFunction( setPixelShaderVersion, void, ( float version ),,
+DefineEngineFunction( setPixelShaderVersion, void, ( F32 version ),,
    "@brief Sets the pixel shader version for the active device.\n"
    "This can be used to force a lower pixel shader version than is supported by "
    "the device for testing or performance optimization.\n"

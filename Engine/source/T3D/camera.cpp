@@ -1546,7 +1546,7 @@ void Camera::_validateEyePoint(F32 pos, MatrixF *mat)
          float dot = mDot(dir, collision.normal);
          if (dot > 0.01f)
          {
-            float colDist = mDot(startPos - collision.point, dir) - (1 / dot) * CameraRadius;
+            F32 colDist = mDot(startPos - collision.point, dir) - (1 / dot) * CameraRadius;
             if (colDist > pos)
                colDist = pos;
             if (colDist < 0.0f)

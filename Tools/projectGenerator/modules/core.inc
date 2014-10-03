@@ -29,9 +29,10 @@ addEngineSrcDir('sfx');
 // Components
 addEngineSrcDir('component');
 addEngineSrcDir('component/interfaces');
+addEngineSrcDir('component/test');
 
 // Core
-if (Generator::isApp())
+if (T3D_Generator::isApp())
 	addSrcDir( '../source' );
     
 addEngineSrcDir('console');
@@ -43,12 +44,10 @@ addEngineSrcDir('core/util/test');
 addEngineSrcDir('core/util/journal');
 addEngineSrcDir('core/util/journal/test');
 addEngineSrcDir('core/util/zip');
-addEngineSrcDir('core/util/zip/unitTests');
+addEngineSrcDir('core/util/zip/test');
 addEngineSrcDir('core/util/zip/compressors');
 addEngineSrcDir('i18n');
 addEngineSrcDir('sim');
-addEngineSrcDir('unit/tests');
-addEngineSrcDir('unit');
 addEngineSrcDir('util');
 addEngineSrcDir('windowManager');
 addEngineSrcDir('windowManager/torque');
@@ -59,7 +58,7 @@ addEngineSrcDir('math/test');
 addEngineSrcDir('platform');
 addEngineSrcDir('cinterface');
 
-switch( Generator::$platform )
+switch( T3D_Generator::$platform )
 {
    case "win32":
    case "mac":
@@ -71,7 +70,9 @@ switch( Generator::$platform )
 }
 
 addEngineSrcDir('platform/threads');
+addEngineSrcDir('platform/threads/test');
 addEngineSrcDir('platform/async');
+addEngineSrcDir('platform/async/test');
 addEngineSrcDir('platform/input');
 addEngineSrcDir('platform/output');
 addEngineSrcDir('app');
@@ -80,7 +81,7 @@ addEngineSrcDir('app/net');
 // Moved this here temporarily because PopupMenu uses on it and is currently in core
 addEngineSrcDir('util/messaging');
 
-switch( Generator::$platform )
+switch( T3D_Generator::$platform )
 {
    case "win32":
      addEngineSrcDir('platformWin32');
@@ -124,7 +125,6 @@ switch( Generator::$platform )
 
 // GFX
 addEngineSrcDir( 'gfx/Null' );
-addEngineSrcDir( 'gfx/test' );
 addEngineSrcDir( 'gfx/bitmap' );
 addEngineSrcDir( 'gfx/bitmap/loaders' );
 addEngineSrcDir( 'gfx/util' );
@@ -132,7 +132,7 @@ addEngineSrcDir( 'gfx/video' );
 addEngineSrcDir( 'gfx' );
 addEngineSrcDir( 'shaderGen' );
 
-switch( Generator::$platform )
+switch( T3D_Generator::$platform )
 {
    case "win32":
       //addEngineSrcDir( 'gfx/D3D8' );
@@ -199,7 +199,7 @@ addIncludePath( '../../source' );		   // product source (relative to solution ou
 addIncludePath( getAppEngineSrcDir() );	// main engine source dir relative to app project file 
 addIncludePath( getAppLibSrcDir() ); 	   // main lib source dir relative to app project file
 
-if ( Generator::$platform == "win32" )
+if ( T3D_Generator::$platform == "win32" )
 {
    addIncludePath( getAppLibSrcDir() . 'directx8' );
    addIncludePath( getAppLibSrcDir() . 'openal/win32' );

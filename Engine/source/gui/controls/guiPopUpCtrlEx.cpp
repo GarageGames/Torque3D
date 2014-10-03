@@ -579,8 +579,9 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, getColorById, const char*, 3, 3,
    ColorI color;
    object->getColoredBox(color, dAtoi(argv[2]));
 
-   char *strBuffer = Con::getReturnBuffer(512);
-   dSprintf(strBuffer, 512, "%d %d %d %d", color.red, color.green, color.blue, color.alpha);
+   static const U32 bufSize = 512;
+   char *strBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(strBuffer, bufSize, "%d %d %d %d", color.red, color.green, color.blue, color.alpha);
    return strBuffer;
 }
 
@@ -1167,8 +1168,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            localStart.x = getWidth() - bitmapBounds[2].extent.x - txt_w;
          } 
          else
          {
@@ -1180,8 +1181,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            localStart.x = (getWidth() - mBitmapBounds[2].extent.x - txt_w) / 2;
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            localStart.x = (getWidth() - bitmapBounds[2].extent.x - txt_w) / 2;
 
          } else
          {
@@ -1199,8 +1200,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
             {
                // We're making use of a bitmap border, so take into account the
                // right cap of the border.
-               RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-               localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
+               RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+               localStart.x = getWidth() - bitmapBounds[2].extent.x - txt_w;
             } 
             else
             {
@@ -1251,8 +1252,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - mBitmapBounds[2].extent.x, localStart.y ) );
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
             GFX->getDrawUtil()->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else

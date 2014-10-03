@@ -63,7 +63,7 @@ AIClient::AIClient() {
    mMoveTolerance = 0.25f;
 
    // Clear the triggers
-   for( int i = 0; i < MaxTriggerKeys; i++ )
+   for( S32 i = 0; i < MaxTriggerKeys; i++ )
       mTriggers[i] = false;
  
    mAimToDestination = true;
@@ -369,7 +369,7 @@ U32 AIClient::getMoveList( Move **movePtr,U32 *numMoves ) {
    }
    
    // Copy over the trigger status
-   for( int i = 0; i < MaxTriggerKeys; i++ ) {
+   for( S32 i = 0; i < MaxTriggerKeys; i++ ) {
       mMove.trigger[i] = mTriggers[i];
       mTriggers[i] = false;
    }
@@ -457,8 +457,9 @@ ConsoleMethod( AIClient, getAimLocation, const char *, 2, 2, "ai.getAimLocation(
    AIClient *ai = static_cast<AIClient *>( object );
    Point3F aimPoint = ai->getAimLocation();
 
-   char *returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%f %f %f", aimPoint.x, aimPoint.y, aimPoint.z );
+   static const U32 bufSize = 256;
+   char *returnBuffer = Con::getReturnBuffer( bufSize );
+   dSprintf( returnBuffer, bufSize, "%f %f %f", aimPoint.x, aimPoint.y, aimPoint.z );
 
    return returnBuffer;
 }
@@ -470,8 +471,9 @@ ConsoleMethod( AIClient, getMoveDestination, const char *, 2, 2, "ai.getMoveDest
    AIClient *ai = static_cast<AIClient *>( object );
    Point3F movePoint = ai->getMoveDestination();
 
-   char *returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%f %f %f", movePoint.x, movePoint.y, movePoint.z );
+   static const U32 bufSize = 256;
+   char *returnBuffer = Con::getReturnBuffer( bufSize );
+   dSprintf( returnBuffer, bufSize, "%f %f %f", movePoint.x, movePoint.y, movePoint.z );
 
    return returnBuffer;
 }
@@ -522,8 +524,9 @@ ConsoleMethod( AIClient, getLocation, const char *, 2, 2, "ai.getLocation();" ) 
    AIClient *ai = static_cast<AIClient *>( object );
    Point3F locPoint = ai->getLocation();
 
-   char *returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%f %f %f", locPoint.x, locPoint.y, locPoint.z );
+   static const U32 bufSize = 256;
+   char *returnBuffer = Con::getReturnBuffer( bufSize );
+   dSprintf( returnBuffer, bufSize, "%f %f %f", locPoint.x, locPoint.y, locPoint.z );
 
    return returnBuffer;
 }

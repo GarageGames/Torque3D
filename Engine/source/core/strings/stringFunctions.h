@@ -31,10 +31,12 @@
 #include "platform/types.h"
 #endif
 
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
+#endif
+#if (_MSC_VER < 1800) && (defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON))
 #define strtof       (float)strtod
 #endif
 
@@ -52,22 +54,22 @@ inline char *dStrncat(char *dst, const char *src, dsize_t len)
    return strncat(dst,src,len);
 }
 
-inline int  dStrcmp(const char *str1, const char *str2)
+inline S32  dStrcmp(const char *str1, const char *str2)
 {
    return strcmp(str1, str2);   
 }
 
-inline int  dStrncmp(const char *str1, const char *str2, dsize_t len)
+inline S32  dStrncmp(const char *str1, const char *str2, dsize_t len)
 {
    return strncmp(str1, str2, len);   
 }  
 
-inline int  dStricmp(const char *str1, const char *str2)
+inline S32  dStricmp(const char *str1, const char *str2)
 {
    return strcasecmp( str1, str2 );
 }
 
-inline int  dStrnicmp(const char *str1, const char *str2, dsize_t len)
+inline S32  dStrnicmp(const char *str1, const char *str2, dsize_t len)
 {
    return strncasecmp( str1, str2, len );
 }
@@ -87,22 +89,22 @@ inline dsize_t dStrlen(const char *str)
    return strlen(str);
 }   
 
-inline char *dStrchr(char *str, int c)
+inline char *dStrchr(char *str, S32 c)
 {
    return strchr(str,c);
 }   
 
-inline const char *dStrchr(const char *str, int c)
+inline const char *dStrchr(const char *str, S32 c)
 {
    return strchr(str,c);
 }   
 
-inline char *dStrrchr(char *str, int c)
+inline char *dStrrchr(char *str, S32 c)
 {
    return strrchr(str,c);
 }
 
-inline const char *dStrrchr(const char *str, int c)
+inline const char *dStrrchr(const char *str, S32 c)
 {
    return strrchr(str,c);
 }   
@@ -198,9 +200,9 @@ extern char *dStrlwr(char *str);
 extern char* dStrichr( char* str, char ch );
 extern const char* dStrichr( const char* str, char ch );
 
-extern int        dStrcmp(const UTF16 *str1, const UTF16 *str2);
-extern int        dStrnatcmp( const char* str1, const char* str2 );
-extern int        dStrnatcasecmp( const char* str1, const char* str2 );
+extern S32        dStrcmp(const UTF16 *str1, const UTF16 *str2);
+extern S32        dStrnatcmp( const char* str1, const char* str2 );
+extern S32        dStrnatcasecmp( const char* str1, const char* str2 );
 
 inline bool dAtob(const char *str)
 {
@@ -215,13 +217,16 @@ bool dStrEndsWith(const char* str1, const char* str2);
 
 char* dStripPath(const char* filename);
 
+int dStrrev(char* str);
+int dItoa(int n, char s[]);
+
 //------------------------------------------------------------------------------
 // standard I/O functions [defined in platformString.cpp]
 
 extern void   dPrintf(const char *format, ...);
-extern int    dVprintf(const char *format, void *arglist);
-extern int    dSprintf(char *buffer, U32 bufferSize, const char *format, ...);
-extern int    dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist);
-extern int    dSscanf(const char *buffer, const char *format, ...);
+extern S32    dVprintf(const char *format, void *arglist);
+extern S32    dSprintf(char *buffer, U32 bufferSize, const char *format, ...);
+extern S32    dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist);
+extern S32    dSscanf(const char *buffer, const char *format, ...);
 
 #endif

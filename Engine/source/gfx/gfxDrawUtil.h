@@ -58,7 +58,7 @@ public:
    void drawRectFill( const Point2I &upperLeft, const Point2I &lowerRight, const ColorI &color );
    void drawRectFill( const RectI &rect, const ColorI &color );
 
-   void draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle );
+   void draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinAngle = 0.0f );
 
    //-----------------------------------------------------------------------------
    // Draw Lines

@@ -81,9 +81,9 @@
 				AdditionalDependencies="{foreach item=def from=$projLibsDebug}{$def} {/foreach}"
             
             {if $uniformOutputFile eq 1}
-				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
+				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName} DLL.dll"
             {else}
-               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_DEBUG.dll"
+               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_DEBUG DLL.dll"
             {/if}
             
 				LinkIncremental="2"
@@ -191,9 +191,9 @@
 				AdditionalDependencies="{foreach item=def from=$projLibsDebug}{$def} {/foreach}"
             
             {if $uniformOutputFile eq 1}
-				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
+				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName} DLL.dll"
             {else}
-               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_OPTIMIZEDDEBUG.dll"
+               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_OPTIMIZEDDEBUG DLL.dll"
             {/if}
 
               LinkIncremental="1"
@@ -299,7 +299,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="{foreach item=def from=$projLibs}{$def} {/foreach}"
-				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
+				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName} DLL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"

@@ -75,7 +75,8 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
    "@ingroup Strings\n"
    "@see http://en.wikipedia.org/wiki/Printf" )
 {
-   char* pBuffer = Con::getReturnBuffer(64);
+   static const U32 bufSize = 64;
+   char* pBuffer = Con::getReturnBuffer(bufSize);
    const char *pch = format;
 
    pBuffer[0] = '\0';
@@ -99,7 +100,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       case 'u':
       case 'x':
       case 'X':
-         dSprintf( pBuffer, 64, format, dAtoi( value ) );
+         dSprintf( pBuffer, bufSize, format, dAtoi( value ) );
          break;
 
       case 'e':
@@ -107,7 +108,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       case 'f':
       case 'g':
       case 'G':
-         dSprintf( pBuffer, 64, format, dAtof( value ) );
+         dSprintf( pBuffer, bufSize, format, dAtof( value ) );
          break;
 
       default:
@@ -259,7 +260,7 @@ DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, int offset ), ( 0 ),
+DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
    "Find the start of @a needle in @a haystack searching from left to right beginning at the given offset.\n"
    "@param haystack The string to search.\n"
    "@param needle The string to search for.\n"
@@ -479,7 +480,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
       if(!scan)
       {
          dStrcpy(ret + dstp, source + scanp);
-         return ret;
+         break;
       }
       U32 len = scan - (source + scanp);
       dStrncpy(ret + dstp, source + scanp, len);
@@ -1588,6 +1589,13 @@ DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/s
    return Platform::displaySplashWindow(path);
 }
 
+DefineEngineFunction( closeSplashWindow, void, (),,
+   "Close our startup splash window.\n\n"
+   "@note This is currently only implemented on Windows.\n\n"
+   "@ingroup Platform" )
+{
+   Platform::closeSplashWindow();
+}
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( getWebDeployment, bool, (),,

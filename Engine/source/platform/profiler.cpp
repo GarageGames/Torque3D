@@ -22,7 +22,7 @@
 
 #include "platform/platform.h"
 
-#if defined(TORQUE_OS_WIN32)
+#if defined(TORQUE_OS_WIN)
 #include<Windows.h> // for SetThreadAffinityMask
 #endif
 
@@ -462,7 +462,7 @@ void Profiler::hashPop(ProfilerRootData *expected)
       if(!mEnabled && mNextEnable)
          startHighResolutionTimer(mCurrentProfilerData->mStartTime);
 
-#if defined(TORQUE_OS_WIN32)
+#if defined(TORQUE_OS_WIN)
       // The high performance counters under win32 are unreliable when running on multiple
       // processors. When the profiler is enabled, we restrict Torque to a single processor.
       if(mNextEnable != mEnabled)
@@ -476,8 +476,8 @@ void Profiler::hashPop(ProfilerRootData *expected)
          else
          {
             Con::warnf("Warning: the Torque profiler thread may now run on any cpu.");
-            DWORD procMask;
-            DWORD sysMask;
+            DWORD_PTR procMask;
+            DWORD_PTR sysMask;
             GetProcessAffinityMask( GetCurrentProcess(), &procMask, &sysMask);
             SetThreadAffinityMask( GetCurrentThread(), procMask);
          }

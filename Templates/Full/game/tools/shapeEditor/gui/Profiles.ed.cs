@@ -41,7 +41,7 @@ singleton GuiControlProfile(GuiShapeEdTextListProfile : ToolsGuiTextListProfile)
 
 singleton GuiControlProfile(GuiShapeEdRolloutProfile : GuiInspectorRolloutProfile0)
 {
-   bitmap = "tools/editorclasses/gui/images/rollout";
+   bitmap = "tools/editorClasses/gui/images/rollout";
    category = "Editor";
 };
 

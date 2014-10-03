@@ -33,7 +33,6 @@
 using namespace Compiler;
 
 bool           CodeBlock::smInFunction = false;
-U32            CodeBlock::smBreakLineCount = 0;
 CodeBlock *    CodeBlock::smCodeBlockList = NULL;
 CodeBlock *    CodeBlock::smCurrentCodeBlock = NULL;
 ConsoleParser *CodeBlock::smCurrentParser = NULL;
@@ -403,14 +402,14 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       for(U32 i = 0; i < size; i++)
          st.read(&functionFloats[i]);
    }
-   U32 codeSize;
-   st.read(&codeSize);
+   U32 codeLength;
+   st.read(&codeLength);
    st.read(&lineBreakPairCount);
 
-   U32 totSize = codeSize + lineBreakPairCount * 2;
+   U32 totSize = codeLength + lineBreakPairCount * 2;
    code = new U32[totSize];
 
-   for(i = 0; i < codeSize; i++)
+   for(i = 0; i < codeLength; i++)
    {
       U8 b;
       st.read(&b);
@@ -420,10 +419,10 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
          code[i] = b;
    }
 
-   for(i = codeSize; i < totSize; i++)
+   for(i = codeLength; i < totSize; i++)
       st.read(&code[i]);
 
-   lineBreakPairs = code + codeSize;
+   lineBreakPairs = code + codeLength;
 
    // StringTable-ize our identifiers.
    U32 identCount;
@@ -456,6 +455,8 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
 
 bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, const char *inScript, bool overrideNoDso)
 {
+	AssertFatal(Con::isMainThread(), "Compiling code on a secondary thread");
+	
    // This will return true, but return value is ignored
    char *script;
    chompUTF8BOM( inScript, &script );
@@ -464,7 +465,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
 
    consoleAllocReset();
 
-   STEtoU32 = compileSTEtoU32;
+   STEtoCode = compileSTEtoCode;
 
    gStatementList = NULL;
 
@@ -497,17 +498,23 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    resetTables();
 
    smInFunction = false;
-   smBreakLineCount = 0;
-   setBreakCodeBlock(this);
 
+   CodeStream codeStream;
+   U32 lastIp;
    if(gStatementList)
-      codeSize = precompileBlock(gStatementList, 0) + 1;
+   {
+      lastIp = compileBlock(gStatementList, codeStream, 0) + 1;
+   }
    else
+   {
       codeSize = 1;
-
-   lineBreakPairCount = smBreakLineCount;
-   code = new U32[codeSize + smBreakLineCount * 2];
-   lineBreakPairs = code + codeSize;
+      lastIp = 0;
+   }
+   
+   codeStream.emit(OP_RETURN);
+   codeStream.emitCodeStream(&codeSize, &code, &lineBreakPairs);
+   
+   lineBreakPairCount = codeStream.getNumLineBreaks();
 
    // Write string table data...
    getGlobalStringTable().write(st);
@@ -517,18 +524,10 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    getGlobalFloatTable().write(st);
    getFunctionFloatTable().write(st);
 
-   smBreakLineCount = 0;
-   U32 lastIp;
-   if(gStatementList)
-      lastIp = compileBlock(gStatementList, code, 0, 0, 0);
-   else
-      lastIp = 0;
-
-   if(lastIp != codeSize - 1)
+   if(lastIp != codeSize)
       Con::errorf(ConsoleLogEntry::General, "CodeBlock::compile - precompile size mismatch, a precompile/compile function pair is probably mismatched.");
-
-   code[lastIp++] = OP_RETURN;
-   U32 totSize = codeSize + smBreakLineCount * 2;
+   
+   U32 totSize = codeSize + codeStream.getNumLineBreaks() * 2;
    st.write(codeSize);
    st.write(lineBreakPairCount);
 
@@ -559,13 +558,15 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
 
 }
 
-const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, int setFrame)
+const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
 {
+	AssertFatal(Con::isMainThread(), "Compiling code on a secondary thread");
+	
    // Check for a UTF8 script file
    char *string;
    chompUTF8BOM( inString, &string );
 
-   STEtoU32 = evalSTEtoU32;
+   STEtoCode = evalSTEtoCode;
    consoleAllocReset();
 
    name = fileName;
@@ -617,12 +618,11 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
    resetTables();
 
    smInFunction = false;
-   smBreakLineCount = 0;
-   setBreakCodeBlock(this);
+   
+   CodeStream codeStream;
+   U32 lastIp = compileBlock(gStatementList, codeStream, 0);
 
-   codeSize = precompileBlock(gStatementList, 0) + 1;
-
-   lineBreakPairCount = smBreakLineCount;
+   lineBreakPairCount = codeStream.getNumLineBreaks();
 
    globalStrings   = getGlobalStringTable().build();
    globalStringsMaxLen = getGlobalStringTable().totalLen;
@@ -632,20 +632,18 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
 
    globalFloats    = getGlobalFloatTable().build();
    functionFloats  = getFunctionFloatTable().build();
-
-   code = new U32[codeSize + lineBreakPairCount * 2];
-   lineBreakPairs = code + codeSize;
-
-   smBreakLineCount = 0;
-   U32 lastIp = compileBlock(gStatementList, code, 0, 0, 0);
-   code[lastIp++] = OP_RETURN;
+   
+   codeStream.emit(OP_RETURN);
+   codeStream.emitCodeStream(&codeSize, &code, &lineBreakPairs);
+   
+   //dumpInstructions(0, false);
    
    consoleAllocReset();
 
    if(lineBreakPairCount && fileName)
       calcBreakList();
 
-   if(lastIp != codeSize)
+   if(lastIp+1 != codeSize)
       Con::warnf(ConsoleLogEntry::General, "precompile size mismatch, precompile: %d compile: %d", codeSize, lastIp);
 
    return exec(0, fileName, NULL, 0, 0, noCalls, NULL, setFrame);
@@ -674,7 +672,7 @@ String CodeBlock::getFunctionArgs( U32 ip )
    U32 fnArgc = code[ ip + 5 ];
    for( U32 i = 0; i < fnArgc; ++ i )
    {
-      StringTableEntry var = U32toSTE( code[ ip + i + 6 ] );
+      StringTableEntry var = CodeToSTE(code, ip + (i*2) + 6);
       
       if( i != 0 )
          str.append( ", " );
@@ -696,41 +694,52 @@ String CodeBlock::getFunctionArgs( U32 ip )
 void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 {
    U32 ip = startIp;
+   smInFunction = false;
+   U32 endFuncIp = 0;
+   
    while( ip < codeSize )
    {
+      if (ip > endFuncIp)
+      {
+         smInFunction = false;
+      }
+      
       switch( code[ ip ++ ] )
       {
+            
          case OP_FUNC_DECL:
          {
-            StringTableEntry fnName       = U32toSTE(code[ip]);
-            StringTableEntry fnNamespace  = U32toSTE(code[ip+1]);
-            StringTableEntry fnPackage    = U32toSTE(code[ip+2]);
-            bool hasBody = bool(code[ip+3]);
-            U32 newIp = code[ ip + 4 ];
-            U32 argc = code[ ip + 5 ];
+            StringTableEntry fnName       = CodeToSTE(code, ip);
+            StringTableEntry fnNamespace  = CodeToSTE(code, ip+2);
+            StringTableEntry fnPackage    = CodeToSTE(code, ip+4);
+            bool hasBody = bool(code[ip+6]);
+            U32 newIp = code[ ip + 7 ];
+            U32 argc = code[ ip + 8 ];
+            endFuncIp = newIp;
             
             Con::printf( "%i: OP_FUNC_DECL name=%s nspace=%s package=%s hasbody=%i newip=%i argc=%i",
                ip - 1, fnName, fnNamespace, fnPackage, hasBody, newIp, argc );
                
             // Skip args.
                            
-            ip += 6 + argc;
+            ip += 9 + (argc * 2);
+            smInFunction = true;
             break;
          }
             
          case OP_CREATE_OBJECT:
          {
-            StringTableEntry objParent = U32toSTE(code[ip    ]);
-            bool isDataBlock =          code[ip + 1];
-            bool isInternal  =          code[ip + 2];
-            bool isSingleton =          code[ip + 3];
-            U32  lineNumber  =          code[ip + 4];
-            U32 failJump     =          code[ip + 5];
+            StringTableEntry objParent = CodeToSTE(code, ip);
+            bool isDataBlock =          code[ip + 2];
+            bool isInternal  =          code[ip + 3];
+            bool isSingleton =          code[ip + 4];
+            U32  lineNumber  =          code[ip + 5];
+            U32 failJump     =          code[ip + 6];
             
             Con::printf( "%i: OP_CREATE_OBJECT objParent=%s isDataBlock=%i isInternal=%i isSingleton=%i lineNumber=%i failJump=%i",
                ip - 1, objParent, isDataBlock, isInternal, isSingleton, lineNumber, failJump );
 
-            ip += 6;
+            ip += 7;
             break;
          }
 
@@ -957,19 +966,19 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_SETCURVAR:
          {
-            StringTableEntry var = U32toSTE(code[ip]);
+            StringTableEntry var = CodeToSTE(code, ip);
             
             Con::printf( "%i: OP_SETCURVAR var=%s", ip - 1, var );
-            ip++;
+            ip += 2;
             break;
          }
          
          case OP_SETCURVAR_CREATE:
          {
-            StringTableEntry var = U32toSTE(code[ip]);
+            StringTableEntry var = CodeToSTE(code, ip);
             
             Con::printf( "%i: OP_SETCURVAR_CREATE var=%s", ip - 1, var );
-            ip++;
+            ip += 2;
             break;
          }
          
@@ -1042,9 +1051,10 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_SETCURFIELD:
          {
-            StringTableEntry curField = U32toSTE(code[ip]);
+            StringTableEntry curField = CodeToSTE(code, ip);
             Con::printf( "%i: OP_SETCURFIELD field=%s", ip - 1, curField );
-            ++ ip;
+            ip += 2;
+            break;
          }
          
          case OP_SETCURFIELD_ARRAY:
@@ -1161,7 +1171,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_LOADIMMED_FLT:
          {
-            F64 val = functionFloats[ code[ ip ] ];
+            F64 val = (smInFunction ? functionFloats : globalFloats)[ code[ ip ] ];
             Con::printf( "%i: OP_LOADIMMED_FLT val=%f", ip - 1, val );
             ++ ip;
             break;
@@ -1169,7 +1179,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_TAG_TO_STR:
          {
-            const char* str = functionStrings + code[ ip ];
+            const char* str = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_TAG_TO_STR str=%s", ip - 1, str );
             ++ ip;
             break;
@@ -1177,7 +1187,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_LOADIMMED_STR:
          {
-            const char* str = functionStrings + code[ ip ];
+            const char* str = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_LOADIMMED_STR str=%s", ip - 1, str );
             ++ ip;
             break;
@@ -1185,7 +1195,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_DOCBLOCK_STR:
          {
-            const char* str = functionStrings + code[ ip ];
+            const char* str = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_DOCBLOCK_STR str=%s", ip - 1, str );
             ++ ip;
             break;
@@ -1193,37 +1203,37 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_LOADIMMED_IDENT:
          {
-            StringTableEntry str = U32toSTE( code[ ip ] );
+            StringTableEntry str = CodeToSTE(code, ip);
             Con::printf( "%i: OP_LOADIMMED_IDENT str=%s", ip - 1, str );
-            ++ ip;
+            ip += 2;
             break;
          }
 
          case OP_CALLFUNC_RESOLVE:
          {
-            StringTableEntry fnNamespace = U32toSTE(code[ip+1]);
-            StringTableEntry fnName      = U32toSTE(code[ip]);
+            StringTableEntry fnNamespace = CodeToSTE(code, ip+2);
+            StringTableEntry fnName      = CodeToSTE(code, ip);
             U32 callType = code[ip+2];
 
             Con::printf( "%i: OP_CALLFUNC_RESOLVE name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace,
                callType == FuncCallExprNode::FunctionCall ? "FunctionCall"
                   : callType == FuncCallExprNode::MethodCall ? "MethodCall" : "ParentCall" );
             
-            ip += 3;
+            ip += 5;
             break;
          }
          
          case OP_CALLFUNC:
          {
-            StringTableEntry fnNamespace = U32toSTE(code[ip+1]);
-            StringTableEntry fnName      = U32toSTE(code[ip]);
-            U32 callType = code[ip+2];
+            StringTableEntry fnNamespace = CodeToSTE(code, ip+2);
+            StringTableEntry fnName      = CodeToSTE(code, ip);
+            U32 callType = code[ip+4];
 
             Con::printf( "%i: OP_CALLFUNC name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace,
                callType == FuncCallExprNode::FunctionCall ? "FunctionCall"
                   : callType == FuncCallExprNode::MethodCall ? "MethodCall" : "ParentCall" );
             
-            ip += 3;
+            ip += 5;
             break;
          }
 
@@ -1285,7 +1295,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_ASSERT:
          {
-            const char* message = functionStrings + code[ ip ];
+            const char* message = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_ASSERT message=%s", ip - 1, message );
             ++ ip;
             break;
@@ -1299,31 +1309,34 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_ITER_BEGIN:
          {
-            StringTableEntry varName = U32toSTE( code[ ip ] );
-            U32 failIp = code[ ip + 1 ];
+            StringTableEntry varName = CodeToSTE(code, ip);
+            U32 failIp = code[ ip + 2 ];
             
-            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", varName, failIp );
+            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", ip - 1, varName, failIp );
 
-            ++ ip;
+            ip += 3;
+            break;
          }
 
          case OP_ITER_BEGIN_STR:
          {
-            StringTableEntry varName = U32toSTE( code[ ip ] );
-            U32 failIp = code[ ip + 1 ];
+            StringTableEntry varName = CodeToSTE(code, ip);
+            U32 failIp = code[ ip + 2 ];
             
-            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", varName, failIp );
+            Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", ip - 1, varName, failIp );
 
-            ip += 2;
+            ip += 3;
+            break;
          }
          
          case OP_ITER:
          {
             U32 breakIp = code[ ip ];
             
-            Con::printf( "%i: OP_ITER breakIp=%i", breakIp );
+            Con::printf( "%i: OP_ITER breakIp=%i", ip - 1, breakIp );
 
             ++ ip;
+            break;
          }
          
          case OP_ITER_END:
@@ -1337,4 +1350,6 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
             break;
       }
    }
+   
+   smInFunction = false;
 }

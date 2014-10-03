@@ -288,7 +288,6 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 {
    for(S32 i=0; document->pushChildElement(i); i++)
    {
-	  bool groupCount = 0;
 	  const UTF8 *type = document->elementValue();
 	  const UTF8 *name = document->attribute("name");
 	  const UTF8 *value = document->getText();
@@ -302,7 +301,6 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 
 		 newStack += name;
          readLayer(document, newStack);
-		 groupCount++;
 	  } else if(dStrcmp(type, "Setting") == 0)
 	  {
 		 String nameString = groupStack;
@@ -635,13 +633,13 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
       document->addText(mValue);
    } else
    {
-	  for(int i=0; i<mSettingNodes.size(); i++)
+	  for(S32 i=0; i<mSettingNodes.size(); i++)
 	  {
          SettingSaveNode *node = mSettingNodes[i];
 		 node->buildDocument(document);
 	  }
 
-      for(int i=0; i<mGroupNodes.size(); i++)
+      for(S32 i=0; i<mGroupNodes.size(); i++)
 	  {
          SettingSaveNode *node = mGroupNodes[i];
 		 node->buildDocument(document);

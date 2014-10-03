@@ -56,7 +56,9 @@ void ShaderGenPrinterGLSL::printMainComment( Stream& stream )
 
 void ShaderGenPrinterGLSL::printVertexShaderCloser( Stream& stream )
 {
-   const char *closer = "}\r\n";
+   // We are render OpenGL upside down for use DX9 texture coords.
+   // Must be the last vertex feature.
+   const char *closer = "   gl_Position.y *= -1;\r\n}\r\n";
    stream.write( dStrlen(closer), closer );
 }
 
@@ -67,7 +69,7 @@ void ShaderGenPrinterGLSL::printPixelShaderOutputStruct( Stream& stream, const M
 
 void ShaderGenPrinterGLSL::printPixelShaderCloser( Stream& stream )
 {
-   const char *closer = "   gl_FragColor = col;\r\n}\r\n";
+   const char *closer = "   OUT_FragColor0 = col;\r\n}\r\n";
    stream.write( dStrlen(closer), closer );
 }
 
@@ -124,6 +126,11 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
          var = vertComp->getElement( RT_TANGENT );
          var->setName( "T" );
       }
+      else if ( element.isSemantic( GFXSemantic::TANGENTW ) )
+      {
+         var = vertComp->getElement( RT_TANGENTW );
+         var->setName( "tangentW" );
+      }
       else if ( element.isSemantic( GFXSemantic::BINORMAL ) )
       {
          var = vertComp->getElement( RT_BINORMAL );
@@ -152,7 +159,7 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
       if ( !var )
          continue;
 
-      var->setStructName( "" );
+      var->setStructName( "IN" );
       var->setType( typeToString( element.getType() ) );
    }
 

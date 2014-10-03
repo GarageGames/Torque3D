@@ -96,6 +96,11 @@ public:
       get()._signalProcess.notify(del,order);
    }
 
+   static void notify(SignalSlot<void()> &slot, F32 order = PROCESS_DEFAULT_ORDER) 
+   {
+      get()._signalProcess.notify(slot,order);
+   }
+
    template <class T>
    static void notify(T func, F32 order = PROCESS_DEFAULT_ORDER) 
    {

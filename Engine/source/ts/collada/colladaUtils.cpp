@@ -84,7 +84,7 @@ const domProfile_COMMON* ColladaUtils::findEffectCommonProfile(const domEffect* 
    if (effect) {
       // Find the COMMON profile
       const domFx_profile_abstract_Array& profiles = effect->getFx_profile_abstract_array();
-      for (int iProfile = 0; iProfile < profiles.getCount(); iProfile++) {
+      for (S32 iProfile = 0; iProfile < profiles.getCount(); iProfile++) {
          if (profiles[iProfile]->getElementType() == COLLADA_TYPE::PROFILE_COMMON)
             return daeSafeCast<domProfile_COMMON>(profiles[iProfile]);
       }
@@ -245,7 +245,7 @@ BasePrimitive* BasePrimitive::get(const daeElement* element)
 // Collada animation curves
 
 /// Determine which elements are being targeted
-void AnimData::parseTargetString(const char* target, int fullCount, const char* elements[])
+void AnimData::parseTargetString(const char* target, S32 fullCount, const char* elements[])
 {
    // Assume targeting all elements at offset 0
    targetValueCount = fullCount;
@@ -253,7 +253,7 @@ void AnimData::parseTargetString(const char* target, int fullCount, const char* 
 
    // Check for array syntax: (n) or (n)(m)
    if (const char* p = dStrchr(target, '(')) {
-      int indN, indM;
+      S32 indN, indM;
       if (dSscanf(p, "(%d)(%d)", &indN, &indM) == 2) {
          targetValueOffset = (indN * 4) + indM;   // @todo: 4x4 matrix only
          targetValueCount = 1;
@@ -265,7 +265,7 @@ void AnimData::parseTargetString(const char* target, int fullCount, const char* 
    }
    else if (const char* p = dStrrchr(target, '.')) {
       // Check for named elements
-      for (int iElem = 0; elements[iElem][0] != 0; iElem++) {
+      for (S32 iElem = 0; elements[iElem][0] != 0; iElem++) {
          if (!dStrcmp(p, elements[iElem])) {
             targetValueOffset = iElem;
             targetValueCount = 1;
@@ -278,9 +278,9 @@ void AnimData::parseTargetString(const char* target, int fullCount, const char* 
 /// Solve the cubic spline B(s) = param for s
 F32 AnimData::invertParamCubic(F32 param, F32 x0, F32 x1, F32 x2, F32 x3) const
 {
-   const double INVERTPARAMCUBIC_TOL         = 1.0e-09;
-   const double INVERTPARAMCUBIC_SMALLERTOL  = 1.0e-20;
-   const double INVERTPARAMCUBIC_MAXIT       = 100;
+   const F64 INVERTPARAMCUBIC_TOL         = 1.0e-09;
+   const F64 INVERTPARAMCUBIC_SMALLERTOL  = 1.0e-20;
+   const F64 INVERTPARAMCUBIC_MAXIT       = 100;
 
    // check input value for outside range
    if ((param - x0) < INVERTPARAMCUBIC_SMALLERTOL)
@@ -295,12 +295,12 @@ F32 AnimData::invertParamCubic(F32 param, F32 x0, F32 x1, F32 x2, F32 x3) const
    F32 v = 1.0f;
 
    while (iterations < INVERTPARAMCUBIC_MAXIT) {
-      double a = (x0 + x1)*0.5f;
-      double b = (x1 + x2)*0.5f;
-      double c = (x2 + x3)*0.5f;
-      double d = (a + b)*0.5f;
-      double e = (b + c)*0.5f;
-      double f = (d + e)*0.5f;
+      F64 a = (x0 + x1)*0.5f;
+      F64 b = (x1 + x2)*0.5f;
+      F64 c = (x2 + x3)*0.5f;
+      F64 d = (a + b)*0.5f;
+      F64 e = (b + c)*0.5f;
+      F64 f = (d + e)*0.5f;
 
       if (mFabs(f - param) < INVERTPARAMCUBIC_TOL)
          break;
@@ -344,7 +344,7 @@ void AnimData::interpValue(F32 t, U32 offset, double* value) const
    t = mClampF(t, curveStart, curveEnd);
 
    // find the index of the input keyframe BEFORE 't'
-   int index;
+   S32 index;
    for (index = 0; index < input.size()-2; index++) {
       if (input.getFloatValue(index + 1) > t)
          break;
@@ -470,7 +470,7 @@ void AnimData::interpValue(F32 t, U32 offset, const char** value) const
       t = mClampF(t, curveStart, curveEnd);
 
       // find the index of the input keyframe BEFORE 't'
-      int index;
+      S32 index;
       for (index = 0; index < input.size()-2; index++) {
          if (input.getFloatValue(index + 1) > t)
             break;
@@ -487,9 +487,9 @@ void AnimData::interpValue(F32 t, U32 offset, const char** value) const
 
 static void conditioner_fixupTextureSIDs(domCOLLADA* root)
 {
-   for (int iLib = 0; iLib < root->getLibrary_effects_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_effects_array().getCount(); iLib++) {
       domLibrary_effects* lib = root->getLibrary_effects_array()[iLib];
-      for (int iEffect = 0; iEffect < lib->getEffect_array().getCount(); iEffect++) {
+      for (S32 iEffect = 0; iEffect < lib->getEffect_array().getCount(); iEffect++) {
          domEffect* effect = lib->getEffect_array()[iEffect];
          const domCommon_color_or_texture_type_complexType* diffuse = findEffectDiffuse(effect);
          if (!diffuse || !diffuse->getTexture())
@@ -542,9 +542,9 @@ static void conditioner_fixupTextureSIDs(domCOLLADA* root)
 
 static void conditioner_fixupImageURIs(domCOLLADA* root)
 {
-   for (int iLib = 0; iLib < root->getLibrary_images_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_images_array().getCount(); iLib++) {
       domLibrary_images* lib = root->getLibrary_images_array()[iLib];
-      for (int iImage = 0; iImage < lib->getImage_array().getCount(); iImage++) {
+      for (S32 iImage = 0; iImage < lib->getImage_array().getCount(); iImage++) {
          domImage* image = lib->getImage_array()[iImage];
          if (image->getInit_from()) {
             xsAnyURI& uri = image->getInit_from()->getValue();
@@ -595,7 +595,7 @@ static void conditioner_fixupTransparency(domCOLLADA* root)
    // Get the <authoring_tool> string
    const char *authoringTool = "";
    if (const domAsset* asset = root->getAsset()) {
-      for (int iContrib = 0; iContrib < asset->getContributor_array().getCount(); iContrib++) {
+      for (S32 iContrib = 0; iContrib < asset->getContributor_array().getCount(); iContrib++) {
          const domAsset::domContributor* contrib = asset->getContributor_array()[iContrib];
          if (contrib->getAuthoring_tool()) {
             authoringTool = contrib->getAuthoring_tool()->getValue();
@@ -608,7 +608,7 @@ static void conditioner_fixupTransparency(domCOLLADA* root)
    bool invertTransparency = false;
    const char *toolNames[] = {   "FBX COLLADA exporter", "Google SketchUp",
                                  "Illusoft Collada Exporter", "FCollada" };
-   for (int iName = 0; iName < (sizeof(toolNames)/sizeof(toolNames[0])); iName++) {
+   for (S32 iName = 0; iName < (sizeof(toolNames)/sizeof(toolNames[0])); iName++) {
       if (dStrstr(authoringTool, toolNames[iName])) {
          invertTransparency = true;
          break;
@@ -619,9 +619,9 @@ static void conditioner_fixupTransparency(domCOLLADA* root)
       return;
 
    // Invert transparency as required for each effect
-   for (int iLib = 0; iLib < root->getLibrary_effects_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_effects_array().getCount(); iLib++) {
       domLibrary_effects* lib = root->getLibrary_effects_array()[iLib];
-      for (int iEffect = 0; iEffect < lib->getEffect_array().getCount(); iEffect++) {
+      for (S32 iEffect = 0; iEffect < lib->getEffect_array().getCount(); iEffect++) {
          domEffect* effect = lib->getEffect_array()[iEffect];
 
          // Find the common profile
@@ -658,9 +658,9 @@ static void conditioner_fixupTransparency(domCOLLADA* root)
 
 static void conditioner_checkBindShapeMatrix(domCOLLADA* root)
 {
-   for (int iLib = 0; iLib < root->getLibrary_controllers_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_controllers_array().getCount(); iLib++) {
       domLibrary_controllers* lib = root->getLibrary_controllers_array().get(iLib);
-      for (int iCon = 0; iCon < lib->getController_array().getCount(); iCon++) {
+      for (S32 iCon = 0; iCon < lib->getController_array().getCount(); iCon++) {
          domController* con = lib->getController_array().get(iCon);
          if (con->getSkin() && con->getSkin()->getBind_shape_matrix()) {
 
@@ -677,14 +677,14 @@ static void conditioner_checkBindShapeMatrix(domCOLLADA* root)
 
 static void conditioner_fixupVertexWeightJoints(domCOLLADA* root)
 {
-   for (int iLib = 0; iLib < root->getLibrary_controllers_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_controllers_array().getCount(); iLib++) {
       domLibrary_controllers* lib = root->getLibrary_controllers_array().get(iLib);
-      for (int iCon = 0; iCon < lib->getController_array().getCount(); iCon++) {
+      for (S32 iCon = 0; iCon < lib->getController_array().getCount(); iCon++) {
          domController* con = lib->getController_array().get(iCon);
          if (con->getSkin() && con->getSkin()->getVertex_weights())
          {
             domInputLocalOffset_Array& vw_inputs = con->getSkin()->getVertex_weights()->getInput_array();
-            for (int vInput = 0; vInput < vw_inputs.getCount(); vInput++) {
+            for (S32 vInput = 0; vInput < vw_inputs.getCount(); vInput++) {
 
                domInputLocalOffset *vw_input = vw_inputs.get(vInput);
                if (dStrEqual(vw_input->getSemantic(), "JOINT")) {
@@ -695,7 +695,7 @@ static void conditioner_fixupVertexWeightJoints(domCOLLADA* root)
 
                      // Copy the value from the <joints> JOINTS input instead
                      domInputLocal_Array& joint_inputs = con->getSkin()->getJoints()->getInput_array();
-                     for (int jInput = 0; jInput < joint_inputs.getCount(); jInput++) {
+                     for (S32 jInput = 0; jInput < joint_inputs.getCount(); jInput++) {
 
                         domInputLocal *joint_input = joint_inputs.get(jInput);
                         if (dStrEqual(joint_input->getSemantic(), "JOINT")) {
@@ -714,16 +714,16 @@ static void conditioner_fixupVertexWeightJoints(domCOLLADA* root)
 static void conditioner_createDefaultClip(domCOLLADA* root)
 {
    // Check if the document has any <animation_clip>s
-   for (int iLib = 0; iLib < root->getLibrary_animation_clips_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_animation_clips_array().getCount(); iLib++) {
       if (root->getLibrary_animation_clips_array()[iLib]->getAnimation_clip_array().getCount())
          return;
    }
 
    // Get all top-level <animation>s into an array
    domAnimation_Array animations;
-   for (int iAnimLib = 0; iAnimLib < root->getLibrary_animations_array().getCount(); iAnimLib++) {
+   for (S32 iAnimLib = 0; iAnimLib < root->getLibrary_animations_array().getCount(); iAnimLib++) {
       const domLibrary_animations* libraryAnims = root->getLibrary_animations_array()[iAnimLib];
-      for (int iAnim = 0; iAnim < libraryAnims->getAnimation_array().getCount(); iAnim++)
+      for (S32 iAnim = 0; iAnim < libraryAnims->getAnimation_array().getCount(); iAnim++)
          animations.append(libraryAnims->getAnimation_array()[iAnim]);
    }
 
@@ -748,7 +748,7 @@ static void conditioner_createDefaultClip(domCOLLADA* root)
 
    // Add all top_level animations to the clip (sub-animations will be included
    // when the clip is procesed)
-   for (int iAnim = 0; iAnim < animations.getCount(); iAnim++) {
+   for (S32 iAnim = 0; iAnim < animations.getCount(); iAnim++) {
       if (!animations[iAnim]->getId())
          animations[iAnim]->setId(avar("dummy-animation-id%d", iAnim));
       CREATE_ELEMENT(animation_clip, instance_animation, domInstanceWithExtra)
@@ -767,7 +767,7 @@ static void conditioner_createDefaultClip(domCOLLADA* root)
 
 static void conditioner_fixupAnimation(domAnimation* anim)
 {
-   for (int iChannel = 0; iChannel < anim->getChannel_array().getCount(); iChannel++) {
+   for (S32 iChannel = 0; iChannel < anim->getChannel_array().getCount(); iChannel++) {
 
       // Get the animation elements: <channel>, <sampler>
       domChannel* channel = anim->getChannel_array()[iChannel];
@@ -848,7 +848,7 @@ static void conditioner_fixupAnimation(domAnimation* anim)
    }
 
    // Process child animations
-   for (int iAnim = 0; iAnim < anim->getAnimation_array().getCount(); iAnim++)
+   for (S32 iAnim = 0; iAnim < anim->getAnimation_array().getCount(); iAnim++)
       conditioner_fixupAnimation(anim->getAnimation_array()[iAnim]);
 }
 
@@ -893,9 +893,9 @@ void ColladaUtils::applyConditioners(domCOLLADA* root)
    // 2) Some exporters generate visibility animations but don't add the FCOLLADA
    //    extension, so the target doesn't actually exist! Detect this situation
    //    and add the extension manually so the animation still works.
-   for (int iLib = 0; iLib < root->getLibrary_animations_array().getCount(); iLib++) {
+   for (S32 iLib = 0; iLib < root->getLibrary_animations_array().getCount(); iLib++) {
       const domLibrary_animations* lib = root->getLibrary_animations_array()[iLib];
-      for (int iAnim = 0; iAnim < lib->getAnimation_array().getCount(); iAnim++)
+      for (S32 iAnim = 0; iAnim < lib->getAnimation_array().getCount(); iAnim++)
          conditioner_fixupAnimation(lib->getAnimation_array()[iAnim]);
    }
 }

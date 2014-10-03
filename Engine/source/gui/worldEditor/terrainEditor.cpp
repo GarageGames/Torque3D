@@ -2111,8 +2111,9 @@ const char* TerrainEditor::getBrushPos()
    AssertFatal(mMouseBrush!=NULL, "TerrainEditor::getBrushPos: no mouse brush!");
 
    Point2I pos = mMouseBrush->getPosition();
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", pos.x, pos.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", pos.x, pos.y);
    return(ret);
 }
 
@@ -2521,8 +2522,9 @@ ConsoleMethod( TerrainEditor, getBrushSize, const char*, 2, 2, "()")
 {
    Point2I size = object->getBrushSize();
 
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", size.x, size.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", size.x, size.y);
    return ret;
 }
 
@@ -2868,7 +2870,7 @@ ConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, 3, 3, 0)
 }
 
 //------------------------------------------------------------------------------  
-void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope )  
+void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage )  
 {  
    if (!mActiveTerrain)  
       return;  
@@ -2894,6 +2896,9 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
   
          if (gi.mMaterial == mat)  
             continue;  
+
+         if (mRandI(0, 100) > mCoverage)
+            continue;
   
          Point3F wp;  
          gridToWorld(gp, wp);  
@@ -2933,7 +2938,7 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
    scheduleMaterialUpdate();     
 }  
   
-ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 6, 6, "(float minHeight, float maxHeight, float minSlope, float maxSlope)")  
+ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 7, 7, "(float minHeight, float maxHeight, float minSlope, float maxSlope, float coverage)")   
 {  
-   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]) );  
+   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]), dAtof(argv[6]));  
 }  

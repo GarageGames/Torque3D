@@ -650,7 +650,7 @@ void ForestBrushTool::_collectElements()
    }
 }
 
-bool ForestBrushTool::getGroundAt( const Point3F &worldPt, float *zValueOut, VectorF *normalOut )
+bool ForestBrushTool::getGroundAt( const Point3F &worldPt, F32 *zValueOut, VectorF *normalOut )
 {
    const U32 mask = TerrainObjectType | StaticShapeObjectType;
 

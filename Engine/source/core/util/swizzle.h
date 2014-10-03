@@ -126,11 +126,11 @@ inline void Swizzle<T, mapLength>::ToBuffer( void *destination, const void *sour
    T *dest = reinterpret_cast<T *>( destination );
    const T *src = reinterpret_cast<const T *>( source );
 
-   for( int i = 0; i < size / ( mapLength * sizeof( T ) ); i++ )
+   for( S32 i = 0; i < size / ( mapLength * sizeof( T ) ); i++ )
    {
       dMemcpy( dest, src, mapLength * sizeof( T ) );
 
-      for( int j = 0; j < mapLength; j++ )
+      for( S32 j = 0; j < mapLength; j++ )
          *dest++ = src[mMap[j]];
       
       src += mapLength;

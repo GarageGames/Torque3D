@@ -59,7 +59,7 @@ float4 main( PFXVertToPix IN ) : COLOR0
     half2 deltaTexCoord = (half2)( texCoord.xy - screenSunPos );  
 
     // Divide by number of samples and scale by control factor.  
-    deltaTexCoord *= 1.0 / (half)samples * density; 
+    deltaTexCoord *= (half)(1.0 / samples * density); 
 	
     // Evaluate summation from Equation 3 NUM_SAMPLES iterations.  
     for ( int i = 0; i < samples; i++ )  
@@ -71,13 +71,13 @@ float4 main( PFXVertToPix IN ) : COLOR0
         half3 sample = (half3)tex2Dlod( frameSampler, texCoord );  
 
         // Apply sample attenuation scale/decay factors.
-        sample *= illuminationDecay * weight;
+        sample *= half(illuminationDecay * weight);
 
         // Accumulate combined color.
         color += sample;
 
         // Update exponential decay factor.
-        illuminationDecay *= decay;
+        illuminationDecay *= half(decay);
     }       
    
     //return saturate( amount ) * color * Exposure;

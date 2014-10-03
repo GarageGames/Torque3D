@@ -213,7 +213,6 @@ void TSShapeAlloc::checkGuard()
    bool check32 = checkGuard32();
    bool check16 = checkGuard16();
    bool check8  = checkGuard8();
-
    AssertFatal(check32,avar("TSShapeAlloc::checkGuard32: found %i, wanted %i",getSaveGuard32(),getPrevGuard32()));
    AssertFatal(check16,avar("TSShapeAlloc::checkGuard16: found %i, wanted %i",getSaveGuard16(),getPrevGuard16()));
    AssertFatal(check8 ,avar("TSShapeAlloc::checkGuard8:  found %i, wanted %i",getSaveGuard8() ,getPrevGuard8()));

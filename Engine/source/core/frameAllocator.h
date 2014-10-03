@@ -234,7 +234,7 @@ public:
       mWaterMark = FrameAllocator::getWaterMark();
       mMemory = reinterpret_cast<T *>( FrameAllocator::alloc( sizeof( T ) * count ) );
 
-      for( int i = 0; i < mNumObjectsInMemory; i++ )
+      for( S32 i = 0; i < mNumObjectsInMemory; i++ )
          constructInPlace<T>( &mMemory[i] );
    }
 
@@ -242,7 +242,7 @@ public:
    ~FrameTemp()
    {
       // Call destructor
-      for( int i = 0; i < mNumObjectsInMemory; i++ )
+      for( S32 i = 0; i < mNumObjectsInMemory; i++ )
          destructInPlace<T>( &mMemory[i] );
 
       FrameAllocator::setWaterMark( mWaterMark );

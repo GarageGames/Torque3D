@@ -77,7 +77,7 @@ bool DDSUtil::squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat )
    // are done, we can discard the old surface, and replace it with this one.
    DDSFile::SurfaceData *newSurface = new DDSFile::SurfaceData();
 
-   for( int i = 0; i < srcDDS->mMipMapCount; i++ )
+   for( S32 i = 0; i < srcDDS->mMipMapCount; i++ )
    {
       const U8 *srcBits = srcSurface->mMips[i];
 
@@ -106,7 +106,7 @@ bool DDSUtil::squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat )
 
 void DDSUtil::swizzleDDS( DDSFile *srcDDS, const Swizzle<U8, 4> &swizzle )
 {
-   for( int i = 0; i < srcDDS->mMipMapCount; i++ )
+   for( S32 i = 0; i < srcDDS->mMipMapCount; i++ )
    {
       swizzle.InPlace( srcDDS->mSurfaces.last()->mMips[i], srcDDS->getSurfaceSize( i ) );
    }

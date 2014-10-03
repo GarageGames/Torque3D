@@ -381,7 +381,7 @@ CodeMapping gVirtualMap[] =
    { "lpov2",         SI_POV,    SI_LPOV2       },
    { "rpov2",         SI_POV,    SI_RPOV2       },
 
-#if defined( TORQUE_OS_WIN32 ) || defined( TORQUE_OS_XENON )
+#if defined( TORQUE_OS_WIN ) || defined( TORQUE_OS_XENON )
    //-------------------------------------- XINPUT EVENTS
    // Controller connect / disconnect:
    { "connect",       SI_BUTTON, XI_CONNECT     },
@@ -500,7 +500,7 @@ void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEve
    newEvent.postToSignal(Input::smInputEvent);
 }
 
-void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue)
+void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, F32 fValue)
 {
    InputEventInfo newEvent;
 

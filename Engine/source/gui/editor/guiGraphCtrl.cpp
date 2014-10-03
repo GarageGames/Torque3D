@@ -274,7 +274,7 @@ void GuiGraphCtrl::addDatum(S32 plotID, F32 v)
 
 //-----------------------------------------------------------------------------
 
-float GuiGraphCtrl::getDatum( int plotID, int sample)
+F32 GuiGraphCtrl::getDatum( S32 plotID, S32 sample)
 {
    AssertFatal(plotID > -1 && plotID < MaxPlots, "Invalid plot specified!");
    AssertFatal(sample > -1 && sample < MaxDataPoints, "Invalid sample specified!");

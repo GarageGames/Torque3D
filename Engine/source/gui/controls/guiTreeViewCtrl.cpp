@@ -3583,7 +3583,7 @@ void GuiTreeViewCtrl::onMiddleMouseDown(const GuiEvent & event)
       for (S32 j = 0; j < mSelected.size(); j++) {
          Con::printf("%d", mSelected[j]);
       }
-      S32 mCurrentDragCell = mMouseOverCell.y;
+      mCurrentDragCell = mMouseOverCell.y;
       S32 midpCell = (mCurrentDragCell) * mItemHeight + (mItemHeight/2);
       S32 currentY = pt.y;
       S32 yDiff = currentY-midpCell;
@@ -3648,7 +3648,7 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
                break;
             }
          }
-         S32 mCurrentDragCell = mMouseOverCell.y;
+         mCurrentDragCell = mMouseOverCell.y;
          if (mVisibleItems[firstSelectedIndex] != firstItem )
          {
             /*
@@ -4920,7 +4920,7 @@ ConsoleMethod( GuiTreeViewCtrl, open, void, 3, 4, "(SimSet obj, bool okToEdit=tr
 
 ConsoleMethod( GuiTreeViewCtrl, setItemTooltip, void, 4, 4, "( int id, string text ) - Set the tooltip to show for the given item." )
 {
-   int id = dAtoi( argv[ 2 ] );
+   S32 id = dAtoi( argv[ 2 ] );
    
    GuiTreeViewCtrl::Item* item = object->getItem( id );
    if( !item )
@@ -4934,7 +4934,7 @@ ConsoleMethod( GuiTreeViewCtrl, setItemTooltip, void, 4, 4, "( int id, string te
 
 ConsoleMethod( GuiTreeViewCtrl, setItemImages, void, 5, 5, "( int id, int normalImage, int expandedImage ) - Sets the normal and expanded images to show for the given item." )
 {
-   int id = dAtoi( argv[ 2 ] );
+   S32 id = dAtoi( argv[ 2 ] );
 
    GuiTreeViewCtrl::Item* item = object->getItem( id );
    if( !item )
@@ -4949,7 +4949,7 @@ ConsoleMethod( GuiTreeViewCtrl, setItemImages, void, 5, 5, "( int id, int normal
 
 ConsoleMethod( GuiTreeViewCtrl, isParentItem, bool, 3, 3, "( int id ) - Returns true if the given item contains child items." )
 {
-   int id = dAtoi( argv[ 2 ] );
+   S32 id = dAtoi( argv[ 2 ] );
    if( !id && object->getItemCount() )
       return true;
    
@@ -5061,11 +5061,12 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedObject, S32, 2, 3, "( int index=0 ) - 
 ConsoleMethod(GuiTreeViewCtrl, getSelectedObjectList, const char*, 2, 2, 
               "Returns a space sperated list of all selected object ids.")
 {
-   char* buff = Con::getReturnBuffer(1024);
-   dSprintf(buff,1024,"");
+   static const U32 bufSize = 1024;
+   char* buff = Con::getReturnBuffer(bufSize);
+   dSprintf(buff,bufSize,"");
 
    const Vector< GuiTreeViewCtrl::Item* > selectedItems = object->getSelectedItems();
-   for(int i = 0; i < selectedItems.size(); i++)
+   for(S32 i = 0; i < selectedItems.size(); i++)
    {
       GuiTreeViewCtrl::Item *item = selectedItems[i];
 
@@ -5077,7 +5078,7 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedObjectList, const char*, 2, 2,
          //the start of the buffer where we want to write
          char* buffPart = buff+len;
          //the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-         S32 size	=	1024-len-1;
+         S32 size = bufSize-len-1;
          //write it:
          if(size < 1)
          {
@@ -5126,11 +5127,12 @@ ConsoleMethod(GuiTreeViewCtrl, getTextToRoot, const char*,4,4,"(TreeItemId item,
 
 ConsoleMethod(GuiTreeViewCtrl, getSelectedItemList,const char*, 2,2,"returns a space seperated list of mulitple item ids")
 {
-	char* buff = Con::getReturnBuffer(1024);
-	dSprintf(buff,1024,"");
+	static const U32 bufSize = 1024;
+	char* buff = Con::getReturnBuffer(bufSize);
+	dSprintf(buff,bufSize,"");
 
    const Vector< S32 >& selected = object->getSelected();
-	for(int i = 0; i < selected.size(); i++)
+	for(S32 i = 0; i < selected.size(); i++)
 	{
 		S32 id  = selected[i];
 		//get the current length of the buffer
@@ -5138,7 +5140,7 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedItemList,const char*, 2,2,"returns a s
 		//the start of the buffer where we want to write
 		char* buffPart = buff+len;
 		//the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-		S32 size	=	1024-len-1;
+		S32 size	=	bufSize-len-1;
 		//write it:
 		if(size < 1)
 		{

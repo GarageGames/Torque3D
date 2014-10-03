@@ -29,7 +29,7 @@
 #include "windowManager/platformWindow.h"
 #include "windowManager/platformWindowMgr.h"
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/winDispatch.h"
 extern void createFontInit(void);
@@ -37,7 +37,7 @@ extern void createFontShutdown(void);
 #endif
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-   extern INT CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
+   extern S32 CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
 #endif
 
 static HashTable<StringTableEntry,StringTableEntry> gSecureScript;
@@ -47,7 +47,7 @@ static HashTable<StringTableEntry,StringTableEntry> gSecureScript;
 // ObjC hooks for shared library support
 // See:  macMain.mm
 
-void torque_mac_engineinit(int argc, const char **argv);
+void torque_mac_engineinit(S32 argc, const char **argv);
 void  torque_mac_enginetick();
 void torque_mac_engineshutdown();
 
@@ -64,7 +64,7 @@ extern "C" {
 	}
 
    // initialize Torque 3D including argument handling
-	int torque_engineinit(S32 argc, const char **argv)
+	S32 torque_engineinit(S32 argc, const char **argv)
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -105,7 +105,7 @@ extern "C" {
 	}
 
    // tick Torque 3D's main loop
-	int torque_enginetick()
+	S32 torque_enginetick()
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -139,7 +139,7 @@ extern "C" {
 	}
 
    // shutdown the engine
-	int torque_engineshutdown()
+	S32 torque_engineshutdown()
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -181,7 +181,7 @@ extern "C" {
 
 	}
 
-	int torque_getconsolebool(const char* name)
+	S32 torque_getconsolebool(const char* name)
 	{
 		return Con::getBoolVariable(name);
 	}
@@ -303,7 +303,7 @@ extern "C" {
 		Namespace::Entry* entry = GetEntry(nameSpace, name);
 
 		if (!entry)
-			return "";
+			return false;
 
 		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);      
 	}
@@ -415,7 +415,7 @@ extern "C" {
 			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
 	}
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
    // retrieve the hwnd of our render window
    void* torque_gethwnd()
    {
@@ -468,9 +468,10 @@ ConsoleFunction(testJavaScriptBridge, const char *, 4, 4, "testBridge(arg1, arg2
 	if (dStrcmp(jret,"42"))
 		failed = 3;
 
-	char *ret = Con::getReturnBuffer(256);
+	static const U32 bufSize = 256;
+	char *ret = Con::getReturnBuffer(bufSize);
 
-	dSprintf(ret, 256, "%i", failed);
+	dSprintf(ret, bufSize, "%i", failed);
 
 	return ret;
 }

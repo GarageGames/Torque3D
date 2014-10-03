@@ -174,7 +174,7 @@ inline OutputClass horrible_cast(const InputClass input){
 	// Cause a compile-time error if in, out and u are not the same size.
 	// If the compile fails here, it means the compiler has peculiar
 	// unions which would prevent the cast from working.
-	typedef int ERROR_CantUseHorrible_cast[sizeof(InputClass)==sizeof(u) 
+	typedef S32 ERROR_CantUseHorrible_cast[sizeof(InputClass)==sizeof(u) 
 		&& sizeof(InputClass)==sizeof(OutputClass) ? 1 : -1];
 	u.in = input;
 	return u.out;
@@ -270,7 +270,7 @@ struct VoidToDefaultVoid<void> { typedef DefaultVoid type; };
 #endif
 
 // The size of a single inheritance member function pointer.
-const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
+const S32 SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
 
 //						SimplifyMemFunc< >::Convert()
 //
@@ -284,7 +284,7 @@ const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
 //	template specialisation, I use full specialisation of a wrapper struct.
 
 // general case -- don't know how to convert it. Force a compile failure
-template <int N>
+template <S32 N>
 struct SimplifyMemFunc {
 	template <class X, class XFuncType, class GenericMemFuncType>
 	inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, 
@@ -344,11 +344,11 @@ struct SimplifyMemFunc< SINGLE_MEMFUNCPTR_SIZE + sizeof(int) >  {
 			XFuncType func;
 			struct {	 
 				GenericMemFuncType funcaddress; // points to the actual member function
-				int delta;	     // #BYTES to be added to the 'this' pointer
+				S32 delta;	     // #BYTES to be added to the 'this' pointer
 			}s;
         } u;
 		// Check that the horrible_cast will work
-		typedef int ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)? 1 : -1];
+		typedef S32 ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)? 1 : -1];
         u.func = function_to_bind;
 		bound_func = u.s.funcaddress;
 		return reinterpret_cast<GenericClass *>(reinterpret_cast<char *>(pthis) + u.s.delta); 
@@ -367,8 +367,8 @@ struct SimplifyMemFunc< SINGLE_MEMFUNCPTR_SIZE + sizeof(int) >  {
 // is internally defined as:
 struct MicrosoftVirtualMFP {
 	void (GenericClass::*codeptr)(); // points to the actual member function
-	int delta;		// #bytes to be added to the 'this' pointer
-	int vtable_index; // or 0 if no virtual inheritance
+	S32 delta;		// #bytes to be added to the 'this' pointer
+	S32 vtable_index; // or 0 if no virtual inheritance
 };
 // The CRUCIAL feature of Microsoft/Intel MFPs which we exploit is that the
 // m_codeptr member is *always* called, regardless of the values of the other
@@ -405,7 +405,7 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2*sizeof(int) >
 			MicrosoftVirtualMFP s;
 		} u2;
 		// Check that the horrible_cast<>s will work
-		typedef int ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)
+		typedef S32 ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)
 			&& sizeof(function_to_bind)==sizeof(u.ProbeFunc)
 			&& sizeof(u2.virtfunc)==sizeof(u2.s) ? 1 : -1];
    // Unfortunately, taking the address of a MF prevents it from being inlined, so 
@@ -477,24 +477,24 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(int) >
 			// is internally defined as:
 			struct {
 				GenericMemFuncType m_funcaddress; // points to the actual member function
-				int delta;		// #bytes to be added to the 'this' pointer
-				int vtordisp;		// #bytes to add to 'this' to find the vtable
-				int vtable_index; // or 0 if no virtual inheritance
+				S32 delta;		// #bytes to be added to the 'this' pointer
+				S32 vtordisp;		// #bytes to add to 'this' to find the vtable
+				S32 vtable_index; // or 0 if no virtual inheritance
 			} s;
 		} u;
 		// Check that the horrible_cast will work
-		typedef int ERROR_CantUsehorrible_cast[sizeof(XFuncType)==sizeof(u.s)? 1 : -1];
+		typedef S32 ERROR_CantUsehorrible_cast[sizeof(XFuncType)==sizeof(u.s)? 1 : -1];
 		u.func = function_to_bind;
 		bound_func = u.s.funcaddress;
-		int virtual_delta = 0;
+		S32 virtual_delta = 0;
 		if (u.s.vtable_index) { // Virtual inheritance is used
 			// First, get to the vtable. 
 			// It is 'vtordisp' bytes from the start of the class.
-			const int * vtable = *reinterpret_cast<const int *const*>(
+			const S32 * vtable = *reinterpret_cast<const S32 *const*>(
 				reinterpret_cast<const char *>(pthis) + u.s.vtordisp );
 
 			// 'vtable_index' tells us where in the table we should be looking.
-			virtual_delta = u.s.vtordisp + *reinterpret_cast<const int *>( 
+			virtual_delta = u.s.vtordisp + *reinterpret_cast<const S32 *>( 
 				reinterpret_cast<const char *>(vtable) + u.s.vtable_index);
 		}
 		// The int at 'virtual_delta' gives us the amount to add to 'this'.
@@ -777,7 +777,7 @@ public:
 		// Ensure that there's a compilation failure if function pointers 
 		// and data pointers have different sizes.
 		// If you get this error, you need to #undef FASTDELEGATE_USESTATICFUNCTIONHACK.
-		typedef int ERROR_CantUseEvilMethod[sizeof(GenericClass *)==sizeof(function_to_bind) ? 1 : -1];
+		typedef S32 ERROR_CantUseEvilMethod[sizeof(GenericClass *)==sizeof(function_to_bind) ? 1 : -1];
 		m_pthis = horrible_cast<GenericClass *>(function_to_bind);
 		// MSVC, SunC++ and DMC accept the following (non-standard) code:
 //		m_pthis = static_cast<GenericClass *>(static_cast<void *>(function_to_bind));
@@ -792,7 +792,7 @@ public:
 		// Ensure that there's a compilation failure if function pointers 
 		// and data pointers have different sizes.
 		// If you get this error, you need to #undef FASTDELEGATE_USESTATICFUNCTIONHACK.
-		typedef int ERROR_CantUseEvilMethod[sizeof(UnvoidStaticFuncPtr)==sizeof(this) ? 1 : -1];
+		typedef S32 ERROR_CantUseEvilMethod[sizeof(UnvoidStaticFuncPtr)==sizeof(this) ? 1 : -1];
 		return horrible_cast<UnvoidStaticFuncPtr>(this);
 	}
 #endif // !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
@@ -906,7 +906,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -991,7 +991,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1076,7 +1076,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1161,7 +1161,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1246,7 +1246,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1331,7 +1331,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1416,7 +1416,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1501,7 +1501,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1586,7 +1586,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1671,7 +1671,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1756,7 +1756,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1841,7 +1841,7 @@ public:
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
-		int a_data_pointer_to_this_is_0_on_buggy_compilers;
+		S32 a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;

@@ -285,7 +285,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
 {
    PROFILE_SCOPE( ProcessedShaderMaterial_DetermineFeatures );
 
-   const float shaderVersion = GFX->getPixelShaderVersion();
+   const F32 shaderVersion = GFX->getPixelShaderVersion();
    AssertFatal(shaderVersion > 0.0 , "Cannot create a shader material if we don't support shaders");
 
    bool lastStage = stageNum == (mMaxStages-1);

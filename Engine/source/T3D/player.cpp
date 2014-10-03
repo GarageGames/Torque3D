@@ -427,9 +427,9 @@ bool PlayerData::preload(bool server, String &errorStr)
    {
       for( U32 i = 0; i < MaxSounds; ++ i )
       {
-         String errorStr;
-         if( !sfxResolve( &sound[ i ], errorStr ) )
-            Con::errorf( "PlayerData::preload: %s", errorStr.c_str() );
+         String sfxErrorStr;
+         if( !sfxResolve( &sound[ i ], sfxErrorStr ) )
+            Con::errorf( "PlayerData::preload: %s", sfxErrorStr.c_str() );
       }
    }
 
@@ -467,7 +467,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       // Extract ground transform velocity from animations
       // Get the named ones first so they can be indexed directly.
       ActionAnimation *dp = &actionList[0];
-      for (int i = 0; i < NumTableActionAnims; i++,dp++)
+      for (S32 i = 0; i < NumTableActionAnims; i++,dp++)
       {
          ActionAnimationDef *sp = &ActionAnimationList[i];
          dp->name          = sp->name;
@@ -487,12 +487,8 @@ bool PlayerData::preload(bool server, String &errorStr)
          dp->death         = false;
          if (dp->sequence != -1)
             getGroundInfo(si,thread,dp);
-
-         // No real reason to spam the console about a missing jet animation
-         if (dStricmp(sp->name, "jet") != 0)
-            AssertWarn(dp->sequence != -1, avar("PlayerData::preload - Unable to find named animation sequence '%s'!", sp->name));
       }
-      for (int b = 0; b < mShape->sequences.size(); b++)
+      for (S32 b = 0; b < mShape->sequences.size(); b++)
       {
          if (!isTableSequence(b))
          {
@@ -509,7 +505,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       // Resolve lookAction index
       dp = &actionList[0];
       String lookName("look");
-      for (int c = 0; c < actionCount; c++,dp++)
+      for (S32 c = 0; c < actionCount; c++,dp++)
          if( dStricmp( dp->name, lookName ) == 0 )
             lookAction = c;
 
@@ -557,7 +553,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       if (!Sim::findObject(dustID, dustEmitter))
          Con::errorf(ConsoleLogEntry::General, "PlayerData::preload - Invalid packet, bad datablockId(dustEmitter): 0x%x", dustID);
 
-   for (int i=0; i<NUM_SPLASH_EMITTERS; i++)
+   for (S32 i=0; i<NUM_SPLASH_EMITTERS; i++)
       if( !splashEmitterList[i] && splashEmitterIDList[i] != 0 )
          if( Sim::findObject( splashEmitterIDList[i], splashEmitterList[i] ) == false)
             Con::errorf(ConsoleLogEntry::General, "PlayerData::onAdd - Invalid packet, bad datablockId(particle emitter): 0x%x", splashEmitterIDList[i]);
@@ -586,7 +582,10 @@ bool PlayerData::preload(bool server, String &errorStr)
             Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(mShapeFP[i].getPath());
 
             if (!fileRef)
+            {
+               errorStr = String::ToString("PlayerData: Mounted image %d loading failed, shape \"%s\" is not found.",i,mShapeFP[i].getPath().getFullPath().c_str());
                return false;
+            }
 
             if(server)
                mCRCFP[i] = fileRef->getChecksum();
@@ -647,7 +646,7 @@ bool PlayerData::isTableSequence(S32 seq)
 {
    // The sequences from the table must already have
    // been loaded for this to work.
-   for (int i = 0; i < NumTableActionAnims; i++)
+   for (S32 i = 0; i < NumTableActionAnims; i++)
       if (actionList[i].sequence == seq)
          return true;
    return false;
@@ -1944,7 +1943,7 @@ void Player::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for ( int i = 0; i < skins.size(); i++ )
+      for ( S32 i = 0; i < skins.size(); i++ )
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );
@@ -1961,7 +1960,7 @@ void Player::reSkin()
 
          // Apply skin to both 3rd person and 1st person shape instances
          mShapeInstance->reSkin( newSkin, oldSkin );
-         for ( int j = 0; j < ShapeBase::MaxMountedImages; j++ )
+         for ( S32 j = 0; j < ShapeBase::MaxMountedImages; j++ )
          {
             if (mShapeFPInstance[j])
                mShapeFPInstance[j]->reSkin( newSkin, oldSkin );
@@ -2952,7 +2951,7 @@ void Player::updateMove(const Move* move)
 
       // Clamp acceleration.
       F32 maxAcc = (mDataBlock->swimForce / getMass()) * TickSec;
-      if ( false && swimSpeed > maxAcc )
+      if ( swimSpeed > maxAcc )
          swimAcc *= maxAcc / swimSpeed;      
 
       acc += swimAcc;
@@ -5822,7 +5821,7 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    F32 const *si = &start.x;
    F32 const *ei = &end.x;
 
-   for (int i = 0; i < 3; i++) {
+   for (S32 i = 0; i < 3; i++) {
       if (*si < *ei) {
          if (*si > *bmax || *ei < *bmin)
             return false;
@@ -6507,8 +6506,9 @@ DefineEngineMethod( Player, getDamageLocation, const char*, ( Point3F pos ),,
 
    object->getDamageLocation(pos, buffer1, buffer2);
 
-   char *buff = Con::getReturnBuffer(128);
-   dSprintf(buff, 128, "%s %s", buffer1, buffer2);
+   static const U32 bufSize = 128;
+   char *buff = Con::getReturnBuffer(bufSize);
+   dSprintf(buff, bufSize, "%s %s", buffer1, buffer2);
    return buff;
 }
 

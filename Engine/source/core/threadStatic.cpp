@@ -103,7 +103,7 @@ TorqueThreadStaticListHandle _TorqueThreadStaticReg::spawnThreadStaticsInstance(
 
    // Copy mThreadStaticInstances[0] (master copy) into new memory, and
    // pass it back.
-   for( int i = 0; i < getThreadStaticListVector()[0].size(); i++ )
+   for( S32 i = 0; i < getThreadStaticListVector()[0].size(); i++ )
    {
       getThreadStaticListVector().last().push_back( getThreadStaticListVector()[0][i]->_createInstance() );
    }

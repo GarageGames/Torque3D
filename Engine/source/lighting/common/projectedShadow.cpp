@@ -53,8 +53,8 @@ SimObjectPtr<RenderPassManager> ProjectedShadow::smRenderPass = NULL;
 SimObjectPtr<PostEffect> ProjectedShadow::smShadowFilter = NULL;
 F32 ProjectedShadow::smDepthAdjust = 10.0f;
 
-float ProjectedShadow::smFadeStartPixelSize = 200.0f;
-float ProjectedShadow::smFadeEndPixelSize = 35.0f;
+F32 ProjectedShadow::smFadeStartPixelSize = 200.0f;
+F32 ProjectedShadow::smFadeEndPixelSize = 35.0f;
 
 
 GFX_ImplementTextureProfile( BLProjectedShadowProfile,
@@ -62,14 +62,14 @@ GFX_ImplementTextureProfile( BLProjectedShadowProfile,
                               GFXTextureProfile::PreserveSize | 
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 GFX_ImplementTextureProfile( BLProjectedShadowZProfile,
                               GFXTextureProfile::DiffuseMap,
                               GFXTextureProfile::PreserveSize | 
                               GFXTextureProfile::ZTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 
 ProjectedShadow::ProjectedShadow( SceneObject *object )

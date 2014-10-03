@@ -243,7 +243,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       return;
 
    // Get the sunlight. If there's no sun, and no lights in the bins, no draw
-   LightInfo *sunLight = mLightManager->getSpecialLight( LightManager::slSunLightType );
+   LightInfo *sunLight = mLightManager->getSpecialLight( LightManager::slSunLightType, false );
    if( !sunLight && mLightBin.empty() )
       return;
 

@@ -54,6 +54,9 @@
 #include "math/util/frustum.h"
 #endif
 
+#ifndef _PLATFORM_PLATFORMTIMER_H_
+#include "platform/platformTimer.h"
+#endif
 
 class FontRenderBatcher;
 class GFont;
@@ -743,6 +746,7 @@ public:
    virtual void endScene();
    virtual void beginField();
    virtual void endField();
+   PlatformTimer *mFrameTime;
 
    virtual GFXTexHandle & getFrontBuffer(){ return mFrontBuffer[mCurrentFrontBufferIdx]; }
 

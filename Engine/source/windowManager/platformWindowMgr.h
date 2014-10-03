@@ -133,6 +133,9 @@ public:
    /// This method removes the curtain window.
    virtual void raiseCurtain()=0;
 
+   /// This method indicates to created windows to show as normal.
+   virtual void setDisplayWindow(bool set){}
+
 private:
    /// Process command line arguments from StandardMainLoop. This is done to
    /// allow web plugin functionality, where we are passed platform-specific

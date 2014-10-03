@@ -438,7 +438,7 @@ void StringBufferManager::updateStats()
    request8 = 0;
    request16 = 0;
    U32 nstrings = strings.size();
-   for(int i=0; i < nstrings; i++)
+   for(S32 i=0; i < nstrings; i++)
    {
       request8 += strings[i]->rc->requestCount8;
       request16 += strings[i]->rc->requestCount16;
@@ -459,7 +459,7 @@ void StringBufferManager::dumpAllStrings()
    U32 nstrings = strings.size();
    Con::printf("===== String Manager: All Strings =====");
    Con::printf(" utf8 | utf16 | string");
-   for(int i=0; i < nstrings; i++)
+   for(S32 i=0; i < nstrings; i++)
    {
       UTF8* tmp = strings[i]->createCopy8();
       strings[i]->rc->requestCount8--;

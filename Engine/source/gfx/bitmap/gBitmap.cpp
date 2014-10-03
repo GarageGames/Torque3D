@@ -796,11 +796,11 @@ bool GBitmap::combine( const GBitmap *bitmapA, const GBitmap *bitmapB, const GFX
    const U8 *aBits = bitmapA->getBits();
    const U8 *bBits = bitmapB->getBits();
 
-   for( int y = 0; y < getHeight(); y++ )
+   for( S32 y = 0; y < getHeight(); y++ )
    {
-      for( int x = 0; x < getWidth(); x++ )
+      for( S32 x = 0; x < getWidth(); x++ )
       {
-         for( int _byte = 0; _byte < mBytesPerPixel; _byte++ )
+         for( S32 _byte = 0; _byte < mBytesPerPixel; _byte++ )
          {
             U8 pxA = 0;
             U8 pxB = 0;

@@ -102,7 +102,7 @@ public:
    void buildBox(const MatrixF& transform,const Box3F& box);
    void intersect(SimObject*, const BSPNode* node);
    inline bool didIntersect()  { return mVolumeList.size() > 1; }
-   void extrudeFace(int fi,const VectorF& vec,Polytope* out);
+   void extrudeFace(S32 fi,const VectorF& vec,Polytope* out);
    bool findCollision(const VectorF& vec,Polytope::Collision *best);
 };
 

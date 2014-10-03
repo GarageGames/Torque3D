@@ -41,7 +41,8 @@ PlatformWindowManager * CreatePlatformWindowManager()
 Win32WindowManager::Win32WindowManager()
 {
    // Register in the process list.
-   Process::notify(this, &Win32WindowManager::_process, PROCESS_INPUT_ORDER);
+   mOnProcessSignalSlot.setDelegate( this, &Win32WindowManager::_process );
+   Process::notify( mOnProcessSignalSlot, PROCESS_INPUT_ORDER );
 
    // Init our list of allocated windows.
    mWindowListHead = NULL;
@@ -53,14 +54,13 @@ Win32WindowManager::Win32WindowManager()
 
    mOffscreenRender = false;
 
+   mDisplayWindow = false;
+
    buildMonitorsList();
 }
 
 Win32WindowManager::~Win32WindowManager()
 {
-   // Get ourselves off the process list.
-   Process::remove(this, &Win32WindowManager::_process);
-
    // Kill all our windows first.
    while(mWindowListHead)
       // The destructors update the list, so this works just fine.
@@ -136,7 +136,7 @@ void Win32WindowManager::buildMonitorsList()
    mMonitors.clear();
 
    // Enumerate all monitors
-   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (U32)(void*)&mMonitors);
+   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (size_t)(void*)&mMonitors);
 }
 
 S32 Win32WindowManager::findFirstMatchingMonitor(const char* name)
@@ -252,7 +252,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
    w32w->setVideoMode(mode);
 
    // Associate our window struct with the HWND.
-   SetWindowLongPtrW(w32w->mWindowHandle, GWLP_USERDATA, (LONG)w32w);
+   SetWindowLongPtr(w32w->mWindowHandle, GWLP_USERDATA, (LONG_PTR)w32w);
 
    // Do some error checking.
    AssertFatal(w32w->mWindowHandle != NULL, "Win32WindowManager::createWindow - Could not create window!");
@@ -265,11 +265,13 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
 
    // If we're not rendering offscreen, make sure our window is shown and drawn to.
 
-   if (!mOffscreenRender)
-      ShowWindow( w32w->mWindowHandle, SW_SHOWDEFAULT );
+   w32w->setDisplayWindow(mDisplayWindow);
 
-   // Close any splash screen we created
-   CloseSplashWindow(winState.appInstance);
+   if (!mOffscreenRender && mDisplayWindow)
+   {
+      ShowWindow( w32w->mWindowHandle, SW_SHOWDEFAULT );
+      CloseSplashWindow(winState.appInstance);
+   }
 
    // Bind the window to the specified device.
    if(device)
@@ -356,7 +358,7 @@ void Win32WindowManager::_process()
 
          // [tom, 4/30/2007] I think this should work, but leaving the above commented
          // out just in case this is actually fubared with multiple windows.
-         Win32Window* window = (Win32Window*)(GetWindowLong(msg.hwnd, GWL_USERDATA));
+         Win32Window* window = (Win32Window*)(GetWindowLongPtr(msg.hwnd, GWLP_USERDATA));
          if(window)
             translated = window->translateMessage(msg);
          
@@ -452,7 +454,7 @@ void Win32WindowManager::_processCmdLineArgs( const S32 argc, const char **argv 
 {
    if (argc > 1)
    {
-      for (int i = 1; i < argc; i++)
+      for (S32 i = 1; i < argc; i++)
       {
          if ( dStrnicmp( argv[i], "-window", 7 ) == 0 )
          {

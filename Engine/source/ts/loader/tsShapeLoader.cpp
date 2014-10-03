@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
+#include "console/engineAPI.h"
 #include "ts/loader/tsShapeLoader.h"
 
 #include "core/volume.h"
@@ -30,12 +31,22 @@
 #include "ts/tsShapeInstance.h"
 #include "ts/tsMaterialList.h"
 
+MODULE_BEGIN( ShapeLoader )
+   MODULE_INIT_AFTER( GFX )
+   MODULE_INIT
+   {
+      TSShapeLoader::addFormat("Torque DTS", "dts");
+      TSShapeLoader::addFormat("Torque DSQ", "dsq");
+   }
+MODULE_END;
 
 const F32 TSShapeLoader::DefaultTime = -1.0f;
-const double TSShapeLoader::MinFrameRate = 15.0f;
-const double TSShapeLoader::MaxFrameRate = 60.0f;
-const double TSShapeLoader::AppGroundFrameRate = 10.0f;
+const F64 TSShapeLoader::MinFrameRate = 15.0f;
+const F64 TSShapeLoader::MaxFrameRate = 60.0f;
+const F64 TSShapeLoader::AppGroundFrameRate = 10.0f;
 Torque::Path TSShapeLoader::shapePath;
+
+Vector<TSShapeLoader::ShapeFormat> TSShapeLoader::smFormats;
 
 //------------------------------------------------------------------------------
 // Utility functions
@@ -102,7 +113,7 @@ void TSShapeLoader::generateNodeTransform(AppNode* node, F32 t, bool blend, F32 
 
 //-----------------------------------------------------------------------------
 
-void TSShapeLoader::updateProgress(int major, const char* msg, int numMinor, int minor)
+void TSShapeLoader::updateProgress(S32 major, const char* msg, S32 numMinor, S32 minor)
 {
    // Calculate progress value
    F32 progress = (F32)major / NumLoadPhases;
@@ -229,7 +240,7 @@ bool cmpShapeName(const String& key, const Vector<String>& names, void* arg1, vo
 
 String getUniqueName(const char* name, NameCmpFunc isNameUnique, const Vector<String>& names, void* arg1=0, void* arg2=0)
 {
-   const int MAX_ITERATIONS = 0x10000;   // maximum of 4 characters (A-P) will be appended
+   const S32 MAX_ITERATIONS = 0x10000;   // maximum of 4 characters (A-P) will be appended
 
    String suffix;
    for (S32 i = 0; i < MAX_ITERATIONS; i++)
@@ -336,7 +347,7 @@ void TSShapeLoader::recurseSubshape(AppNode* appNode, S32 parentIndex, bool recu
    // Create children
    if (recurseChildren)
    {
-      for (int iChild = 0; iChild < appNode->getNumChildNodes(); iChild++)
+      for (S32 iChild = 0; iChild < appNode->getNumChildNodes(); iChild++)
          recurseSubshape(appNode->getChildNode(iChild), myIndex, true);
    }
 }
@@ -500,9 +511,9 @@ void TSShapeLoader::generateObjects()
 void TSShapeLoader::generateSkins()
 {
    Vector<AppMesh*> skins;
-   for (int iObject = 0; iObject < shape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < shape->objects.size(); iObject++)
    {
-      for (int iMesh = 0; iMesh < shape->objects[iObject].numMeshes; iMesh++)
+      for (S32 iMesh = 0; iMesh < shape->objects[iObject].numMeshes; iMesh++)
       {
          AppMesh* mesh = appMeshes[shape->objects[iObject].startMeshIndex + iMesh];
          if (mesh->isSkin())
@@ -510,7 +521,7 @@ void TSShapeLoader::generateSkins()
       }
    }
 
-   for (int iSkin = 0; iSkin < skins.size(); iSkin++)
+   for (S32 iSkin = 0; iSkin < skins.size(); iSkin++)
    {
       updateProgress(Load_GenerateSkins, "Generating skins...", skins.size(), iSkin);
 
@@ -524,11 +535,11 @@ void TSShapeLoader::generateSkins()
 
       // Map bones to nodes
       skin->nodeIndex.setSize(skin->bones.size());
-      for (int iBone = 0; iBone < skin->bones.size(); iBone++)
+      for (S32 iBone = 0; iBone < skin->bones.size(); iBone++)
       {
          // Find the node that matches this bone
          skin->nodeIndex[iBone] = -1;
-         for (int iNode = 0; iNode < appNodes.size(); iNode++)
+         for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
          {
             if (appNodes[iNode]->isEqual(skin->bones[iBone]))
             {
@@ -551,7 +562,7 @@ void TSShapeLoader::generateSkins()
 void TSShapeLoader::generateDefaultStates()
 {
    // Generate default object states (includes initial geometry)
-   for (int iObject = 0; iObject < shape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < shape->objects.size(); iObject++)
    {
       updateProgress(Load_GenerateDefaultStates, "Generating initial mesh and node states...",
          shape->objects.size(), iObject);
@@ -559,7 +570,7 @@ void TSShapeLoader::generateDefaultStates()
       TSShape::Object& obj = shape->objects[iObject];
 
       // Calculate the objectOffset for each mesh at T=0
-      for (int iMesh = 0; iMesh < obj.numMeshes; iMesh++)
+      for (S32 iMesh = 0; iMesh < obj.numMeshes; iMesh++)
       {
          AppMesh* appMesh = appMeshes[obj.startMeshIndex + iMesh];
          AppNode* appNode = obj.nodeIndex >= 0 ? appNodes[obj.nodeIndex] : boundsNode;
@@ -576,7 +587,7 @@ void TSShapeLoader::generateDefaultStates()
    }
 
    // Generate default node transforms
-   for (int iNode = 0; iNode < appNodes.size(); iNode++)
+   for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
    {
       // Determine the default translation and rotation for the node
       QuatF rot, srot;
@@ -610,7 +621,7 @@ void TSShapeLoader::generateObjectState(TSShape::Object& obj, F32 t, bool addFra
 
 void TSShapeLoader::generateFrame(TSShape::Object& obj, F32 t, bool addFrame, bool addMatFrame)
 {
-   for (int iMesh = 0; iMesh < obj.numMeshes; iMesh++)
+   for (S32 iMesh = 0; iMesh < obj.numMeshes; iMesh++)
    {
       AppMesh* appMesh = appMeshes[obj.startMeshIndex + iMesh];
 
@@ -690,7 +701,7 @@ void TSShapeLoader::generateMaterialList()
 {
    // Install the materials into the material list
    shape->materialList = new TSMaterialList;
-   for (int iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++)
+   for (S32 iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++)
    {
       updateProgress(Load_GenerateMaterials, "Generating materials...", AppMesh::appMaterials.size(), iMat);
 
@@ -705,7 +716,7 @@ void TSShapeLoader::generateMaterialList()
 
 void TSShapeLoader::generateSequences()
 {
-   for (int iSeq = 0; iSeq < appSequences.size(); iSeq++)
+   for (S32 iSeq = 0; iSeq < appSequences.size(); iSeq++)
    {
       updateProgress(Load_GenerateSequences, "Generating sequences...", appSequences.size(), iSeq);
 
@@ -783,14 +794,14 @@ void TSShapeLoader::setNodeMembership(TSShape::Sequence& seq, const AppSequence*
 
 void TSShapeLoader::setRotationMembership(TSShape::Sequence& seq)
 {
-   for (int iNode = 0; iNode < appNodes.size(); iNode++)
+   for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
    {
       // Check if any of the node rotations are different to
       // the default rotation
       QuatF defaultRot;
       shape->defaultRotations[iNode].getQuatF(&defaultRot);
 
-      for (int iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
+      for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
       {
          if (nodeRotCache[iNode][iFrame] != defaultRot)
          {
@@ -803,13 +814,13 @@ void TSShapeLoader::setRotationMembership(TSShape::Sequence& seq)
 
 void TSShapeLoader::setTranslationMembership(TSShape::Sequence& seq)
 {
-   for (int iNode = 0; iNode < appNodes.size(); iNode++)
+   for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
    {
       // Check if any of the node translations are different to
       // the default translation
       Point3F& defaultTrans = shape->defaultTranslations[iNode];
 
-      for (int iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
+      for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
       {
          if (!nodeTransCache[iNode][iFrame].equal(defaultTrans))
          {
@@ -828,10 +839,10 @@ void TSShapeLoader::setScaleMembership(TSShape::Sequence& seq)
    U32 alignedScaleCount = 0;
    U32 uniformScaleCount = 0;
 
-   for (int iNode = 0; iNode < appNodes.size(); iNode++)
+   for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
    {
       // Check if any of the node scales are not the unit scale
-      for (int iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
+      for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
       {
          Point3F& scale = nodeScaleCache[iNode][iFrame];
          if (!unitScale.equal(scale))
@@ -865,7 +876,7 @@ void TSShapeLoader::setObjectMembership(TSShape::Sequence& seq, const AppSequenc
    seq.frameMatters.clearAll();        // vert animation (morph) (size = objects.size())
    seq.matFrameMatters.clearAll();     // UV animation (size = objects.size())
 
-   for (int iObject = 0; iObject < shape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < shape->objects.size(); iObject++)
    {
       if (!appMeshes[shape->objects[iObject].startMeshIndex])
          continue;
@@ -883,16 +894,16 @@ void TSShapeLoader::setObjectMembership(TSShape::Sequence& seq, const AppSequenc
 void TSShapeLoader::clearNodeTransformCache()
 {
    // clear out the transform caches
-   for (int i = 0; i < nodeRotCache.size(); i++)
+   for (S32 i = 0; i < nodeRotCache.size(); i++)
       delete [] nodeRotCache[i];
    nodeRotCache.clear();
-   for (int i = 0; i < nodeTransCache.size(); i++)
+   for (S32 i = 0; i < nodeTransCache.size(); i++)
       delete [] nodeTransCache[i];
    nodeTransCache.clear();
-   for (int i = 0; i < nodeScaleRotCache.size(); i++)
+   for (S32 i = 0; i < nodeScaleRotCache.size(); i++)
       delete [] nodeScaleRotCache[i];
    nodeScaleRotCache.clear();
-   for (int i = 0; i < nodeScaleCache.size(); i++)
+   for (S32 i = 0; i < nodeScaleCache.size(); i++)
       delete [] nodeScaleCache[i];
    nodeScaleCache.clear();
 }
@@ -903,23 +914,23 @@ void TSShapeLoader::fillNodeTransformCache(TSShape::Sequence& seq, const AppSequ
    clearNodeTransformCache();
 
    nodeRotCache.setSize(appNodes.size());
-   for (int i = 0; i < nodeRotCache.size(); i++)
+   for (S32 i = 0; i < nodeRotCache.size(); i++)
       nodeRotCache[i] = new QuatF[seq.numKeyframes];
    nodeTransCache.setSize(appNodes.size());
-   for (int i = 0; i < nodeTransCache.size(); i++)
+   for (S32 i = 0; i < nodeTransCache.size(); i++)
       nodeTransCache[i] = new Point3F[seq.numKeyframes];
    nodeScaleRotCache.setSize(appNodes.size());
-   for (int i = 0; i < nodeScaleRotCache.size(); i++)
+   for (S32 i = 0; i < nodeScaleRotCache.size(); i++)
       nodeScaleRotCache[i] = new QuatF[seq.numKeyframes];
    nodeScaleCache.setSize(appNodes.size());
-   for (int i = 0; i < nodeScaleCache.size(); i++)
+   for (S32 i = 0; i < nodeScaleCache.size(); i++)
       nodeScaleCache[i] = new Point3F[seq.numKeyframes];
 
    // get the node transforms for every frame
-   for (int iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
+   for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
    {
       F32 time = appSeq->getStart() + seq.duration * iFrame / getMax(1, seq.numKeyframes - 1);
-      for (int iNode = 0; iNode < appNodes.size(); iNode++)
+      for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
       {
          generateNodeTransform(appNodes[iNode], time, seq.isBlend(), appSeq->getBlendRefTime(),
                                nodeRotCache[iNode][iFrame], nodeTransCache[iNode][iFrame],
@@ -973,9 +984,9 @@ void TSShapeLoader::generateNodeAnimation(TSShape::Sequence& seq)
                    (seq.flags & TSShape::AlignedScale) ? shape->nodeAlignedScales.size() :
                    shape->nodeUniformScales.size();
 
-   for (int iNode = 0; iNode < appNodes.size(); iNode++)
+   for (S32 iNode = 0; iNode < appNodes.size(); iNode++)
    {
-      for (int iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
+      for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
       {
          if (seq.rotationMatters.test(iNode))
             addNodeRotation(nodeRotCache[iNode][iFrame], false);
@@ -1001,7 +1012,7 @@ void TSShapeLoader::generateObjectAnimation(TSShape::Sequence& seq, const AppSeq
 {
    seq.baseObjectState = shape->objectStates.size();
 
-   for (int iObject = 0; iObject < shape->objects.size(); iObject++)
+   for (S32 iObject = 0; iObject < shape->objects.size(); iObject++)
    {
       bool visMatters = seq.visMatters.test(iObject);
       bool frameMatters = seq.frameMatters.test(iObject);
@@ -1009,7 +1020,7 @@ void TSShapeLoader::generateObjectAnimation(TSShape::Sequence& seq, const AppSeq
 
       if (visMatters || frameMatters || matFrameMatters)
       {
-         for (int iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
+         for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
          {
             F32 time = appSeq->getStart() + seq.duration * iFrame / getMax(1, seq.numKeyframes - 1);
             generateObjectState(shape->objects[iObject], time, frameMatters, matFrameMatters);
@@ -1036,7 +1047,7 @@ void TSShapeLoader::generateGroundAnimation(TSShape::Sequence& seq, const AppSeq
    zapScale(invStartMat);
    invStartMat.inverse();
 
-   for (int iFrame = 0; iFrame < seq.numGroundFrames; iFrame++)
+   for (S32 iFrame = 0; iFrame < seq.numGroundFrames; iFrame++)
    {
       F32 time = appSeq->getStart() + seq.duration * iFrame / getMax(1, seq.numGroundFrames - 1);
 
@@ -1064,7 +1075,7 @@ void TSShapeLoader::generateFrameTriggers(TSShape::Sequence& seq, const AppSeque
    seq.flags |= TSShape::MakePath;
 
    // Add triggers
-   for (int iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
+   for (S32 iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
    {
       shape->triggers.increment();
       appSeq->getTrigger(iTrigger, shape->triggers.last());
@@ -1075,7 +1086,7 @@ void TSShapeLoader::generateFrameTriggers(TSShape::Sequence& seq, const AppSeque
    // need to mark ourselves as such so that on/off can become off/on when sequence
    // is played in reverse...
    U32 offTriggers = 0;
-   for (int iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
+   for (S32 iTrigger = 0; iTrigger < seq.numTriggers; iTrigger++)
    {
       U32 state = shape->triggers[seq.firstTrigger+iTrigger].state;
       if ((state & TSShape::Trigger::StateOn) == 0)
@@ -1098,18 +1109,18 @@ void TSShapeLoader::sortDetails()
 
 
    // Insert NULL meshes where required
-   for (int iSub = 0; iSub < subshapes.size(); iSub++)
+   for (S32 iSub = 0; iSub < subshapes.size(); iSub++)
    {
       Vector<S32> validDetails;
       shape->getSubShapeDetails(iSub, validDetails);
 
-      for (int iDet = 0; iDet < validDetails.size(); iDet++)
+      for (S32 iDet = 0; iDet < validDetails.size(); iDet++)
       {
          TSShape::Detail &detail = shape->details[validDetails[iDet]];
          if (detail.subShapeNum >= 0)
             detail.objectDetailNum = iDet;
 
-         for (int iObj = shape->subShapeFirstObject[iSub];
+         for (S32 iObj = shape->subShapeFirstObject[iSub];
             iObj < (shape->subShapeFirstObject[iSub] + shape->subShapeNumObjects[iSub]);
             iObj++)
          {
@@ -1126,7 +1137,7 @@ void TSShapeLoader::sortDetails()
                object.numMeshes++;
 
                // Fixup the start index for the other objects
-               for (int k = iObj+1; k < shape->objects.size(); k++)
+               for (S32 k = iObj+1; k < shape->objects.size(); k++)
                   shape->objects[k].startMeshIndex++;
             }
          }
@@ -1256,17 +1267,67 @@ TSShapeLoader::~TSShapeLoader()
    clearNodeTransformCache();
 
    // Clear shared AppMaterial list
-   for (int iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++)
+   for (S32 iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++)
       delete AppMesh::appMaterials[iMat];
    AppMesh::appMaterials.clear();
 
    // Delete Subshapes
    delete boundsNode;
-   for (int iSub = 0; iSub < subshapes.size(); iSub++)
+   for (S32 iSub = 0; iSub < subshapes.size(); iSub++)
       delete subshapes[iSub];
 
    // Delete AppSequences
-   for (int iSeq = 0; iSeq < appSequences.size(); iSeq++)
+   for (S32 iSeq = 0; iSeq < appSequences.size(); iSeq++)
       delete appSequences[iSeq];
    appSequences.clear();   
+}
+
+// Static functions to handle supported formats for shape loader.
+void TSShapeLoader::addFormat(String name, String extension)
+{
+   ShapeFormat newFormat;
+   newFormat.mName = name;
+   newFormat.mExtension = extension;
+   smFormats.push_back(newFormat);
+}
+
+String TSShapeLoader::getFormatExtensions()
+{
+   // "*.dsq TAB *.dae TAB
+   StringBuilder output;
+   for(U32 n = 0; n < smFormats.size(); ++n)
+   {
+      output.append("*.");
+      output.append(smFormats[n].mExtension);
+      output.append("\t");
+   }
+   return output.end();
+}
+
+String TSShapeLoader::getFormatFilters()
+{
+   // "DSQ Files|*.dsq|COLLADA Files|*.dae|"
+   StringBuilder output;
+   for(U32 n = 0; n < smFormats.size(); ++n)
+   {
+      output.append(smFormats[n].mName);
+      output.append("|*.");
+      output.append(smFormats[n].mExtension);
+      output.append("|");
+   }
+   return output.end();
+}
+
+DefineConsoleFunction( getFormatExtensions, const char*, ( ),, 
+  "Returns a list of supported shape format extensions separated by tabs."
+  "Example output: *.dsq TAB *.dae TAB")
+{
+   return Con::getReturnBuffer(TSShapeLoader::getFormatExtensions());
+}
+
+DefineConsoleFunction( getFormatFilters, const char*, ( ),, 
+  "Returns a list of supported shape formats in filter form.\n"
+  "Example output: DSQ Files|*.dsq|COLLADA Files|*.dae|")
+{
+   return Con::getReturnBuffer(TSShapeLoader::getFormatFilters());
 }

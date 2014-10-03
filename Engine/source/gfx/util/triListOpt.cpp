@@ -48,11 +48,11 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
    FrameTemp<TriData> triangleData(NumPrimitives);
 
    U32 curIdx = 0;
-   for(int tri = 0; tri < NumPrimitives; tri++)
+   for(S32 tri = 0; tri < NumPrimitives; tri++)
    {
       TriData &curTri = triangleData[tri];
 
-      for(int c = 0; c < 3; c++)
+      for(S32 c = 0; c < 3; c++)
       {  
          const U32 &curVIdx = indices[curIdx];
          AssertFatal(curVIdx < numVerts, "Out of range index.");
@@ -71,7 +71,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
 
    // Allocate per-vertex triangle lists, and calculate the starting score of
    // each of the verts
-   for(int v = 0; v < numVerts; v++)
+   for(S32 v = 0; v < numVerts; v++)
    {
       VertData &curVert = vertexData[v];
       curVert.triIndex = new S32[curVert.numUnaddedReferences];
@@ -89,11 +89,11 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
    // Fill-in per-vertex triangle lists, and sum the scores of each vertex used
    // per-triangle, to get the starting triangle score
    curIdx = 0;
-   for(int tri = 0; tri < NumPrimitives; tri++)
+   for(S32 tri = 0; tri < NumPrimitives; tri++)
    {
       TriData &curTri = triangleData[tri];
 
-      for(int c = 0; c < 3; c++)
+      for(S32 c = 0; c < 3; c++)
       {  
          const U32 &curVIdx = indices[curIdx];
          AssertFatal(curVIdx < numVerts, "Out of range index.");
@@ -117,7 +117,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
    // Step 2: Start emitting triangles...this is the emit loop
    //
    LRUCacheModel lruCache;
-   for(int outIdx = 0; outIdx < numIndices; /* this space intentionally left blank */ )
+   for(S32 outIdx = 0; outIdx < numIndices; /* this space intentionally left blank */ )
    {
       // If there is no next best triangle, than search for the next highest
       // scored triangle that isn't in the list already
@@ -127,7 +127,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
          nextBestTriScore = nextNextBestTriScore = -1.0f;
          nextBestTriIdx = nextNextBestTriIdx = -1;
 
-         for(int tri = 0; tri < NumPrimitives; tri++)
+         for(S32 tri = 0; tri < NumPrimitives; tri++)
          {
             TriData &curTri = triangleData[tri];
 
@@ -143,7 +143,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
       // Emit the next best triangle
       TriData &nextBestTri = triangleData[nextBestTriIdx];
       AssertFatal(!nextBestTri.isInList, "Next best triangle already in list, this is no good.");
-      for(int i = 0; i < 3; i++)
+      for(S32 i = 0; i < 3; i++)
       {
          // Emit index
          outIndices[outIdx++] = IndexType(nextBestTri.vertIdx[i]);
@@ -151,7 +151,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
          // Update the list of triangles on the vert
          VertData &curVert = vertexData[nextBestTri.vertIdx[i]];
          curVert.numUnaddedReferences--;
-         for(int t = 0; t < curVert.numReferences; t++)
+         for(S32 t = 0; t < curVert.numReferences; t++)
          {
             if(curVert.triIndex[t] == nextBestTriIdx)
             {
@@ -184,7 +184,7 @@ void OptimizeTriangleOrdering(const dsize_t numVerts, const dsize_t numIndices, 
          {
             tri.score = 0.0f;
 
-            for(int i = 0; i < 3; i++)
+            for(S32 i = 0; i < 3; i++)
                tri.score += vertexData[tri.vertIdx[i]].score;
 
             _CHECK_NEXT_BEST(tri.score, *itr);
@@ -288,12 +288,12 @@ void LRUCacheModel::enforceSize(const dsize_t maxSize, Vector<U32> &outTrisToUpd
       // Update cache position on verts still in cache
       vData.cachePosition = length++;
 
-      for(int i = 0; i < vData.numReferences; i++)
+      for(S32 i = 0; i < vData.numReferences; i++)
       {
          const S32 &triIdx = vData.triIndex[i];
          if(triIdx > -1)
          {
-            int j = 0;
+            S32 j = 0;
             for(; j < outTrisToUpdate.size(); j++)
                if(outTrisToUpdate[j] == triIdx)
                   break;
@@ -378,7 +378,7 @@ F32 score(const VertData &vertexData)
          AssertFatal(vertexData.cachePosition < MaxSizeVertexCache, "Out of range cache position for vertex");
 
          // Points for being high in the cache.
-         const float Scaler = 1.0f / (MaxSizeVertexCache - 3);
+         const F32 Scaler = 1.0f / (MaxSizeVertexCache - 3);
          Score = 1.0f - (vertexData.cachePosition - 3) * Scaler;
          Score = mPow(Score, FindVertexScore::CacheDecayPower);
       }
@@ -387,7 +387,7 @@ F32 score(const VertData &vertexData)
 
    // Bonus points for having a low number of tris still to
    // use the vert, so we get rid of lone verts quickly.
-   float ValenceBoost = mPow(vertexData.numUnaddedReferences, -FindVertexScore::ValenceBoostPower);
+   F32 ValenceBoost = mPow(vertexData.numUnaddedReferences, -FindVertexScore::ValenceBoostPower);
    Score += FindVertexScore::ValenceBoostScale * ValenceBoost;
 
    return Score;

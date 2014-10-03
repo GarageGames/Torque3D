@@ -155,6 +155,8 @@ private:
    static const char *getProtectedMesh(void *obj, const char *data);
    static bool setProtectedWaypoints(void *obj, const char *index, const char *data);
 
+   static bool setProtectedAlwaysRender(void *obj, const char *index, const char *data);
+
    static bool setProtectedFrom(void *obj, const char *index, const char *data);
    static const char *getProtectedFrom(void *obj, const char *data);
 
