@@ -1486,7 +1486,7 @@ S32 String::StrFormat::append(const char * str, S32 len)
    }
 
    S32 newSize = _dynamicSize;
-   while (newSize < _len+len)
+   while (newSize < _len+len+1)
       newSize *= 2;
    if (newSize != _dynamicSize)
       _dynamicBuffer = (char*) dRealloc(_dynamicBuffer, newSize);
