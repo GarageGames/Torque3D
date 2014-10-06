@@ -29,7 +29,7 @@ new SimGroup(MissionGroup) {
       colorizeAmount = "0";
       colorize = "0 0 0 1";
       rayleighScattering = "0.0035";
-      sunScale = "1 1 1 1";
+      sunScale = "0.972549 0.996078 0.788235 1";
       ambientScale = "1 1 1 1";
       fogScale = "1 1 1 1";
       exposure = "1";
@@ -51,7 +51,7 @@ new SimGroup(MissionGroup) {
       nightCubemap = "nightCubemap";
       attenuationRatio = "0 1 1";
       shadowType = "PSSM";
-      texSize = "512";
+      texSize = "1024";
       overDarkFactor = "2000 1000 500 100";
       shadowDistance = "400";
       shadowSoftness = "0.15";
@@ -73,11 +73,11 @@ new SimGroup(MissionGroup) {
       axisTilt = "23.44";
       dayLength = "120";
       startTime = "0.1";
-      time = "0.153243";
+      time = "0.756599";
       play = "1";
       azimuthOverride = "1";
       dayScale = "1";
-      nightScale = "2";
+      nightScale = "3";
       position = "-182.594 54.5451 536.878";
       rotation = "1 0 0 0";
       scale = "1 1 1";
@@ -1229,9 +1229,9 @@ new SimGroup(MissionGroup) {
       gravityMod = "-1";
       appliedForce = "0 0 0";
       polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
-      position = "-75.81 34.2165 245.724";
+      position = "-75.81 34.2165 245.552";
       rotation = "1 0 0 0";
-      scale = "4.70489 4.32539 20.7358";
+      scale = "4.70489 4.32539 16.1481";
       canSave = "1";
       canSaveDynamicFields = "1";
    };
@@ -1289,6 +1289,17 @@ new SimGroup(MissionGroup) {
       position = "-57.5817 -139.689 238.213";
       rotation = "1 0 0 0";
       scale = "3 3 3";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new PhysicalZone() {
+      velocityMod = "1";
+      gravityMod = "0.5";
+      appliedForce = "-2500 0 0";
+      polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+      position = "-79.5161 34.0702 259.951";
+      rotation = "1 0 0 0";
+      scale = "11.8676 3.54503 7.79052";
       canSave = "1";
       canSaveDynamicFields = "1";
    };
