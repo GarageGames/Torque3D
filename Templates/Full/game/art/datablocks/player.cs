@@ -544,6 +544,7 @@ datablock PlayerData(DefaultPlayerData)
    maxCrouchBackwardSpeed = 2.0;
    maxCrouchSideSpeed = 2.0;
 
+   swimForce = 4320;
    maxUnderwaterForwardSpeed = 8.4;
    maxUnderwaterBackwardSpeed = 7.8;
    maxUnderwaterSideSpeed = 4.0;
