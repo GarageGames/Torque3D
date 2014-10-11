@@ -328,6 +328,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    if (  features.hasFeature( MFT_UseInstancing ) &&
          mMaxStages == 1 &&
          !mMaterial->mGlow[0] &&
+         !mMaterial->mDynamicCubemap &&
          shaderVersion >= 3.0f )
       fd.features.addFeature( MFT_UseInstancing );
 
