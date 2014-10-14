@@ -56,8 +56,30 @@ class Win32WindowManager : public PlatformWindowManager
    // is intended for offscreen rendering
    bool mOffscreenRender;
 
+   /// This is set as part of the canvas being shown, and flags that the windows should render as normal from now on.
+   // Basically a flag that lets the window manager know that we've handled the splash screen, and to operate as normal.
+   bool mDisplayWindow;
+
+   /// Internal structure used when enumerating monitors
+   struct MonitorInfo {
+      HMONITOR monitorHandle;
+      RectI    region;
+      String   name;
+   };
+
+   /// Array of enumerated monitors
+   Vector<MonitorInfo> mMonitors;
+
    /// Callback to receive information about available monitors.
    static BOOL CALLBACK MonitorEnumProc(
+      HMONITOR hMonitor,  // handle to display monitor
+      HDC hdcMonitor,     // handle to monitor DC
+      LPRECT lprcMonitor, // monitor intersection rectangle
+      LPARAM dwData       // data
+      );
+
+   /// Callback to receive information about available monitor regions
+   static BOOL CALLBACK MonitorRegionEnumProc(
       HMONITOR hMonitor,  // handle to display monitor
       HDC hdcMonitor,     // handle to monitor DC
       LPRECT lprcMonitor, // monitor intersection rectangle
@@ -67,6 +89,8 @@ class Win32WindowManager : public PlatformWindowManager
    /// If a curtain window is present, then its HWND will be stored here.
    HWND mCurtainWindow;
 
+   SignalSlot<void()> mOnProcessSignalSlot;
+
 public:
    Win32WindowManager();
    ~Win32WindowManager();
@@ -74,6 +98,15 @@ public:
    virtual RectI getPrimaryDesktopArea();
    virtual S32       getDesktopBitDepth();
    virtual Point2I   getDesktopResolution();
+
+   /// Build out the monitors list.  Also used to rebuild the list after
+   /// a WM_DISPLAYCHANGE message.
+   virtual void buildMonitorsList();
+
+   virtual S32 findFirstMatchingMonitor(const char* name);
+   virtual U32 getMonitorCount();
+   virtual const char* getMonitorName(U32 index);
+   virtual RectI getMonitorRect(U32 index);
 
    virtual void getMonitorRegions(Vector<RectI> &regions);
    virtual PlatformWindow *createWindow(GFXDevice *device, const GFXVideoMode &mode);
@@ -88,6 +121,8 @@ public:
 
    virtual void lowerCurtain();
    virtual void raiseCurtain();
+
+   virtual void setDisplayWindow(bool set) { mDisplayWindow = set; }
 };
 
 #endif

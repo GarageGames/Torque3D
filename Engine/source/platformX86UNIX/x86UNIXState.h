@@ -25,7 +25,7 @@
 //#include "platformX86UNIX/platformGL.h"
 #include "core/strings/stringFunctions.h"
 
-#ifndef DEDICATED
+#ifndef TORQUE_DEDICATED
 #include <X11/Xlib.h> // for Display, Window and other X mojo
 #else
 #define Display int
@@ -225,7 +225,7 @@ class DisplayPtrManager
    private:
       Display* openDisplay()
       {
-#ifndef DEDICATED
+#ifndef TORQUE_DEDICATED
          mDisplay = XOpenDisplay(NULL);
          if (mDisplay != NULL)
             mOpenedDisplay = true;
@@ -237,7 +237,7 @@ class DisplayPtrManager
       {
          if (mOpenedDisplay)
          {
-#ifndef DEDICATED
+#ifndef TORQUE_DEDICATED
             XCloseDisplay(mDisplay);
             mDisplay = NULL;
             mOpenedDisplay = false;

@@ -62,7 +62,7 @@ GFX_ImplementTextureProfile( TerrainLayerTexProfile,
                             GFXTextureProfile::DiffuseMap, 
                             GFXTextureProfile::PreserveSize | 
                             GFXTextureProfile::Dynamic,
-                            GFXTextureProfile::None );
+                            GFXTextureProfile::NONE );
 
 
 void TerrainBlock::_onFlushMaterials()
@@ -94,6 +94,10 @@ void TerrainBlock::_updateMaterials()
       if (  mat->getDetailMap().isNotEmpty() &&
             mat->getDetailDistance() > mMaxDetailDistance )
          mMaxDetailDistance = mat->getDetailDistance();
+
+      if (  mat->getMacroMap().isNotEmpty() &&
+            mat->getMacroDistance() > mMaxDetailDistance )
+         mMaxDetailDistance = mat->getMacroDistance();
    }
 
    if ( mCell )
@@ -215,8 +219,12 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
       points[3].texCoord   = Point2F(  1.0, needsYFlip ? 0.0f : 1.0f );
 
       vb.set( GFX, 4, GFXBufferTypeVolatile );
-      dMemcpy( vb.lock(), points, sizeof(GFXVertexPT) * 4 );
-      vb.unlock();
+      GFXVertexPT *ptr = vb.lock();
+      if(ptr)
+      {
+         dMemcpy( ptr, points, sizeof(GFXVertexPT) * 4 );
+         vb.unlock();
+      }
    }
 
    GFXTexHandle blendTex;

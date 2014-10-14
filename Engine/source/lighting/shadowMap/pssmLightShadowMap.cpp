@@ -207,7 +207,7 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
       _setNumSplits( params->numSplits, texSize );
    mLogWeight = params->logWeight;
 
-   Frustum fullFrustum( diffuseState->getFrustum() );
+   Frustum fullFrustum( diffuseState->getCameraFrustum() );
    fullFrustum.cropNearFar(fullFrustum.getNearDist(), params->shadowDistance);
 
    GFXFrustumSaver frustSaver;
@@ -223,7 +223,7 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
 
    // Calculate our standard light matrices
    MatrixF lightMatrix;
-   calcLightMatrices( lightMatrix, diffuseState->getFrustum() );
+   calcLightMatrices( lightMatrix, diffuseState->getCameraFrustum() );
    lightMatrix.inverse();
    MatrixF lightViewProj = GFX->getProjectionMatrix() * lightMatrix;
 

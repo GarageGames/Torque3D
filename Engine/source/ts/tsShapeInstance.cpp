@@ -259,8 +259,10 @@ void TSShapeInstance::cloneMaterialList( const FeatureSet *features )
    if ( mOwnMaterialList )
       return;
 
+   Material::sAllowTextureTargetAssignment = true;
    mMaterialList = new TSMaterialList(mMaterialList);
    initMaterialList( features );
+   Material::sAllowTextureTargetAssignment = false;
 
    mOwnMaterialList = true;
 }
@@ -613,6 +615,11 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
    // skip the unnessasary divide by zero protection.
    F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
+
+   if ( pixelSize < smSmallestVisiblePixelSize ) {
+      mCurrentDetailLevel = -1;
+      return mCurrentDetailLevel;
+   }
 
    if (  pixelSize > smSmallestVisiblePixelSize && 
          pixelSize <= mShape->mSmallestVisibleSize )

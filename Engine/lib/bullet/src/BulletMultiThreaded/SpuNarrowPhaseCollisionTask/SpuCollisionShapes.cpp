@@ -44,7 +44,7 @@ void computeAabb (btVector3& aabbMin, btVector3& aabbMax, btConvexInternalShape*
 		const btTransform& t = xform;
 		btMatrix3x3 abs_b = t.getBasis().absolute();  
 		btVector3 center = t.getOrigin();
-		btVector3 extent = btVector3(abs_b[0].dot(halfExtents),abs_b[1].dot(halfExtents),abs_b[2].dot(halfExtents));
+        btVector3 extent = halfExtents.dot3( abs_b[0], abs_b[1], abs_b[2] );
 		
 		aabbMin = center - extent;
 		aabbMax = center + extent;
@@ -67,7 +67,7 @@ void computeAabb (btVector3& aabbMin, btVector3& aabbMax, btConvexInternalShape*
 		const btTransform& t = xform;
 		btMatrix3x3 abs_b = t.getBasis().absolute();  
 		btVector3 center = t.getOrigin();
-		btVector3 extent = btVector3(abs_b[0].dot(halfExtents),abs_b[1].dot(halfExtents),abs_b[2].dot(halfExtents));
+        btVector3 extent = halfExtents.dot3( abs_b[0], abs_b[1], abs_b[2] );
 		
 		aabbMin = center - extent;
 		aabbMax = center + extent;
@@ -198,6 +198,12 @@ int		getShapeTypeSize(int shapeType)
 			btAssert(shapeSize < MAX_SHAPE_SIZE);
 			return shapeSize;
 		}
+	case STATIC_PLANE_PROXYTYPE:
+		{
+			int shapeSize = sizeof(btStaticPlaneShape);
+			btAssert(shapeSize < MAX_SHAPE_SIZE);
+			return shapeSize;
+		}
 
 	default:
 		btAssert(0);
@@ -225,6 +231,7 @@ void dmaCollisionShape (void* collisionShapeLocation, ppu_address_t collisionSha
 {
 	register int dmaSize = getShapeTypeSize(shapeType);
 	cellDmaGet(collisionShapeLocation, collisionShapePtr  , dmaSize, DMA_TAG(dmaTag), 0, 0);
+	//cellDmaGetReadOnly(collisionShapeLocation, collisionShapePtr  , dmaSize, DMA_TAG(dmaTag), 0, 0);
 	//cellDmaWaitTagStatusAll(DMA_MASK(dmaTag));
 }
 

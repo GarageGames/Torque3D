@@ -23,7 +23,7 @@
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platformX86UNIX/x86UNIXStdConsole.h"
 #include "platformX86UNIX/x86UNIXUtils.h"
-#include "platform/event.h"
+#include "platform/input/event.h"
 #include "platform/platform.h"
 #include "core/util/rawData.h"
 #include "core/strings/stringFunctions.h"
@@ -217,7 +217,7 @@ void StdConsole::process()
       // mojo for select call
       fd_set rfds;
       struct timeval tv;
-      int retval;
+
       FD_ZERO(&rfds);
       FD_SET(stdIn, &rfds);
       // don't wait at all in select

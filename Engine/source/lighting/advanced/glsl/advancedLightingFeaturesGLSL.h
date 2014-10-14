@@ -30,13 +30,25 @@
 class ConditionerMethodDependency;
 
 
-/// Lights the pixel by sampling from the light prepass buffer.  It will
-/// fall back to default vertex lighting functionality if  
+/// Lights the pixel by sampling from the light prepass 
+/// buffer.  It will fall back to forward lighting 
+/// functionality for non-deferred rendered surfaces.
+///
+/// Also note that this feature is only used in the
+/// forward rendering pass.  It is not used during the
+/// prepass step.
+///
 class DeferredRTLightingFeatGLSL : public RTLightingFeatGLSL
 {
    typedef RTLightingFeatGLSL Parent;
 
+protected:
+
+   /// @see DeferredRTLightingFeatHLSL::processPix()
+   U32 mLastTexIndex;
+
 public:
+
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
 
@@ -57,12 +69,12 @@ public:
 
    virtual String getName()
    {
-      return "Deferred RT Lighting Feature";
+      return "Deferred RT Lighting";
    }
 };
 
 
-/// Used to write the normals during the depth/normal prepass.
+/// This is used during the 
 class DeferredBumpFeatGLSL : public BumpFeatGLSL
 {
    typedef BumpFeatGLSL Parent;

@@ -49,6 +49,8 @@
 #include "materials/materialFeatureTypes.h"
 #include "console/engineAPI.h"
 
+using namespace Torque;
+
 extern bool gEditingMission;
 
 IMPLEMENT_CO_NETOBJECT_V1(TSStatic);
@@ -440,7 +442,7 @@ void TSStatic::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for (int i = 0; i < skins.size(); i++)
+      for (S32 i = 0; i < skins.size(); i++)
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );
@@ -523,7 +525,7 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    Frustum culler;
    if ( mMeshCulling )
    {
-      culler = state->getFrustum();
+      culler = state->getCullingFrustum();
       MatrixF xfm( true );
       xfm.scale( Point3F::One / getScale() );
       xfm.mul( getRenderWorldTransform() );
@@ -1036,7 +1038,7 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
 }
 
 //------------------------------------------------------------------------
-//These functions are duplicated in tsStatic, shapeBase, and interiorInstance.
+//These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering
 //target names/counts without polluting simObject.
 
@@ -1120,8 +1122,8 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    newMat->mMapTo = mapTo;
 
-   // Map the material in the in the matmgr
-   MATMGR->mapMaterial( mapTo, newMat->mMapTo );
+   // Map the material by name in the matmgr
+   MATMGR->mapMaterial( mapTo, newMat->getName() );
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought

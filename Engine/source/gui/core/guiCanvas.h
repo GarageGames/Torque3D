@@ -26,9 +26,6 @@
 #ifndef _SIMBASE_H_
 #include "console/simBase.h"
 #endif
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
 #ifndef _GUICONTROL_H_
 #include "gui/core/guiControl.h"
 #endif
@@ -110,6 +107,8 @@ protected:
    bool        mForceMouseToGUI;
    bool        mClampTorqueCursor;
    bool        mAlwaysHandleMouseButtons;
+
+   bool        mDisplayWindow;
 
    /// @}
 

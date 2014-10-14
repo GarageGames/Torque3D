@@ -45,6 +45,7 @@ enum GameConnectionConstants
    DataBlockQueueCount = 16
 };
 
+class IDisplayDevice;
 class SFXProfile;
 class MatrixF;
 class MatrixF;
@@ -86,6 +87,16 @@ private:
    F32   mCameraFov;       ///< Current camera fov (in degrees).
    F32   mCameraPos;       ///< Current camera pos (0-1).
    F32   mCameraSpeed;     ///< Camera in/out speed.
+
+   IDisplayDevice* mDisplayDevice;  ///< Optional client display device that imposes rendering properties.
+   /// @}
+
+   /// @name Client side control scheme that may be referenced by control objects
+   /// @{
+   bool  mUpdateControlScheme;   ///< Set to notify client or server of control scheme change
+   bool  mAbsoluteRotation;      ///< Use absolute rotation values from client, likely through ExtendedMove
+   bool  mAddYawToAbsRot;        ///< Add relative yaw control to the absolute rotation calculation.  Only useful with mAbsoluteRotation.
+   bool  mAddPitchToAbsRot;      ///< Add relative pitch control to the absolute rotation calculation.  Only useful with mAbsoluteRotation.
    /// @}
 
 public:
@@ -263,6 +274,16 @@ public:
 
    void setFirstPerson(bool firstPerson);
    
+   bool hasDisplayDevice() const { return mDisplayDevice != NULL; }
+   const IDisplayDevice* getDisplayDevice() const { return mDisplayDevice; }
+   void setDisplayDevice(IDisplayDevice* display) { mDisplayDevice = display; }
+   void clearDisplayDevice() { mDisplayDevice = NULL; }
+
+   void setControlSchemeParameters(bool absoluteRotation, bool addYawToAbsRot, bool addPitchToAbsRot);
+   bool getControlSchemeAbsoluteRotation() {return mAbsoluteRotation;}
+   bool getControlSchemeAddYawToAbsRot() {return mAddYawToAbsRot;}
+   bool getControlSchemeAddPitchToAbsRot() {return mAddPitchToAbsRot;}
+
    /// @}
 
    void detectLag();

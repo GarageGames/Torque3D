@@ -25,8 +25,8 @@ function initializeRoadEditor()
    echo( " - Initializing Road and Path Editor" );
    
    exec( "./roadEditor.cs" );
-   exec( "./roadEditorGui.gui" );
-   exec( "./roadEditorToolbar.gui");
+   exec( "./RoadEditorGui.gui" );
+   exec( "./RoadEditorToolbar.gui");
    exec( "./roadEditorGui.cs" );
    
    // Add ourselves to EditorGui, where all the other tools reside

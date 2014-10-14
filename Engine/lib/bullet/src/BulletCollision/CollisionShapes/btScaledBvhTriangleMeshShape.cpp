@@ -62,10 +62,12 @@ void	btScaledBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callb
 	scaledAabbMin[0] = m_localScaling.getX() >= 0. ? aabbMin[0] * invLocalScaling[0] : aabbMax[0] * invLocalScaling[0];
 	scaledAabbMin[1] = m_localScaling.getY() >= 0. ? aabbMin[1] * invLocalScaling[1] : aabbMax[1] * invLocalScaling[1];
 	scaledAabbMin[2] = m_localScaling.getZ() >= 0. ? aabbMin[2] * invLocalScaling[2] : aabbMax[2] * invLocalScaling[2];
+	scaledAabbMin[3] = 0.f;
 	
 	scaledAabbMax[0] = m_localScaling.getX() <= 0. ? aabbMin[0] * invLocalScaling[0] : aabbMax[0] * invLocalScaling[0];
 	scaledAabbMax[1] = m_localScaling.getY() <= 0. ? aabbMin[1] * invLocalScaling[1] : aabbMax[1] * invLocalScaling[1];
 	scaledAabbMax[2] = m_localScaling.getZ() <= 0. ? aabbMin[2] * invLocalScaling[2] : aabbMax[2] * invLocalScaling[2];
+	scaledAabbMax[3] = 0.f;
 	
 	
 	m_bvhTriMeshShape->processAllTriangles(&scaledCallback,scaledAabbMin,scaledAabbMax);
@@ -96,9 +98,7 @@ void	btScaledBvhTriangleMeshShape::getAabb(const btTransform& trans,btVector3& a
 
 	btVector3 center = trans(localCenter);
 
-	btVector3 extent = btVector3(abs_b[0].dot(localHalfExtents),
-		   abs_b[1].dot(localHalfExtents),
-		  abs_b[2].dot(localHalfExtents));
+    btVector3 extent = localHalfExtents.dot3(abs_b[0], abs_b[1], abs_b[2]);
 	aabbMin = center - extent;
 	aabbMax = center + extent;
 

@@ -72,9 +72,9 @@ static void pngReadDataFn(png_structp png_ptr,
                     png_bytep   data,
                     png_size_t  length)
 {
-   AssertFatal(png_ptr->io_ptr != NULL, "No stream?");
+   AssertFatal(png_get_io_ptr(png_ptr) != NULL, "No stream?");
 
-   Stream *strm = (Stream*)png_ptr->io_ptr;
+   Stream *strm = (Stream*)png_get_io_ptr(png_ptr);
    bool success = strm->read(length, data);
    AssertFatal(success, "pngReadDataFn - failed to read from stream!");
 }
@@ -85,9 +85,9 @@ static void pngWriteDataFn(png_structp png_ptr,
                      png_bytep   data,
                      png_size_t  length)
 {
-   AssertFatal(png_ptr->io_ptr != NULL, "No stream?");
+   AssertFatal(png_get_io_ptr(png_ptr) != NULL, "No stream?");
 
-   Stream *strm = (Stream*)png_ptr->io_ptr;
+   Stream *strm = (Stream*)png_get_io_ptr(png_ptr);
    bool success = strm->write(length, data);
    AssertFatal(success, "pngWriteDataFn - failed to write to stream!");
 }
@@ -356,9 +356,7 @@ static bool _writePNG(GBitmap *bitmap, Stream &stream, U32 compressionLevel, U32
 
    png_set_write_fn(png_ptr, &stream, pngWriteDataFn, pngFlushDataFn);
 
-   // Set the compression level, image filters, and compression strategy...
-   png_ptr->flags        |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
-   png_ptr->zlib_strategy = strategy;
+   // Set the compression level and image filters
    png_set_compression_window_bits(png_ptr, 15);
    png_set_compression_level(png_ptr, compressionLevel);
    png_set_filter(png_ptr, 0, filter);
@@ -559,9 +557,7 @@ bool DeferredPNGWriter::begin( GFXFormat format, S32 width, S32 height, Stream &
 
    png_set_write_fn(mData->png_ptr, &stream, pngWriteDataFn, pngFlushDataFn);
 
-   // Set the compression level, image filters, and compression strategy...
-   mData->png_ptr->flags        |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
-   mData->png_ptr->zlib_strategy = 0;
+   // Set the compression level and image filters
    png_set_compression_window_bits(mData->png_ptr, 15);
    png_set_compression_level(mData->png_ptr, compressionLevel);
    png_set_filter(mData->png_ptr, 0, PNG_ALL_FILTERS);

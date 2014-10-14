@@ -88,6 +88,7 @@ class GuiObjectView : public GuiTSCtrl
       
       F32 mMaxOrbitDist;
       F32 mMinOrbitDist;
+      EulerF mCameraRotation;
       
       ///
       F32 mOrbitDist;
@@ -244,6 +245,9 @@ class GuiObjectView : public GuiTSCtrl
       ///
       /// @param distance The distance to set the orbit to (will be clamped).
       void setOrbitDistance( F32 distance );
+      
+      /// Sets the angle of the camera on it's orbit in relation to the object.
+      void setCameraRotation( const EulerF& rotation );
       
       /// @}
       

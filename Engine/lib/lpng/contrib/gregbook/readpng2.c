@@ -55,8 +55,10 @@
 
 
 #include <stdlib.h>     /* for exit() prototype */
+#include <setjmp.h>
 
-#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include <zlib.h>
+#include "png.h"        /* libpng header from the local directory */
 #include "readpng2.h"   /* typedefs, common macros, public prototypes */
 
 
@@ -73,84 +75,10 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg);
 
 void readpng2_version_info(void)
 {
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && \
-    (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__)) && \
-    defined(PNG_LIBPNG_VER) && (PNG_LIBPNG_VER >= 10200)
-    /*
-     * WARNING:  This preprocessor approach means that the following code
-     *           cannot be used with a libpng DLL older than 1.2.0--the
-     *           compiled-in symbols for the new functions will not exist.
-     *           (Could use dlopen() and dlsym() on Unix and corresponding
-     *           calls for Windows, but not portable...)
-     */
-    {
-        int mmxsupport = png_mmx_support();
-        if (mmxsupport < 0)
-            fprintf(stderr, "   Compiled with libpng %s; using libpng %s "
-              "without MMX support.\n", PNG_LIBPNG_VER_STRING, png_libpng_ver);
-        else {
-            int compilerID;
-            png_uint_32 mmx_mask = png_get_mmx_flagmask(
-              PNG_SELECT_READ | PNG_SELECT_WRITE, &compilerID);
+    fprintf(stderr, "   Compiled with libpng %s; using libpng %s\n",
+      PNG_LIBPNG_VER_STRING, png_libpng_ver);
 
-            fprintf(stderr, "   Compiled with libpng %s; using libpng %s "
-              "with MMX support\n   (%s version).", PNG_LIBPNG_VER_STRING,
-              png_libpng_ver, compilerID == 1? "MSVC++" :
-              (compilerID == 2? "GNU C" : "unknown"));
-            fprintf(stderr, "  Processor (x86%s) %s MMX instructions.\n",
-#if defined(__x86_64__)
-              "_64",
-#else
-              "",
-#endif
-              mmxsupport? "supports" : "does not support");
-            if (mmxsupport > 0) {
-                int num_optims = 0;
-
-                fprintf(stderr,
-                  "      Potential MMX optimizations supported by libpng:\n");
-                if (mmx_mask & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)
-                    ++num_optims;
-                if (mmx_mask & PNG_ASM_FLAG_MMX_READ_FILTER_UP)
-                    ++num_optims;
-                if (mmx_mask & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)
-                    ++num_optims;
-                if (mmx_mask & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)
-                    ++num_optims;
-                if (num_optims)
-                    fprintf(stderr,
-                      "         decoding %s row filters (reading)\n",
-                      (num_optims == 4)? "all non-trivial" : "some");
-                if (mmx_mask & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW) {
-                    fprintf(stderr, "         combining rows (reading)\n");
-                    ++num_optims;
-                }
-                if (mmx_mask & PNG_ASM_FLAG_MMX_READ_INTERLACE) {
-                    fprintf(stderr,
-                      "         expanding interlacing (reading)\n");
-                    ++num_optims;
-                }
-                mmx_mask &= ~( PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  \
-                             | PNG_ASM_FLAG_MMX_READ_INTERLACE    \
-                             | PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
-                             | PNG_ASM_FLAG_MMX_READ_FILTER_UP    \
-                             | PNG_ASM_FLAG_MMX_READ_FILTER_AVG   \
-                             | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH );
-                if (mmx_mask) {
-                    fprintf(stderr, "         other (unknown)\n");
-                    ++num_optims;
-                }
-                if (num_optims == 0)
-                    fprintf(stderr, "         (none)\n");
-            }
-        }
-    }
-#else
-    fprintf(stderr, "   Compiled with libpng %s; using libpng %s "
-      "without MMX support.\n", PNG_LIBPNG_VER_STRING, png_libpng_ver);
-#endif
-
-    fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
+    fprintf(stderr, "   and with zlib %s; using zlib %s.\n",
       ZLIB_VERSION, zlib_version);
 }
 
@@ -159,7 +87,7 @@ void readpng2_version_info(void)
 
 int readpng2_check_sig(uch *sig, int num)
 {
-    return png_check_sig(sig, num);
+    return !png_sig_cmp(sig, 0, num);
 }
 
 
@@ -203,7 +131,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
     }
 
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
     /* prepare the reader to ignore all recognized chunks whose data won't be
      * used, i.e., all chunks recognized by libpng except for IHDR, PLTE, IDAT,
      * IEND, tRNS, bKGD, gAMA, and sRGB (small performance improvement) */
@@ -212,7 +140,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
          * version recognizes more chunks, add them to this list.  If a
          * future version of readpng2.c recognizes more chunks, delete them
          * from this list. */
-        static const png_byte chunks_to_ignore[] = {
+        static /* const */ png_byte chunks_to_ignore[] = {
              99,  72,  82,  77, '\0',  /* cHRM */
             104,  73,  83,  84, '\0',  /* hIST */
             105,  67,  67,  80, '\0',  /* iCCP */
@@ -232,7 +160,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
         png_set_keep_unknown_chunks(png_ptr, 1 /* PNG_HANDLE_CHUNK_NEVER */,
           chunks_to_ignore, sizeof(chunks_to_ignore)/5);
     }
-#endif /* PNG_UNKNOWN_CHUNKS_SUPPORTED */
+#endif /* PNG_HANDLE_AS_UNKNOWN_SUPPORTED */
 
 
     /* instead of doing png_init_io() here, now we set up our callback
@@ -240,96 +168,6 @@ int readpng2_init(mainprog_info *mainprog_ptr)
 
     png_set_progressive_read_fn(png_ptr, mainprog_ptr,
       readpng2_info_callback, readpng2_row_callback, readpng2_end_callback);
-
-
-    /*
-     * may as well enable or disable MMX routines here, if supported;
-     *
-     * to enable all:  mask = png_get_mmx_flagmask (
-     *                   PNG_SELECT_READ | PNG_SELECT_WRITE, &compilerID);
-     *                 flags = png_get_asm_flags (png_ptr);
-     *                 flags |= mask;
-     *                 png_set_asm_flags (png_ptr, flags);
-     *
-     * to disable all:  mask = png_get_mmx_flagmask (
-     *                   PNG_SELECT_READ | PNG_SELECT_WRITE, &compilerID);
-     *                  flags = png_get_asm_flags (png_ptr);
-     *                  flags &= ~mask;
-     *                  png_set_asm_flags (png_ptr, flags);
-     */
-
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__)) && \
-    defined(PNG_LIBPNG_VER) && (PNG_LIBPNG_VER >= 10200)
-    /*
-     * WARNING:  This preprocessor approach means that the following code
-     *           cannot be used with a libpng DLL older than 1.2.0--the
-     *           compiled-in symbols for the new functions will not exist.
-     *           (Could use dlopen() and dlsym() on Unix and corresponding
-     *           calls for Windows, but not portable...)
-     */
-    {
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-        png_uint_32 mmx_disable_mask = 0;
-        png_uint_32 asm_flags, mmx_mask;
-        int compilerID;
-
-        if (mainprog_ptr->nommxfilters)
-            mmx_disable_mask |= ( PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
-                                | PNG_ASM_FLAG_MMX_READ_FILTER_UP    \
-                                | PNG_ASM_FLAG_MMX_READ_FILTER_AVG   \
-                                | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH );
-        if (mainprog_ptr->nommxcombine)
-            mmx_disable_mask |= PNG_ASM_FLAG_MMX_READ_COMBINE_ROW;
-        if (mainprog_ptr->nommxinterlace)
-            mmx_disable_mask |= PNG_ASM_FLAG_MMX_READ_INTERLACE;
-        asm_flags = png_get_asm_flags(png_ptr);
-        png_set_asm_flags(png_ptr, asm_flags & ~mmx_disable_mask);
-
-
-        /* Now query libpng's asm settings, just for yuks.  Note that this
-         * differs from the querying of its *potential* MMX capabilities
-         * in readpng2_version_info(); this is true runtime verification. */
-
-        asm_flags = png_get_asm_flags(png_ptr);
-        mmx_mask = png_get_mmx_flagmask(PNG_SELECT_READ | PNG_SELECT_WRITE,
-          &compilerID);
-        if (asm_flags & PNG_ASM_FLAG_MMX_SUPPORT_COMPILED)
-            fprintf(stderr,
-              "  MMX support (%s version) is compiled into libpng\n",
-              compilerID == 1? "MSVC++" :
-              (compilerID == 2? "GNU C" : "unknown"));
-        else
-            fprintf(stderr, "  MMX support is not compiled into libpng\n");
-        fprintf(stderr, "  MMX instructions are %ssupported by CPU\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU)? "" : "not ");
-        fprintf(stderr, "  MMX read support for combining rows is %sabled\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)? "en" : "dis");
-        fprintf(stderr,
-          "  MMX read support for expanding interlacing is %sabled\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_READ_INTERLACE)? "en" : "dis");
-        fprintf(stderr, "  MMX read support for \"sub\" filter is %sabled\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "en" : "dis");
-        fprintf(stderr, "  MMX read support for \"up\" filter is %sabled\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP)? "en" : "dis");
-        fprintf(stderr, "  MMX read support for \"avg\" filter is %sabled\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "en" : "dis");
-        fprintf(stderr, "  MMX read support for \"Paeth\" filter is %sabled\n",
-          (asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "en" : "dis");
-        asm_flags &= (mmx_mask & ~( PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  \
-                                  | PNG_ASM_FLAG_MMX_READ_INTERLACE    \
-                                  | PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
-                                  | PNG_ASM_FLAG_MMX_READ_FILTER_UP    \
-                                  | PNG_ASM_FLAG_MMX_READ_FILTER_AVG   \
-                                  | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ));
-        if (asm_flags)
-            fprintf(stderr,
-              "  additional MMX support is also enabled (0x%02lx)\n",
-              asm_flags);
-#else  /* !PNG_ASSEMBLER_CODE_SUPPORTED */
-        fprintf(stderr, "  MMX querying is disabled in libpng.\n");
-#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
-    }
-#endif
 
 
     /* make sure we save our pointers for use in readpng2_decode_data() */
@@ -379,7 +217,12 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 {
     mainprog_info  *mainprog_ptr;
     int  color_type, bit_depth;
+    png_uint_32 width, height;
+#ifdef PNG_FLOATING_POINT_SUPPORTED
     double  gamma;
+#else
+    png_fixed_point gamma;
+#endif
 
 
     /* setjmp() doesn't make sense here, because we'd either have to exit(),
@@ -414,8 +257,10 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
     /* this is just like in the non-progressive case */
 
-    png_get_IHDR(png_ptr, info_ptr, &mainprog_ptr->width,
-      &mainprog_ptr->height, &bit_depth, &color_type, NULL, NULL, NULL);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
+       NULL, NULL, NULL);
+    mainprog_ptr->width = (ulg)width;
+    mainprog_ptr->height = (ulg)height;
 
 
     /* since we know we've read all of the PNG file's "header" (i.e., up
@@ -466,8 +311,14 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
         png_set_expand(png_ptr);
     if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
         png_set_expand(png_ptr);
+#ifdef PNG_READ_16_TO_8_SUPPORTED
     if (bit_depth == 16)
+#  ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+        png_set_scale_16(png_ptr);
+#  else
         png_set_strip_16(png_ptr);
+#  endif
+#endif
     if (color_type == PNG_COLOR_TYPE_GRAY ||
         color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
         png_set_gray_to_rgb(png_ptr);
@@ -488,11 +339,19 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
      * "gamma" value for the entire display system, i.e., the product of
      * LUT_exponent and CRT_exponent. */
 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
     if (png_get_gAMA(png_ptr, info_ptr, &gamma))
         png_set_gamma(png_ptr, mainprog_ptr->display_exponent, gamma);
     else
         png_set_gamma(png_ptr, mainprog_ptr->display_exponent, 0.45455);
-
+#else
+    if (png_get_gAMA_fixed(png_ptr, info_ptr, &gamma))
+        png_set_gamma_fixed(png_ptr,
+            (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), gamma);
+    else
+        png_set_gamma_fixed(png_ptr,
+            (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), 45455);
+#endif
 
     /* we'll let libpng expand interlaced images, too */
 
@@ -641,5 +500,12 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
         exit(99);
     }
 
+    /* Now we have our data structure we can use the information in it
+     * to return control to our own higher level code (all the points
+     * where 'setjmp' is called in this file.)  This will work with other
+     * error handling mechanisms as well - libpng always calls png_error
+     * when it can proceed no further, thus, so long as the error handler
+     * is intercepted, application code can do its own error recovery.
+     */
     longjmp(mainprog_ptr->jmpbuf, 1);
 }

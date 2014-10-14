@@ -71,8 +71,8 @@ extern StringValueLookupFn GFXStringSamplerStateValueLookup[GFXSAMP_COUNT];
 extern StringValueLookupFn GFXStringTextureStageStateValueLookup[GFXTSS_COUNT];
 
 #define GFXREVERSE_LOOKUP( tablearray, enumprefix, val ) \
-   for( int i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
-      if( (int)tablearray##[i] == val ) \
+   for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
+      if( (S32)tablearray##[i] == val ) \
       { \
          val = i; \
          break; \

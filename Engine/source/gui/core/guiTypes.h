@@ -38,7 +38,7 @@
 
 
 #include "gfx/gfxDevice.h"
-#include "platform/event.h"
+#include "platform/input/event.h"
 
 class GBitmap;
 class SFXTrack;

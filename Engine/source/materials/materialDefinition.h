@@ -223,6 +223,7 @@ public:
    ColorF mSpecular[MAX_STAGES];
 
    F32 mSpecularPower[MAX_STAGES];
+   F32 mSpecularStrength[MAX_STAGES];
    bool mPixelSpecular[MAX_STAGES];
 
    bool mVertLit[MAX_STAGES];

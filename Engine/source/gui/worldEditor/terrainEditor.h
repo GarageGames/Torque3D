@@ -112,7 +112,7 @@ protected:
 
 public:
 
-   enum { MaxBrushDim = 40 };
+   enum { MaxBrushDim = 256 };
 
    Brush(TerrainEditor * editor);
    virtual ~Brush(){};
@@ -229,6 +229,8 @@ class TerrainEditor : public EditTSCtrl
       
       void submitMaterialUndo( String actionName );
       void onMaterialUndo( TerrainBlock *terr );
+
+      void autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage );
 
 	private:	
 

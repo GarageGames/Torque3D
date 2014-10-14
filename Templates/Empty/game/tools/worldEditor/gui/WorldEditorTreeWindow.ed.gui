@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -18,7 +18,7 @@
       internalName = "TreeWindow";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       Position = firstWord($pref::Video::mode) - 209
          SPC getWord(EditorGuiToolbar.extent, 1) -1;
       Extent = "210 324";
@@ -49,7 +49,7 @@
          canSaveDynamicFields = "0";
          isContainer = "1";
          internalName = "EditorTree";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "6 27";
@@ -73,7 +73,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "1";
-            Profile = "EditorTabPage";
+            Profile = "ToolsGuiEditorTabPage";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 19";
@@ -94,7 +94,7 @@
             new GuiTextEditCtrl( EditorTreeFilter ) {
                position = "2 4";
                extent = "175 18";
-               profile = "GuiTextEditProfile";
+               profile = "ToolsGuiTextEditProfile";
                horizSizing = "width";
                vertSizing = "bottom";
                class = "GuiTreeViewFilterText";
@@ -107,7 +107,7 @@
                buttonType = "PushButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "180 5";
@@ -115,7 +115,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
                class = "GuiTreeViewFilterClearButton";
@@ -126,7 +126,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Position = "0 25";
@@ -147,7 +147,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "1 1";
@@ -181,7 +181,7 @@
             internalName = "CreatorWindow";
             Enabled = "1";
             isContainer = "1";
-            Profile = "EditorTabPage";
+            Profile = "ToolsGuiEditorTabPage";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 19";
@@ -216,7 +216,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTabBorderProfile";
+            Profile = "ToolsGuiTabBorderProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "0 0";
@@ -230,7 +230,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTabBorderProfile";
+            Profile = "ToolsGuiTabBorderProfile";
             HorizSizing = "width";
             VertSizing = "bottom";
             position = "0 25";
@@ -244,7 +244,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "0";
-               Profile = "GuiTransparentProfile";
+               Profile = "ToolsGuiTransparentProfile";
                HorizSizing = "width";
                VertSizing = "height";
                Position = "-4 47";
@@ -252,7 +252,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                Margin = "0 0 0 0";
                Padding = "4 4 4 4";
@@ -273,7 +273,7 @@
                   MinExtent = "8 2";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   Docking = "Client";
                   Margin = "0 0 0 0";
@@ -294,7 +294,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "1";
-                     Profile = "GuiTransparentProfile";
+                     Profile = "ToolsGuiTransparentProfile";
                      HorizSizing = "width";
                      VertSizing = "height";
                      Position = "1 1";
@@ -302,7 +302,7 @@
                      MinExtent = "8 2";
                      canSave = "1";
                      Visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      colCount = "20";
                      colSize = "64";
@@ -321,7 +321,7 @@
                canSaveDynamicFields = "0";
                Enabled = "1";
                isContainer = "1";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "width";
                VertSizing = "bottom";
                Position = "-3 2";
@@ -329,14 +329,14 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
 
                new GuiBitmapButtonCtrl(CreatorNavUpButton) {
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiButtonProfile";
+                  Profile = "ToolsGuiButtonProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   Position = "9 28";
@@ -345,7 +345,7 @@
                   canSave = "1";
                   Visible = "1";
                   Command = "EWCreatorWindow.navigateUp();";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   groupNum = "0";
                   buttonType = "PushButton";
@@ -357,7 +357,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "0";
-                  Profile = "GuiPopUpMenuProfile";
+                  Profile = "ToolsGuiPopUpMenuProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "32 28";
@@ -365,7 +365,7 @@
                   MinExtent = "8 2";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   Margin = "0 0 0 0";
                   Padding = "0 0 0 0";
@@ -373,7 +373,7 @@
                   AnchorBottom = "0";
                   AnchorLeft = "1";
                   AnchorRight = "0";
-                  text = "Interiors";
+                  text = "Objects";
                   maxLength = "1024";
                   maxPopupHeight = "200";
                   sbUsesNAColor = "0";
@@ -384,7 +384,7 @@
                   canSaveDynamicFields = "0";
                   Enabled = "1";
                   isContainer = "1";
-                  Profile = "GuiTabBookProfile";
+                  Profile = "ToolsGuiTabBookProfile";
                   HorizSizing = "width";
                   VertSizing = "bottom";
                   Position = "6 4";
@@ -392,7 +392,7 @@
                   MinExtent = "8 2";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   Docking = "None";
                   Margin = "0 0 0 0";
@@ -409,7 +409,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "1";
-                     Profile = "GuiTabPageProfile";
+                     Profile = "ToolsGuiTabPageProfile";
                      HorizSizing = "width";
                      VertSizing = "height";
                      Position = "0 0";
@@ -417,7 +417,7 @@
                      MinExtent = "0 0";
                      canSave = "1";
                      Visible = "0";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      Margin = "0 0 0 0";
                      Padding = "0 0 0 0";
@@ -432,7 +432,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "1";
-                     Profile = "GuiTabPageProfile";
+                     Profile = "ToolsGuiTabPageProfile";
                      HorizSizing = "width";
                      VertSizing = "height";
                      Position = "0 0";
@@ -440,7 +440,7 @@
                      MinExtent = "0 0";
                      canSave = "1";
                      Visible = "0";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      Margin = "0 0 0 0";
                      Padding = "0 0 0 0";
@@ -455,7 +455,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "1";
-                     Profile = "GuiTabPageProfile";
+                     Profile = "ToolsGuiTabPageProfile";
                      HorizSizing = "width";
                      VertSizing = "height";
                      Position = "0 0";
@@ -463,7 +463,7 @@
                      MinExtent = "0 0";
                      canSave = "1";
                      Visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      Margin = "0 0 0 0";
                      Padding = "0 0 0 0";
@@ -478,7 +478,7 @@
                      canSaveDynamicFields = "0";
                      Enabled = "1";
                      isContainer = "1";
-                     Profile = "GuiTabPageProfile";
+                     Profile = "ToolsGuiTabPageProfile";
                      HorizSizing = "width";
                      VertSizing = "height";
                      Position = "0 0";
@@ -486,7 +486,7 @@
                      MinExtent = "0 0";
                      canSave = "1";
                      Visible = "1";
-                     tooltipprofile = "GuiToolTipProfile";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
                      hovertime = "1000";
                      Margin = "0 0 0 0";
                      Padding = "0 0 0 0";
@@ -506,7 +506,7 @@
          internalName = "LockSelection";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "157 26";
@@ -515,7 +515,7 @@
          canSave = "1";
          Visible = "1";
          Command = "EWorldEditor.lockSelection(true); EditorTree.toggleLock();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Lock Selection";
          hovertime = "1000";
          bitmap = "tools/gui/images/lock";
@@ -530,7 +530,7 @@
          internalName = "AddSimGroup";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "173 26";
@@ -538,7 +538,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Add Sim Group";
          hovertime = "1000";
          bitmap = "tools/gui/images/add-simgroup-btn";
@@ -554,7 +554,7 @@
          internalName = "DeleteSelection";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "189 26";
@@ -563,7 +563,7 @@
          canSave = "1";
          Visible = "1";
          Command = "EditorMenuEditDelete();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Delete Selection";
          hovertime = "1000";
          bitmap = "tools/gui/images/delete";

@@ -70,7 +70,7 @@ GFX_ImplementTextureProfile( ShadowMapProfile,
                               GFXTextureProfile::PreserveSize | 
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 GFX_ImplementTextureProfile( ShadowMapZProfile,
                              GFXTextureProfile::DiffuseMap, 
@@ -78,7 +78,7 @@ GFX_ImplementTextureProfile( ShadowMapZProfile,
                              GFXTextureProfile::NoMipmap | 
                              GFXTextureProfile::ZTarget |
                              GFXTextureProfile::Pooled,
-                             GFXTextureProfile::None );
+                             GFXTextureProfile::NONE );
 
 
 LightShadowMap::LightShadowMap( LightInfo *light )

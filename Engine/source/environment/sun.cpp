@@ -470,7 +470,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
    const MatrixF &camView = state->getCameraTransform();
 
    // Finalize points
-   for(int i = 0; i < 4; i++)
+   for(S32 i = 0; i < 4; i++)
    {
       // align with camera
       camView.mulV(points[i]);
@@ -487,6 +487,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
    GFXVertexBufferHandle< GFXVertexPCT > vb;
    vb.set( GFX, 4, GFXBufferTypeVolatile );
    GFXVertexPCT *pVert = vb.lock();
+   if(!pVert) return;
 
    for ( S32 i = 0; i < 4; i++ )
    {

@@ -91,7 +91,7 @@ Stream::Stream()
 {
 }
 
-const char* Stream::getStatusString(const Status in_status)
+const char* Stream::getStatusString(const StreamStatus in_status)
 {
    switch (in_status) {
       case Ok:

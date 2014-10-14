@@ -36,7 +36,7 @@
 		inline_			udword				GetNodeSize()	const	{ return SIZEOFOBJECT;				}	\
 																											\
 						volume				mAABB;															\
-						udword				mData;
+						size_t				mData;
 
 	//! Common interface for a node of a no-leaf tree
 	#define IMPLEMENT_NOLEAF_NODE(base_class, volume)														\
@@ -56,8 +56,8 @@
 		inline_			udword				GetNodeSize()		const	{ return SIZEOFOBJECT;			}	\
 																											\
 						volume				mAABB;															\
-						udword				mPosData;														\
-						udword				mNegData;
+						size_t				mPosData;														\
+						size_t				mNegData;
 
 	class OPCODE_API AABBCollisionNode
 	{

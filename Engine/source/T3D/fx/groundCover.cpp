@@ -1225,14 +1225,17 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
          flipBB *= -1.0f;
 
          PROFILE_START( GroundCover_TerrainRayCast );
-         hit = terrainBlock->getNormalHeightMaterial( Point2F( cp.x - pos.x, cp.y - pos.y ), 
+         // Transform billboard point into terrain's frame of reference.
+         Point3F pp = Point3F(cp.x, cp.y, 0);
+         terrainBlock->getWorldTransform().mulP(pp);
+         hit = terrainBlock->getNormalHeightMaterial( Point2F ( pp.x, pp.y ),
                                                       &normal, &h, matName );
+         PROFILE_END(); // GroundCover_TerrainRayCast
          
          // TODO: When did we loose the world space elevation when
          // getting the terrain height?
          h += pos.z + mZOffset;
 
-         PROFILE_END(); // GroundCover_TerrainRayCast
          if ( !hit || h > typeMaxElevation || h < typeMinElevation || 
               ( typeLayer[0] && !typeInvertLayer && matName != typeLayer ) ||
               ( typeLayer[0] && typeInvertLayer && matName == typeLayer ) )
@@ -1536,7 +1539,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
 
    // Setup the frustum culler.
    if ( ( mCuller.getPosition().isZero() || !mDebugLockFrustum ) && !state->isShadowPass() )
-      mCuller = state->getFrustum();
+      mCuller = state->getCullingFrustum();
 
    // Update the cells, but only during the diffuse pass. 
    // We don't want cell generation to thrash when the reflection camera 
@@ -1550,8 +1553,11 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
    {
       PROFILE_SCOPE( GroundCover_RenderBillboards );
 
+      // Take zoom into account.
+      F32 screenScale = state->getWorldToScreenScale().y / state->getViewport().extent.y;
+
       // Set the far distance for billboards.
-      mCuller.setFarDist( mRadius );   
+      mCuller.setFarDist( mRadius * screenScale );
 
       F32 cullScale = 1.0f;
       if ( state->isReflectPass() )
@@ -1560,18 +1566,26 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       // Setup our shader const data.
       // Must be done prior to submitting our render instance.
 
-      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale, mRadius * cullScale );      
+      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale * screenScale, mRadius * cullScale * screenScale );    
 
       const F32 simTime = Sim::getCurrentTime() * 0.001f;
 
       mShaderConstData.gustInfo.set( mWindGustLength, mWindGustFrequency * simTime, mWindGustStrength );
       mShaderConstData.turbInfo.set( mWindTurbulenceFrequency * simTime, mWindTurbulenceStrength );      
-            
+
+      // Use the camera's forward vector to calculate the camera's right
+      // and up vectors.  This removes any camera banking from affecting
+      // the ground cover.
       const MatrixF &camMat = state->getDiffuseCameraTransform();
       Point3F camDir, camUp, camRight;
       camMat.getColumn( 1, &camDir );
-      camMat.getColumn( 2, &camUp );
-      camMat.getColumn( 0, &camRight );
+      mCross( camDir, Point3F::UnitZ, &camRight );
+      if ( camRight.magnitudeSafe() == 0.0f )
+      {
+         camRight.set( 0.0f, -1.0f, 0.0f );
+      }
+      camRight.normalizeSafe();
+      mCross( camRight, camDir, &camUp );
 
       // Limit the camera up vector to keep the billboards 
       // from leaning too far down into the terrain.

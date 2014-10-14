@@ -311,7 +311,7 @@ UTF32 oneUTF8toUTF32( const UTF8* codepoint, U32 *unitsWalked)
    U8 codeunit;
    
    // check the first byte ( a.k.a. codeunit ) .
-   unsigned char c = codepoint[0];
+   U8 c = codepoint[0];
    c = c >> 1;
    expectedByteCount = sgFirstByteLUT[c];
    if(expectedByteCount > 0) // 0 or negative is illegal to start with
@@ -469,7 +469,7 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
    U8  marker = ( ~mask << 1);            // 1000 0000
    
    // Process the low order bytes, shifting the codepoint down 6 each pass.
-   for( int i = bytecount-1; i > 0; i--)
+   for( S32 i = bytecount-1; i > 0; i--)
    {
       threeByteCodeunitBuf[i] = marker | (working & mask); 
       working >>= 6;

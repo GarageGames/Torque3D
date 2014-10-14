@@ -30,7 +30,6 @@
 #include "core/strings/unicode.h"
 #include "core/stream/fileStream.h"
 #include "console/compiler.h"
-#include "platform/event.h"
 #include "platform/platformInput.h"
 #include "core/util/journal/journal.h"
 #include "core/util/uuid.h"
@@ -76,7 +75,8 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
    "@ingroup Strings\n"
    "@see http://en.wikipedia.org/wiki/Printf" )
 {
-   char* pBuffer = Con::getReturnBuffer(64);
+   static const U32 bufSize = 64;
+   char* pBuffer = Con::getReturnBuffer(bufSize);
    const char *pch = format;
 
    pBuffer[0] = '\0';
@@ -100,7 +100,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       case 'u':
       case 'x':
       case 'X':
-         dSprintf( pBuffer, 64, format, dAtoi( value ) );
+         dSprintf( pBuffer, bufSize, format, dAtoi( value ) );
          break;
 
       case 'e':
@@ -108,7 +108,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
       case 'f':
       case 'g':
       case 'G':
-         dSprintf( pBuffer, 64, format, dAtof( value ) );
+         dSprintf( pBuffer, bufSize, format, dAtof( value ) );
          break;
 
       default:
@@ -260,7 +260,7 @@ DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, int offset ), ( 0 ),
+DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
    "Find the start of @a needle in @a haystack searching from left to right beginning at the given offset.\n"
    "@param haystack The string to search.\n"
    "@param needle The string to search for.\n"
@@ -480,7 +480,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
       if(!scan)
       {
          dStrcpy(ret + dstp, source + scanp);
-         return ret;
+         break;
       }
       U32 len = scan - (source + scanp);
       dStrncpy(ret + dstp, source + scanp, len);
@@ -1585,15 +1585,22 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( displaySplashWindow, bool, (),,
+DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/splash.bmp"),
    "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
    "@note This is currently only implemented on Windows.\n\n"
    "@return True if the splash window could be successfully initialized.\n\n"
    "@ingroup Platform" )
 {
-   return Platform::displaySplashWindow();
+   return Platform::displaySplashWindow(path);
 }
 
+DefineEngineFunction( closeSplashWindow, void, (),,
+   "Close our startup splash window.\n\n"
+   "@note This is currently only implemented on Windows.\n\n"
+   "@ingroup Platform" )
+{
+   Platform::closeSplashWindow();
+}
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( getWebDeployment, bool, (),,
@@ -2028,8 +2035,10 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
    //}
 
    // If we had a DSO, let's check to see if we should be reading from it.
-   if(compiled && dsoFile != NULL && (scriptFile == NULL|| (scriptModifiedTime - dsoModifiedTime) > Torque::Time(0)))
-   {
+   //MGT: fixed bug with dsos not getting recompiled correctly
+   //Note: Using Nathan Martin's version from the forums since its easier to read and understand
+   if(compiled && dsoFile != NULL && (scriptFile == NULL|| (dsoModifiedTime >= scriptModifiedTime)))
+   { //MGT: end
       compiledStream = FileStream::createAndOpen( nameBuffer, Torque::FS::File::Read );
       if (compiledStream)
       {

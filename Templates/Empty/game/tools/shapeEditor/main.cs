@@ -33,7 +33,7 @@ function initializeShapeEditor()
    exec("./gui/shapeEdPreviewWindow.ed.gui");
    exec("./gui/shapeEdAnimWindow.ed.gui");
    exec("./gui/shapeEdAdvancedWindow.ed.gui");
-   exec("./gui/shapeEditorToolbar.ed.gui");
+   exec("./gui/ShapeEditorToolbar.ed.gui");
    exec("./gui/shapeEdSelectWindow.ed.gui");
    exec("./gui/shapeEdPropWindow.ed.gui");
 

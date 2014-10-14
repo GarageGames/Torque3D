@@ -23,7 +23,6 @@
 #include "app/net/httpObject.h"
 
 #include "platform/platform.h"
-#include "platform/event.h"
 #include "core/stream/fileStream.h"
 #include "console/simBase.h"
 #include "console/consoleInternal.h"
@@ -299,7 +298,7 @@ void HTTPObject::onDisconnect()
    Parent::onDisconnect();
 }
 
-bool HTTPObject::processLine(U8 *line)
+bool HTTPObject::processLine(UTF8 *line)
 {
    if(mParseState == ParsingStatusLine)
    {

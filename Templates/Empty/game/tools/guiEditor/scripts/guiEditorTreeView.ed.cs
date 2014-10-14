@@ -101,7 +101,7 @@ function GuiEditorTreeView::onDefineIcons(%this)
             ":" @       // SimGroup2
             ":" @       // SimGroup3
             ":" @       // SimGroup4
-            "core/art/gui/images/treeview/hidden:" @
+            "tools/gui/images/treeview/hidden:" @
             "tools/worldEditor/images/lockedHandle";
 
    GuiEditorTreeView.buildIconTable( %icons );

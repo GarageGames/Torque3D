@@ -36,6 +36,8 @@
 #include "core/util/safeDelete.h"
 #include "console/console.h"
 
+using namespace Torque;
+
 extern bool gDisassembleAllShaders;
 
 /// D3DXInclude plugin
@@ -442,7 +444,7 @@ const String GFXD3D9ShaderConstBuffer::describeSelf() const
       GenericConstBufferLayout::ParamDesc pd;
       mVertexConstBufferLayoutF->getDesc(i, pd);
 
-      ret += String::ToString("      Constant name: %s", pd.name);
+      ret += String::ToString("      Constant name: %s", pd.name.c_str());
    }
 
    return ret;

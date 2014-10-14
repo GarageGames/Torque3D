@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl() {
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
@@ -9,7 +9,7 @@
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
    canSaveDynamicFields = "0";
 
@@ -31,7 +31,7 @@
       AnchorLeft = "1";
       AnchorRight = "0";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "windowRelative";
       VertSizing = "windowRelative";
       Position = getWord($pref::Video::mode, 0) - 209
@@ -40,7 +40,7 @@
       MinExtent = "210 140";
       canSave = "1";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       internalName = "DatablockEditorTreeWindow";
       canSaveDynamicFields = "0";
@@ -57,7 +57,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          isContainer = "1";
-         Profile = "GuiTabBookProfile";
+         Profile = "ToolsGuiTabBookProfile";
          HorizSizing = "width";
          VertSizing = "height";
          position = "4 25";
@@ -65,7 +65,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          internalName = "DatablockEditorTree";
          canSaveDynamicFields = "0";
@@ -80,7 +80,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "1";
-            Profile = "EditorTabPage";
+            Profile = "ToolsGuiEditorTabPage";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 19";
@@ -88,7 +88,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "0";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             canSaveDynamicFields = "0";
 
@@ -108,7 +108,7 @@
                buttonType = "PushButton";
                useMouseEvents = "0";
                isContainer = "0";
-               Profile = "GuiDefaultProfile";
+               Profile = "ToolsGuiDefaultProfile";
                HorizSizing = "left";
                VertSizing = "bottom";
                position = "185 5";
@@ -116,7 +116,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
                class = "GuiTreeViewFilterClearButton";
@@ -139,7 +139,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "0 25";
@@ -147,7 +147,7 @@
                MinExtent = "8 8";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
 
@@ -167,7 +167,7 @@
                   objectNamesOnly = "0";
                   compareToObjectID = "0";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "1 1";
@@ -175,7 +175,7 @@
                   MinExtent = "8 8";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
                };
@@ -191,7 +191,7 @@
             AnchorLeft = "1";
             AnchorRight = "0";
             isContainer = "1";
-            Profile = "EditorTabPage";
+            Profile = "ToolsGuiEditorTabPage";
             HorizSizing = "width";
             VertSizing = "height";
             position = "0 19";
@@ -199,7 +199,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "DatablockEditorCreator";
             canSaveDynamicFields = "0";
@@ -220,7 +220,7 @@
                AnchorLeft = "1";
                AnchorRight = "0";
                isContainer = "1";
-               Profile = "GuiScrollProfile";
+               Profile = "ToolsGuiScrollProfile";
                HorizSizing = "width";
                VertSizing = "height";
                position = "0 0";
@@ -228,7 +228,7 @@
                MinExtent = "8 8";
                canSave = "1";
                Visible = "1";
-               tooltipprofile = "GuiToolTipProfile";
+               tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                canSaveDynamicFields = "0";
 
@@ -248,7 +248,7 @@
                   objectNamesOnly = "0";
                   compareToObjectID = "1";
                   isContainer = "1";
-                  Profile = "GuiTreeViewProfile";
+                  Profile = "ToolsGuiTreeViewProfile";
                   HorizSizing = "right";
                   VertSizing = "bottom";
                   position = "1 1";
@@ -256,7 +256,7 @@
                   MinExtent = "8 2";
                   canSave = "1";
                   Visible = "1";
-                  tooltipprofile = "GuiToolTipProfile";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
                   hovertime = "1000";
                   canSaveDynamicFields = "0";
                   altCommand = "DatablockEditorPlugin.createDatablock();";
@@ -270,7 +270,7 @@
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "190 26";
@@ -279,19 +279,19 @@
          canSave = "1";
          Visible = "1";
          Command = "DatablockEditorPlugin.deleteDatablock();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Delete Datablock";
          hovertime = "1000";
          internalName = "deleteSelection";
          canSaveDynamicFields = "0";
       };
       new GuiBitmapButtonCtrl() {
-         bitmap = "core/art/gui/images/new";
+         bitmap = "tools/gui/images/new";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          position = "192 25";
@@ -300,7 +300,7 @@
          canSave = "1";
          Visible = "0";
          Command = "DatablockEditorPlugin.createDatablock();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          tooltip = "Create New Datablock";
          hovertime = "1000";
          internalName = "CreateSelection";

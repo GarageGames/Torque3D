@@ -764,8 +764,7 @@ GuiControl* GuiInspectorTypeShapeFilename::constructEditControl()
 
    // Change filespec
    char szBuffer[512];
-   dSprintf( szBuffer, sizeof(szBuffer), "getLoadFilename(\"%s\", \"%d.apply\", %d.getData());",
-      "DTS Files (*.dts)|*.dts|COLLADA Files (*.dae)|*.dae|(All Files (*.*)|*.*|", getId(), getId() );
+   dSprintf( szBuffer, sizeof(szBuffer), "getLoadFormatFilename(\"%d.apply\", %d.getData());", getId(), getId() );
    mBrowseButton->setField( "Command", szBuffer );
 
    // Create "Open in ShapeEditor" button
@@ -1538,7 +1537,7 @@ GuiControl* GuiInspectorTypeBitMask32Helper::constructEditControl()
    mButton->setField( "Command", szBuffer );
    mButton->setField( "buttonType", "ToggleButton" );
    mButton->setDataField( StringTable->insert("Profile"), NULL, "GuiInspectorButtonProfile" );
-   mButton->setBitmap( "core/art/gui/images/arrowBtn" );
+   mButton->setBitmap( "tools/gui/images/arrowBtn" );
    mButton->setStateOn( true );
    mButton->setExtent( 16, 16 );
    mButton->registerObject();

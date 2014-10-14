@@ -47,10 +47,12 @@ public:
     :  mHitCount( 0 ) 
 #endif
    { };
+   virtual ~_TorqueThreadStatic() { }
 
    static const U32 getListIndex(){ return mListIndex; }
 
    virtual void *getMemInstPtr() = 0;
+   virtual const void *getConstMemInstPtr() const = 0;
    virtual const dsize_t getMemInstSize() const = 0;
 
 #ifdef TORQUE_ENABLE_THREAD_STATIC_METRICS
@@ -142,6 +144,7 @@ private:
 public:
    TorqueThreadStatic( T instanceVal ) : mInstance( instanceVal ) {}
    virtual void *getMemInstPtr() { return &mInstance; }
+   virtual const void *getConstMemInstPtr() const { return &mInstance; }
 
    // I am not sure these are needed, and I don't want to create confusing-to-debug code
 #if 0
@@ -180,7 +183,7 @@ public: \
    _##name##TorqueThreadStatic() : TorqueThreadStatic<type>( initalvalue ) {} \
    virtual const dsize_t getMemInstSize() const { return sizeof( type ); } \
    type &_cast() { return *reinterpret_cast<type *>( getMemInstPtr() ); } \
-   const type &_const_cast() const { return *reinterpret_cast<const type *>( getMemInstPtr() ); } \
+   const type &_const_cast() const { return *reinterpret_cast<const type *>( getConstMemInstPtr() ); } \
 }; \
 static _##name##TorqueThreadStatic name##TorqueThreadStatic; \
 static _TorqueThreadStaticReg _##name##TTSReg( reinterpret_cast<_TorqueThreadStatic *>( & name##TorqueThreadStatic ) )

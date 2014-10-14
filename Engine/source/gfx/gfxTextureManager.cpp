@@ -35,11 +35,16 @@
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
 
+using namespace Torque;
 
 //#define DEBUG_SPEW
 
 
 S32 GFXTextureManager::smTextureReductionLevel = 0;
+
+String GFXTextureManager::smMissingTexturePath("core/art/missingTexture");
+String GFXTextureManager::smUnavailableTexturePath("core/art/unavailable");
+String GFXTextureManager::smWarningTexturePath("core/art/warnmat");
 
 GFXTextureManager::EventSignal GFXTextureManager::smEventSignal;
 
@@ -51,6 +56,19 @@ void GFXTextureManager::init()
       "The number of mipmap levels to drop on loaded textures to reduce "
       "video memory usage.  It will skip any textures that have been defined "
       "as not allowing down scaling.\n"
+      "@ingroup GFX\n" );
+
+   Con::addVariable( "$pref::Video::missingTexturePath", TypeRealString, &smMissingTexturePath,
+      "The file path of the texture to display when the requested texture is missing.\n"
+      "@ingroup GFX\n" );
+
+   Con::addVariable( "$pref::Video::unavailableTexturePath", TypeRealString, &smUnavailableTexturePath,
+      "@brief The file path of the texture to display when the requested texture is unavailable.\n\n"
+      "Often this texture is used by GUI controls to indicate that the request image is unavailable.\n"
+      "@ingroup GFX\n" );
+
+   Con::addVariable( "$pref::Video::warningTexturePath", TypeRealString, &smWarningTexturePath,
+      "The file path of the texture used to warn the developer.\n"
       "@ingroup GFX\n" );
 }
 
@@ -1013,9 +1031,9 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
    // If the format is non-compressed, and the profile requests a compressed format
    // than change the format.
    GFXFormat testingFormat = inOutFormat;
-   if( profile->getCompression() != GFXTextureProfile::None )
+   if( profile->getCompression() != GFXTextureProfile::NONE )
    {
-      const int offset = profile->getCompression() - GFXTextureProfile::DXT1;
+      const S32 offset = profile->getCompression() - GFXTextureProfile::DXT1;
       testingFormat = GFXFormat( GFXFormatDXT1 + offset );
 
       // No auto-gen mips on compressed textures

@@ -20,24 +20,32 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../../../gl/hlslCompat.glsl"
 #include "farFrustumQuad.glsl"
 
-uniform vec4 renderTargetParams;
+in vec4 vPosition;
+in vec3 vNormal;
+in vec3 vTangent;
+in vec2 vTexCoord0;
 
-varying vec4 hpos;
-varying vec2 uv0;
-varying vec3 wsEyeRay;
-
+uniform vec4 rtParams0;
+out vec4 hpos;
+out vec2 uv0;
+out vec3 wsEyeRay;
+out vec3 vsEyeRay;
 
 void main()
-{
-   // Expand the SS coordinate (stored in uv0)
-   hpos = vec4( gl_MultiTexCoord0.st * 2.0 - 1.0, 1.0, 1.0 );
-   gl_Position = hpos;
-   
+{   
+   hpos = vec4( vTexCoord0, 0, 1 );   
+
    // Get a RT-corrected UV from the SS coord
-   uv0 = getUVFromSSPos( hpos.xyz, renderTargetParams );
+   uv0 = getUVFromSSPos( hpos.xyz, rtParams0 );
+   gl_Position = hpos;   
    
-   // Interpolators will generate eye ray from far-frustum corners
-   wsEyeRay = gl_Vertex.xyz;
+   // Interpolators will generate eye rays the 
+   // from far-frustum corners.
+   wsEyeRay = vTangent;
+   vsEyeRay = vNormal;
+   
+   correctSSP(gl_Position);
 }

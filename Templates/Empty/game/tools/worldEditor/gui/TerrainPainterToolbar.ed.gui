@@ -4,7 +4,7 @@
    internalName = "TerrainPainterToolbar";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "306 0";
@@ -15,7 +15,7 @@
    hovertime = "1000";
    
    new GuiTextCtrl() {
-      profile = "GuiTextProfile";
+      profile = "ToolsGuiTextProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "6 7";
@@ -31,7 +31,7 @@
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "0 0";
@@ -43,7 +43,7 @@
       
       new GuiControl(EWTerrainPainterToolbarBrushType){
          isContainer = "1";
-         profile = "GuiDefaultProfile";
+         profile = "ToolsGuiDefaultProfile";
          Position = "83 2";
          Extent = "94 27";
          
@@ -52,7 +52,7 @@
             internalName = "ellipse";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "0 0";
@@ -61,7 +61,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ETerrainEditor.toggleBrushType($ThisControl);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Circle Brush (V)";
             hovertime = "750";
             groupNum = "0";
@@ -74,7 +74,7 @@
             internalName = "box";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "31 0";
@@ -83,7 +83,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ETerrainEditor.toggleBrushType($ThisControl);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Box Brush (B)";
             hovertime = "750";
             groupNum = "0";
@@ -98,7 +98,7 @@
             internalName = "selection";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiButtonProfile";
+            Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "62 0";
@@ -107,7 +107,7 @@
             canSave = "1";
             Visible = "1";
             Command = "ETerrainEditor.toggleBrushType($ThisControl);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Toggles the brush type.";
             hovertime = "750";
             groupNum = "0";
@@ -120,17 +120,17 @@
       
   new GuiBitmapCtrl() {
       Enabled = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       position = "152 3";
       Extent = "2 26";
       MinExtent = "1 1";
-      bitmap = "core/art/gui/images/separator-h.png";
+      bitmap = "tools/gui/images/separator-h.png";
    };
       
       new GuiControl(PaintBrushSizeTextEditContainer) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "145 5";
@@ -144,7 +144,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "21 5";
@@ -168,7 +168,7 @@
             isContainer = "0";
             HorizSizing = "right";
             VertSizing = "bottom";
-            profile="GuiNumericDropSliderTextProfile";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             position = "49 2";
             Extent = "42 16";
             MinExtent = "8 16";
@@ -188,7 +188,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "83 2";
@@ -197,29 +197,29 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(PaintBrushSizeSliderCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the size of the brush (CTRL + Mouse Wheel)";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          };
       };  
 
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "270 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
                 
 	   new GuiControl(PaintBrushSlopeControl) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "262 5";
@@ -227,13 +227,13 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
 
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "21 5";
@@ -241,7 +241,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             tooltip = "Allows painting on the terrain within a specified slope";
             hovertime = "1000";
             Margin = "0 0 0 0";
@@ -257,7 +257,7 @@
             internalName = "SlopeMinAngle";
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiNumericDropSliderTextProfile";
+            Profile = "ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "104 2";
@@ -267,7 +267,7 @@
             Visible = "1";
             validate = "TerrainPainterPlugin.validateSlopeMinAngle();";
             Command = "ETerrainEditor.setSlopeLimitMinAngle( $ThisControl.getText() );";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             tooltip = "Minimum terrain angle that will be paintable";
             hovertime = "1000";
             Margin = "0 0 0 0";
@@ -287,7 +287,7 @@
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "137 2";
@@ -295,17 +295,17 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             tooltip = "Minimum terrain angle that will be paintable";
             hovertime = "1000";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
             Command = "Canvas.pushDialog(PaintBrushSlopeMinContainer);";
          };
          new GuiTextCtrl() {
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "165 5";
@@ -318,7 +318,7 @@
             internalName = "SlopeMaxAngle";
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiNumericDropSliderTextProfile";
+            Profile = "ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "190 2";
@@ -328,7 +328,7 @@
             Visible = "1";
             validate = "TerrainPainterPlugin.validateSlopeMaxAngle();";
             Command = "ETerrainEditor.setSlopeLimitMaxAngle( $ThisControl.getText() );";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             tooltip = "Max terrain angle that will be paintable";
             hovertime = "1000";
             Margin = "0 0 0 0";
@@ -348,7 +348,7 @@
          new GuiBitmapButtonCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "223 2";
@@ -356,30 +356,30 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             groupNum = "-1";
             tooltip = "Max terrain angle that will be paintable";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
             Command = "Canvas.pushDialog(PaintBrushSlopeMaxContainer);";
          };
       };
 
       new GuiBitmapCtrl() {
          Enabled = "1";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          position = "525 3";
          Extent = "2 26";
          MinExtent = "1 1";
-         bitmap = "core/art/gui/images/separator-h.png";
+         bitmap = "tools/gui/images/separator-h.png";
       };
 
       new GuiControl(PaintBrushPressureTextEditContainer,EditorGuiGroup) {
          canSaveDynamicFields = "0";
          isContainer = "1";
-         Profile = "GuiTransparentProfile";
+         Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          position = "540 5";
@@ -393,7 +393,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiTextProfile";
+            Profile = "ToolsGuiTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 5";
@@ -415,7 +415,7 @@
             canSaveDynamicFields = "0";
             internalName = "textEdit";
             isContainer = "0";
-            profile="GuiNumericDropSliderTextProfile";
+            profile="ToolsGuiNumericDropSliderTextProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "49 2";
@@ -436,7 +436,7 @@
             canSaveDynamicFields = "0";
             Enabled = "1";
             isContainer = "0";
-            Profile = "GuiDefaultProfile";
+            Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
             Position = "83 2";
@@ -445,13 +445,13 @@
             canSave = "1";
             Visible = "1";
             Command = "Canvas.pushDialog(PaintBrushPressureSliderCtrlContainer);";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the pressure (CTRL + SHIFT + Mouse Wheel)";
             hovertime = "750";
             groupNum = "-1";
             buttonType = "PushButton";
             useMouseEvents = "0";
-            bitmap = "core/art/gui/images/dropslider";
+            bitmap = "tools/gui/images/dropslider";
          }; 
       };
    };
@@ -484,7 +484,7 @@ new GuiMouseEventCtrl(PaintBrushSizeSliderCtrlContainer,EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(PaintBrushSizeTextEditContainer.position) + firstWord(EWTerrainPainterToolbar.position)+11 SPC 
@@ -494,7 +494,7 @@ new GuiMouseEventCtrl(PaintBrushSizeSliderCtrlContainer,EditorGuiGroup) {
       canSave = "1";
       Visible = "1";
       AltCommand = "PaintBrushSizeTextEditContainer-->textEdit.setValue(mFloatLength( ($ThisControl.getValue()), 2 )); ETerrainEditor.setBrushSize( $ThisControl.value );";
-      range = "1 40";
+      range = "1 256";
       ticks = "0";
       value = "0";
    };
@@ -514,7 +514,7 @@ new GuiMouseEventCtrl(PaintBrushSlopeMinContainer,EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(PaintBrushSlopeControl.position) + firstWord(EWTerrainPainterToolbar.position)+firstWord(PaintBrushSlopeControl->SlopeMinAngle.position) - 40 SPC
@@ -549,7 +549,7 @@ new GuiMouseEventCtrl(PaintBrushSlopeMaxContainer,EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(PaintBrushSlopeControl.position) + firstWord(EWTerrainPainterToolbar.position)+firstWord(PaintBrushSlopeControl->SlopeMaxAngle.position) - 40 SPC
@@ -589,7 +589,7 @@ new GuiMouseEventCtrl(PaintBrushPressureSliderCtrlContainer,EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(PaintBrushPressureTextEditContainer.position) + firstWord(EWTerrainPainterToolbar.position) SPC 
@@ -619,7 +619,7 @@ new GuiMouseEventCtrl(PaintBrushSoftnessSliderCtrlContainer,EditorGuiGroup) {
       canSaveDynamicFields = "0";
       internalName = "slider";
       isContainer = "0";
-      Profile = "GuiSliderBoxProfile";
+      Profile = "ToolsGuiSliderBoxProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = firstWord(PaintBrushSoftnessTextEditContainer.position) + firstWord(EWTerrainPainterToolbar.position) SPC 

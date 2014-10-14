@@ -203,7 +203,7 @@ ShapeBaseImageData::ShapeBaseImageData()
    scriptAnimTransitionTime = 0.25f;
 
    //
-   for (int i = 0; i < MaxStates; i++) {
+   for (S32 i = 0; i < MaxStates; i++) {
       stateName[i] = 0;
 
       stateTransitionLoaded[i] = 0;
@@ -462,7 +462,10 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
             Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(shape[i].getPath());
 
             if (!fileRef)
+            {
+               errorStr = String::ToString("ShapeBaseImageData: Couldn't load shape \"%s\"",name);
                return false;
+            }
 
             if(server)
             {
@@ -685,10 +688,6 @@ void ShapeBaseImageData::initPersistFields()
       "@note Read about the animateOnServer field as you may want to set it to true if you're using useEyeNode.\n\n"
       "@see eyeOffset\n\n"
       "@see animateOnServer\n\n");
-
-   addField( "correctMuzzleVector", TypeBool,  Offset(correctMuzzleVector, ShapeBaseImageData),
-      "@brief Flag to adjust the aiming vector to the eye's LOS point.\n\n"
-      "@see ShapeBase::getMuzzleVector()" );
 
    addField( "correctMuzzleVector", TypeBool,  Offset(correctMuzzleVector, ShapeBaseImageData),
       "@brief Flag to adjust the aiming vector to the eye's LOS point when in 1st person view.\n\n"
@@ -1861,7 +1860,7 @@ void ShapeBase::getImageTransform(U32 imageSlot,MatrixF* mat)
          // We need to animate, even on the server, to make sure the nodes are in the correct location.
          image.shapeInstance[shapeIndex]->animate();
 
-         getEyeBaseTransform(&nmat);
+         getEyeBaseTransform(&nmat, mDataBlock->mountedImagesBank);
 
          MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
 
@@ -1900,7 +1899,7 @@ void ShapeBase::getImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
             image.shapeInstance[shapeIndex]->animate();
 
             MatrixF emat;
-            getEyeBaseTransform(&emat);
+            getEyeBaseTransform(&emat, mDataBlock->mountedImagesBank);
 
             MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
             mountTransform.affineInverse();
@@ -1985,7 +1984,7 @@ void ShapeBase::getRenderImageTransform( U32 imageSlot, MatrixF* mat, bool noEye
 
       MatrixF nmat;
       if ( data.useEyeNode && isFirstPerson() && data.eyeMountNode[shapeIndex] != -1 ) {
-         getRenderEyeBaseTransform(&nmat);
+         getRenderEyeBaseTransform(&nmat, mDataBlock->mountedImagesBank);
 
          MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
 
@@ -2023,7 +2022,7 @@ void ShapeBase::getRenderImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
          if ( data.useEyeNode && isFirstPerson() && data.eyeMountNode[shapeIndex] != -1 )
          {
             MatrixF emat;
-            getRenderEyeBaseTransform(&emat);
+            getRenderEyeBaseTransform(&emat, mDataBlock->mountedImagesBank);
 
             MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
             mountTransform.affineInverse();
@@ -3061,7 +3060,7 @@ TICKAGAIN:
 
       if (image.spinThread[i])
       {
-         float timeScale;
+         F32 timeScale;
 
          switch (stateData.spin) 
          {
@@ -3092,7 +3091,10 @@ TICKAGAIN:
    }
 
    if ( image.rDT > 0.0f && image.delayTime > 0.0f && imageData.useRemainderDT && dt != 0.0f )
+   {
+      dt = image.rDT;
       goto TICKAGAIN;
+   }
 }
 
 
@@ -3259,7 +3261,7 @@ void ShapeBase::submitLights( LightManager *lm, bool staticLighting )
             {
             S32 elapsed = Sim::getCurrentTime() - image.lightStart;
             if ( elapsed > imageData->lightDuration )
-               return;
+               continue;
             intensity = ( 1.0 - (F32)elapsed / (F32)imageData->lightDuration ) * imageData->lightBrightness;
             break;
             }

@@ -74,6 +74,10 @@ EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
 
+String TSShapeConstructor::smCapsuleShapePath("core/art/shapes/unit_capsule.dts");
+String TSShapeConstructor::smCubeShapePath("core/art/shapes/unit_cube.dts");
+String TSShapeConstructor::smSphereShapePath("core/art/shapes/unit_sphere.dts");
+
 ResourceRegisterPostLoadSignal< TSShape > TSShapeConstructor::_smAutoLoad( &TSShapeConstructor::_onTSShapeLoaded );
 ResourceRegisterUnloadSignal< TSShape > TSShapeConstructor::_smAutoUnload( &TSShapeConstructor::_onTSShapeUnloaded );
 
@@ -278,6 +282,23 @@ void TSShapeConstructor::initPersistFields()
    endGroup( "Sequences" );
 
    Parent::initPersistFields();
+}
+
+void TSShapeConstructor::consoleInit()
+{
+   Parent::consoleInit();
+
+   Con::addVariable( "$pref::TSShapeConstructor::CapsuleShapePath", TypeRealString, &TSShapeConstructor::smCapsuleShapePath, 
+      "The file path to the capsule shape used by tsMeshFit.\n\n"
+	   "@ingroup MeshFit\n" );
+
+   Con::addVariable( "$pref::TSShapeConstructor::CubeShapePath", TypeRealString, &TSShapeConstructor::smCubeShapePath, 
+      "The file path to the cube shape used by tsMeshFit.\n\n"
+	   "@ingroup MeshFit\n" );
+
+   Con::addVariable( "$pref::TSShapeConstructor::SphereShapePath", TypeRealString, &TSShapeConstructor::smSphereShapePath, 
+      "The file path to the sphere shape used by tsMeshFit.\n\n"
+	   "@ingroup MeshFit\n" );
 }
 
 TSShapeConstructor* TSShapeConstructor::findShapeConstructor(const FileName& path)
@@ -1195,8 +1216,9 @@ DefineTSShapeConstructorMethod( getMeshName, const char*, ( const char* name, S3
 
    CHECK_INDEX_IN_RANGE( getMeshName, index, objectDetails.size(), "" );
 
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%s %d", name, (S32)mShape->details[objectDetails[index]].size);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%s %d", name, (S32)mShape->details[objectDetails[index]].size);
    return returnBuffer;
 }}
 
@@ -1581,8 +1603,9 @@ DefineTSShapeConstructorMethod( getImposterSettings, const char*, ( S32 index ),
    // Return information about the detail level
    const TSShape::Detail& det = mShape->details[index];
 
-   char* returnBuffer = Con::getReturnBuffer(512);
-   dSprintf(returnBuffer, 512, "%d\t%d\t%d\t%d\t%d\t%d\t%g",
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d\t%d\t%d\t%d\t%d\t%d\t%g",
       (S32)( det.subShapeNum < 0 ),          // isImposter
       det.bbEquatorSteps,
       det.bbPolarSteps,
@@ -1706,8 +1729,9 @@ DefineTSShapeConstructorMethod( getSequenceSource, const char*, ( const char* na
    GET_SEQUENCE( getSequenceSource, seq, name, "" );
 
    // Return information about the source data for this sequence
-   char* returnBuffer = Con::getReturnBuffer(512);
-   dSprintf( returnBuffer, 512, "%s\t%d\t%d\t%d",
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%s\t%d\t%d\t%d",
       seq->sourceData.from.c_str(), seq->sourceData.start,
       seq->sourceData.end, seq->sourceData.total );
    return returnBuffer;
@@ -1781,8 +1805,9 @@ DefineTSShapeConstructorMethod( getSequenceGroundSpeed, const char*, ( const cha
       rot = mat.toEuler();
    }
 
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf( returnBuffer, 256, "%g %g %g %g %g %g",
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%g %g %g %g %g %g",
       trans.x, trans.y, trans.z, rot.x, rot.y, rot.z );
    return returnBuffer;
 }}
@@ -1875,8 +1900,9 @@ DefineTSShapeConstructorMethod( getSequenceBlend, const char*, ( const char* nam
    GET_SEQUENCE( getSequenceBlend, seq, name, "0" );
 
    // Return the blend information (flag reference_sequence reference_frame)
-   char* returnBuffer = Con::getReturnBuffer(512);
-   dSprintf( returnBuffer, 512, "%d\t%s\t%d", (int)seq->isBlend(),
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%d\t%s\t%d", (int)seq->isBlend(),
       seq->sourceData.blendSeq.c_str(), seq->sourceData.blendFrame );
    return returnBuffer;
 }}
@@ -2017,8 +2043,9 @@ DefineTSShapeConstructorMethod( getTrigger, const char*, ( const char* name, S32
    if (!(trig.state & TSShape::Trigger::StateOn))
       state = -state;
 
-   char* returnBuffer = Con::getReturnBuffer(32);
-   dSprintf(returnBuffer, 32, "%d %d", frame, state);
+   static const U32 bufSize = 32;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d", frame, state);
    return returnBuffer;
 }}
 

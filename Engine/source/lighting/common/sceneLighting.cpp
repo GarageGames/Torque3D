@@ -40,14 +40,6 @@
 #include "core/stream/fileStream.h"
 #include "core/crc.h"
 
-//#define DUMP_LIGHTMAPS
-
-#ifdef DUMP_LIGHTMAPS
-#include "interior/interiorInstance.h"
-#include "core/volume.h"
-#endif
-
-
 namespace
 {
    bool              gTerminateLighting = false;
@@ -394,23 +386,6 @@ void SceneLighting::sgSGObjectCompleteEvent(S32 object)
    // only the last light does something
    mLitObjects[object]->postLight(true);
    
-#ifdef DUMP_LIGHTMAPS
-   InteriorInstance *interiorinst = dynamic_cast<InteriorInstance *>(mLitObjects[object]->getObject());
-   if(interiorinst)
-   {
-      Interior *detail = interiorinst->getDetailLevel(0);
-      for(U32 i=0; i<detail->mNormalLMapIndices.size(); i++)
-      {
-         GFXTexHandle normHandle = gInteriorLMManager.duplicateBaseLightmap(detail->getLMHandle(),
-         interiorinst->getLMHandle(), detail->getNormalLMapIndex(i));
-         GBitmap *normLightmap = normHandle->getBitmap();
-
-         FileStream output;
-         output.open(avar("lightmaps/lm_%d_%d.png", object, i), Torque::FS::File::Write);
-         normLightmap->writeBitmap("png",output);
-      }
-   }
-#endif
    
    /*ObjectProxy *obj = mLitObjects[object];
    for(U32 i=0; i<mLights.size(); i++)
@@ -884,7 +859,7 @@ struct CacheEntry {
 };
 
 // object list sort methods: want list in reverse
-static int QSORT_CALLBACK minSizeSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK minSizeSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -892,7 +867,7 @@ static int QSORT_CALLBACK minSizeSort(const void * p1, const void * p2)
 	return(entry2->mFileObject->getSize() - entry1->mFileObject->getSize());
 }
 
-static int QSORT_CALLBACK maxSizeSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK maxSizeSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -900,7 +875,7 @@ static int QSORT_CALLBACK maxSizeSort(const void * p1, const void * p2)
 	return(entry1->mFileObject->getSize() - entry2->mFileObject->getSize());
 }
 
-static int QSORT_CALLBACK lastCreatedSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK lastCreatedSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -924,7 +899,7 @@ static int QSORT_CALLBACK lastCreatedSort(const void * p1, const void * p2)
 	return(Platform::compareFileTimes(create[1], create[0]));
 }
 
-static int QSORT_CALLBACK lastModifiedSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK lastModifiedSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -1076,7 +1051,7 @@ U32 SceneLighting::calcMissionCRC()
    // of U32's, and so the result will be different on big/little endian hardware.
    // To fix this, swap endians on the CRC's in the vector. This must be done
    // _after_ the qsort.
-   for( int i = 0; i < crc.size(); i++ )
+   for( S32 i = 0; i < crc.size(); i++ )
       crc[i] = endianSwap( crc[i] );
 #endif
 

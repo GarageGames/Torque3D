@@ -39,9 +39,9 @@ ConsoleDocClass( GuiSwatchButtonCtrl,
    "A swatch button is a push button that uses its color field to designate the color drawn over an image, on top of a button.\n\n"
    
    "The color itself is a float value stored inside the GuiSwatchButtonCtrl::color field. The texture path that represents\n"
-   "the image underlying the color is stored inside the GuiSwatchButtonCtrl::bitmap field.\n"
+   "the image underlying the color is stored inside the GuiSwatchButtonCtrl::gridBitmap field.\n"
    "The default value assigned toGuiSwatchButtonCtrl::color is \"1 1 1 1\"( White ). The default/fallback image assigned to \n"
-   "GuiSwatchButtonCtrl::bitmap is \"core/art/gui/images/transp_grid\".\n\n"
+   "GuiSwatchButtonCtrl::gridBitmap is \"tools/gui/images/transp_grid\".\n\n"
    
    "@tsexample\n"
    "// Create a GuiSwatchButtonCtrl that calls randomFunction with its current color when clicked\n"
@@ -65,11 +65,15 @@ GuiSwatchButtonCtrl::GuiSwatchButtonCtrl()
    
    static StringTableEntry sProfile = StringTable->insert( "profile" );
    setDataField( sProfile, NULL, "GuiInspectorSwatchButtonProfile" );
+
+   mGridBitmap = "tools/gui/images/transp_grid";
 }
 
 void GuiSwatchButtonCtrl::initPersistFields()
 {
    addField( "color", TypeColorF, Offset( mSwatchColor, GuiSwatchButtonCtrl ), "The foreground color of GuiSwatchButtonCtrl" );
+
+   addField( "gridBitmap", TypeString, Offset( mGridBitmap, GuiSwatchButtonCtrl ), "The bitmap used for the transparent grid" );
    
    Parent::initPersistFields();
 }
@@ -80,7 +84,7 @@ bool GuiSwatchButtonCtrl::onWake()
       return false;
 
    if ( mGrid.isNull() )
-      mGrid.set( "core/art/gui/images/transp_grid", &GFXDefaultGUIProfile, avar("%s() - mGrid (line %d)", __FUNCTION__, __LINE__) );
+      mGrid.set( mGridBitmap, &GFXDefaultGUIProfile, avar("%s() - mGrid (line %d)", __FUNCTION__, __LINE__) );
 
    return true;
 }

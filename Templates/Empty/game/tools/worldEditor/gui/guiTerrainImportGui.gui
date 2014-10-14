@@ -3,7 +3,7 @@
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiOverlayProfile";
+   Profile = "ToolsGuiOverlayProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 0";
@@ -12,7 +12,7 @@
    canSave = "1";
    isDecoy = "0";
    Visible = "1";
-   tooltipprofile = "GuiToolTipProfile";
+   tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
    new GuiWindowCtrl() {
@@ -20,7 +20,7 @@
       internalName = "TerrainImport";
       Enabled = "1";
       isContainer = "1";
-      Profile = "GuiWindowProfile";
+      Profile = "ToolsGuiWindowProfile";
       HorizSizing = "center";
       VertSizing = "center";
       Position = "119 84";
@@ -29,7 +29,7 @@
       canSave = "1";
       isDecoy = "0";
       Visible = "1";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
       Margin = "0 0 0 0";
       Padding = "0 0 0 0";
@@ -53,7 +53,7 @@
          internalName = "HeightfieldFilename";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "width";
          VertSizing = "top";
          Position = "10 85";
@@ -62,7 +62,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -82,7 +82,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "top";
          Position = "11 66";
@@ -91,7 +91,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -106,7 +106,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "316 83";
@@ -116,7 +116,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "TerrainImportGui.browseForHeightfield();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Browse...";
          groupNum = "-1";
@@ -128,7 +128,7 @@
          internalName = "MetersPerPixel";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "226 44";
@@ -137,7 +137,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -157,7 +157,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "226 26";
@@ -166,7 +166,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -181,7 +181,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "316 26";
@@ -190,7 +190,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -206,7 +206,7 @@
          internalName = "HeightScale";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "316 44";
@@ -215,7 +215,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -235,7 +235,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiDefaultProfile";
+         Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          Position = "10 112";
@@ -244,16 +244,16 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
-         bitmap = "core/art/gui/images/separator-v";
+         bitmap = "tools/gui/images/separator-v";
          wrap = "0";
       };
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "top";
          Position = "14 123";
@@ -262,7 +262,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -277,7 +277,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "341 142";
@@ -287,7 +287,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "TerrainImportGui.browseForOpacityMap();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "+";
          groupNum = "-1";
@@ -298,7 +298,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "341 165";
@@ -308,7 +308,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "TerrainImportGui.removeOpacitymap();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "-";
          groupNum = "-1";
@@ -319,7 +319,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "195 225";
@@ -329,7 +329,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "TerrainImportGui.import();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Import";
          groupNum = "-1";
@@ -341,7 +341,7 @@
          internalName = "OpacityLayerScroll";
          Enabled = "1";
          isContainer = "1";
-         Profile = "GuiScrollProfile";
+         Profile = "ToolsGuiScrollProfile";
          HorizSizing = "width";
          VertSizing = "top";
          Position = "10 142";
@@ -350,7 +350,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -371,7 +371,7 @@
             internalName = "OpacityLayerTextList";
             Enabled = "1";
             isContainer = "1";
-            Profile = "GuiTextListProfile";
+            Profile = "ToolsGuiTextListProfile";
             HorizSizing = "width";
             VertSizing = "top";
             Position = "1 1";
@@ -381,7 +381,7 @@
             isDecoy = "0";
             Visible = "1";
             AltCommand = "TerrainImportGui.onOpacityListDblClick();";
-            tooltipprofile = "GuiToolTipProfile";
+            tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             enumerate = "0";
             resizeCell = "1";
@@ -394,7 +394,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "left";
          VertSizing = "bottom";
          Position = "264 123";
@@ -403,7 +403,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -418,7 +418,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextProfile";
+         Profile = "ToolsGuiTextProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
          Position = "11 26";
@@ -427,7 +427,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -443,7 +443,7 @@
          internalName = "TerrainName";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiTextEditProfile";
+         Profile = "ToolsGuiTextEditProfile";
          HorizSizing = "width";
          VertSizing = "bottom";
          Position = "10 44";
@@ -452,7 +452,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -472,7 +472,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "341 199";
@@ -482,7 +482,7 @@
          isDecoy = "0";
          Visible = "1";
          Command = "TerrainImportGui.onOpacityListDblClick();";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Edit";
          groupNum = "-1";
@@ -493,7 +493,7 @@
          canSaveDynamicFields = "0";
          Enabled = "1";
          isContainer = "0";
-         Profile = "GuiButtonProfile";
+         Profile = "ToolsGuiButtonProfile";
          HorizSizing = "left";
          VertSizing = "top";
          Position = "293 225";
@@ -503,12 +503,32 @@
          isDecoy = "0";
          Visible = "1";
          Command = "Canvas.popDialog( TerrainImportGui );";
-         tooltipprofile = "GuiToolTipProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Cancel";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
+      };
+      new GuiCheckBoxCtrl() {
+         text = " Flip Y axis?";
+         groupNum = "-1";
+         buttonType = "ToggleButton";
+         useMouseEvents = "0";
+         position = "12 222";
+         extent = "140 30";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiCheckBoxProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         internalName = "FlipYAxis";
+         canSave = "1";
+         canSaveDynamicFields = "0";
       };
    };
 };
@@ -532,6 +552,8 @@ function TerrainImportGui::import( %this )
      
    %metersPerPixel = %this-->MetersPerPixel.getText();
    %heightScale = %this-->HeightScale.getText();
+   
+   %flipYAxis = %this-->FlipYAxis.isStateOn();
    
    // Grab and validate terrain object name.
    
@@ -568,7 +590,8 @@ function TerrainImportGui::import( %this )
                                   %metersPerPixel, 
                                   %heightScale, 
                                   %opacityNames, 
-                                  %materialNames );
+                                  %materialNames,
+                                  %flipYAxis );
 
    Canvas.popDialog( %this );
 

@@ -31,6 +31,7 @@
 #include "util/noise2d.h"
 #include "core/volume.h"
 
+using namespace Torque;
 
 ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5, 
    "TerrainBlock.create( String terrainName, U32 resolution, String materialName, bool genNoise )\n"
@@ -50,8 +51,13 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    // rename it themselves in their file browser. The main reason for this is so we can easily increment for ourselves;
    // and because its too easy to rename the terrain object and forget to take care of the terrain filename afterwards.
    FileName terrFileName( Con::getVariable("$Client::MissionFile") );
-   terrFileName.replace("tools/levels/", "art/terrains/");
-   terrFileName.replace("levels/", "art/terrains/");
+   String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
+   if ( terrainDirectory.isEmpty() )
+   {
+      terrainDirectory = "art/terrains/";
+   }
+   terrFileName.replace("tools/levels/", terrainDirectory);
+   terrFileName.replace("levels/", terrainDirectory);
 
    TerrainFile::create( &terrFileName, resolution, materials );
 
@@ -115,8 +121,8 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    return terrain->getId();
 }
 
-ConsoleStaticMethod( TerrainBlock, import, S32, 7, 7, 
-   "( String terrainName, String heightMap, F32 metersPerPixel, F32 heightScale, String materials, String opacityLayers )\n"
+ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8, 
+   "( String terrainName, String heightMap, F32 metersPerPixel, F32 heightScale, String materials, String opacityLayers[, bool flipYAxis=true] )\n"
    "" )
 {
    // Get the parameters.
@@ -126,6 +132,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 7,
    F32 heightScale = dAtof(argv[4]);
    const UTF8 *opacityFiles = argv[5];
    const UTF8 *materialsStr = argv[6];
+   bool flipYAxis = argc == 8? dAtob(argv[7]) : true;
 
    // First load the height map and validate it.
    Resource<GBitmap> heightmap = GBitmap::load( hmap );
@@ -246,12 +253,12 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 7,
    // Do we have an existing terrain with that name... then update it!
    TerrainBlock *terrain = dynamic_cast<TerrainBlock*>( Sim::findObject( terrainName ) );
    if ( terrain )
-      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials );
+      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials, flipYAxis );
    else
    {
       terrain = new TerrainBlock();
       terrain->assignName( terrainName );
-      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials );
+      terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials, flipYAxis );
       terrain->registerObject();
 
       // Add to mission group!
@@ -267,7 +274,8 @@ bool TerrainBlock::import( const GBitmap &heightMap,
                            F32 heightScale, 
                            F32 metersPerPixel,
                            const Vector<U8> &layerMap, 
-                           const Vector<String> &materials )
+                           const Vector<String> &materials,
+                           bool flipYAxis)
 {
    AssertFatal( isServerObject(), "TerrainBlock::import - This should only be called on the server terrain!" );
 
@@ -294,7 +302,7 @@ bool TerrainBlock::import( const GBitmap &heightMap,
    }
 
    // The file does a bunch of the work.
-   mFile->import( heightMap, heightScale, layerMap, materials );
+   mFile->import( heightMap, heightScale, layerMap, materials, flipYAxis );
 
    // Set the square size.
    mSquareSize = metersPerPixel;

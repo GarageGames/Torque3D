@@ -114,7 +114,7 @@ GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bo
       return Unset;
 
 #ifdef TORQUE_GATHER_METRICS
-   AssertFatal( mBeginFrame < GuiTSCtrl::getFrameCount(), "GFXD3D9OcclusionQuery::getStatus - called on the same frame as begin!" );
+   //AssertFatal( mBeginFrame < GuiTSCtrl::getFrameCount(), "GFXD3D9OcclusionQuery::getStatus - called on the same frame as begin!" );
 
    //U32 mTimeSinceEnd = mTimer->getElapsedMs();
    //AssertFatal( mTimeSinceEnd >= 5, "GFXD3DOcculsionQuery::getStatus - less than TickMs since called ::end!" );
@@ -124,9 +124,16 @@ GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bo
    DWORD dwOccluded = 0;
 
    if ( block )
-   {      
+   {  
       while( ( hRes = mQuery->GetData( &dwOccluded, sizeof(DWORD), D3DGETDATA_FLUSH ) ) == S_FALSE )
-         ;
+      {
+          //If we're stalled out, proceed with worst-case scenario -BJR
+          if(GFX->mFrameTime->getElapsedMs()>4)
+          {
+              this->end();
+              return NotOccluded;
+          }
+      }
    }
    else
    {

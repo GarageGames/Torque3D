@@ -47,6 +47,10 @@ public:
 
    char mName[MaxAdapterNameLen];
 
+   /// The name of the display output device for the adapter, if any.
+   /// For example under Windows, this could be: \\.\DISPLAY1
+   char mOutputName[MaxAdapterNameLen];
+
    /// List of available full-screen modes. Windows can be any size,
    /// so we do not enumerate them here.
    Vector<GFXVideoMode> mAvailableModes;
@@ -55,6 +59,7 @@ public:
    F32 mShaderModel;
 
    const char * getName() const { return mName; }
+   const char * getOutputName() const { return mOutputName; }
    GFXAdapterType mType;
    U32            mIndex;
    CreateDeviceInstanceDelegate mCreateDeviceInstanceDelegate;
@@ -64,6 +69,7 @@ public:
       VECTOR_SET_ASSOCIATION( mAvailableModes );
 
       mName[0] = 0;
+      mOutputName[0] = 0;
       mShaderModel = 0.f;
       mIndex = 0;
    }

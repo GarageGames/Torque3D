@@ -59,8 +59,8 @@ protected:
    template<class T> const domTechnique* findExtraTechnique(const T* element, const char* name) const
    {
       if (element) {
-         for (int iExt = 0; iExt < element->getExtra_array().getCount(); iExt++) {
-            for (int iTech = 0; iTech < element->getExtra_array()[iExt]->getTechnique_array().getCount(); iTech++) {
+         for (S32 iExt = 0; iExt < element->getExtra_array().getCount(); iExt++) {
+            for (S32 iTech = 0; iTech < element->getExtra_array()[iExt]->getTechnique_array().getCount(); iTech++) {
                if (dStrEqual(element->getExtra_array()[iExt]->getTechnique_array()[iTech]->getProfile(), name))
                   return element->getExtra_array()[iExt]->getTechnique_array()[iTech];
             }
@@ -75,7 +75,7 @@ protected:
       const domCommon_color_or_texture_type_complexType::domTexture* element, const char* name) const
    {
       if (element && element->getExtra()) {
-         for (int iTech = 0; iTech < element->getExtra()->getTechnique_array().getCount(); iTech++) {
+         for (S32 iTech = 0; iTech < element->getExtra()->getTechnique_array().getCount(); iTech++) {
             if (dStrEqual(element->getExtra()->getTechnique_array()[iTech]->getProfile(), name))
                return element->getExtra()->getTechnique_array()[iTech];
          }
@@ -88,7 +88,7 @@ protected:
    {
       if (pTechnique) {
          // search the technique contents for the desired parameter
-         for (int iParam = 0; iParam < pTechnique->getContents().getCount(); iParam++) {
+         for (S32 iParam = 0; iParam < pTechnique->getContents().getCount(); iParam++) {
             const domAny* param = daeSafeCast<domAny>(pTechnique->getContents()[iParam]);
             if (param && !dStrcmp(param->getElementName(), name))
                return param;
@@ -290,7 +290,7 @@ public:
       // Torque profile
       pTechnique = findExtraTechnique(clip, "Torque");
       GET_EXTRA_PARAM(num_triggers, 0);
-      for (int iTrigger = 0; iTrigger < num_triggers; iTrigger++) {
+      for (S32 iTrigger = 0; iTrigger < num_triggers; iTrigger++) {
          triggers.increment();
          get(avar("trigger_time%d", iTrigger), triggers.last().time, 0.0f);
          get(avar("trigger_state%d", iTrigger), triggers.last().state, 0);

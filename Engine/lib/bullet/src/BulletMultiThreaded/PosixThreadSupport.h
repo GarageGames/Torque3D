@@ -13,16 +13,22 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef BT_POSIX_THREAD_SUPPORT_H
+#define BT_POSIX_THREAD_SUPPORT_H
+
 
 #include "LinearMath/btScalar.h"
 #include "PlatformDefinitions.h"
 
-#ifdef USE_PTHREADS  //platform specific defines are defined in PlatformDefinitions.h
+#ifdef USE_PTHREADS //platform specifc defines are defined in PlatformDefinitions.h
+
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600 //for definition of pthread_barrier_t, see http://pages.cs.wisc.edu/~travitch/pthreads_primer.html
+#endif //_XOPEN_SOURCE
 #include <pthread.h>
 #include <semaphore.h>
 
-#ifndef POSIX_THREAD_SUPPORT_H
-#define POSIX_THREAD_SUPPORT_H
+
 
 #include "LinearMath/btAlignedObjectArray.h"
 
@@ -68,7 +74,7 @@ public:
 
 	struct	ThreadConstructionInfo
 	{
-		ThreadConstructionInfo(char* uniqueName,
+		ThreadConstructionInfo(const char* uniqueName,
 									PosixThreadFunc userThreadFunc,
 									PosixlsMemorySetupFunc	lsMemoryFunc,
 									int numThreads=1,
@@ -83,7 +89,7 @@ public:
 
 		}
 
-		char*					m_uniqueName;
+		const char*					m_uniqueName;
 		PosixThreadFunc			m_userThreadFunc;
 		PosixlsMemorySetupFunc	m_lsMemoryFunc;
 		int						m_numThreads;
@@ -117,8 +123,25 @@ public:
 	{
 		return m_activeSpuStatus.size();
 	}
+
+	virtual btBarrier* createBarrier();
+
+	virtual btCriticalSection* createCriticalSection();
+
+	virtual void deleteBarrier(btBarrier* barrier);
+
+	virtual void deleteCriticalSection(btCriticalSection* criticalSection);
+	
+	
+	virtual void*	getThreadLocalMemory(int taskId)
+	{
+		return m_activeSpuStatus[taskId].m_lsMemory;
+	}
+
 };
 
-#endif // POSIX_THREAD_SUPPORT_H
-
 #endif // USE_PTHREADS
+
+#endif // BT_POSIX_THREAD_SUPPORT_H
+
+

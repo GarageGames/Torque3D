@@ -27,8 +27,7 @@
 #include "clusterfit.h"
 #include "colourset.h"
 #include "colourblock.h"
-#include "squishMath.h"
-#include <algorithm>
+#include <cfloat>
 
 namespace squish {
 

@@ -1505,7 +1505,8 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
    GFXVertexBufferHandle<GFXVertexPC> vb;
    vb.set(GFX, 3*batchSize, GFXBufferTypeVolatile);
-   vb.lock();
+   void *lockPtr = vb.lock();
+   if(!lockPtr) return;
 
    U32 vIdx=0;
 
@@ -1542,7 +1543,8 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
          // Reset for next pass...
          vIdx = 0;
-         vb.lock();
+         void *lockPtr = vb.lock();
+         if(!lockPtr) return;
       }
    }
 
@@ -2880,8 +2882,9 @@ const Point3F& WorldEditor::getSelectionCentroid()
 const char* WorldEditor::getSelectionCentroidText()
 {
    const Point3F & centroid = getSelectionCentroid();
-   char * ret = Con::getReturnBuffer(100);
-   dSprintf(ret, 100, "%g %g %g", centroid.x, centroid.y, centroid.z);
+   static const U32 bufSize = 100;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%g %g %g", centroid.x, centroid.y, centroid.z);
    return ret;	
 }
 
@@ -3261,8 +3264,9 @@ ConsoleMethod( WorldEditor, getSelectionCentroid, const char *, 2, 2, "")
 ConsoleMethod( WorldEditor, getSelectionExtent, const char *, 2, 2, "")
 {
    Point3F bounds = object->getSelectionExtent();
-   char * ret = Con::getReturnBuffer(100);
-   dSprintf(ret, 100, "%g %g %g", bounds.x, bounds.y, bounds.z);
+   static const U32 bufSize = 100;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%g %g %g", bounds.x, bounds.y, bounds.z);
    return ret;	
 }
 

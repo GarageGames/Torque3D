@@ -100,9 +100,9 @@ ConsoleDocClass( ParticleEmitterData,
    "@see ParticleEmitterNode\n"
 );
 
-static const float sgDefaultEjectionOffset = 0.f;
-static const float sgDefaultPhiReferenceVel = 0.f;
-static const float sgDefaultPhiVariance = 360.f;
+static const F32 sgDefaultEjectionOffset = 0.f;
+static const F32 sgDefaultPhiReferenceVel = 0.f;
+static const F32 sgDefaultPhiVariance = 360.f;
 
 //-----------------------------------------------------------------------------
 // ParticleEmitterData
@@ -118,6 +118,7 @@ ParticleEmitterData::ParticleEmitterData()
    ejectionVelocity = 2.0f;   // From 1.0 - 3.0 meters per sec
    velocityVariance = 1.0f;
    ejectionOffset   = sgDefaultEjectionOffset;   // ejection from the emitter point
+   ejectionOffsetVariance = 0.0f;
 
    thetaMin         = 0.0f;   // All heights
    thetaMax         = 90.0f;
@@ -171,6 +172,13 @@ ImplementEnumType( ParticleBlendStyle,
    { ParticleRenderInst::BlendPremultAlpha,   "PREMULTALPHA",  "Color blends with the colors of the imagemap rather than the alpha.\n" },
 EndImplementEnumType;
 
+IRangeValidator ejectPeriodIValidator(1, 2047);
+IRangeValidator periodVarianceIValidator(0, 2047);
+FRangeValidator ejectionFValidator(0.f, 655.35f);
+FRangeValidator velVarianceFValidator(0.f, 163.83f);
+FRangeValidator thetaFValidator(0.f, 180.f);
+FRangeValidator phiFValidator(0.f, 360.f);
+
 //-----------------------------------------------------------------------------
 // initPersistFields
 //-----------------------------------------------------------------------------
@@ -178,31 +186,34 @@ void ParticleEmitterData::initPersistFields()
 {
    addGroup( "ParticleEmitterData" );
 
-      addFieldV("ejectionPeriodMS", TYPEID< S32 >(), Offset(ejectionPeriodMS,   ParticleEmitterData), new IRangeValidator(1, 2047),
+      addFieldV("ejectionPeriodMS", TYPEID< S32 >(), Offset(ejectionPeriodMS,   ParticleEmitterData), &ejectPeriodIValidator,
          "Time (in milliseconds) between each particle ejection." );
 
-      addFieldV("periodVarianceMS", TYPEID< S32 >(), Offset(periodVarianceMS,   ParticleEmitterData), new IRangeValidator(0, 2047),
+      addFieldV("periodVarianceMS", TYPEID< S32 >(), Offset(periodVarianceMS,   ParticleEmitterData), &periodVarianceIValidator,
          "Variance in ejection period, from 1 - ejectionPeriodMS." );
 
-      addFieldV( "ejectionVelocity", TYPEID< F32 >(), Offset(ejectionVelocity, ParticleEmitterData), new FRangeValidator(0, 655.35f),
+      addFieldV( "ejectionVelocity", TYPEID< F32 >(), Offset(ejectionVelocity, ParticleEmitterData), &ejectionFValidator,
          "Particle ejection velocity." );
 
-      addFieldV( "velocityVariance", TYPEID< F32 >(), Offset(velocityVariance, ParticleEmitterData), new FRangeValidator(0, 163.83f),
+      addFieldV( "velocityVariance", TYPEID< F32 >(), Offset(velocityVariance, ParticleEmitterData), &velVarianceFValidator,
          "Variance for ejection velocity, from 0 - ejectionVelocity." );
 
-      addFieldV( "ejectionOffset", TYPEID< F32 >(), Offset(ejectionOffset, ParticleEmitterData), new FRangeValidator(0, 655.35f),
+      addFieldV( "ejectionOffset", TYPEID< F32 >(), Offset(ejectionOffset, ParticleEmitterData), &ejectionFValidator,
          "Distance along ejection Z axis from which to eject particles." );
+		 
+      addFieldV( "ejectionOffsetVariance", TYPEID< F32 >(), Offset(ejectionOffsetVariance, ParticleEmitterData), &ejectionFValidator,
+         "Distance Padding along ejection Z axis from which to eject particles." );
 
-      addFieldV( "thetaMin", TYPEID< F32 >(), Offset(thetaMin, ParticleEmitterData), new FRangeValidator(0, 180.0f),
+      addFieldV( "thetaMin", TYPEID< F32 >(), Offset(thetaMin, ParticleEmitterData), &thetaFValidator,
          "Minimum angle, from the horizontal plane, to eject from." );
 
-      addFieldV( "thetaMax", TYPEID< F32 >(), Offset(thetaMax, ParticleEmitterData), new FRangeValidator(0, 180.0f),
+      addFieldV( "thetaMax", TYPEID< F32 >(), Offset(thetaMax, ParticleEmitterData), &thetaFValidator,
          "Maximum angle, from the horizontal plane, to eject particles from." );
 
-      addFieldV( "phiReferenceVel", TYPEID< F32 >(), Offset(phiReferenceVel, ParticleEmitterData), new FRangeValidator(0, 360.0f),
+      addFieldV( "phiReferenceVel", TYPEID< F32 >(), Offset(phiReferenceVel, ParticleEmitterData), &phiFValidator,
          "Reference angle, from the vertical plane, to eject particles from." );
 
-      addFieldV( "phiVariance", TYPEID< F32 >(), Offset(phiVariance, ParticleEmitterData), new FRangeValidator(0, 360.0f),
+      addFieldV( "phiVariance", TYPEID< F32 >(), Offset(phiVariance, ParticleEmitterData), &phiFValidator,
          "Variance from the reference angle, from 0 - 360." );
 
       addField( "softnessDistance", TYPEID< F32 >(), Offset(softnessDistance, ParticleEmitterData),
@@ -309,6 +320,8 @@ void ParticleEmitterData::packData(BitStream* stream)
    stream->writeInt((S32)(velocityVariance * 100), 14);
    if( stream->writeFlag( ejectionOffset != sgDefaultEjectionOffset ) )
       stream->writeInt((S32)(ejectionOffset * 100), 16);
+   if( stream->writeFlag( ejectionOffsetVariance != 0.0f ) )
+      stream->writeInt((S32)(ejectionOffsetVariance * 100), 16);
    stream->writeRangedU32((U32)thetaMin, 0, 180);
    stream->writeRangedU32((U32)thetaMax, 0, 180);
    if( stream->writeFlag( phiReferenceVel != sgDefaultPhiReferenceVel ) )
@@ -361,7 +374,10 @@ void ParticleEmitterData::unpackData(BitStream* stream)
       ejectionOffset = stream->readInt(16) / 100.0f;
    else
       ejectionOffset = sgDefaultEjectionOffset;
-
+   if( stream->readFlag() )
+      ejectionOffsetVariance = stream->readInt(16) / 100.0f;
+   else
+      ejectionOffsetVariance = 0.0f;
    thetaMin = (F32)stream->readRangedU32(0, 180);
    thetaMax = (F32)stream->readRangedU32(0, 180);
    if( stream->readFlag() )
@@ -719,6 +735,7 @@ ParticleEmitter::ParticleEmitter()
    mCurBuffSize = 0;
 
    mDead = false;
+   mDataBlock = NULL;
 
    // ParticleEmitter should be allocated on the client only.
    mNetFlags.set( IsGhost );
@@ -748,11 +765,6 @@ bool ParticleEmitter::onAdd()
    if( cleanup != NULL )
    {
       cleanup->addObject( this );
-   }
-   else
-   {
-      AssertFatal( false, "Error, could not find ClientMissionCleanup group" );
-      return false;
    }
 
    removeFromProcessList();
@@ -917,7 +929,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
 //-----------------------------------------------------------------------------
 void ParticleEmitter::setSizes( F32 *sizeList )
 {
-   for( int i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
+   for( S32 i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
    {
       sizes[i] = sizeList[i];
    }
@@ -928,7 +940,7 @@ void ParticleEmitter::setSizes( F32 *sizeList )
 //-----------------------------------------------------------------------------
 void ParticleEmitter::setColors( ColorF *colorList )
 {
-   for( int i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
+   for( S32 i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
    {
       colors[i] = colorList[i];
    }
@@ -1279,7 +1291,7 @@ void ParticleEmitter::addParticle(const Point3F& pos,
    F32 initialVel = mDataBlock->ejectionVelocity;
    initialVel    += (mDataBlock->velocityVariance * 2.0f * gRandGen.randF()) - mDataBlock->velocityVariance;
 
-   pNew->pos = pos + (ejectionAxis * mDataBlock->ejectionOffset);
+   pNew->pos = pos + (ejectionAxis * (mDataBlock->ejectionOffset + mDataBlock->ejectionOffsetVariance* gRandGen.randF()) );
    pNew->vel = ejectionAxis * initialVel;
    pNew->orientDir = ejectionAxis;
    pNew->acc.set(0, 0, 0);
@@ -1443,7 +1455,7 @@ struct SortParticle
 };
 
 // qsort callback function for particle sorting
-int QSORT_CALLBACK cmpSortParticles(const void* p1, const void* p2)
+S32 QSORT_CALLBACK cmpSortParticles(const void* p1, const void* p2)
 {
    const SortParticle* sp1 = (const SortParticle*)p1;
    const SortParticle* sp2 = (const SortParticle*)p2;

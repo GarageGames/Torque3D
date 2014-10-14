@@ -366,7 +366,7 @@ function ShapeEdSelectWindow::navigate( %this, %address )
    %this-->shapeLibrary.clear();
    ShapeEdSelectMenu.clear();
 
-   %filePatterns = "*.dts" TAB "*.dae" TAB "*.kmz";
+   %filePatterns = getFormatExtensions();
    %fullPath = findFirstFileMultiExpr( %filePatterns );
 
    while ( %fullPath !$= "" )
@@ -524,7 +524,7 @@ function ShapeEdSelectWindow::addFolderIcon( %this, %text )
    %ctrl = %this.createIcon();
 
    %ctrl.altCommand = "ShapeEdSelectWindow.navigateDown( \"" @ %text @ "\" );";
-   %ctrl.iconBitmap = "core/art/gui/images/folder.png";
+   %ctrl.iconBitmap = "tools/gui/images/folder.png";
    %ctrl.text = %text;
    %ctrl.tooltip = %text;
    %ctrl.class = "CreatorFolderIconBtn";
@@ -1632,7 +1632,7 @@ function ShapeEdSequences::onAddSequence( %this, %name )
    if ( %from $= "" )
    {
       // No sequence selected => open dialog to browse for one
-      getLoadFilename( "DSQ Files|*.dsq|COLLADA Files|*.dae|Google Earth Files|*.kmz", %this @ ".onAddSequenceFromBrowse", ShapeEdFromMenu.lastPath );
+      getLoadFormatFilename( %this @ ".onAddSequenceFromBrowse", ShapeEdFromMenu.lastPath );
       return;
    }
    else
@@ -1740,7 +1740,7 @@ function ShapeEdSeqFromMenu::onSelect( %this, %id, %text )
       %this.setText( %seqFrom );
 
       // Allow the user to browse for an external source of animation data
-      getLoadFilename( "DSQ Files|*.dsq|COLLADA Files|*.dae|Google Earth Files|*.kmz", %this @ ".onBrowseSelect", %this.lastPath );
+      getLoadFormatFilename( %this @ ".onBrowseSelect", %this.lastPath );
    }
    else
    {
@@ -1910,7 +1910,7 @@ function ShapeEdShapeView::onThreadPosChanged( %this, %pos, %inTransition )
       if ( %inTransition )
          ShapeEdThreadSlider.profile = GuiShapeEdTransitionSliderProfile;
       else
-         ShapeEdThreadSlider.profile = GuiSliderProfile;
+         ShapeEdThreadSlider.profile = ToolsGuiSliderProfile;
    }
 }
 
@@ -2142,7 +2142,7 @@ function ShapeEdTriggerList::addItem( %this, %frame, %state )
    %ctrl = new GuiBitmapCtrl()
    {
       internalName = "trigger" @ %this.triggerId;
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       position = %pos SPC "0";
@@ -2862,7 +2862,7 @@ function ShapeEdDetails::onAddMeshFromFile( %this, %path )
 {
    if ( %path $= "" )
    {
-      getLoadFilename( "DTS Files|*.dts|COLLADA Files|*.dae|Google Earth Files|*.kmz", %this @ ".onAddMeshFromFile", %this.lastPath );
+      getLoadFormatFilename( %this @ ".onAddMeshFromFile", %this.lastPath );
       return;
    }
 
@@ -3291,7 +3291,7 @@ function ShapeEdMountShapeMenu::onSelect( %this, %id, %text )
    if ( %text $= "Browse..." )
    {
       // Allow the user to browse for an external model file
-      getLoadFilename( "DTS Files|*.dts|COLLADA Files|*.dae|Google Earth Files|*.kmz", %this @ ".onBrowseSelect", %this.lastPath );
+      getLoadFormatFilename( %this @ ".onBrowseSelect", %this.lastPath );
    }
    else
    {

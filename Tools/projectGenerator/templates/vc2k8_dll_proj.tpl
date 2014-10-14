@@ -78,18 +78,18 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="{foreach item=def from=$projLibs}{$def} {/foreach}"
+				AdditionalDependencies="{foreach item=def from=$projLibsDebug}{$def} {/foreach}"
             
             {if $uniformOutputFile eq 1}
-				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
+				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName} DLL.dll"
             {else}
-               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_DEBUG.dll"
+               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_DEBUG DLL.dll"
             {/if}
             
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD"
+				IgnoreDefaultLibraryNames="LIBC,LIBCD{foreach item=def from=$projLibsIgnore},{$def}{/foreach}"
 				ModuleDefinitionFile="{$projModuleDefinitionFile}"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_DEBUG.pdb"
@@ -188,27 +188,27 @@
 			/>
          <Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="{foreach item=def from=$projLibs}{$def} {/foreach}"
+				AdditionalDependencies="{foreach item=def from=$projLibsDebug}{$def} {/foreach}"
             
             {if $uniformOutputFile eq 1}
-				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
+				   OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName} DLL.dll"
             {else}
-               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_OPTIMIZEDDEBUG.dll"
+               OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}_OPTIMIZEDDEBUG DLL.dll"
             {/if}
 
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD"
-				ModuleDefinitionFile="{$projModuleDefinitionFile}"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_OPTIMIZEDDEBUG.pdb"
-				SubSystem="2"
-				TargetMachine="1"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-			/>
-         <Tool
+              LinkIncremental="1"
+              SuppressStartupBanner="true"
+              AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
+              IgnoreDefaultLibraryNames="LIBC,LIBCD{foreach item=def from=$projLibsIgnore},{$def}{/foreach}"
+              ModuleDefinitionFile="{$projModuleDefinitionFile}"
+              GenerateDebugInformation="true"
+              ProgramDatabaseFile="$(OutDir)/$(ProjectName)_OPTIMIZEDDEBUG.pdb"
+              SubSystem="2"
+              TargetMachine="1"
+              RandomizedBaseAddress="1"
+              DataExecutionPrevention="0"
+        />
+        <Tool
 				Name="VCALinkTool"
 			/>
          <Tool
@@ -299,11 +299,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="{foreach item=def from=$projLibs}{$def} {/foreach}"
-				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName}.dll"
+				OutputFile="{$projectOffset}../../{$gameFolder}/{$projOutName} DLL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName);"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD"
+				IgnoreDefaultLibraryNames="LIBC,LIBCD{foreach item=def from=$projLibsIgnore},{$def}{/foreach}"
 				ModuleDefinitionFile="{$projModuleDefinitionFile}"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"

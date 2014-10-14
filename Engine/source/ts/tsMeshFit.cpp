@@ -402,7 +402,7 @@ F32 MeshFit::maxDot( const VectorF& v ) const
 // Best-fit oriented bounding box
 void MeshFit::addBox( const Point3F& sides, const MatrixF& mat )
 {
-   TSMesh* mesh = initMeshFromFile( "core/art/shapes/unit_cube.dts" );
+   TSMesh* mesh = initMeshFromFile( TSShapeConstructor::getCubeShapePath() );
    if ( !mesh )
       return;
 
@@ -431,7 +431,7 @@ void MeshFit::fitOBB()
 // Best-fit sphere
 void MeshFit::addSphere( F32 radius, const Point3F& center )
 {
-   TSMesh* mesh = initMeshFromFile( "core/art/shapes/unit_sphere.dts" );
+   TSMesh* mesh = initMeshFromFile( TSShapeConstructor::getSphereShapePath() );
    if ( !mesh )
       return;
 
@@ -460,7 +460,7 @@ void MeshFit::fitSphere()
 // Best-fit capsule
 void MeshFit::addCapsule( F32 radius, F32 height, const MatrixF& mat )
 {
-   TSMesh* mesh = initMeshFromFile( "core/art/shapes/unit_capsule.dts" );
+   TSMesh* mesh = initMeshFromFile( TSShapeConstructor::getCapsuleShapePath() );
    if ( !mesh )
       return;
 

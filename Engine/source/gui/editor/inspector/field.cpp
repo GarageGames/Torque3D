@@ -58,7 +58,7 @@ GuiInspectorField::GuiInspectorField( GuiInspector* inspector,
    setCanSave( false );
    setBounds(0,0,100,18);
    
-   if( field )
+   if( field != NULL )
       _setFieldDocs( field->pFieldDocs );
 }
 
@@ -378,8 +378,9 @@ void GuiInspectorField::setInspectorField( AbstractClassRep::Field *field, Strin
       mCaption = getFieldName(); 
    else
       mCaption = caption;
-      
-   _setFieldDocs( mField->pFieldDocs );
+
+   if ( mField != NULL )
+      _setFieldDocs( mField->pFieldDocs );
 }
 
 //-----------------------------------------------------------------------------
@@ -454,7 +455,7 @@ void GuiInspectorField::setInspectorProfile()
 {
    GuiControlProfile *profile = NULL;   
    
-   if( mInspector->getNumInspectObjects() > 1 )
+   if( mInspector && (mInspector->getNumInspectObjects() > 1) )
    {
       if( !hasSameValueInAllObjects() )
          Sim::findObject( "GuiInspectorMultiFieldDifferentProfile", profile );

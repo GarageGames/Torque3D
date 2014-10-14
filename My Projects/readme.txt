@@ -1,1 +1,1 @@
-The Torque Toolbox places your projects here.
+your projects will go in this folder

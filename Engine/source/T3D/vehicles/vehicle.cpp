@@ -69,7 +69,7 @@ const F32 sVehicleGravity = -20;
 
 // Physics and collision constants
 static F32 sRestTol = 0.5;             // % of gravity energy to be at rest
-static int sRestCount = 10;            // Consecutive ticks before comming to rest
+static S32 sRestCount = 10;            // Consecutive ticks before comming to rest
 
 } // namespace {}
 
@@ -172,6 +172,10 @@ VehicleData::VehicleData()
    jetEnergyDrain =  0.8f;
    minJetEnergy = 1;
 
+   steeringReturn = 0.0f;
+   steeringReturnSpeedScale = 0.01f;
+   powerSteering = false;
+
    for (S32 i = 0; i < Body::MaxSounds; i++)
       body.sound[i] = 0;
 
@@ -214,6 +218,7 @@ bool VehicleData::preload(bool server, String &errorStr)
    if (!collisionDetails.size() || collisionDetails[0] == -1)
    {
       Con::errorf("VehicleData::preload failed: Vehicle models must define a collision-1 detail");
+      errorStr = String::ToString("VehicleData: Couldn't load shape \"%s\"",shapeName);
       return false;
    }
 
@@ -292,6 +297,10 @@ void VehicleData::packData(BitStream* stream)
    stream->write(jetEnergyDrain);
    stream->write(minJetEnergy);
 
+   stream->write(steeringReturn);
+   stream->write(steeringReturnSpeedScale);
+   stream->writeFlag(powerSteering);
+
    stream->writeFlag(cameraRoll);
    stream->write(cameraLag);
    stream->write(cameraDecay);
@@ -333,14 +342,14 @@ void VehicleData::packData(BitStream* stream)
       }
    }
 
-   for (int j = 0;  j < VC_NUM_DAMAGE_EMITTER_AREAS; j++)
+   for (S32 j = 0;  j < VC_NUM_DAMAGE_EMITTER_AREAS; j++)
    {
       stream->write( damageEmitterOffset[j].x );
       stream->write( damageEmitterOffset[j].y );
       stream->write( damageEmitterOffset[j].z );
    }
 
-   for (int k = 0; k < VC_NUM_DAMAGE_LEVELS; k++)
+   for (S32 k = 0; k < VC_NUM_DAMAGE_LEVELS; k++)
    {
       stream->write( damageLevelTolerance[k] );
    }
@@ -383,6 +392,10 @@ void VehicleData::unpackData(BitStream* stream)
    stream->read(&jetForce);
    stream->read(&jetEnergyDrain);
    stream->read(&minJetEnergy);
+
+   stream->read(&steeringReturn);
+   stream->read(&steeringReturnSpeedScale);
+   powerSteering = stream->readFlag();
 
    cameraRoll = stream->readFlag();
    stream->read(&cameraLag);
@@ -428,14 +441,14 @@ void VehicleData::unpackData(BitStream* stream)
       }
    }
 
-   for( int j=0; j<VC_NUM_DAMAGE_EMITTER_AREAS; j++ )
+   for( S32 j=0; j<VC_NUM_DAMAGE_EMITTER_AREAS; j++ )
    {
       stream->read( &damageEmitterOffset[j].x );
       stream->read( &damageEmitterOffset[j].y );
       stream->read( &damageEmitterOffset[j].z );
    }
 
-   for( int k=0; k<VC_NUM_DAMAGE_LEVELS; k++ )
+   for( S32 k=0; k<VC_NUM_DAMAGE_LEVELS; k++ )
    {
       stream->read( &damageLevelTolerance[k] );
    }
@@ -461,6 +474,13 @@ void VehicleData::initPersistFields()
       "Once the vehicle's energy level reaches 0, it will no longer be able to jet." );
    addField( "minJetEnergy", TypeF32, Offset(minJetEnergy, VehicleData),
       "Minimum vehicle energy level to begin jetting." );
+
+   addField( "steeringReturn", TypeF32, Offset(steeringReturn, VehicleData),
+      "Rate at which the vehicle's steering returns to forwards when it is moving." );
+   addField( "steeringReturnSpeedScale", TypeF32, Offset(steeringReturnSpeedScale, VehicleData),
+      "Amount of effect the vehicle's speed has on its rate of steering return." );
+   addField( "powerSteering", TypeBool, Offset(powerSteering, VehicleData),
+      "If true, steering does not auto-centre while the vehicle is being steered by its driver." );
 
    addField( "massCenter", TypePoint3F, Offset(massCenter, VehicleData),
       "Defines the vehicle's center of mass (offset from the origin of the model)." );
@@ -699,7 +719,7 @@ bool Vehicle::onAdd()
    {
       if( mDataBlock->dustEmitter )
       {
-         for( int i=0; i<VehicleData::VC_NUM_DUST_EMITTERS; i++ )
+         for( S32 i=0; i<VehicleData::VC_NUM_DUST_EMITTERS; i++ )
          {
             mDustEmitterList[i] = new ParticleEmitter;
             mDustEmitterList[i]->onNewDataBlock( mDataBlock->dustEmitter, false );
@@ -1083,6 +1103,22 @@ void Vehicle::updateMove(const Move* move)
    else {
       mSteering.x = 0;
       mSteering.y = 0;
+   }
+
+   // Steering return
+   if(mDataBlock->steeringReturn > 0.0f &&
+      (!mDataBlock->powerSteering || (move->yaw == 0.0f && move->pitch == 0.0f)))
+   {
+      Point2F returnAmount(mSteering.x * mDataBlock->steeringReturn * TickSec,
+                           mSteering.y * mDataBlock->steeringReturn * TickSec);
+      if(mDataBlock->steeringReturnSpeedScale > 0.0f)
+      {
+         Point3F vel;
+         mWorldToObj.mulV(getVelocity(), &vel);
+         returnAmount += Point2F(mSteering.x * vel.y * mDataBlock->steeringReturnSpeedScale * TickSec,
+                                 mSteering.y * vel.y * mDataBlock->steeringReturnSpeedScale * TickSec);
+      }
+      mSteering -= returnAmount;
    }
 
    // Jetting flag
@@ -1769,7 +1805,7 @@ void Vehicle::updateDamageSmoke( F32 dt )
       F32 damagePercent = mDamage / mDataBlock->maxDamage;
       if( damagePercent >= mDataBlock->damageLevelTolerance[j] )
       {
-         for( int i=0; i<mDataBlock->numDmgEmitterAreas; i++ )
+         for( S32 i=0; i<mDataBlock->numDmgEmitterAreas; i++ )
          {
             MatrixF trans = getTransform();
             Point3F offset = mDataBlock->damageEmitterOffset[i];
@@ -1900,7 +1936,7 @@ void Vehicle::_renderMassAndContacts( ObjectRenderInst *ri, SceneRenderState *st
    GFX->getDrawUtil()->drawCube(desc, Point3F(0.1f,0.1f,0.1f),mDataBlock->massCenter, ColorI(255, 255, 255), &mRenderObjToWorld);
 
    // Now render all the contact points.
-   for (int i = 0; i < mCollisionList.getCount(); i++)
+   for (S32 i = 0; i < mCollisionList.getCount(); i++)
    {
       const Collision& collision = mCollisionList[i];
       GFX->getDrawUtil()->drawCube(desc, Point3F(0.05f,0.05f,0.05f),collision.point, ColorI(0, 0, 255));
@@ -1908,7 +1944,7 @@ void Vehicle::_renderMassAndContacts( ObjectRenderInst *ri, SceneRenderState *st
 
    // Finally render the normals as one big batch.
    PrimBuild::begin(GFXLineList, mCollisionList.getCount() * 2);
-   for (int i = 0; i < mCollisionList.getCount(); i++)
+   for (S32 i = 0; i < mCollisionList.getCount(); i++)
    {
       const Collision& collision = mCollisionList[i];
       PrimBuild::color3f(1, 1, 1);

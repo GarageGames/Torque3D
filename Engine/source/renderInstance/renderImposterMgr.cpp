@@ -288,8 +288,12 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
                   smBatches++;
                
                   vb.set( GFX, stateCount*4, GFXBufferTypeVolatile );
-                  dMemcpy( vb.lock(), mBuffer, stateCount * 4 * sizeof( ImposterState ) );
-                  vb.unlock();
+                  ImposterState *buf = vb.lock();
+                  if(buf)
+                  {
+                     dMemcpy( buf, mBuffer, stateCount * 4 * sizeof( ImposterState ) );
+                     vb.unlock();
+                  }
                
                   //GFX->setVertexBuffer( mCornerVB, 0, stateCount * 4 );
                   GFX->setVertexBuffer( vb );
@@ -327,8 +331,12 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderPrePa
                smBatches++;
 
                vb.set( GFX, stateCount*4, GFXBufferTypeVolatile );
-               dMemcpy( vb.lock(), mBuffer, stateCount * 4 * sizeof( ImposterState ) );
-               vb.unlock();
+               ImposterState *buf = vb.lock();
+               if(buf)
+               {
+                  dMemcpy( buf, mBuffer, stateCount * 4 * sizeof( ImposterState ) );
+                  vb.unlock();
+               }
                
                //GFX->setVertexBuffer( mCornerVB, 0, stateCount * 4 );
                GFX->setVertexBuffer( vb );

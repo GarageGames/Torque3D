@@ -267,7 +267,7 @@ bool Noise2D::erodeHydraulic( Vector<F32> *src, Vector<F32> *dst, U32 iterations
    for (S32 k=0; k < (size*size); k++)
       c[k] = 0.0f;
 
-   for (int i=0; i<iterations; i++)
+   for (S32 i=0; i<iterations; i++)
    {
       b = a;
 

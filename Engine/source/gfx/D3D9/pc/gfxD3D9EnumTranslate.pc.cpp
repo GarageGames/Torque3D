@@ -46,14 +46,14 @@ _D3DDECLTYPE GFXD3D9DeclType[GFXDeclType_COUNT];
 //------------------------------------------------------------------------------
 
 #define INIT_LOOKUPTABLE( tablearray, enumprefix, type ) \
-   for( int i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
+   for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
       tablearray##[i] = (##type##)GFX_UNINIT_VAL;
 
 #define VALIDATE_LOOKUPTABLE( tablearray, enumprefix ) \
-   for( int i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
-      if( (int)tablearray##[i] == GFX_UNINIT_VAL ) \
+   for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
+      if( (S32)tablearray##[i] == GFX_UNINIT_VAL ) \
          Con::warnf( "GFXD3D9EnumTranslate: Unassigned value in " #tablearray ": %i", i ); \
-      else if( (int)tablearray##[i] == GFX_UNSUPPORTED_VAL ) \
+      else if( (S32)tablearray##[i] == GFX_UNSUPPORTED_VAL ) \
          Con::warnf( "GFXD3D9EnumTranslate: Unsupported value in " #tablearray ": %i", i );
 
 //------------------------------------------------------------------------------

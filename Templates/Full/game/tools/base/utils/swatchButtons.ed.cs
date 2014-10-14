@@ -46,7 +46,7 @@ function GuiSwatchButtonCtrl::onMouseDragged( %this )
    %ctrl = new GuiDragAndDropControl()
    {
       canSaveDynamicFields    = "0";
-      Profile                 = "GuiSolidDefaultProfile";
+      Profile                 = "ToolsGuiSolidDefaultProfile";
       HorizSizing             = "right";
       VertSizing              = "bottom";
       Position                = %xPos SPC %yPos;

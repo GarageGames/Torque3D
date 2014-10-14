@@ -308,7 +308,7 @@ bool TagDictionary::match(const char* pattern, const char* str)
 
 //------------------------------------------------------------------------------
 
-static int QSORT_CALLBACK idCompare(const void *in_p1, const void *in_p2)
+static S32 QSORT_CALLBACK idCompare(const void *in_p1, const void *in_p2)
 {
    return *((S32 *) in_p1) - *((S32 *) in_p2);
 }

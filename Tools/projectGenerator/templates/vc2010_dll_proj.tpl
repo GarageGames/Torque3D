@@ -50,15 +50,15 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">{$projectOffset}../../{$gameFolder}/</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">{$projOutName}_DEBUG</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">{$projOutName}_DEBUG DLL</TargetName>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">{$projectOffset}../../{$gameFolder}/</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">false</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">{$projOutName}_OPTIMIZEDDEBUG</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">{$projOutName}_OPTIMIZEDDEBUG DLL</TargetName>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">{$projectOffset}../../{$gameFolder}/</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">{$projOutName}</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">{$projOutName} DLL</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -95,11 +95,11 @@
       <AdditionalIncludeDirectories>{foreach item=def from=$projIncludes}{$def};{/foreach}%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>{foreach item=def from=$projLibs}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir){$projOutName}_DEBUG.dll</OutputFile>
+      <AdditionalDependencies>{foreach item=def from=$projLibsDebug}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);$(DXSDK_DIR)/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>{$projModuleDefinitionFile}</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -147,11 +147,11 @@
       <AdditionalIncludeDirectories>{foreach item=def from=$projIncludes}{$def};{/foreach}%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>{foreach item=def from=$projLibs}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir){$projOutName}_OPTIMIZEDDEBUG.dll</OutputFile>
+      <AdditionalDependencies>{foreach item=def from=$projLibsDebug}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>{$projModuleDefinitionFile}</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -200,10 +200,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>{foreach item=def from=$projLibs}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir){$projOutName}.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);$(DXSDK_DIR)/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>{$projModuleDefinitionFile}</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(ProjectName).pdb</ProgramDatabaseFile>

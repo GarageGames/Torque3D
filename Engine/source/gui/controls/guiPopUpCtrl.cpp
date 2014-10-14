@@ -1011,8 +1011,8 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            localStart.x = getWidth() - bitmapBounds[2].extent.x - txt_w;
          } 
          else
          {
@@ -1024,8 +1024,8 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            localStart.x = (getWidth() - mBitmapBounds[2].extent.x - txt_w) / 2;
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            localStart.x = (getWidth() - bitmapBounds[2].extent.x - txt_w) / 2;
 
          } else
          {
@@ -1043,8 +1043,8 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
             {
                // We're making use of a bitmap border, so take into account the
                // right cap of the border.
-               RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-               localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
+               RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+               localStart.x = getWidth() - bitmapBounds[2].extent.x - txt_w;
             } 
             else
             {
@@ -1095,8 +1095,8 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - mBitmapBounds[2].extent.x, localStart.y ) );
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
             GFX->getDrawUtil()->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else

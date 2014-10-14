@@ -45,7 +45,6 @@
 
 static const U32 dropHitMask = 
    TerrainObjectType |
-   InteriorObjectType |
    WaterObjectType |
    StaticShapeObjectType;
 
@@ -1169,9 +1168,7 @@ void Precipitation::destroySplash(Raindrop *drop)
    PROFILE_START(PrecipDestroySplash);
    if (drop == mSplashHead)
    {
-      mSplashHead = NULL;
-      PROFILE_END();
-      return;
+      mSplashHead = mSplashHead->nextSplashDrop;
    }
 
    if (drop->nextSplashDrop)
@@ -1728,6 +1725,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       // Do we need to relock the buffer?
       if ( !vertPtr )
          vertPtr = mRainVB.lock();
+      if(!vertPtr) return;
 
       // Set the proper texture coords... (it's fun!)
       tc = &mTexCoords[4*curr->texCoordIndex];
@@ -1818,6 +1816,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
       // Do we need to relock the buffer?
       if ( !vertPtr )
          vertPtr = mRainVB.lock();
+      if(!vertPtr) return;
 
       vertPtr->point = pos + leftUp;
       vertPtr->texCoord = *tc;

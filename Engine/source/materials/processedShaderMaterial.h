@@ -46,6 +46,7 @@ public:
    GFXShaderConstHandle* mTexMatSC;
    GFXShaderConstHandle* mSpecularColorSC;
    GFXShaderConstHandle* mSpecularPowerSC;
+   GFXShaderConstHandle* mSpecularStrengthSC;
    GFXShaderConstHandle* mParallaxInfoSC;
    GFXShaderConstHandle* mFogDataSC;
    GFXShaderConstHandle* mFogColorSC;   

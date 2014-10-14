@@ -24,7 +24,6 @@
 
 #include "platform/platformInput.h"
 #include "platformWin32/winDirectInput.h"
-#include "platform/event.h"
 #include "console/console.h"
 #include "core/util/journal/process.h"
 #include "windowManager/platformWindowMgr.h"

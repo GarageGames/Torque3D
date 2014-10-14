@@ -251,7 +251,7 @@ Path PosixFile::getName() const
    return _path;
 }
 
-FileNode::Status PosixFile::getStatus() const
+FileNode::NodeStatus PosixFile::getStatus() const
 {
    return _status;
 }
@@ -536,7 +536,7 @@ bool PosixDirectory::getAttributes(Attributes* attr)
    return true;
 }
 
-FileNode::Status PosixDirectory::getStatus() const
+FileNode::NodeStatus PosixDirectory::getStatus() const
 {
    return _status;
 }

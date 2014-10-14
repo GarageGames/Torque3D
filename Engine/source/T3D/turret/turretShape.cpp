@@ -40,7 +40,7 @@ static F32 sMinWarpTicks = 0.5 ;        // Fraction of tick at which instant war
 static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
 
 const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  InteriorObjectType    |  StaticShapeObjectType |
+                                  StaticShapeObjectType |
                                   VehicleObjectType);
 
 const U32 sServerCollisionMask = (sClientCollisionMask);
@@ -1270,7 +1270,7 @@ void TurretShape::getImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
             image.shapeInstance[shapeIndex]->animate();
 
             MatrixF emat;
-            getEyeBaseTransform(&emat);
+            getEyeBaseTransform(&emat, mDataBlock->mountedImagesBank);
 
             MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
             mountTransform.affineInverse();
@@ -1318,7 +1318,7 @@ void TurretShape::getRenderImageTransform(U32 imageSlot,S32 node,MatrixF* mat)
          if ( data.useEyeNode && isFirstPerson() && data.eyeMountNode[shapeIndex] != -1 )
          {
             MatrixF emat;
-            getRenderEyeBaseTransform(&emat);
+            getRenderEyeBaseTransform(&emat, mDataBlock->mountedImagesBank);
 
             MatrixF mountTransform = image.shapeInstance[shapeIndex]->mNodeTransforms[data.eyeMountNode[shapeIndex]];
             mountTransform.affineInverse();

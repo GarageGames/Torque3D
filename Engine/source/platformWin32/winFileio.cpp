@@ -29,6 +29,7 @@
 #include "core/strings/unicode.h"
 #include "util/tempAlloc.h"
 #include "core/util/safeDelete.h"
+#include "core/volume.h"
 
 // Microsoft VC++ has this POSIX header in the wrong directory
 #if defined(TORQUE_COMPILER_VISUALC)
@@ -247,7 +248,7 @@ File::~File()
 // Sets capability appropriate to the openMode.
 // Returns the currentStatus of the file.
 //-----------------------------------------------------------------------------
-File::Status File::open(const char *filename, const AccessMode openMode)
+File::FileStatus File::open(const char *filename, const AccessMode openMode)
 {
    AssertFatal(NULL != filename, "File::open: NULL fname");
    AssertWarn(INVALID_HANDLE_VALUE == (HANDLE)handle, "File::open: handle already valid");
@@ -362,7 +363,7 @@ U32 File::getPosition() const
 //
 // Returns the currentStatus of the file.
 //-----------------------------------------------------------------------------
-File::Status File::setPosition(S32 position, bool absolutePos)
+File::FileStatus File::setPosition(S32 position, bool absolutePos)
 {
     AssertFatal(Closed != currentStatus, "File::setPosition: file closed");
     AssertFatal(INVALID_HANDLE_VALUE != (HANDLE)handle, "File::setPosition: invalid file handle");
@@ -424,7 +425,7 @@ U32 File::getSize() const
 // It is an error to flush a read-only file.
 // Returns the currentStatus of the file.
 //-----------------------------------------------------------------------------
-File::Status File::flush()
+File::FileStatus File::flush()
 {
     AssertFatal(Closed != currentStatus, "File::flush: file closed");
     AssertFatal(INVALID_HANDLE_VALUE != (HANDLE)handle, "File::flush: invalid file handle");
@@ -441,7 +442,7 @@ File::Status File::flush()
 //
 // Returns the currentStatus
 //-----------------------------------------------------------------------------
-File::Status File::close()
+File::FileStatus File::close()
 {
     // check if it's already closed...
     if (Closed == currentStatus)
@@ -460,7 +461,7 @@ File::Status File::close()
 //-----------------------------------------------------------------------------
 // Self-explanatory.
 //-----------------------------------------------------------------------------
-File::Status File::getStatus() const
+File::FileStatus File::getStatus() const
 {
     return currentStatus;
 }
@@ -468,7 +469,7 @@ File::Status File::getStatus() const
 //-----------------------------------------------------------------------------
 // Sets and returns the currentStatus when an error has been encountered.
 //-----------------------------------------------------------------------------
-File::Status File::setStatus()
+File::FileStatus File::setStatus()
 {
     switch (GetLastError())
     {
@@ -488,7 +489,7 @@ File::Status File::setStatus()
 //-----------------------------------------------------------------------------
 // Sets and returns the currentStatus to status.
 //-----------------------------------------------------------------------------
-File::Status File::setStatus(File::Status status)
+File::FileStatus File::setStatus(File::FileStatus status)
 {
     return currentStatus = status;
 }
@@ -499,7 +500,7 @@ File::Status File::setStatus(File::Status status)
 // The number of bytes read is available in bytesRead if a non-Null pointer is
 // provided.
 //-----------------------------------------------------------------------------
-File::Status File::read(U32 size, char *dst, U32 *bytesRead)
+File::FileStatus File::read(U32 size, char *dst, U32 *bytesRead)
 {
     AssertFatal(Closed != currentStatus, "File::read: file closed");
     AssertFatal(INVALID_HANDLE_VALUE != (HANDLE)handle, "File::read: invalid file handle");
@@ -530,7 +531,7 @@ File::Status File::read(U32 size, char *dst, U32 *bytesRead)
 // The number of bytes written is available in bytesWritten if a non-Null
 // pointer is provided.
 //-----------------------------------------------------------------------------
-File::Status File::write(U32 size, const char *src, U32 *bytesWritten)
+File::FileStatus File::write(U32 size, const char *src, U32 *bytesWritten)
 {
     AssertFatal(Closed != currentStatus, "File::write: file closed");
     AssertFatal(INVALID_HANDLE_VALUE != (HANDLE)handle, "File::write: invalid file handle");
@@ -946,7 +947,11 @@ bool Platform::isFile(const char *pFilePath)
    FindClose(handle);
 
    if(handle == INVALID_HANDLE_VALUE)
-      return false;
+   {
+    
+      // Since file does not exist on disk see if it exists in a zip file loaded
+      return Torque::FS::IsFile(pFilePath);
+   }
 
    // if the file is a Directory, Offline, System or Temporary then FALSE
    if (findData.dwFileAttributes &
@@ -1135,7 +1140,7 @@ void Platform::getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bO
 
    out_rNameVector.clear();
 		
-	for(int i = 0; i < 32; i++ )
+	for(S32 i = 0; i < 32; i++ )
 	{
 		dMemset(driveLetter,0,12);
 		if( dwDrives & dwMask )

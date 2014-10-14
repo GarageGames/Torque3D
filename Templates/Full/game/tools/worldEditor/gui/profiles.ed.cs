@@ -64,7 +64,7 @@ singleton GuiControlProfile (EditorScrollProfile)
    border = 3;
    borderThickness = 2;
    borderColor = "0 0 0";
-   bitmap = "core/art/gui/images/scrollBar";
+   bitmap = "tools/gui/images/scrollBar";
    hasBitmapArray = true;
    category = "Editor";
 };
@@ -80,7 +80,7 @@ singleton GuiControlProfile (GuiEditorClassProfile)
    fontColorHL = "50 50 50";
    fixedExtent = true;
    justify = "center";
-   bitmap = "core/art/gui/images/scrollBar";
+   bitmap = "tools/gui/images/scrollBar";
    hasBitmapArray = true;
    category = "Editor";
 };
@@ -94,7 +94,7 @@ singleton GuiControlProfile( EPainterBitmapProfile )
    category = "Editor";
 };
 
-singleton GuiControlProfile( EPainterBorderButtonProfile : GuiDefaultProfile )
+singleton GuiControlProfile( EPainterBorderButtonProfile : ToolsGuiDefaultProfile )
 {
    border = true;
    borderColor = "0 0 0";

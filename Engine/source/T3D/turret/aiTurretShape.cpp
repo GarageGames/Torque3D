@@ -37,7 +37,6 @@ static U32 sScanTypeMask =       PlayerObjectType     |
                                  VehicleObjectType;
 
 static U32 sAimTypeMask =        TerrainObjectType       |
-                                 InteriorObjectType      |
                                  WaterObjectType         | 
                                  PlayerObjectType        |
                                  StaticShapeObjectType   | 
@@ -100,7 +99,7 @@ AITurretShapeData::AITurretShapeData()
 
    weaponLeadVelocity = 0;
 
-   for (int i = 0; i < MaxStates; i++) {
+   for (S32 i = 0; i < MaxStates; i++) {
       stateName[i] = 0;
       stateTransitionAtRest[i] = 0;
       stateTransitionNotAtRest[i] = 0;

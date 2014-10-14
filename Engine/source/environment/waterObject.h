@@ -97,6 +97,7 @@ struct WaterMatParams
    MaterialParameterHandle* mSpecularParamsSC;   
    MaterialParameterHandle* mDepthGradMaxSC;
    MaterialParameterHandle* mReflectivitySC;
+   MaterialParameterHandle* mDepthGradSamplerSC;
 
    void clear();
    void init(BaseMatInstance* matInst);

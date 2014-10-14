@@ -78,6 +78,7 @@ struct ShaderGenVars
    const static String lightSpotFalloff;
    const static String specularColor;
    const static String specularPower;
+   const static String specularStrength;
    
    // Textures
    const static String fogMap;

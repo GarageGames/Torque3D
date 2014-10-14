@@ -32,7 +32,7 @@ singleton GuiControlProfile(GuiShapeEdScrollProfile : GuiEditorScrollProfile)
    category = "Editor";
 };
 
-singleton GuiControlProfile(GuiShapeEdTextListProfile : GuiTextListProfile)
+singleton GuiControlProfile(GuiShapeEdTextListProfile : ToolsGuiTextListProfile)
 {
    // Customise the not-active font used for the header row
    fontColorNA = "75 75 75";
@@ -41,7 +41,7 @@ singleton GuiControlProfile(GuiShapeEdTextListProfile : GuiTextListProfile)
 
 singleton GuiControlProfile(GuiShapeEdRolloutProfile : GuiInspectorRolloutProfile0)
 {
-   bitmap = "tools/editorclasses/gui/images/rollout";
+   bitmap = "tools/editorClasses/gui/images/rollout";
    category = "Editor";
 };
 

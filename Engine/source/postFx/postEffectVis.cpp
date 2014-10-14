@@ -127,7 +127,7 @@ void PostEffectVis::open( PostEffect *pfx )
       bmpCtrl->setSizing( GuiControl::horizResizeWidth, GuiControl::vertResizeHeight );
       bmpCtrl->setExtent( 341, 181 );
       bmpCtrl->setDataField( StringTable->insert( "wrap" ), NULL, "1" );
-      bmpCtrl->setBitmap( "core/art/gui/images/transp_grid" );
+      bmpCtrl->setBitmap( "tools/gui/images/transp_grid" );
       bmpCtrl->registerObject();      
       winCtrl->addObject( bmpCtrl );
 

@@ -286,7 +286,7 @@ void BtWorld::explosion( const Point3F &pos, F32 radius, F32 forceMagnitude )
 
 void BtWorld::onDebugDraw( const SceneRenderState *state )
 {
-   mDebugDraw.setCuller( &state->getFrustum() );
+   mDebugDraw.setCuller( &state->getCullingFrustum() );
 
    mDynamicsWorld->setDebugDrawer( &mDebugDraw );
    mDynamicsWorld->debugDrawWorld();

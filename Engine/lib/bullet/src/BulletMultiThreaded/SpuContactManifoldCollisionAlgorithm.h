@@ -13,14 +13,15 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SPU_CONTACTMANIFOLD_COLLISION_ALGORITHM_H
-#define SPU_CONTACTMANIFOLD_COLLISION_ALGORITHM_H
+#ifndef BT_SPU_CONTACTMANIFOLD_COLLISION_ALGORITHM_H
+#define BT_SPU_CONTACTMANIFOLD_COLLISION_ALGORITHM_H
 
 #include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionCreateFunc.h"
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
 #include "LinearMath/btTransformUtil.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 
 class btPersistentManifold;
 
@@ -37,20 +38,20 @@ ATTRIBUTE_ALIGNED16(class) SpuContactManifoldCollisionAlgorithm : public btColli
 	float	m_collisionMargin0;
 	float	m_collisionMargin1;
 
-	btCollisionObject*	m_collisionObject0;
-	btCollisionObject*	m_collisionObject1;
+	const btCollisionObject*	m_collisionObject0;
+	const btCollisionObject*	m_collisionObject1;
 	
 	
 
 	
 public:
 	
-	virtual void processCollision (btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
+	virtual void processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
 	virtual btScalar calculateTimeOfImpact(btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
 	
-	SpuContactManifoldCollisionAlgorithm(const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* body0,btCollisionObject* body1);
+	SpuContactManifoldCollisionAlgorithm(const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObject* body0,const btCollisionObject* body1);
 #ifdef USE_SEPDISTANCE_UTIL
 	btConvexSeparatingDistanceUtil	m_sepDistance;
 #endif //USE_SEPDISTANCE_UTIL
@@ -68,12 +69,12 @@ public:
 		return m_manifoldPtr;
 	}
 
-	btCollisionObject*	getCollisionObject0()
+	const btCollisionObject*	getCollisionObject0()
 	{
 		return m_collisionObject0;
 	}
 	
-	btCollisionObject*	getCollisionObject1()
+	const btCollisionObject*	getCollisionObject1()
 	{
 		return m_collisionObject1;
 	}
@@ -108,13 +109,13 @@ public:
 
 	struct CreateFunc :public 	btCollisionAlgorithmCreateFunc
 	{
-		virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0,btCollisionObject* body1)
-		{
+        virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap)
+ 		{
 			void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm(sizeof(SpuContactManifoldCollisionAlgorithm));
-			return new(mem) SpuContactManifoldCollisionAlgorithm(ci,body0,body1);
+			return new(mem) SpuContactManifoldCollisionAlgorithm(ci,body0Wrap->getCollisionObject(),body1Wrap->getCollisionObject());
 		}
 	};
 
 };
 
-#endif //SPU_CONTACTMANIFOLD_COLLISION_ALGORITHM_H
+#endif //BT_SPU_CONTACTMANIFOLD_COLLISION_ALGORITHM_H

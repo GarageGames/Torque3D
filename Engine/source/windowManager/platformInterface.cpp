@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platform/event.h"
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxInit.h"
 #include "gfx/gfxDevice.h"
@@ -71,7 +70,7 @@ static struct ModifierBitMap {
    { IM_LOPT,   SI_MAC_LOPT },
    { IM_ROPT,   SI_MAC_ROPT },
 };
-static int _ModifierBitMapCount = sizeof(_ModifierBitMap) / sizeof(ModifierBitMap);
+static S32 _ModifierBitMapCount = sizeof(_ModifierBitMap) / sizeof(ModifierBitMap);
 
 InputModifiers convertModifierBits(const U32 in)
 {
@@ -122,7 +121,7 @@ void Platform::closeWindow()
 
 
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 // Hack so we can get the HWND of the global window more easily - replacement
 // for the HWND that was in the platstate.
 #include "windowManager/win32/win32Window.h"

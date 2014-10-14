@@ -420,7 +420,7 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    reflectRenderState.disableAdvancedLightingBins(true);
 
    // render scene
-   LIGHTMGR->registerGlobalLights( &reflectRenderState.getFrustum(), false );
+   LIGHTMGR->registerGlobalLights( &reflectRenderState.getCullingFrustum(), false );
    gClientSceneGraph->renderSceneNoLights( &reflectRenderState, mDesc->objectTypeMask );
    LIGHTMGR->unregisterAllLights();
 
@@ -546,7 +546,12 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    // store current matrices
    GFXTransformSaver saver;
    
-   F32 aspectRatio = F32( params.viewportExtent.x ) / F32( params.viewportExtent.y );
+   Point2I viewport(params.viewportExtent);
+   if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
+   {
+      viewport.x *= 0.5f;
+   }
+   F32 aspectRatio = F32( viewport.x ) / F32( viewport.y );
 
    Frustum frustum;
    frustum.set(false, params.query->fov, aspectRatio, params.query->nearPlane, params.query->farPlane);
@@ -562,12 +567,138 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    mLastDir = params.query->cameraMatrix.getForwardVector();
    mLastPos = params.query->cameraMatrix.getPosition();
 
+   setGFXMatrices( params.query->cameraMatrix );
+
+   // Adjust the detail amount
+   F32 detailAdjustBackup = TSShapeInstance::smDetailAdjust;
+   TSShapeInstance::smDetailAdjust *= mDesc->detailAdjust;
+
+
+   if(reflectTarget.isNull())
+      reflectTarget = GFX->allocRenderToTextureTarget();
+   reflectTarget->attachTexture( GFXTextureTarget::Color0, reflectTex );
+   reflectTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
+   GFX->pushActiveRenderTarget();
+   GFX->setActiveRenderTarget( reflectTarget );   
+
+   U32 objTypeFlag = -1;
+   SceneCameraState reflectCameraState = SceneCameraState::fromGFX();
+   LIGHTMGR->registerGlobalLights( &reflectCameraState.getFrustum(), false );
+
+   // Since we can sometime be rendering a reflection for 1 or 2 frames before
+   // it gets updated do to the lag associated with getting the results from
+   // a HOQ we can sometimes see into parts of the reflection texture that
+   // have nothing but clear color ( eg. under the water ).
+   // To make this look less crappy use the ambient color of the sun.
+   //
+   // In the future we may want to fix this instead by having the scatterSky
+   // render a skirt or something in its lower half.
+   //
+   ColorF clearColor = gClientSceneGraph->getAmbientLightColor();
+   GFX->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, clearColor, 1.0f, 0 );
+
+   if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
+   {
+      // Store previous values
+      RectI originalVP = GFX->getViewport();
+
+      Point2F projOffset = GFX->getCurrentProjectionOffset();
+      Point3F eyeOffset = GFX->getStereoEyeOffset();
+
+      // Render left half of display
+      RectI leftVP = originalVP;
+      leftVP.extent.x *= 0.5;
+      GFX->setViewport(leftVP);
+
+      MatrixF leftWorldTrans(true);
+      leftWorldTrans.setPosition(Point3F(eyeOffset.x, eyeOffset.y, eyeOffset.z));
+      MatrixF leftWorld(params.query->cameraMatrix);
+      leftWorld.mulL(leftWorldTrans);
+
+      Frustum gfxFrustum = GFX->getFrustum();
+      gfxFrustum.setProjectionOffset(Point2F(projOffset.x, projOffset.y));
+      GFX->setFrustum(gfxFrustum);
+
+      setGFXMatrices( leftWorld );
+
+      SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
+      SceneRenderState renderStateLeft( gClientSceneGraph, SPT_Reflect, cameraStateLeft );
+      renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
+      renderStateLeft.setSceneRenderField(0);
+      renderStateLeft.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
+      renderStateLeft.setDiffuseCameraTransform( params.query->cameraMatrix );
+      renderStateLeft.disableAdvancedLightingBins(true);
+
+      gClientSceneGraph->renderSceneNoLights( &renderStateLeft, objTypeFlag );
+
+      // Render right half of display
+      RectI rightVP = originalVP;
+      rightVP.extent.x *= 0.5;
+      rightVP.point.x += rightVP.extent.x;
+      GFX->setViewport(rightVP);
+
+      MatrixF rightWorldTrans(true);
+      rightWorldTrans.setPosition(Point3F(-eyeOffset.x, eyeOffset.y, eyeOffset.z));
+      MatrixF rightWorld(params.query->cameraMatrix);
+      rightWorld.mulL(rightWorldTrans);
+
+      gfxFrustum = GFX->getFrustum();
+      gfxFrustum.setProjectionOffset(Point2F(-projOffset.x, projOffset.y));
+      GFX->setFrustum(gfxFrustum);
+
+      setGFXMatrices( rightWorld );
+
+      SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
+      SceneRenderState renderStateRight( gClientSceneGraph, SPT_Reflect, cameraStateRight );
+      renderStateRight.setSceneRenderStyle(SRS_SideBySide);
+      renderStateRight.setSceneRenderField(1);
+      renderStateRight.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
+      renderStateRight.setDiffuseCameraTransform( params.query->cameraMatrix );
+      renderStateRight.disableAdvancedLightingBins(true);
+
+      gClientSceneGraph->renderSceneNoLights( &renderStateRight, objTypeFlag );
+
+      // Restore previous values
+      gfxFrustum.clearProjectionOffset();
+      GFX->setFrustum(gfxFrustum);
+      GFX->setViewport(originalVP);
+   }
+   else
+   {
+      SceneRenderState reflectRenderState
+      (
+         gClientSceneGraph,
+         SPT_Reflect,
+         SceneCameraState::fromGFX()
+      );
+
+      reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
+      reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
+      reflectRenderState.disableAdvancedLightingBins(true);
+
+      gClientSceneGraph->renderSceneNoLights( &reflectRenderState, objTypeFlag );
+   }
+
+   LIGHTMGR->unregisterAllLights();
+
+   // Clean up.
+   reflectTarget->resolve();
+   GFX->popActiveRenderTarget();
+
+   // Restore detail adjust amount.
+   TSShapeInstance::smDetailAdjust = detailAdjustBackup;
+
+   mIsRendering = false;
+}
+
+void PlaneReflector::setGFXMatrices( const MatrixF &camTrans )
+{
    if ( objectSpace )
    {
       // set up camera transform relative to object
       MatrixF invObjTrans = mObject->getRenderTransform();
       invObjTrans.inverse();
-      MatrixF relCamTrans = invObjTrans * params.query->cameraMatrix;
+      MatrixF relCamTrans = invObjTrans * camTrans;
 
       MatrixF camReflectTrans = getCameraReflection( relCamTrans );
       MatrixF camTrans = mObject->getRenderTransform() * camReflectTrans;
@@ -586,8 +717,6 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    }    
    else
    {
-      MatrixF camTrans = params.query->cameraMatrix;
-
       // set world mat from new camera view
       MatrixF camReflectTrans = getCameraReflection( camTrans );
       camReflectTrans.inverse();
@@ -598,60 +727,9 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       MatrixF clipProj = getFrustumClipProj( camReflectTrans );
       GFX->setProjectionMatrix( clipProj );
    }   
-
-   // Adjust the detail amount
-   F32 detailAdjustBackup = TSShapeInstance::smDetailAdjust;
-   TSShapeInstance::smDetailAdjust *= mDesc->detailAdjust;
-
-
-   if(reflectTarget.isNull())
-      reflectTarget = GFX->allocRenderToTextureTarget();
-   reflectTarget->attachTexture( GFXTextureTarget::Color0, reflectTex );
-   reflectTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
-   GFX->pushActiveRenderTarget();
-   GFX->setActiveRenderTarget( reflectTarget );   
-
-   SceneRenderState reflectRenderState
-   (
-      gClientSceneGraph,
-      SPT_Reflect,
-      SceneCameraState::fromGFX()
-   );
-
-   reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-   reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
-   reflectRenderState.disableAdvancedLightingBins(true);
-
-   U32 objTypeFlag = -1;
-   LIGHTMGR->registerGlobalLights( &reflectRenderState.getFrustum(), false );
-
-   // Since we can sometime be rendering a reflection for 1 or 2 frames before
-   // it gets updated do to the lag associated with getting the results from
-   // a HOQ we can sometimes see into parts of the reflection texture that
-   // have nothing but clear color ( eg. under the water ).
-   // To make this look less crappy use the ambient color of the sun.
-   //
-   // In the future we may want to fix this instead by having the scatterSky
-   // render a skirt or something in its lower half.
-   //
-   ColorF clearColor = reflectRenderState.getAmbientLightColor();
-   GFX->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, clearColor, 1.0f, 0 );
-
-   gClientSceneGraph->renderSceneNoLights( &reflectRenderState, objTypeFlag );
-
-   LIGHTMGR->unregisterAllLights();
-
-   // Clean up.
-   reflectTarget->resolve();
-   GFX->popActiveRenderTarget();
-
-   // Restore detail adjust amount.
-   TSShapeInstance::smDetailAdjust = detailAdjustBackup;
-
-   mIsRendering = false;
 }
 
-MatrixF PlaneReflector::getCameraReflection( MatrixF &camTrans )
+MatrixF PlaneReflector::getCameraReflection( const MatrixF &camTrans )
 {
    Point3F normal = refplane;
 
@@ -682,7 +760,7 @@ MatrixF PlaneReflector::getCameraReflection( MatrixF &camTrans )
    return newTrans;
 }
 
-inline float sgn(float a)
+inline F32 sgn(F32 a)
 {
    if (a > 0.0F) return (1.0F);
    if (a < 0.0F) return (-1.0F);

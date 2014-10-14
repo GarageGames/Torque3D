@@ -129,14 +129,7 @@ function demoPlaybackComplete()
    // handling functionality.
    clientEndMission();
 
-   if ( $UseUnifiedShell )
-   {
-      if (isObject( UnifiedMainMenuGui ))
-         Canvas.setContent( UnifiedMainMenuGui );
-      else if (isObject( MainMenuGui ))
-         Canvas.setContent( MainMenuGui );
-   }
-   else if (isObject( MainMenuGui ))
+   if (isObject( MainMenuGui ))
       Canvas.setContent( MainMenuGui );
 
    Canvas.pushDialog(RecordingsDlg);

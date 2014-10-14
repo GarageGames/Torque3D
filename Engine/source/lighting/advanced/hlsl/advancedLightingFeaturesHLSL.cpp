@@ -465,6 +465,12 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
       specPow->constSortPos = cspPotentialPrimitive;
    }
 
+   Var *specStrength = new Var;
+   specStrength->setType( "float" );
+   specStrength->setName( "specularStrength" );
+   specStrength->uniform = true;
+   specStrength->constSortPos = cspPotentialPrimitive;
+
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
    Var *d_specular = (Var*)LangElement::find( "d_specular" );
    Var *d_NL_Att = (Var*)LangElement::find( "d_NL_Att" );
@@ -473,8 +479,8 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
       "DeferredPixelSpecularHLSL::processPix - Something hosed the deferred features!" );
 
    // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow( @, ceil(@ / AL_ConstantSpecularPower)) * @;\r\n", 
-      specDecl, d_specular, specPow, d_NL_Att ) );
+   meta->addStatement( new GenOp( "   @ = pow( abs(@), max((@ / AL_ConstantSpecularPower),1.0f)) * @;\r\n", 
+      specDecl, d_specular, specPow, specStrength ) );
 
    LangElement *specMul = new GenOp( "float4( @.rgb, 0 ) * @", specCol, specular );
    LangElement *final = specMul;

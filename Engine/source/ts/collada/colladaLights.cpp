@@ -215,11 +215,11 @@ ConsoleFunction( loadColladaLights, bool, 2, 4,
 
    // First grab all of the top-level nodes
    Vector<ColladaAppNode*> sceneNodes;
-   for (int iSceneLib = 0; iSceneLib < root->getLibrary_visual_scenes_array().getCount(); iSceneLib++) {
+   for (S32 iSceneLib = 0; iSceneLib < root->getLibrary_visual_scenes_array().getCount(); iSceneLib++) {
       const domLibrary_visual_scenes* libScenes = root->getLibrary_visual_scenes_array()[iSceneLib];
-      for (int iScene = 0; iScene < libScenes->getVisual_scene_array().getCount(); iScene++) {
+      for (S32 iScene = 0; iScene < libScenes->getVisual_scene_array().getCount(); iScene++) {
          const domVisual_scene* visualScene = libScenes->getVisual_scene_array()[iScene];
-         for (int iNode = 0; iNode < visualScene->getNode_array().getCount(); iNode++)
+         for (S32 iNode = 0; iNode < visualScene->getNode_array().getCount(); iNode++)
             sceneNodes.push_back(new ColladaAppNode(visualScene->getNode_array()[iNode]));
       }
    }

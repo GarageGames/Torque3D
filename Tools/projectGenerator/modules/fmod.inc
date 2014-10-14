@@ -25,7 +25,7 @@ beginModule( 'fmod' );
   $allgood = true;
 
 	// Additional includes
-	switch( Generator::$platform )
+	switch( T3D_Generator::$platform )
    {
       case "win32":
       case "mac":
@@ -64,6 +64,10 @@ beginModule( 'fmod' );
         {
           addIncludePath( $FMOD_SDK_PATH . "/api/inc" );
           addIncludePath( $FMOD_SDK_PATH . "/fmoddesignerapi/api/inc" );
+          
+          // File Copy
+          copyFileToProject( $FMOD_SDK_PATH . "/api/fmodex.dll",                      "/game/fmodex.dll" );
+          copyFileToProject( $FMOD_SDK_PATH . "/fmoddesignerapi/api/fmod_event.dll",  "/game/fmod_event.dll" );
         }
         else
         {

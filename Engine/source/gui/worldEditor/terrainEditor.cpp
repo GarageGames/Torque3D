@@ -33,7 +33,6 @@
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiCanvas.h"
 #include "gui/worldEditor/terrainActions.h"
-#include "interior/interiorInstance.h"
 #include "terrain/terrMaterial.h"
 
 
@@ -671,7 +670,7 @@ TerrainEditor::TerrainEditor() :
    mUndoSel(0),
    mGridUpdateMin( S32_MAX, S32_MAX ),
    mGridUpdateMax( 0, 0 ),
-   mMaxBrushSize(48,48),
+   mMaxBrushSize(256,256),
    mNeedsGridUpdate( false ),
    mNeedsMaterialUpdate( false ),
    mMouseDown( false )
@@ -710,6 +709,7 @@ TerrainEditor::TerrainEditor() :
    mActions.push_back(new AdjustHeightAction(this));
    mActions.push_back(new FlattenHeightAction(this));
    mActions.push_back(new SmoothHeightAction(this));
+   mActions.push_back(new SmoothSlopeAction(this));
    mActions.push_back(new PaintNoiseAction(this));
    //mActions.push_back(new ThermalErosionAction(this));
 
@@ -2111,8 +2111,9 @@ const char* TerrainEditor::getBrushPos()
    AssertFatal(mMouseBrush!=NULL, "TerrainEditor::getBrushPos: no mouse brush!");
 
    Point2I pos = mMouseBrush->getPosition();
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", pos.x, pos.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", pos.x, pos.y);
    return(ret);
 }
 
@@ -2244,73 +2245,6 @@ void TerrainEditor::markEmptySquares()
 {
    if(!checkTerrainBlock(this, "markEmptySquares"))
       return;
-
-   // TODO!
-   /*
-   // build a list of all the marked interiors
-   Vector<InteriorInstance*> interiors;
-   U32 mask = InteriorObjectType;
-   gServerContainer.findObjects(mask, findObjectsCallback, &interiors);
-
-   // walk the terrains and empty any grid which clips to an interior
-   for (U32 i = 0; i < mTerrainBlocks.size(); i++)
-   {
-      for(U32 x = 0; x < TerrainBlock::BlockSize; x++)
-      {
-         for(U32 y = 0; y < TerrainBlock::BlockSize; y++)
-         {
-            TerrainBlock::Material * material = mTerrainBlocks[i]->getMaterial(x,y);
-            material->flags |= ~(TerrainBlock::Material::Empty);
-
-            Point3F a, b;
-            gridToWorld(Point2I(x,y), a, mTerrainBlocks[i]);
-            gridToWorld(Point2I(x+1,y+1), b, mTerrainBlocks[i]);
-
-            Box3F box;
-            box.minExtents = a;
-            box.maxExtents = b;
-
-            box.minExtents.setMin(b);
-            box.maxExtents.setMax(a);
-
-            const MatrixF & terrOMat = mTerrainBlocks[i]->getTransform();
-            const MatrixF & terrWMat = mTerrainBlocks[i]->getWorldTransform();
-
-            terrWMat.mulP(box.minExtents);
-            terrWMat.mulP(box.maxExtents);
-
-            for(U32 i = 0; i < interiors.size(); i++)
-            {
-               MatrixF mat = interiors[i]->getWorldTransform();
-               mat.scale(interiors[i]->getScale());
-               mat.mul(terrOMat);
-
-               U32 waterMark = FrameAllocator::getWaterMark();
-               U16* zoneVector = (U16*)FrameAllocator::alloc(interiors[i]->getDetailLevel(0)->getNumZones());
-               U32 numZones = 0;
-               interiors[i]->getDetailLevel(0)->scanZones(box, mat,
-                                                          zoneVector, &numZones);
-               if (numZones != 0)
-               {
-                  Con::printf("%d %d", x, y);
-                  material->flags |= TerrainBlock::Material::Empty;
-                  FrameAllocator::setWaterMark(waterMark);
-                  break;
-               }
-               FrameAllocator::setWaterMark(waterMark);
-            }
-         }
-      }
-   }
-
-   // rebuild stuff..
-   for (U32 i = 0; i < mTerrainBlocks.size(); i++)
-   {
-      mTerrainBlocks[i]->buildGridMap();
-      mTerrainBlocks[i]->rebuildEmptyFlags();
-      mTerrainBlocks[i]->packEmptySquares();
-   }
-   */
 }
 
 void TerrainEditor::mirrorTerrain(S32 mirrorIndex)
@@ -2588,8 +2522,9 @@ ConsoleMethod( TerrainEditor, getBrushSize, const char*, 2, 2, "()")
 {
    Point2I size = object->getBrushSize();
 
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", size.x, size.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", size.x, size.y);
    return ret;
 }
 
@@ -2933,3 +2868,77 @@ ConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, 3, 3, 0)
 	object->mSlopeMaxAngle = angle;
 	return angle;
 }
+
+//------------------------------------------------------------------------------  
+void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage )  
+{  
+   if (!mActiveTerrain)  
+      return;  
+  
+   S32 mat = getPaintMaterialIndex();  
+   if (mat == -1)  
+      return;  
+  
+   mUndoSel = new Selection;  
+          
+   U32 terrBlocks = mActiveTerrain->getBlockSize();  
+   for (U32 y = 0; y < terrBlocks; y++) 
+   {  
+      for (U32 x = 0; x < terrBlocks; x++) 
+      {  
+         // get info  
+         GridPoint gp;  
+         gp.terrainBlock = mActiveTerrain;  
+         gp.gridPos.set(x, y);  
+  
+         GridInfo gi;  
+         getGridInfo(gp, gi);  
+  
+         if (gi.mMaterial == mat)  
+            continue;  
+
+         if (mRandI(0, 100) > mCoverage)
+            continue;
+  
+         Point3F wp;  
+         gridToWorld(gp, wp);  
+  
+         if (!(wp.z >= mMinHeight && wp.z <= mMaxHeight))  
+            continue;  
+  
+         // transform wp to object space  
+         Point3F op;  
+         mActiveTerrain->getWorldTransform().mulP(wp, &op);  
+  
+         Point3F norm;  
+         mActiveTerrain->getNormal(Point2F(op.x, op.y), &norm, true);  
+  
+         if (mMinSlope > 0)  
+            if (norm.z > mSin(mDegToRad(90.0f - mMinSlope)))  
+               continue;  
+  
+         if (mMaxSlope < 90)  
+            if (norm.z < mSin(mDegToRad(90.0f - mMaxSlope)))  
+               continue;  
+  
+         gi.mMaterialChanged = true;  
+         mUndoSel->add(gi);  
+         gi.mMaterial = mat;  
+         setGridInfo(gi);  
+      }  
+   }  
+  
+   if(mUndoSel->size())  
+      submitUndo( mUndoSel );  
+   else  
+      delete mUndoSel;  
+  
+   mUndoSel = 0;  
+  
+   scheduleMaterialUpdate();     
+}  
+  
+ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 7, 7, "(float minHeight, float maxHeight, float minSlope, float maxSlope, float coverage)")   
+{  
+   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]), dAtof(argv[6]));  
+}  

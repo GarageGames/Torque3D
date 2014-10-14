@@ -248,7 +248,7 @@ void GFXPCD3D9TextureTarget::activate()
             "GFXPCD3D9TextureTarget::activate() - Failed to get surface description!");
          D3DFORMAT depthFormat = desc.Format;
 
-         HRESULT hr = mDevice->getD3D()->CheckDepthStencilMatch(  D3DADAPTER_DEFAULT,
+         HRESULT hr = mDevice->getD3D()->CheckDepthStencilMatch(  mDevice->getAdaterIndex(),
                                                                   D3DDEVTYPE_HAL,
                                                                   mDevice->mDisplayMode.Format,
                                                                   renderFormat,
@@ -330,7 +330,7 @@ void GFXPCD3D9TextureTarget::resolveTo( GFXTextureObject *tex )
 
 void GFXPCD3D9TextureTarget::zombify()
 {
-   for(int i = 0; i < MaxRenderSlotId; i++)
+   for(S32 i = 0; i < MaxRenderSlotId; i++)
       attachTexture(RenderSlot(i), NULL);
 }
 
@@ -542,7 +542,7 @@ void GFXPCD3D9WindowTarget::activate()
             "GFXPCD3D9TextureTarget::activate() - Failed to get surface description!");
          D3DFORMAT depthFormat = desc.Format;
 
-         HRESULT hr = mDevice->getD3D()->CheckDepthStencilMatch(  D3DADAPTER_DEFAULT,
+         HRESULT hr = mDevice->getD3D()->CheckDepthStencilMatch(  mDevice->getAdaterIndex(),
                                                                   D3DDEVTYPE_HAL,
                                                                   mDevice->mDisplayMode.Format,
                                                                   renderFormat,

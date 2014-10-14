@@ -821,12 +821,13 @@ ConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, 3, 3, "getDec
 	if( decalInstance == NULL )
 		return "";
 
-	char* returnBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
    returnBuffer[0] = 0;
 
    if ( decalInstance )
    {
-	   dSprintf(returnBuffer, 256, "%f %f %f %f %f %f %f",
+	   dSprintf(returnBuffer, bufSize, "%f %f %f %f %f %f %f",
          decalInstance->mPosition.x, decalInstance->mPosition.y, decalInstance->mPosition.z, 
 		   decalInstance->mTangent.x, decalInstance->mTangent.y, decalInstance->mTangent.z,
 		   decalInstance->mSize);

@@ -76,6 +76,9 @@ Frustum::Frustum( bool isOrtho,
    mNumTiles = 1;
    mCurrTile.set(0,0);
    mTileOverlap.set(0.0f, 0.0f);
+
+   mProjectionOffset.zero();
+   mProjectionOffsetMatrix.identity();
 }
 
 //-----------------------------------------------------------------------------
@@ -221,6 +224,100 @@ void Frustum::cropNearFar(F32 newNearDist, F32 newFarDist)
 
    set( mIsOrtho, mNearLeft * newOverOld, mNearRight * newOverOld, mNearTop * newOverOld, mNearBottom * newOverOld, 
       newNearDist, newFarDist, mTransform);
+}
+
+//-----------------------------------------------------------------------------
+
+bool Frustum::bakeProjectionOffset()
+{
+   // Nothing to bake if ortho
+   if( mIsOrtho )
+      return false;
+
+   // Nothing to bake if no offset
+   if( mProjectionOffset.isZero() )
+      return false;
+
+   // Near plane points in camera space
+   Point3F np[4];
+   np[0].set( mNearLeft, mNearDist, mNearTop );       // NearTopLeft
+   np[1].set( mNearRight, mNearDist, mNearTop );      // NearTopRight
+   np[2].set( mNearLeft, mNearDist, mNearBottom );    // NearBottomLeft
+   np[3].set( mNearRight, mNearDist, mNearBottom );   // NearBottomRight
+
+   // Generate the near plane
+   PlaneF nearPlane( np[0], np[1], np[3] );
+
+   // Far plane points in camera space
+   const F32 farOverNear = mFarDist / mNearDist;
+   Point3F fp0( mNearLeft * farOverNear, mFarDist, mNearTop * farOverNear );     // FarTopLeft
+   Point3F fp1( mNearRight * farOverNear, mFarDist, mNearTop * farOverNear );    // FarTopRight
+   Point3F fp2( mNearLeft * farOverNear, mFarDist, mNearBottom * farOverNear );  // FarBottomLeft
+   Point3F fp3( mNearRight * farOverNear, mFarDist, mNearBottom * farOverNear ); // FarBottomRight
+
+   // Generate the far plane
+   PlaneF farPlane( fp0, fp1, fp3 );
+
+   // The offset camera point
+   Point3F offsetCamera( mProjectionOffset.x, 0.0f, mProjectionOffset.y );
+
+   // The near plane point we'll be using for our calculations below
+   U32 nIndex = 0;
+   if( mProjectionOffset.x < 0.0 )
+   {
+      // Offset to the left so we'll need to use the near plane point on the right
+      nIndex = 1;
+   }
+   if( mProjectionOffset.y > 0.0 )
+   {
+      // Offset to the top so we'll need to use the near plane point at the bottom
+      nIndex += 2;
+   }
+
+   // Begin by calculating the offset point on the far plane as it goes
+   // from the offset camera to the edge of the near plane.
+   Point3F farPoint;
+   Point3F fdir = np[nIndex] - offsetCamera;
+   fdir.normalize();
+   if( farPlane.intersect(offsetCamera, fdir, &farPoint) )
+   {
+      // Calculate the new near plane edge from the non-offset camera position
+      // to the far plane point from above.
+      Point3F nearPoint;
+      Point3F ndir = farPoint;
+      ndir.normalize();
+      if( nearPlane.intersect( Point3F::Zero, ndir, &nearPoint) )
+      {
+         // Handle a x offset
+         if( mProjectionOffset.x < 0.0 )
+         {
+            // The new near plane right side
+            mNearRight = nearPoint.x;
+         }
+         else if( mProjectionOffset.x > 0.0 )
+         {
+            // The new near plane left side
+            mNearLeft = nearPoint.x;
+         }
+
+         // Handle a y offset
+         if( mProjectionOffset.y < 0.0 )
+         {
+            // The new near plane top side
+            mNearTop = nearPoint.y;
+         }
+         else if( mProjectionOffset.y > 0.0 )
+         {
+            // The new near plane bottom side
+            mNearBottom = nearPoint.y;
+         }
+      }
+   }
+
+   mDirty = true;
+
+   // Indicate that we've modified the frustum
+   return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -433,12 +530,27 @@ void Frustum::mulL( const MatrixF& mat )
 
 //-----------------------------------------------------------------------------
 
+void Frustum::setProjectionOffset(const Point2F& offsetMat)
+{
+   mProjectionOffset = offsetMat;
+   mProjectionOffsetMatrix.identity();
+   mProjectionOffsetMatrix.setPosition(Point3F(mProjectionOffset.x, mProjectionOffset.y, 0.0f));
+}
+
+//-----------------------------------------------------------------------------
+
 void Frustum::getProjectionMatrix( MatrixF *proj, bool gfxRotate ) const
 {
    if (mIsOrtho)
+   {
       MathUtils::makeOrthoProjection(proj, mNearLeft, mNearRight, mNearTop, mNearBottom, mNearDist, mFarDist, gfxRotate);
+      proj->mulL(mProjectionOffsetMatrix);
+   }
    else
+   {
       MathUtils::makeProjection(proj, mNearLeft, mNearRight, mNearTop, mNearBottom, mNearDist, mFarDist, gfxRotate);
+      proj->mulL(mProjectionOffsetMatrix);
+   }
 }
 
 //-----------------------------------------------------------------------------

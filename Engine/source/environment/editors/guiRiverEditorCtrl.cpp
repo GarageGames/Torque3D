@@ -1430,9 +1430,10 @@ ConsoleMethod( GuiRiverEditorCtrl, setNodeDepth, void, 3, 3, "" )
 
 ConsoleMethod( GuiRiverEditorCtrl, getNodePosition, const char*, 2, 2, "" )
 {
-	char* returnBuffer = Con::getReturnBuffer(256);
+	static const U32 bufSize = 256;
+	char* returnBuffer = Con::getReturnBuffer(bufSize);
 
-	dSprintf(returnBuffer, 256, "%f %f %f",
+	dSprintf(returnBuffer, bufSize, "%f %f %f",
       object->getNodePosition().x, object->getNodePosition().y, object->getNodePosition().z);
 
 	return returnBuffer;
@@ -1456,9 +1457,10 @@ ConsoleMethod( GuiRiverEditorCtrl, setNodePosition, void, 3, 3, "" )
 
 ConsoleMethod( GuiRiverEditorCtrl, getNodeNormal, const char*, 2, 2, "" )
 {
-   char* returnBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
 
-	dSprintf(returnBuffer, 256, "%f %f %f",
+	dSprintf(returnBuffer, bufSize, "%f %f %f",
       object->getNodeNormal().x, object->getNodeNormal().y, object->getNodeNormal().z);
 
 	return returnBuffer;

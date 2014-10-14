@@ -86,15 +86,34 @@ bool ITickable::advanceTime( U32 timeDelta )
 
    // Advance objects
    if( tickCount )
+   {
       for( ; smLastTick != targetTick; smLastTick += smTickMs )
-         for( ProcessListIterator i = getProcessList().begin(); i != getProcessList().end(); i++ )
-            if( (*i)->isProcessingTicks() )
-               (*i)->processTick();
+      {
+         for( U32 i=0; i < getProcessList().size(); )
+         {
+            ITickable* iTick = getProcessList()[i];
+            if( iTick->isProcessingTicks() )
+            {
+               iTick->processTick();
+
+               // Only advance counter if the tickable hasn't deleted itself
+               if( i < getProcessList().size() && iTick == getProcessList()[i] )
+                  ++i;
+            }
+            else
+            {
+               // Move onto the next tickable
+               ++i;
+            }
+         }
+      }
+   }
 
    smLastDelta = ( smTickMs - ( targetTime & smTickMask ) ) & smTickMask;
    F32 dt = smLastDelta / F32( smTickMs );
 
-   // Now interpolate objects that want ticks
+   // Now interpolate objects that want ticks.  Note that an object should never delete
+   // itself during an interpolateTick().
    for( ProcessListIterator i = getProcessList().begin(); i != getProcessList().end(); i++ )
       if( (*i)->isProcessingTicks() )
          (*i)->interpolateTick( dt );
@@ -102,8 +121,15 @@ bool ITickable::advanceTime( U32 timeDelta )
 
    // Inform ALL objects that time was advanced
    dt = F32( timeDelta ) / 1000.f;
-   for( ProcessListIterator i = getProcessList().begin(); i != getProcessList().end(); i++ )
-      (*i)->advanceTime( dt );
+   for( U32 i=0; i < getProcessList().size(); )
+   {
+      ITickable* iTick = getProcessList()[i];
+      iTick->advanceTime( dt );
+
+      // Only advance counter if the tickable hasn't deleted itself
+      if( i < getProcessList().size() && iTick == getProcessList()[i] )
+         ++i;
+   }
 
    smLastTime = targetTime;
 

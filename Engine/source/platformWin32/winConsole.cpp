@@ -130,7 +130,7 @@ WinConsole::~WinConsole()
 void WinConsole::printf(const char *s, ...)
 {
    // Get the line into a buffer.
-   static const int BufSize = 4096;
+   static const S32 BufSize = 4096;
    static char buffer[4096];
    DWORD bytes;
    va_list args;

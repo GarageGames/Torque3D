@@ -119,7 +119,7 @@ struct DXDIAG_INIT_PARAMS
 
 struct IDxDiagContainer : public IUnknown
 {
-   virtual HRESULT   STDMETHODCALLTYPE GetNumberOfChildContaiiners( DWORD* pdwCount ) = 0;
+   virtual HRESULT   STDMETHODCALLTYPE GetNumberOfChildContainers( DWORD* pdwCount ) = 0;
    virtual HRESULT   STDMETHODCALLTYPE EnumChildContainerNames( DWORD dwIndex, LPWSTR pwszContainer, DWORD cchContainer ) = 0;
    virtual HRESULT   STDMETHODCALLTYPE GetChildContainer( LPCWSTR pwszContainer, IDxDiagContainer** ppInstance ) = 0;
    virtual HRESULT   STDMETHODCALLTYPE GetNumberOfProps( DWORD* pdwCount ) = 0;
@@ -361,6 +361,28 @@ bool WMIVideoInfo::_queryPropertyDxDiag( const PVIQueryType queryType, const U32
       IDxDiagContainer* displayDevicesContainer = 0;
       IDxDiagContainer* deviceContainer = 0;
 
+      // Special case to deal with PVI_NumAdapters
+      if(queryType == PVI_NumAdapters)
+      {
+         DWORD count = 0;
+         String value;
+
+         if( mDxDiagProvider->GetRootContainer( &rootContainer ) == S_OK
+            && rootContainer->GetChildContainer( L"DxDiag_DisplayDevices", &displayDevicesContainer ) == S_OK
+            && displayDevicesContainer->GetNumberOfChildContainers( &count ) == S_OK )
+         {
+            value = String::ToString("%d", count);
+         }
+
+         if( rootContainer )
+            SAFE_RELEASE( rootContainer );
+         if( displayDevicesContainer )
+            SAFE_RELEASE( displayDevicesContainer );
+
+         *outValue = value;
+         return true;
+      }
+
       WCHAR adapterIdString[ 2 ];
       adapterIdString[ 0 ] = L'0' + adapterId;
       adapterIdString[ 1 ] = L'\0';
@@ -546,9 +568,20 @@ bool WMIVideoInfo::_queryPropertyWMI( const PVIQueryType queryType, const U32 ad
             LONG longVal = v.lVal;
 
             if( queryType == PVI_VRAM )
+            {
                longVal = longVal >> 20; // Convert to megabytes
 
-            *outValue = String::ToString( (S32)longVal );
+               // While this value is reported as a signed integer, it is possible
+               // for video cards to have 2GB or more.  In those cases the signed
+               // bit is set and will give us a negative number.  Treating this
+               // as unsigned will allows us to handle video cards with up to
+               // 4GB of memory.  After that we'll need a new solution from Microsoft.
+               *outValue = String::ToString( (U32)longVal );
+            }
+            else
+            {
+               *outValue = String::ToString( (S32)longVal );
+            }
             break;
          }
 

@@ -88,10 +88,10 @@ public:
    /// This is just for createPlatformFont to call.
    ///
    /// @todo Rethink this so we don't have a private public.
-   virtual bool create(const char *name, U32 size, U32 charset = TGE_ANSI_CHARSET) = 0;
+   virtual bool create( const char *name, dsize_t size, U32 charset = TGE_ANSI_CHARSET ) = 0;
    static void enumeratePlatformFonts( Vector<StringTableEntry>& fonts, UTF16* fontFamily = NULL );
 };
 
-extern PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset = TGE_ANSI_CHARSET);
+extern PlatformFont *createPlatformFont(const char *name, dsize_t size, U32 charset = TGE_ANSI_CHARSET);
 
 #endif // _PLATFORMFONT_H_

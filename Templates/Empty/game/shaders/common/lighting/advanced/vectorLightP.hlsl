@@ -73,7 +73,7 @@ float4 main( FarFrustumQuadConnectP IN,
 
    // Use eye ray to get ws pos
    float4 worldPos = float4(eyePosWorld + IN.wsEyeRay * depth, 1.0f);
-
+   
    // Get the light attenuation.
    float dotNL = dot(-lightDirection, normal);
 
@@ -198,7 +198,7 @@ float4 main( FarFrustumQuadConnectP IN,
    // Specular term
    float specular = AL_CalcSpecular(   -lightDirection, 
                                        normal, 
-                                       normalize(-IN.vsEyeRay) ) * lightColor.a;
+                                       normalize(-IN.vsEyeRay) ) * lightBrightness * shadowed;
                                     
    float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
    float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;

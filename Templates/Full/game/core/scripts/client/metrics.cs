@@ -142,8 +142,6 @@ function decalMetricsCallback()
 function renderMetricsCallback()
 {
    return "  | Render |" @
-          "  Int: " @ $RenderMetrics::RIT_Interior @
-          "  IntDL: " @ $RenderMetrics::RIT_InteriorDynamicLighting @
           "  Mesh: " @ $RenderMetrics::RIT_Mesh @
           "  MeshDL: " @ $RenderMetrics::RIT_MeshDynamicLighting @
           "  Shadow: " @ $RenderMetrics::RIT_Shadow @

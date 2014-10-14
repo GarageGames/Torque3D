@@ -38,6 +38,7 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/shapeBase.h"
 #include "gfx/gfxOcclusionQuery.h"
+#include "gfx/gfxTextureManager.h"
 #include "gfx/sim/cubemapData.h"
 #include "math/util/matrixSet.h"
 #include "sfx/sfxAmbience.h"
@@ -90,6 +91,7 @@ void WaterMatParams::clear()
    mSpecularParamsSC = NULL;
    mDepthGradMaxSC = NULL;
    mReflectivitySC = NULL;
+   mDepthGradSamplerSC = NULL;
 }
 
 void WaterMatParams::init( BaseMatInstance* matInst )
@@ -131,6 +133,7 @@ void WaterMatParams::init( BaseMatInstance* matInst )
    mSpecularParamsSC = matInst->getMaterialParameterHandle( "$specularParams" );   
    mDepthGradMaxSC = matInst->getMaterialParameterHandle( "$depthGradMax" );
    mReflectivitySC = matInst->getMaterialParameterHandle( "$reflectivity" );
+   mDepthGradSamplerSC = matInst->getMaterialParameterHandle( "$depthGradMap" );
 }
 
 
@@ -731,6 +734,11 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
    bool doQuery = ( !mPlaneReflector.mQueryPending && query && mReflectorDesc.useOcclusionQuery );
 
+   // We need to call this for avoid a DX9 or Nvidia bug.
+   // At some resollutions read from render target,
+   // break current occlusion query.
+   REFLECTMGR->getRefractTex();
+
    if ( doQuery )
       query->begin();
 
@@ -746,22 +754,20 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
 void WaterObject::setCustomTextures( S32 matIdx, U32 pass, const WaterMatParams &paramHandles )
 {
-   // TODO: Retrieve sampler numbers from parameter handles, see r22631.
-   
    // Always use the ripple texture.
-   GFX->setTexture( 0, mRippleTex );
+   GFX->setTexture( paramHandles.mRippleSamplerSC->getSamplerRegister(pass), mRippleTex );
 
    // Only above-water in advanced-lighting uses the foam texture.
    if ( matIdx == WaterMat )
    {
-      GFX->setTexture( 5, mFoamTex );
-      GFX->setTexture( 6, mDepthGradientTex );
+      GFX->setTexture( paramHandles.mFoamSamplerSC->getSamplerRegister(pass), mFoamTex );
+      GFX->setTexture( paramHandles.mDepthGradSamplerSC->getSamplerRegister(pass), mDepthGradientTex );
    }
 
    if ( ( matIdx == WaterMat || matIdx == BasicWaterMat ) && mCubemap )   
-      GFX->setCubeTexture( 4, mCubemap->mCubemap );
-   else
-      GFX->setCubeTexture( 4, NULL );
+      GFX->setCubeTexture( paramHandles.mCubemapSamplerSC->getSamplerRegister(pass), mCubemap->mCubemap );
+   else if(paramHandles.mCubemapSamplerSC->getSamplerRegister(pass) != -1 )
+      GFX->setCubeTexture( paramHandles.mCubemapSamplerSC->getSamplerRegister(pass), NULL );
 }
 
 void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
@@ -1152,12 +1158,12 @@ void WaterObject::initTextures()
    if ( mRippleTexName.isNotEmpty() )
       mRippleTex.set( mRippleTexName, &GFXDefaultStaticDiffuseProfile, "WaterObject::mRippleTex" );
    if ( mRippleTex.isNull() )
-      mRippleTex.set( "core/art/warnmat", &GFXDefaultStaticDiffuseProfile, "WaterObject::mRippleTex" );
+      mRippleTex.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "WaterObject::mRippleTex" );
 
    if ( mDepthGradientTexName.isNotEmpty() )
       mDepthGradientTex.set( mDepthGradientTexName, &GFXDefaultStaticDiffuseProfile, "WaterObject::mDepthGradientTex" );
    if ( mDepthGradientTex.isNull() )
-      mDepthGradientTex.set( "core/art/warnmat", &GFXDefaultStaticDiffuseProfile, "WaterObject::mDepthGradientTex" );
+      mDepthGradientTex.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "WaterObject::mDepthGradientTex" );
    
    if ( mNamedDepthGradTex.isRegistered() )
       mNamedDepthGradTex.setTexture( mDepthGradientTex );
@@ -1165,7 +1171,7 @@ void WaterObject::initTextures()
    if ( mFoamTexName.isNotEmpty() )
       mFoamTex.set( mFoamTexName, &GFXDefaultStaticDiffuseProfile, "WaterObject::mFoamTex" );
    if ( mFoamTex.isNull() )
-      mFoamTex.set( "core/art/warnmat", &GFXDefaultStaticDiffuseProfile, "WaterObject::mFoamTex" );
+      mFoamTex.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "WaterObject::mFoamTex" );
 
    if ( mCubemapName.isNotEmpty() )
       Sim::findObject( mCubemapName, mCubemap );   

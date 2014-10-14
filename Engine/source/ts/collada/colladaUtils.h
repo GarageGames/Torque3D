@@ -185,7 +185,7 @@ template<> inline MatrixF vecToMatrixF<domRotate>(const domListOfFloats& vec)
 template<> inline MatrixF vecToMatrixF<domMatrix>(const domListOfFloats& vec)
 {
    MatrixF mat;
-   for (int i = 0; i < 16; i++)
+   for (S32 i = 0; i < 16; i++)
       mat[i] = vec[i];
    return mat;
 }
@@ -332,7 +332,7 @@ public:
 
       // If no input params were specified, just map the source params directly
       if (!offsets.size()) {
-         for (int iParam = 0; iParam < accessor->getParam_array().getCount(); iParam++)
+         for (S32 iParam = 0; iParam < accessor->getParam_array().getCount(); iParam++)
             offsets.push_back(iParam);
       }
 
@@ -348,9 +348,9 @@ public:
 
    //------------------------------------------------------
    // Get a pointer to the start of a group of values (index advances by stride)
-   //template<class T> T getArrayData(int index) const { return 0; }
+   //template<class T> T getArrayData(S32 index) const { return 0; }
 
-   const double* getStringArrayData(int index) const
+   const double* getStringArrayData(S32 index) const
    {
       if ((index >= 0) && (index < size())) {
          if (source->getFloat_array())
@@ -361,9 +361,9 @@ public:
 
    //------------------------------------------------------
    // Read a single value from the source array
-   //template<class T> T getValue(int index) const { return T; }
+   //template<class T> T getValue(S32 index) const { return T; }
 
-   const char* getStringValue(int index) const
+   const char* getStringValue(S32 index) const
    {
       if ((index >= 0) && (index < size())) {
          // could be plain strings or IDREFs
@@ -375,7 +375,7 @@ public:
       return "";
    }
 
-   F32 getFloatValue(int index) const
+   F32 getFloatValue(S32 index) const
    {
       F32 value(0);
       if (const double* data = getStringArrayData(index))
@@ -383,7 +383,7 @@ public:
       return value;
    }
 
-   Point2F getPoint2FValue(int index) const
+   Point2F getPoint2FValue(S32 index) const
    {
       Point2F value(0, 0);
       if (const double* data = getStringArrayData(index))
@@ -391,7 +391,7 @@ public:
       return value;
    }
 
-   Point3F getPoint3FValue(int index) const
+   Point3F getPoint3FValue(S32 index) const
    {
       Point3F value(1, 0, 0);
       if (const double* data = getStringArrayData(index))
@@ -399,7 +399,7 @@ public:
       return value;
    }
 
-   ColorI getColorIValue(int index) const
+   ColorI getColorIValue(S32 index) const
    {
       ColorI value(255, 255, 255, 255);
       if (const double* data = getStringArrayData(index))
@@ -413,11 +413,11 @@ public:
       return value;
    }
 
-   MatrixF getMatrixFValue(int index) const
+   MatrixF getMatrixFValue(S32 index) const
    {
       MatrixF value(true);
       if (const double* data = getStringArrayData(index)) {
-         for (int i = 0; i < 16; i++)
+         for (S32 i = 0; i < 16; i++)
             value[i] = data[i];
       }
       return value;
@@ -430,6 +430,8 @@ public:
 class BasePrimitive
 {
 public:
+   virtual ~BasePrimitive() { }
+
    /// Return true if the element is a geometric primitive type
    static bool isPrimitive(const daeElement* element)
    {
@@ -486,7 +488,7 @@ public:
 
       // Determine stride
       stride = 0;
-      for (int iInput = 0; iInput < getInputs().getCount(); iInput++) {
+      for (S32 iInput = 0; iInput < getInputs().getCount(); iInput++) {
          if (getInputs()[iInput]->getOffset() >= stride)
             stride = getInputs()[iInput]->getOffset() + 1;
       }
@@ -524,7 +526,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTrian
       // Convert strips to triangles
       pTriangleData = new domListOfUInts();
 
-      for (int iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
+      for (S32 iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
 
          domP* P = primitive->getP_array()[iStrip];
 
@@ -537,7 +539,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTrian
 
          // Convert the strip back to a triangle list
          domUint* v0 = pSrcData;
-         for (int iTri = 0; iTri < numTriangles; iTri++, v0 += stride) {
+         for (S32 iTri = 0; iTri < numTriangles; iTri++, v0 += stride) {
             if (iTri & 0x1)
             {
                // CW triangle
@@ -565,7 +567,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangl
       // Convert strips to triangles
       pTriangleData = new domListOfUInts();
 
-      for (int iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
+      for (S32 iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
 
          domP* P = primitive->getP_array()[iStrip];
 
@@ -578,7 +580,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangl
 
          // Convert the fan back to a triangle list
          domUint* v0 = pSrcData + stride;
-         for (int iTri = 0; iTri < numTriangles; iTri++, v0 += stride) {
+         for (S32 iTri = 0; iTri < numTriangles; iTri++, v0 += stride) {
             pTriangleData->appendArray(stride, pSrcData);   // shared vertex
             pTriangleData->appendArray(stride, v0);         // previous vertex
             pTriangleData->appendArray(stride, v0+stride);  // current vertex
@@ -597,7 +599,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriang
       // Convert polygons to triangles
       pTriangleData = new domListOfUInts();
 
-      for (int iPoly = 0; iPoly < primitive->getCount(); iPoly++) {
+      for (S32 iPoly = 0; iPoly < primitive->getCount(); iPoly++) {
 
          domP* P = primitive->getP_array()[iPoly];
 
@@ -612,7 +614,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriang
          // converting the polygon to triangles.
          domUint* v0 = pSrcData;
          pSrcData += stride;
-         for (int iTri = 0; iTri < numPoints-2; iTri++) {
+         for (S32 iTri = 0; iTri < numPoints-2; iTri++) {
             pTriangleData->appendArray(stride, v0);
             pTriangleData->appendArray(stride*2, pSrcData);
             pSrcData += stride;
@@ -636,7 +638,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
       const domListOfUInts& vcount = primitive->getVcount()->getValue();
 
       U32 expectedCount = 0;
-      for (int iPoly = 0; iPoly < vcount.getCount(); iPoly++)
+      for (S32 iPoly = 0; iPoly < vcount.getCount(); iPoly++)
          expectedCount += vcount[iPoly];
       expectedCount *= stride;
 
@@ -648,13 +650,13 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
       }
 
       domUint* pSrcData = &(primitive->getP()->getValue()[0]);
-      for (int iPoly = 0; iPoly < vcount.getCount(); iPoly++) {
+      for (S32 iPoly = 0; iPoly < vcount.getCount(); iPoly++) {
 
          // Use a simple tri-fan (centered at the first point) method of
          // converting the polygon to triangles.
          domUint* v0 = pSrcData;
          pSrcData += stride;
-         for (int iTri = 0; iTri < vcount[iPoly]-2; iTri++) {
+         for (S32 iTri = 0; iTri < vcount[iPoly]-2; iTri++) {
             pTriangleData->appendArray(stride, v0);
             pTriangleData->appendArray(stride*2, pSrcData);
             pSrcData += stride;
@@ -671,7 +673,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
 template<typename T> inline T convert(const char* value) { return value; }
 template<> inline bool convert(const char* value) { return dAtob(value); }
 template<> inline S32 convert(const char* value) { return dAtoi(value); }
-template<> inline double convert(const char* value) { return dAtof(value); }
+template<> inline F64 convert(const char* value) { return dAtof(value); }
 template<> inline F32 convert(const char* value) { return convert<double>(value); }
 
 //-----------------------------------------------------------------------------
@@ -713,7 +715,7 @@ struct AnimData
 
    AnimData() : enabled(false) { }
 
-   void parseTargetString(const char* target, int fullCount, const char* elements[]);
+   void parseTargetString(const char* target, S32 fullCount, const char* elements[]);
 
    F32 invertParamCubic(F32 param, F32 x0, F32 x1, F32 x2, F32 x3) const;
    void interpValue(F32 t, U32 offset, double* value) const;
@@ -757,7 +759,7 @@ struct AnimatedElement
          // Animate the value
          const AnimChannels* channels = AnimData::getAnimChannels(element);
          if (channels && (time >= 0)) {
-            for (int iChannel = 0; iChannel < channels->size(); iChannel++) {
+            for (S32 iChannel = 0; iChannel < channels->size(); iChannel++) {
                const AnimData* animData = (*channels)[iChannel];
                if (animData->enabled)
                   animData->interpValue(time, 0, &value);
@@ -787,10 +789,10 @@ template<class T> struct AnimatedElementList : public AnimatedElement<T>
          // Animate the vector
          const AnimChannels* channels = AnimData::getAnimChannels(this->element);
          if (channels && (time >= 0)) {
-            for (int iChannel = 0; iChannel < channels->size(); iChannel++) {
+            for (S32 iChannel = 0; iChannel < channels->size(); iChannel++) {
                const AnimData* animData = (*channels)[iChannel];
                if (animData->enabled) {
-                  for (int iValue = 0; iValue < animData->targetValueCount; iValue++)
+                  for (S32 iValue = 0; iValue < animData->targetValueCount; iValue++)
                      animData->interpValue(time, iValue, &vec[animData->targetValueOffset + iValue]);
                }
             }

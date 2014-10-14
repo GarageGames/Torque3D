@@ -71,6 +71,25 @@ public:
    /// @return The current desktop bit depth, or Point2I(-1,-1) if an error occurred
    virtual Point2I getDesktopResolution() = 0;
 
+   // Build out the monitor list.
+   virtual void buildMonitorsList() {}
+
+   // Find the first monitor index that matches the given name.  The actual match
+   // algorithm depends on the implementation.  Provides a default value of -1 to
+   // indicate no match.
+   virtual S32 findFirstMatchingMonitor(const char* name) { return -1; }
+
+   // Retrieve the number of monitors.  Provides a default count of 0 for systems that
+   // don't provide information on connected monitors.
+   virtual U32 getMonitorCount() { return 0; }
+
+   // Get the name of the requested monitor.  Provides a default of "" for platorms
+   // that do not provide information on connected monitors.
+   virtual const char* getMonitorName(U32 index) { return ""; }
+
+   // Get the requested monitor's rectangular region.
+   virtual RectI getMonitorRect(U32 index) { return RectI(0, 0, 0, 0); }
+
    /// Populate a vector with all monitors and their extents in window space.
    virtual void getMonitorRegions(Vector<RectI> &regions) = 0;
 
@@ -113,6 +132,9 @@ public:
    ///
    /// This method removes the curtain window.
    virtual void raiseCurtain()=0;
+
+   /// This method indicates to created windows to show as normal.
+   virtual void setDisplayWindow(bool set){}
 
 private:
    /// Process command line arguments from StandardMainLoop. This is done to

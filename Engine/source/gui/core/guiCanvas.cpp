@@ -26,7 +26,6 @@
 #include "console/console.h"
 #include "console/engineAPI.h"
 #include "platform/profiler.h"
-#include "platform/event.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiTypes.h"
@@ -122,7 +121,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mMiddleMouseLast(false),
                         mRightMouseLast(false),
                         mPlatformWindow(NULL),
-                        mLastRenderMs(0)
+                        mLastRenderMs(0),
+                        mDisplayWindow(true)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -177,6 +177,8 @@ void GuiCanvas::initPersistFields()
 
    addGroup("Canvas Rendering");
    addProtectedField( "numFences", TypeS32, Offset( mNumFences, GuiCanvas ), &setProtectedNumFences, &defaultProtectedGetFn, "The number of GFX fences to use." );
+
+   addField("displayWindow", TypeBool, Offset(mDisplayWindow, GuiCanvas), "Controls if the canvas window is rendered or not." );
    endGroup("Canvas Rendering");
 
    Parent::initPersistFields();
@@ -252,6 +254,19 @@ bool GuiCanvas::onAdd()
 
    // Make sure we're able to render.
    newDevice->setAllowRender( true );
+
+   if(mDisplayWindow)
+   {
+      getPlatformWindow()->show();
+      WindowManager->setDisplayWindow(true);
+      getPlatformWindow()->setDisplayWindow(true);
+   }
+   else
+   {
+      getPlatformWindow()->hide();
+      WindowManager->setDisplayWindow(false);
+      getPlatformWindow()->setDisplayWindow(false);
+   }
 
    // Propagate add to parents.
    // CodeReview - if GuiCanvas fails to add for whatever reason, what happens to
@@ -1562,7 +1577,7 @@ void GuiCanvas::setupFences()
       mFences = new GFXFence*[mNumFences];
 
       // Allocate the new fences
-      for( int i = 0; i < mNumFences; i++ )
+      for( S32 i = 0; i < mNumFences; i++ )
          mFences[i] = GFX->createFence();
    }
 
@@ -2315,6 +2330,40 @@ DefineEngineMethod( GuiCanvas, setWindowTitle, void, ( const char* newTitle),,
 }
 
 
+DefineEngineMethod( GuiCanvas, findFirstMatchingMonitor, S32, (const char* name),,
+				   "@brief Find the first monitor index that matches the given name.\n\n"
+               "The actual match algorithm depends on the implementation.\n"
+               "@param name The name to search for.\n\n"
+				   "@return The number of monitors attached to the system, including the default monoitor.")
+{
+   return PlatformWindowManager::get()->findFirstMatchingMonitor(name);
+}
+
+DefineEngineMethod( GuiCanvas, getMonitorCount, S32, (),,
+				   "@brief Gets the number of monitors attached to the system.\n\n"
+
+				   "@return The number of monitors attached to the system, including the default monoitor.")
+{
+   return PlatformWindowManager::get()->getMonitorCount();
+}
+
+DefineEngineMethod( GuiCanvas, getMonitorName, const char*, (S32 index),,
+				   "@brief Gets the name of the requested monitor.\n\n"
+               "@param index The monitor index.\n\n"
+				   "@return The name of the requested monitor.")
+{
+   return PlatformWindowManager::get()->getMonitorName(index);
+}
+
+DefineEngineMethod( GuiCanvas, getMonitorRect, RectI, (S32 index),,
+				   "@brief Gets the region of the requested monitor.\n\n"
+               "@param index The monitor index.\n\n"
+				   "@return The rectangular region of the requested monitor.")
+{
+   return PlatformWindowManager::get()->getMonitorRect(index);
+}
+
+
 DefineEngineMethod( GuiCanvas, getVideoMode, const char*, (),,
 				   "@brief Gets the current screen mode as a string.\n\n"
 
@@ -2649,4 +2698,24 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
 
    // Store the new mode into a pref.
    Con::setVariable( "$pref::Video::mode", vm.toString() );
+}
+
+ConsoleMethod( GuiCanvas, showWindow, void, 2, 2, "" )
+{
+   if (!object->getPlatformWindow())
+      return;
+
+   object->getPlatformWindow()->show();
+   WindowManager->setDisplayWindow(true);
+   object->getPlatformWindow()->setDisplayWindow(true);
+}
+
+ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
+{
+   if (!object->getPlatformWindow())
+      return;
+
+   object->getPlatformWindow()->hide();
+   WindowManager->setDisplayWindow(false);
+   object->getPlatformWindow()->setDisplayWindow(false);
 }

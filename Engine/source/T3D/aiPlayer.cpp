@@ -28,6 +28,8 @@
 #include "T3D/gameBase/moveManager.h"
 #include "console/engineAPI.h"
 
+static U32 sAIPlayerLoSMask = TerrainObjectType | StaticShapeObjectType | StaticObjectType;
+
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);
 
 ConsoleDocClass( AIPlayer,
@@ -417,33 +419,26 @@ bool AIPlayer::getAIMove(Move *movePtr)
    // Test for target location in sight if it's an object. The LOS is
    // run from the eye position to the center of the object's bounding,
    // which is not very accurate.
-   if (mAimObject) {
-      MatrixF eyeMat;
-      getEyeTransform(&eyeMat);
-      eyeMat.getColumn(3,&location);
-      Point3F targetLoc = mAimObject->getBoxCenter();
-
-      // This ray ignores non-static shapes. Cast Ray returns true
-      // if it hit something.
-      RayInfo dummy;
-      if (getContainer()->castRay( location, targetLoc,
-            InteriorObjectType | StaticShapeObjectType | StaticObjectType |
-            TerrainObjectType, &dummy)) {
-         if (mTargetInLOS) {
-            throwCallback( "onTargetExitLOS" );
-            mTargetInLOS = false;
-         }
-      }
-      else
-         if (!mTargetInLOS) {
-            throwCallback( "onTargetEnterLOS" );
+   if (mAimObject)
+   {
+      if (checkInLos(mAimObject.getPointer()))
+      {
+         if (!mTargetInLOS)
+         {
+            throwCallback("onTargetEnterLOS");
             mTargetInLOS = true;
          }
+      }
+      else if (mTargetInLOS)
+      {
+         throwCallback("onTargetExitLOS");
+         mTargetInLOS = false;
+      }
    }
 
    // Replicate the trigger state into the move so that
    // triggers can be controlled from scripts.
-   for( int i = 0; i < MaxTriggerKeys; i++ )
+   for( S32 i = 0; i < MaxTriggerKeys; i++ )
       movePtr->trigger[i] = getImageTriggerState(i);
 
    mLastLocation = location;
@@ -609,4 +604,113 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
 {
 	GameBase* obj = object->getAimObject();
    return obj? obj->getId(): -1;
+}
+
+bool AIPlayer::checkInLos(GameBase* target, bool _useMuzzle, bool _checkEnabled)
+{
+   if (!isServerObject()) return false;
+   if (!target)
+   {
+      target = mAimObject.getPointer();
+      if (!target)
+         return false;
+   }
+   if (_checkEnabled)
+   {
+       if (target->getTypeMask() & ShapeBaseObjectType)
+       {
+           ShapeBase *shapeBaseCheck = static_cast<ShapeBase *>(target);
+           if (shapeBaseCheck)
+               if (shapeBaseCheck->getDamageState() != Enabled) return false;
+       }
+       else
+           return false;
+   }
+
+   RayInfo ri;
+
+   disableCollision();
+
+   S32 mountCount = target->getMountedObjectCount();
+   for (S32 i = 0; i < mountCount; i++)
+   {
+      target->getMountedObject(i)->disableCollision();
+   }
+
+   Point3F checkPoint ;
+   if (_useMuzzle)
+      getMuzzlePointAI(0, &checkPoint );
+   else
+   {
+      MatrixF eyeMat;
+      getEyeTransform(&eyeMat);
+      eyeMat.getColumn(3, &checkPoint );
+   }
+
+   bool hit = !gServerContainer.castRay(checkPoint, target->getBoxCenter(), sAIPlayerLoSMask, &ri);
+   enableCollision();
+
+   for (S32 i = 0; i < mountCount; i++)
+   {
+      target->getMountedObject(i)->enableCollision();
+   }
+   return hit;
+}
+
+DefineEngineMethod(AIPlayer, checkInLos, bool, (ShapeBase* obj,  bool useMuzzle, bool checkEnabled),(NULL, false, false),
+   "@brief Check whether an object is in line of sight.\n"
+   "@obj Object to check. (If blank, it will check the current target).\n"
+   "@useMuzzle Use muzzle position. Otherwise use eye position. (defaults to false).\n"
+   "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
+{
+   return object->checkInLos(obj, useMuzzle, checkEnabled);
+}
+
+bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
+{
+   if (!isServerObject()) return false;
+   if (!target)
+   {
+      target = mAimObject.getPointer();
+      if (!target)
+         return false;
+   }
+   if (_checkEnabled)
+   {
+       if (target->getTypeMask() & ShapeBaseObjectType)
+       {
+           ShapeBase *shapeBaseCheck = static_cast<ShapeBase *>(target);
+           if (shapeBaseCheck)
+               if (shapeBaseCheck->getDamageState() != Enabled) return false;
+       }
+       else
+           return false;
+   }
+
+   MatrixF cam = getTransform();
+   Point3F camPos;
+   VectorF camDir;
+
+   cam.getColumn(3, &camPos);
+   cam.getColumn(1, &camDir);
+
+   camFov = mDegToRad(camFov) / 2;
+
+   Point3F shapePos = target->getBoxCenter();
+   VectorF shapeDir = shapePos - camPos;
+   // Test to see if it's within our viewcone, this test doesn't
+   // actually match the viewport very well, should consider
+   // projection and box test.
+   shapeDir.normalize();
+   F32 dot = mDot(shapeDir, camDir);
+   return (dot > camFov);
+}
+
+DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (NULL, 45.0f, false),
+   "@brief Check whether an object is within a specified veiw cone.\n"
+   "@obj Object to check. (If blank, it will check the current target).\n"
+   "@fov view angle in degrees.(Defaults to 45)\n"
+   "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
+{
+   return object->checkInFoV(obj, fov, checkEnabled);
 }

@@ -45,6 +45,7 @@
 #include "postFx/postEffectManager.h"
 #include "postFx/postEffectVis.h"
 
+using namespace Torque;
 
 ConsoleDocClass( PostEffect, 
    "@brief A fullscreen shader effect.\n\n"
@@ -111,6 +112,15 @@ ImplementEnumType( PFXTargetClear,
    { PFXTargetClear_OnDraw, "PFXTargetClear_OnDraw", "Clear before every draw.\n" },
 EndImplementEnumType;
 
+ImplementEnumType( PFXTargetViewport,
+   "Specifies how the viewport should be set up for a PostEffect's target.\n"
+   "@note Applies to both the diffuse target and the depth target (if defined).\n"
+   "@ingroup Rendering\n\n")
+   { PFXTargetViewport_TargetSize, "PFXTargetViewport_TargetSize", "Set viewport to match target size (default).\n" },
+   { PFXTargetViewport_GFXViewport, "PFXTargetViewport_GFXViewport", "Use the current GFX viewport (scaled to match target size).\n" },
+   { PFXTargetViewport_NamedInTexture0, "PFXTargetViewport_NamedInTexture0", "Use the input texture 0 if it is named (scaled to match target size), otherwise revert to PFXTargetViewport_TargetSize if there is none.\n" },
+EndImplementEnumType;
+
 
 GFXImplementVertexFormat( PFXVertex )
 {
@@ -124,7 +134,7 @@ GFX_ImplementTextureProfile(  PostFxTargetProfile,
                               GFXTextureProfile::PreserveSize |
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 IMPLEMENT_CONOBJECT(PostEffect);
 
@@ -132,7 +142,7 @@ IMPLEMENT_CONOBJECT(PostEffect);
 GFX_ImplementTextureProfile( PostFxTextureProfile,
                             GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::Static | GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap,
-                            GFXTextureProfile::None );
+                            GFXTextureProfile::NONE );
 
 
 void PostEffect::EffectConst::set( const String &newVal )
@@ -234,6 +244,7 @@ PostEffect::PostEffect()
       mStateBlockData( NULL ),
       mAllowReflectPass( false ),
       mTargetClear( PFXTargetClear_None ),
+      mTargetViewport( PFXTargetViewport_TargetSize ),
       mTargetScale( Point2F::One ),
       mTargetSize( Point2I::Zero ),
       mTargetFormat( GFXFormatR8G8B8A8 ),
@@ -245,6 +256,7 @@ PostEffect::PostEffect()
       mRTSizeSC( NULL ),
       mOneOverRTSizeSC( NULL ),
       mViewportOffsetSC( NULL ),
+      mTargetViewportSC( NULL ),
       mFogDataSC( NULL ),
       mFogColorSC( NULL ),
       mEyePosSC( NULL ),
@@ -254,6 +266,7 @@ PostEffect::PostEffect()
       mNearFarSC( NULL ),
       mInvNearFarSC( NULL ),
       mWorldToScreenScaleSC( NULL ),
+      mProjectionOffsetSC( NULL ),
       mWaterColorSC( NULL ),
       mWaterFogDataSC( NULL ),
       mAmbientColorSC( NULL ),
@@ -311,6 +324,9 @@ void PostEffect::initPersistFields()
    addField( "targetClear", TYPEID< PFXTargetClear >(), Offset( mTargetClear, PostEffect ),
       "Describes when the target texture should be cleared." );
 
+   addField( "targetViewport", TYPEID< PFXTargetViewport >(), Offset( mTargetViewport, PostEffect ),
+      "Specifies how the viewport should be set up for a target texture." );
+
    addField( "texture", TypeImageFilename, Offset( mTexFilename, PostEffect ), NumTextures,
       "Input textures to this effect ( samplers ).\n"
       "@see PFXTextureIdentifiers" );
@@ -358,7 +374,7 @@ bool PostEffect::onAdd()
    scriptPath.setExtension( String::EmptyString );
 
    // Find additional textures
-   for( int i = 0; i < NumTextures; i++ )
+   for( S32 i = 0; i < NumTextures; i++ )
    {
       String texFilename = mTexFilename[i];
 
@@ -435,26 +451,53 @@ void PostEffect::_updateScreenGeometry(   const Frustum &frustum,
    const Point3F *frustumPoints = frustum.getPoints();
    const Point3F& cameraPos = frustum.getPosition();
 
+   // Perform a camera offset.  We need to manually perform this offset on the postFx's
+   // polygon, which is at the far plane.
+   const Point2F& projOffset = frustum.getProjectionOffset();
+   Point3F cameraOffsetPos = cameraPos;
+   if(!projOffset.isZero())
+   {
+      // First we need to calculate the offset at the near plane.  The projOffset
+      // given above can be thought of a percent as it ranges from 0..1 (or 0..-1).
+      F32 nearOffset = frustum.getNearRight() * projOffset.x;
+
+      // Now given the near plane distance from the camera we can solve the right
+      // triangle and calcuate the SIN theta for the offset at the near plane.
+      // SIN theta = x/y
+      F32 sinTheta = nearOffset / frustum.getNearDist();
+
+      // Finally, we can calcuate the offset at the far plane, which is where our sun (or vector)
+      // light's polygon is drawn.
+      F32 farOffset = frustum.getFarDist() * sinTheta;
+
+      // We can now apply this far plane offset to the far plane itself, which then compensates
+      // for the project offset.
+      MatrixF camTrans = frustum.getTransform();
+      VectorF offset = camTrans.getRightVector();
+      offset *= farOffset;
+      cameraOffsetPos += offset;
+   }
+
    PFXVertex *vert = outVB->lock();
 
    vert->point.set( -1.0, -1.0, 0.0 );
    vert->texCoord.set( 0.0f, 1.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarBottomLeft] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos;
    vert++;
 
    vert->point.set( -1.0, 1.0, 0.0 );
    vert->texCoord.set( 0.0f, 0.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarTopLeft] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarTopLeft] - cameraOffsetPos;
    vert++;
 
    vert->point.set( 1.0, 1.0, 0.0 );
    vert->texCoord.set( 1.0f, 0.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarTopRight] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarTopRight] - cameraOffsetPos;
    vert++;
 
    vert->point.set( 1.0, -1.0, 0.0 );
    vert->texCoord.set( 1.0f, 1.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarBottomRight] - cameraPos;
+   vert->wsEyeRay = frustumPoints[Frustum::FarBottomRight] - cameraOffsetPos;
    vert++;
 
    outVB->unlock();
@@ -500,6 +543,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
 
       //mViewportSC = shader->getShaderConstHandle( "$viewport" );
 
+      mTargetViewportSC = mShader->getShaderConstHandle( "$targetViewport" );
+
       mFogDataSC = mShader->getShaderConstHandle( ShaderGenVars::fogData );
       mFogColorSC = mShader->getShaderConstHandle( ShaderGenVars::fogColor );
 
@@ -512,6 +557,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mMatWorldToScreenSC = mShader->getShaderConstHandle( "$matWorldToScreen" );
       mMatScreenToWorldSC = mShader->getShaderConstHandle( "$matScreenToWorld" );
       mMatPrevScreenToWorldSC = mShader->getShaderConstHandle( "$matPrevScreenToWorld" );
+
+      mProjectionOffsetSC = mShader->getShaderConstHandle( "$projectionOffset" );
 
       mWaterColorSC = mShader->getShaderConstHandle( "$waterColor" );
       mAmbientColorSC = mShader->getShaderConstHandle( "$ambientColor" );
@@ -578,6 +625,27 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       }
 
       mShaderConsts->set( mRenderTargetParamsSC[i], rtParams );
+   }
+
+   // Target viewport (in target space)
+   if ( mTargetViewportSC->isValid() )
+   {
+      const Point2I& targetSize = GFX->getActiveRenderTarget()->getSize();
+      Point3I size(targetSize.x, targetSize.y, 0);
+      const RectI& viewport = GFX->getViewport();
+
+      Point2F offset((F32)viewport.point.x / (F32)targetSize.x, (F32)viewport.point.y / (F32)targetSize.y );
+      Point2F scale((F32)viewport.extent.x / (F32)targetSize.x, (F32)viewport.extent.y / (F32)targetSize.y );
+
+      const Point2F halfPixel( 0.5f / targetSize.x, 0.5f / targetSize.y );
+
+      Point4F targetParams;
+      targetParams.x = offset.x + halfPixel.x;
+      targetParams.y = offset.y + halfPixel.y;
+      targetParams.z = offset.x + scale.x - halfPixel.x;
+      targetParams.w = offset.y + scale.y - halfPixel.y;
+
+      mShaderConsts->set( mTargetViewportSC, targetParams );
    }
 
    // Set the fog data.
@@ -651,6 +719,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mShaderConsts->setSafe( mNearFarSC, Point2F( state->getNearPlane(), state->getFarPlane() ) );
       mShaderConsts->setSafe( mInvNearFarSC, Point2F( 1.0f / state->getNearPlane(), 1.0f / state->getFarPlane() ) );
       mShaderConsts->setSafe( mWorldToScreenScaleSC, state->getWorldToScreenScale() );
+      mShaderConsts->setSafe( mProjectionOffsetSC, state->getCameraFrustum().getProjectionOffset() );
       mShaderConsts->setSafe( mFogColorSC, state->getSceneManager()->getFogData().color );
 
       if ( mWaterColorSC->isValid() )
@@ -681,7 +750,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       {
          // Grab our projection matrix
          // from the frustum.
-         Frustum frust = state->getFrustum();
+         Frustum frust = state->getCameraFrustum();
          MatrixF proj( true );
          frust.getProjectionMatrix( &proj );
 
@@ -710,6 +779,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
          MathUtils::mProjectWorldToScreen( lightPos, &sunPos, GFX->getViewport(), tmp, proj );
 
          // And normalize it to the 0 to 1 range.
+         sunPos.x -= (F32)GFX->getViewport().point.x;
+         sunPos.y -= (F32)GFX->getViewport().point.y;
          sunPos.x /= (F32)GFX->getViewport().extent.x;
          sunPos.y /= (F32)GFX->getViewport().extent.y;
 
@@ -897,7 +968,33 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
          if ( mTargetClear == PFXTargetClear_OnCreate )
             *outClearTarget = true;
 
-         mNamedTarget.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         if(mTargetViewport == PFXTargetViewport_GFXViewport)
+         {
+            // We may need to scale the GFX viewport to fit within
+            // our target texture size
+            GFXTarget *oldTarget = GFX->getActiveRenderTarget();
+            const Point2I &oldTargetSize = oldTarget->getSize();
+            Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
+
+            const RectI &viewport = GFX->getViewport();
+
+            mNamedTarget.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else if(mTargetViewport == PFXTargetViewport_NamedInTexture0 && mActiveNamedTarget[0] && mActiveNamedTarget[0]->getTexture())
+         {
+            // Scale the named input texture's viewport to match our target
+            const Point3I &namedTargetSize = mActiveNamedTarget[0]->getTexture()->getSize();
+            Point2F scale(targetSize.x / F32(namedTargetSize.x), targetSize.y / F32(namedTargetSize.y));
+
+            const RectI &viewport = mActiveNamedTarget[0]->getViewport();
+
+            mNamedTarget.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else
+         {
+            // PFXTargetViewport_TargetSize
+            mNamedTarget.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         }
       }
    }
    else
@@ -943,7 +1040,33 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
          if ( mTargetClear == PFXTargetClear_OnCreate )
             *outClearTarget = true;
 
-         mNamedTargetDepthStencil.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         if(mTargetViewport == PFXTargetViewport_GFXViewport)
+         {
+            // We may need to scale the GFX viewport to fit within
+            // our target texture size
+            GFXTarget *oldTarget = GFX->getActiveRenderTarget();
+            const Point2I &oldTargetSize = oldTarget->getSize();
+            Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
+
+            const RectI &viewport = GFX->getViewport();
+
+            mNamedTargetDepthStencil.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else if(mTargetViewport == PFXTargetViewport_NamedInTexture0 && mActiveNamedTarget[0] && mActiveNamedTarget[0]->getTexture())
+         {
+            // Scale the named input texture's viewport to match our target
+            const Point3I &namedTargetSize = mActiveNamedTarget[0]->getTexture()->getSize();
+            Point2F scale(targetSize.x / F32(namedTargetSize.x), targetSize.y / F32(namedTargetSize.y));
+
+            const RectI &viewport = mActiveNamedTarget[0]->getViewport();
+
+            mNamedTargetDepthStencil.setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+         }
+         else
+         {
+            // PFXTargetViewport_TargetSize
+            mNamedTargetDepthStencil.setViewport( RectI( 0, 0, targetSize.x, targetSize.y ) );
+         }
       }
    }
    else
@@ -1034,6 +1157,9 @@ void PostEffect::process(  const SceneRenderState *state,
          GFX->getActiveRenderTarget()->preserve();
 #endif
 
+      const RectI &oldViewport = GFX->getViewport();
+      GFXTarget *oldTarget = GFX->getActiveRenderTarget();
+
       GFX->pushActiveRenderTarget();
       mTarget->attachTexture( GFXTextureTarget::Color0, mTargetTex );
 
@@ -1043,7 +1169,38 @@ void PostEffect::process(  const SceneRenderState *state,
       else
          mTarget->attachTexture( GFXTextureTarget::DepthStencil, mTargetDepthStencil );
 
-      GFX->setActiveRenderTarget( mTarget );
+      // Set the render target but not its viewport.  We'll do that below.
+      GFX->setActiveRenderTarget( mTarget, false );
+
+      if(mNamedTarget.isRegistered())
+      {
+         // Always use the name target's viewport, if available.  It was set up in _setupTarget().
+         GFX->setViewport(mNamedTarget.getViewport());
+      }
+      else if(mTargetViewport == PFXTargetViewport_GFXViewport)
+      {
+         // Go with the current viewport as scaled against our render target.
+         const Point2I &oldTargetSize = oldTarget->getSize();
+         const Point2I &targetSize = mTarget->getSize();
+         Point2F scale(targetSize.x / F32(oldTargetSize.x), targetSize.y / F32(oldTargetSize.y));
+         GFX->setViewport( RectI( oldViewport.point.x*scale.x, oldViewport.point.y*scale.y, oldViewport.extent.x*scale.x, oldViewport.extent.y*scale.y ) );
+      }
+      else if(mTargetViewport == PFXTargetViewport_NamedInTexture0 && mActiveNamedTarget[0] && mActiveNamedTarget[0]->getTexture())
+      {
+         // Go with the first input texture, if it is named.  Scale the named input texture's viewport to match our target
+         const Point3I &namedTargetSize = mActiveNamedTarget[0]->getTexture()->getSize();
+         const Point2I &targetSize = mTarget->getSize();
+         Point2F scale(targetSize.x / F32(namedTargetSize.x), targetSize.y / F32(namedTargetSize.y));
+
+         const RectI &viewport = mActiveNamedTarget[0]->getViewport();
+
+         GFX->setViewport( RectI( viewport.point.x*scale.x, viewport.point.y*scale.y, viewport.extent.x*scale.x, viewport.extent.y*scale.y ) );
+      }
+      else
+      {
+         // Default to using the whole target as the viewport
+         GFX->setViewport( RectI( Point2I::Zero, mTarget->getSize() ) );
+      }
    }
 
    if ( clearTarget )
@@ -1062,7 +1219,7 @@ void PostEffect::process(  const SceneRenderState *state,
 
    Frustum frustum;
    if ( state )
-      frustum = state->getFrustum();
+      frustum = state->getCameraFrustum();
    else
    {
       // If we don't have a scene state then setup

@@ -107,11 +107,14 @@ public:
 
    // RenderBinManager
    virtual void render(SceneRenderState *);
-   virtual void clear();
+   virtual void clear() {}
    virtual void sort() {}
 
    // Add a light to the bins
    void addLight( LightInfo *light );
+
+   // Clear all lights from the bins
+   void clearAllLights();
 
    virtual bool setTargetSize(const Point2I &newTargetSize);
 
@@ -220,7 +223,7 @@ protected:
 
    AdvancedLightBufferConditioner *mConditioner;
 
-   typedef GFXVertexPNT FarFrustumQuadVert; 
+   typedef GFXVertexPNTT FarFrustumQuadVert; 
    GFXVertexBufferHandle<FarFrustumQuadVert> mFarFrustumQuadVerts;
 
 

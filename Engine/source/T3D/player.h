@@ -385,6 +385,9 @@ public:
       NumPoseBits = 3
    };
 
+   /// The ExtendedMove position/rotation index used for head movements
+   static S32 smExtendedMoveHeadPosRotIndex;
+
 protected:
 
    /// Bit masks for different types of events
@@ -393,16 +396,6 @@ protected:
       MoveMask     = Parent::NextFreeMask << 1,
       ImpactMask   = Parent::NextFreeMask << 2,
       NextFreeMask = Parent::NextFreeMask << 3
-   };
-
-   struct Range {
-      Range(F32 _min,F32 _max) {
-         min = _min;
-         max = _max;
-         delta = _max - _min;
-      };
-      F32 min,max;
-      F32 delta;
    };
 
    SimObjectPtr<ParticleEmitter> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
@@ -443,6 +436,9 @@ protected:
    S32 mImpactSound;
 
    bool mUseHeadZCalc;              ///< Including mHead.z in transform calculations
+
+   F32 mLastAbsoluteYaw;            ///< Stores that last absolute yaw value as passed in by ExtendedMove
+   F32 mLastAbsolutePitch;          ///< Stores that last absolute pitch value as passed in by ExtendedMove
 
    S32 mMountPending;               ///< mMountPending suppresses tickDelay countdown so players will sit until
                                     ///< their mount, or another animation, comes through (or 13 seconds elapses).
@@ -502,9 +498,6 @@ protected:
    TSThread* mHeadHThread;
    TSThread* mRecoilThread;
    TSThread* mImageStateThread;
-   static Range mArmRange;
-   static Range mHeadVRange;
-   static Range mHeadHRange;
    /// @}
 
    bool mInMissionArea;       ///< Are we in the mission area?
@@ -687,9 +680,9 @@ public:
 
    void setTransform(const MatrixF &mat);
    void getEyeTransform(MatrixF* mat);
-   void getEyeBaseTransform(MatrixF* mat);
+   void getEyeBaseTransform(MatrixF* mat, bool includeBank);
    void getRenderEyeTransform(MatrixF* mat);
-   void getRenderEyeBaseTransform(MatrixF* mat);
+   void getRenderEyeBaseTransform(MatrixF* mat, bool includeBank);
    void getCameraParameters(F32 *min, F32 *max, Point3F *offset, MatrixF *rot);
    void getMuzzleTransform(U32 imageSlot,MatrixF* mat);
    void getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat);   

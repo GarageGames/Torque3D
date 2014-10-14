@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
-$PE_EMITTEREDITOR_DEFAULT_FILENAME = "art/shapes/particles/managedParticleEmitterData.cs";
+$PE_EMITTEREDITOR_DEFAULT_FILENAME = "art/particles/managedParticleEmitterData.cs";
 
 
 //=============================================================================================
@@ -83,6 +83,9 @@ function PE_EmitterEditor::guiSync( %this )
    
    PE_EmitterEditor-->PEE_ejectionOffset_slider.setValue( %data.ejectionOffset );
    PE_EmitterEditor-->PEE_ejectionOffset_textEdit.setText( %data.ejectionOffset );
+   
+   PE_EmitterEditor-->PEE_ejectionOffsetVariance_slider.setValue( %data.ejectionOffsetVariance );
+   PE_EmitterEditor-->PEE_ejectionOffsetVariance_textEdit.setText( %data.ejectionOffsetVariance );
    
    %blendTypeId = PE_EmitterEditor-->PEE_blendType.findText( %data.blendStyle );
    PE_EmitterEditor-->PEE_blendType.setSelected( %blendTypeId, false );

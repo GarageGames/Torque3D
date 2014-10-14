@@ -77,7 +77,7 @@ bool DDSUtil::squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat )
    // are done, we can discard the old surface, and replace it with this one.
    DDSFile::SurfaceData *newSurface = new DDSFile::SurfaceData();
 
-   for( int i = 0; i < srcDDS->mMipMapCount; i++ )
+   for( S32 i = 0; i < srcDDS->mMipMapCount; i++ )
    {
       const U8 *srcBits = srcSurface->mMips[i];
 
@@ -88,10 +88,7 @@ bool DDSUtil::squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat )
       PROFILE_START(SQUISH_DXT_COMPRESS);
 
       // Compress with Squish
-      //
-      // squish::CompressImageOMP will call squish::CompressImage if OpenMP is 
-      // not enabled.
-      squish::CompressImageOMP( srcBits, srcDDS->getWidth(i), srcDDS->getHeight(i), 
+      squish::CompressImage( srcBits, srcDDS->getWidth(i), srcDDS->getHeight(i), 
          dstBits, squishFlags );
 
       PROFILE_END();
@@ -109,7 +106,7 @@ bool DDSUtil::squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat )
 
 void DDSUtil::swizzleDDS( DDSFile *srcDDS, const Swizzle<U8, 4> &swizzle )
 {
-   for( int i = 0; i < srcDDS->mMipMapCount; i++ )
+   for( S32 i = 0; i < srcDDS->mMipMapCount; i++ )
    {
       swizzle.InPlace( srcDDS->mSurfaces.last()->mMips[i], srcDDS->getSurfaceSize( i ) );
    }

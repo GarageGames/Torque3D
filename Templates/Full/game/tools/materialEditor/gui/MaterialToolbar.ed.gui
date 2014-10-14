@@ -4,7 +4,7 @@
    internalName = "ShapeEditorToolbar";
    Enabled = "1";
    isContainer = "1";
-   Profile = "GuiDefaultProfile";
+   Profile = "ToolsGuiDefaultProfile";
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "672 0";
@@ -23,7 +23,7 @@
    text ="";
    
    new GuiTextCtrl() {
-      profile = "GuiTextProfile";
+      profile = "ToolsGuiTextProfile";
       horizSizing = "right";
       vertSizing = "bottom";
       position = "5 7";
@@ -36,18 +36,18 @@
    };
    new GuiBitmapCtrl() {
       Enabled = "1";
-      Profile = "GuiDefaultProfile";
+      Profile = "ToolsGuiDefaultProfile";
       position = "86 3";
       Extent = "2 26";
       MinExtent = "1 1";
-      bitmap = "core/art/gui/images/separator-h.png";
+      bitmap = "tools/gui/images/separator-h.png";
    };
    new GuiBitmapButtonCtrl() {
       canSaveDynamicFields = "0";
       internalName = "";
       Enabled = "1";
       isContainer = "0";
-      Profile = "GuiButtonProfile";
+      Profile = "ToolsGuiButtonProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
       Position = "91 3";
@@ -56,7 +56,7 @@
       canSave = "1";
       Visible = "1";
       Command = "materialSelector.showDialog();";
-      tooltipprofile = "GuiToolTipProfile";
+      tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Select and Edit an Existing Material";
       hovertime = "1000";
       bitmap = "tools/materialEditor/gui/materialSelectorIcon";

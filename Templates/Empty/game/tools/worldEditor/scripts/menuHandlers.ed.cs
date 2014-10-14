@@ -117,14 +117,7 @@ function EditorDoExitMission(%saveFirst)
       EditorClearDirty();
    }
 
-   if ( $UseUnifiedShell )
-   {
-      if (isObject( UnifiedMainMenuGui ))
-         Editor.close("UnifiedMainMenuGui");
-      else if (isObject( MainMenuGui ))
-         Editor.close("MainMenuGui");
-   }
-   else if (isObject( MainMenuGui ))
+   if (isObject( MainMenuGui ))
       Editor.close("MainMenuGui");
 
    disconnect();

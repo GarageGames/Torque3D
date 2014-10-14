@@ -24,7 +24,7 @@
 #include "farFrustumQuad.hlsl"
 
 
-FarFrustumQuadConnectV main( VertexIn_PNT IN,
+FarFrustumQuadConnectV main( VertexIn_PNTT IN,
                              uniform float4 rtParams0 )
 {
    FarFrustumQuadConnectV OUT;
@@ -36,7 +36,7 @@ FarFrustumQuadConnectV main( VertexIn_PNT IN,
    
    // Interpolators will generate eye rays the 
    // from far-frustum corners.
-   OUT.wsEyeRay = IN.pos.xyz;
+   OUT.wsEyeRay = IN.tangent.xyz;
    OUT.vsEyeRay = IN.normal.xyz;
 
    return OUT;

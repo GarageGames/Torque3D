@@ -60,8 +60,11 @@ function initClient()
    $Client::GameTypeQuery = $appName;
    $Client::MissionTypeQuery = "Any";
 
-   exec("art/gui/customProfiles.cs"); // override the base profiles if necessary
-
+   // These should be game specific GuiProfiles.  Custom profiles are saved out
+   // from the Gui Editor.  Either of these may override any that already exist.
+   exec("art/gui/defaultGameProfiles.cs");
+   exec("art/gui/customProfiles.cs"); 
+   
    // The common module provides basic client functionality
    initBaseClient();
 
@@ -70,25 +73,30 @@ function initClient()
 
    // Load up the Game GUIs
    exec("art/gui/defaultGameProfiles.cs");
-   exec("art/gui/PlayGui.gui");
-   exec("art/gui/ChatHud.gui");
+   exec("art/gui/playGui.gui");
+   exec("art/gui/chatHud.gui");
    exec("art/gui/playerList.gui");
    exec("art/gui/hudlessGui.gui");
-   exec("art/gui/controlsHelpDlg.gui");
 
    // Load up the shell GUIs
-   if($platform !$= "xenon")  // Use the unified shell instead
-      exec("art/gui/mainMenuGui.gui");
+   exec("art/gui/mainMenuGui.gui");
    exec("art/gui/joinServerDlg.gui");
    exec("art/gui/endGameGui.gui");
    exec("art/gui/StartupGui.gui");
-
+   exec("art/gui/chooseLevelDlg.gui");
+   exec("art/gui/loadingGui.gui");
+   exec("art/gui/optionsDlg.gui");
+   exec("art/gui/remapDlg.gui");
+   
    // Gui scripts
    exec("./playerList.cs");
    exec("./chatHud.cs");
    exec("./messageHud.cs");
    exec("scripts/gui/playGui.cs");
    exec("scripts/gui/startupGui.cs");
+   exec("scripts/gui/chooseLevelDlg.cs");
+   exec("scripts/gui/loadingGui.cs");
+   exec("scripts/gui/optionsDlg.cs");
 
    // Client scripts
    exec("./client.cs");
@@ -116,7 +124,7 @@ function initClient()
    setDefaultFov( $pref::Player::defaultFov );
    setZoomSpeed( $pref::Player::zoomSpeed );
 
-   if( isFile( "./audioData.cs" ) )
+   if( isScriptFile( expandFilename("./audioData.cs") ) )
       exec( "./audioData.cs" );
 
    // Start up the main menu... this is separated out into a
@@ -150,8 +158,7 @@ function loadMainMenu()
    // Startup the client with the Main menu...
    if (isObject( MainMenuGui ))
       Canvas.setContent( MainMenuGui );
-   else if (isObject( UnifiedMainMenuGui ))
-      Canvas.setContent( UnifiedMainMenuGui );
+   
    Canvas.setCursor("DefaultCursor");
 
    // first check if we have a level file to load

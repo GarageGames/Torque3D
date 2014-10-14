@@ -45,6 +45,9 @@
 #include "materials/materialManager.h"
 #endif
 
+// Uncomment to optimize function calls at the expense of potential invalid package lookups
+//#define COMPILER_OPTIMIZE_FUNCTION_CALLS
+
 using namespace Compiler;
 
 enum EvalConstants {
@@ -444,8 +447,8 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
    if(argv)
    {
       // assume this points into a function decl:
-      U32 fnArgc = code[ip + 5];
-      thisFunctionName = U32toSTE(code[ip]);
+      U32 fnArgc = code[ip + 2 + 6];
+      thisFunctionName = CodeToSTE(code, ip);
       S32 wantedArgc = getMin(argc-1, fnArgc); // argv[0] is func name
       if(gEvalState.traceOn)
       {
@@ -481,7 +484,7 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
 
       for(i = 0; i < wantedArgc; i++)
       {
-         StringTableEntry var = U32toSTE(code[ip + i + 6]);
+         StringTableEntry var = CodeToSTE(code, ip + (2 + 6 + 1) + (i * 2));
          gEvalState.setCurVarNameCreate(var);
 
          ConsoleValueRef ref = argv[i+1];
@@ -495,7 +498,7 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
          else
             gEvalState.setStringVariable(argv[i+1]);
       }
-      ip = ip + fnArgc + 6;
+      ip = ip + (fnArgc * 2) + (2 + 6 + 1);
       curFloatTable = functionFloats;
       curStringTable = functionStrings;
       curStringTableLen = functionStringsMaxLen;
@@ -600,11 +603,11 @@ breakContinue:
          case OP_FUNC_DECL:
             if(!noCalls)
             {
-               fnName       = U32toSTE(code[ip]);
-               fnNamespace  = U32toSTE(code[ip+1]);
-               fnPackage    = U32toSTE(code[ip+2]);
-               bool hasBody = ( code[ ip + 3 ] & 0x01 ) != 0;
-               U32 lineNumber = code[ ip + 3 ] >> 1;
+               fnName       = CodeToSTE(code, ip);
+               fnNamespace  = CodeToSTE(code, ip+2);
+               fnPackage    = CodeToSTE(code, ip+4);
+               bool hasBody = ( code[ ip + 6 ] & 0x01 ) != 0;
+               U32 lineNumber = code[ ip + 6 ] >> 1;
                
                Namespace::unlinkPackages();
                ns = Namespace::find(fnNamespace, fnPackage);
@@ -627,18 +630,18 @@ breakContinue:
 
                //Con::printf("Adding function %s::%s (%d)", fnNamespace, fnName, ip);
             }
-            ip = code[ip + 4];
+            ip = code[ip + 7];
             break;
 
          case OP_CREATE_OBJECT:
          {
             // Read some useful info.
-            objParent        = U32toSTE(code[ip    ]);
-            bool isDataBlock =          code[ip + 1];
-            bool isInternal  =          code[ip + 2];
-            bool isSingleton =          code[ip + 3];
-            U32  lineNumber  =          code[ip + 4];
-            failJump         =          code[ip + 5];
+            objParent        = CodeToSTE(code, ip);
+            bool isDataBlock =          code[ip + 2];
+            bool isInternal  =          code[ip + 3];
+            bool isSingleton =          code[ip + 4];
+            U32  lineNumber  =          code[ip + 5];
+            failJump         =          code[ip + 6];
                         
             // If we don't allow calls, we certainly don't allow creating objects!
             // Moved this to after failJump is set. Engine was crashing when
@@ -691,6 +694,15 @@ breakContinue:
             {
                // IF we aren't looking at a local/internal object, then check if 
                // this object already exists in the global space
+
+               AbstractClassRep* rep = AbstractClassRep::findClassRep( objectName );
+               if (rep != NULL) {
+                  Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object [%s] the same name as a script class.",
+                     getFileLine(ip), objectName);
+                  ip = failJump;
+                  STR.popFrame();
+                  break;
+               }
 
                SimObject *obj = Sim::findObject( (const char*)objectName );
                if (obj /*&& !obj->isLocalName()*/)
@@ -916,7 +928,7 @@ breakContinue:
             }
 
             // Advance the IP past the create info...
-            ip += 6;
+            ip += 7;
             break;
          }
 
@@ -1298,8 +1310,8 @@ breakContinue:
             break;
 
          case OP_SETCURVAR:
-            var = U32toSTE(code[ip]);
-            ip++;
+            var = CodeToSTE(code, ip);
+            ip += 2;
 
             // If a variable is set, then these must be NULL. It is necessary
             // to set this here so that the vector parser can appropriately
@@ -1318,8 +1330,8 @@ breakContinue:
             break;
 
          case OP_SETCURVAR_CREATE:
-            var = U32toSTE(code[ip]);
-            ip++;
+            var = CodeToSTE(code, ip);
+            ip += 2;
 
             // See OP_SETCURVAR
             prevField = NULL;
@@ -1448,9 +1460,9 @@ breakContinue:
             // Save the previous field for parsing vector fields.
             prevField = curField;
             dStrcpy( prevFieldArray, curFieldArray );
-            curField = U32toSTE(code[ip]);
+            curField = CodeToSTE(code, ip);
             curFieldArray[0] = 0;
-            ip++;
+            ip += 2;
             break;
 
          case OP_SETCURFIELD_ARRAY:
@@ -1646,29 +1658,41 @@ breakContinue:
             break;
 
          case OP_LOADIMMED_IDENT:
-            STR.setStringValue(U32toSTE(code[ip++]));
+            STR.setStringValue(CodeToSTE(code, ip));
+            ip += 2;
             break;
 
          case OP_CALLFUNC_RESOLVE:
             // This deals with a function that is potentially living in a namespace.
-            fnNamespace = U32toSTE(code[ip+1]);
-            fnName      = U32toSTE(code[ip]);
+            fnNamespace = CodeToSTE(code, ip+2);
+            fnName      = CodeToSTE(code, ip);
 
             // Try to look it up.
             ns = Namespace::find(fnNamespace);
             nsEntry = ns->lookup(fnName);
             if(!nsEntry)
             {
-               ip+= 3;
+               ip+= 5;
                Con::warnf(ConsoleLogEntry::General,
                   "%s: Unable to find function %s%s%s",
-                  getFileLine(ip-4), fnNamespace ? fnNamespace : "",
+                  getFileLine(ip-7), fnNamespace ? fnNamespace : "",
                   fnNamespace ? "::" : "", fnName);
                STR.popFrame();
                CSTK.popFrame();
                break;
             }
+            
+#ifdef COMPILER_OPTIMIZE_FUNCTION_CALLS
             // Now fall through to OP_CALLFUNC...
+            // Now, rewrite our code a bit (ie, avoid future lookups) and fall
+            // through to OP_CALLFUNC
+#ifdef TORQUE_CPU_X64
+            *((U64*)(code+ip+2)) = ((U64)nsEntry);
+#else
+            code[ip+2] = ((U32)nsEntry);
+#endif
+            code[ip-1] = OP_CALLFUNC;
+#endif
 
          case OP_CALLFUNC:
          {
@@ -1678,7 +1702,7 @@ breakContinue:
             // or just on the object.
             S32 routingId = 0;
 
-            fnName = U32toSTE(code[ip]);
+            fnName = CodeToSTE(code, ip);
 
             //if this is called from inside a function, append the ip and codeptr
             if( gEvalState.getStackDepth() > 0 )
@@ -1687,9 +1711,9 @@ breakContinue:
                gEvalState.getCurrentFrame().ip = ip - 1;
             }
 
-            U32 callType = code[ip+2];
+            U32 callType = code[ip+4];
 
-            ip += 3;
+            ip += 5;
             CSTK.getArgcArgv(fnName, &callArgc, &callArgv);
 
             const char *componentReturnValue = "";
@@ -1698,9 +1722,16 @@ breakContinue:
             {
                if( !nsEntry )
                {
-                  // We must not have come from OP_CALLFUNC_RESOLVE, so figure out
-                  // our own entry.
+#ifdef COMPILER_OPTIMIZE_FUNCTION_CALLS
+#ifdef TORQUE_CPU_X64
+                  nsEntry = ((Namespace::Entry *) *((U64*)(code+ip-3)));
+#else
+                  nsEntry = ((Namespace::Entry *) *(code+ip-3));
+#endif
+#else
                   nsEntry = Namespace::global()->lookup( fnName );
+#endif
+                  ns = NULL;
                }
                ns = NULL;
             }
@@ -1762,7 +1793,7 @@ breakContinue:
             {
                if(!noCalls && !( routingId == MethodOnComponent ) )
                {
-                  Con::warnf(ConsoleLogEntry::General,"%s: Unknown command %s.", getFileLine(ip-4), fnName);
+                  Con::warnf(ConsoleLogEntry::General,"%s: Unknown command %s.", getFileLine(ip-6), fnName);
                   if(callType == FuncCallExprNode::MethodCall)
                   {
                      Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
@@ -1815,16 +1846,16 @@ breakContinue:
                // which is useful behavior when debugging so I'm ifdefing this out for debug builds.
                if(nsEntry->mToolOnly && ! Con::isCurrentScriptToolScript())
                {
-                  Con::errorf(ConsoleLogEntry::Script, "%s: %s::%s - attempting to call tools only function from outside of tools.", getFileLine(ip-4), nsName, fnName);
+                  Con::errorf(ConsoleLogEntry::Script, "%s: %s::%s - attempting to call tools only function from outside of tools.", getFileLine(ip-6), nsName, fnName);
                }
                else
 #endif
                if((nsEntry->mMinArgs && S32(callArgc) < nsEntry->mMinArgs) || (nsEntry->mMaxArgs && S32(callArgc) > nsEntry->mMaxArgs))
                {
                   Con::warnf(ConsoleLogEntry::Script, "%s: %s::%s - wrong number of arguments (got %i, expected min %i and max %i).",
-                     getFileLine(ip-4), nsName, fnName,
+                     getFileLine(ip-6), nsName, fnName,
                      callArgc, nsEntry->mMinArgs, nsEntry->mMaxArgs);
-                  Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s", getFileLine(ip-4), nsEntry->mUsage);
+                  Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s", getFileLine(ip-6), nsEntry->mUsage);
                   STR.popFrame();
                   CSTK.popFrame();
                }
@@ -1892,7 +1923,7 @@ breakContinue:
                      case Namespace::Entry::VoidCallbackType:
                         nsEntry->cb.mVoidCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         if( code[ ip ] != OP_STR_TO_NONE && Con::getBoolVariable( "$Con::warnVoidAssignment", true ) )
-                           Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip-4), fnName, functionName);
+                           Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip-6), fnName, functionName);
                         
                         STR.popFrame();
                         CSTK.popFrame();
@@ -2029,8 +2060,8 @@ breakContinue:
          
          case OP_ITER_BEGIN:
          {
-            StringTableEntry varName = U32toSTE( code[ ip ] );
-            U32 failIp = code[ ip + 1 ];
+            StringTableEntry varName = CodeToSTE(code, ip);
+            U32 failIp = code[ ip + 2 ];
             
             IterStackRecord& iter = iterStack[ _ITER ];
             
@@ -2065,7 +2096,7 @@ breakContinue:
             
             STR.push();
             
-            ip += 2;
+            ip += 3;
             break;
          }
          

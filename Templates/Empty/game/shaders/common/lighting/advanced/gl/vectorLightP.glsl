@@ -22,40 +22,32 @@
 
 #include "../../../gl/hlslCompat.glsl"
 #include "shadergen:/autogenConditioners.h"
+#include "farFrustumQuad.glsl"
+#include "../../../gl/torque.glsl"
+#include "../../../gl/lighting.glsl"
 #include "lightingUtils.glsl"
 #include "../../shadowMap/shadowMapIO_GLSL.h"
+#include "softShadow.glsl"
 
-varying vec2 uv0;
-varying vec3 wsEyeRay;
+in vec4 hpos;
+in vec2 uv0;
+in vec3 wsEyeRay;
+in vec3 vsEyeRay;
 
-uniform sampler2D prePassBuffer;
-uniform sampler2D ShadowMap;
+uniform sampler2D ShadowMap ;
 
-#if TORQUE_SM >= 30
-
-   // Enables high quality soft shadow 
-   // filtering for SM3.0 and above.
-   #define SOFTSHADOW_SM3
-
-   #include "softShadow.glsl"
-
-#else
-
-   
-   
+#ifdef USE_SSAO_MASK
+uniform sampler2D ssaoMask ;
+uniform vec4 rtParams2;
 #endif
-             
+
+uniform sampler2D prePassBuffer;             
 uniform vec3 lightDirection;
 uniform vec4 lightColor;
-uniform float lightBrightness;
-uniform vec4 lightAmbient;
-uniform vec4 lightTrilight;
-            
-uniform vec3 eyePosWorld;
-
-uniform mat4 worldToLightProj;
-uniform vec4 splitDistStart;
-uniform vec4 splitDistEnd;
+uniform float  lightBrightness;
+uniform vec4 lightAmbient; 
+uniform vec3 eyePosWorld; 
+uniform mat4x4 worldToLightProj;
 uniform vec4 scaleX;
 uniform vec4 scaleY;
 uniform vec4 offsetX;
@@ -65,16 +57,12 @@ uniform vec4 atlasYOffset;
 uniform vec2 atlasScale;
 uniform vec4 zNearFarInvNearFar;
 uniform vec4 lightMapParams;
-
-uniform float constantSpecularPower;
 uniform vec2 fadeStartLength;
 uniform vec4 farPlaneScalePSSM;
-uniform vec4 splitFade;
 uniform vec4 overDarkPSSM;
 uniform float shadowSoftness;
 
-
-void main()
+void main()             
 {
    // Sample/unpack the normal/z data
    vec4 prepassSample = prepassUncondition( prePassBuffer, uv0 );
@@ -83,148 +71,162 @@ void main()
 
    // Use eye ray to get ws pos
    vec4 worldPos = vec4(eyePosWorld + wsEyeRay * depth, 1.0f);
-
+   
    // Get the light attenuation.
    float dotNL = dot(-lightDirection, normal);
+
+   #ifdef PSSM_DEBUG_RENDER
+      vec3 debugColor = vec3(0);
+   #endif
    
    #ifdef NO_SHADOW
 
       // Fully unshadowed.
       float shadowed = 1.0;
 
+      #ifdef PSSM_DEBUG_RENDER
+         debugColor = vec3(1.0);
+      #endif
+
    #else
-   
+
       // Compute shadow map coordinate
-      vec4 pxlPosLightProj = worldToLightProj * worldPos;
+      vec4 pxlPosLightProj = tMul(worldToLightProj, worldPos);
       vec2 baseShadowCoord = pxlPosLightProj.xy / pxlPosLightProj.w;   
-   
-      float distOffset = 0.0;
-      float shadowed = 0.0;
-      float fadeAmt = 0.0;
-      vec4 zDist = vec4(zNearFarInvNearFar.x + zNearFarInvNearFar.y * depth);
-                    
-      // Calculate things dependant on the shadowmap split
-      for ( int i = 0; i < 2; i++ )
-      {
-         float zDistSplit = zDist.x + distOffset;
-         vec4 mask0;
-         mask0.x = float(zDistSplit >= splitDistStart.x);
-         mask0.y = float(zDistSplit >= splitDistStart.y);
-         mask0.z = float(zDistSplit >= splitDistStart.z);
-         mask0.w = float(zDistSplit >= splitDistStart.w);
+
+      // Distance to light, in shadowmap space
+      float distToLight = pxlPosLightProj.z / pxlPosLightProj.w;
          
-         vec4 mask1;
-         mask1.x = float(zDistSplit < splitDistEnd.x);
-         mask1.y = float(zDistSplit < splitDistEnd.y);
-         mask1.z = float(zDistSplit < splitDistEnd.z);
-         mask1.w = float(zDistSplit < splitDistEnd.w);
+      // Figure out which split to sample from.  Basically, we compute the shadowmap sample coord
+      // for all of the splits and then check if its valid.  
+      vec4 shadowCoordX = vec4( baseShadowCoord.x );
+      vec4 shadowCoordY = vec4( baseShadowCoord.y );
+      vec4 farPlaneDists = vec4( distToLight );      
+      shadowCoordX *= scaleX;
+      shadowCoordY *= scaleY;
+      shadowCoordX += offsetX;
+      shadowCoordY += offsetY;
+      farPlaneDists *= farPlaneScalePSSM;
+      
+      // If the shadow sample is within -1..1 and the distance 
+      // to the light for this pixel is less than the far plane 
+      // of the split, use it.
+      vec4 finalMask;
+      if (  shadowCoordX.x > -0.99 && shadowCoordX.x < 0.99 && 
+            shadowCoordY.x > -0.99 && shadowCoordY.x < 0.99 &&
+            farPlaneDists.x < 1.0 )
+         finalMask = vec4(1, 0, 0, 0);
+
+      else if (   shadowCoordX.y > -0.99 && shadowCoordX.y < 0.99 &&
+                  shadowCoordY.y > -0.99 && shadowCoordY.y < 0.99 && 
+                  farPlaneDists.y < 1.0 )
+         finalMask = vec4(0, 1, 0, 0);
+
+      else if (   shadowCoordX.z > -0.99 && shadowCoordX.z < 0.99 && 
+                  shadowCoordY.z > -0.99 && shadowCoordY.z < 0.99 && 
+                  farPlaneDists.z < 1.0 )
+         finalMask = vec4(0, 0, 1, 0);
          
-         vec4 finalMask = mask0 * mask1;
+      else
+         finalMask = vec4(0, 0, 0, 1);
          
-         float splitFadeDist = dot( finalMask, splitFade );
 
-         vec2 finalScale;
-         finalScale.x = dot(finalMask, scaleX);
-         finalScale.y = dot(finalMask, scaleY);
+      #ifdef PSSM_DEBUG_RENDER
+         if ( finalMask.x > 0 )
+            debugColor += vec3( 1, 0, 0 );
+         else if ( finalMask.y > 0 )
+            debugColor += vec3( 0, 1, 0 );
+         else if ( finalMask.z > 0 )
+            debugColor += vec3( 0, 0, 1 );
+         else if ( finalMask.w > 0 )
+            debugColor += vec3( 1, 1, 0 );
+      #endif
 
-         vec2 finalOffset;
-         finalOffset.x = dot(finalMask, offsetX);
-         finalOffset.y = dot(finalMask, offsetY);
-           
-         vec2 shadowCoord;
-         shadowCoord = baseShadowCoord * finalScale;
-         shadowCoord += finalOffset;
+      // Here we know what split we're sampling from, so recompute the texcoord location
+      // Yes, we could just use the result from above, but doing it this way actually saves
+      // shader instructions.
+      vec2 finalScale;
+      finalScale.x = dot(finalMask, scaleX);
+      finalScale.y = dot(finalMask, scaleY);
 
-         // Convert to texcoord space
-         shadowCoord = 0.5 * shadowCoord + vec2(0.5, 0.5);
-         //shadowCoord.y = 1.0f - shadowCoord.y;
+      vec2 finalOffset;
+      finalOffset.x = dot(finalMask, offsetX);
+      finalOffset.y = dot(finalMask, offsetY);
 
-         // Move around inside of atlas 
-         vec2 aOffset;
-         aOffset.x = dot(finalMask, atlasXOffset);
-         aOffset.y = dot(finalMask, atlasYOffset);
+      vec2 shadowCoord;                  
+      shadowCoord = baseShadowCoord * finalScale;      
+      shadowCoord += finalOffset;
 
-         shadowCoord *= atlasScale;
-         shadowCoord += aOffset;
-                    
-         // Distance to light, in shadowmap space
-         float distToLight = pxlPosLightProj.z / pxlPosLightProj.w;
-         
-         // Each split has a different far plane, take this into account.
-         float farPlaneScale = dot( farPlaneScalePSSM, finalMask );
-         distToLight *= farPlaneScale;
-         
-         #ifdef SOFTSHADOW_SM3
+      // Convert to texcoord space
+      shadowCoord = 0.5 * shadowCoord + vec2(0.5, 0.5);
+      shadowCoord.y = 1.0f - shadowCoord.y;
 
-            float esmShadow = softShadow_filter(   ShadowMap,
-                                                   gTapRotationTex,
-                                                   uv0.xy,
-                                                   shadowCoord,
-                                                   farPlaneScale * shadowSoftness,
-                                                   distToLight,
-                                                   dotNL,
-                                                   dot( finalMask, overDarkPSSM ) );
-                                                   
-         #else // !SOFTSHADOW_SM3
+      // Move around inside of atlas 
+      vec2 aOffset;
+      aOffset.x = dot(finalMask, atlasXOffset);
+      aOffset.y = dot(finalMask, atlasYOffset);
 
-            float occluder = decodeShadowMap( texture2DLod( ShadowMap, shadowCoord, 0.0 ) );
-            float overDark = dot( finalMask, overDarkPSSM );                      
-            float esmShadow = saturate( exp( esmFactor * ( occluder - distToLight ) ) );
-
-         #endif
-
-         if ( i == 0 )
-         {
-            float endDist = dot(splitDistEnd, finalMask);
-            fadeAmt = smoothstep(endDist - splitFadeDist, endDist, zDist).x;
-            shadowed = esmShadow * ( 1.0 - fadeAmt );
-         }
-         else
-            shadowed += esmShadow * fadeAmt;
-
-         distOffset += splitFadeDist;
-      }
+      shadowCoord *= atlasScale;
+      shadowCoord += aOffset;
+              
+      // Each split has a different far plane, take this into account.
+      float farPlaneScale = dot( farPlaneScalePSSM, finalMask );
+      distToLight *= farPlaneScale;
+      
+      float shadowed = softShadow_filter(   ShadowMap,
+                                             uv0.xy,
+                                             shadowCoord,
+                                             farPlaneScale * shadowSoftness,
+                                             distToLight,
+                                             dotNL,
+                                             dot( finalMask, overDarkPSSM ) );
   
       // Fade out the shadow at the end of the range.
+      vec4 zDist = vec4(zNearFarInvNearFar.x + zNearFarInvNearFar.y * depth);
       float fadeOutAmt = ( zDist.x - fadeStartLength.x ) * fadeStartLength.y;
-      shadowed = mix( shadowed, 1.0, clamp( fadeOutAmt, 0.0, 1.0 ) );
+      shadowed = mix( shadowed, 1.0, saturate( fadeOutAmt ) );
+
+      #ifdef PSSM_DEBUG_RENDER
+         if ( fadeOutAmt > 1.0 )
+            debugColor = vec3(1.0);
+      #endif
 
    #endif // !NO_SHADOW
-      
-   // Calc lighting coefficents
-   float specular = calcSpecular(   -lightDirection, 
-                                    normal, 
-                                    normalize(-wsEyeRay), 
-                                    constantSpecularPower, 
-                                    lightColor.a * lightBrightness );
-   
-   float Sat_NL_Att = clamp(dotNL, 0.0, 1.0) * shadowed;
-   
-   // Trilight, described by Tom Forsyth
-   // http://home.comcast.net/~tom_forsyth/papers/trilight/trilight.html
-#ifdef ACCUMULATE_LUV
 
-   // In LUV multiply in the brightness of the light color (normaly done in the attenuate function)
-   Sat_NL_Att *= lightColor.a;  
+   // Specular term
+   float specular = AL_CalcSpecular(   -lightDirection, 
+                                       normal, 
+                                       normalize(-vsEyeRay) ) * lightBrightness * shadowed;
    
-   vec4 ambientBlend = lightAmbient;
-   ambientBlend.b *= clamp(-dotNL, 0.0, 1.0);
-   
-   vec3 trilight = lightTrilight.rgb;
-   trilight.b *= clamp(1.0 - abs(dotNL), 0.0, 1.0);
-   
-   ambientBlend.rg = mix(ambientBlend.rg, trilight.rg, clamp(0.5 * trilight.b / lightAmbient.b, 0.0, 1.0));
-   ambientBlend.b += trilight.b;
+   float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
+   vec3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
+   vec4 addToResult = lightAmbient;
 
-#else
+   // TODO: This needs to be removed when lightmapping is disabled
+   // as its extra work per-pixel on dynamic lit scenes.
+   //
+   // Special lightmapping pass.
+   if ( lightMapParams.a < 0.0 )
+   {
+      // This disables shadows on the backsides of objects.
+      shadowed = dotNL < 0.0f ? 1.0f : shadowed;
 
-   // RGB
-   // TODO: Trilight seems broken... it does lighting in shadows!
-   //vec4 ambientBlend = vec4(lightTrilight.rgb * clamp(1.0 - abs(dotNL), 0.0, 1.0) + lightAmbient.rgb * clamp(-dotNL, 0.0, 1.0), 0.0);
-   vec4 ambientBlend = vec4(lightAmbient.rgb, 0.0);
+      Sat_NL_Att = 1.0f;
+      lightColorOut = vec3(shadowed);
+      specular *= lightBrightness;
+      addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
+   }
 
-#endif
+   // Sample the AO texture.      
+   #ifdef USE_SSAO_MASK
+      float ao = 1.0 - texture( ssaoMask, viewportCoordToRenderTarget( uv0.xy, rtParams2 ) ).r;
+      addToResult *= ao;
+   #endif
+
+   #ifdef PSSM_DEBUG_RENDER
+      lightColorOut = debugColor;
+   #endif
    
-   // Output
-   gl_FragColor = lightinfoCondition( lightColor.rgb * lightBrightness, Sat_NL_Att, specular, ambientBlend) * lightMapParams;
+   OUT_FragColor0 = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
+   
 }

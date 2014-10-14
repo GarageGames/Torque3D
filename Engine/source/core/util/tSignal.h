@@ -54,7 +54,6 @@ public:
    {
       mList.next = mList.prev = &mList;
       mList.order = 0.5f;
-      mTriggerNext = NULL;
    }
 
    ~SignalBase();
@@ -77,6 +76,8 @@ protected:
 
       void insert(DelegateLink* node, F32 order);
       void unlink();
+
+      virtual ~DelegateLink() {}
    };
 
    DelegateLink mList;
@@ -90,6 +91,78 @@ protected:
    /// we unlink a node, we can check it against this field and move the traversal
    /// along if needed.
    Vector<DelegateLink*> mTriggerNext;
+};
+
+template<typename Signature> class SignalBaseT;
+
+/// Class for handle automatic diconnect form Signal when destroyed
+template< typename Signature >
+class SignalSlot
+{
+public:
+   typedef Delegate< Signature > DelegateSig;
+   typedef SignalBaseT< Signature > SignalSig;
+
+   SignalSlot() : mSignal(NULL)
+   {
+
+   }
+
+   ~SignalSlot()
+   {
+      disconnect();
+   }
+
+   const DelegateSig& getDelegate() { return mDlg; }
+
+   /// setDelegate disconect form Signal old delegate and connect new delegate
+   template<typename X>
+   void setDelegate( const X &fn ) { setDelegate( DelegateSig( fn ) ); }
+
+   template<typename X, typename Y>
+   void setDelegate( const X &ptr, const Y &fn ) { setDelegate( DelegateSig( ptr, fn ) ); }
+
+   void setDelegate( const DelegateSig &dlg) 
+   {
+      SignalSig* signal = mSignal;
+      if( isConnected() )
+         disconnect();      
+
+      mDlg = dlg;
+      if( signal && mDlg )
+         signal->notify( mDlg );
+   }
+
+   /// is connected to Signal
+   bool isConnected() const { return mSignal; }
+
+   /// disconnect from Signal
+   void disconnect()
+   {
+      if( mSignal )
+      {
+         SignalSig *oldSignal = mSignal;
+         mSignal = NULL;
+         oldSignal->remove( mDlg );
+      }
+   }
+
+protected:
+   friend class SignalBaseT< Signature >;
+
+   void _setSignal(SignalSig *sig)
+   {      
+      mSignal = sig;
+   }
+
+   SignalSig* _getSignal() const { return mSignal; }   
+
+   DelegateSig mDlg;
+   SignalSig *mSignal;
+
+private:
+   SignalSlot( const SignalSlot&) {}
+   SignalSlot& operator=( const SignalSlot&) {}
 };
 
 template<typename Signature> class SignalBaseT : public SignalBase
@@ -135,7 +208,7 @@ public:
          {
             if( del->mDelegate == dlg )
             {
-               for ( int i = 0; i < mTriggerNext.size(); i++ )
+               for ( S32 i = 0; i < mTriggerNext.size(); i++ )
                {
                   if( mTriggerNext[i] == ptr )
                      mTriggerNext[i] = ptr->next;
@@ -161,6 +234,18 @@ public:
    {
       DelegateSig dlg(func);
       notify(dlg, order);
+   }
+
+   void notify( SignalSlot<Signature> &slot, F32 order = 0.5f)
+   {
+      if( !slot.getDelegate() )
+         return;
+
+      if( slot.isConnected() )
+         slot.disconnect();
+
+      slot._setSignal( this );
+      mList.insert( new SlotLinkImpl(slot), order );
    }
 
    template <class T,class U>
@@ -196,6 +281,23 @@ protected:
    {
       DelegateSig mDelegate;
       DelegateLinkImpl(DelegateSig dlg) : mDelegate(dlg) {}
+   };
+
+   struct SlotLinkImpl : public DelegateLinkImpl
+   {      
+      SlotLinkImpl(SignalSlot<Signature>& slot) : mSlot( &slot ), DelegateLinkImpl( slot.getDelegate() )
+      {
+
+      }
+
+      ~SlotLinkImpl()
+      {
+         if( mSlot )
+            mSlot->_setSignal( NULL ); 
+      }
+
+   protected:
+      SignalSlot<Signature> *mSlot;
    };
 
    DelegateSig & getDelegate(SignalBase::DelegateLink * link)
@@ -463,6 +565,75 @@ class Signal<bool(A,B,C,D,E,F,G,H,I,J)> : public SignalBaseT<bool(A,B,C,D,E,F,G,
       }
 };
 
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K> 
+class Signal<bool(A,B,C,D,E,F,G,H,I,J,K)> : public SignalBaseT<bool(A,B,C,D,E,F,G,H,I,J,K)>
+{
+   public:
+
+      bool trigger( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k )
+      {
+         this->mTriggerNext.push_back(NULL);
+         for( SignalBase::DelegateLink* ptr = this->mList.next; ptr != &this->mList; )
+         {
+            this->mTriggerNext.last() = ptr->next;
+            if( !this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j, k ) )
+            {
+               this->mTriggerNext.pop_back();
+               return false;
+            }
+            ptr = this->mTriggerNext.last();
+         }
+         this->mTriggerNext.pop_back();
+         return true;
+      }
+};
+
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L> 
+class Signal<bool(A,B,C,D,E,F,G,H,I,J,K,L)> : public SignalBaseT<bool(A,B,C,D,E,F,G,H,I,J,K,L)>
+{
+   public:
+
+      bool trigger( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l )
+      {
+         this->mTriggerNext.push_back(NULL);
+         for( SignalBase::DelegateLink* ptr = this->mList.next; ptr != &this->mList; )
+         {
+            this->mTriggerNext.last() = ptr->next;
+            if( !this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j, k, l ) )
+            {
+               this->mTriggerNext.pop_back();
+               return false;
+            }
+            ptr = this->mTriggerNext.last();
+         }
+         this->mTriggerNext.pop_back();
+         return true;
+      }
+};
+
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L, class M> 
+class Signal<bool(A,B,C,D,E,F,G,H,I,J,K,L,M)> : public SignalBaseT<bool(A,B,C,D,E,F,G,H,I,J,K,L,M)>
+{
+   public:
+
+      bool trigger( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l, M m )
+      {
+         this->mTriggerNext.push_back(NULL);
+         for( SignalBase::DelegateLink* ptr = this->mList.next; ptr != &this->mList; )
+         {
+            this->mTriggerNext.last() = ptr->next;
+            if( !this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j, k, l, m ) )
+            {
+               this->mTriggerNext.pop_back();
+               return false;
+            }
+            ptr = this->mTriggerNext.last();
+         }
+         this->mTriggerNext.pop_back();
+         return true;
+      }
+};
+
 // Non short-circuit signal implementations
 
 template<> 
@@ -657,6 +828,60 @@ class Signal<void(A,B,C,D,E,F,G,H,I,J)> : public SignalBaseT<void(A,B,C,D,E,F,G,
          {
             this->mTriggerNext.last() = ptr->next;
             this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j );
+            ptr = this->mTriggerNext.last();
+         }
+         this->mTriggerNext.pop_back();
+      }
+};
+
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K> 
+class Signal<void(A,B,C,D,E,F,G,H,I,J,K)> : public SignalBaseT<void(A,B,C,D,E,F,G,H,I,J,K)>
+{
+   public:
+
+      void trigger( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k )
+      {
+         this->mTriggerNext.push_back(NULL);
+         for( SignalBase::DelegateLink* ptr = this->mList.next; ptr != &this->mList; )
+         {
+            this->mTriggerNext.last() = ptr->next;
+            this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j, k );
+            ptr = this->mTriggerNext.last();
+         }
+         this->mTriggerNext.pop_back();
+      }
+};
+
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L> 
+class Signal<void(A,B,C,D,E,F,G,H,I,J,K,L)> : public SignalBaseT<void(A,B,C,D,E,F,G,H,I,J,K,L)>
+{
+   public:
+
+      void trigger( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l )
+      {
+         this->mTriggerNext.push_back(NULL);
+         for( SignalBase::DelegateLink* ptr = this->mList.next; ptr != &this->mList; )
+         {
+            this->mTriggerNext.last() = ptr->next;
+            this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j, k, l );
+            ptr = this->mTriggerNext.last();
+         }
+         this->mTriggerNext.pop_back();
+      }
+};
+
+template<class A, class B, class C, class D, class E, class F, class G, class H, class I, class J, class K, class L, class M> 
+class Signal<void(A,B,C,D,E,F,G,H,I,J,K,L,M)> : public SignalBaseT<void(A,B,C,D,E,F,G,H,I,J,K,L,M)>
+{
+   public:
+
+      void trigger( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l, M m )
+      {
+         this->mTriggerNext.push_back(NULL);
+         for( SignalBase::DelegateLink* ptr = this->mList.next; ptr != &this->mList; )
+         {
+            this->mTriggerNext.last() = ptr->next;
+            this->getDelegate( ptr )( a, b, c, d, e, f, g, h, i, j, k, l, m );
             ptr = this->mTriggerNext.last();
          }
          this->mTriggerNext.pop_back();

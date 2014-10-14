@@ -450,8 +450,9 @@ DefineEngineMethod( GuiListBoxCtrl, getSelectedItems, const char*, (),,
    if( selItems.empty() )
       return StringTable->lookup("-1");
 
-   UTF8 *retBuffer = Con::getReturnBuffer( selItems.size() * 4 );
-   dMemset( retBuffer, 0, selItems.size() * 4 );
+   static const U32 bufSize = selItems.size() * 4;
+   UTF8 *retBuffer = Con::getReturnBuffer( bufSize );
+   dMemset( retBuffer, 0, bufSize );
    Vector<S32>::iterator i = selItems.begin();
    for( ; i != selItems.end(); i++ )
    {
