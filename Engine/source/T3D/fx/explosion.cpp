@@ -964,10 +964,7 @@ void Explosion::onRemove()
       mMainEmitter = NULL;
    }
 
-   if (getSceneManager() != NULL)
-      getSceneManager()->removeObjectFromScene(this);
-   if (getContainer() != NULL)
-      getContainer()->removeObject(this);
+   removeFromScene();
 
    Parent::onRemove();
 }

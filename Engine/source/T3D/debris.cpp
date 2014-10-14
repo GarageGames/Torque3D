@@ -659,11 +659,7 @@ void Debris::onRemove()
       }
    }
 
-   if( getSceneManager() )
-      getSceneManager()->removeObjectFromScene(this);
-
-   if( getContainer() )
-      getContainer()->removeObject(this);
+   removeFromScene();
 
    Parent::onRemove();
 }
