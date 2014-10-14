@@ -367,6 +367,8 @@ SimObject* findObject(const char* name)
                return NULL;
             return obj->findObject(temp);
          }
+         else if (c < '0' || c > '9')
+            return NULL;
       }
    }
    S32 len;
