@@ -324,6 +324,7 @@ void GameConnection::onConnectionEstablished(bool isInitiator)
 
       const char *argv[MaxConnectArgs + 2];
       argv[0] = "onConnect";
+      argv[1] = NULL; // Filled in later
       for(U32 i = 0; i < mConnectArgc; i++)
          argv[i + 2] = mConnectArgv[i];
       // NOTE: Need to fallback to Con::execute() as IMPLEMENT_CALLBACK does not 
