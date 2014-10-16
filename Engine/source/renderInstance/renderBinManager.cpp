@@ -122,7 +122,6 @@ void RenderBinManager::internalAddElement(RenderInst* inst)
    mElementList.increment();
    MainSortElem &elem = mElementList.last();
    elem.inst = inst;
-   elem.key = elem.key2 = 0;
 
    elem.key = inst->defaultKey;
    elem.key2 = inst->defaultKey2;
