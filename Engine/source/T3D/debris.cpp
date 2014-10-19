@@ -99,7 +99,6 @@ DebrisData::DebrisData()
    friction   = 0.2f;
    numBounces = 0;
    bounceVariance = 0;
-   minSpinSpeed = maxSpinSpeed = 0.0;
    staticOnMaxBounce = false;
    explodeOnMaxBounce = false;
    snapOnMaxBounce = false;

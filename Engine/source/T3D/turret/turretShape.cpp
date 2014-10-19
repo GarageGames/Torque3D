@@ -1155,7 +1155,7 @@ void TurretShape::unpackUpdate(NetConnection *connection, BitStream *stream)
 void TurretShape::getWeaponMountTransform( S32 index, const MatrixF &xfm, MatrixF *outMat )
 {
    // Returns mount point to world space transform
-   if ( index >= 0 && index < SceneObject::NumMountPoints) {
+   if ( index >= 0 && index < ShapeBase::MaxMountedImages) {
       S32 ni = mDataBlock->weaponMountNode[index];
       if (ni != -1) {
          MatrixF mountTransform = mShapeInstance->mNodeTransforms[ni];
@@ -1180,7 +1180,7 @@ void TurretShape::getWeaponMountTransform( S32 index, const MatrixF &xfm, Matrix
 void TurretShape::getRenderWeaponMountTransform( F32 delta, S32 mountPoint, const MatrixF &xfm, MatrixF *outMat )
 {
    // Returns mount point to world space transform
-   if ( mountPoint >= 0 && mountPoint < SceneObject::NumMountPoints) {
+   if ( mountPoint >= 0 && mountPoint < ShapeBase::MaxMountedImages) {
       S32 ni = mDataBlock->weaponMountNode[mountPoint];
       if (ni != -1) {
          MatrixF mountTransform = mShapeInstance->mNodeTransforms[ni];
