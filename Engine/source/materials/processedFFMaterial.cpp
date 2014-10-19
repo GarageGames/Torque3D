@@ -368,7 +368,7 @@ void ProcessedFFMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBloc
       result.blendDefined = true;
       result.blendEnable = true;
       result.blendSrc = GFXBlendOne;
-      result.blendSrc = GFXBlendOne;
+      result.blendDest = GFXBlendZero;
    }
 
    // This is here for generic FF shader fallbacks.
