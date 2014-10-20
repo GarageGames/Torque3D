@@ -1,0 +1,3 @@
+<span class="date">{{include.post.date | date_to_string}}</span>
+<a href="{{page.root}}{{post.url}}"><span class="post-title">{{include.post.title}}</span></a>
+<p>{{ include.post.content | strip_html | truncatewords: 40 }}</p>

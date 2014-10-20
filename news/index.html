@@ -12,8 +12,7 @@ root: ..
     <p></p>
     <ul class="list-unstyled">
     {% for post in site.posts %}
-        <li><span class="date">{{post.date | date_to_string}}</span>
-        <a class="post-title" href="{{page.root}}{{post.url}}">{{post.title}}</a></li>
+        {% include newsitem.html post=post %}
     {% endfor %}
     </ul>
 </div>

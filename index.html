@@ -23,12 +23,14 @@ root: .
 <div class="container">
     <div class="row">
         <div class="col-sm-4">
-            <h2>Proven</h2>
+            <h2>Proven tech</h2>
             <p>
             Torque has been around for a while, and it's been used for everything
-            from interactive coral reefs to MMOs to driving simulators.
+            from driving simulators to MMOs to interactive coral reefs.
             </p>
-            <a href="{{page.root}}/engine">Games made with Torque <i class="fa fa-angle-right"></i></a>
+            <center>
+                <a href="{{page.root}}/engine">Games made with Torque <i class="fa fa-angle-right"></i></a>
+            </center>
         </div>
 
         <div class="col-sm-4">
@@ -37,7 +39,9 @@ root: .
             When you get Torque, you get everything. Under the permissive MIT
             open-source license, you can do what you want with the source code.
             </p>
-            <a href="{{page.root}}/start">Download it now <i class="fa fa-angle-right"></i></a>
+            <center>
+                <a class="btn btn-primary" href="{{page.root}}/start">Download it now</a>
+            </center>
         </div>
 
         <div class="col-sm-4">
@@ -47,9 +51,25 @@ root: .
             Its future is in <em>your</em> hands, not those of a company with a
             bottom line to meet.
             </p>
-            <a href="{{page.root}}/contribute">Get involved <i class="fa fa-angle-right"></i></a>
+            <center>
+                <a href="{{page.root}}/contribute">Get involved <i class="fa fa-angle-right"></i></a>
+            </center>
         </div>
     </div>
+
+    {% if site.posts != empty %}
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>Recent news</h2>
+
+            {% for post in site.posts limit:3 %}
+                {% include newsitem.html post=post %}
+            {% endfor %}
+
+            <a class="pull-right" href="{{page.root}}/news">See all <i class="fa fa-angle-right"></i></a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <div class="break"></div>
@@ -65,12 +85,12 @@ root: .
             <h2 class="status">Status</h2>
             <table class="borderless table">
                 <tr>
-                    <td>Continuous</td>
-                    <td><img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt79)/statusIcon"></img></td>
+                    <td>Current version</td>
+                    <td><a href="http://torque3d.wikidot.com/release:three-six-one">3.6.1</a></td>
                 </tr>
                 <tr>
-                    <td>Release</td>
-                    <td><img src="http://builds.garagegames.com/app/rest/builds/buildType:(id:bt78)/statusIcon"></img></td>
+                    <td>Continuous integration</td>
+                    <td><a href="http://t3dci.org">t3dci.org</a></td>
                 </tr>
             </table>
         </div>
@@ -79,39 +99,13 @@ root: .
             <h2>Issues</h2>
             <ul>
                 <li><a href="https://github.com/GarageGames/Torque3D/issues/new">Report an issue</a></li>
-                <li><a href="https://github.com/GarageGames/Torque3D/issues?milestone=2">Issues for next milestone</a></li>
+                <li><a href="https://github.com/GarageGames/Torque3D/issues?q=is%3Aopen+milestone%3A3.7+sort%3Aupdated-desc">Issues for next milestone</a></li>
                 <li><a href="https://github.com/GarageGames/Torque3D/issues?labels=Final+review">Changes for final review</a></li>
                 <li><a href="http://garagegames.uservoice.com/forums/178972-torque-3d-mit/filters/top">Feature requests</a></li>
             </ul>
         </div>
     </div>
 </div>
-
-{% if site.posts != empty %}
-<div class="break"></div>
-
-<div class="container">
-    <div class="imgbanner row">
-        <div class="col-sm-12">
-            <img src="{{page.root}}/img/banner1.jpg"></img>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-12">
-            <h2>Recent news</h2>
-
-            {% for post in site.posts limit:3 %}
-                <span class="date">{{post.date | date_to_string}}</span>
-                <a href="{{page.root}}{{post.url}}"><span class="post-title">{{post.title}}</span></a>
-                <p>{{ post.content | strip_html | truncatewords: 40 }}</p>
-            {% endfor %}
-
-            <a class="pull-right" href="{{page.root}}/news">See all <i class="fa fa-angle-right"></i></a>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 <script type="text/javascript" src="{{page.root}}/js/jquery.cycle.all.js"></script>
 <script type="text/javascript" src="{{page.root}}/js/jquery.timeago.js"></script>
@@ -124,11 +118,9 @@ $(document).ready(function() {
     4:  'Life is Feudal',
     5:  'Frozen Endzone by Mode 7',
     6:  'The Reef by QUT',
-    7:  'By Felix Westin',
-    8:  'By Felix Westin',
+    7:  'Grim Prospects',
+    8:  'Grim Prospects',
     9:  'BeamNG.drive by BeamNG',
-    10: 'Re-Spawn by Gobbo Games',
-    11: 'Blood & Mana',
     12: 'Villagers and Heroes by Mad Otter Games',
     13: 'Villagers and Heroes by Mad Otter Games',
     14: 'Villagers and Heroes by Mad Otter Games',
@@ -144,8 +136,6 @@ $(document).ready(function() {
     24: 'Airship Dragoon by YorkshireRifes',
     25: 'Frozen Endzone by Mode 7',
     26: 'Frozen Endzone by Mode 7',
-    27: 'Re-Spawn by Gobbo Games',
-    28: 'Blood & Mana',
     29: 'Dark Horizons: Mechanized Corps by Max Gaming Technologies',
     30: 'Dark Horizons: Mechanized Corps by Max Gaming Technologies',
     31: 'Dark Horizons: Mechanized Corps by Max Gaming Technologies',
