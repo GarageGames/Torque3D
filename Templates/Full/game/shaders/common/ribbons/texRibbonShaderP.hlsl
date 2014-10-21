@@ -1,6 +1,6 @@
 #define IN_HLSL
-#include "../common/shdrConsts.h"
-#include "shaders/common/torque.hlsl"
+#include "../shdrConsts.h"
+#include "../torque.hlsl"
  
 uniform sampler2D ribTex : register(S0);
  
