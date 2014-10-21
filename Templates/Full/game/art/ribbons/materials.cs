@@ -53,8 +53,8 @@ singleton CustomMaterial( BasicRibbonMat )
  
 new ShaderData( TexturedRibbonShader )
 {
-   DXVertexShaderFile   = "shaders/common/ribbons/TexturedRibbonShaderV.hlsl";
-   DXPixelShaderFile    = "shaders/common/ribbons/TexturedRibbonShaderP.hlsl";
+   DXVertexShaderFile   = "shaders/common/ribbons/texRibbonShaderV.hlsl";
+   DXPixelShaderFile    = "shaders/common/ribbons/texRibbonShaderP.hlsl";
  
    pixVersion = 2.0;
 };

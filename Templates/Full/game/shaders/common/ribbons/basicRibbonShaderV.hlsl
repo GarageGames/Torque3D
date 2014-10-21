@@ -1,5 +1,5 @@
 #define IN_HLSL
-#include "../common/shdrConsts.h"
+#include "../shdrConsts.h"
  
 struct a2v
 {
