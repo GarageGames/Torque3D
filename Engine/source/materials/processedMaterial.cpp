@@ -457,6 +457,14 @@ void ProcessedMaterial::_setStageData()
             mMaterial->logError("Failed to load specular map %s for stage %i", _getTexturePath(mMaterial->mSpecularMapFilename[i]).c_str(), i);
       }
 
+      // AccuMap
+      if( mMaterial->mAccuMapFilename[i].isNotEmpty() )
+      {
+         mStages[i].setTex( MFT_AccuMap, _createTexture( mMaterial->mAccuMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         if(!mStages[i].getTex( MFT_AccuMap ))
+            mMaterial->logError("Failed to load accu map %s for stage %i", _getTexturePath(mMaterial->mAccuMapFilename[i]).c_str(), i);
+      }  
+
       // EnironmentMap
       if( mMaterial->mEnvMapFilename[i].isNotEmpty() )
       {

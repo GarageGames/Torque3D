@@ -55,6 +55,11 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
    mSpecularColorSC = shader->getShaderConstHandle(ShaderGenVars::specularColor);
    mSpecularPowerSC = shader->getShaderConstHandle(ShaderGenVars::specularPower);
    mSpecularStrengthSC = shader->getShaderConstHandle(ShaderGenVars::specularStrength);
+   mAccuScaleSC = shader->getShaderConstHandle("$accuScale");
+   mAccuDirectionSC = shader->getShaderConstHandle("$accuDirection");
+   mAccuStrengthSC = shader->getShaderConstHandle("$accuStrength");
+   mAccuCoverageSC = shader->getShaderConstHandle("$accuCoverage");
+   mAccuSpecularSC = shader->getShaderConstHandle("$accuSpecular");
    mParallaxInfoSC = shader->getShaderConstHandle("$parallaxInfo");
    mFogDataSC = shader->getShaderConstHandle(ShaderGenVars::fogData);
    mFogColorSC = shader->getShaderConstHandle(ShaderGenVars::fogColor);
@@ -419,6 +424,31 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
       // the alpha channel.
       if( mStages[stageNum].getTex( MFT_SpecularMap )->mHasTransparency )
          fd.features.addFeature( MFT_GlossMap );
+   }
+   
+   if ( mMaterial->mAccuMapFilename[stageNum] != String::EmptyString) {
+      fd.features.addFeature( MFT_AccuMap );
+   }
+
+   // we need both diffuse and normal maps + sm3 to have an accu map
+   if(   fd.features[ MFT_AccuMap ] && 
+       ( !fd.features[ MFT_DiffuseMap ] || 
+         !fd.features[ MFT_NormalMap ] ||
+         GFX->getPixelShaderVersion() < 3.0f ) ) {
+      AssertWarn(false, "SAHARA: Using an Accu Map requires SM 3.0 and a normal map.");
+      fd.features.removeFeature( MFT_AccuMap );
+   }
+
+   // if we still have the AccuMap feature, we add all accu constant features
+   if ( fd.features[ MFT_AccuMap ] ) {
+      // add the dependencies of the accu map
+      fd.features.addFeature( MFT_AccuScale );
+      fd.features.addFeature( MFT_AccuDirection );
+      fd.features.addFeature( MFT_AccuStrength );
+      fd.features.addFeature( MFT_AccuCoverage );
+      fd.features.addFeature( MFT_AccuSpecular );
+      // now remove some features that are not compatible with this
+      fd.features.removeFeature( MFT_UseInstancing );
    }
 
    // Without a base texture use the diffuse color
@@ -1081,6 +1111,17 @@ void ProcessedShaderMaterial::_setShaderConstants(SceneRenderState * state, cons
          0.0f, 0.0f ); // TODO: Wrap mode flags?
       shaderConsts->setSafe(handles->mBumpAtlasTileSC, atlasTileParams);
    }
+   
+   if( handles->mAccuScaleSC->isValid() )
+      shaderConsts->set( handles->mAccuScaleSC, mMaterial->mAccuScale[stageNum] );
+   if( handles->mAccuDirectionSC->isValid() )
+      shaderConsts->set( handles->mAccuDirectionSC, mMaterial->mAccuDirection[stageNum] );
+   if( handles->mAccuStrengthSC->isValid() )
+      shaderConsts->set( handles->mAccuStrengthSC, mMaterial->mAccuStrength[stageNum] );
+   if( handles->mAccuCoverageSC->isValid() )
+      shaderConsts->set( handles->mAccuCoverageSC, mMaterial->mAccuCoverage[stageNum] );
+   if( handles->mAccuSpecularSC->isValid() )
+      shaderConsts->set( handles->mAccuSpecularSC, mMaterial->mAccuSpecular[stageNum] );
 }
 
 bool ProcessedShaderMaterial::_hasCubemap(U32 pass)
