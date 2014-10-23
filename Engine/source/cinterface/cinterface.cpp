@@ -132,6 +132,11 @@ extern "C" {
 
 	}
 
+	S32 torque_getreturnstatus()
+	{
+		return StandardMainLoop::getReturnStatus();
+	}
+
    // signal an engine shutdown (as with the quit(); console command)
 	void torque_enginesignalshutdown()
 	{

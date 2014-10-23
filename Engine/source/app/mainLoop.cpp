@@ -623,6 +623,11 @@ bool StandardMainLoop::doMainLoop()
    return keepRunning;
 }
 
+S32 StandardMainLoop::getReturnStatus()
+{
+   return Process::getReturnStatus();
+}
+
 void StandardMainLoop::setRestart(bool restart )
 {
    gRequiresRestart = restart;
