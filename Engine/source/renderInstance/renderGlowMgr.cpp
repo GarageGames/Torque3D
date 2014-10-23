@@ -88,6 +88,7 @@ RenderGlowMgr::RenderGlowMgr()
                                  Point2I( 512, 512 ) )
 {
    notifyType( RenderPassManager::RIT_Decal );
+   notifyType( RenderPassManager::RIT_DecalRoad );
    notifyType( RenderPassManager::RIT_Translucent );
 
    mNamedTarget.registerWithName( "glowbuffer" );

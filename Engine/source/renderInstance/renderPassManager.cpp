@@ -51,6 +51,7 @@ const RenderInstType RenderPassManager::RIT_Terrain("Terrain");
 const RenderInstType RenderPassManager::RIT_Object("Object");      
 const RenderInstType RenderPassManager::RIT_ObjectTranslucent("ObjectTranslucent");
 const RenderInstType RenderPassManager::RIT_Decal("Decal");
+const RenderInstType RenderPassManager::RIT_DecalRoad("DecalRoad");
 const RenderInstType RenderPassManager::RIT_Water("Water");
 const RenderInstType RenderPassManager::RIT_Foliage("Foliage");
 const RenderInstType RenderPassManager::RIT_Translucent("Translucent");
