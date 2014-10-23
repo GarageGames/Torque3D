@@ -454,10 +454,18 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
    {
       // Get the rest of our inputs.
       Var *normalMap = _getNormalMapTex();
-
+      
       // Call the library function to do the rest.
-      meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @.z * @ );\r\n", 
-         inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend ) );
+      if (fd.features.hasFeature(MFT_IsDXTnm, detailIndex))
+      {
+         meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @.z * @ );\r\n",
+            inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend));
+      }
+      else
+      {
+         meta->addStatement(new GenOp("   @.xy += parallaxOffset( @, @.xy, @, @.z * @ );\r\n",
+            inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend));
+      }
    }
 
    // If this is a prepass then we skip color.
