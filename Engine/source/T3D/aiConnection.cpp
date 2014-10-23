@@ -147,6 +147,7 @@ ConsoleFunction(aiConnect, S32 , 2, 20, "(...)"
    // Make sure and leav args[1] empty.
    const char* args[21];
    args[0] = "onConnect";
+   args[1] = NULL; // Filled in later
    for (S32 i = 1; i < argc; i++)
       args[i + 1] = argv[i];
 

@@ -540,7 +540,7 @@ class SimObject: public ConsoleObject
       
       virtual ~SimObject();
 
-      virtual bool processArguments(S32 argc, const char **argv);  ///< Process constructor options. (ie, new SimObject(1,2,3))
+      virtual bool processArguments(S32 argc, ConsoleValueRef *argv);  ///< Process constructor options. (ie, new SimObject(1,2,3))
 
       /// @}
 

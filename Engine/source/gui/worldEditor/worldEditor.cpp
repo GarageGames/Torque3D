@@ -2760,7 +2760,7 @@ void WorldEditor::initPersistFields()
 //------------------------------------------------------------------------------
 // These methods are needed for the console interfaces.
 
-void WorldEditor::ignoreObjClass( U32 argc, const char **argv )
+void WorldEditor::ignoreObjClass( U32 argc, ConsoleValueRef *argv )
 {
    for(S32 i = 2; i < argc; i++)
    {
@@ -3210,7 +3210,7 @@ ConsoleMethod( WorldEditor, setActiveSelection, void, 3, 3, "( id set ) - Set th
    WorldEditorSelection* selection;
    if( !Sim::findObject( argv[ 2 ], selection ) )
    {
-      Con::errorf( "WorldEditor::setActiveSelectionSet - no selection set '%s'", argv[ 2 ] );
+      Con::errorf( "WorldEditor::setActiveSelectionSet - no selection set '%s'", (const char*)argv[ 2 ] );
       return;
    }
    
@@ -3337,14 +3337,14 @@ ConsoleMethod( WorldEditor, alignByBounds, void, 3, 3, "(int boundsAxis)"
               "Align all selected objects against the given bounds axis.")
 {
 	if(!object->alignByBounds(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", argv[2]));
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", (const char*)argv[2]));
 }
 
 ConsoleMethod( WorldEditor, alignByAxis, void, 3, 3, "(int axis)"
               "Align all selected objects along the given axis.")
 {
 	if(!object->alignByAxis(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", argv[2]));
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", (const char*)argv[2]));
 }
 
 ConsoleMethod( WorldEditor, resetSelectedRotation, void, 2, 2, "")
@@ -3549,7 +3549,7 @@ void WorldEditor::colladaExportSelection( const String &path )
 ConsoleMethod( WorldEditor, colladaExportSelection, void, 3, 3, 
               "( String path ) - Export the combined geometry of all selected objects to the specified path in collada format." )
 {  
-   object->colladaExportSelection( argv[2] );
+   object->colladaExportSelection( (const char*)argv[2] );
 }
 
 void WorldEditor::makeSelectionPrefab( const char *filename )

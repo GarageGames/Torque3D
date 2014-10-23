@@ -1455,7 +1455,7 @@ ConsoleFunction( sfxCreateSource, S32, 2, 6,
       description = dynamic_cast< SFXDescription* >( Sim::findObject( argv[1] ) );
       if ( !description )
       {
-         Con::printf( "Unable to locate sound track/description '%s'", argv[1] );
+         Con::printf( "Unable to locate sound track/description '%s'", (const char*)argv[1] );
          return 0;
       }
    }
@@ -1561,7 +1561,7 @@ ConsoleFunction( sfxPlay, S32, 2, 5, "( SFXSource source | ( SFXTrack track [, f
    SFXTrack* track = dynamic_cast<SFXTrack*>( Sim::findObject( argv[1] ) );
    if ( !track )
    {
-      Con::printf( "Unable to locate sfx track '%s'", argv[1] );
+      Con::printf( "Unable to locate sfx track '%s'", (const char*)argv[1] );
       return 0;
    }
 
@@ -1664,7 +1664,7 @@ ConsoleFunction( sfxPlayOnce, S32, 2, 6,
       description = dynamic_cast< SFXDescription* >( Sim::findObject( argv[1] ) );
       if( !description )
       {
-         Con::errorf( "sfxPlayOnce - Unable to locate sound track/description '%s'", argv[1] );
+         Con::errorf( "sfxPlayOnce - Unable to locate sound track/description '%s'", (const char*)argv[1] );
          return 0;
       }
    }

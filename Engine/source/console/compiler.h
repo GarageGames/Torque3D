@@ -63,6 +63,9 @@ namespace Compiler
       OP_RETURN,
       // fixes a bug when not explicitly returning a value
       OP_RETURN_VOID,
+      OP_RETURN_FLT,
+      OP_RETURN_UINT,
+
       OP_CMPEQ,
       OP_CMPGR,
       OP_CMPGE,
@@ -96,10 +99,12 @@ namespace Compiler
       OP_LOADVAR_UINT,// 40
       OP_LOADVAR_FLT,
       OP_LOADVAR_STR,
+      OP_LOADVAR_VAR,
 
       OP_SAVEVAR_UINT,
       OP_SAVEVAR_FLT,
       OP_SAVEVAR_STR,
+      OP_SAVEVAR_VAR,
 
       OP_SETCUROBJECT,
       OP_SETCUROBJECT_NEW,
@@ -126,6 +131,7 @@ namespace Compiler
       OP_UINT_TO_FLT,
       OP_UINT_TO_STR,
       OP_UINT_TO_NONE,
+      OP_COPYVAR_TO_NONE,
 
       OP_LOADIMMED_UINT,
       OP_LOADIMMED_FLT,
@@ -145,8 +151,11 @@ namespace Compiler
       OP_TERMINATE_REWIND_STR,  // 80
       OP_COMPARE_STR,
 
-      OP_PUSH,
-      OP_PUSH_FRAME,
+      OP_PUSH,          // String
+      OP_PUSH_UINT,     // Integer
+      OP_PUSH_FLT,      // Float
+      OP_PUSH_VAR,      // Variable
+      OP_PUSH_FRAME,    // Frame
 
       OP_ASSERT,
       OP_BREAK,

@@ -684,7 +684,7 @@ ConsoleMethod( WorldEditorSelection, union, void, 3, 3, "( SimSet set ) - Add al
    SimSet* selection;
    if( !Sim::findObject( argv[ 2 ], selection ) )
    {
-      Con::errorf( "WorldEditorSelection::union - no SimSet '%s'", argv[ 2 ] );
+      Con::errorf( "WorldEditorSelection::union - no SimSet '%s'", (const char*)argv[ 2 ] );
       return;
    }
    
@@ -700,7 +700,7 @@ ConsoleMethod( WorldEditorSelection, subtract, void, 3, 3, "( SimSet ) - Remove 
    SimSet* selection;
    if( !Sim::findObject( argv[ 2 ], selection ) )
    {
-      Con::errorf( "WorldEditorSelection::subtract - no SimSet '%s'", argv[ 2 ] );
+      Con::errorf( "WorldEditorSelection::subtract - no SimSet '%s'", (const char*)argv[ 2 ] );
       return;
    }
    

@@ -1082,7 +1082,7 @@ ConsoleMethod( GuiRoadEditorCtrl, setNodePosition, void, 3, 3, "" )
 	
 	if ( (count != 3) )
    {
-		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
+		Con::printf("Failed to parse node information \"px py pz\" from '%s'", (const char*)argv[3]);
       return;
    }
 

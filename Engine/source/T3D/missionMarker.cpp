@@ -555,7 +555,7 @@ ConsoleMethod(SpawnSphere, spawnObject, S32, 2, 3,
    String additionalProps;
 
    if (argc == 3)
-      additionalProps = String(argv[2]);
+      additionalProps = (const char*)argv[2];
 
    SimObject* obj = object->spawnObject(additionalProps);
 

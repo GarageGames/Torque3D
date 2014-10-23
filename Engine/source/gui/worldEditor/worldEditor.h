@@ -76,7 +76,7 @@ class WorldEditor : public EditTSCtrl
          Point3F p2;
       };
 
-      void ignoreObjClass(U32 argc, const char** argv);
+      void ignoreObjClass(U32 argc, ConsoleValueRef* argv);
       void clearIgnoreList();
 
       static bool setObjectsUseBoxCenter( void *object, const char *index, const char *data ) { static_cast<WorldEditor*>(object)->setObjectsUseBoxCenter( dAtob( data ) ); return false; };

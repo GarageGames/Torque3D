@@ -471,7 +471,7 @@ ConsoleMethod( EventManager, subscribe, bool, 4, 5, "( SimObject listener, Strin
       return false;
    }
 
-   return object->subscribe( cbObj, argv[3], argc > 4 ? argv[4] : NULL );
+   return object->subscribe( cbObj, argv[3], argc > 4 ? (const char*)argv[4] : NULL );
 }
 
 ConsoleMethod( EventManager, remove, void, 4, 4, "( SimObject listener, String event )\n\n"

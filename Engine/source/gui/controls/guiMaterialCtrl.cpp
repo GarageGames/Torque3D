@@ -169,5 +169,5 @@ void GuiMaterialCtrl::onRender( Point2I offset, const RectI &updateRect )
 ConsoleMethod( GuiMaterialCtrl, setMaterial, bool, 3, 3, "( string materialName )"
                "Set the material to be displayed in the control." )
 {
-   return object->setMaterial( argv[2] );
+   return object->setMaterial( (const char*)argv[2] );
 }

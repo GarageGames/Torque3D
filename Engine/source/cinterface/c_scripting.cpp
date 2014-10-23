@@ -76,7 +76,7 @@ extern "C" {
       if (!entry)
          return "";
 
-      const char* argv[] = {"consoleExportXML", 0};
+      ConsoleValueRef argv[] = {"consoleExportXML"};
 
       return entry->cb.mStringCallbackFunc(NULL, 1, argv);      
    }
@@ -215,7 +215,8 @@ extern "C" {
             return "";
       }
 
-      return entry->cb.mStringCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mStringCallbackFunc(o, args.count(), args);
    }
 
    bool script_call_namespace_entry_bool(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -233,7 +234,8 @@ extern "C" {
             return false;
       }
 
-      return entry->cb.mBoolCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mBoolCallbackFunc(o, args.count(), args);
    }
 
    S32 script_call_namespace_entry_int(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -251,7 +253,8 @@ extern "C" {
             return 0;
       }
 
-      return entry->cb.mIntCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mIntCallbackFunc(o, args.count(), args);
    }
 
    F32 script_call_namespace_entry_float(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -269,7 +272,8 @@ extern "C" {
             return 0.0f;
       }
 
-      return entry->cb.mFloatCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mFloatCallbackFunc(o, args.count(), args);
    }
 
 
@@ -288,7 +292,8 @@ extern "C" {
             return;
       }
 
-      entry->cb.mVoidCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      entry->cb.mVoidCallbackFunc(o, args.count(), args);
    }
 
    S32 script_simobject_get_id(SimObject* so)

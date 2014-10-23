@@ -267,7 +267,8 @@ extern "C" {
 		if (!entry)
 			return;
 
-		entry->cb.mVoidCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		entry->cb.mVoidCallbackFunc(NULL, args.count(), args);
 	}
 
 	F32 torque_callfloatfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -278,7 +279,8 @@ extern "C" {
 		if (!entry)
 			return 0.0f;
 
-		return entry->cb.mFloatCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mFloatCallbackFunc(NULL, args.count(), args);
 	}
 
 	S32 torque_callintfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -289,7 +291,8 @@ extern "C" {
 		if (!entry)
 			return 0;
 
-		return entry->cb.mIntCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mIntCallbackFunc(NULL, args.count(), args);
 	}
 
 
@@ -300,7 +303,8 @@ extern "C" {
 		if (!entry)
 			return "";
 
-		return entry->cb.mStringCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mStringCallbackFunc(NULL, args.count(), args);
 	}
 
 	bool torque_callboolfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -310,7 +314,8 @@ extern "C" {
 		if (!entry)
 			return false;
 
-		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mBoolCallbackFunc(NULL, args.count(), args);
 	}
 
 
@@ -324,7 +329,8 @@ extern "C" {
 		if(!entry->mFunctionOffset)
 			return "";
 
-		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, argc, argv, false, entry->mPackage);
+		StringStackConsoleWrapper args(argc, argv);
+		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, args.count(), args, false, entry->mPackage);
 
 		if (!ret || !dStrlen(ret))
 			return "";

@@ -4929,7 +4929,7 @@ ConsoleMethod( GuiTreeViewCtrl, setItemTooltip, void, 4, 4, "( int id, string te
       return;
    }
    
-   item->mTooltip = argv[ 3 ];
+   item->mTooltip = (const char*)argv[ 3 ];
 }
 
 ConsoleMethod( GuiTreeViewCtrl, setItemImages, void, 5, 5, "( int id, int normalImage, int expandedImage ) - Sets the normal and expanded images to show for the given item." )

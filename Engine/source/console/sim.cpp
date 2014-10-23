@@ -138,20 +138,20 @@ ConsoleDocFragment _spawnObject1(
 ConsoleFunction(spawnObject, S32, 3, 6, "spawnObject(class [, dataBlock, name, properties, script])"
 				"@hide")
 {
-   String spawnClass(argv[1]);
+   String spawnClass((const char*)argv[1]);
    String spawnDataBlock;
    String spawnName;
    String spawnProperties;
    String spawnScript;
 
    if (argc >= 3)
-      spawnDataBlock = argv[2];
+      spawnDataBlock = (const char*)argv[2];
    if (argc >= 4)
-      spawnName = argv[3];
+      spawnName = (const char*)argv[3];
    if (argc >= 5)
-      spawnProperties = argv[4];
+      spawnProperties = (const char*)argv[4];
    if (argc >= 6)
-      spawnScript = argv[5];
+      spawnScript = (const char*)argv[5];
 
    SimObject* spawnObject = Sim::spawnObject(spawnClass, spawnDataBlock, spawnName, spawnProperties, spawnScript);
 

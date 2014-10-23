@@ -2434,7 +2434,7 @@ ConsoleMethod( TerrainEditor, attachTerrain, void, 2, 3, "(TerrainBlock terrain)
          terrains.push_back(terrBlock);
 
       if(terrains.size() == 0)
-         Con::errorf(ConsoleLogEntry::Script, "TerrainEditor::attach: failed to attach to object '%s'", argv[2]);
+         Con::errorf(ConsoleLogEntry::Script, "TerrainEditor::attach: failed to attach to object '%s'", (const char*)argv[2]);
    }
 
    if (terrains.size() > 0)

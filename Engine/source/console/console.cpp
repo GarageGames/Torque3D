@@ -42,6 +42,7 @@
 
 
 extern StringStack STR;
+extern ConsoleValueStack CSTK;
 
 ConsoleDocFragment* ConsoleDocFragment::smFirst;
 ExprEvalState gEvalState;
@@ -709,10 +710,11 @@ void errorf(const char* fmt,...)
 
 //---------------------------------------------------------------------------
 
-void setVariable(const char *name, const char *value)
+bool getVariableObjectField(const char *name, SimObject **object, const char **field)
 {
    // get the field info from the object..
-   if(name[0] != '$' && dStrchr(name, '.') && !isFunction(name))
+   const char *dot = dStrchr(name, '.');
+   if(name[0] != '$' && dot)
    {
       S32 len = dStrlen(name);
       AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - name too long");
@@ -721,17 +723,17 @@ void setVariable(const char *name, const char *value)
       char * token = dStrtok(scratchBuffer, ".");
       SimObject * obj = Sim::findObject(token);
       if(!obj)
-         return;
+         return false;
 
       token = dStrtok(0, ".\0");
       if(!token)
-         return;
+         return false;
 
       while(token != NULL)
       {
          const char * val = obj->getDataField(StringTable->insert(token), 0);
          if(!val)
-            return;
+            return false;
 
          char *fieldToken = token;
          token = dStrtok(0, ".\0");
@@ -739,17 +741,72 @@ void setVariable(const char *name, const char *value)
          {
             obj = Sim::findObject(token);
             if(!obj)
-               return;
+               return false;
          }
          else
          {
-            obj->setDataField(StringTable->insert(fieldToken), 0, value);
+            *object = obj;
+            *field = fieldToken;
+            return true;
          }
       }
    }
 
+   return false;
+}
+
+Dictionary::Entry *getLocalVariableEntry(const char *name)
+{
+   name = prependPercent(name);
+   return gEvalState.getCurrentFrame().lookup(StringTable->insert(name));
+}
+
+Dictionary::Entry *getVariableEntry(const char *name)
+{
    name = prependDollar(name);
-   gEvalState.globalVars.setVariable(StringTable->insert(name), value);
+   return gEvalState.globalVars.lookup(StringTable->insert(name));
+}
+
+Dictionary::Entry *addVariableEntry(const char *name)
+{
+   name = prependDollar(name);
+   return gEvalState.globalVars.add(StringTable->insert(name));
+}
+
+Dictionary::Entry *getAddVariableEntry(const char *name)
+{
+   name = prependDollar(name);
+   StringTableEntry stName = StringTable->insert(name);
+   Dictionary::Entry *entry = gEvalState.globalVars.lookup(stName);
+   if (!entry)
+	   entry = gEvalState.globalVars.add(stName);
+   return entry;
+}
+
+Dictionary::Entry *getAddLocalVariableEntry(const char *name)
+{
+   name = prependPercent(name);
+   StringTableEntry stName = StringTable->insert(name);
+   Dictionary::Entry *entry = gEvalState.getCurrentFrame().lookup(stName);
+   if (!entry)
+	   entry = gEvalState.getCurrentFrame().add(stName);
+   return entry;
+}
+
+void setVariable(const char *name, const char *value)
+{
+   SimObject *obj = NULL;
+   const char *objField = NULL;
+
+   if (getVariableObjectField(name, &obj, &objField))
+   {
+	   obj->setDataField(StringTable->insert(objField), 0, value);
+   }
+   else 
+   {
+      name = prependDollar(name);
+      gEvalState.globalVars.setVariable(StringTable->insert(name), value);
+   }
 }
 
 void setLocalVariable(const char *name, const char *value)
@@ -760,21 +817,57 @@ void setLocalVariable(const char *name, const char *value)
 
 void setBoolVariable(const char *varName, bool value)
 {
-   setVariable(varName, value ? "1" : "0");
+   SimObject *obj = NULL;
+   const char *objField = NULL;
+
+   if (getVariableObjectField(varName, &obj, &objField))
+   {
+	   obj->setDataField(StringTable->insert(objField), 0, value ? "1" : "0");
+   }
+   else
+   {
+      varName = prependDollar(varName);
+      Dictionary::Entry *entry = getAddVariableEntry(varName);
+	  entry->setStringValue(value ? "1" : "0");
+   }
 }
 
 void setIntVariable(const char *varName, S32 value)
 {
-   char scratchBuffer[32];
-   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
-   setVariable(varName, scratchBuffer);
+   SimObject *obj = NULL;
+   const char *objField = NULL;
+
+   if (getVariableObjectField(varName, &obj, &objField))
+   {
+	   char scratchBuffer[32];
+	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
+	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+   }
+   else
+   {
+      varName = prependDollar(varName);
+      Dictionary::Entry *entry = getAddVariableEntry(varName);
+      entry->setIntValue(value);
+   }
 }
 
 void setFloatVariable(const char *varName, F32 value)
 {
-   char scratchBuffer[32];
-   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
-   setVariable(varName, scratchBuffer);
+   SimObject *obj = NULL;
+   const char *objField = NULL;
+
+   if (getVariableObjectField(varName, &obj, &objField))
+   {
+	   char scratchBuffer[32];
+	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
+	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+   }
+   else
+   {
+      varName = prependDollar(varName);
+      Dictionary::Entry *entry = getAddVariableEntry(varName);
+	  entry->setFloatValue(value);
+   }
 }
 
 //---------------------------------------------------------------------------
@@ -825,13 +918,14 @@ void stripColorChars(char* line)
    }
 }
 
-const char *getVariable(const char *name)
+// 
+const char *getObjectTokenField(const char *name)
 {
-   // get the field info from the object..
-   if(name[0] != '$' && dStrchr(name, '.') && !isFunction(name))
+   const char *dot = dStrchr(name, '.');
+   if(name[0] != '$' && dot)
    {
       S32 len = dStrlen(name);
-      AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - name too long");
+      AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - object name too long");
       dMemcpy(scratchBuffer, name, len+1);
 
       char * token = dStrtok(scratchBuffer, ".");
@@ -861,8 +955,21 @@ const char *getVariable(const char *name)
       }
    }
 
-   name = prependDollar(name);
-   return gEvalState.globalVars.getVariable(StringTable->insert(name));
+   return NULL;
+}
+
+const char *getVariable(const char *name)
+{
+   const char *objField = getObjectTokenField(name);
+   if (objField)
+   {
+      return objField;
+   }
+   else
+   {
+      Dictionary::Entry *entry = getVariableEntry(name);
+      return entry ? entry->getStringValue() : "";
+   }
 }
 
 const char *getLocalVariable(const char *name)
@@ -874,20 +981,45 @@ const char *getLocalVariable(const char *name)
 
 bool getBoolVariable(const char *varName, bool def)
 {
-   const char *value = getVariable(varName);
-   return *value ? dAtob(value) : def;
+   const char *objField = getObjectTokenField(varName);
+   if (objField)
+   {
+      return *objField ? dAtob(objField) : def;
+   }
+   else
+   {
+      Dictionary::Entry *entry = getVariableEntry(varName);
+      objField = entry ? entry->getStringValue() : "";
+      return *objField ? dAtob(objField) : def;
+   }
 }
 
 S32 getIntVariable(const char *varName, S32 def)
 {
-   const char *value = getVariable(varName);
-   return *value ? dAtoi(value) : def;
+   const char *objField = getObjectTokenField(varName);
+   if (objField)
+   {
+      return *objField ? dAtoi(objField) : def;
+   }
+   else
+   {
+      Dictionary::Entry *entry = getVariableEntry(varName);
+      return entry ? entry->getIntValue() : def;
+   }
 }
 
 F32 getFloatVariable(const char *varName, F32 def)
 {
-   const char *value = getVariable(varName);
-   return *value ? dAtof(value) : def;
+   const char *objField = getObjectTokenField(varName);
+   if (objField)
+   {
+      return *objField ? dAtof(objField) : def;
+   }
+   else
+   {
+      Dictionary::Entry *entry = getVariableEntry(varName);
+	   return entry ? entry->getFloatValue() : def;
+   }
 }
 
 //---------------------------------------------------------------------------
@@ -1032,7 +1164,7 @@ const char *evaluatef(const char* string, ...)
    return newCodeBlock->compileExec(NULL, buffer, false, 0);
 }
 
-const char *execute(S32 argc, const char *argv[])
+const char *execute(S32 argc, ConsoleValueRef argv[])
 {
 #ifdef TORQUE_MULTITHREAD
    if(isMainThread())
@@ -1044,10 +1176,11 @@ const char *execute(S32 argc, const char *argv[])
 
       if(!ent)
       {
-         warnf(ConsoleLogEntry::Script, "%s: Unknown command.", argv[0]);
+         warnf(ConsoleLogEntry::Script, "%s: Unknown command.", (const char*)argv[0]);
 
          // Clean up arg buffers, if any.
          STR.clearFunctionOffset();
+         CSTK.resetFrame();
          return "";
       }
       return ent->execute(argc, argv, &gEvalState);
@@ -1064,10 +1197,15 @@ const char *execute(S32 argc, const char *argv[])
 #endif
 }
 
-//------------------------------------------------------------------------------
-const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCallOnly)
+const char *execute(S32 argc, const char *argv[])
 {
-   static char idBuf[16];
+   StringStackConsoleWrapper args(argc, argv);
+   return execute(args.count(), args);
+}
+
+//------------------------------------------------------------------------------
+const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool thisCallOnly)
+{
    if(argc < 2)
       return "";
 
@@ -1078,13 +1216,21 @@ const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCa
    {
       ICallMethod *com = dynamic_cast<ICallMethod *>(object);
       if(com)
+      {
+         STR.pushFrame();
+         CSTK.pushFrame();
          com->callMethodArgList(argc, argv, false);
+         STR.popFrame();
+         CSTK.popFrame();
+      }
    }
 
    if(object->getNamespace())
    {
-      dSprintf(idBuf, sizeof(idBuf), "%d", object->getId());
-      argv[1] = idBuf;
+	  ConsoleValueRef internalArgv[StringStack::MaxArgs];
+
+	  U32 ident = object->getId();
+	  ConsoleValueRef oldIdent = argv[1];
 
       StringTableEntry funcName = StringTable->insert(argv[0]);
       Namespace::Entry *ent = object->getNamespace()->lookup(funcName);
@@ -1095,13 +1241,12 @@ const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCa
 
          // Clean up arg buffers, if any.
          STR.clearFunctionOffset();
+         CSTK.resetFrame();
          return "";
       }
 
       // Twiddle %this argument
-      const char *oldArg1 = argv[1];
-      dSprintf(idBuf, sizeof(idBuf), "%d", object->getId());
-      argv[1] = idBuf;
+      argv[1] = (S32)ident;
 
       SimObject *save = gEvalState.thisObject;
       gEvalState.thisObject = object;
@@ -1109,90 +1254,62 @@ const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCa
       gEvalState.thisObject = save;
 
       // Twiddle it back
-      argv[1] = oldArg1;
+      argv[1] = oldIdent;
 
       return ret;
    }
-   warnf(ConsoleLogEntry::Script, "Con::execute - %d has no namespace: %s", object->getId(), argv[0]);
+   warnf(ConsoleLogEntry::Script, "Con::execute - %d has no namespace: %s", object->getId(), (const char*)argv[0]);
    return "";
 }
 
-#define B( a ) const char* a = NULL
-#define A const char*
-inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc, 
-                            A a, B(b), B(c), B(d), B(e), B(f), B(g), B(h), B(i), B(j), B(k))
+const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCallOnly)
 {
-#undef A
-#undef B
+   StringStackConsoleWrapper args(argc, argv);
+   return execute(object, args.count(), args, thisCallOnly);
+}
+
+inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc, ConsoleValueRef *argv)
+{
    const U32 maxArg = 12;
    AssertWarn(checkArgc == argc, "Incorrect arg count passed to Con::executef(SimObject*)");
    AssertFatal(argc <= maxArg - 1, "Too many args passed to Con::_executef(SimObject*). Please update the function to handle more.");
-   const char* argv[maxArg];
-   argv[0] = a;
-   argv[1] = a;
-   argv[2] = b;
-   argv[3] = c;
-   argv[4] = d;
-   argv[5] = e;
-   argv[6] = f;
-   argv[7] = g;
-   argv[8] = h;
-   argv[9] = i;
-   argv[10] = j;
-   argv[11] = k;
-   return execute(obj, argc+1, argv);
+   return execute(obj, argc, argv);
 }
 
-#define A const char*
+#define A ConsoleValueRef
 #define OBJ SimObject* obj
-const char *executef(OBJ, A a)                                    { return _executef(obj, 1, 1, a); }
-const char *executef(OBJ, A a, A b)                               { return _executef(obj, 2, 2, a, b); }
-const char *executef(OBJ, A a, A b, A c)                          { return _executef(obj, 3, 3, a, b, c); }
-const char *executef(OBJ, A a, A b, A c, A d)                     { return _executef(obj, 4, 4, a, b, c, d); }
-const char *executef(OBJ, A a, A b, A c, A d, A e)                { return _executef(obj, 5, 5, a, b, c, d, e); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f)           { return _executef(obj, 6, 6, a, b, c, d, e, f); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g)      { return _executef(obj, 7, 7, a, b, c, d, e, f, g); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h) { return _executef(obj, 8, 8, a, b, c, d, e, f, g, h); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i) { return _executef(obj, 9, 9, a, b, c, d, e, f, g, h, i); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { return _executef(obj,10,10, a, b, c, d, e, f, g, h, i, j); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i, A j, A k) { return _executef(obj,11,11, a, b, c, d, e, f, g, h, i, j, k); }
-#undef A
+const char *executef(OBJ, A a)                                    { ConsoleValueRef params[] = {a,ConsoleValueRef()}; return _executef(obj, 2, 2, params); }
+const char *executef(OBJ, A a, A b)                               { ConsoleValueRef params[] = {a,ConsoleValueRef(),b}; return _executef(obj, 3, 3, params); }
+const char *executef(OBJ, A a, A b, A c)                          { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c}; return _executef(obj, 4, 4, params); }
+const char *executef(OBJ, A a, A b, A c, A d)                     { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d}; return _executef(obj, 5, 5, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e)                { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e}; return _executef(obj, 6, 6, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e, A f)           { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f}; return _executef(obj, 7, 7, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g)      { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g}; return _executef(obj, 8, 8, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h}; return _executef(obj, 9, 9, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h,i}; return _executef(obj, 10, 10, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h,i,j}; return _executef(obj, 11, 11, params); }
+const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i, A j, A k) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h,i,j,k}; return _executef(obj, 12, 12, params); }
 
 //------------------------------------------------------------------------------
-#define B( a ) const char* a = NULL
-#define A const char*
-inline const char*_executef(S32 checkArgc, S32 argc, A a, B(b), B(c), B(d), B(e), B(f), B(g), B(h), B(i), B(j))
+inline const char*_executef(S32 checkArgc, S32 argc, ConsoleValueRef *argv)
 {
-#undef A
-#undef B
    const U32 maxArg = 10;
    AssertFatal(checkArgc == argc, "Incorrect arg count passed to Con::executef()");
    AssertFatal(argc <= maxArg, "Too many args passed to Con::_executef(). Please update the function to handle more.");
-   const char* argv[maxArg];
-   argv[0] = a;
-   argv[1] = b;
-   argv[2] = c;
-   argv[3] = d;
-   argv[4] = e;
-   argv[5] = f;
-   argv[6] = g;
-   argv[7] = h;
-   argv[8] = i;
-   argv[9] = j;
    return execute(argc, argv);
 }
    
-#define A const char*
-const char *executef(A a)                                    { return _executef(1, 1, a); }
-const char *executef(A a, A b)                               { return _executef(2, 2, a, b); }
-const char *executef(A a, A b, A c)                          { return _executef(3, 3, a, b, c); }
-const char *executef(A a, A b, A c, A d)                     { return _executef(4, 4, a, b, c, d); }
-const char *executef(A a, A b, A c, A d, A e)                { return _executef(5, 5, a, b, c, d, e); }
-const char *executef(A a, A b, A c, A d, A e, A f)           { return _executef(6, 6, a, b, c, d, e, f); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g)      { return _executef(7, 7, a, b, c, d, e, f, g); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h) { return _executef(8, 8, a, b, c, d, e, f, g, h); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i) { return _executef(9, 9, a, b, c, d, e, f, g, h, i); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { return _executef(10,10,a, b, c, d, e, f, g, h, i, j); }
+#define A ConsoleValueRef
+const char *executef(A a)                                    { ConsoleValueRef params[] = {a}; return _executef(1, 1, params); }
+const char *executef(A a, A b)                               { ConsoleValueRef params[] = {a,b}; return _executef(2, 2, params); }
+const char *executef(A a, A b, A c)                          { ConsoleValueRef params[] = {a,b,c}; return _executef(3, 3, params); }
+const char *executef(A a, A b, A c, A d)                     { ConsoleValueRef params[] = {a,b,c,d}; return _executef(4, 4, params); }
+const char *executef(A a, A b, A c, A d, A e)                { ConsoleValueRef params[] = {a,b,c,d,e}; return _executef(5, 5, params); }
+const char *executef(A a, A b, A c, A d, A e, A f)           { ConsoleValueRef params[] = {a,b,c,d,e,f}; return _executef(1, 1, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g)      { ConsoleValueRef params[] = {a,b,c,d,e,f,g}; return _executef(1, 1, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g, A h) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h}; return _executef(1, 1, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i}; return _executef(1, 1, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i,j}; return _executef(1, 1, params); }
 #undef A
 
 
@@ -1390,10 +1507,10 @@ StringTableEntry getModNameFromPath(const char *path)
 void postConsoleInput( RawData data )
 {
    // Schedule this to happen at the next time event.
-   char *argv[2];
+   ConsoleValueRef argv[2];
    argv[0] = "eval";
-   argv[1] = ( char* ) data.data;
-   Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(2, const_cast<const char**>(argv), false));
+   argv[1] = ( const char* ) data.data;
+   Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(2, argv, false));
 }
 
 //------------------------------------------------------------------------------
@@ -1455,4 +1572,248 @@ DefineEngineFunction( logWarning, void, ( const char* message ),,
    "@ingroup Logging")
 {
    Con::warnf( "%s", message );
+}
+
+ConsoleValueRef::ConsoleValueRef(const ConsoleValueRef &ref)
+{
+	value = ref.value;
+	stringStackValue = ref.stringStackValue;
+}
+
+ConsoleValueRef::ConsoleValueRef(const char *newValue) : value(NULL)
+{
+   *this = newValue;
+}
+
+ConsoleValueRef::ConsoleValueRef(const String &newValue) : value(NULL)
+{
+   *this = (const char*)(newValue.utf8());
+}
+
+ConsoleValueRef::ConsoleValueRef(U32 newValue) : value(NULL)
+{
+   *this = newValue;
+}
+
+ConsoleValueRef::ConsoleValueRef(S32 newValue) : value(NULL)
+{
+   *this = newValue;
+}
+
+ConsoleValueRef::ConsoleValueRef(F32 newValue) : value(NULL)
+{
+   *this = newValue;
+}
+
+ConsoleValueRef::ConsoleValueRef(F64 newValue) : value(NULL)
+{
+   *this = newValue;
+}
+
+StringStackWrapper::StringStackWrapper(int targc, ConsoleValueRef targv[])
+{
+   argv = new const char*[targc];
+   argc = targc;
+
+   for (int i=0; i<targc; i++)
+   {
+      argv[i] = dStrdup(targv[i]);
+   }
+}
+
+StringStackWrapper::~StringStackWrapper()
+{
+   for (int i=0; i<argc; i++)
+   {
+      dFree(argv[i]);
+   }
+   delete[] argv;
+}
+
+
+StringStackConsoleWrapper::StringStackConsoleWrapper(int targc, const char** targ)
+{
+   argv = new ConsoleValueRef[targc];
+   argc = targc;
+
+   for (int i=0; i<targc; i++) {
+      argv[i] = ConsoleValueRef(targ[i]);
+   }
+}
+
+StringStackConsoleWrapper::~StringStackConsoleWrapper()
+{
+   for (int i=0; i<argc; i++)
+   {
+      argv[i] = NULL;
+   }
+   delete[] argv;
+}
+
+S32 ConsoleValue::getSignedIntValue()
+{
+   if(type <= TypeInternalString)
+      return (S32)fval;
+   else
+      return dAtoi(Con::getData(type, dataPtr, 0, enumTable));
+}
+
+U32 ConsoleValue::getIntValue()
+{
+   if(type <= TypeInternalString)
+      return ival;
+   else
+      return dAtoi(Con::getData(type, dataPtr, 0, enumTable));
+}
+
+F32 ConsoleValue::getFloatValue()
+{
+   if(type <= TypeInternalString)
+      return fval;
+   else
+      return dAtof(Con::getData(type, dataPtr, 0, enumTable));
+}
+
+const char *ConsoleValue::getStringValue()
+{
+   if(type == TypeInternalString || type == TypeInternalStackString)
+      return sval;
+   if(type == TypeInternalFloat)
+      return Con::getData(TypeF32, &fval, 0);
+   else if(type == TypeInternalInt)
+      return Con::getData(TypeS32, &ival, 0);
+   else
+      return Con::getData(type, dataPtr, 0, enumTable);
+}
+
+bool ConsoleValue::getBoolValue()
+{
+   if(type == TypeInternalString || type == TypeInternalStackString)
+      return dAtob(sval);
+   if(type == TypeInternalFloat)
+      return fval > 0;
+   else if(type == TypeInternalInt)
+      return ival > 0;
+   else {
+      const char *value = Con::getData(type, dataPtr, 0, enumTable);
+      return dAtob(value);
+   }
+}
+
+void ConsoleValue::setIntValue(S32 val)
+{
+   setFloatValue(val);
+}
+
+void ConsoleValue::setIntValue(U32 val)
+{
+   if(type <= TypeInternalString)
+   {
+      fval = (F32)val;
+      ival = val;
+      if(sval != typeValueEmpty)
+      {
+         if (type != TypeInternalStackString) dFree(sval);
+         sval = typeValueEmpty;
+      }
+      type = TypeInternalInt;
+   }
+   else
+   {
+      const char *dptr = Con::getData(TypeS32, &val, 0);
+      Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
+   }
+}
+
+void ConsoleValue::setBoolValue(bool val)
+{
+   return setIntValue(val ? 1 : 0);
+}
+
+void ConsoleValue::setFloatValue(F32 val)
+{
+   if(type <= TypeInternalString)
+   {
+      fval = val;
+      ival = static_cast<U32>(val);
+      if(sval != typeValueEmpty)
+      {
+         if (type != TypeInternalStackString) dFree(sval);
+         sval = typeValueEmpty;
+      }
+      type = TypeInternalFloat;
+   }
+   else
+   {
+      const char *dptr = Con::getData(TypeF32, &val, 0);
+      Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
+   }
+}
+
+
+const char *ConsoleValueRef::getStringArgValue()
+{
+   if (value)
+   {
+      if (stringStackValue == NULL)
+         stringStackValue = Con::getStringArg(value->getStringValue());
+      return stringStackValue;
+   }
+   else
+   {
+      return "";
+   }
+}
+
+
+extern ConsoleValueStack CSTK;
+   
+ConsoleValueRef& ConsoleValueRef::operator=(const ConsoleValueRef &newValue)
+{
+   value = newValue.value;
+   stringStackValue = newValue.stringStackValue;
+   return *this;
+}
+
+ConsoleValueRef& ConsoleValueRef::operator=(const char *newValue)
+{
+   value = CSTK.pushStackString(newValue);
+   stringStackValue = NULL;
+   return *this;
+}
+
+ConsoleValueRef& ConsoleValueRef::operator=(S32 newValue)
+{
+   value = CSTK.pushFLT(newValue);
+   stringStackValue = NULL;
+   return *this;
+}
+
+ConsoleValueRef& ConsoleValueRef::operator=(U32 newValue)
+{
+   value = CSTK.pushUINT(newValue);
+   stringStackValue = NULL;
+   return *this;
+}
+
+ConsoleValueRef& ConsoleValueRef::operator=(F32 newValue)
+{
+   value = CSTK.pushFLT(newValue);
+   stringStackValue = NULL;
+   return *this;
+}
+
+ConsoleValueRef& ConsoleValueRef::operator=(F64 newValue)
+{
+   value = CSTK.pushFLT(newValue);
+   stringStackValue = NULL;
+   return *this;
+}
+
+namespace Con
+{
+	void resetStackFrame()
+	{
+		CSTK.resetFrame();
+	}
 }
