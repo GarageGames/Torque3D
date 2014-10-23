@@ -101,11 +101,11 @@ void GFXD3D9Cubemap::initStatic( GFXTexHandle *faces )
       mTexSize = faces[0].getWidth();
       mFaceFormat = faces[0].getFormat();
 
-      D3D9Assert( D3D9Device->CreateCubeTexture( mTexSize, 1, 0, GFXD3D9TextureFormat[mFaceFormat],
+      D3D9Assert( D3D9Device->CreateCubeTexture( mTexSize, 0, D3DUSAGE_AUTOGENMIPMAP, GFXD3D9TextureFormat[mFaceFormat],
                  pool, &mCubeTex, NULL ), NULL );
 
       fillCubeTextures( faces, D3D9Device );
-//      mCubeTex->GenerateMipSubLevels();
+      mCubeTex->GenerateMipSubLevels();
    }
 }
 
