@@ -99,7 +99,7 @@ void AdvancedLightManager::activate( SceneManager *sceneManager )
    // we prefer the floating point format if it works.
    Vector<GFXFormat> formats;
    formats.push_back( GFXFormatR16G16B16A16F );
-   formats.push_back( GFXFormatR16G16B16A16 );
+   //formats.push_back( GFXFormatR16G16B16A16 );
    GFXFormat blendTargetFormat = GFX->selectSupportedFormat( &GFXDefaultRenderTargetProfile,
                                                          formats,
                                                          true,

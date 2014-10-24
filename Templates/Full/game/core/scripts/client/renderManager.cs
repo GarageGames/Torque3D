@@ -33,7 +33,7 @@ function initRenderManager()
    {
       enabled = "false";
       
-      format = "GFXFormatR8G8B8A8";
+      format = "GFXFormatR16G16B16A16F";
       depthFormat = "GFXFormatD24S8";
       aaLevel = 0; // -1 = match backbuffer
       
