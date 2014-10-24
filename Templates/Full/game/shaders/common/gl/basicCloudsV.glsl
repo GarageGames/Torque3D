@@ -20,19 +20,35 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( DesertSkyCubemap )
-{
-   cubeFace[0] = "./cubemap/skybox_1";
-   cubeFace[1] = "./cubemap/skybox_2";
-   cubeFace[2] = "./cubemap/skybox_3";
-   cubeFace[3] = "./cubemap/skybox_4";
-   cubeFace[4] = "./cubemap/skybox_5";
-   cubeFace[5] = "./cubemap/skybox_6";
-};
+#include "hlslCompat.glsl"
 
-singleton Material( DesertSkyMat )
-{
-   cubemap = DesertSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+//CloudVert
+in vec4 vPosition;
+in vec2 vTexCoord0;
+
+#define IN_pos       vPosition
+#define IN_uv0       vTexCoord0
+
+uniform mat4  modelview;
+uniform float     accumTime;
+uniform float     texScale;
+uniform vec2    texDirection;
+uniform vec2    texOffset;
+
+out vec2 texCoord;
+#define OUT_texCoord texCoord
+
+void main()
+{  
+   gl_Position = tMul(modelview, IN_pos);
+   gl_Position.w = gl_Position.z;
+   
+   vec2 uv = IN_uv0;
+   uv += texOffset;
+   uv *= texScale;
+   uv += accumTime * texDirection;
+
+   OUT_texCoord = uv;   
+   
+   correctSSP(gl_Position);
+}

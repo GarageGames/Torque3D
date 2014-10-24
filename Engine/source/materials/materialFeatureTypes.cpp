@@ -84,3 +84,6 @@ ImplementFeatureType( MFT_ParticleNormal, MFG_PreTransform, 2.0f, false );
 ImplementFeatureType( MFT_ForwardShading, U32(-1), -1, true );
 
 ImplementFeatureType( MFT_ImposterVert, MFG_PreTransform, 1.0, false );
+
+// Deferred Shading
+ImplementFeatureType( MFT_SkyBox, MFG_Transform, 1.0f, true );
