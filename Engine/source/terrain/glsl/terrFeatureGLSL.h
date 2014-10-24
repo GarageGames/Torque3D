@@ -35,8 +35,13 @@
 /// includes some helper functions.
 class TerrainFeatGLSL : public ShaderFeatureGLSL
 {
+
 protected:
    
+   ShaderIncludeDependency mTorqueDep;
+
+public:
+   TerrainFeatGLSL();
    Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
    
    Var* _getInMacroCoord(Vector<ShaderComponent*> &componentList );

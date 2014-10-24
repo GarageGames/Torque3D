@@ -826,6 +826,12 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 // Base Texture
 //****************************************************************************
 
+DiffuseMapFeatHLSL::DiffuseMapFeatHLSL()
+: mTorqueDep("shaders/common/torque.hlsl")
+{
+	addDependency(&mTorqueDep);
+}
+
 void DiffuseMapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList, 
                                        const MaterialFeatureData &fd )
 {
@@ -863,10 +869,20 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       diffColor->setName( "diffuseColor" );
       LangElement *colorDecl = new DecOp( diffColor );
    
+      if (  fd.features[MFT_Imposter] )
+      {
       meta->addStatement(  new GenOp( "   @ = tex2D(@, @);\r\n", 
                            colorDecl, 
                            diffuseMap, 
                            inTex ) );
+      }
+      else
+      {
+          meta->addStatement(  new GenOp( "   @ = tex2DLinear(@, @);\r\n", 
+                           colorDecl, 
+                           diffuseMap, 
+                           inTex ) );
+      }
       
       meta->addStatement( new GenOp( "   @;\r\n", assignColor( diffColor, Material::Mul ) ) );
       output = meta;
@@ -950,23 +966,38 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
       if(is_sm3)
       {
+          if (  fd.features[MFT_Imposter] )
+              meta->addStatement(new GenOp( "   @ = tex2DlodLinear(@, float4(@, 0.0, mipLod));\r\n", 
+              new DecOp(diffColor), diffuseMap, inTex));
+          else
          meta->addStatement(new GenOp( "   @ = tex2Dlod(@, float4(@, 0.0, mipLod));\r\n", 
             new DecOp(diffColor), diffuseMap, inTex));
       }
       else
       {
+          if (  fd.features[MFT_Imposter] )
          meta->addStatement(new GenOp( "   @ = tex2D(@, @);\r\n", 
             new DecOp(diffColor), diffuseMap, inTex));
+          else
+              meta->addStatement(new GenOp( "   @ = tex2DLinear(@, @);\r\n",
+                    new DecOp(diffColor), diffuseMap, inTex)); 
       }
 
       meta->addStatement(new GenOp( "   @;\r\n", assignColor(diffColor, Material::Mul)));
    }
    else
    {
+       if (  fd.features[MFT_Imposter] )
+       {
       LangElement *statement = new GenOp( "tex2D(@, @)", diffuseMap, inTex );
       output = new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) );
    }
-   
+       else
+       {
+           LangElement *statement = new GenOp( "tex2DLinear(@, @)", diffuseMap, inTex );
+           output = new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) );
+       }
+   }   
 }
 
 ShaderFeature::Resources DiffuseMapFeatHLSL::getResources( const MaterialFeatureData &fd )

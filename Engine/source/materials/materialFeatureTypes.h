@@ -94,6 +94,7 @@ DeclareFeatureType( MFT_OverlayMap );
 DeclareFeatureType( MFT_DetailMap );
 DeclareFeatureType( MFT_DiffuseColor );
 DeclareFeatureType( MFT_DetailNormalMap );
+DeclareFeatureType( MFT_Imposter );
 
 /// This feature enables vertex coloring for the diffuse channel.
 DeclareFeatureType( MFT_DiffuseVertColor );

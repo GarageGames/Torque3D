@@ -20,28 +20,32 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"  
-#include "./postFx.hlsl"  
-#include "../torque.hlsl"
+#include "../../gl/hlslCompat.glsl"
+#include "../../gl/torque.glsl"
+#include "shadergen:/autogenConditioners.h"
 
-uniform sampler2D backBuffer : register(S0);
-uniform sampler1D colorCorrectionTex : register( s1 );
+uniform sampler2D backBuffer;
+uniform sampler1D colorCorrectionTex;
 
 uniform float OneOverGamma;
 uniform float Brightness;
 uniform float Contrast;
 
-float4 main( PFXVertToPix IN ) : COLOR0  
+in vec2 uv0;
+
+out vec4 OUT_FragColor0;
+
+void main()
 {
-    float4 color = tex2D(backBuffer, IN.uv0.xy);
+    vec4 color = texture(backBuffer, uv0.xy);
 
    // Apply the color correction.
-   color.r = tex1D( colorCorrectionTex, color.r ).r;
-   color.g = tex1D( colorCorrectionTex, color.g ).g;
-   color.b = tex1D( colorCorrectionTex, color.b ).b;
+   color.r = texture( colorCorrectionTex, color.r ).r;
+   color.g = texture( colorCorrectionTex, color.g ).g;
+   color.b = texture( colorCorrectionTex, color.b ).b;
 
    // Apply gamma correction
-    color.rgb = pow( abs(color.rgb), OneOverGamma );
+   color.rgb = pow( abs(color.rgb), vec3(OneOverGamma) );
 
    // Apply contrast
    color.rgb = ((color.rgb - 0.5f) * Contrast) + 0.5f;
@@ -49,5 +53,5 @@ float4 main( PFXVertToPix IN ) : COLOR0
    // Apply brightness
    color.rgb += Brightness;
 
-    return color;    
+   OUT_FragColor0 = color;
 }

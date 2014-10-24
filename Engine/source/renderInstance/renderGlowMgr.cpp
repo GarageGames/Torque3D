@@ -78,6 +78,7 @@ void RenderGlowMgr::GlowMaterialHook::_overrideFeatures( ProcessedMaterial *mat,
    // the glow materials.
    fd.features.removeFeature( MFT_Fog );
    fd.features.removeFeature( MFT_HDROut );
+   fd.features.addFeature( MFT_Imposter );
 }
 
 RenderGlowMgr::RenderGlowMgr()

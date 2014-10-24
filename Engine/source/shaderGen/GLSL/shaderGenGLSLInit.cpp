@@ -66,6 +66,7 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_IsTranslucent, new NamedFeatureGLSL( "Translucent" ) );
    FEATUREMGR->registerFeature( MFT_Visibility, new VisibilityFeatGLSL );
    FEATUREMGR->registerFeature( MFT_Fog, new FogFeatGLSL );
+   FEATUREMGR->registerFeature( MFT_Imposter, new NamedFeatureGLSL( "Imposter" ) );
 
 	FEATUREMGR->registerFeature( MFT_NormalsOut, new NormalsOutFeatGLSL );
 	
