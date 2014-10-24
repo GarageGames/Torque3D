@@ -24,6 +24,7 @@
 #include "shaderGen/GLSL/shaderGenGLSL.h"
 
 #include "shaderGen/GLSL/shaderCompGLSL.h"
+#include "shaderGen/featureMgr.h"
 
 
 void ShaderGenPrinterGLSL::printShaderHeader( Stream& stream )
