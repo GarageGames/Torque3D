@@ -32,8 +32,8 @@
 #include "collision/boxConvex.h"
 #endif
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 class ClippedPolyList;
 
 
@@ -102,12 +102,12 @@ class RigidShapeData : public ShapeBaseData
    Point3F massCenter;        ///< Center of mass for rigid body
    Point3F massBox;           ///< Size of inertial box
 
-   ParticleEmitterData * dustEmitter;
+   IParticleSystemData * dustEmitter;
    S32 dustID;
    F32 triggerDustHeight;  ///< height shape has to be under to kick up dust
    F32 dustHeight;         ///< dust height above ground
 
-   ParticleEmitterData* splashEmitterList[VC_NUM_SPLASH_EMITTERS];
+   IParticleSystemData* splashEmitterList[VC_NUM_SPLASH_EMITTERS];
    S32 splashEmitterIDList[VC_NUM_SPLASH_EMITTERS];
    F32 splashFreqMod;
    F32 splashVelEpsilon;
@@ -116,7 +116,7 @@ class RigidShapeData : public ShapeBaseData
    F32 dragForce;
    F32 vertFactor;
    
-   ParticleEmitterData * dustTrailEmitter;
+   IParticleSystemData * dustTrailEmitter;
    S32                   dustTrailID;
 
    //-------------------------------------- load set variables
@@ -143,7 +143,7 @@ class RigidShape: public ShapeBase
 
   private:
    RigidShapeData* mDataBlock;
-   SimObjectPtr<ParticleEmitter> mDustTrailEmitter;
+   SimObjectPtr<IParticleSystem> mDustTrailEmitter;
 
   protected:
    enum CollisionFaceFlags 
@@ -197,8 +197,8 @@ class RigidShape: public ShapeBase
    ShapeBaseConvex mConvex;
    S32 restCount;
 
-   SimObjectPtr<ParticleEmitter> mDustEmitterList[RigidShapeData::VC_NUM_DUST_EMITTERS];
-   SimObjectPtr<ParticleEmitter> mSplashEmitterList[RigidShapeData::VC_NUM_SPLASH_EMITTERS];
+   SimObjectPtr<IParticleSystem> mDustEmitterList[RigidShapeData::VC_NUM_DUST_EMITTERS];
+   SimObjectPtr<IParticleSystem> mSplashEmitterList[RigidShapeData::VC_NUM_SPLASH_EMITTERS];
 
    GFXStateBlockRef  mSolidSB;
 

@@ -35,9 +35,10 @@
 #ifndef _LIGHTINFO_H_
 #include "lighting/lightInfo.h"
 #endif
+#include <T3D/fx/ParticleSystem/particleSystem.h>
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 class TSThread;
 class SFXTrack;
 struct DebrisData;
@@ -65,7 +66,7 @@ class ExplosionData : public GameBaseData {
    F32 particleRadius;
 
    SFXTrack*        soundProfile;
-   ParticleEmitterData* particleEmitter;
+   IParticleSystemData* particleEmitter;
    S32                  particleEmitterId;
 
    Point3F              explosionScale;
@@ -74,7 +75,7 @@ class ExplosionData : public GameBaseData {
    Resource<TSShape> explosionShape;
    S32               explosionAnimation;
 
-   ParticleEmitterData*    emitterList[EC_NUM_EMITTERS];
+   IParticleSystemData*    emitterList[EC_NUM_EMITTERS];
    S32                     emitterIDList[EC_NUM_EMITTERS];
 
    ShockwaveData *         shockwave;
@@ -145,8 +146,8 @@ class Explosion : public GameBase, public ISceneLight
    TSShapeInstance* mExplosionInstance;
    TSThread*        mExplosionThread;
 
-   SimObjectPtr<ParticleEmitter> mEmitterList[ ExplosionData::EC_NUM_EMITTERS ];
-   SimObjectPtr<ParticleEmitter> mMainEmitter;
+   SimObjectPtr<IParticleSystem> mEmitterList[ ExplosionData::EC_NUM_EMITTERS ];
+   SimObjectPtr<IParticleSystem> mMainEmitter;
 
    U32               mCurrMS;
    U32               mEndingMS;

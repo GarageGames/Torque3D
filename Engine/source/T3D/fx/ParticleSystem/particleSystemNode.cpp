@@ -20,66 +20,66 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "particleEmitterNode.h"
+#include "particleSystemNode.h"
 #include "console/consoleTypes.h"
 #include "core/stream/bitStream.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "math/mathIO.h"
 #include "sim/netConnection.h"
 #include "console/engineAPI.h"
 
-IMPLEMENT_CO_DATABLOCK_V1(ParticleEmitterNodeData);
-IMPLEMENT_CO_NETOBJECT_V1(ParticleEmitterNode);
+IMPLEMENT_CO_DATABLOCK_V1(ParticleSystemNodeData);
+IMPLEMENT_CO_NETOBJECT_V1(ParticleSystemNode);
 
-ConsoleDocClass( ParticleEmitterNodeData,
-   "@brief Contains additional data to be associated with a ParticleEmitterNode."
+ConsoleDocClass(ParticleSystemNodeData,
+   "@brief Contains additional data to be associated with a ParticleSystemNode."
    "@ingroup FX\n"
-);
+   );
 
-ConsoleDocClass( ParticleEmitterNode,
-   "@brief A particle emitter object that can be positioned in the world and "
+ConsoleDocClass(ParticleSystemNode,
+   "@brief A particle System object that can be positioned in the world and "
    "dynamically enabled or disabled.\n\n"
 
    "@tsexample\n"
-   "datablock ParticleEmitterNodeData( SimpleEmitterNodeData )\n"
+   "datablock ParticleSystemNodeData( SimpleSystemNodeData )\n"
    "{\n"
    "   timeMultiple = 1.0;\n"
    "};\n\n"
 
-   "%emitter = new ParticleEmitterNode()\n"
+   "%System = new ParticleSystemNode()\n"
    "{\n"
-   "   datablock = SimpleEmitterNodeData;\n"
+   "   datablock = SimpleSystemNodeData;\n"
    "   active = true;\n"
-   "   emitter = FireEmitterData;\n"
+   "   System = FireSystemData;\n"
    "   velocity = 3.5;\n"
    "};\n\n"
 
-   "// Dynamically change emitter datablock\n"
-   "%emitter.setEmitterDataBlock( DustEmitterData );\n"
+   "// Dynamically change System datablock\n"
+   "%System.setSystemDataBlock( DustSystemData );\n"
    "@endtsexample\n"
 
-   "@note To change the emitter field dynamically (after the ParticleEmitterNode "
-   "object has been created) you must use the setEmitterDataBlock() method or the "
+   "@note To change the System field dynamically (after the ParticleSystemNode "
+   "object has been created) you must use the setSystemDataBlock() method or the "
    "change will not be replicated to other clients in the game.\n"
    "Similarly, use the setActive() method instead of changing the active field "
    "directly. When changing velocity, you need to toggle setActive() on and off "
    "to force the state change to be transmitted to other clients.\n\n"
 
    "@ingroup FX\n"
-   "@see ParticleEmitterNodeData\n"
-   "@see ParticleEmitterData\n"
-);
+   "@see ParticleSystemNodeData\n"
+   "@see ParticleSystemData\n"
+   );
 
 
 //-----------------------------------------------------------------------------
-// ParticleEmitterNodeData
+// ParticleSystemNodeData
 //-----------------------------------------------------------------------------
-ParticleEmitterNodeData::ParticleEmitterNodeData()
+ParticleSystemNodeData::ParticleSystemNodeData()
 {
    timeMultiple = 1.0;
 }
 
-ParticleEmitterNodeData::~ParticleEmitterNodeData()
+ParticleSystemNodeData::~ParticleSystemNodeData()
 {
 
 }
@@ -87,14 +87,14 @@ ParticleEmitterNodeData::~ParticleEmitterNodeData()
 //-----------------------------------------------------------------------------
 // initPersistFields
 //-----------------------------------------------------------------------------
-void ParticleEmitterNodeData::initPersistFields()
+void ParticleSystemNodeData::initPersistFields()
 {
-   addField( "timeMultiple", TYPEID< F32 >(), Offset(timeMultiple, ParticleEmitterNodeData),
-      "@brief Time multiplier for particle emitter nodes.\n\n"
-      "Increasing timeMultiple is like running the emitter at a faster rate - single-shot "
-      "emitters will complete in a shorter time, and continuous emitters will generate "
+   addField("timeMultiple", TYPEID< F32 >(), Offset(timeMultiple, ParticleSystemNodeData),
+      "@brief Time multiplier for particle System nodes.\n\n"
+      "Increasing timeMultiple is like running the System at a faster rate - single-shot "
+      "Systems will complete in a shorter time, and continuous Systems will generate "
       "particles more quickly.\n\n"
-      "Valid range is 0.01 - 100." );
+      "Valid range is 0.01 - 100.");
 
    Parent::initPersistFields();
 }
@@ -102,14 +102,14 @@ void ParticleEmitterNodeData::initPersistFields()
 //-----------------------------------------------------------------------------
 // onAdd
 //-----------------------------------------------------------------------------
-bool ParticleEmitterNodeData::onAdd()
+bool ParticleSystemNodeData::onAdd()
 {
-   if( !Parent::onAdd() )
+   if (!Parent::onAdd())
       return false;
 
-   if( timeMultiple < 0.01 || timeMultiple > 100 )
+   if (timeMultiple < 0.01 || timeMultiple > 100)
    {
-      Con::warnf("ParticleEmitterNodeData::onAdd(%s): timeMultiple must be between 0.01 and 100", getName());
+      Con::warnf("ParticleSystemNodeData::onAdd(%s): timeMultiple must be between 0.01 and 100", getName());
       timeMultiple = timeMultiple < 0.01 ? 0.01 : 100;
    }
 
@@ -120,9 +120,9 @@ bool ParticleEmitterNodeData::onAdd()
 //-----------------------------------------------------------------------------
 // preload
 //-----------------------------------------------------------------------------
-bool ParticleEmitterNodeData::preload(bool server, String &errorStr)
+bool ParticleSystemNodeData::preload(bool server, String &errorStr)
 {
-   if( Parent::preload(server, errorStr) == false )
+   if (Parent::preload(server, errorStr) == false)
       return false;
 
    return true;
@@ -132,7 +132,7 @@ bool ParticleEmitterNodeData::preload(bool server, String &errorStr)
 //-----------------------------------------------------------------------------
 // packData
 //-----------------------------------------------------------------------------
-void ParticleEmitterNodeData::packData(BitStream* stream)
+void ParticleSystemNodeData::packData(BitStream* stream)
 {
    Parent::packData(stream);
 
@@ -142,7 +142,7 @@ void ParticleEmitterNodeData::packData(BitStream* stream)
 //-----------------------------------------------------------------------------
 // unpackData
 //-----------------------------------------------------------------------------
-void ParticleEmitterNodeData::unpackData(BitStream* stream)
+void ParticleSystemNodeData::unpackData(BitStream* stream)
 {
    Parent::unpackData(stream);
 
@@ -151,9 +151,9 @@ void ParticleEmitterNodeData::unpackData(BitStream* stream)
 
 
 //-----------------------------------------------------------------------------
-// ParticleEmitterNode
+// ParticleSystemNode
 //-----------------------------------------------------------------------------
-ParticleEmitterNode::ParticleEmitterNode()
+ParticleSystemNode::ParticleSystemNode()
 {
    // Todo: ScopeAlways?
    mNetFlags.set(Ghostable);
@@ -161,17 +161,17 @@ ParticleEmitterNode::ParticleEmitterNode()
 
    mActive = true;
 
-   mDataBlock          = NULL;
-   mEmitterDatablock   = NULL;
-   mEmitterDatablockId = 0;
-   mEmitter            = NULL;
-   mVelocity           = 1.0;
+   mDataBlock = NULL;
+   mSystemDatablock = NULL;
+   mSystemDatablockId = 0;
+   mSystem = NULL;
+   mVelocity = 1.0;
 }
 
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
-ParticleEmitterNode::~ParticleEmitterNode()
+ParticleSystemNode::~ParticleSystemNode()
 {
    //
 }
@@ -179,15 +179,15 @@ ParticleEmitterNode::~ParticleEmitterNode()
 //-----------------------------------------------------------------------------
 // initPersistFields
 //-----------------------------------------------------------------------------
-void ParticleEmitterNode::initPersistFields()
+void ParticleSystemNode::initPersistFields()
 {
-   addField( "active", TYPEID< bool >(), Offset(mActive,ParticleEmitterNode),
-      "Controls whether particles are emitted from this node." );
-   addField( "emitter",  TYPEID< ParticleEmitterData >(), Offset(mEmitterDatablock, ParticleEmitterNode),
-      "Datablock to use when emitting particles." );
-   addField( "velocity", TYPEID< F32 >(), Offset(mVelocity, ParticleEmitterNode),
+   addField("active", TYPEID< bool >(), Offset(mActive, ParticleSystemNode),
+      "Controls whether particles are emitted from this node.");
+   addField("System", TYPEID< ParticleSystemData >(), Offset(mSystemDatablock, ParticleSystemNode),
+      "Datablock to use when emitting particles.");
+   addField("velocity", TYPEID< F32 >(), Offset(mVelocity, ParticleSystemNode),
       "Velocity to use when emitting particles (in the direction of the "
-      "ParticleEmitterNode object's up (Z) axis)." );
+      "ParticleSystemNode object's up (Z) axis).");
 
    Parent::initPersistFields();
 }
@@ -195,28 +195,28 @@ void ParticleEmitterNode::initPersistFields()
 //-----------------------------------------------------------------------------
 // onAdd
 //-----------------------------------------------------------------------------
-bool ParticleEmitterNode::onAdd()
+bool ParticleSystemNode::onAdd()
 {
-   if( !Parent::onAdd() )
+   if (!Parent::onAdd())
       return false;
 
-   if( !mEmitterDatablock && mEmitterDatablockId != 0 )
+   if (!mSystemDatablock && mSystemDatablockId != 0)
    {
-      if( Sim::findObject(mEmitterDatablockId, mEmitterDatablock) == false )
-         Con::errorf(ConsoleLogEntry::General, "ParticleEmitterNode::onAdd: Invalid packet, bad datablockId(mEmitterDatablock): %d", mEmitterDatablockId);
+      if (Sim::findObject(mSystemDatablockId, mSystemDatablock) == false)
+         Con::errorf(ConsoleLogEntry::General, "ParticleSystemNode::onAdd: Invalid packet, bad datablockId(mSystemDatablock): %d", mSystemDatablockId);
    }
 
-   if( isClientObject() )
+   if (isClientObject())
    {
-      setEmitterDataBlock( mEmitterDatablock );
+      setSystemDataBlock(mSystemDatablock);
    }
    else
    {
-      setMaskBits( StateMask | EmitterDBMask );
+      setMaskBits(StateMask | SystemDBMask);
    }
 
    mObjBox.minExtents.set(-0.5, -0.5, -0.5);
-   mObjBox.maxExtents.set( 0.5,  0.5,  0.5);
+   mObjBox.maxExtents.set(0.5, 0.5, 0.5);
    resetWorldBox();
    addToScene();
 
@@ -226,15 +226,15 @@ bool ParticleEmitterNode::onAdd()
 //-----------------------------------------------------------------------------
 // onRemove
 //-----------------------------------------------------------------------------
-void ParticleEmitterNode::onRemove()
+void ParticleSystemNode::onRemove()
 {
    removeFromScene();
-   if( isClientObject() )
+   if (isClientObject())
    {
-      if( mEmitter )
+      if (mSystem)
       {
-         mEmitter->deleteWhenEmpty();
-         mEmitter = NULL;
+         mSystem->deleteWhenEmpty();
+         mSystem = NULL;
       }
    }
 
@@ -244,10 +244,10 @@ void ParticleEmitterNode::onRemove()
 //-----------------------------------------------------------------------------
 // onNewDataBlock
 //-----------------------------------------------------------------------------
-bool ParticleEmitterNode::onNewDataBlock( GameBaseData *dptr, bool reload )
+bool ParticleSystemNode::onNewDataBlock(GameBaseData *dptr, bool reload)
 {
-   mDataBlock = dynamic_cast<ParticleEmitterNodeData*>( dptr );
-   if ( !mDataBlock || !Parent::onNewDataBlock( dptr, reload ) )
+   mDataBlock = dynamic_cast<ParticleSystemNodeData*>(dptr);
+   if (!mDataBlock || !Parent::onNewDataBlock(dptr, reload))
       return false;
 
    // Todo: Uncomment if this is a "leaf" class
@@ -256,32 +256,32 @@ bool ParticleEmitterNode::onNewDataBlock( GameBaseData *dptr, bool reload )
 }
 
 //-----------------------------------------------------------------------------
-void ParticleEmitterNode::inspectPostApply()
+void ParticleSystemNode::inspectPostApply()
 {
    Parent::inspectPostApply();
-   setMaskBits(StateMask | EmitterDBMask);
+   setMaskBits(StateMask | SystemDBMask);
 }
 
 //-----------------------------------------------------------------------------
 // advanceTime
 //-----------------------------------------------------------------------------
-void ParticleEmitterNode::processTick(const Move* move)
+void ParticleSystemNode::processTick(const Move* move)
 {
    Parent::processTick(move);
 
-   if ( isMounted() )
+   if (isMounted())
    {
       MatrixF mat;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-      setTransform( mat );
+      mMount.object->getMountTransform(mMount.node, mMount.xfm, &mat);
+      setTransform(mat);
    }
 }
 
-void ParticleEmitterNode::advanceTime(F32 dt)
+void ParticleSystemNode::advanceTime(F32 dt)
 {
    Parent::advanceTime(dt);
-   
-   if(!mActive || mEmitter.isNull() || !mDataBlock)
+
+   if (!mActive || mSystem.isNull() || !mDataBlock)
       return;
 
    Point3F emitPoint, emitVelocity;
@@ -290,37 +290,37 @@ void ParticleEmitterNode::advanceTime(F32 dt)
    getTransform().getColumn(3, &emitPoint);
    emitVelocity = emitAxis * mVelocity;
 
-   mEmitter->emitParticles(emitPoint, emitPoint,
-                           emitAxis,
-                           emitVelocity, (U32)(dt * mDataBlock->timeMultiple * 1000.0f));
+   mSystem->emitParticles(emitPoint, emitPoint,
+      emitAxis,
+      emitVelocity, (U32)(dt * mDataBlock->timeMultiple * 1000.0f));
 }
 
 //-----------------------------------------------------------------------------
 // packUpdate
 //-----------------------------------------------------------------------------
-U32 ParticleEmitterNode::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
+U32 ParticleSystemNode::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
-   if ( stream->writeFlag( mask & InitialUpdateMask ) )
+   if (stream->writeFlag(mask & InitialUpdateMask))
    {
       mathWrite(*stream, getTransform());
       mathWrite(*stream, getScale());
    }
 
-   if ( stream->writeFlag( mask & EmitterDBMask ) )
+   if (stream->writeFlag(mask & SystemDBMask))
    {
-      if( stream->writeFlag(mEmitterDatablock != NULL) )
+      if (stream->writeFlag(mSystemDatablock != NULL))
       {
-         stream->writeRangedU32(mEmitterDatablock->getId(), DataBlockObjectIdFirst,
+         stream->writeRangedU32(mSystemDatablock->getId(), DataBlockObjectIdFirst,
             DataBlockObjectIdLast);
       }
    }
 
-   if ( stream->writeFlag( mask & StateMask ) )
+   if (stream->writeFlag(mask & StateMask))
    {
-      stream->writeFlag( mActive );
-      stream->write( mVelocity );
+      stream->writeFlag(mActive);
+      stream->write(mVelocity);
    }
 
    return retMask;
@@ -329,11 +329,11 @@ U32 ParticleEmitterNode::packUpdate(NetConnection* con, U32 mask, BitStream* str
 //-----------------------------------------------------------------------------
 // unpackUpdate
 //-----------------------------------------------------------------------------
-void ParticleEmitterNode::unpackUpdate(NetConnection* con, BitStream* stream)
+void ParticleSystemNode::unpackUpdate(NetConnection* con, BitStream* stream)
 {
    Parent::unpackUpdate(con, stream);
 
-   if ( stream->readFlag() )
+   if (stream->readFlag())
    {
       MatrixF temp;
       Point3F tempScale;
@@ -344,76 +344,76 @@ void ParticleEmitterNode::unpackUpdate(NetConnection* con, BitStream* stream)
       setTransform(temp);
    }
 
-   if ( stream->readFlag() )
+   if (stream->readFlag())
    {
-      mEmitterDatablockId = stream->readFlag() ?
+      mSystemDatablockId = stream->readFlag() ?
          stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast) : 0;
 
-      ParticleEmitterData *emitterDB = NULL;
-      Sim::findObject( mEmitterDatablockId, emitterDB );
-      if ( isProperlyAdded() )
-         setEmitterDataBlock( emitterDB );
+      ParticleSystemData *SystemDB = NULL;
+      Sim::findObject(mSystemDatablockId, SystemDB);
+      if (isProperlyAdded())
+         setSystemDataBlock(SystemDB);
    }
 
-   if ( stream->readFlag() )
+   if (stream->readFlag())
    {
       mActive = stream->readFlag();
-      stream->read( &mVelocity );
+      stream->read(&mVelocity);
    }
 }
 
-void ParticleEmitterNode::setEmitterDataBlock(ParticleEmitterData* data)
+void ParticleSystemNode::setSystemDataBlock(ParticleSystemData* data)
 {
-   if ( isServerObject() )
+   if (isServerObject())
    {
-      setMaskBits( EmitterDBMask );
+      setMaskBits(SystemDBMask);
    }
    else
    {
-      ParticleEmitter* pEmitter = NULL;
-      if ( data )
+      ParticleSystem* pSystem = NULL;
+      if (data)
       {
-         // Create emitter with new datablock
-         pEmitter = new ParticleEmitter;
-         pEmitter->onNewDataBlock( data, false );
-         if( pEmitter->registerObject() == false )
+         // Create System with new datablock
+         pSystem = new ParticleSystem;
+         pSystem->onNewDataBlock(data, false);
+         if (pSystem->registerObject() == false)
          {
-            Con::warnf(ConsoleLogEntry::General, "Could not register base emitter for particle of class: %s", data->getName() ? data->getName() : data->getIdString() );
-            delete pEmitter;
+            Con::warnf(ConsoleLogEntry::General, "Could not register base System for particle of class: %s", data->getName() ? data->getName() : data->getIdString());
+            delete pSystem;
             return;
          }
       }
 
-      // Replace emitter
-      if ( mEmitter )
-         mEmitter->deleteWhenEmpty();
+      // Replace System
+      if (mSystem)
+         mSystem->deleteWhenEmpty();
 
-      mEmitter = pEmitter;
+      mSystem = pSystem;
    }
 
-   mEmitterDatablock = data;
+   mSystemDatablock = data;
 }
- 
-DefineEngineMethod(ParticleEmitterNode, setEmitterDataBlock, void, (ParticleEmitterData* emitterDatablock), (0),
-   "Assigns the datablock for this emitter node.\n"
-   "@param emitterDatablock ParticleEmitterData datablock to assign\n"
+
+DefineEngineMethod(ParticleSystemNode, setSystemDataBlock, void, (ParticleSystemData* SystemDatablock), (0),
+   "Assigns the datablock for this System node.\n"
+   "@param SystemDatablock ParticleSystemData datablock to assign\n"
    "@tsexample\n"
-   "// Assign a new emitter datablock\n"
-   "%emitter.setEmitterDatablock( %emitterDatablock );\n"
-   "@endtsexample\n" )
+   "// Assign a new System datablock\n"
+   "%System.setSystemDatablock( %SystemDatablock );\n"
+   "@endtsexample\n")
 {
-   if ( !emitterDatablock )
+   if (!SystemDatablock)
    {
-      Con::errorf("ParticleEmitterData datablock could not be found when calling setEmitterDataBlock in particleEmitterNode.");
+      Con::errorf("ParticleSystemData datablock could not be found when calling setSystemDataBlock in ParticleSystemNode.");
       return;
    }
 
-   object->setEmitterDataBlock(emitterDatablock);
+   object->setSystemDataBlock(SystemDatablock);
 }
 
-DefineEngineMethod(ParticleEmitterNode, setActive, void, (bool active),,
-   "Turns the emitter on or off.\n"
-   "@param active New emitter state\n" )
+DefineEngineMethod(ParticleSystemNode, setActive, void, (bool active), ,
+   "Turns the System on or off.\n"
+   "@param active New System state\n")
 {
-   object->setActive( active );
+   object->setActive(active);
 }

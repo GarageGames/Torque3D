@@ -46,7 +46,7 @@
 #include "math/util/quadTransforms.h"
 #include "gui/3d/guiTSControl.h"
 #include "gfx/sim/debugDraw.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "scene/reflectionManager.h"
 #include "ts/tsShapeInstance.h"
 #include "postFx/postEffect.h"

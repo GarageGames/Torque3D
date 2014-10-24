@@ -70,8 +70,8 @@ class SceneRenderState;
 class TSThread;
 class GameConnection;
 struct CameraScopeQuery;
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 class ProjectileData;
 class ExplosionData;
 struct DebrisData;
@@ -248,7 +248,7 @@ struct ShapeBaseImageData: public GameBaseData {
 
       const char* script;           ///< Function on datablock to call when we enter this state; passed the id of
                                     ///  the imageSlot.
-      ParticleEmitterData* emitter; ///< A particle emitter; this emitter will emit as long as the gun is in this
+      IParticleSystemData* emitter; ///< A particle emitter; this emitter will emit as long as the gun is in this
                                     ///  this state.
       SFXTrack* sound;
       F32 emitterTime;              ///<
@@ -315,7 +315,7 @@ struct ShapeBaseImageData: public GameBaseData {
    SFXTrack*               stateSound                 [MaxStates];
    const char*             stateScript                [MaxStates];
 
-   ParticleEmitterData*    stateEmitter               [MaxStates];
+   IParticleSystemData*    stateEmitter               [MaxStates];
    F32                     stateEmitterTime           [MaxStates];
    const char*             stateEmitterNode           [MaxStates];
    /// @}
@@ -841,7 +841,7 @@ protected:
       struct ImageEmitter {
          S32 node;
          F32 time;
-         SimObjectPtr<ParticleEmitter> emitter;
+         SimObjectPtr<IParticleSystem> emitter;
       };
       ImageEmitter emitter[MaxImageEmitters];
 
@@ -1117,7 +1117,7 @@ protected:
    /// bounds of all mounted shape images.
    void _renderBoundingBox( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance* );
 
-   void emitDust( ParticleEmitter* emitter, F32 triggerHeight, const Point3F& offset, U32 numMilliseconds, const Point3F& axis = Point3F::Zero );
+   void emitDust( IParticleSystem* emitter, F32 triggerHeight, const Point3F& offset, U32 numMilliseconds, const Point3F& axis = Point3F::Zero );
 
 public:
    ShapeBase();

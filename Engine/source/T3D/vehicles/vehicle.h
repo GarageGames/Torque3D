@@ -33,8 +33,8 @@
 #include "collision/boxConvex.h"
 #endif
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 class ClippedPolyList;
 struct RenderInst;
 class Vehicle;
@@ -111,18 +111,18 @@ struct VehicleData: public ShapeBaseData
    F32 steeringReturnSpeedScale;
    bool powerSteering;
 
-   ParticleEmitterData * dustEmitter;
+   IParticleSystemData * dustEmitter;
    S32 dustID;
    F32 triggerDustHeight;  ///< height vehicle has to be under to kick up dust
    F32 dustHeight;         ///< dust height above ground
 
-   ParticleEmitterData *   damageEmitterList[ VC_NUM_DAMAGE_EMITTERS ];
+   IParticleSystemData *   damageEmitterList[ VC_NUM_DAMAGE_EMITTERS ];
    Point3F damageEmitterOffset[ VC_NUM_DAMAGE_EMITTER_AREAS ];
    S32 damageEmitterIDList[ VC_NUM_DAMAGE_EMITTERS ];
    F32 damageLevelTolerance[ VC_NUM_DAMAGE_LEVELS ];
    F32 numDmgEmitterAreas;
 
-   ParticleEmitterData* splashEmitterList[VC_NUM_SPLASH_EMITTERS];
+   IParticleSystemData* splashEmitterList[VC_NUM_SPLASH_EMITTERS];
    S32 splashEmitterIDList[VC_NUM_SPLASH_EMITTERS];
    F32 splashFreqMod;
    F32 splashVelEpsilon;
@@ -204,9 +204,9 @@ class Vehicle: public ShapeBase
    ShapeBaseConvex mConvex;
    S32 restCount;
 
-   SimObjectPtr<ParticleEmitter> mDustEmitterList[VehicleData::VC_NUM_DUST_EMITTERS];
-   SimObjectPtr<ParticleEmitter> mDamageEmitterList[VehicleData::VC_NUM_DAMAGE_EMITTERS];
-   SimObjectPtr<ParticleEmitter> mSplashEmitterList[VehicleData::VC_NUM_SPLASH_EMITTERS];
+   SimObjectPtr<IParticleSystem> mDustEmitterList[VehicleData::VC_NUM_DUST_EMITTERS];
+   SimObjectPtr<IParticleSystem> mDamageEmitterList[VehicleData::VC_NUM_DAMAGE_EMITTERS];
+   SimObjectPtr<IParticleSystem> mSplashEmitterList[VehicleData::VC_NUM_SPLASH_EMITTERS];
 
    //
    virtual bool onNewDataBlock( GameBaseData *dptr, bool reload );

@@ -1037,6 +1037,14 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
    // All done!
 }
 
+void TSStatic::transformVertex(Point3F &p) {
+    MatrixF mat, trans, nodetrans;
+    trans = getTransform();
+    nodetrans = getShapeInstance()->mNodeTransforms[0];
+    mat.mul(trans, nodetrans);
+    mat.mulV((p * getScale()), &p);
+}
+
 //------------------------------------------------------------------------
 //These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering

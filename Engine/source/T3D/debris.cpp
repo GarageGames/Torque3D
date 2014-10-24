@@ -32,7 +32,8 @@
 #include "scene/sceneManager.h"
 #include "ts/tsShapeInstance.h"
 #include "ts/tsPartInstance.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
+#include "T3D/fx/ParticleSystem/particleSystemInterfaces.h"
 #include "T3D/fx/explosion.h"
 #include "T3D/gameBase/gameProcess.h"
 #include "core/resourceManager.h"
@@ -226,7 +227,7 @@ void DebrisData::initPersistFields()
    endGroup("Display");
 
    addGroup("Datablocks");
-   addField("emitters",             TYPEID< ParticleEmitterData >(),  Offset(emitterList,    DebrisData), DDC_NUM_EMITTERS, 
+   addField("emitters",             TYPEID< IParticleSystemData >(),  Offset(emitterList,    DebrisData), DDC_NUM_EMITTERS, 
       "@brief List of particle emitters to spawn along with this debris object.\n\nThese are optional.  You could have Debris made up of only a shape.\n");
    addField("explosion",            TYPEID< ExplosionData >(),   Offset(explosion,           DebrisData), 
       "@brief ExplosionData to spawn along with this debris object.\n\nThis is optional as not all Debris explode.\n");
@@ -522,7 +523,7 @@ bool Debris::onAdd()
    {
       if( mDataBlock->emitterList[i] != NULL )
       {
-         ParticleEmitter * pEmitter = new ParticleEmitter;
+         IParticleSystem * pEmitter = new ParticleSystem;
          pEmitter->onNewDataBlock( mDataBlock->emitterList[i], false );
          if( !pEmitter->registerObject() )
          {
@@ -535,24 +536,34 @@ bool Debris::onAdd()
    }
 
    // set particle sizes based on debris size
-   F32 sizeList[ParticleData::PDC_NUM_KEYS];
+   F32 sizeList[ParticleSystem::PDC_NUM_KEYS];
+   
+   ISizedParticleRenderer* sizedRenderer = dynamic_cast<ISizedParticleRenderer*>(mEmitterList[0]->getRenderer());
 
-   if( mEmitterList[0] )
+   if(sizedRenderer)
    {
-      sizeList[0] = mSize * 0.5;
-      sizeList[1] = mSize;
-      sizeList[2] = mSize * 1.5;
+      if( mEmitterList[0] )
+      {
+         sizeList[0] = mSize * 0.5;
+         sizeList[1] = mSize;
+         sizeList[2] = mSize * 1.5;
 
-      mEmitterList[0]->setSizes( sizeList );
+         sizedRenderer->setSizes( sizeList );
+      }
    }
 
-   if( mEmitterList[1] )
+   sizedRenderer = dynamic_cast<ISizedParticleRenderer*>(mEmitterList[1]->getRenderer());
+   
+   if(sizedRenderer)
    {
-      sizeList[0] = 0.0;
-      sizeList[1] = mSize * 0.5;
-      sizeList[2] = mSize;
+      if( mEmitterList[1] )
+      {
+         sizeList[0] = 0.0;
+         sizeList[1] = mSize * 0.5;
+         sizeList[2] = mSize;
 
-      mEmitterList[1]->setSizes( sizeList );
+         sizedRenderer->setSizes( sizeList );
+      }
    }
 
    S32 bounceVar = (S32)mDataBlock->bounceVariance;

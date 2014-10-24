@@ -41,7 +41,7 @@
 #include "sfx/sfxSource.h"
 #include "sfx/sfxTypes.h"
 #include "console/engineAPI.h"
-#include "particleEmitter.h"
+#include "ParticleSystem/particleSystem.h"
 
 static const U32 dropHitMask = 
    TerrainObjectType |
@@ -814,7 +814,7 @@ void Precipitation::unpackUpdate(NetConnection* con, BitStream* stream)
 VectorF Precipitation::getWindVelocity()
 {
    // The WindManager happens to set global-wind velocity here, it is not just for particles.
-   return mUseWind ? ParticleEmitter::mWindVelocity : Point3F::Zero;
+   return mUseWind ? ParticleSystem::mWindVelocity : Point3F::Zero;
 }
 
 void Precipitation::fillDropList()

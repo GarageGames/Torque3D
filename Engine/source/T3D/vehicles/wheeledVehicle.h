@@ -31,8 +31,8 @@
 #include "collision/clippedPolyList.h"
 #endif
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleEmitter;
+class IParticleSystemData;
 
 
 //----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ struct WheeledVehicleData: public VehicleData
    };
    SFXTrack* sound[MaxSounds];
 
-   ParticleEmitterData* tireEmitter;
+   IParticleSystemData* tireEmitter;
 
    F32 maxWheelSpeed;            // Engine torque is scale based on wheel speed
    F32 engineTorque;             // Engine force controlled through throttle
@@ -197,7 +197,7 @@ class WheeledVehicle: public Vehicle
       bool slipping;          // Traction on last tick
       F32 torqueScale;        // Max torque % applied to wheel (0-1)
       F32 slip;               // Amount of wheel slip (0-1)
-      SimObjectPtr<ParticleEmitter> emitter;
+      SimObjectPtr<IParticleSystem> emitter;
    };
    Wheel mWheel[WheeledVehicleData::MaxWheels];
    TSThread* mSteeringThread;

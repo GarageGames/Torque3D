@@ -31,8 +31,8 @@
 #include "collision/clippedPolyList.h"
 #endif
 
-class ParticleEmitter;
-class ParticleEmitterData;
+class IParticleSystem;
+class IParticleSystemData;
 
 
 //----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ struct FlyingVehicleData: public VehicleData {
       TrailEmitter,           // Contrail
       MaxJetEmitters,
    };
-   ParticleEmitterData* jetEmitter[MaxJetEmitters];
+   IParticleSystemData* jetEmitter[MaxJetEmitters];
    F32 minTrailSpeed;
 
    //
@@ -163,7 +163,7 @@ class FlyingVehicle: public Vehicle
       S32 emitter;
    };
    static JetActivation sJetActivation[NumThrustDirections];
-   SimObjectPtr<ParticleEmitter> mJetEmitter[FlyingVehicleData::MaxJetNodes];
+   SimObjectPtr<IParticleSystem> mJetEmitter[FlyingVehicleData::MaxJetNodes];
 
    //
    bool onNewDataBlock(GameBaseData* dptr,bool reload);
@@ -175,7 +175,7 @@ class FlyingVehicle: public Vehicle
    // Client sounds & particles
    void updateJet(F32 dt);
    void updateEngineSound(F32 level);
-   void updateEmitter(bool active,F32 dt,ParticleEmitterData *emitter,S32 idx,S32 count);
+   void updateEmitter(bool active,F32 dt,IParticleSystemData *emitter,S32 idx,S32 count);
 
    U32 getCollisionMask();
   public:

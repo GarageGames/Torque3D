@@ -30,8 +30,8 @@
 #include "T3D/gameBase/gameBase.h"
 #endif
 
-class ParticleEmitterData;
-class ParticleEmitter;
+class IParticleSystemData;
+class IParticleSystem;
 class ExplosionData;
 class TSPartInstance;
 class TSShapeInstance;
@@ -84,7 +84,7 @@ struct DebrisData : public GameBaseData
 
    S32                     explosionId;
    ExplosionData *         explosion;
-   ParticleEmitterData*    emitterList[DDC_NUM_EMITTERS];
+   IParticleSystemData*    emitterList[DDC_NUM_EMITTERS];
    S32                     emitterIDList[DDC_NUM_EMITTERS];
 
    DebrisData();
@@ -125,7 +125,7 @@ private:
    F32               mElasticity;
    F32               mFriction;
 
-   SimObjectPtr<ParticleEmitter> mEmitterList[ DebrisData::DDC_NUM_EMITTERS ];
+   SimObjectPtr<IParticleSystem> mEmitterList[ DebrisData::DDC_NUM_EMITTERS ];
 
    /// Bounce the debris - returns true if debris bounces.
    bool bounce( const Point3F &nextPos, F32 dt );

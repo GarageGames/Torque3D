@@ -35,7 +35,7 @@
 #include "core/dnet.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "ts/tsShapeInstance.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "sfx/sfxSystem.h"
 #include "sfx/sfxProfile.h"
 #include "sfx/sfxSource.h"
@@ -216,19 +216,19 @@ void FlyingVehicleData::initPersistFields()
       "@brief The vehicle's height off the ground when useCreateHeight is active.\n\n"
       "This can help avoid problems with spawning the vehicle." );
 
-   addField( "forwardJetEmitter",TYPEID< ParticleEmitterData >(), Offset(jetEmitter[ForwardJetEmitter], FlyingVehicleData),
+   addField( "forwardJetEmitter",TYPEID< IParticleSystemData >(), Offset(jetEmitter[ForwardJetEmitter], FlyingVehicleData),
       "@brief Emitter to generate particles for forward jet thrust.\n\n"
       "Forward jet thrust particles are emitted from model nodes JetNozzle0 "
       "and JetNozzle1." );
-   addField( "backwardJetEmitter",TYPEID< ParticleEmitterData >(), Offset(jetEmitter[BackwardJetEmitter], FlyingVehicleData),
+   addField( "backwardJetEmitter",TYPEID< IParticleSystemData >(), Offset(jetEmitter[BackwardJetEmitter], FlyingVehicleData),
       "@brief Emitter to generate particles for backward jet thrust.\n\n"
       "Backward jet thrust particles are emitted from model nodes JetNozzleX "
       "and JetNozzleY." );
-   addField( "downJetEmitter",TYPEID< ParticleEmitterData >(), Offset(jetEmitter[DownwardJetEmitter], FlyingVehicleData),
+   addField( "downJetEmitter",TYPEID< IParticleSystemData >(), Offset(jetEmitter[DownwardJetEmitter], FlyingVehicleData),
       "@brief Emitter to generate particles for downward jet thrust.\n\n"
       "Downward jet thrust particles are emitted from model nodes JetNozzle2 "
       "and JetNozzle3." );
-   addField( "trailEmitter",TYPEID< ParticleEmitterData >(), Offset(jetEmitter[TrailEmitter], FlyingVehicleData),
+   addField( "trailEmitter",TYPEID< IParticleSystemData >(), Offset(jetEmitter[TrailEmitter], FlyingVehicleData),
       "Emitter to generate contrail particles from model nodes contrail0 - contrail3." );
    addField( "minTrailSpeed", TypeF32, Offset(minTrailSpeed, FlyingVehicleData),
       "Minimum speed at which to start generating contrail particles." );
@@ -289,7 +289,7 @@ void FlyingVehicleData::unpackData(BitStream* stream)
    for (S32 j = 0; j < MaxJetEmitters; j++) {
       jetEmitter[j] = NULL;
       if (stream->readFlag())
-         jetEmitter[j] = (ParticleEmitterData*)stream->readRangedU32(DataBlockObjectIdFirst,
+         jetEmitter[j] = (IParticleSystemData*)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
    }
 
@@ -709,7 +709,7 @@ void FlyingVehicle::updateJet(F32 dt)
 
 //----------------------------------------------------------------------------
 
-void FlyingVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitter,S32 idx,S32 count)
+void FlyingVehicle::updateEmitter(bool active,F32 dt,IParticleSystemData *emitter,S32 idx,S32 count)
 {
    if (!emitter)
       return;
@@ -717,7 +717,7 @@ void FlyingVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitte
       if (active) {
          if (mDataBlock->jetNode[j] != -1) {
             if (!bool(mJetEmitter[j])) {
-               mJetEmitter[j] = new ParticleEmitter;
+               mJetEmitter[j] = emitter->createParticleSystem();
                mJetEmitter[j]->onNewDataBlock(emitter,false);
                mJetEmitter[j]->registerObject();
             }

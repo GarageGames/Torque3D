@@ -34,7 +34,7 @@
 #include "sfx/sfxSystem.h"
 #include "sfx/sfxProfile.h"
 #include "sfx/sfxSource.h"
-#include "T3D/fx/particleEmitter.h"
+#include "T3D/fx/ParticleSystem/particleSystem.h"
 #include "math/mathIO.h"
 
 
@@ -242,7 +242,7 @@ void HoverVehicleData::initPersistFields()
    addField( "floatSound", TYPEID< SFXProfile >(), Offset(sound[FloatSound], HoverVehicleData),
       "Looping sound played while the vehicle is floating.\n\n@see stabMinLen" );
 
-   addField( "dustTrailEmitter", TYPEID< ParticleEmitterData >(), Offset(dustTrailEmitter, HoverVehicleData),
+   addField( "dustTrailEmitter", TYPEID< IParticleSystemData >(), Offset(dustTrailEmitter, HoverVehicleData),
       "Emitter to generate particles for the vehicle's dust trail.\nThe trail "
       "of dust particles is generated only while the vehicle is moving." );
    addField( "dustTrailOffset", TypePoint3F, Offset(dustTrailOffset, HoverVehicleData),
@@ -271,7 +271,7 @@ void HoverVehicleData::initPersistFields()
    addField( "brakingActivationSpeed", TypeF32, Offset(brakingActivationSpeed, HoverVehicleData),
       "Maximum speed below which a braking force is applied.\n\n@see brakingForce" );
 
-   addField( "forwardJetEmitter", TYPEID< ParticleEmitterData >(), Offset(jetEmitter[ForwardJetEmitter], HoverVehicleData),
+   addField( "forwardJetEmitter", TYPEID< IParticleSystemData >(), Offset(jetEmitter[ForwardJetEmitter], HoverVehicleData),
       "Emitter to generate particles for forward jet thrust.\nForward jet "
       "thrust particles are emitted from model nodes JetNozzle0 and JetNozzle1." );
 
@@ -419,7 +419,7 @@ void HoverVehicleData::unpackData(BitStream* stream)
    for (S32 j = 0; j < MaxJetEmitters; j++) {
       jetEmitter[j] = NULL;
       if (stream->readFlag())
-         jetEmitter[j] = (ParticleEmitterData*)stream->readRangedU32(DataBlockObjectIdFirst,
+         jetEmitter[j] = (IParticleSystemData*)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
    }
 
@@ -476,7 +476,7 @@ bool HoverVehicle::onAdd()
    {
       if( mDataBlock->dustTrailEmitter )
       {
-         mDustTrailEmitter = new ParticleEmitter;
+         mDustTrailEmitter = mDataBlock->dustTrailEmitter->createParticleSystem();
          mDustTrailEmitter->onNewDataBlock( mDataBlock->dustTrailEmitter, false );
          if( !mDustTrailEmitter->registerObject() )
          {
@@ -945,7 +945,7 @@ void HoverVehicle::updateJet(F32 dt)
    }
 }
 
-void HoverVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitter,S32 idx,S32 count)
+void HoverVehicle::updateEmitter(bool active,F32 dt,IParticleSystemData *emitter,S32 idx,S32 count)
 {
    if (!emitter)
       return;
@@ -953,7 +953,7 @@ void HoverVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitter
       if (active) {
          if (mDataBlock->jetNode[j] != -1) {
             if (!bool(mJetEmitter[j])) {
-               mJetEmitter[j] = new ParticleEmitter;
+               mJetEmitter[j] = emitter->createParticleSystem();
                mJetEmitter[j]->onNewDataBlock( emitter, false );
                mJetEmitter[j]->registerObject();
             }

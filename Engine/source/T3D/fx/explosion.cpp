@@ -42,7 +42,6 @@
 #include "math/mathUtils.h"
 #include "T3D/debris.h"
 #include "T3D/gameBase/gameConnection.h"
-#include "T3D/fx/particleEmitter.h"
 #include "T3D/fx/cameraFXMgr.h"
 #include "T3D/debris.h"
 #include "T3D/shapeBase.h"
@@ -292,7 +291,7 @@ void ExplosionData::initPersistFields()
    addField( "faceViewer", TypeBool, Offset(faceViewer, ExplosionData),
       "Controls whether the visual effects of the explosion always face the camera." );
 
-   addField( "particleEmitter", TYPEID< ParticleEmitterData >(), Offset(particleEmitter, ExplosionData),
+   addField( "particleEmitter", TYPEID< IParticleSystemData >(), Offset(particleEmitter, ExplosionData),
       "@brief Emitter used to generate a cloud of particles at the start of the explosion.\n\n"
       "Explosions can generate two different particle effects. The first is a "
       "single burst of particles at the start of the explosion emitted in a "
@@ -307,7 +306,7 @@ void ExplosionData::initPersistFields()
       "@brief Radial distance from the explosion center at which cloud particles "
       "are emitted.\n\n"
       "@see particleEmitter" );
-   addField( "emitter", TYPEID< ParticleEmitterData >(), Offset(emitterList, ExplosionData), EC_NUM_EMITTERS,
+   addField( "emitter", TYPEID< IParticleSystemData >(), Offset(emitterList, ExplosionData), EC_NUM_EMITTERS,
       "@brief List of additional ParticleEmitterData objects to spawn with this "
       "explosion.\n\n"
       "@see particleEmitter" );
@@ -1261,7 +1260,7 @@ bool Explosion::explode()
       SFX->playOnce( mDataBlock->soundProfile, &getTransform() );
 
    if (mDataBlock->particleEmitter) {
-      mMainEmitter = new ParticleEmitter;
+      mMainEmitter = mDataBlock->particleEmitter->createParticleSystem();
       mMainEmitter->setDataBlock(mDataBlock->particleEmitter);
       mMainEmitter->registerObject();
 
@@ -1273,7 +1272,7 @@ bool Explosion::explode()
    {
       if( mDataBlock->emitterList[i] != NULL )
       {
-         ParticleEmitter * pEmitter = new ParticleEmitter;
+         IParticleSystem * pEmitter = mDataBlock->emitterList[i]->createParticleSystem();
          pEmitter->setDataBlock( mDataBlock->emitterList[i] );
          if( !pEmitter->registerObject() )
          {
