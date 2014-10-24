@@ -62,15 +62,49 @@ void ShaderGenPrinterGLSL::printVertexShaderCloser( Stream& stream )
    stream.write( dStrlen(closer), closer );
 }
 
-void ShaderGenPrinterGLSL::printPixelShaderOutputStruct( Stream& stream, const MaterialFeatureData &featureData )
+void ShaderGenPrinterGLSL::printPixelShaderOutputStruct(Stream& stream, const MaterialFeatureData &featureData)
 {
-   // Nothing here
+   // Determine the number of output targets we need
+   U32 numMRTs = 0;
+   for (U32 i = 0; i < FEATUREMGR->getFeatureCount(); i++)
+   {
+      const FeatureInfo &info = FEATUREMGR->getAt(i);
+      if (featureData.features.hasFeature(*info.type))
+         numMRTs |= info.feature->getOutputTargets(featureData);
+   }
+
+   if (numMRTs>1)
+   {
+      WRITESTR("layout (location = 0) out vec4 OUT_FragColor0;\r\n");
+   }
+   else
+      WRITESTR("out vec4 OUT_FragColor0;\r\n");
+   for (U32 i = 1; i < 4; i++)
+   {
+      if (numMRTs & 1 << i)
+      {
+         WRITESTR(avar("layout (location = %d) out vec4 OUT_FragColor%d;\r\n", i, i));
+         extraRTs[i - 1] = true;
+      }
+      else
+      {
+         extraRTs[i - 1] = false;
+      }
+   }
+   WRITESTR("\r\n");
+   WRITESTR("\r\n");
 }
 
-void ShaderGenPrinterGLSL::printPixelShaderCloser( Stream& stream )
+void ShaderGenPrinterGLSL::printPixelShaderCloser(Stream& stream)
 {
-   const char *closer = "   OUT_FragColor0 = col;\r\n}\r\n";
-   stream.write( dStrlen(closer), closer );
+   WRITESTR("   OUT_FragColor0 = col;\r\n");
+   for (U32 i = 1; i < 4; i++)
+   {
+      if (extraRTs[i - 1])
+         WRITESTR(avar("   OUT_FragColor%d = col%d;\r\n", i, i));
+   }
+
+   WRITESTR("}\r\n");
 }
 
 void ShaderGenPrinterGLSL::printLine(Stream& stream, const String& line)

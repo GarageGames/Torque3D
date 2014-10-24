@@ -817,6 +817,11 @@ bool GFXGLShader::_loadShaderFromStream(  GLuint shader,
    buffers.push_back( dStrdup( versionDecl ) );
    lengths.push_back( dStrlen( versionDecl ) );
 
+   //support for the Layout Qualifier: https://www.opengl.org/wiki/Layout_Qualifier_(GLSL)
+   const char *extension = "#extension GL_ARB_explicit_attrib_location : enable\r\n";
+   buffers.push_back(dStrdup(extension));
+   lengths.push_back(dStrlen(extension));
+
    // Now add all the macros.
    for( U32 i = 0; i < macros.size(); i++ )
    {
