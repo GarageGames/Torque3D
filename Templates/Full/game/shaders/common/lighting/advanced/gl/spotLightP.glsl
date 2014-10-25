@@ -27,14 +27,17 @@
 #include "shadergen:/autogenConditioners.h"
 #include "softShadow.glsl"
 #include "../../../gl/lighting.glsl"
+#include "../../../gl/torque.glsl"
 
 in vec4 wsEyeDir;
 in vec4 ssPos;
 in vec4 vsEyeDir;
+in vec4 color;
 
 #define IN_wsEyeDir wsEyeDir
 #define IN_ssPos ssPos
 #define IN_vsEyeDir vsEyeDir
+#define IN_color color
 
 #ifdef USE_COOKIE_TEX
 
@@ -45,6 +48,10 @@ uniform sampler2D cookieMap;
 
 uniform sampler2D prePassBuffer;
 uniform sampler2D shadowMap;
+
+uniform sampler2D lightBuffer;
+uniform sampler2D colorBuffer;
+uniform sampler2D matInfoBuffer;
 
 uniform vec4 rtParams0;
 
@@ -63,11 +70,22 @@ uniform mat4 viewToLightProj;
 uniform vec4 lightParams;
 uniform float shadowSoftness;
 
+out vec4 OUT_FragColor0;
+
 void main()
 {   
    // Compute scene UV
    vec3 ssPos = IN_ssPos.xyz / IN_ssPos.w;
    vec2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
+
+   // Emissive.
+   vec4 matInfo = texture( matInfoBuffer, uvScene );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       OUT_FragColor0 = vec4(0.0, 0.0, 0.0, 0.0);
+	   return;
+   }
    
    // Sample/unpack the normal/z data
    vec4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
@@ -162,5 +180,6 @@ void main()
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   OUT_FragColor0 = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   vec4 colorSample = texture( colorBuffer, uvScene );
+   OUT_FragColor0 = AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }

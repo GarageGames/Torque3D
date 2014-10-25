@@ -28,10 +28,12 @@
 #include "../../../gl/lighting.glsl"
 #include "../../shadowMap/shadowMapIO_GLSL.h"
 #include "softShadow.glsl"
+#include "../../../gl/torque.glsl"
 
 in vec4 wsEyeDir;
 in vec4 ssPos;
 in vec4 vsEyeDir;
+in vec4 color;
 
 #ifdef USE_COOKIE_TEX
 
@@ -109,6 +111,10 @@ uniform sampler2D prePassBuffer;
 	uniform sampler2D shadowMap;
 #endif
 
+uniform sampler2D lightBuffer;
+uniform sampler2D colorBuffer;
+uniform sampler2D matInfoBuffer;
+
 uniform vec4 rtParams0;
 
 uniform vec3 lightPosition;
@@ -122,6 +128,7 @@ uniform mat3 viewToLightProj;
 uniform vec4 lightParams;
 uniform float shadowSoftness;
 			   
+out vec4 OUT_FragColor0;
 
 void main()               
 {   
@@ -129,6 +136,15 @@ void main()
    vec3 ssPos = ssPos.xyz / ssPos.w;
    vec2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
    
+   // Emissive.
+   vec4 matInfo = texture( matInfoBuffer, uvScene );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       OUT_FragColor0 = vec4(0.0, 0.0, 0.0, 0.0);
+	   return;
+   }
+
    // Sample/unpack the normal/z data
    vec4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
    vec3 normal = prepassSample.rgb;
@@ -229,5 +245,22 @@ void main()
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   OUT_FragColor0 = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   bool translucent = getFlag( matInfo.r, 2 );
+   if ( translucent && matInfo.g > 0.1 )
+   {
+      float fLTDistortion = 0.0;
+      int iLTPower = 10;
+      float fLTAmbient = 0.0;
+      float fLTThickness = matInfo.g;
+      float fLTScale = 1.0;
+
+      vec3 vLTLight = lightVec + normal * fLTDistortion;
+      float fLTDot = pow(clamp(dot(-vsEyeDir.xyz, -vLTLight),0.0,1.0), iLTPower) * fLTScale;
+      vec3 fLT = vec3(atten * (fLTDot + fLTAmbient) * fLTThickness);
+
+      addToResult = lightColor * vec4( fLT, 0.0);
+   }
+
+   vec4 colorSample = texture( colorBuffer, uvScene );
+   OUT_FragColor0 = AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }
