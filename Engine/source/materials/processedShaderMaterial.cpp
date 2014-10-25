@@ -101,6 +101,9 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
       for (S32 i = 0; i < Material::MAX_TEX_PER_PASS; ++i)
          mTexHandlesSC[i] = shader->getShaderConstHandle(mat->mSamplerNames[i]);
    }
+
+   // Deferred Shading
+   mMatInfoFlagsSC = shader->getShaderConstHandle(ShaderGenVars::matInfoFlags);
 }
 
 ///
@@ -203,26 +206,6 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
       mInstancingState = new InstancingState();
       mInstancingState->setFormat( &_getRPD( 0 )->shader->mInstancingFormat, mVertexFormat );
    }
-
-   // Check for a RenderTexTargetBin assignment
-   // *IMPORTANT NOTE* 
-   // This is a temporary solution for getting diffuse mapping working with tex targets for standard materials
-   // It should be removed once this is done properly, at that time the sAllowTextureTargetAssignment should also be removed 
-   // from Material (it is necessary for catching shadow maps/post effect this shouldn't be applied to)
-   if (Material::sAllowTextureTargetAssignment)
-      if (mMaterial && mMaterial->mDiffuseMapFilename[0].isNotEmpty() && mMaterial->mDiffuseMapFilename[0].substr( 0, 1 ).equal("#"))
-      {
-         String texTargetBufferName = mMaterial->mDiffuseMapFilename[0].substr(1, mMaterial->mDiffuseMapFilename[0].length() - 1);
-         NamedTexTarget *texTarget = NamedTexTarget::find( texTargetBufferName ); 
-
-         RenderPassData* rpd = getPass(0);      
-
-         if (rpd)
-         {
-            rpd->mTexSlot[0].texTarget = texTarget;
-            rpd->mTexType[0] = Material::TexTarget;
-         }
-      }
 
    return true;
 }
@@ -328,6 +311,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    if (  features.hasFeature( MFT_UseInstancing ) &&
          mMaxStages == 1 &&
          !mMaterial->mGlow[0] &&
+         !mMaterial->mDynamicCubemap &&
          shaderVersion >= 3.0f )
       fd.features.addFeature( MFT_UseInstancing );
 
@@ -345,11 +329,12 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    if ( mMaterial->mVertLit[stageNum] )
       fd.features.addFeature( MFT_VertLit );
    
-   // cubemaps only available on stage 0 for now - bramage   
-   if ( stageNum < 1 && 
-         (  (  mMaterial->mCubemapData && mMaterial->mCubemapData->mCubemap ) ||
-               mMaterial->mDynamicCubemap ) )
+   //only render cubemaps during the second pass if we need to pull render-order tricks
+   if (mMaterial->mIsSky)
+   {
    fd.features.addFeature( MFT_CubeMap );
+       fd.features.addFeature( MFT_SkyBox );
+   }
 
    fd.features.addFeature( MFT_Visibility );
 
@@ -392,8 +377,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
       // Only allow parallax if we have a normal map and
       // we're not using DXTnm compression.
       if (  mMaterial->mParallaxScale[stageNum] > 0.0f &&
-         fd.features[ MFT_NormalMap ] &&
-         !fd.features[ MFT_IsDXTnm ] )
+         fd.features[ MFT_NormalMap ] )
          fd.features.addFeature( MFT_Parallax );
 
       // If not parallax then allow per-pixel specular if
@@ -1081,6 +1065,16 @@ void ProcessedShaderMaterial::_setShaderConstants(SceneRenderState * state, cons
          0.0f, 0.0f ); // TODO: Wrap mode flags?
       shaderConsts->setSafe(handles->mBumpAtlasTileSC, atlasTileParams);
    }
+
+   // Deferred Shading: Determine Material Info Flags
+   S32 matInfoFlags = 
+            (mMaterial->mEmissive[stageNum] ? 1 : 0) |                              // Emissive
+            (mMaterial->mGlow[stageNum] ? 2 : 0) |                                  // Glow
+            (mMaterial->mTranslucencyMapFilename[stageNum].isNotEmpty() ? 4 : 0) |  // Translucency
+            (mMaterial->mUseMetalness[stageNum] ? 8: 0)                             // Metalness
+            ;
+   mMaterial->mMatInfoFlags[stageNum] = matInfoFlags / 255.0f;
+   shaderConsts->setSafe(handles->mMatInfoFlagsSC, mMaterial->mMatInfoFlags[stageNum]);
 }
 
 bool ProcessedShaderMaterial::_hasCubemap(U32 pass)

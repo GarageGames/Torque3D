@@ -87,6 +87,7 @@ RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
       mPrePassMatInstance( NULL )
 {
    notifyType( RenderPassManager::RIT_Decal );
+   notifyType( RenderPassManager::RIT_DecalRoad );
    notifyType( RenderPassManager::RIT_Mesh );
    notifyType( RenderPassManager::RIT_Terrain );
    notifyType( RenderPassManager::RIT_Object );
@@ -219,7 +220,7 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
       return;
 
    // First what type of render instance is it?
-   const bool isDecalMeshInst = inst->type == RenderPassManager::RIT_Decal;
+   const bool isDecalMeshInst = ((inst->type == RenderPassManager::RIT_Decal)||(inst->type == RenderPassManager::RIT_DecalRoad));
 
    const bool isMeshInst = inst->type == RenderPassManager::RIT_Mesh;
 
@@ -229,10 +230,6 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
    BaseMatInstance* matInst = NULL;
    if ( isMeshInst || isDecalMeshInst )
       matInst = static_cast<MeshRenderInst*>(inst)->matInst;
-
-   // Skip decals if they don't have normal maps.
-   if ( isDecalMeshInst && !matInst->hasNormalMap() )
-      return;
 
    // If its a custom material and it refracts... skip it.
    if (  matInst && 
@@ -357,6 +354,11 @@ void RenderPrePassMgr::render( SceneRenderState *state )
          GFX->drawPrimitive( ri->prim );
    }
 
+   // init loop data
+   GFXTextureObject *lastLM = NULL;
+   GFXCubemap *lastCubemap = NULL;
+   GFXTextureObject *lastReflectTex = NULL;
+   GFXTextureObject *lastMiscTex = NULL;
 
    // Next render all the meshes.
    itr = mElementList.begin();
@@ -391,12 +393,11 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
             // Set up SG data for this instance.
             setupSGData( passRI, sgData );
+            mat->setSceneInfo(state, sgData);
 
             matrixSet.setWorld(*passRI->objectToWorld);
             matrixSet.setView(*passRI->worldToCamera);
             matrixSet.setProjection(*passRI->projection);
-
-            mat->setSceneInfo(state, sgData);
             mat->setTransforms(matrixSet, state);
 
             // If we're instanced then don't render yet.
@@ -412,6 +413,34 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
                continue;
             }
+
+            bool dirty = false;
+
+            // set the lightmaps if different
+            if( passRI->lightmap && passRI->lightmap != lastLM )
+            {
+               sgData.lightmap = passRI->lightmap;
+               lastLM = passRI->lightmap;
+               dirty = true;
+            }
+
+            // set the cubemap if different.
+            if ( passRI->cubemap != lastCubemap )
+            {
+               sgData.cubemap = passRI->cubemap;
+               lastCubemap = passRI->cubemap;
+               dirty = true;
+            }
+
+            if ( passRI->reflectTex != lastReflectTex )
+            {
+               sgData.reflectTex = passRI->reflectTex;
+               lastReflectTex = passRI->reflectTex;
+               dirty = true;
+            }
+
+            if ( dirty )
+               mat->setTextureStages( state, sgData );
 
             // Setup the vertex and index buffers.
             mat->setBuffers( passRI->vertBuff, passRI->primBuff );
@@ -553,6 +582,43 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
 
 #ifndef TORQUE_DEDICATED
 
+   // Deferred Shading : Diffuse
+   if (mStages[stageNum].getTex( MFT_DiffuseMap ))
+   {
+      newFeatures.addFeature( MFT_DeferredDiffuseMap );
+      if ( mMaterial->mDiffuse[stageNum].alpha >= 0.0 && mMaterial->mDiffuse[stageNum] != ColorF::WHITE )
+         newFeatures.addFeature( MFT_DeferredDiffuseColor );
+   } else {
+      newFeatures.addFeature( MFT_DeferredDiffuseColor );
+   }
+
+   // Deferred Shading : Specular
+   if( mStages[stageNum].getTex( MFT_SpecularMap ) )
+   {
+       newFeatures.addFeature( MFT_DeferredSpecMap );
+       newFeatures.addFeature( MFT_DeferredGlossMap);
+   }
+   else if ( mMaterial->mPixelSpecular[stageNum] )
+   {
+       newFeatures.addFeature( MFT_DeferredSpecStrength );
+       newFeatures.addFeature( MFT_DeferredSpecPower );
+   }
+   else
+       newFeatures.addFeature(MFT_DeferredEmptySpec);
+
+   // Deferred Shading : Translucency Mapping
+   if ( mStages[stageNum].getTex( MFT_TranslucencyMap ) )
+   {
+      newFeatures.addFeature( MFT_DeferredTranslucencyMap );
+   }
+   else
+   {
+      newFeatures.addFeature( MFT_DeferredTranslucencyEmpty );
+   }
+
+   // Deferred Shading : Material Info Flags
+   newFeatures.addFeature( MFT_DeferredMatInfoFlags );
+
    for ( U32 i=0; i < fd.features.getCount(); i++ )
    {
       const FeatureType &type = fd.features.getAt( i );
@@ -581,7 +647,10 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
                   type == MFT_InterlacedPrePass ||
                   type == MFT_Visibility ||
                   type == MFT_UseInstancing ||
-                  type == MFT_DiffuseVertColor )
+                  type == MFT_DiffuseVertColor ||
+                  type == MFT_DetailMap ||
+                  type == MFT_DetailNormalMap ||
+                  type == MFT_DiffuseMapAtlas)
          newFeatures.addFeature( type );
 
       // Add any transform features.
@@ -622,7 +691,17 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
       }
    }
 
+   // cubemaps only available on stage 0 for now - bramage   
+   if ( stageNum < 1 && 
+         (  (  mMaterial->mCubemapData && mMaterial->mCubemapData->mCubemap ) ||
+               mMaterial->mDynamicCubemap ) )
+   newFeatures.addFeature( MFT_CubeMap );
+   
 #endif
+
+   // Deferred Shading : Disable Unused Features
+   newFeatures.removeFeature( MFT_DiffuseMap );
+   newFeatures.removeFeature( MFT_DiffuseColor );
 
    // Set the new features.
    fd.features = newFeatures;
@@ -630,8 +709,54 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
 
 U32 ProcessedPrePassMaterial::getNumStages()
 {
-   // Return 1 stage so this material gets processed for sure
-   return 1;
+   // Loops through all stages to determine how many 
+   // stages we actually use.  
+   // 
+   // The first stage is always active else we shouldn't be
+   // creating the material to begin with.
+   U32 numStages = 1;
+
+   U32 i;
+   for( i=1; i<Material::MAX_STAGES; i++ )
+   {
+      // Assume stage is inactive
+      bool stageActive = false;
+
+      // Cubemaps only on first stage
+      if( i == 0 )
+      {
+         // If we have a cubemap the stage is active
+         if( mMaterial->mCubemapData || mMaterial->mDynamicCubemap )
+         {
+            numStages++;
+            continue;
+         }
+      }
+
+      // If we have a texture for the a feature the 
+      // stage is active.
+      if ( mStages[i].hasValidTex() )
+         stageActive = true;
+
+      // If this stage has specular lighting, it's active
+      if ( mMaterial->mPixelSpecular[i] )
+         stageActive = true;
+
+      // If this stage has diffuse color, it's active
+      if (  mMaterial->mDiffuse[i].alpha > 0 &&
+            mMaterial->mDiffuse[i] != ColorF::WHITE )
+         stageActive = true;
+
+      // If we have a Material that is vertex lit
+      // then it may not have a texture
+      if( mMaterial->mVertLit[i] )
+         stageActive = true;
+
+      // Increment the number of active stages
+      numStages += stageActive;
+   }
+
+   return numStages;
 }
 
 void ProcessedPrePassMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
@@ -861,12 +986,12 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
       // possible so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
       if (GFX->getAdapterType() == OpenGL)
-         meta->addStatement( new GenOp( "    @ = texture2DLod(@, @, 0); \r\n", bufferSampleDecl, prepassSampler, screenUV) );
+         meta->addStatement( new GenOp( "    @ = textureLod(@, @, 0); \r\n", bufferSampleDecl, prepassSampler, screenUV) );
       else
          meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #else\r\n" ) );
       if (GFX->getAdapterType() == OpenGL)
-         meta->addStatement( new GenOp( "    @ = texture2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV) );
+         meta->addStatement( new GenOp( "    @ = texture(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV) );
       else
          meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
