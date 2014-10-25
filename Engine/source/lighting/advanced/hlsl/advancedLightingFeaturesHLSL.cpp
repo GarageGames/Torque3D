@@ -206,7 +206,7 @@ void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
       // which cannot deduce the texture unit itself.
       mLastTexIndex = texIndex;
 
-      passData.mTexType[ texIndex ] = Material::TexTarget;
+      passData.mTexType[ texIndex ] = Material::TexTarget;      
       passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
    }
 }
@@ -225,7 +225,7 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
       getOutViewToTangent( componentList, meta, fd );
 
       // Make sure there are texcoords
-      if( !fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap] )
+      if( !fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap] && !fd.features[MFT_DeferredDiffuseMap] )
       {
          const bool useTexAnim = fd.features[MFT_TexAnim];
 
@@ -465,11 +465,13 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
       specPow->constSortPos = cspPotentialPrimitive;
    }
 
-   Var *specStrength = new Var;
-   specStrength->setType( "float" );
-   specStrength->setName( "specularStrength" );
-   specStrength->uniform = true;
-   specStrength->constSortPos = cspPotentialPrimitive;
+   Var *specStrength = (Var*)LangElement::find( "specularStrength" );
+   if (!specStrength)
+   {
+       specStrength = new Var( "specularStrength", "float" );
+       specStrength->uniform = true;
+       specStrength->constSortPos = cspPotentialPrimitive;
+   }
 
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
    Var *d_specular = (Var*)LangElement::find( "d_specular" );
@@ -480,7 +482,7 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
 
    // (a^m)^n = a^(m*n)
    meta->addStatement( new GenOp( "   @ = pow( abs(@), max((@ / AL_ConstantSpecularPower),1.0f)) * @;\r\n", 
-      specDecl, d_specular, specPow, specStrength ) );
+		   specDecl, d_specular, specPow, specStrength));
 
    LangElement *specMul = new GenOp( "float4( @.rgb, 0 ) * @", specCol, specular );
    LangElement *final = specMul;
