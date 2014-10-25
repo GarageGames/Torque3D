@@ -269,4 +269,12 @@ void fizzle(vec2 vpos, float visibility)
 /// @note This macro will only work in the void main() method of a pixel shader.
 #define assert(condition, color) { if(!any(condition)) { OUT_FragColor0 = color; return; } }
 
+// Deferred Shading: Material Info Flag Check
+bool getFlag(float flags, int num)
+{
+   float process = round(flags * 255);
+   float squareNum = pow(2, num);
+   return (mod(process, pow(2, squareNum)) >= squareNum); 
+}
+
 #endif // _TORQUE_GLSL_

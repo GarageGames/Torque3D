@@ -262,5 +262,13 @@ void fizzle(float2 vpos, float visibility)
    clip( visibility - frac( determinant( m ) ) );
 }
 
+// Deferred Shading: Material Info Flag Check
+bool getFlag(float flags, int num)
+{
+   int process = round(flags * 255);
+   int squareNum = pow(2, num);
+   return (fmod(process, pow(2, squareNum)) >= squareNum); 
+}
+
 
 #endif // _TORQUE_HLSL_
