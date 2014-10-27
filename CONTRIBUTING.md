@@ -1,6 +1,6 @@
 # Torque 3D contribution guidelines
 
-So you want to help TOrque out by contributing to the repo? That's awesome!
+So you want to help Torque out by contributing to the repo? That's awesome!
 We just ask that you'd give this document a quick read to get yourself familiar with the process.
 Do you want to [request a feature](#request-a-feature)?
 Create a [pull-request](#create-a-pull-request) to contribute your own code to the engine?
@@ -9,7 +9,7 @@ Create a [pull-request](#create-a-pull-request) to contribute your own code to t
 ## Report an issue
 
 Before you report an issue with the engine, please [search](https://github.com/GarageGames/Torque3D/issues) and quickly make sure someone else hasn't obviously reported it.
-If you're ont sure if it's the same issue, go ahead and comment on the issue!
+If you're not sure if it's the same issue, go ahead and comment on it!
 Once you're certain you've found a new issue, hit the [big green button](https://github.com/GarageGames/Torque3D/issues/new) and please include the following information:
 
  * Your platform and compiler, if you're not using a precompiled binary
