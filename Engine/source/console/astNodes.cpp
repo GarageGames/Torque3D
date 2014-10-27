@@ -214,8 +214,22 @@ U32 ReturnStmtNode::compileStmt(CodeStream &codeStream, U32 ip)
       codeStream.emit(OP_RETURN_VOID);
    else
    {
-      ip = expr->compile(codeStream, ip, TypeReqString);
-      codeStream.emit(OP_RETURN);
+      TypeReq walkType = expr->getPreferredType();
+      if (walkType == TypeReqNone) walkType = TypeReqString;
+      ip = expr->compile(codeStream, ip, walkType);
+
+      // Return the correct type
+      switch (walkType) {
+      case TypeReqUInt:
+         codeStream.emit(OP_RETURN_UINT);
+         break;
+      case TypeReqFloat:
+         codeStream.emit(OP_RETURN_FLT);
+         break;
+      default:
+         codeStream.emit(OP_RETURN);
+         break;
+      }
    }
    return codeStream.tell();
 }
@@ -1146,8 +1160,21 @@ U32 FuncCallExprNode::compile(CodeStream &codeStream, U32 ip, TypeReq type)
    codeStream.emit(OP_PUSH_FRAME);
    for(ExprNode *walk = args; walk; walk = (ExprNode *) walk->getNext())
    {
-      ip = walk->compile(codeStream, ip, TypeReqString);
-      codeStream.emit(OP_PUSH);
+      TypeReq walkType = walk->getPreferredType();
+      if (walkType == TypeReqNone) walkType = TypeReqString;
+      ip = walk->compile(codeStream, ip, walkType);
+      switch (walk->getPreferredType())
+      {
+         case TypeReqFloat:
+            codeStream.emit(OP_PUSH_FLT);
+            break;
+         case TypeReqUInt:
+            codeStream.emit(OP_PUSH_UINT);
+            break;
+         default:
+            codeStream.emit(OP_PUSH);
+            break;
+      }
    }
    if(callType == MethodCall || callType == ParentCall)
       codeStream.emit(OP_CALLFUNC);
@@ -1444,8 +1471,21 @@ U32 ObjectDeclNode::compileSubObject(CodeStream &codeStream, U32 ip, bool root)
    codeStream.emit(OP_PUSH);
    for(ExprNode *exprWalk = argList; exprWalk; exprWalk = (ExprNode *) exprWalk->getNext())
    {
-      ip = exprWalk->compile(codeStream, ip, TypeReqString);
-      codeStream.emit(OP_PUSH);
+      TypeReq walkType = exprWalk->getPreferredType();
+      if (walkType == TypeReqNone) walkType = TypeReqString;
+      ip = exprWalk->compile(codeStream, ip, walkType);
+      switch (exprWalk->getPreferredType())
+      {
+         case TypeReqFloat:
+            codeStream.emit(OP_PUSH_FLT);
+            break;
+         case TypeReqUInt:
+            codeStream.emit(OP_PUSH_UINT);
+            break;
+         default:
+            codeStream.emit(OP_PUSH);
+            break;      
+      }
    }
    codeStream.emit(OP_CREATE_OBJECT);
    codeStream.emitSTE(parentObject);
