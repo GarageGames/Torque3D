@@ -46,6 +46,7 @@ function EWCreatorWindow::init( %this )
       %this.registerMissionObject( "SFXEmitter",          "Sound Emitter" );
       %this.registerMissionObject( "Precipitation" );
       %this.registerMissionObject( "ParticleEmitterNode", "Particle Emitter" );
+      %this.registerMissionObject( "RibbonNode", "Ribbon" );
       
       // Legacy features. Users should use Ground Cover and the Forest Editor.   
       //%this.registerMissionObject( "fxShapeReplicator",   "Shape Replicator" );
