@@ -702,41 +702,9 @@ bool TSStatic::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
    if ( mCollisionType == Bounds )
    {
-      F32 st, et, fst = 0.0f, fet = 1.0f;
-      F32 *bmin = &mObjBox.minExtents.x;
-      F32 *bmax = &mObjBox.maxExtents.x;
-      F32 const *si = &start.x;
-      F32 const *ei = &end.x;
-
-      for ( U32 i = 0; i < 3; i++ )
-      {
-         if (*si < *ei) 
-         {
-            if ( *si > *bmax || *ei < *bmin )
-               return false;
-            F32 di = *ei - *si;
-            st = ( *si < *bmin ) ? ( *bmin - *si ) / di : 0.0f;
-            et = ( *ei > *bmax ) ? ( *bmax - *si ) / di : 1.0f;
-         }
-         else 
-         {
-            if ( *ei > *bmax || *si < *bmin )
-               return false;
-            F32 di = *ei - *si;
-            st = ( *si > *bmax ) ? ( *bmax - *si ) / di : 0.0f;
-            et = ( *ei < *bmin ) ? ( *bmin - *si ) / di : 1.0f;
-         }
-         if ( st > fst ) fst = st;
-         if ( et < fet ) fet = et;
-         if ( fet < fst )
-            return false;
-         bmin++; bmax++;
-         si++; ei++;
-      }
-
-      info->normal = start - end;
-      info->normal.normalizeSafe();
-      getTransform().mulV( info->normal );
+      F32 fst;
+      if (!mObjBox.collideLine(start, end, &fst, &info->normal))
+         return false;
 
       info->t = fst;
       info->object = this;
