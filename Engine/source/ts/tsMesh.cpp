@@ -784,7 +784,7 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
       // gonna depend on what kind of primitive it is...
       if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
       {
-         for ( S32 j = 0; j < draw.numElements-2; j++)
+         for ( S32 j = 0; j < draw.numElements-2; j += 3 )
          {
             idx0 = indices[drawStart + j + 0];
             idx1 = indices[drawStart + j + 1];
