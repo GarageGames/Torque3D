@@ -19,6 +19,7 @@ Once you're certain you've found a new issue, hit the [big green button](https:/
 ## Create a pull-request
 
 We ask that potential contributors read our [pull-request guidelines](http://torque3d.org/contribute/#pull-request-guide) before opening a PR.
+We also have some [code style guidelines](https://github.com/GarageGames/Torque3D/wiki/Code-Style-Guidelines).
 Here's a quick guide to the branches in this repo that you might think of targeting a PR at:
 
 ### The master branch
