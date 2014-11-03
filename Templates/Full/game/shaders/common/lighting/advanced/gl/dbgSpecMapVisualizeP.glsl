@@ -19,27 +19,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "../../../gl/hlslCompat.glsl"
+#include "shadergen:/autogenConditioners.h"
+#include "../../../postfx/gl/postFx.glsl"
 
-#ifndef _TERRFEATURETYPES_H_
-#define _TERRFEATURETYPES_H_
+uniform sampler2D colorBufferTex;
 
-#ifndef _FEATURETYPE_H_
-#include "shaderGen/featureType.h"
-#endif
+out vec4 OUT_FragColor0;
 
-DeclareFeatureType( MFT_TerrainBaseMap );
-DeclareFeatureType( MFT_TerrainMacroMap );
-DeclareFeatureType( MFT_TerrainDetailMap );
-DeclareFeatureType( MFT_TerrainNormalMap );
-DeclareFeatureType( MFT_TerrainParallaxMap );
-DeclareFeatureType( MFT_TerrainLightMap );
-DeclareFeatureType( MFT_TerrainSideProject );
-DeclareFeatureType( MFT_TerrainAdditive );
-//Deferred Shading
-DeclareFeatureType( MFT_DeferredTerrainBaseMap );
-DeclareFeatureType( MFT_DeferredTerrainDetailMap );
-DeclareFeatureType( MFT_DeferredTerrainMacroMap );
-
-
-#endif // _TERRFEATURETYPES_H_
-
+void main()
+{ 
+   float specular = texture( colorBufferTex, uv0 ).a;  
+   OUT_FragColor0 = vec4( specular, specular, specular, 1.0 );
+}

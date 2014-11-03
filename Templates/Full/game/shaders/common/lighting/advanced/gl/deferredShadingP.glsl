@@ -20,26 +20,33 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRFEATURETYPES_H_
-#define _TERRFEATURETYPES_H_
+#include "../../../gl/hlslCompat.glsl"
+#include "shadergen:/autogenConditioners.h"
+#include "../../../postfx/gl/postFx.glsl"
+#include "../../../gl/torque.glsl"
 
-#ifndef _FEATURETYPE_H_
-#include "shaderGen/featureType.h"
-#endif
+uniform sampler2D colorBufferTex;
+uniform sampler2D lightPrePassTex;
+uniform sampler2D matInfoTex;
 
-DeclareFeatureType( MFT_TerrainBaseMap );
-DeclareFeatureType( MFT_TerrainMacroMap );
-DeclareFeatureType( MFT_TerrainDetailMap );
-DeclareFeatureType( MFT_TerrainNormalMap );
-DeclareFeatureType( MFT_TerrainParallaxMap );
-DeclareFeatureType( MFT_TerrainLightMap );
-DeclareFeatureType( MFT_TerrainSideProject );
-DeclareFeatureType( MFT_TerrainAdditive );
-//Deferred Shading
-DeclareFeatureType( MFT_DeferredTerrainBaseMap );
-DeclareFeatureType( MFT_DeferredTerrainDetailMap );
-DeclareFeatureType( MFT_DeferredTerrainMacroMap );
+out vec4 OUT_FragColor0;
 
+void main()
+{        
+   vec4 lightBuffer = texture( lightPrePassTex, uv0 );
+   vec4 colorBuffer = texture( colorBufferTex, uv0 );
+   vec4 matInfo = texture( matInfoTex, uv0 );
+   float specular = clamp(lightBuffer.a,0.0,1.0);
 
-#endif // _TERRFEATURETYPES_H_
+   // Diffuse Color Altered by Metalness
+   bool metalness = getFlag(matInfo.r, 3);
+   if ( metalness )
+   {
+      colorBuffer *= (1.0 - colorBuffer.a);
+   }
 
+   colorBuffer *= vec4(lightBuffer.rgb, 1.0);
+   colorBuffer += vec4(specular, specular, specular, 1.0);
+
+   OUT_FragColor0 = hdrEncode( colorBuffer );
+}

@@ -43,6 +43,10 @@ public:
    // registered buffer name
    static const String BufferName;
 
+   // andremwac: Deferred Rendering
+   static const String ColorBufferName;
+   static const String MatInfoBufferName;
+
    // Generic PrePass Render Instance Type
    static const RenderInstType RIT_PrePass;
 
@@ -93,6 +97,22 @@ protected:
    virtual void _createPrePassMaterial();
 
    bool _lightManagerActivate(bool active);
+
+   // Deferred Shading
+   GFXVertexBufferHandle<GFXVertexPC>  mClearGBufferVerts;
+   GFXShaderRef                        mClearGBufferShader;
+   GFXStateBlockRef                    mStateblock;
+   NamedTexTarget                      mColorTarget;
+   NamedTexTarget                      mMatInfoTarget;
+   GFXTexHandle                        mColorTex;
+   GFXTexHandle                        mMatInfoTex;
+   GFXShaderConstBufferRef             mShaderConsts;
+   GFXShaderConstHandle                *mSpecularStrengthSC;  
+   GFXShaderConstHandle                *mSpecularPowerSC;
+
+public:
+   void clearBuffers();
+   void _initShaders();
 };
 
 //------------------------------------------------------------------------------

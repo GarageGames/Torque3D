@@ -36,6 +36,7 @@
 #include "scene/sceneRenderState.h"
 #include "gfx/gfxStringEnumTranslate.h"
 #include "gfx/gfxDebugEvent.h"
+#include "gfx/gfxCardProfile.h"
 #include "materials/customMaterialDefinition.h"
 #include "lighting/advanced/advancedLightManager.h"
 #include "lighting/advanced/advancedLightBinManager.h"
@@ -44,10 +45,17 @@
 #include "terrain/terrCellMaterial.h"
 #include "math/mathUtils.h"
 #include "math/util/matrixSet.h"
+#include "gfx/gfxTextureManager.h"
+#include "gfx/primBuilder.h"
+#include "gfx/gfxDrawUtil.h"
+#include "materials/shaderData.h"
+#include "gfx/sim/cubemapData.h"
 
 const MatInstanceHookType PrePassMatInstanceHook::Type( "PrePass" );
 const String RenderPrePassMgr::BufferName("prepass");
 const RenderInstType RenderPrePassMgr::RIT_PrePass("PrePass");
+const String RenderPrePassMgr::ColorBufferName("color");
+const String RenderPrePassMgr::MatInfoBufferName("matinfo");
 
 IMPLEMENT_CONOBJECT(RenderPrePassMgr);
 
@@ -79,6 +87,7 @@ RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
       mPrePassMatInstance( NULL )
 {
    notifyType( RenderPassManager::RIT_Decal );
+   notifyType( RenderPassManager::RIT_DecalRoad );
    notifyType( RenderPassManager::RIT_Mesh );
    notifyType( RenderPassManager::RIT_Terrain );
    notifyType( RenderPassManager::RIT_Object );
@@ -90,6 +99,10 @@ RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
       GFXShader::addGlobalMacro( "TORQUE_LINEAR_DEPTH" );
 
    mNamedTarget.registerWithName( BufferName );
+   mColorTarget.registerWithName( ColorBufferName );
+   mMatInfoTarget.registerWithName( MatInfoBufferName );
+
+   mClearGBufferShader = NULL;
 
    _registerFeatures();
 }
@@ -97,7 +110,8 @@ RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
 RenderPrePassMgr::~RenderPrePassMgr()
 {
    GFXShader::removeGlobalMacro( "TORQUE_LINEAR_DEPTH" );
-
+   mColorTarget.release();
+   mMatInfoTarget.release();
    _unregisterFeatures();
    SAFE_DELETE( mPrePassMatInstance );
 }
@@ -119,6 +133,8 @@ bool RenderPrePassMgr::setTargetSize(const Point2I &newTargetSize)
 {
    bool ret = Parent::setTargetSize( newTargetSize );
    mNamedTarget.setViewport( GFX->getViewport() );
+   mColorTarget.setViewport( GFX->getViewport() );
+   mMatInfoTarget.setViewport( GFX->getViewport() );
    return ret;
 }
 
@@ -137,27 +153,40 @@ bool RenderPrePassMgr::_updateTargets()
 
    // Attach the light info buffer as a second render target, if there is
    // lightmapped geometry in the scene.
-   AdvancedLightBinManager *lightBin;
-   if (  Sim::findObject( "AL_LightBinMgr", lightBin ) &&
-         lightBin->MRTLightmapsDuringPrePass() &&
-         lightBin->isProperlyAdded() )
-   {
-      // Update the size of the light bin target here. This will call _updateTargets
-      // on the light bin
-      ret &= lightBin->setTargetSize( mTargetSize );
-      if ( ret )
-      {
-         // Sanity check
-         AssertFatal(lightBin->getTargetChainLength() == mTargetChainLength, "Target chain length mismatch");
 
-         // Attach light info buffer to Color1 for each target in the chain
-         for ( U32 i = 0; i < mTargetChainLength; i++ )
-         {
-            GFXTexHandle lightInfoTex = lightBin->getTargetTexture(0, i);
-            mTargetChain[i]->attachTexture(GFXTextureTarget::Color1, lightInfoTex);
-         }
-      }
+   GFXFormat colorFormat = mTargetFormat;
+   bool independentMrtBitDepth = GFX->getCardProfiler()->queryProfile("independentMrtBitDepth", false);
+   //If independent bit depth on a MRT is supported than just use 8bit channels for the albedo color.
+   if(independentMrtBitDepth)
+      colorFormat = GFXFormatR8G8B8A8;
+   
+   // andrewmac: Deferred Shading Color Buffer
+   if (mColorTex.getFormat() != colorFormat || mColorTex.getWidthHeight() != mTargetSize)
+   {
+           mColorTarget.release();
+           mColorTex.set(mTargetSize.x, mTargetSize.y, colorFormat,
+                   &GFXDefaultRenderTargetProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__),
+                   1, GFXTextureManager::AA_MATCH_BACKBUFFER);
+           mColorTarget.setTexture(mColorTex);
+ 
+           for (U32 i = 0; i < mTargetChainLength; i++)
+                   mTargetChain[i]->attachTexture(GFXTextureTarget::Color1, mColorTarget.getTexture());
    }
+ 
+   // andrewmac: Deferred Shading Material Info Buffer
+   if (mMatInfoTex.getFormat() != colorFormat || mMatInfoTex.getWidthHeight() != mTargetSize)
+   {
+                mMatInfoTarget.release();
+                mMatInfoTex.set(mTargetSize.x, mTargetSize.y, colorFormat,
+                        &GFXDefaultRenderTargetProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__),
+                        1, GFXTextureManager::AA_MATCH_BACKBUFFER);
+                mMatInfoTarget.setTexture(mMatInfoTex);
+ 
+                for (U32 i = 0; i < mTargetChainLength; i++)
+                        mTargetChain[i]->attachTexture(GFXTextureTarget::Color2, mMatInfoTarget.getTexture());
+   }
+
+   _initShaders();
 
    return ret;
 }
@@ -191,7 +220,7 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
       return;
 
    // First what type of render instance is it?
-   const bool isDecalMeshInst = inst->type == RenderPassManager::RIT_Decal;
+   const bool isDecalMeshInst = ((inst->type == RenderPassManager::RIT_Decal)||(inst->type == RenderPassManager::RIT_DecalRoad));
 
    const bool isMeshInst = inst->type == RenderPassManager::RIT_Mesh;
 
@@ -201,10 +230,6 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
    BaseMatInstance* matInst = NULL;
    if ( isMeshInst || isDecalMeshInst )
       matInst = static_cast<MeshRenderInst*>(inst)->matInst;
-
-   // Skip decals if they don't have normal maps.
-   if ( isDecalMeshInst && !matInst->hasNormalMap() )
-      return;
 
    // If its a custom material and it refracts... skip it.
    if (  matInst && 
@@ -281,9 +306,8 @@ void RenderPrePassMgr::render( SceneRenderState *state )
    // Tell the superclass we're about to render
    const bool isRenderingToTarget = _onPreRender(state);
 
-   // Clear all the buffers to white so that the
-   // default depth is to the far plane.
-   GFX->clear( GFXClearTarget | GFXClearZBuffer | GFXClearStencil, ColorI::WHITE, 1.0f, 0);
+   // Clear all z-buffer, and g-buffer.
+   clearBuffers();
 
    // Restore transforms
    MatrixSet &matrixSet = getRenderPass()->getMatrixSet();
@@ -330,6 +354,11 @@ void RenderPrePassMgr::render( SceneRenderState *state )
          GFX->drawPrimitive( ri->prim );
    }
 
+   // init loop data
+   GFXTextureObject *lastLM = NULL;
+   GFXCubemap *lastCubemap = NULL;
+   GFXTextureObject *lastReflectTex = NULL;
+   GFXTextureObject *lastMiscTex = NULL;
 
    // Next render all the meshes.
    itr = mElementList.begin();
@@ -364,12 +393,11 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
             // Set up SG data for this instance.
             setupSGData( passRI, sgData );
+            mat->setSceneInfo(state, sgData);
 
             matrixSet.setWorld(*passRI->objectToWorld);
             matrixSet.setView(*passRI->worldToCamera);
             matrixSet.setProjection(*passRI->projection);
-
-            mat->setSceneInfo(state, sgData);
             mat->setTransforms(matrixSet, state);
 
             // If we're instanced then don't render yet.
@@ -385,6 +413,34 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
                continue;
             }
+
+            bool dirty = false;
+
+            // set the lightmaps if different
+            if( passRI->lightmap && passRI->lightmap != lastLM )
+            {
+               sgData.lightmap = passRI->lightmap;
+               lastLM = passRI->lightmap;
+               dirty = true;
+            }
+
+            // set the cubemap if different.
+            if ( passRI->cubemap != lastCubemap )
+            {
+               sgData.cubemap = passRI->cubemap;
+               lastCubemap = passRI->cubemap;
+               dirty = true;
+            }
+
+            if ( passRI->reflectTex != lastReflectTex )
+            {
+               sgData.reflectTex = passRI->reflectTex;
+               lastReflectTex = passRI->reflectTex;
+               dirty = true;
+            }
+
+            if ( dirty )
+               mat->setTextureStages( state, sgData );
 
             // Setup the vertex and index buffers.
             mat->setBuffers( passRI->vertBuff, passRI->primBuff );
@@ -526,6 +582,43 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
 
 #ifndef TORQUE_DEDICATED
 
+   // Deferred Shading : Diffuse
+   if (mStages[stageNum].getTex( MFT_DiffuseMap ))
+   {
+      newFeatures.addFeature( MFT_DeferredDiffuseMap );
+      if ( mMaterial->mDiffuse[stageNum].alpha >= 0.0 && mMaterial->mDiffuse[stageNum] != ColorF::WHITE )
+         newFeatures.addFeature( MFT_DeferredDiffuseColor );
+   } else {
+      newFeatures.addFeature( MFT_DeferredDiffuseColor );
+   }
+
+   // Deferred Shading : Specular
+   if( mStages[stageNum].getTex( MFT_SpecularMap ) )
+   {
+       newFeatures.addFeature( MFT_DeferredSpecMap );
+       newFeatures.addFeature( MFT_DeferredGlossMap);
+   }
+   else if ( mMaterial->mPixelSpecular[stageNum] )
+   {
+       newFeatures.addFeature( MFT_DeferredSpecStrength );
+       newFeatures.addFeature( MFT_DeferredSpecPower );
+   }
+   else
+       newFeatures.addFeature(MFT_DeferredEmptySpec);
+
+   // Deferred Shading : Translucency Mapping
+   if ( mStages[stageNum].getTex( MFT_TranslucencyMap ) )
+   {
+      newFeatures.addFeature( MFT_DeferredTranslucencyMap );
+   }
+   else
+   {
+      newFeatures.addFeature( MFT_DeferredTranslucencyEmpty );
+   }
+
+   // Deferred Shading : Material Info Flags
+   newFeatures.addFeature( MFT_DeferredMatInfoFlags );
+
    for ( U32 i=0; i < fd.features.getCount(); i++ )
    {
       const FeatureType &type = fd.features.getAt( i );
@@ -554,7 +647,10 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
                   type == MFT_InterlacedPrePass ||
                   type == MFT_Visibility ||
                   type == MFT_UseInstancing ||
-                  type == MFT_DiffuseVertColor )
+                  type == MFT_DiffuseVertColor ||
+                  type == MFT_DetailMap ||
+                  type == MFT_DetailNormalMap ||
+                  type == MFT_DiffuseMapAtlas)
          newFeatures.addFeature( type );
 
       // Add any transform features.
@@ -595,7 +691,17 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
       }
    }
 
+   // cubemaps only available on stage 0 for now - bramage   
+   if ( stageNum < 1 && 
+         (  (  mMaterial->mCubemapData && mMaterial->mCubemapData->mCubemap ) ||
+               mMaterial->mDynamicCubemap ) )
+   newFeatures.addFeature( MFT_CubeMap );
+   
 #endif
+
+   // Deferred Shading : Disable Unused Features
+   newFeatures.removeFeature( MFT_DiffuseMap );
+   newFeatures.removeFeature( MFT_DiffuseColor );
 
    // Set the new features.
    fd.features = newFeatures;
@@ -603,8 +709,54 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
 
 U32 ProcessedPrePassMaterial::getNumStages()
 {
-   // Return 1 stage so this material gets processed for sure
-   return 1;
+   // Loops through all stages to determine how many 
+   // stages we actually use.  
+   // 
+   // The first stage is always active else we shouldn't be
+   // creating the material to begin with.
+   U32 numStages = 1;
+
+   U32 i;
+   for( i=1; i<Material::MAX_STAGES; i++ )
+   {
+      // Assume stage is inactive
+      bool stageActive = false;
+
+      // Cubemaps only on first stage
+      if( i == 0 )
+      {
+         // If we have a cubemap the stage is active
+         if( mMaterial->mCubemapData || mMaterial->mDynamicCubemap )
+         {
+            numStages++;
+            continue;
+         }
+      }
+
+      // If we have a texture for the a feature the 
+      // stage is active.
+      if ( mStages[i].hasValidTex() )
+         stageActive = true;
+
+      // If this stage has specular lighting, it's active
+      if ( mMaterial->mPixelSpecular[i] )
+         stageActive = true;
+
+      // If this stage has diffuse color, it's active
+      if (  mMaterial->mDiffuse[i].alpha > 0 &&
+            mMaterial->mDiffuse[i] != ColorF::WHITE )
+         stageActive = true;
+
+      // If we have a Material that is vertex lit
+      // then it may not have a texture
+      if( mMaterial->mVertLit[i] )
+         stageActive = true;
+
+      // Increment the number of active stages
+      numStages += stageActive;
+   }
+
+   return numStages;
 }
 
 void ProcessedPrePassMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
@@ -834,12 +986,12 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
       // possible so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
       if (GFX->getAdapterType() == OpenGL)
-         meta->addStatement( new GenOp( "    @ = texture2DLod(@, @, 0); \r\n", bufferSampleDecl, prepassSampler, screenUV) );
+         meta->addStatement( new GenOp( "    @ = textureLod(@, @, 0); \r\n", bufferSampleDecl, prepassSampler, screenUV) );
       else
          meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #else\r\n" ) );
       if (GFX->getAdapterType() == OpenGL)
-         meta->addStatement( new GenOp( "    @ = texture2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV) );
+         meta->addStatement( new GenOp( "    @ = texture(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV) );
       else
          meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
@@ -850,4 +1002,78 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
    }
 
    return retVal;
+}
+
+void RenderPrePassMgr::_initShaders()
+{
+   if ( mClearGBufferShader ) return;
+
+   // Find ShaderData
+   ShaderData *shaderData;
+   mClearGBufferShader = Sim::findObject( "ClearGBufferShader", shaderData ) ? shaderData->getShader() : NULL;
+   if ( !mClearGBufferShader )
+      Con::errorf( "RenderPrePassMgr::_initShaders - could not find ClearGBufferShader" );
+
+   // Create StateBlocks
+   GFXStateBlockDesc desc;
+   desc.setCullMode( GFXCullNone );
+   desc.setBlend( true );
+   desc.setZReadWrite( false, false );
+   desc.samplersDefined = true;
+   desc.samplers[0].addressModeU = GFXAddressWrap;
+   desc.samplers[0].addressModeV = GFXAddressWrap;
+   desc.samplers[0].addressModeW = GFXAddressWrap;
+   desc.samplers[0].magFilter = GFXTextureFilterLinear;
+   desc.samplers[0].minFilter = GFXTextureFilterLinear;
+   desc.samplers[0].mipFilter = GFXTextureFilterLinear;
+   desc.samplers[0].textureColorOp = GFXTOPModulate;
+
+   mStateblock = GFX->createStateBlock( desc );   
+
+   // Set up shader constants.
+   mShaderConsts = mClearGBufferShader->allocConstBuffer();
+   mSpecularStrengthSC = mClearGBufferShader->getShaderConstHandle( "$specularStrength" );
+   mSpecularPowerSC = mClearGBufferShader->getShaderConstHandle( "$specularPower" );
+}
+
+void RenderPrePassMgr::clearBuffers()
+{
+   // Clear z-buffer.
+   GFX->clear( GFXClearZBuffer | GFXClearStencil, ColorI::BLACK, 1.0f, 0);
+
+   if ( !mClearGBufferShader )
+      return;
+
+   GFXTransformSaver saver;
+
+   // Clear the g-buffer.
+   RectI box(-1, -1, 3, 3);
+   GFX->setWorldMatrix( MatrixF::Identity );
+   GFX->setViewMatrix( MatrixF::Identity );
+   GFX->setProjectionMatrix( MatrixF::Identity );
+
+   GFX->setShader(mClearGBufferShader);
+   GFX->setStateBlock(mStateblock);
+
+   Point2F nw(-0.5,-0.5);
+   Point2F ne(0.5,-0.5);
+
+   GFXVertexBufferHandle<GFXVertexPC> verts(GFX, 4, GFXBufferTypeVolatile);
+   verts.lock();
+
+   F32 ulOffset = 0.5f - GFX->getFillConventionOffset();
+   
+   Point2F upperLeft(-1.0, -1.0);
+   Point2F lowerRight(1.0, 1.0);
+
+   verts[0].point.set( upperLeft.x+nw.x+ulOffset, upperLeft.y+nw.y+ulOffset, 0.0f );
+   verts[1].point.set( lowerRight.x+ne.x, upperLeft.y+ne.y+ulOffset, 0.0f );
+   verts[2].point.set( upperLeft.x-ne.x+ulOffset, lowerRight.y-ne.y, 0.0f );
+   verts[3].point.set( lowerRight.x-nw.x, lowerRight.y-nw.y, 0.0f );
+
+   verts.unlock();
+
+   GFX->setVertexBuffer( verts );
+   GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
+   GFX->setShader(NULL);
 }

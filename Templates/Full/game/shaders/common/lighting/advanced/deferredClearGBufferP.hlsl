@@ -20,26 +20,28 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRFEATURETYPES_H_
-#define _TERRFEATURETYPES_H_
+struct Fragout
+{
+   float4 col : COLOR0;
+   float4 col1 : COLOR1;
+   float4 col2 : COLOR2;
+};
 
-#ifndef _FEATURETYPE_H_
-#include "shaderGen/featureType.h"
-#endif
+//-----------------------------------------------------------------------------
+// Main                                                                        
+//-----------------------------------------------------------------------------
+Fragout main( )
+{
+   Fragout OUT;
+   
+   // Clear Prepass Buffer ( Normals/Depth );
+   OUT.col =  float4(1.0, 1.0, 1.0, 1.0);
 
-DeclareFeatureType( MFT_TerrainBaseMap );
-DeclareFeatureType( MFT_TerrainMacroMap );
-DeclareFeatureType( MFT_TerrainDetailMap );
-DeclareFeatureType( MFT_TerrainNormalMap );
-DeclareFeatureType( MFT_TerrainParallaxMap );
-DeclareFeatureType( MFT_TerrainLightMap );
-DeclareFeatureType( MFT_TerrainSideProject );
-DeclareFeatureType( MFT_TerrainAdditive );
-//Deferred Shading
-DeclareFeatureType( MFT_DeferredTerrainBaseMap );
-DeclareFeatureType( MFT_DeferredTerrainDetailMap );
-DeclareFeatureType( MFT_DeferredTerrainMacroMap );
+   // Clear Color Buffer.
+   OUT.col1 = float4(0.0, 0.0, 0.0, 1.0);
 
+   // Clear Material Info Buffer.
+   OUT.col2 = float4(0.0, 0.0, 0.0, 1.0);
 
-#endif // _TERRFEATURETYPES_H_
-
+   return OUT;
+}

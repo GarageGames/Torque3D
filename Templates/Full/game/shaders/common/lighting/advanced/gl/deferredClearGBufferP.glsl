@@ -20,26 +20,21 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRFEATURETYPES_H_
-#define _TERRFEATURETYPES_H_
+layout (location = 0) out vec4 col;
+layout (location = 1) out vec4 col1;
+layout (location = 2) out vec4 col2;
 
-#ifndef _FEATURETYPE_H_
-#include "shaderGen/featureType.h"
-#endif
+//-----------------------------------------------------------------------------
+// Main                                                                        
+//-----------------------------------------------------------------------------
+void main()
+{    
+   // Clear Prepass Buffer ( Normals/Depth );
+   col =  vec4(1.0, 1.0, 1.0, 1.0);
 
-DeclareFeatureType( MFT_TerrainBaseMap );
-DeclareFeatureType( MFT_TerrainMacroMap );
-DeclareFeatureType( MFT_TerrainDetailMap );
-DeclareFeatureType( MFT_TerrainNormalMap );
-DeclareFeatureType( MFT_TerrainParallaxMap );
-DeclareFeatureType( MFT_TerrainLightMap );
-DeclareFeatureType( MFT_TerrainSideProject );
-DeclareFeatureType( MFT_TerrainAdditive );
-//Deferred Shading
-DeclareFeatureType( MFT_DeferredTerrainBaseMap );
-DeclareFeatureType( MFT_DeferredTerrainDetailMap );
-DeclareFeatureType( MFT_DeferredTerrainMacroMap );
+   // Clear Color Buffer.
+   col1 = vec4(0.0, 0.0, 0.0, 1.0);
 
-
-#endif // _TERRFEATURETYPES_H_
-
+   // Clear Material Info Buffer.
+   col2 = vec4(0.0, 0.0, 0.0, 1.0);
+}

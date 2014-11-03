@@ -20,26 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRFEATURETYPES_H_
-#define _TERRFEATURETYPES_H_
+#include "../../../gl/hlslCompat.glsl"
+#include "shadergen:/autogenConditioners.h"
+#include "../../../postfx/gl/postFx.glsl"
 
-#ifndef _FEATURETYPE_H_
-#include "shaderGen/featureType.h"
-#endif
+uniform sampler2D colorBufferTex;
 
-DeclareFeatureType( MFT_TerrainBaseMap );
-DeclareFeatureType( MFT_TerrainMacroMap );
-DeclareFeatureType( MFT_TerrainDetailMap );
-DeclareFeatureType( MFT_TerrainNormalMap );
-DeclareFeatureType( MFT_TerrainParallaxMap );
-DeclareFeatureType( MFT_TerrainLightMap );
-DeclareFeatureType( MFT_TerrainSideProject );
-DeclareFeatureType( MFT_TerrainAdditive );
-//Deferred Shading
-DeclareFeatureType( MFT_DeferredTerrainBaseMap );
-DeclareFeatureType( MFT_DeferredTerrainDetailMap );
-DeclareFeatureType( MFT_DeferredTerrainMacroMap );
+out vec4 OUT_FragColor0;
 
-
-#endif // _TERRFEATURETYPES_H_
-
+void main()
+{ 
+   OUT_FragColor0 = vec4(texture( colorBufferTex, uv0 ).rgb, 1.0);   
+}

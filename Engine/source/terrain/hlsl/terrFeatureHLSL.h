@@ -35,8 +35,13 @@
 /// includes some helper functions.
 class TerrainFeatHLSL : public ShaderFeatureHLSL
 {
+
 protected:
 
+   ShaderIncludeDependency mTorqueDep;
+
+public:
+   TerrainFeatHLSL();
    Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
 
    Var* _getInMacroCoord(Vector<ShaderComponent*> &componentList );
@@ -64,6 +69,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Base Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -87,6 +94,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Detail Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -110,6 +119,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Macro Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 

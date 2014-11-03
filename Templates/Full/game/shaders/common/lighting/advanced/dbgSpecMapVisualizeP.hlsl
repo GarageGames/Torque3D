@@ -20,26 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRFEATURETYPES_H_
-#define _TERRFEATURETYPES_H_
-
-#ifndef _FEATURETYPE_H_
-#include "shaderGen/featureType.h"
-#endif
-
-DeclareFeatureType( MFT_TerrainBaseMap );
-DeclareFeatureType( MFT_TerrainMacroMap );
-DeclareFeatureType( MFT_TerrainDetailMap );
-DeclareFeatureType( MFT_TerrainNormalMap );
-DeclareFeatureType( MFT_TerrainParallaxMap );
-DeclareFeatureType( MFT_TerrainLightMap );
-DeclareFeatureType( MFT_TerrainSideProject );
-DeclareFeatureType( MFT_TerrainAdditive );
-//Deferred Shading
-DeclareFeatureType( MFT_DeferredTerrainBaseMap );
-DeclareFeatureType( MFT_DeferredTerrainDetailMap );
-DeclareFeatureType( MFT_DeferredTerrainMacroMap );
+#include "shadergen:/autogenConditioners.h"
+#include "../../postfx/postFx.hlsl"
 
 
-#endif // _TERRFEATURETYPES_H_
-
+float4 main( PFXVertToPix IN, 
+             uniform sampler2D colorBufferTex : register(S0) ) : COLOR0
+{     
+   float specular = tex2D( colorBufferTex, IN.uv0 ).a;  
+   return float4( specular, specular, specular, 1.0 );   
+}
