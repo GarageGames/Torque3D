@@ -944,12 +944,22 @@ bool ReadFile(const Path &inPath, void *&outData, U32 &outSize, bool inNullTermi
    if ( inNullTerminate )
    {
       outData = new char [outSize+1];
+      if( !outData )
+      {
+          // out of memory
+          return false;
+      }
       sizeRead = fileR->read(outData, outSize);
       static_cast<char *>(outData)[outSize] = '\0';
    }
    else
    {
       outData = new char [outSize];
+      if( !outData )
+      {
+          // out of memory
+          return false;
+      }
       sizeRead = fileR->read(outData, outSize);
    }
 
