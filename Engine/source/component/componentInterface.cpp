@@ -30,11 +30,11 @@ bool ComponentInterfaceCache::add( const char *type, const char *name, const Sim
    if( ( mInterfaceList.size() == 0 ) || ( enumerate( NULL, type, name, owner ) == 0 ) )
    {
       mInterfaceList.increment();
-      // CodeReview [tom, 3/9/2007] Seems silly to keep calling last(), why not cache the var? Yes, I know I am pedantic.
-      mInterfaceList.last().type = ( type == NULL ? NULL : StringTable->insert( type ) );
-      mInterfaceList.last().name = ( name == NULL ? NULL : StringTable->insert( name ) );
-      mInterfaceList.last().owner = owner;
-      mInterfaceList.last().iface = cinterface;
+      ComponentInterfaceCache::_InterfaceEntry mEntry = mInterfaceList.last();
+      mEntry.type = ( type == NULL ? NULL : StringTable->insert( type ) );
+      mEntry.name = ( name == NULL ? NULL : StringTable->insert( name ) );
+      mEntry.owner = owner;
+      mEntry.iface = cinterface; 
 
       return true;
    }
