@@ -78,7 +78,7 @@
       new GuiTabBookCtrl(ppOptionsTabBook) {
          tabPosition = "Top";
          tabMargin = "7";
-         minTabWidth = "64";
+         minTabWidth = "32";
          tabHeight = "20";
          allowReorder = "0";
          defaultPage = "-1";
