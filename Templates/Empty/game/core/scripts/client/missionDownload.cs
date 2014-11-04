@@ -35,13 +35,40 @@
 // Phase 1 
 //----------------------------------------------------------------------------
 
-function clientCmdMissionStartPhase1(%seq, %missionName, %musicTrack)
+function clientCmdMissionStartPhase1(%seq, %missionName, %musicTrack, %serverCRC)
 {
+   error("Server CRC " @ %serverCRC);
+   
+   $ServerDatablockCacheCRC = %serverCRC;
+   
    // These need to come after the cls.
    echo ("*** New Mission: " @ %missionName);
    echo ("*** Phase 1: Download Datablocks & Targets");
    onMissionDownloadPhase1(%missionName, %musicTrack);
-   commandToServer('MissionStartPhase1Ack', %seq);
+   %name = strreplace(%missionName," ","");
+   %pos = strrchrpos(%name,"/");
+   if (%pos!=-1)
+   {
+      %name = getSubStr(%name,%pos + 1);
+   }
+   
+   %pos = strrchrpos(%name,".");   
+   if (%pos>-1)
+   {
+      %name = getSubStr(%name,0,strlen(%name) - (%pos) + 1);
+   }
+      
+   $ServerDatablockCacheMissionName = "DBCaches/" @ %name @ "DB.db";
+
+   %loaded = ServerConnection.LoadDatablocksFromFile(%serverCRC);
+
+   if (%loaded)
+      {
+      echo("Loaded Datablocks from file. (" @ %name @ ").");
+      clientCmdMissionStartPhase2(%seq, %missionName, true);
+      }
+   else      
+      commandToServer('MissionStartPhase1Ack', %seq);
 }
 
 function onDataBlockObjectReceived(%index, %total)
@@ -53,11 +80,15 @@ function onDataBlockObjectReceived(%index, %total)
 // Phase 2
 //----------------------------------------------------------------------------
 
-function clientCmdMissionStartPhase2(%seq,%missionName)
+function clientCmdMissionStartPhase2(%seq,%missionName,%isLoadedFromFile)
 {
    onPhase1Complete();
    echo ("*** Phase 2: Download Ghost Objects");
    onMissionDownloadPhase2(%missionName);
+   if (%isLoadedFromFile)
+      commandToServer('MissionStartPhase2CacheAck');
+
+   
    commandToServer('MissionStartPhase2Ack', %seq, $pref::Player:PlayerDB);
 }
 
