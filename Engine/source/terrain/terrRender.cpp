@@ -178,7 +178,7 @@ bool TerrainBlock::_initBaseShader()
    return true;
 }
 
-void TerrainBlock::_updateBaseTexture( bool writeToCache )
+void TerrainBlock::_updateBaseTexture(bool writeToCache)
 {
    if ( !mBaseShader && !_initBaseShader() )
       return;
@@ -290,7 +290,14 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
       GFX->endScene();
 
    /// Do we cache this sucker?
-   if ( writeToCache )
+   if (mBaseTexFormat == NONE || !writeToCache)
+   {
+      // We didn't cache the result, so set the base texture
+      // to the render target we updated.  This should be good
+      // for realtime painting cases.
+      mBaseTex = blendTex;
+   }
+   else if (mBaseTexFormat == DDS)
    {
       String cachePath = _getBaseTexCacheFileName();
 
@@ -327,10 +334,16 @@ void TerrainBlock::_updateBaseTexture( bool writeToCache )
    }
    else
    {
-      // We didn't cache the result, so set the base texture
-      // to the render target we updated.  This should be good
-      // for realtime painting cases.
-      mBaseTex = blendTex;
+      FileStream stream;
+      if (!stream.open(_getBaseTexCacheFileName(), Torque::FS::File::Write))
+      {
+         mBaseTex = blendTex;
+         return;
+      }
+
+      GBitmap bitmap(blendTex->getWidth(), blendTex->getHeight(), false, GFXFormatR8G8B8);
+      blendTex->copyToBmp(&bitmap);
+      bitmap.writeBitmap(formatToExtension(mBaseTexFormat), stream);
    }
 }
 
