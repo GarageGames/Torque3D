@@ -23,6 +23,7 @@
 #include "console/simPersistSet.h"
 #include "console/simPersistID.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 
 IMPLEMENT_CONOBJECT( SimPersistSet );
@@ -186,7 +187,7 @@ void SimPersistSet::addObject( SimObject* object )
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimPersistSet, resolvePersistentIds, void, 2, 2, "() - Try to bind unresolved persistent IDs in the set." )
+DefineConsoleMethod( SimPersistSet, resolvePersistentIds, void, (), , "() - Try to bind unresolved persistent IDs in the set." )
 {
    object->resolvePIDs();
 }

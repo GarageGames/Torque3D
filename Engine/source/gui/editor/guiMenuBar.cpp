@@ -216,7 +216,7 @@ DefineEngineMethod(GuiMenuBar, addMenu, void, (const char* menuText, S32 menuId)
 }
 
 DefineEngineMethod(GuiMenuBar, addMenuItem, void, (const char* targetMenu, const char* menuItemText, S32 menuItemId, const char* accelerator, int checkGroup),
-												 ("","",0,NULL,-1),
+												 ("","",0,"",-1),
    "@brief Adds a menu item to the specified menu.  The menu argument can be either the text of a menu or its id.\n\n"
    "@param menu Menu name or menu Id to add the new item to.\n"
    "@param menuItemText Text for the new menu item.\n"

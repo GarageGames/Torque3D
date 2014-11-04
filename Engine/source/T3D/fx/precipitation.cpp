@@ -506,7 +506,7 @@ DefineEngineMethod(Precipitation, modifyStorm, void, (F32 percentage, F32 second
    object->modifyStorm(percentage, S32(seconds * 1000.0f));
 }
 
-DefineEngineMethod(Precipitation, setTurbulence, void, (F32 max, F32 speed, F32 seconds), (1.0f, 5.0f, 5.0),
+DefineEngineMethod(Precipitation, setTurbulence, void, (F32 max, F32 speed, F32 seconds), (1.0f, 5.0f, 5.0f),
    "Smoothly change the turbulence parameters over a period of time.\n"
    "@param max New #maxTurbulence value. Set to 0 to disable turbulence.\n"
    "@param speed New #turbulenceSpeed value.\n"

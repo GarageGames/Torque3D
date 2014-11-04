@@ -27,6 +27,7 @@
 #include "core/util/tVector.h"
 #include "core/stream/fileStream.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 
 /// Bookkeeping structure for registered sampling keys.
@@ -393,7 +394,7 @@ SAMPLE_FUNC( const char* );
 //	Console Functions.
 //--------------------------------------------------------------------------------
 
-ConsoleFunction( beginSampling, void, 2, 3, "(location, [backend]) -"
+DefineConsoleFunction( beginSampling, void, (const char * location, const char * backend), ("CSV"), "(location, [backend]) -"
 				"@brief Takes a string informing the backend where to store "
 				"sample data and optionally a name of the specific logging "
 				"backend to use.  The default is the CSV backend. In most "
@@ -403,30 +404,22 @@ ConsoleFunction( beginSampling, void, 2, 3, "(location, [backend]) -"
 				"@endtsexample\n\n"
 				"@ingroup Rendering")
 {
-   const char* location = argv[ 1 ];
-   const char* backend = "CSV";
-   if( argc > 2 )
-      backend = argv[ 2 ];
 
    beginSampling( location, backend );
 }
 
-ConsoleFunction( stopSampling, void, 1, 1, "()"
+DefineConsoleFunction( stopSampling, void, (), , "()"
 				"@brief Stops the rendering sampler\n\n"
 				"@ingroup Rendering\n")
 {
    stopSampling();
 }
 
-ConsoleFunction( enableSamples, void, 2, 3, "(pattern, [state]) -"
+DefineConsoleFunction( enableSamples, void, (const char * pattern, bool state), (true), "(pattern, [state]) -"
 				"@brief Enable sampling for all keys that match the given name "
 				"pattern. Slashes are treated as separators.\n\n"
 				"@ingroup Rendering")
 {
-   const char* pattern = argv[ 1 ];
-   bool state = true;
-   if( argc > 2 )
-      state = dAtob( argv[ 2 ] );
 
    Sampler::enableKeys( pattern, state );
 }

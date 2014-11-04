@@ -27,6 +27,7 @@
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/winConsole.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/journal/process.h"
 
 
@@ -37,10 +38,9 @@ namespace Con
    extern bool alwaysUseDebugOutput;
 }
 
-ConsoleFunction(enableWinConsole, void, 2, 2, "enableWinConsole(bool);")
+DefineConsoleFunction( enableWinConsole, void, (bool flag), , "enableWinConsole(bool);")
 {
-   argc;
-   WindowsConsole->enable(dAtob(argv[1]));
+   WindowsConsole->enable(flag);
 }
 
 void WinConsole::create()

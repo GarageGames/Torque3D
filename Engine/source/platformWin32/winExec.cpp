@@ -22,6 +22,7 @@
 
 #include "platformWin32/platformWin32.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/simBase.h"
 #include "core/strings/unicode.h"
 #include "platform/threads/thread.h"
@@ -135,14 +136,14 @@ void ExecuteThread::run(void *arg /* = 0 */)
 // Console Functions
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(shellExecute, bool, 2, 4, "(string executable, string args, string directory)"
+DefineConsoleFunction( shellExecute, bool, (const char * executable, const char * args, const char * directory), ("", ""), "(string executable, string args, string directory)"
 				"@brief Launches an outside executable or batch file\n\n"
 				"@param executable Name of the executable or batch file\n"
 				"@param args Optional list of arguments, in string format, to pass to the executable\n"
 				"@param directory Optional string containing path to output or shell\n"
 				"@ingroup Platform")
 {
-   ExecuteThread *et = new ExecuteThread(argv[1], argc > 2 ? argv[2] : NULL, argc > 3 ? argv[3] : NULL);
+   ExecuteThread *et = new ExecuteThread( executable, args, directory );
    if(! et->isAlive())
    {
       delete et;

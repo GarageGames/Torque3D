@@ -410,25 +410,20 @@ void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missi
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( queryAllServers, void, 12, 12, "queryAllServers(...);" )
+DefineConsoleFunction( queryAllServers
+                     , void, ( U32 lanPort
+                             , U32 flags
+                             , const char * gameType
+                             , const char * missionType
+                             , U32 minPlayers
+                             , U32 maxPlayers
+                             , U32 maxBots
+                             , U32 regionMask
+                             , U32 maxPing
+                             , U32 minCPU
+                             , U32 filterFlags )
+                     , , "queryAllServers(...);" )
 {
-   TORQUE_UNUSED(argc);
-
-   U32 lanPort = dAtoi(argv[1]);
-   U8 flags = dAtoi(argv[2]);
-
-   // It's not a good idea to hold onto args, recursive calls to
-   // console exec will trash them.
-   char* gameType = dStrdup(argv[3]);
-   char* missionType = dStrdup(argv[4]);
-
-   U8 minPlayers = dAtoi(argv[5]);
-   U8 maxPlayers = dAtoi(argv[6]);
-   U8 maxBots = dAtoi(argv[7]);
-   U32 regionMask = dAtoi(argv[8]);
-   U32 maxPing = dAtoi(argv[9]);
-   U16 minCPU = dAtoi(argv[10]);
-   U8 filterFlags = dAtoi(argv[11]);
    U32 buddyList = 0;
 
    clearServerList();
@@ -442,32 +437,27 @@ ConsoleFunction( queryAllServers, void, 12, 12, "queryAllServers(...);" )
    dFree(missionType);
 
 }
-ConsoleFunction( queryLanServers, void, 12, 12, "queryLanServers(...);" )
+
+DefineConsoleFunction( queryLanServers
+                     , void, ( U32 lanPort
+                             , U32 flags
+                             , const char * gameType
+                             , const char * missionType
+                             , U32 minPlayers
+                             , U32 maxPlayers
+                             , U32 maxBots
+                             , U32 regionMask
+                             , U32 maxPing
+                             , U32 minCPU
+                             , U32 filterFlags )
+                     , , "queryLanServers(...);" )
+
 {
-   TORQUE_UNUSED(argc);
-
-   U32 lanPort = dAtoi(argv[1]);
-   U8 flags = dAtoi(argv[2]);
-
-   // It's not a good idea to hold onto args, recursive calls to
-   // console exec will trash them.
-   char* gameType = dStrdup(argv[3]);
-   char* missionType = dStrdup(argv[4]);
-
-   U8 minPlayers = dAtoi(argv[5]);
-   U8 maxPlayers = dAtoi(argv[6]);
-   U8 maxBots = dAtoi(argv[7]);
-   U32 regionMask = dAtoi(argv[8]);
-   U32 maxPing = dAtoi(argv[9]);
-   U16 minCPU = dAtoi(argv[10]);
-   U8 filterFlags = dAtoi(argv[11]);
 
    clearServerList();
    queryLanServers(lanPort, flags, gameType, missionType, minPlayers, maxPlayers, maxBots,
 	   regionMask, maxPing, minCPU, filterFlags);
 
-   dFree(gameType);
-   dFree(missionType);
 }
 
 //-----------------------------------------------------------------------------
@@ -550,24 +540,20 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
       processMasterServerQuery( gPingSession );
 }
 
-ConsoleFunction( queryMasterServer, void, 11, 11, "queryMasterServer(...);" )
+DefineConsoleFunction( queryMasterServer
+                     , void, ( U32 lanPort
+                             , U32 flags
+                             , const char * gameType
+                             , const char * missionType
+                             , U32 minPlayers
+                             , U32 maxPlayers
+                             , U32 maxBots
+                             , U32 regionMask
+                             , U32 maxPing
+                             , U32 minCPU
+                             , U32 filterFlags )
+                     , , "queryMasterServer(...);" )
 {
-   TORQUE_UNUSED(argc);
-
-   U8 flags = dAtoi(argv[1]);
-
-   // It's not a good idea to hold onto args, recursive calls to
-   // console exec will trash them.
-   char* gameType = dStrdup(argv[2]);
-   char* missionType = dStrdup(argv[3]);
-
-   U8 minPlayers = dAtoi(argv[4]);
-   U8 maxPlayers = dAtoi(argv[5]);
-   U8 maxBots = dAtoi(argv[6]);
-   U32 regionMask = dAtoi(argv[7]);
-   U32 maxPing = dAtoi(argv[8]);
-   U16 minCPU = dAtoi(argv[9]);
-   U8 filterFlags = dAtoi(argv[10]);
    U32 buddyList = 0;
 
    clearServerList();
@@ -580,15 +566,12 @@ ConsoleFunction( queryMasterServer, void, 11, 11, "queryMasterServer(...);" )
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( querySingleServer, void, 3, 3, "querySingleServer(address, flags);" )
+DefineConsoleFunction( querySingleServer
+                     , void, ( const char* addrText, U8 flags )
+                     ,(0) , "querySingleServer(...);" )
 {
-   TORQUE_UNUSED(argc);
 
    NetAddress addr;
-   char* addrText;
-
-   addrText = dStrdup(argv[1]);
-   U8 flags = dAtoi(argv[2]);
 
 
    Net::stringToAddress( addrText, &addr );
@@ -672,9 +655,8 @@ void cancelServerQuery()
    }
 }
 
-ConsoleFunction( cancelServerQuery, void, 1, 1, "cancelServerQuery()" )
+DefineConsoleFunction( cancelServerQuery, void, (), , "cancelServerQuery(...);" )
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    cancelServerQuery();
 }
 
@@ -701,43 +683,36 @@ void stopServerQuery()
    }
 }
 
-ConsoleFunction( stopServerQuery, void, 1, 1, "stopServerQuery()" )
+DefineConsoleFunction( stopServerQuery, void, (), , "stopServerQuery(...);" )
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    stopServerQuery();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(startHeartbeat, void, 1, 1, "startHeartbeat()")
+DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat(...);" )
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
-
    if (validateAuthenticatedServer()) {
       gHeartbeatSeq++;
       processHeartbeat(gHeartbeatSeq);  // thump-thump...
    }
 }
 
-ConsoleFunction(stopHeartbeat, void, 1, 1, "stopHeartbeat();")
+DefineConsoleFunction( stopHeartbeat, void, (), , "stopHeartbeat(...);" )
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    gHeartbeatSeq++;
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( getServerCount, int, 1, 1, "getServerCount();" )
+DefineConsoleFunction( getServerCount, int, (), , "getServerCount(...);" )
 {
-   TORQUE_UNUSED(argv); TORQUE_UNUSED(argc);
    return gServerList.size();
 }
 
-ConsoleFunction( setServerInfo, bool, 2, 2, "setServerInfo(index);" )
+DefineConsoleFunction( setServerInfo, bool, (U32 index), , "setServerInfo(...);" )
 {
-   TORQUE_UNUSED(argc);
-   U32 index = dAtoi(argv[1]);
-   if (index >= 0 && index < gServerList.size()) {
+   if (index < gServerList.size()) {
       ServerInfo& info = gServerList[index];
 
       char addrString[256];
