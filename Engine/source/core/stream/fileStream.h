@@ -30,6 +30,8 @@
 #include "core/stream/stream.h"
 #endif
 
+#include "core/stream/bitStream.h"
+
 class FileStream : public Stream
 {
 public:
@@ -62,10 +64,14 @@ public:
    bool flush();
    FileStream* clone() const;
 
+   bool writeBitStream(BitStream* stream);
+
 protected:
    // more mandatory methods from Stream base class...
    virtual bool _read(const U32 i_numBytes, void *o_pBuffer);
    virtual bool _write(const U32 i_numBytes, const void* i_pBuffer);
+
+   
 
    void init();
    bool fillBuffer(const U32 i_startPosition);

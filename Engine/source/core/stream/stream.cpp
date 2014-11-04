@@ -359,7 +359,7 @@ bool Stream::copyFrom(Stream *other)
    U32 numBytes = other->getStreamSize() - other->getPosition();
    while((other->getStatus() != Stream::EOS) && numBytes > 0)
    {
-      U32 numRead = numBytes > sizeof(buffer) ? sizeof(buffer) : numBytes;
+      U64 numRead = numBytes > sizeof(buffer) ? sizeof(buffer) : numBytes;
       if(! other->read(numRead, buffer))
          return false;
 
