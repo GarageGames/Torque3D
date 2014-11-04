@@ -520,7 +520,7 @@ void ForestWindEmitter::_renderEmitterInfo( ObjectRenderInst *ri, SceneRenderSta
    // Draw a 2D circle for the wind radius.
    if ( isRadialEmitter() )
    {
-	   //WLE - Vince 
+	   
 	   //So the problem is that when your inside the sphere it won't render so it might make someone 
 	   //think that it's not working right.  So what I did was determine if the camera is inside the sphere.
 	   //If the camera is inside the sphere, then I find the distance from the center of the sphere to the camera
