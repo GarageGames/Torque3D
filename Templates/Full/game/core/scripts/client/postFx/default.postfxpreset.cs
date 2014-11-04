@@ -60,3 +60,10 @@ $PostFXManager::Settings::SSAO::sNormalTol = "0";
 $PostFXManager::Settings::SSAO::sRadius = "0.1";
 $PostFXManager::Settings::SSAO::sStrength = "6";
 $PostFXManager::Settings::ColorCorrectionRamp = "core/scripts/client/postFx/null_color_ramp.png";
+// RDM SSAO Start
+$PostFXManager::Settings::SSAO2::intensity = "5.0";
+$PostFXManager::Settings::SSAO2::radius = "1.0";
+$PostFXManager::Settings::SSAO2::scale = "1.0";
+$PostFXManager::Settings::SSAO2::bias = "0.35";
+$PostFXManager::Settings::EnabledSSAO2 = "0";
+// RDM SSAO End

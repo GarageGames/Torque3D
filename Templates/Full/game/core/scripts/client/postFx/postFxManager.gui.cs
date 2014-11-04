@@ -77,6 +77,14 @@ function ppOptionsEnableSSAO::onAction(%this)
    PostFXManager.settingsEffectSetEnabled("SSAO", %toEnable);
 }
 
+// RDM SSAO Start
+function ppOptionsEnableSSAO2::onAction(%this)
+{
+   %toEnable = PostFXManager.getEnableResultFromControl(%this);
+   PostFXManager.settingsEffectSetEnabled("SSAO2", %toEnable);
+}
+// RDM SSAO End
+
 function ppOptionsEnableHDR::onAction(%this)
 {
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
@@ -209,6 +217,33 @@ function ppOptionsSSAOFarTolerancePower::onMouseDragged(%this)
    $SSAOPostFx::lNormalPow = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
+
+// RDM SSAO Start
+//SSAO2 Slider controls
+function ppOptionsSSAO2Intensity::onMouseDragged(%this)
+{
+   $SSAO2PostFx::intensity = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+
+function ppOptionsSSAO2Radius::onMouseDragged(%this)
+{
+   $SSAO2PostFx::radius = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+
+function ppOptionsSSAO2Scale::onMouseDragged(%this)
+{
+   $SSAO2PostFx::scale = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+
+function ppOptionsSSAO2Bias::onMouseDragged(%this)
+{
+   $SSAO2PostFx::bias = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+// RDM SSAO End
 
 //HDR Slider Controls
 //Brighness tab

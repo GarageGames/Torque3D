@@ -35,6 +35,13 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
          SSAOPostFx.enable();      
       else
          SSAOPostFx.disable();
+		 
+	  // RDM SSAO Start
+      if ( $PostFXManager::PostFX::EnableSSAO2 )
+	     SSAO2PostFx.enable();
+	  else
+         SSAO2PostFx.disable();
+      // RDM SSAO End
       
       if ( $PostFXManager::PostFX::EnableHDR )
          HDRPostFX.enable();
@@ -63,6 +70,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
       //Disable all postFX
       
       SSAOPostFx.disable();
+	  SSAO2PostFx.disable();		// RDM SSAO
       HDRPostFX.disable();
       LightRayPostFX.disable();
       DOFPostEffect.disable();
@@ -83,6 +91,13 @@ function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
       $PostFXManager::PostFX::EnableSSAO = %bEnable;
       //$pref::PostFX::SSAO::Enabled = %bEnable;
    }
+   // RDM SSAO Start
+   else if(%sName $= "SSAO2")
+   {
+	  %postEffect = SSAO2PostFx;
+	  $PostFXManager::PostFX::EnableSSAO2 = %bEnable;
+   }
+   // RDM SSAO End
    else if(%sName $= "HDR")
    {
       %postEffect = HDRPostFX;
@@ -157,6 +172,19 @@ function PostFXManager::settingsRefreshSSAO(%this)
    ppOptionsSSAOFarTolerancePower.setValue($SSAOPostFx::lNormalPow);
 }
 
+// RDM SSAO Start
+function PostFXManager::settingsRefreshSSAO2(%this)
+{
+   //Apply the enabled flag
+   ppOptionsEnableSSAO2.setValue($PostFXManager::PostFX::EnableSSAO2);
+
+   ppOptionsSSAO2Intensity.setValue($SSAO2PostFx::intensity);
+   ppOptionsSSAO2Radius.setValue($SSAO2PostFx::radius );
+   ppOptionsSSAO2Scale.setValue($SSAO2PostFx::scale);
+   ppOptionsSSAO2Bias.setValue($SSAO2PostFx::bias);
+}
+// RDM SSAO End
+
 function PostFXManager::settingsRefreshHDR(%this)
 {
   //Apply the enabled flag 
@@ -219,6 +247,7 @@ function PostFXManager::settingsRefreshAll(%this)
 {    
    $PostFXManager::PostFX::Enabled           = $pref::enablePostEffects;
    $PostFXManager::PostFX::EnableSSAO        = SSAOPostFx.isEnabled();
+   $PostFXManager::PostFX::EnableSSAO2       = SSAO2PostFX.isEnabled();		// RDM SSAO
    $PostFXManager::PostFX::EnableHDR         = HDRPostFX.isEnabled();
    $PostFXManager::PostFX::EnableLightRays   = LightRayPostFX.isEnabled();
    $PostFXManager::PostFX::EnableDOF         = DOFPostEffect.isEnabled();
@@ -228,6 +257,7 @@ function PostFXManager::settingsRefreshAll(%this)
    //to the gui controls.
    
    %this.settingsRefreshSSAO();
+   %this.settingsRefreshSSAO2();		// RDM SSAO
    %this.settingsRefreshHDR();
    %this.settingsRefreshLightrays();
    %this.settingsRefreshDOF();
@@ -261,6 +291,13 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $SSAOPostFx::sNormalTol             = $PostFXManager::Settings::SSAO::sNormalTol;
    $SSAOPostFx::sRadius                = $PostFXManager::Settings::SSAO::sRadius;
    $SSAOPostFx::sStrength              = $PostFXManager::Settings::SSAO::sStrength;
+
+   // RDM SSAO Start
+   $SSAO2PostFx::intensity             = $PostFXManager::Settings::SSAO2::intensity;
+   $SSAO2PostFx::radius                = $PostFXManager::Settings::SSAO2::radius;
+   $SSAO2PostFx::scale                 = $PostFXManager::Settings::SSAO2::scale;
+   $SSAO2PostFx::bias                  = $PostFXManager::Settings::SSAO2::bias;
+   // RDM SSAO End
    
    //HDR settings
    $HDRPostFX::adaptRate               = $PostFXManager::Settings::HDR::adaptRate;
@@ -297,6 +334,7 @@ function PostFXManager::settingsApplyFromPreset(%this)
       $PostFXManager::PostFX::EnableLightRays   = $PostFXManager::Settings::EnableLightRays;
       $PostFXManager::PostFX::EnableHDR         = $PostFXManager::Settings::EnableHDR;
       $PostFXManager::PostFX::EnableSSAO        = $PostFXManager::Settings::EnabledSSAO;
+      $PostFXManager::PostFX::EnableSSAO2       = $PostFXManager::Settings::EnabledSSAO2;   // RDM SSAO
 
       %this.settingsSetEnabled( true );
    }
@@ -333,6 +371,18 @@ function PostFXManager::settingsApplySSAO(%this)
    postVerbose("% - PostFX Manager - Settings Saved - SSAO");    
    
 }
+
+// RDM SSAO Start
+function PostFXManager::settingsApplySSAO2(%this)
+{
+   $PostFXManager::Settings::SSAO2::intensity               = $SSAO2PostFx::intensity;
+   $PostFXManager::Settings::SSAO2::radius                  = $SSAO2PostFx::radius;
+   $PostFXManager::Settings::SSAO2::scale                   = $SSAO2PostFx::scale;
+   $PostFXManager::Settings::SSAO2::bias                    = $SSAO2PostFx::bias;
+
+   postVerbose("% - PostFX Manager - Settings Saved - SSAO2");
+}
+// RDM SSAO End
 
 function PostFXManager::settingsApplyHDR(%this)
 {   
@@ -390,12 +440,15 @@ function PostFXManager::settingsApplyAll(%this, %sFrom)
    $PostFXManager::Settings::EnableLightRays     = $PostFXManager::PostFX::EnableLightRays;
    $PostFXManager::Settings::EnableHDR           = $PostFXManager::PostFX::EnableHDR;
    $PostFXManager::Settings::EnabledSSAO         = $PostFXManager::PostFX::EnableSSAO;
+   $PostFXManager::Settings::EnabledSSAO2        = $PostFXManager::PostFX::EnableSSAO2;		// RDM SSAO
       
    // Apply settings should save the values in the system to the 
    // the preset structure ($PostFXManager::Settings::*)
 
    // SSAO Settings
    %this.settingsApplySSAO();
+   // SSAO2 settings
+   %this.settingsApplySSAO2();		// RDM SSAO
    // HDR settings
    %this.settingsApplyHDR();
    // Light rays settings
