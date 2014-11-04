@@ -69,6 +69,11 @@
 #include "platform/platformVFS.h"
 #endif
 
+#ifdef ENABLE_DATABLOCK_CACHE
+#include "core/stream/bitStream.h"
+#endif
+
+
 DITTS( F32, gTimeScale, 1.0 );
 DITTS( U32, gTimeAdvance, 0 );
 DITTS( U32, gFrameSkip, 0 );
@@ -382,6 +387,41 @@ void StandardMainLoop::preShutdown()
       Con::executef("onExit");
 }
 
+void BuildCacheCRC()
+{
+#ifdef ENABLE_DATABLOCK_CACHE
+    SimDataBlockGroup* pGroup = Sim::getDataBlockGroup();
+    SimDataBlock* pDataBlock = 0;
+    const U32 iCount = pGroup->size();
+    BitStream* stream = new InfiniteBitStream;
+    U32 crc=0;
+    for (U32 i = 0; i < iCount; i++)
+    {
+        pDataBlock = (SimDataBlock*)(*pGroup)[i];
+        pDataBlock->packData(stream);
+    }
+    //U32 crc = CRC::calculateCRCStream(stream); //Stream CRC doesn't seem reliable.
+
+    FileStream* datablocksOut = FileStream::createAndOpen("ServerCRC.dmp", Torque::FS::File::Write );
+    if (datablocksOut==NULL)
+        Con::errorf("### Datablock Cache: Unable to Build Server Datablock CRC Key File.");
+    else
+    {
+        datablocksOut->writeBitStream(stream);
+        datablocksOut->close();
+        crc=Con::getFileCRC("ServerCRC.dmp");
+        Con::deleteFile("ServerCRC.dmp");
+    }
+
+	char buffer[100];
+	dSprintf(buffer,100,"%u",crc);
+	Con::setVariable("$ServerDatablockCacheCRC",buffer);
+    Con::warnf("### Datablock Cache: Server Datablock CRC is %s",buffer);
+
+    delete stream;
+#endif
+}
+
 bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
 {
    // Allow the window manager to process command line inputs; this is
@@ -549,6 +589,7 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
    closeEmbeddedVFSArchive();
 #endif
 
+    BuildCacheCRC();
    return true;
 }
 

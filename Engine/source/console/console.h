@@ -402,6 +402,8 @@ namespace Con
 
    /// Is the console active at this time?
    bool isActive();
+   S32 getFileCRC(const char* filename);
+   bool deleteFile(const char * filename);
 
    /// @}
 
@@ -833,6 +835,7 @@ namespace Con
    char* getArgBuffer(U32 bufferSize);
    ConsoleValueRef getFloatArg(F64 arg);
    ConsoleValueRef getIntArg  (S32 arg);
+   ConsoleValueRef getuIntArg  (U32 arg);
    char* getStringArg( const char *arg );
    char* getStringArg( const String& arg );
    /// @}

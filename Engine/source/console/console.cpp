@@ -394,6 +394,28 @@ bool isActive()
 {
    return active;
 }
+S32 getFileCRC(const char* filename)
+{
+		char sgScriptFilenameBuffer[1024];
+		String cleanfilename(Torque::Path::CleanSeparators(filename));
+		Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
+		Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
+		Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( givenPath );
+		if ( fileRef == NULL )
+		{
+			Con::errorf("getFileCRC() - could not access file: [%s]", givenPath.getFullPath().c_str() );
+			return 0;
+		}
+		else
+			return fileRef->getChecksum();
+}
+
+bool deleteFile(const char* filename)
+{
+	char filePath[1024];
+	Platform::makeFullPathName(filename, filePath, sizeof(filePath));
+	return dFileDelete(filePath);
+}
 
 bool isMainThread()
 {

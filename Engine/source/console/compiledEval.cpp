@@ -206,6 +206,11 @@ namespace Con
       ConsoleValueRef ref = arg;
       return ref;
    }
+   ConsoleValueRef getuIntArg(U32 arg)
+   {
+      ConsoleValueRef ref = arg;
+      return ref;
+   }   
    
    char *getStringArg( const char *arg )
    {

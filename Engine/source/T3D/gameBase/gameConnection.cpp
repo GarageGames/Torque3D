@@ -38,6 +38,7 @@
 #include "T3D/gameBase/gameConnectionEvents.h"
 #include "console/engineAPI.h"
 #include "math/mTransform.h"
+#include "torqueConfig.h"
 
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
@@ -45,6 +46,10 @@
    #include "T3D/gameBase/extended/extendedMoveList.h"
 #else
    #include "T3D/gameBase/std/stdMoveList.h"
+#endif
+
+#ifdef ENABLE_DATABLOCK_CACHE
+#include "core/stream/fileStream.h"
 #endif
 
 //----------------------------------------------------------------------------
@@ -171,9 +176,12 @@ IMPLEMENT_CALLBACK( GameConnection, onFlash, void, (bool state), (state),
 //----------------------------------------------------------------------------
 GameConnection::GameConnection()
 {
-   mLagging = false;
-   mControlObject = NULL;
-   mCameraObject = NULL;
+#ifdef ENABLE_DATABLOCK_CACHE
+    clientBitStream = new InfiniteBitStream;
+#endif
+    mLagging = false;
+    mControlObject = NULL;
+    mCameraObject = NULL;
 
 #ifdef TORQUE_HIFI_NET
    mMoveList = new HifiMoveList();
@@ -231,11 +239,15 @@ GameConnection::GameConnection()
 
 GameConnection::~GameConnection()
 {
-   delete mAuthInfo;
-   for(U32 i = 0; i < mConnectArgc; i++)
-      dFree(mConnectArgv[i]);
-   dFree(mJoinPassword);
-   delete mMoveList;
+#ifdef ENABLE_DATABLOCK_CACHE
+    delete clientBitStream;
+#endif
+
+    delete mAuthInfo;
+    for(U32 i = 0; i < mConnectArgc; i++)
+        dFree(mConnectArgv[i]);
+    dFree(mJoinPassword);
+    delete mMoveList;
 }
 
 //----------------------------------------------------------------------------
@@ -1564,6 +1576,31 @@ void GameConnection::handleConnectionMessage(U32 message, U32 sequence, U32 ghos
    {
       if(message == DataBlocksDone)
       {
+#ifdef ENABLE_DATABLOCK_CACHE
+            //We do no caching if this is not in client mode.
+            if (!this->isLocalConnection())
+            {
+                //Ok, so the client has received all of there datablocks.
+                //So now we need to take all of the data in clientBitStream and spool it out to a file.
+                const char * missionName = Con::getVariable("$ServerDatablockCacheMissionName");
+                Con::printf("### Datablock Cache: Writing Cache File '%s'.",missionName);
+
+                FileStream* datablocksOut;
+                datablocksOut = FileStream::createAndOpen(missionName, Torque::FS::File::Write );
+                if (datablocksOut==NULL)
+                    Con::printf("### Datablock Cache: Unable to create %s",Con::getVariable("$ServerDatablockCacheMissionName"));
+                else
+                {
+                    //We append 8 zero bits to the end of the stream, this ensures when we
+                    //load the file, the first few readflags will have something to read.
+                    clientBitStream->writeInt(0,8);
+                    datablocksOut->writeBitStream(clientBitStream);
+                    datablocksOut->close();
+                    delete datablocksOut;
+                }
+            }
+
+#endif
          mDataBlockLoadList.push_back(NULL);
          mDataBlockSequence = sequence;
          if(mDataBlockLoadList.size() == 1)
@@ -1582,6 +1619,74 @@ void GameConnection::handleConnectionMessage(U32 message, U32 sequence, U32 ghos
    }
    Parent::handleConnectionMessage(message, sequence, ghostCount);
 }
+
+#ifdef ENABLE_DATABLOCK_CACHE
+bool GameConnection::LoadDatablocksFromFile(U32 crc)
+{
+    FileStream source;
+    const char* name = Con::getVariable("$ServerDatablockCacheMissionName");
+    Con::printf("### Datablock Cache: Attempting to read '%s'.",name);
+
+    if (!source.open(name,  Torque::FS::File::Read))
+    {
+        Con::printf("### Datablock Cache: Failed To open %s.",Con::getVariable("$ServerDatablockCacheMissionName"));
+        return false;
+    }
+
+    static char* scratchpad = new char[source.getStreamSize()];
+    if (!source.read(source.getStreamSize(),scratchpad))
+    {
+        Con::printf("### Datablock Cache: Failed to load cache file");
+        source.close();
+
+        delete [] scratchpad;
+        return false;
+    }
+
+    delete clientBitStream;
+    clientBitStream = new BitStream(scratchpad,source.getStreamSize());
+    source.close();
+
+
+	U32 filecrc = (U32)clientBitStream->readInt(32);
+
+	Con::printf("Client CRC: %u", filecrc);
+	Con::printf("Passed CRC: %u", crc);
+
+    if (filecrc != crc)
+    {
+        delete clientBitStream;
+        clientBitStream = new InfiniteBitStream;
+        Con::printf("### Datablock Cache: Server/Client CRC's do not match.");
+        return false;
+    }
+    Con::printf("### Datablock Cache: Reading Cache File");
+    while (clientBitStream->readFlag())
+    {
+        clientBitStream->setCurPos(clientBitStream->getCurPos()-1);
+        SimDataBlockEvent sdbe;
+        sdbe.unpack(this, clientBitStream, true);
+        sdbe.process(this);
+    }
+
+    delete clientBitStream;
+    clientBitStream = new InfiniteBitStream;
+    return true;
+}
+#endif
+DefineEngineMethod( GameConnection, LoadDatablocksFromFile, bool, (const char* crc),,"" )
+{
+	#ifdef ENABLE_DATABLOCK_CACHE
+    //This only works if this is a remote client.
+    if (!object->isNetworkConnection())
+        return false;
+	return object->LoadDatablocksFromFile(dAtoui(crc));
+#else
+	return 0;
+	#endif
+}
+
+
 
 //----------------------------------------------------------------------------
 
