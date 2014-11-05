@@ -33,11 +33,11 @@
 #include "platform/threads/mutex.h"
 #endif
 
+#include "TorqueConfig.h"
+
 #ifndef USE_CLASSIC_SIMDICTIONARY
 #include <string>
 #include <unordered_map>
-
-#include "TorqueConfig.h"
 #endif
 
 class SimObject;
