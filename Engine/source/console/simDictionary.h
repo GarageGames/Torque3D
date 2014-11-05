@@ -33,32 +33,39 @@
 #include "platform/threads/mutex.h"
 #endif
 
+#ifndef USE_CLASSIC_SIMDICTIONARY
 #include <string>
 #include <unordered_map>
 
 #include "TorqueConfig.h"
-
+#endif
 
 class SimObject;
 
-#include "core/strings/stringFunctions.h"
-
-struct my_hash {
-	  inline size_t operator()(const char* val) const
-	  {
-		return (long)val;
-	  }
-	};
-	 
-	struct eqstr {
-	  inline bool operator()(const char *s1, const char *s2) const {
-	    return dStrcmp(s1, s2) == 0;
-	  }
-	};
-
 
 #ifndef USE_CLASSIC_SIMDICTIONARY
-typedef std::unordered_map<const char * , SimObject*, my_hash, eqstr>  StringDictDef;	
+
+#include "core/strings/stringFunctions.h"
+
+struct DictionaryHash 
+{
+    inline size_t operator()(const char* val) const
+	{
+	    return (long)val;
+	}
+};
+	 
+struct eqstr 
+{
+    inline bool operator()(const char *s1, const char *s2) const 
+	{
+	    return dStrcmp(s1, s2) == 0;
+	}
+};
+#endif
+
+#ifndef USE_CLASSIC_SIMDICTIONARY
+typedef std::unordered_map<const char * , SimObject*, DictionaryHash, eqstr>  StringDictDef;	
 typedef std::unordered_map<U32 ,SimObject*> U32DictDef;	
 #endif
 
