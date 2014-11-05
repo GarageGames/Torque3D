@@ -2225,7 +2225,10 @@ DefineEngineMethod( GuiCanvas, reset, void, (),,
 }
 
 DefineEngineMethod( GuiCanvas, getCursorPos, Point2I, (),,
-				   "@brief Get the current position of the cursor.\n\n"
+				   "@brief Get the current position of the cursor in screen-space. Note that this position"
+               " might be outside the Torque window. If you want to get the position within the Canvas,"
+               " call screenToClient on the result.\n\n"
+               "@see Canvas::screenToClient()\n\n"
 				   "@param param Description\n\n"
 				   "@tsexample\n"
 				   "%cursorPos = Canvas.getCursorPos();\n"

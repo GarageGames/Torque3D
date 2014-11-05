@@ -415,11 +415,7 @@ void Splash::onRemove()
 
    ringList.clear();
 
-   if( getSceneManager() )
-      getSceneManager()->removeObjectFromScene(this);
-
-   if( getContainer() )
-      getContainer()->removeObject(this);
+   removeFromScene();
 
    Parent::onRemove();
 }
