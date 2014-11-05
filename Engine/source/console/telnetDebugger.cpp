@@ -25,7 +25,7 @@
 
 #include "core/frameAllocator.h"
 #include "console/console.h"
-#include "console/engineApi.h"
+#include "console/engineAPI.h"
 #include "core/stringTable.h"
 #include "console/consoleInternal.h"
 #include "console/ast.h"
