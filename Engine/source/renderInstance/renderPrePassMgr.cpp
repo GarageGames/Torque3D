@@ -813,10 +813,25 @@ ProcessedMaterial* PrePassMatInstance::getShaderMaterial()
    return new ProcessedPrePassMaterial(*mMaterial, mPrePassMgr);
 }
 
-bool PrePassMatInstance::init( const FeatureSet &features,
-                               const GFXVertexFormat *vertexFormat )
+bool PrePassMatInstance::init(const FeatureSet &features,
+   const GFXVertexFormat *vertexFormat)
 {
-   return Parent::init( features, vertexFormat );
+   bool vaild = Parent::init(features, vertexFormat);
+
+   if (mMaterial && mMaterial->mDiffuseMapFilename[0].isNotEmpty() && mMaterial->mDiffuseMapFilename[0].substr(0, 1).equal("#"))
+   {
+      String texTargetBufferName = mMaterial->mDiffuseMapFilename[0].substr(1, mMaterial->mDiffuseMapFilename[0].length() - 1);
+      NamedTexTarget *texTarget = NamedTexTarget::find(texTargetBufferName);
+      RenderPassData* rpd = getPass(0);
+
+      if (rpd)
+      {
+         rpd->mTexSlot[0].texTarget = texTarget;
+         rpd->mTexType[0] = Material::TexTarget;
+         rpd->mSamplerNames[0] = "diffuseMap";
+      }
+   }
+   return vaild;
 }
 
 PrePassMatInstanceHook::PrePassMatInstanceHook( MatInstance *baseMatInst,
