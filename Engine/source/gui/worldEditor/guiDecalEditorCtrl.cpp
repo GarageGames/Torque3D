@@ -818,15 +818,17 @@ DefineConsoleMethod( GuiDecalEditorCtrl, getDecalCount, S32, (), , "getDecalCoun
 DefineConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, ( U32 id ), , "getDecalTransform()" )
 {
 	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
+
 	if( decalInstance == NULL )
 		return "";
 
-	char* returnBuffer = Con::getReturnBuffer(256);
-   returnBuffer[0] = 0;
+	static const U32 bufSize = 256;
+    char* returnBuffer = Con::getReturnBuffer(bufSize);
+
 
    if ( decalInstance )
    {
-	   dSprintf(returnBuffer, 256, "%f %f %f %f %f %f %f",
+	   dSprintf(returnBuffer, bufSize, "%f %f %f %f %f %f %f",
          decalInstance->mPosition.x, decalInstance->mPosition.y, decalInstance->mPosition.z, 
 		   decalInstance->mTangent.x, decalInstance->mTangent.y, decalInstance->mTangent.z,
 		   decalInstance->mSize);

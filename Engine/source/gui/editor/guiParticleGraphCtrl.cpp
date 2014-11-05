@@ -1052,25 +1052,17 @@ DefineConsoleMethod(GuiParticleGraphCtrl, clearAllGraphs, void, (), , "()"
    object->clearAllGraphs();
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, const char*, (S32 plotID, F32 x, F32 y, bool setAdded), (true), "(int plotID, float x, float y, bool setAdded = true;)"
+DefineConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, S32, (S32 plotID, F32 x, F32 y, bool setAdded), (true), "(int plotID, float x, float y, bool setAdded = true;)"
               "Add a data point to the given plot."
 			  "@return")
 {
-   S32 pointAdded = 0;
-   char *retBuffer = Con::getReturnBuffer(32);
-
+  
    if(plotID > object->MaxPlots)
    {
 	   Con::errorf("Invalid plotID.");
-	   dSprintf(retBuffer, 32, "%d", -2);
-      return retBuffer;
+	   return -2;
    }
-
-   pointAdded = object->addPlotPoint( plotID, Point2F(x, y), setAdded);
-   
-   dSprintf(retBuffer, 32, "%d", pointAdded);
-
-   return retBuffer;
+   return object->addPlotPoint( plotID, Point2F(x, y), setAdded);
 }
 
 DefineConsoleMethod(GuiParticleGraphCtrl, insertPlotPoint, void, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)\n"
@@ -1088,7 +1080,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, insertPlotPoint, void, (S32 plotID, S3
    object->insertPlotPoint( plotID, i, Point2F(x, y));
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, const char*, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)"
+DefineConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, S32, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)"
               "Change a data point to the given plot and plot position.\n"
 			  "@param plotID The plot you want to access\n"
 			  "@param i The data point.\n"
@@ -1098,40 +1090,26 @@ DefineConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, const char*, (S32 plo
    if(plotID > object->MaxPlots)
    {
 	   Con::errorf("Invalid plotID.");
-
-      char *retBuffer = Con::getReturnBuffer(64);
-      const S32 index = -1;
-      dSprintf(retBuffer, 64, "%d", index);
-      return retBuffer;
+	   return -1;
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const S32 index = object->changePlotPoint( plotID, i, Point2F(x, y));
-   dSprintf(retBuffer, 64, "%d", index);
-   return retBuffer;
+   return object->changePlotPoint( plotID, i, Point2F(x, y));
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPlot, const char*, (), , "() "
+DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPlot, S32, (), , "() "
               "Gets the selected Plot (a.k.a. graph).\n"
 			  "@return The plot's ID.")
 {
-   char *retBuffer = Con::getReturnBuffer(32);
-   const S32 plot = object->getSelectedPlot();
-   dSprintf(retBuffer, 32, "%d", plot);
-   return retBuffer;
+  return object->getSelectedPlot();
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPoint, const char*, (), , "()"
+DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPoint, S32, (), , "()"
               "Gets the selected Point on the Plot (a.k.a. graph)."
 			  "@return The last selected point ID")
 {
-   char *retBuffer = Con::getReturnBuffer(32);
-   const S32 point = object->getSelectedPoint();
-   dSprintf(retBuffer, 32, "%d", point);
-   return retBuffer;
+	return object->getSelectedPoint();
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, const char*, (S32 plotID, S32 samples), , "(int plotID, int samples)"
+DefineConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, bool, (S32 plotID, S32 samples), , "(int plotID, int samples)"
               "@return Returns true or false whether or not the point in the plot passed is an existing point.")
 {
 
@@ -1143,14 +1121,10 @@ DefineConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, const char*, (S32 plo
    {
 	   Con::errorf("Invalid sample.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(32);
-   const bool isPoint = object->isExistingPoint(plotID, samples);
-   dSprintf(retBuffer, 32, "%d", isPoint);
-   return retBuffer;
+   return object->isExistingPoint(plotID, samples);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, const char*, (S32 plotID, S32 samples), , "(int plotID, int samples)"
+DefineConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, Point2F, (S32 plotID, S32 samples), , "(int plotID, int samples)"
               "Get a data point from the plot specified, samples from the start of the graph."
 			  "@return The data point ID")
 {
@@ -1164,13 +1138,11 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, const char*, (S32 plotID
 	   Con::errorf("Invalid sample.");
    }
 
-   char *retBuffer = Con::getReturnBuffer(64);
-   const Point2F &pos = object->getPlotPoint(plotID, samples);
-   dSprintf(retBuffer, 64, "%f %f", pos.x, pos.y);
-   return retBuffer;
+   
+   return object->getPlotPoint(plotID, samples);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, const char*, (S32 plotID, F32 x, F32 y), , "(int plotID, float x, float y)\n"
+DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, S32, (S32 plotID, F32 x, F32 y), , "(int plotID, float x, float y)\n"
               "Gets the index of the point passed on the plotID passed (graph ID).\n"
 			  "@param plotID The plot you wish to check.\n"
 			  "@param x,y The coordinates of the point to get.\n"
@@ -1181,14 +1153,10 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, const char*, (S32 plotID
    {
 	   Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(32);
-   const S32 &index = object->getPlotIndex(plotID, x, y);
-   dSprintf(retBuffer, 32, "%d", index);
-   return retBuffer;
+   return object->getPlotIndex(plotID, x, y);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, const char*, (S32 plotID), , "(int plotID)"
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, ColorF, (S32 plotID), , "(int plotID)"
               "Get the color of the graph passed."
 			  "@return Returns the color of the graph as a string of RGB values formatted as \"R G B\"")
 {
@@ -1197,14 +1165,12 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, const char*, (S32 plotI
    {
 	   Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const ColorF &color = object->getGraphColor(plotID);
-   dSprintf(retBuffer, 64, "%f %f %f", color.red, color.green, color.blue);
-   return retBuffer;
+  
+   return object->getGraphColor(plotID);
+   
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMin, const char*, (S32 plotID), , "(int plotID) "
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMin, Point2F, (S32 plotID), , "(int plotID) "
               "Get the minimum values of the graph ranges.\n"
 			  "@return Returns the minimum of the range formatted as \"x-min y-min\"")
 {
@@ -1213,14 +1179,10 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMin, const char*, (S32 plotID)
    {
 	   Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const Point2F graphMin = object->getGraphMin(plotID);
-   dSprintf(retBuffer, 64, "%f %f", graphMin.x, graphMin.y);
-   return retBuffer;
+   return object->getGraphMin(plotID);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMax, const char*, (S32 plotID), , "(int plotID) "
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMax, Point2F, (S32 plotID), , "(int plotID) "
 			  "Get the maximum values of the graph ranges.\n"
 			  "@return Returns the maximum of the range formatted as \"x-max y-max\"")
 {
@@ -1229,11 +1191,8 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMax, const char*, (S32 plotID)
    {
 	   Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const Point2F graphMax = object->getGraphMax(plotID);
-   dSprintf(retBuffer, 64, "%f %f", graphMax.x, graphMax.y);
-   return retBuffer;
+   return object->getGraphMax(plotID);
+    
 }
 
 DefineConsoleMethod(GuiParticleGraphCtrl, getGraphName, const char*, (S32 plotID), , "(int plotID) "

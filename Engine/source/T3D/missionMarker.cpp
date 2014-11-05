@@ -223,6 +223,12 @@ ConsoleDocClass( WayPoint,
    "@ingroup enviroMisc\n"
 );
 
+WayPointTeam::WayPointTeam()
+{
+   mTeamId = 0;
+   mWayPoint = 0;
+}
+
 WayPoint::WayPoint()
 {
    mName = StringTable->insert("");
@@ -246,6 +252,7 @@ bool WayPoint::onAdd()
       Sim::getWayPointSet()->addObject(this);
    else
    {
+      mTeam.mWayPoint = this;
       setMaskBits(UpdateNameMask|UpdateTeamMask);
    }
 
@@ -265,6 +272,8 @@ U32 WayPoint::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
    U32 retMask = Parent::packUpdate(con, mask, stream);
    if(stream->writeFlag(mask & UpdateNameMask))
       stream->writeString(mName);
+   if(stream->writeFlag(mask & UpdateTeamMask))
+      stream->write(mTeam.mTeamId);
    if(stream->writeFlag(mask & UpdateHiddenMask))
       stream->writeFlag(isHidden());
    return(retMask);
@@ -276,16 +285,50 @@ void WayPoint::unpackUpdate(NetConnection * con, BitStream * stream)
    if(stream->readFlag())
       mName = stream->readSTString(true);
    if(stream->readFlag())
+      stream->read(&mTeam.mTeamId);
+   if(stream->readFlag())
       setHidden(stream->readFlag());
 }
 
+//-----------------------------------------------------------------------------
+// TypeWayPointTeam
+//-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// TypeWayPointTeam
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_STRUCT( WayPointTeam, WayPointTeam,,   "" )
+END_IMPLEMENT_STRUCT;
+
+//FIXME: this should work but does not; need to check the stripping down to base types within TYPE
+//ConsoleType( WayPointTeam, TypeWayPointTeam, WayPointTeam* )
+ConsoleType( WayPointTeam, TypeWayPointTeam, WayPointTeam )
+
+ConsoleGetType( TypeWayPointTeam )
+{
+   static const U32 bufSize = 32;
+   char * buf = Con::getReturnBuffer(bufSize);
+   dSprintf(buf, bufSize, "%d", ((WayPointTeam*)dptr)->mTeamId);
+   return(buf);
+}
+
+ConsoleSetType( TypeWayPointTeam )
+{
+   WayPointTeam * pTeam = (WayPointTeam*)dptr;
+   pTeam->mTeamId = dAtoi(argv[0]);
+
+   if(pTeam->mWayPoint && pTeam->mWayPoint->isServerObject())
+      pTeam->mWayPoint->setMaskBits(WayPoint::UpdateTeamMask);
+}
 
 void WayPoint::initPersistFields()
 {
    addGroup("Misc");	
    addField("markerName", TypeCaseString, Offset(mName, WayPoint), "Unique name representing this waypoint");
+   addField("team", TypeWayPointTeam, Offset(mTeam, WayPoint), "Unique numerical ID assigned to this waypoint, or set of waypoints");
    endGroup("Misc");
+   
    Parent::initPersistFields();
 }
 

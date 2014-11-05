@@ -2810,28 +2810,11 @@ static ConsoleDocFragment _sGuiControlSetExtent2(
    "void setExtent( Point2I p );" ); // The definition string.
 
 //ConsoleMethod( GuiControl, setExtent, void, 3, 4,
-DefineConsoleMethod( GuiControl, setExtent, void, ( Point2F ext ), ,
+DefineConsoleMethod( GuiControl, setExtent, void, ( Point2I ext ), ,
    " Set the width and height of the control.\n\n"
    "@hide" )
 {
-   //if ( argc == 3 )
-   //if ( pOrX != "" && y == ""  )
-   //{
-   //   // We scan for floats because its possible that math 
-   //   // done on the extent can result in fractional values.
-   //   Point2F ext;
-   //   //if ( dSscanf( argv[2], "%g %g", &ext.x, &ext.y ) == 2 )
-   //   if ( dSscanf( pOrX, "%g %g", &ext.x, &ext.y ) == 2 )
          object->setExtent( (S32)ext.x, (S32)ext.y );
-   //   else
-   //      Con::errorf( "GuiControl::setExtent, not enough parameters!" );
-   //}
-   ////else if ( argc == 4 )
-   //else if ( pOrX != "" && y != "" )
-   //{
-   //   //object->setExtent( dAtoi(argv[2]), dAtoi(argv[3]) );
-   //   object->setExtent( dAtoi(pOrX), dAtoi(y) );
-   //}
 }
 
 //-----------------------------------------------------------------------------

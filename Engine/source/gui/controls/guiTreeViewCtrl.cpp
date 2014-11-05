@@ -5053,11 +5053,13 @@ DefineConsoleMethod(GuiTreeViewCtrl, getSelectedObject, S32, ( S32 index ), (0),
 
 const char* GuiTreeViewCtrl::getSelectedObjectList()
 {
- char* buff = Con::getReturnBuffer(1024);
-   dSprintf(buff,1024,"");
+   static const U32 bufSize = 1024;
+   char* buff = Con::getReturnBuffer(bufSize);
+   dSprintf(buff,bufSize,"");
+
 
    const Vector< GuiTreeViewCtrl::Item* > selectedItems = this->getSelectedItems();
-   for(int i = 0; i < selectedItems.size(); i++)
+   for(S32 i = 0; i < selectedItems.size(); i++)
    {
       GuiTreeViewCtrl::Item *item = selectedItems[i];
 
@@ -5069,7 +5071,7 @@ const char* GuiTreeViewCtrl::getSelectedObjectList()
          //the start of the buffer where we want to write
          char* buffPart = buff+len;
          //the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-         S32 size	=	1024-len-1;
+         S32 size	=	bufSize-len-1;
          //write it:
          if(size < 1)
          {
@@ -5085,37 +5087,9 @@ const char* GuiTreeViewCtrl::getSelectedObjectList()
 }
 
 DefineConsoleMethod(GuiTreeViewCtrl, getSelectedObjectList, const char*, (), , 
-              "Returns a space sperated list of all selected object ids.")
+              "Returns a space seperated list of all selected object ids.")
 {
-   char* buff = Con::getReturnBuffer(1024);
-   dSprintf(buff,1024,"");
-
-   const Vector< GuiTreeViewCtrl::Item* > selectedItems = object->getSelectedItems();
-   for(int i = 0; i < selectedItems.size(); i++)
-   {
-      GuiTreeViewCtrl::Item *item = selectedItems[i];
-
-      if ( item->isInspectorData() && item->getObject() )
-      {      
-         S32 id  = item->getObject()->getId();
-         //get the current length of the buffer
-         U32	len = dStrlen(buff);
-         //the start of the buffer where we want to write
-         char* buffPart = buff+len;
-         //the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-         S32 size	=	1024-len-1;
-         //write it:
-         if(size < 1)
-         {
-            Con::errorf("GuiTreeViewCtrl::getSelectedItemList - Not enough room to return our object list");
-            return buff;
-         }
-
-         dSprintf(buffPart,size,"%d ", id);
-      }
-   }
-
-   return buff;
+   return object->getSelectedObjectList();
 }
 
 DefineConsoleMethod(GuiTreeViewCtrl, moveItemUp, void, (S32 index), , "(TreeItemId item)")

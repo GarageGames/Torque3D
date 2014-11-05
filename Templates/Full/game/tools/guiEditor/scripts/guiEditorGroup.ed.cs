@@ -92,7 +92,7 @@ function GuiEditorGroup::group( %this )
    %y = getWord( %bounds, 1 ) - getWord( %parentGlobalPos, 1 );
 
    %group.setPosition( %x, %y );
-   %group.setExtent( getWord( %bounds, 2 ), getWord( %bounds, 3 ) );
+   %group.setExtent( getWord( %bounds, 2 ) @ " " @ getWord( %bounds, 3 ) );
    
    // Reparent all objects to group.
    

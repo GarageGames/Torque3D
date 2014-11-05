@@ -169,7 +169,7 @@ DefineConsoleFunction( loadColladaLights, bool, (const char * filename, const ch
    // the MissionGroup if not specified.
    SimGroup* missionGroup = dynamic_cast<SimGroup*>(Sim::findObject("MissionGroup"));
    SimGroup* group = 0;
-   if ( parentGroup != "" ) {
+   if (dStrcmp(parentGroup, "") == 0){
       if (!Sim::findObject(parentGroup, group)) {
          // Create the group if it could not be found
          group = new SimGroup;
@@ -188,7 +188,7 @@ DefineConsoleFunction( loadColladaLights, bool, (const char * filename, const ch
 
    // Optional object to provide the base transform
    MatrixF offset(true);
-   if (baseObject != "") {
+   if (dStrcmp(baseObject, "") != 0){
       SceneObject *obj;
       if (Sim::findObject(baseObject, obj))
          offset = obj->getTransform();

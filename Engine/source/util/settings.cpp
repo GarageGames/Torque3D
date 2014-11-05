@@ -648,7 +648,7 @@ DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const c
 {
    const char *fieldName = StringTable->insert( settingName );
    
-   if( value != "")
+   if (dStrcmp(value, "") != 0)
       object->setValue( fieldName, value );
    else
       object->setValue( fieldName );
@@ -664,9 +664,9 @@ DefineConsoleMethod(Settings, value, const char*, (const char * settingName, con
 {
    const char *fieldName = StringTable->insert( settingName );
    
-   if(defaultValue != "")
+   if (dStrcmp(defaultValue, "") != 0)
       return object->value( fieldName, defaultValue );
-   else if(settingName != "")
+   else if (dStrcmp(settingName, "") != 0)
       return object->value( fieldName );
 
    return "";

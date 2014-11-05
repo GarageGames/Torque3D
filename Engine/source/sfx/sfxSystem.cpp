@@ -1464,7 +1464,7 @@ DefineConsoleFunction( sfxCreateSource, S32, ( const char * SFXType, const char 
 
    if ( track )
    {
-      if ( x == "" )
+      if (dStrcmp(x, "") == 0)
       {
          source = SFX->createSource( track );
       }
@@ -1674,7 +1674,7 @@ DefineConsoleFunction( sfxPlayOnce, S32, ( const char * SFXType, const char * fi
    SFXSource* source = NULL;
    if( track )
    {
-      if( x == "" )
+      if (dStrcmp(x, "") == 0)
       {
          source = SFX->playOnce( track );
       }
@@ -1695,7 +1695,7 @@ DefineConsoleFunction( sfxPlayOnce, S32, ( const char * SFXType, const char * fi
       }
       else
       {
-         if( x == "" )
+         if (dStrcmp(x, "") == 0) 
             source = SFX->playOnce( tempProfile );
          else
          {

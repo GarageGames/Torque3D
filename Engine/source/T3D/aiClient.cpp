@@ -456,29 +456,19 @@ DefineConsoleMethod( AIClient, setMoveDestination, void, (Point3F v), , "ai.setM
 /**
  * Returns the point the AI is aiming at
  */
-DefineConsoleMethod( AIClient, getAimLocation, const char *, (),, "ai.getAimLocation();" ) 
+DefineConsoleMethod( AIClient, getAimLocation, Point3F, (),, "ai.getAimLocation();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F aimPoint = ai->getAimLocation();
-
-   char *returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%f %f %f", aimPoint.x, aimPoint.y, aimPoint.z );
-
-   return returnBuffer;
+   return ai->getAimLocation();
 }
 
 /**
  * Returns the point the AI is set to move to
  */
-DefineConsoleMethod( AIClient, getMoveDestination, const char *, (),, "ai.getMoveDestination();" ) 
+DefineConsoleMethod( AIClient, getMoveDestination, Point3F, (),, "ai.getMoveDestination();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F movePoint = ai->getMoveDestination();
-
-   char *returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%f %f %f", movePoint.x, movePoint.y, movePoint.z );
-
-   return returnBuffer;
+   return ai->getMoveDestination();
 }
 
 /**
@@ -527,15 +517,10 @@ DefineConsoleMethod( AIClient, move, void, (),, "ai.move();" )
 /**
  * Gets the AI's location in the world
  */
-DefineConsoleMethod( AIClient, getLocation, const char *, (),, "ai.getLocation();" ) 
+DefineConsoleMethod( AIClient, getLocation, Point3F, (),, "ai.getLocation();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F locPoint = ai->getLocation();
-
-   char *returnBuffer = Con::getReturnBuffer( 256 );
-   dSprintf( returnBuffer, 256, "%f %f %f", locPoint.x, locPoint.y, locPoint.z );
-
-   return returnBuffer;
+   return ai->getLocation();
 }
 
 /**

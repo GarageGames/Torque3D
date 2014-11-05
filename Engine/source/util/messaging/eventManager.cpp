@@ -507,7 +507,7 @@ DefineConsoleMethod( EventManager, dumpSubscribers, void, ( const char * listene
               "Print all subscribers to an event to the console.\n"
               "@param event The event whose subscribers are to be printed. If this parameter isn't specified, all events will be dumped." )
 {
-   if( listenerName != "" )
+   if (dStrcmp(listenerName, "") != 0)
       object->dumpSubscribers( listenerName );
    else
       object->dumpSubscribers();

@@ -180,9 +180,9 @@ function MessageBoxOKCancelDetails(%title, %message, %details, %callback, %cance
       
    %extentY = %textPosY + %textExtentY + 65;
    
-   MBOKCancelDetailsInfoText.setExtent(285, 128);
+   MBOKCancelDetailsInfoText.setExtent("285 128");
    
-   MBOKCancelDetailsFrame.setExtent(300, %extentY);
+   MBOKCancelDetailsFrame.setExtent("300 " @ %extentY);
    
    MessageBoxOKCancelDetailsDlg.callback = %callback;
    MessageBoxOKCancelDetailsDlg.cancelCallback = %cancelCallback;
@@ -212,14 +212,14 @@ function MBOKCancelDetailsToggleInfoFrame()
       %posY = %textPosY + %textExtentY + 10;
       %posX = getWord(MBOKCancelDetailsScroll.getPosition(), 0);
       MBOKCancelDetailsScroll.setPosition(%posX, %posY);
-      MBOKCancelDetailsScroll.setExtent(getWord(MBOKCancelDetailsScroll.getExtent(), 0), %verticalStretch);
-      MBOKCancelDetailsFrame.setExtent(300, %height + %verticalStretch + 10);    
+      MBOKCancelDetailsScroll.setExtent(getWord(MBOKCancelDetailsScroll.getExtent(), 0) @ " " @ %verticalStretch);
+      MBOKCancelDetailsFrame.setExtent("300 " @ %height + %verticalStretch + 10);    
    } else
    {
       %extent = MBOKCancelDetailsFrame.defaultExtent;
       %width = getWord(%extent, 0);
       %height = getWord(%extent, 1);
-      MBOKCancelDetailsFrame.setExtent(%width, %height);
+      MBOKCancelDetailsFrame.setExtent(%width @ " " @ %height);
       MBOKCancelDetailsScroll.setVisible(false);
    }
 }

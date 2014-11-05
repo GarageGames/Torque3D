@@ -504,7 +504,7 @@ void UndoManager::popCompound( bool discard )
 DefineConsoleMethod(UndoAction, addToManager, void, (const char * undoManager), (""), "action.addToManager([undoManager])")
 {
    UndoManager *theMan = NULL;
-   if(undoManager != "")
+   if (dStrcmp(undoManager, "") != 0)
    {
       SimObject *obj = Sim::findObject(undoManager);
       if(obj)
@@ -582,7 +582,7 @@ DefineConsoleMethod( UndoManager, popCompound, void, ( bool discard ), (false), 
 {
    if( !object->getCompoundStackDepth() )
    {
-      Con::errorf( "UndoManager::popCompound - no compound on stack" );
+	   Con::errorf( "UndoManager::popCompound - no compound on stack (%s) ",object->getName() );
       return;
    }
    
