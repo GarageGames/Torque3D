@@ -33,7 +33,7 @@
 #include "platform/threads/mutex.h"
 #endif
 
-#include "TorqueConfig.h"
+#include "torqueConfig.h"
 
 #ifndef USE_CLASSIC_SIMDICTIONARY
 #include <string>
