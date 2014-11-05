@@ -1427,6 +1427,7 @@ bool GuiControl::cursorInControl()
    if (! root) return false;
 
    Point2I pt = root->getCursorPos();
+   pt = root->getPlatformWindow() ? root->getPlatformWindow()->screenToClient(pt) : pt;
    Point2I extent = getExtent();
    Point2I offset = localToGlobalCoord(Point2I(0, 0));
    if (pt.x >= offset.x && pt.y >= offset.y &&
