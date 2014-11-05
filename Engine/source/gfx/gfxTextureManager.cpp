@@ -34,7 +34,7 @@
 #include "core/util/dxt5nmSwizzle.h"
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
-#include "platform\types.h"
+#include "platform/types.h"
 
 using namespace Torque;
 
