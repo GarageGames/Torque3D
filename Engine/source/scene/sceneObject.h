@@ -102,6 +102,9 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       friend class SceneCullingState; // _getZoneRefHead
       friend class SceneObjectLink; // mSceneObjectLinks
 
+      DECLARE_CALLBACK( void, onTickCounter, (const char* counterName ) );
+      virtual void counterNotify(const char* countername);
+
       enum 
       {
          /// Maximum number of zones that an object can concurrently be assigned to.

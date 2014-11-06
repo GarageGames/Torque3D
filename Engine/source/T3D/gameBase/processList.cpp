@@ -33,7 +33,8 @@ ProcessObject::ProcessObject()
  : mProcessTag( 0 ),   
    mOrderGUID( 0 ),
    mProcessTick( false ),
-   mIsGameBase( false )
+   mIsGameBase( false ),
+	mEnableCounters (false)
 { 
    mProcessLink.next = mProcessLink.prev = this;
 }
@@ -101,6 +102,84 @@ void ProcessObject::plJoin(ProcessObject * head)
    mProcessLink.prev = tail1;
    tail2->mProcessLink.next = head;
    head->mProcessLink.prev = tail2;
+}
+
+bool ProcessObject::counterHas(const char* countername)
+{
+	TypeCounters::Iterator got = mCounters.find(String(StringTable->insert(countername)));
+	if (got == mCounters.end())
+		return false;
+	return true;
+}
+
+void ProcessObject::counterSuspend(const char* countername,bool suspend)
+{
+	const char* key = StringTable->insert(countername);
+	if (counterHas(key))
+	{
+		mCounters[String(key)].mSuspend = suspend;
+	}
+
+}
+
+void ProcessObject::counterAdd(const char* countername,U32 interval)
+{
+	const char* key = StringTable->insert(countername);
+   mCounters[String(key)].mInterval = interval;
+   mCounters[String(key)].mCounter = 0;
+}
+
+bool ProcessObject::counterRemove(const char* countername)
+{
+	const char* key = StringTable->insert(countername);
+	if (counterHas(key))
+	{
+		mCounters.erase(String(key));
+		return true;
+	}
+	return false;
+}
+
+U32 ProcessObject::counterGetInterval(const char* countername)
+{
+	const char* key = StringTable->insert(countername);
+	if (counterHas(key))
+	{
+		U32 val = mCounters[String(key)].mInterval;
+		return val;
+	}
+	return 0;
+}
+
+void ProcessObject::counterReset(const char* countername)
+{
+	const char* key = StringTable->insert(countername);
+	if (counterHas(key))
+	{
+		mCounters[String(key)].mCounter = 0;
+	}
+}
+
+void ProcessObject::countersClear()
+{
+	mCounters.clear();
+}
+
+void ProcessObject::countersIncrement()
+{
+   
+   for(TypeCounters::Iterator itr = mCounters.begin(); itr != mCounters.end(); ++itr)
+	{
+		CountersDetail& counter = itr->value;
+
+		if (!counter.mSuspend)
+			counter.mCounter++;
+		if (counter.mCounter >= counter.mInterval)
+		{
+			counter.mCounter = 0;
+			counterNotify(itr->key.c_str());
+		}
+   }
 }
 
 //--------------------------------------------------------------------------
@@ -264,8 +343,14 @@ void ProcessList::advanceObjects()
    {
       pobj->plUnlink();
       pobj->plLinkBefore(&mHead);
-      
-      onTickObject(pobj);
+      SimObjectPtr<SceneObject> safePtr = static_cast<SceneObject*>( pobj );
+
+      if (!safePtr.isNull() && safePtr.isValid())
+         onTickObject(pobj);
+
+      if (!safePtr.isNull() && safePtr.isValid())
+         if (safePtr->mEnableCounters)
+            safePtr->countersIncrement();
    }
 
    mTotalTicks++;

@@ -30,6 +30,8 @@
 #include "core/util/tSignal.h"
 #endif
 
+#include "core/util/tDictionary.h"
+
 //----------------------------------------------------------------------------
 
 #define TickMs      32
@@ -39,7 +41,29 @@
 
 class GameConnection;
 struct Move;
+class CountersDetail
+{
+   public:
+      U32 mInterval;
+      U32 mCounter;
+      bool mSuspend;
 
+   CountersDetail (U32 i,U32 c)
+   {
+      mInterval = i;
+      mCounter = c;
+      mSuspend=false;
+   }
+CountersDetail ()
+   {
+      mInterval =0;
+      mCounter = 0;
+      mSuspend=false;
+   }
+};
+
+
+typedef Map<String,CountersDetail> TypeCounters;
 
 class ProcessObject
 {
@@ -96,6 +120,8 @@ public:
    /// @param  move   Move event corresponding to this tick, or NULL.
    virtual void processTick( const Move *move ) {}
 
+   virtual void processTickNotifyBefore() {}
+   virtual void processTickNotifyAfter() {}
    /// Interpolates between tick events.  This takes place on the CLIENT ONLY.
    ///
    /// @param   delta   Time since last call to interpolate
@@ -131,6 +157,23 @@ public:
    bool mProcessTick;
 
    bool mIsGameBase;
+
+	bool mEnableCounters;
+	   
+   private:
+   TypeCounters mCounters;
+   public:
+
+   void counterAdd(const char* countername,U32 interval);
+   bool counterRemove(const char* countername);
+   U32  counterGetInterval(const char* countername);
+   void counterReset(const char* countername);
+   bool counterHas(const char* countername);
+   void countersClear();
+   void countersIncrement();
+   void counterSuspend(const char* countername,bool suspend);
+   
+   virtual void counterNotify(const char* countername){};
 };
 
 //----------------------------------------------------------------------------
