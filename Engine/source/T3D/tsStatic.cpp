@@ -111,6 +111,11 @@ TSStatic::TSStatic()
    mMeshCulling = false;
    mUseOriginSort = false;
 
+   mUseAlphaLod     = false;
+   mAlphaLODStart   = 100.0f;
+   mAlphaLODEnd     = 150.0f;
+   mInvertAlphaLod  = false;
+   mAlphaLOD = 1.0f;
    mPhysicsRep = NULL;
 
    mCollisionType = CollisionMesh;
@@ -191,6 +196,13 @@ void TSStatic::initPersistFields()
          "When set to false, the slightest bump will stop the player from walking on top of the object.\n");
    
    endGroup("Collision");
+
+   addGroup( "AlphaLOD" );  
+      addField( "ALODEnable",   TypeBool,   Offset(mUseAlphaLod,    TSStatic), "Turn on/off AlphaLod" );  
+      addField( "ALODStart",    TypeF32,    Offset(mAlphaLODStart,  TSStatic), "Distance of start AlphaLOD" );  
+      addField( "ALODEnd",      TypeF32,    Offset(mAlphaLODEnd,    TSStatic), "Distance of end AlphaLOD" );  
+      addField( "ALODInverse", TypeBool,    Offset(mInvertAlphaLod, TSStatic), "Invert AlphaLOD's Start & End Distance" );  
+   endGroup( "AlphaLOD" );
 
    addGroup("Debug");
 
@@ -502,6 +514,38 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    if (dist < 0.01f)
       dist = 0.01f;
 
+   if (mUseAlphaLod)
+   {
+      mAlphaLOD = 1.0f;
+      if ((mAlphaLODStart < mAlphaLODEnd) && mAlphaLODStart > 0.1f)
+      {
+         if (mInvertAlphaLod)
+		 {
+            if (dist <= mAlphaLODStart)
+			{
+               return;
+			}
+  
+            if (dist < mAlphaLODEnd)
+			{
+               mAlphaLOD = ((dist - mAlphaLODStart) / (mAlphaLODEnd - mAlphaLODStart));
+			}
+         }
+         else
+		 {
+            if (dist >= mAlphaLODEnd)
+			{
+               return;
+			}
+  
+            if (dist > mAlphaLODStart)
+			{
+               mAlphaLOD -= ((dist - mAlphaLODStart) / (mAlphaLODEnd - mAlphaLODStart));
+			}
+         }
+      }
+   }
+
    F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
 
    if ( mForceDetail == -1 )
@@ -545,6 +589,19 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    GFX->setWorldMatrix( mat );
 
    mShapeInstance->animate();
+   if(mShapeInstance)
+   {
+      if (mUseAlphaLod)
+      {
+         mShapeInstance->setAlphaAlways(mAlphaLOD);
+         S32 s = mShapeInstance->mMeshObjects.size();
+         
+         for(S32 x = 0; x < s; x++)
+         {
+            mShapeInstance->mMeshObjects[x].visible = mAlphaLOD;
+         }
+      }
+   }
    mShapeInstance->render( rdata );
 
    if ( mRenderNormalScalar > 0 )
@@ -625,6 +682,13 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    stream->writeFlag( mPlayAmbient );
 
+   if ( stream->writeFlag(mUseAlphaLod) )  
+   {  
+      stream->write(mAlphaLODStart);  
+      stream->write(mAlphaLODEnd);  
+      stream->write(mInvertAlphaLod);  
+   } 
+
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
 
@@ -681,6 +745,14 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    stream->read( &mForceDetail );
 
    mPlayAmbient = stream->readFlag();
+
+   mUseAlphaLod = stream->readFlag();  
+   if (mUseAlphaLod)
+   {
+      stream->read(&mAlphaLODStart);  
+      stream->read(&mAlphaLODEnd);  
+      stream->read(&mInvertAlphaLod);  
+   }
 
    if ( mLightPlugin )
    {

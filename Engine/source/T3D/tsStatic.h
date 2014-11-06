@@ -97,6 +97,13 @@ class TSStatic : public SceneObject
    };
 
 public:
+   void setAlphaLOD(bool enable, F32 start, F32 end, bool inverse)
+   {
+      mUseAlphaLod     = enable;
+      mAlphaLODStart   = start;
+      mAlphaLODEnd     = end;
+      mInvertAlphaLod  = inverse;
+   }
    
    /// The different types of mesh data types
    enum MeshType
@@ -108,6 +115,11 @@ public:
    };
    
 protected:
+   bool mUseAlphaLod;
+   F32  mAlphaLODStart;
+   F32  mAlphaLODEnd;
+   F32  mAlphaLOD;
+   bool mInvertAlphaLod;
 
    bool onAdd();
    void onRemove();
