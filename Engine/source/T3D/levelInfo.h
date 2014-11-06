@@ -57,7 +57,7 @@ class LevelInfo : public NetObject
       F32 mVisibleDistance;
 
 #ifdef GHOSTSCOPING
-	  F32 mVisibleGhostDistance;
+      F32 mVisibleGhostDistance;
 #endif
       F32 mDecalBias;
 

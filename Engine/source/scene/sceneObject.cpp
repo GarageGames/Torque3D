@@ -672,7 +672,7 @@ void SceneObject::onCameraScopeQuery( NetConnection* connection, CameraScopeQuer
 #ifdef GHOSTSCOPING
    SceneManager* scenemanager = getSceneManager();
    GameConnection* conn  = dynamic_cast<GameConnection*> (connection);
-   if (conn->getVisibleGhostDistance() == 0.0f)
+   if (conn && conn->getVisibleGhostDistance() == 0.0f)
        query->visibleDistance = scenemanager->getVisibleGhostDistance();
    else
 	   query->visibleDistance = conn->getVisibleGhostDistance();

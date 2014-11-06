@@ -80,7 +80,7 @@ LevelInfo::LevelInfo()
    :  mNearClip( 0.1f ),
       mVisibleDistance( 1000.0f ),
 #ifdef GHOSTSCOPING
-	  mVisibleGhostDistance (200.0f),
+      mVisibleGhostDistance (200.0f),
 #endif
       mDecalBias( 0.0015f ),
       mCanvasClearColor( 255, 0, 255, 255 ),
