@@ -59,6 +59,8 @@
 #include "core/util/tSignal.h"
 #endif
 
+#include "torqueConfig.h"
+
 
 class LightManager;
 class SceneRootZone;
@@ -141,6 +143,9 @@ class SceneManager
 
       F32 mVisibleDistance;
 
+#ifdef GHOSTSCOPING
+      F32 mVisibleGhostDistance;
+#endif
       F32 mNearClip;
 
       FogData mFogData;
@@ -317,6 +322,10 @@ class SceneManager
       /// Returns the default visible distance for the scene.
       F32 getVisibleDistance() { return mVisibleDistance; }
 
+#ifdef GHOSTSCOPING
+      void setVisibleGhostDistance( F32 dist ) { mVisibleGhostDistance = dist; }
+      F32  getVisibleGhostDistance() { return mVisibleGhostDistance;}
+#endif
       /// Used by LevelInfo to set the default near clip plane 
       /// for rendering the scene.
       ///
