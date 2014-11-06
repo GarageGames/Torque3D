@@ -2201,7 +2201,7 @@ DefineConsoleMethod( PersistenceManager, setDirty, void,  ( const char * objName
               "Mark an existing SimObject as dirty (will be written out when saveDirty() is called).")
 {
    SimObject *dirtyObject = NULL;
-   if (objName != "")
+   if (dStrcmp(objName,"") != 0)
    {
       if (!Sim::findObject(objName, dirtyObject))
       {
@@ -2387,7 +2387,7 @@ DefineConsoleMethod( PersistenceManager, removeField, void, (const char * objNam
 
    if (dirtyObject)
    {
-      if (fieldName != "")
+      if (dStrcmp(fieldName,"") != 0)
          object->addRemoveField(dirtyObject, fieldName);
    }
 }

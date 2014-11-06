@@ -5114,7 +5114,7 @@ DefineConsoleMethod(GuiTreeViewCtrl, moveItemDown, void, (S32 index), , "(TreeIt
 DefineConsoleMethod(GuiTreeViewCtrl, getTextToRoot, const char*, (S32 itemId, const char * delimiter), ,
    "(TreeItemId item,Delimiter=none) gets the text from the current node to the root, concatenating at each branch upward, with a specified delimiter optionally")
 {
-   if ( delimiter == "" )
+	if (!dStrcmp(delimiter, "" ))
    {
       Con::warnf("GuiTreeViewCtrl::getTextToRoot - Invalid number of arguments!");
       return ("");

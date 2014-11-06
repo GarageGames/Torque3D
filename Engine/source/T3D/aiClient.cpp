@@ -547,7 +547,7 @@ DefineConsoleFunction( aiAddPlayer, S32, (const char * name, const char * ns), (
    aiPlayer->onConnect_callback( name );
 
    // Now execute the onAdd command and feed it the namespace
-   if( ns != "" )
+   if(dStrcmp( ns,"" ) != 0 )
       aiPlayer->onAdd( ns );
    else
       aiPlayer->onAdd( "AIClient" );

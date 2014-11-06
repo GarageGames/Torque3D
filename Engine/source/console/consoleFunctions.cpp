@@ -2382,7 +2382,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
       // Is it an object?
       if (dStrcmp(varName, "0") && dStrcmp(varName, "") && (Sim::findObject(varName) != NULL))
          return true;
-      else if (varValue != "")
+      else if (dStrcmp(varValue, "" ) != 0)
       {
          Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, varValue);
       }

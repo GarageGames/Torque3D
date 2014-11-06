@@ -1566,11 +1566,11 @@ DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * poin
    }
 
    Point3F pos(0.f, 0.f, 0.f);
-   if ( pointOrX != "" && y == ""&& z == "" )
+   if (dStrcmp( pointOrX, "" ) != 0 && dStrcmp( y, "" ) == 0 && dStrcmp( z, "" ) == 0 )
    {
       dSscanf( pointOrX, "%g %g %g", &pos.x, &pos.y, &pos.z );
    }
-   else if( pointOrX != "" && y != "" && z != "" )
+   else if(dStrcmp( pointOrX, "" ) != 0 && dStrcmp( y, "" ) != 0 && dStrcmp( z, "" ) != 0 )
       pos.set( dAtof(pointOrX), dAtof(y), dAtof(z) );
 
    MatrixF transform;
