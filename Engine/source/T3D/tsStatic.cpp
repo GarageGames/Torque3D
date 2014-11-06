@@ -49,6 +49,10 @@
 #include "materials/materialFeatureTypes.h"
 #include "console/engineAPI.h"
 
+//<!-- Scene Culling --!>
+#include "T3D/gameBase/gameConnection.h"
+//<!-- Scene Culling --!>
+
 using namespace Torque;
 
 extern bool gEditingMission;
@@ -494,6 +498,21 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
 {
    if( !mShapeInstance )
       return;
+//<!-- Scene Culling --!>
+   GameConnection* connection = GameConnection::getConnectionToServer();
+	if (connection && !connection->didFirstRender)
+   {
+      TSRenderState rdata;
+      rdata.setSceneState( state );
+      rdata.setFadeOverride( 1.0f );
+      rdata.setOriginSort( mUseOriginSort );
+      for (S32 i = mShapeInstance->getSmallestVisibleDL(); i >= 0; i-- )
+      {
+         mShapeInstance->setCurrentDetail( i );
+         mShapeInstance->render( rdata );
+      }
+   }
+//<!-- Scene Culling --!>
 
    Point3F cameraOffset;
    getRenderTransform().getColumn(3,&cameraOffset);

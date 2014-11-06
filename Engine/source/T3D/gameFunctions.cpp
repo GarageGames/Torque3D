@@ -88,7 +88,7 @@ extern void ShowInit();
 
 //------------------------------------------------------------------------------
 /// Camera and FOV info
-namespace {
+namespace CameraAndFOV{
 
    const  U32 MaxZoomSpeed             = 2000;     ///< max number of ms to reach target FOV
 
@@ -98,6 +98,8 @@ namespace {
    static F32 sTargetFov               = 90.f;     ///< the desired FOV
    static F32 sLastCameraUpdateTime    = 0;        ///< last time camera was updated
    static S32 sZoomSpeed               = 500;      ///< ms per 90deg fov change
+
+   F32 mFarClippingDistance     = 0.0f; //Set the Far Clipping.
 
    /// A scale to apply to the normal visible distance
    /// typically used for tuning performance.
@@ -191,9 +193,9 @@ DefineEngineFunction( setDefaultFov, void, ( F32 defaultFOV ),,
             "@param defaultFOV The default field of view in degrees\n"
 				"@ingroup CameraSystem")
 {
-   sDefaultFov = mClampF(defaultFOV, MinCameraFov, MaxCameraFov);
-   if(sCameraFov == sTargetFov)
-      sTargetFov = sDefaultFov;
+   CameraAndFOV::sDefaultFov = mClampF(defaultFOV, MinCameraFov, MaxCameraFov);
+   if(CameraAndFOV::sCameraFov == CameraAndFOV::sTargetFov)
+      CameraAndFOV::sTargetFov = CameraAndFOV::sDefaultFov;
 }
 
 DefineEngineFunction( setZoomSpeed, void, ( S32 speed ),,
@@ -203,7 +205,7 @@ DefineEngineFunction( setZoomSpeed, void, ( S32 speed ),,
             "@param speed The camera's zoom speed in ms per 90deg FOV change\n"
 				"@ingroup CameraSystem")
 {
-   sZoomSpeed = mClamp(speed, 0, MaxZoomSpeed);
+   CameraAndFOV::sZoomSpeed = mClamp(speed, 0, CameraAndFOV::MaxZoomSpeed);
 }
 
 DefineEngineFunction( setFov, void, ( F32 FOV ),,
@@ -211,22 +213,22 @@ DefineEngineFunction( setFov, void, ( F32 FOV ),,
             "@param FOV The camera's new FOV in degrees\n"
 				"@ingroup CameraSystem")
 {
-   sTargetFov = mClampF(FOV, MinCameraFov, MaxCameraFov);
+   CameraAndFOV::sTargetFov = mClampF(FOV, MinCameraFov, MaxCameraFov);
 }
 
 F32 GameGetCameraFov()
 {
-   return(sCameraFov);
+   return(CameraAndFOV::sCameraFov);
 }
 
 void GameSetCameraFov(F32 fov)
 {
-   sTargetFov = sCameraFov = fov;
+   CameraAndFOV::sTargetFov = CameraAndFOV::sCameraFov = fov;
 }
 
 void GameSetCameraTargetFov(F32 fov)
 {
-   sTargetFov = fov;
+   CameraAndFOV::sTargetFov = fov;
 }
 
 void GameUpdateCameraFov()
@@ -234,29 +236,29 @@ void GameUpdateCameraFov()
    F32 time = F32(Platform::getVirtualMilliseconds());
 
    // need to update fov?
-   if(sTargetFov != sCameraFov)
+   if(CameraAndFOV::sTargetFov != CameraAndFOV::sCameraFov)
    {
-      F32 delta = time - sLastCameraUpdateTime;
+      F32 delta = time - CameraAndFOV::sLastCameraUpdateTime;
 
       // snap zoom?
-      if((sZoomSpeed == 0) || (delta <= 0.f))
-         sCameraFov = sTargetFov;
+      if((CameraAndFOV::sZoomSpeed == 0) || (delta <= 0.f))
+         CameraAndFOV::sCameraFov = CameraAndFOV::sTargetFov;
       else
       {
          // gZoomSpeed is time in ms to zoom 90deg
-         F32 step = 90.f * (delta / F32(sZoomSpeed));
+         F32 step = 90.f * (delta / F32(CameraAndFOV::sZoomSpeed));
 
-         if(sCameraFov > sTargetFov)
+         if(CameraAndFOV::sCameraFov > CameraAndFOV::sTargetFov)
          {
-            sCameraFov -= step;
-            if(sCameraFov < sTargetFov)
-               sCameraFov = sTargetFov;
+            CameraAndFOV::sCameraFov -= step;
+            if(CameraAndFOV::sCameraFov < CameraAndFOV::sTargetFov)
+               CameraAndFOV::sCameraFov = CameraAndFOV::sTargetFov;
          }
          else
          {
-            sCameraFov += step;
-            if(sCameraFov > sTargetFov)
-               sCameraFov = sTargetFov;
+            CameraAndFOV::sCameraFov += step;
+            if(CameraAndFOV::sCameraFov > CameraAndFOV::sTargetFov)
+               CameraAndFOV::sCameraFov = CameraAndFOV::sTargetFov;
          }
       }
    }
@@ -266,23 +268,23 @@ void GameUpdateCameraFov()
    if(connection)
    {
       // check if fov is valid on control object
-      if(connection->isValidControlCameraFov(sCameraFov))
-         connection->setControlCameraFov(sCameraFov);
+      if(connection->isValidControlCameraFov(CameraAndFOV::sCameraFov))
+         connection->setControlCameraFov(CameraAndFOV::sCameraFov);
       else
       {
          // will set to the closest fov (fails only on invalid control object)
-         if(connection->setControlCameraFov(sCameraFov))
+         if(connection->setControlCameraFov(CameraAndFOV::sCameraFov))
          {
-            F32 setFov = sCameraFov;
+            F32 setFov = CameraAndFOV::sCameraFov;
             connection->getControlCameraFov(&setFov);
-            sTargetFov = sCameraFov = setFov;
+            CameraAndFOV::sTargetFov =CameraAndFOV::sCameraFov = setFov;
          }
       }
    }
 
    // update the console variable
-   sConsoleCameraFov = sCameraFov;
-   sLastCameraUpdateTime = time;
+   CameraAndFOV::sConsoleCameraFov = CameraAndFOV::sCameraFov;
+   CameraAndFOV::sLastCameraUpdateTime = time;
 }
 //--------------------------------------------------------------------------
 
@@ -355,8 +357,8 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
       // Scale the normal visible distance by the performance 
       // tuning scale which we never let over 1.
-      sVisDistanceScale = mClampF( sVisDistanceScale, 0.01f, 1.0f );
-      query->farPlane = gClientSceneGraph->getVisibleDistance() * sVisDistanceScale;
+      CameraAndFOV::sVisDistanceScale = mClampF( CameraAndFOV::sVisDistanceScale, 0.01f, 1.0f );
+      query->farPlane = gClientSceneGraph->getVisibleDistance() * CameraAndFOV::sVisDistanceScale;
 
       // Provide some default values
       query->projectionOffset = Point2F::Zero;
@@ -432,12 +434,18 @@ static void Process3D()
 
 static void RegisterGameFunctions()
 {
-   Con::addVariable( "$pref::Camera::distanceScale", TypeF32, &sVisDistanceScale, 
+   Con::addVariable( "$pref::Camera::distanceScale", TypeF32, &CameraAndFOV::sVisDistanceScale, 
       "A scale to apply to the normal visible distance, typically used for tuning performance.\n"
 	   "@ingroup Game");
-   Con::addVariable( "$cameraFov", TypeF32, &sConsoleCameraFov, 
+   Con::addVariable( "$cameraFov", TypeF32, &CameraAndFOV::sConsoleCameraFov, 
       "The camera's Field of View.\n\n"
 	   "@ingroup Game" );
+
+//<!-- Scene Culling --!>
+	Con::addVariable( "$pref::Camera::FarDistance", TypeF32, &CameraAndFOV::mFarClippingDistance, 
+      "The camera's Far Clipping Distance.\n\n"
+	   "@ingroup Game" );
+//<!-- Scene Culling --!>
 
    // Stuff game types into the console
    Con::setIntVariable("$TypeMasks::StaticObjectType",         StaticObjectType);

@@ -117,6 +117,11 @@ class SceneManager
       /// If true, render the AABBs of objects for debugging.
       static bool smRenderBoundingBoxes;
 
+      //<!-- Scene Culling --!>
+		//Accessor for client render
+	  bool GetIsClient()	{return mIsClient;}
+      //<!-- Scene Culling --!>
+
    protected:
 
       /// Whether this is the client-side scene.
