@@ -520,28 +520,26 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
       if ((mAlphaLODStart < mAlphaLODEnd) && mAlphaLODStart > 0.1f)
       {
          if (mInvertAlphaLod)
-		 {
+         {
             if (dist <= mAlphaLODStart)
-			{
+            {
                return;
-			}
-  
+            }
             if (dist < mAlphaLODEnd)
-			{
+            {
                mAlphaLOD = ((dist - mAlphaLODStart) / (mAlphaLODEnd - mAlphaLODStart));
-			}
+            }
          }
          else
-		 {
+         {
             if (dist >= mAlphaLODEnd)
-			{
+            {
                return;
-			}
-  
+            }
             if (dist > mAlphaLODStart)
-			{
+            {
                mAlphaLOD -= ((dist - mAlphaLODStart) / (mAlphaLODEnd - mAlphaLODStart));
-			}
+            }
          }
       }
    }
