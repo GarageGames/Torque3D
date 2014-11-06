@@ -30,7 +30,7 @@
 //<!-- Scene Culling --!>
 #include "console/engineAPI.h"
 #include "T3D/gameBase/gameConnection.h"
-#include "terrain/terrdata.h"
+#include "terrain/terrData.h"
 
 namespace CameraAndFOV
 	{
