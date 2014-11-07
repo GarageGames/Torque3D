@@ -180,7 +180,18 @@ void end( bool useGenericShaders )
    }
 
    if ( useGenericShaders )
+   {
+	   GFXStateBlock *currentBlock = GFX->getStateBlock();
+	   if (currentBlock && currentBlock->getDesc().samplersDefined)
+	   {
+		   if (currentBlock->getDesc().vertexColorEnable)
       GFX->setupGenericShaders( GFXDevice::GSModColorTexture );
+		   else
+			   GFX->setupGenericShaders( GFXDevice::GSTexture );
+	   }
+	   else
+		   GFX->setupGenericShaders( GFXDevice::GSColor );
+   }
 
    const GFXVertexPCT *srcVerts = mTempVertBuff.address();
    U32 numVerts = mCurVertIndex;
