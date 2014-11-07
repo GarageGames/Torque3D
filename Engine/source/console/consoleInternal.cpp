@@ -880,7 +880,7 @@ void Namespace::Entry::clear()
    // Clean up usage strings generated for script functions.
    if( ( mType == Namespace::Entry::ConsoleFunctionType ) && mUsage )
    {
-      delete mUsage;
+      dFree(mUsage);
       mUsage = NULL;
    }
 }
@@ -906,7 +906,7 @@ Namespace::~Namespace()
    clearEntries();
    if( mUsage && mCleanUpUsage )
    {
-      delete mUsage;
+      dFree(mUsage);
       mUsage = NULL;
       mCleanUpUsage = false;
    }
