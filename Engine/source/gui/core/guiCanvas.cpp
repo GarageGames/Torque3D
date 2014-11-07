@@ -94,9 +94,11 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 
 GuiCanvas::GuiCanvas(): GuiControl(),
+                        mCurUpdateRect(0, 0, 0, 0),
                         mCursorEnabled(true),
                         mForceMouseToGUI(false),
                         mAlwaysHandleMouseButtons(false),
+                        mCursorChanged(0),
                         mClampTorqueCursor(true),
                         mShowCursor(true),
                         mLastCursorEnabled(false),
@@ -120,6 +122,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mLeftMouseLast(false),
                         mMiddleMouseLast(false),
                         mRightMouseLast(false),
+                        mMouseDownPoint(0.0f,0.0f),
                         mPlatformWindow(NULL),
                         mLastRenderMs(0),
                         mDisplayWindow(true)
