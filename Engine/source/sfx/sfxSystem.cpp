@@ -1254,7 +1254,9 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
    "@ingroup SFX" )
 {
    char* deviceList = Con::getReturnBuffer( 2048 );
-   deviceList[0] = 0;
+   S32 len = 2048;
+   char *ptr = deviceList;
+   *ptr = 0;
 
    SFXProvider* provider = SFXProvider::getFirstProvider();
    while ( provider )
@@ -1264,14 +1266,15 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
       for ( S32 d=0; d < deviceInfo.size(); d++ )
       {
          const SFXDeviceInfo* info = deviceInfo[d];
-         dStrcat( deviceList, provider->getName() );
-         dStrcat( deviceList, "\t" );
-         dStrcat( deviceList, info->name );
-         dStrcat( deviceList, "\t" );
-         dStrcat( deviceList, info->hasHardware ? "1" : "0" );
-         dStrcat( deviceList, "\t" );
-         dStrcat( deviceList, Con::getIntArg( info->maxBuffers ) );         
-         dStrcat( deviceList, "\n" );
+		 const char *providerName = provider->getName().c_str();
+		 const char *infoName = info->name.c_str();
+		 dSprintf(ptr, len, "%s\t%s\t%s\t%i\n", providerName, infoName, info->hasHardware ? "1" : "0", info->maxBuffers);
+
+		 ptr += dStrlen(deviceList);
+		 len = 2048 - (ptr - deviceList);
+
+		 if (len <= 0)
+            return deviceList;
          
          //TODO: caps
       }
