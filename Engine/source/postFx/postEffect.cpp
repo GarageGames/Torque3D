@@ -178,7 +178,13 @@ void PostEffect::EffectConst::setToBuffer( GFXShaderConstBufferRef buff )
 
    const char *strVal = mStringVal.c_str();
 
-   if ( type == GFXSCT_Float )
+   if ( type == GFXSCT_Int )
+   {
+      S32 val;
+      Con::setData( TypeS32, &val, 0, 1, &strVal );
+      buff->set( mHandle, val );
+   }
+   else if ( type == GFXSCT_Float )
    {
       F32 val;
       Con::setData( TypeF32, &val, 0, 1, &strVal );
@@ -196,7 +202,7 @@ void PostEffect::EffectConst::setToBuffer( GFXShaderConstBufferRef buff )
       Con::setData( TypePoint3F, &val, 0, 1, &strVal );
       buff->set( mHandle, val );
    }
-   else
+   else if ( type == GFXSCT_Float4 )
    {
       Point4F val;
 
@@ -227,6 +233,14 @@ void PostEffect::EffectConst::setToBuffer( GFXShaderConstBufferRef buff )
          Con::setData( TypePoint4F, &val, 0, 1, &strVal );
          buff->set( mHandle, val );
       }
+   }
+   else
+   {
+#if TORQUE_DEBUG
+      const char* err = avar("PostEffect::EffectConst::setToBuffer $s type is not implemented", mName.c_str());
+      Con::errorf(err);
+      GFXAssertFatal(0,err);
+#endif
    }
 }
 
@@ -533,6 +547,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mTexSizeSC[3] = mShader->getShaderConstHandle( "$texSize3" );
       mTexSizeSC[4] = mShader->getShaderConstHandle( "$texSize4" );
       mTexSizeSC[5] = mShader->getShaderConstHandle( "$texSize5" );
+      mTexSizeSC[6] = mShader->getShaderConstHandle( "$texSize6" );
+      mTexSizeSC[7] = mShader->getShaderConstHandle( "$texSize7" );
 
       mRenderTargetParamsSC[0] = mShader->getShaderConstHandle( "$rtParams0" );
       mRenderTargetParamsSC[1] = mShader->getShaderConstHandle( "$rtParams1" );
@@ -540,6 +556,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mRenderTargetParamsSC[3] = mShader->getShaderConstHandle( "$rtParams3" );
       mRenderTargetParamsSC[4] = mShader->getShaderConstHandle( "$rtParams4" );
       mRenderTargetParamsSC[5] = mShader->getShaderConstHandle( "$rtParams5" );
+      mRenderTargetParamsSC[6] = mShader->getShaderConstHandle( "$rtParams6" );
+      mRenderTargetParamsSC[7] = mShader->getShaderConstHandle( "$rtParams7" );
 
       //mViewportSC = shader->getShaderConstHandle( "$viewport" );
 
@@ -824,7 +842,10 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
 
       EffectConstTable::Iterator iter = mEffectConsts.begin();
       for ( ; iter != mEffectConsts.end(); iter++ )
+      {
          iter->value->mDirty = true;
+         iter->value->mHandle = NULL;
+      }
    }
 
    // Doesn't look like anyone is using this anymore.
@@ -1209,9 +1230,9 @@ void PostEffect::process(  const SceneRenderState *state,
    // Setup the shader and constants.
    if ( mShader )
    {
+      GFX->setShader( mShader );
       _setupConstants( state );
 
-      GFX->setShader( mShader );
       GFX->setShaderConstBuffer( mShaderConsts );
    }
    else
@@ -1395,6 +1416,13 @@ void PostEffect::_checkRequirements()
    mIsValid = false;
    mUpdateShader = false;
    mShader = NULL;
+   mShaderConsts = NULL;
+   EffectConstTable::Iterator iter = mEffectConsts.begin();
+   for ( ; iter != mEffectConsts.end(); iter++ )
+   {
+      iter->value->mDirty = true;
+      iter->value->mHandle = NULL;
+   }
 
    // First make sure the target format is supported.
    if ( mNamedTarget.isRegistered() )
