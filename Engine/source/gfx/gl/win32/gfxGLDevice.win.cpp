@@ -35,7 +35,10 @@
 #include "gfx/GL/gfxGLCubemap.h"
 #include "gfx/GL/gfxGLCardProfiler.h"
 #include "windowManager/win32/win32Window.h"
-#include "ggl/Win32/wgl.h"
+#include "gfx/gl/tGL/tWGL.h"
+
+#include "postFx/postEffect.h"
+#include "gfx/gl/gfxGLUtils.h"
 
 #define GETHWND(x) static_cast<Win32Window*>(x)->getHWND()
 
@@ -105,7 +108,7 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
 
    // Create pixel format descriptor...
    PIXELFORMATDESCRIPTOR pfd;
-   CreatePixelFormat( &pfd, 16, 16, 8, false ); // 16 bit color, 16 bit depth, 8 bit stencil...everyone can do this
+   CreatePixelFormat( &pfd, 32, 0, 0, false );
    if( !SetPixelFormat( tempDC, ChoosePixelFormat( tempDC, &pfd ), &pfd ) )
       AssertFatal( false, "I don't know who's responcible for this, but I want caught..." );
 
@@ -239,6 +242,8 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    AssertFatal(dynamic_cast<Win32Window*>(window), "Invalid window class type!");
    HWND hwnd = GETHWND(window);
 
+   mWindowRT = &static_cast<Win32Window*>(window)->mTarget;
+
    RECT rect;
    GetClientRect(hwnd, &rect);
 
@@ -252,14 +257,41 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
 
    // Create pixel format descriptor...
    PIXELFORMATDESCRIPTOR pfd;
-   CreatePixelFormat( &pfd, 16, 16, 8, false ); // 16 bit color, 16 bit depth, 8 bit stencil...everyone can do this
+   CreatePixelFormat( &pfd, 32, 0, 0, false ); // 32 bit color... We do not need depth or stencil, OpenGL renders into a FBO and then copy the image to window
    if( !SetPixelFormat( hdcGL, ChoosePixelFormat( hdcGL, &pfd ), &pfd ) )
    {
       AssertFatal( false, "GFXGLDevice::init - cannot get the one and only pixel format we check for." );
    }
 
-   // Create a rendering context!
-   mContext = wglCreateContext( hdcGL );
+   int OGL_MAJOR = 3;
+   int OGL_MINOR = 2;
+   
+#if TORQUE_DEBUG
+   int debugFlag = WGL_CONTEXT_DEBUG_BIT_ARB;
+#else
+   int debugFlag = 0;
+#endif
+
+   if( gglHasWExtension(ARB_create_context) )
+   {
+      int const create_attribs[] = {
+               WGL_CONTEXT_MAJOR_VERSION_ARB, OGL_MAJOR,
+               WGL_CONTEXT_MINOR_VERSION_ARB, OGL_MINOR,
+               WGL_CONTEXT_FLAGS_ARB, /*WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB |*/ debugFlag,
+               WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+               //WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+               0
+           };
+
+      mContext = wglCreateContextAttribsARB(hdcGL, 0, create_attribs);
+      if(!mContext)
+      {
+         AssertFatal(0,"");
+      }
+   } 
+   else
+      mContext = wglCreateContext( hdcGL );
+
    if( !wglMakeCurrent( hdcGL, (HGLRC)mContext ) )
       AssertFatal( false , "GFXGLDevice::init - cannot make our context current. Or maybe we can't create it." );
 
@@ -280,99 +312,28 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
 
 bool GFXGLDevice::beginSceneInternal() 
 {
-   glGetError();
+   mCanCurrentlyRender = true;
    return true;
 }
 
 U32 GFXGLDevice::getTotalVideoMemory()
 {
-   // CodeReview [ags 12/21/07] Figure out how to do this.
-   return 0;
+   return getTotalVideoMemory_GL_EXT();
 }
 
 //------------------------------------------------------------------------------
 
 GFXWindowTarget *GFXGLDevice::allocWindowTarget( PlatformWindow *window )
 {
-   HDC hdcGL = GetDC(GETHWND(window));
-
-   if(!mContext)
-   {
-      init(window->getVideoMode(), window);
-      GFXGLWindowTarget *ggwt = new GFXGLWindowTarget(window, this);
-      ggwt->registerResourceWithDevice(this);
-      ggwt->mContext = wglCreateContext(hdcGL);
-      AssertFatal(ggwt->mContext, "GFXGLDevice::allocWindowTarget - failed to allocate window target!");
-
-      return ggwt;
-   }
-
+   AssertFatal(!mContext, "");
+   
+   init(window->getVideoMode(), window);
    GFXGLWindowTarget *ggwt = new GFXGLWindowTarget(window, this);
    ggwt->registerResourceWithDevice(this);
-
-   // Create pixel format descriptor...
-   PIXELFORMATDESCRIPTOR pfd;
-   CreatePixelFormat( &pfd, 16, 16, 8, false ); // 16 bit color, 16 bit depth, 8 bit stencil...everyone can do this
-   if( !SetPixelFormat( hdcGL, ChoosePixelFormat( hdcGL, &pfd ), &pfd ) )
-   {
-      AssertFatal( false, "GFXGLDevice::allocWindowTarget - cannot get the one and only pixel format we check for." );
-   }
-
-   ggwt->mContext = wglCreateContext(hdcGL);
-   DWORD w = GetLastError();
+   ggwt->mContext = mContext;
    AssertFatal(ggwt->mContext, "GFXGLDevice::allocWindowTarget - failed to allocate window target!");
 
-   wglMakeCurrent(NULL, NULL);
-   bool res = wglShareLists((HGLRC)mContext, (HGLRC)ggwt->mContext);
-   w = GetLastError();
-
-   wglMakeCurrent(hdcGL, (HGLRC)ggwt->mContext);
-   AssertFatal(res, "GFXGLDevice::allocWindowTarget - wasn't able to share contexts!");
-
    return ggwt;
-}
-
-void GFXGLDevice::_updateRenderTargets()
-{
-   if ( mRTDirty || mCurrentRT->isPendingState() )
-   {
-      // GL doesn't need to deactivate targets.
-      mRTDeactivate = NULL;
-
-      // NOTE: The render target changes is not really accurate
-      // as the GFXTextureTarget supports MRT internally.  So when
-      // we activate a GFXTarget it could result in multiple calls
-      // to SetRenderTarget on the actual device.
-      mDeviceStatistics.mRenderTargetChanges++;
-
-      GFXGLTextureTarget *tex = dynamic_cast<GFXGLTextureTarget*>( mCurrentRT.getPointer() );
-      if ( tex )
-      {
-         tex->applyState();
-         tex->makeActive();
-      }
-      else
-      {
-         GFXGLWindowTarget *win = dynamic_cast<GFXGLWindowTarget*>( mCurrentRT.getPointer() );
-         AssertFatal( win != NULL, 
-            "GFXGLDevice::_updateRenderTargets() - invalid target subclass passed!" );
-
-         //DWORD w1 = GetLastError();
-         HWND hwnd = GETHWND(win->getWindow());
-         HDC winDc = GetDC(hwnd);      
-         bool res = wglMakeCurrent(winDc,(HGLRC)win->mContext);
-         //DWORD w2 = GetLastError();
-         AssertFatal(res==true,"GFXGLDevice::setActiveRenderTarget - failed");
-      }
-
-      mRTDirty = false;
-   }
-
-   if ( mViewportDirty )
-   {
-      glViewport( mViewport.point.x, mViewport.point.y, mViewport.extent.x, mViewport.extent.y ); 
-      mViewportDirty = false;
-   }
 }
 
 GFXFence* GFXGLDevice::_createPlatformSpecificFence()
@@ -382,16 +343,10 @@ GFXFence* GFXGLDevice::_createPlatformSpecificFence()
 
 
 //-----------------------------------------------------------------------------
-
-void GFXGLWindowTarget::makeActive()
-{
-}
-
-bool GFXGLWindowTarget::present()
+void GFXGLWindowTarget::_WindowPresent()
 {
    HWND hwnd = GETHWND(getWindow());
    SwapBuffers(GetDC(hwnd));
-   return true;
 }
 
 void GFXGLWindowTarget::_teardownCurrentMode()
