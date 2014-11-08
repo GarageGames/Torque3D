@@ -1266,17 +1266,15 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
       for ( S32 d=0; d < deviceInfo.size(); d++ )
       {
          const SFXDeviceInfo* info = deviceInfo[d];
-		 const char *providerName = provider->getName().c_str();
-		 const char *infoName = info->name.c_str();
-		 dSprintf(ptr, len, "%s\t%s\t%s\t%i\n", providerName, infoName, info->hasHardware ? "1" : "0", info->maxBuffers);
+         const char *providerName = provider->getName().c_str();
+         const char *infoName = info->name.c_str();
+         dSprintf(ptr, len, "%s\t%s\t%s\t%i\n", providerName, infoName, info->hasHardware ? "1" : "0", info->maxBuffers);
 
-		 ptr += dStrlen(deviceList);
-		 len = 2048 - (ptr - deviceList);
+         ptr += dStrlen(deviceList);
+         len = 2048 - (ptr - deviceList);
 
-		 if (len <= 0)
+         if (len <= 0)
             return deviceList;
-         
-         //TODO: caps
       }
 
       provider = provider->getNextProvider();
