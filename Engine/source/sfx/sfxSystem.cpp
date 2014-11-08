@@ -1253,8 +1253,9 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
    "@ref SFX_devices\n"
    "@ingroup SFX" )
 {
-   char* deviceList = Con::getReturnBuffer( 2048 );
-   S32 len = 2048;
+   const S32 bufferSize = 2048;
+   char* deviceList = Con::getReturnBuffer( bufferSize );
+   S32 len = bufferSize;
    char *ptr = deviceList;
    *ptr = 0;
 
@@ -1270,8 +1271,8 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
          const char *infoName = info->name.c_str();
          dSprintf(ptr, len, "%s\t%s\t%s\t%i\n", providerName, infoName, info->hasHardware ? "1" : "0", info->maxBuffers);
 
-         ptr += dStrlen(deviceList);
-         len = 2048 - (ptr - deviceList);
+         ptr += dStrlen(ptr);
+         len = bufferSize - (ptr - deviceList);
 
          if (len <= 0)
             return deviceList;
