@@ -98,7 +98,7 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
    uvScene->setName( "uvScene" );
    LangElement *uvSceneDecl = new DecOp( uvScene );
 
-   String rtParamName = String::ToString( "rtParams%d", mLastTexIndex );
+   String rtParamName = String::ToString( "rtParams%s", "lightInfoBuffer" );
    Var *rtParams = (Var*) LangElement::find( rtParamName );
    if( !rtParams )
    {
@@ -207,6 +207,7 @@ void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
       mLastTexIndex = texIndex;
 
       passData.mTexType[ texIndex ] = Material::TexTarget;
+      passData.mSamplerNames[ texIndex ]= "lightInfoBuffer";
       passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
    }
 }
@@ -402,12 +403,14 @@ void DeferredBumpFeatHLSL::setTexData( Material::StageData &stageDat,
            fd.features[MFT_PixSpecular] ) )
    {
       passData.mTexType[ texIndex ] = Material::Bump;
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
 
       if (  fd.features[MFT_PrePassConditioner] &&
             fd.features.hasFeature( MFT_DetailNormalMap ) )
       {
          passData.mTexType[ texIndex ] = Material::DetailBump;
+         passData.mSamplerNames[ texIndex ] = "detailBumpMap";
          passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
       }
    }
