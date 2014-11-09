@@ -26,10 +26,11 @@ root: .
             <h2>Proven tech</h2>
             <p>
             Torque has been around for a while, and it's been used for everything
-            from driving simulators to MMOs to interactive coral reefs.
+            from driving simulators to MMOs to interactive coral reefs. Still
+            not convinced?
             </p>
             <center>
-                <a href="{{page.root}}/engine">Games made with Torque <i class="fa fa-angle-right"></i></a>
+                <a class="btn btn-primary" href="{{page.root}}/engine">See some games</a>
             </center>
         </div>
 
@@ -52,7 +53,7 @@ root: .
             bottom line to meet.
             </p>
             <center>
-                <a href="{{page.root}}/contribute">Get involved <i class="fa fa-angle-right"></i></a>
+                <a class="btn btn-primary" href="{{page.root}}/contribute">Get involved</a>
             </center>
         </div>
     </div>
@@ -86,7 +87,7 @@ root: .
             <table class="borderless table">
                 <tr>
                     <td>Current version</td>
-                    <td><a href="http://torque3d.wikidot.com/release:three-six-one">3.6.1</a></td>
+                    <td><a href="http://wiki.torque3d.org/release:three-six-two">3.6.2</a></td>
                 </tr>
                 <tr>
                     <td>Continuous integration</td>
@@ -187,21 +188,20 @@ $(document).ready(function() {
       if(data.responseData.feed && data.responseData.feed.entries) {
         var list = $('<ul/>').addClass('list-unstyled');
         $.each(data.responseData.feed.entries, function (i, e) {
-          var li = $('<li/>').appendTo(list);
+          var li = $('<li/>').addClass('commit').appendTo(list);
           var hash = e.link.split('/').pop().substr(0, 6);
+
+          var content = e.contentSnippet.split('\n').pop();
+          li.append($('<p/>').text(content));
+
           var hashel = $('<pre/>').addClass('inline').appendTo(li);
           hashel.append($('<a/>')
             .text(hash)
             .attr('href', e.link)
             .attr('target', '_blank'));
 
-          var content = e.contentSnippet.split('\n').pop();
-          li.append($('<span/>')
-            .addClass('commit')
-            .text(content));
-
           var d = new Date(e.publishedDate);
-          var stamp = $('<p/>').addClass('timeago').text('by ' + e.author + ' ').appendTo(li);
+          var stamp = $('<span/>').addClass('timeago').text('by ' + e.author + ' ').appendTo(li);
           stamp.append($('<span/>')
             .attr('title', d.toISOString())
             .timeago());

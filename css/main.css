@@ -167,13 +167,20 @@ a.media-subheading:hover {
   font-size: smaller;
   color: gray;
   margin-top: 0;
-  margin-left: 0.5em;
 }
 
 pre.inline {
   display: inline;
   padding: 3px;
   margin: 0 5px;
+}
+
+.commit {
+  margin-bottom: 10px;
+}
+
+.commit p {
+  margin: 0;
 }
 
 /*-----------------------------------------------------------------------------
