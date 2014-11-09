@@ -11,7 +11,7 @@ root: ..
 <div class="container">
     <p>
     Here are some of the premier projects using Torque 3D right now. This isn't
-    an exhaustive list - you can see more projects over at <a href="http://torque3d.wikidot.com/main:madewithtorque">the wiki</a>,
+    an exhaustive list - you can see more projects over at <a href="http://wiki.torque3d.org/main:madewithtorque">the wiki</a>,
     and even add your own to the list.
     </p>
 
@@ -359,7 +359,9 @@ root: ..
             using a custom C-like language called TorqueScript. You can create
             whole games without touching a line of C++. Check this out:
             </p>
-            <pre><code>$minion = new AIPlayer();
+            <pre><code>$minion = new AIPlayer() {
+   datablock = MinionData;
+};
 $minion.name = "Fubar";
 $minion.setMoveDestination("50 0 0");
 
