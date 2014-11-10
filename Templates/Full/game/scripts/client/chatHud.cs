@@ -159,7 +159,7 @@ function MainChatHud::setChatHudLength( %this, %length )
    %lengthInPixels = $outerChatLenY[%length] * %textHeight;
    %chatMargin = getWord(OuterChatHud.extent, 1) - getWord(ChatScrollHud.Extent, 1)
                   + 2 * ChatScrollHud.profile.borderThickness;
-   OuterChatHud.setExtent(firstWord(OuterChatHud.extent), %lengthInPixels + %chatMargin);
+   OuterChatHud.setExtent(firstWord(OuterChatHud.extent) @ " " @ ( %lengthInPixels + %chatMargin));
    ChatScrollHud.scrollToBottom();
    ChatPageDown.setVisible(false);
 }

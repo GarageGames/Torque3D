@@ -22,6 +22,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 

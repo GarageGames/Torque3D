@@ -28,6 +28,7 @@
 #include "console/simBase.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "T3D/gameBase/moveManager.h"
 #include "ts/tsShapeInstance.h"
 #include "T3D/staticShape.h"
@@ -317,15 +318,15 @@ void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 // This appears to be legacy T2 stuff
 // Marked internal, as this is flagged to be deleted
 // [8/1/2010 mperry]
-ConsoleMethod( StaticShape, setPoweredState, void, 3, 3, "(bool isPowered)"
+DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
 			  "@internal")
 {
    if(!object->isServerObject())
       return;
-   object->setPowered(dAtob(argv[2]));
+   object->setPowered(isPowered);
 }
 
-ConsoleMethod( StaticShape, getPoweredState, bool, 2, 2, "@internal")
+DefineConsoleMethod( StaticShape, getPoweredState, bool, (), , "@internal")
 {
    if(!object->isServerObject())
       return(false);

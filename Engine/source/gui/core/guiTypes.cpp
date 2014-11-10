@@ -24,6 +24,7 @@
 #include "platform/types.h"
 #include "console/consoleTypes.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiTypes.h"
 #include "gui/core/guiControl.h"
 #include "gfx/gFont.h"
@@ -694,9 +695,9 @@ bool GuiControlProfile::loadFont()
    return true;
 }
 
-ConsoleMethod( GuiControlProfile, getStringWidth, S32, 3, 3, "( pString )" )
+DefineConsoleMethod( GuiControlProfile, getStringWidth, S32, ( const char * pString ), , "( pString )" )
 {
-    return object->mFont->getStrNWidth( argv[2], dStrlen( argv[2] ) );
+    return object->mFont->getStrNWidth( pString, dStrlen( pString ) );
 }
 
 //-----------------------------------------------------------------------------

@@ -294,8 +294,11 @@ void WayPoint::unpackUpdate(NetConnection * con, BitStream * stream)
 // TypeWayPointTeam
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_STRUCT( WayPointTeam, WayPointTeam,,
-   "" )
+//-----------------------------------------------------------------------------
+// TypeWayPointTeam
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_STRUCT( WayPointTeam, WayPointTeam,,   "" )
 END_IMPLEMENT_STRUCT;
 
 //FIXME: this should work but does not; need to check the stripping down to base types within TYPE
@@ -546,16 +549,17 @@ ConsoleDocFragment _SpawnSpherespawnObject1(
    "bool spawnObject(string additionalProps);"
 );
 
-ConsoleMethod(SpawnSphere, spawnObject, S32, 2, 3,
+//ConsoleMethod(SpawnSphere, spawnObject, S32, 2, 3,
+DefineConsoleMethod(SpawnSphere, spawnObject, S32, (String additionalProps), ,
    "([string additionalProps]) Spawns the object based on the SpawnSphere's "
    "class, datablock, properties, and script settings. Allows you to pass in "
    "extra properties."
    "@hide" )
 {
-   String additionalProps;
+   //String additionalProps;
 
-   if (argc == 3)
-      additionalProps = (const char*)argv[2];
+   //if (argc == 3)
+   //   additionalProps = String(argv[2]);
 
    SimObject* obj = object->spawnObject(additionalProps);
 

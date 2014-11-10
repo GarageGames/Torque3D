@@ -154,15 +154,15 @@ function GuiEditCanvas::onCreateMenu(%this)
          barTitle = "Move";
          internalName = "MoveMenu";
             
-         item[0] = "Nudge Left" TAB "Left" TAB "GuiEditor.moveSelection( -1, 0);";
-         item[1] = "Nudge Right" TAB "Right" TAB "GuiEditor.moveSelection( 1, 0);";
-         item[2] = "Nudge Up" TAB "Up" TAB "GuiEditor.moveSelection( 0, -1);";
-         item[3] = "Nudge Down" TAB "Down" TAB "GuiEditor.moveSelection( 0, 1 );";
+         item[0] = "Nudge Left" TAB "Left" TAB "GuiEditor.tmoveSelection( -1, 0);";
+         item[1] = "Nudge Right" TAB "Right" TAB "GuiEditor.tmoveSelection( 1, 0);";
+         item[2] = "Nudge Up" TAB "Up" TAB "GuiEditor.tmoveSelection( 0, -1);";
+         item[3] = "Nudge Down" TAB "Down" TAB "GuiEditor.tmoveSelection( 0, 1 );";
          item[4] = "-";
-         item[5] = "Big Nudge Left" TAB "Shift Left" TAB "GuiEditor.moveSelection( - GuiEditor.snap2gridsize, 0 );";
-         item[6] = "Big Nudge Right" TAB "Shift Right" TAB "GuiEditor.moveSelection( GuiEditor.snap2gridsize, 0 );";
-         item[7] = "Big Nudge Up" TAB "Shift Up" TAB "GuiEditor.moveSelection( 0, - GuiEditor.snap2gridsize );";
-         item[8] = "Big Nudge Down" TAB "Shift Down" TAB "GuiEditor.moveSelection( 0, GuiEditor.snap2gridsize );";
+         item[5] = "Big Nudge Left" TAB "Shift Left" TAB "GuiEditor.tmoveSelection( - GuiEditor.snap2gridsize, 0 );";
+         item[6] = "Big Nudge Right" TAB "Shift Right" TAB "GuiEditor.tmoveSelection( GuiEditor.snap2gridsize, 0 );";
+         item[7] = "Big Nudge Up" TAB "Shift Up" TAB "GuiEditor.tmoveSelection( 0, - GuiEditor.snap2gridsize );";
+         item[8] = "Big Nudge Down" TAB "Shift Down" TAB "GuiEditor.tmoveSelection( 0, GuiEditor.snap2gridsize );";
       };
 
       new PopupMenu()
@@ -199,6 +199,11 @@ function GuiEditCanvas::onCreateMenu(%this)
       };
    };
    %this.menuBar.attachToCanvas( Canvas, 0 );
+}
+
+function GuiEditor::tMoveSelection (%x, %y)
+{
+   GuiEditor.moveSelection(%x @ " " @ %y);
 }
 
 $GUI_EDITOR_MENU_EDGESNAP_INDEX = 0;

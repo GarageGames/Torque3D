@@ -2350,12 +2350,12 @@ function EWToolsToolbar::reset( %this )
    for( %i = 0 ; %i < %count; %i++ )
       ToolsToolbarArray.getObject(%i).setVisible(true);
 
-   %this.setExtent((29 + 4) * %count + 12, 33);
+   %this.setExtent(((29 + 4) * %count + 12) @ " 33");
    %this.isClosed = 0;
    EWToolsToolbar.isDynamic = 0;
       
    EWToolsToolbarDecoy.setVisible(false);
-   EWToolsToolbarDecoy.setExtent((29 + 4) * %count + 4, 31);
+   EWToolsToolbarDecoy.setExtent(((29 + 4) * %count + 4) @ " 31");
 
   %this-->resizeArrow.setBitmap( "tools/gui/images/collapse-toolbar" );
 }
@@ -2376,7 +2376,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
             ToolsToolbarArray.getObject(%i).setVisible(false);
       }
          
-      %this.setExtent(43, 33);
+      %this.setExtent("43 33");
       %this.isClosed = 1;
       
       if(!%useDynamics)
@@ -2385,7 +2385,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
          EWToolsToolbar.isDynamic = 1;
       }
          
-      EWToolsToolbarDecoy.setExtent(35, 31);
+      EWToolsToolbarDecoy.setExtent("35 31");
    }
    else
    {
@@ -2395,7 +2395,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
       for( %i = 0 ; %i < %count; %i++ )
          ToolsToolbarArray.getObject(%i).setVisible(true);
       
-      %this.setExtent((29 + 4) * %count + 12, 33);
+      %this.setExtent(((29 + 4) * %count + 12) @ " 33");
       %this.isClosed = 0;
       
       if(!%useDynamics)
@@ -2404,7 +2404,7 @@ function EWToolsToolbar::toggleSize( %this, %useDynamics )
          EWToolsToolbar.isDynamic = 0;
       }
 
-      EWToolsToolbarDecoy.setExtent((29 + 4) * %count + 4, 32);
+      EWToolsToolbarDecoy.setExtent(((29 + 4) * %count + 4) @ " 32");
    }
 
   %this-->resizeArrow.setBitmap( %image );

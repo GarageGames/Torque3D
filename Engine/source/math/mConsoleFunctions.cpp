@@ -94,14 +94,22 @@ DefineConsoleFunction( mFloor, S32, ( F32 v ),,
    return (S32)mFloor( v );
 }
 
-DefineConsoleFunction( mRound, S32, ( F32 v ),,
-    "Round v to the nearest integer.\n"
-    "@param v Number to convert to integer."
-    "@returns Number converted to integer."
-    "@ingroup Math" )
-{
-   return (S32)mFloor( v + 0.5f );
-}
+DefineConsoleFunction( mRound, F32, ( F32 v, S32 n ), (0),  
+    "Round v to the nth decimal place or the nearest whole number by default."  
+    "@param v Value to roundn"  
+    "@param n Number of decimal places to round to, 0 by defaultn"  
+    "@return The rounded value as a S32."  
+    "@ingroup Math" )  
+{  
+    if(n <= 0)
+	{
+        return mRound(v);  
+	}
+    else  
+	{
+        return mRound(v, n);  
+	}
+}  
 
 DefineConsoleFunction( mCeil, S32, ( F32 v ),,
     "Round v up to the nearest integer.\n"
@@ -119,8 +127,9 @@ DefineConsoleFunction( mFloatLength, const char*, ( F32 v, U32 precision ),,
     "@returns Number formatted to the specified number of decimal places."
     "@ingroup Math" )
 {
-   char fmtString[8] = "%.0f";
-   if (precision > 9)
+   char fmtString[8] = "%.9f";
+
+   if (precision >= 9)
       precision = 9;
    fmtString[2] = '0' + precision;
 

@@ -454,6 +454,9 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       GuiTreeViewCtrl();
       virtual ~GuiTreeViewCtrl();
 
+		//WLE Vince, Moving this into a function so I don't have to bounce off the console.  12/05/2013
+		const char* getSelectedObjectList();
+
       /// Used for syncing the mSelected and mSelectedItems lists.
       void syncSelection();
 
@@ -592,6 +595,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       static void initPersistFields();
 
       void inspectObject(SimObject * obj, bool okToEdit);
+	  S32 insertObject(S32 parentId, SimObject * obj, bool okToEdit);
       void buildVisibleTree(bool bForceFullUpdate = false);
 
       void cancelRename();

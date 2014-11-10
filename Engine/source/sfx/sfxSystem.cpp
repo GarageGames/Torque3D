@@ -1441,7 +1441,7 @@ static ConsoleDocFragment _sfxCreateSource4(
    NULL,
    "SFXSound sfxCreateSource( SFXDescription description, string filename, float x, float y, float z );" );
 
-ConsoleFunction( sfxCreateSource, S32, 2, 6,
+DefineConsoleFunction( sfxCreateSource, S32, ( const char * SFXType, const char * filename, const char * x, const char * y, const char * z ), ("", "", "", ""),
                      "( SFXTrack track | ( SFXDescription description, string filename ) [, float x, float y, float z ] ) "
                      "Creates a new paused sound source using a profile or a description "
                      "and filename.  The return value is the source which must be "
@@ -1449,13 +1449,13 @@ ConsoleFunction( sfxCreateSource, S32, 2, 6,
                      "@hide" )
 {
    SFXDescription* description = NULL;
-   SFXTrack* track = dynamic_cast< SFXTrack* >( Sim::findObject( argv[1] ) );
+   SFXTrack* track = dynamic_cast< SFXTrack* >( Sim::findObject( SFXType ) );
    if ( !track )
    {
-      description = dynamic_cast< SFXDescription* >( Sim::findObject( argv[1] ) );
+      description = dynamic_cast< SFXDescription* >( Sim::findObject( SFXType ) );
       if ( !description )
       {
-         Con::printf( "Unable to locate sound track/description '%s'", (const char*)argv[1] );
+         Con::printf( "Unable to locate sound track/description '%s'", SFXType );
          return 0;
       }
    }
@@ -1464,20 +1464,20 @@ ConsoleFunction( sfxCreateSource, S32, 2, 6,
 
    if ( track )
    {
-      if ( argc == 2 )
+      if (dStrcmp(x, "") == 0)
       {
          source = SFX->createSource( track );
       }
       else
       {
          MatrixF transform;
-         transform.set( EulerF(0,0,0), Point3F( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4])) );
+         transform.set( EulerF(0,0,0), Point3F( dAtof(x), dAtof(y), dAtof(z)) );
          source = SFX->createSource( track, &transform );
       }
    }
    else if ( description )
    {
-      SFXProfile* tempProfile = new SFXProfile( description, StringTable->insert( argv[2] ), true );
+      SFXProfile* tempProfile = new SFXProfile( description, StringTable->insert( filename ), true );
       if( !tempProfile->registerObject() )
       {
          Con::errorf( "sfxCreateSource - unable to create profile" );
@@ -1485,14 +1485,14 @@ ConsoleFunction( sfxCreateSource, S32, 2, 6,
       }
       else
       {
-         if ( argc == 3 )
+         if ( dStrcmp(x , "")==0 )
          {
             source = SFX->createSource( tempProfile );
          }
          else
          {
             MatrixF transform;
-            transform.set(EulerF(0,0,0), Point3F( dAtof(argv[3]),dAtof(argv[4]),dAtof(argv[5]) ));
+            transform.set(EulerF(0,0,0), Point3F( dAtof(x),dAtof(y),dAtof(z) ));
             source = SFX->createSource( tempProfile, &transform );
          }
 
@@ -1544,13 +1544,13 @@ static ConsoleDocFragment _sfxPlay3(
    NULL,
    "void sfxPlay( SFXTrack track, float x, float y, float z );" );
    
-ConsoleFunction( sfxPlay, S32, 2, 5, "( SFXSource source | ( SFXTrack track [, float x, float y, float z ] ) ) "
+DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * pointOrX, const char * y, const char * z ), ( "", "", ""),
    "Start playing the given source or create a new source for the given track and play it.\n"
    "@hide" )
 {
-   if ( argc == 2 )
+   if ( dStrcmp(pointOrX , "")==0 )
    {
-      SFXSource* source = dynamic_cast<SFXSource*>( Sim::findObject( argv[1] ) );
+      SFXSource* source = dynamic_cast<SFXSource*>( Sim::findObject( trackName ) );
       if ( source )
       {
          source->play();
@@ -1558,18 +1558,20 @@ ConsoleFunction( sfxPlay, S32, 2, 5, "( SFXSource source | ( SFXTrack track [, f
       }
    }
 
-   SFXTrack* track = dynamic_cast<SFXTrack*>( Sim::findObject( argv[1] ) );
+   SFXTrack* track = dynamic_cast<SFXTrack*>( Sim::findObject( trackName ) );
    if ( !track )
    {
-      Con::printf( "Unable to locate sfx track '%s'", (const char*)argv[1] );
+      Con::printf( "Unable to locate sfx track '%s'", trackName );
       return 0;
    }
 
    Point3F pos(0.f, 0.f, 0.f);
-   if ( argc == 3 )
-      dSscanf( argv[2], "%g %g %g", &pos.x, &pos.y, &pos.z );
-   else if(argc == 5)
-      pos.set( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]) );
+   if (dStrcmp( pointOrX, "" ) != 0 && dStrcmp( y, "" ) == 0 && dStrcmp( z, "" ) == 0 )
+   {
+      dSscanf( pointOrX, "%g %g %g", &pos.x, &pos.y, &pos.z );
+   }
+   else if(dStrcmp( pointOrX, "" ) != 0 && dStrcmp( y, "" ) != 0 && dStrcmp( z, "" ) != 0 )
+      pos.set( dAtof(pointOrX), dAtof(y), dAtof(z) );
 
    MatrixF transform;
    transform.set( EulerF(0,0,0), pos );
@@ -1652,19 +1654,19 @@ static ConsoleDocFragment _sPlayOnce4(
    "SFXSource sfxPlayOnce( SFXDescription description, string filename, float x, float y, float z, float fadeInTime=-1 );"
 );
 
-ConsoleFunction( sfxPlayOnce, S32, 2, 6,
+DefineConsoleFunction( sfxPlayOnce, S32, ( const char * SFXType, const char * filename, const char * x, const char * y, const char * z, F32 fadeInTime ), ("", "", "", -1.0f),
    "SFXSource sfxPlayOnce( ( SFXTrack track | SFXDescription description, string filename ) [, float x, float y, float z, float fadeInTime=-1 ] ) "
    "Create a new play-once source for the given profile or description+filename and start playback of the source.\n"
    "@hide" )
 {
    SFXDescription* description = NULL;
-   SFXTrack* track = dynamic_cast< SFXTrack* >( Sim::findObject( argv[1] ) );
+   SFXTrack* track = dynamic_cast< SFXTrack* >( Sim::findObject( SFXType ) );
    if( !track )
    {
-      description = dynamic_cast< SFXDescription* >( Sim::findObject( argv[1] ) );
+      description = dynamic_cast< SFXDescription* >( Sim::findObject( SFXType ) );
       if( !description )
       {
-         Con::errorf( "sfxPlayOnce - Unable to locate sound track/description '%s'", (const char*)argv[1] );
+         Con::errorf( "sfxPlayOnce - Unable to locate sound track/description '%s'", SFXType );
          return 0;
       }
    }
@@ -1672,21 +1674,20 @@ ConsoleFunction( sfxPlayOnce, S32, 2, 6,
    SFXSource* source = NULL;
    if( track )
    {
-      if( argc == 2 )
+      if (dStrcmp(x, "") == 0)
+      {
          source = SFX->playOnce( track );
+      }
       else
       {
          MatrixF transform;
-         transform.set( EulerF( 0, 0, 0 ), Point3F( dAtof( argv[ 2 ] ), dAtof( argv[ 3 ] ),dAtof( argv[ 4 ] ) ) );
-         F32 fadeInTime = -1.f;
-         if( argc > 5 )
-            fadeInTime = dAtof( argv[ 5 ] );
+         transform.set( EulerF( 0, 0, 0 ), Point3F( dAtof( x ), dAtof( y ),dAtof( z ) ) );
          source = SFX->playOnce( track, &transform, NULL, fadeInTime );
       }
    }
    else if( description )
    {
-      SFXProfile* tempProfile = new SFXProfile( description, StringTable->insert( argv[2] ), true );
+      SFXProfile* tempProfile = new SFXProfile( description, StringTable->insert( filename ), true );
       if( !tempProfile->registerObject() )
       {
          Con::errorf( "sfxPlayOnce - unable to create profile" );
@@ -1694,15 +1695,12 @@ ConsoleFunction( sfxPlayOnce, S32, 2, 6,
       }
       else
       {
-         if ( argc == 3 )
+         if (dStrcmp(x, "") == 0) 
             source = SFX->playOnce( tempProfile );
          else
          {
             MatrixF transform;
-            transform.set(EulerF(0,0,0), Point3F( dAtof(argv[3]),dAtof(argv[4]),dAtof(argv[5]) ));
-            F32 fadeInTime = -1.f;
-            if( argc > 6 )
-               fadeInTime = dAtof( argv[ 6 ] );
+            transform.set( EulerF( 0, 0, 0 ), Point3F( dAtof( x ), dAtof( y ),dAtof( z ) ) );
             source = SFX->playOnce( tempProfile, &transform, NULL, fadeInTime );
          }
          
