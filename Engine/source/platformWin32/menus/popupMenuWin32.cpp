@@ -158,7 +158,7 @@ void PopupMenu::createPlatformMenu()
    mData->mMenu = mIsPopup ? CreatePopupMenu() : CreateMenu();
    AssertFatal(mData->mMenu, "Unable to create menu");
 
-   MENUINFO mi;
+   MENUINFO mi = { 0 };
    mi.cbSize = sizeof(mi);
    mi.fMask = MIM_MENUDATA;
    mi.dwMenuData = (ULONG_PTR)this;
@@ -176,7 +176,7 @@ S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator)
    if(isAttached && pWindow == NULL)
       return -1;
 
-   MENUITEMINFOA mi;
+   MENUITEMINFOA mi = { 0 };
    mi.cbSize = sizeof(mi);
    mi.fMask = MIIM_ID|MIIM_TYPE;
    mi.wID = (mData->mMenuID * PlatformPopupMenuData::PopupMenuIDRange) + mData->mLastID + 1;

@@ -66,6 +66,7 @@ ConnectionProtocol::ConnectionProtocol()
    mLastSendSeq = 0; // start sending at 1
    mAckMask = 0;
    mLastRecvAckAck = 0;
+   mConnectionEstablished = false;
 }
 void ConnectionProtocol::buildSendPacketHeader(BitStream *stream, S32 packetType)
 {
