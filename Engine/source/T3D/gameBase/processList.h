@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 
-class GameConnection;
+class GameConnection;   
 struct Move;
 class CountersDetail
 {
@@ -158,8 +158,8 @@ public:
 
    bool mIsGameBase;
 
-	bool mEnableCounters;
-	   
+   bool mEnableCounters;
+      
    private:
    TypeCounters mCounters;
    public:

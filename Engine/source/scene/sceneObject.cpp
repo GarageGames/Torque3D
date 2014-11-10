@@ -406,7 +406,7 @@ void SceneObject::setTransform( const MatrixF& mat )
 
 void SceneObject::setScale( const VectorF &scale )
 {
-	AssertFatal( !mIsNaN( scale ), "SceneObject::setScale() - The scale is NaN!" );
+   AssertFatal( !mIsNaN( scale ), "SceneObject::setScale() - The scale is NaN!" );
 
    // Avoid unnecessary scaling operations.
    if ( mObjScale.equal( scale ) )
@@ -630,7 +630,7 @@ void SceneObject::initPersistFields()
 
    endGroup( "Mounting" );
    addGroup( "Scripting" );
-	addField( "EnableCounters", TypeBool, Offset(mEnableCounters, SceneObject), "Used to turn tick counters.");
+   addField( "EnableCounters", TypeBool, Offset(mEnableCounters, SceneObject), "Used to turn tick counters.");
    endGroup( "Scripting" );
 
    Parent::initPersistFields();
@@ -945,7 +945,7 @@ Point3F SceneObject::getRenderPosition() const
 
 void SceneObject::setPosition(const Point3F &pos)
 {
-	AssertFatal( !mIsNaN( pos ), "SceneObject::setPosition() - The position is NaN!" );
+   AssertFatal( !mIsNaN( pos ), "SceneObject::setPosition() - The position is NaN!" );
 
    MatrixF xform = mObjToWorld;
    xform.setColumn(3, pos);
