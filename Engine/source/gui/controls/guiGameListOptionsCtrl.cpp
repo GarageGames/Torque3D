@@ -110,7 +110,7 @@ void GuiGameListOptionsCtrl::onRender(Point2I offset, const RectI &updateRect)
             arrowOffset.x = currentOffset.x + columnSplit;
             arrowOffset.y = currentOffset.y + arrowOffsetY;
 
-            drawer->clearBitmapModulation();
+            //drawer->clearBitmapModulation();
             drawer->drawBitmapStretchSR(profile->mTextureObject, RectI(arrowOffset, arrowExtent), profile->getBitmapArrayRect((U32)iconIndex));
 
             // render the right arrow
@@ -119,7 +119,7 @@ void GuiGameListOptionsCtrl::onRender(Point2I offset, const RectI &updateRect)
             arrowOffset.x = currentOffset.x + (profile->mHitAreaLowerRight.x - profile->mRightPad) * xScale - arrowExtent.x;
             arrowOffset.y = currentOffset.y + arrowOffsetY;
 
-            drawer->clearBitmapModulation();
+            //drawer->clearBitmapModulation();
             drawer->drawBitmapStretchSR(profile->mTextureObject, RectI(arrowOffset, arrowExtent), profile->getBitmapArrayRect((U32)iconIndex));
          }
 

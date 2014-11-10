@@ -282,7 +282,7 @@ void GuiIconButtonCtrl::renderButton( Point2I &offset, const RectI& updateRect )
    if ( mTextureNormal && mIconLocation != GuiIconButtonCtrl::IconLocNone )
    {
       // Render the normal bitmap
-      drawer->clearBitmapModulation();
+      //drawer->clearBitmapModulation();  // Copyright (C) 2013 WinterLeaf Entertainment LLC.
 
       // Maintain the bitmap size or fill the button?
       if ( !mFitBitmapToButton )

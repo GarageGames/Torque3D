@@ -431,6 +431,9 @@ public:
       HashTableSize = 127,
    };
 
+   
+   DECLARE_CALLBACK( void, onGhostAlwaysObjectsReceived, () );
+
    void sendDisconnectPacket(const char *reason);
 
    virtual bool canRemoteCreate();

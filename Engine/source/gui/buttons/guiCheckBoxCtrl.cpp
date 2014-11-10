@@ -111,7 +111,7 @@ void GuiCheckBoxCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // just draw the check box and the text:
    S32 xOffset = 0;
-   GFX->getDrawUtil()->clearBitmapModulation();
+   //GFX->getDrawUtil()->clearBitmapModulation();     // Copyright (C) 2013 WinterLeaf Entertainment LLC.
    if(mProfile->mBitmapArrayRects.size() >= 4)
    {
       S32 index = mStateOn;

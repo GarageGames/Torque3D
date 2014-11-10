@@ -28,6 +28,7 @@
 #include "gfx/gfxTransformSaver.h"
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
+#include "console/SimXMLDocument.h"
 
 #if 0 // Enable when enabling debug rendering below.
 #include "scene/sceneRenderState.h"
@@ -261,9 +262,9 @@ bool ScenePolyhedralObject< Base, P >::writeField( StringTableEntry name, const 
 //-----------------------------------------------------------------------------
 
 template< typename Base, typename P >
-void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop )
+void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop, bool XMLOutput  )
 {
-   Parent::writeFields( stream, tabStop );
+	Parent::writeFields( stream, tabStop, XMLOutput );
 
    // If the polyhedron is the same as our object box,
    // don't bother writing out the planes and points.
@@ -271,7 +272,8 @@ void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop 
    if( mIsBox )
       return;
 
-   stream.write( 2, "\r\n" );
+   if(!XMLOutput)
+	   stream.write( 2, "\r\n" );
 
    // Write all planes.
    
@@ -280,9 +282,22 @@ void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop 
    {
       const PlaneF& plane = mPolyhedron.getPlanes()[ i ];
 
-      stream.writeTabs( tabStop );
-
       char buffer[ 1024 ];
+
+
+	  /// For XML Output
+	  if(XMLOutput)
+	  {
+		  dSprintf( buffer, 1024, "%g %g %g %g", plane.x, plane.y, plane.z, plane.d );
+		  getcurrentXML()->pushNewElement("Plane");
+		  getcurrentXML()->addData( buffer );
+		  getcurrentXML()->popElement();
+		  continue;
+	  }
+     
+	  /// For Stream Output
+	  stream.writeTabs( tabStop );
+
       dSprintf( buffer, sizeof( buffer ), "plane = \"%g %g %g %g\";",
          plane.x, plane.y, plane.z, plane.d
       );
@@ -297,9 +312,23 @@ void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop 
    {
       const Point3F& point = mPolyhedron.getPoints()[ i ];
 
-      stream.writeTabs( tabStop );
-
       char buffer[ 1024 ];
+
+
+	  /// For XML Output
+	  if(XMLOutput)
+	  {
+		  dSprintf( buffer, 1024, "%g %g %g", point.x, point.y, point.z );
+		  getcurrentXML()->pushNewElement("point");
+		  getcurrentXML()->addData( buffer );
+		
+        getcurrentXML()->popElement();
+		  continue;
+	  }
+
+	  /// For Stream Output
+	  stream.writeTabs( tabStop );
+
       dSprintf( buffer, sizeof( buffer ), "point = \"%g %g %g\";",
          point.x, point.y, point.z
       );
@@ -313,10 +342,25 @@ void ScenePolyhedralObject< Base, P >::writeFields( Stream& stream, U32 tabStop 
    for( U32 i = 0; i < numEdges; ++ i )
    {
       const PolyhedronData::Edge& edge = mPolyhedron.getEdges()[ i ];
+	 
+	  char buffer[ 1024 ];
 
-      stream.writeTabs( tabStop );
 
-      char buffer[ 1024 ];
+	  /// For XML Output
+	  if(XMLOutput)
+	  {
+		  dSprintf( buffer, 1024, "%i %i %i %i", edge.face[ 0 ], edge.face[ 1 ],
+											edge.vertex[ 0 ], edge.vertex[ 1 ] );
+		  getcurrentXML()->pushNewElement("edge");
+		  getcurrentXML()->addData( buffer );
+		  getcurrentXML()->popElement();
+		  continue;
+	  }
+     // @Copyright end
+
+	  /// For Stream Output
+	  stream.writeTabs( tabStop );
+
       dSprintf( buffer, sizeof( buffer ), "edge = \"%i %i %i %i\";",
          edge.face[ 0 ], edge.face[ 1 ],
          edge.vertex[ 0 ], edge.vertex[ 1 ]

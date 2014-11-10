@@ -45,33 +45,6 @@ ConsoleDocClass( GuiGradientSwatchCtrl,
    "@internal"
 );
 
-IMPLEMENT_CALLBACK( GuiGradientSwatchCtrl, onMouseDown, void, (),(),
-   "@brief Called whenever the left mouse button has entered the down state while in this control.\n\n"
-   "@tsexample\n"
-   "// The left mouse button is down on the control, causing the callback to occur.\n"
-   "GuiGradientSwatchCtrl::onMouseDown(%this)\n"
-   "	{\n"
-   "		// Code to run when the callback occurs\n"
-   "	}\n"
-   "@endtsexample\n\n"
-   "@see GuiControl\n"
-   "@see GuiSwatchButtonCtrl\n\n"
-   "@internal"
-);
-
-IMPLEMENT_CALLBACK( GuiGradientSwatchCtrl, onDoubleClick, void, (),(),
-   "@brief Called whenever the left mouse button performs a double click while in this control.\n\n"
-   "@tsexample\n"
-   "// The left mouse button has performed a double click on the control, causing the callback to occur.\n"
-   "GuiGradientSwatchCtrl::onDoubleClick(%this)\n"
-   "	{\n"
-   "		// Code to run when the callback occurs\n"
-   "	}\n"
-   "@endtsexample\n\n"
-   "@see GuiControl\n"
-   "@see GuiSwatchButtonCtrl\n\n"
-   "@internal"
-);
 
 
 GuiGradientSwatchCtrl::GuiGradientSwatchCtrl()
@@ -109,7 +82,7 @@ void GuiGradientSwatchCtrl::onRender( Point2I offset, const RectI &updateRect )
       renderRect.inset( 1, 1 );      
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
 	
    // Draw background transparency grid texture...
    if ( mGrid.isValid() )
@@ -243,6 +216,17 @@ void GuiGradientCtrl::initPersistFields()
    endGroup("ColorPicker");
 
    Parent::initPersistFields();
+   removeField( "controlFontColor");
+
+   removeField("backgroundColor" );
+
+   removeField("controlFillColor");
+
+   removeField("contextFillColor");
+
+   removeField( "contextFontColor" );
+
+   removeField( "contextBackColor" );
 }
 
 bool GuiGradientCtrl::onAdd()
@@ -270,6 +254,65 @@ void GuiGradientCtrl::inspectPostApply()
 
    // Apply any transformations set in the editor
    Parent::inspectPostApply();
+}
+void GuiGradientCtrl::copyProfileSettings()
+{
+	if(!mProfileSettingsCopied)
+	{
+		mBaseColorCopy = mBaseColor;
+		mPickColorCopy = mPickColor;
+		
+		Parent::copyProfileSettings();
+	}
+}
+
+void GuiGradientCtrl::resetProfileSettings()
+{
+	mBaseColor = mBaseColorCopy;
+	mPickColor = mPickColorCopy;
+
+	colorWhite = ColorF(1.,1.,1.);
+	colorWhiteBlend = ColorF(1.,1.,1.,.75);
+	colorBlack = ColorF(.0,.0,.0);
+	colorAlpha = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
+	colorAlphaW = ColorF(1.0f, 1.0f, 1.0f, 0.0f);
+	
+	Parent::resetProfileSettings();
+}
+
+void GuiGradientCtrl::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   //Set the alpha value
+   if(mBaseColor)
+	   mBaseColor.alpha = mBaseColorCopy.alpha *mRenderAlpha;
+   if(mPickColor)
+	   mPickColor.alpha = mPickColorCopy.alpha * mRenderAlpha;
+
+   Vector<ColorRange>::iterator i;
+   for( i = mColorRange.begin(); i != mColorRange.end(); i++ )
+	   i->color.alpha = mRenderAlpha;
+
+   colorWhite.alpha *= mRenderAlpha;
+   colorWhiteBlend.alpha *= mRenderAlpha;
+   colorAlpha.alpha *= mRenderAlpha;
+   colorAlphaW.alpha *= mRenderAlpha;
+   colorBlack.alpha *= mRenderAlpha;
+}
+
+void GuiGradientCtrl::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "baseColor" ) || !dStricmp( slotName, "pickColor" ) )
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+	
+		if( !dStricmp( slotName, "baseColor" ) )
+			mBaseColorCopy = color;
+		else
+			mPickColorCopy = color;
+	}
 }
 
 void GuiGradientCtrl::onRender(Point2I offset, const RectI& updateRect)
@@ -421,26 +464,33 @@ void GuiGradientCtrl::onMouseDown(const GuiEvent &event)
 	addColorRange( globalToLocalCoord(event.mousePoint), ColorF(tmp) );
    
    mMouseDown = true;
+
+   Parent::onMouseDown(event);
 }
 
-void GuiGradientCtrl::onMouseUp(const GuiEvent &)
+void GuiGradientCtrl::onMouseUp(const GuiEvent &event)
 {
    //if we released the mouse within this control, perform the action
 	if (mActive && mMouseDown ) 
       mMouseDown = false;
    
    mouseUnlock();
+
+   Parent::onMouseUp(event);
 }
 
 void GuiGradientCtrl::onMouseEnter(const GuiEvent &event)
 {
    mMouseOver = true;
+   // fade control
+   fadeControl();
 }
 
 void GuiGradientCtrl::onMouseLeave(const GuiEvent &)
 {
    // Reset state
    mMouseOver = false;
+   smCapturedControl = this;
 }
 
 void GuiGradientCtrl::setupDefaultRange()

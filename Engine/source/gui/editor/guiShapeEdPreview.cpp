@@ -58,6 +58,9 @@ IMPLEMENT_CALLBACK( GuiShapeEdPreview, onThreadPosChanged, void, ( F32 pos, bool
    "Called when the position of the active thread has changed, such as during "
    "playback." );
 
+IMPLEMENT_CALLBACK( GuiShapeEdPreview, onDetailChanged, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiShapeEdPreview, onNodeSelected, void, ( const char* nodeIdx ), ( nodeIdx), "" );
+IMPLEMENT_CALLBACK( GuiShapeEdPreview, onEditNodeTransform, void, ( const char* node, const char* txfm, const char* gizmoID ), ( node, txfm, gizmoID ), "" );
 
 GuiShapeEdPreview::GuiShapeEdPreview()
 :  mOrbitDist( 5.0f ),
@@ -919,7 +922,7 @@ void GuiShapeEdPreview::handleMouseDown(const GuiEvent& event, GizmoMode mode)
       if ( selected != mSelectedNode )
       {
          mSelectedNode = selected;
-         Con::executef( this, "onNodeSelected", Con::getIntArg( mSelectedNode ));
+         onNodeSelected_callback( Con::getIntArg( mSelectedNode ));
       }
    }
 
@@ -1029,7 +1032,7 @@ void GuiShapeEdPreview::handleMouseDragged(const GuiEvent& event, GizmoMode mode
             dSprintf(buffer, sizeof(buffer), "%g %g %g %g %g %g %g",
                pos.x, pos.y, pos.z, aa.axis.x, aa.axis.y, aa.axis.z, aa.angle);
 
-            Con::executef(this, "onEditNodeTransform", name, buffer, Con::getIntArg(mGizmoDragID));
+            onEditNodeTransform_callback( name, buffer, Con::getIntArg(mGizmoDragID) );
          }
       }
    }
@@ -1248,7 +1251,7 @@ void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
    if ( mCurrentDL != currentDetail )
    {
       mCurrentDL = currentDetail;
-      Con::executef( this, "onDetailChanged");
+      onDetailChanged_callback();
    }
 }
 
@@ -1603,6 +1606,9 @@ void GuiShapeEdPreview::renderNodes() const
 
 void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 {
+   if(mModel->mNodeTransforms.size() <= index || index < 0)
+      return; 
+
    const Point3F xAxis( 1.0f,  0.15f, 0.15f );
    const Point3F yAxis( 0.15f, 1.0f,  0.15f );
    const Point3F zAxis( 0.15f, 0.15f, 1.0f  );
@@ -1626,6 +1632,9 @@ void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 
 void GuiShapeEdPreview::renderNodeName(S32 index, const ColorF& textColor) const
 {
+   if(index < 0 || index >= mModel->getShape()->nodes.size() || index >= mProjectedNodes.size())
+      return;
+
    const TSShape::Node& node = mModel->getShape()->nodes[index];
    const String& nodeName = mModel->getShape()->getName( node.nameIndex );
 

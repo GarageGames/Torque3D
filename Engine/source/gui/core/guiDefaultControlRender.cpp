@@ -143,7 +143,7 @@ void renderBorder( const RectI &bounds, GuiControlProfile *profile )
       // Taken from the 'Skinnable GUI Controls in TGE' resource by Justin DuJardin       
       if(profile->mBitmapArrayRects.size() >= 8)
       {
-         drawer->clearBitmapModulation();
+         //drawer->clearBitmapModulation();
 
          RectI destRect;
          RectI stretchRect;
@@ -271,7 +271,7 @@ void renderSizableBitmapBordersFilled( const RectI &bounds, S32 baseMultiplier, 
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
 
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
 
    if(profile->mBitmapArrayRects.size() >= (numBitmaps * baseMultiplier))
    {
@@ -372,7 +372,7 @@ void renderSizableBitmapBordersFilledIndex( const RectI &bounds, S32 startIndex,
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
 
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
    if(profile->mBitmapArrayRects.size() >= (startIndex + numBitmaps))
    {
       RectI destRect;
@@ -468,7 +468,7 @@ void renderFixedBitmapBordersFilled( const RectI &bounds, S32 baseMultiplier, Gu
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
 
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
    if(profile->mBitmapArrayRects.size() >= (numBitmaps * baseMultiplier))
    {
       RectI destRect;
@@ -513,7 +513,7 @@ void renderFixedBitmapBordersFilledIndex( const RectI &bounds, S32 startIndex, G
    S32 borderRight =       2 + startIndex;
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
    if(profile->mBitmapArrayRects.size() >= (startIndex + numBitmaps))
    {
       RectI destRect;

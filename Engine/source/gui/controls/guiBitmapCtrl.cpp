@@ -56,7 +56,8 @@ ConsoleDocClass( GuiBitmapCtrl,
 GuiBitmapCtrl::GuiBitmapCtrl(void)
  : mBitmapName(),
    mStartPoint( 0, 0 ),
-   mWrap( false )
+   mWrap( false ),
+   mChangeBitmap( false )
 {	
 }
 
@@ -83,6 +84,13 @@ void GuiBitmapCtrl::initPersistFields()
          "If true, the bitmap is tiled inside the control rather than stretched to fit." );
       
    endGroup( "Bitmap" );
+   addGroup( "Context Menu Options" );
+
+		addProtectedField("setBitmap", TypeBool, NULL,
+			&_setBitmapControl, &_getBitmapControl,
+			"Allows the user to set the bitmap of the control in the game." );
+
+	endGroup( "Context Menu Options" );
 
    Parent::initPersistFields();
 }
@@ -168,7 +176,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    if (mTextureObject)
    {
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
 		if(mWrap)
 		{
          // We manually draw each repeat because non power of two textures will 

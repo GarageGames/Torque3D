@@ -298,6 +298,9 @@ void GuiMLTextCtrl::initPersistFields()
    endGroup( "Text" );
    
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 DefineEngineMethod( GuiMLTextCtrl, setAlpha, void, (F32 alphaVal),,
@@ -440,7 +443,7 @@ void GuiMLTextCtrl::onRender(Point2I offset, const RectI& updateRect)
       if(!screenBounds.overlaps(updateRect))
          continue;
 
-      drawer->clearBitmapModulation();
+      //drawer->clearBitmapModulation();
       drawer->drawBitmap(walk->bitmap->bitmapObject, screenBounds.point);
       //GFX->drawRectFill(screenBounds, mProfile->mFillColor);
    }
@@ -460,6 +463,18 @@ void GuiMLTextCtrl::onRender(Point2I offset, const RectI& updateRect)
 
       for(Atom *awalk = lwalk->atomList; awalk; awalk = awalk->next)
       {
+      if( mControlFontColor != ColorI::ZERO)
+          {
+            awalk->style->color = mControlFontColor ;
+            awalk->style->color.alpha = mControlFontColor.alpha * mRenderAlpha;
+          }
+          else
+            awalk->style->color.alpha = 255 * mRenderAlpha;
+          awalk->style->linkColor.alpha = mRenderAlpha * 255;
+          awalk->style->linkColorHL.alpha =  mRenderAlpha * 255;
+
+          // Font size
+          awalk->style->font->size = mControlFontSize;
          if(!mSelectionActive || mSelectionEnd < awalk->textStart || mSelectionStart >= awalk->textStart + awalk->len)
             drawAtomText(false, awalk->textStart, awalk->textStart + awalk->len, awalk, lwalk, offset);
          else

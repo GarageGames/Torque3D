@@ -44,6 +44,8 @@ public:
    DECLARE_CATEGORY( "Gui Other" );
    DECLARE_DESCRIPTION( "Draws a box with handles for the user to manipulate.");
 
+   DECLARE_CALLBACK( void, onHandleRectChange, () );
+
    GuiRectHandles();
    virtual ~GuiRectHandles();
 

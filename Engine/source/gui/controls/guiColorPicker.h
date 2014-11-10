@@ -94,7 +94,7 @@ class GuiColorPickerCtrl : public GuiControl
    
    Point2I mSelectorPos;	///< Current position of the selector
    bool mPositionChanged;	///< Current position has changed since last render?
-   bool mMouseOver;		///< Mouse is over?
+   //bool mMouseOver;		///< Mouse is over?
    bool mMouseDown;		///< Mouse button down?
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
@@ -107,6 +107,14 @@ class GuiColorPickerCtrl : public GuiControl
    static ColorI mColorRange[7]; ///< Color range for pHorizColorRange and pVertColorRange
    /// @}
 
+   ColorF mPickColorCopy;
+   ColorF mBaseColorCopy;
+
+   void applyProfileSettings();
+
+   void copyProfileSettings();
+
+   void resetProfileSettings();
   public:   
    
    DECLARE_CONOBJECT(GuiColorPickerCtrl);
@@ -115,6 +123,7 @@ class GuiColorPickerCtrl : public GuiControl
    GuiColorPickerCtrl();
 
    static void initPersistFields();
+   void onStaticModified( const char *slotName, const char *newValue );
    void onRender(Point2I offset, const RectI &updateRect);
    bool mShowReticle;       ///< Show reticle on render
    /// @name Color Value Functions

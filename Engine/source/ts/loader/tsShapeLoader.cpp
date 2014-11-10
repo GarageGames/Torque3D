@@ -46,6 +46,7 @@ const F64 TSShapeLoader::MaxFrameRate = 60.0f;
 const F64 TSShapeLoader::AppGroundFrameRate = 10.0f;
 Torque::Path TSShapeLoader::shapePath;
 
+IMPLEMENT_GLOBAL_CALLBACK( updateTSShapeLoadProgress, void, ( const char * progress, const char * msg ), ( progress, msg ), "");
 Vector<TSShapeLoader::ShapeFormat> TSShapeLoader::smFormats;
 
 //------------------------------------------------------------------------------
@@ -125,7 +126,7 @@ void TSShapeLoader::updateProgress(S32 major, const char* msg, S32 numMinor, S32
       progressMsg = avar("%s (%d of %d)", msg, minor + 1, numMinor);
    }
 
-   Con::executef("updateTSShapeLoadProgress", Con::getFloatArg(progress), progressMsg);
+   updateTSShapeLoadProgress_callback( Con::getFloatArg(progress), progressMsg );
 }
 
 //-----------------------------------------------------------------------------

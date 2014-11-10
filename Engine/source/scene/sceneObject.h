@@ -744,6 +744,9 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
 
       DECLARE_CONOBJECT( SceneObject );
 
+      DECLARE_CALLBACK( void, onEditorRender, (const char * editor, const char * selected, const char * expanded) );
+
+
    private:
 
       SceneObject( const SceneObject& ); ///< @deprecated disallowed

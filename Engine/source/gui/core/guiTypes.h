@@ -396,6 +396,9 @@ public:
    ColorI mBevelColorHL;                          ///< Used for the high-light part of the bevel
    ColorI mBevelColorLL;                          ///< Used for the low-light part of the bevel
 
+   //ControlBoundAddition
+   StringTableEntry mBoundControl;					///< Binding a profile to a control
+
    // font members
    StringTableEntry  mFontType;                    ///< Font face name for the control
    S32               mFontSize;                    ///< Font size for the control

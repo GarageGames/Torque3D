@@ -25,6 +25,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDrawUtil.h"
 
 
@@ -34,6 +35,8 @@ class GuiIdleCamFadeBitmapCtrl : public GuiBitmapCtrl
 public:
    DECLARE_CONOBJECT(GuiIdleCamFadeBitmapCtrl);
    DECLARE_CATEGORY( "Gui Images" );
+
+   DECLARE_CALLBACK( void, click, () );
 
    U32 wakeTime;
    bool done;
@@ -59,11 +62,11 @@ public:
    }
    void onMouseDown(const GuiEvent &)
    {
-      Con::executef(this, "click");
+      click_callback();
    }
    bool onKeyDown(const GuiEvent &)
    {
-      Con::executef(this, "click");
+      click_callback();
       return true;
    }
    bool onWake()
@@ -168,6 +171,9 @@ public:
 };
 
 IMPLEMENT_CONOBJECT(GuiIdleCamFadeBitmapCtrl);
+
+IMPLEMENT_CALLBACK( GuiIdleCamFadeBitmapCtrl, click, void, (), (), "" );
+
 
 ConsoleDocClass( GuiIdleCamFadeBitmapCtrl,
 				"@brief GUI that will fade the current view in and out.\n\n"

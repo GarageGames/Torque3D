@@ -61,8 +61,8 @@ IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseUp, void, (), (),
    "@note To trigger actions, better use onClick() since onMouseUp() will also be called when the mouse was "
       "not originally pressed on the button." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onClick, void, (), (),
-   "Called when the primary action of the button is triggered (e.g. by a left mouse click)." );
+//IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onClick, void, (), (),
+//   "Called when the primary action of the button is triggered (e.g. by a left mouse click)." );
 
 IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onDoubleClick, void, (), (),
    "Called when the left mouse button is double-clicked on the button." );
@@ -132,10 +132,20 @@ void GuiButtonBaseCtrl::initPersistFields()
          "Button behavior type.\n" );
       addField( "useMouseEvents", TypeBool, Offset(mUseMouseEvents, GuiButtonBaseCtrl),
          "If true, mouse events will be passed on to script.  Default is false.\n" );
+	  addProtectedField( "changeTexture", TypeImageFilename, Offset(mControlTexture, GuiButtonBaseCtrl),
+		  &setProtectedTexture, &getProtectedTexture,
+         "Changes the texture of the control" );
       
    endGroup( "Button" );
    
    Parent::initPersistFields();
+   removeField( "contextFillColor");
+
+   removeField( "controlFillColor" );
+
+   removeField( "moveControl" );
+
+   removeField( "lockControl" );
 }
 
 //-----------------------------------------------------------------------------
@@ -171,6 +181,21 @@ void GuiButtonBaseCtrl::setTextID(const char *id)
 		mButtonTextID = StringTable->insert(id);
 		setTextID(n);
 	}
+}
+
+//-----------------------------------------------------------------------------
+
+bool GuiButtonBaseCtrl::setProtectedTexture(void* object, const char* index, const char* data)
+{
+	static_cast<GuiControl* >( object )->setControlTexture( (data) ); 
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+
+const char* GuiButtonBaseCtrl::getProtectedTexture(void* object, const char* data)
+{
+	return static_cast<GuiControl* >( object )->getControlTextureFile( ); 
 }
 
 //-----------------------------------------------------------------------------
@@ -297,6 +322,9 @@ void GuiButtonBaseCtrl::onMouseEnter(const GuiEvent &event)
 
       mMouseOver = true;
    }
+
+   /// Fade Control
+   fadeControl();
 }
 
 //-----------------------------------------------------------------------------
@@ -309,7 +337,9 @@ void GuiButtonBaseCtrl::onMouseLeave(const GuiEvent &)
       onMouseLeave_callback();
    if( isMouseLocked() )
       mDepressed = false;
-   mMouseOver = false;
+
+   smCapturedControl = this;
+   mMouseOver = false;     
 }
 
 //-----------------------------------------------------------------------------
@@ -362,7 +392,7 @@ void GuiButtonBaseCtrl::onMouseDragged( const GuiEvent& event )
          onMouseDragged_callback();
    }
       
-   Parent::onMouseDragged( event );
+   //Parent::onMouseDragged( event );
 }
 
 //-----------------------------------------------------------------------------
@@ -449,7 +479,7 @@ void GuiButtonBaseCtrl::onAction()
    if ( mConsoleVariable[0] )
       Con::setBoolVariable( mConsoleVariable, mStateOn );
 
-    onClick_callback();
+    onClick_callback("");
     Parent::onAction();
 }
 

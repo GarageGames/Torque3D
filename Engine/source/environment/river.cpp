@@ -52,6 +52,7 @@
 #include "postFx/postEffect.h"
 #include "math/util/matrixSet.h"
 #include "environment/nodeListManager.h"
+#include "console/SimXMLDocument.h"
 
 ConsoleDocClass( River,
    "@brief A water volume defined by a 3D spline.\n\n"
@@ -748,22 +749,36 @@ SimSet* River::getServerSet()
    return smServerRiverSet;
 }
 
-void River::writeFields( Stream &stream, U32 tabStop )
+void River::writeFields( Stream &stream, U32 tabStop, bool XMLOutput  )
 {
-   Parent::writeFields( stream, tabStop );
+   Parent::writeFields( stream, tabStop, XMLOutput );
 
    // Now write all nodes
 
-   stream.write(2, "\r\n");   
+
+   if(!XMLOutput) 
+      stream.write(2, "\r\n");   
 
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
       const RiverNode &node = mNodes[i];
 
-      stream.writeTabs(tabStop);
-
       char buffer[1024];
       dMemset( buffer, 0, 1024 );
+     /// For XML Output
+     if(XMLOutput)
+     {
+        dSprintf( buffer, 1024, "%f %f %f %f %f %f %f %f", node.point.x, node.point.y, node.point.z, 
+                                                                     node.width, 
+                                                                     node.depth, 
+                                                                     node.normal.x, node.normal.y, node.normal.z );
+        getcurrentXML()->pushNewElement( "Node" );
+        getcurrentXML()->addData( buffer );
+        getcurrentXML()->popElement();
+        continue;
+     }
+     /// For Stream Output
+     stream.writeTabs(tabStop);
       dSprintf( buffer, 1024, "Node = \"%f %f %f %f %f %f %f %f\";", node.point.x, node.point.y, node.point.z, 
                                                                      node.width, 
                                                                      node.depth, 

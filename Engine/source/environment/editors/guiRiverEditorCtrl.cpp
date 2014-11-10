@@ -24,6 +24,7 @@
 #include "environment/editors/guiRiverEditorCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "environment/river.h"
 #include "renderInstance/renderPassManager.h"
 #include "collision/collision.h"
@@ -49,6 +50,12 @@ ConsoleDocClass( GuiRiverEditorCtrl,
    "Editor use only.\n\n"
    "@internal"
 );
+
+IMPLEMENT_CALLBACK(GuiRiverEditorCtrl, onNodeModified, void, (const char* nodeIdx), (nodeIdx), "");
+IMPLEMENT_CALLBACK(GuiRiverEditorCtrl, onNodeSelected, void, (const char* nodeIdx), (nodeIdx), "");
+IMPLEMENT_CALLBACK(GuiRiverEditorCtrl, paletteSync, void, (const char* mode), (mode), "");
+IMPLEMENT_CALLBACK(GuiRiverEditorCtrl, onRiverSelected, void, (const char* road), (road), "");
+IMPLEMENT_CALLBACK(GuiRiverEditorCtrl, createRiver, StringTableEntry, (), (), "");
 
 GuiRiverEditorCtrl::GuiRiverEditorCtrl()
  : mDefaultNormal( 0, 0, 1 ),
@@ -434,7 +441,7 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
          return;
       }
 
-      const char *res = Con::executef( this, "createRiver" );
+      const char *res = createRiver_callback();
 
       River *newRiver;
       if ( !Sim::findObject( res, newRiver ) )
@@ -726,7 +733,7 @@ void GuiRiverEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       mSelRiver->setNode( pos, scale.x, scale.z, normal, mSelNode );
       mIsDirty = true;
    }
-   Con::executef( this, "onNodeModified", Con::getIntArg(mSelNode) );	
+   onNodeModified_callback( Con::getIntArg(mSelNode) );	
    /*
    // If we are just starting a new drag,
    // we need to save the starting screen position of the mouse,
@@ -1144,7 +1151,7 @@ void GuiRiverEditorCtrl::deleteSelectedRiver( bool undoAble )
    {
       mSelRiver->deleteObject();
       mIsDirty = true;
-      Con::executef( this, "onRiverSelected" );
+      onRiverSelected_callback("");
       mSelNode = -1;
 
       return;
@@ -1170,7 +1177,7 @@ void GuiRiverEditorCtrl::deleteSelectedRiver( bool undoAble )
    }
 
    // ScriptCallback with 'NULL' parameter for no River currently selected.
-   Con::executef( this, "onRiverSelected" );
+   onRiverSelected_callback("");
 
    // Clear the SelectedNode (it has been deleted along with the River).  
 	setSelectedNode( -1 );
@@ -1184,7 +1191,7 @@ void GuiRiverEditorCtrl::setMode( String mode, bool sourceShortcut = false )
    mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", mode );
+    { paletteSync_callback( mode ); }
 }
 
 void GuiRiverEditorCtrl::setSelectedRiver( River *river )
@@ -1192,9 +1199,9 @@ void GuiRiverEditorCtrl::setSelectedRiver( River *river )
    mSelRiver = river;
 
    if ( mSelRiver != NULL )
-      Con::executef( this, "onRiverSelected", river->getIdString() );
+   { onRiverSelected_callback( river->getIdString() ); }
    else
-      Con::executef( this, "onRiverSelected" );
+   { onRiverSelected_callback(""); }
 
 	if ( mSelRiver != river )
       setSelectedNode(-1);
@@ -1286,9 +1293,10 @@ void GuiRiverEditorCtrl::setSelectedNode( S32 node )
    }
    
    if ( mSelNode != -1 )
-      Con::executef( this, "onNodeSelected", Con::getIntArg(mSelNode) );
+   { onNodeSelected_callback( Con::getIntArg(mSelNode) ); }
    else
-      Con::executef( this, "onNodeSelected", Con::getIntArg(-1) );
+   { onNodeSelected_callback( Con::getIntArg(-1) ); }
+      
 }
 
 void GuiRiverEditorCtrl::submitUndo( const UTF8 *name )

@@ -34,9 +34,19 @@
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
 #include "core/fileObject.h"
+#include "console/SimXMLDocument.h"
+#include "core/strings/stringUnit.h"
 
 
 IMPLEMENT_CONOBJECT( SimObject );
+
+IMPLEMENT_CALLBACK(SimObject, onDefineFieldTypes, void, (), (), "");
+IMPLEMENT_CALLBACK(SimObject, setInfo, void, (const char* info), (info), "");
+IMPLEMENT_CALLBACK(SimObject, setSelectionObjectsByCount, void, (const char* count), (count), "");
+IMPLEMENT_CALLBACK(SimObject, onClick, void, (const char* SelectedidString), (SelectedidString),"");
+IMPLEMENT_CALLBACK(SimObject, onDblClick, void, (const char* SelectedidString), (SelectedidString),"");
+IMPLEMENT_CALLBACK(SimObject, onEndDrag, void, (const char* obj), (obj), "");
+IMPLEMENT_CALLBACK(SimObject, onGuiUpdate, void, (const char* text), (text), "");
 
 // See full description in the new CHM manual
 ConsoleDocClass( SimObject,
@@ -47,7 +57,7 @@ ConsoleDocClass( SimObject,
 
 bool SimObject::smForceId = false;
 SimObjectId SimObject::smForcedId = 0;
-
+SimXMLDocument* SimObject::mXMLDocument = NULL;
 
 namespace Sim
 {
@@ -167,6 +177,9 @@ void SimObject::initPersistFields()
       addProtectedField( "locked", TypeBool, NULL,
          &_setLocked, &_getLocked,
          "Whether the object can be edited." );
+	  addProtectedField( "editable", TypeBool, NULL,  
+		  &_setEditable, &_getEditable,
+		  "Whether the object can be edited in the game." );
    
    endGroup( "Editing" );
    
@@ -266,7 +279,7 @@ bool SimObject::writeField(StringTableEntry fieldname, const char* value)
 
 //-----------------------------------------------------------------------------
 
-void SimObject::writeFields(Stream &stream, U32 tabStop)
+void SimObject::writeFields(Stream &stream, U32 tabStop, bool XMLOutput )
 {
    // Write static fields.
    
@@ -318,9 +331,47 @@ void SimObject::writeFields(Stream &stream, U32 tabStop)
             val = fnBuf;
          }
 
+		 
+
+		 if(f->elementCount == 1)
+		 {
+
+			 /// For XML Output
+			 if(XMLOutput)
+			 {
+				 mXMLDocument->pushNewElement("Setting");
+				 mXMLDocument->setAttribute("name",f->pFieldname);
+				 mXMLDocument->addData(val);
+				mXMLDocument->popElement();
+				continue;
+			 }
+
+            dSprintf(expandedBuffer, expandedBufferSize, "%s = \"", f->pFieldname);
+		 }
+         else
+		 {
+
+
+			 /// For XML Output
+			 if(XMLOutput)
+			 {
+				 mXMLDocument->pushNewElement("Setting");
+				 mXMLDocument->setAttribute("name", f->pFieldname);
+				char buffer[1024];
+				dSprintf(buffer, sizeof(buffer), "%d", j);
+				mXMLDocument->setAttribute("id",buffer);
+				mXMLDocument->addData(val);
+				mXMLDocument->popElement();
+				continue;
+			 }
+
+            dSprintf(expandedBuffer, expandedBufferSize, "%s[%d] = \"", f->pFieldname, j);
+		 }
+
          expandEscape((char*)expandedBuffer + dStrlen(expandedBuffer), val);
          dStrcat(expandedBuffer, "\";\r\n");
 
+		 /// For Stream Output
          stream.writeTabs(tabStop);
          stream.write(dStrlen(expandedBuffer),expandedBuffer);
       }
@@ -329,7 +380,8 @@ void SimObject::writeFields(Stream &stream, U32 tabStop)
    // Write dynamic fields, if enabled.
    
    if(mFieldDictionary && mCanSaveFieldDictionary)
-      mFieldDictionary->writeFields(this, stream, tabStop);
+		   mFieldDictionary->writeFields(this, stream, tabStop, XMLOutput);
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -343,6 +395,28 @@ void SimObject::write(Stream &stream, U32 tabStop, U32 flags)
    if((flags & SelectedOnly) && !isSelected())
       return;
 
+   /// For XML Output
+   if( flags & XmlOutput )
+   {
+	   mXMLDocument->pushNewElement("Group");
+
+	   mXMLDocument->setAttribute("name", getClassName());
+	   mXMLDocument->setAttribute("fileName", getFilename());
+	   char buffer[1024];
+	   dSprintf(buffer, sizeof(buffer), "%d", getDeclarationLine());
+	   mXMLDocument->setAttribute("lineNumber", buffer);
+	   mXMLDocument->pushNewElement("Setting");
+	   mXMLDocument->setAttribute("name", "name");
+	   if(getName())
+		   mXMLDocument->addData(getName());
+	   else
+		   mXMLDocument->addData(" ");
+	   mXMLDocument->popElement();
+	   writeFields( stream, tabStop + 1, true);
+
+	   mXMLDocument->popElement();
+	   return;
+   }
    stream.writeTabs(tabStop);
    char buffer[1024];
    dSprintf(buffer, sizeof(buffer), "new %s(%s) {\r\n", getClassName(), getName() && !(flags & NoName) ? getName() : "");
@@ -426,6 +500,24 @@ bool SimObject::save(const char *pcFileName, bool bOnlySelected, const char *pre
 }
 
 //-----------------------------------------------------------------------------
+bool SimObject::saveToXML( const char *profileName, const char *fileName )
+{
+	mXMLDocument = new SimXMLDocument();
+	mXMLDocument->registerObject();
+	mXMLDocument->addHeader();
+	mXMLDocument->pushNewElement( profileName );
+
+	FileStream* stream;
+	write(*stream, 0, XmlOutput);
+
+	mXMLDocument->popElement(  );
+
+	char fileNameBuffer[32];
+	Con::expandScriptFilename( fileNameBuffer, sizeof(fileNameBuffer), fileName );
+	mXMLDocument->saveFile( fileNameBuffer );
+
+	return true;
+}
 
 SimPersistID* SimObject::getOrCreatePersistentId()
 {
@@ -1045,6 +1137,34 @@ SimObject* SimObject::clone()
 SimObject* SimObject::deepClone()
 {
    return clone();
+}
+
+void SimObject::signal(const char* fieldName, const char* args)
+{
+	const char* data = getDataField( fieldName, NULL );
+	if(data == NULL || strlen(data) == 0)
+	{
+		//Con::warnf("Invalid dynamic field index %s for object %s", fieldName, getName());	
+		return;
+	}	
+
+	char chunk[512];
+	char argsParsed[512] = "";
+	if(args != NULL)
+	{		
+		int count = StringUnit::getUnitCount(args, " \t\n");
+		for(int i = 0; i < count; i++)
+		{
+			char str[10];
+			dSprintf(str, 512, ", %%arg%d", i);
+			strcat(argsParsed, str);
+		}
+	}
+
+	dSprintf(chunk, 512, " function SimObjectFunctionChunk(%%this %s) { %s } SimObjectFunctionChunk(%d, %s); ", argsParsed, data, getId(), args);
+
+	Con::evaluate(chunk);
+
 }
 
 //=============================================================================
@@ -1741,6 +1861,13 @@ void SimObject::setLocked( bool b )
 }
 
 //-----------------------------------------------------------------------------
+void SimObject::setEditable( bool b )
+{
+	if( b )
+		mFlags.set( Editable );
+   else
+      mFlags.clear( Editable );
+}
 
 void SimObject::setHidden( bool b )
 {
@@ -2112,6 +2239,21 @@ DefineEngineMethod( SimObject, setLocked, void, ( bool value ), ( true ),
 
 //-----------------------------------------------------------------------------
 
+DefineEngineMethod( SimObject, setEditable, void, ( bool value ), ( true ),
+   "Editable/Non-editable object in the game.\n"
+   "@param value If true, the object will be editable; if false, the object will not be editable." )
+{
+	object->setEditable( value );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( SimObject, isEditable, bool, ( ), ,
+   "Editable/Non-editable object in the game.\n"
+   "@return If the object is editable or not." )
+{
+	return object->isEditable( );
+}
 DefineEngineMethod( SimObject, setHidden, void, ( bool value ), ( true ),
    "Hide/unhide the object.\n"
    "@param value If true, the object will be hidden; if false, the object will be unhidden." )
@@ -2746,7 +2888,29 @@ DefineConsoleMethod( SimObject, getField, const char*, ( S32 index ),,
    return "";
 }
 
+ConsoleMethod(SimObject, signal, void, 3, 4, "evaluates strings stored in dynamic fields take a string as parameter")
+{
+	const char *fieldName = StringTable->insert( argv[2] );
+	object->signal(fieldName, argc > 3 ? argv[3] : NULL);
+}
+
+DefineConsoleMethod(SimObject, setEnabled, void, (bool enabled), , "(enabled)")
+{
+	object->setEnabled(enabled);
+}
+
+DefineConsoleMethod(SimObject, isEnabled, bool, (), , "()")
+{
+	return object->isEnabled();
+}
 //-----------------------------------------------------------------------------
+DefineConsoleMethod( SimObject, saveToXML, bool, ( const char *profileName, const char *fileName ),,
+   "Retrieve the value of a static field by index.\n"
+   "@param index The index of the static field.\n"
+   "@return The value of the static field with the given index or \"\"." )
+{
+	return object->saveToXML( profileName, fileName );
+}
 
 #ifdef TORQUE_DEBUG
 

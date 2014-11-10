@@ -40,7 +40,7 @@ struct ObjectRenderInst;
 class SceneManager;
 class SceneRenderState;
 class BaseMatInstance;
-
+class River;
 
 class GuiRiverEditorCtrl : public EditTSCtrl
 {
@@ -66,6 +66,12 @@ class GuiRiverEditorCtrl : public EditTSCtrl
       ~GuiRiverEditorCtrl();
 
       DECLARE_CONOBJECT(GuiRiverEditorCtrl);
+
+      DECLARE_CALLBACK(void, onNodeModified, (const char* nodeIdx));
+      DECLARE_CALLBACK(void, onNodeSelected, (const char* nodeIdx));
+      DECLARE_CALLBACK(void, paletteSync, (const char* mode));
+      DECLARE_CALLBACK(void, onRiverSelected, (const char* road));
+      DECLARE_CALLBACK(StringTableEntry, createRiver, () );
 
       // SimObject
       bool onAdd();

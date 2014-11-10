@@ -37,6 +37,7 @@ class GuiWindowCtrl : public GuiContainer
 	public:
    
 		typedef GuiContainer Parent;
+		static void CloseAllWindows();
       
    protected:
    
@@ -54,7 +55,7 @@ class GuiWindowCtrl : public GuiContainer
          BmpMaximize,
          BmpNormal,
          BmpMinimize,
-
+		 BmpPopWindow,
          BmpCount
       };
 
@@ -71,7 +72,8 @@ class GuiWindowCtrl : public GuiContainer
       /// Indices for non-button bitmap rects.
       enum
       {
-         BorderTopLeftKey = 12,
+//Note, I added another row of icons to the icon.png
+         BorderTopLeftKey = 15,//12,
          BorderTopRightKey,
          BorderTopKey,
          BorderTopLeftNoKey,
@@ -104,6 +106,21 @@ class GuiWindowCtrl : public GuiContainer
       /// Allow resizing width of window.
       bool mResizeWidth;
       
+public:
+		bool         mShowTitle;				//Show the Title Bar of a window
+		bool         mPopWindowShowTitle;       //Internal use flag for hiding Title when in PopUp
+		bool         mCanPopWindow;				//Console Flag - if the window can be "Popped" onto it's own canvas.
+		bool         mIsInPopUp;				//Console Flag - If it is currently on it's own canvas.
+		bool         mPopWindowButtonPressed;   //Button Event
+		Point2I      mPopWindowPosition;        //Position for popup window
+		RectI        mPopWindowButton;          //Pop Window Button
+		Point2I      mOrigExtent;               //Extent when on Canvas
+		Point2I      mOrigPosition;             //Position when on Canvas
+		SimGroup*    mOldParentGroup;           //Parent Group when on Canvas
+		Point2I      mLastWindowPosition;       //Screen Position for Popped out Window
+		Point2I      mPopWindowLastExtent;      //Screen Extent for Popped out Window.
+		virtual void setVisible(bool value);    //Override to control showing and hiding windows.
+protected:
       /// Allow resizing height of window.
       bool mResizeHeight;
       
@@ -192,6 +209,11 @@ class GuiWindowCtrl : public GuiContainer
       void handleCollapseGroup();
 
       /// @}
+		static bool _setTitle( void* object, const char* index, const char* data )
+		{ static_cast<GuiWindowCtrl* >( object )->setContextTitle( dAtob(data) ); return false; }
+	  
+		static const char* _getTitle( void* object, const char* data )
+		{ if( static_cast< GuiWindowCtrl* >( object )->isTitleSet() ) return "1"; return "0"; }
       
       /// @name Callbacks
       /// @{
@@ -201,13 +223,25 @@ class GuiWindowCtrl : public GuiContainer
       DECLARE_CALLBACK( void, onMaximize, () );
       DECLARE_CALLBACK( void, onCollapse, () );
       DECLARE_CALLBACK( void, onRestore, () );
+		DECLARE_CALLBACK( void, onPopWindow, () );
+		DECLARE_CALLBACK( void, onPopWindowClosed, () );
+   public:
+		DECLARE_CALLBACK( void, onLoseFocus,());
+		DECLARE_CALLBACK( void, onGainFocus,());
       
       /// @}
 
    public:
+		void OnWindowPopOut();
+		void UpdateRendering();
+		void PopUpClosed();
+		void ClosePopOut();
+		void PopUpClosed(GuiCanvas* canvas);
    
       GuiWindowCtrl();
 
+	  void setWindowTitle( const char *title);
+	  const char *getWindowTitle();
       bool isMinimized(S32 &index);
 
       virtual void getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent);
@@ -277,10 +311,23 @@ class GuiWindowCtrl : public GuiContainer
       virtual bool onKeyDown(const GuiEvent &event);
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
+	  virtual void onRightMouseUp(const GuiEvent &event);
+
       DECLARE_CONOBJECT( GuiWindowCtrl );
       DECLARE_DESCRIPTION( "A control that shows an independent window inside the canvas." );
 
       static void initPersistFields();
+
+	  /// Context Menu Options
+
+	  void setContextTitle(bool value) 
+	  {
+		  if(value)
+			  mContextFlag.set( contextTitle );
+		  else
+			  mContextFlag.clear( contextTitle );
+	  } 
+	  bool isTitleSet() { return mContextFlag.test( contextTitle); }
 };
 /// @}
 

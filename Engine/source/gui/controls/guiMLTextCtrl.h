@@ -65,10 +65,11 @@ class GuiMLTextCtrl : public GuiControl
 
    struct URL
    {
-      bool mouseDown;
+	  //Rearranging the fields according to their sizes
       U32 textStart;
       U32 len;
       bool noUnderline;
+      bool mouseDown;
    };
 
    struct Style

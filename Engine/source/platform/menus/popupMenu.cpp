@@ -22,6 +22,7 @@
 
 #include "platform/menus/popupMenu.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "core/util/safeDelete.h"
 
@@ -76,6 +77,15 @@ PopupMenu::~PopupMenu()
 
 IMPLEMENT_CONOBJECT(PopupMenu);
 
+IMPLEMENT_CALLBACK(PopupMenu, onAdd, void, (), (),"");
+IMPLEMENT_CALLBACK(PopupMenu, onRemove, void, (), (),"");
+IMPLEMENT_CALLBACK(PopupMenu, onMenuSelect, void, (), (),"");
+IMPLEMENT_CALLBACK(PopupMenu, onRemoveFromMenuBar, void, (const char* canvas), (canvas),"");
+IMPLEMENT_CALLBACK(PopupMenu, onAttachToMenuBar, void, (const char* canvas, const char* pos, const char* title), (canvas, pos, title),"");
+IMPLEMENT_CALLBACK(PopupMenu, onMessageReceived, bool, (const char* queue, const char* event, const char* data), (queue, event, data),"");
+
+IMPLEMENT_CALLBACK(PopupMenu, onSelectItem, bool, (S32 pos,const char* text), (pos, text),"");
+
 ConsoleDocClass( PopupMenu,
    "@brief PopupMenu represents a system menu.\n\n"
    "You can add menu items to the menu, but there is no torque object associated "
@@ -104,13 +114,13 @@ bool PopupMenu::onAdd()
 
    createPlatformMenu();
 
-   Con::executef(this, "onAdd");
+   onAdd_callback();
    return true;
 }
 
 void PopupMenu::onRemove()
 {
-   Con::executef(this, "onRemove");
+   onRemove_callback();
 
    Parent::onRemove();
 }
@@ -119,7 +129,7 @@ void PopupMenu::onRemove()
 
 void PopupMenu::onMenuSelect()
 {
-   Con::executef(this, "onMenuSelect");
+   onMenuSelect_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +162,8 @@ void PopupMenu::onAttachToMenuBar(GuiCanvas *canvas, S32 pos, const char *title)
 
    // Call script
    if(isProperlyAdded())
-      Con::executef(this, "onAttachToMenuBar", Con::getIntArg(canvas ? canvas->getId() : 0), Con::getIntArg(pos), title);
+   { onAttachToMenuBar_callback( Con::getIntArg(canvas ? canvas->getId() : 0), Con::getIntArg(pos), title); }
+      
 }
 
 void PopupMenu::onRemoveFromMenuBar(GuiCanvas *canvas)
@@ -174,20 +185,21 @@ void PopupMenu::onRemoveFromMenuBar(GuiCanvas *canvas)
 
    // Call script
    if(isProperlyAdded())
-      Con::executef(this, "onRemoveFromMenuBar", Con::getIntArg(canvas ? canvas->getId() : 0));
+   { onRemoveFromMenuBar_callback( Con::getIntArg(canvas ? canvas->getId() : 0) ); }
+      
 }
 
 //-----------------------------------------------------------------------------
 
 bool PopupMenu::onMessageReceived(StringTableEntry queue, const char* event, const char* data)
 {
-   return Con::executef(this, "onMessageReceived", queue, event, data);
+   return onMessageReceived_callback( queue, event, data );
 }
 
 
 bool PopupMenu::onMessageObjectReceived(StringTableEntry queue, Message *msg )
 {
-   return Con::executef(this, "onMessageReceived", queue, Con::getIntArg(msg->getId()));
+   return onMessageReceived_callback( queue, Con::getIntArg(msg->getId()), "" );
 }
 
 //-----------------------------------------------------------------------------

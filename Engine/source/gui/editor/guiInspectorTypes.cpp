@@ -692,7 +692,7 @@ bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, cons
    GFX->setClipRect( rect );
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
    GFX->getDrawUtil()->drawBitmapStretch( texture, rect );
 
    GFX->setClipRect( oldClip );

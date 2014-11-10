@@ -36,6 +36,7 @@
 #include "lighting/lightManager.h"
 #include "core/strings/stringUnit.h"
 
+#include "gui/containers/guiWindowCtrl.h"
 #ifndef TORQUE_TGB_ONLY
 #include "scene/sceneObject.h"
 #endif
@@ -48,6 +49,12 @@
 #endif
 
 IMPLEMENT_CONOBJECT(GuiCanvas);
+IMPLEMENT_CALLBACK(GuiCanvas, onResize, void, (const char* width, const char* height), (width, height), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onCreateMenu, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onDestroyMenu, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onLoseFocus, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onGainFocus, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onWindowClose, void, (), (), "");
 
 ConsoleDocClass( GuiCanvas,
 	"@brief A canvas on which rendering occurs.\n\n"
@@ -108,6 +115,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mMouseMiddleButtonDown(false),
                         mDefaultCursor(NULL),
                         mLastCursor(NULL),
+                        mPopupShown(false),
                         mLastCursorPt(0,0),
                         mCursorPt(0,0),
                         mLastMouseClickCount(0),
@@ -122,7 +130,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mRightMouseLast(false),
                         mPlatformWindow(NULL),
                         mLastRenderMs(0),
-                        mDisplayWindow(true)
+						mIsPopUp(false)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -132,6 +140,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
 
    mFences = NULL;
    mNextFenceIdx = -1;
+	mOverrideMode=String(StringTable->insert(""));
+	OverridePosition = Point2I(0,0);
 
 #ifndef _XBOX
    mNumFences = Con::getIntVariable( "$pref::Video::defaultFenceCount", 0 );
@@ -236,7 +246,8 @@ bool GuiCanvas::onAdd()
 			mPlatformWindow->lockSize(true);
 		
 		// Set a minimum on the window size so people can't break us by resizing tiny.
-		mPlatformWindow->setMinimumWindowSize(Point2I(640,480));
+		//Allow resizing down to 10 by 20
+		mPlatformWindow->setMinimumWindowSize(Point2I(64,32));
 
       // Now, we have to hook in our event callbacks so we'll get
       // appropriate events from the window.
@@ -274,7 +285,7 @@ bool GuiCanvas::onAdd()
    bool parentRet = Parent::onAdd();
 
    // Define the menu bar for this canvas (if any)
-   Con::executef(this, "onCreateMenu");
+   onCreateMenu_callback();
 
 #ifdef TORQUE_DEMO_PURCHASE
    mPurchaseScreen = new PurchaseScreen;
@@ -297,7 +308,7 @@ void GuiCanvas::onRemove()
    Process::remove(this, &GuiCanvas::paint);
 
    // Destroy the menu bar for this canvas (if any)
-   Con::executef(this, "onDestroyMenu");
+   onDestroyMenu_callback();
 
    Parent::onRemove();
 }
@@ -319,7 +330,7 @@ void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 
    // Notify the scripts
    if ( isMethod( "onResize" ) )
-      Con::executef( this, "onResize", Con::getIntArg( width ), Con::getIntArg( height ) );
+   { onResize_callback( Con::getIntArg( width ), Con::getIntArg( height ) ); }
 }
 
 void GuiCanvas::handlePaintEvent(WindowId did)
@@ -346,24 +357,74 @@ void GuiCanvas::handleAppEvent( WindowId did, S32 event )
    // Notify script if we gain or lose focus.
    if(event == LoseFocus)
    {
-      if(isMethod("onLoseFocus"))
-         Con::executef(this, "onLoseFocus");
+			onLoseFocus_callback(); 
+			if (mIsPopUp)
+			{
+				GuiWindowCtrl* content = dynamic_cast<GuiWindowCtrl*>(this->getContentControl());
+				if (content)
+				content->onLoseFocus_callback();
+			}
    }
 
    if(event == GainFocus)
    {
-      if(isMethod("onGainFocus"))
-         Con::executef(this, "onGainFocus");
+			onGainFocus_callback();
+			if (mIsPopUp)
+			{
+				GuiWindowCtrl* content = dynamic_cast<GuiWindowCtrl*>(this->getContentControl());
+				if (content)
+				content->onGainFocus_callback();
+			}
    }
 
    if(event == WindowClose || event == WindowDestroy)
    {
+   onWindowClose();
+   }
+}
 
+class GuiCanvas_Close : public SimEvent
+	{
+	void process(SimObject* obj)
+		{
+      if (obj)
+			obj->deleteObject();
+		}
+	};
+
+void GuiCanvas::onWindowClose()
+{
+	if (mIsPopUp)
+		{
+		//Find the windowctrl in it.
+		GuiWindowCtrl* content = dynamic_cast<GuiWindowCtrl*>(this->getContentControl());
+		if (content)
+			{
+			content->mPopWindowLastExtent = content->getExtent();
+			content->mOldParentGroup->addObject(content);
+			content->setExtent(content->mOrigExtent);
+			content->setPosition(content->mOrigPosition);
+
+			content->mPopWindowShowTitle=true;
+
+			content->setVisible(true);
+			content->mIsInPopUp=false;
+			content->UpdateRendering();
+			content->mLastWindowPosition = getPlatformWindow()->getPosition();
+			content->PopUpClosed(this);
+
+			//Now the tricky part we need to close this canvas.
+			//onWindowClose_callback();
+			Sim::postEvent(this,new GuiCanvas_Close(),Sim::getCurrentTime()+2);
+			}
+		}
+	else
+		{
       if(isMethod("onWindowClose"))
       {
          // First see if there is a method on this window to handle 
          //  it's closure
-         Con::executef(this,"onWindowClose");
+           onWindowClose_callback();
       }
       else if(Con::isFunction("onWindowClose"))
       {
@@ -1010,6 +1071,12 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
 {
    mPrevMouseTime = Platform::getVirtualMilliseconds();
    mMouseButtonDown = true;
+   if(isPopupShown())
+   {
+	   setPopupShown(false);
+	   mMouseCapturedControl = NULL;
+	   return;
+   }
 
    //pass the event to the mouse locked control
    if (bool(mMouseCapturedControl))
@@ -1280,7 +1347,7 @@ void GuiCanvas::setContentControl(GuiControl *gui)
 
    GuiControl *oldContent = getContentControl();
    if(oldContent)
-      Con::executef(oldContent, "onUnsetContent", Con::getIntArg(gui->getId()));
+   { oldContent->onUnsetContent_callback( Con::getIntArg(gui->getId())); }
 
    //remove all dialogs on layer 0
    U32 index = 0;
@@ -1327,7 +1394,7 @@ void GuiCanvas::setContentControl(GuiControl *gui)
    maintainSizing();
 
    // Do this last so onWake gets called first
-   Con::executef(gui, "onSetContent", Con::getIntArg(oldContent ? oldContent->getId() : 0));
+   gui->onSetContent_callback( Con::getIntArg(oldContent ? oldContent->getId() : 0) );
 }
 
 GuiControl *GuiCanvas::getContentControl()
@@ -1646,7 +1713,11 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    GFXVideoMode mode = mPlatformWindow->getVideoMode();
    if ( dStricmp( LIGHTMGR->getId(), "ADVLM" ) == 0 && mode.antialiasLevel > 0 )   
    {
-      const char *pref = Con::getVariable( "$pref::Video::mode" );
+	   String s = String("$pref::Video::") + String(this->getName()) + String("::mode");
+	   const char *pref = Con::getVariable( StringTable->insert(s.c_str()));
+
+		if (dStrcmp(pref,"")==0)
+			pref = this->getOverrideMode();
       mode.parseFromString( pref );
       mode.antialiasLevel = 0;
       mPlatformWindow->setVideoMode(mode);
@@ -1655,7 +1726,10 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    }
    else if ( dStricmp( LIGHTMGR->getId(), "BLM" ) == 0)
    {
-      const char *pref = Con::getVariable( "$pref::Video::mode" );
+	  String s = String("$pref::Video::") + String(this->getName()) + String("::mode");
+	  const char *pref = Con::getVariable( StringTable->insert(s.c_str()));
+	  if (dStrcmp(pref,"")==0)
+		pref = this->getOverrideMode();
 
       U32 prefAA = dAtoi( StringUnit::getUnit(pref, 5, " ") );
       if ( prefAA != mode.antialiasLevel )
@@ -1755,8 +1829,10 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
          
          GFX->setClipRect( updateUnion );
          GFX->setStateBlock(mDefaultGuiSB);
-         
+         contentCtrl->applyProfileSettings();
          contentCtrl->onRender(contentCtrl->getPosition(), updateUnion);
+         if( !contentCtrl->mProfileSettingsReset)
+            contentCtrl->resetProfileSettings();
       }
 
       // Fill Black if no Dialogs
@@ -1864,6 +1940,11 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    // Keep track of the last time we rendered.
    mLastRenderMs = Platform::getRealMilliseconds();
+	if (OverridePosition.x!=0 && OverridePosition.y != 0)
+		{
+		getPlatformWindow()->setPosition(OverridePosition);
+		OverridePosition = Point2I(0,0);
+		}
 }
 
 GuiCanvas::GuiCanvasFrameSignal& GuiCanvas::getGuiCanvasFrameSignal()
@@ -2606,6 +2687,10 @@ ConsoleMethod( GuiCanvas, setFocus, void, 2,2, "() - Claim OS input focus for th
       window->setFocus();
 }
 
+DefineEngineMethod( GuiCanvas, setPopupShown, void, (bool shown),  , "(bool shown) - Enabled when a context menu/popup menu is shown.")
+{
+	object->setPopupShown( shown );
+}
 ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
                "(int width, int height, bool fullscreen, [int bitDepth], [int refreshRate], [int antialiasLevel] )\n"
                "Change the video mode of this canvas. This method has the side effect of setting the $pref::Video::mode to the new values.\n\n"

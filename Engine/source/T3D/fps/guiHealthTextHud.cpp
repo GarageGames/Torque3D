@@ -51,12 +51,24 @@ class GuiHealthTextHud : public GuiControl
    S32 mPulseRate;  
   
    F32 mValue;  
+   /// Copy information
+   ColorF mTextColorCopy;
+   ColorF mFrameColorCopy;
+   ColorF mHealthTextFillColorCopy;
+   ColorF mWarnColorCopy;
+
+   void applyProfileSettings();
+
+   void copyProfileSettings();
+
+   void resetProfileSettings();
   
 public:  
    GuiHealthTextHud();  
   
    void onRender(Point2I, const RectI &);  
    static void initPersistFields();  
+   void onStaticModified( const char *slotName, const char *newValue );
    DECLARE_CONOBJECT(GuiHealthTextHud);  
    DECLARE_CATEGORY("Gui Game");  
    DECLARE_DESCRIPTION("Shows the damage or energy level of the current\n"  
@@ -137,8 +149,82 @@ void GuiHealthTextHud::initPersistFields()
    endGroup("Alert");  
   
    Parent::initPersistFields();  
+
+   removeField( "controlFontColor" );
+
+   removeField( "controlFillColor" );
+
+   removeField( "backgroundColor" );
+
+   removeField( "contextFontColor" );
+
+   removeField( "contextBackColor" );
+
+   removeField( "contextFillColor" );
 }  
   
+
+void GuiHealthTextHud::copyProfileSettings()
+{
+	if(!mProfileSettingsCopied)
+	{
+		mTextColorCopy = mTextColor;
+		mHealthTextFillColorCopy = mFillColor;
+		mFrameColorCopy = mFrameColor;
+		mWarnColorCopy = mWarnColor;
+		
+		Parent::copyProfileSettings();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiHealthTextHud::resetProfileSettings()
+{
+	mFrameColor = mFrameColorCopy;
+	mTextColor = mTextColorCopy;
+	mFillColor = mHealthTextFillColorCopy;
+	mWarnColor = mWarnColorCopy;
+	
+	Parent::resetProfileSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiHealthTextHud::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   //Set the alpha value
+   if(mTextColor)
+	   mTextColor.alpha = mTextColorCopy.alpha *mRenderAlpha;
+   if(mFrameColor)
+	   mFrameColor.alpha = mFrameColorCopy.alpha * mRenderAlpha;
+   if(mFillColor)
+	   mFillColor.alpha = mHealthTextFillColorCopy.alpha * mRenderAlpha;
+   if(mWarnColor)
+	   mWarnColor.alpha = mWarnColorCopy.alpha * mRenderAlpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiHealthTextHud::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "textColor" ) || !dStricmp( slotName, "frameColor" ) || !dStricmp( slotName, "fillColor" ) || !dStricmp( slotName, "warnColor" ))
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+	
+		if( !dStricmp( slotName, "textColor" ) )
+			mTextColorCopy = color;
+		else if( !dStricmp( slotName, "frameColor" ) )
+			mFrameColorCopy = color;
+		else if( !dStricmp( slotName, "fillColor" ) )
+			mHealthTextFillColorCopy = color;
+		else
+			mWarnColorCopy = color;
+	}
+}
 // ----------------------------------------------------------------------------  
   
 void GuiHealthTextHud::onRender(Point2I offset, const RectI &updateRect)  

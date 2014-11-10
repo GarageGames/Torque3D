@@ -190,7 +190,7 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
    {
       S32 idx = mCollapsed ? 0 : 1;
 
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmapStretchSR(
          mProfile->mTextureObject,
          RectI(offset, mProfile->mBitmapArrayRects[idx].extent),
@@ -216,7 +216,7 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
    // Draw our little bar, too
    if(mProfile->mBitmapArrayRects.size() >= 5)
    {
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
 
       S32 barStart = mThumbSize.x + offset.x + textWidth;
       S32 barTop   = mThumbSize.y/2 + offset.y - mProfile->mBitmapArrayRects[3].extent.y /2;
@@ -331,6 +331,9 @@ void GuiPaneControl::onMouseEnter(const GuiEvent &event)
       mMouseOver = true;
    }
 
+   // fade control
+   fadeControl();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -341,6 +344,7 @@ void GuiPaneControl::onMouseLeave(const GuiEvent &event)
    if(isMouseLocked())
       mDepressed = false;
    mMouseOver = false;
+   smCapturedControl = this;
 }
 
 //-----------------------------------------------------------------------------

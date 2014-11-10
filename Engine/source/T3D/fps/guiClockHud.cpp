@@ -19,49 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
-#include "platform/platform.h"
-
-#include "gui/core/guiControl.h"
-#include "console/consoleTypes.h"
-#include "T3D/shapeBase.h"
-#include "gfx/gfxDrawUtil.h"
-#include "console/engineAPI.h"
-
-//-----------------------------------------------------------------------------
-
-/// Vary basic HUD clock.
-/// Displays the current simulation time offset from some base. The base time
-/// is usually synchronized with the server as mission start time.  This hud
-/// currently only displays minutes:seconds.
-class GuiClockHud : public GuiControl
-{
-   typedef GuiControl Parent;
-
-   bool     mShowFrame;
-   bool     mShowFill;
-   bool     mTimeReversed;
-
-   ColorF   mFillColor;
-   ColorF   mFrameColor;
-   ColorF   mTextColor;
-
-   S32      mTimeOffset;
-
-public:
-   GuiClockHud();
-
-   void setTime(F32 newTime);
-   void setReverseTime(F32 reverseTime);
-   F32  getTime();
-
-   void onRender( Point2I, const RectI &);
-   static void initPersistFields();
-   DECLARE_CONOBJECT( GuiClockHud );
-   DECLARE_CATEGORY( "Gui Game" );
-   DECLARE_DESCRIPTION( "Basic HUD clock. Displays the current simulation time offset from some base." );
-};
-
+#include "guiClockHud.h"
 
 //-----------------------------------------------------------------------------
 
@@ -105,8 +63,76 @@ void GuiClockHud::initPersistFields()
    endGroup("Misc");
 
    Parent::initPersistFields();
+
+   removeField( "controlFontColor" );
+
+   removeField( "controlFillColor" );
+
+   removeField( "backgroundColor" );
+
+   removeField( "contextFontColor" );
+
+   removeField( "contextBackColor" );
+
+   removeField( "contextFillColor" );
 }
 
+
+void GuiClockHud::copyProfileSettings()
+{
+	if(!mProfileSettingsCopied)
+	{
+		mClockFillColorCopy = mFillColor;
+		mClockFrameColorCopy = mFrameColor;
+		mClockTextColorCopy = mTextColor;
+		
+		Parent::copyProfileSettings();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiClockHud::resetProfileSettings()
+{
+	mFillColor = mClockFillColorCopy;
+	mFrameColor = mClockFrameColorCopy;
+	mTextColor = mClockTextColorCopy;
+	
+	Parent::resetProfileSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiClockHud::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   /// Set the frame, fill and text alpha.
+   if(mFillColor)
+	   mFillColor.alpha = mClockFillColorCopy.alpha * mRenderAlpha;
+   if(mFrameColor)
+	   mFrameColor.alpha = mClockFrameColorCopy.alpha * mRenderAlpha;;
+   if(mTextColor)
+	   mTextColor.alpha = mClockTextColorCopy.alpha * mRenderAlpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiClockHud::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "fillColor") || !dStricmp( slotName, "frameColor") || !dStricmp( slotName, "textColor") )
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+		
+		if( !dStricmp( slotName, "fillColor") )
+			mClockFillColorCopy = color;
+		else if( !dStricmp( slotName, "frameColor") )
+			mClockFrameColorCopy = color;
+		else
+			mClockTextColorCopy = color;
+	}
+}
 
 //-----------------------------------------------------------------------------
 

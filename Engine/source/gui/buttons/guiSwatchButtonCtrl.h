@@ -46,6 +46,15 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
 
       /// Background texture that will show through with transparent colors.
       GFXTexHandle mGrid;
+	  /// The color copy for rendering alpha
+	  ColorF mSwatchColorCopy;
+
+	  /// Apply Profile Settings
+	  void applyProfileSettings();
+
+	  void copyProfileSettings();
+
+	  void resetProfileSettings();
       
    public:
 
@@ -55,11 +64,12 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
       ColorF getColor() { return mSwatchColor; }
 
       /// Set the color to display in the swatch.
-      void setColor( const ColorF &color ) { mSwatchColor = color; }
+	  void setColor( const ColorF &color ) { mSwatchColor = color; mSwatchColorCopy = color;}
 
       // GuiButtonBaseCtrl
       virtual bool onWake();
       virtual void onRender(Point2I offset, const RectI &updateRect);
+	  void onStaticModified( const char *slotName, const char *newValue );
 
       static void initPersistFields();
 

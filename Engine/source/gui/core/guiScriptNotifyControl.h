@@ -67,8 +67,6 @@ public:
 	DECLARE_CALLBACK(void, onChildRemoved, (SimObjectId ID, SimObjectId childID));
 	DECLARE_CALLBACK(void, onChildResized, (SimObjectId ID, SimObjectId childID));
 	DECLARE_CALLBACK(void, onParentResized, (SimObjectId ID));
-	DECLARE_CALLBACK(void, onLoseFirstResponder, (SimObjectId ID));
-	DECLARE_CALLBACK(void, onGainFirstResponder, (SimObjectId ID));
 	
 	
 	

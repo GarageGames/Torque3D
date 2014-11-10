@@ -50,6 +50,18 @@ class GuiDecalEditorCtrl : public EditTSCtrl
 
       DECLARE_CONOBJECT(GuiDecalEditorCtrl);
 
+      DECLARE_CALLBACK( void, syncNodeDetails, () );
+      DECLARE_CALLBACK( void, rebuildInstanceTree, () );
+      DECLARE_CALLBACK( void, paletteSync, (const char * mode) );
+      DECLARE_CALLBACK( void, undoDeleteDecalDatablock, (const char * datablock) );
+      DECLARE_CALLBACK( void, redoDeleteDecalDatablock, (const char * datablock) );
+      DECLARE_CALLBACK( void, prepGizmoTransform, (S32 decalId, const char * nodeDetails) );
+      DECLARE_CALLBACK( void, completeGizmoTransform, (S32 decalId, const char * nodeDetails) );
+      DECLARE_CALLBACK( void, onSelectInstance, (S32 decalId, const char * lookupName) );
+      DECLARE_CALLBACK( void, onCreateInstance, (S32 decalId, const char * lookupName) );
+      DECLARE_CALLBACK( void, onDeleteInstance, (S32 decalId, const char * lookupName) );
+
+
       // SimObject
       bool onAdd();
       static void initPersistFields();      

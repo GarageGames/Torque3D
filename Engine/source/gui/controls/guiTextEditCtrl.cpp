@@ -106,6 +106,18 @@ IMPLEMENT_CALLBACK( GuiTextEditCtrl, onValidate, void, (),(),
    "@see GuiControl\n\n"
 );
 
+IMPLEMENT_CALLBACK( GuiTextEditCtrl, onChangeCursorPos, void, (S32 newPosition),(),
+   "@brief Called whenever the cursor changes position.\n\n"
+   "@tsexample\n"
+   "// The control gets validated, causing the callback to occur\n"
+   "GuiTextEditCtrl::onChangeCursorPos(%this)\n"
+   "	{\n"
+   "		// Code to run when the control is validated\n"
+   "	}\n"
+   "@endtsexample\n\n"
+   "@see GuiTextCtrl\n"
+   "@see GuiControl\n\n"
+);
 GuiTextEditCtrl::GuiTextEditCtrl()
 {
    mInsertOn = true;
@@ -174,6 +186,10 @@ void GuiTextEditCtrl::initPersistFields()
    endGroup( "Text Input" );
 
    Parent::initPersistFields();
+
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 bool GuiTextEditCtrl::onAdd()
@@ -448,6 +464,7 @@ void GuiTextEditCtrl::onMouseUp(const GuiEvent &event)
    mDragHit = false;
    mScrollDir = 0;
    mouseUnlock();
+   onChangeCursorPos();
 }
 
 void GuiTextEditCtrl::saveUndoState()
@@ -906,6 +923,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
             // Execute the console command!
             execConsoleCallback();
+			onChangeCursorPos();
             return true;
          }
 
@@ -1642,6 +1660,24 @@ S32 GuiTextEditCtrl::findNextWord()
    }
 
    return mTextBuffer.length();
+}
+
+void GuiTextEditCtrl::onChangeCursorPos()
+{	
+	onChangeCursorPos_callback(mCursorPos);
+}
+
+void GuiTextEditCtrl::selectText(S32 blockStart, S32 blockEnd)
+{
+	blockStart = blockStart < 0 ? 0 : blockStart;
+	blockEnd = blockEnd > mTextBuffer.length() ? mTextBuffer.length() : blockEnd;
+	mBlockStart = blockStart;
+	mBlockEnd = blockEnd;
+}
+
+DefineConsoleMethod( GuiTextEditCtrl, selectText, void, ( S32 startBlock, S32 endBlock ), , "textEditCtrl.selectText( %startBlock, %endBlock )" )
+{
+	object->selectText(startBlock, endBlock);
 }
 
 DefineEngineMethod( GuiTextEditCtrl, getText, const char*, (),,

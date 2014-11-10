@@ -159,7 +159,7 @@ public:
    virtual void inspectPostApply();
    virtual bool onAdd();
    virtual void onRemove();
-   virtual void writeFields(Stream &stream, U32 tabStop);
+   virtual void writeFields(Stream &stream, U32 tabStop, bool XMLOutput = false);
    virtual bool writeField( StringTableEntry fieldname, const char *value );
 
    // NetObject
@@ -175,7 +175,7 @@ public:
    virtual bool castRay( const Point3F &start, const Point3F &end, RayInfo *info );
    virtual bool collideBox( const Point3F &start, const Point3F &end, RayInfo *info );
 
-
+   void setMaterial(const String &materialName);
    void updateBounds( bool recenter );
    void recenter();
 

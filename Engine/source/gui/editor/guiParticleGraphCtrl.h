@@ -95,6 +95,17 @@ public:
 	//creation methods
    DECLARE_CONOBJECT(GuiParticleGraphCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
+
+   DECLARE_CALLBACK( void, onSetSelected, ( S32 plotID ) );
+   DECLARE_CALLBACK( void, onMouseDragged, ( Point2F point ) );
+   DECLARE_CALLBACK( void, onMouseMove, ( Point2F point ) );
+   DECLARE_CALLBACK( void, onPlotPointSelected, ( S32 point ) );
+   DECLARE_CALLBACK( void, onPlotPointSelectedMouseDown, ( S32 y ) );   
+   DECLARE_CALLBACK( void, onPlotPointInserted, (  S32 ID, Point2F v ) );
+   DECLARE_CALLBACK( void, onPlotPointRemoved, ( S32 selectedPoint, S32 point , Point2F v ) );
+   DECLARE_CALLBACK( void, onPlotPointAdded, ( S32 point, Point2F addedPoint, S32 addedPointIndex ) ); 
+   DECLARE_CALLBACK( void, onPlotPointChangedMove, ( S32 point, Point2F changedPoint, S32 changedPointIndex ) );
+   DECLARE_CALLBACK( void, onPlotPointChangedUp, ( S32 selectedPoint, Point2F addedPoint, S32 origSelectedPoint, S32 pointIndex ) );
    
    GuiParticleGraphCtrl();
    virtual ~GuiParticleGraphCtrl() { };

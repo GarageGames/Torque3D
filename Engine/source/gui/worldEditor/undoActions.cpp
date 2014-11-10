@@ -26,9 +26,13 @@
 #include "gui/editor/inspector/field.h"
 #include "gui/editor/guiInspector.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 
 IMPLEMENT_CONOBJECT( MECreateUndoAction );
+
+IMPLEMENT_CALLBACK( MECreateUndoAction, onUndone, void, (), (), "" );
+IMPLEMENT_CALLBACK( MECreateUndoAction, onRedone, void, (), (), "" );
 
 ConsoleDocClass( MECreateUndoAction,
 				"@brief Material Editor create undo instance\n\n"
@@ -87,7 +91,7 @@ void MECreateUndoAction::undo()
       object->deleteObject();
    }
    
-   Con::executef( this, "onUndone" );
+   onUndone_callback();
 }
 
 void MECreateUndoAction::redo()
@@ -108,11 +112,14 @@ void MECreateUndoAction::redo()
          group->addObject( object );
    }
    
-   Con::executef( this, "onRedone" );
+   onRedone_callback();
 }
 
 
 IMPLEMENT_CONOBJECT( MEDeleteUndoAction );
+
+IMPLEMENT_CALLBACK( MEDeleteUndoAction, onUndone, void, (), (), "" );
+IMPLEMENT_CALLBACK( MEDeleteUndoAction, onRedone, void, (), (), "" );
 
 ConsoleDocClass( MEDeleteUndoAction,
 				"@brief Material Editor delete undo instance\n\n"
@@ -188,7 +195,7 @@ void MEDeleteUndoAction::undo()
          group->addObject( object );
    }
    
-   Con::executef( this, "onUndone" );
+   onUndone_callback();
 }
 
 void MEDeleteUndoAction::redo()
@@ -201,7 +208,7 @@ void MEDeleteUndoAction::redo()
          object->deleteObject();
    }
    
-   Con::executef( this, "onRedone" );
+   onRedone_callback();
 }
 
 IMPLEMENT_CONOBJECT( InspectorFieldUndoAction );

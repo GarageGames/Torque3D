@@ -24,6 +24,7 @@
 #include "environment/editors/guiMeshRoadEditorCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "environment/meshRoad.h"
 #include "renderInstance/renderPassManager.h"
 #include "collision/collision.h"
@@ -51,6 +52,11 @@ ConsoleDocClass( GuiMeshRoadEditorCtrl,
    "Editor use only.\n\n"
    "@internal"
 );
+
+IMPLEMENT_CALLBACK(GuiMeshRoadEditorCtrl, onNodeModified, void, (const char* nodeIdx), (nodeIdx), "");
+IMPLEMENT_CALLBACK(GuiMeshRoadEditorCtrl, onNodeSelected, void, (const char* nodeIdx), (nodeIdx), "");
+IMPLEMENT_CALLBACK(GuiMeshRoadEditorCtrl, paletteSync, void, (const char* mode), (mode), "");
+IMPLEMENT_CALLBACK(GuiMeshRoadEditorCtrl, onRoadSelected, void, (const char* road), (road), "");
 
 GuiMeshRoadEditorCtrl::GuiMeshRoadEditorCtrl()
  : 
@@ -701,7 +707,7 @@ void GuiMeshRoadEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       mGizmo->markClean();
    }
 
-   Con::executef( this, "onNodeModified", Con::getIntArg(mSelNode) );
+   onNodeModified_callback( Con::getIntArg(mSelNode) );
 }
 
 void GuiMeshRoadEditorCtrl::on3DMouseEnter(const Gui3DMouseEvent & event)
@@ -1002,7 +1008,7 @@ void GuiMeshRoadEditorCtrl::deleteSelectedRoad( bool undoAble )
    {
       mSelRoad->deleteObject();
       mIsDirty = true;
-      Con::executef( this, "onRoadSelected" );
+      onRoadSelected_callback("");
       mSelNode = -1;
 
       return;
@@ -1028,7 +1034,7 @@ void GuiMeshRoadEditorCtrl::deleteSelectedRoad( bool undoAble )
    }
 
    // ScriptCallback with 'NULL' parameter for no Road currently selected.
-   Con::executef( this, "onRoadSelected" );
+   onRoadSelected_callback("");
 
    // Clear the SelectedNode (it has been deleted along with the River).  
 	setSelectedNode( -1 );
@@ -1040,7 +1046,7 @@ void GuiMeshRoadEditorCtrl::setMode( String mode, bool sourceShortcut = false )
    mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", mode );
+    { paletteSync_callback( mode ); }
 }
 
 void GuiMeshRoadEditorCtrl::setSelectedRoad( MeshRoad *road )
@@ -1048,9 +1054,9 @@ void GuiMeshRoadEditorCtrl::setSelectedRoad( MeshRoad *road )
    mSelRoad = road;
 
    if ( mSelRoad != NULL )
-      Con::executef( this, "onRoadSelected", road->getIdString() );
+   { onRoadSelected_callback( road->getIdString() ); }
    else
-      Con::executef( this, "onRoadSelected" );
+   { onRoadSelected_callback(""); }
 
 	if ( mSelRoad != road )
       setSelectedNode(-1);
@@ -1142,9 +1148,9 @@ void GuiMeshRoadEditorCtrl::setSelectedNode( S32 node )
    }
    
    if ( mSelNode != -1 )
-      Con::executef( this, "onNodeSelected", Con::getIntArg(mSelNode) );
+   { onNodeSelected_callback( Con::getIntArg(mSelNode) ); }
    else
-      Con::executef( this, "onNodeSelected", Con::getIntArg(-1) );
+   { onNodeSelected_callback( Con::getIntArg(-1) ); }
 }
 
 void GuiMeshRoadEditorCtrl::submitUndo( const UTF8 *name )

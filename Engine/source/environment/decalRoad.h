@@ -164,7 +164,7 @@ public:
 	void onEditorDisable();
 	void inspectPostApply();
    void onStaticModified(const char* slotName, const char*newValue = NULL);
-   void writeFields(Stream &stream, U32 tabStop);
+   void writeFields(Stream &stream, U32 tabStop, bool XMLOutput = false);
    bool writeField( StringTableEntry fieldname, const char *value );
    
 	// NetObject

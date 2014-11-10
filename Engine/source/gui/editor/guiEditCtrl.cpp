@@ -155,6 +155,10 @@ void GuiEditCtrl::initPersistFields()
    endGroup( "Rendering" );
 
    Parent::initPersistFields();
+
+   removeField( "moveControl" );
+
+   removeField( "lockControl" );
 }
 
 //=============================================================================
@@ -1611,6 +1615,7 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
          continue;
          
       Point2I minExtent    = ctrl->getMinExtent();
+      Point2I maxExtent     = ctrl->getMaxExtent();
       Point2I newPosition  = ctrl->getPosition();
       Point2I newExtent    = ctrl->getExtent();
 
@@ -1624,6 +1629,12 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
             newPosition.x  -= minExtent.x - newExtent.x;
             newExtent.x    = minExtent.x;
          }
+       if( newExtent.x > maxExtent.x )
+       {
+          newPosition.x -= maxExtent.x - newExtent.x;
+          newExtent.x   = maxExtent.x;
+            
+       }
       }
       else if( mSizingMode & sizingRight )
       {
@@ -1631,6 +1642,9 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
 
          if( newExtent.x < minExtent.x )
             newExtent.x    = minExtent.x;
+
+       if( newExtent.x > maxExtent.x )
+          newExtent.x   = maxExtent.x;
       }
 
       if( mSizingMode & sizingTop )
@@ -1643,6 +1657,12 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
             newPosition.y  -= minExtent.y - newExtent.y;
             newExtent.y    = minExtent.y;
          }
+
+       if( newExtent.y > maxExtent.y )
+       {
+          newPosition.y -= maxExtent.y - newExtent.y;
+          newExtent.y   = maxExtent.y;
+       }
       }
       else if( mSizingMode & sizingBottom )
       {
@@ -1650,6 +1670,9 @@ void GuiEditCtrl::resizeControlsInSelectionBy( const Point2I& delta, U32 mode )
          
          if( newExtent.y < minExtent.y )
             newExtent.y = minExtent.y;
+         
+       if( newExtent.y > maxExtent.y )
+          newExtent.y = maxExtent.y;
       }
       
       ctrl->resize( newPosition, newExtent );

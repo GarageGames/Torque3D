@@ -99,6 +99,7 @@ bool MissionMarker::onAdd()
       mAddedToScene = true;
    }
 
+   scriptOnAdd();
    return(true);
 }
 
@@ -110,6 +111,7 @@ void MissionMarker::onRemove()
       mAddedToScene = false;
    }
 
+   scriptOnRemove();
    Parent::onRemove();
 }
 
@@ -577,6 +579,12 @@ ConsoleDocClass( CameraBookmark,
    "@internal"
 );
 
+IMPLEMENT_CALLBACK(CameraBookmark, onAdd, void, (), (),"");
+IMPLEMENT_CALLBACK(CameraBookmark, onRemove, void, (), (),"");
+IMPLEMENT_CALLBACK(CameraBookmark, onGroupAdd, void, (), (),"");
+IMPLEMENT_CALLBACK(CameraBookmark, onGroupRemove, void, (), (),"");
+IMPLEMENT_CALLBACK(CameraBookmark, onInspectPostApply, void, (), (),"");
+
 CameraBookmark::CameraBookmark()
 {
    mName = StringTable->insert("");
@@ -593,30 +601,30 @@ bool CameraBookmark::onAdd()
       setMaskBits(UpdateNameMask);
    }
 
-   if( isServerObject() && isMethod("onAdd") )
-      Con::executef( this, "onAdd" );
+   if( isServerObject())
+   { onAdd_callback(); }
 
    return(true);
 }
 
 void CameraBookmark::onRemove()
 {
-   if( isServerObject() && isMethod("onRemove") )
-      Con::executef( this, "onRemove" );
+   if( isServerObject() )
+   { onRemove_callback(); }
 
    Parent::onRemove();
 }
 
 void CameraBookmark::onGroupAdd()
 {
-   if( isServerObject() && isMethod("onGroupAdd") )
-      Con::executef( this, "onGroupAdd" );
+   if( isServerObject() )
+   { onGroupAdd_callback(); }
 }
 
 void CameraBookmark::onGroupRemove()
 {
-   if( isServerObject() && isMethod("onGroupRemove") )
-      Con::executef( this, "onGroupRemove" );
+   if( isServerObject() )
+   { onGroupRemove_callback(); }
 }
 
 void CameraBookmark::inspectPostApply()
@@ -626,8 +634,7 @@ void CameraBookmark::inspectPostApply()
       mName = StringTable->insert("");
    setMaskBits(UpdateNameMask);
 
-   if( isMethod("onInspectPostApply") )
-      Con::executef( this, "onInspectPostApply" );
+   onInspectPostApply_callback();
 }
 
 U32 CameraBookmark::packUpdate(NetConnection * con, U32 mask, BitStream * stream)

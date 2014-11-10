@@ -57,6 +57,10 @@ void GuiFilterCtrl::initPersistFields()
    addField("identity", TypePoint2F, Offset(mIdentity, GuiFilterCtrl), "@internal");
 
    Parent::initPersistFields();
+
+   removeField( "loveControl" );
+
+   removeField( "moveControl" );
 }
 
 ConsoleMethod( GuiFilterCtrl, getValue, const char*, 2, 2, "Return a tuple containing all the values in the filter."

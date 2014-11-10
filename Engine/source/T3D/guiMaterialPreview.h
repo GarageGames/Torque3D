@@ -116,6 +116,10 @@ public:
    DECLARE_CONOBJECT(GuiMaterialPreview);
    DECLARE_CATEGORY( "Gui Editor" );
 
+	DECLARE_CALLBACK( void, onMouseEnter, () );
+	DECLARE_CALLBACK( void, onMouseLeave, () );
+
+
    GuiMaterialPreview();
    ~GuiMaterialPreview();
 

@@ -38,10 +38,13 @@ public:
 
    DECLARE_CONOBJECT(GuiDecoyCtrl);
    DECLARE_CATEGORY( "Gui Other" );
+
+   DECLARE_CALLBACK(void, onMouseEnter, ());
+   DECLARE_CALLBACK(void, onMouseLeave, ());
    
    static void initPersistFields();
 
-   bool	mMouseOver;
+   //bool	mMouseOver;
    bool mIsDecoy;
    GuiControl* mDecoyReference;
    bool mMouseOverDecoy;

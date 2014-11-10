@@ -25,6 +25,7 @@
 
 #include "forest/editor/forestBrushTool.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "windowManager/platformCursorController.h"
 #include "forest/editor/forestUndo.h"
@@ -38,6 +39,8 @@ ConsoleDocClass( ForestEditorCtrl,
    "Editor use only, should not be modified.\n\n"
    "@internal"
 );
+
+IMPLEMENT_CALLBACK(ForestEditorCtrl, onActiveForestUpdated, void, (const char* forest, const char* createNew), (forest, createNew), "");
 
 ForestEditorCtrl::ForestEditorCtrl()
 {   
@@ -97,7 +100,7 @@ void ForestEditorCtrl::onSleep()
 bool ForestEditorCtrl::updateActiveForest( bool createNew )
 {
    mForest = dynamic_cast<Forest*>( Sim::findObject( "theForest" ) );
-   Con::executef( this, "onActiveForestUpdated", mForest ? mForest->getIdString() : "", createNew ? "1" : "0" );  
+   onActiveForestUpdated_callback( mForest ? mForest->getIdString() : "", createNew ? "1" : "0" );  
 
    if ( mTool )
       mTool->setActiveForest( mForest );
@@ -245,9 +248,10 @@ void ForestEditorCtrl::updateGuiInfo()
    if ( !mForest )
    {
       if ( statusbar )
-         Con::executef( statusbar, "setInfo", "Forest Editor. You have no Forest in your level; click anywhere in the scene to create one." );
+      { statusbar->setInfo_callback("Forest Editor. You have no Forest in your level; click anywhere in the scene to create one."); }
       if ( selectionBar )
-         Con::executef( selectionBar, "setInfo", "" );
+      { selectionBar->setInfo_callback(""); }
+
       return;
    }
 
@@ -260,9 +264,10 @@ void ForestEditorCtrl::updateGuiInfo()
    // Tool did not handle the update so we will.
 
    if ( statusbar )
-      Con::executef( statusbar, "setInfo", "Forest Editor." );
+   { statusbar->setInfo_callback("Forest Editor."); }
+
    if ( selectionBar )
-      Con::executef( selectionBar, "setInfo", "" );
+   { selectionBar->setInfo_callback(""); }
 }
             
 void ForestEditorCtrl::renderScene( const RectI &updateRect )

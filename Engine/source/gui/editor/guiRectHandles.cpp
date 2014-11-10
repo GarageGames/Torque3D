@@ -22,6 +22,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 
@@ -34,6 +35,9 @@ ConsoleDocClass( GuiRectHandles,
    "Editor use only.\n\n"
    "@internal"
 );
+
+IMPLEMENT_CALLBACK( GuiRectHandles, onHandleRectChange, void, (), (), "" );
+
 
 //--------------------------------------------------------------------------
 GuiRectHandles::GuiRectHandles() : GuiControl()
@@ -58,6 +62,10 @@ void GuiRectHandles::initPersistFields()
    addField("handleColor",    TypeColorI, Offset(mHandleColor,  GuiRectHandles),    "Use given custom color for handles." );
 
    Parent::initPersistFields();
+
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //--------------------------------------------------------------------------
@@ -266,8 +274,7 @@ void GuiRectHandles::onMouseDragged(const GuiEvent &event)
    mHandleRect = box;
    mHitPoint = localMousePoint;
 
-   if( isMethod( "onHandleRectChange" ) )
-      Con::executef(this, "onHandleRectChange" );
+   onHandleRectChange_callback();
 }
 
 //--------------------------------------------------------------------------

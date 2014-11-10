@@ -57,6 +57,8 @@ class ForestEditorCtrl : public EditTSCtrl
 
       DECLARE_CONOBJECT( ForestEditorCtrl );
 
+      DECLARE_CALLBACK(void, onActiveForestUpdated, (const char* forest, const char* createNew));
+
       // SimObject
       bool onAdd();
       static void initPersistFields();

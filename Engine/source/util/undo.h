@@ -121,6 +121,15 @@ public:
    // Required in all ConsoleObject subclasses.
    typedef SimObject Parent;
    DECLARE_CONOBJECT(UndoManager);
+
+	DECLARE_CALLBACK( void, onClear, () );
+	DECLARE_CALLBACK( void, onRemoveUndo, () );
+	DECLARE_CALLBACK( void, onUndo, () );
+	DECLARE_CALLBACK( void, onRedo, () );
+	DECLARE_CALLBACK( void, onAddUndo, () );
+
+
+
    static void initPersistFields();
 
    /// Constructor. If levels = 0, we use the default number of undo levels.
@@ -205,12 +214,17 @@ class UndoScriptAction : public UndoAction
 public:
    typedef UndoAction Parent;
 
+   DECLARE_CALLBACK( void, undo, () );
+   DECLARE_CALLBACK( void, redo, () );
+   DECLARE_CALLBACK( void, onAdd, () );
+   DECLARE_CALLBACK( void, onRemove, () );
+
    UndoScriptAction() : UndoAction()
    {
    }
 
-   virtual void undo() { Con::executef(this, "undo"); };
-   virtual void redo() { Con::executef(this, "redo"); }
+   virtual void undo() { undo_callback(); };
+   virtual void redo() { redo_callback(); }
 
    virtual bool onAdd()
    {
@@ -220,8 +234,7 @@ public:
 
 
       // Notify Script.
-      if(isMethod("onAdd"))
-         Con::executef(this, "onAdd");
+      onAdd_callback();
 
       // Return Success.
       return true;
@@ -233,8 +246,7 @@ public:
          mUndoManager->removeAction((UndoAction*)this, true);
 
       // notify script
-      if(isMethod("onRemove"))
-         Con::executef(this, "onRemove");
+      onRemove_callback();
 
       Parent::onRemove();
    }

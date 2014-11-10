@@ -125,5 +125,5 @@ void GuiInspectorCustomField::setValue( const char* newValue )
 
 void GuiInspectorCustomField::_executeSelectedCallback()
 {
-   Con::executef( mInspector, "onFieldSelected", mCaption, ConsoleBaseType::getType(TypeCaseString)->getTypeName(), mDoc );
+   mInspector->onFieldSelected_callback(mCaption, ConsoleBaseType::getType(TypeCaseString)->getTypeName(), mDoc);
 }

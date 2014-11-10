@@ -91,7 +91,7 @@ class ScenePolyhedralObject : public Base, public IScenePolyhedralObject
 
       // SimObject.
       virtual bool onAdd();
-      virtual void writeFields( Stream& stream, U32 tabStop );
+      virtual void writeFields( Stream& stream, U32 tabStop, bool XMLOutput = false );
       virtual bool writeField( StringTableEntry name, const char* value );
 
       static void initPersistFields();

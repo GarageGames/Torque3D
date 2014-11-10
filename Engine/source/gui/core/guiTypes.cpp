@@ -125,7 +125,7 @@ void GuiCursor::render(const Point2I &pos)
    renderPos.x -= (S32)( texWidth  * mRenderOffset.x );
    renderPos.y -= (S32)( texHeight * mRenderOffset.y );
 
-   GFX->getDrawUtil()->clearBitmapModulation();
+   //GFX->getDrawUtil()->clearBitmapModulation();
    GFX->getDrawUtil()->drawBitmap(mTextureObject, renderPos);
 }
 
@@ -322,6 +322,8 @@ GuiControlProfile::GuiControlProfile(void) :
    mChildrenProfileName = NULL;
    mChildrenProfile = NULL;
 
+   mBoundControl = "All";	//ControlBoundAddition
+
    // inherit/copy values from GuiDefaultProfile
    GuiControlProfile *def = dynamic_cast<GuiControlProfile*>(Sim::findObject("GuiDefaultProfile"));
    if (def)
@@ -388,6 +390,7 @@ void GuiControlProfile::initPersistFields()
          "Whether the control can have the keyboard focus." );
       addField("mouseOverSelected", TypeBool,   Offset(mMouseOverSelected, GuiControlProfile));
       addField("modal",         TypeBool,       Offset(mModal, GuiControlProfile));
+	  addField("controlBound",         TypeGuiControl,       Offset(mBoundControl, GuiControlProfile));	//ControlBoundAddition
    
    endGroup( "Behavior" );
    

@@ -367,6 +367,21 @@ class HeartbeatEvent : public SimEvent
 // Public query methods
 //-----------------------------------------------------------------------------
 
+IMPLEMENT_GLOBAL_CALLBACK( onServerQueryStatus, void, ( const char *status, const char *msg, const char *value ), ( status, msg, value ),
+   "A callback called by the engine for update query status .\n");
+
+IMPLEMENT_GLOBAL_CALLBACK( onClearGameTypes, void, (), (),
+   "A callback called by the engine.\n");
+
+IMPLEMENT_GLOBAL_CALLBACK( onAddGameType, void, ( const char *type ), ( type ),
+   "A callback called by the engine.\n");
+
+IMPLEMENT_GLOBAL_CALLBACK( onClearMissionTypes, void, (), (),
+   "A callback called by the engine.\n");
+
+IMPLEMENT_GLOBAL_CALLBACK( onAddMissionType, void, ( const char *type ), ( type ),
+   "A callback called by the engine.\n");
+
 //-----------------------------------------------------------------------------
 
 void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missionType,
@@ -404,7 +419,8 @@ void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missi
    Net::stringToAddress( addrText, &addr );
    pushPingBroadcast( &addr );
 
-   Con::executef("onServerQueryStatus", "start", "Querying LAN servers", "0");
+   onServerQueryStatus_callback("start", "Querying LAN servers", "0");
+
    processPingsAndQueries( gPingSession );
 }
 
@@ -494,7 +510,7 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
    gGotFirstListPacket = false;
    sgServerQueryActive = true;
 
-   Con::executef( "onServerQueryStatus", "start", "Querying master server", "0");
+   onServerQueryStatus_callback("start", "Querying master server", "0");
 
    if ( buddyCount == 0 )
    {
@@ -604,7 +620,7 @@ void queryFavoriteServers( U8 /*flags*/ )
    sActiveFilter.type = ServerFilter::Favorites;
    pushServerFavorites();
 
-   Con::executef( "onServerQueryStatus", "start", "Query favorites...", "0" );
+   onServerQueryStatus_callback("start", "Query favorites...", "0" );
    processPingsAndQueries( gPingSession );
 }
 
@@ -627,7 +643,7 @@ void querySingleServer( const NetAddress* addr, U8 /*flags*/ )
       }
    }
 
-   Con::executef( "onServerQueryStatus", "start", "Refreshing server...", "0" );
+   onServerQueryStatus_callback("start", "Refreshing server...", "0" );
    gServerPingCount = gServerQueryCount = 0;
    pushPingRequest( addr );
    processPingsAndQueries( gPingSession );
@@ -1190,7 +1206,7 @@ static void processMasterServerQuery( U32 session )
             keepGoing = pickMasterServer();
             if ( keepGoing )
             {
-               Con::executef( "onServerQueryStatus", "update", "Switching master servers...", "0" );
+               onServerQueryStatus_callback("update", "Switching master servers...", "0" );
                Net::addressToString( &gMasterServerPing.address, addressString );
             }
          }
@@ -1226,7 +1242,7 @@ static void processMasterServerQuery( U32 session )
 
             Con::printf( "Requesting the server list from master server %s (%d tries left)...", addressString, gMasterServerPing.tryCount );
             if ( gMasterServerPing.tryCount < gMasterServerRetryCount - 1 )
-               Con::executef( "onServerQueryStatus", "update", "Retrying the master server...", "0" );
+               onServerQueryStatus_callback("update", "Retrying the master server...", "0" );
          }
       }
 
@@ -1238,7 +1254,7 @@ static void processMasterServerQuery( U32 session )
       else
       {
          Con::errorf( "There are no more master servers to try!" );
-         Con::executef( "onServerQueryStatus", "done", "No master servers found.", "0" );
+         onServerQueryStatus_callback("done", "No master servers found.", "0" );
       }
    }
 }
@@ -1370,7 +1386,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
       else
          dSprintf( msg, sizeof( msg ), "%d servers found.", foundCount );
 
-      Con::executef( "onServerQueryStatus", "done", msg, "1");
+      onServerQueryStatus_callback("done", msg, "1");
    }
 }
 
@@ -1465,7 +1481,7 @@ static void updatePingProgress()
       progress = F32( gServerPingCount - pingsLeft ) / F32( gServerPingCount * 2 );
 
    //Con::errorf( ConsoleLogEntry::General, "Ping progress - %d of %d left - progress = %.2f", pingsLeft, gServerPingCount, progress );
-   Con::executef( "onServerQueryStatus", "ping", msg, Con::getFloatArg( progress ) );
+   onServerQueryStatus_callback("ping", msg, Con::getFloatArg( progress ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1485,7 +1501,7 @@ static void updateQueryProgress()
       progress += ( F32( gServerQueryCount - queriesLeft ) / F32( gServerQueryCount * 2 ) );
 
    //Con::errorf( ConsoleLogEntry::General, "Query progress - %d of %d left - progress = %.2f", queriesLeft, gServerQueryCount, progress );
-   Con::executef( "onServerQueryStatus", "query", msg, Con::getFloatArg( progress ) );
+   onServerQueryStatus_callback("query", msg, Con::getFloatArg( progress ) );
 }
 
 
@@ -1503,19 +1519,19 @@ static void handleMasterServerGameTypesResponse( BitStream* stream, U32 /*key*/,
    U8 temp;
    char stringBuf[256];
    stream->read( &temp );
-   Con::executef("onClearGameTypes");
+   onClearGameTypes_callback();
    for ( i = 0; i < U32( temp ); i++ )
    {
       readCString( stream, stringBuf );
-      Con::executef("onAddGameType", stringBuf);
+      onAddGameType_callback( stringBuf );
    }
 
    stream->read( &temp );
-   Con::executef("onClearMissionTypes");
+   onClearMissionTypes_callback();
    for ( i = 0; i < U32( temp ); i++ )
    {
       readCString( stream, stringBuf );
-      Con::executef("onAddMissionType", stringBuf);
+      onAddMissionType_callback( stringBuf );
    }
 }
 

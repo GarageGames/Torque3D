@@ -102,14 +102,6 @@ IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onParentResized, void, ( SimObjectId ID
 	"Called when this GUI's parent is resized.\n\n"
 	"@param ID Unique object ID assigned when created (%this in script).\n"
 );
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onLoseFirstResponder, void, ( SimObjectId ID ), ( ID ),
-	"Called when this GUI loses focus.\n\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n"
-);
-IMPLEMENT_CALLBACK( GuiScriptNotifyCtrl, onGainFirstResponder, void, ( SimObjectId ID ), ( ID ),
-	"Called when this GUI gains focus.\n\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n"
-);
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 void GuiScriptNotifyCtrl::onChildAdded( GuiControl *child )

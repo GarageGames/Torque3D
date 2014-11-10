@@ -26,6 +26,7 @@
 // Forward Refs
 class ConsoleBaseType;
 class SimObject;
+class SimXMLDocument;
 
 #include "core/stringTable.h"
 #include "core/stream/stream.h"
@@ -84,7 +85,8 @@ public:
    U32 getFieldType(StringTableEntry slotName) const;
    Entry  *findDynamicField(const String &fieldName) const;
    Entry  *findDynamicField( StringTableEntry fieldName) const;
-   void writeFields(SimObject *obj, Stream &strem, U32 tabStop);
+   Entry *findField( StringTableEntry fieldName) const;
+   void writeFields(SimObject *obj, Stream &strem, U32 tabStop, bool XMLOutput = false);  
    void printFields(SimObject *obj);
    void assignFrom(SimFieldDictionary *dict);
    U32   getNumFields() const { return mNumFields; }

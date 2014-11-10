@@ -132,6 +132,25 @@ class GuiControl : public SimGroup
          vertResizeRelative,      ///< resize relative
          vertResizeWindowRelative ///< resize window relative
       };
+        enum
+        {
+              contextHide = BIT( 0 ),                       ///< Option to hide the control in the game
+              contextLock = BIT( 1 ),                       ///< Option to lock the control in the game
+              contextMove = BIT( 2 ),                       ///< Option to move the control in the game
+              contextWindow = BIT( 3 ),                     ///< Option to change the window settings of the control in the game
+              contextAlpha = BIT( 4 ),                      ///< Option to change the alpha of the control in the game
+              contextMouseOverAlpha = BIT( 5 ),				      ///< Option to change the mouseOver alpha the control in the game
+              contextAlphaFade = BIT( 6 ),                  ///< Option to change the alpha fade the control in the game
+              contextFontColor = BIT( 7 ),                  ///< Option to change the font color of the control in the game
+              contextBackgroundColor = BIT( 8 ),			      ///< Option to change the background color of the control in the game
+              contextFillColor = BIT( 9 ),                  ///< Option to change the fill color the control in the game
+              contextTexture = BIT( 10 ),					          ///< Option to change the texture of the control in the game
+              contextTitle = BIT( 11 ),                     ///< Option to change the title of the control in the game
+              contextFontSize = BIT( 12 )                   ///< Option to change the font size of the control in the game
+        };
+
+        static SimObjectPtr<GuiControl> smCapturedControl;         ///< Last captured control when mouse entered.
+        static SimObjectPtr<GuiControl> smTopParent;               ///< Last active control.
       
    private:
    
@@ -142,7 +161,179 @@ class GuiControl : public SimGroup
    
       GuiControlProfile* mProfile;         ///< The profile for this gui (data settings that are likely to be shared by multiple guis)
       GuiControlProfile* mTooltipProfile;  ///< The profile for any tooltips
-      
+      /// Alpha Value assigned to the object.
+      F32 mAlphaValue;
+
+      /// Mouse over alpha value assigned to the object.
+      F32 mMouseOverAlphaValue;
+	  
+      /// Alpha fade time
+      S32 mAlphaFadeTime;
+
+      ///Fill color info for the alpha change
+      ColorI mFillColorCopy;                        
+      ColorI mFillColorHLCopy;
+      ColorI mFillColorSELCopy;
+      ColorI mFillColorNACopy;
+
+      ///Border color info for the alpha change
+      ColorI mBorderColorCopy;
+      ColorI mBorderColorHLCopy;
+      ColorI mBorderColorNACopy;
+
+      /// Font color info for the alpha change
+      ColorI mFontColorCopy;                        
+      ColorI mFontColorHLCopy;
+      ColorI mFontColorSELCopy;
+      ColorI mFontColorNACopy;
+
+      /// Texture for the control
+      GFXTexHandle mTextureObjectCopy;
+      GFXTexHandle mTextureObject;
+
+      /// Font size copy
+      S32 mFontSizeCopy;
+              
+      /// Parent font and fill colors and alpha value.
+      ColorI mParentFontColor;
+      ColorI mParentFillColor;
+      F32 mParentAlphaValue;
+
+      ColorI mControlFontColor;
+      ColorI mControlFillColor;
+      ColorI mControlBackgroundColor;
+      S32 mControlFontSize;
+
+      /// Texture file for new texture.
+      String mControlTextureFile;
+
+      /// Alpha fade settings
+      bool mMouseOver;
+      U32 mFadeTime;
+      U32 mFadeStartTime;
+      F32 mFadeRate;
+      bool mFadeStart;
+
+      /// Alpha for rendering
+      F32 mRenderAlpha;
+
+      bool mProfileSettingsCopied;                              ///< Set if the profile info have already been copied.
+      bool mProfileSettingsReset;                         ///< Set if the profile info have been reset.
+      bool mTextureChanged;                                     ///< Set if the texture has been changed.
+      bool mFontColorChanged;                                   ///< Set if the font color has been changed.
+      bool mFillColorChanged;                                   ///< Set if the fill color has been changed.
+      bool mFontSizeChanged;
+
+      bool mRenderAlphaSet;
+
+      /// Adjust alpha value of a profile's fill, border and font colors.
+      void setProfileAlpha(F32 mAlphaValue);
+
+      /// Reset the profile settings
+      virtual void resetProfileSettings();
+
+      /// Reset font color
+      void resetFontColor();
+
+      /// Update the render alpha
+      void updateRenderAlpha(bool mMouseOver);
+
+      ///Copy the profile settings of the control.
+      virtual void copyProfileSettings();
+
+      /// Mouse Down Position 
+      Point2I mMouseDownPosition;
+
+      /// Original bounds of the control
+      RectI mOrigBounds;
+
+      bool mMoving;         ///< If true, the control is movable.
+
+      // Alpha settings
+      static bool _setAlphaValue( void* object, const char* index, const char* data )
+      { static_cast< GuiControl* >( object )->setAlphaValue( dAtof(data) ); return false; }
+	  
+      static bool _setMouseOverAlphaValue( void* object, const char* index, const char* data )
+      { static_cast< GuiControl* >( object )->setMouseOverAlphaValue( dAtof(data) ); return false;}
+
+      /// Set alpha fade time
+      static bool _setAlphaFadeTime( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setAlphaFadeTime( dAtoi(data) ); return false; }
+
+      ///Context menu options
+
+      /// Context Menu Flag
+      BitSet32 mContextFlag;
+
+      /// Move control
+      static bool _setContextMoveControl( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextMoveControl( dAtob(data) ); return false; }
+        
+      static const char* _getContextMoveControl( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->isContextMovable() ) return "1"; return "0"; }
+
+      /// Lock Control        
+      static bool _setContextLockControl( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextLockControl( dAtob(data) ); return false; }
+        
+      static const char* _getContextLockControl( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->isContextLockable() ) return "1"; return "0"; }
+
+      /// Window settings     
+      static bool _setContextWindowSettings( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setShowContextWindowSettings( dAtob(data) ); return false; }
+        
+      static const char* _getContextWindowSettings( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->canShowContextWindowSettings() ) return "1"; return "0"; }
+
+      /// Alpha settings  
+      static bool _setContextAlpha( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextAlpha( dAtob(data) ); return false; }
+        
+      static const char* _getContextAlpha( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->isContextAlphaEnabled() ) return "1"; return "0"; }
+
+      /// MouseOver Alpha settings        
+      static bool _setContextMouseOverAlpha( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextMouseOverAlpha( dAtob(data) ); return false; }
+        
+      static const char* _getContextMouseOverAlpha( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->isContextMouseOverAlphaEnabled() ) return "1"; return "0"; }
+
+      /// Alpha fade settings       
+      static bool _setContextAlphaFade( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextAlphaFade( dAtob(data) ); return false; }
+        
+      static const char* _getContextAlphaFade( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->isContextAlphaFadeEnabled() ) return "1"; return "0"; }
+
+        /// Text color settings       
+      static bool _setContextFontColor( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextFontColor( dAtob(data) ); return false; }
+        
+      static const char* _getContextFontColor( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->canChangeContextFontColor() ) return "1"; return "0"; }
+
+        /// Background color settings       
+      static bool _setContextBackColor( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextBackColor( dAtob(data) ); return false; }
+        
+      static const char* _getContextBackColor( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->canChangeContextBackColor() ) return "1"; return "0"; }
+
+        /// Fill/body color settings
+      static bool _setContextFillColor( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextFillColor( dAtob(data) ); return false; }
+        
+      static const char* _getContextFillColor( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->canChangeContextFillColor() ) return "1"; return "0"; }
+
+      /// Font size settings
+      static bool _setContextFontSize( void* object, const char* index, const char* data )
+      { static_cast<GuiControl* >( object )->setContextFontSize( dAtob(data) ); return false; }
+        
+      static const char* _getContextFontSize( void* object, const char* data )
+      { if( static_cast< GuiControl* >( object )->canChangeContextFontSize() ) return "1"; return "0"; }
       /// @name Control State
       /// @{   
       
@@ -169,6 +360,7 @@ class GuiControl : public SimGroup
       
       S32     mLayer;
       Point2I mMinExtent;
+      Point2I mMaxExtent;
       StringTableEntry mLangTableName;
       LangTable *mLangTable;
       
@@ -250,8 +442,8 @@ class GuiControl : public SimGroup
       DECLARE_CALLBACK( void, onWake, () );
       DECLARE_CALLBACK( void, onSleep, () );
       
-      DECLARE_CALLBACK( void, onLoseFirstResponder, () );
-      DECLARE_CALLBACK( void, onGainFirstResponder, () );
+      DECLARE_CALLBACK( void, onLoseFirstResponder, (SimObjectId ID) );
+      DECLARE_CALLBACK( void, onGainFirstResponder, (SimObjectId ID) );
       
       DECLARE_CALLBACK( void, onAction, () );
       DECLARE_CALLBACK( void, onVisible, ( bool state ) );
@@ -264,6 +456,10 @@ class GuiControl : public SimGroup
       DECLARE_CALLBACK( void, onControlDragExit, ( GuiControl* control, const Point2I& dropPoint ) );
       DECLARE_CALLBACK( void, onControlDragged, ( GuiControl* control, const Point2I& dropPoint ) );
       DECLARE_CALLBACK( void, onControlDropped, ( GuiControl* control, const Point2I& dropPoint ) );
+
+      DECLARE_CALLBACK( void, onUnsetContent, ( const char* newContent) );
+      DECLARE_CALLBACK( void, onSetContent, ( const char* oldContent) );
+	  DECLARE_CALLBACK( void, onRightMouseUp, ( GuiControl* control ));
             
       /// @}
       
@@ -331,6 +527,44 @@ class GuiControl : public SimGroup
       
       static void initPersistFields();
       static void consoleInit();
+      void onStaticModified( const char *slotName, const char *newValue );    
+        
+      /// @}
+
+      // Set Background Color
+      void setControlBackgroundColor(ColorI color);
+
+      // Set font Color and fill color
+      void setControlColor(const char* colorName, ColorI mFontColor);
+
+      // Set control font color
+      void setControlFontColor(ColorI mFontColor);
+        
+      // Set the fill Color
+      void setControlFillColor(ColorI mFillColor);
+
+      // Set the font size
+      void setControlFontSize( S32 mFontSize );
+
+      // Get the font size
+      S32 getControlFontSize() { return mControlFontSize; }
+
+      // Set the texture of the control
+      void setControlTexture(String fileName);
+
+      // Get the filename of the control
+      String getControlTextureFile();
+
+      // Fade Control
+      void fadeControl();
+
+      /// Check if the control is transparent or not.
+      bool transparentControlCheck();
+
+      void setCur();
+
+      void resetCur();
+
       
       /// @}
       
@@ -349,6 +583,8 @@ class GuiControl : public SimGroup
       };
       virtual Point2I   getMinExtent() const { return mMinExtent; } ///< Returns minimum size the control can be
       virtual void      setMinExtent( const Point2I &newMinExtent ) { mMinExtent = newMinExtent; };
+      virtual Point2I getMaxExtent() const { return mMaxExtent; } ///< Returns maximum size of the control    
+      virtual void          setMaxExtent( const Point2I &newMaxEntent ) { mMaxExtent = newMaxEntent; };
       inline const S32        getLeft() const { return mBounds.point.x; } ///< Returns the X position of the control
       inline const S32        getTop() const { return mBounds.point.y; } ///< Returns the Y position of the control
       inline const S32        getWidth() const { return mBounds.extent.x; } ///< Returns the width of the control
@@ -357,11 +593,134 @@ class GuiControl : public SimGroup
       inline const S32        getHorizSizing() const { return mHorizSizing; }
       inline const S32        getVertSizing() const { return mVertSizing; }
       
+
+	  ///Set the alpha Value
+	  virtual void setAlphaValue(F32 alpha);
+
+	  /// Set mouse over alpha value.
+	  virtual void setMouseOverAlphaValue( F32 alpha );
+
+	  /// Set alpha fade time.
+	  virtual void setAlphaFadeTime( S32 fadeTime );
+
+	  ///Get the alpha value
+	  F32 getAlphaValue() const { return mAlphaValue; }
+
+	  ///Get the mouse over alpha value
+	  F32 getMouseOverAlphaValue() const { return mMouseOverAlphaValue; }
+
+	  /// Get alpha fade time.
+	  S32 getAlphaFadeTime() const { return mAlphaFadeTime; }
+
       /// @}
       
       /// @name Flags
       /// @{
       
+        // Context Menu Options
+        bool isContextMovable() const { return mContextFlag.test( contextMove ); }
+        void setContextMoveControl( bool movable) 
+        { 
+              if(movable) 
+                    mContextFlag.set( contextMove); 
+              else 
+                    mContextFlag.clear( contextMove ); 
+        }
+
+
+        bool isContextLockable() const { return mContextFlag.test( contextLock ); }
+        void setContextLockControl( bool lock) 
+        { 
+              if(lock) 
+                    mContextFlag.set( contextLock ); 
+              else 
+                    mContextFlag.clear( contextLock );
+        }
+
+        bool canShowContextWindowSettings() const { return mContextFlag.test( contextWindow ); }
+        void setShowContextWindowSettings( bool showSettings) 
+        { 
+              if(showSettings) 
+			  {
+                    mContextFlag.set( contextWindow ); 
+			  }
+              else
+			  {
+                    mContextFlag.clear( contextWindow ); 
+					mContextFlag.clear( contextAlpha );
+					mContextFlag.clear( contextAlphaFade );
+					mContextFlag.clear( contextMouseOverAlpha );
+					if( Sim::findObject( "GuiEditorInspectFields" ) )
+						Con::evaluate( "GuiEditorInspectFields.refresh();");
+			  }
+        }
+
+        bool isContextAlphaEnabled() const { return mContextFlag.test( contextAlpha ); }
+        void setContextAlpha( bool alpha)
+        { 
+			if(alpha && mContextFlag.test( contextWindow )) 
+                    mContextFlag.set( contextAlpha ); 
+              else 
+                    mContextFlag.clear( contextAlpha ); 
+        }
+
+        bool isContextMouseOverAlphaEnabled() const { return mContextFlag.test( contextMouseOverAlpha ); }
+        void setContextMouseOverAlpha( bool mouseOverAlpha) 
+        { 
+              if(mouseOverAlpha && mContextFlag.test( contextWindow )) 
+                    mContextFlag.set( contextMouseOverAlpha ); 
+              else
+                    mContextFlag.clear( contextMouseOverAlpha ); 
+        }
+
+        bool isContextAlphaFadeEnabled() const { return mContextFlag.test( contextAlphaFade ); }
+        void setContextAlphaFade( bool alphaFade) 
+        { 
+              if(alphaFade && mContextFlag.test( contextWindow ))
+                    mContextFlag.set( contextAlphaFade ); 
+              else mContextFlag.clear( contextAlphaFade ); 
+        }
+
+        bool canChangeContextBackColor() const { return mContextFlag.test( contextBackgroundColor ); }
+        void setContextBackColor( bool backColor) 
+        { 
+              if(backColor) 
+                    mContextFlag.set( contextBackgroundColor ); 
+              else mContextFlag.clear( contextBackgroundColor ); 
+        }
+
+        bool canChangeContextFontColor() const { return mContextFlag.test( contextFontColor ); }
+        void setContextFontColor( bool textColor)
+        { 
+              if(textColor)
+                    mContextFlag.set( contextFontColor );
+              else
+                  mContextFlag.clear( contextFontColor ); 
+        }
+
+        bool canChangeContextFillColor() const { return mContextFlag.test( contextFillColor ); }
+        void setContextFillColor( bool fillColor) 
+        {
+              if(fillColor) 
+                    mContextFlag.set( contextFillColor ); 
+              else
+                  mContextFlag.clear( contextFillColor ); 
+        }
+
+		bool canChangeContextFontSize() const { return mContextFlag.test( contextFontSize ); }
+		void setContextFontSize( bool fontSize )
+		{
+			if( fontSize )
+				mContextFlag.set( contextFontSize );
+			else
+				mContextFlag.clear( contextFontSize );
+		}
+
+        /// Context Options end
+
+        /// Get and set lock control
+        virtual void setControlLock( bool locked);
+        virtual bool getControlLock();
       /// Sets the visibility of the control
       /// @param   value   True if object should be visible
       virtual void setVisible(bool value);
@@ -405,6 +764,7 @@ class GuiControl : public SimGroup
       
       GuiControl *getParent();  ///< Returns the control which owns this one.
       GuiCanvas *getRoot();     ///< Returns the root canvas of this control.
+      GuiControl *getRootControl();           ///< Returns the root control ( child of the canvas ) of this control.
       
       virtual bool acceptsAsChild( SimObject* object ) const;
       
@@ -517,6 +877,9 @@ class GuiControl : public SimGroup
       
       /// Do special pre-render processing
       virtual void onPreRender();
+
+      /// Apply profile settings
+      virtual void applyProfileSettings();
       
       /// Called when this object is removed
       virtual void onRemove();
@@ -690,6 +1053,11 @@ class GuiControl : public SimGroup
       ///
       /// @param   child   Control to test
       virtual bool controlIsChild(GuiControl *child);
+
+      /// Returns true if the provided control is a sibling of this one.
+      ///
+      /// @param      sibling           Control to test
+      virtual bool controlIsSibling( GuiControl *sibling);
       
       /// @name First Responder
       /// A first responder is the control which reacts first, in it's responder chain, to keyboard events
@@ -800,6 +1168,7 @@ class GuiControl : public SimGroup
       
       /// Called if this object is a dialog, when it is removed from the visible layers
       virtual void onDialogPop();
+	  virtual void refresh() {};
       /// @}
       
       /// Renders justified text using the profile.
@@ -814,6 +1183,7 @@ class GuiControl : public SimGroup
       
       void inspectPostApply();
       void inspectPreApply();
+
 };
 
 typedef GuiControl::horizSizingOptions GuiHorizontalSizing;

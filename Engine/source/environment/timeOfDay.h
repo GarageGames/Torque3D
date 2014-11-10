@@ -76,6 +76,12 @@ public:
 	static void initPersistFields();
    static void consoleInit();
    DECLARE_CONOBJECT( TimeOfDay );
+
+    DECLARE_CALLBACK(void, onTimeEvent, (const char* identifier, const char* currentTime, const char* currentElevation ));
+    DECLARE_CALLBACK(void, onAnimateStart, ());
+    DECLARE_CALLBACK(void, onAnimateDone, ());
+    DECLARE_CALLBACK(void, onAdd, ());
+
    void inspectPostApply();
 
    // SimObject

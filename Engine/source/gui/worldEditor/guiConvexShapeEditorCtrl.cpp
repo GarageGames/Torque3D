@@ -24,6 +24,7 @@
 #include "gui/worldEditor/guiConvexShapeEditorCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "T3D/convexShape.h"
 #include "renderInstance/renderPassManager.h"
 #include "collision/collision.h"
@@ -47,6 +48,8 @@
 #include "T3D/prefab.h"
 
 IMPLEMENT_CONOBJECT( GuiConvexEditorCtrl );
+
+IMPLEMENT_CALLBACK(GuiConvexEditorCtrl, onSelectionChanged, void, (const char* shape, const char* face), (shape, face), "");
 
 ConsoleDocClass( GuiConvexEditorCtrl,
    "@brief The base class for the sketch tool\n\n"
@@ -879,9 +882,8 @@ void GuiConvexEditorCtrl::renderScene(const RectI & updateRect)
           text = "WARNING: Reduce the number of surfaces on the selected ConvexShape, only the first 100 will be saved!";
       }
 
-      Con::executef( statusbar, "setInfo", text.c_str() );
-
-	Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mConvexSEL == NULL ? 0 : 1 ) );
+    statusbar->setInfo_callback( text.c_str() );
+    statusbar->setSelectionObjectsByCount_callback( Con::getIntArg( mConvexSEL == NULL ? 0 : 1 ) );
    }   
 
    if ( mActiveTool )
@@ -1461,7 +1463,7 @@ void GuiConvexEditorCtrl::setSelection( ConvexShape *shape, S32 faceId )
    mConvexSEL = shape;
    updateGizmoPos();
 
-   Con::executef( this, "onSelectionChanged", shape ? shape->getIdString() : "", Con::getIntArg(faceId) );
+   onSelectionChanged_callback( shape ? shape->getIdString() : "", Con::getIntArg(faceId) );
 }
 
 void GuiConvexEditorCtrl::_prepRenderImage( SceneManager* sceneGraph, const SceneRenderState* state )

@@ -84,6 +84,18 @@ ImplementEnumType( WorldEditorAlignmentType,
 EndImplementEnumType;
 
 
+IMPLEMENT_CALLBACK(WorldEditor, onSelect, void, (const char* idString), (idString),"");
+IMPLEMENT_CALLBACK(WorldEditor, onUnSelect, void, (const char* idString), (idString),"");
+IMPLEMENT_CALLBACK(WorldEditor, onClearSelection, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onSelectionCentroidChanged, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onWorldEditorUndo, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onSelectionSetChanged, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onMultiSelect, void, (const char* idString, const char* addToSelection), (idString, addToSelection),"");
+IMPLEMENT_CALLBACK(WorldEditor, getNewObjectGroup, StringTableEntry, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onStartSelection, void, (),(),"");
+IMPLEMENT_CALLBACK(WorldEditor, onEndSelection, void, (),(),"");
+
+
 // unnamed namespace for static data
 namespace {
 
@@ -394,7 +406,7 @@ void WorldEditor::WorldEditorUndoAction::undo()
    mWorldEditor->mSelected->invalidateCentroid();
 
    // Let the script get a chance at it.
-   Con::executef( mWorldEditor, "onWorldEditorUndo" );
+   mWorldEditor->onWorldEditorUndo_callback();
 }
 
 //------------------------------------------------------------------------------
@@ -456,7 +468,7 @@ bool WorldEditor::pasteSelection( bool dropSel )
    SimGroup *missionGroup = NULL;   
    if( isMethod( "getNewObjectGroup" ) )
    {
-      const char* targetGroupName = Con::executef( this, "getNewObjectGroup" );
+      const char* targetGroupName = this->getNewObjectGroup_callback();
       if( targetGroupName && targetGroupName[ 0 ] && !Sim::findObject( targetGroupName, missionGroup ) )
          Con::errorf( "WorldEditor::pasteSelection() - no SimGroup called '%s'", targetGroupName );
    }
@@ -487,7 +499,7 @@ bool WorldEditor::pasteSelection( bool dropSel )
       if ( !mSelectionLocked )
       {         
          mSelected->addObject( obj );
-         Con::executef( this, "onSelect", obj->getIdString() );
+		 this->onSelect_callback(obj->getIdString());
       }
    }
 
@@ -508,7 +520,10 @@ bool WorldEditor::pasteSelection( bool dropSel )
       SimObject *obj = NULL;
       if(mRedirectID)
          obj = Sim::findObject(mRedirectID);
-      Con::executef(obj ? obj : this, "onClick", buf);
+	  if (obj)
+		  obj->onClick_callback(buf);
+	  else
+		  this->onClick_callback(buf);
    }
 
    // Mark the world editor as dirty!
@@ -546,7 +561,7 @@ void WorldEditor::makeActiveSelectionSet( WorldEditorSelection* selection )
       for( Selection::iterator iter = oldSelection->begin(); iter != oldSelection->end(); ++ iter )
          if( !newSelection || !newSelection->objInSet( *iter ) )
          {
-            Con::executef( this, "onUnselect", ( *iter )->getIdString() );
+		    this->onUnSelect_callback(( *iter )->getIdString());
             markAsSelected( *iter, false );
          }
             
@@ -563,7 +578,7 @@ void WorldEditor::makeActiveSelectionSet( WorldEditorSelection* selection )
          if( !oldSelection || !oldSelection->objInSet( *iter ) )
          {
             markAsSelected( *iter, true );
-            Con::executef( this, "onSelect", ( *iter )->getIdString() );
+			this->onSelect_callback(( *iter )->getIdString());
          }
             
       newSelection->setAutoSelect( true );
@@ -573,8 +588,7 @@ void WorldEditor::makeActiveSelectionSet( WorldEditorSelection* selection )
             
    mSelected = newSelection;
    
-   if( isMethod( "onSelectionSetChanged" ) )
-      Con::executef( this, "onSelectionSetChanged" );
+   this->onSelectionSetChanged_callback();
 }
 
 //------------------------------------------------------------------------------
@@ -1623,7 +1637,7 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
          drawer->setBitmapModulation( ColorI(255,255,255,iconAlpha) );         
 
       drawer->drawBitmapStretch( classIcon, renderRect );      
-      drawer->clearBitmapModulation();
+      //drawer->clearBitmapModulation();
 
       if ( obj->isLocked() )      
          drawer->drawBitmap( mDefaultClassEntry.mLockedHandle, renderPos );      
@@ -1983,6 +1997,9 @@ void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
       if ( !(event.modifier & ( SI_RANGESELECT | SI_MULTISELECT ) ) )
          clearSelection();
 
+      if(mDragSelected->size() > 0)
+			onStartSelection_callback();
+
       mDragSelect = true;
       mDragSelected->clear();
       mDragRect.set( Point2I(event.mousePoint), Point2I(0,0) );
@@ -2030,24 +2047,34 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
          for ( U32 i = 0; i < mDragSelected->size(); i++ )                     
             mSelected->addObject( ( *mDragSelected )[i] );                       
                   
-         Con::executef( this, "onMultiSelect", mDragSelected->getIdString(), addToSelection ? "1" : "0" );
+		 this->onMultiSelect_callback( mDragSelected->getIdString(), addToSelection ? "1" : "0" );
          mDragSelected->clear();
 
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onClick", ( *mSelected )[ 0 ]->getIdString() );
+		 if (obj)
+			 obj->onClick_callback(( *mSelected )[ 0 ]->getIdString() );
+		 else
+			 this->onClick_callback(( *mSelected )[ 0 ]->getIdString() );
       }
-      else if ( mDragSelected->size() == 1 )
+
+      if(mDragSelected->size() > 0)
+			onEndSelection_callback();
+
+      if ( mDragSelected->size() == 1 )
       {         
          mSelected->addObject( ( *mDragSelected )[0] );    
-         Con::executef( this, "onSelect", ( *mDragSelected )[ 0 ]->getIdString() );
+		 this->onSelect_callback(( *mDragSelected )[ 0 ]->getIdString() );
          mDragSelected->clear();
          
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onClick", ( *mSelected )[ 0 ]->getIdString() );
+		 if (obj)
+			 obj->onClick_callback(( *mSelected )[ 0 ]->getIdString());
+		 else
+		     this->onClick_callback(( *mSelected )[ 0 ]->getIdString());
       }
 
       mouseUnlock();
@@ -2064,13 +2091,13 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
             {
                mSelected->removeObject( mPossibleHitObject );
                mSelected->storeCurrentCentroid();
-               Con::executef( this, "onUnSelect", mPossibleHitObject->getIdString() );
+			   this->onUnSelect_callback(mPossibleHitObject->getIdString());
             }
             else
             {
                mSelected->addObject( mPossibleHitObject );
                mSelected->storeCurrentCentroid();
-               Con::executef( this, "onSelect", mPossibleHitObject->getIdString() );
+			   this->onSelect_callback(mPossibleHitObject->getIdString() );
             }
          }
          else
@@ -2084,12 +2111,12 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
                // in reverse.  This will make the loop work even if items are removed as
                // we go along.
                for( S32 i = mSelected->size() - 1; i >= 0; -- i )
-                  Con::executef( this, "onUnSelect", ( *mSelected )[ i ]->getIdString() );
+				  this->onUnSelect_callback(( *mSelected )[ i ]->getIdString());
                
                mSelected->clear();
                mSelected->addObject( mPossibleHitObject );
                mSelected->storeCurrentCentroid();
-               Con::executef( this, "onSelect", mPossibleHitObject->getIdString() );
+			   this->onSelect_callback( mPossibleHitObject->getIdString() );
             }
          }
       }
@@ -2103,7 +2130,12 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onDblClick", buf );
+
+         if(obj != NULL)
+         { obj->onDblClick_callback(buf); }
+         else
+         { this->onDblClick_callback(buf); }
+
       }
       else 
       {
@@ -2113,7 +2145,10 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onClick", buf );
+		 if (obj)
+			 obj->onClick_callback(buf);
+		 else
+			 this->onClick_callback(buf);
       }
 
       mHitObject = mPossibleHitObject;
@@ -2121,20 +2156,21 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
 
    if ( bool(mSelected) && mSelected->hasCentroidChanged() )
    {
-      Con::executef( this, "onSelectionCentroidChanged");
+      this->onSelectionCentroidChanged_callback();
    }
 
    if ( mMouseDragged && bool(mSelected) && mSelected->size() )
    {
       if ( mSelected->size() )
       {
-         if ( isMethod("onEndDrag") )
-         {
             SimObject * obj = 0;
             if ( mRedirectID )
-               obj = Sim::findObject( mRedirectID );
-            Con::executef( obj ? obj : this, "onEndDrag", ( *mSelected )[ 0 ]->getIdString() );
-         }
+            { obj = Sim::findObject( mRedirectID ); } 
+
+            if(obj != nullptr)
+            { obj->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
+            else
+            { this->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
       }
    }
 
@@ -2323,7 +2359,10 @@ void WorldEditor::updateGuiInfo()
       obj = Sim::findObject( mRedirectID );
 
    char buf[] = "";
-   Con::executef( obj ? obj : this, "onGuiUpdate", buf );
+   if(obj != nullptr)
+   { obj->onGuiUpdate_callback(buf); }
+   else
+   { this->onGuiUpdate_callback(buf); }
 }
 
 //------------------------------------------------------------------------------
@@ -2787,8 +2826,8 @@ void WorldEditor::clearIgnoreList()
 void WorldEditor::setObjectsUseBoxCenter(bool state)
 {
    mObjectsUseBoxCenter = state;
-   if( getActiveSelectionSet() && isMethod( "onSelectionCentroidChanged" ) )
-      Con::executef( this, "onSelectionCentroidChanged" );
+   if( getActiveSelectionSet())
+	  this->onSelectionCentroidChanged_callback();
 }
 
 void WorldEditor::clearSelection()
@@ -2801,9 +2840,8 @@ void WorldEditor::clearSelection()
    // in reverse.  This will make the loop work even if items are removed as
    // we go along.
    for( S32 i = mSelected->size() - 1; i >= 0; -- i )
-      Con::executef( this, "onUnSelect", ( *mSelected )[ i ]->getIdString() );
-
-   Con::executef(this, "onClearSelection");
+	  this->onUnSelect_callback(( *mSelected )[ i ]->getIdString());
+   this->onClearSelection_callback();
    mSelected->clear();
 }
 
@@ -2818,7 +2856,7 @@ void WorldEditor::selectObject( SimObject *obj )
    if ( !objClassIgnored( obj ) && !mSelected->objInSet( obj ) )
    {
       mSelected->addObject( obj );	
-      Con::executef( this, "onSelect", obj->getIdString() );
+	  this->onSelect_callback(obj->getIdString() );
    }
 }
 
@@ -2838,7 +2876,7 @@ void WorldEditor::unselectObject( SimObject *obj )
    if ( !objClassIgnored( obj ) && mSelected->objInSet( obj ) )
    {
       mSelected->removeObject( obj );	
-      Con::executef( this, "onUnSelect", obj->getIdString() );
+	  this->onUnSelect_callback(obj->getIdString());
    }
 }
 
@@ -2916,7 +2954,7 @@ void WorldEditor::dropCurrentSelection( bool skipUndo )
 	dropSelection( mSelected );	
 
    if ( mSelected->hasCentroidChanged() )
-      Con::executef( this, "onSelectionCentroidChanged" );
+	  this->onSelectionCentroidChanged_callback();
 }
 
 void WorldEditor::redirectConsole( S32 objID )
@@ -3142,16 +3180,17 @@ void WorldEditor::transformSelection(bool position, Point3F& p, bool relativePos
 
    if(mSelected->hasCentroidChanged())
    {
-      Con::executef( this, "onSelectionCentroidChanged");
+      this->onSelectionCentroidChanged_callback();
    }
 
-   if ( isMethod("onEndDrag") )
-   {
-      SimObject * obj = 0;
-      if ( mRedirectID )
-         obj = Sim::findObject( mRedirectID );
-      Con::executef( obj ? obj : this, "onEndDrag", ( *mSelected )[ 0 ]->getIdString() );
-   }
+   SimObject * obj = 0;
+   if ( mRedirectID )
+   { obj = Sim::findObject( mRedirectID ); }
+
+   if(obj != nullptr)
+   { obj->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
+   else
+   { this->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
 }
 
 //------------------------------------------------------------------------------

@@ -24,6 +24,7 @@
 #include "platform/menus/menuBar.h"
 #include "platform/menus/popupMenu.h"
 #include "gui/core/guiCanvas.h"
+#include "console/engineAPI.h"
 
 //-----------------------------------------------------------------------------
 // Constructor/Destructor

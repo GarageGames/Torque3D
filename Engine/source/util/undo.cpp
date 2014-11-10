@@ -25,6 +25,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 //-----------------------------------------------------------------------------
 // UndoAction
@@ -41,6 +42,11 @@ ConsoleDocClass( UndoScriptAction,
 				"@brief Undo actions which can be created as script objects.\n\n"
 				"Not intended for game development, for editors or internal use only.\n\n "
 				"@internal");
+
+IMPLEMENT_CALLBACK(UndoScriptAction, undo, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoScriptAction, redo, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoScriptAction, onAdd, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoScriptAction, onRemove, void, (), (),"");
 
 UndoAction::UndoAction(const UTF8 *actionName)
 {
@@ -156,6 +162,12 @@ ConsoleMethod( CompoundUndoAction, addAction, void, 3, 3, "addAction( UndoAction
 //-----------------------------------------------------------------------------
 IMPLEMENT_CONOBJECT(UndoManager);
 
+IMPLEMENT_CALLBACK(UndoManager, onClear, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoManager, onRemoveUndo, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoManager, onUndo, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoManager, onRedo, void, (), (),"");
+IMPLEMENT_CALLBACK(UndoManager, onAddUndo, void, (), (),"");
+
 ConsoleDocClass( UndoManager,
 				"@brief SimObject which adds, tracks, and deletes UndoAction objects.\n\n"
 				"Not intended for game development, for editors or internal use only.\n\n "
@@ -215,7 +227,7 @@ void UndoManager::clearAll()
    clearStack(mUndoStack);
    clearStack(mRedoStack);
    
-   Con::executef(this, "onClear");
+   onClear_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -296,7 +308,7 @@ void UndoManager::doRemove( UndoAction* action, bool noDelete )
    }
 
    if( isProperlyAdded() )
-      Con::executef(this, "onRemoveUndo");
+   { onRemoveUndo_callback(); }
 }
 
 //-----------------------------------------------------------------------------
@@ -319,6 +331,8 @@ void UndoManager::undo()
 
    // perform the undo, whatever it may be.
    (*act).undo();
+
+   onUndo_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -341,6 +355,8 @@ void UndoManager::redo()
    
    // perform the redo, whatever it may be.
    (*react).redo();
+
+   onRedo_callback();
 }
 
 ConsoleMethod(UndoManager, getUndoCount, S32, 2, 2, "")
@@ -468,7 +484,7 @@ void UndoManager::addAction(UndoAction* action)
    if(mUndoStack.size() > mNumLevels)
       mUndoStack.pop_front();
 
-   Con::executef(this, "onAddUndo");
+   onAddUndo_callback();
 }
 
 //-----------------------------------------------------------------------------

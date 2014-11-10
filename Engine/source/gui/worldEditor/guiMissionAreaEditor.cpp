@@ -22,8 +22,11 @@
 
 #include "gui/worldEditor/guiMissionAreaEditor.h"
 #include "gui/core/guiCanvas.h"
+#include "console/engineAPI.h"
 
 IMPLEMENT_CONOBJECT(GuiMissionAreaEditorCtrl);
+
+IMPLEMENT_CALLBACK( GuiMissionAreaEditorCtrl, onMissionAreaSelected, void, (const char * missionArea), (missionArea), "" );
 
 ConsoleDocClass( GuiMissionAreaEditorCtrl,
    "@brief Specialized GUI used for editing the MissionArea in a level\n\n"
@@ -89,9 +92,9 @@ void GuiMissionAreaEditorCtrl::setSelectedMissionArea( MissionArea *missionArea 
    mSelMissionArea = missionArea;
 
    if ( mSelMissionArea != NULL )
-      Con::executef( this, "onMissionAreaSelected", missionArea->getIdString() );
+   { onMissionAreaSelected_callback( missionArea->getIdString() ); }
    else
-      Con::executef( this, "onMissionAreaSelected" );
+   { onMissionAreaSelected_callback( "" ); }
 }
 
 ConsoleMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, 2, 3, "" )

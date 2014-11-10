@@ -52,6 +52,9 @@ namespace {
 
 IMPLEMENT_CONOBJECT(GuiMissionAreaCtrl);
 
+IMPLEMENT_CALLBACK( GuiMissionAreaCtrl, onMissionAreaModified, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiMissionAreaCtrl, onUndo, void, (), (), "" );
+
 ConsoleDocClass( GuiMissionAreaCtrl,
    "@brief Visual representation of Mission Area Editor.\n\n"
    "@internal"
@@ -96,6 +99,10 @@ void GuiMissionAreaCtrl::initPersistFields()
    addField( "cameraColor",         TypeColorI,    Offset(mCameraColor, GuiMissionAreaCtrl));
 
    Parent::initPersistFields();
+
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //------------------------------------------------------------------------------
@@ -184,7 +191,7 @@ void GuiMissionAreaCtrl::onMouseUp(const GuiEvent & event)
    if(mSavedDrag)
    {
       // Let the script get a chance at it.
-      Con::executef( this, "onMissionAreaModified" );
+      onMissionAreaModified_callback();
    }
    mSavedDrag = false;
 }
@@ -290,12 +297,16 @@ void GuiMissionAreaCtrl::onMouseEnter(const GuiEvent &)
 {
    mLastHitMode = Handle_None;
    //setCursor(DefaultCursor);
+
+   // fade control
+   fadeControl();
 }
 
 void GuiMissionAreaCtrl::onMouseLeave(const GuiEvent &)
 {
    mLastHitMode = Handle_None;
    //setCursor(DefaultCursor);
+   smCapturedControl = this;
 }
 
 //------------------------------------------------------------------------------
@@ -435,7 +446,7 @@ void GuiMissionAreaCtrl::drawHandles(RectI & box)
    F32 by = box.point.y + fillOffset, ty = box.point.y + box.extent.y + fillOffset;
    F32 cy = (ty + by) * 0.5f;
 
-   GFX->getDrawUtil()->clearBitmapModulation();
+   //GFX->getDrawUtil()->clearBitmapModulation();
    drawHandle(Point2F(lx, ty));
    drawHandle(Point2F(lx, cy));
    drawHandle(Point2F(lx, by));
@@ -606,11 +617,11 @@ void GuiMissionAreaCtrl::onRender(Point2I offset, const RectI & updateRect)
       rect.extent.x > rect.extent.y ? rect.extent.x = rect.extent.y : rect.extent.y = rect.extent.x;
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
    drawer->drawBitmapStretch(mTextureObject, rect, GFXBitmapFlip_Y, GFXTextureFilterLinear, false);
 
    GFX->setStateBlock(mSolidStateBlock);
-   drawer->clearBitmapModulation();
+   //drawer->clearBitmapModulation();
 
    // draw the reference axis
    PrimBuild::begin( GFXLineList, 4 );
@@ -716,5 +727,5 @@ void GuiMissionAreaUndoAction::undo()
    mArea = area;
 
    // Let the script get a chance at it.
-   Con::executef( mMissionAreaEditor, "onUndo" );
+   mMissionAreaEditor->onUndo_callback();
 }

@@ -51,8 +51,10 @@ public:
    enum
    {
       Icon_Folder = 1,
-      Icon_FolderClosed = 2,
-      Icon_Doc = 3
+      Icon_FolderOpen = 2,
+      Icon_TsStatic = 3,
+	  Icon_Collada = 4,
+	  Icon_Prefab = 5
    };
    
    GuiFileTreeCtrl();
@@ -70,6 +72,8 @@ public:
    DECLARE_DESCRIPTION( "A control that displays a hierarchical tree view of a path in the game file system.\n"
                         "Note that to enable expanding/collapsing of directories, the control must be\n"
                         "placed inside a GuiScrollCtrl." );
+
+   DECLARE_CALLBACK(void, onSelectPath, (const char* path));
 
    static void initPersistFields();
 };

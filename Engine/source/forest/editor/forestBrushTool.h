@@ -61,6 +61,12 @@ public:
 
    // SimObject
    DECLARE_CONOBJECT( ForestBrushTool );
+
+    DECLARE_CALLBACK(void, onMouseDown, ());
+    DECLARE_CALLBACK(void, onActivated, ());
+    DECLARE_CALLBACK(void, onDeactivated, ());
+    DECLARE_CALLBACK(void, syncBrushToolbar, ());
+
    static void initPersistFields();
    virtual bool onAdd();
    virtual void onRemove();

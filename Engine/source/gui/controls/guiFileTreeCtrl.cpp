@@ -25,6 +25,8 @@
 #include "core/frameAllocator.h"
 #include "core/strings/stringUnit.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
+#include "gui/worldEditor/editorIconRegistry.h"
 
 
 IMPLEMENT_CONOBJECT(GuiFileTreeCtrl);
@@ -56,6 +58,8 @@ static bool _hasChildren(const char* path)
    
    return dummy.size() > 0;
 }
+
+IMPLEMENT_CALLBACK(GuiFileTreeCtrl, onSelectPath, void, (const char* path), (path), "");
 
 GuiFileTreeCtrl::GuiFileTreeCtrl()
    : Parent()
@@ -222,7 +226,7 @@ void GuiFileTreeCtrl::addPathToTree( StringTableEntry path )
 
 void GuiFileTreeCtrl::onItemSelected( Item *item )
 {
-   Con::executef( this, "onSelectPath", avar("%s",item->getValue()) );
+   onSelectPath_callback( avar("%s",item->getValue()) );
 
    mSelPath = item->getValue();
    if( _hasChildren( mSelPath ) )
@@ -291,8 +295,11 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
    }
    else
    {
-      dStrncpy( szValue, curPos, sizeof( szValue ) );
-      szValue[ sizeof( szValue ) - 1 ] = 0;
+	   if( !mRootPath.isEmpty())
+		   dSprintf( szValue, sizeof( szValue ), "%s/%s", mRootPath.c_str(), curPos );
+	   else
+		   dStrncpy( szValue, curPos, sizeof( szValue ) );
+	   szValue[ sizeof( szValue ) - 1 ] = 0;
    }
    
    const U32 valueLen = dStrlen( szValue );
@@ -309,7 +316,12 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
    S32 itemIndex = 0;
    // only insert blindly if we have no root
    if( !parent )
-      itemIndex = insertItem( 0, curPos, curPos );
+   {
+	   bool allowed = true;
+	   if( String::ToString("%s", value ).find(".") != String::NPos )
+		   allowed = matchesFilters(value);
+	   itemIndex = allowed ? insertItem( 0, curPos, curPos ) : -1;
+   }
    else
    {
       bool allowed = (_isDirInMainDotCsPath(value) || matchesFilters(value));
@@ -335,14 +347,24 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
       newitem->setValue( value );
       if( _isDirInMainDotCsPath( value ) )
       {
-         newitem->setNormalImage( Icon_FolderClosed );
-         newitem->setExpandedImage( Icon_Folder );
+         newitem->setNormalImage( Icon_Folder );
+         newitem->setExpandedImage( Icon_FolderOpen );
          newitem->setVirtualParent(true);
          newitem->setExpanded(false);
       }
       else
       {
-         newitem->setNormalImage( Icon_Doc );
+         const char* val = newitem->getValue();
+		  if( matchesFilters(val) )
+		  {
+			String ext = dStrrchr(val, '.');
+			ext = String::ToLower(ext);
+
+			if( !dStricmp(ext, ".dts") )
+				newitem->setNormalImage( Icon_TsStatic );
+			else
+				newitem->setNormalImage( Icon_Collada );
+		  }
       }
    }
    // since we're only dealing with volumes and directories, all end nodes will be virtual parents

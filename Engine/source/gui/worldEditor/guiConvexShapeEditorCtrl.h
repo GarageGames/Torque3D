@@ -54,6 +54,8 @@ public:
 
    DECLARE_CONOBJECT( GuiConvexEditorCtrl );
 
+   DECLARE_CALLBACK(void, onSelectionChanged, (const char* shape, const char* face));
+
    // SimObject
    virtual bool onAdd();
    virtual void onRemove();

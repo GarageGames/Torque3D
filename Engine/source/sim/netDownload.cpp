@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "core/dnet.h"
 #include "console/simBase.h"
+#include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "core/stream/bitStream.h"
 #include "core/stream/fileStream.h"
@@ -153,6 +154,9 @@ public:
 
 IMPLEMENT_CO_NETEVENT_V1(FileChunkEvent);
 
+IMPLEMENT_GLOBAL_CALLBACK( onFileChunkReceived, void, ( const char * fileName, const char * ofs, const char * size ), ( fileName, ofs, size ), "");
+
+
 ConsoleDocClass( FileChunkEvent,
 				"@brief Used by NetConnection for sending/receiving chunks of data.\n\n"
 				"Not intended for game development, for editors or internal use only.\n\n "
@@ -267,7 +271,7 @@ void NetConnection::chunkReceived(U8 *chunkData, U32 chunkLen)
    }
    else
    {
-      Con::executef("onFileChunkReceived", mMissingFileList[0], Con::getIntArg(mCurrentFileBufferOffset), Con::getIntArg(mCurrentFileBufferSize));
+      onFileChunkReceived_callback( mMissingFileList[0], Con::getIntArg(mCurrentFileBufferOffset), Con::getIntArg(mCurrentFileBufferSize) );
    }
 }
 

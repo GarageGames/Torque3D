@@ -75,7 +75,7 @@ void AbstractClassRep::init()
 const AbstractClassRep::Field *AbstractClassRep::findField(StringTableEntry name) const
 {
    for(U32 i = 0; i < mFieldList.size(); i++)
-      if(mFieldList[i].pFieldname == name)
+      if(!dStricmp(mFieldList[i].pFieldname ,name) )
          return &mFieldList[i];
 
    return NULL;

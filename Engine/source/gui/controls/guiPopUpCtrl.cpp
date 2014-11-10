@@ -119,7 +119,8 @@ void GuiPopupTextListCtrl::onCellSelected( Point2I cell )
       return;
 
    if( isMethod( "onSelect" ) )
-      Con::executef(this, "onSelect", Con::getFloatArg(cell.x), Con::getFloatArg(cell.y));
+   { onSelect_callback( Con::getFloatArg(cell.x), Con::getFloatArg(cell.y)); }
+      
 
    //call the console function
    execConsoleCallback();
@@ -784,6 +785,10 @@ S32 GuiPopUpMenuCtrl::findText( const char* text )
    return( -1 );
 }
 
+IMPLEMENT_CALLBACK(GuiPopUpMenuCtrl, onSelect, void, (const char* id, const char* text), (id, text), "");
+IMPLEMENT_CALLBACK(GuiPopUpMenuCtrl, onCancel, void, (), (), "");
+
+
 //------------------------------------------------------------------------------
 void GuiPopUpMenuCtrl::setSelected(S32 id, bool bNotifyScript )
 {
@@ -802,7 +807,7 @@ void GuiPopUpMenuCtrl::setSelected(S32 id, bool bNotifyScript )
          if( bNotifyScript )
          {
             if( isMethod( "onSelect" ) )
-               Con::executef( this, "onSelect", Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf );
+            { onSelect_callback( Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf ); }
                
             execConsoleCallback();
          }
@@ -818,7 +823,7 @@ void GuiPopUpMenuCtrl::setSelected(S32 id, bool bNotifyScript )
    mSelIndex = -1;
 
    if( bNotifyScript && isMethod( "onCancel" ) )
-      Con::executef( this, "onCancel" );
+   { onCancel_callback(); }
 
    if( id == -1 )
       return;
@@ -844,7 +849,7 @@ void GuiPopUpMenuCtrl::setFirstSelected( bool bNotifyScript )
 		if( bNotifyScript )
       {
          if ( isMethod( "onSelect" ) )
-            Con::executef( this, "onSelect", Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf );
+         { onSelect_callback( Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf ); }
 
 			execConsoleCallback();
       }
@@ -858,7 +863,7 @@ void GuiPopUpMenuCtrl::setFirstSelected( bool bNotifyScript )
 
 		if( bNotifyScript )
       {
-			Con::executef( this, "onCancel" );
+			onCancel_callback();
          execConsoleCallback();
       }
 	}
@@ -913,13 +918,13 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
       if ( mTextureDepressed )
       {
          RectI rect(offset, mBitmapBounds);
-         GFX->getDrawUtil()->clearBitmapModulation();
+         //GFX->getDrawUtil()->clearBitmapModulation();
          GFX->getDrawUtil()->drawBitmapStretch( mTextureDepressed, rect );
       } 
       else if ( mTextureNormal )
       {
          RectI rect(offset, mBitmapBounds);
-         GFX->getDrawUtil()->clearBitmapModulation();
+         //GFX->getDrawUtil()->clearBitmapModulation();
          GFX->getDrawUtil()->drawBitmapStretch( mTextureNormal, rect );
       }
 
@@ -957,7 +962,7 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          if ( mTextureNormal )
          {
             RectI rect( offset, mBitmapBounds );
-            GFX->getDrawUtil()->clearBitmapModulation();
+            //GFX->getDrawUtil()->clearBitmapModulation();
             GFX->getDrawUtil()->drawBitmapStretch( mTextureNormal, rect );
          }
 
@@ -987,7 +992,7 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          if ( mTextureNormal )
          {
             RectI rect(offset, mBitmapBounds);
-            GFX->getDrawUtil()->clearBitmapModulation();
+            //GFX->getDrawUtil()->clearBitmapModulation();
             GFX->getDrawUtil()->drawBitmapStretch( mTextureNormal, rect );
          }
 
@@ -1158,13 +1163,13 @@ void GuiPopUpMenuCtrl::closePopUp()
    if( mSelIndex != -1 && !mBackgroundCancel )
    {
       if ( isMethod( "onSelect" ) )
-         Con::executef( this, "onSelect", Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf );
+      { onSelect_callback( Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf ); }
 
       // Execute the popup console command:
       execConsoleCallback();
    }
    else if ( isMethod( "onCancel" ) )
-      Con::executef( this, "onCancel" );
+   { onCancel_callback(); }
 
    // Pop the background:
    GuiCanvas *root = getRoot();
@@ -1470,6 +1475,9 @@ void GuiPopUpMenuCtrl::onMouseUp( const GuiEvent &event )
 void GuiPopUpMenuCtrl::onMouseEnter( const GuiEvent &event )
 {
    mMouseOver = true;
+
+   // fade control
+   fadeControl();
 }
 
 //------------------------------------------------------------------------------
@@ -1477,6 +1485,7 @@ void GuiPopUpMenuCtrl::onMouseEnter( const GuiEvent &event )
 void GuiPopUpMenuCtrl::onMouseLeave( const GuiEvent &event )
 {
    mMouseOver = false;
+   smCapturedControl = this;
 }
 
 //------------------------------------------------------------------------------

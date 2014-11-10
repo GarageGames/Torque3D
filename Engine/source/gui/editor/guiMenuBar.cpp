@@ -1083,6 +1083,10 @@ void GuiMenuBar::initPersistFields()
    addField("padding", TypeS32, Offset( mPadding, GuiMenuBar ),"Extra padding to add to the bounds of the control.\n");
 
    Parent::initPersistFields();
+
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 bool GuiMenuBar::onWake()
@@ -1297,7 +1301,7 @@ void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 		 Point2I bitmapstart(start);
 		 bitmapstart.y = walk->bounds.point.y + ( walk->bounds.extent.y - rect.extent.y ) / 2;
 
-         GFX->getDrawUtil()->clearBitmapModulation();
+         //GFX->getDrawUtil()->clearBitmapModulation();
          GFX->getDrawUtil()->drawBitmapSR( mProfile->mTextureObject, offset + bitmapstart, rect);
 
 		 // Should we also draw the text?
@@ -1433,7 +1437,7 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
       Point2I off = mMenuBarCtrl->maxBitmapSize - rect.extent;
       off /= 2;
 
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, offset + off, rect);
    } 
 

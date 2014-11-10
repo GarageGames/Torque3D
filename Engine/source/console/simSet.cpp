@@ -34,6 +34,7 @@
 #include "console/typeValidators.h"
 #include "core/frameAllocator.h"
 #include "math/mMathFn.h"
+#include "console/SimXMLDocument.h"
 
 
 IMPLEMENT_CONOBJECT( SimSet );
@@ -370,6 +371,38 @@ void SimSet::write(Stream &stream, U32 tabStop, U32 flags)
 
    }
 
+   /// For XML Output
+   if( flags & XmlOutput )
+   {
+	   getcurrentXML()->pushNewElement("Group");
+
+	   getcurrentXML()->setAttribute("name", getClassName());
+	   getcurrentXML()->setAttribute("fileName", getFilename());
+	   char buffer[1024];
+	   dSprintf(buffer, sizeof(buffer), "%d", getDeclarationLine());
+	   getcurrentXML()->setAttribute("lineNumber", buffer);
+	   getcurrentXML()->pushNewElement("Setting");	   
+	   getcurrentXML()->setAttribute("name", "name");
+	   if(getName())
+		   getcurrentXML()->addData(getName());
+	   else
+		   getcurrentXML()->addData(" ");
+	   getcurrentXML()->popElement();
+	   writeFields( stream, tabStop + 1, true);
+
+	   if(size())
+	   {
+		  for(U32 i = 0; i < size(); i++)
+		  {
+			 SimObject* child = ( *this )[ i ];
+			 if( child->getCanSave() )
+				child->write(stream, tabStop + 1, flags);
+		  }
+	   }
+
+	   getcurrentXML()->popElement();
+	   return;
+   }
    stream.writeTabs( tabStop );
    char buffer[ 2048 ];
    const U32 bufferWriteLen = dSprintf( buffer, sizeof( buffer ), "new %s(%s) {\r\n", getClassName(), getName() && !( flags & NoName ) ? getName() : "" );

@@ -39,8 +39,6 @@ private:
 	RectI mOrigBounds;
 public:
 	DECLARE_CONOBJECT(GuiGradientSwatchCtrl);
-	DECLARE_CALLBACK( void, onMouseDown, ());
-	DECLARE_CALLBACK( void, onDoubleClick, ());
 	GuiGradientSwatchCtrl();
 	void onMouseDown(const GuiEvent &);
 	void onRightMouseDown(const GuiEvent &);
@@ -99,7 +97,7 @@ private:
 	PickMode mSaveDisplayMode;
 
    bool mPositionChanged;	///< Current position has changed since last render?
-   bool mMouseOver;		///< Mouse is over?
+  //bool mMouseOver;		///< Mouse is over?
    bool mMouseDown;		///< Mouse button down?
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
@@ -112,6 +110,14 @@ private:
 	ColorF colorAlphaW;
    /// @}
 	String mColorFunction;
+   ColorF mPickColorCopy;
+   ColorF mBaseColorCopy;
+
+   void applyProfileSettings();
+
+   void copyProfileSettings();
+
+   void resetProfileSettings();
 	
 public:   
    
@@ -121,6 +127,7 @@ public:
    GuiGradientCtrl();
 
    static void initPersistFields();
+   void onStaticModified( const char *slotName, const char* newValue );
    void onRender(Point2I offset, const RectI &updateRect);
    bool mShowReticle;       ///< Show reticle on render
    /// @name Color Value Functions

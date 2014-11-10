@@ -48,10 +48,19 @@ class GuiSpeedometerHud : public GuiBitmapCtrl
 
    GFXStateBlockRef mBlendSB;
 
+   /// Copy information
+   ColorF mColorCopy;
+
+   void applyProfileSettings();
+
+   void copyProfileSettings();
+
+   void resetProfileSettings();
 public:
    GuiSpeedometerHud();
 
    void onRender( Point2I, const RectI &);
+   void onStaticModified( const char *slotName, const char *newValue );
    static void initPersistFields();
    DECLARE_CONOBJECT( GuiSpeedometerHud );
    DECLARE_CATEGORY( "Gui Game" );
@@ -141,8 +150,63 @@ void GuiSpeedometerHud::initPersistFields()
    endGroup("Needle");
 
    Parent::initPersistFields();
+
+   removeField( "controlFontColor" );
+
+   removeField( "controlFillColor" );
+
+   removeField( "backgroundColor" );
+
+   removeField( "contextFontColor" );
+
+   removeField( "contextBackColor" );
+
+   removeField( "contextFillColor" );
 }
 
+
+void GuiSpeedometerHud::copyProfileSettings()
+{
+	if(!mProfileSettingsCopied)
+	{
+		mColorCopy = mColor;
+		
+		Parent::copyProfileSettings();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiSpeedometerHud::resetProfileSettings()
+{
+	mColor = mColorCopy;
+
+	Parent::resetProfileSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiSpeedometerHud::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   //Set the alpha value
+   if(mColor)
+	   mColor.alpha = mColorCopy.alpha *mRenderAlpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiSpeedometerHud::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "color" ))
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+
+		mColorCopy = color;
+	}
+}
 
 //-----------------------------------------------------------------------------
 /**

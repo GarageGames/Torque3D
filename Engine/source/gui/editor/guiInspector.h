@@ -47,6 +47,23 @@ public:
    DECLARE_CATEGORY( "Gui Editor" );
    DECLARE_DESCRIPTION( "A control that allows to edit the properties of one or more SimObjects." );
 
+   /// @name Callbacks
+   /// @{
+   DECLARE_CALLBACK( void, onClear, () );
+   DECLARE_CALLBACK( void, beginCompoundUndo, () );
+   DECLARE_CALLBACK( void, endCompoundUndo, () );
+   DECLARE_CALLBACK( void, onBeginCompoundEdit, () );
+   DECLARE_CALLBACK( void, onEndCompoundEdit, () );
+   DECLARE_CALLBACK( void, onFieldSelected, ( const char* fieldName, const char* fieldTypeStr, const char* fieldDoc ) );
+   DECLARE_CALLBACK( void, onFieldRightClick, ( const char* field ) );
+   DECLARE_CALLBACK( void, onFieldAdded, ( const char* object, const char* fieldName ) );
+   DECLARE_CALLBACK( void, onFieldRemoved, ( const char* object, const char* fieldName ) );
+   DECLARE_CALLBACK( void, onFieldRenameAlreadyDefined, ( const char* object, const char* oldFieldName, const char* newFieldName ) );
+   DECLARE_CALLBACK( void, onFieldRenamed, ( const char* object, const char* oldFieldName, const char* newFieldName ) );
+   DECLARE_CALLBACK( void, onInspectorFieldModified, ( const char* object, const char* fieldName, const char* arrayIndex, const char* oldValue, const char* newValue ) );
+   /// @}
+
+
    // Console Object
    static void initPersistFields();
 

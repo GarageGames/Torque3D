@@ -65,7 +65,8 @@ class GuiTabBookCtrl : public GuiContainer
       enum TabPosition
       {
          AlignTop,   ///< Align the tabs on the top of the tab book control
-         AlignBottom ///< Align the tabs on the bottom of the tab book control
+         AlignBottom, ///< Align the tabs on the bottom of the tab book control
+		 AlignRight	  ///< Align the tabs on the right of the tab book control	//TabBookChanges
       };
 
       struct TabHeaderInfo

@@ -40,6 +40,7 @@
 #include "materials/baseMatInstance.h"
 #include "environment/nodeListManager.h"
 #include "lighting/lightQuery.h"
+#include "console/SimXMLDocument.h"
 
 
 extern F32 gDecalBias;
@@ -438,22 +439,32 @@ SimSet* DecalRoad::getServerSet()
    return smServerDecalRoadSet;
 }
 
-void DecalRoad::writeFields( Stream &stream, U32 tabStop )
+void DecalRoad::writeFields( Stream &stream, U32 tabStop, bool XMLOutput  )
 {
-   Parent::writeFields( stream, tabStop );
+   Parent::writeFields( stream, tabStop, XMLOutput );
 
    // Now write all nodes
 
-   stream.write(2, "\r\n");   
+   if(!XMLOutput)
+      stream.write(2, "\r\n");   
 
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
       const RoadNode &node = mNodes[i];
 
-      stream.writeTabs(tabStop);
-
       char buffer[1024];
       dMemset( buffer, 0, 1024 );
+     /// For XML Output
+     if(XMLOutput)
+     {
+        dSprintf( buffer, 1024, "%f %f %f %f", node.point.x, node.point.y, node.point.z, node.width );
+        getcurrentXML()->pushNewElement("Node");
+        getcurrentXML()->addData( buffer );
+        getcurrentXML()->popElement();
+        continue;
+     }
+     /// For Stream Output
+     stream.writeTabs(tabStop);
       dSprintf( buffer, 1024, "Node = \"%f %f %f %f\";", node.point.x, node.point.y, node.point.z, node.width );      
       stream.writeLine( (const U8*)buffer );
    }

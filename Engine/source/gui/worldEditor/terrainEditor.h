@@ -489,6 +489,11 @@ class TerrainEditor : public EditTSCtrl
 
 
       DECLARE_CONOBJECT(TerrainEditor);     
+
+      DECLARE_CALLBACK( void, onBrushChanged, () );
+      DECLARE_CALLBACK( void, onMaterialUndo, () );
+      DECLARE_CALLBACK( void, onGuiUpdate, (const char * text) );
+      DECLARE_CALLBACK( void, onActiveTerrainChange, (const char * newTerrain) );
 };
 
 inline void TerrainEditor::setGridInfoHeight(const GridInfo & info)

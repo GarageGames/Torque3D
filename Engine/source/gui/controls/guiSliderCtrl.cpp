@@ -96,7 +96,7 @@ GuiSliderCtrl::GuiSliderCtrl()
      mShiftExtent( 10 ),
      mIncAmount( 0.f ),
      mDisplayValue( false ),
-     mMouseOver( false ),
+     //mMouseOver( false ),
      mMouseDragged( false ),
      mDepressed( false )
 {
@@ -121,6 +121,10 @@ void GuiSliderCtrl::initPersistFields()
    endGroup( "Slider" );
 
    Parent::initPersistFields();
+
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +259,9 @@ void GuiSliderCtrl::onMouseEnter(const GuiEvent &event)
       
       mMouseOver = true;
    }
+
+   // fade control
+   fadeControl();
 }
 
 //----------------------------------------------------------------------------
@@ -265,6 +272,7 @@ void GuiSliderCtrl::onMouseLeave(const GuiEvent &)
    if( isMouseLocked() )
       mDepressed = false;
    mMouseOver = false;
+   smCapturedControl = this;
 }
 //----------------------------------------------------------------------------
 
@@ -402,7 +410,7 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
       S32 index = SliderButtonNormal;
       if(mMouseOver)
          index = SliderButtonHighlight;
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
 
       //left border
       GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, Point2I(offset.x,offset.y), mBitmapBounds[SliderLineLeft]);

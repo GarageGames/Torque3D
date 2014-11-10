@@ -58,7 +58,7 @@ GuiInspectorField::GuiInspectorField( GuiInspector* inspector,
    setCanSave( false );
    setBounds(0,0,100,18);
    
-   if( field != NULL )
+   if( field )
       _setFieldDocs( field->pFieldDocs );
 }
 
@@ -234,7 +234,7 @@ void GuiInspectorField::onMouseDown( const GuiEvent &event )
 void GuiInspectorField::onRightMouseUp( const GuiEvent &event )
 {
    if ( mCaptionRect.pointInRect( globalToLocalCoord( event.mousePoint ) ) ) 
-      Con::executef( mInspector, "onFieldRightClick", getIdString() );
+      mInspector->onFieldRightClick_callback( getIdString() );
    else
       Parent::onMouseDown( event );
 }
@@ -252,7 +252,7 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
       const U32 numTargets = mInspector->getNumInspectObjects();
       
       if( callbacks && numTargets > 1 )
-         Con::executef( mInspector, "onBeginCompoundEdit" );
+      { mInspector->onBeginCompoundEdit_callback(); }
             
       for( U32 i = 0; i < numTargets; ++ i )
       {
@@ -320,12 +320,15 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
          // Fire callback single-object undo.
          
          if( callbacks )
-            Con::executef( mInspector, "onInspectorFieldModified", 
+         {
+           mInspector->onInspectorFieldModified_callback( 
                                           target->getIdString(), 
                                           mField->pFieldname, 
                                           mFieldArrayIndex ? mFieldArrayIndex : "(null)", 
                                           oldValue.c_str(), 
                                           newValue.c_str() );
+         }
+            
 
          target->setDataField( mField->pFieldname, mFieldArrayIndex, newValue );
          
@@ -334,7 +337,7 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
       }
       
       if( callbacks && numTargets > 1 )
-         Con::executef( mInspector, "onEndCompoundEdit" );
+      { mInspector->onEndCompoundEdit_callback(); }
    }
 
    // Force our edit to update
@@ -577,7 +580,7 @@ bool GuiInspectorField::hasSameValueInAllObjects()
 void GuiInspectorField::_executeSelectedCallback()
 {
    if( mField )
-      Con::executef( mInspector, "onFieldSelected", mField->pFieldname, ConsoleBaseType::getType(mField->type)->getTypeName(), mFieldDocs.c_str() );
+   { mInspector->onFieldSelected_callback( mField->pFieldname, ConsoleBaseType::getType(mField->type)->getTypeName(), mFieldDocs.c_str() ); } 
 }
 
 //-----------------------------------------------------------------------------
