@@ -128,8 +128,7 @@ static void processNodeLights(AppNode* appNode, const MatrixF& offset, SimGroup*
          Con::errorf(ConsoleLogEntry::General, "Failed to register light for \"%s\"", lightName.c_str());
          delete pLight;
       }
-
-      if (group)
+      else if (group)
          group->addObject(pLight);
    }
 
