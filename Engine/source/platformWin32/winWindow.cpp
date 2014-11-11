@@ -313,7 +313,7 @@ S32 main(S32 argc, const char **argv)
 
 #include "app/mainLoop.h"
 
-S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
+S32 WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 {
    Vector<char *> argv( __FILE__, __LINE__ );
 

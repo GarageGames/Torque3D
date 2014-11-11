@@ -49,7 +49,7 @@ bool getDllName(std::wstring& dllName, const std::wstring suffix)
    return true;
 }
 
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
 {
    // Try to find the game DLL, which may have one of several file names.
    HMODULE hGame = NULL;
