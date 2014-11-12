@@ -40,7 +40,7 @@ function EPainter_TerrainMaterialUpdateCallback( %mat, %matIndex )
 
    // Update the material and the UI.
    ETerrainEditor.updateMaterial( %matIndex, %mat.getInternalName() );
-   EPainter.setup( %matIndex );
+   TerrainPainter.setup( %matIndex );
 }
 
 function EPainter_TerrainMaterialAddCallback( %mat, %matIndex )
@@ -51,7 +51,7 @@ function EPainter_TerrainMaterialAddCallback( %mat, %matIndex )
 
    // Add it and update the UI.
    ETerrainEditor.addMaterial( %mat.getInternalName() );
-   EPainter.setup( %matIndex );
+   TerrainPainter.setup( %matIndex );
 }
 
 function TerrainEditor::setPaintMaterial( %this, %matIndex, %terrainMat )
@@ -79,7 +79,7 @@ function TerrainEditor::setup( %this )
    %this.switchAction( %action );
 }
 
-function EPainter::updateLayers( %this, %matIndex )
+function TerrainPainter::updateLayers( %this, %matIndex )
 {
    // Default to whatever was selected before.
    if ( %matIndex $= "" )
@@ -134,7 +134,7 @@ function EPainter::updateLayers( %this, %matIndex )
             VertSizing = "bottom";
             position = ( %listwidth - 20 ) SPC "26";
             Extent = "17 17";
-            command = "EPainter.showMaterialDeleteDlg( " @ %matInternalName @ " );";
+            command = "TerrainPainter.showMaterialDeleteDlg( " @ %matInternalName @ " );";
          };
       };
 
@@ -187,14 +187,14 @@ function EPainter::updateLayers( %this, %matIndex )
    %ctrl.performClick();
 }
 
-function EPainter::showMaterialDeleteDlg( %this, %matInternalName )
+function TerrainPainter::showMaterialDeleteDlg( %this, %matInternalName )
 {
    MessageBoxYesNo( "Confirmation",
       "Really remove material '" @ %matInternalName @ "' from the terrain?",
       %this @ ".removeMaterial( " @ %matInternalName @ " );", "" );
 }
 
-function EPainter::removeMaterial( %this, %matInternalName )
+function TerrainPainter::removeMaterial( %this, %matInternalName )
 {
    %selIndex = ETerrainEditor.paintIndex - 1;
 
@@ -209,7 +209,7 @@ function EPainter::removeMaterial( %this, %matInternalName )
    %this.updateLayers( %selIndex );
 }
 
-function EPainter::setup( %this, %matIndex )
+function TerrainPainter::setup( %this, %matIndex )
 {
    // Update the layer listing.
    %this.updateLayers( %matIndex );
@@ -267,7 +267,7 @@ function TerrainEditor::onActiveTerrainChange(%this, %newTerrain)
 {
    // Need to refresh the terrain painter.
    if ( EditorGui.currentEditor.getId() == TerrainPainterPlugin.getId() )
-      EPainter.setup(ETerrainEditor.paintIndex);
+      TerrainPainter.setup(ETerrainEditor.paintIndex);
 }
 
 function TerrainEditor::getActionDescription( %this, %action )
@@ -351,7 +351,7 @@ function TerrainEditor::onSmoothHeightmap( %this )
 function TerrainEditor::onMaterialUndo( %this )
 {
    // Update the gui to reflect the current materials.
-   EPainter.updateLayers();
+   TerrainPainter.updateLayers();
 }
 
 //------------------------------------------------------------------------------

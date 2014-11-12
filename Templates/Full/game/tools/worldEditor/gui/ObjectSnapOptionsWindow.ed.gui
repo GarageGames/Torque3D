@@ -16,6 +16,7 @@
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(ESnapOptions) {
+      AllowPopWindow = "1";
       internalName = "SnapOptionsWindow";
       Enabled = "1";
       isContainer = "1";

@@ -114,6 +114,7 @@ function MaterialEditorPlugin::onWorldEditorStartup( %this )
 
 function MaterialEditorPlugin::onActivated( %this )
 {
+   MaterialEditorPlugin.isActive = true;
    if($gfx::wireframe){
       $wasInWireFrameMode = true;   
       $gfx::wireframe = false;
@@ -125,8 +126,8 @@ function MaterialEditorPlugin::onActivated( %this )
    materialAdvancedPropertiesRollout.Expanded = false;
    WorldEditorPlugin.onActivated();
 
-   EditorGui-->MatEdPropertiesWindow.setVisible( true );
-   EditorGui-->MatEdPreviewWindow.setVisible( true );
+   MaterialEditorPropertiesWindow.setVisible( true );
+   MaterialEditorPreviewWindow.setVisible( true );
    EditorGui-->WorldEditorToolbar.setVisible( true );
    
    MaterialEditorGui.currentObject = $Tools::materialEditorList;
@@ -144,6 +145,9 @@ function MaterialEditorPlugin::onEditMenuSelect( %this, %editMenu )
 
 function MaterialEditorPlugin::onDeactivated( %this )
 {
+   if (!MaterialEditorPlugin.isActive)
+      return;
+   MaterialEditorPlugin.isActive = false;
    if($wasInWireFrameMode)
       $gfx::wireframe = true;
       
@@ -151,8 +155,8 @@ function MaterialEditorPlugin::onDeactivated( %this )
 
    MaterialEditorGui.quit();
    
-   EditorGui-->MatEdPropertiesWindow.setVisible( false );
-   EditorGui-->MatEdPreviewWindow.setVisible( false );
+   MaterialEditorPreviewWindow.setVisible( false );
+   MaterialEditorPropertiesWindow.setVisible( false );
    EditorGui-->WorldEditorToolbar.setVisible( false );
    %this.map.pop();
    

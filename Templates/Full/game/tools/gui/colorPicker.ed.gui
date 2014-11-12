@@ -512,12 +512,12 @@ function constructNewColor(%pickColor, %colorType )
    %red = getWord(%pickColor, 0);
    %green = getWord(%pickColor, 1);
    %blue = getWord(%pickColor, 2);
-   %alpha = ColorAlphaSelect.getValue();
+   %alpha = getWord(%pickColor, 3);
    
    // Update the text controls to reflect new color
    //setColorInfo(%red, %green, %blue, %alpha);
    if ( %colorType == 1 ) // ColorI
-      return mCeil( %red * 255 ) SPC mCeil( %green * 255 ) SPC mCeil( %blue * 255 ) SPC %alpha;
+      return mCeil( %red * 255 ) SPC mCeil( %green * 255 ) SPC mCeil( %blue * 255 ) SPC mCeil( %alpha * 255 );
    else // ColorF
       return %red SPC %green SPC %blue SPC %alpha;
 }

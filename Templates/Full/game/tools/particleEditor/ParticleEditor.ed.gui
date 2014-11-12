@@ -21,6 +21,7 @@ $PE_guielement_ext_colorpicker = "18 18";
 
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiWindowCollapseCtrl(PE_Window) {
+   AllowPopWindow = "1";
    canSaveDynamicFields = "0";
    Enabled = "1";
    isContainer = "1";

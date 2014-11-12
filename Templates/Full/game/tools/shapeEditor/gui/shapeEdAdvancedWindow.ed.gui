@@ -1,5 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiWindowCollapseCtrl(ShapeEdAdvancedWindow, EditorGuiGroup) {
+   AllowPopWindow = "1";
    text = "Advanced Properties";
    resizeWidth = "0";
    resizeHeight = "0";

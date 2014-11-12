@@ -35,6 +35,8 @@
    canSaveDynamicFields = "1";
 
    new GuiWindowCollapseCtrl(ForestEditorPalleteWindow) {
+      internalName = "ForestEditorPalleteWindow";
+      AllowPopWindow = "1";
       CollapseGroup = "-1";
       CollapseGroupNum = "-1";
       resizeWidth = "1";
@@ -64,7 +66,7 @@
       Visible = "1";
       tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
-      internalName = "PalleteWindow";
+      
       canSaveDynamicFields = "0";
 
       new GuiTabBookCtrl(ForestEditTabBook) {
@@ -420,6 +422,8 @@
       };
    };
    new GuiWindowCollapseCtrl(ForestEditorPropertiesWindow) {
+      internalName = "ForestEditorPropertiesWindow";
+      AllowPopWindow = "1";
       CollapseGroup = "-1";
       CollapseGroupNum = "-1";
       resizeWidth = "1";
@@ -449,7 +453,7 @@
       Visible = "1";
       tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
-      internalName = "PropertiesWindow";
+      
       canSaveDynamicFields = "0";
 
       new GuiScrollCtrl() {

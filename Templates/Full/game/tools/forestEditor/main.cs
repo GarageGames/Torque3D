@@ -135,6 +135,7 @@ function ForestEditorPlugin::onWorldEditorShutdown( %this )
 
 function ForestEditorPlugin::onActivated( %this )
 {
+   ForestEditorPlugin.isActive = true;
    EditorGui.bringToFront( ForestEditorGui );
    ForestEditorGui.setVisible( true );
    ForestEditorPalleteWindow.setVisible( true );
@@ -202,6 +203,9 @@ function ForestEditorPlugin::onActivated( %this )
 
 function ForestEditorPlugin::onDeactivated( %this )
 {  
+   if (!ForestEditorPlugin.isActive)
+      return;
+   ForestEditorPlugin.isActive = false;
    ForestEditorGui.setVisible( false );
    ForestEditorPalleteWindow.setVisible( false );
    ForestEditorPropertiesWindow.setVisible( false );

@@ -908,23 +908,324 @@ function WorldEditorInspectorPlugin::onWorldEditorStartup( %this )
    
    WorldEditorInspectorPlugin.map = %map; 
 }
+function EWTreeWindow::onPopWindow(%this)
+   {
+   DeactivateAll();
+   WorldEditorInspectorPlugin::onActivated(WorldEditorInspectorPlugin);
+   }
+function EWTreeWindow::onPopWindowClosed(%this)
+   {
+   DeactivateAll();      
+   WorldEditorInspectorPlugin::onActivated(WorldEditorInspectorPlugin);
+   GuiWindowCtrl::attach( EWInspectorWindow, EWTreeWindow);
+   }
+function EWInspectorWindow::onPopWindow(%this)
+   {
+   DeactivateAll();      
+   WorldEditorInspectorPlugin::onActivated(WorldEditorInspectorPlugin);
+   }
+function EWInspectorWindow::onPopWindowClosed(%this)
+   {
+   DeactivateAll();      
+   WorldEditorInspectorPlugin::onActivated(WorldEditorInspectorPlugin);
+   GuiWindowCtrl::attach( EWInspectorWindow, EWTreeWindow);
+   }   
+function TerrainPainter::onPopWindow(%this)
+{
+   DeactivateAll();
+   TerrainPainterPlugin::onActivated(TerrainPainterPlugin);
+}
+function TerrainPainter::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   TerrainPainterPlugin::onActivated(TerrainPainterPlugin);
+   GuiWindowCtrl::attach( TerrainPainter, TerrainPainterPreview);
+}
+function TerrainPainterPreview::onPopWindow(%this)
+{
+   DeactivateAll();
+   TerrainPainterPlugin::onActivated(TerrainPainterPlugin);
+}
+function TerrainPainterPreview::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   TerrainPainterPlugin::onActivated(TerrainPainterPlugin);
+   GuiWindowCtrl::attach( TerrainPainter, TerrainPainterPreview);
+}
+
+function MaterialEditorPreviewWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   MaterialEditorPlugin::onActivated( MaterialEditorPlugin );
+}
+function MaterialEditorPreviewWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   MaterialEditorPlugin::onActivated( MaterialEditorPlugin );
+   GuiWindowCtrl::attach( MaterialEditorPropertiesWindow, MaterialEditorPreviewWindow);
+}
+function MaterialEditorPropertiesWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   MaterialEditorPlugin::onActivated( MaterialEditorPlugin );
+}
+function MaterialEditorPropertiesWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   MaterialEditorPlugin::onActivated( MaterialEditorPlugin );
+   GuiWindowCtrl::attach( MaterialEditorPropertiesWindow, MaterialEditorPreviewWindow);
+}
+
+function DatablockEditorTreeWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   DatablockEditorPlugin::onActivated( DatablockEditorPlugin );
+}
+function DatablockEditorTreeWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   DatablockEditorPlugin::onActivated( DatablockEditorPlugin );
+   GuiWindowCtrl::Attach( DatablockEditorInspectorWindow, DatablockEditorTreeWindow);
+}
+function DatablockEditorInspectorWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   DatablockEditorPlugin::onActivated( DatablockEditorPlugin );
+}
+function DatablockEditorInspectorWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   DatablockEditorPlugin::onActivated( DatablockEditorPlugin );
+   GuiWindowCtrl::Attach( DatablockEditorInspectorWindow, DatablockEditorTreeWindow);
+}
+
+function DecalEditorWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   DecalEditorPlugin::onActivated( DecalEditorPlugin );
+}
+function DecalEditorWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   DecalEditorPlugin::onActivated( DecalEditorPlugin );
+   GuiWindowCtrl::attach( DecalPreviewWindow, DecalEditorWindow );
+}
+function DecalPreviewWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   DecalEditorPlugin::onActivated( DecalEditorPlugin );
+}
+function DecalPreviewWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   DecalEditorPlugin::onActivated( DecalEditorPlugin );
+   GuiWindowCtrl::attach( DecalPreviewWindow, DecalEditorWindow );
+}
+
+function ForestEditorPalleteWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   ForestEditorPlugin::onActivated( ForestEditorPlugin );
+}
+function ForestEditorPalleteWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   ForestEditorPlugin::onActivated( ForestEditorPlugin );
+   GuiWindowCtrl::attach( ForestEditorPropertiesWindow, ForestEditorPalleteWindow );
+}
+function ForestEditorPropertiesWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   ForestEditorPlugin::onActivated(ForestEditorPlugin );
+}
+function ForestEditorPropertiesWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   ForestEditorPlugin::onActivated( ForestEditorPlugin );
+   GuiWindowCtrl::attach( ForestEditorPropertiesWindow, ForestEditorPalleteWindow );
+}
+
+function MeshRoadEditorTreeWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   MeshRoadEditorPlugin::onActivated( MeshRoadEditorPlugin );
+}
+function MeshRoadEditorTreeWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   MeshRoadEditorPlugin::onActivated( MeshRoadEditorPlugin );
+   GuiWindowCtrl::attach( MeshRoadEditorOptionsWindow, MeshRoadEditorTreeWindow);
+}
+function MeshRoadEditorOptionsWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   MeshRoadEditorPlugin::onActivated(MeshRoadEditorPlugin );
+}
+function MeshRoadEditorOptionsWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   MeshRoadEditorPlugin::onActivated( MeshRoadEditorPlugin );
+   GuiWindowCtrl::attach( MeshRoadEditorOptionsWindow, MeshRoadEditorTreeWindow);
+}
+
+function MissionAreaEditorTerrainWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   MissionAreaEditorPlugin::onActivated( MissionAreaEditorPlugin );
+}
+function MissionAreaEditorTerrainWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   MissionAreaEditorPlugin::onActivated( MissionAreaEditorPlugin );
+   GuiWindowCtrl::attach( MissionAreaEditorPropertiesWindow, MissionAreaEditorTerrainWindow);
+}
+function MissionAreaEditorPropertiesWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   MissionAreaEditorPlugin::onActivated( MissionAreaEditorPlugin );
+}
+function MissionAreaEditorPropertiesWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   MissionAreaEditorPlugin::onActivated( MissionAreaEditorPlugin );
+   GuiWindowCtrl::attach( MissionAreaEditorPropertiesWindow, MissionAreaEditorTerrainWindow);
+}
+
+function PE_Window::onPopWindow(%this)
+{
+   DeactivateAll();
+   ParticleEditorPlugin::onActivated( ParticleEditorPlugin );
+}
+function PE_Window::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   ParticleEditorPlugin::onActivated( ParticleEditorPlugin );
+}
+
+
+function RiverEditorTreeWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   RiverEditorPlugin::onActivated( RiverEditorPlugin );
+}
+function RiverEditorTreeWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   RiverEditorPlugin::onActivated( RiverEditorPlugin );
+   GuiWindowCtrl::attach( RiverEditorOptionsWindow, RiverEditorTreeWindow);
+}
+function RiverEditorOptionsWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   RiverEditorPlugin::onActivated(RiverEditorPlugin );
+}
+function RiverEditorOptionsWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   RiverEditorPlugin::onActivated( RiverEditorPlugin );
+   GuiWindowCtrl::attach( RiverEditorOptionsWindow, RiverEditorTreeWindow);
+}
+
+function RoadEditorTreeWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   RoadEditorPlugin::onActivated( RoadEditorPlugin );
+}
+function RoadEditorTreeWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   RoadEditorPlugin::onActivated( RoadEditorPlugin );
+   GuiWindowCtrl::attach( RoadEditorOptionsWindow, RoadEditorTreeWindow);
+}
+function RoadEditorOptionsWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   RoadEditorPlugin::onActivated( RoadEditorPlugin );
+}
+function RoadEditorOptionsWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   RoadEditorPlugin::onActivated( RoadEditorPlugin );
+   GuiWindowCtrl::attach( RoadEditorOptionsWindow, RoadEditorTreeWindow);
+}
+
+
+
+function ShapeEdAdvancedWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   ShapeEditorPlugin::onActivated(ShapeEditorPlugin);
+}
+function ShapeEdAdvancedWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   ShapeEditorPlugin::onActivated(ShapeEditorPlugin);
+   GuiWindowCtrl::attach(ShapeEdPropWindow, ShapeEdSelectWindow);
+}
+function ShapeEdSelectWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   ShapeEditorPlugin::onActivated(ShapeEditorPlugin);
+   ShapeEdShapeTreeView.open(MissionGroup);
+   ShapeEdShapeTreeView.buildVisibleTree(true);
+}
+function ShapeEdSelectWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   ShapeEditorPlugin::onActivated(ShapeEditorPlugin);
+   GuiWindowCtrl::attach(ShapeEdPropWindow, ShapeEdSelectWindow);
+   ShapeEdShapeTreeView.open(MissionGroup);
+   ShapeEdShapeTreeView.buildVisibleTree(true);
+}
+function ShapeEdPropWindow::onPopWindow(%this)
+{
+   DeactivateAll();
+   ShapeEditorPlugin::onActivated(ShapeEditorPlugin);
+}
+function ShapeEdPropWindow::onPopWindowClosed(%this)
+{
+   DeactivateAll();
+   ShapeEditorPlugin::onActivated(ShapeEditorPlugin);
+   GuiWindowCtrl::attach(ShapeEdPropWindow, ShapeEdSelectWindow);
+}
+
+
+function DeactivateAll()
+{
+   
+   WorldEditorInspectorPlugin::onDeactivated(WorldEditorInspectorPlugin);
+   TerrainPainterPlugin::onDeactivated(TerrainPainterPlugin);
+   ShapeEditorPlugin::onDeactivated(ShapeEditorPlugin);
+   MeshRoadEditorPlugin::onDeactivated( MeshRoadEditorPlugin );   
+   RoadEditorPlugin::onDeactivated( RoadEditorPlugin );
+   RiverEditorPlugin::onDeactivated( RiverEditorPlugin );
+   ParticleEditorPlugin::onDeactivated( ParticleEditorPlugin );
+   MissionAreaEditorPlugin::onDeactivated(MissionAreaEditorPlugin );
+   ForestEditorPlugin::onDeactivated( ForestEditorPlugin );
+   DecalEditorPlugin::onDeactivated( DecalEditorPlugin );
+   DatablockEditorPlugin::onDeactivated( DatablockEditorPlugin );
+   MaterialEditorPlugin::onDeactivated( MaterialEditorPlugin );
+   
+}
 
 function WorldEditorInspectorPlugin::onActivated( %this )
 {   
+   WorldEditorInspectorPlugin.isActive = true;
    Parent::onActivated( %this );
-
-   EditorGui-->InspectorWindow.setVisible( true );   
-   EditorGui-->TreeWindow.setVisible( true );
+   EWInspectorWindow.setVisible( true );  
+   EWTreeWindow.setVisible( true );
    EditorGui-->WorldEditorToolbar.setVisible( true );
    %this.map.push();
 }
 
 function WorldEditorInspectorPlugin::onDeactivated( %this )
 {   
+   if (!WorldEditorInspectorPlugin.isActive)
+      return;
+   WorldEditorInspectorPlugin.isActive = false;
    Parent::onDeactivated( %this );
-
-   EditorGui-->InspectorWindow.setVisible( false );  
-   EditorGui-->TreeWindow.setVisible( false ); 
+   EWInspectorWindow.setVisible( false );  
+   EWTreeWindow.setVisible( false );
    EditorGui-->WorldEditorToolbar.setVisible( false );
    %this.map.pop();
 }
@@ -1162,11 +1463,12 @@ function TerrainPainterPlugin::onWorldEditorStartup( %this )
    %map.bindCmd( keyboard, 0, "TerrainPainterPlugin.keyboardSetMaterial(10);", "" );
    
    TerrainPainterPlugin.map = %map;  
-   GuiWindowCtrl::attach( EPainter, EPainterPreview);
+   GuiWindowCtrl::attach( TerrainPainter, TerrainPainterPreview);
 }
 
 function TerrainPainterPlugin::onActivated( %this )
 {
+   TerrainPainterPlugin.isActive = true;
    Parent::onActivated( %this );
 
    EditorGui.readTerrainEditorSettings();
@@ -1179,11 +1481,11 @@ function TerrainPainterPlugin::onActivated( %this )
    ETerrainEditor.attachTerrain();
    ETerrainEditor.makeFirstResponder( true );
 
-   EditorGui-->TerrainPainter.setVisible(true);
-   EditorGui-->TerrainPainterPreview.setVisible(true);
+   TerrainPainter.setVisible(true);
+   TerrainPainterPreview.setVisible(true);
    EWTerrainPainterToolbar.setVisible(true);
    ETerrainEditor.onBrushChanged();
-   EPainter.setup();
+   TerrainPainter.setup();
    TerrainPainterPlugin.syncBrushInfo();
 
    EditorGuiStatusBar.setSelection("");
@@ -1191,13 +1493,16 @@ function TerrainPainterPlugin::onActivated( %this )
 
 function TerrainPainterPlugin::onDeactivated( %this )
 {
+   if (!TerrainPainterPlugin.isActive)
+      return;
+   TerrainPainterPlugin.isActive = false;
    Parent::onDeactivated( %this );
 
    EditorGui.writeTerrainEditorSettings();
 
    %this.map.pop();
-   EditorGui-->TerrainPainter.setVisible(false);
-   EditorGui-->TerrainPainterPreview.setVisible(false);
+   TerrainPainter.setVisible(false);
+   TerrainPainterPreview.setVisible(false);
    EWTerrainPainterToolbar.setVisible(false);
    ETerrainEditor.setVisible( false );
 }
@@ -1249,7 +1554,7 @@ function TerrainPainterPlugin::keyboardModifyBrushSize( %this, %amt)
 function TerrainPainterPlugin::keyboardSetMaterial( %this, %mat)
 {
    %name = "EPainterMaterialButton" @ %mat;
-   %ctrl = EPainter.findObjectByInternalName(%name, true);
+   %ctrl = TerrainPainter.findObjectByInternalName(%name, true);
    if(%ctrl)
    {
       %ctrl.performClick();
@@ -1912,11 +2217,71 @@ function Editor::open(%this)
 
 function Editor::close(%this, %gui)
 {
+    EWTreeWindow.wasOpen = EWTreeWindow.isInPopup;
+    EWInspectorWindow.wasOpen = EWInspectorWindow.isInPopup;
+    TerrainPainter.wasOpen = TerrainPainter.isInPopup;
+    TerrainPainterPreview.wasOpen = TerrainPainterPreview.isInPopup;
+    MaterialEditorPreviewWindow.wasOpen = MaterialEditorPreviewWindow.isInPopup;
+    MaterialEditorPropertiesWindow.wasOpen = MaterialEditorPropertiesWindow.isInPopup;
+    DatablockEditorTreeWindow.wasOpen = DatablockEditorTreeWindow.isInPopup;
+    DatablockEditorInspectorWindow.wasOpen = DatablockEditorInspectorWindow.isInPopup;
+    DecalEditorWindow.wasOpen = DecalEditorWindow.isInPopup;
+    DecalPreviewWindow.wasOpen = DecalPreviewWindow.isInPopup;
+    ForestEditorPalleteWindow.wasOpen = ForestEditorPalleteWindow.isInPopup;
+    ForestEditorPropertiesWindow.wasOpen = ForestEditorPropertiesWindow.isInPopup;
+    MeshRoadEditorTreeWindow.wasOpen = MeshRoadEditorTreeWindow.isInPopup;
+    MeshRoadEditorOptionsWindow.wasOpen = MeshRoadEditorOptionsWindow.isInPopup;
+    MissionAreaEditorTerrainWindow.wasOpen = MissionAreaEditorTerrainWindow.isInPopup;
+    MissionAreaEditorPropertiesWindow.wasOpen = MissionAreaEditorPropertiesWindow.isInPopup;
+    PE_Window.wasOpen = PE_Window.isInPopup;
+    RiverEditorTreeWindow.wasOpen = RiverEditorTreeWindow.isInPopup;
+    RiverEditorOptionsWindow.wasOpen = RiverEditorOptionsWindow.isInPopup;
+    RoadEditorTreeWindow.wasOpen = RoadEditorTreeWindow.isInPopup;
+    RoadEditorOptionsWindow.wasOpen = RoadEditorOptionsWindow.isInPopup;
+    ShapeEdAdvancedWindow.wasOpen = ShapeEdAdvancedWindow.isInPopup;
+    ShapeEdSelectWindow.wasOpen = ShapeEdSelectWindow.isInPopup;
+    ShapeEdPropWindow.wasOpen = ShapeEdPropWindow.isInPopup;
+  
+    EWTreeWindow.ClosePopOut();
+    EWInspectorWindow.ClosePopOut();
+    TerrainPainter.ClosePopOut();
+    TerrainPainterPreview.ClosePopOut();
+    MaterialEditorPreviewWindow.ClosePopOut();
+    MaterialEditorPropertiesWindow.ClosePopOut();
+    DatablockEditorTreeWindow.ClosePopOut();
+    DatablockEditorInspectorWindow.ClosePopOut();
+    DecalEditorWindow.ClosePopOut();
+    DecalPreviewWindow.ClosePopOut();
+    ForestEditorPalleteWindow.ClosePopOut();
+    ForestEditorPropertiesWindow.ClosePopOut();
+    MeshRoadEditorTreeWindow.ClosePopOut();
+    MeshRoadEditorOptionsWindow.ClosePopOut();
+    MissionAreaEditorTerrainWindow.ClosePopOut();
+    MissionAreaEditorPropertiesWindow.ClosePopOut();
+    PE_Window.ClosePopOut();
+    RiverEditorTreeWindow.ClosePopOut();
+    RiverEditorOptionsWindow.ClosePopOut();
+    RoadEditorTreeWindow.ClosePopOut();
+    RoadEditorOptionsWindow.ClosePopOut();
+    ShapeEdAdvancedWindow.ClosePopOut();
+    ShapeEdSelectWindow.ClosePopOut();
+    ShapeEdPropWindow.ClosePopOut();
+ 
+  
+   
    %this.editorDisabled();
    Canvas.setContent(%gui);
    if(isObject(MessageHud))
       MessageHud.close();   
    EditorGui.writeCameraSettings();
+  
+   schedule("1000", 0, "checkCursor");
+   checkCursor();
+}
+
+function checkCursor()
+{
+   Canvas.checkCursor();
 }
 
 $RelightCallback = "";

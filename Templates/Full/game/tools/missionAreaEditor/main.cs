@@ -65,6 +65,7 @@ function MissionAreaEditorPlugin::onWorldEditorStartup( %this )
 
 function MissionAreaEditorPlugin::onActivated( %this )
 {
+   MissionAreaEditorPlugin.isActive = true;
    %this.readSettings();
    
    EditorGui.bringToFront( MissionAreaEditorGui );
@@ -87,6 +88,9 @@ function MissionAreaEditorPlugin::onActivated( %this )
 
 function MissionAreaEditorPlugin::onDeactivated( %this )
 {
+   if (!MissionAreaEditorPlugin.isActive)
+      return;
+   MissionAreaEditorPlugin.isActive = false;
    %this.writeSettings();
    
    MissionAreaEditorGui.setVisible(false);

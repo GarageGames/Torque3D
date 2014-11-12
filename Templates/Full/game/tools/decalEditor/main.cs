@@ -89,6 +89,7 @@ function DecalEditorPlugin::onWorldEditorStartup( %this )
 
 function DecalEditorPlugin::onActivated( %this )
 {   
+   DecalEditorPlugin.isActive = true;
    EditorGui.bringToFront( DecalEditorGui );
    DecalEditorGui.setVisible( true );
    DecalEditorGui.makeFirstResponder( true );
@@ -123,6 +124,9 @@ function DecalEditorPlugin::onActivated( %this )
 
 function DecalEditorPlugin::onDeactivated( %this )
 {   
+   if (!DecalEditorPlugin.isActive)
+      return;
+   DecalEditorPlugin.isActive = false;
    DecalEditorGui.setVisible(false);
    DecalPreviewWindow.setVisible( false );
    DecalEditorWindow.setVisible( false );

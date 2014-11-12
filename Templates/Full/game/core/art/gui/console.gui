@@ -8,7 +8,29 @@
    minExtent = "8 8";
    visible = "1";
    helpTag = "0";
-
+   
+   new GuiWindowCtrl(ConsoleDlgWindow) 
+   {
+   isContainer = "1";
+   AllowPopWindow = "1";
+   profile = "GuiWindowProfile";
+   HorizSizing = "windowRelative";
+   VertSizing = "windowRelative";
+   AnchorTop = "1";
+   AnchorBottom = "0";
+   AnchorLeft = "1";
+   AnchorRight = "0";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 8";
+   visible = "1";
+   helpTag = "0";
+   text = "Console";
+   canMove = "1";
+   canClose = "0";
+   canMinimize = "0";
+   canMaximize = "0";
+   
    new GuiConsoleEditCtrl(ConsoleEntry) {
       profile = "ConsoleTextEditProfile";
       horizSizing = "width";
@@ -26,13 +48,13 @@
       sinkAllKeyEvents = "1";
       useSiblingScroller = "1";
    };
-   new GuiScrollCtrl() {
+   new GuiScrollCtrl(ConsoleEntryScroll) {
       internalName = "Scroll";
       profile = "ConsoleScrollProfile";
       horizSizing = "width";
       vertSizing = "height";
-      position = "0 0";
-      extent = "640 462";
+      position = "0 20";
+      extent = "640 442";
       minExtent = "8 8";
       visible = "1";
       helpTag = "0";
@@ -49,6 +71,8 @@
             position = "0 0";
          };
       };
+   };
+   //};
 };
 //--- OBJECT WRITE END ---
 
@@ -127,6 +151,7 @@ function ToggleConsole(%make)
          Canvas.pushDialog(ConsoleDlg, 99);         
       }
    }
+   canvas.checkcursor();
 }
 
 function ConsoleDlg::hideWindow( %this )
@@ -145,6 +170,8 @@ function ConsoleDlg::setAlpha(  %this, %alpha )
       ConsoleScrollProfile.fillColor = $ConsoleDefaultFillColor;
    else
       ConsoleScrollProfile.fillColor = getWords( $ConsoleDefaultFillColor, 0, 2 ) SPC %alpha * 255.0;
+      
+   ConsoleDlg.resize(0,0,getword( %this.parent.getExtent(),0),getword( %this.parent.getExtent(),1));
 }
 
 // If a message is selected that has a source location preceding it, allow jumping to the
@@ -173,3 +200,34 @@ function ConsoleMessageLogView::onMessageSelected( %this, %level, %message )
    
    EditorOpenFileInTorsion( %fileName, %lineNumber );
 }
+
+
+//------------------------------------------------------------------------------
+//Winterleaf Console Breakout
+//Geev
+//------------------------------------------------------------------------------
+function Canvas_ConsoleDlgWindow::onLoseFocus()
+{
+   //So the main canvas works, we pop this dialog when the window loses focus
+   //Canvas_ConsoleDlgWindow is the system generated name for the canvas
+   
+    Canvas.popDialog(ConsoleDlg);
+    canvas.checkcursor();
+}
+function Canvas_ConsoleDlgWindow::onGainFocus()
+{
+   //So the main canvas works, we push this dialog when the window loses focus
+   //Canvas_ConsoleDlgWindow is the system generated name for the canvas
+   Canvas.pushDialog(ConsoleDlg, 99);     
+   canvas.checkcursor();
+}
+
+function Canvas::onResize(%this,%width,%height)
+{
+   ConsoleDlg.extent =%width SPC %height;
+   ConsoleDlgWindow.extent = %width SPC %height;
+   ConsoleEntryScroll.extent =  %width SPC (%height - 38);
+   ConsoleEntry.position = "0" SPC (%height - 18);
+   ConsoleEntry.extent = %width SPC "18";
+}
+//------------------------------------------------------------------------------

@@ -173,10 +173,14 @@ function MaterialEditorGui::quit(%this)
    
    // Now we can delete the preview materials and shaders
    // knowing that there are no matinstances using them.
-   matEdCubeMapPreviewMat.delete();
-   materialEd_previewMaterial.delete();
-   materialEd_justAlphaMaterial.delete();
-   materialEd_justAlphaShader.delete();
+   if (isobject(matEdCubeMapPreviewMat))
+      matEdCubeMapPreviewMat.delete();
+   if (isobject(materialEd_previewMaterial))   
+      materialEd_previewMaterial.delete();
+   if (isobject(materialEd_previewMaterial))      
+      materialEd_previewMaterial.delete();
+   if (isobject(materialEd_previewMaterial))         
+      materialEd_previewMaterial.delete();
 }
 
 function MaterialEditorGui::openFile( %this, %fileType )

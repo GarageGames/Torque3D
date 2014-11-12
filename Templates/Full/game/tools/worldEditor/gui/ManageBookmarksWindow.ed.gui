@@ -15,6 +15,7 @@
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(EManageBookmarks) {
+      AllowPopWindow = "1";
       internalName = "ManageBookmarksWindow";
       Enabled = "1";
       isContainer = "1";

@@ -214,6 +214,7 @@ function ShapeEditorPlugin::open(%this, %filename)
 
 function ShapeEditorPlugin::onActivated(%this)
 {
+   ShapeEditorPlugin.isActive = true;
    %this.open("");
 
    // Try to start with the shape selected in the world editor
@@ -249,6 +250,9 @@ function ShapeEditorPlugin::initStatusBar(%this)
 
 function ShapeEditorPlugin::onDeactivated(%this)
 {
+   if (!ShapeEditorPlugin.isActive)
+      return
+   ShapeEditorPlugin.isActive = false;
    %this.writeSettings();
 
    // Notify game objects if shape has been modified
@@ -266,7 +270,7 @@ function ShapeEditorPlugin::onDeactivated(%this)
    ShapeEdAnimWindow.setVisible(false);
    ShapeEdAdvancedWindow.setVisible(false);
    
-   if( EditorGui-->MatEdPropertiesWindow.visible )
+   if( MaterialEditorPropertiesWindow.visible )
    {
       ShapeEdMaterials.editSelectedMaterialEnd( true );
    }

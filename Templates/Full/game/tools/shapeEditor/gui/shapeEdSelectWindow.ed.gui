@@ -16,6 +16,7 @@
    //---------------------------------------------------------------------------
    // Shape selector window
    new GuiWindowCollapseCtrl(ShapeEdSelectWindow) {
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       isContainer = "1";
       Profile = "ToolsGuiWindowProfile";

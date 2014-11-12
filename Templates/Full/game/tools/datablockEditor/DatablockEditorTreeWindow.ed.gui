@@ -14,6 +14,8 @@
    canSaveDynamicFields = "0";
 
    new GuiWindowCollapseCtrl(DatablockEditorTreeWindow) {
+      internalName =        "DatablockEditorTreeWindow";
+      AllowPopWindow = "1";
       resizeWidth = "1";
       resizeHeight = "1";
       canMove = "1";
@@ -42,7 +44,7 @@
       Visible = "1";
       tooltipprofile = "ToolsGuiToolTipProfile";
       hovertime = "1000";
-      internalName = "DatablockEditorTreeWindow";
+      
       canSaveDynamicFields = "0";
 
       new GuiTabBookCtrl(DatablockEditorTreeTabBook) {

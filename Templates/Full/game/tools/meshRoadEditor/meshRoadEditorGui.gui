@@ -40,7 +40,8 @@
    HoverNodeColor = "255 255 255 255";
 
    new GuiWindowCollapseCtrl(MeshRoadEditorTreeWindow) {
-      internalName = "";
+      internalName = "MeshRoadEditorTreeWindow";
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
@@ -142,7 +143,9 @@
       };
    };
    new GuiWindowCollapseCtrl(MeshRoadEditorOptionsWindow) {
-      internalName = "Window";
+      //internalName = "Window";
+      internalName = "MeshRoadEditorOptionsWindow";
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
