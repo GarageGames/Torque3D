@@ -25,33 +25,33 @@ $PostFXManager::defaultPreset  = "core/scripts/client/postFx/default.postfxprese
 function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
 {
    $PostFXManager::PostFX::Enabled = %bEnablePostFX;
-   
+      
    //if to enable the postFX, apply the ones that are enabled
    if ( %bEnablePostFX )
    {
       //SSAO, HDR, LightRays, DOF
       
-      if ( $PostFXManager::PostFX::EnableSSAO )      
+      if ( $PostFXManager::PostFX::EnableSSAO && !$pref::Video::disableSSAO)
          SSAOPostFx.enable();      
       else
          SSAOPostFx.disable();
       
-      if ( $PostFXManager::PostFX::EnableHDR )
+      if ( $PostFXManager::PostFX::EnableHDR && !$pref::Video::disableHDR)
          HDRPostFX.enable();
       else
          HDRPostFX.disable();
 
-      if ( $PostFXManager::PostFX::EnableLightRays )
+      if ( $PostFXManager::PostFX::EnableLightRays && !$pref::Video::disableLightRays)
          LightRayPostFX.enable();
       else
          LightRayPostFX.disable();
       
-      if ( $PostFXManager::PostFX::EnableDOF )
+      if ( $PostFXManager::PostFX::EnableDOF && !$pref::Video::disableDOF)
          DOFPostEffect.enable();
       else
          DOFPostEffect.disable();
 		 
-      if ( $PostFXManager::PostFX::EnableVignette )
+      if ( $PostFXManager::PostFX::EnableVignette && !$pref::Video::disableVignette)
          VignettePostEffect.enable();
       else
          VignettePostEffect.disable();

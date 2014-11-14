@@ -72,6 +72,12 @@ $pref::Video::disableCubemapping = false;
 ///
 $pref::Video::disableParallaxMapping = false;
 
+$pref::Video::disableSSAO = false;
+$pref::Video::disableHDR = false;
+$pref::Video::disableLightRays = false;
+$pref::Video::disableDOF = false;
+$pref::Video::disableVignette = false;
+
 $pref::Video::Gamma = 1.0;
 
 // Console-friendly defaults
@@ -404,6 +410,11 @@ new SimGroup( ShaderQualityGroup )
       key["$pref::Video::disableNormalmapping"] = true;
       key["$pref::Video::disableParallaxMapping"] = true;
       key["$pref::Water::disableTrueReflections"] = true;
+      key["$pref::Video::disableSSAO"] = true;
+      key["$pref::Video::disableHDR"] = true;
+      key["$pref::Video::disableVignette"] = true;
+      key["$pref::Video::disableDOF"] = true;
+      key["$pref::Video::disableLightRays"] = true;
    };
    
    new ArrayObject( [Low] )
@@ -414,7 +425,12 @@ new SimGroup( ShaderQualityGroup )
       key["$pref::Video::disablePixSpecular"] = false;
       key["$pref::Video::disableNormalmapping"] = false;
       key["$pref::Video::disableParallaxMapping"] = true;
-      key["$pref::Water::disableTrueReflections"] = true;
+      key["$pref::Water::disableTrueReflections"] = true; 
+      key["$pref::Video::disableSSAO"] = true;
+      key["$pref::Video::disableHDR"] = true;
+      key["$pref::Video::disableVignette"] = false;
+      key["$pref::Video::disableDOF"] = false;
+      key["$pref::Video::disableLightRays"] = false;
    };
    
    new ArrayObject( [Normal] )
@@ -426,6 +442,11 @@ new SimGroup( ShaderQualityGroup )
       key["$pref::Video::disableNormalmapping"] = false;
       key["$pref::Video::disableParallaxMapping"] = false;   
       key["$pref::Water::disableTrueReflections"] = false;   
+      key["$pref::Video::disableSSAO"] = true;
+      key["$pref::Video::disableHDR"] = false;
+      key["$pref::Video::disableVignette"] = false;
+      key["$pref::Video::disableDOF"] = false;
+      key["$pref::Video::disableLightRays"] = false;
    };
    
    new ArrayObject( [High] )
@@ -436,11 +457,19 @@ new SimGroup( ShaderQualityGroup )
       key["$pref::Video::disablePixSpecular"] = false;
       key["$pref::Video::disableNormalmapping"] = false;
       key["$pref::Video::disableParallaxMapping"] = false;     
-      key["$pref::Water::disableTrueReflections"] = false;          
+      key["$pref::Water::disableTrueReflections"] = false; 
+      key["$pref::Video::disableSSAO"] = false;
+      key["$pref::Video::disableHDR"] = false;
+      key["$pref::Video::disableVignette"] = false;
+      key["$pref::Video::disableDOF"] = false;
+      key["$pref::Video::disableLightRays"] = false;
    };   
 };
 
-
+function ShaderQualityGroup::onApply( %this, %level )
+{
+   PostFXManager.settingsSetEnabled(true);
+}
 function GraphicsQualityAutodetect()
 {
    $pref::Video::autoDetect = false;
