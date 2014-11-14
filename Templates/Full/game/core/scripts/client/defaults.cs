@@ -333,7 +333,7 @@ new SimGroup( TextureQualityGroup )
       key["$pref::Video::textureReductionLevel"] = 0;
       key["$pref::Reflect::refractTexScale"] = 1.25;
       key["$pref::Terrain::detailScale"] = 1.5;      
-   };   
+   };
 };
 
 function TextureQualityGroup::onApply( %this, %level )
@@ -443,7 +443,7 @@ new SimGroup( ShaderQualityGroup )
       key["$pref::Video::disableParallaxMapping"] = false;   
       key["$pref::Water::disableTrueReflections"] = false;   
       key["$pref::Video::disableSSAO"] = true;
-      key["$pref::Video::disableHDR"] = false;
+      key["$pref::Video::disableHDR"] = true;
       key["$pref::Video::disableVignette"] = false;
       key["$pref::Video::disableDOF"] = false;
       key["$pref::Video::disableLightRays"] = false;
@@ -458,12 +458,27 @@ new SimGroup( ShaderQualityGroup )
       key["$pref::Video::disableNormalmapping"] = false;
       key["$pref::Video::disableParallaxMapping"] = false;     
       key["$pref::Water::disableTrueReflections"] = false; 
+      key["$pref::Video::disableSSAO"] = true;
+      key["$pref::Video::disableHDR"] = false;
+      key["$pref::Video::disableVignette"] = false;
+      key["$pref::Video::disableDOF"] = false;
+      key["$pref::Video::disableLightRays"] = false;
+   };
+   new ArrayObject( [Highest] )
+   {
+      class = "GraphicsQualityLevel";
+      caseSensitive = true;
+      
+      key["$pref::Video::disablePixSpecular"] = false;
+      key["$pref::Video::disableNormalmapping"] = false;
+      key["$pref::Video::disableParallaxMapping"] = false;     
+      key["$pref::Water::disableTrueReflections"] = false; 
       key["$pref::Video::disableSSAO"] = false;
       key["$pref::Video::disableHDR"] = false;
       key["$pref::Video::disableVignette"] = false;
       key["$pref::Video::disableDOF"] = false;
       key["$pref::Video::disableLightRays"] = false;
-   };   
+   };
 };
 
 function ShaderQualityGroup::onApply( %this, %level )
