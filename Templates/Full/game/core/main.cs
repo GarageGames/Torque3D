@@ -68,8 +68,8 @@ function onStart()
 
    if ($platform $= "macos")
       $pref::Video::displayDevice = "OpenGL";
-   else
-      $pref::Video::displayDevice = "D3D9";
+   //else
+      //$pref::Video::displayDevice = "D3D9";
    
    // Initialise stuff.
    exec("./scripts/client/core.cs");
@@ -79,6 +79,7 @@ function onStart()
    exec("./scripts/server/server.cs");
    
    exec("./scripts/gui/guiTreeViewCtrl.cs");
+   exec("./scripts/gui/FileDialog.cs");
    exec("./scripts/gui/messageBoxes/messageBox.ed.cs");
    
    echo(" % - Initialized Core");

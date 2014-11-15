@@ -28,6 +28,8 @@ uniform sampler2D diffuseMap;
 
 in vec2 texc0, texc1, texc2, texc3;
 
+out vec4 OUT_FragColor0;
+
 void main()
 {
    OUT_FragColor0 = texture(diffuseMap, texc0) * kernel.x;

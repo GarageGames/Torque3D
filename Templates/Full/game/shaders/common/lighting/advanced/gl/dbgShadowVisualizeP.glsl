@@ -25,6 +25,8 @@ in vec2 uv0;
 uniform sampler2D shadowMap;
 uniform sampler1D depthViz;
 
+out vec4 OUT_FragColor0;
+
 void main()
 {
    float depth = saturate( texture( shadowMap, uv0 ).r );

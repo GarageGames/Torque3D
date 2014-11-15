@@ -53,7 +53,7 @@ new ShaderData( AL_DepthVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgDepthVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgDepthVisualizeP.glsl";
 
    samplerNames[0] = "prepassBuffer";
@@ -67,7 +67,7 @@ singleton PostEffect( AL_DepthVisualize )
    shader = AL_DepthVisualizeShader;
    stateBlock = AL_DefaultVisualizeState;
    texture[0] = "#prepass";
-   texture[1] = "depthviz";   
+   texture[1] = "depthviz";  
    target = "$backBuffer";
    renderPriority = 9999;
 };
@@ -84,16 +84,36 @@ function AL_DepthVisualize::onEnabled( %this )
    return true;
 }
 
+new ShaderData( AL_GlowVisualizeShader )
+{
+   DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
+   DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgGlowVisualizeP.hlsl";
+   
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgGlowVisualizeP.glsl";
+
+   samplerNames[0] = "glowBuffer";
+   pixVersion = 2.0;
+};
+
+singleton PostEffect( AL_GlowVisualize )
+{   
+   shader = AL_GlowVisualizeShader;
+   stateBlock = AL_DefaultVisualizeState;
+   texture[0] = "#glowbuffer";
+   target = "$backBuffer";
+   renderPriority = 9999;
+};
 
 new ShaderData( AL_NormalsVisualizeShader )
 {
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgNormalVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgNormalVisualizeP.glsl";
    
-   samplerNames[0] = "prepassTex";
+   samplerNames[0] = "prepassBuffer";
    
    pixVersion = 2.0;
 };
@@ -103,6 +123,7 @@ singleton PostEffect( AL_NormalsVisualize )
    shader = AL_NormalsVisualizeShader;
    stateBlock = AL_DefaultVisualizeState;
    texture[0] = "#prepass";
+   
    target = "$backBuffer";
    renderPriority = 9999;
 };
@@ -126,10 +147,10 @@ new ShaderData( AL_LightColorVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgLightColorVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
-   OGLPixelShaderFile  = "shaders/common/lighting/advanced/dl/dbgLightColorVisualizeP.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgLightColorVisualizeP.glsl";
    
-   samplerNames[0] = "lightInfoBuffer";
+   samplerNames[0] = "lightPrePassTex";
    
    pixVersion = 2.0;
 };
@@ -161,10 +182,10 @@ new ShaderData( AL_LightSpecularVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgLightSpecularVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
-   OGLPixelShaderFile  = "shaders/common/lighting/advanced/dl/dbgLightSpecularVisualizeP.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgLightSpecularVisualizeP.glsl";
    
-   samplerNames[0] = "lightInfoBuffer";
+   samplerNames[0] = "lightPrePassTex";
    
    pixVersion = 2.0;
 };
@@ -202,6 +223,20 @@ function toggleDepthViz( %enable )
       AL_DepthVisualize.enable();
    else if ( !%enable )
       AL_DepthVisualize.disable();
+}
+
+/// Toggles the visualization of the AL depth buffer.
+function toggleGlowViz( %enable )
+{
+   if ( %enable $= "" )
+   {
+      $AL_GlowVisualizeVar = AL_GlowVisualize.isEnabled() ? false : true;
+      AL_GlowVisualize.toggle();
+   }
+   else if ( %enable )
+      AL_GlowVisualize.enable();
+   else if ( !%enable )
+      AL_GlowVisualize.disable();
 }
 
 /// Toggles the visualization of the AL normals buffer.
@@ -246,3 +281,65 @@ function toggleLightSpecularViz( %enable )
       AL_LightSpecularVisualize.disable();    
 }
 
+function toggleBackbufferViz( %enable )
+{   
+   if ( %enable $= "" )
+   {
+      $AL_BackbufferVisualizeVar = AL_DeferredShading.isEnabled() ? true : false;
+      AL_DeferredShading.toggle();
+   }
+   else if ( %enable )
+      AL_DeferredShading.disable();
+   else if ( !%enable )
+      AL_DeferredShading.enable();    
+}
+
+new ShaderData( AL_CoordinatesShader )
+{
+   DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
+   DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgCoordinatesP.hlsl";
+   
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgCoordinatesP.glsl";
+
+   samplerNames[0] = "prepassBuffer";
+   samplerNames[1] = "depthviz";
+   samplerNames[2] = "matInfoTex";
+   pixVersion = 3.0;
+};
+
+singleton PostEffect( AL_Coordinates )
+{   
+   shader = AL_CoordinatesShader;
+   stateBlock = AL_DepthVisualizeState;
+   texture[0] = "#prepass";
+   texture[1] = "depthviz";
+   texture[2] = "#matinfo";
+   target = "$backBuffer";
+   renderPriority = 9999;
+};
+
+function AL_Coordinates::onEnabled( %this )
+{
+   AL_NormalsVisualize.disable();
+   AL_LightColorVisualize.disable();
+   AL_LightSpecularVisualize.disable();
+   $AL_NormalsVisualizeVar = false;
+   $AL_LightColorVisualizeVar = false;
+   $AL_LightSpecularVisualizeVar = false;
+   
+   return true;
+}
+
+function toggleCoordinateViz( %enable )
+{   
+   if ( %enable $= "" )
+   {
+      $AL_CoordinateVisualizeVar = AL_Coordinates.isEnabled() ? false : true;
+      AL_Coordinates.toggle();
+   }
+   else if ( %enable )
+      AL_Coordinates.enable();
+   else if ( !%enable )
+      AL_Coordinates.disable();    
+}

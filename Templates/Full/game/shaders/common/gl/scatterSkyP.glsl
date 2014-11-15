@@ -43,6 +43,8 @@ uniform float useCubemap;
 uniform vec3 lightDir;
 uniform vec3 sunDir;
 
+out vec4 OUT_FragColor0;
+
 void main()
 { 
 
@@ -71,5 +73,8 @@ void main()
       discard;
 
    OUT_FragColor0.a = 1;
+
+   OUT_FragColor0 = clamp(OUT_FragColor0, 0.0, 1.0);
+
    OUT_FragColor0 = hdrEncode( OUT_FragColor0 );
 }

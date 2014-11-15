@@ -78,6 +78,8 @@ vec4 lmSample( vec3 nrm )
 uniform float alphaFactor;
 uniform float alphaScale;
 
+out vec4 OUT_FragColor0;
+
 void main()
 {
    float softBlend = 1;

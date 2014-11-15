@@ -28,6 +28,8 @@ in vec2 uv;
 
 uniform vec2 oneOverTargetSize;
 
+out vec4 OUT_FragColor0;
+
 const float offset[3] = float[]( 0.0, 1.3846153846, 3.2307692308 );
 const float weight[3] = float[]( 0.2270270270, 0.3162162162, 0.0702702703 );
 

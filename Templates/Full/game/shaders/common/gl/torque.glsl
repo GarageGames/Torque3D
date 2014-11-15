@@ -139,12 +139,27 @@ mat3x3 quatToMat( vec4 quat )
 vec2 parallaxOffset( sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale )
 {
    float depth = texture( texMap, texCoord ).a;
-   vec2 offset = negViewTS.xy * ( depth * depthScale );
+   vec2 offset = negViewTS.xy * vec2( depth * depthScale );
 
    for ( int i=0; i < PARALLAX_REFINE_STEPS; i++ )
    {
       depth = ( depth + texture( texMap, texCoord + offset ).a ) * 0.5;
-      offset = negViewTS.xy * ( depth * depthScale );
+      offset = negViewTS.xy * vec2( depth * depthScale );
+   }
+
+   return offset;
+}
+
+/// Same as above but for dxt5nm where the deoth is stored in the red channel instead of the alpha
+vec2 parallaxOffsetDxtnm(sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale)
+{
+   float depth = texture(texMap, texCoord).r;
+   vec2 offset = negViewTS.xy * vec2(depth * depthScale);
+
+   for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
+   {
+      depth = (depth + texture(texMap, texCoord + offset).r) * 0.5;
+      offset = negViewTS.xy * vec2(depth * depthScale);
    }
 
    return offset;
@@ -276,5 +291,36 @@ bool getFlag(float flags, int num)
    float squareNum = pow(2, num);
    return (mod(process, pow(2, squareNum)) >= squareNum); 
 }
+
+// define TORQUE_STOCK_GAMMA
+#ifdef TORQUE_STOCK_GAMMA
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLinear(sampler2D tex, vec2 texCoord)
+{
+   vec4 sampl = texture(tex, texCoord);
+   return sampl;
+}
+
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLodLinear(sampler2D tex, vec4 texCoord)
+{
+   vec4 sampl = textureLod(tex, texCoord.xy,texCoord.w);
+   return sampl;
+}
+#else
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLinear(sampler2D tex, vec2 texCoord)
+{
+   vec4 sampl = texture(tex, texCoord);
+   return vec4(pow(abs(sampl.rgb), vec3(2.2)), sampl.a);
+}
+
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLodLinear(sampler2D tex, vec4 texCoord)
+{
+   vec4 sampl = textureLod(tex, texCoord.xy,texCoord.w);
+   return vec4(pow(abs(sampl.rgb), vec3(2.2)), sampl.a);
+}
+#endif
 
 #endif // _TORQUE_GLSL_

@@ -145,6 +145,8 @@ uniform vec4	      sunColor;
 uniform float        sunBrightness;
 uniform float        reflectivity;
 
+out vec4 OUT_FragColor0;
+
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------

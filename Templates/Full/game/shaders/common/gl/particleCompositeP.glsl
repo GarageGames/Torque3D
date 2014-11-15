@@ -38,6 +38,7 @@ uniform sampler2D edgeSource;
 uniform vec4 edgeTargetParams;
 #endif
 
+out vec4 OUT_FragColor0;
 
 void main()
 {  

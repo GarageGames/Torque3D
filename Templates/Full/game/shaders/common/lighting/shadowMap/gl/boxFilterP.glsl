@@ -28,6 +28,8 @@ uniform vec2 blurDimension;
 
 in vec2 tex0;
 
+out vec4 OUT_FragColor0;
+
 void main()
 {
    // Preshader

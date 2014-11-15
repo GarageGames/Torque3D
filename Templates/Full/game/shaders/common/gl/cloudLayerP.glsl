@@ -47,6 +47,8 @@ uniform float     cloudCoverage;
 uniform vec3      cloudBaseColor;
 uniform float	  cloudExposure;
 
+out vec4 OUT_FragColor0;
+
 //-----------------------------------------------------------------------------
 // Globals                                                                        
 //-----------------------------------------------------------------------------

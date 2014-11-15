@@ -29,6 +29,8 @@ uniform vec4 groundAlpha;
 in vec4 color, groundAlphaCoeff;
 in vec2 outTexCoord, alphaLookup;
 
+out vec4 OUT_FragColor0;
+
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------

@@ -111,6 +111,8 @@ uniform vec4       rippleMagnitude;
 uniform vec4       specularParams;
 uniform mat4     modelMat;
 
+out vec4 OUT_FragColor0;
+
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------

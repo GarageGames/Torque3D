@@ -29,6 +29,8 @@ uniform vec4 shadeColor;
 in vec2 TEX0;
 in vec4 TEX1;
 
+out vec4 OUT_FragColor0;
+
 //-----------------------------------------------------------------------------
 // Fade edges of axis for texcoord passed in
 //-----------------------------------------------------------------------------

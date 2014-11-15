@@ -50,6 +50,11 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
          DOFPostEffect.enable();
       else
          DOFPostEffect.disable();
+		 
+      if ( $PostFXManager::PostFX::EnableVignette )
+         VignettePostEffect.enable();
+      else
+         VignettePostEffect.disable();
      
       postVerbose("% - PostFX Manager - PostFX enabled");      
    }
@@ -61,6 +66,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
       HDRPostFX.disable();
       LightRayPostFX.disable();
       DOFPostEffect.disable();
+	  VignettePostEffect.disable();
       
       postVerbose("% - PostFX Manager - PostFX disabled");
    }
@@ -94,6 +100,12 @@ function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
       %postEffect = DOFPostEffect;
       $PostFXManager::PostFX::EnableDOF = %bEnable;
       //$pref::PostFX::DOF::Enabled = %bEnable;
+   }
+   else if(%sName $= "Vignette")
+   {
+      %postEffect = VignettePostEffect;
+      $PostFXManager::PostFX::EnableVignette = %bEnable;
+      //$pref::PostFX::Vignette::Enabled = %bEnable;
    }
    
    // Apply the change
@@ -196,6 +208,13 @@ function PostFXManager::settingsRefreshDOF(%this)
 
 }
 
+function PostFXManager::settingsRefreshVignette(%this)
+{
+  //Apply the enabled flag 
+   ppOptionsEnableVignette.setValue($PostFXManager::PostFX::EnableVignette);   
+
+}
+
 function PostFXManager::settingsRefreshAll(%this)
 {    
    $PostFXManager::PostFX::Enabled           = $pref::enablePostEffects;
@@ -203,6 +222,7 @@ function PostFXManager::settingsRefreshAll(%this)
    $PostFXManager::PostFX::EnableHDR         = HDRPostFX.isEnabled();
    $PostFXManager::PostFX::EnableLightRays   = LightRayPostFX.isEnabled();
    $PostFXManager::PostFX::EnableDOF         = DOFPostEffect.isEnabled();
+   $PostFXManager::PostFX::EnableVignette    = VignettePostEffect.isEnabled();
    
    //For all the postFX here, apply the active settings in the system
    //to the gui controls.
@@ -211,6 +231,7 @@ function PostFXManager::settingsRefreshAll(%this)
    %this.settingsRefreshHDR();
    %this.settingsRefreshLightrays();
    %this.settingsRefreshDOF();
+   %this.settingsRefreshVignette();
    
    ppOptionsEnable.setValue($PostFXManager::PostFX::Enabled);
 
@@ -272,6 +293,7 @@ function PostFXManager::settingsApplyFromPreset(%this)
    {
       $PostFXManager::PostFX::Enabled           = $PostFXManager::Settings::EnablePostFX;
       $PostFXManager::PostFX::EnableDOF         = $PostFXManager::Settings::EnableDOF;
+      $PostFXManager::PostFX::EnableVignette    = $PostFXManager::Settings::EnableVignette;
       $PostFXManager::PostFX::EnableLightRays   = $PostFXManager::Settings::EnableLightRays;
       $PostFXManager::PostFX::EnableHDR         = $PostFXManager::Settings::EnableHDR;
       $PostFXManager::PostFX::EnableSSAO        = $PostFXManager::Settings::EnabledSSAO;
@@ -353,11 +375,18 @@ function PostFXManager::settingsApplyDOF(%this)
    
 }
 
+function PostFXManager::settingsApplyVignette(%this)
+{
+   postVerbose("% - PostFX Manager - Settings Saved - Vignette");   
+   
+}
+
 function PostFXManager::settingsApplyAll(%this, %sFrom)
 {
    // Apply settings which control if effects are on/off altogether.
    $PostFXManager::Settings::EnablePostFX        = $PostFXManager::PostFX::Enabled;  
    $PostFXManager::Settings::EnableDOF           = $PostFXManager::PostFX::EnableDOF;
+   $PostFXManager::Settings::EnableVignette      = $PostFXManager::PostFX::EnableVignette;
    $PostFXManager::Settings::EnableLightRays     = $PostFXManager::PostFX::EnableLightRays;
    $PostFXManager::Settings::EnableHDR           = $PostFXManager::PostFX::EnableHDR;
    $PostFXManager::Settings::EnabledSSAO         = $PostFXManager::PostFX::EnableSSAO;
@@ -373,6 +402,8 @@ function PostFXManager::settingsApplyAll(%this, %sFrom)
    %this.settingsApplyLightRays();
    // DOF
    %this.settingsApplyDOF();
+   // Vignette
+   %this.settingsApplyVignette();
    
    postVerbose("% - PostFX Manager - All Settings applied to $PostFXManager::Settings");
 }

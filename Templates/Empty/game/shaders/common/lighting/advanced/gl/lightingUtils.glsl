@@ -33,34 +33,6 @@ float attenuate( vec4 lightColor, vec2 attParams, float dist )
 	#endif
 }
 
-// Calculate the specular coefficent
-//
-//	pxlToLight - Normalized vector representing direction from the pixel being lit, to the light source, in world space
-//	normal - Normalized surface normal
-//	pxlToEye - Normalized vector representing direction from pixel being lit, to the camera, in world space
-//	specPwr - Specular exponent
-//	specularScale - A scalar on the specular output used in RGB accumulation.
-//
-float calcSpecular( vec3 pxlToLight, vec3 normal, vec3 pxlToEye, float specPwr, float specularScale )
-{
-#ifdef PHONG_SPECULAR 
-   // (R.V)^c
-   float specVal = dot( normalize( -reflect( pxlToLight, normal ) ), pxlToEye );
-#else
-   // (N.H)^c   [Blinn-Phong, TGEA style, default]
-   float specVal = dot( normal, normalize( pxlToLight + pxlToEye ) );
-#endif
-
-#ifdef ACCUMULATE_LUV
-   return pow( max( specVal, 0.00001f ), specPwr );
-#else
-   // If this is RGB accumulation, than there is no facility for the luminance
-   // of the light to play in to the specular intensity. In LUV, the luminance
-   // of the light color gets rolled into N.L * Attenuation
-   return specularScale * pow( max( specVal, 0.00001f ), specPwr );
-#endif
-}
-
 vec3 getDistanceVectorToPlane( vec3 origin, vec3 direction, vec4 plane )
 {
    float denum = dot( plane.xyz, direction.xyz );

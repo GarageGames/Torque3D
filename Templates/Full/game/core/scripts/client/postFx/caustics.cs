@@ -38,9 +38,13 @@ singleton ShaderData( PFX_CausticsShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/caustics/causticsP.hlsl";
          
-   //OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
-   //OGLPixelShaderFile   = "shaders/common/postFx/gl/passthruP.glsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/caustics/gl/causticsP.glsl";
       
+   samplerNames[0] = "$prepassTex";
+   samplerNames[1] = "$causticsTex0";
+   samplerNames[2] = "$causticsTex1";
+   
    pixVersion = 3.0;
 };
 

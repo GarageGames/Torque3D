@@ -33,6 +33,8 @@ in vec4 outLightVec;
 in vec3 outPos;
 in vec3 outEyePos;
 
+out vec4 OUT_FragColor0;
+
 void main()
 {
    vec2 texOffset;
