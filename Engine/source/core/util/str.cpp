@@ -491,7 +491,7 @@ ConsoleFunction( dumpStringMemStats, void, 1, 1, "()"
 void* String::StringData::operator new( size_t size, U32 len )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
+   StringData *str = static_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
 
    str->mLength      = len;
 
@@ -519,7 +519,7 @@ void String::StringData::operator delete(void *ptr)
 void* String::StringData::operator new( size_t size, U32 len, DataChunker& chunker )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
+   StringData *str = static_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
 
    str->mLength      = len;
 
