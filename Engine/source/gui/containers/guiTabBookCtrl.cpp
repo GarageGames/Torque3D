@@ -272,7 +272,7 @@ bool GuiTabBookCtrl::onWake()
    if( mHasTexture )
    {
       mBitmapBounds = mProfile->mBitmapArrayRects.address();
-      mTabHeight = mBitmapBounds[TabSelected].extent.y;
+      //mTabHeight = mBitmapBounds[TabSelected].extent.y;
    }
 
    calculatePageTabs();
