@@ -26,7 +26,7 @@
 #ifndef _MPOLYHEDRON_H_
 #include "math/mPolyhedron.h"
 #endif
-
+#include "console/SimXMLDocument.h"
 
 /// Shared interface for polyhedral objects.
 struct IScenePolyhedralObject
@@ -78,6 +78,8 @@ class ScenePolyhedralObject : public Base, public IScenePolyhedralObject
       virtual void _renderObject( ObjectRenderInst* ri, SceneRenderState* state, BaseMatInstance* overrideMat );
 
    public:
+
+		virtual SimXMLDocument* getcurrentXML();
 
       ScenePolyhedralObject()
          : mIsBox( true ) {}

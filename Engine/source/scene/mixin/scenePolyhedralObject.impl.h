@@ -28,7 +28,7 @@
 #include "gfx/gfxTransformSaver.h"
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
-#include "console/SimXMLDocument.h"
+
 
 #if 0 // Enable when enabling debug rendering below.
 #include "scene/sceneRenderState.h"
@@ -436,4 +436,14 @@ bool ScenePolyhedralObject< Base, P >::_setEdge( void* object, const char* index
    obj->mIsBox = false;
 
    return false;
+}
+
+template< typename Base, typename P >
+SimXMLDocument * ScenePolyhedralObject< Base, P >::getcurrentXML()
+{
+	SimObject* tmp = dynamic_cast<SimObject*>(this);
+	if (tmp)
+		return tmp->getcurrentXML();
+	else
+		return 0;
 }
