@@ -179,6 +179,8 @@ ReflectorBase::ReflectorBase()
    mObject = NULL;
    mOcclusionQuery = GFX->createOcclusionQuery();
    mQueryPending = false;
+   score = 0.0f;
+   lastUpdateMs = 0;
 }
 
 ReflectorBase::~ReflectorBase()

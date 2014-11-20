@@ -83,7 +83,8 @@ F32 ReflectionManager::smRefractTexScale = 0.5f;
 
 ReflectionManager::ReflectionManager() 
  : mUpdateRefract( true ),
-   mReflectFormat( GFXFormatR8G8B8A8 )
+   mReflectFormat( GFXFormatR8G8B8A8 ),
+   mLastUpdateMs( 0 )
 {
    mTimer = PlatformTimer::create();
 
