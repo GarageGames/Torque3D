@@ -209,8 +209,8 @@ void GuiWindowCtrl::moveFromCollapseGroup()
 
    S32 groupVec = mCollapseGroup;
    S32 vecPos = mCollapseGroupNum;
-	if (parent->mCollapseGroupVec.size() == 0)
-		return;
+//	if (parent->mCollapseGroupVec.size() == 0)
+//		return;
    S32 groupVecCount = parent->mCollapseGroupVec[groupVec].size() - 1;
 
    CollapseGroupNumVec collapseGroupNumVec;
@@ -288,8 +288,6 @@ void GuiWindowCtrl::moveFromCollapseGroup()
 
 void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientation )
 {
-	if (this->mIsInPopUp || hitWindow->mIsInPopUp)
-		return;
    // Orientation 0 - window in question is being connected to top of another window
    // Orientation 1 - window in question is being connected to bottom of another window
 
@@ -303,8 +301,6 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
    
    if(mCollapseGroup == attatchedGroupVec && vecPos != -1)
       return;
-   if (parent->mCollapseGroupVec.size() == 0)
-	  return;
 
    CollapseGroupNumVec collapseGroupNumVec;
 
@@ -429,8 +425,6 @@ void GuiWindowCtrl::refreshCollapseGroups()
    GuiControl *parent = getParent();
    if( !parent )
       return;
-   if (parent->mCollapseGroupVec.size() == 0)
-	  return;
    
    CollapseGroupNumVec	collapseGroupNumVec;
 
@@ -459,8 +453,6 @@ void GuiWindowCtrl::moveWithCollapseGroup(Point2I windowPosition)
    GuiControl *parent = getParent();
    if( !parent )
       return;
-   if (parent->mCollapseGroupVec.size() == 0)
-	  return;
 
    Point2I newChildPosition(0, 0);
    S32 addedPosition = getExtent().y;
@@ -515,8 +507,6 @@ void GuiWindowCtrl::handleCollapseGroup()
    GuiControl *parent = getParent();
    if( !parent )
       return;
-   if (parent->mCollapseGroupVec.size() == 0)
-	  return;
 
    CollapseGroupNumVec	collapseGroupNumVec;
 
@@ -605,8 +595,6 @@ bool GuiWindowCtrl::resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resi
    CollapseGroupNumVec	collapseGroupNumVec;
 
    bool canResize = true;
-   if (parent->mCollapseGroupVec.size() == 0)
-	   return false;
    CollapseGroupNumVec::iterator iter = parent->mCollapseGroupVec[mCollapseGroup].begin();
    for(; iter != parent->mCollapseGroupVec[mCollapseGroup].end(); iter++ )
    {
@@ -683,7 +671,6 @@ S32 GuiWindowCtrl::findHitEdges( const Point2I &globalPoint )
    else if( edges.top.hit( cursorHorzEdge ) )
    {
       // Only the top window in a collapse group can be extended from the top
-		if (!parent->mCollapseGroupVec.size() == 0)
       if( mCanCollapse && mCollapseGroup >= 0 )
       {
          if( parent->mCollapseGroupVec[mCollapseGroup].first() !=  this )
@@ -890,11 +877,16 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
 
    if (mMouseMovingWin && parent)
    {
-      newPosition.x = getMax(0, getMin(parent->getWidth() - getWidth(), mOrigBounds.point.x + deltaMousePosition.x));   
-      newPosition.y = getMax(0, getMin(parent->getHeight() - getHeight(), mOrigBounds.point.y + deltaMousePosition.y));    
       if( parent != root )
       {
+         newPosition.x = mOrigBounds.point.x + deltaMousePosition.x;
+         newPosition.y = getMax(0, mOrigBounds.point.y + deltaMousePosition.y );
          mRepositionWindow = true;
+      }
+      else
+      {
+         newPosition.x = getMax(0, getMin(parent->getWidth() - getWidth(), mOrigBounds.point.x + deltaMousePosition.x));
+         newPosition.y = getMax(0, getMin(parent->getHeight() - getHeight(), mOrigBounds.point.y + deltaMousePosition.y));
       }
 
       // Check snapping to other windows
@@ -1533,10 +1525,11 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
 					else
 						bmp += BmpHilite;
 					}
-				GFX->getDrawUtil()->clearBitmapModulation();
+				//GFX->getDrawUtil()->clearBitmapModulation();
 				GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mPopWindowButton.point, mBitmapBounds[bmp] );
 				}
 			}
+
 		   if( !mMinimized )
 		   {
 		      // Render the children
@@ -1702,6 +1695,9 @@ void GuiWindowCtrl::OnWindowPopOut()
 		Con::errorf ("POP OUT FAILED, GuiWindow is not named!");
 		return;
 	   }
+	moveToCollapseGroup( this, 1 );
+	mCollapseGroup = -1;
+
 	const char* tname = this->getName();
 	if (tname==NULL)
 		tname = StringTable->insert("");
@@ -1812,9 +1808,7 @@ void GuiWindowCtrl::PopUpClosed(GuiCanvas* canvas)
 {
 	if (std::find(openWindows.begin(), openWindows.end(), this->getId()) != openWindows.end())
 		openWindows.erase(std::remove(openWindows.begin(), openWindows.end(), canvas->getId()), openWindows.end());
-}
-void GuiWindowCtrl::PopUpClosed()
-	{
+
 	//VertResizeBottom gives us problems when we pop a control
 	//out of the game canvas.  It's math is based on the 
 	//Window Bar across the top of the window.  Since it is gone
@@ -1954,8 +1948,6 @@ void GuiWindowCtrl::selectWindow(void)
 {
    // First make sure this window is the front most of its siblings
    GuiControl *parent = getParent();
-	if (parent->mCollapseGroupVec.size() == 0)
-		return;
    if (parent && *parent->end() != this )
    {
       // Valid collapse groups have to be selected together
@@ -2059,8 +2051,6 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
          
          // Lets grab the information we need (this should probably be already stored on each individual window object)
          S32 groupNum = mCollapseGroup;
-			if (parent->mCollapseGroupVec.size() == 0)
-				return;
          S32 groupMax = parent->mCollapseGroupVec[ groupNum ].size() - 1;
 
          // Set up vars that we're going to be using
