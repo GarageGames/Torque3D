@@ -2891,7 +2891,7 @@ DefineConsoleMethod( SimObject, getField, const char*, ( S32 index ),,
 ConsoleMethod(SimObject, signal, void, 3, 4, "evaluates strings stored in dynamic fields take a string as parameter")
 {
 	const char *fieldName = StringTable->insert( argv[2] );
-	object->signal(fieldName, argc > 3 ? argv[3] : NULL);
+	object->signal(fieldName, argc > 3 ? argv[3] : "");
 }
 
 DefineConsoleMethod(SimObject, setEnabled, void, (bool enabled), , "(enabled)")
