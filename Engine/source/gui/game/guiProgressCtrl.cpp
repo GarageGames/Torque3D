@@ -64,7 +64,12 @@ const char* GuiProgressCtrl::getScriptValue()
    dSprintf(ret, bufSize, "%g", mProgress);
    return ret;
 }
-
+void GuiProgressCtrl::SetScriptValue(F32 value)
+   {
+   mProgress = value;
+   mProgress = mClampF(mProgress, 0.f, 1.f);
+   setUpdate();
+   }
 void GuiProgressCtrl::setScriptValue(const char *value)
 {
    //set the value

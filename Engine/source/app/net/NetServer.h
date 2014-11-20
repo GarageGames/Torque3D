@@ -19,43 +19,48 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "torqueConfig.h"
+#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
 
-#ifndef _FILEOBJECT_H_
-#define _FILEOBJECT_H_
+#ifndef NetServer_h
+#define NetServer_h
 
-#ifndef _SIMBASE_H_
-#include "console/simBase.h"
+
+#include "core/module.h"
+#include "core/iTickable.h"
+
+#include "core/util/tVector.h"
+#include "console\sim.h"
+#include "console\simObject.h"
+#include "console\simEvents.h"
+#include "NetFTPServer.h"
+
+class NetServer: public virtual ITickable
+   {
+   private:
+      bool mGameRunning;
+      NetFTPServer* mServer;
+   public:
+      NetServer();
+      ~NetServer();
+
+      static const char* getSingletonName();
+      virtual void interpolateTick( F32 delta ){};
+      virtual void processTick();
+      virtual void advanceTime( F32 timeDelta ){};
+      void PushFiles();
+
+      static void processonConnectionRequest_Event(const char* address, const char* ID);
+      S32  buildFileList(const char* pattern, bool recurse, bool multiMatch);
+      
+      Vector<String>   sgFindFilesResults;
+      U32              sgFindFilesPos;
+      char sgScriptFilenameBuffer[1024];
+   };
+
+#define NETSERVER ManagedSingleton<NetServer>::instance()
+
+
 #endif
-#ifndef _FILESTREAM_H_
-#include "core/stream/fileStream.h"
-#endif
-
-class FileObject : public SimObject
-{
-   typedef SimObject Parent;
-   U8 *mFileBuffer;
-   U32 mBufferSize;
-   U32 mCurPos;
-   FileStream *stream;
-public:
-   FileObject();
-   ~FileObject();
-
-   bool openForWrite(const char *fileName, const bool append = false);
-   bool openForRead(const char *fileName);
-   bool readMemory(const char *fileName);
-   const U8 *buffer() { return mFileBuffer; }
-   const U8 *readLine();
-   void peekLine(U8 *line, S32 length);
-   bool isEOF();
-   void writeLine(const U8 *line);
-   void close();
-   void writeObject( SimObject* object, const U8* objectPrepend = NULL );
-
-   void writeBinary(U32 bufferSize, const U8 *buffer) ;
-   U32 getSize() ;
-   U8 * getBuffer() ;
-   DECLARE_CONOBJECT(FileObject);
-};
 
 #endif

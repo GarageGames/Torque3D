@@ -213,6 +213,34 @@ void FileObject::writeObject( SimObject* object, const U8* objectPrepend )
    object->write( *stream, 0 );
 }
 
+void FileObject::writeBinary(U32 bufferSize, const U8 *buffer)
+{
+	stream->write(bufferSize, buffer);
+}
+U32 FileObject::getSize()
+{
+	return mBufferSize ;
+}
+U8 *FileObject::getBuffer()
+{
+	return mFileBuffer ;
+}
+DefineConsoleMethod( FileObject, writeBinary, void, (S32 bufferSize,S32 buffer),,
+   "Writes a file to storage.\n"
+   )
+{
+   object->writeBinary((U32)bufferSize,(const U8 *)buffer);
+}
+
+DefineConsoleMethod( FileObject, getSize, S32, (),,
+	"Gets the file size.\n"
+	)
+{
+	return object->getSize();
+}
+
+
+
 DefineEngineMethod( FileObject, openForRead, bool, ( const char* filename ),,
    "@brief Open a specified file for reading\n\n"
    

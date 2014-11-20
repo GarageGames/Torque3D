@@ -39,6 +39,10 @@
 #include "console/engineAPI.h"
 #include "math/mTransform.h"
 
+#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
+#include "app/net/NetFTPClient.h"
+#endif
+
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
 #elif defined TORQUE_EXTENDED_MOVE
@@ -2199,3 +2203,45 @@ DefineEngineMethod( GameConnection, getControlSchemeAbsoluteRotation, bool, (),,
 {
    return object->getControlSchemeAbsoluteRotation();
 }
+
+
+#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
+
+void GameConnection::connect(const char* remoteAddress)
+	{
+   NetFTPClient::ConnectAndDownload(StringTable->insert(remoteAddress),this);
+	}
+#endif
+void  GameConnection::ParentConnect(const char * remoteAddress)
+	{
+	NetAddress addr;
+    if (!Net::stringToAddress(remoteAddress, &addr))
+		return;
+	Parent::connect(&addr);
+	}
+
+
+DefineEngineMethod( GameConnection, connect, void, (const char* remoteAddress),,
+   "@brief Connects to the remote address.\n\n"
+
+   "Attempts to connect with another NetConnection on the given address.  Typically once "
+   "connected, a game's information is passed along from the server to the client, followed "
+   "by the player entering the game world.  The actual procedure is dependent on "
+   "the NetConnection subclass that is used.  i.e. GameConnection.\n"
+
+   "@param remoteAddress The address to connect to in the form of IP:&lt;address&gt;:&lt;port&rt; "
+   "although the <i>IP:</i> portion is optional.  The <i>address</i> portion may be in the form "
+   "of w.x.y.z or as a host name, in which case a DNS lookup will be performed.  You may also "
+   "substitue the word <i>broadcast</i> for the address to broadcast the connect request over "
+   "the local subnet.\n\n"
+
+   "@see NetConnection::connectLocal() to connect to a server running within the same process "
+   "as the client.\n"
+   )
+	{
+#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
+   object->connect(remoteAddress);
+#else
+   object->ParentConnect(remoteAddress);
+#endif
+	}

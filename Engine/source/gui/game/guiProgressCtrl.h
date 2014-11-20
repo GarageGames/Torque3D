@@ -51,6 +51,7 @@ public:
    virtual const char *getScriptValue();
    virtual void setScriptValue(const char *value);
 
+   void SetScriptValue(F32 value);
    void onPreRender();
    void onRender(Point2I offset, const RectI &updateRect);
 };
