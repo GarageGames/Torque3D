@@ -1831,7 +1831,10 @@ breakContinue:
                   floatStack[++_FLT] = (F32)ret;
                }
                else if(code[ip] == OP_STR_TO_NONE)
+               {
+                  STR.setStringValue(ret.getStringValue());
                   ip++;
+               }
                else
                   STR.setStringValue((const char*)ret);
 			   
