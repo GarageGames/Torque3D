@@ -470,11 +470,11 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
             dSprintf(traceBuffer + dStrlen(traceBuffer), sizeof(traceBuffer) - dStrlen(traceBuffer),
                "%s(", thisFunctionName);
          }
-		 for (i = 0; i < wantedArgc; i++)
+         for (i = 0; i < wantedArgc; i++)
          {
-            dStrcat(traceBuffer, argv[i+1]);
-			if (i != wantedArgc - 1)
-               dStrcat(traceBuffer, ", ");
+             dStrcat(traceBuffer, argv[i + 1]);
+             if (i != wantedArgc - 1)
+                 dStrcat(traceBuffer, ", ");
          }
          dStrcat(traceBuffer, ")");
          Con::printf("%s", traceBuffer);
@@ -1837,7 +1837,7 @@ breakContinue:
                }
                else
                   STR.setStringValue((const char*)ret);
-                           
+               
                // This will clear everything including returnValue
                CSTK.popFrame();
                STR.clearFunctionOffset();
