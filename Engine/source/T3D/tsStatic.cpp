@@ -111,11 +111,11 @@ TSStatic::TSStatic()
    mMeshCulling = false;
    mUseOriginSort = false;
 
-   mUseAlphaLod     = false;
-   mAlphaLODStart   = 100.0f;
-   mAlphaLODEnd     = 150.0f;
-   mInvertAlphaLod  = false;
-   mAlphaLOD = 1.0f;
+   mUseAlphaFade     = false;
+   mAlphaFadeStart   = 100.0f;
+   mAlphaFadeEnd     = 150.0f;
+   mInvertAlphaFade  = false;
+   mAlphaFade = 1.0f;
    mPhysicsRep = NULL;
 
    mCollisionType = CollisionMesh;
@@ -197,12 +197,12 @@ void TSStatic::initPersistFields()
    
    endGroup("Collision");
 
-   addGroup( "AlphaLOD" );  
-      addField( "ALODEnable",   TypeBool,   Offset(mUseAlphaLod,    TSStatic), "Turn on/off AlphaLod" );  
-      addField( "ALODStart",    TypeF32,    Offset(mAlphaLODStart,  TSStatic), "Distance of start AlphaLOD" );  
-      addField( "ALODEnd",      TypeF32,    Offset(mAlphaLODEnd,    TSStatic), "Distance of end AlphaLOD" );  
-      addField( "ALODInverse", TypeBool,    Offset(mInvertAlphaLod, TSStatic), "Invert AlphaLOD's Start & End Distance" );  
-   endGroup( "AlphaLOD" );
+   addGroup( "AlphaFade" );  
+      addField( "Alpha Fade Enable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
+      addField( "Alpha Fade Start",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
+      addField( "Alpha Fade End",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
+      addField( "Alpha Fade Inverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
+   endGroup( "AlphaFade" );
 
    addGroup("Debug");
 
@@ -514,31 +514,31 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    if (dist < 0.01f)
       dist = 0.01f;
 
-   if (mUseAlphaLod)
+   if (mUseAlphaFade)
    {
-      mAlphaLOD = 1.0f;
-      if ((mAlphaLODStart < mAlphaLODEnd) && mAlphaLODStart > 0.1f)
+      mAlphaFade = 1.0f;
+      if ((mAlphaFadeStart < mAlphaFadeEnd) && mAlphaFadeStart > 0.1f)
       {
-         if (mInvertAlphaLod)
+         if (mInvertAlphaFade)
          {
-            if (dist <= mAlphaLODStart)
+            if (dist <= mAlphaFadeStart)
             {
                return;
             }
-            if (dist < mAlphaLODEnd)
+            if (dist < mAlphaFadeEnd)
             {
-               mAlphaLOD = ((dist - mAlphaLODStart) / (mAlphaLODEnd - mAlphaLODStart));
+               mAlphaFade = ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
             }
          }
          else
          {
-            if (dist >= mAlphaLODEnd)
+            if (dist >= mAlphaFadeEnd)
             {
                return;
             }
-            if (dist > mAlphaLODStart)
+            if (dist > mAlphaFadeStart)
             {
-               mAlphaLOD -= ((dist - mAlphaLODStart) / (mAlphaLODEnd - mAlphaLODStart));
+               mAlphaFade -= ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
             }
          }
       }
@@ -589,14 +589,14 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    mShapeInstance->animate();
    if(mShapeInstance)
    {
-      if (mUseAlphaLod)
+      if (mUseAlphaFade)
       {
-         mShapeInstance->setAlphaAlways(mAlphaLOD);
+         mShapeInstance->setAlphaAlways(mAlphaFade);
          S32 s = mShapeInstance->mMeshObjects.size();
          
          for(S32 x = 0; x < s; x++)
          {
-            mShapeInstance->mMeshObjects[x].visible = mAlphaLOD;
+            mShapeInstance->mMeshObjects[x].visible = mAlphaFade;
          }
       }
    }
@@ -680,11 +680,11 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    stream->writeFlag( mPlayAmbient );
 
-   if ( stream->writeFlag(mUseAlphaLod) )  
+   if ( stream->writeFlag(mUseAlphaFade) )  
    {  
-      stream->write(mAlphaLODStart);  
-      stream->write(mAlphaLODEnd);  
-      stream->write(mInvertAlphaLod);  
+      stream->write(mAlphaFadeStart);  
+      stream->write(mAlphaFadeEnd);  
+      stream->write(mInvertAlphaFade);  
    } 
 
    if ( mLightPlugin )
@@ -744,12 +744,12 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
 
    mPlayAmbient = stream->readFlag();
 
-   mUseAlphaLod = stream->readFlag();  
-   if (mUseAlphaLod)
+   mUseAlphaFade = stream->readFlag();  
+   if (mUseAlphaFade)
    {
-      stream->read(&mAlphaLODStart);  
-      stream->read(&mAlphaLODEnd);  
-      stream->read(&mInvertAlphaLod);  
+      stream->read(&mAlphaFadeStart);  
+      stream->read(&mAlphaFadeEnd);  
+      stream->read(&mInvertAlphaFade);  
    }
 
    if ( mLightPlugin )

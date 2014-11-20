@@ -97,12 +97,12 @@ class TSStatic : public SceneObject
    };
 
 public:
-   void setAlphaLOD(bool enable, F32 start, F32 end, bool inverse)
+   void setAlphaFade(bool enable, F32 start, F32 end, bool inverse)
    {
-      mUseAlphaLod     = enable;
-      mAlphaLODStart   = start;
-      mAlphaLODEnd     = end;
-      mInvertAlphaLod  = inverse;
+      mUseAlphaFade     = enable;
+      mAlphaFadeStart   = start;
+      mAlphaFadeEnd     = end;
+      mInvertAlphaFade  = inverse;
    }
    
    /// The different types of mesh data types
@@ -115,11 +115,11 @@ public:
    };
    
 protected:
-   bool mUseAlphaLod;
-   F32  mAlphaLODStart;
-   F32  mAlphaLODEnd;
-   F32  mAlphaLOD;
-   bool mInvertAlphaLod;
+   bool mUseAlphaFade;
+   F32  mAlphaFadeStart;
+   F32  mAlphaFadeEnd;
+   F32  mAlphaFade;
+   bool mInvertAlphaFade;
 
    bool onAdd();
    void onRemove();
