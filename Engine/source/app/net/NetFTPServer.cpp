@@ -37,7 +37,7 @@
 
 NetFTPServer *NetFTPServer::table[NetFTPServer::TableSize] = {0, };
 
-NetFTPServer::ConnectionsList NetFTPServer::mConnections;
+//NetFTPServer::ConnectionsList NetFTPServer::mConnections;
 
 IMPLEMENT_CONOBJECT(NetFTPServer);
 
@@ -49,12 +49,17 @@ NetFTPServer *NetFTPServer::find(NetSocket tag)
    {
    for(NetFTPServer *walk = table[U32(tag) & TableMask]; walk; walk = walk->mNext)
       if(walk->mTag == tag)
+		{
+			Con::errorf("Found Tag %i", walk->mTag);
          return walk;
+		}
+		Con::errorf("Not Found Tag %i", tag);
    return NULL;
    }
 
 void NetFTPServer::addToTable(NetSocket newTag)
    {
+	Con::errorf("addToTable %i", newTag);
    removeFromTable();
    mTag = newTag;
    mNext = table[U32(mTag) & TableMask];
@@ -67,6 +72,7 @@ void NetFTPServer::removeFromTable()
       {
       if(*walk == this)
          {
+			Con::errorf("removeFromTable %i", this->mTag);
          *walk = mNext;
          return;
          }
@@ -113,18 +119,6 @@ NetFTPServer::~NetFTPServer()
       Net::smConnectionReceive.remove(processConnectedReceiveEvent);
       Net::smConnectionNotify.remove(processConnectedNotifyEvent);
       }
-   }
-
-bool NetFTPServer::processArguments(S32 argc, const char **argv)
-   {
-   if(argc == 0)
-      return true;
-   else if(argc == 1)
-      {
-      addToTable(U32(dAtoi(argv[0])));
-      return true;
-      }
-   return false;
    }
 
 bool NetFTPServer::onAdd()
@@ -235,18 +229,12 @@ void NetFTPServer::parseLine(U8 *buffer, U32 *start, U32 bufferLen)
       *start = i + 1;
    }
 
-void NetFTPServer::onConnectionRequest(const NetAddress *addr, U32 connectId)
+void NetFTPServer::onConnectionRequest(const NetAddress *addr, NetSocket connectId)
    {
-   char idBuf[16];
-   char addrBuf[256];
-   Net::addressToString(addr, addrBuf);
-   dSprintf(idBuf, sizeof(idBuf), "%d", connectId);
-
-   const char * clientid = Con::evaluate((String("%client = new NetFTPServer(ftpClient") + String(idBuf) + String(", ") +  String(idBuf) + String (");return %client;")).c_str());
-
-   NetFTPServer* obj = dynamic_cast<NetFTPServer*>(Sim::findObject(clientid));
-   mConnections.push_back(obj);
-	Con::printf("Client Connected!");
+	NetFTPServer* newconn = new NetFTPServer();
+	newconn->registerObject();
+	newconn->addToTable(connectId);
+	Con::printf("onConnectionRequest! %i", connectId);
    }
 
 bool NetFTPServer::processLine(UTF8 *line)
@@ -312,6 +300,32 @@ void NetFTPServer::_Get(String file)
    send((const U8 *) fs->getBuffer(), fs->getSize()) ;
    }
 
+char* uinttochar( unsigned int n)
+{
+	char* a = Con::getReturnBuffer(20);
+  if (n == 0)
+  {
+    *a = '0';
+    *(a+1) = '\0';
+    return a;
+  }
+     
+  char aux[20];
+  aux[19] = '\0';
+  char* auxp = aux + 19;
+     
+  int c = 1;
+  while (n != 0)
+  {
+    int mod = n % 10;
+    *(--auxp) = mod | 0x30;
+    n /=  10;
+    c++;
+  }
+     
+  memcpy(a, auxp, c);
+  return a;
+}
 
 class FileList_SysEvent : public SimEvent
    {
@@ -333,7 +347,7 @@ class FileList_SysEvent : public SimEvent
             String filename = mobj->FilesAt(mIdx);
             Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( filename );
             U32 crc = (fileRef->getChecksum());
-            String str = String("requestsubmit:") + filename + String(":" ) +String( Con::getIntArg(crc)) + String("\n");
+            String str = String("requestsubmit:") + filename + String(":" ) +String( uinttochar(crc)) + String("\n");
             mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
             Sim::postEvent(mobj,new FileList_SysEvent(mIdx+1,mFileSize),Sim::getCurrentTime() + 25);
             }
@@ -393,7 +407,6 @@ void NetFTPServer::finishLastLine()
 
 void NetFTPServer::onDisconnect()
    {
-   mConnections.remove(this);
    finishLastLine();
    mState = Disconnected;
    this->deleteObject();
@@ -432,6 +445,7 @@ void NetFTPServer::connect(const char *address)
 
 void NetFTPServer::disconnect()
    {
+	Con::errorf("disconnect");
    if( mTag != InvalidSocket ) 
       Net::closeConnectTo(mTag);
    removeFromTable();
@@ -440,6 +454,7 @@ void NetFTPServer::disconnect()
 
 void NetFTPServer::send(const U8 *buffer, U32 len)
    {
+	Con::errorf("sending");
    if (mState==State::Connected)
       {
       
@@ -453,6 +468,7 @@ void NetFTPServer::send(const U8 *buffer, U32 len)
 
 void NetFTPServer::processConnectedReceiveEvent(NetSocket sock, RawData incomingData)
    {
+	Con::errorf("processConnectedReceiveEvent %i", sock);
    NetFTPServer *tcpo = NetFTPServer::find(sock);
    if(!tcpo)
       {
@@ -472,20 +488,22 @@ void NetFTPServer::processConnectedReceiveEvent(NetSocket sock, RawData incoming
       }
    }
 
-void NetFTPServer::processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress)
+void NetFTPServer::processConnectedAcceptEvent(NetSocket sock, NetSocket newConnection, NetAddress originatingAddress)
    {
-   NetFTPServer *tcpo = NetFTPServer::find(listeningPort);
+	Con::errorf("processConnectedAcceptEvent: %i",sock);
+   NetFTPServer *tcpo = NetFTPServer::find(sock);
    if(!tcpo)
       return;
-
+	Con::errorf("Socket is good");
    tcpo->onConnectionRequest(&originatingAddress, newConnection);
    }
 
 void NetFTPServer::processConnectedNotifyEvent( NetSocket sock, U32 state )
    {
+	Con::errorf("processConnectedNotifyEvent: %i",sock);
    NetFTPServer *tcpo = NetFTPServer::find(sock);
-   if(!tcpo)
-      return;
+	if (!tcpo)
+		return;
 
    switch(state)
       {

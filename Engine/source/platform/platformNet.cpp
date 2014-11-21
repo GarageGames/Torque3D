@@ -687,6 +687,7 @@ void Net::process()
             {
                // got some data, post it
                readBuff.size = bytesRead;
+					Con::errorf("void Net::process() %i", currentSock->fd);
                Net::smConnectionReceive.trigger(currentSock->fd, readBuff);
             }
             else
@@ -774,6 +775,7 @@ void Net::process()
          {
             setBlocking(incoming, false);
             addPolledSocket(incoming, Connected);
+				Con::errorf("smConnectionAccept %i",currentSock->fd);
             Net::smConnectionAccept.trigger(currentSock->fd, incoming, incomingAddy);
          }
          break;

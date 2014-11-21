@@ -89,7 +89,7 @@ void NetServer::processTick()
       mGameRunning=true;
       mServer = new NetFTPServer();
       mServer->assignName("ftpConnection");
-      U16 port = Con::getIntVariable("$Pref::Server::Port") + 1;
+      U16 port = Con::getIntVariable("$Pref::Server::Port") ;
 #if defined(TORQUE_DEBUG)
       Con::printf("Trying port %u",port);
 #endif

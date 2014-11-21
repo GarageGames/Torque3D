@@ -47,8 +47,8 @@ class NetFTPServer : public SimObject
    private:
       typedef std::list<NetFTPServer*> ConnectionsList;
       enum State {Disconnected, DNSResolved, Connected, Listening };
-      static ConnectionsList mConnections;
-      NetSocket mTag;
+      //static ConnectionsList mConnections;
+      
       NetFTPServer *mNext;
       enum { TableSize = 256, TableMask = 0xFF };
       static NetFTPServer *table[TableSize];
@@ -77,7 +77,9 @@ class NetFTPServer : public SimObject
       FileObject *pDumpFile ;
       U32 mDataSize ;
       U32 mOrigSize ;
+		NetSocket mTag;
    public:
+		
       void FilesClear(){mFiles.clear();};
       void FilesPush(String file){Con::printf("Pushing File: '%s'",file.c_str());mFiles.push_back_unique(file);};
       String FilesAt(S32 i){return mFiles[i];};
@@ -95,14 +97,14 @@ class NetFTPServer : public SimObject
       virtual void onDNSFailed();
       virtual void onConnected();
       virtual void onConnectFailed();
-      virtual void onConnectionRequest(const NetAddress *addr, U32 connectId);
+      virtual void onConnectionRequest(const NetAddress *addr, NetSocket connectId);
       virtual void onDisconnect();
       virtual void onDownloadComplete();
       void connect(const char *address);
       bool listen(U16 port);
       void disconnect();
       State getState() { return mState; }
-      bool processArguments(S32 argc, const char **argv);
+
       void send(const U8 *buffer, U32 bufferLen);
       void addToTable(NetSocket newTag);
       void removeFromTable();

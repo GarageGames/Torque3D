@@ -236,13 +236,6 @@ void NetFTPClient::parseLine(U8 *buffer, U32 *start, U32 bufferLen)
       *start = i + 1;
    }
 
-void NetFTPClient::onConnectionRequest(const NetAddress *addr, U32 connectId)
-   {
-   char idBuf[16];
-   char addrBuf[256];
-   Net::addressToString(addr, addrBuf);
-   dSprintf(idBuf, sizeof(idBuf), "%d", connectId);
-   }
 
 bool NetFTPClient::processLine(UTF8 *line)
    {
@@ -279,10 +272,13 @@ bool NetFTPClient::processLine(UTF8 *line)
          //Check to see if they are the same
          Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( param1 );
 
-         U32 temp = dAtoi(param2.c_str());
+         U32 temp = dAtoui(param2.c_str());
 
-         if(fileRef->getChecksum() != temp)
+			U32 chksum = fileRef->getChecksum();
+
+         if(chksum != temp)
             {
+					Con::errorf("Failed Match %u  != %u",chksum,temp);
             //push file to mfilestograb
             mFilesToGrab.push(param1);
             }
@@ -382,9 +378,11 @@ void NetFTPClient::popdialog()
       dynamic_cast<GuiCanvas* >( mCanvas)->popDialogControl(dynamic_cast<GuiControl*>(mDlg));
    }
 
+
+
 void NetFTPClient::onConnected()
    {
-   Con::printf("Connected!");
+	Con::printf("Connected!");
    mState = Connected;
    String str = String ("list\n");
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
@@ -393,7 +391,12 @@ void NetFTPClient::onConnected()
    mMsg = Sim::findObject("Progress_Message");
    mProgressBar = Sim::findObject("Progress_FTPClientProgress");
    pushDialog();
+
+
 }
+
+
+
 
 void NetFTPClient::onConnectFailed()
    {
@@ -523,14 +526,7 @@ void NetFTPClient::processConnectedReceiveEvent(NetSocket sock, RawData incoming
       }
    }
 
-void NetFTPClient::processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress)
-   {
-   NetFTPClient *tcpo = NetFTPClient::find(listeningPort);
-   if(!tcpo)
-      return;
 
-   tcpo->onConnectionRequest(&originatingAddress, newConnection);
-   }
 
 void NetFTPClient::processConnectedNotifyEvent( NetSocket sock, U32 state )
    {
@@ -560,13 +556,13 @@ void NetFTPClient::processConnectedNotifyEvent( NetSocket sock, U32 state )
 
 void NetFTPClient::ConnectAndDownload(const char* remoteAddress,GameConnection* gc)
    {
-	String ra = String(remoteAddress);
-	String name = ra.substr(0,ra.find(":", 3 ));
-	String portstring = ra.substr(ra.find(":", 3 )+1);
-	S32 port = dAtoi(portstring.c_str());
-	port +=1;
-	String newAddress = name + ":" + String(Con::getIntArg(port));
-	remoteAddress = StringTable->insert(newAddress.c_str());
+	//String ra = String(remoteAddress);
+	//String name = ra.substr(0,ra.find(":", 3 ));
+	//String portstring = ra.substr(ra.find(":", 3 )+1);
+	//S32 port = dAtoi(portstring.c_str());
+	//port +=1;
+	//String newAddress = name + ":" + String(Con::getIntArg(port));
+	//remoteAddress = StringTable->insert(newAddress.c_str());
    _CreateGui();
 
    ftpclient = new NetFTPClient();

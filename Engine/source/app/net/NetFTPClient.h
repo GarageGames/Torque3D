@@ -85,8 +85,9 @@ class NetFTPClient : public SimObject
       virtual void onDNSResolved();
       virtual void onDNSFailed();
       virtual void onConnected();
+		
       virtual void onConnectFailed();
-      virtual void onConnectionRequest(const NetAddress *addr, U32 connectId);
+      
       virtual void onDisconnect();
       virtual void onDownloadComplete();
       void connect(const char *address);
@@ -100,7 +101,7 @@ class NetFTPClient : public SimObject
       void setPort(U16 port) { mPort = port; }
       bool onAdd();
       static void processConnectedReceiveEvent(NetSocket sock, RawData incomingData);
-      static void processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress);
+      
       static void processConnectedNotifyEvent( NetSocket sock, U32 state );
       DECLARE_CONOBJECT(NetFTPClient);
       //Submitting a file to the server
