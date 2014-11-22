@@ -19,40 +19,28 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+
 #include "torqueConfig.h"
+
 #ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
+#include "core/util/str.h"
 
-#ifndef NetServer_h
-#define NetServer_h
+namespace netFileCommands
+{
+extern const String requestsubmit;
+extern const String finished;
+extern const String get;
+extern const String list;
+extern const String writefile;
+extern const String denyWrite;
+extern const String acceptWrite;
+extern const String send;
+}
 
-#include "core/module.h"
-#include "core/iTickable.h"
-#include "core/util/tVector.h"
-#include "console\sim.h"
-#include "console\simObject.h"
-#include "console\simEvents.h"
-#include "netFileServer.h"
-
-class NetServer: public virtual ITickable
-   {
-   private:
-      bool mGameRunning;
-      netFileServer* mServer;
-   public:
-      NetServer();
-
-      static const char* getSingletonName(){return "NetServer"; };
-      virtual void interpolateTick( F32 delta ){};
-      virtual void processTick();
-      virtual void advanceTime( F32 timeDelta ){};
-      void PushFiles();
-
-      //S32  buildFileList(const char* pattern, bool recurse, bool multiMatch);
-      //Vector<String>   sgFindFilesResults;
-      //U32              sgFindFilesPos;
-      //char sgScriptFilenameBuffer[1024];
-   };
-
-#define NETSERVER ManagedSingleton<NetServer>::instance()
-#endif
+namespace netFileUtils
+{
+static char sgScriptFilenameBuffer[1024];
+char* uinttochar( U32 n);
+bool isWriteable(const char* fileName);   //Determine if the file on the server is readonly or not
+}
 #endif

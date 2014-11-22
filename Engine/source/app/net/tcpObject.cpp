@@ -313,7 +313,7 @@ void TCPObject::parseLine(U8 *buffer, U32 *start, U32 bufferLen)
       *start = i + 1;
 }
 
-void TCPObject::onConnectionRequest(const NetAddress *addr, U32 connectId)
+void TCPObject::onConnectionRequest(const NetAddress *addr, NetSocket connectId)
 {
    char idBuf[16];
    char addrBuf[256];
@@ -328,8 +328,6 @@ bool TCPObject::processLine(UTF8 *line)
    return true;
 }
 
-
-
 void TCPObject::onDNSResolved()
 {
    mState = DNSResolved;
@@ -341,7 +339,6 @@ void TCPObject::onDNSFailed()
    mState = Disconnected;
    onDNSFailed_callback();
 }
-
 
 void TCPObject::onConnected()
 {
@@ -374,12 +371,15 @@ void TCPObject::onDisconnect()
    onDisconnect_callback();
 }
 
-void TCPObject::listen(U16 port)
-{
-   mState = Listening;
+bool TCPObject::listen(U16 port)
+   {
    U32 newTag = Net::openListenPort(port);
+   if (newTag ==-1)
+      return false;
+   mState = Listening;
    addToTable(newTag);
-}
+   return true;
+   }
 
 void TCPObject::connect(const char *address)
 {

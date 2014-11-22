@@ -40,7 +40,7 @@
 #include "math/mTransform.h"
 
 #ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-#include "app/net/NetFTPClient.h"
+#include "app/net/netFileClient.h"
 #endif
 
 #ifdef TORQUE_HIFI_NET
@@ -2209,7 +2209,7 @@ DefineEngineMethod( GameConnection, getControlSchemeAbsoluteRotation, bool, (),,
 
 void GameConnection::connect(const char* remoteAddress)
 	{
-   NetFTPClient::ConnectAndDownload(StringTable->insert(remoteAddress),this);
+   netFileClient::ConnectAndDownload(StringTable->insert(remoteAddress),this);
 	}
 #endif
 void  GameConnection::ParentConnect(const char * remoteAddress)

@@ -19,40 +19,62 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+
 #include "torqueConfig.h"
+
 #ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
 
-#ifndef NetServer_h
-#define NetServer_h
+#include "netFileUtils.h"
+#include "console/engineAPI.h"
+#include "core/fileObject.h"
 
-#include "core/module.h"
-#include "core/iTickable.h"
-#include "core/util/tVector.h"
-#include "console\sim.h"
-#include "console\simObject.h"
-#include "console\simEvents.h"
-#include "netFileServer.h"
 
-class NetServer: public virtual ITickable
+namespace netFileCommands
+{
+const String requestsubmit = String("requestsubmit");
+const String finished = String("finished");
+const String get = String("get");
+const String list = String("list");
+const String writefile = String("writefile");
+const String denyWrite = String("denyWrite");
+const String acceptWrite = String("acceptWrite");
+const String send = String("send");
+}
+
+char* netFileUtils::uinttochar( U32 n)
+{
+   char* a = Con::getReturnBuffer(20);
+   if (n == 0)
    {
-   private:
-      bool mGameRunning;
-      netFileServer* mServer;
-   public:
-      NetServer();
+      *a = '0';
+      *(a+1) = '\0';
+      return a;
+   }
+   char aux[20];
+   aux[19] = '\0';
+   char* auxp = aux + 19;
+   int c = 1;
+   while (n != 0)
+   {
+      int mod = n % 10;
+      *(--auxp) = mod | 0x30;
+      n /=  10;
+      c++;
+   }
+   memcpy(a, auxp, c);
+   return a;
+}
 
-      static const char* getSingletonName(){return "NetServer"; };
-      virtual void interpolateTick( F32 delta ){};
-      virtual void processTick();
-      virtual void advanceTime( F32 timeDelta ){};
-      void PushFiles();
+bool netFileUtils::isWriteable(const char* fileName)
+   {
+   String filename(Torque::Path::CleanSeparators(fileName));
+   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filename.c_str());
 
-      //S32  buildFileList(const char* pattern, bool recurse, bool multiMatch);
-      //Vector<String>   sgFindFilesResults;
-      //U32              sgFindFilesPos;
-      //char sgScriptFilenameBuffer[1024];
-   };
+   Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
+   Torque::FS::FileSystemRef fs = Torque::FS::GetFileSystem(givenPath);
+   Torque::Path path = fs->mapTo(givenPath);
 
-#define NETSERVER ManagedSingleton<NetServer>::instance()
-#endif
+   return !Torque::FS::IsReadOnly(path);
+   }
+
 #endif
