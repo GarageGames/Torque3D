@@ -39,22 +39,23 @@ This event class is used to break up the transmission of the file list
 to each client.  This allows multiple clients to receive there file
 list at the same time.
 *********************************************************************/
-class FileList_SysEvent : public SimEvent{
-   public:
-      S32 Idx;
-      S32 fileCount;
+class FileList_SysEvent : public SimEvent
+{
+public:
+   S32 Idx;
+   S32 fileCount;
    FileList_SysEvent(S32 idx,S32 filecount )
    {
       Idx = idx;
       fileCount = filecount;
    }
    void process(SimObject* obj)
-      {
+   {
       netFileServer* mobj = dynamic_cast<netFileServer*>(obj);
       if (mobj)
-         {
+      {
          if (Idx < fileCount)
-            {
+         {
             int percent = ((float)Idx/ (float)fileCount * 100.00f);
             char * buff = Con::getReturnBuffer(10);
             dSprintf(buff,10,"%i",percent);
@@ -74,15 +75,15 @@ class FileList_SysEvent : public SimEvent{
 
             //Post the next iteration to the simevent queue to fire in 25 ms.
             Sim::postEvent(mobj,new FileList_SysEvent(Idx+1,fileCount),Sim::getCurrentTime() + 25);
-            }
+         }
          else
-            {
+         {
                //We are finished with the file list, notify the client.
                String str = netFileCommands::finished + String (":\n");
                mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
-            }
          }
       }
+   }
 };
 
 netFileServer::netFileServer()
