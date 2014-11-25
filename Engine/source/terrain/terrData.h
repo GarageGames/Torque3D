@@ -45,14 +45,13 @@
 #include "gfx/gfxPrimitiveBuffer.h"
 #endif
 
-
-TerrainBlock* getTerrainUnderWorldPoint(const Point3F&);
-
 class GBitmap;
 class TerrainBlock;
 class TerrCell;
 class PhysicsBody;
 class TerrainCellMaterial;
+
+TerrainBlock* getTerrainUnderWorldPoint(const Point3F&);
 
 class TerrainBlock : public SceneObject
 {
