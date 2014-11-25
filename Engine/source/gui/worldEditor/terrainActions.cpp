@@ -940,7 +940,7 @@ void TerrainSolderEdgesAction::redo()
       const SimObjectId id = itr->first;
       TerrainBlock* terrain;
       if ( !Sim::findObject( id, terrain ) || !terrain ) { continue; }
-	   const terrainSet_t::iterator ftr = terrainSet.find( id );
+      const terrainSet_t::iterator ftr = terrainSet.find( id );
       if (ftr != terrainSet.end()) {
          setAvgHeight( terrain, ftr->second );
       }
