@@ -247,7 +247,7 @@ void netFileClient::RequestSubmitFile(String name)
    U32 crc = (fileRef->getChecksum());
    //Save the title of the file to be sent
    fileToSend = name;
-   String str =netFileCommands::requestsubmit + String(":") + name + String(":" ) +String( Con::getIntArg(crc)) + String("\n");
+   String str =netFileCommands::requestsubmit + String(":") + name + String(":" ) +String( netFileUtils::uinttochar(crc)) + String("\n");
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
 }
 
