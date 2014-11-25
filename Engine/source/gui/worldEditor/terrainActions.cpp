@@ -1034,7 +1034,7 @@ TerrainBlock* TerrainSolderEdgesAction::harvest(const Point3F& c, uniqueTHSet_t&
       }
       // add only unique
 	  const std::map< TerrainBlock*, F32 >::const_iterator ftr = set.find( terrain );
-      if (ftr == set.cend()) {
+      if (ftr == set.end()) {
          set.insert( std::make_pair( terrain, h ) );
       }
       return terrain;
@@ -1094,7 +1094,7 @@ F32 TerrainSolderEdgesAction::calcAvgHeight(
 
    // calc an average height
    F32 avgHeight = 0;
-   for (uniqueTHSet_t::const_iterator itr = set.cbegin(); itr != set.cend(); ++itr) {
+   for (uniqueTHSet_t::const_iterator itr = set.begin(); itr != set.end(); ++itr) {
       avgHeight += itr->second;
    }
    avgHeight /= set.size();
@@ -1129,7 +1129,7 @@ void TerrainSolderEdgesAction::setAvgHeight(
 ) {
    AssertFatal( terrain, "" );
 
-   for (heightSet_t::const_iterator itr = hs.cbegin(); itr != hs.cend(); ++itr) {
+   for (heightSet_t::const_iterator itr = hs.begin(); itr != hs.end(); ++itr) {
       const U32 i = itr->first;
       const F32 h = floatToFixed( itr->second );
       terrain->getFile()->setHeight( i, h );
