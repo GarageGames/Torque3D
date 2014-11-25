@@ -1199,6 +1199,8 @@ U32 TerrainBlock::packUpdate(NetConnection* con, U32 mask, BitStream *stream)
    if ( stream->writeFlag( mask & MiscMask ) )
       stream->write( mScreenError );
 
+   stream->writeInt(mBaseTexFormat, 32);
+
    return retMask;
 }
 
@@ -1265,6 +1267,8 @@ void TerrainBlock::unpackUpdate(NetConnection* con, BitStream *stream)
 
    if ( stream->readFlag() ) // MiscMask
       stream->read( &mScreenError );
+
+   mBaseTexFormat = (BaseTexFormat)stream->readInt(32);
 }
 
 void TerrainBlock::getMinMaxHeight( F32 *minHeight, F32 *maxHeight ) const 
