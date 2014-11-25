@@ -51,23 +51,34 @@ public:
     
    void SendChatToClient(const char* msg);                           //Sends a message to a client
    inline String FilesAt(S32 i){return files[i];};                   //Retrieves the file at the index
+
+   void LoadPathPattern(const char* pattern, bool recursive, bool multiMatch, bool verbose);
+   bool LoadFile(const char* file);
+
+   bool start (S32 port = 0);
+   void stop ();
    inline void FilesClear(){files.clear();};                         //Clears the file list
+private:
+
+   
    inline void FilesPush(String file){files.push_back_unique(file);};//Pushes a file onto the stack
    inline S32 FilesSize(){return files.size();};
-private:
+
    static Vector<String> files;                                      //Shared list of all files that will be sent down to all clients
    Vector<String>        currentlyUploadingFiles;                    //Files being uploaded to the server
    FileObject*           xferFile;                                   //Scratch pad for the sockets file io
-   U32                   dataSize ;                                  //expected size of the file
-   FileObject*           fs;                                         //Socket's FileObject
+   U32                   expectedDataSize;                           //expected size of the file
    bool                  dropRest;                                   //Flag to indicate to throw away rest of transmission.
 
    void toFile(U8 *buffer, U32 bufferLen);                           //Dump the buffer into the dumpFile
-   void setXferFile(FileObject *pFile, U32 nDataSize);               //Assign the dumpFile to a real File
-   void GetFile(String file);                                        //Get the real file and send it to the client
-   void GetFileList();                                               //Get all the files plus there crc and send it to the client
+   void SendFileToClient(String file);                               //Get the real file and send it to the client
+   void SendFileListToClient();                                      //Get all the files plus there crc and send it to the client
    bool prepareWrite(const char* filename,U32 size);                 //prepare a file on the server to be written to by this socket.
    void VerifyClientSubmit(String fileName,  String crc);            //Checks to see if the socket is allowed to write to this file on the server.
+
+
+
+
 };
 
 #endif

@@ -31,16 +31,16 @@ extern const String requestsubmit;
 extern const String finished;
 extern const String get;
 extern const String list;
+extern const String listn;
 extern const String writefile;
 extern const String denyWrite;
 extern const String acceptWrite;
 extern const String send;
+extern const String progress;
 }
 
 namespace netFileUtils
 {
-static char sgScriptFilenameBuffer[1024];
 char* uinttochar( U32 n);
-bool isWriteable(const char* fileName);   //Determine if the file on the server is readonly or not
 }
 #endif

@@ -143,7 +143,6 @@ protected:
 
 public:
    
-	const char* getPath () {return mDataFileName;};
    static ForestCreatedSignal& getCreatedSignal() { return smCreatedSignal; }
    static ForestCreatedSignal& getDestroyedSignal() { return smDestroyedSignal; }
 

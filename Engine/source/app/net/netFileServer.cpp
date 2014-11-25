@@ -27,6 +27,7 @@
 
 #include "netFileServer.h"
 #include "netFileUtils.h"
+#include "console/fileSystemFunctions.h"
 
 IMPLEMENT_CONOBJECT(netFileServer);
 
@@ -34,65 +35,80 @@ ConsoleDocClass( netFileServer,"");
 
 Vector<String> netFileServer::files;
 
+
+/*********************************************************************
+This event class is used to break up the transmission of the file list
+to each client.  This allows multiple clients to receive there file
+list at the same time.
+*********************************************************************/
 class FileList_SysEvent : public SimEvent
    {
    public:
-      S32 mIdx;
-      S32 mFileSize;
-    FileList_SysEvent(S32 idx,S32 filesize )
+      S32 Idx;
+      S32 fileCount;
+   FileList_SysEvent(S32 idx,S32 filecount )
       {
-      mIdx = idx;
-      mFileSize = filesize;
+      Idx = idx;
+      fileCount = filecount;
       }
    void process(SimObject* obj)
       {
       netFileServer* mobj = dynamic_cast<netFileServer*>(obj);
       if (mobj)
          {
-         if (mIdx < mFileSize)
-            {   
-            String filename = mobj->FilesAt(mIdx);
+         if (Idx < fileCount)
+            {
+            int percent = ((float)Idx/ (float)fileCount * 100.00f);
+            char * buff = Con::getReturnBuffer(10);
+            dSprintf(buff,10,"%i",percent);
+            
+            //Notify the client of progress
+            String str = netFileCommands::progress + String(":") + String(buff)  + String("\n");
+            mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
+
+            //Get CRC for the file.
+            String filename = mobj->FilesAt(Idx);
             Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( filename );
             U32 crc = (fileRef->getChecksum());
-            String str = netFileCommands::requestsubmit + String(":") + filename + String(":" ) +String( netFileUtils::uinttochar(crc)) + String("\n");
+            
+            //Send the details about the file
+            str = netFileCommands::requestsubmit + String(":") + filename + String(":" ) +String( netFileUtils::uinttochar(crc)) + String("\n");
             mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
-            Sim::postEvent(mobj,new FileList_SysEvent(mIdx+1,mFileSize),Sim::getCurrentTime() + 25);
+
+            //Post the next iteration to the simevent queue to fire in 25 ms.
+            Sim::postEvent(mobj,new FileList_SysEvent(Idx+1,fileCount),Sim::getCurrentTime() + 25);
             }
          else
             {
-            String str = netFileCommands::finished + String (":\n");
-            mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
+               //We are finished with the file list, notify the client.
+               String str = netFileCommands::finished + String (":\n");
+               mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
             }
          }
       }
    };
 
-
 netFileServer::netFileServer()
 {
    xferFile = NULL ;
-   dataSize = 0 ;
+   expectedDataSize = 0 ;
 }
 
 U32 netFileServer::onReceive(U8 *buffer, U32 bufferLen)
    {
-   // we got a raw buffer event
-   // default action is to split the buffer into lines of text
-   // and call processLine on each
-   // for any incomplete lines we have mBuffer
    U32 start = 0;
    U32 extractSize = 0 ;
 
-   if(xferFile && dataSize)
+   //This handles the switching of modes between a raw data mode
+   //and a character mode.
+   //If the xferFile is valid and the 
+   if(xferFile && expectedDataSize)
       {      
-      // could have used start but it's a bit confusing because of the name
-      if(bufferLen < dataSize)
+      if(bufferLen < expectedDataSize)
          extractSize = bufferLen ;
       else
-         extractSize = dataSize ;
-
+         extractSize = expectedDataSize ;
       toFile(buffer, extractSize) ;      
-
       start = extractSize ;
       }
    else
@@ -104,20 +120,17 @@ void netFileServer::toFile(U8 *buffer, U32 bufferLen)
    {
    if(xferFile)
       xferFile->writeBinary(bufferLen, buffer) ;
-
-   dataSize -= bufferLen ;
-
-   if(dataSize == 0)
+   expectedDataSize -= bufferLen ;
+   if(expectedDataSize == 0)
+   {
+      xferFile->close();
+      xferFile->deleteObject();
       onDownloadComplete();
+   }
    }
 
 void netFileServer::onDownloadComplete()
    {
-   if (fs)
-      {
-      fs->close();
-      fs->deleteObject();
-      }
    if (currentlyUploadingFiles.size()>0)
       {
       String str = netFileCommands::get + String (":") +  currentlyUploadingFiles.first() + String("\n");
@@ -126,21 +139,27 @@ void netFileServer::onDownloadComplete()
       }
    }
 
-void netFileServer::setXferFile(FileObject *pFile, U32 nDataSize)
-   { 
-   xferFile = pFile ; 
-   dataSize = nDataSize ;
-   }
-
 void netFileServer::onConnectionRequest(const NetAddress *addr, NetSocket connectId)
    {
-	netFileServer* newconn = new netFileServer();
-	newconn->registerObject();
-	newconn->addToTable(connectId);
+      /*
+      This can be somewhat confusing.  Every time a client connects to the server
+      we create a new instance of the NetFileServer.  This instance handles the 
+      communications for that socket.
+
+      When you call the addToTable function, it updates the Tag on the new
+      instance of NetFileServer to the socket # the client is talking on.
+      */
+	   netFileServer* newconn = new netFileServer();
+	   newconn->registerObject();
+	   newconn->addToTable(connectId);
+      SimSet* miscu = dynamic_cast<SimSet *>(Sim::findObject("MissionCleanup"));
+      if (miscu)
+         miscu->addObject(newconn);
    }
 
 bool netFileServer::processLine(UTF8 *line)
    {
+
    String sline = String(line);
    String cmd = String("");
    String param = String("");
@@ -162,9 +181,11 @@ bool netFileServer::processLine(UTF8 *line)
          }
       }
    if (cmd.equal(netFileCommands::list,1))
-      GetFileList();
+      SendFileListToClient();
+
    else if (cmd.equal(netFileCommands::get,1))
-      GetFile(param);
+      SendFileToClient(param);
+
    else if (cmd.equal(netFileCommands::finished,1))
       {
       if (currentlyUploadingFiles.size()>0)
@@ -174,6 +195,7 @@ bool netFileServer::processLine(UTF8 *line)
          send((const U8*)str.c_str(), dStrlen(str.c_str()));
          }
       }
+
    else if (cmd.equal(netFileCommands::writefile,1))
       {
          if (!prepareWrite(param.c_str(),dAtoui(param2.c_str())))
@@ -184,37 +206,45 @@ bool netFileServer::processLine(UTF8 *line)
          return false;
          }
       }
+
    else if (cmd.equal(netFileCommands::requestsubmit))
       VerifyClientSubmit(param, param2);
 
    return true;
    }
 
-void netFileServer::GetFile(String file)
+void netFileServer::SendFileToClient(String file)
    {
    FileObject* fs = new FileObject();
    if (!fs->readMemory(file.c_str()))
       return;
-   char idBuf[16];
-   dSprintf(idBuf, sizeof(idBuf), "%u", fs->getSize());
-   String str = netFileCommands::writefile + String(":") + file + String(":")+ String(idBuf) + String("\n");
+
+   char* filelengthbuffer = netFileUtils::uinttochar(fs->getSize());
+   String str = netFileCommands::writefile + String(":") + file + String(":")+ String(filelengthbuffer) + String("\n");
+
+   //Let the client know what to expect for the file length
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
+
+   //Send the file.
    send((const U8 *) fs->getBuffer(), fs->getSize()) ;
    }
 
-void netFileServer::GetFileList()
+void netFileServer::SendFileListToClient()
    {
    Sim::postEvent(this,new FileList_SysEvent(0,FilesSize()),Sim::getCurrentTime() + 25);
    }
 
 bool netFileServer::prepareWrite(const char* filename,U32 size)
    {
-   if (netFileUtils::isWriteable(filename))
+   if (fileSystemFunctions::isWriteableFileName(filename))
       {
-      fs = new FileObject();
-      fs->openForWrite(filename, false);
-      setXferFile(fs, size);
-      return true;
+         //Create a new File Object
+         xferFile = new FileObject();
+         //Mark it open for write
+         xferFile->openForWrite(filename, false);
+         //Set the expected size of the file.
+         expectedDataSize = size ;
+         return true;
       }
    return false;
    }
@@ -229,7 +259,6 @@ void netFileServer::VerifyClientSubmit(String fileName, String crc)
 
       U32 temp  = dAtoi(crc.c_str());
 
-      //U32 temp =  (U32)&crc;
       if(fileRef->getChecksum() == temp)
          {
          //Send Deny Message and exit
@@ -280,7 +309,74 @@ void netFileServer::SendChatToClient(const char* msg)
 void netFileServer::onDisconnect()
 {
    Parent::onDisconnect();
-   this->destroySelf();
+   this->deleteObject();
+}
+
+bool netFileServer::start( S32 port )
+{
+   if (port == 0)
+      port = Con::getIntVariable("$Pref::Server::Port") ;
+   return this->listen(port);
+}
+
+void netFileServer::stop()
+{
+   this->disconnect();
+}
+
+void netFileServer::LoadPathPattern(const char* pattern, bool recursive, bool multiMatch, bool verbose)
+{
+   fileSystemFunctions::buildFileList(pattern, recursive, multiMatch);
+   for (int i=0;i<fileSystemFunctions::sgFindFilesResults.size();i++)
+   {
+      if (verbose)
+         Con::printf("Adding file %s to download Queue", fileSystemFunctions::sgFindFilesResults[i].c_str());
+      FilesPush(fileSystemFunctions::sgFindFilesResults[i]);
+   }
+}
+
+bool netFileServer::LoadFile(const char* filename)
+{
+   if (fileSystemFunctions::isFile(filename))
+   {
+      FilesPush(filename);
+      return true;
+   }
+   return false;
+}
+
+DefineConsoleMethod( netFileServer, stop, void, ( ),,
+   "Stops the server listing for connections .\n"
+   )
+{
+   object->stop();
+}
+
+DefineConsoleMethod( netFileServer, start, void, ( S32 port ),( 0 ),
+   "Starts the server listing for connections on specified port, if no port is passed it will use $Pref::Server::Port.\n"
+   "@port - tcpip port to use.\n"
+   "@return - true if able to listen on port.\n"
+   )
+{
+   object->start(port);
+}
+
+DefineConsoleMethod( netFileServer, LoadPath, void, (const char* pattern, bool recursive, bool multiMatch, bool verbose), ( false ),
+   "Loads a directory and pattern into the download queue.\n"
+   "@pattern - Path and pattern to search for.\n"
+   "@verbose - will echo to the console each file it adds.\n"
+   )
+{
+   object->LoadPathPattern(pattern, recursive, multiMatch, verbose);
+}
+
+DefineConsoleMethod( netFileServer, LoadFile, bool, ( const char* filename ),,
+   "Loads a directory and pattern into the download queue.\n"
+   "@pattern - Path and pattern to search for.\n"
+   "@verbose - will echo to the console each file it adds.\n"
+   )
+{
+   return object->LoadFile(filename);
 }
 
 #endif

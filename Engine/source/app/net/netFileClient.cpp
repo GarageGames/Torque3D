@@ -32,51 +32,49 @@
 #include "gui/game/guiProgressCtrl.h"
 #include "gui/core/guiCanvas.h"
 #include "console/engineAPI.h"
+#include "console/fileSystemFunctions.h"
 
 IMPLEMENT_CONOBJECT(netFileClient);
 
+IMPLEMENT_CALLBACK(netFileClient, onProgress, void, ( F32 percent), ( percent ),
+   "@brief Called whenever progress is made in communications between the client and server.\n\n"
+   );
+
+IMPLEMENT_CALLBACK(netFileClient, onFileTransferMessage, void, ( const char* msg ), ( msg ),
+   "@brief Called whenever a event message occurs.\n\n"
+   );
+
+IMPLEMENT_CALLBACK(netFileClient, onFileTransferComplete, void, ( ), ( ),
+   "@brief Called when all file transfers have completed.\n\n"
+   );
+
+IMPLEMENT_CALLBACK(netFileClient, onFileTransferError, void, ( const char* msg ), ( msg ),
+   "@brief Called when an error has occured in the file transfer.\n\n"
+   );
+
+
+
 static String LastFile;
-
-static netFileClient* ftpclient = NULL;
-
-class ConnectToParent_SysEvent : public SimEvent
-{
-   void process(SimObject* obj)
-   {
-      netFileClient* client = dynamic_cast<netFileClient*>(obj);
-      if (client)
-         client->getGameConnection()->ParentConnect(client->getRemoteAddress());
-   }
-};
 
 netFileClient::netFileClient()
 {
    dropRest = false;
-   isDownloadDialogPushed = false;
-   mBuffer = NULL;
-   mBufferSize = 0;
    xferFile = NULL ;
-   dataSize = 0 ;
+   expectedDataSize = 0 ;
    totalDataSize = 0;
-   fs = 0;
 }
 
 U32 netFileClient::onReceive(U8 *buffer, U32 bufferLen)
 {
-   // we got a raw buffer event
-   // default action is to split the buffer into lines of text
-   // and call processLine on each
-   // for any incomplete lines we have mBuffer
    U32 start = 0;
    U32 extractSize = 0 ;
-   if(xferFile && dataSize)
+   if(xferFile && expectedDataSize)
    {      
-      // could have used start but it's a bit confusing because of the name
-      if(bufferLen < dataSize)
+      if(bufferLen < expectedDataSize)
          extractSize = bufferLen ;
       else
-         extractSize = dataSize ;
-      toFile(buffer, extractSize) ;      
+         extractSize = expectedDataSize ;
+      toFile(buffer, extractSize) ;  
       start = extractSize ;
    }
    else
@@ -88,18 +86,16 @@ void netFileClient::toFile(U8 *buffer, U32 bufferLen)
 {   
    if(xferFile)
       xferFile->writeBinary(bufferLen, buffer) ;
-   dataSize -= bufferLen ;
-   if(dataSize == 0)
+   expectedDataSize -= bufferLen ;
+   //If the datasize is 0 then we are done the download.
+   if(expectedDataSize == 0)
+   {
+      xferFile->close();
+      xferFile->deleteObject();
       onDownloadComplete();
+   }
    else
-      dynamic_cast<GuiProgressCtrl*>(pbDownloadProgress)->SetScriptValue(1.00f - ((F32)dataSize)/((F32)totalDataSize));
-}
-
-void netFileClient::setXferFile(FileObject *pFile, U32 nDataSize)
-{ 
-   xferFile = pFile ; 
-   totalDataSize = nDataSize ;
-   dataSize = nDataSize ;
+      onProgress_callback( 1.00f - ( (F32) expectedDataSize ) / ( ( F32 ) totalDataSize ) );
 }
 
 bool netFileClient::processLine(UTF8 *line)
@@ -127,7 +123,14 @@ bool netFileClient::processLine(UTF8 *line)
             param2 += sline[i];
       }
    }
-   if ( cmd.equal( netFileCommands::requestsubmit, 1 ) )
+
+   if ( cmd.equal( netFileCommands::progress,1))
+   {
+      F32 val = (float)atoi(param1.c_str()) / 100.00f;
+      onProgress_callback( val );
+   }
+
+   else if ( cmd.equal( netFileCommands::requestsubmit, 1 ) )
    {
       if ( Torque::FS::IsFile( param1 ) )
       {
@@ -136,19 +139,12 @@ bool netFileClient::processLine(UTF8 *line)
          U32 temp = dAtoui(param2.c_str());
 			U32 chksum = fileRef->getChecksum();
          if(chksum != temp)
-         {
             filesToDownload.push(param1);
-            if (gtcDisplayMessage)
-               dynamic_cast<GuiTextCtrl*>(gtcDisplayMessage)->setText((String("Queueing File '") + param1 + String ("' for download.")).c_str());
-         }
       }
       else
-      {
          filesToDownload.push(param1);
-         if ( gtcDisplayMessage )
-            dynamic_cast<GuiTextCtrl*>(gtcDisplayMessage)->setText((String("Queueing File '") + param1 + String ("' for download.")).c_str());
-      }
    }
+
    else if ( cmd.equal( netFileCommands::finished, 1 ) ) 
    {
       if ( filesToDownload.size() > 0 )
@@ -162,16 +158,12 @@ bool netFileClient::processLine(UTF8 *line)
    }
    else if ( cmd.equal( netFileCommands::writefile, 1 ) )
    {
-      if ( gtcDisplayMessage )
-         dynamic_cast<GuiTextCtrl*>(gtcDisplayMessage)->setText((String("Downloading File '") + param1 + String ("' (") + param2 + String(" kb).")).c_str());
+      onFileTransferMessage_callback(StringTable->insert((String("Downloading File '") + param1 + String ("' (") + param2 + String(" kb).")).c_str()));
 
-      if ( !prepareWrite( param1.c_str(), dAtoui(param2.c_str() ) ) )
+      if ( !prepareClientWrite( param1.c_str(), dAtoui(param2.c_str() ) ) )
       {
          dropRest=true;
-         popdialog();
-         String errmsg = String("Could not update local file '") + param1 + String("', It is ReadOnly.");
-         mGameConnection->onConnectionRejected(errmsg.c_str());
-         disconnect();
+         onFileTransferError_callback((String("Could not update local file '") + param1 + String("', It is ReadOnly.")).c_str());
          return false;
       }
    }
@@ -181,31 +173,17 @@ bool netFileClient::processLine(UTF8 *line)
    return true;
 }
 
-bool netFileClient::prepareWrite(const char* filename,U32 size)
+bool netFileClient::prepareClientWrite(const char* filename,U32 size)
 {
-   if ( netFileUtils::isWriteable( filename ) )
+   if ( fileSystemFunctions::isWriteableFileName( filename ) )
    {
-      fs = new FileObject();
-      fs->openForWrite(filename, false);
-      setXferFile(fs, size);
+      xferFile = new FileObject();
+      xferFile->openForWrite(filename, false);
+      totalDataSize = size ;
+      expectedDataSize = size ;
       return true;
    }
    return false;
-}
-
-void netFileClient::pushDialog()
-{
-   if ( ! ( canvas && gcDownloadDisplayDlg ) )
-      return;
-   dynamic_cast<GuiCanvas* >(canvas)->pushDialogControl(dynamic_cast<GuiControl*>(gcDownloadDisplayDlg),0,true);
-   dynamic_cast<GuiProgressCtrl*>(pbDownloadProgress)->SetScriptValue(0);
-   isDownloadDialogPushed = true;
-}
-
-void netFileClient::popdialog()
-{
-   if (canvas && gcDownloadDisplayDlg && isDownloadDialogPushed)
-      dynamic_cast<GuiCanvas* >( canvas)->popDialogControl(dynamic_cast<GuiControl*>(gcDownloadDisplayDlg));
 }
 
 void netFileClient::SubmitFile(String file)
@@ -215,22 +193,21 @@ void netFileClient::SubmitFile(String file)
       return;
    char idBuf[16];
    dSprintf(idBuf, sizeof(idBuf), "%u", fs->getSize());
-   String str = String("writefile:") + file + String(":")+ String(idBuf) + String("\n");
+   String str = netFileCommands::writefile + String(":") + file + String(":")+ String(idBuf) + String("\n");
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
    send((const U8 *) fs->getBuffer(), fs->getSize()) ;
 }
 
 void netFileClient::onDisconnect()
 {
-   popdialog();
    Parent::onDisconnect();
    xferFile = NULL ; 
    totalDataSize = 0 ;
-   dataSize = 0 ;
-   if (!fs)
+   expectedDataSize = 0 ;
+   if (!xferFile)
       return;
-   fs->close();
-   fs->deleteObject();
+   xferFile->close();
+   xferFile->deleteObject();
 }
 
 void netFileClient::send(const U8 *buffer, U32 len)
@@ -250,165 +227,22 @@ void netFileClient::onDownloadComplete()
    }
    else
    {
-      popdialog();
-      Sim::postEvent(this,new ConnectToParent_SysEvent(),Sim::getTargetTime() + 20);
-      this->disconnect();
+      onFileTransferComplete_callback();
    }
 }
 
 void netFileClient::onDNSFailed()
 {
    Parent::onDNSFailed();
-   mGameConnection->onConnectionRejected("Could not resolve Game server.");
 }
 
 void netFileClient::onConnected()
 {
    Parent::onConnected();
-   send((const U8*)netFileCommands::list.c_str(), dStrlen(netFileCommands::list.c_str()));
-   canvas = Sim::findObject("Canvas");
-   gcDownloadDisplayDlg = Sim::findObject("FTPProgressGui");
-   gtcDisplayMessage = Sim::findObject("Progress_Message");
-   pbDownloadProgress = Sim::findObject("Progress_FTPClientProgress");
-   pushDialog();
+   onFileTransferMessage_callback(StringTable->insert("Checking server for newer files."));
+   send((const U8*)netFileCommands::listn.c_str(), dStrlen(netFileCommands::listn.c_str()));
 }
 
-void netFileClient::onConnectFailed()
-{
-   popdialog();
-   Parent::onConnectFailed();
-   mGameConnection->onConnectionRejected("Could not connect to File Server.");
-}
-
-void netFileClient::ConnectAndDownload(const char* remoteAddress, GameConnection* gc)
-{
-   _CreateGui();
-   ftpclient = new netFileClient();
-   ftpclient->mGameConnection = gc;
-   ftpclient->remoteAddress = remoteAddress;
-   ftpclient->registerObject();
-   SimSet* miscu = dynamic_cast<SimSet *>(Sim::findObject("MissionCleanup"));
-   if (miscu)
-      miscu->addObject(ftpclient);
-   ftpclient->connect(remoteAddress);
-}
-
-void netFileClient::_CreateGui()
-{
-   if (!Sim::findObject("FTPProgressGui"))
-   {
-      String gui =  String("");
-      gui = gui + String("%guiContent = new GuiControl(FTPProgressGui) {");
-      gui = gui + String("   position = \"0 0\";");
-      gui = gui + String("   extent = \"1024 768\";");
-      gui = gui + String("   minExtent = \"8 2\";");
-      gui = gui + String("   horizSizing = \"right\";");
-      gui = gui + String("   vertSizing = \"bottom\";");
-      gui = gui + String("   profile = \"GuiDefaultProfile\";");
-      gui = gui + String("   visible = \"1\";");
-      gui = gui + String("   active = \"1\";");
-      gui = gui + String("   tooltipProfile = \"GuiToolTipProfile\";");
-      gui = gui + String("   hovertime = \"1000\";");
-      gui = gui + String("   isContainer = \"1\";");
-      gui = gui + String("   canSave = \"1\";");
-      gui = gui + String("   canSaveDynamicFields = \"1\";");
-      gui = gui + String("      guidesHorizontal = \"298\";");
-      gui = gui + String("   new GuiPanel(SimSet_2691) {");
-      gui = gui + String("      docking = \"None\";");
-      gui = gui + String("      margin = \"0 0 0 0\";");
-      gui = gui + String("      padding = \"0 0 0 0\";");
-      gui = gui + String("      anchorTop = \"1\";");
-      gui = gui + String("      anchorBottom = \"0\";");
-      gui = gui + String("      anchorLeft = \"1\";");
-      gui = gui + String("      anchorRight = \"0\";");
-      gui = gui + String("      position = \"249 247\";");
-      gui = gui + String("      extent = \"400 129\";");
-      gui = gui + String("      minExtent = \"16 16\";");
-      gui = gui + String("      horizSizing = \"right\";");
-      gui = gui + String("      vertSizing = \"bottom\";");
-      gui = gui + String("      profile = \"GuiDefaultProfile\";");
-      gui = gui + String("      visible = \"1\";");
-      gui = gui + String("      active = \"1\";");
-      gui = gui + String("      tooltipProfile = \"GuiToolTipProfile\";");
-      gui = gui + String("      hovertime = \"1000\";");
-      gui = gui + String("      isContainer = \"1\";");
-      gui = gui + String("      canSave = \"1\";");
-      gui = gui + String("      canSaveDynamicFields = \"0\";");
-      gui = gui + String("");
-      gui = gui + String("      new GuiProgressCtrl(Progress_FTPClientProgress) {");
-      gui = gui + String("         maxLength = \"1024\";");
-      gui = gui + String("         margin = \"0 0 0 0\";");
-      gui = gui + String("         padding = \"0 0 0 0\";");
-      gui = gui + String("         anchorTop = \"1\";");
-      gui = gui + String("         anchorBottom = \"0\";");
-      gui = gui + String("         anchorLeft = \"1\";");
-      gui = gui + String("         anchorRight = \"0\";");
-      gui = gui + String("         position = \"5 89\";");
-      gui = gui + String("         extent = \"390 22\";");
-      gui = gui + String("         minExtent = \"8 2\";");
-      gui = gui + String("         horizSizing = \"right\";");
-      gui = gui + String("         vertSizing = \"bottom\";");
-      gui = gui + String("         profile = \"GuiProgressProfile\";");
-      gui = gui + String("         visible = \"1\";");
-      gui = gui + String("         active = \"1\";");
-      gui = gui + String("         tooltipProfile = \"GuiToolTipProfile\";");
-      gui = gui + String("         hovertime = \"1000\";");
-      gui = gui + String("         isContainer = \"1\";");
-      gui = gui + String("         canSave = \"1\";");
-      gui = gui + String("         canSaveDynamicFields = \"0\";");
-      gui = gui + String("      };");
-      gui = gui + String("      new GuiTextCtrl(Progress_Message) {");
-      gui = gui + String("         text = \"Status:\";");
-      gui = gui + String("         maxLength = \"1024\";");
-      gui = gui + String("         margin = \"0 0 0 0\";");
-      gui = gui + String("         padding = \"0 0 0 0\";");
-      gui = gui + String("         anchorTop = \"1\";");
-      gui = gui + String("         anchorBottom = \"0\";");
-      gui = gui + String("         anchorLeft = \"1\";");
-      gui = gui + String("         anchorRight = \"0\";");
-      gui = gui + String("         position = \"5 36\";");
-      gui = gui + String("         extent = \"390 43\";");
-      gui = gui + String("         minExtent = \"8 2\";");
-      gui = gui + String("         horizSizing = \"right\";");
-      gui = gui + String("         vertSizing = \"bottom\";");
-      gui = gui + String("         profile = \"GuiTextProfile\";");
-      gui = gui + String("         visible = \"1\";");
-      gui = gui + String("         active = \"1\";");
-      gui = gui + String("         tooltipProfile = \"GuiToolTipProfile\";");
-      gui = gui + String("         hovertime = \"1000\";");
-      gui = gui + String("         isContainer = \"1\";");
-      gui = gui + String("         canSave = \"1\";");
-      gui = gui + String("         canSaveDynamicFields = \"0\";");
-      gui = gui + String("      };");
-      gui = gui + String("      new GuiTextCtrl(SimSet_3690) {");
-      gui = gui + String("         text = \"File System Client\";");
-      gui = gui + String("         maxLength = \"1024\";");
-      gui = gui + String("         margin = \"0 0 0 0\";");
-      gui = gui + String("         padding = \"0 0 0 0\";");
-      gui = gui + String("         anchorTop = \"1\";");
-      gui = gui + String("         anchorBottom = \"0\";");
-      gui = gui + String("         anchorLeft = \"1\";");
-      gui = gui + String("         anchorRight = \"0\";");
-      gui = gui + String("         position = \"170 8\";");
-      gui = gui + String("         extent = \"60 11\";");
-      gui = gui + String("         minExtent = \"8 2\";");
-      gui = gui + String("         horizSizing = \"right\";");
-      gui = gui + String("         vertSizing = \"bottom\";");
-      gui = gui + String("         profile = \"GuiTextProfile\";");
-      gui = gui + String("         visible = \"1\";");
-      gui = gui + String("         active = \"1\";");
-      gui = gui + String("         tooltipProfile = \"GuiToolTipProfile\";");
-      gui = gui + String("         hovertime = \"1000\";");
-      gui = gui + String("         isContainer = \"1\";");
-      gui = gui + String("         canSave = \"1\";");
-      gui = gui + String("         canSaveDynamicFields = \"0\";");
-      gui = gui + String("      };");
-      gui = gui + String("   };");
-      gui = gui + String("};");
-      Con::evaluate(gui.c_str());
-   }
-}
-   
 void netFileClient::RequestSubmitFile(String name)
 {
    //Error  checking
@@ -423,11 +257,14 @@ void netFileClient::RequestSubmitFile(String name)
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
 }
 
-//User access via the console
-DefineConsoleFunction(netFileClient, void, (String fileName),,
-   "Test call for users to submit files")
+DefineConsoleMethod( netFileClient, SendFileToServer, void, ( const char* filename ),,
+   "Loads a directory and pattern into the download queue.\n"
+   "@pattern - Path and pattern to search for.\n"
+   "@verbose - will echo to the console each file it adds.\n"
+   )
 {
-   ftpclient->RequestSubmitFile(fileName);
+   object->RequestSubmitFile(filename);
 }
+
 
 #endif

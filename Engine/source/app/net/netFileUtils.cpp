@@ -35,10 +35,12 @@ const String requestsubmit = String("requestsubmit");
 const String finished = String("finished");
 const String get = String("get");
 const String list = String("list");
+const String listn = String("list\n");
 const String writefile = String("writefile");
 const String denyWrite = String("denyWrite");
 const String acceptWrite = String("acceptWrite");
 const String send = String("send");
+const String progress = String("progress");
 }
 
 char* netFileUtils::uinttochar( U32 n)
@@ -64,17 +66,5 @@ char* netFileUtils::uinttochar( U32 n)
    memcpy(a, auxp, c);
    return a;
 }
-
-bool netFileUtils::isWriteable(const char* fileName)
-   {
-   String filename(Torque::Path::CleanSeparators(fileName));
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filename.c_str());
-
-   Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
-   Torque::FS::FileSystemRef fs = Torque::FS::GetFileSystem(givenPath);
-   Torque::Path path = fs->mapTo(givenPath);
-
-   return !Torque::FS::IsReadOnly(path);
-   }
 
 #endif

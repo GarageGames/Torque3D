@@ -39,8 +39,6 @@
 #include "core/bitVector.h"
 #endif
 
-#include "torqueConfig.h"
-
 enum GameConnectionConstants
 {
    MaxClients = 126,
@@ -102,11 +100,6 @@ private:
    /// @}
 
 public:
-#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-	void connect(const char* remoteAddress);
-#endif
-	void ParentConnect(const char* remoteAddress);
-
 
    /// @name Protocol Versions
    ///
