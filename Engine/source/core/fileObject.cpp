@@ -215,16 +215,19 @@ void FileObject::writeObject( SimObject* object, const U8* objectPrepend )
 
 void FileObject::writeBinary(U32 bufferSize, const U8 *buffer)
 {
-	stream->write(bufferSize, buffer);
+   stream->write(bufferSize, buffer);
 }
+
 U32 FileObject::getSize()
 {
-	return mBufferSize ;
+   return mBufferSize ;
 }
+
 U8 *FileObject::getBuffer()
 {
-	return mFileBuffer ;
+   return mFileBuffer ;
 }
+
 DefineConsoleMethod( FileObject, writeBinary, void, (S32 bufferSize,S32 buffer),,
    "Writes a file to storage.\n"
    )
@@ -233,10 +236,10 @@ DefineConsoleMethod( FileObject, writeBinary, void, (S32 bufferSize,S32 buffer),
 }
 
 DefineConsoleMethod( FileObject, getSize, S32, (),,
-	"Gets the file size.\n"
-	)
+   "Gets the file size.\n"
+   )
 {
-	return object->getSize();
+   return object->getSize();
 }
 
 
@@ -257,7 +260,7 @@ DefineEngineMethod( FileObject, openForRead, bool, ( const char* filename ),,
 
    "@return True if file was successfully opened, false otherwise\n")
 {
-	return object->readMemory(filename);
+   return object->readMemory(filename);
 }
 
 DefineEngineMethod( FileObject, openForWrite, bool, ( const char* filename ),,
@@ -276,7 +279,7 @@ DefineEngineMethod( FileObject, openForWrite, bool, ( const char* filename ),,
 
    "@return True if file was successfully opened, false otherwise\n")
 {
-	return object->openForWrite(filename);
+   return object->openForWrite(filename);
 }
 
 DefineEngineMethod( FileObject, openForAppend, bool, ( const char* filename ),,
@@ -297,7 +300,7 @@ DefineEngineMethod( FileObject, openForAppend, bool, ( const char* filename ),,
 
    "@return True if file was successfully opened, false otherwise\n")
 {
-	return object->openForWrite(filename, true);
+   return object->openForWrite(filename, true);
 }
 
 DefineEngineMethod( FileObject, isEOF, bool, (),,
@@ -320,7 +323,7 @@ DefineEngineMethod( FileObject, isEOF, bool, (),,
 
    "@return True if the parser has reached the end of the file, false otherwise\n")
 {
-	return object->isEOF();
+   return object->isEOF();
 }
 
 DefineEngineMethod( FileObject, readLine, const char*, (),,
@@ -342,7 +345,7 @@ DefineEngineMethod( FileObject, readLine, const char*, (),,
 
    "@return String containing the line of data that was just read\n")
 {
-	return (const char *) object->readLine();
+   return (const char *) object->readLine();
 }
 
 DefineEngineMethod( FileObject, peekLine, const char*, (),,
@@ -371,10 +374,10 @@ DefineEngineMethod( FileObject, peekLine, const char*, (),,
 
    "@return String containing the line of data that was just peeked\n")
 {
-	static const U32 bufSize = 512;
-	char *line = Con::getReturnBuffer( bufSize );
-	object->peekLine( (U8*)line, bufSize );
-	return line;
+   static const U32 bufSize = 512;
+   char *line = Con::getReturnBuffer( bufSize );
+   object->peekLine( (U8*)line, bufSize );
+   return line;
 }
 
 DefineEngineMethod( FileObject, writeLine, void, ( const char* text ),,
@@ -396,7 +399,7 @@ DefineEngineMethod( FileObject, writeLine, void, ( const char* text ),,
 
    "@return True if file was successfully opened, false otherwise\n")
 {
-	object->writeLine((const U8 *) text);
+   object->writeLine((const U8 *) text);
 }
 
 DefineEngineMethod( FileObject, close, void, (),,
@@ -426,7 +429,7 @@ DefineEngineMethod( FileObject, close, void, (),,
    "%fileWrite.delete();\n"
    "@endtsexample\n\n")
 {
-	object->close();
+   object->close();
 }
 
 static ConsoleDocFragment _FileObjectwriteObject1(
@@ -513,7 +516,7 @@ static ConsoleDocFragment _FileObjectwriteObject2(
    "void writeObject( SimObject* object, string prepend);");
 
 ConsoleMethod( FileObject, writeObject, void, 3, 4, "FileObject.writeObject(SimObject, object prepend)" 
-			  "@hide")
+           "@hide")
 {
    SimObject* obj = Sim::findObject( argv[2] );
    if( !obj )

@@ -19,11 +19,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
-#include "torqueConfig.h"
-
-#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-
 #include "netFileUtils.h"
 #include "console/engineAPI.h"
 #include "core/fileObject.h"
@@ -67,4 +62,3 @@ char* netFileUtils::uinttochar( U32 n)
    return a;
 }
 
-#endif

@@ -53,6 +53,7 @@ namespace fileSystemFunctions
    Vector<String>   sgFindFilesResults;
    U32              sgFindFilesPos = 0;
 }
+
    S32 fileSystemFunctions::buildFileList(const char* pattern, bool recurse, bool multiMatch)
    {
       static const String sSlash( "/" );
@@ -137,6 +138,7 @@ namespace fileSystemFunctions
       }
       return results;
    }
+
    String fileSystemFunctions::findFirstFile ( const char* pattern, bool recurse )
    {
       S32 numResults = buildFileList( pattern, recurse, false);
@@ -155,6 +157,7 @@ namespace fileSystemFunctions
 
       return numResults ? sgFindFilesResults[0] : String();
    }
+
    String fileSystemFunctions::findNextFile ( const char* pattern )
    {
       if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
@@ -162,6 +165,7 @@ namespace fileSystemFunctions
 
       return sgFindFilesResults[sgFindFilesPos++];
    }
+
    S32 fileSystemFunctions::getFileCount( const char* pattern, bool recurse)
    {
       S32 numResults = buildFileList( pattern, recurse, false );
@@ -173,6 +177,7 @@ namespace fileSystemFunctions
 
       return numResults;
    }
+
    String fileSystemFunctions::findFirstFileMultiExpr( const char* pattern, bool recurse )
    {
       S32 numResults = buildFileList(pattern, recurse, true);
@@ -191,6 +196,7 @@ namespace fileSystemFunctions
 
       return numResults ? sgFindFilesResults[0] : String();
    }
+
    String fileSystemFunctions::findNextFileMultiExpr( const char* pattern )
    {
       if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
@@ -198,6 +204,7 @@ namespace fileSystemFunctions
 
       return sgFindFilesResults[sgFindFilesPos++];
    }
+
    S32 fileSystemFunctions::getFileCountMultiExpr( const char* pattern, bool recurse )
    {
       S32 numResults = buildFileList(pattern, recurse, true);
@@ -209,6 +216,7 @@ namespace fileSystemFunctions
 
       return numResults;
    }
+
    U32 fileSystemFunctions::getFileCRC( const char* fileName )
    {
       String cleanfilename(Torque::Path::CleanSeparators(fileName));
@@ -225,6 +233,7 @@ namespace fileSystemFunctions
 
       return fileRef->getChecksum();
    }
+
    bool fileSystemFunctions::isFile ( const char* fileName )
    {
       String cleanfilename(Torque::Path::CleanSeparators(fileName));
@@ -233,6 +242,7 @@ namespace fileSystemFunctions
       Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
       return Torque::FS::IsFile(givenPath);
    }
+
    bool fileSystemFunctions::IsDirectory ( const char* directory )
    {
       String dir(Torque::Path::CleanSeparators(directory));
@@ -241,6 +251,7 @@ namespace fileSystemFunctions
       Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
       return Torque::FS::IsDirectory( givenPath );
    }
+
    bool fileSystemFunctions::isWriteableFileName ( const char* fileName )
    {
       String filename(Torque::Path::CleanSeparators(fileName));
@@ -257,6 +268,7 @@ namespace fileSystemFunctions
    {
       Torque::FS::StartFileChangeNotifications();
    }
+
    void fileSystemFunctions::stopFileChangeNotifications()
    {
       Torque::FS::StopFileChangeNotifications();
@@ -309,11 +321,13 @@ namespace fileSystemFunctions
 
       return buffer;
    }
+
    S32 fileSystemFunctions::fileSize( const char* fileName )
    {
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
       return Platform::getFileSize( sgScriptFilenameBuffer );
    }
+
    String fileSystemFunctions::fileModifiedTime ( const char* fileName )
    {
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
@@ -331,6 +345,7 @@ namespace fileSystemFunctions
    
       return buffer;
    }
+
    String fileSystemFunctions::fileCreatedTime ( const char* fileName )
    {
       Con::expandScriptFilename( sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName );
@@ -348,6 +363,7 @@ namespace fileSystemFunctions
 
       return buffer;
    }
+
    bool fileSystemFunctions::fileDelete ( const char* path )
    {
       static char fileName[1024];
@@ -358,6 +374,7 @@ namespace fileSystemFunctions
 
       return dFileDelete(sandboxFileName);
    }
+
    String fileSystemFunctions::fileExt ( const char* fileName )
    {
       const char *ret = dStrrchr(fileName, '.');
@@ -365,6 +382,7 @@ namespace fileSystemFunctions
          return ret;
       return "";
    }
+
    String fileSystemFunctions::fileBase ( const char* fileName )
    {
    
@@ -386,6 +404,7 @@ namespace fileSystemFunctions
          *ext = 0;
       return ret;
    }
+
    String fileSystemFunctions::fileName  ( const char* fileName )
    {
       S32 pathLen = dStrlen( fileName );
@@ -403,6 +422,7 @@ namespace fileSystemFunctions
       dStrcpy(ret, name);
       return ret;
    }
+
    String fileSystemFunctions::filePath ( const char* fileName )
    {
       S32 pathLen = dStrlen( fileName );
@@ -420,10 +440,12 @@ namespace fileSystemFunctions
       ret[len] = 0;
       return ret;
    }
+
    String fileSystemFunctions::getWorkingDirectory  ()
    {
       return Platform::getCurrentDirectory();
    }
+
    String fileSystemFunctions::makeFullPath ( const char* path, const char* cwd )
    {
       static const U32 bufSize = 512;
@@ -431,10 +453,12 @@ namespace fileSystemFunctions
       Platform::makeFullPathName(path, buf, bufSize, dStrlen(cwd) > 1 ? cwd : NULL);
       return buf;
    }
+
    String fileSystemFunctions::makeRelativePath ( const char* path, const char* to )
    {
       return Platform::makeRelativePathName( path, dStrlen(to) > 1 ? to : NULL );
    }
+
    String fileSystemFunctions::pathConcat ( const char* path, const char* file)
    {
       static const U32 bufSize = 1024;
@@ -442,10 +466,12 @@ namespace fileSystemFunctions
       Platform::makeFullPathName(file, buf, bufSize, path);
       return buf;
    }
+
    String fileSystemFunctions::getExecutableName()
    {
       return Platform::getExecutableName();
    }
+
    String fileSystemFunctions::getMainDotCsDir()
    {
       return Platform::getMainDotCsDir();

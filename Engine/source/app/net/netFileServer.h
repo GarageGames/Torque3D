@@ -20,13 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "torqueConfig.h"
-#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-
-
 #ifndef _SIMBASE_H_
 #include "console/simBase.h"
 #endif
+
 #include "tcpObject.h"
 #include "core/fileObject.h"
 #include "platform/platformNet.h"
@@ -80,5 +77,3 @@ private:
 
 
 };
-
-#endif

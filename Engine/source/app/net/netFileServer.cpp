@@ -20,11 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-
-#include "torqueConfig.h"
-
-#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-
 #include "netFileServer.h"
 #include "netFileUtils.h"
 #include "console/fileSystemFunctions.h"
@@ -41,16 +36,15 @@ This event class is used to break up the transmission of the file list
 to each client.  This allows multiple clients to receive there file
 list at the same time.
 *********************************************************************/
-class FileList_SysEvent : public SimEvent
-   {
+class FileList_SysEvent : public SimEvent{
    public:
       S32 Idx;
       S32 fileCount;
    FileList_SysEvent(S32 idx,S32 filecount )
-      {
+   {
       Idx = idx;
       fileCount = filecount;
-      }
+   }
    void process(SimObject* obj)
       {
       netFileServer* mobj = dynamic_cast<netFileServer*>(obj);
@@ -86,7 +80,7 @@ class FileList_SysEvent : public SimEvent
             }
          }
       }
-   };
+};
 
 netFileServer::netFileServer()
 {
@@ -95,52 +89,52 @@ netFileServer::netFileServer()
 }
 
 U32 netFileServer::onReceive(U8 *buffer, U32 bufferLen)
-   {
+{
    U32 start = 0;
    U32 extractSize = 0 ;
 
    //This handles the switching of modes between a raw data mode
    //and a character mode.
    //If the xferFile is valid and the 
-   if(xferFile && expectedDataSize)
-      {      
-      if(bufferLen < expectedDataSize)
+   if ( xferFile && expectedDataSize )
+   {      
+      if ( bufferLen < expectedDataSize )
          extractSize = bufferLen ;
       else
          extractSize = expectedDataSize ;
-      toFile(buffer, extractSize) ;      
+      toFile( buffer , extractSize );
       start = extractSize ;
-      }
-   else
-      parseLine(buffer, &start, bufferLen);
-   return start;
    }
+   else
+      parseLine( buffer , &start , bufferLen );
+   return start;
+}
 
 void netFileServer::toFile(U8 *buffer, U32 bufferLen)
-   {
-   if(xferFile)
-      xferFile->writeBinary(bufferLen, buffer) ;
+{
+   if( xferFile )
+      xferFile->writeBinary( bufferLen , buffer ) ;
    expectedDataSize -= bufferLen ;
-   if(expectedDataSize == 0)
+   if ( expectedDataSize == 0 )
    {
       xferFile->close();
       xferFile->deleteObject();
       onDownloadComplete();
    }
-   }
+}
 
 void netFileServer::onDownloadComplete()
-   {
+{
    if (currentlyUploadingFiles.size()>0)
-      {
+   {
       String str = netFileCommands::get + String (":") +  currentlyUploadingFiles.first() + String("\n");
       currentlyUploadingFiles.erase(currentlyUploadingFiles.begin());
       send((const U8*)str.c_str(), dStrlen(str.c_str()));
-      }
    }
+}
 
 void netFileServer::onConnectionRequest(const NetAddress *addr, NetSocket connectId)
-   {
+{
       /*
       This can be somewhat confusing.  Every time a client connects to the server
       we create a new instance of the NetFileServer.  This instance handles the 
@@ -155,10 +149,10 @@ void netFileServer::onConnectionRequest(const NetAddress *addr, NetSocket connec
       SimSet* miscu = dynamic_cast<SimSet *>(Sim::findObject("MissionCleanup"));
       if (miscu)
          miscu->addObject(newconn);
-   }
+}
 
 bool netFileServer::processLine(UTF8 *line)
-   {
+{
 
    String sline = String(line);
    String cmd = String("");
@@ -166,57 +160,57 @@ bool netFileServer::processLine(UTF8 *line)
    String param2 = String("");
 
    S32 p = 0;
-   for (int i = 0;i<sline.length();i++)
-      {
-      if (sline.substr(i,1)==String(":"))
+   for ( int i = 0; i < sline.length() ; i++ )
+   {
+      if ( sline.substr(i,1) == String( ":" ) )
          p++; 
       else 
-         {
-         if (p==0)
+      {
+         if ( p == 0 )
             cmd +=sline[i];
-         else if (p==1)
+         else if ( p == 1 )
             param +=sline[i];
-         else if (p==2)
+         else if ( p == 2 )
             param2 += sline[i];
-         }
       }
-   if (cmd.equal(netFileCommands::list,1))
+   }
+   if ( cmd.equal( netFileCommands::list , 1 ) )
       SendFileListToClient();
 
-   else if (cmd.equal(netFileCommands::get,1))
-      SendFileToClient(param);
+   else if ( cmd.equal( netFileCommands::get , 1 ) ) 
+      SendFileToClient( param );
 
-   else if (cmd.equal(netFileCommands::finished,1))
+   else if ( cmd.equal( netFileCommands::finished, 1 ) ) 
+   {
+      if ( currentlyUploadingFiles.size() > 0 )
       {
-      if (currentlyUploadingFiles.size()>0)
-         {
          String str = netFileCommands::get + String (":") +  currentlyUploadingFiles.first() + String("\n");
          currentlyUploadingFiles.erase(currentlyUploadingFiles.begin());
          send((const U8*)str.c_str(), dStrlen(str.c_str()));
-         }
       }
+   }
 
-   else if (cmd.equal(netFileCommands::writefile,1))
-      {
-         if (!prepareWrite(param.c_str(),dAtoui(param2.c_str())))
+   else if ( cmd.equal( netFileCommands::writefile , 1) )
+   {
+      if ( !prepareWrite(param.c_str() , dAtoui( param2.c_str() ) ) )
          {
          dropRest=true;
          String errmsg = String("Could not update local file '") + param + String("', It is ReadOnly.");
          disconnect();
          return false;
          }
-      }
-
-   else if (cmd.equal(netFileCommands::requestsubmit))
-      VerifyClientSubmit(param, param2);
-
-   return true;
    }
 
+   else if ( cmd.equal( netFileCommands::requestsubmit ) )
+      VerifyClientSubmit( param , param2 );
+
+   return true;
+}
+
 void netFileServer::SendFileToClient(String file)
-   {
+{
    FileObject* fs = new FileObject();
-   if (!fs->readMemory(file.c_str()))
+   if ( !fs->readMemory( file.c_str() ) )
       return;
 
    char* filelengthbuffer = netFileUtils::uinttochar(fs->getSize());
@@ -227,16 +221,16 @@ void netFileServer::SendFileToClient(String file)
 
    //Send the file.
    send((const U8 *) fs->getBuffer(), fs->getSize()) ;
-   }
+}
 
 void netFileServer::SendFileListToClient()
-   {
-   Sim::postEvent(this,new FileList_SysEvent(0,FilesSize()),Sim::getCurrentTime() + 25);
-   }
+{
+   Sim::postEvent( this , new FileList_SysEvent( 0 , FilesSize() ) , Sim::getCurrentTime() + 25 );
+}
 
 bool netFileServer::prepareWrite(const char* filename,U32 size)
-   {
-   if (fileSystemFunctions::isWriteableFileName(filename))
+{
+   if ( fileSystemFunctions::isWriteableFileName( filename ) )
       {
          //Create a new File Object
          xferFile = new FileObject();
@@ -247,38 +241,38 @@ bool netFileServer::prepareWrite(const char* filename,U32 size)
          return true;
       }
    return false;
-   }
+}
 
 void netFileServer::VerifyClientSubmit(String fileName, String crc)
-   {
+{
    //Check if the file exists
-   if(Torque::FS::IsFile(fileName))
-      {
+   if( Torque::FS::IsFile( fileName ) )
+   {
       //Check to see if they are the same
       Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( fileName );
 
-      U32 temp  = dAtoi(crc.c_str());
+      U32 temp  = dAtoi( crc.c_str() );
 
-      if(fileRef->getChecksum() == temp)
-         {
+      if( fileRef->getChecksum() == temp )
+      {
          //Send Deny Message and exit
          String str = netFileCommands::denyWrite + String(":") + fileName + String("\n");
          send((const U8*)str.c_str(), dStrlen(str.c_str()));
          return;
-         }
       }
+   }
 
    //See if the file is currently being written too
-   for(int i = 0; i < currentlyUploadingFiles.size(); ++i)
+   for( int i = 0; i < currentlyUploadingFiles.size() ; ++i )
+   {
+      if( currentlyUploadingFiles[i] == fileName )
       {
-      if(currentlyUploadingFiles[i] == fileName)
-         {
          //Send Deny Message and exit
          String str = netFileCommands::denyWrite + String(":") + fileName + String("\n");
          send((const U8*)str.c_str(), dStrlen(str.c_str()));
          return;
-         }
       }
+   }
 
    //Add the item to the list of files being written to
    this->currentlyUploadingFiles.push_back(fileName);
@@ -286,25 +280,25 @@ void netFileServer::VerifyClientSubmit(String fileName, String crc)
    //Not found, accept write
    String str = netFileCommands::acceptWrite + String(":") + fileName + String("\n");
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
-   }
+}
 
 void netFileServer::send(const U8 *buffer, U32 len)
+{
+   if ( mState == Connected )
    {
-   if (mState == Connected)
-      {
-      Net::Error err = Net::sendtoSocket(mTag, buffer, S32(len));
-      while (err == Net::Error::WouldBlock)
+      S32 err = Net::sendtoSocket(mTag, buffer, S32(len));
+      while ( err == 3 ) //WouldBlock
          err = Net::sendtoSocket(mTag, buffer, S32(len));
       }
    else
       disconnect();
-   }
+}
 
 void netFileServer::SendChatToClient(const char* msg)
-   {
+{
    String str = netFileCommands::send + String (":") + String(msg) + String("\n");
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
-   }
+}
 
 void netFileServer::onDisconnect()
 {
@@ -379,4 +373,4 @@ DefineConsoleMethod( netFileServer, LoadFile, bool, ( const char* filename ),,
    return object->LoadFile(filename);
 }
 
-#endif
+

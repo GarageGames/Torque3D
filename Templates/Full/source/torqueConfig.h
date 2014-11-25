@@ -52,11 +52,6 @@
 #define TORQUE_DISABLE_MEMORY_MANAGER
 #endif
 
-//Define me if you want built in file replication between the client and server
-#ifndef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-#define TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-#endif
-
 /// Define me if you want to disable the virtual mount system.
 //#define TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM
 

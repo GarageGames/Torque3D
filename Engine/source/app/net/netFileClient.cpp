@@ -19,12 +19,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
-
-#include "torqueConfig.h"
-
-#ifdef TORQUE_ENABLE_ASSET_FILE_CLIENT_REPLICATION
-
 #include "netFileClient.h"
 #include "netFileUtils.h"
 #include "gui/core/guiControl.h"
@@ -213,7 +207,7 @@ void netFileClient::onDisconnect()
 void netFileClient::send(const U8 *buffer, U32 len)
 {
    Net::Error err = Net::sendtoSocket(mTag, buffer, S32(len));
-   while (err == Net::Error::WouldBlock)
+   while (err == 3) //WouldBlock
       err = Net::sendtoSocket(mTag, buffer, S32(len));
 }
 
@@ -265,6 +259,3 @@ DefineConsoleMethod( netFileClient, SendFileToServer, void, ( const char* filena
 {
    object->RequestSubmitFile(filename);
 }
-
-
-#endif
