@@ -37,6 +37,9 @@ protected:
    typedef TCPObject Parent;
 public:
    DECLARE_CONOBJECT(netFileServer);
+
+   DECLARE_CALLBACK(bool, onFileUploadRequest, ( const char* filename ));
+
    netFileServer();
    //Base Class Function Overrides
    virtual U32 onReceive(U8 *buffer, U32 bufferLen);

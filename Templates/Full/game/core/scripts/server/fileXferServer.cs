@@ -17,3 +17,9 @@ function StartFileTransferServer()
    %fts.LoadPath("levels/*.*", true, false, true);
    %fts.start();
 }
+
+function netFileServer::onFileUploadRequest(%this, %filename)
+{
+   //Allow all uploads
+   return true;
+}

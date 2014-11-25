@@ -30,6 +30,9 @@ ConsoleDocClass( netFileServer,"");
 
 Vector<String> netFileServer::files;
 
+IMPLEMENT_CALLBACK(netFileServer, onFileUploadRequest, bool, ( const char* filename), ( filename ),
+   "@brief Called whenever a user wants to upload a file.\n\n"
+   );
 
 /*********************************************************************
 This event class is used to break up the transmission of the file list
@@ -245,6 +248,13 @@ bool netFileServer::prepareWrite(const char* filename,U32 size)
 
 void netFileServer::VerifyClientSubmit(String fileName, String crc)
 {
+   if (!onFileUploadRequest_callback(fileName.c_str()))
+   {
+      //Send Deny Message and exit
+      String str = netFileCommands::denyWrite + String(":") + fileName + String("\n");
+      send((const U8*)str.c_str(), dStrlen(str.c_str()));
+      return;
+   }
    //Check if the file exists
    if( Torque::FS::IsFile( fileName ) )
    {
