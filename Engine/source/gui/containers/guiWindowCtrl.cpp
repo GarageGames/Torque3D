@@ -31,7 +31,7 @@
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/containers/guiRolloutCtrl.h"
-#include "core/strings/StringUnit.h" 
+#include "core/strings/stringUnit.h"
 #include <vector>
 #include <algorithm>
 #include "console/simObject.h"
