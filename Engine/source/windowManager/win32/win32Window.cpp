@@ -64,6 +64,19 @@ static bool isScreenSaverRunning()
 	return sreensaver;
 }
 
+DISPLAY_DEVICE GetPrimaryDevice()
+{
+	int index = 0;
+	DISPLAY_DEVICE dd;
+	dd.cb = sizeof(DISPLAY_DEVICE);
+
+	while (EnumDisplayDevices(NULL, index++, &dd, 0))
+	{
+		if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) return dd;
+	}
+	return dd;
+}
+
 Win32Window::Win32Window(): mMouseLockPosition(0,0),
 mShouldLockMouse(false),
 mMouseLocked(false),
