@@ -102,10 +102,10 @@ GuiWindowCtrl::GuiWindowCtrl()
       mCollapseGroupNum(-1),
       mIsCollapsed(false),
       mIsMouseResizing(false),
-		mShowTitle(true),
-		mCanPopWindow(false),
-		mIsInPopUp(false),
-		mPopWindowShowTitle(true)
+      mShowTitle(true),
+      mCanPopWindow(false),
+      mIsInPopUp(false),
+      mPopWindowShowTitle(true)
 {
    // mTitleHeight will change in instanciation most likely...
    mTitleHeight = 24;
@@ -178,19 +178,19 @@ void GuiWindowCtrl::initPersistFields()
    endGroup( "Window" );
 
    addGroup( "Context Menu Options" );
-		addProtectedField("setTitle", TypeBool, NULL,
-			&_setTitle, &_getTitle,
-			"Allows the user to set the title of the control in the game." );
+      addProtectedField("setTitle", TypeBool, NULL,
+         &_setTitle, &_getTitle,
+         "Allows the user to set the title of the control in the game." );
 
-	endGroup("Context Menu Options");
+   endGroup("Context Menu Options");
 
-	addGroup( "PopOut" );
+   addGroup( "PopOut" );
       
-		addField( "ShowTitle",         TypeBool,         Offset( mShowTitle,GuiWindowCtrl ),   "Whether the Title Ctrl will show." );   
-		addField( "AllowPopWindow",    TypeBool,         Offset( mCanPopWindow, GuiWindowCtrl),"Whether the window can be poped out.");
-		addField( "isInPopup",         TypeBool,         Offset( mIsInPopUp, GuiWindowCtrl),   "If the windowctrl is being shown on own canvas");
-		
-	endGroup( "PopOut" );				
+      addField( "ShowTitle",         TypeBool,         Offset( mShowTitle,GuiWindowCtrl ),   "Whether the Title Ctrl will show." );   
+      addField( "AllowPopWindow",    TypeBool,         Offset( mCanPopWindow, GuiWindowCtrl),"Whether the window can be poped out.");
+      addField( "isInPopup",         TypeBool,         Offset( mIsInPopUp, GuiWindowCtrl),   "If the windowctrl is being shown on own canvas");
+      
+   endGroup( "PopOut" );            
    Parent::initPersistFields();
 }
 
@@ -209,8 +209,8 @@ void GuiWindowCtrl::moveFromCollapseGroup()
 
    S32 groupVec = mCollapseGroup;
    S32 vecPos = mCollapseGroupNum;
-//	if (parent->mCollapseGroupVec.size() == 0)
-//		return;
+//   if (parent->mCollapseGroupVec.size() == 0)
+//      return;
    S32 groupVecCount = parent->mCollapseGroupVec[groupVec].size() - 1;
 
    CollapseGroupNumVec collapseGroupNumVec;
@@ -276,7 +276,7 @@ void GuiWindowCtrl::moveFromCollapseGroup()
          parent->mCollapseGroupVec[groupVec].first()->mCollapseGroupNum = -1;
          parent->mCollapseGroupVec[groupVec].erase(U32(0));
          parent->mCollapseGroupVec[groupVec].setSize(groupVecCount - 1);
-         parent->mCollapseGroupVec.erase(groupVec);	
+         parent->mCollapseGroupVec.erase(groupVec);   
       }
    }
    
@@ -426,7 +426,7 @@ void GuiWindowCtrl::refreshCollapseGroups()
    if( !parent )
       return;
    
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec   collapseGroupNumVec;
 
    // iterate through the collided array, renumbering the windows pointers
    S32 assignGroupNum = 0;
@@ -508,7 +508,7 @@ void GuiWindowCtrl::handleCollapseGroup()
    if( !parent )
       return;
 
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec   collapseGroupNumVec;
 
    if( mIsCollapsed ) // minimize window up to its header bar
    {
@@ -574,7 +574,7 @@ void GuiWindowCtrl::handleCollapseGroup()
             if((*iter)->mCollapseGroupNum > mCollapseGroupNum)
             {
                Point2I newChildPosition =  (*iter)->getPosition();
-               newChildPosition.y += moveChildYBy;					
+               newChildPosition.y += moveChildYBy;               
                (*iter)->resize(newChildPosition, (*iter)->getExtent());
             }
          }
@@ -592,7 +592,7 @@ bool GuiWindowCtrl::resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resi
    if( !parent )
       return false;
 
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec   collapseGroupNumVec;
 
    bool canResize = true;
    CollapseGroupNumVec::iterator iter = parent->mCollapseGroupVec[mCollapseGroup].begin();
@@ -699,8 +699,8 @@ void GuiWindowCtrl::getSnappableWindows( Vector<GuiWindowCtrl*> &windowOutVector
       
       if( canCollapse && !childWindow->mCanCollapse )
          continue;
-		if (childWindow->mIsInPopUp)
-			continue;
+      if (childWindow->mIsInPopUp)
+         continue;
       windowOutVector.push_back(childWindow);
    }
 
@@ -825,11 +825,11 @@ void GuiWindowCtrl::onMouseDown(const GuiEvent &event)
       }
       else if (mCanMinimize && mMinimizeButton.pointInRect(localPoint))
          mMinimizeButtonPressed = mCanMinimize;
-		else if (!mIsInPopUp && mCanPopWindow && mPopWindowButton.pointInRect (localPoint))
-			{
-			mPopWindowButtonPressed = true;
-			OnWindowPopOut();
-			}
+      else if (!mIsInPopUp && mCanPopWindow && mPopWindowButton.pointInRect (localPoint))
+         {
+         mPopWindowButtonPressed = true;
+         OnWindowPopOut();
+         }
       else // We clicked anywhere else within the title
       {
          S32 docking = getDocking();
@@ -979,14 +979,14 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
       if( mResizeEdge & edgeBottom )
       {
          newExtent.y = getMin(parent->getHeight(), mOrigBounds.extent.y + deltaMousePosition.y);
-		 if(newExtent.y > mMaxExtent.y)
-			 newExtent.y = mMaxExtent.y;
+       if(newExtent.y > mMaxExtent.y)
+          newExtent.y = mMaxExtent.y;
          resizeY = true;
       }
       else if ( mResizeEdge & edgeTop )
       {
          newExtent.y = getMin(parent->getHeight(), mOrigBounds.extent.y - deltaMousePosition.y);
-		 if ( newExtent.y >= mMinExtent.y && newExtent.y <= mMaxExtent.y)
+       if ( newExtent.y >= mMinExtent.y && newExtent.y <= mMaxExtent.y)
          {
             // Standard reposition as we're not travelling into the min extent range
             newPosition.y = mOrigBounds.point.y + deltaMousePosition.y;
@@ -995,13 +995,13 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
          {
             // We're into the min extent, so adjust the position up to the min extent
             // so the window doesn't appear to jump
-			 if(newExtent.y < mMinExtent.y)
-				newPosition.y = mOrigBounds.point.y + (mOrigBounds.extent.y - mMinExtent.y);
-			 else
-			 {
-				 newPosition.y = mOrigBounds.point.y - (mMaxExtent.y - mOrigBounds.extent.y);
-				 newExtent.y = mMaxExtent.y;
-			 }
+          if(newExtent.y < mMinExtent.y)
+            newPosition.y = mOrigBounds.point.y + (mOrigBounds.extent.y - mMinExtent.y);
+          else
+          {
+             newPosition.y = mOrigBounds.point.y - (mMaxExtent.y - mOrigBounds.extent.y);
+             newExtent.y = mMaxExtent.y;
+          }
          }
          resizeY = true;
       }
@@ -1009,14 +1009,14 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
       if( mResizeEdge & edgeRight )
       {
          newExtent.x = getMin(parent->getWidth(), mOrigBounds.extent.x + deltaMousePosition.x);
-		 if( newExtent.x > mMaxExtent.x)
-			 newExtent.x = mMaxExtent.x;
+       if( newExtent.x > mMaxExtent.x)
+          newExtent.x = mMaxExtent.x;
          resizeX = true;
       }
       else if( mResizeEdge & edgeLeft )
       {
          newExtent.x = getMin(parent->getWidth(), mOrigBounds.extent.x - deltaMousePosition.x);
-		 if ( newExtent.x >= mMinExtent.x && newExtent.x <= mMaxExtent.x)
+       if ( newExtent.x >= mMinExtent.x && newExtent.x <= mMaxExtent.x)
          {
             // Standard reposition as we're not travelling into the min extent range
             newPosition.x = mOrigBounds.point.x + deltaMousePosition.x;
@@ -1025,13 +1025,13 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
          {
             // We're into the min extent, so adjust the position up to the min extent
             // so the window doesn't appear to jump
-			 if(newExtent.x < mMinExtent.x)
-				newPosition.x = mOrigBounds.point.x + (mOrigBounds.extent.x - mMinExtent.x);
-			 else
-			 {
-				 newPosition.x = mOrigBounds.point.x - (mMaxExtent.x - mOrigBounds.extent.x);
-				 newExtent.x = mMaxExtent.x;
-			 }
+          if(newExtent.x < mMinExtent.x)
+            newPosition.x = mOrigBounds.point.x + (mOrigBounds.extent.x - mMinExtent.x);
+          else
+          {
+             newPosition.x = mOrigBounds.point.x - (mMaxExtent.x - mOrigBounds.extent.x);
+             newExtent.x = mMaxExtent.x;
+          }
          }
          resizeX = true;
       }
@@ -1045,9 +1045,9 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
       moveWithCollapseGroup(newPosition);
 
    if(mCanCollapse && mCollapseGroup >= 0 && mResizeWindow == true )
-   {	
+   {   
       // Resize the window if allowed
-	   if( newExtent.y >= getMinExtent().y && newExtent.x >= getMinExtent().x&& newExtent.y <= getMaxExtent().y && newExtent.x <= getMaxExtent().x)
+      if( newExtent.y >= getMinExtent().y && newExtent.x >= getMinExtent().x&& newExtent.y <= getMaxExtent().y && newExtent.x <= getMaxExtent().x)
       {
          mIsMouseResizing = true;
          if( resizeCollapseGroup( resizeX, resizeY, (getPosition() - newPosition), (getExtent() - newExtent) ) )
@@ -1259,8 +1259,8 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
             }
          }
          
-			if ( windowList[i]->mCollapseGroup != -1)
-			{
+         if ( windowList[i]->mCollapseGroup != -1)
+         {
          if( (windowList[i]->mCollapseGroupNum == -1) || (windowList[i]->mCollapseGroupNum == mCollapseGroupNum - 1) ||
                (!parent->mCollapseGroupVec.empty() && parent->mCollapseGroupVec[windowList[i]->mCollapseGroup].last() ==  windowList[i]) )
          {
@@ -1341,7 +1341,7 @@ bool GuiWindowCtrl::onKeyDown(const GuiEvent &event)
 
 void GuiWindowCtrl::onRightMouseUp(const GuiEvent &evt)
 {
-	Parent::onRightMouseUp(evt);
+   Parent::onRightMouseUp(evt);
 }
 
 //-----------------------------------------------------------------------------
@@ -1378,23 +1378,23 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    bool isKey = (!firstResponder || controlIsChild(firstResponder));
 
    U32 topBase = isKey ? BorderTopLeftKey : BorderTopLeftNoKey;
-	if (mShowTitle ==true && mPopWindowShowTitle == true)
-		{
+   if (mShowTitle ==true && mPopWindowShowTitle == true)
+      {
    winRect.point.x += mBitmapBounds[BorderLeft].extent.x;
    winRect.point.y += mBitmapBounds[topBase + 2].extent.y;
 
    winRect.extent.x -= mBitmapBounds[BorderLeft].extent.x + mBitmapBounds[BorderRight].extent.x;
    winRect.extent.y -= mBitmapBounds[topBase + 2].extent.y + mBitmapBounds[BorderBottom].extent.y;
    
-		winRect.extent.x += 1;
-		}
-	GFX->getDrawUtil()->drawRectFill(winRect, mProfile->mFillColor);
+      winRect.extent.x += 1;
+      }
+   GFX->getDrawUtil()->drawRectFill(winRect, mProfile->mFillColor);
 
-	//GFX->getDrawUtil()->clearBitmapModulation();
-	if (mShowTitle==true && mPopWindowShowTitle == true)
-		{
+   //GFX->getDrawUtil()->clearBitmapModulation();
+   if (mShowTitle==true && mPopWindowShowTitle == true)
+      {
    GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset, mBitmapBounds[topBase]);
-		GFX->getDrawUtil()->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[topBase+1].extent.x, offset.y),mBitmapBounds[topBase + 1]);
+      GFX->getDrawUtil()->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[topBase+1].extent.x, offset.y),mBitmapBounds[topBase + 1]);
 
    RectI destRect;
    destRect.point.x = offset.x + mBitmapBounds[topBase].extent.x;
@@ -1515,27 +1515,27 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
       GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
    }
 
-			if (mCanPopWindow && !mIsInPopUp)
-				{
-				bmp = BmpStates * BmpPopWindow;
-				if( mPopWindowButton.pointInRect( mMousePosition ) )
-					{
-					if( mPopWindowButtonPressed )
-						bmp += BmpDown;
-					else
-						bmp += BmpHilite;
-					}
-				//GFX->getDrawUtil()->clearBitmapModulation();
-				GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mPopWindowButton.point, mBitmapBounds[bmp] );
-				}
-			}
+         if (mCanPopWindow && !mIsInPopUp)
+            {
+            bmp = BmpStates * BmpPopWindow;
+            if( mPopWindowButton.pointInRect( mMousePosition ) )
+               {
+               if( mPopWindowButtonPressed )
+                  bmp += BmpDown;
+               else
+                  bmp += BmpHilite;
+               }
+            //GFX->getDrawUtil()->clearBitmapModulation();
+            GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mPopWindowButton.point, mBitmapBounds[bmp] );
+            }
+         }
 
-		   if( !mMinimized )
-		   {
-		      // Render the children
-		      renderChildControls( offset, updateRect );
-		   }
-		}
+         if( !mMinimized )
+         {
+            // Render the children
+            renderChildControls( offset, updateRect );
+         }
+      }
 
 //=============================================================================
 //    Misc.
@@ -1546,8 +1546,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 const RectI GuiWindowCtrl::getClientRect()
 {
-	if (mShowTitle==true && mPopWindowShowTitle==true)
-		{
+   if (mShowTitle==true && mPopWindowShowTitle==true)
+      {
    if( !mProfile || mProfile->mBitmapArrayRects.size() < NumBitmaps )
       return Parent::getClientRect();
       
@@ -1565,18 +1565,18 @@ const RectI GuiWindowCtrl::getClientRect()
    // Inset by padding.  margin is specified for all t/b/l/r but 
    // uses only pointx pointy uniformly on both ends. This should be fixed. - JDD
    // winRect.inset( mSizingOptions.mPadding.point.x, mSizingOptions.mPadding.point.y );
-	   return winRect;
-		}
-	else
-		{
-		RectI winRect = Parent::getClientRect();
-		if (mIsInPopUp &&  (mCanClose ||  mCanMinimize || mCanMaximize))
-			{
-			if (winRect.point.y - mBitmapBounds[BorderTopKey].extent.y >= 0)
-				winRect.point.y = winRect.point.y - mBitmapBounds[BorderTopKey].extent.y;
-			}
-		return winRect;
-		}
+      return winRect;
+      }
+   else
+      {
+      RectI winRect = Parent::getClientRect();
+      if (mIsInPopUp &&  (mCanClose ||  mCanMinimize || mCanMaximize))
+         {
+         if (winRect.point.y - mBitmapBounds[BorderTopKey].extent.y >= 0)
+            winRect.point.y = winRect.point.y - mBitmapBounds[BorderTopKey].extent.y;
+         }
+      return winRect;
+      }
 }
 
 //-----------------------------------------------------------------------------
@@ -1609,11 +1609,11 @@ void GuiWindowCtrl::positionButtons(void)
    RectI closeRect(closeLeft, closeTop, buttonHeight, buttonWidth);
    mCloseButton = closeRect;
 
-	if (mCanPopWindow && !mIsInPopUp)
-	{
-		closeRect.point.x += closeOff;
-		mPopWindowButton = closeRect;
-	}
+   if (mCanPopWindow && !mIsInPopUp)
+   {
+      closeRect.point.x += closeOff;
+      mPopWindowButton = closeRect;
+   }
    // Always put Minimize on left side of Maximize.
    closeRect.point.x += closeOff;
    if (closeOff>0)
@@ -1664,209 +1664,209 @@ bool GuiWindowCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
 }
 void GuiWindowCtrl::setVisible(bool value)
 {
-	if (mIsInPopUp)
-		{
-		const char* tname = this->getName();
-		if (dStrcmp (tname,"")==0)
-			{
-			Con::errorf ("POP OUT FAILED, GuiWindow is not named!");
-			return;
-			}
-		const char* newName =StringTable->insert(( String("Canvas_") + String(tname)).c_str());
-		GuiCanvas* targetCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(newName));
-		if (targetCanvas)
-			if (value)
-				targetCanvas->getPlatformWindow()->show();
-			else
-				targetCanvas->getPlatformWindow()->hide();
-			
-		}
-	else
-		Parent::setVisible(value);
+   if (mIsInPopUp)
+      {
+      const char* tname = this->getName();
+      if (dStrcmp (tname,"")==0)
+         {
+         Con::errorf ("POP OUT FAILED, GuiWindow is not named!");
+         return;
+         }
+      const char* newName =StringTable->insert(( String("Canvas_") + String(tname)).c_str());
+      GuiCanvas* targetCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(newName));
+      if (targetCanvas)
+         if (value)
+            targetCanvas->getPlatformWindow()->show();
+         else
+            targetCanvas->getPlatformWindow()->hide();
+         
+      }
+   else
+      Parent::setVisible(value);
 }
 
 
 
 void GuiWindowCtrl::OnWindowPopOut()
 {
-	
-	if (!this->getName())
-	   {
-		Con::errorf ("POP OUT FAILED, GuiWindow is not named!");
-		return;
-	   }
-	moveToCollapseGroup( this, 1 );
-	mCollapseGroup = -1;
+   
+   if (!this->getName())
+      {
+      Con::errorf ("POP OUT FAILED, GuiWindow is not named!");
+      return;
+      }
+   moveToCollapseGroup( this, 1 );
+   mCollapseGroup = -1;
 
-	const char* tname = this->getName();
-	if (tname==NULL)
-		tname = StringTable->insert("");
-	const char* newName =StringTable->insert(( String("Canvas_") + String(tname)).c_str());
-	//Lets see if the target canvas already exists. 
-	GuiCanvas* targetCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(newName));
-	//If it doesn't exist, then we can pop out to one.
-	if (!targetCanvas)
-		{
-		//Save the original position and extent for use when they close the window.
-		mOrigPosition = this->getPosition();
-		mOrigExtent = this->getExtent();
-		mOldParentGroup = this->getParent();
-		mPopWindowShowTitle = false;
-		String s = String("$pref::Video::Canvas::mode");
-		const char *pref = Con::getVariable( StringTable->insert(s.c_str()));
-		const char* newvideomode = pref;
-		const char * p2 = StringTable->insert( StringUnit::getUnit( pref, 2, " \t\n") );
-		const char * p3 = StringTable->insert( StringUnit::getUnit( pref, 3, " \t\n") );
-		const char * p4 = StringTable->insert( StringUnit::getUnit( pref, 4, " \t\n") );
-		const char * p5 = StringTable->insert( StringUnit::getUnit( pref, 5, " \t\n") );
-		if (mPopWindowLastExtent.x==0 && mPopWindowLastExtent.y == 0)
-			{
-			newvideomode =StringTable->insert( (
-			    String(Con::getIntArg(this->getExtent().x)) + String(" ") + 
-				 String(Con::getIntArg(this->getExtent().y)) + String(" ") + 
-				 String(p2)  + String(" ") + 
-				 String(p3)  + String(" ") + 
-				 String(p4)  + String(" ") + 
-				 String(p5)).c_str());
-			}
-		else
-			{
-			newvideomode =StringTable->insert( (
-			    String(Con::getIntArg(this->mPopWindowLastExtent.x)) + String(" ") + 
-				 String(Con::getIntArg(this->mPopWindowLastExtent.y)) + String(" ") + 
-				 String(p2)  + String(" ") + 
-				 String(p3)  + String(" ") + 
-				 String(p4)  + String(" ") + 
-				 String(p5)).c_str());
-			}
-		targetCanvas = new GuiCanvas();
-		targetCanvas->setOverrideMode(newvideomode);
-		targetCanvas->assignName(StringTable->insert(newName));
-		targetCanvas->setInternalName(StringTable->insert(newName));
-		targetCanvas->registerObject();
-		targetCanvas->setWindowTitle(StringTable->insert(this->mText.c_str()));
-		targetCanvas->setContentControl(this);
+   const char* tname = this->getName();
+   if (tname==NULL)
+      tname = StringTable->insert("");
+   const char* newName =StringTable->insert(( String("Canvas_") + String(tname)).c_str());
+   //Lets see if the target canvas already exists. 
+   GuiCanvas* targetCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(newName));
+   //If it doesn't exist, then we can pop out to one.
+   if (!targetCanvas)
+      {
+      //Save the original position and extent for use when they close the window.
+      mOrigPosition = this->getPosition();
+      mOrigExtent = this->getExtent();
+      mOldParentGroup = this->getParent();
+      mPopWindowShowTitle = false;
+      String s = String("$pref::Video::Canvas::mode");
+      const char *pref = Con::getVariable( StringTable->insert(s.c_str()));
+      const char* newvideomode = pref;
+      const char * p2 = StringTable->insert( StringUnit::getUnit( pref, 2, " \t\n") );
+      const char * p3 = StringTable->insert( StringUnit::getUnit( pref, 3, " \t\n") );
+      const char * p4 = StringTable->insert( StringUnit::getUnit( pref, 4, " \t\n") );
+      const char * p5 = StringTable->insert( StringUnit::getUnit( pref, 5, " \t\n") );
+      if (mPopWindowLastExtent.x==0 && mPopWindowLastExtent.y == 0)
+         {
+         newvideomode =StringTable->insert( (
+             String(Con::getIntArg(this->getExtent().x).getStringArgValue()) + String(" ") + 
+             String(Con::getIntArg(this->getExtent().y).getStringArgValue()) + String(" ") + 
+             String(p2)  + String(" ") + 
+             String(p3)  + String(" ") + 
+             String(p4)  + String(" ") + 
+             String(p5)).c_str());
+         }
+      else
+         {
+         newvideomode =StringTable->insert( (
+             String(Con::getIntArg(this->mPopWindowLastExtent.x).getStringArgValue()) + String(" ") + 
+             String(Con::getIntArg(this->mPopWindowLastExtent.y).getStringArgValue()) + String(" ") + 
+             String(p2)  + String(" ") + 
+             String(p3)  + String(" ") + 
+             String(p4)  + String(" ") + 
+             String(p5)).c_str());
+         }
+      targetCanvas = new GuiCanvas();
+      targetCanvas->setOverrideMode(newvideomode);
+      targetCanvas->assignName(StringTable->insert(newName));
+      targetCanvas->setInternalName(StringTable->insert(newName));
+      targetCanvas->registerObject();
+      targetCanvas->setWindowTitle(StringTable->insert(this->mText.c_str()));
+      targetCanvas->setContentControl(this);
 
-		if( !mBitmapBounds )
-		   mBitmapBounds = mProfile->mBitmapArrayRects.address();
+      if( !mBitmapBounds )
+         mBitmapBounds = mProfile->mBitmapArrayRects.address();
 
-		
-		//VertResizeBottom gives us problems when we pop a control
-		//out of the game canvas.  It's math is based on the 
-		//Window Bar across the top of the window.  Since it is gone
-		//in the case of a pop out we need to adjust the position
-		//of any child gui control that is using that setting.
-		//We must also reverse this out when the window is put
-		//back into the game canvas.
-		for( iterator i = begin(); i != end(); i++)
-			{
-			GuiControl *ctrl = static_cast<GuiControl *>(*i);
-			if (ctrl->getParent()!=this)
-				continue;
+      
+      //VertResizeBottom gives us problems when we pop a control
+      //out of the game canvas.  It's math is based on the 
+      //Window Bar across the top of the window.  Since it is gone
+      //in the case of a pop out we need to adjust the position
+      //of any child gui control that is using that setting.
+      //We must also reverse this out when the window is put
+      //back into the game canvas.
+      for( iterator i = begin(); i != end(); i++)
+         {
+         GuiControl *ctrl = static_cast<GuiControl *>(*i);
+         if (ctrl->getParent()!=this)
+            continue;
 
-			if (ctrl->mVertSizing == vertResizeBottom)
-				{
-				Point2I position =ctrl->getPosition ();
-				if (position.y - mBitmapBounds[BorderTopKey].extent.y > 0)
-					{
-					position.y -= mBitmapBounds[BorderTopKey].extent.y;
-					ctrl->setPosition(position);
-					}
-				/*else if (position.y == 3)
-					{
-					position.y += (mBitmapBounds[BorderTopKey].extent.y * 2);
-					ctrl->setPosition(position);
-					}*/
+         if (ctrl->mVertSizing == vertResizeBottom)
+            {
+            Point2I position =ctrl->getPosition ();
+            if (position.y - mBitmapBounds[BorderTopKey].extent.y > 0)
+               {
+               position.y -= mBitmapBounds[BorderTopKey].extent.y;
+               ctrl->setPosition(position);
+               }
+            /*else if (position.y == 3)
+               {
+               position.y += (mBitmapBounds[BorderTopKey].extent.y * 2);
+               ctrl->setPosition(position);
+               }*/
 
-				}
-			}
+            }
+         }
 
 
-		targetCanvas->mIsPopUp = true;
-		if (mLastWindowPosition.x != 0 && mLastWindowPosition.y != 0)
-			targetCanvas->setOverridePosition(mLastWindowPosition);
-		Point2I newpos = targetCanvas->getPlatformWindow()->getPosition();
-		mIsInPopUp=true;
+      targetCanvas->mIsPopUp = true;
+      if (mLastWindowPosition.x != 0 && mLastWindowPosition.y != 0)
+         targetCanvas->setOverridePosition(mLastWindowPosition);
+      Point2I newpos = targetCanvas->getPlatformWindow()->getPosition();
+      mIsInPopUp=true;
 
-		openWindows.push_back(targetCanvas->getId());
-		onPopWindow_callback();
-		}
+      openWindows.push_back(targetCanvas->getId());
+      onPopWindow_callback();
+      }
 }
 void GuiWindowCtrl::UpdateRendering()
-	{
-	RectI clientRect = getClientRect();
-	layoutControls( clientRect );
-	GuiControl *parent = getParent();
-	S32 docking = getDocking();
-	if( parent && docking != Docking::dockNone && docking != Docking::dockInvalid )
-		setUpdateLayout( updateParent );
-	// Set the button coords
-	positionButtons();
-	}
+   {
+   RectI clientRect = getClientRect();
+   layoutControls( clientRect );
+   GuiControl *parent = getParent();
+   S32 docking = getDocking();
+   if( parent && docking != Docking::dockNone && docking != Docking::dockInvalid )
+      setUpdateLayout( updateParent );
+   // Set the button coords
+   positionButtons();
+   }
 
 void GuiWindowCtrl::PopUpClosed(GuiCanvas* canvas)
 {
-	if (std::find(openWindows.begin(), openWindows.end(), this->getId()) != openWindows.end())
-		openWindows.erase(std::remove(openWindows.begin(), openWindows.end(), canvas->getId()), openWindows.end());
+   if (std::find(openWindows.begin(), openWindows.end(), this->getId()) != openWindows.end())
+      openWindows.erase(std::remove(openWindows.begin(), openWindows.end(), canvas->getId()), openWindows.end());
 
-	//VertResizeBottom gives us problems when we pop a control
-	//out of the game canvas.  It's math is based on the 
-	//Window Bar across the top of the window.  Since it is gone
-	//in the case of a pop out we need to adjust the position
-	//of any child gui control that is using that setting.
-	//We must also reverse this out when the window is put
-	//back into the game canvas.
-	
+   //VertResizeBottom gives us problems when we pop a control
+   //out of the game canvas.  It's math is based on the 
+   //Window Bar across the top of the window.  Since it is gone
+   //in the case of a pop out we need to adjust the position
+   //of any child gui control that is using that setting.
+   //We must also reverse this out when the window is put
+   //back into the game canvas.
+   
 
-	if( !mBitmapBounds )
-		mBitmapBounds = mProfile->mBitmapArrayRects.address();
-	for( iterator i = begin(); i != end(); i++)
-		{
-		GuiControl *ctrl = static_cast<GuiControl *>(*i);
-		if (ctrl->getParent()!=this)
-			continue;
-		/*if (ctrl->mIsContainer)
-			continue;*/
-		if (ctrl->mVertSizing == vertResizeBottom)
-			{
-			Point2I position =ctrl->getPosition ();
-			position.y += mBitmapBounds[BorderTopKey].extent.y;
-			ctrl->setPosition(position);
-			}
-		}
-	onPopWindowClosed_callback();
+   if( !mBitmapBounds )
+      mBitmapBounds = mProfile->mBitmapArrayRects.address();
+   for( iterator i = begin(); i != end(); i++)
+      {
+      GuiControl *ctrl = static_cast<GuiControl *>(*i);
+      if (ctrl->getParent()!=this)
+         continue;
+      /*if (ctrl->mIsContainer)
+         continue;*/
+      if (ctrl->mVertSizing == vertResizeBottom)
+         {
+         Point2I position =ctrl->getPosition ();
+         position.y += mBitmapBounds[BorderTopKey].extent.y;
+         ctrl->setPosition(position);
+         }
+      }
+   onPopWindowClosed_callback();
 }
 
 void GuiWindowCtrl::CloseAllWindows()
 {
-	for (std::vector<U32>::iterator it = openWindows.begin(); it != openWindows.end(); ++it)
-	{
-		U32 id = *it;
-		GuiCanvas* canvas;
-		canvas = dynamic_cast<GuiCanvas*>(Sim::findObject(id));
-		if (canvas)
-		{
-			canvas->onWindowClose();
-		}
-	}
-	openWindows.clear();
+   for (std::vector<U32>::iterator it = openWindows.begin(); it != openWindows.end(); ++it)
+   {
+      U32 id = *it;
+      GuiCanvas* canvas;
+      canvas = dynamic_cast<GuiCanvas*>(Sim::findObject(id));
+      if (canvas)
+      {
+         canvas->onWindowClose();
+      }
+   }
+   openWindows.clear();
 }
 
 
 void GuiWindowCtrl::ClosePopOut()
 {
-	if (mIsInPopUp)
-		{
-		if (std::find(openWindows.begin(), openWindows.end(), this->getId())!=openWindows.end())
-			openWindows.erase(std::remove(openWindows.begin(), openWindows.end(), this->getId()), openWindows.end());
-		const char* tname = this->getName();
-		if (tname==NULL)
-			return;
-		const char* newName =StringTable->insert(( String("Canvas_") + String(tname)).c_str());
-		GuiCanvas* targetCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(newName));
-		targetCanvas->onWindowClose();
-		}
-		//PopUpClosed();
+   if (mIsInPopUp)
+      {
+      if (std::find(openWindows.begin(), openWindows.end(), this->getId())!=openWindows.end())
+         openWindows.erase(std::remove(openWindows.begin(), openWindows.end(), this->getId()), openWindows.end());
+      const char* tname = this->getName();
+      if (tname==NULL)
+         return;
+      const char* newName =StringTable->insert(( String("Canvas_") + String(tname)).c_str());
+      GuiCanvas* targetCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(newName));
+      targetCanvas->onWindowClose();
+      }
+      //PopUpClosed();
 }
 
 //-----------------------------------------------------------------------------
@@ -1974,7 +1974,7 @@ void GuiWindowCtrl::selectWindow(void)
 void GuiWindowCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent)
 {
    if (mIsInPopUp)
-	   return;
+      return;
    GuiCanvas *pRoot = getRoot();
    if( !pRoot )
       return;
@@ -2163,7 +2163,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 
       // Only for collpasing groups, if were not, then do it like normal windows
       if( mCanCollapse && mCollapseGroup >= 0 )
-      {	
+      {   
          bool resizeMe = false;
          
          // Only the group window should control positioning
@@ -2221,11 +2221,11 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 //-----------------------------------------------------------------------------
 
 DefineConsoleFunction(CloseAllPopOuts, void, (), ,
-	"()"
-	"Returns all pop'd out windows to the main canvas."
-	)
+   "()"
+   "Returns all pop'd out windows to the main canvas."
+   )
 {
-	GuiWindowCtrl::CloseAllWindows();
+   GuiWindowCtrl::CloseAllWindows();
 }
 DefineEngineMethod( GuiWindowCtrl, ClosePopOut, void, (),,
    "Puts the guiwindow back on the main canvas." )
@@ -2275,7 +2275,7 @@ DefineEngineMethod( GuiWindowCtrl, attachTo, void, ( GuiWindowCtrl* window ),,
 DefineEngineMethod( GuiWindowCtrl, setWindowTitle, void, ( const char *title),,
    "Sets the title of the window." )
 {
-	object->setWindowTitle( title);
+   object->setWindowTitle( title);
 }
 
 //-----------------------------------------------------------------------------
@@ -2283,7 +2283,7 @@ DefineEngineMethod( GuiWindowCtrl, setWindowTitle, void, ( const char *title),,
 DefineEngineMethod( GuiWindowCtrl, getWindowTitle, const char *, ( ),,
    "Returns the title of the window." )
 {
-	return object->getWindowTitle( );
+   return object->getWindowTitle( );
 }
 
 //-----------------------------------------------------------------------------
@@ -2291,7 +2291,7 @@ DefineEngineMethod( GuiWindowCtrl, getWindowTitle, const char *, ( ),,
 DefineEngineMethod( GuiWindowCtrl, setContextTitle, void, (bool title),,
    "Displays the option to set the title of the window." )
 {
-	object->setContextTitle( title );
+   object->setContextTitle( title );
 }
 
 //-----------------------------------------------------------------------------
@@ -2299,7 +2299,7 @@ DefineEngineMethod( GuiWindowCtrl, setContextTitle, void, (bool title),,
 DefineEngineMethod( GuiWindowCtrl, isTitleSet, bool, ( ),,
    "Returns if the title can be set or not." )
 {
-	return object->isTitleSet( );
+   return object->isTitleSet( );
 }
 
 //-----------------------------------------------------------------------------
