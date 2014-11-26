@@ -64,13 +64,6 @@ static bool isScreenSaverRunning()
 	return sreensaver;
 }
 
-void SetDisplayDefaults()
-{
-    //changes the settings of the default display device
-    //to the default mode
-    ChangeDisplaySettings(NULL, 0);
-}
-
 Win32Window::Win32Window(): mMouseLockPosition(0,0),
 mShouldLockMouse(false),
 mMouseLocked(false),
