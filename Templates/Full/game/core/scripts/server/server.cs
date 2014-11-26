@@ -35,7 +35,7 @@ function initBaseServer()
    exec("./spawn.cs");
    exec("./camera.cs");
    exec("./centerPrint.cs");
-   exec("./fileXferServer.cs");
+   exec("./netFileServer.cs");
 }
 
 /// Attempt to find an open port to initialize the server with
