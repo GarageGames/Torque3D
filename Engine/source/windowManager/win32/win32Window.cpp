@@ -174,10 +174,12 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 		   dv.dmFields = (DM_PELSWIDTH | DM_PELSHEIGHT);
 		   ChangeDisplaySettings(&dv, CDS_FULLSCREEN);
 		   SetWindowLong(getHWND(), GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
-		   SetWindowPos(getHWND(), HWND_TOP,	mi.rcMonitor.left, mi.rcMonitor.top,
-												mi.rcMonitor.right - mi.rcMonitor.left,
-												mi.rcMonitor.bottom - mi.rcMonitor.top,
-												SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		   SetWindowPos(getHWND(), HWND_TOP,	
+		   					mi.rcMonitor.left,
+		   					mi.rcMonitor.top,
+							mi.rcMonitor.right - mi.rcMonitor.left,
+							mi.rcMonitor.bottom - mi.rcMonitor.top,
+							SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
 	  }
 
       if(mDisplayWindow)
