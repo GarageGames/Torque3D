@@ -85,8 +85,8 @@ public:
       S32 id;
       U16 ascii;
       U16 scheme;
-      bool usesColorBox;	//  Added
-      ColorI colorbox;		//  Added
+      bool usesColorBox;   //  Added
+      ColorI colorbox;      //  Added
    };
 
    struct Scheme
@@ -116,18 +116,18 @@ protected:
    bool mInAction;
    bool mReplaceText;
    bool mRenderScrollInNA; //  Added
-   bool mReverseTextList;	//  Added - Should we reverse the text list if we display up?
+   bool mReverseTextList;   //  Added - Should we reverse the text list if we display up?
    StringTableEntry mBitmapName; //  Added
    Point2I mBitmapBounds; //  Added
    GFXTexHandle mTextureNormal; //  Added
    GFXTexHandle mTextureDepressed; //  Added
-	S32 mIdMax;
+   S32 mIdMax;
 
    virtual void addChildren();
    virtual void repositionPopup();
 
 public:
-	GuiAutoCompleteCtrl(void);
+   GuiAutoCompleteCtrl(void);
    ~GuiAutoCompleteCtrl();   
    GuiScrollCtrl::Region mScrollDir;
    bool onWake(); //  Added
@@ -142,7 +142,7 @@ public:
    void onAction();
    virtual void closePopUp();
    void clear();
-	void clearEntry( S32 entry ); //  Added
+   void clearEntry( S32 entry ); //  Added
    void onMouseDown(const GuiEvent &event);
    void onMouseEnter(const GuiEvent &event); //  Added
    void onMouseLeave(const GuiEvent &event); //  Added
@@ -157,7 +157,7 @@ public:
    S32 getSelected();
    void setSelected(S32 id, bool bNotifyScript = true);
    void setFirstSelected(bool bNotifyScript = true); //  Added
-   void setNoneSelected();	//  Added
+   void setNoneSelected();   //  Added
    const char *getScriptValue();
    const char *getTextById(S32 id);
    S32 findText( const char* text );

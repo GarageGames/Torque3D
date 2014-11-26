@@ -129,10 +129,10 @@ void PopupTextListCtrl::onMouseMove(const GuiEvent &event)
    Point2I cell((pt.x < 0 ? -1 : pt.x / mCellSize.x), (pt.y < 0 ? -1 : pt.y / mCellSize.y));
    if (( cell.y > -1 && cell.y < mList.size() && cell.x == 0))
    {
-	   mLastPositionInside = true;
+      mLastPositionInside = true;
 
-	   if( (cell.x == mMouseOverCell.x && cell.y == mMouseOverCell.y) )
-		   return;
+      if( (cell.x == mMouseOverCell.x && cell.y == mMouseOverCell.y) )
+         return;
 
       if (mMouseOverCell.x != -1)
       {
@@ -149,10 +149,10 @@ void PopupTextListCtrl::onMouseMove(const GuiEvent &event)
    }
    else
    {
-	   if( mLastPositionInside )
-		   mMouseOverCell.set(-1,-1);
+      if( mLastPositionInside )
+         mMouseOverCell.set(-1,-1);
 
-	   mLastPositionInside = false;
+      mLastPositionInside = false;
    }
    onCellHighlighted(mMouseOverCell);
 }
@@ -167,16 +167,16 @@ bool PopupTextListCtrl::onKeyDown(const GuiEvent &event)
    //see if the key down is a <return> or not
    if ( event.modifier == 0 )
    {
-	   if( event.keyCode == KEY_UP )
-	   {
-		   mMouseOverCell.set( 0, (mMouseOverCell.y - 1 < 0 ) ? 0 : mMouseOverCell.y - 1 );
-		   onCellHighlighted(mMouseOverCell);
-	   }
-	   if( event.keyCode == KEY_DOWN )
-	   {
-		   mMouseOverCell.set( 0, (mMouseOverCell.y + 1 > mList.size() - 1 ) ? mList.size() - 1 : mMouseOverCell.y + 1 );
-		   onCellHighlighted(mMouseOverCell);
-	   } 
+      if( event.keyCode == KEY_UP )
+      {
+         mMouseOverCell.set( 0, (mMouseOverCell.y - 1 < 0 ) ? 0 : mMouseOverCell.y - 1 );
+         onCellHighlighted(mMouseOverCell);
+      }
+      if( event.keyCode == KEY_DOWN )
+      {
+         mMouseOverCell.set( 0, (mMouseOverCell.y + 1 > mList.size() - 1 ) ? mList.size() - 1 : mMouseOverCell.y + 1 );
+         onCellHighlighted(mMouseOverCell);
+      } 
       if ( event.keyCode == KEY_RETURN )
       {
          mPopUpCtrl->closePopUp();
@@ -210,7 +210,7 @@ void PopupTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected
    if ( mouseOver )
    {      
       RectI cellR( offset.x, offset.y, size.x, size.y );
-	  GFX->getDrawUtil()->drawRectFill(cellR, mProfile->mFillColorHL);
+     GFX->getDrawUtil()->drawRectFill(cellR, mProfile->mFillColorHL);
 
    }
    else if ( selected )
@@ -270,31 +270,31 @@ void PopupTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected
 IMPLEMENT_CONOBJECT(GuiAutoCompleteCtrl);
 
 ConsoleDocClass( GuiAutoCompleteCtrl,
-	"@brief A control that allows to select a value from a drop-down list.\n\n"
+   "@brief A control that allows to select a value from a drop-down list.\n\n"
 
-	"For a nearly identical GUI with additional features, use GuiAutoCompleteCtrlEx.\n\n"
+   "For a nearly identical GUI with additional features, use GuiAutoCompleteCtrlEx.\n\n"
 
-	"@tsexample\n"
-	"new GuiAutoCompleteCtrl()\n"
-	"{\n"
-	"	maxPopupHeight = \"200\";\n"
-	"	sbUsesNAColor = \"0\";\n"
-	"	reverseTextList = \"0\";\n"
-	"	bitmapBounds = \"16 16\";\n"
-	"	maxLength = \"1024\";\n"
-	"	position = \"56 31\";\n"
-	"	extent = \"64 64\";\n"
-	"	minExtent = \"8 2\";\n"
-	"	profile = \"GuiPopUpMenuProfile\";\n"
-	"	tooltipProfile = \"GuiToolTipProfile\";\n"
-	"};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "new GuiAutoCompleteCtrl()\n"
+   "{\n"
+   "   maxPopupHeight = \"200\";\n"
+   "   sbUsesNAColor = \"0\";\n"
+   "   reverseTextList = \"0\";\n"
+   "   bitmapBounds = \"16 16\";\n"
+   "   maxLength = \"1024\";\n"
+   "   position = \"56 31\";\n"
+   "   extent = \"64 64\";\n"
+   "   minExtent = \"8 2\";\n"
+   "   profile = \"GuiPopUpMenuProfile\";\n"
+   "   tooltipProfile = \"GuiToolTipProfile\";\n"
+   "};\n"
+   "@endtsexample\n\n"
 
-	"@note This is definitely going to be deprecated soon.\n\n"
+   "@note This is definitely going to be deprecated soon.\n\n"
 
-	"@see GuiAutoCompleteCtrlEx for more features and better explanations.\n"
+   "@see GuiAutoCompleteCtrlEx for more features and better explanations.\n"
 
-	"@ingroup GuiControls\n");
+   "@ingroup GuiControls\n");
 
 GuiAutoCompleteCtrl::GuiAutoCompleteCtrl(void)
 {
@@ -317,7 +317,7 @@ GuiAutoCompleteCtrl::GuiAutoCompleteCtrl(void)
    mReverseTextList = false; //  Added - Don't reverse text list if displaying up
    mBitmapName = StringTable->insert(""); //  Added
    mBitmapBounds.set(16, 16); //  Added
-	mIdMax = -1;
+   mIdMax = -1;
 }
 
 //------------------------------------------------------------------------------
@@ -337,132 +337,119 @@ void GuiAutoCompleteCtrl::initPersistFields(void)
    Parent::initPersistFields();
 }
 
-//------------------------------------------------------------------------------
-ConsoleMethod( GuiAutoCompleteCtrl, add, void, 3, 5, "(string name, int idNum, int scheme=0)")
+DefineConsoleMethod( GuiAutoCompleteCtrl, add, void, ( const char* name, S32 idNum, S32 scheme ), ( -1, 0 ),
+   "Test whether the given method is defined on this object.\n"
+)
 {
-	if ( argc == 4 )
-		object->addEntry(argv[2],dAtoi(argv[3]));
-   if ( argc == 5 )
-      object->addEntry(argv[2],dAtoi(argv[3]),dAtoi(argv[4]));
-   else
-      object->addEntry(argv[2]);
+   object->addEntry(name, idNum, scheme);
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, addScheme, void, 6, 6, "(int id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL)")
+DefineConsoleMethod( GuiAutoCompleteCtrl, addScheme, void, ( S32 ID, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL),,
+   ""
+)
 {
-   ColorI fontColor, fontColorHL, fontColorSEL;
-   U32 r, g, b;
-   char buf[64];
-
-   dStrcpy( buf, argv[3] );
-   char* temp = dStrtok( buf, " \0" );
-   r = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   g = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   b = temp ? dAtoi( temp ) : 0;
-   fontColor.set( r, g, b );
-
-   dStrcpy( buf, argv[4] );
-   temp = dStrtok( buf, " \0" );
-   r = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   g = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   b = temp ? dAtoi( temp ) : 0;
-   fontColorHL.set( r, g, b );
-
-   dStrcpy( buf, argv[5] );
-   temp = dStrtok( buf, " \0" );
-   r = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   g = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   b = temp ? dAtoi( temp ) : 0;
-   fontColorSEL.set( r, g, b );
-
-   object->addScheme( dAtoi( argv[2] ), fontColor, fontColorHL, fontColorSEL );
+   object->addScheme( ID, fontColor, fontColorHL, fontColorSEL );
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, getText, void, 2, 2, "")
+
+DefineConsoleMethod( GuiAutoCompleteCtrl, getText, void, ( ),,
+   ""
+)
 {
    object->getText("");
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, clear, void, 2, 2, "Clear the popup list.")
+DefineConsoleMethod( GuiAutoCompleteCtrl, clear, void, ( ),,
+   "Clear the popup list."
+)
 {
    object->clear();
 }
 
 //FIXME: clashes with SimSet.sort
-ConsoleMethod(GuiAutoCompleteCtrl, sort, void, 2, 2, "Sort the list alphabetically.")
+DefineConsoleMethod( GuiAutoCompleteCtrl, sort, void, ( ),,
+   "Sort the list alphabetically."
+)
 {
    object->sort();
 }
 
-//  Added to sort the entries by ID
-ConsoleMethod(GuiAutoCompleteCtrl, sortID, void, 2, 2, "Sort the list by ID.")
+
+DefineConsoleMethod( GuiAutoCompleteCtrl, sortID, void, ( ),,
+   "Sort the list by ID."
+)
 {
-   object->sortID();
+  object->sortID();
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, forceOnAction, void, 2, 2, "")
+DefineConsoleMethod( GuiAutoCompleteCtrl, forceOnAction, void, ( ),,
+   ""
+)
 {
-   object->onAction();
+  object->onAction();
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, forceClose, void, 2, 2, "")
+DefineConsoleMethod( GuiAutoCompleteCtrl, forceClose, void, ( ),,
+   ""
+)
 {
-   object->closePopUp();
+  object->closePopUp();
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, getSelected, S32, 2, 2, "")
+DefineConsoleMethod( GuiAutoCompleteCtrl, getSelected, S32, ( ),,
+   ""
+)
 {
-   return object->getSelected();
+  return object->getSelected();
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, setSelected, void, 3, 4, "(int id, [scriptCallback=true])")
+DefineConsoleMethod( GuiAutoCompleteCtrl, setSelected, void, ( S32 id, bool scriptCallback ), (true),
+   ""
+)
 {
-   if( argc > 3 )
-      object->setSelected( dAtoi( argv[2] ), dAtob( argv[3] ) );
-   else
-      object->setSelected( dAtoi( argv[2] ) );
+  object->setSelected( id , scriptCallback );
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, setFirstSelected, void, 2, 3, "([scriptCallback=true])")
+DefineConsoleMethod( GuiAutoCompleteCtrl, setFirstSelected, void, ( bool scriptCallback ), (true),
+   ""
+)
 {
-	if( argc > 2 )
-      object->setFirstSelected( dAtob( argv[2] ) );
-   else
-      object->setFirstSelected();
+  object->setFirstSelected(scriptCallback);
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, setNoneSelected, void, 2, 2, "")
+DefineConsoleMethod( GuiAutoCompleteCtrl, setNoneSelected, void, ( ), ,
+   ""
+)
 {
    object->setNoneSelected();
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, getTextById, const char*, 3, 3,  "(int id)")
+DefineConsoleMethod( GuiAutoCompleteCtrl, getTextById, const char *, ( S32 ID), ,
+   ""
+)
 {
-   return(object->getTextById(dAtoi(argv[2])));
+   return(object->getTextById(ID));
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, changeTextById, void, 4, 4, "( int id, string text )" )
+DefineConsoleMethod( GuiAutoCompleteCtrl, changeTextById, void , ( S32 ID, const char * text), ,
+   ""
+)
 {
-   object->setEntryText( dAtoi( argv[ 2 ] ), argv[ 3 ] );
+   object->setEntryText( ID, text );
 }
 
-ConsoleMethod( GuiAutoCompleteCtrl, setEnumContent, void, 4, 4, "(string class, string enum)"
-              "This fills the popup with a classrep's field enumeration type info.\n\n"
-              "More of a helper function than anything.   If console access to the field list is added, "
-              "at least for the enumerated types, then this should go away..")
+DefineConsoleMethod( GuiAutoCompleteCtrl, setEnumContent, void, ( const char* className, const char* enumName), ,
+   "This fills the popup with a classrep's field enumeration type info.\n\n"
+   "More of a helper function than anything.   If console access to the field list is added, "
+   "at least for the enumerated types, then this should go away.."
+)
 {
    AbstractClassRep * classRep = AbstractClassRep::getClassList();
 
    // walk the class list to get our class
    while(classRep)
    {
-      if(!dStricmp(classRep->getClassName(), argv[2]))
+      if(!dStricmp(classRep->getClassName(), className))
          break;
       classRep = classRep->getNextClass();
    }
@@ -470,20 +457,20 @@ ConsoleMethod( GuiAutoCompleteCtrl, setEnumContent, void, 4, 4, "(string class, 
    // get it?
    if(!classRep)
    {
-      Con::warnf(ConsoleLogEntry::General, "failed to locate class rep for '%s'", argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "failed to locate class rep for '%s'", className);
       return;
    }
 
    // walk the fields to check for this one (findField checks StringTableEntry ptrs...)
    U32 i;
    for(i = 0; i < classRep->mFieldList.size(); i++)
-      if(!dStricmp(classRep->mFieldList[i].pFieldname, argv[3]))
+      if(!dStricmp(classRep->mFieldList[i].pFieldname, enumName))
          break;
 
    // found it?   
    if(i == classRep->mFieldList.size())
    {   
-      Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", argv[3], argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", enumName, className);
       return;
    }
 
@@ -493,7 +480,7 @@ ConsoleMethod( GuiAutoCompleteCtrl, setEnumContent, void, 4, 4, "(string class, 
    // check the type
    if( !conType->getEnumTable() )
    {
-      Con::warnf(ConsoleLogEntry::General, "field '%s' is not an enumeration for class '%s'", argv[3], argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "field '%s' is not an enumeration for class '%s'", enumName, className);
       return;
    }
 
@@ -505,24 +492,29 @@ ConsoleMethod( GuiAutoCompleteCtrl, setEnumContent, void, 4, 4, "(string class, 
       object->addEntry( table[i].getName(), table[i] );
 }
 
-//------------------------------------------------------------------------------
-ConsoleMethod( GuiAutoCompleteCtrl, findText, S32, 3, 3, "(string text)"
-              "Returns the position of the first entry containing the specified text.")
+
+DefineConsoleMethod( GuiAutoCompleteCtrl, findText, S32 , ( const char* text), ,
+   ""
+)
 {
-   return( object->findText( argv[2] ) );   
+   return( object->findText( text ) );   
 }
 
-//------------------------------------------------------------------------------
-ConsoleMethod( GuiAutoCompleteCtrl, size, S32, 2, 2, "Get the size of the menu - the number of entries in it.")
+DefineConsoleMethod( GuiAutoCompleteCtrl, size, S32 , (  ), ,
+   "Get the size of the menu - the number of entries in it."
+)
 {
-   return( object->getNumEntries() ); 
+   return( object->getNumEntries() );
 }
 
-//------------------------------------------------------------------------------
-ConsoleMethod( GuiAutoCompleteCtrl, replaceText, void, 3, 3, "(bool doReplaceText)")
+DefineConsoleMethod( GuiAutoCompleteCtrl, replaceText, void , ( bool doReplaceText ), ,
+   ""
+)
 {
-   object->replaceText(dAtoi(argv[2]));  
+   object->replaceText(doReplaceText);  
 }
+
+
 
 //------------------------------------------------------------------------------
 //  Added
@@ -571,43 +563,43 @@ void GuiAutoCompleteCtrl::clear()
    setText("");
    mSelIndex = -1;
    mRevNum = 0;
-	mIdMax = -1;
+   mIdMax = -1;
 }
 
 //------------------------------------------------------------------------------
 void GuiAutoCompleteCtrl::clearEntry( S32 entry )
-{	
-	if( entry == -1 )
-		return;
+{   
+   if( entry == -1 )
+      return;
 
-	U32 i = 0;
-	for ( ; i < mEntries.size(); i++ )
+   U32 i = 0;
+   for ( ; i < mEntries.size(); i++ )
    {
       if ( mEntries[i].id == entry )
          break;
    }
 
-	mEntries.erase( i );
+   mEntries.erase( i );
 
-	if( mEntries.size() <= 0 )
-	{
-		mEntries.setSize(0);
-		setText("");
-		mSelIndex = -1;
-		mRevNum = 0;
-	}
-	else
-	{
-		if (entry < mSelIndex)
-		{
-			mSelIndex--;
-		}
-		else if( entry == mSelIndex )
-		{
-			setText("");
-			mSelIndex = -1;
-		}
-	}
+   if( mEntries.size() <= 0 )
+   {
+      mEntries.setSize(0);
+      setText("");
+      mSelIndex = -1;
+      mRevNum = 0;
+   }
+   else
+   {
+      if (entry < mSelIndex)
+      {
+         mSelIndex--;
+      }
+      else if( entry == mSelIndex )
+      {
+         setText("");
+         mSelIndex = -1;
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -699,21 +691,21 @@ void GuiAutoCompleteCtrl::addEntry( const char *buf, S32 id, U32 scheme )
       //Con::printf( "GuiAutoCompleteCtrlEx::addEntry - Invalid buffer!" );
       return;
    }
-	
-	// Ensure that there are no other entries with exactly the same name
-	for ( U32 i = 0; i < mEntries.size(); i++ )
+   
+   // Ensure that there are no other entries with exactly the same name
+   for ( U32 i = 0; i < mEntries.size(); i++ )
    {
       if ( dStrcmp( mEntries[i].buf, buf ) == 0 )
          return;
    }
 
-	// If we don't give an id, create one from mIdMax
-	if( id == -1 )
-		id = mIdMax + 1;
-	
-	// Increase mIdMax when an id is greater than it
-	if( id > mIdMax )
-		mIdMax = id;
+   // If we don't give an id, create one from mIdMax
+   if( id == -1 )
+      id = mIdMax + 1;
+   
+   // Increase mIdMax when an id is greater than it
+   if( id > mIdMax )
+      mIdMax = id;
 
    Entry e;
    dStrcpy( e.buf, buf );
@@ -828,9 +820,9 @@ void GuiAutoCompleteCtrl::setSelected(S32 id, bool bNotifyScript )
          i = ( mRevNum > i ) ? mRevNum - i : i;
          mSelIndex = i;
          
-		 if (mReplaceText) //  Only change the displayed text if appropriate.
-			 //setText( mEntries[ i ].buf );
-			 setText(mFilteredEntries[i].buf);
+       if (mReplaceText) //  Only change the displayed text if appropriate.
+          //setText( mEntries[ i ].buf );
+          setText(mFilteredEntries[i].buf);
 
          // Now perform the popup action:
          
@@ -838,7 +830,7 @@ void GuiAutoCompleteCtrl::setSelected(S32 id, bool bNotifyScript )
          {
             if( isMethod( "onSelect" ) )
 
-			   Con::executef(this, "onSelect", Con::getIntArg(mFilteredEntries[mSelIndex].id), mFilteredEntries[mSelIndex].buf);
+            Con::executef(this, "onSelect", Con::getIntArg(mFilteredEntries[mSelIndex].id), mFilteredEntries[mSelIndex].buf);
                
             execConsoleCallback();
          }
@@ -876,28 +868,28 @@ void GuiAutoCompleteCtrl::setFirstSelected( bool bNotifyScript )
          setText( mEntries[0].buf );
       }
 
-		// Execute the popup console command:
-		if( bNotifyScript )
+      // Execute the popup console command:
+      if( bNotifyScript )
       {
          if ( isMethod( "onSelect" ) )
             Con::executef( this, "onSelect", Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf );
 
-			execConsoleCallback();
-      }
-   }
-	else
-	{
-		if ( mReplaceText ) //  Only change the displayed text if appropriate.
-			setText("");
-		
-		mSelIndex = -1;
-
-		if( bNotifyScript )
-      {
-			Con::executef( this, "onCancel" );
          execConsoleCallback();
       }
-	}
+   }
+   else
+   {
+      if ( mReplaceText ) //  Only change the displayed text if appropriate.
+         setText("");
+      
+      mSelIndex = -1;
+
+      if( bNotifyScript )
+      {
+         Con::executef( this, "onCancel" );
+         execConsoleCallback();
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -915,7 +907,7 @@ void GuiAutoCompleteCtrl::setNoneSelected()
 const char *GuiAutoCompleteCtrl::getScriptValue()
 {
    //return getText();
-	return "";
+   return "";
 }
 
 //------------------------------------------------------------------------------
@@ -932,9 +924,9 @@ void GuiAutoCompleteCtrl::closePopUp()
       mSelIndex = ( mRevNum >= mSelIndex && mSelIndex != -1 ) ? mRevNum - mSelIndex : mSelIndex;
       if ( mSelIndex != -1 )
       {
-		  if( mReplaceText )
-			  setText( mFilteredEntries[mSelIndex].buf );
-		  setIntVariable( mFilteredEntries[mSelIndex].id );
+        if( mReplaceText )
+           setText( mFilteredEntries[mSelIndex].buf );
+        setIntVariable( mFilteredEntries[mSelIndex].id );
       }
    }
 
@@ -946,9 +938,9 @@ void GuiAutoCompleteCtrl::closePopUp()
    if( mSelIndex != -1 && !mBackgroundCancel )
    {
       if ( isMethod( "onSelect" ) )
-	  {
-		  Con::executef( this, "onSelect", Con::getIntArg( mFilteredEntries[ mSelIndex ].id ), mFilteredEntries[mSelIndex].buf );
-	  }
+     {
+        Con::executef( this, "onSelect", Con::getIntArg( mFilteredEntries[ mSelIndex ].id ), mFilteredEntries[mSelIndex].buf );
+     }
 
       // Execute the popup console command:
       execConsoleCallback();
@@ -985,15 +977,15 @@ bool GuiAutoCompleteCtrl::onKeyDown(const GuiEvent &event)
    //see if the key down is a <return> or not
    if ( event.keyCode == KEY_DOWN && event.modifier == 0 )
    {
-	   mTl->setFirstResponder();
-	   mTl->mouseLock();
-	   mTl->onKeyDown(event);
+      mTl->setFirstResponder();
+      mTl->mouseLock();
+      mTl->onKeyDown(event);
       return true;
    }
    else if( event.keyCode == KEY_RETURN && event.modifier == 0 )
    {
-	   onReturn_callback();
-	   return true;
+      onReturn_callback();
+      return true;
    }
 
    Parent::onKeyDown( event );
@@ -1008,17 +1000,17 @@ bool GuiAutoCompleteCtrl::onKeyDown(const GuiEvent &event)
 
 void GuiAutoCompleteCtrl::rebuildResultEntries()
 {
-	mFilteredEntries.setSize(0);
+   mFilteredEntries.setSize(0);
 
-	for ( U32 i = 0; i < mEntries.size(); ++i )
-	{
-		char dest[256];
-		mTextBuffer.getCopy8((UTF8*)dest, GuiTextCtrl::MAX_STRING_LENGTH+1);
-		char copy[256];
-		dStrcpy(copy, mEntries[i].buf);
-		if ( dStrstr( dStrlwr(copy), dStrlwr(dest) ) != NULL )
-			mFilteredEntries.push_back( mEntries[i] );
-	}
+   for ( U32 i = 0; i < mEntries.size(); ++i )
+   {
+      char dest[256];
+      mTextBuffer.getCopy8((UTF8*)dest, GuiTextCtrl::MAX_STRING_LENGTH+1);
+      char copy[256];
+      dStrcpy(copy, mEntries[i].buf);
+      if ( dStrstr( dStrlwr(copy), dStrlwr(dest) ) != NULL )
+         mFilteredEntries.push_back( mEntries[i] );
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -1056,7 +1048,7 @@ void GuiAutoCompleteCtrl::onAction()
    mTl->setCellSize(Point2I(width, mProfile->mFont->getHeight() + textSpace));
 
    for ( U32 j = 0; j < mFilteredEntries.size(); ++j )
-	   mTl->addEntry( mFilteredEntries[j].id, mFilteredEntries[j].buf );
+      mTl->addEntry( mFilteredEntries[j].id, mFilteredEntries[j].buf );
 
    if ( mSelIndex >= 0 )
       mTl->setSelectedCell( Point2I( 0, mSelIndex ) );
@@ -1132,11 +1124,11 @@ void GuiAutoCompleteCtrl::onAction()
    if ( setScroll )
    {
       // Resize the text list
-	  Point2I cellSize;
-	  mTl->getCellSize( cellSize );
-	  cellSize.x = width - mSc->scrollBarThickness() - sbBorder;
-	  mTl->setCellSize( cellSize );
-	  mTl->setWidth( cellSize.x );
+     Point2I cellSize;
+     mTl->getCellSize( cellSize );
+     cellSize.x = width - mSc->scrollBarThickness() - sbBorder;
+     mTl->setCellSize( cellSize );
+     mTl->setWidth( cellSize.x );
 
       if ( mSelIndex )
          mTl->scrollCellVisible( Point2I( 0, mSelIndex ) );
@@ -1164,7 +1156,7 @@ void GuiAutoCompleteCtrl::addChildren()
    else
    {
       // Use the children's profile rather than the parent's profile, if it exists.
-	  mTl->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
+     mTl->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
    }
 
    //mTl->setControlProfile(dynamic_cast<GuiControlProfile *>(Sim::findObject( "ToolsGuiTextListProfile" )));
@@ -1180,7 +1172,7 @@ void GuiAutoCompleteCtrl::addChildren()
    else
    {
       // Use the children's profile rather than the parent's profile, if it exists.
-	  mSc->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
+     mSc->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
    }
 
    mSc->setField( "hScrollBar", "AlwaysOff" );
@@ -1207,12 +1199,12 @@ void GuiAutoCompleteCtrl::reverseTextList()
    mTl->clear();
 
    for ( S32 i = mFilteredEntries.size()-1; i >= 0; --i )
-	   mTl->addEntry( mFilteredEntries[i].id, mFilteredEntries[i].buf );
+      mTl->addEntry( mFilteredEntries[i].id, mFilteredEntries[i].buf );
 
    // Don't lose the selected cell:
    if ( mSelIndex >= 0 )
    { 
-	   mTl->setSelectedCell( Point2I( 0, mFilteredEntries.size() - mSelIndex - 1 ) ); 
+      mTl->setSelectedCell( Point2I( 0, mFilteredEntries.size() - mSelIndex - 1 ) ); 
    }
 
    mRevNum = mFilteredEntries.size() - 1;
@@ -1225,11 +1217,11 @@ bool GuiAutoCompleteCtrl::getFontColor( ColorI &fontColor, S32 id, bool selected
    Entry* entry = NULL;
    for( i = 0; i < mFilteredEntries.size(); i++ )
    {
-	   if( mFilteredEntries[i].id == id )
-	   {
-		   entry = &mFilteredEntries[i];
-		   break;
-	   }
+      if( mFilteredEntries[i].id == id )
+      {
+         entry = &mFilteredEntries[i];
+         break;
+      }
    }
 
    if ( !entry )
@@ -1283,8 +1275,8 @@ bool GuiAutoCompleteCtrl::getColoredBox( ColorI &fontColor, S32 id )
 //------------------------------------------------------------------------------
 void GuiAutoCompleteCtrl::onMouseDown( const GuiEvent &event )
 {
-	Parent::onMouseDown(event);
-	
+   Parent::onMouseDown(event);
+   
    TORQUE_UNUSED(event);
 
    if( !mVisible || !mActive || !mAwake )
