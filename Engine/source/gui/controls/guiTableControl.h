@@ -22,15 +22,9 @@
 #ifndef _GUITABLECONTROL_H_
 #define _GUITABLECONTROL_H_
 
-#ifndef _GUITEXTLISTCTRL_H_
 #include "gui/controls/guiTextListCtrl.h"
-#endif
-#ifndef _ARRAYOBJECT_H_
-#include "console\arrayObject.h"
-#endif
-#ifndef _GUISCROLLCTRL_H_
+#include "console/arrayObject.h"
 #include "gui/containers/guiScrollCtrl.h"
-#endif
 
 
 class GuiTableControl :
