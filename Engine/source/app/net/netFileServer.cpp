@@ -42,21 +42,21 @@ list at the same time.
 class FileList_SysEvent : public SimEvent
 {
 public:
-   S32 Idx;
-   S32 fileCount;
+   S32 mIdx;
+   S32 mFileCount;
    FileList_SysEvent(S32 idx,S32 filecount )
    {
-      Idx = idx;
-      fileCount = filecount;
+      mIdx = idx;
+      mFileCount = filecount;
    }
    void process(SimObject* obj)
    {
       netFileServer* mobj = dynamic_cast<netFileServer*>(obj);
       if (mobj)
       {
-         if (Idx < fileCount)
+         if (mIdx < mFileCount)
          {
-            int percent = ((float)Idx/ (float)fileCount * 100.00f);
+            int percent = ((float)mIdx/ (float)mFileCount * 100.00f);
             char * buff = Con::getReturnBuffer(10);
             dSprintf(buff,10,"%i",percent);
             
@@ -65,7 +65,7 @@ public:
             mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
 
             //Get CRC for the file.
-            String filename = mobj->FilesAt(Idx);
+            String filename = mobj->FilesAt(mIdx);
             Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( filename );
             U32 crc = (fileRef->getChecksum());
             
@@ -74,7 +74,7 @@ public:
             mobj->send((const U8*)str.c_str(), dStrlen(str.c_str()));
 
             //Post the next iteration to the simevent queue to fire in 25 ms.
-            Sim::postEvent(mobj,new FileList_SysEvent(Idx+1,fileCount),Sim::getCurrentTime() + 25);
+            Sim::postEvent(mobj,new FileList_SysEvent(mIdx+1, mFileCount),Sim::getCurrentTime() + 25);
          }
          else
          {

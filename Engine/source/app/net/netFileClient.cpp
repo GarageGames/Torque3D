@@ -53,34 +53,34 @@ static String LastFile;
 netFileClient::netFileClient()
 {
    dropRest = false;
-   xferFile = NULL ;
-   expectedDataSize = 0 ;
+   xferFile = NULL;
+   expectedDataSize = 0;
    totalDataSize = 0;
 }
 
 U32 netFileClient::onReceive(U8 *buffer, U32 bufferLen)
 {
    U32 start = 0;
-   U32 extractSize = 0 ;
+   U32 extractSize = 0;
    if(xferFile && expectedDataSize)
    {      
       if(bufferLen < expectedDataSize)
-         extractSize = bufferLen ;
+         extractSize = bufferLen;
       else
-         extractSize = expectedDataSize ;
-      toFile(buffer, extractSize) ;  
-      start = extractSize ;
+         extractSize = expectedDataSize;
+      toFile(buffer, extractSize);  
+      start = extractSize;
    }
    else
       parseLine(buffer, &start, bufferLen);
    return start;
-   }
+}
 
 void netFileClient::toFile(U8 *buffer, U32 bufferLen)
 {   
    if(xferFile)
-      xferFile->writeBinary(bufferLen, buffer) ;
-   expectedDataSize -= bufferLen ;
+      xferFile->writeBinary(bufferLen, buffer);
+   expectedDataSize -= bufferLen;
    //If the datasize is 0 then we are done the download.
    if(expectedDataSize == 0)
    {
@@ -131,7 +131,7 @@ bool netFileClient::processLine(UTF8 *line)
          //Check to see if they are the same
          Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( param1 );
          U32 temp = dAtoui(param2.c_str());
-			U32 chksum = fileRef->getChecksum();
+         U32 chksum = fileRef->getChecksum();
          if(chksum != temp)
             filesToDownload.push(param1);
       }
@@ -173,8 +173,8 @@ bool netFileClient::prepareClientWrite(const char* filename,U32 size)
    {
       xferFile = new FileObject();
       xferFile->openForWrite(filename, false);
-      totalDataSize = size ;
-      expectedDataSize = size ;
+      totalDataSize = size;
+      expectedDataSize = size;
       return true;
    }
    return false;
@@ -189,15 +189,15 @@ void netFileClient::SubmitFile(String file)
    dSprintf(idBuf, sizeof(idBuf), "%u", fs->getSize());
    String str = netFileCommands::writefile + String(":") + file + String(":")+ String(idBuf) + String("\n");
    send((const U8*)str.c_str(), dStrlen(str.c_str()));
-   send((const U8 *) fs->getBuffer(), fs->getSize()) ;
+   send((const U8 *) fs->getBuffer(), fs->getSize());
 }
 
 void netFileClient::onDisconnect()
 {
    Parent::onDisconnect();
-   xferFile = NULL ; 
-   totalDataSize = 0 ;
-   expectedDataSize = 0 ;
+   xferFile = NULL; 
+   totalDataSize = 0;
+   expectedDataSize = 0;
    if (!xferFile)
       return;
    xferFile->close();

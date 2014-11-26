@@ -372,14 +372,14 @@ void TCPObject::onDisconnect()
 }
 
 bool TCPObject::listen(U16 port)
-   {
+{
    U32 newTag = Net::openListenPort(port);
    if (newTag ==-1)
       return false;
    mState = Listening;
    addToTable(newTag);
    return true;
-   }
+}
 
 void TCPObject::connect(const char *address)
 {
