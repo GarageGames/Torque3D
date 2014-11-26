@@ -350,7 +350,12 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    if ( stageNum < 1 && 
          (  (  mMaterial->mCubemapData && mMaterial->mCubemapData->mCubemap ) ||
                mMaterial->mDynamicCubemap ) )
+   //only render cubemaps during the second pass if we need to pull render-order tricks
+   if (mMaterial->mIsSky)
+   {
    fd.features.addFeature( MFT_CubeMap );
+       fd.features.addFeature( MFT_SkyBox );
+   }
 
    fd.features.addFeature( MFT_Visibility );
 

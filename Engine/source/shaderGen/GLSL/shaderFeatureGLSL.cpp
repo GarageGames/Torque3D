@@ -2715,3 +2715,15 @@ void ImposterVertFeatureGLSL::determineFeature( Material *material,
       outFeatureData->features.addFeature( MFT_ImposterVert );
 }
 
+//****************************************************************************
+// Vertex position
+//****************************************************************************
+void DeferredSkyGLSL::processVert( Vector<ShaderComponent*> &componentList, 
+                                    const MaterialFeatureData &fd )
+{
+   Var *outPosition = (Var*)LangElement::find( "gl_Position" );
+   MultiLine *meta = new MultiLine;
+   meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
+
+   output = meta;
+}

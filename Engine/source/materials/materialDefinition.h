@@ -285,6 +285,8 @@ public:
    CubemapData* mCubemapData;
    bool mDynamicCubemap;
 
+   // Deferred Shading
+   bool mIsSky;
    bool mTranslucent;   
    BlendOp mTranslucentBlendOp;
    bool mTranslucentZWrite;

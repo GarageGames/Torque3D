@@ -170,5 +170,6 @@ DeclareFeatureType( MFT_ForwardShading );
 /// so that the rest of the material features can work on it.
 DeclareFeatureType( MFT_ImposterVert );
 
-
+// Deferred Shading
+DeclareFeatureType( MFT_SkyBox );
 #endif // _MATERIALFEATURETYPES_H_

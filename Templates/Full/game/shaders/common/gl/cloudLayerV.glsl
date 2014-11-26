@@ -62,6 +62,7 @@ void main()
    vec2 IN_uv0 = vTexCoord0.st;
 
    gl_Position = modelview * IN_pos;
+   gl_Position.w = gl_Position.z;
    
    // Offset the uv so we don't have a seam directly over our head.
    vec2 uv = IN_uv0 + vec2( 0.5, 0.5 );
