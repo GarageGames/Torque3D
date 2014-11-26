@@ -31,46 +31,49 @@
 #include "torqueConfig.h"
 #include "core/frameAllocator.h"
 
-namespace fileSystemFunctions
+namespace Torque
 {
-   // Buffer for expanding script filenames.
-   extern char sgScriptFilenameBuffer[1024];
-   extern  Vector<String>   sgFindFilesResults;
-   extern  U32              sgFindFilesPos;
+   namespace FileSystem
+   {
+      // Buffer for expanding script filenames.
+      extern char sgScriptFilenameBuffer[1024];
+      extern  Vector<String>   sgFindFilesResults;
+      extern  U32              sgFindFilesPos;
 
-   //-------------------------------------- Helper Functions
-   static void forwardslash(char *str);
-   //----------------------------------------------------------------
+      //-------------------------------------- Helper Functions
+      static void forwardslash(char *str);
+      //----------------------------------------------------------------
 
-   String findFirstFile ( const char* pattern, bool recurse =true);
-   S32 buildFileList(const char* pattern, bool recurse, bool multiMatch);
-   String findFirstFilefindFirstFile ( const char* pattern, bool recurse = true );
-   String findNextFile ( const char* pattern = "");
-   String findFirstFileMultiExpr( const char* pattern, bool recurse = true);
-   String findNextFileMultiExpr( const char* pattern = "");
-   S32 getFileCountMultiExpr( const char* pattern, bool recurse =true);
-   U32 getFileCRC( const char* fileName );
-   bool isFile ( const char* fileName );
-   bool IsDirectory ( const char* directory );
-   bool isWriteableFileName ( const char* fileName );
+      String findFirstFile ( const char* pattern, bool recurse =true);
+      S32 buildFileList(const char* pattern, bool recurse, bool multiMatch);
+      String findFirstFilefindFirstFile ( const char* pattern, bool recurse = true );
+      String findNextFile ( const char* pattern = "");
+      String findFirstFileMultiExpr( const char* pattern, bool recurse = true);
+      String findNextFileMultiExpr( const char* pattern = "");
+      S32 getFileCountMultiExpr( const char* pattern, bool recurse =true);
+      U32 getFileCRC( const char* fileName );
+      bool isFile ( const char* fileName );
+      bool IsDirectory ( const char* directory );
+      bool isWriteableFileName ( const char* fileName );
 
-   void startFileChangeNotifications();
-   void stopFileChangeNotifications();
+      void startFileChangeNotifications();
+      void stopFileChangeNotifications();
 
-   String getDirectoryList( const char* path, S32 depth = 0 );
-   S32 fileSize( const char* fileName );
-   String fileModifiedTime ( const char* fileName );
-   String fileCreatedTime ( const char* fileName );
-   bool fileDelete ( const char* path );
-   String fileExt ( const char* fileName );
-   String fileBase ( const char* fileName );
-   String fileName  ( const char* fileName );
-   String filePath ( const char* fileName );
-   String getWorkingDirectory  ();
-   String makeFullPath ( const char* path, const char* cwd = "");
-   String makeRelativePath ( const char* path, const char* to = "");
-   String pathConcat ( const char* path, const char* file);
-   String getExecutableName();
-   String getMainDotCsDir();
-   S32 getFileCount( const char* pattern, bool recurse = true);
+      String getDirectoryList( const char* path, S32 depth = 0 );
+      S32 fileSize( const char* fileName );
+      String fileModifiedTime ( const char* fileName );
+      String fileCreatedTime ( const char* fileName );
+      bool fileDelete ( const char* path );
+      String fileExt ( const char* fileName );
+      String fileBase ( const char* fileName );
+      String fileName  ( const char* fileName );
+      String filePath ( const char* fileName );
+      String getWorkingDirectory  ();
+      String makeFullPath ( const char* path, const char* cwd = "");
+      String makeRelativePath ( const char* path, const char* to = "");
+      String pathConcat ( const char* path, const char* file);
+      String getExecutableName();
+      String getMainDotCsDir();
+      S32 getFileCount( const char* pattern, bool recurse = true);
+   }
 }

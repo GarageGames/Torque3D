@@ -169,7 +169,7 @@ bool netFileClient::processLine(UTF8 *line)
 
 bool netFileClient::prepareClientWrite(const char* filename,U32 size)
 {
-   if ( fileSystemFunctions::isWriteableFileName( filename ) )
+   if ( Torque::FileSystem::isWriteableFileName( filename ) )
    {
       xferFile = new FileObject();
       xferFile->openForWrite(filename, false);

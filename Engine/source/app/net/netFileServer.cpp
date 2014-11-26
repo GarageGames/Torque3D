@@ -234,7 +234,7 @@ void netFileServer::SendFileListToClient()
 
 bool netFileServer::prepareWrite(const char* filename,U32 size)
 {
-   if ( fileSystemFunctions::isWriteableFileName( filename ) )
+   if ( Torque::FileSystem::isWriteableFileName( filename ) )
       {
          //Create a new File Object
          xferFile = new FileObject();
@@ -331,18 +331,18 @@ void netFileServer::stop()
 
 void netFileServer::LoadPathPattern(const char* pattern, bool recursive, bool multiMatch, bool verbose)
 {
-   fileSystemFunctions::buildFileList(pattern, recursive, multiMatch);
-   for (int i=0;i<fileSystemFunctions::sgFindFilesResults.size();i++)
+   Torque::FileSystem::buildFileList(pattern, recursive, multiMatch);
+   for (int i=0;i<Torque::FileSystem::sgFindFilesResults.size();i++)
    {
       if (verbose)
-         Con::printf("Adding file %s to download Queue", fileSystemFunctions::sgFindFilesResults[i].c_str());
-      FilesPush(fileSystemFunctions::sgFindFilesResults[i]);
+         Con::printf("Adding file %s to download Queue", Torque::FileSystem::sgFindFilesResults[i].c_str());
+      FilesPush(Torque::FileSystem::sgFindFilesResults[i]);
    }
 }
 
 bool netFileServer::LoadFile(const char* filename)
 {
-   if (fileSystemFunctions::isFile(filename))
+   if (Torque::FileSystem::isFile(filename))
    {
       FilesPush(filename);
       return true;

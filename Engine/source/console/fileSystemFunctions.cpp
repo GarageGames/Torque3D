@@ -32,13 +32,15 @@
 #include "core/frameAllocator.h"
 #include "fileSystemFunctions.h"
 
-namespace fileSystemFunctions
+namespace Torque
 {
-   // Buffer for expanding script filenames.
-   char sgScriptFilenameBuffer[1024];
+   namespace FileSystem
+   {
+      // Buffer for expanding script filenames.
+      char sgScriptFilenameBuffer[1024];
 
-   //-------------------------------------- Helper Functions
-   void forwardslash(char *str)
+      //-------------------------------------- Helper Functions
+                              void forwardslash(char *str)
    {
       while(*str)
       {
@@ -48,13 +50,14 @@ namespace fileSystemFunctions
       }
    }
 
-   //----------------------------------------------------------------
+      //----------------------------------------------------------------
 
-   Vector<String>   sgFindFilesResults;
-   U32              sgFindFilesPos = 0;
+      Vector<String>   sgFindFilesResults;
+      U32              sgFindFilesPos = 0;
+   }
 }
-
-   S32 fileSystemFunctions::buildFileList(const char* pattern, bool recurse, bool multiMatch)
+   
+   S32 Torque::FileSystem::buildFileList(const char* pattern, bool recurse, bool multiMatch)
    {
       static const String sSlash( "/" );
 
@@ -139,7 +142,7 @@ namespace fileSystemFunctions
       return results;
    }
 
-   String fileSystemFunctions::findFirstFile ( const char* pattern, bool recurse )
+   String Torque::FileSystem::findFirstFile ( const char* pattern, bool recurse )
    {
       S32 numResults = buildFileList( pattern, recurse, false);
 
@@ -158,7 +161,7 @@ namespace fileSystemFunctions
       return numResults ? sgFindFilesResults[0] : String();
    }
 
-   String fileSystemFunctions::findNextFile ( const char* pattern )
+   String Torque::FileSystem::findNextFile ( const char* pattern )
    {
       if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
          return String();
@@ -166,7 +169,7 @@ namespace fileSystemFunctions
       return sgFindFilesResults[sgFindFilesPos++];
    }
 
-   S32 fileSystemFunctions::getFileCount( const char* pattern, bool recurse)
+   S32 Torque::FileSystem::getFileCount( const char* pattern, bool recurse)
    {
       S32 numResults = buildFileList( pattern, recurse, false );
 
@@ -178,7 +181,7 @@ namespace fileSystemFunctions
       return numResults;
    }
 
-   String fileSystemFunctions::findFirstFileMultiExpr( const char* pattern, bool recurse )
+   String Torque::FileSystem::findFirstFileMultiExpr( const char* pattern, bool recurse )
    {
       S32 numResults = buildFileList(pattern, recurse, true);
 
@@ -197,7 +200,7 @@ namespace fileSystemFunctions
       return numResults ? sgFindFilesResults[0] : String();
    }
 
-   String fileSystemFunctions::findNextFileMultiExpr( const char* pattern )
+   String Torque::FileSystem::findNextFileMultiExpr( const char* pattern )
    {
       if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
          return String();
@@ -205,7 +208,7 @@ namespace fileSystemFunctions
       return sgFindFilesResults[sgFindFilesPos++];
    }
 
-   S32 fileSystemFunctions::getFileCountMultiExpr( const char* pattern, bool recurse )
+   S32 Torque::FileSystem::getFileCountMultiExpr( const char* pattern, bool recurse )
    {
       S32 numResults = buildFileList(pattern, recurse, true);
 
@@ -217,7 +220,7 @@ namespace fileSystemFunctions
       return numResults;
    }
 
-   U32 fileSystemFunctions::getFileCRC( const char* fileName )
+   U32 Torque::FileSystem::getFileCRC( const char* fileName )
    {
       String cleanfilename(Torque::Path::CleanSeparators(fileName));
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
@@ -234,7 +237,7 @@ namespace fileSystemFunctions
       return fileRef->getChecksum();
    }
 
-   bool fileSystemFunctions::isFile ( const char* fileName )
+   bool Torque::FileSystem::isFile ( const char* fileName )
    {
       String cleanfilename(Torque::Path::CleanSeparators(fileName));
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
@@ -243,7 +246,7 @@ namespace fileSystemFunctions
       return Torque::FS::IsFile(givenPath);
    }
 
-   bool fileSystemFunctions::IsDirectory ( const char* directory )
+   bool Torque::FileSystem::IsDirectory ( const char* directory )
    {
       String dir(Torque::Path::CleanSeparators(directory));
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), dir.c_str());
@@ -252,7 +255,7 @@ namespace fileSystemFunctions
       return Torque::FS::IsDirectory( givenPath );
    }
 
-   bool fileSystemFunctions::isWriteableFileName ( const char* fileName )
+   bool Torque::FileSystem::isWriteableFileName ( const char* fileName )
    {
       String filename(Torque::Path::CleanSeparators(fileName));
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filename.c_str());
@@ -264,17 +267,17 @@ namespace fileSystemFunctions
       return !Torque::FS::IsReadOnly(path);
    }
 
-   void fileSystemFunctions::startFileChangeNotifications()
+   void Torque::FileSystem::startFileChangeNotifications()
    {
       Torque::FS::StartFileChangeNotifications();
    }
 
-   void fileSystemFunctions::stopFileChangeNotifications()
+   void Torque::FileSystem::stopFileChangeNotifications()
    {
       Torque::FS::StopFileChangeNotifications();
    }
 
-   String fileSystemFunctions::getDirectoryList( const char* path, S32 depth )
+   String Torque::FileSystem::getDirectoryList( const char* path, S32 depth )
    {
        // Grab the full path.
       char fullpath[1024];
@@ -322,13 +325,13 @@ namespace fileSystemFunctions
       return buffer;
    }
 
-   S32 fileSystemFunctions::fileSize( const char* fileName )
+   S32 Torque::FileSystem::fileSize( const char* fileName )
    {
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
       return Platform::getFileSize( sgScriptFilenameBuffer );
    }
 
-   String fileSystemFunctions::fileModifiedTime ( const char* fileName )
+   String Torque::FileSystem::fileModifiedTime ( const char* fileName )
    {
       Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
 
@@ -346,7 +349,7 @@ namespace fileSystemFunctions
       return buffer;
    }
 
-   String fileSystemFunctions::fileCreatedTime ( const char* fileName )
+   String Torque::FileSystem::fileCreatedTime ( const char* fileName )
    {
       Con::expandScriptFilename( sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName );
 
@@ -364,7 +367,7 @@ namespace fileSystemFunctions
       return buffer;
    }
 
-   bool fileSystemFunctions::fileDelete ( const char* path )
+   bool Torque::FileSystem::fileDelete ( const char* path )
    {
       static char fileName[1024];
       static char sandboxFileName[1024];
@@ -375,7 +378,7 @@ namespace fileSystemFunctions
       return dFileDelete(sandboxFileName);
    }
 
-   String fileSystemFunctions::fileExt ( const char* fileName )
+   String Torque::FileSystem::fileExt ( const char* fileName )
    {
       const char *ret = dStrrchr(fileName, '.');
       if(ret)
@@ -383,7 +386,7 @@ namespace fileSystemFunctions
       return "";
    }
 
-   String fileSystemFunctions::fileBase ( const char* fileName )
+   String Torque::FileSystem::fileBase ( const char* fileName )
    {
    
       S32 pathLen = dStrlen( fileName );
@@ -405,7 +408,7 @@ namespace fileSystemFunctions
       return ret;
    }
 
-   String fileSystemFunctions::fileName  ( const char* fileName )
+   String Torque::FileSystem::fileName  ( const char* fileName )
    {
       S32 pathLen = dStrlen( fileName );
       FrameTemp<char> szPathCopy( pathLen + 1);
@@ -423,7 +426,7 @@ namespace fileSystemFunctions
       return ret;
    }
 
-   String fileSystemFunctions::filePath ( const char* fileName )
+   String Torque::FileSystem::filePath ( const char* fileName )
    {
       S32 pathLen = dStrlen( fileName );
       FrameTemp<char> szPathCopy( pathLen + 1);
@@ -441,12 +444,12 @@ namespace fileSystemFunctions
       return ret;
    }
 
-   String fileSystemFunctions::getWorkingDirectory  ()
+   String Torque::FileSystem::getWorkingDirectory  ()
    {
       return Platform::getCurrentDirectory();
    }
 
-   String fileSystemFunctions::makeFullPath ( const char* path, const char* cwd )
+   String Torque::FileSystem::makeFullPath ( const char* path, const char* cwd )
    {
       static const U32 bufSize = 512;
       char *buf = Con::getReturnBuffer(bufSize);
@@ -454,12 +457,12 @@ namespace fileSystemFunctions
       return buf;
    }
 
-   String fileSystemFunctions::makeRelativePath ( const char* path, const char* to )
+   String Torque::FileSystem::makeRelativePath ( const char* path, const char* to )
    {
       return Platform::makeRelativePathName( path, dStrlen(to) > 1 ? to : NULL );
    }
 
-   String fileSystemFunctions::pathConcat ( const char* path, const char* file)
+   String Torque::FileSystem::pathConcat ( const char* path, const char* file)
    {
       static const U32 bufSize = 1024;
       char *buf = Con::getReturnBuffer(bufSize);
@@ -467,12 +470,12 @@ namespace fileSystemFunctions
       return buf;
    }
 
-   String fileSystemFunctions::getExecutableName()
+   String Torque::FileSystem::getExecutableName()
    {
       return Platform::getExecutableName();
    }
 
-   String fileSystemFunctions::getMainDotCsDir()
+   String Torque::FileSystem::getMainDotCsDir()
    {
       return Platform::getMainDotCsDir();
    }
@@ -508,7 +511,7 @@ DefineEngineFunction( findFirstFile, String, ( const char* pattern, bool recurse
    "@see findFirstFileMultiExpr()"
    "@ingroup FileSearches" )
 {
-  return fileSystemFunctions::findFirstFile(pattern, recurse);
+  return Torque::FileSystem::findFirstFile(pattern, recurse);
 }
 
 //-----------------------------------------------------------------------------
@@ -529,7 +532,7 @@ DefineEngineFunction( findNextFile, String, ( const char* pattern ), ( "" ),
    "@see findFirstFile()"
    "@ingroup FileSearches" )
 {
-   return fileSystemFunctions::findNextFile(pattern);
+   return Torque::FileSystem::findNextFile(pattern);
 }
 
 //-----------------------------------------------------------------------------
@@ -558,7 +561,7 @@ DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), 
    "@see getFileCountMultiExpr()"
    "@ingroup FileSearches" )
 {
-   return fileSystemFunctions::getFileCount(pattern, recurse);
+   return Torque::FileSystem::getFileCount(pattern, recurse);
 }
 
 //-----------------------------------------------------------------------------
@@ -600,7 +603,7 @@ DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool
    "@see findFirstFile()"
 	"@ingroup FileSearches")
 {
-   return fileSystemFunctions::findFirstFileMultiExpr(pattern, recurse);
+   return Torque::FileSystem::findFirstFileMultiExpr(pattern, recurse);
 }
 
 DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""),
@@ -625,7 +628,7 @@ DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""
    "@see findFirstFileMultiExpr()"
 	"@ingroup FileSearches")
 {
-   return fileSystemFunctions::findNextFileMultiExpr(pattern);
+   return Torque::FileSystem::findNextFileMultiExpr(pattern);
 }
 
 DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool recurse ), (true),
@@ -650,7 +653,7 @@ DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool rec
    "@see findNextFileMultiExpr()"
 	"@ingroup FileSearches")
 {
-  return fileSystemFunctions::getFileCountMultiExpr(pattern, recurse);
+  return Torque::FileSystem::getFileCountMultiExpr(pattern, recurse);
 }
 
 DefineEngineFunction(getFileCRC, S32, ( const char* fileName ),,
@@ -662,7 +665,7 @@ DefineEngineFunction(getFileCRC, S32, ( const char* fileName ),,
    
    "@ingroup FileSystem")
 {
-   return fileSystemFunctions::getFileCRC(fileName);
+   return Torque::FileSystem::getFileCRC(fileName);
 }
 
 DefineEngineFunction(isFile, bool, ( const char* fileName ),,
@@ -673,7 +676,7 @@ DefineEngineFunction(isFile, bool, ( const char* fileName ),,
    
    "@ingroup FileSystem")
 {
-   return fileSystemFunctions::isFile( fileName );
+   return Torque::FileSystem::isFile( fileName );
 }
 
 DefineEngineFunction( IsDirectory, bool, ( const char* directory ),,
@@ -686,7 +689,7 @@ DefineEngineFunction( IsDirectory, bool, ( const char* directory ),,
 
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::IsDirectory(directory);
+   return Torque::FileSystem::IsDirectory(directory);
 }
 
 DefineEngineFunction(isWriteableFileName, bool, ( const char* fileName ),,
@@ -697,7 +700,7 @@ DefineEngineFunction(isWriteableFileName, bool, ( const char* fileName ),,
 
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::isWriteableFileName( fileName );
+   return Torque::FileSystem::isWriteableFileName( fileName );
 }
 
 DefineEngineFunction(startFileChangeNotifications, void, (),,
@@ -706,7 +709,7 @@ DefineEngineFunction(startFileChangeNotifications, void, (),,
    "@see stopFileChangeNotifications()\n"
 	"@ingroup FileSystem")
 {
-   fileSystemFunctions::startFileChangeNotifications();
+   Torque::FileSystem::startFileChangeNotifications();
 }
 
 DefineEngineFunction(stopFileChangeNotifications, void, (),,
@@ -715,7 +718,7 @@ DefineEngineFunction(stopFileChangeNotifications, void, (),,
    "@see startFileChangeNotifications()\n"
 	"@ingroup FileSystem")
 {
-   fileSystemFunctions::stopFileChangeNotifications();
+   Torque::FileSystem::stopFileChangeNotifications();
 }
 
 
@@ -728,7 +731,7 @@ DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), 
 
 	"@ingroup FileSystem")
 {
-  return fileSystemFunctions::getDirectoryList(path, depth);
+  return Torque::FileSystem::getDirectoryList(path, depth);
 }
 
 DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
@@ -739,7 +742,7 @@ DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
 
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileSize(fileName);
+   return Torque::FileSystem::fileSize(fileName);
 }
 
 DefineEngineFunction( fileModifiedTime, String, ( const char* fileName ),,
@@ -749,7 +752,7 @@ DefineEngineFunction( fileModifiedTime, String, ( const char* fileName ),,
 	"@return Formatted string (OS specific) containing modified time, \"9/3/2010 12:33:47 PM\" for example\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileModifiedTime(fileName);
+   return Torque::FileSystem::fileModifiedTime(fileName);
 }
 
 DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
@@ -759,7 +762,7 @@ DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
    "@return Formatted string (OS specific) containing created time, \"9/3/2010 12:33:47 PM\" for example\n"
    "@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileCreatedTime(fileName);
+   return Torque::FileSystem::fileCreatedTime(fileName);
 }
 
 DefineEngineFunction(fileDelete, bool, ( const char* path ),,
@@ -770,7 +773,7 @@ DefineEngineFunction(fileDelete, bool, ( const char* path ),,
 	"@return True if file was successfully deleted\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileDelete(path);
+   return Torque::FileSystem::fileDelete(path);
 }
 
 
@@ -783,7 +786,7 @@ DefineEngineFunction(fileExt, String, ( const char* fileName ),,
 	"@return String containing the extension, such as \".exe\" or \".cs\"\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileExt(fileName);
+   return Torque::FileSystem::fileExt(fileName);
 }
 
 DefineEngineFunction(fileBase, String, ( const char* fileName ),,
@@ -793,7 +796,7 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
    "@return String containing the file name, minus extension and path\n"
    "@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileBase(fileName);
+   return Torque::FileSystem::fileBase(fileName);
 }
 
 DefineEngineFunction(fileName, String, ( const char* fileName ),,
@@ -803,7 +806,7 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
 	"@return String containing the file name, minus the path\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::fileName(fileName);
+   return Torque::FileSystem::fileName(fileName);
 }
 
 DefineEngineFunction(filePath, String, ( const char* fileName ),,
@@ -813,7 +816,7 @@ DefineEngineFunction(filePath, String, ( const char* fileName ),,
 	"@return String containing the path, minus name and extension\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::filePath(fileName);
+   return Torque::FileSystem::filePath(fileName);
 }
 
 DefineEngineFunction(getWorkingDirectory, String, (),,
@@ -822,7 +825,7 @@ DefineEngineFunction(getWorkingDirectory, String, (),,
 	"@return String containing full file path of working directory\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::getWorkingDirectory();
+   return Torque::FileSystem::getWorkingDirectory();
 }
 
 //-----------------------------------------------------------------------------
@@ -840,7 +843,7 @@ DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd )
 	"@return String containing non-relative directory of path\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::makeFullPath(path, cwd);
+   return Torque::FileSystem::makeFullPath(path, cwd);
 }
 
 DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* to ), (""),
@@ -853,7 +856,7 @@ DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* t
 	"@returns String containing relative path\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::makeRelativePath(path, to);
+   return Torque::FileSystem::makeRelativePath(path, to);
 }
 
 DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
@@ -864,7 +867,7 @@ DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
 	"@return String containing concatenated file name and path\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::pathConcat(path, file);
+   return Torque::FileSystem::pathConcat(path, file);
 }
 
 //-----------------------------------------------------------------------------
@@ -875,7 +878,7 @@ DefineEngineFunction(getExecutableName, String, (),,
 	"@return String containing this game's executable name\n"
 	"@ingroup FileSystem")
 {
-   return fileSystemFunctions::getExecutableName();
+   return Torque::FileSystem::getExecutableName();
 }
 
 //-----------------------------------------------------------------------------
@@ -888,7 +891,7 @@ DefineEngineFunction( getMainDotCsDir, String, (),,
    "@return The path to the main game assets.\n\n"
    "@ingroup FileSystem\n")
 {
-   return fileSystemFunctions::getMainDotCsDir();
+   return Torque::FileSystem::getMainDotCsDir();
 }
 
 //-----------------------------------------------------------------------------
