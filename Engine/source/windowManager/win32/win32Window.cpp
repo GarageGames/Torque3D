@@ -138,9 +138,10 @@ const GFXVideoMode & Win32Window::getVideoMode()
 
 void Win32Window::setVideoMode( const GFXVideoMode &mode )
 {
-	bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
+   bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
+   static bool first_load = true;
 
-	if(needCurtain)
+   if(needCurtain)
    {
 		Con::errorf("Win32Window::setVideoMode - invoking curtain");
       mOwningManager->lowerCurtain();
@@ -208,7 +209,10 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 	}
 	else
 	{
-	   ChangeDisplaySettings(NULL, 0);
+	   if (!first_load)
+		  ChangeDisplaySettings(NULL, 0);
+
+	   first_load = false;
 
        // Reset device *first*, so that when we call setSize() and let it
 	   // access the monitor settings, it won't end up with our fullscreen
