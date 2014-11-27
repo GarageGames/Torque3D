@@ -48,6 +48,7 @@ new TerrainMaterial()
    Enabled = "1";
    diffuseSize = "200";
    normalMap = "art/terrains/Example/grass1_n";
+   detailDistance = "1000";
 };
 
 singleton Material(TerrainFX_grass2)
