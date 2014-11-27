@@ -139,12 +139,12 @@ class GuiControl : public SimGroup
               contextMove = BIT( 2 ),                       ///< Option to move the control in the game
               contextWindow = BIT( 3 ),                     ///< Option to change the window settings of the control in the game
               contextAlpha = BIT( 4 ),                      ///< Option to change the alpha of the control in the game
-              contextMouseOverAlpha = BIT( 5 ),				      ///< Option to change the mouseOver alpha the control in the game
+              contextMouseOverAlpha = BIT( 5 ),                  ///< Option to change the mouseOver alpha the control in the game
               contextAlphaFade = BIT( 6 ),                  ///< Option to change the alpha fade the control in the game
               contextFontColor = BIT( 7 ),                  ///< Option to change the font color of the control in the game
-              contextBackgroundColor = BIT( 8 ),			      ///< Option to change the background color of the control in the game
+              contextBackgroundColor = BIT( 8 ),               ///< Option to change the background color of the control in the game
               contextFillColor = BIT( 9 ),                  ///< Option to change the fill color the control in the game
-              contextTexture = BIT( 10 ),					          ///< Option to change the texture of the control in the game
+              contextTexture = BIT( 10 ),                         ///< Option to change the texture of the control in the game
               contextTitle = BIT( 11 ),                     ///< Option to change the title of the control in the game
               contextFontSize = BIT( 12 )                   ///< Option to change the font size of the control in the game
         };
@@ -166,7 +166,7 @@ class GuiControl : public SimGroup
 
       /// Mouse over alpha value assigned to the object.
       F32 mMouseOverAlphaValue;
-	  
+     
       /// Alpha fade time
       S32 mAlphaFadeTime;
 
@@ -252,7 +252,7 @@ class GuiControl : public SimGroup
       // Alpha settings
       static bool _setAlphaValue( void* object, const char* index, const char* data )
       { static_cast< GuiControl* >( object )->setAlphaValue( dAtof(data) ); return false; }
-	  
+     
       static bool _setMouseOverAlphaValue( void* object, const char* index, const char* data )
       { static_cast< GuiControl* >( object )->setMouseOverAlphaValue( dAtof(data) ); return false;}
 
@@ -459,7 +459,7 @@ class GuiControl : public SimGroup
 
       DECLARE_CALLBACK( void, onUnsetContent, ( const char* newContent) );
       DECLARE_CALLBACK( void, onSetContent, ( const char* oldContent) );
-	  DECLARE_CALLBACK( void, onRightMouseUp, ( GuiControl* control ));
+     DECLARE_CALLBACK( void, onRightMouseUp, ( GuiControl* control ));
             
       /// @}
       
@@ -594,23 +594,23 @@ class GuiControl : public SimGroup
       inline const S32        getVertSizing() const { return mVertSizing; }
       
 
-	  ///Set the alpha Value
-	  virtual void setAlphaValue(F32 alpha);
+     ///Set the alpha Value
+     virtual void setAlphaValue(F32 alpha);
 
-	  /// Set mouse over alpha value.
-	  virtual void setMouseOverAlphaValue( F32 alpha );
+     /// Set mouse over alpha value.
+     virtual void setMouseOverAlphaValue( F32 alpha );
 
-	  /// Set alpha fade time.
-	  virtual void setAlphaFadeTime( S32 fadeTime );
+     /// Set alpha fade time.
+     virtual void setAlphaFadeTime( S32 fadeTime );
 
-	  ///Get the alpha value
-	  F32 getAlphaValue() const { return mAlphaValue; }
+     ///Get the alpha value
+     F32 getAlphaValue() const { return mAlphaValue; }
 
-	  ///Get the mouse over alpha value
-	  F32 getMouseOverAlphaValue() const { return mMouseOverAlphaValue; }
+     ///Get the mouse over alpha value
+     F32 getMouseOverAlphaValue() const { return mMouseOverAlphaValue; }
 
-	  /// Get alpha fade time.
-	  S32 getAlphaFadeTime() const { return mAlphaFadeTime; }
+     /// Get alpha fade time.
+     S32 getAlphaFadeTime() const { return mAlphaFadeTime; }
 
       /// @}
       
@@ -641,24 +641,24 @@ class GuiControl : public SimGroup
         void setShowContextWindowSettings( bool showSettings) 
         { 
               if(showSettings) 
-			  {
+           {
                     mContextFlag.set( contextWindow ); 
-			  }
+           }
               else
-			  {
+           {
                     mContextFlag.clear( contextWindow ); 
-					mContextFlag.clear( contextAlpha );
-					mContextFlag.clear( contextAlphaFade );
-					mContextFlag.clear( contextMouseOverAlpha );
-					if( Sim::findObject( "GuiEditorInspectFields" ) )
-						Con::evaluate( "GuiEditorInspectFields.refresh();");
-			  }
+               mContextFlag.clear( contextAlpha );
+               mContextFlag.clear( contextAlphaFade );
+               mContextFlag.clear( contextMouseOverAlpha );
+               if( Sim::findObject( "GuiEditorInspectFields" ) )
+                  Con::evaluate( "GuiEditorInspectFields.refresh();");
+           }
         }
 
         bool isContextAlphaEnabled() const { return mContextFlag.test( contextAlpha ); }
         void setContextAlpha( bool alpha)
         { 
-			if(alpha && mContextFlag.test( contextWindow )) 
+         if(alpha && mContextFlag.test( contextWindow )) 
                     mContextFlag.set( contextAlpha ); 
               else 
                     mContextFlag.clear( contextAlpha ); 
@@ -707,14 +707,14 @@ class GuiControl : public SimGroup
                   mContextFlag.clear( contextFillColor ); 
         }
 
-		bool canChangeContextFontSize() const { return mContextFlag.test( contextFontSize ); }
-		void setContextFontSize( bool fontSize )
-		{
-			if( fontSize )
-				mContextFlag.set( contextFontSize );
-			else
-				mContextFlag.clear( contextFontSize );
-		}
+      bool canChangeContextFontSize() const { return mContextFlag.test( contextFontSize ); }
+      void setContextFontSize( bool fontSize )
+      {
+         if( fontSize )
+            mContextFlag.set( contextFontSize );
+         else
+            mContextFlag.clear( contextFontSize );
+      }
 
         /// Context Options end
 
@@ -1168,7 +1168,7 @@ class GuiControl : public SimGroup
       
       /// Called if this object is a dialog, when it is removed from the visible layers
       virtual void onDialogPop();
-	  virtual void refresh() {};
+     virtual void refresh() {};
       /// @}
       
       /// Renders justified text using the profile.

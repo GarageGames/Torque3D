@@ -177,23 +177,23 @@ IMPLEMENT_SCOPE( GuiAPI, Gui,, "" );
 ImplementEnumType( GuiHorizontalSizing,
    "Horizontal sizing behavior of a GuiControl.\n\n"
    "@ingroup GuiCore" )
-	{ GuiControl::horizResizeRight,           "right"     },
-	{ GuiControl::horizResizeWidth,           "width"     },
-	{ GuiControl::horizResizeLeft,            "left"      },
+   { GuiControl::horizResizeRight,           "right"     },
+   { GuiControl::horizResizeWidth,           "width"     },
+   { GuiControl::horizResizeLeft,            "left"      },
    { GuiControl::horizResizeCenter,          "center"    },
    { GuiControl::horizResizeRelative,        "relative"  },
-	{ GuiControl::horizResizeWindowRelative,  "windowRelative"  }
+   { GuiControl::horizResizeWindowRelative,  "windowRelative"  }
 EndImplementEnumType;
 
 ImplementEnumType( GuiVerticalSizing,
    "Vertical sizing behavior of a GuiControl.\n\n"
    "@ingroup GuiCore" )
-	{ GuiControl::vertResizeBottom,           "bottom"     },
-	{ GuiControl::vertResizeHeight,           "height"     },
-	{ GuiControl::vertResizeTop,              "top"        },
+   { GuiControl::vertResizeBottom,           "bottom"     },
+   { GuiControl::vertResizeHeight,           "height"     },
+   { GuiControl::vertResizeTop,              "top"        },
    { GuiControl::vertResizeCenter,           "center"     },
    { GuiControl::vertResizeRelative,         "relative"   },
-	{ GuiControl::vertResizeWindowRelative,   "windowRelative"   }
+   { GuiControl::vertResizeWindowRelative,   "windowRelative"   }
 EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
@@ -287,7 +287,7 @@ void GuiControl::consoleInit()
    Con::addVariable( "$ThisControl", TYPEID< GuiControl >(), &smThisControl,
       "The control for which a command is currently being evaluated.  Only set during 'command' "
       "and altCommand callbacks to the control for which the command or altCommand is invoked.\n"
-	  "@ingroup GuiCore");
+     "@ingroup GuiCore");
 }
 
 //-----------------------------------------------------------------------------
@@ -325,8 +325,8 @@ void GuiControl::initPersistFields()
      addField("backgroundColor", TypeColorI, Offset(mControlBackgroundColor, GuiControl), 
         "The background color for the control" );
 
-	 addField( "controlFontSize", TypeS32, Offset(mControlFontSize, GuiControl),
-		  "Changes the font size of the control." );
+    addField( "controlFontSize", TypeS32, Offset(mControlFontSize, GuiControl),
+        "Changes the font size of the control." );
       addProtectedField( "visible", TypeBool,         Offset(mVisible, GuiControl), &_setVisible, &defaultProtectedGetFn,
          "Whether the control is visible or hidden." );
       addProtectedField( "active",  TypeBool,         Offset( mActive, GuiControl ), &_setActive, &defaultProtectedGetFn,
@@ -348,7 +348,7 @@ void GuiControl::initPersistFields()
       addField("accelerator",       TypeString,       Offset(mAcceleratorKey, GuiControl),
          "Key combination that triggers the control's primary action when the control is on the canvas." );
 
-   endGroup( "Control" );	
+   endGroup( "Control" );   
    
    addGroup( "ToolTip" );
       addProtectedField("tooltipProfile", TYPEID< GuiControlProfile >(), Offset(mTooltipProfile, GuiControl), &setTooltipProfileProt, &defaultProtectedGetFn,
@@ -362,15 +362,15 @@ void GuiControl::initPersistFields()
    addGroup( "Editing" );
       addField("isContainer",       TypeBool,      Offset(mIsContainer, GuiControl),
          "If true, the control may contain child controls." );
-	  addProtectedField( "alphaValue", TypeF32, Offset( mAlphaValue, GuiControl ),
-		  &_setAlphaValue, &defaultProtectedGetFn,
-		 "Sets the alpha value of the object.");
-	  addProtectedField( "mouseOverAlphaValue", TypeF32, Offset( mMouseOverAlphaValue, GuiControl ),
-		  &_setMouseOverAlphaValue, &defaultProtectedGetFn,
-		 "Sets the alpha value of the object.");
-	  addProtectedField( "alphaFadeTime", TypeS32, Offset( mAlphaFadeTime, GuiControl ),
-		  &_setAlphaFadeTime, &defaultProtectedGetFn,
-		  "Sets the alpha fade time of the object.");
+     addProtectedField( "alphaValue", TypeF32, Offset( mAlphaValue, GuiControl ),
+        &_setAlphaValue, &defaultProtectedGetFn,
+       "Sets the alpha value of the object.");
+     addProtectedField( "mouseOverAlphaValue", TypeF32, Offset( mMouseOverAlphaValue, GuiControl ),
+        &_setMouseOverAlphaValue, &defaultProtectedGetFn,
+       "Sets the alpha value of the object.");
+     addProtectedField( "alphaFadeTime", TypeS32, Offset( mAlphaFadeTime, GuiControl ),
+        &_setAlphaFadeTime, &defaultProtectedGetFn,
+        "Sets the alpha fade time of the object.");
    endGroup( "Editing" );
 
    addGroup( "Localization" );
@@ -394,11 +394,11 @@ void GuiControl::initPersistFields()
 
       addProtectedField("alpha", TypeBool, NULL,
          &_setContextAlpha, &_getContextAlpha,
-		 "Allows the user to move the control in the game." );
+       "Allows the user to move the control in the game." );
 
       addProtectedField("mouseOverAlpha", TypeBool, NULL,
          &_setContextMouseOverAlpha, &_getContextMouseOverAlpha,
-		 "Allows the user to move the control in the game.");
+       "Allows the user to move the control in the game.");
 
       addProtectedField("alphaFade", TypeBool, NULL,
          &_setContextAlphaFade, &_getContextAlphaFade,
@@ -416,7 +416,7 @@ void GuiControl::initPersistFields()
          &_setContextFillColor, &_getContextFillColor,
          "Allows the user to change the fill/body color of the control in the game." );
 
-	  addProtectedField("contextFontSize", TypeBool, NULL,
+     addProtectedField("contextFontSize", TypeBool, NULL,
          &_setContextFontSize, &_getContextFontSize,
          "Allows the user to change the font size of the control in the game." );
 
@@ -462,57 +462,57 @@ bool GuiControl::processArguments(S32 argc, ConsoleValueRef *argv)
 
 void GuiControl::onStaticModified( const char *slotName, const char *newValue )
 {
-	if( !dStricmp( slotName, "controlFontSize" ) )
-	{
-		S32 value = dAtoi(newValue);
-		if( value != -1)
-			setControlFontSize( value );
-	}
+   if( !dStricmp( slotName, "controlFontSize" ) )
+   {
+      S32 value = dAtoi(newValue);
+      if( value != -1)
+         setControlFontSize( value );
+   }
    if( !dStricmp( slotName, "controlFontColor") || !dStricmp( slotName, "controlFillColor" ) || !dStricmp( slotName, "backgroundColor" ))
    {
 #if defined _WIN32
-	    // make VS compiler happy
-		char *value = _strdup(newValue);
+       // make VS compiler happy
+      char *value = _strdup(newValue);
 #else
         char *value = strdup(newValue);
 #endif
-		ColorI color(1, 0, 0, 1);
-		dSscanf( value, "%d %d %d %d", &color.red, &color.green, &color.blue, &color.alpha );
+      ColorI color(1, 0, 0, 1);
+      dSscanf( value, "%d %d %d %d", &color.red, &color.green, &color.blue, &color.alpha );
 
-		if( !dStricmp( slotName, "controlFontColor" ) )
-		{
-			if( color != ColorI::ZERO )
-				setControlFontColor( color );
-		}
-		else if( !dStricmp( slotName, "controlFillColor" ) )
-		{
-			if( color != ColorI::ZERO )
-			{
-				AssertWarn( mProfile->mOpaque || mProfile->mTextureObject, "Control Fill Color:: Cannot apply color to transparent objects. " );
-				if( !mProfile->mOpaque && !mProfile->mTextureObject )
-				{
-					Con::evaluate( "GuiEditorStatusBar.print( \"Warning:: Cannot apply fill color to transparent objects.\" );");
-					return;
-				}
-				
-			}
-			setControlFillColor( color );
-			
-		}
-		else
-		{
-			if( color != ColorI::WHITE )
-			{
-				AssertWarn( mProfile->mOpaque || mProfile->mTextureObject, "Control Background Color:: Cannot apply background color to transparent objects.");
-				if( !mProfile->mOpaque && !mProfile->mTextureObject )
-				{
-					Con::evaluate( "GuiEditorStatusBar.print( \"Warning:: Cannot apply background color to transparent objects..\" );");
-					return;
-				}
-			}
+      if( !dStricmp( slotName, "controlFontColor" ) )
+      {
+         if( color != ColorI::ZERO )
+            setControlFontColor( color );
+      }
+      else if( !dStricmp( slotName, "controlFillColor" ) )
+      {
+         if( color != ColorI::ZERO )
+         {
+            AssertWarn( mProfile->mOpaque || mProfile->mTextureObject, "Control Fill Color:: Cannot apply color to transparent objects. " );
+            if( !mProfile->mOpaque && !mProfile->mTextureObject )
+            {
+               Con::evaluate( "GuiEditorStatusBar.print( \"Warning:: Cannot apply fill color to transparent objects.\" );");
+               return;
+            }
+            
+         }
+         setControlFillColor( color );
+         
+      }
+      else
+      {
+         if( color != ColorI::WHITE )
+         {
+            AssertWarn( mProfile->mOpaque || mProfile->mTextureObject, "Control Background Color:: Cannot apply background color to transparent objects.");
+            if( !mProfile->mOpaque && !mProfile->mTextureObject )
+            {
+               Con::evaluate( "GuiEditorStatusBar.print( \"Warning:: Cannot apply background color to transparent objects..\" );");
+               return;
+            }
+         }
 
-			setControlBackgroundColor( color );
-		}
+         setControlBackgroundColor( color );
+      }
    }
    
 }
@@ -616,9 +616,9 @@ void GuiControl::applyProfileSettings()
 
    if( mFontSizeChanged )
    {
-	   mProfile->mFontSize = mControlFontSize;
-	   mProfile->mFont = NULL;
-	   mProfile->loadFont();
+      mProfile->mFontSize = mControlFontSize;
+      mProfile->mFont = NULL;
+      mProfile->loadFont();
    }
 
    /// Update the render alpha for the control.
@@ -636,10 +636,10 @@ void GuiControl::applyProfileSettings()
 
    if( mTextureChanged )
    {
-	   mProfile->mTextureObject = NULL;
-	   mProfile->setBitmapHandle(mTextureObject);
-	   mProfile->mBitmapArrayRects.clear();
-	   mProfile->constructBitmapArray();
+      mProfile->mTextureObject = NULL;
+      mProfile->setBitmapHandle(mTextureObject);
+      mProfile->mBitmapArrayRects.clear();
+      mProfile->constructBitmapArray();
    }
 
    mProfileSettingsReset = false;
@@ -647,7 +647,7 @@ void GuiControl::applyProfileSettings()
 
 void GuiControl::setCur()
 {
-	GuiCanvas *pRoot = getRoot();
+   GuiCanvas *pRoot = getRoot();
    if( !pRoot )
       return;
    PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
@@ -665,7 +665,7 @@ void GuiControl::setCur()
 
 void GuiControl::resetCur()
 {
-	GuiCanvas *pRoot = getRoot();
+   GuiCanvas *pRoot = getRoot();
    if( !pRoot )
       return;
    PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
@@ -825,12 +825,12 @@ void GuiControl::renderChildControls(Point2I offset, const RectI &updateRect)
          {
             GFX->setClipRect( childClip );
             GFX->setStateBlock(mDefaultGuiSB);
-			   if( !ctrl->mProfileSettingsCopied )
-				  ctrl->copyProfileSettings();
-			   ctrl->applyProfileSettings();
+            if( !ctrl->mProfileSettingsCopied )
+              ctrl->copyProfileSettings();
+            ctrl->applyProfileSettings();
             ctrl->onRender(childPosition, childClip);
-			   if( !ctrl->mProfileSettingsReset )
-				  ctrl->resetProfileSettings();
+            if( !ctrl->mProfileSettingsReset )
+              ctrl->resetProfileSettings();
          }
       }
    }
@@ -1165,7 +1165,7 @@ void GuiControl::onGroupRemove()
 
 bool GuiControl::onInputEvent(const InputEventInfo &event)
 {
-	// Do nothing by default...
+   // Do nothing by default...
    return( false );
 }
 
@@ -1213,8 +1213,8 @@ void GuiControl::onMouseUp(const GuiEvent &event)
 
 void GuiControl::onMouseDown(const GuiEvent &event)
 {
-	if (getRoot()->isPopupShown() )
-		return;
+   if (getRoot()->isPopupShown() )
+      return;
    mMouseDownPosition = event.mousePoint;
    mOrigBounds = getBounds();
 
@@ -1222,10 +1222,10 @@ void GuiControl::onMouseDown(const GuiEvent &event)
 
    if(mMoving)
       mouseLock();
-	if ( !mVisible || !mAwake )
+   if ( !mVisible || !mAwake )
       return;
-	
-	execConsoleCallback();
+   
+   execConsoleCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -1272,7 +1272,7 @@ void GuiControl::onMouseDragged(const GuiEvent &event)
 
 void GuiControl::onMouseEnter(const GuiEvent &event)
 {
-		fadeControl();
+      fadeControl();
 }
 
 //-----------------------------------------------------------------------------
@@ -1526,8 +1526,8 @@ void GuiControl::inspectPostApply()
 
 void GuiControl::setSizing(S32 horz, S32 vert)
 {
-	mHorizSizing = horz;
-	mVertSizing = vert;
+   mHorizSizing = horz;
+   mVertSizing = vert;
 }
 
 //-----------------------------------------------------------------------------
@@ -1577,7 +1577,7 @@ bool GuiControl::resize(const Point2I &newPosition, const Point2I &newExtent)
          parent->childResized(this);
       setUpdate();
 
-	  return true; 
+     return true; 
    }
 
    // Note : We treat a repositioning as no sizing happening
@@ -1650,14 +1650,14 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
    Point2I newPosition = getPosition();
    Point2I newExtent = getExtent();
 
-	S32 deltaX = newParentRect.extent.x - oldParentRect.extent.x;
- 	S32 deltaY = newParentRect.extent.y - oldParentRect.extent.y;
+   S32 deltaX = newParentRect.extent.x - oldParentRect.extent.x;
+    S32 deltaY = newParentRect.extent.y - oldParentRect.extent.y;
 
-	if (mHorizSizing == horizResizeCenter)
-	   newPosition.x = (newParentRect.extent.x - getWidth()) >> 1;
-	else if (mHorizSizing == horizResizeWidth)
-		newExtent.x += deltaX;
-	else if (mHorizSizing == horizResizeLeft)
+   if (mHorizSizing == horizResizeCenter)
+      newPosition.x = (newParentRect.extent.x - getWidth()) >> 1;
+   else if (mHorizSizing == horizResizeWidth)
+      newExtent.x += deltaX;
+   else if (mHorizSizing == horizResizeLeft)
       newPosition.x += deltaX;
    else if (mHorizSizing == horizResizeRelative && oldParentRect.extent.x != 0)
    {
@@ -1668,11 +1668,11 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
       newExtent.x = newWidth;
    }
 
-	if (mVertSizing == vertResizeCenter)
-	   newPosition.y = (newParentRect.extent.y - getHeight()) >> 1;
-	else if (mVertSizing == vertResizeHeight)
-		newExtent.y += deltaY;
-	else if (mVertSizing == vertResizeTop)
+   if (mVertSizing == vertResizeCenter)
+      newPosition.y = (newParentRect.extent.y - getHeight()) >> 1;
+   else if (mVertSizing == vertResizeHeight)
+      newExtent.y += deltaY;
+   else if (mVertSizing == vertResizeTop)
       newPosition.y += deltaY;
    else if(mVertSizing == vertResizeRelative && oldParentRect.extent.y != 0)
    {
@@ -1935,11 +1935,11 @@ void GuiControl::setProfileAlpha(F32 mAlphaValue)
          ctrl->copyProfileSettings();
       if(ctrl->mParentAlphaValue != mAlphaValue)
       {
-		  ctrl->mRenderAlpha = mAlphaValue;
-		  if( mAlphaValue == 1 )
-			ctrl->mRenderAlphaSet = false;
-		  else
-			  ctrl->mRenderAlphaSet = true;
+        ctrl->mRenderAlpha = mAlphaValue;
+        if( mAlphaValue == 1 )
+         ctrl->mRenderAlphaSet = false;
+        else
+           ctrl->mRenderAlphaSet = true;
          ctrl->mParentAlphaValue = mAlphaValue;
       }
    }
@@ -1949,34 +1949,34 @@ void GuiControl::setProfileAlpha(F32 mAlphaValue)
 
 void GuiControl::resetProfileSettings()
 {
-	if( mProfileSettingsCopied )
-	{
-	   mProfile->mFillColor = mFillColorCopy;
-	   mProfile->mFillColorHL = mFillColorHLCopy ;
-	   mProfile->mFillColorNA = mFillColorNACopy ;
-	   mProfile->mFillColorSEL = mFillColorSELCopy ;
-	   mProfile->mBorderColor = mBorderColorCopy ;
-	   mProfile->mBorderColorHL = mBorderColorHLCopy ;
-	   mProfile->mBorderColorNA = mBorderColorNACopy ;
-	   mProfile->mFontColor = mFontColorCopy ;
-	   mProfile->mFontColorHL = mFontColorHLCopy ;
-	   mProfile->mFontColorNA = mFontColorNACopy ;
-	   mProfile->mFontColorSEL = mFontColorSELCopy ;
-	}
+   if( mProfileSettingsCopied )
+   {
+      mProfile->mFillColor = mFillColorCopy;
+      mProfile->mFillColorHL = mFillColorHLCopy ;
+      mProfile->mFillColorNA = mFillColorNACopy ;
+      mProfile->mFillColorSEL = mFillColorSELCopy ;
+      mProfile->mBorderColor = mBorderColorCopy ;
+      mProfile->mBorderColorHL = mBorderColorHLCopy ;
+      mProfile->mBorderColorNA = mBorderColorNACopy ;
+      mProfile->mFontColor = mFontColorCopy ;
+      mProfile->mFontColorHL = mFontColorHLCopy ;
+      mProfile->mFontColorNA = mFontColorNACopy ;
+      mProfile->mFontColorSEL = mFontColorSELCopy ;
+   }
 
    if( mTextureChanged )
    {
-	   mProfile->mTextureObject = NULL;
-	   mProfile->setBitmapHandle(mTextureObjectCopy);
-	   mProfile->mBitmapArrayRects.clear();
-	   mProfile->constructBitmapArray();
+      mProfile->mTextureObject = NULL;
+      mProfile->setBitmapHandle(mTextureObjectCopy);
+      mProfile->mBitmapArrayRects.clear();
+      mProfile->constructBitmapArray();
    }
 
    if( mFontSizeChanged )
    {
-	   mProfile->mFontSize = mFontSizeCopy;
-	   mProfile->mFont = NULL;
-	   mProfile->loadFont();
+      mProfile->mFontSize = mFontSizeCopy;
+      mProfile->mFont = NULL;
+      mProfile->loadFont();
    }
 
    GFX->getDrawUtil()->clearBitmapModulation();   
@@ -1990,16 +1990,16 @@ void GuiControl::setControlColor( const char* colorName, ColorI color)
 {
    if( !dStricmp(colorName, "fontColor") )
    {
-	   if( color == ColorI::ZERO)
+      if( color == ColorI::ZERO)
       {
-		  resetFontColor();
-		  iterator l;
-		  for(l = begin(); l != end(); l++)
-		  {
-				GuiControl *ctrl= static_cast< GuiControl *>(*l);
-				ctrl->setControlColor( "fontColor", color );
-		  }
-		  return;
+        resetFontColor();
+        iterator l;
+        for(l = begin(); l != end(); l++)
+        {
+            GuiControl *ctrl= static_cast< GuiControl *>(*l);
+            ctrl->setControlColor( "fontColor", color );
+        }
+        return;
       }
 
       mProfile->mFontColor = color;
@@ -2011,15 +2011,15 @@ void GuiControl::setControlColor( const char* colorName, ColorI color)
       iterator l;
       for(l = begin(); l != end(); l++)
       {
-		  GuiControl *ctrl = static_cast< GuiControl *>(*l);
-		  if( !ctrl->mProfileSettingsCopied)
-			  ctrl->copyProfileSettings();
-		  if(ctrl->mParentFontColor != color)
-		  {
-			  ctrl->setControlFontColor(color);
-			  ctrl->mParentFontColor = color;
-		  }
-	  }
+        GuiControl *ctrl = static_cast< GuiControl *>(*l);
+        if( !ctrl->mProfileSettingsCopied)
+           ctrl->copyProfileSettings();
+        if(ctrl->mParentFontColor != color)
+        {
+           ctrl->setControlFontColor(color);
+           ctrl->mParentFontColor = color;
+        }
+     }
    }
    else if( !dStricmp(colorName, "fillColor") )
    {
@@ -2034,12 +2034,12 @@ void GuiControl::setControlColor( const char* colorName, ColorI color)
 
 void GuiControl::resetFontColor()
 {
-	mProfile->mFontColor = mFontColorCopy;
+   mProfile->mFontColor = mFontColorCopy;
     mProfile->mFontColorHL = mFillColorHLCopy;
     mProfile->mFontColorNA = mFontColorNACopy;
     mProfile->mFontColorSEL = mFontColorSELCopy;
-	mControlFontColor = ColorI::ZERO;
-	mFontColorChanged = false;
+   mControlFontColor = ColorI::ZERO;
+   mFontColorChanged = false;
 }
 //-----------------------------------------------------------------------------
 
@@ -2066,9 +2066,9 @@ void GuiControl::setControlFillColor(ColorI fillColor)
    AssertFatal( fillColor, "GuiControl::setContextControlFillColor: invalid fill color" );
    mControlFillColor = fillColor;
    if( fillColor == ColorI::ZERO )
-		mFillColorChanged = false;
+      mFillColorChanged = false;
    else
-	   mFillColorChanged = true;
+      mFillColorChanged = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -2144,7 +2144,7 @@ void GuiControl::copyProfileSettings( )
    /// Font size copied for reset
    mFontSizeCopy = mProfile->mFontSize;
    if( mProfile->mFontSize > 0 )
-	   mControlFontSize = mProfile->mFontSize;
+      mControlFontSize = mProfile->mFontSize;
 
    mProfileSettingsCopied = true;
 }
@@ -2153,13 +2153,13 @@ void GuiControl::copyProfileSettings( )
 
 bool GuiControl::transparentControlCheck()
 {
-	if( mProfile )
-		if( !mProfile->mOpaque && !mProfile->mTextureObject)
-		{
-			Platform::AlertOK( "Transparent Error", "Cannot apply color to transparent objects.");
-			return true;
-		}
-	return false;
+   if( mProfile )
+      if( !mProfile->mOpaque && !mProfile->mTextureObject)
+      {
+         Platform::AlertOK( "Transparent Error", "Cannot apply color to transparent objects.");
+         return true;
+      }
+   return false;
 }
 
 void GuiControl::setConsoleVariable(const char *variable)
@@ -2185,7 +2185,7 @@ void GuiControl::setConsoleCommand( const String& newCmd )
 
 const char * GuiControl::getConsoleCommand()
 {
-	return mConsoleCommand;
+   return mConsoleCommand;
 }
 
 //-----------------------------------------------------------------------------
@@ -2243,7 +2243,7 @@ F32 GuiControl::getFloatVariable()
 
 void GuiControl::setVisible(bool value)
 {
-	mVisible = value;
+   mVisible = value;
 
    setUpdate();
 
@@ -2251,12 +2251,12 @@ void GuiControl::setVisible(bool value)
    {
       GuiControl *ctrl = static_cast<GuiControl *>(*i);
       ctrl->clearFirstResponder();
-	}
+   }
 
-	GuiControl *parent = getParent();
-	if( parent )
+   GuiControl *parent = getParent();
+   if( parent )
    {
-	   parent->childResized( this );
+      parent->childResized( this );
       
       // If parent is visible and awake and this control has just
       // become visible but was sleeping, wake it up now.
@@ -2324,7 +2324,7 @@ bool GuiControl::getCanSaveParent()
 void GuiControl::write(Stream &stream, U32 tabStop, U32 flags)
 {
    //note: this will return false if either we, or any of our parents, are non-save controls
-   bool bCanSave	= ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
+   bool bCanSave   = ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
    StringTableEntry steName = mAddGroup->getInternalName();
    if(bCanSave && mAddGroup && (steName != NULL) && (steName != StringTable->insert("null")) && getName() )
    {
@@ -2402,7 +2402,7 @@ void GuiControl::addObject(SimObject *object)
 
    AssertFatal( ctrl, "GuiControl::addObject() - cannot add non-GuiControl as child of GuiControl" );
 
-	Parent::addObject(object);
+   Parent::addObject(object);
 
    AssertFatal(!ctrl->isAwake(), "GuiControl::addObject: object is already awake before add");
    if( mAwake )
@@ -2431,8 +2431,8 @@ void GuiControl::removeObject(SimObject *object)
 
 GuiControl *GuiControl::getParent()
 {
-	SimObject *obj = getGroup();
-	if (GuiControl* gui = dynamic_cast<GuiControl*>(obj))
+   SimObject *obj = getGroup();
+   if (GuiControl* gui = dynamic_cast<GuiControl*>(obj))
       return gui;
    return 0;
 }
@@ -2442,7 +2442,7 @@ GuiControl *GuiControl::getParent()
 GuiCanvas *GuiControl::getRoot()
 {
    GuiControl *root = NULL;
-	GuiControl *parent = getParent();
+   GuiControl *parent = getParent();
    while (parent)
    {
       root = parent;
@@ -2760,12 +2760,12 @@ void GuiControl::setFirstResponder( GuiControl* firstResponder )
 
 void GuiControl::setFirstResponder()
 {
-	if( mAwake && mVisible )
-	{
-	   GuiControl *parent = getParent();
-	   if ( mProfile->mCanKeyFocus == true && parent != NULL )
+   if( mAwake && mVisible )
+   {
+      GuiControl *parent = getParent();
+      if ( mProfile->mCanKeyFocus == true && parent != NULL )
          parent->setFirstResponder( this );
-	}
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -2787,8 +2787,8 @@ void GuiControl::clearFirstResponder()
 
 void GuiControl::onLoseFirstResponder()
 {
-	// Since many controls have visual cues when they are the firstResponder...
-	setUpdate();
+   // Since many controls have visual cues when they are the firstResponder...
+   setUpdate();
 
    onLoseFirstResponder_callback(getId());
 }
@@ -2906,31 +2906,31 @@ bool GuiControl::getControlLock()
 
 LangTable * GuiControl::getGUILangTable()
 {
-	if(mLangTable)
-		return mLangTable;
+   if(mLangTable)
+      return mLangTable;
 
-	if(mLangTableName && *mLangTableName)
-	{
-		mLangTable = (LangTable *)getModLangTable((const UTF8*)mLangTableName);
-		return mLangTable;
-	}
+   if(mLangTableName && *mLangTableName)
+   {
+      mLangTable = (LangTable *)getModLangTable((const UTF8*)mLangTableName);
+      return mLangTable;
+   }
 
-	GuiControl *parent = getParent();
-	if(parent)
-		return parent->getGUILangTable();
+   GuiControl *parent = getParent();
+   if(parent)
+      return parent->getGUILangTable();
 
-	return NULL;
+   return NULL;
 }
 
 //-----------------------------------------------------------------------------
 
 const UTF8 * GuiControl::getGUIString(S32 id)
 {
-	LangTable *lt = getGUILangTable();
-	if(lt)
-		return lt->getString(id);
+   LangTable *lt = getGUILangTable();
+   if(lt)
+      return lt->getString(id);
 
-	return NULL;
+   return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -2952,9 +2952,9 @@ void GuiControl::messageSiblings(S32 message)
 
 void GuiControl::getScrollLineSizes(U32 *rowHeight, U32 *columnWidth)
 {
-	// default to 10 pixels in y, 30 pixels in x
-	*columnWidth = 30;
-	*rowHeight = 30;
+   // default to 10 pixels in y, 30 pixels in x
+   *columnWidth = 30;
+   *rowHeight = 30;
 }
 
 //-----------------------------------------------------------------------------
@@ -3064,21 +3064,21 @@ const char* GuiControl::execAltConsoleCallback()
 
 void GuiControl::setAlphaValue( F32 alpha )
 {
-	mAlphaValue = alpha;
+   mAlphaValue = alpha;
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiControl::setMouseOverAlphaValue( F32 alpha )
 {
-	mMouseOverAlphaValue = alpha;
+   mMouseOverAlphaValue = alpha;
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiControl::setAlphaFadeTime( S32 fadeTime )
 {
-	mAlphaFadeTime = fadeTime;
+   mAlphaFadeTime = fadeTime;
 }
 
 //-----------------------------------------------------------------------------
@@ -3087,11 +3087,11 @@ void GuiControl::setControlTexture(String fileName)
 {
    if(fileName.isNotEmpty())
    {
-	   char texturePath[1024];
-	   Platform::makeFullPathName( fileName, texturePath, sizeof(texturePath));
-	   mControlTextureFile = texturePath;
-	   mTextureObject = GFXTexHandle(texturePath, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__));   
-	   mTextureChanged = true;
+      char texturePath[1024];
+      Platform::makeFullPathName( fileName, texturePath, sizeof(texturePath));
+      mControlTextureFile = texturePath;
+      mTextureObject = GFXTexHandle(texturePath, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__));   
+      mTextureChanged = true;
    }
 
 }
@@ -3594,7 +3594,7 @@ DefineEngineMethod( GuiControl, setPositionGlobal, void, ( S32 x, S32 y ),,
    "@param y The new Y coordinate of the control relative to the root's upper left corner." )
 {
    //see if we can turn the x/y into ints directly, 
-   Point2I lPosOffset	=	object->globalToLocalCoord( Point2I( x, y ) );
+   Point2I lPosOffset   =   object->globalToLocalCoord( Point2I( x, y ) );
    
    lPosOffset += object->getPosition();
    
@@ -3688,7 +3688,7 @@ DefineEngineMethod( GuiControl, setAlphaValue, void, ( F32 alpha ), ( 1 ),
    "Set the alpha for the object.\n"
    "@param value Range 0, 1 for the transparency." )
 {
-	object->setAlphaValue( alpha );
+   object->setAlphaValue( alpha );
 }
 
 //-----------------------------------------------------------------------------
@@ -3697,7 +3697,7 @@ DefineEngineMethod( GuiControl, setMouseOverAlphaValue, void, ( F32 alpha ), ( 1
    "Set the alpha for the object.\n"
    "@param value Range 0, 1 for the transparency." )
 {
-	object->setMouseOverAlphaValue( alpha );
+   object->setMouseOverAlphaValue( alpha );
 }
 
 //-----------------------------------------------------------------------------
@@ -3706,7 +3706,7 @@ DefineEngineMethod( GuiControl, setAlphaFadeTime, void, ( S32 fadeTime ), ( 1000
    "Set the alpha for the object.\n"
    "@param value Range 0, 1 for the transparency." )
 {
-	object->setAlphaFadeTime( fadeTime );
+   object->setAlphaFadeTime( fadeTime );
 }
 
 //-----------------------------------------------------------------------------
@@ -3714,7 +3714,7 @@ DefineEngineMethod( GuiControl, setAlphaFadeTime, void, ( S32 fadeTime ), ( 1000
 DefineEngineMethod( GuiControl, getAlphaValue, F32, (  ), ,
    "Get the alpha for the object." )
 {
-	return object->getAlphaValue( );
+   return object->getAlphaValue( );
 }
 
 //-----------------------------------------------------------------------------
@@ -3722,7 +3722,7 @@ DefineEngineMethod( GuiControl, getAlphaValue, F32, (  ), ,
 DefineEngineMethod( GuiControl, getMouseOverAlphaValue, F32, (  ), ,
    "Get the mouse over alpha for the object." )
 {
-	return object->getMouseOverAlphaValue( );
+   return object->getMouseOverAlphaValue( );
 }
 
 //-----------------------------------------------------------------------------
@@ -3730,7 +3730,7 @@ DefineEngineMethod( GuiControl, getMouseOverAlphaValue, F32, (  ), ,
 DefineEngineMethod( GuiControl, getAlphaFadeTime, S32, (  ), ,
    "Get the alpha fade time for the object." )
 {
-	return object->getAlphaFadeTime( );
+   return object->getAlphaFadeTime( );
 }
 
 //-----------------------------------------------------------------------------
@@ -3963,39 +3963,39 @@ DefineEngineMethod( GuiControl, setShowContextWindowSettings, void, ( bool lock)
 DefineEngineMethod( GuiControl, transparentControlCheck, bool, (),,
    "Returns true if the control is transparent." )
 {
-	return object->transparentControlCheck();
+   return object->transparentControlCheck();
 }
 
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, setControlFontSize, void, ( S32 fontSize ), ,
-	"Sets the font size of a control." )
+   "Sets the font size of a control." )
 {
-	object->setControlFontSize( fontSize );
+   object->setControlFontSize( fontSize );
 }
 
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, getControlFontSize, S32, ( ), ,
-	"Sets the font size of a control." )
+   "Sets the font size of a control." )
 {
-	return object->getControlFontSize( );
+   return object->getControlFontSize( );
 }
 
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, setContextFontSize, void, ( bool fontSize ), ,
-	"Displays the option to set the font size of the control in the game when true." )
+   "Displays the option to set the font size of the control in the game when true." )
 {
-	object->setContextFontSize( fontSize );
+   object->setContextFontSize( fontSize );
 }
 
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, canChangeContextFontSize, bool, ( ), ,
-	"Returns if the control's font size can be changed in the game or not." )
+   "Returns if the control's font size can be changed in the game or not." )
 {
-	return object->canChangeContextFontSize( );
+   return object->canChangeContextFontSize( );
 }
 
 DefineEngineMethod( GuiControl, refresh, void, (),,
@@ -4003,995 +4003,3 @@ DefineEngineMethod( GuiControl, refresh, void, (),,
 {
    object->refresh();
 }
-// @Copyright end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//---------------DNTC AUTO-GENERATED---------------//
-#include <vector>
-
-#include <string>
-
-#include "core/strings/stringFunctions.h"
-
-//---------------DO NOT MODIFY CODE BELOW----------//
-
-extern "C" __declspec(dllexport) void  __cdecl wle_fn_GuiControl_getBounds(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-RectI wle_returnObject;
-{
-   {wle_returnObject =object->getBounds();
-dSprintf(retval,1024,"%d %d %d %d ",wle_returnObject.point.x,wle_returnObject.point.y,wle_returnObject.extent.x,wle_returnObject.extent.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fn_GuiControl_getValue(char * x__object,  char* retval)
-{
-dSprintf(retval,16384,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-const char* wle_returnObject;
-{
-   {wle_returnObject =object->getScriptValue();
-if (!wle_returnObject) 
-return;
-dSprintf(retval,16384,"%s",wle_returnObject);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fn_GuiControl_isActive(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isActive();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fn_GuiControl_makeFirstResponder(char * x__object, bool isFirst)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-      object->makeFirstResponder(isFirst);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fn_GuiControl_setExtent(char * x__object, char * x__ext)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2F ext = Point2F();
-sscanf(x__ext,"%f %f",&ext.x,&ext.y);
-{
-                                 object->setExtent( (S32)ext.x, (S32)ext.y );
-                           }
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_addGuiControl(char * x__object, char * x__control)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-GuiControl* control; Sim::findObject(x__control, control ); 
-{
-   if( control )
-      object->addObject( control );
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_canChangeContextBackColor(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->canChangeContextBackColor();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_canChangeContextFillColor(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->canChangeContextFillColor();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_canChangeContextFontColor(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->canChangeContextFontColor();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_canChangeContextFontSize(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-	{wle_returnObject =object->canChangeContextFontSize( );
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_canShowContextWindowSettings(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->canShowContextWindowSettings();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_clearFirstResponder(char * x__object, bool ignored)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->clearFirstResponder();
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_controlIsChild(char * x__object, char * x__control)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-GuiControl* control; Sim::findObject(x__control, control ); 
-bool wle_returnObject;
-{
-   if( !control )
-      {wle_returnObject =false;
-return (S32)(wle_returnObject);}
-      
-   {wle_returnObject =object->controlIsChild( control );
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_controlIsSibling(char * x__object, char * x__control)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-GuiControl* control; Sim::findObject(x__control, control ); 
-bool wle_returnObject;
-{
-   if( !control )
-      {wle_returnObject =false;
-return (S32)(wle_returnObject);}
-      
-   {wle_returnObject =object->controlIsSibling( control );
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_findHitControl(char * x__object, S32 x, S32 y,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-
-GuiControl* wle_returnObject;
-{
-   {wle_returnObject =object->findHitControl( Point2I( x, y ) );
-if (!wle_returnObject) 
-return;
-dSprintf(retval,1024,"%i",wle_returnObject->getId());
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_findHitControls(char * x__object, S32 x, S32 y, S32 width, S32 height,  char* retval)
-{
-dSprintf(retval,16384,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-
-
-const char* wle_returnObject;
-{
-      
-   RectI bounds( x, y, width, height );
-   Vector< GuiControl* > controls;
-   
-   if( !object->findHitControls( bounds, controls ) )
-      {wle_returnObject ="";
-if (!wle_returnObject) 
-return;
-dSprintf(retval,16384,"%s",wle_returnObject);
-return;
-}
-      
-   
-   bool isFirst = true;
-   StringBuilder str;
-   for( U32 i = 0, num = controls.size(); i < num; ++ i )
-   {
-      if( !isFirst )
-         str.append( ' ' );
-         
-      str.append( controls[ i ]->getIdString() );
-      isFirst = false;
-   }
-   String s = str.end();
-   
-   
-   if ( s.compare( object->getIdString() ) == 0 )
-      {wle_returnObject ="";
-if (!wle_returnObject) 
-return;
-dSprintf(retval,16384,"%s",wle_returnObject);
-return;
-}
-   
-   char* buffer = Con::getReturnBuffer( s.size() );
-   dStrcpy( buffer, s.c_str() );
-   
-   {wle_returnObject =buffer;
-if (!wle_returnObject) 
-return;
-dSprintf(retval,16384,"%s",wle_returnObject);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_getAlphaFadeTime(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	return (S32)( 0);
-{
-	return object->getAlphaFadeTime( );
-};
-}
-extern "C" __declspec(dllexport) F32  __cdecl wle_fnGuiControl_getAlphaValue(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	return (F32)( 0);
-{
-	return object->getAlphaValue( );
-};
-}
-extern "C" __declspec(dllexport) F32  __cdecl wle_fnGuiControl_getAspect(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	return (F32)( 0);
-{
-   const Point2I &ext = object->getExtent();
-  return (F32)( (F32)ext.x / (F32)ext.y);
-};
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getCenter(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   const Point2I pos = object->getPosition();
-   const Point2I ext = object->getExtent();
-   Point2I center( pos.x + ext.x / 2, pos.y + ext.y / 2 );
-   
-   {wle_returnObject =center;
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_getControlFontSize(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	return (S32)( 0);
-{
-	return object->getControlFontSize( );
-};
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_getControlLock(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->getControlLock();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getControlTextureFile(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-String wle_returnObject;
-{
-   {wle_returnObject =object->getControlTextureFile();
-dSprintf(retval,16384,"%s",wle_returnObject.c_str());
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getExtent(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   {wle_returnObject =object->getExtent();
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getFirstResponder(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-GuiControl* wle_returnObject;
-{
-   {wle_returnObject =object->getFirstResponder();
-if (!wle_returnObject) 
-return;
-dSprintf(retval,1024,"%i",wle_returnObject->getId());
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getGlobalCenter(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   const Point2I tl( 0, 0 );
-   Point2I pos = object->localToGlobalCoord( tl );
-   const Point2I ext = object->getExtent();
-   Point2I center( pos.x + ext.x / 2, pos.y + ext.y / 2 );
-   
-   {wle_returnObject =center;
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getGlobalPosition(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   const Point2I pos(0,0);
-   {wle_returnObject =object->localToGlobalCoord(pos);
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getMaxExtent(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   {wle_returnObject =object->getMaxExtent();
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getMinExtent(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   {wle_returnObject =object->getMinExtent();
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) F32  __cdecl wle_fnGuiControl_getMouseOverAlphaValue(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	return (F32)( 0);
-{
-	return object->getMouseOverAlphaValue( );
-};
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getParent(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-GuiControl* wle_returnObject;
-{
-   {wle_returnObject =object->getParent();
-if (!wle_returnObject) 
-return;
-dSprintf(retval,1024,"%i",wle_returnObject->getId());
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getPosition(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-Point2I wle_returnObject;
-{
-   {wle_returnObject =object->getPosition();
-dSprintf(retval,1024,"%i %i ",wle_returnObject.x,wle_returnObject.y);
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getRoot(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-GuiCanvas* wle_returnObject;
-{
-   {wle_returnObject =object->getRoot();
-if (!wle_returnObject) 
-return;
-dSprintf(retval,1024,"%i",wle_returnObject->getId());
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_getRootControl(char * x__object,  char* retval)
-{
-dSprintf(retval,1024,"");
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-GuiControl * wle_returnObject;
-{
-   {wle_returnObject =object->getRootControl();
-if (!wle_returnObject) 
-return;
-dSprintf(retval,1024,"%i",wle_returnObject->getId());
-return;
-}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isAwake(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isAwake();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isContextAlphaEnabled(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isContextAlphaEnabled();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isContextAlphaFadeEnabled(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isContextAlphaFadeEnabled();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isContextLockable(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isContextLockable();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isContextMouseOverAlphaEnabled(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isContextMouseOverAlphaEnabled();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isContextMovable(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isContextMovable();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isFirstResponder(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isFirstResponder();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isMouseLocked(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isMouseLocked();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_isVisible(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-   {wle_returnObject =object->isVisible();
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_pointInControl(char * x__object, S32 x, S32 y)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-
-bool wle_returnObject;
-{
-   {wle_returnObject =object->pointInControl( Point2I( x, y ) );
-return (S32)(wle_returnObject);}
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_refresh(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->refresh();
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_resetCur(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->resetCur();
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_resize(char * x__object, S32 x, S32 y, S32 width, S32 height)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-
-
-{
-   Point2I newPos( x, y );
-   Point2I newExt( width, height );
-   object->resize(newPos, newExt);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setActive(char * x__object, bool state)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setActive( state );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setAlphaFadeTime(char * x__object, S32 fadeTime)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-	object->setAlphaFadeTime( fadeTime );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setAlphaValue(char * x__object, F32 alpha)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-	object->setAlphaValue( alpha );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setCenter(char * x__object, S32 x, S32 y)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-
-{
-   const Point2I ext = object->getExtent();
-   Point2I newpos( x - ext.x / 2, y - ext.y / 2 );
-   object->setPosition( newpos );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextAlpha(char * x__object, bool alpha)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextAlpha(alpha);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextAlphaFade(char * x__object, bool fade)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextAlphaFade(fade);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextBackColor(char * x__object, bool backColor)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextBackColor(backColor);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextFillColor(char * x__object, bool fillColor)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextFillColor(fillColor);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextFontColor(char * x__object, bool fontColor)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextFontColor(fontColor);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextFontSize(char * x__object, bool fontSize)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-	object->setContextFontSize( fontSize );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextLockControl(char * x__object, bool lock)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextLockControl(lock);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextMouseOverAlpha(char * x__object, bool mouseOver)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextMouseOverAlpha(mouseOver);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setContextMoveControl(char * x__object, bool move)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setContextMoveControl(move);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setControlBackgroundColor(char * x__object, char * x__color)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-ColorI color = ColorI();
-{
-int r,g,b,a;
-sscanf(x__color,"%d %d %d %d ",&r,&g,&b,&a);
-color.red =(unsigned short)r;
-color.green=(unsigned short)g;
-color.blue=(unsigned short)b;
-color.alpha=(unsigned short)a;
-}
-{
-   object->setControlBackgroundColor(color);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setControlFillColor(char * x__object, char * x__color)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-ColorI color = ColorI();
-{
-int r,g,b,a;
-sscanf(x__color,"%d %d %d %d ",&r,&g,&b,&a);
-color.red =(unsigned short)r;
-color.green=(unsigned short)g;
-color.blue=(unsigned short)b;
-color.alpha=(unsigned short)a;
-}
-{
-   object->setControlFillColor(color);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setControlFontColor(char * x__object, char * x__color)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-ColorI color = ColorI();
-{
-int r,g,b,a;
-sscanf(x__color,"%d %d %d %d ",&r,&g,&b,&a);
-color.red =(unsigned short)r;
-color.green=(unsigned short)g;
-color.blue=(unsigned short)b;
-color.alpha=(unsigned short)a;
-}
-{
-   object->setControlFontColor(color);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setControlFontSize(char * x__object, S32 fontSize)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-	object->setControlFontSize( fontSize );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setControlLock(char * x__object, bool locked)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setControlLock(locked);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setControlTexture(char * x__object, char * x__fileName)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-String fileName = String( x__fileName);
-{
-   object->setControlTexture(fileName);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setCur(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setCur();
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setFirstResponder(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setFirstResponder();
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setMouseOverAlphaValue(char * x__object, F32 alpha)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-	object->setMouseOverAlphaValue( alpha );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setPosition(char * x__object, S32 x, S32 y)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-
-{
-   object->setPosition( Point2I( x, y ) );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setPositionGlobal(char * x__object, S32 x, S32 y)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-
-{
-      Point2I lPosOffset	=	object->globalToLocalCoord( Point2I( x, y ) );
-   
-   lPosOffset += object->getPosition();
-   
-   object->setPosition( lPosOffset );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setProfile(char * x__object, char * x__profile)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-GuiControlProfile* profile; Sim::findObject(x__profile, profile ); 
-{
-   if( !profile )
-      return;
-      
-   object->setControlProfile( profile );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setShowContextWindowSettings(char * x__object, bool lock)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setShowContextWindowSettings(lock);
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setValue(char * x__object, char * x__value)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-const char* value = (const char*)x__value;
-{
-   object->setScriptValue( value );
-}
-}
-extern "C" __declspec(dllexport) void  __cdecl wle_fnGuiControl_setVisible(char * x__object, bool state)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return;
-{
-   object->setVisible( state );
-}
-}
-extern "C" __declspec(dllexport) S32  __cdecl wle_fnGuiControl_transparentControlCheck(char * x__object)
-{
-GuiControl* object; Sim::findObject(x__object, object ); 
-if (!object)
-	 return 0;
-bool wle_returnObject;
-{
-	{wle_returnObject =object->transparentControlCheck();
-return (S32)(wle_returnObject);}
-}
-}
-//---------------END DNTC AUTO-GENERATED-----------//
-

@@ -193,29 +193,29 @@ protected:
    
    void checkLockMouseMove( const GuiEvent& event );
 
-	
-	String mOverrideMode;
-	Point2I OverridePosition;
+   
+   String mOverrideMode;
+   Point2I OverridePosition;
 public:
-	void onWindowClose();
-	void setOverridePosition(Point2I value)
-		{
-			OverridePosition = value;
-		}
-	Point2I getOverridePosition()
-		{
-			return OverridePosition;
-		}
+   void onWindowClose();
+   void setOverridePosition(Point2I value)
+      {
+         OverridePosition = value;
+      }
+   Point2I getOverridePosition()
+      {
+         return OverridePosition;
+      }
 
-	void setOverrideMode(const char * value)
-	{
-		mOverrideMode = String(StringTable->insert (value));
-	}
+   void setOverrideMode(const char * value)
+   {
+      mOverrideMode = String(StringTable->insert (value));
+   }
 
-	const char* getOverrideMode()
-	{
-		return StringTable->insert(mOverrideMode.c_str());
-	}
+   const char* getOverrideMode()
+   {
+      return StringTable->insert(mOverrideMode.c_str());
+   }
    DECLARE_CONOBJECT(GuiCanvas);
    DECLARE_CATEGORY( "Gui Core" );
    DECLARE_CALLBACK( void, onResize, (const char* width, const char* height) );
@@ -226,7 +226,7 @@ public:
    DECLARE_CALLBACK( void, onWindowClose, () );
    
    GuiCanvas();
-	bool mIsPopUp;
+   bool mIsPopUp;
    virtual ~GuiCanvas();
 
    virtual bool onAdd();
