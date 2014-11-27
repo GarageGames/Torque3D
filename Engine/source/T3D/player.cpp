@@ -1775,7 +1775,7 @@ void Player::onRemove()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
 
-   SAFE_DELETE( mPhysicsRep );		
+   SAFE_DELETE( mPhysicsRep );      
 
    Parent::onRemove();
 }
@@ -3270,9 +3270,9 @@ bool Player::canCrouch()
    if ( mDataBlock->actionList[PlayerData::CrouchRootAnim].sequence == -1 )
       return false;       
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == CrouchPose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == CrouchPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3322,8 +3322,8 @@ bool Player::canStand()
       return false;
 
    // We are already in this pose, so don't test it again...
-	if ( mPose == StandPose )
-		return true;
+   if ( mPose == StandPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3386,9 +3386,9 @@ bool Player::canProne()
    if ( !mPhysicsRep )
       return true;
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == PronePose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == PronePose )
+      return true;
 
    return mPhysicsRep->testSpacials( getPosition(), mDataBlock->proneBoxSize );
 }
@@ -3585,7 +3585,7 @@ MatrixF * Player::Death::fallToGround(F32 dt, const Point3F& loc, F32 curZ, F32 
          normal.normalize();
          mat.set(EulerF (0.0f, 0.0f, curZ));
          mat.mulV(upY, & ahead);
-	      mCross(ahead, normal, &sideVec);
+         mCross(ahead, normal, &sideVec);
          sideVec.normalize();
          mCross(normal, sideVec, &ahead);
 
@@ -5780,7 +5780,7 @@ F32 Player::getSpeed() const
 
 void Player::setVelocity(const VectorF& vel)
 {
-	AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
+   AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
 
    mVelocity = vel;
    setMaskBits(MoveMask);
@@ -5788,7 +5788,7 @@ void Player::setVelocity(const VectorF& vel)
 
 void Player::applyImpulse(const Point3F&,const VectorF& vec)
 {
-	AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
+   AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
 
    // Players ignore angular velocity
    VectorF vel;
@@ -5980,6 +5980,13 @@ void Player::writePacketData(GameConnection *connection, BitStream *stream)
    if (stream->writeFlag(mJumpDelay > 0))
       stream->writeInt(mJumpDelay,PlayerData::JumpDelayBits);
 
+//Walkable Shapes
+   if ( stream->writeFlag(mAttachedToObj) )
+   {
+      writeAttachedPacketData(connection, stream);
+      return;
+   }
+//Walkable Shapes
    Point3F pos;
    getTransform().getColumn(3,&pos);
    if (stream->writeFlag(!isMounted())) {
@@ -6035,6 +6042,13 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       mJumpDelay = stream->readInt(PlayerData::JumpDelayBits);
    else
       mJumpDelay = 0;
+//Walkable Shapes
+   if ( stream->readFlag() )
+   {
+      readAttachedPacketData(connection, stream);
+      return;
+   }
+//Walkable Shapes
 
    Point3F pos,rot;
    if (stream->readFlag()) {
@@ -6257,6 +6271,16 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       delta.head = mHead;
       delta.headVec.set(0.0f, 0.0f, 0.0f);
 
+//Walkable Shapes
+      if ( mAttachedToObj )
+      {  // If we're attached to another object, it's maintaining our position and rotation.
+         //Just read in the rest of the update and return
+         stream->readFlag();
+         F32 energy = stream->readFloat(EnergyLevelBits) * mDataBlock->maxEnergy;
+         setEnergyLevel(energy);
+         return;
+      }
+//Walkable Shapes
       if (stream->readFlag() && isProperlyAdded())
       {
          // Determine number of ticks to warp based on the average
@@ -6574,7 +6598,7 @@ DefineEngineMethod( Player, setActionThread, bool, ( const char* name, bool hold
    "@tsexample\n"
       "// Place the player in a sitting position after being mounted\n"
       "%player.setActionThread( \"sitting\", true, true );\n"
-	"@endtsexample\n")
+   "@endtsexample\n")
 {
    return object->setActionThread( name, hold, true, fsp);
 }
@@ -6622,11 +6646,11 @@ DefineEngineMethod( Player, clearControlObject, void, (),,
    "Returns control to the player. This internally calls "
    "Player::setControlObject(0).\n"
    "@tsexample\n"
-		"%player.clearControlObject();\n"
+      "%player.clearControlObject();\n"
       "echo(%player.getControlObject()); //<-- Returns 0, player assumes control\n"
       "%player.setControlObject(%vehicle);\n"
       "echo(%player.getControlObject()); //<-- Returns %vehicle, player controls the vehicle now.\n"
-	"@endtsexample\n"
+   "@endtsexample\n"
    "@note If the player does not have a control object, the player will receive all moves "
    "from its GameConnection.  If you're looking to remove control from the player itself "
    "(i.e. stop sending moves to the player) use GameConnection::setControlObject() to transfer "
@@ -6684,63 +6708,63 @@ void Player::consoleInit()
       "@brief Determines if the player is rendered or not.\n\n"
       "Used on the client side to disable the rendering of all Player objects.  This is "
       "mainly for the tools or debugging.\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::renderMyItems",TypeBool, &sRenderMyItems,
       "@brief Determines if mounted shapes are rendered or not.\n\n"
       "Used on the client side to disable the rendering of all Player mounted objects.  This is "
       "mainly used for the tools or debugging.\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::renderCollision", TypeBool, &sRenderPlayerCollision, 
       "@brief Determines if the player's collision mesh should be rendered.\n\n"
       "This is mainly used for the tools and debugging.\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    Con::addVariable("$player::minWarpTicks",TypeF32,&sMinWarpTicks, 
       "@brief Fraction of tick at which instant warp occures on the client.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::maxWarpTicks",TypeS32,&sMaxWarpTicks, 
       "@brief When a warp needs to occur due to the client being too far off from the server, this is the "
       "maximum number of ticks we'll allow the client to warp to catch up.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::maxPredictionTicks",TypeS32,&sMaxPredictionTicks, 
       "@brief Maximum number of ticks to predict on the client from the last known move obtained from the server.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    Con::addVariable("$player::maxImpulseVelocity", TypeF32, &sMaxImpulseVelocity, 
       "@brief The maximum velocity allowed due to a single impulse.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    // Move triggers
    Con::addVariable("$player::jumpTrigger", TypeS32, &sJumpTrigger, 
       "@brief The move trigger index used for player jumping.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::crouchTrigger", TypeS32, &sCrouchTrigger, 
       "@brief The move trigger index used for player crouching.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::proneTrigger", TypeS32, &sProneTrigger, 
       "@brief The move trigger index used for player prone pose.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::sprintTrigger", TypeS32, &sSprintTrigger, 
       "@brief The move trigger index used for player sprinting.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::imageTrigger0", TypeS32, &sImageTrigger0, 
       "@brief The move trigger index used to trigger mounted image 0.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::imageTrigger1", TypeS32, &sImageTrigger1, 
       "@brief The move trigger index used to trigger mounted image 1 or alternate fire "
       "on mounted image 0.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::jumpJetTrigger", TypeS32, &sJumpJetTrigger, 
       "@brief The move trigger index used for player jump jetting.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::vehicleDismountTrigger", TypeS32, &sVehicleDismountTrigger, 
       "@brief The move trigger index used to dismount player.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    // ExtendedMove support
    Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 }
 
 //--------------------------------------------------------------------------
@@ -7134,3 +7158,117 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    mConvex.renderWorkingList();
    GFX->leaveDebugEvent();
 }
+//Walkable Shapes
+//----------------------------------------------------------------------------
+
+void Player::setDeltas(Point3F pos, Point3F rot)
+{
+   delta.pos = pos;
+   delta.rot = rot;
+}
+
+void Player::writeAttachedPacketData(GameConnection *connection, BitStream *stream)
+{  // Convert our position, velocity and rotation to be relative to the object we're attached to
+   // Get the relative position and rotation from the object that we're attached to
+   Point3F relPos, relRot;
+   mAttachedToObj->getRelativeOrientation(this, relPos, relRot);
+
+   // Converting to int here because the conversion to/from different object transforms here 
+   // and on the server will lead to miniscule floating point differences that will change 
+   // the checksum for essentially identical data. This conversion ensures that if the difference
+   // is no greater than 1/100 of a unit the packet will not be sent. The 18 bit limit
+   // allows attachables to represent local position to +/- ~1.3k in all dimensions.
+   stream->writeSignedInt((S32) mRoundToNearest(relPos.x * 100), 18);
+   stream->writeSignedInt((S32) mRoundToNearest(relPos.y * 100), 18);
+   stream->writeSignedInt((S32) mRoundToNearest(relPos.z * 100), 18);
+
+   stream->writeInt(mJumpSurfaceLastContact > 15 ? 15 : mJumpSurfaceLastContact, 4);
+
+   if (stream->writeFlag(!mAllowSprinting || !mAllowCrouching || !mAllowProne || !mAllowJumping || !mAllowJetJumping || !mAllowSwimming))
+   {
+      stream->writeFlag(mAllowJumping);
+      stream->writeFlag(mAllowJetJumping);
+      stream->writeFlag(mAllowSprinting);
+      stream->writeFlag(mAllowCrouching);
+      stream->writeFlag(mAllowProne);
+      stream->writeFlag(mAllowSwimming);
+   }
+
+   stream->write(mHead.x);
+   if(stream->writeFlag(mDataBlock->cameraCanBank))
+   {
+      // Include mHead.y to allow for camera banking
+      stream->write(mHead.y);
+   }
+   stream->write(mHead.z);
+
+   // Relative rotation can range from 0 to 2pi so this gives 3 decimal place accuracy.
+   // Note: this value is only used for creating the checksum to determine if we need an update.
+   // If an update is required, the object we're attached to will determine the rotation.
+   stream->writeInt((S32)(relRot.z * 1000), 13);
+
+   if (mControlObject) {
+      S32 gIndex = connection->getGhostIndex(mControlObject);
+      if (stream->writeFlag(gIndex != -1)) {
+         stream->writeInt(gIndex,NetConnection::GhostIdBitSize);
+         mControlObject->writePacketData(connection, stream);
+      }
+   }
+   else
+      stream->writeFlag(false);
+}
+
+
+void Player::readAttachedPacketData(GameConnection *connection, BitStream *stream)
+{
+   Point3F relPos, relRot;
+
+   relPos.x = stream->readSignedInt(18) * 0.01f;
+   relPos.y = stream->readSignedInt(18) * 0.01f;
+   relPos.z = stream->readSignedInt(18) * 0.01f;
+   mJumpSurfaceLastContact = stream->readInt(4);
+
+   if (stream->readFlag())
+   {
+      mAllowJumping = stream->readFlag();
+      mAllowJetJumping = stream->readFlag();
+      mAllowSprinting = stream->readFlag();
+      mAllowCrouching = stream->readFlag();
+      mAllowProne = stream->readFlag();
+      mAllowSwimming = stream->readFlag();
+   }
+   else
+   {
+      mAllowJumping = true;
+      mAllowJetJumping = true;
+      mAllowSprinting = true;
+      mAllowCrouching = true;
+      mAllowProne = true;
+      mAllowSwimming = true;
+   }
+
+   stream->read(&mHead.x);
+   if(stream->readFlag())
+   {
+      // Include mHead.y to allow for camera banking
+      stream->read(&mHead.y);
+   }
+   stream->read(&mHead.z);
+   relRot.z = stream->readInt(13) * 0.001f;
+
+   if ( mAttachedToObj )
+   {
+      mAttachedToObj->flagAttachedUpdate(this, true);
+      delta.head = mHead;
+   }
+
+   if (stream->readFlag()) {
+      S32 gIndex = stream->readInt(NetConnection::GhostIdBitSize);
+      ShapeBase* obj = static_cast<ShapeBase*>(connection->resolveGhost(gIndex));
+      setControlObject(obj);
+      obj->readPacketData(connection, stream);
+   }
+   else
+      setControlObject(0);
+}
+//Walkable Shapes

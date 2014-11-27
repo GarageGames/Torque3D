@@ -279,10 +279,16 @@ F32 CameraSpline::getTime(F32 d)
 
 
 //-----------------------------------------------------------------------------
-void CameraSpline::value(F32 t, CameraSpline::Knot *result, bool skip_rotation)
+//Walkable Shapes
+//void CameraSpline::value(F32 t, CameraSpline::Knot *result, bool skip_rotation)
+//{
+//   // Do some easing in and out for t.
+//   if(!gBuilding)
+void CameraSpline::value(F32 t, CameraSpline::Knot *result, bool skip_rotation, bool skip_ease)
 {
    // Do some easing in and out for t.
-   if(!gBuilding)
+   if(!gBuilding && !skip_ease)
+//Walkable Shapes
    {
       F32 oldT = t;
       if(oldT < 0.5f)

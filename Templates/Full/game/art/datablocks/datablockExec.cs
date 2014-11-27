@@ -62,3 +62,6 @@ exec("./aiPlayer.cs");
 
 // Load the vehicle datablocks
 exec("./vehicles/cheetahCar.cs");
+
+exec("./vehicles/CustomCheetahCar.cs");
+exec("./WalkableShapes/StartTrigger.cs");
