@@ -2398,7 +2398,7 @@ void RenderTargetZeroGLSL::processPix( Vector<ShaderComponent*> &componentList, 
 {
    // Do not actually assign zero, but instead a number so close to zero it may as well be zero.
    // This will prevent a divide by zero causing an FP special on float render targets
-   output = new GenOp( "   @;\r\n", assignColor( new GenOp( "0.00001" ), Material::None, NULL, mOutputTargetMask ) );
+   output = new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(0.00001)" ), Material::None, NULL, mOutputTargetMask ) );
 }
 
 
