@@ -2359,7 +2359,7 @@ void WorldEditor::updateGuiInfo()
       obj = Sim::findObject( mRedirectID );
 
    char buf[] = "";
-   if(obj != nullptr)
+   if(obj != NULL)
    { obj->onGuiUpdate_callback(buf); }
    else
    { this->onGuiUpdate_callback(buf); }
@@ -3187,7 +3187,7 @@ void WorldEditor::transformSelection(bool position, Point3F& p, bool relativePos
    if ( mRedirectID )
    { obj = Sim::findObject( mRedirectID ); }
 
-   if(obj != nullptr)
+   if(obj != NULL)
    { obj->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
    else
    { this->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
