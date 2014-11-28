@@ -186,6 +186,11 @@ function PostFXManager::settingsRefreshLightrays(%this)
    ppOptionsEnableLightRays.setValue($PostFXManager::PostFX::EnableLightRays);   
     
    ppOptionsLightRaysBrightScalar.setValue($LightRayPostFX::brightScalar);
+   
+   ppOptionsLightRaysSampleScalar.setValue($LightRayPostFX::numSamples);
+   ppOptionsLightRaysDensityScalar.setValue($LightRayPostFX::density);
+   ppOptionsLightRaysWeightScalar.setValue($LightRayPostFX::weight);
+   ppOptionsLightRaysDecayScalar.setValue($LightRayPostFX::decay);
 }
 
 function PostFXManager::settingsRefreshDOF(%this)
@@ -280,6 +285,11 @@ function PostFXManager::settingsApplyFromPreset(%this)
    //Light rays settings
    $LightRayPostFX::brightScalar       = $PostFXManager::Settings::LightRays::brightScalar;
    
+   $LightRayPostFX::numSamples         = $PostFXManager::Settings::LightRays::numSamples;
+   $LightRayPostFX::density            = $PostFXManager::Settings::LightRays::density;
+   $LightRayPostFX::weight             = $PostFXManager::Settings::LightRays::weight;
+   $LightRayPostFX::decay              = $PostFXManager::Settings::LightRays::decay;
+   
    //DOF settings   
    $DOFPostFx::EnableAutoFocus         = $PostFXManager::Settings::DOF::EnableAutoFocus;
    $DOFPostFx::BlurMin                 = $PostFXManager::Settings::DOF::BlurMin;
@@ -356,6 +366,11 @@ function PostFXManager::settingsApplyHDR(%this)
 function PostFXManager::settingsApplyLightRays(%this)
 {   
    $PostFXManager::Settings::LightRays::brightScalar        = $LightRayPostFX::brightScalar;
+   
+   $PostFXManager::Settings::LightRays::numSamples          = $LightRayPostFX::numSamples;
+   $PostFXManager::Settings::LightRays::density             = $LightRayPostFX::density;
+   $PostFXManager::Settings::LightRays::weight              = $LightRayPostFX::weight;
+   $PostFXManager::Settings::LightRays::decay               = $LightRayPostFX::decay;
    
    postVerbose("% - PostFX Manager - Settings Saved - Light Rays");   
    
