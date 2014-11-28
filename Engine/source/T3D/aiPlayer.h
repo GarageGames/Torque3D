@@ -28,9 +28,9 @@
 #endif
 
 #ifdef TORQUE_NAVIGATION_ENABLED
-#include "walkabout/navPath.h"
-#include "walkabout/navMesh.h"
-#include "walkabout/coverPoint.h"
+#include "navigation/navPath.h"
+#include "navigation/navMesh.h"
+#include "navigation/coverPoint.h"
 #endif // TORQUE_NAVIGATION_ENABLED
 
 class AIPlayer : public Player {

@@ -154,7 +154,7 @@ private:
    dtQueryFilter mFilter;
    S32 mCurIndex;
    Vector<Point3F> mPoints;
-   Vector<unsigned short> mFlags;
+   Vector<U16> mFlags;
    Vector<Point3F> mVisitPoints;
    F32 mLength;
 

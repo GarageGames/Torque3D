@@ -78,7 +78,7 @@ struct LinkData {
    bool ledge;
    bool climb;
    bool teleport;
-   LinkData(unsigned short flags = 0)
+   LinkData(U16 flags = 0)
    {
       walk = flags & WalkFlag;
       jump = flags & JumpFlag;
@@ -88,7 +88,7 @@ struct LinkData {
       climb = flags & ClimbFlag;
       teleport = flags & TeleportFlag;
    }
-   unsigned short getFlags() const
+   U16 getFlags() const
    {
       return
          (walk ? WalkFlag : 0) |

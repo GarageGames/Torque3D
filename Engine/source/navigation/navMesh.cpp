@@ -20,8 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <stdio.h>
-
 #include "navMesh.h"
 #include "navContext.h"
 #include <DetourDebugDraw.h>
@@ -40,6 +38,8 @@
 
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
+
+#include "core/fileio.h"
 
 extern bool gEditingMission;
 
@@ -1496,22 +1496,31 @@ bool NavMesh::load()
    if(!dStrlen(mFileName))
       return false;
 
-   FILE* fp = fopen(mFileName, "rb");
-   if(!fp)
+   File file;
+   if(file.open(mFileName, File::Read) != File::Ok)
+   {
+      file.close();
+      Con::errorf("Could not open file %s when loading navmesh %s.",
+         mFileName, getName() ? getName() : getIdString());
       return false;
+   }
 
    // Read header.
    NavMeshSetHeader header;
-   fread(&header, sizeof(NavMeshSetHeader), 1, fp);
+   file.read(sizeof(NavMeshSetHeader), (char*)&header);
    if(header.magic != NAVMESHSET_MAGIC)
    {
-      fclose(fp);
-      return 0;
+      file.close();
+      Con::errorf("Navmesh magic incorrect when loading navmesh %s; possible corrupt navmesh file %s.",
+         getName() ? getName() : getIdString(), mFileName);
+      return false;
    }
    if(header.version != NAVMESHSET_VERSION)
    {
-      fclose(fp);
-      return 0;
+      file.close();
+      Con::errorf("Navmesh version incorrect when loading navmesh %s; possible corrupt navmesh file %s.",
+         getName() ? getName() : getIdString(), mFileName);
+      return false;
    }
 
    if(nm)
@@ -1519,14 +1528,18 @@ bool NavMesh::load()
    nm = dtAllocNavMesh();
    if(!nm)
    {
-      fclose(fp);
+      file.close();
+      Con::errorf("Out of memory when loading navmesh %s.",
+         getName() ? getName() : getIdString());
       return false;
    }
 
    dtStatus status = nm->init(&header.params);
    if(dtStatusFailed(status))
    {
-      fclose(fp);
+      file.close();
+      Con::errorf("Failed to initialise navmesh params when loading navmesh %s.",
+         getName() ? getName() : getIdString());
       return false;
    }
 
@@ -1534,32 +1547,32 @@ bool NavMesh::load()
    for(U32 i = 0; i < header.numTiles; ++i)
    {
       NavMeshTileHeader tileHeader;
-      fread(&tileHeader, sizeof(tileHeader), 1, fp);
+      file.read(sizeof(NavMeshTileHeader), (char*)&tileHeader);
       if(!tileHeader.tileRef || !tileHeader.dataSize)
          break;
 
       unsigned char* data = (unsigned char*)dtAlloc(tileHeader.dataSize, DT_ALLOC_PERM);
       if(!data) break;
       memset(data, 0, tileHeader.dataSize);
-      fread(data, tileHeader.dataSize, 1, fp);
+      file.read(tileHeader.dataSize, (char*)data);
 
       nm->addTile(data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0);
    }
 
    S32 s;
-   fread(&s, sizeof(S32), 1, fp);
+   file.read(sizeof(S32), (char*)&s);
    setLinkCount(s);
-   fread(const_cast<F32*>(mLinkVerts.address()), sizeof(F32), s * 6, fp);
-   fread(const_cast<F32*>(mLinkRads.address()), sizeof(F32), s, fp);
-   fread(const_cast<U8*>(mLinkDirs.address()), sizeof(U8), s, fp);
-   fread(const_cast<U8*>(mLinkAreas.address()), sizeof(U8), s, fp);
-   fread(const_cast<unsigned short*>(mLinkFlags.address()), sizeof(unsigned short), s, fp);
-   fread(const_cast<U32*>(mLinkIDs.address()), sizeof(U32), s, fp);
+   file.read(sizeof(F32) * s * 6, (char*)const_cast<F32*>(mLinkVerts.address()));
+   file.read(sizeof(F32) * s,     (char*)const_cast<F32*>(mLinkRads.address()));
+   file.read(sizeof(U8) * s,      (char*)const_cast<U8*>(mLinkDirs.address()));
+   file.read(sizeof(U8) * s,      (char*)const_cast<U8*>(mLinkAreas.address()));
+   file.read(sizeof(U16) * s,     (char*)const_cast<U16*>(mLinkFlags.address()));
+   file.read(sizeof(F32) * s,     (char*)const_cast<U32*>(mLinkIDs.address()));
    mLinksUnsynced.fill(false);
    mLinkSelectStates.fill(Unselected);
    mDeleteLinks.fill(false);
 
-   fclose(fp);
+   file.close();
 
    updateTiles();
 
@@ -1581,18 +1594,17 @@ DefineEngineMethod(NavMesh, load, bool, (),,
 
 bool NavMesh::save()
 {
-#ifdef WALKABOUT_DEMO
-   Con::errorf("Sorry, this demo code doesn't allow you to save NavMeshes to files.");
-   Con::executef("OnWalkaboutDemoSave");
-   return false;
-#else
    if(!dStrlen(mFileName) || !nm)
       return false;
-
-   // Save our navmesh into a file to load from next time
-   FILE* fp = fopen(mFileName, "wb");
-   if(!fp)
+   
+   File file;
+   if(file.open(mFileName, File::Write) != File::Ok)
+   {
+      file.close();
+      Con::errorf("Could not open file %s when saving navmesh %s.",
+         mFileName, getName() ? getName() : getIdString());
       return false;
+   }
 
    // Store header.
    NavMeshSetHeader header;
@@ -1606,7 +1618,7 @@ bool NavMesh::save()
       header.numTiles++;
    }
    memcpy(&header.params, nm->getParams(), sizeof(dtNavMeshParams));
-   fwrite(&header, sizeof(NavMeshSetHeader), 1, fp);
+   file.write(sizeof(NavMeshSetHeader), (const char*)&header);
 
    // Store tiles.
    for(U32 i = 0; i < nm->getMaxTiles(); ++i)
@@ -1617,24 +1629,23 @@ bool NavMesh::save()
       NavMeshTileHeader tileHeader;
       tileHeader.tileRef = nm->getTileRef(tile);
       tileHeader.dataSize = tile->dataSize;
-      fwrite(&tileHeader, sizeof(tileHeader), 1, fp);
 
-      fwrite(tile->data, tile->dataSize, 1, fp);
+      file.write(sizeof(tileHeader), (const char*)&tileHeader);
+      file.write(tile->dataSize, (const char*)tile->data);
    }
 
    S32 s = mLinkIDs.size();
-   fwrite(&s, sizeof(S32), 1, fp);
-   fwrite(mLinkVerts.address(), sizeof(F32), s * 6, fp);
-   fwrite(mLinkRads.address(), sizeof(F32), s, fp);
-   fwrite(mLinkDirs.address(), sizeof(U8), s, fp);
-   fwrite(mLinkAreas.address(), sizeof(U8), s, fp);
-   fwrite(mLinkFlags.address(), sizeof(unsigned short), s, fp);
-   fwrite(mLinkIDs.address(), sizeof(U32), s, fp);
+   file.write(sizeof(S32), (const char*)&s);
+   file.write(sizeof(F32) * s * 6, (const char*)mLinkVerts.address());
+   file.write(sizeof(F32) * s,     (const char*)mLinkRads.address());
+   file.write(sizeof(U8) * s,      (const char*)mLinkDirs.address());
+   file.write(sizeof(U8) * s,      (const char*)mLinkAreas.address());
+   file.write(sizeof(U16) * s,     (const char*)mLinkFlags.address());
+   file.write(sizeof(U32) * s,     (const char*)mLinkIDs.address());
 
-   fclose(fp);
+   file.close();
 
    return true;
-#endif
 }
 
 DefineEngineMethod(NavMesh, save, void, (),,

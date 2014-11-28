@@ -349,7 +349,7 @@ private:
    Vector<F32> mLinkRads;             ///< Radius of each link
    Vector<U8> mLinkDirs;              ///< Direction (one-way or bidirectional)
    Vector<U8> mLinkAreas;             ///< Area ID
-   Vector<unsigned short> mLinkFlags; ///< Flags
+   Vector<U16> mLinkFlags; ///< Flags
    Vector<U32> mLinkIDs;              ///< ID number of each link
    Vector<U8> mLinkSelectStates;      ///< Selection state of links
    Vector<bool> mDeleteLinks;         ///< Link will be deleted next build.
