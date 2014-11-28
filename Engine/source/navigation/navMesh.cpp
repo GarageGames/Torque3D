@@ -331,14 +331,6 @@ bool NavMesh::onAdd()
 
    if(isServerObject())
    {
-#ifdef WALKABOUT_DEMO
-      if(getServerSet()->size() >= 1)
-      {
-         Con::errorf("Sorry, the demo binary only allows one NavMesh to exist at a time.");
-         Con::executef("OnWalkaboutDemoLimit");
-         return false;
-      }
-#endif
       getServerSet()->addObject(this);
       ctx = new NavContext();
       setProcessTick(true);
