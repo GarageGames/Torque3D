@@ -562,7 +562,7 @@ bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* poly
 
          // Add the missing points
          U32 vi[5];
-         for (S32 i = 0; i < 4 ; i++) 
+         for (int i = 0; i < 4 ; i++) 
          {
             S32 dx = i >> 1;
             S32 dy = dx ^ (i & 1);

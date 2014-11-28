@@ -27,6 +27,11 @@
 #include "T3D/player.h"
 #endif
 
+#ifdef TORQUE_NAVIGATION_ENABLED
+#include "walkabout/navPath.h"
+#include "walkabout/navMesh.h"
+#include "walkabout/coverPoint.h"
+#endif // TORQUE_NAVIGATION_ENABLED
 
 class AIPlayer : public Player {
 
@@ -61,6 +66,90 @@ private:
    // Utility Methods
    void throwCallback( const char *name );
 
+#ifdef TORQUE_NAVIGATION_ENABLED
+public:
+   /// Get cover we are moving to.
+   CoverPoint *getCover() { return mCoverData.cover; }
+
+private:
+   /// Should we jump?
+   enum JumpStates {
+      None,  ///< No, don't jump.
+      Now,   ///< Jump immediately.
+      Ledge, ///< Jump when we walk off a ledge.
+   } mJump;
+
+   /// Stores information about a path.
+   struct PathData {
+      /// Pointer to path object.
+      SimObjectPtr<NavPath> path;
+      /// Do we own our path? If so, we will delete it when finished.
+      bool owned;
+      /// Path node we're at.
+      U32 index;
+      /// Default constructor.
+      PathData() : path(NULL)
+      {
+         owned = false;
+         index = 0;
+      }
+   };
+
+   /// Path we are currently following.
+   PathData mPathData;
+
+   /// Clear out the current path.
+   void clearPath();
+
+   /// Get the current path we're following.
+   NavPath *getPath() { return mPathData.path; }
+
+   /// Stores information about our cover.
+   struct CoverData {
+      /// Pointer to a cover point.
+      SimObjectPtr<CoverPoint> cover;
+      /// Default constructor.
+      CoverData() : cover(NULL)
+      {
+      }
+   };
+
+   /// Current cover we're trying to get to.
+   CoverData mCoverData;
+
+   /// Stop searching for cover.
+   void clearCover();
+
+   /// Information about a target we're following.
+   struct FollowData {
+      /// Object to follow.
+      SimObjectPtr<SceneObject> object;
+      /// Distance at whcih to follow.
+      F32 radius;
+      /// Default constructor.
+      FollowData() : object(NULL)
+      {
+         radius = 5.0f;
+      }
+   };
+
+   /// Current object we're following.
+   FollowData mFollowData;
+
+   /// Stop following me!
+   void clearFollow();
+
+   /// NavMesh we pathfind on.
+   SimObjectPtr<NavMesh> mNavMesh;
+
+   /// Move to the specified node in the current path.
+   void moveToNode(S32 node);
+
+protected:
+   virtual void onReachDestination();
+   virtual void onStuck();
+#endif // TORQUE_NAVIGATION_ENABLED
+
 public:
    DECLARE_CONOBJECT( AIPlayer );
 
@@ -70,6 +159,9 @@ public:
    static void initPersistFields();
 
    bool onAdd();
+#ifdef TORQUE_NAVIGATION_ENABLED
+   void onRemove();
+#endif // TORQUE_NAVIGATION_ENABLED
 
    virtual bool getAIMove( Move *move );
 
@@ -91,6 +183,38 @@ public:
    void setMoveDestination( const Point3F &location, bool slowdown );
    Point3F getMoveDestination() const { return mMoveDestination; }
    void stopMove();
+
+#ifdef TORQUE_NAVIGATION_ENABLED
+   /// @name Pathfinding
+   /// @{
+
+   enum NavSize {
+      Small,
+      Regular,
+      Large
+   } mNavSize;
+   void setNavSize(NavSize size) { mNavSize = size; updateNavMesh(); }
+   NavSize getNavSize() const { return mNavSize; }
+
+   bool setPathDestination(const Point3F &pos);
+   Point3F getPathDestination() const;
+
+   void followNavPath(NavPath *path);
+   void followObject(SceneObject *obj, F32 radius);
+
+   void repath();
+
+   bool findCover(const Point3F &from, F32 radius);
+
+   NavMesh *findNavMesh() const;
+   void updateNavMesh();
+   NavMesh *getNavMesh() const { return mNavMesh; }
+
+   /// Types of link we can use.
+   LinkData mLinkTypes;
+
+   /// @}
+#endif // TORQUE_NAVIGATION_ENABLED
 };
 
 #endif
