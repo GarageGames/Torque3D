@@ -1,4 +1,3 @@
-#ifdef TORQUE_WALKABOUT_EXTRAS_ENABLED
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 Daniel Buckmaster
 //
@@ -66,5 +65,3 @@ protected:
 };
 
 #endif // _GUIFLEXIBLEARRAYCTRL_H_
-
-#endif // TORQUE_WALKABOUT_EXTRAS_ENABLED

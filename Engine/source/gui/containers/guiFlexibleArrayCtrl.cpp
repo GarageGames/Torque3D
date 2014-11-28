@@ -1,4 +1,3 @@
-#ifdef TORQUE_WALKABOUT_EXTRAS_ENABLED
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 Daniel Buckmaster
 //
@@ -183,5 +182,3 @@ DefineEngineMethod( GuiFlexibleArrayControl, refresh, void, (),,
 {
    object->refresh();
 }
-
-#endif // TORQUE_WALKABOUT_EXTRAS_ENABLED
