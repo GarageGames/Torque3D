@@ -86,7 +86,7 @@ beginModule( 'physX3' );
    addIncludePath( $PHYSX3_SDK_PATH . "/Include/common" );
       
    // Libs
-   addProjectLibDir( $PHYSX3_SDK_PATH . "/Lib/win32" );
+   addProjectLibDir( $PHYSX3_SDK_PATH . "/Lib/vc10win32" );
    addProjectLibInput( "PhysX3_x86.lib","PhysX3CHECKED_x86.lib" );
    addProjectLibInput( "PhysX3Common_x86.lib","PhysX3CommonCHECKED_x86.lib");
    addProjectLibInput( "PhysX3Extensions.lib","PhysX3ExtensionsCHECKED.lib" );
@@ -97,15 +97,15 @@ beginModule( 'physX3' );
    addProjectLibInput( "PhysXProfileSDK.lib", "PhysXProfileSDKCHECKED.lib");
           
    // File Copy
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/nvToolsExt32_1.dll", "/game/nvToolsExt32_1.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3_x86.dll",  "/game/PhysX3_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3CharacterKinematic_x86.dll",     "/game/PhysX3CharacterKinematic_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3CharacterKinematicCHECKED_x86.dll",   "/game/PhysX3CharacterKinematicCHECKED_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3CHECKED_x86.dll",   "/game/PhysX3CHECKED_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3Common_x86.dll",   "/game/PhysX3Common_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3CommonCHECKED_x86.dll",   "/game/PhysX3CommonCHECKED_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3Cooking_x86.dll",   "/game/PhysX3Cooking_x86.dll" );
-   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/win32/PhysX3CookingCHECKED_x86.dll",   "/game/PhysX3CookingCHECKED_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/nvToolsExt32_1.dll", "/game/nvToolsExt32_1.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3_x86.dll",  "/game/PhysX3_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3CharacterKinematic_x86.dll",     "/game/PhysX3CharacterKinematic_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3CharacterKinematicCHECKED_x86.dll",   "/game/PhysX3CharacterKinematicCHECKED_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3CHECKED_x86.dll",   "/game/PhysX3CHECKED_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3Common_x86.dll",   "/game/PhysX3Common_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3CommonCHECKED_x86.dll",   "/game/PhysX3CommonCHECKED_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3Cooking_x86.dll",   "/game/PhysX3Cooking_x86.dll" );
+   copyFileToProject( $PHYSX3_SDK_PATH . "/Bin/vc10win32/PhysX3CookingCHECKED_x86.dll",   "/game/PhysX3CookingCHECKED_x86.dll" );
 
 endModule();
 
