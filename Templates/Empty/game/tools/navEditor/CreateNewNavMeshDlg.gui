@@ -32,7 +32,7 @@
       anchorLeft = "1";
       anchorRight = "0";
       position = "283 240";
-      extent = "200 151";
+      extent = "200 176";
       minExtent = "8 2";
       horizSizing = "right";
       vertSizing = "bottom";
@@ -201,11 +201,11 @@
          canSave = "1";
          canSaveDynamicFields = "0";
       };
-      new GuiCheckBoxCtrl() {
-         text = " Fit NavMesh to mission area?";
+      new GuiCheckBoxCtrl(MeshMissionBounds) {
+         text = " Fit NavMesh to mission area";
          groupNum = "-1";
          buttonType = "ToggleButton";
-         useMouseEvents = "0";
+         useMouseEvents = "1";
          position = "22 99";
          extent = "159 15";
          minExtent = "8 2";
@@ -218,7 +218,26 @@
          tooltip = "Positions and scales the NavMesh so it includes all your mission objects.";
          hovertime = "1000";
          isContainer = "0";
-         internalName = "MeshMissionBounds";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiCheckBoxCtrl(MeshTerrainBounds) {
+         text = " Include terrain";
+         groupNum = "-1";
+         buttonType = "ToggleButton";
+         useMouseEvents = "0";
+         position = "22 121";
+         extent = "159 15";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiCheckBoxProfile";
+         visible = "1";
+         active = "0";
+         tooltipProfile = "GuiToolTipProfile";
+         tooltip = "Consider terrain when calculating NavMesh bounds.";
+         hovertime = "1000";
+         isContainer = "0";
          canSave = "1";
          canSaveDynamicFields = "0";
       };
@@ -227,7 +246,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "12 121";
+         position = "12 146";
          extent = "87 19";
          minExtent = "8 2";
          horizSizing = "right";
@@ -247,7 +266,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "104 121";
+         position = "104 146";
          extent = "84 19";
          minExtent = "8 2";
          horizSizing = "right";
@@ -271,6 +290,8 @@ function CreateNewNavMeshDlg::onWake(%this)
    %this-->MeshName.setText("Nav");
    %this-->MeshPosition.setText("0 0 0");
    %this-->MeshScale.setText("50 50 20");
+   MeshMissionBounds.setStateOn(false);
+   MeshTerrainBounds.setStateOn(true);
 }
 
 function MissionBoundsExtents(%group)
@@ -278,21 +299,31 @@ function MissionBoundsExtents(%group)
    %box = "0 0 0 0 0 0";
    foreach(%obj in %group)
    {
-      // Skip LevelInfos. Need a way to detect other non-SceneObjects.
-      // Also skip GroundPlanes. They're too big.
       %cls = %obj.getClassName();
-      if(%cls $= "LevelInfo" || %cls $= "GroundPlane" || %cls $= "GroundCover")
-         continue;
-
-      // Get world box - might have to recurse into nested SimGroups.
-      %wbox = "0 0 0 0 0 0";
       if(%cls $= "SimGroup" || %cls $= "SimSet" || %cls $= "Path")
+      {
+         // Need to recursively check grouped objects.
          %wbox = MissionBoundsExtents(%obj);
-      else if(%obj.getType() & $TypeMasks::StaticObjectType &&
-         !(%obj.getType() & $TypeMasks::EnvironmentObjectType))
-         %wbox = %obj.getWorldBox();
+      }
       else
-         continue;
+      {
+         // Skip objects that are too big and shouldn't really be considered
+         // part of the scene, or are global bounds and we therefore can't get
+         // any sensible information out of them.
+         if(%cls $= "LevelInfo")
+            continue;
+         if(!MeshTerrainBounds.isStateOn() && %cls $= "TerrainBlock")
+            continue;
+
+         if(!(%obj.getType() & $TypeMasks::StaticObjectType) ||
+            %obj.getType() & $TypeMasks::EnvironmentObjectType)
+            continue;
+
+         if(%obj.isGlobalBounds())
+            continue;
+
+         %wbox = %obj.getWorldBox();
+      }
 
       // Update min point.
       for(%j = 0; %j < 3; %j++)
@@ -321,7 +352,7 @@ function CreateNewNavMeshDlg::create(%this)
 
    %mesh = 0;
 
-   if(%this-->MeshMissionBounds.isStateOn())
+   if(MeshMissionBounds.isStateOn())
    {
       if(!isObject(MissionGroup))
       {
@@ -353,4 +384,9 @@ function CreateNewNavMeshDlg::create(%this)
    NavEditorGui.selectObject(%mesh);
 
    Canvas.popDialog(CreateNewNavMeshDlg);
+}
+
+function MeshMissionBounds::onClick(%this)
+{
+   MeshTerrainBounds.setActive(%this.isStateOn());
 }
