@@ -67,11 +67,6 @@ private:
    void throwCallback( const char *name );
 
 #ifdef TORQUE_NAVIGATION_ENABLED
-public:
-   /// Get cover we are moving to.
-   CoverPoint *getCover() { return mCoverData.cover; }
-
-private:
    /// Should we jump?
    enum JumpStates {
       None,  ///< No, don't jump.
@@ -109,9 +104,7 @@ private:
       /// Pointer to a cover point.
       SimObjectPtr<CoverPoint> cover;
       /// Default constructor.
-      CoverData() : cover(NULL)
-      {
-      }
+      CoverData() : cover(NULL) {}
    };
 
    /// Current cover we're trying to get to.
@@ -144,11 +137,11 @@ private:
 
    /// Move to the specified node in the current path.
    void moveToNode(S32 node);
+#endif // TORQUE_NAVIGATION_ENABLED
 
 protected:
    virtual void onReachDestination();
    virtual void onStuck();
-#endif // TORQUE_NAVIGATION_ENABLED
 
 public:
    DECLARE_CONOBJECT( AIPlayer );
@@ -159,9 +152,7 @@ public:
    static void initPersistFields();
 
    bool onAdd();
-#ifdef TORQUE_NAVIGATION_ENABLED
    void onRemove();
-#endif // TORQUE_NAVIGATION_ENABLED
 
    virtual bool getAIMove( Move *move );
 
@@ -209,6 +200,9 @@ public:
    NavMesh *findNavMesh() const;
    void updateNavMesh();
    NavMesh *getNavMesh() const { return mNavMesh; }
+
+   /// Get cover we are moving to.
+   CoverPoint *getCover() { return mCoverData.cover; }
 
    /// Types of link we can use.
    LinkData mLinkTypes;

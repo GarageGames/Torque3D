@@ -104,7 +104,7 @@ AIPlayer::AIPlayer()
    mJump = None;
    mNavSize = Regular;
    mLinkTypes = LinkData(AllFlags);
-#endif // TORQUE_NAVIGATION_ENABLED
+#endif
 
    mIsAiControlled = true;
 }
@@ -145,20 +145,20 @@ void AIPlayer::initPersistFields()
 #ifdef TORQUE_NAVIGATION_ENABLED
    addGroup("Pathfinding");
 
-   addField("allowWalk", TypeBool, Offset(mLinkTypes.walk, AIPlayer),
-      "Allow the character to walk on dry land.");
-   addField("allowJump", TypeBool, Offset(mLinkTypes.jump, AIPlayer),
-      "Allow the character to use jump links.");
-   addField("allowDrop", TypeBool, Offset(mLinkTypes.drop, AIPlayer),
-      "Allow the character to use drop links.");
-   addField("allowSwim", TypeBool, Offset(mLinkTypes.swim, AIPlayer),
-      "Allow the character tomove in water.");
-   addField("allowLedge", TypeBool, Offset(mLinkTypes.ledge, AIPlayer),
-      "Allow the character to jump ledges.");
-   addField("allowClimb", TypeBool, Offset(mLinkTypes.climb, AIPlayer),
-      "Allow the character to use climb links.");
-   addField("allowTeleport", TypeBool, Offset(mLinkTypes.teleport, AIPlayer),
-      "Allow the character to use teleporters.");
+      addField("allowWalk", TypeBool, Offset(mLinkTypes.walk, AIPlayer),
+         "Allow the character to walk on dry land.");
+      addField("allowJump", TypeBool, Offset(mLinkTypes.jump, AIPlayer),
+         "Allow the character to use jump links.");
+      addField("allowDrop", TypeBool, Offset(mLinkTypes.drop, AIPlayer),
+         "Allow the character to use drop links.");
+      addField("allowSwim", TypeBool, Offset(mLinkTypes.swim, AIPlayer),
+         "Allow the character tomove in water.");
+      addField("allowLedge", TypeBool, Offset(mLinkTypes.ledge, AIPlayer),
+         "Allow the character to jump ledges.");
+      addField("allowClimb", TypeBool, Offset(mLinkTypes.climb, AIPlayer),
+         "Allow the character to use climb links.");
+      addField("allowTeleport", TypeBool, Offset(mLinkTypes.teleport, AIPlayer),
+         "Allow the character to use teleporters.");
 
    endGroup("Pathfinding");
 #endif // TORQUE_NAVIGATION_ENABLED
@@ -179,15 +179,15 @@ bool AIPlayer::onAdd()
    return true;
 }
 
-#ifdef TORQUE_NAVIGATION_ENABLED
 void AIPlayer::onRemove()
 {
+#ifdef TORQUE_NAVIGATION_ENABLED
    clearPath();
    clearCover();
    clearFollow();
+#endif
    Parent::onRemove();
 }
-#endif // TORQUE_NAVIGATION_ENABLED
 
 /**
  * Sets the speed at which this AI moves
@@ -209,7 +209,7 @@ void AIPlayer::stopMove()
    clearPath();
    clearCover();
    clearFollow();
-#endif // TORQUE_NAVIGATION_ENABLED
+#endif
 }
 
 /**
@@ -408,11 +408,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
       if (mFabs(xDiff) < mMoveTolerance && mFabs(yDiff) < mMoveTolerance) 
       {
          mMoveState = ModeStop;
-#ifdef TORQUE_NAVIGATION_ENABLED
          onReachDestination();
-#else
-         throwCallback("onReachDestination");
-#endif // TORQUE_NAVIGATION_ENABLED
       }
       else 
       {
@@ -481,11 +477,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
                if ( mMoveState != ModeSlowing || locationDelta == 0 )
                {
                   mMoveState = ModeStuck;
-#ifdef TORQUE_NAVIGATION_ENABLED
                   onStuck();
-#else
-                  throwCallback("onMoveStuck");
-#endif // TORQUE_NAVIGATION_ENABLED
                }
             }
          }
@@ -558,7 +550,6 @@ void AIPlayer::throwCallback( const char *name )
    Con::executef(getDataBlock(), name, getIdString());
 }
 
-#ifdef TORQUE_NAVIGATION_ENABLED
 /**
  * Called when we get within mMoveTolerance of our destination set using
  * setMoveDestination(). Only fires the script callback if we are at the end
@@ -566,6 +557,7 @@ void AIPlayer::throwCallback( const char *name )
  */
 void AIPlayer::onReachDestination()
 {
+#ifdef TORQUE_NAVIGATION_ENABLED
    if(!mPathData.path.isNull())
    {
       if(mPathData.index == mPathData.path->size() - 1)
@@ -589,6 +581,7 @@ void AIPlayer::onReachDestination()
       }
    }
    else
+#endif
       throwCallback("onReachDestination");
 }
 
@@ -598,12 +591,15 @@ void AIPlayer::onReachDestination()
  */
 void AIPlayer::onStuck()
 {
+#ifdef TORQUE_NAVIGATION_ENABLED
    if(!mPathData.path.isNull())
       repath();
    else
+#endif
       throwCallback("onMoveStuck");
 }
 
+#ifdef TORQUE_NAVIGATION_ENABLED
 // --------------------------------------------------------------------------------------------
 // Pathfinding
 // --------------------------------------------------------------------------------------------
