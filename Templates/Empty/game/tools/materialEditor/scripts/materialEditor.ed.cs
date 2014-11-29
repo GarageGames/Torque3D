@@ -603,7 +603,7 @@ function MaterialEditorGui::searchForTexture(%this,%material, %texture)
       // set the find signal as false to start out with 
       %isFile = false;
       // sete the formats we're going to be looping through if need be
-      %formats = ".png .jpg .dds .bmp .gif .jng .tga";
+      %formats = ".png .jpg .dds .bmp .gif .jng .tga .psd";
       
       // if the texture contains the correct filepath and name right off the bat, lets use it
       if( isFile(%texture) )
