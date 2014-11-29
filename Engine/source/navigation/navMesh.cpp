@@ -1369,16 +1369,16 @@ void NavMesh::renderLinks(duDebugDraw &dd)
 {
    if(mBuilding)
       return;
-   dd.depthMask(false);
+   dd.depthMask(true);
    dd.begin(DU_DRAW_LINES);
    for(U32 i = 0; i < mLinkIDs.size(); i++)
    {
-      unsigned int col = 0;
+      U32 col = 0;
       switch(mLinkSelectStates[i])
       {
-      case Unselected: col = mLinksUnsynced[i] ? duRGBA(255, 0, 0, 200) : duRGBA(0, 0, 255, 255); break;
-      case Hovered: col = duRGBA(255, 255, 255, 255); break;
-      case Selected: col = duRGBA(0, 255, 0, 255); break;
+         case Unselected: col = mLinksUnsynced[i] ? duRGBA(255, 0, 0, 200) : duRGBA(0, 0, 255, 255); break;
+         case Hovered:    col = duRGBA(255, 255, 255, 255); break;
+         case Selected:   col = duRGBA(0, 255, 0, 255); break;
       }
       F32 *s = &mLinkVerts[i*6];
       F32 *e = &mLinkVerts[i*6 + 3];
@@ -1394,7 +1394,6 @@ void NavMesh::renderLinks(duDebugDraw &dd)
          duAppendCircle(&dd, e[0], e[1], e[2], mLinkRads[i], col);
    }
    dd.end();
-   dd.depthMask(true);
 }
 
 void NavMesh::renderTileData(duDebugDrawTorque &dd, U32 tile)
