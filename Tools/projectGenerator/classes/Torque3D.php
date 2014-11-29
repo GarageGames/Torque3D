@@ -39,7 +39,7 @@ class Torque3D
         includeLib( 'jpeg' );
         includeLib( 'tinyxml' );
         includeLib( 'opcode' );
-        includeLib( 'squish' );
+        includeLib( 'crunch' );
         includeLib( 'collada_dom' );
         includeLib( 'pcre' ); 
         includeLib( 'convexDecomp' ); 
@@ -102,7 +102,7 @@ class Torque3D
         addLibIncludePath( "zlib" );
         addLibIncludePath( "tinyxml" );
         addLibIncludePath( "opcode" );
-        addLibIncludePath( "squish" );
+        addLibIncludePath( "crunch" );
         addLibIncludePath( 'convexDecomp' ); 
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
@@ -120,6 +120,7 @@ class Torque3D
         includeModule( 'advancedLighting' );
         includeModule( 'basicLighting' );
         includeModule( 'collada' );
+        includeModule( 'crunch' );
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
         {
@@ -140,7 +141,7 @@ class Torque3D
         addProjectDependency( 'zlib' );
         addProjectDependency( 'tinyxml' );
         addProjectDependency( 'opcode' );
-        addProjectDependency( 'squish' );
+        addProjectDependency( 'crunch' );
         addProjectDependency( 'collada_dom' );
         addProjectDependency( 'pcre' );
         addProjectDependency( 'convexDecomp' ); 
@@ -242,7 +243,7 @@ class Torque3D
               addSolutionProjectRef( 'lungif' );
               addSolutionProjectRef( 'opcode' );
               addSolutionProjectRef( 'pcre' );
-              addSolutionProjectRef( 'squish' );
+              addSolutionProjectRef( 'crunch' );
               addSolutionProjectRef( 'tinyxml' );
               addSolutionProjectRef( 'zlib' );
               addSolutionProjectRef( 'convexDecomp' ); 

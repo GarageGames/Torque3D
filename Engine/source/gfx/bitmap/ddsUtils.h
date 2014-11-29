@@ -23,12 +23,55 @@
 #ifndef _DDS_UTILS_H_
 #define _DDS_UTILS_H_
 
+#include "platform/threads/threadPool.h"
+
 struct DDSFile;
+
+#define ImplementCrunchDDSWorkItem(name) \
+class name : public DDSUtil::crunchDDSWorkItem \
+{ \
+public: \
+   typedef DDSUtil::crunchDDSWorkItem Parent; \
+   void execute(); \
+   name(DDSFile *srcDDS, GFXFormat dxtFormat = GFXFormatDXT1, bool isNormalMap = false, bool forceMainThread = false) \
+      : Parent(srcDDS, dxtFormat, isNormalMap, forceMainThread) \
+   { \
+   } \
+};
 
 namespace DDSUtil
 {
+   class crunchDDSWorkItem : public ThreadPool::WorkItem
+   {
+   public:
+      typedef ThreadPool::WorkItem Parent;
+      DDSFile *mSrcDDS;
+      GFXFormat mDxtFormat;
+      bool mIsNormalMap;
+      bool succeed;
+      crunchDDSWorkItem(DDSFile *srcDDS, GFXFormat dxtFormat, bool isNormalMap, bool forceMainThread)
+         : mSrcDDS(srcDDS), mDxtFormat(dxtFormat), mIsNormalMap(isNormalMap),
+         succeed(false)
+      {
+         // TODO: When updated ThreadPool is ready, use:
+         //if(forceMainThread)
+         //   mFlags.set(ThreadPool::WorkItem::FlagMainThreadOnly, true);
+      }
+   };
+
+   /// This uses crunchDDS() method inside, keeping for backward comp.
    bool squishDDS( DDSFile *srcDDS, const GFXFormat dxtFormat );
    void swizzleDDS( DDSFile *srcDDS, const Swizzle<U8, 4> &swizzle );
+
+   /// Compress DDS, wait for result
+   bool crunchDDS( DDSFile *srcDDS, const GFXFormat dxtFormat, bool isNormalMap = false );
+
+   /// Compress DDS in a separate thread. After it finished, the specified WorkItem will be processed
+   void crunchDDS( crunchDDSWorkItem *item );
+
+   typedef void (*crunchCallback)(DDSFile *, bool);
+   void crunchDDS( crunchCallback, DDSFile *srcDDS, const GFXFormat dxtFormat = GFXFormatDXT1, bool isNormalMap = false );
+
 };
 
 #endif
