@@ -31,7 +31,7 @@
 #include "gfx/gfxDevice.h"
 #include "core/util/safeDelete.h"
 
-#if defined( TORQUE_OS_WIN32 ) || defined( TORQUE_OS_XBOX )
+#if defined( TORQUE_OS_WIN ) || defined( TORQUE_OS_XBOX )
 #  include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
 #  include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
 #endif
@@ -67,7 +67,7 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
    }
    else
    {
-#if defined( TORQUE_OS_WIN32 )
+#if defined( TORQUE_OS_WIN )
       cond = new GBufferConditionerHLSL( prepassTargetFormat, GBufferConditionerHLSL::ViewSpace );
       FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatHLSL());

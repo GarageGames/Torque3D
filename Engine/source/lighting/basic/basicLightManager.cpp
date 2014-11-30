@@ -172,7 +172,7 @@ void BasicLightManager::activate( SceneManager *sceneManager )
    }
    else
    {
-      #if defined( TORQUE_OS_WIN32 )
+      #if defined( TORQUE_OS_WIN )
          FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatHLSL );
          FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatHLSL );
          FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatHLSL );

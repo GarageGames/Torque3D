@@ -25,14 +25,14 @@
 
 #include "platform/platform.h"
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OPENGL
 
 #include "tGL.h"
 #include "GL/wglew.h"
 
 #define gglHasWExtension(EXTENSION) WGLEW_##EXTENSION
 
-#endif //TORQUE_OS_WIN32
+#endif //TORQUE_OPENGL
 
 #endif
 
