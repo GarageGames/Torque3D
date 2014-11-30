@@ -482,8 +482,8 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
 	   outColor = new Var;
 	   outColor->setType("float4");
 	   outColor->setName("col");
-	   meta->addStatement(new GenOp("   @;\r\n", new DecOp(outColor)));
-	   //outColor->setStructName("OUT");
+       outColor->setStructName("OUT");
+	   meta->addStatement(new GenOp("   @;\r\n", outColor));
    }
 
    Var *detailColor = (Var*)LangElement::find("detailColor");

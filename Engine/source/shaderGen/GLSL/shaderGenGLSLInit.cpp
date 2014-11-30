@@ -91,7 +91,7 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
 
    FEATUREMGR->registerFeature( MFT_ImposterVert, new ImposterVertFeatureGLSL );
 
-   //FEATUREMGR->registerFeature( MFT_LightbufferMRT, new NamedFeatureGLSL( "Lightbuffer MRT" ) );
+   FEATUREMGR->registerFeature( MFT_LightbufferMRT, new NamedFeatureGLSL( "Lightbuffer MRT" ) );
    //FEATUREMGR->registerFeature( MFT_IsTranslucentZWrite, new NamedFeatureGLSL( "Translucent ZWrite" ) );
    //FEATUREMGR->registerFeature( MFT_InterlacedPrePass, new NamedFeatureGLSL( "Interlaced Pre Pass" ) );
 

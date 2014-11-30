@@ -89,10 +89,11 @@ LangElement* ShaderFeatureGLSL::assignColor( LangElement *elem,
    {
       // create color var
       color = new Var;
-      color->setName( getOutputTargetVarName( outputTarget ) );
       color->setType( "vec4" );
+      color->setName( getOutputTargetVarName( outputTarget ) );
+      color->setStructName( "OUT" );
 
-      return new GenOp( "@ = @", new DecOp(color), elem );
+      return new GenOp( "@ = @", color, elem );
    }
 
    LangElement *assign;
@@ -2186,6 +2187,7 @@ void FogFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
       color = new Var;
       color->setType( "vec4" );
       color->setName( "col" );
+      color->setStructName("OUT");
    }
 	
    Var *fogAmount;
