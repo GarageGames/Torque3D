@@ -32,6 +32,7 @@ beginModule('openGL');
 		addEngineSrcDir("gfx/gl");
 		addEngineSrcDir("gfx/gl/tGL");
 		addEngineSrcDir("shaderGen/GLSL");
+		addEngineSrcDir("lighting/advanced/glsl");
 		addEngineSrcDir("terrain/glsl");
 		addEngineSrcDir("forest/glsl");
 		addLibSrcFile("glew/src/glew.c");
@@ -41,6 +42,11 @@ beginModule('openGL');
 	{
 		addEngineSrcDir("gfx/gl/win32");
 	}
+    
+	addIncludePath( getAppLibSrcDir() . 'glew/include/' );
+    
+	if ( T3D_Generator::$platform == "win32" )
+		addProjectLibInput('OpenGL32.lib');
 
 endModule();
 
