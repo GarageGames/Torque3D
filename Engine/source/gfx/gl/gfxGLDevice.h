@@ -90,7 +90,6 @@ public:
    virtual void  setPixelShaderVersion( F32 version ) { mPixelShaderVersion = version; }
    
    virtual void setShader(GFXShader* shd);
-   virtual void disableShaders(); ///< Equivalent to setShader(NULL)
    
    /// @attention GL cannot check if the given format supports blending or filtering!
    virtual GFXFormat selectSupportedFormat(GFXTextureProfile *profile,
