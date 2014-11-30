@@ -40,6 +40,7 @@
    HoverNodeColor = "255 255 255 255";
 
    new GuiWindowCollapseCtrl(RiverEditorTreeWindow) {
+      AllowPopWindow = "1";
       internalName = "";
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -192,6 +193,7 @@
       };
    };
    new GuiWindowCollapseCtrl(RiverEditorOptionsWindow) {
+      AllowPopWindow = "1";
       internalName = "Window";
       canSaveDynamicFields = "0";
       Enabled = "1";

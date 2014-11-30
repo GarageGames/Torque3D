@@ -16,6 +16,7 @@
    canSaveDynamicFields = "1";
 
    new GuiWindowCtrl(ESelectObjectsWindow) {
+      AllowPopWindow = "1";
       text = "Select Objects";
       resizeWidth = "0";
       resizeHeight = "0";

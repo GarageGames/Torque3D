@@ -87,7 +87,6 @@ IMPLEMENT_CALLBACK( GuiTreeViewCtrl, isValidDragTarget, bool, ( S32 id, const ch
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onDefineIcons, void, (), (), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onAddGroupSelected, void, ( SimGroup* group ), ( group ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onAddSelection, void, ( S32 itemOrObjectId, bool isLastSelection ), ( itemOrObjectId, isLastSelection ), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onSelect, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onInspect, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onRemoveSelection, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onUnselect, void, ( S32 itemOrObjectId ), ( itemOrObjectId ), "" );
@@ -96,7 +95,6 @@ IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onObjectDeleteCompleted, void, (), (), "" )
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onKeyDown, void, ( S32 modifier, S32 keyCode ), ( modifier, keyCode ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onMouseUp, void, ( S32 hitItemId, S32 mouseClickCount ), ( hitItemId, mouseClickCount ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onMouseDragged, void, (), (), "" );
-IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onRightMouseDown, void, ( S32 itemId, const Point2I& mousePos, SimObject* object ), ( itemId, mousePos, object ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onRightMouseUp, void, ( S32 itemId, const Point2I& mousePos, SimObject* object ), ( itemId, mousePos, object ), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onBeginReparenting, void, (), (), "" );
 IMPLEMENT_CALLBACK( GuiTreeViewCtrl, onEndReparenting, void, (), (), "" );
@@ -881,6 +879,9 @@ void GuiTreeViewCtrl::initPersistFields()
    endGroup( "Inspector Trees" );
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //------------------------------------------------------------------------------
@@ -2232,13 +2233,13 @@ void GuiTreeViewCtrl::onItemSelected( Item *item )
    {
       SimObject* object = item->getObject();
 	   if( object )
-         onSelect_callback( object->getId() );
+         onSelect_callback(Con::getIntArg( object->getId()),"" );
       if( !item->isParent() && object )
          onInspect_callback( object->getId() );
    }
    else
    {
-      onSelect_callback( item->mId );
+   onSelect_callback(Con::getIntArg( item->mId ),"");
       if( !item->isParent() )
          onInspect_callback( item->mId );
    }
@@ -3826,11 +3827,13 @@ void GuiTreeViewCtrl::onRightMouseDown(const GuiEvent & event)
       return;
 
    //
+   char buf[32];
+      dSprintf( buf, sizeof( buf ), "%d %d", event.mousePoint.x, event.mousePoint.y );
 
    if (item->isInspectorData() && item->getObject())
-      onRightMouseDown_callback( item->mId, event.mousePoint, item->getObject() );
+	   onRightMouseDown_callback(Con::getIntArg( item->mId), buf, Con::getIntArg(item->getObject()->getId()) );
    else
-      onRightMouseDown_callback( item->mId, event.mousePoint );
+      onRightMouseDown_callback( Con::getIntArg(item->mId),buf,"" );
 }
 
 //-----------------------------------------------------------------------------
@@ -4605,11 +4608,28 @@ void GuiTreeViewCtrl::inspectObject( SimObject* obj, bool okToEdit )
 
 //-----------------------------------------------------------------------------
 
+S32 GuiTreeViewCtrl::insertObject( S32 parent, SimObject* obj, bool okToEdit )
+{
+   mFlags.set( IsEditable, okToEdit );
+   mFlags.set( IsInspector );
+
+   //onDefineIcons_callback();
+
+   GuiTreeViewCtrl::Item *item = addInspectorDataItem( getItem(parent), obj );
+   return item->getID();
+}
+
+//-----------------------------------------------------------------------------
+
 S32 GuiTreeViewCtrl::findItemByName(const char *name)
 {
    for (S32 i = 0; i < mItems.size(); i++) 
+   {
+	   if( mItems[i]->mState.test( Item::InspectorData ) )
+		   continue;
       if (mItems[i] && dStrcmp(mItems[i]->getText(),name) == 0) 
          return mItems[i]->mId;
+   }
 
    return 0;
 }
@@ -4619,8 +4639,12 @@ S32 GuiTreeViewCtrl::findItemByName(const char *name)
 S32 GuiTreeViewCtrl::findItemByValue(const char *name)
 {
    for (S32 i = 0; i < mItems.size(); i++) 
-      if (mItems[i] && dStrcmp(mItems[i]->getValue(),name) == 0) 
-         return mItems[i]->mId;
+   {
+	   if( mItems[i]->mState.test( Item::InspectorData ) )
+		   continue;
+	   if (mItems[i] && dStrcmp(mItems[i]->getValue(),name) == 0) 
+		   return mItems[i]->mId;
+   }
 
    return 0;
 }
@@ -4767,6 +4791,10 @@ DefineEngineMethod( GuiTreeViewCtrl, insertItem, S32, ( S32 parentId, const char
    return object->insertItem( parentId, text, value, icon, normalImage, expandedImage );
 }
 
+DefineEngineMethod( GuiTreeViewCtrl, insertObject, S32, ( S32 parentId, SimObject* obj, bool OKToEdit ), (false), "Inserts object as a child to the given parent." )
+{
+	return object->insertObject(parentId, obj, OKToEdit);
+}
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiTreeViewCtrl, lockSelection, void, ( bool lock ), ( true ),

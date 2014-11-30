@@ -182,6 +182,21 @@ public:
    virtual void _populateMenu( GuiPopUpMenuCtrl *menu );
 };
 
+//ControlBoundAddition
+//-----------------------------------------------------------------------------
+// GuiInspectorTypeGuiControl Class
+//-----------------------------------------------------------------------------
+class GuiInspectorTypeGuiControl : public GuiInspectorTypeMenuBase
+{
+private:
+   typedef GuiInspectorTypeMenuBase Parent;
+public:
+   DECLARE_CONOBJECT(GuiInspectorTypeGuiControl);
+   static void consoleInit();
+
+   virtual void _populateMenu( GuiPopUpMenuCtrl *menu );
+};
+
 //-----------------------------------------------------------------------------
 // GuiInspectorTypeCheckBox Class
 //-----------------------------------------------------------------------------

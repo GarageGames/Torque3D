@@ -88,6 +88,8 @@ function RiverEditorPlugin::onWorldEditorStartup( %this )
 
 function RiverEditorPlugin::onActivated( %this )
 {
+   RiverEditorPlugin.isActive = true;
+
    %this.readSettings();
    
    $River::EditorOpen = true;   
@@ -125,6 +127,9 @@ function RiverEditorPlugin::onActivated( %this )
 
 function RiverEditorPlugin::onDeactivated( %this )
 {
+   if (!RiverEditorPlugin.isActive)
+      return;
+   RiverEditorPlugin.isActive = false;
    %this.writeSettings();
    
    $River::EditorOpen = false;   

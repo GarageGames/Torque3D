@@ -42,6 +42,7 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "console/engineAPI.h"
+#include "console/SimXMLDocument.h"
 
 IMPLEMENT_CO_NETOBJECT_V1( ConvexShape );
 
@@ -359,13 +360,14 @@ void ConvexShape::onRemove()
    Parent::onRemove();
 }
 
-void ConvexShape::writeFields( Stream &stream, U32 tabStop )
+void ConvexShape::writeFields( Stream &stream, U32 tabStop, bool XMLOutput )
 {
-   Parent::writeFields( stream, tabStop );
+   Parent::writeFields( stream, tabStop, XMLOutput );
 
    // Now write all planes.
 
-   stream.write(2, "\r\n");   
+   if( !XMLOutput)
+      stream.write(2, "\r\n");   
 
    S32 count = mSurfaces.size();
    if ( count > smMaxSurfaces )
@@ -386,6 +388,16 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
       char buffer[1024];
       dMemset( buffer, 0, 1024 );      
       
+      if(XMLOutput)
+      {
+         dSprintf(buffer, 1024, "%g %g %g %g %g %g %g", quat.x, quat.y, quat.z, quat.w, pos.x, pos.y, pos.z);
+         getcurrentXML()->pushNewElement("surface");
+         getcurrentXML()->addData(buffer);
+         getcurrentXML()->popElement();
+         continue;
+      }
+      /// For Stream output
+      stream.writeTabs(tabStop);
       dSprintf( buffer, 1024, "surface = \"%g %g %g %g %g %g %g\";", 
          quat.x, quat.y, quat.z, quat.w, pos.x, pos.y, pos.z );      
 

@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "console/engineAPI.h"
 #include "gui/editor/guiInspector.h"
 #include "gui/editor/inspector/field.h"
 #include "gui/editor/inspector/group.h"
@@ -40,6 +41,18 @@ ConsoleDocClass( GuiInspector,
 
 //#define DEBUG_SPEW
 
+IMPLEMENT_CALLBACK( GuiInspector, onClear, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiInspector, beginCompoundUndo, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiInspector, endCompoundUndo, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onBeginCompoundEdit, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onEndCompoundEdit, void, (), (), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onFieldSelected, void, ( const char* fieldName, const char* fieldTypeStr, const char* fieldDoc ), ( fieldName, fieldTypeStr, fieldDoc ), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onFieldRightClick, void, ( const char* field ), ( field ), "");
+IMPLEMENT_CALLBACK( GuiInspector, onFieldAdded, void, ( const char* object, const char* fieldName ), ( object, fieldName ), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onFieldRemoved, void, ( const char* object, const char* fieldName ), ( object, fieldName ), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onFieldRenameAlreadyDefined, void, ( const char* object, const char* oldFieldName, const char* newFieldName ), ( object, oldFieldName, newFieldName ),"" );
+IMPLEMENT_CALLBACK( GuiInspector, onFieldRenamed, void, ( const char* object, const char* oldFieldName, const char* newFieldName ), ( object, oldFieldName, newFieldName ), "" );
+IMPLEMENT_CALLBACK( GuiInspector, onInspectorFieldModified, void, ( const char* object, const char* fieldName, const char * arrayIndex, const char* oldValue, const char* newValue ), ( object, fieldName, arrayIndex, oldValue, newValue ), "" );
 
 //-----------------------------------------------------------------------------
 
@@ -262,8 +275,7 @@ void GuiInspector::clearGroups()
 
    mHLField = NULL;
    
-   if( isMethod( "onClear" ) )
-      Con::executef( this, "onClear" );
+   onClear_callback();
 
    Vector<GuiInspectorGroup*>::iterator i = mGroups.begin();
 
@@ -342,8 +354,7 @@ void GuiInspector::addInspectObject( SimObject* object, bool autoSync )
    #endif
 
    // Give users a chance to customize fields on this object
-   if( object->isMethod("onDefineFieldTypes") )
-      Con::executef( object, "onDefineFieldTypes" );
+   object->onDefineFieldTypes_callback();
 
    // Set Target
    mTargets.push_back( object );

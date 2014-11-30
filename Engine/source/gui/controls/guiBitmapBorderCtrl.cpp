@@ -150,7 +150,7 @@ void GuiBitmapBorderCtrl::onRender(Point2I offset, const RectI &updateRect)
       if(mProfile->mOpaque)
          GFX->getDrawUtil()->drawRectFill(winRect, mProfile->mFillColor);
 
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset, mBitmapBounds[BorderTopLeft]);
       GFX->getDrawUtil()->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[BorderTopRight].extent.x, offset.y),
                       mBitmapBounds[BorderTopRight]);

@@ -115,6 +115,9 @@ public:
 
    DECLARE_CONOBJECT(GuiMissionAreaCtrl);
 
+   DECLARE_CALLBACK( void, onMissionAreaModified, () );
+   DECLARE_CALLBACK( void, onUndo, () );
+
    // SimObject
    bool onAdd();
    static void initPersistFields();

@@ -40,6 +40,11 @@ public:
       ModeSlowing,                    // AI is slowing down as it reaches it's destination.
 	};
 
+    DECLARE_CALLBACK( void, onMoveStuck, ( AIPlayer* obj ) );
+    DECLARE_CALLBACK( void, onReachDestination, ( AIPlayer* obj ) );
+    DECLARE_CALLBACK( void, onTargetEnterLOS, ( AIPlayer* obj ) );
+    DECLARE_CALLBACK( void, onTargetExitLOS, ( AIPlayer* obj ) );
+
 private:
    MoveState mMoveState;
    F32 mMoveSpeed;

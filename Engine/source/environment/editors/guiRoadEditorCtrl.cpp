@@ -24,6 +24,7 @@
 #include "environment/editors/guiRoadEditorCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneManager.h"
 #include "collision/collision.h"
 #include "math/util/frustum.h"
@@ -45,6 +46,12 @@ ConsoleDocClass( GuiRoadEditorCtrl,
    "Editor use only.\n\n"
    "@internal"
 );
+
+IMPLEMENT_CALLBACK(GuiRoadEditorCtrl, onNodeModified, void, (const char* nodeIdx), (nodeIdx), "");
+IMPLEMENT_CALLBACK(GuiRoadEditorCtrl, onNodeSelected, void, (const char* nodeIdx, const char* nodeWidth), (nodeIdx, nodeWidth), "");
+IMPLEMENT_CALLBACK(GuiRoadEditorCtrl, paletteSync, void, (const char* mode), (mode), "");
+IMPLEMENT_CALLBACK(GuiRoadEditorCtrl, onRoadCreation, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiRoadEditorCtrl, onRoadSelected, void, (const char* road), (road), "");
 
 GuiRoadEditorCtrl::GuiRoadEditorCtrl()
 {
@@ -445,7 +452,7 @@ void GuiRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 		
 		//send a callback to script after were done here if one exists
 		if ( isMethod( "onRoadCreation" ) )
-         Con::executef( this, "onRoadCreation" );
+        { onRoadCreation_callback(); }
 
 		return;
    }
@@ -675,7 +682,7 @@ void GuiRoadEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
       mIsDirty = true;
    }   
 
-   Con::executef( this, "onNodeModified", Con::getIntArg(mSelNode) );
+   onNodeModified_callback( Con::getIntArg(mSelNode) );
 }
 
 void GuiRoadEditorCtrl::on3DMouseEnter(const Gui3DMouseEvent & event)
@@ -945,7 +952,7 @@ void GuiRoadEditorCtrl::setMode( String mode, bool sourceShortcut = false )
    mMode = mode;
 
 	if( sourceShortcut )
-		Con::executef( this, "paletteSync", mode );
+    { paletteSync_callback(mode); }
 }
 
 void GuiRoadEditorCtrl::setSelectedRoad( DecalRoad *road )
@@ -953,9 +960,9 @@ void GuiRoadEditorCtrl::setSelectedRoad( DecalRoad *road )
    mSelRoad = road;
 
    if ( road != NULL )
-      Con::executef( this, "onRoadSelected", road->getIdString() );
+   { onRoadSelected_callback( road->getIdString() ); }
    else
-      Con::executef( this, "onRoadSelected" );
+   { onRoadSelected_callback(""); }
 
 	if ( mSelRoad != road )
       setSelectedNode(-1);
@@ -1003,9 +1010,9 @@ void GuiRoadEditorCtrl::setSelectedNode( S32 node )
    mSelNode = node;
    
    if ( mSelNode != -1 && mSelRoad != NULL )
-      Con::executef( this, "onNodeSelected", Con::getIntArg(mSelNode), Con::getFloatArg(mSelRoad->mNodes[mSelNode].width) );
+   { onNodeSelected_callback( Con::getIntArg(mSelNode), Con::getFloatArg(mSelRoad->mNodes[mSelNode].width) ); }
    else
-      Con::executef( this, "onNodeSelected", Con::getIntArg(-1) );
+   { onNodeSelected_callback( Con::getIntArg(-1) ); }
 }
 
 void GuiRoadEditorCtrl::submitUndo( const UTF8 *name )

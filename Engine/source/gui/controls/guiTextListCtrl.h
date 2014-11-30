@@ -51,6 +51,7 @@ class GuiTextListCtrl : public GuiArrayCtrl
    enum {
       InvalidId = 0xFFFFFFFF
    };
+     public:
    Vector<S32> mColumnOffsets;
 
    bool  mFitParentWidth;
@@ -58,16 +59,15 @@ class GuiTextListCtrl : public GuiArrayCtrl
 
    U32 getRowWidth(Entry *row);
    bool cellSelected(Point2I cell);
-   void onCellSelected(Point2I cell);
+   virtual void onCellSelected(Point2I cell);
 
-  public:
+ 
    GuiTextListCtrl();
 
    DECLARE_CONOBJECT(GuiTextListCtrl);
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that displays text in tabular form." );
    
-   DECLARE_CALLBACK( void, onSelect, (const char* cellid, const char* text));
    DECLARE_CALLBACK( void, onDeleteKey, ( const char* id ));
 
    static void initPersistFields();
@@ -87,6 +87,7 @@ class GuiTextListCtrl : public GuiArrayCtrl
    void setEntryActive(U32 id, bool active);
    S32 findEntryById(U32 id);
    S32 findEntryByText(const char *text);
+   S32 findEntryByColumnText( S32 columnId, const char* text );
    bool isEntryActive(U32 id);
 
    U32 getEntryId(U32 index);

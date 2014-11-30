@@ -26,7 +26,7 @@
 #ifndef _MPOLYHEDRON_H_
 #include "math/mPolyhedron.h"
 #endif
-
+#include "console/SimXMLDocument.h"
 
 /// Shared interface for polyhedral objects.
 struct IScenePolyhedralObject
@@ -79,6 +79,8 @@ class ScenePolyhedralObject : public Base, public IScenePolyhedralObject
 
    public:
 
+		virtual SimXMLDocument* getcurrentXML();
+
       ScenePolyhedralObject()
          : mIsBox( true ) {}
 
@@ -91,7 +93,7 @@ class ScenePolyhedralObject : public Base, public IScenePolyhedralObject
 
       // SimObject.
       virtual bool onAdd();
-      virtual void writeFields( Stream& stream, U32 tabStop );
+      virtual void writeFields( Stream& stream, U32 tabStop, bool XMLOutput = false );
       virtual bool writeField( StringTableEntry name, const char* value );
 
       static void initPersistFields();

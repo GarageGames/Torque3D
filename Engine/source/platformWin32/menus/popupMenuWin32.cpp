@@ -531,7 +531,7 @@ bool PopupMenu::handleSelect(U32 command, const char *text /* = NULL */)
    }
 
    // [tom, 8/20/2006] Wasn't handled by a submenu, pass off to script
-   return dAtob(Con::executef(this, "onSelectItem", Con::getIntArg(pos), text ? text : ""));
+	return onSelectItem_callback(pos,text ? text : "");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -562,6 +562,8 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
       p.y = y;
       ClientToScreen(hWindow, &p);
    }
+   //Set the popupShown in the canvas.
+   owner->setPopupShown(true);
 
    winState.renderThreadBlocked = true;
    U32 opt = (int)TrackPopupMenu(mData->mMenu, TPM_NONOTIFY|TPM_RETURNCMD, p.x, p.y, 0, hWindow, NULL);

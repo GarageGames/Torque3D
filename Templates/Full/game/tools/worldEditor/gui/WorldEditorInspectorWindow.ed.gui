@@ -14,6 +14,8 @@
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(EWInspectorWindow) {
+      AllowPopWindow = "1";
+      Name="EWInspectorWindow";
       canSaveDynamicFields = "0";
       internalName = "InspectorWindow";
       Enabled = "1";

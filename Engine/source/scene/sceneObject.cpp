@@ -86,6 +86,7 @@ ConsoleDocClass( SceneObject,
    "@ingroup gameObjects\n"
 );
 
+IMPLEMENT_CALLBACK( SceneObject, onEditorRender, void, (const char * editor, const char * selected, const char * expanded), (editor, selected, expanded), "" );
 
 Signal< void( SceneObject* ) > SceneObject::smSceneObjectAdd;
 Signal< void( SceneObject* ) > SceneObject::smSceneObjectRemove;

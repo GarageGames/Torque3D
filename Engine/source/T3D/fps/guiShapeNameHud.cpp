@@ -52,6 +52,7 @@ class GuiShapeNameHud : public GuiControl {
    ColorF   mTextColor;
    ColorF   mLabelFillColor;
    ColorF   mLabelFrameColor;
+   Point2I   mLabelPadding;
 
    F32      mVerticalOffset;
    F32      mDistanceFade;
@@ -60,8 +61,16 @@ class GuiShapeNameHud : public GuiControl {
    bool     mShowLabelFrame;
    bool     mShowLabelFill;
 
-   Point2I  mLabelPadding;
 
+   ColorF mTextColorCopy;
+   ColorF mFrameColorCopy;
+   ColorF mShapeNameFillColorCopy;
+
+   void applyProfileSettings();
+
+   void copyProfileSettings();
+
+   void resetProfileSettings();
 protected:
    void drawName( Point2I offset, const char *buf, F32 opacity);
 
@@ -72,6 +81,7 @@ public:
    virtual void onRender(Point2I offset, const RectI &updateRect);
 
    static void initPersistFields();
+   void onStaticModified( const char *slotName, const char *newValue );
    DECLARE_CONOBJECT( GuiShapeNameHud );
    DECLARE_CATEGORY( "Gui Game" );
    DECLARE_DESCRIPTION( "Displays name and damage of ShapeBase objects in its bounds.\n"
@@ -144,8 +154,76 @@ void GuiShapeNameHud::initPersistFields()
    addField( "distanceFade", TypeF32, Offset( mDistanceFade, GuiShapeNameHud ), "Visibility distance (how far the player must be from the ShapeBase object in focus) for this control to render." );
    endGroup("Misc");
    Parent::initPersistFields();
+
+   removeField( "controlFontColor" );
+
+   removeField( "controlFillColor" );
+
+   removeField( "backgroundColor" );
+
+   removeField( "contextFontColor" );
+
+   removeField( "contextBackColor" );
+
+   removeField( "contextFillColor" );
 }
 
+
+void GuiShapeNameHud::copyProfileSettings()
+{
+	if(!mProfileSettingsCopied)
+	{
+		mTextColorCopy = mTextColor;
+		mShapeNameFillColorCopy = mFillColor;
+		mFrameColorCopy = mFrameColor;
+		
+		Parent::copyProfileSettings();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiShapeNameHud::resetProfileSettings()
+{
+	mFrameColor = mFrameColorCopy;
+	mTextColor = mTextColorCopy;
+	mFillColor = mShapeNameFillColorCopy;
+	
+	Parent::resetProfileSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiShapeNameHud::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   //Set the alpha value
+   if(mTextColor)
+	   mTextColor.alpha = mTextColorCopy.alpha *mRenderAlpha;
+   if(mFrameColor)
+	   mFrameColor.alpha = mFrameColorCopy.alpha * mRenderAlpha;
+   if(mFillColor)
+	   mFillColor.alpha = mShapeNameFillColorCopy.alpha * mRenderAlpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiShapeNameHud::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "textColor" ) || !dStricmp( slotName, "frameColor" ) || !dStricmp( slotName, "fillColor" ))
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+	
+		if( !dStricmp( slotName, "textColor" ) )
+			mTextColorCopy = color;
+		else if( !dStricmp( slotName, "frameColor" ) )
+			mFrameColorCopy = color;
+		else if( !dStricmp( slotName, "fillColor" ) )
+			mShapeNameFillColorCopy = color;
+	}
+}
 
 //----------------------------------------------------------------------------
 /// Core rendering method for this control.

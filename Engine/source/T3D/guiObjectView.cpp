@@ -188,6 +188,10 @@ void GuiObjectView::initPersistFields()
    endGroup( "Camera" );
    
    Parent::initPersistFields();
+
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //------------------------------------------------------------------------------
@@ -302,6 +306,8 @@ void GuiObjectView::onRightMouseUp( const GuiEvent &event )
 {
    mouseUnlock();
    mMouseState = None;
+
+   Parent::onRightMouseUp( event );
 }
 
 //------------------------------------------------------------------------------
@@ -469,6 +475,9 @@ bool GuiObjectView::processCameraQuery( CameraQuery* query )
 void GuiObjectView::onMouseEnter( const GuiEvent & event )
 {
    onMouseEnter_callback();
+
+   //fade control
+   fadeControl();
 }
 
 //------------------------------------------------------------------------------
@@ -476,6 +485,7 @@ void GuiObjectView::onMouseEnter( const GuiEvent & event )
 void GuiObjectView::onMouseLeave( const GuiEvent & event )
 {
    onMouseLeave_callback();
+   smCapturedControl = this;
 }
 
 //------------------------------------------------------------------------------

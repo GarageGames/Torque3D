@@ -104,6 +104,17 @@ void GuiColorPickerCtrl::initPersistFields()
    endGroup("ColorPicker");
 
    Parent::initPersistFields();
+   removeField( "controlFontColor" );
+
+   removeField( "controlFillColor" );
+
+   removeField( "backgroundColor" );
+
+   removeField( "contextFontColor" );
+
+   removeField( "contextBackColor" );
+
+   removeField( "contextFillColor" );
 }
 
 //--------------------------------------------------------------------------
@@ -328,6 +339,63 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    }
 }
 
+
+void GuiColorPickerCtrl::copyProfileSettings()
+{
+	if( !mProfileSettingsCopied)
+	{
+		mPickColorCopy = mPickColor;
+		mBaseColorCopy = mBaseColor;
+
+		Parent::copyProfileSettings();
+	}
+}
+
+void GuiColorPickerCtrl::resetProfileSettings()
+{
+	mPickColor = mPickColorCopy;
+	mBaseColor = mBaseColorCopy;
+	colorWhite = ColorF(1.,1.,1.);
+	colorWhiteBlend = ColorF(1.,1.,1.,.75);
+	colorBlack = ColorF(.0,.0,.0);
+	colorAlpha = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
+	colorAlphaW = ColorF(1.0f, 1.0f, 1.0f, 0.0f);
+
+	Parent::resetProfileSettings();
+}
+
+void GuiColorPickerCtrl::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   // Apply alpha to the color
+   if(mPickColor)
+	   mPickColor.alpha = mPickColorCopy.alpha * mRenderAlpha;
+   if(mBaseColor)
+	   mBaseColor.alpha = mBaseColorCopy.alpha * mRenderAlpha;
+   for( S32 i = 0; i < 7; i++ )
+	   mColorRange[i].alpha = mRenderAlpha * 255;
+
+   colorAlpha.alpha *= mRenderAlpha;
+   colorAlphaW.alpha *= mRenderAlpha;
+   colorBlack.alpha *= mRenderAlpha;
+   colorWhite.alpha *= mRenderAlpha;
+   colorWhiteBlend.alpha *= mRenderAlpha;
+
+}
+
+void GuiColorPickerCtrl::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "baseColor" ) || !dStricmp( slotName, "pickColor" ) )
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+		if( !dStricmp( slotName, "baseColor" ) )
+			mBaseColorCopy = color;
+		else
+			mPickColorCopy = color;
+	}
+}
 void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
 {
    if (mStateBlock.isNull())
@@ -453,6 +521,8 @@ void GuiColorPickerCtrl::onMouseDown(const GuiEvent &event)
       setSelectorPos(globalToLocalCoord(event.mousePoint)); 
    
    mMouseDown = true;
+
+   Parent::onMouseDown( event );
 }
 
 //--------------------------------------------------------------------------
@@ -468,6 +538,8 @@ void GuiColorPickerCtrl::onMouseDragged(const GuiEvent &event)
    if( !mActionOnMove )
       execAltConsoleCallback();
 
+   Parent::onMouseDragged( event );
+
 }
 
 //--------------------------------------------------------------------------
@@ -482,6 +554,9 @@ void GuiColorPickerCtrl::onMouseMove(const GuiEvent &event)
 void GuiColorPickerCtrl::onMouseEnter(const GuiEvent &event)
 {
    mMouseOver = true;
+
+   // fade Control
+   fadeControl();
 }
 
 //--------------------------------------------------------------------------
@@ -489,10 +564,12 @@ void GuiColorPickerCtrl::onMouseLeave(const GuiEvent &)
 {
    // Reset state
    mMouseOver = false;
+
+   smCapturedControl = this;
 }
 
 //--------------------------------------------------------------------------
-void GuiColorPickerCtrl::onMouseUp(const GuiEvent &)
+void GuiColorPickerCtrl::onMouseUp(const GuiEvent &event)
 {
    //if we released the mouse within this control, perform the action
 	if (mActive && mMouseDown && (mDisplayMode != pDropperBackground)) 
@@ -505,6 +582,8 @@ void GuiColorPickerCtrl::onMouseUp(const GuiEvent &)
    }
    
    mouseUnlock();
+
+   Parent::onMouseUp( event );
 }
 
 //--------------------------------------------------------------------------

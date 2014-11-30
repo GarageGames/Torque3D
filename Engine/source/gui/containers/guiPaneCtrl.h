@@ -78,7 +78,7 @@ class GuiPaneControl : public GuiControl
       Point2I mThumbSize;
 
       ///
-      bool mMouseOver;
+      //bool mMouseOver;
       
       ///
       bool mDepressed;

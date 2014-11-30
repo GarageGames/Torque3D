@@ -403,7 +403,9 @@ bool PostEffect::onAdd()
          texFilename = scriptPath.getFullPath() + '/' + texFilename;
 
       // Try to load the texture.
-      mTextures[i].set( texFilename, &PostFxTextureProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+	  if (!mTextures[i].set(texFilename, &PostFxTextureProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__)))
+		  Con::errorf("Invalid Texture for PostEffect (%s), The Texture '%s' does not exist!", this->getName(), texFilename.c_str());
+      
    }
 
    // Is the target a named target?

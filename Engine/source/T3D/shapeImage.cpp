@@ -96,14 +96,14 @@ ConsoleDocClass( ShapeBaseImageData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( ShapeBaseImageData, onMount, void, ( ShapeBase* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
+IMPLEMENT_CALLBACK( ShapeBaseImageData, onImageMount, void, ( ShapeBase* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
    "@brief Called when the Image is first mounted to the object.\n\n"
 
    "@param obj object that this Image has been mounted to\n"
    "@param slot Image mount slot on the object\n"
    "@param dt time remaining in this Image update\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseImageData, onUnmount, void, ( ShapeBase* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
+IMPLEMENT_CALLBACK( ShapeBaseImageData, onImageUnmount, void, ( ShapeBase* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
    "@brief Called when the Image is unmounted from the object.\n\n"
 
    "@param obj object that this Image has been unmounted from\n"
@@ -2275,7 +2275,7 @@ void ShapeBase::setImage(  U32 imageSlot,
    // Notify script unmount since we're swapping datablocks.
    if (image.dataBlock && !isGhost()) {
       F32 dt = image.dataBlock->useRemainderDT ? image.rDT : 0.0f;
-      image.dataBlock->onUnmount_callback( this, imageSlot, dt );
+      image.dataBlock->onImageUnmount_callback( this, imageSlot, dt );
    }
 
    // Stop anything currently going on with the image.
@@ -2376,7 +2376,7 @@ void ShapeBase::setImage(  U32 imageSlot,
    if ( !isGhost() )
    {
       F32 dt = image.dataBlock->useRemainderDT ? image.rDT : 0.0f;
-      image.dataBlock->onMount_callback( this, imageSlot, dt );
+      image.dataBlock->onImageMount_callback( this, imageSlot, dt );
    }
    else
    {

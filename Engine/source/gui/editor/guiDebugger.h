@@ -75,6 +75,10 @@ class DbgFileView : public GuiArrayCtrl
    DECLARE_CONOBJECT(DbgFileView);
    DECLARE_CATEGORY( "Gui Editor" );
 
+   DECLARE_CALLBACK( void, onRemoveBreakPoint, ( const char* line) );
+   DECLARE_CALLBACK( void, onSetBreakPoint, ( const char* line) );
+   DECLARE_CALLBACK( void, onSetWatch, ( const char* variable) );
+
    bool onWake();
 
    void clear();

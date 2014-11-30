@@ -24,6 +24,7 @@
 #include "gui/buttons/guiToolboxButtonCtrl.h"
 
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 #include "console/consoleTypes.h"
@@ -204,7 +205,7 @@ void GuiToolboxButtonCtrl::renderStateRect( GFXTexHandle &texture, const RectI& 
 {
    if (texture)
    {
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmapStretch( texture, rect );
    }
 }
@@ -220,7 +221,7 @@ void GuiToolboxButtonCtrl::renderButton(GFXTexHandle &texture, Point2I &offset, 
       finalOffset.x += ( ( getWidth() / 2 ) - ( texture.getWidth() / 2 ) );
       finalOffset.y += ( ( getHeight() / 2 ) - ( texture.getHeight() / 2 ) );
 
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmap(texture, finalOffset);
       renderChildControls( offset, updateRect);
    }

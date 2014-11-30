@@ -87,6 +87,7 @@ function RoadEditorPlugin::onWorldEditorStartup( %this )
 
 function RoadEditorPlugin::onActivated( %this )
 {
+   RoadEditorPlugin.isActive = true;
    %this.readSettings();
    
    ToolsPaletteArray->RoadEditorAddRoadMode.performClick();
@@ -112,6 +113,9 @@ function RoadEditorPlugin::onActivated( %this )
 
 function RoadEditorPlugin::onDeactivated( %this )
 {
+   if (!RoadEditorPlugin.isActive)
+      return;
+   RoadEditorPlugin.isActive = false;
    %this.writeSettings();
    
    RoadEditorGui.setVisible( false );

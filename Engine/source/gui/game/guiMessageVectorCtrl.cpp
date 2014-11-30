@@ -32,6 +32,8 @@
 
 IMPLEMENT_CONOBJECT(GuiMessageVectorCtrl);
 
+IMPLEMENT_CALLBACK( GuiMessageVectorCtrl, urlClickCallback, void, (const char * url), (url), "" );
+
 ConsoleDocClass( GuiMessageVectorCtrl,
 	"@brief A chat HUD control that displays messages from a MessageVector.\n\n"
 
@@ -675,6 +677,49 @@ void GuiMessageVectorCtrl::onSleep()
    Parent::onSleep();
 }
 
+
+void GuiMessageVectorCtrl::copyProfileSettings()
+{
+	if(!mProfileSettingsCopied)
+	{
+		mSpecialColorCopy = mSpecialColor;
+		
+		Parent::copyProfileSettings();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiMessageVectorCtrl::resetProfileSettings()
+{
+	mSpecialColor = mSpecialColorCopy;
+	
+	Parent::resetProfileSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiMessageVectorCtrl::applyProfileSettings()
+{
+   Parent::applyProfileSettings();
+
+   //Set the alpha value
+   if(mSpecialColor)
+	   mSpecialColor.alpha = mSpecialColorCopy.alpha *mRenderAlpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiMessageVectorCtrl::onStaticModified( const char *slotName, const char *newValue )
+{
+	if( !dStricmp( slotName, "matchColor" ))
+	{
+		ColorF color(1, 0, 0, 1);
+		dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
+
+		mSpecialColorCopy = color;
+	}
+}
 
 //--------------------------------------------------------------------------
 void GuiMessageVectorCtrl::onRender(Point2I      offset,

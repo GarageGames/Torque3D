@@ -64,6 +64,15 @@ public:
    
    DECLARE_CONOBJECT(PopupMenu);
 
+   DECLARE_CALLBACK( void, onAdd, () );
+   DECLARE_CALLBACK( void, onRemove, () );
+   DECLARE_CALLBACK( void, onMenuSelect, () );
+   DECLARE_CALLBACK( void, onRemoveFromMenuBar, (const char* canvas) );
+   DECLARE_CALLBACK( void, onAttachToMenuBar, (const char* canvas, const char* pos, const char* title) );
+   DECLARE_CALLBACK( bool, onMessageReceived, (const char* queue, const char* event, const char* data) );
+
+	DECLARE_CALLBACK( bool, onSelectItem, (S32 pos,const char* text));
+
    static void initPersistFields();
 
    virtual bool onAdd();

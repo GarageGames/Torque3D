@@ -48,7 +48,7 @@ class GuiSliderCtrl : public GuiControl
       F32 mIncAmount;
       bool mDisplayValue;
       bool mDepressed;
-      bool mMouseOver;
+      //bool mMouseOver;
       bool mMouseDragged;
       bool mHasTexture;
 

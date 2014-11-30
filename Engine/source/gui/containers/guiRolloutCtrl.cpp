@@ -525,7 +525,7 @@ void GuiRolloutCtrl::onRender( Point2I offset, const RectI &updateRect )
 
    if ( mProfile->mBitmapArrayRects.size() >= NumBitmaps )
    {
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
 
       // Draw Rollout From Skin
       if ( !mIsExpanded && !mIsAnimating )

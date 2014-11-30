@@ -45,6 +45,7 @@ protected:
    DECLARE_CALLBACK( void, onTabComplete, (const char* val));
    DECLARE_CALLBACK( void, onReturn, ());
    DECLARE_CALLBACK( void, onValidate, ());
+	DECLARE_CALLBACK( void, onChangeCursorPos, (S32 newPosition));
 
    StringBuffer mTextBuffer;
 
@@ -123,6 +124,8 @@ public:
    void selectAllText();
    void clearSelectedText();
 
+   void selectText(S32 blockStart, S32 blockEnd);
+
    void forceValidateText();
    const char *getScriptValue();
    void setScriptValue(const char *value);
@@ -139,6 +142,7 @@ public:
    void onPaste();
    void onUndo();
 
+   void onChangeCursorPos();
    virtual void setFirstResponder();
    virtual void onLoseFirstResponder();
 

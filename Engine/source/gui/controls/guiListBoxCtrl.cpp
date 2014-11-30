@@ -1218,6 +1218,8 @@ void GuiListBoxCtrl::onMouseDown( const GuiEvent &event )
       onDoubleClick_callback();
 
    mLastClickItem = hitItem;
+
+   Parent::onMouseDown(event);
 }
 
 void GuiListBoxCtrl::onMouseUp( const GuiEvent& event )

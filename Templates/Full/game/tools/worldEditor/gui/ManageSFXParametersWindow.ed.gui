@@ -16,6 +16,7 @@
    isDecoy = "0";
 
    new GuiWindowCollapseCtrl(EManageSFXParameters) {
+      AllowPopWindow = "1";
       CollapseGroup = "-1";
       CollapseGroupNum = "-1";
       resizeWidth = "1";

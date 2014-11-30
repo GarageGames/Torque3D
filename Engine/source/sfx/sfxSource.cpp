@@ -184,6 +184,8 @@ IMPLEMENT_CALLBACK( SFXSource, onParameterValueChange, void, ( SFXParameter* par
    "@param parameter The parameter that has changed value.\n"
    "@note This is also triggered when the parameter is first attached to the source." );
 
+IMPLEMENT_CALLBACK( SFXSource, onMarkerPassed, void, (const char* idString), (idString),"");
+
 
 //-----------------------------------------------------------------------------
 

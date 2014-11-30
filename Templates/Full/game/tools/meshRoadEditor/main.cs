@@ -87,6 +87,7 @@ function MeshRoadEditorPlugin::onWorldEditorStartup( %this )
 
 function MeshRoadEditorPlugin::onActivated( %this )
 {
+   MeshRoadEditorPlugin.isActive = true;
    %this.readSettings();
    
    ToolsPaletteArray->MeshRoadEditorAddRoadMode.performClick();
@@ -116,6 +117,9 @@ function MeshRoadEditorPlugin::onActivated( %this )
 
 function MeshRoadEditorPlugin::onDeactivated( %this )
 {   
+   if (!MeshRoadEditorPlugin.isActive)
+      return;
+   MeshRoadEditorPlugin.isActive = false;
    %this.writeSettings();
    
    MeshRoadEditorGui.setVisible( false );

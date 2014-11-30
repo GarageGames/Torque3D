@@ -251,6 +251,7 @@ bool GuiInspectorGroup::inspectGroup()
    GuiStackControl *pArrayStack = NULL;
    GuiRolloutCtrl *pArrayRollout = NULL;
    bool bGrabItems = false;
+   bool bReadOnly = false;
 
    AbstractClassRep* commonAncestorClass = findCommonAncestorClass();
    AbstractClassRep::FieldList& fieldList = commonAncestorClass->mFieldList;
@@ -286,6 +287,11 @@ bool GuiInspectorGroup::inspectGroup()
       {
          if( bNoGroup == true && bGrabItems == true )
             continue;
+
+		 if( field->flag.test( AbstractClassRep::FIELD_ReadOnly ) )
+			 bReadOnly = true;
+		 else
+			 bReadOnly = false;
 
          if ( field->type == AbstractClassRep::StartArrayFieldType )
          {
@@ -385,6 +391,9 @@ bool GuiInspectorGroup::inspectGroup()
                      field->pFieldname, i );
                   #endif
 
+				  // Readonly check
+				  if( bReadOnly )
+					  fieldGui->setActive(false);
                   mChildren.push_back( fieldGui );
                   pStack->addObject( fieldGui );
                }
@@ -450,6 +459,9 @@ bool GuiInspectorGroup::inspectGroup()
                
                if ( fieldGui->registerObject() )
                {
+				  // Readonly check
+				  if( bReadOnly )
+					  fieldGui->setActive(false);
                   mChildren.push_back( fieldGui );
                   stack->addObject( fieldGui );
                }
@@ -486,6 +498,10 @@ bool GuiInspectorGroup::inspectGroup()
                Platform::outputDebugString( "[GuiInspectorGroup] Adding field '%s'",
                   field->pFieldname );
                #endif
+
+			   // Readonly check
+			   if( bReadOnly )
+				   fieldGui->setActive(false);
 
                mChildren.push_back( fieldGui );
                mStack->addObject( fieldGui );

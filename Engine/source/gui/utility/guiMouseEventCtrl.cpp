@@ -346,11 +346,13 @@ void GuiMouseEventCtrl::onMouseDragged(const GuiEvent & event)
 void GuiMouseEventCtrl::onMouseEnter(const GuiEvent & event)
 {
    sendMouseEvent("onMouseEnter", event);
+   fadeControl();
 }
 
 void GuiMouseEventCtrl::onMouseLeave(const GuiEvent & event)
 {
-   sendMouseEvent("onMouseLeave", event);
+   sendMouseEvent("onMouseLeave", event); 
+   smCapturedControl = this;
 }
 
 void GuiMouseEventCtrl::onRightMouseDown(const GuiEvent & event)
@@ -365,6 +367,8 @@ void GuiMouseEventCtrl::onRightMouseUp(const GuiEvent & event)
    if(mLockMouse)
       mouseUnlock();
    sendMouseEvent("onRightMouseUp", event);
+
+   Parent::onRightMouseUp( event );
 }
 
 void GuiMouseEventCtrl::onRightMouseDragged(const GuiEvent & event)

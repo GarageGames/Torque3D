@@ -56,6 +56,8 @@ protected:
 
    DECLARE_CALLBACK( void, onCellHighlighted, ( const Point2I& cell ) );
    DECLARE_CALLBACK( void, onCellSelected, ( const Point2I& cell ) );
+   DECLARE_CALLBACK( void, onSelect, (const char* x, const char* y) );
+   DECLARE_CALLBACK( void, onRightMouseDown, (const char* x,  const char* y, const char* obj) );
 
    /// @}
 

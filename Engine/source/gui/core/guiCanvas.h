@@ -111,6 +111,9 @@ protected:
    bool        mDisplayWindow;
 
    /// @}
+   /// Popup Shown or not
+
+   bool mPopupShown;
 
    /// @name Mouse Input
    /// @{
@@ -190,11 +193,40 @@ protected:
    
    void checkLockMouseMove( const GuiEvent& event );
 
+   
+   String mOverrideMode;
+   Point2I OverridePosition;
 public:
+   void onWindowClose();
+   void setOverridePosition(Point2I value)
+      {
+         OverridePosition = value;
+      }
+   Point2I getOverridePosition()
+      {
+         return OverridePosition;
+      }
+
+   void setOverrideMode(const char * value)
+   {
+      mOverrideMode = String(StringTable->insert (value));
+   }
+
+   const char* getOverrideMode()
+   {
+      return StringTable->insert(mOverrideMode.c_str());
+   }
    DECLARE_CONOBJECT(GuiCanvas);
    DECLARE_CATEGORY( "Gui Core" );
+   DECLARE_CALLBACK( void, onResize, (const char* width, const char* height) );
+   DECLARE_CALLBACK( void, onCreateMenu, () );
+   DECLARE_CALLBACK( void, onDestroyMenu, () );
+   DECLARE_CALLBACK( void, onLoseFocus, () );
+   DECLARE_CALLBACK( void, onGainFocus, () );
+   DECLARE_CALLBACK( void, onWindowClose, () );
    
    GuiCanvas();
+   bool mIsPopUp;
    virtual ~GuiCanvas();
 
    virtual bool onAdd();
@@ -328,6 +360,11 @@ public:
    /// Returns true if the cursor is being rendered.
    virtual bool isCursorShown();
    /// @}
+   /// Retruns true if the popup is shown on the screen..
+   virtual bool isPopupShown() { return mPopupShown; }
+
+   ///Set if popup is shown on the screen.
+   virtual void setPopupShown(bool shown) { mPopupShown = shown; }
 
    ///used by the tooltip resource
    Point2I getCursorExtent() { return mDefaultCursor->getExtent(); }

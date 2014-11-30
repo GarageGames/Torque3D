@@ -38,6 +38,8 @@ private:
    typedef GuiTextCtrl Parent;
 
    F32 mProgress;
+   bool mHorizontalFill;
+   bool mInvertFill;
 
 public:
    //creation methods
@@ -53,6 +55,8 @@ public:
 
    void onPreRender();
    void onRender(Point2I offset, const RectI &updateRect);
+
+   static void initPersistFields();
 };
 
 #endif

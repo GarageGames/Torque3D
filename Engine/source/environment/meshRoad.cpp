@@ -51,6 +51,7 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
+#include "console/SimXMLDocument.h"
 
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
@@ -760,22 +761,33 @@ void MeshRoad::onStaticModified( const char* slotName, const char*newValue )
    }
 }
 
-void MeshRoad::writeFields( Stream &stream, U32 tabStop )
+void MeshRoad::writeFields( Stream &stream, U32 tabStop, bool XMLOutput  )
 {
-   Parent::writeFields( stream, tabStop );
+   Parent::writeFields( stream, tabStop, XMLOutput );
 
    // Now write all nodes
 
-   stream.write(2, "\r\n");   
+   if(!XmlOutput)
+      stream.write(2, "\r\n");   
 
    for ( U32 i = 0; i < mNodes.size(); i++ )
    {
       const MeshRoadNode &node = mNodes[i];
 
-      stream.writeTabs(tabStop);
-
-      char buffer[1024];
+     char buffer[1024];
       dMemset( buffer, 0, 1024 );
+     /// For XML Output
+     if(XMLOutput)
+     {
+        dSprintf( buffer, 1024, "%g %g %g %g %g %g %g %g", node.point.x, node.point.y, node.point.z, node.width, node.depth, node.normal.x, node.normal.y, node.normal.z );
+        getcurrentXML()->pushNewElement( "Node" );
+        getcurrentXML()->addData( buffer );
+        getcurrentXML()->popElement();
+        continue;
+     }
+     /// For Stream Output
+      stream.writeTabs(tabStop);
+           
       dSprintf( buffer, 1024, "Node = \"%g %g %g %g %g %g %g %g\";", node.point.x, node.point.y, node.point.z, node.width, node.depth, node.normal.x, node.normal.y, node.normal.z );      
       stream.writeLine( (const U8*)buffer );
    }

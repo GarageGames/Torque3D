@@ -114,6 +114,9 @@ void GuiFrameSetCtrl::initPersistFields()
       "Offset for row and column dividers in pixels" );
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //-----------------------------------------------------------------------------

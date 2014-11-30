@@ -24,6 +24,7 @@
 #include "gui/editor/guiDebugger.h"
 
 #include "gui/core/guiCanvas.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDrawUtil.h"
 #include "core/volume.h"
 
@@ -35,6 +36,11 @@ ConsoleDocClass( DbgFileView,
    "Possibly useful for an editor tooltip.\n\n"
    "@internal"
 );
+
+IMPLEMENT_GLOBAL_CALLBACK( DbgSetCursorWatch, void, ( const char *expr), ( expr ), "");
+IMPLEMENT_CALLBACK( DbgFileView, onRemoveBreakPoint, void, ( const char* line), ( line ), "" );
+IMPLEMENT_CALLBACK( DbgFileView, onSetBreakPoint, void, ( const char* line), ( line ),  "" );
+IMPLEMENT_CALLBACK( DbgFileView, onSetWatch, void, ( const char* variable), ( variable ),  "" );
 
 static const char* itoa(S32 i)
 {
@@ -532,10 +538,12 @@ void DbgFileView::onPreRender()
    {
       //send the query only when the var changes
       if (dStricmp(oldVar, mMouseOverVariable))
-			Con::executef("DbgSetCursorWatch", mMouseOverVariable);
+      { DbgSetCursorWatch_callback( mMouseOverVariable ); }
+			
    }
-	else
-		Con::executef("DbgSetCursorWatch", "");
+    else
+    { DbgSetCursorWatch_callback( "" ); }
+		
 }
 
 void DbgFileView::onMouseDown(const GuiEvent &event)
@@ -560,9 +568,9 @@ void DbgFileView::onMouseDown(const GuiEvent &event)
          if (mFileView[cell.y].breakPosition)
          {
             if (mFileView[cell.y].breakOnLine)
-               Con::executef(this, "onRemoveBreakPoint", itoa(cell.y + 1));
+            { onRemoveBreakPoint_callback( itoa(cell.y + 1) ); }
             else
-               Con::executef(this, "onSetBreakPoint", itoa(cell.y + 1));
+            { onSetBreakPoint_callback( itoa(cell.y + 1) ); }
          }
       }
       else
@@ -575,7 +583,7 @@ void DbgFileView::onMouseDown(const GuiEvent &event)
          //open the file view
          if (mSelectedCell.y == prevSelected.y && doubleClick && mMouseOverVariable[0])
          {
-            Con::executef(this, "onSetWatch", mMouseOverVariable);
+            onSetWatch_callback( mMouseOverVariable );
             mBlockStart = mMouseVarStart;
             mBlockEnd = mMouseVarEnd;
          }

@@ -290,7 +290,6 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       DECLARE_CALLBACK( void, onDefineIcons, () );
       DECLARE_CALLBACK( void, onAddGroupSelected, ( SimGroup* group ) );
       DECLARE_CALLBACK( void, onAddSelection, ( S32 itemOrObjectId, bool isLastSelection ) );
-      DECLARE_CALLBACK( void, onSelect, ( S32 itemOrObjectId ) );
       DECLARE_CALLBACK( void, onInspect, ( S32 itemOrObjectId ) );
       DECLARE_CALLBACK( void, onRemoveSelection, ( S32 itemOrObjectId ) );
       DECLARE_CALLBACK( void, onUnselect, ( S32 itemOrObjectId ) );
@@ -299,7 +298,6 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       DECLARE_CALLBACK( void, onKeyDown, ( S32 modifier, S32 keyCode ) );
       DECLARE_CALLBACK( void, onMouseUp, ( S32 hitItemId, S32 mouseClickCount ) );
       DECLARE_CALLBACK( void, onMouseDragged, () );
-      DECLARE_CALLBACK( void, onRightMouseDown, ( S32 itemId, const Point2I& mousePos, SimObject* object = NULL ) );
       DECLARE_CALLBACK( void, onRightMouseUp, ( S32 itemId, const Point2I& mousePos, SimObject* object = NULL ) );
       DECLARE_CALLBACK( void, onBeginReparenting, () );
       DECLARE_CALLBACK( void, onEndReparenting, () );
@@ -592,6 +590,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       static void initPersistFields();
 
       void inspectObject(SimObject * obj, bool okToEdit);
+	  S32 insertObject(S32 parentId, SimObject * obj, bool okToEdit);
       void buildVisibleTree(bool bForceFullUpdate = false);
 
       void cancelRename();

@@ -51,7 +51,8 @@ ImplementEnumType( GuiTabPosition,
    "Where the control should put the tab headers for selecting individual pages.\n\n"
    "@ingroup GuiContainers" )
    { GuiTabBookCtrl::AlignTop,   "Top",      "Tab headers on top edge." },
-   { GuiTabBookCtrl::AlignBottom,"Bottom",   "Tab headers on bottom edge." }
+   { GuiTabBookCtrl::AlignBottom,"Bottom",   "Tab headers on bottom edge." },
+   { GuiTabBookCtrl::AlignRight,"Right",   "Tab headers on right edge." }	//TabBookChanges
 EndImplementEnumType;
 
 IMPLEMENT_CALLBACK( GuiTabBookCtrl, onTabSelected, void, ( const String& text, U32 index ), ( text, index ),
@@ -123,6 +124,9 @@ void GuiTabBookCtrl::initPersistFields()
    endGroup( "TabBook" );
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //-----------------------------------------------------------------------------
@@ -268,7 +272,7 @@ bool GuiTabBookCtrl::onWake()
    if( mHasTexture )
    {
       mBitmapBounds = mProfile->mBitmapArrayRects.address();
-      mTabHeight = mBitmapBounds[TabSelected].extent.y;
+      //mTabHeight = mBitmapBounds[TabSelected].extent.y;
    }
 
    calculatePageTabs();
@@ -474,6 +478,8 @@ void GuiTabBookCtrl::onRightMouseUp( const GuiEvent& event )
       if( tab )
          onTabRightClick_callback( tab->getText(), getPageNum( tab ) );
    }
+
+   Parent::onRightMouseUp( event );
 }
 
 //-----------------------------------------------------------------------------
@@ -490,9 +496,11 @@ void GuiTabBookCtrl::onRender(Point2I offset, const RectI &updateRect)
    GFX->getDrawUtil()->getBitmapModulation( &oldModulation );
 
    // Wipe it out
-   GFX->getDrawUtil()->clearBitmapModulation();
+   //GFX->getDrawUtil()->clearBitmapModulation();
 
    Parent::onRender(offset, updateRect);
+
+   GFX->getDrawUtil()->setBitmapModulation( oldModulation );
 
    // Clip to tab area
    RectI savedClipRect = GFX->getClipRect();
@@ -541,7 +549,8 @@ void GuiTabBookCtrl::renderTabs( const Point2I &offset, const RectI &tabRect )
          // case trying to render causes a DX assert. Could be better if 
          // setClipRect returned a bool.
          if ( GFX->getViewport().isValidRect() )
-            renderFixedBitmapBordersFilled( tabEndRect, TabEnds + 1, mProfile );
+            //renderFixedBitmapBordersFilled( tabEndRect, TabEnds + 1, mProfile );
+				renderSizableBitmapBordersFilled( tabEndRect, TabEnds + 1, mProfile );	//TabBookChanges
       }
    }
 }
@@ -562,8 +571,8 @@ void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
       switch( mTabPosition )
       {
       case AlignTop:
-      case AlignBottom:
-         
+	  case AlignBottom:
+	  case AlignRight:	//TabBookChanges
          if ( mActivePage == tab )
             indexMultiplier += TabSelected;
          else if( mHoverTab == tab )
@@ -572,8 +581,8 @@ void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
             indexMultiplier += TabNormal;
          break;
       } 
-
-      renderFixedBitmapBordersFilled( tabRect, indexMultiplier, mProfile );
+      //renderFixedBitmapBordersFilled( tabRect, indexMultiplier, mProfile );
+	  renderSizableBitmapBordersFilled( tabRect, indexMultiplier, mProfile );	//TabBookChanges
    }
    else
    {
@@ -592,10 +601,11 @@ void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
 
    switch( mTabPosition )
    {
-   case AlignTop:
-   case AlignBottom:
-      renderJustifiedText( tabRect.point, tabRect.extent, text);
-   break;
+	   case AlignTop:
+	   case AlignBottom:
+	   case AlignRight:	//TabBookChanges
+		  renderJustifiedText( tabRect.point, tabRect.extent, text);	
+		  break;
    }
 
    GFX->getDrawUtil()->setBitmapModulation( oldColor);
@@ -623,7 +633,12 @@ S32 GuiTabBookCtrl::calculatePageTabWidth( GuiTabPageCtrl *page )
    const char* text = page->getText();
 
    if( !text || dStrlen(text) == 0 || mProfile->mFont == NULL )
-      return mMinTabWidth;
+   {
+	   if( mTabPosition != AlignRight )
+		   return mMinTabWidth;
+	   else
+		   return mTabHeight;
+   }
 
    GFont *font = mProfile->mFont;
 
@@ -699,8 +714,35 @@ void GuiTabBookCtrl::calculatePageTabs()
          // Adjust Y Point based on alignment
          if( mTabPosition == AlignTop )
             info.TabRect.point.y  = ( info.TabRow * mTabHeight );
-         else 
+		 else if( mTabPosition == AlignBottom )
             info.TabRect.point.y  = getHeight() - ( ( 1 + info.TabRow ) * mTabHeight );
+		 else
+		 {
+			 info.TabRect.point.x  = getWidth() + currX - mTabHeight;
+			 info.TabRect.point.y  = ( info.TabRow * tabWidth );
+			 info.TabRect.extent.x = mTabHeight;
+			 info.TabRect.extent.y = tabWidth;
+		 }
+
+         currX += tabWidth;
+         break;
+		 //TabBookChanges
+	  case AlignRight:
+		 
+        info.TabRow = i;
+        info.TabColumn = 0;
+
+         // Calculate Tabs Bounding Rect
+         //info.TabRect.point.x  = currX;
+         //info.TabRect.extent.x = tabWidth;
+         //info.TabRect.extent.y = mTabHeight;
+
+         // Adjust Y Point based on alignment
+		 info.TabRect.point.x  = getWidth() - mTabHeight;
+		 info.TabRect.point.y  = ( info.TabRow * tabWidth );
+		 info.TabRect.extent.x = mTabHeight;
+		 info.TabRect.extent.y = tabWidth;
+
 
          currX += tabWidth;
          break;
@@ -740,6 +782,20 @@ void GuiTabBookCtrl::calculatePageTabs()
       mPageRect.point.y = 0;
       mPageRect.extent.x = mTabRect.extent.x;
       mPageRect.extent.y = localPoint.y - mTabRect.extent.y;
+
+      break;
+	  //TabBookChanges
+   case AlignRight:
+
+      mTabRect.extent.x = currRow * mTabHeight;
+	  mTabRect.point.x = getWidth() - mTabRect.extent.x;
+      mTabRect.point.y = 0;
+      mTabRect.extent.y = localPoint.y;
+
+      mPageRect.point.x = 0;
+      mPageRect.point.y = 0;
+	  mPageRect.extent.x = mTabRect.point.x;
+      mPageRect.extent.y = getHeight();// - mTabRect.extent.y;
 
       break;
    }

@@ -60,6 +60,11 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
 
       DECLARE_CONOBJECT(GuiMeshRoadEditorCtrl);
 
+      DECLARE_CALLBACK(void, onNodeModified, (const char* nodeIdx));
+      DECLARE_CALLBACK(void, onNodeSelected, (const char* nodeIdx));
+      DECLARE_CALLBACK(void, paletteSync, (const char* mode));
+      DECLARE_CALLBACK(void, onRoadSelected, (const char* road ));
+
       // SimObject
       bool onAdd();
       static void initPersistFields();

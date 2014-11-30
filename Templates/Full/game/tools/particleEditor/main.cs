@@ -87,6 +87,7 @@ function ParticleEditorPlugin::onWorldEditorStartup( %this )
 
 function ParticleEditorPlugin::onActivated( %this )
 {
+   ParticleEditorPlugin.isActive = true;
    if( !ParticleEditor.isInitialized )
    {
       ParticleEditor.initEditor();
@@ -113,6 +114,9 @@ function ParticleEditorPlugin::onActivated( %this )
 
 function ParticleEditorPlugin::onDeactivated( %this )
 {   
+   if (!ParticleEditorPlugin.isActive)
+      return;
+   ParticleEditorPlugin.isActive = false;
    EditorGui-->WorldEditorToolbar.setVisible( false );
    PE_Window.setVisible( false );
    

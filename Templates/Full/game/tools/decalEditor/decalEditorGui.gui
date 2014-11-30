@@ -38,6 +38,7 @@
    Docking = "None";
    
    new GuiWindowCollapseCtrl(DecalEditorWindow) {      
+      AllowPopWindow = "1";     
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
@@ -382,6 +383,7 @@
 
    
    new GuiWindowCollapseCtrl(DecalPreviewWindow) {
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       internalName = "";
       Enabled = "1";
@@ -409,7 +411,7 @@
       canMinimize = "0";
       canMaximize = "0";
       minSize = "152 235";
-      closeCommand = "EPainter.parentGroup.setVisible(false);";
+      closeCommand = "TerrainPainter.parentGroup.setVisible(false);";
       EdgeSnap = "1";
       text = "Decal Properties";
       

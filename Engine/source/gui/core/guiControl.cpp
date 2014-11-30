@@ -34,7 +34,7 @@
 #include "gui/core/guiDefaultControlRender.h"
 #include "gui/editor/guiEditCtrl.h"
 #include "gfx/gfxDrawUtil.h"
-
+#include "console/SimXMLDocument.h"
 
 //#define DEBUG_SPEW
 
@@ -104,13 +104,13 @@ IMPLEMENT_CALLBACK( GuiControl, onWake, void, (), (),
 IMPLEMENT_CALLBACK( GuiControl, onSleep, void, (), (),
    "Called when the control is put to sleep.\n"
    "@ref GuiControl_Waking" );
-IMPLEMENT_CALLBACK( GuiControl, onGainFirstResponder, void, (), (),
+IMPLEMENT_CALLBACK( GuiControl, onGainFirstResponder, void, ( SimObjectId ID ), ( ID ),
    "Called when the control gains first responder status on the GuiCanvas.\n"
    "@see setFirstResponder\n"
    "@see makeFirstResponder\n"
    "@see isFirstResponder\n"
    "@ref GuiControl_FirstResponders" );
-IMPLEMENT_CALLBACK( GuiControl, onLoseFirstResponder, void, (), (),
+IMPLEMENT_CALLBACK( GuiControl, onLoseFirstResponder, void, ( SimObjectId ID ), ( ID ),
    "Called when the control loses first responder status on the GuiCanvas.\n"
    "@see setFirstResponder\n"
    "@see makeFirstResponder\n"
@@ -158,35 +158,42 @@ IMPLEMENT_CALLBACK( GuiControl, onControlDropped, void, ( GuiControl* control, c
    "@param control The control that is being dropped onto this control.\n"
    "@param dropPoint The point at which the control is being dropped.  Relative to the canvas." );
 
+IMPLEMENT_CALLBACK( GuiControl, onUnsetContent, void, ( const char* newContent ), ( newContent ), "" );
+IMPLEMENT_CALLBACK( GuiControl, onSetContent, void, ( const char* oldContent ), ( oldContent ), "" );
+IMPLEMENT_CALLBACK( GuiControl, onRightMouseUp, void, ( GuiControl* control ), (control),
+   "Called when right click is released and the control can be edited. "
+   "@param control The control that is being edited." );
 
 GuiControl *GuiControl::smPrevResponder = NULL;
 GuiControl *GuiControl::smCurResponder = NULL;
 GuiEditCtrl*GuiControl::smEditorHandle = NULL;
 bool        GuiControl::smDesignTime = false;
-GuiControl* GuiControl::smThisControl;
+GuiControl* GuiControl::smThisControl; 
+SimObjectPtr<GuiControl> GuiControl::smCapturedControl = NULL;
+SimObjectPtr<GuiControl> GuiControl::smTopParent = NULL;
 
 IMPLEMENT_SCOPE( GuiAPI, Gui,, "" );
 
 ImplementEnumType( GuiHorizontalSizing,
    "Horizontal sizing behavior of a GuiControl.\n\n"
    "@ingroup GuiCore" )
-	{ GuiControl::horizResizeRight,           "right"     },
-	{ GuiControl::horizResizeWidth,           "width"     },
-	{ GuiControl::horizResizeLeft,            "left"      },
+   { GuiControl::horizResizeRight,           "right"     },
+   { GuiControl::horizResizeWidth,           "width"     },
+   { GuiControl::horizResizeLeft,            "left"      },
    { GuiControl::horizResizeCenter,          "center"    },
    { GuiControl::horizResizeRelative,        "relative"  },
-	{ GuiControl::horizResizeWindowRelative,  "windowRelative"  }
+   { GuiControl::horizResizeWindowRelative,  "windowRelative"  }
 EndImplementEnumType;
 
 ImplementEnumType( GuiVerticalSizing,
    "Vertical sizing behavior of a GuiControl.\n\n"
    "@ingroup GuiCore" )
-	{ GuiControl::vertResizeBottom,           "bottom"     },
-	{ GuiControl::vertResizeHeight,           "height"     },
-	{ GuiControl::vertResizeTop,              "top"        },
+   { GuiControl::vertResizeBottom,           "bottom"     },
+   { GuiControl::vertResizeHeight,           "height"     },
+   { GuiControl::vertResizeTop,              "top"        },
    { GuiControl::vertResizeCenter,           "center"     },
    { GuiControl::vertResizeRelative,         "relative"   },
-	{ GuiControl::vertResizeWindowRelative,   "windowRelative"   }
+   { GuiControl::vertResizeWindowRelative,   "windowRelative"   }
 EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
@@ -195,6 +202,7 @@ GuiControl::GuiControl() : mAddGroup( NULL ),
                            mLayer(0),
                            mBounds(0,0,64,64),
                            mMinExtent(8,2),
+                           mMaxExtent(1920, 1080),
                            mProfile(NULL),
                            mLangTable(NULL),
                            mFirstResponder(NULL),
@@ -206,8 +214,22 @@ GuiControl::GuiControl() : mAddGroup( NULL ),
                            mTooltipProfile(NULL),
                            mTipHoverTime(1000),
                            mIsContainer(false),
-									mCanResize(true),
-                           mCanHit( true )
+                           mCanResize(true),
+                           mCanHit( true ),
+                           mFillColorCopy(0, 0, 0, 0),
+                           mControlBackgroundColor( 255, 255, 255, 255),
+                           mFillColorHLCopy(0, 0, 0, 0),
+                           mFillColorSELCopy(0, 0, 0, 0),
+                           mFillColorNACopy(0, 0, 0, 0),
+                           mBorderColorCopy(255, 255, 255, 255),
+                           mBorderColorHLCopy(255, 255, 255, 255),
+                           mBorderColorNACopy(255, 255, 255, 255),
+                           mFontColorCopy(0, 0, 0, 0),
+                           mFontColorHLCopy(0, 0, 0, 0),
+                           mFontColorSELCopy(0, 0, 0, 0),
+                           mFontColorNACopy(0, 0, 0, 0),
+                           mParentFillColor(0, 0, 0, 255),
+                           mParentFontColor(0, 0, 0, 255)
 {
    mConsoleVariable     = StringTable->EmptyString();
    mAcceleratorKey      = StringTable->EmptyString();
@@ -218,6 +240,38 @@ GuiControl::GuiControl() : mAddGroup( NULL ),
 
    mCanSaveFieldDictionary = false;
    mNotifyChildrenResized = true;
+   mProfileSettingsCopied = false;
+   mProfileSettingsReset = false;
+   mMouseOver = false;
+
+   mFadeStartTime = 0;
+   mFadeRate = 0;
+   mFadeStart = false;
+
+   mAlphaValue = 1;
+   mMouseOverAlphaValue = 1;
+   mAlphaFadeTime = 1000;
+
+   mParentAlphaValue = 1;
+   mRenderAlpha = 1;
+
+   mMoving = false;
+
+   mControlTextureFile = "";
+   mTextureObject = GFXTexHandle::ZERO;
+   mTextureObjectCopy = NULL;
+   mTextureChanged = false;
+   mControlFontColor = ColorI::ZERO;
+   mControlFillColor = ColorI::ZERO;
+   mControlFontSize = -1;
+   mFontSizeCopy = -1;
+
+   mFillColorChanged = false;
+   mFontColorChanged = false;
+   mFontSizeChanged = false;
+   mRenderAlphaSet = false;
+
+   mContextFlag.set( contextWindow | contextAlpha | contextAlphaFade | contextMouseOverAlpha );
 }
 
 //-----------------------------------------------------------------------------
@@ -233,7 +287,7 @@ void GuiControl::consoleInit()
    Con::addVariable( "$ThisControl", TYPEID< GuiControl >(), &smThisControl,
       "The control for which a command is currently being evaluated.  Only set during 'command' "
       "and altCommand callbacks to the control for which the command or altCommand is invoked.\n"
-	  "@ingroup GuiCore");
+     "@ingroup GuiCore");
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +302,8 @@ void GuiControl::initPersistFields()
          "The width and height of the control." );
       addField("minExtent",         TypePoint2I,      Offset(mMinExtent, GuiControl),
          "The minimum width and height of the control. The control will not be resized smaller than this." );
+     addField("maxExtent",       TypePoint2I,     Offset(mMaxExtent, GuiControl),
+        "The maximum width and height of the control. The control will not be resized bigger than this." );
       addField("horizSizing",       TYPEID< horizSizingOptions >(),         Offset(mHorizSizing, GuiControl),
          "The horizontal resizing behavior." );
       addField("vertSizing",        TYPEID< vertSizingOptions >(),         Offset(mVertSizing, GuiControl),
@@ -260,6 +316,17 @@ void GuiControl::initPersistFields()
       addProtectedField("profile",  TYPEID< GuiControlProfile >(),   Offset(mProfile, GuiControl), &setProfileProt, &defaultProtectedGetFn,
          "The control profile that determines fill styles, font settings, etc." );
 
+     addField("controlFontColor", TypeColorI, Offset(mControlFontColor, GuiControl), 
+        "The font color of the control." );
+
+     addField("controlFillColor", TypeColorI, Offset(mControlFillColor, GuiControl),
+        "The fill color of the control." );
+
+     addField("backgroundColor", TypeColorI, Offset(mControlBackgroundColor, GuiControl), 
+        "The background color for the control" );
+
+    addField( "controlFontSize", TypeS32, Offset(mControlFontSize, GuiControl),
+        "Changes the font size of the control." );
       addProtectedField( "visible", TypeBool,         Offset(mVisible, GuiControl), &_setVisible, &defaultProtectedGetFn,
          "Whether the control is visible or hidden." );
       addProtectedField( "active",  TypeBool,         Offset( mActive, GuiControl ), &_setActive, &defaultProtectedGetFn,
@@ -281,7 +348,7 @@ void GuiControl::initPersistFields()
       addField("accelerator",       TypeString,       Offset(mAcceleratorKey, GuiControl),
          "Key combination that triggers the control's primary action when the control is on the canvas." );
 
-   endGroup( "Control" );	
+   endGroup( "Control" );   
    
    addGroup( "ToolTip" );
       addProtectedField("tooltipProfile", TYPEID< GuiControlProfile >(), Offset(mTooltipProfile, GuiControl), &setTooltipProfileProt, &defaultProtectedGetFn,
@@ -295,6 +362,15 @@ void GuiControl::initPersistFields()
    addGroup( "Editing" );
       addField("isContainer",       TypeBool,      Offset(mIsContainer, GuiControl),
          "If true, the control may contain child controls." );
+     addProtectedField( "alphaValue", TypeF32, Offset( mAlphaValue, GuiControl ),
+        &_setAlphaValue, &defaultProtectedGetFn,
+       "Sets the alpha value of the object.");
+     addProtectedField( "mouseOverAlphaValue", TypeF32, Offset( mMouseOverAlphaValue, GuiControl ),
+        &_setMouseOverAlphaValue, &defaultProtectedGetFn,
+       "Sets the alpha value of the object.");
+     addProtectedField( "alphaFadeTime", TypeS32, Offset( mAlphaFadeTime, GuiControl ),
+        &_setAlphaFadeTime, &defaultProtectedGetFn,
+        "Sets the alpha fade time of the object.");
    endGroup( "Editing" );
 
    addGroup( "Localization" );
@@ -302,6 +378,49 @@ void GuiControl::initPersistFields()
          "Name of string table to use for lookup of internationalized text." );
    endGroup( "Localization" );
 
+   addGroup( "Context Menu Options" );
+
+      addProtectedField("moveControl", TypeBool, NULL,
+         &_setContextMoveControl, &_getContextMoveControl,
+         "Allows the user to move the control in the game." );
+
+      addProtectedField("lockControl", TypeBool, NULL,
+         &_setContextLockControl, &_getContextLockControl,
+         "Allows the user to move the control in the game." );
+
+      addProtectedField("windowSettings", TypeBool, NULL,
+         &_setContextWindowSettings, &_getContextWindowSettings,
+         "Allows the user to move the control in the game." );
+
+      addProtectedField("alpha", TypeBool, NULL,
+         &_setContextAlpha, &_getContextAlpha,
+       "Allows the user to move the control in the game." );
+
+      addProtectedField("mouseOverAlpha", TypeBool, NULL,
+         &_setContextMouseOverAlpha, &_getContextMouseOverAlpha,
+       "Allows the user to move the control in the game.");
+
+      addProtectedField("alphaFade", TypeBool, NULL,
+         &_setContextAlphaFade, &_getContextAlphaFade,
+         "Allows the user to move the control in the game." );
+
+      addProtectedField("contextFontColor", TypeBool, NULL,
+         &_setContextFontColor, &_getContextFontColor,
+         "Allows the user to change the text color of  the control in the game." );
+
+      addProtectedField("contextBackColor", TypeBool, NULL,
+         &_setContextBackColor, &_getContextBackColor,
+         "Allows the user to change the background color of the control in the game." );
+
+      addProtectedField("contextFillColor", TypeBool, NULL,
+         &_setContextFillColor, &_getContextFillColor,
+         "Allows the user to change the fill/body color of the control in the game." );
+
+     addProtectedField("contextFontSize", TypeBool, NULL,
+         &_setContextFontSize, &_getContextFontSize,
+         "Allows the user to change the font size of the control in the game." );
+
+   endGroup("Context Menu Options");
    Parent::initPersistFields();
 }
 
@@ -339,6 +458,64 @@ bool GuiControl::processArguments(S32 argc, ConsoleValueRef *argv)
    return true;
 }
 
+//-----------------------------------------------------------------------------
+
+void GuiControl::onStaticModified( const char *slotName, const char *newValue )
+{
+   if( !dStricmp( slotName, "controlFontSize" ) )
+   {
+      S32 value = dAtoi(newValue);
+      if( value != -1)
+         setControlFontSize( value );
+   }
+   if( !dStricmp( slotName, "controlFontColor") || !dStricmp( slotName, "controlFillColor" ) || !dStricmp( slotName, "backgroundColor" ))
+   {
+#if defined _WIN32
+       // make VS compiler happy
+      char *value = _strdup(newValue);
+#else
+        char *value = strdup(newValue);
+#endif
+      ColorI color(1, 0, 0, 1);
+      dSscanf( value, "%d %d %d %d", &color.red, &color.green, &color.blue, &color.alpha );
+
+      if( !dStricmp( slotName, "controlFontColor" ) )
+      {
+         if( color != ColorI::ZERO )
+            setControlFontColor( color );
+      }
+      else if( !dStricmp( slotName, "controlFillColor" ) )
+      {
+         if( color != ColorI::ZERO )
+         {
+            AssertWarn( mProfile->mOpaque || mProfile->mTextureObject, "Control Fill Color:: Cannot apply color to transparent objects. " );
+            if( !mProfile->mOpaque && !mProfile->mTextureObject )
+            {
+               Con::evaluate( "GuiEditorStatusBar.print( \"Warning:: Cannot apply fill color to transparent objects.\" );");
+               return;
+            }
+            
+         }
+         setControlFillColor( color );
+         
+      }
+      else
+      {
+         if( color != ColorI::WHITE )
+         {
+            AssertWarn( mProfile->mOpaque || mProfile->mTextureObject, "Control Background Color:: Cannot apply background color to transparent objects.");
+            if( !mProfile->mOpaque && !mProfile->mTextureObject )
+            {
+               Con::evaluate( "GuiEditorStatusBar.print( \"Warning:: Cannot apply background color to transparent objects..\" );");
+               return;
+            }
+         }
+
+         setControlBackgroundColor( color );
+      }
+   }
+   
+}
 //-----------------------------------------------------------------------------
 
 void GuiControl::awaken()
@@ -422,9 +599,89 @@ void GuiControl::preRender()
 
 void GuiControl::onPreRender()
 {
-   // do nothing.
+   if(!mProfileSettingsCopied)
+   {
+      copyProfileSettings();
+   }
 }
 
+//-----------------------------------------------------------------------------
+
+void GuiControl::applyProfileSettings()
+{
+   if( mFontColorChanged )
+      setControlColor("fontColor", mControlFontColor);
+   if( mFillColorChanged )
+      setControlColor("fillColor", mControlFillColor);
+
+   if( mFontSizeChanged )
+   {
+      mProfile->mFontSize = mControlFontSize;
+      mProfile->mFont = NULL;
+      mProfile->loadFont();
+   }
+
+   /// Update the render alpha for the control.
+   if( !mRenderAlphaSet )
+   updateRenderAlpha(mMouseOver);
+
+   /// Set the border, fill and font alpha.
+   setProfileAlpha(mRenderAlpha);
+
+   ColorI mBackgroundColorUse;
+   mBackgroundColorUse= mControlBackgroundColor;
+   mBackgroundColorUse.alpha *= mRenderAlpha;
+
+   GFX->getDrawUtil()->setBitmapModulation(mBackgroundColorUse);  
+
+   if( mTextureChanged )
+   {
+      mProfile->mTextureObject = NULL;
+      mProfile->setBitmapHandle(mTextureObject);
+      mProfile->mBitmapArrayRects.clear();
+      mProfile->constructBitmapArray();
+   }
+
+   mProfileSettingsReset = false;
+}
+
+void GuiControl::setCur()
+{
+   GuiCanvas *pRoot = getRoot();
+   if( !pRoot )
+      return;
+   PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
+   AssertFatal(pWindow != NULL,"GuiControl without owning platform window!  This should not be possible.");
+   PlatformCursorController *pController = pWindow->getCursorController();
+   AssertFatal(pController != NULL,"PlatformWindow without an owned CursorController!");
+
+   S32 desiredCursor = PlatformCursorController::curPlus;
+
+   // Now change the cursor shape
+   pController->popCursor();
+   pController->pushCursor(desiredCursor);
+   pRoot->mCursorChanged = desiredCursor;
+}
+
+void GuiControl::resetCur()
+{
+   GuiCanvas *pRoot = getRoot();
+   if( !pRoot )
+      return;
+   PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
+   AssertFatal(pWindow != NULL,"GuiControl without owning platform window!  This should not be possible.");
+   PlatformCursorController *pController = pWindow->getCursorController();
+   AssertFatal(pController != NULL,"PlatformWindow without an owned CursorController!");
+
+   S32 desiredCursor = PlatformCursorController::curArrow;
+
+   // Now change the cursor shape
+   pController->popCursor();
+   pController->pushCursor(desiredCursor);
+   pRoot->mCursorChanged = desiredCursor;
+}
+
+// @Copyright end
 //-----------------------------------------------------------------------------
 
 void GuiControl::onRender(Point2I offset, const RectI &updateRect)
@@ -568,7 +825,12 @@ void GuiControl::renderChildControls(Point2I offset, const RectI &updateRect)
          {
             GFX->setClipRect( childClip );
             GFX->setStateBlock(mDefaultGuiSB);
+            if( !ctrl->mProfileSettingsCopied )
+              ctrl->copyProfileSettings();
+            ctrl->applyProfileSettings();
             ctrl->onRender(childPosition, childClip);
+            if( !ctrl->mProfileSettingsReset )
+              ctrl->resetProfileSettings();
          }
       }
    }
@@ -903,7 +1165,7 @@ void GuiControl::onGroupRemove()
 
 bool GuiControl::onInputEvent(const InputEventInfo &event)
 {
-	// Do nothing by default...
+   // Do nothing by default...
    return( false );
 }
 
@@ -943,16 +1205,27 @@ bool GuiControl::onKeyUp(const GuiEvent &event)
 
 void GuiControl::onMouseUp(const GuiEvent &event)
 {
+   mMoving = false;
+   mouseUnlock();
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiControl::onMouseDown(const GuiEvent &event)
 {
-	if ( !mVisible || !mAwake )
+   if (getRoot()->isPopupShown() )
       return;
-	
-	execConsoleCallback();
+   mMouseDownPosition = event.mousePoint;
+   mOrigBounds = getBounds();
+
+   mMoving = isContextMovable();
+
+   if(mMoving)
+      mouseLock();
+   if ( !mVisible || !mAwake )
+      return;
+   
+   execConsoleCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -973,18 +1246,41 @@ void GuiControl::onMouseMove(const GuiEvent &event)
 
 void GuiControl::onMouseDragged(const GuiEvent &event)
 {
+   GuiControl *parent = getParent();
+   GuiCanvas *root = getRoot();
+   if ( !root ) 
+      return;
+   
+   Point2I deltaMousePosition = event.mousePoint - mMouseDownPosition;
+
+   Point2I newPosition = getPosition();
+   Point2I newExtent = getExtent();
+   if(mMoving)
+   {
+      if( parent != root )
+      {
+      newPosition.x = getMax(0, getMin(parent->getWidth() - getWidth(), mOrigBounds.point.x + deltaMousePosition.x));//mOrigBounds.point.x + deltaMousePosition.x;
+      newPosition.y = getMax(0, getMin(parent->getHeight() - getHeight(), mOrigBounds.point.y + deltaMousePosition.y));//getMax(0, mOrigBounds.point.y + deltaMousePosition.y );
+      }
+      
+      setUpdateRegion( getPosition(), getExtent());
+      resize(newPosition, newExtent);
+   }
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiControl::onMouseEnter(const GuiEvent &event)
 {
+      fadeControl();
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiControl::onMouseLeave(const GuiEvent &event)
 {
+   smCapturedControl = this;
+   mMouseOver = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1027,8 +1323,14 @@ void GuiControl::onRightMouseDown(const GuiEvent &)
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onRightMouseUp(const GuiEvent &)
+void GuiControl::onRightMouseUp(const GuiEvent &event )
 {
+   if(isEditable())
+   {
+      char *ctrl = Con::getArgBuffer(32);
+      dSprintf(ctrl, 32, "%d", this->getId());
+      ((GuiControl *)Sim::findObject("IngameContext"))->onRightMouseUp_callback(this);
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1224,8 +1526,8 @@ void GuiControl::inspectPostApply()
 
 void GuiControl::setSizing(S32 horz, S32 vert)
 {
-	mHorizSizing = horz;
-	mVertSizing = vert;
+   mHorizSizing = horz;
+   mVertSizing = vert;
 }
 
 //-----------------------------------------------------------------------------
@@ -1233,8 +1535,9 @@ void GuiControl::setSizing(S32 horz, S32 vert)
 bool GuiControl::resize(const Point2I &newPosition, const Point2I &newExtent)
 {
    const Point2I minExtent = getMinExtent();
-   Point2I actualNewExtent = Point2I(getMax(minExtent.x, newExtent.x),
-      getMax(minExtent.y, newExtent.y));
+   const Point2I maxExtent = getMaxExtent();
+   Point2I actualNewExtent;
+   actualNewExtent = Point2I(getMax(minExtent.x, newExtent.x), getMax(minExtent.y, newExtent.y));
 
    // only do the child control resizing stuff if you really need to.
    const RectI bounds = getBounds();
@@ -1273,11 +1576,9 @@ bool GuiControl::resize(const Point2I &newPosition, const Point2I &newExtent)
       if (parent)
          parent->childResized(this);
       setUpdate();
+
+     return true; 
    }
-   
-   // We sized something
-   if( extentChanged )
-      return true;
 
    // Note : We treat a repositioning as no sizing happening
    //  because parent's should really not need to know when they
@@ -1349,14 +1650,14 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
    Point2I newPosition = getPosition();
    Point2I newExtent = getExtent();
 
-	S32 deltaX = newParentRect.extent.x - oldParentRect.extent.x;
- 	S32 deltaY = newParentRect.extent.y - oldParentRect.extent.y;
+   S32 deltaX = newParentRect.extent.x - oldParentRect.extent.x;
+    S32 deltaY = newParentRect.extent.y - oldParentRect.extent.y;
 
-	if (mHorizSizing == horizResizeCenter)
-	   newPosition.x = (newParentRect.extent.x - getWidth()) >> 1;
-	else if (mHorizSizing == horizResizeWidth)
-		newExtent.x += deltaX;
-	else if (mHorizSizing == horizResizeLeft)
+   if (mHorizSizing == horizResizeCenter)
+      newPosition.x = (newParentRect.extent.x - getWidth()) >> 1;
+   else if (mHorizSizing == horizResizeWidth)
+      newExtent.x += deltaX;
+   else if (mHorizSizing == horizResizeLeft)
       newPosition.x += deltaX;
    else if (mHorizSizing == horizResizeRelative && oldParentRect.extent.x != 0)
    {
@@ -1367,11 +1668,11 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
       newExtent.x = newWidth;
    }
 
-	if (mVertSizing == vertResizeCenter)
-	   newPosition.y = (newParentRect.extent.y - getHeight()) >> 1;
-	else if (mVertSizing == vertResizeHeight)
-		newExtent.y += deltaY;
-	else if (mVertSizing == vertResizeTop)
+   if (mVertSizing == vertResizeCenter)
+      newPosition.y = (newParentRect.extent.y - getHeight()) >> 1;
+   else if (mVertSizing == vertResizeHeight)
+      newExtent.y += deltaY;
+   else if (mVertSizing == vertResizeTop)
       newPosition.y += deltaY;
    else if(mVertSizing == vertResizeRelative && oldParentRect.extent.y != 0)
    {
@@ -1590,6 +1891,277 @@ void GuiControl::setScriptValue( const char* )
 
 //-----------------------------------------------------------------------------
 
+void GuiControl::setProfileAlpha(F32 mAlphaValue)
+{
+   if( mFillColorChanged ) 
+   {
+      mProfile->mFillColor.alpha = mControlFillColor.alpha * mAlphaValue;
+      mProfile->mFillColorHL.alpha = mControlFillColor.alpha * mAlphaValue;
+      mProfile->mFillColorNA.alpha = mControlFillColor.alpha * mAlphaValue;
+      mProfile->mFillColorSEL.alpha = mControlFillColor.alpha * mAlphaValue;
+   }
+   else
+   {
+      mProfile->mFillColor.alpha = mProfile->mFillColor.alpha * mAlphaValue;
+      mProfile->mFillColorHL.alpha = mProfile->mFillColorHL.alpha * mAlphaValue;
+      mProfile->mFillColorNA.alpha = mProfile->mFillColorNA.alpha * mAlphaValue;
+      mProfile->mFillColorSEL.alpha = mProfile->mFillColorSEL.alpha * mAlphaValue;
+   }
+
+   mProfile->mBorderColor.alpha = mBorderColorCopy.alpha * mAlphaValue;
+   mProfile->mBorderColorHL.alpha = mBorderColorHLCopy.alpha * mAlphaValue;
+   mProfile->mBorderColorNA.alpha = mBorderColorNACopy.alpha * mAlphaValue;
+
+   if( mFontColorChanged )
+   {
+      mProfile->mFontColor.alpha = mControlFontColor.alpha * mAlphaValue;
+      mProfile->mFontColorHL.alpha = mControlFontColor.alpha * mAlphaValue;
+      mProfile->mFontColorNA.alpha = mControlFontColor.alpha * mAlphaValue;
+      mProfile->mFontColorSEL.alpha = mControlFontColor.alpha * mAlphaValue;
+   }
+   else
+   {
+      mProfile->mFontColor.alpha = mProfile->mFontColor.alpha * mAlphaValue;
+      mProfile->mFontColorHL.alpha = mProfile->mFontColorHL.alpha * mAlphaValue;
+      mProfile->mFontColorNA.alpha = mProfile->mFontColorNA.alpha * mAlphaValue;
+      mProfile->mFontColorSEL.alpha = mProfile->mFontColorSEL.alpha * mAlphaValue;
+   }
+
+   iterator i;
+   for(i = begin(); i != end(); i++)
+   {
+      GuiControl *ctrl = static_cast<GuiControl *>(*i);
+      if( !ctrl->mProfileSettingsCopied)
+         ctrl->copyProfileSettings();
+      if(ctrl->mParentAlphaValue != mAlphaValue)
+      {
+        ctrl->mRenderAlpha = mAlphaValue;
+        if( mAlphaValue == 1 )
+         ctrl->mRenderAlphaSet = false;
+        else
+           ctrl->mRenderAlphaSet = true;
+         ctrl->mParentAlphaValue = mAlphaValue;
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::resetProfileSettings()
+{
+   if( mProfileSettingsCopied )
+   {
+      mProfile->mFillColor = mFillColorCopy;
+      mProfile->mFillColorHL = mFillColorHLCopy ;
+      mProfile->mFillColorNA = mFillColorNACopy ;
+      mProfile->mFillColorSEL = mFillColorSELCopy ;
+      mProfile->mBorderColor = mBorderColorCopy ;
+      mProfile->mBorderColorHL = mBorderColorHLCopy ;
+      mProfile->mBorderColorNA = mBorderColorNACopy ;
+      mProfile->mFontColor = mFontColorCopy ;
+      mProfile->mFontColorHL = mFontColorHLCopy ;
+      mProfile->mFontColorNA = mFontColorNACopy ;
+      mProfile->mFontColorSEL = mFontColorSELCopy ;
+   }
+
+   if( mTextureChanged )
+   {
+      mProfile->mTextureObject = NULL;
+      mProfile->setBitmapHandle(mTextureObjectCopy);
+      mProfile->mBitmapArrayRects.clear();
+      mProfile->constructBitmapArray();
+   }
+
+   if( mFontSizeChanged )
+   {
+      mProfile->mFontSize = mFontSizeCopy;
+      mProfile->mFont = NULL;
+      mProfile->loadFont();
+   }
+
+   GFX->getDrawUtil()->clearBitmapModulation();   
+
+   mProfileSettingsReset = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setControlColor( const char* colorName, ColorI color)
+{
+   if( !dStricmp(colorName, "fontColor") )
+   {
+      if( color == ColorI::ZERO)
+      {
+        resetFontColor();
+        iterator l;
+        for(l = begin(); l != end(); l++)
+        {
+            GuiControl *ctrl= static_cast< GuiControl *>(*l);
+            ctrl->setControlColor( "fontColor", color );
+        }
+        return;
+      }
+
+      mProfile->mFontColor = color;
+      mProfile->mFontColorHL = color;
+      mProfile->mFontColorNA = color;
+      mProfile->mFontColorSEL = color;
+
+      /// Pass to the childrens.
+      iterator l;
+      for(l = begin(); l != end(); l++)
+      {
+        GuiControl *ctrl = static_cast< GuiControl *>(*l);
+        if( !ctrl->mProfileSettingsCopied)
+           ctrl->copyProfileSettings();
+        if(ctrl->mParentFontColor != color)
+        {
+           ctrl->setControlFontColor(color);
+           ctrl->mParentFontColor = color;
+        }
+     }
+   }
+   else if( !dStricmp(colorName, "fillColor") )
+   {
+      mProfile->mFillColor = color;
+      mProfile->mFillColorHL = color;
+      mProfile->mFillColorNA = color;
+      mProfile->mFillColorSEL = color;
+   }
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::resetFontColor()
+{
+   mProfile->mFontColor = mFontColorCopy;
+    mProfile->mFontColorHL = mFillColorHLCopy;
+    mProfile->mFontColorNA = mFontColorNACopy;
+    mProfile->mFontColorSEL = mFontColorSELCopy;
+   mControlFontColor = ColorI::ZERO;
+   mFontColorChanged = false;
+}
+//-----------------------------------------------------------------------------
+
+void GuiControl::setControlFontColor(ColorI fontColor)
+{
+   AssertFatal( fontColor, "GuiControl::setContextControlFontColor: invalid font color" );
+   mControlFontColor = fontColor;
+   mFontColorChanged = true;
+   
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setControlBackgroundColor(ColorI backColor)
+{
+   AssertFatal( backColor, "GuiControl::setContextBackgroundColor: invalid background color" );
+   mControlBackgroundColor = backColor;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setControlFillColor(ColorI fillColor)
+{
+   AssertFatal( fillColor, "GuiControl::setContextControlFillColor: invalid fill color" );
+   mControlFillColor = fillColor;
+   if( fillColor == ColorI::ZERO )
+      mFillColorChanged = false;
+   else
+      mFillColorChanged = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setControlFontSize(S32 fontSize)
+{
+   AssertFatal( fontSize, "GuiControl::setContextControlFillColor: invalid font size" );
+   mFontSizeChanged = true;
+   mControlFontSize = fontSize;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::updateRenderAlpha(bool mMouseOver)
+{
+   if(mMouseOver)
+   {
+      if(mFadeStart)
+      {
+         U32 elapsed = Platform::getRealMilliseconds() - mFadeStartTime;
+         if( elapsed <= mAlphaFadeTime )
+            mRenderAlpha = mAlphaValue + mFadeRate * elapsed;
+         else
+         {
+            mFadeStart = false; 
+         }
+      }
+      else
+         mRenderAlpha = mMouseOverAlphaValue;
+   }
+   else
+   {
+      if(mFadeStart)
+      {
+         U32 elapsed = Platform::getRealMilliseconds() - mFadeStartTime;
+         if( elapsed <= mAlphaFadeTime )
+            mRenderAlpha = mMouseOverAlphaValue - mFadeRate * elapsed;
+         else
+         {
+            mFadeStart = false; 
+         }
+      }
+      else
+         mRenderAlpha = mAlphaValue;
+   }
+}
+
+//-----------------------------------------------------------------------------
+void GuiControl::copyProfileSettings( )
+{
+   /// Fill color copied for reset
+   mFillColorCopy= mProfile->mFillColor;
+   mFillColorHLCopy= mProfile->mFillColorHL;
+   mFillColorNACopy= mProfile->mFillColorNA;
+   mFillColorSELCopy= mProfile->mFillColorSEL;
+
+   /// Border color copied for reset
+   mBorderColorCopy= mProfile->mBorderColor;
+   mBorderColorHLCopy= mProfile->mBorderColorHL;
+   mBorderColorNACopy= mProfile->mBorderColorNA;
+
+   /// Font color copied for reset
+   mFontColorCopy = mProfile->mFontColor;
+   mFontColorHLCopy = mProfile->mFontColorHL;
+   mFontColorNACopy = mProfile->mFontColorNA;
+   mFontColorSELCopy = mProfile->mFontColorSEL;
+
+   /// Texture object copied for reset
+   mTextureObjectCopy = mProfile->mTextureObject;
+   if( mTextureObject == GFXTexHandle::ZERO )
+      mTextureObject = mProfile->mTextureObject;
+
+   /// Font size copied for reset
+   mFontSizeCopy = mProfile->mFontSize;
+   if( mProfile->mFontSize > 0 )
+      mControlFontSize = mProfile->mFontSize;
+
+   mProfileSettingsCopied = true;
+}
+
+//-----------------------------------------------------------------------------
+
+bool GuiControl::transparentControlCheck()
+{
+   if( mProfile )
+      if( !mProfile->mOpaque && !mProfile->mTextureObject)
+      {
+         Platform::AlertOK( "Transparent Error", "Cannot apply color to transparent objects.");
+         return true;
+      }
+   return false;
+}
+
 void GuiControl::setConsoleVariable(const char *variable)
 {
    if (variable)
@@ -1613,7 +2185,7 @@ void GuiControl::setConsoleCommand( const String& newCmd )
 
 const char * GuiControl::getConsoleCommand()
 {
-	return mConsoleCommand;
+   return mConsoleCommand;
 }
 
 //-----------------------------------------------------------------------------
@@ -1671,7 +2243,7 @@ F32 GuiControl::getFloatVariable()
 
 void GuiControl::setVisible(bool value)
 {
-	mVisible = value;
+   mVisible = value;
 
    setUpdate();
 
@@ -1679,12 +2251,12 @@ void GuiControl::setVisible(bool value)
    {
       GuiControl *ctrl = static_cast<GuiControl *>(*i);
       ctrl->clearFirstResponder();
-	}
+   }
 
-	GuiControl *parent = getParent();
-	if( parent )
+   GuiControl *parent = getParent();
+   if( parent )
    {
-	   parent->childResized( this );
+      parent->childResized( this );
       
       // If parent is visible and awake and this control has just
       // become visible but was sleeping, wake it up now.
@@ -1752,7 +2324,7 @@ bool GuiControl::getCanSaveParent()
 void GuiControl::write(Stream &stream, U32 tabStop, U32 flags)
 {
    //note: this will return false if either we, or any of our parents, are non-save controls
-   bool bCanSave	= ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
+   bool bCanSave   = ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
    StringTableEntry steName = mAddGroup->getInternalName();
    if(bCanSave && mAddGroup && (steName != NULL) && (steName != StringTable->insert("null")) && getName() )
    {
@@ -1769,6 +2341,31 @@ void GuiControl::write(Stream &stream, U32 tabStop, U32 flags)
 
       }
 
+     /// For XML Output
+     if( flags & XmlOutput )
+     {
+        getcurrentXML()->pushNewElement("Group");
+        getcurrentXML()->setAttribute("name", getClassName());
+        getcurrentXML()->setAttribute("fileName", getFilename());
+        char buffer[1024];
+        dSprintf(buffer, sizeof(buffer), "%d", getDeclarationLine());
+        getcurrentXML()->setAttribute("lineNumber", buffer);
+        getcurrentXML()->pushNewElement("Setting");
+        getcurrentXML()->setAttribute("name", "name");
+         if(getName())
+            getcurrentXML()->addData(getName());
+         else
+            getcurrentXML()->addData(" ");
+         getcurrentXML()->popElement();
+         writeFields( stream, tabStop + 1, true);
+         if(size())
+         {
+          for(U32 i = 0; i < size(); i++)
+            (*this)[i]->write(stream, tabStop + 1, flags);
+         }
+         getcurrentXML()->popElement();
+         return;
+     }
       stream.writeTabs(tabStop);
       char buffer[1024];
       dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
@@ -1805,7 +2402,7 @@ void GuiControl::addObject(SimObject *object)
 
    AssertFatal( ctrl, "GuiControl::addObject() - cannot add non-GuiControl as child of GuiControl" );
 
-	Parent::addObject(object);
+   Parent::addObject(object);
 
    AssertFatal(!ctrl->isAwake(), "GuiControl::addObject: object is already awake before add");
    if( mAwake )
@@ -1834,8 +2431,8 @@ void GuiControl::removeObject(SimObject *object)
 
 GuiControl *GuiControl::getParent()
 {
-	SimObject *obj = getGroup();
-	if (GuiControl* gui = dynamic_cast<GuiControl*>(obj))
+   SimObject *obj = getGroup();
+   if (GuiControl* gui = dynamic_cast<GuiControl*>(obj))
       return gui;
    return 0;
 }
@@ -1845,7 +2442,7 @@ GuiControl *GuiControl::getParent()
 GuiCanvas *GuiControl::getRoot()
 {
    GuiControl *root = NULL;
-	GuiControl *parent = getParent();
+   GuiControl *parent = getParent();
    while (parent)
    {
       root = parent;
@@ -1857,6 +2454,22 @@ GuiCanvas *GuiControl::getRoot()
       return NULL;
 }
 
+GuiControl *GuiControl::getRootControl()
+{
+   GuiControl *rootControl = NULL;
+   GuiControl *parent = this;
+   GuiControl *root = getRoot();
+
+   while (parent != root)
+   {
+      rootControl = parent;
+      parent = parent->getParent();
+   }
+   if (rootControl)
+      return rootControl;
+   else
+      return NULL;
+}
 //-----------------------------------------------------------------------------
 
 bool GuiControl::acceptsAsChild( SimObject* object ) const
@@ -2089,6 +2702,20 @@ bool GuiControl::controlIsChild( GuiControl* child )
    return false;
 }
 
+bool GuiControl::controlIsSibling( GuiControl* sibling )
+{
+   GuiControl *parent = getParent();
+   if( parent )
+   {
+      for( iterator i = parent->begin(); i != parent->end(); ++ i )
+      {
+        GuiControl* ctrl = static_cast< GuiControl* >( *i );
+        if( ctrl == sibling )
+          return true;
+      }
+   }
+   return false;
+}
 //=============================================================================
 //    Event Handling.
 //=============================================================================
@@ -2133,12 +2760,12 @@ void GuiControl::setFirstResponder( GuiControl* firstResponder )
 
 void GuiControl::setFirstResponder()
 {
-	if( mAwake && mVisible )
-	{
-	   GuiControl *parent = getParent();
-	   if ( mProfile->mCanKeyFocus == true && parent != NULL )
+   if( mAwake && mVisible )
+   {
+      GuiControl *parent = getParent();
+      if ( mProfile->mCanKeyFocus == true && parent != NULL )
          parent->setFirstResponder( this );
-	}
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -2160,10 +2787,10 @@ void GuiControl::clearFirstResponder()
 
 void GuiControl::onLoseFirstResponder()
 {
-	// Since many controls have visual cues when they are the firstResponder...
-	setUpdate();
+   // Since many controls have visual cues when they are the firstResponder...
+   setUpdate();
 
-   onLoseFirstResponder_callback();
+   onLoseFirstResponder_callback(getId());
 }
 
 //-----------------------------------------------------------------------------
@@ -2173,7 +2800,7 @@ void GuiControl::onGainFirstResponder()
    // Since many controls have visual cues when they are the firstResponder...
    this->setUpdate();
 
-   onGainFirstResponder_callback();
+   onGainFirstResponder_callback(getId());
 }
 
 //-----------------------------------------------------------------------------
@@ -2258,6 +2885,18 @@ void GuiControl::mouseUnlock()
       root->mouseUnlock(this);
 }
 
+void GuiControl::setControlLock( bool locked )
+{
+   /// Set the move attribute of the window control.
+   setContextMoveControl( !locked );
+}
+
+//-----------------------------------------------------------------------------
+bool GuiControl::getControlLock()
+{
+   return !isContextMovable();
+}
+
 //=============================================================================
 //    Misc.
 //=============================================================================
@@ -2267,31 +2906,31 @@ void GuiControl::mouseUnlock()
 
 LangTable * GuiControl::getGUILangTable()
 {
-	if(mLangTable)
-		return mLangTable;
+   if(mLangTable)
+      return mLangTable;
 
-	if(mLangTableName && *mLangTableName)
-	{
-		mLangTable = (LangTable *)getModLangTable((const UTF8*)mLangTableName);
-		return mLangTable;
-	}
+   if(mLangTableName && *mLangTableName)
+   {
+      mLangTable = (LangTable *)getModLangTable((const UTF8*)mLangTableName);
+      return mLangTable;
+   }
 
-	GuiControl *parent = getParent();
-	if(parent)
-		return parent->getGUILangTable();
+   GuiControl *parent = getParent();
+   if(parent)
+      return parent->getGUILangTable();
 
-	return NULL;
+   return NULL;
 }
 
 //-----------------------------------------------------------------------------
 
 const UTF8 * GuiControl::getGUIString(S32 id)
 {
-	LangTable *lt = getGUILangTable();
-	if(lt)
-		return lt->getString(id);
+   LangTable *lt = getGUILangTable();
+   if(lt)
+      return lt->getString(id);
 
-	return NULL;
+   return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -2313,9 +2952,9 @@ void GuiControl::messageSiblings(S32 message)
 
 void GuiControl::getScrollLineSizes(U32 *rowHeight, U32 *columnWidth)
 {
-	// default to 10 pixels in y, 30 pixels in x
-	*columnWidth = 30;
-	*rowHeight = 30;
+   // default to 10 pixels in y, 30 pixels in x
+   *columnWidth = 30;
+   *rowHeight = 30;
 }
 
 //-----------------------------------------------------------------------------
@@ -2422,6 +3061,172 @@ const char* GuiControl::execAltConsoleCallback()
    return "";
 }
 
+
+void GuiControl::setAlphaValue( F32 alpha )
+{
+   mAlphaValue = alpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setMouseOverAlphaValue( F32 alpha )
+{
+   mMouseOverAlphaValue = alpha;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setAlphaFadeTime( S32 fadeTime )
+{
+   mAlphaFadeTime = fadeTime;
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setControlTexture(String fileName)
+{
+   if(fileName.isNotEmpty())
+   {
+      char texturePath[1024];
+      Platform::makeFullPathName( fileName, texturePath, sizeof(texturePath));
+      mControlTextureFile = texturePath;
+      mTextureObject = GFXTexHandle(texturePath, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__));   
+      mTextureChanged = true;
+   }
+
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::fadeControl()
+{
+   GuiControl *rootControl = getRootControl();
+   GuiCanvas *root = getRoot();
+
+   /// Child to Parent
+   if( smTopParent)
+      smTopParent->mMouseOver = false;
+
+   if( smCapturedControl && controlIsChild(smCapturedControl) )
+   {
+      smTopParent = smCapturedControl;
+
+      /// Get parent which is the child of the root.
+      if(smTopParent->getParent() && smTopParent->getParent() != rootControl)
+      {
+         while( smTopParent->getParent() != rootControl)
+         {
+            smTopParent->mMouseOver = false;
+            smTopParent = smTopParent->getParent();
+         }
+      }
+
+      /// Fade only if the current control is the root
+      if( this == rootControl || this == root)
+      {
+         smTopParent->mMouseOver = false;
+         smTopParent->mFadeStartTime = Platform::getRealMilliseconds();
+
+         if(smTopParent->getAlphaFadeTime() != 0 && (smTopParent->getMouseOverAlphaValue() - smTopParent->getAlphaValue()) != 0)
+         {
+            smTopParent->mFadeRate = (smTopParent->getMouseOverAlphaValue() - smTopParent->getAlphaValue())/smTopParent->getAlphaFadeTime();
+            smTopParent->mFadeStart = true;
+         }
+         else
+         {
+            smTopParent->mFadeRate = 0;
+            smTopParent->mFadeStart = false;
+         }
+      }
+      else
+         smTopParent->mMouseOver = true;  
+
+      /// Fade out captured control
+      smCapturedControl->mMouseOver = false;
+      smCapturedControl->mFadeStartTime = Platform::getRealMilliseconds();
+      if(smCapturedControl->getAlphaFadeTime() != 0 && (smCapturedControl->getMouseOverAlphaValue() - smCapturedControl->getAlphaValue()) != 0)
+      {
+         smCapturedControl->mFadeRate = (smCapturedControl->getMouseOverAlphaValue() - smCapturedControl->getAlphaValue())/smCapturedControl->getAlphaFadeTime();
+         smCapturedControl->mFadeStart = true;
+      }
+      else
+      {
+         smCapturedControl->mFadeRate = 0;
+         smCapturedControl->mFadeStart = false;
+      }
+      mMouseOver = true;
+      return;
+   }
+
+   
+   else if( smCapturedControl && smCapturedControl->isActive())
+   {
+
+      /// Child to child
+      if( controlIsSibling( smCapturedControl ) )
+      {
+         if(smCapturedControl)
+            smCapturedControl->mMouseOver = false;
+         if( smTopParent)
+            smTopParent->mMouseOver = true;
+      }
+
+      /// Parent to child
+      else //( smCapturedControl->controlIsChild( this ))
+      {
+         smTopParent = this;
+
+         /// Get the topmost parent for fade
+         if(smTopParent->getParent() && smTopParent != rootControl )
+         {
+            while( smTopParent && smTopParent->getParent() != rootControl)
+            {
+               smTopParent = smTopParent->getParent();
+            }
+         }
+         smTopParent->mMouseOver = true;
+
+         /// Fade only if the previous captured control is the root
+         if( smCapturedControl == rootControl || smCapturedControl == root)
+         {
+            if(smTopParent->getAlphaFadeTime() != 0 && (smTopParent->getMouseOverAlphaValue() - smTopParent->getAlphaValue()) != 0)
+            {
+               smTopParent->mFadeRate = (smTopParent->getMouseOverAlphaValue() - smTopParent->getAlphaValue())/smTopParent->getAlphaFadeTime();
+               smTopParent->mFadeStart = true;
+            }
+            else
+            {
+               smTopParent->mFadeRate = 0;
+               smTopParent->mFadeStart = false;
+            }
+         }
+      }
+
+      /// Fade in this control
+      mMouseOver = true;
+      mFadeStartTime = Platform::getRealMilliseconds();
+      if(getAlphaFadeTime() != 0 && (getMouseOverAlphaValue() - getAlphaValue()) != 0)
+      {
+         mFadeRate = (getMouseOverAlphaValue() - getAlphaValue())/getAlphaFadeTime();
+         mFadeStart = true;
+      }
+      else
+      {
+         mFadeRate = 0;
+         mFadeStart = false;
+      }
+      return;
+   }
+
+}
+
+
+//-----------------------------------------------------------------------------
+
+String GuiControl::getControlTextureFile()
+{
+   return mControlTextureFile;
+}
 //=============================================================================
 //    Console Methods.
 //=============================================================================
@@ -2491,6 +3296,20 @@ DefineEngineMethod( GuiControl, findHitControls, const char*, ( S32 x, S32 y, S3
    return buffer;
 }
 
+DefineEngineMethod( GuiControl, setCur, void, (  ), ,
+   "Sets the cursor as a plus."
+   "@param ignored Ignored.  Supported for backwards-compatibility.\n" )
+{
+   object->setCur();
+}
+
+DefineEngineMethod( GuiControl, resetCur, void, (  ), ,
+   "Removes the plus cursor."
+   "@param ignored Ignored.  Supported for backwards-compatibility.\n" )
+{
+   object->resetCur();
+}
+
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, controlIsChild, bool, ( GuiControl* control ),,
@@ -2502,6 +3321,17 @@ DefineEngineMethod( GuiControl, controlIsChild, bool, ( GuiControl* control ),,
       return false;
       
    return object->controlIsChild( control );
+}
+
+DefineEngineMethod( GuiControl, controlIsSibling, bool, ( GuiControl* control ),,
+   "Test whether the given control is a sibling of this control.\n"
+   "@param control The potential sibling control.\n"
+   "@return True if the given control is a sibling of this control." )
+{
+   if( !control )
+      return false;
+      
+   return object->controlIsSibling( control );
 }
 
 //-----------------------------------------------------------------------------
@@ -2764,7 +3594,7 @@ DefineEngineMethod( GuiControl, setPositionGlobal, void, ( S32 x, S32 y ),,
    "@param y The new Y coordinate of the control relative to the root's upper left corner." )
 {
    //see if we can turn the x/y into ints directly, 
-   Point2I lPosOffset	=	object->globalToLocalCoord( Point2I( x, y ) );
+   Point2I lPosOffset   =   object->globalToLocalCoord( Point2I( x, y ) );
    
    lPosOffset += object->getPosition();
    
@@ -2843,4 +3673,333 @@ DefineEngineMethod( GuiControl, getAspect, F32, (),,
 {
    const Point2I &ext = object->getExtent();
    return (F32)ext.x / (F32)ext.y;
+}
+
+DefineConsoleMethod(GuiControl, getBounds, RectI, (), , "")
+{
+   return object->getBounds();
+}
+
+//-----------------------------------------------------------------------------
+// Copyright (C) 2013 WinterLeaf Entertainment LLC.
+//  @Copyright start
+
+DefineEngineMethod( GuiControl, setAlphaValue, void, ( F32 alpha ), ( 1 ),
+   "Set the alpha for the object.\n"
+   "@param value Range 0, 1 for the transparency." )
+{
+   object->setAlphaValue( alpha );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setMouseOverAlphaValue, void, ( F32 alpha ), ( 1 ),
+   "Set the alpha for the object.\n"
+   "@param value Range 0, 1 for the transparency." )
+{
+   object->setMouseOverAlphaValue( alpha );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setAlphaFadeTime, void, ( S32 fadeTime ), ( 1000 ),
+   "Set the alpha for the object.\n"
+   "@param value Range 0, 1 for the transparency." )
+{
+   object->setAlphaFadeTime( fadeTime );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getAlphaValue, F32, (  ), ,
+   "Get the alpha for the object." )
+{
+   return object->getAlphaValue( );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getMouseOverAlphaValue, F32, (  ), ,
+   "Get the mouse over alpha for the object." )
+{
+   return object->getMouseOverAlphaValue( );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getAlphaFadeTime, S32, (  ), ,
+   "Get the alpha fade time for the object." )
+{
+   return object->getAlphaFadeTime( );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setControlLock, void, (bool locked),,
+   "Lock the control." )
+{
+   object->setControlLock(locked);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getControlLock, bool, (),,
+   "Returns if the control is locked or not." )
+{
+   return object->getControlLock();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setControlBackgroundColor, void, (ColorI color),,
+   "Set control background color." )
+{
+   object->setControlBackgroundColor(color);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setControlFontColor, void, (ColorI color),,
+   "Set control font color." )
+{
+   object->setControlFontColor(color);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setControlFillColor, void, (ColorI color),,
+   "Set control fill color." )
+{
+   object->setControlFillColor(color);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setControlTexture, void, (String fileName),,
+   "Set control texture." )
+{
+   object->setControlTexture(fileName);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getControlTextureFile, String, (),,
+   "Returns the filename of the texture of the control." )
+{
+   return object->getControlTextureFile();
+}
+
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getRootControl, GuiControl *, (),,
+   "Get root control" )
+{
+   return object->getRootControl();
+}
+
+//-----------------------------------------------------------------------------
+
+/*DefineEngineMethod( GuiControl, isContextHidden, bool, (),,
+   "Returns if the control can be hidden in the game or not." )
+{
+   return object->isContextHidden();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextHideControl, void, ( bool hide),,
+   "Displays the option to hide the control in the game when true." )
+{
+   object->setContextHideControl(hide);
+}*/
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, isContextLockable, bool, (),,
+   "Returns if the control can be locked in the game or not." )
+{
+   return object->isContextLockable();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextLockControl, void, ( bool lock),,
+   "Displays the option to lock the control in the game when true." )
+{
+   object->setContextLockControl(lock);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, canChangeContextBackColor, bool, (),,
+   "Returns if the control's background color can be changed in the game or not." )
+{
+   return object->canChangeContextBackColor();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextBackColor, void, ( bool backColor),,
+   "Displays the option to set the background color of the control in the game when true." )
+{
+   object->setContextBackColor(backColor);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, canChangeContextFillColor, bool, (),,
+   "Returns if the control's fill color can be changed in the game or not." )
+{
+   return object->canChangeContextFillColor();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextFillColor, void, ( bool fillColor),,
+   "Displays the option to set the fill color of the control in the game when true." )
+{
+   object->setContextFillColor(fillColor);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, canChangeContextFontColor, bool, (),,
+   "Returns if the control's font color can be changed in the game or not." )
+{
+   return object->canChangeContextFontColor();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextFontColor, void, ( bool fontColor),,
+   "Displays the option to set the font color of the control in the game when true." )
+{
+   object->setContextFontColor(fontColor);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, isContextMovable, bool, (),,
+   "Returns if the control can be moved in the game or not." )
+{
+   return object->isContextMovable();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextMoveControl, void, ( bool move),,
+   "Displays the option to move the control in the game when true." )
+{
+   object->setContextMoveControl(move);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, isContextAlphaEnabled, bool, (),,
+   "Returns if the control's alpha value can be changed in the game or not." )
+{
+   return object->isContextAlphaEnabled();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextAlpha, void, ( bool alpha),,
+   "Displays the option to set the alpha of the control in the game when true." )
+{
+   object->setContextAlpha(alpha);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, isContextAlphaFadeEnabled, bool, (),,
+   "Returns if the control's alpha fade value can be changed in the game or not." )
+{
+   return object->isContextAlphaFadeEnabled();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextAlphaFade, void, ( bool fade),,
+   "Displays the option to set the alpha fade value of the control in the game when true." )
+{
+   object->setContextAlphaFade(fade);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, isContextMouseOverAlphaEnabled, bool, (),,
+   "Returns if the control's mouse-over alpha value can be changed in the game or not." )
+{
+   return object->isContextMouseOverAlphaEnabled();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextMouseOverAlpha, void, ( bool mouseOver),,
+   "Displays the option to set the mouse-over alpha of the control in the game when true." )
+{
+   object->setContextMouseOverAlpha(mouseOver);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, canShowContextWindowSettings, bool, (),,
+   "Returns if the control's window settings can be changed in the game or not." )
+{
+   return object->canShowContextWindowSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setShowContextWindowSettings, void, ( bool lock),,
+   "Displays the option to set the window settings of the control in the game when true." )
+{
+   object->setShowContextWindowSettings(lock);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, transparentControlCheck, bool, (),,
+   "Returns true if the control is transparent." )
+{
+   return object->transparentControlCheck();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setControlFontSize, void, ( S32 fontSize ), ,
+   "Sets the font size of a control." )
+{
+   object->setControlFontSize( fontSize );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, getControlFontSize, S32, ( ), ,
+   "Sets the font size of a control." )
+{
+   return object->getControlFontSize( );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, setContextFontSize, void, ( bool fontSize ), ,
+   "Displays the option to set the font size of the control in the game when true." )
+{
+   object->setContextFontSize( fontSize );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, canChangeContextFontSize, bool, ( ), ,
+   "Returns if the control's font size can be changed in the game or not." )
+{
+   return object->canChangeContextFontSize( );
+}
+
+DefineEngineMethod( GuiControl, refresh, void, (),,
+   "Recalculates the position and size of this control and all its children." )
+{
+   object->refresh();
 }

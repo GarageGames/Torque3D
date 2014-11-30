@@ -57,6 +57,10 @@ protected:
 public:
 
    DECLARE_CONOBJECT( MECreateUndoAction );
+
+   DECLARE_CALLBACK( void, onUndone, () );
+   DECLARE_CALLBACK( void, onRedone, () );
+
    static void initPersistFields();
    
    MECreateUndoAction( const UTF8* actionName = " " );
@@ -94,6 +98,10 @@ protected:
 public:
 
    DECLARE_CONOBJECT( MEDeleteUndoAction );
+
+   DECLARE_CALLBACK( void, onUndone, () );
+   DECLARE_CALLBACK( void, onRedone, () );
+
    static void initPersistFields();
    
    MEDeleteUndoAction( const UTF8* actionName = "Delete Object" );

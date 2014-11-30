@@ -25,9 +25,11 @@
 
 #include "console/consoleTypes.h"
 #include "console/console.h"
+#include "core/strings/stringUnit.h"
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/core/guiDefaultControlRender.h"
 #include "gfx/gfxDrawUtil.h"
+#include "gui/controls/guiTableControl.h"
 #include "console/engineAPI.h"
 
 IMPLEMENT_CONOBJECT(GuiTextListCtrl);
@@ -49,21 +51,6 @@ ConsoleDocClass( GuiTextListCtrl,
    "@see Reference\n\n"
 
    "@ingroup GuiControls\n"
-);
-
-
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const char* text),( cellid , text ),
-   "@brief Called whenever an item in the list is selected.\n\n"
-   "@param cellid The ID of the cell that was selected\n"
-   "@param text The text in the selected cel\n\n"
-   "@tsexample\n"
-   "// A cel in the control was selected, causing the callback to occur\n"
-   "GuiTextListCtrl::onSelect(%this,%callid,%text)\n"
-   "	{\n"
-   "		// Code to run when a cel item is selected\n"
-   "	}\n"
-   "@endtsexample\n\n"
-   "@see GuiControl\n\n"
 );
 
 IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( const char* id ),( id ),
@@ -172,6 +159,8 @@ bool GuiTextListCtrl::cellSelected(Point2I cell)
 
 void GuiTextListCtrl::onCellSelected(Point2I cell)
 {
+	if( !dStricmp(getParent()->getClassName(), "GuiTableControl" ) )
+		((GuiTableControl*)getParent())->onSelect_callback(Con::getIntArg(mList[cell.y].id), mList[cell.y].text);
    onSelect_callback(Con::getIntArg(mList[cell.y].id), mList[cell.y].text);
    execConsoleCallback();
 }
@@ -214,7 +203,7 @@ void GuiTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected, 
          {
             saveClipRect = GFX->getClipRect();
 
-            RectI clipRect(pos, Point2I(mColumnOffsets[index+1] - mColumnOffsets[index] - 4, mCellSize.y));
+            RectI clipRect(pos, Point2I(mColumnOffsets[index+1] - mColumnOffsets[index] - 10, mCellSize.y));
             if(clipRect.intersect(saveClipRect))
             {
                clipped = true;
@@ -331,6 +320,16 @@ S32 GuiTextListCtrl::findEntryByText(const char *text)
       if(!dStricmp(mList[i].text, text))
          return i;
    return -1;
+}
+
+S32 GuiTextListCtrl::findEntryByColumnText( S32 columnId, const char *text)
+{
+	for(U32 i = 0; i < mList.size(); i++ )
+	{
+		if( !dStricmp( text, StringUnit::getUnit( mList[i].text, columnId, "\t\n" )))
+			return i;
+	}
+	return -1;
 }
 
 bool GuiTextListCtrl::isEntryActive(U32 id)
@@ -811,6 +810,11 @@ DefineEngineMethod( GuiTextListCtrl, findTextIndex, S32, (const char* needle),,
    "@see GuiControl")
 {
    return( object->findEntryByText(needle) );
+}
+
+DefineEngineMethod( GuiTextListCtrl, findColumnTextIndex, S32, (S32 columnId, const char* columnText),,"")
+{
+	return object->findEntryByColumnText( columnId, columnText );
 }
 
 DefineEngineMethod( GuiTextListCtrl, setRowActive, void, (S32 rowNum, bool active),,

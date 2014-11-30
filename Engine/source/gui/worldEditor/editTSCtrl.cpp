@@ -408,6 +408,7 @@ void EditTSCtrl::onMouseDragged(const GuiEvent & event)
 void EditTSCtrl::onMouseEnter(const GuiEvent & event)
 {
    mMouseLeft = false;
+   fadeControl();
    make3DMouseEvent(mLastEvent, event);
    on3DMouseEnter(mLastEvent);
 }
@@ -415,6 +416,7 @@ void EditTSCtrl::onMouseEnter(const GuiEvent & event)
 void EditTSCtrl::onMouseLeave(const GuiEvent & event)
 {
    mMouseLeft = true;
+   smCapturedControl = this;
    mLastBorderMoveTime = 0;
    make3DMouseEvent(mLastEvent, event);
    on3DMouseLeave(mLastEvent);
@@ -514,6 +516,8 @@ void EditTSCtrl::onRightMouseUp(const GuiEvent & event)
    mRightMouseDown = false;
    make3DMouseEvent(mLastEvent, event);
    on3DRightMouseUp(mLastEvent);
+
+   Parent::onRightMouseUp( event );
 }
 
 void EditTSCtrl::onRightMouseDragged(const GuiEvent & event)
@@ -812,7 +816,7 @@ void EditTSCtrl::_renderScene( ObjectRenderInst*, SceneRenderState *state, BaseM
             dSprintf(buf[0], 16, object->isSelected() ? "true" : "false");
             dSprintf(buf[1], 16, object->isExpanded() ? "true" : "false");
             
-            Con::executef( object, "onEditorRender", getIdString(), buf[0], buf[1] );
+           object->onEditorRender_callback( getIdString(), buf[0], buf[1] );
          }
       }
 

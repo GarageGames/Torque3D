@@ -28,6 +28,7 @@
 #include "console/engineAPI.h"
 #include "T3D/gameBase/gameConnectionEvents.h"
 #include "T3D/gameBase/gameConnection.h"
+#include "console/SimXMLDocument.h"
 
 
 IMPLEMENT_CO_DATABLOCK_V1(SimDataBlock);
@@ -124,6 +125,27 @@ void SimDataBlock::write(Stream &stream, U32 tabStop, U32 flags)
    stream.writeTabs(tabStop);
    char buffer[1024];
 
+   if( flags & XmlOutput )
+   {
+	   getcurrentXML()->pushNewElement("Group");
+
+	   getcurrentXML()->setAttribute("name", getClassName());
+	   getcurrentXML()->setAttribute("fileName", getFilename());
+	   char buffer[1024];
+	   dSprintf(buffer, sizeof(buffer), "%d", getDeclarationLine());
+	   getcurrentXML()->setAttribute("lineNumber", buffer);
+	   getcurrentXML()->pushNewElement("Setting");
+	   getcurrentXML()->setAttribute("name", "name");
+	   if(getName())
+		   getcurrentXML()->addData(getName());
+	   else
+		   getcurrentXML()->addData(" ");
+	   getcurrentXML()->popElement();
+	   writeFields( stream, tabStop + 1, true);
+
+	   getcurrentXML()->popElement();
+	   return;
+   }
    // Client side datablocks are created with 'new' while
    // regular server datablocks use the 'datablock' keyword.
    if ( isClientOnly() )
@@ -131,6 +153,7 @@ void SimDataBlock::write(Stream &stream, U32 tabStop, U32 flags)
    else
       dSprintf(buffer, sizeof(buffer), "datablock %s(%s) {\r\n", getClassName(), getName() ? getName() : "");
 
+   /// For Stream Output
    stream.write(dStrlen(buffer), buffer);
    writeFields(stream, tabStop + 1);
 

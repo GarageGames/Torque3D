@@ -112,7 +112,7 @@ class GuiPopUpMenuCtrlEx : public GuiTextCtrl
    S32 mRevNum;
    bool mInAction;
    bool mReplaceText;
-   bool mMouseOver; //  Added
+   //bool mMouseOver;
    bool mRenderScrollInNA; //  Added
    bool mReverseTextList;	//  Added - Should we reverse the text list if we display up?
    bool mHotTrackItems;
@@ -166,6 +166,10 @@ class GuiPopUpMenuCtrlEx : public GuiTextCtrl
    DECLARE_CONOBJECT(GuiPopUpMenuCtrlEx);
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that allows to select a value from a drop-down list." );
+
+   DECLARE_CALLBACK(void, onHotTrackItem, (const char* id));
+   DECLARE_CALLBACK(void, onSelect, (const char* id, const char* text));
+   DECLARE_CALLBACK(void, onCancel, ());
 
    static void initPersistFields(void);
 };

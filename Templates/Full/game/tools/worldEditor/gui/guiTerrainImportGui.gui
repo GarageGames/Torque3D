@@ -616,7 +616,7 @@ function TerrainImportGui::import( %this )
       EWorldEditor.dropSelection( true );
 
       ETerrainEditor.isDirty = true;
-      EPainter.updateLayers();
+      TerrainPainter.updateLayers();
    }
    else
    {

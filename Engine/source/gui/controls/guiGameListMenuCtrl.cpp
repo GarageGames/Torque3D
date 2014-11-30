@@ -121,14 +121,14 @@ void GuiGameListMenuCtrl::onRender(Point2I offset, const RectI &updateRect)
       }
 
       // render the row bitmap
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();
       GFX->getDrawUtil()->drawBitmapStretchSR(profile->mTextureObject, RectI(currentOffset, rowExtent), profile->getBitmapArrayRect(buttonTextureIndex));
 
       // render the row icon if it has one
       if ((iconIndex != NO_ICON) && profileHasIcons && (! profile->getBitmapArrayRect((U32)iconIndex).extent.isZero()))
       {
          iconIndex += Profile::TEX_FIRST_ICON;
-         GFX->getDrawUtil()->clearBitmapModulation();
+         //GFX->getDrawUtil()->clearBitmapModulation();
          GFX->getDrawUtil()->drawBitmapStretchSR(profile->mTextureObject, RectI(currentOffset + iconOffset, iconExtent), profile->getBitmapArrayRect(iconIndex));
       }
 
@@ -638,6 +638,9 @@ void GuiGameListMenuCtrl::initPersistFields()
       "Script callback when the 'Y' button is pressed. 'Y' inputs are Keyboard: Y; Gamepad: Y" );
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 DefineEngineMethod( GuiGameListMenuCtrl, addRow, void,

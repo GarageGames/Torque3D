@@ -186,7 +186,7 @@ public:
    void onMiddleMouseDragged(const GuiEvent& event) { handleMouseDragged(event, MoveMode); }
 
    void onRightMouseDown(const GuiEvent& event) { handleMouseDown(event, RotateMode); }
-   void onRightMouseUp(const GuiEvent& event) { handleMouseUp(event, RotateMode); }
+   void onRightMouseUp(const GuiEvent& event) { handleMouseUp(event, RotateMode);  Parent::onRightMouseUp( event );}
    void onRightMouseDragged(const GuiEvent& event) { handleMouseDragged(event, RotateMode); }
 
    void on3DMouseWheelUp(const Gui3DMouseEvent& event);
@@ -252,6 +252,10 @@ public:
 
    DECLARE_CONOBJECT(GuiShapeEdPreview);
    DECLARE_CATEGORY( "Gui Editor" );
+
+   DECLARE_CALLBACK( void, onDetailChanged, () );
+   DECLARE_CALLBACK( void, onNodeSelected, ( const char* nodeIdx ) );
+   DECLARE_CALLBACK( void, onEditNodeTransform, ( const char* node, const char* txfm, const char* gizmoID ) );
 
    static void initPersistFields();
 

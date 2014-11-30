@@ -41,6 +41,7 @@
    HoverNodeColor = "255 255 255 255";
    
    new GuiWindowCollapseCtrl(RoadEditorTreeWindow) {
+      AllowPopWindow = "1";
       internalName = "";
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -192,6 +193,7 @@
       };
    };
    new GuiWindowCollapseCtrl(RoadEditorOptionsWindow) {
+      AllowPopWindow = "1";
       internalName = "Window";
       canSaveDynamicFields = "0";
       Enabled = "1";

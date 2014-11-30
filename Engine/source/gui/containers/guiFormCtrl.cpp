@@ -267,7 +267,7 @@ void GuiFormCtrl::onRender(Point2I offset, const RectI &updateRect)
    // Draw our little bar, too
    if (mProfile->mBitmapArrayRects.size() >= 5)
    {
-      GFX->getDrawUtil()->clearBitmapModulation();
+      //GFX->getDrawUtil()->clearBitmapModulation();     // Copyright (C) 2013 WinterLeaf Entertainment LLC.
 
       S32 barStart = offset.x + textWidth;
       S32 barTop   = mThumbSize.y / 2 + offset.y - mProfile->mBitmapArrayRects[3].extent.y / 2;
@@ -334,6 +334,9 @@ void GuiFormCtrl::onMouseEnter(const GuiEvent &event)
       mMouseOver = true;
    }
 
+   // fade control
+   fadeControl();
+
 }
 
 void GuiFormCtrl::onMouseLeave(const GuiEvent &event)
@@ -342,6 +345,7 @@ void GuiFormCtrl::onMouseLeave(const GuiEvent &event)
    if(isMouseLocked())
       mDepressed = false;
    mMouseOver = false;
+   smCapturedControl = this;
 }
 
 void GuiFormCtrl::onMouseDown(const GuiEvent &event)

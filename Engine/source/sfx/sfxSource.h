@@ -64,6 +64,8 @@ class SFXSource : public SimGroup
       typedef SimGroup Parent;
          
       friend class SFXSystem; // _init
+
+	   DECLARE_CALLBACK( void, onMarkerPassed, (const char* idString) );
          
    protected:
 

@@ -25,6 +25,7 @@
 #include "gui/buttons/guiButtonBaseCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/primBuilder.h"
 
 //-----------------------------------------------------------------------------
@@ -46,13 +47,16 @@ gui control at a time, is for it to get a rewrite.
 
 IMPLEMENT_CONOBJECT(GuiDecoyCtrl);
 
+IMPLEMENT_CALLBACK(GuiDecoyCtrl, onMouseEnter, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiDecoyCtrl, onMouseLeave, void, (), (), "");
+
 ConsoleDocClass( GuiDecoyCtrl,
 				"@brief Designed soley for buttons, primarily used in editor.\n\n"
 				"Currently editor use only, no real application without extension.\n\n "
 				"@internal");
 
 GuiDecoyCtrl::GuiDecoyCtrl() : mIsDecoy(true),
-							   mMouseOver(false),
+							   //mMouseOver(false),
 							   mDecoyReference(NULL)
 {
 }
@@ -97,6 +101,8 @@ void GuiDecoyCtrl::onMouseUp(const GuiEvent &event)
 		}
 		mVisible = true;
 	}
+
+	Parent::onMouseUp( event );
 }
 
 void GuiDecoyCtrl::onMouseDown(const GuiEvent &event)
@@ -119,6 +125,7 @@ void GuiDecoyCtrl::onMouseDown(const GuiEvent &event)
 		mVisible = true;
 	}
 	
+	Parent::onMouseDown( event );
    execConsoleCallback();
    setUpdate();
 }
@@ -163,6 +170,7 @@ void GuiDecoyCtrl::onMouseMove(const GuiEvent &event)
 
 void GuiDecoyCtrl::onMouseDragged(const GuiEvent &event)
 {
+	Parent::onMouseDragged( event );
 }
 
 void GuiDecoyCtrl::onMouseEnter(const GuiEvent &event)
@@ -171,8 +179,11 @@ void GuiDecoyCtrl::onMouseEnter(const GuiEvent &event)
       return;
 
    setUpdate();
-   Con::executef( this , "onMouseEnter" );
+   onMouseEnter_callback();
    mMouseOver = true;
+
+   // fade control
+   fadeControl();
 }
 
 void GuiDecoyCtrl::onMouseLeave(const GuiEvent &event)
@@ -181,8 +192,9 @@ void GuiDecoyCtrl::onMouseLeave(const GuiEvent &event)
       return;
 
    setUpdate();
-   Con::executef( this , "onMouseLeave" );
+   onMouseLeave_callback();
    mMouseOver = false;
+   smCapturedControl = this;
 }
 
 bool GuiDecoyCtrl::onMouseWheelUp( const GuiEvent &event )
@@ -217,8 +229,9 @@ void GuiDecoyCtrl::onRightMouseDown(const GuiEvent &)
 {
 }
 
-void GuiDecoyCtrl::onRightMouseUp(const GuiEvent &)
+void GuiDecoyCtrl::onRightMouseUp(const GuiEvent &event)
 {
+	Parent::onRightMouseUp(event);
 }
 
 void GuiDecoyCtrl::onRightMouseDragged(const GuiEvent &)

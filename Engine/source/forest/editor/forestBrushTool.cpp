@@ -30,6 +30,7 @@
 
 #include "gui/worldEditor/editTSCtrl.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/tVector.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiCanvas.h"
@@ -39,6 +40,10 @@
 #include "math/mRandomDeck.h"
 #include "math/mRandomSet.h"
 
+IMPLEMENT_CALLBACK(ForestBrushTool, onMouseDown, void, (), (), "");
+IMPLEMENT_CALLBACK(ForestBrushTool, onActivated, void, (), (), "");
+IMPLEMENT_CALLBACK(ForestBrushTool, onDeactivated, void, (), (), "");
+IMPLEMENT_CALLBACK(ForestBrushTool, syncBrushToolbar, void, (), (), "");
 
 bool ForestBrushTool::protectedSetSize( void *object, const char *index, const char *data )
 {
@@ -137,7 +142,7 @@ void ForestBrushTool::onRemove()
 
 void ForestBrushTool::on3DMouseDown( const Gui3DMouseEvent &evt )
 {   
-   Con::executef( this, "onMouseDown" );
+   onMouseDown_callback();
 
    if ( !_updateBrushPoint( evt ) || !mForest )
       return;
@@ -262,12 +267,12 @@ void ForestBrushTool::onActivated( const Gui3DMouseEvent &lastEvent )
 {
    _updateBrushPoint( lastEvent );
 
-   Con::executef( this, "onActivated" );
+   onActivated_callback();
 }
 
 void ForestBrushTool::onDeactivated()
 {
-   Con::executef( this, "onDeactivated" );
+   onDeactivated_callback();
 }
 
 bool ForestBrushTool::updateGuiInfo()
@@ -304,19 +309,19 @@ bool ForestBrushTool::updateGuiInfo()
 void ForestBrushTool::setSize( F32 val )
 {
    mSize = mClampF( val, 0.0f, 150.0f );
-   Con::executef( this, "syncBrushToolbar" );
+   syncBrushToolbar_callback();
 }
 
 void ForestBrushTool::setPressure( F32 val )
 {   
    mPressure = mClampF( val, 0.0f, 1.0f );
-   Con::executef( this, "syncBrushToolbar" );
+   syncBrushToolbar_callback();
 }
 
 void ForestBrushTool::setHardness( F32 val )
 {
    mHardness = mClampF( val, 0.0f, 1.0f );
-   Con::executef( this, "syncBrushToolbar" );
+   syncBrushToolbar_callback();
 }
 
 void ForestBrushTool::_onStroke()

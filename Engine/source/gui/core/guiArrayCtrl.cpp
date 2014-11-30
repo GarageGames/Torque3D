@@ -59,6 +59,10 @@ IMPLEMENT_CALLBACK( GuiArrayCtrl, onCellHighlighted, void, ( const Point2I& cell
    "@param @cell Coordinates of the cell"
 );
 
+IMPLEMENT_CALLBACK(GuiArrayCtrl, onSelect, void, (const char* x, const char* y), (x, y), "");
+IMPLEMENT_CALLBACK(GuiArrayCtrl, onRightMouseDown, void, (const char* x,const char* y, const char* obj), (x, y, obj), "");
+
+
 //-----------------------------------------------------------------------------
 
 GuiArrayCtrl::GuiArrayCtrl()
@@ -134,7 +138,7 @@ bool GuiArrayCtrl::cellSelected(Point2I cell)
 void GuiArrayCtrl::onCellSelected(Point2I cell)
 {
    // [rene, 21-Jan-11 ] clashes with callbacks defined in derived classes
-   Con::executef(this, "onSelect", Con::getFloatArg(cell.x), Con::getFloatArg(cell.y));
+   onSelect_callback( Con::getFloatArg(cell.x), Con::getFloatArg(cell.y) );
 
    onCellSelected_callback( cell );
 
@@ -180,7 +184,7 @@ void GuiArrayCtrl::scrollCellVisible(Point2I cell)
    if(!parent || cell.x < 0 || cell.y < 0)
       return;
 
-   RectI cellBounds(cell.x * mCellSize.x, cell.y * mCellSize.y, mCellSize.x, mCellSize.y);
+   RectI cellBounds(cell.x * mCellSize.x + mHeaderDim.x, cell.y * mCellSize.y + mHeaderDim.y, mCellSize.x, mCellSize.y);
    parent->scrollRectVisible(cellBounds);
 }
 
@@ -417,6 +421,10 @@ void GuiArrayCtrl::onMouseEnter(const GuiEvent &event)
                               cell.y * mCellSize.y + mHeaderDim.y), mCellSize );
 	  onCellHighlighted(mMouseOverCell);
    }
+
+   // Fade Control
+   fadeControl();
+   mMouseOver = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -427,6 +435,8 @@ void GuiArrayCtrl::onMouseLeave(const GuiEvent & /*event*/)
                            mMouseOverCell.y * mCellSize.y + mHeaderDim.y), mCellSize);
    mMouseOverCell.set(-1,-1);
    onCellHighlighted(mMouseOverCell);
+   smCapturedControl = this;
+   mMouseOver = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -548,7 +558,7 @@ void GuiArrayCtrl::onRightMouseDown(const GuiEvent &event)
       // [rene, 21-Jan-11 ] clashes with callbacks defined in derived classes
 
       // Pass it to the console:
-  	   Con::executef(this, "onRightMouseDown", Con::getIntArg(cell.x), Con::getIntArg(cell.y), buf);
+  	  onRightMouseDown_callback( Con::getIntArg(cell.x), Con::getIntArg(cell.y), buf);
    }
 }
 

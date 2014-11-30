@@ -81,6 +81,31 @@ ConsoleDocClass( AIPlayer,
 
 	"@ingroup AI\n"
 	"@ingroup gameObjects\n");
+
+IMPLEMENT_CALLBACK(AIPlayer, onMoveStuck, void, ( AIPlayer* obj ), (obj),
+   "@brief While in motion, if an AIPlayer has moved less than moveStuckTolerance within a single tick, this "
+   "callback is called.\n\n"
+   "@param AIPlayer Object\n"
+   );
+
+IMPLEMENT_CALLBACK(AIPlayer, onReachDestination, void, ( AIPlayer* obj ), (obj),
+   "@brief Called when the player has reached its set destination using the setMoveDestination() method.\n\n"
+   "The actual point at which this callback is called is when the AIPlayer is within the mMoveTolerance.\n"
+   "@param AIPlayer Object\n"
+   );
+
+IMPLEMENT_CALLBACK(AIPlayer, onTargetEnterLOS, void, ( AIPlayer* obj ), (obj),
+   "@brief When an object is being aimed at (following a call to setAimObject()) and the targeted object enters "
+   "the AIPlayer's line of sight, this callback is called.\n\n"
+   "@param AIPlayer Object\n"
+   );
+
+IMPLEMENT_CALLBACK(AIPlayer, onTargetExitLOS, void, ( AIPlayer* obj ), (obj),
+   "@brief When an object is being aimed at (following a call to setAimObject()) and the targeted object leaves "
+   "the AIPlayer's line of sight, this callback is called.\n\n"
+   "@param AIPlayer Object\n"
+   );
+
 /**
  * Constructor
  */
@@ -340,7 +365,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
       if (mFabs(xDiff) < mMoveTolerance && mFabs(yDiff) < mMoveTolerance) 
       {
          mMoveState = ModeStop;
-         throwCallback("onReachDestination");
+		 onReachDestination_callback(this);
       }
       else 
       {
@@ -409,7 +434,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
                if ( mMoveState != ModeSlowing || locationDelta == 0 )
                {
                   mMoveState = ModeStuck;
-                  throwCallback("onMoveStuck");
+				  onMoveStuck_callback(this);
                }
             }
          }
@@ -431,7 +456,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
       }
       else if (mTargetInLOS)
       {
-         throwCallback("onTargetExitLOS");
+            onTargetEnterLOS_callback(this);
          mTargetInLOS = false;
       }
    }

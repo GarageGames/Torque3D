@@ -27,6 +27,7 @@
 #include "core/strings/stringUnit.h"
 #include "console/consoleTypes.h"
 #include "console/simEvents.h"
+#include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "math/mathUtils.h"
 #include "gfx/primBuilder.h"
@@ -662,6 +663,11 @@ void SelectionBrush::render(Vector<GFXVertexPC> & vertexBuffer, S32 & verts, S32
    //... render the selection
 }
 
+IMPLEMENT_CALLBACK( TerrainEditor, onBrushChanged, void, (), (), "" );
+IMPLEMENT_CALLBACK( TerrainEditor, onMaterialUndo, void, (), (), "" );
+IMPLEMENT_CALLBACK( TerrainEditor, onGuiUpdate, void, (const char * text), (text), "" );
+IMPLEMENT_CALLBACK( TerrainEditor, onActiveTerrainChange, void, (const char * newTerrain), (newTerrain), "" );
+
 TerrainEditor::TerrainEditor() :
    mActiveTerrain(0),
    mMousePos(0,0,0),
@@ -1262,14 +1268,14 @@ void TerrainEditor::updateGuiInfo()
       mMouseBrush->size(), mMouseBrush->getMinHeight(),
       mMouseBrush->getAvgHeight(), mMouseBrush->getMaxHeight(),
       mDefaultSel.size(), mDefaultSel.getAvgHeight());
-   Con::executef(this, "onGuiUpdate", buf);
+   onGuiUpdate_callback( buf );
 
    // If the brush setup has changed send out
    // a notification of that!
-   if ( mBrushChanged && isMethod( "onBrushChanged" ) )
+   if ( mBrushChanged )
    {
       mBrushChanged = false;
-      Con::executef( this, "onBrushChanged" );
+      onBrushChanged_callback();
    }
 }
 
@@ -1709,7 +1715,7 @@ void TerrainEditor::onMaterialUndo( TerrainBlock *terr )
    terr->mDetailsDirty = true;
    terr->mLayerTexDirty = true; 
 
-   Con::executef( this, "onMaterialUndo" );
+   onMaterialUndo_callback();
 }
 
 void TerrainEditor::TerrainMaterialUndoAction::undo()
@@ -1792,7 +1798,7 @@ void TerrainEditor::on3DMouseDown(const Gui3DMouseEvent & event)
 
       if (changed)
       {
-         Con::executef(this, "onActiveTerrainChange", Con::getIntArg(hitTerrain->getId()));
+         onActiveTerrainChange_callback( Con::getIntArg(hitTerrain->getId()) );
          mMouseBrush->setTerrain(mActiveTerrain);
          //if(mRenderBrush)
             //mCursorVisible = false;
@@ -1852,7 +1858,7 @@ void TerrainEditor::on3DMouseMove(const Gui3DMouseEvent & event)
          mActiveTerrain = hitTerrain;
 
          if (changed)
-            Con::executef(this, "onActiveTerrainChange", Con::getIntArg(hitTerrain->getId()));
+         { onActiveTerrainChange_callback( Con::getIntArg(hitTerrain->getId()) ); }
       }
 
       mMousePos = pos;

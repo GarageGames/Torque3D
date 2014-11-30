@@ -76,6 +76,9 @@ void GuiTextEditSliderCtrl::initPersistFields()
    addField("focusOnMouseWheel", TypeBool, Offset(mFocusOnMouseWheel, GuiTextEditSliderCtrl), "If true, the control will accept giving focus to the user when the mouse wheel is used.\n");
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 void GuiTextEditSliderCtrl::getText(char *dest)

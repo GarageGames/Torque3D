@@ -76,6 +76,16 @@ class WorldEditor : public EditTSCtrl
          Point3F p2;
       };
 
+	  DECLARE_CALLBACK( void, onSelect, (const char* idString) );
+	  DECLARE_CALLBACK( void, onUnSelect, (const char* idString) );
+	  DECLARE_CALLBACK( void, onClearSelection, () );
+	  DECLARE_CALLBACK( void, onSelectionCentroidChanged, () );
+	  DECLARE_CALLBACK( void, onWorldEditorUndo, () );
+	  DECLARE_CALLBACK( void, onSelectionSetChanged, () );
+	  DECLARE_CALLBACK( void, onMultiSelect, (const char* idString, const char* addToSelection) );
+	  DECLARE_CALLBACK( StringTableEntry, getNewObjectGroup, () );
+	  DECLARE_CALLBACK( void, onStartSelection, ());
+	  DECLARE_CALLBACK( void, onEndSelection, ());
       void ignoreObjClass(U32 argc, ConsoleValueRef* argv);
       void clearIgnoreList();
 

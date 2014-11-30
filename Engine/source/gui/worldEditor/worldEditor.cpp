@@ -61,7 +61,7 @@ ConsoleDocClass( WorldEditor,
 ImplementEnumType( WorldEditorDropType,
    "How to drop objects when placed or dropped in the world.\n"
    "@internal\n\n")
-	{ WorldEditor::DropAtOrigin,           "atOrigin",      "Place at the scene origin (usually 0,0,0)\n"        },
+   { WorldEditor::DropAtOrigin,           "atOrigin",      "Place at the scene origin (usually 0,0,0)\n"        },
    { WorldEditor::DropAtCamera,           "atCamera",       "Places at the same position as the camera, without rotation.\n"        },
    { WorldEditor::DropAtCameraWithRot,    "atCameraRot",    "Places at the same position as the camera, with the camera's rotation.\n"     },
    { WorldEditor::DropBelowCamera,        "belowCamera",    "Places below the camera.\n"    },
@@ -74,7 +74,7 @@ EndImplementEnumType;
 ImplementEnumType( WorldEditorAlignmentType,
    "How to snap when snapping is enabled.\n"
    "@internal\n\n")
-	{ WorldEditor::AlignNone,  "None", "No alignement type.\n"   },
+   { WorldEditor::AlignNone,  "None", "No alignement type.\n"   },
    { WorldEditor::AlignPosX,  "+X", "Snap towards the higher position on the X plane.\n"   },
    { WorldEditor::AlignPosY,  "+Y", "Snap towards the higher position on the Y plane.\n"   },
    { WorldEditor::AlignPosZ,  "+Z", "Snap towards the higher position on the Z plane.\n"   },
@@ -82,6 +82,18 @@ ImplementEnumType( WorldEditorAlignmentType,
    { WorldEditor::AlignNegY,  "-Y", "Snap towards the lower position on the Y plane.\n"    },
    { WorldEditor::AlignNegZ,  "-Z", "Snap towards the lower position on the Z plane.\n"    },
 EndImplementEnumType;
+
+
+IMPLEMENT_CALLBACK(WorldEditor, onSelect, void, (const char* idString), (idString),"");
+IMPLEMENT_CALLBACK(WorldEditor, onUnSelect, void, (const char* idString), (idString),"");
+IMPLEMENT_CALLBACK(WorldEditor, onClearSelection, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onSelectionCentroidChanged, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onWorldEditorUndo, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onSelectionSetChanged, void, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onMultiSelect, void, (const char* idString, const char* addToSelection), (idString, addToSelection),"");
+IMPLEMENT_CALLBACK(WorldEditor, getNewObjectGroup, StringTableEntry, (), (),"");
+IMPLEMENT_CALLBACK(WorldEditor, onStartSelection, void, (),(),"");
+IMPLEMENT_CALLBACK(WorldEditor, onEndSelection, void, (),(),"");
 
 
 // unnamed namespace for static data
@@ -394,7 +406,7 @@ void WorldEditor::WorldEditorUndoAction::undo()
    mWorldEditor->mSelected->invalidateCentroid();
 
    // Let the script get a chance at it.
-   Con::executef( mWorldEditor, "onWorldEditorUndo" );
+   mWorldEditor->onWorldEditorUndo_callback();
 }
 
 //------------------------------------------------------------------------------
@@ -456,7 +468,7 @@ bool WorldEditor::pasteSelection( bool dropSel )
    SimGroup *missionGroup = NULL;   
    if( isMethod( "getNewObjectGroup" ) )
    {
-      const char* targetGroupName = Con::executef( this, "getNewObjectGroup" );
+      const char* targetGroupName = this->getNewObjectGroup_callback();
       if( targetGroupName && targetGroupName[ 0 ] && !Sim::findObject( targetGroupName, missionGroup ) )
          Con::errorf( "WorldEditor::pasteSelection() - no SimGroup called '%s'", targetGroupName );
    }
@@ -487,7 +499,7 @@ bool WorldEditor::pasteSelection( bool dropSel )
       if ( !mSelectionLocked )
       {         
          mSelected->addObject( obj );
-         Con::executef( this, "onSelect", obj->getIdString() );
+       this->onSelect_callback(obj->getIdString());
       }
    }
 
@@ -508,7 +520,10 @@ bool WorldEditor::pasteSelection( bool dropSel )
       SimObject *obj = NULL;
       if(mRedirectID)
          obj = Sim::findObject(mRedirectID);
-      Con::executef(obj ? obj : this, "onClick", buf);
+     if (obj)
+        obj->onClick_callback(buf);
+     else
+        this->onClick_callback(buf);
    }
 
    // Mark the world editor as dirty!
@@ -546,7 +561,7 @@ void WorldEditor::makeActiveSelectionSet( WorldEditorSelection* selection )
       for( Selection::iterator iter = oldSelection->begin(); iter != oldSelection->end(); ++ iter )
          if( !newSelection || !newSelection->objInSet( *iter ) )
          {
-            Con::executef( this, "onUnselect", ( *iter )->getIdString() );
+          this->onUnSelect_callback(( *iter )->getIdString());
             markAsSelected( *iter, false );
          }
             
@@ -563,7 +578,7 @@ void WorldEditor::makeActiveSelectionSet( WorldEditorSelection* selection )
          if( !oldSelection || !oldSelection->objInSet( *iter ) )
          {
             markAsSelected( *iter, true );
-            Con::executef( this, "onSelect", ( *iter )->getIdString() );
+         this->onSelect_callback(( *iter )->getIdString());
          }
             
       newSelection->setAutoSelect( true );
@@ -573,8 +588,7 @@ void WorldEditor::makeActiveSelectionSet( WorldEditorSelection* selection )
             
    mSelected = newSelection;
    
-   if( isMethod( "onSelectionSetChanged" ) )
-      Con::executef( this, "onSelectionSetChanged" );
+   this->onSelectionSetChanged_callback();
 }
 
 //------------------------------------------------------------------------------
@@ -1381,7 +1395,7 @@ void WorldEditor::renderMousePopupInfo()
       GFX->getDrawUtil()->drawRectFill(minPt, maxPt, mPopupBackgroundColor);
    }
 
-	GFX->getDrawUtil()->setBitmapModulation(mPopupTextColor);
+   GFX->getDrawUtil()->setBitmapModulation(mPopupTextColor);
    GFX->getDrawUtil()->drawText(mProfile->mFont, Point2I(posi.x - width / 2, posi.y), buf);
 }
 
@@ -1623,7 +1637,7 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
          drawer->setBitmapModulation( ColorI(255,255,255,iconAlpha) );         
 
       drawer->drawBitmapStretch( classIcon, renderRect );      
-      drawer->clearBitmapModulation();
+      //drawer->clearBitmapModulation();
 
       if ( obj->isLocked() )      
          drawer->drawBitmap( mDefaultClassEntry.mLockedHandle, renderPos );      
@@ -1651,28 +1665,28 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
          pos.x += (classIcon->getWidth() / 2) - (extent.x / 2);
          pos.y += (classIcon->getHeight() / 2) + 3;
       }
-	  
+     
       
-	  if(mGizmoProfile->mode == NoneMode){
-		  
-		 drawer->drawBitmapStretch( classIcon, renderRect );
-		 drawer->setBitmapModulation( ColorI(255,255,255,255) ); 
-		 drawer->drawText(mProfile->mFont, pos, str); 
-		 if ( obj->isLocked() )      
-			drawer->drawBitmap( mDefaultClassEntry.mLockedHandle, renderPos );      
+     if(mGizmoProfile->mode == NoneMode){
+        
+       drawer->drawBitmapStretch( classIcon, renderRect );
+       drawer->setBitmapModulation( ColorI(255,255,255,255) ); 
+       drawer->drawText(mProfile->mFont, pos, str); 
+       if ( obj->isLocked() )      
+         drawer->drawBitmap( mDefaultClassEntry.mLockedHandle, renderPos );      
 
-			// Save an IconObject for performing icon-click testing later.
-		{
-			IconObject icon;
-			icon.object = obj;
-			icon.rect = renderRect;
-			icon.dist = projPos.z;             
-			mIcons.push_back( icon );
-		}
-	  }else{
-		  drawer->setBitmapModulation(mObjectTextColor);
-		  drawer->drawText(mProfile->mFont, pos, str);
-	  };
+         // Save an IconObject for performing icon-click testing later.
+      {
+         IconObject icon;
+         icon.object = obj;
+         icon.rect = renderRect;
+         icon.dist = projPos.z;             
+         mIcons.push_back( icon );
+      }
+     }else{
+        drawer->setBitmapModulation(mObjectTextColor);
+        drawer->drawText(mProfile->mFont, pos, str);
+     };
    }
 }
 
@@ -1950,7 +1964,7 @@ void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
       const F32 spacing = mCeil( size / 20.f );
 
      if( dynamic_cast< SceneObject* >( ( *mSelected )[0] ))
-	  {
+     {
      
          if (size > 0)
          {
@@ -1982,6 +1996,9 @@ void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
    {
       if ( !(event.modifier & ( SI_RANGESELECT | SI_MULTISELECT ) ) )
          clearSelection();
+
+      if(mDragSelected->size() > 0)
+         onStartSelection_callback();
 
       mDragSelect = true;
       mDragSelected->clear();
@@ -2030,24 +2047,34 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
          for ( U32 i = 0; i < mDragSelected->size(); i++ )                     
             mSelected->addObject( ( *mDragSelected )[i] );                       
                   
-         Con::executef( this, "onMultiSelect", mDragSelected->getIdString(), addToSelection ? "1" : "0" );
+       this->onMultiSelect_callback( mDragSelected->getIdString(), addToSelection ? "1" : "0" );
          mDragSelected->clear();
 
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onClick", ( *mSelected )[ 0 ]->getIdString() );
+       if (obj)
+          obj->onClick_callback(( *mSelected )[ 0 ]->getIdString() );
+       else
+          this->onClick_callback(( *mSelected )[ 0 ]->getIdString() );
       }
-      else if ( mDragSelected->size() == 1 )
+
+      if(mDragSelected->size() > 0)
+         onEndSelection_callback();
+
+      if ( mDragSelected->size() == 1 )
       {         
          mSelected->addObject( ( *mDragSelected )[0] );    
-         Con::executef( this, "onSelect", ( *mDragSelected )[ 0 ]->getIdString() );
+       this->onSelect_callback(( *mDragSelected )[ 0 ]->getIdString() );
          mDragSelected->clear();
          
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onClick", ( *mSelected )[ 0 ]->getIdString() );
+       if (obj)
+          obj->onClick_callback(( *mSelected )[ 0 ]->getIdString());
+       else
+           this->onClick_callback(( *mSelected )[ 0 ]->getIdString());
       }
 
       mouseUnlock();
@@ -2064,13 +2091,13 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
             {
                mSelected->removeObject( mPossibleHitObject );
                mSelected->storeCurrentCentroid();
-               Con::executef( this, "onUnSelect", mPossibleHitObject->getIdString() );
+            this->onUnSelect_callback(mPossibleHitObject->getIdString());
             }
             else
             {
                mSelected->addObject( mPossibleHitObject );
                mSelected->storeCurrentCentroid();
-               Con::executef( this, "onSelect", mPossibleHitObject->getIdString() );
+            this->onSelect_callback(mPossibleHitObject->getIdString() );
             }
          }
          else
@@ -2084,12 +2111,12 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
                // in reverse.  This will make the loop work even if items are removed as
                // we go along.
                for( S32 i = mSelected->size() - 1; i >= 0; -- i )
-                  Con::executef( this, "onUnSelect", ( *mSelected )[ i ]->getIdString() );
+              this->onUnSelect_callback(( *mSelected )[ i ]->getIdString());
                
                mSelected->clear();
                mSelected->addObject( mPossibleHitObject );
                mSelected->storeCurrentCentroid();
-               Con::executef( this, "onSelect", mPossibleHitObject->getIdString() );
+            this->onSelect_callback( mPossibleHitObject->getIdString() );
             }
          }
       }
@@ -2103,7 +2130,12 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onDblClick", buf );
+
+         if(obj != NULL)
+         { obj->onDblClick_callback(buf); }
+         else
+         { this->onDblClick_callback(buf); }
+
       }
       else 
       {
@@ -2113,7 +2145,10 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
          SimObject *obj = NULL;
          if ( mRedirectID )
             obj = Sim::findObject( mRedirectID );
-         Con::executef( obj ? obj : this, "onClick", buf );
+       if (obj)
+          obj->onClick_callback(buf);
+       else
+          this->onClick_callback(buf);
       }
 
       mHitObject = mPossibleHitObject;
@@ -2121,20 +2156,21 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
 
    if ( bool(mSelected) && mSelected->hasCentroidChanged() )
    {
-      Con::executef( this, "onSelectionCentroidChanged");
+      this->onSelectionCentroidChanged_callback();
    }
 
    if ( mMouseDragged && bool(mSelected) && mSelected->size() )
    {
       if ( mSelected->size() )
       {
-         if ( isMethod("onEndDrag") )
-         {
             SimObject * obj = 0;
             if ( mRedirectID )
-               obj = Sim::findObject( mRedirectID );
-            Con::executef( obj ? obj : this, "onEndDrag", ( *mSelected )[ 0 ]->getIdString() );
-         }
+            { obj = Sim::findObject( mRedirectID ); } 
+
+            if(obj != NULL)
+            { obj->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
+            else
+            { this->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
       }
    }
 
@@ -2323,7 +2359,10 @@ void WorldEditor::updateGuiInfo()
       obj = Sim::findObject( mRedirectID );
 
    char buf[] = "";
-   Con::executef( obj ? obj : this, "onGuiUpdate", buf );
+   if(obj != NULL)
+   { obj->onGuiUpdate_callback(buf); }
+   else
+   { this->onGuiUpdate_callback(buf); }
 }
 
 //------------------------------------------------------------------------------
@@ -2384,7 +2423,7 @@ void WorldEditor::renderScene( const RectI &updateRect )
    GFXDEBUGEVENT_SCOPE( Editor_renderScene, ColorI::RED );
 
    smRenderSceneSignal.trigger(this);
-	
+   
    // Grab this before anything here changes it.
    Frustum frustum;
    {
@@ -2745,7 +2784,7 @@ void WorldEditor::initPersistFields()
    
    endGroup( "Rendering: Icons" );
 
-   addGroup( "Misc" );	
+   addGroup( "Misc" );   
 
       addField( "isDirty",                TypeBool,   Offset(mIsDirty, WorldEditor) );
       addField( "stickToGround",          TypeBool,   Offset(mStickToGround, WorldEditor) );
@@ -2775,20 +2814,20 @@ void WorldEditor::ignoreObjClass( U32 argc, ConsoleValueRef *argv )
          if(!addClassEntry(entry))
             delete entry;
       }
-   }	
+   }   
 }
 
 void WorldEditor::clearIgnoreList()
 {
    for(U32 i = 0; i < mClassInfo.mEntries.size(); i++)
-      mClassInfo.mEntries[i]->mIgnoreCollision = false;	
+      mClassInfo.mEntries[i]->mIgnoreCollision = false;   
 }
 
 void WorldEditor::setObjectsUseBoxCenter(bool state)
 {
    mObjectsUseBoxCenter = state;
-   if( getActiveSelectionSet() && isMethod( "onSelectionCentroidChanged" ) )
-      Con::executef( this, "onSelectionCentroidChanged" );
+   if( getActiveSelectionSet())
+     this->onSelectionCentroidChanged_callback();
 }
 
 void WorldEditor::clearSelection()
@@ -2801,9 +2840,8 @@ void WorldEditor::clearSelection()
    // in reverse.  This will make the loop work even if items are removed as
    // we go along.
    for( S32 i = mSelected->size() - 1; i >= 0; -- i )
-      Con::executef( this, "onUnSelect", ( *mSelected )[ i ]->getIdString() );
-
-   Con::executef(this, "onClearSelection");
+     this->onUnSelect_callback(( *mSelected )[ i ]->getIdString());
+   this->onClearSelection_callback();
    mSelected->clear();
 }
 
@@ -2817,8 +2855,8 @@ void WorldEditor::selectObject( SimObject *obj )
 
    if ( !objClassIgnored( obj ) && !mSelected->objInSet( obj ) )
    {
-      mSelected->addObject( obj );	
-      Con::executef( this, "onSelect", obj->getIdString() );
+      mSelected->addObject( obj );   
+     this->onSelect_callback(obj->getIdString() );
    }
 }
 
@@ -2837,8 +2875,8 @@ void WorldEditor::unselectObject( SimObject *obj )
 
    if ( !objClassIgnored( obj ) && mSelected->objInSet( obj ) )
    {
-      mSelected->removeObject( obj );	
-      Con::executef( this, "onUnSelect", obj->getIdString() );
+      mSelected->removeObject( obj );   
+     this->onUnSelect_callback(obj->getIdString());
    }
 }
 
@@ -2855,15 +2893,15 @@ S32 WorldEditor::getSelectionSize()
    if( !mSelected )
       return 0;
       
-	return mSelected->size();
+   return mSelected->size();
 }
 
 S32 WorldEditor::getSelectObject(S32 index)
 {
    AssertFatal( mSelected != NULL, "WorldEditor::getSelectedObject - no active selection set!" );
    
-	// Return the object's id
-	return ( *mSelected )[index]->getId();	
+   // Return the object's id
+   return ( *mSelected )[index]->getId();   
 }
 
 const Point3F& WorldEditor::getSelectionCentroid()
@@ -2885,7 +2923,7 @@ const char* WorldEditor::getSelectionCentroidText()
    static const U32 bufSize = 100;
    char * ret = Con::getReturnBuffer(bufSize);
    dSprintf(ret, bufSize, "%g %g %g", centroid.x, centroid.y, centroid.z);
-   return ret;	
+   return ret;   
 }
 
 const Box3F& WorldEditor::getSelectionBounds()
@@ -2913,15 +2951,15 @@ void WorldEditor::dropCurrentSelection( bool skipUndo )
    if ( !skipUndo )
       submitUndo( mSelected );
 
-	dropSelection( mSelected );	
+   dropSelection( mSelected );   
 
    if ( mSelected->hasCentroidChanged() )
-      Con::executef( this, "onSelectionCentroidChanged" );
+     this->onSelectionCentroidChanged_callback();
 }
 
 void WorldEditor::redirectConsole( S32 objID )
 {
-	mRedirectID = objID;		
+   mRedirectID = objID;      
 }
 
 //------------------------------------------------------------------------------
@@ -3142,16 +3180,17 @@ void WorldEditor::transformSelection(bool position, Point3F& p, bool relativePos
 
    if(mSelected->hasCentroidChanged())
    {
-      Con::executef( this, "onSelectionCentroidChanged");
+      this->onSelectionCentroidChanged_callback();
    }
 
-   if ( isMethod("onEndDrag") )
-   {
-      SimObject * obj = 0;
-      if ( mRedirectID )
-         obj = Sim::findObject( mRedirectID );
-      Con::executef( obj ? obj : this, "onEndDrag", ( *mSelected )[ 0 ]->getIdString() );
-   }
+   SimObject * obj = 0;
+   if ( mRedirectID )
+   { obj = Sim::findObject( mRedirectID ); }
+
+   if(obj != NULL)
+   { obj->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
+   else
+   { this->onEndDrag_callback(( *mSelected )[ 0 ]->getIdString()); }
 }
 
 //------------------------------------------------------------------------------
@@ -3184,17 +3223,17 @@ void WorldEditor::resetSelectedScale()
 
 ConsoleMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...)")
 {
-	object->ignoreObjClass(argc, argv);
+   object->ignoreObjClass(argc, argv);
 }
 
 ConsoleMethod( WorldEditor, clearIgnoreList, void, 2, 2, "")
 {
-	object->clearIgnoreList();
+   object->clearIgnoreList();
 }
 
 ConsoleMethod( WorldEditor, clearSelection, void, 2, 2, "")
 {
-	object->clearSelection();
+   object->clearSelection();
 }
 
 ConsoleMethod( WorldEditor, getActiveSelection, S32, 2, 2, "() - Return the currently active WorldEditorSelection object." )
@@ -3219,24 +3258,24 @@ ConsoleMethod( WorldEditor, setActiveSelection, void, 3, 3, "( id set ) - Set th
 
 ConsoleMethod( WorldEditor, selectObject, void, 3, 3, "(SimObject obj)")
 {
-	object->selectObject(argv[2]);
+   object->selectObject(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, unselectObject, void, 3, 3, "(SimObject obj)")
 {
-	object->unselectObject(argv[2]);
+   object->unselectObject(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, invalidateSelectionCentroid, void, 2, 2, "")
 {
    WorldEditor::Selection* sel = object->getActiveSelectionSet();
    if(sel)
-	   sel->invalidateCentroid();
+      sel->invalidateCentroid();
 }
 
 ConsoleMethod( WorldEditor, getSelectionSize, S32, 2, 2, "() - Return the number of objects currently selected in the editor.")
 {
-	return object->getSelectionSize();
+   return object->getSelectionSize();
 }
 
 ConsoleMethod( WorldEditor, getSelectedObject, S32, 3, 3, "(int index)")
@@ -3253,12 +3292,12 @@ ConsoleMethod( WorldEditor, getSelectedObject, S32, 3, 3, "(int index)")
 
 ConsoleMethod( WorldEditor, getSelectionRadius, F32, 2, 2, "")
 {
-	return object->getSelectionRadius();
+   return object->getSelectionRadius();
 }
 
 ConsoleMethod( WorldEditor, getSelectionCentroid, const char *, 2, 2, "")
 {
-	return object->getSelectionCentroidText();
+   return object->getSelectionCentroidText();
 }
 
 ConsoleMethod( WorldEditor, getSelectionExtent, const char *, 2, 2, "")
@@ -3267,7 +3306,7 @@ ConsoleMethod( WorldEditor, getSelectionExtent, const char *, 2, 2, "")
    static const U32 bufSize = 100;
    char * ret = Con::getReturnBuffer(bufSize);
    dSprintf(ret, bufSize, "%g %g %g", bounds.x, bounds.y, bounds.z);
-   return ret;	
+   return ret;   
 }
 
 ConsoleMethod( WorldEditor, dropSelection, void, 2, 3, "( bool skipUndo = false )")
@@ -3276,17 +3315,17 @@ ConsoleMethod( WorldEditor, dropSelection, void, 2, 3, "( bool skipUndo = false 
    if ( argc > 2 )
       skipUndo = dAtob( argv[2] );
 
-	object->dropCurrentSelection( skipUndo );
+   object->dropCurrentSelection( skipUndo );
 }
 
 void WorldEditor::cutCurrentSelection()
 {
-	cutSelection(mSelected);	
+   cutSelection(mSelected);   
 }
 
 void WorldEditor::copyCurrentSelection()
 {
-	copySelection(mSelected);	
+   copySelection(mSelected);   
 }
 
 ConsoleMethod( WorldEditor, cutSelection, void, 2, 2, "")
@@ -3306,12 +3345,12 @@ ConsoleMethod( WorldEditor, pasteSelection, void, 2, 2, "")
 
 bool WorldEditor::canPasteSelection()
 {
-	return mCopyBuffer.empty() != true;
+   return mCopyBuffer.empty() != true;
 }
 
 ConsoleMethod( WorldEditor, canPasteSelection, bool, 2, 2, "")
 {
-	return object->canPasteSelection();
+   return object->canPasteSelection();
 }
 
 ConsoleMethod( WorldEditor, hideObject, void, 4, 4, "(Object obj, bool hide)")
@@ -3336,25 +3375,25 @@ ConsoleMethod( WorldEditor, lockSelection, void, 3, 3, "(bool lock)")
 ConsoleMethod( WorldEditor, alignByBounds, void, 3, 3, "(int boundsAxis)"
               "Align all selected objects against the given bounds axis.")
 {
-	if(!object->alignByBounds(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", (const char*)argv[2]));
+   if(!object->alignByBounds(dAtoi(argv[2])))
+      Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", (const char*)argv[2]));
 }
 
 ConsoleMethod( WorldEditor, alignByAxis, void, 3, 3, "(int axis)"
               "Align all selected objects along the given axis.")
 {
-	if(!object->alignByAxis(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", (const char*)argv[2]));
+   if(!object->alignByAxis(dAtoi(argv[2])))
+      Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", (const char*)argv[2]));
 }
 
 ConsoleMethod( WorldEditor, resetSelectedRotation, void, 2, 2, "")
 {
-	object->resetSelectedRotation();
+   object->resetSelectedRotation();
 }
 
 ConsoleMethod( WorldEditor, resetSelectedScale, void, 2, 2, "")
 {
-	object->resetSelectedScale();
+   object->resetSelectedScale();
 }
 
 ConsoleMethod( WorldEditor, redirectConsole, void, 3, 3, "( int objID )")
@@ -3364,7 +3403,7 @@ ConsoleMethod( WorldEditor, redirectConsole, void, 3, 3, "( int objID )")
 
 ConsoleMethod( WorldEditor, addUndoState, void, 2, 2, "")
 {
-	object->addUndoState();
+   object->addUndoState();
 }
 
 //-----------------------------------------------------------------------------
@@ -3372,25 +3411,25 @@ ConsoleMethod( WorldEditor, addUndoState, void, 2, 2, "")
 ConsoleMethod( WorldEditor, getSoftSnap, bool, 2, 2, "getSoftSnap()\n"
               "Is soft snapping always on?")
 {
-	return object->mSoftSnap;
+   return object->mSoftSnap;
 }
 
 ConsoleMethod( WorldEditor, setSoftSnap, void, 3, 3, "setSoftSnap(bool)\n"
               "Allow soft snapping all of the time.")
 {
-	object->mSoftSnap = dAtob(argv[2]);
+   object->mSoftSnap = dAtob(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, getSoftSnapSize, F32, 2, 2, "getSoftSnapSize()\n"
               "Get the absolute size to trigger a soft snap.")
 {
-	return object->mSoftSnapSize;
+   return object->mSoftSnapSize;
 }
 
 ConsoleMethod( WorldEditor, setSoftSnapSize, void, 3, 3, "setSoftSnapSize(F32)\n"
               "Set the absolute size to trigger a soft snap.")
 {
-	object->mSoftSnapSize = dAtof(argv[2]);
+   object->mSoftSnapSize = dAtof(argv[2]);
 }
 
 DefineEngineMethod( WorldEditor, getSoftSnapAlignment, WorldEditor::AlignmentType, (),,
@@ -3408,37 +3447,37 @@ DefineEngineMethod( WorldEditor, setSoftSnapAlignment, void, ( WorldEditor::Alig
 ConsoleMethod( WorldEditor, softSnapSizeByBounds, void, 3, 3, "softSnapSizeByBounds(bool)\n"
               "Use selection bounds size as soft snap bounds.")
 {
-	object->mSoftSnapSizeByBounds = dAtob(argv[2]);
+   object->mSoftSnapSizeByBounds = dAtob(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, getSoftSnapBackfaceTolerance, F32, 2, 2, "getSoftSnapBackfaceTolerance()\n"
               "The fraction of the soft snap radius that backfaces may be included.")
 {
-	return object->mSoftSnapBackfaceTolerance;
+   return object->mSoftSnapBackfaceTolerance;
 }
 
 ConsoleMethod( WorldEditor, setSoftSnapBackfaceTolerance, void, 3, 3, "setSoftSnapBackfaceTolerance(F32 with range of 0..1)\n"
               "The fraction of the soft snap radius that backfaces may be included.")
 {
-	object->mSoftSnapBackfaceTolerance = dAtof(argv[2]);
+   object->mSoftSnapBackfaceTolerance = dAtof(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, softSnapRender, void, 3, 3, "softSnapRender(bool)\n"
               "Render the soft snapping bounds.")
 {
-	object->mSoftSnapRender = dAtob(argv[2]);
+   object->mSoftSnapRender = dAtob(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, softSnapRenderTriangle, void, 3, 3, "softSnapRenderTriangle(bool)\n"
               "Render the soft snapped triangle.")
 {
-	object->mSoftSnapRenderTriangle = dAtob(argv[2]);
+   object->mSoftSnapRenderTriangle = dAtob(argv[2]);
 }
 
 ConsoleMethod( WorldEditor, softSnapDebugRender, void, 3, 3, "softSnapDebugRender(bool)\n"
               "Toggle soft snapping debug rendering.")
 {
-	object->mSoftSnapDebugRender = dAtob(argv[2]);
+   object->mSoftSnapDebugRender = dAtob(argv[2]);
 }
 
 DefineEngineMethod( WorldEditor, getTerrainSnapAlignment, WorldEditor::AlignmentType, (),,

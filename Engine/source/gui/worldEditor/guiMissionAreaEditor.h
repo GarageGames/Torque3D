@@ -43,6 +43,8 @@ public:
    
    DECLARE_CONOBJECT(GuiMissionAreaEditorCtrl);
 
+   DECLARE_CALLBACK( void, onMissionAreaSelected, (const char * missionArea) );
+
    // SimObject
    bool onAdd();
    static void initPersistFields();

@@ -55,7 +55,7 @@ void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
    
    const U32 numTargets = mInspector->getNumInspectObjects();
    if( callbacks && numTargets > 1 )
-      Con::executef( mInspector, "beginCompoundUndo" );
+   { mInspector->beginCompoundUndo_callback(); }
       
    // Setting an empty string will kill the field.
    const bool isRemoval = !data[ 0 ];
@@ -76,9 +76,9 @@ void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
          if( callbacks )
          {
             if( isRemoval )
-               Con::executef( mInspector, "onFieldRemoved", target->getIdString(), mDynField->slotName );
+            { mInspector->onFieldRemoved_callback( target->getIdString(), mDynField->slotName ); }
             else
-               Con::executef( mInspector, "onInspectorFieldModified", target->getIdString(), mDynField->slotName, oldData, data );
+            { mInspector->onInspectorFieldModified_callback( target->getIdString(), mDynField->slotName,"(null)", oldData, data ); }
          }
 
          target->setDataField( mDynField->slotName, NULL, data );
@@ -89,7 +89,7 @@ void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
    }
    
    if( callbacks && numTargets > 1 )
-      Con::executef( mInspector, "endCompoundUndo" );
+   { mInspector->endCompoundUndo_callback(); }
 
    // Force our edit to update
    updateValue();
@@ -133,7 +133,7 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
    
    const U32 numTargets = mInspector->getNumInspectObjects();
    if( numTargets > 1 )
-      Con::executef( mInspector, "onBeginCompoundEdit" );
+   { mInspector->onBeginCompoundEdit_callback(); }
       
    const char* oldFieldName = getFieldName();
    SimFieldDictionary::Entry* newEntry = NULL;
@@ -150,11 +150,13 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
          // New field is already defined.  If we can, let the scripts handle
          // the error.  Otherwise, just emit an error on the console and proceed.
          
-         if( numTargets == 1 && mInspector->isMethod( "onFieldRenameAlreadyDefined" ) )
-            Con::executef( mInspector, "onFieldRenameAlreadyDefined", target->getIdString(), oldFieldName, newFieldName );
+         if( numTargets == 1 )
+         { mInspector->onFieldRenameAlreadyDefined_callback( target->getIdString(), oldFieldName, newFieldName ); }
          else
-            Con::errorf( "GuiInspectorDynamicField::renameField - field '%s' is already defined on %i:%s (%s)",
+         { 
+             Con::errorf( "GuiInspectorDynamicField::renameField - field '%s' is already defined on %i:%s (%s)", 
                newFieldName, target->getId(), target->getClassName(), target->getName() );
+         }
                
          // Reset the text entry.
                
@@ -175,7 +177,7 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
 
       // Notify script.
       
-      Con::executef( mInspector, "onFieldRenamed", target->getIdString(), oldFieldName, newFieldName );
+      mInspector->onFieldRenamed_callback( target->getIdString(), oldFieldName, newFieldName );
       
       // Look up the new SimFieldDictionary entry.
       
@@ -193,7 +195,7 @@ void GuiInspectorDynamicField::renameField( const char* newFieldName )
    }
 
    if( numTargets > 1 )
-      Con::executef( mInspector, "onEndCompoundEdit" );
+   { mInspector->onEndCompoundEdit_callback(); }
       
    // Lastly we need to reassign our validate field for our value edit control
    char szBuffer[1024];

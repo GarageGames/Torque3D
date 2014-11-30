@@ -203,7 +203,7 @@ void GuiTheoraCtrl::onRender(Point2I offset, const RectI &updateRect)
          // Draw the frame.
          
          GFXDrawUtil* drawUtil = GFX->getDrawUtil();
-         drawUtil->clearBitmapModulation();
+         //drawUtil->clearBitmapModulation();
          drawUtil->drawBitmapStretch( mTheoraTexture.getTexture(), rect );
          
          // Draw frame info, if requested.

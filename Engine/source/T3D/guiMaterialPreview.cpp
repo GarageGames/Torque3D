@@ -34,6 +34,9 @@
 #include "scene/sceneManager.h"
 #include "scene/sceneRenderState.h"
 
+IMPLEMENT_CALLBACK(GuiMaterialPreview, onMouseEnter, void, (), (),"");
+IMPLEMENT_CALLBACK(GuiMaterialPreview, onMouseLeave, void, (), (),"");
+
 // GuiMaterialPreview
 GuiMaterialPreview::GuiMaterialPreview()
 :  mMaxOrbitDist(5.0f),
@@ -192,6 +195,8 @@ void GuiMaterialPreview::onRightMouseUp(const GuiEvent &event)
 {
    mouseUnlock();
    mMouseState = None;
+
+   Parent::onRightMouseUp( event );
 }
 
 // Right Click Drag
@@ -342,12 +347,13 @@ bool GuiMaterialPreview::processCameraQuery(CameraQuery* query)
 
 void GuiMaterialPreview::onMouseEnter(const GuiEvent & event)
 {
-   Con::executef(this, "onMouseEnter");
+   fadeControl();
 }
 
 void GuiMaterialPreview::onMouseLeave(const GuiEvent & event)
 {
-   Con::executef(this, "onMouseLeave");
+   onMouseLeave_callback();
+   smCapturedControl = this;
 }
 
 void GuiMaterialPreview::renderWorld(const RectI &updateRect)

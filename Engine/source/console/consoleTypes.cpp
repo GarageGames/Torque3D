@@ -50,6 +50,26 @@ ConsoleSetType( TypeString )
       Con::printf("(TypeString) Cannot set multiple args to a single string.");
 }
 
+//ControlBoundAddition
+//-----------------------------------------------------------------------------
+// TypeGuiControl
+//-----------------------------------------------------------------------------
+ConsoleType( string, TypeGuiControl, const char* )
+
+ConsoleGetType( TypeGuiControl )
+{
+   return *((const char **)(dptr));
+}
+
+ConsoleSetType( TypeGuiControl )
+{
+   if(argc == 1)
+      *((const char **) dptr) = StringTable->insert(argv[0]);
+   else
+      Con::printf("(TypeGuiControl) Cannot set multiple args to a single string.");
+}
+
+
 //-----------------------------------------------------------------------------
 // TypeCaseString
 //-----------------------------------------------------------------------------

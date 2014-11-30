@@ -80,7 +80,7 @@ function GuiEditorContentList::scanGroup( %this, %group )
          }
       }
       else if( %obj.isMemberOfClass( "SimGroup" )
-               &&  ( %obj.internalName !$= "EditorGuiGroup"    // Don't put our editor's GUIs in the list
+               &&  ( (%obj.internalName !$= "EditorGuiGroup" && %obj.internalName !$= "IngameGuiGroup" )   // Don't put our editor's GUIs in the list
                      || GuiEditor.showEditorGuis ) )   // except if explicitly requested.
       {
          // Scan nested SimGroups for GuiControls.

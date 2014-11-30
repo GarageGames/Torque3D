@@ -190,5 +190,5 @@ SFXMarkerModifier::SFXMarkerModifier( SFXSource* source, const String& name, F32
 
 void SFXMarkerModifier::_onTrigger()
 {
-   Con::executef( mSource, "onMarkerPassed", mMarkerName.c_str() );
+   mSource->onMarkerPassed_callback( mMarkerName.c_str() );
 }

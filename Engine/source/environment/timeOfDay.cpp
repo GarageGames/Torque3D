@@ -60,6 +60,11 @@ ConsoleDocClass( TimeOfDay,
    "@ingroup enviroMisc"
 );
 
+IMPLEMENT_CALLBACK(TimeOfDay, onTimeEvent, void, (const char* identifier, const char* currentTime, const char* currentElevation), (identifier,  currentTime,  currentElevation), "");
+IMPLEMENT_CALLBACK(TimeOfDay, onAnimateStart, void, (), (), "");
+IMPLEMENT_CALLBACK(TimeOfDay, onAnimateDone, void, (), (), "");
+IMPLEMENT_CALLBACK(TimeOfDay, onAdd, void, (), (), "");
+
 TimeOfDay::TimeOfDay() 
    :  mElevation( 0.0f ),
       mAzimuth( 0.0f ),
@@ -194,7 +199,7 @@ bool TimeOfDay::onAdd()
       NetConnection::smGhostAlwaysDone.notify( this, &TimeOfDay::_onGhostAlwaysDone );
 
    if ( isServerObject() )   
-      Con::executef( this, "onAdd" );   
+   { onAdd_callback(); }
 
    setProcessTick( true );
 
@@ -293,7 +298,8 @@ void TimeOfDay::processTick( const Move *move )
       _updateTimeEvents();
 
       if ( !mAnimate && isServerObject() )
-         Con::executef( this, "onAnimateDone" );
+      { onAnimateDone_callback(); }
+         
    }
    else if ( mPlay )
    {
@@ -679,7 +685,7 @@ void TimeOfDay::_onTimeEvent( const String &identifier )
 
    String strCurrentElevation = String::ToString( "%g", elevation );
 
-   Con::executef( this, "onTimeEvent", identifier.c_str(), strCurrentTime.c_str(), strCurrentElevation.c_str() );
+   onTimeEvent_callback( identifier.c_str(), strCurrentTime.c_str(), strCurrentElevation.c_str() );
 }
 
 void TimeOfDay::animate( F32 time, F32 speed )
@@ -708,7 +714,7 @@ void TimeOfDay::animate( F32 time, F32 speed )
 
    if ( isServerObject() )
    {
-      Con::executef( this, "onAnimateStart" );
+      onAnimateStart_callback();
       setMaskBits( AnimateMask );
    }
 }

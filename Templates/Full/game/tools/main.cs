@@ -190,6 +190,37 @@ package Tools
    // Shutdown.
    function onExit()
    {
+   ShapeEdPropWindow.ClosePopOut();
+   ShapeEdSelectWindow.ClosePopOut();
+   ShapeEdAdvancedWindow.ClosePopOut();
+   RoadEditorOptionsWindow.ClosePopOut();
+   RoadEditorTreeWindow.ClosePopOut();
+   RiverEditorOptionsWindow.ClosePopOut();
+   RiverEditorTreeWindow.ClosePopOut();
+   PE_Window.ClosePopOut();
+   MissionAreaEditorPropertiesWindow.ClosePopOut();
+   MissionAreaEditorTerrainWindow.ClosePopOut();
+   MeshRoadEditorOptionsWindow.ClosePopOut();
+   MeshRoadEditorTreeWindow.ClosePopOut();
+   ForestEditorPropertiesWindow.ClosePopOut();
+   ForestEditorPalleteWindow.ClosePopOut();
+   DecalPreviewWindow.ClosePopOut();
+   DecalEditorWindow.ClosePopOut();
+   DatablockEditorInspectorWindow.ClosePopOut();
+   DatablockEditorTreeWindow.ClosePopOut();
+   MaterialEditorPropertiesWindow.ClosePopOut();
+   MaterialEditorPreviewWindow.ClosePopOut();
+   TerrainPainterPreview.ClosePopOut();
+   TerrainPainter.ClosePopOut();
+   EWInspectorWindow.ClosePopOut();
+   EWTreeWindow.ClosePopOut();
+   ConsoleDlgWindow.ClosePopOut();
+   ppOptionsWindow.ClosePopOut();
+   ESettingsWindow.ClosePopOut();
+   EManageBookmarks.ClosePopOut();
+   EManageSFXParameters.ClosePopOut();
+   ESnapOptions.ClosePopOut();
+   ESelectObjectsWindow.ClosePopOut();
       if( EditorGui.isInitialized )
          EditorGui.shutdown();
       

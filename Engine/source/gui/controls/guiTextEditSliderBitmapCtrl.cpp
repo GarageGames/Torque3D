@@ -110,6 +110,9 @@ void GuiTextEditSliderBitmapCtrl::initPersistFields()
    addField("bitmap",    TypeFilename,Offset(mBitmapName, GuiTextEditSliderBitmapCtrl), "Unused" );
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 void GuiTextEditSliderBitmapCtrl::getText(char *dest)
@@ -415,7 +418,7 @@ void GuiTextEditSliderBitmapCtrl::onRender(Point2I offset, const RectI &updateRe
 		Point2I(arrowUpStart.x -2, arrowUpStart.y + getExtent().y),
 		mProfile->mBorderColor);
 
-	GFX->getDrawUtil()->clearBitmapModulation();
+	//GFX->getDrawUtil()->clearBitmapModulation();
 	
 	if(mNumberOfBitmaps == 0)
 		Con::warnf("No image provided for GuiTextEditSliderBitmapCtrl; do not render");

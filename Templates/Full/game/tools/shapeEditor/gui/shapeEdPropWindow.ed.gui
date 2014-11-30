@@ -1,5 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiWindowCollapseCtrl(ShapeEdPropWindow) {
+   AllowPopWindow = "1";
    canSaveDynamicFields = "0";
    isContainer = "1";
    Profile = "ToolsGuiWindowProfile";

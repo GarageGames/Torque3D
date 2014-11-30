@@ -36,7 +36,9 @@
    GizmoProfile = "GlobalGizmoProfile";
 
    new GuiWindowCollapseCtrl(MissionAreaEditorTerrainWindow) {
-      internalName = "";
+
+      internalName = "MissionAreaEditorTerrainWindow";
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";
@@ -109,7 +111,8 @@
       };
    };
    new GuiWindowCollapseCtrl(MissionAreaEditorPropertiesWindow) {
-      internalName = "Window";
+      internalName = "MissionAreaEditorPropertiesWindow";
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       Enabled = "1";
       isContainer = "1";

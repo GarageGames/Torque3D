@@ -207,7 +207,7 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 	else
 		mDim = getWidth();
 	
-	GFX->getDrawUtil()->clearBitmapModulation();
+	//GFX->getDrawUtil()->clearBitmapModulation();
 
 	if(mNumberOfBitmaps == 1)
 	{

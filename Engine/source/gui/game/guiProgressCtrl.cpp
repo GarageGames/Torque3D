@@ -55,6 +55,8 @@ ConsoleDocClass( GuiProgressCtrl,
 GuiProgressCtrl::GuiProgressCtrl()
 {
    mProgress = 0.0f;
+   mHorizontalFill = true;
+   mInvertFill = true;
 }
 
 const char* GuiProgressCtrl::getScriptValue()
@@ -95,16 +97,53 @@ void GuiProgressCtrl::onPreRender()
 void GuiProgressCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    RectI ctrlRect(offset, getExtent());
-
+   
    //draw the progress
-   S32 width = (S32)((F32)(getWidth()) * mProgress);
-   if (width > 0)
+   // check the boolean if we want it horizontal or not (set by the user, defaults to true)
+   if (mHorizontalFill)
    {
-      RectI progressRect = ctrlRect;
-      progressRect.extent.x = width;
-      GFX->getDrawUtil()->drawRectFill(progressRect, mProfile->mFillColor);
+      // the default horizontal code
+      // horizontal
+      S32 width = (S32)((F32)(getWidth()) * mProgress);
+      if (width > 0)
+      {
+         if (mInvertFill) // default left to right if true
+         {
+            RectI progressRect = ctrlRect;
+            progressRect.extent.x = width;
+            GFX->getDrawUtil()->drawRectFill(progressRect, mProfile->mFillColor);
+         }
+         else // to fill right to left
+         {
+            RectI progressRect( ( ctrlRect.point.x + ctrlRect.extent.x ), ctrlRect.point.y, -ctrlRect.extent.x, ctrlRect.extent.y);
+            progressRect.extent.x = -width;
+            GFX->getDrawUtil()->drawRectFill(progressRect, mProfile->mFillColor);
+         }
+      }
    }
-
+   else
+   {
+      // new code to check if we want it vertical
+      // vertical
+      S32 height = (S32)((F32)getHeight() * mProgress);
+      
+      if (height > 0)
+      {
+         if (mInvertFill) // default down to up if true
+         {
+            RectI progressRect(ctrlRect.point.x, ( ctrlRect.point.y + ctrlRect.extent.y ), ctrlRect.extent.x, -ctrlRect.extent.y);
+            progressRect.extent.y = -height;
+            GFX->getDrawUtil()->drawRectFill(progressRect, mProfile->mFillColor);
+         }
+         else // to fill down to up
+         {
+            RectI progressRect = ctrlRect;
+            progressRect.extent.y = height;
+            GFX->getDrawUtil()->drawRectFill(progressRect, mProfile->mFillColor);
+         }
+      }
+   }
+   
    //now draw the border
    if (mProfile->mBorder)
       GFX->getDrawUtil()->drawRect(ctrlRect, mProfile->mBorderColor);
@@ -115,3 +154,16 @@ void GuiProgressCtrl::onRender(Point2I offset, const RectI &updateRect)
    renderChildControls(offset, updateRect);
 }
 
+// add the fields to GuiProgressCtrl  
+void GuiProgressCtrl::initPersistFields()    
+{    
+   // add the horizontal field  
+   addField("horizontalFill", TypeBool, Offset(mHorizontalFill, GuiProgressCtrl),
+         "True if you want the GuiProgressCtrl to be horizontal. Defaults to true. " );
+   
+   addField("invertFill", TypeBool, Offset(mInvertFill, GuiProgressCtrl),
+         "True if you want the GuiProgressCtrl to fill Left to Right (when horizontalFill = true)"
+         "or Down to Up (when horizontalFill = false). Defaults to true. " );
+   
+   Parent::initPersistFields();
+}

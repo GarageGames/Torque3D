@@ -230,7 +230,7 @@ void GuiInspectorDynamicGroup::addDynamicField()
    
    const U32 numTargets = mParent->getNumInspectObjects();
    if( numTargets > 1 )
-      Con::executef( mParent, "onBeginCompoundEdit" );
+   { mParent->onBeginCompoundEdit_callback(); }
 
    for( U32 i = 0; i < numTargets; ++ i )
    {
@@ -240,11 +240,11 @@ void GuiInspectorDynamicGroup::addDynamicField()
  
       // Notify script.
    
-      Con::executef( mParent, "onFieldAdded", target->getIdString(), buf );
+      mParent->onFieldAdded_callback( target->getIdString(), buf );
    }
    
    if( numTargets > 1 )
-      Con::executef( mParent, "onEndCompoundEdit" );
+   { mParent->onEndCompoundEdit_callback(); }
 
    // now we simply re-inspect the object, to see the new field.
    inspectGroup();

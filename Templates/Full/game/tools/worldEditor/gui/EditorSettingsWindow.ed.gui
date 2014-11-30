@@ -14,6 +14,7 @@
    canSaveDynamicFields = "1";
 
    new GuiWindowCollapseCtrl(ESettingsWindow) {
+      AllowPopWindow = "1";
       internalName = "EditorSettingsWindow";
       resizeWidth = "0";
       resizeHeight = "1";

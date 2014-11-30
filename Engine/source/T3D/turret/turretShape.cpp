@@ -69,6 +69,8 @@ ConsoleDocClass( TurretShapeData,
    "@ingroup gameObjects\n"
 );
 
+IMPLEMENT_GLOBAL_CALLBACK( turretMountCallback, void, ( const char * turret, const char * player, const char * mounted ), ( turret, player, mounted ), "");
+
 IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
    "@brief Informs the TurretShapeData object that a player is mounting it.\n\n"
    "@param turret The TurretShape object.\n"
@@ -916,7 +918,7 @@ void TurretShape::mountObject( SceneObject *obj, S32 node, const MatrixF &xfm )
          if (conn)
          {
             // Allow the client to set up any action maps, HUD, etc.
-            Con::executef("turretMountCallback", Con::getIntArg(getId()), Con::getIntArg(obj->getId()), Con::getIntArg(true));
+            turretMountCallback_callback( Con::getIntArg(getId()), Con::getIntArg(obj->getId()), Con::getIntArg(true) );
          }
       }
    }
@@ -938,7 +940,7 @@ void TurretShape::unmountObject( SceneObject *obj )
          if (conn)
          {
             // Allow the client to set up any action maps, HUD, etc.
-            Con::executef("turretMountCallback", Con::getIntArg(getId()), Con::getIntArg(obj->getId()), Con::getIntArg(false));
+            turretMountCallback_callback( Con::getIntArg(getId()), Con::getIntArg(obj->getId()), Con::getIntArg(false) );
          }
       }
    }

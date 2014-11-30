@@ -30,6 +30,7 @@
 #include "gui/worldEditor/editTSCtrl.h"
 #include "gui/worldEditor/gizmo.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/tVector.h"
 #include "core/util/safeDelete.h"
 #include "gfx/gfxDrawUtil.h"
@@ -514,9 +515,8 @@ bool ForestSelectionTool::updateGuiInfo()
          text = "Scale selection.";        
    }   
 
-   Con::executef( statusbar, "setInfo", text.c_str() );
-
-   Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mSelection.size() ) );
+   statusbar->setInfo_callback( text.c_str() );
+   statusbar->setSelectionObjectsByCount_callback( Con::getIntArg( mSelection.size() ) );
 
    return true;
 }

@@ -15,8 +15,9 @@
    hovertime = "1000";
 
    new GuiWindowCollapseCtrl(MaterialEditorPropertiesWindow) {
+       AllowPopWindow = "1";
       canSaveDynamicFields = "0";
-      internalName = "MatEdPropertiesWindow";
+      internalName = "MaterialEditorPropertiesWindow";
       Enabled = "1";
       isContainer = "1";
       Profile = "ToolsGuiWindowProfile";

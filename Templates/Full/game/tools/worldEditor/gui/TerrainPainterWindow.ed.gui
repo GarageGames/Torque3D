@@ -15,7 +15,8 @@
    tooltipprofile = "ToolsGuiToolTipProfile";
    hovertime = "1000";
 
-   new GuiWindowCollapseCtrl(EPainter) {
+   new GuiWindowCollapseCtrl(TerrainPainter) {
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       internalName = "TerrainPainter";
       Enabled = "1";
@@ -44,7 +45,7 @@
       canMinimize = "0";
       canMaximize = "0";
       minSize = "152 300";
-      closeCommand = "EPainter.parentGroup.setVisible(false);";
+      closeCommand = "TerrainPainter.parentGroup.setVisible(false);";
       EdgeSnap = "1";
       text = "Terrain Painter Material Selector";
       
@@ -101,7 +102,8 @@
          };
       };
    };
-   new GuiWindowCollapseCtrl(EPainterPreview) {
+   new GuiWindowCollapseCtrl(TerrainPainterPreview) {
+      AllowPopWindow = "1";
       canSaveDynamicFields = "0";
       internalName = "TerrainPainterPreview";
       Enabled = "1";
@@ -130,7 +132,7 @@
       canMinimize = "0";
       canMaximize = "0";
       minSize = "152 300";
-      closeCommand = "EPainter.parentGroup.setVisible(false);";
+      closeCommand = "TerrainPainter.parentGroup.setVisible(false);";
       EdgeSnap = "1";
       text = "Terrain Painter Material Preview";
       

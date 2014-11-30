@@ -65,6 +65,7 @@ class SimPersistID;
 
 // Define Core Console Types
 DefineConsoleType( TypeBool, bool )
+DefineConsoleType( TypeGuiControl, const char * )	//ControlBoundAddition
 DefineConsoleType( TypeBoolVector, Vector<bool>)
 DefineConsoleType( TypeS8,  S8 )
 DefineConsoleType( TypeS32, S32 )

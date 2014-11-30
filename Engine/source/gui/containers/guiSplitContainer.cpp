@@ -130,6 +130,9 @@ void GuiSplitContainer::initPersistFields()
    endGroup( "Splitter" );
 
    Parent::initPersistFields();
+   removeField( "lockControl" );
+
+   removeField( "moveControl" );
 }
 
 //-----------------------------------------------------------------------------

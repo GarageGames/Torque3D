@@ -6,13 +6,32 @@
    horizSizing = "width";
    vertSizing = "height";
    profile = "GuiOverlayProfile";
+   controlFontColor = "0 0 0 0";
+   controlFillColor = "0 0 0 0";
+   backgroundColor = "255 255 255 255";
+   controlFontSize = "14";
    visible = "1";
    active = "1";
    tooltipProfile = "GuiToolTipProfile";
    hovertime = "1000";
    isContainer = "1";
+   alphaValue = "1";
+   mouseOverAlphaValue = "1";
+   alphaFadeTime = "1000";
+   moveControl = "0";
+   lockControl = "0";
+   windowSettings = "1";
+   alpha = "1";
+   mouseOverAlpha = "1";
+   alphaFade = "1";
+   contextFontColor = "0";
+   contextBackColor = "0";
+   contextFillColor = "0";
+   contextFontSize = "0";
+   editable = "0";
    canSave = "1";
    canSaveDynamicFields = "1";
+   Enabled = "1";
       fixedAspectRatio = "0";
 
    new GuiWindowCtrl() {
@@ -26,6 +45,10 @@
       canCollapse = "0";
       closeCommand = "Canvas.popDialog(optionsDlg);";
       edgeSnap = "0";
+      setTitle = "0";
+      ShowTitle = "1";
+      AllowPopWindow = "0";
+      isInPopup = "0";
       margin = "0 0 0 0";
       padding = "0 0 0 0";
       anchorTop = "1";
@@ -38,13 +61,32 @@
       horizSizing = "center";
       vertSizing = "center";
       profile = "GuiWindowProfile";
+      controlFontColor = "0 0 0 0";
+      controlFillColor = "0 0 0 0";
+      backgroundColor = "255 255 255 255";
+      controlFontSize = "14";
       visible = "1";
       active = "1";
       tooltipProfile = "GuiToolTipProfile";
       hovertime = "1000";
       isContainer = "1";
+      alphaValue = "1";
+      mouseOverAlphaValue = "1";
+      alphaFadeTime = "1000";
+      moveControl = "1";
+      lockControl = "0";
+      windowSettings = "1";
+      alpha = "1";
+      mouseOverAlpha = "1";
+      alphaFade = "1";
+      contextFontColor = "0";
+      contextBackColor = "0";
+      contextFillColor = "0";
+      contextFontSize = "0";
+      editable = "0";
       canSave = "1";
       canSaveDynamicFields = "0";
+      Enabled = "1";
 
       new GuiButtonCtrl() {
          text = "Done";

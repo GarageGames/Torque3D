@@ -56,12 +56,51 @@ void WinConsole::destroy()
    WindowsConsole = NULL;
 }
 
+static void ResConBufAndWindow(HANDLE hConsole, SHORT xWinSize, SHORT yWinSize)
+{
+	CONSOLE_SCREEN_BUFFER_INFO consbbuf;
+	BOOL isSuccess;
+	SMALL_RECT smrWindowRect;
+	COORD coordCharScreen;
+
+	isSuccess = GetConsoleScreenBufferInfo(hConsole, &consbbuf);
+	coordCharScreen = GetLargestConsoleWindowSize(hConsole);
+
+	smrWindowRect.Right = (SHORT) (min(xWinSize, coordCharScreen.X) - 1);
+	smrWindowRect.Bottom = (SHORT) (min(yWinSize, coordCharScreen.Y) - 1);
+	smrWindowRect.Left = smrWindowRect.Top = (SHORT) 0;
+
+	coordCharScreen.X = xWinSize;
+	coordCharScreen.Y = yWinSize;
+
+	if ((DWORD_PTR) consbbuf.dwSize.X * consbbuf.dwSize.Y > 
+		(DWORD_PTR) xWinSize * yWinSize)
+	{
+		isSuccess = SetConsoleWindowInfo(hConsole, TRUE, &smrWindowRect);
+		isSuccess = SetConsoleScreenBufferSize(hConsole, coordCharScreen);
+		isSuccess = SetConsoleWindowInfo(hConsole, TRUE, &smrWindowRect);
+		isSuccess = SetConsoleScreenBufferSize(hConsole, coordCharScreen);
+	}
+
+	if ((DWORD_PTR) consbbuf.dwSize.X * consbbuf.dwSize.Y < 
+		(DWORD_PTR) xWinSize * yWinSize)
+	{
+		isSuccess = SetConsoleScreenBufferSize(hConsole, coordCharScreen);
+		isSuccess = SetConsoleWindowInfo(hConsole, TRUE, &smrWindowRect);
+	}
+
+	return;
+}
+
 void WinConsole::enable(bool enabled)
 {
    winConsoleEnabled = enabled;
    if(winConsoleEnabled)
    {
       AllocConsole();
+	  //Resize Console
+	  HANDLE hConsOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	  ResConBufAndWindow(hConsOut, 120, 60);
       const char *title = Con::getVariable("Con::WindowTitle");
       if (title && *title)
       {

@@ -139,6 +139,13 @@ function MenuBuilder::addItem(%this, %pos, %item)
 function MenuBuilder::appendItem(%this, %item)
 {
    %this.addItem(%this.getItemCount(), %item);
+   return %this.getItemCount()-1;
+}
+function MenuBuilder::removeAllItems(%this)
+{
+   %itemCount = %this.getItemCount();
+   for( %i = 0; %i < %itemCount; %i++)
+      %this.removeItem(%i);
 }
 
 function MenuBuilder::onAdd(%this)
@@ -162,6 +169,7 @@ function MenuBuilder::onRemove(%this)
 function MenuBuilder::onSelectItem(%this, %id, %text)
 {
    %cmd = getField(%this.item[%id], 2);
+   %this.canvas.setPopupShown(false);
    if(%cmd !$= "")
    {
       eval( %cmd );

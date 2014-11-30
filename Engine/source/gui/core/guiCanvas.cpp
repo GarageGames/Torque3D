@@ -36,6 +36,7 @@
 #include "lighting/lightManager.h"
 #include "core/strings/stringUnit.h"
 
+#include "gui/containers/guiWindowCtrl.h"
 #ifndef TORQUE_TGB_ONLY
 #include "scene/sceneObject.h"
 #endif
@@ -48,44 +49,50 @@
 #endif
 
 IMPLEMENT_CONOBJECT(GuiCanvas);
+IMPLEMENT_CALLBACK(GuiCanvas, onResize, void, (const char* width, const char* height), (width, height), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onCreateMenu, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onDestroyMenu, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onLoseFocus, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onGainFocus, void, (), (), "");
+IMPLEMENT_CALLBACK(GuiCanvas, onWindowClose, void, (), (), "");
 
 ConsoleDocClass( GuiCanvas,
-	"@brief A canvas on which rendering occurs.\n\n"
+   "@brief A canvas on which rendering occurs.\n\n"
 
-	"@section GuiCanvas_contents What a GUICanvas Can Contain...\n\n"
+   "@section GuiCanvas_contents What a GUICanvas Can Contain...\n\n"
 
-	"@subsection GuiCanvas_content_contentcontrol Content Control\n"
-	"A content control is the top level GuiControl for a screen. This GuiControl "
-	"will be the parent control for all other GuiControls on that particular "
-	"screen.\n\n"
+   "@subsection GuiCanvas_content_contentcontrol Content Control\n"
+   "A content control is the top level GuiControl for a screen. This GuiControl "
+   "will be the parent control for all other GuiControls on that particular "
+   "screen.\n\n"
 
-	"@subsection GuiCanvas_content_dialogs Dialogs\n\n"
+   "@subsection GuiCanvas_content_dialogs Dialogs\n\n"
 
-	"A dialog is essentially another screen, only it gets overlaid on top of the "
-	"current content control, and all input goes to the dialog. This is most akin "
-	"to the \"Open File\" dialog box found in most operating systems. When you "
-	"choose to open a file, and the \"Open File\" dialog pops up, you can no longer "
-	"send input to the application, and must complete or cancel the open file "
-	"request. Torque keeps track of layers of dialogs. The dialog with the highest "
-	"layer is on top and will get all the input, unless the dialog is "
-	"modeless, which is a profile option.\n\n"
+   "A dialog is essentially another screen, only it gets overlaid on top of the "
+   "current content control, and all input goes to the dialog. This is most akin "
+   "to the \"Open File\" dialog box found in most operating systems. When you "
+   "choose to open a file, and the \"Open File\" dialog pops up, you can no longer "
+   "send input to the application, and must complete or cancel the open file "
+   "request. Torque keeps track of layers of dialogs. The dialog with the highest "
+   "layer is on top and will get all the input, unless the dialog is "
+   "modeless, which is a profile option.\n\n"
 
-	"@see GuiControlProfile\n\n"
+   "@see GuiControlProfile\n\n"
 
-	"@section GuiCanvas_dirty Dirty Rectangles\n\n"
+   "@section GuiCanvas_dirty Dirty Rectangles\n\n"
 
-	"The GuiCanvas is based on dirty regions. "
-	"Every frame the canvas paints only the areas of the canvas that are 'dirty' "
-	"or need updating. In most cases, this only is the area under the mouse cursor. "
-	"This is why if you look in guiCanvas.cc the call to glClear is commented out. "
-	
-	"What you will see is a black screen, except in the dirty regions, where the "
-	"screen will be painted normally. If you are making an animated GuiControl "
-	"you need to add your control to the dirty areas of the canvas.\n\n"
+   "The GuiCanvas is based on dirty regions. "
+   "Every frame the canvas paints only the areas of the canvas that are 'dirty' "
+   "or need updating. In most cases, this only is the area under the mouse cursor. "
+   "This is why if you look in guiCanvas.cc the call to glClear is commented out. "
+   
+   "What you will see is a black screen, except in the dirty regions, where the "
+   "screen will be painted normally. If you are making an animated GuiControl "
+   "you need to add your control to the dirty areas of the canvas.\n\n"
 
-	"@see GuiControl\n\n"
+   "@see GuiControl\n\n"
 
-	"@ingroup GuiCore\n");
+   "@ingroup GuiCore\n");
 
 ColorI gCanvasClearColor( 255, 0, 255 ); ///< For GFX->clear
 
@@ -108,6 +115,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mMouseMiddleButtonDown(false),
                         mDefaultCursor(NULL),
                         mLastCursor(NULL),
+                        mPopupShown(false),
                         mLastCursorPt(0,0),
                         mCursorPt(0,0),
                         mLastMouseClickCount(0),
@@ -122,7 +130,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mRightMouseLast(false),
                         mPlatformWindow(NULL),
                         mLastRenderMs(0),
-                        mDisplayWindow(true)
+                  mIsPopUp(false)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -132,6 +140,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
 
    mFences = NULL;
    mNextFenceIdx = -1;
+   mOverrideMode=String(StringTable->insert(""));
+   OverridePosition = Point2I(0,0);
 
 #ifndef _XBOX
    mNumFences = Con::getIntVariable( "$pref::Video::defaultFenceCount", 0 );
@@ -214,29 +224,30 @@ bool GuiCanvas::onAdd()
    //If we're recording, store the intial video resolution
    if (Journal::IsRecording())
    {
-	   Journal::Write(vm.resolution.x);
-	   Journal::Write(vm.resolution.y);
-	   Journal::Write(vm.fullScreen);
+      Journal::Write(vm.resolution.x);
+      Journal::Write(vm.resolution.y);
+      Journal::Write(vm.fullScreen);
    }
 
    //If we're playing, read the intial video resolution from the journal
    if (Journal::IsPlaying())
    {
-	   Journal::Read(&vm.resolution.x);
-	   Journal::Read(&vm.resolution.y);
-	   Journal::Read(&vm.fullScreen);
+      Journal::Read(&vm.resolution.x);
+      Journal::Read(&vm.resolution.y);
+      Journal::Read(&vm.fullScreen);
    }
 
    if (a && a->mType != NullDevice)
    {
       mPlatformWindow = WindowManager->createWindow(newDevice, vm);
 
-		//Disable window resizing if recording ir playing a journal
-		if (Journal::IsRecording() || Journal::IsPlaying())					
-			mPlatformWindow->lockSize(true);
-		
-		// Set a minimum on the window size so people can't break us by resizing tiny.
-		mPlatformWindow->setMinimumWindowSize(Point2I(640,480));
+      //Disable window resizing if recording ir playing a journal
+      if (Journal::IsRecording() || Journal::IsPlaying())               
+         mPlatformWindow->lockSize(true);
+      
+      // Set a minimum on the window size so people can't break us by resizing tiny.
+      //Allow resizing down to 10 by 20
+      mPlatformWindow->setMinimumWindowSize(Point2I(64,32));
 
       // Now, we have to hook in our event callbacks so we'll get
       // appropriate events from the window.
@@ -274,7 +285,7 @@ bool GuiCanvas::onAdd()
    bool parentRet = Parent::onAdd();
 
    // Define the menu bar for this canvas (if any)
-   Con::executef(this, "onCreateMenu");
+   onCreateMenu_callback();
 
 #ifdef TORQUE_DEMO_PURCHASE
    mPurchaseScreen = new PurchaseScreen;
@@ -297,7 +308,7 @@ void GuiCanvas::onRemove()
    Process::remove(this, &GuiCanvas::paint);
 
    // Destroy the menu bar for this canvas (if any)
-   Con::executef(this, "onDestroyMenu");
+   onDestroyMenu_callback();
 
    Parent::onRemove();
 }
@@ -310,25 +321,25 @@ void GuiCanvas::setWindowTitle(const char *newTitle)
 
 void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 {
-	if (Journal::IsPlaying() && mPlatformWindow)
-	{
-		mPlatformWindow->lockSize(false);
-		mPlatformWindow->setSize(Point2I(width, height));	
-		mPlatformWindow->lockSize(true);
-	}
+   if (Journal::IsPlaying() && mPlatformWindow)
+   {
+      mPlatformWindow->lockSize(false);
+      mPlatformWindow->setSize(Point2I(width, height));   
+      mPlatformWindow->lockSize(true);
+   }
 
    // Notify the scripts
    if ( isMethod( "onResize" ) )
-      Con::executef( this, "onResize", Con::getIntArg( width ), Con::getIntArg( height ) );
+   { onResize_callback( Con::getIntArg( width ), Con::getIntArg( height ) ); }
 }
 
 void GuiCanvas::handlePaintEvent(WindowId did)
 {
    bool canRender = mPlatformWindow->isVisible() && GFX->allowRender() && !GFX->canCurrentlyRender();
    
-	// Do the screenshot first.
+   // Do the screenshot first.
    if ( gScreenShot != NULL && gScreenShot->isPending() && canRender )
-		gScreenShot->capture( this );
+      gScreenShot->capture( this );
 
    // If the video capture is waiting for a canvas, start the capture
    if ( VIDCAP->isWaitingForCanvas() && canRender )
@@ -346,24 +357,74 @@ void GuiCanvas::handleAppEvent( WindowId did, S32 event )
    // Notify script if we gain or lose focus.
    if(event == LoseFocus)
    {
-      if(isMethod("onLoseFocus"))
-         Con::executef(this, "onLoseFocus");
+         onLoseFocus_callback(); 
+         if (mIsPopUp)
+         {
+            GuiWindowCtrl* content = dynamic_cast<GuiWindowCtrl*>(this->getContentControl());
+            if (content)
+            content->onLoseFocus_callback();
+         }
    }
 
    if(event == GainFocus)
    {
-      if(isMethod("onGainFocus"))
-         Con::executef(this, "onGainFocus");
+         onGainFocus_callback();
+         if (mIsPopUp)
+         {
+            GuiWindowCtrl* content = dynamic_cast<GuiWindowCtrl*>(this->getContentControl());
+            if (content)
+            content->onGainFocus_callback();
+         }
    }
 
    if(event == WindowClose || event == WindowDestroy)
    {
+   onWindowClose();
+   }
+}
 
+class GuiCanvas_Close : public SimEvent
+   {
+   void process(SimObject* obj)
+      {
+      if (obj)
+         obj->deleteObject();
+      }
+   };
+
+void GuiCanvas::onWindowClose()
+{
+   if (mIsPopUp)
+      {
+      //Find the windowctrl in it.
+      GuiWindowCtrl* content = dynamic_cast<GuiWindowCtrl*>(this->getContentControl());
+      if (content)
+         {
+         content->mPopWindowLastExtent = content->getExtent();
+         content->mOldParentGroup->addObject(content);
+         content->setExtent(content->mOrigExtent);
+         content->setPosition(content->mOrigPosition);
+
+         content->mPopWindowShowTitle=true;
+
+         content->setVisible(true);
+         content->mIsInPopUp=false;
+         content->UpdateRendering();
+         content->mLastWindowPosition = getPlatformWindow()->getPosition();
+         content->PopUpClosed(this);
+
+         //Now the tricky part we need to close this canvas.
+         //onWindowClose_callback();
+         Sim::postEvent(this,new GuiCanvas_Close(),Sim::getCurrentTime()+2);
+         }
+      }
+   else
+      {
       if(isMethod("onWindowClose"))
       {
          // First see if there is a method on this window to handle 
          //  it's closure
-         Con::executef(this,"onWindowClose");
+           onWindowClose_callback();
       }
       else if(Con::isFunction("onWindowClose"))
       {
@@ -495,19 +556,19 @@ bool GuiCanvas::tabNext(void)
       //save the old
       GuiControl *oldResponder = mFirstResponder;
 
-		GuiControl* newResponder = ctrl->findNextTabable(mFirstResponder);
+      GuiControl* newResponder = ctrl->findNextTabable(mFirstResponder);
       if ( !newResponder )
          newResponder = ctrl->findFirstTabable();
 
-		if ( newResponder && newResponder != oldResponder )
-		{
-			newResponder->setFirstResponder();
+      if ( newResponder && newResponder != oldResponder )
+      {
+         newResponder->setFirstResponder();
 
          // CodeReview Can this get killed? Note tabPrev code. BJG - 3/25/07
-//      	if ( oldResponder )
-//         	oldResponder->onLoseFirstResponder();
+//         if ( oldResponder )
+//            oldResponder->onLoseFirstResponder();
          return true;
-		}
+      }
    }
    return false;
 }
@@ -520,30 +581,30 @@ bool GuiCanvas::tabPrev(void)
       //save the old
       GuiControl *oldResponder = mFirstResponder;
 
-		GuiControl* newResponder = ctrl->findPrevTabable(mFirstResponder);
-		if ( !newResponder )
+      GuiControl* newResponder = ctrl->findPrevTabable(mFirstResponder);
+      if ( !newResponder )
          newResponder = ctrl->findLastTabable();
 
-		if ( newResponder && newResponder != oldResponder )
-		{
-			newResponder->setFirstResponder();
-	
+      if ( newResponder && newResponder != oldResponder )
+      {
+         newResponder->setFirstResponder();
+   
          // CodeReview As with tabNext() above, looks like this can now go. DAW - 7/05/09
-	      //if ( oldResponder )
-	      //   oldResponder->onLoseFirstResponder();
+         //if ( oldResponder )
+         //   oldResponder->onLoseFirstResponder();
 
          return true;
-		}
+      }
    }
    return false;
 }
 
 bool GuiCanvas::processInputEvent(InputEventInfo &inputEvent)
 {
-	// First call the general input handler (on the extremely off-chance that it will be handled):
-	if (mFirstResponder &&  mFirstResponder->onInputEvent(inputEvent))
+   // First call the general input handler (on the extremely off-chance that it will be handled):
+   if (mFirstResponder &&  mFirstResponder->onInputEvent(inputEvent))
    {
-		return(true);
+      return(true);
    }
 
    switch (inputEvent.deviceType)
@@ -1010,6 +1071,12 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
 {
    mPrevMouseTime = Platform::getVirtualMilliseconds();
    mMouseButtonDown = true;
+   if(isPopupShown())
+   {
+      setPopupShown(false);
+      mMouseCapturedControl = NULL;
+      return;
+   }
 
    //pass the event to the mouse locked control
    if (bool(mMouseCapturedControl))
@@ -1280,7 +1347,7 @@ void GuiCanvas::setContentControl(GuiControl *gui)
 
    GuiControl *oldContent = getContentControl();
    if(oldContent)
-      Con::executef(oldContent, "onUnsetContent", Con::getIntArg(gui->getId()));
+   { oldContent->onUnsetContent_callback( Con::getIntArg(gui->getId())); }
 
    //remove all dialogs on layer 0
    U32 index = 0;
@@ -1327,7 +1394,7 @@ void GuiCanvas::setContentControl(GuiControl *gui)
    maintainSizing();
 
    // Do this last so onWake gets called first
-   Con::executef(gui, "onSetContent", Con::getIntArg(oldContent ? oldContent->getId() : 0));
+   gui->onSetContent_callback( Con::getIntArg(oldContent ? oldContent->getId() : 0) );
 }
 
 GuiControl *GuiCanvas::getContentControl()
@@ -1646,7 +1713,11 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    GFXVideoMode mode = mPlatformWindow->getVideoMode();
    if ( dStricmp( LIGHTMGR->getId(), "ADVLM" ) == 0 && mode.antialiasLevel > 0 )   
    {
-      const char *pref = Con::getVariable( "$pref::Video::mode" );
+      String s = String("$pref::Video::") + String(this->getName()) + String("::mode");
+      const char *pref = Con::getVariable( StringTable->insert(s.c_str()));
+
+      if (dStrcmp(pref,"")==0)
+         pref = this->getOverrideMode();
       mode.parseFromString( pref );
       mode.antialiasLevel = 0;
       mPlatformWindow->setVideoMode(mode);
@@ -1655,7 +1726,10 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    }
    else if ( dStricmp( LIGHTMGR->getId(), "BLM" ) == 0)
    {
-      const char *pref = Con::getVariable( "$pref::Video::mode" );
+     String s = String("$pref::Video::") + String(this->getName()) + String("::mode");
+     const char *pref = Con::getVariable( StringTable->insert(s.c_str()));
+     if (dStrcmp(pref,"")==0)
+      pref = this->getOverrideMode();
 
       U32 prefAA = dAtoi( StringUnit::getUnit(pref, 5, " ") );
       if ( prefAA != mode.antialiasLevel )
@@ -1703,9 +1777,9 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       addUpdateRegion(pos - Point2I(2, 2), Point2I(cext.x + 4, cext.y + 4));
    }
 
-	mLastCursorEnabled = cursorVisible;
-	mLastCursor = mouseCursor;
-	mLastCursorPt = cursorPos;
+   mLastCursorEnabled = cursorVisible;
+   mLastCursor = mouseCursor;
+   mLastCursorPt = cursorPos;
 
    // Begin GFX
    PROFILE_START(GFXBeginScene);
@@ -1732,7 +1806,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    resetUpdateRegions();
 
-	// Make sure we have a clean matrix state 
+   // Make sure we have a clean matrix state 
    // before we start rendering anything!   
    GFX->setWorldMatrix( MatrixF::Identity );
    GFX->setViewMatrix( MatrixF::Identity );
@@ -1755,8 +1829,10 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
          
          GFX->setClipRect( updateUnion );
          GFX->setStateBlock(mDefaultGuiSB);
-         
+         contentCtrl->applyProfileSettings();
          contentCtrl->onRender(contentCtrl->getPosition(), updateUnion);
+         if( !contentCtrl->mProfileSettingsReset)
+            contentCtrl->resetProfileSettings();
       }
 
       // Fill Black if no Dialogs
@@ -1864,6 +1940,11 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    // Keep track of the last time we rendered.
    mLastRenderMs = Platform::getRealMilliseconds();
+   if (OverridePosition.x!=0 && OverridePosition.y != 0)
+      {
+      getPlatformWindow()->setPosition(OverridePosition);
+      OverridePosition = Point2I(0,0);
+      }
 }
 
 GuiCanvas::GuiCanvasFrameSignal& GuiCanvas::getGuiCanvasFrameSignal()
@@ -1944,46 +2025,46 @@ void GuiCanvas::resetUpdateRegions()
 
 void GuiCanvas::setFirstResponder( GuiControl* newResponder )
 {
-	GuiControl* oldResponder = mFirstResponder;
-	Parent::setFirstResponder( newResponder );
+   GuiControl* oldResponder = mFirstResponder;
+   Parent::setFirstResponder( newResponder );
    
    if( oldResponder == mFirstResponder )
       return;
 
-	if( oldResponder && ( oldResponder != newResponder ) )
-		oldResponder->onLoseFirstResponder();
+   if( oldResponder && ( oldResponder != newResponder ) )
+      oldResponder->onLoseFirstResponder();
       
    if( newResponder && ( newResponder != oldResponder ) )
       newResponder->onGainFirstResponder();
 }
 
 DefineEngineMethod( GuiCanvas, getContent, S32, (),,
-				   "@brief Get the GuiControl which is being used as the content.\n\n"
+               "@brief Get the GuiControl which is being used as the content.\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.getContent();\n"
-				   "@endtsexample\n\n"
+               "@tsexample\n"
+               "Canvas.getContent();\n"
+               "@endtsexample\n\n"
 
-				   "@return ID of current content control")
+               "@return ID of current content control")
 {
-	GuiControl *ctrl = object->getContentControl();
+   GuiControl *ctrl = object->getContentControl();
    if(ctrl)
       return ctrl->getId();
    return -1;
 }
 
 DefineEngineMethod( GuiCanvas, setContent, void, (GuiControl* ctrl),,
-				   "@brief Set the content of the canvas to a specified control.\n\n"
+               "@brief Set the content of the canvas to a specified control.\n\n"
 
-				   "@param ctrl ID or name of GuiControl to set content to\n\n"
+               "@param ctrl ID or name of GuiControl to set content to\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.setContent(PlayGui);\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.setContent(PlayGui);\n"
+               "@endtsexample\n\n")
 {
-	// Not using old error reporting until we modify the engineAPI - mperry
+   // Not using old error reporting until we modify the engineAPI - mperry
 
-	//GuiControl *gui = NULL;
+   //GuiControl *gui = NULL;
  //  if(argv[2][0])
  //  {
  //     if (!Sim::findObject(argv[2], gui))
@@ -1993,11 +2074,11 @@ DefineEngineMethod( GuiCanvas, setContent, void, (GuiControl* ctrl),,
  //     }
  //  }
 
-	if(!ctrl)
-	{
-		Con::errorf("GuiCanvas::setContent - Invalid control specified')");
-		return;
-	}
+   if(!ctrl)
+   {
+      Con::errorf("GuiCanvas::setContent - Invalid control specified')");
+      return;
+   }
 
    //set the new content control
    object->setContentControl(ctrl);
@@ -2016,11 +2097,11 @@ ConsoleDocFragment _pushDialog(
 );
 
 ConsoleMethod( GuiCanvas, pushDialog, void, 3, 5, "(GuiControl ctrl, int layer=0, bool center=false)"
-			  "@hide")
+           "@hide")
 {
    GuiControl *gui;
 
-   if (!	Sim::findObject(argv[2], gui))
+   if (!   Sim::findObject(argv[2], gui))
    {
       Con::printf("%s(): Invalid control: %s", (const char*)argv[0], (const char*)argv[2]);
       return;
@@ -2060,7 +2141,7 @@ ConsoleDocFragment _popDialog2(
 );
 
 ConsoleMethod( GuiCanvas, popDialog, void, 2, 3, "(GuiControl ctrl=NULL)"
-			  "@hide")
+           "@hide")
 {
    GuiControl *gui = NULL;
    if (argc == 3)
@@ -2079,26 +2160,26 @@ ConsoleMethod( GuiCanvas, popDialog, void, 2, 3, "(GuiControl ctrl=NULL)"
 }
 
 ConsoleDocFragment _popLayer1(
-	"@brief Removes the top most layer of dialogs\n\n"
-	"@tsexample\n"
-	"Canvas.popLayer();\n"
-	"@endtsexample\n\n",
-	"GuiCanvas",
-	"void popLayer();"
+   "@brief Removes the top most layer of dialogs\n\n"
+   "@tsexample\n"
+   "Canvas.popLayer();\n"
+   "@endtsexample\n\n",
+   "GuiCanvas",
+   "void popLayer();"
 );
 
 ConsoleDocFragment _popLayer2(
-	"@brief Removes a specified layer of dialogs\n\n"
-	"@param layer Number of the layer to pop\n\n"
-	"@tsexample\n"
-	"Canvas.popLayer(1);\n"
-	"@endtsexample\n\n",
-	"GuiCanvas",
-	"void popLayer(S32 layer);"
+   "@brief Removes a specified layer of dialogs\n\n"
+   "@param layer Number of the layer to pop\n\n"
+   "@tsexample\n"
+   "Canvas.popLayer(1);\n"
+   "@endtsexample\n\n",
+   "GuiCanvas",
+   "void popLayer(S32 layer);"
 );
 
 ConsoleMethod( GuiCanvas, popLayer, void, 2, 3, "(int layer)" 
-			  "@hide")
+           "@hide")
 {
    S32 layer = 0;
    if (argc == 3)
@@ -2108,134 +2189,134 @@ ConsoleMethod( GuiCanvas, popLayer, void, 2, 3, "(int layer)"
 }
 
 DefineEngineMethod( GuiCanvas, cursorOn, void, (),,
-				   "@brief Turns on the mouse cursor.\n\n"
-				   "@tsexample\n"
-				   "Canvas.cursorOn();\n"
-				   "@endtsexample\n\n")
+               "@brief Turns on the mouse cursor.\n\n"
+               "@tsexample\n"
+               "Canvas.cursorOn();\n"
+               "@endtsexample\n\n")
 {
-	object->setCursorON(true);
+   object->setCursorON(true);
 }
 
 DefineEngineMethod( GuiCanvas, cursorOff, void, (),,
-				    "@brief Turns on the mouse off.\n\n"
-				   "@tsexample\n"
-				   "Canvas.cursorOff();\n"
-				   "@endtsexample\n\n")
+                "@brief Turns on the mouse off.\n\n"
+               "@tsexample\n"
+               "Canvas.cursorOff();\n"
+               "@endtsexample\n\n")
 {
-	object->setCursorON(false);
+   object->setCursorON(false);
 }
 
 
 DefineEngineMethod( GuiCanvas, setCursor, void, (GuiCursor* cursor),,
-				   "@brief Sets the cursor for the canvas.\n\n"
+               "@brief Sets the cursor for the canvas.\n\n"
 
-				   "@param cursor Name of the GuiCursor to use\n\n"
+               "@param cursor Name of the GuiCursor to use\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.setCursor(\"DefaultCursor\");\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.setCursor(\"DefaultCursor\");\n"
+               "@endtsexample\n\n")
 {
-	if(!cursor)
-	{
-		Con::errorf("GuiCanvas::setCursor - Invalid GuiCursor name or ID");
-		return;
-	}
-	object->setCursor(cursor);
+   if(!cursor)
+   {
+      Con::errorf("GuiCanvas::setCursor - Invalid GuiCursor name or ID");
+      return;
+   }
+   object->setCursor(cursor);
 }
 
 DefineEngineMethod( GuiCanvas, renderFront, void, ( bool enable ),,
-				   "@brief This turns on/off front-buffer rendering.\n\n"
+               "@brief This turns on/off front-buffer rendering.\n\n"
 
-				   "@param enable True if all rendering should be done to the front buffer\n\n"
+               "@param enable True if all rendering should be done to the front buffer\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.renderFront(false);\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.renderFront(false);\n"
+               "@endtsexample\n\n")
 {
-	object->setRenderFront(enable);
+   object->setRenderFront(enable);
 }
 
 DefineEngineMethod( GuiCanvas, showCursor, void, (),,
-				   "@brief Enable rendering of the cursor.\n\n"
+               "@brief Enable rendering of the cursor.\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.showCursor();\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.showCursor();\n"
+               "@endtsexample\n\n")
 {
-	object->showCursor(true);
+   object->showCursor(true);
 }
 
 DefineEngineMethod( GuiCanvas, hideCursor, void, (),,
-				   "@brief Disable rendering of the cursor.\n\n"
+               "@brief Disable rendering of the cursor.\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.hideCursor();\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.hideCursor();\n"
+               "@endtsexample\n\n")
 {
-	object->showCursor(false);
+   object->showCursor(false);
 }
 
 DefineEngineMethod( GuiCanvas, isCursorOn, bool, (),,
-				   "@brief Determines if mouse cursor is enabled.\n\n"
+               "@brief Determines if mouse cursor is enabled.\n\n"
 
-				   "@tsexample\n"
-				   "// Is cursor on?\n"
-				   "if(Canvas.isCursorOn())\n"
-				   "	echo(\"Canvas cursor is on\");\n"
-				   "@endtsexample\n\n"
-				   "@return Returns true if the cursor is on.\n\n")
+               "@tsexample\n"
+               "// Is cursor on?\n"
+               "if(Canvas.isCursorOn())\n"
+               "   echo(\"Canvas cursor is on\");\n"
+               "@endtsexample\n\n"
+               "@return Returns true if the cursor is on.\n\n")
 {
-	return object->isCursorON();
+   return object->isCursorON();
 }
 
 DefineEngineMethod( GuiCanvas, isCursorShown, bool, (),,
-				   "@brief Determines if mouse cursor is rendering.\n\n"
+               "@brief Determines if mouse cursor is rendering.\n\n"
 
-				   "@tsexample\n"
-				   "// Is cursor rendering?\n"
-				   "if(Canvas.isCursorShown())\n"
-				   "	echo(\"Canvas cursor is rendering\");\n"
-				   "@endtsexample\n\n"
-				   "@return Returns true if the cursor is rendering.\n\n")
+               "@tsexample\n"
+               "// Is cursor rendering?\n"
+               "if(Canvas.isCursorShown())\n"
+               "   echo(\"Canvas cursor is rendering\");\n"
+               "@endtsexample\n\n"
+               "@return Returns true if the cursor is rendering.\n\n")
 {
-	return object->isCursorShown();
+   return object->isCursorShown();
 }
 
 DefineEngineMethod( GuiCanvas, repaint, void, ( S32 elapsedMS ), (0),
-				   "@brief Force canvas to redraw.\n"
+               "@brief Force canvas to redraw.\n"
                "If the elapsed time is greater than the time since the last paint "
                "then the repaint will be skipped.\n"
                "@param elapsedMS The optional elapsed time in milliseconds.\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.repaint();\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.repaint();\n"
+               "@endtsexample\n\n")
 {
-	object->repaint(elapsedMS < 0 ? 0 : elapsedMS);
+   object->repaint(elapsedMS < 0 ? 0 : elapsedMS);
 }
 
 DefineEngineMethod( GuiCanvas, reset, void, (),,
-				   "@brief Reset the update regions for the canvas.\n\n"
+               "@brief Reset the update regions for the canvas.\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.reset();\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.reset();\n"
+               "@endtsexample\n\n")
 {
-	object->resetUpdateRegions();
+   object->resetUpdateRegions();
 }
 
 DefineEngineMethod( GuiCanvas, getCursorPos, Point2I, (),,
-				   "@brief Get the current position of the cursor in screen-space. Note that this position"
+               "@brief Get the current position of the cursor in screen-space. Note that this position"
                " might be outside the Torque window. If you want to get the position within the Canvas,"
                " call screenToClient on the result.\n\n"
                "@see Canvas::screenToClient()\n\n"
-				   "@param param Description\n\n"
-				   "@tsexample\n"
-				   "%cursorPos = Canvas.getCursorPos();\n"
-				   "@endtsexample\n\n"
-				   "@return Screen coordinates of mouse cursor, in format \"X Y\"")
+               "@param param Description\n\n"
+               "@tsexample\n"
+               "%cursorPos = Canvas.getCursorPos();\n"
+               "@endtsexample\n\n"
+               "@return Screen coordinates of mouse cursor, in format \"X Y\"")
 {
-	return object->getCursorPos();
+   return object->getCursorPos();
 }
 
 ConsoleDocFragment _setCursorPos1(
@@ -2259,7 +2340,7 @@ ConsoleDocFragment _setCursorPos2(
 );
 
 ConsoleMethod( GuiCanvas, setCursorPos, void, 3, 4, "(Point2I pos)"
-			  "@hide")
+           "@hide")
 {
    Point2I pos(0,0);
 
@@ -2272,33 +2353,33 @@ ConsoleMethod( GuiCanvas, setCursorPos, void, 3, 4, "(Point2I pos)"
 }
 
 DefineEngineMethod( GuiCanvas, getMouseControl, S32, (),,
-				   "@brief Gets the gui control under the mouse.\n\n"
-				   "@tsexample\n"
-				   "%underMouse = Canvas.getMouseControl();\n"
-				   "@endtsexample\n\n"
+               "@brief Gets the gui control under the mouse.\n\n"
+               "@tsexample\n"
+               "%underMouse = Canvas.getMouseControl();\n"
+               "@endtsexample\n\n"
 
-				   "@return ID of the gui control, if one was found. NULL otherwise")
+               "@return ID of the gui control, if one was found. NULL otherwise")
 {
-	GuiControl* control = object->getMouseControl();
+   GuiControl* control = object->getMouseControl();
    if (control)
       return control->getId();
    
-   return NULL;
+   return 0;
 }
 
 DefineEngineFunction(excludeOtherInstance, bool, (const char* appIdentifer),,
-					 "@brief Used to exclude/prevent all other instances using the same identifier specified\n\n"
+                "@brief Used to exclude/prevent all other instances using the same identifier specified\n\n"
 
-					 "@note Not used on OSX, Xbox, or in Win debug builds\n\n"
+                "@note Not used on OSX, Xbox, or in Win debug builds\n\n"
 
-					 "@param appIdentifier Name of the app set up for exclusive use.\n"
+                "@param appIdentifier Name of the app set up for exclusive use.\n"
 
-					 "@return False if another app is running that specified the same appIdentifier\n\n"
+                "@return False if another app is running that specified the same appIdentifier\n\n"
 
-					 "@ingroup Platform\n"
-					 "@ingroup GuiCore")
+                "@ingroup Platform\n"
+                "@ingroup GuiCore")
 {
-	   // mac/360 can only run one instance in general.
+      // mac/360 can only run one instance in general.
 #if !defined(TORQUE_OS_MAC) && !defined(TORQUE_OS_XENON) && !defined(TORQUE_DEBUG)
    return Platform::excludeOtherInstances(appIdentifer);
 #else
@@ -2308,82 +2389,82 @@ DefineEngineFunction(excludeOtherInstance, bool, (const char* appIdentifer),,
 }
 
 DefineEngineMethod( GuiCanvas, getExtent, Point2I, (),,
-				   "@brief Returns the dimensions of the canvas\n\n"
+               "@brief Returns the dimensions of the canvas\n\n"
 
-				   "@tsexample\n"
-				   "%extent = Canvas.getExtent();\n"
-				   "@endtsexample\n\n"
+               "@tsexample\n"
+               "%extent = Canvas.getExtent();\n"
+               "@endtsexample\n\n"
 
-				   "@return Width and height of canvas. Formatted as numerical values in a single string \"# #\"")
+               "@return Width and height of canvas. Formatted as numerical values in a single string \"# #\"")
 {
-	return object->getExtent();
+   return object->getExtent();
 }
 
 
 DefineEngineMethod( GuiCanvas, setWindowTitle, void, ( const char* newTitle),,
-				   "@brief Change the title of the OS window.\n\n"
+               "@brief Change the title of the OS window.\n\n"
 
-				   "@param newTitle String containing the new name\n\n"
+               "@param newTitle String containing the new name\n\n"
 
-				   "@tsexample\n"
-				   "Canvas.setWindowTitle(\"Documentation Rocks!\");\n"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "Canvas.setWindowTitle(\"Documentation Rocks!\");\n"
+               "@endtsexample\n\n")
 {
-	object->setWindowTitle(newTitle);
+   object->setWindowTitle(newTitle);
 }
 
 
 DefineEngineMethod( GuiCanvas, findFirstMatchingMonitor, S32, (const char* name),,
-				   "@brief Find the first monitor index that matches the given name.\n\n"
+               "@brief Find the first monitor index that matches the given name.\n\n"
                "The actual match algorithm depends on the implementation.\n"
                "@param name The name to search for.\n\n"
-				   "@return The number of monitors attached to the system, including the default monoitor.")
+               "@return The number of monitors attached to the system, including the default monoitor.")
 {
    return PlatformWindowManager::get()->findFirstMatchingMonitor(name);
 }
 
 DefineEngineMethod( GuiCanvas, getMonitorCount, S32, (),,
-				   "@brief Gets the number of monitors attached to the system.\n\n"
+               "@brief Gets the number of monitors attached to the system.\n\n"
 
-				   "@return The number of monitors attached to the system, including the default monoitor.")
+               "@return The number of monitors attached to the system, including the default monoitor.")
 {
    return PlatformWindowManager::get()->getMonitorCount();
 }
 
 DefineEngineMethod( GuiCanvas, getMonitorName, const char*, (S32 index),,
-				   "@brief Gets the name of the requested monitor.\n\n"
+               "@brief Gets the name of the requested monitor.\n\n"
                "@param index The monitor index.\n\n"
-				   "@return The name of the requested monitor.")
+               "@return The name of the requested monitor.")
 {
    return PlatformWindowManager::get()->getMonitorName(index);
 }
 
 DefineEngineMethod( GuiCanvas, getMonitorRect, RectI, (S32 index),,
-				   "@brief Gets the region of the requested monitor.\n\n"
+               "@brief Gets the region of the requested monitor.\n\n"
                "@param index The monitor index.\n\n"
-				   "@return The rectangular region of the requested monitor.")
+               "@return The rectangular region of the requested monitor.")
 {
    return PlatformWindowManager::get()->getMonitorRect(index);
 }
 
 
 DefineEngineMethod( GuiCanvas, getVideoMode, const char*, (),,
-				   "@brief Gets the current screen mode as a string.\n\n"
+               "@brief Gets the current screen mode as a string.\n\n"
 
-				   "The return string will contain 5 values (width, height, fullscreen, bitdepth, refreshRate). "
-				   "You will need to parse out each one for individual use.\n\n"
+               "The return string will contain 5 values (width, height, fullscreen, bitdepth, refreshRate). "
+               "You will need to parse out each one for individual use.\n\n"
 
-				   "@tsexample\n"
-				   "%screenWidth = getWord(Canvas.getVideoMode(), 0);\n"
-				   "%screenHeight = getWord(Canvas.getVideoMode(), 1);\n"
-				   "%isFullscreen = getWord(Canvas.getVideoMode(), 2);\n"
-				   "%bitdepth = getWord(Canvas.getVideoMode(), 3);\n"
-				   "%refreshRate = getWord(Canvas.getVideoMode(), 4);\n"
-				   "@endtsexample\n\n"
+               "@tsexample\n"
+               "%screenWidth = getWord(Canvas.getVideoMode(), 0);\n"
+               "%screenHeight = getWord(Canvas.getVideoMode(), 1);\n"
+               "%isFullscreen = getWord(Canvas.getVideoMode(), 2);\n"
+               "%bitdepth = getWord(Canvas.getVideoMode(), 3);\n"
+               "%refreshRate = getWord(Canvas.getVideoMode(), 4);\n"
+               "@endtsexample\n\n"
 
-				   "@return String formatted with screen width, screen height, screen mode, bit depth, and refresh rate.")
+               "@return String formatted with screen width, screen height, screen mode, bit depth, and refresh rate.")
 {
-	// Grab the video mode.
+   // Grab the video mode.
    if (!object->getPlatformWindow())
       return "";
 
@@ -2394,17 +2475,17 @@ DefineEngineMethod( GuiCanvas, getVideoMode, const char*, (),,
 
 
 DefineEngineMethod( GuiCanvas, getModeCount, S32, (),,
-				   "@brief Gets the number of modes available on this device.\n\n"
+               "@brief Gets the number of modes available on this device.\n\n"
 
-				   "@param param Description\n\n"
+               "@param param Description\n\n"
 
-				   "@tsexample\n"
-				   "%modeCount = Canvas.getModeCount()\n"
-				   "@endtsexample\n\n"
+               "@tsexample\n"
+               "%modeCount = Canvas.getModeCount()\n"
+               "@endtsexample\n\n"
 
-				   "@return The number of video modes supported by the device")
+               "@return The number of video modes supported by the device")
 {
-	if (!object->getPlatformWindow())
+   if (!object->getPlatformWindow())
       return 0;
 
    // Grab the available mode list from the device.
@@ -2416,12 +2497,12 @@ DefineEngineMethod( GuiCanvas, getModeCount, S32, (),,
 }
 
 DefineEngineMethod( GuiCanvas, getMode, const char*, (S32 modeId),,
-				   "@brief Gets information on the specified mode of this device.\n\n"
-				   "@param modeId Index of the mode to get data from.\n"
-				   "@return A video mode string given an adapter and mode index.\n\n"
-				   "@see GuiCanvas::getVideoMode()")
+               "@brief Gets information on the specified mode of this device.\n\n"
+               "@param modeId Index of the mode to get data from.\n"
+               "@return A video mode string given an adapter and mode index.\n\n"
+               "@see GuiCanvas::getVideoMode()")
 {
-	if (!object->getPlatformWindow())
+   if (!object->getPlatformWindow())
       return 0;
 
    // Grab the available mode list from the device.
@@ -2446,14 +2527,14 @@ DefineEngineMethod( GuiCanvas, getMode, const char*, (S32 modeId),,
 
 
 DefineEngineMethod( GuiCanvas, toggleFullscreen, void, (),,
-				   "@brief toggle canvas from fullscreen to windowed mode or back.\n\n"
+               "@brief toggle canvas from fullscreen to windowed mode or back.\n\n"
 
-				   "@tsexample\n"
-				   "// If we are in windowed mode, the following will put is in fullscreen\n"
-				   "Canvas.toggleFullscreen();"
-				   "@endtsexample\n\n")
+               "@tsexample\n"
+               "// If we are in windowed mode, the following will put is in fullscreen\n"
+               "Canvas.toggleFullscreen();"
+               "@endtsexample\n\n")
 {
-	if (Platform::getWebDeployment())
+   if (Platform::getWebDeployment())
       return;
 
    if (!object->getPlatformWindow())
@@ -2606,6 +2687,10 @@ ConsoleMethod( GuiCanvas, setFocus, void, 2,2, "() - Claim OS input focus for th
       window->setFocus();
 }
 
+DefineEngineMethod( GuiCanvas, setPopupShown, void, (bool shown),  , "(bool shown) - Enabled when a context menu/popup menu is shown.")
+{
+   object->setPopupShown( shown );
+}
 ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
                "(int width, int height, bool fullscreen, [int bitDepth], [int refreshRate], [int antialiasLevel] )\n"
                "Change the video mode of this canvas. This method has the side effect of setting the $pref::Video::mode to the new values.\n\n"
@@ -2614,7 +2699,7 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
                "\\param fullscreen Specify true to run fullscreen or false to run in a window\n"
                "\\param bitDepth [optional] The desired bit-depth. Defaults to the current setting. This parameter is ignored if you are running in a window.\n"
                "\\param refreshRate [optional] The desired refresh rate. Defaults to the current setting. This parameter is ignored if you are running in a window"
-					"\\param antialiasLevel [optional] The level of anti-aliasing to apply 0 = none" )
+               "\\param antialiasLevel [optional] The level of anti-aliasing to apply 0 = none" )
 {
    if (!object->getPlatformWindow())
       return;

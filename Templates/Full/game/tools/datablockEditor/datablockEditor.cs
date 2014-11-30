@@ -56,6 +56,8 @@ function DatablockEditorPlugin::onWorldEditorStartup( %this )
 
 function DatablockEditorPlugin::onActivated( %this )
 {
+
+   DatablockEditorPlugin.isActive = true;
    EditorGui-->WorldEditorToolbar.setVisible(false);
    EditorGui.bringToFront( DatablockEditorPlugin );
    
@@ -87,6 +89,9 @@ function DatablockEditorPlugin::onActivated( %this )
 
 function DatablockEditorPlugin::onDeactivated( %this )
 {
+   if (!DatablockEditorPlugin.isActive)
+      return;
+   DatablockEditorPlugin.isActive = false;
    DatablockEditorPlugin.writeSettings();
    
    DatablockEditorInspectorWindow.setVisible( false );

@@ -22,12 +22,15 @@
 
 #include "platformWin32/platformWin32.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/simBase.h"
 #include "core/strings/unicode.h"
 #include "platform/threads/thread.h"
 #include "platform/threads/mutex.h"
 #include "core/util/safeDelete.h"
 #include "util/tempAlloc.h"
+
+IMPLEMENT_GLOBAL_CALLBACK( onExecuteDone, void, ( const char * data ), ( data ), "");
 
 //-----------------------------------------------------------------------------
 // Thread for executing in
@@ -63,8 +66,7 @@ public:
 
    virtual void process(SimObject *object)
    {
-      if( Con::isFunction( "onExecuteDone" ) )
-         Con::executef( "onExecuteDone", Con::getIntArg( mOK ) );
+      onExecuteDone_callback( Con::getIntArg( mOK ) );
       SAFE_DELETE(mThread);
    }
 };

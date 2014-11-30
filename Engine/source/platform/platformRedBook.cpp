@@ -22,7 +22,10 @@
 
 #include "core/strings/stringFunctions.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "platform/platformRedBook.h"
+
+IMPLEMENT_GLOBAL_CALLBACK( RedBookCallback, void, ( const char * data ), ( data ), "");
 
 //------------------------------------------------------------------------------
 // Class: RedBookDevice
@@ -105,7 +108,9 @@ void RedBook::handleCallback(U32 type)
    switch(type)
    {
       case PlayFinished:
-         Con::executef("RedBookCallback", "PlayFinished");
+         {
+            RedBookCallback_callback( "PlayFinished" );
+         }
          break;
    }
 }

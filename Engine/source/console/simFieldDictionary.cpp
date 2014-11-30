@@ -27,6 +27,8 @@
 #include "console/console.h"
 #include "console/consoleInternal.h"
 #include "core/frameAllocator.h"
+#include "console/SimXMLDocument.h"
+#include "console/simObject.h"
 
 SimFieldDictionary::Entry *SimFieldDictionary::smFreeList = NULL;
 
@@ -168,6 +170,19 @@ SimFieldDictionary::Entry *SimFieldDictionary::findDynamicField( StringTableEntr
    return NULL;
 }
 
+SimFieldDictionary::Entry *SimFieldDictionary::findField( StringTableEntry fieldName) const
+{
+	for(U32 i = 0; i < HashTableSize; i++)
+	{
+	   Entry *walk = mHashTable[i];
+	   if(walk)
+	   {
+		   if( !dStricmp(walk->slotName, fieldName) )
+			   return walk;
+	   }
+	}
+	return NULL;
+}
 
 void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *value)
 {
@@ -236,7 +251,7 @@ static S32 QSORT_CALLBACK compareEntries(const void* a,const void* b)
    return dStricmp(fa->slotName, fb->slotName);
 }
 
-void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop)
+void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop, bool XMLOutput )
 {
    const AbstractClassRep::FieldList &list = obj->getFieldList();
    Vector<Entry *> flist(__FILE__, __LINE__);
@@ -271,6 +286,15 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
       U32 nBufferSize = (dStrlen( (*itr)->value ) * 2) + dStrlen( (*itr)->slotName ) + 16;
       FrameTemp<char> expandedBuffer( nBufferSize );
 
+	  /// For XML Output
+	  if(XMLOutput)
+	  {
+		  obj->getcurrentXML()->pushNewElement("Setting");
+		  obj->getcurrentXML()->setAttribute("name",(*itr)->slotName);
+		  obj->getcurrentXML()->addData((*itr)->value);
+		  obj->getcurrentXML()->popElement();
+		  continue;
+	  }
       stream.writeTabs(tabStop+1);
 
       const char *typeName = (*itr)->type && (*itr)->type->getTypeID() != TypeString ? (*itr)->type->getTypeName() : "";
