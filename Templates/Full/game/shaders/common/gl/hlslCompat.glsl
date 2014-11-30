@@ -48,14 +48,14 @@
 
 #define lerp mix
 
-void tSetMatrixRow(out float3x3 m, int row, float3 value)
+void tSetMatrixRow(inout float3x3 m, int row, float3 value)
 {
    m[0][row] = value.x;
    m[1][row] = value.y;
    m[2][row] = value.z;
 }
 
-void tSetMatrixRow(out float4x4 m, int row, float4 value)
+void tSetMatrixRow(inout float4x4 m, int row, float4 value)
 {
    m[0][row] = value.x;
    m[1][row] = value.y;
