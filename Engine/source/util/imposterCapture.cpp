@@ -229,7 +229,7 @@ void ImposterCapture::_renderToTexture( GFXTexHandle texHandle, GBitmap *outBitm
    PROFILE_SCOPE( ImposterCapture_RenderToTexture );
 
    mRenderTarget->attachTexture( GFXTextureTarget::Color0, texHandle );
-   mRenderTarget->attachTexture( GFXTextureTarget::DepthStencil, GFXTextureTarget::sDefaultDepthStencil );
+   mRenderTarget->attachTexture( GFXTextureTarget::DepthStencil, mDepthBuffer );
    GFX->setActiveRenderTarget( mRenderTarget );
 
    GFX->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, color, 1.0f, 0 );
@@ -373,6 +373,7 @@ void ImposterCapture::begin(  TSShapeInstance *shapeInst,
    mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
    mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
    mNormalTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
+   mDepthBuffer.set( mDim, mDim, GFXFormatD24S8, &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
 
    // copy the black render target data into a bitmap
    mBlackBmp = new GBitmap;
