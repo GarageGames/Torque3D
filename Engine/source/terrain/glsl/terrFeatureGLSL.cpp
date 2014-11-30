@@ -474,7 +474,7 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
    }
 
    Var *baseColor = (Var*)LangElement::find("baseColor");
-   Var *outColor = (Var*)LangElement::find(getOutputTargetVarName(OutputTarget::DefaultTarget));
+   Var *outColor = (Var*)LangElement::find(getOutputTargetVarName(DefaultTarget));
 
    if (!outColor)
    {
