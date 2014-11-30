@@ -47,8 +47,7 @@
 #include "lighting/basic/blTerrainSystem.h"
 #include "lighting/common/projectedShadow.h"
 
-
-#if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
+#if defined( TORQUE_OPENGL )
 #include "shaderGen/GLSL/shaderFeatureGLSL.h"
 #include "shaderGen/GLSL/bumpGLSL.h"
 #include "shaderGen/GLSL/pixSpecularGLSL.h"
@@ -163,7 +162,7 @@ void BasicLightManager::activate( SceneManager *sceneManager )
 
    if( GFX->getAdapterType() == OpenGL )
    {
-      #if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
+      #if defined( TORQUE_OPENGL ) 
          FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatGLSL );
          FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatGLSL );
          FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatGLSL );
@@ -173,7 +172,7 @@ void BasicLightManager::activate( SceneManager *sceneManager )
    }
    else
    {
-      #if !defined( TORQUE_OS_MAC ) && !defined( TORQUE_OS_LINUX )
+      #if defined( TORQUE_OS_WIN32 )
          FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatHLSL );
          FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatHLSL );
          FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatHLSL );
