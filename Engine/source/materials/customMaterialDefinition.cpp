@@ -149,8 +149,11 @@ bool CustomMaterial::onAdd()
             const char *error = (avar("CustomMaterial(%s) bind sampler[%s] and is not present on ShaderData(%s)", 
                getName(), samplerName.c_str(), mShaderDataName.c_str() ));
             Con::errorf(error);
+
+#if TORQUE_OPENGL
             GFXAssertFatal(0, error);
             continue;
+#endif
          }
          mSamplerNames[pos] = samplerName;
          mTexFilename[pos] = entry->value;
