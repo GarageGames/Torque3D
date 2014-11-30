@@ -26,6 +26,7 @@
 uniform sampler2D inputTex;
 uniform vec2 oneOverTargetSize;
 
+out vec4 OUT_col;
 
 const vec2 gTapOffsets[16] = vec2[]
 (
@@ -47,5 +48,5 @@ void main()
       average += lum;
    }
 
-   OUT_FragColor0 = vec4( average / 16.0, 0.0, 0.0, 1.0 );
+   OUT_col = vec4( average / 16.0, 0.0, 0.0, 1.0 );
 }

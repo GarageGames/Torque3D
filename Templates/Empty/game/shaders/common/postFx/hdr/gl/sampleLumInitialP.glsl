@@ -29,6 +29,8 @@ uniform vec2 texSize0;
 
 uniform float g_fMinLuminace;
 
+out vec4 OUT_col;
+
 const vec2 gTapOffsets[9] = vec2[]
 (
    vec2( -1.0, -1.0 ), vec2( 0.0, -1.0 ), vec2( 1.0, -1.0 ),
@@ -56,5 +58,5 @@ void main()
 
    average = exp( average / 9.0 );
 
-   OUT_FragColor0 = vec4( average, 0.0, 0.0, 1.0 );
+   OUT_col = vec4( average, 0.0, 0.0, 1.0 );
 }

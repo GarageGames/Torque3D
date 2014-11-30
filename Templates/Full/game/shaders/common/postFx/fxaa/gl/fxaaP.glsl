@@ -34,9 +34,11 @@ uniform vec2 oneOverTargetSize;
 in vec4 hpos;
 in vec2 uv0;
 
+out vec4 OUT_col;
+
 void main()
 {
-   OUT_FragColor0 = FxaaPixelShader(
+   OUT_col = FxaaPixelShader(
 
     uv0, // vertex position
 

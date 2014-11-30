@@ -24,9 +24,9 @@ uniform sampler2D diffuseMap;
 in vec4 color;
 in vec2 texCoord;
 
-out vec4 OUT_FragColor0;
+out vec4 OUT_col;
 
 void main()
 {
-   OUT_FragColor0 = vec4(color.rgb, color.a * texture(diffuseMap, texCoord).a);
+   OUT_col = vec4(color.rgb, color.a * texture(diffuseMap, texCoord).a);
 }

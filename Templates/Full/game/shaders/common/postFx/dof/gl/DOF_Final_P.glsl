@@ -41,6 +41,8 @@ uniform float maxFarCoC;
 //static vec4 dofLerpBias = vec4( 1.0, (1.0 - d2) / d1, 1.0 / d2, (d2 - 1.0) / d2 );
 //static vec3 dofEqFar = vec3( 2.0, 0.0, 1.0 ); 
 
+out vec4 OUT_col;
+
 vec4 tex2Doffset( sampler2D s, vec2 tc, vec2 offset )  
 {  
    return texture( s, tc + offset * oneOverTargetSize );  
@@ -141,5 +143,5 @@ void main()
    //return half4(nearCoc.rrr,1);
    
    //return half4( 1,0,1,0 );
-   OUT_FragColor0 = InterpolateDof( small, med.rgb, large, coc );  
+   OUT_col = InterpolateDof( small, med.rgb, large, coc );  
 }  

@@ -33,6 +33,8 @@ in vec4 outLightVec;
 in vec3 outPos;
 in vec3 outEyePos;
 
+out vec4 OUT_col;
+
 void main()
 {
    vec2 texOffset;
@@ -45,11 +47,11 @@ void main()
    vec4 bumpNorm = texture(bumpMap, texOffset) * 2.0 - 1.0;
    vec4 diffuse = texture(diffMap, texOffset);
    
-   OUT_FragColor0 = diffuse * (clamp(dot(outLightVec.xyz, bumpNorm.xyz), 0.0, 1.0) + ambient);
+   OUT_col = diffuse * (clamp(dot(outLightVec.xyz, bumpNorm.xyz), 0.0, 1.0) + ambient);
    
    vec3 eyeVec = normalize(outEyePos - outPos);
    vec3 halfAng = normalize(eyeVec + outLightVec.xyz);
    float specular = clamp(dot(bumpNorm.xyz, halfAng), 0.0, 1.0) * outLightVec.w;
    specular = pow(specular, specularPower);
-   OUT_FragColor0 += specularColor * specular;
+   OUT_col += specularColor * specular;
 }

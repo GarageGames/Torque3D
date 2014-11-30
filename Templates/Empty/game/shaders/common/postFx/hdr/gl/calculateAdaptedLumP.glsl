@@ -30,6 +30,8 @@ uniform sampler2D lastAdaptedLum;
 uniform float adaptRate;
 uniform float deltaTime;
 
+out vec4 OUT_col;
+
 void main()
 {
    float fAdaptedLum = texture( lastAdaptedLum, vec2(0.5f, 0.5f) ).r;
@@ -42,5 +44,5 @@ void main()
    float diff = fCurrentLum - fAdaptedLum;
    float fNewAdaptation = fAdaptedLum + ( diff * ( 1.0 - exp( -deltaTime * adaptRate ) ) );
 
-   OUT_FragColor0 = vec4( fNewAdaptation, 0.0, 0.0, 1.0f );
+   OUT_col = vec4( fNewAdaptation, 0.0, 0.0, 1.0f );
 }

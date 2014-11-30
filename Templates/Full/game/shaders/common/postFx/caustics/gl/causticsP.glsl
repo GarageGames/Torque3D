@@ -34,6 +34,8 @@ uniform sampler2D causticsTex0;
 uniform sampler2D causticsTex1;
 uniform vec2 targetSize;
 
+out vec4 OUT_col;
+
 float distanceToPlane(vec4 plane, vec3 pos)
 {
    return (plane.x * pos.x + plane.y * pos.y + plane.z * pos.z) + plane.w;
@@ -48,7 +50,7 @@ void main()
    float depth = prePass.w;   
    if(depth > 0.9999)
    {
-      OUT_FragColor0 = vec4(0,0,0,0);
+      OUT_col = vec4(0,0,0,0);
       return;
    }
    
@@ -59,7 +61,7 @@ void main()
    float waterDepth = -distanceToPlane(waterFogPlane, pos);
    if(waterDepth < 0)
    {
-      OUT_FragColor0 = vec4(0,0,0,0);
+      OUT_col = vec4(0,0,0,0);
       return;
    }
    waterDepth = saturate(waterDepth);
@@ -81,5 +83,5 @@ void main()
    //float waterDepth = 1 - saturate(pos.z + waterFogPlane.w + 1);
    caustics *= saturate(prePass.z) * pow(1-depth, 64) * waterDepth; 
       
-   OUT_FragColor0 = caustics;   
+   OUT_col = caustics;   
 }

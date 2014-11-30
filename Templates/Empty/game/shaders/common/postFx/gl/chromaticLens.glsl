@@ -32,6 +32,8 @@ uniform float distCoeff;
 uniform float cubeDistort;
 uniform vec3 colorDistort;
 
+out vec4 OUT_col;
+
 void main()
 {
     vec2 tex = IN_uv0;
@@ -56,5 +58,5 @@ void main()
         outColor[i] = tex2Dlod( backBuffer, vec4(x,y,0,0) )[i];
     }
 
-    OUT_FragColor0 = vec4( outColor.rgb, 1 );
+    OUT_col = vec4( outColor.rgb, 1 );
 }

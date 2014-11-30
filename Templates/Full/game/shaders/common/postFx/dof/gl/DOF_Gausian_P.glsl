@@ -42,7 +42,7 @@ in vec2 uv6;
 in vec2 uv7;
 #define IN_uv7 uv7
 
-#define OUT OUT_FragColor0
+out vec4 OUT_col;
 
 uniform sampler2D diffuseMap;
 
@@ -50,19 +50,19 @@ void main()
 {
    vec4 kernel = vec4( 0.175, 0.275, 0.375, 0.475 ) * 0.5 / 1.3; //25f;
 
-   OUT = vec4(0);
-   OUT += texture( diffuseMap, IN_uv0 ) * kernel.x;
-   OUT += texture( diffuseMap, IN_uv1 ) * kernel.y;
-   OUT += texture( diffuseMap, IN_uv2 ) * kernel.z;
-   OUT += texture( diffuseMap, IN_uv3 ) * kernel.w;
+   OUT_col = vec4(0);
+   OUT_col += texture( diffuseMap, IN_uv0 ) * kernel.x;
+   OUT_col += texture( diffuseMap, IN_uv1 ) * kernel.y;
+   OUT_col += texture( diffuseMap, IN_uv2 ) * kernel.z;
+   OUT_col += texture( diffuseMap, IN_uv3 ) * kernel.w;
 
-   OUT += texture( diffuseMap, IN_uv4 ) * kernel.x;
-   OUT += texture( diffuseMap, IN_uv5 ) * kernel.y;
-   OUT += texture( diffuseMap, IN_uv6 ) * kernel.z;
-   OUT += texture( diffuseMap, IN_uv7 ) * kernel.w;
+   OUT_col += texture( diffuseMap, IN_uv4 ) * kernel.x;
+   OUT_col += texture( diffuseMap, IN_uv5 ) * kernel.y;
+   OUT_col += texture( diffuseMap, IN_uv6 ) * kernel.z;
+   OUT_col += texture( diffuseMap, IN_uv7 ) * kernel.w;
 
    // Calculate a lumenance value in the alpha so we
    // can use alpha test to save fillrate.
    //vec3 rgb2lum = vec3( 0.30, 0.59, 0.11 );
-   //OUT.a = dot( OUT.rgb, rgb2lum );   
+   //OUT_col.a = dot( OUT_col.rgb, rgb2lum );   
 }

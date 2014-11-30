@@ -34,25 +34,26 @@ in vec2 uv5; //TEXCOORD5;
 in vec2 uv6; //TEXCOORD6;
 in vec2 uv7; //TEXCOORD7;
 
+out vec4 OUT_col;
+
 void main()
 {
    vec4 kernel = vec4( 0.175, 0.275, 0.375, 0.475 ) * 0.5f;
+   
+   vec4 OUT_col = vec4(0);
+   OUT_col += texture( diffuseMap, uv0 ) * kernel.x;
+   OUT_col += texture( diffuseMap, uv1 ) * kernel.y;
+   OUT_col += texture( diffuseMap, uv2 ) * kernel.z;
+   OUT_col += texture( diffuseMap, uv3 ) * kernel.w;
 
-   vec4 OUT = vec4(0);
-   OUT += texture( diffuseMap, uv0 ) * kernel.x;
-   OUT += texture( diffuseMap, uv1 ) * kernel.y;
-   OUT += texture( diffuseMap, uv2 ) * kernel.z;
-   OUT += texture( diffuseMap, uv3 ) * kernel.w;
-
-   OUT += texture( diffuseMap, uv4 ) * kernel.x;
-   OUT += texture( diffuseMap, uv5 ) * kernel.y;
-   OUT += texture( diffuseMap, uv6 ) * kernel.z;
-   OUT += texture( diffuseMap, uv7 ) * kernel.w;
+   OUT_col += texture( diffuseMap, uv4 ) * kernel.x;
+   OUT_col += texture( diffuseMap, uv5 ) * kernel.y;
+   OUT_col += texture( diffuseMap, uv6 ) * kernel.z;
+   OUT_col += texture( diffuseMap, uv7 ) * kernel.w;
 
    // Calculate a lumenance value in the alpha so we
    // can use alpha test to save fillrate.
    vec3 rgb2lum = vec3( 0.30, 0.59, 0.11 );
-   OUT.a = dot( OUT.rgb, rgb2lum );
-
-   OUT_FragColor0 = OUT;
+   OUT_col.a = dot( OUT_col.rgb, rgb2lum );
+   
 }

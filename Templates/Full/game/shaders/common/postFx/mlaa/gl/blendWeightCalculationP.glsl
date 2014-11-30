@@ -34,6 +34,8 @@ uniform sampler2D edgesMap;
 uniform sampler2D edgesMapL;
 uniform sampler2D areaMap;
 
+out vec4 OUT_col;
+
 #include "./functions.glsl"
 
 
@@ -77,5 +79,5 @@ void main()
       areas.ba = Area(abs(d), e1, e2);
    }
 
-   OUT_FragColor0 = areas;
+   OUT_col = areas;
 }

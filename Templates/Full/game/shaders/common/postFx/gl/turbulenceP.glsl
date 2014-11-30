@@ -34,6 +34,8 @@ in vec2 uv0;
 
 #define IN_uv0 uv0
 
+out vec4 OUT_col;
+
 void main() 
 {
 	float speed = 2.0;
@@ -46,5 +48,5 @@ void main()
 	y = clamp(y, targetViewport.y, targetViewport.w);
 	x = clamp(x, targetViewport.x, targetViewport.z);
 
-   OUT_FragColor0 = texture (inputTex, vec2(x, y));
+   OUT_col = texture (inputTex, vec2(x, y));
 }

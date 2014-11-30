@@ -34,6 +34,8 @@ uniform vec4    rtParams0;
 in vec2 uv0;
 in vec3 wsEyeRay;
 
+out vec4 OUT_col;
+
 void main()
 {   
    //vec2 prepassCoord = ( uv0.xy * rtParams0.zw ) + rtParams0.xy;   
@@ -46,5 +48,5 @@ void main()
                                    fogData.y, 
                                    fogData.z );
 
-   OUT_FragColor0 = hdrEncode( vec4( fogColor.rgb, 1.0 - saturate( factor ) ) );     
+   OUT_col = hdrEncode( vec4( fogColor.rgb, 1.0 - saturate( factor ) ) );     
 }

@@ -78,6 +78,8 @@ vec4 lmSample( vec3 nrm )
 uniform float alphaFactor;
 uniform float alphaScale;
 
+out vec4 OUT_col;
+
 void main()
 {
    float softBlend = 1;
@@ -100,12 +102,12 @@ void main()
 	   
    vec4 diffuse = texture( diffuseMap, IN_uv0 );
    
-   //OUT_FragColor0 = vec4( lmSample(vec3(0, 0, -1)).rgb, IN_color.a * diffuse.a * softBlend * alphaScale);
+   //OUT_col = vec4( lmSample(vec3(0, 0, -1)).rgb, IN_color.a * diffuse.a * softBlend * alphaScale);
    
    // Scale output color by the alpha factor (turn LerpAlpha into pre-multiplied alpha)
    vec3 colorScale = ( alphaFactor < 0.0 ? IN_color.rgb * diffuse.rgb : vec3( alphaFactor > 0.0 ? IN_color.a * diffuse.a * alphaFactor * softBlend : softBlend ) );
    
-   OUT_FragColor0 = hdrEncode( vec4( IN_color.rgb * diffuse.rgb * colorScale,
+   OUT_col = hdrEncode( vec4( IN_color.rgb * diffuse.rgb * colorScale,
                   IN_color.a * diffuse.a * softBlend * alphaScale ) );
 }
 

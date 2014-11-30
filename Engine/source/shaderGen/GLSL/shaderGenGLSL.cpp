@@ -75,7 +75,7 @@ void ShaderGenPrinterGLSL::printPixelShaderOutputStruct( Stream& stream, const M
     }
 
     WRITESTR(avar("//Fragment shader OUT\r\n"));
-    //WRITESTR(avar("out vec4 OUT_col;\r\n", i)); // @todo OUT_col defined on hlslCompat.glsl
+    WRITESTR(avar("out vec4 OUT_col;\r\n"));
     for( U32 i = 1; i < 4; i++ )
     {
         if( numMRTs & 1 << i )

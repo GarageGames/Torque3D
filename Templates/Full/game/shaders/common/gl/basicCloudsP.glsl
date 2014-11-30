@@ -30,8 +30,10 @@ in vec2 texCoord;
 
 uniform sampler2D diffuseMap        ;
 
+out vec4 OUT_col;
+
 void main()
 {
    vec4 col = texture( diffuseMap, IN_texCoord );
-   OUT_FragColor0 = hdrEncode( col );
+   OUT_col = hdrEncode( col );
 }

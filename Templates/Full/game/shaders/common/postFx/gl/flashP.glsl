@@ -28,10 +28,12 @@ uniform float damageFlash;
 uniform float whiteOut;
 uniform sampler2D backBuffer;
 
+out vec4 OUT_col;
+
 void main()
 {
  vec4 color1 = texture(backBuffer, IN_uv0); 
  vec4 color2 = color1 * MUL_COLOR;
  vec4 damage = mix(color1,color2,damageFlash);
- OUT_FragColor0 = mix(damage,WHITE_COLOR,whiteOut);
+ OUT_col = mix(damage,WHITE_COLOR,whiteOut);
 }

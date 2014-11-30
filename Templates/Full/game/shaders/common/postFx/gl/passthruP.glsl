@@ -25,7 +25,9 @@
 in vec2 uv0;
 uniform sampler2D inputTex ;
 
+out vec4 OUT_col;
+
 void main()
 {
-   OUT_FragColor0 = texture( inputTex, uv0 );   
+   OUT_col = texture( inputTex, uv0 );   
 }

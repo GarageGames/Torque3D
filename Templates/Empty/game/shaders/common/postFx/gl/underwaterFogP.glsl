@@ -51,6 +51,8 @@ uniform vec2    nearFar;
 uniform vec4    rtParams0;
 uniform float     waterDepthGradMax;
 
+out vec4 OUT_col;
+
 void main() 
 {    
    //vec2 prepassCoord = IN_uv0;
@@ -134,5 +136,5 @@ void main()
    
    vec3 outColor = mix( inColor, fogColor.rgb, fogAmt );
    
-   OUT_FragColor0 = vec4( hdrEncode( outColor ), 1 );        
+   OUT_col = vec4( hdrEncode( outColor ), 1 );        
 }

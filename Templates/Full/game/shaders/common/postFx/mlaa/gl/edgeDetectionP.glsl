@@ -39,6 +39,8 @@ uniform float depthThreshold;
 in vec2 texcoord;
 in vec4 offset[2];
 
+out vec4 OUT_col;
+
 void main()
 {
    // Luma calculation requires gamma-corrected colors (texture 'colorMapG').
@@ -70,5 +72,5 @@ void main()
    if (dot(edges, vec4(1.0)) == 0.0)
       discard;
 
-   OUT_FragColor0 = edges;
+   OUT_col = edges;
 }
