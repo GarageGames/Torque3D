@@ -621,6 +621,7 @@ void GFXDrawUtil::drawLine( F32 x1, F32 y1, F32 z1, F32 x2, F32 y2, F32 z2, cons
 
    mDevice->setVertexBuffer( verts );
    mDevice->setStateBlock( mRectFillSB );
+   mDevice->setupGenericShaders();
    mDevice->drawPrimitive( GFXLineList, 0, 1 );
 }
 
